@@ -25,12 +25,26 @@ export interface EventoConsenso {
 export type VoceNelVideo = 'assente' | 'rimovibile' | 'fissa';
 
 export interface RegolaConsenso {
-  /** I mezzi seguono il consenso: conta chi ne ha uno valido. */
+  /** Conta chi ha un consenso valido: chi non ce l'ha resta fuori dalla
+   *  registrazione, e il resto della sala non cambia. */
   registra: boolean;
   /** Il consenso alla registrazione si chiede a chi partecipa. */
   richiesto: boolean;
-  /** Senza consenso, solo ascolto: la voce non si potrebbe togliere dal video. */
+  /** Senza consenso, solo ascolto: la voce non si potrebbe togliere dal video.
+   *  Solo qui i blocchi della sala seguono il consenso. */
   soloAscolto: boolean;
+}
+
+/**
+ * Chi conduce resta sempre nella registrazione, per dichiarazione di chi
+ * organizza. Conta solo dove chi non acconsente puo' restarne fuori: altrove il
+ * valore rimasto su un evento non cambia niente.
+ */
+export function conduceSempreRegistrato(
+  evento: { hostsAlwaysRecorded?: boolean | null },
+  voce: VoceNelVideo,
+): boolean {
+  return !!evento.hostsAlwaysRecorded && voce === 'rimovibile';
 }
 
 export function regolaConsenso(

@@ -29,6 +29,7 @@ import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { limiteTokenOspiti } from '@/lib/room-rate-limit';
 import { readOwnedEventAccess } from '@/lib/event-session';
 import { guestAccessAllowed } from '@/lib/events/guest-window';
+import { conduceSempreRegistrato } from '@/lib/live/consent-rule';
 import { mediaDelToken, regolaConsenso } from '@/lib/live/listen-only';
 import { elencoVisibileAlPubblico } from '@/lib/live/participant-list';
 import { registraChiConduce } from '@/lib/live/entry-consents';
@@ -272,11 +273,14 @@ export const POST = withErrorHandling(async (request, context) => {
     // Il consenso alla registrazione di chi conduce o interviene: facoltativo,
     // con la prova legata alla sua concessione o al suo account. Viaggia con
     // ogni ingresso (la sala lo rimanda, come per gli ospiti). Senza, entra
-    // lo stesso, con le regole di chi non ha acconsentito.
+    // lo stesso, con le regole di chi non ha acconsentito. Non conta dove chi
+    // organizza dichiara chi conduce sempre nella registrazione: nessuna prova,
+    // perche' nessuno ha spuntato niente.
     const registraVideo = registraChiConduce(event, recordingAvailable());
     // Un link e' un posto, non una persona: quello dato da un altro con lo
     // stesso link non si eredita.
-    const consensoConduce = parsed.data.recordingConsent === true;
+    const consensoConduce =
+      conduceSempreRegistrato(event, voceNelVideo()) || parsed.data.recordingConsent === true;
     const mediaConduce = mediaDelToken(event, regola, isSpeaker ? 'relatore' : 'moderatore', consensoConduce);
     const jwt = await generateJitsiJwt({
       roomName: event.jitsiRoomName,
@@ -436,13 +440,11 @@ export const POST = withErrorHandling(async (request, context) => {
       : null;
     // Pubblico anonimo: in sala lo pseudonimo del posto, senza indirizzo ne'
     // foto (niente che porti alla persona). Chi e' in solo ascolto ha
-    // rifiutato la registrazione: in sala con le iniziali, senza la sua foto,
-    // e cosi' chi ha lasciato vuota la casella. Dove la casella non c'e' (l'evento
-    // avvisa soltanto) nessuno ha rifiutato niente.
+    // rifiutato la registrazione: in sala con le iniziali, senza la sua foto.
+    // Chi resta fuori dalla registrazione tiene la sua: non entra nel video.
     const anonimo = event.audienceAnonymous;
     const nomeInSala = anonimo ? await pseudonimo(event.id, `reg-${registration.id}`) : name;
-    const conVolto =
-      !anonimo && !mediaIscritto.listenOnly && !(mediaIscritto.voiceExcluded && regola.richiesto);
+    const conVolto = !anonimo && !mediaIscritto.listenOnly;
     const jwt = await generateJitsiJwt({
       roomName: event.jitsiRoomName,
       displayName: nomeInSala,

@@ -7,10 +7,10 @@ import { mediaDelToken, regolaConsenso } from './listen-only';
 
 /**
  * Il consenso alla registrazione e i mezzi nel token di Jitsi. Non e' mai una
- * condizione per entrare: in un evento che registra ogni token blocca tutto e
- * lo dice (consentLock), chi acconsente e' ammesso per cio' che l'evento
- * concede, chi no parla con la voce tolta dal video, oppure, dove la voce non
- * si puo' togliere, resta in solo ascolto.
+ * condizione per entrare, e un consenso negato tocca solo chi lo nega: quella
+ * persona ha i limiti di tutti e resta fuori dalla registrazione. Solo dove la
+ * voce non si puo' togliere il pubblico resta in solo ascolto, e ogni token
+ * blocca tutto e lo dice (consentLock).
  */
 const evento = {
   eventType: 'SCHEDULED',
@@ -72,51 +72,51 @@ describe('regolaConsenso', () => {
 
 describe('mediaDelToken', () => {
   const regola = regolaConsenso(evento, true, 'rimovibile');
-  const base = { mediaLock: TUTTO, consentLock: true };
+  const limiti = { audio: false, video: true, desktop: true };
 
-  it('con il consenso, cio\' che l\'evento concede', () => {
-    expect(mediaDelToken(evento, regola, 'moderatore', true)).toEqual(base);
-    expect(mediaDelToken(evento, regola, 'relatore', true)).toEqual({ ...base, mediaExempt: true });
-    expect(mediaDelToken(evento, regola, 'partecipante', true)).toEqual({
-      ...base,
-      mediaAdmit: { audio: true, video: false, desktop: false },
-    });
+  it('con il consenso, i limiti dell\'evento', () => {
+    expect(mediaDelToken(evento, regola, 'moderatore', true)).toEqual({ mediaLock: limiti });
+    expect(mediaDelToken(evento, regola, 'relatore', true)).toEqual({ mediaLock: limiti, mediaExempt: true });
+    expect(mediaDelToken(evento, regola, 'partecipante', true)).toEqual({ mediaLock: limiti });
   });
 
-  it('senza il consenso si parla con la voce tolta dal video, chiunque sia', () => {
-    expect(mediaDelToken(evento, regola, 'moderatore', false)).toEqual({ ...base, voiceExcluded: true });
-    expect(mediaDelToken(evento, regola, 'relatore', false)).toEqual({
-      ...base,
-      mediaExempt: true,
-      voiceExcluded: true,
-    });
-    expect(mediaDelToken(evento, regola, 'partecipante', false)).toEqual({
-      ...base,
-      voiceExcluded: true,
-      mediaAdmit: { audio: true, video: false, desktop: false },
-    });
+  it('senza il consenso cambia solo il segno per la registrazione, chiunque sia', () => {
+    for (const chi of ['moderatore', 'relatore', 'partecipante'] as const) {
+      expect(mediaDelToken(evento, regola, chi, false)).toEqual({
+        ...mediaDelToken(evento, regola, chi, true),
+        voiceExcluded: true,
+      });
+    }
   });
 
-  it('videocamera e schermo restano chiusi anche se l\'evento li concede', () => {
-    const aperto = { ...evento, participantsCanStartVideo: true, participantsCanShareScreen: true };
-    const media = mediaDelToken(aperto, regolaConsenso(aperto, true, 'rimovibile'), 'partecipante', false);
-    expect(media.mediaAdmit).toEqual({ audio: true, video: false, desktop: false });
+  it('un consenso negato non tocca i blocchi della sala', () => {
+    const aperto = {
+      ...evento,
+      participantsCanStartVideo: true,
+      participantsCanShareScreen: true,
+    };
+    const r = regolaConsenso(aperto, true, 'rimovibile');
+    const media = mediaDelToken(aperto, r, 'partecipante', false);
+    expect(media.mediaLock).toEqual({ audio: false, video: false, desktop: false });
+    expect(media.consentLock).toBeUndefined();
+    expect(media.mediaAdmit).toBeUndefined();
   });
 
   it('dove la voce non si puo\' togliere il pubblico resta in solo ascolto, chi conduce no', () => {
     const r = regolaConsenso(evento, true, 'fissa');
+    const base = { mediaLock: TUTTO, consentLock: true };
     expect(mediaDelToken(evento, r, 'partecipante', false)).toEqual({ ...base, listenOnly: true });
+    expect(mediaDelToken(evento, r, 'partecipante', true)).toEqual({
+      ...base,
+      mediaAdmit: { audio: true, video: false, desktop: false },
+    });
     expect(mediaDelToken(evento, r, 'moderatore', false)).toEqual(base);
+    expect(mediaDelToken(evento, r, 'relatore', false)).toEqual({ ...base, mediaExempt: true });
   });
 
   it('senza registrazione restano i limiti dell\'evento', () => {
     const r = regolaConsenso(evento, false, 'rimovibile');
-    expect(mediaDelToken(evento, r, 'partecipante', false)).toEqual({
-      mediaLock: { audio: false, video: true, desktop: true },
-    });
-    expect(mediaDelToken(evento, r, 'relatore', false)).toEqual({
-      mediaLock: { audio: false, video: true, desktop: true },
-      mediaExempt: true,
-    });
+    expect(mediaDelToken(evento, r, 'partecipante', false)).toEqual({ mediaLock: limiti });
+    expect(mediaDelToken(evento, r, 'relatore', false)).toEqual({ mediaLock: limiti, mediaExempt: true });
   });
 });

@@ -545,8 +545,7 @@
       "listenOnlyBadge": "nur zuhören",
       "listenOnlyNoFloor": "Hat nicht in die Aufzeichnung eingewilligt: kann erst sprechen, wenn die Einwilligung im eigenen Raum erteilt wird.",
       "voiceExcludedBadge": "ohne Aufzeichnung",
-      "voiceExcludedFloor": "Keine Einwilligung zur Aufzeichnung: Die Person kann sprechen, ihre Stimme wird aber nicht aufgezeichnet.",
-      "locksByConsentVoice": "Kameras und Bildschirme folgen der Einwilligung zur Aufzeichnung: Wer sie nicht gegeben hat, kann sprechen, ohne aufgezeichnet zu werden, aber Kamera und Bildschirm bleiben aus. Die Sperren des Raums bleiben aktiv."
+      "voiceExcludedFloor": "Hat nicht in die Aufzeichnung eingewilligt: kann sprechen, bleibt aber außerhalb der Aufzeichnung."
     },
     "moderator": {
       "muteAll": "Alle stummschalten",
@@ -688,13 +687,13 @@
         "without": {
           "soloAscolto": "Ohne diese Einwilligung hören Sie nur zu: Mikrofon, Kamera und Bildschirm bleiben geschlossen.",
           "conduce": "Ohne diese Einwilligung moderieren Sie trotzdem, aber Ihre Stimme bleibt weder in den Einzelspuren noch im Transkript.",
-          "voce": "Ohne diese Einwilligung nehmen Sie teil und können sprechen, aber Ihre Stimme wird nicht aufgezeichnet; Kamera und Bildschirm bleiben aus."
+          "voce": "Ohne diese Einwilligung nehmen Sie wie alle teil, bleiben aber außerhalb der Aufzeichnung: kein Name, keine Stimme, kein Bild."
         },
         "alreadyRecorded": "Bereits Aufgezeichnetes bleibt im Video der Veranstaltung: Wenden Sie sich für die Entfernung an die Organisatoren.",
         "withdraw": {
           "soloAscolto": "Wenn Sie sie widerrufen, bleiben Sie im Raum und hören nur zu: Mikrofon, Kamera und Bildschirm werden geschlossen. Auch Ihre Einwilligung in die Transkription Ihrer Beiträge wird widerrufen.",
           "conduce": "Wenn Sie sie widerrufen, moderieren Sie weiter, aber ab jetzt bleibt Ihre Stimme weder in den Einzelspuren noch im Transkript. Das Video des Raums zeigt Sie, falls es aufgezeichnet wird, trotzdem.",
-          "voce": "Wenn Sie sie widerrufen, bleiben Sie im Raum und können sprechen: Ab jetzt wird Ihre Stimme nicht aufgezeichnet, Kamera und Bildschirm werden ausgeschaltet. Sie widerrufen auch die Einwilligung zur Transkription Ihrer Beiträge."
+          "voce": "Wenn Sie sie widerrufen, bleiben Sie wie bisher im Raum und sind ab jetzt nicht mehr in der Aufzeichnung. Sie widerrufen auch die Einwilligung zur Transkription Ihrer Beiträge."
         }
       },
       "transcription": {
@@ -708,7 +707,7 @@
     "voiceExcluded": {
       "title": "Sie nehmen ohne Aufzeichnung teil.",
       "consent": "Ich stimme der Aufzeichnung zu",
-      "body": "Sie haben der Aufzeichnung nicht zugestimmt: Sie können über das Mikrofon sprechen, aber Ihre Stimme wird nicht aufgezeichnet. Kamera und Bildschirm bleiben aus."
+      "body": "Sie haben nicht in die Aufzeichnung eingewilligt: Sie nehmen wie alle teil, aber Ihr Name, Ihre Stimme und Ihr Bild gelangen nicht in die Aufzeichnung."
     }
   },
   "qa": {
@@ -1034,7 +1033,9 @@
         "participantListAnonymous": "Bei anonymem Publikum bleibt die Liste verborgen.",
         "participantListLocked": "Bei geöffnetem Raum nicht änderbar: Wer schon im Raum ist, sähe die Änderung nicht.",
         "participantListCameraNote": "Bei verborgener Liste sehen Personen, die ihre Kamera einschalten, ihr eigenes Bild nicht. Für ein Treffen, bei dem sich alle sehen, zeigen Sie die Liste.",
-        "recordingLockedLive": "Bei geöffnetem Raum ist die Aufzeichnung nicht änderbar: Sie gilt ab dem ersten Eintritt."
+        "recordingLockedLive": "Bei geöffnetem Raum ist die Aufzeichnung nicht änderbar: Sie gilt ab dem ersten Eintritt.",
+        "hostsAlwaysRecorded": "Moderierende und Vortragende sind immer in der Aufzeichnung",
+        "hostsAlwaysRecordedDesc": "Aus: Moderierende und Vortragende entscheiden wie alle. Nur einschalten, wenn sie der Aufnahme bereits zugestimmt haben: Sie sehen das Kästchen nicht, und der Hinweis zur Veranstaltung muss das sagen."
       },
       "step3": {
         "heading": "Personen und Einladungen",
@@ -1336,7 +1337,8 @@
         "participantListShown": "Teilnehmerliste: für alle sichtbar.",
         "participantListHidden": "Teilnehmerliste: nur für Moderierende und Vortragende.",
         "consentRecordingOptional": "Aufzeichnung, freiwillig",
-        "consentRecordingVoice": "Aufzeichnung, freiwillig (ohne sie wird die Stimme nicht aufgezeichnet)"
+        "consentRecordingVoice": "Aufzeichnung, freiwillig (ohne Einwilligung bleibt die Person außerhalb der Aufzeichnung)",
+        "consentsHostsAlways": "Moderierende und Vortragende sind immer in der Aufzeichnung: Sie sehen das Kästchen nicht."
       },
       "preview": {
         "title": "Seitenvorschau",
@@ -1394,7 +1396,36 @@
         "toggleOffWarningCreate": "Ausgeschaltet erscheint das Programm ({count, plural, one {# Thema} other {# Themen}}) nicht auf der Seite und wird nicht mit der Veranstaltung gespeichert: Zum Behalten einschalten.",
         "reviewOffCreate": "Programm: aus, wird nicht mit der Veranstaltung gespeichert ({count, plural, one {# Thema} other {# Themen}})"
       },
-      "saveCopy": "Kopie speichern"
+      "saveCopy": "Kopie speichern",
+      "consentMap": {
+        "show": "Zeigen, was mit den Einwilligungen passiert",
+        "hide": "Diagramm ausblenden",
+        "title": "Einwilligungen zur Aufzeichnung in dieser Veranstaltung",
+        "person": "Wer eintritt",
+        "question": "Hat in die Aufzeichnung eingewilligt?",
+        "yes": "Ja",
+        "no": "Nein",
+        "room": "Im Raum",
+        "recording": "In der Aufzeichnung",
+        "roomSame": "Nimmt nach den Regeln der Veranstaltung teil.",
+        "roomListenOnly": "Nur Zuhören und Chat.",
+        "recordedFull": "Name, Stimme, Bild und geteilter Bildschirm.",
+        "notRecorded": "Kommt nicht vor: kein Name, keine Stimme, kein Bild, kein geteilter Bildschirm.",
+        "recordedVoice": "Die Stimme, auf einer separaten Spur.",
+        "notRecordedVoice": "Die Stimme wird nicht aufgezeichnet.",
+        "othersSame": "Die anderen bleiben gleich: Mikrofonsperren, Wortvergabe und Videodarstellung entsprechen der Veranstaltung.",
+        "audienceNotice": "Das Publikum hat weder Mikrofon noch Kamera noch Bildschirm und erhält nur einen Hinweis. Wer das Wort bekommt, kann im Raum einwilligen; sonst bleibt die Person außerhalb der Aufzeichnung.",
+        "hostsChoose": "Moderierende und Vortragende entscheiden wie alle: Wer nicht einwilligt, moderiert normal, bleibt aber außerhalb der Aufzeichnung.",
+        "hostsAlways": "Moderierende und Vortragende sind immer in der Aufzeichnung: Sie sehen das Kästchen nicht.",
+        "hostsFixed": "Moderierende und Vortragende leiten in jedem Fall, und das Video zeigt sie.",
+        "trace": "Wer während der Aufzeichnung spricht: Ein Hinweis neben dem Video nennt einen fehlenden Beitrag, und das Transkript zeigt *** mit der Uhrzeit.",
+        "anytime": "Die Einwilligung wird im Raum jederzeit erteilt und widerrufen.",
+        "transcription": "Die Transkription der eigenen Beiträge ist eine getrennte, freiwillige Einwilligung.",
+        "fixedVoice": "Diese Installation kann keine Stimme aus dem Video entfernen: Wer nicht einwilligt, bleibt beim Zuhören, und die Sperren im Raum folgen der Einwilligung.",
+        "fixedNotice": "Diese Installation kann keine Stimme aus dem Video entfernen: Wer das Wort erhält, kommt in die Aufzeichnung, und der Hinweis sagt es.",
+        "questionTranscription": "Liegt die Einwilligung in die Transkription vor?",
+        "fixedNotRecorded": "Keine Stimme und kein Bild; der Name kann im Video erscheinen."
+      }
     },
     "nav": {
       "events": "Veranstaltungen",
@@ -4354,9 +4385,10 @@
       "stayInTouchHelp": "Freiwillige Einwilligung (Art. 6.1.a DSGVO). Sie können sie jederzeit über den Link „Aus dem Adressbuch entfernen“ in den E-Mails widerrufen, die Sie erhalten. Name und Organisation sind die dieser Anmeldung.",
       "recordingOptionalListenOnly": "Ohne Einwilligung nehmen Sie trotzdem teil, nur zuhörend: Sie verfolgen das Event und schreiben im Chat, aber Mikrofon, Kamera und Bildschirmfreigabe bleiben aus. Sie können später im Raum einwilligen.",
       "recordingOptionalHost": "Ohne Einwilligung treten Sie trotzdem ein und moderieren wie gewohnt, aber Ihre Stimme bleibt weder in den Einzelspuren noch im Transkript erhalten. Das Video des Raums zeigt Sie, falls aufgezeichnet, trotzdem.",
-      "recordingOptionalVoice": "Wenn Sie nicht zustimmen, nehmen Sie trotzdem teil und können sprechen, aber Ihre Stimme wird nicht aufgezeichnet; Kamera und Bildschirmfreigabe bleiben aus. Sie können später im Raum zustimmen.",
+      "recordingOptionalVoice": "Ohne Einwilligung nehmen Sie trotzdem teil und können sprechen, bleiben aber außerhalb der Aufzeichnung: kein Name, keine Stimme, kein Bild. Sie können später im Raum einwilligen.",
       "recordingNotice": "Die Veranstaltung wird aufgezeichnet (Ton und Bild). Sie nehmen ohne Mikrofon und Kamera teil: Die Aufzeichnung enthält weder Ihre Stimme noch Ihr Bild, es sei denn, die Moderation erteilt Ihnen das Wort.",
-      "recordingNoticeVoice": "Die Veranstaltung wird aufgezeichnet (Ton und Bild). Sie nehmen ohne Mikrofon und Kamera teil: Die Aufzeichnung enthält weder Ihre Stimme noch Ihr Bild, es sei denn, Sie stimmen im Raum zu."
+      "recordingNoticeVoice": "Die Veranstaltung wird aufgezeichnet (Audio und Video). Sie nehmen ohne Mikrofon und Kamera teil: Die Aufzeichnung enthält weder Ihren Namen noch Ihre Stimme noch Ihr Bild, außer Sie willigen im Raum ein.",
+      "recordingHostAlways": "Sie leiten diese Veranstaltung: Sie sind immer in der Aufzeichnung, mit Name, Stimme, Bild und geteiltem Bildschirm."
     },
     "export": {
       "title": "Meine Daten",
@@ -5269,7 +5301,7 @@
     "aiNotice": "Nach dem Ende wird die Aufzeichnung von KI-Werkzeugen verarbeitet, um Transkript, Zusammenfassung sowie eventuelle Übersetzungen und Synchronisationen zu erstellen. Die Ergebnisse können Ungenauigkeiten enthalten; maßgeblich bleibt das Video.",
     "multitrackConsentTitle": "Transkript Ihrer Beiträge",
     "recordingConsentTitle": "Aufzeichnung der Veranstaltung",
-    "recordingConsentIntro": "Diese Veranstaltung wird aufgezeichnet (Ton und Bild). Wenn Sie sich zu Wort melden, enthält die Aufzeichnung Ihre Stimme, Ihr Bild und alles, was Sie auf dem Bildschirm teilen.",
+    "recordingConsentIntro": "Die Veranstaltung wird aufgezeichnet (Audio und Video). Mit Ihrer Einwilligung enthält die Aufzeichnung Ihren Namen, Ihre Stimme, Ihr Bild und das, was Sie auf dem Bildschirm teilen.",
     "enterGardenTitle": "Den Platz betreten",
     "enterGardenHint": "Ein anderer Ort zum Warten: herumgehen, die anderen Wartenden treffen und durch das Tor in die Live-Veranstaltung gehen, sobald der Raum öffnet.",
     "backToWaitingRoom": "Zurück zum Warteraum",

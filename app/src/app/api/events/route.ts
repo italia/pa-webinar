@@ -217,6 +217,7 @@ export const POST = withErrorHandling(async (request) => {
       participantListVisible:
         data.participantListVisible ??
         elencoPredefinito({ ...effectiveToggles, maxParticipants: data.maxParticipants }),
+      ...(data.hostsAlwaysRecorded !== undefined && { hostsAlwaysRecorded: data.hostsAlwaysRecorded }),
       ...(data.wordCloudEnabled !== undefined && {
         wordCloudEnabled: data.wordCloudEnabled,
       }),

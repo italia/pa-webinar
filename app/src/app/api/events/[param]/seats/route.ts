@@ -152,7 +152,7 @@ export const GET = withErrorHandling(async (request, context) => {
   }
   // Chi e' in solo ascolto (dichiarato dal suo browser con il token che lo
   // dice): chi modera non gli da' una parola che il bridge non apre.
-  // Chi non ha un consenso valido puo' parlare, senza videocamera e schermo.
+  // Chi non ha un consenso valido partecipa come tutti, e non viene registrato.
   const [listenOnly, voiceExcluded] = await Promise.all([
     leggiSoloAscolto(event.id),
     endpointSenzaRegistrazione(event.id),

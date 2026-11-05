@@ -9,9 +9,8 @@ import { Icon } from '@/components/ui/icon';
 
 /**
  * Chi e' entrato senza consenso alla registrazione lo sa, anche se ha soltanto
- * dimenticato la casella: puo' intervenire con il microfono ma non viene
- * registrato, e videocamera e schermo restano chiusi. Acconsentire qui lo fa
- * rientrare nella conferenza con cio' che l'evento concede (un token nuovo).
+ * dimenticato la casella: in sala partecipa come tutti, e nella registrazione
+ * non c'e'. Acconsentire qui lo fa rientrare nella conferenza con un token nuovo.
  */
 export default function VoiceExcludedNotice({
   testoConsenso,

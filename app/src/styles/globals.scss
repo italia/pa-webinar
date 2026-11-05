@@ -15077,3 +15077,185 @@ button.back-to-top {
   color: var(--app-muted);
   line-height: 1.4;
 }
+
+// Il diagramma dei consensi, nell'evento: chi entra si divide in due rami.
+.mappa-consensi {
+  --mappa-linea: #8a9aa8;
+  --mappa-distanza: 1.25rem;
+  padding: 0.5rem 0;
+  border-top: 1px solid #e8e8e8;
+}
+
+.mappa-consensi__apri {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+}
+
+.mappa-consensi__figura {
+  margin-top: 0.75rem;
+  padding: 1rem;
+  border: 1px solid #d9dde1;
+  border-radius: 0.25rem;
+  background: #fff;
+}
+
+.mappa-consensi__titolo {
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.mappa-consensi__albero {
+  display: grid;
+  grid-template-columns: minmax(8rem, 11rem) minmax(0, 1fr);
+  align-items: center;
+  column-gap: var(--mappa-distanza);
+}
+
+.mappa-consensi__radice {
+  position: relative;
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  border-radius: 0.25rem;
+  background: #eef3f8;
+  color: var(--app-text);
+  font-size: 0.85rem;
+  line-height: 1.35;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: calc(var(--mappa-distanza) * -1);
+    width: var(--mappa-distanza);
+    border-top: 2px solid var(--mappa-linea);
+  }
+}
+
+.mappa-consensi__rami {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0 0 0 var(--mappa-distanza);
+  list-style: none;
+}
+
+.mappa-consensi__ramo {
+  position: relative;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid #d9dde1;
+  border-left-width: 4px;
+  border-radius: 0.25rem;
+  font-size: 0.85rem;
+  line-height: 1.35;
+
+  &.is-si {
+    border-left-color: #008758;
+  }
+
+  &.is-no {
+    border-left-color: #995c00;
+  }
+
+  // Il tratto verso il ramo, e la verticale che unisce i due.
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: calc(var(--mappa-distanza) * -1 - 1px);
+    width: var(--mappa-distanza);
+    border-top: 2px solid var(--mappa-linea);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: calc(var(--mappa-distanza) * -1 - 1px);
+    border-left: 2px solid var(--mappa-linea);
+  }
+
+  &:first-child::after {
+    top: 50%;
+    bottom: -0.875rem;
+  }
+
+  &:last-child::after {
+    top: -0.875rem;
+    bottom: 50%;
+  }
+}
+
+.mappa-consensi__esito {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.mappa-consensi__ramo.is-si .mappa-consensi__esito .icon {
+  fill: #008758;
+}
+
+.mappa-consensi__ramo.is-no .mappa-consensi__esito .icon {
+  fill: #995c00;
+}
+
+.mappa-consensi__effetti {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+
+  dt,
+  dd {
+    font-size: 0.85rem;
+  }
+
+  dt {
+    font-weight: 600;
+    color: var(--app-muted);
+  }
+
+  dd {
+    margin: 0;
+    color: var(--app-text);
+  }
+}
+
+.mappa-consensi__note {
+  margin: 0.75rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--app-text);
+
+  li + li {
+    margin-top: 0.25rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .mappa-consensi__albero {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0.75rem;
+  }
+
+  .mappa-consensi__radice::after,
+  .mappa-consensi__ramo::before,
+  .mappa-consensi__ramo::after {
+    display: none;
+  }
+
+  .mappa-consensi__rami {
+    padding-left: 0;
+  }
+
+  .mappa-consensi__effetti {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.375rem;
+  }
+}

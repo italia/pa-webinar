@@ -280,6 +280,9 @@ model Event {
   // vedono sempre. Conta il valore letto da lib/live/participant-list, non la
   // colonna.
   participantListVisible Boolean @default(false) @map("participant_list_visible")
+  /// Chi organizza dichiara che moderatori e relatori sono sempre nella
+  /// registrazione: non vedono la casella. Spento, scelgono come tutti.
+  hostsAlwaysRecorded Boolean @default(false) @map("hosts_always_recorded")
 
   // Qualcuno ha parlato senza consenso alla registrazione: la sua voce non c'e',
   // e la pagina dell'evento lo dice accanto al video.

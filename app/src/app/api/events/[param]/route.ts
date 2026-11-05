@@ -141,6 +141,7 @@ export const GET = withErrorHandling(async (request, context) => {
       recordingConsentText: event.recordingConsentText,
       audienceAnonymous: event.audienceAnonymous,
       participantListVisible: event.participantListVisible,
+      hostsAlwaysRecorded: event.hostsAlwaysRecorded,
       // Al co-moderatore torna il SUO token (valido su tutte le route che
       // già lo ammettono), mai quello del primario.
       moderatorToken: isPrimaryModerator ? event.moderatorToken : token,
@@ -251,6 +252,15 @@ export const PUT = withErrorHandling(async (request, context) => {
     await soloStaffDellEvento(eventId, 'Only the event staff can change who can take part');
   }
 
+  // Tenere chi conduce nella registrazione e' una dichiarazione di chi organizza
+  // e toglie agli altri la scelta: un link di conduzione non la cambia.
+  if (
+    data.hostsAlwaysRecorded !== undefined &&
+    data.hostsAlwaysRecorded !== event.hostsAlwaysRecorded
+  ) {
+    await soloStaffDellEvento(eventId, 'Only the event staff can change who is always recorded');
+  }
+
   // Le etichette le manda il wizard a ogni salvataggio, l'elenco intero: si
   // scrivono solo se sono cambiate, e le cambia lo staff che gestisce
   // l'evento, come chi partecipa (un link di conduzione no). Una modifica
@@ -321,10 +331,13 @@ export const PUT = withErrorHandling(async (request, context) => {
   // pseudonimi ai nomi (stesso posto, stesso colore in chat).
   // L'elenco dei partecipanti vale da quando la sala si monta: a sala aperta
   // cambierebbe solo per chi entra dopo.
+  // Anche chi conduce sempre nella registrazione: a sala aperta chi ha gia' detto
+  // no ci entrerebbe al primo rientro, e chi ha letto l'avviso ne uscirebbe.
   const CAMPI_DELLA_SALA = [
     'recordingEnabled',
     'audienceAnonymous',
     'participantListVisible',
+    'hostsAlwaysRecorded',
   ] as const;
   const cambiaRegime = CAMPI_DELLA_SALA.some(
     (campo) => data[campo] !== undefined && data[campo] !== event[campo],
@@ -597,6 +610,7 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.recordingConsentText !== undefined && { recordingConsentText: data.recordingConsentText }),
       ...(data.audienceAnonymous !== undefined && { audienceAnonymous: data.audienceAnonymous }),
       ...(data.participantListVisible !== undefined && { participantListVisible: data.participantListVisible }),
+      ...(data.hostsAlwaysRecorded !== undefined && { hostsAlwaysRecorded: data.hostsAlwaysRecorded }),
       ...(data.recordingPublished !== undefined && {
         recordingPublished: data.recordingPublished,
         ...(data.recordingPublished ? { recordingPublishedAt: new Date() } : { recordingPublishedAt: null }),

@@ -106,8 +106,8 @@ interface JitsiTokenPayload {
   mediaAdmit?: MediaLock;
   /** In solo ascolto: senza consenso alla registrazione, mai ammesso. */
   listenOnly?: boolean;
-  /** Senza un consenso valido alla registrazione: si puo' parlare, la voce si
-   *  toglie dal video, videocamera e schermo restano chiusi. */
+  /** Senza un consenso valido alla registrazione: in sala come tutti, fuori
+   *  dalla registrazione. mod_pa_media_lock lo scrive nella presenza. */
   voiceExcluded?: boolean;
   /** Evento con il solo ascolto: la sala non toglie i blocchi. */
   consentLock?: boolean;

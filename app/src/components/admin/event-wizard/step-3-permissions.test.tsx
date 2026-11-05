@@ -7,6 +7,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import messages from '@/i18n/messages/it.json';
+import type { VoceNelVideo } from '@/lib/live/consent-rule';
 
 import StepPermissions, { type StepPermissionsValue } from './step-3-permissions';
 
@@ -38,7 +39,12 @@ afterEach(() => {
   container.remove();
 });
 
-function render(recordingEnabled: boolean, recordingAvailable: boolean) {
+function render(
+  recordingEnabled: boolean,
+  recordingAvailable: boolean,
+  voceNelVideo?: VoceNelVideo,
+  istantanea = false,
+) {
   const value = {
     recordingEnabled,
     permissionMatrix: {},
@@ -52,11 +58,43 @@ function render(recordingEnabled: boolean, recordingAvailable: boolean) {
           onChange={vi.fn()}
           whiteboardInfraReady={false}
           recordingAvailable={recordingAvailable}
+          voceNelVideo={voceNelVideo}
+          istantanea={istantanea}
         />
       </NextIntlClientProvider>
     );
   });
 }
+
+describe('i consensi nelle impostazioni avanzate', () => {
+  const opzione = () =>
+    container.querySelector(`[aria-label="${messages.admin.wizard.step2.hostsAlwaysRecorded}"]`);
+  const diagramma = () => container.querySelector('.mappa-consensi');
+
+  it('con la registrazione accesa propone l opzione per chi conduce e il diagramma', () => {
+    render(true, true, 'rimovibile');
+    expect(opzione()).not.toBeNull();
+    expect(diagramma()).not.toBeNull();
+  });
+
+  it('l opzione vale solo dove una voce si puo togliere dal video', () => {
+    render(true, true, 'fissa');
+    expect(opzione()).toBeNull();
+    expect(diagramma()).not.toBeNull();
+  });
+
+  it('una chiamata rapida non chiede consensi', () => {
+    render(true, true, 'rimovibile', true);
+    expect(opzione()).toBeNull();
+    expect(diagramma()).toBeNull();
+  });
+
+  it('senza registrazione non propone niente', () => {
+    render(false, true, 'rimovibile');
+    expect(opzione()).toBeNull();
+    expect(diagramma()).toBeNull();
+  });
+});
 
 describe('registrazione nelle impostazioni avanzate', () => {
   const interruttore = () =>

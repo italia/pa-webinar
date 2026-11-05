@@ -545,8 +545,7 @@
       "listenOnlyBadge": "ainult kuulab",
       "listenOnlyNoFloor": "Ei ole salvestamiseks nõusolekut andnud: ei saa sõna võtta enne, kui annab selle oma ruumis.",
       "voiceExcludedBadge": "salvestuseta",
-      "voiceExcludedFloor": "Salvestamiseks pole nõusolekut antud: võib rääkida, kuid häält ei salvestata.",
-      "locksByConsentVoice": "Kaamerad ja ekraanid järgivad salvestamise nõusolekut: kes pole seda andnud, saab rääkida ilma, et teda salvestataks, kuid kaamerat ja ekraani kasutada ei saa. Ruumi lukud jäävad sisse."
+      "voiceExcludedFloor": "Pole salvestamisega nõustunud: võib sõna võtta, kuid jääb salvestusest välja."
     },
     "moderator": {
       "muteAll": "Vaigista kõik",
@@ -688,13 +687,13 @@
         "without": {
           "soloAscolto": "Ilma selle nõusolekuta oled ainult kuulaja: mikrofon, kaamera ja ekraan jäävad suletuks.",
           "conduce": "Ilma selle nõusolekuta juhid ikka, kuid su hääl ei jää isikupõhistele radadele ega transkriptsiooni.",
-          "voce": "Selle nõusolekuta osalete ja saate rääkida, kuid teie häält ei salvestata; kaamera ja ekraan jäävad välja."
+          "voce": "Ilma selle nõusolekuta osaled nagu kõik, kuid jääd salvestusest välja: ei nime, häält ega pilti."
         },
         "alreadyRecorded": "Juba salvestatu jääb ürituse videosse: eemaldamiseks kirjuta korraldajatele.",
         "withdraw": {
           "soloAscolto": "Kui võtad selle tagasi, jääd ruumi ainult kuulajana: mikrofon, kaamera ja ekraan suletakse. Võtad tagasi ka nõusoleku oma sõnavõttude transkribeerimiseks.",
           "conduce": "Kui võtad selle tagasi, juhid edasi, kuid nüüdsest su hääl ei jää isikupõhistele radadele ega transkriptsiooni. Ruumi video näitab sind siiski, kui seda salvestatakse.",
-          "voce": "Kui selle tagasi võtate, jääte ruumi ja saate rääkida: nüüdsest teie häält ei salvestata ning kaamera ja ekraan lülituvad välja. Võtate tagasi ka nõusoleku oma sõnavõttude transkribeerimiseks."
+          "voce": "Kui selle tagasi võtad, jääd ruumi nagu enne ja oled nüüdsest salvestusest väljas. Võtad tagasi ka nõusoleku oma sõnavõttude transkribeerimiseks."
         }
       },
       "transcription": {
@@ -708,7 +707,7 @@
     "voiceExcluded": {
       "title": "Osalete ilma salvestuseta.",
       "consent": "Annan nõusoleku salvestamiseks",
-      "body": "Te pole salvestamiseks nõusolekut andnud: saate mikrofoniga rääkida, kuid teie häält ei salvestata. Kaamera ja ekraan jäävad välja."
+      "body": "Sa pole salvestamisega nõustunud: osaled nagu kõik, kuid sinu nimi, hääl ja pilt ei satu salvestusse."
     }
   },
   "qa": {
@@ -1034,7 +1033,9 @@
         "participantListAnonymous": "Anonüümse publiku korral jääb loend peidetuks.",
         "participantListLocked": "Avatud ruumiga seda muuta ei saa: juba sees olijad muudatust ei näeks.",
         "participantListCameraNote": "Peidetud loendi korral ei näe kaamera sisselülitaja oma pilti. Kohtumiseks, kus kõik üksteist näevad, näita loendit.",
-        "recordingLockedLive": "Avatud ruumiga salvestamist muuta ei saa: see kehtib esimesest sisenemisest."
+        "recordingLockedLive": "Avatud ruumiga salvestamist muuta ei saa: see kehtib esimesest sisenemisest.",
+        "hostsAlwaysRecorded": "Juhtijad on alati salvestuses",
+        "hostsAlwaysRecordedDesc": "Väljas valivad moderaatorid ja esinejad nagu kõik. Lülita sisse ainult siis, kui nad on juba nõustunud filmimisega: nad ei näe lahtrit ja ürituse teavitus peab seda ütlema."
       },
       "step3": {
         "heading": "Inimesed ja kutsed",
@@ -1336,7 +1337,8 @@
         "participantListShown": "Osalejate loend: nähtav kõigile.",
         "participantListHidden": "Osalejate loend: ainult juhtidele ja esinejatele.",
         "consentRecordingOptional": "salvestamine, vabatahtlik",
-        "consentRecordingVoice": "salvestamine, vabatahtlik (ilma selleta häält ei salvestata)"
+        "consentRecordingVoice": "salvestus, vabatahtlik (ilma nõusolekuta jääb isik salvestusest välja)",
+        "consentsHostsAlways": "Juhtijad ja esinejad on alati salvestuses: nad ei näe lahtrit."
       },
       "preview": {
         "title": "Lehe eelvaade",
@@ -1394,7 +1396,36 @@
         "toggleOffWarningCreate": "Väljas olles kava ({count, plural, one {# teema} other {# teemat}}) lehel ei kuvata ega üritusega koos salvestata: lülita see sisse, et seda alles hoida.",
         "reviewOffCreate": "Kava: väljas, üritusega koos ei salvestata ({count, plural, one {# teema} other {# teemat}})"
       },
-      "saveCopy": "Salvesta koopia"
+      "saveCopy": "Salvesta koopia",
+      "consentMap": {
+        "show": "Näita, mis nõusolekutega juhtub",
+        "hide": "Peida skeem",
+        "title": "Salvestamise nõusolekud selles üritusel",
+        "person": "Kes siseneb",
+        "question": "Kas on salvestamisega nõustunud?",
+        "yes": "Jah",
+        "no": "Ei",
+        "room": "Ruumis",
+        "recording": "Salvestuses",
+        "roomSame": "Osaleb ürituse reeglite järgi.",
+        "roomListenOnly": "Ainult kuulamine ja vestlus.",
+        "recordedFull": "Nimi, hääl, pilt ja jagatud ekraan.",
+        "notRecorded": "Ei esine: ei nime, häält, pilti ega jagatud ekraani.",
+        "recordedVoice": "Tema hääl eraldi helirajal.",
+        "notRecordedVoice": "Tema häält ei salvestata.",
+        "othersSame": "Teised ei muutu: mikrofonilukud, sõna andmine ja video kuvamine jäävad ürituse omaks.",
+        "audienceNotice": "Osalejatel pole mikrofoni, kaamerat ega ekraani: nad saavad ainult teavituse. Kui neile antakse sõna, võivad nad ruumis nõustuda; kui ei, jäävad nad salvestusest välja.",
+        "hostsChoose": "Moderaatorid ja esinejad valivad nagu kõik: nõustumata juhivad nad tavapäraselt, kuid jäävad salvestusest välja.",
+        "hostsAlways": "Moderaatorid ja esinejad on alati salvestuses: nad ei näe lahtrit.",
+        "hostsFixed": "Moderaatorid ja esinejad juhivad igal juhul ning video võtab nad üles.",
+        "trace": "Kui ta salvestuse ajal sõna võtab, märgib video kõrval olev märkus puuduvat sõnavõttu ning transkriptsioonis on *** koos kellaajaga.",
+        "anytime": "Nõusolekut antakse ja võetakse tagasi ruumis, igal ajal.",
+        "transcription": "Oma sõnavõttude transkribeerimine on eraldi vabatahtlik nõusolek.",
+        "fixedVoice": "See paigaldus ei saa häält videost eemaldada: nõustumata jäädakse kuulajaks ja ruumi lukud järgivad nõusolekut.",
+        "fixedNotice": "See paigaldus ei saa häält videost eemaldada: sõna saanu satub salvestusse ja teavitus ütleb seda.",
+        "questionTranscription": "Kas transkriptsiooniks on antud nõusolek?",
+        "fixedNotRecorded": "Ei häält ega pilti; nimi võib videos näha olla."
+      }
     },
     "nav": {
       "events": "Üritused",
@@ -4354,9 +4385,10 @@
       "stayInTouchHelp": "Vabatahtlik nõusolek (IKÜM art 6.1.a). Saate selle igal ajal tagasi võtta e-kirjades oleva lingiga „Eemalda mind aadressiraamatust“. Nimi ja organisatsioon on selle registreerimise omad.",
       "recordingOptionalListenOnly": "Kui sa ei nõustu, osaled ikkagi, ainult kuulajana: jälgid ja kirjutad vestlusesse, kuid mikrofon, kaamera ja ekraani jagamine jäävad välja. Saad nõustuda hiljem ruumis.",
       "recordingOptionalHost": "Kui sa nõusolekut ei anna, saad ikkagi siseneda ja juhtida nagu tavaliselt, kuid sinu häält ei säilitata isiklikel radadel ega transkriptsioonis. Ruumi video, kui see salvestatakse, näitab sind siiski.",
-      "recordingOptionalVoice": "Kui te nõusolekut ei anna, osalete ikkagi ja saate rääkida, kuid teie häält ei salvestata; kaamera ja ekraani jagamine jäävad välja. Nõusoleku saate anda hiljem ruumis.",
+      "recordingOptionalVoice": "Kui sa ei nõustu, osaled ikkagi ja võid sõna võtta, kuid jääd salvestusest välja: ei nime, häält ega pilti. Saad nõustuda hiljem ruumis.",
       "recordingNotice": "Üritus salvestatakse (heli ja video). Osalete ilma mikrofoni ja kaamerata: salvestis ei sisalda teie häält ega pilti, välja arvatud juhul, kui moderaator annab teile sõna.",
-      "recordingNoticeVoice": "Üritus salvestatakse (heli ja video). Osalete ilma mikrofoni ja kaamerata: salvestis ei sisalda teie häält ega pilti, kui te ruumis nõusolekut ei anna."
+      "recordingNoticeVoice": "Üritust salvestatakse (heli ja video). Osaled ilma mikrofoni ja kaamerata: salvestus ei sisalda sinu nime, häält ega pilti, kui sa ruumis ei nõustu.",
+      "recordingHostAlways": "Sa juhid seda üritust: oled alati salvestuses nime, hääle, pildi ja jagatud ekraaniga."
     },
     "export": {
       "title": "Minu andmed",
@@ -5269,7 +5301,7 @@
     "aiNotice": "Lõpus töödeldakse salvestist tehisintellekti tööriistadega, et luua transkriptsioon, kokkuvõte ning võimalikud tõlked ja dubleeringud. Tulemused võivad sisaldada ebatäpsusi; video jääb autoriteetseks allikaks.",
     "multitrackConsentTitle": "Teie sõnavõttude transkriptsioon",
     "recordingConsentTitle": "Ürituse salvestamine",
-    "recordingConsentIntro": "Üritus salvestatakse (heli ja video). Kui sõna võtad, sisaldab salvestis sinu häält, sinu kujutist ja seda, mida ekraanil jagad.",
+    "recordingConsentIntro": "Üritust salvestatakse (heli ja video). Sinu nõusolekul sisaldab salvestus sinu nime, häält, pilti ja seda, mida ekraanil jagad.",
     "enterGardenTitle": "Astu väljakule",
     "enterGardenHint": "Teine koht ootamiseks: jaluta ringi, kohtu teiste ootajatega ja sisene otseülekandesse värava kaudu, kui ruum avaneb.",
     "backToWaitingRoom": "Tagasi ooteruumi",

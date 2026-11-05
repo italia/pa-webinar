@@ -36,6 +36,12 @@ describe('consensoRegistrazioneIngresso', () => {
     });
   });
 
+  it('l\'evento che tiene chi conduce sempre nella registrazione non glielo chiede', () => {
+    const sempre = { ...base, conduceSempreRegistrato: true };
+    expect(consensoRegistrazioneIngresso({ ...sempre, conduce: true }).richiesto).toBe(false);
+    expect(consensoRegistrazioneIngresso(sempre).richiesto).toBe(true);
+  });
+
   it('moderatori e relatori: non a chi l\'ha gia\' dato, non senza registrazione, non in una chiamata rapida', () => {
     const conduce = { ...base, conduce: true };
     expect(consensoRegistrazioneIngresso({ ...conduce, giaDato: true }).richiesto).toBe(false);

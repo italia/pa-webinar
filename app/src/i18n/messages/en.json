@@ -545,8 +545,7 @@
       "listenOnlyBadge": "listen-only",
       "listenOnlyNoFloor": "Has not consented to the recording: cannot speak until they consent from their room.",
       "voiceExcludedBadge": "not recorded",
-      "voiceExcludedFloor": "They have not consented to the recording: they can speak, but their voice is not recorded.",
-      "locksByConsentVoice": "Cameras and screens follow the recording consent: people who have not given it can speak without being recorded, but cannot use camera or screen. The room's locks stay on."
+      "voiceExcludedFloor": "They have not consented to the recording: they can speak, but stay out of the recording."
     },
     "moderator": {
       "muteAll": "Mute all",
@@ -688,13 +687,13 @@
         "without": {
           "soloAscolto": "Without this consent you follow in listen-only mode: microphone, camera and screen stay closed.",
           "conduce": "Without this consent you still host, but your voice is not kept in the per-person tracks or in the transcript.",
-          "voce": "Without this consent you take part and can speak, but your voice is not recorded; camera and screen stay off."
+          "voce": "Without this consent you take part like everyone else, but stay out of the recording: no name, no voice, no image."
         },
         "alreadyRecorded": "What has already been recorded stays in the event video: to have it removed, write to the organisers.",
         "withdraw": {
           "soloAscolto": "If you withdraw it you stay in the room in listen-only mode: microphone, camera and screen close. Your consent to the transcription of what you say is withdrawn too.",
           "conduce": "If you withdraw it you keep hosting, but from now on your voice is not kept in the per-person tracks or in the transcript. The room video, if recorded, still shows you.",
-          "voce": "If you withdraw it you stay in the room and can speak: from now on your voice is not recorded, and camera and screen turn off. You also withdraw the consent to the transcription of what you say."
+          "voce": "If you withdraw it you stay in the room as before, and from now on you are out of the recording. You also withdraw consent to transcribing your contributions."
         }
       },
       "transcription": {
@@ -708,7 +707,7 @@
     "voiceExcluded": {
       "title": "You are taking part without being recorded.",
       "consent": "I consent to the recording",
-      "body": "You have not consented to the recording: you can speak with your microphone, but your voice is not recorded. Camera and screen stay off."
+      "body": "You have not consented to the recording: you take part like everyone else, but your name, voice and image do not enter the recording."
     }
   },
   "qa": {
@@ -1034,7 +1033,9 @@
         "participantListAnonymous": "With an anonymous audience the list stays hidden.",
         "participantListLocked": "It cannot change while the room is open: people already inside would not see the change.",
         "participantListCameraNote": "With the list hidden, people who turn on their camera do not see their own tile. For a meeting where everyone sees each other, show the list.",
-        "recordingLockedLive": "Recording cannot change while the room is open: it holds from the first entry."
+        "recordingLockedLive": "Recording cannot change while the room is open: it holds from the first entry.",
+        "hostsAlwaysRecorded": "Hosts are always in the recording",
+        "hostsAlwaysRecordedDesc": "Off, moderators and speakers choose like everyone else. Turn it on only if they have already agreed to be filmed: they do not see the checkbox, and the event notice must say so."
       },
       "step3": {
         "heading": "People and invites",
@@ -1336,7 +1337,8 @@
         "participantListShown": "Participant list: visible to everyone.",
         "participantListHidden": "Participant list: hosts and speakers only.",
         "consentRecordingOptional": "recording, optional",
-        "consentRecordingVoice": "recording, free (without it, the voice is not recorded)"
+        "consentRecordingVoice": "recording, optional (without it, the person stays out of the recording)",
+        "consentsHostsAlways": "Hosts and speakers are always in the recording: they do not see the checkbox."
       },
       "preview": {
         "title": "Page preview",
@@ -1394,7 +1396,36 @@
         "toggleOffWarningCreate": "Off, the programme ({count, plural, one {# topic} other {# topics}}) is not shown on the page and is not saved with the event: turn it on to keep it.",
         "reviewOffCreate": "Programme: off, not saved with the event ({count, plural, one {# topic} other {# topics}})"
       },
-      "saveCopy": "Save the copy"
+      "saveCopy": "Save the copy",
+      "consentMap": {
+        "show": "Show what happens with consents",
+        "hide": "Hide the diagram",
+        "title": "Recording consents in this event",
+        "person": "Who joins",
+        "question": "Has the person consented to the recording?",
+        "yes": "Yes",
+        "no": "No",
+        "room": "In the room",
+        "recording": "In the recording",
+        "roomSame": "Takes part under the event rules.",
+        "roomListenOnly": "Listen and chat only.",
+        "recordedFull": "Name, voice, image and shared screen.",
+        "notRecorded": "Does not appear: no name, voice, image or shared screen.",
+        "recordedVoice": "Their voice, on a separate track.",
+        "notRecordedVoice": "Their voice is not recorded.",
+        "othersSame": "Others do not change: microphone locks, floor and video layout stay as set for the event.",
+        "audienceNotice": "Attendees have no microphone, camera or screen: they only get a notice. If given the floor, they can consent in the room; if they do not, they stay out of the recording.",
+        "hostsChoose": "Moderators and speakers choose like everyone else: those who do not consent still host normally, but stay out of the recording.",
+        "hostsAlways": "Moderators and speakers are always in the recording: they do not see the checkbox.",
+        "hostsFixed": "Moderators and speakers host regardless, and the video records them.",
+        "trace": "If they speak during the recording, a note beside the video says an input is missing, and the transcript shows *** with the time.",
+        "anytime": "Consent is given and withdrawn in the room, at any time.",
+        "transcription": "Transcribing one's own contributions is a separate, optional consent.",
+        "fixedVoice": "This installation cannot remove a voice from the video: those who do not consent stay listen-only, and room locks follow consent.",
+        "fixedNotice": "This installation cannot remove a voice from the video: those given the floor enter the recording, and the notice says so.",
+        "questionTranscription": "Did they consent to the transcription?",
+        "fixedNotRecorded": "No voice or image; the name may appear in the video."
+      }
     },
     "nav": {
       "events": "Events",
@@ -4354,9 +4385,10 @@
       "stayInTouchHelp": "Optional consent (GDPR art. 6.1.a). You can withdraw it at any time with the \"Remove me from the address book\" link in the emails you receive. Your name and organization are the ones in this registration.",
       "recordingOptionalListenOnly": "If you do not consent you still take part, listening only: you follow and write in the chat, but microphone, camera and screen sharing stay off. You can consent later, from the room.",
       "recordingOptionalHost": "If you do not consent you still enter and lead as usual, but your voice is not kept in the per-person tracks or in the transcript. The room video, if recorded, still includes you.",
-      "recordingOptionalVoice": "If you do not consent you still take part and can speak, but your voice is not recorded; camera and screen sharing stay off. You can consent later from the room.",
+      "recordingOptionalVoice": "If you do not consent you still take part and can speak, but stay out of the recording: no name, no voice, no image. You can consent later from the room.",
       "recordingNotice": "This event is recorded (audio and video). You take part without microphone or camera: the recording does not contain your voice or your image, unless the host gives you the floor.",
-      "recordingNoticeVoice": "The event is recorded (audio and video). You take part without microphone or camera: the recording does not contain your voice or image, unless you consent in the room."
+      "recordingNoticeVoice": "The event is recorded (audio and video). You take part without microphone or camera: the recording contains neither your name, your voice nor your image, unless you consent in the room.",
+      "recordingHostAlways": "You host this event: you are always in the recording, with name, voice, image and shared screen."
     },
     "export": {
       "title": "My data",
@@ -5269,7 +5301,7 @@
     "aiNotice": "After it ends, the recording will be processed by AI tools to generate a transcript, summary and any translations and dubbing. The artifacts may contain inaccuracies; the video remains the authoritative source.",
     "multitrackConsentTitle": "Transcript of what you say",
     "recordingConsentTitle": "Event recording",
-    "recordingConsentIntro": "This event is recorded (audio and video). If you speak, the recording contains your voice, your image and whatever you share on screen.",
+    "recordingConsentIntro": "The event is recorded (audio and video). With your consent, the recording contains your name, your voice, your image and what you share on screen.",
     "enterGardenTitle": "Step into the square",
     "enterGardenHint": "Another place to wait: walk around, meet the others who are waiting, and enter the live event through the gate when the room opens.",
     "backToWaitingRoom": "Back to the waiting room",

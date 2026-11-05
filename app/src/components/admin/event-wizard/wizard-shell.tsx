@@ -298,6 +298,7 @@ export interface InitialEventShape {
     autoStartRecording: boolean;
     audienceAnonymous?: boolean;
     participantListVisible?: boolean;
+    hostsAlwaysRecorded?: boolean;
     aiTranscriptEnabled?: boolean | null;
     aiSummaryEnabled?: boolean | null;
     aiTranslationEnabled?: boolean | null;
@@ -527,6 +528,7 @@ export default function EventWizard(props: WizardProps) {
         autoStartRecording: ev.autoStartRecording,
         audienceAnonymous: ev.audienceAnonymous ?? false,
         participantListVisible: ev.participantListVisible ?? false,
+        hostsAlwaysRecorded: ev.hostsAlwaysRecorded ?? false,
         aiTranscriptEnabled: ev.aiTranscriptEnabled ?? false,
         aiSummaryEnabled: ev.aiSummaryEnabled ?? false,
         aiTranslationEnabled: ev.aiTranslationEnabled ?? false,
@@ -677,6 +679,7 @@ export default function EventWizard(props: WizardProps) {
       // pulsante REC, qualunque cosa dica un modello salvato prima.
       autoStartRecording: false,
       audienceAnonymous: false,
+      hostsAlwaysRecorded: false,
       participantListVisible: elencoPredefinito({
         ...togglesFromMatrix(matrix),
         maxParticipants: tpl?.maxParticipants ?? 300,
@@ -1398,7 +1401,9 @@ export default function EventWizard(props: WizardProps) {
         ...(datiBozza.title || datiBozza.description
           ? { title: testiBozza(prima).title, description: testiBozza(prima).description }
           : {}),
-        ...(viaToken !== null ? { accessMode: prima.accessMode } : {}),
+        ...(viaToken !== null
+          ? { accessMode: prima.accessMode, hostsAlwaysRecorded: prima.hostsAlwaysRecorded }
+          : {}),
         ...((risposte?.pre ?? 0) > 0 ? { preEventQuestionnaire: prima.preEventQuestionnaire } : {}),
         ...((risposte?.post ?? 0) > 0 ? { postEventQuestionnaire: prima.postEventQuestionnaire } : {}),
         // Un'agenda gia' usata in sala non si cambia da qui, come sopra; una
@@ -1712,6 +1717,8 @@ export default function EventWizard(props: WizardProps) {
           autoStartRecording: form.recordingEnabled && form.autoStartRecording,
           audienceAnonymous: form.audienceAnonymous,
           participantListVisible: form.participantListVisible,
+          // Una dichiarazione di chi organizza: un link di conduzione non la cambia.
+          hostsAlwaysRecorded: viaToken !== null ? undefined : form.hostsAlwaysRecorded,
 
           // Postprod AI — subordinate al recording (server-side resta
           // un'invariante: senza recordingEnabled non c'è transcript).
@@ -2485,6 +2492,10 @@ export default function EventWizard(props: WizardProps) {
                   fieldErrors={fieldErrors}
                   whiteboardInfraReady={props.whiteboardInfraReady}
                   recordingAvailable={props.recordingAvailable ?? true}
+                  voceNelVideo={props.voceNelVideo}
+                  istantanea={istantanea}
+                  puoDichiarareChiConduce={viaToken === null}
+                  liveCaptionsAvailable={props.liveCaptionsAvailable ?? false}
                   aiPipelineEnabled={props.aiPipelineEnabled ?? true}
                   onCambiaLingue={() =>
                     vaiAlCampo({ key: 'aiTargetLocales', step: 'base', perPubblicare: false })

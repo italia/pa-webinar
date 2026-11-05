@@ -1235,48 +1235,14 @@ jitsi-meet:
       tag: stable-11031
 
   web:
-    # La sessione del registratore (Jibri): nel video completo niente striscia
-    # dei partecipanti, niente griglia, niente nomi o iniziali. Resta chi parla
-    # con la videocamera accesa, e lo schermo condiviso. La voce di chi non ha un
-    # consenso valido non si riproduce, quindi non entra nel video. Un file di
-    # valori che imposta _custom_config_js sostituisce questo testo: va riportato,
-    # altrimenti quelle persone restano in solo ascolto. A ogni aggiornamento di
-    # Jitsi va riprovato: legge parti interne del client.
+    # La sessione del registratore (Jibri) non vede chi non ha un consenso valido:
+    # mod_pa_media_lock lo dice nella presenza, e per tutti gli altri il video
+    # resta com'e'. Un file di valori che imposta _custom_config_js sostituisce
+    # questo testo: va riportato, altrimenti quelle persone restano in solo ascolto.
     custom:
       configs:
         _custom_config_js: |
-          if (typeof document !== 'undefined' && /[#&]config\.iAmRecorder=true/.test(location.hash)) {
-            config.filmstrip = { disabled: true };
-            config.disableTileView = true;
-            config.hideDisplayName = true;
-            const stile = document.createElement('style');
-            stile.textContent = '#dominantSpeaker, #dominantSpeakerAvatarContainer { display: none !important; }';
-            document.head.appendChild(stile);
-            // Voce e immagine di chi non ha un consenso valido non si riproducono, quindi
-            // non entrano nel video: la presenza lo dice (mod_pa_media_lock), e gli altri
-            // non cambiano. L'immagine vale per chi modera: il bridge non lo tiene chiuso.
-            let salaSeguita = null;
-            const fuoriDalVideo = (traccia) => {
-              const sala = salaSeguita;
-              const persona = sala && sala.getParticipantById(traccia.getParticipantId());
-              if (persona && persona.getProperty('paNoRecording') === 'true' && traccia.track) {
-                traccia.track.enabled = false;
-              }
-            };
-            setInterval(() => {
-              const sala = window.APP && window.APP.conference && window.APP.conference._room;
-              if (!sala) return;
-              if (sala !== salaSeguita) {
-                salaSeguita = sala;
-                sala.on('conference.trackAdded', (traccia) => {
-                  if (!traccia.isLocal()) fuoriDalVideo(traccia);
-                });
-              }
-              for (const persona of sala.getParticipants()) {
-                persona.getTracks().forEach(fuoriDalVideo);
-              }
-            }, 100);
-          }
+          config.hiddenFromRecorderFeatureEnabled = true;
     # Immagine web con la patch che forza a 48 kHz il contesto audio della
     # soppressione rumore avanzata. Senza la patch quel filtro, su alcuni
     # browser, ammutolisce il microfono senza alcun errore visibile — e il

@@ -545,8 +545,7 @@
       "listenOnlyBadge": "vain kuuntelee",
       "listenOnlyNoFloor": "Ei ole antanut suostumusta tallennukseen: ei voi puhua ennen kuin antaa sen omasta huoneestaan.",
       "voiceExcludedBadge": "ei tallenneta",
-      "voiceExcludedFloor": "Ei ole antanut suostumusta tallennukseen: voi puhua, mutta ääntä ei tallenneta.",
-      "locksByConsentVoice": "Kamerat ja näytöt noudattavat tallennussuostumusta: sen antamatta jättänyt voi puhua tulematta tallennetuksi, mutta kamera ja näyttö eivät ole käytössä. Huoneen lukitukset pysyvät päällä."
+      "voiceExcludedFloor": "Ei ole antanut suostumusta tallennukseen: voi puhua, mutta jää tallenteen ulkopuolelle."
     },
     "moderator": {
       "muteAll": "Mykistä kaikki",
@@ -688,13 +687,13 @@
         "without": {
           "soloAscolto": "Ilman tätä suostumusta olet vain kuuntelija: mikrofoni, kamera ja näyttö pysyvät suljettuina.",
           "conduce": "Ilman tätä suostumusta johdat silti, mutta äänesi ei jää henkilökohtaisille raidoille eikä litteraattiin.",
-          "voce": "Ilman tätä suostumusta osallistut ja voit puhua, mutta ääntäsi ei tallenneta; kamera ja näyttö pysyvät pois päältä."
+          "voce": "Ilman tätä suostumusta osallistut kuten kaikki, mutta jäät tallenteen ulkopuolelle: ei nimeä, ääntä eikä kuvaa."
         },
         "alreadyRecorded": "Jo tallennettu jää tapahtuman videoon: pyydä poistoa järjestäjiltä.",
         "withdraw": {
           "soloAscolto": "Jos peruutat sen, jäät huoneeseen vain kuuntelijaksi: mikrofoni, kamera ja näyttö suljetaan. Myös suostumuksesi puheenvuorojesi litterointiin peruutetaan.",
           "conduce": "Jos peruutat sen, jatkat johtamista, mutta tästä lähtien äänesi ei jää henkilökohtaisille raidoille eikä litteraattiin. Huoneen video näyttää sinut silti, jos sitä tallennetaan.",
-          "voce": "Jos peruutat sen, pysyt huoneessa ja voit puhua: tästä lähtien ääntäsi ei tallenneta, ja kamera ja näyttö sulkeutuvat. Peruutat myös suostumuksen puheenvuorojesi litterointiin."
+          "voce": "Jos peruutat sen, pysyt huoneessa kuten ennen ja olet nyt tallenteen ulkopuolella. Peruutat samalla suostumuksen puheenvuorojesi litterointiin."
         }
       },
       "transcription": {
@@ -708,7 +707,7 @@
     "voiceExcluded": {
       "title": "Osallistut ilman tallennusta.",
       "consent": "Annan suostumuksen tallennukseen",
-      "body": "Et ole antanut suostumusta tallennukseen: voit puhua mikrofonilla, mutta ääntäsi ei tallenneta. Kamera ja näyttö pysyvät pois päältä."
+      "body": "Et ole antanut suostumusta tallennukseen: osallistut kuten kaikki, mutta nimesi, äänesi ja kuvasi eivät päädy tallenteeseen."
     }
   },
   "qa": {
@@ -1034,7 +1033,9 @@
         "participantListAnonymous": "Nimettömällä yleisöllä luettelo pysyy piilotettuna.",
         "participantListLocked": "Ei muutettavissa huoneen ollessa auki: sisällä olevat eivät näkisi muutosta.",
         "participantListCameraNote": "Kun luettelo on piilotettu, kameran avaava ei näe omaa ruutuaan. Näytä luettelo tapaamisessa, jossa kaikki näkevät toisensa.",
-        "recordingLockedLive": "Tallennusta ei voi muuttaa huoneen ollessa auki: se on voimassa ensimmäisestä sisääntulosta."
+        "recordingLockedLive": "Tallennusta ei voi muuttaa huoneen ollessa auki: se on voimassa ensimmäisestä sisääntulosta.",
+        "hostsAlwaysRecorded": "Juontajat ovat aina tallenteessa",
+        "hostsAlwaysRecordedDesc": "Pois päältä moderaattorit ja puhujat valitsevat kuten kaikki muutkin. Kytke päälle vain, jos he ovat jo suostuneet kuvattaviksi: he eivät näe ruutua, ja tapahtuman tiedotteen on kerrottava se."
       },
       "step3": {
         "heading": "Henkilöt ja kutsut",
@@ -1336,7 +1337,8 @@
         "participantListShown": "Osallistujaluettelo: näkyy kaikille.",
         "participantListHidden": "Osallistujaluettelo: vain juontajille ja puhujille.",
         "consentRecordingOptional": "tallennus, vapaaehtoinen",
-        "consentRecordingVoice": "tallennus, vapaaehtoinen (ilman sitä ääntä ei tallenneta)"
+        "consentRecordingVoice": "tallenne, vapaaehtoinen (ilman suostumusta henkilö jää tallenteen ulkopuolelle)",
+        "consentsHostsAlways": "Juontajat ja puhujat ovat aina tallenteessa: he eivät näe ruutua."
       },
       "preview": {
         "title": "Sivun esikatselu",
@@ -1394,7 +1396,36 @@
         "toggleOffWarningCreate": "Pois päältä ohjelma ({count, plural, one {# aihe} other {# aihetta}}) ei näy sivulla eikä tallennu tapahtuman mukana: ota se käyttöön säilyttääksesi sen.",
         "reviewOffCreate": "Ohjelma: pois päältä, ei tallennu tapahtuman mukana ({count, plural, one {# aihe} other {# aihetta}})"
       },
-      "saveCopy": "Tallenna kopio"
+      "saveCopy": "Tallenna kopio",
+      "consentMap": {
+        "show": "Näytä, mitä suostumuksille tapahtuu",
+        "hide": "Piilota kaavio",
+        "title": "Tallennussuostumukset tässä tapahtumassa",
+        "person": "Kuka tulee",
+        "question": "Onko antanut suostumuksen tallennukseen?",
+        "yes": "Kyllä",
+        "no": "Ei",
+        "room": "Huoneessa",
+        "recording": "Tallenteessa",
+        "roomSame": "Osallistuu tapahtuman säännöillä.",
+        "roomListenOnly": "Vain kuuntelu ja chat.",
+        "recordedFull": "Nimi, ääni, kuva ja jaettu näyttö.",
+        "notRecorded": "Ei näy: ei nimeä, ääntä, kuvaa eikä jaettua näyttöä.",
+        "recordedVoice": "Hänen äänensä, erillisellä raidalla.",
+        "notRecordedVoice": "Hänen ääntään ei tallenneta.",
+        "othersSame": "Muut eivät muutu: mikrofonilukot, puheenvuorot ja videon ulkoasu pysyvät tapahtuman mukaisina.",
+        "audienceNotice": "Yleisöllä ei ole mikrofonia, kameraa eikä näyttöä: he saavat vain ilmoituksen. Jos heille annetaan puheenvuoro, he voivat suostua huoneessa; jos eivät, he jäävät tallenteen ulkopuolelle.",
+        "hostsChoose": "Moderaattorit ja puhujat valitsevat kuten kaikki: ilman suostumusta he juontavat normaalisti mutta jäävät tallenteen ulkopuolelle.",
+        "hostsAlways": "Moderaattorit ja puhujat ovat aina tallenteessa: he eivät näe ruutua.",
+        "hostsFixed": "Moderaattorit ja puhujat juontavat joka tapauksessa, ja video kuvaa heidät.",
+        "trace": "Jos hän puhuu tallennuksen aikana, videon vieressä oleva huomautus kertoo puheenvuoron puuttuvan, ja litteraatissa on *** kellonaikoineen.",
+        "anytime": "Suostumus annetaan ja peruutetaan huoneessa milloin tahansa.",
+        "transcription": "Omien puheenvuorojen litterointi on erillinen, vapaaehtoinen suostumus.",
+        "fixedVoice": "Tämä asennus ei voi poistaa ääntä videolta: ilman suostumusta jäädään kuuntelijaksi, ja huoneen lukot seuraavat suostumusta.",
+        "fixedNotice": "Tämä asennus ei voi poistaa ääntä videolta: puheenvuoron saanut tulee tallenteeseen, ja ilmoitus kertoo sen.",
+        "questionTranscription": "Onko litterointiin annettu suostumus?",
+        "fixedNotRecorded": "Ei ääntä eikä kuvaa; nimi voi näkyä videolla."
+      }
     },
     "nav": {
       "events": "Tapahtumat",
@@ -4354,9 +4385,10 @@
       "stayInTouchHelp": "Vapaaehtoinen suostumus (tietosuoja-asetuksen 6.1.a artikla). Voit perua sen milloin tahansa saamiesi sähköpostien linkillä ”Poista minut osoitekirjasta”. Nimi ja organisaatio ovat tämän ilmoittautumisen mukaiset.",
       "recordingOptionalListenOnly": "Jos et anna suostumusta, osallistut silti, vain kuunnellen: seuraat ja kirjoitat chattiin, mutta mikrofoni, kamera ja näytön jakaminen pysyvät pois päältä. Voit antaa suostumuksen myöhemmin huoneessa.",
       "recordingOptionalHost": "Jos et anna suostumusta, pääset silti sisään ja johdat tavalliseen tapaan, mutta ääntäsi ei säilytetä henkilökohtaisissa raidoissa eikä litteroinnissa. Huoneen video, jos se tallennetaan, näyttää sinut silti.",
-      "recordingOptionalVoice": "Jos et anna suostumusta, osallistut silti ja voit puhua, mutta ääntäsi ei tallenneta; kamera ja näytön jakaminen pysyvät pois päältä. Voit antaa suostumuksen myöhemmin huoneessa.",
+      "recordingOptionalVoice": "Jos et anna suostumusta, osallistut silti ja voit puhua, mutta jäät tallenteen ulkopuolelle: ei nimeä, ääntä eikä kuvaa. Voit antaa suostumuksen myöhemmin huoneessa.",
       "recordingNotice": "Tapahtuma tallennetaan (ääni ja kuva). Osallistut ilman mikrofonia ja kameraa: tallenne ei sisällä ääntäsi eikä kuvaasi, ellei juontaja anna sinulle puheenvuoroa.",
-      "recordingNoticeVoice": "Tapahtuma tallennetaan (ääni ja kuva). Osallistut ilman mikrofonia ja kameraa: tallenne ei sisällä ääntäsi tai kuvaasi, ellet anna suostumusta huoneessa."
+      "recordingNoticeVoice": "Tapahtuma tallennetaan (ääni ja video). Osallistut ilman mikrofonia ja kameraa: tallenne ei sisällä nimeäsi, ääntäsi eikä kuvaasi, ellet anna suostumusta huoneessa.",
+      "recordingHostAlways": "Juonnat tätä tapahtumaa: olet aina tallenteessa nimen, äänen, kuvan ja jaetun näytön kanssa."
     },
     "export": {
       "title": "Omat tietoni",
@@ -5269,7 +5301,7 @@
     "aiNotice": "Lopuksi tallenne käsitellään tekoälytyökaluilla litteroinnin, tiivistelmän sekä mahdollisten käännösten ja dubbausten tuottamiseksi. Tulokset voivat sisältää epätarkkuuksia; video on edelleen ratkaiseva lähde.",
     "multitrackConsentTitle": "Puheenvuorojesi litterointi",
     "recordingConsentTitle": "Tapahtuman tallenne",
-    "recordingConsentIntro": "Tapahtuma tallennetaan (ääni ja kuva). Jos käytät puheenvuoron, tallenteessa on äänesi, kuvasi ja se, mitä jaat näytöllä.",
+    "recordingConsentIntro": "Tapahtuma tallennetaan (ääni ja video). Suostumuksellasi tallenne sisältää nimesi, äänesi, kuvasi ja sen, mitä jaat näytöllä.",
     "enterGardenTitle": "Astu torille",
     "enterGardenHint": "Toinen paikka odottaa: kävele, tapaa muut odottajat ja siirry lähetykseen portista, kun huone avautuu.",
     "backToWaitingRoom": "Takaisin odotustilaan",

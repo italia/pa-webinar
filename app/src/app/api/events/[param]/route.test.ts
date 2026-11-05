@@ -211,6 +211,20 @@ describe('PUT /api/events/[param] — le modifiche parziali restano parziali', (
     expect(datiScritti()).not.toHaveProperty('participantListVisible');
   });
 
+  it('l\'opzione di chi conduce non si azzera con un aggiornamento che non la nomina', async () => {
+    await PUT(richiesta({ title: { it: 'Altro' } }), contesto as never);
+    expect(datiScritti()).not.toHaveProperty('hostsAlwaysRecorded');
+  });
+
+  it('l\'opzione di chi conduce non cambia a sala aperta', async () => {
+    sala.salaForseAperta.mockResolvedValueOnce(true);
+
+    await PUT(richiesta({ hostsAlwaysRecorded: true, title: { it: 'Altro' } }), contesto as never);
+
+    expect(datiScritti()).not.toHaveProperty('hostsAlwaysRecorded');
+  });
+
+
   it("l'elenco dei partecipanti si sceglie a sala chiusa", async () => {
     await PUT(richiesta({ participantListVisible: true }), contesto as never);
 
@@ -368,6 +382,17 @@ describe('PUT /api/events/[param] — le modifiche parziali restano parziali', (
     staff.requireEventManager.mockResolvedValueOnce({ role: 'organizer' });
     await PUT(richiesta({ accessMode: 'INVITATION' }), contesto as never);
     expect(datiScritti().accessMode).toBe('INVITATION');
+  });
+
+  it('l opzione di chi conduce la cambia solo lo staff dell evento', async () => {
+    staff.requireEventManager.mockRejectedValueOnce(new UnauthorizedError());
+    const res = await PUT(richiesta({ hostsAlwaysRecorded: true }), contesto as never);
+    expect(res.status).toBe(403);
+    expect(mocked.event.update).not.toHaveBeenCalled();
+
+    staff.requireEventManager.mockResolvedValueOnce({ role: 'organizer' });
+    await PUT(richiesta({ hostsAlwaysRecorded: true }), contesto as never);
+    expect(datiScritti().hostsAlwaysRecorded).toBe(true);
   });
 
   it('rimandare la scelta che c e gia non chiede lo staff', async () => {

@@ -18,6 +18,7 @@ import { useTranslations } from 'next-intl';
 import { parseLocaleList } from '@/components/admin/language-checklist';
 import ToggleSwitch from '@/components/ui/toggle-switch';
 import { Icon } from '@/components/ui/icon';
+import type { VoceNelVideo } from '@/lib/live/consent-rule';
 import {
   EVENT_ROLES,
   EVENT_FEATURES,
@@ -28,12 +29,16 @@ import {
   togglesFromMatrix,
 } from '@/lib/utils/permission-matrix';
 
+import ConsentDiagram from './consent-diagram';
 import { nomeLingua } from './text-translation';
 
 export interface StepPermissionsValue {
   permissionMatrix: PermissionMatrix;
   recordingEnabled: boolean;
   autoStartRecording: boolean;
+  /** Moderatori e relatori sempre nella registrazione, per dichiarazione di
+   *  chi organizza: non vedono la casella. */
+  hostsAlwaysRecorded: boolean;
   /** Pubblico anonimo: chi partecipa compare con uno pseudonimo. */
   audienceAnonymous: boolean;
   /** L'elenco di chi partecipa, per il pubblico: spento di default. */
@@ -80,6 +85,13 @@ interface Props {
   /** L'installazione puo' registrare. Senza, la registrazione non si propone:
    *  si mostra solo se l'evento ce l'ha gia' accesa, per poterla spegnere. */
   recordingAvailable?: boolean;
+  /** Cosa succede alla voce di chi non acconsente, in questa installazione. */
+  voceNelVideo?: VoceNelVideo;
+  /** Una chiamata rapida non chiede consensi: niente diagramma, niente opzione. */
+  istantanea?: boolean;
+  /** Tenere chi conduce nella registrazione lo dichiara lo staff dell'evento, non
+   *  un link di conduzione. */
+  puoDichiarareChiConduce?: boolean;
   /** Porta alle lingue dell'evento, nel passo «Evento». */
   onCambiaLingue?: () => void;
   /** La post-produzione AI e' accesa sull'installazione? Spenta, le sue
@@ -142,6 +154,9 @@ export default function StepPermissions({
   whiteboardInfraReady,
   liveCaptionsAvailable = false,
   recordingAvailable = true,
+  voceNelVideo = 'rimovibile',
+  istantanea = false,
+  puoDichiarareChiConduce = true,
   onCambiaLingue,
   aiPipelineEnabled = true,
   editing = false,
@@ -472,6 +487,45 @@ export default function StepPermissions({
           <p className="text-secondary mb-0 pb-2" style={{ fontSize: '0.85rem' }}>
             {t('recordingLockedLive')}
           </p>
+        )}
+
+        {value.recordingEnabled &&
+          recordingAvailable &&
+          !istantanea &&
+          puoDichiarareChiConduce &&
+          voceNelVideo === 'rimovibile' && (
+          <div
+            className="py-2 d-flex justify-content-between align-items-start"
+            style={{ borderTop: '1px solid #e8e8e8' }}
+          >
+            <div className="me-3">
+              <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
+                {t('hostsAlwaysRecorded')}
+              </div>
+              <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
+                {t('hostsAlwaysRecordedDesc')}
+              </div>
+            </div>
+            <ToggleSwitch
+              label=""
+              ariaLabel={t('hostsAlwaysRecorded')}
+              checked={value.hostsAlwaysRecorded}
+              disabled={soloAscoltoBloccato}
+              onChange={() => onChange({ hostsAlwaysRecorded: !value.hostsAlwaysRecorded })}
+            />
+          </div>
+        )}
+
+        {value.recordingEnabled && recordingAvailable && !istantanea && (
+          <ConsentDiagram
+            multitrackRecordingEnabled={value.multitrackRecordingEnabled}
+            captionsTranscript={
+              liveCaptionsAvailable && value.liveCaptionsEnabled && value.captionsTranscriptEnabled
+            }
+            {...togglesFromMatrix(value.permissionMatrix)}
+            hostsAlwaysRecorded={value.hostsAlwaysRecorded}
+            voce={voceNelVideo}
+          />
         )}
 
         {value.recordingEnabled && showAutoStart && (

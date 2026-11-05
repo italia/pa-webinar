@@ -2306,6 +2306,22 @@ describe('programma', () => {
     });
   });
 
+  it('l opzione di chi conduce la dichiara lo staff: un link di conduzione non la manda', async () => {
+    fetchMock.mockImplementation(async () => json(200, { items: [] }));
+    const salvataggio = () =>
+      (fetchMock.mock.calls as Array<[string, RequestInit]>).find(
+        ([u, i]) => u === '/api/events/evt-prog' && i.method === 'PUT',
+      );
+    renderWizard({
+      mode: 'edit',
+      initialEvent: structuredClone(ATTIVA),
+      initialStep: 'programme',
+      viaToken: 'token-primario',
+    });
+    await press(button(w.updateEvent));
+    expect(JSON.parse(String(salvataggio()?.[1].body))).not.toHaveProperty('hostsAlwaysRecorded');
+  });
+
   it('con il solo link di conduzione il programma si cambia, e una persona nuova parte col token', async () => {
     fetchMock.mockImplementation(async (input: RequestInfo | URL, init: RequestInit = {}) => {
       const url = String(input);

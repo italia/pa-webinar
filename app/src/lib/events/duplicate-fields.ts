@@ -119,6 +119,7 @@ export const DUPLICATED_EVENT_FIELDS = [
 /** Columns a duplicate must NOT inherit, each with the reason it is excluded. */
 export const NOT_DUPLICATED_EVENT_FIELDS: Record<string, string> = {
   unrecordedSpeech: 'un fatto di QUELLA occorrenza, non configurazione',
+  hostsAlwaysRecorded: 'dichiara che chi conduce QUELLA occorrenza ha accettato: si rifa\' ogni volta',
   id: 'new row',
   createdAt: 'new row',
   updatedAt: 'new row',

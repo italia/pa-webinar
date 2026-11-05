@@ -33,14 +33,15 @@
 --                              rientra con il consenso (il portale gli dà un
 --                              token nuovo);
 --   context.user.voiceExcluded = true per chi non ha un consenso valido alla
---                              registrazione in un evento che registra: il
---                              microfono segue le regole di tutti, ma non viene
---                              registrato: il modulo lo scrive nella presenza
---                              (jitsi_participant_paNoRecording) e la sessione
---                              del registratore non riproduce la sua voce.
---                              Videocamera e schermo restano chiusi, anche per
---                              un moderatore o un relatore: entrerebbero nel
---                              video.
+--                              registrazione in un evento che registra: in sala
+--                              non cambia niente, per lui e per gli altri. Il
+--                              modulo lo scrive nella presenza come
+--                              hidden-from-recorder (l'identità del token non
+--                              basta: Jitsi lo legge anche dal JWT e spegnerebbe
+--                              microfono e videocamera), e la sessione del
+--                              registratore non lo vede: non riproduce la sua
+--                              voce né la sua immagine, e non mostra il suo nome.
+--                              Stesso segno per chi è in solo ascolto.
 -- I moderatori (owner) sono ammessi anche loro: Jicofo controlla solo
 -- l'elenco, non il ruolo.
 --
@@ -227,18 +228,10 @@ local function is_listen_only(user)
     return user ~= nil and user.listenOnly == true;
 end
 
--- Il mezzo resta chiuso a questa persona, qualunque sia il suo ruolo.
-local function excluded_from(user, media_type)
-    if user == nil then
-        return false;
-    end
-    return is_listen_only(user) or (user.voiceExcluded == true and media_type ~= 'audio');
-end
-
 -- Ammesso per quel mezzo senza aspettare chi modera: l'esente per tutti, chi
 -- ha mediaAdmit per i mezzi che vi sono indicati; chi è in solo ascolto mai.
 local function admitted_for(user, media_type)
-    if user == nil or excluded_from(user, media_type) then
+    if user == nil or is_listen_only(user) then
         return false;
     end
     if user.mediaExempt == true then
@@ -316,7 +309,7 @@ local function on_occupant_pre_join(event)
     local nick = occupant and internal_room_jid_match_rewrite(occupant.nick);
     for _, m in ipairs(MEDIA_TYPES) do
         if lock[m] == true and start_lock(room, m, actor) then
-            if (admitted_for(user, m) or (user.affiliation == 'owner' and not excluded_from(user, m))) and nick
+            if (admitted_for(user, m) or (user.affiliation == 'owner' and not is_listen_only(user))) and nick
                 and not contains(room.av_moderation[m], nick) then
                 room.av_moderation[m]:push(nick);
             end
@@ -338,12 +331,12 @@ local function on_occupant_joined(event)
     end
 
     if room:get_role(occupant.nick) == 'moderator' then
-        admit(room, occupant, 'moderatore', function(m) return not excluded_from(user, m) end);
+        admit(room, occupant, 'moderatore', function() return not is_listen_only(user) end);
         -- Il componente ammette gli owner a ogni mezzo prima di questo punto.
         local nick = internal_room_jid_match_rewrite(occupant.nick);
         for _, m in ipairs(MEDIA_TYPES) do
             local whitelist = room.av_moderation and room.av_moderation[m];
-            if whitelist and excluded_from(user, m) and remove_all(whitelist, nick) then
+            if whitelist and is_listen_only(user) and remove_all(whitelist, nick) then
                 notify_whitelist(room, m);
             end
         end
@@ -373,7 +366,7 @@ local function on_affiliation_changed(event)
     if not room.av_moderation or is_healthcheck_room(room.jid) or is_admin(event.jid) then
         return;
     end
-    -- Chi ha un mezzo chiuso resta fuori dagli ammessi anche se diventa
+    -- Chi è in solo ascolto resta fuori dagli ammessi anche se diventa
     -- moderatore: il componente aggiunge gli owner, qui si tolgono.
     if event.affiliation == 'owner' then
         for _, occupant in room:each_occupant() do
@@ -382,8 +375,8 @@ local function on_affiliation_changed(event)
                 local nick = internal_room_jid_match_rewrite(occupant.nick);
                 for _, m in ipairs(MEDIA_TYPES) do
                     local whitelist = room.av_moderation[m];
-                    if whitelist and excluded_from(user, m) and remove_all(whitelist, nick) then
-                        module:log('info', 'Tolto %s (mezzo chiuso) dagli ammessi per %s in %s', nick, m, room.jid);
+                    if whitelist and is_listen_only(user) and remove_all(whitelist, nick) then
+                        module:log('info', 'Tolto %s (solo ascolto) dagli ammessi per %s in %s', nick, m, room.jid);
                         notify_whitelist(room, m);
                     end
                 end
@@ -429,16 +422,13 @@ local function on_av_command(event)
     if not room then
         return;
     end
-    -- «Dai la parola» per un mezzo chiuso a quella persona: non si ammette. In
-    -- solo ascolto non si ammette niente; senza consenso si ammette il
-    -- microfono, non videocamera e schermo. Il comando si ferma qui, prima del
-    -- componente.
+    -- «Dai la parola» a chi è in solo ascolto: non si ammette. Il comando si
+    -- ferma qui, prima del componente.
     local target = command.attr.jidToWhitelist;
     if target then
         local occupant = room:get_occupant_by_nick(room_jid_match_rewrite(target));
-        local media_type = command.attr.mediaType or 'audio';
-        if occupant and excluded_from(context_user(occupant), media_type) then
-            module:log('info', 'Non ammesso %s per %s in %s', target, media_type, room.jid);
+        if occupant and is_listen_only(context_user(occupant)) then
+            module:log('info', 'Non ammesso %s in %s: solo ascolto', target, room.jid);
             return true;
         end
         return;
@@ -529,28 +519,53 @@ process_host_module(av_host, function(host_module)
 end);
 
 -- La presenza di chi non ha un consenso valido lo dice alla sessione del
--- registratore, che non riproduce la sua voce (il testo della conferenza,
--- jitsi-meet.web.custom.configs). Vale il token: il client non se lo puo'
--- togliere ne' dare.
-local NO_RECORDING_TAG = 'jitsi_participant_paNoRecording';
+-- registratore: con hiddenFromRecorderFeatureEnabled (il testo della conferenza,
+-- jitsi-meet.web.custom.configs) Jitsi non la mette nella sala che registra, e
+-- il video resta com'è per tutti gli altri. Chi è in solo ascolto ha lo stesso
+-- segno: dove il testo c'è, nome e riquadro restano fuori anche per lui.
+--
+-- Vale il token: il client non se lo può togliere né dare. Il modulo gira dopo
+-- mod_presence_identity (priorità 0), che ricostruisce l'identità e cancellerebbe
+-- il segno; a chi è segnato toglie ogni identità, a tutti gli altri il segno
+-- scritto dal client.
+local HIDDEN_TAG = 'hidden-from-recorder';
+
+local function without_mark(identity)
+    identity:maptags(function(user_tag)
+        if user_tag.name == 'user' then
+            user_tag:maptags(function(tag)
+                if tag.name == HIDDEN_TAG then
+                    return nil;
+                end
+                return tag;
+            end);
+        end
+        return user_tag;
+    end);
+end
 
 local function mark_no_recording(event)
     local stanza, session = event.stanza, event.origin;
     if not stanza or not session then
         return;
     end
+    local user = session.jitsi_meet_context_user;
+    local marked = type(user) == 'table' and (user.voiceExcluded == true or user.listenOnly == true);
     stanza:maptags(function(tag)
-        if tag.name == NO_RECORDING_TAG then
+        if tag.name ~= 'identity' then
+            return tag;
+        end
+        if marked then
             return nil;
         end
+        without_mark(tag);
         return tag;
     end);
-    local user = session.jitsi_meet_context_user;
-    if type(user) == 'table' and user.voiceExcluded == true then
-        stanza:tag(NO_RECORDING_TAG):text('true'):up();
+    if marked then
+        stanza:add_child(st.stanza('identity'):add_child(st.stanza('user'):add_child(st.stanza(HIDDEN_TAG):text('true'))));
     end
 end
 
 process_host_module(main_domain, function(host_module)
-    host_module:hook('pre-presence/full', mark_no_recording, 10);
+    host_module:hook('pre-presence/full', mark_no_recording, -10);
 end);

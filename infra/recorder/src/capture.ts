@@ -581,7 +581,7 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
       // Il consenso alla registrazione manca (lo dice la presenza, che viene
       // dal token: mod_pa_media_lock): la sua voce non si registra, qualunque
       // altra cosa abbia acconsentito.
-      if (conference?.getParticipantById?.(pid)?.getProperty?.('paNoRecording') === 'true') {
+      if (conference?.getParticipantById?.(pid)?.isHiddenFromRecorder?.() === true) {
         log(`TRACK_SKIPPED pid=${pid}: nessun consenso alla registrazione`);
         return;
       }
@@ -759,6 +759,8 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
         // a initJitsiConference; il recorder deve fare lo stesso.
         conference = connection.initJitsiConference(cfg.room, {
           ...jcfg,
+          // Senza, la presenza perde il segno di chi non ha il consenso.
+          hiddenFromRecorderFeatureEnabled: true,
           iceTransportPolicy: 'all',
           useStunTurn: false,
         });

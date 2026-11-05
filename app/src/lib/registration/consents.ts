@@ -19,9 +19,8 @@
  * lib/captions/room).
  *
  * Il consenso alla registrazione e' libero (art. 7.4 GDPR): non e' mai una
- * condizione per iscriversi o per entrare. Chi non lo da' partecipa lo stesso e
- * puo' intervenire, ma non viene registrato; videocamera e schermo restano
- * chiusi (lib/live/listen-only).
+ * condizione per iscriversi o per entrare. Chi non lo da' partecipa come tutti e
+ * resta fuori dalla registrazione (lib/live/listen-only).
  *
  * Vale per il modulo di iscrizione, per la rotta che la salva e per l'avviso
  * all'ingresso in sala: una sola regola, perché un consenso chiesto in un

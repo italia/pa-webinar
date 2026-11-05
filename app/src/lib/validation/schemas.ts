@@ -119,6 +119,9 @@ export const eventBaseSchema = z.object({
   // L'elenco di chi partecipa, per il pubblico: senza una scelta, lo decide il
   // formato dell'evento (lib/live/participant-list).
   participantListVisible: z.boolean().optional(),
+  // Moderatori e relatori sempre nella registrazione, per dichiarazione di chi
+  // organizza. Niente default: un aggiornamento parziale non lo azzera.
+  hostsAlwaysRecorded: z.boolean().optional(),
 
   // Recurrence (RFC 5545 RRULE). Null = one-off.
   recurrenceRule: z.string().max(500).nullable().optional(),

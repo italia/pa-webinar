@@ -65,8 +65,6 @@ interface ParticipantPanelProps {
   /** Evento con il solo ascolto per chi non acconsente: microfoni e
    *  videocamere seguono il consenso, i blocchi della sala non si tolgono. */
   bloccoDaConsenso?: boolean;
-  /** Chi non acconsente resta in solo ascolto (la voce non si toglie dal video). */
-  consensoSoloAscolto?: boolean;
   /** Il consenso si chiede al pubblico: il segno dice chi non l'ha dato. */
   consensoChiesto?: boolean;
   /** Quante mani sono alzate: la scheda lo mostra a chi modera. */
@@ -91,7 +89,6 @@ export default function ParticipantPanel({
   eventSlug,
   token,
   bloccoDaConsenso = false,
-  consensoSoloAscolto = false,
   consensoChiesto = false,
   onHandsChange,
 }: ParticipantPanelProps) {
@@ -317,8 +314,8 @@ export default function ParticipantPanel({
   // Chi e' in solo ascolto (senza consenso alla registrazione): il bridge non
   // gli apre microfono ne' videocamera, nemmeno con la parola data.
   const inSoloAscolto = useMemo(() => new Set(seatsData?.listenOnly ?? []), [seatsData?.listenOnly]);
-  // Chi non ha un consenso valido puo' parlare, con la voce tolta dal video, ma
-  // il bridge non gli apre videocamera e schermo: la parola si da' a voce.
+  // Chi non ha un consenso valido partecipa come tutti e non viene registrato:
+  // chi modera lo vede prima di dargli la parola.
   const conVoceEsclusa = useMemo(() => new Set(seatsData?.voiceExcluded ?? []), [seatsData?.voiceExcluded]);
   // Chi entra dichiara il suo riquadro un attimo dopo che Jitsi lo mostra:
   // una seconda lettura poco dopo ogni cambio dell'elenco lo trova.
@@ -592,11 +589,9 @@ export default function ParticipantPanel({
           <div className="people-row__hand-actions">
             {!soloAscolto && (
               <>
-                {!voceEsclusa && (
-                  <button type="button" className="people-row__act is-primary" onClick={() => giveFloor(p.participantId, true)}>
-                    {tm('approveAll')}
-                  </button>
-                )}
+                <button type="button" className="people-row__act is-primary" onClick={() => giveFloor(p.participantId, true)}>
+                  {tm('approveAll')}
+                </button>
                 <button type="button" className="people-row__act" onClick={() => giveFloor(p.participantId, false)}>
                   {tm('audioOnly')}
                 </button>
@@ -620,8 +615,8 @@ export default function ParticipantPanel({
               {t('stopVideo')}
             </button>
             {(modAudio || modVideo) && !manoAlzata && !soloAscolto && (
-              <button type="button" className="people-row__act" onClick={() => giveFloor(p.participantId, !voceEsclusa)}>
-                {voceEsclusa ? tm('audioOnly') : tm('approveAll')}
+              <button type="button" className="people-row__act" onClick={() => giveFloor(p.participantId, true)}>
+                {tm('approveAll')}
               </button>
             )}
             {voceEsclusa && !manoAlzata && (
@@ -717,10 +712,10 @@ export default function ParticipantPanel({
               {t('stopAllVideo')}
             </button>
             {bloccoDaConsenso ? (
-              // In un evento che registra i blocchi restano accesi (il bridge
-              // non li lascerebbe togliere): chi ha acconsentito usa gia' cio'
-              // che l'evento concede.
-              <p className="people__note mb-0">{t(consensoSoloAscolto ? 'locksByConsent' : 'locksByConsentVoice')}</p>
+              // Con il solo ascolto i blocchi restano accesi (il bridge non li
+              // lascerebbe togliere): chi ha acconsentito usa gia' cio' che
+              // l'evento concede.
+              <p className="people__note mb-0">{t('locksByConsent')}</p>
             ) : (
             <>
             <button

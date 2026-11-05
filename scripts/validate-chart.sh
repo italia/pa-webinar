@@ -1873,7 +1873,7 @@ done
 # un messaggio che nomina il valore da correggere. Una guardia che non scatta
 # più non la nota nessun altro controllo.
 echo "guardie"
-# La voce di chi non ha acconsentito resta fuori dal video finche' il testo della
+# Chi non ha acconsentito resta fuori dal video finche' il testo della
 # conferenza del chart lo fa: un testo sostituito lo perde, e il portale deve
 # saperlo (senza la variabile quelle persone restano in solo ascolto).
 if ! helm template videocall "$CHART" -n videocall "${comuni[@]}" \
@@ -1890,7 +1890,7 @@ fi
 testo_chart=$(awk '/_custom_config_js: \|/ { dentro = 1; next }
   dentro && /^ {0,9}[^ ]/ { exit }
   dentro { sub(/^ {10}/, ""); print }' "$CHART/values.yaml")
-testo_compose=$(sed -n '/^if (typeof document/,$p' infra/jitsi/web/custom-config.js)
+testo_compose=$(sed -n '/^config.hiddenFromRecorderFeatureEnabled/,$p' infra/jitsi/web/custom-config.js)
 if [ "$testo_chart" != "$testo_compose" ]; then
   errore "testo della sessione del registratore diverso tra values.yaml e infra/jitsi/web/custom-config.js"
 fi

@@ -20,7 +20,7 @@ import { Icon } from '@/components/ui/icon';
 import { useDurataTesto } from '@/hooks/use-durata-testo';
 import { durataProgramma } from '@/lib/agenda/programme';
 import { parseLocaleList } from '@/lib/ai/target-locales';
-import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import { conduceSempreRegistrato, type VoceNelVideo } from '@/lib/live/consent-rule';
 import { registraChiConduce } from '@/lib/live/entry-consents';
 import { elencoVisibileAlPubblico } from '@/lib/live/participant-list';
 import { consensiRichiesti } from '@/lib/registration/consents';
@@ -28,6 +28,7 @@ import { togglesFromMatrix } from '@/lib/utils/permission-matrix';
 import { splitTitleKicker } from '@/lib/utils/title-kicker';
 import { describeRRule } from '@/lib/utils/recurrence';
 
+import ConsentDiagram from './consent-diagram';
 import { vociCompilate } from './programme-plan';
 import { nomeLingua } from './text-translation';
 import type { CampoMancante } from './validation';
@@ -500,7 +501,9 @@ export default function Step5Review({
                 ? tf('consentsLine', { list: vociConsenso.join(' · ') })
                 : tf('consentsNone')}
               {registraChiConduce({ recordingEnabled: form.recordingEnabled, eventType: istantanea ? 'INSTANT' : null }, recordingAvailable) && (
-                <span className="d-block text-secondary small mt-1">{tf('consentsHosts')}</span>
+                <span className="d-block text-secondary small mt-1">
+                  {tf(conduceSempreRegistrato(form, voceNelVideo) ? 'consentsHostsAlways' : 'consentsHosts')}
+                </span>
               )}
               {(consensi.registrazione || consensi.tracce) && (
                 <span className="d-block text-secondary small">{tf('consentsWithdraw')}</span>
@@ -525,6 +528,19 @@ export default function Step5Review({
             </span>
           </li>
         </ul>
+        {registra && !istantanea && (
+          <ConsentDiagram
+            multitrackRecordingEnabled={form.recordingEnabled && !!form.multitrackRecordingEnabled}
+            captionsTranscript={
+              liveCaptionsAvailable && form.liveCaptionsEnabled && !!form.captionsTranscriptEnabled
+            }
+            participantsCanUnmute={toggles.participantsCanUnmute}
+            participantsCanStartVideo={toggles.participantsCanStartVideo}
+            participantsCanShareScreen={toggles.participantsCanShareScreen}
+            hostsAlwaysRecorded={form.hostsAlwaysRecorded}
+            voce={voceNelVideo}
+          />
+        )}
         {capacita && (
           <RigaCapacita
             capacita={capacita}

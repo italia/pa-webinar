@@ -238,6 +238,8 @@ interface WaitingRoomProps {
   /** Si registra, ma chi partecipa non ha ne' microfono, ne' videocamera, ne'
    *  schermo: il riepilogo lo dice, e non c'e' nulla da acconsentire. */
   recordingListenOnly?: boolean;
+  /** Chi conduce un evento che lo tiene sempre nella registrazione: lo sa da qui. */
+  recordingHostAlways?: boolean;
   /** Il testo sulla registrazione scelto per l'evento; null = quello predefinito. */
   recordingConsentText?: string | null;
   /** L'informativa privacy dell'evento, accanto al consenso. */
@@ -304,6 +306,7 @@ export default function WaitingRoom({
   recordingConsentRequired = false,
   voce = 'rimovibile',
   recordingListenOnly = false,
+  recordingHostAlways = false,
   recordingConsentText = null,
   privacy,
   chatToken = '',
@@ -1873,7 +1876,9 @@ export default function WaitingRoom({
         t('summaryRecording'),
         recordingListenOnly
           ? tGdpr(voce === 'fissa' ? 'recordingNotice' : 'recordingNoticeVoice')
-          : t('recordingNotice'),
+          : recordingHostAlways
+            ? tGdpr('recordingHostAlways')
+            : t('recordingNotice'),
       ),
     );
   }

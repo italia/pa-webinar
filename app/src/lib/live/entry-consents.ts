@@ -10,8 +10,9 @@ import { consensiRichiesti, type FormatoEvento } from '@/lib/registration/consen
  * Se chi partecipa ha microfono, videocamera o schermo, la sala lo chiede a
  * chi non l'ha gia' dato (all'iscrizione, o in sala in questa visita della
  * pagina); di solo ascolto informa e basta (lib/registration/consents).
- * Chi conduce o interviene lo vede in ogni evento che registra. E' sempre
- * facoltativo: chi non lo da' entra lo stesso (lib/live/listen-only). Senza
+ * Chi conduce o interviene lo vede in ogni evento che registra, salvo che
+ * l'evento lo tenga sempre nella registrazione (conduceSempreRegistrato). E'
+ * sempre facoltativo: chi non lo da' entra lo stesso (lib/live/listen-only). Senza
  * nulla che possa registrare (lib/recording/availability), e nelle chiamate
  * rapide, non si chiede e non si informa.
  */
@@ -38,13 +39,15 @@ export function consensoRegistrazioneIngresso(i: {
   giaDato: boolean;
   /** Chiamata rapida (eventType INSTANT): la sala non ne mostra la registrazione. */
   istantanea?: boolean;
+  /** Chi conduce e' sempre nella registrazione (lib/live/consent-rule). */
+  conduceSempreRegistrato?: boolean;
 }): { richiesto: boolean; soloAscolto: boolean } {
   if (i.conduce) {
     const registra = registraChiConduce(
       { recordingEnabled: i.formato.recordingEnabled, eventType: i.istantanea ? 'INSTANT' : null },
       i.registrazioneDisponibile,
     );
-    return { richiesto: registra && !i.giaDato, soloAscolto: false };
+    return { richiesto: registra && !i.giaDato && !i.conduceSempreRegistrato, soloAscolto: false };
   }
   const formato = consensiRichiesti({
     ...i.formato,

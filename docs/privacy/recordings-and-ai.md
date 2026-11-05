@@ -66,7 +66,7 @@ assessment belongs to the controller of each installation.
 
 | Capture | Turned on by | Consent collected | What it contains | Where it is stored |
 |---|---|---|---|---|
-| Composite video (Jibri) | **Enable video recording** (`recordingEnabled`). A moderator starts it, or it starts on its own with `autoStartRecording` | `consentRecording` at registration; in the waiting room, a checkbox for whoever has not given it, stored as proof (`RecordingConsent`), never a condition of entering; for moderators and speakers too, stored with their grant or staff account | One MP4 file with the conference video and the mixed audio of everyone who consented: Jibri's session does not play the others | `recordings/` in the recordings storage domain |
+| Composite video (Jibri) | **Enable video recording** (`recordingEnabled`). A moderator starts it, or it starts on its own with `autoStartRecording` | `consentRecording` at registration; in the waiting room, a checkbox for whoever has not given it, stored as proof (`RecordingConsent`), never a condition of entering; for moderators and speakers too, stored with their grant or staff account | One MP4 file with the conference video and the mixed audio of everyone who consented: Jibri's session does not see the others | `recordings/` in the recordings storage domain |
 | Per-participant audio (recorder bot) | **Per-participant recording (high accuracy)** (`multitrackRecordingEnabled`). The toggle appears only with recording and **Automatic transcription** on. The bot starts when the event goes `LIVE` | The optional transcription consent: `consentMultitrack` at registration, or a checkbox in the waiting room stored for the conference seat (`MultitrackConsent`). The bot records only the tracks of people who gave it | One audio file per consenting participant and per track session, plus a manifest that names the participant of each file | `recordings/multitrack/<eventId>/<recordingId>/` in the recordings storage domain |
 | Live caption sentences | **Transcript from captions** (`captionsTranscriptEnabled`), with live captions running for the event | The same transcription consent | For people who consented: the text of each final caption sentence and the speaker's name. For everyone else: the times of their sentences only | `caption_segments` in PostgreSQL, text and name encrypted |
 | Who is in the room | Every event of an installation where live captions are available and on for the instance, whatever the event's own captions switch, and every event with per-participant recording, while Prosody loads `mod_pa_occupants` (the chart and Docker Compose load it); otherwise nothing | No dedicated consent | The bridge endpoint and the conference seat of each occupant who joined with a token, with join and leave times. No name | `room_occupants` in PostgreSQL |
@@ -966,10 +966,11 @@ Key handling and the secrets map are in
 
 Consent and transparency:
 
-- **Leaving a person out of the composite video depends on the Jitsi client.**
-  Jibri's session reads internals of the client to not play them, and the mark
-  depends on the current `mod_pa_media_lock`. Retry it after every Jitsi
-  upgrade, and restart Prosody after an upgrade that changes the modules.
+- **Leaving a person out of the composite video depends on Jitsi and on
+  Prosody.** It uses Jitsi's `hidden-from-recorder` feature, and the mark comes
+  from the current `mod_pa_media_lock`: with an old module loaded nobody is left
+  out, and the room still says so. Retry it after every Jitsi upgrade, and
+  restart Prosody after an upgrade that changes the modules.
 - **What is already in the composite video stays after a withdrawal.** Removing
   a person's passages is a request to the controller.
 - **The consent text promises deletion even when tracks are kept.**
