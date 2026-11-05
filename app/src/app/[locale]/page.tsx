@@ -237,7 +237,7 @@ async function LandingHome({
 
   const projectPoints: { key: string; icon: string }[] = [
     { key: 'sovereignty', icon: 'it-locked' },
-    { key: 'openSource', icon: 'it-open-source' },
+    { key: 'openSource', icon: 'it-code-circle' },
     { key: 'gdpr', icon: 'it-lock' },
   ];
 
