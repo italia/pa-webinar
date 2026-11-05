@@ -25,7 +25,7 @@
 ARG BASE_TAG=stable-11031
 FROM jitsi/web:${BASE_TAG} AS base
 
-FROM node:20-alpine AS patcher
+FROM node:22-alpine AS patcher
 COPY --from=base /usr/share/jitsi-meet/libs/app.bundle.min.js /work/app.bundle.min.js
 COPY patch-bundle.mjs /work/patch-bundle.mjs
 RUN node /work/patch-bundle.mjs /work/app.bundle.min.js
