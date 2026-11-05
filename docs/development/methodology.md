@@ -22,6 +22,7 @@ Three other pages cover what this one does not:
 | Schema and migrations in sync | The Migration Integrity job |
 | A chart that renders on every profile, and that a Kubernetes API server accepts for the example profiles | [`scripts/validate-chart.sh`](../../scripts/validate-chart.sh), and `kubectl apply --dry-run=server` on a throwaway kind cluster |
 | Dependency license policy | `npm run license:check` in the License Compliance job and in the Git hooks |
+| SPDX header on every source file | `scripts/licenses/headers.test.mjs` in Lint & Typecheck, and the `pre-commit` hook for new files |
 | Vulnerability and secret scanning | Trivy on the repository and on the image (blocking); CodeQL (non-blocking); GitHub secret scanning with push protection |
 | Architecture decisions | Architecture Decision Records in [`docs/adr/`](../adr/README.md) |
 | Release notes in all 24 languages | A test on the release-note catalogs |
@@ -197,7 +198,7 @@ The repository ships three Git hooks in [`scripts/git-hooks/`](../../scripts/git
 
 | Hook | When | What it runs |
 |---|---|---|
-| `pre-commit` | `git commit` | On the staged files: secrets in the added lines (common key and token formats), merge-conflict markers, files over 5 MB. Then, for what is staged: ESLint on the staged code of `app/`, the app type check, the unit tests related to the staged files (`vitest related`), the 24-language parity test when a catalog changed, a staged migration when `schema.prisma` changed, the lobby and service type checks, the license check and report when a lockfile changed, the chart validation when `infra/helm/` changed, and Prettier on new code files only. |
+| `pre-commit` | `git commit` | On the staged files: secrets in the added lines (common key and token formats), merge-conflict markers, files over 5 MB, the SPDX header of new source files. Then, for what is staged: ESLint on the staged code of `app/`, the app type check, the unit tests related to the staged files (`vitest related`), the 24-language parity test when a catalog changed, a staged migration when `schema.prisma` changed, the lobby and service type checks, the license check and report when a lockfile changed, the chart validation when `infra/helm/` changed, and Prettier on new code files only. |
 | `commit-msg` | after you write the message | The [commit format](#commits): `type(scope): subject`, 72 characters at most, no emoji, no trailing period, a blank line before the body, no attribution trailers. Merge, revert and fixup messages pass as Git writes them. |
 | `pre-push` | `git push` | The [CI-parity](#ci-parity-before-every-push) commands. Always: lint, type check, the script tests and the coverage run. For the areas the pushed commits touch: tests of the services, the lobby type check, the chart validation, the worker tests, the license check and the migration check. Then the Trivy filesystem scan on a clean checkout of each pushed commit. |
 
@@ -206,7 +207,7 @@ A check whose tool is missing (Helm, Trivy, pytest, a throwaway database for the
 - **The hooks help, they do not replace the rules.** The full unit-test suite runs before the push, not at every commit, and some checks need tools you may not have. Declaring what you skipped still applies.
 - **They read the working tree.** Apart from the secret, conflict and size checks, which read the staged content, the checks run on your working copy. With a partially staged file, or when you push a branch other than the one checked out, the result describes the working copy; the hooks print a notice when that happens.
 - **Skipping them** is for exceptional cases: `git commit --no-verify` or `git push --no-verify`, and say why in the commit body or the pull request.
-- **The rules are tested.** The message format, the secret patterns, the choice of checks and the license policy are pure functions with tests: `npm run test:scripts`, which CI runs in Lint & Typecheck.
+- **The rules are tested.** The message format, the secret patterns, the choice of checks, the license policy and the SPDX header are pure functions with tests: `npm run test:scripts`, which CI runs in Lint & Typecheck.
 - **Removing them:** `git config --unset core.hooksPath`.
 
 ## CI parity before every push
@@ -334,7 +335,7 @@ The coverage thresholds in [`app/vitest.config.ts`](../../app/vitest.config.ts) 
 
 ### Guard tests
 
-Some project rules are too easy to forget to leave to memory, so tests and lint rules encode them. A guard fails the gate the moment the rule is broken, instead of the next time someone notices. For example, `app/src/i18n/locale-parity.test.ts` fails when an interface string is missing or empty in one of the 24 catalogs, and `app/src/lib/gdpr/cleanup-coverage.test.ts` fails when a table with an `eventId` column is not classified as purged or kept by the GDPR cleanup. When you add a rule that can be checked mechanically, add its guard in the same change. [Guard tests that encode rules](testing.md#guard-tests-that-encode-rules) lists every guard and what each one cannot catch.
+Some project rules are too easy to forget to leave to memory, so tests and lint rules encode them. A guard fails the gate the moment the rule is broken, instead of the next time someone notices. For example, `app/src/i18n/locale-parity.test.ts` fails when an interface string is missing or empty in one of the 24 catalogs, and `app/src/lib/gdpr/cleanup-coverage.test.ts` fails when a table with an `eventId` column is not classified as purged or kept by the GDPR cleanup, and `scripts/licenses/headers.test.mjs` fails when a source file has no SPDX header. When you add a rule that can be checked mechanically, add its guard in the same change. [Guard tests that encode rules](testing.md#guard-tests-that-encode-rules) lists every guard and what each one cannot catch.
 
 ## Database changes
 

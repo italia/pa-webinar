@@ -1,11 +1,15 @@
 #!/usr/bin/env node
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Esecutore dei git hook del repository (installati da `npm install` con
  * install.mjs, che imposta `core.hooksPath` su scripts/git-hooks se non e'
  * gia' impostato altrove; per forzarlo: `npm run hooks:install`).
  *
  *   pre-commit  controlli veloci sui file in stage: segreti, marcatori di
- *               conflitto, file troppo grandi, lint dei file toccati, tipi,
+ *               conflitto, file troppo grandi, intestazione SPDX dei file
+ *               nuovi, lint dei file toccati, tipi,
  *               test collegati, parita' delle lingue, migrazione per lo
  *               schema, licenze, formattazione dei file nuovi, tipi dei
  *               servizi e chart Helm quando sono toccati
@@ -34,6 +38,7 @@ import {
   segretiAggiunti,
   soloCommentiSchema,
 } from './rules.mjs';
+import { haIntestazione, richiedeIntestazione } from '../licenses/headers.mjs';
 
 const RADICE = git(['rev-parse', '--show-toplevel']).trim();
 const WINDOWS = process.platform === 'win32';
@@ -204,6 +209,19 @@ function preCommit() {
     errore(
       'Large files',
       grandi.map((f) => `${f} is larger than 5 MB: keep it out of Git`)
+    );
+  }
+
+  const senzaSpdx = nuovi.filter((f) => {
+    const testo = git(['show', `:${f}`]);
+    return richiedeIntestazione(f, testo) && !haIntestazione(testo);
+  });
+  if (senzaSpdx.length) {
+    errore(
+      'SPDX header',
+      senzaSpdx
+        .map((f) => `${f}: no SPDX header`)
+        .concat('Run npm run license:headers -- --fix, then stage the files again.')
     );
   }
 
