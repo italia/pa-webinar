@@ -860,6 +860,9 @@ export default function RegistrationFormClient({
               checked={consentRecording}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setConsentRecording(e.target.checked);
+                // La trascrizione dipende dalla registrazione: tolta questa,
+                // non deve ricomparire gia' spuntata.
+                if (!e.target.checked && voce === 'rimovibile') setConsentMultitrack(false);
                 pulisciErrore('consentRecording');
               }}
             />

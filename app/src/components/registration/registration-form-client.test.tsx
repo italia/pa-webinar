@@ -151,6 +151,42 @@ function rispondi(testo: string) {
   });
 }
 
+describe('RegistrationFormClient — consensi', () => {
+  it('togliendo la registrazione, la trascrizione non ricompare gia\' spuntata', () => {
+    act(() => {
+      root.render(
+        <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
+          <RegistrationFormClient
+            eventSlug={SLUG}
+            privacyPolicyUrl="/privacy"
+            preRegistrationQuestionnaire={null}
+            startsAt={new Date(Date.now() + 7 * 24 * 3600_000).toISOString()}
+            waitingRoomLeadMinutes={15}
+            recordingEnabled
+            multitrackRecordingEnabled
+            participantsCanUnmute
+            voce="rimovibile"
+          />
+        </NextIntlClientProvider>,
+      );
+    });
+    const casella = (id: string) => {
+      const el = container.querySelector<HTMLInputElement>(`#${id}`);
+      if (!el) throw new Error(`casella ${id} non trovata`);
+      return el;
+    };
+    act(() => casella('consentRecording').click());
+    act(() => casella('consentMultitrack').click());
+    expect(casella('consentMultitrack').checked).toBe(true);
+
+    act(() => casella('consentRecording').click());
+    expect(casella('consentMultitrack').disabled).toBe(true);
+
+    act(() => casella('consentRecording').click());
+    expect(casella('consentMultitrack').checked).toBe(false);
+  });
+});
+
 describe('RegistrationFormClient — questionario dell\'iscrizione', () => {
   it('senza questionario il modulo non ne mostra', async () => {
     disegna(null);
