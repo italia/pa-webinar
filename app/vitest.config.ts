@@ -41,7 +41,7 @@ export default defineConfig({
       // modo stabile, questi numeri si alzano dietro; mai il contrario.
       //
       // Misura di riferimento (Vitest 5, copertura V8 rimappata sull'AST):
-      // lines 59,6 · functions 52,0 · branches 53,3 · statements 58,1.
+      // lines 59,6 · functions 52,1 · branches 53,4 · statements 58,1.
       thresholds: {
         lines: 57,
         functions: 50,
