@@ -44,10 +44,16 @@
     "next": {
       "sharp": "^0.35.0",
       "postcss": "^8.5.10"
+    },
+    "@typescript-eslint/typescript-estree": {
+      "minimatch": "$minimatch"
     }
   },
   "engines": {
     "node": "^22.22.2 || ^24.15.0 || >=26.0.0",
     "npm": ">=10.0.0"
+  },
+  "devDependencies": {
+    "minimatch": "^11.0.4"
   }
 }
