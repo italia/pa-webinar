@@ -5,27 +5,15 @@
     "publisher": "TJ Holowaychuk",
     "email": "tj@vision-media.ca"
   },
-  "@asamuzakjp/css-color@5.1.11": {
+  "@asamuzakjp/css-color@7.1.9": {
     "licenses": "MIT",
     "repository": "https://github.com/asamuzaK/cssColor",
     "publisher": "asamuzaK"
   },
-  "@asamuzakjp/dom-selector@7.1.1": {
+  "@asamuzakjp/dom-selector@10.0.5": {
     "licenses": "MIT",
     "repository": "https://github.com/asamuzaK/domSelector",
     "publisher": "asamuzaK"
-  },
-  "@asamuzakjp/generational-cache@1.0.1": {
-    "licenses": "MIT",
-    "repository": "https://github.com/asamuzaK/generationalCache",
-    "publisher": "asamuzaK"
-  },
-  "@asamuzakjp/nwsapi@2.3.9": {
-    "licenses": "MIT",
-    "repository": "https://github.com/dperini/nwsapi",
-    "publisher": "Diego Perini",
-    "email": "diego.perini@gmail.com",
-    "url": "http://www.iport.it/"
   },
   "@asteasolutions/zod-to-openapi@9.1.0": {
     "licenses": "MIT",
@@ -343,34 +331,34 @@
     "email": "demurgos@demurgos.net",
     "url": "https://demurgos.net"
   },
-  "@bramus/specificity@2.4.2": {
+  "@bramus/specificity@2.4.3": {
     "licenses": "MIT",
     "repository": "https://github.com/bramus/specificity",
     "publisher": "Bramus Van Damme",
     "email": "bramus@bram.us",
     "url": "https://www.bram.us/"
   },
-  "@csstools/color-helpers@6.1.1": {
+  "@csstools/color-helpers@6.1.2": {
     "licenses": "MIT-0",
     "repository": "https://github.com/csstools/postcss-plugins"
   },
-  "@csstools/css-calc@3.4.0": {
+  "@csstools/css-calc@3.4.3": {
     "licenses": "MIT",
     "repository": "https://github.com/csstools/postcss-plugins"
   },
-  "@csstools/css-color-parser@4.2.3": {
+  "@csstools/css-color-parser@4.2.7": {
     "licenses": "MIT",
     "repository": "https://github.com/csstools/postcss-plugins"
   },
-  "@csstools/css-parser-algorithms@4.0.0": {
+  "@csstools/css-parser-algorithms@4.0.2": {
     "licenses": "MIT",
     "repository": "https://github.com/csstools/postcss-plugins"
   },
-  "@csstools/css-syntax-patches-for-csstree@1.1.14": {
+  "@csstools/css-syntax-patches-for-csstree@1.1.16": {
     "licenses": "MIT-0",
     "repository": "https://github.com/csstools/postcss-plugins"
   },
-  "@csstools/css-tokenizer@4.0.1": {
+  "@csstools/css-tokenizer@4.0.2": {
     "licenses": "MIT",
     "repository": "https://github.com/csstools/postcss-plugins"
   },
@@ -431,7 +419,7 @@
     "repository": "https://github.com/eslint/rewrite",
     "publisher": "Nicholas C. Zakas"
   },
-  "@exodus/bytes@1.15.2": {
+  "@exodus/bytes@1.16.0": {
     "licenses": "MIT",
     "repository": "https://github.com/ExodusOSS/bytes",
     "publisher": "Exodus Movement, Inc."
@@ -815,7 +803,14 @@
     "publisher": "강동윤",
     "email": "kdy1997.dev@gmail.com"
   },
-  "@testing-library/jest-dom@6.9.1": {
+  "@testing-library/dom@10.4.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/testing-library/dom-testing-library",
+    "publisher": "Kent C. Dodds",
+    "email": "me@kentcdodds.com",
+    "url": "https://kentcdodds.com"
+  },
+  "@testing-library/jest-dom@7.0.1": {
     "licenses": "MIT",
     "repository": "https://github.com/testing-library/jest-dom",
     "publisher": "Ernesto Garcia",
@@ -828,6 +823,10 @@
     "publisher": "Kent C. Dodds",
     "email": "me@kentcdodds.com",
     "url": "https://kentcdodds.com"
+  },
+  "@types/aria-query@5.0.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped"
   },
   "@types/babel__core@7.20.5": {
     "licenses": "MIT",
@@ -1039,12 +1038,26 @@
     "publisher": "Julian Garnier",
     "email": "hello@julian.gr"
   },
+  "ansi-regex@5.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/chalk/ansi-regex",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com"
+  },
   "ansi-styles@4.3.0": {
     "licenses": "MIT",
     "repository": "https://github.com/chalk/ansi-styles",
     "publisher": "Sindre Sorhus",
     "email": "sindresorhus@gmail.com",
     "url": "sindresorhus.com"
+  },
+  "ansi-styles@5.2.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/chalk/ansi-styles",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com"
   },
   "anynum@1.0.1": {
     "licenses": "MIT",
@@ -1066,6 +1079,12 @@
     "repository": "https://github.com/theKashey/aria-hidden",
     "publisher": "Anton Korzunov",
     "email": "thekashey@gmail.com"
+  },
+  "aria-query@5.3.0": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/A11yance/aria-query",
+    "publisher": "Jesse Beach",
+    "email": "splendidnoise@gmail.com"
   },
   "aria-query@5.3.2": {
     "licenses": "Apache-2.0",
@@ -1396,7 +1415,7 @@
     "repository": "https://github.com/tad-lispy/node-damerau-levenshtein",
     "publisher": "The Spanish Inquisition"
   },
-  "data-urls@7.0.0": {
+  "data-urls@8.0.0": {
     "licenses": "MIT",
     "repository": "https://github.com/jsdom/data-urls",
     "publisher": "Domenic Denicola",
@@ -1509,6 +1528,10 @@
     "licenses": "Apache-2.0",
     "repository": "https://github.com/eslint/doctrine"
   },
+  "dom-accessibility-api@0.5.16": {
+    "licenses": "MIT",
+    "repository": "https://github.com/eps1lon/dom-accessibility-api"
+  },
   "dom-accessibility-api@0.6.3": {
     "licenses": "MIT",
     "repository": "https://github.com/eps1lon/dom-accessibility-api"
@@ -1564,7 +1587,7 @@
     "email": "luke.edwards05@gmail.com",
     "url": "https://lukeed.com"
   },
-  "entities@8.1.0": {
+  "entities@9.0.0": {
     "licenses": "BSD-2-Clause",
     "repository": "https://github.com/fb55/entities",
     "publisher": "Felix Boehm",
@@ -2015,7 +2038,7 @@
     "publisher": "Jordan Harband",
     "email": "ljharb@gmail.com"
   },
-  "html-encoding-sniffer@6.0.0": {
+  "html-encoding-sniffer@7.0.0": {
     "licenses": "MIT",
     "repository": "https://github.com/jsdom/html-encoding-sniffer",
     "publisher": "Domenic Denicola",
@@ -2306,7 +2329,7 @@
     "email": "i@izs.me",
     "url": "http://blog.izs.me/"
   },
-  "isomorphic-dompurify@3.19.0": {
+  "isomorphic-dompurify@4.6.0": {
     "licenses": "MIT",
     "repository": "https://github.com/kkomelin/isomorphic-dompurify"
   },
@@ -2342,7 +2365,7 @@
     "publisher": "Vladimir Zapparov",
     "email": "dervus.grim@gmail.com"
   },
-  "jsdom@29.1.1": {
+  "jsdom@30.1.3": {
     "licenses": "MIT",
     "repository": "https://github.com/jsdom/jsdom"
   },
@@ -2453,6 +2476,12 @@
     "repository": "https://github.com/isaacs/node-lru-cache",
     "publisher": "Isaac Z. Schlueter",
     "email": "i@izs.me"
+  },
+  "lz-string@1.5.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/pieroxy/lz-string",
+    "publisher": "pieroxy",
+    "email": "pieroxy@pieroxy.net"
   },
   "m3u8-parser@7.2.0": {
     "licenses": "Apache-2.0",
@@ -2722,7 +2751,7 @@
     "email": "sindresorhus@gmail.com",
     "url": "sindresorhus.com"
   },
-  "parse5@8.0.1": {
+  "parse5@8.1.0": {
     "licenses": "MIT",
     "repository": "https://github.com/inikulin/parse5",
     "publisher": "Ivan Nikulin",
@@ -2843,6 +2872,12 @@
     "repository": "https://github.com/prettier/prettier",
     "publisher": "James Long"
   },
+  "pretty-format@27.5.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/facebook/jest",
+    "publisher": "James Kyle",
+    "email": "me@thejameskyle.com"
+  },
   "prisma@6.19.3": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/prisma/prisma",
@@ -2925,6 +2960,10 @@
     "publisher": "Chris Bolin"
   },
   "react-is@16.13.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/facebook/react"
+  },
+  "react-is@17.0.2": {
     "licenses": "MIT",
     "repository": "https://github.com/facebook/react"
   },
@@ -3284,12 +3323,6 @@
     "licenses": "MIT",
     "repository": "https://github.com/vercel/swr"
   },
-  "symbol-tree@3.2.4": {
-    "licenses": "MIT",
-    "repository": "https://github.com/jsdom/js-symbol-tree",
-    "publisher": "Joris van der Wel",
-    "email": "joris@jorisvanderwel.com"
-  },
   "tdigest@0.1.3": {
     "licenses": "MIT",
     "repository": "https://github.com/welch/tdigest",
@@ -3316,12 +3349,12 @@
     "licenses": "MIT",
     "repository": "https://github.com/tinylibs/tinyrainbow"
   },
-  "tldts-core@7.4.13": {
+  "tldts-core@7.4.20": {
     "licenses": "MIT",
     "repository": "https://github.com/remusao/tldts",
     "publisher": "Rémi Berson"
   },
-  "tldts@7.4.13": {
+  "tldts@7.4.19": {
     "licenses": "MIT",
     "repository": "https://github.com/remusao/tldts",
     "publisher": "Rémi Berson"
@@ -3338,7 +3371,7 @@
     "publisher": "Jeremy Stashewsky",
     "email": "jstash@gmail.com"
   },
-  "tr46@6.0.0": {
+  "tr46@7.0.0": {
     "licenses": "MIT",
     "repository": "https://github.com/jsdom/tr46",
     "publisher": "Sebastian Mayr",
@@ -3427,7 +3460,7 @@
     "licenses": "MIT",
     "repository": "https://github.com/nodejs/undici"
   },
-  "undici@7.30.1": {
+  "undici@8.12.4": {
     "licenses": "MIT",
     "repository": "https://github.com/nodejs/undici"
   },
@@ -3499,7 +3532,7 @@
     "publisher": "Anthony Fu",
     "email": "anthonyfu117@hotmail.com"
   },
-  "w3c-xmlserializer@5.0.0": {
+  "w3c-xmlserializer@6.0.0": {
     "licenses": "MIT",
     "repository": "https://github.com/jsdom/w3c-xmlserializer"
   },
@@ -3528,7 +3561,7 @@
     "email": "d@domenic.me",
     "url": "https://domenic.me/"
   },
-  "whatwg-url@16.0.1": {
+  "whatwg-url@17.3.0": {
     "licenses": "MIT",
     "repository": "https://github.com/jsdom/whatwg-url",
     "publisher": "Sebastian Mayr",
