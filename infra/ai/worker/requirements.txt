@@ -45,7 +45,7 @@ omegaconf==2.4.0
 pandas==2.3.3
 
 # Sottotitoli VTT, scritti dagli helper in worker/vtt.py.
-webvtt-py==0.5.1
+webvtt-py==0.7.0
 
 # Il caricamento degli artefatti usa URL PUT prefirmati: nessun SDK.
 
