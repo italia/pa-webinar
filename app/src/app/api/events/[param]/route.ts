@@ -818,8 +818,15 @@ export const PUT = withErrorHandling(async (request, context) => {
     },
   });
 
+  // Come nella GET: i campi del solo primario non escono verso un co-moderatore,
+  // che col token primario scalerebbe a owner in modo che la revoca non puo' piu'
+  // recuperare. L'hash della password dell'evento non esce verso nessuno.
+  const { joinPasswordHash: _joinPasswordHash, ...rigaSenzaHash } = updated;
+
   return Response.json({
-    ...updated,
+    ...rigaSenzaHash,
+    moderatorToken: isPrimaryModerator ? updated.moderatorToken : token,
+    moderatorEmail: isPrimaryModerator ? tryDecryptPII(updated.moderatorEmail) : null,
     // BigInt: JSON.stringify non lo sa scrivere, e un evento registrato con
     // Jibri ne ha uno. Esce come numero, come nella GET dello stesso evento.
     recordingFileSize:

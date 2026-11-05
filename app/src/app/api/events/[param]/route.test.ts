@@ -89,6 +89,7 @@ vi.mock('@/lib/db', () => ({
   },
 }));
 
+import { constantTimeEqual, extractModeratorToken } from '@/lib/auth/moderator';
 import { prisma } from '@/lib/db';
 import { AppError, UnauthorizedError } from '@/lib/errors';
 import { estimateNumbers } from '@/lib/estimates';
@@ -442,6 +443,60 @@ describe('PUT /api/events/[param] — le modifiche parziali restano parziali', (
  * altrimenti resterebbe aperta per sempre e le statistiche riporterebbero la
  * finestra programmata al posto della durata vera.
  */
+describe('PUT /api/events/[param] — la risposta non porta i campi del solo primario', () => {
+  const rigaSalvata = () => ({
+    ...eventoEsistente(),
+    moderatorToken: 'token-del-primario',
+    moderatorEmail: 'titolare@esempio.it',
+    joinPasswordHash: 'hash-della-password',
+  });
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocked.event.update.mockImplementation(async () => rigaSalvata());
+  });
+
+  // Il corpo vuoto basta a chiedere la riga; il flag e' cio' che manda la sala.
+  it.each([
+    ['un corpo vuoto', {}],
+    ['un flag acceso dalla sala', { wordCloudEnabled: true }],
+  ])('a un co-moderatore, con %s, torna il suo token', async (_nome, corpo) => {
+    vi.mocked(extractModeratorToken).mockReturnValueOnce('token-della-concessione');
+    vi.mocked(constantTimeEqual).mockReturnValueOnce(false);
+
+    const res = await PUT(richiesta(corpo), contesto as never);
+
+    expect(res.status).toBe(200);
+    const risposta = await res.json();
+    expect(risposta.moderatorToken).toBe('token-della-concessione');
+    expect(risposta.moderatorEmail).toBeNull();
+    expect(risposta).not.toHaveProperty('joinPasswordHash');
+    const testo = JSON.stringify(risposta);
+    expect(testo).not.toContain('token-del-primario');
+    expect(testo).not.toContain('titolare@esempio.it');
+    expect(testo).not.toContain('hash-della-password');
+  });
+
+  it('al primario tornano il suo token e il suo indirizzo, mai la password', async () => {
+    vi.mocked(extractModeratorToken).mockReturnValueOnce('token-del-primario');
+
+    const res = await PUT(richiesta({ wordCloudEnabled: true }), contesto as never);
+
+    expect(res.status).toBe(200);
+    const risposta = await res.json();
+    expect(risposta.moderatorToken).toBe('token-del-primario');
+    expect(risposta.moderatorEmail).toBe('titolare@esempio.it');
+    expect(risposta).not.toHaveProperty('joinPasswordHash');
+  });
+
+  it('il resto della riga resta nella risposta', async () => {
+    const res = await PUT(richiesta({ wordCloudEnabled: true }), contesto as never);
+
+    const risposta = await res.json();
+    expect(risposta).toMatchObject({ id: EVENT_ID, slug: 'evento-esistente', dateChanged: false });
+  });
+});
+
 describe('PUT /api/events/[param] — cambio di stato e sessioni di chiamata', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
