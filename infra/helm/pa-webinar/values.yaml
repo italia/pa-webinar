@@ -795,6 +795,8 @@ configReloadHook:
   enabled: true
   # Jitsi components (by app.kubernetes.io/component label) to rollout-restart.
   # Default: web (config.js). Add jicofo / prosody if you change their custom config.
+  # Prosody restarts anyway when the project modules change: run such an
+  # upgrade with no event in progress.
   components:
     - web
   # Image with kubectl. Empty → jvbScaler.image, then kubectlImage.

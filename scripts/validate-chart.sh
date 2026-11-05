@@ -1886,6 +1886,13 @@ if helm template videocall "$CHART" -n videocall "${comuni[@]}" \
     | grep -q RECORDING_VOICE_EXCLUSION; then
   errore "testo della conferenza sostituito: RECORDING_VOICE_EXCLUSION ancora presente"
 fi
+# I moduli di Prosody si caricano all'avvio: senza il riavvio dopo un
+# aggiornamento, la regola del consenso resta quella vecchia.
+if ! helm template videocall "$CHART" -n videocall "${comuni[@]}" \
+    -f "$CHART/examples/values-simple.yaml" \
+    | grep -q 'kubectl rollout restart -n "$ns" "$sts"'; then
+  errore "hook di aggiornamento: Prosody non riparte quando cambiano i moduli"
+fi
 # Lo stesso testo per il chart e per Docker Compose.
 testo_chart=$(awk '/_custom_config_js: \|/ { dentro = 1; next }
   dentro && /^ {0,9}[^ ]/ { exit }
