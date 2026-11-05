@@ -105,6 +105,7 @@ export default function MyDataPage() {
   // Il token per ritirare un consenso: lo consegna la lettura dei dati.
   const [tokenConsensi, setTokenConsensi] = useState<string | null>(null);
   const [voce, setVoce] = useState<VoceNelVideo>('rimovibile');
+  const [comunicazioniRitirateIl, setComunicazioniRitirateIl] = useState<string | null>(null);
   const format = useFormatter();
 
   // When the user lands here via the signed link emailed to them, the
@@ -117,6 +118,7 @@ export default function MyDataPage() {
     (async () => {
       setLoading(true);
       setError('');
+      setComunicazioniRitirateIl(null);
       try {
         const res = await fetch(
           `/api/gdpr/export?t=${encodeURIComponent(token)}`,
@@ -400,6 +402,8 @@ export default function MyDataPage() {
                         registrationId={entry.registration.id}
                         consensi={entry.registration.consents}
                         voce={voce}
+                        comunicazioniRitirateIl={comunicazioniRitirateIl}
+                        onComunicazioniRitirate={setComunicazioniRitirateIl}
                       />
                     )}
 

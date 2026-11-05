@@ -96,6 +96,15 @@ export const GET = withErrorHandling(async (request) => {
   let emailsFailed = 0;
 
   const overridePerLingua = new Map<string, Awaited<ReturnType<typeof loadEmailTemplateOverride>>>();
+  const linkPerLingua = new Map<string, Awaited<ReturnType<typeof linkIMieiDati>>>();
+  const linkDatiPerLingua = async (lingua: string) => {
+    let link = linkPerLingua.get(lingua);
+    if (!link) {
+      link = await linkIMieiDati(baseUrl, lingua);
+      linkPerLingua.set(lingua, link);
+    }
+    return link;
+  };
   for (const promemoria of perEvento.values()) {
     const event = promemoria[0]!.event;
     const corrente = currentReminder(promemoria, event.startsAt, now);
@@ -177,7 +186,7 @@ export const GET = withErrorHandling(async (request) => {
           },
           eventImageUrl: absoluteEventImage(event, baseUrl),
           addressBookOptOutUrl: rubricaOptOutUrl(reg.person, baseUrl, locale),
-          myDataLink: await linkIMieiDati(baseUrl, locale),
+          myDataLink: await linkDatiPerLingua(locale),
         };
 
         // Lo stesso invito personale della conferma (stesso UID): il

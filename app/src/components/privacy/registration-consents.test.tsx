@@ -14,7 +14,10 @@ let container: HTMLDivElement;
 let root: Root;
 const dato = { dato: true, ritiratoIl: null };
 
-const monta = (consensi: Partial<ConsensiVista>) =>
+const monta = (
+  consensi: Partial<ConsensiVista>,
+  altri: { comunicazioniRitirateIl?: string; onComunicazioniRitirate?: (q: string) => void } = {}
+) =>
   act(() =>
     root.render(
       <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
@@ -27,6 +30,7 @@ const monta = (consensi: Partial<ConsensiVista>) =>
             futureCommunications: null,
             ...consensi,
           }}
+          {...altri}
         />
       </NextIntlClientProvider>
     )
@@ -100,6 +104,28 @@ describe('RegistrationConsents', () => {
     expect(container.textContent).toContain(
       'le tue frasi già trascritte perdono testo e nome'
     );
+  });
+
+  it('il ritiro delle comunicazioni si riporta sulle altre schede', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('{}', { status: 200 }))
+    );
+    const avvisa = vi.fn();
+    monta({ futureCommunications: dato }, { onComunicazioniRitirate: avvisa });
+
+    await clic('Ritira il consenso');
+    await clic('Ritira');
+
+    expect(avvisa).toHaveBeenCalledWith(expect.any(String));
+  });
+
+  it('una scheda riceve il ritiro fatto da un\'altra', () => {
+    monta(
+      { futureCommunications: dato },
+      { comunicazioniRitirateIl: '2026-11-05T10:00:00.000Z' }
+    );
+    expect(pulsante('Ritira il consenso')).toBeUndefined();
   });
 
   it('un link scaduto chiede un link nuovo, non di riprovare', async () => {

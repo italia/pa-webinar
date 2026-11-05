@@ -33,17 +33,30 @@ export default function RegistrationConsents({
   registrationId,
   consensi,
   voce = 'rimovibile',
+  comunicazioniRitirateIl = null,
+  onComunicazioniRitirate,
 }: {
   voce?: VoceNelVideo;
   token: string;
   registrationId: string;
   consensi: ConsensiVista;
+  /** Il ritiro delle comunicazioni vale per tutte le iscrizioni dell'indirizzo:
+   *  chi ospita le schede lo riporta su ciascuna. */
+  comunicazioniRitirateIl?: string | null;
+  onComunicazioniRitirate?: (quando: string) => void;
 }) {
   const t = useTranslations('gdpr.export');
   const tl = useTranslations('live.consents');
   const tc = useTranslations('common');
   const format = useFormatter();
-  const [stati, setStati] = useState(consensi);
+  const [statiLocali, setStati] = useState(consensi);
+  const stati: ConsensiVista =
+    comunicazioniRitirateIl && statiLocali.futureCommunications?.dato
+      ? {
+          ...statiLocali,
+          futureCommunications: { dato: false, ritiratoIl: comunicazioniRitirateIl },
+        }
+      : statiLocali;
   const [conferma, setConferma] = useState<Chiave | null>(null);
   const [inCorso, setInCorso] = useState(false);
   const [errore, setErrore] = useState<string | null>(null);
@@ -95,6 +108,7 @@ export default function RegistrationConsents({
           ? { transcription: { dato: false, ritiratoIl: adesso } }
           : {}),
       }));
+      if (chiave === 'futureCommunications') onComunicazioniRitirate?.(adesso);
       setConferma(null);
     } catch {
       setErrore(tl('error'));

@@ -9,7 +9,7 @@ const tx = vi.hoisted(() => ({
   registration: { updateMany: vi.fn(), findMany: vi.fn() },
   person: { updateMany: vi.fn() },
   captionSegment: { updateMany: vi.fn() },
-  gdprAuditLog: { create: vi.fn() },
+  gdprAuditLog: { create: vi.fn(), createMany: vi.fn() },
 }));
 const trascrizione = vi.hoisted(() => ({
   bloccaTrascrizioneEvento: vi.fn(async () => undefined),
@@ -247,13 +247,13 @@ describe('ritiraComunicazioni', () => {
       where: { emailHash: 'impronta', optedInToAddressBook: true },
       data: { optedInToAddressBook: false, optedOutAt: ADESSO },
     });
-    expect(tx.gdprAuditLog.create).toHaveBeenCalledTimes(2);
+    expect(tx.gdprAuditLog.createMany.mock.calls[0]![0].data).toHaveLength(2);
   });
 
   it('senza consenso da ritirare non scrive niente nel registro', async () => {
     tx.registration.findMany.mockResolvedValue([]);
     tx.person.updateMany.mockResolvedValue({ count: 0 });
     expect(await ritiraComunicazioni('impronta', ADESSO)).toBe(false);
-    expect(tx.gdprAuditLog.create).not.toHaveBeenCalled();
+    expect(tx.gdprAuditLog.createMany).toHaveBeenCalledWith({ data: [] });
   });
 });

@@ -202,9 +202,9 @@ export async function ritiraConsensi(
 
 /**
  * Il ritiro del consenso alle comunicazioni future, dalla pagina dei propri
- * dati. La stessa casella dell'iscrizione copre comunicazioni e rubrica: si
- * tolgono entrambe, su ogni iscrizione dell'indirizzo, come l'uscita dalla
- * rubrica dal link delle email (api/rubrica/opt-out).
+ * dati o dal link delle email (api/rubrica/opt-out). La stessa casella
+ * dell'iscrizione copre comunicazioni e rubrica: si tolgono entrambe, su ogni
+ * iscrizione dell'indirizzo, e il registro lo annota per ogni evento toccato.
  */
 export async function ritiraComunicazioni(
   emailHash: string,
@@ -225,16 +225,14 @@ export async function ritiraComunicazioni(
       where: { emailHash, optedInToAddressBook: true },
       data: { optedInToAddressBook: false, optedOutAt: adesso },
     });
-    for (const { eventId } of iscrizioni) {
-      await tx.gdprAuditLog.create({
-        data: {
-          eventId,
-          action: 'CONSENT_WITHDRAWN',
-          recordCount: 1,
-          details: JSON.stringify({ source: 'self-service', futureCommunications: 1 }),
-        },
-      });
-    }
+    await tx.gdprAuditLog.createMany({
+      data: iscrizioni.map(({ eventId }) => ({
+        eventId,
+        action: 'CONSENT_WITHDRAWN',
+        recordCount: 1,
+        details: JSON.stringify({ source: 'self-service', futureCommunications: 1 }),
+      })),
+    });
     return iscrizioni.length > 0 || rubrica.count > 0;
   });
 }
