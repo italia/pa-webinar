@@ -103,6 +103,14 @@ function monta(props: Partial<React.ComponentProps<typeof JitsiRoom>> = {}) {
 }
 
 describe('JitsiRoom, conferenza persa', () => {
+  it('dice alla sala quando parte la condivisione dello schermo, non quando finisce', () => {
+    const onScreenShareStarted = vi.fn();
+    const api = monta({ onScreenShareStarted });
+    act(() => api.emit('screenSharingStatusChanged', { on: true }));
+    act(() => api.emit('screenSharingStatusChanged', { on: false }));
+    expect(onScreenShareStarted).toHaveBeenCalledTimes(1);
+  });
+
   it('un errore fatale della connessione, dopo essere entrati, lo riferisce alla sala', () => {
     const onConnectionLost = vi.fn();
     const api = monta({ onConnectionLost });

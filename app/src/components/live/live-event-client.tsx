@@ -1184,6 +1184,8 @@ export default function LiveEventClient({
     if (!muto) setMezzoUsato(true);
   }, [rientroRef]);
 
+  const handleScreenShareStarted = useCallback(() => setMezzoUsato(true), []);
+
   // «Rientra» dalla schermata di uscita: di nuovo il token e la sala, con le
   // scelte della sala d'attesa. Il consenso alla registrazione e' gia' stato
   // dato.
@@ -2489,6 +2491,7 @@ export default function LiveEventClient({
                 onReadyToClose={handleReadyToClose}
                 onConnectionLost={avviaRientro}
                 onMediaChanged={handleMediaChanged}
+                onScreenShareStarted={handleScreenShareStarted}
                 inRientro={rientro !== null}
                 onParticipantCountChanged={handleParticipantCountChanged}
                 onRecordingStatusChanged={handleRecordingStatusChanged}

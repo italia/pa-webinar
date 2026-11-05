@@ -122,6 +122,8 @@ interface JitsiRoomProps {
   /** Microfono o videocamera accesi o spenti, da chiunque: la sala lo ricorda
    *  per rientrare, dopo una caduta, come si era. */
   onMediaChanged?: (mezzo: Medium, muto: boolean) => void;
+  /** Chi e' in sala ha iniziato a condividere lo schermo. */
+  onScreenShareStarted?: () => void;
   /** Rientro dopo una caduta: lo stato lo mostra la sala, quindi niente
    *  spinner di caricamento qui. */
   inRientro?: boolean;
@@ -177,6 +179,7 @@ export default function JitsiRoom({
   onReadyToClose,
   onConnectionLost,
   onMediaChanged,
+  onScreenShareStarted,
   inRientro = false,
   onParticipantCountChanged,
   onRecordingStatusChanged,
@@ -228,6 +231,8 @@ export default function JitsiRoom({
   useEffect(() => { onReadyToCloseRef.current = onReadyToClose; }, [onReadyToClose]);
   useEffect(() => { onConnectionLostRef.current = onConnectionLost; }, [onConnectionLost]);
   useEffect(() => { onMediaChangedRef.current = onMediaChanged; }, [onMediaChanged]);
+  const onScreenShareStartedRef = useRef(onScreenShareStarted);
+  useEffect(() => { onScreenShareStartedRef.current = onScreenShareStarted; }, [onScreenShareStarted]);
   useEffect(() => { onParticipantCountChangedRef.current = onParticipantCountChanged; }, [onParticipantCountChanged]);
   useEffect(() => { onRecordingStatusChangedRef.current = onRecordingStatusChanged; }, [onRecordingStatusChanged]);
   useEffect(() => { onApiReadyRef.current = onApiReady; }, [onApiReady]);
@@ -777,6 +782,9 @@ export default function JitsiRoom({
         api.addListener('videoMuteStatusChanged', (e: { muted?: boolean }) => {
           cambioStato('video', e?.muted);
           riferisciMezzo('video', e?.muted);
+        });
+        api.addListener('screenSharingStatusChanged', (e: { on?: boolean }) => {
+          if (e?.on) onScreenShareStartedRef.current?.();
         });
         api.addListener('toolbarButtonClicked', (e: { key: string }) => {
           if (e?.key === 'microphone') basta.audio = true;
