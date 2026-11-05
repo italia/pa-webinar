@@ -9,6 +9,7 @@ import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { UnauthorizedError, ValidationError } from '@/lib/errors';
+import { parzialeSenzaDefault } from '@/lib/validation/parziale';
 import { MAX_RETENTION_DAYS } from '@/lib/validation/retention';
 import { coerceMatrix } from '@/lib/utils/permission-matrix';
 
@@ -47,7 +48,7 @@ const templateSchema = z.object({
   retainParticipantTracks: z.boolean().optional(),
   // Elenco di lingue separate da virgola; null = eredita dal sito.
   aiTargetLocales: z.string().max(200).nullish(),
-  descriptionTemplate: z.record(z.string()).nullish(),
+  descriptionTemplate: z.record(z.string(), z.string()).nullish(),
   defaultRetentionDays: z.number().int().min(1).max(MAX_RETENTION_DAYS).nullish(),
   defaultExpectedSpeakers: z.number().int().min(1).max(30).nullish(),
   // Matrice ruolo × funzione (lib/utils/permission-matrix.ts). Facoltativa:
@@ -146,7 +147,7 @@ export const PUT = withErrorHandling(async (request: NextRequest) => {
     return NextResponse.json({ error: 'Template not found' }, { status: 404 });
   }
 
-  const result = templateSchema.partial().safeParse(data);
+  const result = parzialeSenzaDefault(templateSchema).safeParse(data);
   if (!result.success) {
     // Con i campi: l'editor dice quale correggere.
     throw new ValidationError(

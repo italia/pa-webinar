@@ -8,6 +8,7 @@ import {
   EVENT_DESCRIPTION_REQUIRED_LOCALE,
 } from './event-description';
 import { MATERIAL_VISIBILITIES, materialUrlSchema } from './materials';
+import { parzialeSenzaDefault } from './parziale';
 import { MAX_RETENTION_DAYS } from './retention';
 
 // ── Event Schemas ────────────────────────────────────
@@ -63,7 +64,7 @@ export const eventBaseSchema = z.object({
     .max(10000)
     .optional()
     .transform((v) => (v === undefined ? undefined : v.trim() ? v : null)),
-  gdprTemplateId: z.string().uuid().nullable().optional(),
+  gdprTemplateId: z.guid().nullable().optional(),
   /** Cleartext join password. Server hashes and stores in `join_password_hash`.
    *  Empty string clears the password (sets the column back to NULL). */
   joinPassword: z.string().max(200).optional(),
@@ -86,7 +87,7 @@ export const eventBaseSchema = z.object({
   moderatorPublicListed: z.boolean().optional(),
   // La sua foto (EventPersonPhoto): un id che non si può usare si lascia
   // cadere (lib/events/person-photo-store, usablePersonPhotoId).
-  moderatorPhotoId: z.string().uuid().nullable().optional(),
+  moderatorPhotoId: z.guid().nullable().optional(),
   speakersInfo: localizedStringField.optional(),
   organizerName: z.string().max(200).optional(),
   imageUrl: z.string().url().optional(),
@@ -118,7 +119,7 @@ export const eventBaseSchema = z.object({
 
   // Recurrence (RFC 5545 RRULE). Null = one-off.
   recurrenceRule: z.string().max(500).nullable().optional(),
-  recurrenceSeriesId: z.string().uuid().nullable().optional(),
+  recurrenceSeriesId: z.guid().nullable().optional(),
 
   // Per-feature role allowlist. See `lib/utils/permission-matrix.ts`.
   // Accepting `any` here because Zod's record typings don't easily
@@ -189,7 +190,7 @@ export const createEventSchema = eventBaseSchema.refine(
   { message: 'endsAt must be after startsAt', path: ['endsAt'] },
 );
 
-export const updateEventSchema = eventBaseSchema.partial().extend({
+export const updateEventSchema = parzialeSenzaDefault(eventBaseSchema).extend({
   status: z
     .enum(['DRAFT', 'PUBLISHED', 'LIVE', 'ENDED'])
     .optional(),
@@ -231,7 +232,7 @@ export const createGdprTemplateSchema = z.object({
   isDefault: z.boolean().optional().default(false),
 });
 
-export const updateGdprTemplateSchema = createGdprTemplateSchema.partial();
+export const updateGdprTemplateSchema = parzialeSenzaDefault(createGdprTemplateSchema);
 
 export type CreateGdprTemplateInput = z.infer<typeof createGdprTemplateSchema>;
 export type UpdateGdprTemplateInput = z.infer<typeof updateGdprTemplateSchema>;
@@ -306,7 +307,7 @@ export const ORGANIZATION_TYPES = [
 // know item types at parse time; the service layer validates each
 // answer against its item).
 export const questionnaireAnswerInputSchema = z.object({
-  itemId: z.string().uuid(),
+  itemId: z.guid(),
   valueText: z.string().max(2000).nullable().optional(),
   valueChoices: z.array(z.number().int().min(0).max(50)).max(12).nullable().optional(),
   valueScale: z.number().int().min(0).max(11).nullable().optional(),
@@ -324,9 +325,7 @@ export const createRegistrationSchema = z.object({
   organizationRole: z.string().max(200).optional(),
   organizationType: z.enum(ORGANIZATION_TYPES).optional(),
   consentGiven: z
-    .literal(true, {
-      errorMap: () => ({ message: 'registration.errors.consentRequired' }),
-    }),
+    .literal(true, { error: 'registration.errors.consentRequired' }),
   consentRecording: z.boolean().optional(),
   // ADR-013 Fase 5 — consenso separato alla registrazione per-partecipante.
   // Facoltativo: chi non lo da' si iscrive, ma la sua voce non si registra
@@ -399,7 +398,7 @@ export type UpdateQuestionInput = z.infer<typeof updateQuestionSchema>;
 
 export const jitsiTokenRequestSchema = z.object({
   accessToken: z.string().min(1).optional(),
-  moderatorToken: z.string().uuid().optional(),
+  moderatorToken: z.guid().optional(),
   guestName: z.string().min(2).max(100).optional(),
   displayNameOverride: z.string().min(2).max(100).optional(),
   /** Consenso alla registrazione dell'evento dato in sala d'attesa, da chi
@@ -572,7 +571,7 @@ const optionLabelSchema = localizedStringField.refine(
 );
 
 export const questionItemSchema = z.object({
-  id: z.string().uuid().optional(), // present on update, absent on create
+  id: z.guid().optional(), // present on update, absent on create
   prompt: localizedStringField.refine(
     (obj) => typeof obj.it === 'string' && obj.it.length >= 3,
     { message: 'prompt.it is required' },
@@ -614,7 +613,7 @@ export const createQuestionTemplateSchema = z.object({
   items: z.array(questionItemSchema).default([]),
 });
 
-export const updateQuestionTemplateSchema = createQuestionTemplateSchema.partial();
+export const updateQuestionTemplateSchema = parzialeSenzaDefault(createQuestionTemplateSchema);
 
 export type CreateQuestionTemplateInput = z.infer<typeof createQuestionTemplateSchema>;
 export type UpdateQuestionTemplateInput = z.infer<typeof updateQuestionTemplateSchema>;
@@ -626,7 +625,7 @@ export const upsertEventQuestionnaireSchema = z.object({
   description: localizedStringField.optional().default({}),
   required: z.boolean().default(false),
   allowEdit: z.boolean().default(false),
-  templateIds: z.array(z.string().uuid()).default([]),
+  templateIds: z.array(z.guid()).default([]),
   adhocItems: z.array(questionItemSchema).default([]),
 });
 

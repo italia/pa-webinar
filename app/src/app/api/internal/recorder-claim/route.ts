@@ -25,7 +25,7 @@ import { RECORDER_DISPLAY_NAME } from '@/lib/jitsi/participants';
 
 export const dynamic = 'force-dynamic';
 
-const bodySchema = z.object({ recordingId: z.string().uuid() });
+const bodySchema = z.object({ recordingId: z.guid() });
 
 export const POST = withErrorHandling(async (request) => {
   assertCronApiKey(request);

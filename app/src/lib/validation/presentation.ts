@@ -14,7 +14,7 @@ const pagina = z.number().int().min(1).max(PRESENTATION_PAGE_MAX);
  * girata), 409 e nulla cambia; chi chiama rilegge e decide di nuovo.
  */
 export const startPresentationSchema = z.object({
-  materialId: z.string().uuid(),
+  materialId: z.guid(),
   page: pagina.optional(),
   expectedVersion: z.number().int().min(0).optional(),
 });
@@ -28,19 +28,19 @@ export const startPresentationSchema = z.object({
  * di chi presenta, che il documento l'ha aperto.
  */
 export const movePresentationSchema = z.object({
-  materialId: z.string().uuid(),
+  materialId: z.guid(),
   page: pagina,
   pageCount: pagina.optional(),
 });
 
 /** DELETE /api/events/[param]/presentation?materialId=…: il materiale da chiudere, se lo si indica. */
 export const stopPresentationQuerySchema = z.object({
-  materialId: z.string().uuid().optional(),
+  materialId: z.guid().optional(),
 });
 
 /** GET /api/events/[param]/presentation/file?m=…: il materiale presentato. */
 export const presentationFileQuerySchema = z.object({
-  m: z.string().uuid(),
+  m: z.guid(),
 });
 
 /**
@@ -49,7 +49,7 @@ export const presentationFileQuerySchema = z.object({
  * slide accanto alla registrazione.
  */
 export const recordingSlidesFileQuerySchema = z.object({
-  m: z.string().uuid(),
+  m: z.guid(),
 });
 
 /**

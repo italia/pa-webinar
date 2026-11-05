@@ -21,6 +21,7 @@ import { z } from 'zod';
 import { locales } from '@/i18n/config';
 import { prisma } from '@/lib/db';
 import { AppError, NotFoundError } from '@/lib/errors';
+import { parzialeSenzaDefault } from '@/lib/validation/parziale';
 
 export const GLOSSARY_READINGS = ['auto', 'spell', 'word'] as const;
 export type GlossaryReading = (typeof GLOSSARY_READINGS)[number];
@@ -60,7 +61,7 @@ export const glossaryTermInputSchema = z.object({
 });
 export type GlossaryTermInput = z.infer<typeof glossaryTermInputSchema>;
 
-export const glossaryTermPatchSchema = glossaryTermInputSchema.partial();
+export const glossaryTermPatchSchema = parzialeSenzaDefault(glossaryTermInputSchema);
 export type GlossaryTermPatch = z.infer<typeof glossaryTermPatchSchema>;
 
 /** Una voce come la usano la pagina e il worker. */

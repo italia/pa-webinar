@@ -90,7 +90,7 @@ export const GET = withErrorHandling(async (request) => {
 });
 
 const rotateSchema = z.object({
-  eventId: z.string().uuid(),
+  eventId: z.guid(),
   action: z.literal('regenerate'),
 });
 
