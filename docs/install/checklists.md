@@ -122,7 +122,7 @@ stop, or warn, before they change anything. The commands let you check ahead.
 - [ ] **Docker**, running (`docker info`), with room for the build: the
       migration image alone is 2.4 GB.
 - [ ] **For the add-ons**: `curl --version` 7.75 or later.
-- [ ] **For `--verify-call`**: Node.js 20 or later, `npm ci` at the
+- [ ] **For `--verify-call`**: Node.js 22 or later, `npm ci` at the
       repository root, and a Chromium (`npx playwright install chromium`) or
       Chrome. The script checks them at the start of each run, `--dry-run`
       included.

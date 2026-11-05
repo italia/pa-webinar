@@ -9,7 +9,7 @@
 //   printf '%s\n' "$ADMIN_API_KEY" | node scripts/verify-call.mjs \
 //     --url https://webinar.example.org --meet-url https://meet.example.org
 //
-// La lancia scripts/verify-install.sh --call. Richiede node 20 o più recente,
+// La lancia scripts/verify-install.sh --call. Richiede node 22 o più recente,
 // Playwright (npm ci nella radice del repository) e un Chromium: quello di
 // Playwright (npx playwright install chromium) o --browser <percorso>.
 //

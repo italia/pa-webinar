@@ -229,7 +229,7 @@ with `--local`):
   migration image alone is about 2.4 GB;
 - for the add-ons, `curl` 7.75 or later (`--aws-sigv4`), `base64`, `od` and
   `timeout`;
-- for `--verify-call`, Node.js 20 or later, `npm ci` at the repository root,
+- for `--verify-call`, Node.js 22 or later, `npm ci` at the repository root,
   and a Chromium or Chrome. The script checks them, and starts the browser
   once, at the beginning of every run that ends with the call, `--dry-run`
   included;
