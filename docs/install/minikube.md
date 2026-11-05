@@ -286,14 +286,26 @@ No credentials are needed. The node pulls `:dev` and `:dev-migrate` from
 ghcr.io, and the conference uses the standard `jitsi/web` image.
 
 `:dev` moves with every publication. When several people must run the same
-version, pass a fixed tag with `--images registry`: `--tag X.Y.Z` for a release,
-or `--tag dev-<sha>` with the first seven characters of a commit that `dev.yml`
-published. Without `--images registry`, a tag that cannot be pulled silently
-becomes a build from your checkout. Only the head of a push gets that tag. The auxiliary images, such as the recorder and
-the captions, get it only when that push rebuilt them, so with `dev-<sha>` those
-services can fail to pull if you turn them on. The tag fixes the images only:
-the chart comes from your checkout, so also check out the release tag or commit
-that matches the image.
+version, check out the same release tag or commit, because the chart comes from
+your checkout, and pass a fixed tag with `--images registry`:
+
+```bash
+# A release
+scripts/minikube-up.sh --images registry --tag X.Y.Z
+# A build of the development branch
+scripts/minikube-up.sh --images registry --tag dev-<sha>
+```
+
+The script does not remember the tag: pass the same options on every run, or it
+moves to `:dev` and runs the migrations of that image on your data.
+
+`X.Y.Z` is the release without the `v`. `dev-<sha>` exists only for a commit that
+`dev.yml` built, with the first seven characters of its hash. With
+`--images registry` the script stops if the tag cannot be pulled; in the default
+mode, without credentials, it builds from your checkout instead. The script
+checks the tag for the portal and its migrations only: before you turn on an
+auxiliary service, such as the recorder or the captions, check that its image
+exists with that tag and that the node can pull it.
 
 ### 2b. From your checkout
 
@@ -1013,8 +1025,9 @@ other.
   mode `:dev` is a moving tag, and running the script again does not pull a
   newer build. To take one:
   `kubectl --context pa-webinar -n pa-webinar rollout restart deployment/pa-webinar`,
-  or install a fixed build with `--images registry --tag dev-<sha>`, whose
-  migration tag the script derives (`dev-migrate-<sha>`).
+  or install a fixed build from the matching checkout with
+  `--images registry --tag dev-<sha>`, whose migration tag the script derives
+  (`dev-migrate-<sha>`).
 - **Stop.** `scripts/minikube-down.sh --stop` stops the profile.
   `scripts/minikube-up.sh` starts it again with its data.
 - **Delete.** `scripts/minikube-down.sh` deletes the profile: the cluster, the

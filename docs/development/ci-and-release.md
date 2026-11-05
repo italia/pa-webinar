@@ -92,7 +92,7 @@ The only GitHub Actions artifact any workflow uploads is the Playwright report o
 
 ### What a red check blocks
 
-"Blocking" on this page means that a failing job turns the workflow run red. The workflow files make no check required: the branch protection of this repository does. On `main` it requires a pull request, lists the blocking jobs below as required status checks, applies to administrators too, and refuses force pushes and deletion. No approving review is required. The required checks are a list kept by hand in the repository settings and matched by job name, matrix entries included: renaming a job stops every pull request until the list follows, and a new job is not required until someone adds it. The project rule is that nothing merges into `main` while a blocking job is red ([Governance](../../GOVERNANCE.md#everyday-changes)). Branch protection is a repository setting and does not travel with a fork: a fork that wants the rule enforced must configure it itself.
+"Blocking" on this page means that a failing job turns the workflow run red. The workflow files make no check required: the branch protection of this repository does. On `main` it requires a pull request, lists the blocking jobs below as required status checks, applies to administrators too, and refuses force pushes and deletion. No approving review is required, and a pull request does not have to be up to date with `main`: two green pull requests can still break it together, and the `ci.yml` run on `main` then shows it. The protection does not cover tags. The required checks are a list kept by hand in the repository settings and matched by job name, matrix entries included: renaming a job stops every pull request until the list follows, and a new job is not required until someone adds it. The project rule is that nothing merges into `main` while a blocking job is red ([Governance](../../GOVERNANCE.md#everyday-changes)). Branch protection is a repository setting and does not travel with a fork: a fork that wants the rule enforced must configure it itself.
 
 ### `ci.yml`: the gate on the way to `main`
 
@@ -399,7 +399,7 @@ Make one commit on `dev` with the subject `chore(release): vX.Y.Z` and a body th
 
 ### 2. Check, then open the pull request to `main`
 
-1. Run the pre-commit gates and the CI-parity commands described in [How we develop PA Webinar](methodology.md#ci-parity-before-every-push). `release.yml` runs no checks of its own, so this pull request is the last gate, enforced as described in [What a red check blocks](#what-a-red-check-blocks).
+1. Run the pre-commit gates and the CI-parity commands described in [How we develop PA Webinar](methodology.md#ci-parity-before-every-push). `release.yml` runs no checks of its own, so this pull request is the last required gate ([What a red check blocks](#what-a-red-check-blocks)), and the `ci.yml` run on `main` in [step 3](#3-merge-and-tag) is the check to pass before tagging.
 2. Open the pull request from `dev` to `main`. `ci.yml` runs on it.
 3. Review it like any non-trivial change. Resolve every confirmed finding before the merge.
 
