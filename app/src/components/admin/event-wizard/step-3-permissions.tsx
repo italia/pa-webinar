@@ -201,8 +201,8 @@ export default function StepPermissions({
         </p>
       )}
 
-      {/* L'elenco di chi partecipa: nascosto al pubblico di default, lo mostra
-          solo la scelta di chi organizza. Con gli pseudonimi resta nascosto. */}
+      {/* L'elenco di chi partecipa: parte dal formato dell'evento, e lo decide
+          chi organizza. Con gli pseudonimi resta nascosto. */}
       <div className="py-2 mb-3 d-flex justify-content-between align-items-start" style={{ borderBottom: '1px solid #e8e8e8' }}>
         <div className="me-3">
           <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>

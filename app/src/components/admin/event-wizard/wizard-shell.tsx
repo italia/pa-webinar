@@ -27,6 +27,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useRouter, percorso } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
 import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import { elencoPredefinito } from '@/lib/live/participant-list';
 import { profiloSalvato } from '@/lib/events/grant-profile';
 import { eventAdminPath } from '@/lib/events/admin-links';
 import { MAX_RETENTION_DAYS } from '@/lib/validation/retention';
@@ -673,7 +674,10 @@ export default function EventWizard(props: WizardProps) {
       // pulsante REC, qualunque cosa dica un modello salvato prima.
       autoStartRecording: false,
       audienceAnonymous: false,
-      participantListVisible: false,
+      participantListVisible: elencoPredefinito({
+        ...togglesFromMatrix(matrix),
+        maxParticipants: tpl?.maxParticipants ?? 300,
+      }),
       // Default AI dal template (semplificazione): un template "registrato"
       // può pre-attivare trascrizione/sintesi. La trascrizione richiede la
       // registrazione, quindi la attiviamo solo se recordingEnabled, e solo
@@ -986,10 +990,20 @@ export default function EventWizard(props: WizardProps) {
       agendaBloccata ? modulo : senzaRelatoriAssenti(modulo).form,
     [agendaBloccata],
   );
+  // Finche' chi organizza non sceglie, l'elenco segue chi puo' parlare o
+  // mostrarsi e quante persone si aspettano: non su un evento che esiste gia'.
+  const elencoSceltoRef = useRef(mode === 'edit');
   const updateForm = useCallback(
     (patch: Partial<WizardForm>) => {
+      if ('participantListVisible' in patch) elencoSceltoRef.current = true;
       setForm((prev) => {
         const next = { ...prev, ...patch };
+        if (('permissionMatrix' in patch || 'maxParticipants' in patch) && !elencoSceltoRef.current) {
+          next.participantListVisible = elencoPredefinito({
+            ...togglesFromMatrix(next.permissionMatrix),
+            maxParticipants: next.maxParticipants,
+          });
+        }
         return 'moderators' in patch || 'speakers' in patch ? conSceltePulite(next) : next;
       });
     },
@@ -1266,6 +1280,7 @@ export default function EventWizard(props: WizardProps) {
       const { at, dati } = JSON.parse(raw) as { at?: number; dati?: Partial<WizardForm> };
       if (!dati || typeof at !== 'number' || Date.now() - at > TRASLOCO_VALIDO_MS) return;
       traslocoRef.current = true;
+      if (dati.participantListVisible !== undefined) elencoSceltoRef.current = true;
       setForm((prima) => conDatiDellEvento(prima, dati));
       setTraslocoApplicato(true);
     } catch {
@@ -1322,6 +1337,7 @@ export default function EventWizard(props: WizardProps) {
   }, []);
 
   const restoreDraft = useCallback(() => {
+    elencoSceltoRef.current = true;
     const salvata = savedDraftRef.current;
     // Sopra il modulo di partenza, non al suo posto: una bozza salvata prima
     // che il modulo avesse un campo nuovo non lo lascerebbe vuoto.
@@ -1535,6 +1551,8 @@ export default function EventWizard(props: WizardProps) {
     fermaAutosalvataggio();
     try {
       const dati = datiCambiati(form, initial);
+      // Non scelto da nessuno: lo decide il formato nuovo.
+      if (!elencoSceltoRef.current) delete dati.participantListVisible;
       if (Object.keys(dati).length > 0) {
         localStorage.setItem(TRASLOCO_KEY, JSON.stringify({ at: Date.now(), dati }));
       }

@@ -8,6 +8,7 @@ import { RateLimitError, ValidationError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { tagIdsFromSlugs } from '@/lib/events/event-tags';
 import { usablePersonPhotoId } from '@/lib/events/person-photo-store';
+import { elencoPredefinito } from '@/lib/live/participant-list';
 import { createEventSchema } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { generateUniqueSlug } from '@/lib/utils/slug';
@@ -210,7 +211,9 @@ export const POST = withErrorHandling(async (request) => {
         recordingConsentText: data.recordingConsentText,
       }),
       audienceAnonymous: data.audienceAnonymous,
-      participantListVisible: data.participantListVisible,
+      participantListVisible:
+        data.participantListVisible ??
+        elencoPredefinito({ ...effectiveToggles, maxParticipants: data.maxParticipants }),
       ...(data.wordCloudEnabled !== undefined && {
         wordCloudEnabled: data.wordCloudEnabled,
       }),

@@ -272,10 +272,10 @@ model Event {
   audienceAnonymous Boolean @default(false) @map("audience_anonymous")
 
   // L'elenco di chi partecipa, per il pubblico: la scheda Partecipanti, la
-  // griglia e la striscia dei video, i nomi nella piazza. Spento di default,
-  // anche per gli eventi di prima: lo mostra solo la scelta di chi organizza.
-  // Chi conduce e chi interviene lo vedono sempre. Conta il valore letto da
-  // lib/live/participant-list, non la colonna.
+  // griglia e la striscia dei video, i nomi nella piazza. Parte dal formato
+  // dell'evento, e lo decide chi organizza. Chi conduce e chi interviene lo
+  // vedono sempre. Conta il valore letto da lib/live/participant-list, non la
+  // colonna.
   participantListVisible Boolean @default(false) @map("participant_list_visible")
 
   // Qualcuno ha parlato senza consenso alla registrazione: la sua voce non c'e',
@@ -2260,7 +2260,7 @@ model Recording {
   //     diarization: {engine, model, k, method},
   //     llm: {engine, model, vendor, license},
   //     tts: {engine, version, voices: ["alan","amy",…]},
-  //     voiceAssignments: [{diarLabel, displayName, voiceId, gender}],
+  //     voiceAssignments: [{diarLabel, displayName, voiceId}],
   //     languages: {source, translation: [...], dubbing: [...]},
   //     runAt: ISO timestamp,
   //     pipelineVersion: "git-sha"
