@@ -204,6 +204,62 @@ function isWeekdaysSet(codes: string[]): boolean {
   return ['MO', 'TU', 'WE', 'TH', 'FR'].every((c) => set.has(c));
 }
 
+/** «YYYY-MM-DD» → fine della giornata in UTC, cosi' UNTIL comprende il giorno scelto. */
+export function parseIsoDateToUtc(iso: string): Date | undefined {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+  if (!m) return undefined;
+  return new Date(Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3]), 23, 59, 59));
+}
+
+/**
+ * La regola ricostruita quando cambia l'inizio (o il fuso) dell'evento,
+ * senza perdere cio' che si era scelto: i giorni della settimana quando sono
+ * piu' d'uno (un giorno solo segue l'inizio), la data di fine, il numero di
+ * ripetizioni. Una regola personalizzata resta com'e'.
+ */
+export function rebuildForNewStart(value: RecurrenceValue, dtstart: Date): string | null {
+  if (value.preset === 'none') return null;
+  if (value.preset === 'custom') return value.rrule;
+  let byWeekday: number[] | undefined;
+  if (value.preset === 'weekly' && value.rrule) {
+    const match = /BYDAY=([A-Z,]+)/i.exec(value.rrule);
+    const giorni = (match?.[1] ?? '')
+      .split(',')
+      .map((c) => WEEKDAY_CODE_ORDER.indexOf(c.trim().toUpperCase() as (typeof WEEKDAY_CODE_ORDER)[number]))
+      .filter((i) => i >= 0);
+    if (giorni.length > 1) byWeekday = giorni;
+  }
+  const until = value.until ? parseIsoDateToUtc(value.until) : undefined;
+  return buildRRule({ preset: value.preset, dtstart, byWeekday, until, count: value.count ?? undefined }) || null;
+}
+
+/**
+ * Il tipo di ricorrenza da mostrare quando si riapre un evento salvato. Un
+ * tipo predefinito («Ogni settimana», …) vale solo se ricostruire la regola
+ * da quel tipo e dall'inizio dell'evento da' esattamente la regola salvata;
+ * altrimenti resta «Personalizzata», con la regola intatta.
+ */
+export function presetForEditing(
+  rrule: string | null | undefined,
+  dtstart: Date,
+): { preset: RecurrencePreset; count: number | null; until: string | null } {
+  if (!rrule) return { preset: 'none', count: null, until: null };
+  const parsed = parseRRule(rrule);
+  if (!parsed || parsed.preset === 'custom' || parsed.preset === 'none') {
+    return { preset: 'custom', count: null, until: null };
+  }
+  const body = stripRRulePrefix(rrule.trim());
+  const candidate: RecurrenceValue = {
+    preset: parsed.preset,
+    rrule: body,
+    until: parsed.until ?? null,
+    count: parsed.count ?? null,
+  };
+  return rebuildForNewStart(candidate, dtstart) === body
+    ? { preset: parsed.preset, count: candidate.count ?? null, until: candidate.until ?? null }
+    : { preset: 'custom', count: null, until: null };
+}
+
 // ── describeRRule ───────────────────────────────────────────────────────────
 
 const IT_WEEKDAY_LONG: Record<string, string> = {

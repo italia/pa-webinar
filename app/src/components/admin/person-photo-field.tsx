@@ -246,19 +246,24 @@ export default function PersonPhotoField({
       {compact ? (
         pulsanti
       ) : (
-        <div className="person-photo-field">
-          <PersonAvatar
-            name={nome}
-            photoId={photoId}
-            size={64}
-            alt={nome ? t('personPhotoAlt', { name: nome }) : t('personPhoto')}
-          />
-          <div className="person-photo-field__body">
-            <span className="person-photo-field__title">{t('personPhoto')}</span>
-            <small id={helpId} className="text-secondary">
-              {t('personPhotoHelp')}
-            </small>
-            {pulsanti}
+        // Il titolo sta sopra, a filo come quello del logo dell'ente
+        // accanto: i due campi sono allo stesso livello, e un titolo rientrato
+        // dietro la foto sembrava una sottosezione.
+        <div>
+          <span className="campo-file__etichetta d-block">{t('personPhoto')}</span>
+          <div className="person-photo-field">
+            <PersonAvatar
+              name={nome}
+              photoId={photoId}
+              size={64}
+              alt={nome ? t('personPhotoAlt', { name: nome }) : t('personPhoto')}
+            />
+            <div className="person-photo-field__body">
+              <small id={helpId} className="text-secondary">
+                {t('personPhotoHelp')}
+              </small>
+              {pulsanti}
+            </div>
           </div>
         </div>
       )}

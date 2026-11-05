@@ -81,7 +81,8 @@
     "deselectAll": "Díroghnaigh gach ceann",
     "durationMinutes": "{minutes, plural, one {# nóiméad} other {# nóiméad}}",
     "durationHours": "{hours, plural, one {# uair an chloig} other {# uair an chloig}}",
-    "durationHoursMinutes": "{hours, plural, one {# uair an chloig} other {# uair an chloig}} agus {minutes, plural, one {# nóiméad} other {# nóiméad}}"
+    "durationHoursMinutes": "{hours, plural, one {# uair an chloig} other {# uair an chloig}} agus {minutes, plural, one {# nóiméad} other {# nóiméad}}",
+    "backToTop": "Ar ais go barr"
   },
   "markdown": {
     "edit": "Scríobh",
@@ -102,7 +103,14 @@
     "switchLanguage": "Athraigh teanga",
     "skipToContent": "Téigh go dtí an t-ábhar",
     "skipToFooter": "Téigh go dtí an buntásc",
-    "mainLabel": "Príomh-nascleanúint"
+    "mainLabel": "Príomh-nascleanúint",
+    "activeLanguage": "Teanga ghníomhach:",
+    "languageSelected": "(roghnaithe)",
+    "signIn": "Sínigh isteach",
+    "roleAdmin": "Riarthóir",
+    "roleOrganizer": "Eagraí",
+    "instanceKey": "Eochair an chóipe",
+    "signOutFailed": "Theip ar shíniú amach: bain triail eile as."
   },
   "header": {
     "followUs": "Lean sinn ar"
@@ -204,7 +212,8 @@
       "recordingLinkEmailLabel": "An ríomhphost lenar chláraigh tú",
       "recordingLinkSend": "Seol an nasc chugam arís",
       "recordingLinkSent": "Má tá an seoladh cláraithe don ócáid, gheobhaidh tú ríomhphost leis an nasc pearsanta go luath.",
-      "recordingLinkError": "Theip ar an iarratas. Bain triail eile as i gceann cúpla nóiméad."
+      "recordingLinkError": "Theip ar an iarratas. Bain triail eile as i gceann cúpla nóiméad.",
+      "registerOrGuest": "Má chláraíonn tú, gheobhaidh tú do nasc pearsanta agus nuashonruithe faoin ócáid trí ríomhphost. Mar aoi, téann tú isteach láithreach le hainm amháin, fad atá an ócáid beo amháin, agus ní fhaigheann tú ríomhphoist."
     },
     "manage": {
       "toggleChat": "Comhrá",
@@ -523,7 +532,10 @@
       "stopVideo": "Múch an físeán",
       "revokeFloor": "Bain an t-urlár",
       "lowerHandFailed": "Níorbh fhéidir an lámh a ísliú: bain triail eile as.",
-      "handsRaised": "{count, plural, one {# lámh ardaithe} other {# lámha ardaithe}}"
+      "handsRaised": "{count, plural, one {# lámh ardaithe} other {# lámha ardaithe}}",
+      "locksByConsent": "Leanann micreafóin agus ceamaraí an toiliú leis an taifeadadh: úsáideann na daoine a thug é a cheadaíonn an ócáid, éisteann an chuid eile amháin. Fanann glais an tseomra air.",
+      "listenOnlyBadge": "éisteacht amháin",
+      "listenOnlyNoFloor": "Níor thoiligh leis an taifeadadh: ní féidir labhairt go dtoileoidh sé óna sheomra féin."
     },
     "moderator": {
       "muteAll": "Balbhaigh gach duine",
@@ -558,7 +570,8 @@
       "moderatorReveal": "Taispeáin an nasc modhnóra",
       "moderatorWarning": "Tugann an nasc seo rochtain MHODHNÓRA (gach duine a bhalbhú, taifeadadh a thosú, deireadh a chur leis an imeacht). Ná comhroinn é ach le modhnóirí eile.",
       "moderatorLink": "Nasc modhnóra",
-      "moderatorLinkHint": "Rachaidh duine ar bith a osclaíonn an nasc seo isteach mar mhodhnóir le lánsmacht ar an seomra."
+      "moderatorLinkHint": "Rachaidh duine ar bith a osclaíonn an nasc seo isteach mar mhodhnóir le lánsmacht ar an seomra.",
+      "copyFailed": "Theip ar an gcóipeáil: roghnaigh an seoladh agus cóipeáil de láimh é."
     },
     "videoCallFrameTitle": "Físghlao an imeachta",
     "insecureContextTitle": "Seoladh neamhshlán",
@@ -616,7 +629,15 @@
       "unavailable": "Níl fotheidil ar fáil faoi láthair.",
       "show": "Taispeáin fotheidil",
       "hide": "Folaigh fotheidil",
-      "toggle": "Fotheidil uathoibríocha"
+      "toggle": "Fotheidil uathoibríocha",
+      "controls": "Rialuithe fotheideal",
+      "smaller": "Fotheidil níos lú",
+      "larger": "Fotheidil níos mó",
+      "moveUp": "Bog na fotheidil go barr",
+      "moveDown": "Bog na fotheidil go bun",
+      "smallerShort": "A−",
+      "largerShort": "A+",
+      "showShort": "CC"
     },
     "eventEndedModerator": "Tá an ócáid thart. Thíos gheobhaidh tú na staitisticí agus, má taifeadadh an ócáid, an taifeadadh agus an tuarascáil.",
     "endLinks": {
@@ -625,7 +646,54 @@
       "publicPage": "Leathanach poiblí na hócáide"
     },
     "notOpenNow": "Níl an seomra oscailte faoi láthair.",
-    "nameRequired": "Tá an t-ainm le dul isteach in easnamh: téigh siar agus scríobh é."
+    "nameRequired": "Tá an t-ainm le dul isteach in easnamh: téigh siar agus scríobh é.",
+    "closeSidebar": "Dún an painéal taoibh",
+    "contentOnly": "Ábhar amháin, gan comhrá ná painéil",
+    "showPanels": "Taispeáin comhrá agus painéil",
+    "confirmFullscreen": "Athraigh go lánscáileán",
+    "listenOnly": {
+      "title": "Tá tú ag éisteacht amháin.",
+      "body": "Níor thug tú toiliú leis an taifeadadh: leanann tú agus scríobhann tú sa chomhrá, ach fanann an micreafón, an ceamara agus an scáileán múchta, fiú má thugann an t-óstach an t-urlár duit. Chun labhairt, toiligh.",
+      "consent": "Toilím leis an taifeadadh agus glacaim páirt",
+      "joining": "Ag filleadh ar an seomra…",
+      "error": "Níorbh fhéidir filleadh: bain triail eile as."
+    },
+    "pseudonym": "Rannpháirtí-{code}",
+    "consents": {
+      "open": "Do thoilithe",
+      "button": "Toilithe",
+      "title": "Do thoilithe",
+      "intro": "Is féidir leat do thoilithe a thabhairt nó a tharraingt siar ag am ar bith le linn na hócáide. Athnascann gach athrú an comhdháil ar feadh cúpla soicind.",
+      "given": "Toiliú tugtha",
+      "notGiven": "Níor tugadh toiliú",
+      "withdraw": "Tarraing siar an toiliú",
+      "confirmTitle": "An ndeimhníonn tú an tarraingt siar?",
+      "confirm": "Tarraing siar",
+      "working": "Á nuashonrú…",
+      "error": "Níorbh fhéidir an toiliú a nuashonrú: bain triail eile as.",
+      "recording": {
+        "title": "Taifeadadh na hócáide",
+        "give": "Toilím leis an taifeadadh",
+        "without": {
+          "soloAscolto": "Gan an toiliú seo bíonn tú ag éisteacht amháin: fanann an micreafón, an ceamara agus an scáileán dúnta.",
+          "conduce": "Gan an toiliú seo bíonn tú i gceannas fós, ach ní choinnítear do ghuth sna rianta in aghaidh an duine ná sa tras-scríbhinn.",
+          "uscita": "Chun páirt a ghlacadh san ócáid seo, teastaíonn toiliú leis an taifeadadh."
+        },
+        "alreadyRecorded": "Fanann a bhfuil taifeadta cheana féin i bhfíseán na hócáide: chun é a bhaint, scríobh chuig na heagraithe.",
+        "withdraw": {
+          "soloAscolto": "Má tharraingíonn tú siar é, fanann tú sa seomra ag éisteacht amháin: dúntar an micreafón, an ceamara agus an scáileán. Tarraingítear siar freisin do thoiliú le tras-scríobh a ndeir tú.",
+          "uscita": "Má tharraingíonn tú siar é, fágann tú an chomhdháil agus filleann tú ar an seomra feithimh: teastaíonn toiliú leis an taifeadadh chun páirt a ghlacadh. Tarraingítear siar freisin do thoiliú le tras-scríobh a ndeir tú.",
+          "conduce": "Má tharraingíonn tú siar é, leanann tú ort i gceannas, ach as seo amach ní choinnítear do ghuth sna rianta in aghaidh an duine ná sa tras-scríbhinn. Taispeánann físeán an tseomra thú fós, má thaifeadtar é."
+        }
+      },
+      "transcription": {
+        "title": "Tras-scríobh a ndeir tú",
+        "give": "Toilím leis an tras-scríobh",
+        "giveEffect": "Téann a ndeir tú isteach i dtras-scríbhinn na hócáide faoi d'ainm. Gan é, glacann tú páirt fós.",
+        "withdrawEffect": "Má tharraingíonn tú siar é, cailleann na habairtí atá tras-scríofa cheana a dtéacs agus d'ainm, agus as seo amach ní thaifeadtar do ghuth ar rian ar leith ná ní thras-scríobhtar é.",
+        "needsRecording": "Is féidir leat é a thabhairt tar éis toiliú leis an taifeadadh."
+      }
+    }
   },
   "qa": {
     "title": "Ceisteanna agus Freagraí",
@@ -833,7 +901,6 @@
         "coverImageHelp": "Taispeántar é ar an leathanach poiblí agus sna ríomhphoist chuig na daoine cláraithe.",
         "scheduleHeading": "Sceideal",
         "timezone": "Crios ama",
-        "recurrenceHeading": "Athrá",
         "tagsHeading": "Catagóirí (clibeanna)",
         "newTag": "Catagóir nua",
         "newTagLabel": "Ainm na catagóire nua",
@@ -878,11 +945,11 @@
           "BALANCED": "Cothrom (540p)",
           "SAVE_DATA": "Coigilt sonraí (360p)"
         },
-        "requiredLegend": "Teastaíonn na réimsí le * chun an t-imeacht a shábháil: fad atá siad folamh, deirtear é le gach ceann.",
         "kickerHint": "Le haghaidh forcheannteidil, scríobh roimh an teideal é agus scar iad le |, mar shampla “Sraith cruinnithe | An chéad chruinniú”.",
         "kickerUse": "Taispeáin “{kicker}” mar fhorcheannteideal",
         "kickerPreview": "Mar seo a bhreathnaíonn sé ar leathanach an imeachta",
-        "coverImageSize": "16:9, molta 1600 × 900 picteilín."
+        "coverImageSize": "16:9, molta 1600 × 900 picteilín.",
+        "requiredNote": "Tá na réimsí atá marcáilte le * riachtanach."
       },
       "step2": {
         "heading": "Cé atá in ann cad a dhéanamh",
@@ -923,11 +990,11 @@
         "roomFeaturesHeading": "Gnéithe an tseomra",
         "aiPipelineOff": "Níl iarléiriú AI (tras-scríobh, achoimre, aistriúcháin) ar siúl ar an tsuiteáil seo.",
         "rolesHeading": "Róil an imeachta",
-        "roleModeratorColumn": "Eagraí agus modhnóir",
+        "roleModeratorColumn": "Comheagraí agus modhnóir",
         "roleInfo": {
           "organizer": {
-            "name": "Eagraí",
-            "desc": "Óstálann sé an seomra mar mhodhnóir agus léirítear é i measc na n-eagraithe. Cuireann an príomh-eagraí na daoine eile leis agus baineann sé iad. Le cuntas foirne faoin ríomhphost céanna, bainistíonn sé an imeacht freisin."
+            "name": "Comheagraí",
+            "desc": "Stiúrann sé an seomra mar mhodhnóir agus cuirtear i láthair é i measc na n-eagraithe. Le cuntas foirne faoin ríomhphost céanna, bainistíonn sé an ócáid freisin."
           },
           "moderator": {
             "name": "Modhnóir",
@@ -939,10 +1006,17 @@
           },
           "guest": {
             "name": "Rannpháirtí",
-            "desc": "Leanann sé an imeacht agus glacann sé páirt mar a shocraíonn tú sa tábla thíos."
+            "desc": "Leanann sé an ócáid agus glacann páirt mar a shocraíonn tú sa chéim «Ceadanna»."
           }
         },
-        "recordingManualNote": "Ní thosaíonn an taifeadadh as féin riamh: tosaíonn modhnóir é leis an gcnaipe REC."
+        "recordingManualNote": "Ní thosaíonn an taifeadadh as féin riamh: tosaíonn modhnóir é leis an gcnaipe REC.",
+        "listenOnlyWithoutConsent": "Téann daoine nach dtoilíonn isteach ag éisteacht amháin",
+        "listenOnlyWithoutConsentOn": "Tá toiliú leis an taifeadadh saor: glacann daoine nach dtugann é páirt fós, leanann siad agus scríobhann siad sa chomhrá, ach fanann micreafón, ceamara agus scáileán múchta.",
+        "listenOnlyWithoutConsentOff": "Gan toiliú leis an taifeadadh ní théann aon duine isteach.",
+        "listenOnlyLockedLive": "Fad is féidir leis an seomra a bheith oscailte, ní féidir an taifeadadh ná an éisteacht amháin a athrú: tá feidhm acu ón gcéad iontráil.",
+        "audienceAnonymous": "Lucht féachana gan ainm",
+        "audienceAnonymousDesc": "Feictear rannpháirtithe do dhaoine eile faoi ainm cleite (“Rannpháirtí” agus cód) san fhíseán, sa chomhrá agus sna ceisteanna; fanann liosta na rannpháirtithe ag na hóstaigh, agus níl aon chearnóg ann. Úsáideach d’ócáidí móra; ag ócáidí pobail is mian le daoine aithne a chur ar a chéile.",
+        "audienceAnonymousLocked": "Ní féidir é a athrú fad is féidir leis an seomra a bheith oscailte: nascfadh sé ainmneacha cleite le hainmneacha."
       },
       "step3": {
         "heading": "Daoine agus cuirí",
@@ -960,23 +1034,23 @@
         "remove": "Bain",
         "invalidEmail": "Seoladh ríomhphoist neamhbhailí.",
         "duplicateEmail": "Tá an seoladh ann cheana.",
-        "rubricaPick": "Cuardaigh ón leabhar seoltaí…",
+        "rubricaPick": "Cuardaigh an leabhar seoltaí de réir eagraíochta…",
         "rubricaOrAdd": "nó cuir isteach de láimh é",
         "removeItem": "Bain {name}",
         "invitationsStaffOnly": "Is í foireann an imeachta a bhainistíonn na cuirí.",
         "pickSkipped": "Bhí daoine áirithe ar an liosta cheana nó ní raibh seoladh bailí acu, agus níor cuireadh leis iad.",
-        "primaryHeading": "Príomh-eagraí",
+        "primaryHeading": "Príomh-mhodhnóir",
         "primaryHelp": "Faigheann sé príomhnasc an imeachta trí ríomhphost: óstálann sé an seomra agus cuireann sé na daoine eile leis nó baineann sé iad. Tá ainm agus ríomhphost riachtanach chun foilsiú, ní le haghaidh dréachta.",
-        "primaryPrefilled": "Is tusa an príomh-eagraí, le hainm agus ríomhphost do chuntais. Má reáchtálann duine eile an imeacht, cuir a s(h)onraí isteach anseo: rachaidh an nasc chuige/chuici.",
-        "primaryNameRequired": "Cuir isteach ainm an phríomh-eagraí.",
-        "primaryEmailRequired": "Cuir isteach ríomhphost bailí don phríomh-eagraí.",
+        "primaryPrefilled": "Is tusa an príomh-mhodhnóir, le hainm agus ríomhphost do chuntais. Má stiúrann duine eile an ócáid, scríobh a sonraí anseo: rachaidh an nasc chuige.",
+        "primaryNameRequired": "Cuir isteach ainm an phríomh-mhodhnóra.",
+        "primaryEmailRequired": "Cuir isteach ríomhphost bailí don phríomh-mhodhnóir.",
         "linksOnPublish": "Seoltar naisc phearsanta trí ríomhphost nuair a fhoilsítear an imeacht; fad is dréacht é, cóipeáil iad óna leathanach.",
         "personName": "Ainm",
         "personEmail": "Ríomhphost",
-        "peopleHeading": "Daoine an imeachta",
-        "peopleHelp": "Eagraithe, modhnóirí agus cainteoirí. Faigheann gach duine a nasc féin le dul isteach lena ról; taispeántar sna “Ardsocruithe” cad is féidir le gach ról a dhéanamh.",
+        "peopleHeading": "Modhnóirí agus cainteoirí",
+        "peopleHelp": "Comheagraithe, modhnóirí agus cainteoirí. Faigheann gach duine a nasc féin chun dul isteach lena ról; mínítear thuas cad is féidir le gach ról a dhéanamh.",
         "personRole": "Ról",
-        "roleOrganizer": "Eagraí",
+        "roleOrganizer": "Comheagraí",
         "roleModerator": "Modhnóir",
         "roleSpeaker": "Cainteoir",
         "roleHelp": {
@@ -1015,7 +1089,7 @@
         "programMinutesFor": "Nóiméid beartaithe, ábhar {n}",
         "programTimeUnknown": "Níor ríomhadh an t-am: níl fad ag ábhar roimhe seo",
         "programNone": "Duine ar bith",
-        "programLeadOrganizer": "Príomheagraí",
+        "programLeadOrganizer": "Príomh-mhodhnóir",
         "programMoveUp": "Bog ábhar {n} suas",
         "programMoveDown": "Bog ábhar {n} síos",
         "programRemove": "Bain ábhar {n}",
@@ -1029,8 +1103,8 @@
         "programSpeakerRemoved": "Ábhair gan chainteoir, mar baineadh an duine den ócáid: {count}.",
         "programFrozen": "Úsáideadh an clár oibre sa seomra cheana: feiceann tú anseo é, ach athraítear ón seomra é.",
         "programPerson": "{name} ({role})",
-        "invitationsHelpOpen": "Roghnach: liosta na ndaoine a thugann tú cuireadh dóibh. Tá an clárú oscailte, mar sin tar éis an fhoilsithe is féidir le duine ar bith clárú, cuireadh nó gan chuireadh. Ní sheolann an t-ardán cuirí: roinn nasc an imeachta tú féin.",
-        "invitationsHelpRestricted": "Tá an clárú srianta: ní féidir ach leis na seoltaí ar an liosta seo clárú. Ní sheolann an t-ardán cuirí: roinn nasc an imeachta tú féin; tagann an nasc le dul isteach trí ríomhphost tar éis clárú.",
+        "invitationsHelpOpen": "Na daoine a dtugann tú féin cuireadh dóibh. Tá an clárú oscailte: is féidir le duine ar bith clárú, le cuireadh nó gan é. Tar éis foilsiú, seolann tú an cuireadh chucu trí ríomhphost ó leathanach na hócáide.",
+        "invitationsHelpRestricted": "Ní féidir ach leis na seoltaí ar an liosta seo clárú. Tar éis foilsiú, seolann tú an cuireadh chuig gach duine trí ríomhphost ó leathanach na hócáide, leis an nasc clárúcháin; tagann an nasc isteach tar éis clárú.",
         "logoExternal": "Ní thaispeánann an leathanach poiblí ach lógónna a uaslódáladh chuig an ardán seo: ní thaispeánfar lógó ó shuíomh eile.",
         "primaryProfileInvalid": "Seiceáil an eagraíocht agus seoladh an lógó.",
         "primaryMore": "Grianghraf, eagraíocht, lógó agus leathanach poiblí",
@@ -1048,7 +1122,9 @@
         "editQuestions": "Cuir in eagar",
         "editQuestionsBefore": "Cuir in eagar na ceisteanna clárúcháin",
         "editQuestionsAfter": "Cuir in eagar an suirbhé sástachta",
-        "accessStaffOnly": "Is í foireann an imeachta a chinneann cé a chláraíonn."
+        "accessStaffOnly": "Is í foireann an imeachta a chinneann cé a chláraíonn.",
+        "whoOrganizes": "Cé a eagraíonn",
+        "rubricaWho": "Sa leabhar seoltaí tá na daoine a chláraigh d'ócáid agus a d'aontaigh fanacht ann."
       },
       "step4": {
         "heading": "Ábhar agus áiseanna",
@@ -1124,9 +1200,9 @@
           "multitrack": "Taifeadadh de réir rannpháirtí",
           "multitrackOn": "Ar siúl — teastaíonn toiliú follasach tráth an chláraithe",
           "organizingEntities": "Eagraíochtaí eagraithe",
-          "primaryOrganizer": "Príomh-eagraí",
+          "primaryOrganizer": "Príomh-mhodhnóir",
           "primaryMissing": "Le socrú sa chéim “Daoine” chun foilsiú",
-          "organizersPeople": "Eagraithe eile",
+          "organizersPeople": "Comheagraithe",
           "moderators": "Modhnóirí",
           "programme": "Clár: {count, plural, one {# ábhar} two {# ábhar} few {# ábhar} many {# ábhar} other {# ábhar}}",
           "programmeWithDuration": "Clár: {count, plural, one {# ábhar} two {# ábhar} few {# ábhar} many {# ábhar} other {# ábhar}}, {duration}"
@@ -1175,7 +1251,8 @@
           "invites": "Daoine",
           "programme": "Clár",
           "review": "Achoimre",
-          "advanced": "Ardsocruithe"
+          "advanced": "Ardsocruithe",
+          "permissions": "Ceadanna"
         },
         "templateInUse": "Teimpléad: <b>{name}</b>",
         "noTemplate": "Imeacht gan teimpléad",
@@ -1187,18 +1264,16 @@
         "recordingManual": "Ar fáil: ní thosaíonn sé go dtí go mbrúnn modhnóir REC.",
         "aiAfter": "Tar éis an taifeadta: {list}.",
         "scheduleHeading": "Cathain a bheidh sé ar siúl",
-        "scheduleIntro": "Dáta, am agus cé mhéad duine a bhfuil súil agat leo: úsáidtear iad chun an seomra a ullmhú.",
+        "scheduleIntro": "Cathain a bheidh an ócáid ar siúl: dáta, am agus crios ama.",
         "advancedIntro": "Luachanna atá roghnaithe ag an teimpléad cheana: ná hathraigh ach an méid is gá.",
         "advancedIntroTemplate": "Luachanna atá roghnaithe ag an teimpléad «{name}» cheana: ná hathraigh ach an méid is gá.",
-        "requiredToSave": "Riachtanach chun an t-imeacht a shábháil.",
         "requiredToPublish": "Riachtanach chun an t-imeacht a fhoilsiú.",
         "toComplete": "Le comhlánú",
         "missingHeading": "Chun foilsiú, tá easpa fós ar:",
-        "fieldOrganizerName": "Ainm an phríomheagraí",
-        "fieldOrganizerEmail": "Ríomhphost an phríomheagraí",
+        "fieldOrganizerName": "Ainm an phríomh-mhodhnóra",
+        "fieldOrganizerEmail": "Ríomhphost an phríomh-mhodhnóra",
         "fieldProgrammeMinutes": "Fad ábhar {n} den chlár",
         "sections": {
-          "participation": "Rannpháirtíocht agus gnéithe an tseomra",
           "recording": "Taifeadadh agus IS",
           "content": "Ábhar: ábhair agus ceistneoirí",
           "room": "Seomra feithimh agus físeán",
@@ -1230,7 +1305,17 @@
         "askEmail": "ríomhphost",
         "askOrganization": "eagraíocht",
         "askRole": "ról",
-        "askType": "cineál eagraíochta"
+        "askType": "cineál eagraíochta",
+        "permissionsHeading": "Cé atá in ann cad a dhéanamh sa seomra",
+        "permissionsIntro": "Cad is féidir leis na rannpháirtithe a dhéanamh agus cé na feidhmeanna seomra atá ar siúl. Is féidir gach rud a athrú le linn na hócáide freisin.",
+        "consentsLine": "Toilithe ag an gclárú agus sa seomra: {list}",
+        "consentRecordingRequired": "taifeadadh, riachtanach chun dul isteach",
+        "consentRecordingFree": "taifeadadh, roghnach (gan é, éisteacht amháin)",
+        "consentRecordingNotice": "don taifeadadh fógra amháin (ní labhraíonn ná ní thaispeántar na rannpháirtithe)",
+        "consentTranscription": "tras-scríobh a ndeir siad, roghnach",
+        "consentsNone": "Gan aon toiliú seachas toiliú an chláraithe.",
+        "consentsHosts": "Iarrtar ar mhodhnóirí agus ar chainteoirí an taifeadadh sa seomra, go roghnach.",
+        "consentsWithdraw": "Is féidir le rannpháirtithe iad a tharraingt siar sa seomra, leis an gcnaipe “Toilithe”."
       },
       "preview": {
         "title": "Réamhamharc ar an leathanach",
@@ -1242,8 +1327,8 @@
       },
       "programme": {
         "heading": "Clár an chruinnithe",
-        "intro": "Na hábhair in ord: cé a labhraíonn, faoi cad agus cé chomh fada. Taispeántar iad faoin gcur síos, leis na hamanna arna ríomh ón tús ({start}). Roghnach.",
-        "introNoStart": "Na hábhair in ord: cé a labhraíonn, faoi cad agus cé chomh fada. Taispeántar iad faoin gcur síos, leis na hamanna arna ríomh ó thús na hócáide. Roghnach.",
+        "intro": "Na hábhair in ord: cé a labhraíonn, faoi cad agus cé chomh fada. Taispeántar iad faoin gcur síos, leis na hamanna arna ríomh ón tús ({start}).",
+        "introNoStart": "Na hábhair in ord: cé a labhraíonn, faoi cad agus cé chomh fada. Taispeántar iad faoin gcur síos, leis na hamanna arna ríomh ó thús na hócáide.",
         "statusOn": "Taispeántar é ar leathanach na hócáide, agus sa seomra taispeánann sé an t-ábhar reatha do chách.",
         "statusOff": "Múchta: ní thaispeántar an clár ar an leathanach ná sa seomra.",
         "turnOn": "Cas air",
@@ -1287,7 +1372,8 @@
         "offKeptEdit": "Fad atá an clár múchta, is é an leagan is déanaí a sábháladh atá i bhfeidhm: ní shábháiltear athruithe a dhéantar anseo ach má chasann tú air arís é.",
         "toggleOffWarningCreate": "Nuair atá sé múchta, ní thaispeántar an clár ({count, plural, one {# ábhar} two {# ábhar} few {# ábhar} many {# ábhar} other {# ábhar}}) ar an leathanach agus ní shábháiltear é leis an ócáid: cas air é chun é a choinneáil.",
         "reviewOffCreate": "Clár: múchta, ní shábháiltear leis an ócáid é ({count, plural, one {# ábhar} two {# ábhar} few {# ábhar} many {# ábhar} other {# ábhar}})"
-      }
+      },
+      "saveCopy": "Sábháil an chóip"
     },
     "nav": {
       "events": "Imeachtaí",
@@ -1313,7 +1399,6 @@
       "publicationsList": "Foilseacháin",
       "publicationsNew": "Foilseachán nua",
       "ariaLabel": "Nascleanúint riaracháin",
-      "subNavAriaLabel": "Nascleanúint rannáin",
       "questionnaires": "Ceistneoirí",
       "questionnairesLibrary": "Teimpléid cheistneora",
       "questionnairesResponses": "Freagraí",
@@ -1332,7 +1417,9 @@
       "video": "Físeán",
       "glossary": "Gluais",
       "breadcrumbAriaLabel": "Cosán nascleanúna",
-      "skipToPage": "Téigh chuig ábhar an leathanaigh"
+      "skipToPage": "Téigh chuig ábhar an leathanaigh",
+      "openMenu": "Oscail an roghchlár",
+      "closeMenu": "Dún an roghchlár"
     },
     "publications": {
       "subtitle": "Mol eagarthóireachta amháin do gach físeán foilsithe: imeachtaí sceidealta, glaonna meara, físthaifeadtaí cartlainne uaslódáilte agus seisiúin ag fanacht le cur chun cinn.",
@@ -1488,7 +1575,8 @@
       "actions": {
         "DATA_DELETED": "Sonraí scriosta",
         "CONSENT_RECORDED": "Toiliú taifeadta",
-        "DATA_EXPORTED": "Sonraí easpórtáilte"
+        "DATA_EXPORTED": "Sonraí easpórtáilte",
+        "CONSENT_WITHDRAWN": "Toiliú tarraingthe siar"
       },
       "recordsAffected": "{count} taifead i gceist",
       "colWhen": "Cathain",
@@ -1610,13 +1698,6 @@
     "deleteSuccess": "Imeacht scriosta",
     "publishSuccess": "Imeacht foilsithe",
     "unpublishSuccess": "Imeacht tarraingthe siar",
-    "startEvent": "Tosaigh an t-imeacht",
-    "startEventSuccess": "Imeacht tosaithe! Atreorófar rannpháirtithe atá ag fanacht go huathoibríoch.",
-    "startEventConfirmTitle": "An imeacht a thosú?",
-    "startEventConfirmMessage": "Tús beartaithe: {when}. Is féidir le duine ar bith a bhfuil an nasc aige teacht isteach láithreach, agus tosaíonn an seomra físe anois.",
-    "startEventConfirmEarly": "Tá níos mó ná 30 nóiméad fágtha go dtí an tús.",
-    "startEventFailed": "Níor thosaigh an t-imeacht. Bain triail eile as.",
-    "jvbWarmupWarning": "Tá na freastalaithe físe ag tosú (~2 nóiméad). Feicfidh na rannpháirtithe fógra sa seomra feithimh.",
     "eventIsLive": "Tá an t-imeacht beo",
     "liveParticipants": "{count} sa seomra / {max} uasta",
     "joinAsModeratorBtn": "Téigh isteach mar mhodhnóir",
@@ -1654,7 +1735,6 @@
         "expected": "{count, plural, one {rannpháirtí ag súil leis} two {rannpháirtí ag súil leo} few {rannpháirtí ag súil leo} many {rannpháirtí ag súil leo} other {rannpháirtí ag súil leo}}",
         "registered": "{count, plural, =0 {gan aon duine cláraithe fós} one {# duine cláraithe go dtí seo} two {# dhuine cláraithe go dtí seo} few {# dhuine cláraithe go dtí seo} many {# nduine cláraithe go dtí seo} other {# duine cláraithe go dtí seo}}",
         "change": "Athraigh",
-        "changeParticipants": "Athraigh líon na rannpháirtithe a bhfuiltear ag súil leo",
         "sizedOnRegistrations": "Tá níos mó daoine cláraithe ná rannpháirtithe a bhfuiltear ag súil leo: áiríonn an meastachán an {count} duine cláraithe.",
         "cameraQuestion": "Cé mhéad ceamara gréasáin a bheidh ar siúl?",
         "camera": {
@@ -1866,7 +1946,7 @@
       "guestJoinHint": "Nasc tapa chun rannpháirtí ar an nóiméad deireanach a thabhairt isteach: téann sé isteach mar aoi nuair a bhíonn an t-imeacht beo, gan an fhoirm chláraithe a líonadh.",
       "callInvite": "Nasc do rannpháirtithe",
       "callInviteHint": "An té a fhaigheann é, glacann sé páirt sa ghlao mar aoi, gan clárú. Níl leathanach poiblí ag glao tapa: is é seo an nasc le comhroinnt.",
-      "moderatorLink": "Nasc modhnóra",
+      "moderatorLink": "Nasc bainistíochta (modhnóir)",
       "moderatorLinkHint": "Roinnigh an nasc seo le modhnóirí amháin. Is féidir le duine ar bith a bhfuil an nasc seo aige an t-imeacht a bhainistiú.",
       "liveRoomHint": "Nasc chun dul isteach díreach sa seomra mar mhodhnóir.",
       "copyLink": "Cóipeáil nasc",
@@ -1876,7 +1956,8 @@
       "warning": "Riarann duine ar bith a bhfuil an nasc seo aige an t-imeacht: ná taispeáin é agus tú ag comhroinnt scáileáin agus ná greamaigh i gcomhrá é.",
       "hidden": "Nasc folaithe",
       "copyFailed": "Theip ar an gcóipeáil: roghnaigh an seoladh thíos agus cóipeáil de láimh é.",
-      "notYetPublished": "Oibreoidh sé tar éis an fhoilsithe: go dtí sin taispeántar “níor aimsíodh an leathanach”."
+      "notYetPublished": "Oibreoidh sé tar éis an fhoilsithe: go dtí sin taispeántar “níor aimsíodh an leathanach”.",
+      "copyFailedShort": "Theip ar an gcóipeáil"
     },
     "feedbackAdmin": {
       "title": "Torthaí aiseolais",
@@ -1952,7 +2033,8 @@
       "actions": {
         "DATA_DELETED": "Sonraí scriosta",
         "CONSENT_RECORDED": "Toiliú taifeadta",
-        "DATA_EXPORTED": "Sonraí easpórtáilte"
+        "DATA_EXPORTED": "Sonraí easpórtáilte",
+        "CONSENT_WITHDRAWN": "Toiliú tarraingthe siar"
       }
     },
     "settings": {
@@ -2266,9 +2348,9 @@
     },
     "recurrence": {
       "label": "Atarlú",
-      "helpText": "Déan an t-imeacht atarlach. Cruthófar sraith ag tosú ón dáta tosaigh.",
+      "helpText": "Má athdhéantar an ócáid, nuair a dhéanann tú dúblach di molann an chóip dáta na chéad ócáide eile.",
       "preset": {
-        "none": "Faic",
+        "none": "Ní athdhéantar é",
         "daily": "Gach lá",
         "weekly": "Gach seachtain",
         "weekdays": "Laethanta seachtaine",
@@ -2322,7 +2404,6 @@
       "aiTranscript": "Tras-scríobh uathoibríoch (réamhshocrú)",
       "aiSummary": "Achoimre uathoibríoch (réamhshocrú)",
       "aiTranslation": "Aistriúchán uathoibríoch (réamhshocrú)",
-      "pickerTitle": "Roghnaigh teimpléad",
       "pickerSubtitle": "Roghnaigh teimpléad chun socruithe an imeachta a réamhchumrú, nó scipeáil chun gach rud a chumrú de láimh.",
       "skipTemplate": "Cumraigh de láimh",
       "postEventPublic": "Leathanach poiblí tar éis an imeachta",
@@ -2701,10 +2782,7 @@
       "resultsCount": "{count, plural, =0 {Aon imeacht} one {# imeacht} other {# imeacht}}",
       "menu": {
         "actionsFor": "Gníomhartha do “{title}”",
-        "manage": "Bainistigh",
         "edit": "Cuir in eagar",
-        "openPublic": "Oscail an leathanach poiblí",
-        "newTab": "(osclaítear i gcluaisín nua é)",
         "copyLink": "Cóipeáil an nasc poiblí",
         "linkCopied": "Nasc cóipeáilte",
         "publish": "Foilsigh",
@@ -2713,7 +2791,7 @@
         "unpublishMessage": "Imeoidh “{title}” ó na leathanaigh phoiblí go dtí go bhfoilseoidh tú arís é. Coinnítear na clárúcháin a fuarthas cheana.",
         "published": "Imeacht foilsithe",
         "unpublished": "Imeacht tarraingthe siar",
-        "duplicate": "Dúblaigh mar an chéad ócáid eile",
+        "duplicate": "Dúblaigh",
         "delete": "Scrios",
         "deleteTitle": "An imeacht a scriosadh?",
         "deleteMessage": "Scriosfar “{title}” agus a chuid sonraí go léir. Ní féidir é seo a chealú.",
@@ -2771,7 +2849,6 @@
       "participantHintPassword": "Osclaítear i gcluaisín nua é: an seomra mar a fheiceann aoi é, tar éis phasfhocal an imeachta.",
       "participantHintPage": "Osclaítear i gcluaisín nua é: an leathanach poiblí mar a fheiceann na rannpháirtithe é.",
       "editEvent": "Cuir imeacht in eagar",
-      "editSettings": "Cuir socruithe in eagar",
       "featureSummary": "Gnéithe gníomhacha",
       "organizers": "Eagraithe",
       "privacyGdpr": "Príobháideacht & GDPR",
@@ -2824,9 +2901,9 @@
       "aiGenerateError": "Níorbh fhéidir an phíblíne AI a thosú. Deimhnigh go bhfuil an AI cumasaithe ar leibhéal an tsuímh agus go bhfuil taifeadadh ann.",
       "aiGenerateHelp": "Cumasaíonn sé an tras-scríobh + an achoimre AI agus tosaíonn sé an phíblíne ar an taifeadadh, le cliceáil amháin. Idempotent: ní dhúblaíonn dhá chliceáil na jabanna.",
       "aiGenerateNoRecording": "Gan taifeadadh: teastaíonn taifeadadh don AI iarimeachta (ní tharlaíonn an gabháil ach le linn an imeachta). Is féidir leat an t-iarléiriú a bhainistiú anseo mar sin féin.",
-      "duplicateNext": "Dúblaigh don chéad cheann eile",
+      "duplicateNext": "Dúblaigh",
       "duplicateNextBusy": "Á dhúbláil…",
-      "duplicateNextHint": "Cruthaíonn sé dréacht a iompraíonn cumraíocht iomlán an imeachta seo (taifeadadh, rianta ar leith, AI, clár oibre, meabhrúcháin). Má tá minicíocht ag an imeacht, bogtar an dáta go dtí an chéad ócáid eile; murab ea, fágtar duitse é a shocrú.",
+      "duplicateNextHint": "Cruthaíonn sé cóip dréachta le cumraíocht iomlán na hócáide seo. Má athdhéantar an ócáid, tosaíonn an chóip ag an gcéad ócáid eile; murach sin tá na dátaí céanna aici, le nuashonrú.",
       "duplicateNextError": "Níorbh fhéidir é a dhúbláil. Bain triail eile as.",
       "capacitySection": "Toilleadh agus bonneagar",
       "capacitySubtitle": "Tomhaiste do thart ar {max} rannpháirtí a bhfuiltear ag súil leo",
@@ -2838,11 +2915,12 @@
         "publishFailedTitle": "Theip ar an bhfoilsiú",
         "publishFailedBody": "Tá an t-imeacht sábháilte mar dhréacht: foilsigh é ón leathanach seo nuair a bheidh an fhadhb réitithe.",
         "unsaved": "Níor sábháladh: {items}. Is féidir leat iad a chur leis ón leathanach seo.",
-        "copyParticipantLink": "Cóipeáil an nasc do na rannpháirtithe",
         "sendToSpeakers": "Naisc na modhnóirí agus na gcainteoirí",
         "close": "Dún an achoimre",
         "publishNow": "Foilsigh anois"
-      }
+      },
+      "editFeatures": "Cuir na feidhmeanna in eagar",
+      "editPrivacy": "Cuir príobháideachas agus sonraí in eagar"
     },
     "rubrica": {
       "subtitle": "Daoine a thug toiliú a gcur leis an leabhar seoltaí (airteagal 6.1.a GDPR). Nuashonraítear faisnéis phróifíle go huathoibríoch ag gach athchlárúchán.",
@@ -3450,6 +3528,7 @@
     "guided": {
       "title": "Cén sórt imeachta atá agat?",
       "intro": "Ceithre cheist chun tosú leis na socruithe cearta. Is féidir gach gné a chasadh air nó as le linn an imeachta freisin.",
+      "introNoRecording": "Trí cheist chun tosú leis na socruithe cearta. Is féidir gach gné a chasadh air nó as le linn an imeachta freisin.",
       "peopleQ": "Cé mhéad duine a bhfuil súil agat leo?",
       "people": {
         "piccolo": "Suas le 20",
@@ -3474,9 +3553,7 @@
       "preview": "D'imeacht",
       "previewPeople": "Rannpháirtithe a bhfuiltear ag súil leo: timpeall {count}",
       "continue": "Lean ar aghaidh",
-      "useTemplate": "Nó úsáid teimpléad",
-      "instantAlt": "Nó glao físe láithreach",
-      "instantAltAction": "Cruthaigh an glao físe",
+      "useTemplate": "Tosaigh ó theimpléad",
       "summary": {
         "piccolo": "Suas le 20 duine",
         "medio": "Suas le 100 duine",
@@ -3492,10 +3569,12 @@
       "access": {
         "open": "Duine ar bith a chláraíonn",
         "openDesc": "Cláraíonn duine ar bith ar mian leis ó leathanach an imeachta",
-        "invitation": "Na daoine a dtugann tú cuireadh dóibh amháin",
-        "invitationDesc": "Fanann an leathanach le feiceáil, ach ní féidir ach le daoine a fuair cuireadh clárú; gan clárú ní féidir dul isteach"
+        "invitation": "Daoine a fuair cuireadh amháin",
+        "invitationDesc": "Fanann an leathanach le feiceáil, ach ní féidir ach le daoine ar an liosta clárú; seolann tú an cuireadh leis an nasc clárúcháin trí ríomhphost ó leathanach na hócáide"
       },
-      "previewInvitation": "Ní féidir ach leis na daoine a dtugann tú cuireadh dóibh clárú; ní théann aon duine isteach gan clárú."
+      "previewInvitation": "Ní chláraíonn ach daoine a fuair cuireadh; gan clárú ní théann aon duine isteach.",
+      "templateReplaces": "Tugann teimpléad a shocruithe féin in ionad na bhfreagraí thíos. Scríobhann tú an teideal, na dátaí agus na daoine sna céimeanna eile.",
+      "instantBack": "Cruthaigh ócáid sceidealta ina ionad"
     },
     "captionsTranscript": {
       "title": "Tras-scríbhinn ó fhotheidil",
@@ -3584,10 +3663,21 @@
       "status": "Stádas",
       "roleSpeaker": "Cainteoir",
       "registered": "Cláraithe",
-      "notRegistered": "Gan clárú fós",
       "organizersTitle": "Comhlachtaí eagraithe",
       "organizersEdit": "Cuir na comhlachtaí in eagar",
-      "organizersEmpty": "Níl aon chomhlacht luaite: ní thaispeánann an leathanach poiblí cé atá á eagrú."
+      "organizersEmpty": "Níl aon chomhlacht luaite: ní thaispeánann an leathanach poiblí cé atá á eagrú.",
+      "sendAll": "Seol an cuireadh chuig na daoine nach bhfuair é ({count})",
+      "sending": "Á sheoladh…",
+      "sendDone": "Cuirí ar an mbealach: {sent}. Scipeáilte (cláraithe cheana nó gan seoladh): {skipped}.",
+      "sendError": "Theip ar an seoladh: bain triail eile as.",
+      "sendNotPublished": "Seoltar cuirí fad a ghlacann an ócáid le clárúcháin: tar éis foilsiú agus roimh an deireadh.",
+      "invitedOn": "Tugadh cuireadh ar {date}",
+      "notInvited": "Cuireadh nár seoladh",
+      "send": "Seol cuireadh",
+      "resend": "Seol arís",
+      "actions": "Gníomhartha",
+      "sendTooMany": "An iomarca seoltaí in achar gearr: bain triail eile as i gceann nóiméid.",
+      "sendRemaining": "{remaining} fágtha: brúigh arís chun iad a sheoladh."
     },
     "closing": {
       "title": "Dún an imeacht",
@@ -3803,6 +3893,56 @@
         "item": "{language}: {state}",
         "review": "Athbhreithnigh na téacsanna"
       }
+    },
+    "voiceConsent": {
+      "title": "An taifeadadh iomlán a thras-scríobh?",
+      "message": "D'iarr an ócáid seo ar gach duine toiliú le tras-scríobh a ndeir siad. Tá gach guth sa taifeadadh iomlán, lena n-áirítear daoine nár thug toiliú: ná déan é a thras-scríobh ach amháin má thug gach duine a labhraíonn ann toiliú. Coimeádtar do dhearbhú sa loga gníomhaíochta.",
+      "confirm": "Sea, thug gach duine toiliú",
+      "cancel": "Cealaigh",
+      "waiting": "Níor thosaigh tras-scríobh an taifeadta iomláin leis féin: d'iarr an ócáid seo ar gach duine toiliú le tras-scríobh a ndeir siad. Ná tosaigh é le {button} ach amháin má thug gach duine a labhraíonn sa taifeadadh toiliú; murach sin fanfaidh an tras-scríbhinn ó na fotheidil."
+    },
+    "editCopyTitle": "Cóip den ócáid",
+    "editCopyNoticeNext": "Tá tú ag obair ar chóip dréachta: ní athraítear an ócáid bhunaidh. Is é dáta na chéad ócáide eile atá ann cheana: seiceáil an chuid eile agus sábháil.",
+    "editCopyNoticeSameDates": "Tá tú ag obair ar chóip dréachta: ní athraítear an ócáid bhunaidh. Tá na dátaí céanna aici agus atá ag an mbunleagan: nuashonraigh iad sula sábhálann tú.",
+    "consentProofs": {
+      "title": "Cruthúnais toilithe",
+      "intro": "Na toilithe le taifeadadh agus le tras-scríobh a tugadh ag an gclárú, sa seomra feithimh nó sa seomra, agus na cinn a tarraingíodh siar. Is chun iad a chruthú atá an liosta le hainmneacha.",
+      "loading": "Á lódáil…",
+      "loadFailed": "Níorbh fhéidir na cruthúnais toilithe a lódáil.",
+      "none": "Gan toiliú le taifeadadh ná le tras-scríobh don ócáid seo.",
+      "kinds": {
+        "recording": "Taifeadadh",
+        "transcription": "Tras-scríobh a ndeirtear"
+      },
+      "counts": "ag toiliú {given} · tarraingthe siar {withdrawn}",
+      "download": "Íoslódáil an liosta (CSV)",
+      "downloading": "Á íoslódáil…",
+      "downloadNote": "Tá ainmneacha daoine sa liosta: scríobhtar an easpórtáil i loga GDPR na hócáide.",
+      "downloadFailed": "Níorbh fhéidir an liosta a íoslódáil: bain triail eile as.",
+      "csv": {
+        "kind": "Toiliú",
+        "source": "Cá háit",
+        "role": "Ról",
+        "name": "Ainm",
+        "givenAt": "Tugtha ar",
+        "withdrawnAt": "Tarraingthe siar ar",
+        "textVersion": "Leagan an téacs",
+        "kinds": {
+          "recording": "Taifeadadh",
+          "transcription": "Tras-scríobh a ndeirtear"
+        },
+        "sources": {
+          "registration": "clárú",
+          "room": "seomra"
+        },
+        "roles": {
+          "registrant": "cláraithe",
+          "guest": "aoi",
+          "host": "i gceannas nó ag labhairt"
+        },
+        "unreadableName": "(ní féidir an t-ainm a léamh)"
+      },
+      "countsNote": "Áirítear daoine: áirítear clárú, cuntas foirne nó nasc ainmnithe uair amháin; áirítear aoi a fhilleann ar chuairt eile arís."
     }
   },
   "email": {
@@ -3837,7 +3977,9 @@
     "upcoming": {
       "title": "Imeachtaí atá le teacht",
       "viewAll": "Féach ar na himeachtaí go léir",
-      "noEvents": "Níl aon imeacht sceidealta. Fill go luath!"
+      "noEvents": "Níl aon imeacht sceidealta. Fill go luath!",
+      "seePast": "Ócáidí roimhe seo",
+      "seeRecordings": "Taifeadtaí"
     },
     "howItWorks": {
       "title": "Conas páirt a ghlacadh",
@@ -4187,9 +4329,11 @@
       "recordingRequired": "Tá toiliú leis an taifeadadh riachtanach chun páirt a ghlacadh san imeacht seo",
       "recordingNotice": "Taifeadtar an t-imeacht (fuaim agus físeán). Glacann tú páirt gan micreafón ná ceamara: níl do ghuth ná d'íomhá sa taifeadadh, ach amháin má thugann an t-óstach an t-urlár duit.",
       "multitrack": "Toilím go ndéanfar tras-scríobh ar mo chuid cainte, le m'ainm, do thuarascáil an imeachta. Má thaifeadann an t-imeacht rian fuaime ar leith do gach duine, ní thaifeadtar mo ghuth ach chun na críche sin agus scriostar an rian tar éis an tras-scríofa; ní úsáidtear é chun mo ghuth a aithint ná a atáirgeadh.",
-      "multitrackOptional": "Is roghnach é: mura dtugann tú toiliú, is féidir leat páirt a ghlacadh fós, ach ní thaifeadtar do ghuth agus ní chuirtear do chuid cainte sa tras-scríbhinn.",
+      "multitrackOptional": "Is roghnach é: mura dtugann tú toiliú, glacfaidh tú páirt mar sin féin, ach ní rachaidh a ndeir tú isteach sa tras-scríbhinn agus ní thaifeadfar do ghuth ar rian ar leith. Má thaifeadtar an ócáid, beidh do ghuth san fhíseán fós.",
       "stayInTouch": "Ba mhaith liom eolas a fháil faoi imeachtaí atá le teacht agus a bheith curtha leis an leabhar seoltaí, le cuireadh a fháil chuig imeachtaí cosúla",
-      "stayInTouchHelp": "Toiliú roghnach (airt. 6.1.a RGCS). Is féidir leat é a tharraingt siar am ar bith leis an nasc \"Bain mé den leabhar seoltaí\" sna ríomhphoist a gheobhaidh tú. Is iad an t-ainm agus an eagraíocht iad siúd ón gclárú seo."
+      "stayInTouchHelp": "Toiliú roghnach (airt. 6.1.a RGCS). Is féidir leat é a tharraingt siar am ar bith leis an nasc \"Bain mé den leabhar seoltaí\" sna ríomhphoist a gheobhaidh tú. Is iad an t-ainm agus an eagraíocht iad siúd ón gclárú seo.",
+      "recordingOptionalListenOnly": "Mura dtugann tú toiliú glacann tú páirt fós, ag éisteacht amháin: leanann tú agus scríobhann tú sa chomhrá, ach fanann an micreafón, an ceamara agus comhroinnt scáileáin múchta. Is féidir leat toiliú níos déanaí, ón seomra.",
+      "recordingOptionalHost": "Mura dtugann tú toiliú, téann tú isteach agus stiúrann tú mar is gnách, ach ní choinnítear do ghuth sna rianta in aghaidh an duine ná sa tras-scríbhinn. Má thaifeadtar físeán an tseomra, beidh tú ann mar sin féin."
     },
     "export": {
       "title": "Mo chuid sonraí",
@@ -4852,11 +4996,13 @@
     "transparency": "Slándáil agus trédhearcacht",
     "serviceInventory": "Fardal seirbhísí",
     "sourceCode": "Cód foinse",
-    "buildInfoDev": "tógáil forbartha",
-    "viewCommit": "Féach ar an gcommit ar GitHub",
     "viewRelease": "Féach ar an eisiúint ar GitHub",
     "viewChangelog": "Féach ar na nuashonruithe (loga athruithe)",
-    "buildDatePrefix": "Tógtha ar"
+    "newWindow": "osclaítear i bhfuinneog nua é",
+    "usefulLinks": "Naisc úsáideacha",
+    "version": "Leagan {version}",
+    "versionDev": "Leagan forbartha",
+    "updatedOn": "nuashonraithe ar {date}"
   },
   "changelog": {
     "metaTitle": "Nuacht agus loga athruithe",
@@ -5023,7 +5169,9 @@
       "version": "Leagan na píblíne"
     },
     "overlapBadge": "comhuaineach",
-    "overlapTitle": "Caint chomhuaineach: labhraíonn níos mó ná duine amháin ag an am céanna san eatramh seo."
+    "overlapTitle": "Caint chomhuaineach: labhraíonn níos mó ná duine amháin ag an am céanna san eatramh seo.",
+    "anonymousSpeaker": "Rannpháirtí {n}",
+    "untranscribed": "Níor tras-scríobhadh é: níor thug an cainteoir toiliú"
   },
   "waiting": {
     "startsIn": "Tosóidh an t-imeacht i gceann",
@@ -5087,9 +5235,6 @@
     "endedWatchRecording": "Féach ar an taifeadadh",
     "endedLeaveFeedback": "Fág aiseolas",
     "startEventError": "Earráid agus an imeacht á thosú. Bain triail eile as.",
-    "emailLabel": "Ríomhphost (roghnach)",
-    "emailHelp": "Le haghaidh leantachta iar-imeachta amháin",
-    "emailInvalid": "Iontráil seoladh ríomhphoist bailí",
     "chatLockedMessage": "Iontráil d'ainm chun páirt a ghlacadh i gcomhrá an imeachta.",
     "classicView": "Amharc clasaiceach",
     "backToGarden": "Taispeáin an chearnóg",
@@ -5322,7 +5467,12 @@
     "waitingForStartButton": "Ag fanacht leis an tús",
     "countdownHours": "{hours}u",
     "countdownMinutes": "{minutes}n",
-    "countdownSeconds": "{seconds}s"
+    "countdownSeconds": "{seconds}s",
+    "startEarlyConfirm": "Tá níos mó ná 30 nóiméad fágtha go dtí an tús beartaithe ({when}). Má thosaíonn tú anois, rachaidh aon duine a bhfuil an nasc aige isteach láithreach agus lasfar an seomra físe: brúigh arís le deimhniú.",
+    "startEarlyYes": "Tosaigh anois",
+    "startEarlyNo": "Fan leis an am beartaithe",
+    "anonymousNameHelp": "San ócáid seo tá an lucht féachana gan ainm: ní fheiceann daoine eile d’ainm, ach ainm cleite le cód.",
+    "registeredNameHelp": "Seo an t-ainm a chláraigh tú leis: is mar seo a fheicfear thú sa seomra."
   },
   "recording": {
     "management": "Taifeadadh físe",

@@ -114,12 +114,12 @@ Blue statuses are set by people, teal ones only by automation, green is the open
 
 | Transition | Trigger | Actor | Compose | Helm `simple` / `standard` | Helm `full` with scaler |
 |---|---|---|---|---|---|
-| create → `DRAFT` | Event wizard, **Duplicate for next time** on the management page, or **Duplicate as next occurrence** in the event card menu | Administrator or organizer | Yes | Yes | Yes |
+| create → `DRAFT` | Event wizard, or **Duplicate** on the management page or in the event card menu | Administrator or organizer | Yes | Yes | Yes |
 | create → `LIVE` | **New call** under **Instant calls** | Administrator or organizer | Yes | Yes | Yes |
 | `DRAFT` → `PUBLISHED` | **Publish event** in the wizard, or **Publish** on the management page or in the event card menu | Moderator credential | Yes | Yes | Yes |
 | `PUBLISHED` → `DRAFT` | **Unpublish** | Moderator credential | Yes | Yes | Yes |
 | `PROVISIONING`, `IDLE`, `ARCHIVED` → `PUBLISHED` | **Publish** on the management page | Moderator credential | Yes (`ARCHIVED` only) | Yes (`ARCHIVED` only) | Yes |
-| `PUBLISHED`, `PROVISIONING`, `IDLE` → `LIVE` | **Start event** on the management page or in the waiting room | Moderator credential | Yes (`PUBLISHED` only) | Yes (`PUBLISHED` only) | Yes |
+| `PUBLISHED`, `PROVISIONING`, `IDLE` → `LIVE` | **Start event** in the waiting room, for moderators; more than 30 minutes before `startsAt` it asks for a second press. The management page has no start button: when nothing opens the room on time (see [Automatic transitions](#automatic-transitions-the-scaler-tick)), a moderator enters it and starts it there | Moderator credential | Yes (`PUBLISHED` only) | Yes (`PUBLISHED` only) | Yes |
 | `LIVE` → `ENDED` | **End for everyone** (after **Leave room**) or **End event** in the room's **Control** panel | Moderator credential | Yes | Yes | Yes |
 | `ENDED` → `PUBLISHED` or `LIVE` | Saving the event with a future `endsAt` (revival) | Moderator credential | Yes | Yes | Yes |
 | any → `ARCHIVED` | Bulk **Archive** in the event list | Administrator, or organizer for their own events | Yes | Yes | Yes |

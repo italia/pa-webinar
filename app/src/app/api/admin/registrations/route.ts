@@ -105,8 +105,14 @@ export const GET = withErrorHandling(async (request) => {
       include: {
         event: { select: { slug: true, title: true, startsAt: true } },
         // I consensi dati in sala d'attesa da chi non li aveva dati
-        // all'iscrizione (iscritto prima che l'evento registrasse).
-        _count: { select: { recordingConsents: true, multitrackConsents: true } },
+        // all'iscrizione (iscritto prima che l'evento registrasse), se non
+        // ritirati dalla sala.
+        _count: {
+          select: {
+            recordingConsents: { where: { withdrawnAt: null } },
+            multitrackConsents: { where: { withdrawnAt: null } },
+          },
+        },
       },
     }),
     prisma.registration.count({ where }),
@@ -128,8 +134,11 @@ export const GET = withErrorHandling(async (request) => {
     organization: r.organization,
     organizationRole: r.organizationRole,
     organizationType: r.organizationType,
-    consentRecording: r._count.recordingConsents > 0 ? true : r.consentRecording,
-    consentMultitrack: r._count.multitrackConsents > 0 ? true : r.consentMultitrack,
+    // Un consenso dell'iscrizione ritirato dalla sala vale come un no.
+    consentRecording:
+      r._count.recordingConsents > 0 ? true : r.consentRecordingWithdrawnAt ? false : r.consentRecording,
+    consentMultitrack:
+      r._count.multitrackConsents > 0 ? true : r.consentMultitrackWithdrawnAt ? false : r.consentMultitrack,
     consentFutureCommunications: r.consentFutureCommunications,
     joinedAt: r.joinedAt?.toISOString() ?? null,
     leftAt: r.leftAt?.toISOString() ?? null,

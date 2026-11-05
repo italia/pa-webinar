@@ -229,7 +229,7 @@ with `--local`):
   migration image alone is about 2.4 GB;
 - for the add-ons, `curl` 7.75 or later (`--aws-sigv4`), `base64`, `od` and
   `timeout`;
-- for `--verify-call`, Node.js 20 or later, `npm ci` at the repository root,
+- for `--verify-call`, Node.js 22.22.2 or later, `npm ci` at the repository root,
   and a Chromium or Chrome. The script checks them, and starts the browser
   once, at the beginning of every run that ends with the call, `--dry-run`
   included;
@@ -543,7 +543,7 @@ without its `backups/`, encrypted when you give it a recipient
 
 ### Images without registry access
 
-The published images refuse anonymous pulls today
+The portal images can be pulled anonymously, and the patched web image cannot
 ([Registry access](README.md#registry-access-to-the-published-images)). The
 script handles this for you:
 

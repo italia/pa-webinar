@@ -17,6 +17,7 @@ import { Icon } from '@/components/ui/icon';
 import {
   FORMATO_PREDEFINITO,
   PARTECIPANTI_ATTESI,
+  formatoPossibile,
   type FormatoAccesso,
   type FormatoGuidato,
 } from '@/lib/events/guided-format';
@@ -136,7 +137,9 @@ export default function GuidedFormat({
   onContinue,
   aiPipelineEnabled = true,
   liveCaptionsAvailable = false,
+  recordingAvailable = true,
   accessoPredefinito = 'tutti',
+  azioneTitolo,
   children,
 }: {
   initial?: FormatoGuidato | null;
@@ -148,7 +151,12 @@ export default function GuidedFormat({
   aiPipelineEnabled?: boolean;
   /** I sottotitoli live ci sono nell'installazione: ogni formato li accende. */
   liveCaptionsAvailable?: boolean;
-  /** Sotto le domande: i modelli salvati. */
+  /** L'installazione puo' registrare: senza, la domanda non si fa e il formato
+   *  esce sempre senza registrazione (vedi formatoPossibile). */
+  recordingAvailable?: boolean;
+  /** Accanto al titolo: l'azione secondaria (partire da un modello). */
+  azioneTitolo?: React.ReactNode;
+  /** Sotto il titolo, prima delle domande: i modelli, quando si aprono. */
   children?: React.ReactNode;
 }) {
   const t = useTranslations('admin.guided');
@@ -164,6 +172,7 @@ export default function GuidedFormat({
   useEffect(() => pulisciTraslocoScaduto(), []);
   const cambia = (patch: Partial<FormatoGuidato>) =>
     setF((prima) => ({ ...prima, ...patch }));
+  const formato = formatoPossibile(f, recordingAvailable);
 
   const funzioni = [
     tp('feature.chat.label'),
@@ -179,12 +188,16 @@ export default function GuidedFormat({
         mentre si scorre le domande, non sopra i modelli che seguono. */}
       <div className="formato">
         <div className="formato__domande">
-          <h2 className="h4 fw-bold mb-2" style={{ color: 'var(--app-text)' }}>
-            {t('title')}
-          </h2>
+          <div className="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-2">
+            <h2 className="h4 fw-bold mb-0" style={{ color: 'var(--app-text)' }}>
+              {t('title')}
+            </h2>
+            {azioneTitolo}
+          </div>
           <p className="text-secondary mb-4" style={{ fontSize: '0.9rem' }}>
-            {t('intro')}
+            {recordingAvailable ? t('intro') : t('introNoRecording')}
           </p>
+          {children && <div className="formato__modelli mb-4">{children}</div>}
 
           <fieldset className="formato__domanda">
             <legend>{t('peopleQ')}</legend>
@@ -228,29 +241,31 @@ export default function GuidedFormat({
             </div>
           </fieldset>
 
-          <fieldset className="formato__domanda">
-            <legend>{t('recQ')}</legend>
-            <div className="formato__scelte">
-              <Scelta
-                name={`${base}-registra`}
-                value="si"
-                current={f.registra}
-                onChange={(registra) => cambia({ registra })}
-                title={t('rec.yes')}
-                desc={aiPipelineEnabled ? t('rec.yesDesc') : undefined}
-                icon={<IconaRec />}
-              />
-              <Scelta
-                name={`${base}-registra`}
-                value="no"
-                current={f.registra}
-                onChange={(registra) => cambia({ registra })}
-                title={t('rec.no')}
-                desc={t('rec.noDesc')}
-                icon={<Icon icon="it-close-circle" size="sm" />}
-              />
-            </div>
-          </fieldset>
+          {recordingAvailable && (
+            <fieldset className="formato__domanda">
+              <legend>{t('recQ')}</legend>
+              <div className="formato__scelte">
+                <Scelta
+                  name={`${base}-registra`}
+                  value="si"
+                  current={f.registra}
+                  onChange={(registra) => cambia({ registra })}
+                  title={t('rec.yes')}
+                  desc={aiPipelineEnabled ? t('rec.yesDesc') : undefined}
+                  icon={<IconaRec />}
+                />
+                <Scelta
+                  name={`${base}-registra`}
+                  value="no"
+                  current={f.registra}
+                  onChange={(registra) => cambia({ registra })}
+                  title={t('rec.no')}
+                  desc={t('rec.noDesc')}
+                  icon={<Icon icon="it-close-circle" size="sm" />}
+                />
+              </div>
+            </fieldset>
+          )}
 
           <fieldset className="formato__domanda">
             <legend>{t('accessQ')}</legend>
@@ -305,17 +320,19 @@ export default function GuidedFormat({
               </span>
               <span>{tf('features', { list: funzioni.join(', ') })}</span>
             </li>
-            <li>
-              <span className="anteprima-righe__icona">
-                <IconaRec />
-              </span>
-              <span>
-                {f.registra === 'si' ? tf('recordingManual') : t('rec.noDesc')}
-                {f.registra === 'si' && aiPipelineEnabled && (
-                  <span className="d-block text-secondary">{t('rec.yesDesc')}</span>
-                )}
-              </span>
-            </li>
+            {recordingAvailable && (
+              <li>
+                <span className="anteprima-righe__icona">
+                  <IconaRec />
+                </span>
+                <span>
+                  {f.registra === 'si' ? tf('recordingManual') : t('rec.noDesc')}
+                  {f.registra === 'si' && aiPipelineEnabled && (
+                    <span className="d-block text-secondary">{t('rec.yesDesc')}</span>
+                  )}
+                </span>
+              </li>
+            )}
             <li>
               <span className="anteprima-righe__icona">
                 <Icon icon={f.accesso === 'invitati' ? 'it-mail' : 'it-unlocked'} size="sm" />
@@ -327,14 +344,13 @@ export default function GuidedFormat({
           <button
             type="button"
             className="btn btn-primary w-100"
-            onClick={() => onContinue(f)}
+            onClick={() => onContinue(formato)}
           >
             {t('continue')} →
           </button>
         </aside>
       </div>
 
-      {children && <div className="formato__modelli mt-4">{children}</div>}
     </div>
   );
 }

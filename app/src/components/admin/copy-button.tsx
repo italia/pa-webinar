@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from 'design-react-kit';
 
 import { Icon } from '@/components/ui/icon';
+import { useCopia } from '@/hooks/use-copia';
 
 interface CopyButtonProps {
   text: string;
@@ -17,35 +17,24 @@ interface CopyButtonProps {
 
 export default function CopyButton({ text, label, accessibleName }: CopyButtonProps) {
   const t = useTranslations('admin.links');
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      const textarea = document.createElement('textarea');
-      textarea.value = text;
-      document.body.appendChild(textarea);
-      textarea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textarea);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  }, [text]);
+  const { esito, copia } = useCopia();
+  const handleCopy = () => void copia(text);
 
   return (
+    <>
     <Button
-      color={copied ? 'success' : 'primary'}
+      color={esito === 'copiato' ? 'success' : esito === 'fallito' ? 'danger' : 'primary'}
       outline
       size="sm"
       onClick={handleCopy}
       aria-label={accessibleName ?? label ?? t('copyLink')}
     >
-      <Icon icon={copied ? 'it-check' : 'it-copy'} size="sm" className="me-1" />
-      {copied ? t('copied') : (label ?? t('copyLink'))}
+      <Icon icon={esito === 'copiato' ? 'it-check' : esito === 'fallito' ? 'it-error' : 'it-copy'} size="sm" className="me-1" />
+      {esito === 'copiato' ? t('copied') : esito === 'fallito' ? t('copyFailedShort') : (label ?? t('copyLink'))}
     </Button>
+    <span className="visually-hidden" role="status">
+      {esito === 'copiato' ? t('copied') : esito === 'fallito' ? t('copyFailedShort') : ''}
+    </span>
+    </>
   );
 }

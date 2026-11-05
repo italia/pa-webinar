@@ -29,7 +29,8 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: "20"
+          node-version: "22"
+          check-latest: true
           cache: "npm"
       - run: npm ci
       - run: npm run lint --workspace=app
@@ -57,7 +58,8 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: "20"
+          node-version: "22"
+          check-latest: true
           cache: "npm"
       - run: npm ci
       # Con `--coverage`: le soglie in app/vitest.config.ts sono un cricchetto
@@ -66,6 +68,11 @@ jobs:
       - run: npm run test:coverage --workspace=app
         env:
           DATABASE_URL: postgresql://eventi:test@localhost:5432/pa_webinar_test
+      # Vincoli, cascate, transazioni e gare fra richieste sul PostgreSQL del
+      # job: quello che un client simulato non puo' dire.
+      - run: npm run test:db --workspace=app
+        env:
+          TEST_DATABASE_URL: postgresql://eventi:test@localhost:5432/pa_webinar_test
 
 
   # I test dei pacchetti FUORI dai workspace npm.
@@ -90,7 +97,8 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: "20"
+          node-version: "22"
+          check-latest: true
       - run: npm ci
         working-directory: infra/${{ matrix.pkg }}
       - run: npx tsc --noEmit -p tsconfig.json
@@ -107,7 +115,8 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: "20"
+          node-version: "22"
+          check-latest: true
           cache: "npm"
       - run: npm ci
       - run: npx tsc --noEmit -p lobby/tsconfig.json
@@ -247,7 +256,8 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: "20"
+          node-version: "22"
+          check-latest: true
           cache: "npm"
       - run: npm ci
       # Licenze di produzione lette dai lockfile (workspace e servizi npm che
@@ -282,7 +292,8 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: "20"
+          node-version: "22"
+          check-latest: true
           cache: "npm"
       - run: npm ci
       - name: Apply migrations
@@ -321,7 +332,8 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: "20"
+          node-version: "22"
+          check-latest: true
           cache: "npm"
       - run: npm ci
       - name: Install Playwright browsers
@@ -356,8 +368,8 @@ jobs:
           exit 1
         env:
           APP_BUILD_TARGET: production
-      - name: Run database migrations
-        run: docker compose --profile setup run --rm db-migrate
+      - name: Load demo data
+        run: docker compose --profile setup run --rm db-seed
       - name: Wait for app to be ready
         run: |
           for i in $(seq 1 30); do

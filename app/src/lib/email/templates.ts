@@ -882,7 +882,7 @@ export function postEventModeratorEmail(input: PostEventModeratorInput): {
     ? `<pre style="margin:0 0 16px;padding:12px 16px;background:#f5f7fb;border:1px solid #dee5ec;border-radius:4px;font-family:inherit;font-size:14px;white-space:pre-wrap;color:#17324d;">${escapeHtml(input.recapSummary)}</pre>`
     : '';
   const recordingHtml = input.recordingUrl
-    ? `<p style="margin:16px 0 0;font-size:14px;"><a href="${input.recordingUrl}" style="color:#06c;">${escapeHtml(c.recordingCta)}</a></p>`
+    ? `<p style="margin:16px 0 0;font-size:14px;"><a href="${escapeHtml(input.recordingUrl)}" style="color:#06c;">${escapeHtml(c.recordingCta)}</a></p>`
     : '';
   const body = `
 <p style="margin:0 0 16px;">${escapeHtml(c.moderatorIntro(input.eventTitle))}</p>

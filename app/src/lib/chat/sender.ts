@@ -17,6 +17,8 @@
  */
 
 import { resolveGrantForEvent } from '@/lib/auth/moderator';
+import { staffDietroIlPrimario } from '@/lib/auth/staff-seat';
+import { pseudonimo } from '@/lib/live/pseudonym';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { readOwnedEventAccessToken } from '@/lib/event-session';
@@ -44,6 +46,8 @@ export interface ChatEventForAuth {
   id: string;
   moderatorToken: string;
   moderatorName?: string | null;
+  /** Pubblico anonimo: chi partecipa scrive con lo pseudonimo del posto. */
+  audienceAnonymous?: boolean;
 }
 
 /**
@@ -69,6 +73,20 @@ export async function resolveTokenSender(
     // for them (keeps the moderator hot path off an HS256 verify).
     const isGrantModerator = grant.role === 'MODERATOR';
     const override = displayNameOverride?.trim();
+    // Il link primario aperto da una persona dello staff che gestisce
+    // l'evento (lib/auth/staff-seat): un posto suo, con il nome del suo
+    // account. Come per le altre identita' personali il nome lo garantisce il
+    // server, non quello scritto in sala d'attesa.
+    const staff = grant.isPrimaryShared ? await staffDietroIlPrimario(event.id) : null;
+    if (staff) {
+      return {
+        eventId: event.id,
+        senderId: `mod-${event.id}-staff-${staff.accountId}`,
+        senderName: staff.nome,
+        isModerator: true,
+        isPerPersonIdentity: true,
+      };
+    }
     const senderName = grant.isPrimaryShared
       ? override || grant.displayName || 'Moderatore'
       : grant.displayName ?? 'Moderatore';
@@ -106,9 +124,12 @@ export async function resolveTokenSender(
     return {
       eventId: event.id,
       senderId: `reg-${registration.id}`,
-      senderName: owns
-        ? (tryDecryptPII(registration.displayName) ?? registration.displayName)
-        : displayNameOverride?.trim() || 'Partecipante',
+      // Pubblico anonimo: lo pseudonimo del posto, lo stesso del video.
+      senderName: event.audienceAnonymous
+        ? await pseudonimo(event.id, `reg-${registration.id}`)
+        : owns
+          ? (tryDecryptPII(registration.displayName) ?? registration.displayName)
+          : displayNameOverride?.trim() || 'Partecipante',
       isModerator: false,
       // Only the browser that registered — the one holding the signed
       // event_access cookie — is provably this person. A forwarded link shares

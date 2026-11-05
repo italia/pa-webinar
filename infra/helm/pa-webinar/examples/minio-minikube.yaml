@@ -1,0 +1,113 @@
+# ============================================================================
+# MinIO su minikube — archivio a oggetti per la valutazione, fuori dal chart
+# ============================================================================
+#
+# Dà al portale un archivio S3 nel cluster: caricamenti, video e risultati della
+# post-produzione. Solo per provare: un'unica replica, una sola chiave, nessuna
+# copia dei dati. Passi e valori in docs/install/minikube.md, "Object storage
+# with MinIO".
+#
+# <s3-host> va sostituito con s3.<node-ip>.nip.io. Il Secret TLS `s3-tls` e il
+# Secret `minio-root` (MINIO_ROOT_USER, MINIO_ROOT_PASSWORD) si creano prima.
+# L'immagine `latest` è l'unica pubblica senza credenziali: non fissa una
+# versione, e in un'installazione vera non va bene.
+# ============================================================================
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: minio
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: minio }
+  template:
+    metadata:
+      labels: { app: minio }
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        fsGroup: 65532
+      containers:
+        - name: minio
+          image: cgr.dev/chainguard/minio:latest
+          args: ["server", "/data", "--address", ":9000"]
+          envFrom:
+            - secretRef: { name: minio-root }
+          ports:
+            - containerPort: 9000
+          readinessProbe:
+            httpGet: { path: /minio/health/ready, port: 9000 }
+          resources:
+            requests: { cpu: 100m, memory: 256Mi }
+            limits: { cpu: "1", memory: 1Gi }
+          volumeMounts:
+            - { name: dati, mountPath: /data }
+      volumes:
+        - name: dati
+          persistentVolumeClaim: { claimName: minio }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+spec:
+  selector: { app: minio }
+  ports:
+    - { port: 9000, targetPort: 9000 }
+---
+# Lo stesso indirizzo firmato va ai browser e ai componenti nel cluster: serve
+# un nome raggiungibile da tutti, in https.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minio
+  annotations:
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts: [<s3-host>]
+      secretName: s3-tls
+  rules:
+    - host: <s3-host>
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service: { name: minio, port: { number: 9000 } }
+---
+# I due domini del portale, uno per bucket.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: minio-bucket
+spec:
+  backoffLimit: 10
+  ttlSecondsAfterFinished: 3600
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: mc
+          image: cgr.dev/chainguard/minio-client:latest
+          args: ["mb", "--ignore-existing", "--config-dir", "/tmp/mc", "archivio/pa-webinar-files", "archivio/pa-webinar-recordings"]
+          env:
+            - name: MINIO_ROOT_USER
+              valueFrom: { secretKeyRef: { name: minio-root, key: MINIO_ROOT_USER } }
+            - name: MINIO_ROOT_PASSWORD
+              valueFrom: { secretKeyRef: { name: minio-root, key: MINIO_ROOT_PASSWORD } }
+            - name: MC_HOST_archivio
+              value: http://$(MINIO_ROOT_USER):$(MINIO_ROOT_PASSWORD)@minio:9000

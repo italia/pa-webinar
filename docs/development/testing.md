@@ -12,6 +12,7 @@ Run every command from the repository root unless a row or block says otherwise.
 |---|---|---|---|---|
 | Lint and type check | ESLint rules and TypeScript `strict` for the `app` workspace | `npm run lint --workspace=app` and `npx tsc --noEmit --project app/tsconfig.json` | Nothing | **Lint & Typecheck** |
 | App unit and guard tests | The Vitest suite under `app/src/` | `npm run test --workspace=app` (also `test:watch`, `test:coverage`) | Nothing: no database, Redis or Jitsi | **Unit Tests**, with the coverage thresholds |
+| App database tests | Route handlers against real PostgreSQL: constraints, cascades, transactions, races between requests, column types | `npm run test:db --workspace=app` | A disposable PostgreSQL in `TEST_DATABASE_URL`, with a superuser and a database name ending in `_test` | **Unit Tests** |
 | Recorder bot, recorder controller and captions gateway | Pure logic of `infra/recorder` and `infra/recorder-controller`; the captions gateway, end to end over WebSockets with a fake bridge and a fake engine | In each folder: `npm ci`, then `npx tsc --noEmit -p tsconfig.json && npm test` | Each folder's own dependencies | **Unit Tests (recorder, controller)** |
 | Lobby | Type check of the Phaser square | `npm run lobby:typecheck` | Nothing | **Typecheck (lobby)** |
 | Repository tooling | The rules of the Git hooks (commit message, secret patterns, choice of checks) and the license policy (SPDX expressions, lockfile reading) | `npm run test:scripts` (Node's built-in test runner) | Nothing | **Lint & Typecheck** |
@@ -120,6 +121,30 @@ The suite needs no running service. Tests that touch data mock the Prisma client
 
 Most tests cover `app/src/lib/` and route handlers. A route test sits next to its `route.ts`, imports the exported handler (`GET`, `POST`, and so on) and calls it directly. React components have almost no unit tests. The end-to-end smoke tests and manual checks exercise them.
 
+### Database tests
+
+A mocked client cannot say whether a unique index fires, a cascade removes the right rows, a transaction rolls back or a malformed id reaches a `uuid` column. The tests in `app/src/test/db/` call the same route handlers against a real PostgreSQL to answer those questions. Only the session cookies are faked, plus file storage where a route deletes a blob.
+
+```bash
+docker run -d --rm --name pa-webinar-test-db \
+  -e POSTGRES_DB=pa_webinar_test -e POSTGRES_USER=eventi -e POSTGRES_PASSWORD=test \
+  -p 127.0.0.1:55433:5432 postgres:16-alpine
+
+TEST_DATABASE_URL=postgresql://eventi:test@127.0.0.1:55433/pa_webinar_test \
+  npm run test:db --workspace=app
+```
+
+[`app/vitest.db.config.ts`](../../app/vitest.db.config.ts) sets up the run:
+
+- it applies the migrations with `prisma migrate deploy`, the command production uses;
+- it refuses a database whose name does not end in `_test`, because every test empties every table;
+- it uses `TEST_DATABASE_URL` and ignores `DATABASE_URL`, so a development connection cannot be picked up by accident;
+- it runs one file at a time, since all files share the database.
+
+The user must be a superuser: the cleanup between tests turns off foreign key checks for its transaction. The user created by the official PostgreSQL image is one.
+
+Add a test here when the behavior depends on the database itself. Logic that depends only on the input belongs in the unit suite.
+
 ### End-to-end tests (Playwright)
 
 The specs are in `app/e2e/` and the configuration in [`app/playwright.config.ts`](../../app/playwright.config.ts). There are two projects: `chromium` (desktop Chrome) and `mobile-chrome` (a Pixel 5 profile). `npm run test:e2e --workspace=app` runs both, `npm run test:e2e:ui --workspace=app` opens the interactive runner, and CI runs `chromium` only.
@@ -147,8 +172,8 @@ The browser runs with the `it-IT` locale. The specs open Italian URLs (`/it/even
 To run the suite against the local stack:
 
 ```bash
-docker compose up --build -d --wait
-docker compose --profile setup run --rm db-migrate   # migrations and seed data
+docker compose up --build -d --wait                  # migrations run before the app
+docker compose --profile setup run --rm db-seed      # demo data
 cd app
 npx playwright install chromium                      # first run only
 npx playwright test --project=chromium
@@ -164,7 +189,7 @@ npx playwright test --project=chromium
 In CI, the **E2E Smoke Tests** job runs after **Lint & Typecheck** and **Unit Tests**. It:
 
 1. starts the whole Compose stack, which builds the production image of the app;
-2. runs `db-migrate`;
+2. loads the demo data with `db-seed`;
 3. waits for `/api/health`;
 4. runs the `chromium` project;
 5. uploads the report as an artifact.
@@ -241,7 +266,7 @@ What each patch fixes, and how to build and bump the image, are in [Patched jits
 
 `scripts/verify-install.sh` checks a running Helm installation on any platform and exits non-zero when a check fails. From outside, it tests the portal (`/api/health`, `/api/ready`, component status), the conference `config.js`, the HTTP to HTTPS redirect, and certificate validity and days to expiry for both host names. From the cluster, it checks that the release's pods are ready, that the app and migration images match, the last successful run of each scheduled job, overdue and failed emails, and the free space on the database volume. It changes nothing, so it can also run from cron with `--quiet`, which prints only warnings and errors.
 
-With `--call`, two headless browsers join a throwaway instant call and check that audio and video reach both of them; the call is deleted at the end. This needs Node.js, the root `npm ci` (for Playwright) and a Chromium (`npx playwright install chromium`, or `--browser <path>`).
+With `--call`, two headless browsers join a throwaway instant call, open their microphone and camera, which are closed on entry, and check that audio and video reach both of them; the call is deleted at the end. This needs Node.js, the root `npm ci` (for Playwright) and a Chromium (`npx playwright install chromium`, or `--browser <path>`).
 
 The administrator key comes from a secrets file or standard input (`--secrets-file`), or from the release's Secret (`--keys-from-cluster`), never from the command line. Every sign-in with the key is recorded in the administrator audit log.
 

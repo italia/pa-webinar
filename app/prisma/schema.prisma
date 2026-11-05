@@ -259,6 +259,20 @@ model Event {
   // Il consenso lo da' la casella, non l'ingresso.
   recordingConsentText String? @map("recording_consent_text") @db.Text
 
+  // Chi non da' il consenso alla registrazione entra lo stesso, in solo
+  // ascolto: sente, vede e scrive in chat, ma microfono, videocamera e schermo
+  // gli restano chiusi (anche sul bridge, mod_pa_media_lock). Spento, il
+  // consenso resta una condizione per entrare. Acceso per gli eventi nuovi
+  // (lo decide la creazione); quelli di prima restano come erano.
+  listenOnlyWithoutConsent Boolean @default(false) @map("listen_only_without_consent")
+
+  // Pubblico anonimo: chi partecipa (iscritti e ospiti) compare agli altri
+  // con uno pseudonimo stabile per posto («Partecipante 7K2Q»), in video, in
+  // chat e nelle domande; l'elenco dei partecipanti e la vista a griglia
+  // restano a chi conduce. Chi conduce e chi interviene restano con il nome.
+  // Spento di default: negli eventi di comunita' ci si vuole conoscere.
+  audienceAnonymous Boolean @default(false) @map("audience_anonymous")
+
   // Analytics
   peakParticipants Int @default(0) @map("peak_participants")
 
@@ -454,6 +468,8 @@ model EventModerator {
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
   // Gli argomenti del programma su cui la persona interviene.
   agendaItems EventAgendaItem[]
+  // Le prove del consenso alla registrazione date entrando in sala.
+  recordingConsents RecordingConsent[]
 
   presentations EventPresentation[]
 
@@ -837,6 +853,11 @@ model Registration {
   // comprendesse la trascrizione dei propri interventi con il nome: valgono
   // per la traccia audio, non per la trascrizione dai sottotitoli.
   consentMultitrackVersion    Int?     @map("consent_multitrack_version")
+  // Ritiro dalla sala dei consensi dati all'iscrizione (art. 7.3 GDPR): da
+  // quel momento il consenso dell'iscrizione non vale piu'. Uno ridato in sala
+  // dopo il ritiro vale con la sua prova (RecordingConsent, MultitrackConsent).
+  consentRecordingWithdrawnAt  DateTime? @map("consent_recording_withdrawn_at")
+  consentMultitrackWithdrawnAt DateTime? @map("consent_multitrack_withdrawn_at")
   consentFutureCommunications Boolean  @default(false) @map("consent_future_communications")
 
   // Access token (for personal join link)
@@ -1206,7 +1227,7 @@ model ReminderSent {
 model GdprAuditLog {
   id          String  @id @default(uuid()) @db.Uuid
   eventId     String  @map("event_id") @db.Uuid
-  action      String // DATA_DELETED, CONSENT_RECORDED, DATA_EXPORTED
+  action      String // DATA_DELETED, CONSENT_RECORDED, CONSENT_WITHDRAWN, DATA_EXPORTED
   recordCount Int     @map("record_count")
   details     String? @db.Text // JSON, no PII
 
@@ -2584,6 +2605,9 @@ model StaffAccount {
   events        Event[]           @relation("EventCreatedBy")
   loginTokens   StaffLoginToken[]
   glossaryTerms GlossaryTerm[]    @relation("GlossaryTermCreatedBy")
+  // Le prove del consenso alla registrazione date entrando in sala dal link
+  // primario con la propria sessione.
+  recordingConsents RecordingConsent[]
 
   @@map("staff_accounts")
 }
@@ -2622,6 +2646,9 @@ model MultitrackConsent {
   registrationId String?  @map("registration_id") @db.Uuid
   locale         String?  @db.VarChar(8)
   consentedAt    DateTime @default(now()) @map("consented_at")
+  // Ritirato dalla sala (lib/live/consent-withdrawal): la prova resta, il
+  // consenso non vale piu'.
+  withdrawnAt    DateTime? @map("withdrawn_at")
   // Il testo con cui e' stato dato: le prove scritte prima che il testo
   // comprendesse la trascrizione con il nome hanno 1 (vedi
   // Registration.consentMultitrackVersion).
@@ -2704,17 +2731,33 @@ model RecordingConsent {
   // Nome mostrato in sala, cifrato (encryptPII).
   displayName    String   @map("display_name")
   registrationId String?  @map("registration_id") @db.Uuid
+  // Chi conduce o interviene: la concessione nominale, o l'account dello
+  // staff dietro il link primario, a cui la prova si lega (null per chi
+  // partecipa e per il link primario senza un account dietro). Serve a non
+  // richiedere il consenso a ogni ingresso.
+  eventModeratorId String? @map("event_moderator_id") @db.Uuid
+  staffAccountId   String? @map("staff_account_id") @db.Uuid
   locale         String?  @db.VarChar(8)
   consentedAt    DateTime @default(now()) @map("consented_at")
+  // Ritirato dalla sala (lib/live/consent-withdrawal): la prova resta, il
+  // consenso non vale piu'.
+  withdrawnAt    DateTime? @map("withdrawn_at")
+  // I periodi precedenti di un consenso ridato dopo un ritiro (una sola
+  // prova per iscrizione): [{ consentedAt, withdrawnAt }], dal piu' vecchio.
+  earlierPeriods Json?    @map("earlier_periods") @db.JsonB
 
-  event        Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  registration Registration? @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  event          Event           @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  registration   Registration?   @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  eventModerator EventModerator? @relation(fields: [eventModeratorId], references: [id], onDelete: SetNull)
+  staffAccount   StaffAccount?   @relation(fields: [staffAccountId], references: [id], onDelete: SetNull)
 
   // Una prova per iscrizione: due richieste insieme (due schede, un
   // rientro mentre la prima e' in volo) non la raddoppiano. Gli ospiti non
   // hanno iscrizione (NULL), e il vincolo non li tocca.
   @@unique([eventId, registrationId])
   @@index([registrationId])
+  @@index([eventModeratorId])
+  @@index([staffAccountId])
   @@map("recording_consents")
 }
 

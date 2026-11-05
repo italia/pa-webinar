@@ -19,7 +19,7 @@ import { z } from 'zod';
 import { cookies } from 'next/headers';
 
 import { conservaOriginali } from '@/lib/ai/original-body';
-import { withErrorHandling } from '@/lib/api-handler';
+import { parseJsonBody, withErrorHandling } from '@/lib/api-handler';
 import { requireRecordingManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
@@ -121,7 +121,7 @@ export const PUT = withErrorHandling(async (request, context) => {
   const { id } = await (context as { params: Promise<{ id: string }> }).params;
   // Dell'evento della registrazione: l'admin o chi l'ha creato (ADR-014).
   await requireRecordingManager(await cookies(), id);
-  const body = bodySchema.parse(await request.json());
+  const body = bodySchema.parse(await parseJsonBody(request));
 
   const recording = await loadRecording(id);
   if (!recording) throw new NotFoundError('Recording');

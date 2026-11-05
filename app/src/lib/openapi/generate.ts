@@ -14,6 +14,7 @@ import {
   updateQuestionSchema,
   upvoteQuestionSchema,
   jitsiTokenRequestSchema,
+  consentWithdrawalSchema,
   createPollSchema,
   updatePollStatusSchema,
   pollVoteSchema,
@@ -247,6 +248,37 @@ registry.registerPath({
 });
 
 registry.registerPath({
+  method: 'post',
+  path: '/api/events/{param}/listen-only',
+  tags: ['Jitsi'],
+  summary: 'Declare the bridge endpoint of a listen-only participant',
+  description:
+    'The browser of a listen-only participant sends its bridge endpoint with its room token; only a token ' +
+    'that carries listenOnly marks it. Moderators read the list in GET /api/events/{param}/seats (listenOnly).',
+  request: {
+    params: z.object({ param: z.string() }),
+    body: { content: { 'application/json': { schema: z.object({ endpointId: z.string(), roomToken: z.string() }) } } },
+  },
+  responses: { 204: { description: 'Recorded, or nothing to record' }, 401: { description: 'Invalid room token' } },
+});
+
+registry.registerPath({
+  method: 'post',
+  path: '/api/events/{param}/consents/withdraw',
+  tags: ['Jitsi'],
+  summary: 'Withdraw consents given for the event',
+  description:
+    'Withdraws the transcription consent and, with `recording: true`, the recording consent too. ' +
+    'The caller proves its seats with the room tokens (Jitsi JWTs) the portal issued to it; ' +
+    'tokens up to one day past expiry still count. The proofs stay, with the withdrawal time.',
+  request: { params: z.object({ param: z.string() }), body: { content: { 'application/json': { schema: consentWithdrawalSchema } } } },
+  responses: {
+    200: { description: '`withdrawn.recording` and `withdrawn.transcription`: whether there was a consent to withdraw' },
+    401: { description: 'None of the room tokens is valid for this event' },
+  },
+});
+
+registry.registerPath({
   method: 'get',
   path: '/api/events/{param}/questions',
   tags: ['Q&A'],
@@ -419,7 +451,7 @@ registry.registerPath({
     'An empty description removes it. Same authorization as deleting a material.',
   security: [{ [moderatorToken.name]: [] }],
   request: {
-    params: z.object({ param: z.string(), id: z.string().uuid() }),
+    params: z.object({ param: z.string(), id: z.guid() }),
     body: { content: { 'application/json': { schema: updateMaterialRoomSchema } } },
   },
   responses: {
@@ -441,7 +473,7 @@ registry.registerPath({
     'at most once per caller and material every ten minutes. Requires Content-Type: application/json ' +
     '(an empty object as body). Opens by moderators and staff are not counted. Always answers 204, ' +
     'whether counted or not. The count is returned by GET /materials to moderators only.',
-  request: { params: z.object({ param: z.string(), id: z.string().uuid() }) },
+  request: { params: z.object({ param: z.string(), id: z.guid() }) },
   responses: { 204: { description: 'Received' } },
 });
 
@@ -542,7 +574,7 @@ registry.registerPath({
   security: [{ [moderatorToken.name]: [] }],
   request: {
     params: z.object({ param: z.string() }),
-    query: z.object({ materialId: z.string().uuid().optional() }),
+    query: z.object({ materialId: z.guid().optional() }),
   },
   responses: {
     200: { description: 'Presentation state' },
@@ -562,7 +594,7 @@ registry.registerPath({
     'storage with `Cache-Control: private, no-store` and is never given a public address.',
   request: {
     params: z.object({ param: z.string() }),
-    query: z.object({ m: z.string().uuid() }),
+    query: z.object({ m: z.guid() }),
   },
   responses: {
     200: { description: 'application/pdf' },
@@ -747,7 +779,7 @@ registry.registerPath({
     'The file is streamed from the files storage with `Cache-Control: private, no-store`.',
   request: {
     params: z.object({ param: z.string() }),
-    query: z.object({ m: z.string().uuid() }),
+    query: z.object({ m: z.guid() }),
   },
   responses: {
     200: { description: 'application/pdf' },

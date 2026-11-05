@@ -21,9 +21,12 @@ import { createHash, createHmac } from 'crypto';
  * development setup allows. The prefix separates this use of the secret from
  * the others (email hash, signed tokens).
  */
-export function senderColourKey(senderId: string): string {
+export function senderColourKey(senderId: string, eventId?: string): string {
   if (!senderId) return '';
-  const input = `chat-sender-key:${senderId}`;
+  // Con l'evento: la stessa persona (un ospite ha la stessa chiave di posto in
+  // ogni evento, dal suo indirizzo e dal nome) non si riconosce da un evento
+  // all'altro dal colore della sua bolla.
+  const input = eventId ? `chat-sender-key:${eventId}:${senderId}` : `chat-sender-key:${senderId}`;
   const secret = process.env.APP_SECRET;
   const digest = secret
     ? createHmac('sha256', secret).update(input).digest('hex')

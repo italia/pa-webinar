@@ -12,7 +12,7 @@ import { chiudiSondaggiAperti } from '@/lib/events/close-polls';
 export const dynamic = 'force-dynamic';
 
 const bulkArchiveSchema = z.object({
-  ids: z.array(z.string().uuid()).min(1).max(200),
+  ids: z.array(z.guid()).min(1).max(200),
 });
 
 export const POST = withErrorHandling(async (request) => {

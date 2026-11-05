@@ -10,14 +10,17 @@ import { getPublicEnv } from '@/lib/env';
 import { resolveWhiteboardInfraReady } from '@/lib/jitsi/whiteboard';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
+import { rubricaConPersone } from '@/lib/persons/rubrica-picker';
 import { capacitaIstanza } from '@/lib/capacity/istanza';
 import { getSettings } from '@/lib/settings';
 import { liveCaptionsAvailable } from '@/lib/captions/availability';
+import { recordingAvailable } from '@/lib/recording/availability';
 import { traduzioneDisponibile, ultimoLavoroTraduzione } from '@/lib/text-translation/enqueue';
 import { calcolaStatoTesti } from '@/lib/text-translation/auto';
 import { agendaGiaUsata } from '@/lib/agenda/status';
 import { Link, percorso } from '@/i18n/navigation';
 import { WIZARD_ADVANCED_SECTIONS, wizardStepFromParam, type WizardAdvancedSection } from '@/lib/events/wizard-steps';
+import { salaForseAperta } from '@/lib/live/room-open';
 import EventWizard, {
   type InitialEventShape,
 } from '@/components/admin/event-wizard/wizard-shell';
@@ -31,11 +34,17 @@ import {
   type PermissionMatrix,
 } from '@/lib/utils/permission-matrix';
 import AdminPageHeader from '@/components/admin/admin-page-header';
-import { eventPageMetadata } from '@/components/admin/admin-page-title';
+import { adminPageTitle, eventPageMetadata } from '@/components/admin/admin-page-title';
 
 interface PageProps {
   params: Promise<{ id: string; locale: string }>;
-  searchParams: Promise<{ token?: string; step?: string | string[]; section?: string | string[] }>;
+  searchParams: Promise<{
+    token?: string;
+    step?: string | string[];
+    section?: string | string[];
+    /** Una copia appena duplicata (vedi eventAdminPath). */
+    copia?: string | string[];
+  }>;
 }
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -99,18 +108,34 @@ export async function generateMetadata({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ token?: string | string[] }>;
+  searchParams: Promise<{ token?: string | string[]; copia?: string | string[] }>;
 }) {
-  const [{ id }, { token }] = await Promise.all([params, searchParams]);
-  return eventPageMetadata('/admin/events/[id]/edit', id, { token, conToken: true });
+  const [{ id }, { token, copia }] = await Promise.all([params, searchParams]);
+  const meta = await eventPageMetadata('/admin/events/[id]/edit', id, { token, conToken: true });
+  // Una copia appena duplicata: anche la scheda del browser lo dice, per non
+  // confonderla con l'originale aperto accanto.
+  if ((copia === 'prossima' || copia === 'stesse') && typeof meta.title === 'string') {
+    const nome = await adminPageTitle('/admin/events/[id]/edit');
+    if (nome && meta.title.startsWith(nome)) {
+      const t = await getTranslations('admin');
+      return { ...meta, title: `${t('editCopyTitle')}${meta.title.slice(nome.length)}` };
+    }
+  }
+  return meta;
 }
 
 export default async function EditEventPage({ params, searchParams }: PageProps) {
   const { id, locale } = await params;
-  const { token, step, section } = await searchParams;
+  const { token, step, section, copia: copiaParam } = await searchParams;
+  // Una copia appena duplicata, solo finche' e' in bozza: lo si dice in
+  // cima, perche' la pagina e' la stessa della modifica.
+  const copia = copiaParam === 'prossima' || copiaParam === 'stesse' ? copiaParam : null;
   // Il passo da cui partire (dai link «Modifica» della pagina dell'evento),
-  // anche nominato come una volta (`permissions`, `content`).
-  const daIndirizzo = wizardStepFromParam(step);
+  // anche nominato come una volta: `content`, e la vecchia sezione
+  // `section=participation` delle impostazioni avanzate, oggi il passo
+  // «Permessi».
+  const daIndirizzo =
+    section === 'participation' ? { step: 'permissions' as const } : wizardStepFromParam(step);
   const initialStep = daIndirizzo?.step;
   const initialSection: WizardAdvancedSection | undefined =
     (WIZARD_ADVANCED_SECTIONS as readonly string[]).includes(String(section))
@@ -259,6 +284,8 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       liveCaptionsEnabled: event.liveCaptionsEnabled,
       captionsTranscriptEnabled: event.captionsTranscriptEnabled,
       autoStartRecording: event.autoStartRecording,
+      listenOnlyWithoutConsent: event.listenOnlyWithoutConsent,
+      audienceAnonymous: event.audienceAnonymous,
       aiTranscriptEnabled: event.aiTranscriptEnabled,
       aiSummaryEnabled: event.aiSummaryEnabled,
       aiTranslationEnabled: event.aiTranslationEnabled,
@@ -337,6 +364,8 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
     agendaLocked: agendaGiaUsata(event.agendaItems),
   };
 
+  const copiaInBozza = copia !== null && event.status === 'DRAFT';
+
   return (
     <div className="container py-4">
       {/* Lo staff torna indietro con le briciole; chi ha solo il link del
@@ -353,18 +382,25 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
         </div>
       )}
 
-      <AdminPageHeader title={t('editEvent')} />
+      <AdminPageHeader title={copiaInBozza ? t('editCopyTitle') : t('editEvent')} />
+      {copiaInBozza && (
+        <div className="alert alert-info mb-4" role="status">
+          {copia === 'prossima' ? t('editCopyNoticeNext') : t('editCopyNoticeSameDates')}
+        </div>
+      )}
 
       <EventWizard
         mode="edit"
+        copia={copiaInBozza}
         initialStep={initialStep}
         initialSection={initialSection}
-        canUseRubrica={session?.role === 'admin'}
+        canUseRubrica={session?.role === 'admin' && (await rubricaConPersone())}
         canManageTags={session?.role === 'admin'}
         publicRegistrationEnabled={siteSettings.publicRegistrationEnabled}
         viaToken={staffCanManage ? null : (token ?? null)}
         initialEvent={initialEvent}
         siteTimezone={event.timezone}
+        salaAperta={await salaForseAperta(event)}
         enabledLocales={
           Array.isArray(siteSettings.availableLocales) &&
           siteSettings.availableLocales.length > 0
@@ -387,6 +423,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
           getPublicEnv('NEXT_PUBLIC_WHITEBOARD_ENABLED'),
         )}
         liveCaptionsAvailable={liveCaptionsAvailable(siteSettings)}
+        recordingAvailable={recordingAvailable()}
         defaultTargetLocales={siteSettings.aiDefaultTargetLocales}
         aiPipelineEnabled={siteSettings.aiPipelineEnabled}
         // La traduzione al salvataggio la decide il server, per chiunque salvi.

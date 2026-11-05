@@ -90,6 +90,7 @@ describe('elenco degli eventi — il giorno dell\'evento', () => {
     // Un pulsante, non un link: il token del moderatore non si vede passando.
     expect(oggi?.querySelector('a[href*="token="]')).toBeNull();
     expect(Array.from(oggi?.querySelectorAll('button') ?? []).some((b) => b.textContent === messages.admin.eventsList.menu.enterRoom)).toBe(true);
+    expect(Array.from(oggi?.querySelectorAll('a') ?? []).some((a) => a.textContent === messages.admin.manage)).toBe(true);
   });
 });
 

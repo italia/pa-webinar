@@ -7,8 +7,11 @@ vi.mock('@/lib/db', () => ({
     event: { findUnique: vi.fn() },
     registration: { findUnique: vi.fn(), findMany: vi.fn() },
     eventModerator: { findMany: vi.fn() },
+    staffAccount: { findMany: vi.fn() },
   },
 }));
+const staff = vi.hoisted(() => ({ valore: null as { accountId: string; nome: string } | null }));
+vi.mock('@/lib/auth/staff-seat', () => ({ staffDietroIlPrimario: vi.fn(async () => staff.valore) }));
 vi.mock('@/lib/redis', () => ({
   getRedis: () => null,
   withDeadline: <T,>(op: Promise<T>) => op,
@@ -37,7 +40,7 @@ vi.mock('@/lib/crypto/pii', () => ({
 
 import type * as Moderatore from '@/lib/auth/moderator';
 import { prisma } from '@/lib/db';
-import { resetSeatsMemoryForTests } from '@/lib/live/seats';
+import { resetSeatsMemoryForTests, segnaSoloAscolto } from '@/lib/live/seats';
 
 import { GET, POST } from './route';
 
@@ -64,6 +67,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   resetSeatsMemoryForTests();
   cookie.token = null;
+  staff.valore = null;
   fn(prisma.event.findUnique).mockResolvedValue({ id: 'e1', moderatorToken: 'MOD', moderatorName: null });
   fn(prisma.registration.findUnique).mockImplementation(async ({ where }: { where: { accessToken: string } }) =>
     where.accessToken.startsWith('ISCR') ? { id: `r-${where.accessToken}`, eventId: 'e1' } : null,
@@ -75,6 +79,16 @@ beforeEach(() => {
 });
 
 describe('/api/events/[slug]/seats', () => {
+  it('il link condiviso aperto da chi dello staff gestisce l\'evento mostra l\'account', async () => {
+    staff.valore = { accountId: 'acc-1', nome: 'Ada Rossi' };
+    expect((await dichiara('MOD', 'aa05')).status).toBe(204);
+    fn(prisma.staffAccount.findMany).mockResolvedValue([{ id: 'acc-1', name: 'cifrato:Ada Rossi', email: 'cifrato:ada@ente.it' }]);
+    staff.valore = null;
+    expect((await (await leggi('MOD')).json()).seats).toEqual({
+      aa05: { kind: 'staff', name: 'Ada Rossi', email: 'ada@ente.it' },
+    });
+  });
+
   it('lega ogni endpoint a cio’ che il token prova, e chi modera lo legge', async () => {
     cookie.token = 'ISCR1';
     expect((await dichiara('ISCR1', 'aa01')).status).toBe(204);
@@ -101,6 +115,11 @@ describe('/api/events/[slug]/seats', () => {
     expect((await dichiara('ISCR9', 'aa01')).status).toBe(204);
     const seats = (await (await leggi('MOD')).json()).seats;
     expect(seats.aa01).toEqual({ kind: 'contested', name: null, email: null });
+  });
+
+  it("chi modera vede gli endpoint dichiarati in solo ascolto", async () => {
+    await segnaSoloAscolto('e1', 'ep-zitto');
+    expect((await (await leggi('MOD')).json()).listenOnly).toEqual(['ep-zitto']);
   });
 
   it('solo chi modera legge; un token sconosciuto non dichiara', async () => {

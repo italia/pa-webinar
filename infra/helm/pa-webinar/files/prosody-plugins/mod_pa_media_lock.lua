@@ -14,7 +14,19 @@
 --   context.user.mediaLock   = { audio = bool, video = bool, desktop = bool }
 --                              cosa l'evento NON concede ai partecipanti;
 --   context.user.mediaExempt = true per chi ha audio e video pieni senza
---                              moderare (i relatori).
+--                              moderare (i relatori);
+--   context.user.mediaAdmit  = { audio = bool, video = bool, desktop = bool }
+--                              i mezzi per cui la persona è ammessa senza
+--                              aspettare chi modera (chi partecipa avendo
+--                              dato il consenso alla registrazione, per ciò
+--                              che l'evento concede);
+--   context.user.consentLock = true in ogni token di un evento con il solo
+--                              ascolto: la moderazione non si spegne;
+--   context.user.listenOnly  = true per chi è entrato in solo ascolto (non
+--                              ha dato il consenso alla registrazione): mai
+--                              tra gli ammessi, nemmeno se un moderatore gli
+--                              dà la parola. Per parlare rientra con il
+--                              consenso (il portale gli dà un token nuovo).
 -- I moderatori (owner) sono ammessi anche loro: Jicofo controlla solo
 -- l'elenco, non il ruolo.
 --
@@ -71,6 +83,7 @@ local process_host_module = util.process_host_module;
 local is_admin = util.is_admin;
 local is_healthcheck_room = util.is_healthcheck_room;
 local internal_room_jid_match_rewrite = util.internal_room_jid_match_rewrite;
+local room_jid_match_rewrite = util.room_jid_match_rewrite;
 local table_shallow_copy = util.table_shallow_copy;
 
 local MEDIA_TYPES = { 'audio', 'video', 'desktop' };
@@ -196,8 +209,30 @@ local function context_user(occupant)
     return nil;
 end
 
-local function is_exempt(user)
-    return user ~= nil and user.mediaExempt == true;
+local function is_listen_only(user)
+    return user ~= nil and user.listenOnly == true;
+end
+
+-- Ammesso per quel mezzo senza aspettare chi modera: l'esente per tutti, chi
+-- ha mediaAdmit per i mezzi che vi sono indicati; chi è in solo ascolto mai.
+local function admitted_for(user, media_type)
+    if user == nil or is_listen_only(user) then
+        return false;
+    end
+    if user.mediaExempt == true then
+        return true;
+    end
+    local admit = user.mediaAdmit;
+    return type(admit) == 'table' and admit[media_type] == true;
+end
+
+local function admitted_for_any(user)
+    for _, m in ipairs(MEDIA_TYPES) do
+        if admitted_for(user, m) then
+            return true;
+        end
+    end
+    return false;
 end
 
 -- «Ammesso» alla sola persona: l'elenco ai moderatori parte a parte.
@@ -210,15 +245,16 @@ local function notify_approved(room, media_type, approved_jid)
     });
 end
 
--- Mette l'occupante tra gli ammessi di ogni tipo moderato, una volta sola.
-local function admit(room, occupant, why)
+-- Mette l'occupante tra gli ammessi dei tipi moderati, una volta sola: tutti,
+-- o quelli per cui `solo` dice di sì.
+local function admit(room, occupant, why, solo)
     if not room.av_moderation then
         return;
     end
     local nick = internal_room_jid_match_rewrite(occupant.nick);
     for _, m in ipairs(MEDIA_TYPES) do
         local whitelist = room.av_moderation[m];
-        if whitelist and not contains(whitelist, nick) then
+        if whitelist and (solo == nil or solo(m)) and not contains(whitelist, nick) then
             whitelist:push(nick);
             notify_whitelist(room, m, occupant.jid);
             module:log('info', 'Ammesso %s (%s) per %s in %s', nick, why, m, room.jid);
@@ -249,11 +285,16 @@ local function on_occupant_pre_join(event)
         return;
     end
     room._data.pa_media_lock_applied = true;
+    -- Un evento con il solo ascolto lo dice in ogni token (consentLock): i
+    -- blocchi della sala non si tolgono.
+    if user.consentLock == true then
+        room._data.pa_listen_only_room = true;
+    end
     local actor = room.jid .. '/focus';
     local nick = occupant and internal_room_jid_match_rewrite(occupant.nick);
     for _, m in ipairs(MEDIA_TYPES) do
         if lock[m] == true and start_lock(room, m, actor) then
-            if (is_exempt(user) or user.affiliation == 'owner') and nick
+            if (admitted_for(user, m) or (user.affiliation == 'owner' and not is_listen_only(user))) and nick
                 and not contains(room.av_moderation[m], nick) then
                 room.av_moderation[m]:push(nick);
             end
@@ -275,8 +316,10 @@ local function on_occupant_joined(event)
     end
 
     if room:get_role(occupant.nick) == 'moderator' then
-        admit(room, occupant, 'moderatore');
-    elseif is_exempt(user) then
+        if not is_listen_only(user) then
+            admit(room, occupant, 'moderatore');
+        end
+    elseif admitted_for_any(user) then
         -- Già tra gli ammessi se è stato lui ad accendere il blocco: il
         -- componente, al suo ingresso, gli ha detto che la moderazione è
         -- accesa, e manca solo il suo «ammesso». Per gli altri tipi lo manda
@@ -290,7 +333,7 @@ local function on_occupant_joined(event)
                 end
             end
         end
-        admit(room, occupant, 'esente');
+        admit(room, occupant, 'ammesso dal token', function(m) return admitted_for(user, m) end);
     end
 end
 
@@ -299,18 +342,37 @@ end
 -- l'ingresso) non toccano le ammissioni date da un moderatore.
 local function on_affiliation_changed(event)
     local room = event.room;
-    if not room.av_moderation or event.previous_affiliation ~= 'owner' or event.affiliation == 'owner'
-        or is_healthcheck_room(room.jid) or is_admin(event.jid) then
+    if not room.av_moderation or is_healthcheck_room(room.jid) or is_admin(event.jid) then
+        return;
+    end
+    -- Chi e' in solo ascolto resta fuori dagli ammessi anche se diventa
+    -- moderatore: il componente aggiunge gli owner, qui si tolgono.
+    if event.affiliation == 'owner' then
+        for _, occupant in room:each_occupant() do
+            if occupant.bare_jid == event.jid and is_listen_only(context_user(occupant)) then
+                local nick = internal_room_jid_match_rewrite(occupant.nick);
+                for _, m in ipairs(MEDIA_TYPES) do
+                    local whitelist = room.av_moderation[m];
+                    if whitelist and remove_all(whitelist, nick) then
+                        module:log('info', 'Tolto %s (in solo ascolto) dagli ammessi per %s in %s', nick, m, room.jid);
+                        notify_whitelist(room, m);
+                    end
+                end
+            end
+        end
+        return;
+    end
+    if event.previous_affiliation ~= 'owner' then
         return;
     end
     for _, occupant in room:each_occupant() do
         if occupant.bare_jid == event.jid then
-            local exempt = is_exempt(context_user(occupant));
+            local user = context_user(occupant);
             local nick = internal_room_jid_match_rewrite(occupant.nick);
             for _, m in ipairs(MEDIA_TYPES) do
                 local whitelist = room.av_moderation[m];
                 if whitelist and remove_all(whitelist, nick) then
-                    if exempt then
+                    if admitted_for(user, m) then
                         -- L'esente resta, una volta sola: con due voci, la revoca di
                         -- un moderatore ne toglierebbe una e lo lascerebbe ammesso.
                         whitelist:push(nick);
@@ -331,17 +393,40 @@ end
 local function on_av_command(event)
     local session, stanza = event.origin, event.stanza;
     local command = stanza and stanza:get_child('av_moderation');
-    if not command or command.attr.enable ~= 'true' or not session or not session.jitsi_web_query_room then
+    if not command or not session or not session.jitsi_web_query_room then
         return;
     end
     local room = get_room_by_name_and_subdomain(session.jitsi_web_query_room, session.jitsi_web_query_prefix);
     if not room then
         return;
     end
+    -- «Dai la parola» a chi è in solo ascolto: non si ammette. Ha scelto di
+    -- non essere registrato; per parlare rientra dando il consenso (la sala
+    -- glielo propone). Il comando si ferma qui, prima del componente.
+    local target = command.attr.jidToWhitelist;
+    if target then
+        local occupant = room:get_occupant_by_nick(room_jid_match_rewrite(target));
+        if occupant and is_listen_only(context_user(occupant)) then
+            module:log('info', 'Non ammesso %s: in solo ascolto, in %s', target, room.jid);
+            return true;
+        end
+        return;
+    end
+    -- Nelle sale con il solo ascolto la moderazione resta accesa: toglierla
+    -- aprirebbe i mezzi a chi non ha dato il consenso alla registrazione.
+    if command.attr.enable == 'false' and room._data.pa_listen_only_room then
+        module:log('info', 'Moderazione non spenta in %s: sala con il solo ascolto', room.jid);
+        return true;
+    end
+    if command.attr.enable ~= 'true' then
+        return;
+    end
     timer.add_task(0, function()
         for _, occupant in room:each_occupant() do
-            if is_exempt(context_user(occupant)) and room:get_role(occupant.nick) ~= 'moderator' then
-                admit(room, occupant, 'esente, moderazione riaccesa');
+            local user = context_user(occupant);
+            if admitted_for_any(user) and room:get_role(occupant.nick) ~= 'moderator' then
+                admit(room, occupant, 'ammesso dal token, moderazione riaccesa',
+                    function(m) return admitted_for(user, m) end);
             end
         end
     end);

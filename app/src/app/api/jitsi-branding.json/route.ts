@@ -2,6 +2,7 @@ import { getSettings } from '@/lib/settings';
 import { appBaseUrl } from '@/lib/env';
 import {
   JITSI_AVATAR_BACKGROUNDS,
+  JITSI_NOTIFICATION_BACKGROUND,
   JITSI_STAGE_BACKGROUND,
   JITSI_STAGE_SVG,
   JITSI_SURFACE,
@@ -56,6 +57,14 @@ export async function GET() {
           ui03: JITSI_SURFACE_RAISED,
           ui04: JITSI_SURFACE_STRONG,
           thumbnailBackground: JITSI_TILE_BACKGROUND,
+          // Due nomi per la stessa cosa, secondo la versione di Jitsi: la
+          // barra dei comandi (`toolboxBackground` dove esiste, altrimenti
+          // `ui01`) e lo sfondo delle notifiche (`notificationBackground`,
+          // altrimenti `ui10`). Le chiavi che una versione non conosce le
+          // ignora.
+          toolboxBackground: JITSI_SURFACE,
+          notificationBackground: JITSI_NOTIFICATION_BACKGROUND,
+          ui10: JITSI_NOTIFICATION_BACKGROUND,
         },
       },
       logoClickUrl: settings.organizationUrl || '',

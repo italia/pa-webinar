@@ -29,11 +29,11 @@ afterEach(() => {
   container.remove();
 });
 
-function render(onContinue = vi.fn()) {
+function render(onContinue = vi.fn(), recordingAvailable = true) {
   act(() => {
     root.render(
       <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
-        <GuidedFormat onContinue={onContinue} />
+        <GuidedFormat onContinue={onContinue} recordingAvailable={recordingAvailable} />
       </NextIntlClientProvider>,
     );
   });
@@ -79,5 +79,18 @@ describe('formato guidato', () => {
       registra: 'no',
       accesso: 'invitati',
     });
+  });
+
+  it('dove non si puo registrare non fa la domanda e non promette la registrazione', () => {
+    const onContinue = render(vi.fn(), false);
+    expect(container.textContent).not.toContain(g.recQ);
+    expect(container.textContent).not.toContain(f.recordingManual);
+    expect(container.textContent).toContain(g.introNoRecording);
+    expect(container.textContent).not.toContain(g.intro);
+    const continua = Array.from(container.querySelectorAll('button')).find((b) =>
+      b.textContent?.includes(g.continue),
+    )!;
+    act(() => continua.click());
+    expect(onContinue).toHaveBeenCalledWith(expect.objectContaining({ registra: 'no' }));
   });
 });

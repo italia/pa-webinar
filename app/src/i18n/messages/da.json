@@ -81,7 +81,8 @@
     "deselectAll": "Fravælg alle",
     "durationMinutes": "{minutes, plural, one {# minut} other {# minutter}}",
     "durationHours": "{hours, plural, one {# time} other {# timer}}",
-    "durationHoursMinutes": "{hours, plural, one {# time} other {# timer}} og {minutes, plural, one {# minut} other {# minutter}}"
+    "durationHoursMinutes": "{hours, plural, one {# time} other {# timer}} og {minutes, plural, one {# minut} other {# minutter}}",
+    "backToTop": "Til toppen"
   },
   "markdown": {
     "edit": "Skriv",
@@ -102,7 +103,14 @@
     "switchLanguage": "Skift sprog",
     "skipToContent": "Gå til indhold",
     "skipToFooter": "Gå til sidefod",
-    "mainLabel": "Hovednavigation"
+    "mainLabel": "Hovednavigation",
+    "activeLanguage": "Aktivt sprog:",
+    "languageSelected": "(valgt)",
+    "signIn": "Log ind",
+    "roleAdmin": "Administrator",
+    "roleOrganizer": "Arrangør",
+    "instanceKey": "Instansnøgle",
+    "signOutFailed": "Log ud mislykkedes: prøv igen."
   },
   "header": {
     "followUs": "Følg os på"
@@ -204,7 +212,8 @@
       "recordingLinkEmailLabel": "E-mail, du tilmeldte dig med",
       "recordingLinkSend": "Send mig linket igen",
       "recordingLinkSent": "Hvis adressen er tilmeldt begivenheden, modtager du snart en e-mail med dit personlige link.",
-      "recordingLinkError": "Anmodningen mislykkedes. Prøv igen om et par minutter."
+      "recordingLinkError": "Anmodningen mislykkedes. Prøv igen om et par minutter.",
+      "registerOrGuest": "Hvis du tilmelder dig, får du dit personlige link og nyt om arrangementet på e-mail. Som gæst kommer du ind med det samme med kun et navn, kun mens arrangementet er live, og du får ingen e-mails."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -523,7 +532,10 @@
       "stopVideo": "Slå video fra",
       "revokeFloor": "Tag ordet tilbage",
       "lowerHandFailed": "Hånden kunne ikke tages ned: prøv igen.",
-      "handsRaised": "{count, plural, one {# rakt hånd} other {# rakte hænder}}"
+      "handsRaised": "{count, plural, one {# rakt hånd} other {# rakte hænder}}",
+      "locksByConsent": "Mikrofoner og kameraer følger samtykket til optagelsen: de, der har givet det, bruger det, arrangementet tillader, de øvrige lytter kun. Rummets låse forbliver slået til.",
+      "listenOnlyBadge": "lytter kun",
+      "listenOnlyNoFloor": "Har ikke givet samtykke til optagelsen: kan ikke tale, før vedkommende giver det i sit rum."
     },
     "moderator": {
       "muteAll": "Slå alle fra",
@@ -558,7 +570,8 @@
       "moderatorReveal": "Vis moderatorlink",
       "moderatorWarning": "Dette link giver MODERATOR-adgang (slå lyden fra for alle, start optagelse, afslut arrangementet). Del det kun med andre moderatorer.",
       "moderatorLink": "Moderatorlink",
-      "moderatorLinkHint": "Alle, der åbner dette link, kommer ind som moderator med fuld kontrol over mødelokalet."
+      "moderatorLinkHint": "Alle, der åbner dette link, kommer ind som moderator med fuld kontrol over mødelokalet.",
+      "copyFailed": "Kopiering mislykkedes: markér adressen, og kopiér den manuelt."
     },
     "videoCallFrameTitle": "Arrangementets videoopkald",
     "insecureContextTitle": "Usikker adresse",
@@ -616,7 +629,15 @@
       "unavailable": "Undertekster er ikke tilgængelige lige nu.",
       "show": "Vis undertekster",
       "hide": "Skjul undertekster",
-      "toggle": "Automatiske undertekster"
+      "toggle": "Automatiske undertekster",
+      "controls": "Styring af undertekster",
+      "smaller": "Mindre undertekster",
+      "larger": "Større undertekster",
+      "moveUp": "Flyt undertekster op",
+      "moveDown": "Flyt undertekster ned",
+      "smallerShort": "A−",
+      "largerShort": "A+",
+      "showShort": "CC"
     },
     "eventEndedModerator": "Arrangementet er slut. Nedenfor finder du statistikken og, hvis det blev optaget, optagelsen og rapporten.",
     "endLinks": {
@@ -625,7 +646,54 @@
       "publicPage": "Arrangementets offentlige side"
     },
     "notOpenNow": "Rummet er ikke åbent lige nu.",
-    "nameRequired": "Navnet, du vil deltage med, mangler: gå tilbage og skriv det."
+    "nameRequired": "Navnet, du vil deltage med, mangler: gå tilbage og skriv det.",
+    "closeSidebar": "Luk sidepanelet",
+    "contentOnly": "Kun indhold, uden chat og paneler",
+    "showPanels": "Vis chat og paneler",
+    "confirmFullscreen": "Skift til fuld skærm",
+    "listenOnly": {
+      "title": "Du lytter kun med.",
+      "body": "Du har ikke givet samtykke til optagelsen: du følger med og skriver i chatten, men mikrofon, kamera og skærm forbliver slukket, selv hvis værten giver dig ordet. Giv samtykke for at tale.",
+      "consent": "Jeg giver samtykke til optagelsen og deltager",
+      "joining": "Går ind i rummet igen…",
+      "error": "Det lykkedes ikke at komme ind igen: prøv igen."
+    },
+    "pseudonym": "Deltager-{code}",
+    "consents": {
+      "open": "Dine samtykker",
+      "button": "Samtykker",
+      "title": "Dine samtykker",
+      "intro": "Du kan give eller trække dine samtykker tilbage når som helst under arrangementet. Hver ændring forbinder mødet igen i nogle sekunder.",
+      "given": "Samtykke givet",
+      "notGiven": "Samtykke ikke givet",
+      "withdraw": "Træk samtykket tilbage",
+      "confirmTitle": "Vil du trække det tilbage?",
+      "confirm": "Træk tilbage",
+      "working": "Opdaterer…",
+      "error": "Samtykket kunne ikke opdateres: prøv igen.",
+      "recording": {
+        "title": "Optagelse af arrangementet",
+        "give": "Jeg giver samtykke til optagelsen",
+        "without": {
+          "soloAscolto": "Uden dette samtykke lytter du kun med: mikrofon, kamera og skærm forbliver lukket.",
+          "conduce": "Uden dette samtykke leder du stadig, men din stemme gemmes ikke i sporene pr. person eller i transskriptionen.",
+          "uscita": "Deltagelse i dette arrangement kræver samtykke til optagelsen."
+        },
+        "alreadyRecorded": "Det, der allerede er optaget, forbliver i videoen af arrangementet: skriv til arrangørerne for at få det fjernet.",
+        "withdraw": {
+          "soloAscolto": "Hvis du trækker det tilbage, bliver du i rummet og lytter kun med: mikrofon, kamera og skærm lukkes. Dit samtykke til transskription af dine indlæg trækkes også tilbage.",
+          "uscita": "Hvis du trækker det tilbage, forlader du mødet og går tilbage til venterummet: deltagelse kræver samtykke til optagelsen. Dit samtykke til transskription af dine indlæg trækkes også tilbage.",
+          "conduce": "Hvis du trækker det tilbage, leder du videre, men fra nu af gemmes din stemme ikke i sporene pr. person eller i transskriptionen. Videoen af rummet viser dig stadig, hvis den optages."
+        }
+      },
+      "transcription": {
+        "title": "Transskription af dine indlæg",
+        "give": "Jeg giver samtykke til transskriptionen",
+        "giveEffect": "Dine indlæg kommer med i arrangementets transskription med dit navn. Uden samtykke deltager du stadig.",
+        "withdrawEffect": "Hvis du trækker det tilbage, mister dine allerede transskriberede sætninger tekst og navn, og fra nu af optages din stemme hverken på et separat spor eller transskriberes.",
+        "needsRecording": "Du kan give det efter samtykke til optagelsen."
+      }
+    }
   },
   "qa": {
     "title": "Spørgsmål og svar",
@@ -833,7 +901,6 @@
         "coverImageHelp": "Vises på den offentlige side og i e-mails til de tilmeldte.",
         "scheduleHeading": "Tidsplan",
         "timezone": "Tidszone",
-        "recurrenceHeading": "Gentagelse",
         "tagsHeading": "Kategorier (tags)",
         "newTag": "Ny kategori",
         "newTagLabel": "Navn på den nye kategori",
@@ -878,11 +945,11 @@
           "BALANCED": "Balanceret (540p)",
           "SAVE_DATA": "Databesparelse (360p)"
         },
-        "requiredLegend": "Felter markeret med * kræves for at gemme arrangementet: så længe de er tomme, står det ved hvert felt.",
         "kickerHint": "Skriv en overlinje før titlen og adskil dem med |, for eksempel »Mødeserie | Det første møde«.",
         "kickerUse": "Vis »{kicker}« som overlinje",
         "kickerPreview": "Sådan ser den ud på arrangementets side",
-        "coverImageSize": "16:9, anbefalet 1600 × 900 pixels."
+        "coverImageSize": "16:9, anbefalet 1600 × 900 pixels.",
+        "requiredNote": "Felter markeret med * skal udfyldes."
       },
       "step2": {
         "heading": "Hvem må gøre hvad",
@@ -923,11 +990,11 @@
         "roomFeaturesHeading": "Funktioner i mødelokalet",
         "aiPipelineOff": "AI-efterbehandling (transskription, resumé, oversættelser) er ikke slået til på denne installation.",
         "rolesHeading": "Arrangementets roller",
-        "roleModeratorColumn": "Arrangør og moderator",
+        "roleModeratorColumn": "Medarrangør og moderator",
         "roleInfo": {
           "organizer": {
-            "name": "Arrangør",
-            "desc": "Leder rummet som en moderator og præsenteres blandt arrangørerne. Hovedarrangøren tilføjer og fjerner de andre personer. Med en personalekonto med samme e-mail administrerer vedkommende også arrangementet."
+            "name": "Medarrangør",
+            "desc": "Leder rummet som en moderator og præsenteres blandt arrangørerne. Med en personalekonto med samme e-mail administrerer vedkommende også arrangementet."
           },
           "moderator": {
             "name": "Moderator",
@@ -939,10 +1006,17 @@
           },
           "guest": {
             "name": "Deltager",
-            "desc": "Følger arrangementet og deltager, som du bestemmer i tabellen nedenfor."
+            "desc": "Følger arrangementet og deltager, som du bestemmer i trinnet \"Tilladelser\"."
           }
         },
-        "recordingManualNote": "Optagelsen starter aldrig af sig selv: en ordstyrer starter den med REC-knappen."
+        "recordingManualNote": "Optagelsen starter aldrig af sig selv: en ordstyrer starter den med REC-knappen.",
+        "listenOnlyWithoutConsent": "De, der ikke giver samtykke, deltager kun som lyttere",
+        "listenOnlyWithoutConsentOn": "Samtykke til optagelsen er frivilligt: den, der ikke giver det, deltager alligevel, følger med og skriver i chatten, men mikrofon, kamera og skærm forbliver slukket.",
+        "listenOnlyWithoutConsentOff": "Uden samtykke til optagelsen kommer man ikke ind.",
+        "listenOnlyLockedLive": "Mens rummet kan være åbent, kan optagelse og kun lytning ikke ændres: de gælder fra den første indgang.",
+        "audienceAnonymous": "Anonymt publikum",
+        "audienceAnonymousDesc": "Deltagerne vises for de andre under et pseudonym (»Deltager« og en kode) i video, chat og spørgsmål; deltagerlisten er kun for værterne, og der er ingen plads. Nyttigt til store arrangementer; til fællesskabsarrangementer vil folk gerne lære hinanden at kende.",
+        "audienceAnonymousLocked": "Kan ikke ændres, mens rummet kan være åbent: det ville koble pseudonymer til navne."
       },
       "step3": {
         "heading": "Personer og invitationer",
@@ -960,23 +1034,23 @@
         "remove": "Fjern",
         "invalidEmail": "Ugyldig e-mailadresse.",
         "duplicateEmail": "Adressen er allerede tilføjet.",
-        "rubricaPick": "Søg i adressebogen…",
+        "rubricaPick": "Søg i adressebogen efter organisation…",
         "rubricaOrAdd": "eller tilføj manuelt",
         "removeItem": "Fjern {name}",
         "invitationsStaffOnly": "Invitationerne administreres af begivenhedens personale.",
         "pickSkipped": "Nogle personer var allerede på listen eller havde ingen gyldig adresse og blev ikke tilføjet.",
-        "primaryHeading": "Hovedarrangør",
+        "primaryHeading": "Hovedmoderator",
         "primaryHelp": "Modtager arrangementets hovedlink på e-mail: leder rummet og tilføjer eller fjerner de andre personer. Navn og e-mail kræves for at offentliggøre, ikke for en kladde.",
-        "primaryPrefilled": "Du er hovedarrangør med din kontos navn og e-mail. Hvis en anden leder arrangementet, så indtast vedkommendes oplysninger her: linket går til vedkommende.",
-        "primaryNameRequired": "Indtast hovedarrangørens navn.",
-        "primaryEmailRequired": "Indtast en gyldig e-mail for hovedarrangøren.",
+        "primaryPrefilled": "Hovedmoderatoren er dig, med din kontos navn og e-mail. Hvis en anden leder arrangementet, så skriv vedkommendes oplysninger her: linket går til vedkommende.",
+        "primaryNameRequired": "Angiv hovedmoderatorens navn.",
+        "primaryEmailRequired": "Angiv en gyldig e-mail for hovedmoderatoren.",
         "linksOnPublish": "Personlige links sendes på e-mail ved offentliggørelse; så længe arrangementet er en kladde, kopieres de fra dets side.",
         "personName": "Navn",
         "personEmail": "E-mail",
-        "peopleHeading": "Arrangementets personer",
-        "peopleHelp": "Arrangører, moderatorer og talere. Hver får sit eget link til at deltage med sin rolle; hvad hver rolle kan, vises under “Avancerede indstillinger”.",
+        "peopleHeading": "Moderatorer og talere",
+        "peopleHelp": "Medarrangører, moderatorer og talere. Hver får sit eget link til at komme ind i sin rolle; hvad hver rolle kan, er forklaret ovenfor.",
         "personRole": "Rolle",
-        "roleOrganizer": "Arrangør",
+        "roleOrganizer": "Medarrangør",
         "roleModerator": "Moderator",
         "roleSpeaker": "Taler",
         "roleHelp": {
@@ -1015,7 +1089,7 @@
         "programMinutesFor": "Planlagte minutter, emne {n}",
         "programTimeUnknown": "Tiden er ikke beregnet: et tidligere emne har ingen varighed",
         "programNone": "Ingen",
-        "programLeadOrganizer": "Hovedarrangør",
+        "programLeadOrganizer": "Hovedmoderator",
         "programMoveUp": "Flyt emne {n} op",
         "programMoveDown": "Flyt emne {n} ned",
         "programRemove": "Fjern emne {n}",
@@ -1029,8 +1103,8 @@
         "programSpeakerRemoved": "Emner uden taler, fordi personen er fjernet fra arrangementet: {count}.",
         "programFrozen": "Dagsordenen er allerede brugt i rummet: du kan se den her, men den ændres fra rummet.",
         "programPerson": "{name} ({role})",
-        "invitationsHelpOpen": "Valgfrit: listen over de personer, du inviterer. Tilmeldingen er åben, så efter offentliggørelse kan alle tilmelde sig, inviteret eller ej. Platformen sender ingen invitationer: del selv linket til arrangementet.",
-        "invitationsHelpRestricted": "Tilmeldingen er begrænset: kun adresserne på denne liste kan tilmelde sig. Platformen sender ingen invitationer: del selv linket til arrangementet; linket til at deltage kommer på e-mail efter tilmelding.",
+        "invitationsHelpOpen": "De personer, du selv inviterer. Tilmeldingen er åben: alle kan tilmelde sig, inviteret eller ej. Efter offentliggørelsen sender du dem invitationen på e-mail fra arrangementets side.",
+        "invitationsHelpRestricted": "Kun adresserne på denne liste kan tilmelde sig. Efter offentliggørelsen sender du hver af dem invitationen på e-mail fra arrangementets side med tilmeldingslinket; linket til at komme ind kommer efter tilmeldingen.",
         "logoExternal": "Den offentlige side viser kun logoer, der er uploadet til denne platform: et logo fra et andet websted vises ikke.",
         "primaryProfileInvalid": "Kontrollér organisationen og logoets adresse.",
         "primaryMore": "Foto, organisation, logo og offentlig side",
@@ -1048,7 +1122,9 @@
         "editQuestions": "Rediger",
         "editQuestionsBefore": "Rediger spørgsmålene ved tilmelding",
         "editQuestionsAfter": "Rediger tilfredshedsundersøgelsen",
-        "accessStaffOnly": "Hvem der tilmelder sig, bestemmer arrangementets team."
+        "accessStaffOnly": "Hvem der tilmelder sig, bestemmer arrangementets team.",
+        "whoOrganizes": "Hvem arrangerer",
+        "rubricaWho": "Adressebogen indeholder de personer, der har tilmeldt sig et arrangement og accepteret at blive i den."
       },
       "step4": {
         "heading": "Indhold og materialer",
@@ -1124,9 +1200,9 @@
           "multitrack": "Optagelse pr. deltager",
           "multitrackOn": "Slået til — kræver udtrykkeligt samtykke ved tilmeldingen",
           "organizingEntities": "Arrangerende organisationer",
-          "primaryOrganizer": "Hovedarrangør",
+          "primaryOrganizer": "Hovedmoderator",
           "primaryMissing": "Skal angives i trinnet “Personer” for at offentliggøre",
-          "organizersPeople": "Andre arrangører",
+          "organizersPeople": "Medarrangører",
           "moderators": "Moderatorer",
           "programme": "Program: {count, plural, one {# emne} other {# emner}}",
           "programmeWithDuration": "Program: {count, plural, one {# emne} other {# emner}}, {duration}"
@@ -1175,7 +1251,8 @@
           "invites": "Personer",
           "programme": "Program",
           "review": "Oversigt",
-          "advanced": "Avancerede indstillinger"
+          "advanced": "Avancerede indstillinger",
+          "permissions": "Tilladelser"
         },
         "templateInUse": "Skabelon: <b>{name}</b>",
         "noTemplate": "Arrangement uden skabelon",
@@ -1187,18 +1264,16 @@
         "recordingManual": "Tilgængelig: starter først, når en ordstyrer trykker på REC.",
         "aiAfter": "Efter optagelsen: {list}.",
         "scheduleHeading": "Hvornår det finder sted",
-        "scheduleIntro": "Dato, klokkeslæt og hvor mange du forventer: de bruges til at forberede rummet.",
+        "scheduleIntro": "Hvornår arrangementet finder sted: dato, klokkeslæt og tidszone.",
         "advancedIntro": "Værdier, som skabelonen allerede har valgt: ret kun det, der er brug for.",
         "advancedIntroTemplate": "Værdier, som skabelonen »{name}« allerede har valgt: ret kun det, der er brug for.",
-        "requiredToSave": "Kræves for at gemme arrangementet.",
         "requiredToPublish": "Kræves for at offentliggøre arrangementet.",
         "toComplete": "Mangler",
         "missingHeading": "For at offentliggøre mangler stadig:",
-        "fieldOrganizerName": "Hovedarrangørens navn",
-        "fieldOrganizerEmail": "Hovedarrangørens e-mail",
+        "fieldOrganizerName": "Hovedmoderatorens navn",
+        "fieldOrganizerEmail": "Hovedmoderatorens e-mail",
         "fieldProgrammeMinutes": "Varighed af programmets emne {n}",
         "sections": {
-          "participation": "Deltagelse og rummets funktioner",
           "recording": "Optagelse og AI",
           "content": "Indhold: materialer og spørgeskemaer",
           "room": "Venterum og video",
@@ -1230,7 +1305,17 @@
         "askEmail": "e-mail",
         "askOrganization": "organisation",
         "askRole": "rolle",
-        "askType": "organisationstype"
+        "askType": "organisationstype",
+        "permissionsHeading": "Hvem kan gøre hvad i rummet",
+        "permissionsIntro": "Hvad deltagerne kan, og hvilke funktioner i rummet der er slået til. Alt kan også ændres under arrangementet.",
+        "consentsLine": "Samtykker ved tilmelding og i rummet: {list}",
+        "consentRecordingRequired": "optagelse, påkrævet for at komme ind",
+        "consentRecordingFree": "optagelse, frivillig (uden: kun lytte med)",
+        "consentRecordingNotice": "for optagelsen kun en meddelelse (deltagerne hverken taler eller vises)",
+        "consentTranscription": "transskription af egne indlæg, frivillig",
+        "consentsNone": "Intet samtykke ud over det ved tilmeldingen.",
+        "consentsHosts": "Ordstyrere og talere bliver spurgt om optagelsen i rummet, frivilligt.",
+        "consentsWithdraw": "Deltagerne kan trække dem tilbage i rummet med knappen “Samtykker”."
       },
       "preview": {
         "title": "Forhåndsvisning af siden",
@@ -1242,8 +1327,8 @@
       },
       "programme": {
         "heading": "Mødets program",
-        "intro": "Emnerne i rækkefølge: hvem der taler, om hvad og hvor længe. De vises under beskrivelsen, med tider regnet fra starten ({start}). Valgfrit.",
-        "introNoStart": "Emnerne i rækkefølge: hvem der taler, om hvad og hvor længe. De vises under beskrivelsen, med tider regnet fra arrangementets start. Valgfrit.",
+        "intro": "Emnerne i rækkefølge: hvem der taler, om hvad og hvor længe. De vises under beskrivelsen, med tider regnet fra starten ({start}).",
+        "introNoStart": "Emnerne i rækkefølge: hvem der taler, om hvad og hvor længe. De vises under beskrivelsen, med tider regnet fra arrangementets start.",
         "statusOn": "Vises på arrangementets side og viser i rummet alle det aktuelle emne.",
         "statusOff": "Slået fra: programmet vises hverken på siden eller i rummet.",
         "turnOn": "Slå til",
@@ -1287,7 +1372,8 @@
         "offKeptEdit": "Så længe programmet er slået fra, gælder den senest gemte version: ændringer foretaget her gemmes kun, hvis du slår det til igen.",
         "toggleOffWarningCreate": "Slået fra vises programmet ({count, plural, one {# emne} other {# emner}}) ikke på siden og gemmes ikke med arrangementet: slå det til for at beholde det.",
         "reviewOffCreate": "Program: slået fra, gemmes ikke med arrangementet ({count, plural, one {# emne} other {# emner}})"
-      }
+      },
+      "saveCopy": "Gem kopien"
     },
     "nav": {
       "events": "Begivenheder",
@@ -1313,7 +1399,6 @@
       "publicationsList": "Publikationer",
       "publicationsNew": "Ny publikation",
       "ariaLabel": "Administrationsnavigation",
-      "subNavAriaLabel": "Sektionsnavigation",
       "questionnaires": "Spørgeskemaer",
       "questionnairesLibrary": "Skabeloner til spørgeskemaer",
       "questionnairesResponses": "Svar",
@@ -1332,7 +1417,9 @@
       "video": "Video",
       "glossary": "Ordliste",
       "breadcrumbAriaLabel": "Brødkrumme",
-      "skipToPage": "Gå til sidens indhold"
+      "skipToPage": "Gå til sidens indhold",
+      "openMenu": "Åbn menuen",
+      "closeMenu": "Luk menuen"
     },
     "publications": {
       "subtitle": "Samlet redaktionel hub for alle offentliggjorte videoer: planlagte arrangementer, hurtige opkald, uploadede arkivoptagelser og sessioner, der venter på udgivelse.",
@@ -1488,7 +1575,8 @@
       "actions": {
         "DATA_DELETED": "Data slettet",
         "CONSENT_RECORDED": "Samtykke registreret",
-        "DATA_EXPORTED": "Data eksporteret"
+        "DATA_EXPORTED": "Data eksporteret",
+        "CONSENT_WITHDRAWN": "Samtykke trukket tilbage"
       },
       "recordsAffected": "{count} berørte poster",
       "colWhen": "Hvornår",
@@ -1610,13 +1698,6 @@
     "deleteSuccess": "Begivenhed slettet",
     "publishSuccess": "Begivenhed publiceret",
     "unpublishSuccess": "Arrangement trukket tilbage",
-    "startEvent": "Start begivenhed",
-    "startEventSuccess": "Begivenhed startet! Ventende deltagere omdirigeres automatisk.",
-    "startEventConfirmTitle": "Start begivenheden?",
-    "startEventConfirmMessage": "Planlagt start: {when}. Alle med linket kan deltage med det samme, og videorummet starter nu.",
-    "startEventConfirmEarly": "Der er mere end 30 minutter til start.",
-    "startEventFailed": "Begivenheden blev ikke startet. Prøv igen.",
-    "jvbWarmupWarning": "Videoserverne starter op (ca. 2 minutter). Deltagere ser en besked i venteværelset.",
     "eventIsLive": "Begivenheden er i gang",
     "liveParticipants": "{count} i lokalet / maks. {max}",
     "joinAsModeratorBtn": "Deltag som moderator",
@@ -1654,7 +1735,6 @@
         "expected": "{count, plural, one {forventet deltager} other {forventede deltagere}}",
         "registered": "{count, plural, =0 {ingen tilmeldte endnu} one {# tilmeldt indtil nu} other {# tilmeldte indtil nu}}",
         "change": "Skift",
-        "changeParticipants": "Skift antallet af forventede deltagere",
         "sizedOnRegistrations": "Der er flere tilmeldte end forventede deltagere: skønnet tæller de {count} tilmeldte.",
         "cameraQuestion": "Hvor mange webkameraer vil være tændt?",
         "camera": {
@@ -1866,7 +1946,7 @@
       "guestJoinHint": "Hurtigt link til at invitere en deltager i sidste øjeblik: vedkommende kommer ind som gæst, mens arrangementet er live, uden at udfylde tilmeldingsformularen.",
       "callInvite": "Link til deltagere",
       "callInviteHint": "Den, der modtager det, deltager i opkaldet som gæst uden tilmelding. Et hurtigopkald har ingen offentlig side: det er dette link, der skal deles.",
-      "moderatorLink": "Moderatorlink",
+      "moderatorLink": "Administrationslink (moderator)",
       "moderatorLinkHint": "Del kun dette link med moderatorer. Enhver med dette link kan administrere begivenheden.",
       "liveRoomHint": "Link til at gå direkte ind i lokalet som moderator.",
       "copyLink": "Kopiér link",
@@ -1876,7 +1956,8 @@
       "warning": "Enhver med dette link administrerer begivenheden: vis det ikke, når du deler din skærm, og indsæt det ikke i en chat.",
       "hidden": "Linket er skjult",
       "copyFailed": "Kopiering mislykkedes: markér adressen nedenfor, og kopiér den manuelt.",
-      "notYetPublished": "Virker først efter offentliggørelsen: indtil da vises »siden blev ikke fundet«."
+      "notYetPublished": "Virker først efter offentliggørelsen: indtil da vises »siden blev ikke fundet«.",
+      "copyFailedShort": "Kopiering mislykkedes"
     },
     "feedbackAdmin": {
       "title": "Feedbackresultater",
@@ -1952,7 +2033,8 @@
       "actions": {
         "DATA_DELETED": "Data slettet",
         "CONSENT_RECORDED": "Samtykke registreret",
-        "DATA_EXPORTED": "Data eksporteret"
+        "DATA_EXPORTED": "Data eksporteret",
+        "CONSENT_WITHDRAWN": "Samtykke trukket tilbage"
       }
     },
     "settings": {
@@ -2266,9 +2348,9 @@
     },
     "recurrence": {
       "label": "Gentagelse",
-      "helpText": "Gør arrangementet tilbagevendende. En serie oprettes med startdatoen som udgangspunkt.",
+      "helpText": "Hvis arrangementet gentages, foreslår kopien datoen for næste gang, når du duplikerer det.",
       "preset": {
-        "none": "Ingen",
+        "none": "Gentages ikke",
         "daily": "Hver dag",
         "weekly": "Hver uge",
         "weekdays": "Hverdage",
@@ -2322,7 +2404,6 @@
       "aiTranscript": "Automatisk transskription (standard)",
       "aiSummary": "Automatisk resumé (standard)",
       "aiTranslation": "Automatisk oversættelse (standard)",
-      "pickerTitle": "Vælg en skabelon",
       "pickerSubtitle": "Vælg en skabelon for at forkonfigurere begivenhedsindstillingerne, eller spring over for at konfigurere alt manuelt.",
       "skipTemplate": "Konfigurer manuelt",
       "postEventPublic": "Offentlig side efter begivenheden",
@@ -2701,10 +2782,7 @@
       "resultsCount": "{count, plural, =0 {Ingen arrangementer} one {# arrangement} other {# arrangementer}}",
       "menu": {
         "actionsFor": "Handlinger for »{title}«",
-        "manage": "Administrer",
         "edit": "Rediger",
-        "openPublic": "Åbn den offentlige side",
-        "newTab": "(åbner i en ny fane)",
         "copyLink": "Kopiér det offentlige link",
         "linkCopied": "Link kopieret",
         "publish": "Udgiv",
@@ -2713,7 +2791,7 @@
         "unpublishMessage": "»{title}« forsvinder fra de offentlige sider, indtil du udgiver det igen. Allerede modtagne tilmeldinger bevares.",
         "published": "Arrangement udgivet",
         "unpublished": "Arrangement trukket tilbage",
-        "duplicate": "Duplikér som næste afholdelse",
+        "duplicate": "Duplikér",
         "delete": "Slet",
         "deleteTitle": "Slet arrangementet?",
         "deleteMessage": "»{title}« og alle tilhørende data slettes. Det kan ikke fortrydes.",
@@ -2771,7 +2849,6 @@
       "participantHintPassword": "Åbner i en ny fane: rummet, som en gæst ser det, efter begivenhedens adgangskode.",
       "participantHintPage": "Åbner i en ny fane: den offentlige side, som deltagerne ser den.",
       "editEvent": "Rediger arrangement",
-      "editSettings": "Rediger indstillinger",
       "featureSummary": "Aktive funktioner",
       "organizers": "Arrangører",
       "privacyGdpr": "Privatliv og GDPR",
@@ -2824,9 +2901,9 @@
       "aiGenerateError": "AI-pipelinen kunne ikke startes. Kontrollér, at AI er slået til for hele sitet, og at der findes en optagelse.",
       "aiGenerateHelp": "Slår AI-transskription + resumé til og starter pipelinen på optagelsen med ét klik. Idempotent: to klik dublerer ikke jobbene.",
       "aiGenerateNoRecording": "Ingen optagelse: AI-behandling efter arrangementet kræver en optagelse (optagelsen sker kun under arrangementet). Du kan stadig administrere efterbehandlingen her.",
-      "duplicateNext": "Dublér til næste gang",
+      "duplicateNext": "Duplikér",
       "duplicateNextBusy": "Dublerer…",
-      "duplicateNextHint": "Opretter en kladde med hele dette arrangements opsætning (optagelse, separate spor, AI, dagsorden, påmindelser). Har arrangementet en kadence, flyttes datoen til næste forekomst; ellers skal du selv sætte den.",
+      "duplicateNextHint": "Opretter en kopi som kladde med hele arrangementets opsætning. Hvis arrangementet gentages, starter kopien ved næste gang; ellers har den de samme datoer, som skal opdateres.",
       "duplicateNextError": "Dubleringen mislykkedes. Prøv igen.",
       "capacitySection": "Kapacitet og infrastruktur",
       "capacitySubtitle": "Dimensioneret til ca. {max} forventede deltagere",
@@ -2838,11 +2915,12 @@
         "publishFailedTitle": "Offentliggørelsen mislykkedes",
         "publishFailedBody": "Arrangementet er gemt som kladde: offentliggør det fra denne side, når problemet er løst.",
         "unsaved": "Ikke gemt: {items}. Du kan tilføje dem fra denne side.",
-        "copyParticipantLink": "Kopiér linket til deltagerne",
         "sendToSpeakers": "Links til moderatorer og talere",
         "close": "Luk oversigten",
         "publishNow": "Offentliggør nu"
-      }
+      },
+      "editFeatures": "Redigér funktioner",
+      "editPrivacy": "Redigér privatliv og data"
     },
     "rubrica": {
       "subtitle": "Personer, der har givet samtykke til at blive optaget i adressebogen (GDPR art. 6.1.a). Profiloplysninger opdateres automatisk ved hver ny tilmelding.",
@@ -3450,6 +3528,7 @@
     "guided": {
       "title": "Hvordan er dit arrangement?",
       "intro": "Fire spørgsmål for at starte med de rigtige indstillinger. Alle funktioner kan også slås til og fra under arrangementet.",
+      "introNoRecording": "Tre spørgsmål for at starte med de rigtige indstillinger. Alle funktioner kan også slås til og fra under arrangementet.",
       "peopleQ": "Hvor mange personer forventer du?",
       "people": {
         "piccolo": "Op til 20",
@@ -3474,9 +3553,7 @@
       "preview": "Dit arrangement",
       "previewPeople": "Forventede deltagere: ca. {count}",
       "continue": "Fortsæt",
-      "useTemplate": "Eller brug en skabelon",
-      "instantAlt": "Eller et øjeblikkeligt videoopkald",
-      "instantAltAction": "Opret videoopkaldet",
+      "useTemplate": "Start fra en skabelon",
       "summary": {
         "piccolo": "Op til 20 personer",
         "medio": "Op til 100 personer",
@@ -3492,10 +3569,12 @@
       "access": {
         "open": "Alle, der tilmelder sig",
         "openDesc": "Alle, der vil, tilmelder sig fra arrangementets side",
-        "invitation": "Kun dem, du inviterer",
-        "invitationDesc": "Siden forbliver synlig, men kun inviterede kan tilmelde sig; uden tilmelding kommer man ikke ind"
+        "invitation": "Kun inviterede",
+        "invitationDesc": "Siden er stadig synlig, men kun personer på listen kan tilmelde sig; invitationen med tilmeldingslinket sender du på e-mail fra arrangementets side"
       },
-      "previewInvitation": "Kun dem, du inviterer, kan tilmelde sig; ingen kommer ind uden tilmelding."
+      "previewInvitation": "Kun inviterede tilmelder sig; uden tilmelding kommer man ikke ind.",
+      "templateReplaces": "En skabelon bruger sine egne indstillinger i stedet for svarene nedenfor. Titel, datoer og personer skriver du i de næste trin.",
+      "instantBack": "Opret i stedet et planlagt arrangement"
     },
     "captionsTranscript": {
       "title": "Udskrift fra undertekster",
@@ -3584,10 +3663,21 @@
       "status": "Status",
       "roleSpeaker": "Taler",
       "registered": "Tilmeldt",
-      "notRegistered": "Endnu ikke tilmeldt",
       "organizersTitle": "Arrangerende organisationer",
       "organizersEdit": "Rediger organisationer",
-      "organizersEmpty": "Ingen organisation angivet: den offentlige side viser ikke, hvem der arrangerer."
+      "organizersEmpty": "Ingen organisation angivet: den offentlige side viser ikke, hvem der arrangerer.",
+      "sendAll": "Send invitationen til dem, der ikke har fået den ({count})",
+      "sending": "Sender…",
+      "sendDone": "Invitationer på vej: {sent}. Sprunget over (allerede tilmeldt eller uden adresse): {skipped}.",
+      "sendError": "Afsendelsen mislykkedes: prøv igen.",
+      "sendNotPublished": "Invitationer sendes, mens arrangementet tager imod tilmeldinger: efter offentliggørelsen og før slutningen.",
+      "invitedOn": "Inviteret {date}",
+      "notInvited": "Invitation ikke sendt",
+      "send": "Send invitation",
+      "resend": "Send igen",
+      "actions": "Handlinger",
+      "sendTooMany": "For mange afsendelser på kort tid: prøv igen om et minut.",
+      "sendRemaining": "{remaining} tilbage: tryk igen for at sende dem."
     },
     "closing": {
       "title": "Afslut arrangementet",
@@ -3803,6 +3893,56 @@
         "item": "{language}: {state}",
         "review": "Gennemse teksterne"
       }
+    },
+    "voiceConsent": {
+      "title": "Transskribere hele optagelsen?",
+      "message": "Dette arrangement bad hver person om samtykke til transskription af deres indlæg. Hele optagelsen indeholder alle stemmer, også dem der ikke gav samtykke: transskribér den kun, hvis alle, der taler i den, har givet samtykke. Din bekræftelse gemmes i aktivitetsloggen.",
+      "confirm": "Ja, alle har givet samtykke",
+      "cancel": "Annuller",
+      "waiting": "Transskriptionen af hele optagelsen startede ikke af sig selv: dette arrangement bad hver person om samtykke til transskription af deres indlæg. Start den med {button} kun hvis alle, der taler i optagelsen, har givet samtykke; ellers bevares transskriptionen fra underteksterne."
+    },
+    "editCopyTitle": "Kopi af arrangementet",
+    "editCopyNoticeNext": "Du arbejder på en kopi som kladde: det oprindelige arrangement ændres ikke. Datoen er allerede den næste gang: tjek resten, og gem.",
+    "editCopyNoticeSameDates": "Du arbejder på en kopi som kladde: det oprindelige arrangement ændres ikke. Den har de samme datoer som originalen: opdatér dem, før du gemmer.",
+    "consentProofs": {
+      "title": "Dokumentation for samtykker",
+      "intro": "Samtykker til optagelse og transskription givet ved tilmelding, i venterummet eller i rummet, og dem der er trukket tilbage. Listen med navne tjener som dokumentation.",
+      "loading": "Indlæser…",
+      "loadFailed": "Dokumentationen for samtykker kunne ikke indlæses.",
+      "none": "Intet samtykke til optagelse eller transskription for dette arrangement.",
+      "kinds": {
+        "recording": "Optagelse",
+        "transcription": "Transskription af indlæg"
+      },
+      "counts": "samtykker {given} · trukket tilbage {withdrawn}",
+      "download": "Hent listen (CSV)",
+      "downloading": "Henter…",
+      "downloadNote": "Listen indeholder personers navne: eksporten registreres i arrangementets GDPR-log.",
+      "downloadFailed": "Listen kunne ikke hentes: prøv igen.",
+      "csv": {
+        "kind": "Samtykke",
+        "source": "Hvor",
+        "role": "Rolle",
+        "name": "Navn",
+        "givenAt": "Givet",
+        "withdrawnAt": "Trukket tilbage",
+        "textVersion": "Tekstversion",
+        "kinds": {
+          "recording": "Optagelse",
+          "transcription": "Transskription af indlæg"
+        },
+        "sources": {
+          "registration": "tilmelding",
+          "room": "rum"
+        },
+        "roles": {
+          "registrant": "tilmeldt",
+          "guest": "gæst",
+          "host": "leder eller taler"
+        },
+        "unreadableName": "(navn kan ikke læses)"
+      },
+      "countsNote": "Der tælles personer: en tilmelding, en personalekonto eller et personligt link tæller én gang; en gæst, der kommer igen ved et andet besøg, tæller igen."
     }
   },
   "email": {
@@ -3837,7 +3977,9 @@
     "upcoming": {
       "title": "Kommende arrangementer",
       "viewAll": "Se alle arrangementer",
-      "noEvents": "Ingen planlagte arrangementer. Kig forbi igen snart!"
+      "noEvents": "Ingen planlagte arrangementer. Kig forbi igen snart!",
+      "seePast": "Tidligere arrangementer",
+      "seeRecordings": "Optagelser"
     },
     "howItWorks": {
       "title": "Sådan deltager du",
@@ -4187,9 +4329,11 @@
       "recordingRequired": "Samtykke til optagelse er påkrævet for at deltage i denne begivenhed",
       "recordingNotice": "Arrangementet optages (lyd og video). Du deltager uden mikrofon og kamera: optagelsen indeholder ikke din stemme eller dit billede, medmindre værten giver dig ordet.",
       "multitrack": "Jeg giver samtykke til, at mine indlæg udskrives med mit navn til arrangementets referat. Hvis arrangementet optager et separat lydspor for hver person, optages min stemme kun til dette formål, og sporet slettes efter udskrivningen; det bruges ikke til at identificere eller gengive min stemme.",
-      "multitrackOptional": "Det er frivilligt: Hvis du ikke giver samtykke, kan du stadig deltage, men din stemme optages ikke, og dine indlæg kommer ikke med i udskriften.",
+      "multitrackOptional": "Det er frivilligt: Hvis du ikke giver samtykke, deltager du stadig, men dine indlæg kommer ikke med i transskriptionen, og din stemme optages ikke på et separat spor. Hvis arrangementet optages, er din stemme dog stadig med i videoen.",
       "stayInTouch": "Jeg vil gerne modtage information om kommende arrangementer og føjes til adressebogen for at blive inviteret til lignende arrangementer",
-      "stayInTouchHelp": "Valgfrit samtykke (GDPR art. 6.1.a). Du kan til enhver tid trække det tilbage via linket »Fjern mig fra adressebogen« i de e-mails, du modtager. Navn og organisation er dem fra denne tilmelding."
+      "stayInTouchHelp": "Valgfrit samtykke (GDPR art. 6.1.a). Du kan til enhver tid trække det tilbage via linket »Fjern mig fra adressebogen« i de e-mails, du modtager. Navn og organisation er dem fra denne tilmelding.",
+      "recordingOptionalListenOnly": "Hvis du ikke giver samtykke, deltager du alligevel, kun som lytter: du følger med og skriver i chatten, men mikrofon, kamera og skærmdeling forbliver slukket. Du kan give samtykke senere fra rummet.",
+      "recordingOptionalHost": "Hvis du ikke giver samtykke, kommer du stadig ind og leder som sædvanligt, men din stemme gemmes ikke i sporene pr. person eller i transskriptionen. Videoen af rummet viser dig stadig, hvis den optages."
     },
     "export": {
       "title": "Mine data",
@@ -4852,11 +4996,13 @@
     "transparency": "Sikkerhed og gennemsigtighed",
     "serviceInventory": "Serviceoversigt",
     "sourceCode": "Kildekode",
-    "buildInfoDev": "udviklingsbuild",
-    "viewCommit": "Se commit på GitHub",
     "viewRelease": "Se udgivelse på GitHub",
     "viewChangelog": "Se nyhederne (changelog)",
-    "buildDatePrefix": "Bygget den"
+    "newWindow": "åbner i et nyt vindue",
+    "usefulLinks": "Nyttige links",
+    "version": "Version {version}",
+    "versionDev": "Udviklingsversion",
+    "updatedOn": "opdateret {date}"
   },
   "changelog": {
     "metaTitle": "Nyheder og changelog",
@@ -5023,7 +5169,9 @@
       "version": "Pipelineversion"
     },
     "overlapBadge": "samtidig",
-    "overlapTitle": "Samtidig tale: i dette interval taler mere end én person på samme tid."
+    "overlapTitle": "Samtidig tale: i dette interval taler mere end én person på samme tid.",
+    "anonymousSpeaker": "Deltager {n}",
+    "untranscribed": "Ikke transskriberet: den, der talte, gav ikke samtykke"
   },
   "waiting": {
     "startsIn": "Begivenheden starter om",
@@ -5087,9 +5235,6 @@
     "endedWatchRecording": "Se optagelsen",
     "endedLeaveFeedback": "Giv feedback",
     "startEventError": "Fejl ved start af arrangementet. Prøv igen.",
-    "emailLabel": "E-mail (valgfri)",
-    "emailHelp": "Kun til en eventuel opfølgning efter arrangementet",
-    "emailInvalid": "Indtast en gyldig e-mailadresse",
     "chatLockedMessage": "Indtast dit navn for at deltage i arrangementets chat.",
     "classicView": "Klassisk visning",
     "backToGarden": "Vis pladsen",
@@ -5322,7 +5467,12 @@
     "waitingForStartButton": "Venter på start",
     "countdownHours": "{hours} t",
     "countdownMinutes": "{minutes} m",
-    "countdownSeconds": "{seconds} s"
+    "countdownSeconds": "{seconds} s",
+    "startEarlyConfirm": "Der er mere end 30 minutter til det planlagte start ({when}). Starter du nu, kommer alle med linket ind med det samme, og videorummet tændes: tryk igen for at bekræfte.",
+    "startEarlyYes": "Start nu",
+    "startEarlyNo": "Vent til det planlagte tidspunkt",
+    "anonymousNameHelp": "Til dette arrangement er publikum anonymt: de andre ser ikke dit navn, men et pseudonym med en kode.",
+    "registeredNameHelp": "Det er det navn, du tilmeldte dig med: sådan vises du i rummet."
   },
   "recording": {
     "management": "Videooptagelse",

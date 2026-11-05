@@ -15,12 +15,13 @@
  * stays attributable even after a display-name change.
  */
 
+import { Prisma } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { extractModeratorToken } from '@/lib/auth/moderator';
-import { authenticateChatSender } from '@/lib/chat/authenticate';
+import { assertChatOpen, authenticateChatSender } from '@/lib/chat/authenticate';
 import { isChatReactionEmoji, tallyReactions } from '@/lib/chat/emoji';
 import { publishChat } from '@/lib/chat/pubsub';
 import { prisma } from '@/lib/db';
@@ -67,6 +68,7 @@ export const POST = withErrorHandling(async (request, context) => {
     parsed.data.displayNameOverride,
     request,
   );
+  assertChatOpen(auth);
 
   // Members only. A guest senderId is a truncated base64 of `ip:name`: behind
   // one NAT two guests with similar names collide, and the unique key
@@ -117,7 +119,14 @@ export const POST = withErrorHandling(async (request, context) => {
       .create({
         data: { messageId, senderId: auth.senderId, emoji: parsed.data.emoji },
       })
-      .catch(() => {});
+      .catch((err: unknown) => {
+        if (err instanceof Prisma.PrismaClientKnownRequestError) {
+          if (err.code === 'P2002') return;
+          // Il messaggio e' stato tolto dopo il controllo qui sopra.
+          if (err.code === 'P2003') throw new NotFoundError('Message');
+        }
+        throw err;
+      });
   }
 
   const rows = await prisma.chatMessageReaction.findMany({

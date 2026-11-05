@@ -56,6 +56,7 @@ import { ingressoResoconto } from '@/lib/report/input';
 import { scriviNumeriResoconto } from '@/lib/report/job';
 import { metricheResoconto } from '@/lib/report/metrics';
 import { MOTIVO_MOTORE_ASSENTE } from '@/lib/text-translation/enqueue';
+import { endpointRitirati } from '@/lib/captions/room';
 
 export const dynamic = 'force-dynamic';
 
@@ -335,30 +336,7 @@ export const POST = withErrorHandling(async (request) => {
     // signed URL + l'identità certa (dal JWT del portale, decifrata qui)
     // + l'offset per il merge. Il worker trascrive ogni traccia senza
     // diarization e fonde via multitrack.merge_tracks.
-    const tracks = await prisma.recordingTrack.findMany({
-      where: { recordingId: recording.id, audioPurgedAt: null },
-      select: {
-        participantId: true,
-        displayName: true,
-        blobKey: true,
-        startOffsetMs: true,
-      },
-      orderBy: { startOffsetMs: 'asc' },
-    });
-    for (const tr of tracks) {
-      const downloadUrl = await presignArtifactDownload({
-        blobKey: tr.blobKey,
-        expiresInMinutes: lease,
-      });
-      inputs.push({
-        role: 'track',
-        downloadUrl,
-        blobKey: tr.blobKey,
-        participantId: tr.participantId,
-        displayName: tr.displayName ? tryDecryptPII(tr.displayName) : null,
-        startOffsetMs: tr.startOffsetMs,
-      });
-    }
+    inputs.push(...(await tracceAlWorker(recording, lease)));
   }
 
   if (row.kind === 'ARCHIVE') {
@@ -370,30 +348,7 @@ export const POST = withErrorHandling(async (request) => {
     // Le tracce purgate (audioPurgedAt) non sono più disponibili: se
     // l'evento non ha retainParticipantTracks l'archivio conterrà solo
     // il video + i sottotitoli (degradazione pulita).
-    const tracks = await prisma.recordingTrack.findMany({
-      where: { recordingId: recording.id, audioPurgedAt: null },
-      select: {
-        participantId: true,
-        displayName: true,
-        blobKey: true,
-        startOffsetMs: true,
-      },
-      orderBy: { startOffsetMs: 'asc' },
-    });
-    for (const tr of tracks) {
-      const downloadUrl = await presignArtifactDownload({
-        blobKey: tr.blobKey,
-        expiresInMinutes: lease,
-      });
-      inputs.push({
-        role: 'track',
-        downloadUrl,
-        blobKey: tr.blobKey,
-        participantId: tr.participantId,
-        displayName: tr.displayName ? tryDecryptPII(tr.displayName) : null,
-        startOffsetMs: tr.startOffsetMs,
-      });
-    }
+    inputs.push(...(await tracceAlWorker(recording, lease)));
     // Sottotitoli sorgente (best-effort): se il TRANSCRIBE non è ancora
     // completato non c'è VTT — l'archivio si genera comunque senza.
     // Corretti anch'essi, se la trascrizione e' stata rivista
@@ -718,4 +673,45 @@ async function rispostaTraduzioneTesti(
       glossary: glossaryHints(glossary),
     },
   });
+}
+
+/**
+ * Le tracce per partecipante da passare al worker (trascrizione multitraccia,
+ * archivio): quelle ancora presenti, con l'identita' certa (dal JWT del
+ * portale, decifrata qui), l'offset per il merge e un indirizzo firmato. Chi
+ * ha ritirato dalla sala il consenso alla trascrizione dopo che la sua traccia
+ * era gia' registrata non passa piu' (lib/captions/room endpointRitirati).
+ */
+async function tracceAlWorker(
+  recording: { id: string; eventId: string },
+  lease: number,
+): Promise<Array<{
+  role: 'track';
+  downloadUrl: string;
+  blobKey: string;
+  participantId: string;
+  displayName: string | null;
+  startOffsetMs: number;
+}>> {
+  const tracks = await prisma.recordingTrack.findMany({
+    where: { recordingId: recording.id, audioPurgedAt: null },
+    select: { participantId: true, displayName: true, blobKey: true, startOffsetMs: true },
+    orderBy: { startOffsetMs: 'asc' },
+  });
+  const ritirati = await endpointRitirati(recording.eventId, [
+    ...new Set(tracks.map((tr) => tr.participantId)),
+  ]);
+  const tracce = [];
+  for (const tr of tracks) {
+    if (ritirati.has(tr.participantId)) continue;
+    tracce.push({
+      role: 'track' as const,
+      downloadUrl: await presignArtifactDownload({ blobKey: tr.blobKey, expiresInMinutes: lease }),
+      blobKey: tr.blobKey,
+      participantId: tr.participantId,
+      displayName: tr.displayName ? tryDecryptPII(tr.displayName) : null,
+      startOffsetMs: tr.startOffsetMs,
+    });
+  }
+  return tracce;
 }

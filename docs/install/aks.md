@@ -188,9 +188,10 @@ Tick every item before step 1:
       external database; Redis runs in the cluster.
 - [ ] **An SMTP relay** ([Email delivery](../configuration/email.md)). Without
       it no registration confirmation, reminder or staff sign-in link is sent.
-- [ ] **Access to the images.** The images under `ghcr.io/italia/` accept no
-      anonymous pulls: a pull Secret, a mirror in your own registry, or a build
-      from source ([Prerequisites](../DEPLOYMENT.md#prerequisites)).
+- [ ] **Access to the images.** The portal images under `ghcr.io/italia/` are
+      public. The patched web image, the recorder and the GPU worker are not:
+      for those, a pull Secret, a mirror in your own registry, or a build from
+      source ([Prerequisites](../DEPLOYMENT.md#prerequisites)).
 - [ ] **Certificates.** An email address for Let's Encrypt, and TCP 80
       reachable from the internet on the ingress and TURN addresses. If you
       restrict inbound sources, plan a DNS-01 solver or existing certificates

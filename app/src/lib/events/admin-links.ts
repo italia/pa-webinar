@@ -27,6 +27,9 @@ export function eventAdminPath(
     section?: WizardAdvancedSection | null;
     /** La scheda della pagina di gestione da aprire (non per la modifica). */
     tab?: EventAdminTab | null;
+    /** La modifica apre una copia appena duplicata: con la data della prossima
+     *  edizione o con le stesse date dell'originale. */
+    copia?: 'prossima' | 'stesse' | null;
   } = {},
 ): string {
   const base = `/admin/events/${id}${opts.edit ? '/edit' : ''}`;
@@ -35,6 +38,7 @@ export function eventAdminPath(
   if (opts.edit && opts.step) query.push(`step=${opts.step}`);
   if (opts.edit && opts.step === 'advanced' && opts.section) query.push(`section=${opts.section}`);
   if (!opts.edit && opts.tab) query.push(`tab=${opts.tab}`);
+  if (opts.edit && opts.copia) query.push(`copia=${opts.copia}`);
   if (opts.viaToken) query.push(`token=${encodeURIComponent(opts.viaToken)}`);
   return query.length > 0 ? `${base}?${query.join('&')}` : base;
 }

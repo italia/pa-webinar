@@ -12,6 +12,8 @@ vi.mock('@/lib/db', () => ({
   },
 }));
 vi.mock('@/lib/auth/cron', () => ({ assertCronApiKey: vi.fn() }));
+const ritirati = vi.hoisted(() => vi.fn(async (_e: string, _ep: string[]) => new Set<string>()));
+vi.mock('@/lib/captions/room', () => ({ endpointRitirati: ritirati }));
 const del = vi.fn(async (_key: string) => true);
 vi.mock('@/lib/storage/postprod', () => ({
   isPostprodStorageConfigured: () => true,
@@ -35,6 +37,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   db.recordingTrack.update.mockResolvedValue({});
   db.recordingTrack.groupBy.mockResolvedValue([]);
+  db.recordingTrack.findMany.mockResolvedValue([]);
 });
 
 const traccia = (id: string, eventId: string, recordingId: string) => ({
@@ -45,6 +48,28 @@ const traccia = (id: string, eventId: string, recordingId: string) => ({
 });
 
 describe('GET /api/cron/multitrack-purge', () => {
+  it('purges at once the tracks of whoever withdrew the transcription consent, also when tracks are kept', async () => {
+    db.event.findMany.mockResolvedValue([]);
+    db.recordingTrack.findMany
+      .mockResolvedValueOnce([]) // trascritte
+      .mockResolvedValueOnce([
+        { ...traccia('t-via', 'e1', 'r1'), participantId: 'ep-via' },
+        { ...traccia('t-resta', 'e1', 'r1'), participantId: 'ep-resta' },
+      ]);
+    ritirati.mockResolvedValueOnce(new Set(['ep-via']));
+    const res = await GET(req() as never, ctx as never);
+    const body = (await res.json()) as { purged: number; withdrawnConsent: number };
+    expect(ritirati).toHaveBeenCalledWith('e1', ['ep-via', 'ep-resta']);
+    expect(body.withdrawnConsent).toBe(1);
+    expect(del).toHaveBeenCalledWith('recordings/multitrack/e1/r1/audio/t-via.opus');
+    expect(del).not.toHaveBeenCalledWith('recordings/multitrack/e1/r1/audio/t-resta.opus');
+    // Si aspetta solo un job che le ha gia' prese in carico.
+    const where = db.recordingTrack.findMany.mock.calls[1]![0].where as {
+      recording: { jobs: { none: { status: { in: string[] } } } };
+    };
+    expect(where.recording.jobs.none.status.in).toEqual(['CLAIMED', 'RUNNING']);
+  });
+
   it('purges untranscribed tracks only of events past their data retention', async () => {
     db.event.findMany.mockResolvedValue([
       { id: 'e-old', status: 'ENDED', endsAt: daysAgo(40), lastActiveAt: null, dataRetentionDays: 30 },
@@ -71,7 +96,11 @@ describe('GET /api/cron/multitrack-purge', () => {
     db.recordingTrack.findMany.mockResolvedValueOnce([]);
     const body = await (await GET(req() as never, ctx as never)).json();
     expect(body).toMatchObject({ candidates: 0, purged: 0 });
-    expect(db.recordingTrack.findMany).toHaveBeenCalledTimes(1);
+    // Le trascritte e quelle dei consensi ritirati; nessuna ricerca delle
+    // tracce mai trascritte di eventi scaduti.
+    expect(db.recordingTrack.findMany).toHaveBeenCalledTimes(2);
+    const cerche = db.recordingTrack.findMany.mock.calls.map((c) => JSON.stringify(c[0]));
+    expect(cerche.some((c) => c.includes('"eventId":{"in"'))).toBe(false);
     expect(del).not.toHaveBeenCalled();
   });
 

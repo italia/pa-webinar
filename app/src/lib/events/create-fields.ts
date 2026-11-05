@@ -67,6 +67,8 @@ export const CREATED_EVENT_FIELDS = [
   'privacyPolicyText',
   'gdprTemplateId',
   'recordingConsentText',
+  'listenOnlyWithoutConsent',
+  'audienceAnonymous',
 
   // registrazione e pubblicazione
   'recordingEnabled',

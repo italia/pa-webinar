@@ -281,21 +281,14 @@ describe('CapacityPanel', () => {
     }
   });
 
-  it('«Cambia» porta ai partecipanti e alla qualita', () => {
-    const partecipanti = vi.fn();
+  it('«Cambia» porta alla qualita', () => {
     const qualita = vi.fn();
-    mostra({ onCambiaPartecipanti: partecipanti, onCambiaQualita: qualita });
-    act(() =>
-      container
-        .querySelector<HTMLButtonElement>(`button[aria-label="${m.changeParticipants}"]`)
-        ?.click()
-    );
+    mostra({ onCambiaQualita: qualita });
     act(() =>
       container
         .querySelector<HTMLButtonElement>(`button[aria-label="${m.changeQuality}"]`)
         ?.click()
     );
-    expect(partecipanti).toHaveBeenCalledTimes(1);
     expect(qualita).toHaveBeenCalledTimes(1);
   });
 

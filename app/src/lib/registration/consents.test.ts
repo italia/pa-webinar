@@ -19,9 +19,19 @@ describe('consensiRichiesti', () => {
   it('chi può parlare e mostrarsi presta entrambi i consensi', () => {
     expect(consensiRichiesti(base)).toEqual({
       registrazione: true,
+      registrazioneFacoltativa: false,
       avvisoRegistrazione: false,
       tracce: true,
     });
+  });
+
+  it('con il solo ascolto per chi non acconsente il consenso si chiede ma e\' libero', () => {
+    expect(consensiRichiesti({ ...base, listenOnlyWithoutConsent: true })).toMatchObject({
+      registrazione: true,
+      registrazioneFacoltativa: true,
+    });
+    // Senza nulla da acconsentire non c'e' nulla di facoltativo.
+    expect(consensiRichiesti({ ...base, ...ascolto, listenOnlyWithoutConsent: true }).registrazioneFacoltativa).toBe(false);
   });
 
   it("solo ascolto: l'informativa al posto della casella, la traccia resta obbligatoria", () => {
@@ -29,6 +39,7 @@ describe('consensiRichiesti', () => {
     // parola dev'essere già coperto.
     expect(consensiRichiesti({ ...base, ...ascolto })).toEqual({
       registrazione: false,
+      registrazioneFacoltativa: false,
       avvisoRegistrazione: true,
       tracce: true,
     });
@@ -43,6 +54,6 @@ describe('consensiRichiesti', () => {
   it('senza registrazione non si chiede né si avvisa', () => {
     expect(
       consensiRichiesti({ ...base, recordingEnabled: false, multitrackRecordingEnabled: false }),
-    ).toEqual({ registrazione: false, avvisoRegistrazione: false, tracce: false });
+    ).toEqual({ registrazione: false, registrazioneFacoltativa: false, avvisoRegistrazione: false, tracce: false });
   });
 });

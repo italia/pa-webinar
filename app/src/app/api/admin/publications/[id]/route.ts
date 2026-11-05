@@ -13,6 +13,8 @@ import { cookies } from 'next/headers';
 import { z } from 'zod';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
+import { CAMPI_VIDEO_VUOTI } from '@/lib/events/recording-fields';
+import { materialUrlSchema } from '@/lib/validation/materials';
 import { requireEventManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
@@ -40,7 +42,7 @@ const updatePublicationSchema = z.object({
   // has completed, so the URL is guaranteed to point at an existing
   // blob in our container. Setting recordingUrl implies publishing
   // unless the caller explicitly passes recordingPublished: false.
-  recordingUrl: z.string().url().nullable().optional(),
+  recordingUrl: materialUrlSchema.nullable().optional(),
   recordingPublished: z.boolean().optional(),
   recordingFileSize: z.number().int().positive().nullable().optional(),
   recordingDuration: z.number().int().positive().nullable().optional(),
@@ -87,12 +89,11 @@ export const PATCH = withErrorHandling(async (request, context) => {
       ...(parsed.data.youtubeUrl !== undefined && {
         youtubeUrl: parsed.data.youtubeUrl,
       }),
-      ...(setsRecording && {
+      ...(setsRecording && parsed.data.recordingUrl !== null && {
         recordingUrl: parsed.data.recordingUrl,
         // Enable the flag even on retroactive uploads (Jibri was off
         // during the event) so the detail page surfaces the player.
         recordingEnabled: true,
-        ...(parsed.data.recordingUrl === null && { recordingPublished: false }),
       }),
       ...(publishWith !== undefined && {
         recordingPublished: publishWith,
@@ -107,6 +108,9 @@ export const PATCH = withErrorHandling(async (request, context) => {
       ...(parsed.data.recordingDuration !== undefined && {
         recordingDuration: parsed.data.recordingDuration,
       }),
+      // Ultimi, per vincere sui campi qui sopra: togliere il video toglie anche
+      // pubblicazione, peso e durata, qualunque cosa chieda la richiesta.
+      ...(parsed.data.recordingUrl === null && CAMPI_VIDEO_VUOTI),
     },
   });
 

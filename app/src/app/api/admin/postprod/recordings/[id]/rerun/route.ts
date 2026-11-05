@@ -15,6 +15,7 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { requireRecordingManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { enqueuePostprodForRecording } from '@/lib/ai/enqueue';
+import { leggiCorpoAvvio } from '@/lib/ai/voice-consent';
 import { registrazioneSoloSottotitoli, trascrizioneCorrettaDaiSottotitoli } from '@/lib/captions/transcript';
 import { prisma } from '@/lib/db';
 import { AppError, NotFoundError } from '@/lib/errors';
@@ -41,6 +42,8 @@ export const POST = withErrorHandling(async (request, context) => {
       'AI_PIPELINE_DISABLED',
     );
   }
+
+  const allVoicesConsented = (await leggiCorpoAvvio(request)).allVoicesConsented === true;
 
   const result = await prisma.$transaction(async (tx) => {
     const recording = await tx.recording.findUnique({
@@ -89,14 +92,14 @@ export const POST = withErrorHandling(async (request, context) => {
         status: 'POSTPROD_QUEUED',
       },
     });
-    return enqueuePostprodForRecording(tx, { recordingId: recording.id });
+    return enqueuePostprodForRecording(tx, { recordingId: recording.id, allVoicesConsented });
   });
 
   await logAdminAction({
     request,
     action: 'POSTPROD_RERUN',
     target: id,
-    details: { enqueued: result.enqueued, skipped: result.skippedExisting },
+    details: { allVoicesConsented, enqueued: result.enqueued, skipped: result.skippedExisting },
   });
 
   return Response.json({ ok: true, ...result });

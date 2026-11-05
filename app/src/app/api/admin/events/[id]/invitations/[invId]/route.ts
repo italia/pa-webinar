@@ -24,7 +24,7 @@ const patchSchema = z.object({
   email: z.string().email().max(200).optional(),
   name: z.string().min(1).max(200).nullable().optional(),
   role: z.enum(['GUEST', 'SPEAKER']).optional(),
-  personId: z.string().uuid().nullable().optional(),
+  personId: z.guid().nullable().optional(),
 });
 
 async function requireBelongs(eventId: string, invId: string) {
@@ -61,6 +61,10 @@ export const PATCH = withErrorHandling(async (request, context) => {
     const emailNorm = (data.email as string).trim().toLowerCase();
     data.email = encryptPII(emailNorm);
     data.emailHash = hashEmail(emailNorm);
+    // Un indirizzo nuovo non ha ricevuto l'invito, e il link dell'invito
+    // vecchio non deve aprire il modulo con i dati della persona nuova.
+    data.token = null;
+    data.sentAt = null;
   }
   if ('name' in data) {
     data.name = encryptPIIOrNull(data.name as string | null);
@@ -79,8 +83,10 @@ export const PATCH = withErrorHandling(async (request, context) => {
       details: { fields: Object.keys(parsed.data) },
     });
 
+    // Come l'elenco: l'impronta e il token dell'invito restano sul server.
+    const { token: _token, emailHash: _hash, ...visibile } = updated;
     return Response.json({
-      ...updated,
+      ...visibile,
       name: tryDecryptPII(updated.name),
       email: tryDecryptPII(updated.email),
     });

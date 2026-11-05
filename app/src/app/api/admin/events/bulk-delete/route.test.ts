@@ -35,6 +35,7 @@ vi.mock('@/lib/audit/admin-audit', () => ({
 const tx = vi.hoisted(() => ({
   $queryRaw: vi.fn(),
   event: { findMany: vi.fn(), deleteMany: vi.fn() },
+  emailOutbox: { deleteMany: vi.fn(async () => ({ count: 0 })) },
 }));
 vi.mock('@/lib/db', () => ({
   prisma: { $transaction: vi.fn(async (fn: (t: unknown) => unknown) => fn(tx)) },
@@ -91,6 +92,7 @@ describe('POST /api/admin/events/bulk-delete — i file degli eventi', () => {
     const where = { id: { in: [A, B] } };
     expect(files.removeFilesOfEventsBeingDeleted).toHaveBeenCalledWith(where);
     expect(mockedDeleteMany).toHaveBeenCalledWith({ where });
+    expect(tx.emailOutbox.deleteMany).toHaveBeenCalledTimes(1);
     expect(files.removeFilesOfEventsBeingDeleted.mock.invocationCallOrder[0]).toBeLessThan(
       mockedDeleteMany.mock.invocationCallOrder[0]!,
     );

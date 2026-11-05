@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslations } from 'next-intl';
 import useSWR from 'swr';
 
@@ -12,15 +13,16 @@ import {
   readCaptionsVisible,
   writeCaptionsVisible,
 } from '@/lib/captions/toolbar-button';
+import {
+  DIMENSIONI_SOTTOTITOLI,
+  leggiPreferenzeSottotitoli,
+  scriviPreferenzeSottotitoli,
+  type PreferenzeSottotitoli,
+} from '@/lib/captions/preferences';
+import { Icon } from '@/components/ui/icon';
+import { impostaPulsante } from '@/lib/jitsi/custom-buttons';
 import type { JitsiMeetExternalAPI, JitsiTranscriptionChunk } from '@/types/jitsi';
 
-/**
- * Tra togliere il pulsante dalla barra e rimetterlo. I due comandi arrivano a
- * Jitsi come messaggi separati e ciascuno ridisegna la barra; l'attesa copre
- * un iframe impegnato, che altrimenti li elaborerebbe insieme e lascerebbe il
- * pulsante vecchio fino al clic successivo.
- */
-const REMOUNT_DELAY_MS = 250;
 
 /** Stato del servizio come lo riporta la pagina di stato (null = non noto). */
 export type CaptionsServiceState = 'operational' | 'degraded' | 'paused' | 'unavailable' | null;
@@ -41,10 +43,13 @@ export type CaptionsServiceState = 'operational' | 'degraded' | 'paused' | 'unav
 export default function LiveCaptions({
   api,
   active,
+  alto = null,
 }: {
   api: JitsiMeetExternalAPI | null;
   /** Sottotitoli accesi per l'evento e servizio installato. */
   active: boolean;
+  /** Dove disegnarli quando chi guarda li vuole in alto sul video. */
+  alto?: HTMLElement | null;
 }) {
   const t = useTranslations('live.captions');
   // Lo stato del servizio, per dire a chi guarda perché i sottotitoli tacciono
@@ -62,40 +67,32 @@ export default function LiveCaptions({
   // e senza frasi da mostrare la pagina è la stessa.
   const [visible, setVisible] = useState(readCaptionsVisible);
   const [announcement, setAnnouncement] = useState('');
+  // Dove e quanto grandi: li sceglie chi guarda (sopra la barra dei comandi
+  // possono coprire qualcosa), e restano nel suo browser.
+  const [pref, setPref] = useState<PreferenzeSottotitoli>(leggiPreferenzeSottotitoli);
+  const cambiaPref = useCallback((p: Partial<PreferenzeSottotitoli>) => {
+    setPref((prima) => {
+      const dopo = { ...prima, ...p };
+      scriviPreferenzeSottotitoli(dopo);
+      return dopo;
+    });
+  }, []);
 
   // Il pulsante nella barra di Jitsi: c'è solo con i sottotitoli accesi, e
-  // icona e testo dicono che cosa fa il clic. Jitsi (stable-10741) aggiorna la
-  // configurazione ma continua a disegnare il pulsante già montato: per
-  // cambiarne l'icona lo si toglie e lo si rimette, e Jitsi lo ridisegna. Il
-  // prezzo: chi lo usa da tastiera perde il fuoco sul pulsante dopo il clic.
+  // icona e testo dicono che cosa fa il clic. La barra la tiene il registro
+  // dei pulsanti personalizzati (lib/jitsi/custom-buttons), che la condivide
+  // con gli altri pulsanti della sala e la ridisegna quando cambia.
   const show = t('show');
   const hide = t('hide');
-  // La sala su cui il pulsante è già montato: una sala nuova (riconnessione) lo riceve da capo.
-  const montatoSu = useRef<JitsiMeetExternalAPI | null>(null);
   useEffect(() => {
     if (!api) return;
-    const imposta = (buttons: unknown[]) => {
-      try {
-        api.executeCommand('overwriteConfig', { customToolbarButtons: buttons });
-      } catch {
-        // Una versione di Jitsi senza il comando: resta il pulsante della configurazione iniziale.
-      }
-    };
-    if (!active) {
-      imposta([]);
-      montatoSu.current = null;
-      return;
-    }
-    const button = captionsToolbarButton(visible, { show, hide });
-    if (montatoSu.current !== api) {
-      imposta([button]);
-      montatoSu.current = api;
-      return;
-    }
-    imposta([]);
-    const timer = window.setTimeout(() => imposta([button]), REMOUNT_DELAY_MS);
-    return () => window.clearTimeout(timer);
+    impostaPulsante(api, CAPTIONS_BUTTON_ID, active ? captionsToolbarButton(visible, { show, hide }) : null);
   }, [api, active, visible, show, hide]);
+
+  const cambiaVisibili = useCallback((v: boolean) => {
+    writeCaptionsVisible(v);
+    setVisible(v);
+  }, []);
 
   // Accesi a sala già aperta: da qui in poi Jitsi non annuncia la
   // trascrizione come registrazione. Non si ripristina allo spegnimento, che
@@ -170,8 +167,75 @@ export default function LiveCaptions({
   const notice =
     serviceState === 'paused' ? t('paused') : serviceState === 'unavailable' ? t('unavailable') : null;
 
-  return (
-    <div className="live-captions" role="region" aria-label={t('region')}>
+  const indice = DIMENSIONI_SOTTOTITOLI.indexOf(pref.dimensione);
+  const inAlto = pref.posizione === 'alto' && alto !== null;
+  const contenuto = (
+    <div
+      className={`live-captions live-captions--${pref.dimensione}${inAlto ? ' live-captions--alto' : ''}`}
+      role="region"
+      aria-label={t('region')}
+    >
+      {visible ? (
+        // I comandi di chi guarda, sempre a vista mentre i sottotitoli ci
+        // sono: come toglierli, spostarli, ingrandirli.
+        <div className="live-captions__comandi" role="group" aria-label={t('controls')}>
+          <button
+            type="button"
+            className="live-captions__comando"
+            onClick={() => cambiaPref({ dimensione: DIMENSIONI_SOTTOTITOLI[Math.max(0, indice - 1)] })}
+            disabled={indice <= 0}
+            aria-label={t('smaller')}
+            title={t('smaller')}
+          >
+            <span aria-hidden="true">{t('smallerShort')}</span>
+          </button>
+          <button
+            type="button"
+            className="live-captions__comando"
+            onClick={() =>
+              cambiaPref({
+                dimensione: DIMENSIONI_SOTTOTITOLI[Math.min(DIMENSIONI_SOTTOTITOLI.length - 1, indice + 1)],
+              })
+            }
+            disabled={indice >= DIMENSIONI_SOTTOTITOLI.length - 1}
+            aria-label={t('larger')}
+            title={t('larger')}
+          >
+            <span aria-hidden="true">{t('largerShort')}</span>
+          </button>
+          {alto !== null && (
+            <button
+              type="button"
+              className="live-captions__comando"
+              onClick={() => cambiaPref({ posizione: inAlto ? 'basso' : 'alto' })}
+              aria-label={inAlto ? t('moveDown') : t('moveUp')}
+              title={inAlto ? t('moveDown') : t('moveUp')}
+            >
+              <Icon icon={inAlto ? 'it-arrow-down' : 'it-arrow-up'} size="xs" color="white" />
+            </button>
+          )}
+          <button
+            type="button"
+            className="live-captions__comando"
+            onClick={() => cambiaVisibili(false)}
+            aria-label={hide}
+            title={hide}
+          >
+            <Icon icon="it-close" size="xs" color="white" />
+          </button>
+        </div>
+      ) : (
+        // Nascosti: il comando per riaverli, dove stavano.
+        <button
+          type="button"
+          className="live-captions__cc"
+          onClick={() => cambiaVisibili(true)}
+          aria-label={show}
+          title={show}
+        >
+          <span aria-hidden="true">{t('showShort')}</span>
+        </button>
+      )}
       {visible && lines.length > 0 && (
         <div className="live-captions__box" aria-hidden="true">
           {lines.map((line, i) => (
@@ -194,4 +258,7 @@ export default function LiveCaptions({
       </span>
     </div>
   );
+  // In alto, nel riquadro che la sala gli prepara sopra il video: lo stesso
+  // componente, solo un altro posto nella pagina.
+  return inAlto ? createPortal(contenuto, alto) : contenuto;
 }

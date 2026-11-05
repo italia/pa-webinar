@@ -49,7 +49,12 @@ import PresentationTimerBar from '@/components/live/presentation-timer';
 import LiveTimeStrip from '@/components/live/live-time-strip';
 import ClosingNotice from '@/components/live/closing-notice';
 import LiveCaptions from '@/components/live/live-captions';
+import { impostaPulsante } from '@/lib/jitsi/custom-buttons';
+import { FULLSCREEN_BUTTON_ID, fullscreenToolbarButton } from '@/lib/jitsi/fullscreen-button';
 import StageName from '@/components/live/stage-name';
+import ListenOnlyNotice from '@/components/live/listen-only-notice';
+import ConsentsDialog, { type ConsensiInSala } from '@/components/live/consents-dialog';
+import { regolaConsenso } from '@/lib/live/consent-rule';
 import ControlRoomPanel, { type FunzioneSala } from '@/components/live/control-room-panel';
 import { useCaptionsControl } from '@/hooks/use-captions-control';
 import { useRecordingControl, type ControlloRegistrazione } from '@/hooks/use-recording-control';
@@ -96,6 +101,8 @@ interface EventInfo {
   parseTitleKicker?: boolean;
   /** Resolved waiting-room engine (per-event override merged with site default). */
   waitingRoomEngine?: 'GARDEN' | 'GAME' | 'CLASSIC';
+  /** Pubblico anonimo: chi partecipa compare con uno pseudonimo. */
+  audienceAnonymous?: boolean;
   /** Resolved video/audio quality preset (per-event override merged with site default). */
   videoQuality?: VideoQualityPreset;
   startsAt: string;
@@ -142,6 +149,8 @@ interface EventInfo {
   feedbackEnabled?: boolean;
   /** Testo di consenso alla registrazione scelto per l'evento; null = quello predefinito. */
   recordingConsentText?: string | null;
+  /** Chi non acconsente alla registrazione entra in solo ascolto. */
+  listenOnlyWithoutConsent?: boolean;
   /** L'informativa privacy dell'evento (lib/events/privacy-notice), accanto
    *  al consenso chiesto in sala d'attesa. */
   privacy?: { url: string; testo?: string };
@@ -194,6 +203,9 @@ interface LiveEventClientProps {
   /** L'iscrizione risulta entrata in sala (Registration.joinedAt): la
    *  valutazione si propone anche senza il token della sala di questa pagina. */
   registrationJoined?: boolean;
+  /** Chi apre il proprio link d'iscrizione dal browser con cui si e' iscritto:
+   *  in sala compare con il nome dell'iscrizione. */
+  registrantOwnsLink?: boolean;
   displayName: string;
   locale: string;
   jitsiDomain: string;
@@ -293,7 +305,12 @@ interface JitsiCredentials {
   role: string;
   /** Le prove di consenso che il server ha salvato per questo posto. */
   consentsRecorded?: { recording: boolean; multitrack: boolean };
+  /** In solo ascolto: senza consenso alla registrazione (lib/live/listen-only). */
+  listenOnly?: boolean;
 }
+
+/** La notifica di Jitsi «Il moderatore ti chiede di intervenire» (il suo uid). */
+const NOTIFICA_PAROLA_DATA = 'asked-to-unmute';
 
 export default function LiveEventClient({
   event,
@@ -305,6 +322,7 @@ export default function LiveEventClient({
   hasMultitrackConsent = false,
   hasRecordingConsent = false,
   registrationJoined = false,
+  registrantOwnsLink = false,
   displayName: initialDisplayName,
   locale,
   jitsiDomain,
@@ -496,20 +514,56 @@ export default function LiveEventClient({
     registrazione: false,
     tracce: false,
   });
+  // I consensi ritirati dalla sala in questa visita (finestra «I tuoi
+  // consensi»): quelli che la pagina aveva trovato dati non valgono piu'.
+  const [ritirati, setRitirati] = useState<ProveConsenso>({ registrazione: false, tracce: false });
+  const haConsensoRegistrazione =
+    (hasRecordingConsent && !ritirati.registrazione) || consensiRegistrati.registrazione;
+  const haConsensoTracce = (hasMultitrackConsent && !ritirati.tracce) || consensiRegistrati.tracce;
+  // I token della sala consegnati in questa visita: provano i posti di chi
+  // ritira un consenso (lib/live/consent-withdrawal). Gli ultimi cinquanta:
+  // un ospite con la rete instabile ne riceve uno nuovo, con un posto nuovo,
+  // a ogni rientro.
+  const tokenSalaRef = useRef<string[]>([]);
   // La registrazione dell'evento, per chi entra dalla sala d'attesa: se
   // chiederne il consenso, o se basta informare.
-  const consensoRegistrazione = consensoRegistrazioneIngresso({
+  const argomentiRegistrazione = {
     formato: {
       recordingEnabled: event.recordingEnabled,
       multitrackRecordingEnabled: event.multitrackRecordingEnabled ?? false,
       participantsCanUnmute: event.participantsCanUnmute,
       participantsCanStartVideo: event.participantsCanStartVideo,
       participantsCanShareScreen: event.participantsCanShareScreen,
+      listenOnlyWithoutConsent: event.listenOnlyWithoutConsent ?? false,
     },
     registrazioneDisponibile: recordingAvailable,
     conduce: isModerator || isSpeaker,
-    giaDato: hasRecordingConsent || consensiRegistrati.registrazione,
+    istantanea: event.eventType === 'INSTANT',
+  };
+  const consensoRegistrazione = consensoRegistrazioneIngresso({
+    ...argomentiRegistrazione,
+    giaDato: haConsensoRegistrazione,
   });
+  // L'evento chiede a questa persona il consenso alla registrazione (dato o
+  // no): la finestra «I tuoi consensi» lo mostra.
+  const registrazioneChiesta = consensoRegistrazioneIngresso({
+    ...argomentiRegistrazione,
+    giaDato: false,
+  }).richiesto;
+  // L'evento ha il solo ascolto per chi non acconsente (la stessa regola del
+  // server, lib/live/listen-only): i blocchi della sala restano accesi.
+  const salaSoloAscolto = regolaConsenso(
+    {
+      eventType: event.eventType,
+      recordingEnabled: event.recordingEnabled,
+      multitrackRecordingEnabled: event.multitrackRecordingEnabled ?? false,
+      participantsCanUnmute: event.participantsCanUnmute,
+      participantsCanStartVideo: event.participantsCanStartVideo,
+      participantsCanShareScreen: event.participantsCanShareScreen,
+      listenOnlyWithoutConsent: event.listenOnlyWithoutConsent ?? false,
+    },
+    recordingAvailable,
+  ).soloAscolto;
   const [joinPrefs, setJoinPrefs] = useState<WaitingRoomJoinPrefs>({
     cameraOn: false,
     micOn: false,
@@ -665,7 +719,12 @@ export default function LiveEventClient({
   // portale, la schermata giusta è già impostata). In un rientro anche un
   // portale momentaneamente in difficoltà (5xx, troppe richieste) vale
   // 'rete': si riprova da soli invece di mostrare un errore.
-  const richiediCredenziali = useCallback(async (rientro = false): Promise<'fatto' | 'rete' | 'gestito'> => {
+  const richiediCredenziali = useCallback(async (
+    rientro = false,
+    // Il consenso dato dalla sala: un rifiuto qualunque resta un messaggio
+    // nella fascia, non chiude la conferenza in cui si e' gia'.
+    senzaUscire = false,
+  ): Promise<'fatto' | 'rete' | 'gestito'> => {
     const body: Record<string, string | boolean> = {};
     if (isGuest || !token) {
       // Ospite senza link personale, a evento pubblico (o con la password
@@ -686,14 +745,24 @@ export default function LiveEventClient({
       }
     } else {
       body.accessToken = token;
-      if (chosenName && chosenName !== initialDisplayName) {
-        body.displayNameOverride = chosenName;
+      // Sempre il nome scritto: per chi apre il proprio link la rotta usa
+      // quello dell'iscrizione e lo ignora; se non lo riconosce come suo (il
+      // cookie scaduto nel frattempo) e' il nome con cui entra.
+      if (chosenName.trim()) {
+        body.displayNameOverride = chosenName.trim();
       }
     }
     // I consensi dati in sala d'attesa (alla registrazione dell'evento, alla
     // traccia per partecipante): il server ne conserva la prova insieme al
     // posto nella conferenza, uno nuovo a ogni ingresso.
-    const prove = consensiDaInviare(joinPrefs, consensiRegistrati);
+    // Chi conduce e l'ha gia' dato (la pagina l'ha trovato sul suo account):
+    // lo porta con ogni ingresso, come quelli dati in questa visita.
+    const prove = consensiDaInviare(joinPrefs, {
+      ...consensiRegistrati,
+      registrazione:
+        consensiRegistrati.registrazione ||
+        ((isModerator || isSpeaker) && hasRecordingConsent && !ritirati.registrazione),
+    });
     if (prove.registrazione) body.recordingConsent = true;
     if (prove.tracce) body.multitrackConsent = true;
     if (prove.registrazione || prove.tracce) body.locale = locale;
@@ -708,6 +777,7 @@ export default function LiveEventClient({
     if (!res) return 'rete';
 
     if (rientro && (res.status >= 500 || res.status === 429)) return 'rete';
+    if (senzaUscire && !res.ok) return 'rete';
     if (!res.ok) {
       const errore = (res.data ?? {}) as { code?: string };
       // Il cookie della password e' scaduto mentre si era in sala: la
@@ -738,6 +808,15 @@ export default function LiveEventClient({
           setPhase('waiting');
           return 'gestito';
         }
+      }
+      // Il server vuole il consenso alla registrazione che la sala non ha
+      // mandato: si torna in sala d'attesa, dove c'e' la casella.
+      if (errore.code === 'RECORDING_CONSENT_REQUIRED') {
+        setPhase('waiting');
+        // Le regole dell'evento possono essere cambiate da quando la pagina
+        // e' stata aperta: si rileggono, e la sala d'attesa mostra la casella.
+        router.refresh();
+        return 'gestito';
       }
       // L'amministrazione ha chiuso l'ingresso da ospite mentre si era in
       // sala d'attesa: il testo del server non e' tradotto, e «Riprova»
@@ -770,6 +849,7 @@ export default function LiveEventClient({
         tracce: c.tracce || salvati.multitrack,
       }));
     }
+    tokenSalaRef.current = [...tokenSalaRef.current.filter((j) => j !== data.jwt), data.jwt].slice(-50);
     setCredentials(data);
     return 'fatto';
   }, [
@@ -779,13 +859,14 @@ export default function LiveEventClient({
     isGuest,
     token,
     chosenName,
-    initialDisplayName,
     router,
     t,
     tApi,
     markEnded,
     joinPrefs,
     consensiRegistrati,
+    hasRecordingConsent,
+    ritirati.registrazione,
     locale,
   ]);
 
@@ -827,6 +908,141 @@ export default function LiveEventClient({
   // ancora, e con microfono e videocamera come li aveva la persona
   // (hooks/use-rientro, lib/jitsi/riconnessione).
   const richiediTokenRientro = useCallback(() => richiediCredenziali(true), [richiediCredenziali]);
+
+  // Solo ascolto: senza consenso alla registrazione. Acconsentire dalla sala
+  // chiede un token nuovo con il consenso; la conferenza rientra con quello
+  // (JitsiRoom si ricollega quando cambia il token).
+  const soloAscolto = !!credentials?.listenOnly;
+  // Chi e' in solo ascolto dice al server quale riquadro e' il suo, con il
+  // token della sala che lo dice: chi modera lo vede nella scheda Partecipanti
+  // e non gli offre una parola che il bridge non apre (api/events/listen-only).
+  // Un nuovo ingresso ha un endpoint nuovo, e lo dichiara di nuovo.
+  useEffect(() => {
+    const jwt = credentials?.jwt;
+    if (!localEndpointId || !soloAscolto || !jwt) return;
+    let annullato = false;
+    const dichiara = async (tentativo: number) => {
+      try {
+        const res = await fetch(`/api/events/${event.slug}/listen-only`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ endpointId: localEndpointId, roomToken: jwt }),
+        });
+        // Rifiutata per il token o per il corpo: riprovare non cambia niente.
+        if (res.ok || res.status === 401 || res.status === 422) return;
+      } catch {
+        /* rete: si riprova qui sotto */
+      }
+      if (!annullato && tentativo < 3) setTimeout(() => void dichiara(tentativo + 1), 3000 * tentativo);
+    };
+    void dichiara(1);
+    return () => {
+      annullato = true;
+    };
+  }, [localEndpointId, soloAscolto, credentials?.jwt, event.slug]);
+  const [riconsenso, setRiconsenso] = useState<'no' | 'chiesto' | 'in-corso' | 'errore'>('no');
+  const acconsentiInSala = useCallback(() => {
+    setJoinPrefs((p) => ({ ...p, recordingConsent: true }));
+    setRiconsenso('chiesto');
+  }, []);
+  useEffect(() => {
+    if (riconsenso !== 'chiesto') return;
+    setRiconsenso('in-corso');
+    // Come un rientro: un errore passeggero (rete, 5xx, troppe richieste)
+    // resta un messaggio nella fascia, non chiude la conferenza in corso.
+    void richiediCredenziali(true, true).then((esito) => setRiconsenso(esito === 'fatto' ? 'no' : 'errore'));
+  }, [riconsenso, richiediCredenziali]);
+
+  // ── I tuoi consensi, dalla sala ──
+  // Dare e ritirare i consensi in qualunque momento (components/live/
+  // consents-dialog). Dare passa dalla stessa strada del solo ascolto: un
+  // token nuovo con il consenso. Ritirare lo dice al server, con i token della
+  // sala di questa visita come prova dei posti, e poi chiede un token nuovo
+  // senza: la conferenza si ricollega e il registratore smette di registrare
+  // la voce. Chi senza consenso alla registrazione non puo' restare (niente
+  // solo ascolto) torna in sala d'attesa, dove la casella lo aspetta.
+  const [consensiAperti, setConsensiAperti] = useState(false);
+  const [ritiro, setRitiro] = useState<'no' | 'in-corso' | 'errore'>('no');
+  const effettoRitiro = isModerator || isSpeaker ? 'conduce' : salaSoloAscolto ? 'soloAscolto' : 'uscita';
+  // Dopo un ritiro la conferenza deve ricollegarsi senza il consenso: finche'
+  // resta sul token di prima, microfono, videocamera e registratore per voce
+  // valgono ancora. Tre tentativi; se non riesce, si esce dalla conferenza e
+  // la sala d'attesa fa rientrare con le scelte nuove.
+  const [ricollegamento, setRicollegamento] = useState<'no' | 'chiesto' | 'in-corso'>('no');
+  useEffect(() => {
+    if (ricollegamento !== 'chiesto') return;
+    setRicollegamento('in-corso');
+    void (async () => {
+      for (const attesa of [0, 1500, 4000]) {
+        if (attesa) await new Promise((r) => setTimeout(r, attesa));
+        if ((await richiediCredenziali(true, true)) === 'fatto') {
+          setRicollegamento('no');
+          return;
+        }
+      }
+      setRicollegamento('no');
+      setConsensiAperti(false);
+      setPhase('waiting');
+    })();
+  }, [ricollegamento, richiediCredenziali]);
+  const acconsentiInSalaDaFinestra = useCallback(() => {
+    setRitiro('no');
+    acconsentiInSala();
+  }, [acconsentiInSala]);
+  const acconsentiTrascrizioneInSala = useCallback(() => {
+    setRitiro('no');
+    setJoinPrefs((p) => ({ ...p, multitrackConsent: true }));
+    setRiconsenso('chiesto');
+  }, []);
+  const ritiraInSala = useCallback(
+    async (registrazione: boolean) => {
+      setRiconsenso((r) => (r === 'errore' ? 'no' : r));
+      setRitiro('in-corso');
+      const res = await richiestaJson(`/api/events/${event.slug}/consents/withdraw`, {
+        method: 'POST',
+        body: JSON.stringify({ roomTokens: tokenSalaRef.current, recording: registrazione }),
+      });
+      if (!res || !res.ok) {
+        setRitiro('errore');
+        return;
+      }
+      setRitirati((r) => ({ registrazione: r.registrazione || registrazione, tracce: true }));
+      setConsensiRegistrati((c) => ({
+        registrazione: registrazione ? false : c.registrazione,
+        tracce: false,
+      }));
+      setJoinPrefs((p) => ({
+        ...p,
+        multitrackConsent: false,
+        ...(registrazione ? { recordingConsent: false } : {}),
+      }));
+      setRitiro('no');
+      if (registrazione && effettoRitiro === 'uscita') {
+        setConsensiAperti(false);
+        setPhase('waiting');
+        return;
+      }
+      setRicollegamento('chiesto');
+    },
+    [event.slug, effettoRitiro],
+  );
+  const trascrizioneInSala =
+    (!!event.multitrackRecordingEnabled || !!event.captionsTranscript) && eventStatus !== 'ENDED';
+  const registrazioneData = haConsensoRegistrazione && !soloAscolto;
+  const consensiInSala: ConsensiInSala = {
+    ...(registrazioneChiesta
+      ? { registrazione: { dato: registrazioneData, ritiro: effettoRitiro } }
+      : {}),
+    ...(trascrizioneInSala
+      ? {
+          trascrizione: {
+            dato: haConsensoTracce,
+            serveRegistrazione: registrazioneChiesta && !registrazioneData,
+          },
+        }
+      : {}),
+  };
+  const haConsensiInSala = !!consensiInSala.registrazione || !!consensiInSala.trascrizione;
   const rientroConcluso = useCallback(() => {
     markEnded();
     userHangupRef.current = true;
@@ -1050,6 +1266,22 @@ export default function LiveEventClient({
     };
     tryStart();
   }, []);
+
+  // Chi entra ammesso dal token (chi ha dato il consenso in un evento con il
+  // solo ascolto, chi interviene con i microfoni bloccati) riceve da Jitsi
+  // l'«ammesso» appena entra, e Jitsi lo mostra come «Il moderatore ti chiede
+  // di intervenire», anche se nessuno gliel'ha chiesto. Nei primi secondi di
+  // ogni ingresso quella notifica si chiude; la parola data davvero da chi
+  // conduce (askToUnmute, components/participants) arriva dopo e resta.
+  useEffect(() => {
+    if (!jitsiApi || isModerator || ingressi === 0) return;
+    // L'«ammesso» arriva subito dopo l'ingresso: un controllo ogni quarto di
+    // secondo nei primi tre, poi due piu' radi per un messaggio in ritardo.
+    const timer = [...Array.from({ length: 12 }, (_, i) => 250 * (i + 1)), 4500, 6500].map((ms) =>
+      setTimeout(() => jitsiApi.executeCommand('hideNotification', NOTIFICA_PAROLA_DATA), ms),
+    );
+    return () => timer.forEach(clearTimeout);
+  }, [jitsiApi, isModerator, ingressi]);
 
   const autoOrPromptRecording = useCallback(
     (api: JitsiMeetExternalAPI | null) => {
@@ -1448,21 +1680,77 @@ export default function LiveEventClient({
   // Jitsi iframe AND the chat sidebar are in the fullscreen subtree. Optional
   // chaining makes it a safe no-op where Element.requestFullscreen is missing
   // (e.g. iPhone Safari).
+  // Se il browser rifiuta la richiesta (il clic e' arrivato dalla barra di
+  // Jitsi, in un'altra cornice, e non vale come gesto per questa pagina) si
+  // chiede una conferma con un pulsante della pagina: quel clic vale.
+  const [confermaSchermoIntero, setConfermaSchermoIntero] = useState(false);
   const toggleFullscreen = useCallback(() => {
     const root = liveRootRef.current;
     if (!root) return;
     if (document.fullscreenElement) {
-      document.exitFullscreen?.();
-    } else {
-      root.requestFullscreen?.();
+      void document.exitFullscreen?.().catch(() => {});
+      return;
+    }
+    const richiesta = root.requestFullscreen?.();
+    if (richiesta) {
+      richiesta.then(
+        () => setConfermaSchermoIntero(false),
+        () => setConfermaSchermoIntero(true),
+      );
     }
   }, []);
+  useEffect(() => {
+    if (!confermaSchermoIntero) return;
+    const t = window.setTimeout(() => setConfermaSchermoIntero(false), 8000);
+    return () => window.clearTimeout(t);
+  }, [confermaSchermoIntero]);
 
   useEffect(() => {
     const onFsChange = () => setIsFullscreen(document.fullscreenElement != null);
     document.addEventListener('fullscreenchange', onFsChange);
     return () => document.removeEventListener('fullscreenchange', onFsChange);
   }, []);
+
+  // Lo schermo intero sta nella barra dei comandi di Jitsi, accanto agli
+  // altri, dove lo si cerca. Solo dove il browser lo consente (non su iPhone).
+  const tFs = useTranslations('live');
+  const fsEntra = tFs('enterFullscreen');
+  const fsEsci = tFs('exitFullscreen');
+  useEffect(() => {
+    if (!jitsiApi || !document.fullscreenEnabled) return;
+    impostaPulsante(
+      jitsiApi,
+      FULLSCREEN_BUTTON_ID,
+      fullscreenToolbarButton(isFullscreen, { enter: fsEntra, exit: fsEsci }),
+    );
+  }, [jitsiApi, isFullscreen, fsEntra, fsEsci]);
+  useEffect(() => {
+    if (!jitsiApi) return;
+    // Il clic nella conferenza attiva anche questa pagina (attivazione
+    // dell'utente propagata alle cornici che la contengono): la richiesta di
+    // schermo intero e' ammessa.
+    const onClick = (e: { key: string }) => {
+      if (e?.key === FULLSCREEN_BUTTON_ID) toggleFullscreen();
+    };
+    jitsiApi.addListener('toolbarButtonClicked', onClick);
+    return () => jitsiApi.removeListener('toolbarButtonClicked', onClick);
+  }, [jitsiApi, toggleFullscreen]);
+
+  // Solo il contenuto: la colonna laterale (chat, partecipanti, pannelli)
+  // si chiude del tutto, e il video prende la larghezza. La si riapre dalla
+  // barra in alto. Vale per la pagina aperta, non si ricorda.
+  const [soloContenuto, setSoloContenuto] = useState(false);
+  const mostraColonna = useCallback(() => setSoloContenuto(false), []);
+  // Chiusa dalla sua «×», che sparisce con lei: il fuoco va al pulsante che la
+  // riapre, nella barra in alto, non torna all'inizio della pagina.
+  const nascondiColonna = useCallback(() => {
+    setSoloContenuto(true);
+    requestAnimationFrame(() =>
+      document.querySelector<HTMLButtonElement>('[data-solo-contenuto]')?.focus(),
+    );
+  }, []);
+  // Dove i sottotitoli si spostano quando chi guarda li vuole in alto.
+  const [sottotitoliAlto, setSottotitoliAlto] = useState<HTMLDivElement | null>(null);
 
   // Reactstrap portals every Modal into <body> by default. Once the app owns
   // fullscreen on the live wrapper, <body> is OUTSIDE the fullscreen
@@ -1518,8 +1806,12 @@ export default function LiveEventClient({
   // Sottotitoli live (ADR-018): il flag dell'evento, che chi modera cambia
   // dal vivo, arriva con gli altri flag della sala (canale push o polling,
   // stessa voce della barra laterale). Chi modera li accende nella stanza.
-  const { data: flagsSala } = useSWR<{ liveCaptionsEnabled?: boolean }>(
-    event.liveCaptionsAvailable ? `/api/events/${event.slug}/flags` : null,
+  // Gli stessi flag dicono alla sala d'attesa se la chat e' ancora accesa:
+  // la si legge finche' la sala puo' mostrarla (in diretta o in preparazione).
+  const flagsServono =
+    !!event.liveCaptionsAvailable || ['LIVE', 'PROVISIONING', 'IDLE'].includes(eventStatus);
+  const { data: flagsSala } = useSWR<{ liveCaptionsEnabled?: boolean; chatEnabled?: boolean }>(
+    flagsServono ? `/api/events/${event.slug}/flags` : null,
     (url: string) => fetch(url).then((r) => r.json()),
     { refreshInterval: pushLive ? 0 : 15000 },
   );
@@ -1660,6 +1952,7 @@ export default function LiveEventClient({
             slug: event.slug,
             parseTitleKicker: event.parseTitleKicker,
             waitingRoomEngine: event.waitingRoomEngine,
+            audienceAnonymous: event.audienceAnonymous ?? false,
             startsAt: event.startsAt,
             endsAt: event.endsAt,
             status: eventStatus as
@@ -1681,7 +1974,8 @@ export default function LiveEventClient({
             recordingUrl: event.recordingUrl,
             waitingRoomAudioUrl: event.waitingRoomAudioUrl,
             feedbackEnabled: event.feedbackEnabled,
-            chatEnabled: event.chatEnabled,
+            // Il valore corrente: chi modera puo' spegnerla dal vivo.
+            chatEnabled: flagsSala?.chatEnabled ?? event.chatEnabled,
             qaEnabled: event.qaEnabled,
             timezone: event.timezone,
             aiPostprodEnabled: event.aiPostprodEnabled,
@@ -1694,6 +1988,7 @@ export default function LiveEventClient({
           presenze={presenze}
           role={isModerator ? 'moderator' : isGuest ? 'guest' : 'participant'}
           conduce={conduceOInterviene}
+          conduceDaIncarico={isModerator || isSpeaker}
           // Gli stessi permessi che la sala dà a JitsiRoom.
           mediaConcessi={{
             microfono: isModerator || isSpeaker || event.participantsCanUnmute,
@@ -1714,6 +2009,9 @@ export default function LiveEventClient({
           chatToken={token}
           eventType={event.eventType === 'INSTANT' ? 'INSTANT' : 'SCHEDULED'}
           defaultName={chosenName || initialDisplayName}
+          // Chi apre il proprio link d'iscrizione entra con il nome dato
+          // all'iscrizione.
+          nomeDellIscrizione={registrantOwnsLink && !isGuest && !isModerator && !isSpeaker}
           onEnterLive={handleEnterFromWaiting}
           onStartEvent={isModerator ? handleStartEvent : undefined}
           onLeaveFeedback={askFeedback ? () => setShowFeedback(true) : undefined}
@@ -1721,8 +2019,9 @@ export default function LiveEventClient({
           // chi conduce e a chi interviene: e' facoltativa, e decide se la loro
           // voce si registra e si trascrive. Non la si richiede a chi l'ha gia'
           // data (all'iscrizione, o in sala in questa visita della pagina).
-          multitrackConsentExempt={hasMultitrackConsent || consensiRegistrati.tracce}
+          multitrackConsentExempt={haConsensoTracce}
           recordingConsentRequired={consensoRegistrazione.richiesto}
+          recordingConsentOptional={consensoRegistrazione.facoltativo}
           recordingListenOnly={consensoRegistrazione.soloAscolto}
           recordingConsentText={event.recordingConsentText}
           privacy={event.privacy}
@@ -1946,9 +2245,20 @@ export default function LiveEventClient({
         locale={locale}
         moderatorToken={isActualModerator ? token : undefined}
         onLeaveRoom={handleLeaveRoom}
-        isFullscreen={isFullscreen}
-        onToggleFullscreen={toggleFullscreen}
+        soloContenuto={soloContenuto}
+        onToggleSoloContenuto={() => setSoloContenuto((v) => !v)}
+        onApriConsensi={haConsensiInSala ? () => setConsensiAperti(true) : undefined}
       />
+
+      {/* Chi e' in solo ascolto lo vede, con il modo di acconsentire e
+          intervenire. */}
+      {soloAscolto && !showJvbOverlay && (
+        <ListenOnlyNotice
+          onAcconsenti={acconsentiInSala}
+          inCorso={riconsenso === 'in-corso'}
+          errore={riconsenso === 'errore'}
+        />
+      )}
 
       {/* L'orologio dell'evento per chi conduce e per chi interviene; per
           chi interviene senza i comandi di timer e registrazione. */}
@@ -2095,12 +2405,16 @@ export default function LiveEventClient({
                 // I relatori hanno AV pieno (ADR 3): i limiti dei partecipanti non
                 // valgono per loro, anche se in sala non moderano.
                 role={isActualModerator ? 'moderator' : 'participant'}
-                participantsCanUnmute={event.participantsCanUnmute || isSpeaker}
-                participantsCanStartVideo={event.participantsCanStartVideo || isSpeaker}
-                participantsCanShareScreen={event.participantsCanShareScreen || isSpeaker}
+                // In solo ascolto niente microfono, videocamera ne' schermo:
+                // il bridge li tiene chiusi comunque, la barra non li offre.
+                participantsCanUnmute={!soloAscolto && (event.participantsCanUnmute || isSpeaker)}
+                participantsCanStartVideo={!soloAscolto && (event.participantsCanStartVideo || isSpeaker)}
+                participantsCanShareScreen={!soloAscolto && (event.participantsCanShareScreen || isSpeaker)}
                 enableFileSharing={isInstantCall}
                 whiteboardEnabled={whiteboardOn}
                 whiteboardInfraReady={whiteboardInfraReady}
+                // Chi interviene resta con il nome e la griglia, come chi conduce.
+                pubblicoAnonimo={(event.audienceAnonymous ?? false) && !isSpeaker}
                 videoQuality={event.videoQuality}
                 reactionsMode={reactionsMode}
                 liveCaptions={Boolean(event.liveCaptionsAvailable)}
@@ -2125,8 +2439,23 @@ export default function LiveEventClient({
                 subito e solo nascosta sotto l'avviso di avvio del bridge:
                 deve ascoltare la sala già dall'ingresso, che è l'evento che
                 fa sparire quell'avviso. */}
+            <div className="live-stage-top" hidden={showJvbOverlay} ref={setSottotitoliAlto} />
+            {confermaSchermoIntero && (
+              <div className="live-fs-conferma">
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  onClick={() => {
+                    setConfermaSchermoIntero(false);
+                    toggleFullscreen();
+                  }}
+                >
+                  {tFs('confirmFullscreen')}
+                </button>
+              </div>
+            )}
             <div className="live-stage-bottom" hidden={showJvbOverlay}>
-              <LiveCaptions api={jitsiApi} active={sottotitoliAccesi} />
+              <LiveCaptions api={jitsiApi} active={sottotitoliAccesi} alto={sottotitoliAlto} />
               <StageName api={jitsiApi} />
             </div>
             {/* Custom reactions bar only in CUSTOM mode; NATIVE mode uses
@@ -2143,6 +2472,12 @@ export default function LiveEventClient({
         </div>
 
         <LiveSidebar
+          salaSoloAscolto={salaSoloAscolto}
+          guestKeyName={isGuest || !token ? chosenName.trim() : undefined}
+          pubblicoAnonimo={event.audienceAnonymous ?? false}
+          nascosta={soloContenuto}
+          onNascondi={nascondiColonna}
+          onMostra={mostraColonna}
           eventSlug={event.slug}
           eventId={event.id}
           token={token}
@@ -2176,6 +2511,26 @@ export default function LiveEventClient({
           }
         />
       </div>
+
+      {/* I consensi della persona per l'evento: darli e ritirarli. */}
+      {haConsensiInSala && (
+        <ConsentsDialog
+          aperta={consensiAperti}
+          onChiudi={() => setConsensiAperti(false)}
+          consensi={consensiInSala}
+          onAcconsentiRegistrazione={acconsentiInSalaDaFinestra}
+          onAcconsentiTrascrizione={acconsentiTrascrizioneInSala}
+          onRitira={(registrazione) => void ritiraInSala(registrazione)}
+          inCorso={
+            riconsenso === 'in-corso' ||
+            riconsenso === 'chiesto' ||
+            ritiro === 'in-corso' ||
+            ricollegamento !== 'no'
+          }
+          errore={riconsenso === 'errore' || ritiro === 'errore'}
+          container={modalContainer}
+        />
+      )}
 
       {/* Moderator leave prompt: leave for yourself vs end for everyone. */}
       <Modal
@@ -2260,7 +2615,11 @@ export default function LiveEventClient({
               </label>
             ))}
           </div>
-          {event.recordingEnabled && event.aiPostprodEnabled && (
+          {/* Con la trascrizione dai sottotitoli e senza tracce per persona, il
+              video completo contiene anche le voci di chi ha detto no: non si
+              trascrive da solo, e la casella prometterebbe cio' che non accade. */}
+          {event.recordingEnabled && event.aiPostprodEnabled &&
+            !(event.captionsTranscript && !event.multitrackRecordingEnabled) && (
             <label
               className="d-flex align-items-center gap-2 mt-3"
               style={{ cursor: 'pointer', fontSize: '0.88rem' }}
@@ -2323,6 +2682,19 @@ type SidebarTab =
   | 'participants';
 
 interface LiveSidebarProps {
+  /** Evento con il solo ascolto per chi non acconsente (lib/live/listen-only). */
+  salaSoloAscolto?: boolean;
+  /** L'ospite: il nome scritto in sala d'attesa, chiave del suo posto in chat
+   *  e nelle domande (il nome mostrato puo' essere uno pseudonimo). */
+  guestKeyName?: string;
+  /** Pubblico anonimo: l'elenco dei partecipanti solo per chi conduce. */
+  pubblicoAnonimo?: boolean;
+  /** Solo il contenuto: la colonna e' chiusa del tutto (desktop). */
+  nascosta?: boolean;
+  /** La «×» della colonna: chiude tutto, si riapre dalla barra in alto. */
+  onNascondi?: () => void;
+  /** Riapre la colonna chiusa: ogni richiesta di una scheda la riporta. */
+  onMostra?: () => void;
   eventSlug: string;
   /** Persone nella chiamata adesso, dallo stesso conteggio che la sala riceve
    *  da Jitsi: il pannello dei partecipanti lo aggiorna solo quando e' aperto. */
@@ -2376,6 +2748,12 @@ interface LiveSidebarProps {
 }
 
 function LiveSidebar({
+  salaSoloAscolto = false,
+  guestKeyName,
+  pubblicoAnonimo = false,
+  nascosta = false,
+  onNascondi,
+  onMostra,
   eventSlug,
   roomCount,
   eventId,
@@ -2553,6 +2931,7 @@ function LiveSidebar({
     } catch { /* vale finche' resta aperta la pagina */ }
   }, []);
   const compressa = isDesktop && collapsed;
+  const chiusa = isDesktop && nascosta;
   const salvaLarghezza = useCallback((w: number | null) => {
     try {
       if (w === null) window.localStorage.removeItem(SIDEBAR_WIDTH_KEY);
@@ -2608,17 +2987,20 @@ function LiveSidebar({
     mq.addEventListener('change', aggiorna);
     return () => mq.removeEventListener('change', aggiorna);
   }, []);
-  const onScreen = (key: SidebarTab) => activeTab === key && (isDesktop ? !compressa : drawerOpen);
+  const onScreen = (key: SidebarTab) =>
+    activeTab === key && (isDesktop ? !compressa && !chiusa : drawerOpen);
   // Aprire una scheda vuol dire mostrarla: su desktop riapre la colonna
   // compressa, sul telefono apre il cassetto. Ogni via per aprire una scheda
   // passa da qui.
   const apriScheda = useCallback(
     (key: SidebarTab) => {
       setActiveTab(key);
-      if (isDesktop) impostaCompressa(false);
-      else setDrawerOpen(true);
+      if (isDesktop) {
+        impostaCompressa(false);
+        onMostra?.();
+      } else setDrawerOpen(true);
     },
-    [isDesktop, impostaCompressa],
+    [isDesktop, impostaCompressa, onMostra],
   );
   // Una scheda chiesta da fuori (la striscia del tempo apre la Regia).
   useEffect(() => {
@@ -2942,7 +3324,8 @@ function LiveSidebar({
       badge: isModerator && handsCount > 0 ? handsCount : presenti,
       badgeTone: isModerator && handsCount > 0 ? 'alert' : 'neutral',
       dotLabel: isModerator && handsCount > 0 ? tp('handsRaised', { count: handsCount }) : undefined,
-      show: true,
+      // Pubblico anonimo: l'elenco di chi partecipa resta a chi conduce.
+      show: isModerator || !pubblicoAnonimo,
     },
     // La Regia per chi conduce, in fondo e dopo i Partecipanti: è un'altra
     // cosa rispetto ai pannelli della sala, e lì non si confonde con loro.
@@ -3240,7 +3623,7 @@ function LiveSidebar({
       <div
         className={`d-flex flex-column live-sidebar${drawerOpen ? ' live-sidebar--open' : ''}${
           compressa ? ' live-sidebar--collapsed' : ''
-        }`}
+        }${chiusa ? ' live-sidebar--nascosta' : ''}`}
         style={
           isDesktop && !compressa && sidebarWidth !== null
             ? { width: sidebarWidth, flexBasis: sidebarWidth, maxWidth: 'none' }
@@ -3248,7 +3631,7 @@ function LiveSidebar({
         }
         // Sul telefono il cassetto chiuso esce dallo schermo ma resterebbe
         // raggiungibile con il tasto Tab: chiuso, è inerte.
-        inert={!isDesktop && !drawerOpen ? true : undefined}
+        inert={(!isDesktop && !drawerOpen) || chiusa ? true : undefined}
         ref={sidebarRef}
         tabIndex={-1}
       >
@@ -3268,6 +3651,19 @@ function LiveSidebar({
                   comprime, verso sinistra riapre. */}
               <polyline points="9 18 15 12 9 6" />
             </svg>
+          </button>
+        )}
+        {isDesktop && !compressa && onNascondi && (
+          // La «×»: chiude la colonna del tutto (resta solo il contenuto).
+          // Comprimerla a una striscia di icone resta la freccia accanto.
+          <button
+            type="button"
+            className="live-sidebar-close"
+            onClick={onNascondi}
+            aria-label={t('closeSidebar')}
+            title={t('closeSidebar')}
+          >
+            <Icon icon="it-close" size="sm" />
           </button>
         )}
         {isDesktop && !compressa && (
@@ -3414,7 +3810,7 @@ function LiveSidebar({
               eventSlug={eventSlug}
               token={token}
               isModerator={isModerator}
-              guestName={!token ? displayName : undefined}
+              guestName={!token ? guestKeyName || displayName : undefined}
               guestId={!token ? voterGuestId : undefined}
               voterAccessToken={voterAccessToken}
               voterGuestId={voterGuestId}
@@ -3438,6 +3834,7 @@ function LiveSidebar({
                 eventSlug={eventSlug}
                 token={token}
                 displayName={displayName}
+                guestName={guestKeyName}
                 isGuest={!token}
                 isModerator={isModerator}
                 active={isChatActive}
@@ -3508,6 +3905,7 @@ function LiveSidebar({
               visible={onScreen('participants')}
               eventSlug={eventSlug}
               token={token}
+              bloccoDaConsenso={salaSoloAscolto}
             />
           </div>
         </div>
@@ -3564,10 +3962,11 @@ interface LiveTopBarProps {
    *  Surfaced (collapsed, with a warning) in the share popup. */
   moderatorToken?: string;
   onLeaveRoom?: () => void;
-  /** App-owned fullscreen: current state + toggle. Passed only by the
-   *  live-phase top bar (the consent-pending one renders no video/sidebar). */
-  isFullscreen?: boolean;
-  onToggleFullscreen?: () => void;
+  /** Solo il contenuto: la colonna laterale chiusa del tutto. */
+  soloContenuto?: boolean;
+  onToggleSoloContenuto?: () => void;
+  /** I consensi della persona per l'evento, se l'evento ne chiede. */
+  onApriConsensi?: () => void;
 }
 
 function LiveTopBar({
@@ -3586,8 +3985,9 @@ function LiveTopBar({
   hasCallLink = true,
   moderatorToken,
   onLeaveRoom,
-  isFullscreen,
-  onToggleFullscreen,
+  soloContenuto = false,
+  onToggleSoloContenuto,
+  onApriConsensi,
 }: LiveTopBarProps) {
   const t = useTranslations('live');
   const tr = useTranslations('live.role');
@@ -3713,20 +4113,38 @@ function LiveTopBar({
             })}
           </span>
         )}
-        {onToggleFullscreen && (
+        {onToggleSoloContenuto && (
+          // Solo il contenuto (le slide, chi parla), senza chat e pannelli; lo
+          // stesso pulsante li riporta. Lo schermo intero sta nella barra dei
+          // comandi della conferenza.
           <Button
             color="light"
             outline
             size="xs"
-            className="d-none d-md-inline-flex align-items-center fullscreen-toggle-btn"
-            onClick={onToggleFullscreen}
-            aria-label={isFullscreen ? t('exitFullscreen') : t('enterFullscreen')}
-            title={isFullscreen ? t('exitFullscreen') : t('enterFullscreen')}
+            className="d-none d-lg-inline-flex align-items-center fullscreen-toggle-btn"
+            onClick={onToggleSoloContenuto}
+            data-solo-contenuto=""
+            aria-pressed={soloContenuto}
+            aria-label={t('contentOnly')}
+            title={soloContenuto ? t('showPanels') : t('contentOnly')}
           >
-            {/* it-expand/it-collapse are the ACCORDION chevrons in the Bootstrap
-                Italia sprite, so this icon-only button read as "open a panel".
-                it-fullscreen is the four-corners glyph people expect here. */}
-            <Icon icon={isFullscreen ? 'it-collapse' : 'it-fullscreen'} size="xs" color="white" />
+            <Icon icon={soloContenuto ? 'it-comment' : 'it-presentation'} size="xs" color="white" />
+          </Button>
+        )}
+        {onApriConsensi && (
+          // I consensi dati per l'evento, da rivedere, dare o ritirare.
+          <Button
+            color="light"
+            outline
+            size="xs"
+            className="d-inline-flex align-items-center gap-1 live-consents-btn"
+            onClick={onApriConsensi}
+            aria-haspopup="dialog"
+            aria-label={t('consents.open')}
+            title={t('consents.open')}
+          >
+            <Icon icon="it-locked" size="xs" color="white" />
+            <span className="d-none d-xl-inline">{t('consents.button')}</span>
           </Button>
         )}
         <LiveShareButton

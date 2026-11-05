@@ -17,6 +17,8 @@ import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { limiteDellaSala } from '@/lib/room-rate-limit';
 import { authorizePanelRead } from '@/lib/events/panel-read-access';
 import { getCached, setCache, deleteCacheByPrefix } from '@/lib/cache';
+import { pseudonimo } from '@/lib/live/pseudonym';
+import { guestSenderId } from '@/lib/chat/sender-key';
 
 export const dynamic = 'force-dynamic';
 
@@ -208,7 +210,10 @@ export const POST = withErrorHandling(async (request, context) => {
     });
     if (registration && registration.eventId === event.id) {
       registrationId = registration.id;
-      authorName = tryDecryptPII(registration.displayName) ?? registration.displayName;
+      // Pubblico anonimo: lo pseudonimo del posto, lo stesso di video e chat.
+      authorName = event.audienceAnonymous
+        ? await pseudonimo(event.id, `reg-${registration.id}`)
+        : (tryDecryptPII(registration.displayName) ?? registration.displayName);
     } else {
       // Un relatore ha un grant nominale, non una registrazione: cercarlo
       // solo fra gli iscritti gli faceva rifiutare la domanda con un errore
@@ -236,7 +241,9 @@ export const POST = withErrorHandling(async (request, context) => {
     if (name.length < 2) {
       throw new UnauthorizedError('guestName required for anonymous Q&A');
     }
-    authorName = name.slice(0, 80);
+    authorName = event.audienceAnonymous
+      ? await pseudonimo(event.id, guestSenderId(getClientIp(request), name))
+      : name.slice(0, 80);
   }
 
   const parsed = createQuestionSchema.safeParse(rest);

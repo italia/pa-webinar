@@ -40,11 +40,13 @@ export const POST = withErrorHandling(async (request) => {
     limit: 3,
     windowMs: 10 * 60_000,
   });
-  const perIndirizzo = rateLimit(`staff-link-mail:${emailHash}`, {
-    limit: 20,
-    windowMs: 60 * 60_000,
-  });
-  if (perCoppia.allowed && perIndirizzo.allowed) {
+  // Il limite largo conta solo le richieste che passano quello stretto:
+  // altrimenti una sola rete lo esaurirebbe, e tutte le altre resterebbero
+  // senza link.
+  const perIndirizzo = perCoppia.allowed
+    ? rateLimit(`staff-link-mail:${emailHash}`, { limit: 20, windowMs: 60 * 60_000 })
+    : null;
+  if (perIndirizzo?.allowed) {
     const locale = parsed.data.locale;
     // Dopo la risposta: cercare l'account, creare il token e accodare la
     // mail richiedono tempo solo quando l'account esiste, e quel tempo

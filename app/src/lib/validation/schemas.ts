@@ -8,6 +8,7 @@ import {
   EVENT_DESCRIPTION_REQUIRED_LOCALE,
 } from './event-description';
 import { MATERIAL_VISIBILITIES, materialUrlSchema } from './materials';
+import { parzialeSenzaDefault } from './parziale';
 import { MAX_RETENTION_DAYS } from './retention';
 
 // ── Event Schemas ────────────────────────────────────
@@ -55,7 +56,7 @@ export const eventBaseSchema = z.object({
   requireOrganizationRole: z.boolean().default(false),
   requireOrganizationType: z.boolean().default(false),
   dataRetentionDays: z.number().int().min(1).max(MAX_RETENTION_DAYS).default(30),
-  privacyPolicyUrl: z.string().url().optional(),
+  privacyPolicyUrl: materialUrlSchema.optional(),
   // Un testo vuoto non e' un'informativa: vale "nessun testo dell'evento", e
   // all'iscrizione si mostra quella del template GDPR scelto.
   privacyPolicyText: z
@@ -63,7 +64,7 @@ export const eventBaseSchema = z.object({
     .max(10000)
     .optional()
     .transform((v) => (v === undefined ? undefined : v.trim() ? v : null)),
-  gdprTemplateId: z.string().uuid().nullable().optional(),
+  gdprTemplateId: z.guid().nullable().optional(),
   /** Cleartext join password. Server hashes and stores in `join_password_hash`.
    *  Empty string clears the password (sets the column back to NULL). */
   joinPassword: z.string().max(200).optional(),
@@ -86,7 +87,7 @@ export const eventBaseSchema = z.object({
   moderatorPublicListed: z.boolean().optional(),
   // La sua foto (EventPersonPhoto): un id che non si può usare si lascia
   // cadere (lib/events/person-photo-store, usablePersonPhotoId).
-  moderatorPhotoId: z.string().uuid().nullable().optional(),
+  moderatorPhotoId: z.guid().nullable().optional(),
   speakersInfo: localizedStringField.optional(),
   organizerName: z.string().max(200).optional(),
   imageUrl: z.string().url().optional(),
@@ -110,10 +111,15 @@ export const eventBaseSchema = z.object({
   /** La spiegazione sopra la casella del consenso alla registrazione in sala
    *  d'attesa, al posto di quella predefinita. */
   recordingConsentText: z.string().max(5000).optional(),
+  // Chi non acconsente alla registrazione entra in solo ascolto: acceso per
+  // gli eventi nuovi (il consenso e' libero, art. 7.4 GDPR).
+  listenOnlyWithoutConsent: z.boolean().default(true),
+  // Pubblico anonimo: pseudonimi per chi partecipa (spento: ci si conosce).
+  audienceAnonymous: z.boolean().default(false),
 
   // Recurrence (RFC 5545 RRULE). Null = one-off.
   recurrenceRule: z.string().max(500).nullable().optional(),
-  recurrenceSeriesId: z.string().uuid().nullable().optional(),
+  recurrenceSeriesId: z.guid().nullable().optional(),
 
   // Per-feature role allowlist. See `lib/utils/permission-matrix.ts`.
   // Accepting `any` here because Zod's record typings don't easily
@@ -184,7 +190,7 @@ export const createEventSchema = eventBaseSchema.refine(
   { message: 'endsAt must be after startsAt', path: ['endsAt'] },
 );
 
-export const updateEventSchema = eventBaseSchema.partial().extend({
+export const updateEventSchema = parzialeSenzaDefault(eventBaseSchema).extend({
   status: z
     .enum(['DRAFT', 'PUBLISHED', 'LIVE', 'ENDED'])
     .optional(),
@@ -193,10 +199,10 @@ export const updateEventSchema = eventBaseSchema.partial().extend({
   // Chi vede la registrazione pubblicata: tutti o i soli iscritti (lib/recording/audience).
   recordingAudience: z.enum(['PUBLIC', 'REGISTRANTS']).optional(),
   // In modifica null toglie il documento dell'informativa dell'evento.
-  privacyPolicyUrl: z.string().url().nullable().optional(),
+  privacyPolicyUrl: materialUrlSchema.nullable().optional(),
   recordingDeleteAfterDays: z.number().int().min(1).max(365).nullable().optional(),
-  recordingUrl: z.string().url().nullable().optional(),
-  tempRecordingUrl: z.string().url().nullable().optional(),
+  recordingUrl: materialUrlSchema.nullable().optional(),
+  tempRecordingUrl: materialUrlSchema.nullable().optional(),
   recordingFileSize: z.number().int().nullable().optional(),
   recordingDuration: z.number().int().nullable().optional(),
 }).refine(
@@ -226,7 +232,7 @@ export const createGdprTemplateSchema = z.object({
   isDefault: z.boolean().optional().default(false),
 });
 
-export const updateGdprTemplateSchema = createGdprTemplateSchema.partial();
+export const updateGdprTemplateSchema = parzialeSenzaDefault(createGdprTemplateSchema);
 
 export type CreateGdprTemplateInput = z.infer<typeof createGdprTemplateSchema>;
 export type UpdateGdprTemplateInput = z.infer<typeof updateGdprTemplateSchema>;
@@ -251,7 +257,7 @@ export const createLegacyEventSchema = z.object({
   description: localizedStringField.optional().default({ it: '' }),
   startsAt: z.string().datetime(),
   endsAt: z.string().datetime(),
-  recordingUrl: z.string().url(),
+  recordingUrl: materialUrlSchema,
   recordingFileSize: z.number().int().positive().optional(),
   recordingDuration: z.number().int().positive().optional(),
   youtubeUrl: z
@@ -267,6 +273,9 @@ export const createLegacyEventSchema = z.object({
   speakersInfo: localizedStringField.optional(),
   organizerName: z.string().max(200).optional(),
   libraryListed: z.boolean().optional().default(true),
+}).refine((d) => new Date(d.endsAt) > new Date(d.startsAt), {
+  message: 'endsAt must be after startsAt',
+  path: ['endsAt'],
 });
 export type CreateLegacyEventInput = z.infer<typeof createLegacyEventSchema>;
 
@@ -298,7 +307,7 @@ export const ORGANIZATION_TYPES = [
 // know item types at parse time; the service layer validates each
 // answer against its item).
 export const questionnaireAnswerInputSchema = z.object({
-  itemId: z.string().uuid(),
+  itemId: z.guid(),
   valueText: z.string().max(2000).nullable().optional(),
   valueChoices: z.array(z.number().int().min(0).max(50)).max(12).nullable().optional(),
   valueScale: z.number().int().min(0).max(11).nullable().optional(),
@@ -316,9 +325,7 @@ export const createRegistrationSchema = z.object({
   organizationRole: z.string().max(200).optional(),
   organizationType: z.enum(ORGANIZATION_TYPES).optional(),
   consentGiven: z
-    .literal(true, {
-      errorMap: () => ({ message: 'registration.errors.consentRequired' }),
-    }),
+    .literal(true, { error: 'registration.errors.consentRequired' }),
   consentRecording: z.boolean().optional(),
   // ADR-013 Fase 5 — consenso separato alla registrazione per-partecipante.
   // Facoltativo: chi non lo da' si iscrive, ma la sua voce non si registra
@@ -391,7 +398,7 @@ export type UpdateQuestionInput = z.infer<typeof updateQuestionSchema>;
 
 export const jitsiTokenRequestSchema = z.object({
   accessToken: z.string().min(1).optional(),
-  moderatorToken: z.string().uuid().optional(),
+  moderatorToken: z.guid().optional(),
   guestName: z.string().min(2).max(100).optional(),
   displayNameOverride: z.string().min(2).max(100).optional(),
   /** Consenso alla registrazione dell'evento dato in sala d'attesa, da chi
@@ -413,6 +420,17 @@ export const jitsiTokenRequestSchema = z.object({
 );
 
 export type JitsiTokenRequest = z.infer<typeof jitsiTokenRequestSchema>;
+
+/**
+ * Ritiro dalla sala dei consensi dati per l'evento (lib/live/consent-withdrawal).
+ * I posti si provano con i token della sala consegnati in questa visita della
+ * pagina; `recording` ritira anche il consenso alla registrazione (e con esso
+ * quello alla trascrizione), altrimenti solo quello alla trascrizione.
+ */
+export const consentWithdrawalSchema = z.object({
+  roomTokens: z.array(z.string().min(1).max(4096)).min(1).max(50),
+  recording: z.boolean(),
+}).strict();
 
 // ── Poll Schemas ────────────────────────────────────────
 
@@ -553,7 +571,7 @@ const optionLabelSchema = localizedStringField.refine(
 );
 
 export const questionItemSchema = z.object({
-  id: z.string().uuid().optional(), // present on update, absent on create
+  id: z.guid().optional(), // present on update, absent on create
   prompt: localizedStringField.refine(
     (obj) => typeof obj.it === 'string' && obj.it.length >= 3,
     { message: 'prompt.it is required' },
@@ -595,7 +613,7 @@ export const createQuestionTemplateSchema = z.object({
   items: z.array(questionItemSchema).default([]),
 });
 
-export const updateQuestionTemplateSchema = createQuestionTemplateSchema.partial();
+export const updateQuestionTemplateSchema = parzialeSenzaDefault(createQuestionTemplateSchema);
 
 export type CreateQuestionTemplateInput = z.infer<typeof createQuestionTemplateSchema>;
 export type UpdateQuestionTemplateInput = z.infer<typeof updateQuestionTemplateSchema>;
@@ -607,7 +625,7 @@ export const upsertEventQuestionnaireSchema = z.object({
   description: localizedStringField.optional().default({}),
   required: z.boolean().default(false),
   allowEdit: z.boolean().default(false),
-  templateIds: z.array(z.string().uuid()).default([]),
+  templateIds: z.array(z.guid()).default([]),
   adhocItems: z.array(questionItemSchema).default([]),
 });
 

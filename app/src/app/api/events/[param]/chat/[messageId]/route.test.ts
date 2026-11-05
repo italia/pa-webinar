@@ -14,7 +14,7 @@ vi.mock('@/lib/db', () => ({
 vi.mock('@/lib/crypto/pii', () => ({ encryptPII: (v: string) => v }));
 vi.mock('@/lib/chat/pubsub', () => ({ publishChat: vi.fn() }));
 vi.mock('@/lib/storage', () => ({ getFilesStorage: () => null }));
-vi.mock('@/lib/chat/authenticate', () => ({ authenticateChatSender: vi.fn() }));
+vi.mock('@/lib/chat/authenticate', () => ({ authenticateChatSender: vi.fn(), assertChatOpen: vi.fn() }));
 vi.mock('@/lib/auth/moderator', () => ({
   extractModeratorToken: (req: Request) =>
     req.headers.get('authorization')?.replace(/^Bearer\s+/i, '') ?? null,

@@ -7,6 +7,9 @@
 
 services:
   app:
+    # Tag proprio: lo stadio `deps` non deve prendere il posto dell'immagine di
+    # produzione costruita con il solo docker-compose.yml.
+    image: pa-webinar:local-dev
     build:
       target: deps
     working_dir: /workspace/app
@@ -20,3 +23,19 @@ services:
       - ./lobby/src:/workspace/lobby/src
     environment:
       - NODE_ENV=development
+
+  # Dallo stadio `deps` anche migrazioni e dati dimostrativi: lo stadio `builder`
+  # rifarebbe una build di produzione a ogni avvio, e su codice che non compila
+  # il server di sviluppo non partirebbe. app/prisma montata: una migrazione
+  # nuova non richiede di ricostruire.
+  db-migrate:
+    image: pa-webinar:local-dev
+    build:
+      target: deps
+    volumes:
+      - ./app/prisma:/workspace/app/prisma
+
+  db-seed:
+    image: pa-webinar:local-dev
+    volumes:
+      - ./app/prisma:/workspace/app/prisma

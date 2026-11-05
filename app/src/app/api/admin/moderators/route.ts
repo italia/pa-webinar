@@ -12,7 +12,7 @@
 import { randomUUID } from 'node:crypto';
 
 import { cookies } from 'next/headers';
-import type { Prisma } from '@prisma/client';
+import { EventStatus, type Prisma } from '@prisma/client';
 
 import { z } from 'zod';
 
@@ -38,7 +38,9 @@ export const GET = withErrorHandling(async (request) => {
     status: { not: 'DRAFT' },
   };
   if (status) {
-    where.status = status as Prisma.EnumEventStatusFilter['equals'];
+    const valido = z.nativeEnum(EventStatus).safeParse(status);
+    if (!valido.success) throw new ValidationError('Invalid status');
+    where.status = valido.data;
   }
   if (search) {
     // Search by moderatorEmail is dropped because the column is now
@@ -88,7 +90,7 @@ export const GET = withErrorHandling(async (request) => {
 });
 
 const rotateSchema = z.object({
-  eventId: z.string().uuid(),
+  eventId: z.guid(),
   action: z.literal('regenerate'),
 });
 

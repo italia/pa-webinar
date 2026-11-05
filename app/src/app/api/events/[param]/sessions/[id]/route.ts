@@ -2,6 +2,7 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { ForbiddenError, NotFoundError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { extractModeratorToken } from '@/lib/auth/moderator';
+import { CAMPI_VIDEO_VUOTI } from '@/lib/events/recording-fields';
 import { deleteRecordingBlob } from '@/lib/storage/recordings';
 import { tryDecryptJSON } from '@/lib/crypto/pii';
 
@@ -24,6 +25,8 @@ export const GET = withErrorHandling(async (request, context) => {
   });
   if (!event) throw new NotFoundError('Event');
 
+  if (!UUID_RE.test(id)) throw new NotFoundError('CallSession');
+
   const session = await prisma.callSession.findFirst({
     where: { id, eventId: event.id },
   });
@@ -38,7 +41,9 @@ export const GET = withErrorHandling(async (request, context) => {
     peakParticipants: session.peakParticipants,
     participants: tryDecryptJSON(session.participants, []),
     recordingUrl: session.recordingUrl,
-    recordingFileSize: session.recordingFileSize ? Number(session.recordingFileSize) : null,
+    recordingFileSize: session.recordingFileSize
+      ? Number(session.recordingFileSize)
+      : null,
     recordingDuration: session.recordingDuration,
     recordingFilename: session.recordingFilename,
     telemetry: session.telemetry,
@@ -57,27 +62,60 @@ export const DELETE = withErrorHandling(async (request, context) => {
       ...(isUuid ? { OR: [{ id: param }, { slug: param }] } : { slug: param }),
       moderatorToken: token,
     },
-    select: { id: true },
+    select: { id: true, recordingUrl: true },
   });
   if (!event) throw new NotFoundError('Event');
 
+  if (!UUID_RE.test(id)) throw new NotFoundError('CallSession');
+
   const session = await prisma.callSession.findFirst({
     where: { id, eventId: event.id },
-    select: { id: true, recordingUrl: true },
+    select: { id: true, recordingUrl: true, recording: { select: { id: true } } },
   });
   if (!session) throw new NotFoundError('CallSession');
 
-  // Delete the blob from the RECORDINGS domain, keyed off the stored URL
-  // (not a guessed files-domain key). Best-effort.
+  // Se il file tolto e' quello pubblicato sull'evento, la pagina non deve piu'
+  // puntarci. La cancellazione di una registrazione resta tracciata, anche
+  // quando la sessione aveva solo la riga della registrazione: va via a cascata.
+  const eraPubblicato =
+    !!session.recordingUrl && session.recordingUrl === event.recordingUrl;
+  await prisma.$transaction([
+    prisma.callSession.delete({ where: { id: session.id } }),
+    ...(eraPubblicato
+      ? [
+          prisma.event.update({
+            where: { id: event.id },
+            data: CAMPI_VIDEO_VUOTI,
+          }),
+        ]
+      : []),
+    ...(session.recordingUrl || session.recording
+      ? [
+          prisma.gdprAuditLog.create({
+            data: {
+              eventId: event.id,
+              action: 'RECORDING_DELETED',
+              recordCount: 1,
+              details: JSON.stringify({
+                callSession: session.id,
+                wasEventRecording: eraPubblicato,
+              }),
+            },
+          }),
+        ]
+      : []),
+  ]);
+
+  // Dopo la transazione: se fallisse, il file c'e' ancora e la pagina continua a
+  // funzionare. Il file si cancella dallo storage delle registrazioni partendo
+  // dall'URL salvato. Se resta, la riconciliazione lo trova come orfano.
   if (session.recordingUrl) {
     try {
       await deleteRecordingBlob(session.recordingUrl);
-    } catch {
-      /* best effort */
+    } catch (err) {
+      console.error('[sessions DELETE] blob delete failed:', err);
     }
   }
-
-  await prisma.callSession.delete({ where: { id: session.id } });
 
   return Response.json({ deleted: true });
 });

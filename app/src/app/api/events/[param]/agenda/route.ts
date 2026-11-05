@@ -42,7 +42,7 @@ const createSchema = z.union([
 
 /** Il nuovo ordine: tutti gli argomenti dell'agenda, ciascuno una volta. */
 const reorderSchema = z.object({
-  order: z.array(z.string().uuid()).min(1).max(MAX_AGENDA_ITEMS),
+  order: z.array(z.guid()).min(1).max(MAX_AGENDA_ITEMS),
 });
 
 /**
@@ -54,12 +54,12 @@ const reorderSchema = z.object({
  * c'e' piu' si toglie.
  */
 const planSchema = z.object({
-  base: z.array(z.string().uuid()).max(MAX_AGENDA_ITEMS),
+  base: z.array(z.guid()).max(MAX_AGENDA_ITEMS),
   plan: z
     .array(
       z
         .object({
-          id: z.string().uuid().optional(),
+          id: z.guid().optional(),
           label: labelSchema,
           plannedMinutes: plannedMinutesSchema.nullable().optional(),
         })

@@ -16,6 +16,7 @@ import { accessModeDaSalvare, publicRegistrationFor } from '@/lib/events/access-
 import { logoPubblico } from '@/lib/events/public-people';
 
 import { BOZZA_VUOTA, controllaBozza, conRuolo, indirizziPresi, type Bozza } from './people-draft';
+import RuoliEvento from './ruoli-evento';
 import Gruppo from './wizard-group';
 import { emailValida, nomeOrganizzatoreValido } from './validation';
 import type { EventAccessModeValue } from './wizard-shell';
@@ -149,13 +150,22 @@ export default function StepPeople({
         {t('intro')}
       </p>
 
-      {children}
+      {/* Chi organizza, in un posto solo: prima gli enti, poi la persona che
+          conduce con il link principale. */}
+      <section className="mb-4" aria-labelledby="wiz-chi-organizza">
+        <h3 id="wiz-chi-organizza" className="h5 fw-bold mb-3" style={{ color: 'var(--app-text)' }}>
+          {t('whoOrganizes')}
+        </h3>
+        <OrganizersSection
+          value={value.organizers}
+          onChange={(next) => onChange({ organizers: next })}
+          onUploadBusy={onUploadBusy}
+        />
+        {children}
+      </section>
 
-      <OrganizersSection
-        value={value.organizers}
-        onChange={(next) => onChange({ organizers: next })}
-        onUploadBusy={onUploadBusy}
-      />
+      {/* Che cosa fa ogni ruolo, sempre in vista dove i ruoli si assegnano. */}
+      <RuoliEvento />
 
       <PeopleSection
         moderators={value.moderators}
@@ -175,12 +185,17 @@ export default function StepPeople({
 
       {iscrizione}
 
-      <InvitationsSection
-        value={value.invitations}
-        onChange={(next) => onChange({ invitations: next })}
-        locked={invitationsLocked}
-        publicRegistrationEnabled={publicRegistrationEnabled}
-      />
+      {/* Con l'iscrizione solo su invito l'elenco sta dentro quella scelta
+          (SezioneIscrizione); qui resta per l'iscrizione aperta, dove chi
+          organizza invita di persona chi vuole. */}
+      {(publicRegistrationEnabled || !iscrizione) && (
+        <InvitationsSection
+          value={value.invitations}
+          onChange={(next) => onChange({ invitations: next })}
+          locked={invitationsLocked}
+          publicRegistrationEnabled={publicRegistrationEnabled}
+        />
+      )}
     </div>
   );
 }
@@ -236,8 +251,9 @@ export function PrimarySection({
   }, [profiloErrato]);
   const nomeVuoto = perPubblicare && !nomeOrganizzatoreValido(primary.name);
   const emailVuota = perPubblicare && !emailValida(primary.email);
-  const stato = (vuoto: boolean, errore: unknown) =>
-    errore ? ' wizard-campo--insisti' : vuoto ? ' wizard-campo--vuoto' : '';
+  // Come nel primo passo: l'asterisco segna il campo, l'errore compare al
+  // tentativo, rosso e accanto al campo.
+  const stato = (errore: unknown) => (errore ? ' wizard-campo--insisti' : '');
   const promemoria = (id: string) => (
     <div id={id} className="wizard-campo__hint">
       <svg
@@ -284,7 +300,7 @@ export function PrimarySection({
         )}
         <div className="row g-3">
           <div
-            className={`col-md-6 wizard-campo${stato(nomeVuoto, fieldErrors.moderatorName)}`}
+            className={`col-md-6 wizard-campo${stato(fieldErrors.moderatorName)}`}
           >
             <label className="form-label" htmlFor="wiz-primary-name">
               {t('personName')} *
@@ -309,7 +325,7 @@ export function PrimarySection({
               promemoria('wiz-primary-name-promemoria')}
           </div>
           <div
-            className={`col-md-6 wizard-campo${stato(emailVuota, fieldErrors.moderatorEmail)}`}
+            className={`col-md-6 wizard-campo${stato(fieldErrors.moderatorEmail)}`}
           >
             <label className="form-label" htmlFor="wiz-primary-email">
               {t('personEmail')} *
@@ -472,9 +488,12 @@ function RubricaRow({
   onAddMany: (picks: RubricaPickedPerson[]) => void;
 }) {
   const t = useTranslations('admin.wizard.step3');
+  // La pagina la offre solo all'amministrazione e solo se la rubrica ha
+  // qualcuno da aggiungere (RubricaAccessContext): qui si dice chi ci si trova.
   if (!useContext(RubricaAccessContext)) return null;
   return (
     <div className="mb-2">
+      <small className="d-block text-secondary mb-1">{t('rubricaWho')}</small>
       <RubricaPicker mode="multi" onAddMany={onAddMany} placeholder={t('rubricaPick')} />
       <small className="text-muted">{t('rubricaOrAdd')}</small>
     </div>
@@ -863,7 +882,43 @@ function PeopleSection({
 
       <RubricaRow onAddMany={onAddMany} />
 
+      {/* Nell'ordine in cui si pensa a una persona dell'evento: che ruolo ha,
+          di quale ente e', poi chi e' e dove scriverle. */}
       <div className="row g-2 align-items-end">
+        <div className="col-md-6 align-self-start">
+          <label className="form-label" htmlFor={`${id}-role`}>
+            {t('personRole')}
+          </label>
+          <select
+            id={`${id}-role`}
+            className="form-select"
+            value={draft.role}
+            aria-describedby={`${id}-role-help`}
+            onChange={(e) => setDraft({ ...draft, role: e.target.value as PersonRole })}
+          >
+            {opzioniRuolo}
+          </select>
+          <small id={`${id}-role-help`} className="d-block text-secondary mt-1">
+            {t(`roleHelp.${draft.role}`)}
+          </small>
+        </div>
+        <div className="col-md-6 align-self-start">
+          <label className="form-label" htmlFor={`${id}-org`}>
+            {t('personOrganization')}
+          </label>
+          <input
+            id={`${id}-org`}
+            type="text"
+            maxLength={200}
+            className="form-control"
+            value={draft.organization ?? ''}
+            aria-describedby={`${id}-org-help`}
+            onChange={(e) => setDraft({ ...draft, organization: e.target.value || null })}
+          />
+          <small id={`${id}-org-help`} className="d-block text-secondary mt-1">
+            {t('personOrganizationHelp')}
+          </small>
+        </div>
         <div className="col-md-6">
           <label className="form-label" htmlFor={`${id}-name`}>
             {t('personName')}
@@ -889,42 +944,6 @@ function PeopleSection({
               setDraft({ ...draft, email: e.target.value, personId: null })
             }
           />
-        </div>
-        <div className="col-md-4">
-          <label className="form-label" htmlFor={`${id}-role`}>
-            {t('personRole')}
-          </label>
-          <select
-            id={`${id}-role`}
-            className="form-select"
-            value={draft.role}
-            aria-describedby={`${id}-role-help`}
-            onChange={(e) => setDraft({ ...draft, role: e.target.value as PersonRole })}
-          >
-            {opzioniRuolo}
-          </select>
-        </div>
-        <div className="col-md-8">
-          <label className="form-label" htmlFor={`${id}-org`}>
-            {t('personOrganization')}
-          </label>
-          <input
-            id={`${id}-org`}
-            type="text"
-            maxLength={200}
-            className="form-control"
-            value={draft.organization ?? ''}
-            aria-describedby={`${id}-org-help`}
-            onChange={(e) => setDraft({ ...draft, organization: e.target.value || null })}
-          />
-        </div>
-        <div className="col-12">
-          <small id={`${id}-role-help`} className="d-block text-secondary">
-            {t(`roleHelp.${draft.role}`)}
-          </small>
-          <small id={`${id}-org-help`} className="d-block text-secondary">
-            {t('personOrganizationHelp')}
-          </small>
         </div>
         <div className="col-12">
           <FileOrUrlInput
@@ -986,16 +1005,20 @@ function PeopleSection({
   );
 }
 
-function InvitationsSection({
+export function InvitationsSection({
   value,
   onChange,
   locked,
   publicRegistrationEnabled,
+  inline = false,
 }: {
   value: InvitationEntry[];
   onChange: (next: InvitationEntry[]) => void;
   locked: boolean;
   publicRegistrationEnabled: boolean;
+  /** Dentro la scelta «solo le persone invitate»: aperto, senza riquadro
+   *  da aprire. */
+  inline?: boolean;
 }) {
   const t = useTranslations('admin.wizard.step3');
   const id = 'inv';
@@ -1042,16 +1065,8 @@ function InvitationsSection({
     if (toAdd.length > 0) onChange([...value, ...toAdd]);
   };
 
-  return (
-    <Gruppo
-      title={t('invitationsHeading')}
-      help={t(
-        publicRegistrationEnabled ? 'invitationsHelpOpen' : 'invitationsHelpRestricted'
-      )}
-      count={value.length}
-      // Solo su invito l'elenco e' chi puo' iscriversi: lo si vede subito.
-      aperto={!publicRegistrationEnabled}
-    >
+  const contenuto = (
+    <>
       <AddedList
         items={value}
         keyOf={(inv) => inv.email}
@@ -1104,6 +1119,34 @@ function InvitationsSection({
           </div>
         </>
       )}
+    </>
+  );
+
+  if (inline) {
+    return (
+      <div className="wizard-invitati">
+        <p className="wizard-invitati__titolo">
+          {t('invitationsHeading')}
+          {value.length > 0 && (
+            <span className="badge rounded-pill ms-2 wizard-group__count">{value.length}</span>
+          )}
+        </p>
+        <p className="formato__nota mt-0 mb-2">{t('invitationsHelpRestricted')}</p>
+        {contenuto}
+      </div>
+    );
+  }
+  return (
+    <Gruppo
+      title={t('invitationsHeading')}
+      help={t(
+        publicRegistrationEnabled ? 'invitationsHelpOpen' : 'invitationsHelpRestricted'
+      )}
+      count={value.length}
+      // Solo su invito l'elenco e' chi puo' iscriversi: lo si vede subito.
+      aperto={!publicRegistrationEnabled}
+    >
+      {contenuto}
     </Gruppo>
   );
 }
@@ -1125,7 +1168,11 @@ export function SezioneIscrizione({
   bloccato = false,
   iniziale = null,
   questionari,
+  elencoInvitati,
 }: {
+  /** L'elenco degli invitati, mostrato dentro la scelta «solo le persone
+   *  invitate» quando la si sceglie. */
+  elencoInvitati?: React.ReactNode;
   accessMode: EventAccessModeValue | null;
   requireOrganization: boolean;
   requireOrganizationRole: boolean;
@@ -1233,6 +1280,7 @@ export function SezioneIscrizione({
           <span>{t('accessNoInvitees')}</span>
         </p>
       )}
+      {effettivo === 'INVITATION' && elencoInvitati}
 
       <fieldset className="mt-3">
         <legend className="wizard-iscrizione__domanda">{t('askHeading')}</legend>

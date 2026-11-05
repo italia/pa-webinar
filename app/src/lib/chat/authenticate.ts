@@ -13,6 +13,7 @@ import { resolveTokenSender } from '@/lib/chat/sender';
 import { guestChatWindowOpen } from '@/lib/chat/read-access';
 import { guestSenderId } from '@/lib/chat/sender-key';
 import { getClientIp } from '@/lib/rate-limit';
+import { pseudonimo } from '@/lib/live/pseudonym';
 import { getSettings } from '@/lib/settings';
 
 const UUID_RE =
@@ -25,6 +26,8 @@ export interface ChatAuthResult {
   isModerator: boolean;
   /** See ChatTokenSender: a seat is not a person. */
   isPerPersonIdentity: boolean;
+  /** La chat dell'evento, accesa o spenta (anche dal vivo). */
+  chatEnabled: boolean;
 }
 
 /**
@@ -53,6 +56,8 @@ export async function authenticateChatSender(
       accessMode: true,
       moderatorToken: true,
       moderatorName: true,
+      chatEnabled: true,
+      audienceAnonymous: true,
     },
   });
   if (!event) throw new AppError('Event not found', 404, 'NOT_FOUND');
@@ -69,7 +74,7 @@ export async function authenticateChatSender(
     // registrant's decrypted name. A genuinely invalid/foreign/deleted token
     // matches nothing → 403 (contract unchanged).
     const sender = await resolveTokenSender(event, token, displayNameOverride);
-    if (sender) return sender;
+    if (sender) return { ...sender, chatEnabled: event.chatEnabled };
     throw new ForbiddenError('Invalid token for this event');
   }
 
@@ -99,13 +104,28 @@ export async function authenticateChatSender(
   // in any way — it's purely a display hint for UI clustering (same
   // bubble colour, AI summary "this attendee said 3 things").
   const ip = getClientIp(req);
+  const senderId = guestSenderId(ip, name);
   return {
     eventId: event.id,
-    senderId: guestSenderId(ip, name),
-    senderName: name,
+    senderId,
+    // Pubblico anonimo: lo pseudonimo del posto, lo stesso del video.
+    senderName: event.audienceAnonymous ? await pseudonimo(event.id, senderId) : name,
     isModerator: false,
     // Keyed hash of ip:name (lib/chat/sender-key): two people behind one NAT
     // with the same name share it. It is a display hint, never a credential.
     isPerPersonIdentity: false,
+    chatEnabled: event.chatEnabled,
   };
 }
+
+/**
+ * Con la chat spenta (anche dal vivo, da chi modera) si smette di scriverci:
+ * messaggi, reazioni e «sta scrivendo». Chi modera resta libero, per
+ * chiudere con un avviso. Cancellare i propri messaggi resta possibile.
+ */
+export function assertChatOpen(auth: ChatAuthResult): void {
+  if (!auth.chatEnabled && !auth.isModerator) {
+    throw new AppError('Chat is turned off for this event', 403, 'CHAT_DISABLED');
+  }
+}
+

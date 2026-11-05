@@ -79,13 +79,13 @@ export const GET = withErrorHandling(async (request) => {
       // Le prove del consenso alla registrazione per partecipante date in sala
       // d'attesa: quando e in quale lingua (il nome e' quello dell'iscrizione).
       multitrackConsents: {
-        select: { consentedAt: true, locale: true },
+        select: { consentedAt: true, locale: true, withdrawnAt: true },
         orderBy: { consentedAt: 'asc' },
       },
       // Lo stesso per il consenso alla registrazione dell'evento dato in sala
       // d'attesa da chi non l'aveva dato all'iscrizione.
       recordingConsents: {
-        select: { consentedAt: true, locale: true },
+        select: { consentedAt: true, locale: true, withdrawnAt: true },
         orderBy: { consentedAt: 'asc' },
       },
     },
@@ -121,6 +121,11 @@ export const GET = withErrorHandling(async (request) => {
       event: { select: { title: true, startsAt: true } },
       // La foto che lo staff ha caricato per la persona.
       photo: { select: { contentType: true, bytes: true } },
+      // I consensi alla registrazione dati entrando in sala con la concessione.
+      recordingConsents: {
+        select: { consentedAt: true, withdrawnAt: true },
+        orderBy: { consentedAt: 'asc' },
+      },
     },
     orderBy: { createdAt: 'asc' },
   });
@@ -134,6 +139,10 @@ export const GET = withErrorHandling(async (request) => {
       : null,
     createdAt: g.createdAt.toISOString(),
     revokedAt: g.revokedAt?.toISOString() ?? null,
+    recordingConsentsGivenAt: (g.recordingConsents ?? []).map((c) => c.consentedAt.toISOString()),
+    recordingConsentsWithdrawnAt: (g.recordingConsents ?? [])
+      .map((c) => c.withdrawnAt?.toISOString())
+      .filter((v): v is string => !!v),
     event: { title: g.event.title, startsAt: g.event.startsAt.toISOString() },
   }));
 
@@ -187,6 +196,9 @@ export const GET = withErrorHandling(async (request) => {
         consentTimestamp: r.consentTimestamp.toISOString(),
         consentRecording: r.consentRecording,
         consentMultitrack: r.consentMultitrack,
+        // Il ritiro dalla sala dei consensi dati all'iscrizione.
+        consentRecordingWithdrawnAt: r.consentRecordingWithdrawnAt?.toISOString() ?? null,
+        consentMultitrackWithdrawnAt: r.consentMultitrackWithdrawnAt?.toISOString() ?? null,
         consentFutureCommunications: r.consentFutureCommunications,
         // La lingua delle email, che la piattaforma conserva e usa.
         locale: r.locale,
@@ -195,10 +207,12 @@ export const GET = withErrorHandling(async (request) => {
         multitrackConsentsInRoom: (r.multitrackConsents ?? []).map((c) => ({
           consentedAt: c.consentedAt.toISOString(),
           locale: c.locale,
+          withdrawnAt: c.withdrawnAt?.toISOString() ?? null,
         })),
         recordingConsentsInRoom: (r.recordingConsents ?? []).map((c) => ({
           consentedAt: c.consentedAt.toISOString(),
           locale: c.locale,
+          withdrawnAt: c.withdrawnAt?.toISOString() ?? null,
         })),
       },
       event: {

@@ -4,6 +4,7 @@ import { jwtVerify, SignJWT } from 'jose';
 import type { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
 
 import { prisma } from '@/lib/db';
+import { tryDecryptPII } from '@/lib/crypto/pii';
 import { AppError, ForbiddenError, UnauthorizedError } from '@/lib/errors';
 
 import { requireAppSecretKey, tryGetAppSecret } from './app-secret';
@@ -43,6 +44,17 @@ export type StaffSession =
  * per richiesta (`cache`): layout e pagina la chiedono entrambi, e basta
  * leggerla una volta.
  */
+/**
+ * L'account dello staff, letto una volta per richiesta: la sessione e
+ * l'intestazione (che ne mostra il nome) lo chiedono entrambe.
+ */
+const leggiAccount = cache(async (id: string) =>
+  prisma.staffAccount.findUnique({
+    where: { id },
+    select: { id: true, active: true, role: true, emailHash: true, name: true },
+  }),
+);
+
 export const getStaffSession = cache(async function getStaffSession(
   cookies: ReadonlyRequestCookies,
 ): Promise<StaffSession | null> {
@@ -65,10 +77,7 @@ export const getStaffSession = cache(async function getStaffSession(
   if (payload.role !== 'admin' && payload.role !== 'organizer') return null;
   if (!UUID_RE.test(payload.sub)) return null;
 
-  const account = await prisma.staffAccount.findUnique({
-    where: { id: payload.sub },
-    select: { id: true, active: true, role: true, emailHash: true },
-  });
+  const account = await leggiAccount(payload.sub);
   if (!account?.active) return null;
   return account.role === 'ADMIN'
     ? { role: 'admin', accountId: account.id }
@@ -210,3 +219,27 @@ export async function requireSpeakerManager(
   if (!speaker || !(await puoGestire(session, speaker.recording.eventId))) throw new ForbiddenError();
   return session;
 }
+
+/**
+ * Chi e' entrato, per l'intestazione: il ruolo e il nome dell'account (null
+ * con la chiave dell'istanza, che non ha un nome). Solo per mostrarli: un
+ * permesso si decide con getStaffSession.
+ */
+export const staffPerIntestazione = cache(async function staffPerIntestazione(
+  cookies: ReadonlyRequestCookies,
+): Promise<{ ruolo: 'admin' | 'organizer'; nome: string | null } | null> {
+  const session = await getStaffSession(cookies);
+  if (!session) return null;
+  if (!session.accountId) return { ruolo: session.role, nome: null };
+  const account = await leggiAccount(session.accountId);
+  let nome: string | null = null;
+  try {
+    nome = account ? tryDecryptPII(account.name) : null;
+  } catch {
+    // Una chiave PII sbagliata non deve rompere ogni pagina: il nome e' solo
+    // da mostrare, e l'area utente (con «Esci») resta.
+    nome = null;
+  }
+  return { ruolo: session.role, nome };
+});
+

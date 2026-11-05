@@ -283,7 +283,7 @@ Per service:
 |---|---|---|---|
 | AWS S3 | leave unset | the bucket's region | `s3` |
 | Garage on one k3s server, installed by [`infra/onprem/k3s/addons/storage.sh`](../../infra/onprem/k3s/addons/README.md) | `https://s3.<portal>`, through Traefik | `garage` | leave unset: without Jibri, the recordings domain is enabled by `RECORDING_S3_BUCKET` alone, for uploaded and published videos |
-| MinIO, on-premises or sovereign-cloud S3 | the service URL | as the service requires (MinIO accepts any value) | `s3`. The lab could not pull MinIO's images anonymously: check how they are distributed before you plan on them |
+| MinIO, on-premises or sovereign-cloud S3 | the service URL | as the service requires (MinIO accepts any value) | `s3`. MinIO's own images could not be pulled anonymously: check how they are distributed before you plan on them. For evaluation, [Object storage with MinIO](../install/minikube.md#object-storage-with-minio) uses Chainguard's public image |
 | Google Cloud Storage | `https://storage.googleapis.com`, with HMAC keys from the bucket's interoperability settings | `auto` | `gcs` |
 | Cloudflare R2 | `https://<account-id>.r2.cloudflarestorage.com` | `auto` | `s3` |
 | Wasabi and other S3 services | the service URL | the service's region | `s3` |

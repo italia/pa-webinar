@@ -131,7 +131,7 @@ Baking each installation's `NEXT_PUBLIC_*` values into its own build was rejecte
 - Standalone tracing follows imports. A file that the server reads from disk at run time, and that no module imports, is left out of the image unless `outputFileTracingIncludes` lists it. The fonts of the link-preview card route are an example.
 - The root `Dockerfile` has three stages: `deps` → `builder` → `runner`.
 - The runner stage holds the traced server, the static assets, `public/` and a small entrypoint (`scripts/docker-entrypoint.sh`) that waits for the database. It runs `node app/server.js` on port 3000 as a non-root user under `tini`, and never runs migrations. npm and npx are removed from it. Its Docker `HEALTHCHECK` calls `/api/health`.
-- The migration image is the `builder` stage, which still carries the Prisma CLI. In the cluster, the `db-migrate` initContainer of the app Deployment runs `prisma migrate deploy` from it. Docker Compose runs the same stage as its `db-migrate` setup service.
+- The migration image is the `builder` stage, which still carries the Prisma CLI. In the cluster, the `db-migrate` initContainer of the app Deployment runs `prisma migrate deploy` from it. Docker Compose runs the same stage as its `db-migrate` service.
 
 **Public variables.**
 

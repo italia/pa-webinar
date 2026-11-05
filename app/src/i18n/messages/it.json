@@ -81,7 +81,8 @@
     "deselectAll": "Deseleziona tutti",
     "durationMinutes": "{minutes, plural, one {# minuto} other {# minuti}}",
     "durationHours": "{hours, plural, one {# ora} other {# ore}}",
-    "durationHoursMinutes": "{hours, plural, one {# ora} other {# ore}} e {minutes, plural, one {# minuto} other {# minuti}}"
+    "durationHoursMinutes": "{hours, plural, one {# ora} other {# ore}} e {minutes, plural, one {# minuto} other {# minuti}}",
+    "backToTop": "Torna su"
   },
   "markdown": {
     "edit": "Scrivi",
@@ -102,7 +103,14 @@
     "switchLanguage": "Cambia lingua",
     "skipToContent": "Vai al contenuto",
     "skipToFooter": "Vai al footer",
-    "mainLabel": "Navigazione principale"
+    "mainLabel": "Navigazione principale",
+    "activeLanguage": "Lingua attiva:",
+    "languageSelected": "(selezionata)",
+    "signIn": "Accedi",
+    "roleAdmin": "Amministratore",
+    "roleOrganizer": "Organizzatore",
+    "instanceKey": "Chiave dell'istanza",
+    "signOutFailed": "Uscita non riuscita: riprova."
   },
   "header": {
     "followUs": "Seguici su"
@@ -204,7 +212,8 @@
       "recordingLinkEmailLabel": "Email con cui ti sei iscritto",
       "recordingLinkSend": "Rimandami il link",
       "recordingLinkSent": "Se l'indirizzo è iscritto all'evento, riceverai a breve un'email con il link personale.",
-      "recordingLinkError": "Richiesta non riuscita. Riprova tra qualche minuto."
+      "recordingLinkError": "Richiesta non riuscita. Riprova tra qualche minuto.",
+      "registerOrGuest": "Iscrivendoti ricevi per email il tuo link personale e gli aggiornamenti sull'evento. Come ospite entri subito con il solo nome, solo mentre l'evento è in diretta, e non ricevi email."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -316,7 +325,8 @@
       "moderatorReveal": "Mostra link da moderatore",
       "moderatorWarning": "Questo link dà accesso da MODERATORE (muta tutti, avvia registrazione, termina l'evento). Condividilo solo con altri moderatori.",
       "moderatorLink": "Link da moderatore",
-      "moderatorLinkHint": "Chi apre questo link entra come moderatore con pieni poteri di regia."
+      "moderatorLinkHint": "Chi apre questo link entra come moderatore con pieni poteri di regia.",
+      "copyFailed": "Copia non riuscita: seleziona l'indirizzo e copialo a mano."
     },
     "title": "Sala evento",
     "password": {
@@ -537,7 +547,10 @@
       "stopVideo": "Spegni video",
       "revokeFloor": "Togli la parola",
       "lowerHandFailed": "Non è stato possibile abbassare la mano: riprova.",
-      "handsRaised": "{count, plural, one {# mano alzata} other {# mani alzate}}"
+      "handsRaised": "{count, plural, one {# mano alzata} other {# mani alzate}}",
+      "locksByConsent": "Microfoni e videocamere seguono il consenso alla registrazione: chi l'ha dato usa ciò che l'evento concede, chi no resta in solo ascolto. I blocchi della sala restano accesi.",
+      "listenOnlyBadge": "solo ascolto",
+      "listenOnlyNoFloor": "Non ha dato il consenso alla registrazione: non può intervenire finché non acconsente dalla sua sala."
     },
     "moderator": {
       "muteAll": "Silenzia tutti",
@@ -616,7 +629,15 @@
       "unavailable": "Sottotitoli non disponibili in questo momento.",
       "show": "Mostra i sottotitoli",
       "hide": "Nascondi i sottotitoli",
-      "toggle": "Sottotitoli automatici"
+      "toggle": "Sottotitoli automatici",
+      "controls": "Comandi dei sottotitoli",
+      "smaller": "Sottotitoli più piccoli",
+      "larger": "Sottotitoli più grandi",
+      "moveUp": "Sposta i sottotitoli in alto",
+      "moveDown": "Sposta i sottotitoli in basso",
+      "smallerShort": "A−",
+      "largerShort": "A+",
+      "showShort": "CC"
     },
     "eventEndedModerator": "L'evento è concluso. Qui sotto trovi le statistiche e, se l'evento è stato registrato, la registrazione e il resoconto.",
     "endLinks": {
@@ -625,7 +646,54 @@
       "publicPage": "Pagina pubblica dell'evento"
     },
     "notOpenNow": "La sala non è aperta in questo momento.",
-    "nameRequired": "Manca il nome con cui entrare: torna indietro e scrivilo."
+    "nameRequired": "Manca il nome con cui entrare: torna indietro e scrivilo.",
+    "closeSidebar": "Chiudi il pannello laterale",
+    "contentOnly": "Solo contenuto, senza chat e pannelli",
+    "showPanels": "Mostra chat e pannelli",
+    "confirmFullscreen": "Passa a schermo intero",
+    "listenOnly": {
+      "title": "Sei in solo ascolto.",
+      "body": "Non hai dato il consenso alla registrazione: segui e scrivi in chat, ma microfono, videocamera e schermo restano chiusi, anche se chi conduce ti dà la parola. Per intervenire, acconsenti.",
+      "consent": "Acconsento alla registrazione e intervengo",
+      "joining": "Rientro in sala…",
+      "error": "Non è stato possibile rientrare: riprova."
+    },
+    "pseudonym": "Partecipante-{code}",
+    "consents": {
+      "open": "I tuoi consensi",
+      "button": "Consensi",
+      "title": "I tuoi consensi",
+      "intro": "Puoi dare o ritirare i tuoi consensi in qualunque momento dell'evento. Ogni modifica ricollega la conferenza per qualche secondo.",
+      "given": "Consenso dato",
+      "notGiven": "Consenso non dato",
+      "withdraw": "Ritira il consenso",
+      "confirmTitle": "Confermi il ritiro?",
+      "confirm": "Ritira",
+      "working": "Aggiornamento in corso…",
+      "error": "Non è stato possibile aggiornare il consenso: riprova.",
+      "recording": {
+        "title": "Registrazione dell'evento",
+        "give": "Acconsento alla registrazione",
+        "without": {
+          "soloAscolto": "Senza questo consenso segui in solo ascolto: microfono, videocamera e schermo restano chiusi.",
+          "conduce": "Senza questo consenso conduci lo stesso, ma la tua voce non resta nelle tracce per persona né nella trascrizione.",
+          "uscita": "Per partecipare a questo evento serve il consenso alla registrazione."
+        },
+        "alreadyRecorded": "Ciò che è già stato registrato resta nel video dell'evento: per farlo togliere scrivi a chi organizza.",
+        "withdraw": {
+          "soloAscolto": "Se lo ritiri resti in sala in solo ascolto: microfono, videocamera e schermo si chiudono. Ritiri anche il consenso alla trascrizione dei tuoi interventi.",
+          "uscita": "Se lo ritiri esci dalla conferenza e torni in sala d'attesa: per partecipare a questo evento serve il consenso alla registrazione. Ritiri anche il consenso alla trascrizione dei tuoi interventi.",
+          "conduce": "Se lo ritiri continui a condurre, ma da ora la tua voce non resta nelle tracce per persona né nella trascrizione. Il video della sala, se registrato, ti riprende comunque."
+        }
+      },
+      "transcription": {
+        "title": "Trascrizione dei tuoi interventi",
+        "give": "Acconsento alla trascrizione",
+        "giveEffect": "I tuoi interventi entrano nella trascrizione dell'evento con il tuo nome. Senza, partecipi lo stesso.",
+        "withdrawEffect": "Se lo ritiri, le tue frasi già trascritte perdono testo e nome, e da ora la tua voce non viene registrata in una traccia a parte né trascritta.",
+        "needsRecording": "Si può dare dopo il consenso alla registrazione."
+      }
+    }
   },
   "qa": {
     "title": "Domande e Risposte",
@@ -1043,7 +1111,6 @@
         "coverImageHelp": "Compare nella pagina pubblica e nelle email agli iscritti.",
         "scheduleHeading": "Calendario",
         "timezone": "Fuso orario",
-        "recurrenceHeading": "Ricorrenza",
         "tagsHeading": "Categorie (tag)",
         "newTag": "Nuova categoria",
         "newTagLabel": "Nome della nuova categoria",
@@ -1088,11 +1155,11 @@
           "BALANCED": "Bilanciata (540p)",
           "SAVE_DATA": "Risparmio dati (360p)"
         },
-        "requiredLegend": "I campi con * servono per salvare l'evento: finché sono vuoti lo vedi accanto a ciascuno.",
         "kickerHint": "Per un sopratitolo, scrivilo prima del titolo e separali con |, per esempio «Ciclo di incontri | Il primo appuntamento».",
         "kickerUse": "Mostra «{kicker}» come sopratitolo",
         "kickerPreview": "Così appare sulla pagina dell'evento",
-        "coverImageSize": "16:9, consigliata 1600 × 900 pixel."
+        "coverImageSize": "16:9, consigliata 1600 × 900 pixel.",
+        "requiredNote": "I campi con * sono obbligatori."
       },
       "step2": {
         "heading": "Chi può fare cosa",
@@ -1133,11 +1200,11 @@
         "roomFeaturesHeading": "Funzioni della stanza",
         "aiPipelineOff": "La post-produzione AI (trascrizione, sintesi, traduzioni) non è attiva su questa installazione.",
         "rolesHeading": "I ruoli dell'evento",
-        "roleModeratorColumn": "Organizzatore e moderatore",
+        "roleModeratorColumn": "Co-organizzatore e moderatore",
         "roleInfo": {
           "organizer": {
-            "name": "Organizzatore",
-            "desc": "Conduce la sala come un moderatore ed è presentato fra chi organizza. L'organizzatore principale aggiunge e toglie le altre persone. Con un account dello staff con la stessa email, gestisce anche l'evento."
+            "name": "Co-organizzatore",
+            "desc": "Conduce la sala come un moderatore ed è presentato fra chi organizza. Con un account dello staff con la stessa email, gestisce anche l'evento."
           },
           "moderator": {
             "name": "Moderatore",
@@ -1149,10 +1216,17 @@
           },
           "guest": {
             "name": "Partecipante",
-            "desc": "Segue l'evento e interagisce come decidi nella tabella qui sotto."
+            "desc": "Segue l'evento e interagisce come decidi nel passo «Permessi»."
           }
         },
-        "recordingManualNote": "La registrazione non parte mai da sola: chi conduce la avvia con il pulsante REC."
+        "recordingManualNote": "La registrazione non parte mai da sola: chi conduce la avvia con il pulsante REC.",
+        "listenOnlyWithoutConsent": "Chi non acconsente entra in solo ascolto",
+        "listenOnlyWithoutConsentOn": "Il consenso alla registrazione è libero: chi non lo dà partecipa lo stesso, segue e scrive in chat, ma microfono, videocamera e schermo restano chiusi.",
+        "listenOnlyWithoutConsentOff": "Senza consenso alla registrazione non si entra.",
+        "listenOnlyLockedLive": "Con la sala aperta registrazione e solo ascolto non si cambiano: valgono dal primo ingresso.",
+        "audienceAnonymous": "Pubblico anonimo",
+        "audienceAnonymousDesc": "Chi partecipa compare agli altri con uno pseudonimo («Partecipante» e un codice) in video, in chat e nelle domande; l'elenco dei partecipanti resta a chi conduce, e non c'è la piazza. Utile per gli eventi grandi; negli eventi di comunità ci si vuole conoscere.",
+        "audienceAnonymousLocked": "Con la sala aperta non si cambia: accosterebbe gli pseudonimi ai nomi."
       },
       "step3": {
         "heading": "Persone e inviti",
@@ -1170,23 +1244,23 @@
         "remove": "Rimuovi",
         "invalidEmail": "Indirizzo email non valido.",
         "duplicateEmail": "Indirizzo già presente.",
-        "rubricaPick": "Cerca dalla rubrica…",
+        "rubricaPick": "Cerca per ente nella rubrica…",
         "rubricaOrAdd": "oppure aggiungi manualmente",
         "removeItem": "Rimuovi {name}",
         "invitationsStaffOnly": "Gli inviti li gestisce lo staff dell'evento.",
         "pickSkipped": "Alcune persone erano già presenti, o senza un indirizzo valido, e non sono state aggiunte.",
-        "primaryHeading": "Organizzatore principale",
+        "primaryHeading": "Moderatore principale",
         "primaryHelp": "Riceve per email il link principale dell'evento: conduce la sala e aggiunge o toglie le altre persone. Nome ed email servono per pubblicare, non per la bozza.",
-        "primaryPrefilled": "L'organizzatore principale sei tu, con il nome e l'email del tuo account. Se l'evento lo conduce un'altra persona, scrivi qui i suoi dati: il link arriverà a lei.",
-        "primaryNameRequired": "Inserisci il nome dell'organizzatore principale.",
-        "primaryEmailRequired": "Inserisci un'email valida dell'organizzatore principale.",
+        "primaryPrefilled": "Il moderatore principale sei tu, con il nome e l'email del tuo account. Se l'evento lo conduce un'altra persona, scrivi qui i suoi dati: il link arriverà a lei.",
+        "primaryNameRequired": "Inserisci il nome del moderatore principale.",
+        "primaryEmailRequired": "Inserisci un'email valida del moderatore principale.",
         "linksOnPublish": "I link personali partono per email alla pubblicazione; finché l'evento è una bozza si copiano dalla sua pagina.",
         "personName": "Nome",
         "personEmail": "Email",
-        "peopleHeading": "Persone dell'evento",
-        "peopleHelp": "Organizzatori, moderatori e relatori. Ognuno riceve un proprio link per entrare con il suo ruolo; che cosa può fare ogni ruolo lo dicono le «Impostazioni avanzate».",
+        "peopleHeading": "Moderatori e relatori",
+        "peopleHelp": "Co-organizzatori, moderatori e relatori. Ognuno riceve un proprio link per entrare con il suo ruolo; che cosa può fare ogni ruolo è spiegato qui sopra.",
         "personRole": "Ruolo",
-        "roleOrganizer": "Organizzatore",
+        "roleOrganizer": "Co-organizzatore",
         "roleModerator": "Moderatore",
         "roleSpeaker": "Relatore",
         "roleHelp": {
@@ -1225,7 +1299,7 @@
         "programMinutesFor": "Minuti previsti, argomento {n}",
         "programTimeUnknown": "Ora non calcolata: un argomento precedente non ha la durata",
         "programNone": "Nessuno",
-        "programLeadOrganizer": "Organizzatore principale",
+        "programLeadOrganizer": "Moderatore principale",
         "programMoveUp": "Sposta su l'argomento {n}",
         "programMoveDown": "Sposta giù l'argomento {n}",
         "programRemove": "Togli l'argomento {n}",
@@ -1239,8 +1313,8 @@
         "programSpeakerRemoved": "{count, plural, one {Un argomento non ha più chi interviene: la persona è stata tolta dall'evento.} other {# argomenti non hanno più chi interviene: le persone sono state tolte dall'evento.}}",
         "programFrozen": "L'agenda è già stata usata in sala: qui la vedi, ma si cambia dalla sala.",
         "programPerson": "{name} ({role})",
-        "invitationsHelpOpen": "Facoltativo: l'elenco di chi inviti tu. L'iscrizione è aperta, quindi dopo la pubblicazione chiunque può iscriversi, invitato o no. La piattaforma non manda inviti: condividi tu il link dell'evento.",
-        "invitationsHelpRestricted": "L'iscrizione è riservata: possono iscriversi solo gli indirizzi di questo elenco. La piattaforma non manda inviti: condividi tu il link dell'evento; il link per entrare arriva per email dopo l'iscrizione.",
+        "invitationsHelpOpen": "Le persone che inviti tu. L'iscrizione è aperta: chiunque può iscriversi, invitato o no. Dopo la pubblicazione, dalla pagina dell'evento mandi a queste persone l'invito per email.",
+        "invitationsHelpRestricted": "Possono iscriversi solo gli indirizzi di questo elenco. Dopo la pubblicazione, dalla pagina dell'evento mandi a ciascuno l'invito per email, con il link per iscriversi; il link per entrare arriva dopo l'iscrizione.",
         "logoExternal": "Nella pagina pubblica compaiono solo i loghi caricati su questa piattaforma: un logo da un altro sito non si vedrà.",
         "primaryProfileInvalid": "Controlla l'ente e l'indirizzo del logo.",
         "primaryMore": "Foto, ente, logo e pagina pubblica",
@@ -1258,7 +1332,9 @@
         "editQuestions": "Modifica",
         "editQuestionsBefore": "Modifica le domande all'iscrizione",
         "editQuestionsAfter": "Modifica il questionario di gradimento",
-        "accessStaffOnly": "Chi si iscrive lo decide lo staff dell'evento."
+        "accessStaffOnly": "Chi si iscrive lo decide lo staff dell'evento.",
+        "whoOrganizes": "Chi organizza",
+        "rubricaWho": "Nella rubrica ci sono le persone che si sono iscritte a un evento e hanno accettato di restarci."
       },
       "step4": {
         "heading": "Contenuti e materiali",
@@ -1334,9 +1410,9 @@
           "multitrack": "Registrazione per-partecipante",
           "multitrackOn": "Attiva — richiede consenso esplicito in registrazione",
           "organizingEntities": "Enti organizzatori",
-          "primaryOrganizer": "Organizzatore principale",
+          "primaryOrganizer": "Moderatore principale",
           "primaryMissing": "Da indicare nel passo «Persone» per pubblicare",
-          "organizersPeople": "Altri organizzatori",
+          "organizersPeople": "Co-organizzatori",
           "moderators": "Moderatori",
           "programme": "Programma: {count, plural, one {# argomento} other {# argomenti}}",
           "programmeWithDuration": "Programma: {count, plural, one {# argomento} other {# argomenti}}, {duration}"
@@ -1385,7 +1461,8 @@
           "invites": "Persone",
           "programme": "Programma",
           "review": "Riepilogo",
-          "advanced": "Impostazioni avanzate"
+          "advanced": "Impostazioni avanzate",
+          "permissions": "Permessi"
         },
         "templateInUse": "Modello: <b>{name}</b>",
         "noTemplate": "Evento senza modello",
@@ -1397,18 +1474,16 @@
         "recordingManual": "Disponibile: parte solo quando chi conduce preme REC.",
         "aiAfter": "Dopo la registrazione: {list}.",
         "scheduleHeading": "Quando si svolge",
-        "scheduleIntro": "Data, ora e quante persone ti aspetti: servono a preparare la sala.",
+        "scheduleIntro": "Quando si tiene l'evento: data, ora e fuso orario.",
         "advancedIntro": "Valori già scelti dal modello: cambia solo quello che serve.",
         "advancedIntroTemplate": "Valori già scelti dal modello «{name}»: cambia solo quello che serve.",
-        "requiredToSave": "Serve per salvare l'evento.",
         "requiredToPublish": "Serve per pubblicare l'evento.",
         "toComplete": "Da completare",
         "missingHeading": "Per pubblicare manca ancora:",
-        "fieldOrganizerName": "Nome dell'organizzatore principale",
-        "fieldOrganizerEmail": "Email dell'organizzatore principale",
+        "fieldOrganizerName": "Nome del moderatore principale",
+        "fieldOrganizerEmail": "Email del moderatore principale",
         "fieldProgrammeMinutes": "Durata dell'argomento {n} del programma",
         "sections": {
-          "participation": "Partecipazione e funzioni della sala",
           "recording": "Registrazione e AI",
           "content": "Contenuti: materiali e questionari",
           "room": "Sala d'attesa e video",
@@ -1440,7 +1515,17 @@
         "askEmail": "email",
         "askOrganization": "ente",
         "askRole": "ruolo",
-        "askType": "tipo di ente"
+        "askType": "tipo di ente",
+        "permissionsHeading": "Chi può fare cosa in sala",
+        "permissionsIntro": "Che cosa possono fare i partecipanti e quali funzioni della sala sono accese. Tutto si cambia anche durante l'evento.",
+        "consentsLine": "Consensi in iscrizione e in sala: {list}",
+        "consentRecordingRequired": "registrazione, obbligatoria per entrare",
+        "consentRecordingFree": "registrazione, libera (senza, solo ascolto)",
+        "consentRecordingNotice": "per la registrazione solo un avviso (chi partecipa non parla né si mostra)",
+        "consentTranscription": "trascrizione dei propri interventi, facoltativa",
+        "consentsNone": "Nessun consenso oltre a quello dell'iscrizione.",
+        "consentsHosts": "A chi conduce e interviene la registrazione si chiede in sala, facoltativa.",
+        "consentsWithdraw": "Chi partecipa può ritirarli in sala, dal pulsante «Consensi»."
       },
       "preview": {
         "title": "Anteprima della pagina",
@@ -1452,8 +1537,8 @@
       },
       "programme": {
         "heading": "Programma dell'incontro",
-        "intro": "Gli argomenti in ordine: chi parla, di cosa e per quanto. Compaiono sotto la descrizione, con gli orari calcolati dall'inizio ({start}). È facoltativo.",
-        "introNoStart": "Gli argomenti in ordine: chi parla, di cosa e per quanto. Compaiono sotto la descrizione, con gli orari calcolati dall'inizio dell'evento. È facoltativo.",
+        "intro": "Gli argomenti in ordine: chi parla, di cosa e per quanto. Compaiono sotto la descrizione, con gli orari calcolati dall'inizio ({start}).",
+        "introNoStart": "Gli argomenti in ordine: chi parla, di cosa e per quanto. Compaiono sotto la descrizione, con gli orari calcolati dall'inizio dell'evento.",
         "statusOn": "Compare nella pagina dell'evento e in sala mostra a tutti l'argomento in corso.",
         "statusOff": "Spento: il programma non compare nella pagina né in sala.",
         "turnOn": "Accendi",
@@ -1497,7 +1582,8 @@
         "offKeptEdit": "Finché il programma è spento resta quello dell'ultimo salvataggio: le modifiche fatte qui si salvano solo riaccendendolo.",
         "toggleOffWarningCreate": "Spento, il programma ({count, plural, one {# argomento} other {# argomenti}}) non compare nella pagina e non si salva con l'evento: riaccendilo per tenerlo.",
         "reviewOffCreate": "Programma: spento, non si salva con l'evento ({count, plural, one {# argomento} other {# argomenti}})"
-      }
+      },
+      "saveCopy": "Salva la copia"
     },
     "nav": {
       "events": "Eventi",
@@ -1526,7 +1612,6 @@
       "questionnairesLibrary": "Modelli di questionario",
       "questionnairesResponses": "Risposte",
       "ariaLabel": "Navigazione amministrazione",
-      "subNavAriaLabel": "Navigazione sezione",
       "rubrica": "Rubrica",
       "settingsEmailTemplates": "Template email",
       "settingsTags": "Tag",
@@ -1542,7 +1627,9 @@
       "video": "Video",
       "glossary": "Glossario",
       "breadcrumbAriaLabel": "Percorso",
-      "skipToPage": "Vai al contenuto della pagina"
+      "skipToPage": "Vai al contenuto della pagina",
+      "openMenu": "Apri il menu",
+      "closeMenu": "Chiudi il menu"
     },
     "publications": {
       "subtitle": "Hub editoriale unico per tutti i video pubblicati: eventi schedulati, call istantanee, archivi storici caricati e sessioni in attesa di promozione.",
@@ -1698,7 +1785,8 @@
       "actions": {
         "DATA_DELETED": "Dati cancellati",
         "CONSENT_RECORDED": "Consenso registrato",
-        "DATA_EXPORTED": "Dati esportati"
+        "DATA_EXPORTED": "Dati esportati",
+        "CONSENT_WITHDRAWN": "Consenso ritirato"
       },
       "recordsAffected": "{count} record coinvolti",
       "colWhen": "Quando",
@@ -1820,13 +1908,6 @@
     "deleteSuccess": "Evento eliminato",
     "publishSuccess": "Evento pubblicato",
     "unpublishSuccess": "Evento ritirato",
-    "startEvent": "Avvia evento",
-    "startEventSuccess": "Evento avviato! I partecipanti in attesa verranno reindirizzati automaticamente.",
-    "startEventConfirmTitle": "Avviare l'evento?",
-    "startEventConfirmMessage": "Inizio previsto: {when}. Chi ha il link potrà entrare da subito e la sala video si accende ora.",
-    "startEventConfirmEarly": "Mancano più di 30 minuti all'inizio.",
-    "startEventFailed": "L'evento non si è avviato. Riprova.",
-    "jvbWarmupWarning": "I server video si stanno avviando (circa 2 minuti). I partecipanti vedranno un avviso nella sala d'attesa.",
     "eventIsLive": "L'evento è in corso",
     "liveParticipants": "{count} in stanza / {max} max",
     "joinAsModeratorBtn": "Entra come moderatore",
@@ -1864,7 +1945,6 @@
         "expected": "{count, plural, one {partecipante atteso} other {partecipanti attesi}}",
         "registered": "{count, plural, =0 {nessun iscritto finora} one {# iscritto finora} other {# iscritti finora}}",
         "change": "Cambia",
-        "changeParticipants": "Cambia il numero di partecipanti attesi",
         "sizedOnRegistrations": "Gli iscritti sono più dei partecipanti attesi: la stima conta i {count} iscritti.",
         "cameraQuestion": "Quante webcam saranno accese?",
         "camera": {
@@ -2076,7 +2156,7 @@
       "guestJoinHint": "Link rapido per invitare un partecipante all'ultimo momento: accede come ospite quando l'evento è dal vivo, senza compilare il form di registrazione.",
       "callInvite": "Link per i partecipanti",
       "callInviteHint": "Chi lo riceve entra nella chiamata come ospite, senza iscrizione. Una chiamata rapida non ha una pagina pubblica: è questo il link da condividere.",
-      "moderatorLink": "Link moderatore",
+      "moderatorLink": "Link di gestione (moderatore)",
       "moderatorLinkHint": "Condividi questo link solo con i moderatori. Chiunque lo abbia può gestire l'evento.",
       "liveRoomHint": "Link per entrare direttamente nella stanza come moderatore.",
       "copyLink": "Copia link",
@@ -2086,7 +2166,8 @@
       "warning": "Chi ha questo link amministra l’evento: non mostrarlo in condivisione schermo e non incollarlo in chat.",
       "hidden": "Link nascosto",
       "copyFailed": "Copia non riuscita: seleziona l’indirizzo qui sotto e copialo a mano.",
-      "notYetPublished": "Si apre dopo la pubblicazione: fino ad allora chi lo usa trova «pagina non trovata»."
+      "notYetPublished": "Si apre dopo la pubblicazione: fino ad allora chi lo usa trova «pagina non trovata».",
+      "copyFailedShort": "Copia non riuscita"
     },
     "feedbackAdmin": {
       "title": "Risultati Feedback",
@@ -2162,7 +2243,8 @@
       "actions": {
         "DATA_DELETED": "Dati eliminati",
         "CONSENT_RECORDED": "Consenso registrato",
-        "DATA_EXPORTED": "Dati esportati"
+        "DATA_EXPORTED": "Dati esportati",
+        "CONSENT_WITHDRAWN": "Consenso ritirato"
       }
     },
     "settings": {
@@ -2476,9 +2558,9 @@
     },
     "recurrence": {
       "label": "Ricorrenza",
-      "helpText": "Rendi l'evento ricorrente. Verrà creata una serie a partire dalla data di inizio.",
+      "helpText": "Se l'evento si ripete, quando lo duplichi la copia propone già la data della prossima edizione.",
       "preset": {
-        "none": "Nessuna",
+        "none": "Non si ripete",
         "daily": "Ogni giorno",
         "weekly": "Ogni settimana",
         "weekdays": "Giorni feriali",
@@ -2532,7 +2614,6 @@
       "aiTranscript": "Trascrizione automatica (default)",
       "aiSummary": "Sintesi automatica (default)",
       "aiTranslation": "Traduzione automatica (default)",
-      "pickerTitle": "Scegli un template",
       "pickerSubtitle": "Seleziona un template per pre-configurare le impostazioni dell'evento, oppure salta per configurare tutto manualmente.",
       "skipTemplate": "Configura manualmente",
       "postEventPublic": "Pagina dopo l'evento pubblica",
@@ -2911,10 +2992,7 @@
       "resultsCount": "{count, plural, =0 {Nessun evento} one {# evento} other {# eventi}}",
       "menu": {
         "actionsFor": "Azioni per «{title}»",
-        "manage": "Gestisci",
         "edit": "Modifica",
-        "openPublic": "Apri la pagina pubblica",
-        "newTab": "(si apre in una nuova scheda)",
         "copyLink": "Copia il link pubblico",
         "linkCopied": "Link copiato",
         "publish": "Pubblica",
@@ -2923,7 +3001,7 @@
         "unpublishMessage": "«{title}» sparirà dalle pagine pubbliche finché non lo pubblichi di nuovo. Le iscrizioni già ricevute restano.",
         "published": "Evento pubblicato",
         "unpublished": "Evento ritirato",
-        "duplicate": "Duplica come prossima occorrenza",
+        "duplicate": "Duplica",
         "delete": "Elimina",
         "deleteTitle": "Eliminare l'evento?",
         "deleteMessage": "«{title}» e tutti i suoi dati verranno eliminati. L'operazione non si può annullare.",
@@ -2981,7 +3059,6 @@
       "participantHintPassword": "Si apre in una nuova scheda: la sala come la vede un ospite, dopo la password dell'evento.",
       "participantHintPage": "Si apre in una nuova scheda: la pagina pubblica come la vede chi partecipa.",
       "editEvent": "Modifica evento",
-      "editSettings": "Modifica impostazioni",
       "featureSummary": "Funzionalità attive",
       "organizers": "Organizzatori",
       "privacyGdpr": "Privacy & GDPR",
@@ -3034,9 +3111,9 @@
       "aiGenerateError": "Impossibile avviare la pipeline AI. Verifica che l'AI sia abilitata a livello di sito e che esista una registrazione.",
       "aiGenerateHelp": "Abilita la trascrizione + sintesi AI ed avvia la pipeline sulla registrazione, in un solo clic. Idempotente: cliccare due volte non duplica i job.",
       "aiGenerateNoRecording": "Nessuna registrazione: l'AI post-evento richiede una registrazione (la cattura avviene solo durante l'evento). Puoi comunque gestire la post-produzione qui.",
-      "duplicateNext": "Duplica per la prossima",
+      "duplicateNext": "Duplica",
       "duplicateNextBusy": "Duplicazione…",
-      "duplicateNextHint": "Crea una bozza con l'intera configurazione di questo evento (registrazione, tracce separate, AI, agenda, promemoria). Se l'evento ha una cadenza, la data viene portata alla prossima occorrenza; altrimenti resta da impostare.",
+      "duplicateNextHint": "Crea una copia in bozza con l'intera configurazione di questo evento. Se l'evento si ripete, la copia parte dalla prossima edizione; altrimenti ha le stesse date, da aggiornare.",
       "duplicateNextError": "Duplicazione non riuscita. Riprova.",
       "capacitySection": "Capacità e infrastruttura",
       "capacitySubtitle": "Dimensionato per circa {max} partecipanti attesi",
@@ -3048,11 +3125,12 @@
         "publishFailedTitle": "Pubblicazione non riuscita",
         "publishFailedBody": "L'evento è salvato come bozza: pubblicalo da questa pagina quando il problema è risolto.",
         "unsaved": "Non sono stati salvati: {items}. Puoi aggiungerli da questa pagina.",
-        "copyParticipantLink": "Copia il link per i partecipanti",
         "sendToSpeakers": "Link di moderatori e relatori",
         "close": "Chiudi il riepilogo",
         "publishNow": "Pubblica ora"
-      }
+      },
+      "editFeatures": "Modifica le funzioni",
+      "editPrivacy": "Modifica privacy e dati"
     },
     "rubrica": {
       "subtitle": "Persone che hanno dato consenso all'inserimento in rubrica (art. 6.1.a GDPR). Le informazioni di profilo vengono aggiornate automaticamente ad ogni re-iscrizione.",
@@ -3660,6 +3738,7 @@
     "guided": {
       "title": "Com'è il tuo evento?",
       "intro": "Quattro domande per partire con le impostazioni giuste. Ogni funzione si può accendere o spegnere anche durante l'evento.",
+      "introNoRecording": "Tre domande per partire con le impostazioni giuste. Ogni funzione si può accendere o spegnere anche durante l'evento.",
       "peopleQ": "Quante persone ti aspetti?",
       "people": {
         "piccolo": "Fino a 20",
@@ -3684,9 +3763,7 @@
       "preview": "Il tuo evento",
       "previewPeople": "Partecipanti attesi: circa {count}",
       "continue": "Continua",
-      "useTemplate": "Oppure usa un modello",
-      "instantAlt": "Oppure una videocall istantanea",
-      "instantAltAction": "Crea la videocall",
+      "useTemplate": "Parti da un modello",
       "summary": {
         "piccolo": "Fino a 20 persone",
         "medio": "Fino a 100 persone",
@@ -3702,10 +3779,12 @@
       "access": {
         "open": "Chiunque si iscriva",
         "openDesc": "Chi vuole si iscrive dalla pagina dell'evento",
-        "invitation": "Solo chi inviti",
-        "invitationDesc": "La pagina resta visibile, ma si iscrive solo chi è fra gli invitati; senza iscrizione non si entra"
+        "invitation": "Solo persone invitate",
+        "invitationDesc": "La pagina resta visibile, ma si iscrive solo chi è nell'elenco; l'invito con il link per iscriversi lo mandi per email dalla pagina dell'evento"
       },
-      "previewInvitation": "Solo chi inviti si iscrive; senza iscrizione non si entra."
+      "previewInvitation": "Si iscrive solo chi è invitato; senza iscrizione non si entra.",
+      "templateReplaces": "Un modello porta le sue impostazioni al posto delle risposte qui sotto. Titolo, date e persone li scrivi nei passi seguenti.",
+      "instantBack": "Crea invece un evento programmato"
     },
     "captionsTranscript": {
       "title": "Trascrizione dai sottotitoli",
@@ -3794,10 +3873,21 @@
       "status": "Stato",
       "roleSpeaker": "Relatore",
       "registered": "Iscritto",
-      "notRegistered": "Non ancora iscritto",
       "organizersTitle": "Enti organizzatori",
       "organizersEdit": "Modifica gli enti",
-      "organizersEmpty": "Nessun ente indicato: la pagina pubblica non mostra chi organizza."
+      "organizersEmpty": "Nessun ente indicato: la pagina pubblica non mostra chi organizza.",
+      "sendAll": "Invia l'invito a chi non l'ha ancora ricevuto ({count})",
+      "sending": "Invio…",
+      "sendDone": "Inviti in partenza: {sent}. Saltati, perché già iscritti o senza indirizzo: {skipped}.",
+      "sendError": "Invio non riuscito: riprova.",
+      "sendNotPublished": "Gli inviti partono mentre l'evento accetta iscrizioni: dopo la pubblicazione e prima della fine.",
+      "invitedOn": "Invitato il {date}",
+      "notInvited": "Invito da inviare",
+      "send": "Invia l'invito",
+      "resend": "Invia di nuovo",
+      "actions": "Azioni",
+      "sendTooMany": "Troppi invii in poco tempo: riprova tra un minuto.",
+      "sendRemaining": "Ne restano {remaining}: premi di nuovo per mandarli."
     },
     "closing": {
       "title": "Chiudi l'evento",
@@ -4013,6 +4103,56 @@
         "item": "{language}: {state}",
         "review": "Rivedi i testi"
       }
+    },
+    "voiceConsent": {
+      "title": "Trascrivere il video completo?",
+      "message": "Questo evento ha chiesto a ognuno il consenso alla trascrizione dei propri interventi. Il video completo contiene tutte le voci, anche di chi non l'ha dato: trascrivilo solo se tutte le persone che parlano nel video hanno acconsentito. La tua conferma resta nel registro delle attività.",
+      "confirm": "Sì, tutte hanno acconsentito",
+      "cancel": "Annulla",
+      "waiting": "La trascrizione del video completo non è partita da sola: in questo evento è stato chiesto a ognuno il consenso alla trascrizione dei propri interventi. Avviala con {button} solo se tutte le persone che parlano nel video hanno acconsentito; altrimenti resta la trascrizione dai sottotitoli."
+    },
+    "editCopyTitle": "Copia dell'evento",
+    "editCopyNoticeNext": "Stai lavorando su una copia in bozza: l'evento originale non cambia. La data è già quella della prossima edizione: controlla il resto e salva.",
+    "editCopyNoticeSameDates": "Stai lavorando su una copia in bozza: l'evento originale non cambia. Ha le stesse date dell'originale: aggiornale prima di salvare.",
+    "consentProofs": {
+      "title": "Prove dei consensi",
+      "intro": "I consensi alla registrazione e alla trascrizione dati all'iscrizione, in sala d'attesa o in sala, e quelli ritirati. L'elenco con i nomi serve a dimostrarli.",
+      "loading": "Caricamento…",
+      "loadFailed": "Non è stato possibile leggere le prove dei consensi.",
+      "none": "Nessun consenso alla registrazione o alla trascrizione per questo evento.",
+      "kinds": {
+        "recording": "Registrazione",
+        "transcription": "Trascrizione degli interventi"
+      },
+      "counts": "acconsentono {given} · hanno ritirato {withdrawn}",
+      "download": "Scarica l'elenco (CSV)",
+      "downloading": "Download in corso…",
+      "downloadNote": "L'elenco contiene i nomi delle persone: l'esportazione resta nel registro GDPR dell'evento.",
+      "downloadFailed": "Non è stato possibile scaricare l'elenco: riprova.",
+      "csv": {
+        "kind": "Consenso",
+        "source": "Dove",
+        "role": "Ruolo",
+        "name": "Nome",
+        "givenAt": "Dato il",
+        "withdrawnAt": "Ritirato il",
+        "textVersion": "Versione del testo",
+        "kinds": {
+          "recording": "Registrazione",
+          "transcription": "Trascrizione degli interventi"
+        },
+        "sources": {
+          "registration": "iscrizione",
+          "room": "sala"
+        },
+        "roles": {
+          "registrant": "iscritto",
+          "guest": "ospite",
+          "host": "conduce o interviene"
+        },
+        "unreadableName": "(nome non leggibile)"
+      },
+      "countsNote": "Si contano le persone: un'iscrizione, un account dello staff o un link nominale contano una volta; un ospite che torna in un'altra visita conta di nuovo."
     }
   },
   "email": {
@@ -4047,7 +4187,9 @@
     "upcoming": {
       "title": "Prossimi eventi",
       "viewAll": "Vedi tutti gli eventi",
-      "noEvents": "Nessun evento in programma. Torna presto!"
+      "noEvents": "Nessun evento in programma. Torna presto!",
+      "seePast": "Eventi passati",
+      "seeRecordings": "Registrazioni"
     },
     "howItWorks": {
       "title": "Come si partecipa",
@@ -4187,9 +4329,11 @@
       "recordingRequired": "Il consenso alla videoregistrazione è obbligatorio per partecipare a questo evento",
       "recordingNotice": "L'evento viene registrato (audio e video). Partecipi senza microfono né videocamera: la registrazione non contiene la tua voce né la tua immagine, a meno che chi conduce non ti dia la parola.",
       "multitrack": "Acconsento alla trascrizione dei miei interventi, con il mio nome, per il resoconto dell'evento. Se l'evento registra una traccia audio per ogni persona, la mia voce viene registrata a questo solo scopo e la traccia si cancella dopo la trascrizione; non viene usata per identificare o riprodurre la mia voce.",
-      "multitrackOptional": "È facoltativo: se non acconsenti partecipi lo stesso, ma la tua voce non viene registrata e i tuoi interventi non entrano nella trascrizione.",
+      "multitrackOptional": "È facoltativo: se non acconsenti partecipi lo stesso, ma i tuoi interventi non entrano nella trascrizione e la tua voce non viene registrata in una traccia a parte. Se l'evento è registrato, la tua voce resta comunque nel video.",
       "stayInTouch": "Voglio ricevere informazioni sui prossimi eventi ed essere inserito nella rubrica, per essere invitato a eventi simili",
-      "stayInTouchHelp": "Consenso facoltativo (art. 6.1.a GDPR). Puoi revocarlo in qualsiasi momento dal link «Rimuovi i miei dati dalla rubrica» nelle email che riceverai. Nome e organizzazione sono quelli di questa iscrizione."
+      "stayInTouchHelp": "Consenso facoltativo (art. 6.1.a GDPR). Puoi revocarlo in qualsiasi momento dal link «Rimuovi i miei dati dalla rubrica» nelle email che riceverai. Nome e organizzazione sono quelli di questa iscrizione.",
+      "recordingOptionalListenOnly": "Se non acconsenti partecipi lo stesso, in solo ascolto: segui e scrivi in chat, ma microfono, videocamera e condivisione dello schermo restano chiusi. Puoi acconsentire più tardi, dalla sala.",
+      "recordingOptionalHost": "Se non acconsenti entri lo stesso e conduci come sempre, ma la tua voce non resta nelle tracce per persona né nella trascrizione. Il video della sala, se registrato, ti riprende comunque."
     },
     "export": {
       "title": "I miei dati",
@@ -4852,11 +4996,13 @@
     "transparency": "Sicurezza e trasparenza",
     "serviceInventory": "Inventario servizi",
     "sourceCode": "Codice sorgente",
-    "buildInfoDev": "build di sviluppo",
-    "viewCommit": "Vedi il commit su GitHub",
     "viewRelease": "Vedi la release su GitHub",
     "viewChangelog": "Vedi le novità (changelog)",
-    "buildDatePrefix": "Compilato il"
+    "newWindow": "si apre in una nuova finestra",
+    "usefulLinks": "Link utili",
+    "version": "Versione {version}",
+    "versionDev": "Versione di sviluppo",
+    "updatedOn": "aggiornata il {date}"
   },
   "changelog": {
     "metaTitle": "Novità e changelog",
@@ -5023,7 +5169,9 @@
       "version": "Versione pipeline"
     },
     "overlapBadge": "simultaneo",
-    "overlapTitle": "Parlato simultaneo: in questo intervallo parla più di una persona contemporaneamente."
+    "overlapTitle": "Parlato simultaneo: in questo intervallo parla più di una persona contemporaneamente.",
+    "anonymousSpeaker": "Partecipante {n}",
+    "untranscribed": "Intervento non trascritto: chi parlava non ha dato il consenso"
   },
   "waiting": {
     "startsIn": "L'evento inizierà tra",
@@ -5087,9 +5235,6 @@
     "endedWatchRecording": "Guarda la registrazione",
     "endedLeaveFeedback": "Lascia un feedback",
     "startEventError": "Errore nell'avvio dell'evento. Riprova.",
-    "emailLabel": "Email (facoltativa)",
-    "emailHelp": "Solo per eventuale follow-up post-evento",
-    "emailInvalid": "Inserisci un indirizzo email valido",
     "chatLockedMessage": "Inserisci il tuo nome per partecipare alla chat dell'evento.",
     "classicView": "Vista classica",
     "backToGarden": "Mostra la piazza",
@@ -5322,7 +5467,12 @@
     "waitingForStartButton": "In attesa dell'avvio",
     "countdownHours": "{hours}h",
     "countdownMinutes": "{minutes}m",
-    "countdownSeconds": "{seconds}s"
+    "countdownSeconds": "{seconds}s",
+    "startEarlyConfirm": "Mancano più di 30 minuti all'inizio previsto ({when}). Avviando ora, chi ha il link entra subito e la sala video si accende: premi di nuovo per confermare.",
+    "startEarlyYes": "Avvia ora",
+    "startEarlyNo": "Aspetta l'orario previsto",
+    "anonymousNameHelp": "In questo evento il pubblico è anonimo: gli altri non vedono il tuo nome, ma uno pseudonimo con un codice.",
+    "registeredNameHelp": "È il nome dato all'iscrizione: in sala comparirai così."
   },
   "recording": {
     "management": "Registrazione video",

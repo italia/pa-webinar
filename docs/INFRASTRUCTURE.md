@@ -819,10 +819,13 @@ kubectl -n pa-webinar get job np-check
 
 ### What is published
 
-The project publishes to GitHub Container Registry. **None of these images can
-be pulled anonymously today**, so an install with the default values ends in
-`ImagePullBackOff` unless you give the cluster credentials, a mirror or local
-builds ([Registry access](install/README.md#registry-access-to-the-published-images)):
+The project publishes to GitHub Container Registry. The portal, migration,
+recorder controller, live-captions and CPU worker images can be pulled
+anonymously. **The patched web image, the recorder bot and the GPU worker image
+cannot**, so an install with the default values, which use the patched web
+image, ends in `ImagePullBackOff` unless you give the cluster credentials, a
+mirror or the standard web image
+([Registry access](install/README.md#registry-access-to-the-published-images)):
 
 | Image | Used for | Tags |
 |---|---|---|
@@ -845,7 +848,7 @@ From the repository root:
 
 ```bash
 docker build -t pa-webinar:local .                                 # portal
-docker build --target builder -t pa-webinar:local-migrate .        # migrations (about 2.4 GB)
+docker build --target builder -t pa-webinar:local-migrate .        # migrations (about 2.9 GB)
 ```
 
 The browser-facing settings (`NEXT_PUBLIC_*`) are read at runtime, so one image

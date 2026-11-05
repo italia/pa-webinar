@@ -81,7 +81,8 @@
     "deselectAll": "Deselect all",
     "durationMinutes": "{minutes, plural, one {# minute} other {# minutes}}",
     "durationHours": "{hours, plural, one {# hour} other {# hours}}",
-    "durationHoursMinutes": "{hours, plural, one {# hour} other {# hours}} {minutes, plural, one {# minute} other {# minutes}}"
+    "durationHoursMinutes": "{hours, plural, one {# hour} other {# hours}} {minutes, plural, one {# minute} other {# minutes}}",
+    "backToTop": "Back to top"
   },
   "markdown": {
     "edit": "Write",
@@ -102,7 +103,14 @@
     "switchLanguage": "Switch language",
     "skipToContent": "Skip to content",
     "skipToFooter": "Skip to footer",
-    "mainLabel": "Main navigation"
+    "mainLabel": "Main navigation",
+    "activeLanguage": "Active language:",
+    "languageSelected": "(selected)",
+    "signIn": "Sign in",
+    "roleAdmin": "Administrator",
+    "roleOrganizer": "Organizer",
+    "instanceKey": "Instance key",
+    "signOutFailed": "Sign-out failed: please try again."
   },
   "header": {
     "followUs": "Follow us on"
@@ -204,7 +212,8 @@
       "recordingLinkEmailLabel": "Email you registered with",
       "recordingLinkSend": "Send me the link again",
       "recordingLinkSent": "If the address is registered for the event, you will shortly receive an email with your personal link.",
-      "recordingLinkError": "The request failed. Try again in a few minutes."
+      "recordingLinkError": "The request failed. Try again in a few minutes.",
+      "registerOrGuest": "If you register, you receive your personal link and updates on the event by email. As a guest you enter at once with just a name, only while the event is live, and receive no email."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -523,7 +532,10 @@
       "stopVideo": "Turn off video",
       "revokeFloor": "Take back the floor",
       "lowerHandFailed": "The hand could not be lowered: try again.",
-      "handsRaised": "{count, plural, one {# raised hand} other {# raised hands}}"
+      "handsRaised": "{count, plural, one {# raised hand} other {# raised hands}}",
+      "locksByConsent": "Microphones and cameras follow the recording consent: those who gave it use what the event allows, the others stay listening only. The room's locks stay on.",
+      "listenOnlyBadge": "listen-only",
+      "listenOnlyNoFloor": "Has not consented to the recording: cannot speak until they consent from their room."
     },
     "moderator": {
       "muteAll": "Mute all",
@@ -558,7 +570,8 @@
       "moderatorReveal": "Show moderator link",
       "moderatorWarning": "This link grants MODERATOR access (mute everyone, start recording, end the event). Share it only with other moderators.",
       "moderatorLink": "Moderator link",
-      "moderatorLinkHint": "Anyone opening this link joins as a moderator with full control of the room."
+      "moderatorLinkHint": "Anyone opening this link joins as a moderator with full control of the room.",
+      "copyFailed": "Copy failed: select the address and copy it manually."
     },
     "videoCallFrameTitle": "Event video call",
     "insecureContextTitle": "Insecure address",
@@ -616,7 +629,15 @@
       "unavailable": "Captions are unavailable right now.",
       "show": "Show captions",
       "hide": "Hide captions",
-      "toggle": "Automatic captions"
+      "toggle": "Automatic captions",
+      "controls": "Caption controls",
+      "smaller": "Smaller captions",
+      "larger": "Larger captions",
+      "moveUp": "Move captions to the top",
+      "moveDown": "Move captions to the bottom",
+      "smallerShort": "A−",
+      "largerShort": "A+",
+      "showShort": "CC"
     },
     "eventEndedModerator": "The event has ended. Below you'll find the statistics and, if the event was recorded, the recording and the report.",
     "endLinks": {
@@ -625,7 +646,54 @@
       "publicPage": "Public event page"
     },
     "notOpenNow": "The room is not open right now.",
-    "nameRequired": "The name to join with is missing: go back and type it."
+    "nameRequired": "The name to join with is missing: go back and type it.",
+    "closeSidebar": "Close the side panel",
+    "contentOnly": "Content only, without chat and panels",
+    "showPanels": "Show chat and panels",
+    "confirmFullscreen": "Switch to fullscreen",
+    "listenOnly": {
+      "title": "You are listening only.",
+      "body": "You did not consent to the recording: you follow and write in the chat, but microphone, camera and screen stay off, even if the host gives you the floor. To speak, consent.",
+      "consent": "I consent to the recording and take part",
+      "joining": "Rejoining the room…",
+      "error": "Could not rejoin: please try again."
+    },
+    "pseudonym": "Participant-{code}",
+    "consents": {
+      "open": "Your consents",
+      "button": "Consents",
+      "title": "Your consents",
+      "intro": "You can give or withdraw your consents at any time during the event. Each change reconnects the call for a few seconds.",
+      "given": "Consent given",
+      "notGiven": "Consent not given",
+      "withdraw": "Withdraw consent",
+      "confirmTitle": "Withdraw this consent?",
+      "confirm": "Withdraw",
+      "working": "Updating…",
+      "error": "The consent could not be updated: try again.",
+      "recording": {
+        "title": "Event recording",
+        "give": "I consent to the recording",
+        "without": {
+          "soloAscolto": "Without this consent you follow in listen-only mode: microphone, camera and screen stay closed.",
+          "conduce": "Without this consent you still host, but your voice is not kept in the per-person tracks or in the transcript.",
+          "uscita": "Taking part in this event requires consent to the recording."
+        },
+        "alreadyRecorded": "What has already been recorded stays in the event video: to have it removed, write to the organisers.",
+        "withdraw": {
+          "soloAscolto": "If you withdraw it you stay in the room in listen-only mode: microphone, camera and screen close. Your consent to the transcription of what you say is withdrawn too.",
+          "uscita": "If you withdraw it you leave the call and go back to the waiting room: taking part in this event requires consent to the recording. Your consent to the transcription of what you say is withdrawn too.",
+          "conduce": "If you withdraw it you keep hosting, but from now on your voice is not kept in the per-person tracks or in the transcript. The room video, if recorded, still shows you."
+        }
+      },
+      "transcription": {
+        "title": "Transcription of what you say",
+        "give": "I consent to the transcription",
+        "giveEffect": "What you say goes into the event transcript under your name. Without it you still take part.",
+        "withdrawEffect": "If you withdraw it, your sentences already transcribed lose their text and your name, and from now on your voice is neither recorded on a separate track nor transcribed.",
+        "needsRecording": "You can give it after consenting to the recording."
+      }
+    }
   },
   "qa": {
     "title": "Questions & Answers",
@@ -833,7 +901,6 @@
         "coverImageHelp": "Shown on the public page and in the emails to registrants.",
         "scheduleHeading": "Schedule",
         "timezone": "Timezone",
-        "recurrenceHeading": "Recurrence",
         "tagsHeading": "Tags",
         "newTag": "New category",
         "newTagLabel": "Name of the new category",
@@ -878,11 +945,11 @@
           "BALANCED": "Balanced (540p)",
           "SAVE_DATA": "Save data (360p)"
         },
-        "requiredLegend": "Fields marked * are needed to save the event: while they are empty, each one says so.",
         "kickerHint": "For a kicker above the title, write it first and separate them with |, for example “Meeting series | The first meeting”.",
         "kickerUse": "Show “{kicker}” as a kicker above the title",
         "kickerPreview": "How it looks on the event page",
-        "coverImageSize": "16:9, recommended 1600 × 900 pixels."
+        "coverImageSize": "16:9, recommended 1600 × 900 pixels.",
+        "requiredNote": "Fields marked * are required."
       },
       "step2": {
         "heading": "Who can do what",
@@ -923,11 +990,11 @@
         "roomFeaturesHeading": "Room features",
         "aiPipelineOff": "AI post-production (transcription, summary, translations) is not enabled on this installation.",
         "rolesHeading": "Event roles",
-        "roleModeratorColumn": "Organizer and moderator",
+        "roleModeratorColumn": "Co-organizer and moderator",
         "roleInfo": {
           "organizer": {
-            "name": "Organizer",
-            "desc": "Hosts the room like a moderator and is presented among the organizers. The lead organizer adds and removes the other people. With a staff account under the same email, they also manage the event."
+            "name": "Co-organizer",
+            "desc": "Hosts the room like a moderator and is presented among the organizers. With a staff account under the same email, they also manage the event."
           },
           "moderator": {
             "name": "Moderator",
@@ -939,10 +1006,17 @@
           },
           "guest": {
             "name": "Participant",
-            "desc": "Follows the event and interacts as you decide in the table below."
+            "desc": "Follows the event and interacts as you decide in the \"Permissions\" step."
           }
         },
-        "recordingManualNote": "Recording never starts by itself: a host starts it with the REC button."
+        "recordingManualNote": "Recording never starts by itself: a host starts it with the REC button.",
+        "listenOnlyWithoutConsent": "People who do not consent join listening only",
+        "listenOnlyWithoutConsentOn": "Consent to the recording is free: people who do not give it still take part, follow and write in the chat, but microphone, camera and screen stay off.",
+        "listenOnlyWithoutConsentOff": "Without consent to the recording, nobody enters.",
+        "listenOnlyLockedLive": "While the room may be open, recording and listen-only cannot change: they apply from the first entry.",
+        "audienceAnonymous": "Anonymous audience",
+        "audienceAnonymousDesc": "Participants appear to the others under a pseudonym (“Participant” and a code) on video, in the chat and in questions; the participant list stays with the hosts, and there is no square. Useful for large events; at community events people want to know each other.",
+        "audienceAnonymousLocked": "It cannot change while the room may be open: it would link pseudonyms to names."
       },
       "step3": {
         "heading": "People and invites",
@@ -960,23 +1034,23 @@
         "remove": "Remove",
         "invalidEmail": "Invalid email address.",
         "duplicateEmail": "Email already added.",
-        "rubricaPick": "Search from the address book…",
+        "rubricaPick": "Search the address book by organization…",
         "rubricaOrAdd": "or add manually",
         "removeItem": "Remove {name}",
         "invitationsStaffOnly": "Invitations are managed by the event staff.",
         "pickSkipped": "Some people were already listed, or had no valid address, and were not added.",
-        "primaryHeading": "Lead organizer",
+        "primaryHeading": "Lead moderator",
         "primaryHelp": "Receives the event's main link by email: hosts the room and adds or removes the other people. Name and email are required to publish, not for a draft.",
-        "primaryPrefilled": "You are the lead organizer, with your account's name and email. If someone else runs the event, enter their details here: the link will go to them.",
-        "primaryNameRequired": "Enter the lead organizer's name.",
-        "primaryEmailRequired": "Enter a valid email for the lead organizer.",
+        "primaryPrefilled": "You are the lead moderator, with your account's name and email. If someone else runs the event, enter their details here: the link will go to them.",
+        "primaryNameRequired": "Enter the lead moderator's name.",
+        "primaryEmailRequired": "Enter a valid email for the lead moderator.",
         "linksOnPublish": "Personal links are emailed when the event is published; while it is a draft, copy them from its page.",
         "personName": "Name",
         "personEmail": "Email",
-        "peopleHeading": "Event people",
-        "peopleHelp": "Organizers, moderators and speakers. Each receives their own link to enter with their role; what each role can do is shown in “Advanced settings”.",
+        "peopleHeading": "Moderators and speakers",
+        "peopleHelp": "Co-organizers, moderators and speakers. Each receives their own link to enter with their role; what each role can do is explained above.",
         "personRole": "Role",
-        "roleOrganizer": "Organizer",
+        "roleOrganizer": "Co-organizer",
         "roleModerator": "Moderator",
         "roleSpeaker": "Speaker",
         "roleHelp": {
@@ -1015,7 +1089,7 @@
         "programMinutesFor": "Planned minutes, topic {n}",
         "programTimeUnknown": "Time not calculated: an earlier topic has no duration",
         "programNone": "Nobody",
-        "programLeadOrganizer": "Lead organizer",
+        "programLeadOrganizer": "Lead moderator",
         "programMoveUp": "Move topic {n} up",
         "programMoveDown": "Move topic {n} down",
         "programRemove": "Remove topic {n}",
@@ -1029,8 +1103,8 @@
         "programSpeakerRemoved": "{count, plural, one {One topic no longer has a speaker: the person was removed from the event.} other {# topics no longer have a speaker: the people were removed from the event.}}",
         "programFrozen": "The agenda has already been used in the room: you can see it here, but it is changed from the room.",
         "programPerson": "{name} ({role})",
-        "invitationsHelpOpen": "Optional: the list of people you invite. Registration is open, so after publication anyone can register, invited or not. The platform sends no invitations: share the event link yourself.",
-        "invitationsHelpRestricted": "Registration is restricted: only the addresses in this list can register. The platform sends no invitations: share the event link yourself; the link to enter arrives by email after registering.",
+        "invitationsHelpOpen": "The people you invite yourself. Registration is open: anyone can register, invited or not. After publishing, you send these people the invitation by email from the event page.",
+        "invitationsHelpRestricted": "Only the addresses on this list can register. After publishing, you send each of them the invitation by email from the event page, with the registration link; the link to enter arrives after registering.",
         "logoExternal": "The public page shows only logos uploaded to this platform: a logo from another website will not be shown.",
         "primaryProfileInvalid": "Check the organization and the logo address.",
         "primaryMore": "Photo, organization, logo and public page",
@@ -1048,7 +1122,9 @@
         "editQuestions": "Edit",
         "editQuestionsBefore": "Edit the registration questions",
         "editQuestionsAfter": "Edit the satisfaction survey",
-        "accessStaffOnly": "Who registers is decided by the event staff."
+        "accessStaffOnly": "Who registers is decided by the event staff.",
+        "whoOrganizes": "Who organizes",
+        "rubricaWho": "The address book holds the people who registered for an event and agreed to stay in it."
       },
       "step4": {
         "heading": "Content and materials",
@@ -1124,9 +1200,9 @@
           "multitrack": "Per-participant recording",
           "multitrackOn": "On — requires explicit consent at registration",
           "organizingEntities": "Organizing entities",
-          "primaryOrganizer": "Lead organizer",
+          "primaryOrganizer": "Lead moderator",
           "primaryMissing": "To be set in the “People” step to publish",
-          "organizersPeople": "Other organizers",
+          "organizersPeople": "Co-organizers",
           "moderators": "Moderators",
           "programme": "Programme: {count, plural, one {# topic} other {# topics}}",
           "programmeWithDuration": "Programme: {count, plural, one {# topic} other {# topics}}, {duration}"
@@ -1175,7 +1251,8 @@
           "invites": "People",
           "programme": "Programme",
           "review": "Summary",
-          "advanced": "Advanced settings"
+          "advanced": "Advanced settings",
+          "permissions": "Permissions"
         },
         "templateInUse": "Template: <b>{name}</b>",
         "noTemplate": "Event without a template",
@@ -1187,18 +1264,16 @@
         "recordingManual": "Available: it starts only when a host presses REC.",
         "aiAfter": "After the recording: {list}.",
         "scheduleHeading": "When it takes place",
-        "scheduleIntro": "Date, time and how many people you expect: they are used to prepare the room.",
+        "scheduleIntro": "When the event takes place: date, time and time zone.",
         "advancedIntro": "Values already chosen by the template: change only what you need.",
         "advancedIntroTemplate": "Values already chosen by the template «{name}»: change only what you need.",
-        "requiredToSave": "Needed to save the event.",
         "requiredToPublish": "Needed to publish the event.",
         "toComplete": "To complete",
         "missingHeading": "Still missing to publish:",
-        "fieldOrganizerName": "Lead organizer's name",
-        "fieldOrganizerEmail": "Lead organizer's email",
+        "fieldOrganizerName": "Lead moderator's name",
+        "fieldOrganizerEmail": "Lead moderator's email",
         "fieldProgrammeMinutes": "Duration of programme topic {n}",
         "sections": {
-          "participation": "Participation and room features",
           "recording": "Recording and AI",
           "content": "Content: materials and questionnaires",
           "room": "Waiting room and video",
@@ -1230,7 +1305,17 @@
         "askEmail": "email",
         "askOrganization": "organization",
         "askRole": "role",
-        "askType": "organization type"
+        "askType": "organization type",
+        "permissionsHeading": "Who can do what in the room",
+        "permissionsIntro": "What participants can do and which room features are on. Everything can also be changed during the event.",
+        "consentsLine": "Consents at registration and in the room: {list}",
+        "consentRecordingRequired": "recording, required to enter",
+        "consentRecordingFree": "recording, optional (without it, listen-only)",
+        "consentRecordingNotice": "for the recording only a notice (participants neither speak nor show)",
+        "consentTranscription": "transcription of what they say, optional",
+        "consentsNone": "No consent beyond the registration one.",
+        "consentsHosts": "Moderators and speakers are asked for the recording in the room, optionally.",
+        "consentsWithdraw": "Participants can withdraw them in the room, with the “Consents” button."
       },
       "preview": {
         "title": "Page preview",
@@ -1242,8 +1327,8 @@
       },
       "programme": {
         "heading": "Meeting programme",
-        "intro": "The topics in order: who speaks, about what and for how long. They appear under the description, with times worked out from the start ({start}). It is optional.",
-        "introNoStart": "The topics in order: who speaks, about what and for how long. They appear under the description, with times worked out from the start of the event. It is optional.",
+        "intro": "The topics in order: who speaks, about what and for how long. They appear under the description, with times worked out from the start ({start}).",
+        "introNoStart": "The topics in order: who speaks, about what and for how long. They appear under the description, with times worked out from the start of the event.",
         "statusOn": "Shown on the event page, and in the room it shows everyone the current topic.",
         "statusOff": "Off: the programme does not appear on the page or in the room.",
         "turnOn": "Turn on",
@@ -1287,7 +1372,8 @@
         "offKeptEdit": "While the programme is off, the last saved version stays: changes made here are saved only if you turn it on again.",
         "toggleOffWarningCreate": "Off, the programme ({count, plural, one {# topic} other {# topics}}) is not shown on the page and is not saved with the event: turn it on to keep it.",
         "reviewOffCreate": "Programme: off, not saved with the event ({count, plural, one {# topic} other {# topics}})"
-      }
+      },
+      "saveCopy": "Save the copy"
     },
     "nav": {
       "events": "Events",
@@ -1313,7 +1399,6 @@
       "publicationsList": "Publications",
       "publicationsNew": "New publication",
       "ariaLabel": "Admin navigation",
-      "subNavAriaLabel": "Section navigation",
       "questionnaires": "Questionnaires",
       "questionnairesLibrary": "Questionnaire templates",
       "questionnairesResponses": "Responses",
@@ -1332,7 +1417,9 @@
       "video": "Video",
       "glossary": "Glossary",
       "breadcrumbAriaLabel": "Breadcrumb",
-      "skipToPage": "Skip to page content"
+      "skipToPage": "Skip to page content",
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu"
     },
     "publications": {
       "subtitle": "Single editorial hub for every published video: scheduled events, instant calls, uploaded archive recordings, and sessions waiting to be promoted.",
@@ -1488,7 +1575,8 @@
       "actions": {
         "DATA_DELETED": "Data deleted",
         "CONSENT_RECORDED": "Consent recorded",
-        "DATA_EXPORTED": "Data exported"
+        "DATA_EXPORTED": "Data exported",
+        "CONSENT_WITHDRAWN": "Consent withdrawn"
       },
       "recordsAffected": "{count} records affected",
       "colWhen": "When",
@@ -1610,13 +1698,6 @@
     "deleteSuccess": "Event deleted",
     "publishSuccess": "Event published",
     "unpublishSuccess": "Event unpublished",
-    "startEvent": "Start event",
-    "startEventSuccess": "Event started! Waiting participants will be redirected automatically.",
-    "startEventConfirmTitle": "Start the event?",
-    "startEventConfirmMessage": "Scheduled start: {when}. Anyone with the link can join right away, and the video room starts now.",
-    "startEventConfirmEarly": "The start is more than 30 minutes away.",
-    "startEventFailed": "The event did not start. Please try again.",
-    "jvbWarmupWarning": "Video servers are starting up (~2 minutes). Participants will see a notice in the waiting room.",
     "eventIsLive": "The event is live",
     "liveParticipants": "{count} in room / {max} max",
     "joinAsModeratorBtn": "Join as moderator",
@@ -1654,7 +1735,6 @@
         "expected": "{count, plural, one {expected participant} other {expected participants}}",
         "registered": "{count, plural, =0 {no registrations yet} one {# registered so far} other {# registered so far}}",
         "change": "Change",
-        "changeParticipants": "Change the number of expected participants",
         "sizedOnRegistrations": "There are more registrations than expected participants: the estimate counts the {count} registered.",
         "cameraQuestion": "How many webcams will be on?",
         "camera": {
@@ -1866,7 +1946,7 @@
       "guestJoinHint": "Quick link to invite a last-minute attendee: they join as a guest while the event is live, without filling in the registration form.",
       "callInvite": "Participant link",
       "callInviteHint": "Whoever receives it joins the call as a guest, without registering. An instant call has no public page: this is the link to share.",
-      "moderatorLink": "Moderator link",
+      "moderatorLink": "Management link (moderator)",
       "moderatorLinkHint": "Share this link only with moderators. Anyone with this link can manage the event.",
       "liveRoomHint": "Direct link to enter the live room as moderator.",
       "copyLink": "Copy link",
@@ -1876,7 +1956,8 @@
       "warning": "Anyone with this link administers the event: do not show it while sharing your screen and do not paste it into a chat.",
       "hidden": "Link hidden",
       "copyFailed": "Copy failed: select the address below and copy it manually.",
-      "notYetPublished": "Opens once the event is published: until then, anyone who uses it gets “page not found”."
+      "notYetPublished": "Opens once the event is published: until then, anyone who uses it gets “page not found”.",
+      "copyFailedShort": "Copy failed"
     },
     "feedbackAdmin": {
       "title": "Feedback Results",
@@ -1952,7 +2033,8 @@
       "actions": {
         "DATA_DELETED": "Data deleted",
         "CONSENT_RECORDED": "Consent recorded",
-        "DATA_EXPORTED": "Data exported"
+        "DATA_EXPORTED": "Data exported",
+        "CONSENT_WITHDRAWN": "Consent withdrawn"
       }
     },
     "settings": {
@@ -2266,9 +2348,9 @@
     },
     "recurrence": {
       "label": "Recurrence",
-      "helpText": "Make this event recurring. A series will be generated starting from the start date.",
+      "helpText": "If the event repeats, duplicating it suggests the date of the next occurrence.",
       "preset": {
-        "none": "None",
+        "none": "Does not repeat",
         "daily": "Daily",
         "weekly": "Weekly",
         "weekdays": "Weekdays",
@@ -2322,7 +2404,6 @@
       "aiTranscript": "Automatic transcription (default)",
       "aiSummary": "Automatic summary (default)",
       "aiTranslation": "Automatic translation (default)",
-      "pickerTitle": "Choose a template",
       "pickerSubtitle": "Select a template to pre-configure event settings, or skip to configure everything manually.",
       "skipTemplate": "Configure manually",
       "postEventPublic": "Public post-event page",
@@ -2701,10 +2782,7 @@
       "resultsCount": "{count, plural, =0 {No events} one {# event} other {# events}}",
       "menu": {
         "actionsFor": "Actions for “{title}”",
-        "manage": "Manage",
         "edit": "Edit",
-        "openPublic": "Open public page",
-        "newTab": "(opens in a new tab)",
         "copyLink": "Copy public link",
         "linkCopied": "Link copied",
         "publish": "Publish",
@@ -2713,7 +2791,7 @@
         "unpublishMessage": "“{title}” will disappear from the public pages until you publish it again. Registrations already received are kept.",
         "published": "Event published",
         "unpublished": "Event unpublished",
-        "duplicate": "Duplicate as next occurrence",
+        "duplicate": "Duplicate",
         "delete": "Delete",
         "deleteTitle": "Delete the event?",
         "deleteMessage": "“{title}” and all its data will be deleted. This cannot be undone.",
@@ -2771,7 +2849,6 @@
       "participantHintPassword": "Opens in a new tab: the room as a guest sees it, after the event password.",
       "participantHintPage": "Opens in a new tab: the public page as participants see it.",
       "editEvent": "Edit event",
-      "editSettings": "Edit settings",
       "featureSummary": "Active features",
       "organizers": "Organizers",
       "privacyGdpr": "Privacy & GDPR",
@@ -2824,9 +2901,9 @@
       "aiGenerateError": "Could not start the AI pipeline. Check that AI is enabled site-wide and that a recording exists.",
       "aiGenerateHelp": "Enables AI transcription + summary and starts the pipeline on the recording, in one click. Idempotent: clicking twice won't duplicate jobs.",
       "aiGenerateNoRecording": "No recording: post-event AI needs a recording (capture only happens during the event). You can still manage post-production here.",
-      "duplicateNext": "Duplicate for next time",
+      "duplicateNext": "Duplicate",
       "duplicateNextBusy": "Duplicating…",
-      "duplicateNextHint": "Creates a draft carrying this event’s entire configuration (recording, separate tracks, AI, agenda, reminders). If the event has a cadence the date moves to the next occurrence; otherwise it is left for you to set.",
+      "duplicateNextHint": "Creates a draft copy with this event's whole configuration. If the event repeats, the copy starts at the next occurrence; otherwise it has the same dates, to be updated.",
       "duplicateNextError": "Could not duplicate. Please try again.",
       "capacitySection": "Capacity and infrastructure",
       "capacitySubtitle": "Sized for about {max} expected participants",
@@ -2838,11 +2915,12 @@
         "publishFailedTitle": "Publishing failed",
         "publishFailedBody": "The event is saved as a draft: publish it from this page once the problem is solved.",
         "unsaved": "Not saved: {items}. You can add them from this page.",
-        "copyParticipantLink": "Copy the participant link",
         "sendToSpeakers": "Moderator and speaker links",
         "close": "Close the summary",
         "publishNow": "Publish now"
-      }
+      },
+      "editFeatures": "Edit features",
+      "editPrivacy": "Edit privacy and data"
     },
     "rubrica": {
       "subtitle": "People who have consented to be added to the address book (GDPR art. 6.1.a). Profile information is updated automatically on every re-registration.",
@@ -3450,6 +3528,7 @@
     "guided": {
       "title": "What is your event like?",
       "intro": "Four questions to start with the right settings. Every feature can also be switched on or off during the event.",
+      "introNoRecording": "Three questions to start with the right settings. Every feature can also be switched on or off during the event.",
       "peopleQ": "How many people do you expect?",
       "people": {
         "piccolo": "Up to 20",
@@ -3474,9 +3553,7 @@
       "preview": "Your event",
       "previewPeople": "Expected participants: about {count}",
       "continue": "Continue",
-      "useTemplate": "Or use a template",
-      "instantAlt": "Or an instant video call",
-      "instantAltAction": "Create the video call",
+      "useTemplate": "Start from a template",
       "summary": {
         "piccolo": "Up to 20 people",
         "medio": "Up to 100 people",
@@ -3492,10 +3569,12 @@
       "access": {
         "open": "Anyone who registers",
         "openDesc": "Anyone can register from the event page",
-        "invitation": "Only people you invite",
-        "invitationDesc": "The page stays visible, but only invitees can register; without registering, nobody gets in"
+        "invitation": "Invited people only",
+        "invitationDesc": "The page stays visible, but only people on the list can register; you send them the invitation with the registration link by email from the event page"
       },
-      "previewInvitation": "Only the people you invite can register; nobody gets in without registering."
+      "previewInvitation": "Only invited people register; without registering, nobody enters.",
+      "templateReplaces": "A template brings its own settings instead of the answers below. You write the title, dates and people in the next steps.",
+      "instantBack": "Create a scheduled event instead"
     },
     "captionsTranscript": {
       "title": "Transcript from captions",
@@ -3584,10 +3663,21 @@
       "status": "Status",
       "roleSpeaker": "Speaker",
       "registered": "Signed up",
-      "notRegistered": "Not signed up yet",
       "organizersTitle": "Organizing bodies",
       "organizersEdit": "Edit organizers",
-      "organizersEmpty": "No organizer listed: the public page doesn't show who is organizing."
+      "organizersEmpty": "No organizer listed: the public page doesn't show who is organizing.",
+      "sendAll": "Send the invitation to those who have not received it ({count})",
+      "sending": "Sending…",
+      "sendDone": "Invitations on their way: {sent}. Skipped, already registered or without an address: {skipped}.",
+      "sendError": "Sending failed: please try again.",
+      "sendNotPublished": "Invitations go out while the event accepts registrations: after publishing and before it ends.",
+      "invitedOn": "Invited on {date}",
+      "notInvited": "Invitation not sent",
+      "send": "Send invitation",
+      "resend": "Send again",
+      "actions": "Actions",
+      "sendTooMany": "Too many sends in a short time: try again in a minute.",
+      "sendRemaining": "{remaining} left: press again to send them."
     },
     "closing": {
       "title": "Close the event",
@@ -3803,6 +3893,56 @@
         "item": "{language}: {state}",
         "review": "Review the texts"
       }
+    },
+    "voiceConsent": {
+      "title": "Transcribe the full recording?",
+      "message": "This event asked each person for consent to the transcription of what they say. The full recording contains every voice, including people who did not consent: transcribe it only if everyone who speaks in it has consented. Your confirmation is kept in the activity log.",
+      "confirm": "Yes, everyone consented",
+      "cancel": "Cancel",
+      "waiting": "The transcription of the full recording did not start on its own: this event asked each person for consent to the transcription of what they say. Start it with {button} only if everyone who speaks in the recording has consented; otherwise the transcript from captions stays."
+    },
+    "editCopyTitle": "Copy of the event",
+    "editCopyNoticeNext": "You are working on a draft copy: the original event does not change. The date is already that of the next occurrence: check the rest and save.",
+    "editCopyNoticeSameDates": "You are working on a draft copy: the original event does not change. It has the same dates as the original: update them before saving.",
+    "consentProofs": {
+      "title": "Consent proofs",
+      "intro": "The recording and transcription consents given at registration, in the waiting room or in the room, and those withdrawn. The list with names is there to prove them.",
+      "loading": "Loading…",
+      "loadFailed": "The consent proofs could not be loaded.",
+      "none": "No recording or transcription consent for this event.",
+      "kinds": {
+        "recording": "Recording",
+        "transcription": "Transcription of what people say"
+      },
+      "counts": "consenting {given} · withdrawn {withdrawn}",
+      "download": "Download the list (CSV)",
+      "downloading": "Downloading…",
+      "downloadNote": "The list holds people's names: the export is written to the event's GDPR log.",
+      "downloadFailed": "The list could not be downloaded: try again.",
+      "csv": {
+        "kind": "Consent",
+        "source": "Where",
+        "role": "Role",
+        "name": "Name",
+        "givenAt": "Given at",
+        "withdrawnAt": "Withdrawn at",
+        "textVersion": "Text version",
+        "kinds": {
+          "recording": "Recording",
+          "transcription": "Transcription of what people say"
+        },
+        "sources": {
+          "registration": "registration",
+          "room": "room"
+        },
+        "roles": {
+          "registrant": "registrant",
+          "guest": "guest",
+          "host": "hosts or speaks"
+        },
+        "unreadableName": "(name not readable)"
+      },
+      "countsNote": "People are counted: a registration, a staff account or a named link count once; a guest who comes back in another visit counts again."
     }
   },
   "email": {
@@ -3837,7 +3977,9 @@
     "upcoming": {
       "title": "Upcoming events",
       "viewAll": "View all events",
-      "noEvents": "No events scheduled. Check back soon!"
+      "noEvents": "No events scheduled. Check back soon!",
+      "seePast": "Past events",
+      "seeRecordings": "Recordings"
     },
     "howItWorks": {
       "title": "How to take part",
@@ -4187,9 +4329,11 @@
       "recordingRequired": "Recording consent is required to participate in this event",
       "recordingNotice": "This event is recorded (audio and video). You take part without microphone or camera: the recording does not contain your voice or your image, unless the host gives you the floor.",
       "multitrack": "I consent to my contributions being transcribed, with my name, for the event's report. If the event records a separate audio track for each person, my voice is recorded for this purpose only and the track is deleted after transcription; it is not used to identify or reproduce my voice.",
-      "multitrackOptional": "This is optional: if you do not consent you can still take part, but your voice is not recorded and what you say is not included in the transcript.",
+      "multitrackOptional": "It is optional: if you do not consent you still take part, but what you say stays out of the transcript and your voice is not recorded on a separate track. If the event is recorded, your voice is still in the video.",
       "stayInTouch": "I want to receive information about upcoming events and be added to the address book, to be invited to similar events",
-      "stayInTouchHelp": "Optional consent (GDPR art. 6.1.a). You can withdraw it at any time with the \"Remove me from the address book\" link in the emails you receive. Your name and organization are the ones in this registration."
+      "stayInTouchHelp": "Optional consent (GDPR art. 6.1.a). You can withdraw it at any time with the \"Remove me from the address book\" link in the emails you receive. Your name and organization are the ones in this registration.",
+      "recordingOptionalListenOnly": "If you do not consent you still take part, listening only: you follow and write in the chat, but microphone, camera and screen sharing stay off. You can consent later, from the room.",
+      "recordingOptionalHost": "If you do not consent you still enter and lead as usual, but your voice is not kept in the per-person tracks or in the transcript. The room video, if recorded, still includes you."
     },
     "export": {
       "title": "My data",
@@ -4852,11 +4996,13 @@
     "transparency": "Security and transparency",
     "serviceInventory": "Service inventory",
     "sourceCode": "Source code",
-    "buildInfoDev": "development build",
-    "viewCommit": "View commit on GitHub",
     "viewRelease": "View release on GitHub",
     "viewChangelog": "See what's new (changelog)",
-    "buildDatePrefix": "Built on"
+    "newWindow": "opens in a new window",
+    "usefulLinks": "Useful links",
+    "version": "Version {version}",
+    "versionDev": "Development version",
+    "updatedOn": "updated on {date}"
   },
   "changelog": {
     "metaTitle": "What's new & changelog",
@@ -5023,7 +5169,9 @@
       "version": "Pipeline version"
     },
     "overlapBadge": "overlapping",
-    "overlapTitle": "Simultaneous speech: more than one person is speaking at the same time in this interval."
+    "overlapTitle": "Simultaneous speech: more than one person is speaking at the same time in this interval.",
+    "anonymousSpeaker": "Participant {n}",
+    "untranscribed": "Not transcribed: the speaker did not consent"
   },
   "waiting": {
     "startsIn": "The event starts in",
@@ -5087,9 +5235,6 @@
     "endedWatchRecording": "Watch the recording",
     "endedLeaveFeedback": "Leave feedback",
     "startEventError": "Error starting the event. Please try again.",
-    "emailLabel": "Email (optional)",
-    "emailHelp": "Only for post-event follow-up",
-    "emailInvalid": "Please enter a valid email address",
     "chatLockedMessage": "Enter your name to join the event chat.",
     "classicView": "Classic view",
     "backToGarden": "Show the square",
@@ -5322,7 +5467,12 @@
     "waitingForStartButton": "Waiting for the start",
     "countdownHours": "{hours}h",
     "countdownMinutes": "{minutes}m",
-    "countdownSeconds": "{seconds}s"
+    "countdownSeconds": "{seconds}s",
+    "startEarlyConfirm": "The planned start ({when}) is more than 30 minutes away. Starting now lets anyone with the link in and turns on the video room: press again to confirm.",
+    "startEarlyYes": "Start now",
+    "startEarlyNo": "Wait for the planned time",
+    "anonymousNameHelp": "In this event the audience is anonymous: others do not see your name, but a pseudonym with a code.",
+    "registeredNameHelp": "This is the name you registered with: it is how you will appear in the room."
   },
   "recording": {
     "management": "Video recording",

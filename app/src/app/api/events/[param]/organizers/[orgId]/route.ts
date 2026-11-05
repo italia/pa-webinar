@@ -10,6 +10,7 @@
 import { z } from 'zod';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
+import { materialUrlSchema } from '@/lib/validation/materials';
 import { prisma } from '@/lib/db';
 import { AppError, ForbiddenError, UnauthorizedError, ValidationError } from '@/lib/errors';
 import { constantTimeEqual, extractModeratorToken } from '@/lib/auth/moderator';
@@ -21,8 +22,8 @@ const UUID_RE =
 
 const patchSchema = z.object({
   name: z.string().min(1).max(200).optional(),
-  logoUrl: z.string().url().nullable().optional(),
-  websiteUrl: z.string().url().nullable().optional(),
+  logoUrl: materialUrlSchema.nullable().optional(),
+  websiteUrl: materialUrlSchema.nullable().optional(),
   sortOrder: z.number().int().min(0).optional(),
 });
 

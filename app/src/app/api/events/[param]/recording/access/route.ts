@@ -98,8 +98,8 @@ export const POST = withErrorHandling(async (request, context) => {
 
   const ok = () =>
     Response.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } });
-  const body = (await parseJsonBody(request)) as { email?: unknown };
-  const email = typeof body.email === 'string' ? body.email.trim() : '';
+  const body = (await parseJsonBody(request)) as { email?: unknown } | null;
+  const email = typeof body?.email === 'string' ? body.email.trim() : '';
   const riservata =
     event.status === 'ENDED' &&
     event.recordingAudience === 'REGISTRANTS' &&

@@ -4,6 +4,8 @@ import { test, expect, type Locator, type Page } from '@playwright/test';
 
 import messages from '../src/i18n/messages/it.json';
 
+import { accediComeAdmin } from './helpers/accesso-admin';
+
 /**
  * Le pagine pubbliche usate solo da tastiera: il salto al contenuto, il
  * selettore della lingua, l'iscrizione dall'inizio alla fine senza mouse, e
@@ -63,9 +65,10 @@ test('il primo Tab porta al salto al contenuto, e Invio ci arriva', async ({ pag
 
 test('il selettore della lingua si apre e si chiude da tastiera', async ({ page }) => {
   await page.goto('/it');
-  const scelta = page.getByRole('button', { name: /^Cambia lingua/ });
-  // Con poche lingue attive il selettore è un elenco di link, senza menu.
-  test.skip(!(await scelta.isVisible()), 'elenco di link: nessun menu da aprire');
+  // Il menu della lingua dello slim header: un pulsante con la lingua attiva.
+  const scelta = page.getByRole('button', { name: /^Lingua attiva/ });
+  // Con una sola lingua attiva il selettore non c'e'.
+  test.skip(!(await scelta.isVisible()), 'una sola lingua attiva: nessun selettore');
   await tabFino(page, scelta);
   await page.keyboard.press('Enter');
   await expect(scelta).toHaveAttribute('aria-expanded', 'true');
@@ -76,7 +79,7 @@ test('il selettore della lingua si apre e si chiude da tastiera', async ({ page 
 });
 
 test('ci si iscrive a un evento senza usare il mouse', async ({ page }) => {
-  const login = await page.request.post('/api/admin/login', { data: { key: ADMIN_KEY } });
+  const login = await accediComeAdmin(page.request, ADMIN_KEY);
   expect(login.ok(), `login: ${login.status()}`).toBeTruthy();
   const inizio = Date.now() + 86_400_000;
   const creato = await page.request.post('/api/events', {

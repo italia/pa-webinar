@@ -307,6 +307,15 @@ describe("l'anteprima di un valore salvato", () => {
     }
   });
 
+  it('un indirizzo ammesso arriva al link senza virgolette o tag', () => {
+    disegna(
+      <Modulo iniziale={'https://esempio.test/a.pdf"><b>x</b>'} assetType="document" />
+    );
+    expect(container.querySelector('a.campo-file__nome')?.getAttribute('href')).toBe(
+      'https://esempio.test/a.pdf%22%3E%3Cb%3Ex%3C/b%3E'
+    );
+  });
+
   it("un'immagine incorporata nelle impostazioni resta visibile", () => {
     const dati = 'data:image/png;base64,iVBORw0KGgo=';
     disegna(<Modulo iniziale={dati} />);

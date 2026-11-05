@@ -18,6 +18,8 @@ import SvgIcon from '@/components/home/svg-icon';
 import { Link, percorso } from '@/i18n/navigation';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
+import NessunEvento from './nessun-evento';
+
 export interface EventoHome {
   id: string;
   slug: string;
@@ -120,9 +122,7 @@ export default async function LandingIstituzionale({
               </Link>
             </div>
           ) : (
-            <div className="p-5 rounded-3 text-center" style={{ backgroundColor: '#F5F7FB' }}>
-              <p className="text-secondary mb-0 lead">{t('upcoming.noEvents')}</p>
-            </div>
+            <NessunEvento testo={t('upcoming.noEvents')} />
           )}
         </div>
       </section>

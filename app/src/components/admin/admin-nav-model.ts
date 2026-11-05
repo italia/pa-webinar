@@ -15,7 +15,6 @@ export type StaffRole = 'admin' | 'organizer';
 
 export interface NavItem {
   href: PercorsoStatico;
-  icon: string;
   labelKey: string;
   /** Attiva solo sul proprio indirizzo, non sulle pagine sotto. */
   exact?: boolean;
@@ -23,7 +22,6 @@ export interface NavItem {
 
 export interface NavSection {
   href: PercorsoStatico;
-  icon: string;
   labelKey: string;
   /** Gli indirizzi che appartengono alla sezione, con le pagine sotto. */
   radici: readonly PercorsoStatico[];
@@ -47,97 +45,93 @@ export const VOCI_ORGANIZZATORE: ReadonlySet<PercorsoStatico> = new Set<Percorso
   '/admin/glossary',
 ]);
 
-/**
- * Le sezioni, nell'ordine del menu. Nessuna icona si ripete fra intestazione,
- * barra delle sezioni e voci di una stessa sezione (lo verifica il test).
- */
+/** Le sezioni, nell'ordine del menu. */
 export const SEZIONI: readonly NavSection[] = [
   {
     href: '/admin/events',
-    icon: 'it-presentation',
+   
     labelKey: 'events',
     radici: ['/admin/events', '/admin/calendar'],
     voci: [
-      { href: '/admin/events', icon: 'it-list', labelKey: 'eventsList', exact: true },
-      { href: '/admin/events/new', icon: 'it-plus', labelKey: 'newEvent' },
-      { href: '/admin/events/calls', icon: 'it-telephone', labelKey: 'instantCalls' },
-      // Non l'icona del calendario pubblico dell'intestazione: e' un'altra pagina.
-      { href: '/admin/calendar', icon: 'it-clock', labelKey: 'calendar' },
-      { href: '/admin/events/template', icon: 'it-folder', labelKey: 'templates' },
-      { href: '/admin/events/statistics', icon: 'it-chart-line', labelKey: 'analytics' },
+      { href: '/admin/events', labelKey: 'eventsList', exact: true },
+      { href: '/admin/events/new', labelKey: 'newEvent' },
+      { href: '/admin/events/calls', labelKey: 'instantCalls' },
+      { href: '/admin/calendar', labelKey: 'calendar' },
+      { href: '/admin/events/template', labelKey: 'templates' },
+      { href: '/admin/events/statistics', labelKey: 'analytics' },
     ],
   },
   {
     // Chi partecipa: iscrizioni, rubrica, registro GDPR.
     href: '/admin/registrations',
-    icon: 'it-user',
+   
     labelKey: 'people',
     radici: ['/admin/registrations', '/admin/rubrica', '/admin/gdpr-audit'],
     voci: [
-      { href: '/admin/registrations', icon: 'it-list', labelKey: 'registrationsList', exact: true },
-      { href: '/admin/rubrica', icon: 'it-card', labelKey: 'rubrica' },
-      { href: '/admin/gdpr-audit', icon: 'it-file-signed', labelKey: 'gdprAudit' },
+      { href: '/admin/registrations', labelKey: 'registrationsList', exact: true },
+      { href: '/admin/rubrica', labelKey: 'rubrica' },
+      { href: '/admin/gdpr-audit', labelKey: 'gdprAudit' },
     ],
   },
   {
     href: '/admin/questionnaires',
-    icon: 'it-note',
+   
     labelKey: 'questionnaires',
     radici: ['/admin/questionnaires'],
     voci: [
-      { href: '/admin/questionnaires', icon: 'it-folder', labelKey: 'questionnairesLibrary', exact: true },
-      { href: '/admin/questionnaires/responses', icon: 'it-chart-line', labelKey: 'questionnairesResponses' },
-      { href: '/admin/questionnaires/feedback', icon: 'it-star-outline', labelKey: 'feedbackDashboard' },
+      { href: '/admin/questionnaires', labelKey: 'questionnairesLibrary', exact: true },
+      { href: '/admin/questionnaires/responses', labelKey: 'questionnairesResponses' },
+      { href: '/admin/questionnaires/feedback', labelKey: 'feedbackDashboard' },
     ],
   },
   {
     // Tutto cio' che esce da un evento in video: registrazioni, la loro
     // post-produzione, il glossario che la guida, le pubblicazioni in libreria.
     href: '/admin/recordings',
-    icon: 'it-file-video',
+   
     labelKey: 'video',
     radici: ['/admin/recordings', '/admin/postprod', '/admin/glossary', '/admin/publications'],
     voci: [
-      { href: '/admin/recordings', icon: 'it-list', labelKey: 'recordingsList', exact: true },
-      { href: '/admin/postprod', icon: 'it-file-audio', labelKey: 'recordingsPostprod' },
-      { href: '/admin/glossary', icon: 'it-file-txt', labelKey: 'glossary' },
-      { href: '/admin/publications', icon: 'it-share', labelKey: 'publicationsList', exact: true },
-      { href: '/admin/publications/new', icon: 'it-upload', labelKey: 'publicationsNew' },
+      { href: '/admin/recordings', labelKey: 'recordingsList', exact: true },
+      { href: '/admin/postprod', labelKey: 'recordingsPostprod' },
+      { href: '/admin/glossary', labelKey: 'glossary' },
+      { href: '/admin/publications', labelKey: 'publicationsList', exact: true },
+      { href: '/admin/publications/new', labelKey: 'publicationsNew' },
     ],
   },
   {
     // Chi lavora sulla piattaforma e con quali chiavi.
     href: '/admin/organizers',
-    icon: 'it-key',
+   
     labelKey: 'staffAccess',
     radici: ['/admin/organizers', '/admin/moderators'],
     voci: [
-      { href: '/admin/organizers', icon: 'it-card', labelKey: 'staffAccounts', exact: true },
-      { href: '/admin/moderators', icon: 'it-link', labelKey: 'moderatorLinks' },
+      { href: '/admin/organizers', labelKey: 'staffAccounts', exact: true },
+      { href: '/admin/moderators', labelKey: 'moderatorLinks' },
     ],
   },
   {
     // Viste operative, non configurazione.
     href: '/admin/monitoring',
-    icon: 'it-piattaforme',
+   
     labelKey: 'monitoring',
     radici: ['/admin/monitoring', '/admin/infrastructure'],
     voci: [
-      { href: '/admin/monitoring', icon: 'it-check-circle', labelKey: 'monitoringDashboard', exact: true },
-      { href: '/admin/infrastructure', icon: 'it-plug', labelKey: 'infrastructure' },
+      { href: '/admin/monitoring', labelKey: 'monitoringDashboard', exact: true },
+      { href: '/admin/infrastructure', labelKey: 'infrastructure' },
     ],
   },
   {
     href: '/admin/settings',
-    icon: 'it-settings',
+   
     labelKey: 'settings',
     radici: ['/admin/settings'],
     voci: [
-      { href: '/admin/settings', icon: 'it-list', labelKey: 'settingsGeneral', exact: true },
-      { href: '/admin/settings/languages', icon: 'it-flag', labelKey: 'settingsLanguages' },
-      { href: '/admin/settings/gdpr-templates', icon: 'it-file-signed', labelKey: 'settingsGdprTemplates' },
-      { href: '/admin/settings/email-templates', icon: 'it-mail', labelKey: 'settingsEmailTemplates' },
-      { href: '/admin/settings/tags', icon: 'it-bookmark', labelKey: 'settingsTags' },
+      { href: '/admin/settings', labelKey: 'settingsGeneral', exact: true },
+      { href: '/admin/settings/languages', labelKey: 'settingsLanguages' },
+      { href: '/admin/settings/gdpr-templates', labelKey: 'settingsGdprTemplates' },
+      { href: '/admin/settings/email-templates', labelKey: 'settingsEmailTemplates' },
+      { href: '/admin/settings/tags', labelKey: 'settingsTags' },
     ],
   },
 ];

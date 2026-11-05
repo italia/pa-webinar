@@ -84,6 +84,9 @@ interface ChatPanelProps {
   eventSlug: string;
   token: string;
   displayName: string;
+  /** L'ospite: il nome scritto in sala d'attesa, che fa da chiave del suo
+   *  posto in chat. Con il pubblico anonimo diverso da quello mostrato. */
+  guestName?: string;
   isGuest?: boolean;
   /** Enables the moderator "hide" action on each message. */
   isModerator?: boolean;
@@ -189,6 +192,7 @@ export default function ChatPanel({
   eventSlug,
   token,
   displayName,
+  guestName,
   isGuest = false,
   isModerator = false,
   active = true,
@@ -332,6 +336,8 @@ export default function ChatPanel({
 
   // Letti dentro l'handler SSE: metterli fra le dipendenze ricreerebbe la
   // connessione a ogni cambio, e una closure stale renderebbe muta la notifica.
+  // La chiave del posto dell'ospite: il nome scritto, o quello mostrato.
+  const nomeOspite = guestName?.trim() || displayName;
   const mentionCtxRef = useRef({ displayName, editingId: null as string | null });
   useEffect(() => { mentionCtxRef.current.displayName = displayName; }, [displayName]);
 
@@ -471,7 +477,7 @@ export default function ChatPanel({
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({ text, ...(isGuest ? { guestName: displayName } : {}) }),
+        body: JSON.stringify({ text, ...(isGuest ? { guestName: nomeOspite } : {}) }),
       });
       if (!res.ok) {
         // I 403 non sono tutti uguali: "link condiviso" e "finestra scaduta"
@@ -493,7 +499,7 @@ export default function ChatPanel({
     } catch {
       setComposeError(t('editFailed'));
     }
-  }, [editText, eventSlug, token, isGuest, displayName, t]);
+  }, [editText, eventSlug, token, isGuest, nomeOspite, t]);
 
   // Stessa ragione: l'handler SSE non deve dipendere dall'identità della
   // callback, che cambia a ogni render della traduzione.
@@ -1224,7 +1230,7 @@ export default function ChatPanel({
     if (!shouldPing(lastTypingPingRef.current, now)) return;
     lastTypingPingRef.current = now;
     const body: Record<string, unknown> = {};
-    if (isGuest) body.guestName = displayName;
+    if (isGuest) body.guestName = nomeOspite;
     else if (displayName) body.displayNameOverride = displayName;
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     if (token) headers.Authorization = `Bearer ${token}`;
@@ -1235,7 +1241,7 @@ export default function ChatPanel({
       headers,
       body: JSON.stringify(body),
     }).catch(() => undefined);
-  }, [eventSlug, token, isGuest, displayName]);
+  }, [eventSlug, token, isGuest, nomeOspite, displayName]);
 
   // La casella cresce con il testo, fino a circa otto righe: un messaggio
   // lungo si rilegge tutto prima di mandarlo. Oltre, scorre al suo interno.
@@ -1371,7 +1377,7 @@ export default function ChatPanel({
     try {
       const body: Record<string, unknown> = {};
       if (text) body.text = text;
-      if (isGuest) body.guestName = displayName;
+      if (isGuest) body.guestName = nomeOspite;
       else if (displayName) body.displayNameOverride = displayName;
       if (replyTo) body.replyToId = replyTo.id;
       if (attachment) body.attachmentToken = attachment.token;
@@ -1458,7 +1464,7 @@ export default function ChatPanel({
     } finally {
       setSending(false);
     }
-  }, [chiaveBozza, input, attachment, sending, attaching, eventSlug, token, isGuest, displayName, isModerator, replyTo, upsertMessage, t]);
+  }, [chiaveBozza, input, attachment, sending, attaching, eventSlug, token, isGuest, nomeOspite, displayName, isModerator, replyTo, upsertMessage, t]);
 
   // Nascondere un messaggio vale per tutti e non si annulla: il primo clic
   // chiede conferma (il pulsante diventa «Conferma»), il secondo agisce.

@@ -303,7 +303,7 @@ export default function EventDetailClient({
   useEffect(() => {
     if (!isEnded || (!event.recordingUrl && !event.transcriptPublished)) return;
     let cancelled = false;
-    fetch(`/api/events/${event.slug}/postprod/transcript`, { credentials: 'include' })
+    fetch(`/api/events/${event.slug}/postprod/transcript?locale=${locale}`, { credentials: 'include' })
       .then(async (r) => {
         if (!r.ok) return null;
         const data = (await r.json()) as {
@@ -957,6 +957,13 @@ export default function EventDetailClient({
                             {t('detail.joinAsGuest')}
                           </Button>
                         </Link>
+                        {/* Le due porte non si somigliano: lo si dice, perche'
+                            la scelta non resti un indovinello. */}
+                        {registrationAccess === 'open' && (
+                          <p className="text-muted mt-2 mb-0" style={{ fontSize: '0.82rem', lineHeight: 1.45 }}>
+                            {t('detail.registerOrGuest')}
+                          </p>
+                        )}
                         <p className="text-muted text-center mt-2 mb-0" style={{ fontSize: '0.82rem' }}>
                           {t('detail.registeredUseEmailLink')}
                         </p>

@@ -44,8 +44,8 @@ const trackSchema = z.object({
 });
 
 const bodySchema = z.object({
-  eventId: z.string().uuid(),
-  recordingId: z.string().uuid(),
+  eventId: z.guid(),
+  recordingId: z.guid(),
   tracks: z.array(trackSchema).min(1).max(500),
   /** Ora assoluta (epoch ms, orologio del registratore) del primo fotogramma:
    *  lo zero dei tempi delle tracce e della trascrizione. Facoltativa per i

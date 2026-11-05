@@ -11,6 +11,7 @@ import {
   generateRecordingSasUrl,
   deleteRecordingBlob,
 } from '@/lib/storage/recordings';
+import { CAMPI_VIDEO_VUOTI } from '@/lib/events/recording-fields';
 import { accessoRegistrazione } from '@/lib/recording/audience';
 
 export const dynamic = 'force-dynamic';
@@ -113,14 +114,9 @@ export const DELETE = withErrorHandling(async (request, context) => {
     prisma.event.update({
       where: { id: event.id },
       data: {
-        recordingUrl: null,
+        ...CAMPI_VIDEO_VUOTI,
         tempRecordingUrl: null,
         tempRecordingStartedAt: null,
-        recordingPublished: false,
-        recordingPublishedAt: null,
-        recordingFileSize: null,
-        recordingDuration: null,
-        recordingDeleteAfterDays: null,
       },
     }),
     prisma.gdprAuditLog.create({

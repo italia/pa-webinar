@@ -23,22 +23,12 @@ import { localeNames, type Locale } from '@/i18n/config';
 import { Link, percorso } from '@/i18n/navigation';
 import FileOrUrlInput from '@/components/ui/file-or-url-input';
 import { videoQualityMaxHeight } from '@/lib/jitsi/config';
+import { timezoneLabel, timezoneOptions } from '@/lib/time/timezones';
 import { OVERTIME_CAP_DEFAULT_MINUTES, OVERTIME_EMPTY_DEFAULT_MINUTES } from '@/lib/events/overtime-defaults';
 
 import { settingsFieldError, type SettingsFieldError } from './settings-field-error';
 
 type Tab = SettingsFieldError['tab'];
-
-const COMMON_TIMEZONES = [
-  'Europe/Rome', 'Europe/London', 'Europe/Paris', 'Europe/Berlin',
-  'Europe/Madrid', 'Europe/Amsterdam', 'Europe/Brussels', 'Europe/Zurich',
-  'Europe/Vienna', 'Europe/Athens', 'Europe/Bucharest', 'Europe/Helsinki',
-  'Europe/Lisbon', 'Europe/Warsaw', 'Europe/Prague', 'Europe/Stockholm',
-  'Europe/Oslo', 'Europe/Copenhagen', 'Europe/Dublin', 'Europe/Istanbul',
-  'America/New_York', 'America/Chicago', 'America/Los_Angeles',
-  'America/Sao_Paulo', 'Asia/Tokyo', 'Asia/Shanghai', 'Asia/Dubai',
-  'Asia/Kolkata', 'Australia/Sydney', 'Pacific/Auckland', 'UTC',
-];
 
 interface FooterLink {
   title: string;
@@ -363,8 +353,8 @@ function BrandingTab({ settings, updateField }: TabProps) {
               value={settings.defaultTimezone}
               onChange={(e) => updateField('defaultTimezone', e.target.value)}
             >
-              {COMMON_TIMEZONES.map((tz) => (
-                <option key={tz} value={tz}>{tz.replace(/_/g, ' ')}</option>
+              {timezoneOptions(settings.defaultTimezone).map((tz) => (
+                <option key={tz} value={tz}>{timezoneLabel(tz)}</option>
               ))}
             </select>
             <small className="text-muted">{t('defaultTimezoneHelp')}</small>

@@ -7,7 +7,9 @@ import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
  * Appends a numeric suffix if the base slug already exists.
  */
 export async function generateUniqueSlug(title: LocalizedField): Promise<string> {
-  const base = toKebab(getLocalized(title, 'it'));
+  // Un titolo senza lettere latine ne' cifre non lascia niente, e uno slug vuoto
+  // darebbe un indirizzo rotto.
+  const base = toKebab(getLocalized(title, 'it')) || 'evento';
 
   const existing = await prisma.event.findUnique({ where: { slug: base } });
   if (!existing) return base;

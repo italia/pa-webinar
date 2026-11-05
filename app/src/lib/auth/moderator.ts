@@ -172,6 +172,8 @@ export async function verifyGrantToken(
       isPrimaryShared: boolean;
       /** Vedi `resolveGrantForEvent`: null per il link primario condiviso. */
       email: string | null;
+      /** EventModerator.id per le concessioni nominali; null per il primario. */
+      grantId: string | null;
     }
   | null
 > {
@@ -191,6 +193,7 @@ export async function verifyGrantToken(
     displayName: grant.displayName,
     isPrimaryShared: grant.isPrimaryShared,
     email: grant.email,
+    grantId: grant.grantId,
   };
 }
 

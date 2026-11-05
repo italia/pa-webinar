@@ -34,7 +34,9 @@ assessment belongs to the controller of each installation.
 - Per-participant audio is recorded only for the people who consented to the
   transcription of what they say. The consent is separate from the recording
   consent, optional, and asked of everyone, moderators and speakers included;
-  refusing it does not keep anyone out. The recorder asks the portal before
+  refusing it does not keep anyone out. For moderators and speakers, in an
+  event that records the video, it counts only together with their recording
+  consent, which they are also asked for, optionally. The recorder asks the portal before
   recording each voice and skips the others.
 - An event can keep a transcript built from its live captions, without a
   recording and without AI post-production. The same consent decides whose
@@ -65,7 +67,7 @@ assessment belongs to the controller of each installation.
 
 | Capture | Turned on by | Consent collected | What it contains | Where it is stored |
 |---|---|---|---|---|
-| Composite video (Jibri) | **Enable video recording** (`recordingEnabled`). A moderator starts it, or it starts on its own with `autoStartRecording` | `consentRecording` at registration; in the waiting room, a blocking checkbox for whoever has not given it, stored as proof (`RecordingConsent`) | One MP4 file with the conference video and the mixed audio of everyone | `recordings/` in the recordings storage domain |
+| Composite video (Jibri) | **Enable video recording** (`recordingEnabled`). A moderator starts it, or it starts on its own with `autoStartRecording` | `consentRecording` at registration; in the waiting room, a checkbox for whoever has not given it, stored as proof (`RecordingConsent`): blocking, or free with listen-only; for moderators and speakers always free, stored with their grant or staff account | One MP4 file with the conference video and the mixed audio of everyone | `recordings/` in the recordings storage domain |
 | Per-participant audio (recorder bot) | **Per-participant recording (high accuracy)** (`multitrackRecordingEnabled`). The toggle appears only with recording and **Automatic transcription** on. The bot starts when the event goes `LIVE` | The optional transcription consent: `consentMultitrack` at registration, or a checkbox in the waiting room stored for the conference seat (`MultitrackConsent`). The bot records only the tracks of people who gave it | One audio file per consenting participant and per track session, plus a manifest that names the participant of each file | `recordings/multitrack/<eventId>/<recordingId>/` in the recordings storage domain |
 | Live caption sentences | **Transcript from captions** (`captionsTranscriptEnabled`), with live captions running for the event | The same transcription consent | For people who consented: the text of each final caption sentence and the speaker's name. For everyone else: the times of their sentences only | `caption_segments` in PostgreSQL, text and name encrypted |
 | Who is in the room | Every event of an installation where live captions are available and on for the instance, whatever the event's own captions switch, and every event with per-participant recording, while Prosody loads `mod_pa_occupants` (the chart and Docker Compose load it); otherwise nothing | No dedicated consent | The bridge endpoint and the conference seat of each occupant who joined with a token, with join and leave times. No name | `room_occupants` in PostgreSQL |
@@ -128,7 +130,23 @@ browsers do not report them. The log stores the display names in plain text.
 
 The public transcript endpoint uses the log at read time to put names on the
 anonymous voice clusters of a composite recording, so a public transcript can
-show names nobody entered by hand. The post-production worker never reads it,
+show names nobody entered by hand. In an event where each person was asked for the
+transcription consent, a cluster gets a name only when the participant behind
+it, traced from the bridge endpoint to the conference seat (`RoomOccupant`),
+has given that consent (with the text version that applies to the event);
+otherwise it keeps a numbered label and never takes another participant's
+name. The consent counts as asked when the event records per-participant
+tracks or keeps a transcript from captions that actually runs (captions on
+and the service installed), or when the room left traces of it: caption rows,
+consent proofs from the waiting room, or per-participant tracks. Answers given
+at registration alone do not count, because the switch may have been turned
+off before the event. When caption rows exist, the text version that includes
+the name applies. A switch turned off after the event therefore does not bring
+back the names of people who said no (`app/src/lib/ai/voice-consent.ts`). The
+endpoint keeps the answer for a few minutes per recording, so a change of
+consent shows on the public page within that delay. With this check, a
+cluster whose main speaker has no name in the log stays unnamed too, instead
+of taking the name of the second speaker. The post-production worker never reads the speaking log,
 and the names it yields are not stored anywhere. When the cleanup job empties
 the log at the event's data retention, a published transcript shows numbered
 labels again for the clusters nobody named.
@@ -214,6 +232,16 @@ holds for a given installation is for the controller to confirm in its DPIA.
 
 A per-participant track exists to be transcribed. After that, only the
 attributed text is needed.
+
+A person who withdraws the transcription consent from the room
+([Withdrawing consent](../GDPR.md#withdrawing-consent)) is not recorded from
+the reconnection on, and the tracks recorded before are no longer handed to
+the transcription: the claim of a per-participant transcription or of an
+archive leaves out every track whose bridge endpoint belongs to a seat with a
+withdrawn consent and no consent given again
+(`app/src/app/api/internal/postprod-claim/route.ts`). The next
+`multitrack-purge` run deletes those track files, also when the event keeps
+participant tracks, unless a job that already took them is still running.
 
 ```mermaid
 flowchart LR
@@ -388,6 +416,22 @@ this section covers what matters for privacy.
   transcription of what they say (`waiting.captionsNoticeTranscript`), and the
   transcription box asks for the consent, at registration and in the waiting
   room (see [What participants are told](#what-participants-are-told)).
+- **Voices without consent in the transcript.** The rows without text become
+  marks in the transcript (`untranscribed`: start and end only, with no
+  speaker and no text, nearby rows merged), and the public transcript panel
+  shows them as **Not transcribed: the speaker did not consent**, so a reader
+  following the transcript knows that someone spoke there. Live captions are
+  shown to everyone in the room for accessibility; the consent governs what
+  is kept, not what is captioned live.
+- **The full room recording.** In an event where this consent was asked (same
+  rule as above), the
+  composite video contains every voice, including those of people who said
+  no. The AI pipeline therefore does not transcribe it on its own: the
+  recording webhook enqueues nothing for it, and the event's transcript stays
+  the one from captions (or from the per-participant tracks). Staff can still
+  start the transcription of the composite video from the administration
+  area, after confirming that everyone who speaks in it has consented; the
+  confirmation is written to the admin audit log (`allVoicesConsented`).
 - **The transcript.** After the event the sentences become a
   `TRANSCRIPT_JSON` artifact (model `live-captions`) on the event's recording,
   or on a recording without media created for it, with one speaker label per
@@ -546,7 +590,7 @@ where the rule is enforced. See
   endpoint answers `404`. Public transcripts show
   speaker names. In the transcript panel, an unnamed cluster gets a name from
   the speaking timeline while the log exists, or else a numbered label
-  (`Partecipante N`, in Italian whatever the page language). In the downloads
+  (**Participant N**, in the page language). In the downloads
   and subtitles, an unnamed cluster keeps its raw label (`SPEAKER_00`).
 - **Staff who manage the event** (administrators and the organizer who created
   it) see everything in the administration area. That includes raw

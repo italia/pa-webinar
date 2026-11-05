@@ -20,6 +20,7 @@
  */
 
 import {
+  Fragment,
   useEffect,
   useMemo,
   useRef,
@@ -63,6 +64,12 @@ interface TranscriptResponse {
   subtitleTracks: string[];
   summaries: Record<string, string>;
   speakers: Array<{ diarLabel: string; displayName: string | null }>;
+  /**
+   * I tratti in cui ha parlato qualcuno che non ha dato il consenso alla
+   * trascrizione: si segnano, senza testo e senza nome, cosi' chi legge sa
+   * che li' c'e' stato un intervento.
+   */
+  untranscribed?: Array<{ start: number; end: number }>;
   /**
    * True quando il transcript proviene dalla pipeline multi-traccia
    * (ADR-013): i segmenti POSSONO sovrapporsi nel tempo (parlato
@@ -528,6 +535,33 @@ export default function TranscriptPanel({
       .filter(({ seg }) => seg.text.toLowerCase().includes(q));
   }, [data, search]);
 
+  // Gli interventi non trascritti, ciascuno prima del primo segmento che
+  // comincia dopo di lui; in ricerca non si mostrano (non hanno testo).
+  const vuotiPrima = useMemo(() => {
+    const prima = new Map<number, Array<{ start: number; end: number }>>();
+    const inFondo: Array<{ start: number; end: number }> = [];
+    if (!data?.untranscribed?.length || search.trim()) return { prima, inFondo };
+    for (const v of [...data.untranscribed].sort((a, b) => a.start - b.start)) {
+      const idx = data.segments.findIndex((seg) => seg.start >= v.start);
+      if (idx < 0) inFondo.push(v);
+      else prima.set(idx, [...(prima.get(idx) ?? []), v]);
+    }
+    return { prima, inFondo };
+  }, [data, search]);
+
+  const vuoto = (v: { start: number; end: number }) => (
+    <div
+      key={`vuoto-${v.start}`}
+      className="postprod-segment-gap d-flex align-items-center gap-2 small p-2 fst-italic"
+      style={{ color: 'var(--app-muted)', borderLeft: '3px dashed #c5c7c9' }}
+    >
+      <code style={{ minWidth: 56, color: 'var(--app-muted)', fontVariantNumeric: 'tabular-nums' }}>
+        {formatTs(v.start)}
+      </code>
+      <span>{t('untranscribed')}</span>
+    </div>
+  );
+
   if (error) {
     return (
       <div className="alert alert-warning small" role="alert">
@@ -785,8 +819,9 @@ export default function TranscriptPanel({
                   });
               };
               return (
+                <Fragment key={`${seg.start}-${idx}`}>
+                {vuotiPrima.prima.get(idx)?.map(vuoto)}
                 <div
-                  key={`${seg.start}-${idx}`}
                   data-segment-idx={idx}
                   className={`postprod-segment d-block p-2 ${
                     isActive ? 'postprod-segment--active' : ''
@@ -958,8 +993,10 @@ export default function TranscriptPanel({
                     )}
                   </div>
                 </div>
+                </Fragment>
               );
             })}
+            {vuotiPrima.inFondo.map(vuoto)}
           </div>
         </>
       )}

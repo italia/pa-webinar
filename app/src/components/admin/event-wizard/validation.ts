@@ -72,13 +72,6 @@ export function validateStep(
     } catch {
       errs['startsAt'] = 'invalid';
     }
-    if (
-      !Number.isFinite(form.maxParticipants) ||
-      form.maxParticipants < 2 ||
-      form.maxParticipants > 5000
-    ) {
-      errs['maxParticipants'] = 'outOfRange';
-    }
   }
   if (step === 'programme') {
     // Il programma: una durata scritta che non e' una durata. Senza, il
@@ -92,8 +85,29 @@ export function validateStep(
     if (!Number.isInteger(giorni) || giorni < 1 || giorni > retentionMax) {
       errs['dataRetentionDays'] = 'outOfRange';
     }
+    // I partecipanti attesi si cambiano nei dettagli tecnici.
+    if (
+      !Number.isFinite(form.maxParticipants) ||
+      form.maxParticipants < 2 ||
+      form.maxParticipants > 5000
+    ) {
+      errs['maxParticipants'] = 'outOfRange';
+    }
   }
   return errs;
+}
+
+/**
+ * Le sezioni delle impostazioni avanzate che mostrano questi errori: quella
+ * dei dati (conservazione, informativa) e quella tecnica (partecipanti
+ * attesi). Con errori in entrambe si aprono entrambe; senza un campo noto,
+ * quella dei dati.
+ */
+export function sezioniDegliErrori(chiavi: readonly string[]): Array<'data' | 'technical'> {
+  const out: Array<'data' | 'technical'> = [];
+  if (chiavi.some((k) => k === 'dataRetentionDays' || k === 'gdprTemplateId')) out.push('data');
+  if (chiavi.includes('maxParticipants')) out.push('technical');
+  return out.length > 0 ? out : ['data'];
 }
 
 /** Un indirizzo email plausibile: la stessa regola per il pulsante
@@ -127,7 +141,7 @@ export function validatePublish(form: WizardForm): Record<string, string> {
 const INLINE_FIELDS: ReadonlyMap<string, StepKey> = new Map<string, StepKey>([
   ['startsAt', 'schedule'],
   ['endsAt', 'schedule'],
-  ['maxParticipants', 'schedule'],
+  ['maxParticipants', 'advanced'],
   ['aiTargetLocales', 'base'],
   ['gdprTemplateId', 'advanced'],
   ['dataRetentionDays', 'advanced'],

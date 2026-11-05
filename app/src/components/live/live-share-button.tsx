@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 
 import LinkQr, { nomeFileQr } from '@/components/ui/link-qr';
 import { localizedPath } from '@/lib/utils/localized-url';
+import { copiaNegliAppunti } from '@/lib/utils/clipboard';
 
 type RowKey = 'call' | 'event' | 'mod';
 
@@ -134,6 +135,7 @@ export default function LiveShareButton({
   const [sotto, setSotto] = useState<number | null>(null);
   const [origin, setOrigin] = useState('');
   const [copied, setCopied] = useState<RowKey | null>(null);
+  const [fallita, setFallita] = useState<RowKey | null>(null);
   const [showMod, setShowMod] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -160,6 +162,7 @@ export default function LiveShareButton({
       setOpen(false);
       setChiusura(false);
       setShowMod(false);
+      setFallita(null);
     }, CHIUSURA_MS);
     if (rimettiFuoco) triggerRef.current?.focus();
   }, []);
@@ -218,25 +221,17 @@ export default function LiveShareButton({
 
   const copy = useCallback(async (which: RowKey, url: string) => {
     if (!url) return;
-    try {
-      await navigator.clipboard.writeText(url);
-    } catch {
-      const ta = document.createElement('textarea');
-      ta.value = url;
-      ta.style.position = 'fixed';
-      ta.style.opacity = '0';
-      document.body.appendChild(ta);
-      ta.select();
-      try {
-        document.execCommand('copy');
-      } catch {
-        /* resta il campo selezionabile per la copia a mano */
-      }
-      ta.remove();
-    }
-    setCopied(which);
+    const riuscita = await copiaNegliAppunti(url);
     if (timerCopia.current) clearTimeout(timerCopia.current);
-    timerCopia.current = setTimeout(() => setCopied((c) => (c === which ? null : c)), 2000);
+    if (riuscita) {
+      setFallita(null);
+      setCopied(which);
+      timerCopia.current = setTimeout(() => setCopied((c) => (c === which ? null : c)), 2000);
+    } else {
+      // L'indirizzo resta nel campo, selezionabile: si copia a mano.
+      setCopied(null);
+      setFallita(which);
+    }
   }, []);
 
   const rows: Array<{ key: RowKey; icon: ReactNode; label: string; hint: string; url: string }> = [];
@@ -256,6 +251,7 @@ export default function LiveShareButton({
   }
 
   const riga = (key: RowKey, url: string, etichetta: string, pericolo = false) => (
+    <>
     <div className={`live-share__field${copied === key ? ' is-copied' : ''}`}>
       <input
         type="text"
@@ -289,6 +285,10 @@ export default function LiveShareButton({
         {copied === key ? t('copied') : t('copy')}
       </button>
     </div>
+    {fallita === key && (
+      <p className="small text-danger mt-1 mb-0">{t('copyFailed')}</p>
+    )}
+    </>
   );
 
   return (
@@ -383,7 +383,7 @@ export default function LiveShareButton({
 
           {/* La conferma della copia per chi usa un lettore di schermo. */}
           <span className="visually-hidden" role="status">
-            {copied ? t('copied') : ''}
+            {copied ? t('copied') : fallita ? t('copyFailed') : ''}
           </span>
         </div>
       )}

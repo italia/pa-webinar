@@ -10,13 +10,16 @@ import { getPublicEnv } from '@/lib/env';
 import { captionsTranscriptActive, liveCaptionsAvailable } from '@/lib/captions/availability';
 import { getSettings } from '@/lib/settings';
 import { recordingAvailable } from '@/lib/recording/availability';
+import { registraChiConduce } from '@/lib/live/entry-consents';
 import { informativaEvento } from '@/lib/events/privacy-notice';
 import LiveEventClient from '@/components/live/live-event-client';
+import AdminSessionKeepAlive from '@/components/admin/admin-session-keepalive';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { eventAccessCookieName, verifyEventAccess } from '@/lib/event-session';
 import { resolveGrantForEvent } from '@/lib/auth/moderator';
+import { staffDietroIlPrimario } from '@/lib/auth/staff-seat';
 import { isEventPageVisible } from '@/lib/events/visibility';
 import { hasJoinGrant } from '@/lib/events/join-grant';
 import { guestAccessAllowed, guestWindowOpen } from '@/lib/events/guest-window';
@@ -182,7 +185,9 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             slug: event.slug,
             title,
             parseTitleKicker: resolveKickerEnabled(event, settings.parseTitleKicker),
-            waitingRoomEngine: event.waitingRoomEngine ?? settings.waitingRoomEngine,
+            // Pubblico anonimo: niente piazza, dove ci si riconosce dal nome.
+            waitingRoomEngine: event.audienceAnonymous ? 'CLASSIC' : (event.waitingRoomEngine ?? settings.waitingRoomEngine),
+            audienceAnonymous: event.audienceAnonymous,
             videoQuality,
             startsAt: event.startsAt.toISOString(),
             endsAt: event.endsAt.toISOString(),
@@ -218,6 +223,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             tempRecordingUrl: event.tempRecordingUrl,
             feedbackEnabled: event.feedbackEnabled,
             recordingConsentText: isInstant ? null : event.recordingConsentText,
+            listenOnlyWithoutConsent: event.listenOnlyWithoutConsent,
             privacy,
             timezone: event.timezone,
             registrationCount: event._count.registrations,
@@ -278,6 +284,9 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
   // valutazione di fine evento gli si puo' proporre anche senza il token
   // della sala di questa pagina.
   let iscrizioneEntrata = false;
+  // Il browser che si e' iscritto apre il proprio link: entra con il nome
+  // dell'iscrizione (la rotta del token applica la stessa regola).
+  let linkDellIscritto = false;
   if (!isModerator && !isSpeaker) {
     const registration = await prisma.registration.findUnique({
       where: { accessToken: token },
@@ -288,6 +297,8 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         consentRecording: true,
         consentMultitrack: true,
         consentMultitrackVersion: true,
+        consentRecordingWithdrawnAt: true,
+        consentMultitrackWithdrawnAt: true,
         joinedAt: true,
       },
     });
@@ -315,6 +326,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         event.id,
         cookieStore.get(eventAccessCookieName(event.id))?.value,
       )) === token;
+    linkDellIscritto = ownsToken;
     participantInfo = {
       displayName: ownsToken
         ? (tryDecryptPII(registration.displayName) ?? registration.displayName)
@@ -323,43 +335,68 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
     // Dati all'iscrizione, o in sala d'attesa a un ingresso precedente (chi si
     // e' iscritto prima che l'evento registrasse): la prova sta legata
     // all'iscrizione solo nel browser che si e' iscritto.
-    const prove = { eventId: event.id, registrationId: registration.id };
+    // Un consenso ritirato dalla sala non vale piu' (lib/live/consent-withdrawal).
+    const prove = { eventId: event.id, registrationId: registration.id, withdrawnAt: null };
     // Per la trascrizione dai sottotitoli vale solo il consenso dato con il
     // testo che la comprende (lib/registration/consents): a chi aveva dato
     // quello per la sola traccia audio si richiede.
     const versioneMinima = captionsTranscriptActive(event, settings) ? VERSIONE_TESTO_TRASCRIZIONE : 1;
     const datoAllIscrizione =
       registration.consentMultitrack === true &&
+      !registration.consentMultitrackWithdrawnAt &&
       (registration.consentMultitrackVersion ?? 1) >= versioneMinima;
+    const registrazioneAllIscrizione =
+      registration.consentRecording === true && !registration.consentRecordingWithdrawnAt;
     const [proveTracce, proveRegistrazione] = ownsToken
       ? await Promise.all([
           !datoAllIscrizione &&
           (event.multitrackRecordingEnabled || captionsTranscriptActive(event, settings))
             ? prisma.multitrackConsent.count({ where: { ...prove, textVersion: { gte: versioneMinima } } })
             : 0,
-          registration.consentRecording !== true && event.recordingEnabled
+          !registrazioneAllIscrizione && event.recordingEnabled
             ? prisma.recordingConsent.count({ where: prove })
             : 0,
         ])
       : [0, 0];
     hasMultitrackConsent = ownsToken && (datoAllIscrizione || proveTracce > 0);
     hasRecordingConsent =
-      ownsToken && (registration.consentRecording === true || proveRegistrazione > 0);
+      ownsToken && (registrazioneAllIscrizione || proveRegistrazione > 0);
     // Solo per chi ha il proprio link: un link inoltrato non risponde a nome
     // di chi l'ha ricevuto.
     iscrizioneEntrata = ownsToken && registration.joinedAt !== null;
+  } else if (isPrimaryModerator && registraChiConduce(event, canRecord)) {
+    // Chi conduce dal link primario con la sessione del proprio account: il
+    // consenso alla registrazione dato a un ingresso precedente non si
+    // richiede. Solo qui, dove dietro il link c'e' una persona: un link
+    // nominale puo' essere inoltrato, e chi lo apre non eredita il consenso
+    // di un altro (lo da' a ogni visita della pagina).
+    const staff = await staffDietroIlPrimario(event.id);
+    hasRecordingConsent = staff
+      ? !!(await prisma.recordingConsent.findFirst({
+          where: { eventId: event.id, staffAccountId: staff.accountId, withdrawnAt: null },
+          select: { id: true },
+        }))
+      : false;
   }
 
   const title = getLocalized(event.title as LocalizedField, locale);
 
+  // Lo staff dietro il link primario ha il suo posto finche' vale la sessione:
+  // in sala la si tiene viva come nell'amministrazione.
+  const staffInSala = isPrimaryModerator ? await staffDietroIlPrimario(event.id) : null;
+
   return (
+    <>
+    {staffInSala && <AdminSessionKeepAlive allaScadenza="resta" />}
     <LiveEventClient
       event={{
         id: event.id,
         slug: event.slug,
         title,
         parseTitleKicker: resolveKickerEnabled(event, settings.parseTitleKicker),
-        waitingRoomEngine: event.waitingRoomEngine ?? settings.waitingRoomEngine,
+        // Pubblico anonimo: niente piazza, dove ci si riconosce dal nome.
+        waitingRoomEngine: event.audienceAnonymous ? 'CLASSIC' : (event.waitingRoomEngine ?? settings.waitingRoomEngine),
+        audienceAnonymous: event.audienceAnonymous,
         startsAt: event.startsAt.toISOString(),
         endsAt: event.endsAt.toISOString(),
         status: event.status,
@@ -395,6 +432,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         tempRecordingUrl: event.tempRecordingUrl,
         feedbackEnabled: event.feedbackEnabled,
         recordingConsentText: event.recordingConsentText,
+        listenOnlyWithoutConsent: event.listenOnlyWithoutConsent,
         privacy,
         timezone: event.timezone,
         registrationCount: event._count.registrations,
@@ -416,6 +454,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       hasMultitrackConsent={hasMultitrackConsent}
       hasRecordingConsent={hasRecordingConsent}
       registrationJoined={iscrizioneEntrata}
+      registrantOwnsLink={linkDellIscritto}
       displayName={
         grant && !grant.isPrimaryShared
           ? // Named co-moderator or speaker via EventModerator row —
@@ -424,8 +463,10 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
           : isPrimaryModerator
             ? // Primary moderator magic-link (shared): keep the input
               // empty so anyone opening the link types their own name
-              // rather than inheriting the configured moderatorName.
-              ''
+              // rather than inheriting the configured moderatorName — unless
+              // a staff member who manages the event opened it: then it is
+              // their own name (lib/auth/staff-seat).
+              (staffInSala?.nome ?? '')
             : (participantInfo?.displayName ?? 'Partecipante')
       }
       locale={locale}
@@ -436,5 +477,6 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       rnnoiseEnforceOff={rnnoiseEnforceOff}
       whiteboardInfraReady={whiteboardInfraReady}
     />
+    </>
   );
 }

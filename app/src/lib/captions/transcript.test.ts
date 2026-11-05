@@ -75,10 +75,45 @@ describe('componiTrascrizione', () => {
     expect(t.speakers.map((s) => s.displayName)).toEqual(['Relatore 1', 'Moderatrice', 'Relatore 2']);
   });
 
-  it('di chi non ha acconsentito non resta niente', () => {
+  it('di chi non ha acconsentito restano solo i tempi, senza testo ne\' nome', () => {
     const t = componiTrascrizione([frase(null, null, null, 1, 2), frase('mod-1', 'M', 'Si.', 3, 4)], t0);
     expect(t.segments).toHaveLength(1);
     expect(t.speakers).toHaveLength(1);
+    expect(t.untranscribed).toEqual([{ start: 1, end: 2 }]);
+  });
+
+  it('due segni non si uniscono sopra una frase trascritta', () => {
+    const t = componiTrascrizione(
+      [frase(null, null, null, 10, 12), frase('mod-1', 'M', 'Si.', 12.5, 14.5), frase(null, null, null, 15, 16)],
+      t0,
+    );
+    expect(t.untranscribed).toEqual([
+      { start: 10, end: 12 },
+      { start: 15, end: 16 },
+    ]);
+  });
+
+  it('i segni restano dentro il video', () => {
+    const t = componiTrascrizione(
+      [frase(null, null, null, -5, -1), frase(null, null, null, -2, 3), frase(null, null, null, 58, 70), frase(null, null, null, 61, 65)],
+      t0,
+      60,
+    );
+    expect(t.untranscribed).toEqual([
+      { start: 0, end: 3 },
+      { start: 58, end: 60 },
+    ]);
+  });
+
+  it('interventi non trascritti vicini diventano uno solo', () => {
+    const t = componiTrascrizione(
+      [frase(null, null, null, 10, 12), frase(null, null, null, 13, 15), frase(null, null, null, 30, 31)],
+      t0,
+    );
+    expect(t.untranscribed).toEqual([
+      { start: 10, end: 15 },
+      { start: 30, end: 31 },
+    ]);
   });
 
   it('una frase detta prima dell\'inizio del video parte da zero', () => {

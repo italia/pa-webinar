@@ -15,7 +15,7 @@ Other topics have their own pages:
 |---|---|---|
 | Docker Engine with the Compose plugin | Docker 24 or later, Compose 2.20 or later | The local stack. Podman also runs it, with `podman compose` |
 | Git | Any recent version | Cloning the repository |
-| Node.js | 20 or later (`engines` in the root `package.json`) | Running Next.js on the host, tests, lint, type checks and scripts |
+| Node.js | 22.22.2 or later in the 22 line, 24.15 or later in the 24 line, or 26 and later (`engines` in the root `package.json`) | Running Next.js on the host, tests, lint, type checks and scripts |
 | npm | 10 or later (`engines` in the root `package.json`) | Installing the workspaces |
 
 Only Docker and Git are needed to start the stack. Some component checks need more tools: Helm 3, `openssl` and Python 3 with PyYAML for the chart validator, and Python 3 for the AI worker tests. [Testing](development/testing.md) lists what each check needs.
@@ -28,12 +28,21 @@ The repository is an npm workspace with two packages, `app` (the Next.js portal)
 git clone https://github.com/italia/pa-webinar.git
 cd pa-webinar
 
-# Build the portal image and start every default service
-docker compose up --build -d
-
-# First run only: apply the database migrations and load the demo data
-docker compose --profile setup run --rm db-migrate
+# Build the portal images, apply the migrations, start every default service
+# and, when the database has no events, load the demo data
+scripts/compose-up.sh
 ```
+
+`--images registry` takes the published images instead of building them, which skips the Docker build and leaves only the download, with no credentials. `--call` ends with a call between two headless browsers, and `--help` lists the rest. Run the script again after a `git pull`: it rebuilds what changed, applies new migrations and keeps your data.
+
+The script wraps these commands, which also work on their own:
+
+```bash
+docker compose up --build -d                      # build and start: migrations run before the app
+docker compose --profile setup run --rm db-seed   # load the demo data
+```
+
+The project is always named `pa-webinar`, whatever the folder of the checkout is called. The portal images are `pa-webinar:local` and `pa-webinar:local-migrate`, or whatever `PA_WEBINAR_IMAGE` and `PA_WEBINAR_MIGRATE_IMAGE` name; the volumes and the network start with `pa-webinar_`. A later `docker compose up` without those variables goes back to the local images. Two checkouts of the repository therefore share one stack, one database and these image tags: set `COMPOSE_PROJECT_NAME` to keep the data of a second one apart.
 
 | What | Address |
 |---|---|
@@ -43,15 +52,15 @@ docker compose --profile setup run --rm db-migrate
 
 **Accept the Jitsi certificate once.** The local Jitsi serves a self-signed certificate. Open <https://localhost:8443> in the browser you will test with and accept the warning. Until you do, the browser refuses the embedded conference and the live room shows no call. You only need to visit port 8443 for this: Jitsi accepts only tokens signed by the portal (`AUTH_TYPE=jwt`, `ENABLE_GUESTS=0` in `docker-compose.yml`), so rooms are always opened from the portal.
 
-**What the `setup` profile does.** The `db-migrate` service runs `npx prisma migrate deploy` and then `npx tsx prisma/seed.ts`. The seed script (`app/prisma/seed.ts`):
+**What the demo data is.** The `db-seed` service, in the `setup` profile, runs `npx tsx prisma/seed.ts`. The seed script (`app/prisma/seed.ts`):
 
 - makes sure the system event templates exist;
 - creates the site settings row if it is missing;
 - creates three demo events, two `PUBLISHED` and one `ENDED`, and prints a moderator link for each one.
 
-> **Re-running the profile resets the demo content.** Before it creates its examples, the seed deletes every event (with its registrations, questions, polls and materials), the GDPR audit log and the event templates that staff created. To apply new migrations without the seed, see [Where migrations are applied](#where-migrations-are-applied).
+> **Running `db-seed` again resets the demo content.** Before it creates its examples, the seed deletes every event (with its registrations, questions, polls and materials), the GDPR audit log and the event templates that staff created. `scripts/compose-up.sh` runs it by itself only when none of these exist, or with `--seed`.
 
-The `app` container never applies migrations itself. Its entrypoint (`scripts/docker-entrypoint.sh`) only waits for the database. After you pull code that adds a migration, apply it before you restart the app.
+The `app` container never applies migrations itself: its entrypoint (`scripts/docker-entrypoint.sh`) only waits for the database. The one-shot `db-migrate` service does, before `app` starts, on every `docker compose up`, as the init container does in the cluster.
 
 ## First access
 
@@ -101,11 +110,11 @@ To act as a moderator of a demo event, open one of the moderator links that the 
 
 ## Local services
 
-`docker compose up` starts every service below, except the two in a profile. The image tags are in `docker-compose.yml`.
+`docker compose up` starts every service below, except those in a profile. The image tags are in `docker-compose.yml`.
 
 | Service | Image or build | Host port | Role |
 |---|---|---|---|
-| `app` | Built from the root `Dockerfile` (the production image) | 3000 | The PA Webinar portal and its API. It starts once `postgres` and `redis` are healthy |
+| `app` | Built from the root `Dockerfile` (the production image), `pa-webinar:local` | 3000 | The PA Webinar portal and its API. It starts once `db-migrate` has finished and `postgres` and `redis` are healthy |
 | `postgres` | `postgres` (Alpine) | 5432 | Database `pa_webinar`, user `eventi`. Data lives in the `postgres_data` volume |
 | `redis` | `redis` (Alpine) | none | Realtime fan-out (chat, raised hands, live panels, square presence). Runs without persistence |
 | `jitsi-web` | `jitsi/web` | 8443 (HTTPS, self-signed) | Jitsi Meet web app and IFrame API |
@@ -113,14 +122,15 @@ To act as a moderator of a demo event, open one of the moderator links that the 
 | `jicofo` | `jitsi/jicofo` | none | Conference focus. Its REST API (port 8888) answers inside the Compose network, for the status probe |
 | `jvb` | `jitsi/jvb` | 10000/udp | Jitsi Videobridge. Carries the audio and video. Its REST API (port 8080, `/colibri/stats`) answers inside the Compose network, for the status probe and the lifecycle tick |
 | `mailpit` | `axllent/mailpit` | 8025 (web), 1025 (SMTP) | Captures every outgoing email, so nothing reaches a real inbox |
-| `cron` | `curlimages/curl` | none | Calls four `/api/cron/*` routes of `app` with the `x-api-key` header |
-| `db-migrate` (profile `setup`) | The `builder` stage of the root `Dockerfile` | none | One-shot: `prisma migrate deploy`, then the seed |
+| `cron` | `curlimages/curl` | none | Calls the `/api/cron/*` routes of `app` with the `x-api-key` header |
+| `db-migrate` | The `builder` stage of the root `Dockerfile`, `pa-webinar:local-migrate` | none | One-shot, before `app`: `prisma migrate deploy` |
+| `db-seed` (profile `setup`) | The same image as `db-migrate` | none | One-shot: loads the demo data, deleting existing events |
 | `recorder-controller` (profile `recorder`) | Built from `infra/recorder-controller/` | none | Starts one recorder bot container per recording (the per-participant recording path) through the Docker socket |
 | `captions-model`, `captions-engine`, `captions-gateway` (profile `captions`) | Built from `infra/captions/engine/` and `infra/captions/gateway/` | none | Live captions: downloads the model into a volume (about 750 MB, once), runs the speech engine and the gateway the bridge streams audio to. Needs the `CAPTIONS_*` variables in `.env` (see `.env.example`) |
 
 A few details matter when something does not work:
 
-- **The `cron` loop.** It ticks every 30 seconds. It calls `email-outbox` and `lifecycle` every minute, `reminders` every 5 minutes and `cleanup` every hour, all four once at start-up. Each call logs `[cron] <route> ok` or a failure line (`docker compose logs cron`). Calls fail while the app is still starting, which is harmless. The cluster runs more jobs, at other cadences: see the parity matrix below and [Scheduled and background jobs](architecture/background-jobs.md).
+- **The `cron` loop.** It ticks every 30 seconds. It calls `email-outbox` and `lifecycle` every minute, `reminders` every 5 minutes, `multitrack-purge` every 15 minutes, `cleanup` every hour, `recordings-reconcile` every 6 hours, and `postprod-retention` and `rubrica-retention` once a day, all of them once as soon as the app answers. Each call logs `[cron] <route> ok` or a failure line (`docker compose logs cron`). The cluster runs them at other cadences: see the parity matrix below and [Scheduled and background jobs](architecture/background-jobs.md).
 - **The status probes.** The `app` service reads the Jitsi components at their service names, as the chart does in a cluster: `JITSI_WEB_INTERNAL_URL` (`jitsi-web`), `PROSODY_INTERNAL_URL` (`prosody:5280`), `JICOFO_HEALTH_URL` (`jicofo:8888`) and `JVB_HEALTH_URL` (`jvb:8080`). The `jicofo` service sets `JICOFO_ENABLE_REST=1` and the `jvb` service `COLIBRI_REST_ENABLED=true` for this, the same switches the Jitsi subchart sets; neither port is published on the host. **System status** therefore shows every component probed, and the bridge as fixed bridges with `JVB_MAX_REPLICAS=1`, the one `jvb` service ([Monitoring and health](operations/monitoring.md#get-apistatus)).
 - **The bridge address.** The `jvb` service advertises `DOCKER_HOST_ADDRESS` (default `host.docker.internal`) as its address, and asks a public STUN server (`JVB_STUN_SERVERS` in `docker-compose.yml`) for its public address. Browsers on the same machine connect without changes. Other devices need more than this: see [Testing from another device](#testing-from-another-device).
 - **Shared placeholders.** `JITSI_JWT_SECRET` (default `s3cr3t_dev_only`) must be the same for `app`, `jitsi-web` and `prosody`, and `CRON_API_KEY` must be the same for `app`, `cron` and `recorder-controller`. Only `JITSI_JWT_SECRET`, `JITSI_BRANDING_URL`, `DOCKER_HOST_ADDRESS` and `COMPOSE_PROJECT_NAME` are read from your shell or from a `.env` file next to `docker-compose.yml` (ignored by Git). Every other value, `CRON_API_KEY` and `ADMIN_API_KEY` included, is written literally in each service, and changes only through an override file that updates every service that uses it.
@@ -134,7 +144,7 @@ flowchart LR
   subgraph PORTAL["Portal"]
     direction TB
     APP["app<br/>PA Webinar portal and API<br/>host port 3000"]:::portal
-    CRON["cron<br/>calls four /api/cron routes<br/>with x-api-key"]:::job
+    CRON["cron<br/>calls the /api/cron routes<br/>with x-api-key"]:::job
   end
 
   subgraph JITSI["Jitsi Meet"]
@@ -154,7 +164,7 @@ flowchart LR
 
   subgraph OPT["Optional: profile-gated"]
     direction TB
-    MIG["db-migrate<br/>profile setup<br/>migrate deploy and seed"]:::job
+    MIG["db-seed<br/>profile setup<br/>demo data"]:::job
     RC["recorder-controller<br/>profile recorder"]:::job
     SOCK["Docker engine socket<br/>root-equivalent on the host"]:::risk
   end
@@ -170,7 +180,7 @@ flowchart LR
   WEB ---|"XMPP proxy"| PROS
   PROS ---|"XMPP"| JIC
   PROS ---|"XMPP"| JVB
-  MIG -->|"schema and demo data"| PG
+  MIG -->|"demo data"| PG
   RC -->|"reconcile"| APP
   RC -.->|"starts recorder containers"| SOCK
 
@@ -208,10 +218,10 @@ Legend:
 | Portal, registration, live room, Q&A, polls, word cloud, reactions, timer, waiting room | **Same** | Same |
 | Realtime fan-out: chat, raised hands, live panels, the square | **Same**, with Redis running without persistence. When Next.js runs on the host without `REDIS_URL`, fan-out degrades as described in [Redis availability](architecture/live-interaction.md#redis-availability) | Redis subchart or managed Redis |
 | Email: confirmations, reminders, calendar files, sign-in links | **Same** outbox path. Mailpit captures the messages, and the `cron` service drains the outbox | CronJob `email-outbox` and a real SMTP relay |
-| Scheduled jobs | **Partial**: only `email-outbox` and `lifecycle` (every minute), `reminders` (every 5 minutes) and `cleanup` (hourly). `recordings-reconcile`, `rubrica-retention`, `multitrack-purge`, the post-production jobs and the JVB scaler never run. Call a `/api/cron/*` route by hand with the same header if you need it | CronJobs, at the schedules in `infra/helm/pa-webinar/values.yaml` ([catalog](architecture/background-jobs.md)) |
+| Scheduled jobs | **Partial**: the `cron` service runs the portal's jobs, `reminders` and `cleanup` more often than the cluster. The post-production orchestrator, its reclaim job and the JVB scaler never run | CronJobs, at the schedules in `infra/helm/pa-webinar/values.yaml` ([catalog](architecture/background-jobs.md)) |
 | Event lifecycle automation: automatic opening and end, pre-start provisioning, `IDLE` | **Partial**: the `cron` service calls `/api/cron/lifecycle` every minute, which opens a published event at its start time, provided the `jvb` service answers `/colibri/stats` at `JVB_HEALTH_URL`, and ends it at its end time plus grace. There is no pre-start provisioning and no `IDLE` ([Running without the scaler](architecture/event-lifecycle.md#running-without-the-scaler)) | The lifecycle CronJob, or the JVB scaler in the `full` profile, which adds pre-start provisioning and `IDLE` |
 | JVB scale-to-zero | **Not applicable**: the bridge is always on | JVB scaler CronJob and a dedicated node pool ([Scaling the media plane](architecture/scaling.md)) |
-| Jitsi images | **Partial**: stock `jitsi/*` images on the moving `stable` tag. Advanced noise suppression stays off, which is the application default | Versions pinned by the Jitsi subchart, plus the patched web image ([ADR-017](adr/017-patched-jitsi-web-image.md)) |
+| Jitsi images | **Partial**: stock `jitsi/*` images at the release pinned in `docker-compose.yml`. Advanced noise suppression stays off, which is the application default | Versions pinned by the Jitsi subchart, plus the patched web image ([ADR-017](adr/017-patched-jitsi-web-image.md)) |
 | TURN relay for restrictive networks | **Not included**: browsers must reach UDP port 10000 directly | Optional coturn from the Jitsi subchart, off by default (`jitsi-meet.coturn.enabled`; keys in [Deploying with Helm](DEPLOYMENT.md#coturn-turn-and-turns), when TURN is needed in [Infrastructure](INFRASTRUCTURE.md#turn)); on one k3s server, `pa-webinar-up.sh --turn`, with TURN over TLS on the portal's port 443 |
 | Object storage: uploads, recordings, AI outputs | **Not included**: Compose ships no object store. The administration area offers only the URL field for files and the chat shows no attachment button, while materials given as links keep working. To test them, add an S3-compatible store and configure both domains ([Object storage](configuration/storage.md)) | Azure Blob Storage or an S3-compatible service |
 | Composite video recording (Jibri) | **Not included**. Pressing the record control shows **Recording unavailable — Jibri not configured** | Optional (`jitsi-meet.jibri.enabled`), on in the standard and full example profiles ([Deploying with Helm](DEPLOYMENT.md)) |
@@ -238,11 +248,11 @@ There are three ways to run the portal while you work. They share the Compose se
 flowchart LR
   Q{"What are you<br/>doing?"}:::ask
 
-  A["<b>All containers</b><br/>docker compose up<br/>--build -d<br/>production image<br/>and guards"]:::mode
+  A["<b>All containers</b><br/>scripts/compose-up.sh<br/>production image<br/>and guards"]:::mode
   B["<b>Hot reload overlay</b><br/>adds the dev overlay file<br/>next dev inside<br/>the app container"]:::mode
   C["<b>Next.js on the host</b><br/>npm run dev<br/>other services<br/>still in Compose"]:::mode
 
-  A2["Rebuild to see a change.<br/>Migrations reach the<br/>database via db-migrate"]:::note
+  A2["Rebuild to see a change.<br/>Migrations run before<br/>the app starts"]:::note
   B2["Sources are mounted.<br/>Dependencies and the<br/>Prisma client are baked:<br/>rebuild after changing them"]:::note
   C2["Reads app/.env.<br/>No cron and no Redis<br/>unless you add them"]:::note
 
@@ -263,14 +273,14 @@ flowchart LR
 This mode runs the production image, built with `NODE_ENV=production`, so the production guards on secrets apply as in a real installation, except the `PII_ENCRYPTION_KEY` guard, which Compose deliberately bypasses with `ALLOW_INSECURE_PII_KEY=true`. To see a code change, rebuild.
 
 ```bash
-docker compose up --build -d      # build and start
+scripts/compose-up.sh             # build and start
 docker compose ps                 # state and health of each service
 docker compose logs -f app        # follow one service
 docker compose down               # stop, keep the data
 docker compose down -v            # stop and delete the volumes: database and Jitsi configuration
 ```
 
-After `down -v`, run the `setup` profile again.
+After `down -v`, `scripts/compose-up.sh` loads the demo data again.
 
 ### Hot reload with the dev overlay
 
@@ -278,7 +288,13 @@ After `down -v`, run the `setup` profile again.
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 ```
 
-`docker-compose.dev.yml` changes only the `app` service:
+`docker-compose.dev.yml` changes the `app` service, and runs `db-migrate` and `db-seed` from the same image with `app/prisma` mounted, so a new migration needs no rebuild. On an empty database, load the demo data with the same files, so that Compose does not start the production build:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.dev.yml --profile setup run --rm db-seed
+```
+
+The overlay changes the following:
 
 - It builds the `deps` stage of the `Dockerfile`, which holds the dependencies and the generated Prisma client, and runs `npx next dev --hostname 0.0.0.0` with `NODE_ENV=development`.
 - It mounts `app/src`, `app/public`, `app/prisma` and `lobby/src` from your checkout. `lobby/src` is mounted because the live-room page imports the square: without it the page does not compile.
@@ -375,12 +391,11 @@ Never use `db:push`, on your machine or anywhere else. It leaves no migration be
 | Where | How | What runs |
 |---|---|---|
 | Host, during development | `npm run db:migrate:dev --workspace=app` | Creates and applies migrations, regenerates the client |
-| Docker Compose | `docker compose --profile setup run --rm db-migrate` | `prisma migrate deploy`, then the seed |
-| Docker Compose, migrations only | `docker compose --profile setup run --rm --build db-migrate npx prisma migrate deploy` | `prisma migrate deploy` from a freshly built image, without the seed |
+| Docker Compose | The `db-migrate` service, on every `docker compose up` | `prisma migrate deploy` before the app starts |
 | Kubernetes | The `db-migrate` init container of the app Deployment | `npx prisma migrate deploy` before each new app pod starts ([Upgrades and rollback](operations/upgrades.md)) |
 | CI | The **Migration Integrity** job in `.github/workflows/ci.yml` | Applies every migration to an empty database, then fails if `schema.prisma` differs from the result |
 
-The `db-migrate` image copies `app/prisma/` at build time. Without `--build`, a new migration pulled since the last build is not in the image.
+The `db-migrate` image copies `app/prisma/` at build time, so a new migration needs `--build`, which `scripts/compose-up.sh` passes.
 
 To reproduce the CI **Migration Integrity** check before you push, follow [CI parity](development/methodology.md#ci-parity-before-every-push); never point the shadow database at your development database.
 
@@ -513,16 +528,38 @@ docker compose logs postgres
 docker compose exec postgres pg_isready -U eventi -d pa_webinar
 ```
 
-After `docker compose down -v`, the database is empty: run the `setup` profile again.
+After `docker compose down -v`, the database is empty: `scripts/compose-up.sh` loads the demo data again.
+
+### The ports are taken, or `docker compose ps` shows nothing
+
+The project is named `pa-webinar`. A stack started when the project took its
+name from the folder keeps running under that name: `docker compose ps` and
+`docker compose logs` from the repository do not see it, and it still holds
+the ports. `scripts/compose-up.sh` stops before the build and names the stack.
+To update that stack with its data:
+
+```bash
+COMPOSE_PROJECT_NAME=<old-name> scripts/compose-up.sh
+```
+
+To leave it and start on new volumes, stop it first:
+
+```bash
+docker stop $(docker ps -q --filter label=com.docker.compose.project=<old-name>)
+scripts/compose-up.sh
+```
+
+Its volumes stay on disk under the old name.
 
 ### Database errors after updating the code
 
-Errors about a missing table or column after a pull mean that a new migration has not been applied. The `app` container does not migrate on start. Apply the migrations without the seed, then restart the app:
+Errors about a missing table or column after a pull mean that the images are older than the code. Build them again, which also applies the new migrations:
 
 ```bash
-docker compose --profile setup run --rm --build db-migrate npx prisma migrate deploy
-docker compose up -d --build app
+scripts/compose-up.sh
 ```
+
+`Authentication failed` or `database "pa_webinar" does not exist` from `db-migrate` mean that the volume was created with other settings: PostgreSQL reads the user, the password and the database name only the first time it starts on an empty volume. Delete the local data with `docker compose down -v`, then run the script again.
 
 When Next.js runs on the host, run `npm run db:migrate --workspace=app` and `npm run db:generate --workspace=app` instead.
 

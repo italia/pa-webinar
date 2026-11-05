@@ -12,6 +12,7 @@
 import { z } from 'zod';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
+import { materialUrlSchema } from '@/lib/validation/materials';
 import { prisma } from '@/lib/db';
 import { AppError, ForbiddenError, RateLimitError, UnauthorizedError, ValidationError } from '@/lib/errors';
 import { constantTimeEqual, extractModeratorToken } from '@/lib/auth/moderator';
@@ -24,8 +25,8 @@ const UUID_RE =
 
 const addOrganizerSchema = z.object({
   name: z.string().min(1).max(200),
-  logoUrl: z.string().url().optional().nullable(),
-  websiteUrl: z.string().url().optional().nullable(),
+  logoUrl: materialUrlSchema.optional().nullable(),
+  websiteUrl: materialUrlSchema.optional().nullable(),
   sortOrder: z.number().int().min(0).optional(),
 });
 

@@ -22,6 +22,7 @@ import { eventAdminPath } from '@/lib/events/admin-links';
 import { isUuid } from '@/lib/events/event-param';
 import { useToast } from '@/components/ui/toast';
 import { useConfirm } from '@/components/ui/confirm-dialog';
+import { useAvvioPipeline } from '@/hooks/use-avvio-pipeline';
 import { codiceErrore, messaggioErroreApi } from '@/lib/api-error-message';
 import TranscriptEditor from './transcript-editor';
 import { recordingStatusLabel, statusBadgeClass } from './recording-status';
@@ -161,6 +162,7 @@ export default function PostprodDashboard() {
   const format = useFormatter();
   const toast = useToast();
   const confirm = useConfirm();
+  const avviaPipeline = useAvvioPipeline();
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [expanded, setExpanded] = useState<string | null>(null);
 
@@ -222,10 +224,8 @@ export default function PostprodDashboard() {
   }, [data, deepRecordingId, deepEventId, filtroEvento, router]);
 
   async function rerun(recordingId: string): Promise<void> {
-    const r = await fetch(`/api/admin/postprod/recordings/${recordingId}/rerun`, {
-      method: 'POST',
-      credentials: 'include',
-    });
+    const r = await avviaPipeline(`/api/admin/postprod/recordings/${recordingId}/rerun`);
+    if (!r) return;
     if (!r.ok) {
       toast.error(
         messaggioErroreApi(r.status, tApi, t('rerunFailed', { code: r.status }), {}, await codiceErrore(r)),

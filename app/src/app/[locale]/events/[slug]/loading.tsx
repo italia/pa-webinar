@@ -1,4 +1,17 @@
+'use client';
+
+import { LiveRoomSkeleton } from '@/components/live/live-room-skeleton';
+import { usePathname } from '@/i18n/navigation';
+
+/**
+ * Il segnaposto della pagina evento avvolge anche le sue sottopagine. Se il
+ * server tarda a preparare la sala, compare questo e non quello della sala:
+ * per la sala si mostra comunque la sua forma, altrimenti il piede della
+ * pagina sale a meta' schermo e poi salta in fondo quando la sala arriva.
+ */
 export default function EventDetailLoading() {
+  const pathname = usePathname();
+  if (pathname === '/events/[slug]/live') return <LiveRoomSkeleton />;
   return (
     <div className="container py-5">
       <div className="bg-secondary bg-opacity-10 rounded mb-4" style={{ height: 14, width: 140 }} />

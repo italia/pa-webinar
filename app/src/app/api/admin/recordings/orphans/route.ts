@@ -23,7 +23,7 @@ export const dynamic = 'force-dynamic';
 const DECISION_VALUES = ['pending', 'ignore', 'delete-now'] as const;
 
 const bulkDecisionSchema = z.object({
-  ids: z.array(z.string().uuid()).min(1).max(500),
+  ids: z.array(z.guid()).min(1).max(500),
   decision: z.enum(DECISION_VALUES),
 });
 

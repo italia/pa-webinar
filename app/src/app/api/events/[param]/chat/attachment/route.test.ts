@@ -58,8 +58,9 @@ beforeEach(() => {
     id: EVENT_ID,
     moderatorToken: 'token-primario',
     moderatorName: null,
+    chatEnabled: true,
   } as never);
-  vi.mocked(resolveTokenSender).mockResolvedValue({ senderId: 'reg-1' } as never);
+  vi.mocked(resolveTokenSender).mockResolvedValue({ senderId: 'reg-1', isModerator: false } as never);
   log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
 });
 
@@ -73,5 +74,19 @@ describe('POST /api/events/[param]/chat/attachment — senza storage', () => {
     expect(res.status).toBe(503);
     expect(((await res.json()) as { code?: string }).code).toBe('STORAGE_UNAVAILABLE');
     expect(livelloDelLog(log)).toBe('warn');
+  });
+});
+
+describe('POST /api/events/[param]/chat/attachment — chat spenta', () => {
+  it('403 CHAT_DISABLED, prima di toccare lo storage', async () => {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue({
+      id: EVENT_ID,
+      moderatorToken: 'token-primario',
+      moderatorName: null,
+      chatEnabled: false,
+    } as never);
+    const res = await POST(upload(), ctx());
+    expect(res.status).toBe(403);
+    expect(((await res.json()) as { code?: string }).code).toBe('CHAT_DISABLED');
   });
 });

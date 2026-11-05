@@ -90,9 +90,9 @@ Gather these before you start.
       published with a DMARC policy for the sender's domain
       ([Email delivery](../configuration/email.md)). Until it is ready,
       `--mailpit` on k3s keeps the emails in a test mailbox.
-- [ ] **Access to the images**: Docker on the workstation to build them, since
-      the published images refuse anonymous pulls today, or read access to the
-      packages ([Registry access](README.md#registry-access-to-the-published-images)).
+- [ ] **Access to the images**: the portal images are public. The patched web
+      image, the recorder and the GPU worker need read access to the packages
+      ([Registry access](README.md#registry-access-to-the-published-images)).
 - [ ] **Object storage credentials**, when you use your provider's: static
       keys with the permissions in
       [Creating buckets and containers](../configuration/storage.md#creating-buckets-and-containers).
@@ -122,7 +122,7 @@ stop, or warn, before they change anything. The commands let you check ahead.
 - [ ] **Docker**, running (`docker info`), with room for the build: the
       migration image alone is 2.4 GB.
 - [ ] **For the add-ons**: `curl --version` 7.75 or later.
-- [ ] **For `--verify-call`**: Node.js 20 or later, `npm ci` at the
+- [ ] **For `--verify-call`**: Node.js 22.22.2 or later, `npm ci` at the
       repository root, and a Chromium (`npx playwright install chromium`) or
       Chrome. The script checks them at the start of each run, `--dry-run`
       included.

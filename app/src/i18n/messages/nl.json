@@ -81,7 +81,8 @@
     "deselectAll": "Selectie opheffen",
     "durationMinutes": "{minutes, plural, one {# minuut} other {# minuten}}",
     "durationHours": "{hours, plural, one {# uur} other {# uur}}",
-    "durationHoursMinutes": "{hours, plural, one {# uur} other {# uur}} en {minutes, plural, one {# minuut} other {# minuten}}"
+    "durationHoursMinutes": "{hours, plural, one {# uur} other {# uur}} en {minutes, plural, one {# minuut} other {# minuten}}",
+    "backToTop": "Terug naar boven"
   },
   "markdown": {
     "edit": "Schrijven",
@@ -102,7 +103,14 @@
     "switchLanguage": "Taal wijzigen",
     "skipToContent": "Ga naar inhoud",
     "skipToFooter": "Ga naar footer",
-    "mainLabel": "Hoofdnavigatie"
+    "mainLabel": "Hoofdnavigatie",
+    "activeLanguage": "Actieve taal:",
+    "languageSelected": "(geselecteerd)",
+    "signIn": "Inloggen",
+    "roleAdmin": "Beheerder",
+    "roleOrganizer": "Organisator",
+    "instanceKey": "Instantiesleutel",
+    "signOutFailed": "Afmelden mislukt: probeer het opnieuw."
   },
   "header": {
     "followUs": "Volg ons op"
@@ -204,7 +212,8 @@
       "recordingLinkEmailLabel": "E-mailadres waarmee je je hebt ingeschreven",
       "recordingLinkSend": "Stuur me de link opnieuw",
       "recordingLinkSent": "Als het adres voor het evenement is ingeschreven, ontvang je binnenkort een e-mail met je persoonlijke link.",
-      "recordingLinkError": "Het verzoek is mislukt. Probeer het over een paar minuten opnieuw."
+      "recordingLinkError": "Het verzoek is mislukt. Probeer het over een paar minuten opnieuw.",
+      "registerOrGuest": "Als je je inschrijft, krijg je per e-mail je persoonlijke link en nieuws over het evenement. Als gast kom je meteen binnen met alleen een naam, alleen terwijl het evenement live is, en krijg je geen e-mails."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -523,7 +532,10 @@
       "stopVideo": "Video uitzetten",
       "revokeFloor": "Het woord ontnemen",
       "lowerHandFailed": "De hand kon niet worden neergelaten: probeer het opnieuw.",
-      "handsRaised": "{count, plural, one {# opgestoken hand} other {# opgestoken handen}}"
+      "handsRaised": "{count, plural, one {# opgestoken hand} other {# opgestoken handen}}",
+      "locksByConsent": "Microfoons en camera's volgen de toestemming voor de opname: wie die gaf, gebruikt wat het evenement toestaat, de anderen luisteren alleen. De vergrendelingen van de ruimte blijven aan.",
+      "listenOnlyBadge": "alleen luisteren",
+      "listenOnlyNoFloor": "Heeft geen toestemming gegeven voor de opname: kan pas spreken na toestemming vanuit de eigen zaal."
     },
     "moderator": {
       "muteAll": "Iedereen dempen",
@@ -558,7 +570,8 @@
       "moderatorReveal": "Moderatorlink tonen",
       "moderatorWarning": "Deze link geeft MODERATOR-toegang (iedereen dempen, opname starten, evenement beëindigen). Deel hem alleen met andere moderatoren.",
       "moderatorLink": "Moderatorlink",
-      "moderatorLinkHint": "Wie deze link opent, komt binnen als moderator met volledige regie over de zaal."
+      "moderatorLinkHint": "Wie deze link opent, komt binnen als moderator met volledige regie over de zaal.",
+      "copyFailed": "Kopiëren mislukt: selecteer het adres en kopieer het handmatig."
     },
     "videoCallFrameTitle": "Videogesprek van het evenement",
     "insecureContextTitle": "Onveilig adres",
@@ -616,7 +629,15 @@
       "unavailable": "Ondertiteling is op dit moment niet beschikbaar.",
       "show": "Ondertiteling tonen",
       "hide": "Ondertiteling verbergen",
-      "toggle": "Automatische ondertiteling"
+      "toggle": "Automatische ondertiteling",
+      "controls": "Ondertitelbediening",
+      "smaller": "Kleinere ondertitels",
+      "larger": "Grotere ondertitels",
+      "moveUp": "Ondertitels naar boven verplaatsen",
+      "moveDown": "Ondertitels naar beneden verplaatsen",
+      "smallerShort": "A−",
+      "largerShort": "A+",
+      "showShort": "CC"
     },
     "eventEndedModerator": "Het evenement is afgelopen. Hieronder vind je de statistieken en, als het is opgenomen, de opname en het verslag.",
     "endLinks": {
@@ -625,7 +646,54 @@
       "publicPage": "Openbare pagina van het evenement"
     },
     "notOpenNow": "De zaal is op dit moment niet open.",
-    "nameRequired": "De naam om mee binnen te komen ontbreekt: ga terug en vul hem in."
+    "nameRequired": "De naam om mee binnen te komen ontbreekt: ga terug en vul hem in.",
+    "closeSidebar": "Zijpaneel sluiten",
+    "contentOnly": "Alleen inhoud, zonder chat en panelen",
+    "showPanels": "Chat en panelen tonen",
+    "confirmFullscreen": "Overschakelen naar volledig scherm",
+    "listenOnly": {
+      "title": "Je luistert alleen mee.",
+      "body": "Je hebt geen toestemming gegeven voor de opname: je volgt het evenement en schrijft in de chat, maar microfoon, camera en scherm blijven uit, ook als de moderator je het woord geeft. Geef toestemming om te spreken.",
+      "consent": "Ik geef toestemming voor de opname en doe mee",
+      "joining": "Opnieuw de ruimte in…",
+      "error": "Opnieuw binnenkomen mislukt: probeer het opnieuw."
+    },
+    "pseudonym": "Deelnemer-{code}",
+    "consents": {
+      "open": "Je toestemmingen",
+      "button": "Toestemmingen",
+      "title": "Je toestemmingen",
+      "intro": "Je kunt je toestemmingen op elk moment tijdens het evenement geven of intrekken. Bij elke wijziging wordt de vergadering een paar seconden opnieuw verbonden.",
+      "given": "Toestemming gegeven",
+      "notGiven": "Toestemming niet gegeven",
+      "withdraw": "Toestemming intrekken",
+      "confirmTitle": "Toestemming echt intrekken?",
+      "confirm": "Intrekken",
+      "working": "Bezig met bijwerken…",
+      "error": "De toestemming kon niet worden bijgewerkt: probeer het opnieuw.",
+      "recording": {
+        "title": "Opname van het evenement",
+        "give": "Ik geef toestemming voor de opname",
+        "without": {
+          "soloAscolto": "Zonder deze toestemming luister je alleen mee: microfoon, camera en scherm blijven dicht.",
+          "conduce": "Zonder deze toestemming leid je gewoon, maar je stem blijft niet in de sporen per persoon of in de transcriptie.",
+          "uscita": "Voor deelname aan dit evenement is toestemming voor de opname nodig."
+        },
+        "alreadyRecorded": "Wat al is opgenomen, blijft in de video van het evenement: schrijf de organisatoren om het te laten verwijderen.",
+        "withdraw": {
+          "soloAscolto": "Als je hem intrekt, blijf je in de zaal en luister je alleen mee: microfoon, camera en scherm gaan dicht. Je toestemming voor de transcriptie van je bijdragen wordt ook ingetrokken.",
+          "uscita": "Als je hem intrekt, verlaat je de vergadering en ga je terug naar de wachtruimte: voor deelname is toestemming voor de opname nodig. Je toestemming voor de transcriptie van je bijdragen wordt ook ingetrokken.",
+          "conduce": "Als je hem intrekt, blijf je leiden, maar vanaf nu blijft je stem niet in de sporen per persoon of in de transcriptie. De video van de zaal, als die wordt opgenomen, laat je toch zien."
+        }
+      },
+      "transcription": {
+        "title": "Transcriptie van je bijdragen",
+        "give": "Ik geef toestemming voor de transcriptie",
+        "giveEffect": "Je bijdragen komen met je naam in de transcriptie van het evenement. Zonder toestemming doe je gewoon mee.",
+        "withdrawEffect": "Als je hem intrekt, verliezen je al getranscribeerde zinnen hun tekst en je naam, en vanaf nu wordt je stem niet meer op een apart spoor opgenomen of getranscribeerd.",
+        "needsRecording": "Je kunt hem geven na toestemming voor de opname."
+      }
+    }
   },
   "qa": {
     "title": "Vragen en Antwoorden",
@@ -833,7 +901,6 @@
         "coverImageHelp": "Verschijnt op de openbare pagina en in de e-mails aan de ingeschrevenen.",
         "scheduleHeading": "Agenda",
         "timezone": "Tijdzone",
-        "recurrenceHeading": "Herhaling",
         "tagsHeading": "Categorieën (tags)",
         "newTag": "Nieuwe categorie",
         "newTagLabel": "Naam van de nieuwe categorie",
@@ -878,11 +945,11 @@
           "BALANCED": "Gebalanceerd (540p)",
           "SAVE_DATA": "Databesparing (360p)"
         },
-        "requiredLegend": "Velden met * zijn nodig om het evenement op te slaan: zolang ze leeg zijn, staat het bij elk veld.",
         "kickerHint": "Voor een bovenregel schrijft u die vóór de titel en scheidt u ze met |, bijvoorbeeld ‘Reeks bijeenkomsten | De eerste bijeenkomst’.",
         "kickerUse": "‘{kicker}’ als bovenregel tonen",
         "kickerPreview": "Zo ziet het eruit op de evenementpagina",
-        "coverImageSize": "16:9, aanbevolen 1600 × 900 pixels."
+        "coverImageSize": "16:9, aanbevolen 1600 × 900 pixels.",
+        "requiredNote": "Velden met * zijn verplicht."
       },
       "step2": {
         "heading": "Wie mag wat",
@@ -923,11 +990,11 @@
         "roomFeaturesHeading": "Functies van de zaal",
         "aiPipelineOff": "AI-nabewerking (transcriptie, samenvatting, vertalingen) is niet ingeschakeld op deze installatie.",
         "rolesHeading": "Rollen van het evenement",
-        "roleModeratorColumn": "Organisator en moderator",
+        "roleModeratorColumn": "Mede-organisator en moderator",
         "roleInfo": {
           "organizer": {
-            "name": "Organisator",
-            "desc": "Leidt de ruimte als een moderator en wordt bij de organisatoren vermeld. De hoofdorganisator voegt de andere personen toe en verwijdert ze. Met een medewerkersaccount op hetzelfde e-mailadres beheert die persoon ook het evenement."
+            "name": "Mede-organisator",
+            "desc": "Leidt de ruimte zoals een moderator en wordt bij de organisatoren vermeld. Met een medewerkersaccount op hetzelfde e-mailadres beheert diegene ook het evenement."
           },
           "moderator": {
             "name": "Moderator",
@@ -939,10 +1006,17 @@
           },
           "guest": {
             "name": "Deelnemer",
-            "desc": "Volgt het evenement en doet mee zoals u in de tabel hieronder bepaalt."
+            "desc": "Volgt het evenement en doet mee zoals je bepaalt in de stap 'Rechten'."
           }
         },
-        "recordingManualNote": "De opname start nooit vanzelf: een gespreksleider start haar met de REC-knop."
+        "recordingManualNote": "De opname start nooit vanzelf: een gespreksleider start haar met de REC-knop.",
+        "listenOnlyWithoutConsent": "Wie geen toestemming geeft, doet alleen luisterend mee",
+        "listenOnlyWithoutConsentOn": "Toestemming voor de opname is vrij: wie die niet geeft doet toch mee, volgt en schrijft in de chat, maar microfoon, camera en scherm blijven uit.",
+        "listenOnlyWithoutConsentOff": "Zonder toestemming voor de opname kom je er niet in.",
+        "listenOnlyLockedLive": "Zolang de ruimte open kan zijn, kunnen opname en alleen luisteren niet worden gewijzigd: ze gelden vanaf de eerste deelnemer.",
+        "audienceAnonymous": "Anoniem publiek",
+        "audienceAnonymousDesc": "Deelnemers verschijnen voor anderen onder een pseudoniem (‘Deelnemer’ en een code) in de video, de chat en bij vragen; de deelnemerslijst blijft bij de moderatoren en er is geen plein. Handig voor grote evenementen; bij communityevenementen wil men elkaar leren kennen.",
+        "audienceAnonymousLocked": "Kan niet worden gewijzigd zolang de ruimte open kan zijn: het zou pseudoniemen aan namen koppelen."
       },
       "step3": {
         "heading": "Personen en uitnodigingen",
@@ -960,23 +1034,23 @@
         "remove": "Verwijderen",
         "invalidEmail": "Ongeldig e-mailadres.",
         "duplicateEmail": "Adres al toegevoegd.",
-        "rubricaPick": "Zoeken in adresboek…",
+        "rubricaPick": "Zoek in het adresboek op organisatie…",
         "rubricaOrAdd": "of handmatig toevoegen",
         "removeItem": "{name} verwijderen",
         "invitationsStaffOnly": "De uitnodigingen worden beheerd door het team van het evenement.",
         "pickSkipped": "Sommige personen stonden al in de lijst of hadden geen geldig adres en zijn niet toegevoegd.",
-        "primaryHeading": "Hoofdorganisator",
+        "primaryHeading": "Hoofdmoderator",
         "primaryHelp": "Ontvangt de hoofdlink van het evenement per e-mail: leidt de ruimte en voegt de andere personen toe of verwijdert ze. Naam en e-mail zijn nodig om te publiceren, niet voor een concept.",
-        "primaryPrefilled": "De hoofdorganisator bent u, met de naam en het e-mailadres van uw account. Leidt iemand anders het evenement, vul dan hier diens gegevens in: de link gaat naar die persoon.",
-        "primaryNameRequired": "Vul de naam van de hoofdorganisator in.",
-        "primaryEmailRequired": "Vul een geldig e-mailadres van de hoofdorganisator in.",
+        "primaryPrefilled": "De hoofdmoderator ben jij, met de naam en het e-mailadres van je account. Leidt iemand anders het evenement, vul dan hier diens gegevens in: de link gaat naar die persoon.",
+        "primaryNameRequired": "Vul de naam van de hoofdmoderator in.",
+        "primaryEmailRequired": "Vul een geldig e-mailadres van de hoofdmoderator in.",
         "linksOnPublish": "Persoonlijke links worden bij publicatie per e-mail verstuurd; zolang het evenement een concept is, kopieert u ze van de pagina.",
         "personName": "Naam",
         "personEmail": "E-mail",
-        "peopleHeading": "Personen van het evenement",
-        "peopleHelp": "Organisatoren, moderatoren en sprekers. Ieder krijgt een eigen link om met de eigen rol deel te nemen; wat elke rol mag, staat in ‘Geavanceerde instellingen’.",
+        "peopleHeading": "Moderatoren en sprekers",
+        "peopleHelp": "Mede-organisatoren, moderatoren en sprekers. Iedereen krijgt een eigen link om met de eigen rol binnen te komen; wat elke rol kan, staat hierboven.",
         "personRole": "Rol",
-        "roleOrganizer": "Organisator",
+        "roleOrganizer": "Mede-organisator",
         "roleModerator": "Moderator",
         "roleSpeaker": "Spreker",
         "roleHelp": {
@@ -1015,7 +1089,7 @@
         "programMinutesFor": "Geplande minuten, onderwerp {n}",
         "programTimeUnknown": "Tijd niet berekend: een eerder onderwerp heeft geen duur",
         "programNone": "Niemand",
-        "programLeadOrganizer": "Hoofdorganisator",
+        "programLeadOrganizer": "Hoofdmoderator",
         "programMoveUp": "Onderwerp {n} omhoog",
         "programMoveDown": "Onderwerp {n} omlaag",
         "programRemove": "Onderwerp {n} verwijderen",
@@ -1029,8 +1103,8 @@
         "programSpeakerRemoved": "Onderwerpen zonder spreker, omdat de persoon uit het evenement is verwijderd: {count}.",
         "programFrozen": "De agenda is al in de zaal gebruikt: u ziet hem hier, maar hij wordt vanuit de zaal gewijzigd.",
         "programPerson": "{name} ({role})",
-        "invitationsHelpOpen": "Optioneel: de lijst van personen die u uitnodigt. De inschrijving is open, dus na publicatie kan iedereen zich inschrijven, uitgenodigd of niet. Het platform verstuurt geen uitnodigingen: deel de link van het evenement zelf.",
-        "invitationsHelpRestricted": "De inschrijving is beperkt: alleen de adressen op deze lijst kunnen zich inschrijven. Het platform verstuurt geen uitnodigingen: deel de link van het evenement zelf; de link om binnen te komen volgt na inschrijving per e-mail.",
+        "invitationsHelpOpen": "De mensen die je zelf uitnodigt. De inschrijving is open: iedereen kan zich inschrijven, uitgenodigd of niet. Na publicatie stuur je hun de uitnodiging per e-mail vanaf de evenementpagina.",
+        "invitationsHelpRestricted": "Alleen de adressen op deze lijst kunnen zich inschrijven. Na publicatie stuur je iedereen vanaf de evenementpagina de uitnodiging per e-mail, met de inschrijflink; de link om binnen te komen volgt na de inschrijving.",
         "logoExternal": "De openbare pagina toont alleen logo's die naar dit platform zijn geüpload: een logo van een andere website wordt niet getoond.",
         "primaryProfileInvalid": "Controleer de organisatie en het adres van het logo.",
         "primaryMore": "Foto, organisatie, logo en openbare pagina",
@@ -1048,7 +1122,9 @@
         "editQuestions": "Bewerken",
         "editQuestionsBefore": "Bewerken: vragen bij de inschrijving",
         "editQuestionsAfter": "Bewerken: tevredenheidsenquête",
-        "accessStaffOnly": "Wie zich aanmeldt, beslist het team van het evenement."
+        "accessStaffOnly": "Wie zich aanmeldt, beslist het team van het evenement.",
+        "whoOrganizes": "Wie organiseert",
+        "rubricaWho": "In het adresboek staan de mensen die zich voor een evenement hebben ingeschreven en ermee instemden erin te blijven."
       },
       "step4": {
         "heading": "Inhoud en materialen",
@@ -1124,9 +1200,9 @@
           "multitrack": "Opname per deelnemer",
           "multitrackOn": "Aan — vereist uitdrukkelijke toestemming bij de registratie",
           "organizingEntities": "Organiserende instanties",
-          "primaryOrganizer": "Hoofdorganisator",
+          "primaryOrganizer": "Hoofdmoderator",
           "primaryMissing": "Op te geven in de stap ‘Personen’ om te publiceren",
-          "organizersPeople": "Andere organisatoren",
+          "organizersPeople": "Mede-organisatoren",
           "moderators": "Moderatoren",
           "programme": "Programma: {count, plural, one {# onderwerp} other {# onderwerpen}}",
           "programmeWithDuration": "Programma: {count, plural, one {# onderwerp} other {# onderwerpen}}, {duration}"
@@ -1175,7 +1251,8 @@
           "invites": "Personen",
           "programme": "Programma",
           "review": "Overzicht",
-          "advanced": "Geavanceerde instellingen"
+          "advanced": "Geavanceerde instellingen",
+          "permissions": "Rechten"
         },
         "templateInUse": "Sjabloon: <b>{name}</b>",
         "noTemplate": "Evenement zonder sjabloon",
@@ -1187,18 +1264,16 @@
         "recordingManual": "Beschikbaar: start pas wanneer een gespreksleider op REC drukt.",
         "aiAfter": "Na de opname: {list}.",
         "scheduleHeading": "Wanneer het plaatsvindt",
-        "scheduleIntro": "Datum, tijd en hoeveel mensen je verwacht: daarmee wordt de zaal voorbereid.",
+        "scheduleIntro": "Wanneer het evenement plaatsvindt: datum, tijd en tijdzone.",
         "advancedIntro": "Waarden die het sjabloon al heeft gekozen: wijzig alleen wat nodig is.",
         "advancedIntroTemplate": "Waarden die het sjabloon ‘{name}’ al heeft gekozen: wijzig alleen wat nodig is.",
-        "requiredToSave": "Nodig om het evenement op te slaan.",
         "requiredToPublish": "Nodig om het evenement te publiceren.",
         "toComplete": "Nog in te vullen",
         "missingHeading": "Om te publiceren ontbreekt nog:",
-        "fieldOrganizerName": "Naam van de hoofdorganisator",
-        "fieldOrganizerEmail": "E-mail van de hoofdorganisator",
+        "fieldOrganizerName": "Naam van de hoofdmoderator",
+        "fieldOrganizerEmail": "E-mailadres van de hoofdmoderator",
         "fieldProgrammeMinutes": "Duur van programmaonderwerp {n}",
         "sections": {
-          "participation": "Deelname en functies van de zaal",
           "recording": "Opname en AI",
           "content": "Inhoud: materiaal en vragenlijsten",
           "room": "Wachtruimte en video",
@@ -1230,7 +1305,17 @@
         "askEmail": "e-mail",
         "askOrganization": "organisatie",
         "askRole": "functie",
-        "askType": "soort organisatie"
+        "askType": "soort organisatie",
+        "permissionsHeading": "Wie wat mag in de ruimte",
+        "permissionsIntro": "Wat deelnemers kunnen en welke functies van de ruimte aan staan. Alles kan ook tijdens het evenement worden gewijzigd.",
+        "consentsLine": "Toestemmingen bij inschrijving en in de zaal: {list}",
+        "consentRecordingRequired": "opname, verplicht om binnen te komen",
+        "consentRecordingFree": "opname, vrij (zonder: alleen meeluisteren)",
+        "consentRecordingNotice": "voor de opname alleen een melding (deelnemers spreken niet en tonen zich niet)",
+        "consentTranscription": "transcriptie van de eigen bijdragen, optioneel",
+        "consentsNone": "Geen toestemming behalve die voor de inschrijving.",
+        "consentsHosts": "Aan moderatoren en sprekers wordt de opname in de zaal gevraagd, optioneel.",
+        "consentsWithdraw": "Deelnemers kunnen ze in de zaal intrekken met de knop ‘Toestemmingen’."
       },
       "preview": {
         "title": "Voorbeeld van de pagina",
@@ -1242,8 +1327,8 @@
       },
       "programme": {
         "heading": "Programma van de bijeenkomst",
-        "intro": "De onderwerpen op volgorde: wie spreekt, waarover en hoe lang. Ze verschijnen onder de beschrijving, met tijden berekend vanaf het begin ({start}). Optioneel.",
-        "introNoStart": "De onderwerpen op volgorde: wie spreekt, waarover en hoe lang. Ze verschijnen onder de beschrijving, met tijden berekend vanaf het begin van het evenement. Optioneel.",
+        "intro": "De onderwerpen op volgorde: wie spreekt, waarover en hoe lang. Ze verschijnen onder de beschrijving, met tijden berekend vanaf het begin ({start}).",
+        "introNoStart": "De onderwerpen op volgorde: wie spreekt, waarover en hoe lang. Ze verschijnen onder de beschrijving, met tijden berekend vanaf het begin van het evenement.",
         "statusOn": "Verschijnt op de pagina van het evenement en toont in de zaal iedereen het huidige onderwerp.",
         "statusOff": "Uit: het programma verschijnt niet op de pagina en niet in de zaal.",
         "turnOn": "Aanzetten",
@@ -1287,7 +1372,8 @@
         "offKeptEdit": "Zolang het programma uit staat, blijft de laatst opgeslagen versie: wijzigingen hier worden alleen opgeslagen als u het weer aanzet.",
         "toggleOffWarningCreate": "Uit: het programma ({count, plural, one {# onderwerp} other {# onderwerpen}}) verschijnt niet op de pagina en wordt niet met het evenement opgeslagen; zet het aan om het te bewaren.",
         "reviewOffCreate": "Programma: uit, wordt niet met het evenement opgeslagen ({count, plural, one {# onderwerp} other {# onderwerpen}})"
-      }
+      },
+      "saveCopy": "Kopie opslaan"
     },
     "nav": {
       "events": "Evenementen",
@@ -1313,7 +1399,6 @@
       "publicationsList": "Publicaties",
       "publicationsNew": "Nieuwe publicatie",
       "ariaLabel": "Beheernavigatie",
-      "subNavAriaLabel": "Sectienavigatie",
       "questionnaires": "Vragenlijsten",
       "questionnairesLibrary": "Vragenlijstsjablonen",
       "questionnairesResponses": "Antwoorden",
@@ -1332,7 +1417,9 @@
       "video": "Video",
       "glossary": "Woordenlijst",
       "breadcrumbAriaLabel": "Kruimelpad",
-      "skipToPage": "Naar de inhoud van de pagina"
+      "skipToPage": "Naar de inhoud van de pagina",
+      "openMenu": "Menu openen",
+      "closeMenu": "Menu sluiten"
     },
     "publications": {
       "subtitle": "Centrale redactiehub voor alle gepubliceerde video's: geplande evenementen, snelgesprekken, geladen archieven en sessies die wachten op promotie.",
@@ -1488,7 +1575,8 @@
       "actions": {
         "DATA_DELETED": "Gegevens verwijderd",
         "CONSENT_RECORDED": "Toestemming geregistreerd",
-        "DATA_EXPORTED": "Gegevens geëxporteerd"
+        "DATA_EXPORTED": "Gegevens geëxporteerd",
+        "CONSENT_WITHDRAWN": "Toestemming ingetrokken"
       },
       "recordsAffected": "{count} betrokken records",
       "colWhen": "Wanneer",
@@ -1610,13 +1698,6 @@
     "deleteSuccess": "Evenement verwijderd",
     "publishSuccess": "Evenement gepubliceerd",
     "unpublishSuccess": "Evenement ingetrokken",
-    "startEvent": "Evenement starten",
-    "startEventSuccess": "Evenement gestart! Wachtende deelnemers worden automatisch doorgestuurd.",
-    "startEventConfirmTitle": "Evenement starten?",
-    "startEventConfirmMessage": "Geplande start: {when}. Iedereen met de link kan meteen deelnemen, en de videoruimte start nu.",
-    "startEventConfirmEarly": "De start is pas over meer dan 30 minuten.",
-    "startEventFailed": "Het evenement is niet gestart. Probeer het opnieuw.",
-    "jvbWarmupWarning": "Videoservers worden gestart (circa 2 minuten). Deelnemers zien een melding in de wachtkamer.",
     "eventIsLive": "Het evenement is live",
     "liveParticipants": "{count} in ruimte / max. {max}",
     "joinAsModeratorBtn": "Als moderator deelnemen",
@@ -1654,7 +1735,6 @@
         "expected": "{count, plural, one {verwachte deelnemer} other {verwachte deelnemers}}",
         "registered": "{count, plural, =0 {nog geen inschrijvingen} one {# ingeschreven tot nu toe} other {# ingeschreven tot nu toe}}",
         "change": "Wijzigen",
-        "changeParticipants": "Het aantal verwachte deelnemers wijzigen",
         "sizedOnRegistrations": "Er zijn meer inschrijvingen dan verwachte deelnemers: de schatting telt de {count} ingeschrevenen.",
         "cameraQuestion": "Hoeveel webcams staan er aan?",
         "camera": {
@@ -1866,7 +1946,7 @@
       "guestJoinHint": "Snelle link om last-minute een deelnemer uit te nodigen: zij nemen deel als gast wanneer het evenement live is, zonder het aanmeldformulier in te vullen.",
       "callInvite": "Link voor deelnemers",
       "callInviteHint": "Wie hem ontvangt, neemt als gast deel aan het gesprek, zonder aanmelding. Een directe oproep heeft geen openbare pagina: dit is de link om te delen.",
-      "moderatorLink": "Moderatorlink",
+      "moderatorLink": "Beheerlink (moderator)",
       "moderatorLinkHint": "Deel deze link alleen met moderators. Iedereen met deze link kan het evenement beheren.",
       "liveRoomHint": "Link om direct als moderator de ruimte binnen te gaan.",
       "copyLink": "Link kopiëren",
@@ -1876,7 +1956,8 @@
       "warning": "Iedereen met deze link beheert het evenement: toon hem niet tijdens het delen van je scherm en plak hem niet in een chat.",
       "hidden": "Link verborgen",
       "copyFailed": "Kopiëren mislukt: selecteer het adres hieronder en kopieer het handmatig.",
-      "notYetPublished": "Werkt pas na publicatie: tot dan krijgt wie hem gebruikt ‘pagina niet gevonden’."
+      "notYetPublished": "Werkt pas na publicatie: tot dan krijgt wie hem gebruikt ‘pagina niet gevonden’.",
+      "copyFailedShort": "Kopiëren mislukt"
     },
     "feedbackAdmin": {
       "title": "Feedbackresultaten",
@@ -1952,7 +2033,8 @@
       "actions": {
         "DATA_DELETED": "Gegevens verwijderd",
         "CONSENT_RECORDED": "Toestemming geregistreerd",
-        "DATA_EXPORTED": "Gegevens geëxporteerd"
+        "DATA_EXPORTED": "Gegevens geëxporteerd",
+        "CONSENT_WITHDRAWN": "Toestemming ingetrokken"
       }
     },
     "settings": {
@@ -2266,9 +2348,9 @@
     },
     "recurrence": {
       "label": "Herhaling",
-      "helpText": "Maak het evenement terugkerend. Er wordt een serie aangemaakt vanaf de startdatum.",
+      "helpText": "Als het evenement zich herhaalt, stelt de kopie bij dupliceren de datum van de volgende keer voor.",
       "preset": {
-        "none": "Geen",
+        "none": "Herhaalt niet",
         "daily": "Elke dag",
         "weekly": "Elke week",
         "weekdays": "Werkdagen",
@@ -2322,7 +2404,6 @@
       "aiTranscript": "Automatische transcriptie (standaard)",
       "aiSummary": "Automatische samenvatting (standaard)",
       "aiTranslation": "Automatische vertaling (standaard)",
-      "pickerTitle": "Kies een sjabloon",
       "pickerSubtitle": "Selecteer een sjabloon om de evenementinstellingen vooraf te configureren, of sla over om alles handmatig in te stellen.",
       "skipTemplate": "Handmatig instellen",
       "postEventPublic": "Openbare pagina na het evenement",
@@ -2701,10 +2782,7 @@
       "resultsCount": "{count, plural, =0 {Geen evenementen} one {# evenement} other {# evenementen}}",
       "menu": {
         "actionsFor": "Acties voor ‘{title}’",
-        "manage": "Beheren",
         "edit": "Bewerken",
-        "openPublic": "Openbare pagina openen",
-        "newTab": "(opent in een nieuw tabblad)",
         "copyLink": "Openbare link kopiëren",
         "linkCopied": "Link gekopieerd",
         "publish": "Publiceren",
@@ -2713,7 +2791,7 @@
         "unpublishMessage": "‘{title}’ verdwijnt van de openbare pagina’s tot u het opnieuw publiceert. Reeds ontvangen inschrijvingen blijven bewaard.",
         "published": "Evenement gepubliceerd",
         "unpublished": "Evenement ingetrokken",
-        "duplicate": "Dupliceren als volgende editie",
+        "duplicate": "Dupliceren",
         "delete": "Verwijderen",
         "deleteTitle": "Evenement verwijderen?",
         "deleteMessage": "‘{title}’ en alle bijbehorende gegevens worden verwijderd. Dit kan niet ongedaan worden gemaakt.",
@@ -2771,7 +2849,6 @@
       "participantHintPassword": "Opent in een nieuw tabblad: de ruimte zoals een gast die ziet, na het wachtwoord van het evenement.",
       "participantHintPage": "Opent in een nieuw tabblad: de openbare pagina zoals deelnemers die zien.",
       "editEvent": "Evenement bewerken",
-      "editSettings": "Instellingen bewerken",
       "featureSummary": "Actieve functies",
       "organizers": "Organisatoren",
       "privacyGdpr": "Privacy & AVG",
@@ -2824,9 +2901,9 @@
       "aiGenerateError": "Kan de AI-pijplijn niet starten. Controleer of AI op siteniveau is ingeschakeld en of er een opname bestaat.",
       "aiGenerateHelp": "Schakelt de AI-transcriptie + samenvatting in en start de pijplijn op de opname, met één klik. Idempotent: twee keer klikken dupliceert de jobs niet.",
       "aiGenerateNoRecording": "Geen opname: AI na het evenement vereist een opname (het vastleggen gebeurt alleen tijdens het evenement). U kunt de postproductie hier wel beheren.",
-      "duplicateNext": "Dupliceren voor de volgende keer",
+      "duplicateNext": "Dupliceren",
       "duplicateNextBusy": "Bezig met dupliceren…",
-      "duplicateNextHint": "Maakt een concept met de volledige configuratie van dit evenement (opname, aparte sporen, AI, agenda, herinneringen). Als het evenement een vaste frequentie heeft, wordt de datum naar de volgende keer verplaatst; anders moet die nog worden ingesteld.",
+      "duplicateNextHint": "Maakt een kopie als concept met de volledige instellingen van dit evenement. Als het evenement zich herhaalt, begint de kopie bij de volgende keer; anders heeft ze dezelfde data, die je moet bijwerken.",
       "duplicateNextError": "Dupliceren mislukt. Probeer het opnieuw.",
       "capacitySection": "Capaciteit en infrastructuur",
       "capacitySubtitle": "Gedimensioneerd voor ongeveer {max} verwachte deelnemers",
@@ -2838,11 +2915,12 @@
         "publishFailedTitle": "Publiceren mislukt",
         "publishFailedBody": "Het evenement is als concept opgeslagen: publiceer het vanaf deze pagina zodra het probleem is opgelost.",
         "unsaved": "Niet opgeslagen: {items}. U kunt ze op deze pagina toevoegen.",
-        "copyParticipantLink": "Link voor deelnemers kopiëren",
         "sendToSpeakers": "Links voor moderatoren en sprekers",
         "close": "Overzicht sluiten",
         "publishNow": "Nu publiceren"
-      }
+      },
+      "editFeatures": "Functies bewerken",
+      "editPrivacy": "Privacy en gegevens bewerken"
     },
     "rubrica": {
       "subtitle": "Personen die toestemming hebben gegeven voor opname in het adresboek (art. 6.1.a AVG). Profielinformatie wordt automatisch bijgewerkt bij elke nieuwe aanmelding.",
@@ -3450,6 +3528,7 @@
     "guided": {
       "title": "Hoe ziet je evenement eruit?",
       "intro": "Vier vragen om te beginnen met de juiste instellingen. Elke functie kan ook tijdens het evenement aan- of uitgezet worden.",
+      "introNoRecording": "Drie vragen om te beginnen met de juiste instellingen. Elke functie kan ook tijdens het evenement aan- of uitgezet worden.",
       "peopleQ": "Hoeveel mensen verwacht je?",
       "people": {
         "piccolo": "Tot 20",
@@ -3474,9 +3553,7 @@
       "preview": "Je evenement",
       "previewPeople": "Verwachte deelnemers: ongeveer {count}",
       "continue": "Doorgaan",
-      "useTemplate": "Of gebruik een sjabloon",
-      "instantAlt": "Of een direct videogesprek",
-      "instantAltAction": "Videogesprek aanmaken",
+      "useTemplate": "Begin met een sjabloon",
       "summary": {
         "piccolo": "Tot 20 personen",
         "medio": "Tot 100 personen",
@@ -3492,10 +3569,12 @@
       "access": {
         "open": "Iedereen die zich aanmeldt",
         "openDesc": "Wie wil, meldt zich aan via de evenementpagina",
-        "invitation": "Alleen wie je uitnodigt",
-        "invitationDesc": "De pagina blijft zichtbaar, maar alleen genodigden kunnen zich aanmelden; zonder aanmelding kom je er niet in"
+        "invitation": "Alleen genodigden",
+        "invitationDesc": "De pagina blijft zichtbaar, maar alleen mensen op de lijst kunnen zich inschrijven; de uitnodiging met de inschrijflink stuur je per e-mail vanaf de evenementpagina"
       },
-      "previewInvitation": "Alleen wie je uitnodigt kan zich aanmelden; zonder aanmelding komt niemand binnen."
+      "previewInvitation": "Alleen genodigden schrijven zich in; zonder inschrijving kom je er niet in.",
+      "templateReplaces": "Een sjabloon brengt zijn eigen instellingen mee in plaats van de antwoorden hieronder. Titel, data en personen vul je in de volgende stappen in.",
+      "instantBack": "Maak in plaats daarvan een gepland evenement"
     },
     "captionsTranscript": {
       "title": "Transcriptie uit ondertiteling",
@@ -3584,10 +3663,21 @@
       "status": "Status",
       "roleSpeaker": "Spreker",
       "registered": "Aangemeld",
-      "notRegistered": "Nog niet aangemeld",
       "organizersTitle": "Organiserende instanties",
       "organizersEdit": "Instanties bewerken",
-      "organizersEmpty": "Geen instantie opgegeven: de openbare pagina toont niet wie organiseert."
+      "organizersEmpty": "Geen instantie opgegeven: de openbare pagina toont niet wie organiseert.",
+      "sendAll": "Uitnodiging sturen naar wie die nog niet heeft gekregen ({count})",
+      "sending": "Verzenden…",
+      "sendDone": "Uitnodigingen onderweg: {sent}. Overgeslagen (al ingeschreven of zonder adres): {skipped}.",
+      "sendError": "Verzenden mislukt: probeer het opnieuw.",
+      "sendNotPublished": "Uitnodigingen gaan uit zolang het evenement inschrijvingen aanneemt: na publicatie en vóór het einde.",
+      "invitedOn": "Uitgenodigd op {date}",
+      "notInvited": "Uitnodiging niet verzonden",
+      "send": "Uitnodiging sturen",
+      "resend": "Opnieuw sturen",
+      "actions": "Acties",
+      "sendTooMany": "Te veel verzendingen in korte tijd: probeer het over een minuut opnieuw.",
+      "sendRemaining": "Nog {remaining} over: druk opnieuw om ze te versturen."
     },
     "closing": {
       "title": "Evenement afsluiten",
@@ -3803,6 +3893,56 @@
         "item": "{language}: {state}",
         "review": "Teksten nalezen"
       }
+    },
+    "voiceConsent": {
+      "title": "De volledige opname transcriberen?",
+      "message": "Dit evenement vroeg iedereen om toestemming voor de transcriptie van wat ze zeggen. De volledige opname bevat alle stemmen, ook van wie geen toestemming gaf: transcribeer haar alleen als iedereen die erin spreekt toestemming heeft gegeven. Je bevestiging blijft in het activiteitenlogboek.",
+      "confirm": "Ja, iedereen gaf toestemming",
+      "cancel": "Annuleren",
+      "waiting": "De transcriptie van de volledige opname is niet vanzelf gestart: dit evenement vroeg iedereen om toestemming voor de transcriptie van wat ze zeggen. Start haar met {button} alleen als iedereen die in de opname spreekt toestemming heeft gegeven; anders blijft de transcriptie uit de ondertitels."
+    },
+    "editCopyTitle": "Kopie van het evenement",
+    "editCopyNoticeNext": "Je werkt aan een kopie als concept: het oorspronkelijke evenement verandert niet. De datum is al die van de volgende keer: controleer de rest en sla op.",
+    "editCopyNoticeSameDates": "Je werkt aan een kopie als concept: het oorspronkelijke evenement verandert niet. Ze heeft dezelfde data als het origineel: werk ze bij voordat je opslaat.",
+    "consentProofs": {
+      "title": "Bewijs van toestemmingen",
+      "intro": "De toestemmingen voor opname en transcriptie, gegeven bij inschrijving, in de wachtruimte of in de zaal, en de ingetrokken. De lijst met namen dient als bewijs.",
+      "loading": "Laden…",
+      "loadFailed": "Het bewijs van toestemmingen kon niet worden geladen.",
+      "none": "Geen toestemming voor opname of transcriptie voor dit evenement.",
+      "kinds": {
+        "recording": "Opname",
+        "transcription": "Transcriptie van bijdragen"
+      },
+      "counts": "stemmen in {given} · ingetrokken {withdrawn}",
+      "download": "Lijst downloaden (CSV)",
+      "downloading": "Bezig met downloaden…",
+      "downloadNote": "De lijst bevat namen van personen: de export wordt vastgelegd in het AVG-logboek van het evenement.",
+      "downloadFailed": "De lijst kon niet worden gedownload: probeer het opnieuw.",
+      "csv": {
+        "kind": "Toestemming",
+        "source": "Waar",
+        "role": "Rol",
+        "name": "Naam",
+        "givenAt": "Gegeven op",
+        "withdrawnAt": "Ingetrokken op",
+        "textVersion": "Tekstversie",
+        "kinds": {
+          "recording": "Opname",
+          "transcription": "Transcriptie van bijdragen"
+        },
+        "sources": {
+          "registration": "inschrijving",
+          "room": "zaal"
+        },
+        "roles": {
+          "registrant": "ingeschreven",
+          "guest": "gast",
+          "host": "leidt of spreekt"
+        },
+        "unreadableName": "(naam niet leesbaar)"
+      },
+      "countsNote": "Er worden personen geteld: een inschrijving, een medewerkersaccount of een persoonlijke link tellen één keer; een gast die in een ander bezoek terugkomt, telt opnieuw."
     }
   },
   "email": {
@@ -3837,7 +3977,9 @@
     "upcoming": {
       "title": "Komende evenementen",
       "viewAll": "Bekijk alle evenementen",
-      "noEvents": "Geen evenementen gepland. Kom snel terug!"
+      "noEvents": "Geen evenementen gepland. Kom snel terug!",
+      "seePast": "Eerdere evenementen",
+      "seeRecordings": "Opnames"
     },
     "howItWorks": {
       "title": "Hoe je meedoet",
@@ -4187,9 +4329,11 @@
       "recordingRequired": "Toestemming voor opname is vereist om deel te nemen aan dit evenement",
       "recordingNotice": "Het evenement wordt opgenomen (geluid en beeld). Je neemt deel zonder microfoon en camera: de opname bevat je stem en beeld niet, tenzij de host je het woord geeft.",
       "multitrack": "Ik geef toestemming om mijn bijdragen met mijn naam te transcriberen voor het verslag van het evenement. Als het evenement voor elke persoon een apart audiospoor opneemt, wordt mijn stem alleen daarvoor opgenomen en wordt het spoor na de transcriptie verwijderd; het wordt niet gebruikt om mijn stem te herkennen of na te bootsen.",
-      "multitrackOptional": "Dit is vrijwillig: zonder toestemming kunt u gewoon deelnemen, maar uw stem wordt niet opgenomen en uw bijdragen komen niet in de transcriptie.",
+      "multitrackOptional": "Dit is vrijwillig: als je geen toestemming geeft, doe je toch mee, maar wat je zegt komt niet in de transcriptie en je stem wordt niet op een apart spoor opgenomen. Als het evenement wordt opgenomen, blijft je stem wel in de video.",
       "stayInTouch": "Ik wil informatie ontvangen over komende evenementen en in het adresboek worden opgenomen, om voor vergelijkbare evenementen te worden uitgenodigd",
-      "stayInTouchHelp": "Vrijwillige toestemming (art. 6.1.a AVG). Je kunt die altijd intrekken via de link 'Verwijder mij uit het adresboek' in de e-mails die je ontvangt. Naam en organisatie zijn die van deze inschrijving."
+      "stayInTouchHelp": "Vrijwillige toestemming (art. 6.1.a AVG). Je kunt die altijd intrekken via de link 'Verwijder mij uit het adresboek' in de e-mails die je ontvangt. Naam en organisatie zijn die van deze inschrijving.",
+      "recordingOptionalListenOnly": "Zonder toestemming doe je toch mee, alleen luisterend: je volgt het evenement en schrijft in de chat, maar microfoon, camera en scherm delen blijven uit. Je kunt later vanuit de ruimte toestemming geven.",
+      "recordingOptionalHost": "Zonder toestemming kom je toch binnen en leid je zoals gewoonlijk, maar je stem wordt niet bewaard in de sporen per persoon of in de transcriptie. De video van de ruimte, als die wordt opgenomen, laat je toch zien."
     },
     "export": {
       "title": "Mijn gegevens",
@@ -4852,11 +4996,13 @@
     "transparency": "Beveiliging en transparantie",
     "serviceInventory": "Service-inventaris",
     "sourceCode": "Broncode",
-    "buildInfoDev": "ontwikkelbuild",
-    "viewCommit": "Bekijk commit op GitHub",
     "viewRelease": "Bekijk release op GitHub",
     "viewChangelog": "Bekijk wat er nieuw is (changelog)",
-    "buildDatePrefix": "Gebouwd op"
+    "newWindow": "opent in een nieuw venster",
+    "usefulLinks": "Nuttige links",
+    "version": "Versie {version}",
+    "versionDev": "Ontwikkelversie",
+    "updatedOn": "bijgewerkt op {date}"
   },
   "changelog": {
     "metaTitle": "Nieuws en changelog",
@@ -5023,7 +5169,9 @@
       "version": "Versie van de pijplijn"
     },
     "overlapBadge": "gelijktijdig",
-    "overlapTitle": "Gelijktijdig spreken: in dit interval spreekt meer dan één persoon tegelijk."
+    "overlapTitle": "Gelijktijdig spreken: in dit interval spreekt meer dan één persoon tegelijk.",
+    "anonymousSpeaker": "Deelnemer {n}",
+    "untranscribed": "Niet getranscribeerd: de spreker gaf geen toestemming"
   },
   "waiting": {
     "startsIn": "Het evenement begint over",
@@ -5087,9 +5235,6 @@
     "endedWatchRecording": "Bekijk de opname",
     "endedLeaveFeedback": "Geef feedback",
     "startEventError": "Fout bij het starten van het evenement. Probeer het opnieuw.",
-    "emailLabel": "E-mail (optioneel)",
-    "emailHelp": "Alleen voor eventuele follow-up na afloop",
-    "emailInvalid": "Voer een geldig e-mailadres in",
     "chatLockedMessage": "Voer uw naam in om deel te nemen aan de chat van het evenement.",
     "classicView": "Klassieke weergave",
     "backToGarden": "Toon het plein",
@@ -5322,7 +5467,12 @@
     "waitingForStartButton": "Wachten op de start",
     "countdownHours": "{hours}u",
     "countdownMinutes": "{minutes}m",
-    "countdownSeconds": "{seconds}s"
+    "countdownSeconds": "{seconds}s",
+    "startEarlyConfirm": "Tot de geplande start ({when}) duurt het nog meer dan 30 minuten. Als je nu start, kan iedereen met de link meteen naar binnen en gaat de videoruimte aan: druk nogmaals om te bevestigen.",
+    "startEarlyYes": "Nu starten",
+    "startEarlyNo": "Wachten op het geplande tijdstip",
+    "anonymousNameHelp": "Bij dit evenement is het publiek anoniem: anderen zien niet je naam, maar een pseudoniem met een code.",
+    "registeredNameHelp": "Dit is de naam waarmee je je hebt ingeschreven: zo verschijn je in de ruimte."
   },
   "recording": {
     "management": "Video-opname",

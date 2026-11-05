@@ -44,7 +44,7 @@ values depending on how they were set up:
 | Installation | How the row is created | Starting values |
 |---|---|---|
 | Helm chart | The `db-migrate` init container runs `prisma migrate deploy` only. The first request that reads the settings creates the row | The schema defaults |
-| Docker Compose, `setup` profile | `db-migrate` runs the migrations, then `prisma/seed.ts` | The schema defaults, except a site description, **Public calendar** turned on, and footer links to the privacy, accessibility and legal-notice pages |
+| Docker Compose, `setup` profile | `db-seed` runs `prisma/seed.ts` | The schema defaults, except a site description, **Public calendar** turned on, and footer links to the privacy, accessibility and legal-notice pages |
 
 A default applies only when the row is created. If a later release changes a default in
 `schema.prisma`, the value already stored in an existing installation stays as it was. After an
@@ -148,7 +148,7 @@ await fetch('/api/admin/settings', {
 ```
 
 A `422` response lists the fields that failed validation, each with its path, the check that failed
-(`code`, plus `validation`, `type`, `minimum` or `maximum` when they apply). `footerLinks` is an
+(`code`, plus `format`, `origin`, `minimum` or `maximum` when they apply). `footerLinks` is an
 array; a JSON string holding an array, as older installations stored it, is accepted and saved as an
 array. Web addresses without a scheme get `https://`. The change is audited like a save from the
 panel.
@@ -215,14 +215,14 @@ Defaults are those of `app/prisma/schema.prisma`.
 | `githubUrl` | **GitHub repository URL**, **Features** | none | The source-code links in the footer, the security and release-notes pages, and the release SBOM viewer. It must have the form `https://github.com/<owner>/<repo>` for the release links to work |
 | `supportEmail` | **Support email**, **Features** | none | The contact address shown in the footer |
 | `guestAccessEnabled` | **Guest access enabled**, **Features** | `true` | When off, visitors without a token cannot join scheduled events: the live page sends them to registration (skipping the join-password step), the Jitsi token endpoint refuses guest tokens with `403` `GUEST_ACCESS_DISABLED`, the chat refuses tokenless readers and writers, and Q&A and polls refuse them too. The administration's **Direct invite (no registration)** link and the room's **Link to join** are hidden for scheduled events. Instant calls stay open to anyone with the link. Registrants and moderator or speaker links are unaffected. An event open only to invitees (`Event.accessMode` `INVITATION`) never admits guests, whatever this setting; one open to anyone (`OPEN`) follows it. See [guests](../architecture/identity-and-access.md#guests) |
-| `publicRegistrationEnabled` | **Public registration enabled**, **Features** | `true` | The default for events that make no choice of their own (`Event.accessMode` `NULL`); an event's **Who registers** choice overrides it, and the new-event question **Who can take part?** proposes the answer that matches it. When off, only addresses on the event's invitation list (`EventInvitation`) can register. `POST /api/events/{slug}/registrations` then answers `202` with the same body for every address, with no token, link or cookie: an invited address is registered, an already registered address gets its link again, and any other address gets nothing. The personal link arrives only by email. The event's choice, or this setting, is read when each email is built, and a link already sent keeps the behavior it was sent with ([Registrants](../architecture/identity-and-access.md#registrants)). An event with no invitations accepts no new registrations, and its registration page offers only the link resend. Existing registrations, moderator and speaker links, and staff paths are unaffected. For a closed meeting, set the event to **Only people you invite**, which also keeps guests out, or also turn off **Guest access enabled**. See [invitation-only registration](../architecture/event-journey.md#invitation-only-registration) |
+| `publicRegistrationEnabled` | **Public registration enabled**, **Features** | `true` | The default for events that make no choice of their own (`Event.accessMode` `NULL`); an event's **Who registers** choice overrides it, and the new-event question **Who can take part?** proposes the answer that matches it. When off, only addresses on the event's invitation list (`EventInvitation`) can register. `POST /api/events/{slug}/registrations` then answers `202` with the same body for every address, with no token, link or cookie: an invited address is registered, an already registered address gets its link again, and any other address gets nothing. The personal link arrives only by email. The event's choice, or this setting, is read when each email is built, and a link already sent keeps the behavior it was sent with ([Registrants](../architecture/identity-and-access.md#registrants)). An event with no invitations accepts no new registrations, and its registration page offers only the link resend. Existing registrations, moderator and speaker links, and staff paths are unaffected. For a closed meeting, set the event to **Invited people only**, which also keeps guests out, or also turn off **Guest access enabled**. See [invitation-only registration](../architecture/event-journey.md#invitation-only-registration) |
 
 The whiteboard has no switch in the site settings. It is an opt-in on each event, and it also needs
 a whiteboard backend on the Jitsi side. The portal shows its **Whiteboard** button and the reminder
 to export the whiteboard only when the app environment sets `NEXT_PUBLIC_WHITEBOARD_ENABLED=true`
 for the whole installation. The live room reads that variable at request time, so a change needs a
 pod restart, not a new image. The same value drives the administration forms: when it is not `true`,
-the whiteboard switch of the event wizard (advanced settings, **Participation and room features**) and of the event-template form cannot be switched
+the whiteboard switch of the event wizard (**Permissions** step) and of the event-template form cannot be switched
 on and says why, while a value already on can still be switched off. The chart installs no whiteboard
 server: the Jitsi subchart has an optional one (`jitsi-meet.excalidraw.enabled`, off), and that
 combination with the variable has not been tested (see the

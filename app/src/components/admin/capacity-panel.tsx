@@ -58,8 +58,6 @@ export interface CapacityPanelProps {
   participantsCanShareScreen: boolean;
   /** La quota di webcam scelta; null: quella del sito. */
   onCameraPctChange?: (next: number | null) => void;
-  /** Porta al campo dei partecipanti attesi. */
-  onCambiaPartecipanti?: () => void;
   /** Porta alla scelta della qualita' video. */
   onCambiaQualita?: () => void;
   /** Mostra le scelte salvate, senza cambiarle (la pagina dell'evento). */
@@ -77,7 +75,6 @@ export default function CapacityPanel({
   evento,
   participantsCanShareScreen,
   onCameraPctChange,
-  onCambiaPartecipanti,
   onCambiaQualita,
   solaLettura = false,
   iscritti,
@@ -158,19 +155,6 @@ export default function CapacityPanel({
               {' · '}
               {t('registered', { count: iscritti })}
             </span>
-          )}
-          {!solaLettura && onCambiaPartecipanti && (
-            <>
-              {' '}
-              <button
-                type="button"
-                className="btn btn-link capacita__cambia"
-                onClick={onCambiaPartecipanti}
-                aria-label={t('changeParticipants')}
-              >
-                {t('change')}
-              </button>
-            </>
           )}
         </p>
         {sugliIscritti && (

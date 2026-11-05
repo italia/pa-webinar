@@ -11,6 +11,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { Link, percorso } from '@/i18n/navigation';
+import { Icon } from '@/components/ui/icon';
 import { toKebab } from '@/lib/utils/kebab';
 
 export interface EtichettaCreata {
@@ -170,25 +171,30 @@ export default function NuovaEtichetta({
         </div>
       ) : (
         <div className="d-flex flex-wrap align-items-center gap-3">
+          {/* Un pulsante vero, con la sua icona: non una pillola come le
+              categorie che sta accanto, che si sceglierebbe per sbaglio. */}
           <button
             ref={apri}
             type="button"
-            className="btn btn-sm btn-outline-primary nuova-etichetta__apri"
+            className="btn btn-sm btn-primary d-inline-flex align-items-center gap-1 nuova-etichetta__apri"
             onClick={() => {
               setEsito(null);
               setAperta(true);
             }}
           >
-            + {t('newTag')}
+            <Icon icon="it-plus" size="xs" color="white" />
+            {t('newTag')}
           </button>
+          {/* Si apre in una nuova scheda: lo dicono l'icona e il testo. */}
           <Link
             href={percorso('/admin/settings/tags')}
             target="_blank"
             rel="noopener"
-            className="nuova-etichetta__gestisci"
+            className="nuova-etichetta__gestisci d-inline-flex align-items-center gap-1"
           >
             {t('manageTags')}
-            <span className="visually-hidden"> ({t('opensInNewTab')})</span>
+            <Icon icon="it-external-link" size="xs" color="primary" />
+            <span className="small text-muted">({t('opensInNewTab')})</span>
           </Link>
         </div>
       )}

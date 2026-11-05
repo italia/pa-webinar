@@ -32,8 +32,13 @@ ABBREVIATIONS = frozenset({
 
 def write_params(nltk_data_dir: str, languages: Iterable[str]) -> list[str]:
     """Scrive i parametri per ``languages``; ritorna le cartelle scritte."""
+    import nltk
     from nltk.tokenize.punkt import PunktParameters, save_punkt_params
 
+    # NLTK scrive i parametri solo sotto i percorsi di nltk.data.path: la
+    # cartella di destinazione ci entra, se non c'e' gia'.
+    if nltk_data_dir not in nltk.data.path:
+        nltk.data.path.append(nltk_data_dir)
     base = os.path.join(nltk_data_dir, "tokenizers", "punkt_tab")
     os.makedirs(base, exist_ok=True)
     params = PunktParameters()

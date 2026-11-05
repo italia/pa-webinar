@@ -15,7 +15,7 @@ export const grantProfileSchema = z.object({
   /** La foto caricata dallo staff (EventPersonPhoto). Chi scrive la riga
    *  controlla che esista e la lascia cadere se non c'è più
    *  (lib/events/person-photo-store, usablePersonPhotoId). */
-  photoId: z.string().uuid().optional().nullable(),
+  photoId: z.guid().optional().nullable(),
 });
 
 export type GrantProfile = z.infer<typeof grantProfileSchema>;

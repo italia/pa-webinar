@@ -21,6 +21,7 @@ import { useSearchParams } from 'next/navigation';
 import { Link, useRouter, percorso } from '@/i18n/navigation';
 import { useDurataTesto } from '@/hooks/use-durata-testo';
 import { useConfirm } from '@/components/ui/confirm-dialog';
+import { useAvvioPipeline } from '@/hooks/use-avvio-pipeline';
 import { useToast } from '@/components/ui/toast';
 import EventTitle from '@/components/events/event-title';
 import { MarkdownRenderer } from '@/components/ui/markdown';
@@ -38,19 +39,19 @@ import {
   shareLink,
 } from '@/lib/events/participant-entry';
 import { isEventPageVisible } from '@/lib/events/visibility';
-import { canStartManually } from '@/lib/events/lifecycle';
 import { materialAuthorName } from '@/lib/events/material-author';
 import { logoPubblico, sitoPubblico } from '@/lib/events/public-people';
 import { reminderPresetKey } from '@/lib/events/reminder-presets';
 import { reminderTriggerAt } from '@/lib/email/reminder-plan';
 import { unsentReminderState } from '@/lib/email/reminder-status';
-import { localizedUrl } from '@/lib/utils/localized-url';
+import { localizedPath, localizedUrl } from '@/lib/utils/localized-url';
 import { hexWithAlpha, inchiostroEtichetta } from '@/lib/utils/tag-color';
 
 import { forgetCreation, readCreation, type CreationOutcome } from './event-wizard/created-event';
 import CallSessionsPanel from './call-sessions-panel';
 import DeleteEventModal from './delete-event-modal';
 import EventAnalyticsPanel from './event-analytics-panel';
+import EventConsentProofsPanel from './event-consent-proofs-panel';
 import EventFeedbackPanel from './event-feedback-panel';
 import GlossaryManager from './glossary-manager';
 import CapacityPanel from './capacity-panel';
@@ -68,6 +69,7 @@ import EventClosingChecklist, { ANCORE_CHIUSURA } from './event-closing-checklis
 import EventRoomReview from './event-room-review';
 import CollapsibleSection from './collapsible-section';
 import EventLinksSection from './event-links-section';
+import CopyButton from './copy-button';
 import StatusBadge from './status-badge';
 
 // ── Palette ──
@@ -356,7 +358,7 @@ export default function EventManagementClient({
   // I due ruoli con cui si entra, detti per nome: da moderatore, col link di
   // conduzione, e da partecipante, dalla stessa porta del pubblico — per
   // vedere l'evento come lo vede chi ci partecipa. L'ingresso da partecipante
-  // segue lo stato corrente (pubblicare o avviare da questa pagina lo cambia)
+  // segue lo stato corrente (pubblicare o ritirare da questa pagina lo cambia)
   // e le regole della sala: vedi lib/events/participant-entry.
   // Le finestre a tempo si valutano sull'istante del rendering sul server
   // finche' il browser non ha il suo orologio: server e prima passata del
@@ -397,42 +399,6 @@ export default function EventManagementClient({
       toast.error(t('eventsList.menu.failed'));
     } finally { setUpdating(false); }
   }, [status, event.id, event.moderatorToken, t, tc, confirm, toast, title]);
-
-  const isEarlyStart = startsAt.getTime() > Date.now() + 30 * 60_000;
-
-  // Avviare apre la sala a chiunque abbia il link (un evento LIVE ammette gli
-  // ospiti) e accende il bridge: si chiede conferma dicendo quando l'evento
-  // era previsto, e l'esito negativo si vede invece di sparire.
-  const startEvent = useCallback(async () => {
-    const when = format.dateTime(new Date(event.startsAt), {
-      weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
-    });
-    const ok = await confirm({
-      title: t('startEventConfirmTitle'),
-      message: isEarlyStart
-        ? `${t('startEventConfirmMessage', { when })} ${t('startEventConfirmEarly')}`
-        : t('startEventConfirmMessage', { when }),
-      confirmLabel: t('startEvent'),
-      cancelLabel: tc('cancel'),
-    });
-    if (!ok) return;
-    setUpdating(true); setFeedback('');
-    try {
-      const res = await fetch(`/api/events/${event.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${event.moderatorToken}` },
-        body: JSON.stringify({ status: 'LIVE' }),
-      });
-      if (res.ok) {
-        setStatus('LIVE');
-        setFeedback(isEarlyStart ? `${t('startEventSuccess')} ${t('jvbWarmupWarning')}` : t('startEventSuccess'));
-      } else {
-        toast.error(t('startEventFailed'));
-      }
-    } catch {
-      toast.error(t('startEventFailed'));
-    } finally { setUpdating(false); }
-  }, [event.id, event.moderatorToken, event.startsAt, isEarlyStart, t, tc, confirm, toast, format]);
 
   // «Termina evento» da qui: la stessa fine di «Termina per tutti» in sala.
   // Chi e' in sala vede la chiusura; la pagina dopo l'evento segue le scelte
@@ -512,7 +478,7 @@ export default function EventManagementClient({
     router.push(viaToken ? '/' : '/admin/events');
   }, [router, viaToken]);
 
-  // "Duplica come prossima occorrenza" (docs/architecture/event-journey.md,
+  // «Duplica» (docs/architecture/event-journey.md,
   // "Duplicating as the next occurrence"):
   // le call ricorrenti si ricreano a mano ogni volta, e la copia manuale è
   // proprio dove si perdono i flag di cattura. Qui l'endpoint eredita l'intera
@@ -528,7 +494,9 @@ export default function EventManagementClient({
       // Solo lo staff duplica (la rotta chiede la sessione): la copia si apre
       // con la propria sessione.
       const created = await duplicaComeProssima(event.id);
-      router.push(percorso(eventAdminPath(created.id, { edit: true })));
+      router.push(
+        percorso(eventAdminPath(created.id, { edit: true, copia: created.dataProssima ? 'prossima' : 'stesse' })),
+      );
     } catch {
       setDuplicateError(td('duplicateNextError'));
       setDuplicating(false);
@@ -593,7 +561,6 @@ export default function EventManagementClient({
           published={status === 'PUBLISHED' || status === 'LIVE'}
           publishFailed={appenaCreato.publishFailed}
           unsaved={appenaCreato.unsaved}
-          shareUrl={condivisione ? localizedUrl(baseUrl, condivisione.path, locale) : null}
           onPublish={status === 'DRAFT' ? togglePublish : undefined}
           publishing={updating}
           onPeople={() => {
@@ -676,15 +643,32 @@ export default function EventManagementClient({
                 sbagliare significa consegnare l'evento a chi riceve il link
                 sbagliato. */}
             {condivisione && (
-              <CopyBtn text={localizedUrl(baseUrl, condivisione.path, locale)}
-                       label={condivisione.kind === 'invite' ? td('copyInviteUrl') : td('copyPublicUrl')} />
+              <CopyButton text={localizedUrl(baseUrl, condivisione.path, locale)}
+                          label={condivisione.kind === 'invite' ? td('copyInviteUrl') : td('copyPublicUrl')} />
             )}
+            {/* Un pulsante, non un link: l'indirizzo porta il token del
+                moderatore, che passandoci sopra comparirebbe nella barra di
+                stato del browser, anche mentre si condivide lo schermo. Con
+                Ctrl/Cmd o la rotella si apre in una scheda nuova, come un
+                link: la sala accanto alla gestione e' l'uso piu' comune. */}
             {entraModeratore && (
-              <Link href={percorso(liveModeratorUrl)}
+              <button type="button"
+                    onClick={(e) => {
+                      if (e.ctrlKey || e.metaKey || e.shiftKey) {
+                        window.open(localizedPath(liveModeratorUrl, locale), '_blank', 'noopener');
+                      } else {
+                        router.push(percorso(liveModeratorUrl));
+                      }
+                    }}
+                    onAuxClick={(e) => {
+                      if (e.button !== 1) return;
+                      e.preventDefault();
+                      window.open(localizedPath(liveModeratorUrl, locale), '_blank', 'noopener');
+                    }}
                     className="btn btn-primary d-inline-flex align-items-center justify-content-center gap-2"
                     style={{ fontSize: '0.88rem' }}>
                 <Svg name="video" size={14} /> {t('joinAsModeratorBtn')}
-              </Link>
+              </button>
             )}
             {/* In una scheda nuova: chi organizza tiene aperta la gestione, e
                 spesso anche la sala da moderatore accanto. Il link non porta
@@ -797,16 +781,9 @@ export default function EventManagementClient({
             {/* Actions */}
             <div className="p-4 mb-0 mb-lg-3" style={CARD}>
               <div className="d-grid gap-2">
-                {/* Anche in preparazione o in pausa: se nessuno porta la sala a
-                    LIVE (lo scaler è fermo, o non c'è), l'avvio resta a chi
-                    organizza. */}
-                {canStartManually(status) && (
-                  <button type="button"
-                          className={`btn ${isEarlyStart ? 'btn-outline-success' : 'btn-success'} d-flex align-items-center justify-content-center gap-2`}
-                          onClick={startEvent} disabled={updating}>
-                    <Svg name="video" size={14} /> {t('startEvent')}
-                  </button>
-                )}
+                {/* L'avvio non sta qui: l'evento parte da solo all'ora d'inizio,
+                    e chi modera lo anticipa dalla sala d'attesa («Avvia
+                    evento»), dove vede chi aspetta. */}
                 {/* Un'azione principale per stato: in bozza pubblicare, in
                     diretta terminare, a evento concluso archiviare. Le altre
                     restano, in secondo piano. */}
@@ -838,10 +815,10 @@ export default function EventManagementClient({
                     {t('unarchive')}
                   </button>
                 )}
-                {/* «Modifica» e' l'azione principale solo quando l'avvio non lo
-                    e': lontano dall'inizio, «Avvia evento» e' secondario. */}
+                {/* Pubblicato, l'azione principale e' modificare: le altre
+                    (ritirare, duplicare) restano in secondo piano. */}
                 <Link href={percorso(editUrl)}
-                      className={`btn ${canStartManually(status) && isEarlyStart ? 'btn-primary' : 'btn-outline-primary'} d-flex align-items-center justify-content-center gap-2`}>
+                      className={`btn ${status === 'PUBLISHED' ? 'btn-primary' : 'btn-outline-primary'} d-flex align-items-center justify-content-center gap-2`}>
                   <Svg name="pencil" size={14} /> {td('editEvent')}
                 </Link>
                 {status === 'PUBLISHED' && (
@@ -850,10 +827,11 @@ export default function EventManagementClient({
                     {t('unpublish')}
                   </button>
                 )}
-                {/* Solo quando la pagina esiste: in bozza, archiviato o per
-                    una chiamata rapida in corso l'indirizzo risponde «non
-                    trovato». */}
-                {publicPageVisible && (
+                {/* Solo quando la pagina esiste (in bozza, archiviato o per una
+                    chiamata rapida in corso l'indirizzo risponde «non
+                    trovato») e quando in cima non c'e' gia' il pulsante che
+                    la apre («Apri come partecipante»). */}
+                {publicPageVisible && ingressoPartecipante?.kind !== 'page' && (
                   <a href={publicUrl} target="_blank" rel="noopener noreferrer"
                      className="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2">
                     <Svg name="external" size={14} /> {t('openPublicPage')}
@@ -867,7 +845,8 @@ export default function EventManagementClient({
                           className="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2"
                           onClick={duplicateAsNext}
                           disabled={duplicating}
-                          title={td('duplicateNextHint')}>
+                          title={td('duplicateNextHint')}
+                          aria-describedby="duplica-nota">
                     <Svg name="copy" size={14} />
                     {duplicating ? td('duplicateNextBusy') : td('duplicateNext')}
                   </button>
@@ -878,6 +857,9 @@ export default function EventManagementClient({
                                     onDeleted={handleDeleted} />
                 )}
               </div>
+              {!viaToken && !isInstant && (
+                <p id="duplica-nota" className="visually-hidden">{td('duplicateNextHint')}</p>
+              )}
               {duplicateError && (
                 <div className="alert alert-danger mt-2 mb-0 py-2" role="alert">
                   {duplicateError}
@@ -1161,9 +1143,9 @@ function OverviewTab({
       <div>
         <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
           <H>{td('featureSummary')}</H>
-          <Link href={percorso(editUrlAt('advanced', 'participation'))}
+          <Link href={percorso(editUrlAt('permissions'))}
                 className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2">
-            <Svg name="pencil" size={12} /> {td('editSettings')}
+            <Svg name="pencil" size={12} /> {td('editFeatures')}
           </Link>
         </div>
         {/* Due colonne finché ci stanno (mai tre); al telefono una sola. */}
@@ -1224,7 +1206,7 @@ function OverviewTab({
         <div className="d-flex justify-content-end mb-3">
           <Link href={percorso(editUrlAt('advanced', 'data'))}
                 className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2">
-            <Svg name="pencil" size={12} /> {td('editSettings')}
+            <Svg name="pencil" size={12} /> {td('editPrivacy')}
           </Link>
         </div>
         <dl className="mb-0">
@@ -1353,7 +1335,8 @@ function PeopleTab({ event, baseUrl, locale, onExportCsv, canEditRegistrations, 
       {canEditRegistrations && (
         <div className="mb-4">
           <EventInvitationsPanel eventId={event.id} invitationOnly={!event.registrationOpen}
-                                 editHref={editPeopleHref} />
+                                 editHref={editPeopleHref}
+                                 inviabile={linksMailable} />
         </div>
       )}
 
@@ -1550,6 +1533,7 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
   const tct = useTranslations('admin.captionsTranscript');
   const trp = useTranslations('admin.eventReport');
   const trr = useTranslations('admin.roomReview');
+  const tcp = useTranslations('admin.consentProofs');
   const tApi = useTranslations('apiErrors');
   const locale = useLocale();
   const format = useFormatter();
@@ -1559,6 +1543,7 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
   const actionColor = (action: string) => {
     if (action === 'DATA_DELETED') return { bg: '#FFF3CD', fg: '#856404' };
     if (action === 'DATA_EXPORTED') return { bg: '#D1ECF1', fg: '#0C5460' };
+    if (action === 'CONSENT_WITHDRAWN') return { bg: '#F3E5F5', fg: '#5B2C6F' };
     return { bg: '#D4EDDA', fg: '#155724' };
   };
   // A Recording ROW exists (live capture happened) → the AI pipeline can run on
@@ -1566,6 +1551,7 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
   // recordingUrl has no Recording row, so generate-ai would 404 — the button
   // must not offer an action that can never succeed.
   const hasRecording = event.hasRecordingRow;
+  const avviaPipeline = useAvvioPipeline();
   const [generatingAi, setGeneratingAi] = useState(false);
   const [aiGenMsg, setAiGenMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
@@ -1575,11 +1561,8 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
     setGeneratingAi(true);
     setAiGenMsg(null);
     try {
-      const res = await fetch(`/api/admin/events/${event.id}/generate-ai`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ summary: true }),
-      });
+      const res = await avviaPipeline(`/api/admin/events/${event.id}/generate-ai`, { summary: true });
+      if (!res) return;
       const data = (await res.json().catch(() => ({}))) as { enqueued?: number; code?: string };
       if (!res.ok) {
         setAiGenMsg({
@@ -1603,7 +1586,7 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
     } finally {
       setGeneratingAi(false);
     }
-  }, [event.id, td, tApi]);
+  }, [event.id, td, tApi, avviaPipeline]);
 
   // Il file video: riprodurlo, scaricarlo, pubblicarlo, cancellarlo. A
   // evento concluso e' la prima cosa da fare, e sta in cima.
@@ -1800,6 +1783,15 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
                              moderatorToken={event.moderatorToken} />
         </div>
 
+        {/* Le prove dei consensi, con i nomi: solo per lo staff. */}
+        {!viaToken && (
+          <div className="mb-4">
+            <H>{tcp('title')}</H>
+            <p style={{ color: C_MUTED, fontSize: '0.9rem', maxWidth: 680 }}>{tcp('intro')}</p>
+            <EventConsentProofsPanel eventId={event.id} locale={locale} />
+          </div>
+        )}
+
         {event.gdprAuditLogs.length > 0 && (
           <div>
             <H>{t('gdprAuditLog.title')}</H>
@@ -1867,7 +1859,6 @@ function CreatedSummary({
   published,
   publishFailed,
   unsaved,
-  shareUrl,
   onPublish,
   publishing = false,
   onPeople,
@@ -1876,7 +1867,6 @@ function CreatedSummary({
   published: boolean;
   publishFailed: boolean;
   unsaved: CreationOutcome['unsaved'];
-  shareUrl: string | null;
   /** In bozza: pubblicare da qui, senza cercare il pulsante. */
   onPublish?: () => void;
   publishing?: boolean;
@@ -1905,7 +1895,8 @@ function CreatedSummary({
                 {tc('publishNow')}
               </button>
             )}
-            {shareUrl && <CopyBtn text={shareUrl} label={tc('copyParticipantLink')} />}
+            {/* Il link per chi partecipa si copia dal pulsante in cima alla
+                pagina, subito sopra: qui sarebbe un doppione. */}
             <button type="button" className="btn btn-outline-primary btn-sm" onClick={onPeople}>
               {tc('sendToSpeakers')}
             </button>
@@ -1917,37 +1908,3 @@ function CreatedSummary({
   );
 }
 
-// Minimal copy-to-clipboard button with a caller-supplied label.
-// Non si riusa <CopyButton> perche' quello prende l'etichetta da
-// `admin.links` e basta: qui serve poterla passare da fuori
-// (`copyPublicUrl`). In cima alla pagina ne resta uno solo — gli altri link
-// stanno nella sezione in fondo, dove c'e' spazio per dire a chi vanno dati.
-function CopyBtn({ text, label }: { text: string; label: string }) {
-  const tl = useTranslations('admin.links');
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(text);
-    } catch {
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-    }
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }, [text]);
-
-  return (
-    <button type="button" onClick={handleCopy}
-            aria-label={label}
-            className="btn btn-outline-primary btn-sm d-inline-flex align-items-center justify-content-center gap-2"
-            style={{ fontSize: '0.85rem' }}>
-      <Svg name={copied ? 'check' : 'link'} size={14} />
-      {copied ? tl('copied') : label}
-    </button>
-  );
-}

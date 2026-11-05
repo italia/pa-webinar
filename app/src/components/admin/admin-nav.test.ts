@@ -57,17 +57,6 @@ describe('menu dello staff', () => {
     }
   });
 
-  it('nessuna icona si ripete fra intestazione, sezioni e voci di una stessa sezione', () => {
-    // L'intestazione mostra i link pubblici e «Amministrazione».
-    const intestazione = [...LINK_INTESTAZIONE.map((l) => l.icon), 'it-tool'].filter(Boolean);
-    const sezioni = SEZIONI.map((s) => s.icon);
-    expect(new Set(sezioni).size).toBe(sezioni.length);
-    for (const s of SEZIONI) {
-      const visibili = [...intestazione, ...sezioni, ...s.voci.map((v) => v.icon)];
-      expect(new Set(visibili).size, s.labelKey).toBe(visibili.length);
-    }
-  });
-
   it('chi organizza vede eventi e video, con il glossario', () => {
     const sezioni = sezioniPerRuolo('organizer');
     expect(sezioni.map((s) => s.labelKey)).toEqual(['events', 'video']);

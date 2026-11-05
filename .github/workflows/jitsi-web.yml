@@ -23,6 +23,9 @@ on:
       - ".github/workflows/jitsi-web.yml"
   workflow_dispatch: {}
 
+permissions:
+  contents: read
+
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: italia/pa-webinar-jitsi-web

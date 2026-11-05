@@ -27,6 +27,35 @@ describe('alignDiarizationToSpeakers', () => {
     expect(map.size).toBe(2);
   });
 
+  it('senza consenso il cluster resta senza nome, e non prende quello di un altro', () => {
+    const log: SpeakerLogEntry[] = [
+      { atMs: 0, participantId: 'p-alice', displayName: 'Alice' },
+      { atMs: 10_000, participantId: 'p-bob', displayName: 'Bob' },
+    ];
+    // SPEAKER_00 quasi tutto nella finestra di Alice, un poco in quella di Bob.
+    const segments: DiarizationSegment[] = [
+      { start: 0, end: 9, speaker: 'SPEAKER_00' },
+      { start: 10, end: 11, speaker: 'SPEAKER_00' },
+      { start: 11, end: 18, speaker: 'SPEAKER_01' },
+    ];
+
+    const map = alignDiarizationToSpeakers(segments, log, (p) => p !== 'p-alice');
+
+    expect(map.has('SPEAKER_00')).toBe(false);
+    expect(map.get('SPEAKER_01')).toBe('Bob');
+  });
+
+  it('col filtro, chi parla di piu\' senza nome non cede il cluster a un altro', () => {
+    const log: SpeakerLogEntry[] = [
+      { atMs: 0, participantId: 'p-anonimo' },
+      { atMs: 9_000, participantId: 'p-bob', displayName: 'Bob' },
+    ];
+    const segments: DiarizationSegment[] = [{ start: 0, end: 10, speaker: 'SPEAKER_00' }];
+    expect(alignDiarizationToSpeakers(segments, log, () => true).has('SPEAKER_00')).toBe(false);
+    // Senza filtro resta la regola di sempre: vince chi ha un nome.
+    expect(alignDiarizationToSpeakers(segments, log).get('SPEAKER_00')).toBe('Bob');
+  });
+
   it('log vuoto: ritorna mappa vuota', () => {
     const segments: DiarizationSegment[] = [
       { start: 0, end: 5, speaker: 'SPEAKER_00' },

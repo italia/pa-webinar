@@ -14,6 +14,7 @@ import { publishEventStatus, publishFlagsIfChanged } from '@/lib/live-state/publ
 import { LIVE_FLAG_FIELDS } from '@/lib/live-state/pubsub';
 import { recordLiveAction, recordLiveActions } from '@/lib/live/actions';
 import { reviveStatus } from '@/lib/events/lifecycle';
+import { CAMPI_VIDEO_VUOTI } from '@/lib/events/recording-fields';
 import { closeOpenSessions } from '@/lib/events/call-sessions';
 import { chiudiSondaggiAperti } from '@/lib/events/close-polls';
 import { eventTagIds, replaceEventTags, resolveTags, sameTagIds } from '@/lib/events/event-tags';
@@ -49,6 +50,8 @@ import {
   lingueDellEvento,
 } from '@/lib/text-translation/stato-lingue';
 import { unisciTesti } from '@/lib/text-translation/unione-testi';
+import { salaForseAperta } from '@/lib/live/room-open';
+import { annullaEmailInCoda } from '@/lib/email/outbox';
 
 export const dynamic = 'force-dynamic';
 
@@ -133,6 +136,8 @@ export const GET = withErrorHandling(async (request, context) => {
       postEventEmailEnabled: event.postEventEmailEnabled,
       feedbackEnabled: event.feedbackEnabled,
       recordingConsentText: event.recordingConsentText,
+      listenOnlyWithoutConsent: event.listenOnlyWithoutConsent,
+      audienceAnonymous: event.audienceAnonymous,
       // Al co-moderatore torna il SUO token (valido su tutte le route che
       // già lo ammettono), mai quello del primario.
       moderatorToken: isPrimaryModerator ? event.moderatorToken : token,
@@ -304,6 +309,25 @@ export const PUT = withErrorHandling(async (request, context) => {
     data.endsAt !== undefined ||
     data.startsAt !== undefined;
   const ignoredCreationOnlyFields: string[] = [];
+  // Registrazione e solo ascolto decidono il consenso chiesto a chi entra e
+  // il blocco dei mezzi che la sala accende al primo ingresso
+  // (mod_pa_media_lock): a sala aperta non si cambiano. Chi e' gia' dentro
+  // non ha dato il consenso a una registrazione accesa dopo, e chi entra dopo
+  // avrebbe un token che il bridge non fa rispettare.
+  // Anche il pubblico anonimo: cambiarlo a sala aperta accosterebbe gli
+  // pseudonimi ai nomi (stesso posto, stesso colore in chat).
+  const CAMPI_DELLA_SALA = ['listenOnlyWithoutConsent', 'recordingEnabled', 'audienceAnonymous'] as const;
+  const cambiaRegime = CAMPI_DELLA_SALA.some(
+    (campo) => data[campo] !== undefined && data[campo] !== event[campo],
+  );
+  if (cambiaRegime && (await salaForseAperta(event))) {
+    for (const campo of CAMPI_DELLA_SALA) {
+      if (data[campo] !== undefined && data[campo] !== event[campo]) {
+        ignoredCreationOnlyFields.push(campo);
+        delete (data as Record<string, unknown>)[campo];
+      }
+    }
+  }
   if (isTerminalStatus && !isLifecycleEdit) {
     for (const field of CREATION_ONLY_FIELDS) {
       if (data[field] !== undefined) {
@@ -562,6 +586,8 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.recordingNotifyEnabled !== undefined && { recordingNotifyEnabled: data.recordingNotifyEnabled }),
       ...(data.feedbackEnabled !== undefined && { feedbackEnabled: data.feedbackEnabled }),
       ...(data.recordingConsentText !== undefined && { recordingConsentText: data.recordingConsentText }),
+      ...(data.listenOnlyWithoutConsent !== undefined && { listenOnlyWithoutConsent: data.listenOnlyWithoutConsent }),
+      ...(data.audienceAnonymous !== undefined && { audienceAnonymous: data.audienceAnonymous }),
       ...(data.recordingPublished !== undefined && {
         recordingPublished: data.recordingPublished,
         ...(data.recordingPublished ? { recordingPublishedAt: new Date() } : { recordingPublishedAt: null }),
@@ -573,6 +599,9 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.tempRecordingUrl !== undefined && { tempRecordingUrl: data.tempRecordingUrl }),
       ...(data.recordingFileSize !== undefined && { recordingFileSize: data.recordingFileSize }),
       ...(data.recordingDuration !== undefined && { recordingDuration: data.recordingDuration }),
+      // Dopo i campi qui sopra, per vincere su di loro: togliere il video toglie
+      // anche pubblicazione, peso e durata.
+      ...(data.recordingUrl === null && CAMPI_VIDEO_VUOTI),
       ...(data.status !== undefined && { status: data.status }),
       ...(nextCapacityEstimate !== undefined && {
         capacityEstimateJson: nextCapacityEstimate,
@@ -830,6 +859,8 @@ export const DELETE = withErrorHandling(async (request, context) => {
       // prima: la cascata porta via le righe, e dopo nessuno saprebbe più
       // quali blob cancellare. Se lo storage non risponde l'evento resta (503).
       await removeFilesOfEventsBeingDeleted({ id: eventId });
+      // Le email dell'evento ancora da inviare non partono piu'.
+      await annullaEmailInCoda(tx, { eventIds: [eventId] });
       await tx.event.delete({ where: { id: eventId } });
     },
     { timeout: DELETE_TIMEOUT_MS },

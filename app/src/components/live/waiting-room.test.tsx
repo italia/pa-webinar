@@ -143,8 +143,8 @@ describe('sala d\'attesa — nome mancante a sala aperta', () => {
     premi(entra);
     expect(onEnterLive).not.toHaveBeenCalled();
     expect(nome.getAttribute('aria-invalid')).toBe('true');
-    // Il richiamo non è rosso: il campo insiste, senza lo stile d'errore.
-    expect(nome.classList.contains('is-invalid')).toBe(false);
+    // Dopo il tentativo il nome mancante e' un errore: rosso, sul campo.
+    expect(nome.classList.contains('is-invalid')).toBe(true);
     expect(nome.closest('.wr-name-field')?.classList.contains('wr-name-field--insist')).toBe(true);
     expect(document.activeElement).toBe(nome);
     expect(Element.prototype.scrollIntoView).toHaveBeenCalled();
@@ -230,16 +230,12 @@ describe('sala d\'attesa — gli altri campi che trattengono', () => {
     expect(onEnterLive).toHaveBeenCalledTimes(1);
   });
 
-  it('email non valida: non si entra e il fuoco va sull\'email', () => {
+  it('l\'ospite non deve lasciare un\'email per entrare', () => {
     render();
+    expect($('#waiting-email')).toBeNull();
     scrivi('#waiting-name', 'Relatore 1');
-    scrivi('#waiting-email', 'non-una-email');
-    const entra = pulsante(t.joinNowBtn);
-    expect(entra.getAttribute('aria-describedby')).toBe('waiting-email-invalid');
-
-    premi(entra);
-    expect(onEnterLive).not.toHaveBeenCalled();
-    expect(document.activeElement).toBe($('#waiting-email'));
+    premi(pulsante(t.joinNowBtn));
+    expect(onEnterLive).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -646,3 +642,79 @@ describe('sala d\'attesa — evento concluso', () => {
     expect(container.textContent).toContain(t.netiquetteTitle);
   });
 });
+
+describe('sala d\'attesa — il nome di chi entra dal proprio link d\'iscrizione', () => {
+  it('non si modifica e dice che e\' quello dell\'iscrizione', () => {
+    render({ role: 'participant', defaultName: 'Anna Bianchi', nomeDellIscrizione: true });
+    const campo = $<HTMLInputElement>('#waiting-name')!;
+    expect(campo.readOnly).toBe(true);
+    expect(campo.value).toBe('Anna Bianchi');
+    expect($('#waiting-name-help')?.textContent).toBe(t.registeredNameHelp);
+    expect(campo.getAttribute('aria-describedby')).toContain('waiting-name-help');
+  });
+
+  it('senza nome (link inoltrato) resta da scrivere', () => {
+    render({ role: 'participant', defaultName: '', nomeDellIscrizione: true });
+    expect($<HTMLInputElement>('#waiting-name')!.readOnly).toBe(false);
+  });
+
+  it('chi conduce lo puo\' sempre cambiare', () => {
+    render({ role: 'moderator', conduce: true, defaultName: 'Relatore 1', nomeDellIscrizione: true });
+    expect($<HTMLInputElement>('#waiting-name')!.readOnly).toBe(false);
+  });
+
+  it('un nome dell\'iscrizione troppo corto per entrare resta da correggere', () => {
+    render({ role: 'participant', defaultName: 'A ', nomeDellIscrizione: true });
+    expect($<HTMLInputElement>('#waiting-name')!.readOnly).toBe(false);
+  });
+});
+
+describe('sala d\'attesa — consenso alla registrazione di chi conduce o interviene', () => {
+  const evento: Evento = { ...eventoLive, recordingEnabled: true, multitrackRecordingEnabled: true };
+  const conduce = {
+    role: 'moderator' as const,
+    conduce: true,
+    conduceDaIncarico: true,
+    defaultName: 'Relatore 1',
+    event: evento,
+    recordingConsentRequired: true,
+    recordingConsentOptional: true,
+  };
+
+  it('facoltativo: dice cosa succede senza, e si entra lo stesso', () => {
+    render(conduce);
+    expect(container.textContent).toContain(messages.gdpr.consent.recordingOptionalHost);
+    expect(container.textContent).not.toContain(messages.gdpr.consent.recordingOptionalListenOnly);
+    premi(pulsante(t.joinNowBtn));
+    expect(onEnterLive).toHaveBeenCalledWith('Relatore 1', { cameraOn: false, micOn: false });
+  });
+
+  it('la trascrizione dei propri interventi si apre solo dopo il consenso alla registrazione', () => {
+    render(conduce);
+    const trascrizione = $<HTMLInputElement>('#waiting-multitrack-consent')!;
+    expect(trascrizione.disabled).toBe(true);
+    expect(trascrizione.getAttribute('aria-describedby')).toContain('waiting-recording-consent-required');
+
+    premi($<HTMLInputElement>('#waiting-recording-consent')!);
+    expect($<HTMLInputElement>('#waiting-multitrack-consent')!.disabled).toBe(false);
+    premi($<HTMLInputElement>('#waiting-multitrack-consent')!);
+    premi(pulsante(t.joinNowBtn));
+    expect(onEnterLive).toHaveBeenCalledWith('Relatore 1', {
+      cameraOn: false,
+      micOn: false,
+      recordingConsent: true,
+      multitrackConsent: true,
+    });
+  });
+
+  it('togliendo il consenso alla registrazione, la trascrizione non parte', () => {
+    render(conduce);
+    premi($<HTMLInputElement>('#waiting-recording-consent')!);
+    premi($<HTMLInputElement>('#waiting-multitrack-consent')!);
+    premi($<HTMLInputElement>('#waiting-recording-consent')!);
+    expect($<HTMLInputElement>('#waiting-multitrack-consent')!.checked).toBe(false);
+    premi(pulsante(t.joinNowBtn));
+    expect(onEnterLive).toHaveBeenCalledWith('Relatore 1', { cameraOn: false, micOn: false });
+  });
+});
+

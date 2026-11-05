@@ -267,12 +267,21 @@ the form from saving, so configure them through the API as described in
 - Links in the **Legal** section are listed there. Once at least one is configured, they replace the
   default links (**Privacy policy**, **Accessibility statement**, **Legal notes**). Re-add the
   defaults if they are still wanted.
-- **Service inventory** and, when the status page is enabled, **System status** are always appended.
-  The build information (version and commit, linked to the changelog) follows when the build set it.
-  Images built from the repository's `Dockerfile` always do, since it defaults the version to `dev`.
-  A local `npm run dev` or `npm run build` without the `NEXT_PUBLIC_BUILD_*` variables shows none.
+- The default **Accessibility statement** opens in a new window, with the external-link icon and a
+  hidden "opens in a new window"; so does every link to another site (`https://…`, `http://…` or
+  `//…`), including the organization's site, the source code and the SBOM. `mailto:` and `tel:` links
+  open in place.
+- The bottom row ends with the version, linked to the changelog (the commit is in the link's title),
+  and the date of the last update in the page language: **Version X.Y.Z · updated on …**, or
+  **Development version** for images not built from a release. A local `npm run dev` or
+  `npm run build` without the `NEXT_PUBLIC_BUILD_*` variables shows none.
+- Links in the **Main** section get a column of their own, **Useful links**, next to **Software open
+  source**.
+- **Service inventory** (only when `SERVICE_INVENTORY_URL` is set, otherwise the page has nothing to
+  show) and, when the status page is enabled, **System status** are in the **Software open source**
+  column, next to **Security and transparency**.
 - A link that starts with `/` opens in the same tab, and in the visitor's language when it matches a
-  known page. Other links open in a new tab. Link titles are one string for all languages.
+  known page. Link titles are one string for all languages.
 
 The **Pages** tab replaces the built-in text of the privacy notice page and the accessibility statement
 with the organization's own HTML, per language (the form offers Italian and English). A language with

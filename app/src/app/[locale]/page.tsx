@@ -4,6 +4,8 @@ import { getTranslations, getLocale } from 'next-intl/server';
 import { prisma } from '@/lib/db';
 import { getSettings } from '@/lib/settings';
 import { Link } from '@/i18n/navigation';
+import NessunEvento from '@/components/home/nessun-evento';
+import { serviceInventoryUrl } from '@/lib/service-inventory-url';
 import { publicEventStatusWhere } from '@/lib/events/visibility';
 import EventList from '@/components/events/event-list';
 import LandingIstituzionale from '@/components/home/landing-istituzionale';
@@ -155,12 +157,7 @@ async function EventsSection({
           </Link>
         </div>
         {upcoming.length === 0 ? (
-          <div
-            className="p-5 rounded-3 text-center"
-            style={{ backgroundColor: '#F5F7FB' }}
-          >
-            <p className="text-secondary mb-0 lead">{t('upcoming.noEvents')}</p>
-          </div>
+          <NessunEvento testo={t('upcoming.noEvents')} />
         ) : (
           <EventList events={upcoming} parseTitleKicker={parseTitleKicker} />
         )}
@@ -185,12 +182,7 @@ async function EventsListHome({
           {t('upcoming.title')}
         </h1>
         {upcoming.length === 0 ? (
-          <div
-            className="p-5 rounded-3 text-center"
-            style={{ backgroundColor: '#F5F7FB' }}
-          >
-            <p className="text-secondary mb-0 lead">{t('upcoming.noEvents')}</p>
-          </div>
+          <NessunEvento testo={t('upcoming.noEvents')} />
         ) : (
           <EventList events={upcoming} parseTitleKicker={parseTitleKicker} />
         )}
@@ -471,8 +463,10 @@ async function LandingHome({
               <p className="mb-4" style={{ opacity: 0.85, lineHeight: 1.6 }}>
                 {t('projectTeaser.body')}
               </p>
+              {/* L'inventario, se pubblicato; altrimenti la pagina sulla
+                  sicurezza e la trasparenza, che c'e' sempre. */}
               <Link
-                href="/service-inventory"
+                href={serviceInventoryUrl() ? '/service-inventory' : '/security'}
                 className="btn btn-outline-light d-inline-flex align-items-center gap-2"
               >
                 <SvgIcon id="it-list" className="icon-white icon-sm" size={18} />

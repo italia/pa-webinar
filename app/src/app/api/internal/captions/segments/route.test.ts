@@ -6,6 +6,7 @@ const m = vi.hoisted(() => ({
   posto: vi.fn(),
   consenso: vi.fn(),
   createMany: vi.fn(),
+  updateMany: vi.fn(),
 }));
 vi.mock('@/lib/auth/cron', () => ({ assertCronApiKey: vi.fn() }));
 vi.mock('@/lib/captions/room', () => ({
@@ -14,7 +15,7 @@ vi.mock('@/lib/captions/room', () => ({
   consensoTrascrizione: m.consenso,
 }));
 vi.mock('@/lib/crypto/pii', () => ({ encryptPII: (v: string) => `cif:${v}` }));
-vi.mock('@/lib/db', () => ({ prisma: { captionSegment: { createMany: m.createMany } } }));
+vi.mock('@/lib/db', () => ({ prisma: { captionSegment: { createMany: m.createMany, updateMany: m.updateMany } } }));
 
 import { POST } from './route';
 
@@ -54,6 +55,24 @@ describe('POST /api/internal/captions/segments', () => {
     expect(righe[0]).toMatchObject({ seatId: 'mod-e1-x', speakerName: 'cif:Moderatrice', text: 'cif:Buongiorno.' });
     expect(righe[1]).toMatchObject({ endpointId: 'bb', seatId: null, speakerName: null, text: null });
     expect(m.createMany.mock.calls[0]![0].skipDuplicates).toBe(true);
+  });
+
+  it('un ritiro arrivato tra la lettura del consenso e il salvataggio ripulisce anche queste frasi', async () => {
+    m.posto.mockResolvedValue('guest-7');
+    m.consenso.mockResolvedValueOnce({ dato: true, nome: 'Ospite' }).mockResolvedValueOnce({ dato: false, nome: null });
+    await invia({ room: 'stanza', segments: [frase('cc', 'Parlo io.')] });
+    expect(m.createMany.mock.calls[0]![0].data[0]).toMatchObject({ seatId: 'guest-7', text: 'cif:Parlo io.' });
+    expect(m.updateMany).toHaveBeenCalledWith({
+      where: { eventId: 'e1', seatId: { in: ['guest-7'] } },
+      data: { seatId: null, speakerName: null, text: null },
+    });
+  });
+
+  it('con il consenso ancora valido non si tocca niente', async () => {
+    m.posto.mockResolvedValue('guest-8');
+    m.consenso.mockResolvedValue({ dato: true, nome: 'Ospite' });
+    await invia({ room: 'stanza', segments: [frase('dd', 'Ancora io.')] });
+    expect(m.updateMany).not.toHaveBeenCalled();
   });
 
   it('una voce che Prosody non ha riconosciuto non si tiene', async () => {

@@ -2,6 +2,8 @@ import { randomUUID } from 'crypto';
 
 import { test, expect, type Page } from '@playwright/test';
 
+import { accediComeAdmin } from './helpers/accesso-admin';
+
 /**
  * Il menu «…» delle schede nell'elenco degli eventi, aperto col mouse e da
  * tastiera.
@@ -14,7 +16,7 @@ import { test, expect, type Page } from '@playwright/test';
  */
 
 const ADMIN_KEY = process.env.ADMIN_API_KEY || 'dev_admin_key_2026';
-const DUPLICA = 'Duplica come prossima occorrenza';
+const DUPLICA = 'Duplica';
 
 // Un solo accesso per file: il login dell'amministrazione ha un limite di
 // tentativi, e ogni prova ne chiederebbe uno.
@@ -26,7 +28,7 @@ async function accedi(page: Page) {
     await page.context().addCookies(sessione);
     return;
   }
-  const login = await page.request.post('/api/admin/login', { data: { key: ADMIN_KEY } });
+  const login = await accediComeAdmin(page.request, ADMIN_KEY);
   expect(login.ok(), `login: ${login.status()}`).toBeTruthy();
   sessione = await page.context().cookies();
 }

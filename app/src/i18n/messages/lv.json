@@ -81,7 +81,8 @@
     "deselectAll": "Atcelt atlasi",
     "durationMinutes": "{minutes, plural, zero {# minūtes} one {# minūte} other {# minūtes}}",
     "durationHours": "{hours, plural, zero {# stundas} one {# stunda} other {# stundas}}",
-    "durationHoursMinutes": "{hours, plural, zero {# stundas} one {# stunda} other {# stundas}} un {minutes, plural, zero {# minūtes} one {# minūte} other {# minūtes}}"
+    "durationHoursMinutes": "{hours, plural, zero {# stundas} one {# stunda} other {# stundas}} un {minutes, plural, zero {# minūtes} one {# minūte} other {# minūtes}}",
+    "backToTop": "Uz augšu"
   },
   "markdown": {
     "edit": "Rakstīt",
@@ -102,7 +103,14 @@
     "switchLanguage": "Mainīt valodu",
     "skipToContent": "Pāriet uz saturu",
     "skipToFooter": "Pāriet uz kājeni",
-    "mainLabel": "Galvenā navigācija"
+    "mainLabel": "Galvenā navigācija",
+    "activeLanguage": "Aktīvā valoda:",
+    "languageSelected": "(atlasīta)",
+    "signIn": "Pieteikties",
+    "roleAdmin": "Administrators",
+    "roleOrganizer": "Organizators",
+    "instanceKey": "Instances atslēga",
+    "signOutFailed": "Iziešana neizdevās: mēģiniet vēlreiz."
   },
   "header": {
     "followUs": "Sekojiet mums"
@@ -204,7 +212,8 @@
       "recordingLinkEmailLabel": "E-pasts, ar kuru reģistrējāties",
       "recordingLinkSend": "Nosūtīt saiti vēlreiz",
       "recordingLinkSent": "Ja adrese ir reģistrēta pasākumam, drīz saņemsiet e-pastu ar personīgo saiti.",
-      "recordingLinkError": "Pieprasījums neizdevās. Mēģiniet vēlreiz pēc dažām minūtēm."
+      "recordingLinkError": "Pieprasījums neizdevās. Mēģiniet vēlreiz pēc dažām minūtēm.",
+      "registerOrGuest": "Reģistrējoties pa e-pastu saņemat savu personīgo saiti un jaunumus par pasākumu. Kā viesis ienākat uzreiz tikai ar vārdu, tikai kamēr pasākums notiek tiešraidē, un e-pastus nesaņemat."
     },
     "manage": {
       "toggleChat": "Tērzēšana",
@@ -523,7 +532,10 @@
       "stopVideo": "Izslēgt video",
       "revokeFloor": "Atņemt vārdu",
       "lowerHandFailed": "Roku neizdevās nolaist: mēģiniet vēlreiz.",
-      "handsRaised": "{count, plural, zero {# paceltu roku} one {# pacelta roka} other {# paceltas rokas}}"
+      "handsRaised": "{count, plural, zero {# paceltu roku} one {# pacelta roka} other {# paceltas rokas}}",
+      "locksByConsent": "Mikrofoni un kameras seko piekrišanai ierakstīšanai: kas to devuši, izmanto pasākuma atļauto, pārējie tikai klausās. Telpas bloķējumi paliek ieslēgti.",
+      "listenOnlyBadge": "tikai klausās",
+      "listenOnlyNoFloor": "Nav devis piekrišanu ierakstam: nevar runāt, kamēr to nedos savā telpā."
     },
     "moderator": {
       "muteAll": "Izslēgt skaņu visiem",
@@ -558,7 +570,8 @@
       "moderatorReveal": "Rādīt moderatora saiti",
       "moderatorWarning": "Šī saite piešķir MODERATORA piekļuvi (izslēgt mikrofonu visiem, sākt ierakstīšanu, beigt pasākumu). Kopīgojiet to tikai ar citiem moderatoriem.",
       "moderatorLink": "Moderatora saite",
-      "moderatorLinkHint": "Ikviens, kas atver šo saiti, pievienojas kā moderators ar pilnām telpas vadības tiesībām."
+      "moderatorLinkHint": "Ikviens, kas atver šo saiti, pievienojas kā moderators ar pilnām telpas vadības tiesībām.",
+      "copyFailed": "Neizdevās nokopēt: atlasiet adresi un nokopējiet to manuāli."
     },
     "videoCallFrameTitle": "Pasākuma videozvans",
     "insecureContextTitle": "Nedroša adrese",
@@ -616,7 +629,15 @@
       "unavailable": "Subtitri pašlaik nav pieejami.",
       "show": "Rādīt subtitrus",
       "hide": "Paslēpt subtitrus",
-      "toggle": "Automātiskie subtitri"
+      "toggle": "Automātiskie subtitri",
+      "controls": "Subtitru vadīklas",
+      "smaller": "Mazāki subtitri",
+      "larger": "Lielāki subtitri",
+      "moveUp": "Pārvietot subtitrus augšā",
+      "moveDown": "Pārvietot subtitrus lejā",
+      "smallerShort": "A−",
+      "largerShort": "A+",
+      "showShort": "CC"
     },
     "eventEndedModerator": "Pasākums ir beidzies. Zemāk atradīsiet statistiku un, ja pasākums tika ierakstīts, ierakstu un pārskatu.",
     "endLinks": {
@@ -625,7 +646,54 @@
       "publicPage": "Pasākuma publiskā lapa"
     },
     "notOpenNow": "Telpa pašlaik nav atvērta.",
-    "nameRequired": "Trūkst vārda, ar kuru pievienoties: atgriezieties un ierakstiet to."
+    "nameRequired": "Trūkst vārda, ar kuru pievienoties: atgriezieties un ierakstiet to.",
+    "closeSidebar": "Aizvērt sānu paneli",
+    "contentOnly": "Tikai saturs, bez tērzēšanas un paneļiem",
+    "showPanels": "Rādīt tērzēšanu un paneļus",
+    "confirmFullscreen": "Pārslēgt uz pilnekrāna režīmu",
+    "listenOnly": {
+      "title": "Jūs tikai klausāties.",
+      "body": "Jūs nepiekritāt ierakstīšanai: sekojat un rakstāt tērzēšanā, bet mikrofons, kamera un ekrāns paliek izslēgti, pat ja vadītājs dod jums vārdu. Lai runātu, piekrītiet.",
+      "consent": "Piekrītu ierakstīšanai un piedalos",
+      "joining": "Atkārtota ieiešana telpā…",
+      "error": "Neizdevās atgriezties: mēģiniet vēlreiz."
+    },
+    "pseudonym": "Dalībnieks-{code}",
+    "consents": {
+      "open": "Jūsu piekrišanas",
+      "button": "Piekrišanas",
+      "title": "Jūsu piekrišanas",
+      "intro": "Savas piekrišanas varat dot vai atsaukt jebkurā pasākuma brīdī. Katra izmaiņa uz dažām sekundēm atkārtoti savieno konferenci.",
+      "given": "Piekrišana dota",
+      "notGiven": "Piekrišana nav dota",
+      "withdraw": "Atsaukt piekrišanu",
+      "confirmTitle": "Vai tiešām atsaukt?",
+      "confirm": "Atsaukt",
+      "working": "Notiek atjaunināšana…",
+      "error": "Piekrišanu neizdevās atjaunināt: mēģiniet vēlreiz.",
+      "recording": {
+        "title": "Pasākuma ieraksts",
+        "give": "Piekrītu ierakstam",
+        "without": {
+          "soloAscolto": "Bez šīs piekrišanas jūs tikai klausāties: mikrofons, kamera un ekrāns paliek aizvērti.",
+          "conduce": "Bez šīs piekrišanas jūs tāpat vadāt, bet jūsu balss nepaliek atsevišķo personu celiņos un atšifrējumā.",
+          "uscita": "Lai piedalītos šajā pasākumā, nepieciešama piekrišana ierakstam."
+        },
+        "alreadyRecorded": "Tas, kas jau ierakstīts, paliek pasākuma video: lai to izņemtu, rakstiet organizatoriem.",
+        "withdraw": {
+          "soloAscolto": "Ja to atsaucat, paliekat telpā tikai kā klausītājs: mikrofons, kamera un ekrāns tiek aizvērti. Tiek atsaukta arī piekrišana jūsu runas atšifrēšanai.",
+          "uscita": "Ja to atsaucat, jūs pametat konferenci un atgriežaties uzgaidāmajā telpā: dalībai nepieciešama piekrišana ierakstam. Tiek atsaukta arī piekrišana jūsu runas atšifrēšanai.",
+          "conduce": "Ja to atsaucat, jūs turpināt vadīt, bet turpmāk jūsu balss nepaliek atsevišķo personu celiņos un atšifrējumā. Telpas video, ja tas tiek ierakstīts, jūs tāpat rāda."
+        }
+      },
+      "transcription": {
+        "title": "Jūsu runas atšifrēšana",
+        "give": "Piekrītu atšifrēšanai",
+        "giveEffect": "Jūsu runa tiek iekļauta pasākuma atšifrējumā ar jūsu vārdu. Bez piekrišanas jūs tāpat piedalāties.",
+        "withdrawEffect": "Ja to atsaucat, jūsu jau atšifrētie teikumi zaudē tekstu un vārdu, un turpmāk jūsu balss netiek ierakstīta atsevišķā celiņā un netiek atšifrēta.",
+        "needsRecording": "To var dot pēc piekrišanas ierakstam."
+      }
+    }
   },
   "qa": {
     "title": "Jautājumi un atbildes",
@@ -833,7 +901,6 @@
         "coverImageHelp": "Tiek rādīts publiskajā lapā un e-pastos reģistrētajiem dalībniekiem.",
         "scheduleHeading": "Kalendārs",
         "timezone": "Laika josla",
-        "recurrenceHeading": "Atkārtošanās",
         "tagsHeading": "Kategorijas (tagi)",
         "newTag": "Jauna kategorija",
         "newTagLabel": "Jaunās kategorijas nosaukums",
@@ -878,11 +945,11 @@
           "BALANCED": "Līdzsvarota (540p)",
           "SAVE_DATA": "Datu taupīšana (360p)"
         },
-        "requiredLegend": "Ar * atzīmētie lauki vajadzīgi pasākuma saglabāšanai: kamēr tie ir tukši, tas norādīts pie katra lauka.",
         "kickerHint": "Lai pievienotu virsvirsrakstu, rakstiet to pirms virsraksta un atdaliet ar |, piemēram, “Tikšanās cikls | Pirmā tikšanās”.",
         "kickerUse": "Rādīt “{kicker}” kā virsvirsrakstu",
         "kickerPreview": "Tā tas izskatās pasākuma lapā",
-        "coverImageSize": "16:9, ieteicams 1600 × 900 pikseļi."
+        "coverImageSize": "16:9, ieteicams 1600 × 900 pikseļi.",
+        "requiredNote": "Ar * atzīmētie lauki ir obligāti."
       },
       "step2": {
         "heading": "Kurš ko var darīt",
@@ -923,11 +990,11 @@
         "roomFeaturesHeading": "Telpas funkcijas",
         "aiPipelineOff": "MI pēcapstrāde (transkripcija, kopsavilkums, tulkojumi) šajā instalācijā nav ieslēgta.",
         "rolesHeading": "Pasākuma lomas",
-        "roleModeratorColumn": "Organizators un moderators",
+        "roleModeratorColumn": "Līdzorganizators un moderators",
         "roleInfo": {
           "organizer": {
-            "name": "Organizators",
-            "desc": "Vada telpu kā moderators un ir norādīts starp organizatoriem. Galvenais organizators pievieno un noņem pārējās personas. Ar darbinieka kontu ar to pašu e-pastu viņš pārvalda arī pasākumu."
+            "name": "Līdzorganizators",
+            "desc": "Vada telpu kā moderators un ir minēts starp organizētājiem. Ar darbinieka kontu ar to pašu e-pastu pārvalda arī pasākumu."
           },
           "moderator": {
             "name": "Moderators",
@@ -939,10 +1006,17 @@
           },
           "guest": {
             "name": "Dalībnieks",
-            "desc": "Seko pasākumam un piedalās tā, kā nolemjat tabulā zemāk."
+            "desc": "Seko pasākumam un piedalās tā, kā jūs izlemjat solī “Atļaujas”."
           }
         },
-        "recordingManualNote": "Ieraksts nekad nesākas pats: vadītājs to sāk ar pogu REC."
+        "recordingManualNote": "Ieraksts nekad nesākas pats: vadītājs to sāk ar pogu REC.",
+        "listenOnlyWithoutConsent": "Kas nepiekrīt, ieiet tikai klausīties",
+        "listenOnlyWithoutConsentOn": "Piekrišana ierakstīšanai ir brīvprātīga: kas to nedod, tomēr piedalās, seko un raksta tērzēšanā, bet mikrofons, kamera un ekrāns paliek izslēgti.",
+        "listenOnlyWithoutConsentOff": "Bez piekrišanas ierakstīšanai neviens netiek iekšā.",
+        "listenOnlyLockedLive": "Kamēr telpa var būt atvērta, ierakstīšanu un tikai klausīšanos nevar mainīt: tās ir spēkā no pirmās ieiešanas.",
+        "audienceAnonymous": "Anonīma auditorija",
+        "audienceAnonymousDesc": "Dalībnieki citiem redzami ar pseidonīmu (“Dalībnieks” un kods) video, tērzēšanā un jautājumos; dalībnieku saraksts paliek vadītājiem, un laukuma nav. Noderīgi lieliem pasākumiem; kopienas pasākumos cilvēki vēlas iepazīties.",
+        "audienceAnonymousLocked": "Kamēr telpa var būt atvērta, to nevar mainīt: tas sasaistītu pseidonīmus ar vārdiem."
       },
       "step3": {
         "heading": "Personas un ielūgumi",
@@ -960,23 +1034,23 @@
         "remove": "Noņemt",
         "invalidEmail": "Nederīga e-pasta adrese.",
         "duplicateEmail": "Adrese jau ir pievienota.",
-        "rubricaPick": "Meklēt no kontaktu grāmatas…",
+        "rubricaPick": "Meklēt adrešu grāmatā pēc organizācijas…",
         "rubricaOrAdd": "vai pievienot manuāli",
         "removeItem": "Noņemt {name}",
         "invitationsStaffOnly": "Ielūgumus pārvalda pasākuma komanda.",
         "pickSkipped": "Dažas personas jau bija sarakstā vai tām nebija derīgas adreses, tāpēc tās netika pievienotas.",
-        "primaryHeading": "Galvenais organizators",
+        "primaryHeading": "Galvenais moderators",
         "primaryHelp": "Saņem pa e-pastu pasākuma galveno saiti: vada telpu un pievieno vai noņem pārējās personas. Vārds un e-pasts vajadzīgi publicēšanai, ne melnrakstam.",
-        "primaryPrefilled": "Galvenais organizators esat jūs, ar sava konta vārdu un e-pastu. Ja pasākumu vada cita persona, ierakstiet šeit tās datus: saite tiks nosūtīta tai.",
-        "primaryNameRequired": "Ievadiet galvenā organizatora vārdu.",
-        "primaryEmailRequired": "Ievadiet derīgu galvenā organizatora e-pastu.",
+        "primaryPrefilled": "Galvenais moderators esat jūs, ar sava konta vārdu un e-pastu. Ja pasākumu vada kāds cits, ierakstiet šeit viņa datus: saite tiks nosūtīta viņam.",
+        "primaryNameRequired": "Ievadiet galvenā moderatora vārdu.",
+        "primaryEmailRequired": "Ievadiet derīgu galvenā moderatora e-pastu.",
         "linksOnPublish": "Personīgās saites tiek nosūtītas pa e-pastu publicējot; kamēr pasākums ir melnraksts, kopējiet tās no tā lapas.",
         "personName": "Vārds",
         "personEmail": "E-pasts",
-        "peopleHeading": "Pasākuma personas",
-        "peopleHelp": "Organizatori, moderatori un runātāji. Katrs saņem savu saiti, lai ienāktu ar savu lomu; ko katra loma var darīt, parāda sadaļa “Papildu iestatījumi”.",
+        "peopleHeading": "Moderatori un runātāji",
+        "peopleHelp": "Līdzorganizatori, moderatori un runātāji. Katrs saņem savu saiti, lai ienāktu ar savu lomu; ko var katra loma, ir paskaidrots augstāk.",
         "personRole": "Loma",
-        "roleOrganizer": "Organizators",
+        "roleOrganizer": "Līdzorganizators",
         "roleModerator": "Moderators",
         "roleSpeaker": "Runātājs",
         "roleHelp": {
@@ -1015,7 +1089,7 @@
         "programMinutesFor": "Plānotās minūtes, tēma {n}",
         "programTimeUnknown": "Laiks nav aprēķināts: iepriekšējai tēmai nav ilguma",
         "programNone": "Neviens",
-        "programLeadOrganizer": "Galvenais organizators",
+        "programLeadOrganizer": "Galvenais moderators",
         "programMoveUp": "Pārvietot {n}. tēmu uz augšu",
         "programMoveDown": "Pārvietot {n}. tēmu uz leju",
         "programRemove": "Noņemt {n}. tēmu",
@@ -1029,8 +1103,8 @@
         "programSpeakerRemoved": "Tēmas bez runātāja, jo persona noņemta no pasākuma: {count}.",
         "programFrozen": "Darba kārtība telpā jau izmantota: šeit to redzat, bet maina telpā.",
         "programPerson": "{name} ({role})",
-        "invitationsHelpOpen": "Pēc izvēles: jūsu uzaicināto personu saraksts. Reģistrācija ir atvērta, tāpēc pēc publicēšanas var reģistrēties ikviens, uzaicināts vai nē. Platforma nesūta ielūgumus: kopīgojiet pasākuma saiti paši.",
-        "invitationsHelpRestricted": "Reģistrācija ir ierobežota: reģistrēties var tikai šī saraksta adreses. Platforma nesūta ielūgumus: kopīgojiet pasākuma saiti paši; ieejas saite pienāk pa e-pastu pēc reģistrācijas.",
+        "invitationsHelpOpen": "Cilvēki, kurus uzaicināt jūs. Reģistrācija ir atvērta: reģistrēties var ikviens, uzaicināts vai nē. Pēc publicēšanas no pasākuma lapas nosūtāt viņiem ielūgumu pa e-pastu.",
+        "invitationsHelpRestricted": "Reģistrēties var tikai šī saraksta adreses. Pēc publicēšanas no pasākuma lapas katram nosūtāt ielūgumu pa e-pastu ar reģistrācijas saiti; ieejas saite pienāk pēc reģistrācijas.",
         "logoExternal": "Publiskajā lapā redzami tikai šajā platformā augšupielādēti logotipi: logotips no citas vietnes netiks rādīts.",
         "primaryProfileInvalid": "Pārbaudiet organizāciju un logotipa adresi.",
         "primaryMore": "Fotoattēls, iestāde, logotips un publiskā lapa",
@@ -1048,7 +1122,9 @@
         "editQuestions": "Rediģēt",
         "editQuestionsBefore": "Rediģēt reģistrācijas jautājumus",
         "editQuestionsAfter": "Rediģēt apmierinātības aptauju",
-        "accessStaffOnly": "Kas var reģistrēties, izlemj pasākuma komanda."
+        "accessStaffOnly": "Kas var reģistrēties, izlemj pasākuma komanda.",
+        "whoOrganizes": "Kas organizē",
+        "rubricaWho": "Adrešu grāmatā ir cilvēki, kuri reģistrējās pasākumam un piekrita tajā palikt."
       },
       "step4": {
         "heading": "Saturs un materiāli",
@@ -1124,9 +1200,9 @@
           "multitrack": "Ieraksts katram dalībniekam",
           "multitrackOn": "Ieslēgts — nepieciešama skaidra piekrišana reģistrācijas laikā",
           "organizingEntities": "Organizējošās iestādes",
-          "primaryOrganizer": "Galvenais organizators",
+          "primaryOrganizer": "Galvenais moderators",
           "primaryMissing": "Lai publicētu, jānorāda solī “Personas”",
-          "organizersPeople": "Citi organizatori",
+          "organizersPeople": "Līdzorganizatori",
           "moderators": "Moderatori",
           "programme": "Programma: {count, plural, zero {# tēmu} one {# tēma} other {# tēmas}}",
           "programmeWithDuration": "Programma: {count, plural, zero {# tēmu} one {# tēma} other {# tēmas}}, {duration}"
@@ -1175,7 +1251,8 @@
           "invites": "Personas",
           "programme": "Programma",
           "review": "Kopsavilkums",
-          "advanced": "Papildu iestatījumi"
+          "advanced": "Papildu iestatījumi",
+          "permissions": "Atļaujas"
         },
         "templateInUse": "Veidne: <b>{name}</b>",
         "noTemplate": "Pasākums bez veidnes",
@@ -1187,18 +1264,16 @@
         "recordingManual": "Pieejams: sākas tikai tad, kad vadītājs nospiež REC.",
         "aiAfter": "Pēc ieraksta: {list}.",
         "scheduleHeading": "Kad tas notiek",
-        "scheduleIntro": "Datums, laiks un gaidāmais cilvēku skaits: pēc tiem sagatavo zāli.",
+        "scheduleIntro": "Kad notiek pasākums: datums, laiks un laika josla.",
         "advancedIntro": "Veidnes jau izvēlētās vērtības: mainiet tikai vajadzīgo.",
         "advancedIntroTemplate": "Veidnes “{name}” jau izvēlētās vērtības: mainiet tikai vajadzīgo.",
-        "requiredToSave": "Vajadzīgs, lai saglabātu pasākumu.",
         "requiredToPublish": "Vajadzīgs, lai publicētu pasākumu.",
         "toComplete": "Jāaizpilda",
         "missingHeading": "Publicēšanai vēl trūkst:",
-        "fieldOrganizerName": "Galvenā organizatora vārds",
-        "fieldOrganizerEmail": "Galvenā organizatora e-pasts",
+        "fieldOrganizerName": "Galvenā moderatora vārds",
+        "fieldOrganizerEmail": "Galvenā moderatora e-pasts",
         "fieldProgrammeMinutes": "Programmas {n}. tēmas ilgums",
         "sections": {
-          "participation": "Dalība un zāles funkcijas",
           "recording": "Ieraksts un MI",
           "content": "Saturs: materiāli un anketas",
           "room": "Uzgaidāmā telpa un video",
@@ -1230,7 +1305,17 @@
         "askEmail": "e-pasts",
         "askOrganization": "organizācija",
         "askRole": "amats",
-        "askType": "organizācijas veids"
+        "askType": "organizācijas veids",
+        "permissionsHeading": "Kas ko var darīt telpā",
+        "permissionsIntro": "Ko var darīt dalībnieki un kuras telpas funkcijas ir ieslēgtas. Visu var mainīt arī pasākuma laikā.",
+        "consentsLine": "Piekrišanas reģistrējoties un telpā: {list}",
+        "consentRecordingRequired": "ieraksts, obligāts, lai ienāktu",
+        "consentRecordingFree": "ieraksts, brīvprātīgs (bez tā tikai klausīšanās)",
+        "consentRecordingNotice": "par ierakstu tikai paziņojums (dalībnieki nerunā un nav redzami)",
+        "consentTranscription": "savas runas atšifrēšana, brīvprātīga",
+        "consentsNone": "Nav citu piekrišanu kā tikai reģistrācijas.",
+        "consentsHosts": "Vadītājiem un runātājiem ierakstu jautā telpā, brīvprātīgi.",
+        "consentsWithdraw": "Dalībnieki tās var atsaukt telpā ar pogu “Piekrišanas”."
       },
       "preview": {
         "title": "Lapas priekšskatījums",
@@ -1242,8 +1327,8 @@
       },
       "programme": {
         "heading": "Sanāksmes programma",
-        "intro": "Tēmas secībā: kurš uzstājas, par ko un cik ilgi. Tās redzamas zem apraksta, ar laikiem, kas aprēķināti no sākuma ({start}). Nav obligāti.",
-        "introNoStart": "Tēmas secībā: kurš uzstājas, par ko un cik ilgi. Tās redzamas zem apraksta, ar laikiem, kas aprēķināti no pasākuma sākuma. Nav obligāti.",
+        "intro": "Tēmas secībā: kurš uzstājas, par ko un cik ilgi. Tās redzamas zem apraksta, ar laikiem, kas aprēķināti no sākuma ({start}).",
+        "introNoStart": "Tēmas secībā: kurš uzstājas, par ko un cik ilgi. Tās redzamas zem apraksta, ar laikiem, kas aprēķināti no pasākuma sākuma.",
         "statusOn": "Redzama pasākuma lapā, un telpā visiem rāda pašreizējo tēmu.",
         "statusOff": "Izslēgta: programma nav redzama ne lapā, ne telpā.",
         "turnOn": "Ieslēgt",
@@ -1287,7 +1372,8 @@
         "offKeptEdit": "Kamēr programma ir izslēgta, spēkā ir pēdējā saglabātā versija: šeit veiktās izmaiņas tiek saglabātas tikai tad, ja to atkal ieslēdzat.",
         "toggleOffWarningCreate": "Izslēgta programma ({count, plural, zero {# tēmu} one {# tēma} other {# tēmas}}) lapā nav redzama un netiek saglabāta kopā ar pasākumu: ieslēdziet to, lai to paturētu.",
         "reviewOffCreate": "Programma: izslēgta, netiek saglabāta kopā ar pasākumu ({count, plural, zero {# tēmu} one {# tēma} other {# tēmas}})"
-      }
+      },
+      "saveCopy": "Saglabāt kopiju"
     },
     "nav": {
       "events": "Pasākumi",
@@ -1313,7 +1399,6 @@
       "publicationsList": "Publikācijas",
       "publicationsNew": "Jauna publikācija",
       "ariaLabel": "Administrēšanas navigācija",
-      "subNavAriaLabel": "Sadaļas navigācija",
       "questionnaires": "Anketas",
       "questionnairesLibrary": "Anketu veidnes",
       "questionnairesResponses": "Atbildes",
@@ -1332,7 +1417,9 @@
       "video": "Video",
       "glossary": "Glosārijs",
       "breadcrumbAriaLabel": "Navigācijas ceļš",
-      "skipToPage": "Pāriet uz lapas saturu"
+      "skipToPage": "Pāriet uz lapas saturu",
+      "openMenu": "Atvērt izvēlni",
+      "closeMenu": "Aizvērt izvēlni"
     },
     "publications": {
       "subtitle": "Vienots redakcionālais centrs visiem publicētajiem video: plānoti pasākumi, ātrie zvani, augšupielādēti vēsturiski arhīvi un sesijas, kas gaida publicēšanu.",
@@ -1488,7 +1575,8 @@
       "actions": {
         "DATA_DELETED": "Dati dzēsti",
         "CONSENT_RECORDED": "Piekrišana reģistrēta",
-        "DATA_EXPORTED": "Dati eksportēti"
+        "DATA_EXPORTED": "Dati eksportēti",
+        "CONSENT_WITHDRAWN": "Piekrišana atsaukta"
       },
       "recordsAffected": "{count} ietekmēti ieraksti",
       "colWhen": "Kad",
@@ -1610,13 +1698,6 @@
     "deleteSuccess": "Pasākums dzēsts",
     "publishSuccess": "Pasākums publicēts",
     "unpublishSuccess": "Publicēšana atsaukta",
-    "startEvent": "Sākt pasākumu",
-    "startEventSuccess": "Pasākums sākts! Gaidošie dalībnieki tiks automātiski novirzīti.",
-    "startEventConfirmTitle": "Sākt pasākumu?",
-    "startEventConfirmMessage": "Plānotais sākums: {when}. Ikviens, kam ir saite, var pievienoties uzreiz, un video telpa tiek palaista tagad.",
-    "startEventConfirmEarly": "Līdz sākumam ir vairāk nekā 30 minūtes.",
-    "startEventFailed": "Pasākums netika sākts. Mēģiniet vēlreiz.",
-    "jvbWarmupWarning": "Video serveri tiek startēti (aptuveni 2 minūtes). Dalībnieki redzēs paziņojumu gaidīšanas telpā.",
     "eventIsLive": "Pasākums notiek",
     "liveParticipants": "{count} telpā / {max} maks.",
     "joinAsModeratorBtn": "Pievienoties kā moderators",
@@ -1654,7 +1735,6 @@
         "expected": "{count, plural, zero {gaidīto dalībnieku} one {gaidītais dalībnieks} other {gaidītie dalībnieki}}",
         "registered": "{count, plural, =0 {pagaidām neviena reģistrējušā} zero {līdz šim # reģistrējušos} one {līdz šim # reģistrējies} other {līdz šim # reģistrējušies}}",
         "change": "Mainīt",
-        "changeParticipants": "Mainīt gaidīto dalībnieku skaitu",
         "sizedOnRegistrations": "Reģistrējušos ir vairāk nekā gaidīto dalībnieku: novērtējumā ir ieskaitīti {count} reģistrējušies.",
         "cameraQuestion": "Cik tīmekļa kameru būs ieslēgtas?",
         "camera": {
@@ -1866,7 +1946,7 @@
       "guestJoinHint": "Ātrā saite, lai pēdējā brīdī uzaicinātu dalībnieku: tas pievienojas kā viesis, kamēr pasākums ir tiešsaistē, neaizpildot reģistrācijas formu.",
       "callInvite": "Saite dalībniekiem",
       "callInviteHint": "Saņēmējs pievienojas zvanam kā viesis, bez reģistrācijas. Ātrajam zvanam nav publiskas lapas: šī ir kopīgojamā saite.",
-      "moderatorLink": "Moderatora saite",
+      "moderatorLink": "Pārvaldības saite (moderators)",
       "moderatorLinkHint": "Kopīgojiet šo saiti tikai ar moderatoriem. Ikviens ar šo saiti var pārvaldīt pasākumu.",
       "liveRoomHint": "Tieša saite, lai ieietu telpā kā moderators.",
       "copyLink": "Kopēt saiti",
@@ -1876,7 +1956,8 @@
       "warning": "Ikviens, kam ir šī saite, pārvalda pasākumu: nerādiet to, koplietojot ekrānu, un neielīmējiet to tērzēšanā.",
       "hidden": "Saite ir paslēpta",
       "copyFailed": "Kopēšana neizdevās: atlasiet tālāk norādīto adresi un kopējiet to manuāli.",
-      "notYetPublished": "Darbojas tikai pēc publicēšanas: līdz tam tiek rādīts “lapa nav atrasta”."
+      "notYetPublished": "Darbojas tikai pēc publicēšanas: līdz tam tiek rādīts “lapa nav atrasta”.",
+      "copyFailedShort": "Neizdevās nokopēt"
     },
     "feedbackAdmin": {
       "title": "Atsauksmju rezultāti",
@@ -1952,7 +2033,8 @@
       "actions": {
         "DATA_DELETED": "Dati dzēsti",
         "CONSENT_RECORDED": "Piekrišana reģistrēta",
-        "DATA_EXPORTED": "Dati eksportēti"
+        "DATA_EXPORTED": "Dati eksportēti",
+        "CONSENT_WITHDRAWN": "Piekrišana atsaukta"
       }
     },
     "settings": {
@@ -2266,9 +2348,9 @@
     },
     "recurrence": {
       "label": "Atkārtošanās",
-      "helpText": "Padariet pasākumu atkārtotu. Sākot no sākuma datuma tiks izveidota sērija.",
+      "helpText": "Ja pasākums atkārtojas, to dublējot, kopija piedāvā nākamās reizes datumu.",
       "preset": {
-        "none": "Nav",
+        "none": "Neatkārtojas",
         "daily": "Katru dienu",
         "weekly": "Katru nedēļu",
         "weekdays": "Darba dienās",
@@ -2322,7 +2404,6 @@
       "aiTranscript": "Automātiskā transkripcija (noklusējums)",
       "aiSummary": "Automātiskais kopsavilkums (noklusējums)",
       "aiTranslation": "Automātiskā tulkošana (noklusējums)",
-      "pickerTitle": "Izvēlieties veidni",
       "pickerSubtitle": "Izvēlieties veidni, lai iepriekš konfigurētu pasākuma iestatījumus, vai izlaidiet, lai visu konfigurētu manuāli.",
       "skipTemplate": "Konfigurēt manuāli",
       "postEventPublic": "Publiska lapa pēc pasākuma",
@@ -2701,10 +2782,7 @@
       "resultsCount": "{count, plural, =0 {Nav pasākumu} one {# pasākums} other {# pasākumi}}",
       "menu": {
         "actionsFor": "Darbības: “{title}”",
-        "manage": "Pārvaldīt",
         "edit": "Rediģēt",
-        "openPublic": "Atvērt publisko lapu",
-        "newTab": "(atveras jaunā cilnē)",
         "copyLink": "Kopēt publisko saiti",
         "linkCopied": "Saite nokopēta",
         "publish": "Publicēt",
@@ -2713,7 +2791,7 @@
         "unpublishMessage": "“{title}” pazudīs no publiskajām lapām, līdz to publicēsiet vēlreiz. Jau saņemtās reģistrācijas tiek saglabātas.",
         "published": "Pasākums publicēts",
         "unpublished": "Publicēšana atsaukta",
-        "duplicate": "Dublēt kā nākamo reizi",
+        "duplicate": "Dublēt",
         "delete": "Dzēst",
         "deleteTitle": "Dzēst pasākumu?",
         "deleteMessage": "“{title}” un visi tā dati tiks dzēsti. Šo darbību nevar atsaukt.",
@@ -2771,7 +2849,6 @@
       "participantHintPassword": "Atveras jaunā cilnē: telpa tāda, kādu to redz viesis, pēc pasākuma paroles.",
       "participantHintPage": "Atveras jaunā cilnē: publiskā lapa tāda, kādu to redz dalībnieki.",
       "editEvent": "Rediģēt pasākumu",
-      "editSettings": "Rediģēt iestatījumus",
       "featureSummary": "Aktīvās funkcijas",
       "organizers": "Organizatori",
       "privacyGdpr": "Privātums un VDAR",
@@ -2824,9 +2901,9 @@
       "aiGenerateError": "Neizdevās palaist MI konveijeru. Pārbaudiet, vai MI ir iespējots vietnes līmenī un vai pastāv ieraksts.",
       "aiGenerateHelp": "Ar vienu klikšķi iespējo MI transkripciju un kopsavilkumu un palaiž konveijeru ierakstam. Idempotents: divkāršs klikšķis darbus nedublē.",
       "aiGenerateNoRecording": "Nav ieraksta: pēcpasākuma MI ir nepieciešams ieraksts (uzņemšana notiek tikai pasākuma laikā). Pēcapstrādi joprojām varat pārvaldīt šeit.",
-      "duplicateNext": "Izveidot kopiju nākamajai reizei",
+      "duplicateNext": "Dublēt",
       "duplicateNextBusy": "Notiek kopēšana…",
-      "duplicateNextHint": "Izveido melnrakstu ar visu šī pasākuma konfigurāciju (ieraksts, atsevišķi celiņi, MI, darba kārtība, atgādinājumi). Ja pasākumam ir noteikts atkārtošanās biežums, datums tiek pārcelts uz nākamo reizi; pretējā gadījumā tas jānorāda jums.",
+      "duplicateNextHint": "Izveido melnraksta kopiju ar visiem šī pasākuma iestatījumiem. Ja pasākums atkārtojas, kopija sākas ar nākamo reizi; pretējā gadījumā tai ir tie paši datumi, kas jāatjaunina.",
       "duplicateNextError": "Kopiju neizdevās izveidot. Mēģiniet vēlreiz.",
       "capacitySection": "Ietilpība un infrastruktūra",
       "capacitySubtitle": "Paredzēts aptuveni {max} gaidāmajiem dalībniekiem",
@@ -2838,11 +2915,12 @@
         "publishFailedTitle": "Publicēšana neizdevās",
         "publishFailedBody": "Pasākums ir saglabāts kā melnraksts: publicējiet to šajā lapā, kad problēma būs atrisināta.",
         "unsaved": "Nav saglabāti: {items}. Varat tos pievienot šajā lapā.",
-        "copyParticipantLink": "Kopēt dalībnieku saiti",
         "sendToSpeakers": "Moderatoru un runātāju saites",
         "close": "Aizvērt kopsavilkumu",
         "publishNow": "Publicēt tūlīt"
-      }
+      },
+      "editFeatures": "Rediģēt funkcijas",
+      "editPrivacy": "Rediģēt privātumu un datus"
     },
     "rubrica": {
       "subtitle": "Personas, kas devušas piekrišanu iekļaušanai kontaktu grāmatā (VDAR 6.1.a pants). Profila informācija tiek atjaunināta automātiski katrā atkārtotā reģistrācijā.",
@@ -3450,6 +3528,7 @@
     "guided": {
       "title": "Kāds ir jūsu pasākums?",
       "intro": "Četri jautājumi, lai sāktu ar pareizajiem iestatījumiem. Katru funkciju var ieslēgt vai izslēgt arī pasākuma laikā.",
+      "introNoRecording": "Trīs jautājumi, lai sāktu ar pareizajiem iestatījumiem. Katru funkciju var ieslēgt vai izslēgt arī pasākuma laikā.",
       "peopleQ": "Cik cilvēkus jūs gaidāt?",
       "people": {
         "piccolo": "Līdz 20",
@@ -3474,9 +3553,7 @@
       "preview": "Jūsu pasākums",
       "previewPeople": "Gaidāmie dalībnieki: aptuveni {count}",
       "continue": "Turpināt",
-      "useTemplate": "Vai izmantojiet veidni",
-      "instantAlt": "Vai tūlītējs videozvans",
-      "instantAltAction": "Izveidot videozvanu",
+      "useTemplate": "Sākt no veidnes",
       "summary": {
         "piccolo": "Līdz 20 cilvēkiem",
         "medio": "Līdz 100 cilvēkiem",
@@ -3492,10 +3569,12 @@
       "access": {
         "open": "Ikviens, kas reģistrējas",
         "openDesc": "Kas vēlas, reģistrējas pasākuma lapā",
-        "invitation": "Tikai jūsu uzaicinātie",
-        "invitationDesc": "Lapa paliek redzama, bet reģistrēties var tikai uzaicinātie; bez reģistrācijas iekļūt nevar"
+        "invitation": "Tikai uzaicinātie",
+        "invitationDesc": "Lapa paliek redzama, bet reģistrēties var tikai sarakstā esošie; ielūgumu ar reģistrācijas saiti sūtāt pa e-pastu no pasākuma lapas"
       },
-      "previewInvitation": "Reģistrēties var tikai jūsu uzaicinātie; bez reģistrācijas neviens netiek iekšā."
+      "previewInvitation": "Reģistrējas tikai uzaicinātie; bez reģistrācijas neviens netiek iekšā.",
+      "templateReplaces": "Veidne atnes savus iestatījumus zemāk esošo atbilžu vietā. Nosaukumu, datumus un personas ierakstāt nākamajos soļos.",
+      "instantBack": "Tā vietā izveidot plānotu pasākumu"
     },
     "captionsTranscript": {
       "title": "Atšifrējums no subtitriem",
@@ -3584,10 +3663,21 @@
       "status": "Statuss",
       "roleSpeaker": "Runātājs",
       "registered": "Reģistrējies",
-      "notRegistered": "Vēl nav reģistrējies",
       "organizersTitle": "Rīkotājiestādes",
       "organizersEdit": "Rediģēt iestādes",
-      "organizersEmpty": "Nav norādīta neviena iestāde: publiskajā lapā nav redzams, kas rīko."
+      "organizersEmpty": "Nav norādīta neviena iestāde: publiskajā lapā nav redzams, kas rīko.",
+      "sendAll": "Sūtīt ielūgumu tiem, kas to vēl nav saņēmuši ({count})",
+      "sending": "Sūta…",
+      "sendDone": "Sūtītie ielūgumi: {sent}. Izlaisti (jau reģistrējušies vai bez adreses): {skipped}.",
+      "sendError": "Sūtīšana neizdevās: mēģiniet vēlreiz.",
+      "sendNotPublished": "Ielūgumi tiek sūtīti, kamēr pasākums pieņem reģistrācijas: pēc publicēšanas un pirms beigām.",
+      "invitedOn": "Uzaicināts {date}",
+      "notInvited": "Ielūgums nav nosūtīts",
+      "send": "Sūtīt ielūgumu",
+      "resend": "Sūtīt vēlreiz",
+      "actions": "Darbības",
+      "sendTooMany": "Pārāk daudz sūtījumu īsā laikā: mēģiniet pēc minūtes.",
+      "sendRemaining": "Atlikuši {remaining}: nospiediet vēlreiz, lai tos nosūtītu."
     },
     "closing": {
       "title": "Noslēgt pasākumu",
@@ -3803,6 +3893,56 @@
         "item": "{language}: {state}",
         "review": "Pārskatīt tekstus"
       }
+    },
+    "voiceConsent": {
+      "title": "Transkribēt visu ierakstu?",
+      "message": "Šis pasākums lūdza katram piekrišanu viņa teiktā transkribēšanai. Viss ieraksts satur visas balsis, arī to, kas piekrišanu nedeva: transkribējiet to tikai tad, ja visi, kas tajā runā, ir piekrituši. Jūsu apstiprinājums paliek darbību žurnālā.",
+      "confirm": "Jā, visi piekrita",
+      "cancel": "Atcelt",
+      "waiting": "Visa ieraksta transkripcija nesākās pati: šis pasākums lūdza katram piekrišanu viņa teiktā transkribēšanai. Sāciet to ar pogu {button} tikai tad, ja visi, kas runā ierakstā, ir piekrituši; pretējā gadījumā paliek transkripcija no subtitriem."
+    },
+    "editCopyTitle": "Pasākuma kopija",
+    "editCopyNoticeNext": "Jūs strādājat ar melnraksta kopiju: sākotnējais pasākums nemainās. Datums jau ir nākamās reizes datums: pārbaudiet pārējo un saglabājiet.",
+    "editCopyNoticeSameDates": "Jūs strādājat ar melnraksta kopiju: sākotnējais pasākums nemainās. Tai ir tie paši datumi kā oriģinālam: atjauniniet tos pirms saglabāšanas.",
+    "consentProofs": {
+      "title": "Piekrišanu pierādījumi",
+      "intro": "Piekrišanas ierakstam un atšifrēšanai, kas dotas reģistrējoties, uzgaidāmajā telpā vai telpā, un atsauktās. Saraksts ar vārdiem kalpo to pierādīšanai.",
+      "loading": "Ielādē…",
+      "loadFailed": "Piekrišanu pierādījumus neizdevās ielādēt.",
+      "none": "Šim pasākumam nav piekrišanu ierakstam vai atšifrēšanai.",
+      "kinds": {
+        "recording": "Ieraksts",
+        "transcription": "Runas atšifrēšana"
+      },
+      "counts": "piekrīt {given} · atsaukuši {withdrawn}",
+      "download": "Lejupielādēt sarakstu (CSV)",
+      "downloading": "Lejupielādē…",
+      "downloadNote": "Sarakstā ir personu vārdi: eksportēšana tiek reģistrēta pasākuma VDAR žurnālā.",
+      "downloadFailed": "Sarakstu neizdevās lejupielādēt: mēģiniet vēlreiz.",
+      "csv": {
+        "kind": "Piekrišana",
+        "source": "Kur",
+        "role": "Loma",
+        "name": "Vārds",
+        "givenAt": "Dota",
+        "withdrawnAt": "Atsaukta",
+        "textVersion": "Teksta versija",
+        "kinds": {
+          "recording": "Ieraksts",
+          "transcription": "Runas atšifrēšana"
+        },
+        "sources": {
+          "registration": "reģistrācija",
+          "room": "telpa"
+        },
+        "roles": {
+          "registrant": "reģistrējies",
+          "guest": "viesis",
+          "host": "vada vai runā"
+        },
+        "unreadableName": "(vārds nav nolasāms)"
+      },
+      "countsNote": "Tiek skaitītas personas: reģistrācija, darbinieka konts vai personalizēta saite tiek skaitīta vienreiz; viesis, kurš atgriežas citā apmeklējumā, tiek skaitīts vēlreiz."
     }
   },
   "email": {
@@ -3837,7 +3977,9 @@
     "upcoming": {
       "title": "Gaidāmie pasākumi",
       "viewAll": "Skatīt visus pasākumus",
-      "noEvents": "Nav ieplānotu pasākumu. Atgriezieties drīz!"
+      "noEvents": "Nav ieplānotu pasākumu. Atgriezieties drīz!",
+      "seePast": "Pagātnes pasākumi",
+      "seeRecordings": "Ieraksti"
     },
     "howItWorks": {
       "title": "Kā piedalīties",
@@ -4187,9 +4329,11 @@
       "recordingRequired": "Lai piedalītos šajā pasākumā, ir nepieciešama piekrišana ierakstīšanai",
       "recordingNotice": "Pasākums tiek ierakstīts (audio un video). Jūs piedalāties bez mikrofona un kameras: ierakstā nav jūsu balss vai attēla, ja vien vadītājs jums nedod vārdu.",
       "multitrack": "Piekrītu, ka manas uzstāšanās tiek atšifrētas ar manu vārdu pasākuma pārskatam. Ja pasākumā katram cilvēkam tiek ierakstīts atsevišķs audio celiņš, mana balss tiek ierakstīta tikai šim nolūkam un celiņš pēc atšifrēšanas tiek dzēsts; to neizmanto manas balss identificēšanai vai atveidošanai.",
-      "multitrackOptional": "Tas nav obligāti: ja nepiekrītat, jūs tik un tā varat piedalīties, bet jūsu balss netiek ierakstīta un jūsu teiktais neietilpst atšifrējumā.",
+      "multitrackOptional": "Tas nav obligāti: ja nepiekrītat, jūs tik un tā piedalāties, bet jūsu teiktais netiek iekļauts transkripcijā un jūsu balss netiek ierakstīta atsevišķā celiņā. Ja pasākums tiek ierakstīts, jūsu balss tomēr paliek video.",
       "stayInTouch": "Vēlos saņemt informāciju par gaidāmajiem pasākumiem un tikt iekļauts adrešu grāmatā, lai mani aicinātu uz līdzīgiem pasākumiem",
-      "stayInTouchHelp": "Brīvprātīga piekrišana (VDAR 6.1.a pants). To var jebkurā laikā atsaukt ar saiti “Izņemt mani no adrešu grāmatas” saņemtajos e-pastos. Vārds un organizācija ir no šīs reģistrācijas."
+      "stayInTouchHelp": "Brīvprātīga piekrišana (VDAR 6.1.a pants). To var jebkurā laikā atsaukt ar saiti “Izņemt mani no adrešu grāmatas” saņemtajos e-pastos. Vārds un organizācija ir no šīs reģistrācijas.",
+      "recordingOptionalListenOnly": "Ja nepiekrītat, jūs tomēr piedalāties, tikai klausoties: sekojat un rakstāt tērzēšanā, bet mikrofons, kamera un ekrāna kopīgošana paliek izslēgti. Piekrist varat vēlāk, no telpas.",
+      "recordingOptionalHost": "Ja nepiekrītat, jūs tik un tā ieejat un vadāt kā parasti, bet jūsu balss netiek saglabāta personu ierakstos un transkripcijā. Telpas video, ja tas tiek ierakstīts, jūs tik un tā iekļauj."
     },
     "export": {
       "title": "Mani dati",
@@ -4852,11 +4996,13 @@
     "transparency": "Drošība un pārredzamība",
     "serviceInventory": "Pakalpojumu inventārs",
     "sourceCode": "Avota kods",
-    "buildInfoDev": "izstrādes būvējums",
-    "viewCommit": "Skatīt commit GitHub",
     "viewRelease": "Skatīt laidienu GitHub",
     "viewChangelog": "Skatīt jaunumus (izmaiņu žurnālu)",
-    "buildDatePrefix": "Izveidots"
+    "newWindow": "atveras jaunā logā",
+    "usefulLinks": "Noderīgas saites",
+    "version": "Versija {version}",
+    "versionDev": "Izstrādes versija",
+    "updatedOn": "atjaunināta {date}"
   },
   "changelog": {
     "metaTitle": "Jaunumi un izmaiņu žurnāls",
@@ -5023,7 +5169,9 @@
       "version": "Konveijera versija"
     },
     "overlapBadge": "vienlaikus",
-    "overlapTitle": "Vienlaicīga runa: šajā intervālā vienlaikus runā vairāk nekā viena persona."
+    "overlapTitle": "Vienlaicīga runa: šajā intervālā vienlaikus runā vairāk nekā viena persona.",
+    "anonymousSpeaker": "Dalībnieks {n}",
+    "untranscribed": "Nav transkribēts: runātājs nedeva piekrišanu"
   },
   "waiting": {
     "startsIn": "Pasākums sāksies pēc",
@@ -5087,9 +5235,6 @@
     "endedWatchRecording": "Skatīties ierakstu",
     "endedLeaveFeedback": "Atstāt atsauksmes",
     "startEventError": "Kļūda, sākot pasākumu. Mēģiniet vēlreiz.",
-    "emailLabel": "E-pasts (neobligāts)",
-    "emailHelp": "Tikai iespējamai pēcpasākuma saziņai",
-    "emailInvalid": "Lūdzu, ievadiet derīgu e-pasta adresi",
     "chatLockedMessage": "Ievadiet savu vārdu, lai piedalītos pasākuma tērzēšanā.",
     "classicView": "Klasiskais skats",
     "backToGarden": "Rādīt laukumu",
@@ -5322,7 +5467,12 @@
     "waitingForStartButton": "Gaida sākumu",
     "countdownHours": "{hours} st.",
     "countdownMinutes": "{minutes} min",
-    "countdownSeconds": "{seconds} s"
+    "countdownSeconds": "{seconds} s",
+    "startEarlyConfirm": "Līdz plānotajam sākumam ({when}) ir vairāk nekā 30 minūtes. Sākot tagad, ikviens ar saiti uzreiz ienāks un video telpa ieslēgsies: nospiediet vēlreiz, lai apstiprinātu.",
+    "startEarlyYes": "Sākt tagad",
+    "startEarlyNo": "Gaidīt plānoto laiku",
+    "anonymousNameHelp": "Šajā pasākumā auditorija ir anonīma: citi neredz jūsu vārdu, bet pseidonīmu ar kodu.",
+    "registeredNameHelp": "Šis ir vārds, ar kuru reģistrējāties: tā jūs redzēs telpā."
   },
   "recording": {
     "management": "Video ieraksts",

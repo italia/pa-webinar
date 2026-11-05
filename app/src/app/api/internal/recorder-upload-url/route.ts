@@ -23,7 +23,7 @@ import { multitrackRecordingPrefix } from '@/lib/recorder/lifecycle';
 export const dynamic = 'force-dynamic';
 
 const bodySchema = z.object({
-  recordingId: z.string().uuid(),
+  recordingId: z.guid(),
   blobKey: z.string().min(1).max(1_024),
   contentType: z.string().min(1).max(120).default('audio/ogg'),
 });

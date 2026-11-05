@@ -132,7 +132,7 @@ export const PATCH = withErrorHandling(async (request, context) => {
     id: message.id,
     eventId: event.id,
     // Mai l'id grezzo: la domanda di un ospite porterebbe il suo IP a tutta la sala.
-    senderKey: senderColourKey(message.senderId),
+    senderKey: senderColourKey(message.senderId, event.id),
     senderName: tryDecryptPII(message.senderName) ?? message.senderName,
     isModerator: message.isModerator,
     text: tryDecryptPII(message.text) ?? message.text,

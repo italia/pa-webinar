@@ -94,6 +94,17 @@ interface JitsiTokenPayload {
   mediaLock?: MediaLock;
   /** Audio e video pieni senza moderare: il relatore, ammesso subito. */
   mediaExempt?: boolean;
+  /**
+   * I mezzi per cui la persona e' ammessa senza aspettare chi modera: chi
+   * partecipa avendo dato il consenso alla registrazione, per cio' che
+   * l'evento concede (vale quando l'evento ha il solo ascolto per chi non
+   * acconsente, e il blocco riguarda ogni mezzo: lib/live/listen-only).
+   */
+  mediaAdmit?: MediaLock;
+  /** In solo ascolto: senza consenso alla registrazione, mai ammesso. */
+  listenOnly?: boolean;
+  /** Evento con il solo ascolto: la sala non toglie i blocchi. */
+  consentLock?: boolean;
 }
 
 /** Microfono, videocamera, condivisione dello schermo: true = bloccato. */
@@ -201,6 +212,9 @@ export async function generateJitsiJwt(
         moderator: payload.isModerator ? 'true' : 'false',
         ...(payload.mediaLock ? { mediaLock: payload.mediaLock } : {}),
         ...(payload.mediaExempt ? { mediaExempt: true } : {}),
+        ...(payload.mediaAdmit ? { mediaAdmit: payload.mediaAdmit } : {}),
+        ...(payload.listenOnly ? { listenOnly: true } : {}),
+        ...(payload.consentLock ? { consentLock: true } : {}),
       },
       features,
     },
@@ -237,25 +251,34 @@ const POSTO_ISCRITTO = /^reg-([0-9a-f-]{36})-[0-9a-f]+$/i;
  * Il posto in sala provato da un token della sala: un token che il portale ha
  * firmato per questa stanza (`room`) e consegnato a chi e' entrato. Vale anche
  * scaduto da meno di un giorno: la valutazione arriva a fine evento, quando il
- * token di chi e' entrato all'inizio e' gia' scaduto. Non vale il token di chi
- * modera (chi conduce non valuta l'evento). Restituisce l'identificativo del
+ * token di chi e' entrato all'inizio e' gia' scaduto. Il token di chi modera
+ * non vale (chi conduce non valuta l'evento), salvo `ancheChiModera`: il
+ * ritiro dei consensi riguarda ogni posto. Restituisce l'identificativo del
  * posto (`context.user.id`) e, per un iscritto, l'iscrizione che contiene.
  * Null se il token non e' nostro, non e' di questa stanza o e' troppo vecchio.
  */
 export async function postoDaTokenSala(
   token: string,
   roomName: string,
-): Promise<{ posto: string; iscrizioneId: string | null } | null> {
+  /** Vale anche il token di chi modera: per il ritiro dei consensi, che
+   *  riguarda ogni posto (lib/live/consent-withdrawal). */
+  opzioni: { ancheChiModera?: boolean } = {},
+): Promise<{ posto: string; iscrizioneId: string | null; listenOnly: boolean } | null> {
   try {
     const { payload } = await jwtVerify(token, getJitsiJwtSecret(), {
       issuer: getJitsiJwtIssuer(),
       audience: getJitsiJwtAudience(),
       clockTolerance: PROVA_PRESENZA_SECONDI,
     });
-    if (payload.room !== roomName || payload.moderator === true) return null;
-    const id = (payload.context as { user?: { id?: unknown } } | undefined)?.user?.id;
+    if (payload.room !== roomName || (payload.moderator === true && !opzioni.ancheChiModera)) return null;
+    const user = (payload.context as { user?: { id?: unknown; listenOnly?: unknown } } | undefined)?.user;
+    const id = user?.id;
     if (typeof id !== 'string' || id.length === 0) return null;
-    return { posto: id, iscrizioneId: POSTO_ISCRITTO.exec(id)?.[1] ?? null };
+    return {
+      posto: id,
+      iscrizioneId: POSTO_ISCRITTO.exec(id)?.[1] ?? null,
+      listenOnly: user?.listenOnly === true,
+    };
   } catch {
     return null;
   }
@@ -266,8 +289,11 @@ export async function postoDaTokenSala(
  * Each call produces a different ID so multiple moderator tabs are
  * treated as separate participants.
  */
+/** Il prefisso del posto di chi conduce o interviene con un link da moderatore. */
+export const PREFISSO_POSTO_MODERATORE = 'mod-';
+
 export function moderatorJitsiId(eventId: string): string {
-  return `mod-${eventId}-${randomUUID().slice(0, 8)}`;
+  return `${PREFISSO_POSTO_MODERATORE}${eventId}-${randomUUID().slice(0, 8)}`;
 }
 
 /**

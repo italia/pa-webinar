@@ -23,6 +23,15 @@ describe('GET /api/jitsi-branding.json', () => {
     expect(body.avatarBackgrounds).not.toContain(body.backgroundColor);
   });
 
+  it('notifiche chiare per il testo scuro di Jitsi, barra dei comandi scura, con i nomi di ogni versione', async () => {
+    const { palette } = (await (await GET()).json()).customTheme;
+    // 10741 legge `ui10` e `ui01`, le versioni successive i nomi per funzione.
+    expect(palette.notificationBackground).toBe('#FFFFFF');
+    expect(palette.ui10).toBe(palette.notificationBackground);
+    expect(palette.toolboxBackground).toBe(palette.ui01);
+    expect(palette.toolboxBackground).not.toBe((await (await GET()).json()).backgroundColor);
+  });
+
   it('gli sfondi della piattaforma, con indirizzi assoluti, nel pulsante degli sfondi di Jitsi', async () => {
     vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://webinar.ente.example/');
     try {

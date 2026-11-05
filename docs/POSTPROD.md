@@ -210,11 +210,11 @@ there is work: the GPU node pool scales to zero between runs.
 
 | Input | Trigger | Root job |
 |---|---|---|
-| Composite recording | Jibri's finalize script calls `POST /api/webhooks/recording` (bearer `CRON_API_KEY`, plus an HMAC signature when `RECORDING_WEBHOOK_SECRET` is set; see [Recording](architecture/recording.md)). The portal creates the `CallSession` and `Recording` rows and enqueues when the event has `aiTranscriptEnabled`. If the event already has a per-participant recording, the webhook only attaches the MP4 to it and enqueues nothing. | `TRANSCRIBE` |
+| Composite recording | Jibri's finalize script calls `POST /api/webhooks/recording` (bearer `CRON_API_KEY`, plus an HMAC signature when `RECORDING_WEBHOOK_SECRET` is set; see [Recording](architecture/recording.md)). The portal creates the `CallSession` and `Recording` rows and enqueues when the event has `aiTranscriptEnabled`. If the event already has a per-participant recording, the webhook only attaches the MP4 to it and enqueues nothing. On an event where each person was asked for the transcription consent, the composite video holds voices of people who said no: the webhook enqueues nothing, logs a warning, and answers `postprodAwaitsVoiceConsent: true`; the recording page says so next to **Generate AI** ([Recordings, voice data and AI outputs](privacy/recordings-and-ai.md#transcript-from-live-captions)). | `TRANSCRIBE` |
 | Per-participant tracks | The recorder bot calls `POST /api/internal/multitrack-manifest` at the end of the event. The portal stores one `RecordingTrack` per track and enqueues. A silence guard marks the recording `POSTPROD_FAILED` instead when every track is silent. | `TRANSCRIBE_MULTITRACK` |
-| **End for everyone** | The moderator ticks **Generate AI transcript and summary from the recording (once processing finishes)**. The event gets `aiTranscriptEnabled` and `aiSummaryEnabled`, and the webhook enqueues when the recording arrives. The checkbox appears only when the event records, the site switch is on and the event already uses an AI option. | as above |
-| **Generate AI now** (event page) and **Generate AI** (recording page) | `POST /api/admin/events/<id>/generate-ai` and `POST /api/admin/postprod/recordings/<id>/generate-ai` turn on transcription and summary for the event and enqueue in the same transaction, for a recording that already exists. The event-page route acts on the event's newest recording with a media file. | detected |
-| **Re-run** | `POST /api/admin/postprod/recordings/<id>/rerun` bumps the run counter and enqueues a new run. | detected |
+| **End for everyone** | The moderator ticks **Generate AI transcript and summary from the recording (once processing finishes)**. The event gets `aiTranscriptEnabled` and `aiSummaryEnabled`, and the webhook enqueues when the recording arrives, except on an event with the per-voice transcription consent (see the row above). The checkbox appears only when the event records, the site switch is on and the event already uses an AI option. | as above |
+| **Generate AI now** (event page) and **Generate AI** (recording page) | `POST /api/admin/events/<id>/generate-ai` and `POST /api/admin/postprod/recordings/<id>/generate-ai` turn on transcription and summary for the event and enqueue in the same transaction, for a recording that already exists. The event-page route acts on the event's newest recording with a media file. The optional JSON body takes `summary`, `translation` (recording route only) and `allVoicesConsented`, all booleans; other fields are ignored and a body that is not JSON counts as empty. On the composite video of an event with the per-voice transcription consent, the routes answer `409 VOICE_CONSENT_REQUIRED` until `allVoicesConsented: true` confirms that everyone who speaks in it has consented; the confirmation goes to the admin audit log. | detected |
+| **Re-run** | `POST /api/admin/postprod/recordings/<id>/rerun` bumps the run counter and enqueues a new run. Same body field `allVoicesConsented` and same `409` as above. | detected |
 | **Add language** | `POST /api/admin/postprod/recordings/<id>/translations` enqueues one `TRANSLATE` job, and a `DUB` job when the event has dubbing on. | none |
 | **Generate archive** | `POST /api/admin/postprod/recordings/<id>/archive` enqueues one `ARCHIVE` job. | none |
 | **Generate the report** (event page, **After the event** tab) | `POST /api/admin/events/<id>/report` enqueues one `REPORT` job for an ended event within its data retention ([The event report](#the-event-report)). | none |
@@ -1158,6 +1158,11 @@ points to this section.
      --from-literal=HF_TOKEN=<hugging-face-read-token>
    ```
 
+   Each installation creates its own token, of type **Read**, at
+   <https://huggingface.co/settings/tokens>; the repository ships none. Use an
+   account of your organization, because the models stop being downloadable
+   when a personal account goes away.
+
    Set `postprod.worker.hfTokenSecret.name: hf-token`. The token must belong to
    an account that accepted the conditions of the gated pyannote models:
    `pyannote/speaker-diarization-3.1`, `pyannote/segmentation-3.0` and
@@ -1565,7 +1570,7 @@ their own events ([ADR-014](adr/014-organizer-role.md)).
 |---|---|---|
 | **Generate AI** | Turns on transcription and summary for the event and enqueues. The recording page shows it only for `READY` recordings; the event page's **Generate AI now** is always shown once the event has ended and has a recording. Repeating it on a finished run leaves the recording `POSTPROD_QUEUED` ([Idempotency and runs](#idempotency-and-runs)). Refused with `409` when the recording's transcript from live captions was corrected by hand. | `POSTPROD_RERUN` |
 | **Re-run** | New run: bumps `runCount`, sets `POSTPROD_QUEUED`, enqueues a full graph. Refused while the event has transcription off, and with `409` when the recording's transcript from live captions was corrected by hand. | `POSTPROD_RERUN` |
-| **Cancel** | Marks every `PENDING`, `CLAIMED` and `RUNNING` job of the recording `FAILED` (`cancelled by admin`) and the recording `POSTPROD_FAILED` | `POSTPROD_CANCEL` |
+| **Cancel** | Marks every `PENDING`, `CLAIMED` and `RUNNING` job of the recording `FAILED` (`cancelled by admin`). A recording still `POSTPROD_QUEUED` or `POSTPROD_RUNNING` becomes `POSTPROD_FAILED`; any other status stays, so stopping an added language does not hide outputs already public | `POSTPROD_CANCEL` |
 | **Add language** | One `TRANSLATE` job for a language other than the source, plus `DUB` if dubbing is on. The tab offers the languages enabled on the site that are not yet translated. Needs an existing `TRANSCRIPT_JSON`. | `POSTPROD_TRANSLATE_ADD` |
 | **Generate archive** | One `ARCHIVE` job. Needs unpurged tracks and the composite MP4: without tracks it is refused with `NO_PARTICIPANT_TRACKS`, with tracks but no composite MP4 (the room video was not recorded, or has not been uploaded yet) with `RECORDING_WITHOUT_VIDEO`, and the tab then lists each track on its own player instead. | `POSTPROD_ARCHIVE` |
 | Speaker mapping | Names a speaker label or links it to an address-book person | `POSTPROD_SPEAKER_MAP` |
@@ -2438,6 +2443,9 @@ Several of these are tracked in the [Roadmap](ROADMAP.md).
   ([checklist](#operational-checklist), step 3).
 - **The worker image has no release tag.** It is published only as `:dev`
   and `:dev-<sha>` ([Roadmap](ROADMAP.md#installation-and-operations)).
+- **No transcription on CPU.** The worker loads WhisperX on `cuda` and offers
+  no setting to change it. A workstation GPU can run it: see
+  [AI on your own hardware](install/minikube.md#ai-on-your-own-hardware).
 - **No post-production on a single VM**, and without `postprod.enabled` no
   job deletes per-participant tracks
   ([Scheduled and background jobs](architecture/background-jobs.md)).

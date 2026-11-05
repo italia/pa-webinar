@@ -359,7 +359,7 @@ erDiagram
     boolean completed "true only for DONE"
     int plannedMinutes "optional"
     uuid speakerGrantId FK "who speaks, a named grant (SetNull)"
-    boolean speakerPrimary "the lead organizer speaks"
+    boolean speakerPrimary "the lead moderator speaks"
   }
   AGENDA_ITEM_REACTION {
     uuid id PK

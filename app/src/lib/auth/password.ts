@@ -37,6 +37,9 @@ export function verifyJoinPassword(plaintext: string, hash: string): boolean {
   try {
     const salt = Buffer.from(parts[1], 'hex');
     const key = Buffer.from(parts[2], 'hex');
+    // Hex non valido decodifica a un buffer vuoto, e due buffer vuoti sono
+    // uguali: un hash guasto aprirebbe con qualunque password.
+    if (salt.length !== SALT_BYTES || key.length !== KEY_BYTES) return false;
     const candidate = scryptSync(plaintext, salt, key.length);
     return timingSafeEqual(key, candidate);
   } catch {

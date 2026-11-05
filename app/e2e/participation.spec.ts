@@ -2,6 +2,8 @@ import { randomUUID } from 'crypto';
 
 import { test, expect, type APIRequestContext } from '@playwright/test';
 
+import { accediComeAdmin } from './helpers/accesso-admin';
+
 /**
  * Le funzioni di chi partecipa, provate sull'applicazione in esecuzione
  * attraverso le stesse rotte che usa la sala: domande e risposte, sondaggi,
@@ -24,7 +26,7 @@ let evento: {
 
 async function preparaEvento(request: APIRequestContext) {
   if (evento) return evento;
-  const login = await request.post('/api/admin/login', { data: { key: ADMIN_KEY } });
+  const login = await accediComeAdmin(request, ADMIN_KEY);
   expect(login.ok(), `login: ${login.status()}`).toBeTruthy();
   const titolo = `E2E partecipazione ${randomUUID().slice(0, 8)}`;
   const inizio = Date.now() + 3_600_000;
@@ -207,9 +209,9 @@ test('lingue: dalla pagina dell’evento in italiano a quella in inglese', async
   const { slug } = await preparaEvento(request);
   await page.goto(`/it/eventi/${slug}`);
   await expect(page.locator('html')).toHaveAttribute('lang', 'it');
-  // Con molte lingue attive il selettore e' un pulsante che apre l'elenco.
-  const scelta = page.getByRole('button', { name: /^Cambia lingua/ });
-  if (await scelta.isVisible()) await scelta.click();
+  // Il selettore e' il menu dello slim header: il pulsante con la lingua
+  // attiva apre l'elenco.
+  await page.getByRole('button', { name: /^Lingua attiva/ }).click();
   await page.locator('a[lang="en"]').first().click();
   // Gli URL sono localizzati, non solo i testi.
   await expect(page).toHaveURL(new RegExp(`/en/events/${slug}$`));

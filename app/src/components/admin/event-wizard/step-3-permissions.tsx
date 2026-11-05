@@ -30,6 +30,10 @@ export interface StepPermissionsValue {
   permissionMatrix: PermissionMatrix;
   recordingEnabled: boolean;
   autoStartRecording: boolean;
+  /** Chi non acconsente alla registrazione entra in solo ascolto. */
+  listenOnlyWithoutConsent: boolean;
+  /** Pubblico anonimo: chi partecipa compare con uno pseudonimo. */
+  audienceAnonymous: boolean;
   /** Agenda/note live (checklist opt-in). */
   agendaEnabled: boolean;
   /** Nuvola di parole live (opt-in). */
@@ -69,6 +73,9 @@ interface Props {
   /** I sottotitoli live ci sono nell'installazione: senza, l'interruttore
    *  non si mostra (non c'e' niente da accendere). */
   liveCaptionsAvailable?: boolean;
+  /** L'installazione puo' registrare. Senza, la registrazione non si propone:
+   *  si mostra solo se l'evento ce l'ha gia' accesa, per poterla spegnere. */
+  recordingAvailable?: boolean;
   /** Porta alle lingue dell'evento, nel passo «Evento». */
   onCambiaLingue?: () => void;
   /** La post-produzione AI e' accesa sull'installazione? Spenta, le sue
@@ -83,6 +90,9 @@ interface Props {
    *  automatico si mostra solo su un evento che ce l'ha gia' acceso, per
    *  poterlo spegnere. */
   showAutoStart?: boolean;
+  /** La sala e' aperta: il solo ascolto non si cambia (lo decide il primo
+   *  ingresso, mod_pa_media_lock). */
+  soloAscoltoBloccato?: boolean;
   /** Quale parte mostrare, fra le impostazioni avanzate: chi puo' fare cosa e
    *  le funzioni della sala, oppure registrazione e post-produzione AI. */
   parte: 'partecipazione' | 'registrazione';
@@ -127,10 +137,12 @@ export default function StepPermissions({
   fieldErrors = {},
   whiteboardInfraReady,
   liveCaptionsAvailable = false,
+  recordingAvailable = true,
   onCambiaLingue,
   aiPipelineEnabled = true,
   editing = false,
   showAutoStart = false,
+  soloAscoltoBloccato = false,
   parte,
   programma,
 }: Props) {
@@ -151,28 +163,42 @@ export default function StepPermissions({
   };
 
   const visibleFeatures = EVENT_FEATURES.filter(
-    (f) => f !== 'recording_control' || value.recordingEnabled,
+    (f) => f !== 'recording_control' || (value.recordingEnabled && recordingAvailable),
   );
 
-  // Le due sezioni delle impostazioni avanzate: hanno il titolo nella
-  // sezione che le contiene.
+  // Le due parti: il passo «Permessi» (partecipazione e funzioni della sala)
+  // e una sezione delle impostazioni avanzate; il titolo lo mette chi le
+  // contiene.
   if (parte === 'partecipazione') {
     return (
       <div>
-      {/* I ruoli, dal più ampio: chi li ha lo decide il passo «Persone». */}
-      <section className="wizard-roles mb-4" aria-labelledby="wiz-roles-title">
-        <h3 id="wiz-roles-title" className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
-          {t('rolesHeading')}
-        </h3>
-        <dl className="wizard-roles__list mb-0">
-          {(['organizer', 'moderator', 'speaker', 'guest'] as const).map((r) => (
-            <div key={r} className="wizard-roles__item">
-              <dt>{t(`roleInfo.${r}.name`)}</dt>
-              <dd>{t(`roleInfo.${r}.desc`)}</dd>
-            </div>
-          ))}
-        </dl>
-      </section>
+      {/* I ruoli e che cosa fanno stanno nel passo «Persone», dove si
+          assegnano; qui la tabella di cio' che puo' fare ciascuno. */}
+
+      {/* Pubblico anonimo: per gli eventi grandi. Negli eventi di comunita'
+          ci si vuole riconoscere, per questo parte spento. */}
+      <div className="py-2 mb-3 d-flex justify-content-between align-items-start" style={{ borderBottom: '1px solid #e8e8e8' }}>
+        <div className="me-3">
+          <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
+            {t('audienceAnonymous')}
+          </div>
+          <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
+            {t('audienceAnonymousDesc')}
+          </div>
+        </div>
+        <ToggleSwitch
+          label=""
+          ariaLabel={t('audienceAnonymous')}
+          checked={value.audienceAnonymous}
+          disabled={soloAscoltoBloccato}
+          onChange={() => onChange({ audienceAnonymous: !value.audienceAnonymous })}
+        />
+      </div>
+      {soloAscoltoBloccato && (
+        <p className="text-secondary" style={{ fontSize: '0.85rem' }}>
+          {t('audienceAnonymousLocked')}
+        </p>
+      )}
 
       <div className="table-responsive mb-4">
         <table
@@ -357,6 +383,14 @@ export default function StepPermissions({
     );
   }
 
+  if (!recordingAvailable && !value.recordingEnabled) {
+    return (
+      <p className="text-secondary mb-0" style={{ fontSize: '0.85rem' }}>
+        {tAdmin('recording.notConfigured')}
+      </p>
+    );
+  }
+
   return (
     <div>
       {/* Recording toggles (global) */}
@@ -378,6 +412,7 @@ export default function StepPermissions({
             label=""
             ariaLabel={tAdmin('form.recordingEnabled')}
             checked={value.recordingEnabled}
+            disabled={soloAscoltoBloccato}
             onChange={() =>
               onChange({
                 recordingEnabled: !value.recordingEnabled,
@@ -396,6 +431,36 @@ export default function StepPermissions({
         {value.recordingEnabled && !value.autoStartRecording && (
           <p className="text-secondary mb-0 py-2" style={{ fontSize: '0.85rem', borderTop: '1px solid #e8e8e8' }}>
             {t('recordingManualNote')}
+          </p>
+        )}
+
+        {/* Il consenso alla registrazione e' libero: chi non lo da' entra lo
+            stesso, in solo ascolto. Spento, senza consenso non si entra. */}
+        {value.recordingEnabled && (
+          <div
+            className="py-2 d-flex justify-content-between align-items-start"
+            style={{ borderTop: '1px solid #e8e8e8' }}
+          >
+            <div className="me-3">
+              <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
+                {t('listenOnlyWithoutConsent')}
+              </div>
+              <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
+                {value.listenOnlyWithoutConsent ? t('listenOnlyWithoutConsentOn') : t('listenOnlyWithoutConsentOff')}
+              </div>
+            </div>
+            <ToggleSwitch
+              label=""
+              ariaLabel={t('listenOnlyWithoutConsent')}
+              checked={value.listenOnlyWithoutConsent}
+              disabled={soloAscoltoBloccato}
+              onChange={() => onChange({ listenOnlyWithoutConsent: !value.listenOnlyWithoutConsent })}
+            />
+          </div>
+        )}
+        {soloAscoltoBloccato && (
+          <p className="text-secondary mb-0 pb-2" style={{ fontSize: '0.85rem' }}>
+            {t('listenOnlyLockedLive')}
           </p>
         )}
 

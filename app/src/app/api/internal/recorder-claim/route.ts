@@ -15,22 +15,24 @@
 
 import { z } from 'zod';
 
-import { withErrorHandling } from '@/lib/api-handler';
+import { parseJsonBody, withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { prisma } from '@/lib/db';
-import { NotFoundError } from '@/lib/errors';
+import { NotFoundError, ValidationError } from '@/lib/errors';
 import { generateJitsiJwt } from '@/lib/auth/jwt';
 import { recorderSeat } from '@/lib/recorder/seat';
 import { RECORDER_DISPLAY_NAME } from '@/lib/jitsi/participants';
 
 export const dynamic = 'force-dynamic';
 
-const bodySchema = z.object({ recordingId: z.string().uuid() });
+const bodySchema = z.object({ recordingId: z.guid() });
 
 export const POST = withErrorHandling(async (request) => {
   assertCronApiKey(request);
 
-  const { recordingId } = bodySchema.parse(await request.json());
+  const parsed = bodySchema.safeParse(await parseJsonBody(request));
+  if (!parsed.success) throw new ValidationError('recordingId must be a UUID');
+  const { recordingId } = parsed.data;
 
   const recording = await prisma.recording.findUnique({
     where: { id: recordingId },

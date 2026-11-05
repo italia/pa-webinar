@@ -81,6 +81,8 @@ export const DUPLICATED_EVENT_FIELDS = [
   'privacyPolicyText',
   'gdprTemplateId',
   'recordingConsentText',
+  'listenOnlyWithoutConsent',
+  'audienceAnonymous',
 
   // recording & AI post-production
   'recordingEnabled',

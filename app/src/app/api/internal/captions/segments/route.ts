@@ -87,5 +87,22 @@ export const POST = withErrorHandling(async (request) => {
     });
   }
   const { count } = await prisma.captionSegment.createMany({ data: righe, skipDuplicates: true });
+  // Un ritiro dalla sala arrivato tra la lettura del consenso e il salvataggio
+  // (lib/live/consent-withdrawal) ha gia' ripulito le frasi di prima, non
+  // queste: si rilegge il consenso dopo il salvataggio e, se non vale piu',
+  // si tolgono testo, nome e posto anche a queste. Un ritiro che arriva dopo
+  // la rilettura le trova gia' salvate e le ripulisce lui.
+  const conTesto = [...new Set([...persone.values()].filter((p) => p.consenso.dato && p.seatId).map((p) => p.seatId!))];
+  const ritirati = [];
+  for (const seatId of conTesto) {
+    const ora = await consensoTrascrizione(event.id, seatId, VERSIONE_TESTO_TRASCRIZIONE);
+    if (!ora.dato) ritirati.push(seatId);
+  }
+  if (ritirati.length > 0) {
+    await prisma.captionSegment.updateMany({
+      where: { eventId: event.id, seatId: { in: ritirati } },
+      data: { seatId: null, speakerName: null, text: null },
+    });
+  }
   return Response.json({ stored: count });
 });

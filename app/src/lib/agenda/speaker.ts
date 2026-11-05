@@ -10,7 +10,7 @@ import { z } from 'zod';
 
 /** I due campi, facoltativi: assenti = nessuno. */
 export const agendaSpeakerSchema = z.object({
-  speakerGrantId: z.string().uuid().nullable().optional(),
+  speakerGrantId: z.guid().nullable().optional(),
   speakerPrimary: z.boolean().optional(),
 });
 

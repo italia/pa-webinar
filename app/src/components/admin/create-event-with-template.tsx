@@ -10,6 +10,7 @@ import {
   FORMATO_PREDEFINITO,
   codificaFormato,
   decodificaFormato,
+  formatoPossibile,
   presetDaFormato,
   type FormatoGuidato,
 } from '@/lib/events/guided-format';
@@ -83,6 +84,7 @@ interface Props {
   whiteboardInfraReady: boolean;
   /** I sottotitoli live ci sono nell'installazione (lib/captions/availability). */
   liveCaptionsAvailable?: boolean;
+  recordingAvailable?: boolean;
   defaultTargetLocales?: string | null;
   /** La post-produzione AI e' accesa sull'installazione. */
   aiPipelineEnabled?: boolean;
@@ -118,6 +120,7 @@ export default function CreateEventWithTemplate({
   siteDefaultVideoQuality,
   whiteboardInfraReady,
   liveCaptionsAvailable = false,
+  recordingAvailable = true,
   defaultTargetLocales = null,
   aiPipelineEnabled = true,
   textTranslationAvailable = false,
@@ -128,13 +131,13 @@ export default function CreateEventWithTemplate({
   formatoParam = null,
   scegliParam = null,
 }: Props) {
-  const t = useTranslations('admin.templates');
   const tg = useTranslations('admin.guided');
-  const ti = useTranslations('admin.instantCall');
   const router = useRouter();
   const [showInstant, setShowInstant] = useState(initialInstant);
+  const [modelliAperti, setModelliAperti] = useState(false);
   // Le quattro risposte nell'indirizzo: aprono il wizard con i loro valori.
-  const formato: FormatoGuidato | null = selectedTemplate ? null : decodificaFormato(formatoParam);
+  const letto = selectedTemplate ? null : decodificaFormato(formatoParam);
+  const formato: FormatoGuidato | null = letto && formatoPossibile(letto, recordingAvailable);
 
   if (showInstant) {
     return (
@@ -144,7 +147,7 @@ export default function CreateEventWithTemplate({
           className="btn btn-outline-secondary btn-sm mb-4"
           onClick={() => setShowInstant(false)}
         >
-          ← {t('pickerTitle')}
+          ← {tg('instantBack')}
         </button>
         <CreateInstantCall />
       </div>
@@ -176,6 +179,7 @@ export default function CreateEventWithTemplate({
       siteDefaultVideoQuality={siteDefaultVideoQuality}
       whiteboardInfraReady={whiteboardInfraReady}
       liveCaptionsAvailable={liveCaptionsAvailable}
+      recordingAvailable={recordingAvailable}
       defaultTargetLocales={defaultTargetLocales}
       aiPipelineEnabled={aiPipelineEnabled}
       textTranslationAvailable={textTranslationAvailable}
@@ -232,37 +236,37 @@ export default function CreateEventWithTemplate({
           accessoPredefinito={publicRegistrationEnabled ? 'tutti' : 'invitati'}
           aiPipelineEnabled={aiPipelineEnabled}
           liveCaptionsAvailable={liveCaptionsAvailable}
+          recordingAvailable={recordingAvailable}
           onContinue={(f) => router.push(percorso(`/admin/events/new?formato=${codificaFormato(f)}`))}
+          // Il modello si sceglie prima di rispondere, non dopo: un'azione
+          // accanto al titolo. La videochiamata istantanea non sta qui: ha il
+          // suo pulsante nell'elenco degli eventi.
+          azioneTitolo={
+            templates.length > 0 ? (
+              <button
+                type="button"
+                className="btn btn-outline-primary btn-sm"
+                aria-expanded={modelliAperti}
+                aria-controls="formato-modelli"
+                onClick={() => setModelliAperti((v) => !v)}
+              >
+                {tg('useTemplate')}
+              </button>
+            ) : undefined
+          }
         >
           {templates.length > 0 && (
-            <details className="formato-modelli">
-              <summary>{tg('useTemplate')}</summary>
-              <div className="pt-3">
-                <TemplatePicker
-                  showSubtitle={false}
-                  templates={templates}
-                  onSelect={(tpl) => {
-                    router.push(percorso(`/admin/events/new?template=${tpl.id}`));
-                  }}
-                />
-              </div>
-            </details>
+            <div id="formato-modelli" className="formato-modelli" hidden={!modelliAperti}>
+              <p className="text-secondary small mb-3">{tg('templateReplaces')}</p>
+              <TemplatePicker
+                showSubtitle={false}
+                templates={templates}
+                onSelect={(tpl) => {
+                  router.push(percorso(`/admin/events/new?template=${tpl.id}`));
+                }}
+              />
+            </div>
           )}
-          {/* La videochiamata al volo e' un'alternativa, non lo scopo della
-              pagina: sta in fondo, accanto ai modelli, senza colori suoi. */}
-          <div className="formato-alternativa">
-            <span className="formato-alternativa__testo">
-              <span className="formato-alternativa__titolo">{tg('instantAlt')}</span>
-              <span className="formato-alternativa__desc">{ti('subtitle')}</span>
-            </span>
-            <button
-              type="button"
-              className="btn btn-outline-primary btn-sm"
-              onClick={() => setShowInstant(true)}
-            >
-              {tg('instantAltAction')}
-            </button>
-          </div>
         </GuidedFormat>
     </div>
   );

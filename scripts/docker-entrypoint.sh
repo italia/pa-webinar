@@ -39,7 +39,7 @@ fi
 # does not include npm/npx (stripped for security and image size).
 # Migrations must be applied before starting the app:
 #   - Kubernetes: via the db-migrate initContainer (see Helm chart)
-#   - Docker Compose: via the db-migrate service (profile: setup)
+#   - Docker Compose: via the db-migrate service
 #   - Manual: npx prisma migrate deploy (from the builder image)
 
 exec "$@"

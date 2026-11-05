@@ -101,6 +101,8 @@ interface WaitingRoomEvent {
    *  default). GARDEN = SVG garden, GAME = Phaser videogame lobby, CLASSIC =
    *  static accessible card. Defaults to GARDEN when absent. */
   waitingRoomEngine?: 'GARDEN' | 'GAME' | 'CLASSIC';
+  /** Pubblico anonimo: chi partecipa compare con uno pseudonimo. */
+  audienceAnonymous?: boolean;
   startsAt: string;
   endsAt: string;
   status: 'PUBLISHED' | 'LIVE' | 'ENDED' | 'IDLE' | 'PROVISIONING';
@@ -193,8 +195,16 @@ interface WaitingRoomProps {
   /** Chi conduce o interviene: la scelta di fotocamera e microfono si ricorda
    *  a parte da quella di chi assiste. Per tutti partono spenti. */
   conduce?: boolean;
+  /** Moderatore o relatore (non chi e' in una chiamata rapida): il consenso
+   *  alla registrazione gli si chiede libero, e la trascrizione dei propri
+   *  interventi vale solo insieme a quello. */
+  conduceDaIncarico?: boolean;
   jvbReady?: boolean | null;
   defaultName: string;
+  /** Chi entra dal proprio link d'iscrizione: in sala compare con il nome
+   *  dell'iscrizione (lo decide la rotta del token), quindi il campo non si
+   *  modifica e lo dice. */
+  nomeDellIscrizione?: boolean;
   /** Called when the user confirms "Entra ora" / "Guarda registrazione".
    *  The name the user typed is passed through so the parent can forward
    *  it to the JWT fetch (displayNameOverride / guestName). The pre-join
@@ -219,6 +229,8 @@ interface WaitingRoomProps {
    *  all'iscrizione (ospite dal link della sala, iscritto da un altro
    *  browser, iscritto prima che la registrazione fosse attivata). */
   recordingConsentRequired?: boolean;
+  /** Il consenso alla registrazione e' facoltativo: senza, solo ascolto. */
+  recordingConsentOptional?: boolean;
   /** Si registra, ma chi partecipa non ha ne' microfono, ne' videocamera, ne'
    *  schermo: il riepilogo lo dice, e non c'e' nulla da acconsentire. */
   recordingListenOnly?: boolean;
@@ -236,18 +248,18 @@ interface WaitingRoomProps {
 }
 
 const PARTICIPANT_NAME_KEY = 'pawebinar.participant.name';
+// L'email dell'ospite non si chiede piu' (non serviva a niente: restava
+// nel browser). Una vecchia copia salvata si cancella all'apertura.
 const PARTICIPANT_EMAIL_KEY = 'pawebinar.participant.email';
 // Accessibility fallback: when set, the waiting room renders the static
 // scrollable card instead of the full-screen walkable park. New key on
 // purpose so the legacy `pawebinar.garden.hidden=1` from earlier builds
 // no longer disables the (now default) game experience.
 const ARCADE_CLASSIC_KEY = 'pawebinar.arcade.classic';
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /** Il campo su cui portare il fuoco per ciascun blocco. */
 const CAMPO_DEL_BLOCCO: Record<BloccoModulo, string> = {
   name: 'waiting-name',
-  email: 'waiting-email',
   recording: 'waiting-recording-consent',
 };
 /** La casella della trascrizione dei propri interventi: facoltativa, non blocca. */
@@ -258,7 +270,6 @@ const LUNGA_ACCENSIONE_S = 6 * 60;
 /** Il messaggio che spiega ciascun blocco: descrive il campo e il pulsante. */
 const MESSAGGIO_DEL_BLOCCO: Record<BloccoModulo, string> = {
   name: 'waiting-name-required',
-  email: 'waiting-email-invalid',
   recording: 'waiting-recording-consent-required',
 };
 
@@ -274,9 +285,11 @@ export default function WaitingRoom({
   condivisione,
   role,
   conduce = false,
+  conduceDaIncarico = false,
   mediaConcessi = { microfono: true, fotocamera: true },
   jvbReady,
   defaultName,
+  nomeDellIscrizione = false,
   onEnterLive,
   onStartEvent,
   onLeaveFeedback,
@@ -284,6 +297,7 @@ export default function WaitingRoom({
   exitHref,
   multitrackConsentExempt = false,
   recordingConsentRequired = false,
+  recordingConsentOptional = false,
   recordingListenOnly = false,
   recordingConsentText = null,
   privacy,
@@ -300,6 +314,9 @@ export default function WaitingRoom({
 
   const [countdown, setCountdown] = useState('');
   const [startingEvent, setStartingEvent] = useState(false);
+  // Avviare con molto anticipo apre la sala a chiunque abbia il link: lo si
+  // chiede una volta, qui sotto il pulsante.
+  const [confermaAnticipo, setConfermaAnticipo] = useState(false);
   const [watchingCatchUp, setWatchingCatchUp] = useState(false);
   const [pulseCountdown, setPulseCountdown] = useState(false);
   // PUBLISHED con orario di inizio già passato ma il moderatore non ha ancora
@@ -317,7 +334,6 @@ export default function WaitingRoom({
   // Diventa vero dopo aver letto il nome salvato nel browser: fino ad allora
   // un campo vuoto non vuol dire che il nome manchi.
   const [nomeNoto, setNomeNoto] = useState(false);
-  const [email, setEmail] = useState('');
   // Full-screen park (default) vs. static classic card (accessibility
   // fallback). Initialised false to match SSR, then synced from storage.
   const [classicView, setClassicView] = useState(false);
@@ -370,7 +386,7 @@ export default function WaitingRoom({
   // aggiunge i secondi tra un poll e l'altro.
   const [warmupElapsed, setWarmupElapsed] = useState<number | null>(null);
 
-  // Rehydrate name + email from localStorage on mount. Name is merged
+  // Rehydrate the name from localStorage on mount. Name is merged
   // with the server-provided default (registration displayName / grant
   // name) so anonymous guests get their last-typed name back while
   // registered participants still see the accurate greeting.
@@ -381,10 +397,7 @@ export default function WaitingRoom({
       if (storedName && !defaultName) {
         setName(storedName);
       }
-      const storedEmail = window.localStorage.getItem(PARTICIPANT_EMAIL_KEY);
-      if (storedEmail) {
-        setEmail(storedEmail);
-      }
+      window.localStorage.removeItem(PARTICIPANT_EMAIL_KEY);
     } catch {
       /* private mode / blocked storage → fall back to defaults */
     }
@@ -406,7 +419,7 @@ export default function WaitingRoom({
       // PHONES (coarse pointer AND narrow viewport) default to the accessible
       // CLASSIC card: the walkable park + joystick don't work well on small
       // touch screens, and the classic layout shows the real controls (name,
-      // email, device check) inline instead of hiding them in the arcade
+      // device check) inline instead of hiding them in the arcade
       // drawer. Tablets (coarse pointer but wider than 768px) keep the rich
       // room. Precedence + the `?engine=` escape hatch live in the pure helper.
       const mode = resolveWaitingRoomMode({
@@ -466,8 +479,6 @@ export default function WaitingRoom({
   const canEnterLive = isLive;
   const trimmedName = name.trim();
   const nameValid = trimmedName.length >= 2;
-  const trimmedEmail = email.trim();
-  const emailValid = trimmedEmail.length === 0 || EMAIL_RE.test(trimmedEmail);
   // La trascrizione dei propri interventi, con il proprio nome: si chiede se
   // l'evento registra una traccia audio per persona (ADR-013) o tiene la
   // trascrizione dai sottotitoli. E' facoltativa e non ferma l'ingresso: chi
@@ -481,6 +492,13 @@ export default function WaitingRoom({
   // la piazza: il cancello passa dallo stesso controllo del pulsante, che
   // porta alla casella.
   const recordingRequired = recordingConsentRequired && !isEnded;
+  // Chiesto ma libero: senza la spunta si entra in solo ascolto, e il
+  // pulsante «Entra» non aspetta la casella.
+  const consensoBloccante = recordingRequired && !recordingConsentOptional;
+  // Chi conduce o interviene, in un evento che registra: la trascrizione dei
+  // propri interventi vale solo con il consenso alla registrazione (la rotta
+  // del token la ignora senza), quindi la casella si apre dopo quella.
+  const trascrizioneSospesa = conduceDaIncarico && recordingRequired && !recordingConsent;
   // La piazza e' disponibile quando c'e' qualcosa da fare e nessun cancello
   // davanti: a evento finito non serve, in vista classica e' stata rifiutata,
   // e senza consenso multitraccia non si va da nessuna parte.
@@ -522,6 +540,15 @@ export default function WaitingRoom({
   // contrario manderebbe le persone a sbattere con una promessa nostra.
   const salaPronta = pontePresunto;
   const ingressoConsentito = salaPronta || attesaLunga;
+  // Chi arriva quando si puo' gia' entrare non vede la chat: distrarrebbe
+  // dall'ingresso, e la stessa conversazione continua nella sala. Chi l'aveva
+  // gia' davanti mentre aspettava la tiene, con quello che stava scrivendo.
+  const [chatGiaMostrata, setChatGiaMostrata] = useState(false);
+  const ingressoPossibile = canEnterLive && ingressoConsentito;
+  useEffect(() => {
+    if (showChatPreview && !ingressoPossibile) setChatGiaMostrata(true);
+  }, [showChatPreview, ingressoPossibile]);
+  const chatNascosta = ingressoPossibile && !chatGiaMostrata;
 
   // L'apertura va notata. Il passaggio da «aspetta» a «entra» avviene mentre
   // la persona sta guardando altrove — la piazza, la chat, la propria
@@ -545,13 +572,13 @@ export default function WaitingRoom({
   } | null>(null);
   // Sala non pronta e modulo incompleto sono due ragioni diverse per non
   // entrare, con due risposte diverse: vedi lib/waiting-room/entry-state.
-  const { canEnter, bloccoModulo, nomeDaChiedere, nomeSegnalato, bloccoSpiegato } =
+  const { canEnter, bloccoModulo, nomeDaChiedere, nomeSegnalato, consensoSegnalato, bloccoSpiegato } =
     statoIngresso({
       canEnterLive,
       ingressoConsentito,
       nameValid,
-      emailValid,
-      recordingRequired,
+      // Il consenso facoltativo non trattiene l'ingresso.
+      recordingRequired: consensoBloccante,
       recordingConsent,
       ingressoTentato,
       nomeNoto,
@@ -710,6 +737,11 @@ export default function WaitingRoom({
   const [entraDopoAvvio, setEntraDopoAvvio] = useState<number | null>(null);
   const handleStartEvent = useCallback(async () => {
     if (!onStartEvent) return;
+    if (!confermaAnticipo && startsAtMs - Date.now() > 30 * 60_000) {
+      setConfermaAnticipo(true);
+      return;
+    }
+    setConfermaAnticipo(false);
     setStartingEvent(true);
     setStartError('');
     setEntraDopoAvvio(Date.now());
@@ -720,7 +752,7 @@ export default function WaitingRoom({
       setStartError(t('startEventError'));
       setStartingEvent(false);
     }
-  }, [onStartEvent, t]);
+  }, [onStartEvent, t, confermaAnticipo, startsAtMs]);
   // Il pulsante «Avvia evento» torna premibile a ogni cambio di stato: se la
   // sala si ferma (IDLE) e chi modera e' ancora qui, deve poterla riavviare.
   useEffect(() => {
@@ -737,7 +769,7 @@ export default function WaitingRoom({
   }, [bloccoModulo]);
 
   // L'unico cancello del modulo: il pulsante «Entra» resta premibile, quindi
-  // nome, email e consenso alla registrazione li trattiene questo controllo.
+  // nome e consenso alla registrazione li trattiene questo controllo.
   // Ogni ingresso passa di qui (waiting-room.test.tsx lo verifica).
   const handleEnterLive = useCallback(() => {
     if (!canEnter) {
@@ -749,11 +781,6 @@ export default function WaitingRoom({
     if (typeof window !== 'undefined') {
       try {
         window.localStorage.setItem(PARTICIPANT_NAME_KEY, trimmedName);
-        if (trimmedEmail) {
-          window.localStorage.setItem(PARTICIPANT_EMAIL_KEY, trimmedEmail);
-        } else {
-          window.localStorage.removeItem(PARTICIPANT_EMAIL_KEY);
-        }
       } catch {
         /* ignore */
       }
@@ -761,24 +788,26 @@ export default function WaitingRoom({
     onEnterLive(trimmedName, {
       ...devicePrefs,
       ...(recordingRequired && recordingConsent ? { recordingConsent: true } : {}),
-      ...(trascrizioneChiesta && multitrackConsent ? { multitrackConsent: true } : {}),
+      ...(trascrizioneChiesta && multitrackConsent && !trascrizioneSospesa
+        ? { multitrackConsent: true }
+        : {}),
     });
   }, [
     canEnter,
     segnalaCampoMancante,
     onEnterLive,
     trimmedName,
-    trimmedEmail,
     devicePrefs,
     recordingRequired,
     recordingConsent,
     trascrizioneChiesta,
     multitrackConsent,
+    trascrizioneSospesa,
   ]);
 
   // Si entra da soli solo quando tutto e' a posto davvero. Altrimenti resta
   // il clic, che e' il momento giusto per guardare cosa manca:
-  // - un campo da completare (nome, email, consenso): lo si segnala;
+  // - un campo da completare (nome, consenso): lo si segnala;
   // - la domanda facoltativa sulla trascrizione non ancora spuntata: entrare
   //   da soli la salterebbe, e la voce di chi conduce resterebbe fuori;
   // - il ponte video ancora in accensione: si aspetta, fino a due minuti dal
@@ -795,8 +824,13 @@ export default function WaitingRoom({
       segnalaCampoMancante();
       return;
     }
-    if (trascrizioneChiesta && !multitrackConsent) {
+    // Lo stesso per le domande facoltative ancora senza risposta.
+    if ((trascrizioneChiesta && !multitrackConsent) || (recordingRequired && !recordingConsent)) {
       setEntraDopoAvvio(null);
+      // Si dice perche' non si entra da soli: il fuoco va sulla domanda aperta.
+      document
+        .getElementById(recordingRequired && !recordingConsent ? CAMPO_DEL_BLOCCO.recording : CAMPO_TRASCRIZIONE)
+        ?.focus();
       return;
     }
     if (!salaAperta) return;
@@ -811,6 +845,8 @@ export default function WaitingRoom({
     bloccoModulo,
     trascrizioneChiesta,
     multitrackConsent,
+    recordingRequired,
+    recordingConsent,
     salaAperta,
     canEnter,
     handleEnterLive,
@@ -995,8 +1031,21 @@ export default function WaitingRoom({
   // pulsante spento non dice perche' lo e'. Qui si dice, accanto al campo —
   // prima come indicazione, dopo un tentativo come errore — e il campo lo
   // annuncia a chi usa un lettore di schermo.
+  // Il nome dell'iscrizione resta quello: un campo modificabile prometterebbe
+  // un cambio che la sala non applica. Solo se e' un nome valido per entrare,
+  // altrimenti va scritto (e la rotta usa quello scritto).
+  const nomeFisso = nomeDellIscrizione && !conduce && defaultName.trim().length >= 2;
+  // Una sola nota sotto il campo, quella che vale per chi entra.
+  const aiutoNome =
+    event.audienceAnonymous && !conduce
+      ? 'anonymousNameHelp'
+      : nomeFisso
+        ? 'registeredNameHelp'
+        : isGuest
+          ? 'nameHelp'
+          : null;
   const nameDescribedBy =
-    [isGuest ? 'waiting-name-help' : null, nomeDaChiedere ? MESSAGGIO_DEL_BLOCCO.name : null]
+    [aiutoNome ? 'waiting-name-help' : null, nomeDaChiedere ? MESSAGGIO_DEL_BLOCCO.name : null]
       .filter(Boolean)
       .join(' ') || undefined;
   const nameField = (
@@ -1007,20 +1056,22 @@ export default function WaitingRoom({
         type="text"
         value={name}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
+        readOnly={nomeFisso || undefined}
+        normalized={nomeFisso || undefined}
         required
         minLength={2}
         maxLength={100}
         autoComplete="name"
-        // Niente rosso: un nome che manca è una cosa da fare, non un errore.
-        // Il campo lampeggia (vedi .wr-name-field--empty), e dopo un
-        // tentativo lo dice anche ai lettori di schermo.
-        className={nomeSegnalato ? 'wr-name-input--attention' : undefined}
+        // Prima di un tentativo un nome che manca e' una cosa da fare (il
+        // campo lampeggia, vedi .wr-name-field--empty); dopo, e' un errore:
+        // rosso, sul campo, e detto anche ai lettori di schermo.
+        className={nomeSegnalato ? 'is-invalid' : undefined}
         aria-invalid={nomeSegnalato || undefined}
         aria-describedby={nameDescribedBy}
       />
-      {isGuest && (
-        <small id="waiting-name-help" className="text-muted" style={{ fontSize: '0.8rem' }}>
-          {t('nameHelp')}
+      {aiutoNome && (
+        <small id="waiting-name-help" className="text-muted d-block" style={{ fontSize: '0.8rem' }}>
+          {t(aiutoNome)}
         </small>
       )}
       {nomeDaChiedere && (
@@ -1028,40 +1079,16 @@ export default function WaitingRoom({
           id={MESSAGGIO_DEL_BLOCCO.name}
           className={`wr-name-hint${nomeSegnalato ? ' wr-name-hint--insist' : ''}`}
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-               strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M12 20h9" />
-            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
-          </svg>
+          {nomeSegnalato ? (
+            <Icon icon="it-error" size="xs" className="flex-shrink-0" style={{ fill: 'currentColor' }} />
+          ) : (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                 strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M12 20h9" />
+              <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+            </svg>
+          )}
           <span>{t('nameRequiredToEnter')}</span>
-        </div>
-      )}
-    </FormGroup>
-  );
-
-  const emailField = (
-    <FormGroup className="mb-0">
-      <Input
-        id="waiting-email"
-        label={t('emailLabel')}
-        type="email"
-        value={email}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-        maxLength={200}
-        aria-invalid={!emailValid}
-        aria-describedby={!emailValid ? MESSAGGIO_DEL_BLOCCO.email : undefined}
-        autoComplete="email"
-      />
-      <small className="text-muted" style={{ fontSize: '0.8rem' }}>
-        {t('emailHelp')}
-      </small>
-      {!emailValid && (
-        <div
-          id={MESSAGGIO_DEL_BLOCCO.email}
-          className="small text-danger mt-1"
-          style={{ fontSize: '0.8rem' }}
-        >
-          {t('emailInvalid')}
         </div>
       )}
     </FormGroup>
@@ -1174,6 +1201,7 @@ export default function WaitingRoom({
       </h2>
       {recordingRequired && (
         <>
+          {/* Tutto, anche se lungo: e' l'informativa a cui si acconsente. */}
           <p className="wr-consensi__intro">
             {recordingConsentText?.trim() || t('recordingConsentIntro')}
           </p>
@@ -1183,16 +1211,36 @@ export default function WaitingRoom({
               type="checkbox"
               id={CAMPO_DEL_BLOCCO.recording}
               checked={recordingConsent}
-              onChange={(e) => setRecordingConsent(e.target.checked)}
+              onChange={(e) => {
+                setRecordingConsent(e.target.checked);
+                // Chi conduce: senza registrazione la trascrizione non vale, e
+                // non deve ritrovarsi spuntata se la rimette.
+                if (!e.target.checked && conduceDaIncarico) setMultitrackConsent(false);
+              }}
               aria-describedby={!recordingConsent ? MESSAGGIO_DEL_BLOCCO.recording : undefined}
+              aria-invalid={consensoSegnalato || undefined}
             />
             <label className="form-check-label" htmlFor={CAMPO_DEL_BLOCCO.recording}>
               {tGdpr('recording')}
             </label>
           </div>
-          {!recordingConsent && (
+          {!recordingConsent && recordingConsentOptional && (
+            // Libero davvero: si dice che cosa succede senza.
             <div id={MESSAGGIO_DEL_BLOCCO.recording} className="wr-consensi__nota">
-              {t('recordingConsentRequired')}
+              {conduceDaIncarico ? tGdpr('recordingOptionalHost') : tGdpr('recordingOptionalListenOnly')}
+            </div>
+          )}
+          {!recordingConsent && !recordingConsentOptional && (
+            // Prima un'indicazione; dopo un tentativo di entrare, un errore
+            // in rosso, qui accanto alla casella che lo risolve.
+            <div
+              id={MESSAGGIO_DEL_BLOCCO.recording}
+              className={`wr-consensi__nota${consensoSegnalato ? ' wr-consensi__nota--errore' : ''}`}
+            >
+              {consensoSegnalato && (
+                <Icon icon="it-error" size="xs" className="flex-shrink-0" style={{ fill: 'currentColor' }} />
+              )}
+              <span>{t('recordingConsentRequired')}</span>
             </div>
           )}
         </>
@@ -1209,9 +1257,14 @@ export default function WaitingRoom({
               className="form-check-input"
               type="checkbox"
               id={CAMPO_TRASCRIZIONE}
-              checked={multitrackConsent}
+              checked={multitrackConsent && !trascrizioneSospesa}
+              disabled={trascrizioneSospesa}
               onChange={(e) => setMultitrackConsent(e.target.checked)}
-              aria-describedby={`${CAMPO_TRASCRIZIONE}-nota`}
+              aria-describedby={
+                trascrizioneSospesa
+                  ? `${MESSAGGIO_DEL_BLOCCO.recording} ${CAMPO_TRASCRIZIONE}-nota`
+                  : `${CAMPO_TRASCRIZIONE}-nota`
+              }
             />
             <label className="form-check-label" htmlFor={CAMPO_TRASCRIZIONE}>
               {tGdpr('multitrack')}
@@ -1226,7 +1279,7 @@ export default function WaitingRoom({
     </section>
   ) : null;
 
-  const chatPreviewBlock = showChatPreview ? (
+  const chatPreviewBlock = showChatPreview && !chatNascosta ? (
     <div className="wr-chat">
       <div className="wr-chat__head">
         <span className="wr-chat__icon" aria-hidden="true">
@@ -1388,16 +1441,15 @@ export default function WaitingRoom({
               per gli occhi; il lettore di schermo lo riceve una volta sola,
               come descrizione del pulsante. Il consenso non serve ripeterlo:
               il suo riquadro sta subito sopra. */}
-          {(bloccoSpiegato === 'name' || bloccoSpiegato === 'email') && (
+          {bloccoSpiegato === 'name' && (
             <p
               className="d-flex align-items-start justify-content-center text-center mb-0"
-              // Il nome mancante è una cosa da fare (ambra), l'email sbagliata
-              // un errore (rosso).
-              style={{ fontSize: '0.85rem', color: bloccoSpiegato === 'name' ? '#6B4400' : '#A1112E' }}
+              // Dopo un tentativo e' un errore, in rosso come sul campo.
+              style={{ fontSize: '0.85rem', color: nomeSegnalato ? 'var(--bs-danger, #cc334d)' : 'var(--app-muted)' }}
               aria-hidden="true"
             >
-              <Icon icon="it-warning-circle" size="xs" className="me-1 mt-1 flex-shrink-0" style={{ fill: 'currentColor' }} />
-              <span>{bloccoSpiegato === 'name' ? t('nameRequiredToEnter') : t('emailInvalid')}</span>
+              <Icon icon={nomeSegnalato ? 'it-error' : 'it-info-circle'} size="xs" className="me-1 mt-1 flex-shrink-0" style={{ fill: 'currentColor' }} />
+              <span>{t('nameRequiredToEnter')}</span>
             </p>
           )}
           {/* Premibile anche a modulo incompleto: premerlo dice cosa manca e
@@ -1494,10 +1546,22 @@ export default function WaitingRoom({
           ) : (
             <>
               <Icon icon="it-video" size="sm" color="white" className="me-2" />
-              {t('startEventButton')}
+              {confermaAnticipo ? t('startEarlyYes') : t('startEventButton')}
             </>
           )}
         </Button>
+      )}
+      {confermaAnticipo && !startingEvent && (
+        <div className="small text-center" role="status">
+          <p className="mb-1">
+            {t('startEarlyConfirm', {
+              when: format.dateTime(new Date(startsAtMs), { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }),
+            })}
+          </p>
+          <button type="button" className="btn btn-link btn-sm p-0" onClick={() => setConfermaAnticipo(false)}>
+            {t('startEarlyNo')}
+          </button>
+        </div>
       )}
     </div>
       {/* Su telefono l'azione d'ingresso (e solo lei) resta attaccata al
@@ -1824,6 +1888,7 @@ export default function WaitingRoom({
       </Link>
     ) : null;
 
+  const riepilogoInFondo = canEnterLive && !isEnded && !notHeld;
   const riepilogoBlock = (
     <section className="wr-summary" aria-labelledby="wr-summary-title">
       <h2 className="wr-section-title" id="wr-summary-title">{t('summaryTitle')}</h2>
@@ -1944,7 +2009,12 @@ export default function WaitingRoom({
                   <div className="mb-4">{statusBanners}</div>
                 )}
 
-                <div className="mb-4 wr-reveal wr-summary-wrap">{riepilogoBlock}</div>
+                {/* Quando si puo' entrare, prima cio' che serve per entrare
+                    (nome, dispositivi, consensi, «Entra ora»); il riepilogo
+                    dell'evento scende sotto il pulsante. */}
+                {!riepilogoInFondo && (
+                  <div className="mb-4 wr-reveal wr-summary-wrap">{riepilogoBlock}</div>
+                )}
 
                 {/* Da http:// il browser nega microfono e videocamera: lo si dice
                     qui, con l'indirizzo sicuro, invece di una prova dei
@@ -1963,11 +2033,6 @@ export default function WaitingRoom({
                     dietro al token (lo dice il server). */}
                 {!isEnded && chatToken && (
                   <ProfilePhotoField eventSlug={event.slug} token={chatToken} name={name} />
-                )}
-                {/* Email: solo per gli ospiti (i registrati l'hanno già data,
-                    per moderatori/speaker è irrilevante). */}
-                {!isEnded && isGuest && (
-                  <div className="mb-4 wr-email-field">{emailField}</div>
                 )}
                 {!isEnded && <div className="mb-4">{deviceCheckField}</div>}
 
@@ -2013,6 +2078,9 @@ export default function WaitingRoom({
                   <>
                     {consensiBlock && <div className="mb-3">{consensiBlock}</div>}
                     {primaryCta}
+                    {riepilogoInFondo && (
+                      <div className="mb-4 wr-summary-wrap">{riepilogoBlock}</div>
+                    )}
                   </>
                 )}
 

@@ -22,7 +22,7 @@ export default defineConfig({
     passWithNoTests: true,
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
-    exclude: ['node_modules', '.next', 'e2e'],
+    exclude: ['node_modules', '.next', 'e2e', '**/*.db.test.ts'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
@@ -40,13 +40,13 @@ export default defineConfig({
       // parecchi punti — lo sfonda e fa rosso. Quando la copertura sale in
       // modo stabile, questi numeri si alzano dietro; mai il contrario.
       //
-      // Misura di riferimento (Vitest 4, copertura V8 rimappata sull'AST):
-      // lines 46,0 · functions 40,3 · branches 41,8 · statements 45,0.
+      // Misura di riferimento (Vitest 5, copertura V8 rimappata sull'AST):
+      // lines 59,6 · functions 52,1 · branches 53,4 · statements 58,1.
       thresholds: {
-        lines: 44,
-        functions: 38,
-        branches: 40,
-        statements: 43,
+        lines: 57,
+        functions: 50,
+        branches: 51,
+        statements: 56,
       },
     },
   },

@@ -1,13 +1,13 @@
 import { test, expect, type APIRequestContext } from '@playwright/test';
 import { randomUUID } from 'crypto';
 
+import { accediComeAdmin } from './helpers/accesso-admin';
+
 const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:3000';
 const ADMIN_KEY = process.env.ADMIN_API_KEY || 'dev_admin_key_2026';
 
 async function adminLogin(request: APIRequestContext): Promise<string> {
-  const res = await request.post(`${BASE}/api/admin/login`, {
-    data: { key: ADMIN_KEY },
-  });
+  const res = await accediComeAdmin(request, ADMIN_KEY);
   expect(res.ok(), `Admin login failed: ${res.status()}`).toBeTruthy();
 
   const setCookie = res.headers()['set-cookie'] ?? '';

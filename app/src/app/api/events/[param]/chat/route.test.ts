@@ -73,6 +73,7 @@ function eventRow(over: Record<string, unknown> = {}) {
     eventType: 'SCHEDULED',
     moderatorToken: PRIMARY_TOKEN,
     moderatorName: 'Segreteria',
+    chatEnabled: true,
     joinPasswordHash: null,
     ...over,
   };
@@ -270,7 +271,7 @@ describe('GET /api/events/[param]/chat — the raw senderId never ships', () => 
     const payload = JSON.stringify(body);
 
     expect(body.messages[0]).not.toHaveProperty('senderId');
-    expect(body.messages[0].senderKey).toBe(senderColourKey(GUEST_SENDER_ID));
+    expect(body.messages[0].senderKey).toBe(senderColourKey(GUEST_SENDER_ID, EVENT_ID));
     expect(body.messages[0].senderKey).toMatch(/^[0-9a-f]{16}$/);
     // Il controllo che conta davvero: né l'id grezzo né l'IP che ci sta dentro
     // devono comparire da nessuna parte nella risposta (la export della chat
@@ -306,13 +307,24 @@ describe('POST /api/events/[param]/chat — write authorization', () => {
     expect(mockedCreate).not.toHaveBeenCalled();
   });
 
+  it('con la chat spenta dal vivo un ospite non scrive, chi modera si', async () => {
+    mockedFindUnique.mockResolvedValue(eventRow({ chatEnabled: false }));
+    const ospite = await POST(postRequest({ text: 'ciao', guestName: 'Anna' }), ctx());
+    expect(ospite.status).toBe(403);
+    expect((await ospite.json()).code).toBe('CHAT_DISABLED');
+    expect(mockedCreate).not.toHaveBeenCalled();
+
+    const modera = await POST(postRequest({ text: 'chiudo la chat' }, PRIMARY_TOKEN), ctx());
+    expect(modera.status).toBe(201);
+  });
+
   it('does not return the raw senderId to the guest who just posted', async () => {
     const res = await POST(postRequest({ text: 'ciao', guestName: 'Anna' }), ctx());
     expect(res.status).toBe(201);
     const body = await res.json();
     expect(body).not.toHaveProperty('senderId');
     expect(JSON.stringify(body)).not.toContain(GUEST_IP);
-    expect(body.senderKey).toBe(senderColourKey(GUEST_SENDER_ID));
+    expect(body.senderKey).toBe(senderColourKey(GUEST_SENDER_ID, EVENT_ID));
     // Un ospite non è una persona identificata (l'id è base64 di ip:nome e
     // collide dietro un NAT): niente modifica dei propri messaggi.
     expect(body.canEdit).toBe(false);
@@ -333,7 +345,7 @@ describe('POST /api/events/[param]/chat — write authorization', () => {
     expect(payload).not.toContain(GUEST_IP);
     // Stessa chiave della cronologia e della risposta alla POST: una bolla ha
     // lo stesso colore dal vivo e dopo un ricaricamento.
-    expect(envelope.senderKey).toBe(senderColourKey(GUEST_SENDER_ID));
+    expect(envelope.senderKey).toBe(senderColourKey(GUEST_SENDER_ID, EVENT_ID));
     expect(envelope.senderKey).toBe((await res.json()).senderKey);
   });
 });

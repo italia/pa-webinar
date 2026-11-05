@@ -4,6 +4,8 @@ import { test, expect, type APIRequestContext } from '@playwright/test';
 
 import messages from '../src/i18n/messages/it.json';
 
+import { accediComeAdmin } from './helpers/accesso-admin';
+
 /**
  * La cancellazione su richiesta (art. 17 GDPR), dall'inizio alla fine: chi si
  * è iscritto chiede la cancellazione dalla pagina dei propri dati, riceve
@@ -79,7 +81,7 @@ test('cancellazione su richiesta: email, conferma, iscrizione sparita', async ({
   page,
   request,
 }) => {
-  const login = await request.post('/api/admin/login', { data: { key: ADMIN_KEY } });
+  const login = await accediComeAdmin(request, ADMIN_KEY);
   expect(login.ok(), `login: ${login.status()}`).toBeTruthy();
   const inizio = Date.now() + 86_400_000;
   const creato = await request.post('/api/events', {

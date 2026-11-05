@@ -28,6 +28,7 @@ import {
   type InputCapacita,
 } from '@/lib/capacity/model';
 
+import CampoPartecipanti from './campo-partecipanti';
 import type { WizardForm } from './wizard-shell';
 
 export default function AdvancedSettings({
@@ -38,8 +39,9 @@ export default function AdvancedSettings({
 }: {
   /** Il contenuto di ciascuna sezione; una sezione senza contenuto non c'e'. */
   sections: Partial<Record<WizardAdvancedSection, React.ReactNode>>;
-  /** La sezione da aprire (e portare in vista) all'arrivo. */
-  open?: WizardAdvancedSection | null;
+  /** La sezione da aprire (e portare in vista) all'arrivo; con piu' errori
+   *  in sezioni diverse, tutte quelle che ne hanno. */
+  open?: WizardAdvancedSection | readonly WizardAdvancedSection[] | null;
   /** Cambia a ogni richiesta di aprire una sezione: la si riapre anche se la
    *  si era chiusa. */
   richiesta?: number;
@@ -50,15 +52,14 @@ export default function AdvancedSettings({
   // Le sezioni aperte: quelle chieste da fuori e quelle aperte a mano. Le
   // sezioni restano montate (chiuse si nascondono soltanto): cio' che si sta
   // scrivendo in una non si perde aprendone un'altra.
-  const [aperte, setAperte] = useState<ReadonlySet<WizardAdvancedSection>>(
-    () => new Set(open ? [open] : []),
-  );
+  const chieste: readonly WizardAdvancedSection[] = open == null ? [] : typeof open === 'string' ? [open] : open;
+  const [aperte, setAperte] = useState<ReadonlySet<WizardAdvancedSection>>(() => new Set(chieste));
   // Una richiesta nuova apre la sua sezione subito, nello stesso giro: chi
   // porta il fuoco su un campo di quella sezione la trova gia' aperta.
   const [ultimaRichiesta, setUltimaRichiesta] = useState(richiesta);
   if (ultimaRichiesta !== richiesta) {
     setUltimaRichiesta(richiesta);
-    if (open && !aperte.has(open)) setAperte(new Set([...aperte, open]));
+    if (chieste.some((k) => !aperte.has(k))) setAperte(new Set([...aperte, ...chieste]));
   }
 
   return (
@@ -239,18 +240,26 @@ export function SezioneTecnica({
   form,
   onChange,
   capacita,
-  onCambiaPartecipanti,
   onCambiaQualita,
+  errorePartecipanti,
 }: {
   form: WizardForm;
   onChange: (patch: Partial<WizardForm>) => void;
   capacita: CapacitaIstanza;
-  /** Porta al campo dei partecipanti attesi (passo «Quando»). */
-  onCambiaPartecipanti?: () => void;
   /** Apre la sezione della sala e del video. */
   onCambiaQualita?: () => void;
+  /** Il numero di partecipanti attesi e' fuori misura. */
+  errorePartecipanti?: boolean;
 }) {
   return (
+    <>
+    {/* I partecipanti attesi si chiedono nelle domande del formato; qui si
+        cambiano, accanto al carico che ne dipende. */}
+    <CampoPartecipanti
+      value={form.maxParticipants}
+      onChange={(maxParticipants) => onChange({ maxParticipants })}
+      errore={errorePartecipanti}
+    />
     <CapacityPanel
       istanza={capacita}
       evento={inputCapacita(form)}
@@ -258,7 +267,6 @@ export function SezioneTecnica({
         togglesFromMatrix(form.permissionMatrix).participantsCanShareScreen
       }
       onCameraPctChange={(next) => onChange({ expectedSenderRatioPct: next })}
-      onCambiaPartecipanti={onCambiaPartecipanti}
       onCambiaQualita={
         onCambiaQualita &&
         (() => {
@@ -273,6 +281,7 @@ export function SezioneTecnica({
         })
       }
     />
+    </>
   );
 }
 

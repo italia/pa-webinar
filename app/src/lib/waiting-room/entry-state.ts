@@ -5,7 +5,7 @@
  *   - la SALA non e' pronta (evento non avviato, ponte video che si accende):
  *     non dipende dalla persona, e il pulsante resta spento con il suo stato
  *     (conto alla rovescia, «la sala si sta preparando»);
- *   - il MODULO e' incompleto (nome, email, consenso alla registrazione
+ *   - il MODULO e' incompleto (nome, consenso alla registrazione
  *     dell'evento o a quella per partecipante): dipende dalla persona, e va
  *     detto cosa manca e dove.
  *
@@ -13,7 +13,7 @@
  */
 
 /** Cio' che, a sala aperta, trattiene ancora dall'entrare: un campo del modulo. */
-export type BloccoModulo = 'name' | 'email' | 'recording';
+export type BloccoModulo = 'name' | 'recording';
 
 export interface StatoIngressoInput {
   /** L'evento e' avviato (LIVE). */
@@ -21,7 +21,6 @@ export interface StatoIngressoInput {
   /** La sala ammette l'ingresso: ponte pronto, o attesa lunga scaduta. */
   ingressoConsentito: boolean;
   nameValid: boolean;
-  emailValid: boolean;
   /** Serve il consenso alla registrazione dell'evento (non dato all'iscrizione). */
   recordingRequired: boolean;
   recordingConsent: boolean;
@@ -44,6 +43,8 @@ export interface StatoIngresso {
   nomeDaChiedere: boolean;
   /** Il nome manca dopo un tentativo: la richiesta diventa un errore. */
   nomeSegnalato: boolean;
+  /** Il consenso alla registrazione manca dopo un tentativo: errore sul campo. */
+  consensoSegnalato: boolean;
   /** Il blocco il cui messaggio e' sullo schermo, da usare come descrizione
    *  del pulsante: il nome solo quando lo si sta chiedendo. */
   bloccoSpiegato: BloccoModulo | null;
@@ -52,11 +53,9 @@ export interface StatoIngresso {
 export function statoIngresso(i: StatoIngressoInput): StatoIngresso {
   const bloccoModulo: BloccoModulo | null = !i.nameValid
     ? 'name'
-    : !i.emailValid
-      ? 'email'
-      : i.recordingRequired && !i.recordingConsent
-        ? 'recording'
-        : null;
+    : i.recordingRequired && !i.recordingConsent
+      ? 'recording'
+      : null;
   const ingressoAperto = i.canEnterLive && i.ingressoConsentito;
   // Prima che la sala apra — conto alla rovescia, sala in preparazione —
   // chiedere il nome sarebbe un errore segnalato a chi non ha ancora niente
@@ -70,6 +69,7 @@ export function statoIngresso(i: StatoIngressoInput): StatoIngresso {
     bloccoModulo,
     nomeDaChiedere,
     nomeSegnalato: !i.nameValid && i.ingressoTentato,
+    consensoSegnalato: i.recordingRequired && !i.recordingConsent && i.ingressoTentato,
     bloccoSpiegato: bloccoModulo === 'name' && !nomeDaChiedere ? null : bloccoModulo,
   };
 }
@@ -86,7 +86,7 @@ export function annuncioApertura(opts: {
   if (!opts.appenaAperta) return null;
   if (opts.canEnter) return 'roomJustOpened';
   if (opts.bloccoModulo === 'name') return 'roomOpenNameMissing';
-  // Email o consenso: la sala e' aperta, e il pulsante — che il lettore
+  // Consenso: la sala e' aperta, e il pulsante — che il lettore
   // raggiunge subito dopo — porta con se' la descrizione di cio' che manca.
   if (opts.bloccoModulo) return 'roomOpen';
   return null;

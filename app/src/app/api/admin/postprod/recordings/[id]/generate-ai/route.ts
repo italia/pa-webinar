@@ -25,6 +25,7 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { requireRecordingManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { enqueuePostprodForRecording } from '@/lib/ai/enqueue';
+import { leggiCorpoAvvio } from '@/lib/ai/voice-consent';
 import { registrazioneSoloSottotitoli, trascrizioneCorrettaDaiSottotitoli } from '@/lib/captions/transcript';
 import { prisma } from '@/lib/db';
 import { AppError, NotFoundError } from '@/lib/errors';
@@ -49,15 +50,11 @@ export const POST = withErrorHandling(async (request, context) => {
     );
   }
 
-  let alsoSummary = false;
-  let alsoTranslation = false;
-  try {
-    const body = (await request.json()) as { summary?: boolean; translation?: boolean } | null;
-    alsoSummary = body?.summary === true;
-    alsoTranslation = body?.translation === true;
-  } catch {
-    /* no body → transcript only */
-  }
+  // Senza corpo: solo la trascrizione.
+  const corpo = await leggiCorpoAvvio(request);
+  const alsoSummary = corpo.summary === true;
+  const alsoTranslation = corpo.translation === true;
+  const allVoicesConsented = corpo.allVoicesConsented === true;
 
   const result = await prisma.$transaction(async (tx) => {
     const recording = await tx.recording.findUnique({
@@ -92,7 +89,7 @@ export const POST = withErrorHandling(async (request, context) => {
       },
     });
 
-    return enqueuePostprodForRecording(tx, { recordingId: recording.id });
+    return enqueuePostprodForRecording(tx, { recordingId: recording.id, allVoicesConsented });
   });
 
   await logAdminAction({
@@ -101,6 +98,7 @@ export const POST = withErrorHandling(async (request, context) => {
     target: id,
     details: {
       source: 'generate-ai-recording',
+      allVoicesConsented,
       enqueued: result.enqueued,
       skipped: result.skippedExisting,
     },

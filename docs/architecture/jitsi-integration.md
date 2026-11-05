@@ -257,9 +257,17 @@ service (`NEXT_PUBLIC_WHITEBOARD_ENABLED`), and the live captions button when ca
 ([Live captions](live-captions.md)).
 
 The main bar holds at most eight buttons, in the order set by `mainToolbarButtons` in
-`app/src/lib/jitsi/config.ts`: microphone, camera, screen sharing, raised hand, reactions, captions,
-tile view and settings. The others, `security`, the backgrounds and the whiteboard among them, go to
-the **…** menu. Jitsi matches each list to a width threshold by its length, fills any free place
+`app/src/lib/jitsi/config.ts`, the most used first: microphone, camera, raised hand, screen sharing,
+reactions, captions, fullscreen and tile view. The others, settings, `security`, the backgrounds and
+the whiteboard among them, go to the **…** menu (microphone and camera keep their own arrow to choose
+the device).
+
+Jitsi keeps a single list of custom buttons (`customToolbarButtons`), and whoever rewrites it with
+`overwriteConfig` drops the others' buttons. The list therefore has one owner,
+`app/src/lib/jitsi/custom-buttons.ts`: the captions and the fullscreen buttons are declared there, and
+it sends the whole list. Jitsi ignores the command before the conference is joined, so requests made
+earlier wait for `videoConferenceJoined`. Jitsi does not redraw a mounted button whose icon or text
+changed, so the registry removes that button alone and puts it back 250 ms later. Jitsi matches each list to a width threshold by its length, fills any free place
 with another button, and puts a lone overflowing button back in the bar, so the lists keep these
 lengths.
 
@@ -273,7 +281,11 @@ What is deliberately missing, for every role:
   exit to tell a deliberate leave from a network drop. Every exit goes through the app's own controls
   instead: **Leave room**, or **End event** for moderators.
 - **`fullscreen`.** Jitsi's fullscreen covers only the iframe and hides the portal's drawer. The app
-  offers its own **Fullscreen** toggle for the whole live area.
+  puts its own **Fullscreen** button in Jitsi's toolbar instead (a custom button, `pa-fullscreen`),
+  which covers the whole live area. Browsers without the Fullscreen API (iPhone) do not get it. The
+  click reaches the page from the iframe; a browser that does not count it as the page's own gesture
+  refuses the request, and the page then shows a **Switch to fullscreen** button over the stage for a
+  few seconds, whose click it accepts.
 - **`chat`.** The portal's chat panel is the chat. Jitsi's chat is *not* disabled by configuration
   (`disableChat: false`, and private messages stay enabled in the participant tile menu), so it can still
   be reached from Jitsi's own UI. Those messages travel over XMPP and are neither stored nor moderated
@@ -353,6 +365,41 @@ whoever caused it. On a phone, where everyone joins with both off, it does nothi
 
 A moderator can lift or restore the moderation during the call from the **Participants** tab
 (**Microphones locked**, **Video locked**). Both toggles are always shown to moderators.
+
+**Listen-only participants.** On an event that records, concedes some media to participants and
+keeps `listenOnlyWithoutConsent` on, the recording consent is free: whoever does not give it enters
+listening only (`app/src/lib/live/listen-only.ts`). Every token of such an event locks all three media,
+so the moderation is on for each from the first entry; a participant who consented carries
+`mediaAdmit` with the media the event concedes and is admitted at once, exactly as before; a
+listen-only participant carries `listenOnly` and is never admitted, not even when a moderator gives
+them the floor (`mod_pa_media_lock` drops that approval). The room tells them, with
+**I consent to the recording and take part**: consenting asks for a new token with the consent, and
+the conference rejoins with it. Whoever the token admits at entry (a participant who consented on such
+an event, a speaker with the microphones locked) receives the bridge's approval as soon as they join,
+and Jitsi shows it as **The moderator asks you to speak**, though nobody asked: during the first seconds
+of each entry the room closes that notification (`hideNotification`, uid `asked-to-unmute`), while the
+floor given later by a moderator (**Give the floor**, `askToUnmute`) still shows it. The same goes the other way: withdrawing the consent from **Your consents**
+in the top bar asks for a new token without it, and the conference rejoins listening only
+([Withdrawing consent](../GDPR.md#withdrawing-consent)). In the moderator's **Participants** tab a listen-only
+person is marked **listen-only**, and in place of **Give the floor** the row says that they have not
+consented and cannot speak until they consent from their room (`listenOnly` in
+`GET /api/events/{param}/seats`: the person's browser declares its bridge endpoint with its room token,
+`POST /api/events/{param}/listen-only`, and only a token that carries `listenOnly`, the value the bridge
+enforces, marks it). The person's own room explains what is needed. Every token of such an event also carries
+`consentLock`: in that room the module refuses to switch the moderation off (the **Participants** tab
+shows a note instead of **Microphones locked** and **Video locked**), and a listen-only person made
+moderator stays out of the admitted. Neither this setting nor `recordingEnabled` changes while the room may be
+open (`LIVE`, `PROVISIONING`, `IDLE`, or `PUBLISHED` with a call session opened in the last 12 hours,
+since moderators and speakers enter early; `app/src/lib/live/room-open.ts`): the lock is decided at the
+first entry, and people already in the room did not consent to a recording switched on afterwards. A
+save in that window keeps the old values and lists them in `ignoredCreationOnlyFields`; the wizard
+disables both switches. Instant calls ask for no consent. A listen-only participant is in the room like
+a participant of a listen-only event: their name is on their tile, without voice or image, and their
+token carries no profile photo.
+Without `listenOnlyWithoutConsent`, the token route refuses a participant who has not consented
+(`403 RECORDING_CONSENT_REQUIRED`, and the room goes back to the waiting room, where the box is): the
+waiting room is not the only gate. A participant who withdraws the consent from the room on such an event
+goes back to the waiting room at once.
 
 ### Video quality presets
 
@@ -454,9 +501,10 @@ and `app/src/components/jitsi/`):
 
 - **Top bar.** Event title, participant count (moderators), the current agenda topic, the recording
   indicator for participants and speakers (a red **REC** icon while Jibri records, announced to screen
-  readers when it appears), sharing links, **Fullscreen** (desktop) and **Leave room**. No clock: the
-  audience sees no time. The app's fullscreen covers the whole live area, so the drawer stays visible.
-  Dialogs render inside the fullscreen element, so they do not disappear behind it.
+  readers when it appears), sharing links, **Content only** (desktop: closes the drawer altogether, and
+  brings it back) and **Leave room**. No clock: the audience sees no time. **Fullscreen** is in Jitsi's
+  toolbar and covers the whole live area, so the drawer stays visible. Dialogs render inside the
+  fullscreen element, so they do not disappear behind it.
 - **Time strip** (moderators, `app/src/components/live/live-time-strip.tsx`). Time on air against the
   schedule, the overtime and the close ([the overtime countdown](event-lifecycle.md#the-overtime-countdown)),
   the recording state with its duration and the talk timer while it is on. It holds no risky command:
@@ -784,8 +832,10 @@ Building, bumping and verifying the image step by step is covered in
     `backgroundColor`; a `backgroundImageUrl`, an SVG data URI with the room's gradient and faint
     circles, without logo or text, and a `premeetingBackground` with the same gradient;
     `customTheme.palette`, which replaces Jitsi's dark greys with the room's blues: `uiBackground`
-    (`#004D99`, the stage and filmstrip blue), `ui01` (`#2F5175`, a slate blue) for the toolbar, menus
-    and dialogs, `ui02` and `ui03` (`#3D6289`) for highlighted rows on those surfaces and the tiles of
+    (`#004D99`, the stage and filmstrip blue), `ui01` and `toolboxBackground` (`#0E2A47`, a navy much
+    darker than the stage, so the toolbar reads as a bar over slides and videos) for the toolbar, menus
+    and dialogs, `notificationBackground` and `ui10` (white) for Jitsi's notifications, which Jitsi
+    writes in dark text (each Jitsi version reads one of the two names and ignores the other), `ui02` and `ui03` (`#3D6289`) for highlighted rows on those surfaces and the tiles of
     people without a camera, `ui04` (`#4D7299`) for borders and button hover, and
     `thumbnailBackground` (`#3D6289`) for the camera-off tiles where the Jitsi version reads it
     separately. Jitsi's white text and icons keep a contrast of at least 4.5:1 on every one of these

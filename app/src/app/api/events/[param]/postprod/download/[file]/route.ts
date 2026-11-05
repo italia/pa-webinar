@@ -67,12 +67,13 @@ function fmtTs(seconds: number): string {
 
 /** SRT timestamp: hh:mm:ss,mmm. */
 function fmtSrtTs(seconds: number): string {
-  const total = Math.max(0, seconds);
-  const h = Math.floor(total / 3600);
-  const m = Math.floor((total % 3600) / 60);
-  const s = Math.floor(total % 60);
-  const ms = Math.round((total - Math.floor(total)) * 1000);
-  return `${pad(h)}:${pad(m)}:${pad(s)},${pad(ms, 3)}`;
+  // Si arrotonda sui millesimi totali: sul resto del secondo, 1,9996 darebbe
+  // «00:00:01,1000», che i lettori SubRip non accettano.
+  const total = Math.round(Math.max(0, seconds) * 1000);
+  const h = Math.floor(total / 3_600_000);
+  const m = Math.floor((total % 3_600_000) / 60_000);
+  const s = Math.floor((total % 60_000) / 1000);
+  return `${pad(h)}:${pad(m)}:${pad(s)},${pad(total % 1000, 3)}`;
 }
 
 function toTxt(segments: Segment[], speakerMap: Map<string, string>): string {
@@ -111,6 +112,14 @@ function sanitizeFilename(s: string): string {
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '')
     .slice(0, 80) || 'transcript';
+}
+
+/**
+ * La lingua nel nome del file. Puo' arrivare dalla richiesta: va nell'intestazione
+ * della risposta, dove un a capo fa fallire la risposta e una virgoletta la altera.
+ */
+function linguaPerFile(lingua: string): string {
+  return /^[a-z0-9-]{2,12}$/.test(lingua) ? lingua : 'und';
 }
 
 export const GET = withErrorHandling(async (request, context) => {
@@ -190,7 +199,7 @@ export const GET = withErrorHandling(async (request, context) => {
       headers: {
         [AI_GENERATED_HEADER]: AI_GENERATED_HEADER_VALUE,
         'content-type': 'text/markdown; charset=utf-8',
-        'content-disposition': `attachment; filename="${safeSlug}-summary.${candidate.language ?? lang}.md"`,
+        'content-disposition': `attachment; filename="${safeSlug}-summary.${linguaPerFile(candidate.language ?? lang)}.md"`,
         'cache-control': 'private, max-age=60',
       },
     });
@@ -251,7 +260,7 @@ export const GET = withErrorHandling(async (request, context) => {
       headers: {
         [AI_GENERATED_HEADER]: AI_GENERATED_HEADER_VALUE,
         'content-type': 'text/plain; charset=utf-8',
-        'content-disposition': `attachment; filename="${safeSlug}-transcript.${effectiveLang}.txt"`,
+        'content-disposition': `attachment; filename="${safeSlug}-transcript.${linguaPerFile(effectiveLang)}.txt"`,
         'cache-control': 'private, max-age=60',
       },
     });
@@ -264,7 +273,7 @@ export const GET = withErrorHandling(async (request, context) => {
     headers: {
       [AI_GENERATED_HEADER]: AI_GENERATED_HEADER_VALUE,
       'content-type': 'application/x-subrip; charset=utf-8',
-      'content-disposition': `attachment; filename="${safeSlug}-subtitles.${effectiveLang}.srt"`,
+      'content-disposition': `attachment; filename="${safeSlug}-subtitles.${linguaPerFile(effectiveLang)}.srt"`,
       'cache-control': 'private, max-age=60',
     },
   });

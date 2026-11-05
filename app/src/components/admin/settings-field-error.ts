@@ -21,8 +21,8 @@ export type SettingsTab =
 export interface SettingsIssue {
   path: (string | number)[];
   code?: string;
-  validation?: string;
-  type?: string;
+  format?: string;
+  origin?: string;
   minimum?: number;
   maximum?: number;
 }
@@ -144,14 +144,14 @@ function dove(path: (string | number)[]): Omit<SettingsFieldError, 'problem' | '
 }
 
 function problema(issue: SettingsIssue): Pick<SettingsFieldError, 'problem' | 'limit'> {
-  if (issue.code === 'too_small' && issue.type === 'string' && (issue.minimum ?? 0) >= 1) {
+  if (issue.code === 'too_small' && issue.origin === 'string' && (issue.minimum ?? 0) >= 1) {
     return { problem: 'required' };
   }
-  if (issue.code === 'invalid_string' && issue.validation === 'url') return { problem: 'url' };
-  if (issue.code === 'invalid_string' && issue.validation === 'email') return { problem: 'email' };
-  if (issue.code === 'too_big' && issue.type === 'string') return { problem: 'tooLong', limit: issue.maximum };
-  if (issue.code === 'too_small' && issue.type === 'number') return { problem: 'min', limit: issue.minimum };
-  if (issue.code === 'too_big' && issue.type === 'number') return { problem: 'max', limit: issue.maximum };
+  if (issue.code === 'invalid_format' && issue.format === 'url') return { problem: 'url' };
+  if (issue.code === 'invalid_format' && issue.format === 'email') return { problem: 'email' };
+  if (issue.code === 'too_big' && issue.origin === 'string') return { problem: 'tooLong', limit: issue.maximum };
+  if (issue.code === 'too_small' && issue.origin === 'number') return { problem: 'min', limit: issue.minimum };
+  if (issue.code === 'too_big' && issue.origin === 'number') return { problem: 'max', limit: issue.maximum };
   return { problem: 'invalid' };
 }
 
@@ -162,7 +162,14 @@ function problema(issue: SettingsIssue): Pick<SettingsFieldError, 'problem' | 'l
  */
 export function settingsFieldError(details: unknown): SettingsFieldError | null {
   if (!Array.isArray(details)) return null;
-  for (const d of details as SettingsIssue[]) {
+  const problemi = details as SettingsIssue[];
+  // Un numero oltre gli interi sicuri porta anche un problema `int`, prima di
+  // quello del campo: il limite da mostrare e' quello del campo.
+  const inOrdine = [
+    ...problemi.filter((d) => d?.origin !== 'int'),
+    ...problemi.filter((d) => d?.origin === 'int'),
+  ];
+  for (const d of inOrdine) {
     if (!d || !Array.isArray(d.path)) continue;
     const posto = dove(d.path);
     if (!posto) continue;

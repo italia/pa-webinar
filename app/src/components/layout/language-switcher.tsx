@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback, useId } from 'react';
+import { useState, useEffect, useId } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 
+import { Icon } from '@/components/ui/icon';
+import { useTendina } from '@/hooks/use-tendina';
 import { Link, usePathname, type Href } from '@/i18n/navigation';
 import { localeNames, type Locale } from '@/i18n/config';
 import { useSettings } from '@/lib/settings-context';
@@ -32,9 +34,7 @@ export default function LanguageSwitcher() {
   } as unknown as Href;
   const settings = useSettings();
   const t = useTranslations('nav');
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const { aperta: open, setAperta: setOpen, contenitore: ref, pulsante: buttonRef } = useTendina();
   const listId = useId();
 
   const availableLocales = (
@@ -43,151 +43,58 @@ export default function LanguageSwitcher() {
       : ['it', 'en']
   ).filter((l): l is Locale => l in localeNames);
 
-  const handleClickOutside = useCallback((e: MouseEvent) => {
-    if (ref.current && !ref.current.contains(e.target as Node)) {
-      setOpen(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!open) return;
-    // Esc chiude e riporta il focus sul pulsante: chi naviga da tastiera non
-    // deve ritrovarsi col focus su un elenco sparito.
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== 'Escape') return;
-      setOpen(false);
-      buttonRef.current?.focus();
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [open, handleClickOutside]);
-
   if (availableLocales.length <= 1) return null;
 
-  if (availableLocales.length <= 4) {
-    return (
-      // La lingua non attiva e' bianca piena come l'altra: un'opacita' ridotta
-      // sulla fascia blu scendeva sotto il contrasto minimo, proprio sul
-      // comando che serve a chi non legge la lingua corrente. La differenza
-      // la fanno il peso e la sottolineatura, non la trasparenza.
-      <ul
-        className="d-flex list-unstyled mb-0 align-items-center"
-        aria-label={t('language')}
-      >
-        {availableLocales.map((loc, idx) => (
-          <li key={loc} className="d-flex align-items-center">
-            {idx > 0 && (
-              <span className="text-white mx-1" aria-hidden="true">
-                |
-              </span>
-            )}
-            {loc === currentLocale ? (
-              <span
-                className="text-white fw-bold text-uppercase"
-                style={{
-                  fontSize: '0.85rem',
-                  letterSpacing: '0.02em',
-                  borderBottom: '2px solid currentColor',
-                }}
-                aria-current="true"
-              >
-                {loc}
-              </span>
-            ) : (
-              <Link
-                href={stessaPagina}
-                locale={loc}
-                className="text-white text-uppercase text-decoration-none"
-                style={{ fontSize: '0.85rem', letterSpacing: '0.02em' }}
-                lang={loc}
-                // La sigla da sola («EN») il lettore di schermo la compita.
-                aria-label={localeNames[loc]}
-              >
-                {loc}
-              </Link>
-            )}
-          </li>
-        ))}
-      </ul>
-    );
-  }
-
+  // Il menu della lingua dello slim header di Designers Italia: un pulsante
+  // con la lingua attiva e un elenco di link (non una casella di scelta: i
+  // ruoli listbox/option prometterebbero una selezione con le frecce che qui
+  // non esiste). Sempre lo stesso, con due lingue come con ventiquattro.
   return (
-    <div ref={ref} className="position-relative">
-      {/* Un pulsante che apre un elenco di link, non una casella di scelta:
-          i ruoli listbox/option promettevano una selezione con le frecce che
-          qui non esiste. */}
+    <div ref={ref} className="nav-item dropdown lingua-menu">
       <button
         ref={buttonRef}
         type="button"
-        className="btn btn-sm text-white d-inline-flex align-items-center gap-1 border-0"
-        style={{ fontSize: '0.85rem', background: 'transparent' }}
+        className="nav-link dropdown-toggle d-inline-flex align-items-center gap-1 text-white"
         onClick={() => setOpen(!open)}
         aria-expanded={open}
         aria-controls={listId}
-        aria-label={`${t('switchLanguage')}: ${localeNames[currentLocale]}`}
       >
-        <span className="text-uppercase fw-semibold">{currentLocale}</span>
-        <span style={{ fontSize: '0.75rem' }}>{localeNames[currentLocale]}</span>
-        <svg
-          aria-hidden="true"
-          width="10"
-          height="6"
-          viewBox="0 0 10 6"
-          fill="currentColor"
-          style={{
-            transform: open ? 'rotate(180deg)' : 'rotate(0)',
-            transition: 'transform 0.15s ease',
-          }}
-        >
-          <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.5" fill="none" />
-        </svg>
+        <span className="visually-hidden">{t('activeLanguage')}</span>
+        <span className="text-uppercase fw-semibold" lang={currentLocale}>
+          {currentLocale}
+        </span>
+        <span className="visually-hidden">{` (${localeNames[currentLocale]})`}</span>
+        <Icon
+          icon="it-expand"
+          size="xs"
+          color="white"
+          className="d-none d-lg-block"
+          style={{ transform: open ? 'rotate(180deg)' : undefined, transition: 'transform 0.15s ease' }}
+        />
       </button>
-      {open && (
-        <ul
-          id={listId}
-          aria-label={t('language')}
-          className="position-absolute list-unstyled py-2 shadow-lg rounded"
-          style={{
-            right: 0,
-            top: '100%',
-            marginTop: 4,
-            backgroundColor: '#fff',
-            minWidth: 180,
-            maxHeight: 320,
-            overflowY: 'auto',
-            zIndex: 1050,
-            border: '1px solid #d9dadb',
-          }}
-        >
-          {availableLocales.map((loc) => (
-            <li key={loc}>
-              <Link
-                href={stessaPagina}
-                locale={loc}
-                className="d-flex align-items-center gap-2 px-3 py-2 text-decoration-none"
-                style={{
-                  color: loc === currentLocale ? '#0066CC' : 'var(--app-text)',
-                  backgroundColor: loc === currentLocale ? '#f0f7ff' : 'transparent',
-                  fontSize: '0.85rem',
-                }}
-                lang={loc}
-                aria-current={loc === currentLocale ? 'true' : undefined}
-                onClick={() => setOpen(false)}
-              >
-                <span className="text-uppercase fw-semibold" style={{ minWidth: 22 }}>
-                  {loc}
-                </span>
-                <span>{localeNames[loc]}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
+      <div className={`dropdown-menu lingua-menu__elenco${open ? ' show' : ''}`}>
+        <div className="link-list-wrapper">
+          <ul className="link-list" id={listId} aria-label={t('language')}>
+            {availableLocales.map((loc) => (
+              <li key={loc}>
+                <Link
+                  href={stessaPagina}
+                  locale={loc}
+                  className={`dropdown-item list-item${loc === currentLocale ? ' active' : ''}`}
+                  lang={loc}
+                  aria-current={loc === currentLocale ? 'true' : undefined}
+                  onClick={() => setOpen(false)}
+                >
+                  <span>
+                    {localeNames[loc]}
+                    {loc === currentLocale && <span className="visually-hidden"> {t('languageSelected')}</span>}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
     </div>
   );
 }

@@ -81,7 +81,8 @@
     "deselectAll": "Zrušiť výber",
     "durationMinutes": "{minutes, plural, one {# minúta} few {# minúty} other {# minút}}",
     "durationHours": "{hours, plural, one {# hodina} few {# hodiny} other {# hodín}}",
-    "durationHoursMinutes": "{hours, plural, one {# hodina} few {# hodiny} other {# hodín}} a {minutes, plural, one {# minúta} few {# minúty} other {# minút}}"
+    "durationHoursMinutes": "{hours, plural, one {# hodina} few {# hodiny} other {# hodín}} a {minutes, plural, one {# minúta} few {# minúty} other {# minút}}",
+    "backToTop": "Späť nahor"
   },
   "markdown": {
     "edit": "Písať",
@@ -102,7 +103,14 @@
     "switchLanguage": "Zmeniť jazyk",
     "skipToContent": "Prejsť na obsah",
     "skipToFooter": "Prejsť na pätu stránky",
-    "mainLabel": "Hlavná navigácia"
+    "mainLabel": "Hlavná navigácia",
+    "activeLanguage": "Aktívny jazyk:",
+    "languageSelected": "(vybraný)",
+    "signIn": "Prihlásiť sa",
+    "roleAdmin": "Správca",
+    "roleOrganizer": "Organizátor",
+    "instanceKey": "Kľúč inštancie",
+    "signOutFailed": "Odhlásenie zlyhalo: skúste to znova."
   },
   "header": {
     "followUs": "Sledujte nás na"
@@ -204,7 +212,8 @@
       "recordingLinkEmailLabel": "E-mail, ktorým ste sa registrovali",
       "recordingLinkSend": "Poslať odkaz znova",
       "recordingLinkSent": "Ak je adresa na podujatie registrovaná, čoskoro vám príde e-mail s osobným odkazom.",
-      "recordingLinkError": "Požiadavka zlyhala. Skúste to o niekoľko minút znova."
+      "recordingLinkError": "Požiadavka zlyhala. Skúste to o niekoľko minút znova.",
+      "registerOrGuest": "Ak sa zaregistrujete, dostanete e-mailom svoj osobný odkaz a novinky o podujatí. Ako hosť vstúpite hneď len s menom, iba počas živého vysielania, a e-maily nedostávate."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -523,7 +532,10 @@
       "stopVideo": "Vypnúť video",
       "revokeFloor": "Odobrať slovo",
       "lowerHandFailed": "Ruku sa nepodarilo spustiť: skúste to znova.",
-      "handsRaised": "{count, plural, one {# zdvihnutá ruka} few {# zdvihnuté ruky} other {# zdvihnutých rúk}}"
+      "handsRaised": "{count, plural, one {# zdvihnutá ruka} few {# zdvihnuté ruky} other {# zdvihnutých rúk}}",
+      "locksByConsent": "Mikrofóny a kamery sa riadia súhlasom so záznamom: kto ho dal, používa, čo podujatie povoľuje, ostatní iba počúvajú. Zámky miestnosti zostávajú zapnuté.",
+      "listenOnlyBadge": "iba počúva",
+      "listenOnlyNoFloor": "Nedal súhlas so záznamom: nemôže vystúpiť, kým ho neudelí vo svojej miestnosti."
     },
     "moderator": {
       "muteAll": "Stlmiť všetkých",
@@ -558,7 +570,8 @@
       "moderatorReveal": "Zobraziť odkaz pre moderátora",
       "moderatorWarning": "Tento odkaz udeľuje prístup MODERÁTORA (stlmiť všetkých, spustiť nahrávanie, ukončiť podujatie). Zdieľajte ho len s ďalšími moderátormi.",
       "moderatorLink": "Odkaz pre moderátora",
-      "moderatorLinkHint": "Kto otvorí tento odkaz, pripojí sa ako moderátor s plnými právami na riadenie miestnosti."
+      "moderatorLinkHint": "Kto otvorí tento odkaz, pripojí sa ako moderátor s plnými právami na riadenie miestnosti.",
+      "copyFailed": "Kopírovanie zlyhalo: označte adresu a skopírujte ju ručne."
     },
     "videoCallFrameTitle": "Videohovor podujatia",
     "insecureContextTitle": "Nezabezpečená adresa",
@@ -616,7 +629,15 @@
       "unavailable": "Titulky momentálne nie sú k dispozícii.",
       "show": "Zobraziť titulky",
       "hide": "Skryť titulky",
-      "toggle": "Automatické titulky"
+      "toggle": "Automatické titulky",
+      "controls": "Ovládanie titulkov",
+      "smaller": "Menšie titulky",
+      "larger": "Väčšie titulky",
+      "moveUp": "Presunúť titulky hore",
+      "moveDown": "Presunúť titulky dole",
+      "smallerShort": "A−",
+      "largerShort": "A+",
+      "showShort": "CC"
     },
     "eventEndedModerator": "Podujatie sa skončilo. Nižšie nájdete štatistiky, a ak sa nahrávalo, aj záznam a správu.",
     "endLinks": {
@@ -625,7 +646,54 @@
       "publicPage": "Verejná stránka podujatia"
     },
     "notOpenNow": "Miestnosť teraz nie je otvorená.",
-    "nameRequired": "Chýba meno, pod ktorým sa pripojíte: vráťte sa a napíšte ho."
+    "nameRequired": "Chýba meno, pod ktorým sa pripojíte: vráťte sa a napíšte ho.",
+    "closeSidebar": "Zavrieť bočný panel",
+    "contentOnly": "Iba obsah, bez četu a panelov",
+    "showPanels": "Zobraziť čet a panely",
+    "confirmFullscreen": "Prepnúť na celú obrazovku",
+    "listenOnly": {
+      "title": "Iba počúvate.",
+      "body": "Nedali ste súhlas so záznamom: sledujete a píšete do četu, ale mikrofón, kamera a obrazovka zostávajú vypnuté, aj keď vám moderátor dá slovo. Ak chcete hovoriť, udeľte súhlas.",
+      "consent": "Súhlasím so záznamom a zapojím sa",
+      "joining": "Opätovný vstup do miestnosti…",
+      "error": "Opätovný vstup sa nepodaril: skúste to znova."
+    },
+    "pseudonym": "Účastník-{code}",
+    "consents": {
+      "open": "Vaše súhlasy",
+      "button": "Súhlasy",
+      "title": "Vaše súhlasy",
+      "intro": "Svoje súhlasy môžete kedykoľvek počas podujatia udeliť alebo odvolať. Každá zmena na niekoľko sekúnd znova pripojí konferenciu.",
+      "given": "Súhlas udelený",
+      "notGiven": "Súhlas neudelený",
+      "withdraw": "Odvolať súhlas",
+      "confirmTitle": "Naozaj odvolať?",
+      "confirm": "Odvolať",
+      "working": "Prebieha aktualizácia…",
+      "error": "Súhlas sa nepodarilo aktualizovať: skúste to znova.",
+      "recording": {
+        "title": "Záznam podujatia",
+        "give": "Súhlasím so záznamom",
+        "without": {
+          "soloAscolto": "Bez tohto súhlasu iba počúvate: mikrofón, kamera a obrazovka zostávajú zatvorené.",
+          "conduce": "Bez tohto súhlasu moderujete ďalej, ale váš hlas nezostane v stopách jednotlivých osôb ani v prepise.",
+          "uscita": "Účasť na tomto podujatí vyžaduje súhlas so záznamom."
+        },
+        "alreadyRecorded": "Čo už bolo zaznamenané, zostáva vo videu podujatia: o odstránenie požiadajte organizátorov.",
+        "withdraw": {
+          "soloAscolto": "Ak ho odvoláte, zostanete v miestnosti a iba počúvate: mikrofón, kamera a obrazovka sa zatvoria. Odvoláte aj súhlas s prepisom svojich príspevkov.",
+          "uscita": "Ak ho odvoláte, opustíte konferenciu a vrátite sa do čakárne: účasť na podujatí vyžaduje súhlas so záznamom. Odvoláte aj súhlas s prepisom svojich príspevkov.",
+          "conduce": "Ak ho odvoláte, moderujete ďalej, ale odteraz váš hlas nezostane v stopách jednotlivých osôb ani v prepise. Video miestnosti, ak sa nahráva, vás zachytí aj tak."
+        }
+      },
+      "transcription": {
+        "title": "Prepis vašich príspevkov",
+        "give": "Súhlasím s prepisom",
+        "giveEffect": "Vaše príspevky sa dostanú do prepisu podujatia s vaším menom. Bez súhlasu sa zúčastňujete aj tak.",
+        "withdrawEffect": "Ak ho odvoláte, vaše už prepísané vety prídu o text aj meno a odteraz sa váš hlas nenahráva na samostatnú stopu ani neprepisuje.",
+        "needsRecording": "Môžete ho udeliť po súhlase so záznamom."
+      }
+    }
   },
   "qa": {
     "title": "Otázky a odpovede",
@@ -833,7 +901,6 @@
         "coverImageHelp": "Zobrazuje sa na verejnej stránke a v e-mailoch prihláseným.",
         "scheduleHeading": "Kalendár",
         "timezone": "Časové pásmo",
-        "recurrenceHeading": "Opakovanie",
         "tagsHeading": "Kategórie (tagy)",
         "newTag": "Nová kategória",
         "newTagLabel": "Názov novej kategórie",
@@ -878,11 +945,11 @@
           "BALANCED": "Vyvážená (540p)",
           "SAVE_DATA": "Úspora dát (360p)"
         },
-        "requiredLegend": "Polia označené * sú potrebné na uloženie podujatia: kým sú prázdne, je to pri každom uvedené.",
         "kickerHint": "Nadtitulok napíšte pred názov a oddeľte ich znakom |, napríklad „Cyklus stretnutí | Prvé stretnutie“.",
         "kickerUse": "Zobraziť „{kicker}“ ako nadtitulok",
         "kickerPreview": "Takto vyzerá na stránke podujatia",
-        "coverImageSize": "16:9, odporúčané 1600 × 900 pixelov."
+        "coverImageSize": "16:9, odporúčané 1600 × 900 pixelov.",
+        "requiredNote": "Polia označené * sú povinné."
       },
       "step2": {
         "heading": "Kto môže robiť čo",
@@ -923,11 +990,11 @@
         "roomFeaturesHeading": "Funkcie miestnosti",
         "aiPipelineOff": "AI postprodukcia (prepis, zhrnutie, preklady) nie je v tejto inštalácii zapnutá.",
         "rolesHeading": "Roly podujatia",
-        "roleModeratorColumn": "Organizátor a moderátor",
+        "roleModeratorColumn": "Spoluorganizátor a moderátor",
         "roleInfo": {
           "organizer": {
-            "name": "Organizátor",
-            "desc": "Vedie miestnosť ako moderátor a je uvedený medzi organizátormi. Hlavný organizátor pridáva a odoberá ostatné osoby. S účtom personálu s rovnakým e-mailom podujatie aj spravuje."
+            "name": "Spoluorganizátor",
+            "desc": "Vedie miestnosť ako moderátor a je uvedený medzi organizátormi. So služobným účtom s rovnakým e-mailom podujatie aj spravuje."
           },
           "moderator": {
             "name": "Moderátor",
@@ -939,10 +1006,17 @@
           },
           "guest": {
             "name": "Účastník",
-            "desc": "Sleduje podujatie a zapája sa tak, ako určíte v tabuľke nižšie."
+            "desc": "Sleduje podujatie a zapája sa tak, ako rozhodnete v kroku „Oprávnenia“."
           }
         },
-        "recordingManualNote": "Záznam sa nikdy nespustí sám: moderátor ho spustí tlačidlom REC."
+        "recordingManualNote": "Záznam sa nikdy nespustí sám: moderátor ho spustí tlačidlom REC.",
+        "listenOnlyWithoutConsent": "Kto nesúhlasí, vstúpi iba ako poslucháč",
+        "listenOnlyWithoutConsentOn": "Súhlas so záznamom je dobrovoľný: kto ho nedá, aj tak sa zúčastní, sleduje a píše do četu, ale mikrofón, kamera a obrazovka zostávajú vypnuté.",
+        "listenOnlyWithoutConsentOff": "Bez súhlasu so záznamom sa nevstúpi.",
+        "listenOnlyLockedLive": "Kým môže byť miestnosť otvorená, záznam a režim iba počúvania sa nedajú zmeniť: platia od prvého vstupu.",
+        "audienceAnonymous": "Anonymné publikum",
+        "audienceAnonymousDesc": "Účastníci sa ostatným zobrazujú pod pseudonymom („Účastník“ a kód) vo videu, v čete aj v otázkach; zoznam účastníkov zostáva moderátorom a námestie nie je. Užitočné pre veľké podujatia; na komunitných podujatiach sa ľudia chcú spoznať.",
+        "audienceAnonymousLocked": "Kým môže byť miestnosť otvorená, nedá sa to zmeniť: prepojilo by to pseudonymy s menami."
       },
       "step3": {
         "heading": "Osoby a pozvánky",
@@ -960,23 +1034,23 @@
         "remove": "Odstrániť",
         "invalidEmail": "Neplatná e-mailová adresa.",
         "duplicateEmail": "Adresa je už pridaná.",
-        "rubricaPick": "Hľadať v adresári…",
+        "rubricaPick": "Hľadať v adresári podľa organizácie…",
         "rubricaOrAdd": "alebo pridajte ručne",
         "removeItem": "Odstrániť {name}",
         "invitationsStaffOnly": "Pozvánky spravuje tím udalosti.",
         "pickSkipped": "Niektoré osoby už boli uvedené alebo nemali platnú adresu, a neboli pridané.",
-        "primaryHeading": "Hlavný organizátor",
+        "primaryHeading": "Hlavný moderátor",
         "primaryHelp": "Dostane e-mailom hlavný odkaz podujatia: vedie miestnosť a pridáva alebo odoberá ostatné osoby. Meno a e-mail sú potrebné na zverejnenie, nie pre koncept.",
-        "primaryPrefilled": "Hlavným organizátorom ste vy, s menom a e-mailom svojho účtu. Ak podujatie vedie niekto iný, zadajte sem jeho údaje: odkaz dostane on.",
-        "primaryNameRequired": "Zadajte meno hlavného organizátora.",
-        "primaryEmailRequired": "Zadajte platný e-mail hlavného organizátora.",
+        "primaryPrefilled": "Hlavným moderátorom ste vy, s menom a e-mailom svojho účtu. Ak podujatie vedie niekto iný, zadajte sem jeho údaje: odkaz dostane on.",
+        "primaryNameRequired": "Zadajte meno hlavného moderátora.",
+        "primaryEmailRequired": "Zadajte platný e-mail hlavného moderátora.",
         "linksOnPublish": "Osobné odkazy sa odošlú e-mailom pri zverejnení; kým je podujatie konceptom, skopírujte ich z jeho stránky.",
         "personName": "Meno",
         "personEmail": "E-mail",
-        "peopleHeading": "Osoby podujatia",
-        "peopleHelp": "Organizátori, moderátori a rečníci. Každý dostane vlastný odkaz na vstup so svojou rolou; čo môže ktorá rola, ukazuje časť „Pokročilé nastavenia“.",
+        "peopleHeading": "Moderátori a rečníci",
+        "peopleHelp": "Spoluorganizátori, moderátori a rečníci. Každý dostane vlastný odkaz na vstup vo svojej role; čo môže ktorá rola, je vysvetlené vyššie.",
         "personRole": "Rola",
-        "roleOrganizer": "Organizátor",
+        "roleOrganizer": "Spoluorganizátor",
         "roleModerator": "Moderátor",
         "roleSpeaker": "Rečník",
         "roleHelp": {
@@ -1015,7 +1089,7 @@
         "programMinutesFor": "Plánované minúty, téma {n}",
         "programTimeUnknown": "Čas nevypočítaný: predchádzajúca téma nemá dĺžku",
         "programNone": "Nikto",
-        "programLeadOrganizer": "Hlavný organizátor",
+        "programLeadOrganizer": "Hlavný moderátor",
         "programMoveUp": "Posunúť tému {n} nahor",
         "programMoveDown": "Posunúť tému {n} nadol",
         "programRemove": "Odstrániť tému {n}",
@@ -1029,8 +1103,8 @@
         "programSpeakerRemoved": "Témy bez vystupujúcej osoby, lebo osoba bola z podujatia odstránená: {count}.",
         "programFrozen": "Agenda sa už v miestnosti použila: tu ju vidíte, ale mení sa v miestnosti.",
         "programPerson": "{name} ({role})",
-        "invitationsHelpOpen": "Voliteľné: zoznam ľudí, ktorých pozývate. Registrácia je otvorená, takže po zverejnení sa môže registrovať ktokoľvek, pozvaný či nie. Platforma pozvánky neposiela: odkaz na podujatie zdieľajte sami.",
-        "invitationsHelpRestricted": "Registrácia je obmedzená: registrovať sa môžu len adresy z tohto zoznamu. Platforma pozvánky neposiela: odkaz na podujatie zdieľajte sami; odkaz na vstup príde e-mailom po registrácii.",
+        "invitationsHelpOpen": "Ľudia, ktorých pozývate vy. Prihlasovanie je otvorené: prihlásiť sa môže ktokoľvek, pozvaný či nie. Po zverejnení im zo stránky podujatia pošlete pozvánku e-mailom.",
+        "invitationsHelpRestricted": "Prihlásiť sa môžu len adresy z tohto zoznamu. Po zverejnení každému zo stránky podujatia pošlete pozvánku e-mailom s odkazom na prihlásenie; odkaz na vstup príde po prihlásení.",
         "logoExternal": "Verejná stránka zobrazuje len logá nahrané na túto platformu: logo z iného webu sa nezobrazí.",
         "primaryProfileInvalid": "Skontrolujte organizáciu a adresu loga.",
         "primaryMore": "Fotografia, inštitúcia, logo a verejná stránka",
@@ -1048,7 +1122,9 @@
         "editQuestions": "Upraviť",
         "editQuestionsBefore": "Upraviť otázky pri registrácii",
         "editQuestionsAfter": "Upraviť dotazník spokojnosti",
-        "accessStaffOnly": "Kto sa môže prihlásiť, rozhoduje tím podujatia."
+        "accessStaffOnly": "Kto sa môže prihlásiť, rozhoduje tím podujatia.",
+        "whoOrganizes": "Kto organizuje",
+        "rubricaWho": "V adresári sú ľudia, ktorí sa zaregistrovali na podujatie a súhlasili, že v ňom zostanú."
       },
       "step4": {
         "heading": "Obsah a materiály",
@@ -1124,9 +1200,9 @@
           "multitrack": "Nahrávanie po účastníkoch",
           "multitrackOn": "Zapnuté — vyžaduje výslovný súhlas pri registrácii",
           "organizingEntities": "Organizujúce inštitúcie",
-          "primaryOrganizer": "Hlavný organizátor",
+          "primaryOrganizer": "Hlavný moderátor",
           "primaryMissing": "Na zverejnenie ho treba uviesť v kroku „Osoby“",
-          "organizersPeople": "Ďalší organizátori",
+          "organizersPeople": "Spoluorganizátori",
           "moderators": "Moderátori",
           "programme": "Program: {count, plural, one {# téma} few {# témy} many {# témy} other {# tém}}",
           "programmeWithDuration": "Program: {count, plural, one {# téma} few {# témy} many {# témy} other {# tém}}, {duration}"
@@ -1175,7 +1251,8 @@
           "invites": "Osoby",
           "programme": "Program",
           "review": "Zhrnutie",
-          "advanced": "Pokročilé nastavenia"
+          "advanced": "Pokročilé nastavenia",
+          "permissions": "Oprávnenia"
         },
         "templateInUse": "Šablóna: <b>{name}</b>",
         "noTemplate": "Podujatie bez šablóny",
@@ -1187,18 +1264,16 @@
         "recordingManual": "K dispozícii: začne sa až po stlačení REC moderátorom.",
         "aiAfter": "Po zázname: {list}.",
         "scheduleHeading": "Kedy sa koná",
-        "scheduleIntro": "Dátum, čas a koľko ľudí čakáte: podľa nich sa pripraví sála.",
+        "scheduleIntro": "Kedy sa podujatie koná: dátum, čas a časové pásmo.",
         "advancedIntro": "Hodnoty, ktoré už zvolila šablóna: zmeňte len to, čo treba.",
         "advancedIntroTemplate": "Hodnoty, ktoré už zvolila šablóna „{name}“: zmeňte len to, čo treba.",
-        "requiredToSave": "Potrebné na uloženie podujatia.",
         "requiredToPublish": "Potrebné na zverejnenie podujatia.",
         "toComplete": "Na doplnenie",
         "missingHeading": "Na zverejnenie ešte chýba:",
-        "fieldOrganizerName": "Meno hlavného organizátora",
-        "fieldOrganizerEmail": "E-mail hlavného organizátora",
+        "fieldOrganizerName": "Meno hlavného moderátora",
+        "fieldOrganizerEmail": "E-mail hlavného moderátora",
         "fieldProgrammeMinutes": "Dĺžka témy {n} programu",
         "sections": {
-          "participation": "Účasť a funkcie sály",
           "recording": "Záznam a AI",
           "content": "Obsah: materiály a dotazníky",
           "room": "Čakáreň a video",
@@ -1230,7 +1305,17 @@
         "askEmail": "e-mail",
         "askOrganization": "organizácia",
         "askRole": "funkcia",
-        "askType": "typ organizácie"
+        "askType": "typ organizácie",
+        "permissionsHeading": "Kto čo môže v miestnosti",
+        "permissionsIntro": "Čo môžu účastníci robiť a ktoré funkcie miestnosti sú zapnuté. Všetko sa dá meniť aj počas podujatia.",
+        "consentsLine": "Súhlasy pri registrácii a v miestnosti: {list}",
+        "consentRecordingRequired": "záznam, povinný na vstup",
+        "consentRecordingFree": "záznam, dobrovoľný (bez neho iba počúvanie)",
+        "consentRecordingNotice": "k záznamu iba upozornenie (účastníci nehovoria ani sa neukazujú)",
+        "consentTranscription": "prepis vlastných príspevkov, dobrovoľný",
+        "consentsNone": "Žiadny súhlas okrem súhlasu pri registrácii.",
+        "consentsHosts": "Moderátori a rečníci sú o súhlas so záznamom požiadaní v miestnosti, dobrovoľne.",
+        "consentsWithdraw": "Účastníci ich môžu v miestnosti odvolať tlačidlom „Súhlasy“."
       },
       "preview": {
         "title": "Náhľad stránky",
@@ -1242,8 +1327,8 @@
       },
       "programme": {
         "heading": "Program stretnutia",
-        "intro": "Témy v poradí: kto vystupuje, o čom a ako dlho. Zobrazia sa pod popisom, s časmi počítanými od začiatku ({start}). Nepovinné.",
-        "introNoStart": "Témy v poradí: kto vystupuje, o čom a ako dlho. Zobrazia sa pod popisom, s časmi počítanými od začiatku podujatia. Nepovinné.",
+        "intro": "Témy v poradí: kto vystupuje, o čom a ako dlho. Zobrazia sa pod popisom, s časmi počítanými od začiatku ({start}).",
+        "introNoStart": "Témy v poradí: kto vystupuje, o čom a ako dlho. Zobrazia sa pod popisom, s časmi počítanými od začiatku podujatia.",
         "statusOn": "Zobrazuje sa na stránke podujatia a v miestnosti ukazuje všetkým aktuálnu tému.",
         "statusOff": "Vypnuté: program sa nezobrazuje na stránke ani v miestnosti.",
         "turnOn": "Zapnúť",
@@ -1287,7 +1372,8 @@
         "offKeptEdit": "Kým je program vypnutý, platí naposledy uložená verzia: zmeny urobené tu sa uložia, len keď ho znova zapnete.",
         "toggleOffWarningCreate": "Vypnutý program ({count, plural, one {# téma} few {# témy} many {# témy} other {# tém}}) sa na stránke nezobrazuje a s podujatím sa neuloží: zapnite ho, aby ste ho zachovali.",
         "reviewOffCreate": "Program: vypnutý, s podujatím sa neuloží ({count, plural, one {# téma} few {# témy} many {# témy} other {# tém}})"
-      }
+      },
+      "saveCopy": "Uložiť kópiu"
     },
     "nav": {
       "events": "Udalosti",
@@ -1313,7 +1399,6 @@
       "publicationsList": "Publikácie",
       "publicationsNew": "Nová publikácia",
       "ariaLabel": "Navigácia administrácie",
-      "subNavAriaLabel": "Navigácia sekcie",
       "questionnaires": "Dotazníky",
       "questionnairesLibrary": "Šablóny dotazníkov",
       "questionnairesResponses": "Odpovede",
@@ -1332,7 +1417,9 @@
       "video": "Video",
       "glossary": "Glosár",
       "breadcrumbAriaLabel": "Navigačná cesta",
-      "skipToPage": "Prejsť na obsah stránky"
+      "skipToPage": "Prejsť na obsah stránky",
+      "openMenu": "Otvoriť ponuku",
+      "closeMenu": "Zavrieť ponuku"
     },
     "publications": {
       "subtitle": "Jednotný redakčný hub pre všetky zverejnené videá: naplánované podujatia, rýchle hovory, nahrané historické archívy a relácie čakajúce na zverejnenie.",
@@ -1488,7 +1575,8 @@
       "actions": {
         "DATA_DELETED": "Údaje vymazané",
         "CONSENT_RECORDED": "Súhlas zaznamenaný",
-        "DATA_EXPORTED": "Údaje exportované"
+        "DATA_EXPORTED": "Údaje exportované",
+        "CONSENT_WITHDRAWN": "Súhlas odvolaný"
       },
       "recordsAffected": "{count} dotknutých záznamov",
       "colWhen": "Kedy",
@@ -1610,13 +1698,6 @@
     "deleteSuccess": "Udalosť zmazaná",
     "publishSuccess": "Udalosť publikovaná",
     "unpublishSuccess": "Podujatie stiahnuté",
-    "startEvent": "Začať udalosť",
-    "startEventSuccess": "Udalosť začala! Čakajúci účastníci budú automaticky presmerovaní.",
-    "startEventConfirmTitle": "Spustiť podujatie?",
-    "startEventConfirmMessage": "Plánovaný začiatok: {when}. Ktokoľvek s odkazom sa môže hneď pripojiť a videomiestnosť sa spúšťa teraz.",
-    "startEventConfirmEarly": "Do začiatku zostáva viac ako 30 minút.",
-    "startEventFailed": "Podujatie sa nespustilo. Skúste to znova.",
-    "jvbWarmupWarning": "Video servery sa spúšťajú (približne 2 minúty). Účastníci uvidia upozornenie v čakárni.",
     "eventIsLive": "Udalosť práve prebieha",
     "liveParticipants": "{count} v miestnosti / {max} max",
     "joinAsModeratorBtn": "Pripojiť sa ako moderátor",
@@ -1654,7 +1735,6 @@
         "expected": "{count, plural, one {očakávaný účastník} few {očakávaní účastníci} many {očakávaného účastníka} other {očakávaných účastníkov}}",
         "registered": "{count, plural, =0 {zatiaľ žiadni prihlásení} one {zatiaľ # prihlásený} few {zatiaľ # prihlásení} many {zatiaľ # prihláseného} other {zatiaľ # prihlásených}}",
         "change": "Zmeniť",
-        "changeParticipants": "Zmeniť počet očakávaných účastníkov",
         "sizedOnRegistrations": "Prihlásených je viac než očakávaných účastníkov: odhad počíta s {count} prihlásenými.",
         "cameraQuestion": "Koľko webkamier bude zapnutých?",
         "camera": {
@@ -1866,7 +1946,7 @@
       "guestJoinHint": "Rýchly odkaz na pozvanie účastníka na poslednú chvíľu: vstúpi ako hosť, keď je podujatie naživo, bez vyplnenia registračného formulára.",
       "callInvite": "Odkaz pre účastníkov",
       "callInviteHint": "Kto ho dostane, pripojí sa k hovoru ako hosť, bez registrácie. Rýchly hovor nemá verejnú stránku: zdieľajte tento odkaz.",
-      "moderatorLink": "Odkaz moderátora",
+      "moderatorLink": "Odkaz na správu (moderátor)",
       "moderatorLinkHint": "Tento odkaz zdieľajte iba s moderátormi. Ktokoľvek s týmto odkazom môže udalosť spravovať.",
       "liveRoomHint": "Odkaz na priamy vstup do miestnosti ako moderátor.",
       "copyLink": "Kopírovať odkaz",
@@ -1876,7 +1956,8 @@
       "warning": "Ktokoľvek s týmto odkazom spravuje podujatie: nezobrazujte ho pri zdieľaní obrazovky a nevkladajte ho do chatu.",
       "hidden": "Odkaz je skrytý",
       "copyFailed": "Kopírovanie zlyhalo: vyberte adresu nižšie a skopírujte ju ručne.",
-      "notYetPublished": "Funguje až po zverejnení: dovtedy sa zobrazí „stránka sa nenašla“."
+      "notYetPublished": "Funguje až po zverejnení: dovtedy sa zobrazí „stránka sa nenašla“.",
+      "copyFailedShort": "Kopírovanie zlyhalo"
     },
     "feedbackAdmin": {
       "title": "Výsledky spätnej väzby",
@@ -1952,7 +2033,8 @@
       "actions": {
         "DATA_DELETED": "Údaje zmazané",
         "CONSENT_RECORDED": "Súhlas zaznamenaný",
-        "DATA_EXPORTED": "Údaje exportované"
+        "DATA_EXPORTED": "Údaje exportované",
+        "CONSENT_WITHDRAWN": "Súhlas odvolaný"
       }
     },
     "settings": {
@@ -2266,9 +2348,9 @@
     },
     "recurrence": {
       "label": "Opakovanie",
-      "helpText": "Nastavte podujatie ako opakované. Vytvorí sa séria počnúc dátumom začiatku.",
+      "helpText": "Ak sa podujatie opakuje, kópia pri duplikovaní navrhne dátum ďalšieho konania.",
       "preset": {
-        "none": "Žiadne",
+        "none": "Neopakuje sa",
         "daily": "Každý deň",
         "weekly": "Každý týždeň",
         "weekdays": "Pracovné dni",
@@ -2322,7 +2404,6 @@
       "aiTranscript": "Automatický prepis (predvolené)",
       "aiSummary": "Automatické zhrnutie (predvolené)",
       "aiTranslation": "Automatický preklad (predvolené)",
-      "pickerTitle": "Vyberte šablónu",
       "pickerSubtitle": "Vyberte šablónu pre predkonfiguráciu nastavení udalosti, alebo preskočte pre manuálnu konfiguráciu.",
       "skipTemplate": "Konfigurovať manuálne",
       "postEventPublic": "Verejná stránka po udalosti",
@@ -2701,10 +2782,7 @@
       "resultsCount": "{count, plural, =0 {Žiadne podujatie} one {# podujatie} other {# podujatí}}",
       "menu": {
         "actionsFor": "Akcie pre „{title}“",
-        "manage": "Spravovať",
         "edit": "Upraviť",
-        "openPublic": "Otvoriť verejnú stránku",
-        "newTab": "(otvorí sa na novej karte)",
         "copyLink": "Kopírovať verejný odkaz",
         "linkCopied": "Odkaz skopírovaný",
         "publish": "Zverejniť",
@@ -2713,7 +2791,7 @@
         "unpublishMessage": "„{title}“ zmizne z verejných stránok, kým ho znova nezverejníte. Už prijaté registrácie zostanú zachované.",
         "published": "Podujatie zverejnené",
         "unpublished": "Podujatie stiahnuté",
-        "duplicate": "Duplikovať ako ďalší termín",
+        "duplicate": "Duplikovať",
         "delete": "Odstrániť",
         "deleteTitle": "Odstrániť podujatie?",
         "deleteMessage": "„{title}“ a všetky jeho údaje budú odstránené. Túto akciu nemožno vrátiť.",
@@ -2771,7 +2849,6 @@
       "participantHintPassword": "Otvorí sa na novej karte: miestnosť tak, ako ju vidí hosť, po zadaní hesla udalosti.",
       "participantHintPage": "Otvorí sa na novej karte: verejná stránka tak, ako ju vidia účastníci.",
       "editEvent": "Upraviť podujatie",
-      "editSettings": "Upraviť nastavenia",
       "featureSummary": "Aktívne funkcie",
       "organizers": "Organizátori",
       "privacyGdpr": "Súkromie a GDPR",
@@ -2824,9 +2901,9 @@
       "aiGenerateError": "AI pipeline sa nepodarilo spustiť. Skontrolujte, či je AI zapnutá pre celý web a či existuje nahrávka.",
       "aiGenerateHelp": "Jedným kliknutím zapne AI prepis a zhrnutie a spustí pipeline nad nahrávkou. Idempotentné: dvojité kliknutie úlohy nezduplikuje.",
       "aiGenerateNoRecording": "Žiadna nahrávka: AI po podujatí vyžaduje nahrávku (zachytáva sa len počas podujatia). Postprodukciu tu však môžete spravovať aj tak.",
-      "duplicateNext": "Duplikovať na ďalší raz",
+      "duplicateNext": "Duplikovať",
       "duplicateNextBusy": "Duplikuje sa…",
-      "duplicateNextHint": "Vytvorí koncept s celou konfiguráciou tohto podujatia (nahrávanie, samostatné stopy, AI, agenda, pripomienky). Ak má podujatie pravidelnú kadenciu, dátum sa posunie na ďalší výskyt; inak ho treba nastaviť.",
+      "duplicateNextHint": "Vytvorí kópiu v koncepte s celým nastavením tohto podujatia. Ak sa podujatie opakuje, kópia začína ďalším konaním; inak má rovnaké dátumy, ktoré treba upraviť.",
       "duplicateNextError": "Duplikovanie sa nepodarilo. Skúste to znova.",
       "capacitySection": "Kapacita a infraštruktúra",
       "capacitySubtitle": "Dimenzované pre približne {max} očakávaných účastníkov",
@@ -2838,11 +2915,12 @@
         "publishFailedTitle": "Zverejnenie sa nepodarilo",
         "publishFailedBody": "Udalosť je uložená ako koncept: zverejnite ju na tejto stránke, keď bude problém vyriešený.",
         "unsaved": "Neuložené: {items}. Môžete ich pridať na tejto stránke.",
-        "copyParticipantLink": "Kopírovať odkaz pre účastníkov",
         "sendToSpeakers": "Odkazy moderátorov a rečníkov",
         "close": "Zavrieť súhrn",
         "publishNow": "Zverejniť teraz"
-      }
+      },
+      "editFeatures": "Upraviť funkcie",
+      "editPrivacy": "Upraviť súkromie a údaje"
     },
     "rubrica": {
       "subtitle": "Osoby, ktoré dali súhlas so zaradením do adresára (čl. 6.1.a GDPR). Profilové informácie sa automaticky aktualizujú pri každej opätovnej registrácii.",
@@ -3450,6 +3528,7 @@
     "guided": {
       "title": "Aké je vaše podujatie?",
       "intro": "Štyri otázky na začiatok so správnymi nastaveniami. Každú funkciu možno zapnúť alebo vypnúť aj počas podujatia.",
+      "introNoRecording": "Tri otázky na začiatok so správnymi nastaveniami. Každú funkciu možno zapnúť alebo vypnúť aj počas podujatia.",
       "peopleQ": "Koľko ľudí čakáte?",
       "people": {
         "piccolo": "Do 20",
@@ -3474,9 +3553,7 @@
       "preview": "Vaše podujatie",
       "previewPeople": "Očakávaní účastníci: asi {count}",
       "continue": "Pokračovať",
-      "useTemplate": "Alebo použite šablónu",
-      "instantAlt": "Alebo okamžitý videohovor",
-      "instantAltAction": "Vytvoriť videohovor",
+      "useTemplate": "Začať zo šablóny",
       "summary": {
         "piccolo": "Do 20 osôb",
         "medio": "Do 100 osôb",
@@ -3492,10 +3569,12 @@
       "access": {
         "open": "Ktokoľvek, kto sa prihlási",
         "openDesc": "Kto chce, prihlási sa na stránke podujatia",
-        "invitation": "Len vami pozvaní",
-        "invitationDesc": "Stránka zostáva viditeľná, ale prihlásiť sa môžu len pozvaní; bez prihlášky sa dnu nedostanete"
+        "invitation": "Iba pozvaní",
+        "invitationDesc": "Stránka zostáva viditeľná, ale prihlásiť sa môžu len ľudia zo zoznamu; pozvánku s odkazom na prihlásenie pošlete e-mailom zo stránky podujatia"
       },
-      "previewInvitation": "Prihlásiť sa môžu len vami pozvaní; bez prihlášky sa nikto nedostane dnu."
+      "previewInvitation": "Prihlasujú sa iba pozvaní; bez prihlásenia sa nevstúpi.",
+      "templateReplaces": "Šablóna prinesie vlastné nastavenia namiesto odpovedí nižšie. Názov, dátumy a osoby zadáte v ďalších krokoch.",
+      "instantBack": "Vytvoriť namiesto toho naplánované podujatie"
     },
     "captionsTranscript": {
       "title": "Prepis z titulkov",
@@ -3584,10 +3663,21 @@
       "status": "Stav",
       "roleSpeaker": "Rečník",
       "registered": "Prihlásený",
-      "notRegistered": "Ešte neprihlásený",
       "organizersTitle": "Organizujúce inštitúcie",
       "organizersEdit": "Upraviť inštitúcie",
-      "organizersEmpty": "Nie je uvedená žiadna inštitúcia: verejná stránka neukazuje, kto organizuje."
+      "organizersEmpty": "Nie je uvedená žiadna inštitúcia: verejná stránka neukazuje, kto organizuje.",
+      "sendAll": "Poslať pozvánku tým, ktorí ju ešte nedostali ({count})",
+      "sending": "Odosiela sa…",
+      "sendDone": "Odosielané pozvánky: {sent}. Preskočené (už prihlásení alebo bez adresy): {skipped}.",
+      "sendError": "Odoslanie zlyhalo: skúste to znova.",
+      "sendNotPublished": "Pozvánky sa odosielajú, kým podujatie prijíma prihlášky: po zverejnení a pred koncom.",
+      "invitedOn": "Pozvaný {date}",
+      "notInvited": "Pozvánka neodoslaná",
+      "send": "Poslať pozvánku",
+      "resend": "Poslať znova",
+      "actions": "Akcie",
+      "sendTooMany": "Príliš veľa odoslaní za krátky čas: skúste to o minútu.",
+      "sendRemaining": "Zostáva {remaining}: stlačte znova a odošlite ich."
     },
     "closing": {
       "title": "Uzavrieť podujatie",
@@ -3803,6 +3893,56 @@
         "item": "{language}: {state}",
         "review": "Skontrolovať texty"
       }
+    },
+    "voiceConsent": {
+      "title": "Prepísať celý záznam?",
+      "message": "Toto podujatie požiadalo každého o súhlas s prepisom jeho príspevkov. Celý záznam obsahuje všetky hlasy, aj tých, ktorí súhlas nedali: prepíšte ho, len ak súhlasili všetci, ktorí v ňom hovoria. Vaše potvrdenie zostane v protokole činností.",
+      "confirm": "Áno, všetci súhlasili",
+      "cancel": "Zrušiť",
+      "waiting": "Prepis celého záznamu sa nespustil sám: toto podujatie požiadalo každého o súhlas s prepisom jeho príspevkov. Spustite ho tlačidlom {button} len vtedy, ak súhlasili všetci, ktorí v zázname hovoria; inak zostane prepis z titulkov."
+    },
+    "editCopyTitle": "Kópia podujatia",
+    "editCopyNoticeNext": "Pracujete na kópii v koncepte: pôvodné podujatie sa nemení. Dátum je už nastavený na ďalšie konanie: skontrolujte zvyšok a uložte.",
+    "editCopyNoticeSameDates": "Pracujete na kópii v koncepte: pôvodné podujatie sa nemení. Má rovnaké dátumy ako originál: pred uložením ich upravte.",
+    "consentProofs": {
+      "title": "Doklady súhlasov",
+      "intro": "Súhlasy so záznamom a prepisom udelené pri registrácii, v čakárni alebo v miestnosti, a tie odvolané. Zoznam s menami slúži na ich preukázanie.",
+      "loading": "Načítava sa…",
+      "loadFailed": "Doklady súhlasov sa nepodarilo načítať.",
+      "none": "Pre toto podujatie žiadny súhlas so záznamom ani prepisom.",
+      "kinds": {
+        "recording": "Záznam",
+        "transcription": "Prepis príspevkov"
+      },
+      "counts": "súhlasia {given} · odvolali {withdrawn}",
+      "download": "Stiahnuť zoznam (CSV)",
+      "downloading": "Sťahuje sa…",
+      "downloadNote": "Zoznam obsahuje mená osôb: export sa zapíše do protokolu GDPR podujatia.",
+      "downloadFailed": "Zoznam sa nepodarilo stiahnuť: skúste to znova.",
+      "csv": {
+        "kind": "Súhlas",
+        "source": "Kde",
+        "role": "Rola",
+        "name": "Meno",
+        "givenAt": "Udelené",
+        "withdrawnAt": "Odvolané",
+        "textVersion": "Verzia textu",
+        "kinds": {
+          "recording": "Záznam",
+          "transcription": "Prepis príspevkov"
+        },
+        "sources": {
+          "registration": "registrácia",
+          "room": "miestnosť"
+        },
+        "roles": {
+          "registrant": "registrovaný",
+          "guest": "hosť",
+          "host": "moderuje alebo vystupuje"
+        },
+        "unreadableName": "(meno nie je čitateľné)"
+      },
+      "countsNote": "Počítajú sa osoby: registrácia, účet tímu alebo menný odkaz sa počítajú raz; hosť, ktorý sa vráti pri inej návšteve, sa počíta znova."
     }
   },
   "email": {
@@ -3837,7 +3977,9 @@
     "upcoming": {
       "title": "Nadchádzajúce podujatia",
       "viewAll": "Zobraziť všetky podujatia",
-      "noEvents": "Žiadne naplánované podujatia. Pozrite sa čoskoro znova!"
+      "noEvents": "Žiadne naplánované podujatia. Pozrite sa čoskoro znova!",
+      "seePast": "Minulé podujatia",
+      "seeRecordings": "Záznamy"
     },
     "howItWorks": {
       "title": "Ako sa zapojiť",
@@ -4187,9 +4329,11 @@
       "recordingRequired": "Pre účasť na tejto udalosti je potrebný súhlas s nahrávaním",
       "recordingNotice": "Podujatie sa nahráva (zvuk a video). Zúčastňujete sa bez mikrofónu a kamery: záznam neobsahuje váš hlas ani obraz, pokiaľ vám moderátor neudelí slovo.",
       "multitrack": "Súhlasím s prepisom svojich príspevkov so svojím menom na účely správy z podujatia. Ak podujatie nahráva samostatnú zvukovú stopu každej osoby, môj hlas sa nahráva iba na tento účel a stopa sa po prepise vymaže; nepoužíva sa na identifikáciu ani napodobnenie môjho hlasu.",
-      "multitrackOptional": "Je to dobrovoľné: ak súhlas nedáte, môžete sa aj tak zúčastniť, ale váš hlas sa nenahráva a vaše príspevky nebudú v prepise.",
+      "multitrackOptional": "Je to dobrovoľné: ak nesúhlasíte, aj tak sa zúčastníte, ale vaše príspevky sa nedostanú do prepisu a váš hlas sa nebude nahrávať na samostatnú stopu. Ak sa podujatie nahráva, váš hlas vo videu aj tak zostane.",
       "stayInTouch": "Chcem dostávať informácie o pripravovaných podujatiach a byť zaradený do adresára, aby som bol pozývaný na podobné podujatia",
-      "stayInTouchHelp": "Nepovinný súhlas (čl. 6.1.a GDPR). Môžete ho kedykoľvek odvolať odkazom „Odstrániť ma z adresára“ v e-mailoch, ktoré dostanete. Meno a organizácia sú z tejto registrácie."
+      "stayInTouchHelp": "Nepovinný súhlas (čl. 6.1.a GDPR). Môžete ho kedykoľvek odvolať odkazom „Odstrániť ma z adresára“ v e-mailoch, ktoré dostanete. Meno a organizácia sú z tejto registrácie.",
+      "recordingOptionalListenOnly": "Ak nesúhlasíte, aj tak sa zúčastníte, iba ako poslucháč: sledujete a píšete do četu, ale mikrofón, kamera a zdieľanie obrazovky zostávajú vypnuté. Súhlas môžete dať neskôr v miestnosti.",
+      "recordingOptionalHost": "Ak nesúhlasíte, aj tak vstúpite a vediete ako zvyčajne, ale váš hlas sa neuchová v samostatných stopách účastníkov ani v prepise. Video miestnosti, ak sa nahráva, vás aj tak zachytí."
     },
     "export": {
       "title": "Moje údaje",
@@ -4852,11 +4996,13 @@
     "transparency": "Bezpečnosť a transparentnosť",
     "serviceInventory": "Inventár služieb",
     "sourceCode": "Zdrojový kód",
-    "buildInfoDev": "vývojový build",
-    "viewCommit": "Zobraziť commit na GitHube",
     "viewRelease": "Zobraziť vydanie na GitHube",
     "viewChangelog": "Pozrite si novinky (changelog)",
-    "buildDatePrefix": "Zostavené"
+    "newWindow": "otvorí sa v novom okne",
+    "usefulLinks": "Užitočné odkazy",
+    "version": "Verzia {version}",
+    "versionDev": "Vývojová verzia",
+    "updatedOn": "aktualizované {date}"
   },
   "changelog": {
     "metaTitle": "Novinky a changelog",
@@ -5023,7 +5169,9 @@
       "version": "Verzia pipeline"
     },
     "overlapBadge": "súbežne",
-    "overlapTitle": "Súbežná reč: v tomto intervale hovorí viac osôb naraz."
+    "overlapTitle": "Súbežná reč: v tomto intervale hovorí viac osôb naraz.",
+    "anonymousSpeaker": "Účastník {n}",
+    "untranscribed": "Neprepísané: rečník nedal súhlas"
   },
   "waiting": {
     "startsIn": "Udalosť začne o",
@@ -5087,9 +5235,6 @@
     "endedWatchRecording": "Pozrieť záznam",
     "endedLeaveFeedback": "Zanechať spätnú väzbu",
     "startEventError": "Chyba pri spustení podujatia. Skúste to znova.",
-    "emailLabel": "E-mail (voliteľný)",
-    "emailHelp": "Iba pre prípadný follow-up po podujatí",
-    "emailInvalid": "Zadajte platnú e-mailovú adresu",
     "chatLockedMessage": "Zadajte svoje meno na pripojenie do chatu podujatia.",
     "classicView": "Klasické zobrazenie",
     "backToGarden": "Zobraziť námestie",
@@ -5322,7 +5467,12 @@
     "waitingForStartButton": "Čaká sa na začiatok",
     "countdownHours": "{hours} h",
     "countdownMinutes": "{minutes} min",
-    "countdownSeconds": "{seconds} s"
+    "countdownSeconds": "{seconds} s",
+    "startEarlyConfirm": "Do plánovaného začiatku ({when}) zostáva viac ako 30 minút. Ak podujatie spustíte teraz, ktokoľvek s odkazom hneď vstúpi a zapne sa videomiestnosť: potvrďte ďalším stlačením.",
+    "startEarlyYes": "Spustiť teraz",
+    "startEarlyNo": "Počkať na plánovaný čas",
+    "anonymousNameHelp": "Na tomto podujatí je publikum anonymné: ostatní neuvidia vaše meno, ale pseudonym s kódom.",
+    "registeredNameHelp": "Je to meno, pod ktorým ste sa zaregistrovali: tak sa zobrazíte v miestnosti."
   },
   "recording": {
     "management": "Videozáznam",

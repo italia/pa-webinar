@@ -81,7 +81,8 @@
     "deselectAll": "Poista kaikki valinnat",
     "durationMinutes": "{minutes, plural, one {# minuutti} other {# minuuttia}}",
     "durationHours": "{hours, plural, one {# tunti} other {# tuntia}}",
-    "durationHoursMinutes": "{hours, plural, one {# tunti} other {# tuntia}} ja {minutes, plural, one {# minuutti} other {# minuuttia}}"
+    "durationHoursMinutes": "{hours, plural, one {# tunti} other {# tuntia}} ja {minutes, plural, one {# minuutti} other {# minuuttia}}",
+    "backToTop": "Takaisin ylös"
   },
   "markdown": {
     "edit": "Kirjoita",
@@ -102,7 +103,14 @@
     "switchLanguage": "Vaihda kieli",
     "skipToContent": "Siirry sisältöön",
     "skipToFooter": "Siirry alatunnisteeseen",
-    "mainLabel": "Päänavigaatio"
+    "mainLabel": "Päänavigaatio",
+    "activeLanguage": "Aktiivinen kieli:",
+    "languageSelected": "(valittu)",
+    "signIn": "Kirjaudu",
+    "roleAdmin": "Ylläpitäjä",
+    "roleOrganizer": "Järjestäjä",
+    "instanceKey": "Instanssin avain",
+    "signOutFailed": "Uloskirjautuminen epäonnistui: yritä uudelleen."
   },
   "header": {
     "followUs": "Seuraa meitä"
@@ -204,7 +212,8 @@
       "recordingLinkEmailLabel": "Sähköposti, jolla ilmoittauduit",
       "recordingLinkSend": "Lähetä linkki uudelleen",
       "recordingLinkSent": "Jos osoite on ilmoittautunut tapahtumaan, saat pian sähköpostin henkilökohtaisella linkillä.",
-      "recordingLinkError": "Pyyntö epäonnistui. Yritä uudelleen muutaman minuutin kuluttua."
+      "recordingLinkError": "Pyyntö epäonnistui. Yritä uudelleen muutaman minuutin kuluttua.",
+      "registerOrGuest": "Ilmoittautumalla saat sähköpostiin henkilökohtaisen linkin ja tietoa tapahtumasta. Vieraana pääset heti sisään pelkällä nimellä, vain tapahtuman ollessa käynnissä, etkä saa sähköposteja."
     },
     "manage": {
       "toggleChat": "Keskustelu",
@@ -523,7 +532,10 @@
       "stopVideo": "Sammuta video",
       "revokeFloor": "Ota puheenvuoro pois",
       "lowerHandFailed": "Kättä ei voitu laskea: yritä uudelleen.",
-      "handsRaised": "{count, plural, one {# nostettu käsi} other {# nostettua kättä}}"
+      "handsRaised": "{count, plural, one {# nostettu käsi} other {# nostettua kättä}}",
+      "locksByConsent": "Mikrofonit ja kamerat noudattavat suostumusta tallennukseen: sen antaneet käyttävät tapahtuman sallimaa, muut vain kuuntelevat. Huoneen lukitukset pysyvät päällä.",
+      "listenOnlyBadge": "vain kuuntelee",
+      "listenOnlyNoFloor": "Ei ole antanut suostumusta tallennukseen: ei voi puhua ennen kuin antaa sen omasta huoneestaan."
     },
     "moderator": {
       "muteAll": "Mykistä kaikki",
@@ -558,7 +570,8 @@
       "moderatorReveal": "Näytä moderaattorilinkki",
       "moderatorWarning": "Tämä linkki antaa MODERAATTORIN oikeudet (kaikkien mykistys, tallennuksen aloitus, tapahtuman päättäminen). Jaa se vain muille moderaattoreille.",
       "moderatorLink": "Moderaattorilinkki",
-      "moderatorLinkHint": "Linkin avaaja liittyy moderaattorina ja saa huoneen täydet ohjausoikeudet."
+      "moderatorLinkHint": "Linkin avaaja liittyy moderaattorina ja saa huoneen täydet ohjausoikeudet.",
+      "copyFailed": "Kopiointi epäonnistui: valitse osoite ja kopioi se käsin."
     },
     "videoCallFrameTitle": "Tapahtuman videopuhelu",
     "insecureContextTitle": "Suojaamaton osoite",
@@ -616,7 +629,15 @@
       "unavailable": "Tekstitys ei ole juuri nyt käytettävissä.",
       "show": "Näytä tekstitys",
       "hide": "Piilota tekstitys",
-      "toggle": "Automaattinen tekstitys"
+      "toggle": "Automaattinen tekstitys",
+      "controls": "Tekstityksen säätimet",
+      "smaller": "Pienempi tekstitys",
+      "larger": "Suurempi tekstitys",
+      "moveUp": "Siirrä tekstitys ylös",
+      "moveDown": "Siirrä tekstitys alas",
+      "smallerShort": "A−",
+      "largerShort": "A+",
+      "showShort": "CC"
     },
     "eventEndedModerator": "Tapahtuma on päättynyt. Alta löydät tilastot ja, jos tapahtuma tallennettiin, tallenteen ja raportin.",
     "endLinks": {
@@ -625,7 +646,54 @@
       "publicPage": "Tapahtuman julkinen sivu"
     },
     "notOpenNow": "Huone ei ole juuri nyt auki.",
-    "nameRequired": "Nimi, jolla liityt, puuttuu: palaa takaisin ja kirjoita se."
+    "nameRequired": "Nimi, jolla liityt, puuttuu: palaa takaisin ja kirjoita se.",
+    "closeSidebar": "Sulje sivupaneeli",
+    "contentOnly": "Vain sisältö, ilman chattia ja paneeleja",
+    "showPanels": "Näytä chat ja paneelit",
+    "confirmFullscreen": "Vaihda koko näytölle",
+    "listenOnly": {
+      "title": "Olet vain kuuntelija.",
+      "body": "Et antanut suostumusta tallennukseen: seuraat ja kirjoitat chattiin, mutta mikrofoni, kamera ja näyttö pysyvät pois päältä, vaikka juontaja antaisi sinulle puheenvuoron. Anna suostumus puhuaksesi.",
+      "consent": "Suostun tallennukseen ja osallistun",
+      "joining": "Palataan huoneeseen…",
+      "error": "Palaaminen epäonnistui: yritä uudelleen."
+    },
+    "pseudonym": "Osallistuja-{code}",
+    "consents": {
+      "open": "Suostumuksesi",
+      "button": "Suostumukset",
+      "title": "Suostumuksesi",
+      "intro": "Voit antaa tai peruuttaa suostumuksesi milloin tahansa tapahtuman aikana. Jokainen muutos yhdistää kokouksen uudelleen muutamaksi sekunniksi.",
+      "given": "Suostumus annettu",
+      "notGiven": "Suostumusta ei annettu",
+      "withdraw": "Peruuta suostumus",
+      "confirmTitle": "Peruutetaanko suostumus?",
+      "confirm": "Peruuta",
+      "working": "Päivitetään…",
+      "error": "Suostumusta ei voitu päivittää: yritä uudelleen.",
+      "recording": {
+        "title": "Tapahtuman tallennus",
+        "give": "Suostun tallennukseen",
+        "without": {
+          "soloAscolto": "Ilman tätä suostumusta olet vain kuuntelija: mikrofoni, kamera ja näyttö pysyvät suljettuina.",
+          "conduce": "Ilman tätä suostumusta johdat silti, mutta äänesi ei jää henkilökohtaisille raidoille eikä litteraattiin.",
+          "uscita": "Tähän tapahtumaan osallistuminen edellyttää suostumusta tallennukseen."
+        },
+        "alreadyRecorded": "Jo tallennettu jää tapahtuman videoon: pyydä poistoa järjestäjiltä.",
+        "withdraw": {
+          "soloAscolto": "Jos peruutat sen, jäät huoneeseen vain kuuntelijaksi: mikrofoni, kamera ja näyttö suljetaan. Myös suostumuksesi puheenvuorojesi litterointiin peruutetaan.",
+          "uscita": "Jos peruutat sen, poistut kokouksesta ja palaat odotushuoneeseen: osallistuminen edellyttää suostumusta tallennukseen. Myös suostumuksesi puheenvuorojesi litterointiin peruutetaan.",
+          "conduce": "Jos peruutat sen, jatkat johtamista, mutta tästä lähtien äänesi ei jää henkilökohtaisille raidoille eikä litteraattiin. Huoneen video näyttää sinut silti, jos sitä tallennetaan."
+        }
+      },
+      "transcription": {
+        "title": "Puheenvuorojesi litterointi",
+        "give": "Suostun litterointiin",
+        "giveEffect": "Puheenvuorosi tulevat tapahtuman litteraattiin nimelläsi. Ilman suostumusta osallistut silti.",
+        "withdrawEffect": "Jos peruutat sen, jo litteroidut lauseesi menettävät tekstinsä ja nimesi, eikä ääntäsi tästä lähtien tallenneta omalle raidalle eikä litteroida.",
+        "needsRecording": "Voit antaa sen suostuttuasi tallennukseen."
+      }
+    }
   },
   "qa": {
     "title": "Kysymykset ja vastaukset",
@@ -833,7 +901,6 @@
         "coverImageHelp": "Näkyy julkisella sivulla ja ilmoittautuneille lähetettävissä sähköposteissa.",
         "scheduleHeading": "Aikataulu",
         "timezone": "Aikavyöhyke",
-        "recurrenceHeading": "Toistuvuus",
         "tagsHeading": "Kategoriat (tagit)",
         "newTag": "Uusi luokka",
         "newTagLabel": "Uuden luokan nimi",
@@ -878,11 +945,11 @@
           "BALANCED": "Tasapainoinen (540p)",
           "SAVE_DATA": "Datansäästö (360p)"
         },
-        "requiredLegend": "*-merkityt kentät tarvitaan tapahtuman tallentamiseen: niin kauan kuin ne ovat tyhjiä, se lukee jokaisen kohdalla.",
         "kickerHint": "Kirjoita yläotsikko ennen otsikkoa ja erota ne merkillä |, esimerkiksi ”Tapaamissarja | Ensimmäinen tapaaminen”.",
         "kickerUse": "Näytä ”{kicker}” yläotsikkona",
         "kickerPreview": "Näin se näkyy tapahtuman sivulla",
-        "coverImageSize": "16:9, suositus 1600 × 900 pikseliä."
+        "coverImageSize": "16:9, suositus 1600 × 900 pikseliä.",
+        "requiredNote": "Tähdellä * merkityt kentät ovat pakollisia."
       },
       "step2": {
         "heading": "Kuka voi tehdä mitäkin",
@@ -923,11 +990,11 @@
         "roomFeaturesHeading": "Huoneen toiminnot",
         "aiPipelineOff": "Tekoälyjälkikäsittely (litterointi, tiivistelmä, käännökset) ei ole käytössä tässä asennuksessa.",
         "rolesHeading": "Tapahtuman roolit",
-        "roleModeratorColumn": "Järjestäjä ja moderaattori",
+        "roleModeratorColumn": "Toinen järjestäjä ja moderaattori",
         "roleInfo": {
           "organizer": {
-            "name": "Järjestäjä",
-            "desc": "Johtaa huonetta kuten moderaattori ja esitetään järjestäjien joukossa. Pääjärjestäjä lisää ja poistaa muita henkilöitä. Saman sähköpostin henkilökuntatilillä hän hallinnoi myös tapahtumaa."
+            "name": "Toinen järjestäjä",
+            "desc": "Vetää huonetta moderaattorin tavoin ja esitellään järjestäjien joukossa. Samalla sähköpostilla olevalla henkilökunnan tilillä hallinnoi myös tapahtumaa."
           },
           "moderator": {
             "name": "Moderaattori",
@@ -939,10 +1006,17 @@
           },
           "guest": {
             "name": "Osallistuja",
-            "desc": "Seuraa tapahtumaa ja osallistuu niin kuin alla olevassa taulukossa päätät."
+            "desc": "Seuraa tapahtumaa ja osallistuu niin kuin päätät vaiheessa ”Oikeudet”."
           }
         },
-        "recordingManualNote": "Tallennus ei koskaan ala itsestään: juontaja käynnistää sen REC-painikkeella."
+        "recordingManualNote": "Tallennus ei koskaan ala itsestään: juontaja käynnistää sen REC-painikkeella.",
+        "listenOnlyWithoutConsent": "Suostumuksen antamatta jättävät osallistuvat vain kuunnellen",
+        "listenOnlyWithoutConsentOn": "Suostumus tallennukseen on vapaaehtoinen: sen antamatta jättävä osallistuu silti, seuraa ja kirjoittaa chattiin, mutta mikrofoni, kamera ja näyttö pysyvät pois päältä.",
+        "listenOnlyWithoutConsentOff": "Ilman suostumusta tallennukseen ei pääse sisään.",
+        "listenOnlyLockedLive": "Kun huone voi olla auki, tallennusta ja pelkkää kuuntelua ei voi muuttaa: ne ovat voimassa ensimmäisestä sisääntulosta.",
+        "audienceAnonymous": "Anonyymi yleisö",
+        "audienceAnonymousDesc": "Osallistujat näkyvät muille salanimellä (”Osallistuja” ja koodi) videossa, chatissa ja kysymyksissä; osallistujaluettelo jää juontajille, eikä aukiota ole. Hyödyllinen suurissa tapahtumissa; yhteisötapahtumissa halutaan tutustua toisiin.",
+        "audienceAnonymousLocked": "Ei voi muuttaa huoneen ollessa mahdollisesti auki: se yhdistäisi salanimet nimiin."
       },
       "step3": {
         "heading": "Henkilöt ja kutsut",
@@ -960,23 +1034,23 @@
         "remove": "Poista",
         "invalidEmail": "Virheellinen sähköpostiosoite.",
         "duplicateEmail": "Osoite on jo lisätty.",
-        "rubricaPick": "Hae osoitekirjasta…",
+        "rubricaPick": "Hae osoitekirjasta organisaation mukaan…",
         "rubricaOrAdd": "tai lisää manuaalisesti",
         "removeItem": "Poista {name}",
         "invitationsStaffOnly": "Kutsuja hallinnoi tapahtuman henkilökunta.",
         "pickSkipped": "Osa henkilöistä oli jo luettelossa tai heillä ei ollut kelvollista osoitetta, joten heitä ei lisätty.",
-        "primaryHeading": "Pääjärjestäjä",
+        "primaryHeading": "Päämoderaattori",
         "primaryHelp": "Saa tapahtuman päälinkin sähköpostilla: johtaa huonetta ja lisää tai poistaa muita henkilöitä. Nimi ja sähköposti tarvitaan julkaisuun, ei luonnokseen.",
-        "primaryPrefilled": "Pääjärjestäjä olet sinä, tilisi nimellä ja sähköpostilla. Jos tapahtumaa johtaa joku muu, kirjoita tähän hänen tietonsa: linkki menee hänelle.",
-        "primaryNameRequired": "Kirjoita pääjärjestäjän nimi.",
-        "primaryEmailRequired": "Kirjoita pääjärjestäjän kelvollinen sähköposti.",
+        "primaryPrefilled": "Päämoderaattori olet sinä, tilisi nimellä ja sähköpostilla. Jos tapahtumaa vetää joku muu, kirjoita tähän hänen tietonsa: linkki menee hänelle.",
+        "primaryNameRequired": "Kirjoita päämoderaattorin nimi.",
+        "primaryEmailRequired": "Kirjoita päämoderaattorin kelvollinen sähköposti.",
         "linksOnPublish": "Henkilökohtaiset linkit lähetetään sähköpostilla julkaisun yhteydessä; niin kauan kuin tapahtuma on luonnos, kopioi ne sen sivulta.",
         "personName": "Nimi",
         "personEmail": "Sähköposti",
-        "peopleHeading": "Tapahtuman henkilöt",
-        "peopleHelp": "Järjestäjät, moderaattorit ja puhujat. Jokainen saa oman linkin osallistuakseen roolissaan; mitä kukin rooli voi tehdä, näkyy kohdassa ”Lisäasetukset”.",
+        "peopleHeading": "Moderaattorit ja puhujat",
+        "peopleHelp": "Toiset järjestäjät, moderaattorit ja puhujat. Jokainen saa oman linkin, jolla tulee sisään omassa roolissaan; mitä kukin rooli voi tehdä, selitetään yllä.",
         "personRole": "Rooli",
-        "roleOrganizer": "Järjestäjä",
+        "roleOrganizer": "Toinen järjestäjä",
         "roleModerator": "Moderaattori",
         "roleSpeaker": "Puhuja",
         "roleHelp": {
@@ -1015,7 +1089,7 @@
         "programMinutesFor": "Suunnitellut minuutit, aihe {n}",
         "programTimeUnknown": "Aikaa ei laskettu: aiemmalla aiheella ei ole kestoa",
         "programNone": "Ei kukaan",
-        "programLeadOrganizer": "Pääjärjestäjä",
+        "programLeadOrganizer": "Päämoderaattori",
         "programMoveUp": "Siirrä aihetta {n} ylös",
         "programMoveDown": "Siirrä aihetta {n} alas",
         "programRemove": "Poista aihe {n}",
@@ -1029,8 +1103,8 @@
         "programSpeakerRemoved": "Aiheet ilman puhujaa, koska henkilö poistettiin tapahtumasta: {count}.",
         "programFrozen": "Esityslistaa on jo käytetty huoneessa: näet sen tässä, mutta sitä muutetaan huoneesta.",
         "programPerson": "{name} ({role})",
-        "invitationsHelpOpen": "Valinnainen: luettelo kutsumistasi henkilöistä. Ilmoittautuminen on avoin, joten julkaisun jälkeen kuka tahansa voi ilmoittautua, kutsuttu tai ei. Alusta ei lähetä kutsuja: jaa tapahtuman linkki itse.",
-        "invitationsHelpRestricted": "Ilmoittautuminen on rajattu: vain tämän luettelon osoitteet voivat ilmoittautua. Alusta ei lähetä kutsuja: jaa tapahtuman linkki itse; liittymislinkki tulee sähköpostilla ilmoittautumisen jälkeen.",
+        "invitationsHelpOpen": "Ihmiset, jotka kutsut itse. Ilmoittautuminen on avoin: kuka tahansa voi ilmoittautua, kutsuttu tai ei. Julkaisun jälkeen lähetät heille kutsun sähköpostilla tapahtuman sivulta.",
+        "invitationsHelpRestricted": "Vain tämän listan osoitteet voivat ilmoittautua. Julkaisun jälkeen lähetät jokaiselle kutsun sähköpostilla tapahtuman sivulta ilmoittautumislinkin kera; sisäänpääsylinkki tulee ilmoittautumisen jälkeen.",
         "logoExternal": "Julkisella sivulla näkyvät vain tälle alustalle ladatut logot: toiselta sivustolta tuleva logo ei näy.",
         "primaryProfileInvalid": "Tarkista organisaatio ja logon osoite.",
         "primaryMore": "Kuva, organisaatio, logo ja julkinen sivu",
@@ -1048,7 +1122,9 @@
         "editQuestions": "Muokkaa",
         "editQuestionsBefore": "Muokkaa ilmoittautumisen kysymyksiä",
         "editQuestionsAfter": "Muokkaa tyytyväisyyskyselyä",
-        "accessStaffOnly": "Ilmoittautujista päättää tapahtuman henkilökunta."
+        "accessStaffOnly": "Ilmoittautujista päättää tapahtuman henkilökunta.",
+        "whoOrganizes": "Kuka järjestää",
+        "rubricaWho": "Osoitekirjassa ovat henkilöt, jotka ilmoittautuivat tapahtumaan ja suostuivat jäämään siihen."
       },
       "step4": {
         "heading": "Sisältö ja materiaalit",
@@ -1124,9 +1200,9 @@
           "multitrack": "Osallistujakohtainen tallennus",
           "multitrackOn": "Käytössä — edellyttää nimenomaista suostumusta ilmoittautumisen yhteydessä",
           "organizingEntities": "Järjestävät organisaatiot",
-          "primaryOrganizer": "Pääjärjestäjä",
+          "primaryOrganizer": "Päämoderaattori",
           "primaryMissing": "Määritettävä vaiheessa ”Henkilöt” julkaisua varten",
-          "organizersPeople": "Muut järjestäjät",
+          "organizersPeople": "Toiset järjestäjät",
           "moderators": "Moderaattorit",
           "programme": "Ohjelma: {count, plural, one {# aihe} other {# aihetta}}",
           "programmeWithDuration": "Ohjelma: {count, plural, one {# aihe} other {# aihetta}}, {duration}"
@@ -1175,7 +1251,8 @@
           "invites": "Henkilöt",
           "programme": "Ohjelma",
           "review": "Yhteenveto",
-          "advanced": "Lisäasetukset"
+          "advanced": "Lisäasetukset",
+          "permissions": "Oikeudet"
         },
         "templateInUse": "Malli: <b>{name}</b>",
         "noTemplate": "Tapahtuma ilman mallia",
@@ -1187,18 +1264,16 @@
         "recordingManual": "Käytettävissä: alkaa vasta, kun juontaja painaa REC.",
         "aiAfter": "Tallennuksen jälkeen: {list}.",
         "scheduleHeading": "Milloin se järjestetään",
-        "scheduleIntro": "Päivä, kellonaika ja odotettu osallistujamäärä: niillä tila valmistellaan.",
+        "scheduleIntro": "Milloin tapahtuma järjestetään: päivämäärä, kellonaika ja aikavyöhyke.",
         "advancedIntro": "Mallin jo valitsemat arvot: muuta vain tarvittava.",
         "advancedIntroTemplate": "Mallin ”{name}” jo valitsemat arvot: muuta vain tarvittava.",
-        "requiredToSave": "Tarvitaan tapahtuman tallentamiseen.",
         "requiredToPublish": "Tarvitaan tapahtuman julkaisemiseen.",
         "toComplete": "Täydennettävä",
         "missingHeading": "Julkaisemisesta puuttuu vielä:",
-        "fieldOrganizerName": "Pääjärjestäjän nimi",
-        "fieldOrganizerEmail": "Pääjärjestäjän sähköposti",
+        "fieldOrganizerName": "Päämoderaattorin nimi",
+        "fieldOrganizerEmail": "Päämoderaattorin sähköposti",
         "fieldProgrammeMinutes": "Ohjelman aiheen {n} kesto",
         "sections": {
-          "participation": "Osallistuminen ja tilan toiminnot",
           "recording": "Tallenne ja tekoäly",
           "content": "Sisältö: materiaalit ja kyselyt",
           "room": "Odotustila ja video",
@@ -1230,7 +1305,17 @@
         "askEmail": "sähköposti",
         "askOrganization": "organisaatio",
         "askRole": "rooli",
-        "askType": "organisaation tyyppi"
+        "askType": "organisaation tyyppi",
+        "permissionsHeading": "Kuka voi tehdä mitä huoneessa",
+        "permissionsIntro": "Mitä osallistujat voivat tehdä ja mitkä huoneen toiminnot ovat käytössä. Kaikkea voi muuttaa myös tapahtuman aikana.",
+        "consentsLine": "Suostumukset ilmoittautuessa ja huoneessa: {list}",
+        "consentRecordingRequired": "tallennus, pakollinen sisäänpääsyyn",
+        "consentRecordingFree": "tallennus, vapaaehtoinen (ilman: vain kuuntelu)",
+        "consentRecordingNotice": "tallennuksesta vain ilmoitus (osallistujat eivät puhu eivätkä näy)",
+        "consentTranscription": "omien puheenvuorojen litterointi, vapaaehtoinen",
+        "consentsNone": "Ei muita suostumuksia kuin ilmoittautumisen.",
+        "consentsHosts": "Juontajilta ja puhujilta kysytään tallennuksesta huoneessa, vapaaehtoisesti.",
+        "consentsWithdraw": "Osallistujat voivat peruuttaa ne huoneessa Suostumukset-painikkeella."
       },
       "preview": {
         "title": "Sivun esikatselu",
@@ -1242,8 +1327,8 @@
       },
       "programme": {
         "heading": "Tapaamisen ohjelma",
-        "intro": "Aiheet järjestyksessä: kuka puhuu, mistä ja kuinka kauan. Ne näkyvät kuvauksen alla, ja kellonajat lasketaan alusta ({start}). Vapaaehtoinen.",
-        "introNoStart": "Aiheet järjestyksessä: kuka puhuu, mistä ja kuinka kauan. Ne näkyvät kuvauksen alla, ja kellonajat lasketaan tapahtuman alusta. Vapaaehtoinen.",
+        "intro": "Aiheet järjestyksessä: kuka puhuu, mistä ja kuinka kauan. Ne näkyvät kuvauksen alla, ja kellonajat lasketaan alusta ({start}).",
+        "introNoStart": "Aiheet järjestyksessä: kuka puhuu, mistä ja kuinka kauan. Ne näkyvät kuvauksen alla, ja kellonajat lasketaan tapahtuman alusta.",
         "statusOn": "Näkyy tapahtuman sivulla, ja huoneessa se näyttää kaikille käynnissä olevan aiheen.",
         "statusOff": "Pois päältä: ohjelma ei näy sivulla eikä huoneessa.",
         "turnOn": "Ota käyttöön",
@@ -1287,7 +1372,8 @@
         "offKeptEdit": "Kun ohjelma on pois päältä, voimassa on viimeksi tallennettu versio: täällä tehdyt muutokset tallentuvat vain, jos otat sen uudelleen käyttöön.",
         "toggleOffWarningCreate": "Pois päältä ohjelma ({count, plural, one {# aihe} other {# aihetta}}) ei näy sivulla eikä tallennu tapahtuman mukana: ota se käyttöön säilyttääksesi sen.",
         "reviewOffCreate": "Ohjelma: pois päältä, ei tallennu tapahtuman mukana ({count, plural, one {# aihe} other {# aihetta}})"
-      }
+      },
+      "saveCopy": "Tallenna kopio"
     },
     "nav": {
       "events": "Tapahtumat",
@@ -1313,7 +1399,6 @@
       "publicationsList": "Julkaisut",
       "publicationsNew": "Uusi julkaisu",
       "ariaLabel": "Hallinnan navigointi",
-      "subNavAriaLabel": "Osion navigointi",
       "questionnaires": "Kyselyt",
       "questionnairesLibrary": "Kyselymallit",
       "questionnairesResponses": "Vastaukset",
@@ -1332,7 +1417,9 @@
       "video": "Video",
       "glossary": "Sanasto",
       "breadcrumbAriaLabel": "Murupolku",
-      "skipToPage": "Siirry sivun sisältöön"
+      "skipToPage": "Siirry sivun sisältöön",
+      "openMenu": "Avaa valikko",
+      "closeMenu": "Sulje valikko"
     },
     "publications": {
       "subtitle": "Yhtenäinen toimituksellinen keskus kaikille julkaistuille videoille: aikataulutetut tapahtumat, pikapuhelut, ladatut arkistotallenteet ja istunnot, jotka odottavat julkaisua.",
@@ -1488,7 +1575,8 @@
       "actions": {
         "DATA_DELETED": "Tiedot poistettu",
         "CONSENT_RECORDED": "Suostumus kirjattu",
-        "DATA_EXPORTED": "Tiedot viety"
+        "DATA_EXPORTED": "Tiedot viety",
+        "CONSENT_WITHDRAWN": "Suostumus peruutettu"
       },
       "recordsAffected": "{count} tietuetta vaikuttunut",
       "colWhen": "Milloin",
@@ -1610,13 +1698,6 @@
     "deleteSuccess": "Tapahtuma poistettu",
     "publishSuccess": "Tapahtuma julkaistu",
     "unpublishSuccess": "Julkaisu peruttu",
-    "startEvent": "Käynnistä tapahtuma",
-    "startEventSuccess": "Tapahtuma käynnistetty! Odottavat osallistujat ohjataan automaattisesti.",
-    "startEventConfirmTitle": "Aloitetaanko tapahtuma?",
-    "startEventConfirmMessage": "Suunniteltu alkamisaika: {when}. Kaikki, joilla on linkki, voivat liittyä heti, ja videohuone käynnistyy nyt.",
-    "startEventConfirmEarly": "Alkuun on yli 30 minuuttia.",
-    "startEventFailed": "Tapahtuma ei käynnistynyt. Yritä uudelleen.",
-    "jvbWarmupWarning": "Videopalvelimet käynnistyvät (noin 2 minuuttia). Osallistujat näkevät ilmoituksen odotushuoneessa.",
     "eventIsLive": "Tapahtuma on käynnissä",
     "liveParticipants": "{count} huoneessa / {max} max",
     "joinAsModeratorBtn": "Liity moderaattorina",
@@ -1654,7 +1735,6 @@
         "expected": "{count, plural, one {odotettu osallistuja} other {odotettua osallistujaa}}",
         "registered": "{count, plural, =0 {ei vielä ilmoittautuneita} one {# ilmoittautunut tähän mennessä} other {# ilmoittautunutta tähän mennessä}}",
         "change": "Muuta",
-        "changeParticipants": "Muuta odotettujen osallistujien määrää",
         "sizedOnRegistrations": "Ilmoittautuneita on enemmän kuin odotettuja osallistujia: arvio laskee {count} ilmoittautunutta.",
         "cameraQuestion": "Kuinka monta verkkokameraa on päällä?",
         "camera": {
@@ -1866,7 +1946,7 @@
       "guestJoinHint": "Pikalinkki viime hetken osallistujan kutsumiseen: hän liittyy vieraana, kun tapahtuma on käynnissä, ilman ilmoittautumislomakkeen täyttämistä.",
       "callInvite": "Osallistujien linkki",
       "callInviteHint": "Linkin saanut liittyy puheluun vieraana ilman ilmoittautumista. Pikapuhelulla ei ole julkista sivua: tämä on jaettava linkki.",
-      "moderatorLink": "Moderaattorilinkki",
+      "moderatorLink": "Hallintalinkki (moderaattori)",
       "moderatorLinkHint": "Jaa tämä linkki vain moderaattoreille. Kuka tahansa, jolla on tämä linkki, voi hallita tapahtumaa.",
       "liveRoomHint": "Suora linkki, jolla pääsee live-huoneeseen moderaattorina.",
       "copyLink": "Kopioi linkki",
@@ -1876,7 +1956,8 @@
       "warning": "Kuka tahansa, jolla on tämä linkki, hallinnoi tapahtumaa: älä näytä sitä näyttöä jaettaessa äläkä liitä sitä keskusteluun.",
       "hidden": "Linkki on piilotettu",
       "copyFailed": "Kopiointi epäonnistui: valitse alla oleva osoite ja kopioi se käsin.",
-      "notYetPublished": "Toimii vasta julkaisun jälkeen: siihen asti näkyy ”sivua ei löytynyt”."
+      "notYetPublished": "Toimii vasta julkaisun jälkeen: siihen asti näkyy ”sivua ei löytynyt”.",
+      "copyFailedShort": "Kopiointi epäonnistui"
     },
     "feedbackAdmin": {
       "title": "Palautteen tulokset",
@@ -1952,7 +2033,8 @@
       "actions": {
         "DATA_DELETED": "Tiedot poistettu",
         "CONSENT_RECORDED": "Suostumus kirjattu",
-        "DATA_EXPORTED": "Tiedot viety"
+        "DATA_EXPORTED": "Tiedot viety",
+        "CONSENT_WITHDRAWN": "Suostumus peruutettu"
       }
     },
     "settings": {
@@ -2266,9 +2348,9 @@
     },
     "recurrence": {
       "label": "Toistuvuus",
-      "helpText": "Tee tapahtumasta toistuva. Sarja luodaan alkamispäivästä lähtien.",
+      "helpText": "Jos tapahtuma toistuu, kopio ehdottaa monistettaessa seuraavan kerran päivämäärää.",
       "preset": {
-        "none": "Ei mitään",
+        "none": "Ei toistu",
         "daily": "Päivittäin",
         "weekly": "Viikoittain",
         "weekdays": "Arkipäivät",
@@ -2322,7 +2404,6 @@
       "aiTranscript": "Automaattinen litterointi (oletus)",
       "aiSummary": "Automaattinen yhteenveto (oletus)",
       "aiTranslation": "Automaattinen käännös (oletus)",
-      "pickerTitle": "Valitse malli",
       "pickerSubtitle": "Valitse malli esimäärittääksesi tapahtuma-asetukset tai ohita ja määritä kaikki manuaalisesti.",
       "skipTemplate": "Määritä manuaalisesti",
       "postEventPublic": "Julkinen tapahtuman jälkeinen sivu",
@@ -2701,10 +2782,7 @@
       "resultsCount": "{count, plural, =0 {Ei tapahtumia} one {# tapahtuma} other {# tapahtumaa}}",
       "menu": {
         "actionsFor": "Toiminnot: ”{title}”",
-        "manage": "Hallinnoi",
         "edit": "Muokkaa",
-        "openPublic": "Avaa julkinen sivu",
-        "newTab": "(avautuu uuteen välilehteen)",
         "copyLink": "Kopioi julkinen linkki",
         "linkCopied": "Linkki kopioitu",
         "publish": "Julkaise",
@@ -2713,7 +2791,7 @@
         "unpublishMessage": "”{title}” katoaa julkisilta sivuilta, kunnes julkaiset sen uudelleen. Jo saadut ilmoittautumiset säilyvät.",
         "published": "Tapahtuma julkaistu",
         "unpublished": "Julkaisu peruttu",
-        "duplicate": "Monista seuraavaksi kerraksi",
+        "duplicate": "Monista",
         "delete": "Poista",
         "deleteTitle": "Poistetaanko tapahtuma?",
         "deleteMessage": "”{title}” ja kaikki sen tiedot poistetaan. Toimintoa ei voi perua.",
@@ -2771,7 +2849,6 @@
       "participantHintPassword": "Avautuu uuteen välilehteen: huone sellaisena kuin vieras sen näkee, tapahtuman salasanan jälkeen.",
       "participantHintPage": "Avautuu uuteen välilehteen: julkinen sivu sellaisena kuin osallistujat sen näkevät.",
       "editEvent": "Muokkaa tapahtumaa",
-      "editSettings": "Muokkaa asetuksia",
       "featureSummary": "Aktiiviset toiminnot",
       "organizers": "Järjestäjät",
       "privacyGdpr": "Yksityisyys ja GDPR",
@@ -2824,9 +2901,9 @@
       "aiGenerateError": "Tekoälyputkea ei voitu käynnistää. Tarkista, että tekoäly on käytössä sivustotasolla ja että tallenne on olemassa.",
       "aiGenerateHelp": "Ottaa käyttöön tekoälyllä tehtävän litteroinnin ja yhteenvedon ja käynnistää putken tallenteelle yhdellä napsautuksella. Idempotentti: kaksi napsautusta ei kahdenna töitä.",
       "aiGenerateNoRecording": "Ei tallennetta: tapahtuman jälkeinen tekoäly edellyttää tallennetta (kaappaus tapahtuu vain tapahtuman aikana). Voit silti hallita jälkituotantoa täältä.",
-      "duplicateNext": "Monista seuraavaa kertaa varten",
+      "duplicateNext": "Monista",
       "duplicateNextBusy": "Monistetaan…",
-      "duplicateNextHint": "Luo luonnoksen, joka sisältää tämän tapahtuman koko määrityksen (tallennus, erilliset raidat, tekoäly, agenda, muistutukset). Jos tapahtumalla on toistuvuus, päivämäärä siirtyy seuraavaan kertaan; muutoin se jää sinun asetettavaksesi.",
+      "duplicateNextHint": "Luo luonnoskopion tämän tapahtuman kaikista asetuksista. Jos tapahtuma toistuu, kopio alkaa seuraavasta kerrasta; muuten sillä on samat päivämäärät, jotka pitää päivittää.",
       "duplicateNextError": "Monistaminen epäonnistui. Yritä uudelleen.",
       "capacitySection": "Kapasiteetti ja infrastruktuuri",
       "capacitySubtitle": "Mitoitettu noin {max} odotetulle osallistujalle",
@@ -2838,11 +2915,12 @@
         "publishFailedTitle": "Julkaisu epäonnistui",
         "publishFailedBody": "Tapahtuma on tallennettu luonnoksena: julkaise se tältä sivulta, kun ongelma on korjattu.",
         "unsaved": "Ei tallennettu: {items}. Voit lisätä ne tältä sivulta.",
-        "copyParticipantLink": "Kopioi osallistujien linkki",
         "sendToSpeakers": "Moderaattorien ja puhujien linkit",
         "close": "Sulje yhteenveto",
         "publishNow": "Julkaise nyt"
-      }
+      },
+      "editFeatures": "Muokkaa toimintoja",
+      "editPrivacy": "Muokkaa tietosuojaa ja tietoja"
     },
     "rubrica": {
       "subtitle": "Henkilöt, jotka ovat antaneet suostumuksen osoitekirjaan lisäämiseen (GDPR art. 6.1.a). Profiilitiedot päivitetään automaattisesti jokaisen uudelleenilmoittautumisen yhteydessä.",
@@ -3450,6 +3528,7 @@
     "guided": {
       "title": "Millainen tapahtumasi on?",
       "intro": "Neljä kysymystä, joilla aloitat oikeilla asetuksilla. Jokaisen toiminnon voi kytkeä päälle tai pois myös tapahtuman aikana.",
+      "introNoRecording": "Kolme kysymystä, joilla aloitat oikeilla asetuksilla. Jokaisen toiminnon voi kytkeä päälle tai pois myös tapahtuman aikana.",
       "peopleQ": "Kuinka monta osallistujaa odotat?",
       "people": {
         "piccolo": "Enintään 20",
@@ -3474,9 +3553,7 @@
       "preview": "Tapahtumasi",
       "previewPeople": "Odotetut osallistujat: noin {count}",
       "continue": "Jatka",
-      "useTemplate": "Tai käytä mallia",
-      "instantAlt": "Tai pikavideopuhelu",
-      "instantAltAction": "Luo videopuhelu",
+      "useTemplate": "Aloita mallista",
       "summary": {
         "piccolo": "Enintään 20 henkilöä",
         "medio": "Enintään 100 henkilöä",
@@ -3492,10 +3569,12 @@
       "access": {
         "open": "Kuka tahansa, joka ilmoittautuu",
         "openDesc": "Kuka tahansa voi ilmoittautua tapahtuman sivulla",
-        "invitation": "Vain kutsumasi",
-        "invitationDesc": "Sivu pysyy näkyvissä, mutta vain kutsutut voivat ilmoittautua; ilman ilmoittautumista ei pääse sisään"
+        "invitation": "Vain kutsutut",
+        "invitationDesc": "Sivu pysyy näkyvissä, mutta ilmoittautua voivat vain listalla olevat; kutsun ilmoittautumislinkkeineen lähetät sähköpostilla tapahtuman sivulta"
       },
-      "previewInvitation": "Vain kutsumasi voivat ilmoittautua; kukaan ei pääse sisään ilmoittautumatta."
+      "previewInvitation": "Vain kutsutut ilmoittautuvat; ilman ilmoittautumista ei pääse sisään.",
+      "templateReplaces": "Malli tuo omat asetuksensa alla olevien vastausten sijaan. Otsikon, päivämäärät ja henkilöt kirjoitat seuraavissa vaiheissa.",
+      "instantBack": "Luo sen sijaan aikataulutettu tapahtuma"
     },
     "captionsTranscript": {
       "title": "Litterointi tekstityksestä",
@@ -3584,10 +3663,21 @@
       "status": "Tila",
       "roleSpeaker": "Puhuja",
       "registered": "Ilmoittautunut",
-      "notRegistered": "Ei vielä ilmoittautunut",
       "organizersTitle": "Järjestävät organisaatiot",
       "organizersEdit": "Muokkaa organisaatioita",
-      "organizersEmpty": "Organisaatiota ei ole ilmoitettu: julkinen sivu ei näytä, kuka järjestää."
+      "organizersEmpty": "Organisaatiota ei ole ilmoitettu: julkinen sivu ei näytä, kuka järjestää.",
+      "sendAll": "Lähetä kutsu niille, jotka eivät ole saaneet sitä ({count})",
+      "sending": "Lähetetään…",
+      "sendDone": "Lähteviä kutsuja: {sent}. Ohitettu (jo ilmoittautuneet tai ilman osoitetta): {skipped}.",
+      "sendError": "Lähetys epäonnistui: yritä uudelleen.",
+      "sendNotPublished": "Kutsut lähtevät, kun tapahtuma ottaa vastaan ilmoittautumisia: julkaisun jälkeen ja ennen loppua.",
+      "invitedOn": "Kutsuttu {date}",
+      "notInvited": "Kutsua ei lähetetty",
+      "send": "Lähetä kutsu",
+      "resend": "Lähetä uudelleen",
+      "actions": "Toiminnot",
+      "sendTooMany": "Liian monta lähetystä lyhyessä ajassa: yritä minuutin päästä uudelleen.",
+      "sendRemaining": "Jäljellä {remaining}: paina uudelleen lähettääksesi ne."
     },
     "closing": {
       "title": "Päätä tapahtuma",
@@ -3803,6 +3893,56 @@
         "item": "{language}: {state}",
         "review": "Tarkista tekstit"
       }
+    },
+    "voiceConsent": {
+      "title": "Litteroidaanko koko tallenne?",
+      "message": "Tämä tapahtuma pyysi jokaiselta suostumusta puheenvuorojensa litterointiin. Koko tallenne sisältää kaikki äänet, myös niiden, jotka eivät antaneet suostumusta: litteroi se vain, jos kaikki siinä puhuvat ovat suostuneet. Vahvistuksesi tallentuu tapahtumalokiin.",
+      "confirm": "Kyllä, kaikki ovat suostuneet",
+      "cancel": "Peruuta",
+      "waiting": "Koko tallenteen litterointi ei käynnistynyt itsestään: tämä tapahtuma pyysi jokaiselta suostumusta puheenvuorojensa litterointiin. Käynnistä se painikkeella {button} vain, jos kaikki tallenteessa puhuvat ovat suostuneet; muuten tekstityksistä tehty litteraatio jää voimaan."
+    },
+    "editCopyTitle": "Tapahtuman kopio",
+    "editCopyNoticeNext": "Muokkaat luonnoskopiota: alkuperäinen tapahtuma ei muutu. Päivämäärä on jo seuraavan kerran: tarkista muut tiedot ja tallenna.",
+    "editCopyNoticeSameDates": "Muokkaat luonnoskopiota: alkuperäinen tapahtuma ei muutu. Sillä on samat päivämäärät kuin alkuperäisellä: päivitä ne ennen tallentamista.",
+    "consentProofs": {
+      "title": "Suostumusten todisteet",
+      "intro": "Tallennukseen ja litterointiin annetut suostumukset ilmoittautuessa, odotushuoneessa tai huoneessa, sekä peruutetut. Nimellinen luettelo toimii todisteena.",
+      "loading": "Ladataan…",
+      "loadFailed": "Suostumusten todisteita ei voitu ladata.",
+      "none": "Tähän tapahtumaan ei ole suostumuksia tallennukseen tai litterointiin.",
+      "kinds": {
+        "recording": "Tallennus",
+        "transcription": "Puheenvuorojen litterointi"
+      },
+      "counts": "suostuneita {given} · peruuttaneita {withdrawn}",
+      "download": "Lataa luettelo (CSV)",
+      "downloading": "Ladataan…",
+      "downloadNote": "Luettelossa on henkilöiden nimiä: vienti kirjataan tapahtuman GDPR-lokiin.",
+      "downloadFailed": "Luetteloa ei voitu ladata: yritä uudelleen.",
+      "csv": {
+        "kind": "Suostumus",
+        "source": "Missä",
+        "role": "Rooli",
+        "name": "Nimi",
+        "givenAt": "Annettu",
+        "withdrawnAt": "Peruutettu",
+        "textVersion": "Tekstin versio",
+        "kinds": {
+          "recording": "Tallennus",
+          "transcription": "Puheenvuorojen litterointi"
+        },
+        "sources": {
+          "registration": "ilmoittautuminen",
+          "room": "huone"
+        },
+        "roles": {
+          "registrant": "ilmoittautunut",
+          "guest": "vieras",
+          "host": "juontaa tai puhuu"
+        },
+        "unreadableName": "(nimeä ei voi lukea)"
+      },
+      "countsNote": "Lasketaan henkilöitä: ilmoittautuminen, henkilökunnan tili tai nimetty linkki lasketaan kerran; toisella käynnillä palaava vieras lasketaan uudelleen."
     }
   },
   "email": {
@@ -3837,7 +3977,9 @@
     "upcoming": {
       "title": "Tulevat tapahtumat",
       "viewAll": "Näytä kaikki tapahtumat",
-      "noEvents": "Ei suunniteltuja tapahtumia. Tule pian uudelleen!"
+      "noEvents": "Ei suunniteltuja tapahtumia. Tule pian uudelleen!",
+      "seePast": "Menneet tapahtumat",
+      "seeRecordings": "Tallenteet"
     },
     "howItWorks": {
       "title": "Miten osallistua",
@@ -4187,9 +4329,11 @@
       "recordingRequired": "Suostumus tallennukseen on pakollinen tähän tapahtumaan osallistumiseksi",
       "recordingNotice": "Tapahtuma tallennetaan (ääni ja kuva). Osallistut ilman mikrofonia ja kameraa: tallenne ei sisällä ääntäsi eikä kuvaasi, ellei juontaja anna sinulle puheenvuoroa.",
       "multitrack": "Annan suostumukseni siihen, että puheenvuoroni litteroidaan nimelläni tapahtuman yhteenvetoa varten. Jos tapahtuma tallentaa jokaisesta henkilöstä erillisen ääniraidan, ääneni tallennetaan vain tätä tarkoitusta varten ja raita poistetaan litteroinnin jälkeen; sitä ei käytetä ääneni tunnistamiseen tai jäljittelemiseen.",
-      "multitrackOptional": "Tämä on vapaaehtoista: jos et anna suostumusta, voit silti osallistua, mutta ääntäsi ei tallenneta eivätkä puheenvuorosi tule litterointiin.",
+      "multitrackOptional": "Tämä on vapaaehtoista: jos et anna suostumusta, osallistut silti, mutta puheenvuorosi eivät tule litteraatioon eikä ääntäsi tallenneta omalle raidalleen. Jos tapahtuma tallennetaan, äänesi on silti mukana videossa.",
       "stayInTouch": "Haluan saada tietoa tulevista tapahtumista ja tulla lisätyksi osoitekirjaan, jotta minut kutsutaan vastaaviin tapahtumiin",
-      "stayInTouchHelp": "Vapaaehtoinen suostumus (tietosuoja-asetuksen 6.1.a artikla). Voit perua sen milloin tahansa saamiesi sähköpostien linkillä ”Poista minut osoitekirjasta”. Nimi ja organisaatio ovat tämän ilmoittautumisen mukaiset."
+      "stayInTouchHelp": "Vapaaehtoinen suostumus (tietosuoja-asetuksen 6.1.a artikla). Voit perua sen milloin tahansa saamiesi sähköpostien linkillä ”Poista minut osoitekirjasta”. Nimi ja organisaatio ovat tämän ilmoittautumisen mukaiset.",
+      "recordingOptionalListenOnly": "Jos et anna suostumusta, osallistut silti, vain kuunnellen: seuraat ja kirjoitat chattiin, mutta mikrofoni, kamera ja näytön jakaminen pysyvät pois päältä. Voit antaa suostumuksen myöhemmin huoneessa.",
+      "recordingOptionalHost": "Jos et anna suostumusta, pääset silti sisään ja johdat tavalliseen tapaan, mutta ääntäsi ei säilytetä henkilökohtaisissa raidoissa eikä litteroinnissa. Huoneen video, jos se tallennetaan, näyttää sinut silti."
     },
     "export": {
       "title": "Omat tietoni",
@@ -4852,11 +4996,13 @@
     "transparency": "Turvallisuus ja läpinäkyvyys",
     "serviceInventory": "Palveluinventaari",
     "sourceCode": "Lähdekoodi",
-    "buildInfoDev": "kehitysversio",
-    "viewCommit": "Näytä commit GitHubissa",
     "viewRelease": "Näytä julkaisu GitHubissa",
     "viewChangelog": "Katso uutuudet (muutosloki)",
-    "buildDatePrefix": "Koostettu"
+    "newWindow": "avautuu uuteen ikkunaan",
+    "usefulLinks": "Hyödyllisiä linkkejä",
+    "version": "Versio {version}",
+    "versionDev": "Kehitysversio",
+    "updatedOn": "päivitetty {date}"
   },
   "changelog": {
     "metaTitle": "Uutuudet ja muutosloki",
@@ -5023,7 +5169,9 @@
       "version": "Putken versio"
     },
     "overlapBadge": "päällekkäinen",
-    "overlapTitle": "Päällekkäinen puhe: tällä aikavälillä puhuu useampi kuin yksi henkilö samanaikaisesti."
+    "overlapTitle": "Päällekkäinen puhe: tällä aikavälillä puhuu useampi kuin yksi henkilö samanaikaisesti.",
+    "anonymousSpeaker": "Osallistuja {n}",
+    "untranscribed": "Ei litteroitu: puhuja ei antanut suostumusta"
   },
   "waiting": {
     "startsIn": "Tapahtuma alkaa",
@@ -5087,9 +5235,6 @@
     "endedWatchRecording": "Katso tallenne",
     "endedLeaveFeedback": "Jätä palaute",
     "startEventError": "Tapahtuman aloittaminen epäonnistui. Yritä uudelleen.",
-    "emailLabel": "Sähköposti (valinnainen)",
-    "emailHelp": "Vain mahdollista tapahtuman jälkeistä yhteydenpitoa varten",
-    "emailInvalid": "Anna kelvollinen sähköpostiosoite",
     "chatLockedMessage": "Anna nimesi, jotta voit liittyä tapahtuman chattiin.",
     "classicView": "Perinteinen näkymä",
     "backToGarden": "Näytä aukio",
@@ -5322,7 +5467,12 @@
     "waitingForStartButton": "Odotetaan aloitusta",
     "countdownHours": "{hours} h",
     "countdownMinutes": "{minutes} min",
-    "countdownSeconds": "{seconds} s"
+    "countdownSeconds": "{seconds} s",
+    "startEarlyConfirm": "Suunniteltuun alkuun ({when}) on yli 30 minuuttia. Jos aloitat nyt, kaikki linkin saaneet pääsevät heti sisään ja videohuone käynnistyy: vahvista painamalla uudelleen.",
+    "startEarlyYes": "Aloita nyt",
+    "startEarlyNo": "Odota suunniteltua aikaa",
+    "anonymousNameHelp": "Tässä tapahtumassa yleisö on anonyymi: muut eivät näe nimeäsi vaan koodillisen salanimen.",
+    "registeredNameHelp": "Tämä on nimi, jolla ilmoittauduit: näin näyt huoneessa."
   },
   "recording": {
     "management": "Videotallenne",

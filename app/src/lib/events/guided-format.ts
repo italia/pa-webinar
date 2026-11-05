@@ -55,6 +55,12 @@ export function decodificaFormato(valore: unknown): FormatoGuidato | null {
   return { persone, voce, registra, accesso } as FormatoGuidato;
 }
 
+/** Dove l'installazione non puo' registrare il formato non promette una
+ *  registrazione, neanche se arriva da un indirizzo salvato altrove. */
+export function formatoPossibile(f: FormatoGuidato, puoRegistrare: boolean): FormatoGuidato {
+  return puoRegistrare ? f : { ...f, registra: 'no' };
+}
+
 /** Le persone attese per ciascuna risposta: una stima per dimensionare il
  *  server video, non un limite alle iscrizioni. */
 export const PARTECIPANTI_ATTESI: Record<FormatoPersone, number> = {

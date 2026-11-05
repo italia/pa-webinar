@@ -43,3 +43,31 @@ describe('piè di pagina — colonna dei contatti', () => {
     expect(h).toContain('>example.org<');
   });
 });
+
+describe('piè di pagina — trasparenza e link', () => {
+  function conProps(settings: Record<string, unknown>, props: { inventarioPubblicato?: boolean }): string {
+    impostazioni.valore = { siteName: 'PA Webinar', footerLinks: [], ...settings };
+    return renderToString(
+      <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
+        <PAFooter {...props} />
+      </NextIntlClientProvider>
+    );
+  }
+
+  it("l'inventario dei servizi compare solo se e' pubblicato", () => {
+    expect(conProps({}, { inventarioPubblicato: false })).not.toContain('href="/service-inventory"');
+    expect(conProps({}, { inventarioPubblicato: true })).toContain('href="/service-inventory"');
+  });
+
+  it('la dichiarazione di accessibilita si apre in una nuova finestra, e lo dice', () => {
+    const h = html({});
+    expect(h).toMatch(/href="\/accessibility"[^>]*target="_blank"/);
+    expect(h).toContain(messages.footer.newWindow);
+  });
+
+  it('i link della sezione principale hanno una colonna loro', () => {
+    const h = html({ footerLinks: [{ title: 'Portale', url: 'https://example.org', section: 'main' }] });
+    expect(h).toContain(`>${messages.footer.usefulLinks}<`);
+    expect(h).toContain('https://example.org');
+  });
+});

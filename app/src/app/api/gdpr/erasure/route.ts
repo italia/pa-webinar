@@ -72,8 +72,15 @@ export const POST = withErrorHandling(async (request) => {
   // senza aspettare la cache delle verifiche dei moderatori.
   const daTogliere = await prisma.eventModerator.findMany({
     where: { emailHash },
-    select: { eventId: true, token: true, photoId: true },
+    select: { id: true, eventId: true, token: true, photoId: true },
   });
+  // Le prove del consenso alla registrazione date entrando con quelle
+  // concessioni (nome cifrato e posto): via con loro, non solo scollegate.
+  if (daTogliere.length > 0) {
+    await prisma.recordingConsent.deleteMany({
+      where: { eventModeratorId: { in: daTogliere.map((g) => g.id) } },
+    });
+  }
   const grants = await prisma.eventModerator.deleteMany({ where: { emailHash } });
   for (const g of daTogliere) invalidateModeratorCache(g.eventId, g.token);
   // Le foto di quelle concessioni, caricate dallo staff: via, salvo quelle
