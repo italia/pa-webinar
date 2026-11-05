@@ -12,6 +12,8 @@
 
 import { z } from 'zod';
 
+import { parzialeSenzaDefault } from './parziale';
+
 export const MATERIAL_TYPES = ['LINK', 'FILE'] as const;
 export const MATERIAL_VISIBILITIES = ['ALWAYS', 'BEFORE', 'DURING', 'AFTER'] as const;
 
@@ -77,7 +79,7 @@ export const materialBaseSchema = z.object({
 });
 
 export const createMaterialAdminSchema = materialBaseSchema;
-export const updateMaterialAdminSchema = materialBaseSchema.partial();
+export const updateMaterialAdminSchema = parzialeSenzaDefault(materialBaseSchema);
 
 export type CreateMaterialAdminInput = z.infer<typeof createMaterialAdminSchema>;
 export type UpdateMaterialAdminInput = z.infer<typeof updateMaterialAdminSchema>;

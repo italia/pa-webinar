@@ -5,6 +5,8 @@ import { randomUUID } from 'crypto';
 
 import { test, expect, type Page } from '@playwright/test';
 
+import { accediComeAdmin } from './helpers/accesso-admin';
+
 /**
  * La pagina di un evento nell'area di amministrazione, da telefono e da
  * tastiera: su telefono le azioni dello stato vengono prima delle schede e il
@@ -36,7 +38,7 @@ async function apriEvento(page: Page, query = '') {
   if (sessione) {
     await page.context().addCookies(sessione);
   } else {
-    const login = await page.request.post('/api/admin/login', { data: { key: ADMIN_KEY } });
+    const login = await accediComeAdmin(page.request, ADMIN_KEY);
     expect(login.ok(), `login: ${login.status()}`).toBeTruthy();
     sessione = await page.context().cookies();
   }

@@ -33,7 +33,7 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 
 const bodySchema = z
   .object({
-    ids: z.array(z.string().uuid()).min(1).max(500).optional(),
+    ids: z.array(z.guid()).min(1).max(500).optional(),
   })
   .strict();
 

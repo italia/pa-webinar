@@ -67,7 +67,7 @@ const FINESTRA_MS = 10 * 60_000;
 
 const paramsSchema = z.object({
   param: z.string().min(1).max(200),
-  id: z.string().uuid(),
+  id: z.guid(),
 });
 
 const senzaCorpo = () => new Response(null, { status: 204 });

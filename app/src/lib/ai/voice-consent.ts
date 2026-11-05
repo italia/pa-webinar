@@ -140,8 +140,8 @@ export function erroreConfermaVoci(): AppError {
  */
 export const corpoAvvioPipeline = z.object({
   // Come prima: solo `true` accende la sintesi o le traduzioni.
-  summary: z.unknown().transform((v) => v === true),
-  translation: z.unknown().transform((v) => v === true),
+  summary: z.unknown().optional().transform((v) => v === true),
+  translation: z.unknown().optional().transform((v) => v === true),
   allVoicesConsented: z.boolean().optional(),
 });
 

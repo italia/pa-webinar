@@ -46,7 +46,7 @@ export const languageCodeSchema = z
   .max(8)
   .regex(/^[a-z]{2,3}(-[a-z]{2,4})?$/i, 'invalid language code');
 
-export const uuidSchema = z.string().uuid();
+export const uuidSchema = z.guid();
 
 // ── PostprodJob payloads (one per kind) ──────────────────────────
 
@@ -199,7 +199,7 @@ export const claimResponseSchema = z.object({
   // Nullo per i lavori dell'evento (REPORT, TRANSLATE_TEXT), senza registrazione.
   recordingId: uuidSchema.nullable(),
   kind: z.enum(POSTPROD_JOB_KINDS),
-  payload: z.unknown(), // narrowed via postprodJobPayloadSchema downstream
+  payload: z.unknown().optional(), // narrowed via postprodJobPayloadSchema downstream
   attempts: z.number().int().min(0),
   leaseExpiresAt: z.string().datetime(),
   /**

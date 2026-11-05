@@ -5,6 +5,8 @@ import { randomUUID } from 'crypto';
 
 import { test, expect, type APIRequestContext } from '@playwright/test';
 
+import { accediComeAdmin } from './helpers/accesso-admin';
+
 /**
  * Le funzioni di chi partecipa, provate sull'applicazione in esecuzione
  * attraverso le stesse rotte che usa la sala: domande e risposte, sondaggi,
@@ -27,7 +29,7 @@ let evento: {
 
 async function preparaEvento(request: APIRequestContext) {
   if (evento) return evento;
-  const login = await request.post('/api/admin/login', { data: { key: ADMIN_KEY } });
+  const login = await accediComeAdmin(request, ADMIN_KEY);
   expect(login.ok(), `login: ${login.status()}`).toBeTruthy();
   const titolo = `E2E partecipazione ${randomUUID().slice(0, 8)}`;
   const inizio = Date.now() + 3_600_000;

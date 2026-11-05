@@ -40,7 +40,7 @@ export const dynamic = 'force-dynamic';
 const lingua = z.string().regex(/^[a-z]{2,3}(-[a-z]{2,4})?$/);
 
 const corpoSchema = z.object({
-  jobId: z.string().uuid(),
+  jobId: z.guid(),
   title: z.record(lingua, z.string().max(TITOLO_TRADOTTO_MAX * 2)).default({}),
   description: z.record(lingua, z.string().max(DESCRIZIONE_TRADOTTA_MAX * 2)).default({}),
   modelId: z.string().max(200).nullish(),

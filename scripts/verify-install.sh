@@ -171,7 +171,7 @@ for c in "${strumenti[@]}"; do
   command -v "$c" >/dev/null 2>&1 || uscita_uso "Manca '$c'."
 done
 if [ "$CALL" = "si" ]; then
-  command -v node >/dev/null 2>&1 || uscita_uso "--call richiede node (20 o più recente)."
+  command -v node >/dev/null 2>&1 || uscita_uso "--call richiede node (22.22.2 o più recente)."
 fi
 
 TMP="$(mktemp -d)"

@@ -19,7 +19,7 @@ export const dynamic = 'force-dynamic';
 const BULK_DELETE_TIMEOUT_MS = 120_000;
 
 const bulkDeleteSchema = z.object({
-  ids: z.array(z.string().uuid()).min(1).max(200),
+  ids: z.array(z.guid()).min(1).max(200),
 });
 
 export const POST = withErrorHandling(async (request) => {

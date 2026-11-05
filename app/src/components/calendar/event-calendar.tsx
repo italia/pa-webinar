@@ -196,7 +196,7 @@ function montaEvento(info: EventMountArg) {
 function montaAltri(info: MoreLinkMountArg) {
   info.el.setAttribute('role', 'button');
   const suggerimento = info.el.getAttribute('title');
-  if (suggerimento) info.el.setAttribute('aria-label', suggerimento);
+  if (suggerimento) info.el.setAttribute('aria-label', `${info.el.textContent} ${suggerimento}`);
 }
 
 export default function EventCalendar({ mode, initialEvents = [] }: EventCalendarProps) {

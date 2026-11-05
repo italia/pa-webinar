@@ -139,8 +139,8 @@ describe('PUT /api/admin/settings', () => {
     const { details } = (await res.json()) as { details: Record<string, unknown>[] };
     expect(details).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ path: ['supportEmail'], code: 'invalid_string', validation: 'email' }),
-        expect.objectContaining({ path: ['jvbMaxReplicas'], code: 'too_big', type: 'number', maximum: 50 }),
+        expect.objectContaining({ path: ['supportEmail'], code: 'invalid_format', format: 'email' }),
+        expect.objectContaining({ path: ['jvbMaxReplicas'], code: 'too_big', origin: 'number', maximum: 50 }),
       ]),
     );
   });

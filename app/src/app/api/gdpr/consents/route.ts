@@ -24,7 +24,7 @@ export const dynamic = 'force-dynamic';
 const schema = z
   .object({
     token: z.string().min(1).max(512),
-    registrationId: z.string().uuid(),
+    registrationId: z.guid(),
     consent: z.enum(['recording', 'transcription', 'futureCommunications']),
   })
   .strict();

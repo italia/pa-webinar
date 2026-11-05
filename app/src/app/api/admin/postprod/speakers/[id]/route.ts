@@ -31,7 +31,7 @@ const bodySchema = z.object({
   // Optional: when omitted, the existing Person link is left untouched (a
   // plain rename must not drop a previously-mapped rubrica identity). Pass
   // null explicitly to clear the link.
-  personId: z.string().uuid().nullable().optional(),
+  personId: z.guid().nullable().optional(),
 });
 
 export const PUT = withErrorHandling(async (request, context) => {

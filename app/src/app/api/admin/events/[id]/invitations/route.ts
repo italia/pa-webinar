@@ -33,7 +33,7 @@ const addSchema = z.object({
   email: z.string().email().max(200),
   name: z.string().min(1).max(200).optional(),
   role: z.enum(['GUEST', 'SPEAKER']).default('GUEST'),
-  personId: z.string().uuid().nullable().optional(),
+  personId: z.guid().nullable().optional(),
 });
 
 async function loadEvent(id: string) {

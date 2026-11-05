@@ -15,10 +15,10 @@ function problemi(body: unknown): SettingsIssue[] {
   const r = updateSettingsSchema.safeParse(body);
   if (r.success) throw new Error('doveva fallire');
   return r.error.issues.map((i) => ({
-    path: i.path,
+    path: i.path as SettingsIssue['path'],
     code: i.code,
-    ...('validation' in i && typeof i.validation === 'string' && { validation: i.validation }),
-    ...('type' in i && typeof i.type === 'string' && { type: i.type }),
+    ...('format' in i && typeof i.format === 'string' && { format: i.format }),
+    ...('origin' in i && typeof i.origin === 'string' && { origin: i.origin }),
     ...('minimum' in i && { minimum: Number(i.minimum) }),
     ...('maximum' in i && { maximum: Number(i.maximum) }),
   }));
@@ -31,6 +31,14 @@ describe('settingsFieldError', () => {
       tab: 'features',
       inputId: 'supportEmail',
       problem: 'email',
+    });
+  });
+
+  it('un numero oltre gli interi sicuri porta comunque il limite del campo', () => {
+    expect(settingsFieldError(problemi({ jvbMaxReplicas: 1e20 }))).toMatchObject({
+      inputId: 'jvbMaxReplicas',
+      problem: 'max',
+      limit: 50,
     });
   });
 

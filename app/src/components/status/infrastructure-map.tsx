@@ -451,7 +451,6 @@ export default function InfrastructureMap() {
                 style={{ cursor: 'pointer' }}
                 role="button"
                 tabIndex={0}
-                aria-label={`${svcName}: ${t(`statuses.${svc.status}` as Parameters<typeof t>[0])}`}
               >
                 {svc.status === 'healthy' && data.traffic.totalParticipants > 0 && (
                   <circle cx={p.x} cy={p.y} r="50" fill="none" stroke={sc} strokeWidth="1.5" opacity="0">

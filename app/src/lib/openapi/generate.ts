@@ -454,7 +454,7 @@ registry.registerPath({
     'An empty description removes it. Same authorization as deleting a material.',
   security: [{ [moderatorToken.name]: [] }],
   request: {
-    params: z.object({ param: z.string(), id: z.string().uuid() }),
+    params: z.object({ param: z.string(), id: z.guid() }),
     body: { content: { 'application/json': { schema: updateMaterialRoomSchema } } },
   },
   responses: {
@@ -476,7 +476,7 @@ registry.registerPath({
     'at most once per caller and material every ten minutes. Requires Content-Type: application/json ' +
     '(an empty object as body). Opens by moderators and staff are not counted. Always answers 204, ' +
     'whether counted or not. The count is returned by GET /materials to moderators only.',
-  request: { params: z.object({ param: z.string(), id: z.string().uuid() }) },
+  request: { params: z.object({ param: z.string(), id: z.guid() }) },
   responses: { 204: { description: 'Received' } },
 });
 
@@ -577,7 +577,7 @@ registry.registerPath({
   security: [{ [moderatorToken.name]: [] }],
   request: {
     params: z.object({ param: z.string() }),
-    query: z.object({ materialId: z.string().uuid().optional() }),
+    query: z.object({ materialId: z.guid().optional() }),
   },
   responses: {
     200: { description: 'Presentation state' },
@@ -597,7 +597,7 @@ registry.registerPath({
     'storage with `Cache-Control: private, no-store` and is never given a public address.',
   request: {
     params: z.object({ param: z.string() }),
-    query: z.object({ m: z.string().uuid() }),
+    query: z.object({ m: z.guid() }),
   },
   responses: {
     200: { description: 'application/pdf' },
@@ -782,7 +782,7 @@ registry.registerPath({
     'The file is streamed from the files storage with `Cache-Control: private, no-store`.',
   request: {
     params: z.object({ param: z.string() }),
-    query: z.object({ m: z.string().uuid() }),
+    query: z.object({ m: z.guid() }),
   },
   responses: {
     200: { description: 'application/pdf' },
@@ -865,7 +865,7 @@ registry.registerPath({
         'application/json': {
           schema: z.object({
             token: z.string(),
-            registrationId: z.string().uuid(),
+            registrationId: z.guid(),
             consent: z.enum(['recording', 'transcription', 'futureCommunications']),
           }),
         },

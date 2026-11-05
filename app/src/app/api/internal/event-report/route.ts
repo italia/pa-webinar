@@ -26,7 +26,7 @@ import type { ReportMetrics } from '@/lib/report/types';
 export const dynamic = 'force-dynamic';
 
 const corpoSchema = z.object({
-  jobId: z.string().uuid(),
+  jobId: z.guid(),
   narratives: z.record(z.string().min(2).max(10), z.unknown()),
   modelId: z.string().max(200).nullish(),
   modelVersion: z.string().max(200).nullish(),

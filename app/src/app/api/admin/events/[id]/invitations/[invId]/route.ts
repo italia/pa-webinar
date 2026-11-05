@@ -27,7 +27,7 @@ const patchSchema = z.object({
   email: z.string().email().max(200).optional(),
   name: z.string().min(1).max(200).nullable().optional(),
   role: z.enum(['GUEST', 'SPEAKER']).optional(),
-  personId: z.string().uuid().nullable().optional(),
+  personId: z.guid().nullable().optional(),
 });
 
 async function requireBelongs(eventId: string, invId: string) {

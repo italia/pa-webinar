@@ -148,7 +148,7 @@ await fetch('/api/admin/settings', {
 ```
 
 A `422` response lists the fields that failed validation, each with its path, the check that failed
-(`code`, plus `validation`, `type`, `minimum` or `maximum` when they apply). `footerLinks` is an
+(`code`, plus `format`, `origin`, `minimum` or `maximum` when they apply). `footerLinks` is an
 array; a JSON string holding an array, as older installations stored it, is accepted and saved as an
 array. Web addresses without a scheme get `https://`. The change is audited like a save from the
 panel.

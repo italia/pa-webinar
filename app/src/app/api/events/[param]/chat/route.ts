@@ -84,7 +84,7 @@ const postSchema = z
     // at an arbitrary blob or spoof mime/size). Authenticated members only.
     attachmentToken: z.string().min(1).max(4000).optional(),
     // Optional reply to an earlier message in the same event.
-    replyToId: z.string().uuid().optional(),
+    replyToId: z.guid().optional(),
     // Chi scrive dichiara che il suo messaggio è una domanda. È l'autore a
     // marcarla, non il moderatore: chiedere qualcosa è un atto di chi
     // partecipa, e il pubblico non deve aspettare che qualcuno "promuova" il

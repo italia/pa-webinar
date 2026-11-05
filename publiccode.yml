@@ -37,7 +37,7 @@ dependsOn:
       versionMin: "7"
       optional: false
     - name: Node.js
-      versionMin: "20"
+      versionMin: "22"
       optional: false
 
 supports:
