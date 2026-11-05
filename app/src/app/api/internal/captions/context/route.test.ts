@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * GET /api/internal/captions/context — il contesto di una stanza per il
  * servizio dei sottotitoli live: lingua, vocabolario, correzioni.

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { jibriRecordingExpected } from '@/lib/infrastructure';
 import type { VoceNelVideo } from '@/lib/live/consent-rule';
 

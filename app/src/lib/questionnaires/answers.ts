@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Regole delle risposte comuni al modulo d'iscrizione e alla rotta: qui, e
  * non in `lib/questionnaires`, perche' quel modulo legge il database e il

@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 // Sync the message bundle structure across all locales.
 //
 // Strategy:

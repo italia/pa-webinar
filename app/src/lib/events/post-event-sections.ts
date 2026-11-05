@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Le sezioni che la pagina di un evento concluso mostra al pubblico, se c'e'
  * qualcosa da mostrare: la scelta di chi organizza (Event.postEventShow*),

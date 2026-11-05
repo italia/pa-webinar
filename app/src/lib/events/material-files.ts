@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il file dietro un materiale caricato: dove si legge, quale chiave un
  * materiale può puntare e come se ne va.

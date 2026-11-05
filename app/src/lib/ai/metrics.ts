@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Helper per aggiornare i gauge della pipeline postprod a partire dallo
  * stato corrente del DB. Chiamato dal cron `postprod-reclaim` (ogni

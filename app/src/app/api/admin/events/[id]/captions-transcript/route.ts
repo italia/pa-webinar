@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * GET  /api/admin/events/[id]/captions-transcript — a che punto e' la
  *      trascrizione dai sottotitoli: frasi salvate e non, voci, trascrizione

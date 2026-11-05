@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * GET /api/events/[param]/recording/slides?m=<materialId> — il PDF di una
  * slide mostrata accanto alla registrazione pubblicata, per il visore della

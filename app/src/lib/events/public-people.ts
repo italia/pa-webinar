@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Chi organizza e chi interviene, come lo mostra la pagina pubblica
  * dell'evento: gli enti che organizzano (EventOrganizer) e le persone con una

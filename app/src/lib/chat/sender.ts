@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Shared resolution of a chat sender from a token (the NON-guest paths:
  * moderator primary link, per-row co-moderator/speaker grant, or a registered

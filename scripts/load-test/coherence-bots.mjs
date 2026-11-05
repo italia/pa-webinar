@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Coherence stress harness (ADR-013 multitrack validation).
  *

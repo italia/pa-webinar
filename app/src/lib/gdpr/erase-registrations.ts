@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Cancellazione completa di una o piu' iscrizioni: la stessa per la richiesta
  * dell'interessato (art. 17, /api/gdpr/erasure) e per la cancellazione fatta

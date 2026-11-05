@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il cuore del gateway: le conferenze collegate dal bridge, le voci di
  * ciascuna e le sessioni del motore, sotto un unico governo del carico.

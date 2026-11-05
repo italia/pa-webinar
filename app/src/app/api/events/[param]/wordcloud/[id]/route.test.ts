@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il moderatore chiude una domanda di «In una parola»: cosa finisce nella
  * cronologia della sala.

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 // Configurazione della conferenza nello stack locale (docker-compose):
 // nessun logo predefinito. L'immagine jitsi/web aggiunge questo file in coda
 // al suo config.js all'avvio del contenitore.

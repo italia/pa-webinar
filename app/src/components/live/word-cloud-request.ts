@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Cosa manda il pannello della nuvola di parole (WordCloud) quando si scrive
  * una parola, e come legge un rifiuto: fuori dal componente perché si possa

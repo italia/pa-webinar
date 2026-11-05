@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Una cella CSV sicura da aprire in un foglio di calcolo: un valore che
  * comincia come una formula (=, +, -, @, tabulazione, a capo) si neutralizza

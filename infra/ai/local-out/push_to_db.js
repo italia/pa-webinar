@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Inserisce nel DB dell'ambiente di test gli artifact prodotti
  * localmente. Lanciato da package_and_push.py via kubectl exec

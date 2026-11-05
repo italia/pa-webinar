@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il governo del carico: quando il motore non sta al passo, i sottotitoli
  * arrivano sempre più tardi e diventano inutili. Il ritardo misurato su ogni

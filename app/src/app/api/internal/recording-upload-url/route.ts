@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Internal endpoint called by the Jibri finalize script to obtain a
  * short-lived write-SAS URL for uploading a freshly recorded mp4 to

@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """Il glossario della post-produzione (app: lib/ai/glossary.ts).
 
 Ogni voce dice come un termine si scrive, come puo' arrivare dalla

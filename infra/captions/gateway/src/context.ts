@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il contesto di una stanza, chiesto al portale: se i sottotitoli sono
  * attivi, in che lingua si parla e il vocabolario dell'evento (termini del

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * HTML email templates for confirmation and reminder emails.
  * Clean inline-styled HTML — no external images or CSS frameworks.

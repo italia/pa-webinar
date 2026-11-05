@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Returns the built-in default copy for each (key, locale) so the admin UI
  * can render the hardcoded strings as placeholders — without duplicating

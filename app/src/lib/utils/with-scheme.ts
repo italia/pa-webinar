@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Un indirizzo scritto senza schema («www.comune.it», «www.comune.it:8080/x»)
  * diventa https://…: nei pannelli lo si scrive cosi', e senza schema non e'

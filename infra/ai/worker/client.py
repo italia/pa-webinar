@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """HTTP client for the pa-webinar app's /api/internal/postprod-* endpoints.
 
 The worker talks to the app over cluster-internal Service DNS

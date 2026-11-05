@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """Prova di carico in tempo reale: N voci simultanee contro `nemo-speech serve`.
 
 È la misura che decide il dimensionamento. Il server gira come girerebbe in

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Ciclo di vita della Recording per il recorder multi-traccia (ADR-013
  * Fase 3, scelta "crea early + Jibri riusa unificato").

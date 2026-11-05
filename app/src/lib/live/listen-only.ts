@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { mediaLockOf, type MediaLock } from '@/lib/auth/jwt';
 import type { EventoConsenso, RegolaConsenso } from './consent-rule';
 

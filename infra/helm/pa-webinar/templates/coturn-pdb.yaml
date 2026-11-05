@@ -1,3 +1,6 @@
+{{- /* SPDX-License-Identifier: EUPL-1.2 */ -}}
+{{- /* SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale */ -}}
+
 {{- if .Values.coturnPodDisruptionBudget.enabled }}
 {{- if and .Values.jitsi.enabled (dig "coturn" "enabled" false (index .Values "jitsi-meet" | default dict)) }}
 # PodDisruptionBudget per coturn (media relay TURN/TURNS del subchart jitsi-meet).

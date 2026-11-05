@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 locals {
   # Valori del chart che dipendono da questa infrastruttura. Nessun segreto:
   # le chiavi dello storage vanno nel Secret dell'applicazione (README.md).

@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Prova del modulo senza un progetto Google Cloud: il provider è simulato
 # (mock_provider), quindi nessuna chiamata alle API e nessuna credenziale.
 # Controlla le combinazioni delle scelte e i valori che finiscono nel chart.

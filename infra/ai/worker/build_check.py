@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """Controllo al build dell'immagine con la GPU (Dockerfile.worker).
 
 Fallisce il build, invece del primo job, se:

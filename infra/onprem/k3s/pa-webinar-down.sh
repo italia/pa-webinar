@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 #
 # Toglie un'installazione fatta con pa-webinar-up.sh: la release Helm e il
 # namespace, con il database, i volumi, la casella di prova e i componenti

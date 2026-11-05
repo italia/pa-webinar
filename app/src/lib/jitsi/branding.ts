@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * I colori della scena della conferenza, perche' si fonda con il resto della
  * sala: lo stesso blu della barra in alto e delle schede, al posto del nero di

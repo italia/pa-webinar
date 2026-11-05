@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Con quale identità si vota nei sondaggi e si scrive nella nuvola di parole,
  * fuori dalla sala live perché si possa verificare senza caricarla.

@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 #
 # Con tre nodi: riserva un nodo al bridge della conferenza (etichetta e taint
 # `workload=jitsi-jvb`, gli stessi che values-k3s.yaml chiede al bridge) e,

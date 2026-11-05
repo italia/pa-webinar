@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * I momenti della diretta sul tempo del video pubblicato: gli argomenti
  * dell'agenda, le presentazioni, i sondaggi con i risultati, le domande

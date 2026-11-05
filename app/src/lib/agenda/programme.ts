@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il programma dell'incontro: l'agenda preparata prima dell'evento, con gli
  * orari previsti e chi interviene, come la mostra la pagina pubblica.

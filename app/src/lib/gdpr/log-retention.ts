@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Conservazione delle righe che non appartengono a un evento: la coda delle
  * email e il registro delle azioni privilegiate. La pulizia per evento non le

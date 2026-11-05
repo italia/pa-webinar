@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * POST /api/admin/organizers/:id/invite — manda un nuovo link di accesso
  * (ADR-014). Serve anche come «ho perso il link»: il precedente, se non

@@ -1,3 +1,6 @@
+-- SPDX-License-Identifier: EUPL-1.2
+-- SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 -- mod_token_affiliation_custom.lua
 --
 -- Forces XMPP room affiliation based on the JWT context.user.affiliation

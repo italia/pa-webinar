@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Un indirizzo mailto: con oggetto e testo, che apre il programma di posta di
  * chi lo clicca. Il server non spedisce niente: e' per le email che chi

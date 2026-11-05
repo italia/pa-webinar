@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * La traduzione automatica al salvataggio, e lo stato delle lingue di un
  * evento per chi lo modifica.

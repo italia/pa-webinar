@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """Re-trascrive audio.wav con initial_prompt + hallucination filter.
 
 Salva transcript_raw.json (sovrascrive). Da rilanciare ogni volta che

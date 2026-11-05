@@ -1,4 +1,7 @@
 #!/bin/sh
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Mint a Jitsi JWT using openssl + jq. Produces a token compatible with
 # Prosody's JWT module in pa-webinar (same iss/aud/sub layout as app/src/lib/auth/jwt.ts).
 #

@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Motore dei sottotitoli live: NeMo-Speech.cpp, build per CPU (Apache-2.0),
 # in modalità server (`nemo-speech serve`). Il modello non è nell'immagine:
 # lo scarica `fetch-model.sh` all'avvio del pod (initContainer), con revisione

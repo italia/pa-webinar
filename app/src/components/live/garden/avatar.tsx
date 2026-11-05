@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Waiting-room garden avatars — 6 flat-illustration presets aligned
  * with the .italia design system palette (primary #0066CC, success

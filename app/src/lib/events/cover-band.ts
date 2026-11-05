@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * La copertina nella pagina dell'evento: larga quanto il contenuto del
  * contenitore e alta al massimo 340 px o il 38% della finestra

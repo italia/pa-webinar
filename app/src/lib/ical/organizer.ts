@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il nome dell'organizzatore nelle voci di calendario (.ics e allegati delle
  * email): il primo ente che organizza l'evento, altrimenti l'ente

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 // Interfaccia della conferenza nello stack locale (docker-compose): niente
 // logo e niente link di Jitsi sopra la chiamata, come nelle installazioni
 // su Kubernetes. L'immagine jitsi/web aggiunge questo file in coda al suo

@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """Audio waveform peak extraction.
 
 Produces a compact, normalised amplitude envelope of a recording so the

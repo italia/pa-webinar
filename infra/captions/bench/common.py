@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """Funzioni condivise dal banco di prova dei sottotitoli live.
 
 Download con verifica dell'impronta, lettura e scrittura WAV senza

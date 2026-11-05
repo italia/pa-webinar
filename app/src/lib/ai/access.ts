@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Access gating per gli endpoint pubblici di consumo postprod
  * (transcript JSON, subtitle VTT, dubbed audio, download).

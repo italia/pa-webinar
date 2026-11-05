@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * GET /api/avatar/person/[id] — la foto di una persona dell'evento, come
  * immagine (EventPersonPhoto, vedi lib/events/person-photo).

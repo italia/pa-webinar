@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """Text-to-Speech (TTS) per il job DUB.
 
 Usa **Piper** (rhasspy/piper, MIT license) per la sintesi vocale

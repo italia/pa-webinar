@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 #
 # Ripristina un'installazione di PA Webinar da un backup di scripts/backup.sh
 # (il database e, a richiesta, l'object storage su volume), fermando prima chi

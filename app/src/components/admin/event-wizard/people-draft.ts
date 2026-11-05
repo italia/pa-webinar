@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Una persona nuova dell'evento, prima di entrare nell'elenco: la usano il
  * modulo del passo «Persone» e quello breve del passo «Programma», con le

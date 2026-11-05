@@ -1,3 +1,6 @@
+{{- /* SPDX-License-Identifier: EUPL-1.2 */ -}}
+{{- /* SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale */ -}}
+
 {{- /*
 Lo script che Jibri esegue a fine registrazione (files/jibri-finalize.sh):
 carica il file nello storage e avvisa il portale, con la firma

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * I campi dell'evento che descrivono il video pubblicato, azzerati insieme: chi
  * toglie il video lascia una pagina senza date, peso o durata di un file che non

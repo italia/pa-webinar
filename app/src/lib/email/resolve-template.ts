@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Email template resolver: merges DB overrides (EmailTemplate model) with the
  * hardcoded defaults in `templates.ts`, then interpolates `{{placeholder}}`

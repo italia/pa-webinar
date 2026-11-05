@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """Accuratezza dei sottotitoli su un evento vero.
 
 Il banco misura su parlato letto (FLEURS); questo script misura sul parlato

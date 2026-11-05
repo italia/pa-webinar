@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il contesto di una stanza per il servizio dei sottotitoli live (ADR-018):
  * se trascrivere, in che lingua, e il vocabolario dell'evento.

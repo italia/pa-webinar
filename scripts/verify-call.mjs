@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 // Prova di una chiamata vera su un'installazione di PA Webinar: crea una
 // chiamata istantanea con la chiave dell'istanza, fa entrare due partecipanti
 // in due browser headless con videocamera e microfono finti, controlla che

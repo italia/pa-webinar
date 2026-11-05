@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Lo stato del timer degli interventi, uno per evento, condiviso da tutte le
  * istanze dell'app.

@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Rete: una VPC con sottoreti pubbliche e private in az_count zone.
 #
 # - Pubbliche (/24): NAT gateway, bilanciatori esposti a Internet (portale,

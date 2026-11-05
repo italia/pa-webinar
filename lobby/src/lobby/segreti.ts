@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * I codici segreti da tastiera, elencati nella legenda della piazza:
  * su su giù giù sinistra destra sinistra destra B A fa festa, «boom» accende

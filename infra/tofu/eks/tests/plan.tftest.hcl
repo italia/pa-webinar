@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Prove del modulo senza account AWS: `tofu test` da infra/tofu/eks.
 # I provider sono simulati, quindi si controllano solo la logica del modulo
 # (quali risorse, con quali valori) e le sue validazioni, non le API di AWS.

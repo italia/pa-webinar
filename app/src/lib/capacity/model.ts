@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Quanto pesa un evento sul ponte video e sulla rete: un modello per flussi e
  * pacchetti, puro, che usano il pannello della capacita' (nel wizard e sulla

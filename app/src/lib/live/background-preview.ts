@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * L'anteprima dello sfondo virtuale nella sala d'attesa: la persona ritagliata
  * dal video della propria videocamera e disegnata davanti allo sfondo scelto.

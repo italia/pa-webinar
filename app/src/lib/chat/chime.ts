@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il suono di avviso della chat: due note brevi generate dal browser (Web
  * Audio), senza file da scaricare. Al massimo uno ogni due secondi e mezzo,

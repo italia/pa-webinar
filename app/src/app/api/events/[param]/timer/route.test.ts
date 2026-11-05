@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il timer del moderatore: cosa finisce nella cronologia della sala, e lo
  * stato condiviso fra le istanze dell'app. Lo stato del conto alla rovescia

@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """Test dei fallback robusti di transcribe (diarization best-effort).
 
 Coprono il bug che bruciava i nodi A100: token HF segnaposto →

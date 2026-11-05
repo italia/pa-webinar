@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Storage degli oggetti: un bucket S3 privato per entrambi i domini del
 # portale (materiali e registrazioni, le cui chiavi non si sovrappongono) e un
 # utente IAM con chiavi statiche.

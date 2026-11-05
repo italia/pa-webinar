@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """Il resoconto dell'evento (lavoro REPORT).
 
 Il portale raccoglie gli ingressi al claim (``reportInput``: evento, agenda con

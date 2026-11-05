@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { createHash } from 'crypto';
 
 import { afterEach, describe, expect, it } from 'vitest';

@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """LLM post-correction sulla trascrizione.
 
 Passa la trascrizione a Mistral con un glossario di sigle e termini

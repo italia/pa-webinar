@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Le azioni sull'evento che l'amministrazione lancia da piu' punti (la
  * pagina dell'evento, il menu della sua scheda nell'elenco). Una sola

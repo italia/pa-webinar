@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il tempo dell'evento come lo legge chi conduce: da quanto si è in onda,
  * quanto manca alla fine prevista, il fuori orario e quando la sala si

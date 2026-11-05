@@ -1,4 +1,7 @@
 #!/bin/bash
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Entrypoint del container pa-webinar-load-test.
 # Conia un JWT, lancia Malleus Jitsificus con i parametri passati via env.
 #

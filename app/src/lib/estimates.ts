@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * La stima della capacita' salvata con un evento (`capacityEstimateJson`,
  * alla creazione e quando cambia uno dei suoi ingressi): un adattatore sul

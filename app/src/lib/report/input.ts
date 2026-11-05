@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Quello che il modello linguistico legge per scrivere il resoconto
  * dell'evento (lavoro REPORT, infra/ai/worker): l'evento e le persone che lo

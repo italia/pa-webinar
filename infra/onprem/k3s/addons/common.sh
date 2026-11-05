@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # shellcheck shell=bash
 # shellcheck disable=SC2034  # le variabili le leggono gli script che includono questo file
 #

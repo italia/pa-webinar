@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Resource group, identità e ruoli. Cosa crea il modulo e come si usa:
 # README.md in questa cartella. I nomi di etichette, taint e container
 # coincidono con quelli che il chart si aspetta

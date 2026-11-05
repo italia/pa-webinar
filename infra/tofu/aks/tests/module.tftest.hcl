@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Prove del modulo con provider simulati: nessuna credenziale Azure, nessuna
 # risorsa creata. Verificano che ogni combinazione di variabili si valuti, e
 # che etichette, taint, regole di rete e valori Helm dicano la stessa cosa.

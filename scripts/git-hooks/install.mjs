@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Installa i git hook del repository impostando `core.hooksPath` su
  * scripts/git-hooks. Lo lancia `npm install` (script `prepare`).

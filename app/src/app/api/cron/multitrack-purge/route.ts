@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * GET /api/cron/multitrack-purge  (ADR-013, Fase 5 — minimizzazione GDPR)
  *

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Chi puo' leggere e modificare il glossario di un evento: chi lo modera,
  * con il proprio token (la pagina dell'evento si apre anche dal link del

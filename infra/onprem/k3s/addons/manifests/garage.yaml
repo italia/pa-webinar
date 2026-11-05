@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Garage, object storage S3 su un solo nodo, per PA Webinar su k3s.
 # Modello di storage.sh: i segnaposto @@...@@ li sostituisce lo script.
 # I segreti (RPC, token di amministrazione e delle metriche) arrivano dal

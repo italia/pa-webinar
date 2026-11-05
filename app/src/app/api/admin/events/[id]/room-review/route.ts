@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * GET /api/admin/events/[id]/room-review — cio' che la revisione della sala
  * non trova nelle rotte della sala: tutte le domande segnate in chat (non

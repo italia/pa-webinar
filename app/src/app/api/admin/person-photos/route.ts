@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * POST /api/admin/person-photos — carica la foto di una persona dell'evento
  * (organizzatore principale, moderatore, relatore).

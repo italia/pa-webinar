@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """Test della cross-correlazione pura per l'allineamento multi-traccia (C)."""
 
 import numpy as np

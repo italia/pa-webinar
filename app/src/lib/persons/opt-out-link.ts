@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { issueRubricaOptOutToken } from '@/lib/persons/opt-out-token';
 import { localizedUrl } from '@/lib/utils/localized-url';
 

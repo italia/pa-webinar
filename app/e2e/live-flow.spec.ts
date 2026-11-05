@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { test, expect, type APIRequestContext } from '@playwright/test';
 import { randomUUID } from 'crypto';
 

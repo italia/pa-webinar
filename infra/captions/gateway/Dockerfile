@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Gateway dei sottotitoli live: riceve dal bridge l'audio di chi parla, lo
 # passa al motore (sidecar sullo stesso pod) e rimanda il testo. Nessun
 # modello qui dentro: solo Node e il decodificatore Opus (WebAssembly).

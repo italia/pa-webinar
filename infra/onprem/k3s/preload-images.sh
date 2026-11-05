@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 #
 # Immagini per nodi k3s che non possono (o non devono) prelevarle da soli:
 # nodi senza Internet, dietro un proxy che non vede il registro, o senza le

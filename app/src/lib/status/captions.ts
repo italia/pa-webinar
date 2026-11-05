@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Lo stato dei sottotitoli live (ADR-018) per la pagina di stato, la mappa
  * dell'infrastruttura e la sala.

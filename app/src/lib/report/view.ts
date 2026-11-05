@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il resoconto come lo vede la pagina dell'evento: solo a evento concluso e
  * pubblicato dallo staff, nella lingua della pagina se c'e', altrimenti in

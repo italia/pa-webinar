@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /** Gli umori della piazza (UMORI della lobby): solo questi arrivano agli
  *  altri. Uno sconosciuto si scarta, come per i gesti. */
 export const GARDEN_UMORI = ['felice', 'curioso', 'assonnato', 'carico'] as const;

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Pure helpers for event lifecycle decisions — the logic factored out
  * of the JVB scaler route and the events PUT handler so each branch

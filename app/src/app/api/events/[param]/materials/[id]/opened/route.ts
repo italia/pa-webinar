@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * POST /api/events/[param]/materials/[id]/opened — qualcuno ha aperto un link
  * o scaricato un file fra i materiali dell'evento.

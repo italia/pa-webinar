@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Release spine — version, date and the security/sbom flags. No prose at all:
  * the user-facing text lives per-locale in `translations/<locale>.json`, and

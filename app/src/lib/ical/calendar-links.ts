@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Generate "Add to Calendar" URLs for Google, Outlook, and Yahoo.
  * Used both server-side (in email templates) and client-side (in UI dropdown).

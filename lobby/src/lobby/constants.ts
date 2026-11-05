@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /** Cross-cutting tuning constants for the lobby world. */
 
 export const DEFAULT_WORLD = { w: 1600, h: 1024 } as const;

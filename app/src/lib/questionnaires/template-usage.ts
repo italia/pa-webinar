@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Quali modelli di domande si propongono per un questionario: quelli pensati
  * per quel momento (prima dell'evento, all'iscrizione; dopo l'evento, come

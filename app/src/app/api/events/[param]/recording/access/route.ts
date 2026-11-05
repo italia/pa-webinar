@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * GET /api/events/[slug]/recording/access?t=<token>&lang=<lingua>
  * POST /api/events/[slug]/recording/access  { email, locale? }

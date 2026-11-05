@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /** Un materiale come lo restituisce GET /api/events/[slug]/materials. */
 export interface RoomMaterial {
   id: string;

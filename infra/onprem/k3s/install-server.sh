@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 #
 # Installa il server k3s di PA Webinar: con un nodo solo è l'intero cluster,
 # con tre è il piano di controllo a cui si uniscono gli agent

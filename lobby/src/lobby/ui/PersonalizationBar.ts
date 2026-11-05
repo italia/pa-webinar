@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { busOn, type LobbyBus } from '../bus';
 import type { PlayerProfile } from '../ports/types';
 import { AVATAR_COLORS } from '../systems/AvatarTextureFactory';

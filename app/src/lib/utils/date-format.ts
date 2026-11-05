@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 // Formato regionale per ogni lingua: `en` e' l'inglese europeo (giorno prima
 // del mese, orario a 24 ore). Le altre lingue usano il proprio codice.
 const REGIONE: Record<string, string> = {

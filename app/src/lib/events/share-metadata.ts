@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * L'anteprima di un link a un evento (OpenGraph e Twitter), la stessa per
  * tutte le pagine dell'evento che si condividono: la pagina pubblica, il

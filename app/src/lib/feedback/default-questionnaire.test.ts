@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il questionario di valutazione predefinito, dal modello di sistema
  * «Feedback generico»: le quattro strade (c'e' gia', si crea, il modello

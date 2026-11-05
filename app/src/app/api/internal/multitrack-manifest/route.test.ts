@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il manifest del registratore: con l'ora del primo fotogramma, la
  * registrazione sa dove cade lo zero dei tempi della trascrizione.

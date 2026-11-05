@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Image pre-built per eseguire jitsi-meet-torture in locale contro un deploy
 # pa-webinar. Include: OpenJDK 17, Maven, Google Chrome stable, chromedriver
 # matched, xvfb, jitsi-meet-torture clonato. Il JWT viene generato ogni volta

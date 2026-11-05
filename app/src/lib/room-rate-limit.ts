@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * I limiti per indirizzo di quello che si fa nella sala e nella piazza
  * (presenza, reazioni, voti, domande, valutazioni, token degli ospiti),

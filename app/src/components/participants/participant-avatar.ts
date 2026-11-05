@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * L'immagine dell'avatar di un partecipante, come la riporta Jitsi
  * (`avatarURL`, dal token che firma il portale): una foto caricata, il proxy

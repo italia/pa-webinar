@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il personaggio senza Phaser: l'aspetto, la sua codifica e il disegno. Lo
  * importa la pagina che ospita la piazza (l'editor, l'anteprima, l'adattatore

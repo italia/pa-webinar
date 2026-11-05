@@ -1,3 +1,6 @@
+-- SPDX-License-Identifier: EUPL-1.2
+-- SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 -- mod_pa_media_lock.lua
 --
 -- Blocca davvero microfono, videocamera e condivisione dello schermo dei

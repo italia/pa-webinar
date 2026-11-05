@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il ciclo di vita dei lavori dell'evento: il resoconto (PostprodJob di tipo
  * REPORT) e la traduzione di titolo e descrizione (TRANSLATE_TEXT,

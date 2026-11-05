@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Multitrack recorder (ADR-013, Fase 3).
 # Headless-Chrome bot che registra una traccia audio per partecipante.
 #

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Date-change notification email for registered participants.
  * Sent when a moderator updates the event date on a PUBLISHED event.

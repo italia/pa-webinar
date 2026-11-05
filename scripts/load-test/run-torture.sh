@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Run jitsi-meet-torture against an pa-webinar deployment.
 #
 # Wraps Maven invocation of the Malleus Jitsificus scenario with

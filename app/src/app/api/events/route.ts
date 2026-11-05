@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { randomUUID } from 'crypto';
 
 import type { EventStatus, Prisma } from '@prisma/client';

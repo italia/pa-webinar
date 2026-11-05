@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // authorizeChatRead is a pure GATE: it decides may-you-read, then delegates

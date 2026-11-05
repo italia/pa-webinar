@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """Multi-track transcript merge (ADR-013, Fase 1).
 
 When each participant is recorded on a separate audio track (one speaker

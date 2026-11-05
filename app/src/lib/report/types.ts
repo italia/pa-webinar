@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il resoconto dell'evento: i numeri, calcolati dal portale, e il testo,
  * scritto dal modello linguistico (worker della post-produzione, lavoro

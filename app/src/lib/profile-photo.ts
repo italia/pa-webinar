@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * La foto profilo: quella che una persona sceglie di mostrare in sala al
  * posto delle iniziali, legata all'hash della sua email (vedi ProfilePhoto

@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """Unit test per la costruzione del comando ffmpeg dell'archivio MKV."""
 
 from . import archive as arc

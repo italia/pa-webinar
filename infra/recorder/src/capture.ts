@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * ╔══════════════════════════════════════════════════════════════════════╗
  * ║  MODULO WEBRTC — RICHIEDE UN JITSI REALE. NON È UNIT-TESTABILE.        ║

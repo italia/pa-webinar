@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Salva come file il corpo di una risposta gia' ricevuta (un CSV chiesto con
  * le credenziali della pagina: il token non finisce in un indirizzo). Il

@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Pool dei bridge (JVB) su AKS: la definizione sta nel modulo infra/tofu/aks,
 # risorsa azurerm_kubernetes_cluster_node_pool.jvb in node-pools.tf, insieme al
 # profilo del cluster autoscaler (cluster.tf) e alla rete che espone UDP 10000

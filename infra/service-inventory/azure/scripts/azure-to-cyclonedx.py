@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """Reference generator: Azure Resource Graph -> CycloneDX 1.6 services[].
 
 Produces the OPS half of a service-inventory document for a single resource

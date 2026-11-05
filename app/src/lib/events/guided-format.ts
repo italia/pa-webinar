@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il formato di un evento nuovo, scelto con quattro domande invece che fra
  * modelli con un nome da indovinare: quante persone, chi parla e si mostra in

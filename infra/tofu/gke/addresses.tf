@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Indirizzi pubblici fissi e record DNS.
 #
 # Gli indirizzi si prenotano qui e il chart li usa per nome o per valore

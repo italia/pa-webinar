@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Fusi orari proposti nei menu (impostazioni del sito, evento). Un solo
  * elenco: se il fuso predefinito del sito non compare nel menu dell'evento,

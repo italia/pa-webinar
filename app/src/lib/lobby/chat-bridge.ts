@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il ponte fra la chat dell'evento e la piazza: ogni messaggio diventa un
  * fumetto sopra chi l'ha scritto, una correzione lo aggiorna, un messaggio

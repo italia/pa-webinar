@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Le frasi definitive dei sottotitoli, mandate al portale per la trascrizione
  * dell'evento (Event.captionsTranscriptEnabled).

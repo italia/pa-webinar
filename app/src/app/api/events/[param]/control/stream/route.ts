@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Server-Sent Events stream of transient live-CONTROL signals for an event
  * (the moderator's "lower that hand" signal, and any future targeted control op).

@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """Costo del modello per chunk e throughput, alla massima velocità.
 
 Lancia `nemo-speech bench asr --mode stream` sulle frasi singole per ogni

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il pubblico vede chi altro e' in sala? La scheda Partecipanti, la griglia, la
  * striscia dei video e i nomi nella piazza dipendono da questa sola regola.

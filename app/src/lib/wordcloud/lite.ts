@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * La lettura leggera di «in una parola» (`GET …/wordcloud?lite=1`): c'e' una
  * domanda aperta, e quale. La legge ogni presente per il pallino sulla scheda,

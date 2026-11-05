@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import type { CSSProperties } from 'react';
 
 import type { IconSize } from '@/components/ui/icon';

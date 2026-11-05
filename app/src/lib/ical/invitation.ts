@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * L'invito di calendario personale (iCalendar METHOD:REQUEST) che accompagna
  * le email di partecipazione: conferma d'iscrizione, promemoria, avviso di

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Quali eventi contano come «in corso» e «in arrivo» sulle pagine di stato e
  * nel monitoraggio. Una regola sola per l'elenco e per ogni contatore.

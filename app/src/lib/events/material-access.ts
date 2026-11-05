@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { isEventModerator } from '@/lib/auth/moderator';
 import { prisma } from '@/lib/db';
 import { UnauthorizedError } from '@/lib/errors';

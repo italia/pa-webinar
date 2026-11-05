@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Postprod AI worker — single container that:
 #   1. Claims one PostprodJob from the app's /api/internal/postprod-claim
 #   2. Downloads the source MP4 from the signed URL

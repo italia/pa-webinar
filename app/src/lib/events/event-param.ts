@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Shared resolver for the public `[param]` event routes, where the path segment
  * may be either an event UUID or a slug. Kept in one place so the several live

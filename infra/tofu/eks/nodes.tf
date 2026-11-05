@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Gruppi di nodi gestiti.
 #
 #   applications — sempre acceso (app_min_size): portale, CronJob, Prosody,

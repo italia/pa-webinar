@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Dal wizard alla pagina di gestione dell'evento appena creato: quali risorse
  * non sono state salvate e se la pubblicazione richiesta e' fallita. Passa per

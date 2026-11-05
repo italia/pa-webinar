@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 export const locales = [
   'bg', 'cs', 'da', 'de', 'el', 'en', 'es', 'et',
   'fi', 'fr', 'ga', 'hr', 'hu', 'it', 'lt', 'lv',

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Dalla stanza della conferenza all'evento, e dall'endpoint del bridge alla
  * persona: le due corrispondenze che servono per tenere la trascrizione (o

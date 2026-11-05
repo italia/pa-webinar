@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * I grafici del resoconto dell'evento: SVG disegnati qui, senza librerie
  * esterne. Ogni grafico ha una descrizione per chi usa un lettore di schermo e

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Config dell'operator, da env. Tutto iniettato dall'Helm chart (K8s) o dal
  * docker-compose (VM). Il runner è selezionabile per supportare entrambi gli

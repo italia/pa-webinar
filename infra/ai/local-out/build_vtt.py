@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """
 Genera i file WebVTT compatibili con <track> del VideoPlayer:
 - transcript_it.vtt   (sottotitoli IT, lingua sorgente)

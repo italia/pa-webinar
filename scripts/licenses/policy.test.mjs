@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 // Politica delle licenze: valutazione delle espressioni SPDX e lettura dei
 // lockfile. Si esegue con `npm run test:scripts`.
 import assert from 'node:assert/strict';

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Regole dei git hook, come funzioni pure (testate in rules.test.mjs):
  * formato del messaggio di commit, controlli sulle righe aggiunte (segreti,

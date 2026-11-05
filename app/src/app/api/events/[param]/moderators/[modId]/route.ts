@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Revoke (soft-delete) or hard-delete a co-moderator entry, or update the
  * person's public profile.

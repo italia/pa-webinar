@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Un istante di un video come lo legge chi guarda: m:ss, o h:mm:ss oltre
  * l'ora. Lo stesso nel lettore e accanto al video (le slide), così i tempi

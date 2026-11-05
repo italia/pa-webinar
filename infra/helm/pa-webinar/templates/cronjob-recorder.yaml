@@ -1,3 +1,6 @@
+{{- /* SPDX-License-Identifier: EUPL-1.2 */ -}}
+{{- /* SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale */ -}}
+
 {{- if and .Values.recorder.enabled .Values.recorder.controller.enabled }}
 # Recorder template (ADR-013 Fase 3) — CronJob creato **sospeso**, usato come
 # Pod spec template dal recorder-controller (`kubectl create job --from`).

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Marcatura degli output della post-produzione AI quando lasciano il portale
  * (AI Act, art. 50): nella pagina il badge lo dice a chi legge, ma un file

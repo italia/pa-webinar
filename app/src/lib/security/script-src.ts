@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { locales } from '@/i18n/config';
 
 // La sala dell'evento (con la sala d'attesa): l'unica pagina che compila

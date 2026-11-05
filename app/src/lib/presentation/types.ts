@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * La forma della presentazione di un PDF nella sala, condivisa fra server e
  * browser. Nessun import di runtime: la legge anche il bundle della sala.

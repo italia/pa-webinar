@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Regole firewall della VPC.
 #
 # Le regole per i Service LoadBalancer (bridge dietro bilanciatore, coturn,

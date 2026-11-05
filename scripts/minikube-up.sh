@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 #
 # Installa PA Webinar su minikube, su una sola macchina, per valutarlo: avvia
 # un profilo dedicato con ingress e metrics-server, genera i segreti una volta

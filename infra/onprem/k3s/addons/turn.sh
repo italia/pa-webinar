@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 #
 # TURN per PA Webinar su un solo nodo k3s, per i partecipanti le cui reti
 # bloccano UDP verso la porta 10000 del bridge: senza TURN entrano in sala ma

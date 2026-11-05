@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * /api/admin/events/[id]/calendar-invites — reinvio dell'invito di
  * calendario a tutte le persone dell'evento (lib/email/calendar-invite).

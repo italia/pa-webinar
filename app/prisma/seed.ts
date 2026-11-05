@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Prisma seed script — creates example data for local development.
  * Run with: npx prisma db seed (or npm run db:seed)

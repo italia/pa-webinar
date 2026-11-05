@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Worker di post-produzione senza GPU (postprod.worker.cpu nel chart): sintesi,
 # traduzioni, archivio e traduzione dei testi degli eventi (quest'ultima
 # chiama su HTTP il motore di traduzione su CPU, postprod.mt: nessuna

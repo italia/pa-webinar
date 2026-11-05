@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { prisma } from '@/lib/db';
 import { toKebab } from '@/lib/utils/kebab';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { defineConfig, devices } from '@playwright/test';
 
 // Allow pointing the suite at an already-running server on a non-default

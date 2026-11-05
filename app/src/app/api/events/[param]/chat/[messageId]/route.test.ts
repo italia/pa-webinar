@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il moderatore nasconde un messaggio della chat: cosa finisce nella
  * cronologia della sala. La correzione del proprio messaggio da parte

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Client HTTP verso il portale. L'operator legge SOLO lo stato desiderato
  * (quali eventi LIVE devono avere un recorder); non tocca credenziali —

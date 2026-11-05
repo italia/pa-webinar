@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Chi puo' iscriversi a un evento: la regola pura, senza banca dati, cosi' la
  * usano allo stesso modo il server (lib/events/registration-access) e il

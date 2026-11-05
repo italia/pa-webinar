@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 #
 # Object storage S3 per PA Webinar su un solo nodo k3s: Garage in un
 # Deployment con un volume local-path, i due bucket del portale (file e

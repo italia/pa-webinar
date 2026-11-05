@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il suggerimento iniziale per Whisper (`initial_prompt`): termini del
  * glossario, titolo, ente e relatori. Non viene trascritto: orienta il

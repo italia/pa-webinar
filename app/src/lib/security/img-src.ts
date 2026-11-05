@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Gli unici siti esterni da cui le pagine del portale caricano immagini
  * (direttiva `img-src` della CSP, in middleware.ts). Lo legge anche il campo

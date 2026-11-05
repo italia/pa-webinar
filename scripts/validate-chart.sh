@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 #
 # Rende il chart per ogni profilo e verifica le invarianti che, se violate,
 # fanno fallire l'installazione o la lasciano a metà. Serve perché nessun altro

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * L'avviso agli iscritti quando la registrazione di un evento concluso diventa
  * visibile sulla sua pagina pubblica.

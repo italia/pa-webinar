@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il segnale sonoro di una registrazione o trascrizione che parte o si ferma.
  * Lo suona la sala, non Jitsi: gli annunci di Jitsi sono spenti dove ci sono i

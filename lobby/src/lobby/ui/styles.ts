@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * All lobby UI CSS, injected once by LobbyGame and scoped under `.pawl`.
  * Kept as a string so the module ships no external stylesheet and the host
