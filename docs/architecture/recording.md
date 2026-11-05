@@ -914,6 +914,10 @@ title. The event page puts the pages back beside the published video
 
 ## Known limitations
 
+- **People without the consent in the composite.** Jibri's session leaves them
+  out by reading internals of the Jitsi client: retry it after every Jitsi
+  upgrade. A dedicated track for each person would keep them out by
+  construction ([Roadmap](../ROADMAP.md)).
 - **Consent text.** The per-participant consent text states that the track is
   deleted after transcription, and does not change when **Keep
   per-participant tracks** is on.
