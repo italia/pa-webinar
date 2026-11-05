@@ -450,7 +450,7 @@ export default function JitsiRoom({
       // splice() muta il buffer in-place: l'eventuale eccedenza (>2000) resta
       // in coda per il flush successivo invece di essere persa.
       const events = buf.splice(0, 2000);
-      sendJson(`/api/events/${encodeURIComponent(slug)}/speaker-events`, JSON.stringify({ events }), useBeacon);
+      sendJson(`/api/events/${encodeURIComponent(slug)}/speaker-events`, JSON.stringify({ events, roomToken: jwt }), useBeacon);
     }
 
     function scheduleSpeakerFlush() {

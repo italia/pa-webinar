@@ -406,8 +406,9 @@ floor**, `askToUnmute`) still shows it. The moderator's **Participants** tab mar
 value, stored in `RoomOccupant`). `listenOnly` comes from the person's browser, which declares its bridge
 endpoint with its room token (`POST /api/events/{param}/listen-only`), and only a token that carries the
 value the bridge enforces marks it. A dominant-speaker event from a `voiceExcluded` endpoint keeps no
-name and, while a recording runs, sets `Event.unrecordedSpeech`, which puts the note next to the
-published video; the caption segments of that endpoint are kept as times only.
+name. While a recording runs, a batch sent with a valid room token (`roomToken`) also sets
+`Event.unrecordedSpeech`, which puts the note next to the published video; the caption segments of
+that endpoint are kept as times only.
 Every token of such an event also carries `consentLock`: in that room the module refuses to switch the
 moderation off (the **Participants** tab shows a note instead of **Microphones locked** and **Video
 locked**), and a person made moderator stays bound by their token. `recordingEnabled` does not change
