@@ -4,6 +4,8 @@ import { test, expect, type Locator, type Page } from '@playwright/test';
 
 import messages from '../src/i18n/messages/it.json';
 
+import { accediComeAdmin } from './helpers/accesso-admin';
+
 /**
  * Le pagine pubbliche usate solo da tastiera: il salto al contenuto, il
  * selettore della lingua, l'iscrizione dall'inizio alla fine senza mouse, e
@@ -77,7 +79,7 @@ test('il selettore della lingua si apre e si chiude da tastiera', async ({ page 
 });
 
 test('ci si iscrive a un evento senza usare il mouse', async ({ page }) => {
-  const login = await page.request.post('/api/admin/login', { data: { key: ADMIN_KEY } });
+  const login = await accediComeAdmin(page.request, ADMIN_KEY);
   expect(login.ok(), `login: ${login.status()}`).toBeTruthy();
   const inizio = Date.now() + 86_400_000;
   const creato = await page.request.post('/api/events', {
