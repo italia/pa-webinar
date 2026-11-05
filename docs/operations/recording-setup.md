@@ -644,8 +644,9 @@ one hour at 1 Mbps is about 450 MB.
   streaming (faststart) and does not re-encode it, so the stored size is what
   Jibri's encoder produced. It depends on the resolution and on what is on
   screen: slides and a few talking heads compress far better than full-motion
-  video. Measure it with a test recording of a typical event, for example at an
-  average of 1.5 Mbps an hour takes about 675 MB.
+  video. Measure it with a test recording of a typical event. As a reference, a
+  webinar with slides and up to ten cameras averaged about 3.6 Mbps with these
+  settings, or about 1.6 GB per hour.
 - **Per-participant tracks.** Each bot records the remote audio track of every
   participant who consented as Opus at 32 kbps (`infra/recorder/src/capture.ts`),
   about 14 MB per participant per hour of recording.
