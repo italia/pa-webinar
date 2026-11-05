@@ -12,6 +12,7 @@ vi.mock('@/lib/db', () => ({
 }));
 const staff = vi.hoisted(() => ({ valore: null as { accountId: string; nome: string } | null }));
 vi.mock('@/lib/auth/staff-seat', () => ({ staffDietroIlPrimario: vi.fn(async () => staff.valore) }));
+vi.mock('@/lib/captions/room', () => ({ endpointSenzaRegistrazione: vi.fn(async () => []) }));
 vi.mock('@/lib/redis', () => ({
   getRedis: () => null,
   withDeadline: <T,>(op: Promise<T>) => op,

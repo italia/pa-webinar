@@ -110,9 +110,6 @@ export const eventBaseSchema = z.object({
   /** La spiegazione sopra la casella del consenso alla registrazione in sala
    *  d'attesa, al posto di quella predefinita. */
   recordingConsentText: z.string().max(5000).optional(),
-  // Chi non acconsente alla registrazione entra in solo ascolto: acceso per
-  // gli eventi nuovi (il consenso e' libero, art. 7.4 GDPR).
-  listenOnlyWithoutConsent: z.boolean().default(true),
   // Pubblico anonimo: pseudonimi per chi partecipa (spento: ci si conosce).
   audienceAnonymous: z.boolean().default(false),
   // L'elenco di chi partecipa, per il pubblico: spento di default.

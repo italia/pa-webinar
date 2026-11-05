@@ -15,6 +15,7 @@ import { AppError, RateLimitError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { decryptPII, tryDecryptPII } from '@/lib/crypto/pii';
 import { getClientIp, rateLimit } from '@/lib/rate-limit';
+import { voceNelVideo } from '@/lib/recording/availability';
 import { consensiDellIscrizione } from '@/lib/gdpr/consent-state';
 import { issueGdprToken, verifyGdprToken } from '@/lib/gdpr/request-token';
 
@@ -254,5 +255,6 @@ export const GET = withErrorHandling(async (request) => {
     // Serve a ritirare un consenso dalla pagina: il link dell'email resta di
     // sola lettura, e questo non finisce negli indirizzi.
     consentsToken: issueGdprToken('consents', emailHash),
+    voiceInVideo: voceNelVideo(),
   });
 });

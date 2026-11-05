@@ -9,12 +9,15 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { prisma } = vi.hoisted(() => ({
   prisma: {
-    event: { findFirst: vi.fn() },
+    event: { findFirst: vi.fn(), updateMany: vi.fn() },
+    liveAction: { findFirst: vi.fn() },
     callSession: { findFirst: vi.fn(), update: vi.fn() },
   },
 }));
 
 vi.mock('@/lib/db', () => ({ prisma }));
+const room = vi.hoisted(() => ({ endpointSenzaRegistrazione: vi.fn() }));
+vi.mock('@/lib/captions/room', () => room);
 
 import { POST } from './route';
 
@@ -50,6 +53,8 @@ beforeEach(() => {
   prisma.event.findFirst.mockResolvedValue({ id: EVENTO });
   prisma.callSession.findFirst.mockResolvedValue({ id: 's1', dominantSpeakerLog: [] });
   prisma.callSession.update.mockResolvedValue({ id: 's1' });
+  room.endpointSenzaRegistrazione.mockResolvedValue([]);
+  prisma.liveAction.findFirst.mockResolvedValue(null);
 });
 
 describe('cosa si accetta', () => {
@@ -123,6 +128,26 @@ describe('dove si scrive', () => {
 });
 
 describe('il registro', () => {
+  it('il nome di chi non ha acconsentito alla registrazione non resta', async () => {
+    room.endpointSenzaRegistrazione.mockResolvedValue(['escluso']);
+    prisma.liveAction.findFirst.mockResolvedValue({ kind: 'recording.started' });
+    await manda({
+      events: [
+        { atMs: 1, participantId: 'escluso', displayName: 'Senza consenso' },
+        { atMs: 2, participantId: 'altro', displayName: 'Relatore 1' },
+      ],
+    });
+    expect(registroScritto()).toEqual([
+      { atMs: 1, participantId: 'escluso' },
+      { atMs: 2, participantId: 'altro', displayName: 'Relatore 1' },
+    ]);
+    // L'evento ricorda che qualcuno ha parlato senza: lo dice la sua pagina.
+    expect(prisma.event.updateMany).toHaveBeenCalledWith({
+      where: { id: EVENTO, unrecordedSpeech: false },
+      data: { unrecordedSpeech: true },
+    });
+  });
+
   it('le voci nuove si accodano a quelle che ci sono', async () => {
     prisma.callSession.findFirst.mockResolvedValue({
       id: 's1',

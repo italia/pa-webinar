@@ -10,8 +10,6 @@ const base: StatoIngressoInput = {
   canEnterLive: true,
   ingressoConsentito: true,
   nameValid: true,
-  recordingRequired: false,
-  recordingConsent: false,
   ingressoTentato: false,
   nomeNoto: true,
 };
@@ -25,18 +23,8 @@ describe('statoIngresso — modulo completo', () => {
       bloccoModulo: null,
       nomeDaChiedere: false,
       nomeSegnalato: false,
-      consensoSegnalato: false,
       bloccoSpiegato: null,
     });
-  });
-});
-
-describe('statoIngresso — consenso alla registrazione mancante', () => {
-  it("diventa un errore solo dopo un tentativo d'ingresso", () => {
-    const senza = { recordingRequired: true, recordingConsent: false };
-    expect(stato(senza).consensoSegnalato).toBe(false);
-    expect(stato({ ...senza, ingressoTentato: true }).consensoSegnalato).toBe(true);
-    expect(stato({ ...senza, recordingConsent: true, ingressoTentato: true }).consensoSegnalato).toBe(false);
   });
 });
 
@@ -65,14 +53,6 @@ describe('statoIngresso — nome mancante', () => {
     expect(s.nomeSegnalato).toBe(true);
   });
 
-  it('il nome viene prima del consenso: e\' il primo campo della pagina', () => {
-    const s = stato({
-      nameValid: false,
-      recordingRequired: true,
-      recordingConsent: false,
-    });
-    expect(s.bloccoModulo).toBe('name');
-  });
 });
 
 describe('statoIngresso — la sala che aspetta resta distinta dal nome', () => {
@@ -103,19 +83,6 @@ describe('statoIngresso — la sala che aspetta resta distinta dal nome', () => 
   });
 });
 
-describe('statoIngresso — consenso', () => {
-  it('consenso alla registrazione dell\'evento mancante: blocca, e il pulsante lo spiega', () => {
-    const s = stato({ recordingRequired: true, recordingConsent: false });
-    expect(s.canEnter).toBe(false);
-    expect(s.bloccoModulo).toBe('recording');
-    expect(s.bloccoSpiegato).toBe('recording');
-  });
-
-  it('consenso alla registrazione non richiesto (gia\' dato all\'iscrizione): si entra senza spunta', () => {
-    expect(stato({ recordingRequired: false, recordingConsent: false }).canEnter).toBe(true);
-  });
-});
-
 describe('annuncioApertura', () => {
   it('fuori dall\'istante di apertura non annuncia nulla', () => {
     expect(
@@ -135,9 +102,4 @@ describe('annuncioApertura', () => {
     ).toBe('roomOpenNameMissing');
   });
 
-  it('sala appena aperta con consenso mancante: annuncia l\'apertura', () => {
-    expect(
-      annuncioApertura({ appenaAperta: true, canEnter: false, bloccoModulo: 'recording' }),
-    ).toBe('roomOpen');
-  });
 });

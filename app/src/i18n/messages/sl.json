@@ -543,7 +543,10 @@
       "handsRaised": "{count, plural, one {# dvignjena roka} two {# dvignjeni roki} few {# dvignjene roke} other {# dvignjenih rok}}",
       "locksByConsent": "Mikrofoni in kamere sledijo privolitvi v snemanje: kdor jo je dal, uporablja, kar dogodek dovoljuje, ostali le poslušajo. Zaklepi sobe ostanejo vklopljeni.",
       "listenOnlyBadge": "samo posluša",
-      "listenOnlyNoFloor": "Ni dal privolitve v snemanje: ne more govoriti, dokler je ne da v svoji dvorani."
+      "listenOnlyNoFloor": "Ni dal privolitve v snemanje: ne more govoriti, dokler je ne da v svoji dvorani.",
+      "voiceExcludedBadge": "brez snemanja",
+      "voiceExcludedFloor": "Ni privolil(a) v snemanje: lahko govori, vendar se glas ne snema.",
+      "locksByConsentVoice": "Kamere in zasloni sledijo privolitvi v snemanje: kdor je ni dal, lahko govori brez snemanja, ne more pa uporabljati kamere in zaslona. Zaklepi dvorane ostanejo vklopljeni."
     },
     "moderator": {
       "muteAll": "Utišaj vse",
@@ -685,13 +688,13 @@
         "without": {
           "soloAscolto": "Brez te privolitve samo poslušate: mikrofon, kamera in zaslon ostanejo zaprti.",
           "conduce": "Brez te privolitve vseeno vodite, vendar vaš glas ne ostane v posameznih sledeh niti v prepisu.",
-          "uscita": "Za udeležbo na tem dogodku je potrebna privolitev v snemanje."
+          "voce": "Brez te privolitve sodelujete in lahko govorite, vendar se vaš glas ne snema; kamera in zaslon ostaneta izklopljena."
         },
         "alreadyRecorded": "Kar je že posneto, ostane v videu dogodka: za odstranitev pišite organizatorjem.",
         "withdraw": {
           "soloAscolto": "Če jo prekličete, ostanete v dvorani in samo poslušate: mikrofon, kamera in zaslon se zaprejo. Prekličete tudi privolitev v prepis svojih govorov.",
-          "uscita": "Če jo prekličete, zapustite konferenco in se vrnete v čakalnico: za udeležbo je potrebna privolitev v snemanje. Prekličete tudi privolitev v prepis svojih govorov.",
-          "conduce": "Če jo prekličete, vodite naprej, vendar od zdaj vaš glas ne ostane v posameznih sledeh niti v prepisu. Video dvorane, če se snema, vas vseeno prikazuje."
+          "conduce": "Če jo prekličete, vodite naprej, vendar od zdaj vaš glas ne ostane v posameznih sledeh niti v prepisu. Video dvorane, če se snema, vas vseeno prikazuje.",
+          "voce": "Če jo prekličete, ostanete v dvorani in lahko govorite: od zdaj se vaš glas ne snema, kamera in zaslon pa se izklopita. Prekličete tudi privolitev v prepis svojih izjav."
         }
       },
       "transcription": {
@@ -701,6 +704,11 @@
         "withdrawEffect": "Če jo prekličete, vaši že prepisani stavki izgubijo besedilo in ime, od zdaj pa se vaš glas ne snema na ločeno sled in se ne prepisuje.",
         "needsRecording": "Date jo lahko po privolitvi v snemanje."
       }
+    },
+    "voiceExcluded": {
+      "title": "Sodelujete brez snemanja.",
+      "consent": "Privolim v snemanje",
+      "body": "Niste privolili v snemanje: lahko govorite v mikrofon, vendar se vaš glas ne snema. Kamera in zaslon ostaneta izklopljena."
     }
   },
   "qa": {
@@ -1018,10 +1026,6 @@
           }
         },
         "recordingManualNote": "Snemanje se nikoli ne začne samo: moderator ga zažene z gumbom REC.",
-        "listenOnlyWithoutConsent": "Kdor ne privoli, vstopi samo kot poslušalec",
-        "listenOnlyWithoutConsentOn": "Privolitev v snemanje je prostovoljna: kdor je ne da, vseeno sodeluje, spremlja in piše v klepet, mikrofon, kamera in zaslon pa ostanejo izklopljeni.",
-        "listenOnlyWithoutConsentOff": "Brez privolitve v snemanje ni vstopa.",
-        "listenOnlyLockedLive": "Dokler je soba lahko odprta, snemanja in načina samo poslušanja ni mogoče spremeniti: veljata od prvega vstopa.",
         "audienceAnonymous": "Anonimno občinstvo",
         "audienceAnonymousDesc": "Udeleženci so drugim vidni pod psevdonimom (»Udeleženec« in koda) v videu, klepetu in vprašanjih; seznam udeležencev ostane voditeljem, trga ni. Uporabno za velike dogodke; na dogodkih skupnosti se ljudje želijo spoznati.",
         "audienceAnonymousLocked": "Dokler je soba lahko odprta, se ne da spremeniti: povezalo bi psevdonime z imeni.",
@@ -1029,7 +1033,8 @@
         "participantListVisibleDesc": "Izklopljeno: seznam, mreža in imena na trgu ostanejo voditeljem in govorcem; občinstvo vidi samo tistega, ki govori. Vklopljeno: vsi vidijo, kdo je v dvorani.",
         "participantListAnonymous": "Pri anonimnem občinstvu seznam ostane skrit.",
         "participantListLocked": "Ko je dvorana odprta, tega ni mogoče spremeniti: tisti, ki so že v njej, spremembe ne bi videli.",
-        "participantListCameraNote": "Ko je seznam skrit, tisti, ki vklopi kamero, ne vidi svojega okna. Za srečanje, na katerem se vsi vidijo, pokažite seznam."
+        "participantListCameraNote": "Ko je seznam skrit, tisti, ki vklopi kamero, ne vidi svojega okna. Za srečanje, na katerem se vsi vidijo, pokažite seznam.",
+        "recordingLockedLive": "Ko je dvorana odprta, snemanja ni mogoče spremeniti: velja od prvega vstopa."
       },
       "step3": {
         "heading": "Osebe in vabila",
@@ -1322,7 +1327,6 @@
         "permissionsHeading": "Kdo lahko kaj počne v sobi",
         "permissionsIntro": "Kaj lahko počnejo udeleženci in katere funkcije sobe so vklopljene. Vse se lahko spremeni tudi med dogodkom.",
         "consentsLine": "Privolitve ob prijavi in v dvorani: {list}",
-        "consentRecordingRequired": "snemanje, obvezno za vstop",
         "consentRecordingFree": "snemanje, prostovoljno (brez njega samo poslušanje)",
         "consentRecordingNotice": "za snemanje samo obvestilo (udeleženci ne govorijo in se ne kažejo)",
         "consentTranscription": "prepis lastnih govorov, neobvezen",
@@ -1330,7 +1334,9 @@
         "consentsHosts": "Moderatorje in govornike za snemanje vprašamo v dvorani, neobvezno.",
         "consentsWithdraw": "Udeleženci jih lahko v dvorani prekličejo z gumbom »Privolitve«.",
         "participantListShown": "Seznam udeležencev: viden vsem.",
-        "participantListHidden": "Seznam udeležencev: samo za voditelje in govorce."
+        "participantListHidden": "Seznam udeležencev: samo za voditelje in govorce.",
+        "consentRecordingOptional": "snemanje, neobvezno",
+        "consentRecordingVoice": "snemanje, prostovoljno (brez njega se glas ne snema)"
       },
       "preview": {
         "title": "Predogled strani",
@@ -4341,14 +4347,15 @@
   "gdpr": {
     "consent": {
       "recording": "Soglašam z avdio/video snemanjem dogodka",
-      "recordingRequired": "Soglasje s snemanjem je obvezno za udeležbo na tem dogodku",
-      "recordingNotice": "Dogodek se snema (zvok in slika). Sodeluješ brez mikrofona in kamere: posnetek ne vsebuje tvojega glasu ali podobe, razen če ti voditelj da besedo.",
       "multitrack": "Privolim, da se moji prispevki prepišejo z mojim imenom za poročilo o dogodku. Če dogodek snema ločen zvočni posnetek za vsako osebo, se moj glas snema samo za ta namen, posnetek pa se po prepisu izbriše; ne uporablja se za prepoznavanje ali posnemanje mojega glasu.",
       "multitrackOptional": "Ni obvezno: če ne date privolitve, vseeno sodelujete, vendar vaši prispevki ne pridejo v prepis in vaš glas se ne snema na ločeno sled. Če se dogodek snema, vaš glas kljub temu ostane v videoposnetku.",
       "stayInTouch": "Želim prejemati informacije o prihodnjih dogodkih in biti dodan v imenik, da me povabijo na podobne dogodke",
       "stayInTouchHelp": "Neobvezno soglasje (člen 6.1.a GDPR). Kadar koli ga lahko prekličeš s povezavo »Odstrani me iz imenika« v e-poštnih sporočilih, ki jih prejmeš. Ime in organizacija sta iz te prijave.",
       "recordingOptionalListenOnly": "Če ne privolite, vseeno sodelujete, samo kot poslušalec: spremljate in pišete v klepet, mikrofon, kamera in deljenje zaslona pa ostanejo izklopljeni. Privolite lahko pozneje, iz sobe.",
-      "recordingOptionalHost": "Če ne privolite, vseeno vstopite in vodite kot običajno, vendar se vaš glas ne ohrani v posnetkih po osebah niti v prepisu. Video sobe, če se snema, vas vseeno zajame."
+      "recordingOptionalHost": "Če ne privolite, vseeno vstopite in vodite kot običajno, vendar se vaš glas ne ohrani v posnetkih po osebah niti v prepisu. Video sobe, če se snema, vas vseeno zajame.",
+      "recordingOptionalVoice": "Če ne privolite, vseeno sodelujete in lahko govorite, vendar se vaš glas ne snema; kamera in deljenje zaslona ostaneta izklopljena. Privolite lahko pozneje v dvorani.",
+      "recordingNotice": "Dogodek se snema (zvok in slika). Sodeluješ brez mikrofona in kamere: posnetek ne vsebuje tvojega glasu ali podobe, razen če ti voditelj da besedo.",
+      "recordingNoticeVoice": "Dogodek se snema (zvok in slika). Sodelujete brez mikrofona in kamere: posnetek ne vsebuje vašega glasu in slike, razen če privolite v dvorani."
     },
     "export": {
       "title": "Moji podatki",
@@ -5191,7 +5198,8 @@
     "overlapBadge": "hkratno",
     "overlapTitle": "Hkraten govor: v tem odseku govori več oseb hkrati.",
     "anonymousSpeaker": "Udeleženec {n}",
-    "untranscribed": "Ni prepisano: govornik ni dal privolitve"
+    "untranscribed": "Ni prepisano: govornik ni dal privolitve",
+    "unrecordedSpeech": "Nekaterih izjav ni v posnetku: govorci niso dali privolitve."
   },
   "waiting": {
     "startsIn": "Dogodek se začne čez",
@@ -5263,7 +5271,6 @@
     "multitrackConsentTitle": "Prepis vaših prispevkov",
     "recordingConsentTitle": "Snemanje dogodka",
     "recordingConsentIntro": "Dogodek se snema (zvok in slika). Če spregovorite, posnetek vsebuje vaš glas, vašo podobo in to, kar delite na zaslonu.",
-    "recordingConsentRequired": "Za vstop je potrebno vaše soglasje s snemanjem.",
     "enterGardenTitle": "Vstopi na trg",
     "enterGardenHint": "Drug kraj za čakanje: sprehodite se, spoznajte druge, ki čakajo, in vstopite v prenos skozi vrata, ko se soba odpre.",
     "backToWaitingRoom": "Nazaj v čakalnico",

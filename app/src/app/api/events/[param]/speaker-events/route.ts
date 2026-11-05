@@ -4,6 +4,8 @@ import { z } from 'zod';
 import { parseJsonBody, withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { NotFoundError, RateLimitError, ValidationError } from '@/lib/errors';
+import { endpointSenzaRegistrazione } from '@/lib/captions/room';
+import { statoCattura } from '@/lib/live/capture-state';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
@@ -73,7 +75,15 @@ export const POST = withErrorHandling(async (request, context) => {
   // Risolvi evento → CallSession ATTIVA (più recente senza endedAt).
   const event = await prisma.event.findFirst({
     where: eventWhereClause(param),
-    select: { id: true },
+    select: {
+      id: true,
+      status: true,
+      recordingEnabled: true,
+      aiTranscriptEnabled: true,
+      multitrackRecordingEnabled: true,
+      captionsTranscriptEnabled: true,
+      liveCaptionsEnabled: true,
+    },
   });
   if (!event) throw new NotFoundError('Event');
 
@@ -89,7 +99,29 @@ export const POST = withErrorHandling(async (request, context) => {
     ? (session.dominantSpeakerLog as unknown as SpeakerEvent[])
     : [];
 
-  const merged = existing.concat(events);
+  // Il nome di chi non ha un consenso valido alla registrazione non resta nella
+  // cronologia. E se parla mentre si registra resta sull'evento: la pagina lo
+  // dice accanto al video, dove il suo intervento non c'e'.
+  const senzaNome = new Set(await endpointSenzaRegistrazione(event.id));
+  const nuovi = events.map(({ displayName, ...evento }) => ({
+    ...evento,
+    ...(senzaNome.has(evento.participantId) ? {} : { displayName }),
+  }));
+  if (nuovi.some((e) => senzaNome.has(e.participantId))) {
+    const ultima = await prisma.liveAction.findFirst({
+      where: { eventId: event.id, kind: { in: ['recording.started', 'recording.stopped'] } },
+      orderBy: { at: 'desc' },
+      select: { kind: true },
+    });
+    if (ultima?.kind === 'recording.started' || statoCattura(event, {}).registrazione) {
+      await prisma.event.updateMany({
+        where: { id: event.id, unrecordedSpeech: false },
+        data: { unrecordedSpeech: true },
+      });
+    }
+  }
+
+  const merged = existing.concat(nuovi);
   // Mantieni gli ultimi MAX_LOG_ENTRIES (i più recenti sono i più utili in
   // caso di troncamento; comunque è una protezione, non il caso normale).
   const capped =

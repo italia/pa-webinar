@@ -81,7 +81,6 @@ export const DUPLICATED_EVENT_FIELDS = [
   'privacyPolicyText',
   'gdprTemplateId',
   'recordingConsentText',
-  'listenOnlyWithoutConsent',
   'audienceAnonymous',
   'participantListVisible',
 
@@ -116,6 +115,7 @@ export const DUPLICATED_EVENT_FIELDS = [
 
 /** Columns a duplicate must NOT inherit, each with the reason it is excluded. */
 export const NOT_DUPLICATED_EVENT_FIELDS: Record<string, string> = {
+  unrecordedSpeech: 'un fatto di QUELLA occorrenza, non configurazione',
   id: 'new row',
   createdAt: 'new row',
   updatedAt: 'new row',

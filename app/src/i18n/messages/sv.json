@@ -543,7 +543,10 @@
       "handsRaised": "{count, plural, one {# uppräckt hand} other {# uppräckta händer}}",
       "locksByConsent": "Mikrofoner och kameror följer samtycket till inspelningen: de som gett det använder det evenemanget tillåter, övriga lyssnar bara. Rummets lås förblir på.",
       "listenOnlyBadge": "lyssnar bara",
-      "listenOnlyNoFloor": "Har inte samtyckt till inspelningen: kan inte tala förrän samtycke ges i det egna rummet."
+      "listenOnlyNoFloor": "Har inte samtyckt till inspelningen: kan inte tala förrän samtycke ges i det egna rummet.",
+      "voiceExcludedBadge": "utan inspelning",
+      "voiceExcludedFloor": "Har inte samtyckt till inspelningen: kan tala, men rösten spelas inte in.",
+      "locksByConsentVoice": "Kameror och skärmar följer samtycket till inspelning: den som inte har gett det kan tala utan att spelas in, men utan kamera och skärm. Rummets lås förblir på."
     },
     "moderator": {
       "muteAll": "Tysta alla",
@@ -685,13 +688,13 @@
         "without": {
           "soloAscolto": "Utan detta samtycke lyssnar du bara: mikrofon, kamera och skärm förblir stängda.",
           "conduce": "Utan detta samtycke leder du ändå, men din röst sparas inte i spåren per person eller i transkriptionen.",
-          "uscita": "För att delta i evenemanget krävs samtycke till inspelningen."
+          "voce": "Utan detta samtycke deltar du och kan tala, men din röst spelas inte in; kamera och skärm förblir avstängda."
         },
         "alreadyRecorded": "Det som redan har spelats in finns kvar i evenemangets video: skriv till arrangörerna för att få det borttaget.",
         "withdraw": {
           "soloAscolto": "Om du återkallar det stannar du i rummet och lyssnar bara: mikrofon, kamera och skärm stängs. Ditt samtycke till transkription av dina inlägg återkallas också.",
-          "uscita": "Om du återkallar det lämnar du mötet och går tillbaka till väntrummet: deltagande kräver samtycke till inspelningen. Ditt samtycke till transkription av dina inlägg återkallas också.",
-          "conduce": "Om du återkallar det fortsätter du leda, men från och med nu sparas din röst inte i spåren per person eller i transkriptionen. Rummets video visar dig ändå om den spelas in."
+          "conduce": "Om du återkallar det fortsätter du leda, men från och med nu sparas din röst inte i spåren per person eller i transkriptionen. Rummets video visar dig ändå om den spelas in.",
+          "voce": "Om du återkallar det stannar du i rummet och kan tala: från och med nu spelas din röst inte in, och kamera och skärm stängs av. Du återkallar också samtycket till transkribering av dina inlägg."
         }
       },
       "transcription": {
@@ -701,6 +704,11 @@
         "withdrawEffect": "Om du återkallar det förlorar dina redan transkriberade meningar text och namn, och från och med nu spelas din röst varken in på ett eget spår eller transkriberas.",
         "needsRecording": "Du kan ge det efter samtycke till inspelningen."
       }
+    },
+    "voiceExcluded": {
+      "title": "Du deltar utan inspelning.",
+      "consent": "Jag samtycker till inspelningen",
+      "body": "Du har inte samtyckt till inspelningen: du kan tala i mikrofonen, men din röst spelas inte in. Kamera och skärm förblir avstängda."
     }
   },
   "qa": {
@@ -1018,10 +1026,6 @@
           }
         },
         "recordingManualNote": "Inspelningen startar aldrig av sig själv: en moderator startar den med REC-knappen.",
-        "listenOnlyWithoutConsent": "Den som inte samtycker deltar bara som lyssnare",
-        "listenOnlyWithoutConsentOn": "Samtycke till inspelningen är frivilligt: den som inte ger det deltar ändå, följer och skriver i chatten, men mikrofon, kamera och skärm förblir avstängda.",
-        "listenOnlyWithoutConsentOff": "Utan samtycke till inspelningen kommer ingen in.",
-        "listenOnlyLockedLive": "Medan rummet kan vara öppet går inspelning och endast lyssning inte att ändra: de gäller från första inträdet.",
         "audienceAnonymous": "Anonym publik",
         "audienceAnonymousDesc": "Deltagare visas för andra under en pseudonym (”Deltagare” och en kod) i video, chatt och frågor; deltagarlistan stannar hos värdarna och det finns inget torg. Bra för stora evenemang; på gemenskapsevenemang vill man lära känna varandra.",
         "audienceAnonymousLocked": "Kan inte ändras medan rummet kan vara öppet: det skulle koppla pseudonymer till namn.",
@@ -1029,7 +1033,8 @@
         "participantListVisibleDesc": "Av: listan, rutnätet och namnen på torget stannar hos värdar och talare; publiken ser bara den som talar. På: alla ser vilka som är i rummet.",
         "participantListAnonymous": "Med anonym publik förblir listan dold.",
         "participantListLocked": "Kan inte ändras när rummet är öppet: de som redan är inne skulle inte se ändringen.",
-        "participantListCameraNote": "Med dold lista ser den som slår på kameran inte sin egen ruta. Visa listan vid ett möte där alla ser varandra."
+        "participantListCameraNote": "Med dold lista ser den som slår på kameran inte sin egen ruta. Visa listan vid ett möte där alla ser varandra.",
+        "recordingLockedLive": "Inspelning kan inte ändras när rummet är öppet: den gäller från första inträdet."
       },
       "step3": {
         "heading": "Personer och inbjudningar",
@@ -1322,7 +1327,6 @@
         "permissionsHeading": "Vem som får göra vad i rummet",
         "permissionsIntro": "Vad deltagarna kan göra och vilka funktioner i rummet som är på. Allt kan också ändras under evenemanget.",
         "consentsLine": "Samtycken vid anmälan och i rummet: {list}",
-        "consentRecordingRequired": "inspelning, krävs för att komma in",
         "consentRecordingFree": "inspelning, frivillig (utan: bara lyssna)",
         "consentRecordingNotice": "för inspelningen bara ett meddelande (deltagarna varken talar eller syns)",
         "consentTranscription": "transkription av egna inlägg, frivillig",
@@ -1330,7 +1334,9 @@
         "consentsHosts": "Moderatorer och talare tillfrågas om inspelningen i rummet, frivilligt.",
         "consentsWithdraw": "Deltagarna kan återkalla dem i rummet med knappen ”Samtycken”.",
         "participantListShown": "Deltagarlista: synlig för alla.",
-        "participantListHidden": "Deltagarlista: endast för värdar och talare."
+        "participantListHidden": "Deltagarlista: endast för värdar och talare.",
+        "consentRecordingOptional": "inspelning, frivillig",
+        "consentRecordingVoice": "inspelning, frivillig (utan den spelas rösten inte in)"
       },
       "preview": {
         "title": "Förhandsvisning av sidan",
@@ -4341,14 +4347,15 @@
   "gdpr": {
     "consent": {
       "recording": "Jag samtycker till ljud-/videoinspelning av detta evenemang",
-      "recordingRequired": "Samtycke till inspelning krävs för att delta i detta evenemang",
-      "recordingNotice": "Evenemanget spelas in (ljud och bild). Du deltar utan mikrofon och kamera: inspelningen innehåller inte din röst eller bild, om inte värden ger dig ordet.",
       "multitrack": "Jag samtycker till att mina inlägg transkriberas med mitt namn för evenemangets sammanfattning. Om evenemanget spelar in ett separat ljudspår för varje person spelas min röst in enbart i detta syfte och spåret raderas efter transkriberingen; det används inte för att identifiera eller återskapa min röst.",
       "multitrackOptional": "Det är frivilligt: om du inte samtycker deltar du ändå, men det du säger kommer inte med i transkriptionen och din röst spelas inte in på ett eget spår. Om evenemanget spelas in finns din röst ändå kvar i videon.",
       "stayInTouch": "Jag vill få information om kommande evenemang och läggas till i adressboken för att bjudas in till liknande evenemang",
       "stayInTouchHelp": "Frivilligt samtycke (art. 6.1.a GDPR). Du kan när som helst återkalla det via länken ”Ta bort mig från adressboken” i de e-postmeddelanden du får. Namn och organisation är de från den här anmälan.",
       "recordingOptionalListenOnly": "Om du inte samtycker deltar du ändå, bara som lyssnare: du följer och skriver i chatten, men mikrofon, kamera och skärmdelning förblir avstängda. Du kan samtycka senare, från rummet.",
-      "recordingOptionalHost": "Om du inte samtycker kommer du ändå in och leder som vanligt, men din röst sparas inte i spåren per person eller i transkriptionen. Videon av rummet, om den spelas in, visar dig ändå."
+      "recordingOptionalHost": "Om du inte samtycker kommer du ändå in och leder som vanligt, men din röst sparas inte i spåren per person eller i transkriptionen. Videon av rummet, om den spelas in, visar dig ändå.",
+      "recordingOptionalVoice": "Om du inte samtycker deltar du ändå och kan tala, men din röst spelas inte in; kamera och skärmdelning förblir avstängda. Du kan samtycka senare i rummet.",
+      "recordingNotice": "Evenemanget spelas in (ljud och bild). Du deltar utan mikrofon och kamera: inspelningen innehåller inte din röst eller bild, om inte värden ger dig ordet.",
+      "recordingNoticeVoice": "Evenemanget spelas in (ljud och bild). Du deltar utan mikrofon och kamera: inspelningen innehåller inte din röst eller bild, om du inte samtycker i rummet."
     },
     "export": {
       "title": "Mina uppgifter",
@@ -5191,7 +5198,8 @@
     "overlapBadge": "samtidigt",
     "overlapTitle": "Samtidigt tal: i det här intervallet talar mer än en person samtidigt.",
     "anonymousSpeaker": "Deltagare {n}",
-    "untranscribed": "Inte transkriberat: talaren gav inte sitt samtycke"
+    "untranscribed": "Inte transkriberat: talaren gav inte sitt samtycke",
+    "unrecordedSpeech": "Vissa inlägg finns inte i inspelningen: de som talade samtyckte inte."
   },
   "waiting": {
     "startsIn": "Evenemanget börjar om",
@@ -5263,7 +5271,6 @@
     "multitrackConsentTitle": "Transkription av dina inlägg",
     "recordingConsentTitle": "Inspelning av evenemanget",
     "recordingConsentIntro": "Evenemanget spelas in (ljud och bild). Om du tar ordet innehåller inspelningen din röst, din bild och det du delar på skärmen.",
-    "recordingConsentRequired": "Ditt samtycke till inspelningen krävs för att komma in.",
     "enterGardenTitle": "Gå in på torget",
     "enterGardenHint": "En annan plats att vänta på: gå runt, träffa de andra som väntar och gå in i livesändningen genom grinden när rummet öppnar.",
     "backToWaitingRoom": "Tillbaka till väntrummet",

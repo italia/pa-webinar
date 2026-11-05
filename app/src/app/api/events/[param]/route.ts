@@ -136,7 +136,6 @@ export const GET = withErrorHandling(async (request, context) => {
       postEventEmailEnabled: event.postEventEmailEnabled,
       feedbackEnabled: event.feedbackEnabled,
       recordingConsentText: event.recordingConsentText,
-      listenOnlyWithoutConsent: event.listenOnlyWithoutConsent,
       audienceAnonymous: event.audienceAnonymous,
       participantListVisible: event.participantListVisible,
       // Al co-moderatore torna il SUO token (valido su tutte le route che
@@ -310,7 +309,7 @@ export const PUT = withErrorHandling(async (request, context) => {
     data.endsAt !== undefined ||
     data.startsAt !== undefined;
   const ignoredCreationOnlyFields: string[] = [];
-  // Registrazione e solo ascolto decidono il consenso chiesto a chi entra e
+  // La registrazione decide il consenso chiesto a chi entra e
   // il blocco dei mezzi che la sala accende al primo ingresso
   // (mod_pa_media_lock): a sala aperta non si cambiano. Chi e' gia' dentro
   // non ha dato il consenso a una registrazione accesa dopo, e chi entra dopo
@@ -320,7 +319,6 @@ export const PUT = withErrorHandling(async (request, context) => {
   // L'elenco dei partecipanti vale da quando la sala si monta: a sala aperta
   // cambierebbe solo per chi entra dopo.
   const CAMPI_DELLA_SALA = [
-    'listenOnlyWithoutConsent',
     'recordingEnabled',
     'audienceAnonymous',
     'participantListVisible',
@@ -594,7 +592,6 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.recordingNotifyEnabled !== undefined && { recordingNotifyEnabled: data.recordingNotifyEnabled }),
       ...(data.feedbackEnabled !== undefined && { feedbackEnabled: data.feedbackEnabled }),
       ...(data.recordingConsentText !== undefined && { recordingConsentText: data.recordingConsentText }),
-      ...(data.listenOnlyWithoutConsent !== undefined && { listenOnlyWithoutConsent: data.listenOnlyWithoutConsent }),
       ...(data.audienceAnonymous !== undefined && { audienceAnonymous: data.audienceAnonymous }),
       ...(data.participantListVisible !== undefined && { participantListVisible: data.participantListVisible }),
       ...(data.recordingPublished !== undefined && {

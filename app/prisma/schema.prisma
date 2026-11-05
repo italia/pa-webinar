@@ -259,12 +259,10 @@ model Event {
   // Il consenso lo da' la casella, non l'ingresso.
   recordingConsentText String? @map("recording_consent_text") @db.Text
 
-  // Chi non da' il consenso alla registrazione entra lo stesso, in solo
-  // ascolto: sente, vede e scrive in chat, ma microfono, videocamera e schermo
-  // gli restano chiusi (anche sul bridge, mod_pa_media_lock). Spento, il
-  // consenso resta una condizione per entrare. Acceso per gli eventi nuovi
-  // (lo decide la creazione); quelli di prima restano come erano.
-  listenOnlyWithoutConsent Boolean @default(false) @map("listen_only_without_consent")
+  // Non si legge piu': il consenso alla registrazione non e' mai una condizione
+  // per entrare (lib/live/listen-only). La colonna resta: durante un
+  // aggiornamento la versione precedente gira sullo stesso schema.
+  listenOnlyWithoutConsent Boolean @default(false) @map("listen_only_without_consent") @ignore
 
   // Pubblico anonimo: chi partecipa (iscritti e ospiti) compare agli altri
   // con uno pseudonimo stabile per posto («Partecipante 7K2Q»), in video, in
@@ -279,6 +277,10 @@ model Event {
   // Chi conduce e chi interviene lo vedono sempre. Conta il valore letto da
   // lib/live/participant-list, non la colonna.
   participantListVisible Boolean @default(false) @map("participant_list_visible")
+
+  // Qualcuno ha parlato senza consenso alla registrazione: la sua voce non c'e',
+  // e la pagina dell'evento lo dice accanto al video.
+  unrecordedSpeech Boolean @default(false) @map("unrecorded_speech")
 
   // Analytics
   peakParticipants Int @default(0) @map("peak_participants")
@@ -2687,6 +2689,8 @@ model RoomOccupant {
   // sottotitoli riceve dal bridge su ogni versione di Jitsi, e da qui risale
   // all'evento.
   meetingId  String?   @map("meeting_id") @db.VarChar(64)
+  // Senza consenso alla registrazione: lo dice il token, tramite Prosody.
+  voiceExcluded Boolean @default(false) @map("voice_excluded")
   joinedAt   DateTime  @map("joined_at")
   leftAt     DateTime? @map("left_at")
 

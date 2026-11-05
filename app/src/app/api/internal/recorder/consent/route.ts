@@ -3,7 +3,8 @@
  *
  * Se il registratore multitraccia puo' registrare la voce di quell'endpoint:
  * solo se la persona dietro (il posto della conferenza, da Prosody) ha dato
- * il consenso alla trascrizione dei propri interventi. Chi non e' riconosciuto
+ * il consenso alla trascrizione dei propri interventi, e non e' entrata senza
+ * quello alla registrazione. Chi non e' riconosciuto
  * non si registra: la risposta lo dice (`reason: 'unknown'`), perche' il
  * registratore lo segnali nel log — se nessuno e' riconosciuto, Prosody non
  * sta mandando gli occupanti (mod_pa_occupants).
@@ -12,7 +13,7 @@
  */
 import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
-import { consensoTrascrizione, postoDellEndpoint } from '@/lib/captions/room';
+import { consensoTrascrizione, postoDellEndpoint, voceEsclusa } from '@/lib/captions/room';
 import { AppError } from '@/lib/errors';
 
 export const dynamic = 'force-dynamic';
@@ -29,6 +30,7 @@ export const GET = withErrorHandling(async (request) => {
   }
   const seatId = await postoDellEndpoint(eventId, endpoint);
   if (!seatId) return Response.json({ record: false, reason: 'unknown' });
+  if (await voceEsclusa(eventId, endpoint)) return Response.json({ record: false });
   const { dato } = await consensoTrascrizione(eventId, seatId, 1);
   return Response.json({ record: dato });
 });

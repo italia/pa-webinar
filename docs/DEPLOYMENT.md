@@ -607,6 +607,11 @@ what the chart does not configure on the Prosody side, is in
 
 ### Pin the conference's internal credentials
 
+A release that changes the Prosody modules takes effect only after Prosody restarts, and an upgrade with
+pinned secrets does not restart it (`configReloadHook.components` covers the web part by default).
+Restart Prosody, with no event running, before the next event: the rule that keeps people without the
+recording consent out of the recording depends on `mod_pa_media_lock`.
+
 The jitsi-meet subchart generates the XMPP passwords of Jicofo, JVB and Jibri, and coturn's shared
 secret, with a random function at **every render** when you do not set them. Every upgrade then writes
 new values. Each component's pod template carries a checksum of its Secret, so every upgrade with

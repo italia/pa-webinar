@@ -307,9 +307,9 @@ describe('POST registrations — consensi secondo il formato dell\'evento', () =
     expect(audit.recordingConsentRequired).toBe(false);
   });
 
-  it('con il microfono concesso la registrazione e\' obbligatoria, la trascrizione no', async () => {
+  it('con il microfono concesso la registrazione si chiede, ma non e\' mai una condizione', async () => {
     evento({ participantsCanUnmute: true });
-    expect((await iscrivitiCon({})).status).toBe(422);
+    expect((await iscrivitiCon({})).status).toBe(201);
     expect((await iscrivitiCon({ consentRecording: true })).status).toBe(201);
     const ok = await iscrivitiCon({ consentRecording: true, consentMultitrack: true });
     expect(ok.status).toBe(201);
@@ -317,7 +317,7 @@ describe('POST registrations — consensi secondo il formato dell\'evento', () =
 
   it('con il solo schermo condiviso si chiede il consenso alla registrazione', async () => {
     evento({ participantsCanShareScreen: true, multitrackRecordingEnabled: false });
-    expect((await iscrivitiCon({})).status).toBe(422);
+    expect((await iscrivitiCon({})).status).toBe(201);
     expect((await iscrivitiCon({ consentRecording: true })).status).toBe(201);
   });
 

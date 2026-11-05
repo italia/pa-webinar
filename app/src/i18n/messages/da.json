@@ -543,7 +543,10 @@
       "handsRaised": "{count, plural, one {# rakt hånd} other {# rakte hænder}}",
       "locksByConsent": "Mikrofoner og kameraer følger samtykket til optagelsen: de, der har givet det, bruger det, arrangementet tillader, de øvrige lytter kun. Rummets låse forbliver slået til.",
       "listenOnlyBadge": "lytter kun",
-      "listenOnlyNoFloor": "Har ikke givet samtykke til optagelsen: kan ikke tale, før vedkommende giver det i sit rum."
+      "listenOnlyNoFloor": "Har ikke givet samtykke til optagelsen: kan ikke tale, før vedkommende giver det i sit rum.",
+      "voiceExcludedBadge": "uden optagelse",
+      "voiceExcludedFloor": "Har ikke givet samtykke til optagelsen: kan tale, men stemmen optages ikke.",
+      "locksByConsentVoice": "Kameraer og skærme følger samtykket til optagelse: den, der ikke har givet det, kan tale uden at blive optaget, men ikke bruge kamera og skærm. Rummets låse forbliver aktive."
     },
     "moderator": {
       "muteAll": "Slå alle fra",
@@ -685,13 +688,13 @@
         "without": {
           "soloAscolto": "Uden dette samtykke lytter du kun med: mikrofon, kamera og skærm forbliver lukket.",
           "conduce": "Uden dette samtykke leder du stadig, men din stemme gemmes ikke i sporene pr. person eller i transskriptionen.",
-          "uscita": "Deltagelse i dette arrangement kræver samtykke til optagelsen."
+          "voce": "Uden dette samtykke deltager du og kan tale, men din stemme optages ikke; kamera og skærm forbliver slukket."
         },
         "alreadyRecorded": "Det, der allerede er optaget, forbliver i videoen af arrangementet: skriv til arrangørerne for at få det fjernet.",
         "withdraw": {
           "soloAscolto": "Hvis du trækker det tilbage, bliver du i rummet og lytter kun med: mikrofon, kamera og skærm lukkes. Dit samtykke til transskription af dine indlæg trækkes også tilbage.",
-          "uscita": "Hvis du trækker det tilbage, forlader du mødet og går tilbage til venterummet: deltagelse kræver samtykke til optagelsen. Dit samtykke til transskription af dine indlæg trækkes også tilbage.",
-          "conduce": "Hvis du trækker det tilbage, leder du videre, men fra nu af gemmes din stemme ikke i sporene pr. person eller i transskriptionen. Videoen af rummet viser dig stadig, hvis den optages."
+          "conduce": "Hvis du trækker det tilbage, leder du videre, men fra nu af gemmes din stemme ikke i sporene pr. person eller i transskriptionen. Videoen af rummet viser dig stadig, hvis den optages.",
+          "voce": "Hvis du trækker det tilbage, bliver du i rummet og kan tale: fra nu af optages din stemme ikke, og kamera og skærm slukkes. Du trækker også samtykket til transskription af dine indlæg tilbage."
         }
       },
       "transcription": {
@@ -701,6 +704,11 @@
         "withdrawEffect": "Hvis du trækker det tilbage, mister dine allerede transskriberede sætninger tekst og navn, og fra nu af optages din stemme hverken på et separat spor eller transskriberes.",
         "needsRecording": "Du kan give det efter samtykke til optagelsen."
       }
+    },
+    "voiceExcluded": {
+      "title": "Du deltager uden optagelse.",
+      "consent": "Jeg giver samtykke til optagelsen",
+      "body": "Du har ikke givet samtykke til optagelsen: du kan tale i mikrofonen, men din stemme optages ikke. Kamera og skærm forbliver slukket."
     }
   },
   "qa": {
@@ -1018,10 +1026,6 @@
           }
         },
         "recordingManualNote": "Optagelsen starter aldrig af sig selv: en ordstyrer starter den med REC-knappen.",
-        "listenOnlyWithoutConsent": "De, der ikke giver samtykke, deltager kun som lyttere",
-        "listenOnlyWithoutConsentOn": "Samtykke til optagelsen er frivilligt: den, der ikke giver det, deltager alligevel, følger med og skriver i chatten, men mikrofon, kamera og skærm forbliver slukket.",
-        "listenOnlyWithoutConsentOff": "Uden samtykke til optagelsen kommer man ikke ind.",
-        "listenOnlyLockedLive": "Mens rummet kan være åbent, kan optagelse og kun lytning ikke ændres: de gælder fra den første indgang.",
         "audienceAnonymous": "Anonymt publikum",
         "audienceAnonymousDesc": "Deltagerne vises for de andre under et pseudonym (»Deltager« og en kode) i video, chat og spørgsmål; deltagerlisten er kun for værterne, og der er ingen plads. Nyttigt til store arrangementer; til fællesskabsarrangementer vil folk gerne lære hinanden at kende.",
         "audienceAnonymousLocked": "Kan ikke ændres, mens rummet kan være åbent: det ville koble pseudonymer til navne.",
@@ -1029,7 +1033,8 @@
         "participantListVisibleDesc": "Fra: listen, gitteret og navnene på pladsen forbeholdes værter og talere; publikum ser kun den, der taler. Til: alle kan se, hvem der er i rummet.",
         "participantListAnonymous": "Med anonymt publikum forbliver listen skjult.",
         "participantListLocked": "Kan ikke ændres, mens rummet er åbent: dem, der allerede er inde, ville ikke se ændringen.",
-        "participantListCameraNote": "Med skjult liste kan den, der tænder kameraet, ikke se sit eget billede. Vis listen til et møde, hvor alle ser hinanden."
+        "participantListCameraNote": "Med skjult liste kan den, der tænder kameraet, ikke se sit eget billede. Vis listen til et møde, hvor alle ser hinanden.",
+        "recordingLockedLive": "Optagelse kan ikke ændres, mens rummet er åbent: den gælder fra første indgang."
       },
       "step3": {
         "heading": "Personer og invitationer",
@@ -1322,7 +1327,6 @@
         "permissionsHeading": "Hvem kan gøre hvad i rummet",
         "permissionsIntro": "Hvad deltagerne kan, og hvilke funktioner i rummet der er slået til. Alt kan også ændres under arrangementet.",
         "consentsLine": "Samtykker ved tilmelding og i rummet: {list}",
-        "consentRecordingRequired": "optagelse, påkrævet for at komme ind",
         "consentRecordingFree": "optagelse, frivillig (uden: kun lytte med)",
         "consentRecordingNotice": "for optagelsen kun en meddelelse (deltagerne hverken taler eller vises)",
         "consentTranscription": "transskription af egne indlæg, frivillig",
@@ -1330,7 +1334,9 @@
         "consentsHosts": "Ordstyrere og talere bliver spurgt om optagelsen i rummet, frivilligt.",
         "consentsWithdraw": "Deltagerne kan trække dem tilbage i rummet med knappen “Samtykker”.",
         "participantListShown": "Deltagerliste: synlig for alle.",
-        "participantListHidden": "Deltagerliste: kun værter og talere."
+        "participantListHidden": "Deltagerliste: kun værter og talere.",
+        "consentRecordingOptional": "optagelse, frivillig",
+        "consentRecordingVoice": "optagelse, frivillig (uden den optages stemmen ikke)"
       },
       "preview": {
         "title": "Forhåndsvisning af siden",
@@ -4341,14 +4347,15 @@
   "gdpr": {
     "consent": {
       "recording": "Jeg giver samtykke til lyd-/videooptagelse af denne begivenhed",
-      "recordingRequired": "Samtykke til optagelse er påkrævet for at deltage i denne begivenhed",
-      "recordingNotice": "Arrangementet optages (lyd og video). Du deltager uden mikrofon og kamera: optagelsen indeholder ikke din stemme eller dit billede, medmindre værten giver dig ordet.",
       "multitrack": "Jeg giver samtykke til, at mine indlæg udskrives med mit navn til arrangementets referat. Hvis arrangementet optager et separat lydspor for hver person, optages min stemme kun til dette formål, og sporet slettes efter udskrivningen; det bruges ikke til at identificere eller gengive min stemme.",
       "multitrackOptional": "Det er frivilligt: Hvis du ikke giver samtykke, deltager du stadig, men dine indlæg kommer ikke med i transskriptionen, og din stemme optages ikke på et separat spor. Hvis arrangementet optages, er din stemme dog stadig med i videoen.",
       "stayInTouch": "Jeg vil gerne modtage information om kommende arrangementer og føjes til adressebogen for at blive inviteret til lignende arrangementer",
       "stayInTouchHelp": "Valgfrit samtykke (GDPR art. 6.1.a). Du kan til enhver tid trække det tilbage via linket »Fjern mig fra adressebogen« i de e-mails, du modtager. Navn og organisation er dem fra denne tilmelding.",
       "recordingOptionalListenOnly": "Hvis du ikke giver samtykke, deltager du alligevel, kun som lytter: du følger med og skriver i chatten, men mikrofon, kamera og skærmdeling forbliver slukket. Du kan give samtykke senere fra rummet.",
-      "recordingOptionalHost": "Hvis du ikke giver samtykke, kommer du stadig ind og leder som sædvanligt, men din stemme gemmes ikke i sporene pr. person eller i transskriptionen. Videoen af rummet viser dig stadig, hvis den optages."
+      "recordingOptionalHost": "Hvis du ikke giver samtykke, kommer du stadig ind og leder som sædvanligt, men din stemme gemmes ikke i sporene pr. person eller i transskriptionen. Videoen af rummet viser dig stadig, hvis den optages.",
+      "recordingOptionalVoice": "Hvis du ikke giver samtykke, deltager du alligevel og kan tale, men din stemme optages ikke; kamera og skærmdeling forbliver slukket. Du kan give samtykke senere fra rummet.",
+      "recordingNotice": "Arrangementet optages (lyd og video). Du deltager uden mikrofon og kamera: optagelsen indeholder ikke din stemme eller dit billede, medmindre værten giver dig ordet.",
+      "recordingNoticeVoice": "Arrangementet optages (lyd og video). Du deltager uden mikrofon og kamera: optagelsen indeholder ikke din stemme eller dit billede, medmindre du giver samtykke i rummet."
     },
     "export": {
       "title": "Mine data",
@@ -5191,7 +5198,8 @@
     "overlapBadge": "samtidig",
     "overlapTitle": "Samtidig tale: i dette interval taler mere end én person på samme tid.",
     "anonymousSpeaker": "Deltager {n}",
-    "untranscribed": "Ikke transskriberet: den, der talte, gav ikke samtykke"
+    "untranscribed": "Ikke transskriberet: den, der talte, gav ikke samtykke",
+    "unrecordedSpeech": "Nogle indlæg er ikke med i optagelsen: de, der talte, gav ikke samtykke."
   },
   "waiting": {
     "startsIn": "Begivenheden starter om",
@@ -5263,7 +5271,6 @@
     "multitrackConsentTitle": "Udskrift af dine indlæg",
     "recordingConsentTitle": "Optagelse af arrangementet",
     "recordingConsentIntro": "Arrangementet optages (lyd og video). Hvis du tager ordet, indeholder optagelsen din stemme, dit billede og det, du deler på skærmen.",
-    "recordingConsentRequired": "Dit samtykke til optagelsen er påkrævet for at komme ind.",
     "enterGardenTitle": "Gå ind på pladsen",
     "enterGardenHint": "Et andet sted at vente: gå rundt, mød de andre, der venter, og gå ind i livebegivenheden gennem porten, når rummet åbner.",
     "backToWaitingRoom": "Tilbage til venteværelset",

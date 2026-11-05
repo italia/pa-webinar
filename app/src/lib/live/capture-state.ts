@@ -33,9 +33,11 @@ export function statoCattura(
     captionsTranscriptEnabled: boolean;
     liveCaptionsEnabled?: boolean | null;
   },
-  sito: { liveCaptionsEnabled?: boolean | null }
+  sito: { liveCaptionsEnabled?: boolean | null },
+  registrazioneDisponibile = true
 ): StatoCattura {
   const tracce =
+    registrazioneDisponibile &&
     evento.status === 'LIVE' &&
     evento.recordingEnabled &&
     evento.aiTranscriptEnabled &&

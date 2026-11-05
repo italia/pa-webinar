@@ -7,11 +7,10 @@ import { consensiRichiesti, type FormatoEvento } from '@/lib/registration/consen
  * Se chi partecipa ha microfono, videocamera o schermo, la sala lo chiede a
  * chi non l'ha gia' dato (all'iscrizione, o in sala in questa visita della
  * pagina); di solo ascolto informa e basta (lib/registration/consents).
- * Chi conduce o interviene lo vede in ogni evento che registra, facoltativo:
- * senza, entra lo stesso, ma la sua voce non resta nelle tracce per persona
- * ne' nella trascrizione (lo decide la rotta del token). Senza nulla che
- * possa registrare (lib/recording/availability), e nelle chiamate rapide,
- * non si chiede e non si informa.
+ * Chi conduce o interviene lo vede in ogni evento che registra. E' sempre
+ * facoltativo: chi non lo da' entra lo stesso (lib/live/listen-only). Senza
+ * nulla che possa registrare (lib/recording/availability), e nelle chiamate
+ * rapide, non si chiede e non si informa.
  */
 /**
  * L'evento registra chi conduce o interviene: la stessa regola per la sala
@@ -36,14 +35,13 @@ export function consensoRegistrazioneIngresso(i: {
   giaDato: boolean;
   /** Chiamata rapida (eventType INSTANT): la sala non ne mostra la registrazione. */
   istantanea?: boolean;
-}): { richiesto: boolean; facoltativo: boolean; soloAscolto: boolean } {
+}): { richiesto: boolean; soloAscolto: boolean } {
   if (i.conduce) {
     const registra = registraChiConduce(
       { recordingEnabled: i.formato.recordingEnabled, eventType: i.istantanea ? 'INSTANT' : null },
       i.registrazioneDisponibile,
     );
-    const richiesto = registra && !i.giaDato;
-    return { richiesto, facoltativo: richiesto, soloAscolto: false };
+    return { richiesto: registra && !i.giaDato, soloAscolto: false };
   }
   const formato = consensiRichiesti({
     ...i.formato,
@@ -52,8 +50,6 @@ export function consensoRegistrazioneIngresso(i: {
   const richiesto = formato.registrazione && !i.giaDato;
   return {
     richiesto,
-    // Chiesto ma libero: senza, si entra in solo ascolto.
-    facoltativo: richiesto && formato.registrazioneFacoltativa,
     soloAscolto: formato.avvisoRegistrazione,
   };
 }

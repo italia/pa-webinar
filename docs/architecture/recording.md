@@ -85,13 +85,23 @@ options that were weighed.
 
 The two capture paths treat consent differently.
 
-- **Composite video.** `Event.recordingEnabled` adds a recording consent to
-  registration and, when the installation can record (Jibri is expected, or
-  `RECORDER_CONTROLLER_URL` is set: `app/src/lib/recording/availability.ts`), a
-  notice in the waiting room and, for whoever has not consented at
-  registration, a waiting-room gate. Holders of moderator and speaker links
-  skip that gate. Jibri records the conference as it is: the consent is
-  collected before entry, not applied to the video.
+- **Composite video.** `Event.recordingEnabled` adds an optional recording
+  consent to registration and, when the installation can record (Jibri is
+  expected, or `RECORDER_CONTROLLER_URL` is set:
+  `app/src/lib/recording/availability.ts`), a notice in the waiting room and,
+  for whoever has not consented, a box there. Nobody is kept out, and whoever
+  speaks without the consent is not recorded: `mod_pa_media_lock` marks their
+  presence from the token, Jibri's session plays neither the voice nor the image
+  of that person, and camera and screen stay closed
+  ([Jitsi integration](jitsi-integration.md)). The
+  session also shows neither thumbnails nor names or initials
+  (`jitsi-meet.web.custom.configs._custom_config_js` in the chart,
+  `infra/jitsi/web/custom-config.js` for Docker Compose), so the video holds the
+  speaker's camera, the shared screen and the voices that consented. A values
+  file that sets `_custom_config_js` replaces that text and has to carry it over:
+  without it `RECORDING_VOICE_EXCLUSION` is unset, a person without the consent
+  listens only, and names and thumbnails return to the video. The same
+  fallback holds with a Jitsi other than the chart's.
 - **Per-participant audio.** `Event.multitrackRecordingEnabled` adds the
   optional consent to the transcription of one's own contributions
   (`consentMultitrack` at registration, a box in the waiting room for everyone

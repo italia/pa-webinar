@@ -543,7 +543,10 @@
       "handsRaised": "{count, plural, one {# opgestoken hand} other {# opgestoken handen}}",
       "locksByConsent": "Microfoons en camera's volgen de toestemming voor de opname: wie die gaf, gebruikt wat het evenement toestaat, de anderen luisteren alleen. De vergrendelingen van de ruimte blijven aan.",
       "listenOnlyBadge": "alleen luisteren",
-      "listenOnlyNoFloor": "Heeft geen toestemming gegeven voor de opname: kan pas spreken na toestemming vanuit de eigen zaal."
+      "listenOnlyNoFloor": "Heeft geen toestemming gegeven voor de opname: kan pas spreken na toestemming vanuit de eigen zaal.",
+      "voiceExcludedBadge": "zonder opname",
+      "voiceExcludedFloor": "Geen toestemming voor de opname: kan spreken, maar de stem wordt niet opgenomen.",
+      "locksByConsentVoice": "Camera's en schermen volgen de toestemming voor de opname: wie die niet heeft gegeven kan spreken zonder te worden opgenomen, maar zonder camera en scherm. De vergrendelingen van de zaal blijven actief."
     },
     "moderator": {
       "muteAll": "Iedereen dempen",
@@ -685,13 +688,13 @@
         "without": {
           "soloAscolto": "Zonder deze toestemming luister je alleen mee: microfoon, camera en scherm blijven dicht.",
           "conduce": "Zonder deze toestemming leid je gewoon, maar je stem blijft niet in de sporen per persoon of in de transcriptie.",
-          "uscita": "Voor deelname aan dit evenement is toestemming voor de opname nodig."
+          "voce": "Zonder deze toestemming neemt u deel en kunt u spreken, maar uw stem wordt niet opgenomen; camera en scherm blijven uit."
         },
         "alreadyRecorded": "Wat al is opgenomen, blijft in de video van het evenement: schrijf de organisatoren om het te laten verwijderen.",
         "withdraw": {
           "soloAscolto": "Als je hem intrekt, blijf je in de zaal en luister je alleen mee: microfoon, camera en scherm gaan dicht. Je toestemming voor de transcriptie van je bijdragen wordt ook ingetrokken.",
-          "uscita": "Als je hem intrekt, verlaat je de vergadering en ga je terug naar de wachtruimte: voor deelname is toestemming voor de opname nodig. Je toestemming voor de transcriptie van je bijdragen wordt ook ingetrokken.",
-          "conduce": "Als je hem intrekt, blijf je leiden, maar vanaf nu blijft je stem niet in de sporen per persoon of in de transcriptie. De video van de zaal, als die wordt opgenomen, laat je toch zien."
+          "conduce": "Als je hem intrekt, blijf je leiden, maar vanaf nu blijft je stem niet in de sporen per persoon of in de transcriptie. De video van de zaal, als die wordt opgenomen, laat je toch zien.",
+          "voce": "Als u deze intrekt, blijft u in de zaal en kunt u spreken: vanaf nu wordt uw stem niet opgenomen, en camera en scherm gaan uit. U trekt ook de toestemming voor de transcriptie van uw bijdragen in."
         }
       },
       "transcription": {
@@ -701,6 +704,11 @@
         "withdrawEffect": "Als je hem intrekt, verliezen je al getranscribeerde zinnen hun tekst en je naam, en vanaf nu wordt je stem niet meer op een apart spoor opgenomen of getranscribeerd.",
         "needsRecording": "Je kunt hem geven na toestemming voor de opname."
       }
+    },
+    "voiceExcluded": {
+      "title": "U neemt deel zonder opname.",
+      "consent": "Ik geef toestemming voor de opname",
+      "body": "U hebt geen toestemming gegeven voor de opname: u kunt via de microfoon spreken, maar uw stem wordt niet opgenomen. Camera en scherm blijven uit."
     }
   },
   "qa": {
@@ -1018,10 +1026,6 @@
           }
         },
         "recordingManualNote": "De opname start nooit vanzelf: een gespreksleider start haar met de REC-knop.",
-        "listenOnlyWithoutConsent": "Wie geen toestemming geeft, doet alleen luisterend mee",
-        "listenOnlyWithoutConsentOn": "Toestemming voor de opname is vrij: wie die niet geeft doet toch mee, volgt en schrijft in de chat, maar microfoon, camera en scherm blijven uit.",
-        "listenOnlyWithoutConsentOff": "Zonder toestemming voor de opname kom je er niet in.",
-        "listenOnlyLockedLive": "Zolang de ruimte open kan zijn, kunnen opname en alleen luisteren niet worden gewijzigd: ze gelden vanaf de eerste deelnemer.",
         "audienceAnonymous": "Anoniem publiek",
         "audienceAnonymousDesc": "Deelnemers verschijnen voor anderen onder een pseudoniem (‘Deelnemer’ en een code) in de video, de chat en bij vragen; de deelnemerslijst blijft bij de moderatoren en er is geen plein. Handig voor grote evenementen; bij communityevenementen wil men elkaar leren kennen.",
         "audienceAnonymousLocked": "Kan niet worden gewijzigd zolang de ruimte open kan zijn: het zou pseudoniemen aan namen koppelen.",
@@ -1029,7 +1033,8 @@
         "participantListVisibleDesc": "Uit: de lijst, het raster en de namen op het plein blijven bij moderatoren en sprekers; het publiek ziet alleen wie spreekt. Aan: iedereen ziet wie er in de zaal is.",
         "participantListAnonymous": "Bij een anoniem publiek blijft de lijst verborgen.",
         "participantListLocked": "Niet te wijzigen terwijl de zaal open is: wie al binnen is, zou de wijziging niet zien.",
-        "participantListCameraNote": "Met een verborgen lijst ziet wie de camera aanzet het eigen beeld niet. Toon de lijst voor een bijeenkomst waarin iedereen elkaar ziet."
+        "participantListCameraNote": "Met een verborgen lijst ziet wie de camera aanzet het eigen beeld niet. Toon de lijst voor een bijeenkomst waarin iedereen elkaar ziet.",
+        "recordingLockedLive": "Opname is niet te wijzigen terwijl de zaal open is: die geldt vanaf de eerste binnenkomst."
       },
       "step3": {
         "heading": "Personen en uitnodigingen",
@@ -1322,7 +1327,6 @@
         "permissionsHeading": "Wie wat mag in de ruimte",
         "permissionsIntro": "Wat deelnemers kunnen en welke functies van de ruimte aan staan. Alles kan ook tijdens het evenement worden gewijzigd.",
         "consentsLine": "Toestemmingen bij inschrijving en in de zaal: {list}",
-        "consentRecordingRequired": "opname, verplicht om binnen te komen",
         "consentRecordingFree": "opname, vrij (zonder: alleen meeluisteren)",
         "consentRecordingNotice": "voor de opname alleen een melding (deelnemers spreken niet en tonen zich niet)",
         "consentTranscription": "transcriptie van de eigen bijdragen, optioneel",
@@ -1330,7 +1334,9 @@
         "consentsHosts": "Aan moderatoren en sprekers wordt de opname in de zaal gevraagd, optioneel.",
         "consentsWithdraw": "Deelnemers kunnen ze in de zaal intrekken met de knop ‘Toestemmingen’.",
         "participantListShown": "Deelnemerslijst: zichtbaar voor iedereen.",
-        "participantListHidden": "Deelnemerslijst: alleen voor moderatoren en sprekers."
+        "participantListHidden": "Deelnemerslijst: alleen voor moderatoren en sprekers.",
+        "consentRecordingOptional": "opname, vrijwillig",
+        "consentRecordingVoice": "opname, vrijwillig (zonder wordt de stem niet opgenomen)"
       },
       "preview": {
         "title": "Voorbeeld van de pagina",
@@ -4341,14 +4347,15 @@
   "gdpr": {
     "consent": {
       "recording": "Ik stem in met de audio-/video-opname van het evenement",
-      "recordingRequired": "Toestemming voor opname is vereist om deel te nemen aan dit evenement",
-      "recordingNotice": "Het evenement wordt opgenomen (geluid en beeld). Je neemt deel zonder microfoon en camera: de opname bevat je stem en beeld niet, tenzij de host je het woord geeft.",
       "multitrack": "Ik geef toestemming om mijn bijdragen met mijn naam te transcriberen voor het verslag van het evenement. Als het evenement voor elke persoon een apart audiospoor opneemt, wordt mijn stem alleen daarvoor opgenomen en wordt het spoor na de transcriptie verwijderd; het wordt niet gebruikt om mijn stem te herkennen of na te bootsen.",
       "multitrackOptional": "Dit is vrijwillig: als je geen toestemming geeft, doe je toch mee, maar wat je zegt komt niet in de transcriptie en je stem wordt niet op een apart spoor opgenomen. Als het evenement wordt opgenomen, blijft je stem wel in de video.",
       "stayInTouch": "Ik wil informatie ontvangen over komende evenementen en in het adresboek worden opgenomen, om voor vergelijkbare evenementen te worden uitgenodigd",
       "stayInTouchHelp": "Vrijwillige toestemming (art. 6.1.a AVG). Je kunt die altijd intrekken via de link 'Verwijder mij uit het adresboek' in de e-mails die je ontvangt. Naam en organisatie zijn die van deze inschrijving.",
       "recordingOptionalListenOnly": "Zonder toestemming doe je toch mee, alleen luisterend: je volgt het evenement en schrijft in de chat, maar microfoon, camera en scherm delen blijven uit. Je kunt later vanuit de ruimte toestemming geven.",
-      "recordingOptionalHost": "Zonder toestemming kom je toch binnen en leid je zoals gewoonlijk, maar je stem wordt niet bewaard in de sporen per persoon of in de transcriptie. De video van de ruimte, als die wordt opgenomen, laat je toch zien."
+      "recordingOptionalHost": "Zonder toestemming kom je toch binnen en leid je zoals gewoonlijk, maar je stem wordt niet bewaard in de sporen per persoon of in de transcriptie. De video van de ruimte, als die wordt opgenomen, laat je toch zien.",
+      "recordingOptionalVoice": "Als u geen toestemming geeft, neemt u toch deel en kunt u spreken, maar uw stem wordt niet opgenomen; camera en schermdeling blijven uit. U kunt later in de zaal toestemming geven.",
+      "recordingNotice": "Het evenement wordt opgenomen (geluid en beeld). Je neemt deel zonder microfoon en camera: de opname bevat je stem en beeld niet, tenzij de host je het woord geeft.",
+      "recordingNoticeVoice": "Het evenement wordt opgenomen (geluid en beeld). U neemt deel zonder microfoon en camera: de opname bevat uw stem en beeld niet, tenzij u in de zaal toestemming geeft."
     },
     "export": {
       "title": "Mijn gegevens",
@@ -5191,7 +5198,8 @@
     "overlapBadge": "gelijktijdig",
     "overlapTitle": "Gelijktijdig spreken: in dit interval spreekt meer dan één persoon tegelijk.",
     "anonymousSpeaker": "Deelnemer {n}",
-    "untranscribed": "Niet getranscribeerd: de spreker gaf geen toestemming"
+    "untranscribed": "Niet getranscribeerd: de spreker gaf geen toestemming",
+    "unrecordedSpeech": "Sommige bijdragen staan niet in de opname: wie sprak, gaf geen toestemming."
   },
   "waiting": {
     "startsIn": "Het evenement begint over",
@@ -5263,7 +5271,6 @@
     "multitrackConsentTitle": "Transcriptie van uw bijdragen",
     "recordingConsentTitle": "Opname van het evenement",
     "recordingConsentIntro": "Dit evenement wordt opgenomen (audio en video). Als je het woord neemt, bevat de opname je stem, je beeld en wat je op het scherm deelt.",
-    "recordingConsentRequired": "Om binnen te komen is je toestemming voor de opname nodig.",
     "enterGardenTitle": "Betreed het plein",
     "enterGardenHint": "Een andere plek om te wachten: loop rond, ontmoet de anderen die wachten en ga door de poort de live-uitzending in als de zaal opengaat.",
     "backToWaitingRoom": "Terug naar de wachtruimte",

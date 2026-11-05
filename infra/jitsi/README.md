@@ -68,6 +68,7 @@ toolbar. The portal writes these claims into the tokens of an event (`app/src/li
 | `context.user.mediaAdmit` | `{ audio, video, desktop }`: the media this person is admitted to without waiting for a moderator. Only on events with listen-only participants, where every token locks all three media: a participant who consented to the recording is admitted to what the event concedes |
 | `context.user.consentLock` | `true` in every token of an event with listen-only participants: the module refuses to switch the moderation off in that room |
 | `context.user.listenOnly` | `true` for a participant who entered without the recording consent: never admitted, and a moderator's approval for them is dropped before it reaches the moderation component |
+| `context.user.voiceExcluded` | `true` for whoever has no valid recording consent where the recording can leave their voice out: the microphone follows the rules of everyone else, camera and screen stay closed, moderators and speakers included. The module writes `jitsi_participant_paNoRecording` into the person's presence, removing any value the client sent, and Jibri's session and the per-participant recorder read it |
 
 When the first person whose token carries a lock is about to join a room, the module switches on Jitsi's
 audio/video moderation (the stock `av_moderation_component`) for each locked media type, before any

@@ -543,7 +543,10 @@
       "handsRaised": "{count, plural, zero {# paceltu roku} one {# pacelta roka} other {# paceltas rokas}}",
       "locksByConsent": "Mikrofoni un kameras seko piekrišanai ierakstīšanai: kas to devuši, izmanto pasākuma atļauto, pārējie tikai klausās. Telpas bloķējumi paliek ieslēgti.",
       "listenOnlyBadge": "tikai klausās",
-      "listenOnlyNoFloor": "Nav devis piekrišanu ierakstam: nevar runāt, kamēr to nedos savā telpā."
+      "listenOnlyNoFloor": "Nav devis piekrišanu ierakstam: nevar runāt, kamēr to nedos savā telpā.",
+      "voiceExcludedBadge": "bez ierakstīšanas",
+      "voiceExcludedFloor": "Nav dota piekrišana ierakstīšanai: var runāt, bet balss netiek ierakstīta.",
+      "locksByConsentVoice": "Kameras un ekrāni seko piekrišanai ierakstīšanai: tie, kas to nav devuši, var runāt bez ierakstīšanas, bet bez kameras un ekrāna. Telpas bloķējumi paliek ieslēgti."
     },
     "moderator": {
       "muteAll": "Izslēgt skaņu visiem",
@@ -685,13 +688,13 @@
         "without": {
           "soloAscolto": "Bez šīs piekrišanas jūs tikai klausāties: mikrofons, kamera un ekrāns paliek aizvērti.",
           "conduce": "Bez šīs piekrišanas jūs tāpat vadāt, bet jūsu balss nepaliek atsevišķo personu celiņos un atšifrējumā.",
-          "uscita": "Lai piedalītos šajā pasākumā, nepieciešama piekrišana ierakstam."
+          "voce": "Bez šīs piekrišanas jūs piedalāties un varat runāt, bet jūsu balss netiek ierakstīta; kamera un ekrāns paliek izslēgti."
         },
         "alreadyRecorded": "Tas, kas jau ierakstīts, paliek pasākuma video: lai to izņemtu, rakstiet organizatoriem.",
         "withdraw": {
           "soloAscolto": "Ja to atsaucat, paliekat telpā tikai kā klausītājs: mikrofons, kamera un ekrāns tiek aizvērti. Tiek atsaukta arī piekrišana jūsu runas atšifrēšanai.",
-          "uscita": "Ja to atsaucat, jūs pametat konferenci un atgriežaties uzgaidāmajā telpā: dalībai nepieciešama piekrišana ierakstam. Tiek atsaukta arī piekrišana jūsu runas atšifrēšanai.",
-          "conduce": "Ja to atsaucat, jūs turpināt vadīt, bet turpmāk jūsu balss nepaliek atsevišķo personu celiņos un atšifrējumā. Telpas video, ja tas tiek ierakstīts, jūs tāpat rāda."
+          "conduce": "Ja to atsaucat, jūs turpināt vadīt, bet turpmāk jūsu balss nepaliek atsevišķo personu celiņos un atšifrējumā. Telpas video, ja tas tiek ierakstīts, jūs tāpat rāda.",
+          "voce": "Ja to atsauksiet, paliksiet telpā un varēsiet runāt: no šī brīža jūsu balss netiek ierakstīta, un kamera un ekrāns tiek izslēgti. Jūs atsaucat arī piekrišanu savu runu transkribēšanai."
         }
       },
       "transcription": {
@@ -701,6 +704,11 @@
         "withdrawEffect": "Ja to atsaucat, jūsu jau atšifrētie teikumi zaudē tekstu un vārdu, un turpmāk jūsu balss netiek ierakstīta atsevišķā celiņā un netiek atšifrēta.",
         "needsRecording": "To var dot pēc piekrišanas ierakstam."
       }
+    },
+    "voiceExcluded": {
+      "title": "Jūs piedalāties bez ierakstīšanas.",
+      "consent": "Piekrītu ierakstīšanai",
+      "body": "Jūs neesat piekritis ierakstīšanai: varat runāt mikrofonā, bet jūsu balss netiek ierakstīta. Kamera un ekrāns paliek izslēgti."
     }
   },
   "qa": {
@@ -1018,10 +1026,6 @@
           }
         },
         "recordingManualNote": "Ieraksts nekad nesākas pats: vadītājs to sāk ar pogu REC.",
-        "listenOnlyWithoutConsent": "Kas nepiekrīt, ieiet tikai klausīties",
-        "listenOnlyWithoutConsentOn": "Piekrišana ierakstīšanai ir brīvprātīga: kas to nedod, tomēr piedalās, seko un raksta tērzēšanā, bet mikrofons, kamera un ekrāns paliek izslēgti.",
-        "listenOnlyWithoutConsentOff": "Bez piekrišanas ierakstīšanai neviens netiek iekšā.",
-        "listenOnlyLockedLive": "Kamēr telpa var būt atvērta, ierakstīšanu un tikai klausīšanos nevar mainīt: tās ir spēkā no pirmās ieiešanas.",
         "audienceAnonymous": "Anonīma auditorija",
         "audienceAnonymousDesc": "Dalībnieki citiem redzami ar pseidonīmu (“Dalībnieks” un kods) video, tērzēšanā un jautājumos; dalībnieku saraksts paliek vadītājiem, un laukuma nav. Noderīgi lieliem pasākumiem; kopienas pasākumos cilvēki vēlas iepazīties.",
         "audienceAnonymousLocked": "Kamēr telpa var būt atvērta, to nevar mainīt: tas sasaistītu pseidonīmus ar vārdiem.",
@@ -1029,7 +1033,8 @@
         "participantListVisibleDesc": "Izslēgts: saraksts, režģis un vārdi laukumā paliek vadītājiem un runātājiem; auditorija redz tikai runātāju. Ieslēgts: visi redz, kas ir telpā.",
         "participantListAnonymous": "Ar anonīmu auditoriju saraksts paliek paslēpts.",
         "participantListLocked": "Kamēr telpa ir atvērta, to mainīt nevar: tie, kas jau ir iekšā, izmaiņas neredzētu.",
-        "participantListCameraNote": "Kad saraksts ir paslēpts, kameru ieslēdzis cilvēks neredz savu attēlu. Tikšanās reizēm, kur visi redz cits citu, parādiet sarakstu."
+        "participantListCameraNote": "Kad saraksts ir paslēpts, kameru ieslēdzis cilvēks neredz savu attēlu. Tikšanās reizēm, kur visi redz cits citu, parādiet sarakstu.",
+        "recordingLockedLive": "Kamēr telpa ir atvērta, ierakstīšanu mainīt nevar: tā ir spēkā no pirmās ienākšanas."
       },
       "step3": {
         "heading": "Personas un ielūgumi",
@@ -1322,7 +1327,6 @@
         "permissionsHeading": "Kas ko var darīt telpā",
         "permissionsIntro": "Ko var darīt dalībnieki un kuras telpas funkcijas ir ieslēgtas. Visu var mainīt arī pasākuma laikā.",
         "consentsLine": "Piekrišanas reģistrējoties un telpā: {list}",
-        "consentRecordingRequired": "ieraksts, obligāts, lai ienāktu",
         "consentRecordingFree": "ieraksts, brīvprātīgs (bez tā tikai klausīšanās)",
         "consentRecordingNotice": "par ierakstu tikai paziņojums (dalībnieki nerunā un nav redzami)",
         "consentTranscription": "savas runas atšifrēšana, brīvprātīga",
@@ -1330,7 +1334,9 @@
         "consentsHosts": "Vadītājiem un runātājiem ierakstu jautā telpā, brīvprātīgi.",
         "consentsWithdraw": "Dalībnieki tās var atsaukt telpā ar pogu “Piekrišanas”.",
         "participantListShown": "Dalībnieku saraksts: redzams visiem.",
-        "participantListHidden": "Dalībnieku saraksts: tikai vadītājiem un runātājiem."
+        "participantListHidden": "Dalībnieku saraksts: tikai vadītājiem un runātājiem.",
+        "consentRecordingOptional": "ierakstīšana, brīvprātīga",
+        "consentRecordingVoice": "ierakstīšana, brīvprātīga (bez tās balss netiek ierakstīta)"
       },
       "preview": {
         "title": "Lapas priekšskatījums",
@@ -4341,14 +4347,15 @@
   "gdpr": {
     "consent": {
       "recording": "Piekrītu šī pasākuma audio/video ierakstīšanai",
-      "recordingRequired": "Lai piedalītos šajā pasākumā, ir nepieciešama piekrišana ierakstīšanai",
-      "recordingNotice": "Pasākums tiek ierakstīts (audio un video). Jūs piedalāties bez mikrofona un kameras: ierakstā nav jūsu balss vai attēla, ja vien vadītājs jums nedod vārdu.",
       "multitrack": "Piekrītu, ka manas uzstāšanās tiek atšifrētas ar manu vārdu pasākuma pārskatam. Ja pasākumā katram cilvēkam tiek ierakstīts atsevišķs audio celiņš, mana balss tiek ierakstīta tikai šim nolūkam un celiņš pēc atšifrēšanas tiek dzēsts; to neizmanto manas balss identificēšanai vai atveidošanai.",
       "multitrackOptional": "Tas nav obligāti: ja nepiekrītat, jūs tik un tā piedalāties, bet jūsu teiktais netiek iekļauts transkripcijā un jūsu balss netiek ierakstīta atsevišķā celiņā. Ja pasākums tiek ierakstīts, jūsu balss tomēr paliek video.",
       "stayInTouch": "Vēlos saņemt informāciju par gaidāmajiem pasākumiem un tikt iekļauts adrešu grāmatā, lai mani aicinātu uz līdzīgiem pasākumiem",
       "stayInTouchHelp": "Brīvprātīga piekrišana (VDAR 6.1.a pants). To var jebkurā laikā atsaukt ar saiti “Izņemt mani no adrešu grāmatas” saņemtajos e-pastos. Vārds un organizācija ir no šīs reģistrācijas.",
       "recordingOptionalListenOnly": "Ja nepiekrītat, jūs tomēr piedalāties, tikai klausoties: sekojat un rakstāt tērzēšanā, bet mikrofons, kamera un ekrāna kopīgošana paliek izslēgti. Piekrist varat vēlāk, no telpas.",
-      "recordingOptionalHost": "Ja nepiekrītat, jūs tik un tā ieejat un vadāt kā parasti, bet jūsu balss netiek saglabāta personu ierakstos un transkripcijā. Telpas video, ja tas tiek ierakstīts, jūs tik un tā iekļauj."
+      "recordingOptionalHost": "Ja nepiekrītat, jūs tik un tā ieejat un vadāt kā parasti, bet jūsu balss netiek saglabāta personu ierakstos un transkripcijā. Telpas video, ja tas tiek ierakstīts, jūs tik un tā iekļauj.",
+      "recordingOptionalVoice": "Ja nepiekrītat, jūs tik un tā piedalāties un varat runāt, bet jūsu balss netiek ierakstīta; kamera un ekrāna kopīgošana paliek izslēgtas. Piekrist varat vēlāk telpā.",
+      "recordingNotice": "Pasākums tiek ierakstīts (audio un video). Jūs piedalāties bez mikrofona un kameras: ierakstā nav jūsu balss vai attēla, ja vien vadītājs jums nedod vārdu.",
+      "recordingNoticeVoice": "Pasākums tiek ierakstīts (skaņa un video). Jūs piedalāties bez mikrofona un kameras: ierakstā nav jūsu balss vai attēla, ja vien telpā nedodat piekrišanu."
     },
     "export": {
       "title": "Mani dati",
@@ -5191,7 +5198,8 @@
     "overlapBadge": "vienlaikus",
     "overlapTitle": "Vienlaicīga runa: šajā intervālā vienlaikus runā vairāk nekā viena persona.",
     "anonymousSpeaker": "Dalībnieks {n}",
-    "untranscribed": "Nav transkribēts: runātājs nedeva piekrišanu"
+    "untranscribed": "Nav transkribēts: runātājs nedeva piekrišanu",
+    "unrecordedSpeech": "Daži izteikumi nav ierakstā: runātāji nav devuši piekrišanu."
   },
   "waiting": {
     "startsIn": "Pasākums sāksies pēc",
@@ -5263,7 +5271,6 @@
     "multitrackConsentTitle": "Jūsu uzstāšanos atšifrējums",
     "recordingConsentTitle": "Pasākuma ieraksts",
     "recordingConsentIntro": "Pasākums tiek ierakstīts (audio un video). Ja jūs uzstājaties, ierakstā ir jūsu balss, jūsu attēls un tas, ko kopīgojat ekrānā.",
-    "recordingConsentRequired": "Lai ienāktu, nepieciešama jūsu piekrišana ierakstam.",
     "enterGardenTitle": "Ieej laukumā",
     "enterGardenHint": "Cita vieta, kur gaidīt: pastaigājiet, satieciet citus gaidītājus un ieejiet tiešraidē pa vārtiem, kad telpa atveras.",
     "backToWaitingRoom": "Atpakaļ uz uzgaidāmo telpu",

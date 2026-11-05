@@ -31,7 +31,7 @@ import { elencoVisibileAlPubblico } from '@/lib/live/participant-list';
 import { registraChiConduce } from '@/lib/live/entry-consents';
 import { pseudonimo } from '@/lib/live/pseudonym';
 import { guestSenderId } from '@/lib/chat/sender-key';
-import { recordingAvailable } from '@/lib/recording/availability';
+import { recordingAvailable, voceNelVideo } from '@/lib/recording/availability';
 import { hasJoinGrant } from '@/lib/events/join-grant';
 
 export const dynamic = 'force-dynamic';
@@ -214,17 +214,13 @@ export const POST = withErrorHandling(async (request, context) => {
   // Il consenso alla registrazione di chi partecipa e i limiti dei mezzi nel
   // token (lib/live/listen-only): chi entra per primo accende il blocco nella
   // sala (mod_pa_media_lock), con gli stessi tipi per tutti.
-  const regola = regolaConsenso(event, recordingAvailable());
+  const regola = regolaConsenso(event, recordingAvailable(), voceNelVideo());
   // Vale da quando si entra: chi aspetta da prima non ha una scelta vecchia.
   const participantListVisible = elencoVisibileAlPubblico(event);
-  // Il token di chi partecipa: senza consenso, in solo ascolto o fuori. Lo
-  // verifica il server, non solo la sala d'attesa.
-  const mediaPartecipante = (consenso: boolean) => {
-    if (regola.richiesto && !consenso && !regola.soloAscolto) {
-      throw new AppError('Recording consent required', 403, 'RECORDING_CONSENT_REQUIRED');
-    }
-    return mediaDelToken(event, regola, 'partecipante', consenso);
-  };
+  // Il token di chi partecipa: il consenso non e' mai una condizione per
+  // entrare, decide cosa si puo' fare in sala.
+  const mediaPartecipante = (consenso: boolean) =>
+    mediaDelToken(event, regola, 'partecipante', consenso);
 
   // ── Grant flow (primary moderator, co-moderator, or speaker) ──
   if (moderatorToken) {
@@ -259,12 +255,21 @@ export const POST = withErrorHandling(async (request, context) => {
     // Un identificativo per ingresso (con suffisso casuale): lo stesso nel
     // consenso e nel JWT.
     const postoModeratore = moderatorJitsiId(event.id);
+    // Il consenso alla registrazione di chi conduce o interviene: facoltativo,
+    // con la prova legata alla sua concessione o al suo account. Viaggia con
+    // ogni ingresso (la sala lo rimanda, come per gli ospiti). Senza, entra
+    // lo stesso, con le regole di chi non ha acconsentito.
+    const registraVideo = registraChiConduce(event, recordingAvailable());
+    // Un link e' un posto, non una persona: quello dato da un altro con lo
+    // stesso link non si eredita.
+    const consensoConduce = parsed.data.recordingConsent === true;
+    const mediaConduce = mediaDelToken(event, regola, isSpeaker ? 'relatore' : 'moderatore', consensoConduce);
     const jwt = await generateJitsiJwt({
       roomName: event.jitsiRoomName,
       displayName: name,
       uniqueId: postoModeratore,
       isModerator: !isSpeaker,
-      ...mediaDelToken(event, regola, isSpeaker ? 'relatore' : 'moderatore', true),
+      ...mediaConduce,
       // Chi sta sullo schermo è soprattutto chi modera e chi parla: se l'avatar
       // Gravatar valesse solo per il pubblico, la funzione si vedrebbe dove
       // conta meno. `grant.email` è null per il link primario — condiviso da
@@ -272,13 +277,6 @@ export const POST = withErrorHandling(async (request, context) => {
       email: grant.email ?? undefined,
       useGravatar: (await getSettings()).gravatarEnabled,
     });
-    // Il consenso alla registrazione di chi conduce o interviene: facoltativo,
-    // con la prova legata alla sua concessione o al suo account. Viaggia con
-    // ogni ingresso (la sala lo rimanda, come per gli ospiti). Senza, entra lo
-    // stesso, ma in un evento che lo registra la sua voce non resta nelle
-    // tracce per persona ne' nella trascrizione: quel consenso non vale da solo.
-    const registraVideo = registraChiConduce(event, recordingAvailable());
-    const consensoConduce = parsed.data.recordingConsent === true;
     const consentsRecorded = await registraConsensi(
       event,
       {
@@ -300,6 +298,7 @@ export const POST = withErrorHandling(async (request, context) => {
       displayName: name,
       role: isSpeaker ? 'speaker' : 'moderator',
       consentsRecorded,
+      voiceExcluded: !!mediaConduce.voiceExcluded,
       participantListVisible,
     }, { headers: { 'Cache-Control': 'no-store' } });
   }
@@ -374,6 +373,7 @@ export const POST = withErrorHandling(async (request, context) => {
           consentsRecorded,
           participantListVisible,
           listenOnly: !!mediaInoltro.listenOnly,
+          voiceExcluded: !!mediaInoltro.voiceExcluded,
         },
         { headers: { 'Cache-Control': 'no-store' } },
       );
@@ -386,7 +386,7 @@ export const POST = withErrorHandling(async (request, context) => {
     const consensoIscritto =
       parsed.data.recordingConsent === true ||
       (registration.consentRecording === true && !registration.consentRecordingWithdrawnAt) ||
-      (regola.richiesto &&
+      (regola.registra &&
         (await prisma.recordingConsent.findFirst({
           where: { eventId: event.id, registrationId: registration.id, withdrawnAt: null },
           select: { id: true },
@@ -422,10 +422,13 @@ export const POST = withErrorHandling(async (request, context) => {
       : null;
     // Pubblico anonimo: in sala lo pseudonimo del posto, senza indirizzo ne'
     // foto (niente che porti alla persona). Chi e' in solo ascolto ha
-    // rifiutato la registrazione: in sala con le iniziali, senza la sua foto.
+    // rifiutato la registrazione: in sala con le iniziali, senza la sua foto,
+    // e cosi' chi ha lasciato vuota la casella. Dove la casella non c'e' (l'evento
+    // avvisa soltanto) nessuno ha rifiutato niente.
     const anonimo = event.audienceAnonymous;
     const nomeInSala = anonimo ? await pseudonimo(event.id, `reg-${registration.id}`) : name;
-    const conVolto = !anonimo && !mediaIscritto.listenOnly;
+    const conVolto =
+      !anonimo && !mediaIscritto.listenOnly && !(mediaIscritto.voiceExcluded && regola.richiesto);
     const jwt = await generateJitsiJwt({
       roomName: event.jitsiRoomName,
       displayName: nomeInSala,
@@ -452,6 +455,7 @@ export const POST = withErrorHandling(async (request, context) => {
       consentsRecorded,
       participantListVisible,
       listenOnly: !!mediaIscritto.listenOnly,
+      voiceExcluded: !!mediaIscritto.voiceExcluded,
     }, { headers: { 'Cache-Control': 'no-store' } });
   }
 
@@ -517,6 +521,7 @@ export const POST = withErrorHandling(async (request, context) => {
       consentsRecorded,
       participantListVisible,
       listenOnly: !!mediaOspite.listenOnly,
+      voiceExcluded: !!mediaOspite.voiceExcluded,
     }, { headers: { 'Cache-Control': 'no-store' } });
   }
 

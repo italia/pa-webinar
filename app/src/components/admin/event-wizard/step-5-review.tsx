@@ -17,6 +17,7 @@ import { Icon } from '@/components/ui/icon';
 import { useDurataTesto } from '@/hooks/use-durata-testo';
 import { durataProgramma } from '@/lib/agenda/programme';
 import { parseLocaleList } from '@/lib/ai/target-locales';
+import type { VoceNelVideo } from '@/lib/live/consent-rule';
 import { registraChiConduce } from '@/lib/live/entry-consents';
 import { elencoVisibileAlPubblico } from '@/lib/live/participant-list';
 import { consensiRichiesti } from '@/lib/registration/consents';
@@ -61,6 +62,8 @@ interface Props {
   /** La post-produzione AI e' accesa sull'installazione. */
   /** L'installazione puo' registrare: senza, non si chiede il consenso. */
   recordingAvailable?: boolean;
+  /** La voce di chi non acconsente nel video (lib/recording/availability). */
+  voceNelVideo?: VoceNelVideo;
   /** Chiamata rapida: nessuna iscrizione, e chi conduce non e' interpellato. */
   istantanea?: boolean;
   aiPipelineEnabled?: boolean;
@@ -100,6 +103,7 @@ export default function Step5Review({
   mancanti = [],
   aiPipelineEnabled = true,
   recordingAvailable = true,
+  voceNelVideo = 'rimovibile',
   istantanea = false,
   liveCaptionsAvailable = false,
   capacita,
@@ -183,13 +187,16 @@ export default function Step5Review({
     participantsCanUnmute: toggles.participantsCanUnmute,
     participantsCanStartVideo: toggles.participantsCanStartVideo,
     participantsCanShareScreen: toggles.participantsCanShareScreen,
-    listenOnlyWithoutConsent: form.listenOnlyWithoutConsent,
   });
   const vociConsenso = [
     consensi.registrazione &&
-      (consensi.registrazioneFacoltativa
-        ? tf('consentRecordingFree')
-        : tf('consentRecordingRequired')),
+      tf(
+        voceNelVideo === 'rimovibile'
+          ? 'consentRecordingVoice'
+          : voceNelVideo === 'fissa'
+            ? 'consentRecordingFree'
+            : 'consentRecordingOptional'
+      ),
     consensi.avvisoRegistrazione && tf('consentRecordingNotice'),
     consensi.tracce && tf('consentTranscription'),
   ].filter((x): x is string => !!x);

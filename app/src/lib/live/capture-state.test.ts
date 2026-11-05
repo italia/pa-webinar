@@ -17,6 +17,10 @@ const SOTTOTITOLI = {
 };
 
 describe('statoCattura', () => {
+  it('non annuncia una registrazione che nessun registratore puo\' fare', () => {
+    expect(statoCattura(EVENTO, {}, false)).toEqual({ registrazione: false, trascrizione: false });
+  });
+
   beforeEach(() => vi.stubEnv('CAPTIONS_STATUS_URL', 'http://sottotitoli:2700/status'));
   afterEach(() => vi.unstubAllEnvs());
 

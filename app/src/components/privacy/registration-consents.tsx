@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { Button } from 'design-react-kit';
 
+import type { VoceNelVideo } from '@/lib/live/consent-rule';
+
 export interface StatoConsensoVista {
   dato: boolean;
   ritiratoIl: string | null;
@@ -27,7 +29,9 @@ export default function RegistrationConsents({
   token,
   registrationId,
   consensi,
+  voce = 'rimovibile',
 }: {
+  voce?: VoceNelVideo;
   token: string;
   registrationId: string;
   consensi: ConsensiVista;
@@ -46,7 +50,10 @@ export default function RegistrationConsents({
       {
         chiave: 'recording',
         titolo: tl('recording.title'),
-        effetto: tl('recording.withdraw.soloAscolto'),
+        effetto:
+        voce === 'assente'
+          ? ''
+          : tl(voce === 'rimovibile' ? 'recording.withdraw.voce' : 'recording.withdraw.soloAscolto'),
         nota: tl('recording.alreadyRecorded'),
       },
       {
@@ -124,7 +131,7 @@ export default function RegistrationConsents({
                     role="group"
                     aria-label={tl('confirmTitle')}
                   >
-                    <span className="w-100 text-muted">{effetto}</span>
+                    {effetto && <span className="w-100 text-muted">{effetto}</span>}
                     <span className="fw-semibold">{tl('confirmTitle')}</span>
                     <Button
                       color="danger"

@@ -108,7 +108,14 @@ local function notify(room, occupant, action)
     if not endpoint or endpoint == 'focus' then
         return;
     end
-    post(room, { endpointId = endpoint; seatId = user.id; action = action }, action);
+    post(room, {
+        endpointId = endpoint;
+        seatId = user.id;
+        -- Senza consenso alla registrazione (dal token, come in mod_pa_media_lock):
+        -- il portale non tiene ne' il nome ne' il testo dei suoi interventi.
+        voiceExcluded = user.voiceExcluded == true or nil;
+        action = action;
+    }, action);
 end
 
 -- Il posto del registratore multitraccia (app/src/lib/recorder/seat.ts): da

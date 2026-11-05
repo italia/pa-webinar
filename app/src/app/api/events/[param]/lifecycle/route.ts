@@ -16,6 +16,7 @@ import { NotFoundError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { scalerDriverActive } from '@/lib/events/lifecycle-driver';
 import { statoCattura } from '@/lib/live/capture-state';
+import { recordingAvailable } from '@/lib/recording/availability';
 import { getSettings } from '@/lib/settings';
 import { readJvbSnapshot, type JvbSnapshot } from '@/lib/jvb-snapshot';
 
@@ -120,7 +121,7 @@ export const GET = withErrorHandling(async (_request, context) => {
       : null;
 
   // Cosa si sta catturando: la sala lo mostra a chi e' dentro.
-  const cattura = statoCattura(event, await getSettings());
+  const cattura = statoCattura(event, await getSettings(), recordingAvailable());
 
   return Response.json(
     {

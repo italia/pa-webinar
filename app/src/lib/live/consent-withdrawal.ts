@@ -34,10 +34,9 @@ import { bloccaTrascrizioneEvento, togliPersoneDalleTrascrizioni } from '@/lib/c
  * Ogni ritiro lascia una riga nel registro GDPR dell'evento
  * (`CONSENT_WITHDRAWN`, senza dati personali): quante prove, e quando.
  *
- * Il video completo dell'evento non si modifica: chi ritira il consenso alla
- * registrazione esce dalla registrazione da quel momento (solo ascolto, o
- * fuori dalla sala), e per il tratto gia' registrato vale la richiesta di
- * cancellazione a chi organizza (docs/GDPR.md).
+ * Il video gia' registrato non si modifica: chi ritira il consenso alla
+ * registrazione esce dalla registrazione da quel momento, e per il tratto gia'
+ * registrato vale la richiesta di cancellazione a chi organizza (docs/GDPR.md).
  */
 
 export interface EsitoRitiro {

@@ -58,6 +58,9 @@ interface JitsiRoomProps {
   participantsCanUnmute?: boolean;
   participantsCanStartVideo?: boolean;
   participantsCanShareScreen?: boolean;
+  /** Senza un consenso valido alla registrazione: solo il microfono, anche per
+   *  chi conduce. Videocamera e schermo entrerebbero nel video. */
+  soloVoce?: boolean;
   enableFileSharing?: boolean;
   /** Scelta dell'evento (Event.whiteboardEnabled, sempre per le chiamate
    *  istantanee): con `whiteboardInfraReady`, chi modera trova il pulsante
@@ -155,6 +158,7 @@ export default function JitsiRoom({
   participantsCanUnmute = true,
   participantsCanStartVideo = true,
   participantsCanShareScreen = true,
+  soloVoce = false,
   enableFileSharing = false,
   whiteboardEnabled = false,
   whiteboardInfraReady = false,
@@ -365,12 +369,17 @@ export default function JitsiRoom({
     // (i listener della moderazione, sotto).
     const concessi: Record<Medium, boolean> = {
       audio: role !== 'participant' || participantsCanUnmute,
-      video: role !== 'participant' || participantsCanStartVideo,
+      video: !soloVoce && (role !== 'participant' || participantsCanStartVideo),
     };
     if (!concessi.audio) extraConfig.startWithAudioMuted = true;
     if (!concessi.video) extraConfig.startWithVideoMuted = true;
     if (role === 'participant' && !participantsCanShareScreen) {
       toolbarButtons = toolbarButtons.filter(b => b !== 'desktop');
+    }
+    if (soloVoce) {
+      // Anche i tasti: un moderatore il bridge non lo tiene chiuso.
+      extraConfig.disableShortcuts = true;
+      toolbarButtons = toolbarButtons.filter((b) => !['camera', 'desktop', 'select-background'].includes(b));
     }
     const barraPiena = [...toolbarButtons];
     let statoMedia = statoIniziale(concessi);
@@ -957,7 +966,7 @@ export default function JitsiRoom({
   // NOTE: locale is intentionally excluded from deps to prevent iframe
   // recreation (and user disconnection) when the user switches language.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [domain, roomName, jwt, displayName, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, enableFileSharing, whiteboardEnabled, whiteboardInfraReady, elencoNascosto, videoQuality, reactionsMode, liveCaptions, rnnoiseEnforceOff, startWithVideoMuted, startWithAudioMuted, attempt, insecure]);
+  }, [domain, roomName, jwt, displayName, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, soloVoce, enableFileSharing, whiteboardEnabled, whiteboardInfraReady, elencoNascosto, videoQuality, reactionsMode, liveCaptions, rnnoiseEnforceOff, startWithVideoMuted, startWithAudioMuted, attempt, insecure]);
 
   return (
     <div className="jitsi-wrapper position-relative">

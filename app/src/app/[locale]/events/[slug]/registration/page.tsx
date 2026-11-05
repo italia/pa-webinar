@@ -15,7 +15,7 @@ import { isEventOpenForRegistration } from '@/lib/events/visibility';
 import { registrationAccessFor } from '@/lib/events/registration-access';
 import { informativaEvento } from '@/lib/events/privacy-notice';
 import { anteprimaEventoPubblico } from '@/lib/events/meta-title';
-import { recordingAvailable } from '@/lib/recording/availability';
+import { recordingAvailable, voceNelVideo } from '@/lib/recording/availability';
 import { findEventQuestionnaireByPlacement } from '@/lib/questionnaires';
 import { invitoDaToken } from '@/lib/email/invitation';
 
@@ -137,7 +137,7 @@ export default async function RegistrationPage({
           <RegistrationFormClient
             eventSlug={slug}
             invito={invito}
-            listenOnlyWithoutConsent={event.listenOnlyWithoutConsent}
+            voce={voceNelVideo()}
             privacyPolicyUrl={privacyUrl}
             privacyPolicyText={privacyText}
             // Un'installazione che non può registrare non chiede il consenso

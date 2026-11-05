@@ -20,6 +20,7 @@ import QuestionnaireForm, {
 import { createRegistrationSchema, ORGANIZATION_TYPES } from '@/lib/validation/schemas';
 import type { RegistrationAccess } from '@/lib/events/registration-access';
 import { consensiRichiesti } from '@/lib/registration/consents';
+import type { VoceNelVideo } from '@/lib/live/consent-rule';
 
 interface ProfilingConfig {
   requireOrganization: boolean;
@@ -55,7 +56,8 @@ interface RegistrationFormClientProps {
    *  per email; senza invitati resta solo il rinvio del link a chi è iscritto. */
   registrationAccess?: RegistrationAccess;
   /** Chi non acconsente alla registrazione partecipa in solo ascolto. */
-  listenOnlyWithoutConsent?: boolean;
+  /** La voce di chi non acconsente nel video (lib/recording/availability). */
+  voce?: VoceNelVideo;
   /** Arrivati dall'email d'invito: nome e indirizzo dell'invito. */
   invito?: { name: string | null; email: string } | null;
 }
@@ -89,7 +91,7 @@ export default function RegistrationFormClient({
   profiling,
   registrationAccess = 'open',
   invito = null,
-  listenOnlyWithoutConsent = false,
+  voce = 'rimovibile',
 }: RegistrationFormClientProps) {
   const t = useTranslations('registration');
   const tg = useTranslations('gdpr');
@@ -116,7 +118,6 @@ export default function RegistrationFormClient({
     participantsCanUnmute,
     participantsCanStartVideo,
     participantsCanShareScreen,
-    listenOnlyWithoutConsent,
   });
   const [privacyExpanded, setPrivacyExpanded] = useState(false);
 
@@ -210,10 +211,6 @@ export default function RegistrationFormClient({
     // Extra validation: if profiling fields are required by event, ensure they're filled
     if (showOrg && !organization.trim()) {
       fieldErrors.organization = 'registration.errors.organizationRequired';
-    }
-    // Consensi obbligatori secondo il formato dell'evento.
-    if (richiesti.registrazione && !richiesti.registrazioneFacoltativa && !consentRecording) {
-      fieldErrors.consentRecording = 'registration.errors.recordingConsentRequired';
     }
     // Il questionario: obbligatorio vuol dire almeno una risposta; chi
     // risponde, risponde anche alle domande obbligatorie. Le stesse regole
@@ -853,15 +850,7 @@ export default function RegistrationFormClient({
             <Input
               type="checkbox"
               id="consentRecording"
-              aria-invalid={errors.consentRecording ? true : undefined}
-              aria-required={richiesti.registrazioneFacoltativa ? undefined : 'true'}
-              aria-describedby={
-                errors.consentRecording
-                  ? 'consentRecordingError'
-                  : richiesti.registrazioneFacoltativa
-                    ? 'consentRecordingListenOnly'
-                    : undefined
-              }
+              aria-describedby={voce === 'assente' ? undefined : 'consentRecordingOptional'}
               checked={consentRecording}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setConsentRecording(e.target.checked);
@@ -870,27 +859,20 @@ export default function RegistrationFormClient({
             />
             <Label for="consentRecording" check>
               {tg('consent.recording')}{' '}
-              {richiesti.registrazioneFacoltativa ? (
-                <span className="consent-mark">{t('optionalMark')}</span>
-              ) : (
-                <span className="consent-mark consent-mark--required">{t('requiredMark')}</span>
-              )}
+              <span className="consent-mark">{t('optionalMark')}</span>
             </Label>
             {/* Facoltativo davvero: si dice cosa succede senza. */}
-            {richiesti.registrazioneFacoltativa && (
-              <div id="consentRecordingListenOnly" className="form-text">
-                {tg('consent.recordingOptionalListenOnly')}
-              </div>
-            )}
-            {errors.consentRecording && (
-              <div id="consentRecordingError" className="text-danger small mt-1">
-                {tg('consent.recordingRequired')}
+            {voce !== 'assente' && (
+              <div id="consentRecordingOptional" className="form-text">
+                {tg(voce === 'rimovibile' ? 'consent.recordingOptionalVoice' : 'consent.recordingOptionalListenOnly')}
               </div>
             )}
           </FormGroup>
         )}
         {richiesti.avvisoRegistrazione && (
-          <p className="registration-consents__notice mb-3">{tg('consent.recordingNotice')}</p>
+          <p className="registration-consents__notice mb-3">
+            {tg(voce === 'fissa' ? 'consent.recordingNotice' : 'consent.recordingNoticeVoice')}
+          </p>
         )}
 
         {/* ── Trascrizione dei propri interventi (traccia audio per persona o

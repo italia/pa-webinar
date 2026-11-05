@@ -9,7 +9,7 @@ import { anteprimaEventoPubblico } from '@/lib/events/meta-title';
 import { getPublicEnv } from '@/lib/env';
 import { captionsTranscriptActive, liveCaptionsAvailable } from '@/lib/captions/availability';
 import { getSettings } from '@/lib/settings';
-import { recordingAvailable } from '@/lib/recording/availability';
+import { recordingAvailable, voceNelVideo } from '@/lib/recording/availability';
 import { registraChiConduce } from '@/lib/live/entry-consents';
 import { informativaEvento } from '@/lib/events/privacy-notice';
 import LiveEventClient from '@/components/live/live-event-client';
@@ -225,7 +225,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             tempRecordingUrl: event.tempRecordingUrl,
             feedbackEnabled: event.feedbackEnabled,
             recordingConsentText: isInstant ? null : event.recordingConsentText,
-            listenOnlyWithoutConsent: event.listenOnlyWithoutConsent,
+            voceNelVideo: voceNelVideo(),
             privacy,
             timezone: event.timezone,
             registrationCount: event._count.registrations,
@@ -435,7 +435,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         tempRecordingUrl: event.tempRecordingUrl,
         feedbackEnabled: event.feedbackEnabled,
         recordingConsentText: event.recordingConsentText,
-        listenOnlyWithoutConsent: event.listenOnlyWithoutConsent,
+        voceNelVideo: voceNelVideo(),
         privacy,
         timezone: event.timezone,
         registrationCount: event._count.registrations,

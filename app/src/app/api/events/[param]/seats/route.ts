@@ -24,6 +24,7 @@ import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { ForbiddenError, NotFoundError, RateLimitError, UnauthorizedError, ValidationError } from '@/lib/errors';
 import { readOwnedEventAccessToken } from '@/lib/event-session';
+import { endpointSenzaRegistrazione } from '@/lib/captions/room';
 import { claimSeat, leggiSoloAscolto, readSeats, type Seat } from '@/lib/live/seats';
 import { rateLimit } from '@/lib/rate-limit';
 
@@ -148,6 +149,13 @@ export const GET = withErrorHandling(async (request, context) => {
   }
   // Chi e' in solo ascolto (dichiarato dal suo browser con il token che lo
   // dice): chi modera non gli da' una parola che il bridge non apre.
-  const listenOnly = await leggiSoloAscolto(event.id);
-  return Response.json({ seats: out, listenOnly }, { headers: { 'Cache-Control': 'no-store' } });
+  // Chi non ha un consenso valido puo' parlare, senza videocamera e schermo.
+  const [listenOnly, voiceExcluded] = await Promise.all([
+    leggiSoloAscolto(event.id),
+    endpointSenzaRegistrazione(event.id),
+  ]);
+  return Response.json(
+    { seats: out, listenOnly, voiceExcluded },
+    { headers: { 'Cache-Control': 'no-store' } },
+  );
 });

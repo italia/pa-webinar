@@ -372,40 +372,51 @@ whoever caused it. On a phone, where everyone joins with both off, it does nothi
 A moderator can lift or restore the moderation during the call from the **Participants** tab
 (**Microphones locked**, **Video locked**). Both toggles are always shown to moderators.
 
-**Listen-only participants.** On an event that records, concedes some media to participants and
-keeps `listenOnlyWithoutConsent` on, the recording consent is free: whoever does not give it enters
-listening only (`app/src/lib/live/listen-only.ts`). Every token of such an event locks all three media,
-so the moderation is on for each from the first entry; a participant who consented carries
-`mediaAdmit` with the media the event concedes and is admitted at once, exactly as before; a
-listen-only participant carries `listenOnly` and is never admitted, not even when a moderator gives
-them the floor (`mod_pa_media_lock` drops that approval). The room tells them, with
-**I consent to the recording and take part**: consenting asks for a new token with the consent, and
-the conference rejoins with it. Whoever the token admits at entry (a participant who consented on such
-an event, a speaker with the microphones locked) receives the bridge's approval as soon as they join,
-and Jitsi shows it as **The moderator asks you to speak**, though nobody asked: during the first seconds
-of each entry the room closes that notification (`hideNotification`, uid `asked-to-unmute`), while the
-floor given later by a moderator (**Give the floor**, `askToUnmute`) still shows it. The same goes the other way: withdrawing the consent from **Your consents**
-in the top bar asks for a new token without it, and the conference rejoins listening only
-([Withdrawing consent](../GDPR.md#withdrawing-consent)). In the moderator's **Participants** tab a listen-only
-person is marked **listen-only**, and in place of **Give the floor** the row says that they have not
-consented and cannot speak until they consent from their room (`listenOnly` in
-`GET /api/events/{param}/seats`: the person's browser declares its bridge endpoint with its room token,
-`POST /api/events/{param}/listen-only`, and only a token that carries `listenOnly`, the value the bridge
-enforces, marks it). The person's own room explains what is needed. Every token of such an event also carries
-`consentLock`: in that room the module refuses to switch the moderation off (the **Participants** tab
-shows a note instead of **Microphones locked** and **Video locked**), and a listen-only person made
-moderator stays out of the admitted. Neither this setting nor `recordingEnabled` changes while the room may be
-open (`LIVE`, `PROVISIONING`, `IDLE`, or `PUBLISHED` with a call session opened in the last 12 hours,
-since moderators and speakers enter early; `app/src/lib/live/room-open.ts`): the lock is decided at the
-first entry, and people already in the room did not consent to a recording switched on afterwards. A
-save in that window keeps the old values and lists them in `ignoredCreationOnlyFields`; the wizard
-disables both switches. Instant calls ask for no consent. A listen-only participant is in the room like
-a participant of a listen-only event: their name is on their tile, without voice or image, and their
-token carries no profile photo.
-Without `listenOnlyWithoutConsent`, the token route refuses a participant who has not consented
-(`403 RECORDING_CONSENT_REQUIRED`, and the room goes back to the waiting room, where the box is): the
-waiting room is not the only gate. A participant who withdraws the consent from the room on such an event
-goes back to the waiting room at once.
+**People without the recording consent.** The recording consent is never a condition of entering. On
+an event that records, a person without a valid consent enters with `voiceExcluded`
+(`app/src/lib/live/listen-only.ts`), also where the event only informs and shows no box. Every token of
+such an event locks all three media, so the moderation is on for each from the first entry; whoever
+consented carries `mediaAdmit` with the media the event concedes and is admitted at once, exactly as
+before. A `voiceExcluded` participant is admitted for the microphone if the event concedes it, and a
+moderator can give them the floor; camera and screen stay closed for them, moderators and speakers
+included: on the bridge for the audience and for speakers, by removing controls and shortcuts for
+moderators, whom Jicofo does not force. `mod_pa_media_lock` writes the mark into the person's presence
+from the token (`jitsi_participant_paNoRecording`), removing any value the client sent. Jibri's session
+reads it and plays neither the voice nor the image of that person
+(`jitsi-meet.web.custom.configs._custom_config_js` in the chart, `infra/jitsi/web/custom-config.js` for
+Docker Compose with a Jibri of its own; `scripts/validate-chart.sh` keeps the two equal), and the
+per-participant recorder skips the track. That session reads internals of the Jitsi client: retry it at
+every Jitsi upgrade. The mark takes effect only with the new `mod_pa_media_lock` loaded: after an upgrade
+that changes the Prosody modules, restart Prosody before the next event. The
+room tells the person, with **I consent to the recording**: consenting asks for a new token, and the
+conference rejoins with it. Withdrawing from **Your consents** in the top bar does the opposite.
+
+The chart sets `RECORDING_VOICE_EXCLUSION` only when the conference text carries that logic. Without it
+(an external Jitsi, a values file that replaced the text) a Jibri recording would keep the voice, so the
+audience without consent carries `listenOnly` instead and is never admitted, not even when a moderator
+gives them the floor (`mod_pa_media_lock` drops that approval), and moderators and speakers host as
+usual, recorded by the composite video.
+
+Whoever the token admits at entry (a participant who consented, a speaker with the microphones locked)
+receives the bridge's approval as soon as they join, and Jitsi shows it as **The moderator asks you to
+speak**, though nobody asked: during the first seconds of each entry the room closes that notification
+(`hideNotification`, uid `asked-to-unmute`), while the floor given later by a moderator (**Give the
+floor**, `askToUnmute`) still shows it. The moderator's **Participants** tab marks these people, from
+`GET /api/events/{param}/seats`. `voiceExcluded` comes from Prosody (`mod_pa_occupants` sends the token's
+value, stored in `RoomOccupant`). `listenOnly` comes from the person's browser, which declares its bridge
+endpoint with its room token (`POST /api/events/{param}/listen-only`), and only a token that carries the
+value the bridge enforces marks it. A dominant-speaker event from a `voiceExcluded` endpoint keeps no
+name and, while a recording runs, sets `Event.unrecordedSpeech`, which puts the note next to the
+published video; the caption segments of that endpoint are kept as times only.
+Every token of such an event also carries `consentLock`: in that room the module refuses to switch the
+moderation off (the **Participants** tab shows a note instead of **Microphones locked** and **Video
+locked**), and a person made moderator stays bound by their token. `recordingEnabled` does not change
+while the room may be open (`LIVE`, `PROVISIONING`, `IDLE`, or `PUBLISHED` with a call session opened in
+the last 12 hours, since moderators and speakers enter early; `app/src/lib/live/room-open.ts`): the lock
+is decided at the first entry, and people already in the room did not consent to a recording switched on
+afterwards. A save in that window keeps the old values and lists them in `ignoredCreationOnlyFields`; the
+wizard disables the switch. Instant calls ask for no consent. A person without the consent has their name
+on their tile in the room, and their token carries no profile photo.
 
 ### Video quality presets
 

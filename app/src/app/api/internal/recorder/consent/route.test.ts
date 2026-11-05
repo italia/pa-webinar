@@ -1,9 +1,14 @@
 import type { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const m = vi.hoisted(() => ({ posto: vi.fn(), consenso: vi.fn() }));
+const m = vi.hoisted(() => ({ posto: vi.fn(),
+  esclusa: vi.fn(async () => false), consenso: vi.fn() }));
 vi.mock('@/lib/auth/cron', () => ({ assertCronApiKey: vi.fn() }));
-vi.mock('@/lib/captions/room', () => ({ postoDellEndpoint: m.posto, consensoTrascrizione: m.consenso }));
+vi.mock('@/lib/captions/room', () => ({
+  postoDellEndpoint: m.posto,
+  consensoTrascrizione: m.consenso,
+  voceEsclusa: m.esclusa,
+}));
 
 import { GET } from './route';
 
@@ -24,6 +29,13 @@ describe('GET /api/internal/recorder/consent', () => {
     expect(m.consenso).toHaveBeenLastCalledWith(EVENTO, 'mod-x', 1);
     m.consenso.mockResolvedValueOnce({ dato: false, nome: null });
     expect(await (await chiedi(`?eventId=${EVENTO}&endpoint=ab`)).json()).toEqual({ record: false });
+  });
+
+  it('senza consenso alla registrazione non si registra, qualunque altro abbia dato', async () => {
+    m.posto.mockResolvedValue('mod-x');
+    m.esclusa.mockResolvedValueOnce(true);
+    expect(await (await chiedi(`?eventId=${EVENTO}&endpoint=ab`)).json()).toEqual({ record: false });
+    expect(m.consenso).not.toHaveBeenCalled();
   });
 
   it('chi non e\' riconosciuto non si registra', async () => {

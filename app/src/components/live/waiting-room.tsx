@@ -34,6 +34,7 @@ import EventTitle from '@/components/events/event-title';
 import LiveShareButton from '@/components/live/live-share-button';
 import { MarkdownRenderer } from '@/components/ui/markdown';
 import type { EntePubblico, PersonaPubblica } from '@/lib/events/public-people';
+import type { VoceNelVideo } from '@/lib/live/consent-rule';
 import type { Presenze } from '@/lib/live/presence';
 import { PonteChatPiazza } from '@/lib/lobby/chat-bridge';
 import type { DatiBacheca, MostraGalleria } from '@/components/live/garden/piazza-luoghi';
@@ -229,8 +230,8 @@ interface WaitingRoomProps {
    *  all'iscrizione (ospite dal link della sala, iscritto da un altro
    *  browser, iscritto prima che la registrazione fosse attivata). */
   recordingConsentRequired?: boolean;
-  /** Il consenso alla registrazione e' facoltativo: senza, solo ascolto. */
-  recordingConsentOptional?: boolean;
+  /** La voce di chi non acconsente nel video (lib/recording/availability). */
+  voce?: VoceNelVideo;
   /** Si registra, ma chi partecipa non ha ne' microfono, ne' videocamera, ne'
    *  schermo: il riepilogo lo dice, e non c'e' nulla da acconsentire. */
   recordingListenOnly?: boolean;
@@ -260,8 +261,10 @@ const ARCADE_CLASSIC_KEY = 'pawebinar.arcade.classic';
 /** Il campo su cui portare il fuoco per ciascun blocco. */
 const CAMPO_DEL_BLOCCO: Record<BloccoModulo, string> = {
   name: 'waiting-name',
-  recording: 'waiting-recording-consent',
 };
+/** La casella del consenso alla registrazione: facoltativa, non blocca. */
+const CAMPO_REGISTRAZIONE = 'waiting-recording-consent';
+const NOTA_REGISTRAZIONE = 'waiting-recording-consent-required';
 /** La casella della trascrizione dei propri interventi: facoltativa, non blocca. */
 const CAMPO_TRASCRIZIONE = 'waiting-multitrack-consent';
 // Oltre questo tempo l'accensione e' piu' lunga del solito (3-5 minuti alla
@@ -270,7 +273,6 @@ const LUNGA_ACCENSIONE_S = 6 * 60;
 /** Il messaggio che spiega ciascun blocco: descrive il campo e il pulsante. */
 const MESSAGGIO_DEL_BLOCCO: Record<BloccoModulo, string> = {
   name: 'waiting-name-required',
-  recording: 'waiting-recording-consent-required',
 };
 
 /** Le due colonne della sala d'attesa: nella piazza quella con la chat viene
@@ -297,7 +299,7 @@ export default function WaitingRoom({
   exitHref,
   multitrackConsentExempt = false,
   recordingConsentRequired = false,
-  recordingConsentOptional = false,
+  voce = 'rimovibile',
   recordingListenOnly = false,
   recordingConsentText = null,
   privacy,
@@ -488,17 +490,16 @@ export default function WaitingRoom({
     (!!event.multitrackRecordingEnabled || !!event.captionsTranscript) &&
     !isEnded &&
     !multitrackConsentExempt;
-  // Il consenso alla registrazione dell'evento, se va chiesto qui. Non ferma
-  // la piazza: il cancello passa dallo stesso controllo del pulsante, che
-  // porta alla casella.
+  // Il consenso alla registrazione dell'evento, se va chiesto qui. E' libero:
+  // non ferma ne' il pulsante ne' la piazza.
   const recordingRequired = recordingConsentRequired && !isEnded;
-  // Chiesto ma libero: senza la spunta si entra in solo ascolto, e il
-  // pulsante «Entra» non aspetta la casella.
-  const consensoBloccante = recordingRequired && !recordingConsentOptional;
   // Chi conduce o interviene, in un evento che registra: la trascrizione dei
   // propri interventi vale solo con il consenso alla registrazione (la rotta
   // del token la ignora senza), quindi la casella si apre dopo quella.
-  const trascrizioneSospesa = conduceDaIncarico && recordingRequired && !recordingConsent;
+  // Senza consenso alla registrazione non si tiene neanche il testo: la voce non
+  // viene registrata. Chi conduce, dove la voce resta nel video, sceglie lo stesso.
+  const trascrizioneSospesa =
+    (conduceDaIncarico || voce === 'rimovibile') && recordingRequired && !recordingConsent;
   // La piazza e' disponibile quando c'e' qualcosa da fare e nessun cancello
   // davanti: a evento finito non serve, in vista classica e' stata rifiutata,
   // e senza consenso multitraccia non si va da nessuna parte.
@@ -572,14 +573,11 @@ export default function WaitingRoom({
   } | null>(null);
   // Sala non pronta e modulo incompleto sono due ragioni diverse per non
   // entrare, con due risposte diverse: vedi lib/waiting-room/entry-state.
-  const { canEnter, bloccoModulo, nomeDaChiedere, nomeSegnalato, consensoSegnalato, bloccoSpiegato } =
+  const { canEnter, bloccoModulo, nomeDaChiedere, nomeSegnalato, bloccoSpiegato } =
     statoIngresso({
       canEnterLive,
       ingressoConsentito,
       nameValid,
-      // Il consenso facoltativo non trattiene l'ingresso.
-      recordingRequired: consensoBloccante,
-      recordingConsent,
       ingressoTentato,
       nomeNoto,
     });
@@ -829,7 +827,7 @@ export default function WaitingRoom({
       setEntraDopoAvvio(null);
       // Si dice perche' non si entra da soli: il fuoco va sulla domanda aperta.
       document
-        .getElementById(recordingRequired && !recordingConsent ? CAMPO_DEL_BLOCCO.recording : CAMPO_TRASCRIZIONE)
+        .getElementById(recordingRequired && !recordingConsent ? CAMPO_REGISTRAZIONE : CAMPO_TRASCRIZIONE)
         ?.focus();
       return;
     }
@@ -1209,38 +1207,30 @@ export default function WaitingRoom({
             <input
               className="form-check-input"
               type="checkbox"
-              id={CAMPO_DEL_BLOCCO.recording}
+              id={CAMPO_REGISTRAZIONE}
               checked={recordingConsent}
               onChange={(e) => {
                 setRecordingConsent(e.target.checked);
                 // Chi conduce: senza registrazione la trascrizione non vale, e
                 // non deve ritrovarsi spuntata se la rimette.
-                if (!e.target.checked && conduceDaIncarico) setMultitrackConsent(false);
+                if (!e.target.checked && (conduceDaIncarico || voce === 'rimovibile')) {
+                  setMultitrackConsent(false);
+                }
               }}
-              aria-describedby={!recordingConsent ? MESSAGGIO_DEL_BLOCCO.recording : undefined}
-              aria-invalid={consensoSegnalato || undefined}
+              aria-describedby={!recordingConsent && voce !== 'assente' ? NOTA_REGISTRAZIONE : undefined}
             />
-            <label className="form-check-label" htmlFor={CAMPO_DEL_BLOCCO.recording}>
+            <label className="form-check-label" htmlFor={CAMPO_REGISTRAZIONE}>
               {tGdpr('recording')}
             </label>
           </div>
-          {!recordingConsent && recordingConsentOptional && (
+          {!recordingConsent && voce !== 'assente' && (
             // Libero davvero: si dice che cosa succede senza.
-            <div id={MESSAGGIO_DEL_BLOCCO.recording} className="wr-consensi__nota">
-              {conduceDaIncarico ? tGdpr('recordingOptionalHost') : tGdpr('recordingOptionalListenOnly')}
-            </div>
-          )}
-          {!recordingConsent && !recordingConsentOptional && (
-            // Prima un'indicazione; dopo un tentativo di entrare, un errore
-            // in rosso, qui accanto alla casella che lo risolve.
-            <div
-              id={MESSAGGIO_DEL_BLOCCO.recording}
-              className={`wr-consensi__nota${consensoSegnalato ? ' wr-consensi__nota--errore' : ''}`}
-            >
-              {consensoSegnalato && (
-                <Icon icon="it-error" size="xs" className="flex-shrink-0" style={{ fill: 'currentColor' }} />
-              )}
-              <span>{t('recordingConsentRequired')}</span>
+            <div id={NOTA_REGISTRAZIONE} className="wr-consensi__nota">
+              {voce === 'rimovibile'
+                ? tGdpr('recordingOptionalVoice')
+                : conduceDaIncarico
+                  ? tGdpr('recordingOptionalHost')
+                  : tGdpr('recordingOptionalListenOnly')}
             </div>
           )}
         </>
@@ -1262,7 +1252,7 @@ export default function WaitingRoom({
               onChange={(e) => setMultitrackConsent(e.target.checked)}
               aria-describedby={
                 trascrizioneSospesa
-                  ? `${MESSAGGIO_DEL_BLOCCO.recording} ${CAMPO_TRASCRIZIONE}-nota`
+                  ? `${voce !== 'assente' ? `${NOTA_REGISTRAZIONE} ` : ''}${CAMPO_TRASCRIZIONE}-nota`
                   : `${CAMPO_TRASCRIZIONE}-nota`
               }
             />
@@ -1875,7 +1865,9 @@ export default function WaitingRoom({
         'registrazione',
         <span className="wr-fact__rec" />,
         t('summaryRecording'),
-        recordingListenOnly ? tGdpr('recordingNotice') : t('recordingNotice'),
+        recordingListenOnly
+          ? tGdpr(voce === 'fissa' ? 'recordingNotice' : 'recordingNoticeVoice')
+          : t('recordingNotice'),
       ),
     );
   }

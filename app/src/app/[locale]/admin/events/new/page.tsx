@@ -9,7 +9,7 @@ import { rubricaConPersone } from '@/lib/persons/rubrica-picker';
 import { capacitaIstanza } from '@/lib/capacity/istanza';
 import { getSettings } from '@/lib/settings';
 import { liveCaptionsAvailable } from '@/lib/captions/availability';
-import { recordingAvailable } from '@/lib/recording/availability';
+import { recordingAvailable, voceNelVideo } from '@/lib/recording/availability';
 import { traduzioneDisponibile } from '@/lib/text-translation/enqueue';
 import CreateEventWithTemplate from '@/components/admin/create-event-with-template';
 import type { PermissionMatrix } from '@/lib/utils/permission-matrix';
@@ -151,6 +151,7 @@ export default async function CreateEventPage({
         )}
         liveCaptionsAvailable={liveCaptionsAvailable(siteSettings)}
         recordingAvailable={recordingAvailable()}
+        voceNelVideo={voceNelVideo()}
         defaultTargetLocales={siteSettings.aiDefaultTargetLocales}
         aiPipelineEnabled={siteSettings.aiPipelineEnabled}
         textTranslationAvailable={traduzioneDisponibile(siteSettings)}

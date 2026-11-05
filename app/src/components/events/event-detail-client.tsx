@@ -70,6 +70,8 @@ interface EventData {
   recordingUrl: string | null;
   /** La trascrizione si legge anche senza il video pubblicato. */
   transcriptPublished?: boolean;
+  /** Qualcuno ha parlato senza consenso: nel video il suo intervento non c'e'. */
+  unrecordedSpeech?: boolean;
   youtubeUrl?: string | null;
   qaEnabled: boolean;
   chatEnabled: boolean;
@@ -220,6 +222,7 @@ export default function EventDetailClient({
   };
   const tv = useTranslations('video');
   const tm = useTranslations('materials');
+  const tp = useTranslations('postprod');
   const format = useFormatter();
 
   // Ref del player — usato dal TranscriptPanel per click-to-seek + da
@@ -480,6 +483,9 @@ export default function EventDetailClient({
         title={title}
         poster={event.imageUrl}
       />
+      {event.unrecordedSpeech && (
+        <p className="small text-secondary mt-2 mb-0">{tp('unrecordedSpeech')}</p>
+      )}
 
       {/* Mini-transcript inline sotto al video: 3 righe
           (precedente / attiva / successiva) seguono il

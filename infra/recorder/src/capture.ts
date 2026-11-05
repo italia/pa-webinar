@@ -575,6 +575,13 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
       seenParticipant = true;
       if (idleTimer) clearTimeout(idleTimer);
       const pid: string = track.getParticipantId?.() ?? 'unknown';
+      // Il consenso alla registrazione manca (lo dice la presenza, che viene
+      // dal token: mod_pa_media_lock): la sua voce non si registra, qualunque
+      // altra cosa abbia acconsentito.
+      if (conference?.getParticipantById?.(pid)?.getProperty?.('paNoRecording') === 'true') {
+        log(`TRACK_SKIPPED pid=${pid}: nessun consenso alla registrazione`);
+        return;
+      }
       // Solo chi ha dato il consenso alla trascrizione dei propri interventi:
       // chi non l'ha dato partecipa, ma la sua voce non finisce in un file.
       const trackId: string | undefined = track.getId?.();

@@ -26,6 +26,7 @@ import { useLocale, useTranslations } from 'next-intl';
 
 import { useRouter, percorso } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
+import type { VoceNelVideo } from '@/lib/live/consent-rule';
 import { profiloSalvato } from '@/lib/events/grant-profile';
 import { eventAdminPath } from '@/lib/events/admin-links';
 import { MAX_RETENTION_DAYS } from '@/lib/validation/retention';
@@ -200,6 +201,8 @@ export interface WizardProps {
   /** L'installazione puo' registrare (lib/recording/availability): senza,
    *  il riepilogo non promette consensi alla registrazione. */
   recordingAvailable?: boolean;
+  /** La voce di chi non acconsente nel video (lib/recording/availability). */
+  voceNelVideo?: VoceNelVideo;
   /** Le lingue di traduzione predefinite dell'istanza (SiteSetting). */
   defaultTargetLocales?: string | null;
   /** La post-produzione AI e' accesa sull'installazione: spenta, il passo Permessi
@@ -289,7 +292,6 @@ export interface InitialEventShape {
     liveCaptionsEnabled?: boolean | null;
     captionsTranscriptEnabled?: boolean | null;
     autoStartRecording: boolean;
-    listenOnlyWithoutConsent?: boolean;
     audienceAnonymous?: boolean;
     participantListVisible?: boolean;
     aiTranscriptEnabled?: boolean | null;
@@ -519,7 +521,6 @@ export default function EventWizard(props: WizardProps) {
         liveCaptionsEnabled: ev.liveCaptionsEnabled ?? true,
         captionsTranscriptEnabled: ev.captionsTranscriptEnabled ?? false,
         autoStartRecording: ev.autoStartRecording,
-        listenOnlyWithoutConsent: ev.listenOnlyWithoutConsent ?? false,
         audienceAnonymous: ev.audienceAnonymous ?? false,
         participantListVisible: ev.participantListVisible ?? false,
         aiTranscriptEnabled: ev.aiTranscriptEnabled ?? false,
@@ -671,9 +672,6 @@ export default function EventWizard(props: WizardProps) {
       // La registrazione non parte mai da sola: la avvia chi conduce con il
       // pulsante REC, qualunque cosa dica un modello salvato prima.
       autoStartRecording: false,
-      // Il consenso alla registrazione e' libero: chi non lo da' entra in
-      // solo ascolto (si puo' spegnere nei permessi).
-      listenOnlyWithoutConsent: true,
       audienceAnonymous: false,
       participantListVisible: false,
       // Default AI dal template (semplificazione): un template "registrato"
@@ -1691,7 +1689,6 @@ export default function EventWizard(props: WizardProps) {
           // Senza sottotitoli non c'e' niente da trascrivere.
           captionsTranscriptEnabled: form.liveCaptionsEnabled && form.captionsTranscriptEnabled,
           autoStartRecording: form.recordingEnabled && form.autoStartRecording,
-          listenOnlyWithoutConsent: form.listenOnlyWithoutConsent,
           audienceAnonymous: form.audienceAnonymous,
           participantListVisible: form.participantListVisible,
 
@@ -2430,6 +2427,7 @@ export default function EventWizard(props: WizardProps) {
             aiPipelineEnabled={props.aiPipelineEnabled ?? true}
             liveCaptionsAvailable={props.liveCaptionsAvailable ?? false}
             recordingAvailable={props.recordingAvailable ?? true}
+            voceNelVideo={props.voceNelVideo}
             istantanea={istantanea}
             iscrizioneAperta={istantanea ? undefined : iscrizioneAperta}
             onVaiPersone={() => vai('invites')}

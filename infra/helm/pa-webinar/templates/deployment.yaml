@@ -114,6 +114,16 @@ spec:
             - name: JIBRI_HEALTH_URL
               value: {{ . | quote }}
             {{- end }}
+            {{- /*
+              Il testo della conferenza del chart fa si' che il registratore non
+              riproduca la voce di chi non ha acconsentito. Un file di valori che
+              lo sostituisce lo perde: senza, il portale tiene quelle persone in
+              solo ascolto.
+            */}}
+            {{- if contains "paNoRecording" (toString (dig "web" "custom" "configs" "_custom_config_js" "" (index .Values "jitsi-meet" | default dict))) }}
+            - name: RECORDING_VOICE_EXCLUSION
+              value: "true"
+            {{- end }}
             {{- end }}
             {{- with include "pa-webinar.extraCaCerts" . }}
             # Autorità di certificazione in più per le connessioni in uscita

@@ -20,6 +20,7 @@ import {
 import RegistrationConsents, { type ConsensiVista } from '@/components/privacy/registration-consents';
 import { Icon } from '@/components/ui/icon';
 import { Link, percorso } from '@/i18n/navigation';
+import type { VoceNelVideo } from '@/lib/live/consent-rule';
 import { localizedPath } from '@/lib/utils/localized-url';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
@@ -100,6 +101,7 @@ export default function MyDataPage() {
   const [grants, setGrants] = useState<ExportGrant[]>([]);
   // Il token per ritirare un consenso: lo consegna la lettura dei dati.
   const [tokenConsensi, setTokenConsensi] = useState<string | null>(null);
+  const [voce, setVoce] = useState<VoceNelVideo>('rimovibile');
   const format = useFormatter();
 
   // When the user lands here via the signed link emailed to them, the
@@ -135,6 +137,7 @@ export default function MyDataPage() {
         setPhoto(json.profilePhoto ?? null);
         setGrants(Array.isArray(json.grants) ? json.grants : []);
         setTokenConsensi(typeof json.consentsToken === 'string' ? json.consentsToken : null);
+        if (json.voiceInVideo) setVoce(json.voiceInVideo);
       } catch {
         if (!cancelled) setError(t('error'));
       } finally {
@@ -393,6 +396,7 @@ export default function MyDataPage() {
                         token={tokenConsensi}
                         registrationId={entry.registration.id}
                         consensi={entry.registration.consents}
+                        voce={voce}
                       />
                     )}
 

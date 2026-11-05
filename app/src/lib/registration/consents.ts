@@ -15,11 +15,10 @@
  * trascrizione non tiene le sue frasi (lo decide il server, voce per voce,
  * lib/captions/room).
  *
- * Con il solo ascolto per chi non acconsente (Event.listenOnlyWithoutConsent)
- * il consenso alla registrazione resta chiesto, ma non e' piu' una condizione:
- * chi non lo da' si iscrive ed entra lo stesso, in solo ascolto (microfono,
- * videocamera e schermo chiusi, anche sul bridge). Il consenso e' libero
- * (art. 7.4 GDPR): rifiutarlo non toglie la partecipazione.
+ * Il consenso alla registrazione e' libero (art. 7.4 GDPR): non e' mai una
+ * condizione per iscriversi o per entrare. Chi non lo da' partecipa lo stesso e
+ * puo' intervenire, ma non viene registrato; videocamera e schermo restano
+ * chiusi (lib/live/listen-only).
  *
  * Vale per il modulo di iscrizione, per la rotta che la salva e per l'avviso
  * all'ingresso in sala: una sola regola, perché un consenso chiesto in un
@@ -48,15 +47,11 @@ export interface FormatoEvento {
   participantsCanUnmute: boolean;
   participantsCanStartVideo: boolean;
   participantsCanShareScreen: boolean;
-  /** Chi non acconsente alla registrazione entra in solo ascolto. */
-  listenOnlyWithoutConsent?: boolean;
 }
 
 export interface ConsensiRichiesti {
-  /** Consenso alla registrazione audio e video: si chiede. */
+  /** Consenso alla registrazione audio e video: si chiede, facoltativo. */
   registrazione: boolean;
-  /** ...ma e' facoltativo: senza, si partecipa in solo ascolto. */
-  registrazioneFacoltativa: boolean;
   /** Si registra, ma i partecipanti non hanno né microfono, né videocamera,
    *  né schermo: un'informativa, nessuna casella. */
   avvisoRegistrazione: boolean;
@@ -72,7 +67,6 @@ export function consensiRichiesti(evento: FormatoEvento): ConsensiRichiesti {
   const registrazione = evento.recordingEnabled && presenza;
   return {
     registrazione,
-    registrazioneFacoltativa: registrazione && evento.listenOnlyWithoutConsent === true,
     avvisoRegistrazione: evento.recordingEnabled && !presenza,
     tracce: evento.multitrackRecordingEnabled || !!evento.captionsTranscript,
   };

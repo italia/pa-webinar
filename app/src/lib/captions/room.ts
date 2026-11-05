@@ -12,6 +12,7 @@ const CAMPI_EVENTO = {
   liveCaptionsEnabled: true,
   captionsTranscriptEnabled: true,
   multitrackRecordingEnabled: true,
+  recordingEnabled: true,
 } as const;
 
 /**
@@ -46,6 +47,28 @@ export async function eventoDellaConferenza(c: { room?: string | null; meetingId
     select: { event: { select: CAMPI_EVENTO } },
   });
   return occupante?.event ?? null;
+}
+
+/**
+ * Gli endpoint di chi e' entrato senza consenso alla registrazione. Il segno
+ * viene dal token, tramite Prosody (mod_pa_occupants): il browser della persona
+ * non lo puo' dare a un altro, ne' togliersi.
+ */
+export async function endpointSenzaRegistrazione(eventId: string): Promise<string[]> {
+  const righe = await prisma.roomOccupant.findMany({
+    where: { eventId, voiceExcluded: true },
+    select: { endpointId: true },
+  });
+  return righe.map((r) => r.endpointId);
+}
+
+/** Se dietro l'endpoint c'e' chi non ha il consenso alla registrazione. */
+export async function voceEsclusa(eventId: string, endpointId: string): Promise<boolean> {
+  const riga = await prisma.roomOccupant.findUnique({
+    where: { eventId_endpointId: { eventId, endpointId } },
+    select: { voiceExcluded: true },
+  });
+  return riga?.voiceExcluded === true;
 }
 
 /** Il posto (`context.user.id` del JWT) di chi usa quell'endpoint, se Prosody l'ha detto. */
