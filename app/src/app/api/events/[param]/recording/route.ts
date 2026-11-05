@@ -42,6 +42,7 @@ export const GET = withErrorHandling(async (_request, context) => {
       recordingPublished: true,
       transcriptPublished: true,
       recordingAudience: true,
+      recordingDestination: true,
       postEventPublic: true,
       postEventPublicUntil: true,
     },

@@ -298,6 +298,7 @@
       "generic": "Earráid le linn an chláraithe. Bain triail eile as, le bhur dtoil.",
       "questionnaireRequired": "Chun clárú, freagair ceisteanna an cheistiúcháin.",
       "questionnaireIncomplete": "Freagair na ceisteanna éigeantacha go léir sa cheistiúchán.",
+      "recordingDestinationChanged": "The text about the recording changed while you were filling in the form: reload the page and read it again.",
       "questionnaireChanged": "Athraíodh an ceistiúchán agus tú ag líonadh na foirme: athlódáil an leathanach agus freagair arís."
     }
   },
@@ -424,6 +425,7 @@
       "noMessages": "Gan teachtaireachtaí",
       "empty": "Níl teachtaireacht ar bith fós. Bí ar an gcéad duine!",
       "inputLabel": "Teachtaireacht chomhrá",
+      "personalDataNotice": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read and download the chat.",
       "moderatorBadge": "Modhnóir",
       "attach": "Ceangail comhad",
       "emojiPicker": "Cuir emoji isteach",
@@ -722,6 +724,7 @@
     "upvoted": "Vótáilte",
     "noQuestions": "Gan ceist fós. Bígí ar an gcéad duine!",
     "qaPersistenceNote": "Sábháiltear ceisteanna agus beidh siad ar fáil tar éis an imeachta.",
+    "personalDataNotice": "Do not write other people's personal data, or your own if you do not want it made public: the text of your question may appear on the event page, without your name.",
     "qaPostEvent": "Ceisteanna agus freagraí ón imeacht",
     "noAnsweredQuestions": "Gan ceist freagartha don imeacht seo.",
     "filterAll": "Gach ceann",
@@ -742,6 +745,7 @@
       "editAnswer": "Cuir an freagra in eagar",
       "answerFieldLabel": "Freagra ar cheist {name}",
       "answerPlaceholder": "Scríobh an freagra (2000 carachtar ar a mhéad)",
+      "answerNotice": "The answer may appear on the event page: do not write personal data.",
       "sendAnswer": "Foilsigh an freagra",
       "cancel": "Cealaigh",
       "removeAnswer": "Bain an freagra"
@@ -1025,6 +1029,13 @@
           }
         },
         "recordingManualNote": "Ní thosaíonn an taifeadadh as féin riamh: tosaíonn modhnóir é leis an gcnaipe REC.",
+        "recordingDestination": "Where the recording goes",
+        "recordingDestinationReserved": "Reserved",
+        "recordingDestinationReservedDesc": "Organizers and registrants can see it, registrants for as long as their registration data is kept. It cannot be made public.",
+        "recordingDestinationPublic": "Public",
+        "recordingDestinationPublicDesc": "It can be published on the event page and in the video library. Participants consent to this too.",
+        "recordingDestinationNotSet": "Not set: the event was created before this choice existed.",
+        "recordingDestinationLocked": "Once the room has opened you can only switch to reserved: consents are valid for the text people read.",
         "audienceAnonymous": "Lucht féachana gan ainm",
         "audienceAnonymousDesc": "Feictear rannpháirtithe do dhaoine eile faoi ainm cleite (“Rannpháirtí” agus cód) san fhíseán, sa chomhrá agus sna ceisteanna; fanann liosta na rannpháirtithe ag na hóstaigh, agus níl aon chearnóg ann. Úsáideach d’ócáidí móra; ag ócáidí pobail is mian le daoine aithne a chur ar a chéile.",
         "audienceAnonymousLocked": "Ní féidir é a athrú fad is féidir leis an seomra a bheith oscailte: nascfadh sé ainmneacha cleite le hainmneacha.",
@@ -1135,6 +1146,7 @@
         "askOrganization": "Eagraíocht (riachtanach chun clárú)",
         "askRole": "Ról (roghnach)",
         "askType": "Cineál eagraíochta (roghnach)",
+        "askAddressBook": "Offer to join the address book (optional for people who register)",
         "questionnairesHeading": "Ceistneoirí",
         "questionsBefore": "Roimh an imeacht, ag an gclárú: {count, plural, =0 {gan aon cheist bhreise} one {# cheist bhreise} two {# cheist bhreise} few {# cheist bhreise} many {# gceist bhreise} other {# ceist bhreise}}",
         "questionsAfter": "Tar éis an imeachta: {count, plural, =0 {gan suirbhé sástachta} one {suirbhé sástachta, # cheist} two {suirbhé sástachta, # cheist} few {suirbhé sástachta, # cheist} many {suirbhé sástachta, # gceist} other {suirbhé sástachta, # ceist}}",
@@ -1281,7 +1293,10 @@
         "participantsCan": "Rannpháirtithe: {list}",
         "none": "dada",
         "recordingManual": "Ar fáil: ní thosaíonn sé go dtí go mbrúnn modhnóir REC.",
+        "recordingDestinationReserved": "Destination: reserved for the organizers and registrants.",
+        "recordingDestinationPublic": "Destination: public.",
         "aiAfter": "Tar éis an taifeadta: {list}.",
+        "aiConfirmVideo": "Without per-person tracks, the video transcription starts only after someone confirms that every voice has consented.",
         "scheduleHeading": "Cathain a bheidh sé ar siúl",
         "scheduleIntro": "Cathain a bheidh an ócáid ar siúl: dáta, am agus crios ama.",
         "advancedIntro": "Luachanna atá roghnaithe ag an teimpléad cheana: ná hathraigh ach an méid is gá.",
@@ -1325,6 +1340,7 @@
         "askOrganization": "eagraíocht",
         "askRole": "ról",
         "askType": "cineál eagraíochta",
+        "askAddressBook": "whether they want to join the address book",
         "permissionsHeading": "Cé atá in ann cad a dhéanamh sa seomra",
         "permissionsIntro": "Cad is féidir leis na rannpháirtithe a dhéanamh agus cé na feidhmeanna seomra atá ar siúl. Is féidir gach rud a athrú le linn na hócáide freisin.",
         "consentsLine": "Toilithe ag an gclárú agus sa seomra: {list}",
@@ -1336,6 +1352,12 @@
         "consentsWithdraw": "Is féidir le rannpháirtithe iad a tharraingt siar sa seomra, leis an gcnaipe “Toilithe”.",
         "participantListShown": "Liosta na rannpháirtithe: infheicthe do chách.",
         "participantListHidden": "Liosta na rannpháirtithe: do na hóstaigh agus na cainteoirí amháin.",
+        "audiencePseudonyms": "Audience names: pseudonyms.",
+        "audienceRealNames": "Audience names: real names.",
+        "postEventQaHidden": "Questions after the event: not published.",
+        "postEventQaTextOnly": "Questions after the event: text only, without names.",
+        "addressBookOffered": "Address book: offered to people who register.",
+        "addressBookNotOffered": "Address book: not offered.",
         "consentRecordingOptional": "taifeadadh, roghnach",
         "consentRecordingVoice": "taifeadadh, roghnach (gan toiliú, fanann an duine lasmuigh den taifeadadh)",
         "consentsHostsAlways": "Bíonn óstaigh agus cainteoirí sa taifeadadh i gcónaí: ní fheiceann siad an bosca."
@@ -1542,6 +1564,8 @@
           "saveFailed": "Theip ar shábháil na meiteashonraí."
         }
       },
+      "reservedBadge": "Reserved",
+      "reservedHelp": "The recording is reserved for registrants: it cannot appear in the video library.",
       "updateFailed": "Theip ar an nuashonrú."
     },
     "recordingsLibrary": {
@@ -2306,6 +2330,8 @@
         "guestAccessEnabledHelp": "Is féidir le daoine nach bhfuil cláraithe dul isteach in imeachtaí atá ar siúl lena n-ainm amháin. Nuair atá sé múchta, ní féidir dul isteach in imeachtaí sceidealaithe ach le clárú nó le nasc modhnóra nó cainteora; fanann glaonna físe láithreacha oscailte d'aon duine a bhfuil an nasc aige. Ní ligtear aíonna isteach riamh chuig imeacht le cuireadh amháin.",
         "publicRegistrationEnabled": "Clárú poiblí gníomhach",
         "publicRegistrationEnabledHelp": "Is féidir le duine ar bith clárú d'imeachtaí. Nuair atá sé múchta, ní féidir clárú ach le daoine atá ar liosta cuireadh an imeachta, agus ní sheoltar an nasc pearsanta isteach ach trí ríomhphost; leanann daoine atá cláraithe cheana agus naisc mhodhnóirí agus chainteoirí ag obair. Is é seo an rogha a mholtar d'imeachtaí nua: is féidir le gach imeacht cinneadh eile a dhéanamh sa chéim “Daoine”.",
+        "addressBookEnabled": "Events address book",
+        "addressBookEnabledHelp": "Offers people who register the chance to stay in the address book and be invited to similar events. When off, the checkbox disappears from the forms and the picker from the wizard; existing entries stay until they are withdrawn or expire.",
         "calendarPublic": "Féilire poiblí",
         "calendarPublicHelp": "Foilsigh féilire na n-imeachtaí. Is féidir le cuairteoirí imeachtaí beartaithe a fheiceáil.",
         "parseTitleKicker": "Teidil le ciceálaí eagarthóireachta",
@@ -2438,6 +2464,8 @@
       "featuresLabel": "Gnéithe",
       "whiteboardLabel": "Clár bán",
       "recordingLabel": "Taifeadadh",
+      "recordingDestination": "Recording destination",
+      "recordingDestinationNone": "Chosen when creating the event",
       "waitingRoomEngineLabel": "Seomra feithimh (réamhshocrú an teimpléid)",
       "waitingRoomEngineSiteDefault": "Réamhshocrú an tsuímh",
       "waitingRoomEngineGarden": "Gairdín (caighdeánach)",
@@ -2459,6 +2487,7 @@
       "pickerSubtitle": "Roghnaigh teimpléad chun socruithe an imeachta a réamhchumrú, nó scipeáil chun gach rud a chumrú de láimh.",
       "skipTemplate": "Cumraigh de láimh",
       "postEventPublic": "Leathanach poiblí tar éis an imeachta",
+      "offerAddressBook": "Offers the address book to people who register",
       "invalidFields": "Seiceálaigí na réimsí seo: {fields}.",
       "descriptionOtherLanguages": "Tá leaganacha ann freisin i: {languages}, nach féidir a chur in eagar anseo. Má athraíonn sibh an téacs Iodáilise, bainfear iad."
     },
@@ -3599,6 +3628,10 @@
       "rec": {
         "yes": "Is ea, nuair a bhrúnn tú REC",
         "yesDesc": "Tar éis an imeachta: tras-scríbhinn, achoimre agus aistriúchán",
+        "reserved": "Yes, reserved",
+        "reservedDesc": "Organizers and registrants can see it",
+        "public": "Yes, public",
+        "publicDesc": "It can be published on the event page",
         "no": "Ní hea",
         "noDesc": "Gan taifeadadh, gan toiliú le lorg"
       },
@@ -3613,6 +3646,8 @@
         "tutti": "gach duine ar fhíseán",
         "relatori": "labhraíonn na cainteoirí",
         "si": "le taifeadadh",
+        "riservata": "with reserved recording",
+        "pubblica": "with public recording",
         "no": "gan taifeadadh",
         "openAccess": "oscailte do chách",
         "inviteOnly": "le cuireadh amháin"
@@ -3625,6 +3660,8 @@
         "invitationDesc": "Fanann an leathanach le feiceáil, ach ní féidir ach le daoine ar an liosta clárú; seolann tú an cuireadh leis an nasc clárúcháin trí ríomhphost ó leathanach na hócáide"
       },
       "previewInvitation": "Ní chláraíonn ach daoine a fuair cuireadh; gan clárú ní théann aon duine isteach.",
+      "previewPseudonyms": "The audience appears under a pseudonym",
+      "previewRealNames": "The audience appears under their own names",
       "templateReplaces": "Tugann teimpléad a shocruithe féin in ionad na bhfreagraí thíos. Scríobhann tú an teideal, na dátaí agus na daoine sna céimeanna eile.",
       "instantBack": "Cruthaigh ócáid sceidealta ina ionad"
     },
@@ -3762,6 +3799,7 @@
         "pubblicata": "Foilsithe.",
         "prontaAi": "Réidh ón iarléiriú: athbhreithnigh í; foilseofar í in éineacht leis an bhfíseán.",
         "prontaSottotitoli": "Réidh ó na fotheidil: seiceáil na hainmneacha agus foilsigh í.",
+        "daConfermare": "To start: the video is transcribed only once someone confirms that every voice has consented.",
         "inLavorazione": "Á próiseáil.",
         "nessuna": "Níl ceann ann: níl fotheidil ná iarléiriú ann.",
         "soloStaff": "Is é eagraí an imeachta a athbhreithníonn agus a fhoilsíonn í, ón limistéar riaracháin.",
@@ -3801,6 +3839,7 @@
         "title": "Leathanach poiblí",
         "visibile": "Le feiceáil ag cách.",
         "nellaLibreria": "Le feiceáil ag cách agus sa leabharlann físeán.",
+        "libreriaRiservata": "The page is visible, but the video is reserved for registrants: it does not appear in the video library.",
         "privata": "Tarraingthe siar: ní fheiceann an pobal é.",
         "scaduta": "Níl sé le feiceáil a thuilleadh: tá an dáta éagtha caite.",
         "archiviato": "Imeacht cartlannaithe: níl an leathanach poiblí.",
@@ -3951,6 +3990,7 @@
       "message": "D'iarr an ócáid seo ar gach duine toiliú le tras-scríobh a ndeir siad. Tá gach guth sa taifeadadh iomlán, lena n-áirítear daoine nár thug toiliú: ná déan é a thras-scríobh ach amháin má thug gach duine a labhraíonn ann toiliú. Coimeádtar do dhearbhú sa loga gníomhaíochta.",
       "confirm": "Sea, thug gach duine toiliú",
       "cancel": "Cealaigh",
+      "waitingNoCaptions": "The transcription of the full recording did not start on its own: each person chooses whether what they say is transcribed. Start it with {button} only if everyone who speaks in the recording has consented; otherwise the event stays without a transcript.",
       "waiting": "Níor thosaigh tras-scríobh an taifeadta iomláin leis féin: d'iarr an ócáid seo ar gach duine toiliú le tras-scríobh a ndeir siad. Ná tosaigh é le {button} ach amháin má thug gach duine a labhraíonn sa taifeadadh toiliú; murach sin fanfaidh an tras-scríbhinn ó na fotheidil."
     },
     "editCopyTitle": "Cóip den ócáid",
@@ -3979,6 +4019,12 @@
         "givenAt": "Tugtha ar",
         "withdrawnAt": "Tarraingthe siar ar",
         "textVersion": "Leagan an téacs",
+        "destination": "Destination",
+        "destinations": {
+          "PUBLIC": "Public",
+          "REGISTRANTS": "Reserved",
+          "none": "Not set"
+        },
         "kinds": {
           "recording": "Taifeadadh",
           "transcription": "Tras-scríobh a ndeirtear"
@@ -3992,8 +4038,10 @@
           "guest": "aoi",
           "host": "i gceannas nó ag labhairt"
         },
+        "erasedName": "(name removed on request)",
         "unreadableName": "(ní féidir an t-ainm a léamh)"
       },
+      "retainedNote": "{count, plural, one {# proof is kept} other {# proofs are kept}} for as long as the video or transcript stays published.",
       "countsNote": "Áirítear daoine: áirítear clárú, cuntas foirne nó nasc ainmnithe uair amháin; áirítear aoi a fhilleann ar chuairt eile arís."
     }
   },
@@ -4011,6 +4059,8 @@
     "dateLabel": "Dáta",
     "timeLabel": "Am",
     "durationLabel": "Fad",
+    "addressBookNote": "You are in the events address book, to be invited to similar events: you can withdraw your consent at any time.",
+    "addressBookOptOutLink": "Remove me from the address book",
     "myDataLink": "Do shonraí: iad a fheiceáil, a cheartú, toiliú a tharraingt siar nó do chlárú a chealú"
   },
   "home": {
@@ -4379,16 +4429,74 @@
   "gdpr": {
     "consent": {
       "recording": "Toilím le taifeadadh fuaime/físe an imeachta seo",
+      "recordingReserved": "I consent to the audio/video recording of this event. The video stays reserved for the organizers and registrants: it is not published. Registrants can watch it for as long as their registration data is kept.",
+      "recordingPublic": "I consent to the audio/video recording of this event and to its publication: anyone can watch the video on the event page and in the video library.",
+      "recordingNoVideo": "I consent to the recording of this event. The room video is not recorded: only the audio tracks of people who consent to transcription are kept, if the event uses them.",
       "multitrack": "Toilím go ndéanfar tras-scríobh ar mo chuid cainte, le m'ainm, do thuarascáil an imeachta. Má thaifeadann an t-imeacht rian fuaime ar leith do gach duine, ní thaifeadtar mo ghuth ach chun na críche sin agus scriostar an rian tar éis an tras-scríofa; ní úsáidtear é chun mo ghuth a aithint ná a atáirgeadh.",
+      "multitrackRetained": "I consent to my contributions being transcribed, with my name, for the event's report. If the event records a separate audio track for each person, my voice is recorded for this purpose only and the track is kept with the event data; it is not used to identify or reproduce my voice.",
       "multitrackOptional": "Is roghnach é: mura dtugann tú toiliú, glacfaidh tú páirt mar sin féin, ach ní rachaidh a ndeir tú isteach sa tras-scríbhinn agus ní thaifeadfar do ghuth ar rian ar leith. Má thaifeadtar an ócáid, beidh do ghuth san fhíseán fós.",
       "stayInTouch": "Ba mhaith liom eolas a fháil faoi imeachtaí atá le teacht agus a bheith curtha leis an leabhar seoltaí, le cuireadh a fháil chuig imeachtaí cosúla",
       "stayInTouchHelp": "Toiliú roghnach (airt. 6.1.a RGCS). Is féidir leat é a tharraingt siar am ar bith leis an nasc \"Bain mé den leabhar seoltaí\" sna ríomhphoist a gheobhaidh tú. Is iad an t-ainm agus an eagraíocht iad siúd ón gclárú seo.",
+      "stayInTouchRetention": "We keep this data for {months} months from this consent: the period restarts only if you tick the box again.",
       "recordingOptionalListenOnly": "Mura dtugann tú toiliú glacann tú páirt fós, ag éisteacht amháin: leanann tú agus scríobhann tú sa chomhrá, ach fanann an micreafón, an ceamara agus comhroinnt scáileáin múchta. Is féidir leat toiliú níos déanaí, ón seomra.",
       "recordingOptionalHost": "Mura dtugann tú toiliú, téann tú isteach agus stiúrann tú mar is gnách, ach ní choinnítear do ghuth sna rianta in aghaidh an duine ná sa tras-scríbhinn. Má thaifeadtar físeán an tseomra, beidh tú ann mar sin féin.",
       "recordingOptionalVoice": "Mura dtugann tú toiliú glacann tú páirt fós agus is féidir leat labhairt, ach fanann tú lasmuigh den taifeadadh: gan ainm, guth ná íomhá. Is féidir leat toiliú níos déanaí, ón seomra.",
       "recordingNotice": "Taifeadtar an t-imeacht (fuaim agus físeán). Glacann tú páirt gan micreafón ná ceamara: níl do ghuth ná d'íomhá sa taifeadadh, ach amháin má thugann an t-óstach an t-urlár duit.",
       "recordingNoticeVoice": "Taifeadtar an ócáid (fuaim agus físeán). Glacann tú páirt gan micreafón ná ceamara: ní bhíonn d'ainm, do ghuth ná d'íomhá sa taifeadadh, mura dtoilíonn tú sa seomra.",
+      "recordingHostAlwaysReserved": "You host this event: you are always in the recording, with name, voice, image and shared screen. The video stays reserved for the organizers and registrants: it is not published. Registrants can watch it for as long as their registration data is kept.",
+      "recordingHostAlwaysPublic": "You host this event: you are always in the recording, with name, voice, image and shared screen. The video can be published and watched by anyone.",
       "recordingHostAlways": "Óstálann tú an ócáid seo: bíonn tú sa taifeadadh i gcónaí, le hainm, guth, íomhá agus scáileán roinnte."
+    },
+    "sheet": {
+      "title": "This event and your data",
+      "intro": "This depends on how the organizers set up the event. Everything else is in the privacy notice.",
+      "recording": {
+        "label": "Recording",
+        "none": "No recording is planned for this event.",
+        "manual": "The hosts can start the audio and video recording. When it is on, the room shows it.",
+        "auto": "The event is recorded, audio and video, from the moment it starts. The room shows it.",
+        "tracksOnly": "The room video is not recorded: only one audio track for each person who consents.",
+        "destinationReserved": "The recording stays reserved for the organizers and registrants and is not published. Registrants can watch it for as long as their registration data is kept.",
+        "destinationPublic": "The recording may be published after the event.",
+        "destinationUnset": "The organizers decide after the event whether to publish it.",
+        "refuseOut": "If you do not consent you still take part and stay out of the recording.",
+        "refuseListenOnly": "If you do not consent you take part listening only.",
+        "hostsAlways": "The hosts are always in the recording, with name, voice, image and shared screen."
+      },
+      "transcript": {
+        "label": "Transcript",
+        "captions": "The caption text is kept, with the name, only for people who consent, and becomes the event transcript.",
+        "tracks": "For people who consent, an audio track is recorded and deleted after transcription.",
+        "tracksRetained": "For people who consent, an audio track is recorded and kept with the event data.",
+        "fromVideo": "After the event, the organizers can have the video transcribed only if everyone who speaks in it has consented."
+      },
+      "captions": {
+        "label": "Captions"
+      },
+      "ai": {
+        "label": "Artificial intelligence",
+        "summary": "After the event, an AI tool may write a summary of the recording.",
+        "translation": "The transcript and summary may be translated automatically.",
+        "dubbing": "The video may be dubbed with a synthetic voice.",
+        "report": "After the event, the staff may have an AI tool write a report, using also the chat without names, questions and polls."
+      },
+      "list": {
+        "label": "Participant list",
+        "visible": "Participants see the list of people in the room.",
+        "hidden": "In the room the audience does not see the list of people present. Hosts and speakers do."
+      },
+      "name": {
+        "label": "Your name",
+        "real": "In the room, in the chat and in questions you appear under your name.",
+        "pseudonym": "In the room, in the chat and in questions you appear under a pseudonym. The organizers see your registration data. If you consent to the transcript, your name stays there."
+      },
+      "retention": {
+        "label": "Retention",
+        "data": "Registration and room data are deleted {days, plural, one {# day} other {# days}} after the event ends. Questions and polls stay without names.",
+        "videoUnpublished": "If it is not made available, the recording is deleted with them.",
+        "videoPublishedDays": "If it is made available, it is deleted {days, plural, one {# day} other {# days}} later.",
+        "videoPublishedOpen": "If it is made available, it stays until the organizers remove it."
+      }
     },
     "export": {
       "title": "Mo chuid sonraí",
@@ -4434,6 +4542,12 @@
       "consentFuture": "Cumarsáid amach anseo",
       "consentWithdrawnOn": "Tarraingthe siar ar {date}",
       "consentNoteInRoom": "Má tá tú sa seomra faoi láthair, tá an tarraingt siar i bhfeidhm ó do chéad iontráil eile: chun é a chur i bhfeidhm láithreach, úsáid Toilithe sa seomra.",
+      "proofsTitle": "Consent proofs kept",
+      "proofsIntro": "The data for these events has been deleted. These proofs stay for as long as the video or transcript is published. You can withdraw your consent: what is already in the video stays, and to have it removed you must write to the data controller.",
+      "proofGivenOn": "Given on {date}",
+      "addressBookTitle": "Events address book",
+      "addressBookIntro": "You chose to stay in the address book, to be invited to similar events. We keep this data until {date}, unless you withdraw your consent or give it again.",
+      "addressBookOptOut": "Remove me from the address book",
       "consentFutureEffect": "Má tharraingíonn tú siar é ní bhfaighidh tú cumarsáid faoi imeachtaí amach anseo a thuilleadh agus fágann tú an leabhar seoltaí, do do chláruithe go léir."
     },
     "erasure": {
@@ -4448,11 +4562,13 @@
       "linkInvalid": "Tá an nasc neamhbhailí nó imithe in éag. Iarr nasc nua.",
       "confirmWarning": "Tá sibh ar tí na sonraí pearsanta go léir a bhaineann le bhur seoladh ríomhphoist a scriosadh go buan.",
       "confirmBody": "Scriosfar clárúcháin, ceisteanna, vótaí pobalbhreithe, aiseolas, meabhrúcháin agus d’iontráil i leabhar seoltaí na n-imeachtaí. Ní féidir an gníomh seo a chealú.",
+      "confirmProofs": "If an event has a published video or transcript, the type of consent, the date and the text you answered stay, without your name, for as long as that video or transcript stays published. They are there to prove the consent. The video does not change: to ask for your contributions to be removed, write to the data controller.",
       "confirmButton": "Deimhnigh an scriosadh",
       "cancel": "Cealaigh",
       "processing": "Á scriosadh...",
       "doneTitle": "Scriosadh críochnaithe",
       "doneBody": "Clárúcháin scriosta: {count}. Scriosadh na sonraí gaolmhara freisin.",
+      "doneProofs": "{count, plural, one {# consent proof remains, without your name, for as long as the video or transcript stays published.} other {# consent proofs remain, without your name, for as long as the video or transcript stays published.}}",
       "error": "Tharla earráid. Bain triail eile as ar ball, le bhur dtoil.",
       "rateLimited": "An iomarca iarratas. Bain triail eile as i gceann uaire.",
       "back": "Ar ais chuig mo chuid sonraí",
@@ -5302,6 +5418,7 @@
     "multitrackConsentTitle": "Tras-scríbhinn ar do chuid cainte",
     "recordingConsentTitle": "Taifeadadh na hócáide",
     "recordingConsentIntro": "Taifeadtar an ócáid (fuaim agus físeán). Le do thoiliú, bíonn d'ainm, do ghuth, d'íomhá agus an méid a roinneann tú ar an scáileán sa taifeadadh.",
+    "recordingConsentIntroNoVideo": "The room video is not recorded at this event.",
     "enterGardenTitle": "Téigh isteach sa chearnóg",
     "enterGardenHint": "Áit eile chun fanacht: siúil timpeall, buail leis na daoine eile atá ag fanacht, agus téigh isteach san ócáid bheo tríd an ngeata nuair a osclaíonn an seomra.",
     "backToWaitingRoom": "Ar ais go dtí an seomra feithimh",
@@ -5568,6 +5685,8 @@
     "audiencePublicDesc": "Aon duine a osclaíonn leathanach na hócáide. Is féidir leis a bheith le feiceáil sa leabharlann físeán.",
     "audienceRegistrants": "Cláraitheoirí amháin",
     "audienceRegistrantsDesc": "Iad siúd a chláraigh don ócáid, fiú mura ndeachaigh siad isteach sa seomra, tríd an nasc pearsanta san fhógra ríomhphoist. Ní bhíonn sé le feiceáil sa leabharlann físeán.",
+    "audienceReservedNote": "People consented to a reserved recording: only registrants and the organizers can see the video.",
+    "destinationMissing": "This event does not say where the recording goes: the consents collected do not say whether the video would be published. Check before you publish it.",
     "saveFailed": "Níor sábháladh an t-athrú. Bain triail eile as."
   },
   "postEvent": {
@@ -5577,7 +5696,9 @@
     "libraryListed": "Foilsigh sa leabharlann físeán",
     "libraryListedHelp": "Taispeáin an t-imeacht seo sa leabharlann phoiblí (/video-library). Teastaíonn taifeadadh foilsithe nó físeán YouTube, agus caithfidh leathanach an imeachta a bheith infheicthe.",
     "libraryListedNoRecording": "Níl aon taifeadadh foilsithe: ní bheidh an t-imeacht le feiceáil sa leabharlann go dtí go bhfoilseoidh tú an taifeadadh nó go gcuirfidh tú físeán YouTube leis.",
+    "libraryListedReserved": "Reserved recording: the event does not appear in the video library.",
     "showQA": "Taispeáin ceisteanna Q&A",
+    "qaReservedNote": "With a reserved recording, questions are not published.",
     "showMaterials": "Taispeáin ábhair roinnte",
     "showPolls": "Taispeáin torthaí pobalbhreitheanna",
     "showFeedback": "Taispeáin aiseolas",
@@ -5835,6 +5956,7 @@
     "sourceTranscriptMissing": "Níl an taifeadadh seo tras-scríofa fós: tras-scríobh é sula gcuirfidh tú aistriúchán leis.",
     "captionsTranscriptNotTranslatable": "Tagann an tras-scríbhinn seo ó na fotheidil bheo: teastaíonn tras-scríbhinn AI den taifeadadh don aistriúchán uathoibríoch.",
     "sameLanguage": "Is í an teanga a roghnaigh tú bunteanga an taifeadta: roghnaigh ceann eile.",
+    "recordingDestinationNotCovered": "The consents for this event cover a reserved recording: you cannot make it visible to everyone or link an external video.",
     "mtUnavailable": "Níl meaistriúchán suiteáilte ar an ásc seo."
   }
 }

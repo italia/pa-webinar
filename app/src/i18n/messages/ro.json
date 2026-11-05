@@ -298,6 +298,7 @@
       "generic": "Eroare la înscriere. Vă rugăm să reîncercați.",
       "questionnaireRequired": "Pentru a vă înscrie, răspundeți la întrebările din chestionar.",
       "questionnaireIncomplete": "Răspundeți la toate întrebările obligatorii din chestionar.",
+      "recordingDestinationChanged": "The text about the recording changed while you were filling in the form: reload the page and read it again.",
       "questionnaireChanged": "Chestionarul s-a schimbat în timp ce completați formularul: reîncărcați pagina și răspundeți din nou."
     }
   },
@@ -424,6 +425,7 @@
       "noMessages": "Niciun mesaj încă",
       "empty": "Niciun mesaj încă. Scrieți primul!",
       "inputLabel": "Mesaj chat",
+      "personalDataNotice": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read and download the chat.",
       "moderatorBadge": "Moderator",
       "attach": "Atașează un fișier",
       "emojiPicker": "Inserează emoji",
@@ -722,6 +724,7 @@
     "upvoted": "Votat",
     "noQuestions": "Nicio întrebare încă. Fiți primul!",
     "qaPersistenceNote": "Întrebările sunt salvate și vor fi disponibile după eveniment.",
+    "personalDataNotice": "Do not write other people's personal data, or your own if you do not want it made public: the text of your question may appear on the event page, without your name.",
     "qaPostEvent": "Întrebări și răspunsuri de la eveniment",
     "noAnsweredQuestions": "Nicio întrebare cu răspuns pentru acest eveniment.",
     "filterAll": "Toate",
@@ -742,6 +745,7 @@
       "editAnswer": "Modifică răspunsul",
       "answerFieldLabel": "Răspuns la întrebarea lui {name}",
       "answerPlaceholder": "Scrieți răspunsul (max. 2000 de caractere)",
+      "answerNotice": "The answer may appear on the event page: do not write personal data.",
       "sendAnswer": "Publică răspunsul",
       "cancel": "Anulează",
       "removeAnswer": "Elimină răspunsul"
@@ -1025,6 +1029,13 @@
           }
         },
         "recordingManualNote": "Înregistrarea nu pornește niciodată singură: un moderator o pornește cu butonul REC.",
+        "recordingDestination": "Where the recording goes",
+        "recordingDestinationReserved": "Reserved",
+        "recordingDestinationReservedDesc": "Organizers and registrants can see it, registrants for as long as their registration data is kept. It cannot be made public.",
+        "recordingDestinationPublic": "Public",
+        "recordingDestinationPublicDesc": "It can be published on the event page and in the video library. Participants consent to this too.",
+        "recordingDestinationNotSet": "Not set: the event was created before this choice existed.",
+        "recordingDestinationLocked": "Once the room has opened you can only switch to reserved: consents are valid for the text people read.",
         "audienceAnonymous": "Public anonim",
         "audienceAnonymousDesc": "Participanții apar celorlalți sub un pseudonim („Participant” și un cod) în video, în chat și la întrebări; lista participanților rămâne la moderatori și nu există piață. Util pentru evenimente mari; la evenimentele comunității oamenii vor să se cunoască.",
         "audienceAnonymousLocked": "Nu se poate schimba cât timp sala poate fi deschisă: ar lega pseudonimele de nume.",
@@ -1135,6 +1146,7 @@
         "askOrganization": "Organizație (obligatorie pentru înscriere)",
         "askRole": "Funcție (opțional)",
         "askType": "Tip de organizație (opțional)",
+        "askAddressBook": "Offer to join the address book (optional for people who register)",
         "questionnairesHeading": "Chestionare",
         "questionsBefore": "Înainte de eveniment, la înscriere: {count, plural, =0 {nicio întrebare în plus} one {# întrebare în plus} few {# întrebări în plus} other {# de întrebări în plus}}",
         "questionsAfter": "După eveniment: {count, plural, =0 {niciun chestionar de satisfacție} one {chestionar de satisfacție, # întrebare} few {chestionar de satisfacție, # întrebări} other {chestionar de satisfacție, # de întrebări}}",
@@ -1281,7 +1293,10 @@
         "participantsCan": "Participanți: {list}",
         "none": "niciuna",
         "recordingManual": "Disponibilă: pornește doar când un moderator apasă REC.",
+        "recordingDestinationReserved": "Destination: reserved for the organizers and registrants.",
+        "recordingDestinationPublic": "Destination: public.",
         "aiAfter": "După înregistrare: {list}.",
+        "aiConfirmVideo": "Without per-person tracks, the video transcription starts only after someone confirms that every voice has consented.",
         "scheduleHeading": "Când are loc",
         "scheduleIntro": "Când are loc evenimentul: data, ora și fusul orar.",
         "advancedIntro": "Valori deja alese de șablon: modificați doar ce este nevoie.",
@@ -1325,6 +1340,7 @@
         "askOrganization": "organizație",
         "askRole": "funcție",
         "askType": "tip de organizație",
+        "askAddressBook": "whether they want to join the address book",
         "permissionsHeading": "Cine ce poate face în sală",
         "permissionsIntro": "Ce pot face participanții și ce funcții ale sălii sunt pornite. Totul se poate schimba și în timpul evenimentului.",
         "consentsLine": "Consimțăminte la înscriere și în sală: {list}",
@@ -1336,6 +1352,12 @@
         "consentsWithdraw": "Participanții le pot retrage în sală, cu butonul „Consimțăminte”.",
         "participantListShown": "Lista participanților: vizibilă pentru toți.",
         "participantListHidden": "Lista participanților: doar pentru moderatori și vorbitori.",
+        "audiencePseudonyms": "Audience names: pseudonyms.",
+        "audienceRealNames": "Audience names: real names.",
+        "postEventQaHidden": "Questions after the event: not published.",
+        "postEventQaTextOnly": "Questions after the event: text only, without names.",
+        "addressBookOffered": "Address book: offered to people who register.",
+        "addressBookNotOffered": "Address book: not offered.",
         "consentRecordingOptional": "înregistrare, facultativă",
         "consentRecordingVoice": "înregistrare, liberă (fără acord, persoana rămâne în afara înregistrării)",
         "consentsHostsAlways": "Cine conduce și intervine este mereu în înregistrare: nu vede căsuța."
@@ -1542,6 +1564,8 @@
           "saveFailed": "Salvarea metadatelor a eșuat."
         }
       },
+      "reservedBadge": "Reserved",
+      "reservedHelp": "The recording is reserved for registrants: it cannot appear in the video library.",
       "updateFailed": "Actualizarea nu a reușit."
     },
     "recordingsLibrary": {
@@ -2306,6 +2330,8 @@
         "guestAccessEnabledHelp": "Persoanele neînregistrate pot intra la evenimentele în desfășurare indicând doar numele. Când este dezactivat, la evenimentele programate se intră doar cu înregistrare sau cu linkul de moderator ori de vorbitor; apelurile video instant rămân deschise oricui are linkul. Un eveniment doar pe bază de invitație nu admite niciodată oaspeți.",
         "publicRegistrationEnabled": "Înregistrare publică activă",
         "publicRegistrationEnabledHelp": "Oricine se poate înregistra la evenimente. Când este dezactivată, se pot înregistra doar persoanele de pe lista invitaților la eveniment, iar linkul personal pentru a intra se trimite doar prin email; persoanele deja înregistrate și linkurile moderatorilor și vorbitorilor funcționează în continuare. Este alegerea propusă noilor evenimente: fiecare poate decide altfel la pasul „Persoane”.",
+        "addressBookEnabled": "Events address book",
+        "addressBookEnabledHelp": "Offers people who register the chance to stay in the address book and be invited to similar events. When off, the checkbox disappears from the forms and the picker from the wizard; existing entries stay until they are withdrawn or expire.",
         "calendarPublic": "Calendar public",
         "calendarPublicHelp": "Publicați calendarul evenimentelor. Vizitatorii pot vedea evenimentele programate.",
         "parseTitleKicker": "Titluri cu kicker editorial",
@@ -2438,6 +2464,8 @@
       "featuresLabel": "Funcționalități",
       "whiteboardLabel": "Tablă",
       "recordingLabel": "Înregistrare",
+      "recordingDestination": "Recording destination",
+      "recordingDestinationNone": "Chosen when creating the event",
       "waitingRoomEngineLabel": "Sala de așteptare (implicită a șablonului)",
       "waitingRoomEngineSiteDefault": "Implicită a site-ului",
       "waitingRoomEngineGarden": "Grădină (standard)",
@@ -2459,6 +2487,7 @@
       "pickerSubtitle": "Selectați un șablon pentru a pre-configura setările evenimentului sau omiteți pentru a configura totul manual.",
       "skipTemplate": "Configurați manual",
       "postEventPublic": "Pagină publică după eveniment",
+      "offerAddressBook": "Offers the address book to people who register",
       "invalidFields": "Verificați aceste câmpuri: {fields}.",
       "descriptionOtherLanguages": "Există și versiuni în: {languages}, care nu se editează aici. Dacă modificați textul în italiană, sunt eliminate."
     },
@@ -3599,6 +3628,10 @@
       "rec": {
         "yes": "Da, când apeși REC",
         "yesDesc": "După eveniment: transcriere, rezumat și traducere",
+        "reserved": "Yes, reserved",
+        "reservedDesc": "Organizers and registrants can see it",
+        "public": "Yes, public",
+        "publicDesc": "It can be published on the event page",
         "no": "Nu",
         "noDesc": "Fără înregistrare, fără consimțământ de cerut"
       },
@@ -3613,6 +3646,8 @@
         "tutti": "toți pe video",
         "relatori": "vorbesc vorbitorii",
         "si": "cu înregistrare",
+        "riservata": "with reserved recording",
+        "pubblica": "with public recording",
         "no": "fără înregistrare",
         "openAccess": "deschis tuturor",
         "inviteOnly": "doar pe bază de invitație"
@@ -3625,6 +3660,8 @@
         "invitationDesc": "Pagina rămâne vizibilă, dar se pot înscrie doar cei de pe listă; invitația cu linkul de înscriere o trimiți pe e-mail din pagina evenimentului"
       },
       "previewInvitation": "Se înscriu doar cei invitați; fără înscriere nu se intră.",
+      "previewPseudonyms": "The audience appears under a pseudonym",
+      "previewRealNames": "The audience appears under their own names",
       "templateReplaces": "Un șablon aduce propriile setări în locul răspunsurilor de mai jos. Titlul, datele și persoanele le scrii în pașii următori.",
       "instantBack": "Creează în schimb un eveniment programat"
     },
@@ -3762,6 +3799,7 @@
         "pubblicata": "Publicată.",
         "prontaAi": "Gata din postproducție: revizuiți-o; se publică împreună cu videoclipul.",
         "prontaSottotitoli": "Gata din subtitrări: verificați numele și publicați-o.",
+        "daConfermare": "To start: the video is transcribed only once someone confirms that every voice has consented.",
         "inLavorazione": "În curs de procesare.",
         "nessuna": "Nu există: nici subtitrări, nici postproducție.",
         "soloStaff": "Organizatorul evenimentului o revizuiește și o publică din zona de administrare.",
@@ -3801,6 +3839,7 @@
         "title": "Pagină publică",
         "visibile": "Vizibilă pentru toți.",
         "nellaLibreria": "Vizibilă pentru toți și în biblioteca video.",
+        "libreriaRiservata": "The page is visible, but the video is reserved for registrants: it does not appear in the video library.",
         "privata": "Retrasă: publicul nu o vede.",
         "scaduta": "Nu mai este vizibilă: data de expirare a trecut.",
         "archiviato": "Eveniment arhivat: pagina nu este publică.",
@@ -3951,6 +3990,7 @@
       "message": "Acest eveniment a cerut fiecăruia consimțământul pentru transcrierea intervențiilor sale. Înregistrarea completă conține toate vocile, inclusiv ale celor care nu și-au dat consimțământul: transcrie-o doar dacă toți cei care vorbesc în ea au fost de acord. Confirmarea ta rămâne în jurnalul de activitate.",
       "confirm": "Da, toți au fost de acord",
       "cancel": "Anulează",
+      "waitingNoCaptions": "The transcription of the full recording did not start on its own: each person chooses whether what they say is transcribed. Start it with {button} only if everyone who speaks in the recording has consented; otherwise the event stays without a transcript.",
       "waiting": "Transcrierea înregistrării complete nu a pornit singură: acest eveniment a cerut fiecăruia consimțământul pentru transcrierea intervențiilor sale. Pornește-o cu {button} doar dacă toți cei care vorbesc în înregistrare au fost de acord; altfel rămâne transcrierea din subtitrări."
     },
     "editCopyTitle": "Copia evenimentului",
@@ -3979,6 +4019,12 @@
         "givenAt": "Dat la",
         "withdrawnAt": "Retras la",
         "textVersion": "Versiunea textului",
+        "destination": "Destination",
+        "destinations": {
+          "PUBLIC": "Public",
+          "REGISTRANTS": "Reserved",
+          "none": "Not set"
+        },
         "kinds": {
           "recording": "Înregistrare",
           "transcription": "Transcrierea intervențiilor"
@@ -3992,8 +4038,10 @@
           "guest": "invitat",
           "host": "conduce sau intervine"
         },
+        "erasedName": "(name removed on request)",
         "unreadableName": "(nume ilizibil)"
       },
+      "retainedNote": "{count, plural, one {# proof is kept} other {# proofs are kept}} for as long as the video or transcript stays published.",
       "countsNote": "Se numără persoane: o înscriere, un cont al personalului sau un link nominal contează o dată; un invitat care revine la altă vizită contează din nou."
     }
   },
@@ -4011,6 +4059,8 @@
     "dateLabel": "Data",
     "timeLabel": "Ora",
     "durationLabel": "Durată",
+    "addressBookNote": "You are in the events address book, to be invited to similar events: you can withdraw your consent at any time.",
+    "addressBookOptOutLink": "Remove me from the address book",
     "myDataLink": "Datele tale: vizualizare, corectare, retragerea unui consimțământ sau anularea înscrierii"
   },
   "home": {
@@ -4379,16 +4429,74 @@
   "gdpr": {
     "consent": {
       "recording": "Consimt la înregistrarea audio/video a evenimentului",
+      "recordingReserved": "I consent to the audio/video recording of this event. The video stays reserved for the organizers and registrants: it is not published. Registrants can watch it for as long as their registration data is kept.",
+      "recordingPublic": "I consent to the audio/video recording of this event and to its publication: anyone can watch the video on the event page and in the video library.",
+      "recordingNoVideo": "I consent to the recording of this event. The room video is not recorded: only the audio tracks of people who consent to transcription are kept, if the event uses them.",
       "multitrack": "Sunt de acord ca intervențiile mele să fie transcrise, cu numele meu, pentru raportul evenimentului. Dacă evenimentul înregistrează o pistă audio separată pentru fiecare persoană, vocea mea este înregistrată numai în acest scop, iar pista se șterge după transcriere; nu este folosită pentru a-mi identifica sau reproduce vocea.",
+      "multitrackRetained": "I consent to my contributions being transcribed, with my name, for the event's report. If the event records a separate audio track for each person, my voice is recorded for this purpose only and the track is kept with the event data; it is not used to identify or reproduce my voice.",
       "multitrackOptional": "Este opțional: dacă nu îți dai consimțământul, participi oricum, dar intervențiile tale nu intră în transcriere și vocea ta nu este înregistrată pe o pistă separată. Dacă evenimentul este înregistrat, vocea ta rămâne totuși în videoclip.",
       "stayInTouch": "Vreau să primesc informații despre evenimentele viitoare și să fiu adăugat în agenda de contacte, pentru a fi invitat la evenimente similare",
       "stayInTouchHelp": "Consimțământ opțional (art. 6.1.a GDPR). Îl poți retrage oricând prin linkul „Elimină-mă din agenda de contacte” din e-mailurile pe care le primești. Numele și organizația sunt cele din această înscriere.",
+      "stayInTouchRetention": "We keep this data for {months} months from this consent: the period restarts only if you tick the box again.",
       "recordingOptionalListenOnly": "Dacă nu îți dai acordul, participi totuși, doar ascultând: urmărești și scrii în chat, dar microfonul, camera și partajarea ecranului rămân oprite. Poți să îți dai acordul mai târziu, din sală.",
       "recordingOptionalHost": "Dacă nu îți dai consimțământul, intri oricum și conduci ca de obicei, dar vocea ta nu rămâne în pistele pe persoană și nici în transcriere. Videoclipul sălii, dacă este înregistrat, te include oricum.",
       "recordingOptionalVoice": "Dacă nu îți dai acordul, participi totuși și poți interveni, dar rămâi în afara înregistrării: nici numele, nici vocea, nici imaginea. Poți să îți dai acordul mai târziu, din sală.",
       "recordingNotice": "Evenimentul este înregistrat (audio și video). Participi fără microfon și cameră: înregistrarea nu conține vocea sau imaginea ta, decât dacă moderatorul îți dă cuvântul.",
       "recordingNoticeVoice": "Evenimentul este înregistrat (audio și video). Participi fără microfon sau cameră: înregistrarea nu conține numele, vocea sau imaginea ta, decât dacă îți dai acordul în sală.",
+      "recordingHostAlwaysReserved": "You host this event: you are always in the recording, with name, voice, image and shared screen. The video stays reserved for the organizers and registrants: it is not published. Registrants can watch it for as long as their registration data is kept.",
+      "recordingHostAlwaysPublic": "You host this event: you are always in the recording, with name, voice, image and shared screen. The video can be published and watched by anyone.",
       "recordingHostAlways": "Conduci acest eveniment: ești mereu în înregistrare, cu nume, voce, imagine și ecran partajat."
+    },
+    "sheet": {
+      "title": "This event and your data",
+      "intro": "This depends on how the organizers set up the event. Everything else is in the privacy notice.",
+      "recording": {
+        "label": "Recording",
+        "none": "No recording is planned for this event.",
+        "manual": "The hosts can start the audio and video recording. When it is on, the room shows it.",
+        "auto": "The event is recorded, audio and video, from the moment it starts. The room shows it.",
+        "tracksOnly": "The room video is not recorded: only one audio track for each person who consents.",
+        "destinationReserved": "The recording stays reserved for the organizers and registrants and is not published. Registrants can watch it for as long as their registration data is kept.",
+        "destinationPublic": "The recording may be published after the event.",
+        "destinationUnset": "The organizers decide after the event whether to publish it.",
+        "refuseOut": "If you do not consent you still take part and stay out of the recording.",
+        "refuseListenOnly": "If you do not consent you take part listening only.",
+        "hostsAlways": "The hosts are always in the recording, with name, voice, image and shared screen."
+      },
+      "transcript": {
+        "label": "Transcript",
+        "captions": "The caption text is kept, with the name, only for people who consent, and becomes the event transcript.",
+        "tracks": "For people who consent, an audio track is recorded and deleted after transcription.",
+        "tracksRetained": "For people who consent, an audio track is recorded and kept with the event data.",
+        "fromVideo": "After the event, the organizers can have the video transcribed only if everyone who speaks in it has consented."
+      },
+      "captions": {
+        "label": "Captions"
+      },
+      "ai": {
+        "label": "Artificial intelligence",
+        "summary": "After the event, an AI tool may write a summary of the recording.",
+        "translation": "The transcript and summary may be translated automatically.",
+        "dubbing": "The video may be dubbed with a synthetic voice.",
+        "report": "After the event, the staff may have an AI tool write a report, using also the chat without names, questions and polls."
+      },
+      "list": {
+        "label": "Participant list",
+        "visible": "Participants see the list of people in the room.",
+        "hidden": "In the room the audience does not see the list of people present. Hosts and speakers do."
+      },
+      "name": {
+        "label": "Your name",
+        "real": "In the room, in the chat and in questions you appear under your name.",
+        "pseudonym": "In the room, in the chat and in questions you appear under a pseudonym. The organizers see your registration data. If you consent to the transcript, your name stays there."
+      },
+      "retention": {
+        "label": "Retention",
+        "data": "Registration and room data are deleted {days, plural, one {# day} other {# days}} after the event ends. Questions and polls stay without names.",
+        "videoUnpublished": "If it is not made available, the recording is deleted with them.",
+        "videoPublishedDays": "If it is made available, it is deleted {days, plural, one {# day} other {# days}} later.",
+        "videoPublishedOpen": "If it is made available, it stays until the organizers remove it."
+      }
     },
     "export": {
       "title": "Datele mele",
@@ -4434,6 +4542,12 @@
       "consentFuture": "Comunicări viitoare",
       "consentWithdrawnOn": "Retras la {date}",
       "consentNoteInRoom": "Dacă ești acum în sală, retragerea se aplică de la următoarea intrare: pentru a se aplica imediat, folosește Consimțăminte în sală.",
+      "proofsTitle": "Consent proofs kept",
+      "proofsIntro": "The data for these events has been deleted. These proofs stay for as long as the video or transcript is published. You can withdraw your consent: what is already in the video stays, and to have it removed you must write to the data controller.",
+      "proofGivenOn": "Given on {date}",
+      "addressBookTitle": "Events address book",
+      "addressBookIntro": "You chose to stay in the address book, to be invited to similar events. We keep this data until {date}, unless you withdraw your consent or give it again.",
+      "addressBookOptOut": "Remove me from the address book",
       "consentFutureEffect": "Dacă îl retragi, nu mai primești comunicări despre evenimentele viitoare și ieși din agendă, pentru toate înscrierile tale."
     },
     "erasure": {
@@ -4448,11 +4562,13 @@
       "linkInvalid": "Linkul nu este valid sau a expirat. Solicitați un link nou.",
       "confirmWarning": "Sunteți pe cale să ștergeți definitiv toate datele personale asociate adresei dumneavoastră de email.",
       "confirmBody": "Vor fi șterse înregistrările, întrebările, voturile din sondaje, feedbackul, mementourile și înscrierea dumneavoastră în agenda de evenimente. Operațiunea este ireversibilă.",
+      "confirmProofs": "If an event has a published video or transcript, the type of consent, the date and the text you answered stay, without your name, for as long as that video or transcript stays published. They are there to prove the consent. The video does not change: to ask for your contributions to be removed, write to the data controller.",
       "confirmButton": "Confirmați ștergerea",
       "cancel": "Anulați",
       "processing": "Ștergere în curs...",
       "doneTitle": "Ștergere finalizată",
       "doneBody": "Înregistrări șterse: {count}, împreună cu datele asociate.",
+      "doneProofs": "{count, plural, one {# consent proof remains, without your name, for as long as the video or transcript stays published.} other {# consent proofs remain, without your name, for as long as the video or transcript stays published.}}",
       "error": "A apărut o eroare. Reîncercați mai târziu.",
       "rateLimited": "Prea multe solicitări. Reîncercați peste o oră.",
       "back": "Înapoi la datele mele",
@@ -5302,6 +5418,7 @@
     "multitrackConsentTitle": "Transcrierea intervențiilor dvs.",
     "recordingConsentTitle": "Înregistrarea evenimentului",
     "recordingConsentIntro": "Evenimentul este înregistrat (audio și video). Cu acordul tău, înregistrarea conține numele, vocea, imaginea ta și ce partajezi pe ecran.",
+    "recordingConsentIntroNoVideo": "The room video is not recorded at this event.",
     "enterGardenTitle": "Intră în piață",
     "enterGardenHint": "Un alt loc în care să aștepți: plimbă-te, întâlnește-i pe cei care așteaptă și intră în transmisiunea live pe poartă când se deschide sala.",
     "backToWaitingRoom": "Înapoi la sala de așteptare",
@@ -5568,6 +5685,8 @@
     "audiencePublicDesc": "Oricine deschide pagina evenimentului. Poate apărea în videotecă.",
     "audienceRegistrants": "Doar înscrișii",
     "audienceRegistrantsDesc": "Cei înscriși la eveniment, chiar dacă nu au intrat în sală, prin linkul personal din notificarea pe e-mail. Nu apare în videotecă.",
+    "audienceReservedNote": "People consented to a reserved recording: only registrants and the organizers can see the video.",
+    "destinationMissing": "This event does not say where the recording goes: the consents collected do not say whether the video would be published. Check before you publish it.",
     "saveFailed": "Modificarea nu a fost salvată. Încearcă din nou."
   },
   "postEvent": {
@@ -5577,7 +5696,9 @@
     "libraryListed": "Publică în biblioteca video",
     "libraryListedHelp": "Afișează acest eveniment în biblioteca publică (/video-library). Necesită o înregistrare publicată sau un videoclip YouTube și ca pagina evenimentului să fie vizibilă.",
     "libraryListedNoRecording": "Nicio înregistrare publicată: evenimentul nu va apărea în bibliotecă până când nu publicați înregistrarea sau nu adăugați un videoclip YouTube.",
+    "libraryListedReserved": "Reserved recording: the event does not appear in the video library.",
     "showQA": "Afișați întrebările Q&A",
+    "qaReservedNote": "With a reserved recording, questions are not published.",
     "showMaterials": "Afișați materialele distribuite",
     "showPolls": "Afișați rezultatele sondajelor",
     "showFeedback": "Afișați feedbackul",
@@ -5835,6 +5956,7 @@
     "sourceTranscriptMissing": "Această înregistrare nu este încă transcrisă: transcrie-o înainte de a adăuga o traducere.",
     "captionsTranscriptNotTranslatable": "Această transcriere provine din subtitrările live: traducerea automată necesită o transcriere AI a înregistrării.",
     "sameLanguage": "Limba aleasă este cea originală a înregistrării: alege alta.",
+    "recordingDestinationNotCovered": "The consents for this event cover a reserved recording: you cannot make it visible to everyone or link an external video.",
     "mtUnavailable": "Traducerea automată nu este instalată pe această instanță."
   }
 }

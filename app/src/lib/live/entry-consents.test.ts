@@ -3,7 +3,11 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { consensiDaInviare, consensoRegistrazioneIngresso } from './entry-consents';
+import {
+  consensiDaInviare,
+  consensoRegistrazioneIngresso,
+  consensoTrascrizioneIngresso,
+} from './entry-consents';
 
 const interattivo = {
   recordingEnabled: true,
@@ -71,6 +75,72 @@ describe('consensoRegistrazioneIngresso', () => {
 describe('consensoRegistrazioneIngresso — solo ascolto per chi non acconsente', () => {
   it('chiesto ma libero; chi l\'ha dato non lo rivede', () => {
     expect(consensoRegistrazioneIngresso(base)).toEqual({ richiesto: true, soloAscolto: false });
+  });
+});
+
+describe('consensoTrascrizioneIngresso', () => {
+  const siNo = [false, true];
+  const voci = ['assente', 'rimovibile', 'fissa'] as const;
+
+  it("con tracce e sottotitoli risponde come la condizione della sala d'attesa", () => {
+    for (const multitrackRecordingEnabled of siNo) {
+      for (const captionsTranscript of siNo) {
+        for (const concluso of siNo) {
+          for (const giaDato of siNo) {
+            for (const soloAscolto of siNo) {
+              for (const voce of voci) {
+                const atteso =
+                  (multitrackRecordingEnabled || captionsTranscript) &&
+                  !concluso &&
+                  !giaDato &&
+                  !(voce === 'rimovibile' && soloAscolto);
+                expect(
+                  consensoTrascrizioneIngresso({
+                    formato: { multitrackRecordingEnabled, captionsTranscript },
+                    concluso,
+                    giaDato,
+                    voce,
+                    soloAscolto,
+                  }),
+                ).toBe(atteso);
+              }
+            }
+          }
+        }
+      }
+    }
+  });
+
+  it('con il solo formato risponde come la condizione della finestra dei consensi', () => {
+    for (const multitrackRecordingEnabled of siNo) {
+      for (const captionsTranscript of siNo) {
+        for (const concluso of siNo) {
+          expect(
+            consensoTrascrizioneIngresso({
+              formato: { multitrackRecordingEnabled, captionsTranscript },
+              concluso,
+            }),
+          ).toBe((multitrackRecordingEnabled || captionsTranscript) && !concluso);
+        }
+      }
+    }
+  });
+
+  it('la trascrizione dal video apre la casella come le altre due', () => {
+    const formato = { trascrizioneVideo: true };
+    expect(consensoTrascrizioneIngresso({ formato, concluso: false })).toBe(true);
+    expect(consensoTrascrizioneIngresso({ formato, concluso: true })).toBe(false);
+    expect(consensoTrascrizioneIngresso({ formato, concluso: false, giaDato: true })).toBe(false);
+    expect(
+      consensoTrascrizioneIngresso({ formato, concluso: false, voce: 'rimovibile', soloAscolto: true }),
+    ).toBe(false);
+    expect(
+      consensoTrascrizioneIngresso({ formato, concluso: false, voce: 'fissa', soloAscolto: true }),
+    ).toBe(true);
+  });
+
+  it("senza nessuna trascrizione non c'e' casella", () => {
+    expect(consensoTrascrizioneIngresso({ formato: {}, concluso: false })).toBe(false);
   });
 });
 

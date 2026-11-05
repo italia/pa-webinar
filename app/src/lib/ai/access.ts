@@ -61,6 +61,7 @@ export async function assertPostprodAccessible(slug: string): Promise<PostprodAc
         captionsTranscriptEnabled: true,
         transcriptPublished: true,
         recordingAudience: true,
+        recordingDestination: true,
       },
     }),
   ]);

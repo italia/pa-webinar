@@ -17,6 +17,7 @@ import {
   ModalFooter,
   Spinner,
 } from 'design-react-kit';
+import type { RecordingAudience } from '@prisma/client';
 
 import { Icon } from '@/components/ui/icon';
 import { Link, useRouter, percorso } from '@/i18n/navigation';
@@ -151,8 +152,15 @@ interface EventInfo {
   gracePeriodMinutes?: number | null;
   /** Tetto del fuori orario risolto (default di sito applicato): lo usa il contatore. */
   effectiveGraceMinutes?: number;
+  /** Il recupero durante la diretta. Non ha una rotta propria, quindi resta un
+   *  indirizzo: la pagina lo passa solo a evento LIVE e con una destinazione
+   *  non riservata. */
   tempRecordingUrl?: string | null;
   recordingUrl?: string | null;
+  /** Chi ha aperto la pagina puo' vedere il video (`vedeVideo`,
+   *  lib/recording/audience). La pagina non passa l'indirizzo: il link lo
+   *  costruisce il client verso la rotta del video, che rifa' il controllo. */
+  videoDisponibile?: boolean;
   /** Admin-configured post-event visibility — used to seed the end-of-call
    *  "Destino evento" default so ending the call never silently overrides a
    *  pre-configured private (postEventPublic=false) or library setting. */
@@ -163,6 +171,11 @@ interface EventInfo {
   feedbackEnabled?: boolean;
   /** Testo di consenso alla registrazione scelto per l'evento; null = quello predefinito. */
   recordingConsentText?: string | null;
+  /** La destinazione del video all'apertura della pagina
+   *  (Event.recordingDestination): il testo del consenso la dichiara e il token
+   *  la riceve con il consenso. Quella in vigore la riporta ogni risposta del
+   *  token (`JitsiCredentials.recordingDestination`). */
+  recordingDestination?: RecordingAudience | null;
   /** Chi non acconsente alla registrazione entra in solo ascolto. */
   /** La voce di chi non acconsente nel video (lib/recording/availability). */
   voceNelVideo?: VoceNelVideo;
@@ -189,6 +202,12 @@ interface EventInfo {
   multitrackRecordingEnabled?: boolean;
   /** La trascrizione dai sottotitoli e' attiva: si chiede il consenso. */
   captionsTranscript?: boolean;
+  /** La trascrizione parte dal video, senza tracce per persona: si chiede il
+   *  consenso anche cosi' (lib/registration/consents). */
+  trascrizioneVideo?: boolean;
+  /** Le tracce per persona si conservano: la casella della trascrizione non ne
+   *  promette la cancellazione (`chiaveConsensoTrascrizione`). */
+  retainParticipantTracks?: boolean;
 }
 
 interface WatermarkSettings {
@@ -327,6 +346,11 @@ interface JitsiCredentials {
   voiceExcluded?: boolean;
   /** L'elenco di chi partecipa, al momento dell'ingresso. */
   participantListVisible?: boolean;
+  /** La destinazione in vigore (`destinazioneDelTesto`, lib/recording/destination),
+   *  che puo' essere cambiata mentre la pagina era aperta: la sala mostra il testo
+   *  di questa. Il consenso resta legato al testo su cui e' stato dato (`consensoOra`):
+   *  se quel testo non la copre, si dimentica e si richiede sul testo nuovo. */
+  recordingDestination?: RecordingAudience | null;
 }
 
 /** La notifica di Jitsi «Il moderatore ti chiede di intervenire» (il suo uid). */

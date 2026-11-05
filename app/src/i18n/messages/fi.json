@@ -298,6 +298,7 @@
       "generic": "Virhe ilmoittautumisessa. Yritä uudelleen.",
       "questionnaireRequired": "Vastaa kyselyn kysymyksiin ilmoittautuaksesi.",
       "questionnaireIncomplete": "Vastaa kaikkiin kyselyn pakollisiin kysymyksiin.",
+      "recordingDestinationChanged": "The text about the recording changed while you were filling in the form: reload the page and read it again.",
       "questionnaireChanged": "Kysely muuttui, kun täytit lomaketta: lataa sivu uudelleen ja vastaa uudelleen."
     }
   },
@@ -424,6 +425,7 @@
       "noMessages": "Ei viestejä",
       "empty": "Ei vielä viestejä. Kirjoita ensimmäinen!",
       "inputLabel": "Keskusteluviesti",
+      "personalDataNotice": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read and download the chat.",
       "moderatorBadge": "Moderaattori",
       "attach": "Liitä tiedosto",
       "emojiPicker": "Lisää emoji",
@@ -722,6 +724,7 @@
     "upvoted": "Äänestetty",
     "noQuestions": "Ei vielä kysymyksiä. Ole ensimmäinen!",
     "qaPersistenceNote": "Kysymykset tallennetaan ja ovat saatavilla tapahtuman jälkeen.",
+    "personalDataNotice": "Do not write other people's personal data, or your own if you do not want it made public: the text of your question may appear on the event page, without your name.",
     "qaPostEvent": "Q&A tapahtumasta",
     "noAnsweredQuestions": "Ei vastattuja kysymyksiä tähän tapahtumaan.",
     "filterAll": "Kaikki",
@@ -742,6 +745,7 @@
       "editAnswer": "Muokkaa vastausta",
       "answerFieldLabel": "Vastaus kysymykseen, kysyjä {name}",
       "answerPlaceholder": "Kirjoita vastaus (enintään 2000 merkkiä)",
+      "answerNotice": "The answer may appear on the event page: do not write personal data.",
       "sendAnswer": "Julkaise vastaus",
       "cancel": "Peruuta",
       "removeAnswer": "Poista vastaus"
@@ -1025,6 +1029,13 @@
           }
         },
         "recordingManualNote": "Tallennus ei koskaan ala itsestään: juontaja käynnistää sen REC-painikkeella.",
+        "recordingDestination": "Where the recording goes",
+        "recordingDestinationReserved": "Reserved",
+        "recordingDestinationReservedDesc": "Organizers and registrants can see it, registrants for as long as their registration data is kept. It cannot be made public.",
+        "recordingDestinationPublic": "Public",
+        "recordingDestinationPublicDesc": "It can be published on the event page and in the video library. Participants consent to this too.",
+        "recordingDestinationNotSet": "Not set: the event was created before this choice existed.",
+        "recordingDestinationLocked": "Once the room has opened you can only switch to reserved: consents are valid for the text people read.",
         "audienceAnonymous": "Anonyymi yleisö",
         "audienceAnonymousDesc": "Osallistujat näkyvät muille salanimellä (”Osallistuja” ja koodi) videossa, chatissa ja kysymyksissä; osallistujaluettelo jää juontajille, eikä aukiota ole. Hyödyllinen suurissa tapahtumissa; yhteisötapahtumissa halutaan tutustua toisiin.",
         "audienceAnonymousLocked": "Ei voi muuttaa huoneen ollessa mahdollisesti auki: se yhdistäisi salanimet nimiin.",
@@ -1135,6 +1146,7 @@
         "askOrganization": "Organisaatio (pakollinen ilmoittautumiseen)",
         "askRole": "Rooli (valinnainen)",
         "askType": "Organisaation tyyppi (valinnainen)",
+        "askAddressBook": "Offer to join the address book (optional for people who register)",
         "questionnairesHeading": "Kyselyt",
         "questionsBefore": "Ennen tapahtumaa, ilmoittautumisen yhteydessä: {count, plural, =0 {ei lisäkysymyksiä} one {# lisäkysymys} other {# lisäkysymystä}}",
         "questionsAfter": "Tapahtuman jälkeen: {count, plural, =0 {ei tyytyväisyyskyselyä} one {tyytyväisyyskysely, # kysymys} other {tyytyväisyyskysely, # kysymystä}}",
@@ -1281,7 +1293,10 @@
         "participantsCan": "Osallistujat: {list}",
         "none": "ei mitään",
         "recordingManual": "Käytettävissä: alkaa vasta, kun juontaja painaa REC.",
+        "recordingDestinationReserved": "Destination: reserved for the organizers and registrants.",
+        "recordingDestinationPublic": "Destination: public.",
         "aiAfter": "Tallennuksen jälkeen: {list}.",
+        "aiConfirmVideo": "Without per-person tracks, the video transcription starts only after someone confirms that every voice has consented.",
         "scheduleHeading": "Milloin se järjestetään",
         "scheduleIntro": "Milloin tapahtuma järjestetään: päivämäärä, kellonaika ja aikavyöhyke.",
         "advancedIntro": "Mallin jo valitsemat arvot: muuta vain tarvittava.",
@@ -1325,6 +1340,7 @@
         "askOrganization": "organisaatio",
         "askRole": "rooli",
         "askType": "organisaation tyyppi",
+        "askAddressBook": "whether they want to join the address book",
         "permissionsHeading": "Kuka voi tehdä mitä huoneessa",
         "permissionsIntro": "Mitä osallistujat voivat tehdä ja mitkä huoneen toiminnot ovat käytössä. Kaikkea voi muuttaa myös tapahtuman aikana.",
         "consentsLine": "Suostumukset ilmoittautuessa ja huoneessa: {list}",
@@ -1336,6 +1352,12 @@
         "consentsWithdraw": "Osallistujat voivat peruuttaa ne huoneessa Suostumukset-painikkeella.",
         "participantListShown": "Osallistujaluettelo: näkyy kaikille.",
         "participantListHidden": "Osallistujaluettelo: vain juontajille ja puhujille.",
+        "audiencePseudonyms": "Audience names: pseudonyms.",
+        "audienceRealNames": "Audience names: real names.",
+        "postEventQaHidden": "Questions after the event: not published.",
+        "postEventQaTextOnly": "Questions after the event: text only, without names.",
+        "addressBookOffered": "Address book: offered to people who register.",
+        "addressBookNotOffered": "Address book: not offered.",
         "consentRecordingOptional": "tallennus, vapaaehtoinen",
         "consentRecordingVoice": "tallenne, vapaaehtoinen (ilman suostumusta henkilö jää tallenteen ulkopuolelle)",
         "consentsHostsAlways": "Juontajat ja puhujat ovat aina tallenteessa: he eivät näe ruutua."
@@ -1542,6 +1564,8 @@
           "saveFailed": "Metatietojen tallennus epäonnistui."
         }
       },
+      "reservedBadge": "Reserved",
+      "reservedHelp": "The recording is reserved for registrants: it cannot appear in the video library.",
       "updateFailed": "Päivitys epäonnistui."
     },
     "recordingsLibrary": {
@@ -2306,6 +2330,8 @@
         "guestAccessEnabledHelp": "Ilmoittautumattomat voivat liittyä käynnissä oleviin tapahtumiin pelkällä nimellään. Kun asetus on pois käytöstä, suunniteltuihin tapahtumiin pääsee vain ilmoittautumalla tai moderaattorin tai puhujan linkillä; pikavideopuhelut pysyvät avoimina kaikille, joilla on linkki. Vain kutsutuille tarkoitettuun tapahtumaan ei koskaan päästetä vieraita.",
         "publicRegistrationEnabled": "Julkinen rekisteröityminen käytössä",
         "publicRegistrationEnabledHelp": "Kuka tahansa voi ilmoittautua tapahtumiin. Kun asetus on pois käytöstä, vain tapahtuman kutsuttujen luettelossa olevat voivat ilmoittautua, ja henkilökohtainen linkki lähetetään vain sähköpostitse; jo ilmoittautuneet sekä moderaattorien ja puhujien linkit toimivat edelleen. Tämä on uusille tapahtumille ehdotettu valinta: kukin tapahtuma voi valita toisin vaiheessa ”Henkilöt”.",
+        "addressBookEnabled": "Events address book",
+        "addressBookEnabledHelp": "Offers people who register the chance to stay in the address book and be invited to similar events. When off, the checkbox disappears from the forms and the picker from the wizard; existing entries stay until they are withdrawn or expire.",
         "calendarPublic": "Julkinen kalenteri",
         "calendarPublicHelp": "Julkaise tapahtumakalenteri. Kävijät voivat nähdä suunnitellut tapahtumat.",
         "parseTitleKicker": "Toimitukselliset yläotsikot otsikossa",
@@ -2438,6 +2464,8 @@
       "featuresLabel": "Toiminnot",
       "whiteboardLabel": "Piirtotaulu",
       "recordingLabel": "Tallennus",
+      "recordingDestination": "Recording destination",
+      "recordingDestinationNone": "Chosen when creating the event",
       "waitingRoomEngineLabel": "Odotushuone (mallipohjan oletus)",
       "waitingRoomEngineSiteDefault": "Sivuston oletus",
       "waitingRoomEngineGarden": "Puutarha (tavallinen)",
@@ -2459,6 +2487,7 @@
       "pickerSubtitle": "Valitse malli esimäärittääksesi tapahtuma-asetukset tai ohita ja määritä kaikki manuaalisesti.",
       "skipTemplate": "Määritä manuaalisesti",
       "postEventPublic": "Julkinen tapahtuman jälkeinen sivu",
+      "offerAddressBook": "Offers the address book to people who register",
       "invalidFields": "Tarkista nämä kentät: {fields}.",
       "descriptionOtherLanguages": "Tekstistä on myös versiot kielillä: {languages}, joita ei voi muokata täällä. Jos muutat italiankielistä tekstiä, ne poistetaan."
     },
@@ -3599,6 +3628,10 @@
       "rec": {
         "yes": "Kyllä, kun painat REC",
         "yesDesc": "Tapahtuman jälkeen: litterointi, tiivistelmä ja käännös",
+        "reserved": "Yes, reserved",
+        "reservedDesc": "Organizers and registrants can see it",
+        "public": "Yes, public",
+        "publicDesc": "It can be published on the event page",
         "no": "Ei",
         "noDesc": "Ei tallennusta, ei pyydettävää suostumusta"
       },
@@ -3613,6 +3646,8 @@
         "tutti": "kaikki videolla",
         "relatori": "puhujat puhuvat",
         "si": "tallenteella",
+        "riservata": "with reserved recording",
+        "pubblica": "with public recording",
         "no": "ilman tallennetta",
         "openAccess": "avoin kaikille",
         "inviteOnly": "vain kutsutuille"
@@ -3625,6 +3660,8 @@
         "invitationDesc": "Sivu pysyy näkyvissä, mutta ilmoittautua voivat vain listalla olevat; kutsun ilmoittautumislinkkeineen lähetät sähköpostilla tapahtuman sivulta"
       },
       "previewInvitation": "Vain kutsutut ilmoittautuvat; ilman ilmoittautumista ei pääse sisään.",
+      "previewPseudonyms": "The audience appears under a pseudonym",
+      "previewRealNames": "The audience appears under their own names",
       "templateReplaces": "Malli tuo omat asetuksensa alla olevien vastausten sijaan. Otsikon, päivämäärät ja henkilöt kirjoitat seuraavissa vaiheissa.",
       "instantBack": "Luo sen sijaan aikataulutettu tapahtuma"
     },
@@ -3762,6 +3799,7 @@
         "pubblicata": "Julkaistu.",
         "prontaAi": "Valmis jälkikäsittelystä: tarkista se; se julkaistaan yhdessä videon kanssa.",
         "prontaSottotitoli": "Valmis tekstityksestä: tarkista nimet ja julkaise se.",
+        "daConfermare": "To start: the video is transcribed only once someone confirms that every voice has consented.",
         "inLavorazione": "Käsittelyssä.",
         "nessuna": "Ei ole: ei tekstitystä eikä jälkikäsittelyä.",
         "soloStaff": "Tapahtuman järjestäjä tarkistaa ja julkaisee sen ylläpidossa.",
@@ -3801,6 +3839,7 @@
         "title": "Julkinen sivu",
         "visibile": "Näkyy kaikille.",
         "nellaLibreria": "Näkyy kaikille ja videokirjastossa.",
+        "libreriaRiservata": "The page is visible, but the video is reserved for registrants: it does not appear in the video library.",
         "privata": "Poistettu näkyvistä: yleisö ei näe sitä.",
         "scaduta": "Ei enää näkyvissä: vanhentumispäivä on ohitettu.",
         "archiviato": "Tapahtuma arkistoitu: sivu ei ole julkinen.",
@@ -3951,6 +3990,7 @@
       "message": "Tämä tapahtuma pyysi jokaiselta suostumusta puheenvuorojensa litterointiin. Koko tallenne sisältää kaikki äänet, myös niiden, jotka eivät antaneet suostumusta: litteroi se vain, jos kaikki siinä puhuvat ovat suostuneet. Vahvistuksesi tallentuu tapahtumalokiin.",
       "confirm": "Kyllä, kaikki ovat suostuneet",
       "cancel": "Peruuta",
+      "waitingNoCaptions": "The transcription of the full recording did not start on its own: each person chooses whether what they say is transcribed. Start it with {button} only if everyone who speaks in the recording has consented; otherwise the event stays without a transcript.",
       "waiting": "Koko tallenteen litterointi ei käynnistynyt itsestään: tämä tapahtuma pyysi jokaiselta suostumusta puheenvuorojensa litterointiin. Käynnistä se painikkeella {button} vain, jos kaikki tallenteessa puhuvat ovat suostuneet; muuten tekstityksistä tehty litteraatio jää voimaan."
     },
     "editCopyTitle": "Tapahtuman kopio",
@@ -3979,6 +4019,12 @@
         "givenAt": "Annettu",
         "withdrawnAt": "Peruutettu",
         "textVersion": "Tekstin versio",
+        "destination": "Destination",
+        "destinations": {
+          "PUBLIC": "Public",
+          "REGISTRANTS": "Reserved",
+          "none": "Not set"
+        },
         "kinds": {
           "recording": "Tallennus",
           "transcription": "Puheenvuorojen litterointi"
@@ -3992,8 +4038,10 @@
           "guest": "vieras",
           "host": "juontaa tai puhuu"
         },
+        "erasedName": "(name removed on request)",
         "unreadableName": "(nimeä ei voi lukea)"
       },
+      "retainedNote": "{count, plural, one {# proof is kept} other {# proofs are kept}} for as long as the video or transcript stays published.",
       "countsNote": "Lasketaan henkilöitä: ilmoittautuminen, henkilökunnan tili tai nimetty linkki lasketaan kerran; toisella käynnillä palaava vieras lasketaan uudelleen."
     }
   },
@@ -4011,6 +4059,8 @@
     "dateLabel": "Päivämäärä",
     "timeLabel": "Aika",
     "durationLabel": "Kesto",
+    "addressBookNote": "You are in the events address book, to be invited to similar events: you can withdraw your consent at any time.",
+    "addressBookOptOutLink": "Remove me from the address book",
     "myDataLink": "Tietosi: tarkastele, korjaa, peruuta suostumus tai peru ilmoittautuminen"
   },
   "home": {
@@ -4379,16 +4429,74 @@
   "gdpr": {
     "consent": {
       "recording": "Suostun tämän tapahtuman ääni-/videotallennukseen",
+      "recordingReserved": "I consent to the audio/video recording of this event. The video stays reserved for the organizers and registrants: it is not published. Registrants can watch it for as long as their registration data is kept.",
+      "recordingPublic": "I consent to the audio/video recording of this event and to its publication: anyone can watch the video on the event page and in the video library.",
+      "recordingNoVideo": "I consent to the recording of this event. The room video is not recorded: only the audio tracks of people who consent to transcription are kept, if the event uses them.",
       "multitrack": "Annan suostumukseni siihen, että puheenvuoroni litteroidaan nimelläni tapahtuman yhteenvetoa varten. Jos tapahtuma tallentaa jokaisesta henkilöstä erillisen ääniraidan, ääneni tallennetaan vain tätä tarkoitusta varten ja raita poistetaan litteroinnin jälkeen; sitä ei käytetä ääneni tunnistamiseen tai jäljittelemiseen.",
+      "multitrackRetained": "I consent to my contributions being transcribed, with my name, for the event's report. If the event records a separate audio track for each person, my voice is recorded for this purpose only and the track is kept with the event data; it is not used to identify or reproduce my voice.",
       "multitrackOptional": "Tämä on vapaaehtoista: jos et anna suostumusta, osallistut silti, mutta puheenvuorosi eivät tule litteraatioon eikä ääntäsi tallenneta omalle raidalleen. Jos tapahtuma tallennetaan, äänesi on silti mukana videossa.",
       "stayInTouch": "Haluan saada tietoa tulevista tapahtumista ja tulla lisätyksi osoitekirjaan, jotta minut kutsutaan vastaaviin tapahtumiin",
       "stayInTouchHelp": "Vapaaehtoinen suostumus (tietosuoja-asetuksen 6.1.a artikla). Voit perua sen milloin tahansa saamiesi sähköpostien linkillä ”Poista minut osoitekirjasta”. Nimi ja organisaatio ovat tämän ilmoittautumisen mukaiset.",
+      "stayInTouchRetention": "We keep this data for {months} months from this consent: the period restarts only if you tick the box again.",
       "recordingOptionalListenOnly": "Jos et anna suostumusta, osallistut silti, vain kuunnellen: seuraat ja kirjoitat chattiin, mutta mikrofoni, kamera ja näytön jakaminen pysyvät pois päältä. Voit antaa suostumuksen myöhemmin huoneessa.",
       "recordingOptionalHost": "Jos et anna suostumusta, pääset silti sisään ja johdat tavalliseen tapaan, mutta ääntäsi ei säilytetä henkilökohtaisissa raidoissa eikä litteroinnissa. Huoneen video, jos se tallennetaan, näyttää sinut silti.",
       "recordingOptionalVoice": "Jos et anna suostumusta, osallistut silti ja voit puhua, mutta jäät tallenteen ulkopuolelle: ei nimeä, ääntä eikä kuvaa. Voit antaa suostumuksen myöhemmin huoneessa.",
       "recordingNotice": "Tapahtuma tallennetaan (ääni ja kuva). Osallistut ilman mikrofonia ja kameraa: tallenne ei sisällä ääntäsi eikä kuvaasi, ellei juontaja anna sinulle puheenvuoroa.",
       "recordingNoticeVoice": "Tapahtuma tallennetaan (ääni ja video). Osallistut ilman mikrofonia ja kameraa: tallenne ei sisällä nimeäsi, ääntäsi eikä kuvaasi, ellet anna suostumusta huoneessa.",
+      "recordingHostAlwaysReserved": "You host this event: you are always in the recording, with name, voice, image and shared screen. The video stays reserved for the organizers and registrants: it is not published. Registrants can watch it for as long as their registration data is kept.",
+      "recordingHostAlwaysPublic": "You host this event: you are always in the recording, with name, voice, image and shared screen. The video can be published and watched by anyone.",
       "recordingHostAlways": "Juonnat tätä tapahtumaa: olet aina tallenteessa nimen, äänen, kuvan ja jaetun näytön kanssa."
+    },
+    "sheet": {
+      "title": "This event and your data",
+      "intro": "This depends on how the organizers set up the event. Everything else is in the privacy notice.",
+      "recording": {
+        "label": "Recording",
+        "none": "No recording is planned for this event.",
+        "manual": "The hosts can start the audio and video recording. When it is on, the room shows it.",
+        "auto": "The event is recorded, audio and video, from the moment it starts. The room shows it.",
+        "tracksOnly": "The room video is not recorded: only one audio track for each person who consents.",
+        "destinationReserved": "The recording stays reserved for the organizers and registrants and is not published. Registrants can watch it for as long as their registration data is kept.",
+        "destinationPublic": "The recording may be published after the event.",
+        "destinationUnset": "The organizers decide after the event whether to publish it.",
+        "refuseOut": "If you do not consent you still take part and stay out of the recording.",
+        "refuseListenOnly": "If you do not consent you take part listening only.",
+        "hostsAlways": "The hosts are always in the recording, with name, voice, image and shared screen."
+      },
+      "transcript": {
+        "label": "Transcript",
+        "captions": "The caption text is kept, with the name, only for people who consent, and becomes the event transcript.",
+        "tracks": "For people who consent, an audio track is recorded and deleted after transcription.",
+        "tracksRetained": "For people who consent, an audio track is recorded and kept with the event data.",
+        "fromVideo": "After the event, the organizers can have the video transcribed only if everyone who speaks in it has consented."
+      },
+      "captions": {
+        "label": "Captions"
+      },
+      "ai": {
+        "label": "Artificial intelligence",
+        "summary": "After the event, an AI tool may write a summary of the recording.",
+        "translation": "The transcript and summary may be translated automatically.",
+        "dubbing": "The video may be dubbed with a synthetic voice.",
+        "report": "After the event, the staff may have an AI tool write a report, using also the chat without names, questions and polls."
+      },
+      "list": {
+        "label": "Participant list",
+        "visible": "Participants see the list of people in the room.",
+        "hidden": "In the room the audience does not see the list of people present. Hosts and speakers do."
+      },
+      "name": {
+        "label": "Your name",
+        "real": "In the room, in the chat and in questions you appear under your name.",
+        "pseudonym": "In the room, in the chat and in questions you appear under a pseudonym. The organizers see your registration data. If you consent to the transcript, your name stays there."
+      },
+      "retention": {
+        "label": "Retention",
+        "data": "Registration and room data are deleted {days, plural, one {# day} other {# days}} after the event ends. Questions and polls stay without names.",
+        "videoUnpublished": "If it is not made available, the recording is deleted with them.",
+        "videoPublishedDays": "If it is made available, it is deleted {days, plural, one {# day} other {# days}} later.",
+        "videoPublishedOpen": "If it is made available, it stays until the organizers remove it."
+      }
     },
     "export": {
       "title": "Omat tietoni",
@@ -4434,6 +4542,12 @@
       "consentFuture": "Tulevat viestit",
       "consentWithdrawnOn": "Peruutettu {date}",
       "consentNoteInRoom": "Jos olet nyt huoneessa, peruutus tulee voimaan seuraavalla kerralla: käytä huoneen Suostumukset-painiketta, jos haluat sen voimaan heti.",
+      "proofsTitle": "Consent proofs kept",
+      "proofsIntro": "The data for these events has been deleted. These proofs stay for as long as the video or transcript is published. You can withdraw your consent: what is already in the video stays, and to have it removed you must write to the data controller.",
+      "proofGivenOn": "Given on {date}",
+      "addressBookTitle": "Events address book",
+      "addressBookIntro": "You chose to stay in the address book, to be invited to similar events. We keep this data until {date}, unless you withdraw your consent or give it again.",
+      "addressBookOptOut": "Remove me from the address book",
       "consentFutureEffect": "Jos peruutat sen, et enää saa viestejä tulevista tapahtumista ja poistut osoitekirjasta kaikkien ilmoittautumistesi osalta."
     },
     "erasure": {
@@ -4448,11 +4562,13 @@
       "linkInvalid": "Linkki on virheellinen tai vanhentunut. Pyydä uusi linkki.",
       "confirmWarning": "Olet poistamassa pysyvästi kaikki sähköpostiosoitteeseesi liittyvät henkilötiedot.",
       "confirmBody": "Ilmoittautumiset, kysymykset, kyselyjen äänet, palautteet, muistutukset ja tietosi tapahtumien osoitekirjassa poistetaan. Toimintoa ei voi perua.",
+      "confirmProofs": "If an event has a published video or transcript, the type of consent, the date and the text you answered stay, without your name, for as long as that video or transcript stays published. They are there to prove the consent. The video does not change: to ask for your contributions to be removed, write to the data controller.",
       "confirmButton": "Vahvista poisto",
       "cancel": "Peruuta",
       "processing": "Poistetaan...",
       "doneTitle": "Poisto suoritettu",
       "doneBody": "Poistettuja ilmoittautumisia: {count}. Myös niihin liittyvät tiedot on poistettu.",
+      "doneProofs": "{count, plural, one {# consent proof remains, without your name, for as long as the video or transcript stays published.} other {# consent proofs remain, without your name, for as long as the video or transcript stays published.}}",
       "error": "Tapahtui virhe. Yritä myöhemmin uudelleen.",
       "rateLimited": "Liian monta pyyntöä. Yritä uudelleen tunnin kuluttua.",
       "back": "Takaisin omiin tietoihin",
@@ -5302,6 +5418,7 @@
     "multitrackConsentTitle": "Puheenvuorojesi litterointi",
     "recordingConsentTitle": "Tapahtuman tallenne",
     "recordingConsentIntro": "Tapahtuma tallennetaan (ääni ja video). Suostumuksellasi tallenne sisältää nimesi, äänesi, kuvasi ja sen, mitä jaat näytöllä.",
+    "recordingConsentIntroNoVideo": "The room video is not recorded at this event.",
     "enterGardenTitle": "Astu torille",
     "enterGardenHint": "Toinen paikka odottaa: kävele, tapaa muut odottajat ja siirry lähetykseen portista, kun huone avautuu.",
     "backToWaitingRoom": "Takaisin odotustilaan",
@@ -5568,6 +5685,8 @@
     "audiencePublicDesc": "Kuka tahansa, joka avaa tapahtuman sivun. Voi näkyä videokirjastossa.",
     "audienceRegistrants": "Vain ilmoittautuneet",
     "audienceRegistrantsDesc": "Tapahtumaan ilmoittautuneet, vaikka he eivät olisi tulleet huoneeseen, sähköposti-ilmoituksen henkilökohtaisen linkin kautta. Ei näy videokirjastossa.",
+    "audienceReservedNote": "People consented to a reserved recording: only registrants and the organizers can see the video.",
+    "destinationMissing": "This event does not say where the recording goes: the consents collected do not say whether the video would be published. Check before you publish it.",
     "saveFailed": "Muutosta ei tallennettu. Yritä uudelleen."
   },
   "postEvent": {
@@ -5577,7 +5696,9 @@
     "libraryListed": "Julkaise videokirjastoon",
     "libraryListedHelp": "Näytä tämä tapahtuma julkisessa kirjastossa (/video-library). Edellyttää julkaistua tallennetta tai YouTube-videota sekä sitä, että tapahtumasivu on näkyvissä.",
     "libraryListedNoRecording": "Ei julkaistua tallennetta: tapahtuma ei näy kirjastossa, ennen kuin julkaiset tallenteen tai lisäät YouTube-videon.",
+    "libraryListedReserved": "Reserved recording: the event does not appear in the video library.",
     "showQA": "Näytä Q&A-kysymykset",
+    "qaReservedNote": "With a reserved recording, questions are not published.",
     "showMaterials": "Näytä jaetut materiaalit",
     "showPolls": "Näytä kyselytulokset",
     "showFeedback": "Näytä palaute",
@@ -5835,6 +5956,7 @@
     "sourceTranscriptMissing": "Tätä tallennetta ei ole vielä litteroitu: litteroi se ennen käännöksen lisäämistä.",
     "captionsTranscriptNotTranslatable": "Tämä litterointi on peräisin livetekstityksestä: automaattinen käännös edellyttää tallenteen tekoälylitterointia.",
     "sameLanguage": "Valittu kieli on tallenteen alkuperäinen kieli: valitse toinen.",
+    "recordingDestinationNotCovered": "The consents for this event cover a reserved recording: you cannot make it visible to everyone or link an external video.",
     "mtUnavailable": "Konekäännöstä ei ole asennettu tähän instanssiin."
   }
 }

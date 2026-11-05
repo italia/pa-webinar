@@ -83,7 +83,9 @@ async function partecipantiConNome(
       }),
       prisma.siteSetting.findUnique({ where: { id: 'singleton' }, select: { liveCaptionsEnabled: true } }),
     ]);
-    const regime = evento ? await regimeConsensoVoce(prisma, eventId, evento, sito ?? {}) : null;
+    // `false` al posto di Recording.transcriptConsentRule: i nomi seguono la regola
+    // delle registrazioni nate prima di quella sul video.
+    const regime = evento ? await regimeConsensoVoce(prisma, eventId, evento, sito ?? {}, false) : null;
     const ammessi = regime?.chiesto
       ? await endpointConConsenso(eventId, [...new Set(log.map((e) => e.participantId))], regime.versione)
       : null;

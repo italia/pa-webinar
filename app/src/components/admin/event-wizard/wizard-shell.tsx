@@ -26,6 +26,7 @@
 
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
+import type { RecordingAudience } from '@prisma/client';
 
 import { useRouter, percorso } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
@@ -158,6 +159,16 @@ export interface WizardTemplatePreset {
   postEventPublic?: boolean;
   /** Chi partecipa: chiunque si iscrive, o solo gli invitati. */
   accessMode?: EventAccessModeValue | null;
+  /** La destinazione del video; null = la sceglie il wizard. */
+  recordingDestination?: RecordingAudience | null;
+  /** Il modulo d'iscrizione propone la rubrica. */
+  offerAddressBook?: boolean;
+  /** Chi partecipa compare con uno pseudonimo. */
+  audienceAnonymous?: boolean;
+  /** Chi conduce e' sempre nella registrazione. */
+  hostsAlwaysRecorded?: boolean;
+  /** Le domande restano sulla pagina dopo l'evento. */
+  postEventShowQA?: boolean;
 }
 
 /** Chi partecipa a un evento (Event.accessMode); null = come dice il sito. */

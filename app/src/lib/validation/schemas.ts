@@ -18,6 +18,9 @@ import { MAX_RETENTION_DAYS } from './retention';
 
 const localizedStringField = z.record(z.string(), z.string());
 
+/** A chi va un video: a tutti, o a iscritti e staff (RecordingAudience). */
+const destinatariVideo = z.enum(['PUBLIC', 'REGISTRANTS']);
+
 export const eventBaseSchema = z.object({
   title: localizedStringField.refine(
     (obj) => typeof obj.it === 'string' && obj.it.length >= 3,
@@ -122,6 +125,13 @@ export const eventBaseSchema = z.object({
   // Moderatori e relatori sempre nella registrazione, per dichiarazione di chi
   // organizza. Niente default: un aggiornamento parziale non lo azzera.
   hostsAlwaysRecorded: z.boolean().optional(),
+  // La destinazione del video, cioe' cio' a cui acconsente chi spunta la casella
+  // (lib/recording/destination). Niente default: un aggiornamento parziale non
+  // la azzera.
+  recordingDestination: destinatariVideo.nullable().optional(),
+  // Il modulo d'iscrizione propone la rubrica. Senza una scelta vale il default
+  // della colonna.
+  offerAddressBook: z.boolean().optional(),
 
   // Recurrence (RFC 5545 RRULE). Null = one-off.
   recurrenceRule: z.string().max(500).nullable().optional(),
@@ -203,7 +213,7 @@ export const updateEventSchema = parzialeSenzaDefault(eventBaseSchema).extend({
   recordingPublished: z.boolean().optional(),
   transcriptPublished: z.boolean().optional(),
   // Chi vede la registrazione pubblicata: tutti o i soli iscritti (lib/recording/audience).
-  recordingAudience: z.enum(['PUBLIC', 'REGISTRANTS']).optional(),
+  recordingAudience: destinatariVideo.optional(),
   // In modifica null toglie il documento dell'informativa dell'evento.
   privacyPolicyUrl: materialUrlSchema.nullable().optional(),
   recordingDeleteAfterDays: z.number().int().min(1).max(365).nullable().optional(),
@@ -333,6 +343,10 @@ export const createRegistrationSchema = z.object({
   consentGiven: z
     .literal(true, { error: 'registration.errors.consentRequired' }),
   consentRecording: z.boolean().optional(),
+  // La destinazione del video nel testo letto da chi ha spuntato la casella, null
+  // per un testo che non ne dichiara una. Assente solo da una pagina aperta da
+  // prima che il campo esistesse (lib/recording/destination, `testoLetto`).
+  consentRecordingDestination: destinatariVideo.nullable().optional(),
   // ADR-013 Fase 5 — consenso separato alla registrazione per-partecipante.
   // Facoltativo: chi non lo da' si iscrive, ma la sua voce non si registra
   // ne' si trascrive (lo decide il server, voce per voce).
@@ -410,6 +424,10 @@ export const jitsiTokenRequestSchema = z.object({
   /** Consenso alla registrazione dell'evento dato in sala d'attesa, da chi
    *  non l'aveva dato all'iscrizione. */
   recordingConsent: z.boolean().optional(),
+  /** La destinazione del video nel testo di quel consenso, null per un testo che
+   *  non ne dichiara una. Assente solo da una pagina aperta da prima che il campo
+   *  esistesse (lib/recording/destination, `testoLetto`). */
+  recordingConsentDestination: destinatariVideo.nullable().optional(),
   /** Consenso alla registrazione per partecipante dato in sala d'attesa. */
   multitrackConsent: z.boolean().optional(),
   /** Lingua della pagina in cui il consenso e' stato dato. */

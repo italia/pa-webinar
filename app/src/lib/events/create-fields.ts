@@ -63,6 +63,7 @@ export const CREATED_EVENT_FIELDS = [
   'requireOrganization',
   'requireOrganizationRole',
   'requireOrganizationType',
+  'offerAddressBook',
 
   // dati personali e informativa
   'dataRetentionDays',
@@ -76,6 +77,7 @@ export const CREATED_EVENT_FIELDS = [
 
   // registrazione e pubblicazione
   'recordingEnabled',
+  'recordingDestination',
   'autoStartRecording',
   'multitrackRecordingEnabled',
   'retainParticipantTracks',

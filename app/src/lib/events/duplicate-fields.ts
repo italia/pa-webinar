@@ -63,6 +63,7 @@ export const DUPLICATED_EVENT_FIELDS = [
   'requireOrganization',
   'requireOrganizationRole',
   'requireOrganizationType',
+  'offerAddressBook',
 
   // people & branding
   'moderatorName',
@@ -89,6 +90,7 @@ export const DUPLICATED_EVENT_FIELDS = [
 
   // recording & AI post-production
   'recordingEnabled',
+  'recordingDestination',
   'autoStartRecording',
   'multitrackRecordingEnabled',
   'retainParticipantTracks',

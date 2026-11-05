@@ -298,6 +298,7 @@
       "generic": "Σφάλμα κατά την εγγραφή. Δοκιμάστε ξανά.",
       "questionnaireRequired": "Για να εγγραφείτε, απαντήστε στις ερωτήσεις του ερωτηματολογίου.",
       "questionnaireIncomplete": "Απαντήστε σε όλες τις υποχρεωτικές ερωτήσεις του ερωτηματολογίου.",
+      "recordingDestinationChanged": "The text about the recording changed while you were filling in the form: reload the page and read it again.",
       "questionnaireChanged": "Το ερωτηματολόγιο άλλαξε ενώ συμπληρώνατε τη φόρμα: φορτώστε ξανά τη σελίδα και απαντήστε ξανά."
     }
   },
@@ -424,6 +425,7 @@
       "noMessages": "Κανένα μήνυμα",
       "empty": "Κανένα μήνυμα ακόμη. Γράψτε εσείς πρώτος!",
       "inputLabel": "Μήνυμα συνομιλίας",
+      "personalDataNotice": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read and download the chat.",
       "moderatorBadge": "Συντονιστής",
       "attach": "Επισύναψη αρχείου",
       "emojiPicker": "Εισαγωγή emoji",
@@ -722,6 +724,7 @@
     "upvoted": "Ψηφίστηκε",
     "noQuestions": "Καμία ερώτηση ακόμα. Γίνετε ο πρώτος!",
     "qaPersistenceNote": "Οι ερωτήσεις αποθηκεύονται και θα είναι διαθέσιμες μετά την εκδήλωση.",
+    "personalDataNotice": "Do not write other people's personal data, or your own if you do not want it made public: the text of your question may appear on the event page, without your name.",
     "qaPostEvent": "Ερωτήσεις και απαντήσεις από την εκδήλωση",
     "noAnsweredQuestions": "Καμία ερώτηση με απάντηση για αυτή την εκδήλωση.",
     "filterAll": "Όλες",
@@ -742,6 +745,7 @@
       "editAnswer": "Επεξεργασία απάντησης",
       "answerFieldLabel": "Απάντηση στην ερώτηση του/της {name}",
       "answerPlaceholder": "Γράψτε την απάντηση (έως 2000 χαρακτήρες)",
+      "answerNotice": "The answer may appear on the event page: do not write personal data.",
       "sendAnswer": "Δημοσίευση απάντησης",
       "cancel": "Ακύρωση",
       "removeAnswer": "Αφαίρεση απάντησης"
@@ -1025,6 +1029,13 @@
           }
         },
         "recordingManualNote": "Η καταγραφή δεν ξεκινά ποτέ μόνη της: ένας συντονιστής την ξεκινά με το κουμπί REC.",
+        "recordingDestination": "Where the recording goes",
+        "recordingDestinationReserved": "Reserved",
+        "recordingDestinationReservedDesc": "Organizers and registrants can see it, registrants for as long as their registration data is kept. It cannot be made public.",
+        "recordingDestinationPublic": "Public",
+        "recordingDestinationPublicDesc": "It can be published on the event page and in the video library. Participants consent to this too.",
+        "recordingDestinationNotSet": "Not set: the event was created before this choice existed.",
+        "recordingDestinationLocked": "Once the room has opened you can only switch to reserved: consents are valid for the text people read.",
         "audienceAnonymous": "Ανώνυμο κοινό",
         "audienceAnonymousDesc": "Οι συμμετέχοντες εμφανίζονται στους άλλους με ψευδώνυμο («Συμμετέχων» και ένας κωδικός) στο βίντεο, στη συνομιλία και στις ερωτήσεις· η λίστα συμμετεχόντων μένει στους συντονιστές και δεν υπάρχει πλατεία. Χρήσιμο για μεγάλες εκδηλώσεις· στις κοινοτικές οι άνθρωποι θέλουν να γνωριστούν.",
         "audienceAnonymousLocked": "Δεν αλλάζει όσο η αίθουσα μπορεί να είναι ανοιχτή: θα συνέδεε τα ψευδώνυμα με τα ονόματα.",
@@ -1135,6 +1146,7 @@
         "askOrganization": "Φορέας (υποχρεωτικό για την εγγραφή)",
         "askRole": "Ρόλος (προαιρετικό)",
         "askType": "Είδος φορέα (προαιρετικό)",
+        "askAddressBook": "Offer to join the address book (optional for people who register)",
         "questionnairesHeading": "Ερωτηματολόγια",
         "questionsBefore": "Πριν από την εκδήλωση, κατά την εγγραφή: {count, plural, =0 {καμία επιπλέον ερώτηση} one {# επιπλέον ερώτηση} other {# επιπλέον ερωτήσεις}}",
         "questionsAfter": "Μετά την εκδήλωση: {count, plural, =0 {κανένα ερωτηματολόγιο ικανοποίησης} one {ερωτηματολόγιο ικανοποίησης, # ερώτηση} other {ερωτηματολόγιο ικανοποίησης, # ερωτήσεις}}",
@@ -1281,7 +1293,10 @@
         "participantsCan": "Συμμετέχοντες: {list}",
         "none": "καμία",
         "recordingManual": "Διαθέσιμη: ξεκινά μόνο όταν ένας συντονιστής πατήσει REC.",
+        "recordingDestinationReserved": "Destination: reserved for the organizers and registrants.",
+        "recordingDestinationPublic": "Destination: public.",
         "aiAfter": "Μετά την καταγραφή: {list}.",
+        "aiConfirmVideo": "Without per-person tracks, the video transcription starts only after someone confirms that every voice has consented.",
         "scheduleHeading": "Πότε γίνεται",
         "scheduleIntro": "Πότε γίνεται η εκδήλωση: ημερομηνία, ώρα και ζώνη ώρας.",
         "advancedIntro": "Τιμές που έχει ήδη επιλέξει το πρότυπο: αλλάξτε μόνο ό,τι χρειάζεται.",
@@ -1325,6 +1340,7 @@
         "askOrganization": "φορέας",
         "askRole": "ρόλος",
         "askType": "είδος φορέα",
+        "askAddressBook": "whether they want to join the address book",
         "permissionsHeading": "Ποιος μπορεί να κάνει τι στην αίθουσα",
         "permissionsIntro": "Τι μπορούν να κάνουν οι συμμετέχοντες και ποιες λειτουργίες της αίθουσας είναι ενεργές. Όλα αλλάζουν και κατά τη διάρκεια της εκδήλωσης.",
         "consentsLine": "Συγκαταθέσεις στην εγγραφή και στην αίθουσα: {list}",
@@ -1336,6 +1352,12 @@
         "consentsWithdraw": "Οι συμμετέχοντες μπορούν να τις ανακαλέσουν στην αίθουσα, με το κουμπί «Συγκαταθέσεις».",
         "participantListShown": "Λίστα συμμετεχόντων: ορατή σε όλους.",
         "participantListHidden": "Λίστα συμμετεχόντων: μόνο για όσους συντονίζουν και όσους μιλούν.",
+        "audiencePseudonyms": "Audience names: pseudonyms.",
+        "audienceRealNames": "Audience names: real names.",
+        "postEventQaHidden": "Questions after the event: not published.",
+        "postEventQaTextOnly": "Questions after the event: text only, without names.",
+        "addressBookOffered": "Address book: offered to people who register.",
+        "addressBookNotOffered": "Address book: not offered.",
         "consentRecordingOptional": "καταγραφή, προαιρετική",
         "consentRecordingVoice": "καταγραφή, προαιρετική (χωρίς συναίνεση το άτομο μένει εκτός καταγραφής)",
         "consentsHostsAlways": "Συντονιστές και ομιλητές είναι πάντα στην καταγραφή: δεν βλέπουν το πλαίσιο."
@@ -1542,6 +1564,8 @@
           "saveFailed": "Η αποθήκευση των μεταδεδομένων απέτυχε."
         }
       },
+      "reservedBadge": "Reserved",
+      "reservedHelp": "The recording is reserved for registrants: it cannot appear in the video library.",
       "updateFailed": "Η ενημέρωση απέτυχε."
     },
     "recordingsLibrary": {
@@ -2306,6 +2330,8 @@
         "guestAccessEnabledHelp": "Όσοι δεν έχουν εγγραφεί μπορούν να μπουν σε εκδηλώσεις σε εξέλιξη δίνοντας μόνο το όνομά τους. Όταν είναι απενεργοποιημένη, στις προγραμματισμένες εκδηλώσεις η είσοδος γίνεται μόνο με εγγραφή ή με σύνδεσμο συντονιστή ή ομιλητή· οι άμεσες βιντεοκλήσεις παραμένουν ανοιχτές σε όποιον έχει τον σύνδεσμο. Μια εκδήλωση μόνο με πρόσκληση δεν δέχεται ποτέ επισκέπτες.",
         "publicRegistrationEnabled": "Δημόσια εγγραφή ενεργή",
         "publicRegistrationEnabledHelp": "Οποιοσδήποτε μπορεί να εγγραφεί σε εκδηλώσεις. Όταν είναι απενεργοποιημένη, μπορούν να εγγραφούν μόνο όσοι βρίσκονται στη λίστα προσκεκλημένων της εκδήλωσης και ο προσωπικός σύνδεσμος εισόδου αποστέλλεται μόνο μέσω email· όσοι έχουν ήδη εγγραφεί και οι σύνδεσμοι συντονιστών και ομιλητών συνεχίζουν να λειτουργούν. Είναι η επιλογή που προτείνεται στις νέες εκδηλώσεις: η καθεμία μπορεί να αποφασίσει διαφορετικά στο βήμα «Πρόσωπα».",
+        "addressBookEnabled": "Events address book",
+        "addressBookEnabledHelp": "Offers people who register the chance to stay in the address book and be invited to similar events. When off, the checkbox disappears from the forms and the picker from the wizard; existing entries stay until they are withdrawn or expire.",
         "calendarPublic": "Δημόσιο ημερολόγιο",
         "calendarPublicHelp": "Δημοσίευση ημερολογίου εκδηλώσεων. Οι επισκέπτες μπορούν να βλέπουν τις προγραμματισμένες εκδηλώσεις.",
         "parseTitleKicker": "Τίτλοι με εκδοτικό υπερτίτλο",
@@ -2438,6 +2464,8 @@
       "featuresLabel": "Λειτουργίες",
       "whiteboardLabel": "Πίνακας",
       "recordingLabel": "Βιντεοσκόπηση",
+      "recordingDestination": "Recording destination",
+      "recordingDestinationNone": "Chosen when creating the event",
       "waitingRoomEngineLabel": "Αίθουσα αναμονής (προεπιλογή του προτύπου)",
       "waitingRoomEngineSiteDefault": "Προεπιλογή του ιστότοπου",
       "waitingRoomEngineGarden": "Κήπος (κανονική)",
@@ -2459,6 +2487,7 @@
       "pickerSubtitle": "Επιλέξτε ένα πρότυπο για προρύθμιση της εκδήλωσης ή παραλείψτε για χειροκίνητη ρύθμιση.",
       "skipTemplate": "Χειροκίνητη ρύθμιση",
       "postEventPublic": "Δημόσια σελίδα μετά την εκδήλωση",
+      "offerAddressBook": "Offers the address book to people who register",
       "invalidFields": "Ελέγξτε αυτά τα πεδία: {fields}.",
       "descriptionOtherLanguages": "Υπάρχουν και εκδοχές σε: {languages}, που δεν επεξεργάζονται εδώ. Αν αλλάξετε το ιταλικό κείμενο, αφαιρούνται."
     },
@@ -3599,6 +3628,10 @@
       "rec": {
         "yes": "Ναι, όταν πατάτε REC",
         "yesDesc": "Μετά την εκδήλωση: απομαγνητοφώνηση, σύνοψη και μετάφραση",
+        "reserved": "Yes, reserved",
+        "reservedDesc": "Organizers and registrants can see it",
+        "public": "Yes, public",
+        "publicDesc": "It can be published on the event page",
         "no": "Όχι",
         "noDesc": "Χωρίς καταγραφή, χωρίς συγκατάθεση"
       },
@@ -3613,6 +3646,8 @@
         "tutti": "όλοι σε βίντεο",
         "relatori": "μιλούν οι ομιλητές",
         "si": "με καταγραφή",
+        "riservata": "with reserved recording",
+        "pubblica": "with public recording",
         "no": "χωρίς καταγραφή",
         "openAccess": "ανοιχτό σε όλους",
         "inviteOnly": "μόνο με πρόσκληση"
@@ -3625,6 +3660,8 @@
         "invitationDesc": "Η σελίδα παραμένει ορατή, αλλά εγγράφονται μόνο όσοι είναι στη λίστα· την πρόσκληση με τον σύνδεσμο εγγραφής τη στέλνετε με email από τη σελίδα της εκδήλωσης"
       },
       "previewInvitation": "Εγγράφονται μόνο οι προσκεκλημένοι· χωρίς εγγραφή δεν μπαίνει κανείς.",
+      "previewPseudonyms": "The audience appears under a pseudonym",
+      "previewRealNames": "The audience appears under their own names",
       "templateReplaces": "Ένα πρότυπο φέρνει τις δικές του ρυθμίσεις αντί για τις παρακάτω απαντήσεις. Τίτλο, ημερομηνίες και άτομα τα συμπληρώνετε στα επόμενα βήματα.",
       "instantBack": "Δημιουργία προγραμματισμένης εκδήλωσης"
     },
@@ -3762,6 +3799,7 @@
         "pubblicata": "Δημοσιεύτηκε.",
         "prontaAi": "Έτοιμη από τη μεταπαραγωγή: ελέγξτε την· δημοσιεύεται μαζί με το βίντεο.",
         "prontaSottotitoli": "Έτοιμη από τους υπότιτλους: ελέγξτε τα ονόματα και δημοσιεύστε την.",
+        "daConfermare": "To start: the video is transcribed only once someone confirms that every voice has consented.",
         "inLavorazione": "Σε επεξεργασία.",
         "nessuna": "Δεν υπάρχει: ούτε υπότιτλοι ούτε μεταπαραγωγή.",
         "soloStaff": "Την ελέγχει και τη δημοσιεύει ο διοργανωτής της εκδήλωσης από την περιοχή διαχείρισης.",
@@ -3801,6 +3839,7 @@
         "title": "Δημόσια σελίδα",
         "visibile": "Ορατή σε όλους.",
         "nellaLibreria": "Ορατή σε όλους και στη βιβλιοθήκη βίντεο.",
+        "libreriaRiservata": "The page is visible, but the video is reserved for registrants: it does not appear in the video library.",
         "privata": "Αποσύρθηκε: το κοινό δεν τη βλέπει.",
         "scaduta": "Δεν είναι πλέον ορατή: η ημερομηνία λήξης έχει περάσει.",
         "archiviato": "Η εκδήλωση αρχειοθετήθηκε: η σελίδα δεν είναι δημόσια.",
@@ -3951,6 +3990,7 @@
       "message": "Αυτή η εκδήλωση ζήτησε από τον καθένα συναίνεση για τη μεταγραφή των παρεμβάσεών του. Η πλήρης καταγραφή περιέχει όλες τις φωνές, και όσων δεν συναίνεσαν: μεταγράψτε τη μόνο αν όλοι όσοι μιλούν σε αυτή έχουν συναινέσει. Η επιβεβαίωσή σας καταγράφεται στο αρχείο δραστηριοτήτων.",
       "confirm": "Ναι, όλοι συναίνεσαν",
       "cancel": "Ακύρωση",
+      "waitingNoCaptions": "The transcription of the full recording did not start on its own: each person chooses whether what they say is transcribed. Start it with {button} only if everyone who speaks in the recording has consented; otherwise the event stays without a transcript.",
       "waiting": "Η μεταγραφή ολόκληρης της καταγραφής δεν ξεκίνησε αυτόματα: αυτή η εκδήλωση ζήτησε από τον καθένα συναίνεση για τη μεταγραφή των παρεμβάσεών του. Ξεκινήστε τη με {button} μόνο αν όλοι όσοι μιλούν στην καταγραφή έχουν συναινέσει· αλλιώς παραμένει η μεταγραφή από τους υπότιτλους."
     },
     "editCopyTitle": "Αντίγραφο της εκδήλωσης",
@@ -3979,6 +4019,12 @@
         "givenAt": "Δόθηκε",
         "withdrawnAt": "Ανακλήθηκε",
         "textVersion": "Έκδοση κειμένου",
+        "destination": "Destination",
+        "destinations": {
+          "PUBLIC": "Public",
+          "REGISTRANTS": "Reserved",
+          "none": "Not set"
+        },
         "kinds": {
           "recording": "Καταγραφή",
           "transcription": "Απομαγνητοφώνηση παρεμβάσεων"
@@ -3992,8 +4038,10 @@
           "guest": "επισκέπτης",
           "host": "συντονίζει ή μιλά"
         },
+        "erasedName": "(name removed on request)",
         "unreadableName": "(μη αναγνώσιμο όνομα)"
       },
+      "retainedNote": "{count, plural, one {# proof is kept} other {# proofs are kept}} for as long as the video or transcript stays published.",
       "countsNote": "Μετρώνται πρόσωπα: μια εγγραφή, ένας λογαριασμός προσωπικού ή ένας ονομαστικός σύνδεσμος μετρούν μία φορά· ένας επισκέπτης που επιστρέφει σε άλλη επίσκεψη μετρά ξανά."
     }
   },
@@ -4011,6 +4059,8 @@
     "dateLabel": "Ημερομηνία",
     "timeLabel": "Ώρα",
     "durationLabel": "Διάρκεια",
+    "addressBookNote": "You are in the events address book, to be invited to similar events: you can withdraw your consent at any time.",
+    "addressBookOptOutLink": "Remove me from the address book",
     "myDataLink": "Τα δεδομένα σας: προβολή, διόρθωση, ανάκληση συγκατάθεσης ή ακύρωση της εγγραφής"
   },
   "home": {
@@ -4379,16 +4429,74 @@
   "gdpr": {
     "consent": {
       "recording": "Συναινώ στη βιντεοσκόπηση ήχου/βίντεο αυτής της εκδήλωσης",
+      "recordingReserved": "I consent to the audio/video recording of this event. The video stays reserved for the organizers and registrants: it is not published. Registrants can watch it for as long as their registration data is kept.",
+      "recordingPublic": "I consent to the audio/video recording of this event and to its publication: anyone can watch the video on the event page and in the video library.",
+      "recordingNoVideo": "I consent to the recording of this event. The room video is not recorded: only the audio tracks of people who consent to transcription are kept, if the event uses them.",
       "multitrack": "Συναινώ να απομαγνητοφωνηθούν οι παρεμβάσεις μου, με το όνομά μου, για τον απολογισμό της εκδήλωσης. Αν η εκδήλωση καταγράφει ξεχωριστό ηχητικό κανάλι για κάθε άτομο, η φωνή μου καταγράφεται μόνο για τον σκοπό αυτό και το κανάλι διαγράφεται μετά την απομαγνητοφώνηση· δεν χρησιμοποιείται για την αναγνώριση ή την αναπαραγωγή της φωνής μου.",
+      "multitrackRetained": "I consent to my contributions being transcribed, with my name, for the event's report. If the event records a separate audio track for each person, my voice is recorded for this purpose only and the track is kept with the event data; it is not used to identify or reproduce my voice.",
       "multitrackOptional": "Είναι προαιρετικό: αν δεν συναινέσετε, συμμετέχετε κανονικά, αλλά οι παρεμβάσεις σας δεν μπαίνουν στη μεταγραφή και η φωνή σας δεν καταγράφεται σε ξεχωριστό κανάλι. Αν η εκδήλωση καταγράφεται, η φωνή σας παραμένει στο βίντεο.",
       "stayInTouch": "Θέλω να λαμβάνω πληροφορίες για τις επόμενες εκδηλώσεις και να προστεθώ στο βιβλίο διευθύνσεων, ώστε να με προσκαλούν σε παρόμοιες εκδηλώσεις",
       "stayInTouchHelp": "Προαιρετική συγκατάθεση (άρθρο 6.1.α ΓΚΠΔ). Μπορείτε να την ανακαλέσετε ανά πάσα στιγμή από τον σύνδεσμο «Αφαίρεση από το βιβλίο διευθύνσεων» στα email που θα λάβετε. Όνομα και οργανισμός είναι αυτά της παρούσας εγγραφής.",
+      "stayInTouchRetention": "We keep this data for {months} months from this consent: the period restarts only if you tick the box again.",
       "recordingOptionalListenOnly": "Αν δεν συναινέσετε, συμμετέχετε κανονικά, μόνο ως ακροατής: παρακολουθείτε και γράφετε στη συνομιλία, αλλά το μικρόφωνο, η κάμερα και η κοινή χρήση οθόνης μένουν κλειστά. Μπορείτε να συναινέσετε αργότερα από την αίθουσα.",
       "recordingOptionalHost": "Αν δεν συναινέσετε, μπαίνετε κανονικά και συντονίζετε όπως πάντα, αλλά η φωνή σας δεν διατηρείται στα κομμάτια ανά άτομο ούτε στη μεταγραφή. Το βίντεο της αίθουσας, αν καταγράφεται, σας περιλαμβάνει ούτως ή άλλως.",
       "recordingOptionalVoice": "Αν δεν συναινέσετε, συμμετέχετε κανονικά και μπορείτε να μιλήσετε, αλλά μένετε εκτός καταγραφής: χωρίς όνομα, φωνή ή εικόνα. Μπορείτε να συναινέσετε αργότερα από την αίθουσα.",
       "recordingNotice": "Η εκδήλωση καταγράφεται (ήχος και βίντεο). Συμμετέχετε χωρίς μικρόφωνο και κάμερα: η καταγραφή δεν περιέχει τη φωνή ή την εικόνα σας, εκτός αν ο συντονιστής σας δώσει τον λόγο.",
       "recordingNoticeVoice": "Η εκδήλωση καταγράφεται (ήχος και βίντεο). Συμμετέχετε χωρίς μικρόφωνο και κάμερα: η καταγραφή δεν περιέχει το όνομα, τη φωνή ή την εικόνα σας, εκτός αν συναινέσετε στην αίθουσα.",
+      "recordingHostAlwaysReserved": "You host this event: you are always in the recording, with name, voice, image and shared screen. The video stays reserved for the organizers and registrants: it is not published. Registrants can watch it for as long as their registration data is kept.",
+      "recordingHostAlwaysPublic": "You host this event: you are always in the recording, with name, voice, image and shared screen. The video can be published and watched by anyone.",
       "recordingHostAlways": "Συντονίζετε αυτή την εκδήλωση: είστε πάντα στην καταγραφή, με όνομα, φωνή, εικόνα και κοινή οθόνη."
+    },
+    "sheet": {
+      "title": "This event and your data",
+      "intro": "This depends on how the organizers set up the event. Everything else is in the privacy notice.",
+      "recording": {
+        "label": "Recording",
+        "none": "No recording is planned for this event.",
+        "manual": "The hosts can start the audio and video recording. When it is on, the room shows it.",
+        "auto": "The event is recorded, audio and video, from the moment it starts. The room shows it.",
+        "tracksOnly": "The room video is not recorded: only one audio track for each person who consents.",
+        "destinationReserved": "The recording stays reserved for the organizers and registrants and is not published. Registrants can watch it for as long as their registration data is kept.",
+        "destinationPublic": "The recording may be published after the event.",
+        "destinationUnset": "The organizers decide after the event whether to publish it.",
+        "refuseOut": "If you do not consent you still take part and stay out of the recording.",
+        "refuseListenOnly": "If you do not consent you take part listening only.",
+        "hostsAlways": "The hosts are always in the recording, with name, voice, image and shared screen."
+      },
+      "transcript": {
+        "label": "Transcript",
+        "captions": "The caption text is kept, with the name, only for people who consent, and becomes the event transcript.",
+        "tracks": "For people who consent, an audio track is recorded and deleted after transcription.",
+        "tracksRetained": "For people who consent, an audio track is recorded and kept with the event data.",
+        "fromVideo": "After the event, the organizers can have the video transcribed only if everyone who speaks in it has consented."
+      },
+      "captions": {
+        "label": "Captions"
+      },
+      "ai": {
+        "label": "Artificial intelligence",
+        "summary": "After the event, an AI tool may write a summary of the recording.",
+        "translation": "The transcript and summary may be translated automatically.",
+        "dubbing": "The video may be dubbed with a synthetic voice.",
+        "report": "After the event, the staff may have an AI tool write a report, using also the chat without names, questions and polls."
+      },
+      "list": {
+        "label": "Participant list",
+        "visible": "Participants see the list of people in the room.",
+        "hidden": "In the room the audience does not see the list of people present. Hosts and speakers do."
+      },
+      "name": {
+        "label": "Your name",
+        "real": "In the room, in the chat and in questions you appear under your name.",
+        "pseudonym": "In the room, in the chat and in questions you appear under a pseudonym. The organizers see your registration data. If you consent to the transcript, your name stays there."
+      },
+      "retention": {
+        "label": "Retention",
+        "data": "Registration and room data are deleted {days, plural, one {# day} other {# days}} after the event ends. Questions and polls stay without names.",
+        "videoUnpublished": "If it is not made available, the recording is deleted with them.",
+        "videoPublishedDays": "If it is made available, it is deleted {days, plural, one {# day} other {# days}} later.",
+        "videoPublishedOpen": "If it is made available, it stays until the organizers remove it."
+      }
     },
     "export": {
       "title": "Τα δεδομένα μου",
@@ -4434,6 +4542,12 @@
       "consentFuture": "Μελλοντικές επικοινωνίες",
       "consentWithdrawnOn": "Ανακλήθηκε στις {date}",
       "consentNoteInRoom": "Αν βρίσκεστε τώρα στην αίθουσα, η ανάκληση ισχύει από την επόμενη είσοδο: για άμεση ισχύ, χρησιμοποιήστε τις Συγκαταθέσεις στην αίθουσα.",
+      "proofsTitle": "Consent proofs kept",
+      "proofsIntro": "The data for these events has been deleted. These proofs stay for as long as the video or transcript is published. You can withdraw your consent: what is already in the video stays, and to have it removed you must write to the data controller.",
+      "proofGivenOn": "Given on {date}",
+      "addressBookTitle": "Events address book",
+      "addressBookIntro": "You chose to stay in the address book, to be invited to similar events. We keep this data until {date}, unless you withdraw your consent or give it again.",
+      "addressBookOptOut": "Remove me from the address book",
       "consentFutureEffect": "Αν την ανακαλέσετε, δεν θα λαμβάνετε πλέον ενημερώσεις για επόμενες εκδηλώσεις και βγαίνετε από το βιβλίο διευθύνσεων, για όλες τις εγγραφές σας."
     },
     "erasure": {
@@ -4448,11 +4562,13 @@
       "linkInvalid": "Ο σύνδεσμος δεν είναι έγκυρος ή έχει λήξει. Ζητήστε νέο σύνδεσμο.",
       "confirmWarning": "Πρόκειται να διαγράψετε οριστικά όλα τα προσωπικά δεδομένα που συνδέονται με τη διεύθυνση email σας.",
       "confirmBody": "Θα διαγραφούν οι εγγραφές, οι ερωτήσεις, οι ψήφοι σε δημοσκοπήσεις, η ανατροφοδότηση, οι υπενθυμίσεις και η καταχώρισή σας στο Ευρετήριο εκδηλώσεων. Η ενέργεια είναι μη αναστρέψιμη.",
+      "confirmProofs": "If an event has a published video or transcript, the type of consent, the date and the text you answered stay, without your name, for as long as that video or transcript stays published. They are there to prove the consent. The video does not change: to ask for your contributions to be removed, write to the data controller.",
       "confirmButton": "Επιβεβαίωση διαγραφής",
       "cancel": "Ακύρωση",
       "processing": "Διαγραφή σε εξέλιξη...",
       "doneTitle": "Η διαγραφή ολοκληρώθηκε",
       "doneBody": "Διαγράφηκαν {count} εγγραφές και τα συνδεδεμένα δεδομένα.",
+      "doneProofs": "{count, plural, one {# consent proof remains, without your name, for as long as the video or transcript stays published.} other {# consent proofs remain, without your name, for as long as the video or transcript stays published.}}",
       "error": "Παρουσιάστηκε σφάλμα. Δοκιμάστε ξανά αργότερα.",
       "rateLimited": "Πάρα πολλά αιτήματα. Δοκιμάστε ξανά σε μία ώρα.",
       "back": "Επιστροφή στα δεδομένα μου",
@@ -5302,6 +5418,7 @@
     "multitrackConsentTitle": "Απομαγνητοφώνηση των παρεμβάσεών σας",
     "recordingConsentTitle": "Καταγραφή της εκδήλωσης",
     "recordingConsentIntro": "Η εκδήλωση καταγράφεται (ήχος και βίντεο). Με τη συναίνεσή σας, η καταγραφή περιέχει το όνομα, τη φωνή, την εικόνα σας και ό,τι μοιράζεστε στην οθόνη.",
+    "recordingConsentIntroNoVideo": "The room video is not recorded at this event.",
     "enterGardenTitle": "Μπείτε στην πλατεία",
     "enterGardenHint": "Ένα άλλο μέρος για να περιμένετε: περπατήστε, γνωρίστε όσους περιμένουν και μπείτε στη ζωντανή εκδήλωση από την πύλη όταν ανοίξει η αίθουσα.",
     "backToWaitingRoom": "Επιστροφή στην αίθουσα αναμονής",
@@ -5568,6 +5685,8 @@
     "audiencePublicDesc": "Όποιος ανοίγει τη σελίδα της εκδήλωσης. Μπορεί να εμφανιστεί στη βιντεοθήκη.",
     "audienceRegistrants": "Μόνο οι εγγεγραμμένοι",
     "audienceRegistrantsDesc": "Όσοι εγγράφηκαν στην εκδήλωση, ακόμη κι αν δεν μπήκαν στην αίθουσα, μέσω του προσωπικού συνδέσμου της ειδοποίησης email. Δεν εμφανίζεται στη βιντεοθήκη.",
+    "audienceReservedNote": "People consented to a reserved recording: only registrants and the organizers can see the video.",
+    "destinationMissing": "This event does not say where the recording goes: the consents collected do not say whether the video would be published. Check before you publish it.",
     "saveFailed": "Η αλλαγή δεν αποθηκεύτηκε. Δοκιμάστε ξανά."
   },
   "postEvent": {
@@ -5577,7 +5696,9 @@
     "libraryListed": "Δημοσίευση στη βιβλιοθήκη βίντεο",
     "libraryListedHelp": "Εμφανίζει αυτήν την εκδήλωση στη δημόσια βιβλιοθήκη (/video-library). Απαιτεί δημοσιευμένη καταγραφή ή βίντεο YouTube, καθώς και η σελίδα της εκδήλωσης να είναι ορατή.",
     "libraryListedNoRecording": "Καμία δημοσιευμένη καταγραφή: η εκδήλωση δεν θα εμφανιστεί στη βιβλιοθήκη μέχρι να δημοσιεύσετε την καταγραφή ή να προσθέσετε ένα βίντεο YouTube.",
+    "libraryListedReserved": "Reserved recording: the event does not appear in the video library.",
     "showQA": "Εμφάνιση ερωτήσεων Q&A",
+    "qaReservedNote": "With a reserved recording, questions are not published.",
     "showMaterials": "Εμφάνιση κοινοποιημένου υλικού",
     "showPolls": "Εμφάνιση αποτελεσμάτων δημοσκοπήσεων",
     "showFeedback": "Εμφάνιση αξιολόγησης",
@@ -5835,6 +5956,7 @@
     "sourceTranscriptMissing": "Αυτή η καταγραφή δεν έχει ακόμη απομαγνητοφωνηθεί: απομαγνητοφωνήστε την πριν προσθέσετε μετάφραση.",
     "captionsTranscriptNotTranslatable": "Αυτή η απομαγνητοφώνηση προέρχεται από τους ζωντανούς υπότιτλους: η αυτόματη μετάφραση χρειάζεται απομαγνητοφώνηση AI της εγγραφής.",
     "sameLanguage": "Η γλώσσα που επιλέξατε είναι η αρχική της καταγραφής: επιλέξτε άλλη.",
+    "recordingDestinationNotCovered": "The consents for this event cover a reserved recording: you cannot make it visible to everyone or link an external video.",
     "mtUnavailable": "Η αυτόματη μετάφραση δεν είναι εγκατεστημένη σε αυτή την εγκατάσταση."
   }
 }

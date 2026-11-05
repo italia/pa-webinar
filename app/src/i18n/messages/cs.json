@@ -298,6 +298,7 @@
       "generic": "Chyba při registraci. Zkuste to znovu.",
       "questionnaireRequired": "Pro registraci odpovězte na otázky dotazníku.",
       "questionnaireIncomplete": "Odpovězte na všechny povinné otázky dotazníku.",
+      "recordingDestinationChanged": "The text about the recording changed while you were filling in the form: reload the page and read it again.",
       "questionnaireChanged": "Dotazník se změnil, zatímco jste vyplňovali formulář: načtěte stránku znovu a odpovězte znovu."
     }
   },
@@ -424,6 +425,7 @@
       "noMessages": "Žádné zprávy",
       "empty": "Zatím žádné zprávy. Napište jako první!",
       "inputLabel": "Zpráva chatu",
+      "personalDataNotice": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read and download the chat.",
       "moderatorBadge": "Moderátor",
       "attach": "Přiložit soubor",
       "emojiPicker": "Vložit emoji",
@@ -722,6 +724,7 @@
     "upvoted": "Hlasováno",
     "noQuestions": "Zatím žádné otázky. Buďte první!",
     "qaPersistenceNote": "Otázky jsou uloženy a budou dostupné i po skončení události.",
+    "personalDataNotice": "Do not write other people's personal data, or your own if you do not want it made public: the text of your question may appear on the event page, without your name.",
     "qaPostEvent": "Otázky a odpovědi z události",
     "noAnsweredQuestions": "Žádné zodpovězené otázky k této události.",
     "filterAll": "Všechny",
@@ -742,6 +745,7 @@
       "editAnswer": "Upravit odpověď",
       "answerFieldLabel": "Odpověď na otázku od {name}",
       "answerPlaceholder": "Napište odpověď (max. 2000 znaků)",
+      "answerNotice": "The answer may appear on the event page: do not write personal data.",
       "sendAnswer": "Zveřejnit odpověď",
       "cancel": "Zrušit",
       "removeAnswer": "Odebrat odpověď"
@@ -1025,6 +1029,13 @@
           }
         },
         "recordingManualNote": "Záznam se nikdy nespustí sám: moderátor ho spustí tlačítkem REC.",
+        "recordingDestination": "Where the recording goes",
+        "recordingDestinationReserved": "Reserved",
+        "recordingDestinationReservedDesc": "Organizers and registrants can see it, registrants for as long as their registration data is kept. It cannot be made public.",
+        "recordingDestinationPublic": "Public",
+        "recordingDestinationPublicDesc": "It can be published on the event page and in the video library. Participants consent to this too.",
+        "recordingDestinationNotSet": "Not set: the event was created before this choice existed.",
+        "recordingDestinationLocked": "Once the room has opened you can only switch to reserved: consents are valid for the text people read.",
         "audienceAnonymous": "Anonymní publikum",
         "audienceAnonymousDesc": "Účastníci se ostatním zobrazují pod pseudonymem („Účastník“ a kód) ve videu, v chatu i v dotazech; seznam účastníků vidí jen moderátoři a náměstí není k dispozici. Hodí se pro velké akce; na komunitních akcích se lidé chtějí poznat.",
         "audienceAnonymousLocked": "Dokud může být místnost otevřená, nelze to změnit: propojilo by to pseudonymy se jmény.",
@@ -1135,6 +1146,7 @@
         "askOrganization": "Organizace (povinná pro přihlášku)",
         "askRole": "Funkce (nepovinné)",
         "askType": "Typ organizace (nepovinné)",
+        "askAddressBook": "Offer to join the address book (optional for people who register)",
         "questionnairesHeading": "Dotazníky",
         "questionsBefore": "Před akcí, při registraci: {count, plural, =0 {žádné další otázky} one {# další otázka} few {# další otázky} other {# dalších otázek}}",
         "questionsAfter": "Po akci: {count, plural, =0 {žádný dotazník spokojenosti} one {dotazník spokojenosti, # otázka} few {dotazník spokojenosti, # otázky} other {dotazník spokojenosti, # otázek}}",
@@ -1281,7 +1293,10 @@
         "participantsCan": "Účastníci: {list}",
         "none": "žádné",
         "recordingManual": "K dispozici: začne až po stisknutí REC moderátorem.",
+        "recordingDestinationReserved": "Destination: reserved for the organizers and registrants.",
+        "recordingDestinationPublic": "Destination: public.",
         "aiAfter": "Po záznamu: {list}.",
+        "aiConfirmVideo": "Without per-person tracks, the video transcription starts only after someone confirms that every voice has consented.",
         "scheduleHeading": "Kdy se koná",
         "scheduleIntro": "Kdy se akce koná: datum, čas a časové pásmo.",
         "advancedIntro": "Hodnoty, které už zvolila šablona: změňte jen to, co je potřeba.",
@@ -1325,6 +1340,7 @@
         "askOrganization": "organizace",
         "askRole": "funkce",
         "askType": "typ organizace",
+        "askAddressBook": "whether they want to join the address book",
         "permissionsHeading": "Kdo co může v místnosti",
         "permissionsIntro": "Co mohou účastníci dělat a které funkce místnosti jsou zapnuté. Vše lze měnit i během akce.",
         "consentsLine": "Souhlasy při registraci a v místnosti: {list}",
@@ -1336,6 +1352,12 @@
         "consentsWithdraw": "Účastníci je mohou v místnosti odvolat tlačítkem „Souhlasy“.",
         "participantListShown": "Seznam účastníků: viditelný pro všechny.",
         "participantListHidden": "Seznam účastníků: jen pro moderátory a řečníky.",
+        "audiencePseudonyms": "Audience names: pseudonyms.",
+        "audienceRealNames": "Audience names: real names.",
+        "postEventQaHidden": "Questions after the event: not published.",
+        "postEventQaTextOnly": "Questions after the event: text only, without names.",
+        "addressBookOffered": "Address book: offered to people who register.",
+        "addressBookNotOffered": "Address book: not offered.",
         "consentRecordingOptional": "nahrávání, dobrovolné",
         "consentRecordingVoice": "záznam, dobrovolný (bez souhlasu zůstává osoba mimo záznam)",
         "consentsHostsAlways": "Moderátoři a řečníci jsou vždy v záznamu: políčko nevidí."
@@ -1542,6 +1564,8 @@
           "saveFailed": "Uložení metadat se nezdařilo."
         }
       },
+      "reservedBadge": "Reserved",
+      "reservedHelp": "The recording is reserved for registrants: it cannot appear in the video library.",
       "updateFailed": "Aktualizace se nezdařila."
     },
     "recordingsLibrary": {
@@ -2306,6 +2330,8 @@
         "guestAccessEnabledHelp": "Neregistrovaní se mohou k probíhajícím událostem připojit jen se svým jménem. Pokud je vypnuto, k plánovaným událostem se lze připojit pouze po registraci nebo odkazem pro moderátora či řečníka; okamžité videohovory zůstávají otevřené každému, kdo má odkaz. Akce jen pro pozvané hosty nikdy nepouští.",
         "publicRegistrationEnabled": "Veřejná registrace aktivní",
         "publicRegistrationEnabledHelp": "Na události se může registrovat kdokoli. Pokud je vypnuto, mohou se registrovat pouze osoby ze seznamu pozvaných na událost a osobní odkaz pro vstup se posílá pouze e-mailem; již registrovaní a odkazy pro moderátory a řečníky fungují dál. Je to volba nabízená novým akcím: každá akce může v kroku „Osoby“ rozhodnout jinak.",
+        "addressBookEnabled": "Events address book",
+        "addressBookEnabledHelp": "Offers people who register the chance to stay in the address book and be invited to similar events. When off, the checkbox disappears from the forms and the picker from the wizard; existing entries stay until they are withdrawn or expire.",
         "calendarPublic": "Veřejný kalendář",
         "calendarPublicHelp": "Zveřejnit kalendář událostí. Návštěvníci mohou vidět naplánované události.",
         "parseTitleKicker": "Názvy s redakčním kickerem",
@@ -2438,6 +2464,8 @@
       "featuresLabel": "Funkce",
       "whiteboardLabel": "Tabule",
       "recordingLabel": "Nahrávání",
+      "recordingDestination": "Recording destination",
+      "recordingDestinationNone": "Chosen when creating the event",
       "waitingRoomEngineLabel": "Čekárna (výchozí pro šablonu)",
       "waitingRoomEngineSiteDefault": "Výchozí nastavení webu",
       "waitingRoomEngineGarden": "Zahrada (běžná)",
@@ -2459,6 +2487,7 @@
       "pickerSubtitle": "Vyberte šablonu pro předkonfiguraci nastavení události, nebo přeskočte pro ruční konfiguraci.",
       "skipTemplate": "Konfigurovat ručně",
       "postEventPublic": "Veřejná stránka po události",
+      "offerAddressBook": "Offers the address book to people who register",
       "invalidFields": "Zkontrolujte tato pole: {fields}.",
       "descriptionOtherLanguages": "Existují také verze v jazycích: {languages}, které zde nelze upravit. Pokud změníte italský text, odstraní se."
     },
@@ -3599,6 +3628,10 @@
       "rec": {
         "yes": "Ano, když stisknete REC",
         "yesDesc": "Po akci: přepis, shrnutí a překlad",
+        "reserved": "Yes, reserved",
+        "reservedDesc": "Organizers and registrants can see it",
+        "public": "Yes, public",
+        "publicDesc": "It can be published on the event page",
         "no": "Ne",
         "noDesc": "Žádný záznam, žádný souhlas k vyžádání"
       },
@@ -3613,6 +3646,8 @@
         "tutti": "všichni na videu",
         "relatori": "mluví řečníci",
         "si": "se záznamem",
+        "riservata": "with reserved recording",
+        "pubblica": "with public recording",
         "no": "bez záznamu",
         "openAccess": "otevřené všem",
         "inviteOnly": "jen pro pozvané"
@@ -3625,6 +3660,8 @@
         "invitationDesc": "Stránka zůstává viditelná, ale registrovat se mohou jen lidé ze seznamu; pozvánku s odkazem k registraci pošlete e-mailem ze stránky akce"
       },
       "previewInvitation": "Registrují se jen pozvaní; bez registrace se nevstoupí.",
+      "previewPseudonyms": "The audience appears under a pseudonym",
+      "previewRealNames": "The audience appears under their own names",
       "templateReplaces": "Šablona přinese vlastní nastavení místo odpovědí níže. Název, data a osoby zadáte v dalších krocích.",
       "instantBack": "Vytvořit místo toho naplánovanou akci"
     },
@@ -3762,6 +3799,7 @@
         "pubblicata": "Zveřejněn.",
         "prontaAi": "Připraven z postprodukce: zkontrolujte ho; zveřejní se spolu s videem.",
         "prontaSottotitoli": "Připraven z titulků: zkontrolujte jména a zveřejněte ho.",
+        "daConfermare": "To start: the video is transcribed only once someone confirms that every voice has consented.",
         "inLavorazione": "Zpracovává se.",
         "nessuna": "Není k dispozici: chybí titulky i postprodukce.",
         "soloStaff": "Kontrolu a zveřejnění provádí organizátor akce v administraci.",
@@ -3801,6 +3839,7 @@
         "title": "Veřejná stránka",
         "visibile": "Viditelná pro všechny.",
         "nellaLibreria": "Viditelná pro všechny a ve videotéce.",
+        "libreriaRiservata": "The page is visible, but the video is reserved for registrants: it does not appear in the video library.",
         "privata": "Stažena: veřejnost ji nevidí.",
         "scaduta": "Již není viditelná: datum vypršení uplynulo.",
         "archiviato": "Akce archivována: stránka není veřejná.",
@@ -3951,6 +3990,7 @@
       "message": "Tato akce požádala každého o souhlas s přepisem jeho příspěvků. Celý záznam obsahuje všechny hlasy, i těch, kdo souhlas nedali: přepište ho jen tehdy, pokud souhlasili všichni, kdo v něm mluví. Vaše potvrzení zůstane v protokolu činností.",
       "confirm": "Ano, všichni souhlasili",
       "cancel": "Zrušit",
+      "waitingNoCaptions": "The transcription of the full recording did not start on its own: each person chooses whether what they say is transcribed. Start it with {button} only if everyone who speaks in the recording has consented; otherwise the event stays without a transcript.",
       "waiting": "Přepis celého záznamu se nespustil sám: tato akce požádala každého o souhlas s přepisem jeho příspěvků. Spusťte ho tlačítkem {button} jen tehdy, pokud souhlasili všichni, kdo v záznamu mluví; jinak zůstane přepis z titulků."
     },
     "editCopyTitle": "Kopie akce",
@@ -3979,6 +4019,12 @@
         "givenAt": "Uděleno",
         "withdrawnAt": "Odvoláno",
         "textVersion": "Verze textu",
+        "destination": "Destination",
+        "destinations": {
+          "PUBLIC": "Public",
+          "REGISTRANTS": "Reserved",
+          "none": "Not set"
+        },
         "kinds": {
           "recording": "Záznam",
           "transcription": "Přepis příspěvků"
@@ -3992,8 +4038,10 @@
           "guest": "host",
           "host": "moderuje nebo vystupuje"
         },
+        "erasedName": "(name removed on request)",
         "unreadableName": "(jméno nelze přečíst)"
       },
+      "retainedNote": "{count, plural, one {# proof is kept} other {# proofs are kept}} for as long as the video or transcript stays published.",
       "countsNote": "Počítají se osoby: registrace, účet týmu nebo jmenný odkaz se počítají jednou; host, který se vrátí při jiné návštěvě, se počítá znovu."
     }
   },
@@ -4011,6 +4059,8 @@
     "dateLabel": "Datum",
     "timeLabel": "Čas",
     "durationLabel": "Délka trvání",
+    "addressBookNote": "You are in the events address book, to be invited to similar events: you can withdraw your consent at any time.",
+    "addressBookOptOutLink": "Remove me from the address book",
     "myDataLink": "Vaše údaje: zobrazit, opravit, odvolat souhlas nebo zrušit registraci"
   },
   "home": {
@@ -4379,16 +4429,74 @@
   "gdpr": {
     "consent": {
       "recording": "Souhlasím s audio/video záznamem této události",
+      "recordingReserved": "I consent to the audio/video recording of this event. The video stays reserved for the organizers and registrants: it is not published. Registrants can watch it for as long as their registration data is kept.",
+      "recordingPublic": "I consent to the audio/video recording of this event and to its publication: anyone can watch the video on the event page and in the video library.",
+      "recordingNoVideo": "I consent to the recording of this event. The room video is not recorded: only the audio tracks of people who consent to transcription are kept, if the event uses them.",
       "multitrack": "Souhlasím s přepisem svých příspěvků se svým jménem pro zprávu z akce. Pokud akce nahrává samostatnou zvukovou stopu každé osoby, můj hlas se nahrává pouze za tímto účelem a stopa se po přepisu smaže; nepoužívá se k identifikaci ani k napodobení mého hlasu.",
+      "multitrackRetained": "I consent to my contributions being transcribed, with my name, for the event's report. If the event records a separate audio track for each person, my voice is recorded for this purpose only and the track is kept with the event data; it is not used to identify or reproduce my voice.",
       "multitrackOptional": "Je to dobrovolné: pokud nesouhlasíte, můžete se přesto zúčastnit, ale vaše příspěvky nebudou v přepisu a váš hlas se nebude nahrávat na samostatnou stopu. Pokud se akce nahrává, váš hlas ve videu přesto zůstane.",
       "stayInTouch": "Chci dostávat informace o připravovaných akcích a být zařazen do adresáře, abych byl zván na podobné akce",
       "stayInTouchHelp": "Nepovinný souhlas (čl. 6.1.a GDPR). Můžete ho kdykoli odvolat odkazem „Odebrat mě z adresáře“ v e-mailech, které obdržíte. Jméno a organizace jsou ty z této registrace.",
+      "stayInTouchRetention": "We keep this data for {months} months from this consent: the period restarts only if you tick the box again.",
       "recordingOptionalListenOnly": "Pokud nesouhlasíte, účastníte se i tak, pouze jako posluchač: sledujete a píšete do chatu, ale mikrofon, kamera a sdílení obrazovky zůstávají vypnuté. Souhlas můžete dát později v místnosti.",
       "recordingOptionalHost": "Pokud nesouhlasíte, vstoupíte i tak a vedete jako obvykle, ale váš hlas se neuchová v samostatných stopách účastníků ani v přepisu. Video místnosti, pokud se nahrává, vás přesto zachytí.",
       "recordingOptionalVoice": "Pokud nesouhlasíte, účastníte se i tak a můžete mluvit, ale zůstáváte mimo záznam: bez jména, hlasu i obrazu. Souhlas můžete dát později v místnosti.",
       "recordingNotice": "Akce se nahrává (zvuk a video). Účastníte se bez mikrofonu a kamery: záznam neobsahuje váš hlas ani obraz, pokud vám moderátor neudělí slovo.",
       "recordingNoticeVoice": "Akce se nahrává (zvuk i video). Účastníte se bez mikrofonu a kamery: záznam neobsahuje vaše jméno, hlas ani obraz, pokud nesouhlasíte v místnosti.",
+      "recordingHostAlwaysReserved": "You host this event: you are always in the recording, with name, voice, image and shared screen. The video stays reserved for the organizers and registrants: it is not published. Registrants can watch it for as long as their registration data is kept.",
+      "recordingHostAlwaysPublic": "You host this event: you are always in the recording, with name, voice, image and shared screen. The video can be published and watched by anyone.",
       "recordingHostAlways": "Vedete tuto akci: jste vždy v záznamu, se jménem, hlasem, obrazem a sdílenou obrazovkou."
+    },
+    "sheet": {
+      "title": "This event and your data",
+      "intro": "This depends on how the organizers set up the event. Everything else is in the privacy notice.",
+      "recording": {
+        "label": "Recording",
+        "none": "No recording is planned for this event.",
+        "manual": "The hosts can start the audio and video recording. When it is on, the room shows it.",
+        "auto": "The event is recorded, audio and video, from the moment it starts. The room shows it.",
+        "tracksOnly": "The room video is not recorded: only one audio track for each person who consents.",
+        "destinationReserved": "The recording stays reserved for the organizers and registrants and is not published. Registrants can watch it for as long as their registration data is kept.",
+        "destinationPublic": "The recording may be published after the event.",
+        "destinationUnset": "The organizers decide after the event whether to publish it.",
+        "refuseOut": "If you do not consent you still take part and stay out of the recording.",
+        "refuseListenOnly": "If you do not consent you take part listening only.",
+        "hostsAlways": "The hosts are always in the recording, with name, voice, image and shared screen."
+      },
+      "transcript": {
+        "label": "Transcript",
+        "captions": "The caption text is kept, with the name, only for people who consent, and becomes the event transcript.",
+        "tracks": "For people who consent, an audio track is recorded and deleted after transcription.",
+        "tracksRetained": "For people who consent, an audio track is recorded and kept with the event data.",
+        "fromVideo": "After the event, the organizers can have the video transcribed only if everyone who speaks in it has consented."
+      },
+      "captions": {
+        "label": "Captions"
+      },
+      "ai": {
+        "label": "Artificial intelligence",
+        "summary": "After the event, an AI tool may write a summary of the recording.",
+        "translation": "The transcript and summary may be translated automatically.",
+        "dubbing": "The video may be dubbed with a synthetic voice.",
+        "report": "After the event, the staff may have an AI tool write a report, using also the chat without names, questions and polls."
+      },
+      "list": {
+        "label": "Participant list",
+        "visible": "Participants see the list of people in the room.",
+        "hidden": "In the room the audience does not see the list of people present. Hosts and speakers do."
+      },
+      "name": {
+        "label": "Your name",
+        "real": "In the room, in the chat and in questions you appear under your name.",
+        "pseudonym": "In the room, in the chat and in questions you appear under a pseudonym. The organizers see your registration data. If you consent to the transcript, your name stays there."
+      },
+      "retention": {
+        "label": "Retention",
+        "data": "Registration and room data are deleted {days, plural, one {# day} other {# days}} after the event ends. Questions and polls stay without names.",
+        "videoUnpublished": "If it is not made available, the recording is deleted with them.",
+        "videoPublishedDays": "If it is made available, it is deleted {days, plural, one {# day} other {# days}} later.",
+        "videoPublishedOpen": "If it is made available, it stays until the organizers remove it."
+      }
     },
     "export": {
       "title": "Moje údaje",
@@ -4434,6 +4542,12 @@
       "consentFuture": "Budoucí sdělení",
       "consentWithdrawnOn": "Odvoláno {date}",
       "consentNoteInRoom": "Pokud jste právě v místnosti, odvolání platí od příštího vstupu: aby platilo hned, použijte v místnosti Souhlasy.",
+      "proofsTitle": "Consent proofs kept",
+      "proofsIntro": "The data for these events has been deleted. These proofs stay for as long as the video or transcript is published. You can withdraw your consent: what is already in the video stays, and to have it removed you must write to the data controller.",
+      "proofGivenOn": "Given on {date}",
+      "addressBookTitle": "Events address book",
+      "addressBookIntro": "You chose to stay in the address book, to be invited to similar events. We keep this data until {date}, unless you withdraw your consent or give it again.",
+      "addressBookOptOut": "Remove me from the address book",
       "consentFutureEffect": "Pokud jej odvoláte, nebudete dostávat sdělení o dalších akcích a opustíte adresář, a to pro všechny své registrace."
     },
     "erasure": {
@@ -4448,11 +4562,13 @@
       "linkInvalid": "Tento odkaz je neplatný nebo vypršel. Požádejte o nový odkaz.",
       "confirmWarning": "Chystáte se trvale vymazat všechny osobní údaje spojené s vaší e-mailovou adresou.",
       "confirmBody": "Budou vymazány registrace, otázky, hlasy v anketách, zpětná vazba, připomenutí a váš záznam v adresáři událostí. Tato operace je nevratná.",
+      "confirmProofs": "If an event has a published video or transcript, the type of consent, the date and the text you answered stay, without your name, for as long as that video or transcript stays published. They are there to prove the consent. The video does not change: to ask for your contributions to be removed, write to the data controller.",
       "confirmButton": "Potvrdit výmaz",
       "cancel": "Zrušit",
       "processing": "Probíhá výmaz...",
       "doneTitle": "Výmaz dokončen",
       "doneBody": "Registrace ({count}) a související údaje byly vymazány.",
+      "doneProofs": "{count, plural, one {# consent proof remains, without your name, for as long as the video or transcript stays published.} other {# consent proofs remain, without your name, for as long as the video or transcript stays published.}}",
       "error": "Došlo k chybě. Zkuste to prosím později.",
       "rateLimited": "Příliš mnoho požadavků. Zkuste to prosím znovu za hodinu.",
       "back": "Zpět na moje údaje",
@@ -5302,6 +5418,7 @@
     "multitrackConsentTitle": "Přepis vašich příspěvků",
     "recordingConsentTitle": "Záznam akce",
     "recordingConsentIntro": "Akce se nahrává (zvuk i video). S vaším souhlasem záznam obsahuje vaše jméno, hlas, obraz a to, co sdílíte na obrazovce.",
+    "recordingConsentIntroNoVideo": "The room video is not recorded at this event.",
     "enterGardenTitle": "Vstupte na náměstí",
     "enterGardenHint": "Jiné místo pro čekání: projděte se, potkejte ostatní čekající a vstupte do přenosu branou, až se místnost otevře.",
     "backToWaitingRoom": "Zpět do čekárny",
@@ -5568,6 +5685,8 @@
     "audiencePublicDesc": "Kdokoli, kdo otevře stránku akce. Může se objevit ve videotéce.",
     "audienceRegistrants": "Jen registrovaní",
     "audienceRegistrantsDesc": "Ti, kdo se na akci zaregistrovali, i když do místnosti nevstoupili, přes osobní odkaz z e-mailového upozornění. Ve videotéce se neobjeví.",
+    "audienceReservedNote": "People consented to a reserved recording: only registrants and the organizers can see the video.",
+    "destinationMissing": "This event does not say where the recording goes: the consents collected do not say whether the video would be published. Check before you publish it.",
     "saveFailed": "Změna nebyla uložena. Zkuste to znovu."
   },
   "postEvent": {
@@ -5577,7 +5696,9 @@
     "libraryListed": "Publikovat do videoknihovny",
     "libraryListedHelp": "Zobrazí tuto událost ve veřejné knihovně (/video-library). Vyžaduje publikovaný záznam nebo video na YouTube a viditelnou stránku události.",
     "libraryListedNoRecording": "Žádný publikovaný záznam: událost se v knihovně neobjeví, dokud záznam nepublikujete nebo nepřidáte video z YouTube.",
+    "libraryListedReserved": "Reserved recording: the event does not appear in the video library.",
     "showQA": "Zobrazit otázky Q&A",
+    "qaReservedNote": "With a reserved recording, questions are not published.",
     "showMaterials": "Zobrazit sdílené materiály",
     "showPolls": "Zobrazit výsledky anket",
     "showFeedback": "Zobrazit zpětnou vazbu",
@@ -5835,6 +5956,7 @@
     "sourceTranscriptMissing": "Tento záznam ještě není přepsaný: nejdřív ho přepište, pak přidejte překlad.",
     "captionsTranscriptNotTranslatable": "Tento přepis pochází z živých titulků: automatický překlad vyžaduje AI přepis záznamu.",
     "sameLanguage": "Zvolený jazyk je původní jazyk záznamu: vyberte jiný.",
+    "recordingDestinationNotCovered": "The consents for this event cover a reserved recording: you cannot make it visible to everyone or link an external video.",
     "mtUnavailable": "Strojový překlad není na této instanci nainstalován."
   }
 }

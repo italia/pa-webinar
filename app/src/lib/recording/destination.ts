@@ -1,0 +1,295 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
+import type { RecordingAudience } from '@prisma/client';
+
+import { AppError } from '@/lib/errors';
+import type { VoceNelVideo } from '@/lib/live/consent-rule';
+
+/**
+ * La destinazione della registrazione di un evento: cio' a cui acconsente chi
+ * spunta la casella, dichiarato prima della sala (Event.recordingDestination).
+ *
+ *  - PUBLIC: il video si puo' pubblicare, per chiunque.
+ *  - REGISTRANTS: riservata a iscritti e staff. `Event.recordingAudience` resta
+ *    REGISTRANTS, e niente video esterno.
+ *  - Null: l'evento non l'ha mai dichiarata. Niente blocco, un avviso a chi
+ *    pubblica. Una destinazione dichiarata non si toglie piu'.
+ *
+ * La destinazione si congela all'apertura della sala: da li' si puo' solo
+ * restringere (`puoCambiareDestinazione`).
+ *
+ * La guardia di pubblicazione guarda l'evento, mai le singole prove: chi non ha
+ * un consenso che copre la destinazione (`consensoCopre`) viene richiesto in
+ * sala, e se non acconsente resta fuori dal video. Tutte le persone nel video
+ * hanno quindi un consenso che copre l'evento, la guardia regge anche dopo la
+ * pulizia che toglie le prove, e un consenso negato tocca solo chi lo nega.
+ *
+ * Il modulo e' puro: lo importano anche i componenti client, per il testo
+ * della casella. Niente Prisma, se non per i tipi.
+ */
+
+/** La destinazione di un evento o di un consenso. Null: non dichiarata. */
+export type Destinazione = RecordingAudience | null;
+
+/**
+ * La versione del testo del consenso alla registrazione. Si salva con il
+ * consenso, accanto alla destinazione letta (Registration.consentRecordingVersion,
+ * RecordingConsent.textVersion), solo se il testo la dichiara:
+ *   1. il testo che dice dove va il video (gdpr.consent.recordingReserved,
+ *      gdpr.consent.recordingPublic).
+ * Due testi non lo dicono, e destinazione e versione restano null, come sui
+ * consensi dati prima: gdpr.consent.recording, su un evento senza destinazione,
+ * e gdpr.consent.recordingNoVideo, dove non c'e' un video da pubblicare. Per
+ * questo i consensi si confrontano con `destinazioneDelTesto`, non con la colonna
+ * dell'evento: dove non c'e' un video un consenso senza destinazione copre. Se
+ * poi l'installazione registra il video, su un evento con destinazione non copre
+ * piu', perche' quel testo diceva che il video non c'era, e si richiede in sala.
+ * Si cambia insieme al testo, quando il suo scopo cambia.
+ */
+export const VERSIONE_TESTO_REGISTRAZIONE = 1;
+
+/**
+ * Un elemento di RecordingConsent.earlierPeriods, il periodo di un consenso
+ * sostituito da uno successivo: porta anche il testo di quel periodo, perche'
+ * la prova deve dire a cosa si era acconsentito allora. Gli elementi scritti
+ * prima che il testo dichiarasse la destinazione hanno solo le date, e chi li
+ * legge tollera l'assenza degli altri campi.
+ *
+ * Il ritiro dalla pagina dei propri dati segue la stessa prova:
+ * POST /api/gdpr/consents accetta esattamente uno tra `registrationId`
+ * (l'iscrizione che esiste ancora) e `proofId` (la prova conservata dopo la
+ * cancellazione dell'iscrizione).
+ */
+export interface PeriodoConsenso {
+  consentedAt: string;
+  withdrawnAt: string | null;
+  destination?: Destinazione;
+  textVersion?: number | null;
+}
+
+/**
+ * Un consenso gia' dato vale per la destinazione dell'evento. Riceve la
+ * destinazione del consenso: che il consenso ci sia, e non sia ritirato, lo
+ * dicono le sue colonne.
+ *
+ * Su un evento senza destinazione vale ogni consenso. Altrimenti un consenso
+ * senza destinazione non copre, perche' quel testo non diceva dove va il video,
+ * e chi ha acconsentito a un video pubblico ha acconsentito anche a uno
+ * riservato, non il contrario. Quindi restringere non chiede niente, e allargare
+ * fa richiedere il consenso in sala.
+ */
+export function consensoCopre(
+  consenso: Destinazione | undefined,
+  evento: Destinazione | undefined
+): boolean {
+  if (evento == null) return true;
+  if (consenso == null) return false;
+  return evento === 'REGISTRANTS' || consenso === 'PUBLIC';
+}
+
+/**
+ * La destinazione che il testo della casella dichiara: quella con cui si
+ * confrontano i consensi e che si salva nella prova. E' quella dell'evento,
+ * salvo dove non c'e' un video (voce 'assente'): quel testo non dice dove va,
+ * perche' non c'e' niente da pubblicare.
+ */
+export function destinazioneDelTesto(
+  destinazione: Destinazione | undefined,
+  voce: VoceNelVideo
+): Destinazione {
+  return voce === 'assente' ? null : (destinazione ?? null);
+}
+
+/**
+ * Il testo letto da chi acconsente, dal campo che la pagina manda con il
+ * consenso: la destinazione del testo mostrato, null se non ne dichiara una.
+ * Solo una pagina aperta da prima che il campo esistesse lo omette: vale il
+ * testo in vigore (`destinazioneDelTesto`). E' la destinazione che si salva con
+ * la prova, anche quando quella in vigore e' piu' stretta.
+ */
+export function testoLetto(
+  letta: Destinazione | undefined,
+  inVigore: Destinazione | undefined
+): Destinazione {
+  return letta === undefined ? (inVigore ?? null) : letta;
+}
+
+/**
+ * Il testo letto e' quello in vigore (`destinazioneDelTesto`). E' la regola del
+ * modulo d'iscrizione: chi lo compila puo' ancora rileggere, e se la destinazione
+ * e' cambiata mentre la pagina era aperta, in qualunque direzione, la rotta
+ * risponde 422 (registration.errors.recordingDestinationChanged).
+ */
+export function testoInVigore(
+  letta: Destinazione | undefined,
+  inVigore: Destinazione | undefined
+): boolean {
+  return testoLetto(letta, inVigore) === (inVigore ?? null);
+}
+
+/**
+ * Il consenso alla registrazione dato con questa richiesta (il corpo di
+ * POST /api/events/[slug]/jitsi/token). Vale se il testo letto copre la
+ * destinazione in vigore (`destinazioneDelTesto`), con la regola dei consensi
+ * gia' dati (`consensoCopre`): una restrizione a pagina aperta non chiede niente,
+ * e chi rientra resta nel video. Se la destinazione si e' allargata, o il testo
+ * non la dichiarava, il consenso non c'e'. La persona entra lo stesso, fuori dal
+ * video: il consenso non e' mai una condizione per entrare.
+ *
+ * Una pagina aperta non si aggiorna da sola. La risposta del token riporta la
+ * destinazione in vigore (`recordingDestination`, da `destinazioneDelTesto`), e
+ * la sala mostra quel testo, cosi' la persona rilegge prima di acconsentire. Il
+ * consenso resta legato al testo su cui e' stato dato: se quel testo non copre
+ * la destinazione in vigore, la sala lo dimentica e lo richiede sul testo nuovo,
+ * invece di rimandarlo come letto.
+ */
+export function consensoOra(
+  corpo: {
+    recordingConsent?: boolean;
+    recordingConsentDestination?: Destinazione;
+  },
+  inVigore: Destinazione | undefined
+): boolean {
+  if (corpo.recordingConsent !== true) return false;
+  return consensoCopre(testoLetto(corpo.recordingConsentDestination, inVigore), inVigore);
+}
+
+const TESTO_CASELLA = {
+  PUBLIC: 'recordingPublic',
+  REGISTRANTS: 'recordingReserved',
+} as const;
+
+/**
+ * Il testo della casella di consenso alla registrazione, come chiave sotto
+ * `gdpr.consent`: lo stesso nel modulo, in sala d'attesa e nei punti della sala
+ * in cui si da' il consenso. Dove non c'e' un video (voce 'assente') dice questo,
+ * qualunque sia la destinazione dell'evento: si salva come dice
+ * `VERSIONE_TESTO_REGISTRAZIONE`.
+ */
+export function chiaveConsenso(
+  destinazione: Destinazione | undefined,
+  voce: VoceNelVideo
+) {
+  if (voce === 'assente') return 'recordingNoVideo';
+  return destinazione ? TESTO_CASELLA[destinazione] : 'recording';
+}
+
+const TESTO_CHI_CONDUCE = {
+  PUBLIC: 'recordingHostAlwaysPublic',
+  REGISTRANTS: 'recordingHostAlwaysReserved',
+} as const;
+
+/**
+ * L'avviso a chi conduce un evento che lo tiene sempre nella registrazione,
+ * come chiave sotto `gdpr.consent`. Non e' una casella: dice solo dove va il
+ * video.
+ */
+export function chiaveAvvisoConduce(destinazione: Destinazione | undefined) {
+  return destinazione ? TESTO_CHI_CONDUCE[destinazione] : 'recordingHostAlways';
+}
+
+/**
+ * Cosa dice la destinazione a chi pubblica:
+ *  - 'riservata': si pubblica solo per gli iscritti;
+ *  - 'senzaDestinazione': i consensi raccolti non dicono dove sarebbe andato il
+ *    video. Niente blocco, un avviso;
+ *  - 'libera': destinazione pubblica, o un evento storico importato (LEGACY),
+ *    che non ha consensi su cui avvisare.
+ */
+export type EsitoPubblicazione = 'riservata' | 'senzaDestinazione' | 'libera';
+
+export function esitoPubblicazione(stato: {
+  recordingDestination: Destinazione | undefined;
+  eventType: string | null;
+}): EsitoPubblicazione {
+  if (stato.recordingDestination === 'REGISTRANTS') return 'riservata';
+  if (stato.recordingDestination == null && stato.eventType !== 'LEGACY') {
+    return 'senzaDestinazione';
+  }
+  return 'libera';
+}
+
+/** Cio' che decide quanto e' esposto il video di un evento. */
+export interface EsposizioneVideo {
+  recordingDestination: Destinazione;
+  recordingAudience: RecordingAudience;
+  recordingPublished: boolean;
+  transcriptPublished: boolean;
+  youtubeUrl: string | null;
+  tempRecordingUrl: string | null;
+}
+
+/** L'errore con cui si ferma una modifica che la destinazione non consente. */
+export function erroreDestinazioneNonCoperta(): AppError {
+  return new AppError(
+    'The consents of this event cover a reserved recording: it cannot be shown to everyone or linked to an external video.',
+    409,
+    'RECORDING_DESTINATION_NOT_COVERED'
+  );
+}
+
+const indirizzoNuovo = (prima: string | null | undefined, dopo: string | null): boolean =>
+  !!dopo && dopo !== prima;
+
+/**
+ * Rifiuta con un 409 una modifica che espone di piu' un evento riservato.
+ * `dopo` e' lo stato che la richiesta scriverebbe, con `recordingAudience` gia'
+ * allineata alla destinazione; `prima` quello attuale, null alla creazione.
+ *
+ * Aumenta l'esposizione:
+ *  - rendere la registrazione per tutti, anche prima di pubblicarla: il
+ *    caricamento di un file pubblica da solo, senza passare da questa guardia;
+ *  - pubblicare il video o la trascrizione per tutti;
+ *  - un indirizzo nuovo di video esterno o del recupero in diretta, che nessuna
+ *    regola di accesso protegge.
+ *
+ * Il confronto e' tra prima e dopo perche' restringere non si rifiuta mai: un
+ * evento che diventa riservato tenendo il suo video esterno o il video gia'
+ * pubblicato riduce l'esposizione. Non guarda `libraryListed`, `postEventPublic`,
+ * lo stato e `recordingUrl`: la chiusura di un evento e un file gia' nello
+ * storage non si fermano qui, e pagina e videoteca filtrano su `recordingAudience`.
+ */
+export function assertEsposizioneConsentita(
+  prima: EsposizioneVideo | null,
+  dopo: EsposizioneVideo
+): void {
+  if (dopo.recordingDestination !== 'REGISTRANTS') return;
+  const piuPubblicata =
+    (dopo.recordingPublished && !prima?.recordingPublished) ||
+    (dopo.transcriptPublished && !prima?.transcriptPublished);
+  const perTutti =
+    dopo.recordingAudience === 'PUBLIC' &&
+    (prima?.recordingAudience !== 'PUBLIC' || piuPubblicata);
+  if (
+    perTutti ||
+    indirizzoNuovo(prima?.youtubeUrl, dopo.youtubeUrl) ||
+    indirizzoNuovo(prima?.tempRecordingUrl, dopo.tempRecordingUrl)
+  ) {
+    throw erroreDestinazioneNonCoperta();
+  }
+}
+
+/**
+ * Se la destinazione di un evento puo' passare da `prima` a `dopo`.
+ * `salaGiaAperta`: la sala si e' aperta almeno una volta, anche se ora e' chiusa.
+ *
+ * Una destinazione dichiarata non si toglie, in nessun momento: su un evento
+ * senza destinazione ogni consenso copre e la guardia non ferma niente, quindi
+ * chi ha acconsentito a un video riservato non verrebbe richiesto, e il video si
+ * potrebbe pubblicare. Null resta agli eventi che non l'hanno mai dichiarata.
+ *
+ * Prima della sala gli altri cambi sono liberi: chi ha un consenso che non copre
+ * piu' viene richiesto in sala. Dopo, le persone gia' nel video hanno letto quel
+ * testo: si puo' solo restringere, a riservata, anche su un evento che non
+ * l'aveva dichiarata.
+ */
+export function puoCambiareDestinazione(
+  prima: Destinazione | undefined,
+  dopo: Destinazione,
+  salaGiaAperta: boolean
+): boolean {
+  const attuale = prima ?? null;
+  if (dopo === null) return attuale === null;
+  return attuale === dopo || !salaGiaAperta || dopo === 'REGISTRANTS';
+}

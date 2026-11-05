@@ -1,7 +1,13 @@
 // SPDX-License-Identifier: EUPL-1.2
 // SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
 
-import { consensiRichiesti, type FormatoEvento } from '@/lib/registration/consents';
+import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import {
+  consensiRichiesti,
+  trascrizioneRichiesta,
+  type FormatoEvento,
+  type FormatoTrascrizione,
+} from '@/lib/registration/consents';
 
 /**
  * Il consenso alla registrazione dell'evento per chi entra dalla sala
@@ -58,6 +64,31 @@ export function consensoRegistrazioneIngresso(i: {
     richiesto,
     soloAscolto: formato.avvisoRegistrazione,
   };
+}
+
+/**
+ * La casella della trascrizione dei propri interventi per chi entra: la stessa
+ * regola del modulo d'iscrizione (lib/registration/consents), finche' l'evento
+ * non e' concluso. E' facoltativa e non ferma l'ingresso: chi non la da' entra,
+ * ma la sua voce non si registra ne' si trascrive (lo decide il server, voce per
+ * voce). Senza `giaDato`, `voce` e `soloAscolto` risponde se l'evento la chiede
+ * a questa persona, data o no: e' cio' che mostra la finestra dei consensi.
+ */
+export function consensoTrascrizioneIngresso(i: {
+  formato: FormatoTrascrizione;
+  /** L'evento e' concluso: non resta niente da trascrivere. */
+  concluso: boolean;
+  /** Dato all'iscrizione o in sala: la casella non si ripropone. */
+  giaDato?: boolean;
+  /** La voce di chi non acconsente nel video (lib/recording/availability). */
+  voce?: VoceNelVideo;
+  /** Il `soloAscolto` di `consensoRegistrazioneIngresso`: si avvisa e basta. */
+  soloAscolto?: boolean;
+}): boolean {
+  // Dove si avvisa soltanto la voce non si registra senza il consenso, che si
+  // da' in sala: la trascrizione, qui, non varrebbe.
+  const nonVarrebbe = i.voce === 'rimovibile' && !!i.soloAscolto;
+  return trascrizioneRichiesta(i.formato) && !i.concluso && !i.giaDato && !nonVarrebbe;
 }
 
 export interface ProveConsenso {

@@ -7,6 +7,8 @@ import { encryptPIIOrNull } from '@/lib/crypto/pii';
 
 export interface PersonUpsertInput {
   emailHash: string;
+  // Gia' cifrata: si copia com'e', senza una seconda cifratura.
+  email?: string;
   displayName?: string | null;
   organization?: string | null;
   organizationRole?: string | null;

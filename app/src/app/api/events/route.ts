@@ -173,6 +173,7 @@ export const POST = withErrorHandling(async (request) => {
       qaEnabled: effectiveToggles.qaEnabled,
       chatEnabled: effectiveToggles.chatEnabled,
       recordingEnabled: data.recordingEnabled,
+      recordingDestination: data.recordingDestination ?? null,
       // La registrazione non parte mai da sola: la avvia chi conduce con REC.
       autoStartRecording: false,
       participantsCanUnmute: effectiveToggles.participantsCanUnmute,
@@ -218,6 +219,7 @@ export const POST = withErrorHandling(async (request) => {
         data.participantListVisible ??
         elencoPredefinito({ ...effectiveToggles, maxParticipants: data.maxParticipants }),
       ...(data.hostsAlwaysRecorded !== undefined && { hostsAlwaysRecorded: data.hostsAlwaysRecorded }),
+      ...(data.offerAddressBook !== undefined && { offerAddressBook: data.offerAddressBook }),
       ...(data.wordCloudEnabled !== undefined && {
         wordCloudEnabled: data.wordCloudEnabled,
       }),

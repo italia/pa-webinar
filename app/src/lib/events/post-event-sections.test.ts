@@ -3,7 +3,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { sezioniDopoEvento } from './post-event-sections';
+import { domandePubbliche, sezioniDopoEvento } from './post-event-sections';
 
 const tutte = { recap: true, qa: true, polls: true, wordCloud: true, materials: true, feedback: true };
 
@@ -19,5 +19,27 @@ describe('sezioni della pagina dopo l\'evento', () => {
       'materials',
       'feedback',
     ]);
+  });
+});
+
+describe('domande sulla pagina dopo l\'evento', () => {
+  const evento = {
+    postEventShowQA: true,
+    qaEnabled: true,
+    recordingDestination: 'PUBLIC' as 'PUBLIC' | 'REGISTRANTS' | null,
+  };
+
+  it('si pubblicano se chi organizza le mostra e la registrazione non e\' riservata', () => {
+    expect(domandePubbliche(evento)).toBe(true);
+    expect(domandePubbliche({ ...evento, recordingDestination: null })).toBe(true);
+  });
+
+  it('con l\'interruttore spento o senza Q&A no', () => {
+    expect(domandePubbliche({ ...evento, postEventShowQA: false })).toBe(false);
+    expect(domandePubbliche({ ...evento, qaEnabled: false })).toBe(false);
+  });
+
+  it('con la registrazione riservata no, anche con l\'interruttore acceso', () => {
+    expect(domandePubbliche({ ...evento, recordingDestination: 'REGISTRANTS' })).toBe(false);
   });
 });

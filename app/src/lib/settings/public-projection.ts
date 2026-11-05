@@ -15,15 +15,36 @@
  * The lists below are exhaustive over the model and enforced by a test against
  * Prisma's own schema: a new column that nobody classifies fails the suite
  * instead of silently going public.
+ *
+ * Lo stesso vale per le pagine: la riga che arriva a un Client Component finisce
+ * nell'HTML di ogni pagina pubblica, quindi il layout passa `publicSettings()`, e
+ * `ImpostazioniPubbliche` rifiuta la riga intera in compilazione.
  */
+import type { SiteSetting } from '@prisma/client';
 
 /** Columns withheld from non-admin callers, each with the reason. */
-export const NON_PUBLIC_SETTING_FIELDS: Record<string, string> = {
+export const NON_PUBLIC_SETTING_FIELDS = {
   customHomeHtml:
     'operator-authored HTML for the home page; not needed by any public consumer',
   emailReplyTo:
     'a real, usually staffed mailbox — publishing it hands it to scrapers, and it is only ever needed server-side when sending',
+  addressBookEnabled:
+    'decide lato server se il modulo d’iscrizione propone la rubrica: nessuna pagina pubblica ha bisogno di leggerlo',
+} as const satisfies Record<string, string>;
+
+type CampoNonPubblico = keyof typeof NON_PUBLIC_SETTING_FIELDS;
+
+/**
+ * Una riga senza i campi non pubblici. Con `never`, e non con il solo `Omit`, la
+ * riga intera non si assegna a questo tipo: il compilatore ferma chi la passa a
+ * un Client Component.
+ */
+export type SenzaCampiNonPubblici<T> = Omit<T, CampoNonPubblico> & {
+  [K in CampoNonPubblico]?: never;
 };
+
+/** Le impostazioni che un Client Component puo' ricevere. */
+export type ImpostazioniPubbliche = SenzaCampiNonPubblici<SiteSetting>;
 
 /**
  * Columns reviewed as safe to serve publicly. Most are branding, copy or
@@ -74,11 +95,11 @@ export const PUBLIC_SETTING_FIELDS = [
 /** Strip the non-public columns from a settings row. */
 export function publicSettings<T extends Record<string, unknown>>(
   settings: T,
-): Record<string, unknown> {
+): SenzaCampiNonPubblici<T> {
   const out: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(settings)) {
     if (key in NON_PUBLIC_SETTING_FIELDS) continue;
     out[key] = value;
   }
-  return out;
+  return out as SenzaCampiNonPubblici<T>;
 }

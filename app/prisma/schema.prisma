@@ -175,6 +175,12 @@ model Event {
   // (anche chi non e' mai entrato in sala) e lo staff che lo gestisce.
   // Regola unica in lib/recording/audience.ts.
   recordingAudience        RecordingAudience @default(PUBLIC) @map("recording_audience")
+  // La destinazione del video dichiarata prima della sala, cioe' cio' a cui
+  // acconsente chi spunta la casella: pubblico (PUBLIC) o riservato a iscritti
+  // e staff (REGISTRANTS). Regole in lib/recording/destination.ts. Null: un
+  // evento che non l'ha mai dichiarata. `recordingAudience` resta la scelta di
+  // chi vede il video pubblicato.
+  recordingDestination     RecordingAudience? @map("recording_destination")
   // Avviso agli iscritti quando la registrazione diventa visibile sulla pagina
   // pubblica (lib/events/recording-notify): acceso di predefinito, parte una
   // volta sola; `recordingNotifiedAt` e' quando e' partito.
@@ -283,6 +289,11 @@ model Event {
   /// Chi organizza dichiara che moderatori e relatori sono sempre nella
   /// registrazione: non vedono la casella. Spento, scelgono come tutti.
   hostsAlwaysRecorded Boolean @default(false) @map("hosts_always_recorded")
+
+  // Il modulo d'iscrizione propone la rubrica. Parte dal formato dell'evento;
+  // con la rubrica spenta nell'istanza (SiteSetting.addressBookEnabled) non si
+  // propone comunque.
+  offerAddressBook Boolean @default(true) @map("offer_address_book")
 
   // Qualcuno ha parlato senza consenso alla registrazione: la sua voce non c'e',
   // e la pagina dell'evento lo dice accanto al video.
@@ -407,10 +418,11 @@ model Event {
   // FK lookup index: "what events use this GDPR template" / cascade
   // SetNull on template delete.
 
-  multitrackConsents MultitrackConsent[]
-  recordingConsents  RecordingConsent[]
-  roomOccupants      RoomOccupant[]
-  captionSegments    CaptionSegment[]
+  multitrackConsents    MultitrackConsent[]
+  recordingConsents     RecordingConsent[]
+  retainedConsentProofs RetainedConsentProof[]
+  roomOccupants         RoomOccupant[]
+  captionSegments       CaptionSegment[]
   @@index([gdprTemplateId], map: "events_gdpr_template_id_idx")
   // FK lookup index: "find all events in this recurring series".
   @@index([recurrenceSeriesId], map: "events_recurrence_series_id_idx")
@@ -859,6 +871,11 @@ model Registration {
   consentGiven                Boolean  @map("consent_given")
   consentTimestamp            DateTime @map("consent_timestamp")
   consentRecording            Boolean? @map("consent_recording") // null if event has no recording
+  // Il testo del consenso alla registrazione letto da chi ha spuntato: la
+  // destinazione del video e la versione (lib/recording/destination). Null per
+  // chi non ha spuntato e per i consensi dati prima che il testo la dichiarasse.
+  consentRecordingDestination RecordingAudience? @map("consent_recording_destination")
+  consentRecordingVersion     Int?     @map("consent_recording_version")
   // ADR-013 Fase 5 — consenso esplicito SEPARATO alla registrazione audio
   // per-partecipante (traccia isolata = PII sensibile). Null se l'evento non
   // ha il multitrack abilitato; obbligatorio (true) per registrarsi se lo ha.
@@ -1365,6 +1382,18 @@ model EventTemplate {
   // La pagina dopo l'evento (Event.postEventPublic) e' pubblica? Una riunione
   // di lavoro non lo e': il template lo decide per gli eventi che crea.
   postEventPublic Boolean @default(true) @map("post_event_public")
+  // Le domande restano sulla pagina dopo l'evento (Event.postEventShowQA).
+  postEventShowQA Boolean @default(true) @map("post_event_show_qa")
+
+  // I valori di partenza di consenso e riservatezza per gli eventi creati da
+  // questo modello: chi organizza li cambia nel wizard, e valgono solo per gli
+  // eventi nuovi. Stessi nomi e stessi default di `Event`.
+  // - recordingDestination: null = la sceglie il wizard.
+  // - hostsAlwaysRecorded: spento, chi conduce sceglie come tutti.
+  recordingDestination RecordingAudience? @map("recording_destination")
+  audienceAnonymous    Boolean @default(false) @map("audience_anonymous")
+  hostsAlwaysRecorded  Boolean @default(false) @map("hosts_always_recorded")
+  offerAddressBook     Boolean @default(true) @map("offer_address_book")
 
   isSystem  Boolean  @default(false) @map("is_system")
   sortOrder Int      @default(0) @map("sort_order")
@@ -1474,6 +1503,10 @@ model SiteSetting {
   // va dichiarata nell'informativa. Con il flag spento restano gli avatar con
   // le iniziali generati da noi.
   gravatarEnabled Boolean @default(false) @map("gravatar_enabled")
+
+  // La rubrica dell'istanza: spenta, nessun evento la propone, qualunque sia
+  // la sua impostazione (Event.offerAddressBook).
+  addressBookEnabled Boolean @default(true) @map("address_book_enabled")
 
   // Sottotitoli live (ADR-018): interruttore dell'istanza, attivo di default.
   // Spento, nessun evento li avvia, qualunque sia la sua impostazione.
@@ -2034,6 +2067,9 @@ model Person {
   // rubrica route only searches on `organization` and orders by
   // `lastActiveAt`. See ADR-011 and app/src/lib/crypto/pii.ts.
   displayName      String?           @map("display_name")
+  // Email cifrata (encryptPII), copiata com'e' dall'iscrizione che ha dato il
+  // consenso alla rubrica, senza decifrarla. Null per una voce senza email.
+  email            String?           @map("email")
   organization     String?
   organizationRole String?           @map("organization_role")
   organizationType OrganizationType? @map("organization_type")
@@ -2058,6 +2094,9 @@ model Person {
   speakers      Speaker[]
 
   @@index([optedInToAddressBook, lastActiveAt])
+  // Le voci in rubrica per data del consenso: da li' parte la conservazione
+  // (`retentionMonths`).
+  @@index([optedInToAddressBook, optedInAt])
   @@map("persons")
 }
 
@@ -2295,6 +2334,13 @@ model Recording {
   // fuori di qualche secondo.
   slidesEnabled   Boolean @default(true) @map("slides_enabled")
   slidesOffsetSec Int     @default(0) @map("slides_offset_sec")
+
+  // Il video nasce sotto la regola per cui una trascrizione ricavata dal video
+  // senza tracce per persona chiede una conferma (lib/ai/voice-consent). False
+  // solo sulle righe nate prima di quella regola, che restano com'erano. Il
+  // valore viene dal default di colonna per ogni via di creazione: nessun
+  // creatore lo scrive.
+  transcriptConsentRule Boolean @default(true) @map("transcript_consent_rule")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -2762,8 +2808,16 @@ model RecordingConsent {
   // consenso non vale piu'.
   withdrawnAt    DateTime? @map("withdrawn_at")
   // I periodi precedenti di un consenso ridato dopo un ritiro (una sola
-  // prova per iscrizione): [{ consentedAt, withdrawnAt }], dal piu' vecchio.
+  // prova per iscrizione): [{ consentedAt, withdrawnAt, destination,
+  // textVersion }], dal piu' vecchio. Gli elementi scritti prima che il testo
+  // dichiarasse la destinazione hanno solo le prime due chiavi: chi li legge
+  // tollera l'assenza delle altre.
   earlierPeriods Json?    @map("earlier_periods") @db.JsonB
+  // Il testo del consenso del periodo in corso: destinazione del video e
+  // versione (lib/recording/destination). Null per i consensi dati prima che
+  // il testo la dichiarasse.
+  destination    RecordingAudience? @map("destination")
+  textVersion    Int?     @map("text_version")
 
   event          Event           @relation(fields: [eventId], references: [id], onDelete: Cascade)
   registration   Registration?   @relation(fields: [registrationId], references: [id], onDelete: Cascade)
@@ -2778,6 +2832,47 @@ model RecordingConsent {
   @@index([eventModeratorId])
   @@index([staffAccountId])
   @@map("recording_consents")
+}
+
+// La prova di un consenso che sopravvive alla cancellazione della sua
+// sorgente (Registration, RecordingConsent, MultitrackConsent) finche' esiste
+// il video o la trascrizione a cui si riferisce. Una riga per periodo di
+// consenso, copiata nella stessa transazione che cancella la sorgente: niente
+// chiavi esterne verso iscrizioni e concessioni, cosi' nessuna cascata la
+// tocca, e niente colonne JSON. Non si modifica piu', salvo il ritiro
+// (`withdrawnAt`) e la rimozione del nome (`nameRemovedAt`). Se ne va con
+// l'evento.
+model RetainedConsentProof {
+  id            String             @id @default(dbgenerated("gen_random_uuid()")) @map("id") @db.Uuid
+  eventId       String             @map("event_id") @db.Uuid
+  // Valori di TipoConsenso, OrigineConsenso e RuoloConsenso
+  // (lib/gdpr/consent-proofs).
+  kind          String             @map("kind") @db.VarChar(16)
+  source        String             @map("source") @db.VarChar(16)
+  role          String             @map("role") @db.VarChar(16)
+  // sha256 di evento e titolare: serve solo a contare persone e non righe,
+  // non si esporta.
+  holderHash    String             @map("holder_hash") @db.VarChar(64)
+  // Null per chi non ha dato un'email (ospiti, chi conduce senza indirizzo).
+  emailHash     String?            @map("email_hash") @db.VarChar(64)
+  // Nome cifrato (encryptPII), copiato senza decifrarlo. Null dopo che la
+  // persona ne ha chiesto la rimozione: resta `nameRemovedAt`.
+  displayName   String?            @map("display_name")
+  nameRemovedAt DateTime?          @map("name_removed_at")
+  locale        String?            @map("locale") @db.VarChar(8)
+  // Il testo del consenso: versione e destinazione del video, come sulla
+  // sorgente. Null per i consensi dati prima che il testo la dichiarasse.
+  textVersion   Int?               @map("text_version")
+  destination   RecordingAudience? @map("destination")
+  givenAt       DateTime           @map("given_at")
+  withdrawnAt   DateTime?          @map("withdrawn_at")
+  retainedAt    DateTime           @default(now()) @map("retained_at")
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+  @@index([emailHash])
+  @@map("retained_consent_proofs")
 }
 
 // La cronologia della sala: un'azione dal vivo per riga (un argomento della

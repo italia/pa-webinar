@@ -298,6 +298,7 @@
       "generic": "Reģistrācijas kļūda. Lūdzu, mēģiniet vēlreiz.",
       "questionnaireRequired": "Lai reģistrētos, atbildiet uz anketas jautājumiem.",
       "questionnaireIncomplete": "Atbildiet uz visiem anketas obligātajiem jautājumiem.",
+      "recordingDestinationChanged": "The text about the recording changed while you were filling in the form: reload the page and read it again.",
       "questionnaireChanged": "Anketa tika mainīta, kamēr aizpildījāt veidlapu: pārlādējiet lapu un atbildiet vēlreiz."
     }
   },
@@ -424,6 +425,7 @@
       "noMessages": "Nav ziņojumu",
       "empty": "Vēl nav ziņojumu. Esiet pirmais!",
       "inputLabel": "Tērzēšanas ziņojums",
+      "personalDataNotice": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read and download the chat.",
       "moderatorBadge": "Moderators",
       "attach": "Pievienot failu",
       "emojiPicker": "Ievietot emocijzīmi",
@@ -722,6 +724,7 @@
     "upvoted": "Nobalsots",
     "noQuestions": "Vēl nav jautājumu. Esiet pirmais!",
     "qaPersistenceNote": "Jautājumi tiek saglabāti un būs pieejami pēc pasākuma.",
+    "personalDataNotice": "Do not write other people's personal data, or your own if you do not want it made public: the text of your question may appear on the event page, without your name.",
     "qaPostEvent": "Jautājumi un atbildes no pasākuma",
     "noAnsweredQuestions": "Šajā pasākumā nav atbildētu jautājumu.",
     "filterAll": "Visi",
@@ -742,6 +745,7 @@
       "editAnswer": "Rediģēt atbildi",
       "answerFieldLabel": "Atbilde uz {name} jautājumu",
       "answerPlaceholder": "Uzrakstiet atbildi (līdz 2000 rakstzīmēm)",
+      "answerNotice": "The answer may appear on the event page: do not write personal data.",
       "sendAnswer": "Publicēt atbildi",
       "cancel": "Atcelt",
       "removeAnswer": "Noņemt atbildi"
@@ -1025,6 +1029,13 @@
           }
         },
         "recordingManualNote": "Ieraksts nekad nesākas pats: vadītājs to sāk ar pogu REC.",
+        "recordingDestination": "Where the recording goes",
+        "recordingDestinationReserved": "Reserved",
+        "recordingDestinationReservedDesc": "Organizers and registrants can see it, registrants for as long as their registration data is kept. It cannot be made public.",
+        "recordingDestinationPublic": "Public",
+        "recordingDestinationPublicDesc": "It can be published on the event page and in the video library. Participants consent to this too.",
+        "recordingDestinationNotSet": "Not set: the event was created before this choice existed.",
+        "recordingDestinationLocked": "Once the room has opened you can only switch to reserved: consents are valid for the text people read.",
         "audienceAnonymous": "Anonīma auditorija",
         "audienceAnonymousDesc": "Dalībnieki citiem redzami ar pseidonīmu (“Dalībnieks” un kods) video, tērzēšanā un jautājumos; dalībnieku saraksts paliek vadītājiem, un laukuma nav. Noderīgi lieliem pasākumiem; kopienas pasākumos cilvēki vēlas iepazīties.",
         "audienceAnonymousLocked": "Kamēr telpa var būt atvērta, to nevar mainīt: tas sasaistītu pseidonīmus ar vārdiem.",
@@ -1135,6 +1146,7 @@
         "askOrganization": "Organizācija (obligāta reģistrācijai)",
         "askRole": "Amats (neobligāts)",
         "askType": "Organizācijas veids (neobligāts)",
+        "askAddressBook": "Offer to join the address book (optional for people who register)",
         "questionnairesHeading": "Anketas",
         "questionsBefore": "Pirms pasākuma, reģistrējoties: {count, plural, =0 {nav papildu jautājumu} zero {# papildu jautājumu} one {# papildu jautājums} other {# papildu jautājumi}}",
         "questionsAfter": "Pēc pasākuma: {count, plural, =0 {apmierinātības aptaujas nav} zero {apmierinātības aptauja, # jautājumu} one {apmierinātības aptauja, # jautājums} other {apmierinātības aptauja, # jautājumi}}",
@@ -1281,7 +1293,10 @@
         "participantsCan": "Dalībnieki: {list}",
         "none": "nav",
         "recordingManual": "Pieejams: sākas tikai tad, kad vadītājs nospiež REC.",
+        "recordingDestinationReserved": "Destination: reserved for the organizers and registrants.",
+        "recordingDestinationPublic": "Destination: public.",
         "aiAfter": "Pēc ieraksta: {list}.",
+        "aiConfirmVideo": "Without per-person tracks, the video transcription starts only after someone confirms that every voice has consented.",
         "scheduleHeading": "Kad tas notiek",
         "scheduleIntro": "Kad notiek pasākums: datums, laiks un laika josla.",
         "advancedIntro": "Veidnes jau izvēlētās vērtības: mainiet tikai vajadzīgo.",
@@ -1325,6 +1340,7 @@
         "askOrganization": "organizācija",
         "askRole": "amats",
         "askType": "organizācijas veids",
+        "askAddressBook": "whether they want to join the address book",
         "permissionsHeading": "Kas ko var darīt telpā",
         "permissionsIntro": "Ko var darīt dalībnieki un kuras telpas funkcijas ir ieslēgtas. Visu var mainīt arī pasākuma laikā.",
         "consentsLine": "Piekrišanas reģistrējoties un telpā: {list}",
@@ -1336,6 +1352,12 @@
         "consentsWithdraw": "Dalībnieki tās var atsaukt telpā ar pogu “Piekrišanas”.",
         "participantListShown": "Dalībnieku saraksts: redzams visiem.",
         "participantListHidden": "Dalībnieku saraksts: tikai vadītājiem un runātājiem.",
+        "audiencePseudonyms": "Audience names: pseudonyms.",
+        "audienceRealNames": "Audience names: real names.",
+        "postEventQaHidden": "Questions after the event: not published.",
+        "postEventQaTextOnly": "Questions after the event: text only, without names.",
+        "addressBookOffered": "Address book: offered to people who register.",
+        "addressBookNotOffered": "Address book: not offered.",
         "consentRecordingOptional": "ierakstīšana, brīvprātīga",
         "consentRecordingVoice": "ierakstīšana, brīva (bez tās persona paliek ārpus ieraksta)",
         "consentsHostsAlways": "Pasākuma vadītāji un runātāji vienmēr ir ierakstā: viņi neredz izvēles rūtiņu."
@@ -1542,6 +1564,8 @@
           "saveFailed": "Metadatu saglabāšana neizdevās."
         }
       },
+      "reservedBadge": "Reserved",
+      "reservedHelp": "The recording is reserved for registrants: it cannot appear in the video library.",
       "updateFailed": "Atjaunināšana neizdevās."
     },
     "recordingsLibrary": {
@@ -2306,6 +2330,8 @@
         "guestAccessEnabledHelp": "Nereģistrētas personas var pievienoties notiekošiem pasākumiem, norādot tikai savu vārdu. Ja tā ir izslēgta, plānotajiem pasākumiem var pievienoties tikai ar reģistrāciju vai ar moderatora vai runātāja saiti; tūlītējie video zvani paliek atvērti ikvienam, kam ir saite. Pasākumā tikai ar ielūgumu viesi netiek ielaisti nekad.",
         "publicRegistrationEnabled": "Publiskā reģistrācija iespējota",
         "publicRegistrationEnabledHelp": "Ikviens var reģistrēties pasākumiem. Ja tā ir izslēgta, reģistrēties var tikai personas no pasākuma uzaicināto saraksta, un personīgā saite ieiešanai tiek nosūtīta tikai pa e-pastu; jau reģistrētie un moderatoru un runātāju saites turpina darboties. Šī ir jauniem pasākumiem piedāvātā izvēle: katrs pasākums solī “Personas” var izlemt citādi.",
+        "addressBookEnabled": "Events address book",
+        "addressBookEnabledHelp": "Offers people who register the chance to stay in the address book and be invited to similar events. When off, the checkbox disappears from the forms and the picker from the wizard; existing entries stay until they are withdrawn or expire.",
         "calendarPublic": "Publiskais kalendārs",
         "calendarPublicHelp": "Publicēt pasākumu kalendāru. Apmeklētāji var redzēt plānotos pasākumus.",
         "parseTitleKicker": "Nosaukumi ar redakcionālu virsrakstu",
@@ -2438,6 +2464,8 @@
       "featuresLabel": "Funkcijas",
       "whiteboardLabel": "Tāfele",
       "recordingLabel": "Ierakstīšana",
+      "recordingDestination": "Recording destination",
+      "recordingDestinationNone": "Chosen when creating the event",
       "waitingRoomEngineLabel": "Uzgaidāmā telpa (veidnes noklusējums)",
       "waitingRoomEngineSiteDefault": "Vietnes noklusējums",
       "waitingRoomEngineGarden": "Dārzs (parastais)",
@@ -2459,6 +2487,7 @@
       "pickerSubtitle": "Izvēlieties veidni, lai iepriekš konfigurētu pasākuma iestatījumus, vai izlaidiet, lai visu konfigurētu manuāli.",
       "skipTemplate": "Konfigurēt manuāli",
       "postEventPublic": "Publiska lapa pēc pasākuma",
+      "offerAddressBook": "Offers the address book to people who register",
       "invalidFields": "Pārbaudiet šos laukus: {fields}.",
       "descriptionOtherLanguages": "Ir arī versijas valodās: {languages}, kuras šeit nevar rediģēt. Ja maināt itāļu tekstu, tās tiek noņemtas."
     },
@@ -3599,6 +3628,10 @@
       "rec": {
         "yes": "Jā, kad nospiežat REC",
         "yesDesc": "Pēc pasākuma: transkripcija, kopsavilkums un tulkojums",
+        "reserved": "Yes, reserved",
+        "reservedDesc": "Organizers and registrants can see it",
+        "public": "Yes, public",
+        "publicDesc": "It can be published on the event page",
         "no": "Nē",
         "noDesc": "Nav ieraksta, nav jālūdz piekrišana"
       },
@@ -3613,6 +3646,8 @@
         "tutti": "visi video",
         "relatori": "runā runātāji",
         "si": "ar ierakstu",
+        "riservata": "with reserved recording",
+        "pubblica": "with public recording",
         "no": "bez ieraksta",
         "openAccess": "atvērts visiem",
         "inviteOnly": "tikai ar ielūgumu"
@@ -3625,6 +3660,8 @@
         "invitationDesc": "Lapa paliek redzama, bet reģistrēties var tikai sarakstā esošie; ielūgumu ar reģistrācijas saiti sūtāt pa e-pastu no pasākuma lapas"
       },
       "previewInvitation": "Reģistrējas tikai uzaicinātie; bez reģistrācijas neviens netiek iekšā.",
+      "previewPseudonyms": "The audience appears under a pseudonym",
+      "previewRealNames": "The audience appears under their own names",
       "templateReplaces": "Veidne atnes savus iestatījumus zemāk esošo atbilžu vietā. Nosaukumu, datumus un personas ierakstāt nākamajos soļos.",
       "instantBack": "Tā vietā izveidot plānotu pasākumu"
     },
@@ -3762,6 +3799,7 @@
         "pubblicata": "Publicēts.",
         "prontaAi": "Gatavs no pēcapstrādes: pārskatiet to; tas tiek publicēts kopā ar video.",
         "prontaSottotitoli": "Gatavs no subtitriem: pārbaudiet vārdus un publicējiet to.",
+        "daConfermare": "To start: the video is transcribed only once someone confirms that every voice has consented.",
         "inLavorazione": "Tiek apstrādāts.",
         "nessuna": "Nav: nav ne subtitru, ne pēcapstrādes.",
         "soloStaff": "To pārskata un publicē pasākuma organizators administrēšanas sadaļā.",
@@ -3801,6 +3839,7 @@
         "title": "Publiskā lapa",
         "visibile": "Redzama visiem.",
         "nellaLibreria": "Redzama visiem un video bibliotēkā.",
+        "libreriaRiservata": "The page is visible, but the video is reserved for registrants: it does not appear in the video library.",
         "privata": "Atsaukta: sabiedrība to neredz.",
         "scaduta": "Vairs nav redzama: derīguma termiņš ir beidzies.",
         "archiviato": "Pasākums arhivēts: lapa nav publiska.",
@@ -3951,6 +3990,7 @@
       "message": "Šis pasākums lūdza katram piekrišanu viņa teiktā transkribēšanai. Viss ieraksts satur visas balsis, arī to, kas piekrišanu nedeva: transkribējiet to tikai tad, ja visi, kas tajā runā, ir piekrituši. Jūsu apstiprinājums paliek darbību žurnālā.",
       "confirm": "Jā, visi piekrita",
       "cancel": "Atcelt",
+      "waitingNoCaptions": "The transcription of the full recording did not start on its own: each person chooses whether what they say is transcribed. Start it with {button} only if everyone who speaks in the recording has consented; otherwise the event stays without a transcript.",
       "waiting": "Visa ieraksta transkripcija nesākās pati: šis pasākums lūdza katram piekrišanu viņa teiktā transkribēšanai. Sāciet to ar pogu {button} tikai tad, ja visi, kas runā ierakstā, ir piekrituši; pretējā gadījumā paliek transkripcija no subtitriem."
     },
     "editCopyTitle": "Pasākuma kopija",
@@ -3979,6 +4019,12 @@
         "givenAt": "Dota",
         "withdrawnAt": "Atsaukta",
         "textVersion": "Teksta versija",
+        "destination": "Destination",
+        "destinations": {
+          "PUBLIC": "Public",
+          "REGISTRANTS": "Reserved",
+          "none": "Not set"
+        },
         "kinds": {
           "recording": "Ieraksts",
           "transcription": "Runas atšifrēšana"
@@ -3992,8 +4038,10 @@
           "guest": "viesis",
           "host": "vada vai runā"
         },
+        "erasedName": "(name removed on request)",
         "unreadableName": "(vārds nav nolasāms)"
       },
+      "retainedNote": "{count, plural, one {# proof is kept} other {# proofs are kept}} for as long as the video or transcript stays published.",
       "countsNote": "Tiek skaitītas personas: reģistrācija, darbinieka konts vai personalizēta saite tiek skaitīta vienreiz; viesis, kurš atgriežas citā apmeklējumā, tiek skaitīts vēlreiz."
     }
   },
@@ -4011,6 +4059,8 @@
     "dateLabel": "Datums",
     "timeLabel": "Laiks",
     "durationLabel": "Ilgums",
+    "addressBookNote": "You are in the events address book, to be invited to similar events: you can withdraw your consent at any time.",
+    "addressBookOptOutLink": "Remove me from the address book",
     "myDataLink": "Jūsu dati: skatīt, labot, atsaukt piekrišanu vai atcelt reģistrāciju"
   },
   "home": {
@@ -4379,16 +4429,74 @@
   "gdpr": {
     "consent": {
       "recording": "Piekrītu šī pasākuma audio/video ierakstīšanai",
+      "recordingReserved": "I consent to the audio/video recording of this event. The video stays reserved for the organizers and registrants: it is not published. Registrants can watch it for as long as their registration data is kept.",
+      "recordingPublic": "I consent to the audio/video recording of this event and to its publication: anyone can watch the video on the event page and in the video library.",
+      "recordingNoVideo": "I consent to the recording of this event. The room video is not recorded: only the audio tracks of people who consent to transcription are kept, if the event uses them.",
       "multitrack": "Piekrītu, ka manas uzstāšanās tiek atšifrētas ar manu vārdu pasākuma pārskatam. Ja pasākumā katram cilvēkam tiek ierakstīts atsevišķs audio celiņš, mana balss tiek ierakstīta tikai šim nolūkam un celiņš pēc atšifrēšanas tiek dzēsts; to neizmanto manas balss identificēšanai vai atveidošanai.",
+      "multitrackRetained": "I consent to my contributions being transcribed, with my name, for the event's report. If the event records a separate audio track for each person, my voice is recorded for this purpose only and the track is kept with the event data; it is not used to identify or reproduce my voice.",
       "multitrackOptional": "Tas nav obligāti: ja nepiekrītat, jūs tik un tā piedalāties, bet jūsu teiktais netiek iekļauts transkripcijā un jūsu balss netiek ierakstīta atsevišķā celiņā. Ja pasākums tiek ierakstīts, jūsu balss tomēr paliek video.",
       "stayInTouch": "Vēlos saņemt informāciju par gaidāmajiem pasākumiem un tikt iekļauts adrešu grāmatā, lai mani aicinātu uz līdzīgiem pasākumiem",
       "stayInTouchHelp": "Brīvprātīga piekrišana (VDAR 6.1.a pants). To var jebkurā laikā atsaukt ar saiti “Izņemt mani no adrešu grāmatas” saņemtajos e-pastos. Vārds un organizācija ir no šīs reģistrācijas.",
+      "stayInTouchRetention": "We keep this data for {months} months from this consent: the period restarts only if you tick the box again.",
       "recordingOptionalListenOnly": "Ja nepiekrītat, jūs tomēr piedalāties, tikai klausoties: sekojat un rakstāt tērzēšanā, bet mikrofons, kamera un ekrāna kopīgošana paliek izslēgti. Piekrist varat vēlāk, no telpas.",
       "recordingOptionalHost": "Ja nepiekrītat, jūs tik un tā ieejat un vadāt kā parasti, bet jūsu balss netiek saglabāta personu ierakstos un transkripcijā. Telpas video, ja tas tiek ierakstīts, jūs tik un tā iekļauj.",
       "recordingOptionalVoice": "Ja nepiekrītat, jūs tomēr piedalāties un varat uzstāties, bet paliekat ārpus ieraksta: ne vārds, ne balss, ne attēls. Piekrist varat vēlāk, no telpas.",
       "recordingNotice": "Pasākums tiek ierakstīts (audio un video). Jūs piedalāties bez mikrofona un kameras: ierakstā nav jūsu balss vai attēla, ja vien vadītājs jums nedod vārdu.",
       "recordingNoticeVoice": "Pasākums tiek ierakstīts (audio un video). Jūs piedalāties bez mikrofona un kameras: ierakstā nebūs jūsu vārda, balss un attēla, ja vien nepiekritīsit telpā.",
+      "recordingHostAlwaysReserved": "You host this event: you are always in the recording, with name, voice, image and shared screen. The video stays reserved for the organizers and registrants: it is not published. Registrants can watch it for as long as their registration data is kept.",
+      "recordingHostAlwaysPublic": "You host this event: you are always in the recording, with name, voice, image and shared screen. The video can be published and watched by anyone.",
       "recordingHostAlways": "Jūs vadāt šo pasākumu: vienmēr esat ierakstā ar vārdu, balsi, attēlu un kopīgoto ekrānu."
+    },
+    "sheet": {
+      "title": "This event and your data",
+      "intro": "This depends on how the organizers set up the event. Everything else is in the privacy notice.",
+      "recording": {
+        "label": "Recording",
+        "none": "No recording is planned for this event.",
+        "manual": "The hosts can start the audio and video recording. When it is on, the room shows it.",
+        "auto": "The event is recorded, audio and video, from the moment it starts. The room shows it.",
+        "tracksOnly": "The room video is not recorded: only one audio track for each person who consents.",
+        "destinationReserved": "The recording stays reserved for the organizers and registrants and is not published. Registrants can watch it for as long as their registration data is kept.",
+        "destinationPublic": "The recording may be published after the event.",
+        "destinationUnset": "The organizers decide after the event whether to publish it.",
+        "refuseOut": "If you do not consent you still take part and stay out of the recording.",
+        "refuseListenOnly": "If you do not consent you take part listening only.",
+        "hostsAlways": "The hosts are always in the recording, with name, voice, image and shared screen."
+      },
+      "transcript": {
+        "label": "Transcript",
+        "captions": "The caption text is kept, with the name, only for people who consent, and becomes the event transcript.",
+        "tracks": "For people who consent, an audio track is recorded and deleted after transcription.",
+        "tracksRetained": "For people who consent, an audio track is recorded and kept with the event data.",
+        "fromVideo": "After the event, the organizers can have the video transcribed only if everyone who speaks in it has consented."
+      },
+      "captions": {
+        "label": "Captions"
+      },
+      "ai": {
+        "label": "Artificial intelligence",
+        "summary": "After the event, an AI tool may write a summary of the recording.",
+        "translation": "The transcript and summary may be translated automatically.",
+        "dubbing": "The video may be dubbed with a synthetic voice.",
+        "report": "After the event, the staff may have an AI tool write a report, using also the chat without names, questions and polls."
+      },
+      "list": {
+        "label": "Participant list",
+        "visible": "Participants see the list of people in the room.",
+        "hidden": "In the room the audience does not see the list of people present. Hosts and speakers do."
+      },
+      "name": {
+        "label": "Your name",
+        "real": "In the room, in the chat and in questions you appear under your name.",
+        "pseudonym": "In the room, in the chat and in questions you appear under a pseudonym. The organizers see your registration data. If you consent to the transcript, your name stays there."
+      },
+      "retention": {
+        "label": "Retention",
+        "data": "Registration and room data are deleted {days, plural, one {# day} other {# days}} after the event ends. Questions and polls stay without names.",
+        "videoUnpublished": "If it is not made available, the recording is deleted with them.",
+        "videoPublishedDays": "If it is made available, it is deleted {days, plural, one {# day} other {# days}} later.",
+        "videoPublishedOpen": "If it is made available, it stays until the organizers remove it."
+      }
     },
     "export": {
       "title": "Mani dati",
@@ -4434,6 +4542,12 @@
       "consentFuture": "Turpmākie paziņojumi",
       "consentWithdrawnOn": "Atsaukts {date}",
       "consentNoteInRoom": "Ja pašlaik esat telpā, atsaukums ir spēkā no nākamās ienākšanas: lai tas stātos spēkā uzreiz, telpā izmantojiet Piekrišanas.",
+      "proofsTitle": "Consent proofs kept",
+      "proofsIntro": "The data for these events has been deleted. These proofs stay for as long as the video or transcript is published. You can withdraw your consent: what is already in the video stays, and to have it removed you must write to the data controller.",
+      "proofGivenOn": "Given on {date}",
+      "addressBookTitle": "Events address book",
+      "addressBookIntro": "You chose to stay in the address book, to be invited to similar events. We keep this data until {date}, unless you withdraw your consent or give it again.",
+      "addressBookOptOut": "Remove me from the address book",
       "consentFutureEffect": "Ja to atsauksiet, vairs nesaņemsiet paziņojumus par nākamajiem pasākumiem un izstāsieties no adrešu grāmatas visām savām reģistrācijām."
     },
     "erasure": {
@@ -4448,11 +4562,13 @@
       "linkInvalid": "Saite nav derīga vai tai ir beidzies derīguma termiņš. Pieprasiet jaunu saiti.",
       "confirmWarning": "Jūs grasāties neatgriezeniski dzēst visus ar jūsu e-pasta adresi saistītos personas datus.",
       "confirmBody": "Tiks dzēstas reģistrācijas, jautājumi, balsojumi aptaujās, atsauksmes, atgādinājumi un jūsu ieraksts pasākumu kontaktu grāmatā. Darbība ir neatgriezeniska.",
+      "confirmProofs": "If an event has a published video or transcript, the type of consent, the date and the text you answered stay, without your name, for as long as that video or transcript stays published. They are there to prove the consent. The video does not change: to ask for your contributions to be removed, write to the data controller.",
       "confirmButton": "Apstiprināt dzēšanu",
       "cancel": "Atcelt",
       "processing": "Notiek dzēšana...",
       "doneTitle": "Dzēšana pabeigta",
       "doneBody": "Dzēsto reģistrāciju skaits: {count}. Dzēsti arī saistītie dati.",
+      "doneProofs": "{count, plural, one {# consent proof remains, without your name, for as long as the video or transcript stays published.} other {# consent proofs remain, without your name, for as long as the video or transcript stays published.}}",
       "error": "Radās kļūda. Lūdzu, mēģiniet vēlāk.",
       "rateLimited": "Pārāk daudz pieprasījumu. Lūdzu, mēģiniet vēlreiz pēc stundas.",
       "back": "Atpakaļ uz maniem datiem",
@@ -5302,6 +5418,7 @@
     "multitrackConsentTitle": "Jūsu uzstāšanos atšifrējums",
     "recordingConsentTitle": "Pasākuma ieraksts",
     "recordingConsentIntro": "Pasākums tiek ierakstīts (audio un video). Ar piekrišanu ierakstā būs jūsu vārds, balss, attēls un tas, ko kopīgojat ekrānā.",
+    "recordingConsentIntroNoVideo": "The room video is not recorded at this event.",
     "enterGardenTitle": "Ieej laukumā",
     "enterGardenHint": "Cita vieta, kur gaidīt: pastaigājiet, satieciet citus gaidītājus un ieejiet tiešraidē pa vārtiem, kad telpa atveras.",
     "backToWaitingRoom": "Atpakaļ uz uzgaidāmo telpu",
@@ -5568,6 +5685,8 @@
     "audiencePublicDesc": "Ikviens, kas atver pasākuma lapu. Var parādīties videotēkā.",
     "audienceRegistrants": "Tikai reģistrētie",
     "audienceRegistrantsDesc": "Tie, kas reģistrējās pasākumam, pat ja neienāca telpā, izmantojot personīgo saiti no e-pasta paziņojuma. Neparādās videotēkā.",
+    "audienceReservedNote": "People consented to a reserved recording: only registrants and the organizers can see the video.",
+    "destinationMissing": "This event does not say where the recording goes: the consents collected do not say whether the video would be published. Check before you publish it.",
     "saveFailed": "Izmaiņas netika saglabātas. Mēģiniet vēlreiz."
   },
   "postEvent": {
@@ -5577,7 +5696,9 @@
     "libraryListed": "Publicēt video bibliotēkā",
     "libraryListedHelp": "Rāda šo pasākumu publiskajā bibliotēkā (/video-library). Nepieciešams publicēts ieraksts vai YouTube video, kā arī redzama pasākuma lapa.",
     "libraryListedNoRecording": "Nav publicēta ieraksta: pasākums bibliotēkā neparādīsies, kamēr nepublicēsiet ierakstu vai nepievienosiet YouTube video.",
+    "libraryListedReserved": "Reserved recording: the event does not appear in the video library.",
     "showQA": "Rādīt Q&A jautājumus",
+    "qaReservedNote": "With a reserved recording, questions are not published.",
     "showMaterials": "Rādīt kopīgotos materiālus",
     "showPolls": "Rādīt aptauju rezultātus",
     "showFeedback": "Rādīt atsauksmes",
@@ -5835,6 +5956,7 @@
     "sourceTranscriptMissing": "Šis ieraksts vēl nav transkribēts: vispirms to transkribējiet, tad pievienojiet tulkojumu.",
     "captionsTranscriptNotTranslatable": "Šis atšifrējums iegūts no tiešraides subtitriem: automātiskajai tulkošanai nepieciešams ieraksta MI atšifrējums.",
     "sameLanguage": "Izvēlētā valoda ir ieraksta oriģinālvaloda: izvēlieties citu.",
+    "recordingDestinationNotCovered": "The consents for this event cover a reserved recording: you cannot make it visible to everyone or link an external video.",
     "mtUnavailable": "Šajā instancē mašīntulkošana nav instalēta."
   }
 }
