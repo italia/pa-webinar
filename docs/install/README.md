@@ -620,7 +620,8 @@ two participants can join a room and hear and see each other.
 
 ## Getting help
 
-- There is no support contract and no service level. Budget for the
+- There is no support contract and no service level for an installation.
+  Issues get a first answer within two working days. Budget for the
   skills listed in [What you need](../REUSE.md#what-you-need), in house or
   from a supplier ([Support](../REUSE.md#support)).
 - Start from the symptom: [Troubleshooting](../operations/troubleshooting.md)

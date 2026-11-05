@@ -363,6 +363,43 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build   # op
 
 The portal answers on <http://localhost:3000/en>, Mailpit on <http://localhost:8025> and Jitsi on <https://localhost:8443>, whose self-signed certificate you accept once. Sign in at <http://localhost:3000/en/admin/login> with the `ADMIN_API_KEY` placeholder from `docker-compose.yml`. The seed prints a moderator link for each demo event. Everything else about the local stack is in [Local development](docs/DEVELOPMENT.md).
 
+## Requirements and dependencies
+
+An installation needs a Linux server or a Kubernetes cluster, Helm, and an SMTP relay for email. One k3s server needs at least 4 vCPU, 8 GiB of memory and 40 GB of disk. [Requirements](docs/install/README.md#requirements) has the measured figures for every platform.
+
+The chart installs the rest: Jitsi Meet, PostgreSQL 16 or later, Redis 7 or later and the portal, which runs on Node.js 20 or later. [The stack at a glance](docs/install/README.md#the-stack-at-a-glance) lists every component.
+
+No commercial software is required. Every installation runs a Redis server, which is licensed under RSALv2, SSPLv1 or AGPLv3. Some optional parts are commercial services or carry their own terms:
+
+- Managed Kubernetes and object storage, such as AKS, GKE, EKS, Azure Blob and AWS S3, are commercial services. k3s and Garage are the free route.
+- AI post-production on GPU uses the NVIDIA base image and cuDNN, which are vendor binaries.
+- The recorder and Jibri images include Chrome.
+
+[Third-party licenses](THIRD-PARTY-LICENSES.md) covers each component.
+
+## Repository structure
+
+| Path | Contents |
+|---|---|
+| `app/` | The portal: the Next.js application, the API routes, the Prisma schema and migrations, the unit and end-to-end tests |
+| `lobby/` | The 2D square of the waiting room, in its own workspace |
+| `infra/helm/pa-webinar/` | The Helm chart |
+| `infra/onprem/` | Installation on your own servers with k3s |
+| `infra/tofu/` | OpenTofu modules for AKS, GKE and EKS |
+| `infra/jitsi/`, `infra/jitsi-web-patched/` | Conference configuration, Prosody modules and the patched web image |
+| `infra/recorder/`, `infra/recorder-controller/` | The per-participant recorder and its controller |
+| `infra/captions/` | The live-captions gateway and engine |
+| `infra/ai/` | The AI post-production worker |
+| `infra/aks/`, `infra/k8s/`, `infra/grafana/`, `infra/service-inventory/` | Manifests and notes for AKS, namespace and secret templates, the Grafana dashboard, the service-inventory generator |
+| `scripts/` | Installation, backup and restore, verification, license checks, Git hooks, load tests |
+| `docs/` | The documentation, with the decision records in `docs/adr/` |
+
+| Branch | Role |
+|---|---|
+| `main` | The released line. It moves only through a pull request from `dev`, and release tags are cut on it |
+| `dev` | Integration. Every change enters here |
+| `feat/`, `fix/`, `docs/`, `chore/` | Topic branches, merged into `dev` |
+
 ## How we build it
 
 - Every architecture-level choice has an Architecture Decision Record in [`docs/adr/`](docs/adr/README.md).
@@ -415,7 +452,7 @@ The full method is in [How we develop PA Webinar](docs/development/methodology.m
 ## Governance, security and conduct
 
 - The Dipartimento per la Trasformazione Digitale owns and maintains PA Webinar. Roles, decisions, the roadmap and releases are described in [GOVERNANCE.md](GOVERNANCE.md).
-- Report vulnerabilities privately, never in a public issue, as described in [SECURITY.md](SECURITY.md).
+- Report vulnerabilities privately through GitHub Private Vulnerability Reporting or, if you cannot use it, to segreteria.trasformazionedigitale@governo.it. Never use a public issue. [SECURITY.md](SECURITY.md) has the details.
 - Everyone who takes part follows the [Contributor Covenant code of conduct](CODE_OF_CONDUCT.md).
 
 ## Documentation
