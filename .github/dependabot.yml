@@ -194,6 +194,14 @@ updates:
   - dependency-name: torchaudio
     update-types:
     - version-update:semver-major
+  # Il worker fissa la build per CUDA 12.6, che per la 2.11.1 non esiste.
+  - dependency-name: torchaudio
+    versions:
+    - 2.11.1
+  # transformers dalla 5.21 chiede Python 3.11 o successivo.
+  - dependency-name: transformers
+    versions:
+    - ">=5.21"
   # Il worker GPU gira sul Python 3.10 dell'immagine NGC: numpy dalla 2.3
   # chiede Python 3.11 o successivo, pandas 3 lo stesso. Le minor di numpy si
   # aggiornano a mano anche per il worker senza GPU, che sta nella stessa
