@@ -35,7 +35,9 @@ DISCO="30g"
 KUBERNETES="v1.35.1"
 IMMAGINI="auto"
 TAG="dev"
+TAG_SCELTO="no"
 TAG_MIGRAZIONE=""
+MIGRAZIONE_SCELTA="no"
 FILE_SECRET_PULL=""
 DOMINIO="nip.io"
 MAILPIT="si"
@@ -118,9 +120,11 @@ Immagini dell'applicazione
                             e pa-webinar:local-<profilo>-migrate; l'immagine
                             delle migrazioni si ricarica nel nodo solo se
                             cambiano Dockerfile, lockfile o app/prisma
-  --tag TAG                 tag pubblicato (predefinito: dev). Il tag delle
-                            migrazioni si ricava: dev -> dev-migrate,
-                            dev-<sha> -> dev-migrate-<sha>, X.Y.Z -> vX.Y.Z-migrate
+  --tag TAG                 tag pubblicato (predefinito: dev, o quello già
+                            installato). Vale come --images registry, salvo un
+                            --images esplicito. Il tag delle migrazioni si
+                            ricava: dev -> dev-migrate, dev-<sha> ->
+                            dev-migrate-<sha>, X.Y.Z -> vX.Y.Z-migrate
   --migrate-tag TAG         tag delle migrazioni, se non si ricava dal primo
   --pull-secret-file FILE   file .dockerconfigjson con le credenziali del
                             registro (campo `auth` per ghcr.io), da cui
@@ -176,8 +180,8 @@ while [ $# -gt 0 ]; do
     --timeout) ATTESA="${2:?}"; shift 2 ;;
     --state-dir) STATO="${2:?}"; shift 2 ;;
     --images) IMMAGINI="${2:?}"; shift 2 ;;
-    --tag) TAG="${2:?}"; shift 2 ;;
-    --migrate-tag) TAG_MIGRAZIONE="${2:?}"; shift 2 ;;
+    --tag) TAG="${2:?}"; TAG_SCELTO="si"; shift 2 ;;
+    --migrate-tag) TAG_MIGRAZIONE="${2:?}"; MIGRAZIONE_SCELTA="si"; shift 2 ;;
     --pull-secret-file) FILE_SECRET_PULL="${2:?}"; shift 2 ;;
     --trust-ca) FIDUCIA_CA="si"; shift ;;
     --values)
@@ -551,6 +555,26 @@ ALTERNATIVE="  Le strade:
     - --images host    preleva con il docker di questa macchina (dopo docker login ghcr.io)
     - --images local   costruisce le immagini dai sorgenti di questo repository"
 
+# Il tag in uso lo dice il Deployment: un lancio senza --tag resta lì, invece di
+# passare al tag mobile e applicarne le migrazioni al database, senza ritorno.
+# Si cerca per etichetta, che vale anche con nameOverride. Un errore di kubectl
+# ferma tutto: scambiarlo per «nessuna installazione» porterebbe a quel passaggio.
+if [ "$TAG_SCELTO" = "no" ] && [ "$IMMAGINI" != "local" ]; then
+  installate="$(kc -n "$NAMESPACE" get deployment -l "app.kubernetes.io/instance=$RELEASE" \
+    -o jsonpath='{range .items[*]}{.spec.template.spec.containers[?(@.name=="pa-webinar")].image} {.spec.template.spec.initContainers[?(@.name=="db-migrate")].image}{"\n"}{end}')" \
+    || errore "Non riesco a leggere le immagini installate. Riprova, o scegli con --tag."
+  read -r img_app img_migrazioni <<<"$(printf '%s\n' "$installate" | awk 'NF == 2 { print; exit }')"
+  case "${img_app:-}:${img_migrazioni:-}" in
+    "$REPO_IMMAGINE:dev:"*) ;;
+    "$REPO_IMMAGINE":*:"$REPO_IMMAGINE":*)
+      TAG="${img_app##*:}"
+      [ "$MIGRAZIONE_SCELTA" = "si" ] || TAG_MIGRAZIONE="${img_migrazioni##*:}"
+      TAG_SCELTO="si"
+      nota "resto sul tag di questa installazione: $TAG (per cambiarlo: --tag)"
+      ;;
+  esac
+fi
+
 # Un Secret di prelievo, se ci sono credenziali: nuove (file o ambiente) o
 # quelle di un Secret creato a un lancio precedente. Prima di usarle si
 # provano: un Secret che non vale si scoprirebbe solo dopo il quarto d'ora di
@@ -590,7 +614,7 @@ if [ -n "$auth" ]; then
     2) nota "ATTENZIONE: ghcr.io non risponde, le credenziali non si possono provare: le uso così." ;;
     *)
       if [ "$origine" = "secret" ]; then
-        errore "ghcr.io rifiuta le credenziali del Secret '$SECRET_PULL' già nel namespace (token scaduto o revocato?).
+        errore "ghcr.io rifiuta le credenziali del Secret '$SECRET_PULL' già nel namespace (token scaduto o revocato?), oppure il tag $TAG non esiste.
   Cancellalo (kubectl --context $PROFILO -n $NAMESPACE delete secret $SECRET_PULL) e rilancia,
   con credenziali nuove o senza."
       fi
@@ -619,6 +643,12 @@ $ALTERNATIVE" ;;
   secret_pull="si"
 fi
 auth=""
+
+# Chi chiede un tag vuole quella versione: se non si preleva ci si ferma, invece
+# di ripiegare su una build locale che ogni macchina farebbe a modo suo.
+if [ "$IMMAGINI" = "auto" ] && [ "$TAG_SCELTO" = "si" ]; then
+  IMMAGINI="registry"
+fi
 
 # Scelta da sé: le immagini pubblicate se il nodo può prelevarle, altrimenti
 # costruite dai sorgenti.
@@ -703,7 +733,8 @@ case "$IMMAGINI" in
       case "$esito" in
         0) nota "ghcr.io concede il prelievo senza credenziali" ;;
         2) errore "ghcr.io non risponde: il nodo non potrebbe prelevare le immagini." ;;
-        *) errore "ghcr.io non concede il prelievo di $REPO_IMMAGINE:$TAG senza credenziali.
+        *) errore "ghcr.io non concede il prelievo di $REPO_IMMAGINE:$TAG senza credenziali,
+o il tag non esiste.
 $ALTERNATIVE" ;;
       esac
     fi

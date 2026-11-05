@@ -287,23 +287,23 @@ ghcr.io, and the conference uses the standard `jitsi/web` image.
 
 `:dev` moves with every publication. When several people must run the same
 version, check out the same release tag or commit, because the chart comes from
-your checkout, and pass a fixed tag with `--images registry`:
+your checkout, and pass a fixed tag:
 
 ```bash
 # A release
-scripts/minikube-up.sh --images registry --tag X.Y.Z
+scripts/minikube-up.sh --tag X.Y.Z
 # A build of the development branch
-scripts/minikube-up.sh --images registry --tag dev-<sha>
+scripts/minikube-up.sh --tag dev-<sha>
 ```
 
-The script does not remember the tag: pass the same options on every run, or it
-moves to `:dev` and runs the migrations of that image on your data.
+`--tag` uses the published images, unless you also pass `--images`. A later run
+with no options reads the tag from the installation and stays on that version.
+`--tag dev` goes back to the moving tag.
 
 `X.Y.Z` is the release without the `v`. `dev-<sha>` exists only for a commit that
-`dev.yml` built, with the first seven characters of its hash. With
-`--images registry` the script stops if the tag cannot be pulled; in the default
-mode, without credentials, it builds from your checkout instead. The script
-checks the tag for the portal and its migrations only: before you turn on an
+`dev.yml` built, with the first seven characters of its hash. Without
+credentials, the script stops if the tag cannot be pulled. It checks the tag for
+the portal and its migrations only: before you turn on an
 auxiliary service, such as the recorder or the captions, check that its image
 exists with that tag and that the node can pull it.
 
@@ -1014,7 +1014,8 @@ other.
 
 ## Update, stop and remove
 
-- **Update.** Run `scripts/minikube-up.sh` again, for example after
+- **Update.** On a fixed tag, pass `--tag` with the new version. Otherwise run
+  `scripts/minikube-up.sh` again, for example after
   `git pull`. It runs `helm upgrade` with the same secrets. The conference's
   internal passwords are pinned, so an upgrade does not restart Prosody,
   Jicofo or the bridge unless their own settings change. Jitsi web restarts on
@@ -1025,9 +1026,8 @@ other.
   mode `:dev` is a moving tag, and running the script again does not pull a
   newer build. To take one:
   `kubectl --context pa-webinar -n pa-webinar rollout restart deployment/pa-webinar`,
-  or install a fixed build from the matching checkout with
-  `--images registry --tag dev-<sha>`, whose migration tag the script derives
-  (`dev-migrate-<sha>`).
+  or install a fixed build from the matching checkout with `--tag dev-<sha>`,
+  whose migration tag the script derives (`dev-migrate-<sha>`).
 - **Stop.** `scripts/minikube-down.sh --stop` stops the profile.
   `scripts/minikube-up.sh` starts it again with its data.
 - **Delete.** `scripts/minikube-down.sh` deletes the profile: the cluster, the
