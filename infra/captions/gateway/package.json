@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "opus-decoder": "0.7.12",
-    "ws": "^8.21.0"
+    "ws": "^8.22.1"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
