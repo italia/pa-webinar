@@ -17,6 +17,7 @@ import BackToTop from '@/components/layout/back-to-top';
 import { serviceInventoryUrl } from '@/lib/service-inventory-url';
 import { staffPerIntestazione } from '@/lib/auth/staff-session';
 import { getSettings } from '@/lib/settings';
+import { publicSettings } from '@/lib/settings/public-projection';
 import { SettingsProvider } from '@/lib/settings-context';
 
 function hexToRgb(hex: string): string {
@@ -96,7 +97,7 @@ export default async function LocaleLayout({
           <style dangerouslySetInnerHTML={{ __html: `:root { --bs-primary: ${settings.primaryColor}; --bs-primary-rgb: ${hexToRgb(settings.primaryColor)}; }` }} />
         )}
         <NextIntlClientProvider messages={messages}>
-          <SettingsProvider settings={settings}>
+          <SettingsProvider settings={publicSettings(settings)}>
             <Skiplink />
             <PAHeader staff={staff} />
             <main id="main-content" className="flex-grow-1" tabIndex={-1}>

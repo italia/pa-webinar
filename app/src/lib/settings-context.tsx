@@ -4,15 +4,17 @@
 'use client';
 
 import { createContext, useContext } from 'react';
-import type { SiteSetting } from '@prisma/client';
 
-const SettingsContext = createContext<SiteSetting | null>(null);
+import type { ImpostazioniPubbliche } from '@/lib/settings/public-projection';
 
+const SettingsContext = createContext<ImpostazioniPubbliche | null>(null);
+
+// Cio' che passa di qui finisce nell'HTML di ogni pagina pubblica.
 export function SettingsProvider({
   settings,
   children,
 }: {
-  settings: SiteSetting;
+  settings: ImpostazioniPubbliche;
   children: React.ReactNode;
 }) {
   return (
@@ -22,7 +24,7 @@ export function SettingsProvider({
   );
 }
 
-export function useSettings(): SiteSetting {
+export function useSettings(): ImpostazioniPubbliche {
   const ctx = useContext(SettingsContext);
   if (!ctx)
     throw new Error('useSettings must be used within SettingsProvider');
