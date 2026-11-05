@@ -56,6 +56,17 @@ interface ConsensiSalvati {
   multitrack: boolean;
 }
 
+/**
+ * Senza consenso alla registrazione la trascrizione non vale: la voce non viene
+ * registrata e il testo non si tiene (lib/captions/room). Non se ne salva la prova.
+ */
+function conVoce<T extends { multitrackConsent?: boolean }>(
+  data: T,
+  media: { voiceExcluded?: boolean },
+): T {
+  return media.voiceExcluded ? { ...data, multitrackConsent: false } : data;
+}
+
 async function registraConsensi(
   event: {
     id: string;
@@ -360,7 +371,7 @@ export const POST = withErrorHandling(async (request, context) => {
         ...mediaInoltro,
         expiresInSeconds: 2 * 60 * 60,
       });
-      const consentsRecorded = await registraConsensi(event, parsed.data, {
+      const consentsRecorded = await registraConsensi(event, conVoce(parsed.data, mediaInoltro), {
         jitsiUserId: postoOspite,
         displayName: typedName,
       });
@@ -441,7 +452,7 @@ export const POST = withErrorHandling(async (request, context) => {
       // token resta puro (vedi JitsiTokenPayload.useGravatar).
       useGravatar: conVolto && (await getSettings()).gravatarEnabled,
     });
-    const consentsRecorded = await registraConsensi(event, parsed.data, {
+    const consentsRecorded = await registraConsensi(event, conVoce(parsed.data, mediaIscritto), {
       jitsiUserId: postoIscritto,
       displayName: name,
       registrationId: registration.id,
@@ -508,7 +519,7 @@ export const POST = withErrorHandling(async (request, context) => {
       ...mediaOspite,
       expiresInSeconds: 2 * 60 * 60,
     });
-    const consentsRecorded = await registraConsensi(event, parsed.data, {
+    const consentsRecorded = await registraConsensi(event, conVoce(parsed.data, mediaOspite), {
       jitsiUserId: postoOspite,
       displayName: guestName,
     });

@@ -1069,6 +1069,15 @@ describe('POST jitsi/token — consenso alla registrazione verificato dal server
       expect(user.mediaAdmit).toEqual({ audio: true, video: false, desktop: false });
     });
 
+    it('senza consenso alla registrazione non salva la prova della trascrizione', async () => {
+      vi.mocked(prisma.event.findUnique).mockResolvedValue(
+        eventRow({ ...interattivo, multitrackRecordingEnabled: true }) as never,
+      );
+      const res = await post({ guestName: 'Ospite', multitrackConsent: true });
+      expect(res.status).toBe(200);
+      expect(prisma.multitrackConsent.create).not.toHaveBeenCalled();
+    });
+
     it('il microfono segue le regole dell\'evento: chiuso, si apre con la parola', async () => {
       vi.mocked(prisma.event.findUnique).mockResolvedValue(
         eventRow({ recordingEnabled: true, participantsCanStartVideo: true }) as never,

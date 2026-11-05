@@ -7,6 +7,7 @@ import { NotFoundError, RateLimitError, ValidationError } from '@/lib/errors';
 import { endpointSenzaRegistrazione } from '@/lib/captions/room';
 import { statoCattura } from '@/lib/live/capture-state';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
+import { recordingAvailable } from '@/lib/recording/availability';
 
 export const dynamic = 'force-dynamic';
 
@@ -113,7 +114,7 @@ export const POST = withErrorHandling(async (request, context) => {
       orderBy: { at: 'desc' },
       select: { kind: true },
     });
-    if (ultima?.kind === 'recording.started' || statoCattura(event, {}).registrazione) {
+    if (ultima?.kind === 'recording.started' || statoCattura(event, {}, recordingAvailable()).registrazione) {
       await prisma.event.updateMany({
         where: { id: event.id, unrecordedSpeech: false },
         data: { unrecordedSpeech: true },

@@ -489,7 +489,10 @@ export default function WaitingRoom({
   const trascrizioneChiesta =
     (!!event.multitrackRecordingEnabled || !!event.captionsTranscript) &&
     !isEnded &&
-    !multitrackConsentExempt;
+    !multitrackConsentExempt &&
+    // Dove si avvisa soltanto la voce non si registra senza il consenso, che si
+    // da' in sala: la trascrizione, qui, non varrebbe.
+    !(voce === 'rimovibile' && recordingListenOnly);
   // Il consenso alla registrazione dell'evento, se va chiesto qui. E' libero:
   // non ferma ne' il pulsante ne' la piazza.
   const recordingRequired = recordingConsentRequired && !isEnded;

@@ -22,6 +22,7 @@ import {
   writeResponse,
   type RenderedQuestionnaire,
 } from '@/lib/questionnaires';
+import { regolaConsenso } from '@/lib/live/consent-rule';
 import { rispostaVuota } from '@/lib/questionnaires/answers';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { encryptPII, hashEmail } from '@/lib/crypto/pii';
@@ -35,7 +36,7 @@ import { consensiRichiesti, VERSIONE_TESTO_TRASCRIZIONE } from '@/lib/registrati
 import { getSettings } from '@/lib/settings';
 import { captionsTranscriptActive } from '@/lib/captions/availability';
 import { localizedUrl } from '@/lib/utils/localized-url';
-import { recordingAvailable } from '@/lib/recording/availability';
+import { recordingAvailable, voceNelVideo } from '@/lib/recording/availability';
 import {
   buildEventAccessSetCookie,
   eventAccessTtlSeconds,
@@ -117,7 +118,12 @@ export const POST = withErrorHandling(async (request, context) => {
   });
   // La trascrizione dei propri interventi (traccia audio per persona o
   // sottotitoli salvati) e' facoltativa: senza, ci si iscrive lo stesso e la
-  // voce non si registra ne' si trascrive (lib/captions/room).
+  // voce non si registra ne' si trascrive (lib/captions/room). Dove la voce di
+  // chi non acconsente alla registrazione resta fuori, senza quel consenso non
+  // vale neanche questo.
+  const regola = regolaConsenso(event, recordingAvailable(), voceNelVideo());
+  const senzaVoce = regola.registra && !regola.soloAscolto && consentRecording !== true;
+  const trascrizioneData = !senzaVoce && consentMultitrack === true;
 
   // L'ente, quando l'evento lo chiede: la regola del modulo vale anche per chi
   // chiama la rotta direttamente. Ruolo e tipo di ente restano facoltativi.
@@ -184,8 +190,8 @@ export const POST = withErrorHandling(async (request, context) => {
         consentGiven,
         consentTimestamp: new Date(),
         consentRecording: richiesti.registrazione ? (consentRecording ?? false) : null,
-        consentMultitrack: richiesti.tracce ? (consentMultitrack ?? false) : null,
-        consentMultitrackVersion: richiesti.tracce && consentMultitrack ? VERSIONE_TESTO_TRASCRIZIONE : null,
+        consentMultitrack: richiesti.tracce ? trascrizioneData : null,
+        consentMultitrackVersion: richiesti.tracce && trascrizioneData ? VERSIONE_TESTO_TRASCRIZIONE : null,
         consentFutureCommunications: consentFutureCommunications ?? false,
         locale: pageLocale,
         accessToken,
@@ -220,8 +226,8 @@ export const POST = withErrorHandling(async (request, context) => {
           recordingConsentRequired: richiesti.registrazione,
           // Il consenso e' libero: non e' mai una condizione per iscriversi.
           recordingConsentOptional: richiesti.registrazione,
-          consentMultitrack: richiesti.tracce ? (consentMultitrack ?? false) : null,
-          consentMultitrackVersion: richiesti.tracce && consentMultitrack ? VERSIONE_TESTO_TRASCRIZIONE : null,
+          consentMultitrack: richiesti.tracce ? trascrizioneData : null,
+          consentMultitrackVersion: richiesti.tracce && trascrizioneData ? VERSIONE_TESTO_TRASCRIZIONE : null,
           consentFutureCommunications: consentFutureCommunications ?? false,
           consentAddressBook: consentAddressBook === true,
         }),

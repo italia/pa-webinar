@@ -119,6 +119,9 @@ export default function RegistrationFormClient({
     participantsCanStartVideo,
     participantsCanShareScreen,
   });
+  // Dove la voce di chi non acconsente alla registrazione resta fuori, senza
+  // quel consenso la trascrizione non vale.
+  const trascrizioneSospesa = voce === 'rimovibile' && richiesti.registrazione && !consentRecording;
   const [privacyExpanded, setPrivacyExpanded] = useState(false);
 
   const [orgSuggestions, setOrgSuggestions] = useState<string[]>([]);
@@ -878,13 +881,14 @@ export default function RegistrationFormClient({
         {/* ── Trascrizione dei propri interventi (traccia audio per persona o
             sottotitoli salvati): facoltativa, chi non la da' partecipa lo
             stesso, ma la sua voce non si registra ne' si trascrive ── */}
-        {richiesti.tracce && (
+        {richiesti.tracce && !(voce === 'rimovibile' && richiesti.avvisoRegistrazione) && (
           <FormGroup check className="mb-3">
             <Input
               type="checkbox"
               id="consentMultitrack"
               aria-describedby="consentMultitrackNota"
-              checked={consentMultitrack}
+              checked={consentMultitrack && !trascrizioneSospesa}
+              disabled={trascrizioneSospesa}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConsentMultitrack(e.target.checked)}
             />
             <Label for="consentMultitrack" check>

@@ -63,6 +63,10 @@ export async function ritiraConsensi(
     return { registrazione: false, trascrizione: false };
   }
   return prisma.$transaction(async (tx) => {
+    // In fila con le costruzioni della trascrizione e con le cancellazioni, per
+    // prima cosa: una gia' partita non rimette le frasi tolte qui sotto, e nessuno
+    // aspetta tenendo le righe che servono all'altro.
+    await bloccaTrascrizioneEvento(tx, eventId);
     // Le prove della registrazione dei posti dati: portano l'iscrizione, la
     // concessione nominale o l'account dello staff.
     const proveDeiPosti = await tx.recordingConsent.findMany({
@@ -156,10 +160,8 @@ export async function ritiraConsensi(
             data: { consentMultitrackWithdrawnAt: adesso },
           })
         : { count: 0 };
-    // In fila con le costruzioni della trascrizione: una gia' partita non
-    // rimette le frasi appena tolte. Dopo l'evento la trascrizione puo' essere
-    // gia' costruita: la persona se ne va anche da li'.
-    await bloccaTrascrizioneEvento(tx, eventId);
+    // Dopo l'evento la trascrizione puo' essere gia' costruita: la persona se ne
+    // va anche da li'.
     if (listaIscrizioni.length > 0) {
       await togliPersoneDalleTrascrizioni(tx, [eventId], listaIscrizioni);
     }
