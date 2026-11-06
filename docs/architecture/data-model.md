@@ -144,7 +144,7 @@ flowchart LR
   EV -->|"eventId, or via a parent<br/>(Person and ProfilePhoto<br/>are instance-wide)"| PA
   EV -->|"eventId"| LI
   PA -->|"registrationId"| LI
-  EV -->|"eventId on CallSession<br/>and GdprAuditLog"| SA
+  EV -->|"eventId on CallSession<br/>and, when there is one, GdprAuditLog"| SA
   SA -->|"one Recording<br/>per CallSession"| RA
 ```
 

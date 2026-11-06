@@ -319,6 +319,39 @@ describe('ritiraComunicazioni', () => {
     expect(tx.gdprAuditLog.createMany.mock.calls[0]![0].data).toHaveLength(2);
   });
 
+  it("una voce senza iscrizioni lascia una riga nel registro, senza evento", async () => {
+    tx.registration.findMany.mockResolvedValue([]);
+    tx.person.updateMany.mockResolvedValue({ count: 1 });
+    expect(await ritiraComunicazioni('impronta', ADESSO)).toBe(true);
+    const [riga, ...altre] = tx.gdprAuditLog.createMany.mock.calls[0]![0].data;
+    expect(altre).toEqual([]);
+    expect(riga).toMatchObject({
+      eventId: null,
+      action: 'CONSENT_WITHDRAWN',
+      recordCount: 1,
+    });
+    expect(JSON.parse(riga.details)).toEqual({
+      source: 'self-service',
+      futureCommunications: 0,
+      addressBook: 1,
+    });
+  });
+
+  it('con le iscrizioni la riga sta sui loro eventi, senza una in piu', async () => {
+    tx.registration.findMany.mockResolvedValue([{ eventId: 'e1' }]);
+    tx.person.updateMany.mockResolvedValue({ count: 1 });
+    await ritiraComunicazioni('impronta', ADESSO);
+    const righe = tx.gdprAuditLog.createMany.mock.calls[0]![0].data;
+    expect(righe.map((r: { eventId: string | null }) => r.eventId)).toEqual(['e1']);
+  });
+
+  it('un ritiro che non trova niente da ritirare non scrive righe', async () => {
+    tx.registration.findMany.mockResolvedValue([]);
+    tx.person.updateMany.mockResolvedValue({ count: 0 });
+    expect(await ritiraComunicazioni('impronta', ADESSO)).toBe(false);
+    expect(tx.gdprAuditLog.createMany.mock.calls[0]![0].data).toEqual([]);
+  });
+
   it('lascia il segno del ritiro anche sulle iscrizioni senza la spunta', async () => {
     tx.registration.findMany.mockResolvedValue([]);
     tx.person.updateMany.mockResolvedValue({ count: 1 });

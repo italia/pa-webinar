@@ -16,9 +16,9 @@ interface AuditRow {
   recordCount: number;
   details: string | null;
   createdAt: string;
-  eventId: string;
-  eventSlug: string;
-  eventTitle: string;
+  eventId: string | null;
+  eventSlug: string | null;
+  eventTitle: string | null;
 }
 
 interface ApiResponse {
@@ -156,9 +156,13 @@ export default function GdprAuditDashboard() {
                         </Badge>
                       </td>
                       <td>
-                        <Link href={percorso(`/admin/events/${r.eventId}`)} className="text-decoration-none">
-                          {r.eventTitle}
-                        </Link>
+                        {r.eventId ? (
+                          <Link href={percorso(`/admin/events/${r.eventId}`)} className="text-decoration-none">
+                            {r.eventTitle}
+                          </Link>
+                        ) : (
+                          '—'
+                        )}
                       </td>
                       <td className="text-end fw-semibold">{r.recordCount}</td>
                       <td className="text-muted" style={{ fontSize: '0.72rem', maxWidth: 400, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>

@@ -140,8 +140,9 @@ that address: with one, there is still something to withdraw. The page then call
 `POST /api/rubrica/opt-out?token=…` to confirm; the API also accepts the token in a JSON body. The
 confirmation is rate-limited per client address. Confirming sets `optedInToAddressBook` to `false`, stamps
 `optedOutAt`, clears the stored address, stops the invitations to that address and withdraws consent to
-future communications on every registration of that address. It also marks the withdrawal on the
-registrations that never had that consent, so that a later tick finds it, and drops any tick waiting for
+future communications on every registration of that address. The GDPR audit log gets one row for each
+event involved, or one row with no event when the person has no such registration. It also marks the
+withdrawal on the registrations that never had that consent, so that a later tick finds it, and drops any tick waiting for
 confirmation. The daily job deletes the record at its next run. The page warns that event registrations
 are not deleted.
 

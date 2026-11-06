@@ -17,6 +17,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { DELETE as cancellaVoce } from '@/app/api/admin/rubrica/[id]/route';
 import { GET as elencoRubrica, POST as cercaRubrica } from '@/app/api/admin/rubrica/route';
+import { GET as registroGdpr } from '@/app/api/admin/gdpr-audit/route';
 import { GET as conservazione } from '@/app/api/cron/rubrica-retention/route';
 import { POST as cancellazione } from '@/app/api/gdpr/erasure/route';
 import { POST as esceDalLink } from '@/app/api/rubrica/opt-out/route';
@@ -263,6 +264,47 @@ describe('profilo della voce', () => {
     const riga = await prisma.person.findUniqueOrThrow({ where: { id: id! } });
     expect(riga.organization).toBeNull();
     expect(riga.optedOutAt).toBeNull();
+  });
+});
+
+describe('registro del ritiro', () => {
+  it('una voce senza iscrizioni lascia una riga senza evento, che la pagina legge', async () => {
+    const { emailHash, persona } = await voce();
+    const token = issueRubricaOptOutToken(persona.id);
+    const risposta = await esceDalLink(
+      richiesta(`/api/rubrica/opt-out?token=${encodeURIComponent(token)}`, 'POST') as never,
+      senzaParametri
+    );
+    expect(risposta.status).toBe(200);
+    expect(await prisma.person.findUniqueOrThrow({ where: { emailHash } })).toMatchObject({
+      optedInToAddressBook: false,
+    });
+    const righe = await prisma.gdprAuditLog.findMany();
+    expect(righe).toHaveLength(1);
+    expect(righe[0]).toMatchObject({
+      eventId: null,
+      action: 'CONSENT_WITHDRAWN',
+      recordCount: 1,
+    });
+    await entraCome('ADMIN');
+    const pagina = await registroGdpr(
+      richiesta('/api/admin/gdpr-audit') as never,
+      senzaParametri
+    );
+    expect(pagina.status).toBe(200);
+    const { rows } = (await pagina.json()) as {
+      rows: { eventId: string | null; eventTitle: string | null }[];
+    };
+    expect(rows).toEqual([
+      expect.objectContaining({ eventId: null, eventTitle: null, eventSlug: null }),
+    ]);
+  });
+
+  it('un secondo ritiro non aggiunge righe', async () => {
+    const { emailHash } = await voce();
+    await ritiraComunicazioni(emailHash);
+    await ritiraComunicazioni(emailHash);
+    expect(await prisma.gdprAuditLog.count()).toBe(1);
   });
 });
 
