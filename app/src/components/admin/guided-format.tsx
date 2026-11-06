@@ -19,6 +19,7 @@ import { pulisciTraslocoScaduto } from '@/components/admin/event-wizard/drafts';
 import { Icon } from '@/components/ui/icon';
 import {
   PARTECIPANTI_ATTESI,
+  formatoConAccesso,
   formatoPossibile,
   formatoPredefinito,
   presetDaFormato,
@@ -185,16 +186,21 @@ export default function GuidedFormat({
   // La risposta sulla registrazione segue le altre finche' nessuno l'ha scelta:
   // chi passa a una riunione non si ritrova un video pubblico che non ha chiesto.
   const [registraScelta, setRegistraScelta] = useState(initial != null);
+  // Una risposta ripresa e non toccata in questa schermata puo' essere stata solo
+  // proposta: passando agli inviti un video pubblico torna alla proposta.
+  const [registraToccata, setRegistraToccata] = useState(false);
   // I dati di «Cambia formato» rimasti nel browser oltre il loro tempo se ne
   // vanno anche se il wizard non si riapre.
   useEffect(() => pulisciTraslocoScaduto(), []);
   const cambia = (patch: Partial<FormatoGuidato>) =>
     setF((prima) => {
       const dopo = { ...prima, ...patch };
-      return registraScelta ? dopo : { ...dopo, registra: registrazioneProposta(dopo) };
+      if (!registraScelta) return { ...dopo, registra: registrazioneProposta(dopo) };
+      return patch.accesso && !registraToccata ? formatoConAccesso(prima, patch.accesso) : dopo;
     });
   const scegliRegistra = (registra: FormatoRegistra) => {
     setRegistraScelta(true);
+    setRegistraToccata(true);
     setF((prima) => ({ ...prima, registra }));
   };
   const conVideo = videoDaDestinare(voceNelVideo);

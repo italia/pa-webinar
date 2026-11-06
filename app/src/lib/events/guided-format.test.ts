@@ -14,7 +14,9 @@ import {
   formatoPossibile,
   formatoPredefinito,
   presetDaFormato,
+  registrazioneProponibile,
   registrazioneProposta,
+  trascriveSenzaRegistrare,
   type FormatoAccesso,
   type FormatoGuidato,
   type FormatoPersone,
@@ -339,5 +341,46 @@ describe('presetDaFormato: l\'elenco dei partecipanti', () => {
     expect(elenco('medio', 'tutti')).toBe(true);
     expect(elenco('grande', 'tutti')).toBe(false);
     expect(elenco('medio', 'relatori')).toBe(false);
+  });
+});
+
+describe('trascriveSenzaRegistrare', () => {
+  it('senza video e senza AI restano i sottotitoli, se ci sono', () => {
+    expect(trascriveSenzaRegistrare(true, 'assente', false, true)).toBe(true);
+    expect(trascriveSenzaRegistrare(true, 'assente', false, false)).toBe(false);
+  });
+
+  it('dove la domanda si fa decide la risposta', () => {
+    expect(trascriveSenzaRegistrare(true, 'fissa', false, true)).toBe(false);
+    expect(trascriveSenzaRegistrare(true, 'assente', true, true)).toBe(false);
+  });
+
+  it('dove non si puo registrare non cambia nulla', () => {
+    expect(trascriveSenzaRegistrare(false, 'assente', false, true)).toBe(false);
+  });
+
+  it('il preset la tiene anche senza registrazione', () => {
+    const f: FormatoGuidato = { persone: 'medio', voce: 'tutti', registra: 'no', accesso: 'tutti' };
+    expect(presetDaFormato(f, 'x', true, true)).toMatchObject({
+      recordingEnabled: false,
+      captionsTranscriptEnabled: true,
+    });
+    expect(presetDaFormato(f, 'x').captionsTranscriptEnabled).toBe(false);
+  });
+});
+
+describe('registrazioneProponibile', () => {
+  it('con il video della sala si propone, anche senza AI', () => {
+    expect(registrazioneProponibile(true, 'fissa', false)).toBe(true);
+    expect(registrazioneProponibile(true, undefined, false)).toBe(true);
+  });
+
+  it('senza video restano le tracce, che vogliono la pipeline AI', () => {
+    expect(registrazioneProponibile(true, 'assente', true)).toBe(true);
+    expect(registrazioneProponibile(true, 'assente', false)).toBe(false);
+  });
+
+  it('dove non si puo registrare non si propone mai', () => {
+    expect(registrazioneProponibile(false, 'fissa', true)).toBe(false);
   });
 });

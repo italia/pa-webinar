@@ -3,16 +3,19 @@
 
 import { describe, expect, it } from 'vitest';
 
+import { videoDaDestinare } from '@/lib/recording/destination';
+
 import {
   campiDaEvento,
   campiDaModello,
   campiDaSalvare,
   destinazioneDopoIlSalvataggio,
   destinazioneSuInvito,
+  paginaCheSegue,
+  registrazioneVuota,
+  videoPubblico,
   type CampiDelFormato,
 } from './campi-del-formato';
-import { videoDaDestinare } from '@/lib/recording/destination';
-
 import type { WizardForm, WizardTemplatePreset } from './wizard-shell';
 
 /**
@@ -124,6 +127,152 @@ describe('campiDaEvento', () => {
       hostsAlwaysRecorded: false,
       postEventShowQA: true,
     });
+  });
+});
+
+describe('videoPubblico', () => {
+  it('conta solo su un evento che registra', () => {
+    expect(videoPubblico({ recordingEnabled: true, recordingDestination: 'PUBLIC' })).toBe(true);
+    expect(videoPubblico({ recordingEnabled: false, recordingDestination: 'PUBLIC' })).toBe(false);
+    expect(videoPubblico({ recordingEnabled: true, recordingDestination: 'REGISTRANTS' })).toBe(false);
+  });
+});
+
+describe('registrazioneVuota', () => {
+  const tracce = { aiTranscriptEnabled: true, multitrackRecordingEnabled: true };
+  const niente = { aiTranscriptEnabled: false, multitrackRecordingEnabled: false };
+
+  it('solo senza video della sala e senza tracce', () => {
+    expect(registrazioneVuota({ recordingEnabled: true, ...niente }, 'assente', true)).toBe(true);
+    expect(registrazioneVuota({ recordingEnabled: true, ...tracce }, 'assente', true)).toBe(false);
+    expect(registrazioneVuota({ recordingEnabled: true, ...niente }, 'fissa', true)).toBe(false);
+    expect(registrazioneVuota({ recordingEnabled: false, ...niente }, 'assente', true)).toBe(false);
+  });
+
+  it('non conta un evento che non registra, e le tracce valgono solo se il registratore c e', () => {
+    expect(registrazioneVuota({ recordingEnabled: true, ...tracce }, 'assente', false)).toBe(true);
+  });
+});
+
+describe('paginaCheSegue', () => {
+  const riservata = { recordingEnabled: true, recordingDestination: 'REGISTRANTS' as const };
+  const pubblica = { recordingEnabled: true, recordingDestination: 'PUBLIC' as const };
+  const senza = { recordingEnabled: false, recordingDestination: null };
+  const spenta = { recordingEnabled: false, recordingDestination: 'PUBLIC' as const };
+  const daRiservataPrivata = { ...riservata, postEventPublic: false };
+  const daRiservataAperta = { ...riservata, postEventPublic: true };
+  const daPubblicaPrivata = { ...pubblica, postEventPublic: false };
+  const daPubblicaAperta = { ...pubblica, postEventPublic: true };
+
+  it('un evento che diventa su invito chiude la pagina', () => {
+    expect(
+      paginaCheSegue(
+        daRiservataAperta,
+        { suInvito: false, form: riservata },
+        { suInvito: true, form: { ...riservata, postEventPublic: true } },
+      ),
+    ).toBe(false);
+    expect(
+      paginaCheSegue(
+        { ...senza, postEventPublic: true },
+        { suInvito: false, form: senza },
+        { suInvito: true, form: { ...senza, postEventPublic: true } },
+      ),
+    ).toBe(false);
+  });
+
+  it('salvo che il video resti pubblico', () => {
+    expect(
+      paginaCheSegue(
+        daPubblicaAperta,
+        { suInvito: false, form: pubblica },
+        { suInvito: true, form: { ...pubblica, postEventPublic: true } },
+      ),
+    ).toBe(true);
+  });
+
+  it('un video che diventa pubblico apre la pagina, anche su invito', () => {
+    expect(
+      paginaCheSegue(
+        daRiservataPrivata,
+        { suInvito: false, form: riservata },
+        { suInvito: false, form: { ...pubblica, postEventPublic: false } },
+      ),
+    ).toBe(true);
+    expect(
+      paginaCheSegue(
+        daRiservataPrivata,
+        { suInvito: true, form: riservata },
+        { suInvito: true, form: { ...pubblica, postEventPublic: false } },
+      ),
+    ).toBe(true);
+  });
+
+  it('il video di un evento su invito che smette di essere pubblico la richiude', () => {
+    expect(
+      paginaCheSegue(
+        daRiservataAperta,
+        { suInvito: true, form: pubblica },
+        { suInvito: true, form: { ...riservata, postEventPublic: true } },
+      ),
+    ).toBe(false);
+  });
+
+  it('su un evento aperto il video che smette di essere pubblico torna alla partenza', () => {
+    expect(
+      paginaCheSegue(
+        daRiservataPrivata,
+        { suInvito: false, form: pubblica },
+        { suInvito: false, form: { ...riservata, postEventPublic: true } },
+      ),
+    ).toBe(false);
+    expect(
+      paginaCheSegue(
+        daPubblicaAperta,
+        { suInvito: false, form: pubblica },
+        { suInvito: false, form: { ...riservata, postEventPublic: true } },
+      ),
+    ).toBe(true);
+  });
+
+  it('un video pubblico gia alla partenza non apre una pagina privata tornando', () => {
+    const spegnendo = paginaCheSegue(
+      daPubblicaPrivata,
+      { suInvito: false, form: pubblica },
+      { suInvito: false, form: { ...spenta, postEventPublic: false } },
+    );
+    expect(spegnendo).toBe(false);
+    expect(
+      paginaCheSegue(
+        daPubblicaPrivata,
+        { suInvito: false, form: spenta },
+        { suInvito: false, form: { ...pubblica, postEventPublic: spegnendo } },
+      ),
+    ).toBe(false);
+  });
+
+  it('senza un passaggio la pagina resta com e', () => {
+    expect(
+      paginaCheSegue(
+        daRiservataAperta,
+        { suInvito: true, form: riservata },
+        { suInvito: false, form: { ...riservata, postEventPublic: false } },
+      ),
+    ).toBe(false);
+    expect(
+      paginaCheSegue(
+        daPubblicaPrivata,
+        { suInvito: false, form: pubblica },
+        { suInvito: false, form: { ...pubblica, postEventPublic: false } },
+      ),
+    ).toBe(false);
+    expect(
+      paginaCheSegue(
+        daRiservataAperta,
+        { suInvito: true, form: riservata },
+        { suInvito: true, form: { ...riservata, postEventPublic: true } },
+      ),
+    ).toBe(true);
   });
 });
 

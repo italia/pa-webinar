@@ -307,6 +307,64 @@ describe('CreateEventWithTemplate', () => {
     expect(container.textContent).toContain(w.flow.postEventQaHidden);
   });
 
+  it('senza video e senza AI le domande non promettono una registrazione', () => {
+    mostra({ voceNelVideo: 'assente', aiPipelineEnabled: false });
+    expect(container.textContent).not.toContain(g.recQ);
+    expect(container.textContent).not.toContain(w.flow.recordingManual);
+    expect(container.textContent).toContain(g.introNoRecording);
+  });
+
+  it('senza video e senza AI un indirizzo salvato apre il wizard senza registrazione', () => {
+    mostra({
+      formatoParam: 'piccolo.tutti.riservata.tutti',
+      voceNelVideo: 'assente',
+      aiPipelineEnabled: false,
+    });
+    vaiAlRiepilogo();
+    expect(container.textContent).not.toContain(w.flow.recordingManual);
+    expect(container.textContent).toContain(w.step5.summary.recordingOff);
+  });
+
+  describe('senza video e senza AI, la trascrizione dai sottotitoli', () => {
+    const senzaVideo = { voceNelVideo: 'assente', aiPipelineEnabled: false } as const;
+
+    it('resta dove i sottotitoli ci sono, e il riepilogo la dice', async () => {
+      mostra({ ...senzaVideo, formatoParam: 'medio.tutti.no.tutti', liveCaptionsAvailable: true });
+      expect(await corpoPubblicato()).toMatchObject({
+        recordingEnabled: false,
+        liveCaptionsEnabled: true,
+        captionsTranscriptEnabled: true,
+      });
+      expect(container.textContent).toContain(messages.admin.form.captionsTranscriptEnabled);
+      expect(container.textContent).toContain(w.step5.summary.recordingOff);
+    });
+
+    it('non si accende dove i sottotitoli non ci sono', async () => {
+      mostra({ ...senzaVideo, formatoParam: 'medio.tutti.no.tutti' });
+      expect(await corpoPubblicato()).toMatchObject({ captionsTranscriptEnabled: false });
+    });
+
+    it('un no dato alla domanda resta un no', async () => {
+      mostra({
+        voceNelVideo: 'assente',
+        aiPipelineEnabled: true,
+        formatoParam: 'medio.tutti.no.tutti',
+        liveCaptionsAvailable: true,
+      });
+      expect(await corpoPubblicato()).toMatchObject({ captionsTranscriptEnabled: false });
+    });
+
+    it('dove non si puo registrare resta spenta come prima', async () => {
+      mostra({
+        ...senzaVideo,
+        recordingAvailable: false,
+        formatoParam: 'medio.tutti.no.tutti',
+        liveCaptionsAvailable: true,
+      });
+      expect(await corpoPubblicato()).toMatchObject({ captionsTranscriptEnabled: false });
+    });
+  });
+
   it('le domande non promettono una rubrica spenta sull installazione', () => {
     mostra({ scegliParam: 'medio.tutti.pubblica.tutti', addressBookEnabled: false });
     expect(container.textContent).toContain(w.flow.addressBookNotOffered);

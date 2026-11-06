@@ -1,7 +1,13 @@
 // SPDX-License-Identifier: EUPL-1.2
 // SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
 
-import { destinazioneDiPartenza, type Destinazione } from '@/lib/recording/destination';
+import { tracceConfigurate } from '@/lib/live/capture-state';
+import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import {
+  destinazioneDiPartenza,
+  videoDaDestinare,
+  type Destinazione,
+} from '@/lib/recording/destination';
 
 import type { WizardForm, WizardTemplatePreset } from './wizard-shell';
 
@@ -58,11 +64,71 @@ export function destinazioneSuInvito(
   return suInvito && !scelta && destinazione === 'PUBLIC' ? 'REGISTRANTS' : destinazione;
 }
 
+/** Una registrazione accesa non produce nulla: l'installazione non ha il video
+ *  della sala, e l'evento ha spento le tracce per persona. */
+export function registrazioneVuota(
+  form: Pick<
+    WizardForm,
+    'recordingEnabled' | 'aiTranscriptEnabled' | 'multitrackRecordingEnabled'
+  >,
+  voce: VoceNelVideo | undefined,
+  recordingAvailable: boolean,
+): boolean {
+  return (
+    form.recordingEnabled &&
+    !videoDaDestinare(voce) &&
+    !tracceConfigurate(form, recordingAvailable)
+  );
+}
+
+/** Il video dell'evento e' pubblico: la destinazione conta solo se l'evento registra. */
+export function videoPubblico(
+  form: Pick<WizardForm, 'recordingEnabled' | 'recordingDestination'>,
+): boolean {
+  return form.recordingEnabled && form.recordingDestination === 'PUBLIC';
+}
+
+/**
+ * La pagina dopo l'evento quando accesso e destinazione cambiano, finche' chi
+ * organizza non tocca il suo interruttore. `partenza`: il modulo appena aperto.
+ *
+ * Un video che diventa pubblico senza esserlo alla partenza apre la pagina: con la
+ * pagina privata non lo vedrebbe nessuno, nemmeno chi si e' iscritto. Un video che
+ * smette di esserlo la riporta al valore di partenza, cosi' un'andata e ritorno non
+ * cambia nulla, e su invito la chiude. Un evento che diventa su invito la chiude,
+ * come fanno le domande, salvo che il video resti pubblico. Tornando aperto la
+ * pagina resta com'era: quel passaggio non allarga mai.
+ */
+export function paginaCheSegue(
+  partenza: Pick<WizardForm, 'recordingEnabled' | 'recordingDestination' | 'postEventPublic'>,
+  prima: { suInvito: boolean; form: Pick<WizardForm, 'recordingEnabled' | 'recordingDestination'> },
+  dopo: {
+    suInvito: boolean;
+    form: Pick<WizardForm, 'recordingEnabled' | 'recordingDestination' | 'postEventPublic'>;
+  },
+): boolean {
+  const pubblicoDopo = videoPubblico(dopo.form);
+  if (pubblicoDopo !== videoPubblico(prima.form)) {
+    if (pubblicoDopo) return videoPubblico(partenza) ? partenza.postEventPublic : true;
+    return !dopo.suInvito && partenza.postEventPublic;
+  }
+  return dopo.suInvito && !prima.suInvito && !pubblicoDopo ? false : dopo.form.postEventPublic;
+}
+
 /** Cio' che il wizard dice su un evento su invito che registra: il testo sotto
  *  `admin.wizard.step2`. */
 export type NotaDestinazione =
   | 'recordingDestinationPublicOnInvitation'
   | 'recordingDestinationReservedOnInvitation';
+
+/** Cio' che il wizard dice della pagina dopo l'evento: passata da sola a seguire
+ *  l'accesso o il video, rimasta privata su un evento tornato aperto, o privata con
+ *  un video pubblico che cosi' nessuno vede. */
+export type NotaPagina =
+  | 'postEventPagePrivateOnInvitation'
+  | 'postEventPagePublicWithVideo'
+  | 'postEventPageStaysPrivate'
+  | 'postEventPagePrivateVideoHidden';
 
 /** I valori di un evento salvato. */
 export function campiDaEvento(ev: Partial<CampiDelFormato>): CampiDelFormato {

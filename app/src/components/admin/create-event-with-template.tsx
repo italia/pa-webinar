@@ -18,6 +18,8 @@ import {
   formatoPossibile,
   formatoPredefinito,
   presetDaFormato,
+  registrazioneProponibile,
+  trascriveSenzaRegistrare,
   type FormatoGuidato,
 } from '@/lib/events/guided-format';
 import EventWizard, { type WizardTemplatePreset } from '@/components/admin/event-wizard/wizard-shell';
@@ -98,7 +100,7 @@ export default function CreateEventWithTemplate({
   siteDefaultVideoQuality,
   whiteboardInfraReady,
   liveCaptionsAvailable = false,
-  recordingAvailable = true,
+  recordingAvailable: installazioneRegistra = true,
   voceNelVideo,
   defaultTargetLocales = null,
   aiPipelineEnabled = true,
@@ -113,6 +115,11 @@ export default function CreateEventWithTemplate({
 }: Props) {
   const tg = useTranslations('admin.guided');
   const router = useRouter();
+  const recordingAvailable = registrazioneProponibile(
+    installazioneRegistra,
+    voceNelVideo,
+    aiPipelineEnabled,
+  );
   const [showInstant, setShowInstant] = useState(initialInstant);
   const [modelliAperti, setModelliAperti] = useState(false);
   // Le quattro risposte nell'indirizzo: aprono il wizard con i loro valori.
@@ -201,7 +208,17 @@ export default function CreateEventWithTemplate({
       tg(formato.accesso === 'invitati' ? 'summary.inviteOnly' : 'summary.openAccess'),
     ].join(' · ');
     return wizard({
-      template: presetDaFormato(formato, nome, publicRegistrationEnabled),
+      template: presetDaFormato(
+        formato,
+        nome,
+        publicRegistrationEnabled,
+        trascriveSenzaRegistrare(
+          installazioneRegistra,
+          voceNelVideo,
+          aiPipelineEnabled,
+          liveCaptionsAvailable,
+        ),
+      ),
       formatoLabel: nome,
       // Su invito le domande propongono riservata: un video pubblico e' una
       // risposta data a mano.
