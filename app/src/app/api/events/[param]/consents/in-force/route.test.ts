@@ -55,6 +55,18 @@ beforeEach(() => {
 });
 
 describe('POST consents/in-force', () => {
+  it('il limite per indirizzo scala con quelli della sala', async () => {
+    vi.stubEnv('ROOM_RATE_LIMIT_MULTIPLIER', '2');
+    const token = await tokenSala('guest-a');
+    const stati: number[] = [];
+    for (let i = 0; i < 601; i += 1) {
+      stati.push((await post({ roomTokens: [token] }, '10.3.0.1')).status);
+    }
+    vi.unstubAllEnvs();
+    expect(stati.slice(0, 600).every((s) => s === 200)).toBe(true);
+    expect(stati[600]).toBe(429);
+  });
+
   it('risponde per i posti provati, nell ordine dei token, anche di chi modera', async () => {
     const res = await post({
       roomTokens: [
