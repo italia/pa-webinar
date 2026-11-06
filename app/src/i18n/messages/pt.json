@@ -2768,7 +2768,7 @@
       "title": "Sessões de chamada",
       "empty": "Nenhuma sessão registada. As sessões em direto são listadas automaticamente assim que o moderador entra na sala.",
       "loading": "A carregar sessões...",
-      "participants": "participantes",
+      "participantsCount": "{count, plural, one {# participant} other {# participants}}",
       "participantList": "Participantes",
       "name": "Nome",
       "joined": "Entrada",

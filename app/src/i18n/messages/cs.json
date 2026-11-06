@@ -2768,7 +2768,7 @@
       "title": "Relace hovoru",
       "empty": "Nebyly zaznamenány žádné relace. Živé relace se zde zobrazí automaticky, jakmile moderátor vstoupí do místnosti.",
       "loading": "Načítání relací…",
-      "participants": "účastníků",
+      "participantsCount": "{count, plural, one {# participant} other {# participants}}",
       "participantList": "Účastníci",
       "name": "Jméno",
       "joined": "Vstup",

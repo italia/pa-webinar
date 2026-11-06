@@ -2768,7 +2768,7 @@
       "title": "Sesije poziva",
       "empty": "Nije zabilježena nijedna sesija. Sesije uživo automatski se navode čim moderator uđe u sobu.",
       "loading": "Učitavanje sesija...",
-      "participants": "sudionika",
+      "participantsCount": "{count, plural, one {# participant} other {# participants}}",
       "participantList": "Sudionici",
       "name": "Ime",
       "joined": "Ulazak",

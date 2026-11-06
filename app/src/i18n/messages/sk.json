@@ -2768,7 +2768,7 @@
       "title": "Relácie hovoru",
       "empty": "Zatiaľ žiadne zaznamenané relácie. Živé relácie sa tu zobrazia automaticky, len čo moderátor vstúpi do miestnosti.",
       "loading": "Načítavajú sa relácie...",
-      "participants": "účastníci",
+      "participantsCount": "{count, plural, one {# participant} other {# participants}}",
       "participantList": "Účastníci",
       "name": "Meno",
       "joined": "Vstup",

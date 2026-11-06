@@ -2768,7 +2768,7 @@
       "title": "Opkaldssessioner",
       "empty": "Ingen sessioner registreret. Live-sessioner vises her automatisk, så snart moderatoren går ind i lokalet.",
       "loading": "Indlæser sessioner...",
-      "participants": "deltagere",
+      "participantsCount": "{count, plural, one {# participant} other {# participants}}",
       "participantList": "Deltagere",
       "name": "Navn",
       "joined": "Tilsluttet",

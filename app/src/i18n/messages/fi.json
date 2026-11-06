@@ -2768,7 +2768,7 @@
       "title": "Puheluistuntoja",
       "empty": "Ei vielä rekisteröityjä istuntoja. Live-istunnot listataan tähän automaattisesti heti, kun moderaattori liittyy huoneeseen.",
       "loading": "Ladataan istuntoja...",
-      "participants": "osallistujaa",
+      "participantsCount": "{count, plural, one {# participant} other {# participants}}",
       "participantList": "Osallistujat",
       "name": "Nimi",
       "joined": "Liittynyt",

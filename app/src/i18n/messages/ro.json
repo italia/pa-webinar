@@ -2768,7 +2768,7 @@
       "title": "Sesiuni de apel",
       "empty": "Nicio sesiune înregistrată. Sesiunile live sunt listate automat aici imediat ce moderatorul intră în sală.",
       "loading": "Se încarcă sesiunile...",
-      "participants": "participanți",
+      "participantsCount": "{count, plural, one {# participant} other {# participants}}",
       "participantList": "Participanți",
       "name": "Nume",
       "joined": "Intrare",

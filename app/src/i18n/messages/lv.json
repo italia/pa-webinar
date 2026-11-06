@@ -2768,7 +2768,7 @@
       "title": "Zvana sesijas",
       "empty": "Vēl nav reģistrētu sesiju. Tiešraides sesijas tiek automātiski uzskaitītas, kad moderators ieiet telpā.",
       "loading": "Notiek sesiju ielāde...",
-      "participants": "dalībnieki",
+      "participantsCount": "{count, plural, one {# participant} other {# participants}}",
       "participantList": "Dalībnieki",
       "name": "Vārds",
       "joined": "Pievienojies",

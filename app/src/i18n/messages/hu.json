@@ -2768,7 +2768,7 @@
       "title": "Hívás munkamenetei",
       "empty": "Még nincs rögzített munkamenet. Az élő munkamenetek automatikusan megjelennek itt, amint a moderátor belép a terembe.",
       "loading": "Munkamenetek betöltése...",
-      "participants": "résztvevő",
+      "participantsCount": "{count, plural, one {# participant} other {# participants}}",
       "participantList": "Résztvevők",
       "name": "Név",
       "joined": "Belépés",

@@ -2768,7 +2768,7 @@
       "title": "Sesje połączenia",
       "empty": "Brak zarejestrowanych sesji. Sesje na żywo są tutaj wyświetlane automatycznie, gdy moderator wejdzie do pokoju.",
       "loading": "Ładowanie sesji...",
-      "participants": "uczestników",
+      "participantsCount": "{count, plural, one {# participant} other {# participants}}",
       "participantList": "Uczestnicy",
       "name": "Imię i nazwisko",
       "joined": "Wejście",

@@ -2768,7 +2768,7 @@
       "title": "Seje klicev",
       "empty": "Še ni zabeleženih sej. Seje v živo so samodejno navedene, ko moderator vstopi v sobo.",
       "loading": "Nalaganje sej ...",
-      "participants": "udeležencev",
+      "participantsCount": "{count, plural, one {# participant} other {# participants}}",
       "participantList": "Udeleženci",
       "name": "Ime",
       "joined": "Vstop",

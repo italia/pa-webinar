@@ -2768,7 +2768,7 @@
       "title": "Kõnesessioonid",
       "empty": "Sessioone pole veel salvestatud. Otsesessioonid loetletakse siin automaatselt niipea, kui moderaator ruumi siseneb.",
       "loading": "Sessioonide laadimine...",
-      "participants": "osalejad",
+      "participantsCount": "{count, plural, one {# participant} other {# participants}}",
       "participantList": "Osalejad",
       "name": "Nimi",
       "joined": "Sisenes",

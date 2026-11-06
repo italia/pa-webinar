@@ -151,6 +151,14 @@ describe('scheda pubblica — video', () => {
   });
 });
 
+describe('scheda pubblica — picco di partecipanti', () => {
+  it('al singolare con una persona', () => {
+    disegna({ event: evento({ status: 'ENDED', peakParticipants: 1 }), registrationOpen: false });
+    expect(container.textContent).toContain('Picco: 1 partecipante');
+    expect(container.textContent).not.toContain('1 partecipanti');
+  });
+});
+
 describe('scheda pubblica — iscrizione', () => {
   it('evento in programma: pulsante d’iscrizione e promemoria di calendario', () => {
     disegna({ event: evento(), registrationOpen: true });

@@ -2768,7 +2768,7 @@
       "title": "Συνεδρίες κλήσης",
       "empty": "Δεν έχει καταγραφεί καμία συνεδρία. Οι ζωντανές συνεδρίες εμφανίζονται εδώ αυτόματα μόλις ο συντονιστής εισέλθει στην αίθουσα.",
       "loading": "Φόρτωση συνεδριών...",
-      "participants": "συμμετέχοντες",
+      "participantsCount": "{count, plural, one {# participant} other {# participants}}",
       "participantList": "Συμμετέχοντες",
       "name": "Όνομα",
       "joined": "Είσοδος",

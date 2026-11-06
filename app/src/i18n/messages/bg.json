@@ -2768,7 +2768,7 @@
       "title": "Сесии на разговори",
       "empty": "Няма записани сесии. Сесиите на живо се изброяват автоматично, когато модераторът влезе в залата.",
       "loading": "Зареждане на сесиите...",
-      "participants": "участници",
+      "participantsCount": "{count, plural, one {# participant} other {# participants}}",
       "participantList": "Участници",
       "name": "Име",
       "joined": "Влизане",

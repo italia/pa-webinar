@@ -2768,7 +2768,7 @@
       "title": "Seisiúin ghlao",
       "empty": "Níl aon seisiún taifeadta go fóill. Liostaítear seisiúin bheo anseo go huathoibríoch a luaithe a théann an modhnóir isteach sa seomra.",
       "loading": "Seisiúin á luchtú...",
-      "participants": "rannpháirtithe",
+      "participantsCount": "{count, plural, one {# participant} other {# participants}}",
       "participantList": "Rannpháirtithe",
       "name": "Ainm",
       "joined": "Tháinig isteach",

@@ -2768,7 +2768,7 @@
       "title": "Gesprekssessies",
       "empty": "Nog geen sessies geregistreerd. Live sessies worden hier automatisch vermeld zodra de moderator de ruimte binnenkomt.",
       "loading": "Sessies laden...",
-      "participants": "deelnemers",
+      "participantsCount": "{count, plural, one {# participant} other {# participants}}",
       "participantList": "Deelnemers",
       "name": "Naam",
       "joined": "Binnengekomen",

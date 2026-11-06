@@ -2768,7 +2768,7 @@
       "title": "Sessjonijiet ta' telefonata",
       "empty": "Ebda sessjoni reġistrata. Lu sessjonijiet livu vengono elencatu awtomatikament waħda volta li il moderatur entra fi sala.",
       "loading": "Caricament sessjonijiet...",
-      "participants": "parteċipanti",
+      "participantsCount": "{count, plural, one {# participant} other {# participants}}",
       "participantList": "Parteċipanti",
       "name": "Isem",
       "joined": "Entrata",

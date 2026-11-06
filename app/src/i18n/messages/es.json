@@ -2768,7 +2768,7 @@
       "title": "Sesiones de llamada",
       "empty": "Aún no se ha registrado ninguna sesión. Las sesiones en directo se listan automáticamente cuando el moderador entra en la sala.",
       "loading": "Cargando sesiones...",
-      "participants": "participantes",
+      "participantsCount": "{count, plural, one {# participant} other {# participants}}",
       "participantList": "Participantes",
       "name": "Nombre",
       "joined": "Entrada",

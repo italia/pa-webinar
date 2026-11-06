@@ -2768,7 +2768,7 @@
       "title": "Anruf-Sitzungen",
       "empty": "Noch keine Sitzungen erfasst. Live-Sitzungen werden hier automatisch aufgeführt, sobald die Moderation den Raum betritt.",
       "loading": "Sitzungen werden geladen...",
-      "participants": "Teilnehmende",
+      "participantsCount": "{count, plural, one {# participant} other {# participants}}",
       "participantList": "Teilnehmende",
       "name": "Name",
       "joined": "Eintritt",

@@ -2768,7 +2768,7 @@
       "title": "Samtalssessioner",
       "empty": "Inga sessioner registrerade. Live-sessioner listas automatiskt här så snart moderatorn går in i rummet.",
       "loading": "Laddar sessioner...",
-      "participants": "deltagare",
+      "participantsCount": "{count, plural, one {# participant} other {# participants}}",
       "participantList": "Deltagare",
       "name": "Namn",
       "joined": "Anslöt",

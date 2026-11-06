@@ -175,7 +175,7 @@ export default function CallSessionsPanel({
                       </div>
                       <div className="d-flex gap-2 text-muted" style={{ fontSize: '0.78rem' }}>
                         <span>{formatDuration(session.duration)}</span>
-                        <span>{session.peakParticipants} {t('participants')}</span>
+                        <span>{t('participantsCount', { count: session.peakParticipants })}</span>
                         {session.recordingUrl && (
                           <Badge color="success" pill style={{ fontSize: '0.68rem' }}>REC</Badge>
                         )}

@@ -2768,7 +2768,7 @@
       "title": "Skambučio sesijos",
       "empty": "Sesijų dar neįregistruota. Tiesioginės sesijos čia rodomos automatiškai, kai tik moderatorius prisijungia prie salės.",
       "loading": "Įkeliamos sesijos...",
-      "participants": "dalyviai",
+      "participantsCount": "{count, plural, one {# participant} other {# participants}}",
       "participantList": "Dalyviai",
       "name": "Vardas",
       "joined": "Prisijungė",
