@@ -153,5 +153,35 @@ describe('resolveTokenSender — pubblico anonimo', () => {
     expect(sender).toMatchObject({ senderId: 'reg-reg-99', senderName: 'Pseudo reg-reg-99' });
     expect(sender?.senderName).not.toContain('Alice');
   });
+
+  it('il relatore e chi modera tengono il nome: gli pseudonimi sono del pubblico', async () => {
+    mockedGrant.mockResolvedValue({
+      role: 'SPEAKER',
+      displayName: 'Rita Relatrice',
+      isPrimaryShared: false,
+      grantId: 'g-2',
+    });
+    const relatore = await resolveTokenSender({ ...EVENT, audienceAnonymous: true }, 'SPK');
+    expect(relatore).toMatchObject({ senderName: 'Rita Relatrice', isModerator: false });
+
+    mockedGrant.mockResolvedValue({
+      role: 'MODERATOR',
+      displayName: 'Mara Mod',
+      isPrimaryShared: false,
+      grantId: 'g-3',
+    });
+    const moderatore = await resolveTokenSender({ ...EVENT, audienceAnonymous: true }, 'MOD');
+    expect(moderatore).toMatchObject({ senderName: 'Mara Mod', isModerator: true });
+  });
+
+  it('un link inoltrato non scrive col nome digitato: resta lo pseudonimo del posto', async () => {
+    mockedOwned.mockResolvedValue('ALTRO');
+    const sender = await resolveTokenSender(
+      { ...EVENT, audienceAnonymous: true },
+      'ACCESS',
+      'Nome Digitato',
+    );
+    expect(sender?.senderName).toBe('Pseudo reg-reg-99');
+  });
 });
 

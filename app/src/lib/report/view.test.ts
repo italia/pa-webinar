@@ -87,6 +87,11 @@ describe('vistaResoconto', () => {
           retentionPct: 80,
         },
         participation: { attention: 71, interactions: 3 },
+        questions: {
+          total: 2,
+          answered: 1,
+          top: [{ text: 'Testo di una domanda', upvotes: 4 }],
+        },
       },
     };
     const v = vistaResoconto(
@@ -99,5 +104,9 @@ describe('vistaResoconto', () => {
       retentionPct: null,
     });
     expect(v.metrics!.participation).toMatchObject({ interactions: 3, attention: null });
+    // I conteggi restano: la pagina li disegna. Il testo delle domande no, e non
+    // deve arrivare nemmeno con la loro sezione spenta.
+    expect(v.metrics!.questions).toEqual({ total: 2, answered: 1, top: [] });
+    expect(JSON.stringify(v)).not.toContain('Testo di una domanda');
   });
 });

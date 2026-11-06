@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: EUPL-1.2
 // SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
 
+import type { NextRequest } from 'next/server';
 import { isValidElement, type ReactElement, type ReactNode } from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
@@ -21,11 +22,20 @@ vi.mock('@/lib/db', () => ({
     eventFeedback: { aggregate: vi.fn(), groupBy: vi.fn(), findMany: vi.fn(async (): Promise<unknown[]> => []) },
     questionnaireAnswer: { findMany: vi.fn(async (): Promise<unknown[]> => []) },
     eventQuestionnaire: { findUnique: vi.fn() },
+    registration: { count: vi.fn(), findFirst: vi.fn() },
   },
 }));
+const { biscotti } = vi.hoisted(() => ({ biscotti: new Map<string, string>() }));
 vi.mock('next/headers', () => ({
-  cookies: async () => ({ get: () => undefined }),
+  cookies: async () => ({
+    get: (name: string) =>
+      biscotti.has(name) ? { name, value: biscotti.get(name)! } : undefined,
+  }),
 }));
+vi.mock('@/lib/auth/app-secret', () => ({
+  tryGetAppSecret: () => 'segreto-di-prova-abbastanza-lungo-per-hmac',
+}));
+vi.mock('@/lib/auth/staff-session', () => ({ isEventManager: vi.fn(async () => false) }));
 vi.mock('next-intl/server', () => ({
   getLocale: async () => 'it',
 }));
@@ -53,8 +63,16 @@ vi.mock('@/lib/event-session', () => ({
 vi.mock('@/lib/events/registration-access', () => ({
   registrationAccessFor: vi.fn(async () => 'open'),
 }));
-vi.mock('@/lib/events/recap', () => ({
+vi.mock('@/lib/events/recap', async (originale) => ({
+  ...(await originale<typeof ModuloRiepilogo>()),
   ensureEventRecap: vi.fn(async () => null),
+}));
+vi.mock('@/lib/presentation/recording-slides-data', () => ({
+  publicRecordingSlides: vi.fn(async () => null),
+}));
+vi.mock('@/lib/replay/moments', () => ({
+  replayMoments: vi.fn(async () => []),
+  programmeVideoTimes: vi.fn(async () => null),
 }));
 // Il client è un componente pesante: qui conta solo con quali props lo chiama
 // la pagina.
@@ -64,13 +82,25 @@ vi.mock('@/components/events/event-detail-client', () => ({
   },
 }));
 
+import { GET as arrivoDalLink } from '@/app/api/events/[param]/recording/access/route';
+import { isEventManager } from '@/lib/auth/staff-session';
 import { prisma } from '@/lib/db';
+import { ensureEventRecap, type EventRecap } from '@/lib/events/recap';
+import type * as ModuloRiepilogo from '@/lib/events/recap';
+import { publicRecordingSlides } from '@/lib/presentation/recording-slides-data';
+import { issueViewingToken, viewingCookieName } from '@/lib/recording/viewing';
+import { replayMoments } from '@/lib/replay/moments';
 import EventDetailClient from '@/components/events/event-detail-client';
 
 import EventDetailPage from './page';
 
 const mockedEvent = prisma.event.findUnique as unknown as ReturnType<typeof vi.fn>;
 const mockedMaterials = prisma.eventMaterial.findMany as unknown as ReturnType<typeof vi.fn>;
+const mockedQuestions = prisma.question.findMany as unknown as ReturnType<typeof vi.fn>;
+const mockedRegCount = prisma.registration.count as unknown as ReturnType<typeof vi.fn>;
+const mockedRegFirst = prisma.registration.findFirst as unknown as ReturnType<typeof vi.fn>;
+const mockedManager = isEventManager as unknown as ReturnType<typeof vi.fn>;
+const mockedRecap = ensureEventRecap as unknown as ReturnType<typeof vi.fn>;
 
 const EVENT_ID = '22222222-2222-4222-8222-222222222222';
 const FOTO = '33333333-3333-4333-8333-333333333333';
@@ -95,7 +125,11 @@ function eventRow(over: Record<string, unknown> = {}) {
     organizers: [],
     additionalMods: [],
     recordingPublished: false,
+    transcriptPublished: false,
+    recordingAudience: 'PUBLIC',
+    recordingDestination: null,
     recordingUrl: null,
+    unrecordedSpeech: false,
     youtubeUrl: null,
     qaEnabled: true,
     chatEnabled: true,
@@ -140,11 +174,19 @@ const MATERIAL_ROW = {
   createdAt: new Date('2026-09-22T10:00:00.000Z'),
 };
 
-/** Le props con cui la pagina ha chiamato il client. */
-async function clientProps(): Promise<Record<string, unknown>> {
-  const tree = (await EventDetailPage({
+type Parametri = Awaited<NonNullable<Parameters<typeof EventDetailPage>[0]['searchParams']>>;
+
+/** L'albero che la pagina restituisce. */
+async function pagina(searchParams?: Parametri) {
+  return (await EventDetailPage({
     params: Promise.resolve({ slug: SLUG }),
+    searchParams: Promise.resolve(searchParams ?? {}),
   })) as ReactElement<{ children: ReactNode }>;
+}
+
+/** Le props con cui la pagina ha chiamato il client. */
+async function clientProps(searchParams?: Parametri): Promise<Record<string, unknown>> {
+  const tree = await pagina(searchParams);
   const children = ([] as ReactNode[]).concat(tree.props.children);
   const client = children.find(
     (c): c is ReactElement<Record<string, unknown>> =>
@@ -162,7 +204,12 @@ function whereInterrogato(): Record<string, unknown> {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  biscotti.clear();
   mockedMaterials.mockResolvedValue([MATERIAL_ROW]);
+  mockedQuestions.mockResolvedValue([]);
+  mockedRegCount.mockResolvedValue(0);
+  mockedManager.mockResolvedValue(false);
+  mockedRecap.mockResolvedValue(null);
 });
 
 describe('scheda dell’evento — materiali per il pubblico', () => {
@@ -522,5 +569,405 @@ describe('scheda dell’evento — programma', () => {
     const props = await clientProps();
     expect((props.event as { programme: unknown[] }).programme).toEqual([]);
     expect(await jsonLd()).not.toHaveProperty('subEvent');
+  });
+});
+
+describe('scheda dell’evento — le domande dopo l’evento', () => {
+  const NOME = 'Anna Rossi';
+  const RIGA_DOMANDA = {
+    id: 'q-1',
+    eventId: EVENT_ID,
+    registrationId: 'reg-1',
+    authorName: NOME,
+    text: 'Testo della domanda?',
+    answerText: 'Testo della risposta',
+    upvoteCount: 4,
+    status: 'ANSWERED',
+    answeredAt: new Date('2026-09-22T10:10:00.000Z'),
+    highlightedAt: null,
+    createdAt: new Date('2026-09-22T10:00:00.000Z'),
+  };
+  const SALVATO: EventRecap = {
+    version: 2,
+    generatedAt: '2026-09-22T12:00:00.000Z',
+    headcount: 10,
+    registrations: 20,
+    topQuestions: [{ text: 'Domanda più votata', upvotes: 4 }],
+    chatQuestions: [{ text: 'Domanda scritta in chat', reactions: 1, answered: false }],
+    polls: [],
+    topWords: [{ word: 'digitale', count: 3 }],
+    feedback: { average: null, count: 0 },
+  };
+  const concluso = (over: Record<string, unknown> = {}) =>
+    eventRow({
+      status: 'ENDED',
+      startsAt: new Date(Date.now() - 4 * HOUR),
+      endsAt: new Date(Date.now() - 2 * HOUR),
+      postEventShowQA: true,
+      postEventShowRecap: true,
+      ...over,
+    });
+
+  beforeEach(() => {
+    mockedQuestions.mockResolvedValue([RIGA_DOMANDA]);
+    mockedRecap.mockResolvedValue(SALVATO);
+  });
+
+  it('non chiede il nome di chi ha fatto la domanda, e tiene le date dei momenti del video', async () => {
+    mockedEvent.mockResolvedValue(concluso());
+    await clientProps();
+    const { select } = mockedQuestions.mock.calls[0]?.[0] as { select: Record<string, boolean> };
+    expect(select).toEqual({
+      id: true,
+      text: true,
+      answerText: true,
+      upvoteCount: true,
+      status: true,
+      answeredAt: true,
+      highlightedAt: true,
+    });
+  });
+
+  it('nel payload il testo sì, il nome mai', async () => {
+    mockedEvent.mockResolvedValue(concluso());
+    const props = await clientProps();
+    expect(props.answeredQuestions).toEqual([
+      {
+        id: 'q-1',
+        text: 'Testo della domanda?',
+        answerText: 'Testo della risposta',
+        upvotes: 4,
+        status: 'ANSWERED',
+      },
+    ]);
+    const payload = JSON.stringify(props);
+    expect(payload).not.toContain('authorName');
+    expect(payload).not.toContain(NOME);
+  });
+
+  it('nemmeno i dati strutturati nominano chi ha chiesto', async () => {
+    mockedEvent.mockResolvedValue(concluso());
+    const tree = await pagina();
+    const blocchi = ([] as ReactNode[]).concat(tree.props.children);
+    const script = blocchi.find(
+      (c): c is ReactElement<{ dangerouslySetInnerHTML: { __html: string } }> =>
+        isValidElement(c) && c.type === 'script',
+    );
+    const jsonLd = script!.props.dangerouslySetInnerHTML.__html;
+    expect(jsonLd).not.toContain(NOME);
+    expect(jsonLd).not.toContain('Testo della domanda');
+  });
+
+  it('i momenti del video ricevono le domande con le date', async () => {
+    mockedEvent.mockResolvedValue(
+      concluso({ recordingPublished: true, recordingUrl: 'https://s.example/v.mp4' }),
+    );
+    mockedQuestions.mockResolvedValue([
+      {
+        id: 'q-1',
+        text: 'Testo della domanda?',
+        answerText: null,
+        upvoteCount: 4,
+        status: 'ANSWERED',
+        answeredAt: RIGA_DOMANDA.answeredAt,
+        highlightedAt: null,
+      },
+    ]);
+    await clientProps();
+    const fonti = (replayMoments as unknown as ReturnType<typeof vi.fn>).mock.calls[0]?.[1] as {
+      questions: Array<Record<string, unknown>>;
+    };
+    expect(fonti.questions[0]).toMatchObject({ answeredAt: RIGA_DOMANDA.answeredAt });
+  });
+
+  it('le domande in chat non arrivano al client, anche da uno snapshot salvato', async () => {
+    mockedEvent.mockResolvedValue(concluso());
+    const props = await clientProps();
+    expect(props.recap).not.toHaveProperty('chatQuestions');
+    expect(JSON.stringify(props)).not.toContain('Domanda scritta in chat');
+    expect((props.recap as EventRecap).topQuestions).toEqual(SALVATO.topQuestions);
+  });
+
+  it.each([
+    ['domande spente', { postEventShowQA: false }],
+    ['Q&A mai acceso in sala', { qaEnabled: false }],
+    ['riepilogo spento', { postEventShowRecap: false }],
+    ['registrazione riservata', { recordingDestination: 'REGISTRANTS', recordingAudience: 'REGISTRANTS' }],
+  ])('con %s nessun testo di domanda dal riepilogo', async (_caso, over) => {
+    mockedEvent.mockResolvedValue(concluso(over));
+    const props = await clientProps();
+    expect((props.recap as EventRecap).topQuestions).toEqual([]);
+    expect(JSON.stringify(props)).not.toContain('Domanda più votata');
+  });
+
+  it.each([
+    ['domande spente', { postEventShowQA: false }],
+    ['Q&A mai acceso in sala', { qaEnabled: false }],
+    ['registrazione riservata', { recordingDestination: 'REGISTRANTS', recordingAudience: 'REGISTRANTS' }],
+  ])('con %s la scheda delle domande non si legge nemmeno', async (_caso, over) => {
+    mockedEvent.mockResolvedValue(concluso(over));
+    const props = await clientProps();
+    expect(mockedQuestions).not.toHaveBeenCalled();
+    expect(props.answeredQuestions).toEqual([]);
+    expect((props.event as { postEventShowQA: boolean }).postEventShowQA).toBe(false);
+  });
+
+  it('a riepilogo spento le parole restano: le usa la loro sezione', async () => {
+    mockedEvent.mockResolvedValue(concluso({ postEventShowRecap: false }));
+    const props = await clientProps();
+    expect((props.recap as EventRecap).topWords).toEqual(SALVATO.topWords);
+  });
+});
+
+describe('scheda dell’evento — registrazione riservata con la pagina privata', () => {
+  const REG_ID = 'reg-1';
+  const VIDEO = 'https://storage.example.net/recordings/sala.mp4';
+  const YOUTUBE = 'https://www.youtube.com/watch?v=abc';
+  const riservata = (over: Record<string, unknown> = {}) =>
+    eventRow({
+      status: 'ENDED',
+      startsAt: new Date(Date.now() - 4 * HOUR),
+      endsAt: new Date(Date.now() - 2 * HOUR),
+      postEventPublic: false,
+      recordingAudience: 'REGISTRANTS',
+      recordingDestination: 'REGISTRANTS',
+      recordingPublished: true,
+      recordingUrl: VIDEO,
+      ...over,
+    });
+  /** Il browser di chi ha aperto il link personale. */
+  const iscritto = () => {
+    biscotti.set(viewingCookieName(EVENT_ID), issueViewingToken(EVENT_ID, REG_ID)!);
+    mockedRegCount.mockResolvedValue(1);
+  };
+  const eventoDi = (props: Record<string, unknown>) =>
+    props.event as { recordingUrl: string | null; youtubeUrl: string | null; transcriptPublished: boolean };
+
+  it('l’iscritto trova la pagina con il video', async () => {
+    mockedEvent.mockResolvedValue(riservata());
+    iscritto();
+    const props = await clientProps();
+    expect(eventoDi(props).recordingUrl).toBe(VIDEO);
+    expect(props.recordingForRegistrants).toBe(false);
+    expect(props.previewForStaff).toBe(false);
+    expect(publicRecordingSlides).toHaveBeenCalled();
+  });
+
+  it('il link personale arriva a una pagina resa', async () => {
+    mockedEvent.mockResolvedValue(riservata());
+    mockedRegFirst.mockResolvedValue({ locale: 'it' });
+    mockedRegCount.mockResolvedValue(1);
+    const token = issueViewingToken(EVENT_ID, REG_ID)!;
+    const risposta = await arrivoDalLink(
+      new Request(
+        `https://webinar.example.gov.it/api/events/${SLUG}/recording/access?t=${encodeURIComponent(token)}`,
+      ) as unknown as NextRequest,
+      { params: Promise.resolve({ param: SLUG }) },
+    );
+    expect(risposta.status).toBe(303);
+    expect(risposta.headers.get('Location')).toContain(`/it/eventi/${SLUG}`);
+
+    // Cio' che il browser fa dopo il rimando: torna con il cookie appena posato.
+    const [nome, valore] = (risposta.headers.get('Set-Cookie') ?? '').split(';')[0]!.split('=');
+    biscotti.set(nome!, valore!);
+    expect(eventoDi(await clientProps()).recordingUrl).toBe(VIDEO);
+  });
+
+  it('con la sola trascrizione la pagina si apre: il link porta anche lì', async () => {
+    mockedEvent.mockResolvedValue(
+      riservata({ recordingPublished: false, transcriptPublished: true }),
+    );
+    iscritto();
+    const props = await clientProps();
+    expect(eventoDi(props).transcriptPublished).toBe(true);
+    expect(eventoDi(props).recordingUrl).toBeNull();
+  });
+
+  it('chi non prova l’iscrizione trova 404', async () => {
+    mockedEvent.mockResolvedValue(riservata());
+    await expect(pagina()).rejects.toThrow('NOT_FOUND');
+  });
+
+  it('un’iscrizione cancellata, anche dalla pulizia dei dati, non apre più', async () => {
+    mockedEvent.mockResolvedValue(riservata());
+    iscritto();
+    mockedRegCount.mockResolvedValue(0);
+    await expect(pagina()).rejects.toThrow('NOT_FOUND');
+  });
+
+  it('non pubblicata, o oltre la finestra: 404 anche all’iscritto', async () => {
+    iscritto();
+    mockedEvent.mockResolvedValue(riservata({ recordingPublished: false }));
+    await expect(pagina()).rejects.toThrow('NOT_FOUND');
+    mockedEvent.mockResolvedValue(riservata({ postEventPublicUntil: new Date(Date.now() - HOUR) }));
+    await expect(pagina()).rejects.toThrow('NOT_FOUND');
+  });
+
+  it('un evento senza destinazione resta com’era: pagina privata, 404 anche all’iscritto', async () => {
+    mockedEvent.mockResolvedValue(riservata({ recordingDestination: null }));
+    iscritto();
+    await expect(pagina()).rejects.toThrow('NOT_FOUND');
+  });
+
+  it('un evento archiviato non ha una pagina, nemmeno per l’iscritto', async () => {
+    mockedEvent.mockResolvedValue(riservata({ status: 'ARCHIVED' }));
+    iscritto();
+    await expect(pagina()).rejects.toThrow('NOT_FOUND');
+  });
+
+  it('lo staff entra solo chiedendo l’anteprima, come prima', async () => {
+    mockedEvent.mockResolvedValue(riservata());
+    mockedManager.mockResolvedValue(true);
+    await expect(pagina()).rejects.toThrow('NOT_FOUND');
+    const props = await clientProps({ anteprima: '1' });
+    expect(props.previewForStaff).toBe(true);
+    expect(eventoDi(props).recordingUrl).toBe(VIDEO);
+  });
+
+  it('iscritto e staff insieme: il link personale apre la pagina in anteprima', async () => {
+    mockedEvent.mockResolvedValue(riservata());
+    mockedManager.mockResolvedValue(true);
+    mockedRegFirst.mockResolvedValue({ locale: 'it' });
+    mockedRegCount.mockResolvedValue(1);
+    const token = issueViewingToken(EVENT_ID, REG_ID)!;
+    const risposta = await arrivoDalLink(
+      new Request(
+        `https://webinar.example.gov.it/api/events/${SLUG}/recording/access?t=${encodeURIComponent(token)}`,
+      ) as unknown as NextRequest,
+      { params: Promise.resolve({ param: SLUG }) },
+    );
+    const dove = new URL(risposta.headers.get('Location')!);
+    const [nome, valore] = (risposta.headers.get('Set-Cookie') ?? '').split(';')[0]!.split('=');
+    biscotti.set(nome!, valore!);
+    const props = await clientProps({ anteprima: dove.searchParams.get('anteprima') ?? '' });
+    expect(eventoDi(props).recordingUrl).toBe(VIDEO);
+  });
+
+  it('con la pagina visibile chi non è iscritto legge che è riservata, senza il video', async () => {
+    mockedEvent.mockResolvedValue(riservata({ postEventPublic: true }));
+    const props = await clientProps();
+    expect(props.recordingForRegistrants).toBe(true);
+    expect(eventoDi(props).recordingUrl).toBeNull();
+  });
+
+  describe('resoconto', () => {
+    const RESOCONTO = {
+      postEventReportPublished: true,
+      postEventReport: {
+        version: 1,
+        generatedAt: '2026-10-20T10:00:00.000Z',
+        sourceLanguage: 'it',
+        model: { id: 'm', version: null },
+        metrics: null,
+        narratives: {
+          it: {
+            title: 'Resoconto di prova',
+            abstract: 'Sintesi di prova',
+            summary: '',
+            highlights: [],
+            topics: [],
+            conceptMap: { nodes: [], edges: [] },
+            consensus: { summary: '', agreements: [], disagreements: [] },
+            engagement: { summary: '', observations: [] },
+            benefits: { summary: '', items: [] },
+            feedback: { summary: '', strengths: [], improvements: [], quotes: [] },
+            openQuestions: [],
+            nextSteps: [],
+          },
+        },
+      },
+    };
+
+    it('riservata con la pagina visibile: solo chi vede la registrazione', async () => {
+      mockedEvent.mockResolvedValue(riservata({ postEventPublic: true, ...RESOCONTO }));
+      expect((await clientProps()).report).toBeNull();
+      iscritto();
+      expect((await clientProps()).report).toMatchObject({ language: 'it' });
+    });
+
+    it('riservata senza nulla di pubblicato: resta chiuso, salvo l’anteprima dello staff', async () => {
+      mockedEvent.mockResolvedValue(
+        riservata({ postEventPublic: true, recordingPublished: false, ...RESOCONTO }),
+      );
+      iscritto();
+      expect((await clientProps()).report).toBeNull();
+      mockedManager.mockResolvedValue(true);
+      expect((await clientProps()).report).toBeNull();
+      expect((await clientProps({ anteprima: '1' })).report).toMatchObject({ language: 'it' });
+    });
+
+    it('per tutti, anche senza video pubblicato: lo vede chiunque', async () => {
+      mockedEvent.mockResolvedValue(
+        riservata({
+          postEventPublic: true,
+          recordingAudience: 'PUBLIC',
+          recordingDestination: 'PUBLIC',
+          recordingPublished: false,
+          ...RESOCONTO,
+        }),
+      );
+      expect((await clientProps()).report).toMatchObject({ language: 'it' });
+    });
+
+    it('un evento senza destinazione resta com’era', async () => {
+      mockedEvent.mockResolvedValue(
+        riservata({ postEventPublic: true, recordingDestination: null, ...RESOCONTO }),
+      );
+      expect((await clientProps()).report).toMatchObject({ language: 'it' });
+    });
+  });
+
+  describe('link su YouTube', () => {
+    it('riservata: lo vede solo chi vede il video', async () => {
+      mockedEvent.mockResolvedValue(riservata({ postEventPublic: true, youtubeUrl: YOUTUBE }));
+      expect(eventoDi(await clientProps()).youtubeUrl).toBeNull();
+      iscritto();
+      expect(eventoDi(await clientProps()).youtubeUrl).toBe(YOUTUBE);
+    });
+
+    it('riservata: con il solo link, senza video pubblicato, non esce', async () => {
+      mockedEvent.mockResolvedValue(
+        riservata({ postEventPublic: true, recordingPublished: false, youtubeUrl: YOUTUBE }),
+      );
+      iscritto();
+      expect(eventoDi(await clientProps()).youtubeUrl).toBeNull();
+    });
+
+    it('ristretta dallo staff su un evento nato pubblico: segue il video', async () => {
+      mockedEvent.mockResolvedValue(
+        riservata({ postEventPublic: true, recordingDestination: 'PUBLIC', youtubeUrl: YOUTUBE }),
+      );
+      expect(eventoDi(await clientProps()).youtubeUrl).toBeNull();
+    });
+
+    it('per tutti, anche con il solo link: il pubblico lo vede', async () => {
+      mockedEvent.mockResolvedValue(
+        riservata({
+          postEventPublic: true,
+          recordingAudience: 'PUBLIC',
+          recordingDestination: 'PUBLIC',
+          recordingPublished: false,
+          recordingUrl: null,
+          youtubeUrl: YOUTUBE,
+        }),
+      );
+      expect(eventoDi(await clientProps()).youtubeUrl).toBe(YOUTUBE);
+    });
+
+    it('un evento senza destinazione resta com’era', async () => {
+      for (const recordingAudience of ['PUBLIC', 'REGISTRANTS']) {
+        mockedEvent.mockResolvedValue(
+          riservata({
+            postEventPublic: true,
+            recordingAudience,
+            recordingDestination: null,
+            recordingPublished: false,
+            recordingUrl: null,
+            youtubeUrl: YOUTUBE,
+          }),
+        );
+        expect(eventoDi(await clientProps()).youtubeUrl).toBe(YOUTUBE);
+      }
+    });
   });
 });

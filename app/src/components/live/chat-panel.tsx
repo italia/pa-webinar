@@ -289,6 +289,7 @@ export default function ChatPanel({
   // citato: si illumina un attimo per farsi trovare.
   const [flashId, setFlashId] = useState<string | null>(null);
   const mentionListId = useId();
+  const avvisoId = useId();
   // Chi sta scrivendo (lib/chat/typing): arriva dallo stream come evento a
   // parte, si spegne da solo dopo qualche secondo o al suo messaggio.
   const [typing, setTyping] = useState<TypingState>(() => new Map());
@@ -2133,6 +2134,7 @@ export default function ChatPanel({
             disabled={sending}
             maxLength={2000}
             aria-label={t('inputLabel')}
+            aria-describedby={avvisoId}
             aria-controls={mentionSuggestions.length > 0 ? mentionListId : undefined}
             aria-activedescendant={
               mentionSuggestions.length > 0 ? `${mentionListId}-${mentionIndex}` : undefined
@@ -2221,6 +2223,9 @@ export default function ChatPanel({
             </button>
           </div>
         </div>
+        <p id={avvisoId} className="chat-panel__notice">
+          {t('personalDataNotice')}
+        </p>
       </div>
     </div>
   );

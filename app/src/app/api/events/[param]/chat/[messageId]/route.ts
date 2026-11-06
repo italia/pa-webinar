@@ -195,8 +195,8 @@ export const PATCH = withErrorHandling(async (request, context) => {
     op: 'edit',
   });
 
-  // Il riepilogo pubblico di un evento concluso riporta le domande: se si e'
-  // corretta una domanda, si rifa'.
+  // Il riepilogo salvato di un evento concluso puo' riportare le domande poste
+  // in chat: se si e' corretta una domanda, si rifa'. Al pubblico non arrivano.
   if (message.isQuestion) await rifaiRiepilogo(auth.eventId);
   return NextResponse.json({ ok: true, editedAt: editedAt.toISOString() });
 });

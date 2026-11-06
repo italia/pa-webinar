@@ -8,7 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 /**
  * Il PDF di una slide accanto alla registrazione pubblicata.
  *
- * Solo per la pagina post-evento pubblica, solo un materiale che la pagina
+ * Solo per chi vede la pagina post-evento, solo un materiale che la pagina
  * mostra accanto al video (ricalcolato a ogni richiesta), letto lato server
  * con un URL firmato che non esce dalla rotta.
  */
@@ -27,10 +27,15 @@ vi.mock('@/lib/db', () => ({
 }));
 vi.mock('@/lib/storage', () => ({ getFilesStorage: () => storage.current }));
 vi.mock('@/lib/presentation/recording-slides-data', () => slides);
-vi.mock('@/lib/recording/audience', () => accesso);
+// Chi prova l'iscrizione si simula; la regola sulla pagina privata e' quella vera.
+vi.mock('@/lib/recording/audience', async (originale) => ({
+  ...(await originale<typeof ModuloAccesso>()),
+  accessoRegistrazione: accesso.accessoRegistrazione,
+}));
 vi.mock('next/headers', () => ({ cookies: async () => ({ get: () => undefined }) }));
 
 import { prisma } from '@/lib/db';
+import type * as ModuloAccesso from '@/lib/recording/audience';
 
 import { GET } from './route';
 
@@ -64,6 +69,9 @@ function evento(over: Record<string, unknown> = {}) {
     postEventPublicUntil: null,
     recordingUrl: 'https://storage.example.net/recordings/sala.mp4',
     recordingPublished: true,
+    transcriptPublished: false,
+    recordingAudience: 'PUBLIC',
+    recordingDestination: null,
     postEventShowMaterials: true,
     ...over,
   };
@@ -131,6 +139,45 @@ describe('GET /api/events/[slug]/recording/slides', () => {
     );
     expect((await GET(req(), ctx())).status).toBe(404);
     mockedEvent.mockResolvedValue(evento({ status: 'DRAFT' }));
+    expect((await GET(req(), ctx())).status).toBe(404);
+    expect(slides.publicSlideFileKey).not.toHaveBeenCalled();
+  });
+
+  it('riservata con la pagina privata: l’iscritto legge le slide', async () => {
+    mockedEvent.mockResolvedValue(
+      evento({
+        postEventPublic: false,
+        recordingAudience: 'REGISTRANTS',
+        recordingDestination: 'REGISTRANTS',
+      })
+    );
+    accesso.accessoRegistrazione.mockResolvedValue('iscritto');
+    expect((await GET(req(), ctx())).status).toBe(200);
+    expect(slides.publicSlideFileKey).toHaveBeenCalledWith(
+      expect.objectContaining({ recordingPublished: true }),
+      MATERIAL_ID,
+    );
+  });
+
+  it('riservata con la pagina privata: oltre la finestra dopo l’evento no', async () => {
+    mockedEvent.mockResolvedValue(
+      evento({
+        postEventPublic: false,
+        postEventPublicUntil: new Date('2020-01-01'),
+        recordingAudience: 'REGISTRANTS',
+        recordingDestination: 'REGISTRANTS',
+      })
+    );
+    accesso.accessoRegistrazione.mockResolvedValue('iscritto');
+    expect((await GET(req(), ctx())).status).toBe(404);
+    expect(slides.publicSlideFileKey).not.toHaveBeenCalled();
+  });
+
+  it('riservata senza destinazione: la pagina privata chiude anche all’iscritto, come sempre', async () => {
+    mockedEvent.mockResolvedValue(
+      evento({ postEventPublic: false, recordingAudience: 'REGISTRANTS' })
+    );
+    accesso.accessoRegistrazione.mockResolvedValue('iscritto');
     expect((await GET(req(), ctx())).status).toBe(404);
     expect(slides.publicSlideFileKey).not.toHaveBeenCalled();
   });

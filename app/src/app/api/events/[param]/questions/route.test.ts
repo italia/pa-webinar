@@ -31,9 +31,13 @@ vi.mock('@/lib/cache', () => ({
 vi.mock('@/lib/live-state/publish', () => ({ pokeLivePanel: vi.fn() }));
 vi.mock('@/lib/events/join-grant', () => ({ hasJoinGrant: vi.fn(async () => false) }));
 vi.mock('@/lib/crypto/pii', () => ({ tryDecryptPII: (v: string) => v }));
+vi.mock('@/lib/live/pseudonym', () => ({
+  pseudonimo: vi.fn(async (_evento: string, posto: string) => `Pseudo ${posto}`),
+}));
 const { siteSettings } = vi.hoisted(() => ({ siteSettings: { guestAccessEnabled: true } }));
 vi.mock('@/lib/settings', () => ({ getSettings: async () => siteSettings }));
 
+import { getCached, setCache } from '@/lib/cache';
 import { prisma } from '@/lib/db';
 import { hasJoinGrant } from '@/lib/events/join-grant';
 
@@ -259,6 +263,192 @@ describe('GET /api/events/[slug]/questions — chi vede le domande', () => {
     expect((await GET(get(), ctx())).status).toBe(401);
     // Chi ha un token legge come prima.
     expect((await GET(get({ Authorization: `Bearer ${PRIMARY_TOKEN}` }), ctx())).status).toBe(200);
+  });
+});
+
+describe('GET /api/events/[slug]/questions — il nome di chi ha chiesto', () => {
+  const NOME = 'Anna';
+  const concluso = (status: string) =>
+    mockedEvent.mockResolvedValue({
+      id: EVENT_ID,
+      status,
+      eventType: 'SCHEDULED',
+      moderatorToken: PRIMARY_TOKEN,
+      joinPasswordHash: null,
+      qaEnabled: true,
+    });
+  const nomiLetti = async (res: Response) => {
+    const { questions } = (await res.json()) as { questions: { authorName: string }[] };
+    return questions.map((q) => q.authorName);
+  };
+  const conIscritto = () =>
+    mockedRegistration.mockResolvedValue({ id: 'reg-1', eventId: EVENT_ID });
+  const conRelatore = () =>
+    mockedGrant.mockResolvedValue({ eventId: EVENT_ID, revokedAt: null, role: 'SPEAKER' });
+
+  it.each(['ENDED', 'ARCHIVED'])('a evento %s l’iscritto legge le domande senza nomi', async (stato) => {
+    concluso(stato);
+    conIscritto();
+    const res = await GET(get({ Authorization: 'Bearer TOKEN_ISCRITTO' }), ctx());
+    expect(res.status).toBe(200);
+    expect(await nomiLetti(res)).toEqual(['']);
+  });
+
+  it.each(['ENDED', 'ARCHIVED'])('a evento %s nemmeno il relatore riceve i nomi', async (stato) => {
+    concluso(stato);
+    conRelatore();
+    const res = await GET(get({ Authorization: 'Bearer TOKEN_RELATORE' }), ctx());
+    expect(await nomiLetti(res)).toEqual(['']);
+  });
+
+  it.each(['ENDED', 'ARCHIVED'])('a evento %s chi modera tiene i nomi: la revisione della sala li mostra', async (stato) => {
+    concluso(stato);
+    const res = await GET(get({ Authorization: `Bearer ${PRIMARY_TOKEN}` }), ctx());
+    expect(await nomiLetti(res)).toEqual([NOME]);
+  });
+
+  it('il testo resta: si toglie solo il nome', async () => {
+    concluso('ENDED');
+    conIscritto();
+    const res = await GET(get({ Authorization: 'Bearer TOKEN_ISCRITTO' }), ctx());
+    const { questions } = (await res.json()) as { questions: { text: string }[] };
+    expect(questions[0]?.text).toBe('Ci sarà la registrazione?');
+  });
+
+  it.each(['LIVE', 'IDLE', 'PROVISIONING'])('con la sala %s tutti leggono i nomi', async (stato) => {
+    concluso(stato);
+    conIscritto();
+    let res = await GET(get({ Authorization: 'Bearer TOKEN_ISCRITTO' }), ctx());
+    expect(await nomiLetti(res)).toEqual([NOME]);
+    mockedRegistration.mockResolvedValue(null);
+    conRelatore();
+    res = await GET(get({ Authorization: 'Bearer TOKEN_RELATORE' }), ctx());
+    expect(await nomiLetti(res)).toEqual([NOME]);
+  });
+
+  it('un ospite in diretta legge i nomi; dopo la fine non ha più il pannello', async () => {
+    concluso('LIVE');
+    expect(await nomiLetti(await GET(get(), ctx()))).toEqual([NOME]);
+    concluso('ENDED');
+    expect((await GET(get(), ctx())).status).toBe(401);
+  });
+
+  it('la cache non cambia: stessa chiave e stesso contenuto, il nome si toglie dopo', async () => {
+    concluso('ENDED');
+    conIscritto();
+    const nascosto = await nomiLetti(await GET(get({ Authorization: 'Bearer TOKEN_ISCRITTO' }), ctx()));
+    expect(nascosto).toEqual(['']);
+    const scrittura = vi.mocked(setCache).mock.calls.find(([k]) => k.startsWith('qa:'));
+    expect(scrittura?.[0]).toBe(`qa:${EVENT_ID}:all`);
+    expect(scrittura?.[1]).toEqual([expect.objectContaining({ authorName: NOME })]);
+  });
+
+  it('dalla cache piena il nome si toglie lo stesso', async () => {
+    concluso('ENDED');
+    conIscritto();
+    const dallaCache = [
+      {
+        id: 'q-1',
+        authorName: NOME,
+        text: 'Dalla cache',
+        answerText: null,
+        status: 'PENDING',
+        upvoteCount: 0,
+        createdAt: '2026-09-22T10:00:00.000Z',
+        highlightedAt: null,
+        answeredAt: null,
+      },
+    ];
+    vi.mocked(getCached).mockImplementation((chiave: string) =>
+      chiave.startsWith('qa:') ? dallaCache : null,
+    );
+    try {
+      const res = await GET(get({ Authorization: 'Bearer TOKEN_ISCRITTO' }), ctx());
+      expect(mockedQuestions).not.toHaveBeenCalled();
+      expect(await nomiLetti(res)).toEqual(['']);
+    } finally {
+      vi.mocked(getCached).mockImplementation(() => null);
+    }
+  });
+});
+
+describe('POST /api/events/[slug]/questions — pubblico anonimo', () => {
+  function chiedi(body: Record<string, unknown>, ip: string): NextRequest {
+    return new Request(`https://webinar.gov.it/api/events/${SLUG}/questions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-forwarded-for': ip },
+      body: JSON.stringify(body),
+    }) as unknown as NextRequest;
+  }
+  const nomeSalvato = () =>
+    (mockedCreate.mock.calls[0]?.[0] as { data: { authorName: string } }).data.authorName;
+
+  beforeEach(() => {
+    mockedEvent.mockResolvedValue({
+      id: EVENT_ID,
+      status: 'LIVE',
+      eventType: 'SCHEDULED',
+      moderatorToken: PRIMARY_TOKEN,
+      joinPasswordHash: null,
+      qaEnabled: true,
+      audienceAnonymous: true,
+    });
+  });
+
+  it('l’iscritto chiede con lo pseudonimo del suo posto', async () => {
+    mockedRegistration.mockResolvedValue({
+      id: 'reg-41',
+      eventId: EVENT_ID,
+      displayName: 'Anna Rossi',
+    });
+    const res = await POST(
+      chiedi({ text: 'Domanda da iscritta', accessToken: 'TOKEN_ISCRITTO' }, '203.0.113.71'),
+      ctx(),
+    );
+    expect(res.status).toBe(201);
+    expect(nomeSalvato()).toBe('Pseudo reg-reg-41');
+  });
+
+  it('l’ospite chiede con lo pseudonimo, mai col nome scritto in sala d’attesa', async () => {
+    const res = await POST(
+      chiedi({ text: 'Domanda da ospite', guestName: 'Bruno Verdi' }, '203.0.113.72'),
+      ctx(),
+    );
+    expect(res.status).toBe(201);
+    expect(nomeSalvato()).toMatch(/^Pseudo /);
+    expect(nomeSalvato()).not.toContain('Bruno');
+  });
+
+  it('il relatore tiene il suo nome: gli pseudonimi sono del pubblico', async () => {
+    mockedGrant.mockResolvedValue({ eventId: EVENT_ID, revokedAt: null, name: 'Relatrice' });
+    const res = await POST(
+      chiedi({ text: 'Domanda dal relatore', accessToken: 'TOKEN_RELATORE' }, '203.0.113.73'),
+      ctx(),
+    );
+    expect(res.status).toBe(201);
+    expect(nomeSalvato()).toBe('Relatrice');
+  });
+
+  it('senza pseudonimi l’iscritto chiede col suo nome', async () => {
+    mockedEvent.mockResolvedValue({
+      id: EVENT_ID,
+      status: 'LIVE',
+      eventType: 'SCHEDULED',
+      moderatorToken: PRIMARY_TOKEN,
+      joinPasswordHash: null,
+      qaEnabled: true,
+      audienceAnonymous: false,
+    });
+    mockedRegistration.mockResolvedValue({
+      id: 'reg-42',
+      eventId: EVENT_ID,
+      displayName: 'Anna Rossi',
+    });
+    await POST(
+      chiedi({ text: 'Domanda col nome', accessToken: 'TOKEN_ISCRITTO' }, '203.0.113.74'),
+      ctx(),
+    );
+    expect(nomeSalvato()).toBe('Anna Rossi');
   });
 });
 

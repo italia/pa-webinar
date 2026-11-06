@@ -166,8 +166,13 @@ export const GET = withErrorHandling(async (request, context) => {
     userUpvotedIds = new Set(upvotes.map((u) => u.questionId));
   }
 
+  // Finita la diretta il nome di chi ha chiesto resta solo a chi modera: un
+  // token identifica un posto e un link si inoltra. Si toglie dopo la cache,
+  // cosi' la sua chiave non cambia; '' e' il valore che lascia anche la pulizia.
+  const senzaNome = !isModerator && (event.status === 'ENDED' || event.status === 'ARCHIVED');
   const result = cachedQuestions.map((q) => ({
     ...q,
+    ...(senzaNome && { authorName: '' }),
     hasUpvoted: userUpvotedIds.has(q.id),
   }));
 

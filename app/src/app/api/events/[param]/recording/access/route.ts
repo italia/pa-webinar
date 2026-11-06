@@ -8,8 +8,12 @@
  * L'arrivo dal link personale dell'avviso «registrazione disponibile» per una
  * registrazione riservata agli iscritti (lib/recording/viewing): con un token
  * valido di un'iscrizione esistente posa il cookie della visione, poi porta
- * alla pagina dell'evento. Con un token non valido porta alla pagina e basta:
+ * alla pagina dell'evento, che con il cookie si apre anche quando e' privata
+ * (lib/recording/audience). Con un token non valido porta alla pagina e basta:
  * li' chi non puo' vedere la registrazione legge che e' riservata agli iscritti.
+ * Chi si e' iscritto e gestisce anche l'evento arriva con `?anteprima=1`: la
+ * pagina lo tratta da staff, e senza anteprima una pagina privata gli sarebbe
+ * chiusa.
  *
  * La POST rimanda il link a chi l'ha perso, o non l'ha mai ricevuto (avviso
  * spento, registrazione riservata dopo l'avviso): con l'email di un'iscrizione
@@ -17,8 +21,11 @@
  * con il link personale. Risponde sempre uguale, cosi' non dice chi e'
  * iscritto; limitata per indirizzo IP.
  */
+import { cookies } from 'next/headers';
+
 import { defaultLocale } from '@/i18n/config';
 import { parseJsonBody, withErrorHandling } from '@/lib/api-handler';
+import { isEventManager } from '@/lib/auth/staff-session';
 import { decryptPII, hashEmail } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { lingueIscrizione, linguaPagina } from '@/lib/email/lingua';
@@ -60,12 +67,14 @@ export const GET = withErrorHandling(async (request, context) => {
     linguaPagina(url.searchParams.get('lang')) ??
     linguaPagina(registration?.locale) ??
     defaultLocale;
+  const pagina = localizedUrl(
+    getPublicEnv('NEXT_PUBLIC_APP_URL'),
+    `/events/${slug}`,
+    locale
+  );
+  const staff = registration !== null && (await isEventManager(await cookies(), event.id));
   const headers = new Headers({
-    Location: localizedUrl(
-      getPublicEnv('NEXT_PUBLIC_APP_URL'),
-      `/events/${slug}`,
-      locale
-    ),
+    Location: staff ? `${pagina}?anteprima=1` : pagina,
     'Cache-Control': 'no-store',
     'Referrer-Policy': 'no-referrer',
   });

@@ -9,7 +9,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
  * L'arrivo dal link personale della visione: posa il cookie solo per un token
  * valido di un'iscrizione esistente, e porta sempre alla pagina dell'evento.
  */
-const { db, outbox } = vi.hoisted(() => ({
+const { db, outbox, gestore } = vi.hoisted(() => ({
+  gestore: vi.fn(async (): Promise<boolean> => false),
   db: {
     event: { findUnique: vi.fn() },
     registration: { findFirst: vi.fn(), findUnique: vi.fn() },
@@ -20,6 +21,8 @@ const { db, outbox } = vi.hoisted(() => ({
 }));
 
 vi.mock('@/lib/db', () => ({ prisma: db }));
+vi.mock('next/headers', () => ({ cookies: async () => ({ get: () => undefined }) }));
+vi.mock('@/lib/auth/staff-session', () => ({ isEventManager: gestore }));
 vi.mock('@/lib/auth/app-secret', () => ({
   tryGetAppSecret: () => 'segreto-di-prova-abbastanza-lungo-per-hmac',
 }));
@@ -47,9 +50,27 @@ beforeEach(() => {
   vi.clearAllMocks();
   db.event.findUnique.mockResolvedValue({ id: 'ev-1' });
   db.registration.findFirst.mockResolvedValue({ locale: 'en' });
+  gestore.mockResolvedValue(false);
 });
 
 describe('GET /api/events/[slug]/recording/access', () => {
+  it('iscritto che gestisce anche l’evento: arriva con l’anteprima', async () => {
+    gestore.mockResolvedValue(true);
+    const token = issueViewingToken('ev-1', 'reg-1')!;
+    const res = await GET(req(`?t=${encodeURIComponent(token)}`), ctx());
+    expect(res.headers.get('Location')).toBe(
+      'https://webinar.example.gov.it/en/events/webinar?anteprima=1'
+    );
+    expect(res.headers.get('Set-Cookie')).toBeTruthy();
+  });
+
+  it('senza un’iscrizione valida lo staff non chiede nulla di diverso', async () => {
+    gestore.mockResolvedValue(true);
+    const res = await GET(req('?t=non-valido'), ctx());
+    expect(res.headers.get('Location')).not.toContain('anteprima');
+    expect(gestore).not.toHaveBeenCalled();
+  });
+
   it("token valido: cookie della visione e pagina dell'evento nella lingua dell'iscrizione", async () => {
     const token = issueViewingToken('ev-1', 'reg-1')!;
     const res = await GET(req(`?t=${encodeURIComponent(token)}`), ctx());
@@ -117,6 +138,7 @@ describe('POST /api/events/[slug]/recording/access', () => {
     recordingPublished: true,
     transcriptPublished: false,
     recordingAudience: 'REGISTRANTS',
+    recordingDestination: null,
     postEventPublic: true,
     postEventPublicUntil: null,
   };
@@ -141,6 +163,25 @@ describe('POST /api/events/[slug]/recording/access', () => {
     };
     expect(mail.to).toBe('anna@ente.it');
     expect(mail.html).toContain('/api/events/webinar/recording/access?t=');
+  });
+
+  it('con la pagina privata rimanda il link solo se l’evento ha una destinazione', async () => {
+    db.registration.findUnique.mockResolvedValue({
+      id: 'reg-1',
+      email: 'cifrato:anna@ente.it',
+      locale: 'it',
+    });
+    db.event.findUnique.mockResolvedValue({ ...riservata, postEventPublic: false });
+    await POST(post({ email: 'anna@ente.it' }), ctx());
+    expect(outbox.enqueueEmail).not.toHaveBeenCalled();
+
+    db.event.findUnique.mockResolvedValue({
+      ...riservata,
+      postEventPublic: false,
+      recordingDestination: 'REGISTRANTS',
+    });
+    await POST(post({ email: 'anna@ente.it' }), ctx());
+    expect(outbox.enqueueEmail).toHaveBeenCalledTimes(1);
   });
 
   it('stessa risposta senza iscrizione, con email non valida o registrazione per tutti, e nessun invio', async () => {

@@ -50,6 +50,8 @@ vi.mock('@/components/ui/markdown', () => ({
   MarkdownRenderer: ({ content }: { content: string }) => <p>{content}</p>,
 }));
 
+import type { EventRecap } from '@/lib/events/recap';
+
 import EventDetailClient from './event-detail-client';
 
 const SLUG = 'evento-di-prova';
@@ -95,6 +97,7 @@ function disegna(props: {
   invalidToken?: boolean;
   hasPostEventQuestionnaire?: boolean;
   feedbackProof?: { accessToken?: string; ratingToken?: string } | null;
+  recap?: EventRecap | null;
 }) {
   act(() => {
     root.render(
@@ -321,6 +324,64 @@ describe('scheda pubblica — lingue di titolo e descrizione', () => {
     expect(titolo().textContent).toBe('Evento di prova');
     expect(titolo().getAttribute('lang')).toBe('it');
     expect(container.querySelector('.traduzione-automatica')).toBeNull();
+  });
+});
+
+describe('scheda pubblica — video esterno', () => {
+  const concluso = (youtubeUrl: string | null) =>
+    evento({
+      status: 'ENDED',
+      youtubeUrl,
+      startsAt: new Date(Date.now() - 4 * HOUR).toISOString(),
+      endsAt: new Date(Date.now() - 2 * HOUR).toISOString(),
+    });
+  const linkEsterno = () =>
+    container.querySelector<HTMLAnchorElement>('a[href*="youtube.com"], a[href*="youtu.be"]');
+
+  it('il link si mostra solo se il server lo manda', () => {
+    disegna({
+      event: concluso('https://www.youtube.com/watch?v=abc'),
+      registrationOpen: false,
+    });
+    expect(linkEsterno()).not.toBeNull();
+    disegna({ event: concluso(null), registrationOpen: false });
+    expect(linkEsterno()).toBeNull();
+  });
+});
+
+describe('scheda pubblica — riepilogo senza domande', () => {
+  const concluso = () =>
+    evento({
+      status: 'ENDED',
+      postEventShowQA: false,
+      postEventShowRecap: true,
+      startsAt: new Date(Date.now() - 4 * HOUR).toISOString(),
+      endsAt: new Date(Date.now() - 2 * HOUR).toISOString(),
+    });
+  const riepilogo = {
+    version: 2 as const,
+    generatedAt: '2026-09-22T12:00:00.000Z',
+    headcount: 0,
+    registrations: 0,
+    topQuestions: [],
+    polls: [],
+    topWords: [],
+    feedback: { average: null, count: 0 },
+  };
+
+  it('una scheda che conteneva solo domande non compare', () => {
+    disegna({ event: concluso(), registrationOpen: false, recap: riepilogo });
+    expect(container.textContent).not.toContain(messages.events.recap.title);
+  });
+
+  it('con altri dati compare, senza domande', () => {
+    disegna({
+      event: concluso(),
+      registrationOpen: false,
+      recap: { ...riepilogo, headcount: 12 },
+    });
+    expect(container.textContent).toContain(messages.events.recap.title);
+    expect(container.textContent).not.toContain(messages.events.recap.topQuestions);
   });
 });
 
