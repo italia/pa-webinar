@@ -1248,6 +1248,55 @@ describe('GET /api/events/[param] — le domande dopo l’evento', () => {
     expect(corpo).not.toHaveProperty('recordingDestination');
   });
 
+  describe('il recupero in diretta', () => {
+    const recupero = {
+      tempRecordingUrl: 'https://storage.example.test/recupero.mp4',
+      tempRecordingStartedAt: new Date('2027-03-01T09:05:00.000Z'),
+    };
+
+    it.each([
+      ['in diretta, senza destinazione', 'LIVE', null],
+      ['in diretta, destinazione pubblica', 'LIVE', 'PUBLIC'],
+    ])('%s: esce', async (_n, status, recordingDestination) => {
+      mocked.event.findUnique.mockResolvedValue(
+        evento({ ...recupero, status, recordingDestination }),
+      );
+      const corpo = await (await lettura()).json();
+      expect(corpo.tempRecordingUrl).toBe(recupero.tempRecordingUrl);
+      expect(corpo.tempRecordingStartedAt).toBe('2027-03-01T09:05:00.000Z');
+    });
+
+    it.each([
+      ['in diretta, registrazione riservata', 'LIVE', 'REGISTRANTS'],
+      ['concluso, destinazione pubblica', 'ENDED', 'PUBLIC'],
+      ['concluso, senza destinazione', 'ENDED', null],
+      ['in pausa, destinazione pubblica', 'IDLE', 'PUBLIC'],
+    ])('%s: non esce', async (_n, status, recordingDestination) => {
+      mocked.event.findUnique.mockResolvedValue(
+        evento({ ...recupero, status, recordingDestination }),
+      );
+      const corpo = await (await lettura()).json();
+      expect(corpo.tempRecordingUrl).toBeNull();
+      expect(corpo.tempRecordingStartedAt).toBeNull();
+    });
+
+    it('chi conduce lo legge anche su una registrazione riservata', async () => {
+      vi.mocked(extractModeratorToken).mockReturnValue('token-valido');
+      mocked.event.findUnique.mockResolvedValue(
+        evento({
+          ...recupero,
+          status: 'LIVE',
+          recordingDestination: 'REGISTRANTS',
+          createdAt: new Date('2027-01-01T09:00:00.000Z'),
+          registrations: [],
+        }),
+      );
+      const corpo = await (await lettura()).json();
+      expect(corpo.tempRecordingUrl).toBe(recupero.tempRecordingUrl);
+      expect(corpo.tempRecordingStartedAt).toBe('2027-03-01T09:05:00.000Z');
+    });
+  });
+
   it('chi conduce legge la scelta salvata, la destinazione e la rubrica', async () => {
     vi.mocked(extractModeratorToken).mockReturnValue('token-valido');
     mocked.event.findUnique.mockResolvedValue(

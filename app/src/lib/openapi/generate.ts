@@ -857,8 +857,79 @@ registry.registerPath({
   path: '/api/gdpr/export',
   tags: ['GDPR'],
   summary: 'Fulfil a GDPR data export via signed token (Art. 15, step 2)',
+  description:
+    'Also answers a person with no registrations left: the address-book entry and the consent ' +
+    'proofs last longer than the registrations.',
   request: { query: z.object({ t: z.string() }) },
-  responses: { 200: { description: 'Exported personal data' } },
+  responses: {
+    200: {
+      description: 'Exported personal data',
+      content: {
+        'application/json': {
+          schema: z.object({
+            data: z.array(z.record(z.string(), z.unknown())).openapi({
+              description: 'One entry per registration, with its event and its live activity',
+            }),
+            addressBook: z
+              .object({
+                name: z.string().nullable(),
+                email: z.string().nullable(),
+                organization: z.string().nullable(),
+                organizationRole: z.string().nullable(),
+                organizationType: z.string().nullable(),
+                optedIn: z.boolean(),
+                optedInAt: z.iso.datetime().nullable(),
+                optedOutAt: z.iso.datetime().nullable(),
+                expiresAt: z.iso.datetime().nullable().openapi({
+                  description: 'When the entry expires. Null when the person is not opted in',
+                }),
+                optOutToken: z.string().nullable().openapi({
+                  description: 'Leaves the address book. Null when the person is not opted in',
+                }),
+              })
+              .nullable()
+              .openapi({ description: 'Address-book entry. Null when there is none' }),
+            retainedConsentProofs: z
+              .array(
+                z.object({
+                  id: z.guid().openapi({ description: 'The `proofId` of POST /api/gdpr/consents' }),
+                  eventId: z.guid(),
+                  kind: z.enum(['recording', 'transcription']),
+                  source: z.enum(['registration', 'room']),
+                  role: z.enum(['registrant', 'guest', 'host']),
+                  name: z.string().nullable(),
+                  nameRemoved: z.boolean().openapi({
+                    description: 'The person asked to remove the name from the proof',
+                  }),
+                  locale: z.string().nullable(),
+                  textVersion: z.number().int().nullable(),
+                  destination: z.enum(['PUBLIC', 'REGISTRANTS']).nullable(),
+                  givenAt: z.iso.datetime(),
+                  withdrawnAt: z.iso.datetime().nullable(),
+                  retainedAt: z.iso.datetime(),
+                  event: z.object({
+                    title: z.record(z.string(), z.string()).openapi({
+                      description: 'Title by language',
+                    }),
+                    startsAt: z.iso.datetime(),
+                  }),
+                })
+              )
+              .openapi({
+                description:
+                  'Consent proofs kept after their source was deleted, while the video or the ' +
+                  'transcript stays published',
+              }),
+            consentsToken: z.string().optional().openapi({
+              description:
+                'Token for POST /api/gdpr/consents. Missing when the person has no registrations ' +
+                'and no kept proofs',
+            }),
+          }),
+        },
+      },
+    },
+  },
 });
 
 registry.registerPath({
@@ -868,17 +939,30 @@ registry.registerPath({
   summary: 'Withdraw one consent (Art. 7.3), with the token the export returns',
   description:
     'Takes exactly one of `registrationId` (a registration that still exists) and `proofId` ' +
-    '(the proof kept after the registration was deleted).',
+    '(the proof kept after the registration was deleted). With `proofId`, `consent` is ' +
+    '`recording` or `transcription`: future communications have no kept proof.',
   request: {
     body: {
       content: {
         'application/json': {
-          schema: z.object({
-            token: z.string(),
-            registrationId: z.guid().optional(),
-            proofId: z.guid().optional(),
-            consent: z.enum(['recording', 'transcription', 'futureCommunications']),
-          }),
+          schema: z
+            .union([
+              z
+                .object({
+                  token: z.string(),
+                  registrationId: z.guid(),
+                  consent: z.enum(['recording', 'transcription', 'futureCommunications']),
+                })
+                .strict(),
+              z
+                .object({
+                  token: z.string(),
+                  proofId: z.guid(),
+                  consent: z.enum(['recording', 'transcription']),
+                })
+                .strict(),
+            ])
+            .openapi({}, { unionPreferredType: 'oneOf' }),
         },
       },
     },
@@ -886,7 +970,7 @@ registry.registerPath({
   responses: {
     200: { description: 'Consent withdrawn' },
     401: { description: 'Invalid or expired token' },
-    404: { description: 'No such registration for this address' },
+    404: { description: 'No such registration or consent proof for this address' },
   },
 });
 

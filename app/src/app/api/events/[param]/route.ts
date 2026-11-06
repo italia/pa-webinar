@@ -182,6 +182,11 @@ export const GET = withErrorHandling(async (request, context) => {
     throw new NotFoundError('Event');
   }
 
+  // Come la pagina della sala: il recupero esiste solo in diretta, e una
+  // registrazione riservata non si offre a chi legge questa risposta pubblica.
+  const recuperoInDiretta =
+    event.status === 'LIVE' && event.recordingDestination !== 'REGISTRANTS';
+
   return Response.json({
     id: event.id,
     slug: event.slug,
@@ -204,8 +209,8 @@ export const GET = withErrorHandling(async (request, context) => {
     // registrazione riservata agli iscritti passa dalla pagina e dal player,
     // che riconoscono l'iscritto (lib/recording/audience).
     recordingUrl: event.recordingPublished && event.recordingAudience === 'PUBLIC' ? event.recordingUrl : null,
-    tempRecordingUrl: event.status === 'LIVE' ? event.tempRecordingUrl : null,
-    tempRecordingStartedAt: event.status === 'LIVE' ? event.tempRecordingStartedAt?.toISOString() ?? null : null,
+    tempRecordingUrl: recuperoInDiretta ? event.tempRecordingUrl : null,
+    tempRecordingStartedAt: recuperoInDiretta ? event.tempRecordingStartedAt?.toISOString() ?? null : null,
     postEventPublic: event.postEventPublic,
     // Il valore efficace, non l'interruttore: con la registrazione riservata le
     // domande non si pubblicano, qualunque sia la scelta salvata.
