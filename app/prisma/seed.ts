@@ -31,8 +31,8 @@ async function main() {
 
   // Ensure system templates exist (idempotent — migration handles this, seed is a safety net).
   // I modelli di sistema delle migrazioni 20261007150000_three_event_templates,
-  // 20261007233000_template_scenarios, 20261010090000_template_registrazione_manuale
-  // e 20261010100000_template_formazione_stampa.
+  // 20261007233000_template_scenarios, 20261010090000_template_registrazione_manuale,
+  // 20261010100000_template_formazione_stampa e 20261105220000_modelli_secondo_il_formato.
   const systemTemplates = [
     {
       name: 'Webinar pubblico',
@@ -54,6 +54,10 @@ async function main() {
       maxParticipants: 300,
       defaultDurationMinutes: 90,
       postEventPublic: true,
+      recordingDestination: 'PUBLIC' as const,
+      audienceAnonymous: true,
+      postEventShowQA: true,
+      offerAddressBook: true,
       isSystem: true,
       sortOrder: 0,
     },
@@ -71,6 +75,10 @@ async function main() {
       maxParticipants: 20,
       defaultDurationMinutes: 60,
       postEventPublic: false,
+      recordingDestination: 'REGISTRANTS' as const,
+      audienceAnonymous: false,
+      postEventShowQA: false,
+      offerAddressBook: false,
       isSystem: true,
       sortOrder: 1,
     },
@@ -93,6 +101,10 @@ async function main() {
       maxParticipants: 100,
       defaultDurationMinutes: 60,
       postEventPublic: true,
+      recordingDestination: 'PUBLIC' as const,
+      audienceAnonymous: false,
+      postEventShowQA: true,
+      offerAddressBook: true,
       isSystem: true,
       sortOrder: 2,
     },
@@ -116,6 +128,10 @@ async function main() {
       maxParticipants: 50,
       defaultDurationMinutes: 120,
       postEventPublic: false,
+      recordingDestination: 'REGISTRANTS' as const,
+      audienceAnonymous: false,
+      postEventShowQA: false,
+      offerAddressBook: false,
       isSystem: true,
       sortOrder: 3,
     },
@@ -137,6 +153,10 @@ async function main() {
       maxParticipants: 150,
       defaultDurationMinutes: 60,
       postEventPublic: true,
+      recordingDestination: 'PUBLIC' as const,
+      audienceAnonymous: false,
+      postEventShowQA: true,
+      offerAddressBook: true,
       isSystem: true,
       sortOrder: 4,
     },

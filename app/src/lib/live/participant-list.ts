@@ -25,7 +25,7 @@ export function elencoVisibileAlPubblico(evento: {
 }
 
 /** Da qui in su un evento e' su vasta scala. */
-const VASTA_SCALA = 300;
+export const VASTA_SCALA = 300;
 
 /**
  * Il valore di partenza: dove chi partecipa parla o si mostra ci si conosce
