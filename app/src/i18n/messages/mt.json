@@ -681,6 +681,7 @@
       "working": "Qed jaġġorna…",
       "error": "Ma kienx possibbli jiġi aġġornat il-kunsens: erġa' pprova.",
       "textChanged": "It-test tal-kunsens inbidel wara li ftaħt il-paġna: aqra t-test il-ġdid u kkonferma, jekk taqbel.",
+      "closeNotice": "Close this notice: your consents stay under the button at the top",
       "recording": {
         "title": "Reġistrazzjoni tal-avveniment",
         "give": "Nagħti l-kunsens għar-reġistrazzjoni",

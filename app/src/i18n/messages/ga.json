@@ -681,6 +681,7 @@
       "working": "Á nuashonrú…",
       "error": "Níorbh fhéidir an toiliú a nuashonrú: bain triail eile as.",
       "textChanged": "Athraíodh téacs an toilithe tar éis duit an leathanach a oscailt: léigh an téacs nua agus deimhnigh má aontaíonn tú leis.",
+      "closeNotice": "Close this notice: your consents stay under the button at the top",
       "recording": {
         "title": "Taifeadadh na hócáide",
         "give": "Toilím leis an taifeadadh",

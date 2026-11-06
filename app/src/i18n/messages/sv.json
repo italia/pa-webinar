@@ -681,6 +681,7 @@
       "working": "Uppdaterar…",
       "error": "Samtycket kunde inte uppdateras: försök igen.",
       "textChanged": "Samtyckestexten har ändrats efter att du öppnade sidan: läs den nya texten och bekräfta om du håller med.",
+      "closeNotice": "Close this notice: your consents stay under the button at the top",
       "recording": {
         "title": "Inspelning av evenemanget",
         "give": "Jag samtycker till inspelningen",

@@ -681,6 +681,7 @@
       "working": "Opdaterer…",
       "error": "Samtykket kunne ikke opdateres: prøv igen.",
       "textChanged": "Teksten til samtykket er ændret, efter at du åbnede siden: læs den nye tekst, og bekræft, hvis du er enig.",
+      "closeNotice": "Close this notice: your consents stay under the button at the top",
       "recording": {
         "title": "Optagelse af arrangementet",
         "give": "Jeg giver samtykke til optagelsen",

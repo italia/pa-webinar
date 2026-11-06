@@ -681,6 +681,7 @@
       "working": "Aggiornamento in corso…",
       "error": "Non è stato possibile aggiornare il consenso: riprova.",
       "textChanged": "Il testo del consenso è cambiato dopo che hai aperto la pagina: leggi quello nuovo e conferma, se sei d'accordo.",
+      "closeNotice": "Chiudi questo avviso: i tuoi consensi restano nel pulsante in alto",
       "recording": {
         "title": "Registrazione dell'evento",
         "give": "Acconsento alla registrazione",

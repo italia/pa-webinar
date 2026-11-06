@@ -681,6 +681,7 @@
       "working": "Probíhá aktualizace…",
       "error": "Souhlas se nepodařilo aktualizovat: zkuste to znovu.",
       "textChanged": "Text souhlasu se změnil poté, co jste tuto stránku otevřeli: přečtěte si nové znění a potvrďte ho, pokud souhlasíte.",
+      "closeNotice": "Close this notice: your consents stay under the button at the top",
       "recording": {
         "title": "Záznam akce",
         "give": "Souhlasím se záznamem",

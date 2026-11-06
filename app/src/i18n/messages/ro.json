@@ -681,6 +681,7 @@
       "working": "Se actualizează…",
       "error": "Consimțământul nu a putut fi actualizat: încearcă din nou.",
       "textChanged": "Textul consimțământului s-a schimbat după ce ai deschis pagina: citește-l pe cel nou și confirmă, dacă ești de acord.",
+      "closeNotice": "Close this notice: your consents stay under the button at the top",
       "recording": {
         "title": "Înregistrarea evenimentului",
         "give": "Sunt de acord cu înregistrarea",

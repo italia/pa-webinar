@@ -681,6 +681,7 @@
       "working": "Uuendamine…",
       "error": "Nõusolekut ei õnnestunud uuendada: proovi uuesti.",
       "textChanged": "Nõusoleku tekst muutus pärast seda, kui selle lehe avasid: loe uus tekst läbi ja kinnita, kui oled nõus.",
+      "closeNotice": "Close this notice: your consents stay under the button at the top",
       "recording": {
         "title": "Ürituse salvestamine",
         "give": "Annan nõusoleku salvestamiseks",

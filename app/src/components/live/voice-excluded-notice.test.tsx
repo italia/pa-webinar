@@ -41,6 +41,7 @@ function disegna(props: Partial<ComponentProps<typeof VoiceExcludedNotice>> = {}
           onAcconsenti={onAcconsenti}
           inCorso={false}
           errore={false}
+          onChiudi={vi.fn()}
           {...props}
         />
       </NextIntlClientProvider>
@@ -53,6 +54,15 @@ const g = messages.gdpr.consent;
 const pulsante = () => container.querySelector('button') as HTMLButtonElement;
 
 describe('VoiceExcludedNotice', () => {
+  it('si chiude, e il pulsante dice dove restano i consensi', () => {
+    const onChiudi = vi.fn();
+    disegna({ onChiudi });
+    const chiudi = container.querySelector<HTMLButtonElement>('.live-listen-only__chiudi')!;
+    expect(chiudi.getAttribute('aria-label')).toBe(messages.live.consents.closeNotice);
+    act(() => chiudi.click());
+    expect(onChiudi).toHaveBeenCalledTimes(1);
+  });
+
   it("sopra il pulsante c'e' il testo della destinazione in vigore", () => {
     disegna({ destinazione: 'REGISTRANTS' });
     expect(container.textContent).toContain(g.recordingReserved);

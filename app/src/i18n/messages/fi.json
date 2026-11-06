@@ -681,6 +681,7 @@
       "working": "Päivitetään…",
       "error": "Suostumusta ei voitu päivittää: yritä uudelleen.",
       "textChanged": "Suostumuksen teksti muuttui sen jälkeen, kun avasit sivun: lue uusi teksti ja vahvista, jos hyväksyt sen.",
+      "closeNotice": "Close this notice: your consents stay under the button at the top",
       "recording": {
         "title": "Tapahtuman tallennus",
         "give": "Suostun tallennukseen",

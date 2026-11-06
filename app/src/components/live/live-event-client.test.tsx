@@ -1261,6 +1261,80 @@ describe('sala — un ritiro e un token insieme', () => {
   });
 });
 
+describe('sala — la fascia di chi resta fuori dalla registrazione', () => {
+  const fascia = () => document.querySelector('.live-listen-only');
+  const pulsanteConsensi = () => document.querySelector<HTMLElement>('.live-consents-btn');
+  const chiudi = () => premi(document.querySelector<HTMLElement>('.live-listen-only__chiudi')!);
+  const eventoRiservato: Props['event'] = { ...evento, recordingDestination: 'REGISTRANTS' };
+
+  async function dentro(risposta: Risposta, e: Props['event'] = eventoRiservato) {
+    await monta({ event: e });
+    risposte.push({ recordingDestination: 'REGISTRANTS', ...risposta });
+    await entra();
+    expect(fascia()).not.toBeNull();
+  }
+
+  it.each<[string, Risposta, Props['event']]>([
+    ['chi non acconsente', { voiceExcluded: true }, eventoRiservato],
+    ['chi segue in solo ascolto', { listenOnly: true }, { ...eventoRiservato, voceNelVideo: 'fissa' }],
+  ])('%s la chiude e tiene il pulsante dei consensi, che prende il fuoco', async (_chi, risposta, e) => {
+    await dentro(risposta, e);
+    await chiudi();
+    expect(fascia()).toBeNull();
+    expect(pulsanteConsensi()).not.toBeNull();
+    expect(document.activeElement).toBe(pulsanteConsensi());
+
+    await premi(pulsanteConsensi()!);
+    expect(testo()).toContain(l.consents.intro);
+    expect(testo()).toContain(l.consents.recording.give);
+  });
+
+  it('il token successivo non la riapre', async () => {
+    await dentro({ voiceExcluded: true });
+    await chiudi();
+    risposte.push({ recordingDestination: 'REGISTRANTS', voiceExcluded: true });
+    await caduta();
+    await act(async () => {
+      await new Promise((fatto) => setTimeout(fatto, 10));
+    });
+    expect(richiesteToken()).toHaveLength(2);
+    expect(fascia()).toBeNull();
+  });
+
+  it('torna per dire un errore', async () => {
+    await dentro({ voiceExcluded: true });
+    await chiudi();
+    await premi(pulsanteConsensi()!);
+    vi.mocked(fetch).mockImplementationOnce(async () => rispondi({}, 503));
+    await premi(pulsante(l.consents.recording.give));
+    expect(fascia()?.textContent).toContain(l.listenOnly.error);
+
+    await chiudi();
+    expect(fascia()).toBeNull();
+    if (!testo().includes(l.consents.intro)) await premi(pulsanteConsensi()!);
+    expect(testo()).toContain(l.consents.recording.give);
+    expect(testo()).toContain(l.consents.error);
+
+    vi.mocked(fetch).mockImplementationOnce(async () => rispondi({}, 503));
+    await premi(pulsante(l.consents.recording.give));
+    expect(fascia()?.textContent).toContain(l.listenOnly.error);
+  });
+
+  it('torna quando cambia il testo', async () => {
+    await dentro({ voiceExcluded: true });
+    await chiudi();
+    await premi(pulsanteConsensi()!);
+    risposte.push({ recordingDestination: 'PUBLIC', voiceExcluded: true });
+    await premi(pulsante(l.consents.recording.give));
+    expect(fascia()?.textContent).toContain(l.consents.textChanged);
+
+    await chiudi();
+    expect(fascia()).toBeNull();
+    if (!testo().includes(l.consents.intro)) await premi(pulsanteConsensi()!);
+    expect(testo()).toContain(l.consents.textChanged);
+  });
+});
+
 describe("sala — la scheda in sala d'attesa", () => {
   const scheda = {
     pseudonimi: true,

@@ -6,6 +6,7 @@
 import { useId } from 'react';
 import { useTranslations } from 'next-intl';
 
+import ChiudiFascia from '@/components/live/chiudi-fascia';
 import TestoEnteFascia from '@/components/live/testo-ente-fascia';
 import { Icon } from '@/components/ui/icon';
 import { testoConsensoEvento, type VoceNelVideo } from '@/lib/live/consent-rule';
@@ -28,6 +29,7 @@ export default function ListenOnlyNotice({
   inCorso,
   errore,
   testoCambiato = false,
+  onChiudi,
 }: {
   /** Il testo dell'ente sulla registrazione: il consenso qui vale per quello. */
   testoConsenso?: string | null;
@@ -39,6 +41,8 @@ export default function ListenOnlyNotice({
   errore: boolean;
   /** Il consenso e' arrivato su un testo non piu' in vigore: va riletto. */
   testoCambiato?: boolean;
+  /** Chiude la fascia: consensi e testi restano in «I tuoi consensi». */
+  onChiudi: () => void;
 }) {
   const t = useTranslations('live.listenOnly');
   const tc = useTranslations('live.consents');
@@ -68,6 +72,7 @@ export default function ListenOnlyNotice({
       >
         {inCorso ? t('joining') : t('consent')}
       </button>
+      <ChiudiFascia onChiudi={onChiudi} />
       {errore && (
         <p className="mb-0 w-100 small text-danger" role="alert">
           {t('error')}

@@ -681,6 +681,7 @@
       "working": "Updating…",
       "error": "The consent could not be updated: try again.",
       "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
+      "closeNotice": "Close this notice: your consents stay under the button at the top",
       "recording": {
         "title": "Event recording",
         "give": "I consent to the recording",

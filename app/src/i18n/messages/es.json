@@ -681,6 +681,7 @@
       "working": "Actualizando…",
       "error": "No se ha podido actualizar el consentimiento: inténtalo de nuevo.",
       "textChanged": "El texto del consentimiento ha cambiado después de que abrieras la página: lee el nuevo y confirma, si estás de acuerdo.",
+      "closeNotice": "Close this notice: your consents stay under the button at the top",
       "recording": {
         "title": "Grabación del evento",
         "give": "Doy mi consentimiento a la grabación",

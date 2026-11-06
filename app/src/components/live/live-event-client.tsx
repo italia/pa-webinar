@@ -1339,6 +1339,17 @@ export default function LiveEventClient({
       : {}),
   };
   const haConsensiInSala = !!consensiInSala.registrazione || !!consensiInSala.trascrizione;
+  // La fascia di chi e' fuori dalla registrazione si chiude, e torna solo per dire
+  // qualcosa di nuovo: un errore, o un testo da rileggere. Chi l'ha chiusa trova
+  // i consensi nel pulsante in alto, dove va anche il fuoco.
+  const [fasciaChiusa, setFasciaChiusa] = useState(false);
+  useEffect(() => {
+    if (riconsenso === 'errore' || riconsenso === 'rileggi') setFasciaChiusa(false);
+  }, [riconsenso]);
+  const chiudiFascia = useCallback(() => {
+    setFasciaChiusa(true);
+    document.querySelector<HTMLElement>('.live-consents-btn')?.focus();
+  }, []);
   const rientroConcluso = useCallback(() => {
     markEnded();
     userHangupRef.current = true;
@@ -2584,7 +2595,7 @@ export default function LiveEventClient({
 
       {/* Chi e' in solo ascolto lo vede, con il modo di acconsentire e
           intervenire. */}
-      {soloAscolto && !showJvbOverlay && (
+      {soloAscolto && !showJvbOverlay && !fasciaChiusa && (
         <ListenOnlyNotice
           testoConsenso={event.recordingConsentText}
           destinazione={destinazioneInVigore}
@@ -2593,6 +2604,7 @@ export default function LiveEventClient({
           inCorso={riconsenso === 'in-corso'}
           errore={riconsenso === 'errore'}
           testoCambiato={riconsenso === 'rileggi'}
+          onChiudi={chiudiFascia}
         />
       )}
       {/* Chi non ha dato il consenso e puo' parlare o mostrarsi lo sa, anche se ha
@@ -2600,6 +2612,7 @@ export default function LiveEventClient({
           solo ascolto, da quando ha la parola. */}
       {voceEsclusa &&
         !showJvbOverlay &&
+        !fasciaChiusa &&
         (event.participantsCanUnmute ||
           event.participantsCanStartVideo ||
           event.participantsCanShareScreen ||
@@ -2614,6 +2627,7 @@ export default function LiveEventClient({
           inCorso={riconsenso === 'in-corso'}
           errore={riconsenso === 'errore'}
           testoCambiato={riconsenso === 'rileggi'}
+          onChiudi={chiudiFascia}
         />
       )}
 

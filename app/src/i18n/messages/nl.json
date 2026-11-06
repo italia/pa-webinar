@@ -681,6 +681,7 @@
       "working": "Bezig met bijwerken…",
       "error": "De toestemming kon niet worden bijgewerkt: probeer het opnieuw.",
       "textChanged": "De tekst van de toestemming is gewijzigd nadat je de pagina hebt geopend: lees de nieuwe tekst en bevestig als je akkoord gaat.",
+      "closeNotice": "Close this notice: your consents stay under the button at the top",
       "recording": {
         "title": "Opname van het evenement",
         "give": "Ik geef toestemming voor de opname",

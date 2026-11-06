@@ -681,6 +681,7 @@
       "working": "Ažuriranje…",
       "error": "Privolu nije bilo moguće ažurirati: pokušajte ponovno.",
       "textChanged": "Tekst privole promijenio se nakon što ste otvorili stranicu: pročitajte novi tekst i potvrdite ako se slažete.",
+      "closeNotice": "Close this notice: your consents stay under the button at the top",
       "recording": {
         "title": "Snimanje događaja",
         "give": "Pristajem na snimanje",

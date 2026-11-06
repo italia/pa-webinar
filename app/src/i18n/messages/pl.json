@@ -681,6 +681,7 @@
       "working": "Aktualizowanie…",
       "error": "Nie udało się zaktualizować zgody: spróbuj ponownie.",
       "textChanged": "Tekst zgody zmienił się po otwarciu tej strony: przeczytaj nowy tekst i potwierdź, jeśli się zgadzasz.",
+      "closeNotice": "Close this notice: your consents stay under the button at the top",
       "recording": {
         "title": "Nagrywanie wydarzenia",
         "give": "Wyrażam zgodę na nagrywanie",

@@ -681,6 +681,7 @@
       "working": "Mise à jour…",
       "error": "Impossible de mettre à jour le consentement : réessayez.",
       "textChanged": "Le texte du consentement a changé après que vous avez ouvert la page : lisez le nouveau texte et confirmez si vous êtes d'accord.",
+      "closeNotice": "Close this notice: your consents stay under the button at the top",
       "recording": {
         "title": "Enregistrement de l'événement",
         "give": "Je consens à l'enregistrement",

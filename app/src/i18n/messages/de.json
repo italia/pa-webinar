@@ -681,6 +681,7 @@
       "working": "Wird aktualisiert…",
       "error": "Die Einwilligung konnte nicht aktualisiert werden: Bitte versuchen Sie es erneut.",
       "textChanged": "Der Text der Einwilligung hat sich geändert, nachdem Sie diese Seite geöffnet haben: Lesen Sie den neuen Text und bestätigen Sie, wenn Sie einverstanden sind.",
+      "closeNotice": "Close this notice: your consents stay under the button at the top",
       "recording": {
         "title": "Aufzeichnung der Veranstaltung",
         "give": "Ich willige in die Aufzeichnung ein",

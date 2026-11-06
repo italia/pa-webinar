@@ -681,6 +681,7 @@
       "working": "Frissítés folyamatban…",
       "error": "A hozzájárulást nem sikerült frissíteni: próbálja újra.",
       "textChanged": "A hozzájárulás szövege megváltozott az oldal megnyitása óta: olvassa el az újat, és ha egyetért, erősítse meg.",
+      "closeNotice": "Close this notice: your consents stay under the button at the top",
       "recording": {
         "title": "Az esemény felvétele",
         "give": "Hozzájárulok a felvételhez",

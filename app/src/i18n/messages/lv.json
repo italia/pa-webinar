@@ -681,6 +681,7 @@
       "working": "Notiek atjaunināšana…",
       "error": "Piekrišanu neizdevās atjaunināt: mēģiniet vēlreiz.",
       "textChanged": "Piekrišanas teksts mainījās pēc tam, kad atvērāt šo lapu: izlasiet jauno tekstu un apstipriniet, ja piekrītat.",
+      "closeNotice": "Close this notice: your consents stay under the button at the top",
       "recording": {
         "title": "Pasākuma ieraksts",
         "give": "Piekrītu ierakstam",

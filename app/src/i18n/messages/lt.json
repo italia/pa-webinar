@@ -681,6 +681,7 @@
       "working": "Atnaujinama…",
       "error": "Sutikimo atnaujinti nepavyko: bandykite dar kartą.",
       "textChanged": "Sutikimo tekstas pasikeitė po to, kai atidarėte šį puslapį: perskaitykite naująjį ir, jei sutinkate, patvirtinkite.",
+      "closeNotice": "Close this notice: your consents stay under the button at the top",
       "recording": {
         "title": "Renginio įrašymas",
         "give": "Sutinku su įrašymu",

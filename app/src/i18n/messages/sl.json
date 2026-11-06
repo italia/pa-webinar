@@ -681,6 +681,7 @@
       "working": "Posodabljanje…",
       "error": "Privolitve ni bilo mogoče posodobiti: poskusite znova.",
       "textChanged": "Besedilo privolitve se je spremenilo, potem ko ste odprli stran: preberite novo besedilo in potrdite, če se strinjate.",
+      "closeNotice": "Close this notice: your consents stay under the button at the top",
       "recording": {
         "title": "Snemanje dogodka",
         "give": "Privolim v snemanje",
