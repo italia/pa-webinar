@@ -226,7 +226,7 @@ The browser keeps an unsaved copy of the form in `localStorage` under `pa-wizard
 
 **What publishing checks** (`assertEsposizioneConsentita()`). The guard looks at the event, never at the individual proofs: everyone in the video has a consent that covers the event, so it holds also after the cleanup removes the proofs. On a reserved event it answers `409` to showing the recording to everyone, to publishing the video or the transcript for everyone, and to a new address of an external video or of the catch-up recording. A new `recordingUrl` on a reserved event must be a file in the recordings storage, which the signed-address route protects, and otherwise gets the same `409` (`assertVideoNelloStorage()`); with no storage configured the address is accepted as it is. Attaching a new `recordingUrl` with `PUT /api/events/{id}` takes the session of staff who manage the event: a moderator link can only send back the address already there. Narrowing is never refused, and neither is uploading a file, which only registrants and staff then see.
 
-**Without a room video.** Where the installation records only per-participant tracks, the text of the box says that the room video is not recorded and declares no destination, so the wizard does not ask for one. An event that records still starts reserved: a file uploaded later stays reserved, and if the installation adds a room video, people who read that text are asked again in the room.
+**Without a room video.** Where the installation records only per-participant tracks, the text of the box says that the room video is not recorded and declares no destination, so the wizard does not ask for one. An event without those tracks records nothing there (`eventoRegistrabile()`): as in the sheet, the form and the room show no recording box, no notice and no recording command. An event that records still starts reserved: a file uploaded later stays reserved, and if the installation adds a room video, people who read that text are asked again in the room.
 
 ## Templates
 
@@ -390,7 +390,7 @@ The registration form shows it above the link to the privacy notice. The waiting
 | **Captions** | That captions are on, and whether their text is kept |
 | **Artificial intelligence** | With the pipeline on: summary, translation and dubbing, what the organizers can still ask for after the event, the event report, and that these texts may contain inaccuracies. The text an administrator wrote for that language (`aiConsentDisclosure`) replaces the sentences on summary, translation and dubbing |
 | **Participant list** | Whether participants see who is in the room |
-| **Your name** | Real name or pseudonym in the room, in the chat and in questions |
+| **Your name** | Real name or pseudonym in the room, in the chat and in questions. With a pseudonym, that the name stays in the transcript for someone who consents, where the event asks for that consent |
 | **Chat and questions** | That chat messages are never published, and whether the text of Q&A questions may be, never with the name |
 | **Retention** | When registration and room data are deleted, and what happens to the recording |
 | **Address book** | That the form offers it and for how many months the data stays. The form only, as the waiting room has no such box |

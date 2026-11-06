@@ -691,6 +691,7 @@
           "voce": "Bez tohto súhlasu sa zúčastňujete ako všetci, ale zostanete mimo záznamu: ani meno, ani hlas, ani obraz.",
           "comeTutti": "Bez tohto súhlasu sa zúčastňujete ako všetci."
         },
+        "withoutTranscriptHost": "Your voice is not kept in the per-person tracks or in the transcript.",
         "alreadyRecorded": "Čo už bolo zaznamenané, zostáva vo videu podujatia: o odstránenie požiadajte organizátorov.",
         "withdraw": {
           "soloAscolto": "Ak ho odvoláte, zostanete v miestnosti a iba počúvate: mikrofón, kamera a obrazovka sa zatvoria. Odvoláte aj súhlas s prepisom svojich príspevkov.",
@@ -698,7 +699,9 @@
           "voce": "Ak ho odvoláte, zostanete v miestnosti ako predtým a odteraz ste mimo záznamu. Odvoláte aj súhlas s prepisom svojich príspevkov.",
           "avvertenza": "Ak ho odvoláte, zostanete v miestnosti ako predtým. Odvoláte aj súhlas s prepisom svojich príspevkov. Ak dostanete slovo a podujatie sa nahráva, váš hlas vo videu aj tak zostane.",
           "assente": "Ak ho odvoláte, zostanete v miestnosti ako predtým. Odvoláte aj súhlas s prepisom svojich príspevkov. Odteraz sa váš hlas nenahráva na samostatnú stopu."
-        }
+        },
+        "withdrawTranscript": "You also withdraw consent to transcribing your contributions.",
+        "withdrawTranscriptHost": "From now on your voice is not kept in the per-person tracks or in the transcript."
       },
       "transcription": {
         "title": "Prepis vašich príspevkov",
@@ -4502,7 +4505,8 @@
       "name": {
         "label": "Vaše meno",
         "real": "V miestnosti, v chate a v otázkach sa zobrazujete pod svojím menom.",
-        "pseudonym": "V miestnosti, v chate a v otázkach sa zobrazujete pod pseudonymom. Organizátori vidia údaje z registrácie. Ak súhlasíte s prepisom, v ňom zostáva vaše meno."
+        "pseudonym": "V miestnosti, v chate a v otázkach sa zobrazujete pod pseudonymom. Organizátori vidia údaje z registrácie. Ak súhlasíte s prepisom, v ňom zostáva vaše meno.",
+        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
       },
       "retention": {
         "label": "Uchovávanie",

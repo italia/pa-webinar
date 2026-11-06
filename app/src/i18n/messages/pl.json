@@ -691,6 +691,7 @@
           "voce": "Bez tej zgody uczestniczysz jak wszyscy, ale pozostajesz poza nagraniem: bez imienia i nazwiska, głosu i obrazu.",
           "comeTutti": "Bez tej zgody uczestniczysz jak wszyscy."
         },
+        "withoutTranscriptHost": "Your voice is not kept in the per-person tracks or in the transcript.",
         "alreadyRecorded": "To, co już zostało nagrane, pozostaje w nagraniu wydarzenia: aby to usunąć, napisz do organizatorów.",
         "withdraw": {
           "soloAscolto": "Jeśli ją wycofasz, zostajesz w sali i tylko słuchasz: mikrofon, kamera i ekran się zamykają. Wycofujesz też zgodę na transkrypcję swoich wypowiedzi.",
@@ -698,7 +699,9 @@
           "voce": "Jeśli ją wycofasz, zostajesz w sali jak wcześniej, a od teraz jesteś poza nagraniem. Wycofujesz też zgodę na transkrypcję swoich wypowiedzi.",
           "avvertenza": "Jeśli ją wycofasz, zostajesz w sali jak wcześniej. Wycofujesz też zgodę na transkrypcję swoich wypowiedzi. Jeśli otrzymasz głos, a wydarzenie jest nagrywane, twój głos i tak pozostanie w nagraniu wideo.",
           "assente": "Jeśli ją wycofasz, zostajesz w sali jak wcześniej. Wycofujesz też zgodę na transkrypcję swoich wypowiedzi. Od teraz twój głos nie jest nagrywany na osobnej ścieżce."
-        }
+        },
+        "withdrawTranscript": "You also withdraw consent to transcribing your contributions.",
+        "withdrawTranscriptHost": "From now on your voice is not kept in the per-person tracks or in the transcript."
       },
       "transcription": {
         "title": "Transkrypcja twoich wypowiedzi",
@@ -4502,7 +4505,8 @@
       "name": {
         "label": "Twoje imię i nazwisko",
         "real": "W sali, na czacie i w pytaniach występujesz pod swoim imieniem i nazwiskiem.",
-        "pseudonym": "W sali, na czacie i w pytaniach występujesz pod pseudonimem. Organizatorzy widzą dane rejestracji. Jeśli wyrazisz zgodę na transkrypcję, pozostanie w niej Twoje imię i nazwisko."
+        "pseudonym": "W sali, na czacie i w pytaniach występujesz pod pseudonimem. Organizatorzy widzą dane rejestracji. Jeśli wyrazisz zgodę na transkrypcję, pozostanie w niej Twoje imię i nazwisko.",
+        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
       },
       "retention": {
         "label": "Przechowywanie",

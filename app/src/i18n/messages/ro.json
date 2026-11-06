@@ -691,6 +691,7 @@
           "voce": "Fără acest acord participi ca toți ceilalți, dar rămâi în afara înregistrării: nici numele, nici vocea, nici imaginea.",
           "comeTutti": "Fără acest consimțământ participi ca toți ceilalți."
         },
+        "withoutTranscriptHost": "Your voice is not kept in the per-person tracks or in the transcript.",
         "alreadyRecorded": "Ce a fost deja înregistrat rămâne în videoclipul evenimentului: pentru a-l elimina, scrie organizatorilor.",
         "withdraw": {
           "soloAscolto": "Dacă îl retragi, rămâi în sală doar ca ascultător: microfonul, camera și ecranul se închid. Retragi și consimțământul la transcrierea intervențiilor tale.",
@@ -698,7 +699,9 @@
           "voce": "Dacă îl retragi, rămâi în sală ca înainte, iar de acum ești în afara înregistrării. Retragi și acordul pentru transcrierea intervențiilor tale.",
           "avvertenza": "Dacă îl retragi, rămâi în sală ca înainte. Retragi și consimțământul la transcrierea intervențiilor tale. Dacă primești cuvântul și evenimentul este înregistrat, vocea ta rămâne totuși în videoclip.",
           "assente": "Dacă îl retragi, rămâi în sală ca înainte. Retragi și consimțământul la transcrierea intervențiilor tale. De acum vocea ta nu mai este înregistrată pe o pistă separată."
-        }
+        },
+        "withdrawTranscript": "You also withdraw consent to transcribing your contributions.",
+        "withdrawTranscriptHost": "From now on your voice is not kept in the per-person tracks or in the transcript."
       },
       "transcription": {
         "title": "Transcrierea intervențiilor tale",
@@ -4502,7 +4505,8 @@
       "name": {
         "label": "Numele tău",
         "real": "În sală, în chat și la întrebări apari cu numele tău.",
-        "pseudonym": "În sală, în chat și la întrebări apari cu un pseudonim. Organizatorii văd datele înscrierii. Dacă îți dai consimțământul la transcriere, acolo rămâne numele tău."
+        "pseudonym": "În sală, în chat și la întrebări apari cu un pseudonim. Organizatorii văd datele înscrierii. Dacă îți dai consimțământul la transcriere, acolo rămâne numele tău.",
+        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
       },
       "retention": {
         "label": "Păstrare",

@@ -8,6 +8,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import messages from '@/i18n/messages/it.json';
 
+import type { VoceNelVideo } from '@/lib/live/consent-rule';
+
 import RegistrationConsents, { type ConsensiVista } from './registration-consents';
 
 let container: HTMLDivElement;
@@ -16,7 +18,11 @@ const dato = { dato: true, ritiratoIl: null };
 
 const monta = (
   consensi: Partial<ConsensiVista>,
-  altri: { comunicazioniRitirateIl?: string; onComunicazioniRitirate?: (q: string) => void } = {}
+  altri: {
+    comunicazioniRitirateIl?: string;
+    onComunicazioniRitirate?: (q: string) => void;
+    voce?: VoceNelVideo;
+  } = {}
 ) =>
   act(() =>
     root.render(
@@ -96,6 +102,45 @@ describe('RegistrationConsents', () => {
     await clic('Ritira');
 
     expect(container.textContent?.match(/Ritirato il/g)).toHaveLength(2);
+  });
+
+  describe('la conferma del ritiro della registrazione', () => {
+    const { withdraw, withdrawTranscript } = messages.live.consents.recording;
+    const ritiroAvviato = async (
+      consensi: Partial<ConsensiVista>,
+      voce: VoceNelVideo
+    ) => {
+      monta(consensi, { voce });
+      await clic('Ritira il consenso');
+      return container.querySelector('[role="group"]')?.textContent;
+    };
+
+    it.each([
+      ['rimovibile', withdraw.voce],
+      ['fissa', withdraw.soloAscolto],
+    ] as const)('voce %s: annuncia anche la trascrizione data', async (voce, testo) => {
+      const conferma = await ritiroAvviato({ recording: dato, transcription: dato }, voce);
+      expect(conferma).toContain(`${testo} ${withdrawTranscript}`);
+    });
+
+    it('senza video annuncia comunque la trascrizione data', async () => {
+      const conferma = await ritiroAvviato({ recording: dato, transcription: dato }, 'assente');
+      expect(conferma).toContain(withdrawTranscript);
+    });
+
+    it('senza una trascrizione data non la nomina', async () => {
+      const conferma = await ritiroAvviato({ recording: dato, transcription: null }, 'rimovibile');
+      expect(conferma).toContain(withdraw.voce);
+      expect(conferma).not.toContain(withdrawTranscript);
+    });
+
+    it('una trascrizione gia ritirata non la nomina', async () => {
+      const conferma = await ritiroAvviato(
+        { recording: dato, transcription: { dato: false, ritiratoIl: '2026-11-05T10:00:00.000Z' } },
+        'rimovibile'
+      );
+      expect(conferma).not.toContain(withdrawTranscript);
+    });
   });
 
   it('prima di ritirare dice cosa cambia', async () => {

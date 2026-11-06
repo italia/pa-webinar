@@ -71,10 +71,13 @@ export default function RegistrationConsents({
       {
         chiave: 'recording',
         titolo: tl('recording.title'),
-        effetto:
-        voce === 'assente'
-          ? ''
-          : tl(voce === 'rimovibile' ? 'recording.withdraw.voce' : 'recording.withdraw.soloAscolto'),
+        // Il ritiro porta con se' la trascrizione (`ritira`): la conferma lo dice.
+        effetto: [
+          ...(voce === 'assente'
+            ? []
+            : [tl(voce === 'rimovibile' ? 'recording.withdraw.voce' : 'recording.withdraw.soloAscolto')]),
+          ...(stati.transcription?.dato ? [tl('recording.withdrawTranscript')] : []),
+        ].join(' '),
         nota: tl('recording.alreadyRecorded'),
       },
       {

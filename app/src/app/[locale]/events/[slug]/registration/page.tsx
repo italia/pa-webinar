@@ -20,7 +20,7 @@ import { informativaEvento } from '@/lib/events/privacy-notice';
 import { schedaPrivacyEvento, testoIaDelSito } from '@/lib/events/privacy-sheet';
 import { anteprimaEventoPubblico } from '@/lib/events/meta-title';
 import { rubricaProposta } from '@/lib/persons/address-book';
-import { recordingAvailable, voceNelVideo } from '@/lib/recording/availability';
+import { recordingAvailableFor, voceNelVideo } from '@/lib/recording/availability';
 import { traccePerPersonaConservate, trascrizioneDalVideo } from '@/lib/registration/consents';
 import { findEventQuestionnaireByPlacement } from '@/lib/questionnaires';
 import { invitoDaToken } from '@/lib/email/invitation';
@@ -100,7 +100,7 @@ export default async function RegistrationPage({
   // iscriversi (lib/events/privacy-notice).
   const { url: privacyUrl, testo: privacyText } = informativaEvento(event, locale);
 
-  const disponibile = recordingAvailable();
+  const disponibile = recordingAvailableFor(event);
   const voce = voceNelVideo();
 
   return (
@@ -151,12 +151,12 @@ export default async function RegistrationPage({
             privacyPolicyText={privacyText}
             schedaPrivacy={schedaPrivacyEvento(event, settings)}
             testoIa={testoIaDelSito(settings, locale)}
-            // Un'installazione che non può registrare non chiede il consenso
-            // alla registrazione e non la annuncia (come la sala d'attesa).
+            // Dove la scheda dice che non si registra niente non si chiede il
+            // consenso e non si annuncia la registrazione (come la sala d'attesa).
             recordingEnabled={event.recordingEnabled && disponibile}
             recordingDestination={event.recordingDestination}
             recordingConsentText={event.recordingConsentText}
-            multitrackRecordingEnabled={event.multitrackRecordingEnabled}
+            multitrackRecordingEnabled={event.multitrackRecordingEnabled && disponibile}
             captionsTranscript={captionsTranscriptActive(event, settings)}
             trascrizioneVideo={trascrizioneDalVideo(event, settings, disponibile, voce)}
             tracceConservate={traccePerPersonaConservate(event, settings)}

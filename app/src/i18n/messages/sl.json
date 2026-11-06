@@ -691,6 +691,7 @@
           "voce": "Brez te privolitve sodelujete kot vsi, a ostanete zunaj posnetka: ne ime, ne glas, ne slika.",
           "comeTutti": "Brez te privolitve sodelujete kot vsi."
         },
+        "withoutTranscriptHost": "Your voice is not kept in the per-person tracks or in the transcript.",
         "alreadyRecorded": "Kar je že posneto, ostane v videu dogodka: za odstranitev pišite organizatorjem.",
         "withdraw": {
           "soloAscolto": "Če jo prekličete, ostanete v dvorani in samo poslušate: mikrofon, kamera in zaslon se zaprejo. Prekličete tudi privolitev v prepis svojih govorov.",
@@ -698,7 +699,9 @@
           "voce": "Če jo prekličete, ostanete v sobi kot prej, od zdaj pa ste zunaj posnetka. Prekličete tudi privolitev v prepis svojih prispevkov.",
           "avvertenza": "Če jo prekličete, ostanete v sobi kot prej. Prekličete tudi privolitev v prepis svojih prispevkov. Če dobite besedo in se dogodek snema, vaš glas kljub temu ostane v videoposnetku.",
           "assente": "Če jo prekličete, ostanete v sobi kot prej. Prekličete tudi privolitev v prepis svojih prispevkov. Od zdaj se vaš glas ne snema na ločeno sled."
-        }
+        },
+        "withdrawTranscript": "You also withdraw consent to transcribing your contributions.",
+        "withdrawTranscriptHost": "From now on your voice is not kept in the per-person tracks or in the transcript."
       },
       "transcription": {
         "title": "Prepis vaših govorov",
@@ -4502,7 +4505,8 @@
       "name": {
         "label": "Vaše ime",
         "real": "V dvorani, klepetu in vprašanjih ste prikazani s svojim imenom.",
-        "pseudonym": "V dvorani, klepetu in vprašanjih ste prikazani pod psevdonimom. Organizatorji vidijo podatke o prijavi. Če privolite v prepis, tam ostane vaše ime."
+        "pseudonym": "V dvorani, klepetu in vprašanjih ste prikazani pod psevdonimom. Organizatorji vidijo podatke o prijavi. Če privolite v prepis, tam ostane vaše ime.",
+        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
       },
       "retention": {
         "label": "Hramba",

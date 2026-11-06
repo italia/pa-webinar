@@ -393,7 +393,7 @@ describe('RegistrationFormClient — la scheda privacy', () => {
       chiNonAcconsente: 'restaFuori',
       conduceSempre: false,
     },
-    trascrizione: { sottotitoli: false, tracce: null, dalVideo: false },
+    trascrizione: { chiesta: false, sottotitoli: false, tracce: null, dalVideo: false },
     sottotitoli: { attivi: false, testoConservato: false },
     ia: { sintesi: true, traduzione: false, doppiaggio: false, elaborabileDopo: false },
     chat: { attiva: true, domandeAttive: true, esitoDomande: 'nonPubblicate' },
@@ -402,6 +402,21 @@ describe('RegistrationFormClient — la scheda privacy', () => {
     conservazione: { giorniDati: 30, video: { giorniDopoPubblicazione: null } },
     rubrica: null,
   };
+
+  describe('la nota sotto il nome', () => {
+    const nota = () => container.querySelector('#displayNameHelp')?.textContent;
+
+    it('dove il pubblico e\' anonimo dice lo stesso della sala d\'attesa', () => {
+      conScheda({ schedaPrivacy: { ...SCHEDA, pseudonimi: true } });
+      expect(nota()).toBe(messages.waiting.anonymousNameHelp);
+      expect(nota()).not.toBe(messages.registration.namePlaceholder);
+    });
+
+    it('altrimenti il nome si vede in sala', () => {
+      conScheda({ schedaPrivacy: SCHEDA });
+      expect(nota()).toBe(messages.registration.namePlaceholder);
+    });
+  });
 
   function conScheda(props: Partial<ComponentProps<typeof RegistrationFormClient>> = {}) {
     act(() => {
@@ -475,8 +490,13 @@ describe('RegistrationFormClient — la scheda privacy', () => {
       registrazione: { ...SCHEDA.registrazione, modo },
     });
 
-    it('dove la scheda dice che non si registra niente, non si annuncia', () => {
-      conScheda({ ...senzaPresenza, voce: 'assente', schedaPrivacy: conModo('nessuna') });
+    it('dove la pagina dice che non si registra niente, non si annuncia', () => {
+      conScheda({
+        ...senzaPresenza,
+        recordingEnabled: false,
+        voce: 'assente',
+        schedaPrivacy: conModo('nessuna'),
+      });
       expect(container.textContent).toContain(sheet.recording.none);
       expect(container.textContent).not.toContain(recordingNoticeVoice);
       expect(container.textContent).not.toContain(recordingNotice);

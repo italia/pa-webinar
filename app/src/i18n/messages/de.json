@@ -691,6 +691,7 @@
           "voce": "Ohne diese Einwilligung nehmen Sie wie alle teil, bleiben aber außerhalb der Aufzeichnung: kein Name, keine Stimme, kein Bild.",
           "comeTutti": "Ohne diese Einwilligung nehmen Sie wie alle teil."
         },
+        "withoutTranscriptHost": "Your voice is not kept in the per-person tracks or in the transcript.",
         "alreadyRecorded": "Bereits Aufgezeichnetes bleibt im Video der Veranstaltung: Wenden Sie sich für die Entfernung an die Organisatoren.",
         "withdraw": {
           "soloAscolto": "Wenn Sie sie widerrufen, bleiben Sie im Raum und hören nur zu: Mikrofon, Kamera und Bildschirm werden geschlossen. Auch Ihre Einwilligung in die Transkription Ihrer Beiträge wird widerrufen.",
@@ -698,7 +699,9 @@
           "voce": "Wenn Sie sie widerrufen, bleiben Sie wie bisher im Raum und sind ab jetzt nicht mehr in der Aufzeichnung. Sie widerrufen auch die Einwilligung zur Transkription Ihrer Beiträge.",
           "avvertenza": "Wenn Sie sie widerrufen, bleiben Sie wie bisher im Raum. Sie widerrufen auch die Einwilligung zur Transkription Ihrer Beiträge. Wenn Sie das Wort erhalten und das Event aufgezeichnet wird, ist Ihre Stimme trotzdem im Video zu hören.",
           "assente": "Wenn Sie sie widerrufen, bleiben Sie wie bisher im Raum. Sie widerrufen auch die Einwilligung zur Transkription Ihrer Beiträge. Ab jetzt wird Ihre Stimme nicht mehr auf einer eigenen Spur aufgezeichnet."
-        }
+        },
+        "withdrawTranscript": "You also withdraw consent to transcribing your contributions.",
+        "withdrawTranscriptHost": "From now on your voice is not kept in the per-person tracks or in the transcript."
       },
       "transcription": {
         "title": "Transkription Ihrer Beiträge",
@@ -4502,7 +4505,8 @@
       "name": {
         "label": "Ihr Name",
         "real": "Im Raum, im Chat und bei den Fragen erscheinen Sie unter Ihrem Namen.",
-        "pseudonym": "Im Raum, im Chat und bei den Fragen erscheinen Sie unter einem Pseudonym. Die Veranstalter sehen Ihre Anmeldedaten. Wenn Sie in die Transkription einwilligen, bleibt dort Ihr Name stehen."
+        "pseudonym": "Im Raum, im Chat und bei den Fragen erscheinen Sie unter einem Pseudonym. Die Veranstalter sehen Ihre Anmeldedaten. Wenn Sie in die Transkription einwilligen, bleibt dort Ihr Name stehen.",
+        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
       },
       "retention": {
         "label": "Aufbewahrung",

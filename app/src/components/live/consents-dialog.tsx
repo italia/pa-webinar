@@ -101,6 +101,18 @@ export default function ConsentsDialog({
   const testoEvento = registrazione
     ? testoConsensoEvento(registrazione.testoEvento, registrazione.voce)
     : null;
+  // La trascrizione si nomina dove la finestra la mostra: l'evento la chiede, o
+  // la persona l'ha data.
+  const effettoRegistrazione = (r: NonNullable<ConsensiInSala['registrazione']>) => {
+    const effetto = r.dato
+      ? t(`recording.withdraw.${r.ritiro}`)
+      : t(`recording.without.${senzaConsenso(r.ritiro)}`);
+    if (!trascrizione) return effetto;
+    if (r.ritiro === 'conduce') {
+      return `${effetto} ${t(r.dato ? 'recording.withdrawTranscriptHost' : 'recording.withoutTranscriptHost')}`;
+    }
+    return r.dato ? `${effetto} ${t('recording.withdrawTranscript')}` : effetto;
+  };
   // Dopo un'azione il pulsante premuto sparisce (o si ferma): il focus va al
   // titolo del consenso, dentro la finestra, cosi' Esc e Tab continuano a
   // valere e il lettore di schermo resta al suo posto.
@@ -198,9 +210,7 @@ export default function ConsentsDialog({
               'live-consents-rec',
               t('recording.title'),
               registrazione.dato,
-              registrazione.dato
-                ? t(`recording.withdraw.${registrazione.ritiro}`)
-                : t(`recording.without.${senzaConsenso(registrazione.ritiro)}`),
+              effettoRegistrazione(registrazione),
               !registrazione.dato
                 ? [testoEvento, tGdpr(chiaveConsenso(registrazione.destinazione, registrazione.voce))]
                     .filter(Boolean)

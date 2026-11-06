@@ -184,6 +184,34 @@ describe('pagina di iscrizione: consensi passati al modulo', () => {
     expect((await propsDelModulo()).voce).toBe('assente');
   });
 
+  describe('dove la scheda dice che non si registra niente', () => {
+    beforeEach(() => {
+      senzaVideo();
+      evento({ multitrackRecordingEnabled: false });
+    });
+
+    it('niente casella, come la scheda', async () => {
+      const props = await propsDelModulo();
+      expect((props.schedaPrivacy as SchedaPrivacy).registrazione.modo).toBe('nessuna');
+      expect(props.recordingEnabled).toBe(false);
+    });
+
+    it('il flag delle tracce da solo non chiede niente', async () => {
+      evento({ multitrackRecordingEnabled: true, aiTranscriptEnabled: false });
+      const props = await propsDelModulo();
+      expect((props.schedaPrivacy as SchedaPrivacy).registrazione.modo).toBe('nessuna');
+      expect(props.multitrackRecordingEnabled).toBe(false);
+    });
+
+    it('con le sole tracce la casella resta', async () => {
+      evento({ multitrackRecordingEnabled: true, aiTranscriptEnabled: true });
+      const props = await propsDelModulo();
+      expect((props.schedaPrivacy as SchedaPrivacy).registrazione.modo).toBe('soloTracce');
+      expect(props.recordingEnabled).toBe(true);
+      expect(props.multitrackRecordingEnabled).toBe(true);
+    });
+  });
+
   it('trascrizione dal video: evento, pipeline e video insieme', async () => {
     expect((await propsDelModulo()).trascrizioneVideo).toBe(true);
   });

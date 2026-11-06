@@ -134,6 +134,55 @@ afterEach(() => {
   container.remove();
 });
 
+describe('sala d\'attesa — pubblico anonimo', () => {
+  const anonimo: Evento = { ...eventoLive, audienceAnonymous: true };
+  const conPiazza: Evento = { ...eventoLive, waitingRoomEngine: 'GAME' };
+  const senzaPulsante = () =>
+    Array.from(container.querySelectorAll('button')).every(
+      (b) => !b.textContent?.includes(t.backToGarden),
+    );
+  const conIndirizzo = (cerca: string) => window.history.replaceState(null, '', `/${cerca}`);
+
+  afterEach(() => conIndirizzo(''));
+
+  it('la piazza non si apre, nemmeno con il parametro', () => {
+    conIndirizzo('?engine=phaser');
+    render({ event: { ...conPiazza, audienceAnonymous: true } });
+    expect($('.wr-piazza-card')).toBeNull();
+    expect(piazza.onEnterLive).toBeNull();
+    expect(senzaPulsante()).toBe(true);
+  });
+
+  it('il pulsante per riaprirla non c\'e\'', () => {
+    render({ event: anonimo });
+    expect(senzaPulsante()).toBe(true);
+  });
+
+  it('altrove il pulsante resta', () => {
+    window.localStorage.setItem('pawebinar.arcade.classic', '1');
+    render({ event: conPiazza });
+    expect(senzaPulsante()).toBe(false);
+  });
+
+  it('la foto non si offre: in sala non si vedrebbe', async () => {
+    const lettura = vi.fn(async (_url: string) =>
+      Response.json({ canUpload: true, needsEmailProof: false, photo: null }),
+    );
+    vi.stubGlobal('fetch', lettura);
+    render({ event: anonimo, chatToken: 'token-iscritto', role: 'participant' });
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(lettura.mock.calls.some(([url]) => String(url).includes('profile-photo'))).toBe(false);
+    render({ event: eventoLive, chatToken: 'token-iscritto', role: 'participant' });
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(lettura.mock.calls.some(([url]) => String(url).includes('profile-photo'))).toBe(true);
+    vi.unstubAllGlobals();
+  });
+});
+
 describe('sala d\'attesa — nome mancante a sala aperta', () => {
   it('il pulsante si preme, dice cosa manca e non fa entrare', () => {
     render();
@@ -885,7 +934,7 @@ describe('sala d\'attesa — la scheda privacy', () => {
       chiNonAcconsente: 'restaFuori',
       conduceSempre: false,
     },
-    trascrizione: { sottotitoli: false, tracce: null, dalVideo: false },
+    trascrizione: { chiesta: false, sottotitoli: false, tracce: null, dalVideo: false },
     sottotitoli: { attivi: true, testoConservato: false },
     ia: { sintesi: true, traduzione: false, doppiaggio: false, elaborabileDopo: false },
     chat: { attiva: true, domandeAttive: true, esitoDomande: 'soloTesto' },

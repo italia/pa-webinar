@@ -383,8 +383,9 @@ The consent is the transcription of one's own contributions, with one's name. It
 blocks entry; the same consent also decides what the transcript from live captions keeps
 ([ADR-018](018-live-captions.md)).
 
-- **At registration.** When `multitrackRecordingEnabled` is on, or the event keeps a transcript from
-  live captions, the form shows an optional box. The answer is stored on `Registration.consentMultitrack`
+- **At registration.** When `multitrackRecordingEnabled` is on and the event can record its tracks
+  (`eventoRegistrabile`), or the event keeps a transcript from live captions, the form shows an
+  optional box. The answer is stored on `Registration.consentMultitrack`
   (`false` when the box is left unticked), which is null for events that do not ask.
 - **In the waiting room.** The box, under **Transcript of what you say**, is shown to everyone who has
   not given the consent, moderators and speakers included, and entry does not wait for it. A registrant

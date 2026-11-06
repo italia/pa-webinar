@@ -691,6 +691,7 @@
           "voce": "Gan an toiliú seo glacann tú páirt mar a ghlacann gach duine, ach fanann tú lasmuigh den taifeadadh: gan ainm, guth ná íomhá.",
           "comeTutti": "Gan an toiliú seo glacann tú páirt mar a ghlacann gach duine."
         },
+        "withoutTranscriptHost": "Your voice is not kept in the per-person tracks or in the transcript.",
         "alreadyRecorded": "Fanann a bhfuil taifeadta cheana féin i bhfíseán na hócáide: chun é a bhaint, scríobh chuig na heagraithe.",
         "withdraw": {
           "soloAscolto": "Má tharraingíonn tú siar é, fanann tú sa seomra ag éisteacht amháin: dúntar an micreafón, an ceamara agus an scáileán. Tarraingítear siar freisin do thoiliú le tras-scríobh a ndeir tú.",
@@ -698,7 +699,9 @@
           "voce": "Má tharraingíonn tú siar é fanann tú sa seomra mar a bhí, agus ón nóiméad seo tá tú lasmuigh den taifeadadh. Tarraingíonn tú siar freisin an toiliú le tras-scríobh do rannchuidithe.",
           "avvertenza": "Má tharraingíonn tú siar é fanann tú sa seomra mar a bhí. Tarraingíonn tú siar freisin an toiliú le tras-scríobh do rannchuidithe. Má thugtar an t-urlár duit agus má thaifeadtar an ócáid, beidh do ghuth san fhíseán fós.",
           "assente": "Má tharraingíonn tú siar é fanann tú sa seomra mar a bhí. Tarraingíonn tú siar freisin an toiliú le tras-scríobh do rannchuidithe. Ón nóiméad seo ní thaifeadtar do ghuth ar rian ar leith."
-        }
+        },
+        "withdrawTranscript": "You also withdraw consent to transcribing your contributions.",
+        "withdrawTranscriptHost": "From now on your voice is not kept in the per-person tracks or in the transcript."
       },
       "transcription": {
         "title": "Tras-scríobh a ndeir tú",
@@ -4502,7 +4505,8 @@
       "name": {
         "label": "D'ainm",
         "real": "Sa seomra, sa chomhrá agus sna ceisteanna taispeántar thú faoi d'ainm féin.",
-        "pseudonym": "Sa seomra, sa chomhrá agus sna ceisteanna taispeántar thú faoi ainm cleite. Feiceann na heagraithe do shonraí cláraithe. Má thoilíonn tú leis an tras-scríobh, fanann d'ainm sa tras-scríbhinn."
+        "pseudonym": "Sa seomra, sa chomhrá agus sna ceisteanna taispeántar thú faoi ainm cleite. Feiceann na heagraithe do shonraí cláraithe. Má thoilíonn tú leis an tras-scríobh, fanann d'ainm sa tras-scríbhinn.",
+        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
       },
       "retention": {
         "label": "Coinneáil",

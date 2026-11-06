@@ -21,7 +21,7 @@ const SCHEDA: SchedaPrivacy = {
     chiNonAcconsente: 'restaFuori',
     conduceSempre: false,
   },
-  trascrizione: { sottotitoli: false, tracce: null, dalVideo: false },
+  trascrizione: { chiesta: false, sottotitoli: false, tracce: null, dalVideo: false },
   sottotitoli: { attivi: false, testoConservato: false },
   ia: null,
   chat: { attiva: false, domandeAttive: false, esitoDomande: 'nonPubblicate' },
@@ -150,13 +150,13 @@ describe('PrivacySheet, trascrizione e sottotitoli', () => {
   });
 
   it.each([
-    [{ sottotitoli: true, tracce: null, dalVideo: false }, t.transcript.captions],
-    [{ sottotitoli: false, tracce: 'cancellate', dalVideo: false }, t.transcript.tracks],
+    [{ chiesta: true, sottotitoli: true, tracce: null, dalVideo: false }, t.transcript.captions],
+    [{ chiesta: true, sottotitoli: false, tracce: 'cancellate', dalVideo: false }, t.transcript.tracks],
     [
-      { sottotitoli: false, tracce: 'conservate', dalVideo: false },
+      { chiesta: true, sottotitoli: false, tracce: 'conservate', dalVideo: false },
       t.transcript.tracksRetained,
     ],
-    [{ sottotitoli: false, tracce: null, dalVideo: true }, t.transcript.fromVideo],
+    [{ chiesta: true, sottotitoli: false, tracce: null, dalVideo: true }, t.transcript.fromVideo],
   ] as const)('%o', (trascrizione, testo) => {
     const resa = disegna({ trascrizione });
     expect(resa).toContain(t.transcript.label);
@@ -165,7 +165,7 @@ describe('PrivacySheet, trascrizione e sottotitoli', () => {
 
   it('una traccia che si conserva non promette la cancellazione', () => {
     const resa = disegna({
-      trascrizione: { sottotitoli: false, tracce: 'conservate', dalVideo: false },
+      trascrizione: { chiesta: true, sottotitoli: false, tracce: 'conservate', dalVideo: false },
     });
     expect(resa).not.toContain(t.transcript.tracks);
   });
@@ -236,7 +236,7 @@ describe('PrivacySheet, intelligenza artificiale', () => {
   it("vale anche se l'unica elaborazione e' la trascrizione", () => {
     expect(
       disegna(
-        { ia: IA, trascrizione: { sottotitoli: false, tracce: null, dalVideo: true } },
+        { ia: IA, trascrizione: { chiesta: true, sottotitoli: false, tracce: null, dalVideo: true } },
         SCRITTO
       )
     ).toContain(SCRITTO);
@@ -291,10 +291,43 @@ describe('PrivacySheet, chat e domande', () => {
   });
 });
 
+describe('PrivacySheet, il nome nella trascrizione', () => {
+  const SI = { ...SCHEDA.trascrizione, chiesta: true };
+
+  it('dove nessuno chiede la trascrizione non la nomina', () => {
+    const testo = disegna({ pseudonimi: true });
+    expect(testo).toContain(t.name.pseudonym);
+    expect(testo).not.toContain(t.name.pseudonymTranscript);
+  });
+
+  it('dove si chiede dice che il nome resta', () => {
+    expect(disegna({ pseudonimi: true, trascrizione: SI })).toContain(t.name.pseudonymTranscript);
+  });
+
+  it('con il proprio nome non serve dirlo', () => {
+    expect(disegna({ trascrizione: SI })).not.toContain(t.name.pseudonymTranscript);
+  });
+
+  it('in sala vale anche il consenso gia\' dato, o i sottotitoli accesi dal vivo', () => {
+    const adesso = { sottotitoli: false, chat: true, domande: true };
+    const base: SchedaPrivacy = { ...SCHEDA, pseudonimi: true };
+    expect(schedaInSala(base, adesso).trascrizione.chiesta).toBe(false);
+    expect(
+      schedaInSala(base, { ...adesso, trascrizioneData: true }).trascrizione.chiesta
+    ).toBe(true);
+    expect(
+      schedaInSala(
+        { ...base, sottotitoli: { attivi: false, testoConservato: true } },
+        { ...adesso, sottotitoli: true }
+      ).trascrizione.chiesta
+    ).toBe(true);
+  });
+});
+
 describe('schedaInSala, la scheda con i flag di adesso', () => {
   const accesi: SchedaPrivacy = {
     ...SCHEDA,
-    trascrizione: { sottotitoli: true, tracce: 'cancellate', dalVideo: false },
+    trascrizione: { chiesta: true, sottotitoli: true, tracce: 'cancellate', dalVideo: false },
     sottotitoli: { attivi: true, testoConservato: true },
     chat: { attiva: true, domandeAttive: true, esitoDomande: 'soloTesto' },
   };
@@ -309,6 +342,7 @@ describe('schedaInSala, la scheda con i flag di adesso', () => {
     const dopo = conSottotitoli(accesi, false);
     expect(dopo.sottotitoli).toEqual({ attivi: false, testoConservato: true });
     expect(dopo.trascrizione).toEqual({
+      chiesta: true,
       sottotitoli: false,
       tracce: 'cancellate',
       dalVideo: false,

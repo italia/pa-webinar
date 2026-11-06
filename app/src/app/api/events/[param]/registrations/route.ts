@@ -45,7 +45,7 @@ import {
 import { getSettings } from '@/lib/settings';
 import { captionsTranscriptActive } from '@/lib/captions/availability';
 import { localizedUrl } from '@/lib/utils/localized-url';
-import { recordingAvailable, voceNelVideo } from '@/lib/recording/availability';
+import { recordingAvailableFor, voceNelVideo } from '@/lib/recording/availability';
 import {
   destinazioneDelTesto,
   testoInVigore,
@@ -126,13 +126,14 @@ export const POST = withErrorHandling(async (request, context) => {
   // I consensi da chiedere dipendono dal formato dell'evento: la stessa regola
   // del modulo (lib/registration/consents).
   const settings = await getSettings();
-  const disponibile = recordingAvailable();
+  const disponibile = recordingAvailableFor(event);
   const voce = voceNelVideo();
   const richiesti = consensiRichiesti({
     ...event,
-    // Come la sala d'attesa: dove l'installazione non può registrare, il
+    // Come la sala d'attesa: dove la scheda dice che non si registra niente, il
     // consenso alla registrazione non si chiede.
     recordingEnabled: event.recordingEnabled && disponibile,
+    multitrackRecordingEnabled: event.multitrackRecordingEnabled && disponibile,
     captionsTranscript: captionsTranscriptActive(event, settings),
     trascrizioneVideo: trascrizioneDalVideo(event, settings, disponibile, voce),
   });

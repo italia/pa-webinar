@@ -97,8 +97,12 @@ vi.mock('@/hooks/use-live-state', async () => {
 vi.mock('@/hooks/use-qa-alerts', () => ({ useQaAlerts: () => ({ hasNews: false }) }));
 vi.mock('@/hooks/use-presence', () => ({ usePresenze: () => null }));
 vi.mock('@/hooks/use-captions-control', () => ({ useCaptionsControl: () => vi.fn() }));
+const comandoRec = vi.hoisted(() => ({ attivo: null as boolean | null }));
 vi.mock('@/hooks/use-recording-control', () => ({
-  useRecordingControl: () => ({ fase: 'ferma' }),
+  useRecordingControl: ({ attivo }: { attivo: boolean }) => {
+    comandoRec.attivo = attivo;
+    return { fase: 'ferma' };
+  },
 }));
 vi.mock('@/hooks/use-presentation-timer', () => ({
   TimerInterventiSync: () => null,
@@ -159,6 +163,7 @@ interface Risposta {
   recordingDestination?: 'PUBLIC' | 'REGISTRANTS' | null;
   voiceExcluded?: boolean;
   listenOnly?: boolean;
+  role?: 'moderator';
   consentsRecorded?: { recording: boolean; multitrack: boolean };
   consentsInForce?: { recording: boolean; transcription: boolean };
   /** Lo stato della risposta, se non e' un 200. */
@@ -323,7 +328,7 @@ describe("sala — quello che arriva alla sala d'attesa", () => {
         chiNonAcconsente: 'restaFuori',
         conduceSempre: false,
       },
-      trascrizione: { sottotitoli: true, tracce: null, dalVideo: false },
+      trascrizione: { chiesta: true, sottotitoli: true, tracce: null, dalVideo: false },
       sottotitoli: { attivi: true, testoConservato: true },
       ia: null,
       chat: { attiva: true, domandeAttive: true, esitoDomande: 'soloTesto' },
@@ -403,7 +408,7 @@ describe("sala — quello che arriva alla sala d'attesa", () => {
         recordingEnabled: false,
         schedaPrivacy: {
           ...SCHEDA,
-          trascrizione: { sottotitoli: false, tracce: null, dalVideo: false },
+          trascrizione: { chiesta: false, sottotitoli: false, tracce: null, dalVideo: false },
           sottotitoli: { attivi: false, testoConservato: true },
         },
         liveCaptionsAvailable: true,
@@ -1344,7 +1349,7 @@ describe("sala — la scheda in sala d'attesa", () => {
       chiNonAcconsente: 'soloAscolto',
       conduceSempre: false,
     },
-    trascrizione: { sottotitoli: false, tracce: null, dalVideo: false },
+    trascrizione: { chiesta: false, sottotitoli: false, tracce: null, dalVideo: false },
     sottotitoli: { attivi: false, testoConservato: false },
     chat: { attiva: true, domandeAttive: false, esitoDomande: 'soloTesto' },
   } as unknown as SchedaPrivacy;
@@ -1363,6 +1368,41 @@ describe("sala — la scheda in sala d'attesa", () => {
       pseudonimi: true,
       registrazione: { chiNonAcconsente: 'soloAscolto' },
     });
+  });
+
+  it('il consenso alla trascrizione gia dato fa nominare il nome che resta', async () => {
+    await monta({ event: { ...evento, schedaPrivacy: scheda } });
+    expect(leggiAttesa().schedaPrivacy?.trascrizione.chiesta).toBe(false);
+    await monta({ event: { ...evento, schedaPrivacy: scheda }, hasMultitrackConsent: true });
+    expect(leggiAttesa().schedaPrivacy?.trascrizione.chiesta).toBe(true);
+  });
+});
+
+describe('sala — dove non si registra niente', () => {
+  const registrato = {
+    ...evento,
+    recordingEnabled: true,
+    participantsCanUnmute: true,
+  };
+
+  it('il comando di registrazione non si offre a chi conduce', async () => {
+    await monta({ event: registrato, isModerator: true, recordingAvailable: false });
+    risposte.push({ role: 'moderator' });
+    await entra();
+    expect(comandoRec.attivo).toBe(false);
+  });
+
+  it('dove si registra si offre', async () => {
+    await monta({ event: registrato, isModerator: true, recordingAvailable: true });
+    risposte.push({ role: 'moderator' });
+    await entra();
+    expect(comandoRec.attivo).toBe(true);
+  });
+
+  it('non si chiede il consenso e la finestra non lo mostra', async () => {
+    await monta({ event: registrato, recordingAvailable: false });
+    expect(leggiAttesa().recordingConsentRequired).toBe(false);
+    expect(leggiAttesa().event.recordingEnabled).toBe(false);
   });
 });
 

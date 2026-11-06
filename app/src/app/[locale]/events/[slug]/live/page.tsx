@@ -13,7 +13,7 @@ import { anteprimaEventoPubblico } from '@/lib/events/meta-title';
 import { getPublicEnv } from '@/lib/env';
 import { captionsTranscriptActive, liveCaptionsAvailable } from '@/lib/captions/availability';
 import { getSettings } from '@/lib/settings';
-import { recordingAvailable, voceNelVideo } from '@/lib/recording/availability';
+import { recordingAvailableFor, voceNelVideo } from '@/lib/recording/availability';
 import { accessoRegistrazione, vedeVideo } from '@/lib/recording/audience';
 import {
   consensoCopre,
@@ -101,10 +101,10 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
   // LiveEventClient on mount when the initial status is IDLE.
 
   const settings = await getSettings();
-  // Se qualcosa puo' registrare (Jibri o il registratore per partecipante):
-  // senza, a chi partecipa non si dice «questo evento puo' essere registrato» e non
-  // si chiede il consenso (lib/recording/availability).
-  const canRecord = recordingAvailable();
+  // Se qualcosa puo' registrare questo evento (il video, o le sue tracce per
+  // persona): senza, a chi partecipa non si dice «questo evento puo' essere
+  // registrato» e non si chiede il consenso (lib/recording/availability).
+  const canRecord = recordingAvailableFor(event);
 
   const watermark = {
     url:
@@ -273,7 +273,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             aiConsentDisclosure,
             multitrackRecordingEnabled: isInstant
               ? false
-              : event.multitrackRecordingEnabled,
+              : event.multitrackRecordingEnabled && canRecord,
             captionsTranscript: captionsTranscriptActive(event, settings),
             trascrizioneVideo,
           }}
@@ -492,7 +492,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         liveCaptionsEnabled: event.liveCaptionsEnabled,
         liveCaptionsLanguage: settings.defaultLocale,
         aiConsentDisclosure,
-        multitrackRecordingEnabled: event.multitrackRecordingEnabled,
+        multitrackRecordingEnabled: event.multitrackRecordingEnabled && canRecord,
         captionsTranscript: captionsTranscriptActive(event, settings),
         trascrizioneVideo,
       }}

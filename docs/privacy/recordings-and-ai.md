@@ -158,9 +158,10 @@ recording box. The rules are in `app/src/lib/recording/destination.ts`.
   `404`.
 - **No room video.** On an installation without Jibri the box says that the room
   video is not recorded (`gdpr.consent.recordingNoVideo`) and the sheet names no
-  destination. An event that records still starts reserved, so an uploaded file
-  stays reserved. A consent to that text states no destination: if the
-  installation later adds a room video, the person is asked again.
+  destination. Without per-person tracks either, nothing is recorded and no
+  recording consent is asked. An event that records still starts reserved, so an
+  uploaded file stays reserved. A consent to that text states no destination: if
+  the installation later adds a room video, the person is asked again.
 
 ### Per-participant audio
 

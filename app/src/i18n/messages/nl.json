@@ -691,6 +691,7 @@
           "voce": "Zonder deze toestemming neem je deel zoals iedereen, maar blijf je buiten de opname: geen naam, stem of beeld.",
           "comeTutti": "Zonder deze toestemming neem je deel zoals iedereen."
         },
+        "withoutTranscriptHost": "Your voice is not kept in the per-person tracks or in the transcript.",
         "alreadyRecorded": "Wat al is opgenomen, blijft in de video van het evenement: schrijf de organisatoren om het te laten verwijderen.",
         "withdraw": {
           "soloAscolto": "Als je hem intrekt, blijf je in de zaal en luister je alleen mee: microfoon, camera en scherm gaan dicht. Je toestemming voor de transcriptie van je bijdragen wordt ook ingetrokken.",
@@ -698,7 +699,9 @@
           "voce": "Als je intrekt, blijf je in de zaal zoals eerst en sta je vanaf nu buiten de opname. Je trekt ook de toestemming voor het transcript van je bijdragen in.",
           "avvertenza": "Als je hem intrekt, blijf je in de zaal zoals eerst. Je trekt ook de toestemming voor de transcriptie van je bijdragen in. Als je het woord krijgt en het evenement wordt opgenomen, blijft je stem wel in de video.",
           "assente": "Als je hem intrekt, blijf je in de zaal zoals eerst. Je trekt ook de toestemming voor de transcriptie van je bijdragen in. Vanaf nu wordt je stem niet op een apart spoor opgenomen."
-        }
+        },
+        "withdrawTranscript": "You also withdraw consent to transcribing your contributions.",
+        "withdrawTranscriptHost": "From now on your voice is not kept in the per-person tracks or in the transcript."
       },
       "transcription": {
         "title": "Transcriptie van je bijdragen",
@@ -4502,7 +4505,8 @@
       "name": {
         "label": "Je naam",
         "real": "In de zaal, in de chat en bij vragen verschijn je onder je eigen naam.",
-        "pseudonym": "In de zaal, in de chat en bij vragen verschijn je onder een pseudoniem. De organisatoren zien je inschrijvingsgegevens. Als je toestemming geeft voor de transcriptie, blijft je naam daarin staan."
+        "pseudonym": "In de zaal, in de chat en bij vragen verschijn je onder een pseudoniem. De organisatoren zien je inschrijvingsgegevens. Als je toestemming geeft voor de transcriptie, blijft je naam daarin staan.",
+        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
       },
       "retention": {
         "label": "Bewaring",

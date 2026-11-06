@@ -78,8 +78,16 @@ const TESTO_DOMANDE = {
  */
 export function schedaInSala(
   scheda: SchedaPrivacy,
-  adesso: { sottotitoli: boolean; chat: boolean; domande: boolean; conduce?: boolean }
+  adesso: {
+    sottotitoli: boolean;
+    chat: boolean;
+    domande: boolean;
+    conduce?: boolean;
+    /** Questa persona ha dato il consenso alla trascrizione. */
+    trascrizioneData?: boolean;
+  }
 ): SchedaPrivacy {
+  const testoSottotitoli = adesso.sottotitoli && scheda.sottotitoli.testoConservato;
   return {
     ...scheda,
     ...(adesso.conduce
@@ -94,7 +102,8 @@ export function schedaInSala(
     sottotitoli: { ...scheda.sottotitoli, attivi: adesso.sottotitoli },
     trascrizione: {
       ...scheda.trascrizione,
-      sottotitoli: adesso.sottotitoli && scheda.sottotitoli.testoConservato,
+      chiesta: scheda.trascrizione.chiesta || testoSottotitoli || !!adesso.trascrizioneData,
+      sottotitoli: testoSottotitoli,
     },
     chat: { ...scheda.chat, attiva: adesso.chat, domandeAttive: adesso.domande },
     rubrica: null,
@@ -195,6 +204,11 @@ export function PrivacySheet({
     );
   }
 
+  // Il nome nella trascrizione si dice dove quel consenso esiste.
+  const frasiNome = scheda.pseudonimi
+    ? [t('name.pseudonym'), ...(trascrizione.chiesta ? [t('name.pseudonymTranscript')] : [])]
+    : [t('name.real')];
+
   return (
     <section className="wr-summary" aria-labelledby={titolo}>
       <h2 className="wr-section-title" id={titolo}>
@@ -232,7 +246,7 @@ export function PrivacySheet({
         <Fatto
           icona="it-user"
           etichetta={t('name.label')}
-          frasi={[t(scheda.pseudonimi ? 'name.pseudonym' : 'name.real')]}
+          frasi={frasiNome}
         />
         <Fatto icona="it-comment" etichetta={t('chat.label')} frasi={frasiChat} />
         <Fatto

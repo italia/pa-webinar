@@ -158,12 +158,54 @@ describe('ConsentsDialog', () => {
     expect(document.getElementById('live-consents-rec-effetto')?.textContent).toBe(
       messages.live.consents.recording.withdraw.avvertenza
     );
-    expect(messages.live.consents.recording.withdraw.avvertenza).toContain(
-      'trascrizione'
-    );
     expect(document.body.textContent).toContain(
       messages.live.consents.recording.alreadyRecorded
     );
+  });
+
+  describe('la trascrizione nella riga della registrazione', () => {
+    const r = messages.live.consents.recording;
+    const effetto = () => document.getElementById('live-consents-rec-effetto')?.textContent;
+
+    it.each(['voce', 'soloAscolto', 'avvertenza', 'assente'] as const)(
+      'dove nessuno la chiede non si nomina (%s)',
+      async (ritiro) => {
+        await disegna({ registrazione: registrazione(true, ritiro) });
+        expect(effetto()).toBe(r.withdraw[ritiro]);
+        expect(effetto()).not.toMatch(/trascrizione/i);
+      }
+    );
+
+    it.each(['voce', 'soloAscolto', 'avvertenza', 'assente'] as const)(
+      'dove la finestra la mostra, il ritiro la comprende (%s)',
+      async (ritiro) => {
+        await disegna({
+          registrazione: registrazione(true, ritiro),
+          trascrizione: trascrizione(true, false),
+        });
+        expect(effetto()).toBe(`${r.withdraw[ritiro]} ${r.withdrawTranscript}`);
+      }
+    );
+
+    it('chi conduce non si sente dire delle tracce dove non ce ne sono', async () => {
+      await disegna({ registrazione: registrazione(true, 'conduce') });
+      expect(effetto()).toBe(r.withdraw.conduce);
+      await disegna({ registrazione: registrazione(false, 'conduce') });
+      expect(effetto()).toBe(r.without.conduce);
+    });
+
+    it('chi conduce le legge dove ci sono', async () => {
+      await disegna({
+        registrazione: registrazione(true, 'conduce'),
+        trascrizione: trascrizione(false, true),
+      });
+      expect(effetto()).toBe(`${r.withdraw.conduce} ${r.withdrawTranscriptHost}`);
+      await disegna({
+        registrazione: registrazione(false, 'conduce'),
+        trascrizione: trascrizione(false, true),
+      });
+      expect(effetto()).toBe(`${r.without.conduce} ${r.withoutTranscriptHost}`);
+    });
   });
 
   it("senza un video il ritiro dice cosa cambia, e non parla di un video che non c'e'", async () => {

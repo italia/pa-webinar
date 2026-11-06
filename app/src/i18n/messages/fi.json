@@ -691,6 +691,7 @@
           "voce": "Ilman tätä suostumusta osallistut kuten kaikki, mutta jäät tallenteen ulkopuolelle: ei nimeä, ääntä eikä kuvaa.",
           "comeTutti": "Ilman tätä suostumusta osallistut kuten kaikki."
         },
+        "withoutTranscriptHost": "Your voice is not kept in the per-person tracks or in the transcript.",
         "alreadyRecorded": "Jo tallennettu jää tapahtuman videoon: pyydä poistoa järjestäjiltä.",
         "withdraw": {
           "soloAscolto": "Jos peruutat sen, jäät huoneeseen vain kuuntelijaksi: mikrofoni, kamera ja näyttö suljetaan. Myös suostumuksesi puheenvuorojesi litterointiin peruutetaan.",
@@ -698,7 +699,9 @@
           "voce": "Jos peruutat sen, pysyt huoneessa kuten ennen ja olet nyt tallenteen ulkopuolella. Peruutat samalla suostumuksen puheenvuorojesi litterointiin.",
           "avvertenza": "Jos peruutat sen, pysyt huoneessa kuten ennen. Peruutat samalla suostumuksen puheenvuorojesi litterointiin. Jos saat puheenvuoron ja tapahtuma tallennetaan, äänesi on silti mukana videossa.",
           "assente": "Jos peruutat sen, pysyt huoneessa kuten ennen. Peruutat samalla suostumuksen puheenvuorojesi litterointiin. Tästä lähtien ääntäsi ei tallenneta omalle raidalleen."
-        }
+        },
+        "withdrawTranscript": "You also withdraw consent to transcribing your contributions.",
+        "withdrawTranscriptHost": "From now on your voice is not kept in the per-person tracks or in the transcript."
       },
       "transcription": {
         "title": "Puheenvuorojesi litterointi",
@@ -4502,7 +4505,8 @@
       "name": {
         "label": "Nimesi",
         "real": "Huoneessa, chatissa ja kysymyksissä näyt omalla nimelläsi.",
-        "pseudonym": "Huoneessa, chatissa ja kysymyksissä näyt salanimellä. Järjestäjät näkevät ilmoittautumistietosi. Jos annat suostumuksen litterointiin, nimesi jää siihen."
+        "pseudonym": "Huoneessa, chatissa ja kysymyksissä näyt salanimellä. Järjestäjät näkevät ilmoittautumistietosi. Jos annat suostumuksen litterointiin, nimesi jää siihen.",
+        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
       },
       "retention": {
         "label": "Säilytys",

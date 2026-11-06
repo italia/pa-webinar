@@ -691,6 +691,7 @@
           "voce": "Utan detta samtycke deltar du som alla andra, men står utanför inspelningen: varken namn, röst eller bild.",
           "comeTutti": "Utan detta samtycke deltar du som alla andra."
         },
+        "withoutTranscriptHost": "Your voice is not kept in the per-person tracks or in the transcript.",
         "alreadyRecorded": "Det som redan har spelats in finns kvar i evenemangets video: skriv till arrangörerna för att få det borttaget.",
         "withdraw": {
           "soloAscolto": "Om du återkallar det stannar du i rummet och lyssnar bara: mikrofon, kamera och skärm stängs. Ditt samtycke till transkription av dina inlägg återkallas också.",
@@ -698,7 +699,9 @@
           "voce": "Om du återkallar det är du kvar i rummet som förut, och från nu står du utanför inspelningen. Du återkallar också samtycket till utskrift av dina inlägg.",
           "avvertenza": "Om du återkallar det är du kvar i rummet som förut. Du återkallar också samtycket till transkription av dina inlägg. Om du får ordet och evenemanget spelas in finns din röst ändå kvar i videon.",
           "assente": "Om du återkallar det är du kvar i rummet som förut. Du återkallar också samtycket till transkription av dina inlägg. Från och med nu spelas din röst inte in på ett eget spår."
-        }
+        },
+        "withdrawTranscript": "You also withdraw consent to transcribing your contributions.",
+        "withdrawTranscriptHost": "From now on your voice is not kept in the per-person tracks or in the transcript."
       },
       "transcription": {
         "title": "Transkription av dina inlägg",
@@ -4502,7 +4505,8 @@
       "name": {
         "label": "Ditt namn",
         "real": "I rummet, i chatten och i frågorna visas du med ditt namn.",
-        "pseudonym": "I rummet, i chatten och i frågorna visas du under en pseudonym. Arrangörerna ser uppgifterna från din anmälan. Om du samtycker till transkriptionen står ditt namn kvar där."
+        "pseudonym": "I rummet, i chatten och i frågorna visas du under en pseudonym. Arrangörerna ser uppgifterna från din anmälan. Om du samtycker till transkriptionen står ditt namn kvar där.",
+        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
       },
       "retention": {
         "label": "Lagring",

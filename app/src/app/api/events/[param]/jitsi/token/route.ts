@@ -37,7 +37,7 @@ import { elencoVisibileAlPubblico } from '@/lib/live/participant-list';
 import { registraChiConduce } from '@/lib/live/entry-consents';
 import { pseudonimo } from '@/lib/live/pseudonym';
 import { guestSenderId } from '@/lib/chat/sender-key';
-import { recordingAvailable, voceNelVideo } from '@/lib/recording/availability';
+import { recordingAvailableFor, voceNelVideo } from '@/lib/recording/availability';
 import {
   consensoCopre,
   consensoOra,
@@ -415,7 +415,15 @@ export const POST = withErrorHandling(async (request, context) => {
   // token (lib/live/listen-only): chi entra per primo accende il blocco nella
   // sala (mod_pa_media_lock), con gli stessi tipi per tutti.
   const voce = voceNelVideo();
-  const regola = regolaConsenso(event, recordingAvailable(), voce);
+  const registrabile = recordingAvailableFor(event);
+  const regola = regolaConsenso(event, registrabile, voce);
+  // Le prove seguono la regola della rotta d'iscrizione: dove non si registra
+  // niente non c'e' un consenso da dare, nemmeno da una pagina aperta da prima.
+  const eventoConsensi = {
+    ...event,
+    recordingEnabled: event.recordingEnabled && registrabile,
+    multitrackRecordingEnabled: event.multitrackRecordingEnabled && registrabile,
+  };
   // La destinazione del testo in vigore: si confronta con i consensi, dati ora o
   // prima, e torna in ogni risposta, cosi' una pagina aperta da prima mostra il
   // testo giusto e non rimanda un consenso dato su quello vecchio. Dove non c'e'
@@ -468,7 +476,7 @@ export const POST = withErrorHandling(async (request, context) => {
     // con le regole di chi non ha acconsentito. Non conta dove chi organizza
     // dichiara chi conduce sempre nella registrazione: nessuna prova, perche'
     // nessuno ha spuntato niente.
-    const registraVideo = registraChiConduce(event, recordingAvailable());
+    const registraVideo = registraChiConduce(event, registrabile);
     // Un link e' un posto, non una persona: quello dato da un altro con lo
     // stesso link non si eredita.
     const replicaConduce = await provaDellaReplica(
@@ -494,7 +502,7 @@ export const POST = withErrorHandling(async (request, context) => {
       useGravatar: (await getSettings()).gravatarEnabled,
     });
     const consentsRecorded = await registraConsensi(
-      event,
+      eventoConsensi,
       {
         ...parsed.data,
         multitrackConsent:
@@ -587,7 +595,7 @@ export const POST = withErrorHandling(async (request, context) => {
         expiresInSeconds: 2 * 60 * 60,
       });
       const consentsRecorded = await registraConsensi(
-        event,
+        eventoConsensi,
         conVoce(parsed.data, mediaInoltro),
         { jitsiUserId: postoOspite, displayName: typedName },
         destinazione,
@@ -673,7 +681,7 @@ export const POST = withErrorHandling(async (request, context) => {
       useGravatar: conVolto && (await getSettings()).gravatarEnabled,
     });
     const consentsRecorded = await registraConsensi(
-      event,
+      eventoConsensi,
       conVoce(parsed.data, mediaIscritto),
       { jitsiUserId: postoIscritto, displayName: name, registrationId: registration.id },
       destinazione,
@@ -748,7 +756,7 @@ export const POST = withErrorHandling(async (request, context) => {
       expiresInSeconds: 2 * 60 * 60,
     });
     const consentsRecorded = await registraConsensi(
-      event,
+      eventoConsensi,
       conVoce(parsed.data, mediaOspite),
       { jitsiUserId: postoOspite, displayName: guestName },
       destinazione,

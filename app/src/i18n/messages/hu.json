@@ -691,6 +691,7 @@
           "voce": "E hozzájárulás nélkül ugyanúgy részt vesz, de kimarad a felvételből: sem a neve, sem a hangja, sem a képe nem szerepel.",
           "comeTutti": "E hozzájárulás nélkül ugyanúgy részt vesz, mint mindenki más."
         },
+        "withoutTranscriptHost": "Your voice is not kept in the per-person tracks or in the transcript.",
         "alreadyRecorded": "Ami már felvételre került, az az esemény videójában marad: az eltávolításért írjon a szervezőknek.",
         "withdraw": {
           "soloAscolto": "Ha visszavonja, a teremben marad, de csak hallgatóként: a mikrofon, a kamera és a képernyő bezárul. A hozzászólásai átiratához adott hozzájárulását is visszavonja.",
@@ -698,7 +699,9 @@
           "voce": "Ha visszavonja, ugyanúgy a teremben marad, de mostantól kimarad a felvételből. A hozzászólásai átiratához adott hozzájárulást is visszavonja.",
           "avvertenza": "Ha visszavonja, ugyanúgy a teremben marad. A hozzászólásai átiratához adott hozzájárulást is visszavonja. Ha szót kap, és az eseményt rögzítik, a hangja a videóban így is benne marad.",
           "assente": "Ha visszavonja, ugyanúgy a teremben marad. A hozzászólásai átiratához adott hozzájárulást is visszavonja. Mostantól a hangját nem rögzítjük külön sávon."
-        }
+        },
+        "withdrawTranscript": "You also withdraw consent to transcribing your contributions.",
+        "withdrawTranscriptHost": "From now on your voice is not kept in the per-person tracks or in the transcript."
       },
       "transcription": {
         "title": "A hozzászólásai átirata",
@@ -4502,7 +4505,8 @@
       "name": {
         "label": "Az Ön neve",
         "real": "A teremben, a csevegésben és a kérdéseknél a saját nevén jelenik meg.",
-        "pseudonym": "A teremben, a csevegésben és a kérdéseknél álnéven jelenik meg. A szervezők látják a regisztrációs adatait. Ha hozzájárul az átirathoz, ott a neve megmarad."
+        "pseudonym": "A teremben, a csevegésben és a kérdéseknél álnéven jelenik meg. A szervezők látják a regisztrációs adatait. Ha hozzájárul az átirathoz, ott a neve megmarad.",
+        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
       },
       "retention": {
         "label": "Megőrzés",

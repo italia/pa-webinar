@@ -691,6 +691,7 @@
           "voce": "Bez šīs piekrišanas jūs piedalāties kā visi, bet paliekat ārpus ieraksta: ne vārds, ne balss, ne attēls.",
           "comeTutti": "Bez šīs piekrišanas jūs piedalāties kā visi."
         },
+        "withoutTranscriptHost": "Your voice is not kept in the per-person tracks or in the transcript.",
         "alreadyRecorded": "Tas, kas jau ierakstīts, paliek pasākuma video: lai to izņemtu, rakstiet organizatoriem.",
         "withdraw": {
           "soloAscolto": "Ja to atsaucat, paliekat telpā tikai kā klausītājs: mikrofons, kamera un ekrāns tiek aizvērti. Tiek atsaukta arī piekrišana jūsu runas atšifrēšanai.",
@@ -698,7 +699,9 @@
           "voce": "Ja atsaucat, paliekat telpā kā iepriekš, un no šī brīža esat ārpus ieraksta. Atsaucat arī piekrišanu savu uzstāšanos transkripcijai.",
           "avvertenza": "Ja atsaucat, paliekat telpā kā iepriekš. Atsaucat arī piekrišanu savu uzstāšanos atšifrēšanai. Ja jums dod vārdu un pasākums tiek ierakstīts, jūsu balss tomēr paliek video.",
           "assente": "Ja atsaucat, paliekat telpā kā iepriekš. Atsaucat arī piekrišanu savu uzstāšanos atšifrēšanai. No šī brīža jūsu balss netiek ierakstīta atsevišķā celiņā."
-        }
+        },
+        "withdrawTranscript": "You also withdraw consent to transcribing your contributions.",
+        "withdrawTranscriptHost": "From now on your voice is not kept in the per-person tracks or in the transcript."
       },
       "transcription": {
         "title": "Jūsu runas atšifrēšana",
@@ -4502,7 +4505,8 @@
       "name": {
         "label": "Jūsu vārds",
         "real": "Telpā, tērzēšanā un jautājumos jūs parādāties ar savu vārdu.",
-        "pseudonym": "Telpā, tērzēšanā un jautājumos jūs parādāties ar pseidonīmu. Organizatori redz reģistrācijas datus. Ja piekrītat atšifrēšanai, tur paliek jūsu vārds."
+        "pseudonym": "Telpā, tērzēšanā un jautājumos jūs parādāties ar pseidonīmu. Organizatori redz reģistrācijas datus. Ja piekrītat atšifrēšanai, tur paliek jūsu vārds.",
+        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
       },
       "retention": {
         "label": "Glabāšana",

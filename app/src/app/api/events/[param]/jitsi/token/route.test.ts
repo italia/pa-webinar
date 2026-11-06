@@ -114,6 +114,7 @@ type EventOverrides = Partial<{
   audienceAnonymous: boolean;
   recordingDestination: 'PUBLIC' | 'REGISTRANTS' | null;
   aiTranscriptEnabled: boolean;
+  captionsTranscriptEnabled: boolean;
 }>;
 
 function eventRow(overrides: EventOverrides = {}) {
@@ -136,6 +137,7 @@ function eventRow(overrides: EventOverrides = {}) {
     hostsAlwaysRecorded: false,
     recordingDestination: null,
     aiTranscriptEnabled: false,
+    captionsTranscriptEnabled: false,
     ...overrides,
   };
 }
@@ -1386,7 +1388,11 @@ describe('POST jitsi/token — il testo del consenso e la destinazione del video
     beforeEach(() => {
       vi.stubEnv('JITSI_WEB_INTERNAL_URL', 'http://jitsi-web');
       vi.stubEnv('RECORDER_CONTROLLER_URL', 'http://recorder');
-      conEvento({ recordingDestination: 'REGISTRANTS' });
+      conEvento({
+        recordingDestination: 'REGISTRANTS',
+        multitrackRecordingEnabled: true,
+        aiTranscriptEnabled: true,
+      });
     });
 
     it('il testo non dichiara una destinazione, mai la colonna dell evento', async () => {
@@ -1398,10 +1404,88 @@ describe('POST jitsi/token — il testo del consenso e la destinazione del video
       expect(riga()).toMatchObject({ destination: null, textVersion: null });
     });
 
+    it('chi conduce: con le tracce la trascrizione la aspetta', async () => {
+      const { body } = await minted(
+        await post({
+          moderatorToken: PRIMARY_TOKEN,
+          displayNameOverride: 'Relatore 1',
+          multitrackConsent: true,
+        }),
+      );
+      expect(body.consentsRecorded?.multitrack).toBe(false);
+    });
+
     it('il consenso dato all iscrizione senza destinazione copre', async () => {
       await iscritto({ consentRecording: true, consentRecordingDestination: null });
       const { body } = await minted(await post({ accessToken: ACCESS_TOKEN }));
       expect(body.voiceExcluded).toBe(false);
+    });
+
+    describe('e nemmeno le tracce: non si registra niente', () => {
+      const senzaTracce = { recordingDestination: 'REGISTRANTS', multitrackRecordingEnabled: true } as const;
+      const nessunaProva = () => {
+        expect(prisma.recordingConsent.createMany).not.toHaveBeenCalled();
+        expect(prisma.multitrackConsent.create).not.toHaveBeenCalled();
+      };
+      afterEach(() => {
+        staffSeat.valore = null;
+      });
+
+      it('un clic da una pagina aperta da prima non lascia prove', async () => {
+        conEvento(senzaTracce);
+        const { body } = await minted(
+          await post({
+            guestName: 'Ospite',
+            recordingConsent: true,
+            recordingConsentDestination: null,
+            multitrackConsent: true,
+          }),
+        );
+        expect(body.consentsRecorded).toEqual({ recording: false, multitrack: false });
+        expect(body.consentsInForce?.recording).toBe(false);
+        nessunaProva();
+      });
+
+      it('nemmeno quello di chi conduce', async () => {
+        conEvento(senzaTracce);
+        const { body } = await minted(
+          await post({
+            moderatorToken: PRIMARY_TOKEN,
+            displayNameOverride: 'Relatore 1',
+            recordingConsent: true,
+            recordingConsentDestination: null,
+            multitrackConsent: true,
+          }),
+        );
+        expect(body.consentsRecorded).toEqual({ recording: false, multitrack: false });
+        nessunaProva();
+      });
+
+      it('una replica non porta la prova della registrazione sul posto nuovo', async () => {
+        conEvento(senzaTracce);
+        staffSeat.valore = { accountId: 'acc-1', nome: 'Ada Rossi' };
+        vi.mocked(prisma.recordingConsent.findMany).mockResolvedValueOnce([
+          { consentedAt: new Date(), locale: 'it', destination: null, textVersion: null },
+        ] as never);
+        const { body } = await minted(
+          await post({ moderatorToken: PRIMARY_TOKEN, consentReplay: { recording: true } }),
+        );
+        expect(body.consentsRecorded?.recording).toBe(false);
+        nessunaProva();
+      });
+
+      it('chi conduce: con i sottotitoli conservati la trascrizione non aspetta la registrazione', async () => {
+        vi.stubEnv('CAPTIONS_STATUS_URL', 'http://captions');
+        conEvento({ recordingDestination: 'REGISTRANTS', captionsTranscriptEnabled: true });
+        const { body } = await minted(
+          await post({
+            moderatorToken: PRIMARY_TOKEN,
+            displayNameOverride: 'Relatore 1',
+            multitrackConsent: true,
+          }),
+        );
+        expect(body.consentsRecorded?.multitrack).toBe(true);
+      });
     });
   });
 

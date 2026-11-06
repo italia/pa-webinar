@@ -48,6 +48,14 @@ describe('resolveWaitingRoomMode', () => {
     ).toBe('CLASSIC');
   });
 
+  it('dove il pubblico e\' anonimo la piazza non c\'e\', nemmeno con il parametro', () => {
+    for (const urlEngine of ['phaser', 'svg', null]) {
+      expect(
+        resolveWaitingRoomMode({ ...base, configured: 'GAME', urlEngine, pubblicoAnonimo: true }),
+      ).toBe('CLASSIC');
+    }
+  });
+
   it('un urlEngine sconosciuto viene ignorato (fallback al configurato)', () => {
     expect(resolveWaitingRoomMode({ ...base, configured: 'GAME', urlEngine: 'xyz' })).toBe(
       'GAME',

@@ -375,7 +375,9 @@ export default function WaitingRoom({
   const [nomeNoto, setNomeNoto] = useState(false);
   // Full-screen park (default) vs. static classic card (accessibility
   // fallback). Initialised false to match SSR, then synced from storage.
-  const [classicView, setClassicView] = useState(false);
+  // Dove il pubblico e' anonimo si parte senza piazza: un solo render con la
+  // piazza manderebbe il nome a garden/ping.
+  const [classicView, setClassicView] = useState(!!event.audienceAnonymous);
   // La piazza si apre su richiesta: vedi il commento su piazzaCard.
   const [gameOpen, setGameOpen] = useState(false);
   // La chat dell'evento vista dalla piazza (fumetti, puntini, correzioni):
@@ -470,6 +472,7 @@ export default function WaitingRoom({
           window.matchMedia?.('(pointer: coarse) and (max-width: 768px)')?.matches ??
           false,
         classicPref: window.localStorage.getItem(ARCADE_CLASSIC_KEY) === '1',
+        pubblicoAnonimo: !!event.audienceAnonymous,
       });
       // Con un solo gameplay, GARDEN e GAME significano entrambi "la piazza è
       // disponibile"; CLASSIC resta l'uscita di sicurezza per telefoni e per chi
@@ -478,7 +481,7 @@ export default function WaitingRoom({
     } catch {
       /* ignore */
     }
-  }, [event.waitingRoomEngine]);
+  }, [event.waitingRoomEngine, event.audienceAnonymous]);
 
   const startsAtMs = new Date(event.startsAt).getTime();
   const endsAtMs = new Date(event.endsAt).getTime();
@@ -2088,8 +2091,9 @@ export default function WaitingRoom({
                   </div>
                 )}
                 {/* La foto al posto delle iniziali: solo per chi ha un'email
-                    dietro al token (lo dice il server). */}
-                {!isEnded && chatToken && (
+                    dietro al token (lo dice il server), e mai dove il pubblico e'
+                    anonimo, perche' in sala non si vedrebbe. */}
+                {!isEnded && chatToken && !event.audienceAnonymous && (
                   <ProfilePhotoField eventSlug={event.slug} token={chatToken} name={name} />
                 )}
                 {!isEnded && <div className="mb-4">{deviceCheckField}</div>}
@@ -2151,7 +2155,7 @@ export default function WaitingRoom({
 
                 {/* Re-show the game box after it was hidden (accessibility /
                     touch default). Only when the game is actually available. */}
-                {!isEnded && classicView && (
+                {!isEnded && classicView && !event.audienceAnonymous && (
                   <div className="text-center mb-3">
                     <Button
                       color="primary"
