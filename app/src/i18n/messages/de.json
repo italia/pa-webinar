@@ -4068,6 +4068,7 @@
     "timeLabel": "Uhrzeit",
     "durationLabel": "Dauer",
     "addressBookNote": "Sie stehen im Veranstaltungs-Adressbuch, um zu ähnlichen Veranstaltungen eingeladen zu werden: Sie können Ihre Einwilligung jederzeit widerrufen.",
+    "addressBookPendingNote": "Bei dieser Anmeldung wurde das Kästchen für das Veranstaltungs-Adressbuch angekreuzt, aber diese Adresse hatte keine Einladungen mehr erhalten. Wenn die Anfrage von Ihnen stammt, können Sie sie auf der Seite mit Ihren Daten über den Link unten bestätigen. Andernfalls ignorieren Sie diese Nachricht: Sie bleiben außerhalb des Adressbuchs und erhalten keine Einladungen.",
     "addressBookOptOutLink": "Meine Daten aus dem Adressbuch entfernen",
     "myDataLink": "Ihre Daten: einsehen, berichtigen, eine Einwilligung widerrufen oder die Anmeldung löschen"
   },
@@ -4577,7 +4578,8 @@
       "addressBookPendingBody": "Bei dieser Anmeldung wurde das Kästchen für das Adressbuch angekreuzt, aber diese Adresse hatte keine Einladungen mehr erhalten. Solange Sie nicht bestätigen, ändert sich nichts.",
       "addressBookPendingEffect": "Wenn Sie bestätigen, kehren Sie mit dem Namen und der Organisation dieser Anmeldung ins Adressbuch zurück und erhalten wieder Einladungen. Wenn Sie abbrechen oder wenn Sie es nicht waren, bleiben Sie außerhalb des Adressbuchs und erhalten keine Einladungen.",
       "addressBookPendingConfirm": "Rückkehr bestätigen",
-      "addressBookPendingCancel": "Anfrage abbrechen"
+      "addressBookPendingCancel": "Anfrage abbrechen",
+      "addressBookPendingGone": "This request is no longer waiting. Reload the page to see the current state."
     },
     "erasure": {
       "title": "Löschung Ihrer Daten",

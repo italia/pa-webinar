@@ -323,6 +323,32 @@ describe('ritiraComunicazioni', () => {
     });
   });
 
+  it('la spunta in attesa annullata lascia una riga nel registro', async () => {
+    tx.registration.findMany.mockResolvedValue([
+      { eventId: 'e1', consentFutureCommunications: false, addressBookPending: true },
+      { eventId: 'e2', consentFutureCommunications: true, addressBookPending: false },
+    ]);
+    tx.person.updateMany.mockResolvedValue({ count: 0 });
+    expect(await ritiraComunicazioni('impronta', ADESSO)).toBe(true);
+    expect(tx.registration.findMany.mock.calls[0]![0].where).toEqual({
+      emailHash: 'impronta',
+      OR: [{ consentFutureCommunications: true }, { addressBookPending: true }],
+    });
+    const righe = tx.gdprAuditLog.createMany.mock.calls[0]![0].data as {
+      eventId: string;
+      action: string;
+      details: string;
+    }[];
+    expect(righe.map((r) => [r.eventId, r.action, JSON.parse(r.details)])).toEqual([
+      [
+        'e1',
+        'CONSENT_WITHDRAWN',
+        { source: 'self-service', futureCommunications: 0, addressBookPending: 1 },
+      ],
+      ['e2', 'CONSENT_WITHDRAWN', { source: 'self-service', futureCommunications: 1 }],
+    ]);
+  });
+
   it('senza consenso da ritirare non scrive niente nel registro', async () => {
     tx.registration.findMany.mockResolvedValue([]);
     tx.person.updateMany.mockResolvedValue({ count: 0 });

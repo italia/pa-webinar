@@ -4068,6 +4068,7 @@
     "timeLabel": "Time",
     "durationLabel": "Duration",
     "addressBookNote": "You are in the events address book, to be invited to similar events: you can withdraw your consent at any time.",
+    "addressBookPendingNote": "The events address book box was ticked on this registration, but this address had stopped receiving invitations. If the request is yours, you can confirm it from the page with your data, using the link below. If it is not, ignore this message: you stay out of the address book and receive no invitations.",
     "addressBookOptOutLink": "Remove me from the address book",
     "myDataLink": "Your data: see it, correct it, withdraw a consent or cancel your registration"
   },
@@ -4577,7 +4578,8 @@
       "addressBookPendingBody": "The address book box was ticked on this registration, but this address had stopped receiving invitations. Nothing changes until you confirm.",
       "addressBookPendingEffect": "If you confirm, you return to the address book with the name and organisation of this registration and receive invitations again. If you cancel, or if it was not you, you stay out of the address book and receive no invitations.",
       "addressBookPendingConfirm": "Confirm my return",
-      "addressBookPendingCancel": "Cancel the request"
+      "addressBookPendingCancel": "Cancel the request",
+      "addressBookPendingGone": "This request is no longer waiting. Reload the page to see the current state."
     },
     "erasure": {
       "title": "Erase your data",

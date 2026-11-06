@@ -4068,6 +4068,7 @@
     "timeLabel": "Hora",
     "durationLabel": "Duração",
     "addressBookNote": "Está na agenda de eventos, para ser convidado para eventos semelhantes: pode retirar o consentimento a qualquer momento.",
+    "addressBookPendingNote": "The events address book box was ticked on this registration, but this address had stopped receiving invitations. If the request is yours, you can confirm it from the page with your data, using the link below. If it is not, ignore this message: you stay out of the address book and receive no invitations.",
     "addressBookOptOutLink": "Remover os meus dados da agenda",
     "myDataLink": "Os seus dados: consultá-los, corrigi-los, retirar um consentimento ou cancelar a inscrição"
   },
@@ -4577,7 +4578,8 @@
       "addressBookPendingBody": "Nesta inscrição foi assinalada a caixa da agenda, mas este endereço tinha deixado de receber convites. Até confirmar, nada muda.",
       "addressBookPendingEffect": "Se confirmar, regressa à agenda com o nome e o organismo desta inscrição e volta a receber convites. Se cancelar, ou se não tiver sido você, fica fora da agenda e não recebe convites.",
       "addressBookPendingConfirm": "Confirmar o regresso",
-      "addressBookPendingCancel": "Cancelar o pedido"
+      "addressBookPendingCancel": "Cancelar o pedido",
+      "addressBookPendingGone": "This request is no longer waiting. Reload the page to see the current state."
     },
     "erasure": {
       "title": "Eliminação dos seus dados",

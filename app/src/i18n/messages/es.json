@@ -4068,6 +4068,7 @@
     "timeLabel": "Hora",
     "durationLabel": "Duración",
     "addressBookNote": "Está en la Agenda de eventos, para recibir invitaciones a eventos similares: puede revocar su consentimiento en cualquier momento.",
+    "addressBookPendingNote": "En esta inscripción se marcó la casilla de la Agenda de eventos, pero esta dirección había dejado de recibir invitaciones. Si la solicitud es suya, puede confirmarla desde la página de sus datos, con el enlace de abajo. Si no lo es, ignore este mensaje: sigue fuera de la agenda y no recibe invitaciones.",
     "addressBookOptOutLink": "Eliminar mis datos de la agenda",
     "myDataLink": "Tus datos: verlos, corregirlos, retirar un consentimiento o cancelar la inscripción"
   },
@@ -4577,7 +4578,8 @@
       "addressBookPendingBody": "En esta inscripción se marcó la casilla de la agenda, pero esta dirección había dejado de recibir invitaciones. Hasta que confirmes no cambia nada.",
       "addressBookPendingEffect": "Si confirmas, vuelves a la agenda con el nombre y el organismo de esta inscripción y recibes de nuevo las invitaciones. Si cancelas, o si no has sido tú, sigues fuera de la agenda y no recibes invitaciones.",
       "addressBookPendingConfirm": "Confirmar mi regreso",
-      "addressBookPendingCancel": "Cancelar la solicitud"
+      "addressBookPendingCancel": "Cancelar la solicitud",
+      "addressBookPendingGone": "This request is no longer waiting. Reload the page to see the current state."
     },
     "erasure": {
       "title": "Supresión de sus datos",

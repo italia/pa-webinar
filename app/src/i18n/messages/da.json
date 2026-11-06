@@ -4068,6 +4068,7 @@
     "timeLabel": "Klokkeslæt",
     "durationLabel": "Varighed",
     "addressBookNote": "Du er i arrangementsadressebogen for at blive inviteret til lignende arrangementer: du kan til enhver tid trække dit samtykke tilbage.",
+    "addressBookPendingNote": "The events address book box was ticked on this registration, but this address had stopped receiving invitations. If the request is yours, you can confirm it from the page with your data, using the link below. If it is not, ignore this message: you stay out of the address book and receive no invitations.",
     "addressBookOptOutLink": "Fjern mine data fra adressebogen",
     "myDataLink": "Dine data: se dem, ret dem, træk et samtykke tilbage eller annullér tilmeldingen"
   },
@@ -4577,7 +4578,8 @@
       "addressBookPendingBody": "Afkrydsningsfeltet til adressebogen blev markeret på denne tilmelding, men denne adresse var holdt op med at modtage invitationer. Intet ændrer sig, før du bekræfter.",
       "addressBookPendingEffect": "Hvis du bekræfter, kommer du tilbage i adressebogen med navnet og organisationen fra denne tilmelding og modtager invitationer igen. Hvis du annullerer, eller hvis det ikke var dig, forbliver du uden for adressebogen og modtager ingen invitationer.",
       "addressBookPendingConfirm": "Bekræft min tilbagevenden",
-      "addressBookPendingCancel": "Annuller anmodningen"
+      "addressBookPendingCancel": "Annuller anmodningen",
+      "addressBookPendingGone": "This request is no longer waiting. Reload the page to see the current state."
     },
     "erasure": {
       "title": "Sletning af dine data",

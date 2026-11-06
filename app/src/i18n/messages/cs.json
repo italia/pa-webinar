@@ -4068,6 +4068,7 @@
     "timeLabel": "Čas",
     "durationLabel": "Délka trvání",
     "addressBookNote": "Jste v adresáři událostí, abyste byli zváni na podobné akce: souhlas můžete kdykoli odvolat.",
+    "addressBookPendingNote": "The events address book box was ticked on this registration, but this address had stopped receiving invitations. If the request is yours, you can confirm it from the page with your data, using the link below. If it is not, ignore this message: you stay out of the address book and receive no invitations.",
     "addressBookOptOutLink": "Odebrat mé údaje z adresáře",
     "myDataLink": "Vaše údaje: zobrazit, opravit, odvolat souhlas nebo zrušit registraci"
   },
@@ -4577,7 +4578,8 @@
       "addressBookPendingBody": "U této registrace bylo zaškrtnuto políčko adresáře, ale tato adresa přestala dostávat pozvánky. Dokud nepotvrdíte, nic se nezmění.",
       "addressBookPendingEffect": "Pokud potvrdíte, vrátíte se do adresáře se jménem a organizací z této registrace a budete znovu dostávat pozvánky. Pokud zrušíte nebo pokud jste to nebyli vy, zůstanete mimo adresář a pozvánky dostávat nebudete.",
       "addressBookPendingConfirm": "Potvrdit návrat",
-      "addressBookPendingCancel": "Zrušit žádost"
+      "addressBookPendingCancel": "Zrušit žádost",
+      "addressBookPendingGone": "This request is no longer waiting. Reload the page to see the current state."
     },
     "erasure": {
       "title": "Výmaz vašich údajů",

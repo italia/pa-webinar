@@ -38,6 +38,8 @@ export default function RegistrationConsents({
   voce = 'rimovibile',
   comunicazioniRitirateIl = null,
   onComunicazioniRitirate,
+  rubricaConfermata = false,
+  onRubricaConfermata,
 }: {
   voce?: VoceNelVideo;
   token: string;
@@ -47,21 +49,33 @@ export default function RegistrationConsents({
    *  chi ospita le schede lo riporta su ciascuna. */
   comunicazioniRitirateIl?: string | null;
   onComunicazioniRitirate?: (quando: string) => void;
+  /** Anche la conferma vale per l'indirizzo: chiude ogni spunta in attesa, e chi
+   *  ospita le schede lo riporta su ciascuna. */
+  rubricaConfermata?: boolean;
+  onRubricaConfermata?: () => void;
 }) {
   const t = useTranslations('gdpr.export');
   const tl = useTranslations('live.consents');
   const tc = useTranslations('common');
   const format = useFormatter();
   const [statiLocali, setStati] = useState(consensi);
+  const dopoConferma: ConsensiVista =
+    rubricaConfermata && statiLocali.addressBookPending
+      ? {
+          ...statiLocali,
+          addressBookPending: false,
+          futureCommunications: { dato: true, ritiratoIl: null },
+        }
+      : statiLocali;
   const stati: ConsensiVista = comunicazioniRitirateIl
     ? {
-        ...statiLocali,
+        ...dopoConferma,
         addressBookPending: false,
-        ...(statiLocali.futureCommunications?.dato
+        ...(dopoConferma.futureCommunications?.dato
           ? { futureCommunications: { dato: false, ritiratoIl: comunicazioniRitirateIl } }
           : {}),
       }
-    : statiLocali;
+    : dopoConferma;
   const [conferma, setConferma] = useState<Chiave | null>(null);
   const [inCorso, setInCorso] = useState(false);
   const [errore, setErrore] = useState<string | null>(null);
@@ -89,9 +103,13 @@ export default function RegistrationConsents({
       },
     ];
   const visibili = voci.filter((v) => stati[v.chiave] !== null);
-  if (visibili.length === 0 && !stati.addressBookPending) return null;
+  if (visibili.length === 0 && !stati.addressBookPending && !errore) return null;
 
-  const invia = async (azione: Record<string, unknown>, fatto: () => void) => {
+  const invia = async (
+    azione: Record<string, unknown>,
+    fatto: () => void,
+    nonTrovato?: () => void
+  ) => {
     setInCorso(true);
     setErrore(null);
     try {
@@ -103,6 +121,7 @@ export default function RegistrationConsents({
       // Il token dura un'ora: riprovare non serve, ci vuole un link nuovo.
       if (res.status === 401) return setErrore(t('linkInvalid'));
       if (res.status === 429) return setErrore(t('rateLimited'));
+      if (res.status === 404 && nonTrovato) return nonTrovato();
       if (!res.ok) return setErrore(tl('error'));
       fatto();
     } catch {
@@ -130,13 +149,23 @@ export default function RegistrationConsents({
     });
 
   const confermaRubrica = () =>
-    invia({ confirmAddressBook: true }, () => {
-      setStati((prima) => ({
-        ...prima,
-        addressBookPending: false,
-        futureCommunications: { dato: true, ritiratoIl: null },
-      }));
-    });
+    invia(
+      { confirmAddressBook: true },
+      () => {
+        setStati((prima) => ({
+          ...prima,
+          addressBookPending: false,
+          futureCommunications: { dato: true, ritiratoIl: null },
+        }));
+        onRubricaConfermata?.();
+      },
+      // Una pagina rimasta aperta: la spunta non aspetta piu', perche' confermata
+      // altrove o tolta dove la rubrica non si propone. I pulsanti non servono piu'.
+      () => {
+        setStati((prima) => ({ ...prima, addressBookPending: false }));
+        setErrore(t('addressBookPendingGone'));
+      }
+    );
 
   return (
     <section className="mb-3" aria-label={tl('title')}>

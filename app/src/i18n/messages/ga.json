@@ -4068,6 +4068,7 @@
     "timeLabel": "Am",
     "durationLabel": "Fad",
     "addressBookNote": "Tá tú i leabhar seoltaí na n-imeachtaí, chun cuireadh a fháil chuig imeachtaí comhchosúla: is féidir leat do thoiliú a tharraingt siar am ar bith.",
+    "addressBookPendingNote": "The events address book box was ticked on this registration, but this address had stopped receiving invitations. If the request is yours, you can confirm it from the page with your data, using the link below. If it is not, ignore this message: you stay out of the address book and receive no invitations.",
     "addressBookOptOutLink": "Bain mo shonraí den leabhar seoltaí",
     "myDataLink": "Do shonraí: iad a fheiceáil, a cheartú, toiliú a tharraingt siar nó do chlárú a chealú"
   },
@@ -4577,7 +4578,8 @@
       "addressBookPendingBody": "Ticeáladh bosca an leabhair seoltaí ar an gclárú seo, ach bhí deireadh curtha ag an seoladh seo le cuirí a fháil. Ní athróidh aon rud go dtí go ndeimhníonn tú.",
       "addressBookPendingEffect": "Má dheimhníonn tú, fillfidh tú ar an leabhar seoltaí le hainm agus eagraíocht an chláraithe seo agus gheobhaidh tú cuirí arís. Má chuireann tú ar ceal, nó murarbh tusa a rinne é, fanfaidh tú lasmuigh den leabhar seoltaí agus ní bhfaighidh tú cuirí.",
       "addressBookPendingConfirm": "Deimhnigh m'fhilleadh",
-      "addressBookPendingCancel": "Cuir an t-iarratas ar ceal"
+      "addressBookPendingCancel": "Cuir an t-iarratas ar ceal",
+      "addressBookPendingGone": "This request is no longer waiting. Reload the page to see the current state."
     },
     "erasure": {
       "title": "Scriosadh bhur gcuid sonraí",

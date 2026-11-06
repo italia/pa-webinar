@@ -4068,6 +4068,7 @@
     "timeLabel": "Tid",
     "durationLabel": "Längd",
     "addressBookNote": "Du finns i evenemangsadressboken för att bjudas in till liknande evenemang: du kan när som helst återkalla ditt samtycke.",
+    "addressBookPendingNote": "The events address book box was ticked on this registration, but this address had stopped receiving invitations. If the request is yours, you can confirm it from the page with your data, using the link below. If it is not, ignore this message: you stay out of the address book and receive no invitations.",
     "addressBookOptOutLink": "Ta bort mina uppgifter från adressboken",
     "myDataLink": "Dina uppgifter: se dem, rätta dem, återkalla ett samtycke eller avbryt anmälan"
   },
@@ -4577,7 +4578,8 @@
       "addressBookPendingBody": "Rutan för adressboken kryssades i på den här anmälan, men den här adressen hade slutat ta emot inbjudningar. Inget ändras förrän du bekräftar.",
       "addressBookPendingEffect": "Om du bekräftar kommer du tillbaka till adressboken med namnet och organisationen från den här anmälan och får inbjudningar igen. Om du avbryter, eller om det inte var du, stannar du utanför adressboken och får inga inbjudningar.",
       "addressBookPendingConfirm": "Bekräfta min återkomst",
-      "addressBookPendingCancel": "Avbryt begäran"
+      "addressBookPendingCancel": "Avbryt begäran",
+      "addressBookPendingGone": "This request is no longer waiting. Reload the page to see the current state."
     },
     "erasure": {
       "title": "Radering av dina uppgifter",

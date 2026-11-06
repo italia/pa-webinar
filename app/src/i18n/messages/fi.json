@@ -4068,6 +4068,7 @@
     "timeLabel": "Aika",
     "durationLabel": "Kesto",
     "addressBookNote": "Olet tapahtumien osoitekirjassa, jotta sinut voidaan kutsua vastaaviin tapahtumiin: voit peruuttaa suostumuksesi milloin tahansa.",
+    "addressBookPendingNote": "The events address book box was ticked on this registration, but this address had stopped receiving invitations. If the request is yours, you can confirm it from the page with your data, using the link below. If it is not, ignore this message: you stay out of the address book and receive no invitations.",
     "addressBookOptOutLink": "Poista tietoni osoitekirjasta",
     "myDataLink": "Tietosi: tarkastele, korjaa, peruuta suostumus tai peru ilmoittautuminen"
   },
@@ -4577,7 +4578,8 @@
       "addressBookPendingBody": "Tässä ilmoittautumisessa valittiin osoitekirjan valintaruutu, mutta tämä osoite oli lakannut saamasta kutsuja. Mikään ei muutu, ennen kuin vahvistat.",
       "addressBookPendingEffect": "Jos vahvistat, palaat osoitekirjaan tämän ilmoittautumisen nimellä ja organisaatiolla ja saat taas kutsuja. Jos peruutat tai jos se et ollut sinä, pysyt osoitekirjan ulkopuolella etkä saa kutsuja.",
       "addressBookPendingConfirm": "Vahvista paluu",
-      "addressBookPendingCancel": "Peruuta pyyntö"
+      "addressBookPendingCancel": "Peruuta pyyntö",
+      "addressBookPendingGone": "This request is no longer waiting. Reload the page to see the current state."
     },
     "erasure": {
       "title": "Tietojesi poistaminen",

@@ -14,7 +14,10 @@ import type { Prisma } from '@prisma/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { POST as aggiungiInvito } from '@/app/api/admin/events/[id]/invitations/route';
-import { PATCH as cambiaInvito } from '@/app/api/admin/events/[id]/invitations/[invId]/route';
+import {
+  DELETE as cancellaInvito,
+  PATCH as cambiaInvito,
+} from '@/app/api/admin/events/[id]/invitations/[invId]/route';
 import { GET as conservazione } from '@/app/api/cron/rubrica-retention/route';
 import { GET as apriLink } from '@/app/api/events/[param]/registrations/enter/route';
 import { POST as iscrivi } from '@/app/api/events/[param]/registrations/route';
@@ -23,7 +26,7 @@ import {
   GET as linkRubrica,
   POST as ritiroDalLink,
 } from '@/app/api/rubrica/opt-out/route';
-import { encryptPII, hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
+import { decryptPII, encryptPII, hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { sendInvitations } from '@/lib/email/invitation';
 import { eventAccessCookieName, signEventAccess } from '@/lib/event-session';
@@ -35,6 +38,7 @@ import { issueGdprToken } from '@/lib/gdpr/request-token';
 import { ritiraComunicazioni } from '@/lib/live/consent-withdrawal';
 import { upsertPersonOnRegistration } from '@/lib/persons';
 import { issueRubricaOptOutToken } from '@/lib/persons/opt-out-token';
+import { invalidateSettingsCache } from '@/lib/settings';
 
 import { biscotti } from './biscotti';
 import { creaEvento, richiesta, svuotaDatabase } from './fixtures';
@@ -113,6 +117,16 @@ function apri(slug: string, query: Record<string, string>) {
   );
 }
 
+/** I dettagli delle righe di registro che dicono che una spunta e' stata tolta. */
+async function righeSpuntaTolta(eventId: string) {
+  const righe = await prisma.gdprAuditLog.findMany({
+    where: { eventId, action: 'CONSENT_WITHDRAWN' },
+  });
+  return righe
+    .map((r) => JSON.parse(r.details ?? '{}') as Record<string, unknown>)
+    .filter((d) => d.addressBookPending === 1);
+}
+
 /** Il browser che porta il cookie di quell'iscrizione. */
 async function browserDi(eventId: string, accessToken: string) {
   biscotti.set(
@@ -148,6 +162,20 @@ const iscrizione = (eventId: string, emailHash: string) =>
 
 const invitiFermi = (emailHash: string) =>
   prisma.eventInvitation.count({ where: { emailHash, declinedAt: { not: null } } });
+
+/** Le email di conferma accodate, in chiaro. */
+const conferme = async () =>
+  (await prisma.emailOutbox.findMany({ orderBy: { createdAt: 'asc' } }))
+    .filter((r) => (r.metadata as { kind?: string } | null)?.kind === 'confirmation')
+    .map((r) => decryptPII(r.text ?? ''));
+
+/** I destinatari delle email di un invito ancora in tabella, con lo stato. */
+const emailInviti = async () =>
+  (
+    await prisma.emailOutbox.findMany({
+      where: { dedupKey: { startsWith: 'event-invitation:' } },
+    })
+  ).map((r) => [decryptPII(r.toAddress), r.status]);
 
 beforeEach(async () => {
   vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://webinar.example.org');
@@ -541,6 +569,356 @@ describe('il link della rubrica con una spunta in attesa', () => {
   });
 });
 
+describe('l’email di conferma dice della spunta in attesa', () => {
+  const NOTA = 'addressBookPendingNote';
+
+  it('su invito: la risposta resta uguale per tutti, e il paragrafo sta nell’email', async () => {
+    const persona = await ritirata();
+    const senzaSpunta = `${randomUUID()}@example.org`;
+    const evento = persona.riservato;
+    await prisma.eventInvitation.create({
+      data: {
+        eventId: evento.id,
+        email: encryptPII(senzaSpunta),
+        emailHash: hashEmail(senzaSpunta),
+      },
+    });
+
+    const conAttesa = await iscriviti(evento.slug, persona.email, spunta);
+    const normale = await iscriviti(evento.slug, senzaSpunta);
+
+    expect(conAttesa.status).toBe(normale.status);
+    expect(await conAttesa.json()).toEqual(await normale.json());
+    const testi = await conferme();
+    expect(testi).toHaveLength(2);
+    expect(testi[0]).toContain(NOTA);
+    expect(testi[1]).not.toContain(NOTA);
+  });
+
+  it('su un evento aperto, con il link alla pagina dei propri dati', async () => {
+    const persona = await ritirata();
+    const evento = await eventoAperto();
+
+    await iscriviti(evento.slug, persona.email, spunta);
+
+    const [testo] = await conferme();
+    expect(testo).toContain(NOTA);
+    expect(testo).toContain('/privacy/');
+  });
+
+  it('senza ritiri non c’e’ niente da dire', async () => {
+    const evento = await eventoAperto();
+    await iscriviti(evento.slug, `${randomUUID()}@example.org`, spunta);
+    expect((await conferme())[0]).not.toContain(NOTA);
+  });
+});
+
+describe('la conferma vale per l’indirizzo', () => {
+  /** Due spunte in attesa dello stesso indirizzo, su due eventi. */
+  async function dueInAttesa(
+    campiSeconda: Partial<Prisma.EventUncheckedCreateInput> = {}
+  ) {
+    const persona = await ritirata();
+    const primo = await eventoAperto();
+    const secondo = await eventoAperto();
+    await iscriviti(primo.slug, persona.email, spunta);
+    await iscriviti(secondo.slug, persona.email, {
+      ...spunta,
+      organization: 'Ente della seconda',
+    });
+    if (Object.keys(campiSeconda).length > 0) {
+      await prisma.event.update({ where: { id: secondo.id }, data: campiSeconda });
+    }
+    return {
+      persona,
+      primo,
+      secondo,
+      r1: await iscrizione(primo.id, persona.emailHash),
+      r2: await iscrizione(secondo.id, persona.emailHash),
+    };
+  }
+
+  it('chiude ogni spunta in attesa: voce, consenso e registro valgono per tutte', async () => {
+    const { persona, primo, secondo, r1 } = await dueInAttesa();
+
+    await daiMieiDati(persona.emailHash, {
+      registrationId: r1.id,
+      confirmAddressBook: true,
+    });
+
+    for (const eventoId of [primo.id, secondo.id]) {
+      expect(await iscrizione(eventoId, persona.emailHash)).toMatchObject({
+        addressBookPending: false,
+        consentFutureCommunications: true,
+        personId: persona.id,
+      });
+      const registro = await prisma.gdprAuditLog.findMany({
+        where: {
+          eventId: eventoId,
+          action: 'CONSENT_RECORDED',
+          details: { contains: 'self-service' },
+        },
+      });
+      expect(registro).toHaveLength(1);
+    }
+    expect(await invitiFermi(persona.emailHash)).toBe(0);
+  });
+
+  it('un altro clic dalla seconda iscrizione non trova niente e non rinnova il consenso', async () => {
+    const { persona, r1, r2 } = await dueInAttesa();
+    await daiMieiDati(persona.emailHash, {
+      registrationId: r1.id,
+      confirmAddressBook: true,
+    });
+    const dopo = await prisma.person.findUniqueOrThrow({ where: { id: persona.id } });
+
+    const seconda = await daiMieiDati(persona.emailHash, {
+      registrationId: r2.id,
+      confirmAddressBook: true,
+    });
+
+    expect(seconda.status).toBe(404);
+    const voce = await prisma.person.findUniqueOrThrow({ where: { id: persona.id } });
+    expect(voce.optedInAt).toEqual(dopo.optedInAt);
+    expect(voce.organization).toBe(dopo.organization);
+    expect(voce.organization).not.toBe('Ente della seconda');
+  });
+
+  it('una spunta su un evento che non offre piu’ la rubrica si chiude senza consenso', async () => {
+    const { persona, primo, secondo, r1 } = await dueInAttesa({
+      offerAddressBook: false,
+    });
+
+    await daiMieiDati(persona.emailHash, {
+      registrationId: r1.id,
+      confirmAddressBook: true,
+    });
+
+    expect(await iscrizione(primo.id, persona.emailHash)).toMatchObject({
+      consentFutureCommunications: true,
+    });
+    expect(await iscrizione(secondo.id, persona.emailHash)).toMatchObject({
+      addressBookPending: false,
+      consentFutureCommunications: false,
+    });
+    expect(await righeSpuntaTolta(secondo.id)).toEqual([
+      {
+        source: 'self-service',
+        futureCommunications: 0,
+        addressBookPending: 1,
+        reason: 'address-book-not-offered',
+      },
+    ]);
+    expect(
+      await prisma.gdprAuditLog.count({
+        where: { eventId: secondo.id, action: 'CONSENT_RECORDED', details: { contains: 'self-service' } },
+      })
+    ).toBe(0);
+  });
+});
+
+describe('dove la rubrica non si propone piu’', () => {
+  async function inAttesaPoiSpenta(spegni: () => Promise<unknown>) {
+    const persona = await ritirata();
+    await corsaConservazione();
+    const evento = await eventoAperto();
+    await iscriviti(evento.slug, persona.email, spunta);
+    await spegni();
+    return { persona, evento, reg: await iscrizione(evento.id, persona.emailHash) };
+  }
+
+  const prove: [string, () => Promise<unknown>][] = [
+    [
+      'l’evento non la offre',
+      () => prisma.event.updateMany({ data: { offerAddressBook: false } }),
+    ],
+    [
+      'l’installazione l’ha spenta',
+      async () => {
+        await prisma.siteSetting.upsert({
+          where: { id: 'singleton' },
+          create: { addressBookEnabled: false },
+          update: { addressBookEnabled: false },
+        });
+        invalidateSettingsCache();
+      },
+    ],
+  ];
+
+  it.each(prove)('%s: la pagina dei propri dati non crea la voce', async (_, spegni) => {
+    const { persona, evento, reg } = await inAttesaPoiSpenta(spegni);
+    const voci = await prisma.person.count();
+
+    const risposta = await daiMieiDati(persona.emailHash, {
+      registrationId: reg.id,
+      confirmAddressBook: true,
+    });
+
+    expect(risposta.status).toBe(404);
+    expect(await prisma.person.count()).toBe(voci);
+    expect(await iscrizione(evento.id, persona.emailHash)).toMatchObject({
+      addressBookPending: false,
+      consentFutureCommunications: false,
+    });
+    expect(await invitiFermi(persona.emailHash)).toBe(1);
+    expect(await righeSpuntaTolta(evento.id)).toEqual([
+      {
+        source: 'self-service',
+        futureCommunications: 0,
+        addressBookPending: 1,
+        reason: 'address-book-not-offered',
+      },
+    ]);
+  });
+
+  it('il link dell’email non crea la voce, e la sala si apre', async () => {
+    const { persona, evento, reg } = await inAttesaPoiSpenta(() =>
+      prisma.event.updateMany({ data: { offerAddressBook: false } })
+    );
+    await browserDi(evento.id, reg.accessToken);
+    const voci = await prisma.person.count();
+
+    const risposta = await apri(evento.slug, {
+      token: reg.accessToken,
+      proof: signRegistrationProof(evento.id, reg.accessToken),
+    });
+
+    expect(risposta.status).toBeLessThan(400);
+    expect(await prisma.person.count()).toBe(voci);
+    expect((await iscrizione(evento.id, persona.emailHash)).addressBookPending).toBe(
+      false
+    );
+    expect(await righeSpuntaTolta(evento.id)).toEqual([
+      {
+        source: 'registration-link',
+        futureCommunications: 0,
+        addressBookPending: 1,
+        reason: 'address-book-not-offered',
+      },
+    ]);
+  });
+
+  it('una seconda conferma non trova niente e non scrive un’altra riga', async () => {
+    const { persona, evento, reg } = await inAttesaPoiSpenta(() =>
+      prisma.event.updateMany({ data: { offerAddressBook: false } })
+    );
+    const conferma = { registrationId: reg.id, confirmAddressBook: true };
+
+    await daiMieiDati(persona.emailHash, conferma);
+    await daiMieiDati(persona.emailHash, conferma);
+
+    expect(await righeSpuntaTolta(evento.id)).toHaveLength(1);
+  });
+});
+
+describe('il registro ricorda la spunta annullata', () => {
+  it('dalla pagina dei propri dati: una riga con la spunta annullata', async () => {
+    const persona = await ritirata();
+    await iscriviti(persona.riservato.slug, persona.email, spunta);
+    const reg = await iscrizione(persona.riservato.id, persona.emailHash);
+
+    await daiMieiDati(persona.emailHash, {
+      registrationId: reg.id,
+      consent: 'futureCommunications',
+    });
+
+    const righe = await prisma.gdprAuditLog.findMany({
+      where: { eventId: persona.riservato.id, action: 'CONSENT_WITHDRAWN' },
+    });
+    expect(righe.map((r) => JSON.parse(r.details ?? '{}'))).toEqual([
+      { source: 'self-service', futureCommunications: 0, addressBookPending: 1 },
+    ]);
+  });
+});
+
+describe('le email di un invito seguono l’invito', () => {
+  /** Un invito su un evento riservato, gia' accodato verso il suo indirizzo. */
+  async function invitoInCoda(email = `${randomUUID()}@example.org`) {
+    const evento = await eventoAperto({ accessMode: 'INVITATION' });
+    const invito = await prisma.eventInvitation.create({
+      data: { eventId: evento.id, email: encryptPII(email), emailHash: hashEmail(email) },
+    });
+    expect(await sendInvitations(evento.id, { locale: 'it' })).toMatchObject({ sent: 1 });
+    return { evento, invito, email };
+  }
+
+  it.each(['PENDING', 'SENT'] as const)(
+    'corretto l’indirizzo dopo un invio %s, l’invito parte verso quello nuovo e solo lì',
+    async (stato) => {
+      const { evento, invito } = await invitoInCoda();
+      await prisma.emailOutbox.updateMany({ data: { status: stato } });
+
+      await cambiaIndirizzo(evento.id, invito.id, 'nuova@example.org');
+
+      expect(await emailInviti()).toEqual([]);
+      expect(await sendInvitations(evento.id, { locale: 'it' })).toMatchObject({
+        sent: 1,
+        skipped: 0,
+      });
+      expect(await emailInviti()).toEqual([['nuova@example.org', 'PENDING']]);
+    }
+  );
+
+  it('da A a B e di nuovo ad A l’invito riparte ogni volta', async () => {
+    const { evento, invito, email } = await invitoInCoda();
+
+    await cambiaIndirizzo(evento.id, invito.id, 'nuova@example.org');
+    await sendInvitations(evento.id, { locale: 'it' });
+    await cambiaIndirizzo(evento.id, invito.id, email);
+
+    expect(await sendInvitations(evento.id, { locale: 'it' })).toMatchObject({ sent: 1 });
+    expect(await emailInviti()).toEqual([[email, 'PENDING']]);
+    expect(
+      (await prisma.eventInvitation.findUniqueOrThrow({ where: { id: invito.id } }))
+        .sentAt
+    ).not.toBeNull();
+  });
+
+  it('riscrivendo lo stesso indirizzo l’email resta e non ne parte un’altra', async () => {
+    const { evento, invito, email } = await invitoInCoda();
+
+    await cambiaIndirizzo(evento.id, invito.id, email.toUpperCase());
+
+    expect(await emailInviti()).toEqual([[email, 'PENDING']]);
+  });
+
+  it('un indirizzo gia’ preso da un altro invito risponde 409 e le email restano', async () => {
+    const { evento, invito, email } = await invitoInCoda();
+    await prisma.eventInvitation.create({
+      data: {
+        eventId: evento.id,
+        email: encryptPII('occupata@example.org'),
+        emailHash: hashEmail('occupata@example.org'),
+      },
+    });
+
+    const risposta = await cambiaIndirizzo(evento.id, invito.id, 'occupata@example.org');
+
+    expect(risposta.status).toBe(409);
+    expect(await emailInviti()).toEqual([[email, 'PENDING']]);
+  });
+
+  it('cancellato l’invito, l’email in coda non parte e quella inviata resta', async () => {
+    const { evento, invito } = await invitoInCoda();
+    const inviata = await invitoInCoda();
+    await prisma.emailOutbox.updateMany({
+      where: { dedupKey: { contains: inviata.invito.id } },
+      data: { status: 'SENT' },
+    });
+
+    for (const { eventId, id } of [invito, inviata.invito]) {
+      const risposta = await cancellaInvito(
+        richiesta(`/api/admin/events/${eventId}/invitations/${id}`, 'DELETE') as never,
+        { params: Promise.resolve({ id: eventId, invId: id }) }
+      );
+      expect(risposta.status).toBe(200);
+    }
+
+    expect(await prisma.eventInvitation.count({ where: { eventId: evento.id } })).toBe(0);
+    expect(await emailInviti()).toEqual([[inviata.email, 'SENT']]);
+  });
+});
+
 describe('il ritiro lascia il segno anche senza la spunta', () => {
   it('voce attiva e iscrizione senza spunta: dopo il ritiro e la conservazione una spunta anonima resta in attesa', async () => {
     const email = `${randomUUID()}@example.org`;
@@ -632,6 +1010,23 @@ describe('lo stop di un invito segue l’indirizzo', () => {
     expect(await sendInvitations(riservato.id, { locale: 'it' })).toMatchObject({
       sent: 0,
     });
+  });
+
+  it('se la riga era l’unica traccia del ritiro, da A a B e ritorno lo stop si perde', async () => {
+    const persona = await ritirata();
+    await prisma.person.deleteMany();
+    await prisma.registration.deleteMany();
+    const invito = await prisma.eventInvitation.findFirstOrThrow({
+      where: { emailHash: persona.emailHash },
+    });
+
+    await cambiaIndirizzo(persona.riservato.id, invito.id, 'altra@example.org');
+    await cambiaIndirizzo(persona.riservato.id, invito.id, persona.email);
+
+    expect(
+      (await prisma.eventInvitation.findUniqueOrThrow({ where: { id: invito.id } }))
+        .declinedAt
+    ).toBeNull();
   });
 
   it('un indirizzo senza ritiri parte normalmente', async () => {

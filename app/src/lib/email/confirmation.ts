@@ -14,6 +14,8 @@
  * client di posta lo mostrano come un invito da aggiungere o accettare.
  */
 
+import { getTranslations } from 'next-intl/server';
+
 import { prisma } from '@/lib/db';
 import { decryptPII } from '@/lib/crypto/pii';
 import { registrationInvite } from '@/lib/ical/invitation';
@@ -40,7 +42,9 @@ import { formatDate, formatDuration, formatTimeWithZone } from '@/lib/utils/date
 import { getPublicEnv } from '@/lib/env';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { linguaEmail } from '@/lib/email/lingua';
+import { rubricaProposta } from '@/lib/persons/address-book';
 import { rubricaOptOutUrl } from '@/lib/persons/opt-out-link';
+import { getSettings } from '@/lib/settings';
 
 interface ConfirmationEmailInput {
   registrationId: string;
@@ -86,6 +90,12 @@ export async function sendConfirmationEmail(input: ConfirmationEmailInput): Prom
     const title = getLocalized(event.title as LocalizedField, input.locale);
     const description = getLocalized(event.description as LocalizedField, input.locale);
 
+    // Una spunta sospesa non cambia la risposta dell'iscrizione: lo sa solo chi
+    // legge questa casella (lib/persons/spunta-in-attesa).
+    const spuntaDaConfermare =
+      registration.addressBookPending && rubricaProposta(event, await getSettings());
+    const tEmail = await getTranslations({ locale: testi, namespace: 'email' });
+
     const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
     const calendarInput = {
       title,
@@ -116,6 +126,7 @@ export async function sendConfirmationEmail(input: ConfirmationEmailInput): Prom
       eventImageUrl: absoluteEventImage(event, baseUrl),
       addressBookOptOutUrl: rubricaOptOutUrl(registration.person, baseUrl, input.locale),
       myDataLink: await linkIMieiDati(baseUrl, input.locale),
+      addressBookPendingNote: spuntaDaConfermare ? tEmail('addressBookPendingNote') : null,
     };
 
     // L'invito personale: UID stabile per evento e indirizzo e SEQUENCE

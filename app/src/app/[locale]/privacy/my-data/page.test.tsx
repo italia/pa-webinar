@@ -130,6 +130,47 @@ describe('I miei dati', () => {
     expect(container.textContent).not.toContain(m.addressBookOptOut);
   });
 
+  it('la conferma su una scheda chiude la spunta in attesa sulle altre', async () => {
+    const iscrizione = (id: string, titolo: string) => ({
+      event: { title: { it: titolo }, startsAt: '2026-12-01T08:00:00.000Z' },
+      registration: {
+        id,
+        displayName: 'Anna Bianchi',
+        email: 'anna@example.com',
+        organization: null,
+        registeredAt: '2026-11-01T08:00:00.000Z',
+        consentGiven: true,
+        consentTimestamp: '2026-11-01T08:00:00.000Z',
+        consents: {
+          recording: null,
+          transcription: null,
+          futureCommunications: null,
+          addressBookPending: true,
+        },
+      },
+      questions: [],
+      pollVotes: [],
+    });
+    await monta({
+      ...VUOTO,
+      consentsToken: 'consensi',
+      data: [iscrizione('r1', 'Primo'), iscrizione('r2', 'Secondo')],
+    });
+    const pulsanti = (nome: string) =>
+      [...container.querySelectorAll('button')].filter((b) => b.textContent?.trim() === nome);
+    expect(pulsanti(m.addressBookPendingConfirm)).toHaveLength(2);
+
+    await act(async () => {
+      pulsanti(m.addressBookPendingConfirm)[0]?.click();
+    });
+
+    expect(pulsanti(m.addressBookPendingConfirm)).toHaveLength(0);
+    expect(pulsanti(m.addressBookPendingCancel)).toHaveLength(0);
+    expect(container.querySelectorAll('[role="alert"]')).toHaveLength(0);
+    const dati = container.textContent?.split(messages.live.consents.given).length ?? 0;
+    expect(dati - 1).toBe(2);
+  });
+
   it('una voce senza nome ed email li lascia vuoti, senza rompere', async () => {
     await monta({
       ...VUOTO,
