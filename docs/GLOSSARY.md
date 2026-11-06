@@ -727,8 +727,8 @@ event needs one, and starting them again ahead of the next event.
 
 **Scheduled jobs**: the periodic tasks behind email, reminders, cleanup,
 retention, reconciliation, scaling and post-production. They run as Kubernetes
-CronJobs in the chart; the Compose `cron` service runs only the email outbox,
-reminders and GDPR cleanup.
+CronJobs in the chart; the Compose `cron` service runs the same portal jobs
+from a shell loop, without scaling and post-production.
 [Scheduled and background jobs](architecture/background-jobs.md)
 
 **Secret modes** (`secrets.mode`: `existing`, `external`, `generate`): who

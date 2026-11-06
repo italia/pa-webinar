@@ -405,7 +405,7 @@ The answers set starting values, and the organizer can change each one in the wi
 | Text of Q&A questions after the event | Not published | Published without names | Published without names |
 | Address book at registration | Not offered | Offered | Offered |
 
-On every format the hosts choose about the recording like everyone else. An invitation-only event proposes **Yes, reserved**. The page after the event starts private for a meeting or an invitation-only event, unless the answer is **Yes, public**. With a reserved recording, questions are not published.
+On every format the hosts choose about the recording like everyone else. An invitation-only event proposes **Yes, reserved**. The page after the event starts private for a meeting or an invitation-only event, unless the answer is **Yes, public**. Until staff touch its switch, it follows the move to invitation-only and the move to a public video; going back to open does not reopen it, and the wizard says so. With a reserved recording, questions are not published.
 
 When an event becomes invitation-only, in the wizard or from its template, a public recording that nobody chose moves back to reserved, and a note says so. A public recording that staff chose stays, **Yes, public** included, and a note says that anyone will be able to see the video, not just the invitees. See [What the format sets](architecture/event-journey.md#what-the-format-sets).
 

@@ -195,9 +195,10 @@ conference. That name is stored encrypted in the database
 `tracks.json`, next to the audio files, and it holds the same names in plain
 text.
 
-A per-participant capture does not raise the in-room **Recording in progress**
-banner, which only Jibri controls. Participants learn about it through the
-consent box described below.
+A per-participant capture has its own signal in the room: a written notice and a
+sound when it starts or stops, for everyone in the room, and a fixed mark in the
+top bar while it runs (`app/src/components/live/capture-notice.tsx`). The consent
+box described below tells people about it before they enter.
 
 ### Speaking timeline
 
@@ -310,8 +311,9 @@ design keeps every audio path clear of that use:
   belongs to one participant, and the name is the display name that person
   used in the conference, not something derived from their voice.
 - **Dubbing.** The speech synthesizer reads translated text. No participant
-  audio goes into it. The choice of voice uses the speaker's first name, not
-  their voice (see [Dubbing without cloning](#dubbing-without-cloning)).
+  audio goes into it. Voices are handed out by speaking time, neither from the
+  speaker's name nor from their voice
+  (see [Dubbing without cloning](#dubbing-without-cloning)).
 - **Storage.** The `Speaker` model has no field for voice features, and no
   code compares voices across recordings or events.
 
@@ -862,9 +864,8 @@ file, its row and, through the foreign key, its machine version.
 This pass deletes artifacts only. Speaker records and job payloads wait for
 the event-bound or per-recording purge, so on a published video they stay as
 long as the video. Tracks follow their own rules, described above. The value
-can therefore shorten retention but never extend it. The field's help text
-says a positive value keeps artifacts "even after the event is closed", which
-is not what the code does for unpublished recordings.
+can therefore shorten retention but never extend it, and the field's help
+text says so.
 
 ### Per-recording date: `Recording.retentionUntil`
 
@@ -886,16 +887,16 @@ A recording-level purge (event-bound or `retentionUntil`) deletes:
 - the job payloads, replaced by `{ "scrubbed": true }`, and the last error
   messages.
 
-It then marks the recording `ARCHIVED`. The help text of **Artifact retention
-(days)** says its deletion includes speaker names and job payloads. Only these
-recording-level purges delete them; the site-wide limit does not.
+It then marks the recording `ARCHIVED`. Only these recording-level purges
+delete speaker names and job payloads; the site-wide limit does not.
 
 A purge leaves:
 
 - the `Recording` row, including `pipelineSnapshot`, with the speaker
   names emptied;
 - the admin audit log entries `POSTPROD_SPEAKER_MAP`, which hold each name
-  given to a speaker label and are never deleted;
+  given to a speaker label until the GDPR cleanup empties their detail
+  (`AUDIT_LOG_PERSONAL_DATA_RETENTION_DAYS`, default 90 days);
 - the `PostprodJob` rows, with kind, status and timing;
 - files from earlier pipeline runs;
 - `tracks.json`;
@@ -1032,7 +1033,7 @@ handles them in the administration area:
 | Right | How to act on it |
 |---|---|
 | Access | Read the transcript in the transcript editor and provide a copy |
-| Rectification | Correct a line, reassign a segment to another speaker, or rename a speaker label. A rename writes a `POSTPROD_SPEAKER_MAP` entry to the admin audit log that holds the new name and is never deleted. A correction changes the database copies only: outputs generated later (an added translation language, a new archive) start from the stored machine text, unless the lines were also erased from the original |
+| Rectification | Correct a line, reassign a segment to another speaker, or rename a speaker label. A rename writes a `POSTPROD_SPEAKER_MAP` entry to the admin audit log that holds the new name until the GDPR cleanup empties its detail. A correction changes the database copies: outputs generated later (an added translation language, a new archive) start from the corrected text, and outputs already produced stay as they are |
 | Erasure of words | Use **Erase from the original too**, then handle the derived outputs listed above and, if needed, the video |
 | Erasure of a voice track | No control deletes a single track. **Delete session** removes the recording's rows but leaves its track and output files in storage, so delete those in storage as well. Otherwise tracks go at the next purge or orphan sweep, or have to be deleted in storage |
 
@@ -1085,7 +1086,7 @@ Points for the controller's assessment:
 | Who is in the room | `RoomOccupant` | Plain text: endpoint, seat and meeting identifiers and times, no names |
 | Speaker names | `Speaker.displayName` | Plain text |
 | Pipeline snapshot | `Recording.pipelineSnapshot` | Plain text JSON, including speaker names until the AI outputs are purged |
-| Speaker renames | `AdminAuditLog.details` (`POSTPROD_SPEAKER_MAP`) | Plain text JSON, including the name, never deleted |
+| Speaker renames | `AdminAuditLog.details` (`POSTPROD_SPEAKER_MAP`) | Plain text JSON, including the name, until the GDPR cleanup empties the detail |
 | Speaking timeline | `CallSession.dominantSpeakerLog` | Plain text, emptied at the event's retention |
 | Every output file, track audio, `tracks.json`, composite video | Object storage | The storage provider's server-side encryption. Access through signed URLs |
 
@@ -1150,8 +1151,6 @@ Retention and deletion:
 
 - **`Recording.retentionUntil` cannot be set from the application.** Retained
   tracks and the per-recording regime depend on it.
-- **The help text of Artifact retention (days) overstates the setting.** The
-  setting can only shorten retention.
 - **The site-wide limit deletes artifacts only.** It leaves speaker records
   and job payloads in place.
 - **Speaker names in the admin audit log.** The `POSTPROD_SPEAKER_MAP`
@@ -1175,9 +1174,10 @@ Data-subject rights:
 - **Self-service export and erasure exclude recordings, tracks and AI
   outputs.** Only the transcript from captions is reached, by erasure and by the
   withdrawal of a consent.
-- **Corrections do not reach the stored files.** Outputs generated after a
-  correction start from the machine text, unless the lines were erased from
-  the original.
+- **A correction reaches the stored files only when a job needs them.** The
+  file stays as it was until a summary, translation, dubbing or archive job
+  takes it. If that write fails, the job reads the previous file, and only
+  the application log says so.
 - **Redaction does not reach derived outputs or the recording.** No control
   regenerates translations or dubbing from a revised transcript, and the
   spoken words stay in the video and the tracks.
