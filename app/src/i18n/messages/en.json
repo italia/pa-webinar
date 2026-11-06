@@ -4445,13 +4445,13 @@
       "multitrackOptional": "It is optional: if you do not consent you still take part, but what you say stays out of the transcript and your voice is not recorded on a separate track. If the event is recorded, your voice is still in the video.",
       "multitrackOptionalShort": "It is optional: if you do not consent you still take part, but what you say stays out of the transcript and your voice is not recorded on a separate track.",
       "stayInTouch": "I want to receive information about upcoming events and be added to the address book, to be invited to similar events",
-      "stayInTouchHelp": "Optional consent (GDPR art. 6.1.a). You can withdraw it at any time with the \"Remove me from the address book\" link in the emails you receive. Your name, email address and organization are the ones in this registration.",
+      "stayInTouchHelp": "Optional consent (GDPR art. 6.1.a). You can withdraw it at any time with the \"Remove me from the address book\" link in the confirmation email, the reminders and the invitations, or from the \"My data\" page. Your name, email address and organization are the ones in this registration.",
       "stayInTouchRetention": "We keep this data for {months} months from this consent: the period restarts only if you tick the box again.",
       "recordingOptionalListenOnly": "If you do not consent you still take part, listening only: you follow and write in the chat, but microphone, camera and screen sharing stay off. You can consent later, from the room.",
       "recordingOptionalHost": "If you do not consent you still enter and lead as usual, but your voice is not kept in the per-person tracks or in the transcript. The room video, if recorded, still includes you.",
       "recordingOptionalVoice": "If you do not consent you still take part and can speak, but stay out of the recording: no name, no voice, no image. You can consent later from the room.",
-      "recordingNotice": "This event is recorded (audio and video). You take part without microphone or camera: the recording does not contain your voice or your image, unless the host gives you the floor.",
-      "recordingNoticeVoice": "The event is recorded (audio and video). You take part without microphone or camera: the recording contains neither your name, your voice nor your image, unless you consent in the room.",
+      "recordingNotice": "The event may be recorded. You take part without microphone or camera: the recording does not contain your voice or your image, unless the host gives you the floor.",
+      "recordingNoticeVoice": "The event may be recorded. You take part without microphone or camera: the recording contains neither your name, your voice nor your image, unless you consent in the room.",
       "recordingHostAlwaysReserved": "You host this event: you are always in the recording, with name, voice, image and shared screen. The video stays reserved for the organizers and registrants: it is not published. Registrants can watch it for as long as their registration data is kept.",
       "recordingHostAlwaysPublic": "You host this event: you are always in the recording, with name, voice, image and shared screen. The video can be published and watched by anyone.",
       "recordingHostAlways": "You host this event: you are always in the recording, with name, voice, image and shared screen."
@@ -4490,7 +4490,8 @@
         "translation": "The transcript and summary may be translated automatically.",
         "dubbing": "The video may be dubbed with a synthetic voice.",
         "onRequest": "After the event the organisers can also ask for automatic processing of the recording not listed here: transcription, summary or translation.",
-        "report": "After the event, the staff may have an AI tool write a report, using also the polls and, where they are published, the questions. The text of the chat is not used."
+        "report": "After the event, the staff may have an AI tool write a report, using also the polls and, where they are published, the questions. The text of the chat is not used.",
+        "accuracy": "Texts produced with artificial intelligence may contain inaccuracies."
       },
       "list": {
         "label": "Participant list",
@@ -4512,6 +4513,12 @@
       "addressBook": {
         "label": "Address book",
         "offered": "When you register you can choose to stay in the events address book, to be invited to similar events. It is optional: the data stays for {months} months from your consent, unless you withdraw it."
+      },
+      "chat": {
+        "label": "Chat and questions",
+        "messages": "Chat messages are never published, not even questions asked in the chat.",
+        "questionsText": "After the event the text of the Q&A questions may be published, never the name of the person who asked them.",
+        "questionsNone": "The Q&A questions are not published."
       }
     },
     "export": {
@@ -5380,7 +5387,7 @@
     "watchNow": "Watch",
     "switchToLive": "Switch to live",
     "enterRoom": "Enter the room",
-    "recordingNotice": "This event is being recorded.",
+    "recordingNotice": "This event may be recorded.",
     "recordingAvailableAfter": "The recording will be available after the event.",
     "autoRefreshHint": "The page will automatically refresh when the event starts.",
     "startEventButton": "Start event",
@@ -5434,7 +5441,7 @@
     "aiNotice": "After it ends, the recording may be processed by AI tools to generate a transcript, summary and any translations and dubbing. The transcript covers only people who consented. The artifacts may contain inaccuracies; the video remains the authoritative source.",
     "multitrackConsentTitle": "Transcript of what you say",
     "recordingConsentTitle": "Event recording",
-    "recordingConsentIntro": "The event is recorded (audio and video). With your consent, the recording contains your name, your voice, your image and what you share on screen.",
+    "recordingConsentIntro": "The event may be recorded (audio and video). With your consent, the recording contains your name, your voice, your image and what you share on screen.",
     "recordingConsentIntroNoVideo": "The room video is not recorded at this event.",
     "enterGardenTitle": "Step into the square",
     "enterGardenHint": "Another place to wait: walk around, meet the others who are waiting, and enter the live event through the gate when the room opens.",

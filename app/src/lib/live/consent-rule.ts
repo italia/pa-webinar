@@ -65,3 +65,15 @@ export function regolaConsenso(
     soloAscolto: recordingEnabled && voce === 'fissa' && richiesto,
   };
 }
+
+/**
+ * Il testo sulla registrazione scelto per l'evento, se si puo' mostrare. Senza un
+ * video completo parlerebbe di una registrazione che non c'e' e direbbe il
+ * contrario della casella e della scheda privacy: vale quello predefinito.
+ */
+export function testoConsensoEvento(
+  testo: string | null | undefined,
+  voce: VoceNelVideo
+): string | null {
+  return voce === 'assente' ? null : testo?.trim() || null;
+}

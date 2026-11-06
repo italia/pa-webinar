@@ -64,6 +64,14 @@ describe('VoiceExcludedNotice', () => {
     expect(container.textContent).toContain(g.recordingNoVideo);
   });
 
+  it("il testo dell'evento si mostra, tranne dove non c'e' un video", () => {
+    disegna({ testoConsenso: "Testo dell'ente." });
+    expect(container.textContent).toContain("Testo dell'ente.");
+    disegna({ testoConsenso: "Testo dell'ente.", voce: 'assente' });
+    expect(container.textContent).not.toContain("Testo dell'ente.");
+    expect(container.textContent).toContain(g.recordingNoVideo);
+  });
+
   it("il pulsante e' descritto da quel testo, e il clic acconsente", () => {
     const onAcconsenti = disegna({ destinazione: 'PUBLIC' });
     const id = pulsante().getAttribute('aria-describedby');

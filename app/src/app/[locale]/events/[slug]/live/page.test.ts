@@ -83,6 +83,7 @@ import { resolveGrantForEvent } from '@/lib/auth/moderator';
 import { staffDietroIlPrimario } from '@/lib/auth/staff-seat';
 import { isEventManager } from '@/lib/auth/staff-session';
 import LiveEventClient from '@/components/live/live-event-client';
+import type { SchedaPrivacy } from '@/lib/events/privacy-sheet';
 
 import LivePage from './page';
 
@@ -237,6 +238,54 @@ beforeEach(() => {
 });
 
 afterEach(() => vi.unstubAllEnvs());
+
+describe('sala — la scheda privacy', () => {
+  const scheda = (props: PropsClient) => props.event.schedaPrivacy as SchedaPrivacy | null;
+
+  it('arriva a chi entra senza token e a chi ha il token, uguale', async () => {
+    conEvento();
+    const ospite = scheda(await clientProps());
+    iscritto();
+    const conToken = scheda(await clientProps(TOKEN));
+    expect(ospite).not.toBeNull();
+    expect(conToken).toEqual(ospite);
+  });
+
+  it('sulle chiamate rapide non c\'e\', in nessuno dei due rami', async () => {
+    conEvento({ eventType: 'INSTANT' });
+    expect(scheda(await clientProps())).toBeNull();
+    iscritto();
+    expect(scheda(await clientProps(TOKEN))).toBeNull();
+  });
+
+  it('si calcola sull\'evento com\'e\', non sui valori mascherati per chi guarda', async () => {
+    conEvento({ recordingEnabled: true, autoStartRecording: true });
+    expect(scheda(await clientProps())?.registrazione.modo).toBe('automatica');
+  });
+
+  it('dice dove va il video, come la casella', async () => {
+    conEvento({ recordingDestination: 'REGISTRANTS' });
+    const { event } = await clientProps();
+    expect(event.recordingDestination).toBe('REGISTRANTS');
+    expect(scheda({ event } as PropsClient)?.registrazione.destinazione).toBe('REGISTRANTS');
+    expect(scheda({ event } as PropsClient)?.chat.esitoDomande).toBe('nonPubblicate');
+  });
+
+  it('senza voce nel video non parla di video', async () => {
+    vi.stubEnv('JITSI_WEB_INTERNAL_URL', 'http://jitsi-web');
+    vi.stubEnv('RECORDER_CONTROLLER_URL', 'http://recorder-controller');
+    conEvento();
+    const { event } = await clientProps();
+    expect(event.voceNelVideo).toBe('assente');
+    expect(scheda({ event } as PropsClient)?.registrazione.destinazione).toBeNull();
+  });
+
+  it('la disclosure dell\'amministrazione resta nella lingua della pagina', async () => {
+    stato.impostazioni.aiConsentDisclosure = { it: 'Testo scritto.', fr: 'Texte écrit.' };
+    conEvento();
+    expect((await clientProps()).event.aiConsentDisclosure).toBe('Testo scritto.');
+  });
+});
 
 describe('sala — il video a evento concluso', () => {
   const concluso = {

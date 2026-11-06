@@ -15,8 +15,8 @@ import type { SchedaPrivacy } from '@/lib/events/privacy-sheet';
  *
  * `testoIa` e' il testo che l'amministrazione ha scritto per questa lingua: dice
  * come si elabora la registrazione al posto delle frasi su sintesi, traduzione e
- * doppiaggio. Restano a parte il resoconto, che parte anche da chat, domande e
- * sondaggi, e cio' che chi organizza puo' chiedere dopo l'evento.
+ * doppiaggio. Restano a parte il resoconto, che parte anche da sondaggi e domande
+ * pubblicate, e cio' che chi organizza puo' chiedere dopo l'evento.
  */
 const TESTO_MODO = {
   nessuna: 'recording.none',
@@ -42,6 +42,36 @@ const TESTO_TRACCE = {
   cancellate: 'transcript.tracks',
   conservate: 'transcript.tracksRetained',
 } as const;
+
+const TESTO_DOMANDE = {
+  soloTesto: 'chat.questionsText',
+  nonPubblicate: 'chat.questionsNone',
+} as const;
+
+/**
+ * La scheda come la legge chi e' in sala d'attesa. Sottotitoli, chat e Q&A sono
+ * le funzioni che chi modera accende e spegne dal vivo: la sala riceve il valore
+ * di adesso, il resto della scheda non cambia a sala aperta. Il testo dei
+ * sottotitoli diventa trascrizione solo se i sottotitoli ci sono.
+ *
+ * La rubrica si sceglie solo nel modulo d'iscrizione: la sala non ha quella
+ * casella, quindi non la promette.
+ */
+export function schedaInSala(
+  scheda: SchedaPrivacy,
+  adesso: { sottotitoli: boolean; chat: boolean; domande: boolean }
+): SchedaPrivacy {
+  return {
+    ...scheda,
+    sottotitoli: { ...scheda.sottotitoli, attivi: adesso.sottotitoli },
+    trascrizione: {
+      ...scheda.trascrizione,
+      sottotitoli: adesso.sottotitoli && scheda.sottotitoli.testoConservato,
+    },
+    chat: { ...scheda.chat, attiva: adesso.chat, domandeAttive: adesso.domande },
+    rubrica: null,
+  };
+}
 
 function Fatto({
   icona,
@@ -116,7 +146,12 @@ export function PrivacySheet({
     }
     if (ia.elaborabileDopo) frasiIa.push(t('ai.onRequest'));
     frasiIa.push(t('ai.report'));
+    frasiIa.push(t('ai.accuracy'));
   }
+
+  const frasiChat: string[] = [];
+  if (scheda.chat.attiva) frasiChat.push(t('chat.messages'));
+  if (scheda.chat.domandeAttive) frasiChat.push(t(TESTO_DOMANDE[scheda.chat.esitoDomande]));
 
   const frasiConservazione = [t('retention.data', { days: conservazione.giorniDati })];
   if (conservazione.video) {
@@ -168,6 +203,7 @@ export function PrivacySheet({
           etichetta={t('name.label')}
           frasi={[t(scheda.pseudonimi ? 'name.pseudonym' : 'name.real')]}
         />
+        <Fatto icona="it-comment" etichetta={t('chat.label')} frasi={frasiChat} />
         <Fatto
           icona="it-clock"
           etichetta={t('retention.label')}

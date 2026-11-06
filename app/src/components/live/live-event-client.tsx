@@ -96,6 +96,8 @@ import WaitingRoom, {
 } from '@/components/live/waiting-room';
 import { closingPhase, exitDestination, phaseAfterTokenConflict } from '@/components/live/live-phase';
 import { warmupFromLifecycle } from '@/components/live/lifecycle-warmup';
+import { schedaInSala } from '@/components/events/privacy-sheet';
+import type { SchedaPrivacy } from '@/lib/events/privacy-sheet';
 import { avatarColor, avatarInitials } from '@/lib/chat/avatar';
 import { isHumanParticipant } from '@/lib/jitsi/participants';
 import {
@@ -163,7 +165,6 @@ interface EventInfo {
    *  indirizzo: la pagina lo passa solo a evento LIVE e con una destinazione
    *  non riservata. */
   tempRecordingUrl?: string | null;
-  recordingUrl?: string | null;
   /** Chi ha aperto la pagina puo' vedere il video (`vedeVideo`,
    *  lib/recording/audience). La pagina non passa l'indirizzo: il link lo
    *  costruisce il client verso la rotta del video, che rifa' il controllo. */
@@ -189,6 +190,9 @@ interface EventInfo {
   /** L'informativa privacy dell'evento (lib/events/privacy-notice), accanto
    *  al consenso chiesto in sala d'attesa. */
   privacy?: { url: string; testo?: string };
+  /** La scheda privacy dell'evento (lib/events/privacy-sheet), calcolata sul
+   *  server. Null sulle chiamate rapide. */
+  schedaPrivacy?: SchedaPrivacy | null;
   timezone?: string;
   /** True quando il master switch AI è attivo e l'evento usa almeno una
    *  feature di post-produzione AI — abilita l'informativa in sala d'attesa. */
@@ -252,7 +256,7 @@ interface LiveEventClientProps {
   jitsiDomain: string;
   watermark?: WatermarkSettings;
   /** L'installazione puo' registrare (lib/recording/availability), risolto dal
-   *  Server Component. Senza, l'avviso «questo evento viene registrato» e il
+   *  Server Component. Senza, l'avviso «questo evento puo' essere registrato» e il
    *  consenso prima di entrare non si mostrano: prometterebbero una
    *  registrazione che nulla puo' fare. Default true: nel dubbio il consenso
    *  si chiede. */
@@ -1143,8 +1147,34 @@ export default function LiveEventClient({
     },
     [event.slug],
   );
+  // Sottotitoli live (ADR-018): il flag dell'evento, che chi modera cambia
+  // dal vivo, arriva con gli altri flag della sala (canale push o polling,
+  // stessa voce della barra laterale). Chi modera li accende nella stanza.
+  // Gli stessi flag dicono alla sala d'attesa se chat e Q&A sono ancora accesi:
+  // li si legge finche' la sala puo' mostrarli (in diretta o in preparazione).
+  const flagsServono =
+    !!event.liveCaptionsAvailable || ['LIVE', 'PROVISIONING', 'IDLE'].includes(eventStatus);
+  const { data: flagsSala } = useSWR<{
+    liveCaptionsEnabled?: boolean;
+    chatEnabled?: boolean;
+    qaEnabled?: boolean;
+  }>(
+    flagsServono ? `/api/events/${event.slug}/flags` : null,
+    (url: string) => fetch(url).then((r) => r.json()),
+    { refreshInterval: pushLive ? 0 : 15000 },
+  );
+  const sottotitoliAccesi =
+    !!event.liveCaptionsAvailable &&
+    (flagsSala?.liveCaptionsEnabled ?? event.liveCaptionsEnabled ?? true);
+  const chatAccesa = flagsSala?.chatEnabled ?? event.chatEnabled;
+  // Il testo dei sottotitoli si conserva solo se i sottotitoli ci sono: la
+  // scheda lo dice con il valore di adesso, e la casella della trascrizione
+  // compare e scompare con lei. Le chiamate rapide non hanno scheda.
+  const trascrizioneDaiSottotitoli = event.schedaPrivacy
+    ? sottotitoliAccesi && event.schedaPrivacy.sottotitoli.testoConservato
+    : event.captionsTranscript;
   const trascrizioneInSala = consensoTrascrizioneIngresso({
-    formato: event,
+    formato: { ...event, captionsTranscript: trascrizioneDaiSottotitoli },
     concluso: eventStatus === 'ENDED',
   });
   const registrazioneData = haConsensoRegistrazione && !soloAscolto && !voceEsclusa;
@@ -1159,7 +1189,8 @@ export default function LiveEventClient({
           },
         }
       : {}),
-    ...(trascrizioneInSala
+    // Il consenso dato resta ritirabile anche se i sottotitoli si spengono.
+    ...(trascrizioneInSala || (haConsensoTracce && eventStatus !== 'ENDED')
       ? {
           trascrizione: {
             dato: haConsensoTracce,
@@ -1949,21 +1980,6 @@ export default function LiveEventClient({
     onAvvioRichiesto: segnaAvvioChiesto,
     dopoComando: riaffermaSottotitoli,
   });
-  // Sottotitoli live (ADR-018): il flag dell'evento, che chi modera cambia
-  // dal vivo, arriva con gli altri flag della sala (canale push o polling,
-  // stessa voce della barra laterale). Chi modera li accende nella stanza.
-  // Gli stessi flag dicono alla sala d'attesa se la chat e' ancora accesa:
-  // la si legge finche' la sala puo' mostrarla (in diretta o in preparazione).
-  const flagsServono =
-    !!event.liveCaptionsAvailable || ['LIVE', 'PROVISIONING', 'IDLE'].includes(eventStatus);
-  const { data: flagsSala } = useSWR<{ liveCaptionsEnabled?: boolean; chatEnabled?: boolean }>(
-    flagsServono ? `/api/events/${event.slug}/flags` : null,
-    (url: string) => fetch(url).then((r) => r.json()),
-    { refreshInterval: pushLive ? 0 : 15000 },
-  );
-  const sottotitoliAccesi =
-    !!event.liveCaptionsAvailable &&
-    (flagsSala?.liveCaptionsEnabled ?? event.liveCaptionsEnabled ?? true);
   const riaffermaSottotitoliOra = useCaptionsControl({
     api: jitsiApi,
     attivo: conduce && !!event.liveCaptionsAvailable,
@@ -2117,7 +2133,7 @@ export default function LiveEventClient({
             imageUrl: event.imageUrl,
             coverImageUrl: event.coverImageUrl,
             maxParticipants: event.maxParticipants ?? 300,
-            // L'avviso «questo evento viene registrato» solo dove qualcosa puo'
+            // L'avviso «questo evento puo' essere registrato» solo dove qualcosa puo'
             // registrare: vedi `recordingAvailable`.
             recordingEnabled: event.recordingEnabled && recordingAvailable,
             tempRecordingUrl: event.tempRecordingUrl,
@@ -2125,14 +2141,14 @@ export default function LiveEventClient({
             waitingRoomAudioUrl: event.waitingRoomAudioUrl,
             feedbackEnabled: event.feedbackEnabled,
             // Il valore corrente: chi modera puo' spegnerla dal vivo.
-            chatEnabled: flagsSala?.chatEnabled ?? event.chatEnabled,
+            chatEnabled: chatAccesa,
             qaEnabled: event.qaEnabled,
             timezone: event.timezone,
             aiPostprodEnabled: event.aiPostprodEnabled,
             aiConsentDisclosure: event.aiConsentDisclosure,
             liveCaptions: !!event.liveCaptionsAvailable && (event.liveCaptionsEnabled ?? true),
             multitrackRecordingEnabled: event.multitrackRecordingEnabled,
-            captionsTranscript: event.captionsTranscript,
+            captionsTranscript: trascrizioneDaiSottotitoli,
             trascrizioneVideo: event.trascrizioneVideo,
             retainParticipantTracks: event.retainParticipantTracks,
             riepilogo: event.riepilogo,
@@ -2179,6 +2195,15 @@ export default function LiveEventClient({
           recordingHostAlways={chiConduceSempreRegistrato && (isModerator || isSpeaker)}
           recordingConsentText={event.recordingConsentText}
           privacy={event.privacy}
+          schedaPrivacy={
+            event.schedaPrivacy
+              ? schedaInSala(event.schedaPrivacy, {
+                  sottotitoli: sottotitoliAccesi,
+                  chat: chatAccesa,
+                  domande: flagsSala?.qaEnabled ?? event.qaEnabled,
+                })
+              : null
+          }
         />
         {feedbackModal}
       </>

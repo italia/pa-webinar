@@ -8,6 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { RenderedQuestionnaire } from '@/components/questionnaires/questionnaire-form';
 import messages from '@/i18n/messages/it.json';
+import type { SchedaPrivacy } from '@/lib/events/privacy-sheet';
 
 /**
  * Il questionario dell'iscrizione sta nel modulo e le risposte partono con
@@ -364,7 +365,140 @@ describe('RegistrationFormClient — casella della trascrizione', () => {
   });
 });
 
+describe('RegistrationFormClient — la scheda privacy', () => {
+  const sheet = messages.gdpr.sheet;
+  const SCHEDA: SchedaPrivacy = {
+    registrazione: {
+      modo: 'manuale',
+      destinazione: 'REGISTRANTS',
+      chiNonAcconsente: 'restaFuori',
+      conduceSempre: false,
+    },
+    trascrizione: { sottotitoli: false, tracce: null, dalVideo: false },
+    sottotitoli: { attivi: false, testoConservato: false },
+    ia: { sintesi: true, traduzione: false, doppiaggio: false, elaborabileDopo: false },
+    chat: { attiva: true, domandeAttive: true, esitoDomande: 'nonPubblicate' },
+    elencoVisibile: true,
+    pseudonimi: false,
+    conservazione: { giorniDati: 30, video: { giorniDopoPubblicazione: null } },
+    rubrica: null,
+  };
+
+  function conScheda(props: Partial<ComponentProps<typeof RegistrationFormClient>> = {}) {
+    act(() => {
+      root.render(
+        <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
+          <RegistrationFormClient
+            eventSlug={SLUG}
+            privacyPolicyUrl="/privacy"
+            startsAt={new Date(Date.now() + 7 * 24 * 3600_000).toISOString()}
+            waitingRoomLeadMinutes={15}
+            schedaPrivacy={SCHEDA}
+            {...props}
+          />
+        </NextIntlClientProvider>,
+      );
+    });
+  }
+  const segue = (prima: Node, dopo: Node) =>
+    (prima.compareDocumentPosition(dopo) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
+  const titoloScheda = () =>
+    Array.from(container.querySelectorAll('h2')).find((h) => h.textContent === sheet.title);
+
+  it('senza scheda il modulo resta quello di sempre', () => {
+    conScheda({ schedaPrivacy: null });
+    expect(titoloScheda()).toBeUndefined();
+  });
+
+  it('mostra i fatti della scheda, aperta', () => {
+    conScheda();
+    expect(container.textContent).toContain(sheet.recording.manual);
+    expect(container.textContent).toContain(sheet.recording.destinationReserved);
+    expect(container.textContent).toContain(sheet.chat.questionsNone);
+  });
+
+  it('sta sopra il link all\'informativa', () => {
+    conScheda();
+    const link = Array.from(container.querySelectorAll('a')).find(
+      (a) => a.textContent === messages.registration.gdprLink,
+    );
+    expect(link?.getAttribute('href')).toBe('/privacy');
+    expect(segue(titoloScheda() as Node, link as Node)).toBe(true);
+  });
+
+  it('sta sopra il testo dell\'informativa da aprire, e sopra i consensi', () => {
+    conScheda({ privacyPolicyText: 'Informativa dell\'evento.' });
+    const apri = Array.from(container.querySelectorAll('button')).find(
+      (b) => b.textContent?.includes(messages.registration.gdprLink),
+    );
+    expect(segue(titoloScheda() as Node, apri as Node)).toBe(true);
+    expect(
+      segue(titoloScheda() as Node, container.querySelector('#consentGiven') as Node),
+    ).toBe(true);
+  });
+
+  it('il testo dell\'amministrazione arriva alla scheda', () => {
+    conScheda({ testoIa: 'Testo scritto dall\'ente.' });
+    expect(container.textContent).toContain('Testo scritto dall\'ente.');
+    expect(container.textContent).not.toContain(sheet.ai.summary);
+  });
+
+  describe("l'avviso al pubblico senza microfono", () => {
+    const { recordingNotice, recordingNoticeVoice } = messages.gdpr.consent;
+    const senzaPresenza = {
+      recordingEnabled: true,
+      participantsCanUnmute: false,
+      participantsCanStartVideo: false,
+      participantsCanShareScreen: false,
+    };
+    const conModo = (modo: SchedaPrivacy['registrazione']['modo']): SchedaPrivacy => ({
+      ...SCHEDA,
+      registrazione: { ...SCHEDA.registrazione, modo },
+    });
+
+    it('dove la scheda dice che non si registra niente, non si annuncia', () => {
+      conScheda({ ...senzaPresenza, voce: 'assente', schedaPrivacy: conModo('nessuna') });
+      expect(container.textContent).toContain(sheet.recording.none);
+      expect(container.textContent).not.toContain(recordingNoticeVoice);
+      expect(container.textContent).not.toContain(recordingNotice);
+    });
+
+    it('con le sole tracce resta', () => {
+      conScheda({ ...senzaPresenza, voce: 'assente', schedaPrivacy: conModo('soloTracce') });
+      expect(container.textContent).toContain(recordingNoticeVoice);
+    });
+
+    it('con un video resta', () => {
+      conScheda({ ...senzaPresenza, voce: 'fissa', schedaPrivacy: conModo('manuale') });
+      expect(container.textContent).toContain(recordingNotice);
+    });
+
+    it('senza scheda resta', () => {
+      conScheda({ ...senzaPresenza, voce: 'rimovibile', schedaPrivacy: null });
+      expect(container.textContent).toContain(recordingNoticeVoice);
+    });
+  });
+
+  it('non cambia il corpo della richiesta', async () => {
+    conScheda();
+    await iscriviti();
+    const chiamata = fetchMock.mock.calls.find(([url]) =>
+      String(url).endsWith(`/api/events/${SLUG}/registrations`),
+    );
+    const corpo = JSON.parse(String(chiamata?.[1]?.body)) as Record<string, unknown>;
+    expect(Object.keys(corpo).filter((k) => /scheda|testoIa/i.test(k))).toEqual([]);
+  });
+});
+
 describe('RegistrationFormClient — rubrica', () => {
+  it('dice dove si trova davvero il link per uscire, senza promettere ogni email', () => {
+    const { stayInTouchHelp } = messages.gdpr.consent;
+    expect(stayInTouchHelp).not.toContain('nelle email che riceverai');
+    for (const luogo of ['email di conferma', 'promemoria', 'inviti', messages.gdpr.export.title]) {
+      expect(stayInTouchHelp).toContain(luogo);
+    }
+  });
+
   it('proposta: la casella dice per quanto si conservano i dati', () => {
     disegnaCon({});
     const aiuto = testoDi('#consentStayInTouchHelp');

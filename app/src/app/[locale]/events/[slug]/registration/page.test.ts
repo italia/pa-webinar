@@ -17,6 +17,7 @@ const { sito } = vi.hoisted(() => ({
     aiPipelineEnabled: true,
     waitingRoomLeadMinutes: 15,
     parseTitleKicker: false,
+    aiConsentDisclosure: null as Record<string, string> | null,
   },
 }));
 
@@ -52,6 +53,7 @@ vi.mock('@/components/registration/registration-form-client', () => ({
 
 import RegistrationFormClient from '@/components/registration/registration-form-client';
 import { prisma } from '@/lib/db';
+import type { SchedaPrivacy } from '@/lib/events/privacy-sheet';
 
 import RegistrationPage from './page';
 
@@ -119,7 +121,35 @@ beforeEach(() => {
   vi.unstubAllEnvs();
   sito.addressBookEnabled = true;
   sito.aiPipelineEnabled = true;
+  sito.aiConsentDisclosure = null;
   evento();
+});
+
+describe('pagina di iscrizione: la scheda privacy', () => {
+  it("la calcola il server, con la riga delle impostazioni", async () => {
+    const { schedaPrivacy } = (await propsDelModulo()) as { schedaPrivacy: SchedaPrivacy };
+    expect(schedaPrivacy.registrazione.modo).toBe('manuale');
+    expect(schedaPrivacy.rubrica).not.toBeNull();
+  });
+
+  it('dice lo stesso di cio che chiede il modulo', async () => {
+    senzaVideo();
+    const props = await propsDelModulo();
+    expect(props.voce).toBe('assente');
+    expect((props.schedaPrivacy as SchedaPrivacy).registrazione.modo).toBe('nessuna');
+  });
+
+  it('segue la rubrica spenta nel sito', async () => {
+    sito.addressBookEnabled = false;
+    expect(((await propsDelModulo()).schedaPrivacy as SchedaPrivacy).rubrica).toBeNull();
+  });
+
+  it("passa il testo dell'amministrazione nella lingua della pagina", async () => {
+    sito.aiConsentDisclosure = { it: 'Testo scritto.', fr: 'Texte écrit.' };
+    expect((await propsDelModulo()).testoIa).toBe('Testo scritto.');
+    sito.aiConsentDisclosure = { fr: 'Texte écrit.' };
+    expect((await propsDelModulo()).testoIa).toBeNull();
+  });
 });
 
 describe('pagina di iscrizione: consensi passati al modulo', () => {

@@ -7,6 +7,7 @@ import {
   captionsTranscriptActive,
   liveCaptionsAvailable,
 } from '@/lib/captions/availability';
+import { domandePubbliche } from '@/lib/events/post-event-sections';
 import { tracceConfigurate } from '@/lib/live/capture-state';
 import {
   conduceSempreRegistrato,
@@ -79,7 +80,9 @@ export interface SchedaPrivacy {
   };
   sottotitoli: {
     attivi: boolean;
-    /** Il testo non sparisce con la diretta. Lo legge l'avviso dei sottotitoli. */
+    /** Dove l'evento tiene la trascrizione dai sottotitoli, il testo non sparisce
+     *  con la diretta. Non dipende da `attivi`: chi modera puo' accenderli dal
+     *  vivo (`schedaInSala`, components/events/privacy-sheet). */
     testoConservato: boolean;
   };
   /** Null con la pipeline spenta. Con la pipeline accesa c'e' sempre, perche' il
@@ -94,6 +97,17 @@ export interface SchedaPrivacy {
      *  sintesi o la traduzione. Falso se c'e' gia' tutto, o niente da elaborare. */
     elaborabileDopo: boolean;
   } | null;
+  /** Chat e domande del Q&A dopo l'evento. */
+  chat: {
+    /** L'evento ha la chat: i messaggi non si pubblicano mai. */
+    attiva: boolean;
+    /** L'evento raccoglie domande. */
+    domandeAttive: boolean;
+    /** Cosa si pubblica delle domande (`domandePubbliche`). Non dipende da
+     *  `domandeAttive`: chi modera puo' aprire il Q&A dal vivo (`schedaInSala`,
+     *  components/events/privacy-sheet). */
+    esitoDomande: 'soloTesto' | 'nonPubblicate';
+  };
   elencoVisibile: boolean;
   pseudonimi: boolean;
   conservazione: {
@@ -137,6 +151,9 @@ export type EventoScheda = Pick<
   | 'aiSummaryEnabled'
   | 'aiTranslationEnabled'
   | 'aiDubbingEnabled'
+  | 'chatEnabled'
+  | 'qaEnabled'
+  | 'postEventShowQA'
   | 'participantListVisible'
   | 'audienceAnonymous'
   | 'dataRetentionDays'
@@ -225,17 +242,26 @@ export function schedaPrivacy({
     },
     sottotitoli: {
       attivi: ambiente.sottotitoliDisponibili && evento.liveCaptionsEnabled !== false,
-      testoConservato: ambiente.trascrizioneSottotitoli,
+      testoConservato:
+        ambiente.sottotitoliDisponibili && evento.captionsTranscriptEnabled,
     },
     ia: sito.aiPipelineEnabled
       ? {
           sintesi,
           traduzione,
-          // Serve un video, e si accoda per lingua tradotta (lib/ai/enqueue).
-          doppiaggio: video && evento.aiTranslationEnabled && evento.aiDubbingEnabled,
+          // Serve un video. Si accoda con ogni lingua tradotta, anche con una
+          // aggiunta dopo l'evento a traduzione spenta (lib/ai/enqueue).
+          doppiaggio: video && evento.aiDubbingEnabled,
           elaborabileDopo: siRegistra && !((tracce || dalVideo) && sintesi && traduzione),
         }
       : null,
+    chat: {
+      attiva: evento.chatEnabled,
+      domandeAttive: evento.qaEnabled,
+      esitoDomande: domandePubbliche({ ...evento, qaEnabled: true })
+        ? 'soloTesto'
+        : 'nonPubblicate',
+    },
     elencoVisibile: elencoVisibileAlPubblico(evento),
     pseudonimi: evento.audienceAnonymous,
     conservazione: {
@@ -269,4 +295,17 @@ export function schedaPrivacyEvento(
       tracceDisponibili: tracceDisponibili(),
     },
   });
+}
+
+/**
+ * Il testo sull'elaborazione della registrazione scritto dall'amministrazione per
+ * questa lingua (SiteSetting.aiConsentDisclosure), o null.
+ */
+export function testoIaDelSito(
+  sito: Pick<SiteSetting, 'aiConsentDisclosure'>,
+  locale: string
+): string | null {
+  return (
+    ((sito.aiConsentDisclosure as Record<string, string> | null) ?? {})[locale] ?? null
+  );
 }

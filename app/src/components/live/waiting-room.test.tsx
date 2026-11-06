@@ -11,6 +11,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import messages from '@/i18n/messages/it.json';
+import type { SchedaPrivacy } from '@/lib/events/privacy-sheet';
 
 import WaitingRoom from './waiting-room';
 
@@ -785,10 +786,16 @@ describe('sala d\'attesa — il testo segue la destinazione', () => {
     expect(container.textContent).not.toContain(t.recordingConsentIntro);
   });
 
-  it('il testo scelto per l\'evento resta sopra la casella anche senza video', () => {
+  it('senza video il testo scelto per l\'evento non si mostra: direbbe il contrario della casella', () => {
     render({ ...ingresso, voce: 'assente', recordingConsentText: 'Testo dell\'ente.' });
+    expect(container.textContent).not.toContain('Testo dell\'ente.');
+    expect(container.textContent).toContain(t.recordingConsentIntroNoVideo);
+  });
+
+  it('con un video il testo scelto per l\'evento resta', () => {
+    render({ ...ingresso, voce: 'fissa', recordingConsentText: 'Testo dell\'ente.' });
     expect(container.textContent).toContain('Testo dell\'ente.');
-    expect(container.textContent).not.toContain(t.recordingConsentIntroNoVideo);
+    expect(container.textContent).not.toContain(t.recordingConsentIntro);
   });
 
   it('il consenso viaggia con il testo su cui si e\' spuntata la casella', () => {
@@ -865,6 +872,201 @@ describe('sala d\'attesa — trascrizione', () => {
       multitrackConsentExempt: true,
     });
     expect($('#waiting-multitrack-consent')).toBeNull();
+  });
+});
+
+describe('sala d\'attesa — la scheda privacy', () => {
+  const sheet = messages.gdpr.sheet;
+  const gdprLink = messages.registration.gdprLink;
+  const SCHEDA: SchedaPrivacy = {
+    registrazione: {
+      modo: 'manuale',
+      destinazione: 'PUBLIC',
+      chiNonAcconsente: 'restaFuori',
+      conduceSempre: false,
+    },
+    trascrizione: { sottotitoli: false, tracce: null, dalVideo: false },
+    sottotitoli: { attivi: true, testoConservato: false },
+    ia: { sintesi: true, traduzione: false, doppiaggio: false, elaborabileDopo: false },
+    chat: { attiva: true, domandeAttive: true, esitoDomande: 'soloTesto' },
+    elencoVisibile: true,
+    pseudonimi: false,
+    conservazione: { giorniDati: 30, video: { giorniDopoPubblicazione: null } },
+    rubrica: null,
+  };
+  const SENZA_REGISTRAZIONE: SchedaPrivacy = {
+    ...SCHEDA,
+    registrazione: {
+      modo: 'nessuna',
+      destinazione: null,
+      chiNonAcconsente: null,
+      conduceSempre: false,
+    },
+  };
+  const eventoConAvvisi: Evento = {
+    ...eventoLive,
+    recordingEnabled: true,
+    aiPostprodEnabled: true,
+    liveCaptions: true,
+  };
+  const linkInformativa = () =>
+    Array.from(container.querySelectorAll<HTMLAnchorElement>('a')).filter(
+      (a) => a.textContent === gdprLink,
+    );
+
+  it('compare aperta, con il testo intero, senza caselle da spuntare', () => {
+    render({ event: eventoConAvvisi, schedaPrivacy: SCHEDA });
+    expect($('#waiting-recording-consent')).toBeNull();
+    expect(container.textContent).toContain(sheet.title);
+    expect(container.textContent).toContain(sheet.recording.manual);
+    expect(container.textContent).toContain(sheet.chat.messages);
+    expect(container.querySelector('details .wr-facts--frasi')).toBeNull();
+  });
+
+  it('assorbe l\'avviso AI e quello dei sottotitoli, senza ripeterli', () => {
+    render({ event: eventoConAvvisi, schedaPrivacy: SCHEDA });
+    expect(container.textContent).not.toContain(t.aiNoticeTitle);
+    expect(container.textContent).not.toContain(t.aiNotice);
+    expect(container.textContent).not.toContain(t.captionsNoticeTitle);
+    expect(container.textContent).toContain(sheet.ai.summary);
+    expect(container.textContent).toContain(sheet.ai.accuracy);
+    expect(container.textContent?.split(t.captionsNotice)).toHaveLength(2);
+  });
+
+  it('il testo dell\'amministrazione finisce nella scheda', () => {
+    render({
+      event: { ...eventoConAvvisi, aiConsentDisclosure: 'Testo scritto dall\'ente.' },
+      schedaPrivacy: SCHEDA,
+    });
+    expect(container.textContent).toContain('Testo scritto dall\'ente.');
+    expect(container.textContent).not.toContain(sheet.ai.summary);
+  });
+
+  it('senza scheda, come sulle chiamate rapide, gli avvisi restano', () => {
+    render({ event: eventoConAvvisi, schedaPrivacy: null });
+    expect(container.textContent).not.toContain(sheet.title);
+    expect(container.textContent).toContain(t.aiNotice);
+    expect(container.textContent).toContain(t.captionsNotice);
+  });
+
+  it('il link all\'informativa sta accanto alla scheda anche senza caselle', () => {
+    render({ event: eventoLive, schedaPrivacy: SCHEDA, privacy: { url: '/it/privacy' } });
+    expect($('.wr-consensi')).toBeNull();
+    expect(linkInformativa()).toHaveLength(1);
+    expect(linkInformativa()[0]?.getAttribute('href')).toBe('/it/privacy');
+  });
+
+  it('con le caselle il link non sta dentro il blocco dei consensi, e compare una volta', () => {
+    render({
+      event: { ...eventoLive, recordingEnabled: true },
+      schedaPrivacy: SCHEDA,
+      recordingConsentRequired: true,
+      privacy: { url: '/it/privacy' },
+    });
+    expect($('.wr-consensi')).not.toBeNull();
+    expect($('.wr-consensi .wr-consensi__privacy')).toBeNull();
+    expect(linkInformativa()).toHaveLength(1);
+  });
+
+  it('il testo dell\'informativa si apre sul posto anche senza caselle', () => {
+    render({
+      event: eventoLive,
+      schedaPrivacy: SCHEDA,
+      privacy: { url: '/it/privacy', testo: 'Informativa dell\'evento.' },
+    });
+    premi(pulsante(gdprLink));
+    expect(container.textContent).toContain('Informativa dell\'evento.');
+    expect(container.querySelectorAll('#wr-consensi-informativa')).toHaveLength(1);
+  });
+
+  it('senza scheda e senza caselle il link non compare da solo', () => {
+    render({ event: eventoLive, privacy: { url: '/it/privacy' } });
+    expect(linkInformativa()).toHaveLength(0);
+  });
+
+  it('sta prima del pulsante per entrare, sotto i consensi', () => {
+    render({
+      event: { ...eventoLive, recordingEnabled: true },
+      schedaPrivacy: SCHEDA,
+      recordingConsentRequired: true,
+      defaultName: 'Relatore 1',
+    });
+    const segue = (prima: Node, dopo: Node) =>
+      (prima.compareDocumentPosition(dopo) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
+    const titolo = Array.from(container.querySelectorAll('h2')).find(
+      (h) => h.textContent === sheet.title,
+    ) as Node;
+    expect(segue($('.wr-consensi') as Node, titolo)).toBe(true);
+    expect(segue(titolo, pulsante(t.enterNow))).toBe(true);
+  });
+
+  it('a evento concluso non compare', () => {
+    render({ event: { ...eventoConAvvisi, status: 'ENDED' }, schedaPrivacy: SCHEDA });
+    expect(container.textContent).not.toContain(sheet.title);
+    expect(container.textContent).not.toContain(t.aiNotice);
+  });
+
+  it('un evento mai tenuto non ha una scheda', () => {
+    render({
+      event: { ...eventoConAvvisi, status: 'PUBLISHED', endsAt: oraPiu(-30), startsAt: oraPiu(-90) },
+      schedaPrivacy: SCHEDA,
+    });
+    expect(container.textContent).toContain(t.notHeldTitle);
+    expect(container.textContent).not.toContain(sheet.title);
+  });
+
+  it('il riepilogo resta di una riga, e non promette una registrazione certa', () => {
+    render({ event: { ...eventoLive, recordingEnabled: true }, schedaPrivacy: SCHEDA });
+    expect(container.textContent).toContain(t.recordingNotice);
+    expect(t.recordingNotice).not.toMatch(/viene registrato/);
+    expect(t.recordingNotice).not.toBe(sheet.recording.manual);
+  });
+
+  it('di solo ascolto, il riepilogo non ripete la frase della scheda', () => {
+    render({
+      event: { ...eventoLive, recordingEnabled: true },
+      schedaPrivacy: {
+        ...SCHEDA,
+        registrazione: { ...SCHEDA.registrazione, chiNonAcconsente: 'avvisoVoce' },
+      },
+      recordingListenOnly: true,
+    });
+    expect(container.textContent).toContain(t.recordingNotice);
+    expect(container.textContent).not.toContain(messages.gdpr.consent.recordingNoticeVoice);
+    expect(container.textContent).toContain(sheet.recording.audienceNoticeVoice);
+  });
+
+  it('se la scheda dice che non si registra niente, il riepilogo non lo annuncia', () => {
+    render({
+      event: { ...eventoLive, recordingEnabled: true },
+      schedaPrivacy: SENZA_REGISTRAZIONE,
+      voce: 'assente',
+    });
+    expect(container.textContent).toContain(sheet.recording.none);
+    expect(container.textContent).not.toContain(t.recordingNotice);
+    expect($('.wr-fact__rec')).toBeNull();
+  });
+
+  it('chi conduce ed e\' sempre nel video tiene la sua riga', () => {
+    render({
+      event: { ...eventoLive, recordingEnabled: true },
+      schedaPrivacy: SCHEDA,
+      recordingHostAlways: true,
+      recordingDestination: 'PUBLIC',
+    });
+    expect(container.textContent).toContain(messages.gdpr.consent.recordingHostAlwaysPublic);
+    expect(container.textContent).not.toContain(t.recordingNotice);
+  });
+
+  it('non cambia cio\' che ferma l\'ingresso', () => {
+    render({
+      event: { ...eventoLive, recordingEnabled: true },
+      schedaPrivacy: SCHEDA,
+      recordingConsentRequired: true,
+      defaultName: 'Relatore 1',
+    });
+    premi(pulsante(t.enterNow));
+    expect(onEnterLive).toHaveBeenCalledTimes(1);
   });
 });
 

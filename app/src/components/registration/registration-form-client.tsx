@@ -16,12 +16,14 @@ import {
 
 import { Icon } from '@/components/ui/icon';
 import { Link, useRouter, percorso } from '@/i18n/navigation';
+import { PrivacySheet } from '@/components/events/privacy-sheet';
 import QuestionnaireForm, {
   type QuestionnaireState,
   type RenderedQuestionnaire,
 } from '@/components/questionnaires/questionnaire-form';
 import { createRegistrationSchema, ORGANIZATION_TYPES } from '@/lib/validation/schemas';
 import type { RegistrationAccess } from '@/lib/events/registration-access';
+import type { SchedaPrivacy } from '@/lib/events/privacy-sheet';
 import { MESI_RUBRICA_PREDEFINITI } from '@/lib/persons/retention';
 import {
   chiaveConsenso,
@@ -41,6 +43,11 @@ interface RegistrationFormClientProps {
   eventSlug: string;
   privacyPolicyUrl: string;
   privacyPolicyText?: string;
+  /** La scheda privacy dell'evento (lib/events/privacy-sheet), calcolata sul
+   *  server con la riga delle impostazioni. */
+  schedaPrivacy?: SchedaPrivacy | null;
+  /** Il testo dell'amministrazione sull'elaborazione della registrazione. */
+  testoIa?: string | null;
   recordingEnabled?: boolean;
   /** Dove va il video: decide il testo della casella della registrazione
    *  (lib/recording/destination). */
@@ -99,6 +106,8 @@ export default function RegistrationFormClient({
   eventSlug,
   privacyPolicyUrl,
   privacyPolicyText,
+  schedaPrivacy = null,
+  testoIa = null,
   recordingEnabled = false,
   recordingDestination = null,
   multitrackRecordingEnabled = false,
@@ -789,6 +798,13 @@ export default function RegistrationFormClient({
         </FormGroup>
       )}
 
+      {/* La scheda dell'evento, poi l'informativa a cui rimanda. */}
+      {schedaPrivacy && (
+        <div className="mb-3">
+          <PrivacySheet scheda={schedaPrivacy} testoIa={testoIa} />
+        </div>
+      )}
+
       {/* ── Privacy policy (inline text or link) ── */}
       {privacyPolicyText ? (
         <div className="mb-4">
@@ -926,7 +942,8 @@ export default function RegistrationFormClient({
             )}
           </FormGroup>
         )}
-        {richiesti.avvisoRegistrazione && (
+        {/* Dove la scheda dice che non si registra niente, qui non si annuncia. */}
+        {richiesti.avvisoRegistrazione && schedaPrivacy?.registrazione.modo !== 'nessuna' && (
           <p className="registration-consents__notice mb-3">
             {tg(voce === 'fissa' ? 'consent.recordingNotice' : 'consent.recordingNoticeVoice')}
           </p>

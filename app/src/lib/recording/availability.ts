@@ -6,7 +6,7 @@ import type { VoceNelVideo } from '@/lib/live/consent-rule';
 
 /**
  * Se questa installazione puo' registrare un evento. Decide cosa si dice a chi
- * partecipa: l'avviso «questo evento viene registrato» e il consenso prima di
+ * partecipa: l'avviso «questo evento puo' essere registrato» e il consenso prima di
  * entrare. Sbagliare per eccesso costa un avviso inutile; sbagliare per difetto
  * vuol dire registrare senza consenso. Per questo la risposta e' «no» solo
  * quando l'assenza e' certa:
