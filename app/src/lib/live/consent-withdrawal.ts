@@ -208,8 +208,8 @@ export async function ritiraConsensi(
  * dell'iscrizione copre comunicazioni e rubrica: si tolgono entrambe, su ogni
  * iscrizione dell'indirizzo, e il registro lo annota per ogni evento toccato.
  * La voce di rubrica perde subito l'email e gli inviti dell'indirizzo si fermano,
- * anche quelli scritti a mano (`fermaInviti`): il resto della riga lo toglie la
- * corsa successiva di api/cron/rubrica-retention.
+ * anche quelli scritti a mano e le loro email in coda (`fermaInviti`): il resto
+ * della riga lo toglie la corsa successiva di api/cron/rubrica-retention.
  */
 export async function ritiraComunicazioni(
   emailHash: string,

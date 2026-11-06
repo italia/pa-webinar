@@ -8,7 +8,8 @@ const tx = vi.hoisted(() => ({
   multitrackConsent: { findMany: vi.fn(), updateMany: vi.fn() },
   registration: { updateMany: vi.fn(), findMany: vi.fn() },
   person: { updateMany: vi.fn() },
-  eventInvitation: { deleteMany: vi.fn(), updateMany: vi.fn() },
+  eventInvitation: { findMany: vi.fn(), deleteMany: vi.fn(), updateMany: vi.fn() },
+  emailOutbox: { deleteMany: vi.fn() },
   captionSegment: { updateMany: vi.fn() },
   gdprAuditLog: { create: vi.fn(), createMany: vi.fn() },
 }));
@@ -38,6 +39,7 @@ beforeEach(() => {
   tx.multitrackConsent.updateMany.mockResolvedValue({ count: 0 });
   tx.registration.updateMany.mockResolvedValue({ count: 0 });
   tx.captionSegment.updateMany.mockResolvedValue({ count: 0 });
+  tx.eventInvitation.findMany.mockResolvedValue([]);
 });
 
 describe('ritiraConsensi', () => {
@@ -266,6 +268,20 @@ describe('ritiraComunicazioni', () => {
     expect(tx.eventInvitation.updateMany).toHaveBeenCalledWith({
       where: { AND: [dove], declinedAt: null },
       data: { declinedAt: ADESSO },
+    });
+  });
+
+  it('toglie le email degli inviti ancora in coda', async () => {
+    tx.registration.findMany.mockResolvedValue([]);
+    tx.person.updateMany.mockResolvedValue({ count: 1 });
+    tx.eventInvitation.findMany.mockResolvedValue([{ id: 'inv-1' }]);
+    tx.emailOutbox.deleteMany.mockResolvedValue({ count: 1 });
+    await ritiraComunicazioni('impronta', ADESSO);
+    expect(tx.emailOutbox.deleteMany).toHaveBeenCalledWith({
+      where: {
+        status: { in: ['PENDING', 'FAILED'] },
+        OR: [{ dedupKey: { startsWith: 'event-invitation:inv-1:' } }],
+      },
     });
   });
 

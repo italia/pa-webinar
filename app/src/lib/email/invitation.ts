@@ -35,7 +35,7 @@ import { hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { linguaEmail, linguaPagina, type EmailLocale } from '@/lib/email/lingua';
 import { emailBaseUrl } from '@/lib/email/links';
-import { enqueueEmailOnce } from '@/lib/email/outbox';
+import { chiaveEmailInvito, enqueueEmailOnce } from '@/lib/email/outbox';
 import { escapeHtml } from '@/lib/email/templates';
 import { publicRegistrationFor } from '@/lib/events/access-mode';
 import { isEventOpenForRegistration } from '@/lib/events/visibility';
@@ -329,23 +329,22 @@ export async function sendInvitations(
       skipped += 1;
       continue;
     }
-    // Il token si scrive solo se manca, e si rilegge: con due richieste
-    // insieme vince la prima, e l'email porta quello salvato.
+    // Il token si scrive solo se manca. La riga si rilegge subito prima di
+    // accodare: con due richieste insieme vince il primo token e l'email porta
+    // quello salvato, e un ritiro arrivato mentre il giro scorre l'elenco ferma
+    // questa email (o ha cancellato la riga).
     if (!r.token) {
       await prisma.eventInvitation.updateMany({
         where: { id: r.id, token: null },
         data: { token: nuovoToken() },
       });
     }
-    const token =
-      r.token ??
-      (
-        await prisma.eventInvitation.findUnique({
-          where: { id: r.id },
-          select: { token: true },
-        })
-      )?.token;
-    if (!token) {
+    const attuale = await prisma.eventInvitation.findUnique({
+      where: { id: r.id },
+      select: { token: true, declinedAt: true },
+    });
+    const token = attuale?.token;
+    if (!token || attuale.declinedAt) {
       skipped += 1;
       continue;
     }
@@ -379,14 +378,14 @@ export async function sendInvitations(
       html: mail.html,
       text: mail.text,
       metadata: { kind: 'event-invitation', eventId: event.id },
-      dedupKey: `event-invitation:${r.id}:${r.sentAt?.toISOString() ?? 'primo'}`,
+      dedupKey: `${chiaveEmailInvito(r.id)}${r.sentAt?.toISOString() ?? 'primo'}`,
     });
     if (!accodata) {
       skipped += 1;
       continue;
     }
     // «Invitato» solo con l'email davvero in coda.
-    await prisma.eventInvitation.update({
+    await prisma.eventInvitation.updateMany({
       where: { id: r.id },
       data: { sentAt: new Date() },
     });

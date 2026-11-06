@@ -195,17 +195,31 @@ export function nextAttemptDelayMs(attempts: number): number {
 
 export const MAX_EMAIL_OUTBOX_ATTEMPTS = 6;
 
+/** La parte fissa di `dedupKey` delle email di un invito: dopo c'e' il giro di invio. */
+export function chiaveEmailInvito(invitationId: string): string {
+  return `event-invitation:${invitationId}:`;
+}
+
+const emailDiInviti = (ids: readonly string[]) =>
+  ids.map((id) => ({ dedupKey: { startsWith: chiaveEmailInvito(id) } }));
+
+type DbCoda = Pick<Prisma.TransactionClient, 'emailOutbox'>;
+
 /**
  * Le email ancora da inviare (in coda, o fallite e in attesa di un nuovo
- * tentativo) di eventi o iscrizioni che se ne vanno: una conferma, un
- * promemoria o un invito non partono per un evento cancellato, ne' verso chi
- * ha chiesto la cancellazione dei propri dati. Le righe gia' inviate seguono
- * la conservazione della coda (cron cleanup). Va chiamata nella stessa
- * transazione che cancella.
+ * tentativo) di eventi, iscrizioni o inviti che se ne vanno o si fermano: una
+ * conferma, un promemoria o un invito non partono per un evento cancellato, ne'
+ * verso chi ha ritirato il consenso o chiesto la cancellazione dei propri dati.
+ * Le righe gia' inviate seguono la conservazione della coda (cron cleanup). Va
+ * chiamata nella stessa transazione che cancella.
  */
 export async function annullaEmailInCoda(
-  tx: Prisma.TransactionClient,
-  chi: { eventIds?: readonly string[]; registrationIds?: readonly string[] }
+  tx: DbCoda,
+  chi: {
+    eventIds?: readonly string[];
+    registrationIds?: readonly string[];
+    invitationIds?: readonly string[];
+  }
 ): Promise<number> {
   const condizioni = [
     ...(chi.eventIds ?? []).map((id) => ({
@@ -214,10 +228,27 @@ export async function annullaEmailInCoda(
     ...(chi.registrationIds ?? []).map((id) => ({
       metadata: { path: ['registrationId'], equals: id },
     })),
+    ...emailDiInviti(chi.invitationIds ?? []),
   ];
   if (condizioni.length === 0) return 0;
   const { count } = await tx.emailOutbox.deleteMany({
     where: { status: { in: ['PENDING', 'FAILED'] }, OR: condizioni },
+  });
+  return count;
+}
+
+/**
+ * Tutte le email di inviti cancellati su richiesta della persona, anche quelle
+ * gia' inviate: portano nome, indirizzo e link d'iscrizione, e senza l'invito
+ * nessun nuovo invio puo' riusare la chiave.
+ */
+export async function cancellaEmailInviti(
+  tx: DbCoda,
+  invitationIds: readonly string[]
+): Promise<number> {
+  if (invitationIds.length === 0) return 0;
+  const { count } = await tx.emailOutbox.deleteMany({
+    where: { OR: emailDiInviti(invitationIds) },
   });
   return count;
 }

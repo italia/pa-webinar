@@ -15,7 +15,6 @@ const db = vi.hoisted(() => ({
   event: { findUnique: vi.fn() },
   eventInvitation: {
     findMany: vi.fn(),
-    update: vi.fn(),
     updateMany: vi.fn(),
     findUnique: vi.fn(),
     findFirst: vi.fn(),
@@ -23,7 +22,10 @@ const db = vi.hoisted(() => ({
   registration: { findMany: vi.fn() },
   person: { findMany: vi.fn() },
 }));
-const coda = vi.hoisted(() => ({ enqueueEmailOnce: vi.fn() }));
+const coda = vi.hoisted(() => ({
+  enqueueEmailOnce: vi.fn(),
+  chiaveEmailInvito: (id: string) => `event-invitation:${id}:`,
+}));
 vi.mock('@/lib/db', () => ({ prisma: db }));
 vi.mock('@/lib/email/outbox', () => coda);
 vi.mock('@/lib/settings', () => ({
@@ -65,7 +67,6 @@ beforeEach(() => {
   for (const f of [
     db.event.findUnique,
     db.eventInvitation.findMany,
-    db.eventInvitation.update,
     db.eventInvitation.updateMany,
     db.eventInvitation.findUnique,
     db.registration.findMany,
@@ -76,6 +77,10 @@ beforeEach(() => {
   db.event.findUnique.mockResolvedValue(evento);
   db.registration.findMany.mockResolvedValue([]);
   db.person.findMany.mockResolvedValue([]);
+  db.eventInvitation.findUnique.mockImplementation(async () => ({
+    token: 'riletto',
+    declinedAt: null,
+  }));
   coda.enqueueEmailOnce.mockResolvedValue(true);
 });
 afterEach(() => {
@@ -143,14 +148,13 @@ describe('sendInvitations', () => {
         sentAt: null,
       },
     ]);
-    db.eventInvitation.findUnique.mockResolvedValue({ token: 'salvato' });
+    db.eventInvitation.findUnique.mockResolvedValue({ token: 'salvato', declinedAt: null });
     const ordine: string[] = [];
-    db.eventInvitation.updateMany.mockImplementation(async () => {
-      ordine.push('token');
-    });
-    db.eventInvitation.update.mockImplementation(async () => {
-      ordine.push('sentAt');
-    });
+    db.eventInvitation.updateMany.mockImplementation(
+      async ({ data }: { data: { token?: string } }) => {
+        ordine.push(data.token ? 'token' : 'sentAt');
+      }
+    );
     coda.enqueueEmailOnce.mockImplementation(async () => {
       ordine.push('email');
       return true;
@@ -206,7 +210,65 @@ describe('sendInvitations', () => {
     expect(
       (coda.enqueueEmailOnce.mock.calls[0]![0] as { dedupKey: string }).dedupKey
     ).toBe('event-invitation:i1:2026-10-30T10:00:00.000Z');
-    expect(db.eventInvitation.update).not.toHaveBeenCalled();
+    expect(db.eventInvitation.updateMany).not.toHaveBeenCalled();
+  });
+
+  it('un ritiro arrivato durante il giro ferma l’email: la riga si rilegge prima di accodare', async () => {
+    db.eventInvitation.findMany.mockResolvedValue([
+      {
+        id: 'i1',
+        name: null,
+        email: 'p1@example.org',
+        emailHash: 'h:p1@example.org',
+        token: 't',
+        sentAt: null,
+        declinedAt: null,
+      },
+      {
+        id: 'i2',
+        name: null,
+        email: 'p2@example.org',
+        emailHash: 'h:p2@example.org',
+        token: 't2',
+        sentAt: null,
+        declinedAt: null,
+      },
+    ]);
+    db.eventInvitation.findUnique
+      .mockResolvedValueOnce({ token: 't', declinedAt: new Date() })
+      .mockResolvedValueOnce(null);
+    expect(await sendInvitations('e1', { locale: 'it' })).toEqual({
+      sent: 0,
+      skipped: 2,
+      remaining: 0,
+    });
+    expect(coda.enqueueEmailOnce).not.toHaveBeenCalled();
+  });
+
+  it('una riga sparita dopo l’accodamento non interrompe il giro', async () => {
+    db.eventInvitation.findMany.mockResolvedValue([
+      {
+        id: 'i1',
+        name: null,
+        email: 'p1@example.org',
+        emailHash: 'h:p1@example.org',
+        token: 't',
+        sentAt: null,
+        declinedAt: null,
+      },
+      {
+        id: 'i2',
+        name: null,
+        email: 'p2@example.org',
+        emailHash: 'h:p2@example.org',
+        token: 't2',
+        sentAt: null,
+        declinedAt: null,
+      },
+    ]);
+    db.eventInvitation.updateMany.mockResolvedValueOnce({ count: 0 });
+    expect(await sendInvitations('e1', { locale: 'it' })).toMatchObject({ sent: 2 });
+    expect(db.eventInvitation.updateMany).toHaveBeenCalledTimes(2);
   });
 
   it("salta chi si e' gia' iscritto: con un elenco lo conta, invitando tutti no", async () => {
@@ -229,6 +291,7 @@ describe('sendInvitations', () => {
       },
     ];
     db.eventInvitation.findMany.mockResolvedValue(righe);
+    db.eventInvitation.findUnique.mockResolvedValue({ token: 'gia-dato', declinedAt: null });
     db.registration.findMany.mockResolvedValue([{ emailHash: 'h:p2@example.org' }]);
     expect(await sendInvitations('e1', { ids: ['i1', 'i2'], locale: 'it' })).toEqual({
       sent: 1,
@@ -238,7 +301,10 @@ describe('sendInvitations', () => {
     expect((coda.enqueueEmailOnce.mock.calls[0]![0] as { html: string }).html).toContain(
       'invito=gia-dato'
     );
-    expect(db.eventInvitation.updateMany).not.toHaveBeenCalled();
+    // Il token c'era: si scrive solo la data dell'invio.
+    expect(db.eventInvitation.updateMany.mock.calls.map(([a]) => Object.keys(a.data))).toEqual([
+      ['sentAt'],
+    ]);
     expect(await sendInvitations('e1', { locale: 'it' })).toEqual({
       sent: 1,
       skipped: 0,
@@ -371,7 +437,7 @@ describe('sendInvitations e rubrica', () => {
       remaining: 0,
     });
     expect(inCoda().to).toBe('p2@example.org');
-    expect(db.eventInvitation.update).toHaveBeenCalledTimes(1);
+    expect(db.eventInvitation.updateMany).toHaveBeenCalledTimes(1);
   });
 
   it('senza impronte non cerca in rubrica', async () => {
