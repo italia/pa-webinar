@@ -4461,7 +4461,9 @@
         "destinationUnset": "Chi organizza decide dopo l'evento se pubblicarla.",
         "refuseOut": "Se non acconsenti partecipi lo stesso e resti fuori dalla registrazione.",
         "refuseListenOnly": "Se non acconsenti partecipi in solo ascolto.",
-        "hostsAlways": "Chi conduce è sempre nella registrazione, con nome, voce, immagine e schermo condiviso."
+        "hostsAlways": "Chi conduce è sempre nella registrazione, con nome, voce, immagine e schermo condiviso.",
+        "audienceNotice": "Partecipi senza microfono né videocamera: la registrazione non contiene la tua voce né la tua immagine, a meno che chi conduce non ti dia la parola.",
+        "audienceNoticeVoice": "Partecipi senza microfono né videocamera: la registrazione non contiene il tuo nome, la tua voce né la tua immagine, a meno che tu non acconsenta in sala."
       },
       "transcript": {
         "label": "Trascrizione",
@@ -4478,6 +4480,7 @@
         "summary": "Dopo l'evento uno strumento di intelligenza artificiale può scrivere la sintesi della registrazione.",
         "translation": "Trascrizione e sintesi possono essere tradotte automaticamente.",
         "dubbing": "Il video può avere un doppiaggio con voce sintetica.",
+        "onRequest": "Dopo l'evento chi organizza può chiedere anche elaborazioni automatiche della registrazione non indicate qui: trascrizione, sintesi o traduzione.",
         "report": "Dopo l'evento lo staff può far scrivere un resoconto con l'intelligenza artificiale, a partire anche da chat senza nomi, domande e sondaggi."
       },
       "list": {
@@ -4496,6 +4499,10 @@
         "videoUnpublished": "Se non viene messa a disposizione, la registrazione si cancella con loro.",
         "videoPublishedDays": "Se viene messa a disposizione, si cancella {days, plural, one {# giorno} other {# giorni}} dopo.",
         "videoPublishedOpen": "Se viene messa a disposizione, resta finché chi organizza non la toglie."
+      },
+      "addressBook": {
+        "label": "Rubrica",
+        "offered": "Iscrivendoti puoi scegliere di restare nella rubrica degli eventi, per essere invitato a eventi simili. È facoltativo: i dati restano {months} mesi dal consenso, salvo revoca."
       }
     },
     "export": {

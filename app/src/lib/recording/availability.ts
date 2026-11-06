@@ -33,6 +33,19 @@ export function recordingAvailable(
 }
 
 /**
+ * Se questa installazione puo' registrare una traccia audio per persona: con il
+ * registratore per partecipante collegato. `recordingAvailable` non basta, perche'
+ * e' vera anche con il solo Jibri, che di tracce non ne fa. Con un Jitsi esterno
+ * non si sa chi registra: vale la risposta prudente, come sopra.
+ */
+export function tracceDisponibili(
+  env: Record<string, string | undefined> = process.env,
+): boolean {
+  const jitsiDelChart = !!env.JITSI_WEB_INTERNAL_URL?.trim();
+  return !jitsiDelChart || !!env.RECORDER_CONTROLLER_URL?.trim();
+}
+
+/**
  * La voce di chi non ha un consenso valido nel video completo. La sessione del
  * registratore (Jibri) non la riproduce: il testo della conferenza del chart, che
  * lo dichiara con RECORDING_VOICE_EXCLUSION. Senza Jibri non c'e' un video

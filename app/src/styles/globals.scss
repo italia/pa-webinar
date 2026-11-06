@@ -7856,6 +7856,20 @@ button.live-time-strip__rec {
   }
 }
 
+// Frasi intere invece di valori brevi: una colonna sola a ogni larghezza, anche
+// fuori dalla scheda della sala d'attesa, e peso normale per reggere la lettura.
+.wr-facts.wr-facts--frasi {
+  grid-template-columns: 1fr;
+
+  .wr-fact__value {
+    font-weight: 400;
+  }
+
+  .wr-fact__value + .wr-fact__value {
+    margin-top: 0.35rem;
+  }
+}
+
 .wr-fact {
   display: flex;
   align-items: flex-start;

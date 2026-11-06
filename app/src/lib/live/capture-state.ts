@@ -27,6 +27,28 @@ export interface StatoCattura {
 
 const STATI_CON_SALA = ['PUBLISHED', 'IDLE', 'PROVISIONING', 'LIVE'];
 
+/**
+ * L'evento e' impostato per registrare una traccia audio per persona, le stesse
+ * condizioni di GET /api/internal/recorder-desired senza guardare se e' in
+ * diretta: la risposta vale anche prima della sala. `registratorePresente`
+ * dice se l'installazione ha qualcosa che possa farlo.
+ */
+export function tracceConfigurate(
+  evento: {
+    recordingEnabled: boolean;
+    aiTranscriptEnabled: boolean;
+    multitrackRecordingEnabled: boolean;
+  },
+  registratorePresente: boolean
+): boolean {
+  return (
+    registratorePresente &&
+    evento.recordingEnabled &&
+    evento.aiTranscriptEnabled &&
+    evento.multitrackRecordingEnabled
+  );
+}
+
 export function statoCattura(
   evento: {
     status: string;
@@ -39,12 +61,7 @@ export function statoCattura(
   sito: { liveCaptionsEnabled?: boolean | null },
   registrazioneDisponibile = true
 ): StatoCattura {
-  const tracce =
-    registrazioneDisponibile &&
-    evento.status === 'LIVE' &&
-    evento.recordingEnabled &&
-    evento.aiTranscriptEnabled &&
-    evento.multitrackRecordingEnabled;
+  const tracce = evento.status === 'LIVE' && tracceConfigurate(evento, registrazioneDisponibile);
   const sottotitoli =
     STATI_CON_SALA.includes(evento.status) && captionsTranscriptActive(evento, sito);
   return { registrazione: tracce, trascrizione: tracce || sottotitoli };
