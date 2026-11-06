@@ -36,7 +36,7 @@ import {
   togglesFromMatrix,
 } from '@/lib/utils/permission-matrix';
 
-import type { NotaDestinazione } from './campi-del-formato';
+import { registrazioneVuota, type NotaDestinazione, type NotaPagina } from './campi-del-formato';
 import ConsentDiagram from './consent-diagram';
 import { nomeLingua } from './text-translation';
 
@@ -114,6 +114,8 @@ interface Props {
     chiesta: boolean;
     /** Cosa diventa la registrazione con un evento su invito. */
     nota?: NotaDestinazione | null;
+    /** Cosa diventa la pagina dopo l'evento. */
+    notaPagina?: NotaPagina | null;
   };
   /** La destinazione dopo il salvataggio: con un link di conduzione la scelta non
    *  c'e', e questa dice cosa diventa l'evento. */
@@ -538,7 +540,11 @@ export default function StepPermissions({
 
         {value.recordingEnabled && !value.autoStartRecording && (
           <p className="text-secondary mb-0 py-2" style={{ fontSize: '0.85rem', borderTop: '1px solid #e8e8e8' }}>
-            {t('recordingManualNote')}
+            {t(
+              registrazioneVuota(value, voceNelVideo, recordingAvailable)
+                ? 'recordingNothingToCapture'
+                : 'recordingManualNote',
+            )}
           </p>
         )}
 
@@ -615,6 +621,11 @@ export default function StepPermissions({
             {destinazione.nota && (
               <p className="text-secondary mb-0 mt-1" style={{ fontSize: '0.85rem' }}>
                 {t(destinazione.nota)}
+              </p>
+            )}
+            {destinazione.notaPagina && (
+              <p className="text-secondary mb-0 mt-1" style={{ fontSize: '0.85rem' }}>
+                {t(destinazione.notaPagina)}
               </p>
             )}
           </fieldset>

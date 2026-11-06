@@ -235,6 +235,35 @@ describe('la domanda sulla registrazione', () => {
     scegli(g.people.piccolo);
     expect(registraScelta()).toBe('pubblica');
   });
+
+  it('passando agli inviti un video pubblico solo ripreso torna alla proposta', () => {
+    const onContinue = render(vi.fn(), true, {
+      initial: { persone: 'medio', voce: 'tutti', registra: 'pubblica', accesso: 'tutti' },
+    });
+    scegli(g.access.invitation);
+    expect(registraScelta()).toBe('riservata');
+    continua();
+    expect(onContinue).toHaveBeenCalledWith(
+      expect.objectContaining({ registra: 'riservata', accesso: 'invitati' }),
+    );
+  });
+
+  it('un video pubblico scelto in questa schermata resta anche su invito', () => {
+    render(vi.fn(), true, {
+      initial: { persone: 'piccolo', voce: 'tutti', registra: 'riservata', accesso: 'tutti' },
+    });
+    scegli(g.rec.public);
+    scegli(g.access.invitation);
+    expect(registraScelta()).toBe('pubblica');
+  });
+
+  it('il no ripreso resta no passando agli inviti', () => {
+    render(vi.fn(), true, {
+      initial: { persone: 'medio', voce: 'tutti', registra: 'no', accesso: 'tutti' },
+    });
+    scegli(g.access.invitation);
+    expect(registraScelta()).toBe('no');
+  });
 });
 
 describe('la griglia a tre colonne', () => {

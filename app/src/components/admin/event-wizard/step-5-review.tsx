@@ -32,7 +32,12 @@ import { togglesFromMatrix } from '@/lib/utils/permission-matrix';
 import { splitTitleKicker } from '@/lib/utils/title-kicker';
 import { describeRRule } from '@/lib/utils/recurrence';
 
-import { destinazioneDopoIlSalvataggio, type NotaDestinazione } from './campi-del-formato';
+import {
+  destinazioneDopoIlSalvataggio,
+  registrazioneVuota,
+  type NotaDestinazione,
+  type NotaPagina,
+} from './campi-del-formato';
 import ConsentDiagram from './consent-diagram';
 import { vociCompilate } from './programme-plan';
 import { nomeLingua } from './text-translation';
@@ -100,6 +105,8 @@ interface Props {
   iscrizioneAperta?: boolean;
   /** Cosa diventa la registrazione con un evento su invito. */
   notaDestinazione?: NotaDestinazione | null;
+  /** Cosa diventa la pagina dopo l'evento. */
+  notaPagina?: NotaPagina | null;
   /** Porta al passo «Persone», dove si sceglie chi si iscrive. */
   onVaiPersone?: () => void;
   /** Porta al passo «Programma». Assente per una chiamata istantanea, che
@@ -138,6 +145,7 @@ export default function Step5Review({
   sopratitolo = false,
   iscrizioneAperta,
   notaDestinazione,
+  notaPagina,
   onVaiPersone,
   onVaiProgramma,
   programmaInCreazione = false,
@@ -209,6 +217,8 @@ export default function Step5Review({
   // partecipa, con la stessa regola (lib/registration/consents): chi crea
   // l'evento vede prima cosa si chiedera', e se la scelta e' quella voluta.
   const registra = form.recordingEnabled && recordingAvailable;
+  // Accesa, ma non produrrebbe nulla: il riepilogo non la promette.
+  const vuota = registrazioneVuota(form, voceNelVideo, recordingAvailable);
   const destinazioneDopo = destinazioneDopoIlSalvataggio(form, destinazioneSenzaScelta);
   const conVideo = videoDaDestinare(voceNelVideo);
   const trascrizioneVideo = trascrizioneDalVideo(
@@ -244,7 +254,7 @@ export default function Step5Review({
     consensi.tracce && tf('consentTranscription'),
   ].filter((x): x is string => !!x);
   const traduce =
-    form.recordingEnabled && form.aiTranscriptEnabled && form.aiTranslationEnabled;
+    !vuota && form.recordingEnabled && form.aiTranscriptEnabled && form.aiTranslationEnabled;
   const funzioniAi = [
     tForm('aiTranscriptEnabled'),
     form.aiSummaryEnabled && tForm('aiSummaryEnabled'),
@@ -492,7 +502,7 @@ export default function Step5Review({
               <IconaRec />
             </span>
             <span>
-              {!form.recordingEnabled
+              {!form.recordingEnabled || vuota
                 ? t('summary.recordingOff')
                 : form.autoStartRecording
                   ? t('summary.recordingAuto')
@@ -500,6 +510,11 @@ export default function Step5Review({
               {/* Dove va il video. Se manca e va scelto, lo dice l'elenco in cima.
                   Dove il video della sala non c'e' si dice solo quella che l'evento
                   avra', e non si cambia: la scelta non si propone. */}
+              {vuota && (
+                <span className="d-block text-secondary small mt-1">
+                  {tp('recordingNothingToCapture')}
+                </span>
+              )}
               {registra &&
                 !istantanea &&
                 (conVideo || destinazioneDopo !== null) &&
@@ -531,7 +546,10 @@ export default function Step5Review({
                   )}
                 </span>
               )}
-              {form.recordingEnabled && form.aiTranscriptEnabled && (
+              {notaPagina && (
+                <span className="d-block text-secondary small mt-1">{tp(notaPagina)}</span>
+              )}
+              {!vuota && form.recordingEnabled && form.aiTranscriptEnabled && (
                 <span className="d-block">
                   {tf('aiAfter', { list: funzioniAi.join(', ') })}
                 </span>

@@ -18,7 +18,7 @@ import type { PersonRole } from '@/lib/events/grant-profile';
 import { accessModeDaSalvare, publicRegistrationFor } from '@/lib/events/access-mode';
 import { logoPubblico } from '@/lib/events/public-people';
 
-import type { NotaDestinazione } from './campi-del-formato';
+import type { NotaDestinazione, NotaPagina } from './campi-del-formato';
 import { BOZZA_VUOTA, controllaBozza, conRuolo, indirizziPresi, type Bozza } from './people-draft';
 import RuoliEvento from './ruoli-evento';
 import Gruppo from './wizard-group';
@@ -1175,6 +1175,7 @@ export function SezioneIscrizione({
   iniziale = null,
   questionari,
   notaDestinazione,
+  notaPagina,
   elencoInvitati,
 }: {
   /** L'elenco degli invitati, mostrato dentro la scelta «solo le persone
@@ -1212,6 +1213,8 @@ export function SezioneIscrizione({
   questionari?: React.ReactNode;
   /** Cosa diventa la registrazione con un evento su invito. */
   notaDestinazione?: NotaDestinazione | null;
+  /** Cosa diventa la pagina dopo l'evento. */
+  notaPagina?: NotaPagina | null;
 }) {
   const t = useTranslations('admin.wizard.step3');
   const tg = useTranslations('admin.guided');
@@ -1296,6 +1299,7 @@ export function SezioneIscrizione({
         )}
       </fieldset>
       {notaDestinazione && <p className="formato__nota" role="status">{tp(notaDestinazione)}</p>}
+      {notaPagina && <p className="formato__nota" role="status">{tp(notaPagina)}</p>}
       {effettivo === 'INVITATION' && invitati === 0 && (
         <p className="wizard-iscrizione__avviso" role="status">
           <Icon icon="it-warning-circle" size="sm" />

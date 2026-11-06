@@ -20,7 +20,9 @@ import type { RecordingAudience } from '@prisma/client';
 
 import type { WizardTemplatePreset } from '@/components/admin/event-wizard/wizard-shell';
 import { accessModeDaSalvare } from '@/lib/events/access-mode';
+import type { VoceNelVideo } from '@/lib/live/consent-rule';
 import { VASTA_SCALA } from '@/lib/live/participant-list';
+import { videoDaDestinare } from '@/lib/recording/destination';
 
 export type FormatoPersone = 'piccolo' | 'medio' | 'grande';
 export type FormatoVoce = 'tutti' | 'relatori';
@@ -173,10 +175,45 @@ export function formatoPossibile(
   return !conVideo && f.registra === 'pubblica' ? { ...f, registra: 'riservata' } : f;
 }
 
+/** Se in questa installazione la registrazione di un evento produce qualcosa: il
+ *  video della sala o, senza quello, le tracce per persona, che il wizard accende
+ *  solo con la pipeline AI. `puoRegistrare` risponde «si'» anche nel dubbio, perche'
+ *  decide gli avvisi a chi partecipa: chi organizza non riceve la promessa di una
+ *  registrazione che non parte. */
+export function registrazioneProponibile(
+  puoRegistrare: boolean,
+  voce: VoceNelVideo | undefined,
+  aiPipelineEnabled: boolean,
+): boolean {
+  return puoRegistrare && (videoDaDestinare(voce) || aiPipelineEnabled);
+}
+
+/** Dove la domanda sulla registrazione non si fa perche' non produrrebbe nulla, la
+ *  trascrizione dai sottotitoli funziona lo stesso: non dipende ne' dal video ne'
+ *  dalla pipeline AI, e la risposta mancante non la spegne. */
+export function trascriveSenzaRegistrare(
+  puoRegistrare: boolean,
+  voce: VoceNelVideo | undefined,
+  aiPipelineEnabled: boolean,
+  sottotitoliDisponibili: boolean,
+): boolean {
+  return (
+    puoRegistrare &&
+    sottotitoliDisponibili &&
+    !registrazioneProponibile(puoRegistrare, voce, aiPipelineEnabled)
+  );
+}
+
 /** I valori di partenza del wizard per un formato, nella forma di un modello.
  *  `sitoAperto`: l'iscrizione pubblica del sito, per non fissare sull'evento
- *  una scelta che coincide con la sua (vedi accessModeDaSalvare). */
-export function presetDaFormato(f: FormatoGuidato, nome: string, sitoAperto = true) {
+ *  una scelta che coincide con la sua (vedi accessModeDaSalvare).
+ *  `soloSottotitoli`: `trascriveSenzaRegistrare` dell'installazione. */
+export function presetDaFormato(
+  f: FormatoGuidato,
+  nome: string,
+  sitoAperto = true,
+  soloSottotitoli = false,
+) {
   const tutti = f.voce === 'tutti';
   const registra = f.registra !== 'no';
   const suInvito = f.accesso === 'invitati';
@@ -194,7 +231,7 @@ export function presetDaFormato(f: FormatoGuidato, nome: string, sitoAperto = tr
     liveCaptionsEnabled: true,
     // Chi registra tiene anche la trascrizione dai sottotitoli: c'e' subito a
     // fine evento, anche senza la pipeline AI, e quella AI la sostituisce.
-    captionsTranscriptEnabled: registra,
+    captionsTranscriptEnabled: registra || soloSottotitoli,
     participantsCanUnmute: tutti,
     participantsCanStartVideo: tutti,
     participantsCanShareScreen: tutti,

@@ -54,7 +54,9 @@ import {
   wizardStepFromParam,
   type WizardAdvancedSection,
 } from '@/lib/events/wizard-steps';
+import { messaggioErroreApi } from '@/lib/api-error-message';
 import { publicRegistrationFor } from '@/lib/events/access-mode';
+import { registrazioneProponibile } from '@/lib/events/guided-format';
 import {
   destinazioneDiPartenza,
   pubblicoAllineato,
@@ -78,7 +80,10 @@ import {
   campiDaSalvare,
   destinazioneDopoIlSalvataggio,
   destinazioneSuInvito,
+  paginaCheSegue,
+  videoPubblico,
   type NotaDestinazione,
+  type NotaPagina,
 } from './campi-del-formato';
 import { rememberCreation, type UnsavedResource } from './created-event';
 import StepProgramma from './programme-section';
@@ -448,8 +453,15 @@ export interface Step5ReviewFields {
   offerAddressBook: boolean;
 }
 
-/** La bozza nel browser: il modulo e le lingue toccate quando la si e' scritta. */
-type BozzaDelModulo = WizardForm & { lingueToccate?: string[] };
+/** La bozza nel browser: il modulo, e cio' che chi organizza ha toccato quando la
+ *  si e' scritta. */
+type BozzaDelModulo = WizardForm & {
+  lingueToccate?: string[];
+  /** Destinazione e pagina dopo l'evento le ha scelte chi organizza: una proposta
+   *  ripresa resta una proposta. Assenti in una bozza di prima (vedi restoreDraft). */
+  destinazioneScelta?: boolean;
+  paginaScelta?: boolean;
+};
 
 export type WizardForm = Step1Value &
   StepPermissionsValue &
@@ -462,6 +474,7 @@ export default function EventWizard(props: WizardProps) {
   const t = useTranslations('admin.wizard');
   const tc = useTranslations('common');
   const tDetail = useTranslations('admin.eventDetail');
+  const tErr = useTranslations('apiErrors');
   const router = useRouter();
   const toast = useToast();
 
@@ -473,6 +486,16 @@ export default function EventWizard(props: WizardProps) {
   const [etichetteCreate, setEtichetteCreate] = useState<WizardProps['availableTags']>([]);
   const etichette = viaToken !== null ? [] : [...props.availableTags, ...etichetteCreate];
   const initialEvent = props.initialEvent;
+  // Dove registrare non produce nulla il wizard non lo propone. Un evento salvato
+  // che registra resta com'e': i suoi consensi non cambiano perche' lo si riapre.
+  const recordingAvailable =
+    mode === 'edit' && initialEvent?.event.recordingEnabled
+      ? (props.recordingAvailable ?? true)
+      : registrazioneProponibile(
+          props.recordingAvailable ?? true,
+          props.voceNelVideo,
+          props.aiPipelineEnabled ?? true,
+        );
   // Un evento gia' salvato con una conservazione piu' lunga del massimo (le
   // pubblicazioni in libreria) si puo' modificare senza toccarla: in quel caso
   // il valore non si rimanda (vedi il payload).
@@ -660,9 +683,18 @@ export default function EventWizard(props: WizardProps) {
 
     const tpl = props.template;
     // Dove non si puo' registrare un modello non accende la registrazione.
-    const registra = (tpl?.recordingEnabled ?? false) && (props.recordingAvailable ?? true);
+    const registra = (tpl?.recordingEnabled ?? false) && recordingAvailable;
     const conAi = registra && (props.aiPipelineEnabled ?? true);
     const campiDelModello = campiDaModello(tpl, registra, videoDaDestinare(props.voceNelVideo));
+    const suInvito = !publicRegistrationFor(
+      { accessMode: tpl?.accessMode ?? null },
+      props.publicRegistrationEnabled ?? true,
+    );
+    const destinazione = destinazioneSuInvito(
+      campiDelModello.recordingDestination,
+      suInvito,
+      !!props.destinazioneScelta,
+    );
     // Le lingue dell'evento, del modello o dell'istanza. La traduzione di
     // sottotitoli e sintesi parte solo se ce n'e' almeno una: senza, il
     // wizard chiederebbe di scegliere lingue che nessuno ha chiesto.
@@ -724,14 +756,7 @@ export default function EventWizard(props: WizardProps) {
       // pulsante REC, qualunque cosa dica un modello salvato prima.
       autoStartRecording: false,
       ...campiDelModello,
-      recordingDestination: destinazioneSuInvito(
-        campiDelModello.recordingDestination,
-        !publicRegistrationFor(
-          { accessMode: tpl?.accessMode ?? null },
-          props.publicRegistrationEnabled ?? true,
-        ),
-        !!props.destinazioneScelta,
-      ),
+      recordingDestination: destinazione,
       participantListVisible: elencoPredefinito({
         ...togglesFromMatrix(matrix),
         maxParticipants: tpl?.maxParticipants ?? 300,
@@ -789,7 +814,11 @@ export default function EventWizard(props: WizardProps) {
         tpl?.defaultRetentionDays ?? props.defaultRetentionDays,
         MAX_RETENTION_DAYS
       ),
-      postEventPublic: tpl?.postEventPublic ?? true,
+      // Il valore del modello vale su invito solo con il video pubblico per scelta.
+      postEventPublic:
+        (tpl?.postEventPublic ?? true) &&
+        (!suInvito ||
+          videoPubblico({ recordingEnabled: registra, recordingDestination: destinazione })),
       // Il modello marcato come predefinito esiste per essere pre-scelto sui
       // nuovi eventi: senza questo la colonna resterebbe vuota su ogni evento
       // creato da qui, e quella marcatura non avrebbe alcun effetto.
@@ -831,7 +860,7 @@ export default function EventWizard(props: WizardProps) {
     viaToken === null &&
     !istantanea &&
     !salaBloccata &&
-    (props.recordingAvailable ?? true) &&
+    recordingAvailable &&
     videoDaDestinare(props.voceNelVideo) &&
     (mode === 'create' ||
       !!initialEvent?.destinazioneDaChiedere ||
@@ -1091,17 +1120,31 @@ export default function EventWizard(props: WizardProps) {
   const [destinazioneScelta, setDestinazioneScelta] = useState(
     mode === 'edit' || !!props.destinazioneScelta,
   );
+  // Finche' chi organizza non tocca l'interruttore, la pagina dopo l'evento segue il
+  // passaggio a su invito e quello a video pubblico (paginaCheSegue). Un link di
+  // conduzione non decide chi vede il video, e non la muove.
+  const [paginaScelta, setPaginaScelta] = useState(false);
   const updateForm = useCallback(
     (patch: Partial<WizardForm>) => {
       if ('participantListVisible' in patch) elencoSceltoRef.current = true;
       if ('recordingDestination' in patch) setDestinazioneScelta(true);
+      if ('postEventPublic' in patch) setPaginaScelta(true);
       setForm((prev) => {
         const next = { ...prev, ...patch };
+        const sitoAperto = props.publicRegistrationEnabled ?? true;
+        const suInvito = !publicRegistrationFor(next, sitoAperto);
         if ('accessMode' in patch) {
           next.recordingDestination = destinazioneSuInvito(
             next.recordingDestination,
-            !publicRegistrationFor(next, props.publicRegistrationEnabled ?? true),
+            suInvito,
             destinazioneScelta,
+          );
+        }
+        if (viaToken === null && !paginaScelta) {
+          next.postEventPublic = paginaCheSegue(
+            initial,
+            { suInvito: !publicRegistrationFor(prev, sitoAperto), form: prev },
+            { suInvito, form: next },
           );
         }
         if (('permissionMatrix' in patch || 'maxParticipants' in patch) && !elencoSceltoRef.current) {
@@ -1113,7 +1156,14 @@ export default function EventWizard(props: WizardProps) {
         return 'moderators' in patch || 'speakers' in patch ? conSceltePulite(next) : next;
       });
     },
-    [conSceltePulite, destinazioneScelta, props.publicRegistrationEnabled],
+    [
+      conSceltePulite,
+      destinazioneScelta,
+      initial,
+      paginaScelta,
+      props.publicRegistrationEnabled,
+      viaToken,
+    ],
   );
   // Il passo «Programma», quando si apre, dice quanti argomenti hanno perso
   // chi interviene da quando lo si e' visto l'ultima volta: il confronto e'
@@ -1406,7 +1456,12 @@ export default function EventWizard(props: WizardProps) {
       try {
         // Con le lingue toccate: riprendendo la bozza, solo quelle tornano
         // come le si era scritte (vedi restoreDraft).
-        const bozza: BozzaDelModulo = { ...form, lingueToccate: [...toccate] };
+        const bozza: BozzaDelModulo = {
+          ...form,
+          lingueToccate: [...toccate],
+          destinazioneScelta,
+          paginaScelta,
+        };
         localStorage.setItem(draftKey, JSON.stringify(bozza));
       } catch {
         /* quota / unavailable — best effort */
@@ -1415,7 +1470,7 @@ export default function EventWizard(props: WizardProps) {
     return () => {
       if (autosaveRef.current) clearTimeout(autosaveRef.current);
     };
-  }, [form, draftKey, toccate]);
+  }, [form, draftKey, toccate, destinazioneScelta, paginaScelta]);
 
   const savedDraftRef = useRef<{ key: string; form: Partial<BozzaDelModulo> } | null>(null);
   const [draftAvailable, setDraftAvailable] = useState(false);
@@ -1444,7 +1499,6 @@ export default function EventWizard(props: WizardProps) {
 
   const restoreDraft = useCallback(() => {
     elencoSceltoRef.current = true;
-    setDestinazioneScelta(true);
     const salvata = savedDraftRef.current;
     // Sopra il modulo di partenza, non al suo posto: una bozza salvata prima
     // che il modulo avesse un campo nuovo non lo lascerebbe vuoto.
@@ -1463,7 +1517,26 @@ export default function EventWizard(props: WizardProps) {
     // avere una traduzione piu' nuova di quella che la bozza ricorda. Una
     // bozza di prima, che non dice le lingue toccate, riporta le lingue che
     // cambia e che hanno un testo (mai una lingua svuotata).
-    const { lingueToccate, ...datiBozza } = salvata?.form ?? {};
+    const {
+      lingueToccate,
+      destinazioneScelta: destinazioneDellaBozza,
+      paginaScelta: paginaDellaBozza,
+      ...datiBozza
+    } = salvata?.form ?? {};
+    // Una proposta ripresa resta una proposta. Una bozza di prima non lo dice:
+    // conta come scelta solo cio' che si allontana dai valori di partenza.
+    setDestinazioneScelta(
+      mode === 'edit' ||
+        !!props.destinazioneScelta ||
+        (destinazioneDellaBozza ??
+          (datiBozza.recordingDestination !== undefined &&
+            datiBozza.recordingDestination !== initial.recordingDestination)),
+    );
+    setPaginaScelta(
+      paginaDellaBozza ??
+        (datiBozza.postEventPublic !== undefined &&
+          datiBozza.postEventPublic !== initial.postEventPublic),
+    );
     const testiBozza = (prima: WizardForm) => {
       const titoli = (datiBozza.title ?? {}) as Record<string, string>;
       const descrizioni = (datiBozza.description ?? {}) as Record<string, string>;
@@ -1537,7 +1610,17 @@ export default function EventWizard(props: WizardProps) {
       /* ignore */
     }
     setDraftAvailable(false);
-  }, [draftKey, viaToken, initialEvent, conSceltePulite, tocca, props.defaultLocale]);
+  }, [
+    draftKey,
+    viaToken,
+    initialEvent,
+    initial,
+    mode,
+    conSceltePulite,
+    tocca,
+    props.defaultLocale,
+    props.destinazioneScelta,
+  ]);
   const dismissDraft = useCallback(() => {
     try {
       const salvata = savedDraftRef.current;
@@ -1632,13 +1715,28 @@ export default function EventWizard(props: WizardProps) {
     !istantanea &&
     !iscrizioneAperta &&
     form.recordingEnabled &&
-    (props.recordingAvailable ?? true) &&
+    recordingAvailable &&
     videoDaDestinare(props.voceNelVideo)
   ) {
     if (form.recordingDestination === 'PUBLIC') {
-      notaDestinazione = 'recordingDestinationPublicOnInvitation';
+      // Con la pagina privata il video non lo vede nessuno: lo dice notaPagina.
+      if (form.postEventPublic) notaDestinazione = 'recordingDestinationPublicOnInvitation';
     } else if (!destinazioneScelta && props.template?.recordingDestination === 'PUBLIC') {
       notaDestinazione = 'recordingDestinationReservedOnInvitation';
+    }
+  }
+  // La pagina dopo l'evento: se si e' mossa da sola lo si dice, e se resta privata
+  // con un video pubblico anche, perche' quel video non lo vedrebbe nessuno.
+  let notaPagina: NotaPagina | null = null;
+  if (viaToken === null && !istantanea) {
+    const paginaDiPartenza =
+      mode === 'edit' ? initial.postEventPublic : (props.template?.postEventPublic ?? true);
+    if (videoPubblico(form) && !form.postEventPublic) {
+      notaPagina = 'postEventPagePrivateVideoHidden';
+    } else if (!paginaScelta && form.postEventPublic !== paginaDiPartenza) {
+      if (form.postEventPublic) notaPagina = 'postEventPagePublicWithVideo';
+      else if (iscrizioneAperta) notaPagina = 'postEventPageStaysPrivate';
+      else notaPagina = 'postEventPagePrivateOnInvitation';
     }
   }
 
@@ -1725,14 +1823,17 @@ export default function EventWizard(props: WizardProps) {
    * dove correggere. Resta, dentro una frase localizzata, solo per gli errori
    * che nessun campo del wizard sa mostrare.
    */
+  const testoRisposta = useCallback(
+    (err: { error?: string; message?: string; code?: string }, status: number): string =>
+      messaggioErroreApi(status, tErr, err.error ?? err.message ?? `HTTP ${status}`, {}, err.code),
+    [tErr]
+  );
   const serverErrorMessage = useCallback(
     (
-      err: { error?: string; message?: string; details?: unknown },
+      err: { error?: string; message?: string; code?: string; details?: unknown },
       status: number
     ): string => {
-      if (!Array.isArray(err.details)) {
-        return err.error ?? err.message ?? `HTTP ${status}`;
-      }
+      if (!Array.isArray(err.details)) return testoRisposta(err, status);
       const mapped = mapServerIssues(err.details, props.defaultLocale);
       chiaviClientRef.current = new Set();
       fuocoRichiestoRef.current = true;
@@ -1750,7 +1851,7 @@ export default function EventWizard(props: WizardProps) {
       }
       return parti.join('\n');
     },
-    [props.defaultLocale, t]
+    [props.defaultLocale, t, testoRisposta]
   );
 
   /**
@@ -2194,10 +2295,9 @@ export default function EventWizard(props: WizardProps) {
             const err = (await pubRes.json().catch(() => ({}))) as {
               error?: string;
               message?: string;
+              code?: string;
             };
-            publishProblem = {
-              reason: err.error ?? err.message ?? `HTTP ${pubRes.status}`,
-            };
+            publishProblem = { reason: testoRisposta(err, pubRes.status) };
           }
         }
 
@@ -2262,6 +2362,7 @@ export default function EventWizard(props: WizardProps) {
       initialRetention,
       showError,
       serverErrorMessage,
+      testoRisposta,
       toccate,
       ricaricaLingue,
       scartaLetture,
@@ -2339,6 +2440,8 @@ export default function EventWizard(props: WizardProps) {
             className="btn btn-sm btn-outline-secondary"
             onClick={() => {
               setForm(initial);
+              setDestinazioneScelta(mode === 'edit' || !!props.destinazioneScelta);
+              setPaginaScelta(false);
               setTraslocoApplicato(false);
             }}
           >
@@ -2490,6 +2593,7 @@ export default function EventWizard(props: WizardProps) {
                     bloccato={viaToken !== null}
                     iniziale={initial.accessMode}
                     notaDestinazione={notaDestinazione}
+                    notaPagina={notaPagina}
                     elencoInvitati={
                       <InvitationsSection
                         value={form.invitations}
@@ -2575,7 +2679,7 @@ export default function EventWizard(props: WizardProps) {
               fieldErrors={fieldErrors}
               whiteboardInfraReady={props.whiteboardInfraReady}
               liveCaptionsAvailable={props.liveCaptionsAvailable ?? false}
-              recordingAvailable={props.recordingAvailable ?? true}
+              recordingAvailable={recordingAvailable}
               aiPipelineEnabled={props.aiPipelineEnabled ?? true}
               editing={mode === 'edit'}
             />
@@ -2593,7 +2697,7 @@ export default function EventWizard(props: WizardProps) {
             mancanti={mancanti}
             aiPipelineEnabled={props.aiPipelineEnabled ?? true}
             liveCaptionsAvailable={props.liveCaptionsAvailable ?? false}
-            recordingAvailable={props.recordingAvailable ?? true}
+            recordingAvailable={recordingAvailable}
             voceNelVideo={props.voceNelVideo}
             istantanea={istantanea}
             addressBookEnabled={props.addressBookEnabled ?? true}
@@ -2603,6 +2707,7 @@ export default function EventWizard(props: WizardProps) {
             onCambiaDestinazione={viaToken === null ? () => vai('advanced', 'recording') : undefined}
             iscrizioneAperta={istantanea ? undefined : iscrizioneAperta}
             notaDestinazione={notaDestinazione}
+            notaPagina={notaPagina}
             onVaiPersone={() => vai('invites')}
             onVaiProgramma={istantanea ? undefined : () => vai('programme')}
             programmaInCreazione={mode === 'create'}
@@ -2636,7 +2741,7 @@ export default function EventWizard(props: WizardProps) {
                   onChange={updateForm}
                   fieldErrors={fieldErrors}
                   whiteboardInfraReady={props.whiteboardInfraReady}
-                  recordingAvailable={props.recordingAvailable ?? true}
+                  recordingAvailable={recordingAvailable}
                   voceNelVideo={props.voceNelVideo}
                   istantanea={istantanea}
                   puoDichiarareChiConduce={viaToken === null}
@@ -2649,6 +2754,7 @@ export default function EventWizard(props: WizardProps) {
                           salaGiaAperta: !!initialEvent?.salaGiaAperta,
                           chiesta: chiedeDestinazione,
                           nota: notaDestinazione,
+                          notaPagina,
                         }
                       : undefined
                   }
