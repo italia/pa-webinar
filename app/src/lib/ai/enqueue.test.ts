@@ -62,13 +62,25 @@ describe('enqueuePostprodForRecording', () => {
   });
 
   describe('video completo di un evento che chiede il consenso voce per voce', () => {
-    function txCompleta(event: Record<string, unknown>, tracce: { frase?: boolean } = {}) {
-      const { tx } = txCon({ id: 'rec-1', blobKey: 'recordings/ev-1/a.mp4', runCount: 0, event });
+    function txCompleta(
+      event: Record<string, unknown>,
+      tracce: { frase?: boolean; segno?: boolean; tracce?: number } = {}
+    ) {
+      const { tx } = txCon({
+        id: 'rec-1',
+        blobKey: 'recordings/ev-1/a.mp4',
+        runCount: 0,
+        transcriptConsentRule: tracce.segno ?? false,
+        event,
+      });
       const t = tx as unknown as Record<string, unknown>;
       const update = vi.fn(async () => ({}));
       const create = vi.fn(async () => ({ id: `job-${create.mock.calls.length}` }));
       (t.recording as Record<string, unknown>).update = update;
-      t.recordingTrack = { count: vi.fn(async () => 0), findFirst: vi.fn(async () => null) };
+      t.recordingTrack = {
+        count: vi.fn(async () => tracce.tracce ?? 0),
+        findFirst: vi.fn(async () => null),
+      };
       t.postprodJob = { findUnique: vi.fn(async () => null), create };
       t.captionSegment = { findFirst: vi.fn(async () => (tracce.frase ? { id: 'f' } : null)) };
       t.multitrackConsent = { findFirst: vi.fn(async () => null) };
@@ -117,6 +129,65 @@ describe('enqueuePostprodForRecording', () => {
       const { tx } = txCompleta(evento);
       const esito = await enqueuePostprodForRecording(tx, { recordingId: 'rec-1' });
       expect(esito.enqueued).toBeGreaterThan(0);
+    });
+
+    describe('con il segno della registrazione', () => {
+      it('senza conferma: 409 a chi la avvia, e niente lavori', async () => {
+        const { tx, update, create } = txCompleta(evento, { segno: true });
+        await expect(
+          enqueuePostprodForRecording(tx, { recordingId: 'rec-1' })
+        ).rejects.toMatchObject({ statusCode: 409, code: 'VOICE_CONSENT_REQUIRED' });
+        expect(update).not.toHaveBeenCalled();
+        expect(create).not.toHaveBeenCalled();
+      });
+
+      it('il webhook salta e lo dice', async () => {
+        const { tx, create } = txCompleta(evento, { segno: true });
+        await expect(
+          enqueuePostprodForRecording(tx, { recordingId: 'rec-1', seServeConferma: 'salta' })
+        ).resolves.toEqual({
+          enqueued: 0,
+          skippedExisting: 0,
+          jobIds: [],
+          voiceConsentRequired: true,
+        });
+        expect(create).not.toHaveBeenCalled();
+      });
+
+      it('con la conferma esplicita trascrive il video', async () => {
+        const { tx, create } = txCompleta(evento, { segno: true });
+        const esito = await enqueuePostprodForRecording(tx, {
+          recordingId: 'rec-1',
+          allVoicesConsented: true,
+        });
+        expect(esito.enqueued).toBeGreaterThan(0);
+        expect(create.mock.calls[0]).toMatchObject([{ data: { kind: 'TRANSCRIBE' } }]);
+      });
+
+      it('le tracce per persona non chiedono conferma: contengono solo chi ha acconsentito', async () => {
+        const { tx, create } = txCompleta(evento, { segno: true, tracce: 2 });
+        const esito = await enqueuePostprodForRecording(tx, { recordingId: 'rec-1' });
+        expect(esito.enqueued).toBeGreaterThan(0);
+        expect(create.mock.calls[0]).toMatchObject([
+          { data: { kind: 'TRANSCRIBE_MULTITRACK' } },
+        ]);
+      });
+
+      it('il manifest delle tracce non chiede conferma', async () => {
+        const { tx } = txCompleta(evento, { segno: true });
+        const esito = await enqueuePostprodForRecording(tx, {
+          recordingId: 'rec-1',
+          multitrack: true,
+        });
+        expect(esito.enqueued).toBeGreaterThan(0);
+      });
+
+      it('AI spenta o pipeline in pausa: non serve nessuna conferma, non parte niente', async () => {
+        const { tx } = txCompleta({ ...evento, aiTranscriptEnabled: false }, { segno: true });
+        await expect(
+          enqueuePostprodForRecording(tx, { recordingId: 'rec-1' })
+        ).resolves.toEqual({ enqueued: 0, skippedExisting: 0, jobIds: [] });
+      });
     });
   });
 });

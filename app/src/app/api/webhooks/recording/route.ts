@@ -211,8 +211,8 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
       jobIds: [],
     };
     if (event.aiTranscriptEnabled) {
-      // Senza conferma, il video completo di un evento con il consenso voce
-      // per voce non si trascrive: resta la trascrizione dai sottotitoli.
+      // Senza conferma, il video completo soggetto al consenso voce per voce
+      // non si trascrive: la trascrizione, se c'e', resta quella dai sottotitoli.
       postprod = await enqueuePostprodForRecording(tx, {
         recordingId: recording.id,
         seServeConferma: 'salta',
@@ -232,7 +232,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   if (result.postprod.voiceConsentRequired) {
     console.warn(
       `[recording-webhook] recording ${result.recording.id}: full-room transcription not started, ` +
-        'the event asked for per-voice consent and staff must confirm',
+        'per-voice consent applies and staff must confirm',
     );
   }
 

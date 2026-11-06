@@ -52,6 +52,7 @@ export default function RecordingManageClient({
   soloSottotitoli = false,
   confermaVoci = false,
   avvisoConfermaVoci = false,
+  restaDaiSottotitoli = false,
   eventId,
   initialTab = 'overview',
 }: {
@@ -63,6 +64,8 @@ export default function RecordingManageClient({
   confermaVoci?: boolean;
   /** La pipeline sarebbe partita da sola, e non e' partita solo per quella conferma. */
   avvisoConfermaVoci?: boolean;
+  /** Senza quella conferma resta la trascrizione dai sottotitoli. */
+  restaDaiSottotitoli?: boolean;
   eventId?: string;
   recordingId: string;
   eventTitle: string;
@@ -288,11 +291,14 @@ export default function RecordingManageClient({
         </div>
       </div>
 
-      {/* La trascrizione del video completo non parte da sola in un evento con
-          il consenso voce per voce: lo si dice accanto al pulsante che la avvia. */}
+      {/* La trascrizione del video completo soggetta al consenso voce per voce
+          non parte da sola: lo si dice accanto al pulsante che la avvia, con
+          cio' che resta se non parte. */}
       {avvisoConfermaVoci && status === 'READY' && (
         <div className="alert alert-info mb-3" role="status">
-          {tVoci('waiting', { button: t('generateAi') })}
+          {tVoci(restaDaiSottotitoli ? 'waiting' : 'waitingNoCaptions', {
+            button: t('generateAi'),
+          })}
         </div>
       )}
 

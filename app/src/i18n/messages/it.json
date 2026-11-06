@@ -702,7 +702,7 @@
         "title": "Trascrizione dei tuoi interventi",
         "give": "Acconsento alla trascrizione",
         "giveEffect": "I tuoi interventi entrano nella trascrizione dell'evento con il tuo nome. Senza, partecipi lo stesso.",
-        "withdrawEffect": "Se lo ritiri, le tue frasi già trascritte perdono testo e nome, e da ora la tua voce non viene registrata in una traccia a parte né trascritta.",
+        "withdrawEffect": "Se lo ritiri, le tue frasi già trascritte dai sottotitoli perdono testo e nome, e da ora la tua voce non viene registrata in una traccia a parte né trascritta. Per una trascrizione del video già prodotta rivolgiti a chi organizza.",
         "needsRecording": "Si può dare dopo il consenso alla registrazione."
       }
     },
@@ -2150,7 +2150,7 @@
       "aiSectionHeading": "Post-produzione automatica",
       "aiSectionDesc": "Dopo la fine dell'evento, la registrazione può essere processata da una pipeline di intelligenza artificiale in cluster per produrre trascrizione, sintesi e, se richiesto, traduzioni e doppiaggio. Tutto avviene sull'infrastruttura di questa installazione, nessun dato esce verso terze parti.",
       "aiTranscriptEnabled": "Trascrizione automatica",
-      "aiTranscriptEnabledDesc": "Riconoscimento del parlato con identificazione dei parlanti. Necessaria per attivare sintesi, traduzioni e doppiaggio.",
+      "aiTranscriptEnabledDesc": "Riconoscimento del parlato con identificazione dei parlanti. Necessaria per attivare sintesi, traduzioni e doppiaggio. Chi partecipa sceglie se i propri interventi vengono trascritti.",
       "aiSummaryEnabled": "Sintesi e capitoli",
       "aiSummaryEnabledDesc": "Riassunto della riunione, decisioni prese, cose da fare e suddivisione in capitoli con timing.",
       "aiTranslationEnabled": "Traduzione in altre lingue",
@@ -4197,7 +4197,7 @@
     },
     "voiceConsent": {
       "title": "Trascrivere il video completo?",
-      "message": "Questo evento ha chiesto a ognuno il consenso alla trascrizione dei propri interventi. Il video completo contiene tutte le voci, anche di chi non l'ha dato: trascrivilo solo se tutte le persone che parlano nel video hanno acconsentito. La tua conferma resta nel registro delle attività.",
+      "message": "Il video completo contiene tutte le voci, anche di chi non ha dato il consenso alla trascrizione dei propri interventi: trascrivilo solo se tutte le persone che parlano nel video hanno acconsentito. La tua conferma resta nel registro delle attività.",
       "confirm": "Sì, tutte hanno acconsentito",
       "cancel": "Annulla",
       "waitingNoCaptions": "La trascrizione del video completo non è partita da sola: ognuno sceglie se i propri interventi vengono trascritti. Avviala con {button} solo se tutte le persone che parlano nel video hanno acconsentito; altrimenti l'evento resta senza trascrizione.",
@@ -5414,7 +5414,7 @@
     "classicView": "Vista classica",
     "backToGarden": "Mostra la piazza",
     "aiNoticeTitle": "Elaborazione AI dopo l'evento",
-    "aiNotice": "Al termine, la registrazione sarà elaborata da strumenti di intelligenza artificiale per generare trascrizione, sintesi ed eventuali traduzioni e doppiaggi. Gli artefatti possono contenere imprecisioni; il video resta la fonte autoritativa.",
+    "aiNotice": "Al termine, la registrazione può essere elaborata da strumenti di intelligenza artificiale per generare trascrizione, sintesi ed eventuali traduzioni e doppiaggi. La trascrizione riguarda solo chi ha dato il consenso. Gli artefatti possono contenere imprecisioni; il video resta la fonte autoritativa.",
     "multitrackConsentTitle": "Trascrizione dei tuoi interventi",
     "recordingConsentTitle": "Registrazione dell'evento",
     "recordingConsentIntro": "L'evento viene registrato (audio e video). Con il consenso, la registrazione contiene il tuo nome, la tua voce, la tua immagine e quello che condividi sullo schermo.",

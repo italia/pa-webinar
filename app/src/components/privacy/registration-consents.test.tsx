@@ -102,7 +102,7 @@ describe('RegistrationConsents', () => {
     monta({ transcription: dato });
     await clic('Ritira il consenso');
     expect(container.textContent).toContain(
-      'le tue frasi già trascritte perdono testo e nome'
+      'le tue frasi già trascritte dai sottotitoli perdono testo e nome'
     );
   });
 

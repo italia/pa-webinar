@@ -4,18 +4,20 @@
 /**
  * Il consenso alla trascrizione voce per voce.
  *
- * Un evento che registra una traccia audio per persona, o che tiene la
- * trascrizione dai sottotitoli, chiede a ognuno se i propri interventi
- * possono entrare nella trascrizione con il proprio nome. In quegli eventi
- * il video completo della sala contiene anche le voci di chi ha detto no:
+ * Un evento che registra una traccia audio per persona, tiene la trascrizione
+ * dai sottotitoli o trascrive il video con la pipeline AI chiede a ognuno se i
+ * propri interventi possono entrare nella trascrizione con il proprio nome.
+ * Il video completo della sala contiene anche le voci di chi ha detto no:
  * trascriverlo in blocco annullerebbe la scelta. Per questo la pipeline non
- * lo trascrive da sola, e chi la avvia a mano deve confermare che tutte le
- * voci del video hanno acconsentito.
+ * trascrive da sola un video senza tracce per persona, e chi la avvia a mano
+ * deve confermare che tutte le voci del video hanno acconsentito. La conferma
+ * si chiede anche se parla solo chi conduce: il video non dice chi ha parlato.
  *
  * Le regole sono due, e non vanno confuse. `chiedeConsensoPerVoce` decide cosa
  * chiedere a chi entra. `regimeConsensoVoce` decide gli effetti su una
  * registrazione gia' fatta: una domanda nata dopo non si applica a chi non
- * l'ha mai ricevuta.
+ * l'ha mai ricevuta, e il segno `Recording.transcriptConsentRule` distingue le
+ * registrazioni nate sotto la regola sul video da quelle nate prima.
  */
 import type { Prisma, PrismaClient } from '@prisma/client';
 import { z } from 'zod';
@@ -76,7 +78,11 @@ type Db = PrismaClient | Prisma.TransactionClient;
 export interface RegimeConsensoVoce {
   /** Il consenso voce per voce e' stato chiesto. */
   chiesto: boolean;
-  /** La versione minima del testo che conta per mostrare un nome. */
+  /**
+   * La versione minima del testo che conta per mostrare un nome: quella che lo
+   * comprende, con la trascrizione dai sottotitoli o con il segno della
+   * registrazione.
+   */
   versione: number;
 }
 
@@ -99,7 +105,8 @@ export interface RegimeConsensoVoce {
  * conferma a ogni rilancio. Per questo `segnoRegistrazione` e' obbligatorio:
  * legge Recording.transcriptConsentRule della registrazione in esame, non
  * dell'evento, perche' un evento ricorrente puo' avere righe vecchie e nuove.
- * Vero, la domanda vale anche per il video; falso, restano le altre condizioni.
+ * Vero, la domanda vale anche per il video e servono consensi al testo che
+ * comprende il nome; falso, restano le altre condizioni.
  */
 export async function regimeConsensoVoce(
   db: Db,
@@ -123,7 +130,7 @@ export async function regimeConsensoVoce(
       e.multitrackRecordingEnabled ||
       sottotitoli ||
       Boolean(prova || traccia),
-    versione: sottotitoli ? VERSIONE_TESTO_TRASCRIZIONE : 1,
+    versione: segnoRegistrazione || sottotitoli ? VERSIONE_TESTO_TRASCRIZIONE : 1,
   };
 }
 
@@ -140,22 +147,22 @@ export async function registrazioneMultitraccia(
 
 /**
  * Trascrivere questa registrazione richiede la conferma che tutte le voci
- * hanno acconsentito: e' il video completo (non le tracce per persona) di un
- * evento in cui il consenso voce per voce e' stato chiesto. La stessa regola
- * per la pipeline e per la pagina che la avvia.
+ * hanno acconsentito: e' il video completo (non le tracce per persona) e il
+ * consenso voce per voce e' stato chiesto, oppure la registrazione ha il segno.
+ * La stessa regola per la pipeline, per la pagina che la avvia e per la
+ * chiusura dell'evento.
  */
 export async function confermaVociNecessaria(
   db: Db,
-  rec: { id: string; blobKey: string; eventId: string },
+  rec: { id: string; blobKey: string; eventId: string; transcriptConsentRule: boolean },
   e: EventoConsensoVoce,
   sito: SitoConsensoVoce,
   multitraccia?: boolean
 ): Promise<boolean> {
   if (rec.blobKey === '') return false;
   if (multitraccia ?? (await registrazioneMultitraccia(db, rec))) return false;
-  // `false` al posto di Recording.transcriptConsentRule: la pipeline tratta ogni
-  // video come una registrazione nata prima della regola sul video.
-  return (await regimeConsensoVoce(db, rec.eventId, e, sito, false)).chiesto;
+  return (await regimeConsensoVoce(db, rec.eventId, e, sito, rec.transcriptConsentRule))
+    .chiesto;
 }
 
 export { CODICE_CONFERMA_VOCI };
@@ -168,7 +175,7 @@ export { CODICE_CONFERMA_VOCI };
  */
 export function erroreConfermaVoci(): AppError {
   return new AppError(
-    'This event asks each person for consent to the transcription of what they say, and the full room recording contains every voice. Confirm that every voice in the recording has consented to transcribe it.',
+    'The full room recording contains every voice, including people who did not consent to the transcription of what they say. Confirm that every voice in the recording has consented to transcribe it.',
     409,
     CODICE_CONFERMA_VOCI
   );

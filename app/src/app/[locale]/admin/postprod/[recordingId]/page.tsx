@@ -9,6 +9,7 @@ import { puoGestire } from '@/lib/auth/staff-session';
 import AccessDenied from '@/components/admin/access-denied';
 import { prisma } from '@/lib/db';
 import { confermaVociNecessaria } from '@/lib/ai/voice-consent';
+import { registrazionePubblica } from '@/lib/captions/transcript';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import RecordingManageClient from '@/components/admin/recording-manage-client';
 import { recordingTabFrom } from '@/components/admin/recording-tabs';
@@ -45,6 +46,7 @@ export default async function RecordingManagePage({ params, searchParams }: Page
       createdAt: true,
       eventId: true,
       blobKey: true,
+      transcriptConsentRule: true,
       event: {
         select: {
           title: true,
@@ -64,15 +66,29 @@ export default async function RecordingManagePage({ params, searchParams }: Page
   }
 
   const eventTitle = getLocalized(recording.event?.title as LocalizedField, locale) || '—';
-  // Il video completo di un evento con il consenso voce per voce si trascrive
-  // solo con la conferma che tutte le voci hanno acconsentito: la si chiede
-  // una volta, al posto della conferma generica.
+  // Il video completo soggetto al consenso voce per voce si trascrive solo con
+  // la conferma che tutte le voci hanno acconsentito: la si chiede una volta,
+  // al posto della conferma generica.
   const sito = await prisma.siteSetting.findUnique({
     where: { id: 'singleton' },
     select: { liveCaptionsEnabled: true, aiPipelineEnabled: true },
   });
   const confermaVoci =
     !!recording.event && (await confermaVociNecessaria(prisma, recording, recording.event, sito ?? {}));
+  // Il motivo per cui non e' partita, solo se senza quella conferma sarebbe
+  // partita (AI accesa per l'evento e per il sito).
+  const avvisoConfermaVoci =
+    confermaVoci && !!recording.event?.aiTranscriptEnabled && !!sito?.aiPipelineEnabled;
+  // Se la conferma non arriva, una trascrizione dai sottotitoli resta? Ci sono
+  // frasi che possono diventarla (di chi non ha dato il consenso restano solo i
+  // tempi), o il testo gia' ricavato anche se le frasi non ci sono piu'.
+  const restaDaiSottotitoli =
+    avvisoConfermaVoci &&
+    (!!(await prisma.captionSegment.findFirst({
+      where: { eventId: recording.eventId, text: { not: null }, seatId: { not: null } },
+      select: { id: true },
+    })) ||
+      (await registrazionePubblica(recording.eventId, true)) !== null);
   // La scheda chiesta dal link (`?tab=slides` dalla scheda dell'evento), se esiste.
   const initialTab = recordingTabFrom((await searchParams)?.tab);
 
@@ -88,9 +104,8 @@ export default async function RecordingManagePage({ params, searchParams }: Page
       // Senza file: la trascrizione e' quella dei sottotitoli live.
       soloSottotitoli={recording.blobKey === ''}
       confermaVoci={confermaVoci}
-      // Il motivo per cui non e' partita, solo se senza quella conferma
-      // sarebbe partita (AI accesa per l'evento e per il sito).
-      avvisoConfermaVoci={confermaVoci && !!recording.event?.aiTranscriptEnabled && !!sito?.aiPipelineEnabled}
+      avvisoConfermaVoci={avvisoConfermaVoci}
+      restaDaiSottotitoli={restaDaiSottotitoli}
       eventId={recording.eventId}
       initialTab={initialTab}
     />

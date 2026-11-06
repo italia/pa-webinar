@@ -147,6 +147,12 @@ describe('POST /api/internal/multitrack-manifest', () => {
     const res = await POST(post({ eventId: EVENT_ID, recordingId: REC_ID, tracks: [track], interrupted: true }), ctx());
     expect(await res.json()).toMatchObject({ enqueued: 1, partial: false });
     expect(enqueuePostprodForRecording).toHaveBeenCalledTimes(1);
+    // Le tracce contengono solo chi ha acconsentito: la pipeline non chiede
+    // conferme, e si dice che sono tracce.
+    expect(enqueuePostprodForRecording).toHaveBeenCalledWith(expect.anything(), {
+      recordingId: expect.any(String),
+      multitrack: true,
+    });
   });
 
   it('anche in pausa (IDLE) l\'evento e\' aperto: una cattura fermata non avvia la trascrizione', async () => {
