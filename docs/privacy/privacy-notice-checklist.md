@@ -143,7 +143,7 @@ else. Where something depends on the organizers, it says "may".
 | **Transcript** | The caption text is kept for people who consent; the per-person track is deleted after transcription or kept; the video is transcribed only if everyone who speaks in it has consented | `captionsTranscriptEnabled`, `multitrackRecordingEnabled`, `retainParticipantTracks`, `aiTranscriptEnabled` |
 | **Captions** | The text of `waiting.captionsNotice` or `waiting.captionsNoticeTranscript` | `liveCaptionsEnabled`, `captionsTranscriptEnabled` |
 | **Artificial intelligence** | Summary, translation and dubbing the event asks for, what staff can still request after the event, the event report, and that outputs may be inaccurate. No row with the AI pipeline off | `aiPipelineEnabled`, the event's AI flags, **AI notice in the waiting room** |
-| **Chat and questions** | Chat messages are never published. The text of Q&A questions may be published, never the name, or the questions are not published | `chatEnabled`, `qaEnabled`, `postEventShowQA`, `recordingDestination` |
+| **Chat and questions** | Chat messages are never published. The text of Q&A questions may be published, never the name, or the questions are not published | `chatEnabled`, `qaEnabled`, `postEventShowQA`, `recordingDestination`, `recordingAudience` |
 | **Participant list** and **Your name** | Whether the audience sees who is present, and whether people appear under their name or a pseudonym | `participantListVisible`, `audienceAnonymous` |
 | **Retention** | The days of the event's data, what happens to the video if it is made available or not | `dataRetentionDays`, `recordingDeleteAfterDays` |
 | **Address book** | The optional offer, with its months. Registration form only | `addressBookEnabled`, `offerAddressBook` |
@@ -154,6 +154,11 @@ else. Where something depends on the organizers, it says "may".
 - **Live changes.** In the waiting room, the captions, chat and Q&A rows follow
   what moderators switch on during the event. The other rows are those of the
   page load.
+- **People who lead the event.** In the waiting room moderators and speakers read
+  two rows written for them. **Your name** says they appear under their name,
+  also where the audience has a pseudonym. **Recording** says what happens to
+  them without the consent: they stay out of it, or, where a voice cannot be left
+  out of the video, the text of `gdpr.consent.recordingOptionalHost`.
 - **Rewording.** Every sentence is a key under `gdpr.sheet`, or under `waiting`
   for the captions, and can be changed with custom translations. The sentence
   is chosen by the fact, so a reworded sentence applies to every event with that
@@ -170,14 +175,20 @@ else. Where something depends on the organizers, it says "may".
 
 Events have a `recordingConsentText` field. It can be set only through the
 events API (`POST /api/events`, `PUT /api/events/<slug>`) and appears on the
-event page of the administration area. When it is set, the waiting room shows
-it above the recording consent box in place of the built-in explanation
-(`waiting.recordingConsentIntro`), as written and in every language, because
-the field is not translated, and the room shows it in its notice to people who
-are out of the recording. On an installation with no room video it is not shown,
-and the built-in text is `waiting.recordingConsentIntroNoVideo`. When it is
-empty, the built-in text is shown; change it for the whole installation with
-that custom translation key. Nothing compares the field with the event: a text
+event page of the administration area. When it is set, people read it wherever
+they can give the recording consent: under the box on the registration form,
+above the box in the waiting room, in place of the built-in explanation
+(`waiting.recordingConsentIntro`), with the box text in the room's **Consents**
+dialog for whoever has not given the consent, and above the consent button in
+the room's notices to people who follow in listen-only mode or are out of the
+recording. In those notices the text has a maximum height and scrolls, so a long
+text leaves the conference and the button on screen. It appears as written and
+in every language, because the field is not translated. A registration form that
+shows a notice instead of a box does not show it. On an installation with no
+room video it is not shown anywhere, and the waiting room's built-in text is
+`waiting.recordingConsentIntroNoVideo`. When it is empty, the waiting room shows
+the built-in text; change it for the whole installation with that custom
+translation key. Nothing compares the field with the event: a text
 that calls the video public on a reserved event contradicts the box and the
 sheet, so review it when the destination changes. A
 custom translation saved under `live.recordingConsent` or
@@ -204,8 +215,8 @@ language with **Settings** > **Languages** > **Custom translations**.
 |---|---|---|---|
 | Acknowledgement of the privacy notice | Always, with a sentence on statistics added when organization fields are on | Yes. It records that the person read the notice: it is not a consent to the processing | `registration.gdprConsent`, `registration.gdprConsentProfiling`; see [Purposes and legal bases](#purposes-and-legal-bases) |
 | Audio and video recording | When `recordingEnabled` is on and participants may use the microphone, camera or screen. Otherwise the form shows an information notice instead of a box, and so does the live room's dialog | No: whoever leaves it unticked takes part with the rules of everyone else, and stays out of the recording | Follows the destination, see below; the notices are `gdpr.consent.recordingNotice` and `gdpr.consent.recordingNoticeVoice` |
-| Transcription of the person's contributions, with their name | When `multitrackRecordingEnabled` is on, also for listen-only events, when the event keeps a transcript from captions (`captionsTranscriptEnabled`, with captions available), or when the AI pipeline transcribes its video (the event records a room video, `aiTranscriptEnabled` and `aiPipelineEnabled` are on, not on instant calls) | No: whoever leaves it unticked takes part, but is neither recorded on a track of their own nor kept in the transcript | `gdpr.consent.multitrack`, or `gdpr.consent.multitrackRetained` when the event keeps the tracks, with the note `gdpr.consent.multitrackOptional` or `gdpr.consent.multitrackOptionalShort` |
-| Upcoming events and address book | Where the installation (`addressBookEnabled`) and the event (`offerAddressBook`) offer it, one box for being contacted about upcoming events: it sets both `consentFutureCommunications` and the address-book opt-in, and the address-book withdrawal link revokes both | No | `gdpr.consent.stayInTouch`, `gdpr.consent.stayInTouchHelp`, `gdpr.consent.stayInTouchRetention`; see [Address book](#address-book) |
+| Transcription of the person's contributions, with their name | When `multitrackRecordingEnabled` is on, also for listen-only events, when the event keeps a transcript from captions (`captionsTranscriptEnabled`, with captions available), or when the AI pipeline transcribes its video (the event records a room video, `aiTranscriptEnabled` and `aiPipelineEnabled` are on, not on instant calls) | No: whoever leaves it unticked takes part, but is neither recorded on a track of their own nor kept in the transcript | `gdpr.consent.multitrack`, or `gdpr.consent.multitrackRetained` where tracks are kept, because the event keeps them or the AI pipeline is off and nothing transcribes them, with the note `gdpr.consent.multitrackOptional` or `gdpr.consent.multitrackOptionalShort` |
+| Upcoming events and address book | Where the installation (`addressBookEnabled`) and the event (`offerAddressBook`) offer it, one box for being contacted about upcoming events: it sets both `consentFutureCommunications` and the address-book opt-in, and the address-book withdrawal link revokes both. On an address that has stopped receiving invitations the tick waits for a confirmation | No | `gdpr.consent.stayInTouch`, `gdpr.consent.stayInTouchHelp`, `gdpr.consent.stayInTouchRetention`; see [Address book](#address-book) |
 
 The form groups the boxes under **Privacy notice and consents** and marks each one **required** or **optional**. Rules in
 `app/src/lib/registration/consents.ts`.
@@ -308,7 +319,7 @@ feature on and what the notice should say about it.
 | Registration | Always | Name and email, the consent choices, and join and leave times. The personal join link in emails is an access credential. In the call, the event's moderators see each registrant's registration name and email address next to the name shown in the room ([Who is behind each video tile](../architecture/identity-and-access.md#who-is-behind-each-video-tile)) |
 | Organization fields | `requireOrganization`, `requireOrganizationRole`, `requireOrganizationType`, per event: the wizard's **People** step, under **What we ask people who register**, or the events API. Off by default | When on, the organization name is required (by the form and by the registration API); role and type of body are optional. State the statistical purpose |
 | Guests | **Guest access enabled** for scheduled events, except those open only to invitees (**Invited people only**), which never admit guests; always on instant calls | The display name typed in the waiting room, and, in chat messages, an identifier derived from the IP address and that name. The **Email (optional)** field there stays in the browser and is never sent |
-| Q&A, chat, polls, word cloud, reactions, agenda reactions | `qaEnabled`, `chatEnabled` and the other live-interaction flags of the event | Contributions carry the author's display name: chat sender names and texts are encrypted; Q&A author names and questions are stored in plain text. Everyone who can read the chat can download it, names included. Chat messages are never published, not even questions asked in the chat. After the event only moderators see who asked a question: the event page can show its text, never the name, and shows none where the event's destination is reserved or its post-event settings hide them. A notice under both fields tells people not to write personal data. At the event's retention the chat is deleted, while questions, votes and words stay with the event without names or identifiers |
+| Q&A, chat, polls, word cloud, reactions, agenda reactions | `qaEnabled`, `chatEnabled` and the other live-interaction flags of the event | Contributions carry the author's display name: chat sender names and texts are encrypted; Q&A author names and questions are stored in plain text. Everyone who can read the chat can download it, names included. Chat messages are never published, not even questions asked in the chat. After the event only moderators see who asked a question: the event page can show its text, never the name, and shows none where the recording is reserved, by its destination or by its audience, or where its post-event settings hide them. A notice under both fields tells people not to write personal data. At the event's retention the chat is deleted, while questions, votes and words stay with the event without names or identifiers |
 | Questionnaires and post-event feedback | Per event; every event created with feedback collection on gets the generic end-of-event rating | Pre-registration answers carry the respondent's name. The end-of-event rating stores no name and no email hash, only the registration (one response each) or a browser id, and the form tells respondents that organizers see the answers without their name. Administrators, the event's organizer and its moderators read every answer and can download them as CSV. Free-text answers can contain anything |
 | Materials | Staff and moderators add them per event | Whatever the documents contain. The visibility setting decides which public lists show a material, not who can open it: an uploaded file is served from its URL to anyone who has the URL, so a document with personal data should not be shared as a material. Openings and downloads are counted as one number per material, which only the event's moderators see; to count each person once every 10 minutes the server holds a hash of the room token, or else the IP address, in memory for that time, and stores neither |
 | The square | Offered in the waiting room; the waiting-room engine sets only the starting view ([Engines](../architecture/waiting-room.md#engines-classic-view-and-the-square)) | Display name and position, visible to others waiting who have access to the room (people who only know the address see positions without names), expiring seconds after the last update ([Presence](../architecture/waiting-room.md#presence)) |
@@ -320,7 +331,7 @@ feature on and what the notice should say about it.
 | Who is in the room | Every event, where the installation runs live captions and **Automatic captions in video calls** is on, whatever the event's own captions switch; events with per-participant recording. In both cases where Prosody loads the project's occupants module (the chart and Docker Compose do) | Which conference seat stands behind each voice on the bridge, with join and leave times and no names. It lets the recorder and the transcript from captions honor each person's consent, also for people who joined before the transcript was turned on, and is deleted at the event's retention. For other events, nothing |
 | AI outputs | `aiPipelineEnabled` and the event's AI flags | Transcript with speaker labels, summary, translations, subtitles, dubbed audio. A video without per-person tracks is transcribed only after staff confirm that everyone who speaks in it has consented. Staff can map a speaker label to a name or an address-book entry |
 | AI event report | Requested by staff after the event, with `aiPipelineEnabled` on | A language model inside the installation reads the transcript, polls, words and the post-event comments, and the Q&A questions only where the event page publishes them, and writes a report beside the platform's figures. It reads the number of chat messages, never their text. It rewords comments, without authors. It is public only after staff review and publish it, and it stays with the event after its retention |
-| Consent proofs | Whoever gives or withdraws the recording or transcription consent | The person's name, when each consent was given and withdrawn, the version of the text and the destination it stated, and the role. Staff who manage the event read them under **Consent proofs**. They last longer than the registration when a video or a transcript is published (see [Retention and where to change it](#retention-and-where-to-change-it)) |
+| Consent proofs | Whoever gives or withdraws the recording or transcription consent | The person's name, when each consent was given and withdrawn, the version of the text and the destination it stated, and the role. Staff who manage the event read them under **Consent proofs**. They outlast the registration while a video or a transcript is published and, after an erasure, while one exists, published or not (see [Retention and where to change it](#retention-and-where-to-change-it)) |
 | Address book | The optional box on the registration form, where it is offered | See [Address book](#address-book) |
 | Invitations | Staff add them in the event wizard, and send each invitee an invitation email from the event page once registration is open. The email links to the registration page with the form filled in, through a random token kept with the invitation until the event's data is deleted | The invitee's name and email. When an event is open only to invitees (**Invited people only**, or **Public registration enabled** off for an event without a choice of its own), the list decides who may register, and the personal join link reaches the registrant only by email |
 | Moderators and speakers | Event wizard and named grants | The primary moderator's name and email, which registrants receive (see [Recipients and processors](#recipients-and-processors)); named grants; the public speaker list; the photos staff upload for these people, which the public event page shows only for the people it lists. The platform asks no consent for them: the person supplies the photo to the organizer |
@@ -369,7 +380,7 @@ Check each row against the basis you rely on.
 | Staff | Always | Administrators see everything and can export sign-ups as CSV; organizers see their own events; moderators see what happens in their room, including, in the participants panel, the name and email address given at registration or on a named grant for each person in the call. Speakers do not see these |
 | Registrants | A reserved recording that staff make available | The video and what derives from it, for as long as their registration exists |
 | Other participants | Always | Display names and avatars in the room, chat and Q&A authors, and the chat download. People in the square who have access to the room see each other's display names and positions. Registrants receive the primary moderator's name and email address as the organizer of the calendar file attached to their confirmation, reminder and date-change emails |
-| The public | Per event | The speaker list, the primary moderator's name in the event's public calendar file (any event that is not `DRAFT`), a recording published for everyone and its AI outputs, a transcript from captions published for everyone with its speakers' names, a published AI event report, publications, the text of Q&A questions without names, and the event recap |
+| The public | Per event | The speaker list, the primary moderator's name in the event's public calendar file (while the event page is visible), a recording published for everyone and its AI outputs, a transcript from captions published for everyone with its speakers' names, a published AI event report, publications, the text of Q&A questions without names, and the event recap |
 
 AI post-production has no external recipient. Every engine the application
 accepts runs inside the installation's cluster (`app/src/lib/ai/providers.ts`),
@@ -409,8 +420,8 @@ What each job deletes is in the
 | Caption sentences and the record of who was in the room | The event's retention | As event personal data |
 | Transcript from captions | The event's retention, deleted by the cleanup job on every installation, unless the event's video or transcript is published; then for as long as either stays published | **Publish the transcript on the event page** in the event's **Transcript from captions** panel, and the recording's publication |
 | Event record, recap and AI event report | Nothing deletes them. After its retention the event keeps its title, description, dates, speaker list and the primary moderator's name and encrypted email; the recap keeps, without authors, the text of the top Q&A questions, published poll results and the most-submitted word-cloud words (`app/src/lib/events/recap.ts`). It reads no chat, and the event page leaves out the text of the questions where the event does not publish them | Edit or delete the event |
-| Consent proofs | The per-person proofs go with their registration or grant at the event's retention. While a video or transcript is published (an external video link counts), a copy stays (`RetainedConsentProof`): both consents with a video, the transcription consent with a transcript alone. It goes at the first cleanup after nothing is published any more, or with the event. Self-service erasure removes the name from the copy and stamps the withdrawal; the rest stays while the video does | Unpublish the video and transcript, and remove the external link |
-| Address book | `retentionMonths` from the consent (`optedInAt`, default in `app/prisma/schema.prisma`, not editable in the administration area): only a new tick of the box restarts it, a registration without the tick does not. Opted-out entries at the next run | Delete entries under **Address book** |
+| Consent proofs | The per-person proofs go with their registration or grant at the event's retention. At that point a copy stays (`RetainedConsentProof`) if a video or transcript is published (an external video link counts): both consents with a video, the transcription consent with a transcript alone. An erasure before that point keeps a copy, without the name and stamped as withdrawn, for whatever exists, published or not: both consents while there is a video file of any session, the catch-up copy, an external link or a per-person track with its audio, the transcription consent with a transcript alone. A copy goes at the first cleanup after none of that exists. After the event's retention it goes at the first cleanup after nothing is published any more. In any case it goes with the event. A later erasure removes the name from the copy and stamps the withdrawal; the rest stays as long as the copy does | Before the event's retention, delete the video and transcript; after it, unpublish them. In both cases remove the external link |
+| Address book | `retentionMonths` from the consent (`optedInAt`, default in `app/prisma/schema.prisma`, not editable in the administration area): only a new tick of the box restarts it, confirmed if it follows a withdrawal (see [Address book](#address-book)), a registration without the tick does not. Opted-out entries at the next run | Delete entries under **Address book** |
 | Profile photos | Kept while a registration with the same email address exists, at any event; then deleted once 30 days have passed since the photo last changed (`app/src/app/api/cron/cleanup/route.ts`). Self-service erasure deletes it | Not configurable. The person can remove it in the waiting room |
 | Photos of event people | The event's retention: the cleanup clears the lead moderator's photo and deletes the grants' photos, unless a duplicated event still uses them. A photo that nothing uses goes 7 days after its upload. Self-service erasure deletes the photos of the erased grants | **Remove the photo** in the wizard's **People** step |
 | Staff accounts | The account stays until an administrator deletes it. Used or expired sign-in links are swept by the daily cleanup (`app/src/app/api/cron/cleanup/route.ts`) | **Staff and access** > **Staff accounts** |
@@ -497,10 +508,13 @@ Your notice should state at least:
 - **What it holds.** Only a ticked box creates or updates a person record, with
   the name, the email address, encrypted, and the organization of that
   registration. A registration without the tick links to an existing record and
-  changes nothing. Only administrators see it; they use it to find people when
-  they prepare invitations, and the wizard fills in the address.
+  changes nothing, and so does a tick that waits for a confirmation (see **A
+  tick after a withdrawal** below). Only administrators see it; they use it to
+  find people when they prepare invitations, and the wizard fills in the
+  address.
 - **Retention.** The box has its own consent and its own retention, counted from
-  the consent: only a new tick restarts it (see
+  the consent: only a new tick restarts it, and after a withdrawal only once it
+  is confirmed (see
   [Retention and where to change it](#retention-and-where-to-change-it)). The
   form states the months (`gdpr.consent.stayInTouchRetention`).
 - **Objection.** The registration form says consent can be withdrawn with the
@@ -514,10 +528,26 @@ Your notice should state at least:
   entry goes at the next retention run, the future-communications choice is
   withdrawn on all the person's registrations, and invitations stop: unsent ones
   on open events are deleted, and the others are marked so that nothing more is
-  sent. On an event open only to invitees the invitation stays, and with it the
-  right to register. An expired or deleted entry stops its invitations as well.
-  A new tick reopens them.
-- Self-service erasure also deletes the person's address-book entry.
+  sent, and invitation emails still in the queue are cancelled. On an event open
+  only to invitees the invitation stays, and with it the right to register. An
+  expired or deleted entry stops its invitations as well. The stop follows the
+  address: writing it again on an invitation, or on a new one, does not lift it.
+- **A tick after a withdrawal.** The form does not prove who owns an address, so
+  a tick cannot undo a withdrawal. On an address that has withdrawn, or that has
+  a stopped invitation, the tick stays on the registration (`addressBookPending`)
+  and changes nothing: no address-book entry, no future-communications consent,
+  no invitations. It counts once the person confirms it: by opening the personal
+  link of an email in the browser that filled in the form, on an event open to
+  public registration, or with the button on the **My data** page. The link alone
+  confirms nothing, so a mail filter that opens it, or another browser, changes
+  nothing. On confirmation the entry returns with the data of that registration,
+  its retention restarts and the stopped invitations resume. Both steps are
+  written to the GDPR audit log. A new withdrawal cancels a waiting tick. The
+  platform remembers a withdrawal through the entry, a stopped invitation or a
+  registration that records it: once those are deleted, a tick counts as a first
+  consent.
+- Self-service erasure also deletes the person's address-book entry and their
+  invitations, with every email of those invitations, queued or sent.
 
 ### Rights and the self-service URLs
 
@@ -532,8 +562,8 @@ flow covers.
 | Right | Where | What your internal procedure must cover |
 |---|---|---|
 | Access (Art. 15) | `/<locale>/privacy/my-data` (`/it/privacy/i-miei-dati`, `/en/privacy/my-data`) | Everything outside [What the export contains](../GDPR.md#what-the-export-contains), such as chat, questionnaire answers, recordings and AI outputs |
-| Withdrawal of a consent (Art. 7(3)) | The same page, for the recording, the transcription and future communications, also from the copies of the proofs kept after a registration is gone. In the room, under **Consents** | What is already in the composite video stays: removing it is a request to you |
-| Erasure (Art. 17) | `/<locale>/privacy/my-data/erasure` (`/it/privacy/i-miei-dati/cancellazione`, `/en/privacy/my-data/erasure`) | Everything outside [What erasure deletes](../GDPR.md#what-erasure-deletes). Feedback and questionnaire answers given through a registration are deleted; those given as a guest, or on the public event page, are not found; the event's retention later deletes the chat and removes names and browser ids from the content that stays. The proof of a consent stays without a name while its video or transcript is published: say so |
+| Withdrawal of a consent (Art. 7(3)) | The same page, for the recording, the transcription and future communications, also from the copies of the proofs kept after a registration is gone. In the room, under **Consents** | What is already in the composite video stays: removing it is a request to you. A withdrawal from a kept copy also takes a registrant out of the transcript from captions, as one from the room does; an AI transcript already built does not change |
+| Erasure (Art. 17) | `/<locale>/privacy/my-data/erasure` (`/it/privacy/i-miei-dati/cancellazione`, `/en/privacy/my-data/erasure`) | Everything outside [What erasure deletes](../GDPR.md#what-erasure-deletes). Feedback and questionnaire answers given through a registration are deleted; those given as a guest, or on the public event page, are not found; the event's retention later deletes the chat and removes names and browser ids from the content that stays. The proof of a consent stays without a name while its video or transcript exists, published or not: say so |
 | Objection (Art. 21), address book | The link in emails, or the **My data** page | Requests by other means: deletion of the entry by an administrator |
 | Rectification, portability, restriction | By request | No self-service flow |
 | Guests | By request | Nothing ties a guest's data to an email address, so self-service cannot find it |
@@ -599,7 +629,6 @@ The same differences are tracked in [Known gaps](../GDPR.md#known-limitations).
 | Waiting room, guests | **Email (optional)**, "Only for post-event follow-up" | The address never leaves the browser | `waiting.emailHelp` |
 | AI pipeline settings | **Artifact retention (days)**: "A positive value keeps them for the given number of days even after the event is closed" | A positive value only adds a deletion date; it never extends retention | `admin.settings.postprod.artifactRetentionDaysHelp` |
 | Site privacy page | The built-in generic text | Describes AI processing and specific models on every installation | `legal.privacy.*` |
-| Published AI event report | "written by an artificial intelligence model from the transcript, chat, questions, polls and ratings" | The model reads the number of chat messages, never their text, and the questions only where the page publishes them | `postEvent.report.aiNotice` |
 
 ## Settings to review before the first public event
 

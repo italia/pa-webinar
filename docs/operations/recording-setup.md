@@ -592,7 +592,7 @@ first recorded event; the durations and what each deletion removes are in
 |---|---|---|
 | **Data retention (days after event)** (`Event.dataRetentionDays`; default 30 in `schema.prisma`) | Event wizard | When the daily cleanup deletes the event's personal data, including an unpublished video |
 | `Event.recordingDeleteAfterDays` | Recording panel of the event's administration page | How long a published video stays after publication |
-| **Keep per-participant tracks** (`Event.retainParticipantTracks`; off by default) | Event wizard or event template | Off: tracks are deleted soon after transcription. On: they are kept until the recording's retention ends |
+| **Keep per-participant tracks** (`Event.retainParticipantTracks`; off by default) | Event wizard or event template | Off: tracks are deleted soon after transcription, and with the pipeline off, or a transcription that never completes, they stay until the event's data retention ends. On: they are kept until the recording's retention ends |
 | **Post-event pipeline active** (`SiteSetting.aiPipelineEnabled`; off by default) | Site settings | Whether anything is transcribed, and therefore whether tracks are ever purged after transcription |
 | `SiteSetting.orphanRecordingGraceDays` (default 30 in `schema.prisma`) | `PUT /api/admin/settings`, or `scripts/restore.sh --reset-orphan-grace <days>` on a chart installation; the settings form has no field for it | Days before `recordings-reconcile` deletes an unlinked object; `0` turns automatic deletion off, as a restore does |
 

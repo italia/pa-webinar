@@ -386,11 +386,12 @@ The values below come from the route files. To list every call site with its val
 | Square presence ping | `POST …/garden/ping` | IP | 600 per minute × `ROOM_RATE_LIMIT_MULTIPLIER` |
 | Data-subject export or erasure request | `POST /api/gdpr/export/request`, `POST /api/gdpr/erasure/request` | IP / email hash | 5 / 3 per hour |
 | Export download, erasure confirmation | `GET /api/gdpr/export`, `POST /api/gdpr/erasure` | IP | 10 per hour |
-| Withdrawal of a consent | `POST /api/gdpr/consents` | IP | 30 per hour |
+| Withdrawal of a consent, confirmation of an address-book tick | `POST /api/gdpr/consents` | IP | 30 per hour |
+| Reading the consents in force from the room | `POST …/consents/in-force` | IP | 300 per minute |
 | Address-book opt-out | `POST /api/rubrica/opt-out` | IP | 10 per minute |
 | Link-preview image | `GET /api/og/event/{slug}` | IP | 60 per minute |
 
-The entry route of the registration emails, `GET …/registrations/enter`, has no rate limit. It answers a valid, an invalid and an unknown token in the same way, with a redirect, and sets its cookie only for a valid signature; for a link signed with `proof`, only in the browser that already holds the registration's cookie ([Identity, access and tokens](identity-and-access.md#registrants)).
+The entry route of the registration emails, `GET …/registrations/enter`, has no rate limit. It answers a valid, an invalid and an unknown token in the same way, with a redirect, and sets its cookie only for a valid signature; for a link signed with `proof`, only in the browser that already holds the registration's cookie ([Identity, access and tokens](identity-and-access.md#registrants)). A `proof` link opened in the browser whose cookie came from the form also confirms an address-book tick waiting on that registration ([ADR-011](../adr/011-person-rubrica.md#a-tick-after-a-withdrawal)). A link signed with `sig` confirms nothing and does not read the existing cookie, because it sets that cookie itself.
 
 The guest limit is generous because many participants may join from behind one corporate NAT at the same moment. To change it on the chart, add the variable to `app.env`, which is rendered into the portal's ConfigMap.
 

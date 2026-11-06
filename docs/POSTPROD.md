@@ -764,10 +764,10 @@ is no diarization. The worker loads the speech model once, transcribes each
 track, and merges the segments on one timeline (`infra/ai/worker/multitrack.py`).
 Speaker names come from the portal's JWT, so no mapping is needed, and two
 people talking at once produce two overlapping segments. On a recording with
-`transcriptConsentRule` the claim passes a track's name to the worker only
-with a consent to the current text; the other tracks are transcribed under
-their track label, in the outputs and in the archive too, until staff name
-that voice. When the composite
+`transcriptConsentRule` the claim passes to this job only the tracks with a
+consent to the current text, with their names; a track with an older consent
+is not transcribed. The archive still receives that track, under its track
+label until staff name that voice. When the composite
 MP4 exists, each track's start offset is refined by cross-correlating its
 energy envelope with the mix (`align.py`); otherwise the offsets from the
 recorder's manifest are used. Several track sessions of the same participant
@@ -1713,9 +1713,10 @@ lives on the event, not on a recording (`app/src/lib/report/`,
 
 **Requesting it.** The **AI event report** panel of the event's **After the
 event** tab (`app/src/components/admin/event-report-panel.tsx`) shows the
-requirements, the material available (transcript, chat messages, questions,
-published polls, words, ratings, reactions to the agenda) and the languages,
-and offers **Generate the report** or **Regenerate the report**. It is meant
+requirements, the material available (transcript, questions, published polls,
+words, ratings, reactions to the agenda), the number of chat messages, which
+enters the report only as a figure, and the languages, and offers **Generate
+the report** or **Regenerate the report**. It is meant
 for after the ratings are in: those received up to the claim are included.
 Behind it is `/api/admin/events/<id>/report`, for the staff who manage the
 event (administrators, and organizers for their own events):
@@ -1727,12 +1728,12 @@ event (administrators, and organizers for their own events):
 | `PUT` | `{ published }`: shows or hides the report on the event page (audit `EVENT_REPORT_PUBLISHED` or `EVENT_REPORT_WITHDRAWN`) |
 
 A request needs an `ENDED` event, the site switch on, and the event's data
-retention not yet over, because chat, reactions to the agenda and attendance
-are deleted at retention; otherwise `POST` answers `409`.
+retention not yet over, because the chat messages it counts, reactions to the
+agenda and attendance are deleted at retention; otherwise `POST` answers `409`.
 
 **The job.** Unlike the other jobs it belongs to the event
 (`PostprodJob.eventId`), not to a recording (`recordingId` is empty): an
-event without a recording still has chat, polls and ratings, and nothing done
+event without a recording still has questions, polls and ratings, and nothing done
 to a recording (cancelling its post-production, replacing or deleting it)
 touches the report. It goes to the CPU worker (`AI_WORKER_KINDS` includes
 `REPORT` in the chart) and counts in the orchestrator's demand, so vLLM

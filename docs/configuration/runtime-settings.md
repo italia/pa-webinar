@@ -26,7 +26,7 @@ this page and those files disagree, the files win.
   row is created.
 - **Can one event differ from the site?** Yes, for the settings listed under
   [per-event overrides](#per-event-overrides).
-- **Are the settings confidential?** No. All but two columns can be read by anyone through a public
+- **Are the settings confidential?** No. All but three columns can be read by anyone through a public
   API (see [who can read them](#who-can-read-them)).
 
 ## What SiteSetting is
@@ -101,10 +101,12 @@ flowchart LR
 
 `GET /api/admin/settings` returns the full row to an administrator. Every other caller, anonymous
 ones included, receives every column except the ones listed in `NON_PUBLIC_SETTING_FIELDS`
-(`app/src/lib/settings/public-projection.ts`): `customHomeHtml` and `emailReplyTo`. The public answer
-carries `Cache-Control: public, s-maxage=300, stale-while-revalidate=600`, so a shared cache in front
-of the app may keep serving a stale copy for up to 15 minutes after a change. Treat every other
-setting as public, the sizing and AI parameters included.
+(`app/src/lib/settings/public-projection.ts`): `customHomeHtml`, `emailReplyTo` and
+`addressBookEnabled`. The root layout passes the same projection (`publicSettings()`) to the
+client-side settings context, so those columns do not reach the browser in the page data either.
+The public answer carries `Cache-Control: public, s-maxage=300, stale-while-revalidate=600`, so a
+shared cache in front of the app may keep serving a stale copy for up to 15 minutes after a change.
+Treat every other setting as public, the sizing and AI parameters included.
 
 A guard test, `app/src/lib/settings/public-projection.test.ts`, reads the Prisma schema and fails when
 a column is neither listed as public nor withheld with a reason.
@@ -208,6 +210,7 @@ Defaults are those of `app/prisma/schema.prisma`.
 | `parseTitleKicker` | **Editorial title kicker**, **Features** | `false` | Shows the part of a title before `\|` as a small label above it. An event can override it ([branding](branding.md#editorial-title-kicker)) |
 | `gravatarEnabled` | **Use Gravatar when available**, **Features** | `false` | Lets the platform fetch a registrant's Gravatar through its own proxy, so browsers never contact the Gravatar service. Declare it in the privacy notice ([avatars](../architecture/identity-and-access.md#avatars)) |
 | `liveCaptionsEnabled` | **Automatic captions in video calls**, **Features** | `true` | Live captions in every event's room, where the captions service is installed. Off, no event starts them and the scaler keeps the service at zero; on, the service runs while any event is live. Each event can turn them off in the event wizard or during the event, and can keep a transcript built from them (`Event.captionsTranscriptEnabled`), which needs this setting on ([Live captions](../architecture/live-captions.md)) |
+| `addressBookEnabled` | **Events address book**, **Features** | `true` | When on, events can offer people who register the chance to stay in the address book, one event at a time (`Event.offerAddressBook`). When off, no event offers it: the box disappears from the registration forms, the picker from the wizard and the line from the privacy sheet, and the registration route ignores both consent fields. Existing entries stay until they are withdrawn or expire ([ADR-011](../adr/011-person-rubrica.md)). Only the server reads this setting |
 | `reactionsMode` | **Reactions (emoji)**, **Features** | `NATIVE` | `NATIVE` is **Jitsi native (in the toolbar, ephemeral)**; `CUSTOM` is **App custom (left-hand bar, with stats)**. See [reactions](../architecture/live-interaction.md#reactions) |
 | `waitingRoomEngine` | **Waiting room (site default)**, **Branding** | `GARDEN` | The site's default waiting-room engine. `GAME` (**Videogame (Phaser lobby)**) offers the square; `CLASSIC` (**Classic (static)**) starts in the classic view. `GARDEN`, the schema default, is a legacy value that behaves as `GAME`, and the selector shows it as the videogame option. See [engines](../architecture/waiting-room.md#engines-classic-view-and-the-square) |
 | `videoQuality` | **Default quality**, **Infra sizing** | `HIGH` | The default video and audio preset: `SAVE_DATA` (360p), `BALANCED` (540p), `HIGH` (720p) or `MAX` (1080p). Phones are capped at 360p whatever the preset. See [video quality presets](../architecture/jitsi-integration.md#video-quality-presets) |
@@ -379,6 +382,10 @@ empty in `app/prisma/schema.prisma`:
 - live features such as `whiteboardEnabled`, which a template can pre-fill; the wizard and the template
   form offer the whiteboard only when the installation declares the whiteboard service
   (`NEXT_PUBLIC_WHITEBOARD_ENABLED`);
+- the address-book offer, `offerAddressBook`, which starts on and which a template can pre-fill. It is not
+  an override: with
+  `addressBookEnabled` off no event offers the address book, whatever this column says
+  (`rubricaProposta()` in `app/src/lib/persons/address-book.ts`);
 - the transcript from captions, `captionsTranscriptEnabled`, offered in the wizard under **Automatic
   captions** where captions are available, and its publication on the event page, `transcriptPublished`,
   set after the event. The transcript takes effect only while captions are on for the event and in this

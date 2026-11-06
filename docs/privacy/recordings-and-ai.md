@@ -111,12 +111,17 @@ recording box. The rules are in `app/src/lib/recording/destination.ts`.
 |---|---|---|
 | Reserved (`REGISTRANTS`) | The staff who manage the event, and registrants for as long as their registration exists. It is not public and not in the video library | `gdpr.consent.recordingReserved` |
 | Public (`PUBLIC`) | Anyone, once staff publish it | `gdpr.consent.recordingPublic` |
-| Not declared (null) | What staff decide after the event, with a warning when they publish. Only events that recorded before the choice existed, and instant calls | `gdpr.consent.recording` |
+| Not declared (null) | What staff decide after the event, with a warning when they publish. Only events that recorded before the choice existed, events that received a file after their room opened, instant calls, and imported archives, which publish with no warning | `gdpr.consent.recording` |
 
 - **Starting value.** Staff choose it, or the event's format and template
-  propose it. An event or a copy that starts recording with no choice starts
-  reserved, and so does an event that starts recording through an edit or an
-  uploaded file. A moderator link cannot choose it.
+  propose it. On an invitation-only event a proposed public destination goes back
+  to reserved; a public one that staff chose stays, and the wizard says so. An
+  event or a copy that starts recording with no choice starts reserved, and so
+  does an event that starts recording through an edit, or through an uploaded
+  file while its room has never opened. Instant calls and imported archives stay
+  without a destination, with their copies, and so does an event that receives a
+  file after its room has opened. A moderator link cannot choose the destination
+  or attach a new video.
 - **Changes.** A declared destination cannot be removed. Until the room first
   opens staff can change it either way; afterwards it can only become reserved,
   because the people in the video read that text.
@@ -129,20 +134,28 @@ recording box. The rules are in `app/src/lib/recording/destination.ts`.
   read the text again, and the waiting room shows the current text.
 - **The guard.** On a reserved event the API refuses with `409`
   (`RECORDING_DESTINATION_NOT_COVERED`) a recording shown to everyone, a video or
-  transcript published for everyone, and a new external video or catch-up
-  address. It looks at the event, never at single proofs: everyone in the video
+  transcript published for everyone, a new external video or catch-up address,
+  and, where recordings storage is configured, a new video address outside it.
+  It looks at the event, never at single proofs: everyone in the video
   holds a consent that covers the event. Narrowing is never refused.
 - **Access by registrants.** They prove the registration with the personal link
   of the recording notice, or with the event's access cookie, and the
   registration must still exist: after the event's retention or an erasure the
-  video stays with staff. On a reserved event the video does not depend on
-  `postEventPublic`, so the event page can stay private;
-  `postEventPublicUntil` still applies. The temporary catch-up copy is not offered
-  in the room.
-- **Questions.** A reserved event publishes no Q&A questions, and neither the
-  summary nor the report reads them, whatever the post-event settings say. The
-  rule looks only at the destination, so it also holds for a reserved event
-  that no longer records.
+  video stays with staff. On an event with a declared destination a video for
+  registrants does not depend on `postEventPublic`, so the event page can stay
+  private; `postEventPublicUntil` still applies.
+- **Reserved by audience.** Staff can limit a video to registrants
+  (`recordingAudience`) also where the destination is public or not declared.
+  Registrants then reach it as above, and the next point applies.
+- **Questions and catch-up.** A recording reserved by its destination or by its
+  audience publishes no Q&A questions, neither the summary nor the report reads
+  them, whatever the post-event settings say, and the room offers no temporary
+  catch-up copy (`registrazioneRiservata`). The rule looks only at those two
+  fields, so it also holds for a reserved event that no longer records.
+- **Public reads.** The event lists and the public event API give the address of
+  the video only when it is published for everyone and inside the post-event
+  window, whatever the event's status. An event without a visible page answers
+  `404`.
 - **No room video.** On an installation without Jibri the box says that the room
   video is not recorded (`gdpr.consent.recordingNoVideo`) and the sheet names no
   destination. An event that records still starts reserved, so an uploaded file
@@ -163,13 +176,15 @@ seat. Without consent the track is not recorded, and the same happens when the
 portal does not answer or does not know the endpoint: the check fails closed.
 Because Prosody can report a join a moment after the track arrives, a refusal
 is asked again twice, after a few seconds, before the track is skipped.
-Moderators and speakers are checked like everyone else, and the recorder
-accepts a consent given with any version of the text, all of which cover the
-audio track. When the portal still does not know the endpoint after the
-retries, the bot logs a warning that names `mod_pa_occupants`. Without that
-module, as with an external Jitsi that does not load it, the bot records no
-track at all, and the chart refuses to render `recorder.enabled` when
-`XMPP_MUC_MODULES` does not load it.
+Moderators and speakers are checked like everyone else. Where the event
+transcribes, from captions, from the video or from the tracks with the AI
+pipeline, the recorder accepts only a consent to the current text; elsewhere a
+consent to any version covers the audio track
+(`app/src/lib/ai/voice-consent.ts`). When the portal still does not know the
+endpoint after the retries, the bot logs a warning that names
+`mod_pa_occupants`. Without that module, as with an external Jitsi that does
+not load it, the bot records no track at all, and the chart refuses to render
+`recorder.enabled` when `XMPP_MUC_MODULES` does not load it.
 
 The recorder starts a new file for each track session. A participant who
 rejoins, or whose audio track is removed and added again, produces another
@@ -223,7 +238,8 @@ records, transcribes and publishes. Then the boxes ask.
 
 At registration, an event with per-participant recording, with a transcript
 from captions or whose video the AI pipeline transcribes, adds a separate,
-optional checkbox (`gdpr.consent.multitrack`), with a note that taking part does
+optional checkbox (`gdpr.consent.multitrack`, or `gdpr.consent.multitrackRetained`
+where tracks are kept), with a note that taking part does
 not depend on it (`gdpr.consent.multitrackOptional`, or
 `gdpr.consent.multitrackOptionalShort` where a person's voice stays out of the
 video without the recording consent). The registration API accepts a request
@@ -236,6 +252,9 @@ sentence that matters most on this page is the promise the text makes:
 > If the event records a separate audio track for each person, my voice is
 > recorded for this purpose only and the track is deleted after transcription;
 > it is not used to identify or reproduce my voice.
+
+Where tracks are kept, the text says so instead
+([The consent text and retained tracks](#the-consent-text-and-retained-tracks)).
 
 Registrants who consented at registration and open the room in the browser
 they registered with are not asked again. Everyone else is asked in the
@@ -265,10 +284,11 @@ calls have no sheet: they show the same setting, or the built-in
 
 These texts give the purpose and exclude biometric use. They do not cover
 encryption, the legal basis or rights: the event's privacy notice
-(`privacyPolicyUrl` or `privacyPolicyText`) has to say those. The **Consents**
-dialog in the room always shows its built-in text and ignores
-`recordingConsentText`
-([Recording: consent gates](../architecture/recording.md#consent-gates)).
+(`privacyPolicyUrl` or `privacyPolicyText`) has to say those. The event's
+`recordingConsentText`, where set, goes with the recording box at registration,
+in the waiting room and in the room, **Consents** dialog included
+([Custom recording consent text](privacy-notice-checklist.md#custom-recording-consent-text),
+[Recording: consent gates](../architecture/recording.md#consent-gates)).
 
 ## Voice data
 
@@ -402,18 +422,18 @@ whoever sets the option that it "extends retention of sensitive personal data
 
 ### The consent text and retained tracks
 
-The consent box follows **Keep per-participant tracks**: with it off, the track
-"is deleted after transcription" (`gdpr.consent.multitrack`); with it on, the
-track "is kept with the event data" (`gdpr.consent.multitrackRetained`). The two
-texts have the same purpose and the same version, so a consent given to one
-stays valid under the other.
+The consent box says what happens to the track. With **Keep per-participant
+tracks** off and the AI pipeline on, the track "is deleted after transcription"
+(`gdpr.consent.multitrack`). With the option on, or with the AI pipeline off,
+where tracks are never transcribed and stay until the event's retention, the
+track "is kept with the event data" (`gdpr.consent.multitrackRetained`). The
+sheet follows the same rule. The two texts have the same purpose and the same
+version, so a consent given to one stays valid under the other.
 
-The setting can still change after people have consented, and their consent
-then does not say what happens to their track. A controller who turns it on
-after registration has opened has to say so in the event's privacy notice and
-in its own communication to participants. With the AI pipeline off, tracks are
-never transcribed and stay until the event's retention: the sheet says they are
-kept, and the box keeps the first text.
+Both settings can still change after people have consented, and their consent
+then does not say what happens to their track. A controller who turns the option
+on, or the pipeline off, after registration has opened has to say so in the
+event's privacy notice and in its own communication to participants.
 
 ### Where voice data lives and who can reach it
 
@@ -423,13 +443,14 @@ kept, and the box keeps the first text.
 | `tracks.json` | Same prefix | Anyone allowed to list the bucket | Display names in plain text. Nothing reads it after the upload; the purge jobs delete it with the recording's last track |
 | Track rows (`RecordingTrack`) | PostgreSQL | The portal | Display name encrypted |
 | Downloadable archive | Object storage, `postprod/…/archive.mkv` | Staff who manage the event, through a signed URL | Never public |
-| Mixed audio | Inside the composite MP4 | Anyone who reaches the waiting room, guests included, through the temporary catch-up copy (24 hours), which reserved events do not offer; the public, once the video is published for everyone; registrants, for a reserved video | See [Privacy and data protection](../GDPR.md) |
+| Mixed audio | Inside the composite MP4 | Anyone who reaches the waiting room, guests included, through the temporary catch-up copy (24 hours), which a reserved recording does not offer; the public, once the video is published for everyone; registrants, for a reserved video | See [Privacy and data protection](../GDPR.md) |
 
 The worker receives each participant's name in clear text through the internal
 API, because it writes names into the transcript. On a recording with the mark
-`transcriptConsentRule` the name passes only with a consent to the current text:
-without it the voice stays under an anonymous label in the transcript, the
-summary and the archive. Signed-URL mechanics are in
+`transcriptConsentRule` a track reaches the transcription, with its name, only
+with a consent to the current text. Without it the voice stays out of the
+transcript and of what is built from it; the downloadable archive still takes
+the track, under an anonymous label. Signed-URL mechanics are in
 [Object storage](../configuration/storage.md).
 
 ### Operator responsibilities
@@ -540,8 +561,9 @@ this section covers what matters for privacy.
   in the original text kept at the first correction: the transcript keeps, in
   its encrypted body, the registration behind each registrant speaker for this
   purpose. Lines that staff moved by hand to another speaker stay with that
-  speaker, and a transcript left empty is deleted. The words of a guest, who
-  has no registration, are removed with the editor's erasure mode
+  speaker, and a transcript left empty is deleted. Withdrawing the consent does
+  the same, also from a proof kept after the registration is gone. The words of
+  a guest, who has no registration, are removed with the editor's erasure mode
   ([Erasing a passage](#erasing-a-passage)).
 
 ## AI outputs
@@ -1001,7 +1023,7 @@ captions:
   stored sentences, and removes the person from the transcript built from
   captions ([Transcript from live captions](#transcript-from-live-captions));
   it does not reach recordings, tracks or AI outputs. The proof of a consent to
-  a published video or transcript stays, without a name.
+  a video or transcript that exists, published or not, stays, without a name.
 
 Requests about recordings and transcripts therefore go to the controller, who
 handles them in the administration area:
@@ -1025,8 +1047,8 @@ privacy notice states the actual basis.
 
 | Processing | Basis the design assumes | Evidence the platform keeps |
 |---|---|---|
-| Recording the event | Art. 6(1)(a): consent to a text that says where the video goes, optional, never a condition of entering | `Registration.consentRecording` with `consentRecordingDestination` and `consentRecordingVersion`, and waiting-room proofs (`RecordingConsent`), with the same facts and the periods they replace. They go at the event's retention, and a copy stays while a video or transcript is published (`RetainedConsentProof`) |
-| Per-participant track | Art. 6(1)(a): explicit consent, separate from the recording consent, optional, checked for each track before it is recorded | `Registration.consentMultitrack`, deleted with the registration at the event's retention. A `CONSENT_RECORDED` entry in the GDPR audit log, with the flags but no identity, which is kept. Waiting-room ticks are stored for the conference seat (`MultitrackConsent`) and deleted at the event's retention. While a video or transcript is published, a copy stays (`RetainedConsentProof`) |
+| Recording the event | Art. 6(1)(a): consent to a text that says where the video goes, optional, never a condition of entering | `Registration.consentRecording` with `consentRecordingDestination` and `consentRecordingVersion`, and waiting-room proofs (`RecordingConsent`), with the same facts and the periods they replace. They go at the event's retention. A copy stays (`RetainedConsentProof`) while a video or transcript is published and, after an erasure, while one exists, published or not ([details](privacy-notice-checklist.md#retention-and-where-to-change-it)) |
+| Per-participant track | Art. 6(1)(a): explicit consent, separate from the recording consent, optional, checked for each track before it is recorded | `Registration.consentMultitrack`, deleted with the registration at the event's retention. A `CONSENT_RECORDED` entry in the GDPR audit log, with the flags but no identity, which is kept. Waiting-room ticks are stored for the conference seat (`MultitrackConsent`) and deleted at the event's retention. A copy stays in the same cases (`RetainedConsentProof`) |
 | Keeping a person's words in the transcript, with their name, from captions or from tracks | Art. 6(1)(a): the same consent, given to the current version of its text | The same records, with the version of the text each consent was given to. Each stored sentence carries the conference seat whose consent allowed it (`CaptionSegment.seatId`) |
 | Transcribing the composite video | The same consent, for everyone who speaks in it; the system cannot check it voice by voice, so staff confirm it | The confirmation in the admin audit log (`allVoicesConsented`) |
 | Summary, translations and dubbing | The basis of AI post-production, which the controller states: no consent of their own. They start from the transcript | The event's flags. `Recording.consentSnapshot` records the event's AI and per-participant settings when the recording is queued (`app/src/lib/ai/enqueue.ts`). It is evidence only: no code reads it, so it does not restrict what happens to outputs after a setting changes |
@@ -1150,7 +1172,8 @@ Retention and deletion:
 Data-subject rights:
 
 - **Self-service export and erasure exclude recordings, tracks and AI
-  outputs.** Only the transcript from captions is reached, by erasure.
+  outputs.** Only the transcript from captions is reached, by erasure and by the
+  withdrawal of a consent.
 - **Corrections do not reach the stored files.** Outputs generated after a
   correction start from the machine text, unless the lines were erased from
   the original.

@@ -192,6 +192,7 @@ The [ADR index](adr/README.md) gives each record's status and relations, the sta
 | [017](adr/017-patched-jitsi-web-image.md) | Patch the jitsi/web bundle by shape for fixes with no configuration point |
 | [018](adr/018-live-captions.md) | Live captions from an in-cluster streaming recognizer, fed by Jitsi's bridge |
 | [019](adr/019-event-languages-text-translation.md) | One language list per event, and automatic translation of its texts at save |
+| [020](adr/020-consents-follow-event-format.md) | Consents follow the event format, which sets starting values and never rights |
 
 ## Develop and contribute
 

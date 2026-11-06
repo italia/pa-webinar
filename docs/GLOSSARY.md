@@ -263,7 +263,9 @@ enabled**. When only invitees can take part, the list is the set of addresses
 allowed to register (invitation-only registration), and an event that chose
 it admits no guests. An invitation is stopped (`declinedAt`, UI **Receives no
 invitations**) when the person must not be contacted any more: nothing is sent
-for it, and on an event not open to anyone the row keeps its access.
+for it, and on an event not open to anyone the row keeps its access. The stop
+follows the address: a new row for it starts stopped, and only a confirmed
+address-book tick lifts it.
 [From creation to recap](architecture/event-journey.md#invitations-and-named-grants)
 
 **Join password** (`joinPasswordHash`): an optional per-event password asked
@@ -296,7 +298,7 @@ control) for `GUEST` (the audience), `SPEAKER` and `MODERATOR`. Only the
 `GUEST` column is chosen and applied: moderators can always do everything,
 and speakers always have microphone, camera and screen; the other columns
 are normalized to that on every write.
-[From creation to recap](architecture/event-journey.md#the-five-wizard-steps)
+[From creation to recap](architecture/event-journey.md#the-wizard-steps-and-the-advanced-settings)
 
 **Questionnaire** (`EventQuestionnaire`, UI **Questionnaires**): questions
 attached to an event, either inside the registration form (`PRE_REGISTRATION`)
@@ -434,7 +436,7 @@ opening. [Event lifecycle](architecture/event-lifecycle.md)
 
 **Temporary recording** (`tempRecordingUrl`, UI **Watch from the start**): an
 optional catch-up recording offered while the event is live, before any
-recording is published, and never on a reserved destination.
+recording is published, and never on a reserved recording.
 [Recording](architecture/recording.md)
 
 **Timer** (UI **Timer**): a countdown a moderator can show to the whole room.
@@ -680,7 +682,9 @@ or may not be the public body that runs the events.
 **Orphan recording** (`OrphanRecording`): a file in recording storage that no
 event or call session references. A reconciliation job finds orphan
 recordings, and they are deleted after a grace period unless an administrator
-decides otherwise. [Recording](architecture/recording.md)
+decides otherwise. Removing a video from an event with `PUT` or `PATCH` detaches
+the file from the event and its call sessions, and it becomes an orphan.
+[Recording](architecture/recording.md)
 
 **Platform overlay**: a small values file in `infra/helm/pa-webinar/examples/`
 (`values-minikube.yaml`, `values-k3s.yaml`, `values-aks.yaml`,
@@ -826,7 +830,8 @@ job from the queue, runs the models and uploads the artifacts.
 **Per-participant audio track** (`RecordingTrack`): one participant's
 isolated audio in a multitrack recording. It is deleted after transcription
 unless the event keeps tracks (`retainParticipantTracks`, UI **Keep
-per-participant tracks**).
+per-participant tracks**). Without the AI pipeline nothing is transcribed, and
+the track stays until the event's data retention ends.
 [Recordings, voice data and AI outputs](privacy/recordings-and-ai.md)
 
 **Pipeline snapshot** (`Recording.pipelineSnapshot`, UI **AI processing
@@ -869,7 +874,8 @@ cross-event record of people who explicitly opted in to be invited again. It
 keeps their encrypted email, has its own retention, counted from the last
 tick of the box, and a self-service opt-out. An installation can turn it off
 (`addressBookEnabled`), and an event can choose not to offer it
-(`offerAddressBook`).
+(`offerAddressBook`). A tick on an address that withdrew waits on the
+registration (`addressBookPending`) until the person confirms it.
 [ADR-011](adr/011-person-rubrica.md),
 [Privacy and data protection](GDPR.md)
 
@@ -910,8 +916,8 @@ transcripts held in the database) are stored encrypted with AES-256-GCM under
 
 **Erasure** (right to erasure, GDPR Art. 17): deleting a data subject's
 personal data on request, alongside the automatic deletion at the end of
-retention. The proof of a consent to a published video or transcript stays,
-without the name. [Privacy and data protection](GDPR.md)
+retention. The proof of a consent to a video or transcript that still exists
+stays, without the name. [Privacy and data protection](GDPR.md)
 
 **GDPR audit log** (`GdprAuditLog`, UI **GDPR log**): per-event records of
 personal-data operations such as consents, exports and deletions. It records
@@ -945,7 +951,8 @@ installation for a public body.
 
 **Retained consent proof** (`RetainedConsentProof`): the copy of a consent that
 stays after its source is deleted, while the video or transcript it refers to
-is published. It goes with the event.
+exists. Past the event's data retention it stays only while that content is
+published. It goes with the event.
 [Data model](architecture/data-model.md#deleting-data)
 
 **Retention**: how long each kind of personal data is kept before deletion or

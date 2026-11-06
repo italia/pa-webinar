@@ -33,7 +33,7 @@ The wizard asks how many people are expected, who speaks and shows on video, whe
 | Q&A after the event | Not published | Text only | Text only |
 | Address book | Not offered | Offered | Offered |
 
-An event on invitation starts reserved in every family. The answer "no recording" leaves the destination empty. The system templates carry the same columns, so an event created from a template starts the same way. The course template follows the meeting, and the press conference template follows the public event without pseudonyms. `hostsAlwaysRecorded` can be set on an event by its staff, and it counts only where a person who refuses can be left out of the video. Its value in the preset comes from one constant, which is off.
+On an event on invitation every family proposes a reserved recording: a public destination that comes only from a family or a template goes back to reserved, and the wizard says so. A public video that staff chose stays, and the wizard warns that anyone will see it, not just the invitees. The answer "no recording" leaves the destination empty. The system templates carry the same columns, so an event created from a template starts the same way. The course template follows the meeting, and the press conference template follows the public event without pseudonyms. `hostsAlwaysRecorded` can be set on an event by its staff, and it counts only where a person who refuses can be left out of the video. Its value in the preset comes from one constant, which is off.
 
 ### Rights do not depend on the format
 
@@ -44,7 +44,7 @@ These hold for every format and no setting removes them:
 - A person who refuses stays out of the recording, and the room does not change for anyone else. How that happens depends on the installation's recorder, not on the format. Where the recorder can leave the person out, the person takes part as usual. Where it cannot, the audience without a consent listens only ([ADR-013](013-multitrack-speaker-attribution.md)).
 - People are told that the event can be recorded and transcribed. Where the audience has no microphone, camera or screen there is nothing of theirs to record, and the event informs them instead of asking.
 - A consent can be withdrawn, from the room or from the person's own data page.
-- The proof of a consent stays for as long as the video or transcript it covers is published.
+- The proof of a consent stays for as long as the video or transcript it covers exists, and past the event's data retention for as long as that content is published.
 
 The installation decides what applies to all its events: the privacy notice, the legal texts, whether the address book exists, and the templates.
 
@@ -58,13 +58,13 @@ Instant calls stay outside this model. They declare no destination, ask no conse
 |---|---|
 | `PUBLIC` | The video can be published for anyone. |
 | `REGISTRANTS` | Reserved. Registrants and staff see it. `recordingAudience` stays `REGISTRANTS`, and no external video can be linked. |
-| Null | Never declared: events that predate the choice, and instant calls. |
+| Null | Never declared: events that predate the choice, instant calls and imported archives, with their copies, and events that receive a file after their room has opened. |
 
 `recordingAudience` keeps its meaning from [ADR-006](006-recording-and-storage.md): who sees a video once it is published. A public destination can still be published to registrants only, and the reverse is refused.
 
 The rules for the value:
 
-- **Only staff declare it.** A moderator link cannot, because the link is a seat. Any path that starts recording without a choice starts reserved: creating an event, copying one, editing it, uploading a file to an event that did not record. Widening is an explicit act.
+- **Only staff declare it.** A moderator link cannot, because the link is a seat. Any path that starts recording without a choice starts reserved: creating an event, copying one, editing it, uploading a file to an event that did not record and whose room never opened. After the room has opened the destination could no longer be widened, so a file uploaded then declares nothing. Widening is an explicit act.
 - **It freezes when the room opens.** Before that, staff can change it freely. After that, it can only move to reserved, also on an event that had none.
 - **A declared destination cannot be removed.** On an event with no destination every consent counts, so removing it would let a video reserved by its consents be published.
 - **A reserved video does not depend on the event page.** A registrant sees it even when the page after the event is private, within `postEventPublicUntil`. The registrant loses access when the registration is deleted by the cleanup, and from then on only staff see it. The consent text and the privacy sheet say so.
@@ -103,7 +103,7 @@ flowchart LR
     A["<b>Asked again</b><br/>in the room,<br/>on the text in force"]:::job
     OUT["<b>Out of the video</b><br/>stays in the room,<br/>nothing else changes"]:::ext
     G["<b>Publication guard</b><br/>looks at the event,<br/>never at single proofs"]:::job
-    P["<b>Proofs copied</b><br/>before cleanup or erasure,<br/>kept while published"]:::data
+    P["<b>Proofs copied</b><br/>before cleanup or erasure,<br/>kept while the content is there"]:::data
 
     D --> T --> C --> Q
     D --> F --> Q
@@ -121,7 +121,7 @@ flowchart LR
 
 ### The publication guard looks at the event
 
-`assertEsposizioneConsentita()` refuses with 409 `RECORDING_DESTINATION_NOT_COVERED` a change that exposes a reserved event further: making the recording visible to everyone, publishing it or its transcript for everyone, or adding an external video or catch-up address. It compares the state before and after a request, so narrowing is never refused and closing an event never stops here.
+`assertEsposizioneConsentita()` refuses with 409 `RECORDING_DESTINATION_NOT_COVERED` a change that exposes a reserved event further: making the recording visible to everyone, publishing it or its transcript for everyone, or adding an external video or catch-up address. `assertVideoNelloStorage()` answers the same way to a new video address outside the recordings storage, which no access rule would protect. The first compares the state before and after a request, so narrowing is never refused and closing an event never stops here.
 
 The guard reads the event and never counts consents. Everyone in the video has a consent that covers the event, because anyone else was asked again or left out. That stays true after the cleanup removes the proofs, and one refusal never blocks a publication.
 
@@ -130,16 +130,24 @@ An event with no destination is not blocked: its consents do not say where the v
 ### Chat and questions are outside the recording consent
 
 - **Chat is never published**, including questions asked in the chat. The public recap drops them when it is read, which also covers recaps saved earlier, and the AI report receives only the number of messages.
-- **Q&A questions are published as text, never with a name.** After the event the name stays with the moderators. `domandePubbliche()` is the one rule for the page, the room, the public API and the report input: with a reserved destination questions are not published, whatever the event's switch says.
+- **Q&A questions are published as text, never with a name.** After the event the name stays with the moderators. `domandePubbliche()` is the one rule for the page, the room, the public API and the report input: with a recording reserved by its destination, or by an audience narrowed to registrants (`registrazioneRiservata()`), questions are not published, whatever the event's switch says.
 - **A notice sits under both fields**, in the chat and in the Q&A composer, asking people not to write personal data.
 
 ### Proofs of consent outlive their sources
 
 `RetainedConsentProof` holds one row per consent period, copied in the same transaction that deletes the sources. It has no foreign key to registrations or room consents, so the code that reads live consents cannot mistake a historical proof for a consent in force. Its only key is to the event.
 
-`tipiDiProvaDaConservare()` is the one definition of how long a proof lasts:
+Two rules say how long a proof lasts, because the question changes when the event's data retention ends.
 
-- A video published on the platform, or linked as an external video, keeps both the recording and the transcription proofs.
+Until then a video can exist without being published, and the voice of whoever asks for erasure is in it. `tipiDiProvaDiCioCheEsiste()` looks at what exists, for whoever deletes registrations, grants or staff accounts and for the proofs those deletions leave:
+
+- The event's video, the file of any session, an external video, a catch-up file or per-participant tracks whose audio is still there keep both the recording and the transcription proofs.
+- A transcript alone keeps its own proof.
+- Otherwise nothing stays, and the cleanup deletes such proofs at the first pass in which neither exists.
+
+At the end of retention the unpublished file goes, and `tipiDiProvaDaConservare()` looks at what is published:
+
+- A video published on the platform, or linked as an external video, keeps both proofs.
 - A published transcript alone keeps its own proof.
 - Otherwise nothing stays, and proofs kept earlier go at the next cleanup pass.
 
@@ -159,6 +167,7 @@ This extends [ADR-011](011-person-rubrica.md):
 - **The record keeps the address, encrypted.** Without it a record could not reach anyone once the registrations that carried the address were deleted, which is the moment the address book is meant for.
 - **Retention counts from the consent.** A record expires `retentionMonths` after the last tick. A registration without the box links to the record and changes nothing, so no one's data is kept longer without a new consent.
 - **A withdrawal takes effect at once.** The address goes immediately, the invitations stop, and the rest of the record goes at the next daily run.
+- **A tick does not undo a withdrawal by itself.** The form does not prove who owns an address, so after a withdrawal a tick waits for the person's confirmation ([ADR-011](011-person-rubrica.md#a-tick-after-a-withdrawal)).
 
 ## Consequences
 
@@ -239,7 +248,7 @@ This was the previous behavior. A record lost its address when the cleanup delet
 | Consent at the door | `POST /api/events/{slug}/registrations`, `POST /api/events/{slug}/jitsi/token` |
 | Transcription from the video | `app/src/lib/ai/voice-consent.ts`, with `Recording.transcriptConsentRule` |
 | Chat and questions | `domandePubbliche()` in `app/src/lib/events/post-event-sections.ts`, `riepilogoPubblico()` in `app/src/lib/events/recap.ts`, `app/src/lib/report/input.ts` |
-| Proofs | `app/src/lib/gdpr/consent-proofs.ts`, `app/src/lib/gdpr/retained-consent-proofs.ts`, `tipiDiProvaDaConservare()` in `app/src/lib/gdpr/cleanup-selection.ts` |
+| Proofs | `app/src/lib/gdpr/consent-proofs.ts`, `app/src/lib/gdpr/retained-consent-proofs.ts`, `tipiDiProvaDaConservare()` and `tipiDiProvaDiCioCheEsiste()` in `app/src/lib/gdpr/cleanup-selection.ts` |
 | Copy before deletion | `/api/cron/cleanup`, `app/src/lib/gdpr/erase-registrations.ts`, `/api/gdpr/erasure` |
 | Withdrawal of a retained proof | `POST /api/gdpr/consents` with `proofId` |
 | Privacy sheet | `app/src/lib/events/privacy-sheet.ts`, `app/src/components/events/privacy-sheet.tsx` |
@@ -252,7 +261,7 @@ A consent records the destination of the text read (`testoLetto()`), which can d
 
 - **A registrant who loses the link on a private page.** The form that sends a personal viewing link lives on the event page. A registrant with no valid link cannot reach it while the page is private, and has to ask the organizers.
 - **Deleting an event deletes its proofs**, also when an external video stays online. The platform cannot tell what another site still shows: a proof kept for an external video stays until someone removes the link.
-- **Proofs with no email hash.** Guests, and hosts for their transcription proofs, cannot be matched to a retained proof, so they cannot withdraw it or remove the name alone. It goes with the video.
+- **Proofs with no email hash.** Guests, and hosts who enter from the primary link without a staff session, cannot be matched to a retained proof, so they cannot withdraw it or remove the name alone. It goes with the video.
 - **The sheet leaves no record of what was shown.** Being computed, it has no version. The proof records the consent text, not the sheet beside it.
 - **Keeping tracks after consents are given.** `retainParticipantTracks` stays editable after people have consented to a text that promises deletion. The two texts have the same version, so those consents stay valid.
 - **The AI report on a reserved event.** Publishing it is not refused. The event page hides it from whoever cannot see the recording.
