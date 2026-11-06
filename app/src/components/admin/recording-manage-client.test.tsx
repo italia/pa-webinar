@@ -83,6 +83,13 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+describe('le azioni della pagina', () => {
+  it('vanno a capo: su un telefono non allargano la pagina', () => {
+    disegna();
+    expect(pulsante(tp.generateAi).parentElement?.classList).toContain('flex-wrap');
+  });
+});
+
 describe('l’avviso sulla trascrizione ferma', () => {
   it('senza sottotitoli dice che l’evento resta senza trascrizione', () => {
     disegna({ confermaVoci: true, avvisoConfermaVoci: true });

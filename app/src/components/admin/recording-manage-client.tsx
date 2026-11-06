@@ -241,7 +241,8 @@ export default function RecordingManageClient({
             <span>· {format.dateTime(new Date(createdAt), { dateStyle: 'short', timeStyle: 'medium' })}</span>
           </div>
         </div>
-        <div className="d-flex align-items-center gap-2">
+        {/* Le azioni vanno a capo: su un telefono non stanno su una riga. */}
+        <div className="d-flex flex-wrap align-items-center gap-2">
           {/* Il lavoro sul video fa parte della chiusura dell'evento: da qui
               si torna alla sua scheda «Dopo l'evento». */}
           {eventId && (
