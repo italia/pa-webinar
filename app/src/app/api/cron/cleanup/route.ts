@@ -6,7 +6,7 @@ import { Prisma } from '@prisma/client';
 import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { assertCronApiKey } from '@/lib/auth/cron';
-import { CAMPI_VIDEO_VUOTI } from '@/lib/events/recording-fields';
+import { CAMPI_VIDEO_VUOTI, sessioniSenzaFile } from '@/lib/events/recording-fields';
 import { deleteRecordingBlob } from '@/lib/storage/recordings';
 import { deleteBlob, isAzureConfigured } from '@/lib/azure/blob-storage';
 import { closeStaleSessions, type OvertimeLimits } from '@/lib/events/call-sessions';
@@ -159,6 +159,9 @@ export const GET = withErrorHandling(async (request) => {
           where: { id: evt.id },
           data: CAMPI_VIDEO_VUOTI,
         }),
+        ...(evt.recordingUrl
+          ? [prisma.callSession.updateMany(sessioniSenzaFile(evt.id, evt.recordingUrl))]
+          : []),
         prisma.gdprAuditLog.create({
           data: {
             eventId: evt.id,

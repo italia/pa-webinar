@@ -17,7 +17,7 @@ import { publishEventStatus, publishFlagsIfChanged } from '@/lib/live-state/publ
 import { LIVE_FLAG_FIELDS } from '@/lib/live-state/pubsub';
 import { recordLiveAction, recordLiveActions } from '@/lib/live/actions';
 import { reviveStatus } from '@/lib/events/lifecycle';
-import { CAMPI_VIDEO_VUOTI } from '@/lib/events/recording-fields';
+import { CAMPI_VIDEO_VUOTI, sessioniSenzaFile } from '@/lib/events/recording-fields';
 import { domandePubbliche } from '@/lib/events/post-event-sections';
 import { closeOpenSessions } from '@/lib/events/call-sessions';
 import { chiudiSondaggiAperti } from '@/lib/events/close-polls';
@@ -780,8 +780,10 @@ export const PUT = withErrorHandling(async (request, context) => {
   // aperti si chiudono nella stessa transazione (lib/events/close-polls).
   const closesPolls =
     nextStatus !== event.status && !isTerminalStatus && (nextStatus === 'ENDED' || nextStatus === 'ARCHIVED');
+  // Il file tolto dall'evento non resta nemmeno sulle sessioni.
+  const fileTolto = data.recordingUrl === null ? event.recordingUrl : null;
   const updated =
-    closesSessions || closesPolls || tagIds !== null || conUnione
+    closesSessions || closesPolls || tagIds !== null || conUnione || fileTolto
       ? await prisma.$transaction(async (tx) => {
           let argomenti: Prisma.EventUpdateArgs = updateArgs;
           if (conUnione) {
@@ -797,6 +799,7 @@ export const PUT = withErrorHandling(async (request, context) => {
           if (closesSessions) await closeOpenSessions(tx, [eventId], new Date());
           if (closesPolls) await chiudiSondaggiAperti(tx, [eventId], new Date());
           if (tagIds !== null) await replaceEventTags(tx, eventId, tagIds);
+          if (fileTolto) await tx.callSession.updateMany(sessioniSenzaFile(eventId, fileTolto));
           return aggiornato;
         })
       : await prisma.event.update(updateArgs);

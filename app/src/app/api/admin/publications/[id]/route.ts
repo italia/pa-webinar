@@ -16,7 +16,7 @@ import { cookies } from 'next/headers';
 import { z } from 'zod';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
-import { CAMPI_VIDEO_VUOTI } from '@/lib/events/recording-fields';
+import { CAMPI_VIDEO_VUOTI, sessioniSenzaFile } from '@/lib/events/recording-fields';
 import { materialUrlSchema } from '@/lib/validation/materials';
 import { requireEventManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
@@ -86,6 +86,7 @@ export const PATCH = withErrorHandling(async (request, context) => {
       recordingPublished: true,
       transcriptPublished: true,
       youtubeUrl: true,
+      recordingUrl: true,
       tempRecordingUrl: true,
     },
   });
@@ -123,45 +124,50 @@ export const PATCH = withErrorHandling(async (request, context) => {
     parsed.data.recordingPublished ??
     (setsRecording && parsed.data.recordingUrl !== null ? true : undefined);
 
-  const updated = await prisma.event.update({
-    where: { id },
-    data: {
-      ...(parsed.data.libraryListed !== undefined && {
-        libraryListed: parsed.data.libraryListed,
-      }),
-      ...(parsed.data.postEventPublic !== undefined && {
-        postEventPublic: parsed.data.postEventPublic,
-      }),
-      ...(parsed.data.coverImageUrl !== undefined && {
-        coverImageUrl: parsed.data.coverImageUrl,
-      }),
-      ...(parsed.data.youtubeUrl !== undefined && {
-        youtubeUrl: parsed.data.youtubeUrl,
-      }),
-      ...(setsRecording && parsed.data.recordingUrl !== null && {
-        recordingUrl: parsed.data.recordingUrl,
-        // Enable the flag even on retroactive uploads (Jibri was off
-        // during the event) so the detail page surfaces the player.
-        recordingEnabled: true,
-        ...destinazione,
-      }),
-      ...(publishWith !== undefined && {
-        recordingPublished: publishWith,
-        ...(publishWith && { recordingPublishedAt: new Date() }),
-      }),
-      ...(parsed.data.recordingFileSize !== undefined && {
-        recordingFileSize:
-          parsed.data.recordingFileSize === null
-            ? null
-            : BigInt(parsed.data.recordingFileSize),
-      }),
-      ...(parsed.data.recordingDuration !== undefined && {
-        recordingDuration: parsed.data.recordingDuration,
-      }),
-      // Ultimi, per vincere sui campi qui sopra: togliere il video toglie anche
-      // pubblicazione, peso e durata, qualunque cosa chieda la richiesta.
-      ...(parsed.data.recordingUrl === null && CAMPI_VIDEO_VUOTI),
-    },
+  // Il file tolto dall'evento non resta nemmeno sulle sessioni.
+  const fileTolto = parsed.data.recordingUrl === null ? prima.recordingUrl : null;
+  const updated = await prisma.$transaction(async (tx) => {
+    if (fileTolto) await tx.callSession.updateMany(sessioniSenzaFile(id, fileTolto));
+    return tx.event.update({
+      where: { id },
+      data: {
+        ...(parsed.data.libraryListed !== undefined && {
+          libraryListed: parsed.data.libraryListed,
+        }),
+        ...(parsed.data.postEventPublic !== undefined && {
+          postEventPublic: parsed.data.postEventPublic,
+        }),
+        ...(parsed.data.coverImageUrl !== undefined && {
+          coverImageUrl: parsed.data.coverImageUrl,
+        }),
+        ...(parsed.data.youtubeUrl !== undefined && {
+          youtubeUrl: parsed.data.youtubeUrl,
+        }),
+        ...(setsRecording && parsed.data.recordingUrl !== null && {
+          recordingUrl: parsed.data.recordingUrl,
+          // Enable the flag even on retroactive uploads (Jibri was off
+          // during the event) so the detail page surfaces the player.
+          recordingEnabled: true,
+          ...destinazione,
+        }),
+        ...(publishWith !== undefined && {
+          recordingPublished: publishWith,
+          ...(publishWith && { recordingPublishedAt: new Date() }),
+        }),
+        ...(parsed.data.recordingFileSize !== undefined && {
+          recordingFileSize:
+            parsed.data.recordingFileSize === null
+              ? null
+              : BigInt(parsed.data.recordingFileSize),
+        }),
+        ...(parsed.data.recordingDuration !== undefined && {
+          recordingDuration: parsed.data.recordingDuration,
+        }),
+        // Ultimi, per vincere sui campi qui sopra: togliere il video toglie anche
+        // pubblicazione, peso e durata, qualunque cosa chieda la richiesta.
+        ...(parsed.data.recordingUrl === null && CAMPI_VIDEO_VUOTI),
+      },
+    });
   });
 
   await logAdminAction({

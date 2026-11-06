@@ -92,7 +92,7 @@ export async function tipiDelleProve(
 /** Cosa esiste dell'evento, anche non pubblicato, letto dentro la transazione:
  *  per chi cancella e per le prove prima della fine della conservazione. */
 export async function tipiDelleProveEsistenti(
-  db: Pick<Prisma.TransactionClient, 'event' | 'postprodArtifact' | 'recording'>,
+  db: Pick<Prisma.TransactionClient, 'event' | 'postprodArtifact' | 'recording' | 'callSession'>,
   eventId: string
 ): Promise<TipoConsenso[]> {
   const evento = await db.event.findUnique({
@@ -102,7 +102,16 @@ export async function tipiDelleProveEsistenti(
   if (!evento) return [];
   const registrazioni = await db.recording.findMany({
     where: { eventId, status: { not: 'ARCHIVED' } },
-    select: { blobKey: true, mediaStartedAt: true },
+    select: {
+      blobKey: true,
+      mediaStartedAt: true,
+      // La cancellazione dell'audio dopo la trascrizione lascia la riga e il suo
+      // stato: delle tracce conta solo quelle che ci sono ancora.
+      tracks: { where: { audioPurgedAt: null }, select: { id: true }, take: 1 },
+    },
+  });
+  const fileDiSessione = await db.callSession.count({
+    where: { eventId, recordingUrl: { not: null } },
   });
   const trascrizioni = await db.postprodArtifact.count({
     where: { type: 'TRANSCRIPT_JSON', recording: { eventId } },
@@ -111,8 +120,10 @@ export async function tipiDelleProveEsistenti(
     youtubeUrl: evento.youtubeUrl ?? null,
     recordingUrl: evento.recordingUrl ?? null,
     tempRecordingUrl: evento.tempRecordingUrl ?? null,
+    fileDiSessione: fileDiSessione > 0,
     tracceArrivate: registrazioni.some(
-      (r) => isMultitrackPlaceholder(r.blobKey) && registrazioneConMedia(r)
+      (r) =>
+        isMultitrackPlaceholder(r.blobKey) && registrazioneConMedia(r) && r.tracks.length > 0
     ),
     trascrizioneEsiste: trascrizioni > 0,
   });

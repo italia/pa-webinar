@@ -336,6 +336,7 @@ describe('tipiDiProvaDiCioCheEsiste', () => {
     youtubeUrl: null,
     recordingUrl: null,
     tempRecordingUrl: null,
+    fileDiSessione: false,
     tracceArrivate: false,
     trascrizioneEsiste: false,
   };
@@ -344,6 +345,7 @@ describe('tipiDiProvaDiCioCheEsiste', () => {
     ['il file non ancora pubblicato', { recordingUrl: 'https://file' }],
     ['la registrazione temporanea', { tempRecordingUrl: 'https://temp' }],
     ['il link esterno', { youtubeUrl: 'https://esterno' }],
+    ['il file di un’altra sessione', { fileDiSessione: true }],
     ['le tracce per persona arrivate', { tracceArrivate: true }],
   ])('%s vale come video: restano entrambe', (_nome, stato) => {
     expect(tipiDiProvaDiCioCheEsiste({ ...niente, ...stato })).toEqual([

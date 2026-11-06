@@ -219,9 +219,13 @@ export interface StatoEsistenzaProve {
   youtubeUrl: string | null;
   recordingUrl: string | null;
   tempRecordingUrl: string | null;
-  /** Le tracce per persona arrivate di una registrazione che sull'evento non ha
-   *  un indirizzo. Le altre registrazioni non contano: `recordingUrl` dice gia'
-   *  se il loro video c'e', e la riga resta anche dopo che il video e' stato tolto. */
+  /** Il file di una sessione ancora al suo posto, anche se non e' quello
+   *  dell'evento: l'evento indica solo l'ultima sessione registrata. */
+  fileDiSessione: boolean;
+  /** Le tracce per persona ancora presenti di una registrazione che sull'evento
+   *  non ha un indirizzo. Le altre registrazioni non contano: i campi qui sopra
+   *  dicono gia' se il loro video c'e', e la riga resta anche dopo che il video e'
+   *  stato tolto. */
   tracceArrivate: boolean;
   /** C'e' un artefatto di trascrizione, pubblicato o no. */
   trascrizioneEsiste: boolean;
@@ -236,7 +240,13 @@ export interface StatoEsistenzaProve {
  * `tipiDiProvaDaConservare`.
  */
 export function tipiDiProvaDiCioCheEsiste(evt: StatoEsistenzaProve): TipoConsenso[] {
-  if (evt.youtubeUrl || evt.recordingUrl || evt.tempRecordingUrl || evt.tracceArrivate) {
+  if (
+    evt.youtubeUrl ||
+    evt.recordingUrl ||
+    evt.tempRecordingUrl ||
+    evt.fileDiSessione ||
+    evt.tracceArrivate
+  ) {
     return ['recording', 'transcription'];
   }
   return evt.trascrizioneEsiste ? ['transcription'] : [];

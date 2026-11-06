@@ -20,6 +20,7 @@ const m = vi.hoisted(() => ({
     event: { findUnique: vi.fn() },
     postprodArtifact: { count: vi.fn(), findMany: vi.fn() },
     recording: { findMany: vi.fn() },
+    callSession: { count: vi.fn() },
     $executeRaw: vi.fn(),
   },
 }));
@@ -78,6 +79,7 @@ beforeEach(() => {
   m.transazione.mockImplementation(async (fn: (t: typeof m.tx) => unknown) => fn(m.tx));
   tx.postprodArtifact.findMany.mockResolvedValue([]);
   tx.recording.findMany.mockResolvedValue([]);
+  tx.callSession.count.mockResolvedValue(0);
   tx.registration.findMany.mockResolvedValue([iscritta]);
   tx.recordingConsent.findMany.mockResolvedValue([]);
   tx.multitrackConsent.findMany.mockResolvedValue([]);
@@ -302,26 +304,51 @@ describe('tipiDelleProveEsistenti', () => {
     tx.event.findUnique.mockResolvedValue(evento);
     tx.postprodArtifact.count.mockResolvedValue(0);
     tx.recording.findMany.mockResolvedValue([
-      { blobKey: 'recordings/sala.mp4', mediaStartedAt: t('09:00') },
+      { blobKey: 'recordings/sala.mp4', mediaStartedAt: t('09:00'), tracks: [] },
     ]);
     expect(await tipiDelleProveEsistenti(tx as never, 'e1')).toEqual([]);
+  });
+
+  it('il file di una sessione vale come video, anche se l’evento non lo indica', async () => {
+    tx.event.findUnique.mockResolvedValue(evento);
+    tx.postprodArtifact.count.mockResolvedValue(0);
+    tx.callSession.count.mockResolvedValue(1);
+    expect(await tipiDelleProveEsistenti(tx as never, 'e1')).toEqual([
+      'recording',
+      'transcription',
+    ]);
+    expect(tx.callSession.count).toHaveBeenCalledWith({
+      where: { eventId: 'e1', recordingUrl: { not: null } },
+    });
   });
 
   it('le tracce per persona arrivate valgono come video, il segnaposto vuoto no', async () => {
     tx.event.findUnique.mockResolvedValue(evento);
     tx.postprodArtifact.count.mockResolvedValue(0);
     tx.recording.findMany.mockResolvedValue([
-      { blobKey: 'recordings/multitrack/e1/', mediaStartedAt: null },
+      { blobKey: 'recordings/multitrack/e1/', mediaStartedAt: null, tracks: [] },
     ]);
     expect(await tipiDelleProveEsistenti(tx as never, 'e1')).toEqual([]);
     tx.recording.findMany.mockResolvedValue([
-      { blobKey: 'recordings/multitrack/e1/', mediaStartedAt: t('09:00') },
+      { blobKey: 'recordings/multitrack/e1/', mediaStartedAt: t('09:00'), tracks: [{ id: 't1' }] },
     ]);
     expect(await tipiDelleProveEsistenti(tx as never, 'e1')).toEqual([
       'recording',
       'transcription',
     ]);
     expect(tx.recording.findMany.mock.calls[0]![0].where.status).toEqual({ not: 'ARCHIVED' });
+  });
+
+  it('le tracce gia’ cancellate non valgono come video', async () => {
+    tx.event.findUnique.mockResolvedValue(evento);
+    tx.postprodArtifact.count.mockResolvedValue(0);
+    tx.recording.findMany.mockResolvedValue([
+      { blobKey: 'recordings/multitrack/e1/', mediaStartedAt: t('09:00'), tracks: [] },
+    ]);
+    expect(await tipiDelleProveEsistenti(tx as never, 'e1')).toEqual([]);
+    expect(tx.recording.findMany.mock.calls[0]![0].select.tracks.where).toEqual({
+      audioPurgedAt: null,
+    });
   });
 
   it('la sola trascrizione tiene la sua prova', async () => {
