@@ -16,7 +16,8 @@ import { captionsTranscriptActive } from '@/lib/captions/availability';
  * sbagliare per difetto vuol dire catturare senza dirlo.
  *
  * La trascrizione dal video completo, dopo l'evento, non e' una cattura in
- * sala: la annuncia la sala d'attesa (`waiting.aiNotice`).
+ * sala: la annuncia la scheda privacy (`transcript.fromVideo`,
+ * lib/events/privacy-sheet).
  */
 export interface StatoCattura {
   /** Si registra l'audio di ciascuno, per chi ha acconsentito. */

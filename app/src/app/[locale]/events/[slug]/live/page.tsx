@@ -18,6 +18,7 @@ import { accessoRegistrazione, vedeVideo } from '@/lib/recording/audience';
 import { consensoCopre, destinazioneDelTesto } from '@/lib/recording/destination';
 import { registraChiConduce } from '@/lib/live/entry-consents';
 import { informativaEvento } from '@/lib/events/privacy-notice';
+import { schedaPrivacyEvento, testoIaDelSito } from '@/lib/events/privacy-sheet';
 import LiveEventClient from '@/components/live/live-event-client';
 import AdminSessionKeepAlive from '@/components/admin/admin-session-keepalive';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
@@ -131,10 +132,10 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
     getPublicEnv('NEXT_PUBLIC_WHITEBOARD_ENABLED'),
   );
 
-  // Informativa AI per la sala d'attesa (AI Act / GDPR trasparenza): la
-  // mostriamo quando il master switch è attivo E l'evento ha almeno una
-  // feature AI. Il testo è il custom per-locale dell'admin
-  // (SiteSetting.aiConsentDisclosure) oppure null → la WaitingRoom usa il
+  // Informativa AI per la sala d'attesa (AI Act / GDPR trasparenza): la dice
+  // la scheda privacy. Sulle chiamate rapide, senza scheda, la mostriamo quando
+  // il master switch è attivo E l'evento ha almeno una feature AI. Il testo è
+  // il custom per-locale dell'admin oppure null → la WaitingRoom usa il
   // fallback i18n `waiting.aiNotice`.
   const aiPostprodEnabled =
     !!settings.aiPipelineEnabled &&
@@ -145,9 +146,10 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
   // Sottotitoli live (ADR-018): servizio installato e acceso nell'istanza.
   // Se l'evento li vuole, lo dice il suo flag, che il moderatore cambia dal vivo.
   const captionsAvailable = liveCaptionsAvailable(settings);
-  const aiConsentDisclosure =
-    ((settings.aiConsentDisclosure as Record<string, string> | null) ?? {})[locale] ??
-    null;
+  const aiConsentDisclosure = testoIaDelSito(settings, locale);
+  // La scheda dell'evento com'e', una sola per ospiti e iscritti: gli stessi
+  // fatti del modulo d'iscrizione. Null sulle chiamate rapide.
+  const schedaPrivacy = schedaPrivacyEvento(event, settings);
 
   const isInstant = event.eventType === 'INSTANT';
 
@@ -257,6 +259,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             recordingConsentText: isInstant ? null : event.recordingConsentText,
             voceNelVideo: voce,
             privacy,
+            schedaPrivacy,
             timezone: event.timezone,
             registrationCount: event._count.registrations,
             effectiveGraceMinutes:
@@ -486,6 +489,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         recordingConsentText: event.recordingConsentText,
         voceNelVideo: voce,
         privacy,
+        schedaPrivacy,
         timezone: event.timezone,
         registrationCount: event._count.registrations,
         effectiveGraceMinutes:

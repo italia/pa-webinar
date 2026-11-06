@@ -17,6 +17,7 @@ import { captionsTranscriptActive } from '@/lib/captions/availability';
 import { isEventOpenForRegistration } from '@/lib/events/visibility';
 import { registrationAccessFor } from '@/lib/events/registration-access';
 import { informativaEvento } from '@/lib/events/privacy-notice';
+import { schedaPrivacyEvento, testoIaDelSito } from '@/lib/events/privacy-sheet';
 import { anteprimaEventoPubblico } from '@/lib/events/meta-title';
 import { rubricaProposta } from '@/lib/persons/address-book';
 import { recordingAvailable, voceNelVideo } from '@/lib/recording/availability';
@@ -148,6 +149,8 @@ export default async function RegistrationPage({
             voce={voce}
             privacyPolicyUrl={privacyUrl}
             privacyPolicyText={privacyText}
+            schedaPrivacy={schedaPrivacyEvento(event, settings)}
+            testoIa={testoIaDelSito(settings, locale)}
             // Un'installazione che non può registrare non chiede il consenso
             // alla registrazione e non la annuncia (come la sala d'attesa).
             recordingEnabled={event.recordingEnabled && disponibile}

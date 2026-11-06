@@ -9,7 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import messages from '@/i18n/messages/it.json';
 import type { SchedaPrivacy } from '@/lib/events/privacy-sheet';
 
-import { PrivacySheet } from './privacy-sheet';
+import { PrivacySheet, schedaInSala } from './privacy-sheet';
 
 const t = messages.gdpr.sheet;
 const tSala = messages.waiting;
@@ -24,6 +24,7 @@ const SCHEDA: SchedaPrivacy = {
   trascrizione: { sottotitoli: false, tracce: null, dalVideo: false },
   sottotitoli: { attivi: false, testoConservato: false },
   ia: null,
+  chat: { attiva: false, domandeAttive: false, esitoDomande: 'nonPubblicate' },
   elencoVisibile: true,
   pseudonimi: false,
   conservazione: { giorniDati: 30, video: { giorniDopoPubblicazione: null } },
@@ -193,6 +194,14 @@ describe('PrivacySheet, intelligenza artificiale', () => {
     expect(testo).not.toContain(t.ai.onRequest);
   });
 
+  it("dice che i testi automatici possono sbagliare, anche sotto il testo dell'amministrazione", () => {
+    expect(disegna({ ia: IA })).toContain(t.ai.accuracy);
+    expect(disegna({ ia: { ...IA, sintesi: true } }, 'Testo scritto.')).toContain(
+      t.ai.accuracy
+    );
+    expect(disegna({ ia: null })).not.toContain(t.ai.accuracy);
+  });
+
   it("dice cio' che chi organizza puo' chiedere dopo l'evento, prima del resoconto", () => {
     const testo = disegna({ ia: { ...IA, elaborabileDopo: true } });
     expect(testo).toContain(t.ai.onRequest);
@@ -245,6 +254,128 @@ describe('PrivacySheet, intelligenza artificiale', () => {
 
   it("senza pipeline il testo dell'amministrazione non compare", () => {
     expect(disegna({ ia: null }, SCRITTO)).not.toContain(SCRITTO);
+  });
+});
+
+describe('PrivacySheet, chat e domande', () => {
+  it('niente chat e niente domande: la riga non compare', () => {
+    expect(disegna()).not.toContain(t.chat.label);
+  });
+
+  it('la chat non si pubblica mai', () => {
+    const testo = disegna({
+      chat: { attiva: true, domandeAttive: false, esitoDomande: 'soloTesto' },
+    });
+    expect(testo).toContain(t.chat.label);
+    expect(testo).toContain(t.chat.messages);
+    expect(testo).not.toContain(t.chat.questionsText);
+    expect(testo).not.toContain(t.chat.questionsNone);
+  });
+
+  it('delle domande si pubblica solo il testo', () => {
+    const testo = disegna({
+      chat: { attiva: true, domandeAttive: true, esitoDomande: 'soloTesto' },
+    });
+    expect(testo).toContain(t.chat.questionsText);
+    expect(testo).not.toContain(t.chat.questionsNone);
+  });
+
+  it('con la registrazione riservata nessuna domanda', () => {
+    const testo = disegna({
+      chat: { attiva: false, domandeAttive: true, esitoDomande: 'nonPubblicate' },
+    });
+    expect(testo).toContain(t.chat.label);
+    expect(testo).toContain(t.chat.questionsNone);
+    expect(testo).not.toContain(t.chat.messages);
+    expect(testo).not.toContain(t.chat.questionsText);
+  });
+});
+
+describe('schedaInSala, la scheda con i flag di adesso', () => {
+  const accesi: SchedaPrivacy = {
+    ...SCHEDA,
+    trascrizione: { sottotitoli: true, tracce: 'cancellate', dalVideo: false },
+    sottotitoli: { attivi: true, testoConservato: true },
+    chat: { attiva: true, domandeAttive: true, esitoDomande: 'soloTesto' },
+  };
+  const conSottotitoli = (scheda: SchedaPrivacy, sottotitoli: boolean) =>
+    schedaInSala(scheda, {
+      sottotitoli,
+      chat: scheda.chat.attiva,
+      domande: scheda.chat.domandeAttive,
+    });
+
+  it('spenti dal vivo: niente riga, e il testo non diventa trascrizione', () => {
+    const dopo = conSottotitoli(accesi, false);
+    expect(dopo.sottotitoli).toEqual({ attivi: false, testoConservato: true });
+    expect(dopo.trascrizione).toEqual({
+      sottotitoli: false,
+      tracce: 'cancellate',
+      dalVideo: false,
+    });
+    const testo = disegna(dopo);
+    expect(testo).not.toContain(t.captions.label);
+    expect(testo).not.toContain(t.transcript.captions);
+    expect(testo).toContain(t.transcript.tracks);
+  });
+
+  it('accesi dal vivo dove erano spenti: dice che il testo si conserva', () => {
+    const spenti = conSottotitoli(accesi, false);
+    const testo = disegna(conSottotitoli(spenti, true));
+    expect(testo).toContain(tSala.captionsNoticeTranscript);
+    expect(testo).toContain(t.transcript.captions);
+  });
+
+  it('dove il testo non si conserva resta cosi', () => {
+    const dopo = conSottotitoli(
+      { ...SCHEDA, sottotitoli: { attivi: false, testoConservato: false } },
+      true
+    );
+    expect(dopo.sottotitoli.attivi).toBe(true);
+    expect(dopo.trascrizione.sottotitoli).toBe(false);
+    expect(disegna(dopo)).toContain(tSala.captionsNotice);
+  });
+
+  it('Q&A acceso dal vivo: dice cosa si pubblica delle domande', () => {
+    const chiuso: SchedaPrivacy = {
+      ...accesi,
+      chat: { ...accesi.chat, domandeAttive: false },
+    };
+    expect(disegna(chiuso)).not.toContain(t.chat.questionsText);
+    const testo = disegna(
+      schedaInSala(chiuso, { sottotitoli: true, chat: true, domande: true })
+    );
+    expect(testo).toContain(t.chat.questionsText);
+  });
+
+  it('chat e Q&A spenti dal vivo: la riga sparisce', () => {
+    const testo = disegna(
+      schedaInSala(accesi, { sottotitoli: true, chat: false, domande: false })
+    );
+    expect(testo).not.toContain(t.chat.label);
+  });
+
+  it('chat spenta dal vivo: restano le domande', () => {
+    const testo = disegna(
+      schedaInSala(accesi, { sottotitoli: true, chat: false, domande: true })
+    );
+    expect(testo).not.toContain(t.chat.messages);
+    expect(testo).toContain(t.chat.questionsText);
+  });
+
+  it('la rubrica non si promette: in sala non c\'e\' la casella', () => {
+    const dopo = conSottotitoli({ ...accesi, rubrica: { mesi: 24 } }, true);
+    expect(dopo.rubrica).toBeNull();
+    expect(disegna(dopo)).not.toContain(t.addressBook.label);
+  });
+
+  it('il resto della scheda non cambia', () => {
+    expect(conSottotitoli(accesi, false)).toMatchObject({
+      registrazione: accesi.registrazione,
+      conservazione: accesi.conservazione,
+      elencoVisibile: accesi.elencoVisibile,
+      pseudonimi: accesi.pseudonimi,
+    });
   });
 });
 

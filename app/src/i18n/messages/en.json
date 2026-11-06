@@ -4488,7 +4488,8 @@
         "translation": "The transcript and summary may be translated automatically.",
         "dubbing": "The video may be dubbed with a synthetic voice.",
         "onRequest": "After the event the organisers can also ask for automatic processing of the recording not listed here: transcription, summary or translation.",
-        "report": "After the event, the staff may have an AI tool write a report, using also the polls and, where they are published, the questions. The text of the chat is not used."
+        "report": "After the event, the staff may have an AI tool write a report, using also the polls and, where they are published, the questions. The text of the chat is not used.",
+        "accuracy": "Texts produced with artificial intelligence may contain inaccuracies."
       },
       "list": {
         "label": "Participant list",
@@ -4510,6 +4511,12 @@
       "addressBook": {
         "label": "Address book",
         "offered": "When you register you can choose to stay in the events address book, to be invited to similar events. It is optional: the data stays for {months} months from your consent, unless you withdraw it."
+      },
+      "chat": {
+        "label": "Chat and questions",
+        "messages": "Chat messages are never published, not even questions asked in the chat.",
+        "questionsText": "After the event the text of the Q&A questions may be published, never the name of the person who asked them.",
+        "questionsNone": "The Q&A questions are not published."
       }
     },
     "export": {

@@ -8,6 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import messages from '@/i18n/messages/it.json';
 import type { WaitingRoomJoinPrefs } from '@/components/live/waiting-room';
+import type { SchedaPrivacy } from '@/lib/events/privacy-sheet';
 import type * as Riconnessione from '@/lib/jitsi/riconnessione';
 
 import LiveEventClient from './live-event-client';
@@ -26,6 +27,7 @@ type PropsAttesa = {
   recordingConsentRequired?: boolean;
   recordingDestination?: unknown;
   voce?: unknown;
+  schedaPrivacy?: SchedaPrivacy | null;
   onEnterLive: (nome: string, prefs: WaitingRoomJoinPrefs) => void;
 };
 const attesa = vi.hoisted(() => ({ props: null as unknown }));
@@ -63,7 +65,14 @@ vi.mock('@/lib/jitsi/riconnessione', async (originale) => ({
   attesaTentativo: () => 0,
 }));
 
-vi.mock('swr', () => ({ default: () => ({ data: undefined, mutate: vi.fn() }) }));
+// I flag della sala sono l'unica lettura che qui conta: la sala d'attesa li segue.
+const flagsDellaSala = vi.hoisted(() => ({ dati: undefined as unknown }));
+vi.mock('swr', () => ({
+  default: (chiave: unknown) => ({
+    data: String(chiave).endsWith('/flags') ? flagsDellaSala.dati : undefined,
+    mutate: vi.fn(),
+  }),
+}));
 vi.mock('@/i18n/navigation', async () => {
   const { createElement } = await import('react');
   return {
@@ -173,6 +182,7 @@ beforeEach(() => {
   chiamate = [];
   risposte = [];
   statiEvento = [];
+  flagsDellaSala.dati = undefined;
   vi.stubGlobal(
     'fetch',
     vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -290,6 +300,173 @@ describe("sala — quello che arriva alla sala d'attesa", () => {
       retainParticipantTracks: true,
     });
     expect(a.event).not.toHaveProperty('recordingUrl');
+  });
+
+  describe('la scheda privacy', () => {
+    const SCHEDA: SchedaPrivacy = {
+      registrazione: {
+        modo: 'manuale',
+        destinazione: 'PUBLIC',
+        chiNonAcconsente: 'restaFuori',
+        conduceSempre: false,
+      },
+      trascrizione: { sottotitoli: true, tracce: null, dalVideo: false },
+      sottotitoli: { attivi: true, testoConservato: true },
+      ia: null,
+      chat: { attiva: true, domandeAttive: true, esitoDomande: 'soloTesto' },
+      elencoVisibile: true,
+      pseudonimi: false,
+      conservazione: { giorniDati: 30, video: null },
+      rubrica: null,
+    };
+    const conSottotitoli = {
+      ...evento,
+      schedaPrivacy: SCHEDA,
+      liveCaptionsAvailable: true,
+      liveCaptionsEnabled: true,
+    };
+
+    it('arriva alla sala d\'attesa, e sulle chiamate rapide non arriva', async () => {
+      await monta({ event: { ...evento, schedaPrivacy: null } });
+      expect(leggiAttesa().schedaPrivacy).toBeNull();
+    });
+
+    it('i sottotitoli seguono i flag della sala, non il valore dell\'apertura', async () => {
+      flagsDellaSala.dati = { liveCaptionsEnabled: false };
+      await monta({ event: conSottotitoli });
+      expect(leggiAttesa().schedaPrivacy?.sottotitoli.attivi).toBe(false);
+      expect(leggiAttesa().schedaPrivacy?.trascrizione.sottotitoli).toBe(false);
+    });
+
+    it('prima che i flag arrivino vale il valore dell\'apertura', async () => {
+      await monta({ event: conSottotitoli });
+      expect(leggiAttesa().schedaPrivacy?.sottotitoli.attivi).toBe(true);
+      expect(leggiAttesa().schedaPrivacy?.trascrizione.sottotitoli).toBe(true);
+    });
+
+    it('sottotitoli non disponibili nell\'istanza: spenti, qualunque cosa dica l\'evento', async () => {
+      await monta({ event: { ...conSottotitoli, liveCaptionsAvailable: false } });
+      expect(leggiAttesa().schedaPrivacy?.sottotitoli.attivi).toBe(false);
+    });
+
+    it('chat e Q&A seguono i flag della sala, non il valore dell\'apertura', async () => {
+      const chiusi: SchedaPrivacy = {
+        ...SCHEDA,
+        chat: { attiva: false, domandeAttive: false, esitoDomande: 'soloTesto' },
+      };
+      await monta({ event: { ...evento, schedaPrivacy: chiusi } });
+      expect(leggiAttesa().schedaPrivacy?.chat).toEqual(chiusi.chat);
+
+      flagsDellaSala.dati = { chatEnabled: true, qaEnabled: true };
+      await monta({ event: { ...evento, schedaPrivacy: chiusi } });
+      expect(leggiAttesa().schedaPrivacy?.chat).toEqual({
+        attiva: true,
+        domandeAttive: true,
+        esitoDomande: 'soloTesto',
+      });
+    });
+
+    it('prima che i flag arrivino, chat e Q&A valgono come all\'apertura', async () => {
+      await monta({
+        event: { ...evento, chatEnabled: true, qaEnabled: true, schedaPrivacy: SCHEDA },
+      });
+      expect(leggiAttesa().schedaPrivacy?.chat).toMatchObject({
+        attiva: true,
+        domandeAttive: true,
+      });
+    });
+
+    it('la rubrica non arriva alla sala d\'attesa, che non ha quella casella', async () => {
+      await monta({
+        event: { ...evento, schedaPrivacy: { ...SCHEDA, rubrica: { mesi: 24 } } },
+      });
+      expect(leggiAttesa().schedaPrivacy?.rubrica).toBeNull();
+    });
+
+    describe('la casella della trascrizione segue i sottotitoli', () => {
+      // La pagina ha calcolato l'evento con i sottotitoli spenti.
+      const spentiAllApertura = {
+        ...evento,
+        recordingEnabled: false,
+        schedaPrivacy: {
+          ...SCHEDA,
+          trascrizione: { sottotitoli: false, tracce: null, dalVideo: false },
+          sottotitoli: { attivi: false, testoConservato: true },
+        },
+        liveCaptionsAvailable: true,
+        liveCaptionsEnabled: false,
+        captionsTranscript: false,
+      };
+      const accesiAllApertura = {
+        ...spentiAllApertura,
+        schedaPrivacy: SCHEDA,
+        liveCaptionsEnabled: true,
+        captionsTranscript: true,
+      };
+      const scrittaFinestra = l.consents.transcription.give;
+
+      it('in sala d\'attesa compare quando chi modera li accende', async () => {
+        await monta({ event: spentiAllApertura });
+        expect(leggiAttesa().event.captionsTranscript).toBe(false);
+
+        flagsDellaSala.dati = { liveCaptionsEnabled: true };
+        await monta({ event: spentiAllApertura });
+        expect(leggiAttesa().event.captionsTranscript).toBe(true);
+        expect(leggiAttesa().schedaPrivacy?.trascrizione.sottotitoli).toBe(true);
+      });
+
+      it('in sala d\'attesa scompare quando chi modera li spegne', async () => {
+        await monta({ event: accesiAllApertura });
+        expect(leggiAttesa().event.captionsTranscript).toBe(true);
+
+        flagsDellaSala.dati = { liveCaptionsEnabled: false };
+        await monta({ event: accesiAllApertura });
+        expect(leggiAttesa().event.captionsTranscript).toBe(false);
+        expect(leggiAttesa().schedaPrivacy?.trascrizione.sottotitoli).toBe(false);
+      });
+
+      it('nella finestra dei consensi segue lo stesso valore', async () => {
+        flagsDellaSala.dati = { liveCaptionsEnabled: false };
+        await monta({ event: accesiAllApertura });
+        await entra();
+        expect(testo()).not.toContain(l.consents.button);
+
+        flagsDellaSala.dati = { liveCaptionsEnabled: true };
+        await monta({ event: accesiAllApertura });
+        await premi(pulsante(l.consents.button));
+        expect(testo()).toContain(scrittaFinestra);
+      });
+
+      it('chi ha gia\' acconsentito puo\' ritirare anche a sottotitoli spenti', async () => {
+        flagsDellaSala.dati = { liveCaptionsEnabled: false };
+        await monta({ event: accesiAllApertura, hasMultitrackConsent: true });
+        await entra();
+        await premi(pulsante(l.consents.button));
+        expect(testo()).toContain(l.consents.given);
+        expect(pulsante(l.consents.withdraw)).toBeTruthy();
+      });
+
+      it('dove il testo non si conserva la casella non compare', async () => {
+        flagsDellaSala.dati = { liveCaptionsEnabled: true };
+        const event = {
+          ...spentiAllApertura,
+          schedaPrivacy: {
+            ...spentiAllApertura.schedaPrivacy,
+            sottotitoli: { attivi: false, testoConservato: false },
+          },
+        };
+        await monta({ event });
+        expect(leggiAttesa().event.captionsTranscript).toBe(false);
+      });
+
+      it('sulle chiamate rapide, senza scheda, resta il valore della pagina', async () => {
+        flagsDellaSala.dati = { liveCaptionsEnabled: false };
+        await monta({
+          event: { ...evento, captionsTranscript: true, liveCaptionsAvailable: true },
+        });
+        expect(leggiAttesa().event.captionsTranscript).toBe(true);
+      });
+    });
   });
 
   it('senza video il testo non dichiara una destinazione', async () => {

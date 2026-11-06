@@ -4488,7 +4488,8 @@
         "translation": "Trascrizione e sintesi possono essere tradotte automaticamente.",
         "dubbing": "Il video può avere un doppiaggio con voce sintetica.",
         "onRequest": "Dopo l'evento chi organizza può chiedere anche elaborazioni automatiche della registrazione non indicate qui: trascrizione, sintesi o traduzione.",
-        "report": "Dopo l'evento lo staff può far scrivere un resoconto con l'intelligenza artificiale, a partire anche dai sondaggi e, se sono pubblicate, dalle domande. Il testo della chat non viene usato."
+        "report": "Dopo l'evento lo staff può far scrivere un resoconto con l'intelligenza artificiale, a partire anche dai sondaggi e, se sono pubblicate, dalle domande. Il testo della chat non viene usato.",
+        "accuracy": "I testi prodotti con l'intelligenza artificiale possono contenere imprecisioni."
       },
       "list": {
         "label": "Elenco dei partecipanti",
@@ -4510,6 +4511,12 @@
       "addressBook": {
         "label": "Rubrica",
         "offered": "Iscrivendoti puoi scegliere di restare nella rubrica degli eventi, per essere invitato a eventi simili. È facoltativo: i dati restano {months} mesi dal consenso, salvo revoca."
+      },
+      "chat": {
+        "label": "Chat e domande",
+        "messages": "I messaggi della chat non vengono mai pubblicati, nemmeno le domande fatte in chat.",
+        "questionsText": "Dopo l'evento può essere pubblicato il testo delle domande del Q&A, mai il nome di chi le ha fatte.",
+        "questionsNone": "Le domande del Q&A non vengono pubblicate."
       }
     },
     "export": {

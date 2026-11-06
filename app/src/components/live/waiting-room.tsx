@@ -34,10 +34,12 @@ import DeviceCheck from '@/components/live/device-check';
 import { InsecureContextNotice } from '@/components/live/insecure-context';
 import VideoPlayer from '@/components/events/video-player';
 import EventTitle from '@/components/events/event-title';
+import { PrivacySheet } from '@/components/events/privacy-sheet';
 import LiveShareButton from '@/components/live/live-share-button';
 import { MarkdownRenderer } from '@/components/ui/markdown';
 import type { EntePubblico, PersonaPubblica } from '@/lib/events/public-people';
-import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import type { SchedaPrivacy } from '@/lib/events/privacy-sheet';
+import { testoConsensoEvento, type VoceNelVideo } from '@/lib/live/consent-rule';
 import { consensoTrascrizioneIngresso } from '@/lib/live/entry-consents';
 import type { Presenze } from '@/lib/live/presence';
 import { PonteChatPiazza } from '@/lib/lobby/chat-bridge';
@@ -95,7 +97,8 @@ class PhaserLobbyBoundary extends Component<
  *   - countdown (PUBLISHED only)
  *   - catch-up recording (whenever tempRecordingUrl is set — no 5min gate)
  *   - chat preview while LIVE
- *   - the recording consents still to give, with the event's privacy notice
+ *   - the recording consents still to give
+ *   - the event's privacy sheet, with the link to the privacy notice next to it
  *   - primary CTA: enter, start (moderator), watch recording, feedback
  *
  * The JWT fetch, and the choice of which consents to ask, stay in the parent
@@ -136,7 +139,8 @@ interface WaitingRoomEvent {
   qaEnabled?: boolean;
   timezone?: string;
   /** L'evento verrà processato dalla pipeline AI post-evento → mostra
-   *  l'informativa in sala d'attesa (AI Act / GDPR trasparenza). */
+   *  l'informativa in sala d'attesa (AI Act / GDPR trasparenza). Dove c'e' la
+   *  scheda privacy lo dice lei. */
   aiPostprodEnabled?: boolean;
   /** Testo custom per-locale dell'informativa AI; vuoto/null → fallback i18n. */
   aiConsentDisclosure?: string | null;
@@ -263,8 +267,12 @@ interface WaitingRoomProps {
   recordingHostAlways?: boolean;
   /** Il testo sulla registrazione scelto per l'evento; null = quello predefinito. */
   recordingConsentText?: string | null;
-  /** L'informativa privacy dell'evento, accanto al consenso. */
+  /** L'informativa privacy dell'evento, accanto alla scheda. */
   privacy?: { url: string; testo?: string };
+  /** La scheda privacy dell'evento (lib/events/privacy-sheet). Assorbe l'avviso
+   *  AI e quello dei sottotitoli. Non c'e' sulle chiamate rapide, che tengono gli
+   *  avvisi e, se hanno consensi da chiedere, l'informativa sotto di loro. */
+  schedaPrivacy?: SchedaPrivacy | null;
   /** Token dell'utente (moderatore/iscritto) da usare per leggere e scrivere in
    *  chat durante l'attesa. Vuoto per un ospite senza credenziali. */
   chatToken?: string;
@@ -331,6 +339,7 @@ export default function WaitingRoom({
   recordingHostAlways = false,
   recordingConsentText = null,
   privacy,
+  schedaPrivacy = null,
   chatToken = '',
   eventType = 'SCHEDULED',
 }: WaitingRoomProps) {
@@ -1157,7 +1166,7 @@ export default function WaitingRoom({
     event.aiConsentDisclosure && event.aiConsentDisclosure.trim()
       ? event.aiConsentDisclosure
       : t('aiNotice');
-  const aiNoticeBlock = event.aiPostprodEnabled && !isEnded ? (
+  const aiNoticeBlock = !schedaPrivacy && event.aiPostprodEnabled && !isEnded ? (
     <div className="wr-info">
       <span className="wr-info__icon" aria-hidden="true">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
@@ -1176,7 +1185,7 @@ export default function WaitingRoom({
   // Avviso dei sottotitoli live: chi parla in sala viene trascritto in tempo
   // reale, nel cluster dell'ente, e il testo non viene conservato. Non chiede
   // un consenso: è trasparenza su un trattamento in corso, come l'avviso AI.
-  const captionsNoticeBlock = event.liveCaptions && !isEnded ? (
+  const captionsNoticeBlock = !schedaPrivacy && event.liveCaptions && !isEnded ? (
     <div className="wr-info">
       <span className="wr-info__icon" aria-hidden="true">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
@@ -1192,11 +1201,8 @@ export default function WaitingRoom({
     </div>
   ) : null;
 
-  // I consensi da dare prima di entrare: alla registrazione dell'evento, per
-  // chi non l'ha dato all'iscrizione, e alla traccia audio per partecipante.
-  // Senza la spunta `canEnter` è false e il pulsante «Entra» porta il fuoco
-  // sulla casella. Non è un <Alert>: serve un input, e l'icona ::before
-  // finirebbe sopra il testo.
+  // L'informativa dell'evento: sta accanto alla scheda privacy, che rimanda a lei,
+  // anche quando non resta niente da acconsentire.
   const informativa = privacy ? (
     <div className="wr-consensi__privacy">
       {privacy.testo ? (
@@ -1224,6 +1230,12 @@ export default function WaitingRoom({
     </div>
   ) : null;
 
+  // I consensi da dare prima di entrare: alla registrazione dell'evento, per
+  // chi non l'ha dato all'iscrizione, e alla traccia audio per partecipante.
+  // Senza la spunta `canEnter` è false e il pulsante «Entra» porta il fuoco
+  // sulla casella. Non è un <Alert>: serve un input, e l'icona ::before
+  // finirebbe sopra il testo.
+  const testoEvento = testoConsensoEvento(recordingConsentText, voce);
   const consensiBlock = recordingRequired || trascrizioneChiesta ? (
     <section className="wr-consensi" aria-labelledby="wr-consensi-title">
       <h2 className="wr-consensi__title" id="wr-consensi-title">
@@ -1233,7 +1245,7 @@ export default function WaitingRoom({
         <>
           {/* Tutto, anche se lungo: e' l'informativa a cui si acconsente. */}
           <p className="wr-consensi__intro">
-            {recordingConsentText?.trim() ||
+            {testoEvento ||
               t(voce === 'assente' ? 'recordingConsentIntroNoVideo' : 'recordingConsentIntro')}
           </p>
           <div className="form-check mb-0">
@@ -1302,9 +1314,19 @@ export default function WaitingRoom({
           </div>
         </div>
       )}
-      {informativa}
     </section>
   ) : null;
+
+  // Prima di «Entra ora», accanto ai consensi: chi entra deve poterla leggere.
+  const schedaBlock =
+    schedaPrivacy || (consensiBlock && informativa) ? (
+      <div className="mb-3">
+        {schedaPrivacy && (
+          <PrivacySheet scheda={schedaPrivacy} testoIa={event.aiConsentDisclosure} />
+        )}
+        {informativa}
+      </div>
+    ) : null;
 
   const chatPreviewBlock = showChatPreview && !chatNascosta ? (
     <div className="wr-chat">
@@ -1895,14 +1917,19 @@ export default function WaitingRoom({
       ),
     );
   }
-  // La registrazione è un'informazione, non un allarme.
-  if (event.recordingEnabled && !isEnded) {
+  // La registrazione è un'informazione, non un allarme. La scheda la dice per
+  // intero: qui resta una riga, per chi conduce la sua. Dove la scheda dice che
+  // non si registra niente, qui non si annuncia.
+  const siRegistra = schedaPrivacy
+    ? schedaPrivacy.registrazione.modo !== 'nessuna'
+    : event.recordingEnabled;
+  if (siRegistra && !isEnded) {
     fatti.push(
       fatto(
         'registrazione',
         <span className="wr-fact__rec" />,
         t('summaryRecording'),
-        recordingListenOnly
+        recordingListenOnly && !schedaPrivacy
           ? tGdpr(voce === 'fissa' ? 'recordingNotice' : 'recordingNoticeVoice')
           : recordingHostAlways
             ? tGdpr(chiaveAvvisoConduce(recordingDestination))
@@ -2108,6 +2135,7 @@ export default function WaitingRoom({
                 ) : (
                   <>
                     {consensiBlock && <div className="mb-3">{consensiBlock}</div>}
+                    {schedaBlock}
                     {primaryCta}
                     {riepilogoInFondo && (
                       <div className="mb-4 wr-summary-wrap">{riepilogoBlock}</div>

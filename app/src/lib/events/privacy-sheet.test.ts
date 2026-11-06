@@ -22,6 +22,7 @@ import {
 import {
   schedaPrivacy,
   schedaPrivacyEvento,
+  testoIaDelSito,
   type AmbienteScheda,
   type EventoScheda,
   type SitoScheda,
@@ -44,6 +45,9 @@ const EVENTO: EventoScheda = {
   aiSummaryEnabled: true,
   aiTranslationEnabled: true,
   aiDubbingEnabled: false,
+  chatEnabled: true,
+  qaEnabled: true,
+  postEventShowQA: true,
   participantListVisible: true,
   audienceAnonymous: false,
   dataRetentionDays: 30,
@@ -300,10 +304,23 @@ describe('schedaPrivacy, i sottotitoli', () => {
 
   it('accesi, con il testo che si conserva o no', () => {
     expect(scheda().sottotitoli).toEqual({ attivi: true, testoConservato: false });
-    expect(scheda({}, { trascrizioneSottotitoli: true }).sottotitoli).toEqual({
+    expect(scheda({ captionsTranscriptEnabled: true }).sottotitoli).toEqual({
       attivi: true,
       testoConservato: true,
     });
+  });
+
+  it('spenti in partenza: si sa comunque che accesi dal vivo il testo si conserva', () => {
+    expect(
+      scheda({ liveCaptionsEnabled: false, captionsTranscriptEnabled: true }).sottotitoli
+    ).toEqual({ attivi: false, testoConservato: true });
+  });
+
+  it("senza il servizio il testo non si conserva, qualunque cosa dica l'evento", () => {
+    expect(
+      scheda({ captionsTranscriptEnabled: true }, { sottotitoliDisponibili: false })
+        .sottotitoli
+    ).toEqual({ attivi: false, testoConservato: false });
   });
 });
 
@@ -344,11 +361,14 @@ describe('schedaPrivacy, la pipeline AI', () => {
     });
   });
 
-  it('il doppiaggio dipende dalla traduzione', () => {
+  it('il doppiaggio segue il suo flag, anche a traduzione spenta', () => {
+    expect(scheda().ia?.doppiaggio).toBe(false);
     expect(scheda({ aiDubbingEnabled: true }).ia?.doppiaggio).toBe(true);
+    // Chi organizza puo' aggiungere una lingua dopo l'evento, e il doppiaggio
+    // parte con lei (lib/ai/enqueue).
     expect(
       scheda({ aiDubbingEnabled: true, aiTranslationEnabled: false }).ia?.doppiaggio
-    ).toBe(false);
+    ).toBe(true);
   });
 
   it('senza video non si doppia niente: sintesi e traduzione restano sulle tracce', () => {
@@ -404,6 +424,48 @@ describe('schedaPrivacy, la pipeline AI', () => {
         scheda(SPENTI, { registrazioneDisponibile: false }).ia?.elaborabileDopo
       ).toBe(false);
     });
+  });
+});
+
+describe('schedaPrivacy, chat e domande', () => {
+  it("la chat c'e' e le domande pubblicate restano solo testo", () => {
+    expect(scheda().chat).toEqual({
+      attiva: true,
+      domandeAttive: true,
+      esitoDomande: 'soloTesto',
+    });
+  });
+
+  it('niente chat, niente domande: niente da dire', () => {
+    expect(scheda({ chatEnabled: false, qaEnabled: false }).chat).toMatchObject({
+      attiva: false,
+      domandeAttive: false,
+    });
+  });
+
+  it("l'esito delle domande non dipende dal Q&A: chi modera puo' aprirlo dal vivo", () => {
+    expect(scheda({ qaEnabled: false }).chat.esitoDomande).toBe('soloTesto');
+    expect(
+      scheda({ qaEnabled: false, recordingDestination: 'REGISTRANTS' }).chat.esitoDomande
+    ).toBe('nonPubblicate');
+    expect(scheda({ qaEnabled: false, postEventShowQA: false }).chat.esitoDomande).toBe(
+      'nonPubblicate'
+    );
+  });
+
+  it('con la registrazione riservata le domande non si pubblicano, qualunque sia la scelta', () => {
+    expect(
+      scheda({ recordingDestination: 'REGISTRANTS', postEventShowQA: true }).chat.esitoDomande
+    ).toBe('nonPubblicate');
+  });
+
+  it('segue la scelta di chi organizza', () => {
+    expect(scheda({ postEventShowQA: false }).chat.esitoDomande).toBe('nonPubblicate');
+  });
+
+  it('non dipende da cosa registra: senza video la regola resta quella della pagina', () => {
+    expect(scheda({ recordingEnabled: false }).chat.esitoDomande).toBe('soloTesto');
+    expect(scheda({}, { voce: 'assente' }).chat.esitoDomande).toBe('soloTesto');
   });
 });
 
@@ -475,7 +537,7 @@ describe('schedaPrivacy, gli altri fatti', () => {
 describe('schedaPrivacy, i formati guidati', () => {
   const PERSONE: FormatoPersone[] = ['piccolo', 'medio', 'grande'];
   const VOCI: FormatoVoce[] = ['tutti', 'relatori'];
-  const REGISTRA: FormatoRegistra[] = ['si', 'no'];
+  const REGISTRA: FormatoRegistra[] = ['no', 'riservata', 'pubblica'];
   const ACCESSI: FormatoAccesso[] = ['tutti', 'invitati'];
   const FORMATI: FormatoGuidato[] = PERSONE.flatMap((persone) =>
     VOCI.flatMap((voce) =>
@@ -490,13 +552,12 @@ describe('schedaPrivacy, i formati guidati', () => {
     return {
       ...EVENTO,
       ...preset,
-      recordingDestination: null,
       participantListVisible: elencoPredefinito(preset),
     } as EventoScheda;
   }
 
   it('prova tutte le combinazioni', () => {
-    expect(FORMATI).toHaveLength(24);
+    expect(FORMATI).toHaveLength(36);
   });
 
   it.each(
@@ -507,15 +568,39 @@ describe('schedaPrivacy, i formati guidati', () => {
     expect(s).not.toBeNull();
     if (!s) return;
 
-    const registra = formato.registra === 'si';
+    // La tabella dei formati, scritta qui per intero: chi cambia un valore di
+    // partenza deve cambiarla apposta.
+    const registra = formato.registra !== 'no';
+    const pubblico = formato.voce === 'relatori' || formato.persone === 'grande';
+    const riunione = !pubblico && formato.persone === 'piccolo';
+
     expect(s.registrazione.modo).toBe(registra ? 'manuale' : 'nessuna');
-    expect(s.elencoVisibile).toBe(
-      formato.voce === 'tutti' && formato.persone !== 'grande'
+    expect(s.registrazione.destinazione).toBe(
+      { no: null, riservata: 'REGISTRANTS', pubblica: 'PUBLIC' }[formato.registra]
     );
-    expect(s.trascrizione.tracce).toBe(registra ? 'cancellate' : null);
     expect(s.registrazione.chiNonAcconsente).toBe(
       !registra ? null : formato.voce === 'tutti' ? 'restaFuori' : 'avvisoVoce'
     );
+    expect(s.registrazione.conduceSempre).toBe(false);
+    expect(s.trascrizione.tracce).toBe(registra ? 'cancellate' : null);
+    expect(s.elencoVisibile).toBe(!pubblico);
+    expect(s.pseudonimi).toBe(pubblico);
+    expect(s.chat).toEqual({
+      attiva: true,
+      domandeAttive: true,
+      esitoDomande:
+        riunione || formato.registra === 'riservata' ? 'nonPubblicate' : 'soloTesto',
+    });
+    expect(s.rubrica).toEqual(riunione ? null : { mesi: MESI_RUBRICA_PREDEFINITI });
+  });
+});
+
+describe('testoIaDelSito', () => {
+  it('il testo della lingua della pagina, o nessuno', () => {
+    const sito = { aiConsentDisclosure: { fr: 'Texte écrit.' } };
+    expect(testoIaDelSito(sito, 'fr')).toBe('Texte écrit.');
+    expect(testoIaDelSito(sito, 'it')).toBeNull();
+    expect(testoIaDelSito({ aiConsentDisclosure: null }, 'it')).toBeNull();
   });
 });
 
