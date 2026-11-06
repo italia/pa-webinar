@@ -214,6 +214,58 @@ describe('ricerca', () => {
   });
 });
 
+describe('profilo della voce', () => {
+  it('una nuova spunta senza ente tiene ente, ruolo, tipo e nome salvati', async () => {
+    const { emailHash, cifrata } = nuovoIndirizzo();
+    await upsertPersonOnRegistration(prisma, {
+      emailHash,
+      email: cifrata,
+      displayName: 'Nome',
+      organization: 'Comune di Prova',
+      organizationRole: 'Responsabile',
+      organizationType: 'MINISTRY',
+      optedIn: true,
+    });
+    const id = await upsertPersonOnRegistration(prisma, {
+      emailHash,
+      email: cifrata,
+      organization: null,
+      organizationRole: null,
+      organizationType: null,
+      optedIn: true,
+    });
+    const riga = await prisma.person.findUniqueOrThrow({ where: { id: id! } });
+    expect(tryDecryptPII(riga.displayName)).toBe('Nome');
+    expect(riga).toMatchObject({
+      organization: 'Comune di Prova',
+      organizationRole: 'Responsabile',
+      organizationType: 'MINISTRY',
+    });
+  });
+
+  it('dopo un ritiro una nuova spunta senza ente non riporta quello vecchio', async () => {
+    const { emailHash, cifrata } = nuovoIndirizzo();
+    await upsertPersonOnRegistration(prisma, {
+      emailHash,
+      email: cifrata,
+      displayName: 'Nome',
+      organization: 'Comune di Prova',
+      optedIn: true,
+    });
+    await ritiraComunicazioni(emailHash);
+    const id = await upsertPersonOnRegistration(prisma, {
+      emailHash,
+      email: cifrata,
+      displayName: 'Nome',
+      organization: null,
+      optedIn: true,
+    });
+    const riga = await prisma.person.findUniqueOrThrow({ where: { id: id! } });
+    expect(riga.organization).toBeNull();
+    expect(riga.optedOutAt).toBeNull();
+  });
+});
+
 describe('selettore', () => {
   it('non dipende dalle iscrizioni: la voce resta quando se ne vanno', async () => {
     const { email, persona } = await voce();

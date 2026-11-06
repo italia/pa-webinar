@@ -29,6 +29,9 @@ type Tx = Prisma.TransactionClient | PrismaClient;
  * - Con la spunta si scrivono nome, email e organizzazione di questa iscrizione,
  *   `optedInAt` riparte da adesso (e con lui i mesi di conservazione, vedi
  *   `lib/persons/retention`) e il segno di un ritiro precedente si azzera.
+ * - Un campo che l'iscrizione non porta (l'evento non chiede l'ente, per esempio)
+ *   non cancella quello salvato. Dopo un ritiro invece il profilo vecchio non
+ *   sopravvive: dopo la nuova spunta resta solo cio' che questa iscrizione porta.
  *
  * Una spunta dal modulo non annulla un ritiro: su un indirizzo con un ritiro o
  * inviti fermati il chiamante passa `optedIn` falso (`indirizzoFermato`), e la
@@ -42,21 +45,24 @@ export async function upsertPersonOnRegistration(
 ): Promise<string | null> {
   const existing = await tx.person.findUnique({
     where: { emailHash: input.emailHash },
-    select: { id: true },
+    select: { id: true, optedOutAt: true },
   });
 
   if (!input.optedIn) return existing?.id ?? null;
 
   const now = new Date();
+  // Prisma lascia stare un campo `undefined`; una voce nuova o ritirata riparte
+  // da vuoto.
+  const assente = existing && !existing.optedOutAt ? undefined : null;
 
   // Nome ed email sono cifrati a riposo (AES-256-GCM). Gli altri campi restano
   // in chiaro perche' l'elenco dello staff li cerca e li filtra.
   const profilo = {
-    displayName: encryptPIIOrNull(input.displayName),
+    displayName: input.displayName ? encryptPIIOrNull(input.displayName) : assente,
     email: input.email,
-    organization: input.organization ?? null,
-    organizationRole: input.organizationRole ?? null,
-    organizationType: input.organizationType ?? null,
+    organization: input.organization || assente,
+    organizationRole: input.organizationRole || assente,
+    organizationType: input.organizationType || assente,
     optedInToAddressBook: true,
     optedInAt: now,
     lastActiveAt: now,

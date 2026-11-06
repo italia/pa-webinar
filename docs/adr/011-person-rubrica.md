@@ -255,7 +255,7 @@ flowchart LR
     Q3{"Record with this<br/>emailHash?"}:::ext
     N["<b>Nothing created</b><br/>Registration.personId<br/>stays null"]:::ext
     C["<b>Create the record</b><br/>profile and address from this form,<br/>optedInAt and lastActiveAt set,<br/>registration linked"]:::data
-    U["<b>Overwrite the record</b><br/>empty fields included,<br/>opt-out cleared, optedInAt and<br/>lastActiveAt set, registration linked"]:::data
+    U["<b>Update the record</b><br/>empty fields keep the stored value,<br/>unless the record was withdrawn,<br/>opt-out cleared, optedInAt and<br/>lastActiveAt set, registration linked"]:::data
     L["<b>Link only</b><br/>nothing on the record changes,<br/>the consent window does not move,<br/>registration linked"]:::job
 
     R --> Q1
@@ -281,10 +281,12 @@ flowchart LR
   changes: not the profile, not the consent state, not the retention. Leaving the box unticked is treated
   as "not now", not as a withdrawal. The same applies to an opted-out record that the daily job has not
   deleted yet: the registration is linked to it until the next run deletes it.
-- **An opt-in overwrites the whole record.** A registration with the box ticked writes that form's name,
-  address and organization fields over the stored ones, empty organization values included. The form sends the organization
-  fields only when the event asks for them. So an opted-in registration for an event that does not ask
-  for the organization clears the stored organization.
+- **An opt-in updates what the form carries.** A registration with the box ticked writes that form's name,
+  address and organization fields over the stored ones. The form sends the organization fields only when
+  the event asks for them, and an empty field leaves the stored value in place, so a tick on an event that
+  does not ask for the organization keeps it. Each field stands on its own: a new organization with no
+  role keeps the old role. On a withdrawn record the old profile does not survive: the tick leaves only
+  what this form carries.
 - **Re-consent.** Every tick that takes effect sets a new `optedInAt`, on an opted-in record too, so the
   consent window restarts.
 

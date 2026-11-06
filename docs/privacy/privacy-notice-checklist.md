@@ -507,7 +507,8 @@ Your notice should state at least:
   box, and a registration writes nothing to the address book.
 - **What it holds.** Only a ticked box creates or updates a person record, with
   the name, the email address, encrypted, and the organization of that
-  registration. A registration without the tick links to an existing record and
+  registration; a field the registration does not carry keeps its stored value,
+  unless the record was withdrawn. A registration without the tick links to an existing record and
   changes nothing, and so does a tick that waits for a confirmation (see **A
   tick after a withdrawal** below). Only administrators see it; they use it to
   find people when they prepare invitations, and the wizard fills in the
