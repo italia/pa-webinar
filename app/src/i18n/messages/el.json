@@ -1040,6 +1040,8 @@
         "recordingDestinationStartsReserved": "Η καταγραφή ξεκινά ως «Μόνο για εγγεγραμμένους»: μπορεί να την κάνει δημόσια το προσωπικό της εκδήλωσης, έως ότου ανοίξει η αίθουσα.",
         "recordingDestinationStaysReserved": "Η καταγραφή παραμένει μόνο για εγγεγραμμένους: η αίθουσα έχει ήδη ανοίξει.",
         "recordingDestinationLocked": "Μετά το άνοιγμα της αίθουσας η αλλαγή επιτρέπεται μόνο προς την επιλογή «Μόνο για εγγεγραμμένους»: οι συγκαταθέσεις ισχύουν για το κείμενο που διάβασαν τα άτομα.",
+        "recordingDestinationPublicOnInvitation": "The event is invitation-only, but the recording stays public: anyone will be able to see the video, not just the invitees.",
+        "recordingDestinationReservedOnInvitation": "The event is invitation-only: the recording has moved to reserved. You can change this in \"Recording and AI\".",
         "recordingDestinationRequired": "Επιλέξτε πού καταλήγει η καταγραφή.",
         "audienceAnonymous": "Ανώνυμο κοινό",
         "audienceAnonymousDesc": "Οι συμμετέχοντες εμφανίζονται στους άλλους με ψευδώνυμο («Συμμετέχων» και ένας κωδικός) στο βίντεο, στη συνομιλία και στις ερωτήσεις· η λίστα συμμετεχόντων μένει στους συντονιστές και δεν υπάρχει πλατεία. Χρήσιμο για μεγάλες εκδηλώσεις· στις κοινοτικές οι άνθρωποι θέλουν να γνωριστούν.",

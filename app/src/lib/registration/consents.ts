@@ -104,15 +104,25 @@ export function trascrizioneDalVideo(
 }
 
 /**
+ * Le tracce per persona restano con i dati dell'evento: le conserva l'evento,
+ * oppure con la pipeline AI spenta non arriva la trascrizione che le cancella
+ * (api/cron/multitrack-purge). La regola unica di scheda e casella.
+ */
+export function traccePerPersonaConservate(
+  evento: { retainParticipantTracks?: boolean | null },
+  sito: { aiPipelineEnabled?: boolean | null }
+): boolean {
+  return !!evento.retainParticipantTracks || !sito.aiPipelineEnabled;
+}
+
+/**
  * Il testo della casella della trascrizione, come chiave sotto `gdpr.consent`:
  * lo stesso nel modulo e in sala d'attesa. Dove le tracce per persona si
- * conservano (Event.retainParticipantTracks) il testo non ne promette la
+ * conservano (`traccePerPersonaConservate`) il testo non ne promette la
  * cancellazione.
  */
-export function chiaveConsensoTrascrizione(evento: {
-  retainParticipantTracks?: boolean | null;
-}) {
-  return evento.retainParticipantTracks ? 'multitrackRetained' : 'multitrack';
+export function chiaveConsensoTrascrizione(tracceConservate: boolean | undefined) {
+  return tracceConservate ? 'multitrackRetained' : 'multitrack';
 }
 
 /** Da quali fatti dipende il consenso alla trascrizione dei propri interventi. */

@@ -348,6 +348,27 @@ describe('Riepilogo — cio che il formato ha scelto', () => {
     );
   });
 
+  it('con la pagina dopo l evento privata le domande non si pubblicano', () => {
+    const privata = mostra({
+      permissionMatrix: conQa,
+      postEventShowQA: true,
+      postEventPublic: false,
+      recordingEnabled: false,
+      recordingDestination: null,
+    });
+    expect(privata).toContain(f.postEventQaHidden);
+    expect(privata).not.toContain(f.postEventQaTextOnly);
+  });
+
+  it('un evento su invito con il video pubblico lo dice accanto alla destinazione', () => {
+    expect(
+      mostra(
+        { recordingEnabled: true, recordingDestination: 'PUBLIC' },
+        { notaDestinazione: 'recordingDestinationPublicOnInvitation' },
+      ),
+    ).toContain(tp.recordingDestinationPublicOnInvitation);
+  });
+
   it('le domande dopo l evento seguono la regola della pagina', () => {
     expect(
       mostra({ permissionMatrix: conQa, postEventShowQA: true, recordingDestination: 'PUBLIC' }),

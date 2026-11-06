@@ -1040,6 +1040,8 @@
         "recordingDestinationStartsReserved": "Iš pradžių įrašas skirtas tik užsiregistravusiems: renginio komanda gali padaryti jį viešą, kol salė neatidaryta.",
         "recordingDestinationStaysReserved": "Įrašas lieka skirtas tik užsiregistravusiems: salė jau atidaryta.",
         "recordingDestinationLocked": "Atidarius salę galima tik pakeisti į „Tik užsiregistravusiems“: sutikimai galioja tam tekstui, kurį žmonės perskaitė.",
+        "recordingDestinationPublicOnInvitation": "The event is invitation-only, but the recording stays public: anyone will be able to see the video, not just the invitees.",
+        "recordingDestinationReservedOnInvitation": "The event is invitation-only: the recording has moved to reserved. You can change this in \"Recording and AI\".",
         "recordingDestinationRequired": "Pasirinkite, kam skirtas įrašas.",
         "audienceAnonymous": "Anoniminė auditorija",
         "audienceAnonymousDesc": "Dalyviai kitiems rodomi slapyvardžiu („Dalyvis“ ir kodas) vaizdo įraše, pokalbyje ir klausimuose; dalyvių sąrašas lieka vedėjams, aikštės nėra. Naudinga dideliems renginiams; bendruomenės renginiuose žmonės nori susipažinti.",

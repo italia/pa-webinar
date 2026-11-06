@@ -21,7 +21,7 @@ import { schedaPrivacyEvento, testoIaDelSito } from '@/lib/events/privacy-sheet'
 import { anteprimaEventoPubblico } from '@/lib/events/meta-title';
 import { rubricaProposta } from '@/lib/persons/address-book';
 import { recordingAvailable, voceNelVideo } from '@/lib/recording/availability';
-import { trascrizioneDalVideo } from '@/lib/registration/consents';
+import { traccePerPersonaConservate, trascrizioneDalVideo } from '@/lib/registration/consents';
 import { findEventQuestionnaireByPlacement } from '@/lib/questionnaires';
 import { invitoDaToken } from '@/lib/email/invitation';
 
@@ -159,7 +159,7 @@ export default async function RegistrationPage({
             multitrackRecordingEnabled={event.multitrackRecordingEnabled}
             captionsTranscript={captionsTranscriptActive(event, settings)}
             trascrizioneVideo={trascrizioneDalVideo(event, settings, disponibile, voce)}
-            retainParticipantTracks={event.retainParticipantTracks}
+            tracceConservate={traccePerPersonaConservate(event, settings)}
             rubricaProposta={rubricaProposta(event, settings)}
             participantsCanUnmute={event.participantsCanUnmute}
             participantsCanStartVideo={event.participantsCanStartVideo}

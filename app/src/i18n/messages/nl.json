@@ -1040,6 +1040,8 @@
         "recordingDestinationStartsReserved": "De opname begint als ‘Alleen voor ingeschrevenen’: het team van het evenement kan haar openbaar maken zolang de zaal niet is geopend.",
         "recordingDestinationStaysReserved": "De opname blijft ‘Alleen voor ingeschrevenen’: de zaal is al geopend.",
         "recordingDestinationLocked": "Na de opening van de zaal kan alleen nog worden overgeschakeld naar ‘Alleen voor ingeschrevenen’: toestemmingen gelden voor de tekst die mensen hebben gelezen.",
+        "recordingDestinationPublicOnInvitation": "The event is invitation-only, but the recording stays public: anyone will be able to see the video, not just the invitees.",
+        "recordingDestinationReservedOnInvitation": "The event is invitation-only: the recording has moved to reserved. You can change this in \"Recording and AI\".",
         "recordingDestinationRequired": "Kies waar de opname terechtkomt.",
         "audienceAnonymous": "Anoniem publiek",
         "audienceAnonymousDesc": "Deelnemers verschijnen voor anderen onder een pseudoniem (‘Deelnemer’ en een code) in de video, de chat en bij vragen; de deelnemerslijst blijft bij de moderatoren en er is geen plein. Handig voor grote evenementen; bij communityevenementen wil men elkaar leren kennen.",

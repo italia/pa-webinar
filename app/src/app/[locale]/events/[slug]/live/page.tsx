@@ -8,7 +8,7 @@ import { getLocale } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
 import { chiedeConsensoPerVoce, versioneConsensoTrascrizione } from '@/lib/ai/voice-consent';
-import { trascrizioneDalVideo } from '@/lib/registration/consents';
+import { traccePerPersonaConservate, trascrizioneDalVideo } from '@/lib/registration/consents';
 import { anteprimaEventoPubblico } from '@/lib/events/meta-title';
 import { getPublicEnv } from '@/lib/env';
 import { captionsTranscriptActive, liveCaptionsAvailable } from '@/lib/captions/availability';
@@ -223,7 +223,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             hostsAlwaysRecorded: event.hostsAlwaysRecorded,
             recordingDestination: event.recordingDestination,
             recordingAudience: event.recordingAudience,
-            retainParticipantTracks: event.retainParticipantTracks,
+            tracceConservate: traccePerPersonaConservate(event, settings),
             videoQuality,
             startsAt: event.startsAt.toISOString(),
             endsAt: event.endsAt.toISOString(),
@@ -444,7 +444,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         hostsAlwaysRecorded: event.hostsAlwaysRecorded,
         recordingDestination: event.recordingDestination,
         recordingAudience: event.recordingAudience,
-        retainParticipantTracks: event.retainParticipantTracks,
+        tracceConservate: traccePerPersonaConservate(event, settings),
         startsAt: event.startsAt.toISOString(),
         endsAt: event.endsAt.toISOString(),
         status: event.status,

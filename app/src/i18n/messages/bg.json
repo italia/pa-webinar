@@ -1040,6 +1040,8 @@
         "recordingDestinationStartsReserved": "Първоначално записът е само за регистрираните: екипът на събитието може да го направи публичен, докато залата не е отворена.",
         "recordingDestinationStaysReserved": "Записът остава само за регистрираните: залата вече е отворена.",
         "recordingDestinationLocked": "След отваряне на залата е възможна единствено промяна към „Само за регистрираните“: съгласията важат за текста, който хората са прочели.",
+        "recordingDestinationPublicOnInvitation": "The event is invitation-only, but the recording stays public: anyone will be able to see the video, not just the invitees.",
+        "recordingDestinationReservedOnInvitation": "The event is invitation-only: the recording has moved to reserved. You can change this in \"Recording and AI\".",
         "recordingDestinationRequired": "Изберете къде отива записът.",
         "audienceAnonymous": "Анонимна публика",
         "audienceAnonymousDesc": "Участниците се виждат от останалите под псевдоним („Участник“ и код) във видеото, чата и въпросите; списъкът с участници остава за водещите и няма площад. Полезно за големи събития; на общностните хората искат да се опознаят.",

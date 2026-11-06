@@ -157,13 +157,22 @@ describe('pagina di iscrizione: consensi passati al modulo', () => {
     evento({ recordingDestination: 'REGISTRANTS', retainParticipantTracks: true });
     expect(await propsDelModulo()).toMatchObject({
       recordingDestination: 'REGISTRANTS',
-      retainParticipantTracks: true,
+      tracceConservate: true,
     });
   });
 
   it("passa il testo che l'ente ha scelto per l'evento", async () => {
     evento({ recordingConsentText: 'Testo scelto per evento' });
     expect((await propsDelModulo()).recordingConsentText).toBe('Testo scelto per evento');
+  });
+
+  it('senza conservazione, a pipeline accesa, le tracce si cancellano', async () => {
+    expect((await propsDelModulo()).tracceConservate).toBe(false);
+  });
+
+  it('a pipeline spenta la casella segue la scheda: le tracce restano', async () => {
+    sito.aiPipelineEnabled = false;
+    expect((await propsDelModulo()).tracceConservate).toBe(true);
   });
 
   it('senza destinazione dichiarata passa null, non un valore di partenza', async () => {

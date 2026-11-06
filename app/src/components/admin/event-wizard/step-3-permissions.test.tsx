@@ -6,6 +6,7 @@ import { createRoot, type Root } from 'react-dom/client';
 import { NextIntlClientProvider } from 'next-intl';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import en from '@/i18n/messages/en.json';
 import messages from '@/i18n/messages/it.json';
 import type { VoceNelVideo } from '@/lib/live/consent-rule';
 
@@ -127,7 +128,12 @@ describe('la destinazione della registrazione', () => {
 
   function mostra(
     value: Partial<StepPermissionsValue>,
-    destinazione?: { iniziale: 'PUBLIC' | 'REGISTRANTS' | null; salaGiaAperta: boolean; chiesta: boolean },
+    destinazione?: {
+      iniziale: 'PUBLIC' | 'REGISTRANTS' | null;
+      salaGiaAperta: boolean;
+      chiesta: boolean;
+      nota?: 'recordingDestinationPublicOnInvitation' | null;
+    },
     extra: {
       editing?: boolean;
       soloAscoltoBloccato?: boolean;
@@ -164,6 +170,25 @@ describe('la destinazione della registrazione', () => {
     expect(scelta('PUBLIC')).not.toBeChecked();
     expect(container.textContent).toContain(s2.recordingDestinationReservedDesc);
     expect(container.textContent).toContain(s2.recordingDestinationPublicDesc);
+  });
+
+  it('il testo di Riservata non nega un passaggio che si puo\' ancora fare', () => {
+    mostra({ recordingEnabled: true, recordingDestination: 'REGISTRANTS' }, libera);
+    expect(scelta('PUBLIC')).toBeEnabled();
+    expect(s2.recordingDestinationReservedDesc).toContain(
+      "Dopo l'apertura della sala non si può più rendere pubblica.",
+    );
+    expect(en.admin.wizard.step2.recordingDestinationReservedDesc).toContain(
+      'Once the room has opened it can no longer be made public.',
+    );
+  });
+
+  it('su un evento su invito dice cosa diventa la registrazione', () => {
+    mostra(
+      { recordingEnabled: true, recordingDestination: 'PUBLIC' },
+      { ...libera, nota: 'recordingDestinationPublicOnInvitation' },
+    );
+    expect(container.textContent).toContain(s2.recordingDestinationPublicOnInvitation);
   });
 
   it('non si propone senza registrazione, ne dove la decide altri', () => {

@@ -1040,6 +1040,8 @@
         "recordingDestinationStartsReserved": "Die Aufzeichnung ist zunächst auf Angemeldete beschränkt: Das Team der Veranstaltung kann sie öffentlich machen, solange der Raum nicht geöffnet ist.",
         "recordingDestinationStaysReserved": "Die Aufzeichnung bleibt auf Angemeldete beschränkt: Der Raum wurde bereits geöffnet.",
         "recordingDestinationLocked": "Nach der Öffnung des Raums kann nur noch auf „Nur für Angemeldete“ umgestellt werden: Die Einwilligungen gelten für den Text, den die Personen gelesen haben.",
+        "recordingDestinationPublicOnInvitation": "The event is invitation-only, but the recording stays public: anyone will be able to see the video, not just the invitees.",
+        "recordingDestinationReservedOnInvitation": "The event is invitation-only: the recording has moved to reserved. You can change this in \"Recording and AI\".",
         "recordingDestinationRequired": "Wählen Sie, wohin die Aufzeichnung geht.",
         "audienceAnonymous": "Anonymes Publikum",
         "audienceAnonymousDesc": "Teilnehmende erscheinen für andere unter einem Pseudonym („Teilnehmende“ und ein Code) im Video, im Chat und bei Fragen; die Teilnehmerliste bleibt bei der Moderation, und es gibt keinen Platz. Sinnvoll für große Events; bei Community-Events möchte man sich kennenlernen.",

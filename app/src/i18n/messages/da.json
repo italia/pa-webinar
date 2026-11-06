@@ -1040,6 +1040,8 @@
         "recordingDestinationStartsReserved": "Optagelsen er fra start kun for tilmeldte: arrangementets team kan gøre den offentlig, indtil rummet åbnes.",
         "recordingDestinationStaysReserved": "Optagelsen forbliver kun for tilmeldte: rummet er allerede åbnet.",
         "recordingDestinationLocked": "Når rummet er åbnet, kan optagelsen kun ændres til »Kun for tilmeldte«: samtykkerne gælder den tekst, personerne har læst.",
+        "recordingDestinationPublicOnInvitation": "The event is invitation-only, but the recording stays public: anyone will be able to see the video, not just the invitees.",
+        "recordingDestinationReservedOnInvitation": "The event is invitation-only: the recording has moved to reserved. You can change this in \"Recording and AI\".",
         "recordingDestinationRequired": "Vælg, hvor optagelsen skal hen.",
         "audienceAnonymous": "Anonymt publikum",
         "audienceAnonymousDesc": "Deltagerne vises for de andre under et pseudonym (»Deltager« og en kode) i video, chat og spørgsmål; deltagerlisten er kun for værterne, og der er ingen plads. Nyttigt til store arrangementer; til fællesskabsarrangementer vil folk gerne lære hinanden at kende.",

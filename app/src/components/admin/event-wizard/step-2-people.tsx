@@ -18,6 +18,7 @@ import type { PersonRole } from '@/lib/events/grant-profile';
 import { accessModeDaSalvare, publicRegistrationFor } from '@/lib/events/access-mode';
 import { logoPubblico } from '@/lib/events/public-people';
 
+import type { NotaDestinazione } from './campi-del-formato';
 import { BOZZA_VUOTA, controllaBozza, conRuolo, indirizziPresi, type Bozza } from './people-draft';
 import RuoliEvento from './ruoli-evento';
 import Gruppo from './wizard-group';
@@ -1173,6 +1174,7 @@ export function SezioneIscrizione({
   bloccato = false,
   iniziale = null,
   questionari,
+  notaDestinazione,
   elencoInvitati,
 }: {
   /** L'elenco degli invitati, mostrato dentro la scelta «solo le persone
@@ -1208,9 +1210,12 @@ export function SezioneIscrizione({
   /** Le domande dei questionari, prima e dopo l'evento: si vedono qui accanto
    *  a cio' che si chiede all'iscrizione. */
   questionari?: React.ReactNode;
+  /** Cosa diventa la registrazione con un evento su invito. */
+  notaDestinazione?: NotaDestinazione | null;
 }) {
   const t = useTranslations('admin.wizard.step3');
   const tg = useTranslations('admin.guided');
+  const tp = useTranslations('admin.wizard.step2');
   const nome = useId();
   const effettivo: EventAccessModeValue = publicRegistrationFor({ accessMode }, siteOpen)
     ? 'OPEN'
@@ -1290,6 +1295,7 @@ export function SezioneIscrizione({
           )
         )}
       </fieldset>
+      {notaDestinazione && <p className="formato__nota" role="status">{tp(notaDestinazione)}</p>}
       {effettivo === 'INVITATION' && invitati === 0 && (
         <p className="wizard-iscrizione__avviso" role="status">
           <Icon icon="it-warning-circle" size="sm" />

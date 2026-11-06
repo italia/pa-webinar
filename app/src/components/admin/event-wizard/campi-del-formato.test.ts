@@ -8,6 +8,7 @@ import {
   campiDaModello,
   campiDaSalvare,
   destinazioneDopoIlSalvataggio,
+  destinazioneSuInvito,
   type CampiDelFormato,
 } from './campi-del-formato';
 import { videoDaDestinare } from '@/lib/recording/destination';
@@ -123,6 +124,22 @@ describe('campiDaEvento', () => {
       hostsAlwaysRecorded: false,
       postEventShowQA: true,
     });
+  });
+});
+
+describe('destinazioneSuInvito', () => {
+  it('un video pubblico che nessuno ha scelto torna riservato', () => {
+    expect(destinazioneSuInvito('PUBLIC', true, false)).toBe('REGISTRANTS');
+  });
+
+  it('una destinazione scelta resta', () => {
+    expect(destinazioneSuInvito('PUBLIC', true, true)).toBe('PUBLIC');
+  });
+
+  it('il passaggio inverso non allarga, e nulla resta nulla', () => {
+    expect(destinazioneSuInvito('REGISTRANTS', false, false)).toBe('REGISTRANTS');
+    expect(destinazioneSuInvito('PUBLIC', false, false)).toBe('PUBLIC');
+    expect(destinazioneSuInvito(null, true, false)).toBeNull();
   });
 });
 

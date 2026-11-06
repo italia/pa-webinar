@@ -242,6 +242,19 @@ describe('CreateEventWithTemplate', () => {
       expect(corpo).not.toHaveProperty('recordingDestination');
     });
 
+    it('un video pubblico scelto per un evento su invito resta, e il wizard lo dice', async () => {
+      mostra({ formatoParam: 'medio.tutti.pubblica.invitati' });
+      passo(w.flow.steps.invites);
+      expect(container.querySelector('.wizard-iscrizione')?.textContent).toContain(
+        w.step2.recordingDestinationPublicOnInvitation,
+      );
+      passo(w.flow.steps.base);
+      expect(await corpoPubblicato()).toMatchObject({
+        accessMode: 'INVITATION',
+        recordingDestination: 'PUBLIC',
+      });
+    });
+
     it('senza registrazione non parte una destinazione', async () => {
       mostra({ formatoParam: 'medio.tutti.no.tutti' });
       const corpo = await corpoPubblicato();

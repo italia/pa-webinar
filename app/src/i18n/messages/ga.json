@@ -1040,6 +1040,8 @@
         "recordingDestinationStartsReserved": "Tosaíonn an taifeadadh mar thaifeadadh do dhaoine cláraithe amháin: is féidir le foireann an imeachta é a dhéanamh poiblí go dtí go n-osclaítear an seomra.",
         "recordingDestinationStaysReserved": "Fanann an taifeadadh do dhaoine cláraithe amháin: tá an seomra oscailte cheana.",
         "recordingDestinationLocked": "Tar éis an seomra a oscailt ní féidir ach aistriú go dtí taifeadadh do dhaoine cláraithe amháin: baineann na toilithe leis an téacs a léigh na daoine.",
+        "recordingDestinationPublicOnInvitation": "The event is invitation-only, but the recording stays public: anyone will be able to see the video, not just the invitees.",
+        "recordingDestinationReservedOnInvitation": "The event is invitation-only: the recording has moved to reserved. You can change this in \"Recording and AI\".",
         "recordingDestinationRequired": "Roghnaigh cá dtéann an taifeadadh.",
         "audienceAnonymous": "Lucht féachana gan ainm",
         "audienceAnonymousDesc": "Feictear rannpháirtithe do dhaoine eile faoi ainm cleite (“Rannpháirtí” agus cód) san fhíseán, sa chomhrá agus sna ceisteanna; fanann liosta na rannpháirtithe ag na hóstaigh, agus níl aon chearnóg ann. Úsáideach d’ócáidí móra; ag ócáidí pobail is mian le daoine aithne a chur ar a chéile.",

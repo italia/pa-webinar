@@ -24,7 +24,7 @@ import {
   voceNelVideo,
 } from '@/lib/recording/availability';
 import { destinazioneDelTesto } from '@/lib/recording/destination';
-import { trascrizioneDalVideo } from '@/lib/registration/consents';
+import { traccePerPersonaConservate, trascrizioneDalVideo } from '@/lib/registration/consents';
 
 /**
  * La scheda privacy di un evento: cosa succede ai dati di chi partecipa, secondo
@@ -239,11 +239,9 @@ export function schedaPrivacy({
     },
     trascrizione: {
       sottotitoli: ambiente.trascrizioneSottotitoli,
-      // Una traccia mai trascritta resta quanto i dati dell'evento
-      // (api/cron/multitrack-purge): senza pipeline la cancellazione non arriva.
       tracce: !tracce
         ? null
-        : evento.retainParticipantTracks || !sito.aiPipelineEnabled
+        : traccePerPersonaConservate(evento, sito)
           ? 'conservate'
           : 'cancellate',
       dalVideo,

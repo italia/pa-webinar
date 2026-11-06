@@ -592,11 +592,11 @@ describe('sala — i dati del testo del consenso', () => {
     conEvento({ recordingDestination: 'REGISTRANTS', retainParticipantTracks: true });
     const ospite = await clientProps();
     expect(ospite.event.recordingDestination).toBe('REGISTRANTS');
-    expect(ospite.event.retainParticipantTracks).toBe(true);
+    expect(ospite.event.tracceConservate).toBe(true);
     iscritto();
     const conToken = await clientProps(TOKEN);
     expect(conToken.event.recordingDestination).toBe('REGISTRANTS');
-    expect(conToken.event.retainParticipantTracks).toBe(true);
+    expect(conToken.event.tracceConservate).toBe(true);
   });
 
   it('il pubblico della registrazione arriva nei due rami', async () => {
@@ -608,9 +608,17 @@ describe('sala — i dati del testo del consenso', () => {
 
   it('la conservazione spenta resta spenta', async () => {
     conEvento();
-    expect((await clientProps()).event.retainParticipantTracks).toBe(false);
+    expect((await clientProps()).event.tracceConservate).toBe(false);
     iscritto();
-    expect((await clientProps(TOKEN)).event.retainParticipantTracks).toBe(false);
+    expect((await clientProps(TOKEN)).event.tracceConservate).toBe(false);
+  });
+
+  it('a pipeline spenta le tracce restano, come dice la scheda', async () => {
+    stato.impostazioni.aiPipelineEnabled = false;
+    conEvento();
+    expect((await clientProps()).event.tracceConservate).toBe(true);
+    iscritto();
+    expect((await clientProps(TOKEN)).event.tracceConservate).toBe(true);
   });
 });
 

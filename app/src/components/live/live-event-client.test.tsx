@@ -298,7 +298,7 @@ describe("sala — quello che arriva alla sala d'attesa", () => {
         recordingDestination: 'REGISTRANTS',
         videoDisponibile: true,
         trascrizioneVideo: true,
-        retainParticipantTracks: true,
+        tracceConservate: true,
       },
     });
     const a = leggiAttesa();
@@ -307,7 +307,7 @@ describe("sala — quello che arriva alla sala d'attesa", () => {
     expect(a.event).toMatchObject({
       videoDisponibile: true,
       trascrizioneVideo: true,
-      retainParticipantTracks: true,
+      tracceConservate: true,
     });
     expect(a.event).not.toHaveProperty('recordingUrl');
   });
@@ -1019,7 +1019,7 @@ describe('sala — la finestra dei consensi', () => {
 
   it('il testo della casella della trascrizione arriva alla finestra', async () => {
     await monta({
-      event: { ...evento, multitrackRecordingEnabled: true, retainParticipantTracks: true },
+      event: { ...evento, multitrackRecordingEnabled: true, tracceConservate: true },
       hasRecordingConsent: true,
     });
     risposte.push({ consentsInForce: { recording: true, transcription: false } });

@@ -7,6 +7,7 @@ import messages from '@/i18n/messages/it.json';
 
 import {
   chiaveConsensoTrascrizione,
+  traccePerPersonaConservate,
   consensiRichiesti,
   trascrizioneDalVideo,
   trascrizioneRichiesta,
@@ -129,15 +130,38 @@ describe('consensiRichiesti con la trascrizione dal video', () => {
   });
 });
 
+describe('traccePerPersonaConservate', () => {
+  it("l'evento le conserva, anche a pipeline accesa", () => {
+    expect(
+      traccePerPersonaConservate({ retainParticipantTracks: true }, { aiPipelineEnabled: true }),
+    ).toBe(true);
+  });
+
+  it('a pipeline spenta nessuna trascrizione le cancella', () => {
+    expect(
+      traccePerPersonaConservate({ retainParticipantTracks: false }, { aiPipelineEnabled: false }),
+    ).toBe(true);
+    expect(traccePerPersonaConservate({}, {})).toBe(true);
+  });
+
+  it('a pipeline accesa, senza conservazione, si cancellano', () => {
+    expect(
+      traccePerPersonaConservate({ retainParticipantTracks: false }, { aiPipelineEnabled: true }),
+    ).toBe(false);
+    expect(
+      traccePerPersonaConservate({ retainParticipantTracks: null }, { aiPipelineEnabled: true }),
+    ).toBe(false);
+  });
+});
+
 describe('chiaveConsensoTrascrizione', () => {
   it('con le tracce conservate il testo non promette la cancellazione', () => {
-    expect(chiaveConsensoTrascrizione({ retainParticipantTracks: true })).toBe('multitrackRetained');
+    expect(chiaveConsensoTrascrizione(true)).toBe('multitrackRetained');
   });
 
   it('altrimenti resta il testo di sempre, anche se il valore manca', () => {
-    expect(chiaveConsensoTrascrizione({ retainParticipantTracks: false })).toBe('multitrack');
-    expect(chiaveConsensoTrascrizione({ retainParticipantTracks: null })).toBe('multitrack');
-    expect(chiaveConsensoTrascrizione({})).toBe('multitrack');
+    expect(chiaveConsensoTrascrizione(false)).toBe('multitrack');
+    expect(chiaveConsensoTrascrizione(undefined)).toBe('multitrack');
   });
 
   it('i due testi esistono, e solo uno promette la cancellazione', () => {

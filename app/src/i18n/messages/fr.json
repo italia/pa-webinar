@@ -1040,6 +1040,8 @@
         "recordingDestinationStartsReserved": "L'enregistrement est d'abord réservé : l'équipe de l'événement peut le rendre public tant que la salle n'est pas ouverte.",
         "recordingDestinationStaysReserved": "L'enregistrement reste réservé : la salle a déjà été ouverte.",
         "recordingDestinationLocked": "Après l'ouverture de la salle, on peut seulement passer à « Réservé » : les consentements valent pour le texte que les personnes ont lu.",
+        "recordingDestinationPublicOnInvitation": "The event is invitation-only, but the recording stays public: anyone will be able to see the video, not just the invitees.",
+        "recordingDestinationReservedOnInvitation": "The event is invitation-only: the recording has moved to reserved. You can change this in \"Recording and AI\".",
         "recordingDestinationRequired": "Choisissez où va l'enregistrement.",
         "audienceAnonymous": "Public anonyme",
         "audienceAnonymousDesc": "Les participants apparaissent aux autres sous un pseudonyme (« Participant » et un code) en vidéo, dans le chat et les questions ; la liste des participants reste aux animateurs et il n'y a pas de place. Utile pour les grands événements ; aux événements de communauté, on veut se connaître.",
