@@ -194,7 +194,7 @@ The browser keeps an unsaved copy of the form in `localStorage` under `pa-wizard
 `/admin/events/{id}/edit?token=<moderatorToken>` loads the event with its organizations, active named grants, invitations, materials and questionnaires, and opens the same wizard in `edit` mode. The page answers `404` without the matching token in the URL. On **Update event**:
 
 1. The wizard sends the whole form to `PUT /api/events/{id}` with the moderator token. The server:
-   - ignores the capture flags (`recordingEnabled`, `autoStartRecording`, `whiteboardEnabled`, `multitrackRecordingEnabled`, `waitingRoomEngine`, `videoQuality`) on an `ENDED` or `ARCHIVED` event when the request carries no status and no dates, and lists them in `ignoredCreationOnlyFields`. The wizard always sends the dates, so this guard applies only to partial updates from other callers;
+   - ignores the capture flags (`recordingEnabled`, `autoStartRecording`, `whiteboardEnabled`, `multitrackRecordingEnabled`, `waitingRoomEngine`, `videoQuality`) on an `ENDED` or `ARCHIVED` event unless the request changes the status or reopens the event, and lists them in `ignoredCreationOnlyFields`. A date corrected on an event that stays concluded reopens nothing, and an event closed before its end reopens with the same dates, because the end is still in the future;
    - answers `403` to a moderator link that changes `recordingDestination`, `offerAddressBook` or `hostsAlwaysRecorded`, which only staff who manage the event decide; the wizard opened with that link does not send them;
    - applies the rules of [The recording destination](#the-recording-destination);
    - revives an ended event whose end is moved into the future ([event-lifecycle.md](event-lifecycle.md#revival));
