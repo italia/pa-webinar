@@ -681,27 +681,27 @@
       "working": "Actualizando…",
       "error": "No se ha podido actualizar el consentimiento: inténtalo de nuevo.",
       "textChanged": "El texto del consentimiento ha cambiado después de que abrieras la página: lee el nuevo y confirma, si estás de acuerdo.",
-      "closeNotice": "Close this notice: your consents stay under the button at the top",
+      "closeNotice": "Cerrar este aviso: tus consentimientos siguen en el botón de arriba",
       "recording": {
         "title": "Grabación del evento",
         "give": "Doy mi consentimiento a la grabación",
         "without": {
           "soloAscolto": "Sin este consentimiento sigues solo escuchando: micrófono, cámara y pantalla permanecen cerrados.",
-          "conduce": "Sin este consentimiento conduces igualmente, pero tu voz no queda en las pistas por persona ni en la transcripción.",
+          "conduce": "Sin este consentimiento conduces igualmente.",
           "voce": "Sin este consentimiento participas como todos, pero quedas fuera de la grabación: ni nombre, ni voz, ni imagen.",
           "comeTutti": "Sin este consentimiento participas como todos."
         },
-        "withoutTranscriptHost": "Your voice is not kept in the per-person tracks or in the transcript.",
+        "withoutTranscriptHost": "Tu voz no queda en las pistas por persona ni en la transcripción.",
         "alreadyRecorded": "Lo que ya se ha grabado queda en el vídeo del evento: para que lo quiten, escribe a quien lo organiza.",
         "withdraw": {
-          "soloAscolto": "Si lo retiras, sigues en la sala solo escuchando: micrófono, cámara y pantalla se cierran. También retiras el consentimiento a la transcripción de tus intervenciones.",
-          "conduce": "Si lo retiras, sigues conduciendo, pero desde ahora tu voz no queda en las pistas por persona ni en la transcripción. El vídeo de la sala, si se graba, te muestra igualmente.",
-          "voce": "Si lo retiras sigues en la sala como antes, y desde ahora estás fuera de la grabación. También retiras el consentimiento a la transcripción de tus intervenciones.",
-          "avvertenza": "Si lo retiras sigues en la sala como antes. También retiras el consentimiento a la transcripción de tus intervenciones. Si te dan la palabra y el evento se graba, tu voz sigue estando en el vídeo.",
-          "assente": "Si lo retiras sigues en la sala como antes. También retiras el consentimiento a la transcripción de tus intervenciones. Desde ahora tu voz no se graba en una pista aparte."
+          "soloAscolto": "Si lo retiras, sigues en la sala solo escuchando: micrófono, cámara y pantalla se cierran.",
+          "conduce": "Si lo retiras, sigues conduciendo. El vídeo de la sala, si se graba, te muestra igualmente.",
+          "voce": "Si lo retiras sigues en la sala como antes, y desde ahora estás fuera de la grabación.",
+          "avvertenza": "Si lo retiras sigues en la sala como antes. Si te dan la palabra y el evento se graba, tu voz sigue estando en el vídeo.",
+          "assente": "Si lo retiras sigues en la sala como antes. Desde ahora tu voz no se graba en una pista aparte."
         },
-        "withdrawTranscript": "You also withdraw consent to transcribing your contributions.",
-        "withdrawTranscriptHost": "From now on your voice is not kept in the per-person tracks or in the transcript."
+        "withdrawTranscript": "También retiras el consentimiento a la transcripción de tus intervenciones.",
+        "withdrawTranscriptHost": "Desde ahora tu voz no queda en las pistas por persona ni en la transcripción."
       },
       "transcription": {
         "title": "Transcripción de tus intervenciones",
@@ -1046,11 +1046,11 @@
         "recordingDestinationLocked": "Tras la apertura de la sala solo se puede pasar a reservada: los consentimientos valen para el texto que las personas han leído.",
         "recordingDestinationPublicOnInvitation": "El evento es por invitación, pero la grabación sigue siendo pública: cualquiera podrá ver el vídeo, no solo los invitados.",
         "recordingDestinationReservedOnInvitation": "El evento es por invitación: la grabación ha pasado a reservada. Puedes cambiarla en «Grabación e IA».",
-        "postEventPagePrivateOnInvitation": "The event is invitation-only: the page after the event has moved to private. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPagePublicWithVideo": "The recording is public: the page after the event has moved to public, otherwise nobody could see the video. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPageStaysPrivate": "The event is open to anyone who registers, but the page after the event stayed private: it does not reopen on its own. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPagePrivateVideoHidden": "The recording is public but the page after the event is private: nobody will see the video, not even registrants, while the page stays private.",
-        "recordingNothingToCapture": "This installation has no room video: without the transcript and the per-participant tracks, nothing is recorded.",
+        "postEventPagePrivateOnInvitation": "El evento es por invitación: la página después del evento ha pasado a privada. Puedes cambiarla en «Privacidad, datos y página después del evento».",
+        "postEventPagePublicWithVideo": "La grabación es pública: la página después del evento ha pasado a pública; de lo contrario, nadie vería el vídeo. Puedes cambiarla en «Privacidad, datos y página después del evento».",
+        "postEventPageStaysPrivate": "El evento está abierto a quien se inscriba, pero la página después del evento sigue siendo privada: no se vuelve a abrir sola. Puedes cambiarla en «Privacidad, datos y página después del evento».",
+        "postEventPagePrivateVideoHidden": "La grabación es pública, pero la página después del evento es privada: nadie verá el vídeo, ni siquiera los inscritos, mientras la página siga siendo privada.",
+        "recordingNothingToCapture": "En esta instalación no hay vídeo de la sala: sin la transcripción y las pistas por participante no se graba nada.",
         "recordingDestinationRequired": "Elige a dónde va la grabación.",
         "audienceAnonymous": "Público anónimo",
         "audienceAnonymousDesc": "Quien participa aparece ante los demás con un seudónimo («Participante» y un código) en el vídeo, el chat y las preguntas; la lista de participantes queda para la moderación y no hay plaza. Útil para eventos grandes; en los eventos de comunidad la gente quiere conocerse.",
@@ -4511,8 +4511,8 @@
       "name": {
         "label": "Tu nombre",
         "real": "En la sala, en el chat y en las preguntas apareces con tu nombre.",
-        "pseudonym": "En la sala, en el chat y en las preguntas apareces con un seudónimo. Quien organiza ve los datos de la inscripción. Si das tu consentimiento a la transcripción, allí queda tu nombre.",
-        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
+        "pseudonym": "En la sala, en el chat y en las preguntas apareces con un seudónimo. Quien organiza ve los datos de la inscripción.",
+        "pseudonymTranscript": "Si das tu consentimiento a la transcripción, allí queda tu nombre."
       },
       "retention": {
         "label": "Conservación",
@@ -4581,12 +4581,12 @@
       "proofGivenOn": "Dado el {date}",
       "proofSuperseded": "Sustituido por un consentimiento posterior",
       "proofWithdrawEffect": {
-        "recording": "You also withdraw your consent to transcription: your sentences and your name leave the transcript from captions. What is already in the video stays, and so does a transcript made from the video or the audio tracks: to have them removed, write to the data controller. This withdrawal cannot be undone from this page.",
-        "transcription": "Your sentences and your name leave the transcript from captions. A transcript made from the video or the audio tracks stays: to have it removed, write to the data controller. This withdrawal cannot be undone from this page."
+        "recording": "También retiras el consentimiento a la transcripción: tus frases y tu nombre salen de la transcripción a partir de los subtítulos. Lo que ya está en el vídeo permanece, igual que una transcripción hecha a partir del vídeo o de las pistas de audio: para que los quiten, escribe al responsable del tratamiento. Desde esta página la retirada no se puede deshacer.",
+        "transcription": "Tus frases y tu nombre salen de la transcripción a partir de los subtítulos. Una transcripción hecha a partir del vídeo o de las pistas de audio permanece: para que la quiten, escribe al responsable del tratamiento. Desde esta página la retirada no se puede deshacer."
       },
-      "proofWithdrawHost": "Older transcripts from captions do not recognize hosts: your sentences and your name stay there, and to have them removed you must write to the data controller.",
-      "roomProofsTitle": "Consents given while leading an event",
-      "roomProofsIntro": "The recording and transcription consents you gave when entering the room with a role in the event. The Consents dialog in the room withdraws those of the current entry and, with your staff account, those of earlier entries too; for the others, and once the event is over, what remains is erasing your data.",
+      "proofWithdrawHost": "Las transcripciones más antiguas a partir de los subtítulos no reconocen a quien modera: allí quedan tus frases y tu nombre y, para que los quiten, debes escribir al responsable del tratamiento.",
+      "roomProofsTitle": "Consentimientos dados al conducir un evento",
+      "roomProofsIntro": "Los consentimientos a la grabación y a la transcripción que diste al entrar en la sala con un rol en el evento. Desde la ventana «Consentimientos» de la sala se retiran los de la entrada en curso y, con tu cuenta del personal, también los de entradas anteriores; para los demás, y una vez concluido el evento, queda la supresión de tus datos.",
       "addressBookTitle": "Agenda de eventos",
       "addressBookIntro": "Has elegido permanecer en la agenda para recibir invitaciones a eventos similares. Conservamos estos datos hasta el {date}, salvo que retires tu consentimiento o lo des de nuevo.",
       "addressBookOptOut": "Eliminar mis datos de la agenda",
@@ -4596,7 +4596,7 @@
       "addressBookPendingEffect": "Si confirmas, vuelves a la agenda con el nombre y el organismo de esta inscripción y recibes de nuevo las invitaciones. Si cancelas, o si no has sido tú, sigues fuera de la agenda y no recibes invitaciones.",
       "addressBookPendingConfirm": "Confirmar mi regreso",
       "addressBookPendingCancel": "Cancelar la solicitud",
-      "addressBookPendingGone": "This request is no longer waiting. Reload the page to see the current state."
+      "addressBookPendingGone": "Esta solicitud ya no está pendiente. Recarga la página para ver el estado actualizado."
     },
     "erasure": {
       "title": "Supresión de sus datos",
@@ -4610,7 +4610,7 @@
       "linkInvalid": "Este enlace no es válido o ha caducado. Solicite un nuevo enlace.",
       "confirmWarning": "Está a punto de suprimir de forma definitiva los datos personales asociados a su dirección de correo electrónico, excepto lo que se indica a continuación.",
       "confirmBody": "Se suprimirán las inscripciones, las preguntas, los votos en las encuestas, las valoraciones, los recordatorios y su registro en la Agenda de eventos. La operación es irreversible.",
-      "confirmProofs": "Si existe un vídeo o una transcripción de un evento, aunque aún no estén publicados, permanecen el tipo de consentimiento, la fecha y el texto al que respondió, sin su nombre, mientras ese vídeo o esa transcripción existan. Sirven para demostrar el consentimiento. El vídeo no cambia: para solicitar que se retiren sus intervenciones, escriba al responsable del tratamiento.",
+      "confirmProofs": "Si existe un vídeo o una transcripción de un evento, aunque aún no estén publicados, permanecen el tipo de consentimiento, la fecha y el texto al que respondió, sin su nombre, mientras ese vídeo o esa transcripción existan. Sirven para demostrar el consentimiento. El vídeo no cambia: para solicitar que se retiren sus intervenciones, escriba al responsable del tratamiento. Las transcripciones más antiguas a partir de los subtítulos no reconocen a quien modera o interviene con un rol en el evento: allí quedan sus frases y su nombre y, para que los quiten, debe escribir al responsable del tratamiento.",
       "confirmButton": "Confirmar la supresión",
       "cancel": "Cancelar",
       "processing": "Eliminando...",
@@ -5998,8 +5998,8 @@
     "recordingWithoutMedia": "Esta grabación no tiene vídeo: su transcripción viene de los subtítulos del directo.",
     "recordingWithoutVideo": "De esta grabación están las pistas de audio de los participantes, pero no el vídeo: no se grabó o todavía no ha llegado. El archivo descargable también necesita el vídeo.",
     "noParticipantTracks": "No hay pistas de audio separadas de los participantes: no se grabaron o ya se eliminaron. Para tenerlas, activa la grabación por participante antes del evento.",
-    "noTranscribableTracks": "No track of this recording can be transcribed: they were deleted, or the people in them did not consent to a transcription with their name.",
-    "tracksPending": "The tracks of this recording have not arrived yet: the transcription will start by itself when they do.",
+    "noTranscribableTracks": "Ninguna pista de esta grabación se puede transcribir: se han eliminado, o quienes aparecen en ellas no han dado su consentimiento a la transcripción con su nombre.",
+    "tracksPending": "Las pistas de esta grabación aún no han llegado: la transcripción empezará sola cuando lleguen.",
     "summaryMissing": "Todavía no hay un resumen que editar en este idioma: genéralo primero.",
     "storageUnavailable": "La subida de archivos no está disponible en esta instalación.",
     "aiDisabledForEvent": "La IA está desactivada para este evento: usa «Generar IA» para activarla e iniciar el proceso.",

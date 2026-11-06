@@ -681,27 +681,27 @@
       "working": "Uuendamine…",
       "error": "Nõusolekut ei õnnestunud uuendada: proovi uuesti.",
       "textChanged": "Nõusoleku tekst muutus pärast seda, kui selle lehe avasid: loe uus tekst läbi ja kinnita, kui oled nõus.",
-      "closeNotice": "Close this notice: your consents stay under the button at the top",
+      "closeNotice": "Sulge see teade: sinu nõusolekud jäävad kättesaadavaks ülemise nupu alt",
       "recording": {
         "title": "Ürituse salvestamine",
         "give": "Annan nõusoleku salvestamiseks",
         "without": {
           "soloAscolto": "Ilma selle nõusolekuta oled ainult kuulaja: mikrofon, kaamera ja ekraan jäävad suletuks.",
-          "conduce": "Ilma selle nõusolekuta juhid ikka, kuid su hääl ei jää isikupõhistele radadele ega transkriptsiooni.",
+          "conduce": "Ilma selle nõusolekuta juhid ikka.",
           "voce": "Ilma selle nõusolekuta osaled nagu kõik, kuid jääd salvestusest välja: ei nime, häält ega pilti.",
           "comeTutti": "Ilma selle nõusolekuta osaled nagu kõik."
         },
-        "withoutTranscriptHost": "Your voice is not kept in the per-person tracks or in the transcript.",
+        "withoutTranscriptHost": "Sinu häält ei säilitata isikupõhistel radadel ega transkriptsioonis.",
         "alreadyRecorded": "Juba salvestatu jääb ürituse videosse: eemaldamiseks kirjuta korraldajatele.",
         "withdraw": {
-          "soloAscolto": "Kui võtad selle tagasi, jääd ruumi ainult kuulajana: mikrofon, kaamera ja ekraan suletakse. Võtad tagasi ka nõusoleku oma sõnavõttude transkribeerimiseks.",
-          "conduce": "Kui võtad selle tagasi, juhid edasi, kuid nüüdsest su hääl ei jää isikupõhistele radadele ega transkriptsiooni. Ruumi video näitab sind siiski, kui seda salvestatakse.",
-          "voce": "Kui selle tagasi võtad, jääd ruumi nagu enne ja oled nüüdsest salvestusest väljas. Võtad tagasi ka nõusoleku oma sõnavõttude transkribeerimiseks.",
-          "avvertenza": "Kui selle tagasi võtad, jääd ruumi nagu enne. Võtad tagasi ka nõusoleku oma sõnavõttude transkribeerimiseks. Kui sulle antakse sõna ja üritus salvestatakse, jääb sinu hääl siiski videosse.",
-          "assente": "Kui selle tagasi võtad, jääd ruumi nagu enne. Võtad tagasi ka nõusoleku oma sõnavõttude transkribeerimiseks. Nüüdsest ei salvestata sinu häält eraldi rajale."
+          "soloAscolto": "Kui võtad selle tagasi, jääd ruumi ainult kuulajana: mikrofon, kaamera ja ekraan suletakse.",
+          "conduce": "Kui võtad selle tagasi, juhid edasi. Ruumi video näitab sind siiski, kui seda salvestatakse.",
+          "voce": "Kui selle tagasi võtad, jääd ruumi nagu enne ja oled nüüdsest salvestisest väljas.",
+          "avvertenza": "Kui selle tagasi võtad, jääd ruumi nagu enne. Kui sulle antakse sõna ja üritus salvestatakse, jääb sinu hääl siiski videosse.",
+          "assente": "Kui selle tagasi võtad, jääd ruumi nagu enne. Nüüdsest ei salvestata sinu häält eraldi rajale."
         },
-        "withdrawTranscript": "You also withdraw consent to transcribing your contributions.",
-        "withdrawTranscriptHost": "From now on your voice is not kept in the per-person tracks or in the transcript."
+        "withdrawTranscript": "Võtad tagasi ka nõusoleku oma sõnavõttude transkribeerimiseks.",
+        "withdrawTranscriptHost": "Nüüdsest ei säilitata sinu häält isikupõhistel radadel ega transkriptsioonis."
       },
       "transcription": {
         "title": "Sinu sõnavõttude transkribeerimine",
@@ -1046,11 +1046,11 @@
         "recordingDestinationLocked": "Pärast ruumi avamist saab valida ainult „Ainult registreerunutele“: nõusolekud kehtivad teksti kohta, mida inimesed lugesid.",
         "recordingDestinationPublicOnInvitation": "Üritus on ainult kutsega, kuid salvestis jääb avalikuks: videot saab vaadata igaüks, mitte ainult kutsutud.",
         "recordingDestinationReservedOnInvitation": "Üritus on ainult kutsega: salvestis on muudetud valikule „Ainult registreerunutele“. Saad seda muuta jaotises „Salvestus ja tehisintellekt“.",
-        "postEventPagePrivateOnInvitation": "The event is invitation-only: the page after the event has moved to private. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPagePublicWithVideo": "The recording is public: the page after the event has moved to public, otherwise nobody could see the video. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPageStaysPrivate": "The event is open to anyone who registers, but the page after the event stayed private: it does not reopen on its own. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPagePrivateVideoHidden": "The recording is public but the page after the event is private: nobody will see the video, not even registrants, while the page stays private.",
-        "recordingNothingToCapture": "This installation has no room video: without the transcript and the per-participant tracks, nothing is recorded.",
+        "postEventPagePrivateOnInvitation": "Üritus on ainult kutsega: ürituse järgne leht on muudetud privaatseks. Saad seda muuta jaotises „Privaatsus, andmed ja leht pärast üritust“.",
+        "postEventPagePublicWithVideo": "Salvestis on avalik: ürituse järgne leht on muudetud avalikuks, muidu ei näeks videot keegi. Saad seda muuta jaotises „Privaatsus, andmed ja leht pärast üritust“.",
+        "postEventPageStaysPrivate": "Üritus on avatud registreerujatele, kuid ürituse järgne leht jäi privaatseks: see ei avane ise uuesti. Saad seda muuta jaotises „Privaatsus, andmed ja leht pärast üritust“.",
+        "postEventPagePrivateVideoHidden": "Salvestis on avalik, kuid ürituse järgne leht on privaatne: videot ei näe keegi, isegi mitte registreerunud, seni kuni leht jääb privaatseks.",
+        "recordingNothingToCapture": "Selles paigalduses ei ole ruumi videot: ilma transkriptsiooni ja osalejapõhiste radadeta ei salvestata midagi.",
         "recordingDestinationRequired": "Vali, kuhu salvestis läheb.",
         "audienceAnonymous": "Anonüümne publik",
         "audienceAnonymousDesc": "Osalejad on teistele nähtavad pseudonüümiga („Osaleja“ ja kood) videos, vestluses ja küsimustes; osalejate nimekiri jääb juhatajatele ja väljakut pole. Kasulik suurtel sündmustel; kogukonna sündmustel tahetakse üksteist tundma õppida.",
@@ -4077,7 +4077,7 @@
     "timeLabel": "Kellaaeg",
     "durationLabel": "Kestus",
     "addressBookNote": "Oled ürituste aadressraamatus, et sind kutsutaks sarnastele üritustele: saad nõusoleku igal ajal tagasi võtta.",
-    "addressBookPendingNote": "The events address book box was ticked on this registration, but this address had stopped receiving invitations. If the request is yours, you can confirm it from the page with your data, using the link below. If it is not, ignore this message: you stay out of the address book and receive no invitations.",
+    "addressBookPendingNote": "Selle registreerumise juures märgiti ürituste aadressraamatu lahter, kuid see aadress oli lakanud kutseid saamast. Kui taotlus on sinu, saad selle kinnitada oma andmete lehel allpool oleva lingi kaudu. Kui see pole sinu, jäta see sõnum tähelepanuta: jääd aadressraamatust välja ega saa kutseid.",
     "addressBookOptOutLink": "Eemalda minu andmed aadressraamatust",
     "myDataLink": "Teie andmed: vaadake, parandage, võtke nõusolek tagasi või tühistage registreerimine"
   },
@@ -4511,8 +4511,8 @@
       "name": {
         "label": "Sinu nimi",
         "real": "Ruumis, vestluses ja küsimustes oled nähtav oma nimega.",
-        "pseudonym": "Ruumis, vestluses ja küsimustes oled nähtav pseudonüümiga. Korraldajad näevad sinu registreerumisandmeid. Kui nõustud transkribeerimisega, jääb sinu nimi transkriptsiooni.",
-        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
+        "pseudonym": "Ruumis, vestluses ja küsimustes oled nähtav pseudonüümiga. Korraldajad näevad sinu registreerumisandmeid.",
+        "pseudonymTranscript": "Kui nõustud transkribeerimisega, jääb sinu nimi transkriptsiooni."
       },
       "retention": {
         "label": "Säilitamine",
@@ -4581,12 +4581,12 @@
       "proofGivenOn": "Antud {date}",
       "proofSuperseded": "Asendatud hilisema nõusolekuga",
       "proofWithdrawEffect": {
-        "recording": "You also withdraw your consent to transcription: your sentences and your name leave the transcript from captions. What is already in the video stays, and so does a transcript made from the video or the audio tracks: to have them removed, write to the data controller. This withdrawal cannot be undone from this page.",
-        "transcription": "Your sentences and your name leave the transcript from captions. A transcript made from the video or the audio tracks stays: to have it removed, write to the data controller. This withdrawal cannot be undone from this page."
+        "recording": "Võtate tagasi ka nõusoleku transkribeerimiseks: teie laused ja nimi eemaldatakse subtiitritest tehtud transkriptsioonist. See, mis on juba videos, jääb alles, nagu ka videost või helirajadest tehtud transkriptsioon: nende eemaldamiseks kirjutage vastutavale töötlejale. Sellel lehel ei saa tagasivõtmist tühistada.",
+        "transcription": "Teie laused ja nimi eemaldatakse subtiitritest tehtud transkriptsioonist. Videost või helirajadest tehtud transkriptsioon jääb alles: selle eemaldamiseks kirjutage vastutavale töötlejale. Sellel lehel ei saa tagasivõtmist tühistada."
       },
-      "proofWithdrawHost": "Older transcripts from captions do not recognize hosts: your sentences and your name stay there, and to have them removed you must write to the data controller.",
-      "roomProofsTitle": "Consents given while leading an event",
-      "roomProofsIntro": "The recording and transcription consents you gave when entering the room with a role in the event. The Consents dialog in the room withdraws those of the current entry and, with your staff account, those of earlier entries too; for the others, and once the event is over, what remains is erasing your data.",
+      "proofWithdrawHost": "Vanemad subtiitritest tehtud transkriptsioonid ei tunne juhte ära: neis jäävad teie laused ja nimi alles ning nende eemaldamiseks peate kirjutama vastutavale töötlejale.",
+      "roomProofsTitle": "Ürituse juhina antud nõusolekud",
+      "roomProofsIntro": "Nõusolekud salvestamiseks ja transkribeerimiseks, mille andsite ruumi sisenedes, kui teil oli ürituses roll. Ruumi aknas „Nõusolekud“ saab tagasi võtta praeguse sisenemise nõusolekud ja oma töötajakontoga ka varasemate sisenemiste omad; ülejäänute puhul ja pärast ürituse lõppu jääb üle teie andmete kustutamine.",
       "addressBookTitle": "Ürituste aadressraamat",
       "addressBookIntro": "Valisite jääda aadressraamatusse, et teid kutsutaks sarnastele üritustele. Säilitame neid andmeid kuni {date}, välja arvatud juhul, kui võtate nõusoleku tagasi või annate uue.",
       "addressBookOptOut": "Eemalda minu andmed aadressraamatust",
@@ -4596,7 +4596,7 @@
       "addressBookPendingEffect": "Kui kinnitate, naasete aadressraamatusse selle registreerumise nime ja organisatsiooniga ning saate taas kutseid. Kui tühistate või kui see polnud teie, jääte aadressraamatust välja ega saa kutseid.",
       "addressBookPendingConfirm": "Kinnita naasmine",
       "addressBookPendingCancel": "Tühista taotlus",
-      "addressBookPendingGone": "This request is no longer waiting. Reload the page to see the current state."
+      "addressBookPendingGone": "See taotlus ei oota enam kinnitust. Uuendatud oleku nägemiseks laadige leht uuesti."
     },
     "erasure": {
       "title": "Teie andmete kustutamine",
@@ -4610,7 +4610,7 @@
       "linkInvalid": "See link on kehtetu või aegunud. Palun taotlege uus link.",
       "confirmWarning": "Olete jäädavalt kustutamas teie e-posti aadressiga seotud isikuandmeid, välja arvatud allpool märgitu.",
       "confirmBody": "Kustutatakse registreerumised, küsimused, küsitluste hääled, tagasiside, meeldetuletused ja teie kirje ürituste aadressraamatus. Toiming on pöördumatu.",
-      "confirmProofs": "Kui ürituse kohta on olemas video või transkriptsioon, isegi kui seda pole veel avaldatud, jäävad nõusoleku liik, kuupäev ja tekst, millele vastasite, alles ilma teie nimeta seni, kuni see video või transkriptsioon on olemas. Need on vajalikud nõusoleku tõendamiseks. Video ei muutu: oma sõnavõttude eemaldamise taotlemiseks kirjutage vastutavale töötlejale.",
+      "confirmProofs": "Kui ürituse kohta on olemas video või transkriptsioon, isegi kui seda pole veel avaldatud, jäävad nõusoleku liik, kuupäev ja tekst, millele vastasite, alles ilma teie nimeta seni, kuni see video või transkriptsioon on olemas. Need on vajalikud nõusoleku tõendamiseks. Video ei muutu: oma sõnavõttude eemaldamise taotlemiseks kirjutage vastutavale töötlejale. Vanemad subtiitritest tehtud transkriptsioonid ei tunne ära neid, kes juhivad või võtavad sõna ürituses mingis rollis: neis jäävad teie laused ja nimi alles ning nende eemaldamiseks peate kirjutama vastutavale töötlejale.",
       "confirmButton": "Kinnita kustutamine",
       "cancel": "Tühista",
       "processing": "Kustutamine...",
@@ -5998,8 +5998,8 @@
     "recordingWithoutMedia": "Sellel salvestusel pole videot: selle transkriptsioon pärineb otseülekande subtiitritest.",
     "recordingWithoutVideo": "Sellest salvestisest on osalejate helirajad, aga mitte videot: seda ei salvestatud või see pole veel saabunud. Allalaaditav arhiiv vajab ka videot.",
     "noParticipantTracks": "Osalejate eraldi helirajad puuduvad: neid ei salvestatud või need on juba kustutatud. Nende saamiseks lülita enne üritust sisse osalejapõhine salvestamine.",
-    "noTranscribableTracks": "No track of this recording can be transcribed: they were deleted, or the people in them did not consent to a transcription with their name.",
-    "tracksPending": "The tracks of this recording have not arrived yet: the transcription will start by itself when they do.",
+    "noTranscribableTracks": "Selle salvestise ühtegi rada ei saa transkribeerida: need on kustutatud või neil esinevad inimesed ei ole andnud nõusolekut transkribeerimiseks oma nimega.",
+    "tracksPending": "Selle salvestise rajad pole veel kohale jõudnud: transkribeerimine algab iseenesest, kui need saabuvad.",
     "summaryMissing": "Selles keeles pole veel muudetavat kokkuvõtet: loo see kõigepealt.",
     "storageUnavailable": "Failide üleslaadimine pole selles paigalduses saadaval.",
     "aiDisabledForEvent": "Tehisintellekt on selle ürituse jaoks välja lülitatud: kasuta nuppu „Loo AI“, et see sisse lülitada ja töötlus käivitada.",

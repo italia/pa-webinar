@@ -681,27 +681,27 @@
       "working": "Se actualizează…",
       "error": "Consimțământul nu a putut fi actualizat: încearcă din nou.",
       "textChanged": "Textul consimțământului s-a schimbat după ce ai deschis pagina: citește-l pe cel nou și confirmă, dacă ești de acord.",
-      "closeNotice": "Close this notice: your consents stay under the button at the top",
+      "closeNotice": "Închide acest anunț: consimțămintele tale rămân la butonul de sus",
       "recording": {
         "title": "Înregistrarea evenimentului",
         "give": "Sunt de acord cu înregistrarea",
         "without": {
           "soloAscolto": "Fără acest consimțământ doar asculți: microfonul, camera și ecranul rămân închise.",
-          "conduce": "Fără acest consimțământ conduci în continuare, dar vocea ta nu rămâne în pistele per persoană și nici în transcriere.",
-          "voce": "Fără acest acord participi ca toți ceilalți, dar rămâi în afara înregistrării: nici numele, nici vocea, nici imaginea.",
+          "conduce": "Fără acest consimțământ conduci în continuare.",
+          "voce": "Fără acest consimțământ participi ca toți ceilalți, dar rămâi în afara înregistrării: nici numele, nici vocea, nici imaginea.",
           "comeTutti": "Fără acest consimțământ participi ca toți ceilalți."
         },
-        "withoutTranscriptHost": "Your voice is not kept in the per-person tracks or in the transcript.",
+        "withoutTranscriptHost": "Vocea ta nu rămâne în pistele pe persoană și nici în transcriere.",
         "alreadyRecorded": "Ce a fost deja înregistrat rămâne în videoclipul evenimentului: pentru a-l elimina, scrie organizatorilor.",
         "withdraw": {
-          "soloAscolto": "Dacă îl retragi, rămâi în sală doar ca ascultător: microfonul, camera și ecranul se închid. Retragi și consimțământul la transcrierea intervențiilor tale.",
-          "conduce": "Dacă îl retragi, continui să conduci, dar de acum vocea ta nu rămâne în pistele per persoană și nici în transcriere. Videoclipul sălii, dacă este înregistrat, te arată în continuare.",
-          "voce": "Dacă îl retragi, rămâi în sală ca înainte, iar de acum ești în afara înregistrării. Retragi și acordul pentru transcrierea intervențiilor tale.",
-          "avvertenza": "Dacă îl retragi, rămâi în sală ca înainte. Retragi și consimțământul la transcrierea intervențiilor tale. Dacă primești cuvântul și evenimentul este înregistrat, vocea ta rămâne totuși în videoclip.",
-          "assente": "Dacă îl retragi, rămâi în sală ca înainte. Retragi și consimțământul la transcrierea intervențiilor tale. De acum vocea ta nu mai este înregistrată pe o pistă separată."
+          "soloAscolto": "Dacă îl retragi, rămâi în sală doar ca ascultător: microfonul, camera și ecranul se închid.",
+          "conduce": "Dacă îl retragi, continui să conduci. Videoclipul sălii, dacă este înregistrat, te arată în continuare.",
+          "voce": "Dacă îl retragi, rămâi în sală ca înainte, iar de acum ești în afara înregistrării.",
+          "avvertenza": "Dacă îl retragi, rămâi în sală ca înainte. Dacă primești cuvântul și evenimentul este înregistrat, vocea ta rămâne totuși în videoclip.",
+          "assente": "Dacă îl retragi, rămâi în sală ca înainte. De acum vocea ta nu mai este înregistrată pe o pistă separată."
         },
-        "withdrawTranscript": "You also withdraw consent to transcribing your contributions.",
-        "withdrawTranscriptHost": "From now on your voice is not kept in the per-person tracks or in the transcript."
+        "withdrawTranscript": "Retragi și consimțământul la transcrierea intervențiilor tale.",
+        "withdrawTranscriptHost": "De acum vocea ta nu rămâne în pistele pe persoană și nici în transcriere."
       },
       "transcription": {
         "title": "Transcrierea intervențiilor tale",
@@ -1046,11 +1046,11 @@
         "recordingDestinationLocked": "După deschiderea sălii se poate trece doar la rezervată: consimțămintele sunt valabile pentru textul pe care persoanele l-au citit.",
         "recordingDestinationPublicOnInvitation": "Evenimentul este pe bază de invitație, dar înregistrarea rămâne publică: videoclipul va putea fi văzut de oricine, nu doar de invitați.",
         "recordingDestinationReservedOnInvitation": "Evenimentul este pe bază de invitație: înregistrarea a trecut la rezervată. O poți schimba în „Înregistrare și IA”.",
-        "postEventPagePrivateOnInvitation": "The event is invitation-only: the page after the event has moved to private. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPagePublicWithVideo": "The recording is public: the page after the event has moved to public, otherwise nobody could see the video. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPageStaysPrivate": "The event is open to anyone who registers, but the page after the event stayed private: it does not reopen on its own. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPagePrivateVideoHidden": "The recording is public but the page after the event is private: nobody will see the video, not even registrants, while the page stays private.",
-        "recordingNothingToCapture": "This installation has no room video: without the transcript and the per-participant tracks, nothing is recorded.",
+        "postEventPagePrivateOnInvitation": "Evenimentul este pe bază de invitație: pagina după eveniment a trecut la privată. O poți schimba în „Confidențialitate, date și pagina după eveniment”.",
+        "postEventPagePublicWithVideo": "Înregistrarea este publică: pagina după eveniment a trecut la publică, altfel videoclipul nu l-ar vedea nimeni. O poți schimba în „Confidențialitate, date și pagina după eveniment”.",
+        "postEventPageStaysPrivate": "Evenimentul este deschis celor care se înscriu, dar pagina după eveniment a rămas privată: nu se redeschide singură. O poți schimba în „Confidențialitate, date și pagina după eveniment”.",
+        "postEventPagePrivateVideoHidden": "Înregistrarea este publică, dar pagina după eveniment este privată: videoclipul nu îl va vedea nimeni, nici măcar înscrișii, cât timp pagina rămâne privată.",
+        "recordingNothingToCapture": "În această instalare nu există videoclipul sălii: fără transcriere și fără pistele pe participant nu se înregistrează nimic.",
         "recordingDestinationRequired": "Alege unde merge înregistrarea.",
         "audienceAnonymous": "Public anonim",
         "audienceAnonymousDesc": "Participanții apar celorlalți sub un pseudonim („Participant” și un cod) în video, în chat și la întrebări; lista participanților rămâne la moderatori și nu există piață. Util pentru evenimente mari; la evenimentele comunității oamenii vor să se cunoască.",
@@ -4077,7 +4077,7 @@
     "timeLabel": "Ora",
     "durationLabel": "Durată",
     "addressBookNote": "Sunteți în agenda de evenimente, pentru a fi invitat la evenimente similare: vă puteți retrage consimțământul în orice moment.",
-    "addressBookPendingNote": "The events address book box was ticked on this registration, but this address had stopped receiving invitations. If the request is yours, you can confirm it from the page with your data, using the link below. If it is not, ignore this message: you stay out of the address book and receive no invitations.",
+    "addressBookPendingNote": "La această înscriere a fost bifată caseta agendei de evenimente, dar această adresă nu mai primea invitații. Dacă cererea vă aparține, o puteți confirma din pagina cu datele dumneavoastră, folosind linkul de mai jos. Dacă nu vă aparține, ignorați acest mesaj: rămâneți în afara agendei și nu primiți invitații.",
     "addressBookOptOutLink": "Elimină-mi datele din agendă",
     "myDataLink": "Datele tale: vizualizare, corectare, retragerea unui consimțământ sau anularea înscrierii"
   },
@@ -4511,8 +4511,8 @@
       "name": {
         "label": "Numele tău",
         "real": "În sală, în chat și la întrebări apari cu numele tău.",
-        "pseudonym": "În sală, în chat și la întrebări apari cu un pseudonim. Organizatorii văd datele înscrierii. Dacă îți dai consimțământul la transcriere, acolo rămâne numele tău.",
-        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
+        "pseudonym": "În sală, în chat și la întrebări apari cu un pseudonim. Organizatorii văd datele înscrierii.",
+        "pseudonymTranscript": "Dacă îți dai consimțământul la transcriere, acolo rămâne numele tău."
       },
       "retention": {
         "label": "Păstrare",
@@ -4581,12 +4581,12 @@
       "proofGivenOn": "Dat la {date}",
       "proofSuperseded": "Înlocuit de un consimțământ ulterior",
       "proofWithdrawEffect": {
-        "recording": "You also withdraw your consent to transcription: your sentences and your name leave the transcript from captions. What is already in the video stays, and so does a transcript made from the video or the audio tracks: to have them removed, write to the data controller. This withdrawal cannot be undone from this page.",
-        "transcription": "Your sentences and your name leave the transcript from captions. A transcript made from the video or the audio tracks stays: to have it removed, write to the data controller. This withdrawal cannot be undone from this page."
+        "recording": "Vă retrageți și consimțământul la transcriere: frazele și numele dumneavoastră ies din transcrierea din subtitrări. Ceea ce se află deja în videoclip rămâne, la fel ca o transcriere făcută din videoclip sau din pistele audio: pentru a le elimina, scrieți operatorului de date. Retragerea nu poate fi anulată din această pagină.",
+        "transcription": "Frazele și numele dumneavoastră ies din transcrierea din subtitrări. O transcriere făcută din videoclip sau din pistele audio rămâne: pentru a o elimina, scrieți operatorului de date. Retragerea nu poate fi anulată din această pagină."
       },
-      "proofWithdrawHost": "Older transcripts from captions do not recognize hosts: your sentences and your name stay there, and to have them removed you must write to the data controller.",
-      "roomProofsTitle": "Consents given while leading an event",
-      "roomProofsIntro": "The recording and transcription consents you gave when entering the room with a role in the event. The Consents dialog in the room withdraws those of the current entry and, with your staff account, those of earlier entries too; for the others, and once the event is over, what remains is erasing your data.",
+      "proofWithdrawHost": "Transcrierile mai vechi din subtitrări nu îi recunosc pe moderatori: acolo rămân frazele și numele dumneavoastră, iar pentru a le elimina trebuie să scrieți operatorului de date.",
+      "roomProofsTitle": "Consimțăminte date la conducerea unui eveniment",
+      "roomProofsIntro": "Consimțămintele la înregistrare și la transcriere pe care le-ați dat intrând în sală cu un rol în eveniment. Din fereastra „Consimțăminte” a sălii se retrag cele ale intrării în curs și, cu contul dumneavoastră de personal, și cele ale intrărilor anterioare; pentru celelalte, și după încheierea evenimentului, rămâne ștergerea datelor dumneavoastră.",
       "addressBookTitle": "Agenda de evenimente",
       "addressBookIntro": "Ați ales să rămâneți în agendă, pentru a fi invitat la evenimente similare. Păstrăm aceste date până la {date}, cu excepția cazului în care vă retrageți consimțământul sau dați un nou consimțământ.",
       "addressBookOptOut": "Elimină-mi datele din agendă",
@@ -4596,7 +4596,7 @@
       "addressBookPendingEffect": "Dacă confirmați, reveniți în agendă cu numele și instituția de la această înscriere și primiți din nou invitații. Dacă anulați sau dacă nu ați fost dumneavoastră, rămâneți în afara agendei și nu primiți invitații.",
       "addressBookPendingConfirm": "Confirmați revenirea",
       "addressBookPendingCancel": "Anulați cererea",
-      "addressBookPendingGone": "This request is no longer waiting. Reload the page to see the current state."
+      "addressBookPendingGone": "Această cerere nu mai este în așteptare. Reîncărcați pagina pentru a vedea starea actualizată."
     },
     "erasure": {
       "title": "Ștergerea datelor dumneavoastră",
@@ -4610,7 +4610,7 @@
       "linkInvalid": "Linkul nu este valid sau a expirat. Solicitați un link nou.",
       "confirmWarning": "Sunteți pe cale să ștergeți definitiv datele personale asociate adresei dumneavoastră de email, cu excepția celor indicate mai jos.",
       "confirmBody": "Vor fi șterse înscrierile, întrebările, voturile din sondaje, feedbackul, mementourile și intrarea dumneavoastră din agenda de evenimente. Operațiunea este ireversibilă.",
-      "confirmProofs": "Dacă un eveniment are un videoclip sau o transcriere, chiar dacă nu au fost încă publicate, rămân tipul de consimțământ, data și textul la care ați răspuns, fără numele dumneavoastră, cât timp acel videoclip sau acea transcriere există. Acestea servesc la dovedirea consimțământului. Videoclipul nu se schimbă: pentru a cere eliminarea intervențiilor dumneavoastră, scrieți operatorului de date.",
+      "confirmProofs": "Dacă un eveniment are un videoclip sau o transcriere, chiar dacă nu au fost încă publicate, rămân tipul de consimțământ, data și textul la care ați răspuns, fără numele dumneavoastră, cât timp acel videoclip sau acea transcriere există. Acestea servesc la dovedirea consimțământului. Videoclipul nu se schimbă: pentru a cere eliminarea intervențiilor dumneavoastră, scrieți operatorului de date. Transcrierile mai vechi din subtitrări nu îi recunosc pe moderatori sau pe persoanele care intervin cu un rol în eveniment: acolo rămân frazele și numele dumneavoastră, iar pentru a le elimina trebuie să scrieți operatorului de date.",
       "confirmButton": "Confirmați ștergerea",
       "cancel": "Anulați",
       "processing": "Ștergere în curs...",
@@ -5998,8 +5998,8 @@
     "recordingWithoutMedia": "Această înregistrare nu are video: transcrierea ei provine din subtitrările transmisiei.",
     "recordingWithoutVideo": "Din această înregistrare există pistele audio ale participanților, dar nu și video: nu a fost înregistrat sau nu a sosit încă. Arhiva descărcabilă are nevoie și de video.",
     "noParticipantTracks": "Nu există piste audio separate ale participanților: nu au fost înregistrate sau au fost deja șterse. Pentru a le avea, activează înregistrarea pe participant înainte de eveniment.",
-    "noTranscribableTracks": "No track of this recording can be transcribed: they were deleted, or the people in them did not consent to a transcription with their name.",
-    "tracksPending": "The tracks of this recording have not arrived yet: the transcription will start by itself when they do.",
+    "noTranscribableTracks": "Nicio pistă a acestei înregistrări nu poate fi transcrisă: au fost șterse sau persoanele care apar în ele nu și-au dat consimțământul la transcrierea cu numele lor.",
+    "tracksPending": "Pistele acestei înregistrări nu au sosit încă: transcrierea va porni singură când sosesc.",
     "summaryMissing": "Încă nu există un rezumat de editat în această limbă: generează-l mai întâi.",
     "storageUnavailable": "Încărcarea fișierelor nu este disponibilă în această instalare.",
     "aiDisabledForEvent": "AI este oprită pentru acest eveniment: folosește „Generează AI” pentru a o porni și a lansa procesarea.",

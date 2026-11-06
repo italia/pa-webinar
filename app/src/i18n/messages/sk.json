@@ -681,27 +681,27 @@
       "working": "Prebieha aktualizácia…",
       "error": "Súhlas sa nepodarilo aktualizovať: skúste to znova.",
       "textChanged": "Text súhlasu sa zmenil po tom, čo ste otvorili stránku: prečítajte si nový text a potvrďte ho, ak súhlasíte.",
-      "closeNotice": "Close this notice: your consents stay under the button at the top",
+      "closeNotice": "Zavrieť toto upozornenie: vaše súhlasy zostávajú pod tlačidlom hore",
       "recording": {
         "title": "Záznam podujatia",
         "give": "Súhlasím so záznamom",
         "without": {
           "soloAscolto": "Bez tohto súhlasu iba počúvate: mikrofón, kamera a obrazovka zostávajú zatvorené.",
-          "conduce": "Bez tohto súhlasu moderujete ďalej, ale váš hlas nezostane v stopách jednotlivých osôb ani v prepise.",
+          "conduce": "Bez tohto súhlasu moderujete ďalej.",
           "voce": "Bez tohto súhlasu sa zúčastňujete ako všetci, ale zostanete mimo záznamu: ani meno, ani hlas, ani obraz.",
           "comeTutti": "Bez tohto súhlasu sa zúčastňujete ako všetci."
         },
-        "withoutTranscriptHost": "Your voice is not kept in the per-person tracks or in the transcript.",
+        "withoutTranscriptHost": "Váš hlas nezostane v stopách jednotlivých osôb ani v prepise.",
         "alreadyRecorded": "Čo už bolo zaznamenané, zostáva vo videu podujatia: o odstránenie požiadajte organizátorov.",
         "withdraw": {
-          "soloAscolto": "Ak ho odvoláte, zostanete v miestnosti a iba počúvate: mikrofón, kamera a obrazovka sa zatvoria. Odvoláte aj súhlas s prepisom svojich príspevkov.",
-          "conduce": "Ak ho odvoláte, moderujete ďalej, ale odteraz váš hlas nezostane v stopách jednotlivých osôb ani v prepise. Video miestnosti, ak sa nahráva, vás zachytí aj tak.",
-          "voce": "Ak ho odvoláte, zostanete v miestnosti ako predtým a odteraz ste mimo záznamu. Odvoláte aj súhlas s prepisom svojich príspevkov.",
-          "avvertenza": "Ak ho odvoláte, zostanete v miestnosti ako predtým. Odvoláte aj súhlas s prepisom svojich príspevkov. Ak dostanete slovo a podujatie sa nahráva, váš hlas vo videu aj tak zostane.",
-          "assente": "Ak ho odvoláte, zostanete v miestnosti ako predtým. Odvoláte aj súhlas s prepisom svojich príspevkov. Odteraz sa váš hlas nenahráva na samostatnú stopu."
+          "soloAscolto": "Ak ho odvoláte, zostanete v miestnosti a iba počúvate: mikrofón, kamera a obrazovka sa zatvoria.",
+          "conduce": "Ak ho odvoláte, moderujete ďalej. Video miestnosti, ak sa nahráva, vás zachytí aj tak.",
+          "voce": "Ak ho odvoláte, zostanete v miestnosti ako predtým a odteraz ste mimo záznamu.",
+          "avvertenza": "Ak ho odvoláte, zostanete v miestnosti ako predtým. Ak dostanete slovo a podujatie sa nahráva, váš hlas vo videu aj tak zostane.",
+          "assente": "Ak ho odvoláte, zostanete v miestnosti ako predtým. Odteraz sa váš hlas nenahráva na samostatnú stopu."
         },
-        "withdrawTranscript": "You also withdraw consent to transcribing your contributions.",
-        "withdrawTranscriptHost": "From now on your voice is not kept in the per-person tracks or in the transcript."
+        "withdrawTranscript": "Odvoláte aj súhlas s prepisom svojich príspevkov.",
+        "withdrawTranscriptHost": "Odteraz váš hlas nezostane v stopách jednotlivých osôb ani v prepise."
       },
       "transcription": {
         "title": "Prepis vašich príspevkov",
@@ -1046,11 +1046,11 @@
         "recordingDestinationLocked": "Po otvorení miestnosti možno záznam iba zmeniť na „Len pre registrovaných“: súhlasy platia pre text, ktorý si ľudia prečítali.",
         "recordingDestinationPublicOnInvitation": "Podujatie je len pre pozvaných, ale záznam zostáva verejný: video bude môcť vidieť ktokoľvek, nielen pozvaní.",
         "recordingDestinationReservedOnInvitation": "Podujatie je len pre pozvaných: záznam sa zmenil na „Len pre registrovaných“. Môžete to zmeniť v časti „Záznam a AI“.",
-        "postEventPagePrivateOnInvitation": "The event is invitation-only: the page after the event has moved to private. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPagePublicWithVideo": "The recording is public: the page after the event has moved to public, otherwise nobody could see the video. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPageStaysPrivate": "The event is open to anyone who registers, but the page after the event stayed private: it does not reopen on its own. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPagePrivateVideoHidden": "The recording is public but the page after the event is private: nobody will see the video, not even registrants, while the page stays private.",
-        "recordingNothingToCapture": "This installation has no room video: without the transcript and the per-participant tracks, nothing is recorded.",
+        "postEventPagePrivateOnInvitation": "Podujatie je len pre pozvaných: stránka po podujatí sa zmenila na súkromnú. Môžete to zmeniť v časti „Súkromie, údaje a stránka po podujatí“.",
+        "postEventPagePublicWithVideo": "Záznam je verejný: stránka po podujatí sa zmenila na verejnú, inak by video nikto nevidel. Môžete to zmeniť v časti „Súkromie, údaje a stránka po podujatí“.",
+        "postEventPageStaysPrivate": "Podujatie je otvorené pre všetkých, ktorí sa zaregistrujú, ale stránka po podujatí zostala súkromná: sama sa znova neotvorí. Môžete to zmeniť v časti „Súkromie, údaje a stránka po podujatí“.",
+        "postEventPagePrivateVideoHidden": "Záznam je verejný, ale stránka po podujatí je súkromná: video neuvidí nikto, ani registrovaní, kým stránka zostane súkromná.",
+        "recordingNothingToCapture": "V tejto inštalácii nie je video miestnosti: bez prepisu a stôp jednotlivých účastníkov sa nič nenahráva.",
         "recordingDestinationRequired": "Vyberte, kam ide záznam.",
         "audienceAnonymous": "Anonymné publikum",
         "audienceAnonymousDesc": "Účastníci sa ostatným zobrazujú pod pseudonymom („Účastník“ a kód) vo videu, v čete aj v otázkach; zoznam účastníkov zostáva moderátorom a námestie nie je. Užitočné pre veľké podujatia; na komunitných podujatiach sa ľudia chcú spoznať.",
@@ -4077,7 +4077,7 @@
     "timeLabel": "Čas",
     "durationLabel": "Trvanie",
     "addressBookNote": "Ste v adresári podujatí, aby ste boli pozývaní na podobné podujatia: súhlas môžete kedykoľvek odvolať.",
-    "addressBookPendingNote": "The events address book box was ticked on this registration, but this address had stopped receiving invitations. If the request is yours, you can confirm it from the page with your data, using the link below. If it is not, ignore this message: you stay out of the address book and receive no invitations.",
+    "addressBookPendingNote": "Pri tejto registrácii bolo začiarknuté políčko adresára podujatí, ale táto adresa prestala dostávať pozvánky. Ak je žiadosť vaša, môžete ju potvrdiť na stránke so svojimi údajmi pomocou odkazu nižšie. Ak nie je vaša, túto správu ignorujte: zostanete mimo adresára a pozvánky dostávať nebudete.",
     "addressBookOptOutLink": "Odstrániť moje údaje z adresára",
     "myDataLink": "Vaše údaje: zobraziť, opraviť, odvolať súhlas alebo zrušiť registráciu"
   },
@@ -4511,8 +4511,8 @@
       "name": {
         "label": "Vaše meno",
         "real": "V miestnosti, v chate a v otázkach sa zobrazujete pod svojím menom.",
-        "pseudonym": "V miestnosti, v chate a v otázkach sa zobrazujete pod pseudonymom. Organizátori vidia údaje z registrácie. Ak súhlasíte s prepisom, v ňom zostáva vaše meno.",
-        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
+        "pseudonym": "V miestnosti, v chate a v otázkach sa zobrazujete pod pseudonymom. Organizátori vidia údaje z registrácie.",
+        "pseudonymTranscript": "Ak súhlasíte s prepisom, zostane v ňom vaše meno."
       },
       "retention": {
         "label": "Uchovávanie",
@@ -4581,12 +4581,12 @@
       "proofGivenOn": "Udelený {date}",
       "proofSuperseded": "Nahradený neskorším súhlasom",
       "proofWithdrawEffect": {
-        "recording": "You also withdraw your consent to transcription: your sentences and your name leave the transcript from captions. What is already in the video stays, and so does a transcript made from the video or the audio tracks: to have them removed, write to the data controller. This withdrawal cannot be undone from this page.",
-        "transcription": "Your sentences and your name leave the transcript from captions. A transcript made from the video or the audio tracks stays: to have it removed, write to the data controller. This withdrawal cannot be undone from this page."
+        "recording": "Odvoláte aj súhlas s prepisom: vaše vety a vaše meno zmiznú z prepisu z titulkov. To, čo už je vo videu, zostáva, rovnako ako prepis vytvorený z videa alebo zo zvukových stôp: ak ich chcete odstrániť, napíšte prevádzkovateľovi osobných údajov. Na tejto stránke odvolanie nemožno vziať späť.",
+        "transcription": "Vaše vety a vaše meno zmiznú z prepisu z titulkov. Prepis vytvorený z videa alebo zo zvukových stôp zostáva: ak ho chcete odstrániť, napíšte prevádzkovateľovi osobných údajov. Na tejto stránke odvolanie nemožno vziať späť."
       },
-      "proofWithdrawHost": "Older transcripts from captions do not recognize hosts: your sentences and your name stay there, and to have them removed you must write to the data controller.",
-      "roomProofsTitle": "Consents given while leading an event",
-      "roomProofsIntro": "The recording and transcription consents you gave when entering the room with a role in the event. The Consents dialog in the room withdraws those of the current entry and, with your staff account, those of earlier entries too; for the others, and once the event is over, what remains is erasing your data.",
+      "proofWithdrawHost": "Staršie prepisy z titulkov nerozpoznávajú moderátorov: vaše vety a vaše meno v nich zostávajú a ak ich chcete odstrániť, musíte napísať prevádzkovateľovi osobných údajov.",
+      "roomProofsTitle": "Súhlasy udelené pri moderovaní podujatia",
+      "roomProofsIntro": "Súhlasy so záznamom a s prepisom, ktoré ste udelili pri vstupe do miestnosti s rolou na podujatí. V okne „Súhlasy“ v miestnosti odvoláte súhlasy z aktuálneho vstupu a so svojím účtom tímu aj súhlasy z predchádzajúcich vstupov; pri ostatných a po skončení podujatia zostáva vymazanie vašich údajov.",
       "addressBookTitle": "Adresár podujatí",
       "addressBookIntro": "Rozhodli ste sa zostať v adresári, aby ste boli pozývaní na podobné podujatia. Tieto údaje uchovávame do {date}, pokiaľ súhlas neodvoláte alebo ho neudelíte znova.",
       "addressBookOptOut": "Odstrániť moje údaje z adresára",
@@ -4596,7 +4596,7 @@
       "addressBookPendingEffect": "Ak potvrdíte, vrátite sa do adresára s menom a organizáciou z tejto registrácie a budete opäť dostávať pozvánky. Ak zrušíte alebo ak ste to neboli vy, zostanete mimo adresára a pozvánky dostávať nebudete.",
       "addressBookPendingConfirm": "Potvrdiť návrat",
       "addressBookPendingCancel": "Zrušiť žiadosť",
-      "addressBookPendingGone": "This request is no longer waiting. Reload the page to see the current state."
+      "addressBookPendingGone": "Táto žiadosť už nečaká na potvrdenie. Znova načítajte stránku, aby ste videli aktuálny stav."
     },
     "erasure": {
       "title": "Vymazanie vašich údajov",
@@ -4610,7 +4610,7 @@
       "linkInvalid": "Odkaz je neplatný alebo jeho platnosť vypršala. Požiadajte o nový odkaz.",
       "confirmWarning": "Chystáte sa natrvalo vymazať osobné údaje spojené s vašou e-mailovou adresou, okrem toho, čo je uvedené nižšie.",
       "confirmBody": "Vymažú sa registrácie, otázky, hlasy v anketách, spätná väzba, pripomienky a váš záznam v adresári podujatí. Táto operácia je nevratná.",
-      "confirmProofs": "Ak má podujatie video alebo prepis, aj keď ešte nie sú zverejnené, zostáva typ súhlasu, dátum a text, na ktorý ste odpovedali, bez vášho mena, kým toto video alebo tento prepis existujú. Slúžia na preukázanie súhlasu. Video sa nemení: ak chcete požiadať o odstránenie svojich príspevkov, napíšte prevádzkovateľovi osobných údajov.",
+      "confirmProofs": "Ak má podujatie video alebo prepis, aj keď ešte nie sú zverejnené, zostáva typ súhlasu, dátum a text, na ktorý ste odpovedali, bez vášho mena, kým toto video alebo tento prepis existujú. Slúžia na preukázanie súhlasu. Video sa nemení: ak chcete požiadať o odstránenie svojich príspevkov, napíšte prevádzkovateľovi osobných údajov. Staršie prepisy z titulkov nerozpoznávajú moderátorov ani osoby, ktoré vystupujú s rolou na podujatí: vaše vety a vaše meno v nich zostávajú a ak ich chcete odstrániť, musíte napísať prevádzkovateľovi osobných údajov.",
       "confirmButton": "Potvrdiť vymazanie",
       "cancel": "Zrušiť",
       "processing": "Prebieha vymazávanie...",
@@ -5998,8 +5998,8 @@
     "recordingWithoutMedia": "Tento záznam nemá video: jeho prepis pochádza zo živých titulkov.",
     "recordingWithoutVideo": "Z tohto záznamu sú zvukové stopy účastníkov, ale nie video: nebolo nahrané alebo ešte neprišlo. Archív na stiahnutie potrebuje aj video.",
     "noParticipantTracks": "Neexistujú samostatné zvukové stopy účastníkov: neboli nahrané alebo už boli vymazané. Ak ich chcete, zapnite pred podujatím nahrávanie po účastníkoch.",
-    "noTranscribableTracks": "No track of this recording can be transcribed: they were deleted, or the people in them did not consent to a transcription with their name.",
-    "tracksPending": "The tracks of this recording have not arrived yet: the transcription will start by itself when they do.",
+    "noTranscribableTracks": "Žiadnu stopu tohto záznamu nemožno prepísať: boli vymazané alebo osoby, ktoré v nich vystupujú, nesúhlasili s prepisom so svojím menom.",
+    "tracksPending": "Stopy tohto záznamu ešte neprišli: prepis sa spustí sám, keď prídu.",
     "summaryMissing": "V tomto jazyku zatiaľ nie je zhrnutie na úpravu: najprv ho vygenerujte.",
     "storageUnavailable": "Nahrávanie súborov nie je v tejto inštalácii dostupné.",
     "aiDisabledForEvent": "AI je pre toto podujatie vypnutá: pomocou „Vygenerovať AI“ ju zapnete a spustíte spracovanie.",

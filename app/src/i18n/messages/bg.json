@@ -681,27 +681,27 @@
       "working": "Обновяване…",
       "error": "Съгласието не можа да бъде обновено: опитайте отново.",
       "textChanged": "Текстът на съгласието се промени, след като отворихте страницата: прочетете новия текст и потвърдете, ако сте съгласни.",
-      "closeNotice": "Close this notice: your consents stay under the button at the top",
+      "closeNotice": "Затворете това известие: съгласията ви остават достъпни от бутона горе",
       "recording": {
         "title": "Запис на събитието",
         "give": "Съгласявам се със записа",
         "without": {
           "soloAscolto": "Без това съгласие само слушате: микрофонът, камерата и екранът остават затворени.",
-          "conduce": "Без това съгласие водите както обикновено, но гласът ви не остава в отделните записи по участник, нито в транскрипцията.",
+          "conduce": "Без това съгласие пак водите.",
           "voce": "Без това съгласие участвате като всички, но оставате извън записа: без име, глас и образ.",
           "comeTutti": "Без това съгласие участвате като всички."
         },
-        "withoutTranscriptHost": "Your voice is not kept in the per-person tracks or in the transcript.",
+        "withoutTranscriptHost": "Гласът ви не остава в отделните записи по участник, нито в транскрипцията.",
         "alreadyRecorded": "Вече записаното остава във видеото на събитието: за премахването му пишете на организаторите.",
         "withdraw": {
-          "soloAscolto": "Ако го оттеглите, оставате в залата само като слушател: микрофонът, камерата и екранът се затварят. Оттегляте и съгласието за транскрипция на изказванията си.",
-          "conduce": "Ако го оттеглите, продължавате да водите, но оттук нататък гласът ви не остава в отделните записи по участник, нито в транскрипцията. Видеото на залата, ако се записва, ви показва въпреки това.",
-          "voce": "Ако го оттеглите, оставате в залата както преди, а оттук нататък сте извън записа. Оттегляте и съгласието за транскрипция на изказванията си.",
-          "avvertenza": "Ако го оттеглите, оставате в залата както преди. Оттегляте и съгласието за транскрипция на изказванията си. Ако ви бъде дадена думата и събитието се записва, гласът ви все пак остава във видеото.",
-          "assente": "Ако го оттеглите, оставате в залата както преди. Оттегляте и съгласието за транскрипция на изказванията си. Оттук нататък гласът ви не се записва в отделна аудиопътека."
+          "soloAscolto": "Ако го оттеглите, оставате в залата само като слушател: микрофонът, камерата и екранът се затварят.",
+          "conduce": "Ако го оттеглите, продължавате да водите. Видеото на залата, ако се записва, ви показва въпреки това.",
+          "voce": "Ако го оттеглите, оставате в залата както преди, а оттук нататък сте извън записа.",
+          "avvertenza": "Ако го оттеглите, оставате в залата както преди. Ако ви бъде дадена думата и събитието се записва, гласът ви все пак остава във видеото.",
+          "assente": "Ако го оттеглите, оставате в залата както преди. Оттук нататък гласът ви не се записва в отделна аудиопътека."
         },
-        "withdrawTranscript": "You also withdraw consent to transcribing your contributions.",
-        "withdrawTranscriptHost": "From now on your voice is not kept in the per-person tracks or in the transcript."
+        "withdrawTranscript": "Оттегляте и съгласието за транскрипция на изказванията си.",
+        "withdrawTranscriptHost": "Оттук нататък гласът ви не остава в отделните записи по участник, нито в транскрипцията."
       },
       "transcription": {
         "title": "Транскрипция на вашите изказвания",
@@ -1046,11 +1046,11 @@
         "recordingDestinationLocked": "След отваряне на залата е възможна единствено промяна към „Само за регистрираните“: съгласията важат за текста, който хората са прочели.",
         "recordingDestinationPublicOnInvitation": "Събитието е само с покана, но записът остава публичен: видеото ще може да се гледа от всеки, не само от поканените.",
         "recordingDestinationReservedOnInvitation": "Събитието е само с покана: записът премина към „Само за регистрираните“. Можете да промените това в раздел „Запис и ИИ“.",
-        "postEventPagePrivateOnInvitation": "The event is invitation-only: the page after the event has moved to private. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPagePublicWithVideo": "The recording is public: the page after the event has moved to public, otherwise nobody could see the video. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPageStaysPrivate": "The event is open to anyone who registers, but the page after the event stayed private: it does not reopen on its own. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPagePrivateVideoHidden": "The recording is public but the page after the event is private: nobody will see the video, not even registrants, while the page stays private.",
-        "recordingNothingToCapture": "This installation has no room video: without the transcript and the per-participant tracks, nothing is recorded.",
+        "postEventPagePrivateOnInvitation": "Събитието е само с покана: страницата след събитието премина към частна. Можете да я промените в раздел „Поверителност, данни и страница след събитието“.",
+        "postEventPagePublicWithVideo": "Записът е публичен: страницата след събитието премина към публична, иначе никой не би могъл да види видеото. Можете да я промените в раздел „Поверителност, данни и страница след събитието“.",
+        "postEventPageStaysPrivate": "Събитието е отворено за всеки, който се регистрира, но страницата след събитието остана частна: тя не се отваря отново сама. Можете да я промените в раздел „Поверителност, данни и страница след събитието“.",
+        "postEventPagePrivateVideoHidden": "Записът е публичен, но страницата след събитието е частна: никой няма да вижда видеото, дори регистрираните, докато страницата остава частна.",
+        "recordingNothingToCapture": "В тази инсталация няма видео на залата: без транскрипцията и отделните аудиопътеки по участник нищо не се записва.",
         "recordingDestinationRequired": "Изберете къде отива записът.",
         "audienceAnonymous": "Анонимна публика",
         "audienceAnonymousDesc": "Участниците се виждат от останалите под псевдоним („Участник“ и код) във видеото, чата и въпросите; списъкът с участници остава за водещите и няма площад. Полезно за големи събития; на общностните хората искат да се опознаят.",
@@ -4077,7 +4077,7 @@
     "timeLabel": "Час",
     "durationLabel": "Продължителност",
     "addressBookNote": "Вие сте в адресната книга на събитията, за да бъдете канени на подобни събития: можете да оттеглите съгласието си по всяко време.",
-    "addressBookPendingNote": "The events address book box was ticked on this registration, but this address had stopped receiving invitations. If the request is yours, you can confirm it from the page with your data, using the link below. If it is not, ignore this message: you stay out of the address book and receive no invitations.",
+    "addressBookPendingNote": "При тази регистрация е отметнато полето за адресната книга на събитията, но този адрес беше спрял да получава покани. Ако заявката е ваша, можете да я потвърдите от страницата с вашите данни чрез връзката по-долу. Ако не е ваша, не обръщайте внимание на това съобщение: оставате извън адресната книга и не получавате покани.",
     "addressBookOptOutLink": "Премахни данните ми от адресната книга",
     "myDataLink": "Вашите данни: преглед, коригиране, оттегляне на съгласие или отмяна на регистрацията"
   },
@@ -4511,8 +4511,8 @@
       "name": {
         "label": "Вашето име",
         "real": "В залата, в чата и във въпросите се показвате със собственото си име.",
-        "pseudonym": "В залата, в чата и във въпросите се показвате с псевдоним. Организаторите виждат данните от регистрацията ви. Ако дадете съгласие за транскрипцията, там остава вашето име.",
-        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
+        "pseudonym": "В залата, в чата и във въпросите се показвате с псевдоним. Организаторите виждат данните от регистрацията ви.",
+        "pseudonymTranscript": "Ако дадете съгласие за транскрипцията, там остава вашето име."
       },
       "retention": {
         "label": "Съхранение",
@@ -4581,12 +4581,12 @@
       "proofGivenOn": "Дадено на {date}",
       "proofSuperseded": "Заменено с последващо съгласие",
       "proofWithdrawEffect": {
-        "recording": "You also withdraw your consent to transcription: your sentences and your name leave the transcript from captions. What is already in the video stays, and so does a transcript made from the video or the audio tracks: to have them removed, write to the data controller. This withdrawal cannot be undone from this page.",
-        "transcription": "Your sentences and your name leave the transcript from captions. A transcript made from the video or the audio tracks stays: to have it removed, write to the data controller. This withdrawal cannot be undone from this page."
+        "recording": "Оттегляте и съгласието за транскрипция: вашите изречения и вашето име излизат от транскрипцията от субтитрите. Вече включеното във видеото остава, както и транскрипция, направена от видеото или от аудиопътеките: за да бъдат премахнати, пишете на администратора на лични данни. Оттеглянето не може да се отмени от тази страница.",
+        "transcription": "Вашите изречения и вашето име излизат от транскрипцията от субтитрите. Транскрипция, направена от видеото или от аудиопътеките, остава: за да бъде премахната, пишете на администратора на лични данни. Оттеглянето не може да се отмени от тази страница."
       },
-      "proofWithdrawHost": "Older transcripts from captions do not recognize hosts: your sentences and your name stay there, and to have them removed you must write to the data controller.",
-      "roomProofsTitle": "Consents given while leading an event",
-      "roomProofsIntro": "The recording and transcription consents you gave when entering the room with a role in the event. The Consents dialog in the room withdraws those of the current entry and, with your staff account, those of earlier entries too; for the others, and once the event is over, what remains is erasing your data.",
+      "proofWithdrawHost": "По-старите транскрипции от субтитрите не разпознават водещите: там вашите изречения и вашето име остават и за да бъдат премахнати, трябва да пишете на администратора на лични данни.",
+      "roomProofsTitle": "Съгласия, дадени при водене на събитие",
+      "roomProofsIntro": "Съгласията за запис и транскрипция, които сте дали при влизане в залата с роля в събитието. От прозореца „Съгласия“ в залата се оттеглят тези от текущото влизане и с вашия акаунт на персонала – и тези от предишни влизания; за останалите, както и след края на събитието, остава изтриването на вашите данни.",
       "addressBookTitle": "Адресна книга на събитията",
       "addressBookIntro": "Избрали сте да останете в адресната книга, за да бъдете канени на подобни събития. Съхраняваме тези данни до {date}, освен ако не оттеглите съгласието си или не дадете ново.",
       "addressBookOptOut": "Премахни данните ми от адресната книга",
@@ -4596,7 +4596,7 @@
       "addressBookPendingEffect": "Ако потвърдите, се връщате в адресната книга с името и организацията от тази регистрация и отново получавате покани. Ако откажете или ако не сте били вие, оставате извън адресната книга и не получавате покани.",
       "addressBookPendingConfirm": "Потвърждаване на връщането",
       "addressBookPendingCancel": "Отказ от заявката",
-      "addressBookPendingGone": "This request is no longer waiting. Reload the page to see the current state."
+      "addressBookPendingGone": "Тази заявка вече не е в изчакване. Презаредете страницата, за да видите актуалното състояние."
     },
     "erasure": {
       "title": "Изтриване на Вашите данни",
@@ -4610,7 +4610,7 @@
       "linkInvalid": "Този линк е невалиден или е изтекъл. Моля, поискайте нов линк.",
       "confirmWarning": "На път сте да изтриете окончателно личните данни, свързани с Вашия имейл адрес, с изключение на посоченото по-долу.",
       "confirmBody": "Ще бъдат изтрити регистрациите, въпросите, гласовете в анкетите, обратната връзка, напомнянията и вашето вписване в адресната книга на събитията. Действието е необратимо.",
-      "confirmProofs": "Ако дадено събитие има видео или транскрипция, дори още да не са публикувани, видът на съгласието, датата и текстът, на който сте отговорили, остават, без вашето име, докато това видео или тази транскрипция съществуват. Те служат за доказване на съгласието. Видеото не се променя: за да поискате премахване на изказванията ви, пишете на администратора на лични данни.",
+      "confirmProofs": "Ако дадено събитие има видео или транскрипция, дори още да не са публикувани, видът на съгласието, датата и текстът, на който сте отговорили, остават, без вашето име, докато това видео или тази транскрипция съществуват. Те служат за доказване на съгласието. Видеото не се променя: за да поискате премахване на изказванията ви, пишете на администратора на лични данни. По-старите транскрипции от субтитрите не разпознават хората, които водят или се изказват с роля в събитието: там вашите изречения и вашето име остават и за да бъдат премахнати, трябва да пишете на администратора на лични данни.",
       "confirmButton": "Потвърждаване на изтриването",
       "cancel": "Отказ",
       "processing": "Изтриване...",
@@ -5998,8 +5998,8 @@
     "recordingWithoutMedia": "Този запис няма видео: транскрипцията му идва от субтитрите на живо.",
     "recordingWithoutVideo": "От този запис има аудиозаписите на участниците, но не и видеото: то не е записано или още не е пристигнало. За архива за изтегляне е нужно и видеото.",
     "noParticipantTracks": "Няма отделни аудиозаписи на участниците: не са записани или вече са изтрити. За да ги има, включете записа по участник преди събитието.",
-    "noTranscribableTracks": "No track of this recording can be transcribed: they were deleted, or the people in them did not consent to a transcription with their name.",
-    "tracksPending": "The tracks of this recording have not arrived yet: the transcription will start by itself when they do.",
+    "noTranscribableTracks": "Нито една аудиопътека от този запис не може да бъде транскрибирана: изтрити са или хората в тях не са дали съгласие за транскрипция с името си.",
+    "tracksPending": "Аудиопътеките на този запис още не са пристигнали: транскрипцията ще започне сама, когато пристигнат.",
     "summaryMissing": "Все още няма обобщение за редактиране на този език: първо го генерирайте.",
     "storageUnavailable": "Качването на файлове не е налично в тази инсталация.",
     "aiDisabledForEvent": "ИИ е изключен за това събитие: използвайте „Генериране с ИИ“, за да го включите и да стартирате обработката.",

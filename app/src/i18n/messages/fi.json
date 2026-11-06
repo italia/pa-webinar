@@ -681,27 +681,27 @@
       "working": "Päivitetään…",
       "error": "Suostumusta ei voitu päivittää: yritä uudelleen.",
       "textChanged": "Suostumuksen teksti muuttui sen jälkeen, kun avasit sivun: lue uusi teksti ja vahvista, jos hyväksyt sen.",
-      "closeNotice": "Close this notice: your consents stay under the button at the top",
+      "closeNotice": "Sulje tämä ilmoitus: suostumuksesi löytyvät edelleen ylhäällä olevasta painikkeesta",
       "recording": {
         "title": "Tapahtuman tallennus",
         "give": "Suostun tallennukseen",
         "without": {
           "soloAscolto": "Ilman tätä suostumusta olet vain kuuntelija: mikrofoni, kamera ja näyttö pysyvät suljettuina.",
-          "conduce": "Ilman tätä suostumusta johdat silti, mutta äänesi ei jää henkilökohtaisille raidoille eikä litteraattiin.",
+          "conduce": "Ilman tätä suostumusta johdat silti.",
           "voce": "Ilman tätä suostumusta osallistut kuten kaikki, mutta jäät tallenteen ulkopuolelle: ei nimeä, ääntä eikä kuvaa.",
           "comeTutti": "Ilman tätä suostumusta osallistut kuten kaikki."
         },
-        "withoutTranscriptHost": "Your voice is not kept in the per-person tracks or in the transcript.",
+        "withoutTranscriptHost": "Ääntäsi ei säilytetä henkilökohtaisilla raidoilla eikä litteroinnissa.",
         "alreadyRecorded": "Jo tallennettu jää tapahtuman videoon: pyydä poistoa järjestäjiltä.",
         "withdraw": {
-          "soloAscolto": "Jos peruutat sen, jäät huoneeseen vain kuuntelijaksi: mikrofoni, kamera ja näyttö suljetaan. Myös suostumuksesi puheenvuorojesi litterointiin peruutetaan.",
-          "conduce": "Jos peruutat sen, jatkat johtamista, mutta tästä lähtien äänesi ei jää henkilökohtaisille raidoille eikä litteraattiin. Huoneen video näyttää sinut silti, jos sitä tallennetaan.",
-          "voce": "Jos peruutat sen, pysyt huoneessa kuten ennen ja olet nyt tallenteen ulkopuolella. Peruutat samalla suostumuksen puheenvuorojesi litterointiin.",
-          "avvertenza": "Jos peruutat sen, pysyt huoneessa kuten ennen. Peruutat samalla suostumuksen puheenvuorojesi litterointiin. Jos saat puheenvuoron ja tapahtuma tallennetaan, äänesi on silti mukana videossa.",
-          "assente": "Jos peruutat sen, pysyt huoneessa kuten ennen. Peruutat samalla suostumuksen puheenvuorojesi litterointiin. Tästä lähtien ääntäsi ei tallenneta omalle raidalleen."
+          "soloAscolto": "Jos peruutat sen, jäät huoneeseen vain kuuntelijaksi: mikrofoni, kamera ja näyttö suljetaan.",
+          "conduce": "Jos peruutat sen, jatkat johtamista. Huoneen video näyttää sinut silti, jos sitä tallennetaan.",
+          "voce": "Jos peruutat sen, pysyt huoneessa kuten ennen ja olet tästä lähtien tallenteen ulkopuolella.",
+          "avvertenza": "Jos peruutat sen, pysyt huoneessa kuten ennen. Jos saat puheenvuoron ja tapahtuma tallennetaan, äänesi on silti mukana videossa.",
+          "assente": "Jos peruutat sen, pysyt huoneessa kuten ennen. Tästä lähtien ääntäsi ei tallenneta omalle raidalleen."
         },
-        "withdrawTranscript": "You also withdraw consent to transcribing your contributions.",
-        "withdrawTranscriptHost": "From now on your voice is not kept in the per-person tracks or in the transcript."
+        "withdrawTranscript": "Peruutat samalla suostumuksen puheenvuorojesi litterointiin.",
+        "withdrawTranscriptHost": "Tästä lähtien ääntäsi ei säilytetä henkilökohtaisilla raidoilla eikä litteroinnissa."
       },
       "transcription": {
         "title": "Puheenvuorojesi litterointi",
@@ -1046,11 +1046,11 @@
         "recordingDestinationLocked": "Huoneen avaamisen jälkeen voi vaihtaa vain valintaan ”Vain ilmoittautuneille”: suostumukset koskevat sitä tekstiä, jonka ihmiset ovat lukeneet.",
         "recordingDestinationPublicOnInvitation": "Tapahtuma on vain kutsutuille, mutta tallenne pysyy julkisena: videon voi katsoa kuka tahansa, ei vain kutsutut.",
         "recordingDestinationReservedOnInvitation": "Tapahtuma on vain kutsutuille: tallenne on vaihdettu valintaan ”Vain ilmoittautuneille”. Voit muuttaa tätä kohdassa ”Tallenne ja tekoäly”.",
-        "postEventPagePrivateOnInvitation": "The event is invitation-only: the page after the event has moved to private. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPagePublicWithVideo": "The recording is public: the page after the event has moved to public, otherwise nobody could see the video. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPageStaysPrivate": "The event is open to anyone who registers, but the page after the event stayed private: it does not reopen on its own. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPagePrivateVideoHidden": "The recording is public but the page after the event is private: nobody will see the video, not even registrants, while the page stays private.",
-        "recordingNothingToCapture": "This installation has no room video: without the transcript and the per-participant tracks, nothing is recorded.",
+        "postEventPagePrivateOnInvitation": "Tapahtuma on vain kutsutuille: tapahtuman jälkeinen sivu on vaihdettu yksityiseksi. Voit muuttaa tätä kohdassa ”Tietosuoja, tiedot ja sivu tapahtuman jälkeen”.",
+        "postEventPagePublicWithVideo": "Tallenne on julkinen: tapahtuman jälkeinen sivu on vaihdettu julkiseksi, muuten kukaan ei näkisi videota. Voit muuttaa tätä kohdassa ”Tietosuoja, tiedot ja sivu tapahtuman jälkeen”.",
+        "postEventPageStaysPrivate": "Tapahtuma on avoin ilmoittautuville, mutta tapahtuman jälkeinen sivu pysyi yksityisenä: se ei avaudu uudelleen itsestään. Voit muuttaa tätä kohdassa ”Tietosuoja, tiedot ja sivu tapahtuman jälkeen”.",
+        "postEventPagePrivateVideoHidden": "Tallenne on julkinen, mutta tapahtuman jälkeinen sivu on yksityinen: kukaan ei näe videota, eivät edes ilmoittautuneet, niin kauan kuin sivu pysyy yksityisenä.",
+        "recordingNothingToCapture": "Tässä asennuksessa ei ole huoneen videota: ilman litterointia ja osallistujakohtaisia raitoja mitään ei tallenneta.",
         "recordingDestinationRequired": "Valitse, mihin tallenne menee.",
         "audienceAnonymous": "Anonyymi yleisö",
         "audienceAnonymousDesc": "Osallistujat näkyvät muille salanimellä (”Osallistuja” ja koodi) videossa, chatissa ja kysymyksissä; osallistujaluettelo jää juontajille, eikä aukiota ole. Hyödyllinen suurissa tapahtumissa; yhteisötapahtumissa halutaan tutustua toisiin.",
@@ -4077,7 +4077,7 @@
     "timeLabel": "Aika",
     "durationLabel": "Kesto",
     "addressBookNote": "Olet tapahtumien osoitekirjassa, jotta sinut voidaan kutsua vastaaviin tapahtumiin: voit peruuttaa suostumuksesi milloin tahansa.",
-    "addressBookPendingNote": "The events address book box was ticked on this registration, but this address had stopped receiving invitations. If the request is yours, you can confirm it from the page with your data, using the link below. If it is not, ignore this message: you stay out of the address book and receive no invitations.",
+    "addressBookPendingNote": "Tässä ilmoittautumisessa valittiin tapahtumien osoitekirjan valintaruutu, mutta tämä osoite oli lakannut saamasta kutsuja. Jos pyyntö on sinun, voit vahvistaa sen tietojesi sivulla alla olevan linkin kautta. Jos se ei ole sinun, jätä tämä viesti huomiotta: pysyt osoitekirjan ulkopuolella etkä saa kutsuja.",
     "addressBookOptOutLink": "Poista tietoni osoitekirjasta",
     "myDataLink": "Tietosi: tarkastele, korjaa, peruuta suostumus tai peru ilmoittautuminen"
   },
@@ -4511,8 +4511,8 @@
       "name": {
         "label": "Nimesi",
         "real": "Huoneessa, chatissa ja kysymyksissä näyt omalla nimelläsi.",
-        "pseudonym": "Huoneessa, chatissa ja kysymyksissä näyt salanimellä. Järjestäjät näkevät ilmoittautumistietosi. Jos annat suostumuksen litterointiin, nimesi jää siihen.",
-        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
+        "pseudonym": "Huoneessa, chatissa ja kysymyksissä näyt salanimellä. Järjestäjät näkevät ilmoittautumistietosi.",
+        "pseudonymTranscript": "Jos annat suostumuksen litterointiin, nimesi jää siihen."
       },
       "retention": {
         "label": "Säilytys",
@@ -4581,12 +4581,12 @@
       "proofGivenOn": "Annettu {date}",
       "proofSuperseded": "Korvattu myöhemmällä suostumuksella",
       "proofWithdrawEffect": {
-        "recording": "You also withdraw your consent to transcription: your sentences and your name leave the transcript from captions. What is already in the video stays, and so does a transcript made from the video or the audio tracks: to have them removed, write to the data controller. This withdrawal cannot be undone from this page.",
-        "transcription": "Your sentences and your name leave the transcript from captions. A transcript made from the video or the audio tracks stays: to have it removed, write to the data controller. This withdrawal cannot be undone from this page."
+        "recording": "Peruutat samalla suostumuksesi litterointiin: lauseesi ja nimesi poistuvat tekstityksistä tehdystä litteroinnista. Se, mikä on jo videossa, säilyy, samoin videosta tai ääniraidoista tehty litterointi: niiden poistamiseksi kirjoita rekisterinpitäjälle. Tätä peruutusta ei voi kumota tällä sivulla.",
+        "transcription": "Lauseesi ja nimesi poistuvat tekstityksistä tehdystä litteroinnista. Videosta tai ääniraidoista tehty litterointi säilyy: sen poistamiseksi kirjoita rekisterinpitäjälle. Tätä peruutusta ei voi kumota tällä sivulla."
       },
-      "proofWithdrawHost": "Older transcripts from captions do not recognize hosts: your sentences and your name stay there, and to have them removed you must write to the data controller.",
-      "roomProofsTitle": "Consents given while leading an event",
-      "roomProofsIntro": "The recording and transcription consents you gave when entering the room with a role in the event. The Consents dialog in the room withdraws those of the current entry and, with your staff account, those of earlier entries too; for the others, and once the event is over, what remains is erasing your data.",
+      "proofWithdrawHost": "Vanhemmat tekstityksistä tehdyt litteroinnit eivät tunnista juontajia: niissä lauseesi ja nimesi säilyvät, ja niiden poistamiseksi sinun on kirjoitettava rekisterinpitäjälle.",
+      "roomProofsTitle": "Tapahtuman juontajana annetut suostumukset",
+      "roomProofsIntro": "Suostumukset tallennukseen ja litterointiin, jotka annoit tullessasi huoneeseen, kun sinulla oli rooli tapahtumassa. Huoneen Suostumukset-ikkunassa peruutetaan nykyisen sisääntulon suostumukset ja henkilökunnan tililläsi myös aiempien sisääntulojen suostumukset; muiden osalta ja tapahtuman päätyttyä jäljelle jää tietojesi poistaminen.",
       "addressBookTitle": "Tapahtumien osoitekirja",
       "addressBookIntro": "Valitsit jäädä osoitekirjaan, jotta sinut voidaan kutsua vastaaviin tapahtumiin. Säilytämme näitä tietoja {date} asti, ellet peruuta suostumusta tai anna uutta suostumusta.",
       "addressBookOptOut": "Poista tietoni osoitekirjasta",
@@ -4596,7 +4596,7 @@
       "addressBookPendingEffect": "Jos vahvistat, palaat osoitekirjaan tämän ilmoittautumisen nimellä ja organisaatiolla ja saat taas kutsuja. Jos peruutat tai jos se et ollut sinä, pysyt osoitekirjan ulkopuolella etkä saa kutsuja.",
       "addressBookPendingConfirm": "Vahvista paluu",
       "addressBookPendingCancel": "Peruuta pyyntö",
-      "addressBookPendingGone": "This request is no longer waiting. Reload the page to see the current state."
+      "addressBookPendingGone": "Tämä pyyntö ei enää odota vahvistusta. Lataa sivu uudelleen nähdäksesi ajantasaisen tilan."
     },
     "erasure": {
       "title": "Tietojesi poistaminen",
@@ -4610,7 +4610,7 @@
       "linkInvalid": "Linkki on virheellinen tai vanhentunut. Pyydä uusi linkki.",
       "confirmWarning": "Olet poistamassa pysyvästi sähköpostiosoitteeseesi liittyvät henkilötiedot alla mainittuja lukuun ottamatta.",
       "confirmBody": "Ilmoittautumiset, kysymykset, kyselyjen äänet, palautteet, muistutukset ja tietosi tapahtumien osoitekirjassa poistetaan. Toimintoa ei voi perua.",
-      "confirmProofs": "Jos tapahtumasta on olemassa video tai litterointi, vaikka sitä ei olisi vielä julkaistu, suostumuksen tyyppi, päivämäärä ja teksti, johon vastasit, säilyvät ilman nimeäsi niin kauan kuin kyseinen video tai litterointi on olemassa. Niillä osoitetaan suostumus. Video ei muutu: jos haluat pyytää puheenvuorojesi poistamista, kirjoita rekisterinpitäjälle.",
+      "confirmProofs": "Jos tapahtumasta on olemassa video tai litterointi, vaikka sitä ei olisi vielä julkaistu, suostumuksen tyyppi, päivämäärä ja teksti, johon vastasit, säilyvät ilman nimeäsi niin kauan kuin kyseinen video tai litterointi on olemassa. Niillä osoitetaan suostumus. Video ei muutu: jos haluat pyytää puheenvuorojesi poistamista, kirjoita rekisterinpitäjälle. Vanhemmat tekstityksistä tehdyt litteroinnit eivät tunnista niitä, jotka juontavat tai puhuvat tapahtumassa jossakin roolissa: niissä lauseesi ja nimesi säilyvät, ja niiden poistamiseksi sinun on kirjoitettava rekisterinpitäjälle.",
       "confirmButton": "Vahvista poisto",
       "cancel": "Peruuta",
       "processing": "Poistetaan...",
@@ -5998,8 +5998,8 @@
     "recordingWithoutMedia": "Tässä tallenteessa ei ole videota: sen litterointi tulee suorista tekstityksistä.",
     "recordingWithoutVideo": "Tästä tallenteesta on osallistujien ääniraidat mutta ei videota: sitä ei tallennettu, tai se ei ole vielä saapunut. Ladattava arkisto tarvitsee myös videon.",
     "noParticipantTracks": "Osallistujista ei ole erillisiä ääniraitoja: niitä ei tallennettu tai ne on jo poistettu. Jos tarvitset niitä, ota osallistujakohtainen tallennus käyttöön ennen tapahtumaa.",
-    "noTranscribableTracks": "No track of this recording can be transcribed: they were deleted, or the people in them did not consent to a transcription with their name.",
-    "tracksPending": "The tracks of this recording have not arrived yet: the transcription will start by itself when they do.",
+    "noTranscribableTracks": "Yhtäkään tämän tallenteen raitaa ei voi litteroida: ne on poistettu, tai niillä esiintyvät henkilöt eivät ole suostuneet litterointiin nimellään.",
+    "tracksPending": "Tämän tallenteen raidat eivät ole vielä saapuneet: litterointi käynnistyy itsestään, kun ne saapuvat.",
     "summaryMissing": "Tällä kielellä ei ole vielä muokattavaa yhteenvetoa: luo se ensin.",
     "storageUnavailable": "Tiedostojen lataaminen ei ole käytettävissä tässä asennuksessa.",
     "aiDisabledForEvent": "Tekoäly on pois päältä tässä tapahtumassa: ota se käyttöön ja käynnistä käsittely painikkeella ”Luo tekoälyllä”.",

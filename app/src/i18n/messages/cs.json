@@ -681,27 +681,27 @@
       "working": "Probíhá aktualizace…",
       "error": "Souhlas se nepodařilo aktualizovat: zkuste to znovu.",
       "textChanged": "Text souhlasu se změnil poté, co jste tuto stránku otevřeli: přečtěte si nové znění a potvrďte ho, pokud souhlasíte.",
-      "closeNotice": "Close this notice: your consents stay under the button at the top",
+      "closeNotice": "Zavřít toto upozornění: vaše souhlasy zůstávají pod tlačítkem nahoře",
       "recording": {
         "title": "Záznam akce",
         "give": "Souhlasím se záznamem",
         "without": {
           "soloAscolto": "Bez tohoto souhlasu jste pouze posluchač: mikrofon, kamera a obrazovka zůstávají zavřené.",
-          "conduce": "Bez tohoto souhlasu moderujete dál, ale váš hlas nezůstane ve stopách jednotlivých osob ani v přepisu.",
+          "conduce": "Bez tohoto souhlasu moderujete dál.",
           "voce": "Bez tohoto souhlasu se účastníte jako všichni, ale zůstáváte mimo záznam: bez jména, hlasu i obrazu.",
           "comeTutti": "Bez tohoto souhlasu se účastníte jako všichni."
         },
-        "withoutTranscriptHost": "Your voice is not kept in the per-person tracks or in the transcript.",
+        "withoutTranscriptHost": "Váš hlas nezůstane ve stopách jednotlivých osob ani v přepisu.",
         "alreadyRecorded": "Co už bylo zaznamenáno, zůstává ve videu akce: o odstranění požádejte pořadatele.",
         "withdraw": {
-          "soloAscolto": "Pokud ho odvoláte, zůstanete v místnosti jen jako posluchač: mikrofon, kamera a obrazovka se zavřou. Odvoláte i souhlas s přepisem svých příspěvků.",
-          "conduce": "Pokud ho odvoláte, moderujete dál, ale od teď váš hlas nezůstane ve stopách jednotlivých osob ani v přepisu. Video místnosti, pokud se nahrává, vás zachytí i tak.",
-          "voce": "Pokud jej odvoláte, zůstanete v místnosti jako dříve a od nynějška jste mimo záznam. Odvoláte i souhlas s přepisem svých příspěvků.",
-          "avvertenza": "Pokud jej odvoláte, zůstanete v místnosti jako dříve. Odvoláte i souhlas s přepisem svých příspěvků. Pokud dostanete slovo a akce se nahrává, váš hlas ve videu přesto zůstane.",
-          "assente": "Pokud jej odvoláte, zůstanete v místnosti jako dříve. Odvoláte i souhlas s přepisem svých příspěvků. Od nynějška se váš hlas nenahrává na samostatnou stopu."
+          "soloAscolto": "Pokud ho odvoláte, zůstanete v místnosti jen jako posluchač: mikrofon, kamera a obrazovka se zavřou.",
+          "conduce": "Pokud ho odvoláte, moderujete dál. Video místnosti, pokud se nahrává, vás zachytí i tak.",
+          "voce": "Pokud ho odvoláte, zůstanete v místnosti jako dříve a od teď jste mimo záznam.",
+          "avvertenza": "Pokud ho odvoláte, zůstanete v místnosti jako dříve. Pokud dostanete slovo a akce se nahrává, váš hlas ve videu přesto zůstane.",
+          "assente": "Pokud ho odvoláte, zůstanete v místnosti jako dříve. Od teď se váš hlas nenahrává na samostatnou stopu."
         },
-        "withdrawTranscript": "You also withdraw consent to transcribing your contributions.",
-        "withdrawTranscriptHost": "From now on your voice is not kept in the per-person tracks or in the transcript."
+        "withdrawTranscript": "Odvoláte i souhlas s přepisem svých příspěvků.",
+        "withdrawTranscriptHost": "Od teď váš hlas nezůstane ve stopách jednotlivých osob ani v přepisu."
       },
       "transcription": {
         "title": "Přepis vašich příspěvků",
@@ -1046,11 +1046,11 @@
         "recordingDestinationLocked": "Po otevření místnosti lze přejít pouze na variantu jen pro registrované: souhlasy platí pro text, který si lidé přečetli.",
         "recordingDestinationPublicOnInvitation": "Akce je jen pro pozvané, ale záznam zůstává veřejný: video bude moci sledovat kdokoli, nejen pozvaní.",
         "recordingDestinationReservedOnInvitation": "Akce je jen pro pozvané: záznam byl přepnut na variantu jen pro registrované. Můžete to změnit v části „Záznam a AI“.",
-        "postEventPagePrivateOnInvitation": "The event is invitation-only: the page after the event has moved to private. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPagePublicWithVideo": "The recording is public: the page after the event has moved to public, otherwise nobody could see the video. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPageStaysPrivate": "The event is open to anyone who registers, but the page after the event stayed private: it does not reopen on its own. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPagePrivateVideoHidden": "The recording is public but the page after the event is private: nobody will see the video, not even registrants, while the page stays private.",
-        "recordingNothingToCapture": "This installation has no room video: without the transcript and the per-participant tracks, nothing is recorded.",
+        "postEventPagePrivateOnInvitation": "Akce je jen pro pozvané: stránka po akci byla přepnuta na soukromou. Můžete to změnit v části „Soukromí, data a stránka po akci“.",
+        "postEventPagePublicWithVideo": "Záznam je veřejný: stránka po akci byla přepnuta na veřejnou, jinak by video nikdo neviděl. Můžete to změnit v části „Soukromí, data a stránka po akci“.",
+        "postEventPageStaysPrivate": "Akce je otevřená všem, kdo se zaregistrují, ale stránka po akci zůstala soukromá: sama se znovu neotevře. Můžete to změnit v části „Soukromí, data a stránka po akci“.",
+        "postEventPagePrivateVideoHidden": "Záznam je veřejný, ale stránka po akci je soukromá: video neuvidí nikdo, ani registrovaní, dokud stránka zůstane soukromá.",
+        "recordingNothingToCapture": "V této instalaci není video místnosti: bez přepisu a stop jednotlivých účastníků se nic nenahrává.",
         "recordingDestinationRequired": "Zvolte, kam záznam půjde.",
         "audienceAnonymous": "Anonymní publikum",
         "audienceAnonymousDesc": "Účastníci se ostatním zobrazují pod pseudonymem („Účastník“ a kód) ve videu, v chatu i v dotazech; seznam účastníků vidí jen moderátoři a náměstí není k dispozici. Hodí se pro velké akce; na komunitních akcích se lidé chtějí poznat.",
@@ -4077,7 +4077,7 @@
     "timeLabel": "Čas",
     "durationLabel": "Délka trvání",
     "addressBookNote": "Jste v adresáři událostí, abyste byli zváni na podobné akce: souhlas můžete kdykoli odvolat.",
-    "addressBookPendingNote": "The events address book box was ticked on this registration, but this address had stopped receiving invitations. If the request is yours, you can confirm it from the page with your data, using the link below. If it is not, ignore this message: you stay out of the address book and receive no invitations.",
+    "addressBookPendingNote": "U této registrace bylo zaškrtnuto políčko adresáře událostí, ale tato adresa přestala dostávat pozvánky. Pokud je žádost vaše, můžete ji potvrdit na stránce se svými údaji pomocí odkazu níže. Pokud vaše není, tuto zprávu ignorujte: zůstanete mimo adresář a pozvánky dostávat nebudete.",
     "addressBookOptOutLink": "Odebrat mé údaje z adresáře",
     "myDataLink": "Vaše údaje: zobrazit, opravit, odvolat souhlas nebo zrušit registraci"
   },
@@ -4511,8 +4511,8 @@
       "name": {
         "label": "Vaše jméno",
         "real": "V místnosti, v chatu a v otázkách se zobrazujete pod svým jménem.",
-        "pseudonym": "V místnosti, v chatu a v otázkách se zobrazujete pod pseudonymem. Pořadatelé vidí údaje z registrace. Pokud souhlasíte s přepisem, vaše jméno v něm zůstane.",
-        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
+        "pseudonym": "V místnosti, v chatu a v otázkách se zobrazujete pod pseudonymem. Pořadatelé vidí údaje z registrace.",
+        "pseudonymTranscript": "Pokud souhlasíte s přepisem, vaše jméno v něm zůstane."
       },
       "retention": {
         "label": "Uchovávání",
@@ -4581,12 +4581,12 @@
       "proofGivenOn": "Udělen {date}",
       "proofSuperseded": "Nahrazen pozdějším souhlasem",
       "proofWithdrawEffect": {
-        "recording": "You also withdraw your consent to transcription: your sentences and your name leave the transcript from captions. What is already in the video stays, and so does a transcript made from the video or the audio tracks: to have them removed, write to the data controller. This withdrawal cannot be undone from this page.",
-        "transcription": "Your sentences and your name leave the transcript from captions. A transcript made from the video or the audio tracks stays: to have it removed, write to the data controller. This withdrawal cannot be undone from this page."
+        "recording": "Odvoláte i souhlas s přepisem: vaše věty a vaše jméno zmizí z přepisu z titulků. Co už je ve videu, zůstává, stejně jako přepis pořízený z videa nebo ze zvukových stop: k jejich odstranění napište správci osobních údajů. Na této stránce odvolání nelze vzít zpět.",
+        "transcription": "Vaše věty a vaše jméno zmizí z přepisu z titulků. Přepis pořízený z videa nebo ze zvukových stop zůstává: k jeho odstranění napište správci osobních údajů. Na této stránce odvolání nelze vzít zpět."
       },
-      "proofWithdrawHost": "Older transcripts from captions do not recognize hosts: your sentences and your name stay there, and to have them removed you must write to the data controller.",
-      "roomProofsTitle": "Consents given while leading an event",
-      "roomProofsIntro": "The recording and transcription consents you gave when entering the room with a role in the event. The Consents dialog in the room withdraws those of the current entry and, with your staff account, those of earlier entries too; for the others, and once the event is over, what remains is erasing your data.",
+      "proofWithdrawHost": "Starší přepisy z titulků nerozpoznávají moderátory: vaše věty a vaše jméno v nich zůstávají a k jejich odstranění musíte napsat správci osobních údajů.",
+      "roomProofsTitle": "Souhlasy udělené při moderování akce",
+      "roomProofsIntro": "Souhlasy se záznamem a s přepisem, které jste udělili při vstupu do místnosti s rolí v akci. V okně „Souhlasy“ v místnosti odvoláte souhlasy z aktuálního vstupu a se svým účtem týmu i souhlasy z předchozích vstupů; u ostatních a po skončení akce zbývá výmaz vašich údajů.",
       "addressBookTitle": "Adresář událostí",
       "addressBookIntro": "Rozhodli jste se zůstat v adresáři, abyste byli zváni na podobné akce. Tyto údaje uchováváme do {date}, pokud souhlas neodvoláte nebo neudělíte nový.",
       "addressBookOptOut": "Odebrat mé údaje z adresáře",
@@ -4596,7 +4596,7 @@
       "addressBookPendingEffect": "Pokud potvrdíte, vrátíte se do adresáře se jménem a organizací z této registrace a budete znovu dostávat pozvánky. Pokud zrušíte nebo pokud jste to nebyli vy, zůstanete mimo adresář a pozvánky dostávat nebudete.",
       "addressBookPendingConfirm": "Potvrdit návrat",
       "addressBookPendingCancel": "Zrušit žádost",
-      "addressBookPendingGone": "This request is no longer waiting. Reload the page to see the current state."
+      "addressBookPendingGone": "Tato žádost už nečeká na potvrzení. Znovu načtěte stránku, abyste viděli aktuální stav."
     },
     "erasure": {
       "title": "Výmaz vašich údajů",
@@ -4610,7 +4610,7 @@
       "linkInvalid": "Tento odkaz je neplatný nebo vypršel. Požádejte o nový odkaz.",
       "confirmWarning": "Chystáte se trvale vymazat osobní údaje spojené s vaší e-mailovou adresou, kromě toho, co je uvedeno níže.",
       "confirmBody": "Budou vymazány registrace, otázky, hlasy v anketách, zpětná vazba, připomenutí a váš záznam v adresáři událostí. Tato operace je nevratná.",
-      "confirmProofs": "Pokud má akce video nebo přepis, i když ještě nejsou zveřejněné, zůstane typ souhlasu, datum a text, na který jste odpověděli, bez vašeho jména, dokud toto video nebo přepis existují. Slouží k prokázání souhlasu. Video se nemění: chcete-li požádat o odstranění svých příspěvků, napište správci osobních údajů.",
+      "confirmProofs": "Pokud má akce video nebo přepis, i když ještě nejsou zveřejněné, zůstane typ souhlasu, datum a text, na který jste odpověděli, bez vašeho jména, dokud toto video nebo přepis existují. Slouží k prokázání souhlasu. Video se nemění: chcete-li požádat o odstranění svých příspěvků, napište správci osobních údajů. Starší přepisy z titulků nerozpoznávají moderátory ani osoby, které vystupují s rolí v akci: vaše věty a vaše jméno v nich zůstávají a k jejich odstranění musíte napsat správci osobních údajů.",
       "confirmButton": "Potvrdit výmaz",
       "cancel": "Zrušit",
       "processing": "Probíhá výmaz...",
@@ -5998,8 +5998,8 @@
     "recordingWithoutMedia": "Tento záznam nemá video: jeho přepis pochází z živých titulků.",
     "recordingWithoutVideo": "Z tohoto záznamu jsou zvukové stopy účastníků, ale ne video: nebylo nahráno, nebo ještě nedorazilo. Archiv ke stažení potřebuje i video.",
     "noParticipantTracks": "Neexistují samostatné zvukové stopy účastníků: nebyly nahrány nebo už byly smazány. Pokud je chcete, zapněte před akcí nahrávání po účastnících.",
-    "noTranscribableTracks": "No track of this recording can be transcribed: they were deleted, or the people in them did not consent to a transcription with their name.",
-    "tracksPending": "The tracks of this recording have not arrived yet: the transcription will start by itself when they do.",
+    "noTranscribableTracks": "Žádnou stopu tohoto záznamu nelze přepsat: byly smazány, nebo osoby, které v nich vystupují, nesouhlasily s přepisem se svým jménem.",
+    "tracksPending": "Stopy tohoto záznamu ještě nedorazily: přepis se spustí sám, jakmile dorazí.",
     "summaryMissing": "V tomto jazyce zatím není shrnutí k úpravě: nejdřív ho vygenerujte.",
     "storageUnavailable": "Nahrávání souborů není v této instalaci k dispozici.",
     "aiDisabledForEvent": "AI je pro tuto akci vypnutá: pomocí „Vygenerovat AI“ ji zapnete a spustíte zpracování.",

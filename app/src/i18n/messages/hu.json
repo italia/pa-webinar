@@ -681,27 +681,27 @@
       "working": "Frissítés folyamatban…",
       "error": "A hozzájárulást nem sikerült frissíteni: próbálja újra.",
       "textChanged": "A hozzájárulás szövege megváltozott az oldal megnyitása óta: olvassa el az újat, és ha egyetért, erősítse meg.",
-      "closeNotice": "Close this notice: your consents stay under the button at the top",
+      "closeNotice": "Értesítés bezárása: hozzájárulásai továbbra is a felső gombbal érhetők el",
       "recording": {
         "title": "Az esemény felvétele",
         "give": "Hozzájárulok a felvételhez",
         "without": {
           "soloAscolto": "E hozzájárulás nélkül csak hallgatóként vesz részt: a mikrofon, a kamera és a képernyő zárva marad.",
-          "conduce": "E hozzájárulás nélkül is vezetheti az eseményt, de a hangja nem marad meg a személyenkénti sávokban és az átiratban.",
+          "conduce": "E hozzájárulás nélkül is vezetheti az eseményt.",
           "voce": "E hozzájárulás nélkül ugyanúgy részt vesz, de kimarad a felvételből: sem a neve, sem a hangja, sem a képe nem szerepel.",
           "comeTutti": "E hozzájárulás nélkül ugyanúgy részt vesz, mint mindenki más."
         },
-        "withoutTranscriptHost": "Your voice is not kept in the per-person tracks or in the transcript.",
+        "withoutTranscriptHost": "A hangja nem marad meg a személyenkénti sávokban és az átiratban.",
         "alreadyRecorded": "Ami már felvételre került, az az esemény videójában marad: az eltávolításért írjon a szervezőknek.",
         "withdraw": {
-          "soloAscolto": "Ha visszavonja, a teremben marad, de csak hallgatóként: a mikrofon, a kamera és a képernyő bezárul. A hozzászólásai átiratához adott hozzájárulását is visszavonja.",
-          "conduce": "Ha visszavonja, tovább vezeti az eseményt, de mostantól a hangja nem marad meg a személyenkénti sávokban és az átiratban. A terem videója, ha készül felvétel, így is mutatja Önt.",
-          "voce": "Ha visszavonja, ugyanúgy a teremben marad, de mostantól kimarad a felvételből. A hozzászólásai átiratához adott hozzájárulást is visszavonja.",
-          "avvertenza": "Ha visszavonja, ugyanúgy a teremben marad. A hozzászólásai átiratához adott hozzájárulást is visszavonja. Ha szót kap, és az eseményt rögzítik, a hangja a videóban így is benne marad.",
-          "assente": "Ha visszavonja, ugyanúgy a teremben marad. A hozzászólásai átiratához adott hozzájárulást is visszavonja. Mostantól a hangját nem rögzítjük külön sávon."
+          "soloAscolto": "Ha visszavonja, a teremben marad, de csak hallgatóként: a mikrofon, a kamera és a képernyő bezárul.",
+          "conduce": "Ha visszavonja, tovább vezeti az eseményt. A terem videója, ha készül felvétel, így is mutatja Önt.",
+          "voce": "Ha visszavonja, ugyanúgy a teremben marad, és mostantól kimarad a felvételből.",
+          "avvertenza": "Ha visszavonja, ugyanúgy a teremben marad. Ha szót kap, és az eseményt rögzítik, a hangja a videóban így is benne marad.",
+          "assente": "Ha visszavonja, ugyanúgy a teremben marad. Mostantól a hangját nem rögzítjük külön sávon."
         },
-        "withdrawTranscript": "You also withdraw consent to transcribing your contributions.",
-        "withdrawTranscriptHost": "From now on your voice is not kept in the per-person tracks or in the transcript."
+        "withdrawTranscript": "A hozzászólásai átiratához adott hozzájárulását is visszavonja.",
+        "withdrawTranscriptHost": "Mostantól a hangja nem marad meg a személyenkénti sávokban és az átiratban."
       },
       "transcription": {
         "title": "A hozzászólásai átirata",
@@ -1046,11 +1046,11 @@
         "recordingDestinationLocked": "A terem megnyitása után a felvétel már csak a „Csak regisztráltaknak” beállításra módosítható: a hozzájárulások arra a szövegre érvényesek, amelyet az emberek elolvastak.",
         "recordingDestinationPublicOnInvitation": "Az esemény csak meghívással látogatható, de a felvétel nyilvános marad: a videót bárki megnézheti, nem csak a meghívottak.",
         "recordingDestinationReservedOnInvitation": "Az esemény csak meghívással látogatható: a felvétel „Csak regisztráltaknak” beállításra váltott. Ezt a „Felvétel és MI” részben módosíthatja.",
-        "postEventPagePrivateOnInvitation": "The event is invitation-only: the page after the event has moved to private. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPagePublicWithVideo": "The recording is public: the page after the event has moved to public, otherwise nobody could see the video. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPageStaysPrivate": "The event is open to anyone who registers, but the page after the event stayed private: it does not reopen on its own. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPagePrivateVideoHidden": "The recording is public but the page after the event is private: nobody will see the video, not even registrants, while the page stays private.",
-        "recordingNothingToCapture": "This installation has no room video: without the transcript and the per-participant tracks, nothing is recorded.",
+        "postEventPagePrivateOnInvitation": "Az esemény csak meghívással látogatható: az esemény utáni oldal privátra váltott. Ezt az „Adatvédelem, adatok és oldal az esemény után” részben módosíthatja.",
+        "postEventPagePublicWithVideo": "A felvétel nyilvános: az esemény utáni oldal nyilvánosra váltott, különben senki sem látná a videót. Ezt az „Adatvédelem, adatok és oldal az esemény után” részben módosíthatja.",
+        "postEventPageStaysPrivate": "Az esemény nyitott a regisztrálók számára, de az esemény utáni oldal privát maradt: nem nyílik meg újra magától. Ezt az „Adatvédelem, adatok és oldal az esemény után” részben módosíthatja.",
+        "postEventPagePrivateVideoHidden": "A felvétel nyilvános, de az esemény utáni oldal privát: a videót senki sem fogja látni, még a regisztráltak sem, amíg az oldal privát marad.",
+        "recordingNothingToCapture": "Ezen a telepítésen nincs videó a teremről: az átirat és a résztvevőnkénti sávok nélkül semmit sem rögzítünk.",
         "recordingDestinationRequired": "Válassza ki, hová kerül a felvétel.",
         "audienceAnonymous": "Névtelen közönség",
         "audienceAnonymousDesc": "A résztvevők másoknak álnéven jelennek meg („Résztvevő” és egy kód) a videóban, a csevegésben és a kérdésekben; a résztvevők listája a moderátoroknál marad, és nincs tér. Nagy eseményekhez hasznos; közösségi eseményeken az emberek meg akarják ismerni egymást.",
@@ -4077,7 +4077,7 @@
     "timeLabel": "Időpont",
     "durationLabel": "Időtartam",
     "addressBookNote": "Ön szerepel az események címjegyzékében, hogy hasonló eseményekre meghívást kapjon: hozzájárulását bármikor visszavonhatja.",
-    "addressBookPendingNote": "The events address book box was ticked on this registration, but this address had stopped receiving invitations. If the request is yours, you can confirm it from the page with your data, using the link below. If it is not, ignore this message: you stay out of the address book and receive no invitations.",
+    "addressBookPendingNote": "Ennél a regisztrációnál bejelölték az események címjegyzékének jelölőnégyzetét, de erre a címre már nem érkeztek meghívók. Ha a kérés az Öné, a saját adatait tartalmazó oldalon erősítheti meg, az alábbi hivatkozással. Ha nem az Öné, hagyja figyelmen kívül ezt az üzenetet: a címjegyzéken kívül marad, és nem kap meghívókat.",
     "addressBookOptOutLink": "Adataim eltávolítása a címjegyzékből",
     "myDataLink": "Az adatai: megtekintés, javítás, hozzájárulás visszavonása vagy a regisztráció törlése"
   },
@@ -4511,8 +4511,8 @@
       "name": {
         "label": "Az Ön neve",
         "real": "A teremben, a csevegésben és a kérdéseknél a saját nevén jelenik meg.",
-        "pseudonym": "A teremben, a csevegésben és a kérdéseknél álnéven jelenik meg. A szervezők látják a regisztrációs adatait. Ha hozzájárul az átirathoz, ott a neve megmarad.",
-        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
+        "pseudonym": "A teremben, a csevegésben és a kérdéseknél álnéven jelenik meg. A szervezők látják a regisztrációs adatait.",
+        "pseudonymTranscript": "Ha hozzájárul az átirathoz, ott a neve megmarad."
       },
       "retention": {
         "label": "Megőrzés",
@@ -4581,12 +4581,12 @@
       "proofGivenOn": "Megadva: {date}",
       "proofSuperseded": "Egy későbbi hozzájárulás váltotta fel",
       "proofWithdrawEffect": {
-        "recording": "You also withdraw your consent to transcription: your sentences and your name leave the transcript from captions. What is already in the video stays, and so does a transcript made from the video or the audio tracks: to have them removed, write to the data controller. This withdrawal cannot be undone from this page.",
-        "transcription": "Your sentences and your name leave the transcript from captions. A transcript made from the video or the audio tracks stays: to have it removed, write to the data controller. This withdrawal cannot be undone from this page."
+        "recording": "Az átirathoz adott hozzájárulását is visszavonja: a mondatai és a neve kikerülnek a feliratokból készült átiratból. Ami már a videóban van, az megmarad, ahogy a videóból vagy a hangsávokból készült átirat is: az eltávolításukhoz írjon az adatkezelőnek. A visszavonást erről az oldalról nem lehet semmissé tenni.",
+        "transcription": "A mondatai és a neve kikerülnek a feliratokból készült átiratból. A videóból vagy a hangsávokból készült átirat megmarad: az eltávolításához írjon az adatkezelőnek. A visszavonást erről az oldalról nem lehet semmissé tenni."
       },
-      "proofWithdrawHost": "Older transcripts from captions do not recognize hosts: your sentences and your name stay there, and to have them removed you must write to the data controller.",
-      "roomProofsTitle": "Consents given while leading an event",
-      "roomProofsIntro": "The recording and transcription consents you gave when entering the room with a role in the event. The Consents dialog in the room withdraws those of the current entry and, with your staff account, those of earlier entries too; for the others, and once the event is over, what remains is erasing your data.",
+      "proofWithdrawHost": "A feliratokból készült régebbi átiratok nem ismerik fel a moderátorokat: ott a mondatai és a neve megmaradnak, és az eltávolításukhoz írnia kell az adatkezelőnek.",
+      "roomProofsTitle": "Egy esemény vezetésekor adott hozzájárulások",
+      "roomProofsIntro": "A felvételhez és az átirathoz adott hozzájárulások, amelyeket akkor adott meg, amikor az eseményben betöltött szerepkörrel lépett be a terembe. A terem „Hozzájárulások” ablakában az aktuális belépés hozzájárulásai vonhatók vissza, munkatársi fiókjával pedig a korábbi belépéseké is; a többi esetében, illetve az esemény befejezése után marad az adatai törlése.",
       "addressBookTitle": "Az események címjegyzéke",
       "addressBookIntro": "Ön úgy döntött, hogy a címjegyzékben marad, hogy hasonló eseményekre meghívást kapjon. Visszavonás vagy új hozzájárulás hiányában ezeket az adatokat a következő napig őrizzük meg: {date}.",
       "addressBookOptOut": "Adataim eltávolítása a címjegyzékből",
@@ -4596,7 +4596,7 @@
       "addressBookPendingEffect": "Ha megerősíti, az ebben a regisztrációban szereplő névvel és szervezettel visszakerül a címjegyzékbe, és ismét kap meghívókat. Ha visszavonja a kérést, vagy ha nem Ön volt, a címjegyzéken kívül marad, és nem kap meghívókat.",
       "addressBookPendingConfirm": "Visszatérés megerősítése",
       "addressBookPendingCancel": "Kérés visszavonása",
-      "addressBookPendingGone": "This request is no longer waiting. Reload the page to see the current state."
+      "addressBookPendingGone": "Ez a kérés már nem vár megerősítésre. Töltse be újra az oldalt a jelenlegi állapot megtekintéséhez."
     },
     "erasure": {
       "title": "Az Ön adatainak törlése",
@@ -4610,7 +4610,7 @@
       "linkInvalid": "A link érvénytelen vagy lejárt. Kérjen új linket.",
       "confirmWarning": "Az e-mail címéhez társított személyes adatok végleges törlésére készül, kivéve az alább felsoroltakat.",
       "confirmBody": "Törlésre kerülnek a regisztrációk, a kérdések, a szavazatok, a visszajelzések, az emlékeztetők és az Ön bejegyzése az események címjegyzékében. A művelet visszavonhatatlan.",
-      "confirmProofs": "Ha egy eseménynek van videója vagy átirata, akkor is, ha még nincs közzétéve, a hozzájárulás típusa, a dátum és a szöveg, amelyre válaszolt, a neve nélkül megmarad, amíg az a videó vagy az az átirat létezik. Ezek a hozzájárulás igazolására szolgálnak. A videó nem változik: ha kérni szeretné a hozzászólásai eltávolítását, írjon az adatkezelőnek.",
+      "confirmProofs": "Ha egy eseménynek van videója vagy átirata, akkor is, ha még nincs közzétéve, a hozzájárulás típusa, a dátum és a szöveg, amelyre válaszolt, a neve nélkül megmarad, amíg az a videó vagy az az átirat létezik. Ezek a hozzájárulás igazolására szolgálnak. A videó nem változik: ha kérni szeretné a hozzászólásai eltávolítását, írjon az adatkezelőnek. A feliratokból készült régebbi átiratok nem ismerik fel azokat, akik az eseményben betöltött szerepkörrel vezetnek vagy szólalnak fel: ott a mondatai és a neve megmaradnak, és az eltávolításukhoz írnia kell az adatkezelőnek.",
       "confirmButton": "Törlés megerősítése",
       "cancel": "Mégse",
       "processing": "Törlés folyamatban...",
@@ -5998,8 +5998,8 @@
     "recordingWithoutMedia": "Ennek a felvételnek nincs videója: az átirata az élő feliratokból származik.",
     "recordingWithoutVideo": "Erről a felvételről megvannak a résztvevők hangsávjai, de a videó nincs: nem rögzítették, vagy még nem érkezett meg. A letölthető archívumhoz a videó is kell.",
     "noParticipantTracks": "Nincsenek külön hangsávok a résztvevőkről: nem rögzítették őket, vagy már törölték. Ha szükség van rájuk, az esemény előtt kapcsolja be a résztvevőnkénti felvételt.",
-    "noTranscribableTracks": "No track of this recording can be transcribed: they were deleted, or the people in them did not consent to a transcription with their name.",
-    "tracksPending": "The tracks of this recording have not arrived yet: the transcription will start by itself when they do.",
+    "noTranscribableTracks": "Ennek a felvételnek egyetlen sávja sem írható át: törölték őket, vagy akik szerepelnek rajtuk, nem járultak hozzá a névvel ellátott átirathoz.",
+    "tracksPending": "Ennek a felvételnek a sávjai még nem érkeztek meg: az átírás magától elindul, amint megérkeznek.",
     "summaryMissing": "Ezen a nyelven még nincs szerkeszthető összefoglaló: előbb hozza létre.",
     "storageUnavailable": "Ebben a telepítésben a fájlfeltöltés nem érhető el.",
     "aiDisabledForEvent": "Az MI ki van kapcsolva ennél az eseménynél: az „AI-tartalom létrehozása” gombbal bekapcsolhatja és elindíthatja a feldolgozást.",

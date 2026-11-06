@@ -681,27 +681,27 @@
       "working": "Á nuashonrú…",
       "error": "Níorbh fhéidir an toiliú a nuashonrú: bain triail eile as.",
       "textChanged": "Athraíodh téacs an toilithe tar éis duit an leathanach a oscailt: léigh an téacs nua agus deimhnigh má aontaíonn tú leis.",
-      "closeNotice": "Close this notice: your consents stay under the button at the top",
+      "closeNotice": "Dún an fógra seo: fanann do thoilithe faoin gcnaipe ag an mbarr",
       "recording": {
         "title": "Taifeadadh na hócáide",
         "give": "Toilím leis an taifeadadh",
         "without": {
           "soloAscolto": "Gan an toiliú seo bíonn tú ag éisteacht amháin: fanann an micreafón, an ceamara agus an scáileán dúnta.",
-          "conduce": "Gan an toiliú seo bíonn tú i gceannas fós, ach ní choinnítear do ghuth sna rianta in aghaidh an duine ná sa tras-scríbhinn.",
+          "conduce": "Gan an toiliú seo bíonn tú i gceannas fós.",
           "voce": "Gan an toiliú seo glacann tú páirt mar a ghlacann gach duine, ach fanann tú lasmuigh den taifeadadh: gan ainm, guth ná íomhá.",
           "comeTutti": "Gan an toiliú seo glacann tú páirt mar a ghlacann gach duine."
         },
-        "withoutTranscriptHost": "Your voice is not kept in the per-person tracks or in the transcript.",
+        "withoutTranscriptHost": "Ní choinnítear do ghuth sna rianta in aghaidh an duine ná sa tras-scríbhinn.",
         "alreadyRecorded": "Fanann a bhfuil taifeadta cheana féin i bhfíseán na hócáide: chun é a bhaint, scríobh chuig na heagraithe.",
         "withdraw": {
-          "soloAscolto": "Má tharraingíonn tú siar é, fanann tú sa seomra ag éisteacht amháin: dúntar an micreafón, an ceamara agus an scáileán. Tarraingítear siar freisin do thoiliú le tras-scríobh a ndeir tú.",
-          "conduce": "Má tharraingíonn tú siar é, leanann tú ort i gceannas, ach as seo amach ní choinnítear do ghuth sna rianta in aghaidh an duine ná sa tras-scríbhinn. Taispeánann físeán an tseomra thú fós, má thaifeadtar é.",
-          "voce": "Má tharraingíonn tú siar é fanann tú sa seomra mar a bhí, agus ón nóiméad seo tá tú lasmuigh den taifeadadh. Tarraingíonn tú siar freisin an toiliú le tras-scríobh do rannchuidithe.",
-          "avvertenza": "Má tharraingíonn tú siar é fanann tú sa seomra mar a bhí. Tarraingíonn tú siar freisin an toiliú le tras-scríobh do rannchuidithe. Má thugtar an t-urlár duit agus má thaifeadtar an ócáid, beidh do ghuth san fhíseán fós.",
-          "assente": "Má tharraingíonn tú siar é fanann tú sa seomra mar a bhí. Tarraingíonn tú siar freisin an toiliú le tras-scríobh do rannchuidithe. Ón nóiméad seo ní thaifeadtar do ghuth ar rian ar leith."
+          "soloAscolto": "Má tharraingíonn tú siar é, fanann tú sa seomra ag éisteacht amháin: dúntar an micreafón, an ceamara agus an scáileán.",
+          "conduce": "Má tharraingíonn tú siar é, leanann tú ort i gceannas. Taispeánann físeán an tseomra thú fós, má thaifeadtar é.",
+          "voce": "Má tharraingíonn tú siar é fanann tú sa seomra mar a bhí, agus ón nóiméad seo tá tú lasmuigh den taifeadadh.",
+          "avvertenza": "Má tharraingíonn tú siar é fanann tú sa seomra mar a bhí. Má thugtar an t-urlár duit agus má thaifeadtar an ócáid, beidh do ghuth san fhíseán fós.",
+          "assente": "Má tharraingíonn tú siar é fanann tú sa seomra mar a bhí. Ón nóiméad seo ní thaifeadtar do ghuth ar rian ar leith."
         },
-        "withdrawTranscript": "You also withdraw consent to transcribing your contributions.",
-        "withdrawTranscriptHost": "From now on your voice is not kept in the per-person tracks or in the transcript."
+        "withdrawTranscript": "Tarraingíonn tú siar freisin an toiliú le tras-scríobh a ndeir tú.",
+        "withdrawTranscriptHost": "As seo amach ní choinnítear do ghuth sna rianta in aghaidh an duine ná sa tras-scríbhinn."
       },
       "transcription": {
         "title": "Tras-scríobh a ndeir tú",
@@ -1046,11 +1046,11 @@
         "recordingDestinationLocked": "Tar éis an seomra a oscailt ní féidir ach aistriú go dtí taifeadadh do dhaoine cláraithe amháin: baineann na toilithe leis an téacs a léigh na daoine.",
         "recordingDestinationPublicOnInvitation": "Is le cuireadh amháin an t-imeacht, ach fanann an taifeadadh poiblí: beidh aon duine in ann féachaint ar an bhfíseán, ní hamháin na daoine le cuireadh.",
         "recordingDestinationReservedOnInvitation": "Is le cuireadh amháin an t-imeacht: athraíodh an taifeadadh go \"Do dhaoine cláraithe amháin\". Is féidir leat é seo a athrú in \"Taifeadadh agus IS\".",
-        "postEventPagePrivateOnInvitation": "The event is invitation-only: the page after the event has moved to private. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPagePublicWithVideo": "The recording is public: the page after the event has moved to public, otherwise nobody could see the video. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPageStaysPrivate": "The event is open to anyone who registers, but the page after the event stayed private: it does not reopen on its own. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPagePrivateVideoHidden": "The recording is public but the page after the event is private: nobody will see the video, not even registrants, while the page stays private.",
-        "recordingNothingToCapture": "This installation has no room video: without the transcript and the per-participant tracks, nothing is recorded.",
+        "postEventPagePrivateOnInvitation": "Is le cuireadh amháin an t-imeacht: athraíodh an leathanach tar éis an imeachta go príobháideach. Is féidir leat é seo a athrú in \"Príobháideachas, sonraí agus an leathanach tar éis an imeachta\".",
+        "postEventPagePublicWithVideo": "Tá an taifeadadh poiblí: athraíodh an leathanach tar éis an imeachta go poiblí, nó ní fheicfeadh aon duine an físeán. Is féidir leat é seo a athrú in \"Príobháideachas, sonraí agus an leathanach tar éis an imeachta\".",
+        "postEventPageStaysPrivate": "Tá an t-imeacht oscailte do dhaoine a chláraíonn, ach d'fhan an leathanach tar éis an imeachta príobháideach: ní osclaíonn sé arís as féin. Is féidir leat é seo a athrú in \"Príobháideachas, sonraí agus an leathanach tar éis an imeachta\".",
+        "postEventPagePrivateVideoHidden": "Tá an taifeadadh poiblí ach tá an leathanach tar éis an imeachta príobháideach: ní fheicfidh aon duine an físeán, ná fiú na daoine cláraithe, fad a fhanann an leathanach príobháideach.",
+        "recordingNothingToCapture": "Níl físeán an tseomra ar an suiteáil seo: gan an tras-scríbhinn agus na rianta in aghaidh an rannpháirtí, ní thaifeadtar aon rud.",
         "recordingDestinationRequired": "Roghnaigh cá dtéann an taifeadadh.",
         "audienceAnonymous": "Lucht féachana gan ainm",
         "audienceAnonymousDesc": "Feictear rannpháirtithe do dhaoine eile faoi ainm cleite (“Rannpháirtí” agus cód) san fhíseán, sa chomhrá agus sna ceisteanna; fanann liosta na rannpháirtithe ag na hóstaigh, agus níl aon chearnóg ann. Úsáideach d’ócáidí móra; ag ócáidí pobail is mian le daoine aithne a chur ar a chéile.",
@@ -4077,7 +4077,7 @@
     "timeLabel": "Am",
     "durationLabel": "Fad",
     "addressBookNote": "Tá tú i leabhar seoltaí na n-imeachtaí, chun cuireadh a fháil chuig imeachtaí comhchosúla: is féidir leat do thoiliú a tharraingt siar am ar bith.",
-    "addressBookPendingNote": "The events address book box was ticked on this registration, but this address had stopped receiving invitations. If the request is yours, you can confirm it from the page with your data, using the link below. If it is not, ignore this message: you stay out of the address book and receive no invitations.",
+    "addressBookPendingNote": "Ticeáladh bosca leabhar seoltaí na n-imeachtaí ar an gclárú seo, ach bhí deireadh curtha ag an seoladh seo le cuirí a fháil. Más tusa a rinne an t-iarratas, is féidir leat é a dheimhniú ar leathanach do shonraí, leis an nasc thíos. Murarbh tusa a rinne é, déan neamhaird den teachtaireacht seo: fanfaidh tú lasmuigh den leabhar seoltaí agus ní bhfaighidh tú cuirí.",
     "addressBookOptOutLink": "Bain mo shonraí den leabhar seoltaí",
     "myDataLink": "Do shonraí: iad a fheiceáil, a cheartú, toiliú a tharraingt siar nó do chlárú a chealú"
   },
@@ -4511,8 +4511,8 @@
       "name": {
         "label": "D'ainm",
         "real": "Sa seomra, sa chomhrá agus sna ceisteanna taispeántar thú faoi d'ainm féin.",
-        "pseudonym": "Sa seomra, sa chomhrá agus sna ceisteanna taispeántar thú faoi ainm cleite. Feiceann na heagraithe do shonraí cláraithe. Má thoilíonn tú leis an tras-scríobh, fanann d'ainm sa tras-scríbhinn.",
-        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
+        "pseudonym": "Sa seomra, sa chomhrá agus sna ceisteanna taispeántar thú faoi ainm cleite. Feiceann na heagraithe do shonraí cláraithe.",
+        "pseudonymTranscript": "Má thoilíonn tú leis an tras-scríobh, fanann d'ainm sa tras-scríbhinn."
       },
       "retention": {
         "label": "Coinneáil",
@@ -4581,12 +4581,12 @@
       "proofGivenOn": "Tugtha ar {date}",
       "proofSuperseded": "Athsholáthraithe ag toiliú níos déanaí",
       "proofWithdrawEffect": {
-        "recording": "You also withdraw your consent to transcription: your sentences and your name leave the transcript from captions. What is already in the video stays, and so does a transcript made from the video or the audio tracks: to have them removed, write to the data controller. This withdrawal cannot be undone from this page.",
-        "transcription": "Your sentences and your name leave the transcript from captions. A transcript made from the video or the audio tracks stays: to have it removed, write to the data controller. This withdrawal cannot be undone from this page."
+        "recording": "Tarraingíonn tú siar do thoiliú leis an tras-scríobh freisin: baintear d'abairtí agus d'ainm as an tras-scríbhinn ó na fotheidil. Fanann a bhfuil san fhíseán cheana, mar aon le tras-scríbhinn a rinneadh ón bhfíseán nó ó na rianta fuaime: chun iad a bhaint, scríobh chuig an rialaitheoir sonraí. Ní féidir an tarraingt siar a chealú ón leathanach seo.",
+        "transcription": "Baintear d'abairtí agus d'ainm as an tras-scríbhinn ó na fotheidil. Fanann tras-scríbhinn a rinneadh ón bhfíseán nó ó na rianta fuaime: chun í a bhaint, scríobh chuig an rialaitheoir sonraí. Ní féidir an tarraingt siar a chealú ón leathanach seo."
       },
-      "proofWithdrawHost": "Older transcripts from captions do not recognize hosts: your sentences and your name stay there, and to have them removed you must write to the data controller.",
-      "roomProofsTitle": "Consents given while leading an event",
-      "roomProofsIntro": "The recording and transcription consents you gave when entering the room with a role in the event. The Consents dialog in the room withdraws those of the current entry and, with your staff account, those of earlier entries too; for the others, and once the event is over, what remains is erasing your data.",
+      "proofWithdrawHost": "Ní aithníonn tras-scríbhinní níos sine ó na fotheidil na hóstaigh: fanann d'abairtí agus d'ainm iontu, agus chun iad a bhaint ní mór duit scríobh chuig an rialaitheoir sonraí.",
+      "roomProofsTitle": "Toilithe a tugadh mar óstach imeachta",
+      "roomProofsIntro": "Na toilithe leis an taifeadadh agus leis an tras-scríobh a thug tú agus tú ag dul isteach sa seomra le ról san imeacht. Ó fhuinneog «Toilithe» an tseomra tarraingítear siar iad siúd den iontráil reatha agus, le do chuntas foirne, iad siúd de na hiontrálacha roimhe seo freisin; maidir leis na cinn eile, agus nuair a bhíonn an t-imeacht thart, is é atá fágtha ná do shonraí a scriosadh.",
       "addressBookTitle": "Leabhar seoltaí na n-imeachtaí",
       "addressBookIntro": "Roghnaigh tú fanacht sa leabhar seoltaí chun cuireadh a fháil chuig imeachtaí comhchosúla. Coinnímid na sonraí seo go dtí {date}, mura dtarraingíonn tú siar do thoiliú nó mura dtugann tú toiliú nua.",
       "addressBookOptOut": "Bain mo shonraí den leabhar seoltaí",
@@ -4596,7 +4596,7 @@
       "addressBookPendingEffect": "Má dheimhníonn tú, fillfidh tú ar an leabhar seoltaí le hainm agus eagraíocht an chláraithe seo agus gheobhaidh tú cuirí arís. Má chuireann tú ar ceal, nó murarbh tusa a rinne é, fanfaidh tú lasmuigh den leabhar seoltaí agus ní bhfaighidh tú cuirí.",
       "addressBookPendingConfirm": "Deimhnigh m'fhilleadh",
       "addressBookPendingCancel": "Cuir an t-iarratas ar ceal",
-      "addressBookPendingGone": "This request is no longer waiting. Reload the page to see the current state."
+      "addressBookPendingGone": "Níl an t-iarratas seo ag feitheamh a thuilleadh. Athlódáil an leathanach chun an staid reatha a fheiceáil."
     },
     "erasure": {
       "title": "Scriosadh bhur gcuid sonraí",
@@ -4610,7 +4610,7 @@
       "linkInvalid": "Tá an nasc neamhbhailí nó imithe in éag. Iarr nasc nua.",
       "confirmWarning": "Tá tú ar tí na sonraí pearsanta a bhaineann le do sheoladh ríomhphoist a scriosadh go buan, seachas a bhfuil luaite thíos.",
       "confirmBody": "Scriosfar clárúcháin, ceisteanna, vótaí pobalbhreithe, aiseolas, meabhrúcháin agus d’iontráil i leabhar seoltaí na n-imeachtaí. Ní féidir an gníomh seo a chealú.",
-      "confirmProofs": "Má tá físeán nó tras-scríbhinn ag imeacht, fiú mura bhfuil sé foilsithe fós, fanann cineál an toilithe, an dáta agus an téacs ar thug tú freagra air, gan d'ainm, fad atá an físeán nó an tras-scríbhinn sin ann. Is chun an toiliú a chruthú atá siad ann. Ní athraíonn an físeán: chun iarraidh go mbainfí do chuid cainte as, scríobh chuig an rialaitheoir sonraí.",
+      "confirmProofs": "Má tá físeán nó tras-scríbhinn ag imeacht, fiú mura bhfuil sé foilsithe fós, fanann cineál an toilithe, an dáta agus an téacs ar thug tú freagra air, gan d'ainm, fad atá an físeán nó an tras-scríbhinn sin ann. Is chun an toiliú a chruthú atá siad ann. Ní athraíonn an físeán: chun iarraidh go mbainfí do chuid cainte as, scríobh chuig an rialaitheoir sonraí. Ní aithníonn tras-scríbhinní níos sine ó na fotheidil daoine a bhíonn ag óstáil nó a labhraíonn le ról san imeacht: fanann d'abairtí agus d'ainm iontu, agus chun iad a bhaint ní mór duit scríobh chuig an rialaitheoir sonraí.",
       "confirmButton": "Deimhnigh an scriosadh",
       "cancel": "Cealaigh",
       "processing": "Á scriosadh...",
@@ -5998,8 +5998,8 @@
     "recordingWithoutMedia": "Níl físeán ag an taifeadadh seo: tagann a thras-scríbhinn ó na fotheidil bheo.",
     "recordingWithoutVideo": "Tá rianta fuaime na rannpháirtithe ann ón taifeadadh seo, ach níl an físeán: níor taifeadadh é, nó níor tháinig sé fós. Teastaíonn an físeán freisin don chartlann íoslódála.",
     "noParticipantTracks": "Níl rianta fuaime ar leith de na rannpháirtithe ann: níor taifeadadh iad nó scriosadh cheana iad. Chun iad a bheith agat, cuir taifeadadh in aghaidh an rannpháirtí ar siúl roimh an ócáid.",
-    "noTranscribableTracks": "No track of this recording can be transcribed: they were deleted, or the people in them did not consent to a transcription with their name.",
-    "tracksPending": "The tracks of this recording have not arrived yet: the transcription will start by itself when they do.",
+    "noTranscribableTracks": "Ní féidir aon rian den taifeadadh seo a thras-scríobh: scriosadh iad, nó níor thoiligh na daoine atá iontu le tras-scríobh faoina n-ainm.",
+    "tracksPending": "Níor tháinig rianta an taifeadta seo fós: tosóidh an tras-scríobh leis féin nuair a thiocfaidh siad.",
     "summaryMissing": "Níl achoimre le cur in eagar sa teanga seo fós: gin í ar dtús.",
     "storageUnavailable": "Níl uaslódáil comhad ar fáil ar an tsuiteáil seo.",
     "aiDisabledForEvent": "Tá IS múchta don ócáid seo: úsáid «Cruthaigh AI» chun é a chur ar siúl agus an phróiseáil a thosú.",

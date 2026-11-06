@@ -681,27 +681,27 @@
       "working": "Atnaujinama…",
       "error": "Sutikimo atnaujinti nepavyko: bandykite dar kartą.",
       "textChanged": "Sutikimo tekstas pasikeitė po to, kai atidarėte šį puslapį: perskaitykite naująjį ir, jei sutinkate, patvirtinkite.",
-      "closeNotice": "Close this notice: your consents stay under the button at the top",
+      "closeNotice": "Uždaryti šį pranešimą: jūsų sutikimai lieka pasiekiami per mygtuką viršuje",
       "recording": {
         "title": "Renginio įrašymas",
         "give": "Sutinku su įrašymu",
         "without": {
           "soloAscolto": "Be šio sutikimo tik klausotės: mikrofonas, kamera ir ekranas lieka uždaryti.",
-          "conduce": "Be šio sutikimo vis tiek vedate, bet jūsų balsas nelieka atskirų asmenų takeliuose ir nuorašuose.",
+          "conduce": "Be šio sutikimo vis tiek vedate.",
           "voce": "Be šio sutikimo dalyvaujate kaip visi, bet į įrašą nepatenkate: nei vardas, nei balsas, nei vaizdas.",
           "comeTutti": "Be šio sutikimo dalyvaujate kaip visi."
         },
-        "withoutTranscriptHost": "Your voice is not kept in the per-person tracks or in the transcript.",
+        "withoutTranscriptHost": "Jūsų balsas nelieka nei atskirų asmenų takeliuose, nei transkripcijoje.",
         "alreadyRecorded": "Tai, kas jau įrašyta, lieka renginio vaizdo įraše: norėdami tai pašalinti, parašykite organizatoriams.",
         "withdraw": {
-          "soloAscolto": "Jei jį atšauksite, liksite salėje tik klausydamiesi: mikrofonas, kamera ir ekranas užsidarys. Atšauksite ir sutikimą transkribuoti jūsų pasisakymus.",
-          "conduce": "Jei jį atšauksite, toliau vesite, bet nuo šiol jūsų balsas neliks atskirų asmenų takeliuose ir nuorašuose. Salės vaizdo įrašas, jei įrašinėjamas, jus vis tiek rodo.",
-          "voce": "Jei atšauksite, liksite kambaryje kaip anksčiau, o nuo dabar į įrašą nepatenkate. Atšaukiate ir sutikimą dėl savo pasisakymų transkripcijos.",
-          "avvertenza": "Jei atšauksite, liksite kambaryje kaip anksčiau. Atšaukiate ir sutikimą dėl savo pasisakymų transkripcijos. Jei jums bus suteiktas žodis ir renginys įrašomas, jūsų balsas vis tiek liks vaizdo įraše.",
-          "assente": "Jei atšauksite, liksite kambaryje kaip anksčiau. Atšaukiate ir sutikimą dėl savo pasisakymų transkripcijos. Nuo dabar jūsų balsas nebus įrašomas atskirame takelyje."
+          "soloAscolto": "Jei jį atšauksite, liksite salėje tik klausydamiesi: mikrofonas, kamera ir ekranas užsidarys.",
+          "conduce": "Jei jį atšauksite, toliau vesite. Salės vaizdo įrašas, jei įrašomas, jus vis tiek rodo.",
+          "voce": "Jei jį atšauksite, liksite salėje kaip anksčiau, o nuo šiol į įrašą nepateksite.",
+          "avvertenza": "Jei jį atšauksite, liksite salėje kaip anksčiau. Jei jums bus suteiktas žodis ir renginys įrašomas, jūsų balsas vis tiek liks vaizdo įraše.",
+          "assente": "Jei jį atšauksite, liksite salėje kaip anksčiau. Nuo šiol jūsų balsas nebus įrašomas atskirame takelyje."
         },
-        "withdrawTranscript": "You also withdraw consent to transcribing your contributions.",
-        "withdrawTranscriptHost": "From now on your voice is not kept in the per-person tracks or in the transcript."
+        "withdrawTranscript": "Atšauksite ir sutikimą transkribuoti jūsų pasisakymus.",
+        "withdrawTranscriptHost": "Nuo šiol jūsų balsas neliks nei atskirų asmenų takeliuose, nei transkripcijoje."
       },
       "transcription": {
         "title": "Jūsų pasisakymų transkripcija",
@@ -1046,11 +1046,11 @@
         "recordingDestinationLocked": "Atidarius salę galima tik pakeisti į „Tik užsiregistravusiems“: sutikimai galioja tam tekstui, kurį žmonės perskaitė.",
         "recordingDestinationPublicOnInvitation": "Renginys tik su kvietimais, tačiau įrašas lieka viešas: vaizdo įrašą galės žiūrėti bet kas, ne tik pakviestieji.",
         "recordingDestinationReservedOnInvitation": "Renginys tik su kvietimais: įrašas perjungtas į „Tik užsiregistravusiems“. Tai galite pakeisti skiltyje „Įrašas ir DI“.",
-        "postEventPagePrivateOnInvitation": "The event is invitation-only: the page after the event has moved to private. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPagePublicWithVideo": "The recording is public: the page after the event has moved to public, otherwise nobody could see the video. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPageStaysPrivate": "The event is open to anyone who registers, but the page after the event stayed private: it does not reopen on its own. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPagePrivateVideoHidden": "The recording is public but the page after the event is private: nobody will see the video, not even registrants, while the page stays private.",
-        "recordingNothingToCapture": "This installation has no room video: without the transcript and the per-participant tracks, nothing is recorded.",
+        "postEventPagePrivateOnInvitation": "Renginys tik su kvietimais: puslapis po renginio perjungtas į privatų. Tai galite pakeisti skiltyje „Privatumas, duomenys ir puslapis po renginio“.",
+        "postEventPagePublicWithVideo": "Įrašas viešas: puslapis po renginio perjungtas į viešą, kitaip vaizdo įrašo niekas negalėtų pamatyti. Tai galite pakeisti skiltyje „Privatumas, duomenys ir puslapis po renginio“.",
+        "postEventPageStaysPrivate": "Renginys atviras visiems, kas registruojasi, tačiau puslapis po renginio liko privatus: savaime jis vėl neatsidaro. Tai galite pakeisti skiltyje „Privatumas, duomenys ir puslapis po renginio“.",
+        "postEventPagePrivateVideoHidden": "Įrašas viešas, bet puslapis po renginio privatus: vaizdo įrašo niekas nepamatys, net užsiregistravusieji, kol puslapis liks privatus.",
+        "recordingNothingToCapture": "Šiame diegime nėra salės vaizdo įrašo: be transkripcijos ir atskirų dalyvių takelių niekas neįrašoma.",
         "recordingDestinationRequired": "Pasirinkite, kam skirtas įrašas.",
         "audienceAnonymous": "Anoniminė auditorija",
         "audienceAnonymousDesc": "Dalyviai kitiems rodomi slapyvardžiu („Dalyvis“ ir kodas) vaizdo įraše, pokalbyje ir klausimuose; dalyvių sąrašas lieka vedėjams, aikštės nėra. Naudinga dideliems renginiams; bendruomenės renginiuose žmonės nori susipažinti.",
@@ -4077,7 +4077,7 @@
     "timeLabel": "Laikas",
     "durationLabel": "Trukmė",
     "addressBookNote": "Esate renginių adresų knygoje, kad būtumėte kviečiami į panašius renginius: sutikimą galite atšaukti bet kada.",
-    "addressBookPendingNote": "The events address book box was ticked on this registration, but this address had stopped receiving invitations. If the request is yours, you can confirm it from the page with your data, using the link below. If it is not, ignore this message: you stay out of the address book and receive no invitations.",
+    "addressBookPendingNote": "Šioje registracijoje buvo pažymėtas renginių adresų knygos langelis, tačiau šis adresas nebegaudavo kvietimų. Jei prašymas jūsų, galite jį patvirtinti savo duomenų puslapyje, pasinaudoję toliau pateikta nuoroda. Jei ne jūsų, nekreipkite dėmesio į šį pranešimą: liksite už adresų knygos ribų ir kvietimų negausite.",
     "addressBookOptOutLink": "Pašalinti mano duomenis iš adresų knygos",
     "myDataLink": "Jūsų duomenys: peržiūrėti, ištaisyti, atšaukti sutikimą arba atšaukti registraciją"
   },
@@ -4511,8 +4511,8 @@
       "name": {
         "label": "Jūsų vardas",
         "real": "Salėje, pokalbyje ir klausimuose rodomas jūsų vardas.",
-        "pseudonym": "Salėje, pokalbyje ir klausimuose rodomas jūsų slapyvardis. Organizatoriai mato jūsų registracijos duomenis. Jei sutinkate su transkripcija, joje lieka jūsų vardas.",
-        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
+        "pseudonym": "Salėje, pokalbyje ir klausimuose rodomas jūsų slapyvardis. Organizatoriai mato jūsų registracijos duomenis.",
+        "pseudonymTranscript": "Jei sutinkate su transkripcija, joje lieka jūsų vardas."
       },
       "retention": {
         "label": "Saugojimas",
@@ -4581,12 +4581,12 @@
       "proofGivenOn": "Duotas {date}",
       "proofSuperseded": "Pakeistas vėlesniu sutikimu",
       "proofWithdrawEffect": {
-        "recording": "You also withdraw your consent to transcription: your sentences and your name leave the transcript from captions. What is already in the video stays, and so does a transcript made from the video or the audio tracks: to have them removed, write to the data controller. This withdrawal cannot be undone from this page.",
-        "transcription": "Your sentences and your name leave the transcript from captions. A transcript made from the video or the audio tracks stays: to have it removed, write to the data controller. This withdrawal cannot be undone from this page."
+        "recording": "Atšaukiate ir sutikimą su transkripcija: jūsų sakiniai ir vardas pašalinami iš subtitrų transkripcijos. Tai, kas jau yra vaizdo įraše, lieka, kaip ir transkripcija, parengta iš vaizdo įrašo ar garso takelių: norėdami tai pašalinti, rašykite duomenų valdytojui. Šiame puslapyje atšaukimo panaikinti negalima.",
+        "transcription": "Jūsų sakiniai ir vardas pašalinami iš subtitrų transkripcijos. Transkripcija, parengta iš vaizdo įrašo ar garso takelių, lieka: norėdami ją pašalinti, rašykite duomenų valdytojui. Šiame puslapyje atšaukimo panaikinti negalima."
       },
-      "proofWithdrawHost": "Older transcripts from captions do not recognize hosts: your sentences and your name stay there, and to have them removed you must write to the data controller.",
-      "roomProofsTitle": "Consents given while leading an event",
-      "roomProofsIntro": "The recording and transcription consents you gave when entering the room with a role in the event. The Consents dialog in the room withdraws those of the current entry and, with your staff account, those of earlier entries too; for the others, and once the event is over, what remains is erasing your data.",
+      "proofWithdrawHost": "Senesnės subtitrų transkripcijos neatpažįsta vedėjų: jose jūsų sakiniai ir vardas lieka, o norėdami juos pašalinti turite rašyti duomenų valdytojui.",
+      "roomProofsTitle": "Sutikimai, duoti vedant renginį",
+      "roomProofsIntro": "Sutikimai su įrašymu ir transkripcija, kuriuos davėte įeidami į salę su vaidmeniu renginyje. Salės lange „Sutikimai“ atšaukiami dabartinio įėjimo sutikimai, o su jūsų darbuotojo paskyra – ir ankstesnių įėjimų sutikimai; dėl kitų sutikimų, taip pat pasibaigus renginiui, lieka jūsų duomenų ištrynimas.",
       "addressBookTitle": "Renginių adresų knyga",
       "addressBookIntro": "Pasirinkote likti adresų knygoje, kad būtumėte kviečiami į panašius renginius. Šiuos duomenis saugome iki {date}, nebent sutikimą atšauksite arba duosite naują.",
       "addressBookOptOut": "Pašalinti mano duomenis iš adresų knygos",
@@ -4596,7 +4596,7 @@
       "addressBookPendingEffect": "Jei patvirtinsite, grįšite į adresų knygą su šios registracijos vardu ir organizacija ir vėl gausite kvietimus. Jei atšauksite arba jei tai buvote ne jūs, liksite už adresų knygos ribų ir kvietimų negausite.",
       "addressBookPendingConfirm": "Patvirtinti grįžimą",
       "addressBookPendingCancel": "Atšaukti prašymą",
-      "addressBookPendingGone": "This request is no longer waiting. Reload the page to see the current state."
+      "addressBookPendingGone": "Šis prašymas nebelaukia patvirtinimo. Įkelkite puslapį iš naujo, kad pamatytumėte dabartinę būseną."
     },
     "erasure": {
       "title": "Jūsų duomenų ištrynimas",
@@ -4610,7 +4610,7 @@
       "linkInvalid": "Nuoroda negalioja arba baigėsi jos galiojimas. Paprašykite naujos nuorodos.",
       "confirmWarning": "Ketinate visam laikui ištrinti su jūsų el. pašto adresu susietus asmens duomenis, išskyrus tai, kas nurodyta toliau.",
       "confirmBody": "Bus ištrintos registracijos, klausimai, balsai apklausose, atsiliepimai, priminimai ir jūsų įrašas renginių adresų knygoje. Šio veiksmo atšaukti negalima.",
-      "confirmProofs": "Jei renginys turi vaizdo įrašą ar transkripciją, net jei jie dar nepaskelbti, sutikimo rūšis, data ir tekstas, į kurį atsakėte, lieka be jūsų vardo, kol tas vaizdo įrašas ar ta transkripcija egzistuoja. Jie reikalingi sutikimui įrodyti. Vaizdo įrašas nesikeičia: norėdami paprašyti pašalinti savo pasisakymus, rašykite duomenų valdytojui.",
+      "confirmProofs": "Jei renginys turi vaizdo įrašą ar transkripciją, net jei jie dar nepaskelbti, sutikimo rūšis, data ir tekstas, į kurį atsakėte, lieka be jūsų vardo, kol tas vaizdo įrašas ar ta transkripcija egzistuoja. Jie reikalingi sutikimui įrodyti. Vaizdo įrašas nesikeičia: norėdami paprašyti pašalinti savo pasisakymus, rašykite duomenų valdytojui. Senesnės subtitrų transkripcijos neatpažįsta asmenų, kurie veda renginį arba jame kalba turėdami vaidmenį: jose jūsų sakiniai ir vardas lieka, o norėdami juos pašalinti turite rašyti duomenų valdytojui.",
       "confirmButton": "Patvirtinti ištrynimą",
       "cancel": "Atšaukti",
       "processing": "Trinama...",
@@ -5998,8 +5998,8 @@
     "recordingWithoutMedia": "Šis įrašas neturi vaizdo: jo transkripcija gaunama iš tiesioginių subtitrų.",
     "recordingWithoutVideo": "Iš šio įrašo yra dalyvių garso takeliai, bet nėra vaizdo įrašo: jis nebuvo įrašytas arba dar neatkeliavo. Atsisiunčiamam archyvui reikia ir vaizdo įrašo.",
     "noParticipantTracks": "Nėra atskirų dalyvių garso takelių: jie nebuvo įrašyti arba jau ištrinti. Kad jie būtų, prieš renginį įjunkite įrašymą kiekvienam dalyviui.",
-    "noTranscribableTracks": "No track of this recording can be transcribed: they were deleted, or the people in them did not consent to a transcription with their name.",
-    "tracksPending": "The tracks of this recording have not arrived yet: the transcription will start by itself when they do.",
+    "noTranscribableTracks": "Nė vieno šio įrašo takelio negalima transkribuoti: jie buvo ištrinti arba juose esantys asmenys nesutiko, kad jų pasisakymai būtų transkribuoti su vardu.",
+    "tracksPending": "Šio įrašo takeliai dar neatkeliavo: transkripcija prasidės savaime, kai jie atkeliaus.",
     "summaryMissing": "Šia kalba dar nėra santraukos, kurią būtų galima redaguoti: pirmiausia ją sukurkite.",
     "storageUnavailable": "Failų įkėlimas šioje diegimo versijoje nepasiekiamas.",
     "aiDisabledForEvent": "DI šiam renginiui išjungtas: naudokite „Generuoti DI“, kad jį įjungtumėte ir pradėtumėte apdorojimą.",

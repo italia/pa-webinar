@@ -681,27 +681,27 @@
       "working": "Notiek atjaunināšana…",
       "error": "Piekrišanu neizdevās atjaunināt: mēģiniet vēlreiz.",
       "textChanged": "Piekrišanas teksts mainījās pēc tam, kad atvērāt šo lapu: izlasiet jauno tekstu un apstipriniet, ja piekrītat.",
-      "closeNotice": "Close this notice: your consents stay under the button at the top",
+      "closeNotice": "Aizvērt šo paziņojumu: jūsu piekrišanas paliek pieejamas ar pogu augšā",
       "recording": {
         "title": "Pasākuma ieraksts",
         "give": "Piekrītu ierakstam",
         "without": {
           "soloAscolto": "Bez šīs piekrišanas jūs tikai klausāties: mikrofons, kamera un ekrāns paliek aizvērti.",
-          "conduce": "Bez šīs piekrišanas jūs tāpat vadāt, bet jūsu balss nepaliek atsevišķo personu celiņos un atšifrējumā.",
+          "conduce": "Bez šīs piekrišanas jūs tāpat vadāt.",
           "voce": "Bez šīs piekrišanas jūs piedalāties kā visi, bet paliekat ārpus ieraksta: ne vārds, ne balss, ne attēls.",
           "comeTutti": "Bez šīs piekrišanas jūs piedalāties kā visi."
         },
-        "withoutTranscriptHost": "Your voice is not kept in the per-person tracks or in the transcript.",
+        "withoutTranscriptHost": "Jūsu balss nepaliek ne atsevišķo personu celiņos, ne atšifrējumā.",
         "alreadyRecorded": "Tas, kas jau ierakstīts, paliek pasākuma video: lai to izņemtu, rakstiet organizatoriem.",
         "withdraw": {
-          "soloAscolto": "Ja to atsaucat, paliekat telpā tikai kā klausītājs: mikrofons, kamera un ekrāns tiek aizvērti. Tiek atsaukta arī piekrišana jūsu runas atšifrēšanai.",
-          "conduce": "Ja to atsaucat, jūs turpināt vadīt, bet turpmāk jūsu balss nepaliek atsevišķo personu celiņos un atšifrējumā. Telpas video, ja tas tiek ierakstīts, jūs tāpat rāda.",
-          "voce": "Ja atsaucat, paliekat telpā kā iepriekš, un no šī brīža esat ārpus ieraksta. Atsaucat arī piekrišanu savu uzstāšanos transkripcijai.",
-          "avvertenza": "Ja atsaucat, paliekat telpā kā iepriekš. Atsaucat arī piekrišanu savu uzstāšanos atšifrēšanai. Ja jums dod vārdu un pasākums tiek ierakstīts, jūsu balss tomēr paliek video.",
-          "assente": "Ja atsaucat, paliekat telpā kā iepriekš. Atsaucat arī piekrišanu savu uzstāšanos atšifrēšanai. No šī brīža jūsu balss netiek ierakstīta atsevišķā celiņā."
+          "soloAscolto": "Ja to atsaucat, paliekat telpā tikai kā klausītājs: mikrofons, kamera un ekrāns tiek aizvērti.",
+          "conduce": "Ja to atsaucat, jūs turpināt vadīt. Telpas video, ja tas tiek ierakstīts, jūs tāpat rāda.",
+          "voce": "Ja to atsaucat, paliekat telpā kā iepriekš, un no šī brīža esat ārpus ieraksta.",
+          "avvertenza": "Ja to atsaucat, paliekat telpā kā iepriekš. Ja jums dod vārdu un pasākums tiek ierakstīts, jūsu balss tomēr paliek video.",
+          "assente": "Ja to atsaucat, paliekat telpā kā iepriekš. No šī brīža jūsu balss netiek ierakstīta atsevišķā celiņā."
         },
-        "withdrawTranscript": "You also withdraw consent to transcribing your contributions.",
-        "withdrawTranscriptHost": "From now on your voice is not kept in the per-person tracks or in the transcript."
+        "withdrawTranscript": "Atsaucat arī piekrišanu savu uzstāšanos atšifrēšanai.",
+        "withdrawTranscriptHost": "Turpmāk jūsu balss nepaliek ne atsevišķo personu celiņos, ne atšifrējumā."
       },
       "transcription": {
         "title": "Jūsu runas atšifrēšana",
@@ -1046,11 +1046,11 @@
         "recordingDestinationLocked": "Pēc telpas atvēršanas var pāriet tikai uz “Tikai reģistrētajiem”: piekrišanas ir spēkā tekstam, ko cilvēki izlasīja.",
         "recordingDestinationPublicOnInvitation": "Pasākums ir tikai ar uzaicinājumu, taču ieraksts paliek publisks: video varēs skatīties ikviens, ne tikai uzaicinātie.",
         "recordingDestinationReservedOnInvitation": "Pasākums ir tikai ar uzaicinājumu: ieraksts ir pārslēgts uz “Tikai reģistrētajiem”. To varat mainīt sadaļā “Ieraksts un MI”.",
-        "postEventPagePrivateOnInvitation": "The event is invitation-only: the page after the event has moved to private. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPagePublicWithVideo": "The recording is public: the page after the event has moved to public, otherwise nobody could see the video. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPageStaysPrivate": "The event is open to anyone who registers, but the page after the event stayed private: it does not reopen on its own. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPagePrivateVideoHidden": "The recording is public but the page after the event is private: nobody will see the video, not even registrants, while the page stays private.",
-        "recordingNothingToCapture": "This installation has no room video: without the transcript and the per-participant tracks, nothing is recorded.",
+        "postEventPagePrivateOnInvitation": "Pasākums ir tikai ar uzaicinājumu: lapa pēc pasākuma ir pārslēgta uz privātu. To varat mainīt sadaļā “Privātums, dati un lapa pēc pasākuma”.",
+        "postEventPagePublicWithVideo": "Ieraksts ir publisks: lapa pēc pasākuma ir pārslēgta uz publisku, citādi video neviens neredzētu. To varat mainīt sadaļā “Privātums, dati un lapa pēc pasākuma”.",
+        "postEventPageStaysPrivate": "Pasākums ir atvērts visiem, kas reģistrējas, taču lapa pēc pasākuma palika privāta: tā pati no jauna neatveras. To varat mainīt sadaļā “Privātums, dati un lapa pēc pasākuma”.",
+        "postEventPagePrivateVideoHidden": "Ieraksts ir publisks, bet lapa pēc pasākuma ir privāta: video neviens neredzēs, pat ne reģistrētie, kamēr lapa paliek privāta.",
+        "recordingNothingToCapture": "Šajā instalācijā nav telpas video: bez atšifrēšanas un atsevišķo dalībnieku celiņiem nekas netiek ierakstīts.",
         "recordingDestinationRequired": "Izvēlieties, kur nonāk ieraksts.",
         "audienceAnonymous": "Anonīma auditorija",
         "audienceAnonymousDesc": "Dalībnieki citiem redzami ar pseidonīmu (“Dalībnieks” un kods) video, tērzēšanā un jautājumos; dalībnieku saraksts paliek vadītājiem, un laukuma nav. Noderīgi lieliem pasākumiem; kopienas pasākumos cilvēki vēlas iepazīties.",
@@ -4077,7 +4077,7 @@
     "timeLabel": "Laiks",
     "durationLabel": "Ilgums",
     "addressBookNote": "Jūs esat pasākumu kontaktu grāmatā, lai jūs aicinātu uz līdzīgiem pasākumiem: piekrišanu varat atsaukt jebkurā laikā.",
-    "addressBookPendingNote": "The events address book box was ticked on this registration, but this address had stopped receiving invitations. If the request is yours, you can confirm it from the page with your data, using the link below. If it is not, ignore this message: you stay out of the address book and receive no invitations.",
+    "addressBookPendingNote": "Šajā reģistrācijā tika atzīmēta pasākumu kontaktu grāmatas izvēles rūtiņa, taču šī adrese vairs nesaņēma ielūgumus. Ja pieprasījums ir jūsu, varat to apstiprināt savu datu lapā, izmantojot zemāk esošo saiti. Ja tas nav jūsu, neņemiet vērā šo ziņojumu: paliekat ārpus kontaktu grāmatas un ielūgumus nesaņemat.",
     "addressBookOptOutLink": "Izņemt manus datus no kontaktu grāmatas",
     "myDataLink": "Jūsu dati: skatīt, labot, atsaukt piekrišanu vai atcelt reģistrāciju"
   },
@@ -4458,7 +4458,7 @@
       "stayInTouchHelp": "Brīvprātīga piekrišana (VDAR 6.1.a pants). To var jebkurā laikā atsaukt ar saiti “Izņemt manus datus no kontaktu grāmatas” apstiprinājuma e-pastā, atgādinājumos un ielūgumos vai lapā “Mani dati”. Vārds, e-pasta adrese un organizācija ir no šīs reģistrācijas.",
       "stayInTouchRetention": "Šos datus glabājam {months} mēnešus no šīs piekrišanas brīža: termiņš sākas no jauna tikai tad, ja atkārtoti atzīmējat izvēles rūtiņu.",
       "recordingOptionalListenOnly": "Ja nepiekrītat, jūs tomēr piedalāties, tikai klausoties: sekojat un rakstāt tērzēšanā, bet mikrofons, kamera un ekrāna kopīgošana paliek izslēgti. Piekrist varat vēlāk, no telpas.",
-      "recordingOptionalHost": "Ja nepiekrītat, jūs tik un tā ieejat un vadāt kā parasti, bet jūsu balss netiek saglabāta personu ierakstos un transkripcijā. Telpas video, ja tas tiek ierakstīts, jūs tik un tā iekļauj.",
+      "recordingOptionalHost": "Ja nepiekrītat, jūs tik un tā ieejat un vadāt kā parasti, bet jūsu balss nepaliek atsevišķo personu celiņos un atšifrējumā. Telpas video, ja tas tiek ierakstīts, jūs tāpat rāda.",
       "recordingOptionalVoice": "Ja nepiekrītat, jūs tomēr piedalāties un varat uzstāties, bet paliekat ārpus ieraksta: ne vārds, ne balss, ne attēls. Piekrist varat vēlāk, no telpas.",
       "recordingNotice": "Pasākums var tikt ierakstīts. Jūs piedalāties bez mikrofona un kameras: ierakstā nav ne jūsu balss, ne attēla, ja vien vadītāji jums nedod vārdu.",
       "recordingNoticeVoice": "Pasākums var tikt ierakstīts. Jūs piedalāties bez mikrofona un kameras: ierakstā nav ne jūsu vārda, ne balss, ne attēla, ja vien jūs nepiekrītat telpā.",
@@ -4511,8 +4511,8 @@
       "name": {
         "label": "Jūsu vārds",
         "real": "Telpā, tērzēšanā un jautājumos jūs parādāties ar savu vārdu.",
-        "pseudonym": "Telpā, tērzēšanā un jautājumos jūs parādāties ar pseidonīmu. Organizatori redz reģistrācijas datus. Ja piekrītat atšifrēšanai, tur paliek jūsu vārds.",
-        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
+        "pseudonym": "Telpā, tērzēšanā un jautājumos jūs parādāties ar pseidonīmu. Organizatori redz reģistrācijas datus.",
+        "pseudonymTranscript": "Ja piekrītat atšifrēšanai, tur paliek jūsu vārds."
       },
       "retention": {
         "label": "Glabāšana",
@@ -4581,12 +4581,12 @@
       "proofGivenOn": "Dota {date}",
       "proofSuperseded": "Aizstāta ar vēlāku piekrišanu",
       "proofWithdrawEffect": {
-        "recording": "You also withdraw your consent to transcription: your sentences and your name leave the transcript from captions. What is already in the video stays, and so does a transcript made from the video or the audio tracks: to have them removed, write to the data controller. This withdrawal cannot be undone from this page.",
-        "transcription": "Your sentences and your name leave the transcript from captions. A transcript made from the video or the audio tracks stays: to have it removed, write to the data controller. This withdrawal cannot be undone from this page."
+        "recording": "Atsaucat arī piekrišanu atšifrēšanai: jūsu teikumi un vārds tiek izņemti no subtitru atšifrējuma. Tas, kas jau ir video, paliek, tāpat kā atšifrējums, kas izveidots no video vai audio celiņiem: lai tos izņemtu, rakstiet datu pārzinim. Šajā lapā atsaukumu nevar atcelt.",
+        "transcription": "Jūsu teikumi un vārds tiek izņemti no subtitru atšifrējuma. Atšifrējums, kas izveidots no video vai audio celiņiem, paliek: lai to izņemtu, rakstiet datu pārzinim. Šajā lapā atsaukumu nevar atcelt."
       },
-      "proofWithdrawHost": "Older transcripts from captions do not recognize hosts: your sentences and your name stay there, and to have them removed you must write to the data controller.",
-      "roomProofsTitle": "Consents given while leading an event",
-      "roomProofsIntro": "The recording and transcription consents you gave when entering the room with a role in the event. The Consents dialog in the room withdraws those of the current entry and, with your staff account, those of earlier entries too; for the others, and once the event is over, what remains is erasing your data.",
+      "proofWithdrawHost": "Senāki subtitru atšifrējumi neatpazīst vadītājus: tajos jūsu teikumi un vārds paliek, un, lai tos izņemtu, jums jāraksta datu pārzinim.",
+      "roomProofsTitle": "Piekrišanas, kas dotas, vadot pasākumu",
+      "roomProofsIntro": "Piekrišanas ierakstīšanai un atšifrēšanai, ko devāt, ienākot telpā ar lomu pasākumā. Telpas logā “Piekrišanas” var atsaukt pašreizējās ienākšanas piekrišanas un ar jūsu darbinieka kontu arī iepriekšējo ienākšanu piekrišanas; pārējām, kā arī pēc pasākuma beigām, atliek jūsu datu dzēšana.",
       "addressBookTitle": "Pasākumu kontaktu grāmata",
       "addressBookIntro": "Jūs izvēlējāties palikt kontaktu grāmatā, lai jūs aicinātu uz līdzīgiem pasākumiem. Šos datus glabājam līdz {date}, ja vien neatsaucat piekrišanu vai nedodat jaunu.",
       "addressBookOptOut": "Izņemt manus datus no kontaktu grāmatas",
@@ -4596,7 +4596,7 @@
       "addressBookPendingEffect": "Ja apstiprināsiet, atgriezīsieties kontaktu grāmatā ar šīs reģistrācijas vārdu un organizāciju un atkal saņemsiet ielūgumus. Ja atcelsiet vai ja tas nebijāt jūs, paliksiet ārpus kontaktu grāmatas un ielūgumus nesaņemsiet.",
       "addressBookPendingConfirm": "Apstiprināt atgriešanos",
       "addressBookPendingCancel": "Atcelt pieprasījumu",
-      "addressBookPendingGone": "This request is no longer waiting. Reload the page to see the current state."
+      "addressBookPendingGone": "Šis pieprasījums vairs negaida apstiprinājumu. Pārlādējiet lapu, lai redzētu aktuālo stāvokli."
     },
     "erasure": {
       "title": "Jūsu datu dzēšana",
@@ -4610,7 +4610,7 @@
       "linkInvalid": "Saite nav derīga vai tai ir beidzies derīguma termiņš. Pieprasiet jaunu saiti.",
       "confirmWarning": "Jūs grasāties neatgriezeniski dzēst ar jūsu e-pasta adresi saistītos personas datus, izņemot to, kas norādīts zemāk.",
       "confirmBody": "Tiks dzēstas reģistrācijas, jautājumi, balsojumi aptaujās, atsauksmes, atgādinājumi un jūsu ieraksts pasākumu kontaktu grāmatā. Darbība ir neatgriezeniska.",
-      "confirmProofs": "Ja pasākumam ir video vai atšifrējums, pat ja tas vēl nav publicēts, piekrišanas veids, datums un teksts, uz kuru atbildējāt, paliek bez jūsu vārda, kamēr šis video vai atšifrējums pastāv. Tie kalpo piekrišanas pierādīšanai. Video nemainās: lai lūgtu izņemt savas uzstāšanās, rakstiet datu pārzinim.",
+      "confirmProofs": "Ja pasākumam ir video vai atšifrējums, pat ja tas vēl nav publicēts, piekrišanas veids, datums un teksts, uz kuru atbildējāt, paliek bez jūsu vārda, kamēr šis video vai atšifrējums pastāv. Tie kalpo piekrišanas pierādīšanai. Video nemainās: lai lūgtu izņemt savas uzstāšanās, rakstiet datu pārzinim. Senāki subtitru atšifrējumi neatpazīst tos, kas vada vai uzstājas ar lomu pasākumā: tajos jūsu teikumi un vārds paliek, un, lai tos izņemtu, jums jāraksta datu pārzinim.",
       "confirmButton": "Apstiprināt dzēšanu",
       "cancel": "Atcelt",
       "processing": "Notiek dzēšana...",
@@ -5998,8 +5998,8 @@
     "recordingWithoutMedia": "Šim ierakstam nav video: tā transkripcija nāk no tiešraides subtitriem.",
     "recordingWithoutVideo": "No šī ieraksta ir dalībnieku audio celiņi, bet nav video: tas netika ierakstīts vai vēl nav pienācis. Lejupielādējamajam arhīvam vajag arī video.",
     "noParticipantTracks": "Nav atsevišķu dalībnieku audio ierakstu: tie netika ierakstīti vai jau ir izdzēsti. Lai tie būtu, pirms pasākuma ieslēdziet ierakstīšanu katram dalībniekam.",
-    "noTranscribableTracks": "No track of this recording can be transcribed: they were deleted, or the people in them did not consent to a transcription with their name.",
-    "tracksPending": "The tracks of this recording have not arrived yet: the transcription will start by itself when they do.",
+    "noTranscribableTracks": "Nevienu šī ieraksta celiņu nevar atšifrēt: tie ir izdzēsti, vai arī tajos esošās personas nav piekritušas atšifrēšanai ar savu vārdu.",
+    "tracksPending": "Šī ieraksta celiņi vēl nav pienākuši: atšifrēšana sāksies pati, kad tie pienāks.",
     "summaryMissing": "Šajā valodā vēl nav kopsavilkuma, ko rediģēt: vispirms to izveidojiet.",
     "storageUnavailable": "Failu augšupielāde šajā instalācijā nav pieejama.",
     "aiDisabledForEvent": "MI šim pasākumam ir izslēgts: izmantojiet “Ģenerēt MI”, lai to ieslēgtu un sāktu apstrādi.",

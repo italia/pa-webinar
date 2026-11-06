@@ -681,27 +681,27 @@
       "working": "Posodabljanje…",
       "error": "Privolitve ni bilo mogoče posodobiti: poskusite znova.",
       "textChanged": "Besedilo privolitve se je spremenilo, potem ko ste odprli stran: preberite novo besedilo in potrdite, če se strinjate.",
-      "closeNotice": "Close this notice: your consents stay under the button at the top",
+      "closeNotice": "Zapri to obvestilo: vaše privolitve ostanejo pod gumbom na vrhu",
       "recording": {
         "title": "Snemanje dogodka",
         "give": "Privolim v snemanje",
         "without": {
           "soloAscolto": "Brez te privolitve samo poslušate: mikrofon, kamera in zaslon ostanejo zaprti.",
-          "conduce": "Brez te privolitve vseeno vodite, vendar vaš glas ne ostane v posameznih sledeh niti v prepisu.",
+          "conduce": "Brez te privolitve vseeno vodite.",
           "voce": "Brez te privolitve sodelujete kot vsi, a ostanete zunaj posnetka: ne ime, ne glas, ne slika.",
           "comeTutti": "Brez te privolitve sodelujete kot vsi."
         },
-        "withoutTranscriptHost": "Your voice is not kept in the per-person tracks or in the transcript.",
+        "withoutTranscriptHost": "Vaš glas ne ostane v sledeh po osebah niti v prepisu.",
         "alreadyRecorded": "Kar je že posneto, ostane v videu dogodka: za odstranitev pišite organizatorjem.",
         "withdraw": {
-          "soloAscolto": "Če jo prekličete, ostanete v dvorani in samo poslušate: mikrofon, kamera in zaslon se zaprejo. Prekličete tudi privolitev v prepis svojih govorov.",
-          "conduce": "Če jo prekličete, vodite naprej, vendar od zdaj vaš glas ne ostane v posameznih sledeh niti v prepisu. Video dvorane, če se snema, vas vseeno prikazuje.",
-          "voce": "Če jo prekličete, ostanete v sobi kot prej, od zdaj pa ste zunaj posnetka. Prekličete tudi privolitev v prepis svojih prispevkov.",
-          "avvertenza": "Če jo prekličete, ostanete v sobi kot prej. Prekličete tudi privolitev v prepis svojih prispevkov. Če dobite besedo in se dogodek snema, vaš glas kljub temu ostane v videoposnetku.",
-          "assente": "Če jo prekličete, ostanete v sobi kot prej. Prekličete tudi privolitev v prepis svojih prispevkov. Od zdaj se vaš glas ne snema na ločeno sled."
+          "soloAscolto": "Če jo prekličete, ostanete v dvorani in samo poslušate: mikrofon, kamera in zaslon se zaprejo.",
+          "conduce": "Če jo prekličete, vodite naprej. Video dvorane, če se snema, vas vseeno prikazuje.",
+          "voce": "Če jo prekličete, ostanete v dvorani kot prej, od zdaj pa ste zunaj posnetka.",
+          "avvertenza": "Če jo prekličete, ostanete v dvorani kot prej. Če dobite besedo in se dogodek snema, vaš glas kljub temu ostane v videoposnetku.",
+          "assente": "Če jo prekličete, ostanete v dvorani kot prej. Od zdaj se vaš glas ne snema na ločeno sled."
         },
-        "withdrawTranscript": "You also withdraw consent to transcribing your contributions.",
-        "withdrawTranscriptHost": "From now on your voice is not kept in the per-person tracks or in the transcript."
+        "withdrawTranscript": "Prekličete tudi privolitev v prepis svojih prispevkov.",
+        "withdrawTranscriptHost": "Od zdaj vaš glas ne ostane v sledeh po osebah niti v prepisu."
       },
       "transcription": {
         "title": "Prepis vaših govorov",
@@ -1046,11 +1046,11 @@
         "recordingDestinationLocked": "Po odprtju dvorane je posnetek mogoče spremeniti le v posnetek samo za prijavljene: privolitve veljajo za besedilo, ki so ga osebe prebrale.",
         "recordingDestinationPublicOnInvitation": "Dogodek je samo za povabljene, vendar posnetek ostane javen: video si bo lahko ogledal kdor koli, ne le povabljeni.",
         "recordingDestinationReservedOnInvitation": "Dogodek je samo za povabljene: posnetek je bil spremenjen v posnetek samo za prijavljene. To lahko spremenite v razdelku »Snemanje in UI«.",
-        "postEventPagePrivateOnInvitation": "The event is invitation-only: the page after the event has moved to private. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPagePublicWithVideo": "The recording is public: the page after the event has moved to public, otherwise nobody could see the video. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPageStaysPrivate": "The event is open to anyone who registers, but the page after the event stayed private: it does not reopen on its own. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPagePrivateVideoHidden": "The recording is public but the page after the event is private: nobody will see the video, not even registrants, while the page stays private.",
-        "recordingNothingToCapture": "This installation has no room video: without the transcript and the per-participant tracks, nothing is recorded.",
+        "postEventPagePrivateOnInvitation": "Dogodek je samo za povabljene: stran po dogodku je bila spremenjena v zasebno. To lahko spremenite v razdelku »Zasebnost, podatki in stran po dogodku«.",
+        "postEventPagePublicWithVideo": "Posnetek je javen: stran po dogodku je bila spremenjena v javno, sicer videa ne bi videl nihče. To lahko spremenite v razdelku »Zasebnost, podatki in stran po dogodku«.",
+        "postEventPageStaysPrivate": "Dogodek je odprt za vse, ki se prijavijo, vendar je stran po dogodku ostala zasebna: sama se ne odpre znova. To lahko spremenite v razdelku »Zasebnost, podatki in stran po dogodku«.",
+        "postEventPagePrivateVideoHidden": "Posnetek je javen, vendar je stran po dogodku zasebna: videa ne bo videl nihče, niti prijavljeni, dokler stran ostane zasebna.",
+        "recordingNothingToCapture": "V tej namestitvi ni videa dvorane: brez prepisa in sledi posameznih udeležencev se nič ne posname.",
         "recordingDestinationRequired": "Izberite, komu je posnetek namenjen.",
         "audienceAnonymous": "Anonimno občinstvo",
         "audienceAnonymousDesc": "Udeleženci so drugim vidni pod psevdonimom (»Udeleženec« in koda) v videu, klepetu in vprašanjih; seznam udeležencev ostane voditeljem, trga ni. Uporabno za velike dogodke; na dogodkih skupnosti se ljudje želijo spoznati.",
@@ -4077,7 +4077,7 @@
     "timeLabel": "Ura",
     "durationLabel": "Trajanje",
     "addressBookNote": "Ste v imeniku dogodkov, da bi vas lahko povabili na podobne dogodke: privolitev lahko kadar koli prekličete.",
-    "addressBookPendingNote": "The events address book box was ticked on this registration, but this address had stopped receiving invitations. If the request is yours, you can confirm it from the page with your data, using the link below. If it is not, ignore this message: you stay out of the address book and receive no invitations.",
+    "addressBookPendingNote": "Pri tej prijavi je bilo označeno polje za imenik dogodkov, vendar ta naslov ni več prejemal povabil. Če je zahteva vaša, jo lahko potrdite na strani s svojimi podatki prek spodnje povezave. Če ni vaša, prezrite to sporočilo: ostanete zunaj imenika in ne prejemate povabil.",
     "addressBookOptOutLink": "Odstrani moje podatke iz imenika",
     "myDataLink": "Vaši podatki: ogled, popravek, preklic privolitve ali preklic prijave"
   },
@@ -4511,8 +4511,8 @@
       "name": {
         "label": "Vaše ime",
         "real": "V dvorani, klepetu in vprašanjih ste prikazani s svojim imenom.",
-        "pseudonym": "V dvorani, klepetu in vprašanjih ste prikazani pod psevdonimom. Organizatorji vidijo podatke o prijavi. Če privolite v prepis, tam ostane vaše ime.",
-        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
+        "pseudonym": "V dvorani, klepetu in vprašanjih ste prikazani pod psevdonimom. Organizatorji vidijo podatke o prijavi.",
+        "pseudonymTranscript": "Če privolite v prepis, tam ostane vaše ime."
       },
       "retention": {
         "label": "Hramba",
@@ -4581,12 +4581,12 @@
       "proofGivenOn": "Dana {date}",
       "proofSuperseded": "Zamenjana s poznejšo privolitvijo",
       "proofWithdrawEffect": {
-        "recording": "You also withdraw your consent to transcription: your sentences and your name leave the transcript from captions. What is already in the video stays, and so does a transcript made from the video or the audio tracks: to have them removed, write to the data controller. This withdrawal cannot be undone from this page.",
-        "transcription": "Your sentences and your name leave the transcript from captions. A transcript made from the video or the audio tracks stays: to have it removed, write to the data controller. This withdrawal cannot be undone from this page."
+        "recording": "Prekličete tudi privolitev v prepis: vaši stavki in vaše ime izginejo iz prepisa iz podnapisov. Kar je že v videu, ostane, prav tako prepis, izdelan iz videa ali zvočnih sledi: za njihovo odstranitev pišite upravljavcu podatkov. S te strani preklica ni mogoče razveljaviti.",
+        "transcription": "Vaši stavki in vaše ime izginejo iz prepisa iz podnapisov. Prepis, izdelan iz videa ali zvočnih sledi, ostane: za njegovo odstranitev pišite upravljavcu podatkov. S te strani preklica ni mogoče razveljaviti."
       },
-      "proofWithdrawHost": "Older transcripts from captions do not recognize hosts: your sentences and your name stay there, and to have them removed you must write to the data controller.",
-      "roomProofsTitle": "Consents given while leading an event",
-      "roomProofsIntro": "The recording and transcription consents you gave when entering the room with a role in the event. The Consents dialog in the room withdraws those of the current entry and, with your staff account, those of earlier entries too; for the others, and once the event is over, what remains is erasing your data.",
+      "proofWithdrawHost": "Starejši prepisi iz podnapisov ne prepoznajo voditeljev: vaši stavki in vaše ime tam ostanejo, za njihovo odstranitev pa morate pisati upravljavcu podatkov.",
+      "roomProofsTitle": "Privolitve, dane pri vodenju dogodka",
+      "roomProofsIntro": "Privolitve v snemanje in prepis, ki ste jih dali ob vstopu v dvorano z vlogo na dogodku. V oknu »Privolitve« v dvorani prekličete privolitve iz trenutnega vstopa, s svojim računom osebja pa tudi tiste iz prejšnjih vstopov; za druge in po koncu dogodka ostane izbris vaših podatkov.",
       "addressBookTitle": "Imenik dogodkov",
       "addressBookIntro": "Izbrali ste, da ostanete v imeniku, da bi vas lahko povabili na podobne dogodke. Te podatke hranimo do {date}, razen v primeru preklica ali nove privolitve.",
       "addressBookOptOut": "Odstrani moje podatke iz imenika",
@@ -4596,7 +4596,7 @@
       "addressBookPendingEffect": "Če potrdite, se vrnete v imenik z imenom in organizacijo iz te prijave in znova prejemate povabila. Če prekličete ali če to niste bili vi, ostanete zunaj imenika in ne prejemate povabil.",
       "addressBookPendingConfirm": "Potrdi vrnitev",
       "addressBookPendingCancel": "Prekliči zahtevo",
-      "addressBookPendingGone": "This request is no longer waiting. Reload the page to see the current state."
+      "addressBookPendingGone": "Ta zahteva ne čaka več na potrditev. Znova naložite stran, da vidite trenutno stanje."
     },
     "erasure": {
       "title": "Izbris vaših podatkov",
@@ -4610,7 +4610,7 @@
       "linkInvalid": "Povezava ni veljavna ali je potekla. Zahtevajte novo povezavo.",
       "confirmWarning": "Dokončno boste izbrisali osebne podatke, povezane z vašim e-poštnim naslovom, razen tistega, kar je navedeno spodaj.",
       "confirmBody": "Izbrisani bodo prijave, vprašanja, glasovi v anketah, povratne informacije, opomniki in vaš vnos v imeniku dogodkov. Postopka ni mogoče razveljaviti.",
-      "confirmProofs": "Če ima dogodek video ali prepis, tudi če še nista objavljena, ostanejo vrsta privolitve, datum in besedilo, na katero ste odgovorili, brez vašega imena, dokler ta video ali prepis obstaja. Služijo kot dokazilo o privolitvi. Video se ne spremeni: če želite zahtevati odstranitev svojih prispevkov, pišite upravljavcu podatkov.",
+      "confirmProofs": "Če ima dogodek video ali prepis, tudi če še nista objavljena, ostanejo vrsta privolitve, datum in besedilo, na katero ste odgovorili, brez vašega imena, dokler ta video ali prepis obstaja. Služijo kot dokazilo o privolitvi. Video se ne spremeni: če želite zahtevati odstranitev svojih prispevkov, pišite upravljavcu podatkov. Starejši prepisi iz podnapisov ne prepoznajo voditeljev niti oseb, ki nastopajo z vlogo na dogodku: vaši stavki in vaše ime tam ostanejo, za njihovo odstranitev pa morate pisati upravljavcu podatkov.",
       "confirmButton": "Potrdi izbris",
       "cancel": "Prekliči",
       "processing": "Brisanje poteka...",
@@ -5998,8 +5998,8 @@
     "recordingWithoutMedia": "Ta posnetek nima videa: njegov prepis izhaja iz podnapisov v živo.",
     "recordingWithoutVideo": "Iz tega posnetka so zvočne sledi udeležencev, videa pa ni: ni bil posnet ali še ni prispel. Arhiv za prenos potrebuje tudi video.",
     "noParticipantTracks": "Ni ločenih zvočnih sledi udeležencev: niso bile posnete ali so že izbrisane. Če jih želite, pred dogodkom vklopite snemanje po udeležencih.",
-    "noTranscribableTracks": "No track of this recording can be transcribed: they were deleted, or the people in them did not consent to a transcription with their name.",
-    "tracksPending": "The tracks of this recording have not arrived yet: the transcription will start by itself when they do.",
+    "noTranscribableTracks": "Nobene sledi tega posnetka ni mogoče prepisati: izbrisane so bile ali pa osebe, ki se v njih pojavljajo, niso privolile v prepis s svojim imenom.",
+    "tracksPending": "Sledi tega posnetka še niso prispele: prepis se bo začel sam, ko prispejo.",
     "summaryMissing": "V tem jeziku še ni povzetka za urejanje: najprej ga ustvarite.",
     "storageUnavailable": "Nalaganje datotek v tej namestitvi ni na voljo.",
     "aiDisabledForEvent": "UI je za ta dogodek izklopljena: z »Ustvari z AI« jo vklopite in zaženete obdelavo.",

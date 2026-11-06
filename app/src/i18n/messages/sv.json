@@ -681,27 +681,27 @@
       "working": "Uppdaterar…",
       "error": "Samtycket kunde inte uppdateras: försök igen.",
       "textChanged": "Samtyckestexten har ändrats efter att du öppnade sidan: läs den nya texten och bekräfta om du håller med.",
-      "closeNotice": "Close this notice: your consents stay under the button at the top",
+      "closeNotice": "Stäng det här meddelandet: dina samtycken finns kvar under knappen högst upp",
       "recording": {
         "title": "Inspelning av evenemanget",
         "give": "Jag samtycker till inspelningen",
         "without": {
           "soloAscolto": "Utan detta samtycke lyssnar du bara: mikrofon, kamera och skärm förblir stängda.",
-          "conduce": "Utan detta samtycke leder du ändå, men din röst sparas inte i spåren per person eller i transkriptionen.",
+          "conduce": "Utan detta samtycke leder du ändå.",
           "voce": "Utan detta samtycke deltar du som alla andra, men står utanför inspelningen: varken namn, röst eller bild.",
           "comeTutti": "Utan detta samtycke deltar du som alla andra."
         },
-        "withoutTranscriptHost": "Your voice is not kept in the per-person tracks or in the transcript.",
+        "withoutTranscriptHost": "Din röst sparas inte i spåren per person eller i transkriptionen.",
         "alreadyRecorded": "Det som redan har spelats in finns kvar i evenemangets video: skriv till arrangörerna för att få det borttaget.",
         "withdraw": {
-          "soloAscolto": "Om du återkallar det stannar du i rummet och lyssnar bara: mikrofon, kamera och skärm stängs. Ditt samtycke till transkription av dina inlägg återkallas också.",
-          "conduce": "Om du återkallar det fortsätter du leda, men från och med nu sparas din röst inte i spåren per person eller i transkriptionen. Rummets video visar dig ändå om den spelas in.",
-          "voce": "Om du återkallar det är du kvar i rummet som förut, och från nu står du utanför inspelningen. Du återkallar också samtycket till utskrift av dina inlägg.",
-          "avvertenza": "Om du återkallar det är du kvar i rummet som förut. Du återkallar också samtycket till transkription av dina inlägg. Om du får ordet och evenemanget spelas in finns din röst ändå kvar i videon.",
-          "assente": "Om du återkallar det är du kvar i rummet som förut. Du återkallar också samtycket till transkription av dina inlägg. Från och med nu spelas din röst inte in på ett eget spår."
+          "soloAscolto": "Om du återkallar det stannar du i rummet och lyssnar bara: mikrofon, kamera och skärm stängs.",
+          "conduce": "Om du återkallar det fortsätter du leda. Rummets video visar dig ändå om den spelas in.",
+          "voce": "Om du återkallar det är du kvar i rummet som förut, och från och med nu står du utanför inspelningen.",
+          "avvertenza": "Om du återkallar det är du kvar i rummet som förut. Om du får ordet och evenemanget spelas in finns din röst ändå kvar i videon.",
+          "assente": "Om du återkallar det är du kvar i rummet som förut. Från och med nu spelas din röst inte in på ett eget spår."
         },
-        "withdrawTranscript": "You also withdraw consent to transcribing your contributions.",
-        "withdrawTranscriptHost": "From now on your voice is not kept in the per-person tracks or in the transcript."
+        "withdrawTranscript": "Du återkallar också samtycket till transkription av dina inlägg.",
+        "withdrawTranscriptHost": "Från och med nu sparas din röst inte i spåren per person eller i transkriptionen."
       },
       "transcription": {
         "title": "Transkription av dina inlägg",
@@ -1046,11 +1046,11 @@
         "recordingDestinationLocked": "När rummet har öppnats kan inspelningen bara ändras till ”Endast för anmälda”: samtyckena gäller den text som personerna har läst.",
         "recordingDestinationPublicOnInvitation": "Evenemanget är endast för inbjudna, men inspelningen förblir offentlig: vem som helst kommer att kunna se videon, inte bara de inbjudna.",
         "recordingDestinationReservedOnInvitation": "Evenemanget är endast för inbjudna: inspelningen har ändrats till ”Endast för anmälda”. Du kan ändra det under ”Inspelning och AI”.",
-        "postEventPagePrivateOnInvitation": "The event is invitation-only: the page after the event has moved to private. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPagePublicWithVideo": "The recording is public: the page after the event has moved to public, otherwise nobody could see the video. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPageStaysPrivate": "The event is open to anyone who registers, but the page after the event stayed private: it does not reopen on its own. You can change this in \"Privacy, data and the page after the event\".",
-        "postEventPagePrivateVideoHidden": "The recording is public but the page after the event is private: nobody will see the video, not even registrants, while the page stays private.",
-        "recordingNothingToCapture": "This installation has no room video: without the transcript and the per-participant tracks, nothing is recorded.",
+        "postEventPagePrivateOnInvitation": "Evenemanget är endast för inbjudna: sidan efter evenemanget har ändrats till privat. Du kan ändra det under ”Integritet, data och sidan efter evenemanget”.",
+        "postEventPagePublicWithVideo": "Inspelningen är offentlig: sidan efter evenemanget har ändrats till offentlig, annars skulle ingen kunna se videon. Du kan ändra det under ”Integritet, data och sidan efter evenemanget”.",
+        "postEventPageStaysPrivate": "Evenemanget är öppet för alla som anmäler sig, men sidan efter evenemanget har förblivit privat: den öppnas inte igen av sig själv. Du kan ändra det under ”Integritet, data och sidan efter evenemanget”.",
+        "postEventPagePrivateVideoHidden": "Inspelningen är offentlig men sidan efter evenemanget är privat: ingen kommer att se videon, inte ens de anmälda, så länge sidan förblir privat.",
+        "recordingNothingToCapture": "Den här installationen har ingen video av rummet: utan transkriptionen och spåren per deltagare spelas ingenting in.",
         "recordingDestinationRequired": "Välj vart inspelningen ska.",
         "audienceAnonymous": "Anonym publik",
         "audienceAnonymousDesc": "Deltagare visas för andra under en pseudonym (”Deltagare” och en kod) i video, chatt och frågor; deltagarlistan stannar hos värdarna och det finns inget torg. Bra för stora evenemang; på gemenskapsevenemang vill man lära känna varandra.",
@@ -4077,7 +4077,7 @@
     "timeLabel": "Tid",
     "durationLabel": "Längd",
     "addressBookNote": "Du finns i evenemangsadressboken för att bjudas in till liknande evenemang: du kan när som helst återkalla ditt samtycke.",
-    "addressBookPendingNote": "The events address book box was ticked on this registration, but this address had stopped receiving invitations. If the request is yours, you can confirm it from the page with your data, using the link below. If it is not, ignore this message: you stay out of the address book and receive no invitations.",
+    "addressBookPendingNote": "Rutan för evenemangsadressboken kryssades i på den här anmälan, men den här adressen hade slutat ta emot inbjudningar. Om begäran är din kan du bekräfta den på sidan med dina uppgifter, via länken nedan. Om den inte är din kan du bortse från det här meddelandet: du stannar utanför adressboken och får inga inbjudningar.",
     "addressBookOptOutLink": "Ta bort mina uppgifter från adressboken",
     "myDataLink": "Dina uppgifter: se dem, rätta dem, återkalla ett samtycke eller avbryt anmälan"
   },
@@ -4511,8 +4511,8 @@
       "name": {
         "label": "Ditt namn",
         "real": "I rummet, i chatten och i frågorna visas du med ditt namn.",
-        "pseudonym": "I rummet, i chatten och i frågorna visas du under en pseudonym. Arrangörerna ser uppgifterna från din anmälan. Om du samtycker till transkriptionen står ditt namn kvar där.",
-        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
+        "pseudonym": "I rummet, i chatten och i frågorna visas du under en pseudonym. Arrangörerna ser uppgifterna från din anmälan.",
+        "pseudonymTranscript": "Om du samtycker till transkriptionen står ditt namn kvar där."
       },
       "retention": {
         "label": "Lagring",
@@ -4581,12 +4581,12 @@
       "proofGivenOn": "Givet den {date}",
       "proofSuperseded": "Ersatt av ett senare samtycke",
       "proofWithdrawEffect": {
-        "recording": "You also withdraw your consent to transcription: your sentences and your name leave the transcript from captions. What is already in the video stays, and so does a transcript made from the video or the audio tracks: to have them removed, write to the data controller. This withdrawal cannot be undone from this page.",
-        "transcription": "Your sentences and your name leave the transcript from captions. A transcript made from the video or the audio tracks stays: to have it removed, write to the data controller. This withdrawal cannot be undone from this page."
+        "recording": "Du återkallar också ditt samtycke till transkription: dina meningar och ditt namn tas bort från transkriptionen baserad på undertexterna. Det som redan finns i videon blir kvar, liksom en transkription som gjorts från videon eller ljudspåren: för att få dem borttagna, skriv till den personuppgiftsansvarige. Återkallelsen kan inte ångras från den här sidan.",
+        "transcription": "Dina meningar och ditt namn tas bort från transkriptionen baserad på undertexterna. En transkription som gjorts från videon eller ljudspåren blir kvar: för att få den borttagen, skriv till den personuppgiftsansvarige. Återkallelsen kan inte ångras från den här sidan."
       },
-      "proofWithdrawHost": "Older transcripts from captions do not recognize hosts: your sentences and your name stay there, and to have them removed you must write to the data controller.",
-      "roomProofsTitle": "Consents given while leading an event",
-      "roomProofsIntro": "The recording and transcription consents you gave when entering the room with a role in the event. The Consents dialog in the room withdraws those of the current entry and, with your staff account, those of earlier entries too; for the others, and once the event is over, what remains is erasing your data.",
+      "proofWithdrawHost": "Äldre transkriptioner baserade på undertexterna känner inte igen moderatorerna: där står dina meningar och ditt namn kvar, och för att få dem borttagna måste du skriva till den personuppgiftsansvarige.",
+      "roomProofsTitle": "Samtycken givna som moderator för ett evenemang",
+      "roomProofsIntro": "De samtycken till inspelning och transkription som du gav när du gick in i rummet med en roll i evenemanget. I fönstret Samtycken i rummet återkallar du dem från det pågående inträdet och, med ditt personalkonto, även dem från tidigare inträden; för de övriga, och när evenemanget är slut, återstår radering av dina uppgifter.",
       "addressBookTitle": "Evenemangsadressbok",
       "addressBookIntro": "Du har valt att stanna kvar i adressboken för att bjudas in till liknande evenemang. Vi sparar dessa uppgifter fram till {date}, om du inte återkallar samtycket eller ger ett nytt.",
       "addressBookOptOut": "Ta bort mina uppgifter från adressboken",
@@ -4596,7 +4596,7 @@
       "addressBookPendingEffect": "Om du bekräftar kommer du tillbaka till adressboken med namnet och organisationen från den här anmälan och får inbjudningar igen. Om du avbryter, eller om det inte var du, stannar du utanför adressboken och får inga inbjudningar.",
       "addressBookPendingConfirm": "Bekräfta min återkomst",
       "addressBookPendingCancel": "Avbryt begäran",
-      "addressBookPendingGone": "This request is no longer waiting. Reload the page to see the current state."
+      "addressBookPendingGone": "Den här begäran väntar inte längre. Ladda om sidan för att se aktuell status."
     },
     "erasure": {
       "title": "Radering av dina uppgifter",
@@ -4610,7 +4610,7 @@
       "linkInvalid": "Länken är ogiltig eller har gått ut. Begär en ny länk.",
       "confirmWarning": "Du håller på att permanent radera de personuppgifter som är kopplade till din e-postadress, utom det som anges nedan.",
       "confirmBody": "Anmälningar, frågor, röster i omröstningar, återkoppling, påminnelser och din post i evenemangsadressboken raderas. Åtgärden kan inte ångras.",
-      "confirmProofs": "Om det finns en video eller transkription av ett evenemang, även om den ännu inte är publicerad, finns typen av samtycke, datumet och texten som du svarade på kvar, utan ditt namn, så länge den videon eller transkriptionen finns. De behövs för att visa samtycket. Videon ändras inte: för att begära att dina inlägg tas bort, skriv till den personuppgiftsansvarige.",
+      "confirmProofs": "Om det finns en video eller transkription av ett evenemang, även om den ännu inte är publicerad, finns typen av samtycke, datumet och texten som du svarade på kvar, utan ditt namn, så länge den videon eller transkriptionen finns. De behövs för att visa samtycket. Videon ändras inte: för att begära att dina inlägg tas bort, skriv till den personuppgiftsansvarige. Äldre transkriptioner baserade på undertexterna känner inte igen personer som leder eller talar med en roll i evenemanget: där står dina meningar och ditt namn kvar, och för att få dem borttagna måste du skriva till den personuppgiftsansvarige.",
       "confirmButton": "Bekräfta radering",
       "cancel": "Avbryt",
       "processing": "Raderar...",
@@ -5998,8 +5998,8 @@
     "recordingWithoutMedia": "Den här inspelningen har ingen video: dess transkription kommer från livetextningen.",
     "recordingWithoutVideo": "Från den här inspelningen finns deltagarnas ljudspår men inte videon: den spelades inte in, eller så har den inte kommit än. Det nedladdningsbara arkivet kräver också videon.",
     "noParticipantTracks": "Det finns inga separata ljudspår för deltagarna: de spelades inte in eller har redan raderats. Slå på inspelning per deltagare före evenemanget för att få dem.",
-    "noTranscribableTracks": "No track of this recording can be transcribed: they were deleted, or the people in them did not consent to a transcription with their name.",
-    "tracksPending": "The tracks of this recording have not arrived yet: the transcription will start by itself when they do.",
+    "noTranscribableTracks": "Inget spår från den här inspelningen kan transkriberas: de har raderats, eller så har personerna som förekommer i dem inte samtyckt till en transkription med sitt namn.",
+    "tracksPending": "Spåren från den här inspelningen har inte kommit än: transkriptionen startar av sig själv när de kommer.",
     "summaryMissing": "Det finns ännu ingen sammanfattning att redigera på det här språket: generera den först.",
     "storageUnavailable": "Filuppladdning är inte tillgänglig i den här installationen.",
     "aiDisabledForEvent": "AI är avstängd för det här evenemanget: använd ”Generera AI” för att slå på den och starta bearbetningen.",
