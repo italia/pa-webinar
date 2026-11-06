@@ -1035,6 +1035,8 @@
         "recordingDestinationStartsReserved": "Ieraksts sākotnēji ir pieejams tikai reģistrētajiem: pasākuma komanda var to padarīt publisku līdz telpas atvēršanai.",
         "recordingDestinationStaysReserved": "Ieraksts paliek pieejams tikai reģistrētajiem: telpa jau tika atvērta.",
         "recordingDestinationLocked": "Pēc telpas atvēršanas var pāriet tikai uz “Tikai reģistrētajiem”: piekrišanas ir spēkā tekstam, ko cilvēki izlasīja.",
+        "recordingDestinationPublicOnInvitation": "The event is invitation-only, but the recording stays public: anyone will be able to see the video, not just the invitees.",
+        "recordingDestinationReservedOnInvitation": "The event is invitation-only: the recording has moved to reserved. You can change this in \"Recording and AI\".",
         "recordingDestinationRequired": "Izvēlieties, kur nonāk ieraksts.",
         "audienceAnonymous": "Anonīma auditorija",
         "audienceAnonymousDesc": "Dalībnieki citiem redzami ar pseidonīmu (“Dalībnieks” un kods) video, tērzēšanā un jautājumos; dalībnieku saraksts paliek vadītājiem, un laukuma nav. Noderīgi lieliem pasākumiem; kopienas pasākumos cilvēki vēlas iepazīties.",

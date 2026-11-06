@@ -346,6 +346,15 @@ describe('Riepilogo — cio che il formato ha scelto', () => {
     expect(privata).not.toContain(f.postEventQaTextOnly);
   });
 
+  it('un evento su invito con il video pubblico lo dice accanto alla destinazione', () => {
+    expect(
+      mostra(
+        { recordingEnabled: true, recordingDestination: 'PUBLIC' },
+        { notaDestinazione: 'recordingDestinationPublicOnInvitation' },
+      ),
+    ).toContain(tp.recordingDestinationPublicOnInvitation);
+  });
+
   it('le domande dopo l evento seguono la regola della pagina', () => {
     expect(
       mostra({ permissionMatrix: conQa, postEventShowQA: true, recordingDestination: 'PUBLIC' }),

@@ -1035,6 +1035,8 @@
         "recordingDestinationStartsReserved": "Posnetek je na začetku samo za prijavljene: javnega ga lahko naredi osebje dogodka, dokler se dvorana ne odpre.",
         "recordingDestinationStaysReserved": "Posnetek ostane samo za prijavljene: dvorana se je že odprla.",
         "recordingDestinationLocked": "Po odprtju dvorane je posnetek mogoče spremeniti le v posnetek samo za prijavljene: privolitve veljajo za besedilo, ki so ga osebe prebrale.",
+        "recordingDestinationPublicOnInvitation": "The event is invitation-only, but the recording stays public: anyone will be able to see the video, not just the invitees.",
+        "recordingDestinationReservedOnInvitation": "The event is invitation-only: the recording has moved to reserved. You can change this in \"Recording and AI\".",
         "recordingDestinationRequired": "Izberite, komu je posnetek namenjen.",
         "audienceAnonymous": "Anonimno občinstvo",
         "audienceAnonymousDesc": "Udeleženci so drugim vidni pod psevdonimom (»Udeleženec« in koda) v videu, klepetu in vprašanjih; seznam udeležencev ostane voditeljem, trga ni. Uporabno za velike dogodke; na dogodkih skupnosti se ljudje želijo spoznati.",

@@ -1035,6 +1035,8 @@
         "recordingDestinationStartsReserved": "Salvestis on alguses ainult registreerunutele: ürituse meeskond saab selle avalikuks muuta kuni ruumi avamiseni.",
         "recordingDestinationStaysReserved": "Salvestis jääb ainult registreerunutele: ruum on juba avatud.",
         "recordingDestinationLocked": "Pärast ruumi avamist saab valida ainult „Ainult registreerunutele“: nõusolekud kehtivad teksti kohta, mida inimesed lugesid.",
+        "recordingDestinationPublicOnInvitation": "The event is invitation-only, but the recording stays public: anyone will be able to see the video, not just the invitees.",
+        "recordingDestinationReservedOnInvitation": "The event is invitation-only: the recording has moved to reserved. You can change this in \"Recording and AI\".",
         "recordingDestinationRequired": "Vali, kuhu salvestis läheb.",
         "audienceAnonymous": "Anonüümne publik",
         "audienceAnonymousDesc": "Osalejad on teistele nähtavad pseudonüümiga („Osaleja“ ja kood) videos, vestluses ja küsimustes; osalejate nimekiri jääb juhatajatele ja väljakut pole. Kasulik suurtel sündmustel; kogukonna sündmustel tahetakse üksteist tundma õppida.",

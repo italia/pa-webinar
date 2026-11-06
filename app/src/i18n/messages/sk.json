@@ -1035,6 +1035,8 @@
         "recordingDestinationStartsReserved": "Záznam začína ako „Len pre registrovaných“: tím podujatia ho môže zmeniť na verejný, kým sa miestnosť neotvorí.",
         "recordingDestinationStaysReserved": "Záznam zostáva len pre registrovaných: miestnosť sa už otvorila.",
         "recordingDestinationLocked": "Po otvorení miestnosti možno záznam iba zmeniť na „Len pre registrovaných“: súhlasy platia pre text, ktorý si ľudia prečítali.",
+        "recordingDestinationPublicOnInvitation": "The event is invitation-only, but the recording stays public: anyone will be able to see the video, not just the invitees.",
+        "recordingDestinationReservedOnInvitation": "The event is invitation-only: the recording has moved to reserved. You can change this in \"Recording and AI\".",
         "recordingDestinationRequired": "Vyberte, kam ide záznam.",
         "audienceAnonymous": "Anonymné publikum",
         "audienceAnonymousDesc": "Účastníci sa ostatným zobrazujú pod pseudonymom („Účastník“ a kód) vo videu, v čete aj v otázkach; zoznam účastníkov zostáva moderátorom a námestie nie je. Užitočné pre veľké podujatia; na komunitných podujatiach sa ľudia chcú spoznať.",

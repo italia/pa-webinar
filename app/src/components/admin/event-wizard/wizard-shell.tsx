@@ -76,6 +76,8 @@ import {
   campiDaModello,
   campiDaSalvare,
   destinazioneDopoIlSalvataggio,
+  destinazioneSuInvito,
+  type NotaDestinazione,
 } from './campi-del-formato';
 import { rememberCreation, type UnsavedResource } from './created-event';
 import StepProgramma from './programme-section';
@@ -278,6 +280,9 @@ export interface WizardProps {
   /** I valori di partenza vengono dalle quattro domande del formato, riassunte
    *  qui: la fascia in cima le dice al posto del nome di un modello. */
   formatoLabel?: string;
+  /** La destinazione del modello e' una risposta data a mano, non una proposta:
+   *  su un evento su invito resta. */
+  destinazioneScelta?: boolean;
 }
 
 /**
@@ -655,6 +660,7 @@ export default function EventWizard(props: WizardProps) {
     // Dove non si puo' registrare un modello non accende la registrazione.
     const registra = (tpl?.recordingEnabled ?? false) && (props.recordingAvailable ?? true);
     const conAi = registra && (props.aiPipelineEnabled ?? true);
+    const campiDelModello = campiDaModello(tpl, registra, videoDaDestinare(props.voceNelVideo));
     // Le lingue dell'evento, del modello o dell'istanza. La traduzione di
     // sottotitoli e sintesi parte solo se ce n'e' almeno una: senza, il
     // wizard chiederebbe di scegliere lingue che nessuno ha chiesto.
@@ -715,7 +721,15 @@ export default function EventWizard(props: WizardProps) {
       // La registrazione non parte mai da sola: la avvia chi conduce con il
       // pulsante REC, qualunque cosa dica un modello salvato prima.
       autoStartRecording: false,
-      ...campiDaModello(tpl, registra, videoDaDestinare(props.voceNelVideo)),
+      ...campiDelModello,
+      recordingDestination: destinazioneSuInvito(
+        campiDelModello.recordingDestination,
+        !publicRegistrationFor(
+          { accessMode: tpl?.accessMode ?? null },
+          props.publicRegistrationEnabled ?? true,
+        ),
+        !!props.destinazioneScelta,
+      ),
       participantListVisible: elencoPredefinito({
         ...togglesFromMatrix(matrix),
         maxParticipants: tpl?.maxParticipants ?? 300,
@@ -1062,11 +1076,24 @@ export default function EventWizard(props: WizardProps) {
   // Finche' chi organizza non sceglie, l'elenco segue chi puo' parlare o
   // mostrarsi e quante persone si aspettano: non su un evento che esiste gia'.
   const elencoSceltoRef = useRef(mode === 'edit');
+  // Finche' chi organizza non sceglie, un evento che diventa su invito torna alla
+  // destinazione proposta. Quella di un evento che esiste gia' e' stata dichiarata.
+  const [destinazioneScelta, setDestinazioneScelta] = useState(
+    mode === 'edit' || !!props.destinazioneScelta,
+  );
   const updateForm = useCallback(
     (patch: Partial<WizardForm>) => {
       if ('participantListVisible' in patch) elencoSceltoRef.current = true;
+      if ('recordingDestination' in patch) setDestinazioneScelta(true);
       setForm((prev) => {
         const next = { ...prev, ...patch };
+        if ('accessMode' in patch) {
+          next.recordingDestination = destinazioneSuInvito(
+            next.recordingDestination,
+            !publicRegistrationFor(next, props.publicRegistrationEnabled ?? true),
+            destinazioneScelta,
+          );
+        }
         if (('permissionMatrix' in patch || 'maxParticipants' in patch) && !elencoSceltoRef.current) {
           next.participantListVisible = elencoPredefinito({
             ...togglesFromMatrix(next.permissionMatrix),
@@ -1076,7 +1103,7 @@ export default function EventWizard(props: WizardProps) {
         return 'moderators' in patch || 'speakers' in patch ? conSceltePulite(next) : next;
       });
     },
-    [conSceltePulite],
+    [conSceltePulite, destinazioneScelta, props.publicRegistrationEnabled],
   );
   // Il passo «Programma», quando si apre, dice quanti argomenti hanno perso
   // chi interviene da quando lo si e' visto l'ultima volta: il confronto e'
@@ -1407,6 +1434,7 @@ export default function EventWizard(props: WizardProps) {
 
   const restoreDraft = useCallback(() => {
     elencoSceltoRef.current = true;
+    setDestinazioneScelta(true);
     const salvata = savedDraftRef.current;
     // Sopra il modulo di partenza, non al suo posto: una bozza salvata prima
     // che il modulo avesse un campo nuovo non lo lascerebbe vuoto.
@@ -1585,6 +1613,24 @@ export default function EventWizard(props: WizardProps) {
     form,
     props.publicRegistrationEnabled ?? true
   );
+  // Un evento su invito che registra: se il video resta pubblico lo si dice, e
+  // se il modello lo proponeva pubblico ed e' riservato senza una scelta anche,
+  // sia che sia tornato tale nel modulo sia che sia partito cosi'.
+  let notaDestinazione: NotaDestinazione | null = null;
+  if (
+    viaToken === null &&
+    !istantanea &&
+    !iscrizioneAperta &&
+    form.recordingEnabled &&
+    (props.recordingAvailable ?? true) &&
+    videoDaDestinare(props.voceNelVideo)
+  ) {
+    if (form.recordingDestination === 'PUBLIC') {
+      notaDestinazione = 'recordingDestinationPublicOnInvitation';
+    } else if (!destinazioneScelta && props.template?.recordingDestination === 'PUBLIC') {
+      notaDestinazione = 'recordingDestinationReservedOnInvitation';
+    }
+  }
 
   // Cio' che manca ancora: la barra lo dice per passo, il riepilogo per campo.
   const mancanti = useMemo(
@@ -2433,6 +2479,7 @@ export default function EventWizard(props: WizardProps) {
                     invitati={form.invitations.length}
                     bloccato={viaToken !== null}
                     iniziale={initial.accessMode}
+                    notaDestinazione={notaDestinazione}
                     elencoInvitati={
                       <InvitationsSection
                         value={form.invitations}
@@ -2544,6 +2591,7 @@ export default function EventWizard(props: WizardProps) {
             destinazioneSenzaScelta={destinazioneSenzaScelta}
             onCambiaDestinazione={viaToken === null ? () => vai('advanced', 'recording') : undefined}
             iscrizioneAperta={istantanea ? undefined : iscrizioneAperta}
+            notaDestinazione={notaDestinazione}
             onVaiPersone={() => vai('invites')}
             onVaiProgramma={istantanea ? undefined : () => vai('programme')}
             programmaInCreazione={mode === 'create'}
@@ -2589,6 +2637,7 @@ export default function EventWizard(props: WizardProps) {
                           iniziale: initial.recordingDestination,
                           salaGiaAperta: !!initialEvent?.salaGiaAperta,
                           chiesta: chiedeDestinazione,
+                          nota: notaDestinazione,
                         }
                       : undefined
                   }

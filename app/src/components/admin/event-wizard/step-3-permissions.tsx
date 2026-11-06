@@ -36,6 +36,7 @@ import {
   togglesFromMatrix,
 } from '@/lib/utils/permission-matrix';
 
+import type { NotaDestinazione } from './campi-del-formato';
 import ConsentDiagram from './consent-diagram';
 import { nomeLingua } from './text-translation';
 
@@ -111,6 +112,8 @@ interface Props {
     salaGiaAperta: boolean;
     /** Va scelta per salvare (validation.ts): senza, resta «non indicata». */
     chiesta: boolean;
+    /** Cosa diventa la registrazione con un evento su invito. */
+    nota?: NotaDestinazione | null;
   };
   /** La destinazione dopo il salvataggio: con un link di conduzione la scelta non
    *  c'e', e questa dice cosa diventa l'evento. */
@@ -607,6 +610,11 @@ export default function StepPermissions({
             {destinazione.salaGiaAperta && (
               <p className="text-secondary mb-0 mt-1" style={{ fontSize: '0.85rem' }}>
                 {t('recordingDestinationLocked')}
+              </p>
+            )}
+            {destinazione.nota && (
+              <p className="text-secondary mb-0 mt-1" style={{ fontSize: '0.85rem' }}>
+                {t(destinazione.nota)}
               </p>
             )}
           </fieldset>

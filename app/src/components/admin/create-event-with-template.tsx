@@ -138,6 +138,7 @@ export default function CreateEventWithTemplate({
   const wizard = (props: {
     template: React.ComponentProps<typeof EventWizard>['template'];
     formatoLabel?: string;
+    destinazioneScelta?: boolean;
     onChangeTemplate: (stato: { invitati: boolean }) => void;
   }) => (
     <EventWizard
@@ -146,6 +147,7 @@ export default function CreateEventWithTemplate({
       key={props.template?.id ?? 'vuoto'}
       template={props.template}
       formatoLabel={props.formatoLabel}
+      destinazioneScelta={props.destinazioneScelta}
       onChangeTemplate={props.onChangeTemplate}
       siteTimezone={siteTimezone}
       enabledLocales={enabledLocales}
@@ -201,6 +203,9 @@ export default function CreateEventWithTemplate({
     return wizard({
       template: presetDaFormato(formato, nome, publicRegistrationEnabled),
       formatoLabel: nome,
+      // Su invito le domande propongono riservata: un video pubblico e' una
+      // risposta data a mano.
+      destinazioneScelta: formato.accesso === 'invitati' && formato.registra === 'pubblica',
       // Chi partecipa come lo si vede ora: cambiato nel passo «Persone», le
       // domande lo mostrano cosi'. Il passaggio agli inviti non porta con se' un
       // video pubblico che nessuno ha scelto per loro.

@@ -1035,6 +1035,8 @@
         "recordingDestinationStartsReserved": "Záznam je zpočátku jen pro registrované: veřejným ho může učinit tým akce, dokud se neotevře místnost.",
         "recordingDestinationStaysReserved": "Záznam zůstává jen pro registrované: místnost už se otevřela.",
         "recordingDestinationLocked": "Po otevření místnosti lze přejít pouze na variantu jen pro registrované: souhlasy platí pro text, který si lidé přečetli.",
+        "recordingDestinationPublicOnInvitation": "The event is invitation-only, but the recording stays public: anyone will be able to see the video, not just the invitees.",
+        "recordingDestinationReservedOnInvitation": "The event is invitation-only: the recording has moved to reserved. You can change this in \"Recording and AI\".",
         "recordingDestinationRequired": "Zvolte, kam záznam půjde.",
         "audienceAnonymous": "Anonymní publikum",
         "audienceAnonymousDesc": "Účastníci se ostatním zobrazují pod pseudonymem („Účastník“ a kód) ve videu, v chatu i v dotazech; seznam účastníků vidí jen moderátoři a náměstí není k dispozici. Hodí se pro velké akce; na komunitních akcích se lidé chtějí poznat.",

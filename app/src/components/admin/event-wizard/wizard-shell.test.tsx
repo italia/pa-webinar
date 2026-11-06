@@ -2709,6 +2709,124 @@ describe('i valori del formato', () => {
     });
   });
 
+  describe('un evento su invito e la destinazione', () => {
+    const s2 = w.step2;
+    const scegliAccesso = (testo: string) => {
+      goToStep('invites');
+      const voce = Array.from(
+        container.querySelectorAll<HTMLLabelElement>('.wizard-iscrizione label'),
+      ).find((l) => l.querySelector('.formato-scelta__titolo')?.textContent === testo);
+      click(voce!);
+    };
+    const sezione = () => container.querySelector('.wizard-iscrizione')?.textContent ?? '';
+
+    it('diventando su invito un video pubblico non scelto torna riservato, e lo dice', async () => {
+      renderWizard({ template: modello });
+      compila();
+      scegliAccesso(messages.admin.guided.access.invitation);
+      expect(sezione()).toContain(s2.recordingDestinationReservedOnInvitation);
+      goToStep('review');
+      expect(container.textContent).toContain(w.flow.recordingDestinationReserved);
+      await press(button(w.publish));
+      expect(corpo('POST')).toMatchObject({
+        accessMode: 'INVITATION',
+        recordingDestination: 'REGISTRANTS',
+      });
+    });
+
+    it('tornando aperto non si allarga da solo', () => {
+      renderWizard({ template: modello });
+      scegliAccesso(messages.admin.guided.access.invitation);
+      scegliAccesso(messages.admin.guided.access.open);
+      expect(sezione()).not.toContain(s2.recordingDestinationReservedOnInvitation);
+      goToStep('recording');
+      expect(destinazione('REGISTRANTS')?.checked).toBe(true);
+    });
+
+    it('la destinazione scelta a mano resta, e il wizard lo dice', async () => {
+      renderWizard({ template: modello });
+      compila();
+      goToStep('recording');
+      click(destinazione('REGISTRANTS')!);
+      click(destinazione('PUBLIC')!);
+      scegliAccesso(messages.admin.guided.access.invitation);
+      expect(sezione()).toContain(s2.recordingDestinationPublicOnInvitation);
+      goToStep('recording');
+      expect(container.textContent).toContain(s2.recordingDestinationPublicOnInvitation);
+      goToStep('review');
+      expect(container.textContent).toContain(s2.recordingDestinationPublicOnInvitation);
+      await press(button(w.publish));
+      expect(corpo('POST')).toMatchObject({
+        accessMode: 'INVITATION',
+        recordingDestination: 'PUBLIC',
+      });
+    });
+
+    it('dopo una scelta a mano la nota della proposta non torna', () => {
+      renderWizard({ template: modello });
+      scegliAccesso(messages.admin.guided.access.invitation);
+      goToStep('recording');
+      click(destinazione('PUBLIC')!);
+      click(destinazione('REGISTRANTS')!);
+      goToStep('invites');
+      expect(sezione()).not.toContain(s2.recordingDestinationReservedOnInvitation);
+      expect(sezione()).not.toContain(s2.recordingDestinationPublicOnInvitation);
+    });
+
+    it('su un sito con iscrizione chiusa il modello parte riservato', () => {
+      renderWizard({ template: modello, publicRegistrationEnabled: false });
+      goToStep('recording');
+      expect(destinazione('REGISTRANTS')?.checked).toBe(true);
+      expect(destinazione('PUBLIC')?.disabled).toBe(false);
+      expect(container.textContent).toContain(s2.recordingDestinationReservedOnInvitation);
+      goToStep('invites');
+      expect(sezione()).toContain(s2.recordingDestinationReservedOnInvitation);
+      goToStep('review');
+      expect(container.textContent).toContain(s2.recordingDestinationReservedOnInvitation);
+    });
+
+    it('un modello su invito che propone il video pubblico parte riservato, e lo dice', () => {
+      renderWizard({ template: { ...modello, accessMode: 'INVITATION' } });
+      goToStep('invites');
+      expect(sezione()).toContain(s2.recordingDestinationReservedOnInvitation);
+      goToStep('recording');
+      expect(destinazione('REGISTRANTS')?.checked).toBe(true);
+    });
+
+    it('un modello che propone il video riservato non ha nulla da dire', () => {
+      renderWizard({
+        template: { ...modello, recordingDestination: 'REGISTRANTS' },
+        publicRegistrationEnabled: false,
+      });
+      goToStep('invites');
+      expect(sezione()).not.toContain(s2.recordingDestinationReservedOnInvitation);
+      expect(sezione()).not.toContain(s2.recordingDestinationPublicOnInvitation);
+    });
+
+    it('una risposta data a mano nelle domande resta anche su invito', () => {
+      renderWizard({
+        template: { ...modello, accessMode: 'INVITATION' },
+        destinazioneScelta: true,
+      });
+      goToStep('recording');
+      expect(destinazione('PUBLIC')?.checked).toBe(true);
+      expect(container.textContent).toContain(s2.recordingDestinationPublicOnInvitation);
+    });
+
+    it('su un evento salvato la destinazione dichiarata non cambia da sola', async () => {
+      renderWizard({
+        mode: 'edit',
+        initialEvent: salvato({ recordingDestination: 'PUBLIC', accessMode: 'OPEN' }),
+        publicRegistrationEnabled: true,
+      });
+      scegliAccesso(messages.admin.guided.access.invitation);
+      expect(sezione()).toContain(s2.recordingDestinationPublicOnInvitation);
+      await press(button(w.updateEvent));
+      expect(corpo('PUT')).toMatchObject({ accessMode: 'INVITATION' });
+      expect(corpo('PUT')).not.toHaveProperty('recordingDestination');
+    });
+  });
+
   it('si vedono nel riepilogo', () => {
     renderWizard({ template: modello });
     goToStep('review');

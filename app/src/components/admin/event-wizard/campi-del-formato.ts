@@ -44,6 +44,26 @@ export function campiDaModello(
   };
 }
 
+/**
+ * La destinazione di un evento su invito: un video pubblico che nessuno ha scelto
+ * per questo evento torna alla proposta, riservata, come fa `formatoConAccesso`
+ * nelle domande. `scelta`: chi organizza l'ha indicata, e resta. Il passaggio
+ * inverso non allarga mai: la destinazione resta quella che era.
+ */
+export function destinazioneSuInvito(
+  destinazione: Destinazione,
+  suInvito: boolean,
+  scelta: boolean
+): Destinazione {
+  return suInvito && !scelta && destinazione === 'PUBLIC' ? 'REGISTRANTS' : destinazione;
+}
+
+/** Cio' che il wizard dice su un evento su invito che registra: il testo sotto
+ *  `admin.wizard.step2`. */
+export type NotaDestinazione =
+  | 'recordingDestinationPublicOnInvitation'
+  | 'recordingDestinationReservedOnInvitation';
+
 /** I valori di un evento salvato. */
 export function campiDaEvento(ev: Partial<CampiDelFormato>): CampiDelFormato {
   return {

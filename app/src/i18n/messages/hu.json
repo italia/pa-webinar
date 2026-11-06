@@ -1035,6 +1035,8 @@
         "recordingDestinationStartsReserved": "A felvétel kezdetben csak regisztráltaknak szól: az esemény munkatársai a terem megnyitásáig nyilvánossá tehetik.",
         "recordingDestinationStaysReserved": "A felvétel továbbra is csak regisztráltaknak szól: a terem már megnyílt.",
         "recordingDestinationLocked": "A terem megnyitása után a felvétel már csak a „Csak regisztráltaknak” beállításra módosítható: a hozzájárulások arra a szövegre érvényesek, amelyet az emberek elolvastak.",
+        "recordingDestinationPublicOnInvitation": "The event is invitation-only, but the recording stays public: anyone will be able to see the video, not just the invitees.",
+        "recordingDestinationReservedOnInvitation": "The event is invitation-only: the recording has moved to reserved. You can change this in \"Recording and AI\".",
         "recordingDestinationRequired": "Válassza ki, hová kerül a felvétel.",
         "audienceAnonymous": "Névtelen közönség",
         "audienceAnonymousDesc": "A résztvevők másoknak álnéven jelennek meg („Résztvevő” és egy kód) a videóban, a csevegésben és a kérdésekben; a résztvevők listája a moderátoroknál marad, és nincs tér. Nagy eseményekhez hasznos; közösségi eseményeken az emberek meg akarják ismerni egymást.",

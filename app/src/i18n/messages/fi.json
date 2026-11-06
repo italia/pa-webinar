@@ -1035,6 +1035,8 @@
         "recordingDestinationStartsReserved": "Tallenne on aluksi vain ilmoittautuneille: tapahtuman henkilökunta voi muuttaa sen julkiseksi, kunnes huone avataan.",
         "recordingDestinationStaysReserved": "Tallenne pysyy vain ilmoittautuneille: huone on jo avattu.",
         "recordingDestinationLocked": "Huoneen avaamisen jälkeen voi vaihtaa vain valintaan ”Vain ilmoittautuneille”: suostumukset koskevat sitä tekstiä, jonka ihmiset ovat lukeneet.",
+        "recordingDestinationPublicOnInvitation": "The event is invitation-only, but the recording stays public: anyone will be able to see the video, not just the invitees.",
+        "recordingDestinationReservedOnInvitation": "The event is invitation-only: the recording has moved to reserved. You can change this in \"Recording and AI\".",
         "recordingDestinationRequired": "Valitse, mihin tallenne menee.",
         "audienceAnonymous": "Anonyymi yleisö",
         "audienceAnonymousDesc": "Osallistujat näkyvät muille salanimellä (”Osallistuja” ja koodi) videossa, chatissa ja kysymyksissä; osallistujaluettelo jää juontajille, eikä aukiota ole. Hyödyllinen suurissa tapahtumissa; yhteisötapahtumissa halutaan tutustua toisiin.",

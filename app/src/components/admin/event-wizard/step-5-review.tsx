@@ -31,7 +31,7 @@ import { togglesFromMatrix } from '@/lib/utils/permission-matrix';
 import { splitTitleKicker } from '@/lib/utils/title-kicker';
 import { describeRRule } from '@/lib/utils/recurrence';
 
-import { destinazioneDopoIlSalvataggio } from './campi-del-formato';
+import { destinazioneDopoIlSalvataggio, type NotaDestinazione } from './campi-del-formato';
 import ConsentDiagram from './consent-diagram';
 import { vociCompilate } from './programme-plan';
 import { nomeLingua } from './text-translation';
@@ -95,6 +95,8 @@ interface Props {
   /** Si iscrive chiunque (scelta dell'evento, o del sito). Assente per una
    *  chiamata istantanea, che non ha iscrizione. */
   iscrizioneAperta?: boolean;
+  /** Cosa diventa la registrazione con un evento su invito. */
+  notaDestinazione?: NotaDestinazione | null;
   /** Porta al passo «Persone», dove si sceglie chi si iscrive. */
   onVaiPersone?: () => void;
   /** Porta al passo «Programma». Assente per una chiamata istantanea, che
@@ -131,6 +133,7 @@ export default function Step5Review({
   capacita,
   sopratitolo = false,
   iscrizioneAperta,
+  notaDestinazione,
   onVaiPersone,
   onVaiProgramma,
   programmaInCreazione = false,
@@ -516,6 +519,11 @@ export default function Step5Review({
                         {tf('change')}
                       </button>
                     </>
+                  )}
+                  {notaDestinazione && (
+                    <span className="d-block text-secondary small mt-1">
+                      {tp(notaDestinazione)}
+                    </span>
                   )}
                 </span>
               )}

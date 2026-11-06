@@ -1035,6 +1035,8 @@
         "recordingDestinationStartsReserved": "Inspelningen är från början endast för anmälda: evenemangets personal kan göra den offentlig tills rummet öppnas.",
         "recordingDestinationStaysReserved": "Inspelningen förblir endast för anmälda: rummet har redan öppnats.",
         "recordingDestinationLocked": "När rummet har öppnats kan inspelningen bara ändras till ”Endast för anmälda”: samtyckena gäller den text som personerna har läst.",
+        "recordingDestinationPublicOnInvitation": "The event is invitation-only, but the recording stays public: anyone will be able to see the video, not just the invitees.",
+        "recordingDestinationReservedOnInvitation": "The event is invitation-only: the recording has moved to reserved. You can change this in \"Recording and AI\".",
         "recordingDestinationRequired": "Välj vart inspelningen ska.",
         "audienceAnonymous": "Anonym publik",
         "audienceAnonymousDesc": "Deltagare visas för andra under en pseudonym (”Deltagare” och en kod) i video, chatt och frågor; deltagarlistan stannar hos värdarna och det finns inget torg. Bra för stora evenemang; på gemenskapsevenemang vill man lära känna varandra.",
