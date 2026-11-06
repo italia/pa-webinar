@@ -16,7 +16,7 @@
  */
 
 import type { NextRequest } from 'next/server';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 vi.mock('@/lib/auth/moderator', () => ({
   extractModeratorToken: vi.fn(() => 'token-valido'),
@@ -58,7 +58,10 @@ const { sessioni } = vi.hoisted(() => ({
   sessioni: { closeOpenSessions: vi.fn(async () => 0) },
 }));
 vi.mock('@/lib/events/call-sessions', () => sessioni);
-const sala = vi.hoisted(() => ({ salaForseAperta: vi.fn(async () => false) }));
+const sala = vi.hoisted(() => ({
+  salaForseAperta: vi.fn(async () => false),
+  salaGiaAperta: vi.fn(async () => false),
+}));
 vi.mock('@/lib/live/room-open', () => sala);
 const sondaggi = vi.hoisted(() => ({ chiudiSondaggiAperti: vi.fn(async () => 0) }));
 vi.mock('@/lib/events/close-polls', () => sondaggi);
@@ -91,11 +94,11 @@ vi.mock('@/lib/db', () => ({
 
 import { constantTimeEqual, extractModeratorToken } from '@/lib/auth/moderator';
 import { prisma } from '@/lib/db';
-import { AppError, UnauthorizedError } from '@/lib/errors';
+import { AppError, ForbiddenError, UnauthorizedError } from '@/lib/errors';
 import { estimateNumbers } from '@/lib/estimates';
 import { recordLiveAction, recordLiveActions } from '@/lib/live/actions';
 
-import { DELETE, PUT } from './route';
+import { DELETE, GET, PUT } from './route';
 
 const EVENT_ID = '7c6d5e4f-3a2b-4c1d-8e9f-0a1b2c3d4e5f';
 const GDPR_ID = '3f2a1b0c-4d5e-4f6a-8b9c-0d1e2f3a4b5c';
@@ -893,6 +896,373 @@ describe('PUT /api/events/[param] — lingue di titolo e descrizione', () => {
       const r = await PUT(richiesta({ title: salvato.title, textEdits: { touched } }), contesto as never);
       expect(r.status).toBe(422);
     }
+  });
+});
+
+describe('PUT /api/events/[param] — la destinazione della registrazione', () => {
+  const NON_COPERTA = 'RECORDING_DESTINATION_NOT_COVERED';
+  const VIDEO_ESTERNO = 'https://www.youtube.com/watch?v=abc';
+  const FILE = 'https://storage.example.com/recordings/sala.mp4';
+
+  /** Un evento riservato: la destinazione e il pubblico che ne segue. */
+  function riservato(over: Record<string, unknown> = {}) {
+    return {
+      ...eventoEsistente(),
+      recordingEnabled: true,
+      recordingDestination: 'REGISTRANTS',
+      recordingAudience: 'REGISTRANTS',
+      recordingPublished: false,
+      transcriptPublished: false,
+      youtubeUrl: null,
+      tempRecordingUrl: null,
+      ...over,
+    };
+  }
+
+  async function modifica(evento: Record<string, unknown>, corpo: Record<string, unknown>) {
+    const { verifyModeratorToken } = await import('@/lib/auth/moderator');
+    vi.mocked(verifyModeratorToken).mockResolvedValueOnce(
+      evento as unknown as Awaited<ReturnType<typeof verifyModeratorToken>>,
+    );
+    return PUT(richiesta(corpo), contesto as never);
+  }
+
+  async function rifiutata(r: Response) {
+    expect(r.status).toBe(409);
+    expect(await r.json()).toMatchObject({ code: NON_COPERTA });
+    expect(mocked.event.update).not.toHaveBeenCalled();
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    staff.requireEventManager.mockReset();
+    sala.salaForseAperta.mockResolvedValue(false);
+    sala.salaGiaAperta.mockResolvedValue(false);
+    mocked.$transaction.mockImplementation(async (fn: (tx: unknown) => unknown) => fn(prisma));
+    mocked.event.update.mockImplementation(
+      async ({ data }: { data: Record<string, unknown> }) => ({ ...riservato(), ...data }),
+    );
+  });
+
+  describe('la guardia sull’esposizione', () => {
+    it.each([
+      ['il pubblico per tutti', { recordingAudience: 'PUBLIC' }],
+      ['un video esterno', { youtubeUrl: VIDEO_ESTERNO }],
+      ['il recupero in diretta', { tempRecordingUrl: FILE }],
+    ])('un evento riservato rifiuta %s', async (_n, corpo) => {
+      await rifiutata(await modifica(riservato(), corpo));
+    });
+
+    it('il rifiuto vale anche su un evento concluso con il video pubblicato', async () => {
+      await rifiutata(
+        await modifica(riservato({ status: 'ENDED', recordingPublished: true }), {
+          recordingAudience: 'PUBLIC',
+        }),
+      );
+    });
+
+    it.each([
+      ['la libreria', { libraryListed: true }],
+      ['la pagina dopo l’evento', { postEventPublic: true }],
+      ['«Termina per tutti»', { status: 'ENDED', postEventPublic: true, libraryListed: true }],
+      ['la pubblicazione per gli iscritti', { recordingPublished: true }],
+      ['la trascrizione per gli iscritti', { transcriptPublished: true }],
+      ['un file nello storage', { recordingUrl: FILE }],
+      ['togliere il video esterno', { youtubeUrl: null }],
+      ['il pubblico che ha gia’', { recordingAudience: 'REGISTRANTS' }],
+    ])('un evento riservato accetta %s', async (_n, corpo) => {
+      expect((await modifica(riservato(), corpo)).status).toBe(200);
+    });
+
+    it('lo stesso video esterno rimandato dal wizard passa', async () => {
+      const r = await modifica(riservato({ youtubeUrl: VIDEO_ESTERNO }), {
+        youtubeUrl: VIDEO_ESTERNO,
+      });
+      expect(r.status).toBe(200);
+    });
+
+    it('un evento senza destinazione non si blocca', async () => {
+      const r = await modifica(
+        riservato({ recordingDestination: null, recordingAudience: 'REGISTRANTS' }),
+        { recordingAudience: 'PUBLIC', youtubeUrl: VIDEO_ESTERNO, recordingPublished: true },
+      );
+      expect(r.status).toBe(200);
+      expect(datiScritti()).toMatchObject({
+        recordingAudience: 'PUBLIC',
+        youtubeUrl: VIDEO_ESTERNO,
+        recordingPublished: true,
+      });
+    });
+
+    it('un evento storico importato non si blocca', async () => {
+      const r = await modifica(
+        riservato({ eventType: 'LEGACY', recordingDestination: null }),
+        { recordingAudience: 'PUBLIC' },
+      );
+      expect(r.status).toBe(200);
+    });
+
+    it('una destinazione pubblica non si blocca', async () => {
+      const r = await modifica(
+        riservato({ recordingDestination: 'PUBLIC', recordingAudience: 'REGISTRANTS' }),
+        { recordingAudience: 'PUBLIC', youtubeUrl: VIDEO_ESTERNO },
+      );
+      expect(r.status).toBe(200);
+    });
+  });
+
+  describe('togliere la destinazione', () => {
+    it.each([
+      ['prima della sala', false, false],
+      ['dopo la sala', false, true],
+      ['con la sala aperta', true, true],
+    ])('non passa %s', async (_n, aperta, gia) => {
+      sala.salaForseAperta.mockResolvedValue(aperta);
+      sala.salaGiaAperta.mockResolvedValue(gia);
+      await rifiutata(await modifica(riservato(), { recordingDestination: null }));
+      await rifiutata(
+        await modifica(riservato({ recordingDestination: 'PUBLIC' }), {
+          recordingDestination: null,
+        }),
+      );
+    });
+
+    it('su un evento che non l’ha mai dichiarata, null non cambia niente', async () => {
+      const r = await modifica(riservato({ recordingDestination: null }), {
+        recordingDestination: null,
+      });
+      expect(r.status).toBe(200);
+      expect(datiScritti()).not.toHaveProperty('recordingDestination');
+    });
+  });
+
+  describe('cambiarla', () => {
+    it('la cambia solo lo staff: un link di conduzione prende 403', async () => {
+      staff.requireEventManager.mockRejectedValue(new ForbiddenError('no'));
+      const r = await modifica(riservato({ recordingDestination: null }), {
+        recordingDestination: 'REGISTRANTS',
+      });
+      expect(r.status).toBe(403);
+      expect(mocked.event.update).not.toHaveBeenCalled();
+    });
+
+    it('lo stesso valore da un link di conduzione passa', async () => {
+      staff.requireEventManager.mockRejectedValue(new ForbiddenError('no'));
+      const r = await modifica(riservato(), { recordingDestination: 'REGISTRANTS' });
+      expect(r.status).toBe(200);
+      expect(staff.requireEventManager).not.toHaveBeenCalled();
+    });
+
+    it('restringere allinea il pubblico, tiene il video esterno e non da’ mai 409', async () => {
+      const r = await modifica(
+        riservato({
+          recordingDestination: 'PUBLIC',
+          recordingAudience: 'PUBLIC',
+          recordingPublished: true,
+          youtubeUrl: VIDEO_ESTERNO,
+        }),
+        { recordingDestination: 'REGISTRANTS' },
+      );
+      expect(r.status).toBe(200);
+      expect(datiScritti()).toMatchObject({
+        recordingDestination: 'REGISTRANTS',
+        recordingAudience: 'REGISTRANTS',
+      });
+    });
+
+    it('restringere vince sul pubblico chiesto dalla stessa richiesta', async () => {
+      const r = await modifica(
+        riservato({ recordingDestination: 'PUBLIC', recordingAudience: 'PUBLIC' }),
+        { recordingDestination: 'REGISTRANTS', recordingAudience: 'PUBLIC' },
+      );
+      expect(r.status).toBe(200);
+      expect(datiScritti().recordingAudience).toBe('REGISTRANTS');
+    });
+
+    it('prima della sala si allarga, e il pubblico torna per tutti', async () => {
+      const r = await modifica(riservato(), { recordingDestination: 'PUBLIC' });
+      expect(r.status).toBe(200);
+      expect(datiScritti()).toMatchObject({
+        recordingDestination: 'PUBLIC',
+        recordingAudience: 'PUBLIC',
+      });
+    });
+
+    it('allargando si puo’ tenere un pubblico ristretto', async () => {
+      await modifica(riservato(), {
+        recordingDestination: 'PUBLIC',
+        recordingAudience: 'REGISTRANTS',
+      });
+      expect(datiScritti().recordingDestination).toBe('PUBLIC');
+      expect(datiScritti()).not.toHaveProperty('recordingAudience');
+    });
+
+    it('dopo la sala non si allarga, anche a evento concluso', async () => {
+      sala.salaGiaAperta.mockResolvedValue(true);
+      await rifiutata(
+        await modifica(riservato({ status: 'ENDED' }), {
+          recordingDestination: 'PUBLIC',
+          startsAt: '2027-03-01T09:00:00.000Z',
+          endsAt: '2027-03-01T10:00:00.000Z',
+        }),
+      );
+      expect(sala.salaGiaAperta).toHaveBeenCalled();
+    });
+
+    it('dopo la sala un evento senza destinazione si puo’ solo restringere', async () => {
+      sala.salaGiaAperta.mockResolvedValue(true);
+      const senza = riservato({ recordingDestination: null, recordingAudience: 'PUBLIC' });
+      await rifiutata(await modifica(senza, { recordingDestination: 'PUBLIC' }));
+      const r = await modifica(senza, { recordingDestination: 'REGISTRANTS' });
+      expect(r.status).toBe(200);
+      expect(datiScritti()).toMatchObject({
+        recordingDestination: 'REGISTRANTS',
+        recordingAudience: 'REGISTRANTS',
+      });
+    });
+
+    it('a sala aperta una restrizione si ignora e lo si dice', async () => {
+      sala.salaForseAperta.mockResolvedValue(true);
+      sala.salaGiaAperta.mockResolvedValue(true);
+      const r = await modifica(
+        riservato({
+          status: 'LIVE',
+          recordingDestination: 'PUBLIC',
+          recordingAudience: 'PUBLIC',
+        }),
+        { recordingDestination: 'REGISTRANTS' },
+      );
+      expect(r.status).toBe(200);
+      expect(datiScritti()).not.toHaveProperty('recordingDestination');
+      expect(datiScritti()).not.toHaveProperty('recordingAudience');
+      expect((await r.json()).ignoredCreationOnlyFields).toEqual(['recordingDestination']);
+    });
+
+    it('una modifica parziale non tocca destinazione e pubblico', async () => {
+      await modifica(riservato(), { postEventShowQA: false });
+      expect(datiScritti()).not.toHaveProperty('recordingDestination');
+      expect(datiScritti()).not.toHaveProperty('recordingAudience');
+    });
+  });
+
+  describe('un evento che comincia a registrare', () => {
+    const spento = () =>
+      riservato({
+        recordingEnabled: false,
+        recordingDestination: null,
+        recordingAudience: 'PUBLIC',
+      });
+
+    it.each([
+      ['senza il campo', {}],
+      ['con null', { recordingDestination: null }],
+    ])('%s parte riservato con il pubblico allineato', async (_n, extra) => {
+      await modifica(spento(), { recordingEnabled: true, ...extra });
+      expect(datiScritti()).toMatchObject({
+        recordingEnabled: true,
+        recordingDestination: 'REGISTRANTS',
+        recordingAudience: 'REGISTRANTS',
+      });
+    });
+
+    it('una scelta esplicita vale', async () => {
+      await modifica(spento(), { recordingEnabled: true, recordingDestination: 'PUBLIC' });
+      expect(datiScritti().recordingDestination).toBe('PUBLIC');
+    });
+
+    it('una chiamata rapida resta senza destinazione', async () => {
+      await modifica({ ...spento(), eventType: 'INSTANT' }, { recordingEnabled: true });
+      expect(datiScritti()).not.toHaveProperty('recordingDestination');
+    });
+
+    it('a sala aperta il flag si ignora e la destinazione non cambia', async () => {
+      sala.salaForseAperta.mockResolvedValue(true);
+      await modifica(spento(), { recordingEnabled: true });
+      expect(datiScritti()).not.toHaveProperty('recordingDestination');
+    });
+  });
+
+  describe('la rubrica nel modulo', () => {
+    const conRubrica = () => riservato({ offerAddressBook: true });
+
+    it('la cambia lo staff, e si salva', async () => {
+      const r = await modifica(conRubrica(), { offerAddressBook: false });
+      expect(r.status).toBe(200);
+      expect(datiScritti().offerAddressBook).toBe(false);
+      expect(staff.requireEventManager).toHaveBeenCalled();
+    });
+
+    it('un link di conduzione prende 403', async () => {
+      staff.requireEventManager.mockRejectedValue(new ForbiddenError('no'));
+      const r = await modifica(conRubrica(), { offerAddressBook: false });
+      expect(r.status).toBe(403);
+      expect(mocked.event.update).not.toHaveBeenCalled();
+    });
+
+    it('lo stesso valore da un link di conduzione passa', async () => {
+      staff.requireEventManager.mockRejectedValue(new ForbiddenError('no'));
+      expect((await modifica(conRubrica(), { offerAddressBook: true })).status).toBe(200);
+    });
+  });
+
+  it('la risposta della modifica riporta la destinazione', async () => {
+    const r = await modifica(riservato(), {});
+    expect((await r.json()).recordingDestination).toBe('REGISTRANTS');
+  });
+});
+
+describe('GET /api/events/[param] — le domande dopo l’evento', () => {
+  const lettura = () =>
+    GET(
+      new Request(`http://localhost/api/events/evento-esistente`) as unknown as NextRequest,
+      { params: Promise.resolve({ param: 'evento-esistente' }) } as never,
+    );
+
+  const evento = (over: Record<string, unknown>) => ({
+    ...eventoEsistente(),
+    _count: { registrations: 0 },
+    qaEnabled: true,
+    postEventShowQA: true,
+    recordingDestination: null,
+    ...over,
+  });
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(extractModeratorToken).mockReturnValue(null as unknown as string);
+  });
+  afterEach(() => {
+    vi.mocked(extractModeratorToken).mockReturnValue('token-valido');
+  });
+
+  it.each([
+    ['evento senza destinazione', {}, true],
+    ['destinazione pubblica', { recordingDestination: 'PUBLIC' }, true],
+    ['registrazione riservata, interruttore acceso', { recordingDestination: 'REGISTRANTS' }, false],
+    ['interruttore spento', { postEventShowQA: false }, false],
+    ['domande spente in sala', { qaEnabled: false }, false],
+  ])('%s', async (_n, over, atteso) => {
+    mocked.event.findUnique.mockResolvedValue(evento(over));
+    const corpo = await (await lettura()).json();
+    expect(corpo.postEventShowQA).toBe(atteso);
+    expect(corpo).not.toHaveProperty('recordingDestination');
+  });
+
+  it('chi conduce legge la scelta salvata, la destinazione e la rubrica', async () => {
+    vi.mocked(extractModeratorToken).mockReturnValue('token-valido');
+    mocked.event.findUnique.mockResolvedValue(
+      evento({
+        recordingDestination: 'REGISTRANTS',
+        offerAddressBook: false,
+        createdAt: new Date('2027-01-01T09:00:00.000Z'),
+        registrations: [],
+      }),
+    );
+    expect(await (await lettura()).json()).toMatchObject({
+      postEventShowQA: true,
+      recordingDestination: 'REGISTRANTS',
+      offerAddressBook: false,
+    });
   });
 });
 

@@ -217,6 +217,13 @@ describe('la chiamata che nasce', () => {
     });
   });
 
+  it('registra e resta senza destinazione: niente blocco, un avviso a chi pubblica', async () => {
+    await crea(CORPO);
+    expect(salvato().recordingEnabled).toBe(true);
+    expect(salvato()).not.toHaveProperty('recordingDestination');
+    expect(salvato()).not.toHaveProperty('recordingAudience');
+  });
+
   it('ha gli orari che servono a chi la spegne quando resta vuota', async () => {
     const prima = Date.now();
     await crea(CORPO);

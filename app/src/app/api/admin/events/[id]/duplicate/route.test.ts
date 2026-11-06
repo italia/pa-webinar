@@ -257,6 +257,60 @@ describe('POST /api/admin/events/[id]/duplicate', () => {
     expect(mocked.eventAgendaItem.createMany).not.toHaveBeenCalled();
   });
 
+  describe('la destinazione della registrazione', () => {
+    const copiaDi = async (over: Record<string, unknown>) => {
+      mocked.event.findUnique.mockResolvedValue({ ...sourceEvent(), ...over });
+      expect((await POST(request(), context as never)).status).toBe(201);
+      return mocked.event.create.mock.calls[0]![0].data as Record<string, unknown>;
+    };
+
+    it('da un evento che registra senza destinazione la copia parte riservata', async () => {
+      const copia = await copiaDi({
+        recordingEnabled: true,
+        recordingDestination: null,
+        recordingAudience: 'PUBLIC',
+      });
+      expect(copia).toMatchObject({
+        recordingDestination: 'REGISTRANTS',
+        recordingAudience: 'REGISTRANTS',
+      });
+    });
+
+    it('una destinazione dichiarata si copia cosi’ com’e’', async () => {
+      const copia = await copiaDi({
+        recordingEnabled: true,
+        recordingDestination: 'PUBLIC',
+        recordingAudience: 'PUBLIC',
+      });
+      expect(copia).toMatchObject({
+        recordingDestination: 'PUBLIC',
+        recordingAudience: 'PUBLIC',
+      });
+    });
+
+    it('una copia di un evento riservato resta riservata', async () => {
+      const copia = await copiaDi({
+        recordingEnabled: true,
+        recordingDestination: 'REGISTRANTS',
+        recordingAudience: 'REGISTRANTS',
+      });
+      expect(copia).toMatchObject({
+        recordingDestination: 'REGISTRANTS',
+        recordingAudience: 'REGISTRANTS',
+      });
+    });
+
+    it('senza registrazione la copia resta senza destinazione', async () => {
+      const copia = await copiaDi({
+        recordingEnabled: false,
+        recordingDestination: null,
+        recordingAudience: 'PUBLIC',
+      });
+      expect(copia.recordingDestination).toBeNull();
+      expect(copia.recordingAudience).toBe('PUBLIC');
+    });
+  });
+
   it('la copia nasce in BOZZA: un clone non deve andare pubblico da solo', async () => {
     await POST(request(), context as never);
     const created = mocked.event.create.mock.calls[0]?.[0]?.data as Record<string, unknown>;
