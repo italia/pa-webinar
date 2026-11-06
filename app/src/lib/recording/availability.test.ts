@@ -4,7 +4,7 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
 
-import { recordingAvailable, voceNelVideo } from './availability';
+import { recordingAvailable, tracceDisponibili, voceNelVideo } from './availability';
 
 // Jitsi installato dal chart: l'unico caso in cui l'assenza di un registratore
 // e' certa.
@@ -68,5 +68,27 @@ describe('voceNelVideo', () => {
 
   it('con un Jitsi esterno non si sa chi registra: vale la risposta prudente', () => {
     expect(voceNelVideo({})).toBe('fissa');
+  });
+});
+
+describe('tracceDisponibili', () => {
+  it('Jitsi esterno o non dichiarato: si presume che il registratore ci sia', () => {
+    expect(tracceDisponibili({})).toBe(true);
+  });
+
+  it('chart con il registratore per partecipante collegato', () => {
+    expect(tracceDisponibili({ ...CHART, RECORDER_CONTROLLER_URL: 'http://recorder-controller:8080' })).toBe(
+      true,
+    );
+  });
+
+  it('il solo Jibri registra il video ma non le tracce', () => {
+    const soloJibri = { ...CHART, JIBRI_HEALTH_URL: 'http://pa-webinar-jitsi-meet-jibri:2222' };
+    expect(recordingAvailable(soloJibri)).toBe(true);
+    expect(tracceDisponibili(soloJibri)).toBe(false);
+  });
+
+  it('un indirizzo vuoto del registratore non conta', () => {
+    expect(tracceDisponibili({ ...CHART, RECORDER_CONTROLLER_URL: '  ' })).toBe(false);
   });
 });
