@@ -199,7 +199,7 @@
       "registrationEnded": "Die Veranstaltung ist beendet: Die Anmeldung ist geschlossen.",
       "joinAsGuest": "Als Gast teilnehmen",
       "registeredUseEmailLink": "Bereits angemeldet? Nutzen Sie den persönlichen Link aus Ihrer E-Mail.",
-      "willBeRecorded": "Die Veranstaltung wird aufgezeichnet.",
+      "willBeRecorded": "Die Veranstaltung kann aufgezeichnet werden.",
       "machineTranslation": "Automatische Übersetzung",
       "machineTranslationNote": "Titel und Beschreibung wurden von einem automatischen Modell übersetzt und noch von niemandem geprüft.",
       "previewTitle": "Vorschau für das Team",
@@ -726,7 +726,7 @@
     "noQuestions": "Noch keine Fragen. Stellen Sie die erste!",
     "qaPersistenceNote": "Der Text der Fragen kann auf der Seite der Veranstaltung erscheinen, ohne den Namen der Person, die sie gestellt hat.",
     "personalDataNotice": "Schreiben Sie keine personenbezogenen Daten anderer und auch keine eigenen, die Sie nicht öffentlich machen möchten: Der Text Ihrer Frage kann ohne Ihren Namen auf der Seite der Veranstaltung erscheinen.",
-    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
+    "personalDataNoticeNotPublished": "Schreiben Sie keine personenbezogenen Daten anderer und auch keine eigenen, die Sie nicht bekannt machen möchten: Wer im Raum ist, kann den Text Ihrer Frage lesen.",
     "filterAll": "Alle",
     "showPanel": "Q&A anzeigen",
     "hidePanel": "Q&A ausblenden",
@@ -746,7 +746,7 @@
       "answerFieldLabel": "Antwort auf die Frage von {name}",
       "answerPlaceholder": "Antwort schreiben (max. 2000 Zeichen)",
       "answerNotice": "Die Antwort kann auf der Seite der Veranstaltung erscheinen: Schreiben Sie keine personenbezogenen Daten.",
-      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
+      "answerNoticeNotPublished": "Wer im Raum ist, kann die Antwort lesen: Schreiben Sie keine personenbezogenen Daten.",
       "sendAnswer": "Antwort veröffentlichen",
       "cancel": "Abbrechen",
       "removeAnswer": "Antwort entfernen"
@@ -1032,7 +1032,7 @@
         "recordingManualNote": "Die Aufzeichnung startet nie von selbst: Die Moderation startet sie mit der REC-Taste.",
         "recordingDestination": "Wohin die Aufzeichnung geht",
         "recordingDestinationReserved": "Nur für Angemeldete",
-        "recordingDestinationReservedDesc": "Sichtbar für die Veranstalter und die Angemeldeten, für Letztere, solange ihre Anmeldedaten aufbewahrt werden. Kann nicht öffentlich gemacht werden.",
+        "recordingDestinationReservedDesc": "Sichtbar für die Veranstalter und die Angemeldeten, für Letztere, solange ihre Anmeldedaten aufbewahrt werden. Sie wird nicht veröffentlicht. Nach der Öffnung des Raums kann sie nicht mehr öffentlich gemacht werden.",
         "recordingDestinationPublic": "Öffentlich",
         "recordingDestinationPublicDesc": "Kann auf der Seite der Veranstaltung und in der Videothek veröffentlicht werden. Die Teilnehmenden willigen auch darin ein.",
         "recordingDestinationNotSet": "Nicht angegeben: Die Veranstaltung wurde vor Einführung dieser Auswahl erstellt.",
@@ -1040,8 +1040,8 @@
         "recordingDestinationStartsReserved": "Die Aufzeichnung ist zunächst auf Angemeldete beschränkt: Das Team der Veranstaltung kann sie öffentlich machen, solange der Raum nicht geöffnet ist.",
         "recordingDestinationStaysReserved": "Die Aufzeichnung bleibt auf Angemeldete beschränkt: Der Raum wurde bereits geöffnet.",
         "recordingDestinationLocked": "Nach der Öffnung des Raums kann nur noch auf „Nur für Angemeldete“ umgestellt werden: Die Einwilligungen gelten für den Text, den die Personen gelesen haben.",
-        "recordingDestinationPublicOnInvitation": "The event is invitation-only, but the recording stays public: anyone will be able to see the video, not just the invitees.",
-        "recordingDestinationReservedOnInvitation": "The event is invitation-only: the recording has moved to reserved. You can change this in \"Recording and AI\".",
+        "recordingDestinationPublicOnInvitation": "Die Veranstaltung ist nur auf Einladung zugänglich, aber die Aufzeichnung bleibt öffentlich: Alle werden das Video sehen können, nicht nur die Eingeladenen.",
+        "recordingDestinationReservedOnInvitation": "Die Veranstaltung ist nur auf Einladung zugänglich: Die Aufzeichnung wurde auf „Nur für Angemeldete“ umgestellt. Sie können dies unter „Aufzeichnung und KI“ ändern.",
         "recordingDestinationRequired": "Wählen Sie, wohin die Aufzeichnung geht.",
         "audienceAnonymous": "Anonymes Publikum",
         "audienceAnonymousDesc": "Teilnehmende erscheinen für andere unter einem Pseudonym („Teilnehmende“ und ein Code) im Video, im Chat und bei Fragen; die Teilnehmerliste bleibt bei der Moderation, und es gibt keinen Platz. Sinnvoll für große Events; bei Community-Events möchte man sich kennenlernen.",
@@ -2053,7 +2053,7 @@
     },
     "recordingUpload": {
       "title": "Bestehende Aufzeichnung hochladen",
-      "subtitle": "Wenn Sie bereits eine Videodatei der Veranstaltung haben (zum Beispiel mit einer anderen Plattform aufgezeichnet), laden Sie sie hier hoch: Sie wird als offizielle Aufzeichnung auf der öffentlichen Seite gezeigt.",
+      "subtitle": "Wenn Sie bereits eine Videodatei der Veranstaltung haben (zum Beispiel mit einer anderen Plattform aufgezeichnet), laden Sie sie hier hoch: Sie wird die offizielle Aufzeichnung der Veranstaltung.",
       "fileLabel": "Videodatei",
       "upload": "Hochladen und zuordnen",
       "signing": "Vorbereitung…",
@@ -3011,8 +3011,8 @@
       "editPrivacy": "Datenschutz und Daten bearbeiten"
     },
     "rubrica": {
-      "subtitle": "Personen, die der Aufnahme in das Adressbuch zugestimmt haben (Art. 6.1.a GDPR). Profilinformationen werden bei jeder erneuten Anmeldung automatisch aktualisiert.",
-      "searchLabel": "Nach Name oder Organisation suchen",
+      "subtitle": "Personen, die der Aufnahme in das Adressbuch zugestimmt haben (Art. 6.1.a DSGVO). Name, E-Mail-Adresse und Organisation werden nur aktualisiert, wenn die Person das Kästchen erneut ankreuzt.",
+      "searchLabel": "Nach Organisation suchen",
       "orgTypeLabel": "Art der Organisation",
       "allTypes": "Alle",
       "includeOptedOut": "Personen einbeziehen, die ihre Einwilligung widerrufen haben",
@@ -3815,7 +3815,7 @@
         "title": "Bericht",
         "pubblicato": "Veröffentlicht.",
         "daPubblicare": "Erstellt: Lesen Sie ihn durch und veröffentlichen Sie ihn.",
-        "daGenerare": "Noch zu erstellen, auf Grundlage von Transkript, Chat und Bewertungen.",
+        "daGenerare": "Noch zu erstellen, auf Grundlage von Transkript, Umfragen und Bewertungen sowie, sofern veröffentlicht, Fragen.",
         "inLavorazione": "In Bearbeitung.",
         "senzaPipeline": "Die KI-Nachbearbeitung ist in dieser Installation nicht aktiv.",
         "soloStaff": "Wer die Veranstaltung organisiert, erstellt und veröffentlicht ihn im Verwaltungsbereich.",
@@ -4573,7 +4573,7 @@
       "addressBookIntro": "Sie haben sich dafür entschieden, im Adressbuch zu bleiben, um zu ähnlichen Veranstaltungen eingeladen zu werden. Wir bewahren diese Daten bis zum {date} auf, sofern Sie nicht widerrufen oder erneut einwilligen.",
       "addressBookOptOut": "Meine Daten aus dem Adressbuch entfernen",
       "consentFutureEffect": "Wenn Sie sie widerrufen, erhalten Sie keine Mitteilungen zu kommenden Veranstaltungen mehr und verlassen das Adressbuch, für alle Ihre Anmeldungen.",
-      "addressBookPendingTitle": "Rückkehr ins Adressbuch bestätigen",
+      "addressBookPendingTitle": "Rückkehr ins Adressbuch noch zu bestätigen",
       "addressBookPendingBody": "Bei dieser Anmeldung wurde das Kästchen für das Adressbuch angekreuzt, aber diese Adresse hatte keine Einladungen mehr erhalten. Solange Sie nicht bestätigen, ändert sich nichts.",
       "addressBookPendingEffect": "Wenn Sie bestätigen, kehren Sie mit dem Namen und der Organisation dieser Anmeldung ins Adressbuch zurück und erhalten wieder Einladungen. Wenn Sie abbrechen oder wenn Sie es nicht waren, bleiben Sie außerhalb des Adressbuchs und erhalten keine Einladungen.",
       "addressBookPendingConfirm": "Rückkehr bestätigen",
@@ -5820,7 +5820,7 @@
       "strengths": "Stärken",
       "improvements": "Verbesserungsbedarf",
       "quotes": "Aus den Kommentaren",
-      "aiNotice": "Der Text wurde von einem KI-Modell aus Transkript, Chat, Fragen, Umfragen und Bewertungen verfasst und vor der Veröffentlichung vom Team geprüft. Zahlen und Diagramme berechnet die Plattform. Er kann Ungenauigkeiten enthalten."
+      "aiNotice": "Der Text wurde von einem KI-Modell aus Transkript, Umfragen und Bewertungen sowie, sofern veröffentlicht, Fragen verfasst und vor der Veröffentlichung vom Team geprüft. Zahlen und Diagramme berechnet die Plattform. Der Text kann Ungenauigkeiten enthalten."
     },
     "languages": {
       "title": "Ansehen auf",
@@ -5881,7 +5881,7 @@
       "confirm": "Entfernung bestätigen",
       "submitting": "Wird entfernt…",
       "successTitle": "Entfernung abgeschlossen",
-      "successBody": "Ihre Daten sind nicht mehr im Veranstaltungs-Adressbuch enthalten.",
+      "successBody": "Ab sofort erhalten Sie keine Einladungen mehr. Ihre E-Mail-Adresse wurde bereits entfernt; Name und Organisation werden spätestens am Folgetag aus dem Adressbuch gelöscht.",
       "errors": {
         "generic": "Es ist ein Fehler aufgetreten. Bitte später erneut versuchen."
       }

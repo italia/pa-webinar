@@ -199,7 +199,7 @@
       "registrationEnded": "Tapahtuma on päättynyt: ilmoittautuminen on suljettu.",
       "joinAsGuest": "Liity vieraana",
       "registeredUseEmailLink": "Oletko jo ilmoittautunut? Liity sähköpostissa saamallasi henkilökohtaisella linkillä.",
-      "willBeRecorded": "Tapahtuma tallennetaan.",
+      "willBeRecorded": "Tapahtuma voidaan tallentaa.",
       "machineTranslation": "Automaattinen käännös",
       "machineTranslationNote": "Otsikon ja kuvauksen on kääntänyt automaattinen malli, eikä kukaan ole vielä tarkistanut niitä.",
       "previewTitle": "Esikatselu tiimille",
@@ -726,7 +726,7 @@
     "noQuestions": "Ei vielä kysymyksiä. Ole ensimmäinen!",
     "qaPersistenceNote": "Kysymysten teksti voi näkyä tapahtuman sivulla ilman kysyjän nimeä.",
     "personalDataNotice": "Älä kirjoita muiden henkilötietoja äläkä omia tietojasi, joita et halua julkisiksi: kysymyksesi teksti voi näkyä tapahtuman sivulla ilman nimeäsi.",
-    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
+    "personalDataNoticeNotPublished": "Älä kirjoita muiden henkilötietoja äläkä omia tietojasi, joita et halua muiden tietoon: huoneessa olevat voivat lukea kysymyksesi tekstin.",
     "filterAll": "Kaikki",
     "showPanel": "Näytä Q&A",
     "hidePanel": "Piilota Q&A",
@@ -746,7 +746,7 @@
       "answerFieldLabel": "Vastaus kysymykseen, kysyjä {name}",
       "answerPlaceholder": "Kirjoita vastaus (enintään 2000 merkkiä)",
       "answerNotice": "Vastaus voi näkyä tapahtuman sivulla: älä kirjoita henkilötietoja.",
-      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
+      "answerNoticeNotPublished": "Huoneessa olevat voivat lukea vastauksen: älä kirjoita henkilötietoja.",
       "sendAnswer": "Julkaise vastaus",
       "cancel": "Peruuta",
       "removeAnswer": "Poista vastaus"
@@ -1032,7 +1032,7 @@
         "recordingManualNote": "Tallennus ei koskaan ala itsestään: juontaja käynnistää sen REC-painikkeella.",
         "recordingDestination": "Mihin tallenne menee",
         "recordingDestinationReserved": "Vain ilmoittautuneille",
-        "recordingDestinationReservedDesc": "Sen näkevät järjestäjät ja ilmoittautuneet, viimeksi mainitut niin kauan kuin heidän ilmoittautumistietojaan säilytetään. Sitä ei voi muuttaa julkiseksi.",
+        "recordingDestinationReservedDesc": "Sen näkevät järjestäjät ja ilmoittautuneet, viimeksi mainitut niin kauan kuin heidän ilmoittautumistietojaan säilytetään. Sitä ei julkaista. Huoneen avaamisen jälkeen sitä ei voi enää muuttaa julkiseksi.",
         "recordingDestinationPublic": "Julkinen",
         "recordingDestinationPublicDesc": "Sen voi julkaista tapahtuman sivulla ja videokirjastossa. Osallistujat antavat suostumuksen myös tähän.",
         "recordingDestinationNotSet": "Ei ilmoitettu: tapahtuma luotiin ennen tätä valintaa.",
@@ -1040,8 +1040,8 @@
         "recordingDestinationStartsReserved": "Tallenne on aluksi vain ilmoittautuneille: tapahtuman henkilökunta voi muuttaa sen julkiseksi, kunnes huone avataan.",
         "recordingDestinationStaysReserved": "Tallenne pysyy vain ilmoittautuneille: huone on jo avattu.",
         "recordingDestinationLocked": "Huoneen avaamisen jälkeen voi vaihtaa vain valintaan ”Vain ilmoittautuneille”: suostumukset koskevat sitä tekstiä, jonka ihmiset ovat lukeneet.",
-        "recordingDestinationPublicOnInvitation": "The event is invitation-only, but the recording stays public: anyone will be able to see the video, not just the invitees.",
-        "recordingDestinationReservedOnInvitation": "The event is invitation-only: the recording has moved to reserved. You can change this in \"Recording and AI\".",
+        "recordingDestinationPublicOnInvitation": "Tapahtuma on vain kutsutuille, mutta tallenne pysyy julkisena: videon voi katsoa kuka tahansa, ei vain kutsutut.",
+        "recordingDestinationReservedOnInvitation": "Tapahtuma on vain kutsutuille: tallenne on vaihdettu valintaan ”Vain ilmoittautuneille”. Voit muuttaa tätä kohdassa ”Tallenne ja tekoäly”.",
         "recordingDestinationRequired": "Valitse, mihin tallenne menee.",
         "audienceAnonymous": "Anonyymi yleisö",
         "audienceAnonymousDesc": "Osallistujat näkyvät muille salanimellä (”Osallistuja” ja koodi) videossa, chatissa ja kysymyksissä; osallistujaluettelo jää juontajille, eikä aukiota ole. Hyödyllinen suurissa tapahtumissa; yhteisötapahtumissa halutaan tutustua toisiin.",
@@ -2053,7 +2053,7 @@
     },
     "recordingUpload": {
       "title": "Lataa olemassa oleva tallenne",
-      "subtitle": "Jos sinulla on jo videotiedosto tapahtumasta (esimerkiksi toisella alustalla tallennettu), lataa se tähän: se näytetään virallisena tallenteena julkisella sivulla.",
+      "subtitle": "Jos sinulla on jo videotiedosto tapahtumasta (esimerkiksi toisella alustalla tallennettu), lataa se tähän: siitä tulee tapahtuman virallinen tallenne.",
       "fileLabel": "Videotiedosto",
       "upload": "Lataa ja liitä",
       "signing": "Valmistellaan…",
@@ -3011,8 +3011,8 @@
       "editPrivacy": "Muokkaa tietosuojaa ja tietoja"
     },
     "rubrica": {
-      "subtitle": "Henkilöt, jotka ovat antaneet suostumuksen osoitekirjaan lisäämiseen (GDPR art. 6.1.a). Profiilitiedot päivitetään automaattisesti jokaisen uudelleenilmoittautumisen yhteydessä.",
-      "searchLabel": "Hae nimellä tai organisaatiolla",
+      "subtitle": "Henkilöt, jotka ovat antaneet suostumuksen osoitekirjaan lisäämiseen (GDPR art. 6.1.a). Nimi, sähköposti ja organisaatio päivittyvät vain, kun henkilö valitsee ruudun uudelleen.",
+      "searchLabel": "Hae organisaatiolla",
       "orgTypeLabel": "Organisaation tyyppi",
       "allTypes": "Kaikki",
       "includeOptedOut": "Näytä myös suostumuksensa peruneet",
@@ -3815,7 +3815,7 @@
         "title": "Raportti",
         "pubblicato": "Julkaistu.",
         "daPubblicare": "Luotu: lue se läpi ja julkaise.",
-        "daGenerare": "Luotava litteroinnin, keskustelun ja arvioiden pohjalta.",
+        "daGenerare": "Luotava litteroinnin, kyselyjen ja arvioiden sekä, jos ne on julkaistu, kysymysten pohjalta.",
         "inLavorazione": "Käsittelyssä.",
         "senzaPipeline": "Tekoälyjälkikäsittely ei ole käytössä tässä asennuksessa.",
         "soloStaff": "Tapahtuman järjestäjä luo ja julkaisee sen ylläpidossa.",
@@ -4573,7 +4573,7 @@
       "addressBookIntro": "Valitsit jäädä osoitekirjaan, jotta sinut voidaan kutsua vastaaviin tapahtumiin. Säilytämme näitä tietoja {date} asti, ellet peruuta suostumusta tai anna uutta suostumusta.",
       "addressBookOptOut": "Poista tietoni osoitekirjasta",
       "consentFutureEffect": "Jos peruutat sen, et enää saa viestejä tulevista tapahtumista ja poistut osoitekirjasta kaikkien ilmoittautumistesi osalta.",
-      "addressBookPendingTitle": "Vahvista paluu osoitekirjaan",
+      "addressBookPendingTitle": "Paluu osoitekirjaan odottaa vahvistusta",
       "addressBookPendingBody": "Tässä ilmoittautumisessa valittiin osoitekirjan valintaruutu, mutta tämä osoite oli lakannut saamasta kutsuja. Mikään ei muutu, ennen kuin vahvistat.",
       "addressBookPendingEffect": "Jos vahvistat, palaat osoitekirjaan tämän ilmoittautumisen nimellä ja organisaatiolla ja saat taas kutsuja. Jos peruutat tai jos se et ollut sinä, pysyt osoitekirjan ulkopuolella etkä saa kutsuja.",
       "addressBookPendingConfirm": "Vahvista paluu",
@@ -5820,7 +5820,7 @@
       "strengths": "Vahvuudet",
       "improvements": "Parannettavaa",
       "quotes": "Kommenteista",
-      "aiNotice": "Tekstin on kirjoittanut tekoälymalli litteroinnin, chatin, kysymysten, kyselyjen ja arvioiden pohjalta, ja tiimi on tarkistanut sen ennen julkaisua. Luvut ja kaaviot laskee alusta. Se voi sisältää epätarkkuuksia."
+      "aiNotice": "Tekstin on kirjoittanut tekoälymalli litteroinnin, kyselyjen ja arvioiden sekä, jos ne on julkaistu, kysymysten pohjalta, ja tiimi on tarkistanut sen ennen julkaisua. Luvut ja kaaviot laskee alusta. Se voi sisältää epätarkkuuksia."
     },
     "languages": {
       "title": "Katso kielellä",
@@ -5881,7 +5881,7 @@
       "confirm": "Vahvista poisto",
       "submitting": "Poistetaan…",
       "successTitle": "Poisto valmis",
-      "successBody": "Tietojasi ei ole enää tapahtumien osoitekirjassa.",
+      "successBody": "Tästä hetkestä alkaen et saa enää kutsuja. Sähköpostiosoitteesi on jo poistettu; nimesi ja organisaatiosi poistetaan osoitekirjasta viimeistään seuraavana päivänä.",
       "errors": {
         "generic": "Tapahtui virhe. Yritä myöhemmin uudelleen."
       }

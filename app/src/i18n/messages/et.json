@@ -199,7 +199,7 @@
       "registrationEnded": "Üritus on lõppenud: registreerumine on suletud.",
       "joinAsGuest": "Liitu külalisena",
       "registeredUseEmailLink": "Juba registreerunud? Kasuta e-kirjas saadud isiklikku linki.",
-      "willBeRecorded": "Üritus salvestatakse.",
+      "willBeRecorded": "Üritust võidakse salvestada.",
       "machineTranslation": "Automaatne tõlge",
       "machineTranslationNote": "Pealkirja ja kirjelduse tõlkis automaatne mudel ja keegi ei ole neid veel üle vaadanud.",
       "previewTitle": "Eelvaade meeskonnale",
@@ -695,7 +695,7 @@
           "soloAscolto": "Kui võtad selle tagasi, jääd ruumi ainult kuulajana: mikrofon, kaamera ja ekraan suletakse. Võtad tagasi ka nõusoleku oma sõnavõttude transkribeerimiseks.",
           "conduce": "Kui võtad selle tagasi, juhid edasi, kuid nüüdsest su hääl ei jää isikupõhistele radadele ega transkriptsiooni. Ruumi video näitab sind siiski, kui seda salvestatakse.",
           "voce": "Kui selle tagasi võtad, jääd ruumi nagu enne ja oled nüüdsest salvestusest väljas. Võtad tagasi ka nõusoleku oma sõnavõttude transkribeerimiseks.",
-          "avvertenza": "Kui selle tagasi võtad, jääd ruumi nagu enne. Võtad tagasi ka nõusoleku oma sõnavõttude transkribeerimiseks. Kui sulle antakse sõna ja sündmus salvestatakse, jääb sinu hääl siiski videosse.",
+          "avvertenza": "Kui selle tagasi võtad, jääd ruumi nagu enne. Võtad tagasi ka nõusoleku oma sõnavõttude transkribeerimiseks. Kui sulle antakse sõna ja üritus salvestatakse, jääb sinu hääl siiski videosse.",
           "assente": "Kui selle tagasi võtad, jääd ruumi nagu enne. Võtad tagasi ka nõusoleku oma sõnavõttude transkribeerimiseks. Nüüdsest ei salvestata sinu häält eraldi rajale."
         }
       },
@@ -726,7 +726,7 @@
     "noQuestions": "Küsimusi veel pole. Olge esimene!",
     "qaPersistenceNote": "Küsimuste tekst võib ilmuda ürituse lehel ilma küsija nimeta.",
     "personalDataNotice": "Ärge kirjutage teiste inimeste isikuandmeid ega enda omi, mida te ei soovi avalikustada: küsimuse tekst võib ilmuda ürituse lehel ilma teie nimeta.",
-    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
+    "personalDataNoticeNotPublished": "Ärge kirjutage teiste inimeste isikuandmeid ega enda omi, mida te ei soovi teistele teada anda: ruumis olijad saavad küsimuse teksti lugeda.",
     "filterAll": "Kõik",
     "showPanel": "Näita Q&A",
     "hidePanel": "Peida Q&A",
@@ -746,7 +746,7 @@
       "answerFieldLabel": "Vastus küsimusele, küsija {name}",
       "answerPlaceholder": "Kirjutage vastus (kuni 2000 tähemärki)",
       "answerNotice": "Vastus võib ilmuda ürituse lehel: ära kirjuta isikuandmeid.",
-      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
+      "answerNoticeNotPublished": "Ruumis olijad saavad vastust lugeda: ära kirjuta isikuandmeid.",
       "sendAnswer": "Avalda vastus",
       "cancel": "Tühista",
       "removeAnswer": "Eemalda vastus"
@@ -1032,7 +1032,7 @@
         "recordingManualNote": "Salvestus ei alga kunagi iseenesest: juht käivitab selle REC-nupuga.",
         "recordingDestination": "Kuhu salvestis läheb",
         "recordingDestinationReserved": "Ainult registreerunutele",
-        "recordingDestinationReservedDesc": "Seda näevad korraldajad ja registreerunud, viimased seni, kuni nende registreerumisandmeid säilitatakse. Seda ei saa avalikuks muuta.",
+        "recordingDestinationReservedDesc": "Seda näevad korraldajad ja registreerunud, viimased seni, kuni nende registreerumisandmeid säilitatakse. Seda ei avaldata. Pärast ruumi avamist ei saa seda enam avalikuks muuta.",
         "recordingDestinationPublic": "Avalik",
         "recordingDestinationPublicDesc": "Saab avaldada ürituse lehel ja videoteegis. Osalejad annavad nõusoleku ka selleks.",
         "recordingDestinationNotSet": "Määramata: üritus loodi enne selle valiku lisamist.",
@@ -1040,8 +1040,8 @@
         "recordingDestinationStartsReserved": "Salvestis on alguses ainult registreerunutele: ürituse meeskond saab selle avalikuks muuta kuni ruumi avamiseni.",
         "recordingDestinationStaysReserved": "Salvestis jääb ainult registreerunutele: ruum on juba avatud.",
         "recordingDestinationLocked": "Pärast ruumi avamist saab valida ainult „Ainult registreerunutele“: nõusolekud kehtivad teksti kohta, mida inimesed lugesid.",
-        "recordingDestinationPublicOnInvitation": "The event is invitation-only, but the recording stays public: anyone will be able to see the video, not just the invitees.",
-        "recordingDestinationReservedOnInvitation": "The event is invitation-only: the recording has moved to reserved. You can change this in \"Recording and AI\".",
+        "recordingDestinationPublicOnInvitation": "Üritus on ainult kutsega, kuid salvestis jääb avalikuks: videot saab vaadata igaüks, mitte ainult kutsutud.",
+        "recordingDestinationReservedOnInvitation": "Üritus on ainult kutsega: salvestis on muudetud valikule „Ainult registreerunutele“. Saad seda muuta jaotises „Salvestus ja tehisintellekt“.",
         "recordingDestinationRequired": "Vali, kuhu salvestis läheb.",
         "audienceAnonymous": "Anonüümne publik",
         "audienceAnonymousDesc": "Osalejad on teistele nähtavad pseudonüümiga („Osaleja“ ja kood) videos, vestluses ja küsimustes; osalejate nimekiri jääb juhatajatele ja väljakut pole. Kasulik suurtel sündmustel; kogukonna sündmustel tahetakse üksteist tundma õppida.",
@@ -2053,7 +2053,7 @@
     },
     "recordingUpload": {
       "title": "Lae üles olemasolev salvestus",
-      "subtitle": "Kui sul on juba ürituse videofail (näiteks salvestatud teisel platvormil), laadi see siia: seda näidatakse avalikul lehel ametliku salvestusena.",
+      "subtitle": "Kui sul on juba ürituse videofail (näiteks salvestatud teisel platvormil), laadi see siia: sellest saab ürituse ametlik salvestis.",
       "fileLabel": "Videofail",
       "upload": "Lae üles ja seo",
       "signing": "Ettevalmistus…",
@@ -3011,8 +3011,8 @@
       "editPrivacy": "Muuda privaatsust ja andmeid"
     },
     "rubrica": {
-      "subtitle": "Inimesed, kes on andnud nõusoleku aadressraamatusse lisamiseks (IKÜM art. 6.1.a). Profiiliteave uuendatakse automaatselt iga uuesti registreerimise käigus.",
-      "searchLabel": "Otsi nime või organisatsiooni järgi",
+      "subtitle": "Inimesed, kes on andnud nõusoleku aadressraamatusse lisamiseks (IKÜM art. 6.1.a). Nimi, e-posti aadress ja organisatsioon uuenevad ainult siis, kui inimene märgib lahtri uuesti.",
+      "searchLabel": "Otsi organisatsiooni järgi",
       "orgTypeLabel": "Organisatsiooni liik",
       "allTypes": "Kõik",
       "includeOptedOut": "Kaasa ka nõusoleku tagasi võtnud inimesed",
@@ -3815,7 +3815,7 @@
         "title": "Ülevaade",
         "pubblicato": "Avaldatud.",
         "daPubblicare": "Loodud: lugege see läbi ja avaldage.",
-        "daGenerare": "Tuleb luua transkriptsiooni, vestluse ja hinnangute põhjal.",
+        "daGenerare": "Tuleb luua transkriptsiooni, küsitluste, hinnangute ja, kui need on avaldatud, küsimuste põhjal.",
         "inLavorazione": "Töötlemisel.",
         "senzaPipeline": "AI järeltöötlus pole selles paigalduses aktiivne.",
         "soloStaff": "Ürituse korraldaja loob selle ja avaldab haldusalas.",
@@ -4574,8 +4574,8 @@
       "addressBookOptOut": "Eemalda minu andmed aadressraamatust",
       "consentFutureEffect": "Kui selle tagasi võtate, ei saa te enam teateid järgmiste ürituste kohta ja lahkute aadressiraamatust kõigi oma registreerimiste puhul.",
       "addressBookPendingTitle": "Aadressraamatusse naasmine vajab kinnitust",
-      "addressBookPendingBody": "Selle registreerimise juures märgiti aadressraamatu ruut, kuid see aadress oli lakanud kutseid saamast. Enne kinnitamist ei muutu midagi.",
-      "addressBookPendingEffect": "Kui kinnitad, naased aadressraamatusse selle registreerimise nime ja asutusega ning saad taas kutseid. Kui tühistad või kui see polnud sina, jääd aadressraamatust välja ega saa kutseid.",
+      "addressBookPendingBody": "Selle registreerumise juures märgiti aadressraamatu lahter, kuid see aadress oli lakanud kutseid saamast. Enne kinnitamist ei muutu midagi.",
+      "addressBookPendingEffect": "Kui kinnitate, naasete aadressraamatusse selle registreerumise nime ja organisatsiooniga ning saate taas kutseid. Kui tühistate või kui see polnud teie, jääte aadressraamatust välja ega saa kutseid.",
       "addressBookPendingConfirm": "Kinnita naasmine",
       "addressBookPendingCancel": "Tühista taotlus"
     },
@@ -5820,7 +5820,7 @@
       "strengths": "Tugevused",
       "improvements": "Parandada",
       "quotes": "Kommentaaridest",
-      "aiNotice": "Teksti on kirjutanud tehisintellekti mudel transkriptsiooni, vestluse, küsimuste, küsitluste ja hinnangute põhjal ning meeskond vaatas selle enne avaldamist üle. Numbrid ja graafikud arvutab platvorm. See võib sisaldada ebatäpsusi."
+      "aiNotice": "Teksti on kirjutanud tehisintellekti mudel transkriptsiooni, küsitluste, hinnangute ja, kui need on avaldatud, küsimuste põhjal ning meeskond vaatas selle enne avaldamist üle. Numbrid ja graafikud arvutab platvorm. See võib sisaldada ebatäpsusi."
     },
     "languages": {
       "title": "Vaata keeles",
@@ -5881,7 +5881,7 @@
       "confirm": "Kinnita eemaldamine",
       "submitting": "Eemaldamine käib…",
       "successTitle": "Eemaldamine valmis",
-      "successBody": "Teie andmed ei ole enam ürituste aadressraamatus.",
+      "successBody": "Alates praegusest hetkest ei saa te enam kutseid. Teie e-posti aadress on juba eemaldatud; teie nimi ja organisatsioon kustutatakse aadressraamatust hiljemalt järgmisel päeval.",
       "errors": {
         "generic": "Tekkis viga. Palun proovige hiljem uuesti."
       }

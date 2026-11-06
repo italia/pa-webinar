@@ -199,7 +199,7 @@
       "registrationEnded": "L'événement est terminé : les inscriptions sont closes.",
       "joinAsGuest": "Participer en tant qu'invité",
       "registeredUseEmailLink": "Déjà inscrit ? Entrez avec le lien personnel reçu par e-mail.",
-      "willBeRecorded": "L'événement sera enregistré.",
+      "willBeRecorded": "L'événement peut être enregistré.",
       "machineTranslation": "Traduction automatique",
       "machineTranslationNote": "Le titre et la description ont été traduits par un modèle automatique et personne ne les a encore relus.",
       "previewTitle": "Aperçu réservé à l'équipe",
@@ -726,7 +726,7 @@
     "noQuestions": "Aucune question pour le moment. Soyez le premier !",
     "qaPersistenceNote": "Le texte des questions peut apparaître sur la page de l'événement, sans le nom de la personne qui les a posées.",
     "personalDataNotice": "N'écrivez pas les données personnelles d'autres personnes, ni les vôtres si vous ne souhaitez pas les rendre publiques : le texte de la question peut apparaître sur la page de l'événement, sans votre nom.",
-    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
+    "personalDataNoticeNotPublished": "N'écrivez pas les données personnelles d'autres personnes, ni les vôtres si vous ne souhaitez pas les faire connaître : les personnes présentes dans la salle peuvent lire le texte de la question.",
     "filterAll": "Toutes",
     "showPanel": "Afficher Q&A",
     "hidePanel": "Masquer Q&A",
@@ -746,7 +746,7 @@
       "answerFieldLabel": "Réponse à la question de {name}",
       "answerPlaceholder": "Rédigez la réponse (2000 caractères max.)",
       "answerNotice": "La réponse peut apparaître sur la page de l'événement : n'écrivez pas de données personnelles.",
-      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
+      "answerNoticeNotPublished": "Les personnes présentes dans la salle peuvent lire la réponse : n'écrivez pas de données personnelles.",
       "sendAnswer": "Publier la réponse",
       "cancel": "Annuler",
       "removeAnswer": "Retirer la réponse"
@@ -1032,7 +1032,7 @@
         "recordingManualNote": "L'enregistrement ne démarre jamais tout seul : un animateur le lance avec le bouton REC.",
         "recordingDestination": "Où va l'enregistrement",
         "recordingDestinationReserved": "Réservé",
-        "recordingDestinationReservedDesc": "Les organisateurs et les inscrits peuvent le voir, ces derniers tant que les données de leur inscription sont conservées. Il ne peut pas être rendu public.",
+        "recordingDestinationReservedDesc": "Les organisateurs et les inscrits peuvent le voir, ces derniers tant que les données de leur inscription sont conservées. Il n'est pas publié. Après l'ouverture de la salle, il ne peut plus être rendu public.",
         "recordingDestinationPublic": "Public",
         "recordingDestinationPublicDesc": "Il peut être publié sur la page de l'événement et dans la vidéothèque. Les participants y consentent également.",
         "recordingDestinationNotSet": "Non indiqué : l'événement a été créé avant ce choix.",
@@ -1040,8 +1040,8 @@
         "recordingDestinationStartsReserved": "L'enregistrement est d'abord réservé : l'équipe de l'événement peut le rendre public tant que la salle n'est pas ouverte.",
         "recordingDestinationStaysReserved": "L'enregistrement reste réservé : la salle a déjà été ouverte.",
         "recordingDestinationLocked": "Après l'ouverture de la salle, on peut seulement passer à « Réservé » : les consentements valent pour le texte que les personnes ont lu.",
-        "recordingDestinationPublicOnInvitation": "The event is invitation-only, but the recording stays public: anyone will be able to see the video, not just the invitees.",
-        "recordingDestinationReservedOnInvitation": "The event is invitation-only: the recording has moved to reserved. You can change this in \"Recording and AI\".",
+        "recordingDestinationPublicOnInvitation": "L'événement est sur invitation, mais l'enregistrement reste public : tout le monde pourra voir la vidéo, pas seulement les invités.",
+        "recordingDestinationReservedOnInvitation": "L'événement est sur invitation : l'enregistrement est passé à « Réservé ». Vous pouvez le modifier dans « Enregistrement et IA ».",
         "recordingDestinationRequired": "Choisissez où va l'enregistrement.",
         "audienceAnonymous": "Public anonyme",
         "audienceAnonymousDesc": "Les participants apparaissent aux autres sous un pseudonyme (« Participant » et un code) en vidéo, dans le chat et les questions ; la liste des participants reste aux animateurs et il n'y a pas de place. Utile pour les grands événements ; aux événements de communauté, on veut se connaître.",
@@ -2053,7 +2053,7 @@
     },
     "recordingUpload": {
       "title": "Téléverser un enregistrement existant",
-      "subtitle": "Si vous avez déjà un fichier vidéo de l'événement (par exemple enregistré avec une autre plateforme), téléversez-le ici : il sera affiché comme enregistrement officiel sur la page publique.",
+      "subtitle": "Si vous avez déjà un fichier vidéo de l'événement (par exemple enregistré avec une autre plateforme), téléversez-le ici : il sera l'enregistrement officiel de l'événement.",
       "fileLabel": "Fichier vidéo",
       "upload": "Téléverser et associer",
       "signing": "Préparation…",
@@ -3011,8 +3011,8 @@
       "editPrivacy": "Modifier la confidentialité et les données"
     },
     "rubrica": {
-      "subtitle": "Personnes ayant consenti à être inscrites au carnet d'adresses (art. 6.1.a RGPD). Les informations de profil sont mises à jour automatiquement à chaque ré-inscription.",
-      "searchLabel": "Rechercher par nom ou organisation",
+      "subtitle": "Personnes ayant consenti à être inscrites au carnet d'adresses (art. 6.1.a RGPD). Le nom, l'e-mail et l'organisation ne sont mis à jour que lorsque la personne coche à nouveau la case.",
+      "searchLabel": "Rechercher par organisation",
       "orgTypeLabel": "Type d'organisation",
       "allTypes": "Tous",
       "includeOptedOut": "Inclure les personnes ayant retiré leur consentement",
@@ -3815,7 +3815,7 @@
         "title": "Compte rendu",
         "pubblicato": "Publié.",
         "daPubblicare": "Généré : relisez-le et publiez-le.",
-        "daGenerare": "À générer, à partir de la transcription, du chat et des évaluations.",
+        "daGenerare": "À générer, à partir de la transcription, des sondages, des évaluations et, si elles sont publiées, des questions.",
         "inLavorazione": "En cours de traitement.",
         "senzaPipeline": "La post-production IA n’est pas activée sur cette installation.",
         "soloStaff": "La personne qui organise l’événement le génère et le publie depuis l’espace d’administration.",
@@ -5820,7 +5820,7 @@
       "strengths": "Points forts",
       "improvements": "À améliorer",
       "quotes": "Extraits des commentaires",
-      "aiNotice": "Le texte est rédigé par un modèle d'intelligence artificielle à partir de la transcription, du chat, des questions, des sondages et des évaluations, et l'équipe l'a relu avant de le publier. Les chiffres et les graphiques sont calculés par la plateforme. Il peut contenir des imprécisions."
+      "aiNotice": "Le texte est rédigé par un modèle d'intelligence artificielle à partir de la transcription, des sondages, des évaluations et, si elles sont publiées, des questions, et l'équipe l'a relu avant de le publier. Les chiffres et les graphiques sont calculés par la plateforme. Il peut contenir des imprécisions."
     },
     "languages": {
       "title": "Regarder en",
@@ -5881,7 +5881,7 @@
       "confirm": "Confirmer la suppression",
       "submitting": "Suppression en cours…",
       "successTitle": "Suppression effectuée",
-      "successBody": "Vos données ne sont plus présentes dans le carnet d'adresses des événements.",
+      "successBody": "À partir de maintenant, vous ne recevrez plus d'invitations. Votre adresse e-mail a déjà été retirée ; le nom et l'organisme sont supprimés du carnet d'adresses au plus tard le lendemain.",
       "errors": {
         "generic": "Une erreur s'est produite. Veuillez réessayer plus tard."
       }

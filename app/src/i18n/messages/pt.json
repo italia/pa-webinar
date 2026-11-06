@@ -199,7 +199,7 @@
       "registrationEnded": "O evento terminou: as inscrições estão encerradas.",
       "joinAsGuest": "Participar como convidado",
       "registeredUseEmailLink": "Já se inscreveu? Entre com a ligação pessoal que recebeu por e-mail.",
-      "willBeRecorded": "O evento será gravado.",
+      "willBeRecorded": "O evento pode ser gravado.",
       "machineTranslation": "Tradução automática",
       "machineTranslationNote": "O título e a descrição foram traduzidos por um modelo automático e ninguém os reviu ainda.",
       "previewTitle": "Pré-visualização para a equipa",
@@ -726,7 +726,7 @@
     "noQuestions": "Ainda não há perguntas. Seja o primeiro!",
     "qaPersistenceNote": "O texto das perguntas pode aparecer na página do evento, sem o nome de quem as fez.",
     "personalDataNotice": "Não escreva dados pessoais de outras pessoas, nem seus que não queira tornar públicos: o texto da pergunta pode aparecer na página do evento, sem o seu nome.",
-    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
+    "personalDataNoticeNotPublished": "Não escreva dados pessoais de outras pessoas, nem seus que não queira dar a conhecer: quem está na sala pode ler o texto da pergunta.",
     "filterAll": "Todas",
     "showPanel": "Mostrar Q&A",
     "hidePanel": "Ocultar Q&A",
@@ -746,7 +746,7 @@
       "answerFieldLabel": "Resposta à pergunta de {name}",
       "answerPlaceholder": "Escreva a resposta (máx. 2000 caracteres)",
       "answerNotice": "A resposta pode aparecer na página do evento: não escreva dados pessoais.",
-      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
+      "answerNoticeNotPublished": "Quem está na sala pode ler a resposta: não escreva dados pessoais.",
       "sendAnswer": "Publicar resposta",
       "cancel": "Cancelar",
       "removeAnswer": "Remover a resposta"
@@ -1032,7 +1032,7 @@
         "recordingManualNote": "A gravação nunca começa sozinha: um moderador inicia-a com o botão REC.",
         "recordingDestination": "Para onde vai a gravação",
         "recordingDestinationReserved": "Reservada",
-        "recordingDestinationReservedDesc": "Veem-na quem organiza e quem se inscreveu, enquanto os dados da respetiva inscrição forem conservados. Não pode ser tornada pública.",
+        "recordingDestinationReservedDesc": "Podem vê-la quem organiza e quem se inscreveu, estes últimos enquanto os dados da sua inscrição forem conservados. Não é publicada. Depois da abertura da sala já não pode ser tornada pública.",
         "recordingDestinationPublic": "Pública",
         "recordingDestinationPublicDesc": "Pode ser publicada na página do evento e na biblioteca de vídeo. Quem participa consente também nisso.",
         "recordingDestinationNotSet": "Não indicada: o evento foi criado antes de esta escolha existir.",
@@ -1040,8 +1040,8 @@
         "recordingDestinationStartsReserved": "A gravação começa como reservada: a equipa do evento pode torná-la pública até a sala abrir.",
         "recordingDestinationStaysReserved": "A gravação continua reservada: a sala já abriu.",
         "recordingDestinationLocked": "Depois da abertura da sala só se pode passar a reservada: os consentimentos valem para o texto que as pessoas leram.",
-        "recordingDestinationPublicOnInvitation": "The event is invitation-only, but the recording stays public: anyone will be able to see the video, not just the invitees.",
-        "recordingDestinationReservedOnInvitation": "The event is invitation-only: the recording has moved to reserved. You can change this in \"Recording and AI\".",
+        "recordingDestinationPublicOnInvitation": "O evento é por convite, mas a gravação continua pública: qualquer pessoa poderá ver o vídeo, não apenas os convidados.",
+        "recordingDestinationReservedOnInvitation": "O evento é por convite: a gravação passou a reservada. Pode alterá-la em «Gravação e IA».",
         "recordingDestinationRequired": "Escolha para onde vai a gravação.",
         "audienceAnonymous": "Público anónimo",
         "audienceAnonymousDesc": "Quem participa aparece aos outros com um pseudónimo («Participante» e um código) no vídeo, no chat e nas perguntas; a lista de participantes fica com a moderação e não há praça. Útil para eventos grandes; nos eventos de comunidade as pessoas querem conhecer-se.",
@@ -2053,7 +2053,7 @@
     },
     "recordingUpload": {
       "title": "Carregar gravação existente",
-      "subtitle": "Se já tem um ficheiro de vídeo do evento (por exemplo gravado com outra plataforma), carregue-o aqui: será mostrado como gravação oficial na página pública.",
+      "subtitle": "Se já tem um ficheiro de vídeo do evento (por exemplo gravado com outra plataforma), carregue-o aqui: será a gravação oficial do evento.",
       "fileLabel": "Ficheiro de vídeo",
       "upload": "Carregar e associar",
       "signing": "A preparar…",
@@ -3011,8 +3011,8 @@
       "editPrivacy": "Editar privacidade e dados"
     },
     "rubrica": {
-      "subtitle": "Pessoas que deram consentimento para constarem na agenda (art. 6.1.a RGPD). As informações de perfil são atualizadas automaticamente em cada nova inscrição.",
-      "searchLabel": "Pesquisar por nome ou organização",
+      "subtitle": "Pessoas que deram consentimento para constarem na agenda (art. 6.1.a RGPD). O nome, o e-mail e a organização só são atualizados quando a pessoa volta a assinalar a caixa.",
+      "searchLabel": "Pesquisar por organização",
       "orgTypeLabel": "Tipo de organização",
       "allTypes": "Todos",
       "includeOptedOut": "Incluir quem retirou o consentimento",
@@ -3815,7 +3815,7 @@
         "title": "Relatório",
         "pubblicato": "Publicado.",
         "daPubblicare": "Gerado: releia-o e publique-o.",
-        "daGenerare": "Por gerar, a partir da transcrição, do chat e das avaliações.",
+        "daGenerare": "Por gerar, a partir da transcrição, das sondagens, das avaliações e, se estiverem publicadas, das perguntas.",
         "inLavorazione": "Em processamento.",
         "senzaPipeline": "A pós-produção com IA não está ativa nesta instalação.",
         "soloStaff": "Quem organiza o evento gera-o e publica-o a partir da área de administração.",
@@ -4574,8 +4574,8 @@
       "addressBookOptOut": "Remover os meus dados da agenda",
       "consentFutureEffect": "Se o retirar, deixa de receber comunicações sobre próximos eventos e sai da lista de contactos, para todas as suas inscrições.",
       "addressBookPendingTitle": "Regresso à agenda por confirmar",
-      "addressBookPendingBody": "Nesta inscrição foi assinalada a caixa da agenda, mas este endereço tinha deixado de receber convites. Até confirmares, nada muda.",
-      "addressBookPendingEffect": "Se confirmares, regressas à agenda com o nome e a organização desta inscrição e voltas a receber convites. Se cancelares, ou se não foste tu, ficas fora da agenda e não recebes convites.",
+      "addressBookPendingBody": "Nesta inscrição foi assinalada a caixa da agenda, mas este endereço tinha deixado de receber convites. Até confirmar, nada muda.",
+      "addressBookPendingEffect": "Se confirmar, regressa à agenda com o nome e o organismo desta inscrição e volta a receber convites. Se cancelar, ou se não tiver sido você, fica fora da agenda e não recebe convites.",
       "addressBookPendingConfirm": "Confirmar o regresso",
       "addressBookPendingCancel": "Cancelar o pedido"
     },
@@ -5820,7 +5820,7 @@
       "strengths": "Pontos fortes",
       "improvements": "A melhorar",
       "quotes": "Dos comentários",
-      "aiNotice": "O texto é escrito por um modelo de inteligência artificial a partir da transcrição, do chat, das perguntas, das sondagens e das avaliações, e a equipa reviu-o antes de o publicar. Os números e os gráficos são calculados pela plataforma. Pode conter imprecisões."
+      "aiNotice": "O texto é escrito por um modelo de inteligência artificial a partir da transcrição, das sondagens, das avaliações e, se estiverem publicadas, das perguntas, e a equipa reviu-o antes de o publicar. Os números e os gráficos são calculados pela plataforma. Pode conter imprecisões."
     },
     "languages": {
       "title": "Ver em",
@@ -5881,7 +5881,7 @@
       "confirm": "Confirmar a remoção",
       "submitting": "A remover…",
       "successTitle": "Remoção concluída",
-      "successBody": "Os seus dados já não estão presentes na agenda de eventos.",
+      "successBody": "A partir deste momento deixará de receber convites. O seu endereço de e-mail já foi removido; o nome e o organismo são eliminados da agenda até ao dia seguinte.",
       "errors": {
         "generic": "Ocorreu um erro. Tente novamente mais tarde."
       }

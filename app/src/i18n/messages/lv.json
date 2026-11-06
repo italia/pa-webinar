@@ -199,7 +199,7 @@
       "registrationEnded": "Pasākums ir beidzies: reģistrācija ir slēgta.",
       "joinAsGuest": "Pievienoties kā viesim",
       "registeredUseEmailLink": "Jau pieteicāties? Ieejiet ar personīgo saiti no e-pasta.",
-      "willBeRecorded": "Pasākums tiks ierakstīts.",
+      "willBeRecorded": "Pasākums var tikt ierakstīts.",
       "machineTranslation": "Automātiskais tulkojums",
       "machineTranslationNote": "Nosaukumu un aprakstu iztulkoja automātisks modelis, un neviens tos vēl nav pārskatījis.",
       "previewTitle": "Priekšskatījums komandai",
@@ -695,8 +695,8 @@
           "soloAscolto": "Ja to atsaucat, paliekat telpā tikai kā klausītājs: mikrofons, kamera un ekrāns tiek aizvērti. Tiek atsaukta arī piekrišana jūsu runas atšifrēšanai.",
           "conduce": "Ja to atsaucat, jūs turpināt vadīt, bet turpmāk jūsu balss nepaliek atsevišķo personu celiņos un atšifrējumā. Telpas video, ja tas tiek ierakstīts, jūs tāpat rāda.",
           "voce": "Ja atsaucat, paliekat telpā kā iepriekš, un no šī brīža esat ārpus ieraksta. Atsaucat arī piekrišanu savu uzstāšanos transkripcijai.",
-          "avvertenza": "Ja atsaucat, paliekat telpā kā iepriekš. Atsaucat arī piekrišanu savu uzstāšanos transkripcijai. Ja jums dod vārdu un pasākums tiek ierakstīts, jūsu balss tomēr paliek video.",
-          "assente": "Ja atsaucat, paliekat telpā kā iepriekš. Atsaucat arī piekrišanu savu uzstāšanos transkripcijai. No šī brīža jūsu balss netiek ierakstīta atsevišķā celiņā."
+          "avvertenza": "Ja atsaucat, paliekat telpā kā iepriekš. Atsaucat arī piekrišanu savu uzstāšanos atšifrēšanai. Ja jums dod vārdu un pasākums tiek ierakstīts, jūsu balss tomēr paliek video.",
+          "assente": "Ja atsaucat, paliekat telpā kā iepriekš. Atsaucat arī piekrišanu savu uzstāšanos atšifrēšanai. No šī brīža jūsu balss netiek ierakstīta atsevišķā celiņā."
         }
       },
       "transcription": {
@@ -726,7 +726,7 @@
     "noQuestions": "Vēl nav jautājumu. Esiet pirmais!",
     "qaPersistenceNote": "Jautājumu teksts var parādīties pasākuma lapā bez to uzdevēja vārda.",
     "personalDataNotice": "Nerakstiet citu cilvēku personas datus, kā arī savus, ja nevēlaties tos publiskot: jautājuma teksts var parādīties pasākuma lapā bez jūsu vārda.",
-    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
+    "personalDataNoticeNotPublished": "Nerakstiet citu cilvēku personas datus, kā arī savus, ja nevēlaties tos atklāt: telpā esošie var lasīt jautājuma tekstu.",
     "filterAll": "Visi",
     "showPanel": "Rādīt Q&A",
     "hidePanel": "Slēpt Q&A",
@@ -746,7 +746,7 @@
       "answerFieldLabel": "Atbilde uz {name} jautājumu",
       "answerPlaceholder": "Uzrakstiet atbildi (līdz 2000 rakstzīmēm)",
       "answerNotice": "Atbilde var parādīties pasākuma lapā: nerakstiet personas datus.",
-      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
+      "answerNoticeNotPublished": "Telpā esošie var lasīt atbildi: nerakstiet personas datus.",
       "sendAnswer": "Publicēt atbildi",
       "cancel": "Atcelt",
       "removeAnswer": "Noņemt atbildi"
@@ -1032,7 +1032,7 @@
         "recordingManualNote": "Ieraksts nekad nesākas pats: vadītājs to sāk ar pogu REC.",
         "recordingDestination": "Kur nonāk ieraksts",
         "recordingDestinationReserved": "Tikai reģistrētajiem",
-        "recordingDestinationReservedDesc": "To redz organizatori, kā arī reģistrētie, kamēr tiek glabāti viņu reģistrācijas dati. To nevar padarīt publisku.",
+        "recordingDestinationReservedDesc": "To redz organizatori, kā arī reģistrētie, kamēr tiek glabāti viņu reģistrācijas dati. Tas netiek publicēts. Pēc telpas atvēršanas to vairs nevar padarīt publisku.",
         "recordingDestinationPublic": "Publisks",
         "recordingDestinationPublicDesc": "To var publicēt pasākuma lapā un video bibliotēkā. Dalībnieki piekrīt arī tam.",
         "recordingDestinationNotSet": "Nav norādīts: pasākums izveidots pirms šīs izvēles ieviešanas.",
@@ -1040,8 +1040,8 @@
         "recordingDestinationStartsReserved": "Ieraksts sākotnēji ir pieejams tikai reģistrētajiem: pasākuma komanda var to padarīt publisku līdz telpas atvēršanai.",
         "recordingDestinationStaysReserved": "Ieraksts paliek pieejams tikai reģistrētajiem: telpa jau tika atvērta.",
         "recordingDestinationLocked": "Pēc telpas atvēršanas var pāriet tikai uz “Tikai reģistrētajiem”: piekrišanas ir spēkā tekstam, ko cilvēki izlasīja.",
-        "recordingDestinationPublicOnInvitation": "The event is invitation-only, but the recording stays public: anyone will be able to see the video, not just the invitees.",
-        "recordingDestinationReservedOnInvitation": "The event is invitation-only: the recording has moved to reserved. You can change this in \"Recording and AI\".",
+        "recordingDestinationPublicOnInvitation": "Pasākums ir tikai ar uzaicinājumu, taču ieraksts paliek publisks: video varēs skatīties ikviens, ne tikai uzaicinātie.",
+        "recordingDestinationReservedOnInvitation": "Pasākums ir tikai ar uzaicinājumu: ieraksts ir pārslēgts uz “Tikai reģistrētajiem”. To varat mainīt sadaļā “Ieraksts un MI”.",
         "recordingDestinationRequired": "Izvēlieties, kur nonāk ieraksts.",
         "audienceAnonymous": "Anonīma auditorija",
         "audienceAnonymousDesc": "Dalībnieki citiem redzami ar pseidonīmu (“Dalībnieks” un kods) video, tērzēšanā un jautājumos; dalībnieku saraksts paliek vadītājiem, un laukuma nav. Noderīgi lieliem pasākumiem; kopienas pasākumos cilvēki vēlas iepazīties.",
@@ -2053,7 +2053,7 @@
     },
     "recordingUpload": {
       "title": "Augšupielādēt esošu ierakstu",
-      "subtitle": "Ja jums jau ir pasākuma video fails (piemēram, ierakstīts citā platformā), augšupielādējiet to šeit: tas tiks rādīts kā oficiālais ieraksts publiskajā lapā.",
+      "subtitle": "Ja jums jau ir pasākuma video fails (piemēram, ierakstīts citā platformā), augšupielādējiet to šeit: tas būs pasākuma oficiālais ieraksts.",
       "fileLabel": "Video fails",
       "upload": "Augšupielādēt un piesaistīt",
       "signing": "Sagatavošana…",
@@ -3011,8 +3011,8 @@
       "editPrivacy": "Rediģēt privātumu un datus"
     },
     "rubrica": {
-      "subtitle": "Personas, kas devušas piekrišanu iekļaušanai kontaktu grāmatā (VDAR 6.1.a pants). Profila informācija tiek atjaunināta automātiski katrā atkārtotā reģistrācijā.",
-      "searchLabel": "Meklēt pēc vārda vai organizācijas",
+      "subtitle": "Personas, kas devušas piekrišanu iekļaušanai kontaktu grāmatā (VDAR 6.1.a pants). Vārds, e-pasts un organizācija tiek atjaunināti tikai tad, kad persona atkārtoti atzīmē izvēles rūtiņu.",
+      "searchLabel": "Meklēt pēc organizācijas",
       "orgTypeLabel": "Organizācijas veids",
       "allTypes": "Visi",
       "includeOptedOut": "Iekļaut personas, kas atsaukušas piekrišanu",
@@ -3815,7 +3815,7 @@
         "title": "Pārskats",
         "pubblicato": "Publicēts.",
         "daPubblicare": "Izveidots: izlasiet un publicējiet to.",
-        "daGenerare": "Jāizveido no atšifrējuma, tērzēšanas un vērtējumiem.",
+        "daGenerare": "Jāizveido no atšifrējuma, aptaujām, vērtējumiem un, ja tie ir publicēti, jautājumiem.",
         "inLavorazione": "Tiek apstrādāts.",
         "senzaPipeline": "MI pēcapstrāde šajā instalācijā nav aktīva.",
         "soloStaff": "To izveido un publicē pasākuma organizators administrēšanas sadaļā.",
@@ -4574,8 +4574,8 @@
       "addressBookOptOut": "Izņemt manus datus no kontaktu grāmatas",
       "consentFutureEffect": "Ja to atsauksiet, vairs nesaņemsiet paziņojumus par nākamajiem pasākumiem un izstāsieties no adrešu grāmatas visām savām reģistrācijām.",
       "addressBookPendingTitle": "Atgriešanās kontaktu grāmatā jāapstiprina",
-      "addressBookPendingBody": "Šajā reģistrācijā tika atzīmēta kontaktu grāmatas izvēles rūtiņa, taču šī adrese vairs nesaņēma ielūgumus. Kamēr neapstiprināsi, nekas nemainīsies.",
-      "addressBookPendingEffect": "Ja apstiprināsi, atgriezīsies kontaktu grāmatā ar šīs reģistrācijas vārdu un organizāciju un atkal saņemsi ielūgumus. Ja atcelsi vai ja tas nebiji tu, paliksi ārpus kontaktu grāmatas un ielūgumus nesaņemsi.",
+      "addressBookPendingBody": "Šajā reģistrācijā tika atzīmēta kontaktu grāmatas izvēles rūtiņa, taču šī adrese vairs nesaņēma ielūgumus. Kamēr neapstiprināsiet, nekas nemainīsies.",
+      "addressBookPendingEffect": "Ja apstiprināsiet, atgriezīsieties kontaktu grāmatā ar šīs reģistrācijas vārdu un organizāciju un atkal saņemsiet ielūgumus. Ja atcelsiet vai ja tas nebijāt jūs, paliksiet ārpus kontaktu grāmatas un ielūgumus nesaņemsiet.",
       "addressBookPendingConfirm": "Apstiprināt atgriešanos",
       "addressBookPendingCancel": "Atcelt pieprasījumu"
     },
@@ -4591,7 +4591,7 @@
       "linkInvalid": "Saite nav derīga vai tai ir beidzies derīguma termiņš. Pieprasiet jaunu saiti.",
       "confirmWarning": "Jūs grasāties neatgriezeniski dzēst ar jūsu e-pasta adresi saistītos personas datus, izņemot to, kas norādīts zemāk.",
       "confirmBody": "Tiks dzēstas reģistrācijas, jautājumi, balsojumi aptaujās, atsauksmes, atgādinājumi un jūsu ieraksts pasākumu kontaktu grāmatā. Darbība ir neatgriezeniska.",
-      "confirmProofs": "Ja pasākumam ir video vai atšifrējums, pat ja tas vēl nav publicēts, piekrišanas veids, datums un teksts, uz kuru atbildējāt, paliek bez jūsu vārda, kamēr šis video vai atšifrējums pastāv. Tie kalpo piekrišanas pierādīšanai. Video nemainās: lai lūgtu izņemt jūsu uzstāšanās, rakstiet datu pārzinim.",
+      "confirmProofs": "Ja pasākumam ir video vai atšifrējums, pat ja tas vēl nav publicēts, piekrišanas veids, datums un teksts, uz kuru atbildējāt, paliek bez jūsu vārda, kamēr šis video vai atšifrējums pastāv. Tie kalpo piekrišanas pierādīšanai. Video nemainās: lai lūgtu izņemt savas uzstāšanās, rakstiet datu pārzinim.",
       "confirmButton": "Apstiprināt dzēšanu",
       "cancel": "Atcelt",
       "processing": "Notiek dzēšana...",
@@ -5820,7 +5820,7 @@
       "strengths": "Stiprās puses",
       "improvements": "Uzlabojamais",
       "quotes": "No komentāriem",
-      "aiNotice": "Tekstu uzrakstījis mākslīgā intelekta modelis, izmantojot atšifrējumu, tērzēšanu, jautājumus, aptaujas un vērtējumus, un komanda to pārskatīja pirms publicēšanas. Skaitļus un grafikus aprēķina platforma. Tas var saturēt neprecizitātes."
+      "aiNotice": "Tekstu uzrakstījis mākslīgā intelekta modelis, izmantojot atšifrējumu, aptaujas, vērtējumus un, ja tie ir publicēti, jautājumus, un komanda to pārskatīja pirms publicēšanas. Skaitļus un grafikus aprēķina platforma. Tekstā var būt neprecizitātes."
     },
     "languages": {
       "title": "Skatīties valodā",
@@ -5881,7 +5881,7 @@
       "confirm": "Apstiprināt noņemšanu",
       "submitting": "Notiek noņemšana…",
       "successTitle": "Noņemšana pabeigta",
-      "successBody": "Jūsu dati vairs nav pasākumu kontaktu grāmatā.",
+      "successBody": "No šī brīža jūs vairs nesaņemsiet ielūgumus. Jūsu e-pasta adrese jau ir noņemta; vārds un organizācija no kontaktu grāmatas tiek dzēsti ne vēlāk kā nākamajā dienā.",
       "errors": {
         "generic": "Radās kļūda. Mēģiniet vēlāk."
       }

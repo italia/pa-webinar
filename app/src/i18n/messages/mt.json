@@ -199,7 +199,7 @@
       "registrationEnded": "L-avveniment intemm: ir-reġistrazzjoni hija magħluqa.",
       "joinAsGuest": "Ipparteċipa bħala mistieden",
       "registeredUseEmailLink": "Diġà rreġistrajt? Idħol bil-link personali li rċevejt bl-email.",
-      "willBeRecorded": "L-avveniment se jiġi rreġistrat.",
+      "willBeRecorded": "L-avveniment jista' jiġi rrekordjat.",
       "machineTranslation": "Traduzzjoni awtomatika",
       "machineTranslationNote": "It-titolu u d-deskrizzjoni ġew tradotti minn mudell awtomatiku u ħadd għadu ma rrevedihom.",
       "previewTitle": "Previżjoni għat-tim",
@@ -695,8 +695,8 @@
           "soloAscolto": "Jekk tirtirah tibqa' fis-sala tisma' biss: il-mikrofonu, il-kamera u l-iskrin jingħalqu. Tirtira wkoll il-kunsens għat-traskrizzjoni ta' dak li tgħid.",
           "conduce": "Jekk tirtirah tkompli tmexxi, iżda minn issa 'l quddiem leħnek ma jibqax fil-binarji għal kull persuna u lanqas fit-traskrizzjoni. Il-vidjo tas-sala, jekk jiġi rreġistrat, xorta juruk.",
           "voce": "Jekk tneħħih, tibqa' fis-sala bħal qabel, u minn issa int barra mir-reġistrazzjoni. Tneħħi wkoll il-kunsens għat-traskrizzjoni tal-interventi tiegħek.",
-          "avvertenza": "Jekk tneħħih, tibqa' fis-sala bħal qabel. Tneħħi wkoll il-kunsens għat-traskrizzjoni tal-interventi tiegħek. Jekk tingħata l-kelma u l-avveniment jiġi rrekordjat, leħnek jibqa' fil-vidjo xorta waħda.",
-          "assente": "Jekk tneħħih, tibqa' fis-sala bħal qabel. Tneħħi wkoll il-kunsens għat-traskrizzjoni tal-interventi tiegħek. Minn issa leħnek ma jiġix irrekordjat fuq korsija separata."
+          "avvertenza": "Jekk tirtirah, tibqa' fis-sala bħal qabel. Tirtira wkoll il-kunsens għat-traskrizzjoni tal-interventi tiegħek. Jekk tingħata l-kelma u l-avveniment jiġi rrekordjat, leħnek jibqa' fil-vidjo xorta waħda.",
+          "assente": "Jekk tirtirah, tibqa' fis-sala bħal qabel. Tirtira wkoll il-kunsens għat-traskrizzjoni tal-interventi tiegħek. Minn issa 'l quddiem leħnek ma jiġix irrekordjat f'korsa separata."
         }
       },
       "transcription": {
@@ -726,7 +726,7 @@
     "noQuestions": "L-ebda mistoqsijiet għalissa. Kun l-ewwel wieħed!",
     "qaPersistenceNote": "It-test tal-mistoqsijiet jista' jidher fil-paġna tal-avveniment, mingħajr l-isem ta' min għamilhom.",
     "personalDataNotice": "Tiktibx dejta personali ta' ħaddieħor, u lanqas tiegħek li ma tridx tagħmel pubblika: it-test tal-mistoqsija jista' jidher fil-paġna tal-avveniment, mingħajr ismek.",
-    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
+    "personalDataNoticeNotPublished": "Tiktibx dejta personali ta' ħaddieħor, u lanqas tiegħek li ma tridx li tkun magħrufa: min hu fis-sala jista' jaqra t-test tal-mistoqsija.",
     "filterAll": "Kollha",
     "showPanel": "Uri l-Q&A",
     "hidePanel": "Aħbi l-Q&A",
@@ -746,7 +746,7 @@
       "answerFieldLabel": "Tweġiba għall-mistoqsija ta' {name}",
       "answerPlaceholder": "Ikteb it-tweġiba (massimu ta' 2000 karattru)",
       "answerNotice": "It-tweġiba tista' tidher fil-paġna tal-avveniment: tiktibx dejta personali.",
-      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
+      "answerNoticeNotPublished": "Min hu fis-sala jista' jaqra t-tweġiba: tiktibx dejta personali.",
       "sendAnswer": "Ippubblika t-tweġiba",
       "cancel": "Ikkanċella",
       "removeAnswer": "Neħħi t-tweġiba"
@@ -1032,7 +1032,7 @@
         "recordingManualNote": "Ir-reġistrazzjoni qatt ma tibda waħedha: moderatur jibdiha bil-buttuna REC.",
         "recordingDestination": "Fejn imur ir-rekording",
         "recordingDestinationReserved": "Riservat",
-        "recordingDestinationReservedDesc": "Jarawh min jorganizza u min irreġistra, sakemm id-dejta tar-reġistrazzjoni tiegħu tkun miżmuma. Ma jistax isir pubbliku.",
+        "recordingDestinationReservedDesc": "Jarawh min jorganizza u min irreġistra, sakemm id-dejta tar-reġistrazzjoni tiegħu tkun miżmuma. Ma jiġix ippubblikat. Wara li tinfetaħ is-sala ma jistax isir pubbliku aktar.",
         "recordingDestinationPublic": "Pubbliku",
         "recordingDestinationPublicDesc": "Jista' jiġi ppubblikat fil-paġna tal-avveniment u fil-librerija tal-vidjos. Min jipparteċipa jagħti l-kunsens ukoll għal dan.",
         "recordingDestinationNotSet": "Mhux indikat: l-avveniment inħoloq qabel din l-għażla.",
@@ -1040,8 +1040,8 @@
         "recordingDestinationStartsReserved": "Ir-rekording jibda riservat: il-persunal tal-avveniment jista' jagħmlu pubbliku, sakemm tinfetaħ is-sala.",
         "recordingDestinationStaysReserved": "Ir-rekording jibqa' riservat: is-sala diġà nfetħet.",
         "recordingDestinationLocked": "Wara li tinfetaħ is-sala, tista' tgħaddi biss għal riservat: il-kunsensi jgħoddu għat-test li qraw il-persuni.",
-        "recordingDestinationPublicOnInvitation": "The event is invitation-only, but the recording stays public: anyone will be able to see the video, not just the invitees.",
-        "recordingDestinationReservedOnInvitation": "The event is invitation-only: the recording has moved to reserved. You can change this in \"Recording and AI\".",
+        "recordingDestinationPublicOnInvitation": "L-avveniment huwa b'invit biss, iżda r-rekording jibqa' pubbliku: il-vidjo jkun jista' jarah kulħadd, mhux biss il-mistednin.",
+        "recordingDestinationReservedOnInvitation": "L-avveniment huwa b'invit biss: ir-rekording għadda għal riservat. Tista' tbiddlu fit-taqsima “Reġistrazzjoni u IA”.",
         "recordingDestinationRequired": "Agħżel fejn imur ir-rekording.",
         "audienceAnonymous": "Udjenza anonima",
         "audienceAnonymousDesc": "Il-parteċipanti jidhru lill-oħrajn b’psewdonimu (“Parteċipant” u kodiċi) fil-vidjo, fiċ-chat u fil-mistoqsijiet; il-lista tal-parteċipanti tibqa’ għand min imexxi, u m’hemmx pjazza. Utli għal avvenimenti kbar; f’avvenimenti tal-komunità n-nies iridu jsiru jafu lil xulxin.",
@@ -2053,7 +2053,7 @@
     },
     "recordingUpload": {
       "title": "Carica reġistrazzjoni eżistenti",
-      "subtitle": "Jekk diġà għandek fajl tal-vidjo tal-avveniment (pereżempju rreġistrat b'pjattaforma oħra), tellgħu hawn: se jintwera bħala r-reġistrazzjoni uffiċjali fil-paġna pubblika.",
+      "subtitle": "Jekk diġà għandek fajl tal-vidjo tal-avveniment (pereżempju rrekordjat b'pjattaforma oħra), tellgħu hawn: ikun ir-rekording uffiċjali tal-avveniment.",
       "fileLabel": "Fajl vidjo",
       "upload": "Carica u associa",
       "signing": "Tħejjija…",
@@ -3011,8 +3011,8 @@
       "editPrivacy": "Editja l-privatezza u d-data"
     },
     "rubrica": {
-      "subtitle": "Personu chu hsena datum kunsens lill-inserimento fi direttorju (art. 6.1.a GDPR). Lu informazzjoni ta' profilo vengono aġġornatu awtomatikament ad kull re-reġistrazzjoni.",
-      "searchLabel": "Fittex skont l-isem jew l-organizzazzjoni",
+      "subtitle": "Persuni li taw il-kunsens biex jiddaħħlu fid-direttorju (art. 6.1.a GDPR). L-isem, l-email u l-organizzazzjoni jiġu aġġornati biss meta l-persuna terġa' timmarka l-kaxxa.",
+      "searchLabel": "Fittex skont l-organizzazzjoni",
       "orgTypeLabel": "Tip ta' organizzazzjoni",
       "allTypes": "Kollha",
       "includeOptedOut": "Inkludi lil min irtira l-kunsens",
@@ -3815,7 +3815,7 @@
         "title": "Rapport",
         "pubblicato": "Ippubblikat.",
         "daPubblicare": "Iġġenerat: aqrah u ppubblikah.",
-        "daGenerare": "Irid jiġi ġġenerat mit-traskrizzjoni, miċ-chat u mill-valutazzjonijiet.",
+        "daGenerare": "Irid jiġi ġġenerat mit-traskrizzjoni, mill-istħarriġ, mill-evalwazzjonijiet u, jekk ikunu ppubblikati, mill-mistoqsijiet.",
         "inLavorazione": "Qed jiġi pproċessat.",
         "senzaPipeline": "Il-post-produzzjoni AI mhix attiva f’din l-installazzjoni.",
         "soloStaff": "L-organizzatur tal-avveniment jiġġenerah u jippubblikah miż-żona tal-amministrazzjoni.",
@@ -4574,7 +4574,7 @@
       "addressBookOptOut": "Neħħi d-dejta tiegħi mid-direttorju",
       "consentFutureEffect": "Jekk tirtirah ma tibqax tirċievi komunikazzjonijiet dwar avvenimenti li ġejjin u toħroġ mill-ktieb tal-indirizzi, għar-reġistrazzjonijiet kollha tiegħek.",
       "addressBookPendingTitle": "Ir-ritorn fid-direttorju irid jiġi kkonfermat",
-      "addressBookPendingBody": "F'din ir-reġistrazzjoni ġiet immarkata l-kaxxa tal-indirizzarju, iżda dan l-indirizz kien waqaf jirċievi stediniet. Sakemm ma tikkonfermax, ma jinbidel xejn.",
+      "addressBookPendingBody": "F'din ir-reġistrazzjoni ġiet immarkata l-kaxxa tad-direttorju, iżda dan l-indirizz kien waqaf jirċievi stediniet. Sakemm ma tikkonfermax, ma jinbidel xejn.",
       "addressBookPendingEffect": "Jekk tikkonferma, terġa' lura fid-direttorju bl-isem u l-organizzazzjoni ta' din ir-reġistrazzjoni u terġa' tirċievi stediniet. Jekk tikkanċella, jew jekk ma kontx int, tibqa' barra mid-direttorju u ma tirċievix stediniet.",
       "addressBookPendingConfirm": "Ikkonferma r-ritorn",
       "addressBookPendingCancel": "Ikkanċella t-talba"
@@ -5820,7 +5820,7 @@
       "strengths": "Punti b'saħħithom",
       "improvements": "X'għandu jitjieb",
       "quotes": "Mill-kummenti",
-      "aiNotice": "It-test inkiteb minn mudell tal-intelliġenza artifiċjali abbażi tat-traskrizzjoni, taċ-chat, tal-mistoqsijiet, tal-istħarriġ u tal-evalwazzjonijiet, u t-tim irreveda qabel il-pubblikazzjoni. In-numri u l-graffs jikkalkulahom il-pjattaforma. Jista' jkun fih ineżattezzi."
+      "aiNotice": "It-test inkiteb minn mudell tal-intelliġenza artifiċjali abbażi tat-traskrizzjoni, tal-istħarriġ, tal-evalwazzjonijiet u, jekk ikunu ppubblikati, tal-mistoqsijiet, u t-tim irrevedih qabel il-pubblikazzjoni. In-numri u l-graffs tikkalkulahom il-pjattaforma. Jista' jkun fih ineżattezzi."
     },
     "languages": {
       "title": "Ara bil-",
@@ -5881,7 +5881,7 @@
       "confirm": "Ikkonferma il-rimozione",
       "submitting": "Rimozionu in corso…",
       "successTitle": "Rimozionu tlestiet",
-      "successBody": "Id-dejta tiegħek m'għadhiex fid-direttorju tal-avvenimenti.",
+      "successBody": "Minn dan il-mument ma tibqax tirċievi stediniet. L-indirizz email tiegħek diġà tneħħa; l-isem u l-organizzazzjoni jitħassru mid-direttorju sal-għada.",
       "errors": {
         "generic": "Seħħ żball. Erġa' pprova aktar tard."
       }

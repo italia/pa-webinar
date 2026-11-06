@@ -199,7 +199,7 @@
       "registrationEnded": "Evenimentul s-a încheiat: înregistrarea este închisă.",
       "joinAsGuest": "Participă ca invitat",
       "registeredUseEmailLink": "Te-ai înscris deja? Intră cu linkul personal primit pe e-mail.",
-      "willBeRecorded": "Evenimentul va fi înregistrat.",
+      "willBeRecorded": "Evenimentul poate fi înregistrat.",
       "machineTranslation": "Traducere automată",
       "machineTranslationNote": "Titlul și descrierea au fost traduse de un model automat și nimeni nu le-a revizuit încă.",
       "previewTitle": "Previzualizare pentru echipă",
@@ -688,15 +688,15 @@
           "soloAscolto": "Fără acest consimțământ doar asculți: microfonul, camera și ecranul rămân închise.",
           "conduce": "Fără acest consimțământ conduci în continuare, dar vocea ta nu rămâne în pistele per persoană și nici în transcriere.",
           "voce": "Fără acest acord participi ca toți ceilalți, dar rămâi în afara înregistrării: nici numele, nici vocea, nici imaginea.",
-          "comeTutti": "Fără acest acord participi ca toți ceilalți."
+          "comeTutti": "Fără acest consimțământ participi ca toți ceilalți."
         },
         "alreadyRecorded": "Ce a fost deja înregistrat rămâne în videoclipul evenimentului: pentru a-l elimina, scrie organizatorilor.",
         "withdraw": {
           "soloAscolto": "Dacă îl retragi, rămâi în sală doar ca ascultător: microfonul, camera și ecranul se închid. Retragi și consimțământul la transcrierea intervențiilor tale.",
           "conduce": "Dacă îl retragi, continui să conduci, dar de acum vocea ta nu rămâne în pistele per persoană și nici în transcriere. Videoclipul sălii, dacă este înregistrat, te arată în continuare.",
           "voce": "Dacă îl retragi, rămâi în sală ca înainte, iar de acum ești în afara înregistrării. Retragi și acordul pentru transcrierea intervențiilor tale.",
-          "avvertenza": "Dacă îl retragi, rămâi în sală ca înainte. Retragi și acordul pentru transcrierea intervențiilor tale. Dacă primești cuvântul și evenimentul este înregistrat, vocea ta rămâne totuși în videoclip.",
-          "assente": "Dacă îl retragi, rămâi în sală ca înainte. Retragi și acordul pentru transcrierea intervențiilor tale. De acum vocea ta nu mai este înregistrată pe o pistă separată."
+          "avvertenza": "Dacă îl retragi, rămâi în sală ca înainte. Retragi și consimțământul la transcrierea intervențiilor tale. Dacă primești cuvântul și evenimentul este înregistrat, vocea ta rămâne totuși în videoclip.",
+          "assente": "Dacă îl retragi, rămâi în sală ca înainte. Retragi și consimțământul la transcrierea intervențiilor tale. De acum vocea ta nu mai este înregistrată pe o pistă separată."
         }
       },
       "transcription": {
@@ -726,7 +726,7 @@
     "noQuestions": "Nicio întrebare încă. Fiți primul!",
     "qaPersistenceNote": "Textul întrebărilor poate apărea pe pagina evenimentului, fără numele celor care le-au pus.",
     "personalDataNotice": "Nu scrieți date personale ale altor persoane și nici date proprii pe care nu doriți să le faceți publice: textul întrebării poate apărea pe pagina evenimentului, fără numele dumneavoastră.",
-    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
+    "personalDataNoticeNotPublished": "Nu scrieți date personale ale altor persoane și nici date proprii pe care nu doriți să le faceți cunoscute: cei aflați în sală pot citi textul întrebării.",
     "filterAll": "Toate",
     "showPanel": "Afișați Q&A",
     "hidePanel": "Ascundeți Q&A",
@@ -746,7 +746,7 @@
       "answerFieldLabel": "Răspuns la întrebarea lui {name}",
       "answerPlaceholder": "Scrieți răspunsul (max. 2000 de caractere)",
       "answerNotice": "Răspunsul poate apărea pe pagina evenimentului: nu scrieți date personale.",
-      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
+      "answerNoticeNotPublished": "Cei aflați în sală pot citi răspunsul: nu scrieți date personale.",
       "sendAnswer": "Publică răspunsul",
       "cancel": "Anulează",
       "removeAnswer": "Elimină răspunsul"
@@ -1032,7 +1032,7 @@
         "recordingManualNote": "Înregistrarea nu pornește niciodată singură: un moderator o pornește cu butonul REC.",
         "recordingDestination": "Unde merge înregistrarea",
         "recordingDestinationReserved": "Rezervată",
-        "recordingDestinationReservedDesc": "O văd organizatorii și înscrișii, aceștia din urmă cât timp datele înscrierii lor sunt păstrate. Nu poate fi făcută publică.",
+        "recordingDestinationReservedDesc": "O văd organizatorii și înscrișii, aceștia din urmă cât timp datele înscrierii lor sunt păstrate. Nu este publicată. După deschiderea sălii nu mai poate fi făcută publică.",
         "recordingDestinationPublic": "Publică",
         "recordingDestinationPublicDesc": "Se poate publica pe pagina evenimentului și în biblioteca video. Participanții își dau consimțământul și pentru aceasta.",
         "recordingDestinationNotSet": "Neindicată: evenimentul a fost creat înainte de această opțiune.",
@@ -1040,8 +1040,8 @@
         "recordingDestinationStartsReserved": "Înregistrarea pornește ca rezervată: o poate face publică echipa evenimentului, până la deschiderea sălii.",
         "recordingDestinationStaysReserved": "Înregistrarea rămâne rezervată: sala s-a deschis deja.",
         "recordingDestinationLocked": "După deschiderea sălii se poate trece doar la rezervată: consimțămintele sunt valabile pentru textul pe care persoanele l-au citit.",
-        "recordingDestinationPublicOnInvitation": "The event is invitation-only, but the recording stays public: anyone will be able to see the video, not just the invitees.",
-        "recordingDestinationReservedOnInvitation": "The event is invitation-only: the recording has moved to reserved. You can change this in \"Recording and AI\".",
+        "recordingDestinationPublicOnInvitation": "Evenimentul este pe bază de invitație, dar înregistrarea rămâne publică: videoclipul va putea fi văzut de oricine, nu doar de invitați.",
+        "recordingDestinationReservedOnInvitation": "Evenimentul este pe bază de invitație: înregistrarea a trecut la rezervată. O poți schimba în „Înregistrare și IA”.",
         "recordingDestinationRequired": "Alege unde merge înregistrarea.",
         "audienceAnonymous": "Public anonim",
         "audienceAnonymousDesc": "Participanții apar celorlalți sub un pseudonim („Participant” și un cod) în video, în chat și la întrebări; lista participanților rămâne la moderatori și nu există piață. Util pentru evenimente mari; la evenimentele comunității oamenii vor să se cunoască.",
@@ -2053,7 +2053,7 @@
     },
     "recordingUpload": {
       "title": "Încărcați o înregistrare existentă",
-      "subtitle": "Dacă ai deja un fișier video al evenimentului (de exemplu înregistrat cu altă platformă), încarcă-l aici: va fi afișat ca înregistrare oficială pe pagina publică.",
+      "subtitle": "Dacă ai deja un fișier video al evenimentului (de exemplu înregistrat cu altă platformă), încarcă-l aici: va fi înregistrarea oficială a evenimentului.",
       "fileLabel": "Fișier video",
       "upload": "Încărcați și asociați",
       "signing": "Se pregătește…",
@@ -3011,8 +3011,8 @@
       "editPrivacy": "Editează confidențialitatea și datele"
     },
     "rubrica": {
-      "subtitle": "Persoane care și-au dat consimțământul pentru includerea în agendă (art. 6.1.a RGPD). Informațiile de profil sunt actualizate automat la fiecare reînscriere.",
-      "searchLabel": "Căutați după nume sau organizație",
+      "subtitle": "Persoane care și-au dat consimțământul pentru includerea în agendă (art. 6.1.a RGPD). Numele, e-mailul și organizația se actualizează doar când persoana bifează din nou caseta.",
+      "searchLabel": "Căutați după organizație",
       "orgTypeLabel": "Tipul organizației",
       "allTypes": "Toate",
       "includeOptedOut": "Includeți persoanele care și-au retras consimțământul",
@@ -3815,7 +3815,7 @@
         "title": "Raport",
         "pubblicato": "Publicat.",
         "daPubblicare": "Generat: recitiți-l și publicați-l.",
-        "daGenerare": "De generat, pe baza transcrierii, a chatului și a evaluărilor.",
+        "daGenerare": "De generat, pe baza transcrierii, a sondajelor, a evaluărilor și, dacă sunt publicate, a întrebărilor.",
         "inLavorazione": "În curs de procesare.",
         "senzaPipeline": "Postproducția AI nu este activă în această instalare.",
         "soloStaff": "Organizatorul evenimentului îl generează și îl publică din zona de administrare.",
@@ -4574,10 +4574,10 @@
       "addressBookOptOut": "Elimină-mi datele din agendă",
       "consentFutureEffect": "Dacă îl retragi, nu mai primești comunicări despre evenimentele viitoare și ieși din agendă, pentru toate înscrierile tale.",
       "addressBookPendingTitle": "Revenire în agendă de confirmat",
-      "addressBookPendingBody": "La această înscriere a fost bifată caseta agendei, dar această adresă nu mai primea invitații. Până nu confirmi, nu se schimbă nimic.",
-      "addressBookPendingEffect": "Dacă confirmi, revii în agendă cu numele și organizația de la această înscriere și primești din nou invitații. Dacă anulezi sau dacă nu ai fost tu, rămâi în afara agendei și nu primești invitații.",
-      "addressBookPendingConfirm": "Confirmă revenirea",
-      "addressBookPendingCancel": "Anulează cererea"
+      "addressBookPendingBody": "La această înscriere a fost bifată caseta agendei, dar această adresă nu mai primea invitații. Până nu confirmați, nu se schimbă nimic.",
+      "addressBookPendingEffect": "Dacă confirmați, reveniți în agendă cu numele și instituția de la această înscriere și primiți din nou invitații. Dacă anulați sau dacă nu ați fost dumneavoastră, rămâneți în afara agendei și nu primiți invitații.",
+      "addressBookPendingConfirm": "Confirmați revenirea",
+      "addressBookPendingCancel": "Anulați cererea"
     },
     "erasure": {
       "title": "Ștergerea datelor dumneavoastră",
@@ -5820,7 +5820,7 @@
       "strengths": "Puncte forte",
       "improvements": "De îmbunătățit",
       "quotes": "Din comentarii",
-      "aiNotice": "Textul este scris de un model de inteligență artificială pe baza transcrierii, a chatului, a întrebărilor, a sondajelor și a evaluărilor, iar echipa l-a revizuit înainte de publicare. Cifrele și graficele sunt calculate de platformă. Poate conține inexactități."
+      "aiNotice": "Textul este scris de un model de inteligență artificială pe baza transcrierii, a sondajelor, a evaluărilor și, dacă sunt publicate, a întrebărilor, iar echipa l-a revizuit înainte de publicare. Cifrele și graficele sunt calculate de platformă. Poate conține inexactități."
     },
     "languages": {
       "title": "Urmărește în",
@@ -5881,7 +5881,7 @@
       "confirm": "Confirmați eliminarea",
       "submitting": "Se elimină…",
       "successTitle": "Eliminare finalizată",
-      "successBody": "Datele dvs. nu mai sunt prezente în agenda de evenimente.",
+      "successBody": "Din acest moment nu veți mai primi invitații. Adresa dumneavoastră de e-mail a fost deja eliminată; numele și instituția se șterg din agendă cel târziu a doua zi.",
       "errors": {
         "generic": "S-a produs o eroare. Încercați din nou mai târziu."
       }

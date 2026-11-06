@@ -199,7 +199,7 @@
       "registrationEnded": "Tá an t-imeacht críochnaithe: tá an clárú dúnta.",
       "joinAsGuest": "Glac páirt mar aoi",
       "registeredUseEmailLink": "Cláraithe cheana? Úsáid an nasc pearsanta a fuair tú i ríomhphost.",
-      "willBeRecorded": "Taifeadfar an ócáid.",
+      "willBeRecorded": "Féadfar an ócáid a thaifeadadh.",
       "machineTranslation": "Aistriúchán uathoibríoch",
       "machineTranslationNote": "Rinne samhail uathoibríoch an teideal agus an cur síos a aistriú agus níl athbhreithniú déanta orthu ag aon duine fós.",
       "previewTitle": "Réamhamharc don fhoireann",
@@ -726,7 +726,7 @@
     "noQuestions": "Gan ceist fós. Bígí ar an gcéad duine!",
     "qaPersistenceNote": "Féadfaidh téacs na gceisteanna a bheith le feiceáil ar leathanach an imeachta, gan ainm an duine a chuir iad.",
     "personalDataNotice": "Ná scríobh sonraí pearsanta daoine eile, ná do chuid sonraí féin nach mian leat a phoibliú: féadfaidh téacs na ceiste a bheith le feiceáil ar leathanach an imeachta, gan d'ainm.",
-    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
+    "personalDataNoticeNotPublished": "Ná scríobh sonraí pearsanta daoine eile, ná do chuid sonraí féin nach mian leat a chur in iúl do dhaoine eile: is féidir leis na daoine sa seomra téacs na ceiste a léamh.",
     "filterAll": "Gach ceann",
     "showPanel": "Taispeáin Q&A",
     "hidePanel": "Folaigh Q&A",
@@ -746,7 +746,7 @@
       "answerFieldLabel": "Freagra ar cheist {name}",
       "answerPlaceholder": "Scríobh an freagra (2000 carachtar ar a mhéad)",
       "answerNotice": "Féadfaidh an freagra a bheith le feiceáil ar leathanach an imeachta: ná scríobh sonraí pearsanta.",
-      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
+      "answerNoticeNotPublished": "Is féidir leis na daoine sa seomra an freagra a léamh: ná scríobh sonraí pearsanta.",
       "sendAnswer": "Foilsigh an freagra",
       "cancel": "Cealaigh",
       "removeAnswer": "Bain an freagra"
@@ -1032,7 +1032,7 @@
         "recordingManualNote": "Ní thosaíonn an taifeadadh as féin riamh: tosaíonn modhnóir é leis an gcnaipe REC.",
         "recordingDestination": "Cá dtéann an taifeadadh",
         "recordingDestinationReserved": "Do dhaoine cláraithe amháin",
-        "recordingDestinationReservedDesc": "Feiceann na heagraithe agus na daoine cláraithe é, na daoine cláraithe fad a choinnítear a sonraí cláraithe. Ní féidir é a dhéanamh poiblí.",
+        "recordingDestinationReservedDesc": "Feiceann na heagraithe agus na daoine cláraithe é, na daoine cláraithe fad a choinnítear a sonraí cláraithe. Ní fhoilsítear é. Tar éis an seomra a oscailt ní féidir é a dhéanamh poiblí a thuilleadh.",
         "recordingDestinationPublic": "Poiblí",
         "recordingDestinationPublicDesc": "Is féidir é a fhoilsiú ar leathanach an imeachta agus sa leabharlann físeán. Toilíonn na rannpháirtithe leis seo freisin.",
         "recordingDestinationNotSet": "Gan sonrú: cruthaíodh an t-imeacht sula raibh an rogha seo ann.",
@@ -1040,8 +1040,8 @@
         "recordingDestinationStartsReserved": "Tosaíonn an taifeadadh mar thaifeadadh do dhaoine cláraithe amháin: is féidir le foireann an imeachta é a dhéanamh poiblí go dtí go n-osclaítear an seomra.",
         "recordingDestinationStaysReserved": "Fanann an taifeadadh do dhaoine cláraithe amháin: tá an seomra oscailte cheana.",
         "recordingDestinationLocked": "Tar éis an seomra a oscailt ní féidir ach aistriú go dtí taifeadadh do dhaoine cláraithe amháin: baineann na toilithe leis an téacs a léigh na daoine.",
-        "recordingDestinationPublicOnInvitation": "The event is invitation-only, but the recording stays public: anyone will be able to see the video, not just the invitees.",
-        "recordingDestinationReservedOnInvitation": "The event is invitation-only: the recording has moved to reserved. You can change this in \"Recording and AI\".",
+        "recordingDestinationPublicOnInvitation": "Is le cuireadh amháin an t-imeacht, ach fanann an taifeadadh poiblí: beidh aon duine in ann féachaint ar an bhfíseán, ní hamháin na daoine le cuireadh.",
+        "recordingDestinationReservedOnInvitation": "Is le cuireadh amháin an t-imeacht: athraíodh an taifeadadh go \"Do dhaoine cláraithe amháin\". Is féidir leat é seo a athrú in \"Taifeadadh agus IS\".",
         "recordingDestinationRequired": "Roghnaigh cá dtéann an taifeadadh.",
         "audienceAnonymous": "Lucht féachana gan ainm",
         "audienceAnonymousDesc": "Feictear rannpháirtithe do dhaoine eile faoi ainm cleite (“Rannpháirtí” agus cód) san fhíseán, sa chomhrá agus sna ceisteanna; fanann liosta na rannpháirtithe ag na hóstaigh, agus níl aon chearnóg ann. Úsáideach d’ócáidí móra; ag ócáidí pobail is mian le daoine aithne a chur ar a chéile.",
@@ -2053,7 +2053,7 @@
     },
     "recordingUpload": {
       "title": "Uaslódáil taifeadadh atá ann cheana",
-      "subtitle": "Má tá comhad físe den ócáid agat cheana (mar shampla taifeadta le hardán eile), uaslódáil anseo é: taispeánfar é mar an taifeadadh oifigiúil ar an leathanach poiblí.",
+      "subtitle": "Má tá comhad físe den ócáid agat cheana (mar shampla taifeadta le hardán eile), uaslódáil anseo é: beidh sé ina thaifeadadh oifigiúil na hócáide.",
       "fileLabel": "Comhad físe",
       "upload": "Uaslódáil agus ceangail",
       "signing": "Á ullmhú…",
@@ -3011,8 +3011,8 @@
       "editPrivacy": "Cuir príobháideachas agus sonraí in eagar"
     },
     "rubrica": {
-      "subtitle": "Daoine a thug toiliú a gcur leis an leabhar seoltaí (airteagal 6.1.a GDPR). Nuashonraítear faisnéis phróifíle go huathoibríoch ag gach athchlárúchán.",
-      "searchLabel": "Cuardaigh de réir ainm nó eagraíochta",
+      "subtitle": "Daoine a thug toiliú a gcur leis an leabhar seoltaí (airteagal 6.1.a GDPR). Ní nuashonraítear an t-ainm, an ríomhphost ná an eagraíocht ach amháin nuair a thiceálann an duine an bosca arís.",
+      "searchLabel": "Cuardaigh de réir eagraíochta",
       "orgTypeLabel": "Cineál eagraíochta",
       "allTypes": "Gach cineál",
       "includeOptedOut": "Cuir san áireamh daoine a tharraing siar a dtoiliú",
@@ -3815,7 +3815,7 @@
         "title": "Tuarascáil",
         "pubblicato": "Foilsithe.",
         "daPubblicare": "Ginte: léigh í agus foilsigh í.",
-        "daGenerare": "Le giniúint, bunaithe ar an tras-scríbhinn, ar an gcomhrá agus ar na meastóireachtaí.",
+        "daGenerare": "Le giniúint, bunaithe ar an tras-scríbhinn, ar na pobalbhreitheanna, ar na meastóireachtaí agus, má tá siad foilsithe, ar na ceisteanna.",
         "inLavorazione": "Á próiseáil.",
         "senzaPipeline": "Níl an t-iarléiriú AI gníomhach ar an suiteáil seo.",
         "soloStaff": "Is é eagraí an imeachta a ghineann agus a fhoilsíonn í, ón limistéar riaracháin.",
@@ -4576,8 +4576,8 @@
       "addressBookPendingTitle": "Filleadh ar an leabhar seoltaí le deimhniú",
       "addressBookPendingBody": "Ticeáladh bosca an leabhair seoltaí ar an gclárú seo, ach bhí deireadh curtha ag an seoladh seo le cuirí a fháil. Ní athróidh aon rud go dtí go ndeimhníonn tú.",
       "addressBookPendingEffect": "Má dheimhníonn tú, fillfidh tú ar an leabhar seoltaí le hainm agus eagraíocht an chláraithe seo agus gheobhaidh tú cuirí arís. Má chuireann tú ar ceal, nó murarbh tusa a rinne é, fanfaidh tú lasmuigh den leabhar seoltaí agus ní bhfaighidh tú cuirí.",
-      "addressBookPendingConfirm": "Deimhnigh mo fhilleadh",
-      "addressBookPendingCancel": "Cuir an iarratas ar ceal"
+      "addressBookPendingConfirm": "Deimhnigh m'fhilleadh",
+      "addressBookPendingCancel": "Cuir an t-iarratas ar ceal"
     },
     "erasure": {
       "title": "Scriosadh bhur gcuid sonraí",
@@ -5820,7 +5820,7 @@
       "strengths": "Láidreachtaí",
       "improvements": "Le feabhsú",
       "quotes": "Ó na tráchtanna",
-      "aiNotice": "Is samhail intleachta saorga a scríobh an téacs ón tras-scríbhinn, ón gcomhrá, ó na ceisteanna, ó na pobalbhreitheanna agus ó na measúnuithe, agus rinne an fhoireann athbhreithniú air sular foilsíodh é. Is é an t-ardán a ríomhann na figiúirí agus na graif. D'fhéadfadh míchruinneas a bheith ann."
+      "aiNotice": "Is samhail intleachta saorga a scríobh an téacs ón tras-scríbhinn, ó na pobalbhreitheanna, ó na measúnuithe agus, má tá siad foilsithe, ó na ceisteanna, agus rinne an fhoireann athbhreithniú air sular foilsíodh é. Is é an t-ardán a ríomhann na figiúirí agus na graif. D'fhéadfadh míchruinneas a bheith ann."
     },
     "languages": {
       "title": "Féach i",
@@ -5881,7 +5881,7 @@
       "confirm": "Deimhnigh an baint",
       "submitting": "Á bhaint…",
       "successTitle": "Baint críochnaithe",
-      "successBody": "Níl do shonraí i leabhar seoltaí na n-imeachtaí a thuilleadh.",
+      "successBody": "Ón nóiméad seo ní bhfaighidh tú cuirí a thuilleadh. Baineadh do sheoladh ríomhphoist cheana féin; scriosfar d'ainm agus d'eagraíocht as an leabhar seoltaí faoin lá dár gcionn.",
       "errors": {
         "generic": "Tharla earráid. Bain triail eile as ar ball."
       }

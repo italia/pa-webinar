@@ -199,7 +199,7 @@
       "registrationEnded": "Dogodek se je zaključil: prijave so zaprte.",
       "joinAsGuest": "Pridruži se kot gost",
       "registeredUseEmailLink": "Ste že prijavljeni? Vstopite z osebno povezavo iz e-pošte.",
-      "willBeRecorded": "Dogodek bo posnet.",
+      "willBeRecorded": "Dogodek se lahko snema.",
       "machineTranslation": "Samodejni prevod",
       "machineTranslationNote": "Naslov in opis je prevedel samodejni model in ju še nihče ni pregledal.",
       "previewTitle": "Predogled za ekipo",
@@ -726,7 +726,7 @@
     "noQuestions": "Še ni vprašanj. Bodite prvi!",
     "qaPersistenceNote": "Besedilo vprašanj se lahko prikaže na strani dogodka, brez imena osebe, ki jih je postavila.",
     "personalDataNotice": "Ne pišite osebnih podatkov drugih oseb niti svojih, ki jih ne želite objaviti: besedilo vprašanja se lahko prikaže na strani dogodka, brez vašega imena.",
-    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
+    "personalDataNoticeNotPublished": "Ne pišite osebnih podatkov drugih oseb niti svojih, ki jih ne želite razkriti: besedilo vprašanja lahko preberejo osebe v dvorani.",
     "filterAll": "Vsa",
     "showPanel": "Prikaži Q&A",
     "hidePanel": "Skrij Q&A",
@@ -746,7 +746,7 @@
       "answerFieldLabel": "Odgovor na vprašanje od {name}",
       "answerPlaceholder": "Napišite odgovor (največ 2000 znakov)",
       "answerNotice": "Odgovor se lahko prikaže na strani dogodka: ne pišite osebnih podatkov.",
-      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
+      "answerNoticeNotPublished": "Odgovor lahko preberejo osebe v dvorani: ne pišite osebnih podatkov.",
       "sendAnswer": "Objavi odgovor",
       "cancel": "Prekliči",
       "removeAnswer": "Odstrani odgovor"
@@ -1032,7 +1032,7 @@
         "recordingManualNote": "Snemanje se nikoli ne začne samo: moderator ga zažene z gumbom REC.",
         "recordingDestination": "Komu je posnetek namenjen",
         "recordingDestinationReserved": "Samo za prijavljene",
-        "recordingDestinationReservedDesc": "Vidijo ga organizatorji in prijavljene osebe, slednje, dokler se hranijo podatki o njihovi prijavi. Ni ga mogoče narediti javnega.",
+        "recordingDestinationReservedDesc": "Vidijo ga organizatorji in prijavljene osebe, slednje, dokler se hranijo podatki o njihovi prijavi. Ne objavi se. Po odprtju dvorane ga ni več mogoče narediti javnega.",
         "recordingDestinationPublic": "Javni",
         "recordingDestinationPublicDesc": "Objaviti ga je mogoče na strani dogodka in v videoknjižnici. Udeleženci privolijo tudi v to.",
         "recordingDestinationNotSet": "Ni navedeno: dogodek je bil ustvarjen pred uvedbo te izbire.",
@@ -1040,8 +1040,8 @@
         "recordingDestinationStartsReserved": "Posnetek je na začetku samo za prijavljene: javnega ga lahko naredi osebje dogodka, dokler se dvorana ne odpre.",
         "recordingDestinationStaysReserved": "Posnetek ostane samo za prijavljene: dvorana se je že odprla.",
         "recordingDestinationLocked": "Po odprtju dvorane je posnetek mogoče spremeniti le v posnetek samo za prijavljene: privolitve veljajo za besedilo, ki so ga osebe prebrale.",
-        "recordingDestinationPublicOnInvitation": "The event is invitation-only, but the recording stays public: anyone will be able to see the video, not just the invitees.",
-        "recordingDestinationReservedOnInvitation": "The event is invitation-only: the recording has moved to reserved. You can change this in \"Recording and AI\".",
+        "recordingDestinationPublicOnInvitation": "Dogodek je samo za povabljene, vendar posnetek ostane javen: video si bo lahko ogledal kdor koli, ne le povabljeni.",
+        "recordingDestinationReservedOnInvitation": "Dogodek je samo za povabljene: posnetek je bil spremenjen v posnetek samo za prijavljene. To lahko spremenite v razdelku »Snemanje in UI«.",
         "recordingDestinationRequired": "Izberite, komu je posnetek namenjen.",
         "audienceAnonymous": "Anonimno občinstvo",
         "audienceAnonymousDesc": "Udeleženci so drugim vidni pod psevdonimom (»Udeleženec« in koda) v videu, klepetu in vprašanjih; seznam udeležencev ostane voditeljem, trga ni. Uporabno za velike dogodke; na dogodkih skupnosti se ljudje želijo spoznati.",
@@ -2053,7 +2053,7 @@
     },
     "recordingUpload": {
       "title": "Naloži obstoječ posnetek",
-      "subtitle": "Če že imate videoposnetek dogodka (na primer posnet na drugi platformi), ga naložite tukaj: prikazan bo kot uradni posnetek na javni strani.",
+      "subtitle": "Če že imate videoposnetek dogodka (na primer posnet na drugi platformi), ga naložite tukaj: to bo uradni posnetek dogodka.",
       "fileLabel": "Video datoteka",
       "upload": "Naloži in poveži",
       "signing": "Priprava …",
@@ -3011,8 +3011,8 @@
       "editPrivacy": "Uredi zasebnost in podatke"
     },
     "rubrica": {
-      "subtitle": "Osebe, ki so privolile v vključitev v imenik (čl. 6.1.a GDPR). Profilne informacije se ob vsaki ponovni prijavi samodejno posodobijo.",
-      "searchLabel": "Iskanje po imenu ali organizaciji",
+      "subtitle": "Osebe, ki so privolile v vključitev v imenik (čl. 6.1.a GDPR). Ime, e-poštni naslov in organizacija se posodobijo samo, ko oseba znova označi polje.",
+      "searchLabel": "Iskanje po organizaciji",
       "orgTypeLabel": "Vrsta organizacije",
       "allTypes": "Vse",
       "includeOptedOut": "Vključi osebe, ki so preklicale privolitev",
@@ -3815,7 +3815,7 @@
         "title": "Poročilo",
         "pubblicato": "Objavljeno.",
         "daPubblicare": "Ustvarjeno: preberite ga in objavite.",
-        "daGenerare": "Treba ga je ustvariti iz prepisa, klepeta in ocen.",
+        "daGenerare": "Treba ga je ustvariti iz prepisa, anket, ocen in, če so objavljena, vprašanj.",
         "inLavorazione": "V obdelavi.",
         "senzaPipeline": "Poprodukcija z UI v tej namestitvi ni aktivna.",
         "soloStaff": "Ustvari ga in objavi organizator dogodka v administraciji.",
@@ -5820,7 +5820,7 @@
       "strengths": "Prednosti",
       "improvements": "Za izboljšanje",
       "quotes": "Iz komentarjev",
-      "aiNotice": "Besedilo je napisal model umetne inteligence na podlagi prepisa, klepeta, vprašanj, anket in ocen, ekipa pa ga je pred objavo pregledala. Številke in grafe izračuna platforma. Lahko vsebuje netočnosti."
+      "aiNotice": "Besedilo je napisal model umetne inteligence na podlagi prepisa, anket, ocen in, če so objavljena, vprašanj, ekipa pa ga je pred objavo pregledala. Številke in grafe izračuna platforma. Lahko vsebuje netočnosti."
     },
     "languages": {
       "title": "Glej v jeziku",
@@ -5881,7 +5881,7 @@
       "confirm": "Potrdi odstranitev",
       "submitting": "Odstranjevanje poteka …",
       "successTitle": "Odstranitev zaključena",
-      "successBody": "Vaših podatkov ni več v imeniku dogodkov.",
+      "successBody": "Od tega trenutka ne boste več prejemali povabil. Vaš e-poštni naslov je že odstranjen; ime in organizacija se iz imenika izbrišeta najpozneje naslednji dan.",
       "errors": {
         "generic": "Prišlo je do napake. Poskusite znova pozneje."
       }

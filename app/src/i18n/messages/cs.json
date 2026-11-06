@@ -199,7 +199,7 @@
       "registrationEnded": "Událost skončila: registrace je uzavřena.",
       "joinAsGuest": "Připojit se jako host",
       "registeredUseEmailLink": "Už jste přihlášeni? Vstupte přes osobní odkaz z e-mailu.",
-      "willBeRecorded": "Akce bude nahrávána.",
+      "willBeRecorded": "Akce může být nahrávána.",
       "machineTranslation": "Automatický překlad",
       "machineTranslationNote": "Název a popis přeložil automatický model a zatím je nikdo nezkontroloval.",
       "previewTitle": "Náhled pro tým",
@@ -726,7 +726,7 @@
     "noQuestions": "Zatím žádné otázky. Buďte první!",
     "qaPersistenceNote": "Text otázek se může objevit na stránce události, bez jména toho, kdo je položil.",
     "personalDataNotice": "Nepište osobní údaje jiných osob ani své vlastní, které nechcete zveřejnit: text otázky se může objevit na stránce události, bez vašeho jména.",
-    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
+    "personalDataNoticeNotPublished": "Nepište osobní údaje jiných osob ani své vlastní, které nechcete prozradit: text otázky si mohou přečíst ti, kdo jsou v místnosti.",
     "filterAll": "Všechny",
     "showPanel": "Zobrazit Q&A",
     "hidePanel": "Skrýt Q&A",
@@ -746,7 +746,7 @@
       "answerFieldLabel": "Odpověď na otázku od {name}",
       "answerPlaceholder": "Napište odpověď (max. 2000 znaků)",
       "answerNotice": "Odpověď se může objevit na stránce události: nepište osobní údaje.",
-      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
+      "answerNoticeNotPublished": "Odpověď si mohou přečíst ti, kdo jsou v místnosti: nepište osobní údaje.",
       "sendAnswer": "Zveřejnit odpověď",
       "cancel": "Zrušit",
       "removeAnswer": "Odebrat odpověď"
@@ -1032,7 +1032,7 @@
         "recordingManualNote": "Záznam se nikdy nespustí sám: moderátor ho spustí tlačítkem REC.",
         "recordingDestination": "Kam půjde záznam",
         "recordingDestinationReserved": "Jen pro registrované",
-        "recordingDestinationReservedDesc": "Vidí ho pořadatelé a registrovaní, dokud jsou uchovávány údaje o jejich registraci. Nelze ho zveřejnit.",
+        "recordingDestinationReservedDesc": "Vidí ho pořadatelé a registrovaní; registrovaní tak dlouho, dokud jsou uchovávány údaje o jejich registraci. Nezveřejňuje se. Po otevření místnosti už ho nelze učinit veřejným.",
         "recordingDestinationPublic": "Veřejný",
         "recordingDestinationPublicDesc": "Lze ho zveřejnit na stránce akce a ve videotéce. Účastníci souhlasí i s tím.",
         "recordingDestinationNotSet": "Neuvedeno: akce vznikla dříve, než tato volba existovala.",
@@ -1040,8 +1040,8 @@
         "recordingDestinationStartsReserved": "Záznam je zpočátku jen pro registrované: veřejným ho může učinit tým akce, dokud se neotevře místnost.",
         "recordingDestinationStaysReserved": "Záznam zůstává jen pro registrované: místnost už se otevřela.",
         "recordingDestinationLocked": "Po otevření místnosti lze přejít pouze na variantu jen pro registrované: souhlasy platí pro text, který si lidé přečetli.",
-        "recordingDestinationPublicOnInvitation": "The event is invitation-only, but the recording stays public: anyone will be able to see the video, not just the invitees.",
-        "recordingDestinationReservedOnInvitation": "The event is invitation-only: the recording has moved to reserved. You can change this in \"Recording and AI\".",
+        "recordingDestinationPublicOnInvitation": "Akce je jen pro pozvané, ale záznam zůstává veřejný: video bude moci sledovat kdokoli, nejen pozvaní.",
+        "recordingDestinationReservedOnInvitation": "Akce je jen pro pozvané: záznam byl přepnut na variantu jen pro registrované. Můžete to změnit v části „Záznam a AI“.",
         "recordingDestinationRequired": "Zvolte, kam záznam půjde.",
         "audienceAnonymous": "Anonymní publikum",
         "audienceAnonymousDesc": "Účastníci se ostatním zobrazují pod pseudonymem („Účastník“ a kód) ve videu, v chatu i v dotazech; seznam účastníků vidí jen moderátoři a náměstí není k dispozici. Hodí se pro velké akce; na komunitních akcích se lidé chtějí poznat.",
@@ -2053,7 +2053,7 @@
     },
     "recordingUpload": {
       "title": "Nahrát existující záznam",
-      "subtitle": "Pokud už máte videosoubor akce (například nahraný na jiné platformě), nahrajte ho sem: zobrazí se jako oficiální záznam na veřejné stránce.",
+      "subtitle": "Pokud už máte videosoubor akce (například nahraný na jiné platformě), nahrajte ho sem: bude oficiálním záznamem akce.",
       "fileLabel": "Video soubor",
       "upload": "Nahrát a přiřadit",
       "signing": "Příprava…",
@@ -3011,8 +3011,8 @@
       "editPrivacy": "Upravit soukromí a data"
     },
     "rubrica": {
-      "subtitle": "Osoby, které udělily souhlas se zařazením do adresáře (čl. 6.1.a GDPR). Informace v profilu se automaticky aktualizují při každé opětovné registraci.",
-      "searchLabel": "Hledat podle jména nebo organizace",
+      "subtitle": "Osoby, které udělily souhlas se zařazením do adresáře (čl. 6.1.a GDPR). Jméno, e-mail a organizace se aktualizují pouze tehdy, když osoba políčko znovu zaškrtne.",
+      "searchLabel": "Hledat podle organizace",
       "orgTypeLabel": "Typ organizace",
       "allTypes": "Všechny",
       "includeOptedOut": "Zahrnout osoby, které odvolaly souhlas",
@@ -3815,7 +3815,7 @@
         "title": "Zpráva",
         "pubblicato": "Zveřejněna.",
         "daPubblicare": "Vygenerována: přečtěte si ji a zveřejněte.",
-        "daGenerare": "Zbývá vygenerovat z přepisu, chatu a hodnocení.",
+        "daGenerare": "Zbývá vygenerovat z přepisu, anket, hodnocení a, pokud jsou zveřejněné, z otázek.",
         "inLavorazione": "Zpracovává se.",
         "senzaPipeline": "AI postprodukce není v této instalaci aktivní.",
         "soloStaff": "Vygenerování a zveřejnění provádí organizátor akce v administraci.",
@@ -5820,7 +5820,7 @@
       "strengths": "Silné stránky",
       "improvements": "Ke zlepšení",
       "quotes": "Z komentářů",
-      "aiNotice": "Text napsal model umělé inteligence z přepisu, chatu, otázek, anket a hodnocení a tým jej před zveřejněním zkontroloval. Čísla a grafy počítá platforma. Může obsahovat nepřesnosti."
+      "aiNotice": "Text napsal model umělé inteligence z přepisu, anket, hodnocení a, pokud jsou zveřejněné, z otázek. Tým jej před zveřejněním zkontroloval. Čísla a grafy počítá platforma. Může obsahovat nepřesnosti."
     },
     "languages": {
       "title": "Sledovat v jazyce",
@@ -5881,7 +5881,7 @@
       "confirm": "Potvrdit odstranění",
       "submitting": "Probíhá odstraňování…",
       "successTitle": "Odstranění dokončeno",
-      "successBody": "Vaše údaje již nejsou v adresáři událostí.",
+      "successBody": "Od této chvíle už nebudete dostávat pozvánky. Vaše e-mailová adresa už byla odstraněna; jméno a organizace se z adresáře vymažou nejpozději následující den.",
       "errors": {
         "generic": "Došlo k chybě. Zkuste to později."
       }

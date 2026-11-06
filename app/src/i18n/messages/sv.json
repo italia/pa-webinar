@@ -199,7 +199,7 @@
       "registrationEnded": "Evenemanget är avslutat: anmälan är stängd.",
       "joinAsGuest": "Delta som gäst",
       "registeredUseEmailLink": "Redan anmäld? Använd den personliga länken i ditt e-postmeddelande.",
-      "willBeRecorded": "Evenemanget spelas in.",
+      "willBeRecorded": "Evenemanget kan komma att spelas in.",
       "machineTranslation": "Automatisk översättning",
       "machineTranslationNote": "Titel och beskrivning har översatts av en automatisk modell och ingen har granskat dem än.",
       "previewTitle": "Förhandsgranskning för teamet",
@@ -695,8 +695,8 @@
           "soloAscolto": "Om du återkallar det stannar du i rummet och lyssnar bara: mikrofon, kamera och skärm stängs. Ditt samtycke till transkription av dina inlägg återkallas också.",
           "conduce": "Om du återkallar det fortsätter du leda, men från och med nu sparas din röst inte i spåren per person eller i transkriptionen. Rummets video visar dig ändå om den spelas in.",
           "voce": "Om du återkallar det är du kvar i rummet som förut, och från nu står du utanför inspelningen. Du återkallar också samtycket till utskrift av dina inlägg.",
-          "avvertenza": "Om du återkallar det är du kvar i rummet som förut. Du återkallar också samtycket till utskrift av dina inlägg. Om du får ordet och evenemanget spelas in finns din röst ändå kvar i videon.",
-          "assente": "Om du återkallar det är du kvar i rummet som förut. Du återkallar också samtycket till utskrift av dina inlägg. Från och med nu spelas din röst inte in på ett eget spår."
+          "avvertenza": "Om du återkallar det är du kvar i rummet som förut. Du återkallar också samtycket till transkription av dina inlägg. Om du får ordet och evenemanget spelas in finns din röst ändå kvar i videon.",
+          "assente": "Om du återkallar det är du kvar i rummet som förut. Du återkallar också samtycket till transkription av dina inlägg. Från och med nu spelas din röst inte in på ett eget spår."
         }
       },
       "transcription": {
@@ -726,7 +726,7 @@
     "noQuestions": "Inga frågor ännu. Var den första!",
     "qaPersistenceNote": "Frågornas text kan visas på evenemangets sida, utan namnet på den som ställde dem.",
     "personalDataNotice": "Skriv inte andras personuppgifter, och inte heller dina egna om du inte vill att de ska bli offentliga: frågans text kan visas på evenemangets sida, utan ditt namn.",
-    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
+    "personalDataNoticeNotPublished": "Skriv inte andras personuppgifter, och inte heller dina egna om du inte vill att de ska bli kända: de som är i rummet kan läsa frågans text.",
     "filterAll": "Alla",
     "showPanel": "Visa Q&A",
     "hidePanel": "Dölj Q&A",
@@ -746,7 +746,7 @@
       "answerFieldLabel": "Svar på frågan från {name}",
       "answerPlaceholder": "Skriv svaret (max 2000 tecken)",
       "answerNotice": "Svaret kan visas på evenemangets sida: skriv inga personuppgifter.",
-      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
+      "answerNoticeNotPublished": "De som är i rummet kan läsa svaret: skriv inga personuppgifter.",
       "sendAnswer": "Publicera svar",
       "cancel": "Avbryt",
       "removeAnswer": "Ta bort svaret"
@@ -1032,7 +1032,7 @@
         "recordingManualNote": "Inspelningen startar aldrig av sig själv: en moderator startar den med REC-knappen.",
         "recordingDestination": "Vart inspelningen ska",
         "recordingDestinationReserved": "Endast för anmälda",
-        "recordingDestinationReservedDesc": "Arrangörerna och de anmälda kan se den, de anmälda så länge uppgifterna om deras anmälan sparas. Den kan inte göras offentlig.",
+        "recordingDestinationReservedDesc": "Arrangörerna och de anmälda kan se den, de anmälda så länge uppgifterna om deras anmälan sparas. Den publiceras inte. När rummet har öppnats kan den inte längre göras offentlig.",
         "recordingDestinationPublic": "Offentlig",
         "recordingDestinationPublicDesc": "Den kan publiceras på evenemangets sida och i videobiblioteket. Deltagarna samtycker även till detta.",
         "recordingDestinationNotSet": "Inte angiven: evenemanget skapades innan det här valet fanns.",
@@ -1040,8 +1040,8 @@
         "recordingDestinationStartsReserved": "Inspelningen är från början endast för anmälda: evenemangets personal kan göra den offentlig tills rummet öppnas.",
         "recordingDestinationStaysReserved": "Inspelningen förblir endast för anmälda: rummet har redan öppnats.",
         "recordingDestinationLocked": "När rummet har öppnats kan inspelningen bara ändras till ”Endast för anmälda”: samtyckena gäller den text som personerna har läst.",
-        "recordingDestinationPublicOnInvitation": "The event is invitation-only, but the recording stays public: anyone will be able to see the video, not just the invitees.",
-        "recordingDestinationReservedOnInvitation": "The event is invitation-only: the recording has moved to reserved. You can change this in \"Recording and AI\".",
+        "recordingDestinationPublicOnInvitation": "Evenemanget är endast för inbjudna, men inspelningen förblir offentlig: vem som helst kommer att kunna se videon, inte bara de inbjudna.",
+        "recordingDestinationReservedOnInvitation": "Evenemanget är endast för inbjudna: inspelningen har ändrats till ”Endast för anmälda”. Du kan ändra det under ”Inspelning och AI”.",
         "recordingDestinationRequired": "Välj vart inspelningen ska.",
         "audienceAnonymous": "Anonym publik",
         "audienceAnonymousDesc": "Deltagare visas för andra under en pseudonym (”Deltagare” och en kod) i video, chatt och frågor; deltagarlistan stannar hos värdarna och det finns inget torg. Bra för stora evenemang; på gemenskapsevenemang vill man lära känna varandra.",
@@ -2053,7 +2053,7 @@
     },
     "recordingUpload": {
       "title": "Ladda upp befintlig inspelning",
-      "subtitle": "Om du redan har en videofil från evenemanget (till exempel inspelad med en annan plattform) laddar du upp den här: den visas som officiell inspelning på den offentliga sidan.",
+      "subtitle": "Om du redan har en videofil från evenemanget (till exempel inspelad med en annan plattform) laddar du upp den här: den blir evenemangets officiella inspelning.",
       "fileLabel": "Videofil",
       "upload": "Ladda upp och koppla",
       "signing": "Förbereder…",
@@ -3011,8 +3011,8 @@
       "editPrivacy": "Redigera integritet och data"
     },
     "rubrica": {
-      "subtitle": "Personer som har samtyckt till att läggas till i adressboken (GDPR art. 6.1.a). Profilinformation uppdateras automatiskt vid varje ny anmälan.",
-      "searchLabel": "Sök på namn eller organisation",
+      "subtitle": "Personer som har samtyckt till att läggas till i adressboken (GDPR art. 6.1.a). Namn, e-postadress och organisation uppdateras bara när personen kryssar i rutan igen.",
+      "searchLabel": "Sök på organisation",
       "orgTypeLabel": "Typ av organisation",
       "allTypes": "Alla",
       "includeOptedOut": "Ta med personer som har återkallat sitt samtycke",
@@ -3815,7 +3815,7 @@
         "title": "Rapport",
         "pubblicato": "Publicerad.",
         "daPubblicare": "Genererad: läs igenom och publicera den.",
-        "daGenerare": "Ska genereras utifrån transkriptionen, chatten och omdömena.",
+        "daGenerare": "Ska genereras utifrån transkriptionen, omröstningarna, omdömena och, om de är publicerade, frågorna.",
         "inLavorazione": "Bearbetas.",
         "senzaPipeline": "AI-efterbearbetning är inte aktiverad i den här installationen.",
         "soloStaff": "Evenemangets arrangör genererar och publicerar den i administrationen.",
@@ -4573,7 +4573,7 @@
       "addressBookIntro": "Du har valt att stanna kvar i adressboken för att bjudas in till liknande evenemang. Vi sparar dessa uppgifter fram till {date}, om du inte återkallar samtycket eller ger ett nytt.",
       "addressBookOptOut": "Ta bort mina uppgifter från adressboken",
       "consentFutureEffect": "Om du återkallar det får du inte längre meddelanden om kommande evenemang och du lämnar adressboken, för alla dina anmälningar.",
-      "addressBookPendingTitle": "Återkomst till adressboken att bekräfta",
+      "addressBookPendingTitle": "Återkomst till adressboken väntar på bekräftelse",
       "addressBookPendingBody": "Rutan för adressboken kryssades i på den här anmälan, men den här adressen hade slutat ta emot inbjudningar. Inget ändras förrän du bekräftar.",
       "addressBookPendingEffect": "Om du bekräftar kommer du tillbaka till adressboken med namnet och organisationen från den här anmälan och får inbjudningar igen. Om du avbryter, eller om det inte var du, stannar du utanför adressboken och får inga inbjudningar.",
       "addressBookPendingConfirm": "Bekräfta min återkomst",
@@ -5820,7 +5820,7 @@
       "strengths": "Styrkor",
       "improvements": "Att förbättra",
       "quotes": "Ur kommentarerna",
-      "aiNotice": "Texten är skriven av en AI-modell utifrån transkriptionen, chatten, frågorna, omröstningarna och bedömningarna, och teamet har granskat den före publicering. Siffrorna och diagrammen beräknar plattformen. Den kan innehålla felaktigheter."
+      "aiNotice": "Texten är skriven av en AI-modell utifrån transkriptionen, omröstningarna, omdömena och, om de är publicerade, frågorna, och teamet har granskat den före publicering. Siffrorna och diagrammen beräknar plattformen. Texten kan innehålla felaktigheter."
     },
     "languages": {
       "title": "Titta på",
@@ -5881,7 +5881,7 @@
       "confirm": "Bekräfta borttagningen",
       "submitting": "Tar bort…",
       "successTitle": "Borttagning klar",
-      "successBody": "Dina uppgifter finns inte längre i evenemangsadressboken.",
+      "successBody": "Från och med nu får du inga fler inbjudningar. Din e-postadress har redan tagits bort; namn och organisation raderas från adressboken senast nästa dag.",
       "errors": {
         "generic": "Ett fel uppstod. Försök igen senare."
       }

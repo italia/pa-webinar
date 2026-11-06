@@ -199,7 +199,7 @@
       "registrationEnded": "Renginys baigėsi: registracija uždaryta.",
       "joinAsGuest": "Prisijungti kaip svečiui",
       "registeredUseEmailLink": "Jau užsiregistravote? Prisijunkite asmenine nuoroda iš el. laiško.",
-      "willBeRecorded": "Renginys bus įrašomas.",
+      "willBeRecorded": "Renginys gali būti įrašomas.",
       "machineTranslation": "Automatinis vertimas",
       "machineTranslationNote": "Pavadinimą ir aprašymą išvertė automatinis modelis, ir niekas jų dar neperžiūrėjo.",
       "previewTitle": "Peržiūra komandai",
@@ -726,7 +726,7 @@
     "noQuestions": "Klausimų dar nėra. Būkite pirmas!",
     "qaPersistenceNote": "Klausimų tekstas gali būti rodomas renginio puslapyje, be juos uždavusių asmenų vardų.",
     "personalDataNotice": "Nerašykite kitų žmonių asmens duomenų ir savo asmens duomenų, kurių nenorite paviešinti: klausimo tekstas gali būti rodomas renginio puslapyje, be jūsų vardo.",
-    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
+    "personalDataNoticeNotPublished": "Nerašykite kitų žmonių asmens duomenų ir savo asmens duomenų, kurių nenorite atskleisti: salėje esantys gali perskaityti klausimo tekstą.",
     "filterAll": "Visi",
     "showPanel": "Rodyti Q&A",
     "hidePanel": "Slėpti Q&A",
@@ -746,7 +746,7 @@
       "answerFieldLabel": "Atsakymas į {name} klausimą",
       "answerPlaceholder": "Parašykite atsakymą (iki 2000 simbolių)",
       "answerNotice": "Atsakymas gali būti rodomas renginio puslapyje: nerašykite asmens duomenų.",
-      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
+      "answerNoticeNotPublished": "Salėje esantys gali perskaityti atsakymą: nerašykite asmens duomenų.",
       "sendAnswer": "Paskelbti atsakymą",
       "cancel": "Atšaukti",
       "removeAnswer": "Pašalinti atsakymą"
@@ -1032,7 +1032,7 @@
         "recordingManualNote": "Įrašymas niekada neprasideda savaime: vedėjas jį pradeda mygtuku REC.",
         "recordingDestination": "Kam skirtas įrašas",
         "recordingDestinationReserved": "Tik užsiregistravusiems",
-        "recordingDestinationReservedDesc": "Jį mato organizatoriai ir užsiregistravusieji, pastarieji – kol saugomi jų registracijos duomenys. Viešu jo padaryti negalima.",
+        "recordingDestinationReservedDesc": "Jį mato organizatoriai ir užsiregistravusieji, pastarieji – kol saugomi jų registracijos duomenys. Jis neskelbiamas. Atidarius salę jo nebegalima padaryti viešo.",
         "recordingDestinationPublic": "Viešas",
         "recordingDestinationPublicDesc": "Galima paskelbti renginio puslapyje ir vaizdo įrašų bibliotekoje. Dalyviai sutinka ir su tuo.",
         "recordingDestinationNotSet": "Nenurodyta: renginys sukurtas anksčiau, nei atsirado šis pasirinkimas.",
@@ -1040,8 +1040,8 @@
         "recordingDestinationStartsReserved": "Iš pradžių įrašas skirtas tik užsiregistravusiems: renginio komanda gali padaryti jį viešą, kol salė neatidaryta.",
         "recordingDestinationStaysReserved": "Įrašas lieka skirtas tik užsiregistravusiems: salė jau atidaryta.",
         "recordingDestinationLocked": "Atidarius salę galima tik pakeisti į „Tik užsiregistravusiems“: sutikimai galioja tam tekstui, kurį žmonės perskaitė.",
-        "recordingDestinationPublicOnInvitation": "The event is invitation-only, but the recording stays public: anyone will be able to see the video, not just the invitees.",
-        "recordingDestinationReservedOnInvitation": "The event is invitation-only: the recording has moved to reserved. You can change this in \"Recording and AI\".",
+        "recordingDestinationPublicOnInvitation": "Renginys tik su kvietimais, tačiau įrašas lieka viešas: vaizdo įrašą galės žiūrėti bet kas, ne tik pakviestieji.",
+        "recordingDestinationReservedOnInvitation": "Renginys tik su kvietimais: įrašas perjungtas į „Tik užsiregistravusiems“. Tai galite pakeisti skiltyje „Įrašas ir DI“.",
         "recordingDestinationRequired": "Pasirinkite, kam skirtas įrašas.",
         "audienceAnonymous": "Anoniminė auditorija",
         "audienceAnonymousDesc": "Dalyviai kitiems rodomi slapyvardžiu („Dalyvis“ ir kodas) vaizdo įraše, pokalbyje ir klausimuose; dalyvių sąrašas lieka vedėjams, aikštės nėra. Naudinga dideliems renginiams; bendruomenės renginiuose žmonės nori susipažinti.",
@@ -2053,7 +2053,7 @@
     },
     "recordingUpload": {
       "title": "Įkelti esamą įrašą",
-      "subtitle": "Jei jau turite renginio vaizdo įrašo failą (pavyzdžiui, įrašytą kita platforma), įkelkite jį čia: jis bus rodomas kaip oficialus įrašas viešajame puslapyje.",
+      "subtitle": "Jei jau turite renginio vaizdo įrašo failą (pavyzdžiui, įrašytą kita platforma), įkelkite jį čia: jis bus oficialus renginio įrašas.",
       "fileLabel": "Vaizdo failas",
       "upload": "Įkelti ir susieti",
       "signing": "Ruošiama…",
@@ -3011,8 +3011,8 @@
       "editPrivacy": "Redaguoti privatumą ir duomenis"
     },
     "rubrica": {
-      "subtitle": "Asmenys, davę sutikimą būti įtraukti į adresų knygą (GDPR/BDAR str. 6.1.a). Profilio informacija automatiškai atnaujinama kiekvieną kartą iš naujo registruojantis.",
-      "searchLabel": "Ieškoti pagal vardą ar organizaciją",
+      "subtitle": "Asmenys, davę sutikimą būti įtraukti į adresų knygą (BDAR 6.1.a str.). Vardas, el. paštas ir organizacija atnaujinami tik tada, kai asmuo vėl pažymi langelį.",
+      "searchLabel": "Ieškoti pagal organizaciją",
       "orgTypeLabel": "Organizacijos tipas",
       "allTypes": "Visi",
       "includeOptedOut": "Įtraukti atšaukusius sutikimą",
@@ -3815,7 +3815,7 @@
         "title": "Ataskaita",
         "pubblicato": "Paskelbta.",
         "daPubblicare": "Sugeneruota: perskaitykite ir paskelbkite.",
-        "daGenerare": "Reikia sugeneruoti iš transkripcijos, pokalbio ir įvertinimų.",
+        "daGenerare": "Reikia sugeneruoti iš transkripcijos, apklausų, įvertinimų ir, jei jie paskelbti, klausimų.",
         "inLavorazione": "Apdorojama.",
         "senzaPipeline": "DI pogamyba šiame diegime neįjungta.",
         "soloStaff": "Ją sugeneruoja ir paskelbia renginio organizatorius administravimo srityje.",
@@ -5820,7 +5820,7 @@
       "strengths": "Stipriosios pusės",
       "improvements": "Tobulintina",
       "quotes": "Iš komentarų",
-      "aiNotice": "Tekstą parašė dirbtinio intelekto modelis pagal stenogramą, pokalbį, klausimus, apklausas ir vertinimus, o komanda jį peržiūrėjo prieš paskelbiant. Skaičius ir diagramas apskaičiuoja platforma. Jame gali būti netikslumų."
+      "aiNotice": "Tekstą parašė dirbtinio intelekto modelis pagal transkripciją, apklausas, vertinimus ir, jei jie paskelbti, klausimus, o komanda jį peržiūrėjo prieš paskelbiant. Skaičius ir diagramas apskaičiuoja platforma. Jame gali būti netikslumų."
     },
     "languages": {
       "title": "Žiūrėti kalba",
@@ -5881,7 +5881,7 @@
       "confirm": "Patvirtinti pašalinimą",
       "submitting": "Šalinama…",
       "successTitle": "Pašalinimas baigtas",
-      "successBody": "Jūsų duomenų renginių adresų knygoje nebėra.",
+      "successBody": "Nuo šiol nebegausite kvietimų. Jūsų el. pašto adresas jau pašalintas; vardas ir organizacija iš adresų knygos ištrinami ne vėliau kaip kitą dieną.",
       "errors": {
         "generic": "Įvyko klaida. Bandykite vėliau."
       }

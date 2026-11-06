@@ -199,7 +199,7 @@
       "registrationEnded": "Az esemény véget ért: a regisztráció lezárult.",
       "joinAsGuest": "Csatlakozás vendégként",
       "registeredUseEmailLink": "Már jelentkezett? Lépjen be az e-mailben kapott személyes linkkel.",
-      "willBeRecorded": "Az eseményt rögzítik.",
+      "willBeRecorded": "Az eseményről felvétel készülhet.",
       "machineTranslation": "Automatikus fordítás",
       "machineTranslationNote": "A címet és a leírást egy automatikus modell fordította, és még senki sem ellenőrizte.",
       "previewTitle": "Előnézet a csapatnak",
@@ -688,7 +688,7 @@
           "soloAscolto": "E hozzájárulás nélkül csak hallgatóként vesz részt: a mikrofon, a kamera és a képernyő zárva marad.",
           "conduce": "E hozzájárulás nélkül is vezetheti az eseményt, de a hangja nem marad meg a személyenkénti sávokban és az átiratban.",
           "voce": "E hozzájárulás nélkül ugyanúgy részt vesz, de kimarad a felvételből: sem a neve, sem a hangja, sem a képe nem szerepel.",
-          "comeTutti": "E hozzájárulás nélkül ugyanúgy részt vesz."
+          "comeTutti": "E hozzájárulás nélkül ugyanúgy részt vesz, mint mindenki más."
         },
         "alreadyRecorded": "Ami már felvételre került, az az esemény videójában marad: az eltávolításért írjon a szervezőknek.",
         "withdraw": {
@@ -726,7 +726,7 @@
     "noQuestions": "Még nincsenek kérdések. Legyen Ön az első!",
     "qaPersistenceNote": "A kérdések szövege megjelenhet az esemény oldalán, a kérdezők neve nélkül.",
     "personalDataNotice": "Ne írja le mások személyes adatait, sem a sajátjait, ha nem szeretné nyilvánossá tenni őket: a kérdés szövege megjelenhet az esemény oldalán, a neve nélkül.",
-    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
+    "personalDataNoticeNotPublished": "Ne írja le mások személyes adatait, sem a sajátjait, ha nem szeretné, hogy mások megismerjék őket: a teremben lévők elolvashatják a kérdés szövegét.",
     "filterAll": "Összes",
     "showPanel": "Q&A megjelenítése",
     "hidePanel": "Q&A elrejtése",
@@ -746,7 +746,7 @@
       "answerFieldLabel": "Válasz {name} kérdésére",
       "answerPlaceholder": "Írja meg a választ (legfeljebb 2000 karakter)",
       "answerNotice": "A válasz megjelenhet az esemény oldalán: ne írjon bele személyes adatokat.",
-      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
+      "answerNoticeNotPublished": "A teremben lévők elolvashatják a választ: ne írjon bele személyes adatokat.",
       "sendAnswer": "Válasz közzététele",
       "cancel": "Mégse",
       "removeAnswer": "Válasz eltávolítása"
@@ -1032,7 +1032,7 @@
         "recordingManualNote": "A felvétel soha nem indul el magától: egy moderátor indítja a REC gombbal.",
         "recordingDestination": "Hová kerül a felvétel",
         "recordingDestinationReserved": "Csak regisztráltaknak",
-        "recordingDestinationReservedDesc": "A szervezők és a regisztráltak láthatják, ez utóbbiak addig, amíg a regisztrációs adataikat megőrizzük. Nem tehető nyilvánossá.",
+        "recordingDestinationReservedDesc": "A szervezők és a regisztráltak láthatják, ez utóbbiak addig, amíg a regisztrációs adataikat megőrizzük. Nem kerül közzétételre. A terem megnyitása után már nem tehető nyilvánossá.",
         "recordingDestinationPublic": "Nyilvános",
         "recordingDestinationPublicDesc": "Közzétehető az esemény oldalán és a videótárban. A résztvevők ehhez is hozzájárulnak.",
         "recordingDestinationNotSet": "Nincs megadva: az esemény e választási lehetőség bevezetése előtt jött létre.",
@@ -1040,8 +1040,8 @@
         "recordingDestinationStartsReserved": "A felvétel kezdetben csak regisztráltaknak szól: az esemény munkatársai a terem megnyitásáig nyilvánossá tehetik.",
         "recordingDestinationStaysReserved": "A felvétel továbbra is csak regisztráltaknak szól: a terem már megnyílt.",
         "recordingDestinationLocked": "A terem megnyitása után a felvétel már csak a „Csak regisztráltaknak” beállításra módosítható: a hozzájárulások arra a szövegre érvényesek, amelyet az emberek elolvastak.",
-        "recordingDestinationPublicOnInvitation": "The event is invitation-only, but the recording stays public: anyone will be able to see the video, not just the invitees.",
-        "recordingDestinationReservedOnInvitation": "The event is invitation-only: the recording has moved to reserved. You can change this in \"Recording and AI\".",
+        "recordingDestinationPublicOnInvitation": "Az esemény csak meghívással látogatható, de a felvétel nyilvános marad: a videót bárki megnézheti, nem csak a meghívottak.",
+        "recordingDestinationReservedOnInvitation": "Az esemény csak meghívással látogatható: a felvétel „Csak regisztráltaknak” beállításra váltott. Ezt a „Felvétel és MI” részben módosíthatja.",
         "recordingDestinationRequired": "Válassza ki, hová kerül a felvétel.",
         "audienceAnonymous": "Névtelen közönség",
         "audienceAnonymousDesc": "A résztvevők másoknak álnéven jelennek meg („Résztvevő” és egy kód) a videóban, a csevegésben és a kérdésekben; a résztvevők listája a moderátoroknál marad, és nincs tér. Nagy eseményekhez hasznos; közösségi eseményeken az emberek meg akarják ismerni egymást.",
@@ -2053,7 +2053,7 @@
     },
     "recordingUpload": {
       "title": "Meglévő felvétel feltöltése",
-      "subtitle": "Ha már van videofájlja az eseményről (például más platformon rögzítve), töltse fel ide: hivatalos felvételként jelenik meg a nyilvános oldalon.",
+      "subtitle": "Ha már van videofájlja az eseményről (például más platformon rögzítve), töltse fel ide: ez lesz az esemény hivatalos felvétele.",
       "fileLabel": "Videofájl",
       "upload": "Feltöltés és hozzárendelés",
       "signing": "Előkészítés…",
@@ -3011,8 +3011,8 @@
       "editPrivacy": "Adatvédelem és adatok szerkesztése"
     },
     "rubrica": {
-      "subtitle": "A címjegyzékbe való felvételhez hozzájárulást adó személyek (GDPR 6. cikk (1) bekezdés a) pont). A profilinformációk minden újraregisztrációkor automatikusan frissülnek.",
-      "searchLabel": "Keresés név vagy szervezet szerint",
+      "subtitle": "A címjegyzékbe való felvételhez hozzájárulást adó személyek (GDPR 6. cikk (1) bekezdés a) pont). A név, az e-mail cím és a szervezet csak akkor frissül, ha a személy ismét bejelöli a jelölőnégyzetet.",
+      "searchLabel": "Keresés szervezet szerint",
       "orgTypeLabel": "Szervezet típusa",
       "allTypes": "Mind",
       "includeOptedOut": "A hozzájárulásukat visszavonók is",
@@ -3815,7 +3815,7 @@
         "title": "Beszámoló",
         "pubblicato": "Közzétéve.",
         "daPubblicare": "Elkészült: olvassa át, és tegye közzé.",
-        "daGenerare": "Még el kell készíteni az átiratból, a csevegésből és az értékelésekből.",
+        "daGenerare": "Még el kell készíteni az átiratból, a szavazásokból, az értékelésekből és, ha közzé vannak téve, a kérdésekből.",
         "inLavorazione": "Feldolgozás alatt.",
         "senzaPipeline": "Az AI-utómunka ebben a telepítésben nincs bekapcsolva.",
         "soloStaff": "Az esemény szervezője készíti el és teszi közzé az adminisztrációs felületen.",
@@ -4573,9 +4573,9 @@
       "addressBookIntro": "Ön úgy döntött, hogy a címjegyzékben marad, hogy hasonló eseményekre meghívást kapjon. Visszavonás vagy új hozzájárulás hiányában ezeket az adatokat a következő napig őrizzük meg: {date}.",
       "addressBookOptOut": "Adataim eltávolítása a címjegyzékből",
       "consentFutureEffect": "Ha visszavonja, többé nem kap értesítést a következő eseményekről, és kikerül a címjegyzékből, minden regisztrációja esetében.",
-      "addressBookPendingTitle": "A címjegyzékbe való visszatérés megerősítése",
+      "addressBookPendingTitle": "A címjegyzékbe való visszatérés megerősítésre vár",
       "addressBookPendingBody": "Ennél a regisztrációnál bejelölték a címjegyzék jelölőnégyzetét, de erre a címre már nem érkeztek meghívók. Amíg nem erősíti meg, semmi sem változik.",
-      "addressBookPendingEffect": "Ha megerősíti, a regisztráció nevével és szervezetével visszakerül a címjegyzékbe, és ismét kap meghívókat. Ha megszakítja, vagy ha nem Ön volt, a címjegyzéken kívül marad, és nem kap meghívókat.",
+      "addressBookPendingEffect": "Ha megerősíti, az ebben a regisztrációban szereplő névvel és szervezettel visszakerül a címjegyzékbe, és ismét kap meghívókat. Ha visszavonja a kérést, vagy ha nem Ön volt, a címjegyzéken kívül marad, és nem kap meghívókat.",
       "addressBookPendingConfirm": "Visszatérés megerősítése",
       "addressBookPendingCancel": "Kérés visszavonása"
     },
@@ -5820,7 +5820,7 @@
       "strengths": "Erősségek",
       "improvements": "Fejlesztendő",
       "quotes": "A hozzászólásokból",
-      "aiNotice": "A szöveget mesterségesintelligencia-modell írta az átirat, a csevegés, a kérdések, a szavazások és az értékelések alapján, és a csapat közzététel előtt átnézte. A számokat és a grafikonokat a platform számítja ki. Pontatlanságokat tartalmazhat."
+      "aiNotice": "A szöveget mesterségesintelligencia-modell írta az átirat, a szavazások, az értékelések és, ha közzé vannak téve, a kérdések alapján, és a csapat közzététel előtt átnézte. A számokat és a grafikonokat a platform számítja ki. Pontatlanságokat tartalmazhat."
     },
     "languages": {
       "title": "Megtekintés nyelve",
@@ -5881,7 +5881,7 @@
       "confirm": "Eltávolítás megerősítése",
       "submitting": "Eltávolítás folyamatban…",
       "successTitle": "Eltávolítás befejezve",
-      "successBody": "Az adatai már nem szerepelnek az események címjegyzékében.",
+      "successBody": "Mostantól nem kap több meghívót. Az e-mail címét már eltávolítottuk; a nevét és a szervezetét legkésőbb a következő napon töröljük a címjegyzékből.",
       "errors": {
         "generic": "Hiba történt. Kérjük, próbálja újra később."
       }

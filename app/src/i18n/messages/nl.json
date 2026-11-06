@@ -199,7 +199,7 @@
       "registrationEnded": "Het evenement is afgelopen: de inschrijving is gesloten.",
       "joinAsGuest": "Deelnemen als gast",
       "registeredUseEmailLink": "Al ingeschreven? Gebruik de persoonlijke link uit je e-mail.",
-      "willBeRecorded": "Het evenement wordt opgenomen.",
+      "willBeRecorded": "Het evenement kan worden opgenomen.",
       "machineTranslation": "Automatische vertaling",
       "machineTranslationNote": "Titel en beschrijving zijn vertaald door een automatisch model en nog door niemand nagelezen.",
       "previewTitle": "Voorbeeld voor het team",
@@ -695,8 +695,8 @@
           "soloAscolto": "Als je hem intrekt, blijf je in de zaal en luister je alleen mee: microfoon, camera en scherm gaan dicht. Je toestemming voor de transcriptie van je bijdragen wordt ook ingetrokken.",
           "conduce": "Als je hem intrekt, blijf je leiden, maar vanaf nu blijft je stem niet in de sporen per persoon of in de transcriptie. De video van de zaal, als die wordt opgenomen, laat je toch zien.",
           "voce": "Als je intrekt, blijf je in de zaal zoals eerst en sta je vanaf nu buiten de opname. Je trekt ook de toestemming voor het transcript van je bijdragen in.",
-          "avvertenza": "Als je intrekt, blijf je in de zaal zoals eerst. Je trekt ook de toestemming voor het transcript van je bijdragen in. Als je het woord krijgt en het evenement wordt opgenomen, blijft je stem wel in de video.",
-          "assente": "Als je intrekt, blijf je in de zaal zoals eerst. Je trekt ook de toestemming voor het transcript van je bijdragen in. Vanaf nu wordt je stem niet op een apart spoor opgenomen."
+          "avvertenza": "Als je hem intrekt, blijf je in de zaal zoals eerst. Je trekt ook de toestemming voor de transcriptie van je bijdragen in. Als je het woord krijgt en het evenement wordt opgenomen, blijft je stem wel in de video.",
+          "assente": "Als je hem intrekt, blijf je in de zaal zoals eerst. Je trekt ook de toestemming voor de transcriptie van je bijdragen in. Vanaf nu wordt je stem niet op een apart spoor opgenomen."
         }
       },
       "transcription": {
@@ -726,7 +726,7 @@
     "noQuestions": "Nog geen vragen. Stel de eerste!",
     "qaPersistenceNote": "De tekst van de vragen kan op de pagina van het evenement verschijnen, zonder de naam van wie ze heeft gesteld.",
     "personalDataNotice": "Schrijf geen persoonsgegevens van anderen op, en ook geen eigen gegevens die u niet openbaar wilt maken: de tekst van de vraag kan op de pagina van het evenement verschijnen, zonder uw naam.",
-    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
+    "personalDataNoticeNotPublished": "Schrijf geen persoonsgegevens van anderen op, en ook geen eigen gegevens die u niet bekend wilt maken: wie in de zaal is, kan de tekst van de vraag lezen.",
     "filterAll": "Alle",
     "showPanel": "Q&A tonen",
     "hidePanel": "Q&A verbergen",
@@ -746,7 +746,7 @@
       "answerFieldLabel": "Antwoord op de vraag van {name}",
       "answerPlaceholder": "Schrijf het antwoord (max. 2000 tekens)",
       "answerNotice": "Het antwoord kan op de pagina van het evenement verschijnen: schrijf geen persoonsgegevens op.",
-      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
+      "answerNoticeNotPublished": "Wie in de zaal is, kan het antwoord lezen: schrijf geen persoonsgegevens op.",
       "sendAnswer": "Antwoord publiceren",
       "cancel": "Annuleren",
       "removeAnswer": "Antwoord verwijderen"
@@ -1032,7 +1032,7 @@
         "recordingManualNote": "De opname start nooit vanzelf: een gespreksleider start haar met de REC-knop.",
         "recordingDestination": "Waar de opname terechtkomt",
         "recordingDestinationReserved": "Alleen voor ingeschrevenen",
-        "recordingDestinationReservedDesc": "De organisatoren en de ingeschrevenen kunnen haar zien; de ingeschrevenen zolang de gegevens van hun inschrijving worden bewaard. Ze kan niet openbaar worden gemaakt.",
+        "recordingDestinationReservedDesc": "De organisatoren en de ingeschrevenen kunnen haar zien; de ingeschrevenen zolang de gegevens van hun inschrijving worden bewaard. Ze wordt niet gepubliceerd. Na de opening van de zaal kan ze niet meer openbaar worden gemaakt.",
         "recordingDestinationPublic": "Openbaar",
         "recordingDestinationPublicDesc": "Kan worden gepubliceerd op de pagina van het evenement en in de videobibliotheek. Deelnemers stemmen ook daarmee in.",
         "recordingDestinationNotSet": "Niet aangegeven: het evenement is aangemaakt vóór deze keuze.",
@@ -1040,8 +1040,8 @@
         "recordingDestinationStartsReserved": "De opname begint als ‘Alleen voor ingeschrevenen’: het team van het evenement kan haar openbaar maken zolang de zaal niet is geopend.",
         "recordingDestinationStaysReserved": "De opname blijft ‘Alleen voor ingeschrevenen’: de zaal is al geopend.",
         "recordingDestinationLocked": "Na de opening van de zaal kan alleen nog worden overgeschakeld naar ‘Alleen voor ingeschrevenen’: toestemmingen gelden voor de tekst die mensen hebben gelezen.",
-        "recordingDestinationPublicOnInvitation": "The event is invitation-only, but the recording stays public: anyone will be able to see the video, not just the invitees.",
-        "recordingDestinationReservedOnInvitation": "The event is invitation-only: the recording has moved to reserved. You can change this in \"Recording and AI\".",
+        "recordingDestinationPublicOnInvitation": "Het evenement is alleen op uitnodiging, maar de opname blijft openbaar: iedereen zal de video kunnen bekijken, niet alleen de genodigden.",
+        "recordingDestinationReservedOnInvitation": "Het evenement is alleen op uitnodiging: de opname is overgeschakeld naar ‘Alleen voor ingeschrevenen’. Je kunt dit wijzigen bij ‘Opname en AI’.",
         "recordingDestinationRequired": "Kies waar de opname terechtkomt.",
         "audienceAnonymous": "Anoniem publiek",
         "audienceAnonymousDesc": "Deelnemers verschijnen voor anderen onder een pseudoniem (‘Deelnemer’ en een code) in de video, de chat en bij vragen; de deelnemerslijst blijft bij de moderatoren en er is geen plein. Handig voor grote evenementen; bij communityevenementen wil men elkaar leren kennen.",
@@ -2053,7 +2053,7 @@
     },
     "recordingUpload": {
       "title": "Bestaande opname uploaden",
-      "subtitle": "Heb je al een videobestand van het evenement (bijvoorbeeld opgenomen met een ander platform), upload het dan hier: het wordt als officiële opname op de openbare pagina getoond.",
+      "subtitle": "Heb je al een videobestand van het evenement (bijvoorbeeld opgenomen met een ander platform), upload het dan hier: het wordt de officiële opname van het evenement.",
       "fileLabel": "Videobestand",
       "upload": "Uploaden en koppelen",
       "signing": "Voorbereiden…",
@@ -3011,8 +3011,8 @@
       "editPrivacy": "Privacy en gegevens bewerken"
     },
     "rubrica": {
-      "subtitle": "Personen die toestemming hebben gegeven voor opname in het adresboek (art. 6.1.a AVG). Profielinformatie wordt automatisch bijgewerkt bij elke nieuwe aanmelding.",
-      "searchLabel": "Zoeken op naam of organisatie",
+      "subtitle": "Personen die toestemming hebben gegeven voor opname in het adresboek (art. 6.1.a AVG). Naam, e-mailadres en organisatie worden alleen bijgewerkt wanneer de persoon het vakje opnieuw aanvinkt.",
+      "searchLabel": "Zoeken op organisatie",
       "orgTypeLabel": "Type organisatie",
       "allTypes": "Alle",
       "includeOptedOut": "Personen opnemen die hun toestemming hebben ingetrokken",
@@ -3815,7 +3815,7 @@
         "title": "Verslag",
         "pubblicato": "Gepubliceerd.",
         "daPubblicare": "Gegenereerd: lees het na en publiceer het.",
-        "daGenerare": "Nog te genereren, op basis van de transcriptie, de chat en de beoordelingen.",
+        "daGenerare": "Nog te genereren, op basis van de transcriptie, de peilingen, de beoordelingen en, als ze zijn gepubliceerd, de vragen.",
         "inLavorazione": "Wordt verwerkt.",
         "senzaPipeline": "AI-nabewerking is niet actief op deze installatie.",
         "soloStaff": "De organisator van het evenement genereert het en publiceert het in het beheergedeelte.",
@@ -4573,9 +4573,9 @@
       "addressBookIntro": "U hebt ervoor gekozen in het adresboek te blijven om voor vergelijkbare evenementen te worden uitgenodigd. We bewaren deze gegevens tot {date}, tenzij u uw toestemming intrekt of opnieuw geeft.",
       "addressBookOptOut": "Verwijder mijn gegevens uit het adresboek",
       "consentFutureEffect": "Als u deze intrekt, ontvangt u geen berichten meer over komende evenementen en verlaat u het adresboek, voor al uw inschrijvingen.",
-      "addressBookPendingTitle": "Terugkeer in het adresboek bevestigen",
-      "addressBookPendingBody": "Bij deze inschrijving is het vakje voor het adresboek aangevinkt, maar dit adres ontving geen uitnodigingen meer. Zolang je niet bevestigt, verandert er niets.",
-      "addressBookPendingEffect": "Als je bevestigt, keer je terug in het adresboek met de naam en de organisatie van deze inschrijving en ontvang je weer uitnodigingen. Als je annuleert, of als jij het niet was, blijf je buiten het adresboek en ontvang je geen uitnodigingen.",
+      "addressBookPendingTitle": "Terugkeer in het adresboek nog te bevestigen",
+      "addressBookPendingBody": "Bij deze inschrijving is het vakje voor het adresboek aangevinkt, maar dit adres ontving geen uitnodigingen meer. Zolang u niet bevestigt, verandert er niets.",
+      "addressBookPendingEffect": "Als u bevestigt, keert u terug in het adresboek met de naam en de organisatie van deze inschrijving en ontvangt u weer uitnodigingen. Als u annuleert, of als u het niet was, blijft u buiten het adresboek en ontvangt u geen uitnodigingen.",
       "addressBookPendingConfirm": "Terugkeer bevestigen",
       "addressBookPendingCancel": "Verzoek annuleren"
     },
@@ -5820,7 +5820,7 @@
       "strengths": "Sterke punten",
       "improvements": "Te verbeteren",
       "quotes": "Uit de opmerkingen",
-      "aiNotice": "De tekst is geschreven door een AI-model op basis van de transcriptie, de chat, de vragen, de peilingen en de beoordelingen, en het team heeft hem voor publicatie nagelezen. De cijfers en grafieken berekent het platform. Hij kan onnauwkeurigheden bevatten."
+      "aiNotice": "De tekst is geschreven door een AI-model op basis van de transcriptie, de peilingen, de beoordelingen en, als ze zijn gepubliceerd, de vragen, en het team heeft hem voor publicatie nagelezen. De cijfers en grafieken berekent het platform. De tekst kan onnauwkeurigheden bevatten."
     },
     "languages": {
       "title": "Bekijken in",
@@ -5881,7 +5881,7 @@
       "confirm": "Verwijdering bevestigen",
       "submitting": "Verwijderen…",
       "successTitle": "Verwijdering voltooid",
-      "successBody": "Uw gegevens staan niet meer in het evenementenadresboek.",
+      "successBody": "Vanaf nu ontvangt u geen uitnodigingen meer. Uw e-mailadres is al verwijderd; naam en organisatie worden uiterlijk de volgende dag uit het adresboek verwijderd.",
       "errors": {
         "generic": "Er is een fout opgetreden. Probeer het later opnieuw."
       }

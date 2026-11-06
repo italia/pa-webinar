@@ -199,7 +199,7 @@
       "registrationEnded": "Begivenheden er afsluttet: tilmeldingen er lukket.",
       "joinAsGuest": "Deltag som gæst",
       "registeredUseEmailLink": "Allerede tilmeldt? Brug det personlige link fra din e-mail.",
-      "willBeRecorded": "Arrangementet bliver optaget.",
+      "willBeRecorded": "Arrangementet kan blive optaget.",
       "machineTranslation": "Automatisk oversættelse",
       "machineTranslationNote": "Titel og beskrivelse er oversat af en automatisk model, og ingen har gennemlæst dem endnu.",
       "previewTitle": "Forhåndsvisning for teamet",
@@ -726,7 +726,7 @@
     "noQuestions": "Ingen spørgsmål endnu. Vær den første!",
     "qaPersistenceNote": "Teksten til spørgsmålene kan blive vist på arrangementets side uden navnet på den, der stillede dem.",
     "personalDataNotice": "Skriv ikke andres personoplysninger og heller ikke dine egne, hvis du ikke ønsker, at de bliver offentlige: teksten til dit spørgsmål kan blive vist på arrangementets side uden dit navn.",
-    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
+    "personalDataNoticeNotPublished": "Skriv ikke andres personoplysninger og heller ikke dine egne, hvis du ikke ønsker, at de bliver kendt: de, der er i rummet, kan læse teksten til dit spørgsmål.",
     "filterAll": "Alle",
     "showPanel": "Vis Q&A",
     "hidePanel": "Skjul Q&A",
@@ -746,7 +746,7 @@
       "answerFieldLabel": "Svar på spørgsmålet fra {name}",
       "answerPlaceholder": "Skriv svaret (maks. 2000 tegn)",
       "answerNotice": "Svaret kan blive vist på arrangementets side: skriv ikke personoplysninger.",
-      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
+      "answerNoticeNotPublished": "De, der er i rummet, kan læse svaret: skriv ikke personoplysninger.",
       "sendAnswer": "Offentliggør svar",
       "cancel": "Annuller",
       "removeAnswer": "Fjern svaret"
@@ -1032,7 +1032,7 @@
         "recordingManualNote": "Optagelsen starter aldrig af sig selv: en ordstyrer starter den med REC-knappen.",
         "recordingDestination": "Hvor optagelsen skal hen",
         "recordingDestinationReserved": "Kun for tilmeldte",
-        "recordingDestinationReservedDesc": "Arrangørerne og de tilmeldte kan se den, de tilmeldte så længe deres tilmeldingsdata opbevares. Den kan ikke gøres offentlig.",
+        "recordingDestinationReservedDesc": "Arrangørerne og de tilmeldte kan se den, de tilmeldte så længe deres tilmeldingsdata opbevares. Den offentliggøres ikke. Når rummet er åbnet, kan den ikke længere gøres offentlig.",
         "recordingDestinationPublic": "Offentlig",
         "recordingDestinationPublicDesc": "Den kan offentliggøres på arrangementets side og i videobiblioteket. Deltagerne giver også samtykke til dette.",
         "recordingDestinationNotSet": "Ikke angivet: arrangementet blev oprettet før dette valg.",
@@ -1040,8 +1040,8 @@
         "recordingDestinationStartsReserved": "Optagelsen er fra start kun for tilmeldte: arrangementets team kan gøre den offentlig, indtil rummet åbnes.",
         "recordingDestinationStaysReserved": "Optagelsen forbliver kun for tilmeldte: rummet er allerede åbnet.",
         "recordingDestinationLocked": "Når rummet er åbnet, kan optagelsen kun ændres til »Kun for tilmeldte«: samtykkerne gælder den tekst, personerne har læst.",
-        "recordingDestinationPublicOnInvitation": "The event is invitation-only, but the recording stays public: anyone will be able to see the video, not just the invitees.",
-        "recordingDestinationReservedOnInvitation": "The event is invitation-only: the recording has moved to reserved. You can change this in \"Recording and AI\".",
+        "recordingDestinationPublicOnInvitation": "Arrangementet er kun for inviterede, men optagelsen forbliver offentlig: alle vil kunne se videoen, ikke kun de inviterede.",
+        "recordingDestinationReservedOnInvitation": "Arrangementet er kun for inviterede: optagelsen er ændret til »Kun for tilmeldte«. Du kan ændre det under »Optagelse og AI«.",
         "recordingDestinationRequired": "Vælg, hvor optagelsen skal hen.",
         "audienceAnonymous": "Anonymt publikum",
         "audienceAnonymousDesc": "Deltagerne vises for de andre under et pseudonym (»Deltager« og en kode) i video, chat og spørgsmål; deltagerlisten er kun for værterne, og der er ingen plads. Nyttigt til store arrangementer; til fællesskabsarrangementer vil folk gerne lære hinanden at kende.",
@@ -2053,7 +2053,7 @@
     },
     "recordingUpload": {
       "title": "Upload eksisterende optagelse",
-      "subtitle": "Hvis du allerede har en videofil af arrangementet (for eksempel optaget med en anden platform), så upload den her: den vises som den officielle optagelse på den offentlige side.",
+      "subtitle": "Hvis du allerede har en videofil af arrangementet (for eksempel optaget med en anden platform), så upload den her: den bliver arrangementets officielle optagelse.",
       "fileLabel": "Videofil",
       "upload": "Upload og tilknyt",
       "signing": "Forbereder…",
@@ -3011,8 +3011,8 @@
       "editPrivacy": "Redigér privatliv og data"
     },
     "rubrica": {
-      "subtitle": "Personer, der har givet samtykke til at blive optaget i adressebogen (GDPR art. 6.1.a). Profiloplysninger opdateres automatisk ved hver ny tilmelding.",
-      "searchLabel": "Søg efter navn eller organisation",
+      "subtitle": "Personer, der har givet samtykke til at blive optaget i adressebogen (GDPR art. 6.1.a). Navn, e-mailadresse og organisation opdateres kun, når personen sætter kryds i feltet igen.",
+      "searchLabel": "Søg efter organisation",
       "orgTypeLabel": "Organisationstype",
       "allTypes": "Alle",
       "includeOptedOut": "Medtag personer, der har trukket samtykket tilbage",
@@ -3815,7 +3815,7 @@
         "title": "Referat",
         "pubblicato": "Offentliggjort.",
         "daPubblicare": "Genereret: læs det igennem og offentliggør det.",
-        "daGenerare": "Skal genereres ud fra udskriften, chatten og vurderingerne.",
+        "daGenerare": "Skal genereres ud fra transskriptionen, afstemningerne, vurderingerne og, hvis de er offentliggjort, spørgsmålene.",
         "inLavorazione": "Under behandling.",
         "senzaPipeline": "AI-efterbehandling er ikke aktiveret på denne installation.",
         "soloStaff": "Arrangøren genererer og offentliggør det i administrationen.",
@@ -4566,7 +4566,7 @@
       "consentWithdrawnOn": "Trukket tilbage den {date}",
       "consentNoteInRoom": "Hvis du er i rummet lige nu, gælder tilbagetrækningen fra din næste indgang: brug Samtykker i rummet, hvis den skal gælde straks.",
       "proofsTitle": "Opbevaret dokumentation for samtykker",
-      "proofsIntro": "Dataene for disse arrangementer er blevet slettet. Denne dokumentation bevares, så længe videoen eller transskriptionen findes. Du kan trække dit samtykke tilbage: det, der allerede er i videoen, forbliver, og for at få det fjernet skal du skrive til den dataansvarlige.",
+      "proofsIntro": "Dataene for disse arrangementer er blevet slettet. Denne dokumentation bevares, så længe videoen eller transskriptionen findes. Du kan trække dit samtykke tilbage: det, der allerede er i videoen, forbliver der, og for at få det fjernet skal du skrive til den dataansvarlige.",
       "proofGivenOn": "Givet den {date}",
       "proofSuperseded": "Erstattet af et senere samtykke",
       "addressBookTitle": "Arrangementsadressebog",
@@ -5820,7 +5820,7 @@
       "strengths": "Styrker",
       "improvements": "Kan forbedres",
       "quotes": "Fra kommentarerne",
-      "aiNotice": "Teksten er skrevet af en AI-model ud fra udskriften, chatten, spørgsmålene, afstemningerne og vurderingerne, og teamet har gennemlæst den før offentliggørelsen. Tallene og diagrammerne beregner platformen. Den kan indeholde unøjagtigheder."
+      "aiNotice": "Teksten er skrevet af en AI-model ud fra transskriptionen, afstemningerne, vurderingerne og, hvis de er offentliggjort, spørgsmålene, og teamet har gennemlæst den før offentliggørelsen. Tallene og diagrammerne beregner platformen. Teksten kan indeholde unøjagtigheder."
     },
     "languages": {
       "title": "Se på",
@@ -5881,7 +5881,7 @@
       "confirm": "Bekræft fjernelse",
       "submitting": "Fjerner…",
       "successTitle": "Fjernelse fuldført",
-      "successBody": "Dine data findes ikke længere i arrangementsadressebogen.",
+      "successBody": "Fra nu af modtager du ikke flere invitationer. Din e-mailadresse er allerede fjernet; navn og organisation slettes fra adressebogen senest dagen efter.",
       "errors": {
         "generic": "Der opstod en fejl. Prøv igen senere."
       }
