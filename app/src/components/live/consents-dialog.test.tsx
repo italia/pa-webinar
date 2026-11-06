@@ -8,7 +8,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import messages from '@/i18n/messages/it.json';
 
-import ConsentsDialog, { type ConsensiInSala } from './consents-dialog';
+import ConsentsDialog, {
+  type ConsensiInSala,
+  type EffettoRitiroRegistrazione,
+} from './consents-dialog';
+
+type Registrazione = NonNullable<ConsensiInSala['registrazione']>;
 
 /**
  * «I tuoi consensi» in sala: mostra solo i consensi che l'evento chiede, dice
@@ -41,7 +46,7 @@ const azioni = () => ({
 async function disegna(
   consensi: ConsensiInSala,
   a = azioni(),
-  extra: { inCorso?: boolean; errore?: boolean } = {}
+  extra: { inCorso?: boolean; errore?: boolean; testoCambiato?: boolean } = {}
 ) {
   await act(async () => {
     root.render(
@@ -60,6 +65,13 @@ async function disegna(
   return a;
 }
 
+/** Il consenso alla registrazione, con il testo di un evento senza destinazione. */
+const registrazione = (
+  dato: boolean,
+  ritiro: EffettoRitiroRegistrazione,
+  testo: Partial<Pick<Registrazione, 'destinazione' | 'voce'>> = {}
+): Registrazione => ({ dato, ritiro, destinazione: null, voce: 'fissa', ...testo });
+
 const pulsante = (testo: RegExp) =>
   [...document.querySelectorAll('button')].find((b) =>
     testo.test(b.textContent ?? '')
@@ -72,7 +84,7 @@ const clic = async (b: HTMLElement | undefined) => {
 describe('ConsentsDialog', () => {
   it('ritirare la registrazione chiede conferma e dice che si resta in solo ascolto', async () => {
     const a = await disegna({
-      registrazione: { dato: true, ritiro: 'soloAscolto' },
+      registrazione: registrazione(true, 'soloAscolto'),
       trascrizione: { dato: true, serveRegistrazione: false },
     });
     expect(document.body.textContent).toContain(
@@ -107,7 +119,7 @@ describe('ConsentsDialog', () => {
 
   it("dare il consenso e' un clic; la trascrizione aspetta la registrazione", async () => {
     const a = await disegna({
-      registrazione: { dato: false, ritiro: 'soloAscolto' },
+      registrazione: registrazione(false, 'soloAscolto'),
       trascrizione: { dato: false, serveRegistrazione: true },
     });
     expect(document.body.textContent).toContain(
@@ -124,7 +136,7 @@ describe('ConsentsDialog', () => {
   });
 
   it("chi conduce: il ritiro non lo toglie dalla sala, e nessun avviso sul video gia' registrato", async () => {
-    await disegna({ registrazione: { dato: true, ritiro: 'conduce' } });
+    await disegna({ registrazione: registrazione(true, 'conduce') });
     expect(document.body.textContent).toContain(
       messages.live.consents.recording.withdraw.conduce
     );
@@ -148,5 +160,38 @@ describe('ConsentsDialog', () => {
     expect(document.querySelector('[role="alert"]')!.textContent).toBe(
       messages.live.consents.error
     );
+  });
+
+  it('chi non ha dato il consenso legge il testo della destinazione sopra il pulsante', async () => {
+    const g = messages.gdpr.consent;
+    await disegna({ registrazione: registrazione(false, 'voce', { destinazione: 'REGISTRANTS' }) });
+    expect(document.body.textContent).toContain(g.recordingReserved);
+    expect(pulsante(new RegExp(messages.live.consents.recording.give))!.getAttribute('aria-describedby'))
+      .toBe('live-consents-rec-nota');
+    expect(document.getElementById('live-consents-rec-nota')!.textContent).toBe(g.recordingReserved);
+
+    await disegna({ registrazione: registrazione(false, 'voce', { destinazione: 'PUBLIC' }) });
+    expect(document.body.textContent).toContain(g.recordingPublic);
+
+    await disegna({ registrazione: registrazione(false, 'voce') });
+    expect(document.body.textContent).toContain(g.recording);
+
+    await disegna({
+      registrazione: registrazione(false, 'nessuno', { destinazione: 'PUBLIC', voce: 'assente' }),
+    });
+    expect(document.body.textContent).toContain(g.recordingNoVideo);
+  });
+
+  it('il testo del consenso non si ripete a chi l\'ha gia\' dato', async () => {
+    await disegna({ registrazione: registrazione(true, 'voce', { destinazione: 'PUBLIC' }) });
+    expect(document.body.textContent).not.toContain(messages.gdpr.consent.recordingPublic);
+  });
+
+  it('un testo cambiato si annuncia, senza un messaggio di errore', async () => {
+    await disegna({ registrazione: registrazione(false, 'voce') }, azioni(), { testoCambiato: true });
+    expect(document.querySelector('[role="alert"]')!.textContent).toBe(
+      messages.live.consents.textChanged
+    );
+    expect(document.body.textContent).not.toContain(messages.live.consents.error);
   });
 });

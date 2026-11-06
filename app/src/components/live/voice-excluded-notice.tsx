@@ -3,29 +3,45 @@
 
 'use client';
 
+import { useId } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { Icon } from '@/components/ui/icon';
+import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import { chiaveConsenso, type Destinazione } from '@/lib/recording/destination';
 
 /**
  * Chi e' entrato senza consenso alla registrazione lo sa, anche se ha soltanto
  * dimenticato la casella: in sala partecipa come tutti, e nella registrazione
  * non c'e'. Acconsentire qui lo fa rientrare nella conferenza con un token nuovo.
+ * Il clic e' un consenso: sopra il pulsante c'e' il testo della casella, che dice
+ * dove va il video.
  */
 export default function VoiceExcludedNotice({
   testoConsenso,
+  destinazione,
+  voce,
   onAcconsenti,
   inCorso,
   errore,
+  testoCambiato = false,
 }: {
   /** Il testo dell'ente sulla registrazione: il consenso qui vale per quello. */
   testoConsenso?: string | null;
+  /** La destinazione in vigore: il testo a cui si acconsente. */
+  destinazione: Destinazione;
+  voce: VoceNelVideo;
   onAcconsenti: () => void;
   inCorso: boolean;
   errore: boolean;
+  /** Il consenso e' arrivato su un testo non piu' in vigore: va riletto. */
+  testoCambiato?: boolean;
 }) {
   const t = useTranslations('live.voiceExcluded');
   const tl = useTranslations('live.listenOnly');
+  const tc = useTranslations('live.consents');
+  const tGdpr = useTranslations('gdpr.consent');
+  const idTesto = useId();
   return (
     <div className="live-listen-only" role="region" aria-label={t('title')}>
       <Icon
@@ -38,18 +54,27 @@ export default function VoiceExcludedNotice({
         {testoConsenso?.trim() && (
           <span className="d-block small mt-1">{testoConsenso}</span>
         )}
+        <span id={idTesto} className="d-block small mt-1">
+          {tGdpr(chiaveConsenso(destinazione, voce))}
+        </span>
       </p>
       <button
         type="button"
         className="btn btn-primary btn-sm flex-shrink-0"
         onClick={onAcconsenti}
         disabled={inCorso}
+        aria-describedby={idTesto}
       >
         {inCorso ? tl('joining') : t('consent')}
       </button>
       {errore && (
         <p className="mb-0 w-100 small text-danger" role="alert">
           {tl('error')}
+        </p>
+      )}
+      {testoCambiato && (
+        <p className="mb-0 w-100 small text-danger" role="alert">
+          {tc('textChanged')}
         </p>
       )}
     </div>

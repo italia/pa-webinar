@@ -704,7 +704,8 @@
         "giveEffect": "Vaše príspevky sa dostanú do prepisu podujatia s vaším menom. Bez súhlasu sa zúčastňujete aj tak.",
         "withdrawEffect": "Ak ho odvoláte, vaše už prepísané vety prídu o text aj meno a odteraz sa váš hlas nenahráva na samostatnú stopu ani neprepisuje.",
         "needsRecording": "Môžete ho udeliť po súhlase so záznamom."
-      }
+      },
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree."
     },
     "voiceExcluded": {
       "title": "Zúčastňujete sa bez nahrávania.",
@@ -4438,7 +4439,7 @@
       "multitrack": "Súhlasím s prepisom svojich príspevkov so svojím menom na účely správy z podujatia. Ak podujatie nahráva samostatnú zvukovú stopu každej osoby, môj hlas sa nahráva iba na tento účel a stopa sa po prepise vymaže; nepoužíva sa na identifikáciu ani napodobnenie môjho hlasu.",
       "multitrackRetained": "I consent to my contributions being transcribed, with my name, for the event's report. If the event records a separate audio track for each person, my voice is recorded for this purpose only and the track is kept with the event data; it is not used to identify or reproduce my voice.",
       "multitrackOptional": "Je to dobrovoľné: ak nesúhlasíte, aj tak sa zúčastníte, ale vaše príspevky sa nedostanú do prepisu a váš hlas sa nebude nahrávať na samostatnú stopu. Ak sa podujatie nahráva, váš hlas vo videu aj tak zostane.",
-      "multitrackOptionalShort": "It is optional: if you do not consent you still take part, but what you say stays out of the transcript and your voice is not recorded on a separate track.",
+      "multitrackOptionalShort": "Je to dobrovoľné: ak nesúhlasíte, aj tak sa zúčastníte, ale vaše príspevky sa nedostanú do prepisu a váš hlas sa nebude nahrávať na samostatnú stopu.",
       "stayInTouch": "Chcem dostávať informácie o pripravovaných podujatiach a byť zaradený do adresára, aby som bol pozývaný na podobné podujatia",
       "stayInTouchHelp": "Nepovinný súhlas (čl. 6.1.a GDPR). Môžete ho kedykoľvek odvolať odkazom „Odstrániť ma z adresára“ v e-mailoch, ktoré dostanete. Meno a organizácia sú z tejto registrácie.",
       "stayInTouchRetention": "We keep this data for {months} months from this consent: the period restarts only if you tick the box again.",

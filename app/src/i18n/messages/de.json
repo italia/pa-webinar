@@ -704,7 +704,8 @@
         "giveEffect": "Ihre Beiträge kommen mit Ihrem Namen in das Transkript der Veranstaltung. Ohne Einwilligung nehmen Sie trotzdem teil.",
         "withdrawEffect": "Wenn Sie sie widerrufen, verlieren Ihre bereits transkribierten Sätze Text und Namen, und ab jetzt wird Ihre Stimme weder auf einer eigenen Spur aufgezeichnet noch transkribiert.",
         "needsRecording": "Sie können sie nach der Einwilligung in die Aufzeichnung erteilen."
-      }
+      },
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree."
     },
     "voiceExcluded": {
       "title": "Sie nehmen ohne Aufzeichnung teil.",
@@ -4438,7 +4439,7 @@
       "multitrack": "Ich willige ein, dass meine Wortbeiträge mit meinem Namen für den Bericht der Veranstaltung transkribiert werden. Zeichnet die Veranstaltung für jede Person eine eigene Tonspur auf, wird meine Stimme nur zu diesem Zweck aufgezeichnet und die Spur nach der Transkription gelöscht; sie wird nicht verwendet, um meine Stimme zu identifizieren oder nachzubilden.",
       "multitrackRetained": "I consent to my contributions being transcribed, with my name, for the event's report. If the event records a separate audio track for each person, my voice is recorded for this purpose only and the track is kept with the event data; it is not used to identify or reproduce my voice.",
       "multitrackOptional": "Freiwillig: Ohne Einwilligung nehmen Sie trotzdem teil, aber Ihre Beiträge kommen nicht in das Transkript und Ihre Stimme wird nicht auf einer eigenen Spur aufgezeichnet. Wird das Event aufgezeichnet, ist Ihre Stimme trotzdem im Video zu hören.",
-      "multitrackOptionalShort": "It is optional: if you do not consent you still take part, but what you say stays out of the transcript and your voice is not recorded on a separate track.",
+      "multitrackOptionalShort": "Freiwillig: Ohne Einwilligung nehmen Sie trotzdem teil, aber Ihre Beiträge kommen nicht in das Transkript und Ihre Stimme wird nicht auf einer eigenen Spur aufgezeichnet.",
       "stayInTouch": "Ich möchte Informationen zu kommenden Veranstaltungen erhalten und in das Adressbuch aufgenommen werden, um zu ähnlichen Veranstaltungen eingeladen zu werden",
       "stayInTouchHelp": "Freiwillige Einwilligung (Art. 6.1.a DSGVO). Sie können sie jederzeit über den Link „Aus dem Adressbuch entfernen“ in den E-Mails widerrufen, die Sie erhalten. Name und Organisation sind die dieser Anmeldung.",
       "stayInTouchRetention": "We keep this data for {months} months from this consent: the period restarts only if you tick the box again.",
