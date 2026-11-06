@@ -13,6 +13,13 @@
  *
  * Una voce e' «da fare» solo se chi guarda la scheda la puo' fare da li'.
  */
+import type { RecordingAudience } from '@prisma/client';
+
+import {
+  confermaVociNecessaria,
+  type EventoConsensoVoce,
+  type SitoConsensoVoce,
+} from '@/lib/ai/voice-consent';
 import { prisma } from '@/lib/db';
 import {
   CAPTIONS_TRANSCRIPT_MODEL,
@@ -56,12 +63,18 @@ export interface DatiChiusura {
   recordingEnabled: boolean;
   recordingUrl: string | null;
   recordingPublished: boolean;
+  recordingAudience: RecordingAudience;
   youtubeUrl: string | null;
   transcriptPublished: boolean;
   captionsTranscriptEnabled: boolean;
   /** La trascrizione che la pagina pubblica mostrerebbe, e da dove viene. */
   trascrizione: { recordingId: string; origine: 'sottotitoli' | 'ai' } | null;
   trascrizioneInLavorazione: boolean;
+  /**
+   * La registrazione il cui video non si e' trascritto da solo perche' aspetta
+   * la conferma che tutte le voci hanno acconsentito (lib/ai/voice-consent).
+   */
+  trascrizioneDaConfermare: string | null;
   pipelineAi: boolean;
   resocontoGenerato: boolean;
   resocontoPubblicato: boolean;
@@ -183,6 +196,18 @@ export function statoChiusura(
           }
         : { voce: 'trascrizione', stato: 'non-serve', caso: 'soloStaff' }
     );
+  } else if (d.pipelineAi && d.trascrizioneDaConfermare && !archiviato) {
+    // La conferma la da' chi avvia la pipeline, dall'area riservata.
+    voci.push(
+      staff
+        ? {
+            voce: 'trascrizione',
+            stato: 'da-fare',
+            caso: 'daConfermare',
+            recordingId: d.trascrizioneDaConfermare,
+          }
+        : { voce: 'trascrizione', stato: 'non-serve', caso: 'soloStaff' }
+    );
   } else {
     voci.push({ voce: 'trascrizione', stato: 'non-serve', caso: 'nessuna' });
   }
@@ -290,7 +315,8 @@ export function statoChiusura(
   }
 
   // Pagina pubblica: si dice com'e', non si chiede niente. Nella libreria
-  // video l'evento compare solo con un video da guardare.
+  // video l'evento compare solo con un video da guardare, e aperto a tutti
+  // (api/public/video-library).
   if (d.status === 'ARCHIVED') {
     voci.push({ voce: 'pagina', stato: 'non-serve', caso: 'archiviato' });
   } else if (paginaVisibile) {
@@ -299,9 +325,11 @@ export function statoChiusura(
       stato: 'fatto',
       caso: !d.libraryListed
         ? 'visibile'
-        : videoPubblicato
-          ? 'nellaLibreria'
-          : 'libreriaSenzaVideo',
+        : d.recordingAudience !== 'PUBLIC'
+          ? 'libreriaRiservata'
+          : videoPubblicato
+            ? 'nellaLibreria'
+            : 'libreriaSenzaVideo',
     });
   } else {
     voci.push({
@@ -312,6 +340,26 @@ export function statoChiusura(
   }
 
   return { voci, daFare: voci.filter((v) => v.stato === 'da-fare').length };
+}
+
+/**
+ * Il video piu' recente rimasto fermo in attesa della conferma sulle voci. Solo
+ * se senza quella conferma sarebbe partito: AI accesa per l'evento e per il
+ * sito, come l'avviso sulla pagina della registrazione.
+ */
+async function videoDaConfermare(
+  eventId: string,
+  evento: EventoConsensoVoce,
+  sito: SitoConsensoVoce
+): Promise<string | null> {
+  if (!evento.aiTranscriptEnabled || !sito.aiPipelineEnabled) return null;
+  const video = await prisma.recording.findFirst({
+    where: { eventId, status: 'READY', blobKey: { not: '' } },
+    orderBy: { createdAt: 'desc' },
+    select: { id: true, blobKey: true, eventId: true, transcriptConsentRule: true },
+  });
+  if (!video) return null;
+  return (await confermaVociNecessaria(prisma, video, evento, sito)) ? video.id : null;
 }
 
 /** Raccoglie dal database cio' che serve a `statoChiusura`. */
@@ -326,9 +374,13 @@ export async function caricaDatiChiusura(eventId: string): Promise<DatiChiusura 
       recordingEnabled: true,
       recordingUrl: true,
       recordingPublished: true,
+      recordingAudience: true,
       youtubeUrl: true,
       transcriptPublished: true,
+      multitrackRecordingEnabled: true,
       captionsTranscriptEnabled: true,
+      liveCaptionsEnabled: true,
+      aiTranscriptEnabled: true,
       postEventReportAt: true,
       postEventReportPublished: true,
       postEventShowMaterials: true,
@@ -410,6 +462,10 @@ export async function caricaDatiChiusura(eventId: string): Promise<DatiChiusura 
         select: { modelId: true },
       })
     : null;
+  // Con una trascrizione da mostrare la voce e' gia' decisa: la scheda si
+  // rilegge di continuo, e qui servono altre letture.
+  const daConfermare =
+    pubblica && artefatto ? null : await videoDaConfermare(eventId, evento, impostazioni);
   const conteggio = (domanda: boolean) =>
     perTipoMessaggio.find((g) => g.isQuestion === domanda)?._count._all ?? 0;
 
@@ -422,6 +478,7 @@ export async function caricaDatiChiusura(eventId: string): Promise<DatiChiusura 
     recordingEnabled: evento.recordingEnabled,
     recordingUrl: evento.recordingUrl,
     recordingPublished: evento.recordingPublished,
+    recordingAudience: evento.recordingAudience,
     youtubeUrl: evento.youtubeUrl,
     transcriptPublished: evento.transcriptPublished,
     captionsTranscriptEnabled: evento.captionsTranscriptEnabled,
@@ -436,6 +493,7 @@ export async function caricaDatiChiusura(eventId: string): Promise<DatiChiusura 
           }
         : null,
     trascrizioneInLavorazione: trascrizioniAttive > 0,
+    trascrizioneDaConfermare: daConfermare,
     pipelineAi,
     resocontoGenerato: evento.postEventReportAt != null,
     resocontoPubblicato: evento.postEventReportPublished,
