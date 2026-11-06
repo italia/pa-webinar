@@ -36,6 +36,7 @@ const evento = (over: Record<string, unknown> = {}) => ({
   recordingPublished: true,
   transcriptPublished: false,
   recordingAudience: 'PUBLIC',
+  recordingDestination: null,
   postEventPublic: true,
   postEventPublicUntil: null,
   ...over,
@@ -62,6 +63,26 @@ describe('GET /api/events/[slug]/recording', () => {
     db.event.findFirst.mockResolvedValue(evento({ recordingAudience: 'REGISTRANTS' }));
     accesso.accessoRegistrazione.mockResolvedValue(null);
     expect((await GET(req(), ctx())).status).toBe(403);
+  });
+
+  it('legge la destinazione, che decide per l’iscritto con la pagina privata', async () => {
+    db.event.findFirst.mockResolvedValue(
+      evento({
+        recordingAudience: 'REGISTRANTS',
+        recordingDestination: 'REGISTRANTS',
+        postEventPublic: false,
+      })
+    );
+    accesso.accessoRegistrazione.mockResolvedValue('iscritto');
+    expect((await GET(req(), ctx())).status).toBe(302);
+    const { select } = db.event.findFirst.mock.calls[0]?.[0] as {
+      select: Record<string, boolean>;
+    };
+    expect(select.recordingDestination).toBe(true);
+    expect(accesso.accessoRegistrazione).toHaveBeenCalledWith(
+      expect.objectContaining({ recordingDestination: 'REGISTRANTS' }),
+      expect.anything()
+    );
   });
 
   it('non pubblicata: lo staff la vede (anteprima), gli altri no', async () => {

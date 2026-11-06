@@ -3459,6 +3459,15 @@ button.live-time-strip__rec {
     }
   }
 
+  // Sempre visibile sotto la casella: va a capo e cede altezza all'elenco dei
+  // messaggi, mai al testo.
+  &__notice {
+    margin: 6px 2px 0;
+    font-size: 0.72rem;
+    line-height: 1.35;
+    color: var(--app-muted);
+  }
+
   &__input {
     display: block;
     width: 100%;
@@ -3767,6 +3776,13 @@ button.live-time-strip__rec {
       border-color: var(--app-primary) !important;
       box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15) !important;
     }
+  }
+
+  &__notice {
+    margin: 0.4rem 0 0;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: var(--app-muted);
   }
 
   &__foot {
@@ -4144,6 +4160,13 @@ button.live-time-strip__rec {
       border-color: var(--app-primary);
       box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
     }
+  }
+
+  &__notice {
+    margin: 0.35rem 0 0;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: var(--app-muted);
   }
 
   &__actions {

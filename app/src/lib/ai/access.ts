@@ -15,7 +15,8 @@
  *      (`transcriptPublished`), per esempio quella dai sottotitoli di un
  *      evento senza registrazione — nella finestra post-evento
  *      (`postEventPublic`, `postEventPublicUntil`), per chiunque o per i soli
- *      iscritti secondo `recordingAudience`; oppure lo staff che gestisce
+ *      iscritti secondo `recordingAudience`, che su un evento con destinazione
+ *      non dipendono da `postEventPublic`; oppure lo staff che gestisce
  *      l'evento, anche prima della pubblicazione (l'anteprima della pagina).
  *
  * Passati i cancelli, il perimetro (`ambito`) dice che cosa si mostra:

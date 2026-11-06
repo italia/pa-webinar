@@ -131,11 +131,14 @@ export default function QuestionForm({
         rows={3}
         maxLength={MAX_LENGTH}
         placeholder={t('placeholderInviting')}
-        aria-describedby="qa-question-hint"
+        aria-describedby="qa-question-hint qa-question-notice"
         value={text}
         onChange={(e) => setText(e.target.value)}
         disabled={submitting || cooldown > 0}
       />
+      <p id="qa-question-notice" className="qa-composer__notice">
+        {t('personalDataNotice')}
+      </p>
 
       {error && (
         <p className="qa-error" role="alert">

@@ -1,22 +1,86 @@
 // SPDX-License-Identifier: EUPL-1.2
 // SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
 
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/lib/db', () => ({ prisma: {} }));
+const { db } = vi.hoisted(() => ({
+  db: {
+    event: { findUnique: vi.fn() },
+    question: { findMany: vi.fn() },
+  },
+}));
 
-import { campione, righeTrascrizione } from './input';
+vi.mock('@/lib/db', () => ({ prisma: db }));
+vi.mock('@/lib/captions/transcript', () => ({
+  CAPTIONS_TRANSCRIPT_MODEL: 'captions',
+  registrazionePubblica: async () => null,
+}));
+vi.mock('@/lib/events/public-people', () => ({
+  PERSONE_PUBBLICHE_INCLUDE: {},
+  entiEPersonePubblici: () => ({ enti: [], persone: [] }),
+}));
 
-describe('campione', () => {
-  it('tutti se sono pochi, altrimenti distribuiti nel tempo', () => {
-    expect(campione([1, 2, 3], 5)).toEqual([1, 2, 3]);
-    const c = campione(
-      Array.from({ length: 100 }, (_, i) => i),
-      10
-    );
-    expect(c).toHaveLength(10);
-    expect(c[0]).toBe(0);
-    expect(c[9]).toBe(90);
+import type { EventFeedbackReport } from '@/lib/feedback/event-feedback-report';
+
+import { ingressoResoconto, righeTrascrizione } from './input';
+import type { ReportMetrics } from './types';
+
+describe('ingressoResoconto', () => {
+  const METRICS = {
+    durationSec: 3600,
+    agenda: [],
+    polls: [],
+    words: [],
+    feedback: { responses: 0, average: null, items: [] },
+    participation: { chatMessages: 12 },
+  } as unknown as ReportMetrics;
+  const VALUTAZIONI = {
+    items: [],
+    responses: [],
+    legacy: { entries: [] },
+  } as unknown as EventFeedbackReport;
+  const evento = (over: Record<string, unknown> = {}) => ({
+    title: { it: 'Evento' },
+    description: { it: 'Descrizione' },
+    startsAt: new Date('2026-10-20T10:00:00Z'),
+    endsAt: new Date('2026-10-20T11:00:00Z'),
+    timezone: 'Europe/Rome',
+    postEventShowQA: true,
+    qaEnabled: true,
+    recordingDestination: 'PUBLIC',
+    ...over,
+  });
+  const leggi = () => ingressoResoconto('e1', 'it', METRICS, VALUTAZIONI);
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    db.question.findMany.mockResolvedValue([
+      { text: 'Le slide?', upvoteCount: 3, status: 'ANSWERED', answerText: 'Domani.' },
+    ]);
+  });
+
+  it('le domande arrivano al modello solo se la pagina le pubblica', async () => {
+    db.event.findUnique.mockResolvedValue(evento());
+    expect((await leggi())?.questions).toEqual([
+      { text: 'Le slide?', upvotes: 3, answered: true, answer: 'Domani.' },
+    ]);
+  });
+
+  it.each([
+    ['domande spente', { postEventShowQA: false }],
+    ['Q&A mai acceso', { qaEnabled: false }],
+    ['registrazione riservata', { recordingDestination: 'REGISTRANTS' }],
+  ])('con %s nessun testo di domanda', async (_caso, over) => {
+    db.event.findUnique.mockResolvedValue(evento(over));
+    expect((await leggi())?.questions).toEqual([]);
+    expect(db.question.findMany).not.toHaveBeenCalled();
+  });
+
+  it('della chat resta il conteggio nei numeri, il testo non si legge', async () => {
+    db.event.findUnique.mockResolvedValue(evento());
+    const ingresso = await leggi();
+    expect(ingresso).not.toHaveProperty('chat');
+    expect(ingresso?.metrics.participation.chatMessages).toBe(12);
   });
 });
 

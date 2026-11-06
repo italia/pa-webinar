@@ -38,6 +38,7 @@ const base = {
   postEventPublicUntil: null as Date | null,
   captionsTranscriptEnabled: false,
   recordingAudience: 'PUBLIC' as 'PUBLIC' | 'REGISTRANTS',
+  recordingDestination: null as 'PUBLIC' | 'REGISTRANTS' | null,
 };
 
 describe('assertPostprodAccessible', () => {
@@ -66,6 +67,23 @@ describe('assertPostprodAccessible', () => {
     mockRegCount.mockResolvedValue(1);
     await expect(assertPostprodAccessible('s')).resolves.toMatchObject({ ambito: 'tutto' });
     expect(mockRegCount).toHaveBeenCalledWith({ where: { id: 'reg-1', eventId: 'ev-1' } });
+  });
+
+  it('riservata con la pagina privata: l\'iscritto apre la trascrizione, se l\'evento ha una destinazione', async () => {
+    const privata = {
+      ...base,
+      recordingPublished: true,
+      recordingAudience: 'REGISTRANTS' as const,
+      postEventPublic: false,
+    };
+    cookieJar.set(viewingCookieName('ev-1'), issueViewingToken('ev-1', 'reg-1')!);
+    mockRegCount.mockResolvedValue(1);
+
+    mockEvent.mockResolvedValue({ ...privata, recordingDestination: 'REGISTRANTS' });
+    await expect(assertPostprodAccessible('s')).resolves.toMatchObject({ ambito: 'tutto' });
+
+    mockEvent.mockResolvedValue(privata);
+    await expect(assertPostprodAccessible('s')).rejects.toThrow();
   });
 
   it('riservata agli iscritti: un\'iscrizione cancellata non apre piu\'', async () => {

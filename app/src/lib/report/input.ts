@@ -6,9 +6,13 @@
  * dell'evento (lavoro REPORT, infra/ai/worker): l'evento e le persone che lo
  * presentano, l'agenda con i «d'accordo» e «non d'accordo», la trascrizione
  * (dell'AI o dai sottotitoli live, con i nomi dati dallo staff o da chi ha
- * acconsentito), la chat senza nomi, le domande, i sondaggi pubblicati, le
- * parole, le valutazioni e i commenti del questionario dopo l'evento, e i
- * numeri del portale.
+ * acconsentito), i sondaggi pubblicati, le parole, le valutazioni e i commenti
+ * del questionario dopo l'evento, e i numeri del portale.
+ *
+ * Il resoconto e' destinato alla pagina dell'evento, e cio' che il modello legge
+ * puo' uscirne riformulato: della chat arriva solo il numero dei messaggi, dentro
+ * i numeri del portale, e le domande del Q&A solo se la pagina le pubblica
+ * (`domandePubbliche`).
  *
  * Si legge al momento del claim: i commenti arrivati fino a quel momento
  * entrano. Tutto resta nel cluster (vLLM, nessun servizio esterno).
@@ -19,6 +23,7 @@ import {
 } from '@/lib/captions/transcript';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
+import { domandePubbliche } from '@/lib/events/post-event-sections';
 import {
   entiEPersonePubblici,
   PERSONE_PUBBLICHE_INCLUDE,
@@ -32,8 +37,6 @@ import { markdownToPlainText } from '@/lib/utils/markdown-text';
 
 import type { ReportMetrics } from './types';
 
-/** Quanti messaggi della chat al massimo: oltre, un campione distribuito nel tempo. */
-export const MAX_MESSAGGI = 400;
 /** Quanti commenti delle valutazioni al massimo. */
 export const MAX_COMMENTI = 100;
 /** Quanti caratteri di trascrizione al massimo (il worker la riassume a pezzi). */
@@ -60,15 +63,6 @@ export interface IngressoResoconto {
     overall: string;
     topics: Array<{ title: string; start: string; summary: string }>;
   } | null;
-  chat: {
-    total: number;
-    messages: Array<{
-      at: string;
-      role: 'moderator' | 'participant';
-      question: boolean;
-      text: string;
-    }>;
-  };
   questions: Array<{
     text: string;
     upvotes: number;
@@ -93,13 +87,6 @@ export interface IngressoResoconto {
 
 const accorcia = (t: string, max: number) =>
   t.length > max ? `${t.slice(0, max - 1).trimEnd()}…` : t;
-
-/** Un campione distribuito: tutti se sono pochi, altrimenti uno ogni tanti. */
-export function campione<T>(righe: readonly T[], max: number): T[] {
-  if (righe.length <= max) return [...righe];
-  const passo = righe.length / max;
-  return Array.from({ length: max }, (_, i) => righe[Math.floor(i * passo)]!);
-}
 
 function mmss(sec: number): string {
   const s = Math.max(0, Math.floor(sec));
@@ -291,41 +278,26 @@ export async function ingressoResoconto(
       moderatorPhotoId: true,
       // A agenda accesa le persone seguono l'ordine del programma.
       agendaEnabled: true,
+      postEventShowQA: true,
+      qaEnabled: true,
+      recordingDestination: true,
       ...PERSONE_PUBBLICHE_INCLUDE,
     },
   });
   if (!evento) return null;
 
-  const [trascrizione, messaggi, domande, valutazioni] = await Promise.all([
+  const [trascrizione, domande, valutazioni] = await Promise.all([
     trascrizioneEvento(eventId),
-    prisma.chatMessage.findMany({
-      where: { eventId, hiddenAt: null, dismissedAt: null },
-      orderBy: { createdAt: 'asc' },
-      select: { createdAt: true, text: true, isModerator: true, isQuestion: true },
-      take: 20_000,
-    }),
-    prisma.question.findMany({
-      where: { eventId, status: { not: 'DISMISSED' } },
-      orderBy: { upvoteCount: 'desc' },
-      select: { text: true, upvoteCount: true, status: true, answerText: true },
-      take: 40,
-    }),
+    domandePubbliche(evento)
+      ? prisma.question.findMany({
+          where: { eventId, status: { not: 'DISMISSED' } },
+          orderBy: { upvoteCount: 'desc' },
+          select: { text: true, upvoteCount: true, status: true, answerText: true },
+          take: 40,
+        })
+      : Promise.resolve([]),
     valutazioniLette ?? buildEventFeedbackReport(eventId),
   ]);
-
-  const ora = new Intl.DateTimeFormat('it-IT', {
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: evento.timezone || 'Europe/Rome',
-  });
-  const chat = campione(messaggi, MAX_MESSAGGI)
-    .map((m) => ({
-      at: ora.format(m.createdAt),
-      role: m.isModerator ? ('moderator' as const) : ('participant' as const),
-      question: m.isQuestion,
-      text: accorcia((tryDecryptPII(m.text) ?? '').replace(/\s+/g, ' ').trim(), 300),
-    }))
-    .filter((m) => m.text);
 
   // I commenti scritti: le risposte aperte del questionario e i commenti delle
   // valutazioni a stelle. Senza chi li ha scritti.
@@ -374,7 +346,6 @@ export async function ingressoResoconto(
       truncated: trascrizione.truncated,
     },
     summary: trascrizione.summary,
-    chat: { total: messaggi.length, messages: chat },
     questions: domande.map((d) => ({
       text: accorcia(d.text, 400),
       upvotes: d.upvoteCount,

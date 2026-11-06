@@ -379,6 +379,7 @@ function QuestionCard({
             maxLength={QUESTION_ANSWER_MAX}
             value={draft}
             placeholder={t('moderator.answerPlaceholder')}
+            aria-describedby={`${answerId}-notice`}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => {
               if (e.key !== 'Escape') return;
@@ -388,6 +389,9 @@ function QuestionCard({
             }}
             autoFocus
           />
+          <p id={`${answerId}-notice`} className="qa-answer-form__notice">
+            {t('moderator.answerNotice')}
+          </p>
           <div className="qa-answer-form__actions">
             {question.answerText && (
               <button

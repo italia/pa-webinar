@@ -4,8 +4,9 @@
 """Il resoconto dell'evento (lavoro REPORT).
 
 Il portale raccoglie gli ingressi al claim (``reportInput``: evento, agenda con
-«d'accordo» e «non d'accordo», trascrizione, chat senza nomi, domande,
-sondaggi, parole, valutazioni e commenti, numeri della piattaforma). Qui il
+«d'accordo» e «non d'accordo», trascrizione, sondaggi, parole, valutazioni e
+commenti, numeri della piattaforma, e le domande se la pagina dell'evento le
+pubblica; della chat solo il numero dei messaggi). Qui il
 modello linguistico scrive il testo: sintesi, argomenti spiegati, mappa
 concettuale, consenso e dissenso, partecipazione, benefici, valutazioni,
 domande aperte e prossimi passi; poi lo traduce nelle lingue chieste.
@@ -34,7 +35,6 @@ log = logging.getLogger(__name__)
 TRASCRIZIONE_DIRETTA = 30_000
 PEZZO = 18_000
 # Tetti dei blocchi del prompt finale.
-MAX_CHAT = 24_000
 MAX_COMMENTI = 12_000
 MAX_DOMANDE = 8_000
 
@@ -81,11 +81,11 @@ Regole:
   solo se servono al discorso, e identici a quelli forniti.
 - Persone: puoi nominare solo le persone dell'elenco «Persone dell'evento» e quelle che
   parlano con un nome nella trascrizione. Per chiunque altro scrivi «un partecipante»
-  o «alcuni partecipanti». Non attribuire mai a qualcuno frasi della chat o dei
-  commenti; non riportare dati personali (email, telefoni, indirizzi).
+  o «alcuni partecipanti». Non attribuire mai a qualcuno frasi dei commenti; non
+  riportare dati personali (email, telefoni, indirizzi).
 - Consenso e dissenso: ricavali dai «d'accordo» e «non d'accordo» dell'agenda, dai
-  sondaggi, dalla chat e dagli interventi. Se i segnali mancano, scrivi che non si
-  possono valutare e usa "unknown".
+  sondaggi e dagli interventi. Se i segnali mancano, scrivi che non si possono
+  valutare e usa "unknown".
 - Benefici: cosa hanno ottenuto i partecipanti (conoscenze, strumenti, chiarimenti,
   contatti), ricavato da trascrizione e valutazioni; niente promesse.
 - Voci dalle valutazioni («quotes»): riformula sempre con parole tue, in breve; mai il testo
@@ -245,20 +245,6 @@ def componi_richiesta(inp: Dict[str, Any], blocco_trascrizione: str) -> str:
         blocchi.append(f"# Sintesi gia' fatta della registrazione\n{sintesi['overall']}\n{temi}")
 
     blocchi.append(blocco_trascrizione)
-
-    chat = inp.get("chat") or {}
-    messaggi = chat.get("messages") or []
-    if messaggi:
-        righe = []
-        for c in messaggi:
-            chi = "moderazione" if c.get("role") == "moderator" else "partecipante"
-            if c.get("question"):
-                chi += ", domanda"
-            righe.append(f"[{c.get('at')}] ({chi}) {c.get('text')}")
-        blocchi.append(
-            f"# Chat ({len(messaggi)} messaggi su {chat.get('total', len(messaggi))}, senza nomi)\n"
-            + _taglia("\n".join(righe), MAX_CHAT)
-        )
 
     fb = inp.get("feedback") or {}
     if fb.get("responses"):

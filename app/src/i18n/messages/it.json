@@ -379,7 +379,7 @@
       "publicHelpNone": "La pagina dell'evento concluso resta visibile, con titolo e descrizione.",
       "sections": {
         "recap": "il riepilogo",
-        "qa": "le domande del Q&A",
+        "qa": "il testo delle domande del Q&A",
         "polls": "i sondaggi pubblicati",
         "wordCloud": "la nuvola di parole",
         "materials": "i materiali",
@@ -723,7 +723,7 @@
     "upvote": "Vota",
     "upvoted": "Votata",
     "noQuestions": "Nessuna domanda ancora. Sii il primo!",
-    "qaPersistenceNote": "Le domande vengono salvate e saranno disponibili dopo l'evento.",
+    "qaPersistenceNote": "Il testo delle domande può comparire sulla pagina dell'evento, senza il nome di chi le ha fatte.",
     "personalDataNotice": "Non scrivere dati personali di altri, né tuoi che non vuoi rendere pubblici: il testo della domanda può comparire sulla pagina dell'evento, senza il tuo nome.",
     "qaPostEvent": "Domande e risposte dall'evento",
     "noAnsweredQuestions": "Nessuna domanda con risposta per questo evento.",
@@ -4484,7 +4484,7 @@
         "translation": "Trascrizione e sintesi possono essere tradotte automaticamente.",
         "dubbing": "Il video può avere un doppiaggio con voce sintetica.",
         "onRequest": "Dopo l'evento chi organizza può chiedere anche elaborazioni automatiche della registrazione non indicate qui: trascrizione, sintesi o traduzione.",
-        "report": "Dopo l'evento lo staff può far scrivere un resoconto con l'intelligenza artificiale, a partire anche da chat senza nomi, domande e sondaggi."
+        "report": "Dopo l'evento lo staff può far scrivere un resoconto con l'intelligenza artificiale, a partire anche dai sondaggi e, se sono pubblicate, dalle domande. Il testo della chat non viene usato."
       },
       "list": {
         "label": "Elenco dei partecipanti",
@@ -5708,7 +5708,7 @@
     "libraryListedHelp": "Mostra questo evento nella libreria pubblica (/video-library). Richiede una registrazione pubblicata o un video YouTube, e che la pagina evento sia visibile.",
     "libraryListedNoRecording": "Nessuna registrazione pubblicata: l'evento non comparirà in libreria finché non pubblichi la registrazione o aggiungi un video YouTube.",
     "libraryListedReserved": "Registrazione riservata: l'evento non compare nella libreria video.",
-    "showQA": "Mostra domande Q&A",
+    "showQA": "Mostra il testo delle domande Q&A, senza i nomi",
     "qaReservedNote": "Con la registrazione riservata le domande non si pubblicano.",
     "showMaterials": "Mostra materiali condivisi",
     "showPolls": "Mostra risultati sondaggi",
