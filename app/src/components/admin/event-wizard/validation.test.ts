@@ -185,3 +185,48 @@ describe('partecipanti attesi: nei dettagli tecnici', () => {
   });
 });
 
+describe('la destinazione della registrazione', () => {
+  const avanzate = (form: WizardForm, chiede?: boolean) =>
+    validateStep('advanced', form, 'it', undefined, chiede);
+  const modulo = (overrides: Partial<WizardForm> = {}) =>
+    base({ dataRetentionDays: 30, recordingEnabled: true, recordingDestination: null, ...overrides });
+
+  it('si pretende solo dove va chiesta, e con la registrazione accesa', () => {
+    expect(avanzate(modulo(), true)).toEqual({ recordingDestination: 'required' });
+    expect(avanzate(modulo(), false)).toEqual({});
+    expect(avanzate(modulo())).toEqual({});
+    expect(avanzate(modulo({ recordingEnabled: false }), true)).toEqual({});
+  });
+
+  it('una destinazione scelta basta', () => {
+    expect(avanzate(modulo({ recordingDestination: 'REGISTRANTS' }), true)).toEqual({});
+    expect(avanzate(modulo({ recordingDestination: 'PUBLIC' }), true)).toEqual({});
+  });
+
+  it('vale anche per l elenco di cio che manca, e la bozza compresa', () => {
+    expect(campiMancanti(modulo(), 'it', undefined, false, true)).toContainEqual({
+      key: 'recordingDestination',
+      step: 'advanced',
+      perPubblicare: false,
+    });
+    expect(campiMancanti(modulo(), 'it', undefined, false, false)).toEqual([]);
+  });
+
+  it('l errore apre la sezione della registrazione', () => {
+    expect(sezioniDegliErrori(['recordingDestination'])).toEqual(['recording']);
+    expect(sezioniDegliErrori(['recordingDestination', 'maxParticipants'])).toEqual([
+      'recording',
+      'technical',
+    ]);
+  });
+
+  it('un errore del server sul campo porta alle impostazioni avanzate', () => {
+    expect(
+      mapServerIssues([{ path: ['recordingDestination'], message: 'x' }], 'it'),
+    ).toMatchObject({
+      fieldErrors: { recordingDestination: 'server' },
+      step: 'advanced',
+      unmapped: [],
+    });
+  });
+});

@@ -24,6 +24,7 @@ import { agendaGiaUsata } from '@/lib/agenda/status';
 import { Link, percorso } from '@/i18n/navigation';
 import { WIZARD_ADVANCED_SECTIONS, wizardStepFromParam, type WizardAdvancedSection } from '@/lib/events/wizard-steps';
 import { salaForseAperta } from '@/lib/live/room-open';
+import { domandaDestinazione } from '@/lib/events/destination-question';
 import EventWizard, {
   type InitialEventShape,
 } from '@/components/admin/event-wizard/wizard-shell';
@@ -254,10 +255,14 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
 
   const matrix: PermissionMatrix | null = coerceMatrix(event.permissionMatrix);
 
+  const destinazione = await domandaDestinazione(event);
+
   const initialEvent: InitialEventShape = {
     id: event.id,
     slug: event.slug,
     moderatorToken: event.moderatorToken,
+    salaGiaAperta: destinazione.salaGiaAperta,
+    destinazioneDaChiedere: destinazione.daChiedere,
     event: {
       title: (event.title ?? {}) as Record<string, string>,
       description: (event.description ?? {}) as Record<string, string>,
@@ -290,6 +295,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       audienceAnonymous: event.audienceAnonymous,
       participantListVisible: event.participantListVisible,
       hostsAlwaysRecorded: event.hostsAlwaysRecorded,
+      recordingDestination: event.recordingDestination,
       aiTranscriptEnabled: event.aiTranscriptEnabled,
       aiSummaryEnabled: event.aiSummaryEnabled,
       aiTranslationEnabled: event.aiTranslationEnabled,
@@ -301,6 +307,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       status: event.status,
       dataRetentionDays: event.dataRetentionDays,
       postEventPublic: event.postEventPublic,
+      postEventShowQA: event.postEventShowQA,
       gdprTemplateId: event.gdprTemplateId,
       privacyPolicyText: event.privacyPolicyText,
       privacyPolicyUrl: event.privacyPolicyUrl,
@@ -315,6 +322,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       requireOrganization: event.requireOrganization,
       requireOrganizationRole: event.requireOrganizationRole,
       requireOrganizationType: event.requireOrganizationType,
+      offerAddressBook: event.offerAddressBook,
     },
     organizers: event.organizers.map((o) => ({
       id: o.id,
@@ -398,9 +406,14 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
         copia={copiaInBozza}
         initialStep={initialStep}
         initialSection={initialSection}
-        canUseRubrica={session?.role === 'admin' && (await rubricaConPersone())}
+        canUseRubrica={
+          session?.role === 'admin' &&
+          siteSettings.addressBookEnabled !== false &&
+          (await rubricaConPersone())
+        }
         canManageTags={session?.role === 'admin'}
         publicRegistrationEnabled={siteSettings.publicRegistrationEnabled}
+        addressBookEnabled={siteSettings.addressBookEnabled}
         viaToken={staffCanManage ? null : (token ?? null)}
         initialEvent={initialEvent}
         siteTimezone={event.timezone}

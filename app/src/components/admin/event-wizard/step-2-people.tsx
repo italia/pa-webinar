@@ -1165,6 +1165,8 @@ export function SezioneIscrizione({
   requireOrganization,
   requireOrganizationRole,
   requireOrganizationType,
+  offerAddressBook,
+  rubricaAttiva = true,
   onChange,
   siteOpen,
   invitati,
@@ -1180,12 +1182,17 @@ export function SezioneIscrizione({
   requireOrganization: boolean;
   requireOrganizationRole: boolean;
   requireOrganizationType: boolean;
+  /** Il modulo d'iscrizione propone la rubrica: facoltativa per chi si iscrive. */
+  offerAddressBook: boolean;
+  /** La rubrica e' accesa sull'installazione: spenta, non si propone. */
+  rubricaAttiva?: boolean;
   onChange: (
     patch: Partial<{
       accessMode: EventAccessModeValue | null;
       requireOrganization: boolean;
       requireOrganizationRole: boolean;
       requireOrganizationType: boolean;
+      offerAddressBook: boolean;
     }>
   ) => void;
   /** L'iscrizione aperta del sito: vale finche' l'evento non sceglie. */
@@ -1223,9 +1230,14 @@ export function SezioneIscrizione({
     onChange({ accessMode: accessModeDaSalvare(v, siteOpen) });
   };
   const chiede = (
-    campo: 'requireOrganization' | 'requireOrganizationRole' | 'requireOrganizationType',
+    campo:
+      | 'requireOrganization'
+      | 'requireOrganizationRole'
+      | 'requireOrganizationType'
+      | 'offerAddressBook',
     valore: boolean,
-    etichetta: string
+    etichetta: string,
+    disabled = false
   ) => (
     <div className="form-check">
       <input
@@ -1233,6 +1245,7 @@ export function SezioneIscrizione({
         type="checkbox"
         className="form-check-input"
         checked={valore}
+        disabled={disabled}
         onChange={(e) => onChange({ [campo]: e.target.checked })}
       />
       <label className="form-check-label" htmlFor={`${nome}-${campo}`}>
@@ -1291,6 +1304,9 @@ export function SezioneIscrizione({
         {chiede('requireOrganization', requireOrganization, t('askOrganization'))}
         {chiede('requireOrganizationRole', requireOrganizationRole, t('askRole'))}
         {chiede('requireOrganizationType', requireOrganizationType, t('askType'))}
+        {/* Quali dati si raccolgono lo decide lo staff dell'evento. */}
+        {rubricaAttiva &&
+          chiede('offerAddressBook', offerAddressBook, t('askAddressBook'), bloccato)}
       </fieldset>
       {questionari}
     </section>

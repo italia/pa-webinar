@@ -18,6 +18,7 @@ import { useTranslations } from 'next-intl';
 import CapacityPanel, { type RiepilogoCapacita } from '@/components/admin/capacity-panel';
 import FileOrUrlInput from '@/components/ui/file-or-url-input';
 import ToggleSwitch from '@/components/ui/toggle-switch';
+import type { Destinazione } from '@/lib/recording/destination';
 import { togglesFromMatrix } from '@/lib/utils/permission-matrix';
 import { MAX_RETENTION_DAYS } from '@/lib/validation/retention';
 import {
@@ -32,6 +33,7 @@ import {
 } from '@/lib/capacity/model';
 
 import CampoPartecipanti from './campo-partecipanti';
+import { destinazioneDopoIlSalvataggio } from './campi-del-formato';
 import type { WizardForm } from './wizard-shell';
 
 export default function AdvancedSettings({
@@ -101,7 +103,7 @@ export default function AdvancedSettings({
 }
 
 /** L'informativa privacy (la vede chi si iscrive), quanto restano i dati
- *  delle persone, e se la pagina resta pubblica dopo l'evento. */
+ *  delle persone, e cosa resta pubblico dopo l'evento. */
 export function SezioneDati({
   form,
   onChange,
@@ -109,6 +111,8 @@ export function SezioneDati({
   fieldErrors = {},
   retentionMax = MAX_RETENTION_DAYS,
   onUploadBusy,
+  domandeDopoEvento = true,
+  destinazioneSalvata = null,
 }: {
   form: WizardForm;
   onChange: (patch: Partial<WizardForm>) => void;
@@ -118,9 +122,17 @@ export function SezioneDati({
   /** Il documento della privacy in viaggio verso il server: il wizard
    *  aspetta che arrivi prima di salvare o cambiare passo. */
   onUploadBusy?: (inCaricamento: boolean) => void;
+  /** Si sceglie qui se le domande restano sulla pagina: non con un link di
+   *  conduzione, che le cambia dalla pagina dell'evento. */
+  domandeDopoEvento?: boolean;
+  /** La destinazione dell'evento salvato, null se e' nuovo o non l'ha dichiarata. */
+  destinazioneSalvata?: Destinazione;
 }) {
   const t = useTranslations('admin.wizard.step5');
   const tPost = useTranslations('postEvent');
+  // La regola della pagina si legge sull'evento che il salvataggio scrive: una
+  // scelta rimasta nel modulo a registrazione spenta non toglie le domande.
+  const riservata = destinazioneDopoIlSalvataggio(form, destinazioneSalvata) === 'REGISTRANTS';
   return (
     <div className="row g-3">
       <div className="col-md-6">
@@ -216,6 +228,22 @@ export function SezioneDati({
         />
         <small className="form-text text-muted d-block">{tPost('pageVisibleHelp')}</small>
       </div>
+      {/* Le domande sulla pagina dell'evento concluso: partono dal formato, e
+          con la registrazione riservata non si pubblicano comunque
+          (domandePubbliche). */}
+      {domandeDopoEvento && (
+        <div className="col-12">
+          <ToggleSwitch
+            label={tPost('showQA')}
+            checked={form.postEventShowQA && !riservata}
+            disabled={riservata}
+            onChange={() => onChange({ postEventShowQA: !form.postEventShowQA })}
+          />
+          {riservata && (
+            <small className="form-text text-muted d-block">{tPost('qaReservedNote')}</small>
+          )}
+        </div>
+      )}
     </div>
   );
 }

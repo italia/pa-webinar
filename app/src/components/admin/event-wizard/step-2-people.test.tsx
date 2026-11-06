@@ -35,7 +35,7 @@ vi.mock('@/components/ui/image-crop-dialog', () => ({
   },
 }));
 
-import StepPeople, { type StepPeopleValue } from './step-2-people';
+import StepPeople, { SezioneIscrizione, type StepPeopleValue } from './step-2-people';
 
 const t = messages.admin.wizard.step3;
 const FOTO = '11111111-1111-4111-8111-111111111111';
@@ -205,5 +205,51 @@ describe('StepPeople — la foto della persona nuova', () => {
       aggiungi().click();
     });
     expect(ultimo.speakers[1]).toMatchObject({ name: 'Relatore Due', photoId: null });
+  });
+});
+
+describe('SezioneIscrizione — la rubrica', () => {
+  const onChange = vi.fn();
+  const casella = () =>
+    Array.from(container.querySelectorAll('label'))
+      .find((l) => l.textContent === t.askAddressBook)
+      ?.parentElement?.querySelector('input');
+
+  function mostra(props: { offerAddressBook: boolean; rubricaAttiva?: boolean; bloccato?: boolean }) {
+    onChange.mockReset();
+    act(() => {
+      root.render(
+        <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
+          <SezioneIscrizione
+            accessMode={null}
+            requireOrganization={false}
+            requireOrganizationRole={false}
+            requireOrganizationType={false}
+            onChange={onChange}
+            siteOpen
+            invitati={0}
+            {...props}
+          />
+        </NextIntlClientProvider>
+      );
+    });
+  }
+
+  it('si propone con il valore del formato, e si cambia', () => {
+    mostra({ offerAddressBook: true });
+    expect(casella()).toBeChecked();
+    act(() => casella()?.click());
+    expect(onChange).toHaveBeenCalledWith({ offerAddressBook: false });
+  });
+
+  it('spenta sull installazione non si vede', () => {
+    mostra({ offerAddressBook: true, rubricaAttiva: false });
+    expect(casella()).toBeUndefined();
+  });
+
+  it('con un link di conduzione si vede ma non si cambia', () => {
+    mostra({ offerAddressBook: false, bloccato: true });
+    expect(casella()).toBeDisabled();
+    expect(casella()).not.toBeChecked();
   });
 });

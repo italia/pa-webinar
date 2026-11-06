@@ -18,8 +18,7 @@ import {
   presetDaFormato,
   type FormatoGuidato,
 } from '@/lib/events/guided-format';
-import EventWizard from '@/components/admin/event-wizard/wizard-shell';
-import type { PermissionMatrix } from '@/lib/utils/permission-matrix';
+import EventWizard, { type WizardTemplatePreset } from '@/components/admin/event-wizard/wizard-shell';
 import CreateInstantCall from '@/components/admin/create-instant-call';
 import type { CapacitaIstanza } from '@/lib/capacity/model';
 import type { VideoQualityPreset } from '@/lib/jitsi/config';
@@ -39,39 +38,9 @@ interface TemplateSummary {
   maxParticipants: number;
 }
 
-interface TemplatePreset {
-  id: string;
-  name: string;
-  qaEnabled: boolean;
-  chatEnabled: boolean;
-  recordingEnabled: boolean;
-  autoStartRecording: boolean;
-  agendaEnabled?: boolean;
-  wordCloudEnabled?: boolean;
-  whiteboardEnabled?: boolean;
-  liveCaptionsEnabled?: boolean;
-  waitingRoomEngine?: 'GARDEN' | 'GAME' | 'CLASSIC' | null;
-  participantsCanUnmute: boolean;
-  participantsCanStartVideo: boolean;
-  participantsCanShareScreen: boolean;
-  maxParticipants: number;
-  permissionMatrix?: PermissionMatrix | null;
-  defaultDurationMinutes?: number | null;
-  aiTranscriptEnabled?: boolean;
-  aiSummaryEnabled?: boolean;
-  aiTranslationEnabled?: boolean;
-  aiDubbingEnabled?: boolean;
-  multitrackRecordingEnabled?: boolean;
-  retainParticipantTracks?: boolean;
-  aiTargetLocales?: string | null;
-  descriptionTemplate?: Record<string, string> | null;
-  defaultRetentionDays?: number | null;
-  defaultExpectedSpeakers?: number | null;
-}
-
 interface Props {
   templates: TemplateSummary[];
-  selectedTemplate: TemplatePreset | null;
+  selectedTemplate: WizardTemplatePreset | null;
   siteTimezone: string;
   enabledLocales: string[];
   defaultLocale: string;
@@ -100,6 +69,8 @@ interface Props {
   defaultModerator?: { name: string; email: string } | null;
   /** L'iscrizione pubblica dell'installazione: vedi il passo «Persone». */
   publicRegistrationEnabled?: boolean;
+  /** La rubrica dell'installazione: vedi il passo «Persone». */
+  addressBookEnabled?: boolean;
   /** Apre direttamente il modulo della chiamata rapida (dal pulsante della
    *  lista eventi), senza passare dalla scelta del modello. */
   initialInstant?: boolean;
@@ -133,6 +104,7 @@ export default function CreateEventWithTemplate({
   isSiteAdmin = false,
   defaultModerator = null,
   publicRegistrationEnabled = true,
+  addressBookEnabled = true,
   initialInstant = false,
   formatoParam = null,
   scegliParam = null,
@@ -193,6 +165,7 @@ export default function CreateEventWithTemplate({
       isSiteAdmin={isSiteAdmin}
       defaultModerator={defaultModerator}
       publicRegistrationEnabled={publicRegistrationEnabled}
+      addressBookEnabled={addressBookEnabled}
     />
   );
 

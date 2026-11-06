@@ -24,6 +24,7 @@ import { consensiRichiesti } from '@/lib/registration/consents';
 export default function ConsentDiagram({
   multitrackRecordingEnabled,
   captionsTranscript,
+  trascrizioneVideo,
   participantsCanUnmute,
   participantsCanStartVideo,
   participantsCanShareScreen,
@@ -32,6 +33,8 @@ export default function ConsentDiagram({
 }: {
   multitrackRecordingEnabled: boolean;
   captionsTranscript: boolean;
+  /** La pipeline AI trascrive il video (`trascrizioneDalVideo`). */
+  trascrizioneVideo?: boolean;
   participantsCanUnmute: boolean;
   participantsCanStartVideo: boolean;
   participantsCanShareScreen: boolean;
@@ -45,6 +48,7 @@ export default function ConsentDiagram({
     recordingEnabled: true,
     multitrackRecordingEnabled,
     captionsTranscript,
+    trascrizioneVideo,
     participantsCanUnmute,
     participantsCanStartVideo,
     participantsCanShareScreen,

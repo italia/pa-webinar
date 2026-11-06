@@ -1,0 +1,118 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
+import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import type { Destinazione } from '@/lib/recording/destination';
+
+import type { WizardForm, WizardTemplatePreset } from './wizard-shell';
+
+/**
+ * I cinque valori che il formato o il modello scelgono per un evento: dove va la
+ * registrazione, se si propone la rubrica, i nomi del pubblico, chi conduce e le
+ * domande dopo l'evento. Sono valori di partenza: chi organizza li cambia nel
+ * wizard, e ogni formato li ricalcola («Cambia formato» non se li porta dietro).
+ */
+export interface CampiDelFormato {
+  recordingDestination: Destinazione;
+  offerAddressBook: boolean;
+  audienceAnonymous: boolean;
+  hostsAlwaysRecorded: boolean;
+  postEventShowQA: boolean;
+}
+
+/** La destinazione di partenza di chi registra, se il modello non la dice. */
+export const DESTINAZIONE_DI_PARTENZA = 'REGISTRANTS';
+
+/**
+ * Dove la voce non entra nel video (voce 'assente') un video da pubblicare non
+ * c'e', e il testo della casella lo dice (`destinazioneDelTesto`): non c'e' una
+ * destinazione da chiedere, e una riservata toglierebbe le domande dalla pagina
+ * dell'evento per un video che non esiste.
+ */
+export function videoDaDestinare(voce: VoceNelVideo | undefined): boolean {
+  return voce !== 'assente';
+}
+
+/**
+ * I valori di partenza di un evento nuovo. `registra`: l'evento registra davvero
+ * (il modello lo chiede, l'installazione puo' farlo). Solo un evento che registra
+ * parte con una destinazione se il modello non ne dice una, e solo lui puo'
+ * tenere chi conduce nel video: la dichiarazione non riguarda altri eventi.
+ * `conVideo`: `videoDaDestinare` dell'installazione.
+ */
+export function campiDaModello(
+  tpl: WizardTemplatePreset | null | undefined,
+  registra: boolean,
+  conVideo = true
+): CampiDelFormato {
+  const destinazione =
+    tpl?.recordingDestination ?? (registra ? DESTINAZIONE_DI_PARTENZA : null);
+  return {
+    recordingDestination: conVideo ? destinazione : null,
+    offerAddressBook: tpl?.offerAddressBook ?? true,
+    audienceAnonymous: tpl?.audienceAnonymous ?? false,
+    hostsAlwaysRecorded: registra && (tpl?.hostsAlwaysRecorded ?? false),
+    postEventShowQA: tpl?.postEventShowQA ?? true,
+  };
+}
+
+/** I valori di un evento salvato. */
+export function campiDaEvento(ev: Partial<CampiDelFormato>): CampiDelFormato {
+  return {
+    recordingDestination: ev.recordingDestination ?? null,
+    offerAddressBook: ev.offerAddressBook ?? true,
+    audienceAnonymous: ev.audienceAnonymous ?? false,
+    hostsAlwaysRecorded: ev.hostsAlwaysRecorded ?? false,
+    postEventShowQA: ev.postEventShowQA ?? true,
+  };
+}
+
+/**
+ * La destinazione che l'evento avra' dopo il salvataggio, la stessa che legge
+ * `domandePubbliche`. Un evento che non registra non ne dichiara una nuova: la
+ * scelta resta nel modulo per quando la registrazione si riaccende, altrimenti
+ * una riservata toglierebbe le domande a un evento senza video. Una destinazione
+ * gia' dichiarata resta anche a registrazione spenta, e si puo' cambiare.
+ */
+export function destinazioneDopoIlSalvataggio(
+  form: Pick<WizardForm, 'recordingEnabled' | 'recordingDestination'>,
+  salvata: Destinazione
+): Destinazione {
+  if (salvata === null && !form.recordingEnabled) return null;
+  return form.recordingDestination ?? salvata;
+}
+
+/**
+ * Cio' che il salvataggio manda di questi campi. `undefined` non parte, e il
+ * server lascia il valore com'e'.
+ *
+ *  - Un link di conduzione non cambia destinazione, rubrica e chi conduce: li
+ *    decide lo staff dell'evento, e il server rifiuterebbe il salvataggio. Le
+ *    domande dopo l'evento le cambia dalla pagina dell'evento.
+ *  - In modifica destinazione, rubrica e domande partono solo se cambiati: le
+ *    domande hanno un loro interruttore nella pagina dell'evento, e un
+ *    salvataggio del wizard non deve rimettere un valore letto prima.
+ *  - Null non parte mai: una destinazione dichiarata non si toglie, nemmeno
+ *    spegnendo la registrazione, e il server rifiuterebbe il salvataggio. Vale
+ *    `destinazioneDopoIlSalvataggio`.
+ */
+export function campiDaSalvare(
+  form: WizardForm,
+  salvati: CampiDelFormato | null,
+  viaToken: boolean
+): Partial<CampiDelFormato> {
+  const seCambiato = <K extends keyof CampiDelFormato>(campo: K) =>
+    viaToken || (salvati !== null && form[campo] === salvati[campo])
+      ? undefined
+      : form[campo];
+  const salvata = salvati?.recordingDestination ?? null;
+  const destinazione = destinazioneDopoIlSalvataggio(form, salvata);
+  return {
+    recordingDestination:
+      viaToken || destinazione === salvata ? undefined : (destinazione ?? undefined),
+    offerAddressBook: seCambiato('offerAddressBook'),
+    audienceAnonymous: form.audienceAnonymous,
+    hostsAlwaysRecorded: viaToken ? undefined : form.hostsAlwaysRecorded,
+    postEventShowQA: seCambiato('postEventShowQA'),
+  };
+}

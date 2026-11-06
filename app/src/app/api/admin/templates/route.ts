@@ -28,6 +28,17 @@ const templateSchema = z.object({
   wordCloudEnabled: z.boolean().optional(),
   // La pagina dopo l'evento e' pubblica? (Event.postEventPublic)
   postEventPublic: z.boolean().optional(),
+  // Le domande restano su quella pagina (Event.postEventShowQA).
+  postEventShowQA: z.boolean().optional(),
+  // Dove va il video degli eventi creati dal modello. null = lo sceglie chi crea
+  // l'evento (Event.recordingDestination).
+  recordingDestination: z.enum(['PUBLIC', 'REGISTRANTS']).nullish(),
+  // Il modulo d'iscrizione propone la rubrica (Event.offerAddressBook).
+  offerAddressBook: z.boolean().optional(),
+  // Chi partecipa compare con uno pseudonimo (Event.audienceAnonymous).
+  audienceAnonymous: z.boolean().optional(),
+  // Chi conduce e' sempre nella registrazione (Event.hostsAlwaysRecorded).
+  hostsAlwaysRecorded: z.boolean().optional(),
   whiteboardEnabled: z.boolean().optional(),
   // I sottotitoli live degli eventi creati dal modello (Event.liveCaptionsEnabled).
   liveCaptionsEnabled: z.boolean().optional(),
