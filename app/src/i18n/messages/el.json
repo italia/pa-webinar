@@ -683,6 +683,7 @@
       "confirm": "Ανάκληση",
       "working": "Ενημέρωση…",
       "error": "Δεν ήταν δυνατή η ενημέρωση της συγκατάθεσης: δοκιμάστε ξανά.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Καταγραφή της εκδήλωσης",
         "give": "Συναινώ στην καταγραφή",

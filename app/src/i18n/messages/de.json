@@ -683,6 +683,7 @@
       "confirm": "Widerrufen",
       "working": "Wird aktualisiert…",
       "error": "Die Einwilligung konnte nicht aktualisiert werden: Bitte versuchen Sie es erneut.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Aufzeichnung der Veranstaltung",
         "give": "Ich willige in die Aufzeichnung ein",

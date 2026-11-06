@@ -683,6 +683,7 @@
       "confirm": "Wycofaj",
       "working": "Aktualizowanie…",
       "error": "Nie udało się zaktualizować zgody: spróbuj ponownie.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Nagrywanie wydarzenia",
         "give": "Wyrażam zgodę na nagrywanie",

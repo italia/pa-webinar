@@ -683,6 +683,7 @@
       "confirm": "Retrage",
       "working": "Se actualizează…",
       "error": "Consimțământul nu a putut fi actualizat: încearcă din nou.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Înregistrarea evenimentului",
         "give": "Sunt de acord cu înregistrarea",

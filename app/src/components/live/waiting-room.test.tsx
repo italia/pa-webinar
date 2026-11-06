@@ -381,6 +381,7 @@ describe('sala d\'attesa — consenso alla registrazione', () => {
       cameraOn: false,
       micOn: false,
       recordingConsent: true,
+      recordingConsentDestination: null,
     });
   });
 
@@ -445,6 +446,7 @@ describe('sala d\'attesa — consenso alla registrazione', () => {
       cameraOn: false,
       micOn: false,
       recordingConsent: true,
+      recordingConsentDestination: null,
       multitrackConsent: true,
     });
   });
@@ -714,6 +716,7 @@ describe('sala d\'attesa — consenso alla registrazione di chi conduce o interv
       cameraOn: false,
       micOn: false,
       recordingConsent: true,
+      recordingConsentDestination: null,
       multitrackConsent: true,
     });
   });
@@ -729,3 +732,133 @@ describe('sala d\'attesa — consenso alla registrazione di chi conduce o interv
   });
 });
 
+describe('sala d\'attesa — il testo segue la destinazione', () => {
+  const evento: Evento = { ...eventoLive, recordingEnabled: true };
+  const g = messages.gdpr.consent;
+  const etichetta = () => $('label[for="waiting-recording-consent"]')?.textContent;
+  const ingresso = { event: evento, defaultName: 'Relatore 1', recordingConsentRequired: true };
+
+  it('la casella dichiara dove va il video', () => {
+    render({ ...ingresso, recordingDestination: 'REGISTRANTS' });
+    expect(etichetta()).toBe(g.recordingReserved);
+    render({ ...ingresso, recordingDestination: 'PUBLIC' });
+    expect(etichetta()).toBe(g.recordingPublic);
+    render({ ...ingresso, recordingDestination: null });
+    expect(etichetta()).toBe(g.recording);
+  });
+
+  it('senza video lo dice sopra e nella casella, qualunque sia la destinazione', () => {
+    render({ ...ingresso, recordingDestination: 'PUBLIC', voce: 'assente' });
+    expect(etichetta()).toBe(g.recordingNoVideo);
+    expect(container.textContent).toContain(t.recordingConsentIntroNoVideo);
+    expect(container.textContent).not.toContain(t.recordingConsentIntro);
+  });
+
+  it('il testo scelto per l\'evento resta sopra la casella anche senza video', () => {
+    render({ ...ingresso, voce: 'assente', recordingConsentText: 'Testo dell\'ente.' });
+    expect(container.textContent).toContain('Testo dell\'ente.');
+    expect(container.textContent).not.toContain(t.recordingConsentIntroNoVideo);
+  });
+
+  it('il consenso viaggia con il testo su cui si e\' spuntata la casella', () => {
+    render({ ...ingresso, recordingDestination: 'PUBLIC' });
+    premi($<HTMLInputElement>('#waiting-recording-consent')!);
+    premi(pulsante(t.joinNowBtn));
+    expect(onEnterLive).toHaveBeenCalledWith('Relatore 1', {
+      cameraOn: false,
+      micOn: false,
+      recordingConsent: true,
+      recordingConsentDestination: 'PUBLIC',
+    });
+  });
+
+  it('la spunta resta legata al testo letto, anche se quello mostrato cambia dopo', () => {
+    render({ ...ingresso, recordingDestination: 'REGISTRANTS' });
+    premi($<HTMLInputElement>('#waiting-recording-consent')!);
+    render({ ...ingresso, recordingDestination: 'PUBLIC' });
+    expect(etichetta()).toBe(g.recordingPublic);
+    premi(pulsante(t.joinNowBtn));
+    expect(onEnterLive.mock.calls[0]?.[1]).toMatchObject({
+      recordingConsentDestination: 'REGISTRANTS',
+    });
+  });
+
+  it('il testo vuoto viaggia come null, non come campo assente', () => {
+    render({ ...ingresso, recordingDestination: null });
+    premi($<HTMLInputElement>('#waiting-recording-consent')!);
+    premi(pulsante(t.joinNowBtn));
+    expect(onEnterLive.mock.calls[0]?.[1]).toHaveProperty('recordingConsentDestination', null);
+  });
+
+  it('chi conduce ed e\' sempre nel video legge dove va', () => {
+    const conduce = { event: evento, defaultName: 'Relatore 1', recordingHostAlways: true };
+    render({ ...conduce, recordingDestination: 'REGISTRANTS' });
+    expect(container.textContent).toContain(g.recordingHostAlwaysReserved);
+    render({ ...conduce, recordingDestination: 'PUBLIC' });
+    expect(container.textContent).toContain(g.recordingHostAlwaysPublic);
+    render({ ...conduce, recordingDestination: null });
+    expect(container.textContent).toContain(g.recordingHostAlways);
+  });
+});
+
+describe('sala d\'attesa — trascrizione', () => {
+  const g = messages.gdpr.consent;
+  const etichetta = () => $('label[for="waiting-multitrack-consent"]')?.textContent;
+
+  it('si chiede anche quando parte dal video', () => {
+    render({ event: { ...eventoLive, trascrizioneVideo: true }, defaultName: 'Relatore 1' });
+    expect(etichetta()).toBe(g.multitrack);
+  });
+
+  it('dove le tracce si conservano il testo non ne promette la cancellazione', () => {
+    render({
+      event: { ...eventoLive, multitrackRecordingEnabled: true, retainParticipantTracks: true },
+      defaultName: 'Relatore 1',
+    });
+    expect(etichetta()).toBe(g.multitrackRetained);
+  });
+
+  it('dove si avvisa soltanto e la voce si toglie, non si chiede', () => {
+    render({
+      event: { ...eventoLive, trascrizioneVideo: true },
+      defaultName: 'Relatore 1',
+      recordingListenOnly: true,
+    });
+    expect($('#waiting-multitrack-consent')).toBeNull();
+  });
+
+  it('chi l\'ha gia\' data non la rivede', () => {
+    render({
+      event: { ...eventoLive, trascrizioneVideo: true },
+      defaultName: 'Relatore 1',
+      multitrackConsentExempt: true,
+    });
+    expect($('#waiting-multitrack-consent')).toBeNull();
+  });
+});
+
+describe('sala d\'attesa — video a evento concluso', () => {
+  const concluso: Evento = { ...eventoLive, status: 'ENDED', endsAt: oraPiu(-5) };
+  const link = () =>
+    Array.from(container.querySelectorAll('a')).find((a) =>
+      a.textContent?.includes(t.endedWatchRecording),
+    );
+
+  it('il link porta alla rotta del video', () => {
+    render({ event: { ...concluso, videoDisponibile: true } });
+    expect(link()?.getAttribute('href')).toBe(`/api/events/${concluso.slug}/recording`);
+  });
+
+  it('senza il diritto di vederlo il link non c\'e\'', () => {
+    render({ event: { ...concluso, videoDisponibile: false } });
+    expect(link()).toBeUndefined();
+    render({ event: concluso });
+    expect(link()).toBeUndefined();
+  });
+
+  it('a evento concluso nessuna casella', () => {
+    render({ event: { ...concluso, trascrizioneVideo: true }, recordingConsentRequired: true });
+    expect($('#waiting-multitrack-consent')).toBeNull();
+    expect($('#waiting-recording-consent')).toBeNull();
+  });
+});

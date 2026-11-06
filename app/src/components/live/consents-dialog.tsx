@@ -7,6 +7,9 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'design-react-kit';
 
+import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import { chiaveConsenso, type Destinazione } from '@/lib/recording/destination';
+
 /**
  * I consensi della persona per questo evento, dalla sala: si danno e si
  * ritirano qui, in qualunque momento (art. 7.3 GDPR: ritirarli e' facile come
@@ -14,16 +17,23 @@ import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'design-react
  * qualche secondo.
  *
  * La finestra mostra solo i consensi che l'evento chiede a questa persona;
- * cosa cambia lo dice la riga sotto ciascuno, prima di agire. Il ritiro
- * chiede una conferma: ricollega la conferenza (o la chiude), e un clic per
- * sbaglio non deve farlo.
+ * cosa cambia lo dice la riga sotto ciascuno, prima di agire. Chi non ha dato
+ * il consenso alla registrazione legge qui lo stesso testo della casella: il
+ * clic vale per quello. Il ritiro chiede una conferma: ricollega la conferenza
+ * (o la chiude), e un clic per sbaglio non deve farlo.
  */
 
 /** Cosa succede ritirando il consenso alla registrazione. */
 export type EffettoRitiroRegistrazione = 'voce' | 'soloAscolto' | 'conduce' | 'nessuno';
 
 export interface ConsensiInSala {
-  registrazione?: { dato: boolean; ritiro: EffettoRitiroRegistrazione };
+  /** `destinazione` e `voce` scelgono il testo a cui si acconsente. */
+  registrazione?: {
+    dato: boolean;
+    ritiro: EffettoRitiroRegistrazione;
+    destinazione: Destinazione;
+    voce: VoceNelVideo;
+  };
   /** `serveRegistrazione`: si puo' dare solo dopo il consenso alla registrazione. */
   trascrizione?: { dato: boolean; serveRegistrazione: boolean };
 }
@@ -39,6 +49,7 @@ export default function ConsentsDialog({
   onRitira,
   inCorso,
   errore,
+  testoCambiato = false,
   container,
 }: {
   aperta: boolean;
@@ -50,10 +61,13 @@ export default function ConsentsDialog({
   onRitira: (registrazione: boolean) => void;
   inCorso: boolean;
   errore: boolean;
+  /** Il consenso e' arrivato su un testo non piu' in vigore: va riletto. */
+  testoCambiato?: boolean;
   container?: HTMLElement | null;
 }) {
   const t = useTranslations('live.consents');
   const tc = useTranslations('common');
+  const tGdpr = useTranslations('gdpr.consent');
   const [conferma, setConferma] = useState<Azione | null>(null);
   const chiudi = () => {
     setConferma(null);
@@ -84,7 +98,11 @@ export default function ConsentsDialog({
       <p id={`${id}-effetto`} className="mb-2 small text-secondary">
         {effetto}
       </p>
-      {nota && <p className="mb-2 small text-secondary">{nota}</p>}
+      {nota && (
+        <p id={`${id}-nota`} className="mb-2 small text-secondary">
+          {nota}
+        </p>
+      )}
       {azione}
     </section>
   );
@@ -160,9 +178,11 @@ export default function ConsentsDialog({
                 : registrazione.ritiro === 'nessuno'
                   ? ''
                   : t(`recording.without.${registrazione.ritiro}`),
-              registrazione.dato && registrazione.ritiro !== 'conduce'
-                ? t('recording.alreadyRecorded')
-                : null,
+              !registrazione.dato
+                ? tGdpr(chiaveConsenso(registrazione.destinazione, registrazione.voce))
+                : registrazione.ritiro !== 'conduce'
+                  ? t('recording.alreadyRecorded')
+                  : null,
               registrazione.dato ? (
                 confermaRitiro('live-consents-rec', 'ritiraRegistrazione', t('withdraw'))
               ) : (
@@ -174,6 +194,7 @@ export default function ConsentsDialog({
                     onAcconsentiRegistrazione();
                     restaQui('live-consents-rec');
                   }}
+                  aria-describedby="live-consents-rec-nota"
                 >
                   {t('recording.give')}
                 </Button>
@@ -214,6 +235,11 @@ export default function ConsentsDialog({
         {errore && (
           <p className="small mb-0 text-danger" role="alert">
             {t('error')}
+          </p>
+        )}
+        {testoCambiato && (
+          <p className="small mb-0 text-danger" role="alert">
+            {t('textChanged')}
           </p>
         )}
       </ModalBody>

@@ -683,6 +683,7 @@
       "confirm": "Atsaukt",
       "working": "Notiek atjaunināšana…",
       "error": "Piekrišanu neizdevās atjaunināt: mēģiniet vēlreiz.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Pasākuma ieraksts",
         "give": "Piekrītu ierakstam",

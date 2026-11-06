@@ -683,6 +683,7 @@
       "confirm": "Intrekken",
       "working": "Bezig met bijwerken…",
       "error": "De toestemming kon niet worden bijgewerkt: probeer het opnieuw.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Opname van het evenement",
         "give": "Ik geef toestemming voor de opname",

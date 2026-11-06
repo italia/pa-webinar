@@ -683,6 +683,7 @@
       "confirm": "Tarraing siar",
       "working": "Á nuashonrú…",
       "error": "Níorbh fhéidir an toiliú a nuashonrú: bain triail eile as.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Taifeadadh na hócáide",
         "give": "Toilím leis an taifeadadh",

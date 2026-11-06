@@ -683,6 +683,7 @@
       "confirm": "Retirer",
       "working": "Mise à jour…",
       "error": "Impossible de mettre à jour le consentement : réessayez.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Enregistrement de l'événement",
         "give": "Je consens à l'enregistrement",

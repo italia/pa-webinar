@@ -683,6 +683,7 @@
       "confirm": "Оттегли",
       "working": "Обновяване…",
       "error": "Съгласието не можа да бъде обновено: опитайте отново.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Запис на събитието",
         "give": "Съгласявам се със записа",

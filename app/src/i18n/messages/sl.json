@@ -683,6 +683,7 @@
       "confirm": "Prekliči",
       "working": "Posodabljanje…",
       "error": "Privolitve ni bilo mogoče posodobiti: poskusite znova.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Snemanje dogodka",
         "give": "Privolim v snemanje",

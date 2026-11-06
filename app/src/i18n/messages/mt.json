@@ -683,6 +683,7 @@
       "confirm": "Irtira",
       "working": "Qed jaġġorna…",
       "error": "Ma kienx possibbli jiġi aġġornat il-kunsens: erġa' pprova.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Reġistrazzjoni tal-avveniment",
         "give": "Nagħti l-kunsens għar-reġistrazzjoni",

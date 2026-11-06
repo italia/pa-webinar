@@ -683,6 +683,7 @@
       "confirm": "Odvolať",
       "working": "Prebieha aktualizácia…",
       "error": "Súhlas sa nepodarilo aktualizovať: skúste to znova.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Záznam podujatia",
         "give": "Súhlasím so záznamom",

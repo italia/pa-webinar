@@ -683,6 +683,7 @@
       "confirm": "Retirar",
       "working": "A atualizar…",
       "error": "Não foi possível atualizar o consentimento: tente novamente.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Gravação do evento",
         "give": "Dou o meu consentimento à gravação",

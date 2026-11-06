@@ -683,6 +683,7 @@
       "confirm": "Võta tagasi",
       "working": "Uuendamine…",
       "error": "Nõusolekut ei õnnestunud uuendada: proovi uuesti.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Ürituse salvestamine",
         "give": "Annan nõusoleku salvestamiseks",

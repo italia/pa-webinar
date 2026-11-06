@@ -683,6 +683,7 @@
       "confirm": "Återkalla",
       "working": "Uppdaterar…",
       "error": "Samtycket kunde inte uppdateras: försök igen.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Inspelning av evenemanget",
         "give": "Jag samtycker till inspelningen",

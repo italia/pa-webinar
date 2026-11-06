@@ -683,6 +683,7 @@
       "confirm": "Peruuta",
       "working": "Päivitetään…",
       "error": "Suostumusta ei voitu päivittää: yritä uudelleen.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Tapahtuman tallennus",
         "give": "Suostun tallennukseen",

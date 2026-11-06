@@ -683,6 +683,7 @@
       "confirm": "Odvolat",
       "working": "Probíhá aktualizace…",
       "error": "Souhlas se nepodařilo aktualizovat: zkuste to znovu.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Záznam akce",
         "give": "Souhlasím se záznamem",
