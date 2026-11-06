@@ -1080,7 +1080,7 @@
         "remove": "Remove",
         "invalidEmail": "Invalid email address.",
         "duplicateEmail": "Email already added.",
-        "rubricaPick": "Search the address book by organization…",
+        "rubricaPick": "Search the address book by name, email or organization…",
         "rubricaOrAdd": "or add manually",
         "removeItem": "Remove {name}",
         "invitationsStaffOnly": "Invitations are managed by the event staff.",
@@ -3021,7 +3021,8 @@
     },
     "rubrica": {
       "subtitle": "People who have consented to be added to the address book (GDPR art. 6.1.a). Name, email and organization are updated only when the person ticks the box again.",
-      "searchLabel": "Search by organization",
+      "searchLabel": "Search by name, email or organization",
+      "searchPartial": "The search looked only at the {limit} most recently updated entries: someone less recent may not appear.",
       "orgTypeLabel": "Organization type",
       "allTypes": "All",
       "includeOptedOut": "Include people who withdrew consent",

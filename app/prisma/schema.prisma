@@ -2083,8 +2083,8 @@ model Person {
   // displayName is encrypted at rest via encryptPII (AES-256-GCM) — write
   // through encryptPIIOrNull, read through tryDecryptPII. Ciphertext makes
   // `contains` search and alphabetical orderBy meaningless, so the admin
-  // rubrica route only searches on `organization` and orders by
-  // `lastActiveAt`. See ADR-011 and app/src/lib/crypto/pii.ts.
+  // rubrica route filters after decrypting (lib/persons/ricerca-rubrica) and
+  // orders by `lastActiveAt`. See ADR-011 and app/src/lib/crypto/pii.ts.
   displayName      String?           @map("display_name")
   // Email cifrata (encryptPII), copiata com'e' dall'iscrizione che ha dato il
   // consenso alla rubrica, senza decifrarla. Null per una voce senza email.

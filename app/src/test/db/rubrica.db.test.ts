@@ -16,7 +16,7 @@ import path from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { DELETE as cancellaVoce } from '@/app/api/admin/rubrica/[id]/route';
-import { GET as elencoRubrica } from '@/app/api/admin/rubrica/route';
+import { GET as elencoRubrica, POST as cercaRubrica } from '@/app/api/admin/rubrica/route';
 import { GET as conservazione } from '@/app/api/cron/rubrica-retention/route';
 import { POST as cancellazione } from '@/app/api/gdpr/erasure/route';
 import { POST as esceDalLink } from '@/app/api/rubrica/opt-out/route';
@@ -75,17 +75,22 @@ async function voce(campi: { optedInAt?: Date | null; retentionMonths?: number }
   return { ...indirizzo, persona };
 }
 
-async function selettore() {
+async function cerca(corpo: object) {
   await entraCome('ADMIN');
-  const risposta = await elencoRubrica(
-    richiesta('/api/admin/rubrica?withEmail=1') as never,
+  const risposta = await cercaRubrica(
+    richiesta('/api/admin/rubrica', 'POST', corpo) as never,
     senzaParametri
   );
   expect(risposta.status).toBe(200);
-  const { rows } = (await risposta.json()) as {
-    rows: { id: string; email: string | null }[];
+  return (await risposta.json()) as {
+    rows: { id: string; displayName: string | null; email?: string | null }[];
+    total: number;
   };
-  return rows;
+}
+
+/** Quello che il selettore puo' proporre: ogni indirizzo contiene la chiocciola. */
+async function selettore() {
+  return (await cerca({ q: '@', withEmail: true })).rows;
 }
 
 function corsaConservazione() {
@@ -152,6 +157,60 @@ describe('iscrizione e consenso', () => {
       optedOutAt: null,
       email: cifrata,
     });
+  });
+});
+
+describe('ricerca', () => {
+  /** Una voce come quelle del modulo predefinito: senza ente. */
+  async function voceConNome(nome: string) {
+    const creata = await voce();
+    await prisma.person.update({
+      where: { id: creata.persona.id },
+      data: { displayName: encryptPII(nome) },
+    });
+    return creata;
+  }
+
+  it("una voce senza ente si trova per nome e per email, e si puo' invitare", async () => {
+    const { persona, email } = await voceConNome('Nicolò Prova');
+    await voceConNome('Altra Persona');
+    for (const q of ['nicolò', 'NICOLO', email.slice(4, 16)]) {
+      const { rows, total } = await cerca({ q, withEmail: true });
+      expect(rows.map((r) => r.id), q).toEqual([persona.id]);
+      expect(rows[0]?.email).toBe(email);
+      expect(total).toBe(1);
+    }
+  });
+
+  it("l'elenco senza testo non restituisce indirizzi, nemmeno a chiederli", async () => {
+    const { persona } = await voce();
+    await entraCome('ADMIN');
+    const risposta = await elencoRubrica(
+      richiesta('/api/admin/rubrica?withEmail=1') as never,
+      senzaParametri
+    );
+    const { rows } = (await risposta.json()) as { rows: { id: string }[] };
+    expect(rows.map((r) => r.id)).toEqual([persona.id]);
+    expect(rows[0]).not.toHaveProperty('email');
+  });
+
+  it('una voce si trova per ente, anche dalla pagina della rubrica', async () => {
+    const { persona } = await voce();
+    await prisma.person.update({
+      where: { id: persona.id },
+      data: { organization: 'Comune di Prova' },
+    });
+    const { rows } = await cerca({ q: 'comune di' });
+    expect(rows.map((r) => r.id)).toEqual([persona.id]);
+    expect(rows[0]).not.toHaveProperty('email');
+  });
+
+  it('chi ha ritirato il consenso non si trova nel selettore', async () => {
+    const { emailHash } = await voceConNome('Persona Ritirata');
+    await ritiraComunicazioni(emailHash);
+    expect((await cerca({ q: 'ritirata', withEmail: true })).rows).toEqual([]);
+    expect((await cerca({ q: 'ritirata' })).rows).toEqual([]);
+    expect((await cerca({ q: 'ritirata', includeOptedOut: true })).rows).toHaveLength(1);
   });
 });
 

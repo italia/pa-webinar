@@ -3022,6 +3022,7 @@
     "rubrica": {
       "subtitle": "Personen, die der Aufnahme in das Adressbuch zugestimmt haben (Art. 6.1.a DSGVO). Name, E-Mail-Adresse und Organisation werden nur aktualisiert, wenn die Person das Kästchen erneut ankreuzt.",
       "searchLabel": "Nach Organisation suchen",
+      "searchPartial": "The search looked only at the {limit} most recently updated entries: someone less recent may not appear.",
       "orgTypeLabel": "Art der Organisation",
       "allTypes": "Alle",
       "includeOptedOut": "Personen einbeziehen, die ihre Einwilligung widerrufen haben",

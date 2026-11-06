@@ -73,8 +73,11 @@ function RubricaPickerInner(props: RubricaPickerProps) {
   const { placeholder, disabled } = props;
   const mode: 'single' | 'multi' = props.mode ?? 'single';
   const t = useTranslations('admin.rubricaPicker');
+  const tRubrica = useTranslations('admin.rubrica');
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<RubricaRow[]>([]);
+  // Quante voci ha guardato una ricerca che non le ha viste tutte.
+  const [scanLimit, setScanLimit] = useState<number | null>(null);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [highlight, setHighlight] = useState(0);
@@ -90,28 +93,34 @@ function RubricaPickerInner(props: RubricaPickerProps) {
     try {
       // Solo chi ha accettato di restare in rubrica (chi ha revocato il
       // consenso non si propone), con l'email conservata nella voce: senza,
-      // la persona non si potrebbe aggiungere all'evento.
-      const qs = new URLSearchParams({
-        q,
-        limit: String(RESULT_LIMIT),
-        withEmail: '1',
-      });
-      const res = await fetch(`/api/admin/rubrica?${qs.toString()}`, {
+      // la persona non si potrebbe aggiungere all'evento. Il testo sta nel corpo:
+      // un nome o un indirizzo nell'URL finirebbe nei log di accesso.
+      const res = await fetch('/api/admin/rubrica', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ q, limit: RESULT_LIMIT, withEmail: true }),
         cache: 'no-store',
       });
       if (!res.ok) {
-        if (mine === reqCounter.current) setResults([]);
+        if (mine === reqCounter.current) {
+          setResults([]);
+          setScanLimit(null);
+        }
         return;
       }
-      const data = (await res.json()) as { rows: RubricaRow[] };
+      const data = (await res.json()) as { rows: RubricaRow[]; scanLimit?: number };
       if (mine === reqCounter.current) {
         setResults(
           Array.isArray(data.rows) ? data.rows.slice(0, RESULT_LIMIT) : [],
         );
+        setScanLimit(data.scanLimit ?? null);
         setHighlight(0);
       }
     } catch {
-      if (mine === reqCounter.current) setResults([]);
+      if (mine === reqCounter.current) {
+        setResults([]);
+        setScanLimit(null);
+      }
     } finally {
       if (mine === reqCounter.current) setLoading(false);
     }
@@ -354,6 +363,11 @@ function RubricaPickerInner(props: RubricaPickerProps) {
               </li>
             );
           })}
+          {!loading && scanLimit !== null && (
+            <li className="list-group-item text-muted small">
+              {tRubrica('searchPartial', { limit: scanLimit })}
+            </li>
+          )}
         </ul>
       )}
     </div>

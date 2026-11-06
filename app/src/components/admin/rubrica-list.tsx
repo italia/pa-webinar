@@ -6,10 +6,9 @@
 /**
  * Admin rubrica list — displays Person rows with filters.
  *
- * The rubrica is intentionally email-free: we show displayName +
- * organization only. PII (encrypted email) still lives on the
- * Registration rows; the Person row keeps an emailHash for dedup.
- * Opening a detail page shows the per-event attendance history.
+ * We show displayName + organization only: the search can match the
+ * email address, but the list never shows it. Opening a detail page
+ * shows the per-event attendance history.
  */
 
 import { useEffect, useId, useState } from 'react';
@@ -44,6 +43,7 @@ export default function RubricaList() {
   const id = useId();
   const [rows, setRows] = useState<Row[]>([]);
   const [total, setTotal] = useState(0);
+  const [scanLimit, setScanLimit] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
   const [q, setQ] = useState('');
@@ -61,16 +61,34 @@ export default function RubricaList() {
     let cancelled = false;
     setLoading(true);
     const qs = new URLSearchParams();
-    if (query) qs.set('q', query);
     if (orgType) qs.set('orgType', orgType);
     if (includeOptedOut) qs.set('includeOpted', 'out');
-    fetch(`/api/admin/rubrica?${qs}`, { cache: 'no-store' })
+    // Il testo cercato sta nel corpo: un nome o un indirizzo nell'URL finirebbe
+    // nei log di accesso.
+    const richiesta = query
+      ? fetch('/api/admin/rubrica', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            q: query,
+            ...(orgType ? { orgType } : {}),
+            includeOptedOut,
+          }),
+          cache: 'no-store',
+        })
+      : fetch(`/api/admin/rubrica?${qs}`, { cache: 'no-store' });
+    richiesta
       .then(async (res) => {
         if (!res.ok) throw new Error(String(res.status));
-        const data = (await res.json()) as { rows: Row[]; total: number };
+        const data = (await res.json()) as {
+          rows: Row[];
+          total: number;
+          scanLimit?: number;
+        };
         if (cancelled) return;
         setRows(data.rows);
         setTotal(data.total);
+        setScanLimit(data.scanLimit ?? null);
         setFailed(false);
       })
       .catch(() => {
@@ -140,6 +158,9 @@ export default function RubricaList() {
 
       <p className="mb-3 text-muted small" role="status">
         {loading ? '' : t('count', { count: total })}
+        {!loading && !failed && scanLimit !== null && (
+          <> {t('searchPartial', { limit: scanLimit })}</>
+        )}
       </p>
 
       {loading ? (

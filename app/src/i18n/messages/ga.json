@@ -3022,6 +3022,7 @@
     "rubrica": {
       "subtitle": "Daoine a thug toiliú a gcur leis an leabhar seoltaí (airteagal 6.1.a GDPR). Ní nuashonraítear an t-ainm, an ríomhphost ná an eagraíocht ach amháin nuair a thiceálann an duine an bosca arís.",
       "searchLabel": "Cuardaigh de réir eagraíochta",
+      "searchPartial": "The search looked only at the {limit} most recently updated entries: someone less recent may not appear.",
       "orgTypeLabel": "Cineál eagraíochta",
       "allTypes": "Gach cineál",
       "includeOptedOut": "Cuir san áireamh daoine a tharraing siar a dtoiliú",

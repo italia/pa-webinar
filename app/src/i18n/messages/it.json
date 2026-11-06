@@ -1290,7 +1290,7 @@
         "remove": "Rimuovi",
         "invalidEmail": "Indirizzo email non valido.",
         "duplicateEmail": "Indirizzo già presente.",
-        "rubricaPick": "Cerca per ente nella rubrica…",
+        "rubricaPick": "Cerca nella rubrica per nome, email o ente…",
         "rubricaOrAdd": "oppure aggiungi manualmente",
         "removeItem": "Rimuovi {name}",
         "invitationsStaffOnly": "Gli inviti li gestisce lo staff dell'evento.",
@@ -3231,7 +3231,8 @@
     },
     "rubrica": {
       "subtitle": "Persone che hanno dato consenso all'inserimento in rubrica (art. 6.1.a GDPR). Nome, email e organizzazione si aggiornano solo quando la persona spunta di nuovo la casella.",
-      "searchLabel": "Cerca per ente",
+      "searchLabel": "Cerca per nome, email o ente",
+      "searchPartial": "La ricerca ha guardato solo le {limit} voci aggiornate più di recente: una persona meno recente può non comparire.",
       "orgTypeLabel": "Tipo di ente",
       "allTypes": "Tutti",
       "includeOptedOut": "Includi chi ha revocato il consenso",

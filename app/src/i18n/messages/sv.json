@@ -3022,6 +3022,7 @@
     "rubrica": {
       "subtitle": "Personer som har samtyckt till att läggas till i adressboken (GDPR art. 6.1.a). Namn, e-postadress och organisation uppdateras bara när personen kryssar i rutan igen.",
       "searchLabel": "Sök på organisation",
+      "searchPartial": "The search looked only at the {limit} most recently updated entries: someone less recent may not appear.",
       "orgTypeLabel": "Typ av organisation",
       "allTypes": "Alla",
       "includeOptedOut": "Ta med personer som har återkallat sitt samtycke",

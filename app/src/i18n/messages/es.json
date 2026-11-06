@@ -3022,6 +3022,7 @@
     "rubrica": {
       "subtitle": "Personas que han dado consentimiento para ser incluidas en la agenda (art. 6.1.a RGPD). El nombre, el correo electrónico y la organización solo se actualizan cuando la persona vuelve a marcar la casilla.",
       "searchLabel": "Buscar por organización",
+      "searchPartial": "The search looked only at the {limit} most recently updated entries: someone less recent may not appear.",
       "orgTypeLabel": "Tipo de organización",
       "allTypes": "Todos",
       "includeOptedOut": "Incluir a quienes retiraron el consentimiento",

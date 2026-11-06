@@ -3022,6 +3022,7 @@
     "rubrica": {
       "subtitle": "Persoane care și-au dat consimțământul pentru includerea în agendă (art. 6.1.a RGPD). Numele, e-mailul și organizația se actualizează doar când persoana bifează din nou caseta.",
       "searchLabel": "Căutați după organizație",
+      "searchPartial": "The search looked only at the {limit} most recently updated entries: someone less recent may not appear.",
       "orgTypeLabel": "Tipul organizației",
       "allTypes": "Toate",
       "includeOptedOut": "Includeți persoanele care și-au retras consimțământul",

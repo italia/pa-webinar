@@ -3022,6 +3022,7 @@
     "rubrica": {
       "subtitle": "Osobe koje su dale privolu za uvrštavanje u imenik (čl. 6.1.a GDPR). Ime, e-pošta i organizacija ažuriraju se samo kada osoba ponovno označi okvir.",
       "searchLabel": "Pretraži po organizaciji",
+      "searchPartial": "The search looked only at the {limit} most recently updated entries: someone less recent may not appear.",
       "orgTypeLabel": "Vrsta organizacije",
       "allTypes": "Sve",
       "includeOptedOut": "Uključi osobe koje su povukle privolu",

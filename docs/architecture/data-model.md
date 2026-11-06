@@ -76,7 +76,7 @@ Personal data is encrypted in the application, not by the database. The code is 
 
 What follows from this design:
 
-- **No search, sort or uniqueness on encrypted columns.** Each write uses a new IV, so equal plaintexts produce different ciphertexts. Uniqueness and lookups use a hash column instead ([Keyed email hash](#keyed-email-hash)). For the same reason, the address-book search matches only `organization` and sorts by `lastActiveAt`.
+- **No search, sort or uniqueness on encrypted columns.** Each write uses a new IV, so equal plaintexts produce different ciphertexts. Uniqueness and lookups use a hash column instead ([Keyed email hash](#keyed-email-hash)). For the same reason, the address-book search decrypts the records and filters them in memory, within a limit, and sorts by `lastActiveAt` ([ADR-011](../adr/011-person-rubrica.md)).
 - **Encryption covers storage only.** Redis messages and SSE streams carry plaintext ([live-interaction.md](live-interaction.md)).
 - **No key rotation.** A different but well-formed key is not detected: decryption fails, and `tryDecryptPII()` returns the stored base64 as if it were a legacy plaintext row. No tooling re-encrypts existing data, so replacing `PII_ENCRYPTION_KEY` on a populated database makes every encrypted value unreadable.
 
