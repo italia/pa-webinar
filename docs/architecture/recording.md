@@ -86,9 +86,10 @@ options that were weighed.
 The two capture paths treat consent differently.
 
 - **Composite video.** `Event.recordingEnabled` adds an optional recording
-  consent to registration and, when the installation can record (Jibri is
-  expected, or `RECORDER_CONTROLLER_URL` is set:
-  `app/src/lib/recording/availability.ts`), a notice in the waiting room and,
+  consent to registration and, when something can record the event (Jibri is
+  expected, or `RECORDER_CONTROLLER_URL` is set and the event keeps per-person
+  tracks: `recordingAvailableFor` in `app/src/lib/recording/availability.ts`),
+  a notice in the waiting room and,
   for whoever has not consented, a box there. Nobody is kept out, and whoever
   speaks without the consent is not recorded: `mod_pa_media_lock` marks their
   presence from the token, and Jitsi's `hidden-from-recorder` feature keeps that
@@ -207,7 +208,9 @@ are in `app/src/lib/recording/destination.ts`.
 - **Without a video.** Where the installation records no composite video
   (`voceNelVideo` is `assente`), the box says so
   (`gdpr.consent.recordingNoVideo`) and the consent declares no destination.
-  The event can still hold one, for a file uploaded later. If the installation
+  An event without per-person tracks records nothing there: no box, no notice
+  and no recording command. The event can still hold a destination, for a file
+  uploaded later. If the installation
   adds the video afterwards, those consents no longer cover an event with a
   destination, and the person is asked again in the room.
 - **What else follows.** With a recording reserved by its destination, or by

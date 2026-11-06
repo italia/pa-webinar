@@ -4,7 +4,13 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
 
-import { recordingAvailable, tracceDisponibili, voceNelVideo } from './availability';
+import {
+  eventoRegistrabile,
+  recordingAvailable,
+  recordingAvailableFor,
+  tracceDisponibili,
+  voceNelVideo,
+} from './availability';
 
 // Jitsi installato dal chart: l'unico caso in cui l'assenza di un registratore
 // e' certa.
@@ -90,5 +96,46 @@ describe('tracceDisponibili', () => {
 
   it('un indirizzo vuoto del registratore non conta', () => {
     expect(tracceDisponibili({ ...CHART, RECORDER_CONTROLLER_URL: '  ' })).toBe(false);
+  });
+});
+
+describe('eventoRegistrabile', () => {
+  const CON_TRACCE = {
+    recordingEnabled: true,
+    aiTranscriptEnabled: true,
+    multitrackRecordingEnabled: true,
+  };
+  const SENZA_TRACCE = { ...CON_TRACCE, multitrackRecordingEnabled: false };
+  const ambiente = {
+    registrazioneDisponibile: true,
+    voce: 'assente' as const,
+    tracceDisponibili: true,
+  };
+
+  it('senza video e senza tracce non si registra niente', () => {
+    expect(eventoRegistrabile(SENZA_TRACCE, ambiente)).toBe(false);
+    expect(eventoRegistrabile({ ...CON_TRACCE, aiTranscriptEnabled: false }, ambiente)).toBe(false);
+    expect(eventoRegistrabile(CON_TRACCE, { ...ambiente, tracceDisponibili: false })).toBe(false);
+  });
+
+  it('senza video le tracce bastano', () => {
+    expect(eventoRegistrabile(CON_TRACCE, ambiente)).toBe(true);
+  });
+
+  it.each(['rimovibile', 'fissa'] as const)('con un video (%s) non servono le tracce', (voce) => {
+    expect(eventoRegistrabile(SENZA_TRACCE, { ...ambiente, voce })).toBe(true);
+  });
+
+  it("senza nulla che registri non basta l'evento", () => {
+    expect(
+      eventoRegistrabile(CON_TRACCE, { ...ambiente, registrazioneDisponibile: false }),
+    ).toBe(false);
+  });
+
+  it("recordingAvailableFor legge l'ambiente", () => {
+    const soloRegistratore = { ...CHART, RECORDER_CONTROLLER_URL: 'http://recorder' };
+    expect(recordingAvailableFor(SENZA_TRACCE, soloRegistratore)).toBe(false);
+    expect(recordingAvailableFor(CON_TRACCE, soloRegistratore)).toBe(true);
+    expect(recordingAvailableFor(SENZA_TRACCE, {})).toBe(true);
   });
 });

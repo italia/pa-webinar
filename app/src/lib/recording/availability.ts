@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
 
 import { jibriRecordingExpected } from '@/lib/infrastructure';
+import { tracceConfigurate } from '@/lib/live/capture-state';
 import type { VoceNelVideo } from '@/lib/live/consent-rule';
 
 /**
@@ -57,4 +58,41 @@ export function voceNelVideo(env: Record<string, string | undefined> = process.e
   const conJibri = !jitsiDelChart || jibriRecordingExpected(env) || !!env.JIBRI_HEALTH_URL?.trim();
   if (!conJibri) return 'assente';
   return env.RECORDING_VOICE_EXCLUSION?.trim() === 'true' ? 'rimovibile' : 'fissa';
+}
+
+/**
+ * Se c'e' qualcosa che possa registrare questo evento: la regola unica di scheda
+ * privacy, modulo d'iscrizione, sala d'attesa, sala e token. Senza un video
+ * completo restano solo le tracce per persona, quindi senza tracce non si
+ * registra niente, e non c'e' niente da annunciare ne' a cui acconsentire. Non
+ * dice se l'evento vuole registrare: quello e' `recordingEnabled`.
+ */
+export function eventoRegistrabile(
+  evento: {
+    recordingEnabled: boolean;
+    aiTranscriptEnabled: boolean;
+    multitrackRecordingEnabled: boolean;
+  },
+  ambiente: {
+    registrazioneDisponibile: boolean;
+    voce: VoceNelVideo;
+    tracceDisponibili: boolean;
+  },
+): boolean {
+  return (
+    ambiente.registrazioneDisponibile &&
+    (ambiente.voce !== 'assente' || tracceConfigurate(evento, ambiente.tracceDisponibili))
+  );
+}
+
+/** `eventoRegistrabile` con i fatti dell'installazione letti dall'ambiente. */
+export function recordingAvailableFor(
+  evento: Parameters<typeof eventoRegistrabile>[0],
+  env: Record<string, string | undefined> = process.env,
+): boolean {
+  return eventoRegistrabile(evento, {
+    registrazioneDisponibile: recordingAvailable(env),
+    voce: voceNelVideo(env),
+    tracceDisponibili: tracceDisponibili(env),
+  });
 }

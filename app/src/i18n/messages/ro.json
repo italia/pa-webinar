@@ -4504,7 +4504,8 @@
       "name": {
         "label": "Numele tău",
         "real": "În sală, în chat și la întrebări apari cu numele tău.",
-        "pseudonym": "În sală, în chat și la întrebări apari cu un pseudonim. Organizatorii văd datele înscrierii. Dacă îți dai consimțământul la transcriere, acolo rămâne numele tău."
+        "pseudonym": "În sală, în chat și la întrebări apari cu un pseudonim. Organizatorii văd datele înscrierii. Dacă îți dai consimțământul la transcriere, acolo rămâne numele tău.",
+        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
       },
       "retention": {
         "label": "Păstrare",

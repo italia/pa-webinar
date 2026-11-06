@@ -161,11 +161,32 @@ describe('destinazione del consenso alla registrazione', () => {
     expect(await prisma.emailOutbox.count()).toBe(0);
   });
 
-  it("dove non c'e' un video vale il testo senza destinazione", async () => {
+  it("senza video e senza tracce non c'e' niente a cui acconsentire", async () => {
     vi.stubEnv('JITSI_WEB_INTERNAL_URL', 'http://jitsi-web');
     vi.stubEnv('JIBRI_HEALTH_URL', '');
     vi.stubEnv('RECORDER_CONTROLLER_URL', 'http://recorder-controller');
     const evento = await eventoAperto({ recordingDestination: 'REGISTRANTS' });
+    const email = nuovaEmail();
+
+    const risposta = await iscriviti(evento.slug, email, { consentRecording: true });
+
+    expect(risposta.status).toBe(201);
+    expect(await iscrizioneDi(email)).toMatchObject({
+      consentRecording: null,
+      consentRecordingDestination: null,
+      consentRecordingVersion: null,
+    });
+  });
+
+  it("dove non c'e' un video vale il testo senza destinazione", async () => {
+    vi.stubEnv('JITSI_WEB_INTERNAL_URL', 'http://jitsi-web');
+    vi.stubEnv('JIBRI_HEALTH_URL', '');
+    vi.stubEnv('RECORDER_CONTROLLER_URL', 'http://recorder-controller');
+    const evento = await eventoAperto({
+      recordingDestination: 'REGISTRANTS',
+      multitrackRecordingEnabled: true,
+      aiTranscriptEnabled: true,
+    });
     const email = nuovaEmail();
 
     const risposta = await iscriviti(evento.slug, email, {

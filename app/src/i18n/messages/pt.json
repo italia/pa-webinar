@@ -4504,7 +4504,8 @@
       "name": {
         "label": "O seu nome",
         "real": "Na sala, no chat e nas perguntas aparece com o seu nome.",
-        "pseudonym": "Na sala, no chat e nas perguntas aparece com um pseudónimo. Quem organiza vê os dados da inscrição. Se consentir na transcrição, nela fica o seu nome."
+        "pseudonym": "Na sala, no chat e nas perguntas aparece com um pseudónimo. Quem organiza vê os dados da inscrição. Se consentir na transcrição, nela fica o seu nome.",
+        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
       },
       "retention": {
         "label": "Conservação",

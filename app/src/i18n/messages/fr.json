@@ -4504,7 +4504,8 @@
       "name": {
         "label": "Votre nom",
         "real": "Dans la salle, dans le chat et dans les questions, vous apparaissez sous votre nom.",
-        "pseudonym": "Dans la salle, dans le chat et dans les questions, vous apparaissez sous un pseudonyme. Les organisateurs voient les données de votre inscription. Si vous consentez à la transcription, votre nom y reste."
+        "pseudonym": "Dans la salle, dans le chat et dans les questions, vous apparaissez sous un pseudonyme. Les organisateurs voient les données de votre inscription. Si vous consentez à la transcription, votre nom y reste.",
+        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
       },
       "retention": {
         "label": "Conservation",

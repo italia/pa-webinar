@@ -19,12 +19,17 @@ import { elencoVisibileAlPubblico } from '@/lib/live/participant-list';
 import { rubricaProposta } from '@/lib/persons/address-book';
 import { MESI_RUBRICA_PREDEFINITI } from '@/lib/persons/retention';
 import {
+  eventoRegistrabile,
   recordingAvailable,
   tracceDisponibili,
   voceNelVideo,
 } from '@/lib/recording/availability';
 import { destinazioneDelTesto } from '@/lib/recording/destination';
-import { traccePerPersonaConservate, trascrizioneDalVideo } from '@/lib/registration/consents';
+import {
+  traccePerPersonaConservate,
+  trascrizioneDalVideo,
+  trascrizioneRichiesta,
+} from '@/lib/registration/consents';
 
 /**
  * La scheda privacy di un evento: cosa succede ai dati di chi partecipa, secondo
@@ -77,6 +82,8 @@ export interface SchedaPrivacy {
     conduceSempre: boolean;
   };
   trascrizione: {
+    /** L'evento chiede il consenso alla trascrizione (`trascrizioneRichiesta`). */
+    chiesta: boolean;
     /** Il testo dei sottotitoli si conserva per chi acconsente. */
     sottotitoli: boolean;
     /** La traccia audio per persona, e cosa ne resta. Null se non si registra. */
@@ -209,8 +216,9 @@ export function schedaPrivacy({
   if (evento.eventType === 'INSTANT') return null;
 
   const { registrazioneDisponibile, voce } = ambiente;
-  const registra = registraChiConduce(evento, registrazioneDisponibile);
-  const video = registra && voce !== 'assente';
+  const registrabile = eventoRegistrabile(evento, ambiente);
+  const siRegistra = registraChiConduce(evento, registrabile);
+  const video = siRegistra && voce !== 'assente';
   const tracce = tracceConfigurate(
     evento,
     registrazioneDisponibile && ambiente.tracceDisponibili
@@ -218,13 +226,12 @@ export function schedaPrivacy({
 
   let modo: ModoRegistrazione = 'nessuna';
   if (video) modo = evento.autoStartRecording ? 'automatica' : 'manuale';
-  else if (tracce) modo = 'soloTracce';
-  const siRegistra = modo !== 'nessuna';
+  else if (siRegistra) modo = 'soloTracce';
 
+  const trascriveVideo = trascrizioneDalVideo(evento, sito, registrazioneDisponibile, voce);
   // `trascrizioneDalVideo` e' vera anche con le tracce per persona, che sono la
   // via che la pipeline prende quando ci sono.
-  const dalVideo =
-    !tracce && trascrizioneDalVideo(evento, sito, registrazioneDisponibile, voce);
+  const dalVideo = !tracce && trascriveVideo;
   const sintesi = siRegistra && evento.aiSummaryEnabled;
   const traduzione = siRegistra && evento.aiTranslationEnabled;
 
@@ -238,6 +245,11 @@ export function schedaPrivacy({
       conduceSempre: siRegistra && conduceSempreRegistrato(evento, voce),
     },
     trascrizione: {
+      chiesta: trascrizioneRichiesta({
+        multitrackRecordingEnabled: evento.multitrackRecordingEnabled && registrabile,
+        captionsTranscript: ambiente.trascrizioneSottotitoli,
+        trascrizioneVideo: trascriveVideo,
+      }),
       sottotitoli: ambiente.trascrizioneSottotitoli,
       tracce: !tracce
         ? null

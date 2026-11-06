@@ -216,7 +216,7 @@ describe('schedaPrivacy, la registrazione', () => {
       chiNonAcconsente: null,
       conduceSempre: false,
     });
-    expect(s.trascrizione).toEqual({ sottotitoli: false, tracce: null, dalVideo: false });
+    expect(s.trascrizione).toEqual({ chiesta: false, sottotitoli: false, tracce: null, dalVideo: false });
     expect(s.conservazione.video).toBeNull();
     expect(s.ia).toEqual({
       sintesi: false,
@@ -246,6 +246,7 @@ describe('schedaPrivacy, la trascrizione', () => {
     // prima le tracce.
     expect(trascrizioneDalVideo(evento, SITO, true, 'rimovibile')).toBe(true);
     expect(scheda(TRACCE).trascrizione).toEqual({
+      chiesta: true,
       sottotitoli: false,
       tracce: 'cancellate',
       dalVideo: false,
@@ -254,6 +255,7 @@ describe('schedaPrivacy, la trascrizione', () => {
 
   it('solo dal video: niente tracce e pipeline accesa', () => {
     expect(scheda().trascrizione).toEqual({
+      chiesta: true,
       sottotitoli: false,
       tracce: null,
       dalVideo: true,
@@ -262,6 +264,7 @@ describe('schedaPrivacy, la trascrizione', () => {
 
   it('con il solo Jibri il flag delle tracce non basta: si trascrive dal video', () => {
     expect(scheda(TRACCE, { tracceDisponibili: false }).trascrizione).toEqual({
+      chiesta: true,
       sottotitoli: false,
       tracce: null,
       dalVideo: true,
@@ -270,6 +273,7 @@ describe('schedaPrivacy, la trascrizione', () => {
 
   it("senza trascrizione sull'evento il registratore per persona non parte", () => {
     expect(scheda({ ...TRACCE, aiTranscriptEnabled: false }).trascrizione).toEqual({
+      chiesta: true,
       sottotitoli: false,
       tracce: null,
       dalVideo: false,
@@ -290,10 +294,34 @@ describe('schedaPrivacy, la trascrizione', () => {
 
   it('i sottotitoli tenuti si dicono accanto alle altre vie', () => {
     expect(scheda(TRACCE, { trascrizioneSottotitoli: true }).trascrizione).toEqual({
+      chiesta: true,
       sottotitoli: true,
       tracce: 'cancellate',
       dalVideo: false,
     });
+  });
+});
+
+describe('schedaPrivacy, se la trascrizione si chiede', () => {
+  const TRACCE = { multitrackRecordingEnabled: true };
+
+  it('senza pipeline, tracce e sottotitoli non la chiede nessuno', () => {
+    expect(scheda({}, {}, { aiPipelineEnabled: false }).trascrizione.chiesta).toBe(false);
+  });
+
+  it('la chiedono le tracce, il video e i sottotitoli tenuti', () => {
+    expect(scheda(TRACCE, {}, { aiPipelineEnabled: false }).trascrizione.chiesta).toBe(true);
+    expect(scheda().trascrizione.chiesta).toBe(true);
+    expect(
+      scheda({}, { trascrizioneSottotitoli: true }, { aiPipelineEnabled: false }).trascrizione
+        .chiesta
+    ).toBe(true);
+  });
+
+  it('il flag delle tracce non basta dove non si registra niente', () => {
+    expect(
+      scheda({ ...TRACCE, aiTranscriptEnabled: false }, { voce: 'assente' }).trascrizione.chiesta
+    ).toBe(false);
   });
 });
 
@@ -646,7 +674,7 @@ describe('schedaPrivacyEvento, sul server', () => {
       SITO
     );
     expect(s?.registrazione.chiNonAcconsente).toBe('restaFuori');
-    expect(s?.trascrizione).toEqual({ sottotitoli: true, tracce: null, dalVideo: true });
+    expect(s?.trascrizione).toEqual({ chiesta: true, sottotitoli: true, tracce: null, dalVideo: true });
     expect(s?.sottotitoli).toEqual({ attivi: true, testoConservato: true });
   });
 

@@ -4504,7 +4504,8 @@
       "name": {
         "label": "Jūsu vārds",
         "real": "Telpā, tērzēšanā un jautājumos jūs parādāties ar savu vārdu.",
-        "pseudonym": "Telpā, tērzēšanā un jautājumos jūs parādāties ar pseidonīmu. Organizatori redz reģistrācijas datus. Ja piekrītat atšifrēšanai, tur paliek jūsu vārds."
+        "pseudonym": "Telpā, tērzēšanā un jautājumos jūs parādāties ar pseidonīmu. Organizatori redz reģistrācijas datus. Ja piekrītat atšifrēšanai, tur paliek jūsu vārds.",
+        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
       },
       "retention": {
         "label": "Glabāšana",

@@ -4504,7 +4504,8 @@
       "name": {
         "label": "Vaše ime",
         "real": "U dvorani, chatu i pitanjima prikazujete se pod svojim imenom.",
-        "pseudonym": "U dvorani, chatu i pitanjima prikazujete se pod pseudonimom. Organizatori vide podatke o vašoj prijavi. Ako date privolu za transkripciju, u transkriptu ostaje vaše ime."
+        "pseudonym": "U dvorani, chatu i pitanjima prikazujete se pod pseudonimom. Organizatori vide podatke o vašoj prijavi. Ako date privolu za transkripciju, u transkriptu ostaje vaše ime.",
+        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
       },
       "retention": {
         "label": "Čuvanje",

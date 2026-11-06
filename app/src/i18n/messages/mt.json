@@ -4504,7 +4504,8 @@
       "name": {
         "label": "Ismek",
         "real": "Fis-sala, fiċ-chat u fil-mistoqsijiet tidher b'ismek.",
-        "pseudonym": "Fis-sala, fiċ-chat u fil-mistoqsijiet tidher b'psewdonimu. Min jorganizza jara d-dejta tar-reġistrazzjoni. Jekk tagħti l-kunsens għat-traskrizzjoni, hemmhekk jibqa' ismek."
+        "pseudonym": "Fis-sala, fiċ-chat u fil-mistoqsijiet tidher b'psewdonimu. Min jorganizza jara d-dejta tar-reġistrazzjoni. Jekk tagħti l-kunsens għat-traskrizzjoni, hemmhekk jibqa' ismek.",
+        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
       },
       "retention": {
         "label": "Żamma",

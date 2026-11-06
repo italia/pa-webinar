@@ -13,7 +13,7 @@
  */
 import { Prisma } from '@prisma/client';
 import type { NextRequest } from 'next/server';
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { siteSettings, tx } = vi.hoisted(() => ({
   siteSettings: {
@@ -419,6 +419,31 @@ describe('POST registrations — presa visione dell\'informativa', () => {
   });
 });
 
+describe('POST registrations — dove non si registra niente', () => {
+  afterEach(() => vi.unstubAllEnvs());
+
+  it('un consenso in arrivo non si salva: niente video e niente tracce', async () => {
+    senzaVideo();
+    eventoCon({ recordingEnabled: true, participantsCanUnmute: true });
+    const res = await iscriviti('anna@example.com', { consentRecording: true });
+    expect(res.status).toBe(201);
+    expect(iscrizioneScritta()).toMatchObject({ consentRecording: null, consentMultitrack: null });
+  });
+
+  it('con le sole tracce il consenso resta', async () => {
+    senzaVideo();
+    eventoCon({
+      recordingEnabled: true,
+      participantsCanUnmute: true,
+      multitrackRecordingEnabled: true,
+      aiTranscriptEnabled: true,
+    });
+    const res = await iscriviti('anna@example.com', { consentRecording: true });
+    expect(res.status).toBe(201);
+    expect(iscrizioneScritta().consentRecording).toBe(true);
+  });
+});
+
 describe('POST registrations — la destinazione del video nel consenso', () => {
   const conRegistrazione = (recordingDestination: 'PUBLIC' | 'REGISTRANTS' | null) =>
     eventoCon({ recordingEnabled: true, participantsCanUnmute: true, recordingDestination });
@@ -518,7 +543,13 @@ describe('POST registrations — la destinazione del video nel consenso', () => 
   it('dove non c\'e\' un video il testo non dichiara la destinazione dell\'evento', async () => {
     senzaVideo();
     try {
-      conRegistrazione('REGISTRANTS');
+      eventoCon({
+        recordingEnabled: true,
+        participantsCanUnmute: true,
+        recordingDestination: 'REGISTRANTS',
+        multitrackRecordingEnabled: true,
+        aiTranscriptEnabled: true,
+      });
       const res = await iscriviti('anna@example.com', {
         consentRecording: true,
         consentRecordingDestination: null,

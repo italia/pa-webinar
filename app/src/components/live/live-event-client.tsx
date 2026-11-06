@@ -681,6 +681,8 @@ export default function LiveEventClient({
     event.voceNelVideo ?? 'fissa',
   );
   const salaSoloAscolto = regolaSala.soloAscolto;
+  // Dove la scheda dice che non si registra niente la sala non offre il comando.
+  const registraInSala = event.recordingEnabled && recordingAvailable;
   const [joinPrefs, setJoinPrefs] = useState<WaitingRoomJoinPrefs>({
     cameraOn: false,
     micOn: false,
@@ -1605,7 +1607,7 @@ export default function LiveEventClient({
 
     if (
       isModerator &&
-      event.recordingEnabled &&
+      registraInSala &&
       jibriReady &&
       !recPromptShownRef.current
     ) {
@@ -1614,7 +1616,7 @@ export default function LiveEventClient({
     }
   }, [
     isModerator,
-    event.recordingEnabled,
+    registraInSala,
     event.slug,
     jibriReady,
     jitsiApi,
@@ -1630,13 +1632,13 @@ export default function LiveEventClient({
       jibriReady &&
       jitsiApi &&
       isModerator &&
-      event.recordingEnabled &&
+      registraInSala &&
       !recPromptShownRef.current
     ) {
       recPromptShownRef.current = true;
       autoOrPromptRecording(jitsiApi);
     }
-  }, [jibriReady, jitsiApi, isModerator, event.recordingEnabled, autoOrPromptRecording]);
+  }, [jibriReady, jitsiApi, isModerator, registraInSala, autoOrPromptRecording]);
   // Authoritative "the user intentionally left" signal from Jitsi's
   // `readyToClose` (native hangup button, our executeCommand('hangup'),
   // moderator "Termina evento"). It fires ONLY on an intentional close,
@@ -2080,7 +2082,7 @@ export default function LiveEventClient({
   }, []);
   const registrazione = useRecordingControl({
     api: jitsiApi,
-    attivo: conduce && event.recordingEnabled,
+    attivo: conduce && registraInSala,
     isRecording,
     faseRegistratore: recorderPhase,
     onAvvioRichiesto: segnaAvvioChiesto,
@@ -2241,7 +2243,7 @@ export default function LiveEventClient({
             maxParticipants: event.maxParticipants ?? 300,
             // L'avviso «questo evento puo' essere registrato» solo dove qualcosa puo'
             // registrare: vedi `recordingAvailable`.
-            recordingEnabled: event.recordingEnabled && recordingAvailable,
+            recordingEnabled: registraInSala,
             tempRecordingUrl: event.tempRecordingUrl,
             videoDisponibile: event.videoDisponibile,
             waitingRoomAudioUrl: event.waitingRoomAudioUrl,
@@ -2308,6 +2310,7 @@ export default function LiveEventClient({
                   chat: chatAccesa,
                   domande: flagsSala?.qaEnabled ?? event.qaEnabled,
                   conduce: isModerator || isSpeaker,
+                  trascrizioneData: haConsensoTracce,
                 })
               : null
           }
@@ -2588,7 +2591,7 @@ export default function LiveEventClient({
           startsAt={event.startsAt}
           endsAt={event.endsAt}
           graceMinutes={event.effectiveGraceMinutes ?? OVERTIME_CAP_DEFAULT_MINUTES}
-          recordingEnabled={event.recordingEnabled}
+          recordingEnabled={registraInSala}
           isRecording={isRecording}
           recordingStartedAt={flagsRegistrazione?.recordingStartedAt ?? null}
           scartoOrologio={scartoOrologio}
@@ -2828,7 +2831,7 @@ export default function LiveEventClient({
               ? {
                   onEnded: handleEndedFromControls,
                   modalContainer,
-                  recordingEnabled: event.recordingEnabled,
+                  recordingEnabled: registraInSala,
                   isRecording,
                   faseRegistratore: recorderPhase,
                   registrazione,

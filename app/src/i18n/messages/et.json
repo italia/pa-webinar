@@ -4504,7 +4504,8 @@
       "name": {
         "label": "Sinu nimi",
         "real": "Ruumis, vestluses ja küsimustes oled nähtav oma nimega.",
-        "pseudonym": "Ruumis, vestluses ja küsimustes oled nähtav pseudonüümiga. Korraldajad näevad sinu registreerumisandmeid. Kui nõustud transkribeerimisega, jääb sinu nimi transkriptsiooni."
+        "pseudonym": "Ruumis, vestluses ja küsimustes oled nähtav pseudonüümiga. Korraldajad näevad sinu registreerumisandmeid. Kui nõustud transkribeerimisega, jääb sinu nimi transkriptsiooni.",
+        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
       },
       "retention": {
         "label": "Säilitamine",

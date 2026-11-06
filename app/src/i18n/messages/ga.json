@@ -4504,7 +4504,8 @@
       "name": {
         "label": "D'ainm",
         "real": "Sa seomra, sa chomhrá agus sna ceisteanna taispeántar thú faoi d'ainm féin.",
-        "pseudonym": "Sa seomra, sa chomhrá agus sna ceisteanna taispeántar thú faoi ainm cleite. Feiceann na heagraithe do shonraí cláraithe. Má thoilíonn tú leis an tras-scríobh, fanann d'ainm sa tras-scríbhinn."
+        "pseudonym": "Sa seomra, sa chomhrá agus sna ceisteanna taispeántar thú faoi ainm cleite. Feiceann na heagraithe do shonraí cláraithe. Má thoilíonn tú leis an tras-scríobh, fanann d'ainm sa tras-scríbhinn.",
+        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
       },
       "retention": {
         "label": "Coinneáil",

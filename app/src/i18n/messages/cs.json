@@ -4504,7 +4504,8 @@
       "name": {
         "label": "Vaše jméno",
         "real": "V místnosti, v chatu a v otázkách se zobrazujete pod svým jménem.",
-        "pseudonym": "V místnosti, v chatu a v otázkách se zobrazujete pod pseudonymem. Pořadatelé vidí údaje z registrace. Pokud souhlasíte s přepisem, vaše jméno v něm zůstane."
+        "pseudonym": "V místnosti, v chatu a v otázkách se zobrazujete pod pseudonymem. Pořadatelé vidí údaje z registrace. Pokud souhlasíte s přepisem, vaše jméno v něm zůstane.",
+        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
       },
       "retention": {
         "label": "Uchovávání",

@@ -4504,7 +4504,8 @@
       "name": {
         "label": "Jūsų vardas",
         "real": "Salėje, pokalbyje ir klausimuose rodomas jūsų vardas.",
-        "pseudonym": "Salėje, pokalbyje ir klausimuose rodomas jūsų slapyvardis. Organizatoriai mato jūsų registracijos duomenis. Jei sutinkate su transkripcija, joje lieka jūsų vardas."
+        "pseudonym": "Salėje, pokalbyje ir klausimuose rodomas jūsų slapyvardis. Organizatoriai mato jūsų registracijos duomenis. Jei sutinkate su transkripcija, joje lieka jūsų vardas.",
+        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
       },
       "retention": {
         "label": "Saugojimas",

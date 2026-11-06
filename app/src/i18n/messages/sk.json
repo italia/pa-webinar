@@ -4504,7 +4504,8 @@
       "name": {
         "label": "Vaše meno",
         "real": "V miestnosti, v chate a v otázkach sa zobrazujete pod svojím menom.",
-        "pseudonym": "V miestnosti, v chate a v otázkach sa zobrazujete pod pseudonymom. Organizátori vidia údaje z registrácie. Ak súhlasíte s prepisom, v ňom zostáva vaše meno."
+        "pseudonym": "V miestnosti, v chate a v otázkach sa zobrazujete pod pseudonymom. Organizátori vidia údaje z registrácie. Ak súhlasíte s prepisom, v ňom zostáva vaše meno.",
+        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
       },
       "retention": {
         "label": "Uchovávanie",

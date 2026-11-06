@@ -955,8 +955,7 @@ export default function RegistrationFormClient({
             )}
           </FormGroup>
         )}
-        {/* Dove la scheda dice che non si registra niente, qui non si annuncia. */}
-        {richiesti.avvisoRegistrazione && schedaPrivacy?.registrazione.modo !== 'nessuna' && (
+        {richiesti.avvisoRegistrazione && (
           <p className="registration-consents__notice mb-3">
             {tg(voce === 'fissa' ? 'consent.recordingNotice' : 'consent.recordingNoticeVoice')}
           </p>

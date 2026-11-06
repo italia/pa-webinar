@@ -4504,7 +4504,8 @@
       "name": {
         "label": "Nimesi",
         "real": "Huoneessa, chatissa ja kysymyksissä näyt omalla nimelläsi.",
-        "pseudonym": "Huoneessa, chatissa ja kysymyksissä näyt salanimellä. Järjestäjät näkevät ilmoittautumistietosi. Jos annat suostumuksen litterointiin, nimesi jää siihen."
+        "pseudonym": "Huoneessa, chatissa ja kysymyksissä näyt salanimellä. Järjestäjät näkevät ilmoittautumistietosi. Jos annat suostumuksen litterointiin, nimesi jää siihen.",
+        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
       },
       "retention": {
         "label": "Säilytys",

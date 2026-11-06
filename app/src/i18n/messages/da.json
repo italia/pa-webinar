@@ -4504,7 +4504,8 @@
       "name": {
         "label": "Dit navn",
         "real": "I rummet, i chatten og i spørgsmålene vises du med dit navn.",
-        "pseudonym": "I rummet, i chatten og i spørgsmålene vises du under et pseudonym. Arrangørerne kan se dine tilmeldingsdata. Hvis du giver samtykke til transskriptionen, står dit navn der fortsat."
+        "pseudonym": "I rummet, i chatten og i spørgsmålene vises du under et pseudonym. Arrangørerne kan se dine tilmeldingsdata. Hvis du giver samtykke til transskriptionen, står dit navn der fortsat.",
+        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
       },
       "retention": {
         "label": "Opbevaring",

@@ -934,7 +934,7 @@ describe('sala d\'attesa — la scheda privacy', () => {
       chiNonAcconsente: 'restaFuori',
       conduceSempre: false,
     },
-    trascrizione: { sottotitoli: false, tracce: null, dalVideo: false },
+    trascrizione: { chiesta: false, sottotitoli: false, tracce: null, dalVideo: false },
     sottotitoli: { attivi: true, testoConservato: false },
     ia: { sintesi: true, traduzione: false, doppiaggio: false, elaborabileDopo: false },
     chat: { attiva: true, domandeAttive: true, esitoDomande: 'soloTesto' },

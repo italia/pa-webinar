@@ -393,7 +393,7 @@ describe('RegistrationFormClient — la scheda privacy', () => {
       chiNonAcconsente: 'restaFuori',
       conduceSempre: false,
     },
-    trascrizione: { sottotitoli: false, tracce: null, dalVideo: false },
+    trascrizione: { chiesta: false, sottotitoli: false, tracce: null, dalVideo: false },
     sottotitoli: { attivi: false, testoConservato: false },
     ia: { sintesi: true, traduzione: false, doppiaggio: false, elaborabileDopo: false },
     chat: { attiva: true, domandeAttive: true, esitoDomande: 'nonPubblicate' },
@@ -490,8 +490,13 @@ describe('RegistrationFormClient — la scheda privacy', () => {
       registrazione: { ...SCHEDA.registrazione, modo },
     });
 
-    it('dove la scheda dice che non si registra niente, non si annuncia', () => {
-      conScheda({ ...senzaPresenza, voce: 'assente', schedaPrivacy: conModo('nessuna') });
+    it('dove la pagina dice che non si registra niente, non si annuncia', () => {
+      conScheda({
+        ...senzaPresenza,
+        recordingEnabled: false,
+        voce: 'assente',
+        schedaPrivacy: conModo('nessuna'),
+      });
       expect(container.textContent).toContain(sheet.recording.none);
       expect(container.textContent).not.toContain(recordingNoticeVoice);
       expect(container.textContent).not.toContain(recordingNotice);

@@ -195,6 +195,7 @@ interface PropsClient {
   event: Record<string, unknown> & { postEventShow: { qa: boolean } };
   hasRecordingConsent?: boolean;
   hasMultitrackConsent?: boolean;
+  recordingAvailable?: boolean;
 }
 
 /** Le props con cui la pagina ha chiamato il client, in uno dei due rami. */
@@ -278,6 +279,29 @@ describe('sala — la scheda privacy', () => {
     const { event } = await clientProps();
     expect(event.voceNelVideo).toBe('assente');
     expect(scheda({ event } as PropsClient)?.registrazione.destinazione).toBeNull();
+  });
+
+  describe('dove la scheda dice che non si registra niente', () => {
+    beforeEach(() => {
+      vi.stubEnv('JITSI_WEB_INTERNAL_URL', 'http://jitsi-web');
+      vi.stubEnv('RECORDER_CONTROLLER_URL', 'http://recorder-controller');
+    });
+
+    it('la sala non ha niente da chiedere', async () => {
+      conEvento({ multitrackRecordingEnabled: true, aiTranscriptEnabled: false });
+      const props = await clientProps();
+      expect(scheda(props)?.registrazione.modo).toBe('nessuna');
+      expect(props.recordingAvailable).toBe(false);
+      expect(props.event.multitrackRecordingEnabled).toBe(false);
+    });
+
+    it('con le sole tracce si chiede', async () => {
+      conEvento({ multitrackRecordingEnabled: true, aiTranscriptEnabled: true });
+      const props = await clientProps();
+      expect(scheda(props)?.registrazione.modo).toBe('soloTracce');
+      expect(props.recordingAvailable).toBe(true);
+      expect(props.event.multitrackRecordingEnabled).toBe(true);
+    });
   });
 
   it('la disclosure dell\'amministrazione resta nella lingua della pagina', async () => {

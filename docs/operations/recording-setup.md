@@ -324,7 +324,9 @@ template are not rendered, and the app's notification fails harmlessly with a
 logged warning (`[jvb] dispatch recorder best-effort fallito`) each time the
 scaler or the lifecycle cron opens a room. Setting `RECORDER_CONTROLLER_URL`
 also makes the live room treat the installation as able to record, so events
-with recording on show the recording notice and ask for consent.
+with recording on show the recording notice and ask for consent. Without Jibri
+that holds only for events that keep per-person tracks: the others record
+nothing and ask nothing.
 
 A bot starts only when all of these hold:
 

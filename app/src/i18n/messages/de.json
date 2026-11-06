@@ -4504,7 +4504,8 @@
       "name": {
         "label": "Ihr Name",
         "real": "Im Raum, im Chat und bei den Fragen erscheinen Sie unter Ihrem Namen.",
-        "pseudonym": "Im Raum, im Chat und bei den Fragen erscheinen Sie unter einem Pseudonym. Die Veranstalter sehen Ihre Anmeldedaten. Wenn Sie in die Transkription einwilligen, bleibt dort Ihr Name stehen."
+        "pseudonym": "Im Raum, im Chat und bei den Fragen erscheinen Sie unter einem Pseudonym. Die Veranstalter sehen Ihre Anmeldedaten. Wenn Sie in die Transkription einwilligen, bleibt dort Ihr Name stehen.",
+        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
       },
       "retention": {
         "label": "Aufbewahrung",

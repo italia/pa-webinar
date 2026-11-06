@@ -4504,7 +4504,8 @@
       "name": {
         "label": "Az Ön neve",
         "real": "A teremben, a csevegésben és a kérdéseknél a saját nevén jelenik meg.",
-        "pseudonym": "A teremben, a csevegésben és a kérdéseknél álnéven jelenik meg. A szervezők látják a regisztrációs adatait. Ha hozzájárul az átirathoz, ott a neve megmarad."
+        "pseudonym": "A teremben, a csevegésben és a kérdéseknél álnéven jelenik meg. A szervezők látják a regisztrációs adatait. Ha hozzájárul az átirathoz, ott a neve megmarad.",
+        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
       },
       "retention": {
         "label": "Megőrzés",

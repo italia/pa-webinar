@@ -4504,7 +4504,8 @@
       "name": {
         "label": "Twoje imię i nazwisko",
         "real": "W sali, na czacie i w pytaniach występujesz pod swoim imieniem i nazwiskiem.",
-        "pseudonym": "W sali, na czacie i w pytaniach występujesz pod pseudonimem. Organizatorzy widzą dane rejestracji. Jeśli wyrazisz zgodę na transkrypcję, pozostanie w niej Twoje imię i nazwisko."
+        "pseudonym": "W sali, na czacie i w pytaniach występujesz pod pseudonimem. Organizatorzy widzą dane rejestracji. Jeśli wyrazisz zgodę na transkrypcję, pozostanie w niej Twoje imię i nazwisko.",
+        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
       },
       "retention": {
         "label": "Przechowywanie",

@@ -4504,7 +4504,8 @@
       "name": {
         "label": "Je naam",
         "real": "In de zaal, in de chat en bij vragen verschijn je onder je eigen naam.",
-        "pseudonym": "In de zaal, in de chat en bij vragen verschijn je onder een pseudoniem. De organisatoren zien je inschrijvingsgegevens. Als je toestemming geeft voor de transcriptie, blijft je naam daarin staan."
+        "pseudonym": "In de zaal, in de chat en bij vragen verschijn je onder een pseudoniem. De organisatoren zien je inschrijvingsgegevens. Als je toestemming geeft voor de transcriptie, blijft je naam daarin staan.",
+        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
       },
       "retention": {
         "label": "Bewaring",

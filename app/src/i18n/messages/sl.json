@@ -4504,7 +4504,8 @@
       "name": {
         "label": "Vaše ime",
         "real": "V dvorani, klepetu in vprašanjih ste prikazani s svojim imenom.",
-        "pseudonym": "V dvorani, klepetu in vprašanjih ste prikazani pod psevdonimom. Organizatorji vidijo podatke o prijavi. Če privolite v prepis, tam ostane vaše ime."
+        "pseudonym": "V dvorani, klepetu in vprašanjih ste prikazani pod psevdonimom. Organizatorji vidijo podatke o prijavi. Če privolite v prepis, tam ostane vaše ime.",
+        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
       },
       "retention": {
         "label": "Hramba",
