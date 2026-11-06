@@ -3834,7 +3834,7 @@
         "speakers": "Relatori e chi modera",
         "speakersDesc": "Il pubblico scrive in chat e fa domande"
       },
-      "recQ": "Vuoi poter registrare?",
+      "recQ": "Vuoi poter registrare, e per chi?",
       "rec": {
         "yes": "Sì, quando premi REC",
         "yesDesc": "Dopo l'evento: trascrizione, sintesi e traduzione",

@@ -3,7 +3,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { elencoPredefinito, elencoVisibileAlPubblico } from './participant-list';
+import { VASTA_SCALA, elencoPredefinito, elencoVisibileAlPubblico } from './participant-list';
 
 describe('elencoVisibileAlPubblico', () => {
   it("di default e' nascosto", () => {
@@ -41,6 +41,8 @@ describe('elencoPredefinito', () => {
   it('resta nascosto su vasta scala, anche se parlano tutti', () => {
     expect(elencoPredefinito({ participantsCanUnmute: true, maxParticipants: 100 })).toBe(true);
     expect(elencoPredefinito({ participantsCanUnmute: true, maxParticipants: 300 })).toBe(false);
+    expect(elencoPredefinito({ participantsCanUnmute: true, maxParticipants: VASTA_SCALA - 1 })).toBe(true);
+    expect(elencoPredefinito({ participantsCanUnmute: true, maxParticipants: VASTA_SCALA })).toBe(false);
   });
 
   it('resta nascosto dove il pubblico ascolta soltanto', () => {

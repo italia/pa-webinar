@@ -3624,7 +3624,7 @@
         "speakers": "Speakers and moderators",
         "speakersDesc": "The audience writes in the chat and asks questions"
       },
-      "recQ": "Do you want to be able to record?",
+      "recQ": "Do you want to be able to record, and for whom?",
       "rec": {
         "yes": "Yes, when you press REC",
         "yesDesc": "After the event: transcript, summary and translation",
