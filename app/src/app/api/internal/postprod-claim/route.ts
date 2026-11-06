@@ -59,8 +59,11 @@ import { ingressoResoconto } from '@/lib/report/input';
 import { scriviNumeriResoconto } from '@/lib/report/job';
 import { metricheResoconto } from '@/lib/report/metrics';
 import { MOTIVO_MOTORE_ASSENTE } from '@/lib/text-translation/enqueue';
-import { endpointConConsenso, endpointRitirati } from '@/lib/captions/room';
-import { VERSIONE_TESTO_TRASCRIZIONE } from '@/lib/registration/consents';
+import {
+  chiudiLavoroPresoSenzaTracce,
+  tracceUtilizzabili,
+  type RegistrazioneConTracce,
+} from '@/lib/ai/track-inputs';
 
 export const dynamic = 'force-dynamic';
 
@@ -340,7 +343,14 @@ export const POST = withErrorHandling(async (request) => {
     // signed URL + l'identità certa (dal JWT del portale, decifrata qui)
     // + l'offset per il merge. Il worker trascrive ogni traccia senza
     // diarization e fonde via multitrack.merge_tracks.
-    inputs.push(...(await tracceAlWorker(recording, lease, { daTrascrivere: true })));
+    const tracce = await tracceAlWorker(recording, lease, { daTrascrivere: true });
+    // Le tracce sono sparite dopo l'accodamento: al worker il lavoro fallirebbe a
+    // ogni tentativo, quindi si chiude qui.
+    if (tracce.length === 0) {
+      await chiudiLavoroPresoSenzaTracce(row.id, recording.id, row.attempts);
+      return new Response(null, { status: 204 });
+    }
+    inputs.push(...tracce);
   }
 
   if (row.kind === 'ARCHIVE') {
@@ -681,21 +691,14 @@ async function rispostaTraduzioneTesti(
 
 /**
  * Le tracce per partecipante da passare al worker (trascrizione multitraccia,
- * archivio): quelle ancora presenti, con l'identita' certa (dal JWT del
- * portale, decifrata qui), l'offset per il merge e un indirizzo firmato. Chi
- * ha ritirato dalla sala il consenso alla trascrizione dopo che la sua traccia
- * era gia' registrata non passa piu' (lib/captions/room endpointRitirati).
- *
- * Su una registrazione con il segno `transcriptConsentRule` il nome passa solo
- * con un consenso al testo che lo comprende, e con lo stesso consenso la traccia
- * passa alla trascrizione (`daTrascrivere`): chi aveva acconsentito alla sola
- * traccia audio non ha acconsentito a questo. All'archivio la traccia passa con
- * ogni versione, il nome no. Senza nome al worker, nome e voce non si legano mai:
- * l'etichetta della voce resta anonima nella sintesi e nell'archivio.
- * Il nome dato dallo staff alla voce resta com'e'.
+ * archivio): quelle utilizzabili (lib/ai/track-inputs), con l'identita' certa
+ * (dal JWT del portale, decifrata qui), l'offset per il merge e un indirizzo
+ * firmato. Senza nome al worker, nome e voce non si legano mai: l'etichetta
+ * della voce resta anonima nella sintesi e nell'archivio. Il nome dato dallo
+ * staff alla voce resta com'e'.
  */
 async function tracceAlWorker(
-  recording: { id: string; eventId: string; transcriptConsentRule: boolean },
+  recording: RegistrazioneConTracce,
   lease: number,
   { daTrascrivere }: { daTrascrivere: boolean },
 ): Promise<Array<{
@@ -706,31 +709,14 @@ async function tracceAlWorker(
   displayName: string | null;
   startOffsetMs: number;
 }>> {
-  const tracks = await prisma.recordingTrack.findMany({
-    where: { recordingId: recording.id, audioPurgedAt: null },
-    select: { participantId: true, displayName: true, blobKey: true, startOffsetMs: true },
-    orderBy: { startOffsetMs: 'asc' },
-  });
-  const endpoint = [...new Set(tracks.map((tr) => tr.participantId))];
-  const [ritirati, nominabili] = await Promise.all([
-    endpointRitirati(recording.eventId, endpoint),
-    recording.transcriptConsentRule
-      ? endpointConConsenso(recording.eventId, endpoint, VERSIONE_TESTO_TRASCRIZIONE)
-      : null,
-  ]);
   const tracce = [];
-  for (const tr of tracks) {
-    if (ritirati.has(tr.participantId)) continue;
-    if (daTrascrivere && nominabili && !nominabili.has(tr.participantId)) continue;
+  for (const tr of await tracceUtilizzabili(prisma, recording, { daTrascrivere })) {
     tracce.push({
       role: 'track' as const,
       downloadUrl: await presignArtifactDownload({ blobKey: tr.blobKey, expiresInMinutes: lease }),
       blobKey: tr.blobKey,
       participantId: tr.participantId,
-      displayName:
-        tr.displayName && (nominabili?.has(tr.participantId) ?? true)
-          ? tryDecryptPII(tr.displayName)
-          : null,
+      displayName: tr.displayName && tr.nominabile ? tryDecryptPII(tr.displayName) : null,
       startOffsetMs: tr.startOffsetMs,
     });
   }

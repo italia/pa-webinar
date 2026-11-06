@@ -95,7 +95,17 @@ export const POST = withErrorHandling(async (request, context) => {
         status: 'POSTPROD_QUEUED',
       },
     });
-    return enqueuePostprodForRecording(tx, { recordingId: recording.id, allVoicesConsented });
+    const esito = await enqueuePostprodForRecording(tx, { recordingId: recording.id, allVoicesConsented });
+    // Niente da rilanciare: l'errore riporta indietro contatore e stato, e il
+    // manifest accodera' la pipeline all'arrivo delle tracce.
+    if (esito.tracksPending) {
+      throw new AppError(
+        'The tracks of this recording have not arrived yet: the transcription starts when they do.',
+        409,
+        'TRACKS_PENDING',
+      );
+    }
+    return esito;
   });
 
   await logAdminAction({

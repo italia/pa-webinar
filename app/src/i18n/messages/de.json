@@ -681,6 +681,7 @@
       "working": "Wird aktualisiert…",
       "error": "Die Einwilligung konnte nicht aktualisiert werden: Bitte versuchen Sie es erneut.",
       "textChanged": "Der Text der Einwilligung hat sich geändert, nachdem Sie diese Seite geöffnet haben: Lesen Sie den neuen Text und bestätigen Sie, wenn Sie einverstanden sind.",
+      "closeNotice": "Close this notice: your consents stay under the button at the top",
       "recording": {
         "title": "Aufzeichnung der Veranstaltung",
         "give": "Ich willige in die Aufzeichnung ein",
@@ -5979,6 +5980,8 @@
     "recordingWithoutMedia": "Diese Aufzeichnung hat kein Video: Ihr Transkript stammt aus den Live-Untertiteln.",
     "recordingWithoutVideo": "Von dieser Aufzeichnung gibt es die Audiospuren der Teilnehmenden, aber kein Video: Es wurde nicht aufgezeichnet oder ist noch nicht angekommen. Das herunterladbare Archiv benötigt auch das Video.",
     "noParticipantTracks": "Es gibt keine getrennten Audiospuren der Teilnehmenden: Sie wurden nicht aufgezeichnet oder sind bereits gelöscht. Schalten Sie dafür vor der Veranstaltung die Aufzeichnung pro Person ein.",
+    "noTranscribableTracks": "No track of this recording can be transcribed: they were deleted, or the people in them did not consent to a transcription with their name.",
+    "tracksPending": "The tracks of this recording have not arrived yet: the transcription will start by itself when they do.",
     "summaryMissing": "Für diese Sprache gibt es noch keine Zusammenfassung zum Bearbeiten: Erstellen Sie sie zuerst.",
     "storageUnavailable": "Das Hochladen von Dateien ist in dieser Installation nicht verfügbar.",
     "aiDisabledForEvent": "Die KI ist für diese Veranstaltung ausgeschaltet: Mit „KI erzeugen“ schalten Sie sie ein und starten die Pipeline.",

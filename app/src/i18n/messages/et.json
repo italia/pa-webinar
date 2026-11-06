@@ -681,6 +681,7 @@
       "working": "Uuendamine…",
       "error": "Nõusolekut ei õnnestunud uuendada: proovi uuesti.",
       "textChanged": "Nõusoleku tekst muutus pärast seda, kui selle lehe avasid: loe uus tekst läbi ja kinnita, kui oled nõus.",
+      "closeNotice": "Close this notice: your consents stay under the button at the top",
       "recording": {
         "title": "Ürituse salvestamine",
         "give": "Annan nõusoleku salvestamiseks",
@@ -5979,6 +5980,8 @@
     "recordingWithoutMedia": "Sellel salvestusel pole videot: selle transkriptsioon pärineb otseülekande subtiitritest.",
     "recordingWithoutVideo": "Sellest salvestisest on osalejate helirajad, aga mitte videot: seda ei salvestatud või see pole veel saabunud. Allalaaditav arhiiv vajab ka videot.",
     "noParticipantTracks": "Osalejate eraldi helirajad puuduvad: neid ei salvestatud või need on juba kustutatud. Nende saamiseks lülita enne üritust sisse osalejapõhine salvestamine.",
+    "noTranscribableTracks": "No track of this recording can be transcribed: they were deleted, or the people in them did not consent to a transcription with their name.",
+    "tracksPending": "The tracks of this recording have not arrived yet: the transcription will start by itself when they do.",
     "summaryMissing": "Selles keeles pole veel muudetavat kokkuvõtet: loo see kõigepealt.",
     "storageUnavailable": "Failide üleslaadimine pole selles paigalduses saadaval.",
     "aiDisabledForEvent": "Tehisintellekt on selle ürituse jaoks välja lülitatud: kasuta nuppu „Loo AI“, et see sisse lülitada ja töötlus käivitada.",

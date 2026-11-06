@@ -9,6 +9,8 @@ vi.mock('@/lib/db', () => ({
   prisma: { siteSetting: { findUnique: vi.fn() }, $queryRaw: vi.fn() },
 }));
 vi.mock('@/lib/auth/cron', () => ({ assertCronApiKey: vi.fn() }));
+const chiudiSenzaTracce = vi.hoisted(() => vi.fn(async () => 0));
+vi.mock('@/lib/ai/track-inputs', () => ({ chiudiLavoriInCodaSenzaTracce: chiudiSenzaTracce }));
 
 import { prisma } from '@/lib/db';
 
@@ -35,6 +37,33 @@ afterEach(() => {
 });
 
 describe('GET /api/internal/postprod-pending', () => {
+  it('chiude i lavori senza tracce prima di contare: è la conta ad accendere la GPU', async () => {
+    fn(prisma.$queryRaw).mockResolvedValue([]);
+    await call();
+    expect(chiudiSenzaTracce.mock.invocationCallOrder[0]!).toBeLessThan(
+      fn(prisma.$queryRaw).mock.invocationCallOrder[0]!
+    );
+  });
+
+  it('se quel controllo fallisce la coda risponde lo stesso', async () => {
+    const avviso = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    chiudiSenzaTracce.mockRejectedValueOnce(new Error('database'));
+    fn(prisma.$queryRaw).mockResolvedValue([
+      { runnable: 1n, claimed: 0n, running: 0n, gpu_runnable: 1n, gpu_claimed: 0n },
+    ]);
+    const risposta = await call();
+    expect(risposta.status).toBe(200);
+    expect(await risposta.json()).toMatchObject({ desiredGpu: 1 });
+    expect(avviso).toHaveBeenCalled();
+    avviso.mockRestore();
+  });
+
+  it('a pipeline in pausa non controlla niente', async () => {
+    fn(prisma.siteSetting.findUnique).mockResolvedValue({ aiPipelineEnabled: false, aiMaxConcurrentJobs: 2 });
+    await call();
+    expect(chiudiSenzaTracce).not.toHaveBeenCalled();
+  });
+
   it('separa il lavoro per il worker con la GPU (trascrizione) da quello senza', async () => {
     // 3 pronti + 1 preso; fra questi una trascrizione pronta.
     fn(prisma.$queryRaw).mockResolvedValue([

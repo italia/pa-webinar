@@ -186,8 +186,11 @@ export default function RecordingManageClient({
         const data = (await r.json().catch(() => null)) as {
           enqueued?: number;
           skippedExisting?: number;
+          tracksPending?: boolean;
         } | null;
-        if (data?.enqueued === 0) {
+        if (data?.tracksPending) {
+          toast.success(tApi('tracksPending'));
+        } else if (data?.enqueued === 0) {
           if ((data.skippedExisting ?? 0) > 0) {
             toast.success(t('manageRerunAlreadyQueued'));
             window.location.reload();

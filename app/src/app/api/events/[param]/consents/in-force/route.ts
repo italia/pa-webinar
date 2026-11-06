@@ -12,8 +12,8 @@
  * dato, e nel corpo, perche' un token non finisca nei log di un indirizzo.
  *
  * Le stesse persone chiedono nello stesso momento quando cambia il flag, e un
- * ufficio esce da un solo indirizzo: il limite e' largo, e una richiesta scartata
- * lascia solo lo stato di prima, verso il chiuso.
+ * ufficio esce da un solo indirizzo: il limite e' largo e scala con quelli della
+ * sala, e una richiesta scartata lascia solo lo stato di prima, verso il chiuso.
  */
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { postoDaTokenSala } from '@/lib/auth/jwt';
@@ -23,6 +23,7 @@ import { consensiInVigoreDeiPosti } from '@/lib/live/consents-in-force';
 import { getClientIp, rateLimit } from '@/lib/rate-limit';
 import { voceNelVideo } from '@/lib/recording/availability';
 import { destinazioneDelTesto } from '@/lib/recording/destination';
+import { limiteDellaSala } from '@/lib/room-rate-limit';
 import { consentsInForceSchema } from '@/lib/validation/schemas';
 
 export const dynamic = 'force-dynamic';
@@ -31,7 +32,7 @@ export const POST = withErrorHandling(async (request, context) => {
   const { param: slug } = await context.params;
 
   const ip = getClientIp(request);
-  const rl = rateLimit(`consents-in-force:${ip}`, { limit: 300, windowMs: 60_000 });
+  const rl = rateLimit(`consents-in-force:${ip}`, { limit: limiteDellaSala(300), windowMs: 60_000 });
   if (!rl.allowed) throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
 
   const parsed = consentsInForceSchema.safeParse(await parseJsonBody(request));

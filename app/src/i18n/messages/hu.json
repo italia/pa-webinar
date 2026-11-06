@@ -681,6 +681,7 @@
       "working": "Frissítés folyamatban…",
       "error": "A hozzájárulást nem sikerült frissíteni: próbálja újra.",
       "textChanged": "A hozzájárulás szövege megváltozott az oldal megnyitása óta: olvassa el az újat, és ha egyetért, erősítse meg.",
+      "closeNotice": "Close this notice: your consents stay under the button at the top",
       "recording": {
         "title": "Az esemény felvétele",
         "give": "Hozzájárulok a felvételhez",
@@ -5979,6 +5980,8 @@
     "recordingWithoutMedia": "Ennek a felvételnek nincs videója: az átirata az élő feliratokból származik.",
     "recordingWithoutVideo": "Erről a felvételről megvannak a résztvevők hangsávjai, de a videó nincs: nem rögzítették, vagy még nem érkezett meg. A letölthető archívumhoz a videó is kell.",
     "noParticipantTracks": "Nincsenek külön hangsávok a résztvevőkről: nem rögzítették őket, vagy már törölték. Ha szükség van rájuk, az esemény előtt kapcsolja be a résztvevőnkénti felvételt.",
+    "noTranscribableTracks": "No track of this recording can be transcribed: they were deleted, or the people in them did not consent to a transcription with their name.",
+    "tracksPending": "The tracks of this recording have not arrived yet: the transcription will start by itself when they do.",
     "summaryMissing": "Ezen a nyelven még nincs szerkeszthető összefoglaló: előbb hozza létre.",
     "storageUnavailable": "Ebben a telepítésben a fájlfeltöltés nem érhető el.",
     "aiDisabledForEvent": "Az MI ki van kapcsolva ennél az eseménynél: az „AI-tartalom létrehozása” gombbal bekapcsolhatja és elindíthatja a feldolgozást.",

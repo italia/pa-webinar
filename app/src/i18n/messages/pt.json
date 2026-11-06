@@ -681,6 +681,7 @@
       "working": "A atualizar…",
       "error": "Não foi possível atualizar o consentimento: tente novamente.",
       "textChanged": "O texto do consentimento mudou depois de ter aberto a página: leia o novo e confirme, se estiver de acordo.",
+      "closeNotice": "Close this notice: your consents stay under the button at the top",
       "recording": {
         "title": "Gravação do evento",
         "give": "Dou o meu consentimento à gravação",
@@ -5979,6 +5980,8 @@
     "recordingWithoutMedia": "Esta gravação não tem vídeo: a sua transcrição vem das legendas do direto.",
     "recordingWithoutVideo": "Desta gravação existem as faixas de áudio dos participantes, mas não o vídeo: não foi gravado ou ainda não chegou. O arquivo descarregável também precisa do vídeo.",
     "noParticipantTracks": "Não há faixas de áudio separadas dos participantes: não foram gravadas ou já foram eliminadas. Para as ter, ative a gravação por participante antes do evento.",
+    "noTranscribableTracks": "No track of this recording can be transcribed: they were deleted, or the people in them did not consent to a transcription with their name.",
+    "tracksPending": "The tracks of this recording have not arrived yet: the transcription will start by itself when they do.",
     "summaryMissing": "Ainda não há um resumo para editar neste idioma: gere-o primeiro.",
     "storageUnavailable": "O carregamento de ficheiros não está disponível nesta instalação.",
     "aiDisabledForEvent": "A IA está desligada para este evento: use «Gerar IA» para a ligar e iniciar o processo.",

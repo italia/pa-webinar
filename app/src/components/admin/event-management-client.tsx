@@ -1567,7 +1567,11 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
     try {
       const res = await avviaPipeline(`/api/admin/events/${event.id}/generate-ai`, { summary: true });
       if (!res) return;
-      const data = (await res.json().catch(() => ({}))) as { enqueued?: number; code?: string };
+      const data = (await res.json().catch(() => ({}))) as {
+        enqueued?: number;
+        tracksPending?: boolean;
+        code?: string;
+      };
       if (!res.ok) {
         setAiGenMsg({
           ok: false,
@@ -1580,10 +1584,8 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
           ),
         });
       } else {
-        setAiGenMsg({
-          ok: true,
-          text: (data.enqueued ?? 0) > 0 ? td('aiGenerateQueued') : td('aiGenerateAlready'),
-        });
+        const accodati = (data.enqueued ?? 0) > 0 ? td('aiGenerateQueued') : td('aiGenerateAlready');
+        setAiGenMsg({ ok: true, text: data.tracksPending ? tApi('tracksPending') : accodati });
       }
     } catch {
       setAiGenMsg({ ok: false, text: td('aiGenerateError') });

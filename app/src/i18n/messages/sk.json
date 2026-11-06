@@ -681,6 +681,7 @@
       "working": "Prebieha aktualizácia…",
       "error": "Súhlas sa nepodarilo aktualizovať: skúste to znova.",
       "textChanged": "Text súhlasu sa zmenil po tom, čo ste otvorili stránku: prečítajte si nový text a potvrďte ho, ak súhlasíte.",
+      "closeNotice": "Close this notice: your consents stay under the button at the top",
       "recording": {
         "title": "Záznam podujatia",
         "give": "Súhlasím so záznamom",
@@ -5979,6 +5980,8 @@
     "recordingWithoutMedia": "Tento záznam nemá video: jeho prepis pochádza zo živých titulkov.",
     "recordingWithoutVideo": "Z tohto záznamu sú zvukové stopy účastníkov, ale nie video: nebolo nahrané alebo ešte neprišlo. Archív na stiahnutie potrebuje aj video.",
     "noParticipantTracks": "Neexistujú samostatné zvukové stopy účastníkov: neboli nahrané alebo už boli vymazané. Ak ich chcete, zapnite pred podujatím nahrávanie po účastníkoch.",
+    "noTranscribableTracks": "No track of this recording can be transcribed: they were deleted, or the people in them did not consent to a transcription with their name.",
+    "tracksPending": "The tracks of this recording have not arrived yet: the transcription will start by itself when they do.",
     "summaryMissing": "V tomto jazyku zatiaľ nie je zhrnutie na úpravu: najprv ho vygenerujte.",
     "storageUnavailable": "Nahrávanie súborov nie je v tejto inštalácii dostupné.",
     "aiDisabledForEvent": "AI je pre toto podujatie vypnutá: pomocou „Vygenerovať AI“ ju zapnete a spustíte spracovanie.",

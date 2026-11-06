@@ -126,6 +126,15 @@ describe('l’avvio della pipeline', () => {
     );
   });
 
+  it('tracce non ancora arrivate: lo dice, e la pagina resta dov’e’', async () => {
+    avvia.mockResolvedValue(new Response(JSON.stringify({ enqueued: 0, tracksPending: true })));
+    disegna();
+    await act(async () => pulsante(tp.generateAi).click());
+    expect(toast.success).toHaveBeenCalledWith(messages.apiErrors.tracksPending);
+    expect(toast.error).not.toHaveBeenCalled();
+    expect(location.reload).not.toHaveBeenCalled();
+  });
+
   it('una registrazione che non chiede conferma parte senza quella domanda', async () => {
     disegna();
     await act(async () => pulsante(tp.generateAi).click());

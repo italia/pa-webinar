@@ -211,7 +211,7 @@ there is work: the GPU node pool scales to zero between runs.
 | Input | Trigger | Root job |
 |---|---|---|
 | Composite recording | Jibri's finalize script calls `POST /api/webhooks/recording` (bearer `CRON_API_KEY`, plus an HMAC signature when `RECORDING_WEBHOOK_SECRET` is set; see [Recording](architecture/recording.md)). The portal creates the `CallSession` and `Recording` rows and enqueues when the event has `aiTranscriptEnabled`. If the event already has a per-participant recording, the webhook only attaches the MP4 to it and enqueues nothing. The composite video holds every voice and cannot be divided by person, so a recording with `transcriptConsentRule` needs a confirmation from staff, even if only the hosts speak: every row created after that column was added has it, whoever creates it (`app/src/lib/ai/voice-consent.ts`). An older row needs it only on an event where each person was asked for the transcription consent. In both cases the webhook enqueues nothing, logs a warning, and answers `postprodAwaitsVoiceConsent: true`; the recording page says so next to **Generate AI**, and the event's closing checklist lists it for the staff ([Recordings, voice data and AI outputs](privacy/recordings-and-ai.md#transcript-from-live-captions)). | `TRANSCRIBE` |
-| Per-participant tracks | The recorder bot calls `POST /api/internal/multitrack-manifest` at the end of the event. The portal stores one `RecordingTrack` per track and enqueues. A silence guard marks the recording `POSTPROD_FAILED` instead when every track is silent. | `TRANSCRIBE_MULTITRACK` |
+| Per-participant tracks | The recorder bot calls `POST /api/internal/multitrack-manifest` at the end of the event. The portal stores one `RecordingTrack` per track and enqueues. A silence guard marks the recording `POSTPROD_FAILED` instead when every track is silent. When no track can be transcribed, nothing is enqueued and a warning is logged (see below). | `TRANSCRIBE_MULTITRACK` |
 | **End for everyone** | The moderator ticks **Generate AI transcript and summary from the recording (once processing finishes)**. The event gets `aiTranscriptEnabled` and `aiSummaryEnabled`, and the webhook enqueues when the recording arrives, except where the video waits for the confirmation (see the row above). The checkbox appears only when the event records, the site switch is on and the event already uses an AI option. | as above |
 | **Generate AI now** (event page) and **Generate AI** (recording page) | `POST /api/admin/events/<id>/generate-ai` and `POST /api/admin/postprod/recordings/<id>/generate-ai` turn on transcription and summary for the event and enqueue in the same transaction, for a recording that already exists. The event-page route acts on the event's newest recording with a media file. The optional JSON body takes `summary`, `translation` (recording route only) and `allVoicesConsented`, all booleans; other fields are ignored and a body that is not JSON counts as empty. On a composite video that needs the confirmation (see the first row), the routes answer `409 VOICE_CONSENT_REQUIRED` until `allVoicesConsented: true` confirms that everyone who speaks in it has consented; the confirmation goes to the admin audit log. | detected |
 | **Re-run** | `POST /api/admin/postprod/recordings/<id>/rerun` bumps the run counter and enqueues a new run. Same body field `allVoicesConsented` and same `409` as above. | detected |
@@ -227,7 +227,20 @@ without media, which only carries a transcript from live captions, is never
 queued: the enqueue does nothing for it, and **Generate AI** (both routes) and
 **Re-run** answer `400`. On a recording whose transcript from live captions
 was corrected by hand, the automatic paths (recording webhook, track manifest,
-lifecycle) do nothing and the admin routes answer `409`. The event page counts only recordings with a media
+lifecycle) do nothing and the admin routes answer `409`. A `TRANSCRIBE_MULTITRACK`
+root job is not created when no track can be transcribed
+(`app/src/lib/ai/track-inputs.ts`): every track was deleted, its person withdrew
+the transcription consent from the room, or, on a recording with
+`transcriptConsentRule`, the consents do not reach the text that includes the
+name. The track manifest then does nothing, and **Generate AI** (both routes)
+and **Re-run** answer `422 NO_TRANSCRIBABLE_TRACKS` and undo what they changed.
+A run whose root job is queued, running or done is not stopped: it can still add
+its summary and translations. A `FAILED` root job gets no such exception. While
+a multitrack placeholder has no tracks because the recorder has not delivered
+its manifest yet, **Generate AI** (both routes) enqueues nothing and answers
+`200` with `tracksPending: true`, and the event keeps the AI switches on, so the
+manifest starts the pipeline; if the manifest never arrives, nothing starts.
+**Re-run** answers `409 TRACKS_PENDING` and undoes what it changed. The event page counts only recordings with a media
 file when it decides whether to offer **Generate AI now**. "Detected" means
 that the root job is `TRANSCRIBE_MULTITRACK` when the recording's key is the
 multitrack placeholder or the recording has any `RecordingTrack` rows, and
@@ -300,7 +313,7 @@ What each job reads, as prepared by `POST /api/internal/postprod-claim`:
 | Job | Inputs | Extra context in the claim |
 |---|---|---|
 | `TRANSCRIBE` | The composite MP4 | `asrInitialPrompt` built from the event title, organizer name and speaker information (at most 800 characters); `expectedSpeakers` |
-| `TRANSCRIBE_MULTITRACK` | Each unpurged track, with participant id, decrypted display name and start offset; the composite MP4 when one exists | none |
+| `TRANSCRIBE_MULTITRACK` | Each track that can be transcribed, with participant id, decrypted display name and start offset; the composite MP4 when one exists. With no such track the claim closes the job as `FAILED` and hands nothing to the worker | none |
 | `SUMMARIZE` | `TRANSCRIPT_JSON` | `speakerNames` (label to name, from the `Speaker` rows); `agenda`, the agenda topics with their status and planned minutes, when the event uses the agenda; `timeline`, the room timeline, when it has entries or chapters ([Room timeline](#room-timeline)) |
 | `TRANSLATE` | `TRANSCRIPT_JSON`; the source-language `SUMMARY_JSON` when it exists | `speakerNames` |
 | `DUB` | `TRANSCRIPT_JSON`; the target-language `TRANSLATION_VTT`; the composite MP4 for `DUBBED_VIDEO` | `speakerNames` |
@@ -481,7 +494,9 @@ every minute (`postprod.orchestrator.schedule`) with
 piling up. Each run:
 
 1. calls `GET /api/internal/postprod-pending` with `CRON_API_KEY`. The portal
-   answers with `pipelineEnabled`, `runnable`, `claimed`, `running`,
+   first marks `FAILED` the `PENDING` `TRANSCRIBE_MULTITRACK` jobs left without
+   a track to transcribe, so that they do not count towards the GPU, and moves
+   their recording to `POSTPROD_PARTIAL`. It then answers with `pipelineEnabled`, `runnable`, `claimed`, `running`,
    `maxConcurrent` and `desired = min(runnable + claimed, aiMaxConcurrentJobs)`,
    split into `desiredGpu` and `desiredCpu` for the two kinds of worker
    ([The worker Job](#the-worker-job)). The split keeps the same overall cap

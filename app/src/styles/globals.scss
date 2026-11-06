@@ -15087,11 +15087,12 @@ button.back-to-top {
 
 // In solo ascolto: una fascia sopra la conferenza, con il modo di intervenire.
 .live-listen-only {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem 0.75rem;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 2.75rem 0.5rem 1rem;
   background: #fff8e6;
   border-bottom: 1px solid #f0d58c;
   color: #3d2e00;
@@ -15116,6 +15117,24 @@ button.back-to-top {
     overflow-y: auto;
     padding-left: 0.5rem;
     border-left: 2px solid #f0d58c;
+  }
+
+  // Una x di 44 px, nell'angolo, anche quando il pulsante va a capo.
+  .live-listen-only__chiudi {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    box-shadow: none;
+
+    .icon {
+      fill: #3d2e00;
+    }
   }
 }
 
