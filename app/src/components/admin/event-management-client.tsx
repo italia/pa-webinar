@@ -178,6 +178,7 @@ interface EventData {
   recordingUrl: string | null; tempRecordingUrl: string | null; tempRecordingStartedAt: string | null;
   recordingPublished: boolean; recordingPublishedAt: string | null;
   recordingAudience: 'PUBLIC' | 'REGISTRANTS';
+  recordingDestination: 'PUBLIC' | 'REGISTRANTS' | null;
   recordingFileSize: number | null; recordingDuration: number | null; recordingDeleteAfterDays: number | null;
   youtubeUrl: string | null; libraryListed: boolean; hasRecordingRow: boolean;
   /** La registrazione del video dell'evento, quando in sala si è presentato un
@@ -1600,7 +1601,9 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
         <RecordingManagement
           event={{
             id: event.id, slug: event.slug, status,
+            eventType: event.eventType,
             recordingEnabled: event.recordingEnabled,
+            recordingDestination: event.recordingDestination,
             recordingUrl: event.recordingUrl,
             tempRecordingUrl: event.tempRecordingUrl,
             tempRecordingStartedAt: event.tempRecordingStartedAt,
@@ -1644,6 +1647,7 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
             postEventPublic: paginaPostEvento.postEventPublic,
             postEventPublicUntil: paginaPostEvento.postEventPublicUntil,
             libraryListed: event.libraryListed,
+            recordingDestination: event.recordingDestination,
             hasPlayableRecording:
               (event.recordingPublished && !!event.recordingUrl) || !!event.youtubeUrl,
             postEventShowQA: event.postEventShowQA,

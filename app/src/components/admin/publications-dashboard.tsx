@@ -23,6 +23,7 @@ interface PublicationRow {
   endsAt: string;
   libraryListed: boolean;
   postEventPublic: boolean;
+  recordingAudience: 'PUBLIC' | 'REGISTRANTS';
   coverImageUrl: string | null;
   imageUrl: string | null;
   youtubeUrl: string | null;
@@ -193,6 +194,11 @@ export default function PublicationsDashboard() {
         <div className="d-flex flex-column gap-3">
           {data.rows.map((r) => {
             const cover = r.coverImageUrl ?? r.imageUrl ?? null;
+            // La libreria mostra solo le registrazioni per tutti: una riservata
+            // non ci entra, e una che c'era ancora si puo' togliere.
+            const riservata = r.recordingAudience === 'REGISTRANTS';
+            const nonElencabile = riservata && !r.libraryListed;
+            const motivo = `pubblicazione-riservata-${r.id}`;
             return (
               <Card key={r.id} className="shadow-sm border-0" style={{ borderRadius: 10 }}>
                 <CardBody className="p-3">
@@ -230,6 +236,11 @@ export default function PublicationsDashboard() {
                         ) : (
                           <Badge color="" pill style={{ fontSize: '0.7rem', background: '#E9ECEF', color: 'var(--app-text)' }}>
                             {t('badges.unlisted')}
+                          </Badge>
+                        )}
+                        {riservata && (
+                          <Badge color="secondary" pill style={{ fontSize: '0.65rem' }}>
+                            {t('reservedBadge')}
                           </Badge>
                         )}
                         {r.pendingSessionRecordings > 0 && !r.libraryListed && (
@@ -272,12 +283,18 @@ export default function PublicationsDashboard() {
                         <Button
                           color={r.libraryListed ? 'warning' : 'primary'}
                           size="xs"
-                          disabled={busyId === r.id}
+                          disabled={busyId === r.id || nonElencabile}
+                          aria-describedby={nonElencabile ? motivo : undefined}
                           onClick={() => toggleLibraryListed(r)}
                         >
                           {r.libraryListed ? t('actions.unlist') : t('actions.list')}
                         </Button>
                       </div>
+                      {nonElencabile && (
+                        <div id={motivo} className="text-muted mt-1" style={{ fontSize: '0.78rem' }}>
+                          {t('reservedHelp')}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </CardBody>
