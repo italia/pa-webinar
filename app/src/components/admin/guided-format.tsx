@@ -28,7 +28,9 @@ import {
   type FormatoRegistra,
 } from '@/lib/events/guided-format';
 import { domandePubbliche } from '@/lib/events/post-event-sections';
+import type { VoceNelVideo } from '@/lib/live/consent-rule';
 import { rubricaProposta } from '@/lib/persons/address-book';
+import { videoDaDestinare } from '@/lib/recording/destination';
 
 /** Una persona, due persone: chi partecipa (SVG: lo sprite non ha l'icona). */
 export function IconaPersone() {
@@ -146,6 +148,7 @@ export default function GuidedFormat({
   aiPipelineEnabled = true,
   liveCaptionsAvailable = false,
   recordingAvailable = true,
+  voceNelVideo,
   addressBookAvailable = true,
   accessoPredefinito = 'tutti',
   azioneTitolo,
@@ -163,6 +166,9 @@ export default function GuidedFormat({
   /** L'installazione puo' registrare: senza, la domanda non si fa e il formato
    *  esce sempre senza registrazione (vedi formatoPossibile). */
   recordingAvailable?: boolean;
+  /** Dov'e' la voce di chi non ha un consenso valido, secondo l'installazione. Senza
+   *  un video della sala (voce 'assente') un video pubblico non si propone. */
+  voceNelVideo?: VoceNelVideo;
   /** L'installazione tiene la rubrica: senza, l'anteprima non la promette. */
   addressBookAvailable?: boolean;
   /** Accanto al titolo: l'azione secondaria (partire da un modello). */
@@ -191,7 +197,8 @@ export default function GuidedFormat({
     setRegistraScelta(true);
     setF((prima) => ({ ...prima, registra }));
   };
-  const formato = formatoPossibile(f, recordingAvailable);
+  const conVideo = videoDaDestinare(voceNelVideo);
+  const formato = formatoPossibile(f, recordingAvailable, conVideo);
   const preset = presetDaFormato(formato, '');
 
   const funzioni = [
@@ -264,29 +271,31 @@ export default function GuidedFormat({
           {recordingAvailable && (
             <fieldset className="formato__domanda">
               <legend>{t('recQ')}</legend>
-              <div className="formato__scelte formato__scelte--tre">
+              <div className={`formato__scelte${conVideo ? ' formato__scelte--tre' : ''}`}>
                 <Scelta
                   name={`${base}-registra`}
                   value="riservata"
-                  current={f.registra}
+                  current={formato.registra}
                   onChange={scegliRegistra}
                   title={t('rec.reserved')}
                   desc={t('rec.reservedDesc')}
                   icon={<Icon icon="it-lock" size="sm" />}
                 />
-                <Scelta
-                  name={`${base}-registra`}
-                  value="pubblica"
-                  current={f.registra}
-                  onChange={scegliRegistra}
-                  title={t('rec.public')}
-                  desc={t('rec.publicDesc')}
-                  icon={<IconaRec />}
-                />
+                {conVideo && (
+                  <Scelta
+                    name={`${base}-registra`}
+                    value="pubblica"
+                    current={formato.registra}
+                    onChange={scegliRegistra}
+                    title={t('rec.public')}
+                    desc={t('rec.publicDesc')}
+                    icon={<IconaRec />}
+                  />
+                )}
                 <Scelta
                   name={`${base}-registra`}
                   value="no"
-                  current={f.registra}
+                  current={formato.registra}
                   onChange={scegliRegistra}
                   title={t('rec.no')}
                   desc={t('rec.noDesc')}

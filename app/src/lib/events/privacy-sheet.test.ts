@@ -475,7 +475,7 @@ describe('schedaPrivacy, gli altri fatti', () => {
 describe('schedaPrivacy, i formati guidati', () => {
   const PERSONE: FormatoPersone[] = ['piccolo', 'medio', 'grande'];
   const VOCI: FormatoVoce[] = ['tutti', 'relatori'];
-  const REGISTRA: FormatoRegistra[] = ['si', 'no'];
+  const REGISTRA: FormatoRegistra[] = ['no', 'riservata', 'pubblica'];
   const ACCESSI: FormatoAccesso[] = ['tutti', 'invitati'];
   const FORMATI: FormatoGuidato[] = PERSONE.flatMap((persone) =>
     VOCI.flatMap((voce) =>
@@ -485,18 +485,19 @@ describe('schedaPrivacy, i formati guidati', () => {
     )
   );
 
+  /** L'evento che il formato crea: i valori del preset, compresa la destinazione,
+   *  con la lista dei partecipanti che il wizard ne ricava. */
   function eventoDaFormato(f: FormatoGuidato): EventoScheda {
     const preset = presetDaFormato(f, 'Formato');
     return {
       ...EVENTO,
       ...preset,
-      recordingDestination: null,
       participantListVisible: elencoPredefinito(preset),
     } as EventoScheda;
   }
 
   it('prova tutte le combinazioni', () => {
-    expect(FORMATI).toHaveLength(24);
+    expect(FORMATI).toHaveLength(36);
   });
 
   it.each(
@@ -507,11 +508,17 @@ describe('schedaPrivacy, i formati guidati', () => {
     expect(s).not.toBeNull();
     if (!s) return;
 
-    const registra = formato.registra === 'si';
+    const registra = formato.registra !== 'no';
+    const pubblico = formato.voce === 'relatori' || formato.persone === 'grande';
+    const riunione = !pubblico && formato.persone === 'piccolo';
     expect(s.registrazione.modo).toBe(registra ? 'manuale' : 'nessuna');
-    expect(s.elencoVisibile).toBe(
-      formato.voce === 'tutti' && formato.persone !== 'grande'
+    expect(s.registrazione.destinazione).toBe(
+      { no: null, riservata: 'REGISTRANTS', pubblica: 'PUBLIC' }[formato.registra]
     );
+    expect(s.registrazione.conduceSempre).toBe(false);
+    expect(s.elencoVisibile).toBe(!pubblico);
+    expect(s.pseudonimi).toBe(pubblico);
+    expect(s.rubrica).toEqual(riunione ? null : { mesi: MESI_RUBRICA_PREDEFINITI });
     expect(s.trascrizione.tracce).toBe(registra ? 'cancellate' : null);
     expect(s.registrazione.chiNonAcconsente).toBe(
       !registra ? null : formato.voce === 'tutti' ? 'restaFuori' : 'avvisoVoce'
