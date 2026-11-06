@@ -405,21 +405,32 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
     // Solo per chi ha il proprio link: un link inoltrato non risponde a nome
     // di chi l'ha ricevuto.
     iscrizioneEntrata = ownsToken && registration.joinedAt !== null;
-  } else if (isPrimaryModerator && registraChiConduce(event, canRecord)) {
-    // Chi conduce dal link primario con la sessione del proprio account: il
-    // consenso alla registrazione dato a un ingresso precedente non si
-    // richiede. Solo qui, dove dietro il link c'e' una persona: un link
-    // nominale puo' essere inoltrato, e chi lo apre non eredita il consenso
+  } else if (isPrimaryModerator) {
+    // Chi conduce dal link primario con la sessione del proprio account: i
+    // consensi dati a un ingresso precedente non si richiedono, e si possono
+    // ritirare da questo. Solo qui, dove dietro il link c'e' una persona: un
+    // link nominale puo' essere inoltrato, e chi lo apre non eredita il consenso
     // di un altro (lo da' a ogni visita della pagina).
     const staff = await staffDietroIlPrimario(event.id);
-    // Una prova per ingresso: basta che una copra il testo in vigore.
-    const proveStaff = staff
-      ? await prisma.recordingConsent.findMany({
-          where: { eventId: event.id, staffAccountId: staff.accountId, withdrawnAt: null },
-          select: { destination: true },
-        })
-      : [];
-    hasRecordingConsent = proveStaff.some((p) => consensoCopre(p.destination, destinazione));
+    if (staff) {
+      const dellAccount = { eventId: event.id, staffAccountId: staff.accountId, withdrawnAt: null };
+      const [proveStaff, tracceStaff] = await Promise.all([
+        registraChiConduce(event, canRecord)
+          ? prisma.recordingConsent.findMany({ where: dellAccount, select: { destination: true } })
+          : [],
+        chiedeConsensoPerVoce(event, settings)
+          ? prisma.multitrackConsent.count({
+              where: {
+                ...dellAccount,
+                textVersion: { gte: versioneConsensoTrascrizione(event, settings) },
+              },
+            })
+          : 0,
+      ]);
+      // Una prova per ingresso: basta che una copra il testo in vigore.
+      hasRecordingConsent = proveStaff.some((p) => consensoCopre(p.destination, destinazione));
+      hasMultitrackConsent = tracceStaff > 0;
+    }
   }
 
   const title = getLocalized(event.title as LocalizedField, locale);

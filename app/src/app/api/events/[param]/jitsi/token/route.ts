@@ -131,9 +131,9 @@ async function provaDellaReplica(
           select: { consentedAt: true, locale: true, destination: true, textVersion: true },
         })
       : [],
-    replica.multitrack && posti.length > 0
+    replica.multitrack && dove.length > 0
       ? prisma.multitrackConsent.findFirst({
-          where: { eventId: event.id, jitsiUserId: { in: posti }, withdrawnAt: null },
+          where: { eventId: event.id, withdrawnAt: null, OR: dove },
           orderBy: { textVersion: 'desc' },
           select: { consentedAt: true, locale: true, textVersion: true },
         })

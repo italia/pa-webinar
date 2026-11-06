@@ -1752,6 +1752,19 @@ describe('POST jitsi/token — il testo del consenso e la destinazione del video
       expect(prisma.gdprAuditLog.create).not.toHaveBeenCalled();
     });
 
+    it('l account: la trascrizione data a un ingresso precedente si riporta sul posto nuovo', async () => {
+      conEvento({ recordingDestination: 'REGISTRANTS' });
+      staffSeat.valore = { accountId: 'acc-1', nome: 'Ada Rossi' };
+      await minted(
+        await post({ moderatorToken: PRIMARY_TOKEN, consentReplay: { multitrack: true } }),
+      );
+      expect(prisma.multitrackConsent.findFirst).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { eventId: EVENT_ID, withdrawnAt: null, OR: [{ staffAccountId: 'acc-1' }] },
+        }),
+      );
+    });
+
     it('una prova che non copre il testo in vigore non vale', async () => {
       conEvento({ recordingDestination: 'PUBLIC' });
       staffSeat.valore = { accountId: 'acc-1', nome: 'Ada Rossi' };
