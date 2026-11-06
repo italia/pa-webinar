@@ -12,10 +12,27 @@
  * si cancella qui, esplicitamente: feedback e risposte ai questionari (che la
  * puntano con SetNull), i messaggi di chat scritti come `reg-<id>` con i loro
  * allegati e reazioni, e le email accodate per quelle iscrizioni.
+ *
+ * Le prove dei consensi di un video o di una trascrizione pubblicati restano,
+ * senza nome, finche' sono pubblicati (lib/gdpr/retained-consent-proofs): si
+ * copiano prima che la cascata le porti via. Il video non cambia.
+ *
+ * Il chiamante ha gia' letto le iscrizioni e dice a quale evento appartengono:
+ * mentre aspetta il suo turno una pulizia puo' averle gia' cancellate, e quello
+ * che ha copiato con il nome perde il nome qui.
  */
 import { deleteBlob, isAzureConfigured } from '@/lib/azure/blob-storage';
 import { bloccaTrascrizioneEvento, togliPersoneDalleTrascrizioni } from '@/lib/captions/transcript';
 import { prisma } from '@/lib/db';
+import {
+  conservaProve,
+  tipiDelleProve,
+  togliNomeDelleIscrizioni,
+} from '@/lib/gdpr/retained-consent-proofs';
+
+/** La copia delle prove si aggiunge a una transazione gia' lunga, che puo' anche
+ *  aspettare le costruzioni della trascrizione e la pulizia dello stesso evento. */
+export const TIMEOUT_CANCELLAZIONE_MS = 30_000;
 
 export interface ErasureCounts {
   registrations: number;
@@ -23,14 +40,18 @@ export interface ErasureCounts {
   questionnaireResponses: number;
   chatMessages: number;
   outboxRows: number;
+  /** Prove dei consensi rimaste, senza nome, per cio' che e' pubblicato: copiate
+   *  qui, o gia' copiate da una pulizia in corso. */
+  consentProofsKept: number;
   /** File allegati che lo storage non ha cancellato: vanno tolti a mano. */
   attachmentFilesNotDeleted: number;
 }
 
 export async function eraseRegistrations(
-  registrationIds: string[],
+  iscrizioni: readonly { id: string; eventId: string }[],
   logPrefix: string,
 ): Promise<ErasureCounts> {
+  const registrationIds = iscrizioni.map((r) => r.id);
   // In chat un iscritto scrive come `reg-<id>` (lib/chat/sender): e' il solo
   // legame tra i suoi messaggi e l'iscrizione, perche' la tabella della chat
   // non ha una chiave verso le iscrizioni.
@@ -42,6 +63,30 @@ export async function eraseRegistrations(
   });
 
   const counts = await prisma.$transaction(async (tx) => {
+    // In fila con le costruzioni della trascrizione, i ritiri e la pulizia degli
+    // stessi eventi, per prima cosa e in ordine: una costruzione gia' partita non
+    // rimette le frasi tolte qui sotto, e nessuno aspetta tenendo le righe che
+    // servono all'altro.
+    const idEventi = [...new Set(iscrizioni.map((r) => r.eventId))].sort();
+    for (const id of idEventi) await bloccaTrascrizioneEvento(tx, id);
+    // Prima che la cascata delle iscrizioni le porti via.
+    const adesso = new Date();
+    let consentProofsKept = 0;
+    for (const eventId of idEventi) {
+      consentProofsKept += await conservaProve(tx, {
+        eventId,
+        tipi: await tipiDelleProve(tx, eventId),
+        registrationIds,
+        senzaNome: true,
+        adesso,
+      });
+      consentProofsKept += await togliNomeDelleIscrizioni(
+        tx,
+        eventId,
+        iscrizioni.filter((r) => r.eventId === eventId).map((r) => r.id),
+        adesso,
+      );
+    }
     const feedback = await tx.eventFeedback.deleteMany({
       where: { registrationId: { in: registrationIds } },
     });
@@ -63,15 +108,6 @@ export async function eraseRegistrations(
     await tx.chatMessageReaction.deleteMany({ where: { senderId: { in: chatSenderIds } } });
     // La trascrizione gia' costruita dai sottotitoli: le frasi e il nome della
     // persona se ne vanno anche da li' (lib/captions/transcript).
-    const eventi = await tx.registration.findMany({
-      where: { id: { in: registrationIds } },
-      select: { eventId: true },
-      distinct: ['eventId'],
-    });
-    // In fila con le costruzioni della trascrizione degli stessi eventi: una
-    // costruzione gia' partita non rimette le frasi appena tolte.
-    const idEventi = eventi.map((e) => e.eventId).sort();
-    for (const id of idEventi) await bloccaTrascrizioneEvento(tx, id);
     await togliPersoneDalleTrascrizioni(tx, idEventi, registrationIds);
     // Le frasi dei sottotitoli salvate per la trascrizione e i posti in sala:
     // il posto della conferenza e' `reg-<id>-<suffisso>`, l'unico legame con
@@ -99,8 +135,9 @@ export async function eraseRegistrations(
       chatMessages: chatMessages.count,
       wordCloudSubmissions: wordCloudSubmissions.count,
       outboxRows,
+      consentProofsKept,
     };
-  });
+  }, { timeout: TIMEOUT_CANCELLAZIONE_MS });
 
   // I file allegati si cancellano dopo il commit. Se lo storage non risponde
   // il file resta, senza piu' una riga che lo citi: lo si scrive nel log con il

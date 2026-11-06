@@ -1,21 +1,28 @@
 // SPDX-License-Identifier: EUPL-1.2
 // SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
 
+import { createHash } from 'crypto';
+
+import type { Prisma } from '@prisma/client';
+
 import { prisma } from '@/lib/db';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { PREFISSO_POSTO_MODERATORE } from '@/lib/auth/jwt';
 import { iscrizioneDelPosto } from '@/lib/captions/room';
+import type { Destinazione, PeriodoConsenso } from '@/lib/recording/destination';
 
 /**
  * Le prove dei consensi di un evento, per chi lo gestisce (art. 7.1 GDPR:
  * chi tratta i dati deve poter dimostrare il consenso): quelle date
  * all'iscrizione e quelle date in sala d'attesa o in sala, con l'ora del
- * ritiro quando c'e' stato (lib/live/consent-withdrawal).
+ * ritiro quando c'e' stato (lib/live/consent-withdrawal), e quelle conservate
+ * dopo la cancellazione delle sorgenti (lib/gdpr/retained-consent-proofs).
  *
  * Una riga per prova, e per i periodi precedenti di un consenso ridato dopo
- * un ritiro. Chi l'ha data si dice per nome (quello con cui e'
- * entrato, o quello dell'iscrizione) e per ruolo: iscritto, ospite (anche chi
- * apre un link d'iscrizione inoltrato), chi conduce o interviene.
+ * un ritiro o sostituito da uno successivo. Chi l'ha data si dice per nome
+ * (quello con cui e' entrato, o quello dell'iscrizione) e per ruolo: iscritto,
+ * ospite (anche chi apre un link d'iscrizione inoltrato), chi conduce o
+ * interviene.
  */
 
 export type TipoConsenso = 'recording' | 'transcription';
@@ -26,16 +33,64 @@ export interface ProvaConsenso {
   kind: TipoConsenso;
   source: OrigineConsenso;
   role: RuoloConsenso;
-  /** Null se non si e' potuto decifrare, o se non si e' chiesto (`nomi: false`). */
+  /** Null se non si e' potuto decifrare, se non si e' chiesto (`nomi: false`) o
+   *  se la persona ne ha chiesto la rimozione (`nomeRimosso`). */
   name: string | null;
+  nomeRimosso: boolean;
+  /** La prova sopravvive alla sua sorgente, che e' stata cancellata. */
+  conservata: boolean;
+  /** Un periodo sostituito da uno successivo: resta come prova di quel testo,
+   *  ma se il consenso vale lo dice il periodo che l'ha sostituito. */
+  superata: boolean;
   givenAt: string;
   withdrawnAt: string | null;
-  /** La versione del testo, per la trascrizione (lib/registration/consents). */
+  /** La versione del testo (lib/registration/consents,
+   *  lib/recording/destination). Null se il testo non ne dichiarava una. */
   textVersion: number | null;
-  /** Chi ha il consenso, per contare persone e non righe: l'iscrizione,
-   *  l'account dello staff o la concessione, altrimenti il posto. Non si
-   *  esporta. */
+  /** La destinazione del video dichiarata dal testo, per la registrazione. */
+  destination: Destinazione;
+  /** L'impronta di chi ha il consenso, per contare persone e non righe: la
+   *  stessa con la sorgente viva e con la prova conservata. Non si esporta. */
   holder: string;
+}
+
+/** Una prova come sta sulla sorgente: il nome e' ancora cifrato. */
+export interface RigaProva {
+  kind: TipoConsenso;
+  source: OrigineConsenso;
+  role: RuoloConsenso;
+  /** Il nome cifrato. Null se non si e' chiesto (`nomi: false`). */
+  displayName: string | null;
+  /** L'impronta dell'indirizzo. Null per chi non ne ha dato uno. */
+  emailHash: string | null;
+  locale: string | null;
+  /** Un periodo di RecordingConsent.earlierPeriods senza ritiro: e' stato
+   *  sostituito da uno successivo, non ritirato. */
+  superata: boolean;
+  givenAt: string;
+  withdrawnAt: string | null;
+  textVersion: number | null;
+  destination: Destinazione;
+  /** Chi ha il consenso: l'iscrizione, l'account dello staff o la concessione,
+   *  altrimenti il posto. */
+  holder: string;
+}
+
+/** Le tabelle sorgente: il client, o la transazione che le sta cancellando. */
+export type LettoreProve = Pick<
+  Prisma.TransactionClient,
+  'registration' | 'recordingConsent' | 'multitrackConsent'
+>;
+
+/** Quali prove leggere. Senza filtri, tutte quelle dell'evento. */
+export interface FiltroProve {
+  /** Le prove di queste iscrizioni: all'iscrizione e in sala. */
+  registrationIds?: readonly string[];
+  /** Le prove della registrazione date entrando con queste concessioni. */
+  grantIds?: readonly string[];
+  /** Le prove della registrazione date entrando dal link primario con questi
+   *  account dello staff. */
+  staffAccountIds?: readonly string[];
 }
 
 const ruoloDelPosto = (posto: string, registrationId: string | null): RuoloConsenso =>
@@ -45,83 +100,169 @@ const ruoloDelPosto = (posto: string, registrationId: string | null): RuoloConse
       ? 'host'
       : 'guest';
 
+/** Il titolare delle prove di un'iscrizione, all'iscrizione e in sala. */
+export const titolareIscrizione = (registrationId: string): string => `reg:${registrationId}`;
+
 const titolareDelPosto = (posto: string, registrationId: string | null): string => {
   const iscrizione = registrationId ?? iscrizioneDelPosto(posto);
-  return iscrizione ? `reg:${iscrizione}` : `posto:${posto}`;
+  return iscrizione ? titolareIscrizione(iscrizione) : `posto:${posto}`;
 };
 
-interface Periodo {
-  consentedAt: string;
-  withdrawnAt: string | null;
-}
-const periodiPrecedenti = (v: unknown): Periodo[] =>
+const periodiPrecedenti = (v: unknown): PeriodoConsenso[] =>
   Array.isArray(v)
     ? v.filter(
-        (p): p is Periodo =>
-          !!p && typeof p === 'object' && typeof (p as Periodo).consentedAt === 'string'
+        (p): p is PeriodoConsenso =>
+          !!p && typeof p === 'object' && typeof (p as PeriodoConsenso).consentedAt === 'string'
       )
     : [];
 
-export async function proveConsensoEvento(
+/** L'impronta di un titolare in un evento: non dice chi e', e non vale altrove. */
+export const improntaTitolare = (eventId: string, holder: string): string =>
+  createHash('sha256').update(`${eventId}|${holder}`).digest('hex');
+
+/** Quanto serve di una prova conservata per riconoscere un periodo sostituito. */
+interface PeriodoConservato {
+  kind: string;
+  source: string;
+  role: string;
+  holderHash: string;
+  givenAt: Date;
+  withdrawnAt: Date | null;
+}
+
+/**
+ * I periodi sostituiti tra le prove conservate, che non hanno una colonna per
+ * dirlo. Le prove di sala di un'iscrizione sono i periodi di un'unica prova
+ * (vincolo unico) e si susseguono: un periodo ritirato finisce prima che inizi
+ * il successivo, uno sostituito no. Un ritiro che arriva dopo la copia segna
+ * tutti i periodi ancora aperti, e non cambia questa lettura. Gli altri titolari
+ * possono avere piu' prove di sala insieme, una per posto, e restano fuori.
+ */
+export function periodiSostituiti<T extends PeriodoConservato>(
+  righe: readonly T[]
+): Set<T> {
+  const perTitolare = new Map<string, T[]>();
+  for (const r of righe) {
+    if (r.kind !== 'recording' || r.source !== 'room' || r.role !== 'registrant')
+      continue;
+    perTitolare.set(r.holderHash, [...(perTitolare.get(r.holderHash) ?? []), r]);
+  }
+  const sostituiti = new Set<T>();
+  for (const periodi of perTitolare.values()) {
+    periodi.sort((a, b) => a.givenAt.getTime() - b.givenAt.getTime());
+    periodi.forEach((periodo, i) => {
+      const dopo = periodi[i + 1];
+      if (dopo && (!periodo.withdrawnAt || periodo.withdrawnAt > dopo.givenAt)) {
+        sostituiti.add(periodo);
+      }
+    });
+  }
+  return sostituiti;
+}
+
+/**
+ * Le prove sulle tabelle sorgente, senza decifrare niente: la stessa lettura per
+ * chi le mostra e per chi le copia prima di cancellarle (dentro la transazione
+ * che le cancella).
+ */
+export async function leggiRigheProve(
+  db: LettoreProve,
   eventId: string,
-  { nomi = true }: { nomi?: boolean } = {}
-): Promise<ProvaConsenso[]> {
+  { nomi = true, registrationIds, grantIds, staffAccountIds }: FiltroProve & { nomi?: boolean } = {}
+): Promise<RigaProva[]> {
+  const filtrate = !!registrationIds || !!grantIds || !!staffAccountIds;
+  const iscrizioniChieste = [...(registrationIds ?? [])];
+  const concessioniChieste = [...(grantIds ?? [])];
+  const accountChiesti = [...(staffAccountIds ?? [])];
   const [iscrizioni, registrazione, trascrizione] = await Promise.all([
-    prisma.registration.findMany({
-      where: { eventId, OR: [{ consentRecording: true }, { consentMultitrack: true }] },
+    db.registration.findMany({
+      where: {
+        eventId,
+        OR: [{ consentRecording: true }, { consentMultitrack: true }],
+        ...(filtrate ? { id: { in: iscrizioniChieste } } : {}),
+      },
       select: {
         id: true,
         displayName: nomi,
+        emailHash: true,
+        locale: true,
         consentTimestamp: true,
         consentRecording: true,
+        consentRecordingDestination: true,
+        consentRecordingVersion: true,
         consentRecordingWithdrawnAt: true,
         consentMultitrack: true,
         consentMultitrackVersion: true,
         consentMultitrackWithdrawnAt: true,
       },
     }),
-    prisma.recordingConsent.findMany({
-      where: { eventId },
+    db.recordingConsent.findMany({
+      where: {
+        eventId,
+        ...(filtrate
+          ? {
+              OR: [
+                { registrationId: { in: iscrizioniChieste } },
+                { eventModeratorId: { in: concessioniChieste } },
+                { staffAccountId: { in: accountChiesti } },
+              ],
+            }
+          : {}),
+      },
       select: {
         displayName: nomi,
         jitsiUserId: true,
         registrationId: true,
         eventModeratorId: true,
         staffAccountId: true,
+        locale: true,
         consentedAt: true,
         withdrawnAt: true,
         earlierPeriods: true,
+        destination: true,
+        textVersion: true,
+        // L'indirizzo non sta sulla prova: lo sa chi la lega a una persona.
+        registration: { select: { emailHash: true } },
+        eventModerator: { select: { emailHash: true } },
+        staffAccount: { select: { emailHash: true } },
       },
     }),
-    prisma.multitrackConsent.findMany({
-      where: { eventId },
+    db.multitrackConsent.findMany({
+      where: {
+        eventId,
+        ...(filtrate ? { registrationId: { in: iscrizioniChieste } } : {}),
+      },
       select: {
         displayName: nomi,
         jitsiUserId: true,
         registrationId: true,
+        locale: true,
         consentedAt: true,
         withdrawnAt: true,
         textVersion: true,
+        registration: { select: { emailHash: true } },
       },
     }),
   ]);
-  const nome = (cifrato: string | undefined) =>
-    nomi && cifrato ? tryDecryptPII(cifrato) : null;
-  const righe: ProvaConsenso[] = [];
+  const righe: RigaProva[] = [];
   for (const r of iscrizioni) {
     const base = {
       source: 'registration' as const,
       role: 'registrant' as const,
-      name: nome(r.displayName),
+      displayName: r.displayName ?? null,
+      emailHash: r.emailHash ?? null,
+      locale: r.locale ?? null,
+      superata: false,
       givenAt: r.consentTimestamp.toISOString(),
-      holder: `reg:${r.id}`,
+      holder: titolareIscrizione(r.id),
     };
     if (r.consentRecording) {
       righe.push({
         ...base,
         kind: 'recording',
         withdrawnAt: r.consentRecordingWithdrawnAt?.toISOString() ?? null,
-        textVersion: null,
+        textVersion: r.consentRecordingVersion ?? null,
+        destination: r.consentRecordingDestination ?? null,
       });
     }
     if (r.consentMultitrack) {
@@ -130,42 +271,49 @@ export async function proveConsensoEvento(
         kind: 'transcription',
         withdrawnAt: r.consentMultitrackWithdrawnAt?.toISOString() ?? null,
         textVersion: r.consentMultitrackVersion ?? 1,
+        destination: null,
       });
     }
   }
   for (const p of registrazione) {
-    const role =
-      p.eventModeratorId || p.staffAccountId
-        ? 'host'
-        : ruoloDelPosto(p.jitsiUserId, p.registrationId);
-    const holder = p.staffAccountId
-      ? `staff:${p.staffAccountId}`
-      : p.eventModeratorId
-        ? `concessione:${p.eventModeratorId}`
-        : titolareDelPosto(p.jitsiUserId, p.registrationId);
-    const name = nome(p.displayName);
-    // Un consenso ridato dopo un ritiro: i periodi di prima, poi quello attuale.
+    const base = {
+      kind: 'recording' as const,
+      source: 'room' as const,
+      role:
+        p.eventModeratorId || p.staffAccountId
+          ? ('host' as const)
+          : ruoloDelPosto(p.jitsiUserId, p.registrationId),
+      displayName: p.displayName ?? null,
+      emailHash:
+        p.registration?.emailHash ??
+        p.eventModerator?.emailHash ??
+        p.staffAccount?.emailHash ??
+        null,
+      locale: p.locale ?? null,
+      holder: p.staffAccountId
+        ? `staff:${p.staffAccountId}`
+        : p.eventModeratorId
+          ? `concessione:${p.eventModeratorId}`
+          : titolareDelPosto(p.jitsiUserId, p.registrationId),
+    };
+    // Un consenso ridato o sostituito: i periodi di prima, poi quello attuale.
     for (const periodo of periodiPrecedenti(p.earlierPeriods)) {
       righe.push({
-        kind: 'recording',
-        source: 'room',
-        role,
-        name,
+        ...base,
+        superata: !periodo.withdrawnAt,
         givenAt: periodo.consentedAt,
-        withdrawnAt: periodo.withdrawnAt,
-        textVersion: null,
-        holder,
+        withdrawnAt: periodo.withdrawnAt ?? null,
+        textVersion: periodo.textVersion ?? null,
+        destination: periodo.destination ?? null,
       });
     }
     righe.push({
-      kind: 'recording',
-      source: 'room',
-      role,
-      name,
+      ...base,
+      superata: false,
       givenAt: p.consentedAt.toISOString(),
       withdrawnAt: p.withdrawnAt?.toISOString() ?? null,
-      textVersion: null,
-      holder,
+      textVersion: p.textVersion ?? null,
+      destination: p.destination ?? null,
     });
   }
   for (const p of trascrizione) {
@@ -173,11 +321,73 @@ export async function proveConsensoEvento(
       kind: 'transcription',
       source: 'room',
       role: ruoloDelPosto(p.jitsiUserId, p.registrationId),
-      name: nome(p.displayName),
+      displayName: p.displayName ?? null,
+      emailHash: p.registration?.emailHash ?? null,
+      locale: p.locale ?? null,
+      superata: false,
       givenAt: p.consentedAt.toISOString(),
       withdrawnAt: p.withdrawnAt?.toISOString() ?? null,
       textVersion: p.textVersion,
+      destination: null,
       holder: titolareDelPosto(p.jitsiUserId, p.registrationId),
+    });
+  }
+  return righe;
+}
+
+export async function proveConsensoEvento(
+  eventId: string,
+  { nomi = true }: { nomi?: boolean } = {}
+): Promise<ProvaConsenso[]> {
+  const [sorgenti, conservate] = await Promise.all([
+    leggiRigheProve(prisma, eventId, { nomi }),
+    prisma.retainedConsentProof.findMany({
+      where: { eventId },
+      select: {
+        kind: true,
+        source: true,
+        role: true,
+        holderHash: true,
+        displayName: nomi,
+        nameRemovedAt: true,
+        textVersion: true,
+        destination: true,
+        givenAt: true,
+        withdrawnAt: true,
+      },
+    }),
+  ]);
+  const nome = (cifrato: string | null | undefined) =>
+    nomi && cifrato ? tryDecryptPII(cifrato) : null;
+  const righe: ProvaConsenso[] = sorgenti.map((r) => ({
+    kind: r.kind,
+    source: r.source,
+    role: r.role,
+    name: nome(r.displayName),
+    nomeRimosso: false,
+    conservata: false,
+    superata: r.superata,
+    givenAt: r.givenAt,
+    withdrawnAt: r.withdrawnAt,
+    textVersion: r.textVersion,
+    destination: r.destination,
+    holder: improntaTitolare(eventId, r.holder),
+  }));
+  const sostituite = periodiSostituiti(conservate);
+  for (const p of conservate) {
+    righe.push({
+      kind: p.kind as TipoConsenso,
+      source: p.source as OrigineConsenso,
+      role: p.role as RuoloConsenso,
+      name: nome(p.displayName),
+      nomeRimosso: !!p.nameRemovedAt,
+      conservata: true,
+      superata: sostituite.has(p),
+      givenAt: p.givenAt.toISOString(),
+      withdrawnAt: p.withdrawnAt?.toISOString() ?? null,
+      textVersion: p.textVersion,
+      destination: p.destination,
+      holder: p.holderHash,
     });
   }
   return righe.sort((a, b) => a.givenAt.localeCompare(b.givenAt));
@@ -188,13 +398,15 @@ export async function proveConsensoEvento(
  * concessione, altrimenti un posto) hanno un consenso valido per tipo, e
  * quante l'hanno ritirato senza ridarlo. Una persona che rientra non conta
  * due volte; un ospite che torna in un'altra visita ha un posto nuovo e conta
- * di nuovo (nessun dato lo lega alla visita di prima). Senza nomi.
+ * di nuovo (nessun dato lo lega alla visita di prima). Un periodo sostituito
+ * non conta: chi ritira dopo una sostituzione ha ritirato. Senza nomi.
  */
 export function riepilogoProve(
   righe: readonly ProvaConsenso[]
 ): Record<TipoConsenso, { given: number; withdrawn: number }> {
   const stato = new Map<string, boolean>();
   for (const r of righe) {
+    if (r.superata) continue;
     const chiave = `${r.kind}|${r.holder}`;
     stato.set(chiave, (stato.get(chiave) ?? false) || !r.withdrawnAt);
   }

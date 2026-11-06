@@ -7,8 +7,14 @@
  * Il ritiro di un singolo consenso dai propri dati, prima o dopo l'evento,
  * senza cancellare l'iscrizione (art. 7.3 GDPR). Il token lo consegna la pagina
  * dei propri dati (GET /api/gdpr/export) e porta l'impronta dell'indirizzo: si
- * tocca solo un'iscrizione di quell'indirizzo. Gli effetti sono gli stessi del
- * ritiro dalla sala (lib/live/consent-withdrawal).
+ * tocca solo un'iscrizione o una prova di quell'indirizzo.
+ *
+ * Il corpo porta esattamente uno tra:
+ *  - `registrationId`, l'iscrizione che esiste ancora: gli effetti sono gli
+ *    stessi del ritiro dalla sala (lib/live/consent-withdrawal);
+ *  - `proofId`, la prova conservata dopo la cancellazione dell'iscrizione
+ *    (lib/gdpr/retained-consent-proofs), solo per registrazione e trascrizione:
+ *    le comunicazioni future non hanno una prova conservata.
  */
 import { z } from 'zod';
 
@@ -16,18 +22,29 @@ import { parseJsonBody, withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { AppError, NotFoundError, RateLimitError, ValidationError } from '@/lib/errors';
 import { verifyGdprToken } from '@/lib/gdpr/request-token';
+import { ritiraProvaConservata } from '@/lib/gdpr/retained-consent-proofs';
 import { ritiraComunicazioni, ritiraConsensi } from '@/lib/live/consent-withdrawal';
 import { getClientIp, rateLimit } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 
-const schema = z
-  .object({
-    token: z.string().min(1).max(512),
-    registrationId: z.guid(),
-    consent: z.enum(['recording', 'transcription', 'futureCommunications']),
-  })
-  .strict();
+const token = z.string().min(1).max(512);
+const schema = z.union([
+  z
+    .object({
+      token,
+      registrationId: z.guid(),
+      consent: z.enum(['recording', 'transcription', 'futureCommunications']),
+    })
+    .strict(),
+  z
+    .object({
+      token,
+      proofId: z.guid(),
+      consent: z.enum(['recording', 'transcription']),
+    })
+    .strict(),
+]);
 
 export const POST = withErrorHandling(async (request) => {
   const rl = rateLimit(`gdpr-consents:${getClientIp(request)}`, {
@@ -38,12 +55,25 @@ export const POST = withErrorHandling(async (request) => {
 
   const parsed = schema.safeParse(await parseJsonBody(request, 2048));
   if (!parsed.success) throw new ValidationError('Invalid body');
-  const { token, registrationId, consent } = parsed.data;
-  const verificato = verifyGdprToken(token, 'consents');
+  const corpo = parsed.data;
+  const { consent } = corpo;
+  const verificato = verifyGdprToken(corpo.token, 'consents');
   if (!verificato) throw new AppError('Invalid or expired token', 401, 'UNAUTHORIZED');
+  const risposta = () =>
+    Response.json({ withdrawn: consent }, { headers: { 'Cache-Control': 'no-store' } });
+
+  if ('proofId' in corpo) {
+    const trovata = await ritiraProvaConservata(
+      verificato.emailHash,
+      corpo.proofId,
+      corpo.consent
+    );
+    if (!trovata) throw new NotFoundError('Consent proof');
+    return risposta();
+  }
 
   const iscrizione = await prisma.registration.findFirst({
-    where: { id: registrationId, emailHash: verificato.emailHash },
+    where: { id: corpo.registrationId, emailHash: verificato.emailHash },
     select: { id: true, eventId: true },
   });
   if (!iscrizione) throw new NotFoundError('Registration');
@@ -62,8 +92,5 @@ export const POST = withErrorHandling(async (request) => {
       }
     );
   }
-  return Response.json(
-    { withdrawn: consent },
-    { headers: { 'Cache-Control': 'no-store' } }
-  );
+  return risposta();
 });

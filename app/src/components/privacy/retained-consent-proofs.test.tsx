@@ -1,0 +1,204 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
+// @vitest-environment jsdom
+import { act } from 'react';
+import { createRoot, type Root } from 'react-dom/client';
+import { NextIntlClientProvider } from 'next-intl';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import messages from '@/i18n/messages/it.json';
+
+import RetainedConsentProofs, {
+  type ProvaConservataVista,
+} from './retained-consent-proofs';
+
+let container: HTMLDivElement;
+let root: Root;
+
+const prova = (
+  id: string,
+  kind: ProvaConservataVista['kind'],
+  altri: Partial<ProvaConservataVista> = {}
+): ProvaConservataVista => ({
+  id,
+  eventId: 'e1',
+  kind,
+  name: null,
+  superseded: false,
+  givenAt: '2026-09-01T08:00:00.000Z',
+  withdrawnAt: null,
+  event: { title: { it: 'Evento passato' }, startsAt: '2026-09-02T08:00:00.000Z' },
+  ...altri,
+});
+
+const monta = (prove: ProvaConservataVista[]) =>
+  act(() =>
+    root.render(
+      <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
+        <RetainedConsentProofs token="tok" prove={prove} />
+      </NextIntlClientProvider>
+    )
+  );
+const pulsanti = (nome: string) =>
+  [...container.querySelectorAll('button')].filter((b) => b.textContent?.trim() === nome);
+const clic = async (nome: string) => {
+  await act(async () => {
+    pulsanti(nome)[0]?.click();
+  });
+};
+
+beforeEach(() => {
+  (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+  container = document.createElement('div');
+  document.body.appendChild(container);
+  root = createRoot(container);
+});
+
+afterEach(() => {
+  act(() => root.unmount());
+  container.remove();
+  vi.unstubAllGlobals();
+});
+
+describe('RetainedConsentProofs', () => {
+  it('dice di quale evento e di quale consenso, e da quando', () => {
+    monta([prova('p1', 'recording')]);
+    expect(container.textContent).toContain('Prove dei consensi conservate');
+    expect(container.textContent).toContain('Evento passato');
+    expect(container.textContent).toContain("Registrazione dell'evento");
+    expect(container.textContent).toContain('Dato il 1 settembre 2026');
+  });
+
+  it('mostra il nome conservato, se c’e’', () => {
+    monta([
+      prova('p1', 'recording', { name: 'Anna Bianchi' }),
+      prova('p2', 'transcription'),
+    ]);
+    const voci = container.querySelectorAll('li');
+    expect(voci[0]?.textContent).toContain('Nome: Anna Bianchi');
+    expect(voci[1]?.textContent).not.toContain('Nome');
+  });
+
+  it('il ritiro chiede una conferma, poi manda la prova', async () => {
+    const richiesta = vi.fn(async () => new Response('{}', { status: 200 }));
+    vi.stubGlobal('fetch', richiesta);
+    monta([prova('p1', 'transcription')]);
+
+    await clic('Ritira il consenso');
+    expect(richiesta).not.toHaveBeenCalled();
+    await clic('Ritira');
+
+    expect(richiesta).toHaveBeenCalledWith(
+      '/api/gdpr/consents',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ token: 'tok', proofId: 'p1', consent: 'transcription' }),
+      })
+    );
+    expect(container.textContent).toContain('Ritirato il');
+    expect(pulsanti('Ritira il consenso')).toHaveLength(0);
+  });
+
+  it('si puo’ tornare indietro dalla conferma', async () => {
+    monta([prova('p1', 'recording')]);
+    await clic('Ritira il consenso');
+    await clic('Annulla');
+    expect(pulsanti('Ritira il consenso')).toHaveLength(1);
+  });
+
+  it('ritirare la registrazione ritira la trascrizione dello stesso evento, non degli altri', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('{}', { status: 200 }))
+    );
+    monta([
+      prova('p1', 'recording'),
+      prova('p2', 'transcription'),
+      prova('p3', 'transcription', { eventId: 'e2' }),
+    ]);
+
+    await clic('Ritira il consenso');
+    await clic('Ritira');
+
+    expect(container.textContent?.match(/Ritirato il/g)).toHaveLength(2);
+    expect(pulsanti('Ritira il consenso')).toHaveLength(1);
+  });
+
+  it('ritirare la trascrizione non tocca la registrazione', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('{}', { status: 200 }))
+    );
+    monta([prova('p2', 'transcription'), prova('p1', 'recording')]);
+
+    await clic('Ritira il consenso');
+    await clic('Ritira');
+
+    expect(container.textContent?.match(/Ritirato il/g)).toHaveLength(1);
+    expect(pulsanti('Ritira il consenso')).toHaveLength(1);
+  });
+
+  it('una prova gia’ ritirata non ha il pulsante', () => {
+    monta([prova('p1', 'recording', { withdrawnAt: '2026-10-01T08:00:00.000Z' })]);
+    expect(pulsanti('Ritira il consenso')).toHaveLength(0);
+    expect(container.textContent).toContain('Ritirato il 1 ottobre 2026');
+  });
+
+  it('un periodo sostituito si dice, e non si ritira: si ritira il consenso che l’ha sostituito', () => {
+    monta([prova('p1', 'recording', { superseded: true }), prova('p2', 'recording')]);
+    expect(
+      container.textContent?.match(/Sostituito da un consenso successivo/g)
+    ).toHaveLength(1);
+    expect(pulsanti('Ritira il consenso')).toHaveLength(1);
+  });
+
+  it('dopo il ritiro il periodo sostituito resta riconoscibile', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('{}', { status: 200 }))
+    );
+    monta([prova('p1', 'recording', { superseded: true }), prova('p2', 'recording')]);
+
+    await clic('Ritira il consenso');
+    await clic('Ritira');
+
+    expect(container.textContent).toContain('Sostituito da un consenso successivo');
+    expect(pulsanti('Ritira il consenso')).toHaveLength(0);
+  });
+
+  it.each([
+    [401, messages.gdpr.export.linkInvalid],
+    [429, messages.gdpr.export.rateLimited],
+    [500, messages.live.consents.error],
+  ])('la risposta %i lo dice e lascia il consenso com’era', async (status, testo) => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('{}', { status }))
+    );
+    monta([prova('p1', 'recording')]);
+
+    await clic('Ritira il consenso');
+    await clic('Ritira');
+
+    expect(container.querySelector('[role="alert"]')?.textContent).toBe(testo);
+    expect(container.textContent).not.toContain('Ritirato il');
+  });
+
+  it('una rete che cade lo dice', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        throw new Error('rete');
+      })
+    );
+    monta([prova('p1', 'recording')]);
+
+    await clic('Ritira il consenso');
+    await clic('Ritira');
+
+    expect(container.querySelector('[role="alert"]')?.textContent).toBe(
+      messages.live.consents.error
+    );
+  });
+});

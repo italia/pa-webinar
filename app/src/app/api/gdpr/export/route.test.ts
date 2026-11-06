@@ -17,13 +17,16 @@ const { prisma } = vi.hoisted(() => ({
     eventModerator: { findMany: vi.fn() },
     gdprAuditLog: { create: vi.fn() },
     captionSegment: { findMany: vi.fn() },
+    person: { findUnique: vi.fn() },
+    retainedConsentProof: { findMany: vi.fn() },
   },
 }));
 
 vi.mock('@/lib/db', () => ({ prisma }));
 
 import { encryptPII } from '@/lib/crypto/pii';
-import { issueGdprToken } from '@/lib/gdpr/request-token';
+import { issueGdprToken, verifyGdprToken } from '@/lib/gdpr/request-token';
+import { verifyRubricaOptOutToken } from '@/lib/persons/opt-out-token';
 
 import { GET } from './route';
 
@@ -84,6 +87,8 @@ beforeEach(() => {
   prisma.profilePhoto.findUnique.mockResolvedValue(null);
   prisma.eventModerator.findMany.mockResolvedValue([]);
   prisma.captionSegment.findMany.mockResolvedValue([]);
+  prisma.person.findUnique.mockResolvedValue(null);
+  prisma.retainedConsentProof.findMany.mockResolvedValue([]);
 });
 
 describe('chi puo’ scaricare', () => {
@@ -287,5 +292,197 @@ describe('la traccia della consegna', () => {
     expect(riga.details).toContain(HASH.slice(0, 8));
     expect(riga.details).not.toContain(HASH);
     expect(riga.details).not.toContain('anna');
+  });
+});
+
+describe('testo letto', () => {
+  it('riporta la destinazione e la versione del consenso alla registrazione', async () => {
+    prisma.registration.findMany.mockResolvedValue([
+      iscrizione('r1', 'e1', {
+        consentRecordingDestination: 'REGISTRANTS',
+        consentRecordingVersion: 1,
+        recordingConsents: [
+          {
+            consentedAt: new Date('2026-10-02T08:00:00Z'),
+            locale: 'it',
+            withdrawnAt: null,
+            destination: 'PUBLIC',
+            textVersion: 1,
+          },
+        ],
+      }),
+    ]);
+    const corpo = (await (await conToken()).json()) as {
+      data: Array<{ registration: Record<string, unknown> }>;
+    };
+    expect(corpo.data[0]!.registration).toMatchObject({
+      consentRecordingDestination: 'REGISTRANTS',
+      consentRecordingVersion: 1,
+      recordingConsentsInRoom: [{ destination: 'PUBLIC', textVersion: 1 }],
+    });
+  });
+});
+
+const prova = () => ({
+  id: 'p1',
+  eventId: 'e9',
+  kind: 'recording',
+  source: 'room',
+  role: 'registrant',
+  displayName: encryptPII('Anna Bianchi'),
+  nameRemovedAt: null,
+  locale: 'it',
+  textVersion: 1,
+  destination: 'PUBLIC',
+  givenAt: new Date('2026-09-01T08:00:00Z'),
+  withdrawnAt: null,
+  retainedAt: new Date('2026-10-30T03:00:00Z'),
+  event: { title: { it: 'Evento passato' }, startsAt: new Date('2026-09-02T08:00:00Z') },
+});
+
+describe('prove dei consensi conservate', () => {
+  it('chi ha solo prove le vede, puo’ ritirarle e lascia una traccia', async () => {
+    prisma.retainedConsentProof.findMany.mockResolvedValue([prova()]);
+    const testo = await (await conToken()).text();
+    const corpo = JSON.parse(testo) as {
+      data: unknown[];
+      consentsToken: string;
+      retainedConsentProofs: Array<Record<string, unknown>>;
+    };
+    expect(corpo.data).toEqual([]);
+    expect(corpo.retainedConsentProofs).toEqual([
+      expect.objectContaining({
+        id: 'p1',
+        eventId: 'e9',
+        kind: 'recording',
+        name: 'Anna Bianchi',
+        nameRemoved: false,
+        givenAt: '2026-09-01T08:00:00.000Z',
+        withdrawnAt: null,
+        event: { title: { it: 'Evento passato' }, startsAt: '2026-09-02T08:00:00.000Z' },
+      }),
+    ]);
+    expect(prisma.retainedConsentProof.findMany.mock.calls[0]![0].where).toEqual({
+      emailHash: HASH,
+    });
+    expect(verifyGdprToken(corpo.consentsToken, 'consents')).toEqual({ emailHash: HASH });
+    expect(prisma.gdprAuditLog.create).toHaveBeenCalledTimes(1);
+    expect(prisma.gdprAuditLog.create.mock.calls[0]![0].data).toMatchObject({
+      eventId: 'e9',
+      action: 'DATA_EXPORTED',
+    });
+    expect(testo).not.toContain(HASH);
+  });
+
+  it('una prova senza nome resta senza nome', async () => {
+    prisma.retainedConsentProof.findMany.mockResolvedValue([
+      {
+        ...prova(),
+        displayName: null,
+        nameRemovedAt: new Date('2026-10-31T08:00:00Z'),
+        withdrawnAt: new Date('2026-10-31T08:00:00Z'),
+      },
+    ]);
+    const corpo = (await (await conToken()).json()) as {
+      retainedConsentProofs: Array<Record<string, unknown>>;
+    };
+    expect(corpo.retainedConsentProofs[0]).toMatchObject({ name: null, nameRemoved: true });
+  });
+
+  it('accanto alle iscrizioni: una riga di registro per evento, senza doppioni', async () => {
+    prisma.registration.findMany.mockResolvedValue([iscrizione('r1', 'e1')]);
+    prisma.retainedConsentProof.findMany.mockResolvedValue([
+      { ...prova(), id: 'p1', eventId: 'e1' },
+      { ...prova(), id: 'p2', eventId: 'e9' },
+    ]);
+    const corpo = (await (await conToken()).json()) as { retainedConsentProofs: unknown[] };
+    expect(corpo.retainedConsentProofs).toHaveLength(2);
+    const eventi = prisma.gdprAuditLog.create.mock.calls.map((c) => c[0].data.eventId);
+    expect(eventi).toEqual(['e1', 'e9']);
+  });
+
+  it('senza niente non consegna il token per ritirare', async () => {
+    const corpo = (await (await conToken()).json()) as Record<string, unknown>;
+    expect(corpo).toEqual({
+      data: [],
+      profilePhoto: null,
+      grants: [],
+      addressBook: null,
+      retainedConsentProofs: [],
+    });
+  });
+});
+
+const VOCE_ID = '55555555-5555-4555-8555-555555555555';
+const voce = () => ({
+  id: VOCE_ID,
+  displayName: encryptPII('Anna Bianchi'),
+  email: encryptPII('anna@example.com'),
+  organization: 'Comune',
+  organizationRole: null,
+  organizationType: null,
+  optedInToAddressBook: true,
+  optedInAt: new Date('2026-01-31T08:00:00Z'),
+  optedOutAt: null,
+  retentionMonths: 24,
+});
+
+describe('rubrica', () => {
+  it('chi e’ solo in rubrica vede i suoi dati, la scadenza e il modo di uscirne', async () => {
+    prisma.person.findUnique.mockResolvedValue(voce());
+    const testo = await (await conToken()).text();
+    const corpo = JSON.parse(testo) as {
+      data: unknown[];
+      addressBook: Record<string, unknown> & { optOutToken: string };
+    };
+    expect(prisma.person.findUnique.mock.calls[0]![0].where).toEqual({ emailHash: HASH });
+    expect(corpo.data).toEqual([]);
+    expect(corpo.addressBook).toMatchObject({
+      name: 'Anna Bianchi',
+      email: 'anna@example.com',
+      organization: 'Comune',
+      optedIn: true,
+      optedInAt: '2026-01-31T08:00:00.000Z',
+      optedOutAt: null,
+      expiresAt: '2028-01-31T08:00:00.000Z',
+    });
+    expect(verifyRubricaOptOutToken(corpo.addressBook.optOutToken)).toEqual({
+      personId: VOCE_ID,
+    });
+    expect(testo).not.toContain(HASH);
+  });
+
+  it('accanto alle iscrizioni c’e’ lo stesso blocco', async () => {
+    prisma.person.findUnique.mockResolvedValue(voce());
+    prisma.registration.findMany.mockResolvedValue([iscrizione('r1', 'e1')]);
+    const corpo = (await (await conToken()).json()) as {
+      addressBook: Record<string, unknown>;
+    };
+    expect(corpo.addressBook).toMatchObject({ email: 'anna@example.com' });
+  });
+
+  it('chi ne e’ uscito vede il ritiro, senza scadenza e senza token', async () => {
+    prisma.person.findUnique.mockResolvedValue({
+      ...voce(),
+      optedInToAddressBook: false,
+      optedOutAt: new Date('2026-03-01T08:00:00Z'),
+    });
+    const corpo = (await (await conToken()).json()) as {
+      addressBook: Record<string, unknown>;
+    };
+    expect(corpo.addressBook).toMatchObject({
+      optedIn: false,
+      optedOutAt: '2026-03-01T08:00:00.000Z',
+      expiresAt: null,
+      optOutToken: null,
+    });
+  });
+
+  it('una voce senza data di consenso non ha una scadenza inventata', async () => {
+    prisma.person.findUnique.mockResolvedValue({ ...voce(), optedInAt: null, email: null });
+    const corpo = (await (await conToken()).json()) as {
+      addressBook: Record<string, unknown>;
+    };
+    expect(corpo.addressBook).toMatchObject({ expiresAt: null, email: null });
   });
 });

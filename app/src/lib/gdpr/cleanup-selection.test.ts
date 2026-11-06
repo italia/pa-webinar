@@ -12,6 +12,7 @@ import {
   isRecordingRetentionExpired,
   shouldPurgeRecordingBlob,
   tempRecordingExpiryCutoff,
+  tipiDiProvaDaConservare,
 } from './cleanup-selection';
 
 /**
@@ -274,5 +275,55 @@ describe('shouldPurgeRecordingBlob', () => {
     expect(
       shouldPurgeRecordingBlob({ recordingUrl: null, recordingPublished: false })
     ).toBe(false);
+  });
+});
+
+describe('tipiDiProvaDaConservare', () => {
+  const niente = {
+    youtubeUrl: null,
+    recordingUrl: null,
+    recordingPublished: false,
+    trascrizionePubblicata: false,
+  };
+  const entrambe = ['recording', 'transcription'];
+
+  it('niente di pubblicato: nessuna prova', () => {
+    expect(tipiDiProvaDaConservare(niente)).toEqual([]);
+  });
+
+  it('il video pubblicato tiene entrambe', () => {
+    expect(
+      tipiDiProvaDaConservare({ ...niente, recordingUrl: 'u', recordingPublished: true })
+    ).toEqual(entrambe);
+  });
+
+  it('il link esterno conta come video, anche senza file', () => {
+    expect(tipiDiProvaDaConservare({ ...niente, youtubeUrl: 'y' })).toEqual(entrambe);
+  });
+
+  it('il file non pubblicato non conta', () => {
+    expect(tipiDiProvaDaConservare({ ...niente, recordingUrl: 'u' })).toEqual([]);
+  });
+
+  it('il flag di pubblicazione senza file non conta', () => {
+    expect(tipiDiProvaDaConservare({ ...niente, recordingPublished: true })).toEqual([]);
+  });
+
+  it('la sola trascrizione pubblicata tiene la sua prova', () => {
+    expect(tipiDiProvaDaConservare({ ...niente, trascrizionePubblicata: true })).toEqual([
+      'transcription',
+    ]);
+  });
+
+  it('video e trascrizione insieme non raddoppiano', () => {
+    expect(
+      tipiDiProvaDaConservare({ ...niente, youtubeUrl: 'y', trascrizionePubblicata: true })
+    ).toEqual(entrambe);
+  });
+
+  it('non cambia il destino del file: il link esterno non lo tiene in vita', () => {
+    const evt = { ...niente, youtubeUrl: 'y', recordingUrl: 'u' };
+    expect(tipiDiProvaDaConservare(evt)).toEqual(entrambe);
+    expect(shouldPurgeRecordingBlob(evt)).toBe(true);
   });
 });

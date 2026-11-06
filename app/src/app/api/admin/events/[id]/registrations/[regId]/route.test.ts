@@ -19,6 +19,7 @@ vi.mock('@/lib/gdpr/erase-registrations', () => ({
     questionnaireResponses: 0,
     chatMessages: 2,
     outboxRows: 1,
+    consentProofsKept: 2,
     attachmentFilesNotDeleted: 0,
   })),
 }));
@@ -207,11 +208,28 @@ describe('DELETE registration', () => {
   it('erases it with its contributions and logs the deletion without personal data', async () => {
     const res = await DELETE(req('DELETE') as never, ctx as never);
     expect(res.status).toBe(200);
-    expect(eraseRegistrations).toHaveBeenCalledWith([REG], expect.any(String));
+    expect(eraseRegistrations).toHaveBeenCalledWith(
+      [expect.objectContaining({ id: REG, eventId: expect.any(String) })],
+      expect.any(String),
+    );
     const audit = db.gdprAuditLog.create.mock.calls[0]![0] as {
       data: { action: string; details: string };
     };
     expect(audit.data.action).toBe('DATA_DELETED');
     expect(audit.data.details).toContain('admin-registration-delete');
+  });
+
+  it('says how many consent proofs stay, in the response and in the log', async () => {
+    const res = await DELETE(req('DELETE') as never, ctx as never);
+    expect(await res.json()).toMatchObject({ ok: true, registrations: 1, consentProofsKept: 2 });
+    const audit = db.gdprAuditLog.create.mock.calls[0]![0] as { data: { details: string } };
+    expect(JSON.parse(audit.data.details)).toMatchObject({ consentProofsKept: 2 });
+  });
+
+  it('erases nothing for a registration of another event', async () => {
+    db.registration.findUnique.mockResolvedValue({ eventId: 'altro-evento', id: REG });
+    const res = await DELETE(req('DELETE') as never, ctx as never);
+    expect(res.status).toBe(404);
+    expect(eraseRegistrations).not.toHaveBeenCalled();
   });
 });

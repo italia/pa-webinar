@@ -4021,6 +4021,8 @@
         "withdrawnAt": "Tarraingthe siar ar",
         "textVersion": "Leagan an téacs",
         "destination": "Destination",
+        "superseded": "Replaced",
+        "supersededValue": "By a later consent",
         "destinations": {
           "PUBLIC": "Public",
           "REGISTRANTS": "Reserved",
@@ -4553,6 +4555,7 @@
       "proofsTitle": "Consent proofs kept",
       "proofsIntro": "The data for these events has been deleted. These proofs stay for as long as the video or transcript is published. You can withdraw your consent: what is already in the video stays, and to have it removed you must write to the data controller.",
       "proofGivenOn": "Given on {date}",
+      "proofSuperseded": "Replaced by a later consent",
       "addressBookTitle": "Events address book",
       "addressBookIntro": "You chose to stay in the address book, to be invited to similar events. We keep this data until {date}, unless you withdraw your consent or give it again.",
       "addressBookOptOut": "Remove me from the address book",

@@ -14,6 +14,7 @@
  * L'handler DEVE usare queste funzioni: sono la definizione unica di "cosa è
  * eleggibile alla cancellazione e da quando".
  */
+import type { TipoConsenso } from '@/lib/gdpr/consent-proofs';
 
 const DAY_MS = 86_400_000;
 
@@ -171,4 +172,34 @@ export interface RecordingBlobRow {
  */
 export function shouldPurgeRecordingBlob(evt: RecordingBlobRow): boolean {
   return Boolean(evt.recordingUrl) && !evt.recordingPublished;
+}
+
+export interface StatoPubblicazioneProve extends RecordingBlobRow {
+  youtubeUrl: string | null;
+  /** La trascrizione e' pubblicata e il suo artefatto esiste ancora. */
+  trascrizionePubblicata: boolean;
+}
+
+/**
+ * Quali prove di consenso restano quando le loro sorgenti se ne vanno: e' la
+ * definizione unica della vita di una prova conservata.
+ *
+ *  - Il video e' pubblicato, sulla piattaforma o con un link esterno (come
+ *    `lib/events/closing`): restano entrambe, perche' la trascrizione viene da
+ *    quel video.
+ *  - E' pubblicata la sola trascrizione: resta la sua prova.
+ *  - Altrimenti nessuna, e quelle gia' conservate si cancellano.
+ *
+ * Il link esterno vale finche' qualcuno non lo toglie: la piattaforma non sa
+ * quando il video sparisce da un altro sito. `recordingPublished` senza
+ * `recordingUrl` non e' un video: non c'e' niente da mostrare.
+ *
+ * Da non confondere con `shouldPurgeRecordingBlob`, che decide il file: un video
+ * con il solo link esterno non tiene in vita il file non pubblicato.
+ */
+export function tipiDiProvaDaConservare(evt: StatoPubblicazioneProve): TipoConsenso[] {
+  if (evt.youtubeUrl || (evt.recordingUrl && evt.recordingPublished)) {
+    return ['recording', 'transcription'];
+  }
+  return evt.trascrizionePubblicata ? ['transcription'] : [];
 }

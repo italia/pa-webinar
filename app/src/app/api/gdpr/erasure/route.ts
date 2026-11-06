@@ -14,7 +14,11 @@
  * explicitly: feedback, questionnaire responses, chat messages (with
  * their attachment files), the invitations addressed to that email, the
  * named grants with that email (with their photos, when no other event
- * uses them) and the outbox rows written for those registrations.
+ * uses them), the consents given entering the room with a staff account of
+ * that email, and the outbox rows written for those registrations.
+ * Le prove dei consensi di un video o di una trascrizione pubblicati restano
+ * senza nome e ritirate finche' sono pubblicati, anche quelle gia' conservate
+ * di un evento ripulito (lib/gdpr/retained-consent-proofs).
  * Recordings tied to the underlying Event are NOT deleted here — they are
  * governed by the event-level retention cron and are subject to separate
  * legal-hold rules.
@@ -27,10 +31,16 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { AppError, RateLimitError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { getClientIp, rateLimit } from '@/lib/rate-limit';
-import { eraseRegistrations } from '@/lib/gdpr/erase-registrations';
+import { eraseRegistrations, TIMEOUT_CANCELLAZIONE_MS } from '@/lib/gdpr/erase-registrations';
 import { verifyGdprToken } from '@/lib/gdpr/request-token';
 import { invalidateModeratorCache } from '@/lib/auth/moderator';
+import { bloccaTrascrizioneEvento } from '@/lib/captions/transcript';
 import { deleteUnreferencedPersonPhotos } from '@/lib/events/person-photo-store';
+import {
+  conservaProve,
+  tipiDelleProve,
+  togliNomeDalleProve,
+} from '@/lib/gdpr/retained-consent-proofs';
 
 export const dynamic = 'force-dynamic';
 
@@ -56,6 +66,7 @@ export const POST = withErrorHandling(async (request) => {
   }
 
   const { emailHash } = verified;
+  const adesso = new Date();
 
   // La voce di rubrica e' un dato della stessa persona, e sopravviveva: le
   // iscrizioni la puntano con onDelete SetNull, quindi cancellarle non la
@@ -77,12 +88,55 @@ export const POST = withErrorHandling(async (request) => {
     where: { emailHash },
     select: { id: true, eventId: true, token: true, photoId: true },
   });
+  // Il consenso alla registrazione dato entrando dal link primario con un
+  // account dello staff: l'account resta, la prova porta il nome della persona.
+  const account = await prisma.staffAccount.findUnique({
+    where: { emailHash },
+    select: { id: true },
+  });
+  const proveAccount = account
+    ? await prisma.recordingConsent.findMany({
+        where: { staffAccountId: account.id },
+        select: { eventId: true },
+        distinct: ['eventId'],
+      })
+    : [];
   // Le prove del consenso alla registrazione date entrando con quelle
-  // concessioni (nome cifrato e posto): via con loro, non solo scollegate.
-  if (daTogliere.length > 0) {
-    await prisma.recordingConsent.deleteMany({
-      where: { eventModeratorId: { in: daTogliere.map((g) => g.id) } },
-    });
+  // concessioni o con quell'account (nome cifrato e posto): via con loro, non
+  // solo scollegate. Se l'evento ha un video pubblicato ne resta la copia, senza
+  // nome. Copia e cancellazione vanno insieme: un nuovo tentativo non la
+  // raddoppia.
+  const proveCopiate = new Map<string, number>();
+  const eventiConProve = [
+    ...new Set([...daTogliere, ...proveAccount].map((p) => p.eventId)),
+  ].sort();
+  if (eventiConProve.length > 0) {
+    const grantIds = daTogliere.map((g) => g.id);
+    await prisma.$transaction(async (tx) => {
+      // In fila con la pulizia degli stessi eventi, come per le iscrizioni: la
+      // stessa prova non si copia due volte, una delle due con il nome.
+      for (const eventId of eventiConProve) await bloccaTrascrizioneEvento(tx, eventId);
+      for (const eventId of eventiConProve) {
+        const copiate = await conservaProve(tx, {
+          eventId,
+          tipi: await tipiDelleProve(tx, eventId),
+          grantIds: daTogliere.filter((g) => g.eventId === eventId).map((g) => g.id),
+          staffAccountIds: account ? [account.id] : [],
+          senzaNome: true,
+          adesso,
+        });
+        if (copiate > 0) proveCopiate.set(eventId, copiate);
+      }
+      await tx.recordingConsent.deleteMany({
+        where: {
+          eventId: { in: eventiConProve },
+          OR: [
+            { eventModeratorId: { in: grantIds } },
+            ...(account ? [{ staffAccountId: account.id }] : []),
+          ],
+        },
+      });
+    }, { timeout: TIMEOUT_CANCELLAZIONE_MS });
   }
   const grants = await prisma.eventModerator.deleteMany({ where: { emailHash } });
   for (const g of daTogliere) invalidateModeratorCache(g.eventId, g.token);
@@ -101,8 +155,38 @@ export const POST = withErrorHandling(async (request) => {
     where: { emailHash },
     select: { id: true, eventId: true },
   });
+  const counts =
+    registrations.length > 0 ? await eraseRegistrations(registrations, 'gdpr/erasure') : null;
 
-  if (registrations.length === 0) {
+  // Le prove gia' conservate di eventi ripuliti: per chi ha solo quelle e' tutto
+  // cio' che la cancellazione cambia, e deve restarne traccia nel registro. Dopo
+  // le iscrizioni, cosi' prende anche cio' che una pulizia in corso ha copiato
+  // con il nome mentre questa richiesta aspettava il suo turno.
+  const proveToccate = await togliNomeDalleProve(emailHash, adesso);
+  for (const [eventId, copiate] of proveCopiate) {
+    proveToccate.set(eventId, (proveToccate.get(eventId) ?? 0) + copiate);
+  }
+
+  const registraCancellazione = (eventId: string, recordCount: number, altri: object = {}) =>
+    prisma.gdprAuditLog.create({
+      data: {
+        eventId,
+        action: 'DATA_DELETED',
+        recordCount,
+        details: JSON.stringify({
+          source: 'gdpr-erasure-endpoint',
+          emailHashPrefix: emailHash.substring(0, 8),
+          addressBookDeleted,
+          ...altri,
+        }),
+      },
+    });
+  const proveRimaste = () => prisma.retainedConsentProof.count({ where: { emailHash } });
+
+  if (!counts) {
+    for (const [eventId, prove] of proveToccate) {
+      await registraCancellazione(eventId, prove, { consentProofsWithoutName: prove });
+    }
     return Response.json({
       ok: true,
       deleted: 0,
@@ -111,28 +195,23 @@ export const POST = withErrorHandling(async (request) => {
       grantsDeleted: grants.count,
       grantPhotosDeleted,
       profilePhotoDeleted,
+      consentProofsKept: await proveRimaste(),
     });
   }
 
-  const registrationIds = registrations.map((r) => r.id);
   const eventIds = [...new Set(registrations.map((r) => r.eventId))];
-  const counts = await eraseRegistrations(registrationIds, 'gdpr/erasure');
   const { attachmentFilesNotDeleted } = counts;
 
-  for (const eventId of eventIds) {
-    await prisma.gdprAuditLog.create({
-      data: {
-        eventId,
-        action: 'DATA_DELETED',
-        recordCount: registrations.filter((r) => r.eventId === eventId).length,
-        details: JSON.stringify({
-          source: 'gdpr-erasure-endpoint',
-          emailHashPrefix: emailHash.substring(0, 8),
-          addressBookDeleted,
-          ...(attachmentFilesNotDeleted > 0 && { attachmentFilesNotDeleted }),
-        }),
-      },
-    });
+  for (const eventId of new Set([...eventIds, ...proveToccate.keys()])) {
+    const prove = proveToccate.get(eventId) ?? 0;
+    await registraCancellazione(
+      eventId,
+      registrations.filter((r) => r.eventId === eventId).length + prove,
+      {
+        ...(prove > 0 && { consentProofsWithoutName: prove }),
+        ...(attachmentFilesNotDeleted > 0 && { attachmentFilesNotDeleted }),
+      }
+    );
   }
 
   return Response.json({
@@ -147,6 +226,7 @@ export const POST = withErrorHandling(async (request) => {
     questionnaireResponsesDeleted: counts.questionnaireResponses,
     chatMessagesDeleted: counts.chatMessages,
     outboxRowsDeleted: counts.outboxRows,
+    consentProofsKept: await proveRimaste(),
     ...(attachmentFilesNotDeleted > 0 && { attachmentFilesNotDeleted }),
   });
 });

@@ -21,6 +21,9 @@ import {
 } from 'design-react-kit';
 
 import RegistrationConsents, { type ConsensiVista } from '@/components/privacy/registration-consents';
+import RetainedConsentProofs, {
+  type ProvaConservataVista,
+} from '@/components/privacy/retained-consent-proofs';
 import { Icon } from '@/components/ui/icon';
 import { Link, percorso } from '@/i18n/navigation';
 import type { VoceNelVideo } from '@/lib/live/consent-rule';
@@ -82,6 +85,18 @@ interface ExportGrant {
   event: { title: Record<string, string>; startsAt: string };
 }
 
+/** La voce di rubrica: dura oltre le iscrizioni, e arriva a parte. */
+interface ExportAddressBook {
+  name: string | null;
+  email: string | null;
+  organization: string | null;
+  optedIn: boolean;
+  optedOutAt: string | null;
+  expiresAt: string | null;
+  /** Vale per la pagina di uscita dalla rubrica. */
+  optOutToken: string | null;
+}
+
 const GRANT_ROLE_KEY = {
   organizer: 'grantRoleOrganizer',
   moderator: 'grantRoleModerator',
@@ -102,6 +117,9 @@ export default function MyDataPage() {
   const [photo, setPhoto] = useState<{ uploadedAt: string; dataUrl: string } | null>(null);
   // I ruoli negli eventi: anche chi non si è mai iscritto può averne.
   const [grants, setGrants] = useState<ExportGrant[]>([]);
+  const [rubrica, setRubrica] = useState<ExportAddressBook | null>(null);
+  // Le prove restate dopo la cancellazione delle iscrizioni.
+  const [prove, setProve] = useState<ProvaConservataVista[]>([]);
   // Il token per ritirare un consenso: lo consegna la lettura dei dati.
   const [tokenConsensi, setTokenConsensi] = useState<string | null>(null);
   const [voce, setVoce] = useState<VoceNelVideo>('rimovibile');
@@ -141,6 +159,8 @@ export default function MyDataPage() {
         setResults(json.data);
         setPhoto(json.profilePhoto ?? null);
         setGrants(Array.isArray(json.grants) ? json.grants : []);
+        setRubrica(json.addressBook ?? null);
+        setProve(Array.isArray(json.retainedConsentProofs) ? json.retainedConsentProofs : []);
         setTokenConsensi(typeof json.consentsToken === 'string' ? json.consentsToken : null);
         if (json.voiceInVideo) setVoce(json.voiceInVideo);
       } catch {
@@ -346,12 +366,65 @@ export default function MyDataPage() {
             </Card>
           )}
 
-          {results !== null && results.length === 0 && !photo && grants.length === 0 && (
-            <Alert color="info">
-              <Icon icon="it-info-circle" className="me-2" />
-              {t('noData')}
-            </Alert>
+          {rubrica && (
+            <Card className="shadow-sm border-0 mb-4" style={{ borderRadius: 8, border: '1px solid #e8e8e8' }}>
+              <CardBody className="p-4">
+                <h2 className="h5 mb-1">{t('addressBookTitle')}</h2>
+                {rubrica.expiresAt && (
+                  <p className="text-muted mb-3" style={{ fontSize: '0.9rem' }}>
+                    {t('addressBookIntro', {
+                      date: format.dateTime(new Date(rubrica.expiresAt), { dateStyle: 'long' }),
+                    })}
+                  </p>
+                )}
+                <dl className="row mb-3" style={{ fontSize: '0.9rem' }}>
+                  <dt className="col-sm-4">{t('fieldName')}</dt>
+                  <dd className="col-sm-8">{rubrica.name ?? '—'}</dd>
+                  <dt className="col-sm-4">{t('fieldEmail')}</dt>
+                  <dd className="col-sm-8">{rubrica.email ?? '—'}</dd>
+                  {rubrica.organization && (
+                    <>
+                      <dt className="col-sm-4">{t('fieldOrganization')}</dt>
+                      <dd className="col-sm-8">{rubrica.organization}</dd>
+                    </>
+                  )}
+                </dl>
+                {!rubrica.optedIn && rubrica.optedOutAt && (
+                  <p className="text-muted mb-0" style={{ fontSize: '0.9rem' }}>
+                    {t('consentWithdrawnOn', {
+                      date: format.dateTime(new Date(rubrica.optedOutAt), { dateStyle: 'long' }),
+                    })}
+                  </p>
+                )}
+                {rubrica.optOutToken && (
+                  <Link
+                    className="btn btn-outline-primary btn-sm"
+                    href={percorso(
+                      `/rubrica/opt-out?token=${encodeURIComponent(rubrica.optOutToken)}`,
+                    )}
+                  >
+                    {t('addressBookOptOut')}
+                  </Link>
+                )}
+              </CardBody>
+            </Card>
           )}
+
+          {prove.length > 0 && tokenConsensi && (
+            <RetainedConsentProofs token={tokenConsensi} prove={prove} />
+          )}
+
+          {results !== null &&
+            results.length === 0 &&
+            !photo &&
+            grants.length === 0 &&
+            !rubrica &&
+            prove.length === 0 && (
+              <Alert color="info">
+                <Icon icon="it-info-circle" className="me-2" />
+                {t('noData')}
+              </Alert>
+            )}
 
           {results !== null && results.length > 0 && (
             <div>
