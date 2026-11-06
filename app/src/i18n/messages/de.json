@@ -4569,6 +4569,11 @@
       "proofsIntro": "Die Daten dieser Veranstaltungen wurden gelöscht. Diese Nachweise bleiben erhalten, solange das Video oder das Transkript existiert. Sie können Ihre Einwilligung widerrufen: Was bereits im Video enthalten ist, bleibt, und um es entfernen zu lassen, müssen Sie an den Verantwortlichen für die Datenverarbeitung schreiben.",
       "proofGivenOn": "Erteilt am {date}",
       "proofSuperseded": "Durch eine spätere Einwilligung ersetzt",
+      "proofWithdrawEffect": {
+        "recording": "You also withdraw your consent to transcription: your sentences and your name leave the transcript from captions. What is already in the video stays, and so does a transcript made from the video or the audio tracks: to have them removed, write to the data controller. This withdrawal cannot be undone from this page.",
+        "transcription": "Your sentences and your name leave the transcript from captions. A transcript made from the video or the audio tracks stays: to have it removed, write to the data controller. This withdrawal cannot be undone from this page."
+      },
+      "proofWithdrawHost": "Older transcripts from captions do not recognize hosts: your sentences and your name stay there, and to have them removed you must write to the data controller.",
       "addressBookTitle": "Veranstaltungs-Adressbuch",
       "addressBookIntro": "Sie haben sich dafür entschieden, im Adressbuch zu bleiben, um zu ähnlichen Veranstaltungen eingeladen zu werden. Wir bewahren diese Daten bis zum {date} auf, sofern Sie nicht widerrufen oder erneut einwilligen.",
       "addressBookOptOut": "Meine Daten aus dem Adressbuch entfernen",

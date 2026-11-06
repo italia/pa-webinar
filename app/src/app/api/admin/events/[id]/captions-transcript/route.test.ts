@@ -27,6 +27,8 @@ vi.mock('@/lib/db', () => ({
     event: { findUnique: vi.fn() },
     captionSegment: { count: vi.fn(), findMany: vi.fn() },
     recording: { findFirst: vi.fn() },
+    recordingConsent: { findMany: vi.fn(async () => []) },
+    multitrackConsent: { findMany: vi.fn(async () => []) },
   },
 }));
 

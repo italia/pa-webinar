@@ -4569,6 +4569,11 @@
       "proofsIntro": "Datele acestor evenimente au fost șterse. Aceste dovezi rămân cât timp videoclipul sau transcrierea există. Vă puteți retrage consimțământul: ceea ce se află deja în videoclip rămâne, iar pentru a-l elimina trebuie să scrieți operatorului de date.",
       "proofGivenOn": "Dat la {date}",
       "proofSuperseded": "Înlocuit de un consimțământ ulterior",
+      "proofWithdrawEffect": {
+        "recording": "You also withdraw your consent to transcription: your sentences and your name leave the transcript from captions. What is already in the video stays, and so does a transcript made from the video or the audio tracks: to have them removed, write to the data controller. This withdrawal cannot be undone from this page.",
+        "transcription": "Your sentences and your name leave the transcript from captions. A transcript made from the video or the audio tracks stays: to have it removed, write to the data controller. This withdrawal cannot be undone from this page."
+      },
+      "proofWithdrawHost": "Older transcripts from captions do not recognize hosts: your sentences and your name stay there, and to have them removed you must write to the data controller.",
       "addressBookTitle": "Agenda de evenimente",
       "addressBookIntro": "Ați ales să rămâneți în agendă, pentru a fi invitat la evenimente similare. Păstrăm aceste date până la {date}, cu excepția cazului în care vă retrageți consimțământul sau dați un nou consimțământ.",
       "addressBookOptOut": "Elimină-mi datele din agendă",

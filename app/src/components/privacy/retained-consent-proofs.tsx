@@ -13,6 +13,7 @@ export interface ProvaConservataVista {
   id: string;
   eventId: string;
   kind: 'recording' | 'transcription';
+  role: 'registrant' | 'guest' | 'host';
   /** Il nome conservato: null dopo una cancellazione, o se non si legge piu'. */
   name: string | null;
   /** Sostituita da un consenso successivo: si ritira quello. */
@@ -25,14 +26,14 @@ export interface ProvaConservataVista {
 /**
  * Le prove dei consensi restate dopo la cancellazione dell'iscrizione, nella
  * pagina dei propri dati: un consenso si ritira anche quando l'iscrizione non
- * esiste piu', con la stessa conferma di quelli delle iscrizioni. Il ritiro di
- * una prova vale per lo stesso consenso su tutto l'evento, e quello della
- * registrazione ritira anche la trascrizione.
+ * esiste piu', con la conferma che dice cosa cambia. Il ritiro di una prova vale
+ * per lo stesso consenso su tutto l'evento, e quello della registrazione ritira
+ * anche la trascrizione.
  *
  * La conferma sostituisce il bottone premuto, e il ritiro la toglie: il fuoco non
  * si perde, passa al gruppo della conferma e torna al titolo della riga. L'esito
- * dice evento e consenso, e si annuncia in una zona sempre presente nella pagina:
- * il titolo della riga non dice che il ritiro e' avvenuto.
+ * dice evento e consensi ritirati, e si annuncia in una zona sempre presente nella
+ * pagina: il titolo della riga non dice che il ritiro e' avvenuto.
  */
 export default function RetainedConsentProofs({
   token,
@@ -91,8 +92,16 @@ export default function RetainedConsentProofs({
       if (res.status === 429) return setErrore(t('rateLimited'));
       if (!res.ok) return setErrore(tl('error'));
       const adesso = new Date().toISOString();
+      const anchePerLaTrascrizione =
+        prova.kind === 'recording' &&
+        righe.some(
+          (r) => r.eventId === prova.eventId && r.kind === 'transcription' && !r.withdrawnAt
+        );
+      const consensi = anchePerLaTrascrizione
+        ? `${tl('recording.title')}, ${tl('transcription.title')}`
+        : tl(`${prova.kind}.title`);
       setEsito(
-        `${titolo(prova)} · ${tl(`${prova.kind}.title`)}: ${t('consentWithdrawnOn', { date: data(adesso) })}`
+        `${titolo(prova)} · ${consensi}: ${t('consentWithdrawnOn', { date: data(adesso) })}`
       );
       setRighe((prima) =>
         prima.map((r) =>
@@ -159,7 +168,11 @@ export default function RetainedConsentProofs({
                     tabIndex={-1}
                     ref={gruppoConferma}
                   >
-                    <span className="fw-semibold">{tl('confirmTitle')}</span>
+                    <span className="fw-semibold w-100">{tl('confirmTitle')}</span>
+                    <span className="w-100">{t(`proofWithdrawEffect.${p.kind}`)}</span>
+                    {p.role === 'host' && (
+                      <span className="w-100">{t('proofWithdrawHost')}</span>
+                    )}
                     <Button
                       color="danger"
                       size="sm"

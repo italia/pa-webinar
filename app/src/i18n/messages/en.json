@@ -4569,6 +4569,11 @@
       "proofsIntro": "The data for these events has been deleted. These proofs stay for as long as the video or transcript exists. You can withdraw your consent: what is already in the video stays, and to have it removed you must write to the data controller.",
       "proofGivenOn": "Given on {date}",
       "proofSuperseded": "Replaced by a later consent",
+      "proofWithdrawEffect": {
+        "recording": "You also withdraw your consent to transcription: your sentences and your name leave the transcript from captions. What is already in the video stays, and so does a transcript made from the video or the audio tracks: to have them removed, write to the data controller. This withdrawal cannot be undone from this page.",
+        "transcription": "Your sentences and your name leave the transcript from captions. A transcript made from the video or the audio tracks stays: to have it removed, write to the data controller. This withdrawal cannot be undone from this page."
+      },
+      "proofWithdrawHost": "Older transcripts from captions do not recognize hosts: your sentences and your name stay there, and to have them removed you must write to the data controller.",
       "addressBookTitle": "Events address book",
       "addressBookIntro": "You chose to stay in the address book, to be invited to similar events. We keep this data until {date}, unless you withdraw your consent or give it again.",
       "addressBookOptOut": "Remove me from the address book",
@@ -4591,7 +4596,7 @@
       "linkInvalid": "This link is invalid or expired. Please request a new link.",
       "confirmWarning": "You are about to permanently erase the personal data tied to your email, except what is listed below.",
       "confirmBody": "Registrations, questions, poll votes, feedback, reminders and your entry in the events address book will be deleted. This action is irreversible.",
-      "confirmProofs": "If a video or transcript of an event exists, even if it is not published yet, the type of consent, the date and the text you answered stay, without your name, for as long as that video or transcript exists. They are there to prove the consent. The video does not change: to ask for your contributions to be removed, write to the data controller.",
+      "confirmProofs": "If a video or transcript of an event exists, even if it is not published yet, the type of consent, the date and the text you answered stay, without your name, for as long as that video or transcript exists. They are there to prove the consent. The video does not change: to ask for your contributions to be removed, write to the data controller. Older transcripts from captions do not recognize people who lead or speak with a role in the event: your sentences and your name stay there, and to have them removed you must write to the data controller.",
       "confirmButton": "Confirm erasure",
       "cancel": "Cancel",
       "processing": "Deleting...",

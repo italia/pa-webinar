@@ -24,6 +24,7 @@ const prova = (
   id,
   eventId: 'e1',
   kind,
+  role: 'registrant',
   name: null,
   superseded: false,
   givenAt: '2026-09-01T08:00:00.000Z',
@@ -99,6 +100,57 @@ describe('RetainedConsentProofs', () => {
     );
     expect(container.textContent).toContain('Ritirato il');
     expect(pulsanti('Ritira il consenso')).toHaveLength(0);
+  });
+
+  it('la conferma dice cosa cambia prima del ritiro', async () => {
+    monta([prova('p1', 'recording'), prova('p2', 'transcription', { eventId: 'e2' })]);
+
+    await clic('Ritira il consenso');
+    const gruppo = () => container.querySelector('[role="group"]')?.textContent;
+    expect(gruppo()).toContain(messages.gdpr.export.proofWithdrawEffect.recording);
+    expect(gruppo()).not.toContain(messages.gdpr.export.proofWithdrawHost);
+    await clic('Annulla');
+
+    await act(async () => pulsanti('Ritira il consenso')[1]?.click());
+    expect(gruppo()).toContain(messages.gdpr.export.proofWithdrawEffect.transcription);
+  });
+
+  it('a chi conduce dice che le trascrizioni piu’ vecchie non lo riconoscono', async () => {
+    monta([prova('p1', 'transcription', { role: 'host' })]);
+    await clic('Ritira il consenso');
+    expect(container.querySelector('[role="group"]')?.textContent).toContain(
+      messages.gdpr.export.proofWithdrawHost
+    );
+  });
+
+  it('l’esito annuncia entrambi i consensi quando la registrazione porta via la trascrizione', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('{}', { status: 200 }))
+    );
+    monta([prova('p1', 'recording'), prova('p2', 'transcription')]);
+
+    await clic('Ritira il consenso');
+    await clic('Ritira');
+
+    const esito = container.querySelector('[role="status"]')?.textContent;
+    expect(esito).toContain("Registrazione dell'evento");
+    expect(esito).toContain('Trascrizione dei tuoi interventi');
+  });
+
+  it('l’esito nomina solo il consenso ritirato se la trascrizione non c’era', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('{}', { status: 200 }))
+    );
+    monta([prova('p1', 'recording'), prova('p2', 'transcription', { eventId: 'e2' })]);
+
+    await clic('Ritira il consenso');
+    await clic('Ritira');
+
+    expect(container.querySelector('[role="status"]')?.textContent).not.toContain(
+      'Trascrizione dei tuoi interventi'
+    );
   });
 
   it('si puo’ tornare indietro dalla conferma', async () => {

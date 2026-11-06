@@ -4569,6 +4569,11 @@
       "proofsIntro": "Os dados destes eventos foram eliminados. Estas provas ficam enquanto o vídeo ou a transcrição existirem. Pode retirar o consentimento: o que já está no vídeo fica e, para o retirar, tem de escrever ao responsável pelo tratamento.",
       "proofGivenOn": "Dado em {date}",
       "proofSuperseded": "Substituído por um consentimento posterior",
+      "proofWithdrawEffect": {
+        "recording": "You also withdraw your consent to transcription: your sentences and your name leave the transcript from captions. What is already in the video stays, and so does a transcript made from the video or the audio tracks: to have them removed, write to the data controller. This withdrawal cannot be undone from this page.",
+        "transcription": "Your sentences and your name leave the transcript from captions. A transcript made from the video or the audio tracks stays: to have it removed, write to the data controller. This withdrawal cannot be undone from this page."
+      },
+      "proofWithdrawHost": "Older transcripts from captions do not recognize hosts: your sentences and your name stay there, and to have them removed you must write to the data controller.",
       "addressBookTitle": "Agenda de eventos",
       "addressBookIntro": "Escolheu ficar na agenda para ser convidado para eventos semelhantes. Conservamos estes dados até {date}, salvo retirada ou novo consentimento.",
       "addressBookOptOut": "Remover os meus dados da agenda",

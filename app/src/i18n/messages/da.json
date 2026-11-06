@@ -4569,6 +4569,11 @@
       "proofsIntro": "Dataene for disse arrangementer er blevet slettet. Denne dokumentation bevares, så længe videoen eller transskriptionen findes. Du kan trække dit samtykke tilbage: det, der allerede er i videoen, forbliver der, og for at få det fjernet skal du skrive til den dataansvarlige.",
       "proofGivenOn": "Givet den {date}",
       "proofSuperseded": "Erstattet af et senere samtykke",
+      "proofWithdrawEffect": {
+        "recording": "You also withdraw your consent to transcription: your sentences and your name leave the transcript from captions. What is already in the video stays, and so does a transcript made from the video or the audio tracks: to have them removed, write to the data controller. This withdrawal cannot be undone from this page.",
+        "transcription": "Your sentences and your name leave the transcript from captions. A transcript made from the video or the audio tracks stays: to have it removed, write to the data controller. This withdrawal cannot be undone from this page."
+      },
+      "proofWithdrawHost": "Older transcripts from captions do not recognize hosts: your sentences and your name stay there, and to have them removed you must write to the data controller.",
       "addressBookTitle": "Arrangementsadressebog",
       "addressBookIntro": "Du har valgt at blive i adressebogen for at blive inviteret til lignende arrangementer. Vi opbevarer disse data indtil {date}, medmindre du trækker samtykket tilbage eller giver et nyt.",
       "addressBookOptOut": "Fjern mine data fra adressebogen",

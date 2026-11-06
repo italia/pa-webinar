@@ -4569,6 +4569,11 @@
       "proofsIntro": "Данните за тези събития са изтрити. Тези доказателства остават, докато видеото или транскрипцията съществуват. Можете да оттеглите съгласието си: вече включеното във видеото остава и за да бъде премахнато, трябва да пишете на администратора на лични данни.",
       "proofGivenOn": "Дадено на {date}",
       "proofSuperseded": "Заменено с последващо съгласие",
+      "proofWithdrawEffect": {
+        "recording": "You also withdraw your consent to transcription: your sentences and your name leave the transcript from captions. What is already in the video stays, and so does a transcript made from the video or the audio tracks: to have them removed, write to the data controller. This withdrawal cannot be undone from this page.",
+        "transcription": "Your sentences and your name leave the transcript from captions. A transcript made from the video or the audio tracks stays: to have it removed, write to the data controller. This withdrawal cannot be undone from this page."
+      },
+      "proofWithdrawHost": "Older transcripts from captions do not recognize hosts: your sentences and your name stay there, and to have them removed you must write to the data controller.",
       "addressBookTitle": "Адресна книга на събитията",
       "addressBookIntro": "Избрали сте да останете в адресната книга, за да бъдете канени на подобни събития. Съхраняваме тези данни до {date}, освен ако не оттеглите съгласието си или не дадете ново.",
       "addressBookOptOut": "Премахни данните ми от адресната книга",

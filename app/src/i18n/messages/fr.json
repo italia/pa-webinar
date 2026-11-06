@@ -4569,6 +4569,11 @@
       "proofsIntro": "Les données de ces événements ont été supprimées. Ces preuves restent tant que la vidéo ou la transcription existe. Vous pouvez retirer votre consentement : ce qui figure déjà dans la vidéo reste, et pour le faire retirer vous devez écrire au responsable du traitement.",
       "proofGivenOn": "Donné le {date}",
       "proofSuperseded": "Remplacé par un consentement ultérieur",
+      "proofWithdrawEffect": {
+        "recording": "You also withdraw your consent to transcription: your sentences and your name leave the transcript from captions. What is already in the video stays, and so does a transcript made from the video or the audio tracks: to have them removed, write to the data controller. This withdrawal cannot be undone from this page.",
+        "transcription": "Your sentences and your name leave the transcript from captions. A transcript made from the video or the audio tracks stays: to have it removed, write to the data controller. This withdrawal cannot be undone from this page."
+      },
+      "proofWithdrawHost": "Older transcripts from captions do not recognize hosts: your sentences and your name stay there, and to have them removed you must write to the data controller.",
       "addressBookTitle": "Carnet d'adresses des événements",
       "addressBookIntro": "Vous avez choisi de rester dans le carnet d'adresses pour être invité à des événements similaires. Nous conservons ces données jusqu'au {date}, sauf retrait ou nouveau consentement.",
       "addressBookOptOut": "Supprimer mes données du carnet d’adresses",

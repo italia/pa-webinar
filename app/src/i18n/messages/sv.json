@@ -4569,6 +4569,11 @@
       "proofsIntro": "Uppgifterna för dessa evenemang har raderats. Dessa bevis finns kvar så länge videon eller transkriptionen finns. Du kan återkalla ditt samtycke: det som redan finns i videon blir kvar, och för att få det borttaget måste du skriva till den personuppgiftsansvarige.",
       "proofGivenOn": "Givet den {date}",
       "proofSuperseded": "Ersatt av ett senare samtycke",
+      "proofWithdrawEffect": {
+        "recording": "You also withdraw your consent to transcription: your sentences and your name leave the transcript from captions. What is already in the video stays, and so does a transcript made from the video or the audio tracks: to have them removed, write to the data controller. This withdrawal cannot be undone from this page.",
+        "transcription": "Your sentences and your name leave the transcript from captions. A transcript made from the video or the audio tracks stays: to have it removed, write to the data controller. This withdrawal cannot be undone from this page."
+      },
+      "proofWithdrawHost": "Older transcripts from captions do not recognize hosts: your sentences and your name stay there, and to have them removed you must write to the data controller.",
       "addressBookTitle": "Evenemangsadressbok",
       "addressBookIntro": "Du har valt att stanna kvar i adressboken för att bjudas in till liknande evenemang. Vi sparar dessa uppgifter fram till {date}, om du inte återkallar samtycket eller ger ett nytt.",
       "addressBookOptOut": "Ta bort mina uppgifter från adressboken",

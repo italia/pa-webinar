@@ -4569,6 +4569,11 @@
       "proofsIntro": "Podaci o ovim događajima su izbrisani. Ovi dokazi ostaju dok videozapis ili transkript postoje. Možete povući privolu: ono što je već u videozapisu ostaje, a za uklanjanje morate pisati voditelju obrade.",
       "proofGivenOn": "Dano {date}",
       "proofSuperseded": "Zamijenjeno kasnijom privolom",
+      "proofWithdrawEffect": {
+        "recording": "You also withdraw your consent to transcription: your sentences and your name leave the transcript from captions. What is already in the video stays, and so does a transcript made from the video or the audio tracks: to have them removed, write to the data controller. This withdrawal cannot be undone from this page.",
+        "transcription": "Your sentences and your name leave the transcript from captions. A transcript made from the video or the audio tracks stays: to have it removed, write to the data controller. This withdrawal cannot be undone from this page."
+      },
+      "proofWithdrawHost": "Older transcripts from captions do not recognize hosts: your sentences and your name stay there, and to have them removed you must write to the data controller.",
       "addressBookTitle": "Imenik događaja",
       "addressBookIntro": "Odabrali ste ostati u imeniku kako biste bili pozivani na slične događaje. Ove podatke čuvamo do {date}, osim ako povučete privolu ili date novu.",
       "addressBookOptOut": "Ukloni moje podatke iz imenika",

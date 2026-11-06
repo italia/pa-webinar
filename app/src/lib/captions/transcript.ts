@@ -23,6 +23,12 @@ import type { Prisma, RecordingStatus } from '@prisma/client';
 import { prisma } from '@/lib/db';
 import { encryptPII, tryDecryptPII } from '@/lib/crypto/pii';
 import { iscrizioneDelPosto } from '@/lib/captions/room';
+import {
+  impronteDiSala,
+  titolariDeiPosti,
+  type ProvaDiSala,
+  type TitolareDelPosto,
+} from '@/lib/gdpr/consent-proofs';
 import { recordingTimeZero } from '@/lib/postprod/live-timeline';
 import { isMultitrackPlaceholder } from '@/lib/recorder/lifecycle';
 
@@ -75,6 +81,12 @@ export interface ParlanteTrascrizione {
    * (togliPersoneDalleTrascrizioni). Sta nel corpo cifrato, mai fuori.
    */
   registrationId?: string;
+  /**
+   * Le impronte di chi parla senza un'iscrizione (`impronteDiSala`): le prove
+   * della persona, anche quelle conservate, lo riconoscono quando il legame tra
+   * il posto e la persona non c'e' piu'. Sta nel corpo cifrato, mai fuori.
+   */
+  titolari?: string[];
 }
 
 export interface TrascrizioneSottotitoli {
@@ -110,20 +122,32 @@ interface FraseSalvata {
  * Chi parla. Il posto cambia a ogni ingresso: chi si ricollega non deve
  * diventare un secondo parlante. Un'iscrizione e' la stessa persona a ogni
  * ingresso; per gli altri posti (link di moderazione condiviso, ospiti) vale
- * il nome con cui la persona e' entrata, quando c'e'.
+ * il nome con cui la persona e' entrata, quando c'e'. Lo stesso nome con due
+ * concessioni o due account e' due persone: togliendone una, l'altra resta.
  */
-function chiParla(seatId: string, nome: string | null): string {
+function chiParla(
+  seatId: string,
+  nome: string | null,
+  titolari?: ReadonlyMap<string, TitolareDelPosto>,
+): string {
   const iscrizione = iscrizioneDelPosto(seatId);
   if (iscrizione) return `reg:${iscrizione}`;
-  return nome ? `nome:${nome.trim().toLowerCase()}` : `posto:${seatId}`;
+  if (!nome) return `posto:${seatId}`;
+  const persona = titolari?.get(seatId)?.persona;
+  return `${persona ? `${persona}|` : ''}nome:${nome.trim().toLowerCase()}`;
 }
 
 /** Quante persone hanno parlato, con lo stesso criterio della trascrizione. */
-export function contaVoci(frasi: ReadonlyArray<{ seatId: string | null; speakerName: string | null }>): number {
+export function contaVoci(
+  frasi: ReadonlyArray<{ seatId: string | null; speakerName: string | null }>,
+  titolari?: ReadonlyMap<string, TitolareDelPosto>,
+): number {
   const persone = new Set<string>();
   for (const f of frasi) {
     if (!f.seatId) continue;
-    persone.add(chiParla(f.seatId, f.speakerName ? (tryDecryptPII(f.speakerName) ?? null) : null));
+    persone.add(
+      chiParla(f.seatId, f.speakerName ? (tryDecryptPII(f.speakerName) ?? null) : null, titolari),
+    );
   }
   return persone.size;
 }
@@ -133,11 +157,18 @@ export function componiTrascrizione(
   t0: Date,
   /** La durata del video, se la trascrizione ci si allinea: i segni fuori non si vedrebbero. */
   durataS?: number | null,
+  /** Chi c'e' dietro i posti senza iscrizione (`titolariDeiPosti`). */
+  titolari?: ReadonlyMap<string, TitolareDelPosto>,
 ): TrascrizioneSottotitoli {
   const etichette = new Map<string, string>();
   const parlanti = new Map<
     string,
-    { displayName: string | null; totalSpeechSec: number; registrationId?: string }
+    {
+      displayName: string | null;
+      totalSpeechSec: number;
+      registrationId?: string;
+      titolari: Set<string>;
+    }
   >();
   const segments: SegmentoTrascrizione[] = [];
   const vuoti: Array<{ start: number; end: number }> = [];
@@ -161,7 +192,7 @@ export function componiTrascrizione(
     const start = Math.max(0, (f.startedAt.getTime() - t0.getTime()) / 1000);
     const end = Math.max(start, (f.endedAt.getTime() - t0.getTime()) / 1000);
     const nome = f.speakerName ? (tryDecryptPII(f.speakerName) ?? null) : null;
-    const persona = chiParla(f.seatId, nome);
+    const persona = chiParla(f.seatId, nome, titolari);
     let etichetta = etichette.get(persona);
     if (!etichetta) {
       etichetta = `SPEAKER_${String(etichette.size).padStart(2, '0')}`;
@@ -170,11 +201,15 @@ export function componiTrascrizione(
       parlanti.set(etichetta, {
         displayName: nome,
         totalSpeechSec: 0,
+        titolari: new Set(),
         ...(registrationId ? { registrationId } : {}),
       });
     }
     const p = parlanti.get(etichetta);
-    if (p) p.totalSpeechSec += end - start;
+    if (p) {
+      p.totalSpeechSec += end - start;
+      for (const impronta of titolari?.get(f.seatId)?.impronte ?? []) p.titolari.add(impronta);
+    }
     if (f.language) lingue.set(f.language, (lingue.get(f.language) ?? 0) + 1);
     segments.push({ start: round(start), end: round(end), text: testo, speaker: etichetta });
   }
@@ -199,6 +234,7 @@ export function componiTrascrizione(
       displayName: p.displayName,
       totalSpeechSec: Math.round(p.totalSpeechSec),
       ...(p.registrationId ? { registrationId: p.registrationId } : {}),
+      ...(p.titolari.size > 0 ? { titolari: [...p.titolari] } : {}),
     })),
   };
 }
@@ -376,7 +412,12 @@ export async function costruisciTrascrizioneDaiSottotitoli(eventId: string): Pro
 
     const t0 = conVideo && esistente === conVideo ? await zeroDelVideo(tx, conVideo) : primo;
     const allineata = conVideo && esistente === conVideo;
-    const trascrizione = componiTrascrizione(frasi, t0, allineata ? conVideo.durationSec : null);
+    const trascrizione = componiTrascrizione(
+      frasi,
+      t0,
+      allineata ? conVideo.durationSec : null,
+      await titolariDeiPosti(tx, eventId),
+    );
     if (trascrizione.segments.length === 0) return { stato: 'nessuna-frase' };
     const corpo = JSON.stringify(trascrizione);
     const contentHash = createHash('sha256').update(corpo).digest('hex');
@@ -643,14 +684,20 @@ export async function costruisciTrascrizioniMancanti(now: Date, giorni = 7): Pro
 
 interface CorpoTrascrizione {
   segments?: Array<{ speaker?: string | null; [k: string]: unknown }>;
-  speakers?: Array<{ diarLabel?: string; registrationId?: string; [k: string]: unknown }>;
+  speakers?: Array<{
+    diarLabel?: string;
+    registrationId?: string;
+    titolari?: string[];
+    [k: string]: unknown;
+  }>;
   [k: string]: unknown;
 }
 
-/** Il corpo senza le frasi e i parlanti di quelle iscrizioni; null se non le contiene. */
+/** Il corpo senza le frasi e i parlanti di quelle iscrizioni e di quei titolari; null se non li contiene. */
 export function senzaLePersone(
   corpo: string,
   registrationIds: ReadonlySet<string>,
+  titolari: ReadonlySet<string> = new Set(),
 ): { corpo: string; etichette: string[]; vuoto: boolean } | null {
   let t: CorpoTrascrizione;
   try {
@@ -659,7 +706,12 @@ export function senzaLePersone(
     return null;
   }
   const etichette = (t.speakers ?? [])
-    .filter((s) => s.registrationId && registrationIds.has(s.registrationId) && s.diarLabel)
+    .filter(
+      (s) =>
+        s.diarLabel &&
+        ((s.registrationId && registrationIds.has(s.registrationId)) ||
+          s.titolari?.some((t) => titolari.has(t))),
+    )
     .map((s) => s.diarLabel as string);
   if (etichette.length === 0) return null;
   const via = new Set(etichette);
@@ -710,14 +762,20 @@ export async function iscrizioniNelleTrascrizioni(
  * correzione. Le frasi spostate a mano su un'altra voce restano con quella.
  * Una trascrizione che resta vuota se ne va, con la registrazione «solo
  * sottotitoli» che la portava.
+ *
+ * Chi non e' iscritto si riconosce dalle impronte dei `titolari`. Un corpo senza
+ * impronte non dice chi c'e' dietro i posti di chi conduce: quelle frasi restano,
+ * e si tolgono con l'editor della trascrizione (docs/GDPR.md).
  */
 export async function togliPersoneDalleTrascrizioni(
   tx: Prisma.TransactionClient,
   eventIds: readonly string[],
   registrationIds: readonly string[],
+  titolari: readonly string[] = [],
 ): Promise<number> {
-  if (eventIds.length === 0 || registrationIds.length === 0) return 0;
+  if (eventIds.length === 0 || (registrationIds.length === 0 && titolari.length === 0)) return 0;
   const persone = new Set(registrationIds);
+  const impronte = new Set(titolari);
   const artefatti = await tx.postprodArtifact.findMany({
     where: {
       type: 'TRANSCRIPT_JSON',
@@ -735,9 +793,9 @@ export async function togliPersoneDalleTrascrizioni(
   let toccate = 0;
   for (const a of artefatti) {
     const chiaro = a.inlineBody ? tryDecryptPII(a.inlineBody) : null;
-    const nuovo = chiaro ? senzaLePersone(chiaro, persone) : null;
+    const nuovo = chiaro ? senzaLePersone(chiaro, persone, impronte) : null;
     const originale = a.original ? tryDecryptPII(a.original.body) : null;
-    const nuovoOriginale = originale ? senzaLePersone(originale, persone) : null;
+    const nuovoOriginale = originale ? senzaLePersone(originale, persone, impronte) : null;
     if (!nuovo && !nuovoOriginale) continue;
     toccate += 1;
     const etichette = [...new Set([...(nuovo?.etichette ?? []), ...(nuovoOriginale?.etichette ?? [])])];
@@ -773,4 +831,29 @@ export async function togliPersoneDalleTrascrizioni(
     await tx.speaker.deleteMany({ where: { recordingId: a.recordingId, diarLabel: { in: etichette } } });
   }
   return toccate;
+}
+
+/**
+ * La cancellazione chiesta da chi conduce: le frasi salvate dei posti delle sue
+ * prove di sala se ne vanno, e con loro nome e voce dalle trascrizioni gia'
+ * costruite. Va chiamata prima di cancellare le prove, che sono il solo legame
+ * tra il posto e la persona, in fila con le costruzioni dello stesso evento
+ * (`bloccaTrascrizioneEvento`).
+ */
+export async function togliPostiDaiSottotitoli(
+  tx: Prisma.TransactionClient,
+  prove: ReadonlyArray<ProvaDiSala & { eventId: string }>,
+): Promise<void> {
+  for (const eventId of new Set(prove.map((p) => p.eventId))) {
+    const dellEvento = prove.filter((p) => p.eventId === eventId);
+    await tx.captionSegment.deleteMany({
+      where: { eventId, seatId: { in: [...new Set(dellEvento.map((p) => p.jitsiUserId))] } },
+    });
+    await togliPersoneDalleTrascrizioni(
+      tx,
+      [eventId],
+      [],
+      [...new Set(dellEvento.flatMap((p) => impronteDiSala(eventId, p)))],
+    );
+  }
 }

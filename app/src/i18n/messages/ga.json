@@ -4569,6 +4569,11 @@
       "proofsIntro": "Scriosadh sonraí na n-imeachtaí seo. Fanann na cruthúnais seo fad atá an físeán nó an tras-scríbhinn ann. Is féidir leat do thoiliú a tharraingt siar: fanann a bhfuil san fhíseán cheana, agus chun é a bhaint ní mór duit scríobh chuig an rialaitheoir sonraí.",
       "proofGivenOn": "Tugtha ar {date}",
       "proofSuperseded": "Athsholáthraithe ag toiliú níos déanaí",
+      "proofWithdrawEffect": {
+        "recording": "You also withdraw your consent to transcription: your sentences and your name leave the transcript from captions. What is already in the video stays, and so does a transcript made from the video or the audio tracks: to have them removed, write to the data controller. This withdrawal cannot be undone from this page.",
+        "transcription": "Your sentences and your name leave the transcript from captions. A transcript made from the video or the audio tracks stays: to have it removed, write to the data controller. This withdrawal cannot be undone from this page."
+      },
+      "proofWithdrawHost": "Older transcripts from captions do not recognize hosts: your sentences and your name stay there, and to have them removed you must write to the data controller.",
       "addressBookTitle": "Leabhar seoltaí na n-imeachtaí",
       "addressBookIntro": "Roghnaigh tú fanacht sa leabhar seoltaí chun cuireadh a fháil chuig imeachtaí comhchosúla. Coinnímid na sonraí seo go dtí {date}, mura dtarraingíonn tú siar do thoiliú nó mura dtugann tú toiliú nua.",
       "addressBookOptOut": "Bain mo shonraí den leabhar seoltaí",

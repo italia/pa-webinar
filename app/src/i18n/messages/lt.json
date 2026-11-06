@@ -4569,6 +4569,11 @@
       "proofsIntro": "Šių renginių duomenys ištrinti. Šie įrodymai lieka, kol vaizdo įrašas arba transkripcija egzistuoja. Sutikimą galite atšaukti: tai, kas jau yra vaizdo įraše, lieka, o norėdami tai pašalinti turite rašyti duomenų valdytojui.",
       "proofGivenOn": "Duotas {date}",
       "proofSuperseded": "Pakeistas vėlesniu sutikimu",
+      "proofWithdrawEffect": {
+        "recording": "You also withdraw your consent to transcription: your sentences and your name leave the transcript from captions. What is already in the video stays, and so does a transcript made from the video or the audio tracks: to have them removed, write to the data controller. This withdrawal cannot be undone from this page.",
+        "transcription": "Your sentences and your name leave the transcript from captions. A transcript made from the video or the audio tracks stays: to have it removed, write to the data controller. This withdrawal cannot be undone from this page."
+      },
+      "proofWithdrawHost": "Older transcripts from captions do not recognize hosts: your sentences and your name stay there, and to have them removed you must write to the data controller.",
       "addressBookTitle": "Renginių adresų knyga",
       "addressBookIntro": "Pasirinkote likti adresų knygoje, kad būtumėte kviečiami į panašius renginius. Šiuos duomenis saugome iki {date}, nebent sutikimą atšauksite arba duosite naują.",
       "addressBookOptOut": "Pašalinti mano duomenis iš adresų knygos",

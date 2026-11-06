@@ -4569,6 +4569,11 @@
       "proofsIntro": "Podatki teh dogodkov so bili izbrisani. Ta dokazila ostanejo, dokler video ali prepis obstaja. Privolitev lahko prekličete: kar je že v videu, ostane, za odstranitev pa morate pisati upravljavcu podatkov.",
       "proofGivenOn": "Dana {date}",
       "proofSuperseded": "Zamenjana s poznejšo privolitvijo",
+      "proofWithdrawEffect": {
+        "recording": "You also withdraw your consent to transcription: your sentences and your name leave the transcript from captions. What is already in the video stays, and so does a transcript made from the video or the audio tracks: to have them removed, write to the data controller. This withdrawal cannot be undone from this page.",
+        "transcription": "Your sentences and your name leave the transcript from captions. A transcript made from the video or the audio tracks stays: to have it removed, write to the data controller. This withdrawal cannot be undone from this page."
+      },
+      "proofWithdrawHost": "Older transcripts from captions do not recognize hosts: your sentences and your name stay there, and to have them removed you must write to the data controller.",
       "addressBookTitle": "Imenik dogodkov",
       "addressBookIntro": "Izbrali ste, da ostanete v imeniku, da bi vas lahko povabili na podobne dogodke. Te podatke hranimo do {date}, razen v primeru preklica ali nove privolitve.",
       "addressBookOptOut": "Odstrani moje podatke iz imenika",

@@ -4569,6 +4569,11 @@
       "proofsIntro": "Šo pasākumu dati ir dzēsti. Šie pierādījumi paliek, kamēr video vai atšifrējums pastāv. Varat atsaukt piekrišanu: tas, kas jau ir video, paliek, un, lai to izņemtu, jums jāraksta datu pārzinim.",
       "proofGivenOn": "Dota {date}",
       "proofSuperseded": "Aizstāta ar vēlāku piekrišanu",
+      "proofWithdrawEffect": {
+        "recording": "You also withdraw your consent to transcription: your sentences and your name leave the transcript from captions. What is already in the video stays, and so does a transcript made from the video or the audio tracks: to have them removed, write to the data controller. This withdrawal cannot be undone from this page.",
+        "transcription": "Your sentences and your name leave the transcript from captions. A transcript made from the video or the audio tracks stays: to have it removed, write to the data controller. This withdrawal cannot be undone from this page."
+      },
+      "proofWithdrawHost": "Older transcripts from captions do not recognize hosts: your sentences and your name stay there, and to have them removed you must write to the data controller.",
       "addressBookTitle": "Pasākumu kontaktu grāmata",
       "addressBookIntro": "Jūs izvēlējāties palikt kontaktu grāmatā, lai jūs aicinātu uz līdzīgiem pasākumiem. Šos datus glabājam līdz {date}, ja vien neatsaucat piekrišanu vai nedodat jaunu.",
       "addressBookOptOut": "Izņemt manus datus no kontaktu grāmatas",
