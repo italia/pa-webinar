@@ -16,6 +16,7 @@ import {
   assertEsposizioneConsentita,
   destinazioneDiPartenza,
 } from '@/lib/recording/destination';
+import { videoPerTutti } from '@/lib/recording/audience';
 import { createEventSchema } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { generateUniqueSlug } from '@/lib/utils/slug';
@@ -449,8 +450,9 @@ export const GET = withErrorHandling(async (request) => {
       recordingEnabled: event.recordingEnabled,
       status: event.status,
       eventType: event.eventType,
-      // Come la rotta del singolo evento: il video solo se pubblicato per tutti.
-      recordingUrl: event.recordingPublished && event.recordingAudience === 'PUBLIC' ? event.recordingUrl : null,
+      // Come la rotta del singolo evento (`videoPerTutti`): risposta in cache
+      // condivisa, senza chi legge.
+      recordingUrl: videoPerTutti(event),
     };
   });
 

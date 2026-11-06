@@ -726,6 +726,7 @@
     "noQuestions": "Brak pytań. Zadaj pierwsze!",
     "qaPersistenceNote": "Tekst pytań może pojawić się na stronie wydarzenia, bez imienia i nazwiska osoby, która je zadała.",
     "personalDataNotice": "Nie wpisuj danych osobowych innych osób ani własnych, których nie chcesz upubliczniać: tekst pytania może pojawić się na stronie wydarzenia, bez Twojego imienia i nazwiska.",
+    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
     "filterAll": "Wszystkie",
     "showPanel": "Pokaż Q&A",
     "hidePanel": "Ukryj Q&A",
@@ -745,6 +746,7 @@
       "answerFieldLabel": "Odpowiedź na pytanie od {name}",
       "answerPlaceholder": "Napisz odpowiedź (maks. 2000 znaków)",
       "answerNotice": "Odpowiedź może pojawić się na stronie wydarzenia: nie wpisuj danych osobowych.",
+      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
       "sendAnswer": "Opublikuj odpowiedź",
       "cancel": "Anuluj",
       "removeAnswer": "Usuń odpowiedź"

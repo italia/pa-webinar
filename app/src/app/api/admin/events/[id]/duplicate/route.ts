@@ -26,7 +26,8 @@
  * password — a fresh copy must not inherit a secret the operator cannot see.
  *
  * What we fill in: a source that records without a recording destination gives a
- * copy that starts reserved (lib/recording/destination).
+ * copy that starts reserved, except instant calls and imported archives, which
+ * stay without one (lib/recording/destination).
  *
  * Optional body:
  *   { "nextOccurrence": true }        project the date from the source's RRULE,
@@ -210,14 +211,19 @@ function resolveSchedule(
  * La destinazione di una copia che eredita un evento senza destinazione: e' un
  * evento nuovo, e un evento nuovo che registra la dichiara. Parte riservata con
  * il pubblico allineato, come POST /api/events: senza, una serie duplicata da un
- * evento storico resterebbe per sempre senza destinazione.
+ * evento nato prima di questa scelta resterebbe per sempre senza destinazione.
+ * Chiamate rapide e archivi importati restano senza: li esclude la regola unica.
  */
 function destinazioneDellaCopia(source: {
+  eventType: string;
   recordingEnabled: boolean;
   recordingDestination: RecordingAudience | null;
 }) {
   if (source.recordingDestination != null) return {};
-  const destinazione = destinazioneDiPartenza({ recordingEnabled: false }, source.recordingEnabled);
+  const destinazione = destinazioneDiPartenza(
+    { recordingEnabled: false, eventType: source.eventType },
+    source.recordingEnabled,
+  );
   return destinazione
     ? { recordingDestination: destinazione, recordingAudience: destinazione }
     : {};

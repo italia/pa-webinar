@@ -199,7 +199,7 @@
       "registrationEnded": "L'evento è terminato: la registrazione è chiusa.",
       "joinAsGuest": "Partecipa come ospite",
       "registeredUseEmailLink": "Ti sei iscritto? Entra con il link personale che hai ricevuto via email.",
-      "willBeRecorded": "L'evento sarà registrato.",
+      "willBeRecorded": "L'evento può essere registrato.",
       "machineTranslation": "Traduzione automatica",
       "machineTranslationNote": "Titolo e descrizione sono stati tradotti da un modello automatico e nessuno li ha ancora riletti.",
       "previewTitle": "Anteprima per lo staff",
@@ -726,6 +726,7 @@
     "noQuestions": "Nessuna domanda ancora. Sii il primo!",
     "qaPersistenceNote": "Il testo delle domande può comparire sulla pagina dell'evento, senza il nome di chi le ha fatte.",
     "personalDataNotice": "Non scrivere dati personali di altri, né tuoi che non vuoi rendere pubblici: il testo della domanda può comparire sulla pagina dell'evento, senza il tuo nome.",
+    "personalDataNoticeNotPublished": "Non scrivere dati personali di altri, né tuoi che non vuoi rendere noti: chi è in sala può leggere il testo della domanda.",
     "filterAll": "Tutte",
     "showPanel": "Mostra Q&A",
     "hidePanel": "Nascondi Q&A",
@@ -745,6 +746,7 @@
       "answerFieldLabel": "Risposta alla domanda di {name}",
       "answerPlaceholder": "Scrivi la risposta (max 2000 caratteri)",
       "answerNotice": "La risposta può comparire sulla pagina dell'evento: non scrivere dati personali.",
+      "answerNoticeNotPublished": "Chi è in sala può leggere la risposta: non scrivere dati personali.",
       "sendAnswer": "Pubblica risposta",
       "cancel": "Annulla",
       "removeAnswer": "Togli la risposta"
@@ -2259,7 +2261,7 @@
     },
     "recordingUpload": {
       "title": "Carica registrazione esistente",
-      "subtitle": "Se hai già un file video dell'evento (per esempio registrato con un'altra piattaforma), caricalo qui: sarà mostrato come registrazione ufficiale nella pagina pubblica.",
+      "subtitle": "Se hai già un file video dell'evento (per esempio registrato con un'altra piattaforma), caricalo qui: sarà la registrazione ufficiale dell'evento.",
       "fileLabel": "File video",
       "upload": "Carica e associa",
       "signing": "Preparazione…",
@@ -4021,7 +4023,7 @@
         "title": "Resoconto",
         "pubblicato": "Pubblicato.",
         "daPubblicare": "Generato: rileggilo e pubblicalo.",
-        "daGenerare": "Da generare, a partire da trascrizione, chat e valutazioni.",
+        "daGenerare": "Da generare, a partire da trascrizione, sondaggi, valutazioni e, se sono pubblicate, domande.",
         "inLavorazione": "In lavorazione.",
         "senzaPipeline": "La post-produzione AI non è attiva su questa installazione.",
         "soloStaff": "Lo genera e lo pubblica chi organizza l'evento, dall'area riservata.",
@@ -5816,7 +5818,7 @@
       "strengths": "Punti di forza",
       "improvements": "Da migliorare",
       "quotes": "Dai commenti",
-      "aiNotice": "Il testo è scritto da un modello di intelligenza artificiale a partire da trascrizione, chat, domande, sondaggi e valutazioni, e lo staff lo ha riletto prima di pubblicarlo. I numeri e i grafici li calcola la piattaforma. Può contenere imprecisioni."
+      "aiNotice": "Il testo è scritto da un modello di intelligenza artificiale a partire da trascrizione, sondaggi, valutazioni e, se sono pubblicate, domande, e lo staff lo ha riletto prima di pubblicarlo. I numeri e i grafici li calcola la piattaforma. Può contenere imprecisioni."
     },
     "languages": {
       "title": "Guarda in",

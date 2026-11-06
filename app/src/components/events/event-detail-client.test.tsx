@@ -274,10 +274,10 @@ describe('scheda pubblica — stato e ingresso leggibili', () => {
     expect(link(`/events/${SLUG}/registration`)?.textContent).toContain(detail.registerAndJoin);
   });
 
-  it('dice prima che l’evento sarà registrato', () => {
-    disegna({ event: evento({ recordingEnabled: true }), registrationOpen: true });
+  it('dice prima che l’evento può essere registrato', () => {
+    disegna({ event: evento({ siRegistra: true }), registrationOpen: true });
     expect(container.textContent).toContain(detail.willBeRecorded);
-    disegna({ event: evento({ recordingEnabled: false }), registrationOpen: true });
+    disegna({ event: evento({ siRegistra: false }), registrationOpen: true });
     expect(container.textContent).not.toContain(detail.willBeRecorded);
   });
 });

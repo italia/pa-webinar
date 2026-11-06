@@ -33,6 +33,7 @@ const EVENTO: EventoScheda = {
   recordingEnabled: true,
   autoStartRecording: false,
   recordingDestination: 'PUBLIC',
+  recordingAudience: 'PUBLIC',
   multitrackRecordingEnabled: false,
   retainParticipantTracks: false,
   hostsAlwaysRecorded: false,
@@ -461,6 +462,7 @@ describe('schedaPrivacy, chat e domande', () => {
 
   it('segue la scelta di chi organizza', () => {
     expect(scheda({ postEventShowQA: false }).chat.esitoDomande).toBe('nonPubblicate');
+    expect(scheda({ recordingAudience: 'REGISTRANTS' }).chat.esitoDomande).toBe('nonPubblicate');
   });
 
   it('non dipende da cosa registra: senza video la regola resta quella della pagina', () => {

@@ -164,9 +164,13 @@ export default function RecordingManagement({
       if (errore) {
         setAudience(prima);
         toast.error(errore);
+        return;
       }
+      // Il pubblico decide anche cio' che la pagina dice delle domande e della
+      // libreria: il pannello qui accanto rilegge l'evento.
+      router.refresh();
     },
-    [audience, updateField, toast],
+    [audience, updateField, toast, router],
   );
 
   const handleRetentionChange = useCallback(

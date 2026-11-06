@@ -726,6 +726,7 @@
     "noQuestions": "Aucune question pour le moment. Soyez le premier !",
     "qaPersistenceNote": "Le texte des questions peut apparaître sur la page de l'événement, sans le nom de la personne qui les a posées.",
     "personalDataNotice": "N'écrivez pas les données personnelles d'autres personnes, ni les vôtres si vous ne souhaitez pas les rendre publiques : le texte de la question peut apparaître sur la page de l'événement, sans votre nom.",
+    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
     "filterAll": "Toutes",
     "showPanel": "Afficher Q&A",
     "hidePanel": "Masquer Q&A",
@@ -745,6 +746,7 @@
       "answerFieldLabel": "Réponse à la question de {name}",
       "answerPlaceholder": "Rédigez la réponse (2000 caractères max.)",
       "answerNotice": "La réponse peut apparaître sur la page de l'événement : n'écrivez pas de données personnelles.",
+      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
       "sendAnswer": "Publier la réponse",
       "cancel": "Annuler",
       "removeAnswer": "Retirer la réponse"

@@ -14,13 +14,18 @@ const { prisma, sessione } = vi.hoisted(() => ({
     staffAccount: { findUnique: vi.fn() },
     adminAuditLog: { create: vi.fn() },
     event: { count: vi.fn(), findUnique: vi.fn(), update: vi.fn() },
-    callSession: { updateMany: vi.fn() },
+    callSession: { findFirst: vi.fn(), updateMany: vi.fn() },
     $transaction: vi.fn(),
   },
   sessione: { cookie: undefined as string | undefined },
 }));
 
 vi.mock('@/lib/db', () => ({ prisma }));
+const storage = vi.hoisted(() => ({ getRecordingsStorage: vi.fn((): unknown => null) }));
+vi.mock('@/lib/storage/index', () => ({
+  getRecordingsStorage: storage.getRecordingsStorage,
+  recordingsProviderLabel: () => 'not-configured',
+}));
 vi.mock('next/headers', () => ({
   cookies: async () => ({
     get: (nome: string) =>
@@ -59,10 +64,12 @@ async function entra(role: 'ADMIN' | 'ORGANIZER') {
 
 /** Cio' che la rotta rilegge per la guardia: un evento senza destinazione. */
 const evento = (over: Record<string, unknown> = {}) => ({
+  status: 'PUBLISHED',
   eventType: 'SCHEDULED',
   recordingEnabled: true,
   recordingDestination: null,
   recordingAudience: 'PUBLIC',
+  recordingUrl: null,
   recordingPublished: false,
   transcriptPublished: false,
   youtubeUrl: null,
@@ -87,6 +94,8 @@ beforeEach(async () => {
   prisma.$transaction.mockImplementation(async (fn: (tx: typeof prisma) => unknown) =>
     fn(prisma)
   );
+  prisma.callSession.findFirst.mockResolvedValue(null);
+  storage.getRecordingsStorage.mockReturnValue(null);
   prisma.event.update.mockImplementation(async ({ data }: { data: object }) => ({
     id: EVENTO,
     moderatorToken: 'token-segreto-di-conduzione',
@@ -242,6 +251,20 @@ describe('la destinazione della registrazione', () => {
     expect(dati()).toMatchObject({ recordingUrl: VIDEO, recordingPublished: true });
   });
 
+  it('un indirizzo fuori dallo storage su un evento riservato e’ 409', async () => {
+    storage.getRecordingsStorage.mockReturnValue({ keyFromUrl: () => null });
+    prisma.event.findUnique.mockResolvedValue(riservato());
+    const r = await aggiorna({ recordingUrl: 'https://altro.example.com/video.mp4' });
+    expect(r.status).toBe(409);
+    expect(prisma.event.update).not.toHaveBeenCalled();
+  });
+
+  it('un file dello storage su un evento riservato passa', async () => {
+    storage.getRecordingsStorage.mockReturnValue({ keyFromUrl: () => 'recordings/sala.mp4' });
+    prisma.event.findUnique.mockResolvedValue(riservato());
+    expect((await aggiorna({ recordingUrl: VIDEO })).status).toBe(200);
+  });
+
   it.each([
     ['la libreria', { libraryListed: true }],
     ['la pagina dopo l’evento', { postEventPublic: true }],
@@ -282,6 +305,28 @@ describe('la destinazione della registrazione', () => {
         recordingDestination: 'REGISTRANTS',
         recordingAudience: 'REGISTRANTS',
       });
+    });
+
+    it.each([
+      ['concluso', () => spento({ status: 'ENDED' })],
+      ['archiviato', () => spento({ status: 'ARCHIVED' })],
+    ])('su un evento %s resta senza destinazione e pubblica', async (_n, stato) => {
+      prisma.event.findUnique.mockResolvedValue(stato());
+      expect((await aggiorna({ recordingUrl: VIDEO })).status).toBe(200);
+      expect(dati()).toMatchObject({
+        recordingUrl: VIDEO,
+        recordingEnabled: true,
+        recordingPublished: true,
+      });
+      expect(dati()).not.toHaveProperty('recordingDestination');
+      expect(dati()).not.toHaveProperty('recordingAudience');
+    });
+
+    it('anche su un evento pubblicato la cui sala si e’ gia’ aperta', async () => {
+      prisma.event.findUnique.mockResolvedValue(spento());
+      prisma.callSession.findFirst.mockResolvedValue({ id: 'sessione' });
+      await aggiorna({ recordingUrl: VIDEO });
+      expect(dati()).not.toHaveProperty('recordingDestination');
     });
 
     it('un video esterno nella stessa richiesta e’ 409', async () => {

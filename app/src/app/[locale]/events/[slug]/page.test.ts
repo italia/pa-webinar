@@ -3,7 +3,7 @@
 
 import type { NextRequest } from 'next/server';
 import { isValidElement, type ReactElement, type ReactNode } from 'react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { afterEach, describe, it, expect, vi, beforeEach } from 'vitest';
 
 /**
  * I materiali che la scheda pubblica dell'evento passa al client.
@@ -680,6 +680,20 @@ describe('scheda dell’evento — le domande dopo l’evento', () => {
     expect(fonti.questions[0]).toMatchObject({ answeredAt: RIGA_DOMANDA.answeredAt });
   });
 
+  it.each([
+    ['su destinazione pubblica', 'PUBLIC'],
+    ['senza destinazione', null],
+  ])('con il video reso riservato dal pubblico %s nessuna domanda esce', async (_n, recordingDestination) => {
+    mockedEvent.mockResolvedValue(
+      concluso({ recordingAudience: 'REGISTRANTS', recordingDestination }),
+    );
+    const props = await clientProps();
+    expect(mockedQuestions).not.toHaveBeenCalled();
+    expect(props.answeredQuestions).toEqual([]);
+    expect(JSON.stringify(props)).not.toContain(SALVATO.topQuestions[0]!.text);
+    expect((props.event as { postEventShowQA: boolean }).postEventShowQA).toBe(false);
+  });
+
   it('le domande in chat non arrivano al client, anche da uno snapshot salvato', async () => {
     mockedEvent.mockResolvedValue(concluso());
     const props = await clientProps();
@@ -716,6 +730,34 @@ describe('scheda dell’evento — le domande dopo l’evento', () => {
     mockedEvent.mockResolvedValue(concluso({ postEventShowRecap: false }));
     const props = await clientProps();
     expect((props.recap as EventRecap).topWords).toEqual(SALVATO.topWords);
+  });
+});
+
+describe('scheda dell’evento — l’annuncio della registrazione', () => {
+  const annuncio = async () =>
+    ((await clientProps()).event as { siRegistra: boolean }).siRegistra;
+
+  afterEach(() => vi.unstubAllEnvs());
+
+  it('segue la scheda: dove qualcosa registra si annuncia', async () => {
+    vi.stubEnv('JITSI_WEB_INTERNAL_URL', 'http://jitsi-web.interno');
+    vi.stubEnv('JIBRI_HEALTH_URL', 'http://jibri.interno');
+    mockedEvent.mockResolvedValue(eventRow({ recordingEnabled: true }));
+    expect(await annuncio()).toBe(true);
+  });
+
+  it('l’evento lo chiede ma l’installazione non registra niente: non si annuncia', async () => {
+    vi.stubEnv('JITSI_WEB_INTERNAL_URL', 'http://jitsi-web.interno');
+    vi.stubEnv('JIBRI_HEALTH_URL', '');
+    vi.stubEnv('RECORDER_CONTROLLER_URL', '');
+    mockedEvent.mockResolvedValue(eventRow({ recordingEnabled: true }));
+    expect(await annuncio()).toBe(false);
+  });
+
+  it('l’evento non registra: non si annuncia', async () => {
+    vi.stubEnv('JIBRI_HEALTH_URL', 'http://jibri.interno');
+    mockedEvent.mockResolvedValue(eventRow({ recordingEnabled: false }));
+    expect(await annuncio()).toBe(false);
   });
 });
 

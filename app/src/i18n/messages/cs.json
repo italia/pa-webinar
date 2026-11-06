@@ -726,6 +726,7 @@
     "noQuestions": "Zatím žádné otázky. Buďte první!",
     "qaPersistenceNote": "Text otázek se může objevit na stránce události, bez jména toho, kdo je položil.",
     "personalDataNotice": "Nepište osobní údaje jiných osob ani své vlastní, které nechcete zveřejnit: text otázky se může objevit na stránce události, bez vašeho jména.",
+    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
     "filterAll": "Všechny",
     "showPanel": "Zobrazit Q&A",
     "hidePanel": "Skrýt Q&A",
@@ -745,6 +746,7 @@
       "answerFieldLabel": "Odpověď na otázku od {name}",
       "answerPlaceholder": "Napište odpověď (max. 2000 znaků)",
       "answerNotice": "Odpověď se může objevit na stránce události: nepište osobní údaje.",
+      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
       "sendAnswer": "Zveřejnit odpověď",
       "cancel": "Zrušit",
       "removeAnswer": "Odebrat odpověď"

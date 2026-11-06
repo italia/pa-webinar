@@ -139,6 +139,7 @@ const evento: Props['event'] = {
   startsAt: new Date(Date.now() - 60_000).toISOString(),
   endsAt: new Date(Date.now() + 3_600_000).toISOString(),
   status: 'LIVE',
+  recordingAudience: 'PUBLIC',
   recordingEnabled: true,
   qaEnabled: false,
   chatEnabled: false,
@@ -1244,6 +1245,24 @@ describe("sala — fine dell'evento", () => {
     ).toBe(true);
     const put = await termina();
     expect(put.body).toEqual({ status: 'ENDED', postEventPublic: true });
+  });
+
+  it('un video riservato dal pubblico scelto dopo non offre la libreria', async () => {
+    await allaScelta({
+      ...evento,
+      recordingDestination: 'PUBLIC',
+      recordingAudience: 'REGISTRANTS',
+      libraryListed: true,
+    });
+    expect(opzioni()).toHaveLength(2);
+    expect(testo()).not.toContain(l.endDestino.library);
+    const put = await termina();
+    expect(put.body).toEqual({ status: 'ENDED', postEventPublic: true });
+  });
+
+  it('riservato dal pubblico senza destinazione: la libreria resta fuori', async () => {
+    await allaScelta({ ...evento, recordingAudience: 'REGISTRANTS' });
+    expect(opzioni()).toHaveLength(2);
   });
 
   it("con la pagina privata la libreria nascosta non rende pubblico l'evento", async () => {

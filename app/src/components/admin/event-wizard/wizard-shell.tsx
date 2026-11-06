@@ -57,6 +57,7 @@ import {
 import { publicRegistrationFor } from '@/lib/events/access-mode';
 import {
   destinazioneDiPartenza,
+  pubblicoAllineato,
   puoCambiareDestinazione,
   videoDaDestinare,
 } from '@/lib/recording/destination';
@@ -331,6 +332,7 @@ export interface InitialEventShape {
     participantListVisible?: boolean;
     hostsAlwaysRecorded?: boolean;
     recordingDestination?: RecordingAudience | null;
+    recordingAudience: RecordingAudience;
     aiTranscriptEnabled?: boolean | null;
     aiSummaryEnabled?: boolean | null;
     aiTranslationEnabled?: boolean | null;
@@ -825,6 +827,14 @@ export default function EventWizard(props: WizardProps) {
   const destinazioneSenzaScelta = destinazioneDiPartenza(
     initialEvent?.event ?? { recordingEnabled: false },
     form.recordingEnabled && !salaBloccata,
+  );
+  // Cio' che il salvataggio lascia sul pubblico del video, per l'anteprima delle
+  // domande: la stessa regola della PUT, che il modulo non chiede mai di cambiare.
+  const pubblicoDopo = pubblicoAllineato(
+    initialEvent?.event.recordingDestination ?? null,
+    destinazioneDopoIlSalvataggio(form, destinazioneSenzaScelta),
+    undefined,
+    initialEvent?.event.recordingAudience ?? 'PUBLIC',
   );
   const controllaPasso = useCallback(
     (passo: StepKey) =>
@@ -2542,6 +2552,7 @@ export default function EventWizard(props: WizardProps) {
             addressBookEnabled={props.addressBookEnabled ?? true}
             chiedeDestinazione={chiedeDestinazione}
             destinazioneSenzaScelta={destinazioneSenzaScelta}
+            pubblicoDopo={pubblicoDopo}
             onCambiaDestinazione={viaToken === null ? () => vai('advanced', 'recording') : undefined}
             iscrizioneAperta={istantanea ? undefined : iscrizioneAperta}
             onVaiPersone={() => vai('invites')}
@@ -2644,6 +2655,7 @@ export default function EventWizard(props: WizardProps) {
                   onUploadBusy={segnalaCaricamento}
                   domandeDopoEvento={viaToken === null}
                   destinazioneSenzaScelta={destinazioneSenzaScelta}
+                  pubblicoDopo={pubblicoDopo}
                 />
               ),
               technical: (

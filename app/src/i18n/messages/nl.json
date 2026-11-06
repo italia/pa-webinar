@@ -726,6 +726,7 @@
     "noQuestions": "Nog geen vragen. Stel de eerste!",
     "qaPersistenceNote": "De tekst van de vragen kan op de pagina van het evenement verschijnen, zonder de naam van wie ze heeft gesteld.",
     "personalDataNotice": "Schrijf geen persoonsgegevens van anderen op, en ook geen eigen gegevens die u niet openbaar wilt maken: de tekst van de vraag kan op de pagina van het evenement verschijnen, zonder uw naam.",
+    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
     "filterAll": "Alle",
     "showPanel": "Q&A tonen",
     "hidePanel": "Q&A verbergen",
@@ -745,6 +746,7 @@
       "answerFieldLabel": "Antwoord op de vraag van {name}",
       "answerPlaceholder": "Schrijf het antwoord (max. 2000 tekens)",
       "answerNotice": "Het antwoord kan op de pagina van het evenement verschijnen: schrijf geen persoonsgegevens op.",
+      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
       "sendAnswer": "Antwoord publiceren",
       "cancel": "Annuleren",
       "removeAnswer": "Antwoord verwijderen"

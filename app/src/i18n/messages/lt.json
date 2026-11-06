@@ -726,6 +726,7 @@
     "noQuestions": "Klausimų dar nėra. Būkite pirmas!",
     "qaPersistenceNote": "Klausimų tekstas gali būti rodomas renginio puslapyje, be juos uždavusių asmenų vardų.",
     "personalDataNotice": "Nerašykite kitų žmonių asmens duomenų ir savo asmens duomenų, kurių nenorite paviešinti: klausimo tekstas gali būti rodomas renginio puslapyje, be jūsų vardo.",
+    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
     "filterAll": "Visi",
     "showPanel": "Rodyti Q&A",
     "hidePanel": "Slėpti Q&A",
@@ -745,6 +746,7 @@
       "answerFieldLabel": "Atsakymas į {name} klausimą",
       "answerPlaceholder": "Parašykite atsakymą (iki 2000 simbolių)",
       "answerNotice": "Atsakymas gali būti rodomas renginio puslapyje: nerašykite asmens duomenų.",
+      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
       "sendAnswer": "Paskelbti atsakymą",
       "cancel": "Atšaukti",
       "removeAnswer": "Pašalinti atsakymą"

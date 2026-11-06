@@ -146,6 +146,7 @@ export type EventoScheda = Pick<
   | 'recordingEnabled'
   | 'autoStartRecording'
   | 'recordingDestination'
+  | 'recordingAudience'
   | 'multitrackRecordingEnabled'
   | 'retainParticipantTracks'
   | 'hostsAlwaysRecorded'

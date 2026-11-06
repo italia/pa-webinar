@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: EUPL-1.2
 // SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
 
-import type { Prisma, RecordingAudience } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import { cookies } from 'next/headers';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
@@ -19,6 +19,7 @@ import { recordLiveAction, recordLiveActions } from '@/lib/live/actions';
 import { reviveStatus } from '@/lib/events/lifecycle';
 import { CAMPI_VIDEO_VUOTI, sessioniSenzaFile } from '@/lib/events/recording-fields';
 import { domandePubbliche } from '@/lib/events/post-event-sections';
+import { isEventPageVisible } from '@/lib/events/visibility';
 import { closeOpenSessions } from '@/lib/events/call-sessions';
 import { chiudiSondaggiAperti } from '@/lib/events/close-polls';
 import { eventTagIds, replaceEventTags, resolveTags, sameTagIds } from '@/lib/events/event-tags';
@@ -59,9 +60,13 @@ import {
   assertEsposizioneConsentita,
   destinazioneDiPartenza,
   erroreDestinazioneNonCoperta,
+  pubblicoAllineato,
   puoCambiareDestinazione,
+  recuperoAperto,
   type Destinazione,
 } from '@/lib/recording/destination';
+import { videoPerTutti } from '@/lib/recording/audience';
+import { assertVideoNelloStorage } from '@/lib/storage/recordings';
 import { annullaEmailInCoda } from '@/lib/email/outbox';
 
 export const dynamic = 'force-dynamic';
@@ -178,15 +183,13 @@ export const GET = withErrorHandling(async (request, context) => {
     });
   }
 
-  // Public mode — hide DRAFT and ARCHIVED events
-  if (event.status === 'DRAFT' || event.status === 'ARCHIVED') {
-    throw new NotFoundError('Event');
-  }
+  // La lettura pubblica segue la pagina: un evento senza pagina (bozza, archivio,
+  // concluso con la pagina privata o la finestra scaduta) qui non esiste.
+  if (!isEventPageVisible(event)) throw new NotFoundError('Event');
 
-  // Come la pagina della sala: il recupero esiste solo in diretta, e una
-  // registrazione riservata non si offre a chi legge questa risposta pubblica.
-  const recuperoInDiretta =
-    event.status === 'LIVE' && event.recordingDestination !== 'REGISTRANTS';
+  // Come la pagina della sala: una registrazione riservata non si offre a chi
+  // legge questa risposta pubblica.
+  const recuperoInDiretta = recuperoAperto(event);
 
   return Response.json({
     id: event.id,
@@ -206,10 +209,10 @@ export const GET = withErrorHandling(async (request, context) => {
     participantsCanStartVideo: event.participantsCanStartVideo,
     participantsCanShareScreen: event.participantsCanShareScreen,
     status: event.status,
-    // Risposta in cache condivisa: il video solo se pubblicato per tutti; una
-    // registrazione riservata agli iscritti passa dalla pagina e dal player,
-    // che riconoscono l'iscritto (lib/recording/audience).
-    recordingUrl: event.recordingPublished && event.recordingAudience === 'PUBLIC' ? event.recordingUrl : null,
+    // Risposta in cache condivisa: il video solo se pubblicato per tutti e dentro
+    // la finestra post-evento; una registrazione riservata agli iscritti passa
+    // dalla pagina e dal player, che riconoscono l'iscritto (lib/recording/audience).
+    recordingUrl: videoPerTutti(event),
     tempRecordingUrl: recuperoInDiretta ? event.tempRecordingUrl : null,
     tempRecordingStartedAt: recuperoInDiretta ? event.tempRecordingStartedAt?.toISOString() ?? null : null,
     postEventPublic: event.postEventPublic,
@@ -300,6 +303,13 @@ export const PUT = withErrorHandling(async (request, context) => {
     ) {
       throw erroreDestinazioneNonCoperta();
     }
+  }
+
+  // Quale video mostra l'evento lo decide lo staff, come la destinazione: si carica
+  // dalla gestione della registrazione. Un link di conduzione puo' solo rimandare
+  // l'indirizzo che c'e' gia'.
+  if (data.recordingUrl && data.recordingUrl !== event.recordingUrl) {
+    await soloStaffDellEvento(eventId, 'Only the event staff can attach a recording');
   }
 
   // Le etichette le manda il wizard a ogni salvataggio, l'elenco intero: si
@@ -407,15 +417,20 @@ export const PUT = withErrorHandling(async (request, context) => {
   // confronta prima e dopo, quindi una modifica che non espone di piu' passa: la
   // chiusura dell'evento, un salvataggio dal wizard.
   const destinazionePrima = event.recordingDestination ?? null;
+  const fileNuovo =
+    !!data.recordingUrl &&
+    data.recordingUrl !== event.recordingUrl &&
+    !(await salaGiaAperta(event));
   const destinazioneDopo: Destinazione =
     data.recordingDestination ??
-    destinazioneDiPartenza(event, data.recordingEnabled === true);
+    destinazioneDiPartenza(event, data.recordingEnabled === true || fileNuovo);
   const pubblicoDopo = pubblicoAllineato(
     destinazionePrima,
     destinazioneDopo,
     data.recordingAudience,
     event.recordingAudience,
   );
+  assertVideoNelloStorage(destinazioneDopo, event.recordingUrl, data.recordingUrl);
   assertEsposizioneConsentita(event, {
     recordingDestination: destinazioneDopo,
     recordingAudience: pubblicoDopo,
@@ -911,24 +926,6 @@ export const PUT = withErrorHandling(async (request, context) => {
     ...(traduzione && { traduzione }),
   });
 });
-
-/**
- * Il pubblico della registrazione dopo un cambio di destinazione. Una
- * destinazione riservata lo porta sempre a REGISTRANTS: restringere vince su cio'
- * che chiede la stessa richiesta, e non produce mai un rifiuto. Da riservata a
- * pubblica torna per tutti, se la richiesta non dice altro: quel pubblico l'aveva
- * imposto la destinazione. Altrimenti resta quello scelto.
- */
-function pubblicoAllineato(
-  prima: Destinazione,
-  dopo: Destinazione,
-  chiesto: RecordingAudience | undefined,
-  attuale: RecordingAudience,
-): RecordingAudience {
-  if (dopo === 'REGISTRANTS' && prima !== 'REGISTRANTS') return 'REGISTRANTS';
-  if (chiesto) return chiesto;
-  return prima === 'REGISTRANTS' && dopo === 'PUBLIC' ? 'PUBLIC' : attuale;
-}
 
 /**
  * Un campo che decide lo staff che gestisce l'evento, non chi ha un link di

@@ -29,6 +29,9 @@ interface QAPanelProps {
   /** …oppure l'identificativo stabile del browser, per chi una registrazione
    *  non ce l'ha (ospiti, relatori, moderatori). Esattamente uno dei due. */
   voterGuestId?: string;
+  /** Le domande possono comparire sulla pagina dell'evento
+   *  (`domandePubblicateInSala`): altrimenti gli avvisi non lo dicono. */
+  domandePubblicate: boolean;
 }
 
 export default function QAPanel({
@@ -39,6 +42,7 @@ export default function QAPanel({
   guestId,
   voterAccessToken,
   voterGuestId,
+  domandePubblicate,
 }: QAPanelProps) {
   const t = useTranslations('qa');
   const [refreshKey, setRefreshKey] = useState(0);
@@ -67,7 +71,9 @@ export default function QAPanel({
             <Icon icon="it-help-circle" size="sm" aria-hidden="true" />
             {t('title')}
           </h3>
-          <p className="live-panel-header__note">{t('qaPersistenceNote')}</p>
+          {domandePubblicate && (
+            <p className="live-panel-header__note">{t('qaPersistenceNote')}</p>
+          )}
         </div>
 
         <div className="qa-body flex-grow-1">
@@ -78,6 +84,7 @@ export default function QAPanel({
               guestName={guestName}
               guestId={guestId}
               onSubmitted={handleSubmitted}
+              domandePubblicate={domandePubblicate}
             />
           )}
 
@@ -91,6 +98,7 @@ export default function QAPanel({
             voterAccessToken={voterAccessToken}
             voterGuestId={voterGuestId}
             myQuestionIds={myQuestionIds}
+            domandePubblicate={domandePubblicate}
           />
         </div>
     </div>

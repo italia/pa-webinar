@@ -201,6 +201,14 @@ describe("chiudi l'evento — trascrizione", () => {
 });
 
 describe("chiudi l'evento — resoconto", () => {
+  it.each([
+    ['it', itMessaggi.admin.closing.resoconto.daGenerare, 'domande'],
+    ['en', enMessaggi.admin.closing.resoconto.daGenerare, 'questions'],
+  ])('%s: non dice che il testo nasce dalla chat, e le domande solo se pubblicate', (_l, testo, domande) => {
+    expect(testo.toLowerCase()).not.toContain('chat');
+    expect(testo).toMatch(new RegExp(`(pubblicate|published), ${domande}`));
+  });
+
   it('senza pipeline non serve; con la pipeline va generato e poi pubblicato', () => {
     expect(voce({ pipelineAi: false }, 'resoconto').stato).toBe('non-serve');
     expect(voce({}, 'resoconto').caso).toBe('daGenerare');

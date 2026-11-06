@@ -12,6 +12,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { cancellaBlob } = vi.hoisted(() => ({ cancellaBlob: vi.fn() }));
 vi.mock('@/lib/storage/recordings', () => ({
+  assertVideoNelloStorage: vi.fn(),
   deleteRecordingBlob: cancellaBlob,
   generateRecordingSasUrl: vi.fn(),
 }));

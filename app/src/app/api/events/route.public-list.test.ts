@@ -4,7 +4,8 @@
 // @vitest-environment node
 /**
  * GET /api/events in modalità pubblica: il video di un evento esce solo se la
- * registrazione è pubblicata, come nella rotta del singolo evento.
+ * registrazione è pubblicata per tutti e dentro la finestra post-evento, come
+ * nella rotta del singolo evento.
  */
 import type { NextRequest } from 'next/server';
 import { describe, expect, it, vi } from 'vitest';
@@ -17,7 +18,8 @@ import { GET } from './route';
 const evento = (
   id: string,
   recordingPublished: boolean,
-  recordingAudience: 'PUBLIC' | 'REGISTRANTS' = 'PUBLIC'
+  recordingAudience: 'PUBLIC' | 'REGISTRANTS' = 'PUBLIC',
+  over: Record<string, unknown> = {}
 ) => ({
   id,
   slug: `evento-${id}`,
@@ -34,8 +36,27 @@ const evento = (
   eventType: 'SCHEDULED',
   recordingUrl: `recordings/${id}.mp4`,
   recordingPublished,
+  transcriptPublished: false,
   recordingAudience,
+  recordingDestination: null,
+  postEventPublic: true,
+  postEventPublicUntil: null,
+  ...over,
 });
+
+const elenco = async () => {
+  const res = await GET(
+    new Request('http://x/api/events') as unknown as NextRequest,
+    {
+      params: Promise.resolve({}),
+    } as never
+  );
+  const corpo = (await res.json()) as Array<{
+    id: string;
+    recordingUrl: string | null;
+  }>;
+  return corpo.map((e) => [e.id, e.recordingUrl]);
+};
 
 describe('GET /api/events, elenco pubblico', () => {
   it('il video solo per le registrazioni pubblicate', async () => {
@@ -46,20 +67,38 @@ describe('GET /api/events, elenco pubblico', () => {
       // passa solo dalla pagina e dal player che riconoscono l'iscritto.
       evento('c', true, 'REGISTRANTS'),
     ]);
-    const res = await GET(
-      new Request('http://x/api/events') as unknown as NextRequest,
-      {
-        params: Promise.resolve({}),
-      } as never
-    );
-    const corpo = (await res.json()) as Array<{
-      id: string;
-      recordingUrl: string | null;
-    }>;
-    expect(corpo.map((e) => [e.id, e.recordingUrl])).toEqual([
+    expect(await elenco()).toEqual([
       ['a', 'recordings/a.mp4'],
       ['b', null],
       ['c', null],
     ]);
+  });
+
+  it.each(['PUBLISHED', 'LIVE'])(
+    'con la pagina dopo l’evento privata il video resta chiuso anche in stato %s',
+    async (status) => {
+      m.eventi.mockResolvedValueOnce([
+        evento('a', true, 'PUBLIC', { status, recordingDestination: 'PUBLIC' }),
+        evento('b', true, 'PUBLIC', {
+          status,
+          recordingDestination: 'PUBLIC',
+          postEventPublic: false,
+        }),
+      ]);
+      expect(await elenco()).toEqual([
+        ['a', 'recordings/a.mp4'],
+        ['b', null],
+      ]);
+    }
+  );
+
+  it('oltre la finestra post-evento il video resta chiuso', async () => {
+    m.eventi.mockResolvedValueOnce([
+      evento('a', true, 'PUBLIC', {
+        status: 'LIVE',
+        postEventPublicUntil: new Date('2020-01-01T00:00:00Z'),
+      }),
+    ]);
+    expect(await elenco()).toEqual([['a', null]]);
   });
 });

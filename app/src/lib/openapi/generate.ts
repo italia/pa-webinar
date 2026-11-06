@@ -183,7 +183,10 @@ registry.registerPath({
   tags: ['Events'],
   summary: 'Get event detail',
   request: { params: z.object({ param: z.string() }) },
-  responses: { 200: { description: 'Full event object' } },
+  responses: {
+    200: { description: 'Public view of the event, or the full view with a moderator token' },
+    404: { description: 'No such event, or, without a moderator token, an event with no public page' },
+  },
 });
 
 registry.registerPath({
@@ -195,7 +198,8 @@ registry.registerPath({
   request: { params: z.object({ param: z.string() }), body: { content: { 'application/json': { schema: updateEventSchema } } } },
   responses: {
     200: { description: 'Updated event' },
-    409: { description: 'RECORDING_DESTINATION_NOT_COVERED: the change exposes a reserved recording (audience PUBLIC, an external video), removes a declared destination, or widens it after the room has opened' },
+    403: { description: 'The token is not valid for this event, or the field needs a staff session: the destination, who can take part, a new recording address' },
+    409: { description: 'RECORDING_DESTINATION_NOT_COVERED: the change exposes a reserved recording (audience PUBLIC, an external video or a file outside the recordings storage), removes a declared destination, or widens it after the room has opened' },
   },
 });
 
@@ -740,7 +744,10 @@ registry.registerPath({
   tags: ['Events'],
   summary: 'Download iCal file for event',
   request: { params: z.object({ param: z.string() }) },
-  responses: { 200: { description: 'iCal file', content: { 'text/calendar': { schema: z.string() } } } },
+  responses: {
+    200: { description: 'iCal file', content: { 'text/calendar': { schema: z.string() } } },
+    404: { description: 'No such event, or an event with no public page' },
+  },
 });
 
 registry.registerPath({

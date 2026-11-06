@@ -14,8 +14,9 @@ import messages from '@/i18n/messages/it.json';
  * sceglie, su un evento senza destinazione c'e' un avviso e nessun blocco, e il
  * rifiuto del server arriva con il suo motivo.
  */
-const { toast } = vi.hoisted(() => ({
+const { toast, refresh } = vi.hoisted(() => ({
   toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
+  refresh: vi.fn(),
 }));
 vi.mock('@/components/ui/toast', () => ({ useToast: () => toast }));
 vi.mock('@/components/ui/confirm-dialog', () => ({ useConfirm: () => vi.fn() }));
@@ -24,7 +25,7 @@ vi.mock('@/i18n/navigation', () => ({
     <a href={href}>{children}</a>
   ),
   percorso: (p: string) => p,
-  useRouter: () => ({ refresh: vi.fn() }),
+  useRouter: () => ({ refresh }),
 }));
 vi.mock('./recording-upload-widget', () => ({
   default: () => <div data-testid="carica" />,
@@ -219,6 +220,24 @@ describe('RecordingManagement — destinazione pubblica', () => {
     expect(radio('PUBLIC').disabled).toBe(false);
     expect(container.textContent).not.toContain(t.destinationMissing);
     expect(container.textContent).not.toContain(t.audienceReservedNote);
+  });
+});
+
+describe('RecordingManagement — il pubblico del video', () => {
+  it('salvato, rilegge l’evento: decide anche cio’ che la pagina dice delle domande', async () => {
+    refresh.mockClear();
+    fetchMock.mockResolvedValue(new Response('{}', { status: 200 }));
+    render({ recordingDestination: 'PUBLIC' });
+    await premi(radio('REGISTRANTS'));
+    expect(refresh).toHaveBeenCalledTimes(1);
+  });
+
+  it('rifiutato, no', async () => {
+    refresh.mockClear();
+    fetchMock.mockResolvedValue(rifiuto(409, 'RECORDING_DESTINATION_NOT_COVERED'));
+    render({ recordingDestination: 'PUBLIC', recordingAudience: 'REGISTRANTS' });
+    await premi(radio('PUBLIC'));
+    expect(refresh).not.toHaveBeenCalled();
   });
 });
 

@@ -281,6 +281,7 @@ export async function ingressoResoconto(
       postEventShowQA: true,
       qaEnabled: true,
       recordingDestination: true,
+      recordingAudience: true,
       ...PERSONE_PUBBLICHE_INCLUDE,
     },
   });

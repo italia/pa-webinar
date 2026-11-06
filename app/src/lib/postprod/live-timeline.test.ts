@@ -198,6 +198,7 @@ describe('buildLiveTimeline', () => {
     ['domande spente', { postEventShowQA: false, qaEnabled: true, recordingDestination: 'PUBLIC' }],
     ['Q&A mai acceso', { postEventShowQA: true, qaEnabled: false, recordingDestination: 'PUBLIC' }],
     ['registrazione riservata', { postEventShowQA: true, qaEnabled: true, recordingDestination: 'REGISTRANTS' }],
+    ['video reso riservato', { postEventShowQA: true, qaEnabled: true, recordingDestination: 'PUBLIC', recordingAudience: 'REGISTRANTS' }],
     ['evento non trovato', null],
   ])('con %s nessun testo di domanda, nemmeno dalle azioni', async (_caso, riga) => {
     evento.mockResolvedValue(riga);

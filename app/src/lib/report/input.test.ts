@@ -48,6 +48,7 @@ describe('ingressoResoconto', () => {
     postEventShowQA: true,
     qaEnabled: true,
     recordingDestination: 'PUBLIC',
+    recordingAudience: 'PUBLIC',
     ...over,
   });
   const leggi = () => ingressoResoconto('e1', 'it', METRICS, VALUTAZIONI);
@@ -70,6 +71,7 @@ describe('ingressoResoconto', () => {
     ['domande spente', { postEventShowQA: false }],
     ['Q&A mai acceso', { qaEnabled: false }],
     ['registrazione riservata', { recordingDestination: 'REGISTRANTS' }],
+    ['video reso riservato', { recordingAudience: 'REGISTRANTS' }],
   ])('con %s nessun testo di domanda', async (_caso, over) => {
     db.event.findUnique.mockResolvedValue(evento(over));
     expect((await leggi())?.questions).toEqual([]);

@@ -189,6 +189,7 @@ describe('Dati e pagina dopo l evento — le domande', () => {
     onChange = vi.fn(),
     domandeDopoEvento?: boolean,
     destinazioneSenzaScelta?: 'PUBLIC' | 'REGISTRANTS' | null,
+    pubblicoDopo?: 'PUBLIC' | 'REGISTRANTS',
   ) =>
     mount(
       <SezioneDati
@@ -197,6 +198,7 @@ describe('Dati e pagina dopo l evento — le domande', () => {
         gdprTemplates={[]}
         domandeDopoEvento={domandeDopoEvento}
         destinazioneSenzaScelta={destinazioneSenzaScelta}
+        pubblicoDopo={pubblicoDopo}
       />,
     );
 
@@ -212,6 +214,18 @@ describe('Dati e pagina dopo l evento — le domande', () => {
     mostra(modulo({ recordingEnabled: true, recordingDestination: 'REGISTRANTS' }));
     expect(interruttore()).toBeDisabled();
     expect(interruttore()).not.toBeChecked();
+    expect(container.textContent).toContain(tp.qaReservedNote);
+  });
+
+  it('con il video reso riservato dal pubblico vale lo stesso', () => {
+    mostra(
+      modulo({ recordingEnabled: true, recordingDestination: 'PUBLIC' }),
+      vi.fn(),
+      undefined,
+      undefined,
+      'REGISTRANTS',
+    );
+    expect(interruttore()).toBeDisabled();
     expect(container.textContent).toContain(tp.qaReservedNote);
   });
 
@@ -367,6 +381,12 @@ describe('Riepilogo — cio che il formato ha scelto', () => {
           recordingDestination: 'REGISTRANTS',
         },
         { destinazioneSenzaScelta: 'REGISTRANTS' },
+      ),
+    ).toContain(f.postEventQaHidden);
+    expect(
+      mostra(
+        { permissionMatrix: conQa, postEventShowQA: true, recordingDestination: 'PUBLIC' },
+        { pubblicoDopo: 'REGISTRANTS' },
       ),
     ).toContain(f.postEventQaHidden);
     const senzaDomande = mostra({ postEventShowQA: true });

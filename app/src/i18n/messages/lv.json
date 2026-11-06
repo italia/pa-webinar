@@ -726,6 +726,7 @@
     "noQuestions": "Vēl nav jautājumu. Esiet pirmais!",
     "qaPersistenceNote": "Jautājumu teksts var parādīties pasākuma lapā bez to uzdevēja vārda.",
     "personalDataNotice": "Nerakstiet citu cilvēku personas datus, kā arī savus, ja nevēlaties tos publiskot: jautājuma teksts var parādīties pasākuma lapā bez jūsu vārda.",
+    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
     "filterAll": "Visi",
     "showPanel": "Rādīt Q&A",
     "hidePanel": "Slēpt Q&A",
@@ -745,6 +746,7 @@
       "answerFieldLabel": "Atbilde uz {name} jautājumu",
       "answerPlaceholder": "Uzrakstiet atbildi (līdz 2000 rakstzīmēm)",
       "answerNotice": "Atbilde var parādīties pasākuma lapā: nerakstiet personas datus.",
+      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
       "sendAnswer": "Publicēt atbildi",
       "cancel": "Atcelt",
       "removeAnswer": "Noņemt atbildi"

@@ -172,6 +172,24 @@ describe('la copia', () => {
     });
   });
 
+  it.each([
+    ['chiamata rapida', 'INSTANT'],
+    ['importazione storica', 'LEGACY'],
+  ] as const)('di una %s resta senza destinazione', async (_n, eventType) => {
+    const originale = await creaEvento({ eventType, recordingEnabled: true, status: 'ENDED' });
+    const r = await duplica(
+      richiesta(`/api/admin/events/${originale.id}/duplicate`, 'POST') as never,
+      { params: Promise.resolve({ id: originale.id }) }
+    );
+    expect(r.status).toBe(201);
+    const { id } = (await r.json()) as { id: string };
+    expect(await riga(id)).toMatchObject({
+      eventType,
+      recordingDestination: null,
+      recordingAudience: 'PUBLIC',
+    });
+  });
+
   it('di un evento riservato resta riservata, con il pubblico allineato', async () => {
     const originale = await creaEvento({ ...RISERVATO, status: 'ENDED' });
     const r = await duplica(
@@ -379,7 +397,7 @@ describe('un evento senza destinazione', () => {
   });
 
   it('che comincia a registrare caricando un file parte riservato', async () => {
-    const evento = await creaEvento({ recordingEnabled: false, status: 'ENDED' });
+    const evento = await creaEvento({ recordingEnabled: false, status: 'PUBLISHED' });
     expect((await modificaPubblicazione(evento.id, { recordingUrl: FILE })).status).toBe(
       200
     );
@@ -389,9 +407,29 @@ describe('un evento senza destinazione', () => {
       recordingPublished: true,
     });
 
-    const r = await modifica(evento, { recordingAudience: 'PUBLIC' });
-    expect(r.status).toBe(409);
-    expect(await r.json()).toMatchObject(NON_COPERTA);
+    // A sala mai aperta si puo' ancora allargare, e lo fa lo staff.
+    expect(
+      (await modifica(evento, { recordingDestination: 'PUBLIC' })).status
+    ).toBe(200);
+    expect(await riga(evento.id)).toMatchObject({
+      recordingDestination: 'PUBLIC',
+      recordingAudience: 'PUBLIC',
+    });
+  });
+
+  it('gia’ concluso, con il file caricato pubblica senza destinazione', async () => {
+    const evento = await creaEvento({ recordingEnabled: false, status: 'ENDED' });
+    expect((await modificaPubblicazione(evento.id, { recordingUrl: FILE })).status).toBe(
+      200
+    );
+    expect(await riga(evento.id)).toMatchObject({
+      recordingDestination: null,
+      recordingAudience: 'PUBLIC',
+      recordingEnabled: true,
+      recordingPublished: true,
+    });
+    // Resta allargabile: nessun rifiuto, come gli eventi che registravano gia'.
+    expect((await modifica(evento, { recordingAudience: 'PUBLIC' })).status).toBe(200);
   });
 
   it.each([
@@ -449,8 +487,8 @@ describe('dove il video della sala non c e', () => {
     expect(await riga(id)).toMatchObject(RISERVATO);
   });
 
-  it('un file caricato su un evento spento e un video, e parte riservato', async () => {
-    const evento = await creaEvento({ recordingEnabled: false, status: 'ENDED' });
+  it('un file caricato su un evento spento mai aperto e un video, e parte riservato', async () => {
+    const evento = await creaEvento({ recordingEnabled: false, status: 'PUBLISHED' });
     expect((await modificaPubblicazione(evento.id, { recordingUrl: FILE })).status).toBe(200);
     expect(await riga(evento.id)).toMatchObject(RISERVATO);
   });

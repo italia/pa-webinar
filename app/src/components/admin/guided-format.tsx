@@ -395,7 +395,11 @@ export default function GuidedFormat({
               </span>
               <span>
                 {/* Con la pagina privata nessuno le legge: dopo l'evento non c'e' dove pubblicarle. */}
-                {preset.postEventPublic && domandePubbliche(preset)
+                {preset.postEventPublic &&
+                domandePubbliche({
+                  ...preset,
+                  recordingAudience: preset.recordingDestination ?? 'PUBLIC',
+                })
                   ? tf('postEventQaTextOnly')
                   : tf('postEventQaHidden')}
               </span>

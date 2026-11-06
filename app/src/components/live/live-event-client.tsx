@@ -23,7 +23,11 @@ import { Icon } from '@/components/ui/icon';
 import { Link, useRouter, percorso } from '@/i18n/navigation';
 import type { JitsiMeetExternalAPI } from '@/types/jitsi';
 import { messaggioErroreApi } from '@/lib/api-error-message';
-import { sezioniDopoEvento, type SezioneDopoEvento } from '@/lib/events/post-event-sections';
+import {
+  domandePubblicateInSala,
+  sezioniDopoEvento,
+  type SezioneDopoEvento,
+} from '@/lib/events/post-event-sections';
 import type { VideoQualityPreset } from '@/lib/jitsi/config';
 import {
   faseRegistratoreStabile,
@@ -65,6 +69,7 @@ import type { VoceNelVideo } from '@/lib/live/consent-rule';
 import {
   consensoCopre,
   destinazioneDelTesto,
+  registrazioneRiservata,
   testoLetto,
   type Destinazione,
 } from '@/lib/recording/destination';
@@ -187,6 +192,9 @@ interface EventInfo {
    *  la riceve con il consenso. Quella in vigore la riporta ogni risposta del
    *  token (`JitsiCredentials.recordingDestination`). */
   recordingDestination?: RecordingAudience | null;
+  /** Il pubblico della registrazione (Event.recordingAudience): puo' restringere
+   *  anche una destinazione pubblica (`registrazioneRiservata`). */
+  recordingAudience: RecordingAudience;
   /** La voce di chi non acconsente nel video (lib/recording/availability). */
   voceNelVideo?: VoceNelVideo;
   /** L'informativa privacy dell'evento (lib/events/privacy-notice), accanto
@@ -1471,7 +1479,10 @@ export default function LiveEventClient({
   // Un video riservato non va in libreria: l'opzione non si offre, e un evento
   // gia' in libreria parte dalla visibilita' configurata per la pagina.
   const videoRiservato =
-    event.recordingDestination === 'REGISTRANTS' || destinazioneInVigore === 'REGISTRANTS';
+    registrazioneRiservata({
+      recordingAudience: event.recordingAudience,
+      recordingDestination: event.recordingDestination ?? null,
+    }) || destinazioneInVigore === 'REGISTRANTS';
   const destinoScelto =
     endDestino === 'library' && videoRiservato
       ? event.postEventPublic === false
@@ -2785,6 +2796,7 @@ export default function LiveEventClient({
         </div>
 
         <LiveSidebar
+          domandePubblicate={domandePubblicateInSala(event)}
           salaSoloAscolto={salaSoloAscolto}
           salaConsensoChiesto={regolaSala.richiesto}
           guestKeyName={isGuest || !token ? chosenName.trim() : undefined}
@@ -3054,6 +3066,8 @@ interface LiveSidebarProps {
   /** Una scheda da aprire chiesta da fuori (la striscia del tempo apre la
    *  Regia); il contatore fa ripetere la stessa richiesta. */
   richiestaScheda?: { tab: SidebarTab; n: number } | null;
+  /** Le domande possono comparire sulla pagina dell'evento (`domandePubblicateInSala`). */
+  domandePubblicate: boolean;
   /** La scheda Regia, per chi conduce (non per i relatori). */
   regia?: {
     onEnded: () => void;
@@ -3066,6 +3080,7 @@ interface LiveSidebarProps {
 }
 
 function LiveSidebar({
+  domandePubblicate,
   salaSoloAscolto = false,
   salaConsensoChiesto = false,
   guestKeyName,
@@ -4133,6 +4148,7 @@ function LiveSidebar({
               guestId={!token ? voterGuestId : undefined}
               voterAccessToken={voterAccessToken}
               voterGuestId={voterGuestId}
+              domandePubblicate={domandePubblicate}
             />
           )}
           {/* ChatPanel stays mounted while the event is live so it can
