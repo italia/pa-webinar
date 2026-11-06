@@ -65,6 +65,25 @@ export function pubblicazioneAperta(
 }
 
 /**
+ * L'indirizzo del video per chi non si fa riconoscere: gli elenchi, la GET pubblica
+ * dell'evento e le pagine che lo passano al browser. Esce solo se e' pubblicato per
+ * tutti e dentro la finestra post-evento, in ogni stato dell'evento: gli elenchi
+ * filtrano per pagina solo gli eventi conclusi, e un file pubblicato prima della
+ * fine su una pagina privata qui resta chiuso. Una registrazione riservata passa
+ * dalla pagina e dal player, che riconoscono l'iscritto.
+ */
+export function videoPerTutti(
+  event: EventoPerAccesso & { recordingUrl: string | null },
+  now: Date = new Date()
+): string | null {
+  const perTutti =
+    event.recordingPublished &&
+    event.recordingAudience === 'PUBLIC' &&
+    pubblicazioneAperta(event, now);
+  return perTutti ? event.recordingUrl : null;
+}
+
+/**
  * Gli iscritti vedono la registrazione anche se la pagina dell'evento non si vede
  * (lib/events/visibility): cio' che ferma il pubblico sulla pagina non vale per
  * loro, e chi decide se aprirla o avvisarli deve chiederlo qui.

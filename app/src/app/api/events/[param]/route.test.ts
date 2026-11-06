@@ -1360,7 +1360,26 @@ describe('GET /api/events/[param] — le domande dopo l’evento', () => {
       ['in pausa, destinazione pubblica', 'IDLE', 'PUBLIC'],
     ])('%s: non esce', async (_n, status, recordingDestination) => {
       mocked.event.findUnique.mockResolvedValue(
-        evento({ ...recupero, status, recordingDestination }),
+        evento({
+          ...recupero,
+          status,
+          recordingDestination,
+          endsAt: new Date(Date.now() + 3_600_000),
+        }),
+      );
+      const corpo = await (await lettura()).json();
+      expect(corpo.tempRecordingUrl).toBeNull();
+      expect(corpo.tempRecordingStartedAt).toBeNull();
+    });
+
+    it('in diretta, video reso riservato dal pubblico: non esce', async () => {
+      mocked.event.findUnique.mockResolvedValue(
+        evento({
+          ...recupero,
+          status: 'LIVE',
+          recordingDestination: 'PUBLIC',
+          recordingAudience: 'REGISTRANTS',
+        }),
       );
       const corpo = await (await lettura()).json();
       expect(corpo.tempRecordingUrl).toBeNull();
@@ -1381,6 +1400,63 @@ describe('GET /api/events/[param] — le domande dopo l’evento', () => {
       const corpo = await (await lettura()).json();
       expect(corpo.tempRecordingUrl).toBe(recupero.tempRecordingUrl);
       expect(corpo.tempRecordingStartedAt).toBe('2027-03-01T09:05:00.000Z');
+    });
+  });
+
+  describe('un evento senza pagina pubblica', () => {
+    const VIDEO = 'https://storage.example.test/video.mp4';
+    const pubblicato = {
+      status: 'ENDED',
+      recordingUrl: VIDEO,
+      recordingPublished: true,
+      registrationCount: 3,
+    };
+
+    it.each([
+      ['bozza', { status: 'DRAFT' }],
+      ['archiviato', { status: 'ARCHIVED' }],
+      ['concluso con la pagina privata', { ...pubblicato, postEventPublic: false }],
+      [
+        'concluso con la finestra scaduta',
+        { ...pubblicato, postEventPublicUntil: new Date(Date.now() - 1000) },
+      ],
+      ['chiamata rapida non conclusa', { status: 'LIVE', eventType: 'INSTANT' }],
+    ])('%s: 404, senza titolo ne’ video', async (_n, over) => {
+      mocked.event.findUnique.mockResolvedValue(evento(over));
+      const r = await lettura();
+      expect(r.status).toBe(404);
+      const corpo = await r.text();
+      expect(corpo).not.toContain('Evento esistente');
+      expect(corpo).not.toContain(VIDEO);
+    });
+
+    it('concluso con la pagina visibile: il video pubblico esce', async () => {
+      mocked.event.findUnique.mockResolvedValue(evento(pubblicato));
+      const corpo = await (await lettura()).json();
+      expect(corpo.recordingUrl).toBe(VIDEO);
+    });
+
+    it('in diretta il video resta chiuso se la pagina dopo l’evento e’ privata', async () => {
+      mocked.event.findUnique.mockResolvedValue(
+        evento({ ...pubblicato, status: 'LIVE', postEventPublic: false }),
+      );
+      const corpo = await (await lettura()).json();
+      expect(corpo.recordingUrl).toBeNull();
+    });
+
+    it('chi conduce legge l’evento anche con la pagina privata', async () => {
+      vi.mocked(extractModeratorToken).mockReturnValue('token-valido');
+      mocked.event.findUnique.mockResolvedValue(
+        evento({
+          ...pubblicato,
+          postEventPublic: false,
+          createdAt: new Date('2027-01-01T09:00:00.000Z'),
+          registrations: [],
+        }),
+      );
+      const r = await lettura();
+      expect(r.status).toBe(200);
+      expect((await r.json()).recordingUrl).toBe(VIDEO);
     });
   });
 

@@ -10,6 +10,7 @@ import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { localizedPath } from '@/lib/utils/localized-url';
 import { getSettings } from '@/lib/settings';
 import { isUpcomingPublicEvent, publicEventStatusWhere } from '@/lib/events/visibility';
+import { videoPerTutti, type EventoPerAccesso } from '@/lib/recording/audience';
 import EventList from '@/components/events/event-list';
 import { fondoEtichettaPiena, hexWithAlpha, inchiostroEtichetta } from '@/lib/utils/tag-color';
 
@@ -179,8 +180,7 @@ async function TagFilterRow({ tags, activeTag, locale }: TagFilterRowProps) {
   );
 }
 
-interface EventWithCount {
-  id: string;
+interface EventWithCount extends EventoPerAccesso {
   slug: string;
   title: unknown;
   description: unknown;
@@ -190,8 +190,6 @@ interface EventWithCount {
   maxParticipants: number;
   status: string;
   recordingUrl: string | null;
-  recordingPublished: boolean;
-  recordingAudience: 'PUBLIC' | 'REGISTRANTS';
   speakersInfo: unknown;
   organizerName: string | null;
   imageUrl: string | null;
@@ -220,7 +218,7 @@ function serialise(e: EventWithCount, _locale: string) {
     status: e.status,
     // Serve al contrassegno «registrazione»: solo se pubblicata per tutti,
     // come nelle API pubbliche (lib/recording/audience).
-    recordingUrl: e.recordingPublished && e.recordingAudience === 'PUBLIC' ? e.recordingUrl : null,
+    recordingUrl: videoPerTutti(e),
     speakersInfo: e.speakersInfo as Record<string, string> | null,
     organizerName: e.organizerName,
     imageUrl: e.imageUrl,

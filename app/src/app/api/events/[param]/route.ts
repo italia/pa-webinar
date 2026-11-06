@@ -19,6 +19,7 @@ import { recordLiveAction, recordLiveActions } from '@/lib/live/actions';
 import { reviveStatus } from '@/lib/events/lifecycle';
 import { CAMPI_VIDEO_VUOTI } from '@/lib/events/recording-fields';
 import { domandePubbliche } from '@/lib/events/post-event-sections';
+import { isEventPageVisible } from '@/lib/events/visibility';
 import { closeOpenSessions } from '@/lib/events/call-sessions';
 import { chiudiSondaggiAperti } from '@/lib/events/close-polls';
 import { eventTagIds, replaceEventTags, resolveTags, sameTagIds } from '@/lib/events/event-tags';
@@ -61,8 +62,10 @@ import {
   erroreDestinazioneNonCoperta,
   pubblicoAllineato,
   puoCambiareDestinazione,
+  recuperoAperto,
   type Destinazione,
 } from '@/lib/recording/destination';
+import { videoPerTutti } from '@/lib/recording/audience';
 import { assertVideoNelloStorage } from '@/lib/storage/recordings';
 import { annullaEmailInCoda } from '@/lib/email/outbox';
 
@@ -180,15 +183,13 @@ export const GET = withErrorHandling(async (request, context) => {
     });
   }
 
-  // Public mode — hide DRAFT and ARCHIVED events
-  if (event.status === 'DRAFT' || event.status === 'ARCHIVED') {
-    throw new NotFoundError('Event');
-  }
+  // La lettura pubblica segue la pagina: un evento senza pagina (bozza, archivio,
+  // concluso con la pagina privata o la finestra scaduta) qui non esiste.
+  if (!isEventPageVisible(event)) throw new NotFoundError('Event');
 
-  // Come la pagina della sala: il recupero esiste solo in diretta, e una
-  // registrazione riservata non si offre a chi legge questa risposta pubblica.
-  const recuperoInDiretta =
-    event.status === 'LIVE' && event.recordingDestination !== 'REGISTRANTS';
+  // Come la pagina della sala: una registrazione riservata non si offre a chi
+  // legge questa risposta pubblica.
+  const recuperoInDiretta = recuperoAperto(event);
 
   return Response.json({
     id: event.id,
@@ -208,10 +209,10 @@ export const GET = withErrorHandling(async (request, context) => {
     participantsCanStartVideo: event.participantsCanStartVideo,
     participantsCanShareScreen: event.participantsCanShareScreen,
     status: event.status,
-    // Risposta in cache condivisa: il video solo se pubblicato per tutti; una
-    // registrazione riservata agli iscritti passa dalla pagina e dal player,
-    // che riconoscono l'iscritto (lib/recording/audience).
-    recordingUrl: event.recordingPublished && event.recordingAudience === 'PUBLIC' ? event.recordingUrl : null,
+    // Risposta in cache condivisa: il video solo se pubblicato per tutti e dentro
+    // la finestra post-evento; una registrazione riservata agli iscritti passa
+    // dalla pagina e dal player, che riconoscono l'iscritto (lib/recording/audience).
+    recordingUrl: videoPerTutti(event),
     tempRecordingUrl: recuperoInDiretta ? event.tempRecordingUrl : null,
     tempRecordingStartedAt: recuperoInDiretta ? event.tempRecordingStartedAt?.toISOString() ?? null : null,
     postEventPublic: event.postEventPublic,

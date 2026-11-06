@@ -26,6 +26,7 @@ import {
   vedeVideo,
   visioneRegistrazione,
   type AccessoRegistrazione,
+  videoPerTutti,
   type EventoPerVisione,
 } from './audience';
 import { issueViewingToken, viewingCookieName } from './viewing';
@@ -75,6 +76,37 @@ describe('pubblicazioneAperta', () => {
         NOW
       )
     ).toBe(false);
+  });
+});
+
+describe('videoPerTutti', () => {
+  const conFile = (over: Record<string, unknown> = {}, recordingUrl: string | null = 'recordings/a.mp4') => ({
+    ...evento(over),
+    recordingUrl,
+  });
+
+  it('dà l’indirizzo del video pubblicato per tutti, dentro la finestra', () => {
+    expect(videoPerTutti(conFile(), NOW)).toBe('recordings/a.mp4');
+    const domani = new Date(NOW.getTime() + 86_400_000);
+    expect(videoPerTutti(conFile({ postEventPublicUntil: domani }), NOW)).toBe('recordings/a.mp4');
+  });
+
+  it.each([
+    ['non pubblicato', { recordingPublished: false }],
+    ['solo la trascrizione pubblicata', { recordingPublished: false, transcriptPublished: true }],
+    ['pagina dopo l’evento privata', { postEventPublic: false }],
+    ['finestra scaduta', { postEventPublicUntil: new Date(NOW.getTime() - 1) }],
+    ['riservato agli iscritti', { recordingAudience: 'REGISTRANTS' }],
+    [
+      'riservato agli iscritti, anche con destinazione',
+      { recordingAudience: 'REGISTRANTS', recordingDestination: 'REGISTRANTS' },
+    ],
+  ])('%s: nessun indirizzo', (_caso, over) => {
+    expect(videoPerTutti(conFile(over), NOW)).toBeNull();
+  });
+
+  it('senza file resta null', () => {
+    expect(videoPerTutti(conFile({}, null), NOW)).toBeNull();
   });
 });
 

@@ -182,7 +182,10 @@ registry.registerPath({
   tags: ['Events'],
   summary: 'Get event detail',
   request: { params: z.object({ param: z.string() }) },
-  responses: { 200: { description: 'Full event object' } },
+  responses: {
+    200: { description: 'Public view of the event, or the full view with a moderator token' },
+    404: { description: 'No such event, or, without a moderator token, an event with no public page' },
+  },
 });
 
 registry.registerPath({
@@ -724,7 +727,10 @@ registry.registerPath({
   tags: ['Events'],
   summary: 'Download iCal file for event',
   request: { params: z.object({ param: z.string() }) },
-  responses: { 200: { description: 'iCal file', content: { 'text/calendar': { schema: z.string() } } } },
+  responses: {
+    200: { description: 'iCal file', content: { 'text/calendar': { schema: z.string() } } },
+    404: { description: 'No such event, or an event with no public page' },
+  },
 });
 
 registry.registerPath({
