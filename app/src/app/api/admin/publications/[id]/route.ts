@@ -22,10 +22,12 @@ import { requireEventManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { AppError, NotFoundError, ValidationError } from '@/lib/errors';
+import { salaGiaAperta } from '@/lib/live/room-open';
 import {
   assertEsposizioneConsentita,
   destinazioneDiPartenza,
 } from '@/lib/recording/destination';
+import { assertVideoNelloStorage } from '@/lib/storage/recordings';
 
 export const dynamic = 'force-dynamic';
 
@@ -74,15 +76,17 @@ export const PATCH = withErrorHandling(async (request, context) => {
 
   // La destinazione dell'evento decide cosa si puo' esporre. Un file appena
   // caricato non si rifiuta mai: e' gia' nello storage, e sugli eventi riservati
-  // lo vedono solo gli iscritti. La guardia guarda solo una pubblicazione
-  // chiesta esplicitamente e l'indirizzo esterno.
+  // lo vedono solo gli iscritti. La guardia guarda una pubblicazione chiesta
+  // esplicitamente e gli indirizzi esterni.
   const prima = await prisma.event.findUnique({
     where: { id },
     select: {
+      status: true,
       eventType: true,
       recordingEnabled: true,
       recordingDestination: true,
       recordingAudience: true,
+      recordingUrl: true,
       recordingPublished: true,
       transcriptPublished: true,
       youtubeUrl: true,
@@ -93,16 +97,18 @@ export const PATCH = withErrorHandling(async (request, context) => {
 
   // Il caricamento accende la registrazione: un evento che comincia a registrare
   // con questo file parte riservato, come quando la si accende dalla modifica
-  // dell'evento. Gli eventi storici restano senza destinazione.
+  // dell'evento. A sala gia' aperta non si dichiara niente: l'evento resta senza
+  // destinazione e pubblica con un avviso (`destinazioneDiPartenza`).
   const partenza = destinazioneDiPartenza(
     prima,
-    !!parsed.data.recordingUrl && prima.eventType !== 'LEGACY',
+    !!parsed.data.recordingUrl && !(await salaGiaAperta({ id, status: prima.status })),
   );
   const destinazione =
     partenza && partenza !== prima.recordingDestination
       ? ({ recordingDestination: partenza, recordingAudience: partenza } as const)
       : null;
 
+  assertVideoNelloStorage(partenza, prima.recordingUrl, parsed.data.recordingUrl);
   assertEsposizioneConsentita(prima, {
     ...prima,
     ...destinazione,

@@ -680,6 +680,20 @@ describe('scheda dell’evento — le domande dopo l’evento', () => {
     expect(fonti.questions[0]).toMatchObject({ answeredAt: RIGA_DOMANDA.answeredAt });
   });
 
+  it.each([
+    ['su destinazione pubblica', 'PUBLIC'],
+    ['senza destinazione', null],
+  ])('con il video reso riservato dal pubblico %s nessuna domanda esce', async (_n, recordingDestination) => {
+    mockedEvent.mockResolvedValue(
+      concluso({ recordingAudience: 'REGISTRANTS', recordingDestination }),
+    );
+    const props = await clientProps();
+    expect(mockedQuestions).not.toHaveBeenCalled();
+    expect(props.answeredQuestions).toEqual([]);
+    expect(JSON.stringify(props)).not.toContain(SALVATO.topQuestions[0]!.text);
+    expect((props.event as { postEventShowQA: boolean }).postEventShowQA).toBe(false);
+  });
+
   it('le domande in chat non arrivano al client, anche da uno snapshot salvato', async () => {
     mockedEvent.mockResolvedValue(concluso());
     const props = await clientProps();

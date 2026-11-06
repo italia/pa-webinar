@@ -272,6 +272,7 @@ describe('modifica — revoca di un co-moderatore', () => {
     slug: 'evento',
     moderatorToken: 'token-primario',
     event: {
+      recordingAudience: 'PUBLIC',
       title: { it: 'Evento di prova' },
       description: { it: 'Una descrizione valida per il wizard.' },
       startsAt: '2030-01-10T09:00:00.000Z',
@@ -976,6 +977,7 @@ describe('lingue dell evento e traduzione automatica', () => {
     slug: 'evento-lingue',
     moderatorToken: 'token-l',
     event: {
+      recordingAudience: 'PUBLIC',
       title: { it: 'Evento di prova', en: 'Test event', de: 'Testveranstaltung' },
       description: {
         it: 'Una descrizione valida per il wizard.',
@@ -2364,6 +2366,7 @@ const ATTIVA: InitialEventShape = {
   slug: 'evento-programma',
   moderatorToken: 'token-primario',
   event: {
+    recordingAudience: 'PUBLIC',
     title: { it: 'Evento con programma' },
     description: { it: 'Una descrizione valida per il wizard.' },
     startsAt: '2030-01-10T09:00:00.000Z',
@@ -2905,6 +2908,19 @@ describe('i valori del formato', () => {
     const inviato = corpo('PUT');
     expect(inviato.recordingEnabled).toBe(true);
     expect(inviato).not.toHaveProperty('recordingDestination');
+  });
+
+  it('un video reso riservato dal pubblico toglie le domande dal riepilogo', () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato({
+        ...conDomande,
+        recordingDestination: 'PUBLIC',
+        recordingAudience: 'REGISTRANTS',
+      }),
+      initialStep: 'review',
+    });
+    expect(container.textContent).toContain(w.flow.postEventQaHidden);
   });
 
   it('con un link di conduzione un evento vecchio che registra resta senza, e lo dice', async () => {

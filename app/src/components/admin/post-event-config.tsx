@@ -14,7 +14,7 @@ import {
 } from 'design-react-kit';
 
 import ToggleSwitch from '@/components/ui/toggle-switch';
-import type { Destinazione } from '@/lib/recording/destination';
+import { registrazioneRiservata, type Destinazione } from '@/lib/recording/destination';
 
 /** I due campi che decidono se la pagina post-evento e' pubblica. */
 export interface PostEventVisibility {
@@ -33,6 +33,7 @@ interface PostEventConfigProps {
     postEventPublicUntil: string | null;
     libraryListed: boolean;
     recordingDestination: Destinazione;
+    recordingAudience: 'PUBLIC' | 'REGISTRANTS';
     hasPlayableRecording: boolean;
     postEventShowQA: boolean;
     postEventShowMaterials: boolean;
@@ -57,7 +58,7 @@ export default function PostEventConfig({ event, onPublicPageChange }: PostEvent
   // Con la registrazione riservata la libreria non la mostra e le domande non si
   // pubblicano (lib/events/post-event-sections): i due interruttori non
   // cambierebbero niente, e lo si dice. La scelta salvata resta quella.
-  const riservata = event.recordingDestination === 'REGISTRANTS';
+  const riservata = registrazioneRiservata(event);
 
   const [pageVisible, setPageVisible] = useState(event.postEventPublic);
   const [libraryListed, setLibraryListed] = useState(event.libraryListed);

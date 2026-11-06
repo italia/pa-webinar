@@ -62,6 +62,7 @@ import type { VoceNelVideo } from '@/lib/live/consent-rule';
 import {
   consensoCopre,
   destinazioneDelTesto,
+  registrazioneRiservata,
   testoLetto,
   type Destinazione,
 } from '@/lib/recording/destination';
@@ -184,6 +185,9 @@ interface EventInfo {
    *  la riceve con il consenso. Quella in vigore la riporta ogni risposta del
    *  token (`JitsiCredentials.recordingDestination`). */
   recordingDestination?: RecordingAudience | null;
+  /** Il pubblico della registrazione (Event.recordingAudience): puo' restringere
+   *  anche una destinazione pubblica (`registrazioneRiservata`). */
+  recordingAudience: RecordingAudience;
   /** La voce di chi non acconsente nel video (lib/recording/availability). */
   voceNelVideo?: VoceNelVideo;
   /** L'informativa privacy dell'evento (lib/events/privacy-notice), accanto
@@ -1375,7 +1379,10 @@ export default function LiveEventClient({
   // Un video riservato non va in libreria: l'opzione non si offre, e un evento
   // gia' in libreria parte dalla visibilita' configurata per la pagina.
   const videoRiservato =
-    event.recordingDestination === 'REGISTRANTS' || destinazioneInVigore === 'REGISTRANTS';
+    registrazioneRiservata({
+      recordingAudience: event.recordingAudience,
+      recordingDestination: event.recordingDestination ?? null,
+    }) || destinazioneInVigore === 'REGISTRANTS';
   const destinoScelto =
     endDestino === 'library' && videoRiservato
       ? event.postEventPublic === false

@@ -58,6 +58,11 @@ const { sessioni } = vi.hoisted(() => ({
   sessioni: { closeOpenSessions: vi.fn(async () => 0) },
 }));
 vi.mock('@/lib/events/call-sessions', () => sessioni);
+const storage = vi.hoisted(() => ({ getRecordingsStorage: vi.fn((): unknown => null) }));
+vi.mock('@/lib/storage/index', () => ({
+  getRecordingsStorage: storage.getRecordingsStorage,
+  recordingsProviderLabel: () => 'not-configured',
+}));
 const sala = vi.hoisted(() => ({
   salaForseAperta: vi.fn(async () => false),
   salaGiaAperta: vi.fn(async () => false),
@@ -938,6 +943,7 @@ describe('PUT /api/events/[param] — la destinazione della registrazione', () =
     staff.requireEventManager.mockReset();
     sala.salaForseAperta.mockResolvedValue(false);
     sala.salaGiaAperta.mockResolvedValue(false);
+    storage.getRecordingsStorage.mockReturnValue(null);
     mocked.$transaction.mockImplementation(async (fn: (tx: unknown) => unknown) => fn(prisma));
     mocked.event.update.mockImplementation(
       async ({ data }: { data: Record<string, unknown> }) => ({ ...riservato(), ...data }),
@@ -1182,6 +1188,78 @@ describe('PUT /api/events/[param] — la destinazione della registrazione', () =
     });
   });
 
+  describe('un file agganciato con recordingUrl', () => {
+    const spento = (over: Record<string, unknown> = {}) =>
+      riservato({
+        recordingEnabled: false,
+        recordingDestination: null,
+        recordingAudience: 'PUBLIC',
+        recordingUrl: null,
+        ...over,
+      });
+
+    it('con il solo link di conduzione e’ 403, e non si scrive niente', async () => {
+      staff.requireEventManager.mockRejectedValue(new UnauthorizedError('sessione'));
+      const r = await modifica(spento(), { recordingUrl: FILE, recordingPublished: true });
+      expect(r.status).toBe(403);
+      expect(mocked.event.update).not.toHaveBeenCalled();
+    });
+
+    it('il link di conduzione rimanda lo stesso indirizzo senza rifiuti', async () => {
+      staff.requireEventManager.mockRejectedValue(new UnauthorizedError('sessione'));
+      const r = await modifica(riservato({ recordingUrl: FILE }), {
+        recordingUrl: FILE,
+        recordingPublished: true,
+      });
+      expect(r.status).toBe(200);
+      expect(staff.requireEventManager).not.toHaveBeenCalled();
+    });
+
+    it('lo staff su un evento mai aperto parte riservato, con il pubblico allineato', async () => {
+      await modifica(spento(), { recordingUrl: FILE });
+      expect(datiScritti()).toMatchObject({
+        recordingUrl: FILE,
+        recordingDestination: 'REGISTRANTS',
+        recordingAudience: 'REGISTRANTS',
+      });
+    });
+
+    it('a sala gia’ aperta l’evento resta senza destinazione', async () => {
+      sala.salaGiaAperta.mockResolvedValue(true);
+      await modifica(spento({ status: 'ENDED' }), { recordingUrl: FILE });
+      const scritti = datiScritti();
+      expect(scritti.recordingUrl).toBe(FILE);
+      expect(scritti).not.toHaveProperty('recordingDestination');
+      expect(scritti).not.toHaveProperty('recordingAudience');
+    });
+
+    it('una chiamata rapida e un evento storico restano senza destinazione', async () => {
+      await modifica(spento({ eventType: 'INSTANT' }), { recordingUrl: FILE });
+      expect(datiScritti()).not.toHaveProperty('recordingDestination');
+      mocked.event.update.mockClear();
+      await modifica(spento({ eventType: 'LEGACY' }), { recordingUrl: FILE });
+      expect(datiScritti()).not.toHaveProperty('recordingDestination');
+    });
+
+    it('un indirizzo fuori dallo storage su un evento riservato e’ 409', async () => {
+      storage.getRecordingsStorage.mockReturnValue({ keyFromUrl: () => null });
+      await rifiutata(await modifica(riservato(), { recordingUrl: FILE }));
+    });
+
+    it('un file dello storage su un evento riservato passa', async () => {
+      storage.getRecordingsStorage.mockReturnValue({ keyFromUrl: () => 'recordings/sala.mp4' });
+      expect((await modifica(riservato(), { recordingUrl: FILE })).status).toBe(200);
+    });
+
+    it('fuori dallo storage, su un evento per tutti, passa come prima', async () => {
+      storage.getRecordingsStorage.mockReturnValue({ keyFromUrl: () => null });
+      const r = await modifica(riservato({ recordingDestination: 'PUBLIC', recordingAudience: 'PUBLIC' }), {
+        recordingUrl: FILE,
+      });
+      expect(r.status).toBe(200);
+    });
+  });
+
   describe('la rubrica nel modulo', () => {
     const conRubrica = () => riservato({ offerAddressBook: true });
 
@@ -1223,7 +1301,10 @@ describe('GET /api/events/[param] — le domande dopo l’evento', () => {
     _count: { registrations: 0 },
     qaEnabled: true,
     postEventShowQA: true,
+    postEventPublic: true,
+    postEventPublicUntil: null,
     recordingDestination: null,
+    recordingAudience: 'PUBLIC',
     ...over,
   });
 
@@ -1239,6 +1320,12 @@ describe('GET /api/events/[param] — le domande dopo l’evento', () => {
     ['evento senza destinazione', {}, true],
     ['destinazione pubblica', { recordingDestination: 'PUBLIC' }, true],
     ['registrazione riservata, interruttore acceso', { recordingDestination: 'REGISTRANTS' }, false],
+    [
+      'video reso riservato su destinazione pubblica',
+      { recordingDestination: 'PUBLIC', recordingAudience: 'REGISTRANTS' },
+      false,
+    ],
+    ['pubblico riservato senza destinazione', { recordingAudience: 'REGISTRANTS' }, false],
     ['interruttore spento', { postEventShowQA: false }, false],
     ['domande spente in sala', { qaEnabled: false }, false],
   ])('%s', async (_n, over, atteso) => {

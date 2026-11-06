@@ -3,6 +3,8 @@
 
 import type { RecordingAudience } from '@prisma/client';
 
+import { registrazioneRiservata } from '@/lib/recording/destination';
+
 /**
  * Le sezioni che la pagina di un evento concluso mostra al pubblico, se c'e'
  * qualcosa da mostrare: la scelta di chi organizza (Event.postEventShow*),
@@ -19,7 +21,8 @@ export function sezioniDopoEvento(mostra: Record<SezioneDopoEvento, boolean>): S
 
 /**
  * Le domande del Q&A restano sulla pagina dopo l'evento: chi organizza le
- * mostra e l'evento le ha raccolte. Con la registrazione riservata non si
+ * mostra e l'evento le ha raccolte. Con la registrazione riservata, dalla
+ * destinazione o dal pubblico scelto dopo (`registrazioneRiservata`), non si
  * pubblicano, qualunque sia l'interruttore: e' una regola in lettura, quindi
  * vale anche per un evento che diventa riservato dopo, e `postEventShowQA` resta
  * la scelta di chi organizza. Una sola regola per la pagina, la sala e
@@ -33,10 +36,20 @@ export function domandePubbliche(evento: {
   postEventShowQA: boolean;
   qaEnabled: boolean;
   recordingDestination: RecordingAudience | null;
+  recordingAudience: RecordingAudience;
 }): boolean {
-  return (
-    evento.postEventShowQA &&
-    evento.qaEnabled &&
-    evento.recordingDestination !== 'REGISTRANTS'
-  );
+  return evento.postEventShowQA && evento.qaEnabled && !registrazioneRiservata(evento);
+}
+
+/**
+ * Se in sala si puo' dire che le domande possono comparire sulla pagina
+ * dell'evento. La scheda vale anche per un Q&A aperto dal vivo; le chiamate rapide
+ * non ce l'hanno, e seguono la sezione della pagina.
+ */
+export function domandePubblicateInSala(evento: {
+  schedaPrivacy?: { chat: { esitoDomande: 'soloTesto' | 'nonPubblicate' } } | null;
+  postEventShow?: Pick<Record<SezioneDopoEvento, boolean>, 'qa'>;
+}): boolean {
+  if (evento.schedaPrivacy) return evento.schedaPrivacy.chat.esitoDomande === 'soloTesto';
+  return evento.postEventShow?.qa ?? true;
 }

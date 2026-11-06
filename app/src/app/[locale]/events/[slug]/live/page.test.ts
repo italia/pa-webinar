@@ -422,6 +422,17 @@ describe('sala — il recupero durante la diretta', () => {
     expect(JSON.stringify(conToken.event)).not.toContain(RECUPERO);
   });
 
+  it('con il video reso riservato dal pubblico non si offre, in nessuno dei due rami', async () => {
+    conEvento({
+      ...conRecupero,
+      recordingDestination: 'PUBLIC',
+      recordingAudience: 'REGISTRANTS',
+    });
+    expect((await clientProps()).event.tempRecordingUrl).toBeNull();
+    iscritto();
+    expect((await clientProps(TOKEN)).event.tempRecordingUrl).toBeNull();
+  });
+
   it.each(['PUBLISHED', 'IDLE', 'PROVISIONING', 'ENDED', 'ARCHIVED'])(
     'con l evento %s non si offre',
     async (status) => {
@@ -442,6 +453,13 @@ describe('sala — le domande dopo l evento', () => {
 
   it('con la registrazione riservata non si pubblicano, nei due rami', async () => {
     conEvento({ recordingDestination: 'REGISTRANTS' });
+    expect((await clientProps()).event.postEventShow.qa).toBe(false);
+    iscritto();
+    expect((await clientProps(TOKEN)).event.postEventShow.qa).toBe(false);
+  });
+
+  it('con il video reso riservato dal pubblico non si pubblicano, nei due rami', async () => {
+    conEvento({ recordingDestination: 'PUBLIC', recordingAudience: 'REGISTRANTS' });
     expect((await clientProps()).event.postEventShow.qa).toBe(false);
     iscritto();
     expect((await clientProps(TOKEN)).event.postEventShow.qa).toBe(false);
@@ -579,6 +597,13 @@ describe('sala — i dati del testo del consenso', () => {
     const conToken = await clientProps(TOKEN);
     expect(conToken.event.recordingDestination).toBe('REGISTRANTS');
     expect(conToken.event.retainParticipantTracks).toBe(true);
+  });
+
+  it('il pubblico della registrazione arriva nei due rami', async () => {
+    conEvento({ recordingDestination: 'PUBLIC', recordingAudience: 'REGISTRANTS' });
+    expect((await clientProps()).event.recordingAudience).toBe('REGISTRANTS');
+    iscritto();
+    expect((await clientProps(TOKEN)).event.recordingAudience).toBe('REGISTRANTS');
   });
 
   it('la conservazione spenta resta spenta', async () => {

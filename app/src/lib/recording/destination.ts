@@ -60,10 +60,17 @@ export function videoDaDestinare(voce: VoceNelVideo | undefined): boolean {
  * il suo salvataggio non si blocca e il video parte dalla scelta piu' stretta.
  * Allargarla resta allo staff, finche' la sala non si apre.
  *
+ * Un file caricato conta come «comincia» solo a sala mai aperta: dopo non si
+ * potrebbe piu' allargare (`puoCambiareDestinazione`), e un evento gia' concluso
+ * che pubblicava per tutti diventerebbe riservato per sempre. Quell'evento resta
+ * senza destinazione e pubblica con un avviso, come chi registrava gia'.
+ *
  * Resta null chi registrava gia' senza averla dichiarata: sono gli eventi nati
  * prima di questa scelta, che pubblicano con un avviso. Restano null anche le
- * chiamate rapide. Senza registrazione non si dichiara niente: la destinazione
- * deciderebbe da sola sulle domande dopo l'evento (`domandePubbliche`).
+ * chiamate rapide e gli archivi storici importati (LEGACY), con le loro copie:
+ * non hanno iscritti a cui riservare il video. Senza registrazione non si dichiara
+ * niente: la destinazione deciderebbe da sola sulle domande dopo l'evento
+ * (`domandePubbliche`).
  */
 export function destinazioneDiPartenza(
   evento: {
@@ -74,10 +81,57 @@ export function destinazioneDiPartenza(
   registra: boolean
 ): Destinazione {
   const comincia = registra && !evento.recordingEnabled;
+  const senzaDestinazione = evento.eventType === 'INSTANT' || evento.eventType === 'LEGACY';
   return (
     evento.recordingDestination ??
-    (comincia && evento.eventType !== 'INSTANT' ? DESTINAZIONE_DI_PARTENZA : null)
+    (comincia && !senzaDestinazione ? DESTINAZIONE_DI_PARTENZA : null)
   );
+}
+
+/**
+ * Il pubblico della registrazione dopo un cambio di destinazione. Una
+ * destinazione riservata lo porta sempre a REGISTRANTS: restringere vince su cio'
+ * che chiede la stessa richiesta, e non produce mai un rifiuto. Da riservata a
+ * pubblica torna per tutti, se la richiesta non dice altro: quel pubblico l'aveva
+ * imposto la destinazione. Altrimenti resta quello scelto.
+ */
+export function pubblicoAllineato(
+  prima: Destinazione,
+  dopo: Destinazione,
+  chiesto: RecordingAudience | undefined,
+  attuale: RecordingAudience,
+): RecordingAudience {
+  if (dopo === 'REGISTRANTS' && prima !== 'REGISTRANTS') return 'REGISTRANTS';
+  if (chiesto) return chiesto;
+  return prima === 'REGISTRANTS' && dopo === 'PUBLIC' ? 'PUBLIC' : attuale;
+}
+
+/**
+ * La registrazione non e' per tutti: la riserva la destinazione o il pubblico
+ * scelto dopo, che puo' restringere anche una destinazione pubblica. Decide cio'
+ * che esce fuori dalle rotte che riconoscono l'iscritto: le domande sulla pagina
+ * (`domandePubbliche`) e il recupero in diretta (`recuperoAperto`).
+ */
+export function registrazioneRiservata(evento: {
+  recordingAudience: RecordingAudience;
+  recordingDestination: Destinazione;
+}): boolean {
+  return (
+    evento.recordingDestination === 'REGISTRANTS' || evento.recordingAudience === 'REGISTRANTS'
+  );
+}
+
+/**
+ * Il recupero esiste solo in diretta e il suo indirizzo arriva grezzo a chi lo
+ * legge: nessuna rotta riconosce l'iscritto, quindi una registrazione riservata
+ * non lo offre. Lo stesso per la GET pubblica e per la sala.
+ */
+export function recuperoAperto(evento: {
+  status: string;
+  recordingAudience: RecordingAudience;
+  recordingDestination: Destinazione;
+}): boolean {
+  return evento.status === 'LIVE' && !registrazioneRiservata(evento);
 }
 
 /**
@@ -297,6 +351,8 @@ const indirizzoNuovo = (prima: string | null | undefined, dopo: string | null): 
  * pubblicato riduce l'esposizione. Non guarda `libraryListed`, `postEventPublic`,
  * lo stato e `recordingUrl`: la chiusura di un evento e un file gia' nello
  * storage non si fermano qui, e pagina e videoteca filtrano su `recordingAudience`.
+ * Se il file sta davvero nello storage lo dice `assertVideoNelloStorage`
+ * (lib/storage/recordings), che legge la configurazione del server.
  */
 export function assertEsposizioneConsentita(
   prima: EsposizioneVideo | null,

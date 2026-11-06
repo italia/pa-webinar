@@ -15,7 +15,11 @@ import { captionsTranscriptActive, liveCaptionsAvailable } from '@/lib/captions/
 import { getSettings } from '@/lib/settings';
 import { recordingAvailable, voceNelVideo } from '@/lib/recording/availability';
 import { accessoRegistrazione, vedeVideo } from '@/lib/recording/audience';
-import { consensoCopre, destinazioneDelTesto } from '@/lib/recording/destination';
+import {
+  consensoCopre,
+  destinazioneDelTesto,
+  recuperoAperto,
+} from '@/lib/recording/destination';
 import { registraChiConduce } from '@/lib/live/entry-consents';
 import { informativaEvento } from '@/lib/events/privacy-notice';
 import { schedaPrivacyEvento, testoIaDelSito } from '@/lib/events/privacy-sheet';
@@ -169,10 +173,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
   const accesso =
     event.status === 'ENDED' ? await accessoRegistrazione(event, cookieStore) : null;
   const videoDisponibile = !!event.recordingUrl && vedeVideo(event, accesso);
-  const recuperoInDiretta =
-    event.status === 'LIVE' && event.recordingDestination !== 'REGISTRANTS'
-      ? event.tempRecordingUrl
-      : null;
+  const recuperoInDiretta = recuperoAperto(event) ? event.tempRecordingUrl : null;
 
   // No token: guest access or redirect. Password-protected events
   // require a cleared join-grant cookie before we issue the guest JWT.
@@ -221,6 +222,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             participantListVisible: elencoVisibileAlPubblico(event),
             hostsAlwaysRecorded: event.hostsAlwaysRecorded,
             recordingDestination: event.recordingDestination,
+            recordingAudience: event.recordingAudience,
             retainParticipantTracks: event.retainParticipantTracks,
             videoQuality,
             startsAt: event.startsAt.toISOString(),
@@ -451,6 +453,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         participantListVisible: elencoVisibileAlPubblico(event),
         hostsAlwaysRecorded: event.hostsAlwaysRecorded,
         recordingDestination: event.recordingDestination,
+        recordingAudience: event.recordingAudience,
         retainParticipantTracks: event.retainParticipantTracks,
         startsAt: event.startsAt.toISOString(),
         endsAt: event.endsAt.toISOString(),

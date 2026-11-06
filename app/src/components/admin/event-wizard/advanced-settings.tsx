@@ -12,13 +12,14 @@
  * dell'evento): il wizard porta su di lei il fuoco e la vista.
  */
 
+import type { RecordingAudience } from '@prisma/client';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import CapacityPanel, { type RiepilogoCapacita } from '@/components/admin/capacity-panel';
 import FileOrUrlInput from '@/components/ui/file-or-url-input';
 import ToggleSwitch from '@/components/ui/toggle-switch';
-import type { Destinazione } from '@/lib/recording/destination';
+import { registrazioneRiservata, type Destinazione } from '@/lib/recording/destination';
 import { togglesFromMatrix } from '@/lib/utils/permission-matrix';
 import { MAX_RETENTION_DAYS } from '@/lib/validation/retention';
 import {
@@ -113,6 +114,7 @@ export function SezioneDati({
   onUploadBusy,
   domandeDopoEvento = true,
   destinazioneSenzaScelta = null,
+  pubblicoDopo = 'PUBLIC',
 }: {
   form: WizardForm;
   onChange: (patch: Partial<WizardForm>) => void;
@@ -128,12 +130,17 @@ export function SezioneDati({
   /** La destinazione che l'evento tiene se il modulo non ne sceglie una
    *  (`destinazioneDiPartenza`). */
   destinazioneSenzaScelta?: Destinazione;
+  /** Il pubblico del video dopo il salvataggio (`pubblicoAllineato`). */
+  pubblicoDopo?: RecordingAudience;
 }) {
   const t = useTranslations('admin.wizard.step5');
   const tPost = useTranslations('postEvent');
   // La regola della pagina si legge sull'evento che il salvataggio scrive: una
   // scelta rimasta nel modulo a registrazione spenta non toglie le domande.
-  const riservata = destinazioneDopoIlSalvataggio(form, destinazioneSenzaScelta) === 'REGISTRANTS';
+  const riservata = registrazioneRiservata({
+    recordingDestination: destinazioneDopoIlSalvataggio(form, destinazioneSenzaScelta),
+    recordingAudience: pubblicoDopo,
+  });
   return (
     <div className="row g-3">
       <div className="col-md-6">

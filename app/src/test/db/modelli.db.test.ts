@@ -277,7 +277,9 @@ describe('dal formato all evento', () => {
         'Formato',
       );
       expect(preset.recordingDestination).toBe('REGISTRANTS');
-      expect(domandePubbliche(preset)).toBe(false);
+      expect(
+        domandePubbliche({ ...preset, recordingAudience: preset.recordingDestination ?? 'PUBLIC' }),
+      ).toBe(false);
       const riga = await eventoDalPreset(preset, false);
       expect(riga).toMatchObject(VIDEO_RISERVATO);
       expect(domandePubbliche(riga)).toBe(false);

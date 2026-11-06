@@ -12,6 +12,7 @@
  * avanzate. I pulsanti per salvare li ha il wizard.
  */
 
+import type { RecordingAudience } from '@prisma/client';
 import { useTranslations } from 'next-intl';
 
 import { RigaCapacita, type RiepilogoCapacita } from '@/components/admin/capacity-panel';
@@ -87,6 +88,8 @@ interface Props {
   /** La destinazione che l'evento tiene se il modulo non ne sceglie una
    *  (`destinazioneDiPartenza`). */
   destinazioneSenzaScelta?: Destinazione;
+  /** Il pubblico del video dopo il salvataggio (`pubblicoAllineato`). */
+  pubblicoDopo?: RecordingAudience;
   /** La capacita' in una riga: il carico del ponte e quanto riceve chi guarda;
    *  da «attenzione» in su e' un avviso. Porta ai dettagli tecnici. */
   capacita?: RiepilogoCapacita;
@@ -128,6 +131,7 @@ export default function Step5Review({
   chiedeDestinazione = false,
   onCambiaDestinazione,
   destinazioneSenzaScelta = null,
+  pubblicoDopo = 'PUBLIC',
   capacita,
   sopratitolo = false,
   iscrizioneAperta,
@@ -611,6 +615,7 @@ export default function Step5Review({
                       postEventShowQA: form.postEventShowQA,
                       qaEnabled: toggles.qaEnabled,
                       recordingDestination: destinazioneDopo,
+                      recordingAudience: pubblicoDopo,
                     })
                       ? 'postEventQaTextOnly'
                       : 'postEventQaHidden',

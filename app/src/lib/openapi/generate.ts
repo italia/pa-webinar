@@ -194,7 +194,8 @@ registry.registerPath({
   request: { params: z.object({ param: z.string() }), body: { content: { 'application/json': { schema: updateEventSchema } } } },
   responses: {
     200: { description: 'Updated event' },
-    409: { description: 'RECORDING_DESTINATION_NOT_COVERED: the change exposes a reserved recording (audience PUBLIC, an external video), removes a declared destination, or widens it after the room has opened' },
+    403: { description: 'The token is not valid for this event, or the field needs a staff session: the destination, who can take part, a new recording address' },
+    409: { description: 'RECORDING_DESTINATION_NOT_COVERED: the change exposes a reserved recording (audience PUBLIC, an external video or a file outside the recordings storage), removes a declared destination, or widens it after the room has opened' },
   },
 });
 

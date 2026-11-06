@@ -1648,6 +1648,7 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
             postEventPublicUntil: paginaPostEvento.postEventPublicUntil,
             libraryListed: event.libraryListed,
             recordingDestination: event.recordingDestination,
+            recordingAudience: event.recordingAudience,
             hasPlayableRecording:
               (event.recordingPublished && !!event.recordingUrl) || !!event.youtubeUrl,
             postEventShowQA: event.postEventShowQA,

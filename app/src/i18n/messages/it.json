@@ -2256,7 +2256,7 @@
     },
     "recordingUpload": {
       "title": "Carica registrazione esistente",
-      "subtitle": "Se hai già un file video dell'evento (per esempio registrato con un'altra piattaforma), caricalo qui: sarà mostrato come registrazione ufficiale nella pagina pubblica.",
+      "subtitle": "Se hai già un file video dell'evento (per esempio registrato con un'altra piattaforma), caricalo qui: sarà la registrazione ufficiale dell'evento.",
       "fileLabel": "File video",
       "upload": "Carica e associa",
       "signing": "Preparazione…",

@@ -12,6 +12,8 @@
  * whatever bucket/container the provider is pointed to.
  */
 
+import { erroreDestinazioneNonCoperta, type Destinazione } from '@/lib/recording/destination';
+
 import type { BrowserUpload } from './provider';
 
 import { getRecordingsStorage, recordingsProviderLabel } from './index';
@@ -151,6 +153,23 @@ export async function deleteRecordingBlob(recordingUrl: string): Promise<boolean
     console.warn(`[storage] Recording not found or delete failed: ${key}`);
   }
   return ok;
+}
+
+/**
+ * Un indirizzo nuovo per il video di un evento riservato deve essere un file
+ * dello storage: li' lo protegge la rotta che ne firma l'indirizzo, mentre un
+ * video esterno resta fuori da ogni regola di accesso. Senza storage configurato
+ * (ambiente locale) non lo si puo' dire, e l'indirizzo vale com'e', come in
+ * `generateRecordingSasUrl`.
+ */
+export function assertVideoNelloStorage(
+  destinazione: Destinazione,
+  prima: string | null | undefined,
+  dopo: string | null | undefined,
+): void {
+  if (destinazione !== 'REGISTRANTS' || !dopo || dopo === prima) return;
+  const provider = getRecordingsStorage();
+  if (provider && !provider.keyFromUrl(dopo)) throw erroreDestinazioneNonCoperta();
 }
 
 /** True when a recordings provider is configured and wired. */

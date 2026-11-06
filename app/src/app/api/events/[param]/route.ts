@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: EUPL-1.2
 // SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
 
-import type { Prisma, RecordingAudience } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import { cookies } from 'next/headers';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
@@ -59,9 +59,11 @@ import {
   assertEsposizioneConsentita,
   destinazioneDiPartenza,
   erroreDestinazioneNonCoperta,
+  pubblicoAllineato,
   puoCambiareDestinazione,
   type Destinazione,
 } from '@/lib/recording/destination';
+import { assertVideoNelloStorage } from '@/lib/storage/recordings';
 import { annullaEmailInCoda } from '@/lib/email/outbox';
 
 export const dynamic = 'force-dynamic';
@@ -302,6 +304,13 @@ export const PUT = withErrorHandling(async (request, context) => {
     }
   }
 
+  // Quale video mostra l'evento lo decide lo staff, come la destinazione: si carica
+  // dalla gestione della registrazione. Un link di conduzione puo' solo rimandare
+  // l'indirizzo che c'e' gia'.
+  if (data.recordingUrl && data.recordingUrl !== event.recordingUrl) {
+    await soloStaffDellEvento(eventId, 'Only the event staff can attach a recording');
+  }
+
   // Le etichette le manda il wizard a ogni salvataggio, l'elenco intero: si
   // scrivono solo se sono cambiate, e le cambia lo staff che gestisce
   // l'evento, come chi partecipa (un link di conduzione no). Una modifica
@@ -407,15 +416,20 @@ export const PUT = withErrorHandling(async (request, context) => {
   // confronta prima e dopo, quindi una modifica che non espone di piu' passa: la
   // chiusura dell'evento, un salvataggio dal wizard.
   const destinazionePrima = event.recordingDestination ?? null;
+  const fileNuovo =
+    !!data.recordingUrl &&
+    data.recordingUrl !== event.recordingUrl &&
+    !(await salaGiaAperta(event));
   const destinazioneDopo: Destinazione =
     data.recordingDestination ??
-    destinazioneDiPartenza(event, data.recordingEnabled === true);
+    destinazioneDiPartenza(event, data.recordingEnabled === true || fileNuovo);
   const pubblicoDopo = pubblicoAllineato(
     destinazionePrima,
     destinazioneDopo,
     data.recordingAudience,
     event.recordingAudience,
   );
+  assertVideoNelloStorage(destinazioneDopo, event.recordingUrl, data.recordingUrl);
   assertEsposizioneConsentita(event, {
     recordingDestination: destinazioneDopo,
     recordingAudience: pubblicoDopo,
@@ -908,24 +922,6 @@ export const PUT = withErrorHandling(async (request, context) => {
     ...(traduzione && { traduzione }),
   });
 });
-
-/**
- * Il pubblico della registrazione dopo un cambio di destinazione. Una
- * destinazione riservata lo porta sempre a REGISTRANTS: restringere vince su cio'
- * che chiede la stessa richiesta, e non produce mai un rifiuto. Da riservata a
- * pubblica torna per tutti, se la richiesta non dice altro: quel pubblico l'aveva
- * imposto la destinazione. Altrimenti resta quello scelto.
- */
-function pubblicoAllineato(
-  prima: Destinazione,
-  dopo: Destinazione,
-  chiesto: RecordingAudience | undefined,
-  attuale: RecordingAudience,
-): RecordingAudience {
-  if (dopo === 'REGISTRANTS' && prima !== 'REGISTRANTS') return 'REGISTRANTS';
-  if (chiesto) return chiesto;
-  return prima === 'REGISTRANTS' && dopo === 'PUBLIC' ? 'PUBLIC' : attuale;
-}
 
 /**
  * Un campo che decide lo staff che gestisce l'evento, non chi ha un link di

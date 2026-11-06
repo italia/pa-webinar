@@ -25,6 +25,7 @@ const evento = {
   postEventPublicUntil: null,
   libraryListed: false,
   recordingDestination: null as 'PUBLIC' | 'REGISTRANTS' | null,
+  recordingAudience: 'PUBLIC' as 'PUBLIC' | 'REGISTRANTS',
   hasPlayableRecording: false,
   postEventShowQA: false,
   postEventShowMaterials: false,
@@ -103,6 +104,17 @@ describe('PostEventConfig — registrazione riservata', () => {
 
   it('le domande: interruttore spento e bloccato, con il motivo', () => {
     render({ recordingDestination: 'REGISTRANTS', postEventShowQA: true });
+    expect(leva(m.showQA).checked).toBe(false);
+    expect(leva(m.showQA).disabled).toBe(true);
+    expect(container.textContent).toContain(m.qaReservedNote);
+  });
+
+  it('le domande: lo stesso se il video e’ reso riservato dal pubblico', () => {
+    render({
+      recordingDestination: 'PUBLIC',
+      recordingAudience: 'REGISTRANTS',
+      postEventShowQA: true,
+    });
     expect(leva(m.showQA).checked).toBe(false);
     expect(leva(m.showQA).disabled).toBe(true);
     expect(container.textContent).toContain(m.qaReservedNote);

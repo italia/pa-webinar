@@ -23,6 +23,9 @@ import {
   type Destinazione,
   type EsposizioneVideo,
   destinazioneDiPartenza,
+  pubblicoAllineato,
+  recuperoAperto,
+  registrazioneRiservata,
   DESTINAZIONE_DI_PARTENZA,
   videoDaDestinare,
 } from './destination';
@@ -489,6 +492,63 @@ describe('puoCambiareDestinazione', () => {
   });
 });
 
+describe('pubblicoAllineato', () => {
+  it('una destinazione riservata lo porta a REGISTRANTS, qualunque cosa si chieda', () => {
+    expect(pubblicoAllineato(null, 'REGISTRANTS', 'PUBLIC', 'PUBLIC')).toBe('REGISTRANTS');
+  });
+
+  it('da riservata a pubblica torna per tutti, se la richiesta non dice altro', () => {
+    expect(pubblicoAllineato('REGISTRANTS', 'PUBLIC', undefined, 'REGISTRANTS')).toBe('PUBLIC');
+    expect(pubblicoAllineato('REGISTRANTS', 'PUBLIC', 'REGISTRANTS', 'REGISTRANTS')).toBe(
+      'REGISTRANTS',
+    );
+  });
+
+  it('altrimenti resta quello scelto', () => {
+    expect(pubblicoAllineato('PUBLIC', 'PUBLIC', undefined, 'REGISTRANTS')).toBe('REGISTRANTS');
+  });
+});
+
+describe('registrazioneRiservata', () => {
+  it.each([
+    ['destinazione riservata', 'REGISTRANTS', 'REGISTRANTS', true],
+    ['pubblico riservato su destinazione pubblica', 'PUBLIC', 'REGISTRANTS', true],
+    ['pubblico riservato senza destinazione', null, 'REGISTRANTS', true],
+    ['per tutti', 'PUBLIC', 'PUBLIC', false],
+    ['per tutti senza destinazione', null, 'PUBLIC', false],
+  ] as const)('%s', (_n, recordingDestination, recordingAudience, atteso) => {
+    expect(registrazioneRiservata({ recordingDestination, recordingAudience })).toBe(atteso);
+  });
+});
+
+describe('recuperoAperto', () => {
+  const evento = {
+    status: 'LIVE',
+    recordingDestination: 'PUBLIC',
+    recordingAudience: 'PUBLIC',
+  } as const;
+
+  it('in diretta, su una registrazione per tutti', () => {
+    expect(recuperoAperto(evento)).toBe(true);
+    expect(recuperoAperto({ ...evento, recordingDestination: null })).toBe(true);
+  });
+
+  it('non su una registrazione riservata, dalla destinazione o dal pubblico', () => {
+    expect(recuperoAperto({ ...evento, recordingAudience: 'REGISTRANTS' })).toBe(false);
+    expect(
+      recuperoAperto({
+        ...evento,
+        recordingDestination: 'REGISTRANTS',
+        recordingAudience: 'REGISTRANTS',
+      }),
+    ).toBe(false);
+  });
+
+  it('non fuori dalla diretta', () => {
+    expect(recuperoAperto({ ...evento, status: 'ENDED' })).toBe(false);
+  });
+});
+
 describe('destinazioneDiPartenza', () => {
   const spento = { recordingEnabled: false };
 
@@ -521,6 +581,7 @@ describe('destinazioneDiPartenza', () => {
   it('una chiamata rapida resta senza', () => {
     expect(destinazioneDiPartenza({ ...spento, eventType: 'INSTANT' }, true)).toBeNull();
     expect(destinazioneDiPartenza({ ...spento, eventType: 'SCHEDULED' }, true)).toBe('REGISTRANTS');
+    expect(destinazioneDiPartenza({ ...spento, eventType: 'LEGACY' }, true)).toBeNull();
   });
 
 });

@@ -2046,7 +2046,7 @@
     },
     "recordingUpload": {
       "title": "Upload an existing recording",
-      "subtitle": "If you already have a video file of the event (for example recorded with another platform), upload it here: it will be shown as the official recording on the public page.",
+      "subtitle": "If you already have a video file of the event (for example recorded with another platform), upload it here: it will be the official recording of the event.",
       "fileLabel": "Video file",
       "upload": "Upload and attach",
       "signing": "Preparing…",

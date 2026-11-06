@@ -390,7 +390,12 @@ export async function buildLiveTimeline(opts: {
     await Promise.all([
       prisma.event.findUnique({
         where: { id: eventId },
-        select: { postEventShowQA: true, qaEnabled: true, recordingDestination: true },
+        select: {
+          postEventShowQA: true,
+          qaEnabled: true,
+          recordingDestination: true,
+          recordingAudience: true,
+        },
       }),
       prisma.liveAction.findMany({
         where: {
