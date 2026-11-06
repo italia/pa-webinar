@@ -5,7 +5,7 @@ import { useId } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { Icon } from '@/components/ui/icon';
-import type { SchedaPrivacy } from '@/lib/events/privacy-sheet';
+import type { ChiNonAcconsente, SchedaPrivacy } from '@/lib/events/privacy-sheet';
 
 /**
  * La scheda privacy di un evento, con gli stessi fatti nel modulo d'iscrizione e
@@ -38,6 +38,21 @@ const TESTO_CHI_NON_ACCONSENTE = {
   avvisoVoce: 'recording.audienceNoticeVoice',
 } as const;
 
+/** Cio' che chi non acconsente legge in sala d'attesa, se conduce (`schedaInSala`). */
+function chiConduceNonAcconsente(scheda: SchedaPrivacy): ChiNonAcconsente | null {
+  if (scheda.registrazione.conduceSempre) return null;
+  switch (scheda.registrazione.chiNonAcconsente) {
+    case null:
+      return null;
+    // Dove la voce non si toglie dal video, chi conduce resta ripreso.
+    case 'soloAscolto':
+    case 'avviso':
+      return 'conduceRipreso';
+    default:
+      return 'restaFuori';
+  }
+}
+
 const TESTO_TRACCE = {
   cancellate: 'transcript.tracks',
   conservate: 'transcript.tracksRetained',
@@ -56,13 +71,26 @@ const TESTO_DOMANDE = {
  *
  * La rubrica si sceglie solo nel modulo d'iscrizione: la sala non ha quella
  * casella, quindi non la promette.
+ *
+ * La scheda sul server e' una sola per evento e parla a chi partecipa. Chi conduce
+ * o interviene entra con il proprio nome e con microfono e videocamera: la sala
+ * gli dice cio' che vale per lui.
  */
 export function schedaInSala(
   scheda: SchedaPrivacy,
-  adesso: { sottotitoli: boolean; chat: boolean; domande: boolean }
+  adesso: { sottotitoli: boolean; chat: boolean; domande: boolean; conduce?: boolean }
 ): SchedaPrivacy {
   return {
     ...scheda,
+    ...(adesso.conduce
+      ? {
+          pseudonimi: false,
+          registrazione: {
+            ...scheda.registrazione,
+            chiNonAcconsente: chiConduceNonAcconsente(scheda),
+          },
+        }
+      : {}),
     sottotitoli: { ...scheda.sottotitoli, attivi: adesso.sottotitoli },
     trascrizione: {
       ...scheda.trascrizione,
@@ -108,6 +136,7 @@ export function PrivacySheet({
   testoIa?: string | null;
 }) {
   const t = useTranslations('gdpr.sheet');
+  const tConsenso = useTranslations('gdpr.consent');
   const tSala = useTranslations('waiting');
   const titolo = useId();
 
@@ -117,7 +146,9 @@ export function PrivacySheet({
   if (registrazione.destinazione) {
     frasiRegistrazione.push(t(TESTO_DESTINAZIONE[registrazione.destinazione]));
   }
-  if (registrazione.chiNonAcconsente) {
+  if (registrazione.chiNonAcconsente === 'conduceRipreso') {
+    frasiRegistrazione.push(tConsenso('recordingOptionalHost'));
+  } else if (registrazione.chiNonAcconsente) {
     frasiRegistrazione.push(t(TESTO_CHI_NON_ACCONSENTE[registrazione.chiNonAcconsente]));
   }
   if (registrazione.conduceSempre) frasiRegistrazione.push(t('recording.hostsAlways'));
