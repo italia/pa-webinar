@@ -96,20 +96,38 @@ export interface ProveConsenso {
   tracce: boolean;
 }
 
+export function stessiConsensi(a: ProveConsenso, b: ProveConsenso): boolean {
+  return a.registrazione === b.registrazione && a.tracce === b.tracce;
+}
+
+export interface ConsensiDaInviare {
+  /** Dati ora con un clic, e non ancora salvati dal server. */
+  dati: ProveConsenso;
+  /** Gia' dati: la pagina li riporta a un nuovo ingresso, senza un clic. */
+  repliche: ProveConsenso;
+}
+
 /**
- * Quali consensi mandare con la richiesta del JWT: quelli dati ora in sala
- * d'attesa, e quelli che il server ha gia' salvato in questa visita della
- * pagina. A ogni ingresso, anche dopo un rientro o una riconnessione: ogni
- * ingresso e' un posto nuovo nella conferenza (per un ospite, magari con un
- * altro nome), e ogni posto ha la sua prova. Per un'iscrizione il server non
- * la raddoppia.
+ * Quali consensi mandare con la richiesta del JWT, tenendo separati quelli dati
+ * ora in sala da quelli che il server ha gia' salvato in questa visita della
+ * pagina. Solo un clic da' un consenso: una replica vale se il server ne trova
+ * ancora la prova, quindi un ritiro fatto altrove (la pagina dei propri dati,
+ * un'altra scheda) non si annulla da solo a un rientro. Ogni ingresso e' un posto
+ * nuovo nella conferenza, per questo una replica viaggia con ogni ingresso.
  */
 export function consensiDaInviare(
   prefs: { recordingConsent?: boolean; multitrackConsent?: boolean },
   salvati: ProveConsenso,
-): ProveConsenso {
+): ConsensiDaInviare {
+  const dati = {
+    registrazione: !!prefs.recordingConsent,
+    tracce: !!prefs.multitrackConsent,
+  };
   return {
-    registrazione: !!prefs.recordingConsent || salvati.registrazione,
-    tracce: !!prefs.multitrackConsent || salvati.tracce,
+    dati,
+    repliche: {
+      registrazione: !dati.registrazione && salvati.registrazione,
+      tracce: !dati.tracce && salvati.tracce,
+    },
   };
 }

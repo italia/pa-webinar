@@ -64,6 +64,13 @@ describe('ListenOnlyNotice', () => {
     expect(container.textContent).toContain(g.recordingNoVideo);
   });
 
+  it("il testo scelto dall'ente sta sopra il pulsante, dove un video c'e'", () => {
+    disegna({ testoConsenso: 'Testo scelto per evento', destinazione: 'PUBLIC' });
+    expect(container.textContent).toContain('Testo scelto per evento');
+    disegna({ testoConsenso: 'Testo scelto per evento', voce: 'assente' });
+    expect(container.textContent).not.toContain('Testo scelto per evento');
+  });
+
   it("il pulsante e' descritto da quel testo, e il clic acconsente", () => {
     const onAcconsenti = disegna({ destinazione: 'PUBLIC' });
     const id = pulsante().getAttribute('aria-describedby');

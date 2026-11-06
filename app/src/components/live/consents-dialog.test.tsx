@@ -14,6 +14,7 @@ import ConsentsDialog, {
 } from './consents-dialog';
 
 type Registrazione = NonNullable<ConsensiInSala['registrazione']>;
+type Trascrizione = NonNullable<ConsensiInSala['trascrizione']>;
 
 /**
  * «I tuoi consensi» in sala: mostra solo i consensi che l'evento chiede, dice
@@ -69,8 +70,15 @@ async function disegna(
 const registrazione = (
   dato: boolean,
   ritiro: EffettoRitiroRegistrazione,
-  testo: Partial<Pick<Registrazione, 'destinazione' | 'voce'>> = {}
+  testo: Partial<Pick<Registrazione, 'destinazione' | 'voce' | 'testoEvento'>> = {}
 ): Registrazione => ({ dato, ritiro, destinazione: null, voce: 'fissa', ...testo });
+
+/** Il consenso alla trascrizione, con il testo che promette la cancellazione. */
+const trascrizione = (
+  dato: boolean,
+  serveRegistrazione: boolean,
+  testo: Partial<Pick<Trascrizione, 'testo' | 'voce'>> = {}
+): Trascrizione => ({ dato, serveRegistrazione, testo: 'multitrack', voce: 'fissa', ...testo });
 
 const pulsante = (testo: RegExp) =>
   [...document.querySelectorAll('button')].find((b) =>
@@ -85,7 +93,7 @@ describe('ConsentsDialog', () => {
   it('ritirare la registrazione chiede conferma e dice che si resta in solo ascolto', async () => {
     const a = await disegna({
       registrazione: registrazione(true, 'soloAscolto'),
-      trascrizione: { dato: true, serveRegistrazione: false },
+      trascrizione: trascrizione(true, false),
     });
     expect(document.body.textContent).toContain(
       messages.live.consents.recording.withdraw.soloAscolto
@@ -105,7 +113,7 @@ describe('ConsentsDialog', () => {
   });
 
   it('ritirare solo la trascrizione; «Annulla» non ritira', async () => {
-    const a = await disegna({ trascrizione: { dato: true, serveRegistrazione: false } });
+    const a = await disegna({ trascrizione: trascrizione(true, false) });
     expect(document.body.textContent).not.toContain(
       messages.live.consents.recording.title
     );
@@ -120,7 +128,7 @@ describe('ConsentsDialog', () => {
   it("dare il consenso e' un clic; la trascrizione aspetta la registrazione", async () => {
     const a = await disegna({
       registrazione: registrazione(false, 'soloAscolto'),
-      trascrizione: { dato: false, serveRegistrazione: true },
+      trascrizione: trascrizione(false, true),
     });
     expect(document.body.textContent).toContain(
       messages.live.consents.recording.without.soloAscolto
@@ -147,7 +155,7 @@ describe('ConsentsDialog', () => {
 
   it("durante l'aggiornamento i pulsanti sono fermi; un errore si annuncia", async () => {
     await disegna(
-      { trascrizione: { dato: false, serveRegistrazione: false } },
+      { trascrizione: trascrizione(false, false) },
       azioni(),
       { inCorso: true, errore: true }
     );
@@ -180,6 +188,43 @@ describe('ConsentsDialog', () => {
       registrazione: registrazione(false, 'nessuno', { destinazione: 'PUBLIC', voce: 'assente' }),
     });
     expect(document.body.textContent).toContain(g.recordingNoVideo);
+  });
+
+  it("il testo scelto dall'ente vale per quel consenso, dove un video c'e'", async () => {
+    await disegna({
+      registrazione: registrazione(false, 'voce', { testoEvento: 'Testo scelto per evento' }),
+    });
+    expect(document.getElementById('live-consents-rec-nota')!.textContent).toBe(
+      `Testo scelto per evento ${messages.gdpr.consent.recording}`
+    );
+    await disegna({
+      registrazione: registrazione(false, 'nessuno', {
+        testoEvento: 'Testo scelto per evento',
+        voce: 'assente',
+      }),
+    });
+    expect(document.body.textContent).not.toContain('Testo scelto per evento');
+  });
+
+  it('il consenso alla trascrizione mostra il testo della casella e la sua nota', async () => {
+    const g = messages.gdpr.consent;
+    await disegna({ trascrizione: trascrizione(false, false) });
+    expect(document.getElementById('live-consents-tr-nota')!.textContent).toBe(
+      `${g.multitrack} ${g.multitrackOptional}`
+    );
+    expect(
+      pulsante(new RegExp(messages.live.consents.transcription.give))!.getAttribute('aria-describedby')
+    ).toBe('live-consents-tr-effetto live-consents-tr-nota');
+
+    await disegna({
+      trascrizione: trascrizione(false, false, { testo: 'multitrackRetained', voce: 'rimovibile' }),
+    });
+    expect(document.getElementById('live-consents-tr-nota')!.textContent).toBe(
+      `${g.multitrackRetained} ${g.multitrackOptionalShort}`
+    );
+
+    await disegna({ trascrizione: trascrizione(true, false) });
+    expect(document.getElementById('live-consents-tr-nota')).toBeNull();
   });
 
   it('il testo del consenso non si ripete a chi l\'ha gia\' dato', async () => {

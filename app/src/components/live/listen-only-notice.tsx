@@ -7,7 +7,7 @@ import { useId } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { Icon } from '@/components/ui/icon';
-import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import { testoConsensoEvento, type VoceNelVideo } from '@/lib/live/consent-rule';
 import { chiaveConsenso, type Destinazione } from '@/lib/recording/destination';
 
 /**
@@ -20,6 +20,7 @@ import { chiaveConsenso, type Destinazione } from '@/lib/recording/destination';
  * video.
  */
 export default function ListenOnlyNotice({
+  testoConsenso,
   destinazione,
   voce,
   onAcconsenti,
@@ -27,6 +28,8 @@ export default function ListenOnlyNotice({
   errore,
   testoCambiato = false,
 }: {
+  /** Il testo dell'ente sulla registrazione: il consenso qui vale per quello. */
+  testoConsenso?: string | null;
   /** La destinazione in vigore: il testo a cui si acconsente. */
   destinazione: Destinazione;
   voce: VoceNelVideo;
@@ -40,6 +43,7 @@ export default function ListenOnlyNotice({
   const tc = useTranslations('live.consents');
   const tGdpr = useTranslations('gdpr.consent');
   const idTesto = useId();
+  const testoEvento = testoConsensoEvento(testoConsenso, voce);
   return (
     <div className="live-listen-only" role="region" aria-label={t('title')}>
       <Icon
@@ -49,6 +53,7 @@ export default function ListenOnlyNotice({
       />
       <p className="mb-0 flex-grow-1">
         <strong>{t('title')}</strong> {t('body')}
+        {testoEvento && <span className="d-block small mt-1">{testoEvento}</span>}
         <span id={idTesto} className="d-block small mt-1">
           {tGdpr(chiaveConsenso(destinazione, voce))}
         </span>

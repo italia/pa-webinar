@@ -147,21 +147,30 @@ describe('consensoTrascrizioneIngresso', () => {
 describe('consensiDaInviare', () => {
   const nessuno = { registrazione: false, tracce: false };
 
-  it('manda i consensi dati ora in sala', () => {
+  it('i consensi dati ora con un clic restano un clic', () => {
     expect(consensiDaInviare({ recordingConsent: true, multitrackConsent: true }, nessuno)).toEqual({
-      registrazione: true,
-      tracce: true,
+      dati: { registrazione: true, tracce: true },
+      repliche: nessuno,
     });
   });
 
-  it('a un rientro o a una riconnessione li rimanda: il posto e\' nuovo, e vuole la sua prova', () => {
+  it("a un rientro quelli gia' salvati sono repliche, mai un clic", () => {
     expect(consensiDaInviare({}, { registrazione: true, tracce: false })).toEqual({
-      registrazione: true,
-      tracce: false,
+      dati: nessuno,
+      repliche: { registrazione: true, tracce: false },
+    });
+  });
+
+  it('un clic prevale sulla replica dello stesso consenso, non sull altro', () => {
+    expect(
+      consensiDaInviare({ recordingConsent: true }, { registrazione: true, tracce: true })
+    ).toEqual({
+      dati: { registrazione: true, tracce: false },
+      repliche: { registrazione: false, tracce: true },
     });
   });
 
   it('senza consenso dato non manda niente', () => {
-    expect(consensiDaInviare({}, nessuno)).toEqual(nessuno);
+    expect(consensiDaInviare({}, nessuno)).toEqual({ dati: nessuno, repliche: nessuno });
   });
 });

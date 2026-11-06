@@ -156,6 +156,7 @@ interface Risposta {
   voiceExcluded?: boolean;
   listenOnly?: boolean;
   consentsRecorded?: { recording: boolean; multitrack: boolean };
+  consentsInForce?: { recording: boolean; transcription: boolean };
   /** Lo stato della risposta, se non e' un 200. */
   stato?: number;
 }
@@ -557,20 +558,108 @@ describe('sala — il testo su cui si acconsente', () => {
     expect(ultimoToken()).not.toHaveProperty('recordingConsentDestination');
   });
 
-  it('un consenso valido torna con ogni rientro, con lo stesso testo', async () => {
+  it('un consenso salvato torna a ogni rientro come replica, mai come clic', async () => {
     await monta({ event: { ...evento, recordingDestination: 'REGISTRANTS' } });
     risposte.push({
       recordingDestination: 'REGISTRANTS',
       consentsRecorded: { recording: true, multitrack: false },
     });
     await entra({ recordingConsent: true, recordingConsentDestination: 'REGISTRANTS' });
+    expect(ultimoToken()).toMatchObject({ recordingConsent: true });
+    expect(ultimoToken()).not.toHaveProperty('consentReplay');
     risposte.push({ recordingDestination: 'REGISTRANTS' });
     await caduta();
     expect(richiesteToken()).toHaveLength(2);
     expect(ultimoToken()).toMatchObject({
-      recordingConsent: true,
-      recordingConsentDestination: 'REGISTRANTS',
+      consentReplay: { recording: true, multitrack: false, roomTokens: ['jwt-1'] },
     });
+    expect(ultimoToken()).not.toHaveProperty('recordingConsent');
+    expect(ultimoToken()).not.toHaveProperty('multitrackConsent');
+  });
+
+  it('il server decide se un consenso copre il testo in vigore', async () => {
+    await monta({
+      event: { ...evento, recordingDestination: 'REGISTRANTS' },
+      isModerator: true,
+      hasRecordingConsent: true,
+    });
+    risposte.push({
+      recordingDestination: 'PUBLIC',
+      consentsInForce: { recording: true, transcription: false },
+    });
+    await entra();
+    expect(testo()).not.toContain(l.consents.textChanged);
+    await premi(pulsante(l.consents.button));
+    expect(testo()).toContain(l.consents.given);
+  });
+
+  it('un clic non salvato resta un clic al rientro', async () => {
+    await monta({ event: { ...evento, recordingDestination: 'REGISTRANTS' } });
+    await entra({ recordingConsent: true, recordingConsentDestination: 'REGISTRANTS' });
+    risposte.push({ recordingDestination: 'REGISTRANTS' });
+    await caduta();
+    expect(ultimoToken()).toMatchObject({ recordingConsent: true });
+    expect(ultimoToken()).not.toHaveProperty('consentReplay');
+  });
+
+  it('un consenso ritirato altrove non torna: la replica rifiutata non diventa un clic', async () => {
+    await monta({ event: { ...evento, multitrackRecordingEnabled: true } });
+    risposte.push({ consentsInForce: { recording: true, transcription: true } });
+    await entra({
+      recordingConsent: true,
+      recordingConsentDestination: null,
+      multitrackConsent: true,
+    });
+    await premi(pulsante(l.consents.button));
+    expect(testo()).toContain(l.consents.given);
+
+    risposte.push({
+      voiceExcluded: true,
+      consentsInForce: { recording: false, transcription: false },
+    });
+    await caduta();
+    expect(ultimoToken()).toMatchObject({ consentReplay: { recording: true, multitrack: true } });
+    expect(ultimoToken()).not.toHaveProperty('recordingConsent');
+    expect(testo()).toContain(l.consents.notGiven);
+    expect(testo()).not.toContain(l.consents.given);
+
+    risposte.push({
+      voiceExcluded: true,
+      consentsInForce: { recording: false, transcription: false },
+    });
+    await caduta();
+    expect(ultimoToken()).not.toHaveProperty('recordingConsent');
+    expect(ultimoToken()).not.toHaveProperty('multitrackConsent');
+    expect(ultimoToken()).not.toHaveProperty('consentReplay');
+
+    // Solo un nuovo clic lo ridà.
+    risposte.push({ consentsInForce: { recording: true, transcription: false } });
+    await premi(pulsante(l.consents.recording.give));
+    expect(ultimoToken()).toMatchObject({ recordingConsent: true });
+  });
+
+  it('il token aggiorna lo stato letto all apertura', async () => {
+    await monta({
+      event: { ...evento, multitrackRecordingEnabled: true },
+      hasRecordingConsent: true,
+      hasMultitrackConsent: true,
+    });
+    risposte.push({ consentsInForce: { recording: true, transcription: false } });
+    await entra();
+    await premi(pulsante(l.consents.button));
+    expect(pulsante(l.consents.transcription.give).disabled).toBe(false);
+    expect(ultimoToken()).not.toHaveProperty('multitrackConsent');
+  });
+
+  it('il token dice anche un consenso che la pagina non aveva letto', async () => {
+    await monta({
+      event: { ...evento, multitrackRecordingEnabled: true },
+      hasRecordingConsent: true,
+    });
+    risposte.push({ consentsInForce: { recording: true, transcription: true } });
+    await entra();
+    await premi(pulsante(l.consents.button));
+    expect(testo()).toContain(l.consents.transcription.withdrawEffect);
   });
 
   it("un consenso gia' salvato che non copre piu' si dimentica al rientro", async () => {
@@ -655,8 +744,7 @@ describe('sala — il testo su cui si acconsente', () => {
     risposte.push({ recordingDestination: 'REGISTRANTS' });
     await premi(pulsante(l.consents.transcription.give));
     expect(ultimoToken()).toMatchObject({
-      recordingConsent: true,
-      recordingConsentDestination: 'PUBLIC',
+      consentReplay: { recording: true },
       multitrackConsent: true,
     });
   });
@@ -680,10 +768,8 @@ describe('sala — il testo su cui si acconsente', () => {
     });
     risposte.push({ recordingDestination: 'PUBLIC' });
     await entra();
-    expect(ultimoToken()).toMatchObject({
-      recordingConsent: true,
-      recordingConsentDestination: 'REGISTRANTS',
-    });
+    expect(ultimoToken()).toMatchObject({ consentReplay: { recording: true, roomTokens: [] } });
+    expect(ultimoToken()).not.toHaveProperty('recordingConsent');
     // Non copre piu': al prossimo ingresso non riparte, e si richiede.
     await premi(pulsante(l.consents.button));
     expect(testo()).toContain(l.consents.notGiven);
@@ -828,12 +914,116 @@ describe('sala — acconsentire dalla sala', () => {
     });
     await entra();
     await premi(pulsante(l.consents.button));
-    risposte.push({ recordingDestination: 'REGISTRANTS' });
+    risposte.push({
+      recordingDestination: 'REGISTRANTS',
+      consentsRecorded: { recording: false, multitrack: true },
+    });
     await premi(pulsante(l.consents.transcription.give));
     expect(ultimoToken()).toMatchObject({ multitrackConsent: true });
     expect(ultimoToken()).not.toHaveProperty('recordingConsent');
     expect(testo()).not.toContain(l.consents.textChanged);
     expect(testo()).not.toContain(l.consents.error);
+  });
+
+  it('un consenso alla trascrizione che il server non applica si dice', async () => {
+    await monta({
+      event: { ...evento, recordingEnabled: false, captionsTranscript: true },
+    });
+    await entra();
+    await premi(pulsante(l.consents.button));
+    await premi(pulsante(l.consents.transcription.give));
+    expect(testo()).toContain(l.consents.error);
+  });
+});
+
+describe('sala — la finestra dei consensi', () => {
+  const soloAvviso = {
+    ...evento,
+    participantsCanUnmute: false,
+    participantsCanStartVideo: false,
+    participantsCanShareScreen: false,
+  };
+  const TESTO_ENTE = 'Testo scelto per evento';
+
+  it("il consenso valido si ritira anche dove l'evento non lo chiede", async () => {
+    await monta({ event: soloAvviso, hasRecordingConsent: true });
+    risposte.push({ consentsInForce: { recording: true, transcription: false } });
+    await entra();
+    await premi(pulsante(l.consents.button));
+    expect(testo()).toContain(l.consents.recording.title);
+    expect(testo()).toContain(l.consents.given);
+    expect(pulsante(l.consents.withdraw).disabled).toBe(false);
+  });
+
+  it('senza consenso alla registrazione la trascrizione non si offre per nulla', async () => {
+    await monta({ event: { ...soloAvviso, multitrackRecordingEnabled: true } });
+    risposte.push({ voiceExcluded: true });
+    await entra();
+    await premi(pulsante(l.consents.button));
+    expect(pulsante(l.consents.transcription.give).disabled).toBe(true);
+    expect(testo()).toContain(l.consents.transcription.needsRecording);
+    expect(pulsante(l.consents.recording.give).disabled).toBe(false);
+  });
+
+  it("il testo dell'ente compare dove si da' il consenso", async () => {
+    await monta({ event: { ...evento, recordingConsentText: TESTO_ENTE } });
+    risposte.push({ voiceExcluded: true });
+    await entra();
+    await premi(pulsante(l.consents.button));
+    expect(document.getElementById('live-consents-rec-nota')?.textContent).toContain(TESTO_ENTE);
+  });
+
+  it("in solo ascolto il testo dell'ente sta sopra il pulsante", async () => {
+    await monta({
+      event: { ...evento, voceNelVideo: 'fissa', recordingConsentText: TESTO_ENTE },
+    });
+    risposte.push({ listenOnly: true });
+    await entra();
+    expect(document.querySelector('.live-listen-only')?.textContent).toContain(TESTO_ENTE);
+  });
+
+  it('il testo della casella della trascrizione arriva alla finestra', async () => {
+    await monta({
+      event: { ...evento, multitrackRecordingEnabled: true, retainParticipantTracks: true },
+      hasRecordingConsent: true,
+    });
+    risposte.push({ consentsInForce: { recording: true, transcription: false } });
+    await entra();
+    await premi(pulsante(l.consents.button));
+    expect(document.getElementById('live-consents-tr-nota')?.textContent).toContain(
+      g.multitrackRetained
+    );
+  });
+});
+
+describe("sala — la scheda in sala d'attesa", () => {
+  const scheda = {
+    pseudonimi: true,
+    registrazione: {
+      modo: 'manuale',
+      destinazione: 'PUBLIC',
+      chiNonAcconsente: 'soloAscolto',
+      conduceSempre: false,
+    },
+    trascrizione: { sottotitoli: false, tracce: null, dalVideo: false },
+    sottotitoli: { attivi: false, testoConservato: false },
+    chat: { attiva: true, domandeAttive: false, esitoDomande: 'soloTesto' },
+  } as unknown as SchedaPrivacy;
+
+  it('dice a chi conduce cio che vale per lui', async () => {
+    await monta({ event: { ...evento, schedaPrivacy: scheda }, isModerator: true });
+    expect(leggiAttesa().schedaPrivacy).toMatchObject({
+      pseudonimi: false,
+      registrazione: { chiNonAcconsente: 'conduceRipreso' },
+    });
+  });
+
+  it('al pubblico resta quella dell evento', async () => {
+    await monta({ event: { ...evento, schedaPrivacy: scheda } });
+    expect(leggiAttesa().schedaPrivacy).toMatchObject({
+      pseudonimi: true,
+      registrazione: { chiNonAcconsente: 'soloAscolto' },
+    });
   });
 });
 

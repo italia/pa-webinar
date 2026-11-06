@@ -421,15 +421,23 @@ export const jitsiTokenRequestSchema = z.object({
   moderatorToken: z.guid().optional(),
   guestName: z.string().min(2).max(100).optional(),
   displayNameOverride: z.string().min(2).max(100).optional(),
-  /** Consenso alla registrazione dell'evento dato in sala d'attesa, da chi
-   *  non l'aveva dato all'iscrizione. */
+  /** Consenso alla registrazione dell'evento dato ora con un clic: in sala
+   *  d'attesa o dalla sala. I consensi gia' dati si riportano in `consentReplay`. */
   recordingConsent: z.boolean().optional(),
   /** La destinazione del video nel testo di quel consenso, null per un testo che
    *  non ne dichiara una. Assente solo da una pagina aperta da prima che il campo
    *  esistesse (lib/recording/destination, `testoLetto`). */
   recordingConsentDestination: destinatariVideo.nullable().optional(),
-  /** Consenso alla registrazione per partecipante dato in sala d'attesa. */
+  /** Consenso alla trascrizione dei propri interventi dato ora con un clic. */
   multitrackConsent: z.boolean().optional(),
+  /** I consensi gia' dati che la pagina riporta da sola a un nuovo ingresso. Non
+   *  valgono come un clic: il server li accetta solo se ne trova ancora la prova,
+   *  sui posti dei token della sala di questa visita o sull'account di chi conduce. */
+  consentReplay: z.object({
+    recording: z.boolean().optional(),
+    multitrack: z.boolean().optional(),
+    roomTokens: z.array(z.string().min(1).max(4096)).max(50).optional(),
+  }).strict().optional(),
   /** Lingua della pagina in cui il consenso e' stato dato. */
   locale: z.string().min(2).max(8).optional(),
 }).refine(

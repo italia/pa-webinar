@@ -7,8 +7,9 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'design-react-kit';
 
-import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import { testoConsensoEvento, type VoceNelVideo } from '@/lib/live/consent-rule';
 import { chiaveConsenso, type Destinazione } from '@/lib/recording/destination';
+import type { chiaveConsensoTrascrizione } from '@/lib/registration/consents';
 
 /**
  * I consensi della persona per questo evento, dalla sala: si danno e si
@@ -16,10 +17,12 @@ import { chiaveConsenso, type Destinazione } from '@/lib/recording/destination';
  * darli). Ogni cambio porta un token nuovo e la conferenza si ricollega per
  * qualche secondo.
  *
- * La finestra mostra solo i consensi che l'evento chiede a questa persona;
+ * La finestra mostra i consensi che l'evento chiede a questa persona, quelli
+ * che ha gia' dato e quello che le serve per rientrare nella registrazione;
  * cosa cambia lo dice la riga sotto ciascuno, prima di agire. Chi non ha dato
- * il consenso alla registrazione legge qui lo stesso testo della casella: il
- * clic vale per quello. Il ritiro chiede una conferma: ricollega la conferenza
+ * un consenso legge qui lo stesso testo della casella, con quello scelto
+ * dall'ente per la registrazione: il clic vale per quello. Il ritiro chiede una
+ * conferma: ricollega la conferenza
  * (o la chiude), e un clic per sbaglio non deve farlo.
  */
 
@@ -27,15 +30,23 @@ import { chiaveConsenso, type Destinazione } from '@/lib/recording/destination';
 export type EffettoRitiroRegistrazione = 'voce' | 'soloAscolto' | 'conduce' | 'nessuno';
 
 export interface ConsensiInSala {
-  /** `destinazione` e `voce` scelgono il testo a cui si acconsente. */
+  /** `destinazione` e `voce` scelgono il testo a cui si acconsente; `testoEvento`
+   *  e' quello scelto dall'ente, che vale per lo stesso consenso. */
   registrazione?: {
     dato: boolean;
     ritiro: EffettoRitiroRegistrazione;
     destinazione: Destinazione;
     voce: VoceNelVideo;
+    testoEvento?: string | null;
   };
-  /** `serveRegistrazione`: si puo' dare solo dopo il consenso alla registrazione. */
-  trascrizione?: { dato: boolean; serveRegistrazione: boolean };
+  /** `serveRegistrazione`: si puo' dare solo dopo il consenso alla registrazione.
+   *  `testo` e `voce` scelgono il testo della casella e la nota che l'accompagna. */
+  trascrizione?: {
+    dato: boolean;
+    serveRegistrazione: boolean;
+    testo: ReturnType<typeof chiaveConsensoTrascrizione>;
+    voce: VoceNelVideo;
+  };
 }
 
 type Azione = 'ritiraRegistrazione' | 'ritiraTrascrizione';
@@ -74,6 +85,9 @@ export default function ConsentsDialog({
     onChiudi();
   };
   const { registrazione, trascrizione } = consensi;
+  const testoEvento = registrazione
+    ? testoConsensoEvento(registrazione.testoEvento, registrazione.voce)
+    : null;
   // Dopo un'azione il pulsante premuto sparisce (o si ferma): il focus va al
   // titolo del consenso, dentro la finestra, cosi' Esc e Tab continuano a
   // valere e il lettore di schermo resta al suo posto.
@@ -179,7 +193,9 @@ export default function ConsentsDialog({
                   ? ''
                   : t(`recording.without.${registrazione.ritiro}`),
               !registrazione.dato
-                ? tGdpr(chiaveConsenso(registrazione.destinazione, registrazione.voce))
+                ? [testoEvento, tGdpr(chiaveConsenso(registrazione.destinazione, registrazione.voce))]
+                    .filter(Boolean)
+                    .join(' ')
                 : registrazione.ritiro !== 'conduce'
                   ? t('recording.alreadyRecorded')
                   : null,
@@ -210,7 +226,14 @@ export default function ConsentsDialog({
                 : trascrizione.serveRegistrazione
                   ? t('transcription.needsRecording')
                   : t('transcription.giveEffect'),
-              null,
+              trascrizione.dato
+                ? null
+                : [
+                    tGdpr(trascrizione.testo),
+                    tGdpr(
+                      trascrizione.voce === 'fissa' ? 'multitrackOptional' : 'multitrackOptionalShort'
+                    ),
+                  ].join(' '),
               trascrizione.dato ? (
                 confermaRitiro('live-consents-tr', 'ritiraTrascrizione', t('withdraw'))
               ) : (
@@ -222,7 +245,7 @@ export default function ConsentsDialog({
                     onAcconsentiTrascrizione();
                     restaQui('live-consents-tr');
                   }}
-                  aria-describedby="live-consents-tr-effetto"
+                  aria-describedby="live-consents-tr-effetto live-consents-tr-nota"
                 >
                   {t('transcription.give')}
                 </Button>
