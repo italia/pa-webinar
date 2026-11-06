@@ -229,7 +229,11 @@ export default function StepPermissions({
   };
 
   const visibleFeatures = EVENT_FEATURES.filter(
-    (f) => f !== 'recording_control' || (value.recordingEnabled && recordingAvailable),
+    (f) =>
+      f !== 'recording_control' ||
+      (value.recordingEnabled &&
+        recordingAvailable &&
+        !registrazioneVuota(value, voceNelVideo, recordingAvailable)),
   );
 
   // Le due parti: il passo «Permessi» (partecipazione e funzioni della sala)

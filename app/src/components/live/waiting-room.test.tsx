@@ -835,6 +835,18 @@ describe('sala d\'attesa — il testo segue la destinazione', () => {
     expect(container.textContent).not.toContain(t.recordingConsentIntro);
   });
 
+  it('su un evento anonimo la registrazione contiene lo pseudonimo, non il nome', () => {
+    render({ ...ingresso, event: { ...evento, audienceAnonymous: true } });
+    expect(container.textContent).toContain(t.recordingConsentIntroAnonymous);
+    expect(container.textContent).not.toContain(t.recordingConsentIntro);
+  });
+
+  it('chi conduce un evento anonimo resta col nome, anche nella registrazione', () => {
+    render({ ...ingresso, event: { ...evento, audienceAnonymous: true }, conduce: true });
+    expect(container.textContent).toContain(t.recordingConsentIntro);
+    expect(container.textContent).not.toContain(t.recordingConsentIntroAnonymous);
+  });
+
   it('senza video il testo scelto per l\'evento non si mostra: direbbe il contrario della casella', () => {
     render({ ...ingresso, voce: 'assente', recordingConsentText: 'Testo dell\'ente.' });
     expect(container.textContent).not.toContain('Testo dell\'ente.');

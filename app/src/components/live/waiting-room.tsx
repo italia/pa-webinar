@@ -1249,7 +1249,13 @@ export default function WaitingRoom({
           {/* Tutto, anche se lungo: e' l'informativa a cui si acconsente. */}
           <p className="wr-consensi__intro">
             {testoEvento ||
-              t(voce === 'assente' ? 'recordingConsentIntroNoVideo' : 'recordingConsentIntro')}
+              t(
+                voce === 'assente'
+                  ? 'recordingConsentIntroNoVideo'
+                  : event.audienceAnonymous && !conduce
+                    ? 'recordingConsentIntroAnonymous'
+                    : 'recordingConsentIntro',
+              )}
           </p>
           <div className="form-check mb-0">
             <input

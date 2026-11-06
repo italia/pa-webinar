@@ -216,9 +216,9 @@ export default function Step5Review({
   // I consensi che modulo d'iscrizione e sala d'attesa chiederanno a chi
   // partecipa, con la stessa regola (lib/registration/consents): chi crea
   // l'evento vede prima cosa si chiedera', e se la scelta e' quella voluta.
-  const registra = form.recordingEnabled && recordingAvailable;
   // Accesa, ma non produrrebbe nulla: il riepilogo non la promette.
   const vuota = registrazioneVuota(form, voceNelVideo, recordingAvailable);
+  const registra = form.recordingEnabled && recordingAvailable && !vuota;
   const destinazioneDopo = destinazioneDopoIlSalvataggio(form, destinazioneSenzaScelta);
   const conVideo = videoDaDestinare(voceNelVideo);
   const trascrizioneVideo = trascrizioneDalVideo(
@@ -233,7 +233,7 @@ export default function Step5Review({
   );
   const consensi = consensiRichiesti({
     recordingEnabled: registra,
-    multitrackRecordingEnabled: form.recordingEnabled && !!form.multitrackRecordingEnabled,
+    multitrackRecordingEnabled: registra && !!form.multitrackRecordingEnabled,
     captionsTranscript:
       liveCaptionsAvailable && form.liveCaptionsEnabled && !!form.captionsTranscriptEnabled,
     trascrizioneVideo,
@@ -600,7 +600,7 @@ export default function Step5Review({
               {vociConsenso.length > 0
                 ? tf('consentsLine', { list: vociConsenso.join(' · ') })
                 : tf('consentsNone')}
-              {registraChiConduce({ recordingEnabled: form.recordingEnabled, eventType: istantanea ? 'INSTANT' : null }, recordingAvailable) && (
+              {registraChiConduce({ recordingEnabled: form.recordingEnabled && !vuota, eventType: istantanea ? 'INSTANT' : null }, recordingAvailable) && (
                 <span className="d-block text-secondary small mt-1">
                   {tf(conduceSempreRegistrato(form, voceNelVideo) ? 'consentsHostsAlways' : 'consentsHosts')}
                 </span>

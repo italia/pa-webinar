@@ -314,6 +314,27 @@ describe('CreateEventWithTemplate', () => {
     expect(container.textContent).toContain(g.introNoRecording);
   });
 
+  it('senza niente da registrare le schede dei modelli non promettono la registrazione', () => {
+    const scheda = {
+      id: 'modello-registrato',
+      name: 'Modello',
+      description: null,
+      icon: 'it-presentation',
+      qaEnabled: false,
+      chatEnabled: false,
+      recordingEnabled: true,
+      autoStartRecording: false,
+      participantsCanUnmute: false,
+      participantsCanStartVideo: false,
+      participantsCanShareScreen: false,
+      maxParticipants: 100,
+    };
+    mostra({ templates: [scheda], voceNelVideo: 'assente', aiPipelineEnabled: false });
+    const modelli = container.querySelector('#formato-modelli')!;
+    expect(modelli.textContent).toContain(messages.admin.templates.noRecording);
+    expect(modelli.textContent).not.toContain(messages.admin.templates.recordingLabel);
+  });
+
   it('senza video e senza AI un indirizzo salvato apre il wizard senza registrazione', () => {
     mostra({
       formatoParam: 'piccolo.tutti.riservata.tutti',

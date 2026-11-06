@@ -300,7 +300,12 @@ describe('Riepilogo — cio che il formato ha scelto', () => {
 
   it('dove il video della sala non c e dice quella che l evento avra, senza farla cambiare', () => {
     const testo = mostra(
-      { recordingEnabled: true, recordingDestination: null },
+      {
+        recordingEnabled: true,
+        recordingDestination: null,
+        aiTranscriptEnabled: true,
+        multitrackRecordingEnabled: true,
+      },
       {
         voceNelVideo: 'assente',
         destinazioneSenzaScelta: 'REGISTRANTS',
@@ -313,7 +318,10 @@ describe('Riepilogo — cio che il formato ha scelto', () => {
   });
 
   it('dove il video della sala non c e, su un evento vecchio senza, non ne parla', () => {
-    const testo = mostra({ recordingEnabled: true }, { voceNelVideo: 'assente' });
+    const testo = mostra(
+      { recordingEnabled: true, aiTranscriptEnabled: true, multitrackRecordingEnabled: true },
+      { voceNelVideo: 'assente' },
+    );
     expect(testo).not.toContain(tp.recordingDestinationStaffOnly);
     expect(testo).not.toContain(f.recordingDestinationReserved);
   });

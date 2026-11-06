@@ -187,6 +187,14 @@ describe('ConsentsDialog', () => {
       }
     );
 
+    it('non si ritira un consenso che la persona non ha dato', async () => {
+      await disegna({
+        registrazione: registrazione(true, 'voce'),
+        trascrizione: trascrizione(false, false),
+      });
+      expect(effetto()).toBe(r.withdraw.voce);
+    });
+
     it('chi conduce non si sente dire delle tracce dove non ce ne sono', async () => {
       await disegna({ registrazione: registrazione(true, 'conduce') });
       expect(effetto()).toBe(r.withdraw.conduce);

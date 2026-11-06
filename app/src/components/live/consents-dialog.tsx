@@ -102,7 +102,8 @@ export default function ConsentsDialog({
     ? testoConsensoEvento(registrazione.testoEvento, registrazione.voce)
     : null;
   // La trascrizione si nomina dove la finestra la mostra: l'evento la chiede, o
-  // la persona l'ha data.
+  // la persona l'ha data. Il ritiro la comprende solo se c'e' un consenso da
+  // ritirare; per chi conduce la riga dice che cosa succede alle sue tracce.
   const effettoRegistrazione = (r: NonNullable<ConsensiInSala['registrazione']>) => {
     const effetto = r.dato
       ? t(`recording.withdraw.${r.ritiro}`)
@@ -111,7 +112,7 @@ export default function ConsentsDialog({
     if (r.ritiro === 'conduce') {
       return `${effetto} ${t(r.dato ? 'recording.withdrawTranscriptHost' : 'recording.withoutTranscriptHost')}`;
     }
-    return r.dato ? `${effetto} ${t('recording.withdrawTranscript')}` : effetto;
+    return r.dato && trascrizione.dato ? `${effetto} ${t('recording.withdrawTranscript')}` : effetto;
   };
   // Dopo un'azione il pulsante premuto sparisce (o si ferma): il focus va al
   // titolo del consenso, dentro la finestra, cosi' Esc e Tab continuano a

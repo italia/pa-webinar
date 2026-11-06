@@ -1538,7 +1538,15 @@ describe('creazione — i default del modello', () => {
   it('chi si iscrive: segue il sito finche non si sceglie, e solo su invito lo dice ovunque', async () => {
     const g = messages.admin.guided;
     const s3 = messages.admin.wizard.step3;
-    renderWizard({ template: { ...modello, accessMode: null }, publicRegistrationEnabled: true });
+    renderWizard({
+      template: { ...modello, accessMode: null, recordingDestination: 'PUBLIC' },
+      publicRegistrationEnabled: true,
+      formatoLabel: 'dalle domande',
+      etichettaFormato: ({ registra, invitati }) => `${registra} ${invitati}`,
+      onChangeTemplate: vi.fn(),
+    });
+    const fascia = () => container.querySelector('.wizard-modello')?.textContent;
+    expect(fascia()).toContain('pubblica false');
     compila();
     goToStep('invites');
     const sezione = container.querySelector('.wizard-iscrizione')!;
@@ -1550,6 +1558,8 @@ describe('creazione — i default del modello', () => {
     expect(scelta(g.access.open).querySelector('input')!.checked).toBe(true);
 
     click(scelta(g.access.invitation));
+    // La fascia in cima non resta alle risposte di partenza.
+    expect(fascia()).toContain('riservata true');
     expect(sezione.textContent).not.toContain(s3.accessSiteDefault);
     expect(sezione.textContent).toContain(s3.accessNoInvitees);
     // Solo su invito l'elenco degli invitati sta dentro la scelta, aperto:
@@ -3690,7 +3700,13 @@ describe('i valori del formato', () => {
   it('con un link di conduzione, dove il video non c e, annuncia cio che il server scrive', () => {
     renderWizard({
       mode: 'edit',
-      initialEvent: salvato({ ...conDomande, recordingDestination: null, recordingEnabled: false }),
+      initialEvent: salvato({
+        ...conDomande,
+        recordingDestination: null,
+        recordingEnabled: false,
+        aiTranscriptEnabled: true,
+        multitrackRecordingEnabled: true,
+      }),
       initialStep: 'advanced',
       initialSection: 'recording',
       viaToken: 'token-primario',
@@ -3793,7 +3809,13 @@ describe('i valori del formato', () => {
 
   it('dove il video non c e non chiede, e annuncia la riservata che il server scrive', async () => {
     renderWizard({
-      template: { ...modello, recordingDestination: null, postEventShowQA: true },
+      template: {
+        ...modello,
+        recordingDestination: null,
+        postEventShowQA: true,
+        aiTranscriptEnabled: true,
+        multitrackRecordingEnabled: true,
+      },
       voceNelVideo: 'assente',
     });
     compila();
@@ -3811,7 +3833,13 @@ describe('i valori del formato', () => {
 
   it('dove il video non c e un modello pubblico non parte, e il riepilogo non lo promette', async () => {
     renderWizard({
-      template: { ...modello, recordingDestination: 'PUBLIC', postEventShowQA: true },
+      template: {
+        ...modello,
+        recordingDestination: 'PUBLIC',
+        postEventShowQA: true,
+        aiTranscriptEnabled: true,
+        multitrackRecordingEnabled: true,
+      },
       voceNelVideo: 'assente',
     });
     compila();
@@ -3821,6 +3849,70 @@ describe('i valori del formato', () => {
     expect(container.textContent).toContain(w.flow.postEventQaHidden);
     await press(button(w.publish));
     expect(corpo('POST')).not.toHaveProperty('recordingDestination');
+  });
+
+  it('riaprendo un evento che registra a vuoto il wizard non promette niente', () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato({
+        recordingEnabled: true,
+        multitrackRecordingEnabled: false,
+        aiTranscriptEnabled: false,
+        recordingDestination: 'REGISTRANTS',
+      }),
+      voceNelVideo: 'assente',
+      aiPipelineEnabled: false,
+    });
+    goToStep('review');
+    expect(container.textContent).toContain(w.step5.summary.recordingOff);
+    expect(container.textContent).not.toContain(w.flow.recordingDestinationReserved);
+    expect(container.textContent).not.toContain(w.flow.consentsHosts);
+    goToStep('permissions');
+    expect(container.textContent).not.toContain(w.step2.feature.recording_control.label);
+  });
+
+  it('senza un registratore il riepilogo non promette il consenso alla trascrizione', () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato({
+        recordingEnabled: true,
+        aiTranscriptEnabled: true,
+        multitrackRecordingEnabled: true,
+      }),
+      voceNelVideo: 'assente',
+      recordingAvailable: false,
+    });
+    goToStep('review');
+    expect(container.textContent).toContain(w.step5.summary.recordingOff);
+    expect(container.textContent).not.toContain(w.flow.consentsWithdraw);
+  });
+
+  it('una registrazione a vuoto non parla di un video pubblico sulla pagina privata', () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato({
+        recordingEnabled: true,
+        multitrackRecordingEnabled: false,
+        aiTranscriptEnabled: false,
+        recordingDestination: 'PUBLIC',
+        postEventPublic: false,
+      }),
+      voceNelVideo: 'assente',
+      aiPipelineEnabled: false,
+    });
+    goToStep('review');
+    expect(container.textContent).not.toContain(w.step2.postEventPagePrivateVideoHidden);
+  });
+
+  it('la fascia del formato non annuncia una registrazione a vuoto', () => {
+    renderWizard({
+      template: { ...modello, aiTranscriptEnabled: false, multitrackRecordingEnabled: false },
+      voceNelVideo: 'assente',
+      formatoLabel: 'dalle domande',
+      etichettaFormato: ({ registra }) => `registra ${registra}`,
+      onChangeTemplate: vi.fn(),
+    });
+    expect(container.querySelector('.wizard-modello')?.textContent).toContain('registra no');
   });
 
   it('dove un video non c e una copia senza destinazione si salva', async () => {

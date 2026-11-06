@@ -21,6 +21,7 @@ import {
   registrazioneProponibile,
   trascriveSenzaRegistrare,
   type FormatoGuidato,
+  type FormatoRegistra,
 } from '@/lib/events/guided-format';
 import EventWizard, { type WizardTemplatePreset } from '@/components/admin/event-wizard/wizard-shell';
 import CreateInstantCall from '@/components/admin/create-instant-call';
@@ -145,6 +146,7 @@ export default function CreateEventWithTemplate({
   const wizard = (props: {
     template: React.ComponentProps<typeof EventWizard>['template'];
     formatoLabel?: string;
+    etichettaFormato?: React.ComponentProps<typeof EventWizard>['etichettaFormato'];
     destinazioneScelta?: boolean;
     onChangeTemplate: (stato: { invitati: boolean }) => void;
   }) => (
@@ -154,6 +156,7 @@ export default function CreateEventWithTemplate({
       key={props.template?.id ?? 'vuoto'}
       template={props.template}
       formatoLabel={props.formatoLabel}
+      etichettaFormato={props.etichettaFormato}
       destinazioneScelta={props.destinazioneScelta}
       onChangeTemplate={props.onChangeTemplate}
       siteTimezone={siteTimezone}
@@ -201,12 +204,17 @@ export default function CreateEventWithTemplate({
   // Le quattro risposte: il wizard parte dai loro valori, e «Cambia formato»
   // riporta alle domande con le risposte gia' date.
   if (formato) {
-    const nome = [
-      tg(`summary.${formato.persone}`),
-      tg(`summary.${formato.voce}`),
-      tg(`summary.${formato.registra}`),
-      tg(formato.accesso === 'invitati' ? 'summary.inviteOnly' : 'summary.openAccess'),
-    ].join(' · ');
+    const etichetta = ({ registra, invitati }: { registra: FormatoRegistra; invitati: boolean }) =>
+      [
+        tg(`summary.${formato.persone}`),
+        tg(`summary.${formato.voce}`),
+        tg(`summary.${registra}`),
+        tg(invitati ? 'summary.inviteOnly' : 'summary.openAccess'),
+      ].join(' · ');
+    const nome = etichetta({
+      registra: formato.registra,
+      invitati: formato.accesso === 'invitati',
+    });
     return wizard({
       template: presetDaFormato(
         formato,
@@ -220,6 +228,7 @@ export default function CreateEventWithTemplate({
         ),
       ),
       formatoLabel: nome,
+      etichettaFormato: etichetta,
       // Su invito le domande propongono riservata: un video pubblico e' una
       // risposta data a mano.
       destinazioneScelta: formato.accesso === 'invitati' && formato.registra === 'pubblica',
@@ -268,6 +277,7 @@ export default function CreateEventWithTemplate({
               <p className="text-secondary small mb-3">{tg('templateReplaces')}</p>
               <TemplatePicker
                 showSubtitle={false}
+                registrazioneProponibile={recordingAvailable}
                 templates={templates}
                 onSelect={(tpl) => {
                   router.push(percorso(`/admin/events/new?template=${tpl.id}`));

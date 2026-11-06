@@ -56,7 +56,7 @@ import {
 } from '@/lib/events/wizard-steps';
 import { messaggioErroreApi } from '@/lib/api-error-message';
 import { publicRegistrationFor } from '@/lib/events/access-mode';
-import { registrazioneProponibile } from '@/lib/events/guided-format';
+import { registrazioneProponibile, type FormatoRegistra } from '@/lib/events/guided-format';
 import {
   destinazioneDiPartenza,
   pubblicoAllineato,
@@ -81,6 +81,7 @@ import {
   destinazioneDopoIlSalvataggio,
   destinazioneSuInvito,
   paginaCheSegue,
+  registrazioneVuota,
   videoPubblico,
   type NotaDestinazione,
   type NotaPagina,
@@ -286,6 +287,9 @@ export interface WizardProps {
   /** I valori di partenza vengono dalle quattro domande del formato, riassunte
    *  qui: la fascia in cima le dice al posto del nome di un modello. */
   formatoLabel?: string;
+  /** La stessa fascia con accesso e registrazione come sono ora nel modulo: si
+   *  cambiano anche nei passi, senza tornare alle domande. */
+  etichettaFormato?: (stato: { registra: FormatoRegistra; invitati: boolean }) => string;
   /** La destinazione del modello e' una risposta data a mano, non una proposta:
    *  su un evento su invito resta. */
   destinazioneScelta?: boolean;
@@ -1731,7 +1735,11 @@ export default function EventWizard(props: WizardProps) {
   if (viaToken === null && !istantanea) {
     const paginaDiPartenza =
       mode === 'edit' ? initial.postEventPublic : (props.template?.postEventPublic ?? true);
-    if (videoPubblico(form) && !form.postEventPublic) {
+    if (
+      videoPubblico(form) &&
+      !form.postEventPublic &&
+      !registrazioneVuota(form, props.voceNelVideo, recordingAvailable)
+    ) {
       notaPagina = 'postEventPagePrivateVideoHidden';
     } else if (!paginaScelta && form.postEventPublic !== paginaDiPartenza) {
       if (form.postEventPublic) notaPagina = 'postEventPagePublicWithVideo';
@@ -2457,7 +2465,20 @@ export default function EventWizard(props: WizardProps) {
           <span>
             {props.formatoLabel
               ? t.rich('flow.formatInUse', {
-                  name: props.formatoLabel,
+                  name:
+                    props.etichettaFormato?.({
+                      registra:
+                        !form.recordingEnabled ||
+                        registrazioneVuota(form, props.voceNelVideo, recordingAvailable)
+                          ? 'no'
+                          : form.recordingDestination === 'PUBLIC'
+                            ? 'pubblica'
+                            : 'riservata',
+                      invitati: !publicRegistrationFor(
+                        form,
+                        props.publicRegistrationEnabled ?? true,
+                      ),
+                    }) ?? props.formatoLabel,
                   b: (c) => <strong>{c}</strong>,
                 })
               : props.template
@@ -2681,6 +2702,7 @@ export default function EventWizard(props: WizardProps) {
               whiteboardInfraReady={props.whiteboardInfraReady}
               liveCaptionsAvailable={props.liveCaptionsAvailable ?? false}
               recordingAvailable={recordingAvailable}
+              voceNelVideo={props.voceNelVideo}
               aiPipelineEnabled={props.aiPipelineEnabled ?? true}
               editing={mode === 'edit'}
             />
