@@ -31,7 +31,8 @@ export interface ProvaConservataVista {
  *
  * La conferma sostituisce il bottone premuto, e il ritiro la toglie: il fuoco non
  * si perde, passa al gruppo della conferma e torna al titolo della riga. L'esito
- * si annuncia in una zona sempre presente nella pagina.
+ * dice evento e consenso, e si annuncia in una zona sempre presente nella pagina:
+ * il titolo della riga non dice che il ritiro e' avvenuto.
  */
 export default function RetainedConsentProofs({
   token,
@@ -70,10 +71,15 @@ export default function RetainedConsentProofs({
   };
 
   const data = (iso: string) => format.dateTime(new Date(iso), { dateStyle: 'long' });
+  const titolo = (prova: ProvaConservataVista) =>
+    getLocalized(prova.event.title as LocalizedField, locale);
 
   const ritira = async (prova: ProvaConservataVista) => {
     setInCorso(true);
     setErrore(null);
+    // Vuota, cosi' anche un esito uguale al precedente cambia il testo e si
+    // annuncia: gli eventi di una serie hanno lo stesso titolo.
+    setEsito('');
     try {
       const res = await fetch('/api/gdpr/consents', {
         method: 'POST',
@@ -86,7 +92,7 @@ export default function RetainedConsentProofs({
       if (!res.ok) return setErrore(tl('error'));
       const adesso = new Date().toISOString();
       setEsito(
-        `${tl(`${prova.kind}.title`)}: ${t('consentWithdrawnOn', { date: data(adesso) })}`
+        `${titolo(prova)} · ${tl(`${prova.kind}.title`)}: ${t('consentWithdrawnOn', { date: data(adesso) })}`
       );
       setRighe((prima) =>
         prima.map((r) =>
@@ -123,12 +129,12 @@ export default function RetainedConsentProofs({
               <div
                 className="fw-semibold"
                 tabIndex={-1}
-                ref={(titolo) => {
-                  if (titolo) titoli.current.set(p.id, titolo);
+                ref={(elemento) => {
+                  if (elemento) titoli.current.set(p.id, elemento);
                   else titoli.current.delete(p.id);
                 }}
               >
-                {getLocalized(p.event.title as LocalizedField, locale)}
+                {titolo(p)}
               </div>
               <div>{tl(`${p.kind}.title`)}</div>
               {p.name && (

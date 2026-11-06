@@ -215,6 +215,55 @@ describe('RetainedConsentProofs', () => {
     expect(annuncio?.textContent).toContain('Ritirato il');
   });
 
+  it('l’esito dice l’evento, e due ritiri dello stesso consenso si annunciano entrambi', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('{}', { status: 200 }))
+    );
+    monta([
+      prova('p1', 'recording'),
+      prova('p2', 'recording', {
+        eventId: 'e2',
+        event: { title: { it: 'Altro evento' }, startsAt: '2026-09-03T08:00:00.000Z' },
+      }),
+    ]);
+    const annuncio = container.querySelector('[role="status"]');
+
+    await clic('Ritira il consenso');
+    await clic('Ritira');
+    const primo = annuncio?.textContent;
+    expect(primo).toContain('Evento passato');
+
+    await clic('Ritira il consenso');
+    await clic('Ritira');
+    expect(annuncio?.textContent).toContain('Altro evento');
+    expect(annuncio?.textContent).not.toBe(primo);
+  });
+
+  it('un esito uguale al precedente si annuncia lo stesso: la zona si vuota mentre si ritira', async () => {
+    let risposta: (r: Response) => void = () => undefined;
+    const richiesta = vi
+      .fn()
+      .mockResolvedValueOnce(new Response('{}', { status: 200 }))
+      .mockImplementationOnce(() => new Promise<Response>((r) => (risposta = r)));
+    vi.stubGlobal('fetch', richiesta);
+    // Due eventi di una serie: stesso titolo, stesso consenso, stesso giorno.
+    monta([prova('p1', 'recording'), prova('p2', 'recording', { eventId: 'e2' })]);
+    const annuncio = container.querySelector('[role="status"]');
+
+    await clic('Ritira il consenso');
+    await clic('Ritira');
+    const primo = annuncio?.textContent;
+    expect(primo).toContain('Ritirato il');
+
+    await clic('Ritira il consenso');
+    await clic('Ritira');
+    expect(annuncio?.textContent).toBe('');
+
+    await act(async () => risposta(new Response('{}', { status: 200 })));
+    expect(annuncio?.textContent).toBe(primo);
+  });
+
   it('dopo un errore il fuoco resta nella conferma', async () => {
     vi.stubGlobal(
       'fetch',
