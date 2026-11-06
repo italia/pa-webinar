@@ -7,7 +7,7 @@ import { useId } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { Icon } from '@/components/ui/icon';
-import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import { testoConsensoEvento, type VoceNelVideo } from '@/lib/live/consent-rule';
 import { chiaveConsenso, type Destinazione } from '@/lib/recording/destination';
 
 /**
@@ -42,6 +42,7 @@ export default function VoiceExcludedNotice({
   const tc = useTranslations('live.consents');
   const tGdpr = useTranslations('gdpr.consent');
   const idTesto = useId();
+  const testoEvento = testoConsensoEvento(testoConsenso, voce);
   return (
     <div className="live-listen-only" role="region" aria-label={t('title')}>
       <Icon
@@ -51,9 +52,7 @@ export default function VoiceExcludedNotice({
       />
       <p className="mb-0 flex-grow-1">
         <strong>{t('title')}</strong> {t('body')}
-        {testoConsenso?.trim() && (
-          <span className="d-block small mt-1">{testoConsenso}</span>
-        )}
+        {testoEvento && <span className="d-block small mt-1">{testoEvento}</span>}
         <span id={idTesto} className="d-block small mt-1">
           {tGdpr(chiaveConsenso(destinazione, voce))}
         </span>
