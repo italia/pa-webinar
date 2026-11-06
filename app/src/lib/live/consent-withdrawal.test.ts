@@ -10,6 +10,7 @@ const tx = vi.hoisted(() => ({
   person: { updateMany: vi.fn() },
   eventInvitation: { deleteMany: vi.fn(), updateMany: vi.fn() },
   captionSegment: { updateMany: vi.fn() },
+  retainedConsentProof: { updateMany: vi.fn() },
   gdprAuditLog: { create: vi.fn(), createMany: vi.fn() },
 }));
 const trascrizione = vi.hoisted(() => ({
@@ -17,12 +18,15 @@ const trascrizione = vi.hoisted(() => ({
   togliPersoneDalleTrascrizioni: vi.fn(async () => 0),
 }));
 vi.mock('@/lib/captions/transcript', () => trascrizione);
+const transazione = vi.hoisted(() => vi.fn());
 vi.mock('@/lib/db', () => ({
-  prisma: { $transaction: (fn: (t: typeof tx) => unknown) => fn(tx) },
+  prisma: { $transaction: transazione },
 }));
 vi.mock('@/lib/settings', () => ({
   getSettings: async () => ({ publicRegistrationEnabled: true }),
 }));
+
+import { TIMEOUT_PULIZIA_EVENTO_MS } from '@/lib/gdpr/cleanup-selection';
 
 import { ritiraComunicazioni, ritiraConsensi } from './consent-withdrawal';
 
@@ -32,6 +36,8 @@ const ADESSO = new Date('2026-11-01T10:00:00Z');
 
 beforeEach(() => {
   vi.clearAllMocks();
+  transazione.mockImplementation((fn: (t: typeof tx) => unknown) => fn(tx));
+  tx.retainedConsentProof.updateMany.mockResolvedValue({ count: 0 });
   tx.recordingConsent.findMany.mockResolvedValue([]);
   tx.multitrackConsent.findMany.mockResolvedValue([]);
   tx.recordingConsent.updateMany.mockResolvedValue({ count: 0 });
@@ -41,6 +47,18 @@ beforeEach(() => {
 });
 
 describe('ritiraConsensi', () => {
+  it('puo\' aspettare tutta la pulizia dello stesso evento', async () => {
+    await ritiraConsensi(EVENTO, [], { registrazione: true }, ADESSO, {
+      iscrizioni: [ISCRIZIONE],
+    });
+    expect(transazione.mock.calls[0]![1].timeout).toBeGreaterThan(TIMEOUT_PULIZIA_EVENTO_MS);
+  });
+
+  it('senza iscrizioni non cerca prove conservate', async () => {
+    await ritiraConsensi(EVENTO, ['ospite-1'], { registrazione: true }, ADESSO);
+    expect(tx.retainedConsentProof.updateMany).not.toHaveBeenCalled();
+  });
+
   it("l'iscritto ritira tutto cio' che porta la sua iscrizione, di ogni ingresso", async () => {
     tx.registration.updateMany.mockResolvedValue({ count: 1 });
     const esito = await ritiraConsensi(

@@ -4042,7 +4042,7 @@
         "erasedName": "(navn fjernet efter anmodning)",
         "unreadableName": "(navn kan ikke læses)"
       },
-      "retainedNote": "{count, plural, one {# dokumentation for samtykke opbevares} other {# dokumentationer for samtykke opbevares}}, så længe videoen eller transskriptionen forbliver offentliggjort.",
+      "retainedNote": "{count, plural, one {# dokumentation for samtykke opbevares} other {# dokumentationer for samtykke opbevares}}, så længe videoen eller transskriptionen findes.",
       "countsNote": "Der tælles personer: en tilmelding, en personalekonto eller et personligt link tæller én gang; en gæst, der kommer igen ved et andet besøg, tæller igen."
     }
   },
@@ -4559,7 +4559,7 @@
       "consentWithdrawnOn": "Trukket tilbage den {date}",
       "consentNoteInRoom": "Hvis du er i rummet lige nu, gælder tilbagetrækningen fra din næste indgang: brug Samtykker i rummet, hvis den skal gælde straks.",
       "proofsTitle": "Opbevaret dokumentation for samtykker",
-      "proofsIntro": "Dataene for disse arrangementer er blevet slettet. Denne dokumentation bevares, så længe videoen eller transskriptionen er offentliggjort. Du kan trække dit samtykke tilbage: det, der allerede er i videoen, forbliver, og for at få det fjernet skal du skrive til den dataansvarlige.",
+      "proofsIntro": "Dataene for disse arrangementer er blevet slettet. Denne dokumentation bevares, så længe videoen eller transskriptionen findes. Du kan trække dit samtykke tilbage: det, der allerede er i videoen, forbliver, og for at få det fjernet skal du skrive til den dataansvarlige.",
       "proofGivenOn": "Givet den {date}",
       "proofSuperseded": "Erstattet af et senere samtykke",
       "addressBookTitle": "Arrangementsadressebog",
@@ -4579,13 +4579,13 @@
       "linkInvalid": "Linket er ugyldigt eller udløbet. Anmod om et nyt link.",
       "confirmWarning": "Du er ved at slette personoplysningerne tilknyttet din e-mailadresse permanent, bortset fra det, der er anført nedenfor.",
       "confirmBody": "Tilmeldinger, spørgsmål, afstemningsstemmer, feedback, påmindelser og din post i arrangementsadressebogen slettes. Handlingen kan ikke fortrydes.",
-      "confirmProofs": "Hvis et arrangement har en offentliggjort video eller transskription, bevares samtykketypen, datoen og den tekst, du svarede på, uden dit navn, så længe videoen eller transskriptionen forbliver offentliggjort. De tjener til at dokumentere samtykket. Videoen ændres ikke: for at bede om at få dine indlæg fjernet skal du skrive til den dataansvarlige.",
+      "confirmProofs": "Hvis der findes en video eller transskription af et arrangement, også selvom den endnu ikke er offentliggjort, bevares samtykketypen, datoen og den tekst, du svarede på, uden dit navn, så længe videoen eller transskriptionen findes. De tjener til at dokumentere samtykket. Videoen ændres ikke: for at bede om at få dine indlæg fjernet skal du skrive til den dataansvarlige.",
       "confirmButton": "Bekræft sletning",
       "cancel": "Annuller",
       "processing": "Sletter...",
       "doneTitle": "Sletning gennemført",
       "doneBody": "{count} tilmeldinger og de tilknyttede data er blevet slettet.",
-      "doneProofs": "{count, plural, one {# dokumentation for samtykke er bevaret uden dit navn, så længe videoen eller transskriptionen forbliver offentliggjort.} other {# dokumentationer for samtykke er bevaret uden dit navn, så længe videoen eller transskriptionen forbliver offentliggjort.}}",
+      "doneProofs": "{count, plural, one {# dokumentation for samtykke er bevaret uden dit navn, så længe videoen eller transskriptionen findes.} other {# dokumentationer for samtykke er bevaret uden dit navn, så længe videoen eller transskriptionen findes.}}",
       "error": "Der opstod en fejl. Prøv igen senere.",
       "rateLimited": "For mange anmodninger. Prøv igen om en time.",
       "back": "Tilbage til mine data",

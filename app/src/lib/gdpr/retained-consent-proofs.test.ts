@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const m = vi.hoisted(() => ({
   decifra: vi.fn((v: string) => `chiaro:${v}`),
+  transazione: vi.fn(),
   tx: {
     registration: { findMany: vi.fn() },
     recordingConsent: { findMany: vi.fn() },
@@ -17,23 +18,31 @@ const m = vi.hoisted(() => ({
     },
     gdprAuditLog: { create: vi.fn() },
     event: { findUnique: vi.fn() },
-    postprodArtifact: { count: vi.fn() },
+    postprodArtifact: { count: vi.fn(), findMany: vi.fn() },
+    recording: { findMany: vi.fn() },
+    $executeRaw: vi.fn(),
   },
 }));
 vi.mock('@/lib/db', () => ({
   prisma: {
     ...m.tx,
-    $transaction: vi.fn(async (fn: (t: typeof m.tx) => unknown) => fn(m.tx)),
+    $transaction: m.transazione,
   },
 }));
-vi.mock('@/lib/crypto/pii', () => ({ tryDecryptPII: m.decifra }));
+vi.mock('@/lib/crypto/pii', () => ({
+  tryDecryptPII: m.decifra,
+  encryptPII: (v: string) => v,
+}));
 
+import { TIMEOUT_PULIZIA_EVENTO_MS } from './cleanup-selection';
 import { improntaTitolare, titolareIscrizione } from './consent-proofs';
 import {
   conservaProve,
   proveConservateDellaPersona,
   ritiraProvaConservata,
+  ritiraProveDelleIscrizioni,
   tipiDelleProve,
+  tipiDelleProveEsistenti,
   togliNomeDalleProve,
   togliNomeDelleIscrizioni,
 } from './retained-consent-proofs';
@@ -66,6 +75,9 @@ const copiate = () =>
 
 beforeEach(() => {
   vi.clearAllMocks();
+  m.transazione.mockImplementation(async (fn: (t: typeof m.tx) => unknown) => fn(m.tx));
+  tx.postprodArtifact.findMany.mockResolvedValue([]);
+  tx.recording.findMany.mockResolvedValue([]);
   tx.registration.findMany.mockResolvedValue([iscritta]);
   tx.recordingConsent.findMany.mockResolvedValue([]);
   tx.multitrackConsent.findMany.mockResolvedValue([]);
@@ -233,12 +245,15 @@ describe('conservaProve', () => {
 
 describe('togliNomeDalleProve', () => {
   it('toglie il nome, ritira e conta per evento', async () => {
-    tx.retainedConsentProof.findMany.mockResolvedValue([
-      { eventId: 'e1' },
-      { eventId: 'e1' },
-      { eventId: 'e2' },
-    ]);
+    tx.retainedConsentProof.findMany
+      .mockResolvedValueOnce([{ eventId: 'e2' }, { eventId: 'e1' }])
+      .mockResolvedValueOnce([{ eventId: 'e1' }, { eventId: 'e1' }, { eventId: 'e2' }])
+      .mockResolvedValue([]);
     const perEvento = await togliNomeDalleProve('impronta', ADESSO);
+    // Gli eventi in fila in ordine, come chi cancella le iscrizioni.
+    expect(
+      tx.$executeRaw.mock.calls.map((c) => (c as unknown[]).slice(1)[0])
+    ).toEqual(['captions-transcript:e1', 'captions-transcript:e2']);
     expect([...perEvento]).toEqual([
       ['e1', 2],
       ['e2', 1],
@@ -257,6 +272,91 @@ describe('togliNomeDalleProve', () => {
     tx.retainedConsentProof.findMany.mockResolvedValue([]);
     expect((await togliNomeDalleProve('impronta', ADESSO)).size).toBe(0);
     expect(tx.retainedConsentProof.updateMany).not.toHaveBeenCalled();
+  });
+
+  it('puo\' aspettare tutta la pulizia degli stessi eventi', async () => {
+    tx.retainedConsentProof.findMany.mockResolvedValue([]);
+    await togliNomeDalleProve('impronta', ADESSO);
+    expect(m.transazione.mock.calls[0]![1].timeout).toBeGreaterThan(TIMEOUT_PULIZIA_EVENTO_MS);
+  });
+});
+
+describe('tipiDelleProveEsistenti', () => {
+  const evento = { youtubeUrl: null, recordingUrl: null, tempRecordingUrl: null };
+
+  it('un evento che non esiste non conserva niente', async () => {
+    tx.event.findUnique.mockResolvedValue(null);
+    expect(await tipiDelleProveEsistenti(tx as never, 'e1')).toEqual([]);
+  });
+
+  it('il file non ancora pubblicato vale come video', async () => {
+    tx.event.findUnique.mockResolvedValue({ ...evento, recordingUrl: 'https://file' });
+    tx.postprodArtifact.count.mockResolvedValue(0);
+    expect(await tipiDelleProveEsistenti(tx as never, 'e1')).toEqual([
+      'recording',
+      'transcription',
+    ]);
+  });
+
+  it('una registrazione con il suo file non vale da sola: lo dice l’indirizzo sull’evento', async () => {
+    tx.event.findUnique.mockResolvedValue(evento);
+    tx.postprodArtifact.count.mockResolvedValue(0);
+    tx.recording.findMany.mockResolvedValue([
+      { blobKey: 'recordings/sala.mp4', mediaStartedAt: t('09:00') },
+    ]);
+    expect(await tipiDelleProveEsistenti(tx as never, 'e1')).toEqual([]);
+  });
+
+  it('le tracce per persona arrivate valgono come video, il segnaposto vuoto no', async () => {
+    tx.event.findUnique.mockResolvedValue(evento);
+    tx.postprodArtifact.count.mockResolvedValue(0);
+    tx.recording.findMany.mockResolvedValue([
+      { blobKey: 'recordings/multitrack/e1/', mediaStartedAt: null },
+    ]);
+    expect(await tipiDelleProveEsistenti(tx as never, 'e1')).toEqual([]);
+    tx.recording.findMany.mockResolvedValue([
+      { blobKey: 'recordings/multitrack/e1/', mediaStartedAt: t('09:00') },
+    ]);
+    expect(await tipiDelleProveEsistenti(tx as never, 'e1')).toEqual([
+      'recording',
+      'transcription',
+    ]);
+    expect(tx.recording.findMany.mock.calls[0]![0].where.status).toEqual({ not: 'ARCHIVED' });
+  });
+
+  it('la sola trascrizione tiene la sua prova', async () => {
+    tx.event.findUnique.mockResolvedValue(evento);
+    tx.postprodArtifact.count.mockResolvedValue(1);
+    expect(await tipiDelleProveEsistenti(tx as never, 'e1')).toEqual(['transcription']);
+  });
+});
+
+describe('ritiraProveDelleIscrizioni', () => {
+  const dove = {
+    eventId: 'e1',
+    holderHash: { in: [improntaTitolare('e1', titolareIscrizione('r1'))] },
+    withdrawnAt: null,
+  };
+
+  it('la registrazione porta con se\' la trascrizione', async () => {
+    tx.retainedConsentProof.updateMany
+      .mockResolvedValueOnce({ count: 2 })
+      .mockResolvedValueOnce({ count: 1 });
+    expect(
+      await ritiraProveDelleIscrizioni(cliente, 'e1', ['r1'], { registrazione: true }, ADESSO)
+    ).toEqual({ recording: 2, transcription: 1 });
+    expect(tx.retainedConsentProof.updateMany.mock.calls.map((c) => c[0])).toEqual([
+      { where: { ...dove, kind: 'recording' }, data: { withdrawnAt: ADESSO } },
+      { where: { ...dove, kind: 'transcription' }, data: { withdrawnAt: ADESSO } },
+    ]);
+  });
+
+  it('la trascrizione non tocca la registrazione', async () => {
+    tx.retainedConsentProof.updateMany.mockResolvedValue({ count: 1 });
+    expect(
+      await ritiraProveDelleIscrizioni(cliente, 'e1', ['r1'], { registrazione: false }, ADESSO)
+    ).toEqual({ recording: 0, transcription: 1 });
+    expect(tx.retainedConsentProof.updateMany).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -331,6 +431,21 @@ describe('ritiraProvaConservata', () => {
     tx.retainedConsentProof.updateMany.mockResolvedValue({ count: 0 });
     expect(await ritiraProvaConservata('impronta', 'p1', 'recording', ADESSO)).toBe(true);
     expect(tx.gdprAuditLog.create).not.toHaveBeenCalled();
+  });
+
+  it('si mette in fila con la pulizia prima di ritirare', async () => {
+    tx.retainedConsentProof.findFirst.mockResolvedValue({ eventId: 'e1' });
+    tx.retainedConsentProof.updateMany.mockResolvedValue({ count: 1 });
+    await ritiraProvaConservata('impronta', 'p1', 'transcription', ADESSO);
+    expect(tx.$executeRaw.mock.invocationCallOrder[0]).toBeLessThan(
+      tx.retainedConsentProof.updateMany.mock.invocationCallOrder[0]!
+    );
+  });
+
+  it('puo\' aspettare tutta la pulizia dello stesso evento', async () => {
+    tx.retainedConsentProof.findFirst.mockResolvedValue(null);
+    await ritiraProvaConservata('impronta', 'p1', 'recording', ADESSO);
+    expect(m.transazione.mock.calls[0]![1].timeout).toBeGreaterThan(TIMEOUT_PULIZIA_EVENTO_MS);
   });
 });
 

@@ -13,9 +13,10 @@
  * puntano con SetNull), i messaggi di chat scritti come `reg-<id>` con i loro
  * allegati e reazioni, e le email accodate per quelle iscrizioni.
  *
- * Le prove dei consensi di un video o di una trascrizione pubblicati restano,
- * senza nome, finche' sono pubblicati (lib/gdpr/retained-consent-proofs): si
- * copiano prima che la cascata le porti via. Il video non cambia.
+ * Le prove dei consensi di un video o di una trascrizione che esistono, anche
+ * non ancora pubblicati, restano senza nome finche' esistono
+ * (lib/gdpr/retained-consent-proofs): si copiano prima che la cascata le porti
+ * via. Il video non cambia.
  *
  * Il chiamante ha gia' letto le iscrizioni e dice a quale evento appartengono:
  * mentre aspetta il suo turno una pulizia puo' averle gia' cancellate, e quello
@@ -24,15 +25,12 @@
 import { deleteBlob, isAzureConfigured } from '@/lib/azure/blob-storage';
 import { bloccaTrascrizioneEvento, togliPersoneDalleTrascrizioni } from '@/lib/captions/transcript';
 import { prisma } from '@/lib/db';
+import { TIMEOUT_DOPO_PULIZIA_MS } from '@/lib/gdpr/cleanup-selection';
 import {
   conservaProve,
-  tipiDelleProve,
+  tipiDelleProveEsistenti,
   togliNomeDelleIscrizioni,
 } from '@/lib/gdpr/retained-consent-proofs';
-
-/** La copia delle prove si aggiunge a una transazione gia' lunga, che puo' anche
- *  aspettare le costruzioni della trascrizione e la pulizia dello stesso evento. */
-export const TIMEOUT_CANCELLAZIONE_MS = 30_000;
 
 export interface ErasureCounts {
   registrations: number;
@@ -40,8 +38,8 @@ export interface ErasureCounts {
   questionnaireResponses: number;
   chatMessages: number;
   outboxRows: number;
-  /** Prove dei consensi rimaste, senza nome, per cio' che e' pubblicato: copiate
-   *  qui, o gia' copiate da una pulizia in corso. */
+  /** Prove dei consensi rimaste, senza nome, per cio' che esiste: copiate qui, o
+   *  gia' copiate da una pulizia in corso. */
   consentProofsKept: number;
   /** File allegati che lo storage non ha cancellato: vanno tolti a mano. */
   attachmentFilesNotDeleted: number;
@@ -75,7 +73,7 @@ export async function eraseRegistrations(
     for (const eventId of idEventi) {
       consentProofsKept += await conservaProve(tx, {
         eventId,
-        tipi: await tipiDelleProve(tx, eventId),
+        tipi: await tipiDelleProveEsistenti(tx, eventId),
         registrationIds,
         senzaNome: true,
         adesso,
@@ -137,7 +135,7 @@ export async function eraseRegistrations(
       outboxRows,
       consentProofsKept,
     };
-  }, { timeout: TIMEOUT_CANCELLAZIONE_MS });
+  }, { timeout: TIMEOUT_DOPO_PULIZIA_MS });
 
   // I file allegati si cancellano dopo il commit. Se lo storage non risponde
   // il file resta, senza piu' una riga che lo citi: lo si scrive nel log con il

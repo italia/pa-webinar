@@ -4042,7 +4042,7 @@
         "erasedName": "(baineadh an t-ainm ar iarratas)",
         "unreadableName": "(ní féidir an t-ainm a léamh)"
       },
-      "retainedNote": "Coinnítear {count, plural, one {# chruthúnas} two {# chruthúnas} few {# chruthúnas} many {# gcruthúnas} other {# cruthúnas}} fad a fhanann an físeán nó an tras-scríbhinn foilsithe.",
+      "retainedNote": "Coinnítear {count, plural, one {# chruthúnas} two {# chruthúnas} few {# chruthúnas} many {# gcruthúnas} other {# cruthúnas}} fad atá an físeán nó an tras-scríbhinn ann.",
       "countsNote": "Áirítear daoine: áirítear clárú, cuntas foirne nó nasc ainmnithe uair amháin; áirítear aoi a fhilleann ar chuairt eile arís."
     }
   },
@@ -4559,7 +4559,7 @@
       "consentWithdrawnOn": "Tarraingthe siar ar {date}",
       "consentNoteInRoom": "Má tá tú sa seomra faoi láthair, tá an tarraingt siar i bhfeidhm ó do chéad iontráil eile: chun é a chur i bhfeidhm láithreach, úsáid Toilithe sa seomra.",
       "proofsTitle": "Cruthúnais toilithe atá coinnithe",
-      "proofsIntro": "Scriosadh sonraí na n-imeachtaí seo. Fanann na cruthúnais seo fad atá an físeán nó an tras-scríbhinn foilsithe. Is féidir leat do thoiliú a tharraingt siar: fanann a bhfuil san fhíseán cheana, agus chun é a bhaint ní mór duit scríobh chuig an rialaitheoir sonraí.",
+      "proofsIntro": "Scriosadh sonraí na n-imeachtaí seo. Fanann na cruthúnais seo fad atá an físeán nó an tras-scríbhinn ann. Is féidir leat do thoiliú a tharraingt siar: fanann a bhfuil san fhíseán cheana, agus chun é a bhaint ní mór duit scríobh chuig an rialaitheoir sonraí.",
       "proofGivenOn": "Tugtha ar {date}",
       "proofSuperseded": "Athsholáthraithe ag toiliú níos déanaí",
       "addressBookTitle": "Leabhar seoltaí na n-imeachtaí",
@@ -4579,13 +4579,13 @@
       "linkInvalid": "Tá an nasc neamhbhailí nó imithe in éag. Iarr nasc nua.",
       "confirmWarning": "Tá tú ar tí na sonraí pearsanta a bhaineann le do sheoladh ríomhphoist a scriosadh go buan, seachas a bhfuil luaite thíos.",
       "confirmBody": "Scriosfar clárúcháin, ceisteanna, vótaí pobalbhreithe, aiseolas, meabhrúcháin agus d’iontráil i leabhar seoltaí na n-imeachtaí. Ní féidir an gníomh seo a chealú.",
-      "confirmProofs": "Má tá físeán nó tras-scríbhinn foilsithe ag imeacht, fanann cineál an toilithe, an dáta agus an téacs ar thug tú freagra air, gan d'ainm, fad a fhanann an físeán nó an tras-scríbhinn sin foilsithe. Is chun an toiliú a chruthú atá siad ann. Ní athraíonn an físeán: chun iarraidh go mbainfí do chuid cainte as, scríobh chuig an rialaitheoir sonraí.",
+      "confirmProofs": "Má tá físeán nó tras-scríbhinn ag imeacht, fiú mura bhfuil sé foilsithe fós, fanann cineál an toilithe, an dáta agus an téacs ar thug tú freagra air, gan d'ainm, fad atá an físeán nó an tras-scríbhinn sin ann. Is chun an toiliú a chruthú atá siad ann. Ní athraíonn an físeán: chun iarraidh go mbainfí do chuid cainte as, scríobh chuig an rialaitheoir sonraí.",
       "confirmButton": "Deimhnigh an scriosadh",
       "cancel": "Cealaigh",
       "processing": "Á scriosadh...",
       "doneTitle": "Scriosadh críochnaithe",
       "doneBody": "Clárúcháin scriosta: {count}. Scriosadh na sonraí gaolmhara freisin.",
-      "doneProofs": "{count, plural, one {Fanann # chruthúnas toilithe, gan d'ainm, fad a fhanann an físeán nó an tras-scríbhinn foilsithe.} two {Fanann # chruthúnas toilithe, gan d'ainm, fad a fhanann an físeán nó an tras-scríbhinn foilsithe.} few {Fanann # chruthúnas toilithe, gan d'ainm, fad a fhanann an físeán nó an tras-scríbhinn foilsithe.} many {Fanann # gcruthúnas toilithe, gan d'ainm, fad a fhanann an físeán nó an tras-scríbhinn foilsithe.} other {Fanann # cruthúnas toilithe, gan d'ainm, fad a fhanann an físeán nó an tras-scríbhinn foilsithe.}}",
+      "doneProofs": "{count, plural, one {Fanann # chruthúnas toilithe, gan d'ainm, fad atá an físeán nó an tras-scríbhinn ann.} two {Fanann # chruthúnas toilithe, gan d'ainm, fad atá an físeán nó an tras-scríbhinn ann.} few {Fanann # chruthúnas toilithe, gan d'ainm, fad atá an físeán nó an tras-scríbhinn ann.} many {Fanann # gcruthúnas toilithe, gan d'ainm, fad atá an físeán nó an tras-scríbhinn ann.} other {Fanann # cruthúnas toilithe, gan d'ainm, fad atá an físeán nó an tras-scríbhinn ann.}}",
       "error": "Tharla earráid. Bain triail eile as ar ball, le bhur dtoil.",
       "rateLimited": "An iomarca iarratas. Bain triail eile as i gceann uaire.",
       "back": "Ar ais chuig mo chuid sonraí",

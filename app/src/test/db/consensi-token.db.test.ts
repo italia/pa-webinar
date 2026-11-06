@@ -12,7 +12,7 @@ import { randomUUID } from 'node:crypto';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { POST as chiediToken } from '@/app/api/events/[param]/jitsi/token/route';
-import { encryptPII } from '@/lib/crypto/pii';
+import { encryptPII, hashEmail } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { eventAccessCookieName, signEventAccess } from '@/lib/event-session';
 import type { PeriodoConsenso } from '@/lib/recording/destination';
@@ -313,5 +313,37 @@ describe('le prove senza iscrizione', () => {
       destination: 'REGISTRANTS',
       textVersion: 1,
     });
+  });
+
+  it('le due prove di una concessione portano il legame e l’impronta dell’indirizzo', async () => {
+    const evento = await creaEvento({
+      ...CHE_REGISTRA,
+      multitrackRecordingEnabled: true,
+      recordingDestination: 'REGISTRANTS',
+    });
+    const indirizzo = `${randomUUID()}@example.org`;
+    const concessione = await prisma.eventModerator.create({
+      data: {
+        eventId: evento.id,
+        token: randomUUID(),
+        name: encryptPII('Relatore 1'),
+        email: encryptPII(indirizzo),
+        emailHash: hashEmail(indirizzo),
+        role: 'SPEAKER',
+      },
+    });
+
+    await entra(evento.slug, {
+      moderatorToken: concessione.token,
+      recordingConsent: true,
+      recordingConsentDestination: 'REGISTRANTS',
+      multitrackConsent: true,
+    });
+
+    const legami = { eventModeratorId: concessione.id, emailHash: hashEmail(indirizzo) };
+    expect(await prove(evento.id)).toMatchObject([legami]);
+    expect(
+      await prisma.multitrackConsent.findMany({ where: { eventId: evento.id } })
+    ).toMatchObject([legami]);
   });
 });

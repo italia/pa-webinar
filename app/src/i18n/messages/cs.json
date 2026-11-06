@@ -4042,7 +4042,7 @@
         "erasedName": "(jméno odstraněno na žádost)",
         "unreadableName": "(jméno nelze přečíst)"
       },
-      "retainedNote": "{count, plural, one {# doklad je uchováván} few {# doklady jsou uchovávány} many {# dokladu je uchováváno} other {# dokladů je uchováváno}}, dokud video nebo přepis zůstávají zveřejněné.",
+      "retainedNote": "{count, plural, one {# doklad je uchováván} few {# doklady jsou uchovávány} many {# dokladu je uchováváno} other {# dokladů je uchováváno}}, dokud video nebo přepis existují.",
       "countsNote": "Počítají se osoby: registrace, účet týmu nebo jmenný odkaz se počítají jednou; host, který se vrátí při jiné návštěvě, se počítá znovu."
     }
   },
@@ -4559,7 +4559,7 @@
       "consentWithdrawnOn": "Odvoláno {date}",
       "consentNoteInRoom": "Pokud jste právě v místnosti, odvolání platí od příštího vstupu: aby platilo hned, použijte v místnosti Souhlasy.",
       "proofsTitle": "Uchovávané doklady o souhlasu",
-      "proofsIntro": "Údaje k těmto akcím byly vymazány. Tyto doklady zůstávají, dokud je video nebo přepis zveřejněn. Souhlas můžete odvolat: co už je ve videu, zůstává, a k jeho odstranění musíte napsat správci osobních údajů.",
+      "proofsIntro": "Údaje k těmto akcím byly vymazány. Tyto doklady zůstávají, dokud video nebo přepis existují. Souhlas můžete odvolat: co už je ve videu, zůstává, a k jeho odstranění musíte napsat správci osobních údajů.",
       "proofGivenOn": "Udělen {date}",
       "proofSuperseded": "Nahrazen pozdějším souhlasem",
       "addressBookTitle": "Adresář událostí",
@@ -4579,13 +4579,13 @@
       "linkInvalid": "Tento odkaz je neplatný nebo vypršel. Požádejte o nový odkaz.",
       "confirmWarning": "Chystáte se trvale vymazat osobní údaje spojené s vaší e-mailovou adresou, kromě toho, co je uvedeno níže.",
       "confirmBody": "Budou vymazány registrace, otázky, hlasy v anketách, zpětná vazba, připomenutí a váš záznam v adresáři událostí. Tato operace je nevratná.",
-      "confirmProofs": "Pokud má akce zveřejněné video nebo přepis, zůstane typ souhlasu, datum a text, na který jste odpověděli, bez vašeho jména, dokud toto video nebo přepis zůstávají zveřejněné. Slouží k prokázání souhlasu. Video se nemění: chcete-li požádat o odstranění svých příspěvků, napište správci osobních údajů.",
+      "confirmProofs": "Pokud má akce video nebo přepis, i když ještě nejsou zveřejněné, zůstane typ souhlasu, datum a text, na který jste odpověděli, bez vašeho jména, dokud toto video nebo přepis existují. Slouží k prokázání souhlasu. Video se nemění: chcete-li požádat o odstranění svých příspěvků, napište správci osobních údajů.",
       "confirmButton": "Potvrdit výmaz",
       "cancel": "Zrušit",
       "processing": "Probíhá výmaz...",
       "doneTitle": "Výmaz dokončen",
       "doneBody": "Registrace ({count}) a související údaje byly vymazány.",
-      "doneProofs": "{count, plural, one {Zůstává # doklad o souhlasu, bez vašeho jména, dokud video nebo přepis zůstávají zveřejněné.} few {Zůstávají # doklady o souhlasu, bez vašeho jména, dokud video nebo přepis zůstávají zveřejněné.} many {Zůstává # dokladu o souhlasu, bez vašeho jména, dokud video nebo přepis zůstávají zveřejněné.} other {Zůstává # dokladů o souhlasu, bez vašeho jména, dokud video nebo přepis zůstávají zveřejněné.}}",
+      "doneProofs": "{count, plural, one {Zůstává # doklad o souhlasu, bez vašeho jména, dokud video nebo přepis existují.} few {Zůstávají # doklady o souhlasu, bez vašeho jména, dokud video nebo přepis existují.} many {Zůstává # dokladu o souhlasu, bez vašeho jména, dokud video nebo přepis existují.} other {Zůstává # dokladů o souhlasu, bez vašeho jména, dokud video nebo přepis existují.}}",
       "error": "Došlo k chybě. Zkuste to prosím později.",
       "rateLimited": "Příliš mnoho požadavků. Zkuste to prosím znovu za hodinu.",
       "back": "Zpět na moje údaje",

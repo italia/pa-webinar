@@ -4042,7 +4042,7 @@
         "erasedName": "(vardas pašalintas pagal prašymą)",
         "unreadableName": "(vardas neįskaitomas)"
       },
-      "retainedNote": "{count, plural, one {# įrodymas saugomas} few {# įrodymai saugomi} many {# įrodymo saugoma} other {# įrodymų saugoma}}, kol vaizdo įrašas arba transkripcija yra paskelbti.",
+      "retainedNote": "{count, plural, one {# įrodymas saugomas} few {# įrodymai saugomi} many {# įrodymo saugoma} other {# įrodymų saugoma}}, kol vaizdo įrašas arba transkripcija egzistuoja.",
       "countsNote": "Skaičiuojami asmenys: registracija, darbuotojo paskyra ar vardinė nuoroda skaičiuojamos vieną kartą; svečias, grįžęs kito apsilankymo metu, skaičiuojamas iš naujo."
     }
   },
@@ -4559,7 +4559,7 @@
       "consentWithdrawnOn": "Atšaukta {date}",
       "consentNoteInRoom": "Jei dabar esate salėje, atšaukimas galioja nuo kito įėjimo: kad galiotų iš karto, salėje naudokite Sutikimai.",
       "proofsTitle": "Saugomi sutikimų įrodymai",
-      "proofsIntro": "Šių renginių duomenys ištrinti. Šie įrodymai lieka, kol vaizdo įrašas arba transkripcija yra paskelbti. Sutikimą galite atšaukti: tai, kas jau yra vaizdo įraše, lieka, o norėdami tai pašalinti turite rašyti duomenų valdytojui.",
+      "proofsIntro": "Šių renginių duomenys ištrinti. Šie įrodymai lieka, kol vaizdo įrašas arba transkripcija egzistuoja. Sutikimą galite atšaukti: tai, kas jau yra vaizdo įraše, lieka, o norėdami tai pašalinti turite rašyti duomenų valdytojui.",
       "proofGivenOn": "Duotas {date}",
       "proofSuperseded": "Pakeistas vėlesniu sutikimu",
       "addressBookTitle": "Renginių adresų knyga",
@@ -4579,13 +4579,13 @@
       "linkInvalid": "Nuoroda negalioja arba baigėsi jos galiojimas. Paprašykite naujos nuorodos.",
       "confirmWarning": "Ketinate visam laikui ištrinti su jūsų el. pašto adresu susietus asmens duomenis, išskyrus tai, kas nurodyta toliau.",
       "confirmBody": "Bus ištrintos registracijos, klausimai, balsai apklausose, atsiliepimai, priminimai ir jūsų įrašas renginių adresų knygoje. Šio veiksmo atšaukti negalima.",
-      "confirmProofs": "Jei renginys turi paskelbtą vaizdo įrašą ar transkripciją, sutikimo rūšis, data ir tekstas, į kurį atsakėte, lieka be jūsų vardo, kol tas vaizdo įrašas ar ta transkripcija yra paskelbti. Jie reikalingi sutikimui įrodyti. Vaizdo įrašas nesikeičia: norėdami paprašyti pašalinti savo pasisakymus, rašykite duomenų valdytojui.",
+      "confirmProofs": "Jei renginys turi vaizdo įrašą ar transkripciją, net jei jie dar nepaskelbti, sutikimo rūšis, data ir tekstas, į kurį atsakėte, lieka be jūsų vardo, kol tas vaizdo įrašas ar ta transkripcija egzistuoja. Jie reikalingi sutikimui įrodyti. Vaizdo įrašas nesikeičia: norėdami paprašyti pašalinti savo pasisakymus, rašykite duomenų valdytojui.",
       "confirmButton": "Patvirtinti ištrynimą",
       "cancel": "Atšaukti",
       "processing": "Trinama...",
       "doneTitle": "Ištrynimas baigtas",
       "doneBody": "Ištrinta registracijų: {count}. Ištrinti ir susiję duomenys.",
-      "doneProofs": "{count, plural, one {Lieka # sutikimo įrodymas, be jūsų vardo, kol vaizdo įrašas arba transkripcija yra paskelbti.} few {Lieka # sutikimo įrodymai, be jūsų vardo, kol vaizdo įrašas arba transkripcija yra paskelbti.} many {Lieka # sutikimo įrodymo, be jūsų vardo, kol vaizdo įrašas arba transkripcija yra paskelbti.} other {Lieka # sutikimo įrodymų, be jūsų vardo, kol vaizdo įrašas arba transkripcija yra paskelbti.}}",
+      "doneProofs": "{count, plural, one {Lieka # sutikimo įrodymas, be jūsų vardo, kol vaizdo įrašas arba transkripcija egzistuoja.} few {Lieka # sutikimo įrodymai, be jūsų vardo, kol vaizdo įrašas arba transkripcija egzistuoja.} many {Lieka # sutikimo įrodymo, be jūsų vardo, kol vaizdo įrašas arba transkripcija egzistuoja.} other {Lieka # sutikimo įrodymų, be jūsų vardo, kol vaizdo įrašas arba transkripcija egzistuoja.}}",
       "error": "Įvyko klaida. Bandykite vėliau.",
       "rateLimited": "Per daug užklausų. Bandykite dar kartą po valandos.",
       "back": "Grįžti į mano duomenis",

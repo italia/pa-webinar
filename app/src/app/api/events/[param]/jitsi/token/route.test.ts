@@ -15,7 +15,7 @@ import { describe, it, expect, vi, afterEach, beforeAll, beforeEach } from 'vite
 import { SignJWT, jwtVerify } from 'jose';
 import type { NextRequest } from 'next/server';
 
-import { encryptPII } from '@/lib/crypto/pii';
+import { encryptPII, hashEmail } from '@/lib/crypto/pii';
 import { eventAccessCookieName, signEventAccess } from '@/lib/event-session';
 import { readGravatarRef } from '@/lib/gravatar-ref';
 import { invalidateSettingsCache } from '@/lib/settings';
@@ -51,6 +51,7 @@ vi.mock('@/lib/db', () => ({
     event: { findUnique: vi.fn() },
     registration: { findUnique: vi.fn(), update: vi.fn() },
     eventModerator: { findUnique: vi.fn() },
+    staffAccount: { findUnique: vi.fn() },
     siteSetting: { findUnique: vi.fn() },
     multitrackConsent: { create: vi.fn(), findFirst: vi.fn() },
     recordingConsent: { createMany: vi.fn(), updateMany: vi.fn(async () => ({ count: 0 })), findFirst: vi.fn(async () => null) },
@@ -1002,6 +1003,24 @@ describe('POST jitsi/token — consenso alla registrazione di chi conduce o inte
     vi.mocked(prisma.multitrackConsent.findFirst).mockResolvedValue(null as never);
   });
 
+  it('la prova della trascrizione porta gli stessi legami e l\'impronta', async () => {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(
+      eventRow({ recordingEnabled: true, multitrackRecordingEnabled: true }) as never,
+    );
+    vi.mocked(prisma.eventModerator.findUnique).mockResolvedValue(
+      { ...concessione(), email: encryptPII('Relatrice@Example.org') } as never,
+    );
+    const res = await post({
+      moderatorToken: GRANT_TOKEN,
+      recordingConsent: true,
+      multitrackConsent: true,
+    });
+    expect(res.status).toBe(200);
+    const legami = { eventModeratorId: 'grant-1', emailHash: hashEmail('relatrice@example.org') };
+    expect(righe()[0]).toMatchObject(legami);
+    expect(vi.mocked(prisma.multitrackConsent.create).mock.calls[0]![0].data).toMatchObject(legami);
+  });
+
   it('lega la prova alla concessione nominale', async () => {
     vi.mocked(prisma.event.findUnique).mockResolvedValue(eventRow({ recordingEnabled: true }) as never);
     vi.mocked(prisma.eventModerator.findUnique).mockResolvedValue(concessione() as never);
@@ -1012,11 +1031,16 @@ describe('POST jitsi/token — consenso alla registrazione di chi conduce o inte
 
   it("lega la prova all'account dello staff dietro il link primario", async () => {
     staffSeat.valore = { accountId: 'acc-1', nome: 'Ada Rossi' };
+    vi.mocked(prisma.staffAccount.findUnique).mockResolvedValue({ emailHash: 'd'.repeat(64) } as never);
     try {
       vi.mocked(prisma.event.findUnique).mockResolvedValue(eventRow({ recordingEnabled: true }) as never);
       const res = await post({ moderatorToken: PRIMARY_TOKEN, recordingConsent: true });
       expect(res.status).toBe(200);
-      expect(righe()[0]).toMatchObject({ eventModeratorId: null, staffAccountId: 'acc-1' });
+      expect(righe()[0]).toMatchObject({
+        eventModeratorId: null,
+        staffAccountId: 'acc-1',
+        emailHash: 'd'.repeat(64),
+      });
     } finally {
       staffSeat.valore = null;
     }

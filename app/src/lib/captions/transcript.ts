@@ -669,6 +669,41 @@ export function senzaLePersone(
 }
 
 /**
+ * Le iscrizioni che parlano nelle trascrizioni dai sottotitoli di un evento. Il
+ * legame sta nel corpo cifrato e resta dopo la pulizia, che cancella le iscrizioni
+ * e lascia la trascrizione pubblicata.
+ */
+export async function iscrizioniNelleTrascrizioni(
+  tx: Prisma.TransactionClient,
+  eventId: string,
+): Promise<string[]> {
+  const artefatti = await tx.postprodArtifact.findMany({
+    where: {
+      type: 'TRANSCRIPT_JSON',
+      modelId: CAPTIONS_TRANSCRIPT_MODEL,
+      recording: { eventId },
+    },
+    select: { inlineBody: true, original: { select: { body: true } } },
+  });
+  const iscrizioni = new Set<string>();
+  for (const a of artefatti) {
+    for (const cifrato of [a.inlineBody, a.original?.body]) {
+      const chiaro = cifrato ? tryDecryptPII(cifrato) : null;
+      if (!chiaro) continue;
+      try {
+        const { speakers } = JSON.parse(chiaro) as CorpoTrascrizione;
+        for (const s of speakers ?? []) {
+          if (s.registrationId) iscrizioni.add(s.registrationId);
+        }
+      } catch {
+        // Un corpo illeggibile non nomina nessuno: `senzaLePersone` fa lo stesso.
+      }
+    }
+  }
+  return [...iscrizioni];
+}
+
+/**
  * Chi chiede la cancellazione esce anche dalla trascrizione gia' costruita
  * dai sottotitoli: le sue frasi, il suo nome e la sua voce nell'elenco dei
  * parlanti, nel testo pubblicato e in quello originale conservato alla prima

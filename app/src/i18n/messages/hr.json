@@ -4042,7 +4042,7 @@
         "erasedName": "(ime uklonjeno na zahtjev)",
         "unreadableName": "(ime nije čitljivo)"
       },
-      "retainedNote": "{count, plural, one {# dokaz se čuva} few {# dokaza se čuvaju} other {# dokaza se čuva}} dok videozapis ili transkript ostaju objavljeni.",
+      "retainedNote": "{count, plural, one {# dokaz se čuva} few {# dokaza se čuvaju} other {# dokaza se čuva}} dok videozapis ili transkript postoje.",
       "countsNote": "Broje se osobe: prijava, račun osoblja ili imenska poveznica broje se jednom; gost koji se vrati u drugom posjetu broji se ponovno."
     }
   },
@@ -4559,7 +4559,7 @@
       "consentWithdrawnOn": "Povučeno {date}",
       "consentNoteInRoom": "Ako ste trenutačno u dvorani, povlačenje vrijedi od sljedećeg ulaska: da vrijedi odmah, upotrijebite Privole u dvorani.",
       "proofsTitle": "Sačuvani dokazi o privolama",
-      "proofsIntro": "Podaci o ovim događajima su izbrisani. Ovi dokazi ostaju dok su videozapis ili transkript objavljeni. Možete povući privolu: ono što je već u videozapisu ostaje, a za uklanjanje morate pisati voditelju obrade.",
+      "proofsIntro": "Podaci o ovim događajima su izbrisani. Ovi dokazi ostaju dok videozapis ili transkript postoje. Možete povući privolu: ono što je već u videozapisu ostaje, a za uklanjanje morate pisati voditelju obrade.",
       "proofGivenOn": "Dano {date}",
       "proofSuperseded": "Zamijenjeno kasnijom privolom",
       "addressBookTitle": "Imenik događaja",
@@ -4579,13 +4579,13 @@
       "linkInvalid": "Poveznica nije valjana ili je istekla. Zatražite novu poveznicu.",
       "confirmWarning": "Upravo ćete trajno izbrisati osobne podatke povezane s vašom email adresom, osim onoga što je navedeno u nastavku.",
       "confirmBody": "Bit će izbrisane prijave, pitanja, glasovi u anketama, povratne informacije, podsjetnici i vaš unos u imeniku događaja. Radnja je nepovratna.",
-      "confirmProofs": "Ako događaj ima objavljen videozapis ili transkript, ostaju vrsta privole, datum i tekst na koji ste odgovorili, bez vašeg imena, dok taj videozapis ili transkript ostaju objavljeni. Služe kao dokaz privole. Videozapis se ne mijenja: ako želite zatražiti uklanjanje svojih izlaganja, pišite voditelju obrade.",
+      "confirmProofs": "Ako događaj ima videozapis ili transkript, čak i ako još nisu objavljeni, ostaju vrsta privole, datum i tekst na koji ste odgovorili, bez vašeg imena, dok taj videozapis ili transkript postoje. Služe kao dokaz privole. Videozapis se ne mijenja: ako želite zatražiti uklanjanje svojih izlaganja, pišite voditelju obrade.",
       "confirmButton": "Potvrdi brisanje",
       "cancel": "Odustani",
       "processing": "Brisanje u tijeku...",
       "doneTitle": "Brisanje dovršeno",
       "doneBody": "Broj izbrisanih prijava: {count}. Izbrisani su i povezani podaci.",
-      "doneProofs": "{count, plural, one {Ostao je # dokaz o privoli, bez vašeg imena, dok videozapis ili transkript ostaju objavljeni.} few {Ostala su # dokaza o privoli, bez vašeg imena, dok videozapis ili transkript ostaju objavljeni.} other {Ostalo je # dokaza o privoli, bez vašeg imena, dok videozapis ili transkript ostaju objavljeni.}}",
+      "doneProofs": "{count, plural, one {Ostao je # dokaz o privoli, bez vašeg imena, dok videozapis ili transkript postoje.} few {Ostala su # dokaza o privoli, bez vašeg imena, dok videozapis ili transkript postoje.} other {Ostalo je # dokaza o privoli, bez vašeg imena, dok videozapis ili transkript postoje.}}",
       "error": "Došlo je do pogreške. Molimo pokušajte ponovno kasnije.",
       "rateLimited": "Previše zahtjeva. Molimo pokušajte ponovno za sat vremena.",
       "back": "Natrag na moje podatke",

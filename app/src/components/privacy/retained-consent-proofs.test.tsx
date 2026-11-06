@@ -42,6 +42,7 @@ const monta = (prove: ProvaConservataVista[]) =>
   );
 const pulsanti = (nome: string) =>
   [...container.querySelectorAll('button')].filter((b) => b.textContent?.trim() === nome);
+const elenco = () => container.querySelector('ul')?.textContent;
 const clic = async (nome: string) => {
   await act(async () => {
     pulsanti(nome)[0]?.click();
@@ -121,7 +122,7 @@ describe('RetainedConsentProofs', () => {
     await clic('Ritira il consenso');
     await clic('Ritira');
 
-    expect(container.textContent?.match(/Ritirato il/g)).toHaveLength(2);
+    expect(elenco()?.match(/Ritirato il/g)).toHaveLength(2);
     expect(pulsanti('Ritira il consenso')).toHaveLength(1);
   });
 
@@ -135,7 +136,7 @@ describe('RetainedConsentProofs', () => {
     await clic('Ritira il consenso');
     await clic('Ritira');
 
-    expect(container.textContent?.match(/Ritirato il/g)).toHaveLength(1);
+    expect(elenco()?.match(/Ritirato il/g)).toHaveLength(1);
     expect(pulsanti('Ritira il consenso')).toHaveLength(1);
   });
 
@@ -183,6 +184,49 @@ describe('RetainedConsentProofs', () => {
 
     expect(container.querySelector('[role="alert"]')?.textContent).toBe(testo);
     expect(container.textContent).not.toContain('Ritirato il');
+  });
+
+  it('la conferma prende il fuoco, e «Annulla» lo riporta alla riga', async () => {
+    monta([prova('p1', 'recording')]);
+
+    await clic('Ritira il consenso');
+    expect(document.activeElement).toBe(container.querySelector('[role="group"]'));
+
+    await clic('Annulla');
+    expect(document.activeElement?.textContent).toBe('Evento passato');
+  });
+
+  it('dopo il ritiro il fuoco resta sulla riga e l’esito si annuncia', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('{}', { status: 200 }))
+    );
+    monta([prova('p1', 'recording')]);
+    const annuncio = container.querySelector('[role="status"]');
+    expect(annuncio?.textContent).toBe('');
+
+    await clic('Ritira il consenso');
+    await clic('Ritira');
+
+    expect(document.activeElement?.textContent).toBe('Evento passato');
+    // La zona c'era gia': e' il cambio del testo che si annuncia.
+    expect(container.querySelector('[role="status"]')).toBe(annuncio);
+    expect(annuncio?.textContent).toContain("Registrazione dell'evento");
+    expect(annuncio?.textContent).toContain('Ritirato il');
+  });
+
+  it('dopo un errore il fuoco resta nella conferma', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('{}', { status: 500 }))
+    );
+    monta([prova('p1', 'recording')]);
+
+    await clic('Ritira il consenso');
+    await clic('Ritira');
+
+    expect(document.activeElement).toBe(container.querySelector('[role="group"]'));
+    expect(container.querySelector('[role="status"]')?.textContent).toBe('');
   });
 
   it('una rete che cade lo dice', async () => {

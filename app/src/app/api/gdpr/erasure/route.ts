@@ -16,9 +16,11 @@
  * named grants with that email (with their photos, when no other event
  * uses them), the consents given entering the room with a staff account of
  * that email, and the outbox rows written for those registrations.
- * Le prove dei consensi di un video o di una trascrizione pubblicati restano
- * senza nome e ritirate finche' sono pubblicati, anche quelle gia' conservate
- * di un evento ripulito (lib/gdpr/retained-consent-proofs).
+ * Le prove dei consensi di un video o di una trascrizione che esistono, anche
+ * non ancora pubblicati, restano senza nome e ritirate finche' esistono, comprese
+ * quelle gia' conservate di un evento ripulito (lib/gdpr/retained-consent-proofs).
+ * Le prove della stessa persona date entrando con una concessione o un account
+ * si trovano anche quando la concessione o l'account non ci sono piu'.
  * Recordings tied to the underlying Event are NOT deleted here — they are
  * governed by the event-level retention cron and are subject to separate
  * legal-hold rules.
@@ -31,14 +33,15 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { AppError, RateLimitError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { getClientIp, rateLimit } from '@/lib/rate-limit';
-import { eraseRegistrations, TIMEOUT_CANCELLAZIONE_MS } from '@/lib/gdpr/erase-registrations';
+import { TIMEOUT_DOPO_PULIZIA_MS } from '@/lib/gdpr/cleanup-selection';
+import { eraseRegistrations } from '@/lib/gdpr/erase-registrations';
 import { verifyGdprToken } from '@/lib/gdpr/request-token';
 import { invalidateModeratorCache } from '@/lib/auth/moderator';
 import { bloccaTrascrizioneEvento } from '@/lib/captions/transcript';
 import { deleteUnreferencedPersonPhotos } from '@/lib/events/person-photo-store';
 import {
   conservaProve,
-  tipiDelleProve,
+  tipiDelleProveEsistenti,
   togliNomeDalleProve,
 } from '@/lib/gdpr/retained-consent-proofs';
 
@@ -88,30 +91,43 @@ export const POST = withErrorHandling(async (request) => {
     where: { emailHash },
     select: { id: true, eventId: true, token: true, photoId: true },
   });
-  // Il consenso alla registrazione dato entrando dal link primario con un
-  // account dello staff: l'account resta, la prova porta il nome della persona.
+  // I consensi dati entrando dal link primario con un account dello staff:
+  // l'account resta, la prova porta il nome della persona.
   const account = await prisma.staffAccount.findUnique({
     where: { emailHash },
     select: { id: true },
   });
-  const proveAccount = account
-    ? await prisma.recordingConsent.findMany({
-        where: { staffAccountId: account.id },
-        select: { eventId: true },
-        distinct: ['eventId'],
-      })
-    : [];
-  // Le prove del consenso alla registrazione date entrando con quelle
-  // concessioni o con quell'account (nome cifrato e posto): via con loro, non
-  // solo scollegate. Se l'evento ha un video pubblicato ne resta la copia, senza
-  // nome. Copia e cancellazione vanno insieme: un nuovo tentativo non la
-  // raddoppia.
+  const grantIds = daTogliere.map((g) => g.id);
+  // Le prove di sala della persona: la registrazione e la trascrizione, date
+  // entrando con quelle concessioni o con quell'account, o con un indirizzo la
+  // cui concessione o il cui account non ci sono piu'.
+  const dellaPersona = [
+    { emailHash },
+    { eventModeratorId: { in: grantIds } },
+    ...(account ? [{ staffAccountId: account.id }] : []),
+  ];
+  const [proveRegistrazione, proveTrascrizione] = await Promise.all([
+    prisma.recordingConsent.findMany({
+      where: { OR: dellaPersona },
+      select: { eventId: true },
+      distinct: ['eventId'],
+    }),
+    prisma.multitrackConsent.findMany({
+      where: { OR: dellaPersona },
+      select: { eventId: true },
+      distinct: ['eventId'],
+    }),
+  ]);
+  // Nome cifrato e posto: via con loro, non solo scollegate. Se esiste ancora un
+  // video o una trascrizione ne resta la copia, senza nome. Copia e cancellazione
+  // vanno insieme: un nuovo tentativo non la raddoppia.
   const proveCopiate = new Map<string, number>();
   const eventiConProve = [
-    ...new Set([...daTogliere, ...proveAccount].map((p) => p.eventId)),
+    ...new Set(
+      [...daTogliere, ...proveRegistrazione, ...proveTrascrizione].map((p) => p.eventId)
+    ),
   ].sort();
   if (eventiConProve.length > 0) {
-    const grantIds = daTogliere.map((g) => g.id);
     await prisma.$transaction(async (tx) => {
       // In fila con la pulizia degli stessi eventi, come per le iscrizioni: la
       // stessa prova non si copia due volte, una delle due con il nome.
@@ -119,24 +135,19 @@ export const POST = withErrorHandling(async (request) => {
       for (const eventId of eventiConProve) {
         const copiate = await conservaProve(tx, {
           eventId,
-          tipi: await tipiDelleProve(tx, eventId),
+          tipi: await tipiDelleProveEsistenti(tx, eventId),
           grantIds: daTogliere.filter((g) => g.eventId === eventId).map((g) => g.id),
           staffAccountIds: account ? [account.id] : [],
+          emailHash,
           senzaNome: true,
           adesso,
         });
         if (copiate > 0) proveCopiate.set(eventId, copiate);
       }
-      await tx.recordingConsent.deleteMany({
-        where: {
-          eventId: { in: eventiConProve },
-          OR: [
-            { eventModeratorId: { in: grantIds } },
-            ...(account ? [{ staffAccountId: account.id }] : []),
-          ],
-        },
-      });
-    }, { timeout: TIMEOUT_CANCELLAZIONE_MS });
+      const scelte = { eventId: { in: eventiConProve }, OR: dellaPersona };
+      await tx.recordingConsent.deleteMany({ where: scelte });
+      await tx.multitrackConsent.deleteMany({ where: scelte });
+    }, { timeout: TIMEOUT_DOPO_PULIZIA_MS });
   }
   const grants = await prisma.eventModerator.deleteMany({ where: { emailHash } });
   for (const g of daTogliere) invalidateModeratorCache(g.eventId, g.token);

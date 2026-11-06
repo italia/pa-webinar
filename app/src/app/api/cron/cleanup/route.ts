@@ -13,6 +13,8 @@ import { closeStaleSessions, type OvertimeLimits } from '@/lib/events/call-sessi
 import { OVERTIME_CAP_DEFAULT_MINUTES, OVERTIME_EMPTY_DEFAULT_MINUTES } from '@/lib/events/overtime-defaults';
 import {
   CLEANABLE_EVENT_STATUSES,
+  TIMEOUT_DOPO_PULIZIA_MS,
+  TIMEOUT_PULIZIA_EVENTO_MS,
   UNFINISHED_EVENT_STATUSES,
   isEventEligibleForCleanup,
   isFinishedEventStatus,
@@ -30,7 +32,11 @@ import {
 import { completaImprontaConcessioni } from '@/lib/events/grant-email-hash';
 import { deleteUnreferencedPersonPhotos } from '@/lib/events/person-photo-store';
 import { bloccaTrascrizioneEvento, CAPTIONS_TRANSCRIPT_MODEL } from '@/lib/captions/transcript';
-import { conservaProve, tipiDelleProve } from '@/lib/gdpr/retained-consent-proofs';
+import {
+  conservaProve,
+  tipiDelleProve,
+  tipiDelleProveEsistenti,
+} from '@/lib/gdpr/retained-consent-proofs';
 
 /** Giorni senza iscrizioni dopo cui una foto profilo si cancella. */
 const PROFILE_PHOTO_GRACE_DAYS = 30;
@@ -38,11 +44,6 @@ const PROFILE_PHOTO_GRACE_DAYS = 30;
 /** Giorni dopo cui la foto di una persona dell'evento che nessuno usa (mai
  *  salvata, sostituita, o di un evento cancellato) si cancella. */
 const PERSON_PHOTO_GRACE_DAYS = 7;
-
-/** La transazione di un evento fa decine di istruzioni, e quelle sulle prove
- *  crescono con le persone: il limite predefinito di Prisma (5 secondi) farebbe
- *  fallire ogni giorno un evento grande, che non si ripulirebbe mai. */
-const TIMEOUT_PULIZIA_EVENTO_MS = 60_000;
 
 export const dynamic = 'force-dynamic';
 
@@ -55,7 +56,7 @@ export const dynamic = 'force-dynamic';
  * consents, reactions — and strips every identity from the content that
  * stays with the event (questions, poll votes, words, ratings, end-of-event
  * answers, materials). Le prove dei consensi di un video o di una trascrizione
- * pubblicati si copiano prima e restano finche' sono pubblicati
+ * pubblicati si copiano prima e restano finche' esistono
  * (lib/gdpr/retained-consent-proofs). Ripassa ogni giorno sugli eventi
  * oltre la conservazione: tutto e' idempotente, e cosi' toglie anche cio' che
  * si fosse scritto dopo il primo giro o che un giro fallito avesse lasciato.
@@ -590,6 +591,43 @@ export const GET = withErrorHandling(async (request) => {
     } catch (err) {
       console.error(`[cron/cleanup] Failed to clean event ${evt.id} (${evt.slug}):`, err);
       failures.push(`event:${evt.id}`);
+    }
+  }
+
+  // ── Prove conservate non piu' coperte, sugli eventi ancora in conservazione ──
+  // Una prova nasce anche da una cancellazione chiesta prima della scadenza, e
+  // deve andarsene quando il video e la trascrizione se ne vanno, senza aspettare
+  // la fine della conservazione dell'evento. Fino ad allora non conta se sono
+  // pubblicati: finche' esistono la prova serve.
+  const provePerEvento = await prisma.retainedConsentProof.findMany({
+    where: { eventId: { notIn: toClean.map((evt) => evt.id) } },
+    select: { eventId: true },
+    distinct: ['eventId'],
+  });
+  for (const { eventId } of provePerEvento) {
+    try {
+      totalRetainedConsentProofsDeleted += await prisma.$transaction(async (tx) => {
+        // In fila con chi le copia: lo stato letto qui vale anche per loro.
+        await bloccaTrascrizioneEvento(tx, eventId);
+        const tipi = await tipiDelleProveEsistenti(tx, eventId);
+        const { count } = await tx.retainedConsentProof.deleteMany({
+          where: { eventId, kind: { notIn: tipi } },
+        });
+        if (count > 0) {
+          await tx.gdprAuditLog.create({
+            data: {
+              eventId,
+              action: 'DATA_DELETED',
+              recordCount: count,
+              details: JSON.stringify({ retainedConsentProofs: count }),
+            },
+          });
+        }
+        return count;
+      }, { timeout: TIMEOUT_DOPO_PULIZIA_MS });
+    } catch (err) {
+      console.error(`[cron/cleanup] Failed to clear consent proofs of event ${eventId}:`, err);
+      failures.push(`proofs:${eventId}`);
     }
   }
 

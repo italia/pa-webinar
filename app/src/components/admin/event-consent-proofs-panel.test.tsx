@@ -63,7 +63,7 @@ describe('EventConsentProofsPanel', () => {
   it('dice quante prove sono conservate', async () => {
     await monta({ ...riepilogo, retained: 2 });
     expect(container.textContent).toContain(
-      '2 prove sono conservate finché il video o la trascrizione restano pubblicati.'
+      '2 prove sono conservate finché il video o la trascrizione esistono.'
     );
   });
 

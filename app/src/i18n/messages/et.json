@@ -4042,7 +4042,7 @@
         "erasedName": "(nimi eemaldatud taotluse alusel)",
         "unreadableName": "(nimi pole loetav)"
       },
-      "retainedNote": "{count, plural, one {# tõend säilitatakse} other {# tõendit säilitatakse}} seni, kuni video või transkriptsioon on avaldatud.",
+      "retainedNote": "{count, plural, one {# tõend säilitatakse} other {# tõendit säilitatakse}} seni, kuni video või transkriptsioon on olemas.",
       "countsNote": "Loetakse inimesi: registreerimine, töötaja konto või nimeline link loetakse üks kord; teisel külastusel naasev külaline loetakse uuesti."
     }
   },
@@ -4559,7 +4559,7 @@
       "consentWithdrawnOn": "Tagasi võetud {date}",
       "consentNoteInRoom": "Kui olete praegu ruumis, kehtib tagasivõtmine järgmisest sisenemisest: et see kehtiks kohe, kasutage ruumis nuppu Nõusolekud.",
       "proofsTitle": "Säilitatud nõusolekute tõendid",
-      "proofsIntro": "Nende ürituste andmed on kustutatud. Need tõendid jäävad alles seni, kuni video või transkriptsioon on avaldatud. Võite nõusoleku tagasi võtta: see, mis on juba videos, jääb alles, ja selle eemaldamiseks peate kirjutama vastutavale töötlejale.",
+      "proofsIntro": "Nende ürituste andmed on kustutatud. Need tõendid jäävad alles seni, kuni video või transkriptsioon on olemas. Võite nõusoleku tagasi võtta: see, mis on juba videos, jääb alles, ja selle eemaldamiseks peate kirjutama vastutavale töötlejale.",
       "proofGivenOn": "Antud {date}",
       "proofSuperseded": "Asendatud hilisema nõusolekuga",
       "addressBookTitle": "Ürituste aadressraamat",
@@ -4579,13 +4579,13 @@
       "linkInvalid": "See link on kehtetu või aegunud. Palun taotlege uus link.",
       "confirmWarning": "Olete jäädavalt kustutamas teie e-posti aadressiga seotud isikuandmeid, välja arvatud allpool märgitu.",
       "confirmBody": "Kustutatakse registreerumised, küsimused, küsitluste hääled, tagasiside, meeldetuletused ja teie kirje ürituste aadressraamatus. Toiming on pöördumatu.",
-      "confirmProofs": "Kui üritusel on avaldatud video või transkriptsioon, jäävad nõusoleku liik, kuupäev ja tekst, millele vastasite, alles ilma teie nimeta seni, kuni see video või transkriptsioon on avaldatud. Need on vajalikud nõusoleku tõendamiseks. Video ei muutu: oma sõnavõttude eemaldamise taotlemiseks kirjutage vastutavale töötlejale.",
+      "confirmProofs": "Kui ürituse kohta on olemas video või transkriptsioon, isegi kui seda pole veel avaldatud, jäävad nõusoleku liik, kuupäev ja tekst, millele vastasite, alles ilma teie nimeta seni, kuni see video või transkriptsioon on olemas. Need on vajalikud nõusoleku tõendamiseks. Video ei muutu: oma sõnavõttude eemaldamise taotlemiseks kirjutage vastutavale töötlejale.",
       "confirmButton": "Kinnita kustutamine",
       "cancel": "Tühista",
       "processing": "Kustutamine...",
       "doneTitle": "Kustutamine lõpetatud",
       "doneBody": "Kustutatud registreerumiste arv: {count}. Ka nendega seotud andmed on kustutatud.",
-      "doneProofs": "{count, plural, one {Alles jäi # nõusoleku tõend ilma teie nimeta seni, kuni video või transkriptsioon on avaldatud.} other {Alles jäi # nõusoleku tõendit ilma teie nimeta seni, kuni video või transkriptsioon on avaldatud.}}",
+      "doneProofs": "{count, plural, one {Alles jäi # nõusoleku tõend ilma teie nimeta seni, kuni video või transkriptsioon on olemas.} other {Alles jäi # nõusoleku tõendit ilma teie nimeta seni, kuni video või transkriptsioon on olemas.}}",
       "error": "Tekkis viga. Palun proovige hiljem uuesti.",
       "rateLimited": "Liiga palju päringuid. Palun proovige tunni aja pärast uuesti.",
       "back": "Tagasi minu andmete juurde",

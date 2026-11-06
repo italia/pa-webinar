@@ -479,9 +479,11 @@ describe('leggiRigheProve', () => {
       { eventModeratorId: { in: [] } },
       { staffAccountId: { in: [] } },
     ]);
-    expect(db.multitrackConsent.findMany.mock.calls[0]![0].where.registrationId).toEqual({
-      in: ['r1'],
-    });
+    expect(db.multitrackConsent.findMany.mock.calls[0]![0].where.OR).toEqual([
+      { registrationId: { in: ['r1'] } },
+      { eventModeratorId: { in: [] } },
+      { staffAccountId: { in: [] } },
+    ]);
   });
 
   it('filtra per concessione: restano fuori le prove delle iscrizioni', async () => {
@@ -494,9 +496,11 @@ describe('leggiRigheProve', () => {
       { eventModeratorId: { in: ['g1'] } },
       { staffAccountId: { in: [] } },
     ]);
-    expect(db.multitrackConsent.findMany.mock.calls[0]![0].where.registrationId).toEqual({
-      in: [],
-    });
+    expect(db.multitrackConsent.findMany.mock.calls[0]![0].where.OR).toEqual([
+      { registrationId: { in: [] } },
+      { eventModeratorId: { in: ['g1'] } },
+      { staffAccountId: { in: [] } },
+    ]);
   });
 
   it('filtra per account dello staff: restano fuori le prove delle iscrizioni', async () => {
@@ -509,5 +513,78 @@ describe('leggiRigheProve', () => {
       { eventModeratorId: { in: [] } },
       { staffAccountId: { in: ['s1'] } },
     ]);
+  });
+
+  it('filtra per impronta: trova le prove di chi non ha piu\' concessione o account', async () => {
+    await leggiRigheProve(db as unknown as Parameters<typeof leggiRigheProve>[0], 'e1', {
+      emailHash: 'impronta',
+    });
+    expect(db.registration.findMany.mock.calls[0]![0].where.id).toEqual({ in: [] });
+    for (const tabella of [db.recordingConsent, db.multitrackConsent]) {
+      expect(tabella.findMany.mock.calls[0]![0].where.OR).toContainEqual({
+        emailHash: 'impronta',
+      });
+    }
+  });
+
+  it('la prova della trascrizione di chi conduce si lega come quella della registrazione', async () => {
+    db.registration.findMany.mockResolvedValue([]);
+    db.recordingConsent.findMany.mockResolvedValue([]);
+    db.multitrackConsent.findMany.mockResolvedValue([
+      {
+        displayName: 'cifrato',
+        jitsiUserId: 'mod-e1-aa',
+        registrationId: null,
+        eventModeratorId: 'g1',
+        staffAccountId: null,
+        emailHash: null,
+        locale: 'it',
+        consentedAt: new Date('2026-10-01T09:00:00Z'),
+        withdrawnAt: null,
+        textVersion: 2,
+        registration: null,
+        eventModerator: { emailHash: 'della-concessione' },
+        staffAccount: null,
+      },
+    ]);
+    const [riga] = await leggiRigheProve(
+      db as unknown as Parameters<typeof leggiRigheProve>[0],
+      'e1'
+    );
+    expect(riga).toMatchObject({
+      kind: 'transcription',
+      role: 'host',
+      emailHash: 'della-concessione',
+      holder: 'concessione:g1',
+    });
+  });
+
+  it('l\'impronta scritta con il consenso resta se concessione e account se ne vanno', async () => {
+    db.registration.findMany.mockResolvedValue([]);
+    db.multitrackConsent.findMany.mockResolvedValue([]);
+    db.recordingConsent.findMany.mockResolvedValue([
+      {
+        displayName: 'cifrato',
+        jitsiUserId: 'mod-e1-aa',
+        registrationId: null,
+        eventModeratorId: null,
+        staffAccountId: null,
+        emailHash: 'scritta-sulla-prova',
+        locale: 'it',
+        consentedAt: new Date('2026-10-01T09:00:00Z'),
+        withdrawnAt: null,
+        earlierPeriods: null,
+        destination: 'PUBLIC',
+        textVersion: 1,
+        registration: null,
+        eventModerator: null,
+        staffAccount: null,
+      },
+    ]);
+    const [riga] = await leggiRigheProve(
+      db as unknown as Parameters<typeof leggiRigheProve>[0],
+      'e1'
+    );
+    expect(riga).toMatchObject({ role: 'host', emailHash: 'scritta-sulla-prova' });
   });
 });

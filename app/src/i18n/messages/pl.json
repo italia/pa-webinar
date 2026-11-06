@@ -4042,7 +4042,7 @@
         "erasedName": "(imię i nazwisko usunięte na wniosek)",
         "unreadableName": "(nazwa nieczytelna)"
       },
-      "retainedNote": "{count, plural, one {# dowód jest przechowywany} few {# dowody są przechowywane} many {# dowodów jest przechowywanych} other {# dowodu jest przechowywane}}, dopóki wideo lub transkrypcja pozostają opublikowane.",
+      "retainedNote": "{count, plural, one {# dowód jest przechowywany} few {# dowody są przechowywane} many {# dowodów jest przechowywanych} other {# dowodu jest przechowywane}}, dopóki wideo lub transkrypcja istnieją.",
       "countsNote": "Liczone są osoby: rejestracja, konto personelu lub link imienny liczą się raz; gość, który wraca podczas innej wizyty, liczy się ponownie."
     }
   },
@@ -4559,7 +4559,7 @@
       "consentWithdrawnOn": "Wycofano {date}",
       "consentNoteInRoom": "Jeśli jesteś teraz w sali, wycofanie działa od następnego wejścia: aby zadziałało od razu, użyj Zgody w sali.",
       "proofsTitle": "Zachowane dowody zgód",
-      "proofsIntro": "Dane tych wydarzeń zostały usunięte. Te dowody pozostają, dopóki wideo lub transkrypcja są opublikowane. Możesz wycofać zgodę: to, co jest już w wideo, pozostaje, a aby to usunąć, musisz napisać do administratora danych.",
+      "proofsIntro": "Dane tych wydarzeń zostały usunięte. Te dowody pozostają, dopóki wideo lub transkrypcja istnieją. Możesz wycofać zgodę: to, co jest już w wideo, pozostaje, a aby to usunąć, musisz napisać do administratora danych.",
       "proofGivenOn": "Wyrażono {date}",
       "proofSuperseded": "Zastąpiona późniejszą zgodą",
       "addressBookTitle": "Książka adresowa wydarzeń",
@@ -4579,13 +4579,13 @@
       "linkInvalid": "Link jest nieprawidłowy lub wygasł. Poproś o nowy link.",
       "confirmWarning": "Za chwilę trwale usuniesz dane osobowe powiązane z Twoim adresem e-mail, z wyjątkiem tego, co wskazano poniżej.",
       "confirmBody": "Zostaną usunięte rejestracje, pytania, głosy w ankietach, opinie, przypomnienia oraz Twój wpis w książce adresowej wydarzeń. Tej operacji nie można cofnąć.",
-      "confirmProofs": "Jeśli wydarzenie ma opublikowane wideo lub transkrypcję, pozostają rodzaj zgody, data i tekst, na który odpowiedziałeś(-aś), bez Twojego imienia i nazwiska, dopóki to wideo lub ta transkrypcja pozostają opublikowane. Służą do wykazania zgody. Wideo się nie zmienia: aby poprosić o usunięcie swoich wypowiedzi, napisz do administratora danych.",
+      "confirmProofs": "Jeśli wydarzenie ma wideo lub transkrypcję, nawet jeszcze nieopublikowane, pozostają rodzaj zgody, data i tekst, na który odpowiedziałeś(-aś), bez Twojego imienia i nazwiska, dopóki to wideo lub ta transkrypcja istnieją. Służą do wykazania zgody. Wideo się nie zmienia: aby poprosić o usunięcie swoich wypowiedzi, napisz do administratora danych.",
       "confirmButton": "Potwierdź usunięcie",
       "cancel": "Anuluj",
       "processing": "Usuwanie...",
       "doneTitle": "Usuwanie zakończone",
       "doneBody": "Usunięte rejestracje: {count}, wraz z powiązanymi danymi.",
-      "doneProofs": "{count, plural, one {Pozostaje # dowód zgody, bez Twojego imienia i nazwiska, dopóki wideo lub transkrypcja są opublikowane.} few {Pozostają # dowody zgody, bez Twojego imienia i nazwiska, dopóki wideo lub transkrypcja są opublikowane.} many {Pozostaje # dowodów zgody, bez Twojego imienia i nazwiska, dopóki wideo lub transkrypcja są opublikowane.} other {Pozostaje # dowodu zgody, bez Twojego imienia i nazwiska, dopóki wideo lub transkrypcja są opublikowane.}}",
+      "doneProofs": "{count, plural, one {Pozostaje # dowód zgody, bez Twojego imienia i nazwiska, dopóki wideo lub transkrypcja istnieją.} few {Pozostają # dowody zgody, bez Twojego imienia i nazwiska, dopóki wideo lub transkrypcja istnieją.} many {Pozostaje # dowodów zgody, bez Twojego imienia i nazwiska, dopóki wideo lub transkrypcja istnieją.} other {Pozostaje # dowodu zgody, bez Twojego imienia i nazwiska, dopóki wideo lub transkrypcja istnieją.}}",
       "error": "Wystąpił błąd. Spróbuj ponownie później.",
       "rateLimited": "Zbyt wiele żądań. Spróbuj ponownie za godzinę.",
       "back": "Wróć do moich danych",

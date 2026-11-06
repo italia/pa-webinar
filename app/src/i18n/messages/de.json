@@ -4042,7 +4042,7 @@
         "erasedName": "(Name auf Antrag entfernt)",
         "unreadableName": "(Name nicht lesbar)"
       },
-      "retainedNote": "{count, plural, one {# Einwilligungsnachweis wird} other {# Einwilligungsnachweise werden}} aufbewahrt, solange das Video oder das Transkript veröffentlicht bleibt.",
+      "retainedNote": "{count, plural, one {# Einwilligungsnachweis wird} other {# Einwilligungsnachweise werden}} aufbewahrt, solange das Video oder das Transkript existiert.",
       "countsNote": "Gezählt werden Personen: eine Anmeldung, ein Mitarbeiterkonto oder ein persönlicher Link zählen einmal; ein Gast, der in einem anderen Besuch zurückkehrt, zählt erneut."
     }
   },
@@ -4559,7 +4559,7 @@
       "consentWithdrawnOn": "Widerrufen am {date}",
       "consentNoteInRoom": "Wenn Sie gerade im Raum sind, gilt der Widerruf ab dem nächsten Eintritt: Damit er sofort gilt, nutzen Sie „Einwilligungen“ im Raum.",
       "proofsTitle": "Aufbewahrte Einwilligungsnachweise",
-      "proofsIntro": "Die Daten dieser Veranstaltungen wurden gelöscht. Diese Nachweise bleiben erhalten, solange das Video oder das Transkript veröffentlicht ist. Sie können Ihre Einwilligung widerrufen: Was bereits im Video enthalten ist, bleibt, und um es entfernen zu lassen, müssen Sie an den Verantwortlichen für die Datenverarbeitung schreiben.",
+      "proofsIntro": "Die Daten dieser Veranstaltungen wurden gelöscht. Diese Nachweise bleiben erhalten, solange das Video oder das Transkript existiert. Sie können Ihre Einwilligung widerrufen: Was bereits im Video enthalten ist, bleibt, und um es entfernen zu lassen, müssen Sie an den Verantwortlichen für die Datenverarbeitung schreiben.",
       "proofGivenOn": "Erteilt am {date}",
       "proofSuperseded": "Durch eine spätere Einwilligung ersetzt",
       "addressBookTitle": "Veranstaltungs-Adressbuch",
@@ -4579,13 +4579,13 @@
       "linkInvalid": "Dieser Link ist ungültig oder abgelaufen. Bitte fordern Sie einen neuen Link an.",
       "confirmWarning": "Sie sind im Begriff, die mit Ihrer E-Mail-Adresse verknüpften personenbezogenen Daten endgültig zu löschen, mit Ausnahme der unten genannten.",
       "confirmBody": "Anmeldungen, Fragen, Umfragestimmen, Feedback, Erinnerungen und Ihr Eintrag im Veranstaltungs-Adressbuch werden gelöscht. Dieser Vorgang ist unwiderruflich.",
-      "confirmProofs": "Wenn eine Veranstaltung ein veröffentlichtes Video oder Transkript hat, bleiben die Art der Einwilligung, das Datum und der Text, auf den Sie geantwortet haben, ohne Ihren Namen erhalten, solange dieses Video oder Transkript veröffentlicht bleibt. Sie dienen dem Nachweis der Einwilligung. Das Video ändert sich nicht: Um die Entfernung Ihrer Beiträge zu beantragen, schreiben Sie an den Verantwortlichen für die Datenverarbeitung.",
+      "confirmProofs": "Wenn es zu einer Veranstaltung ein Video oder Transkript gibt, auch wenn es noch nicht veröffentlicht ist, bleiben die Art der Einwilligung, das Datum und der Text, auf den Sie geantwortet haben, ohne Ihren Namen erhalten, solange dieses Video oder Transkript existiert. Sie dienen dem Nachweis der Einwilligung. Das Video ändert sich nicht: Um die Entfernung Ihrer Beiträge zu beantragen, schreiben Sie an den Verantwortlichen für die Datenverarbeitung.",
       "confirmButton": "Löschung bestätigen",
       "cancel": "Abbrechen",
       "processing": "Wird gelöscht...",
       "doneTitle": "Löschung abgeschlossen",
       "doneBody": "{count} Anmeldungen und die zugehörigen Daten wurden gelöscht.",
-      "doneProofs": "{count, plural, one {# Einwilligungsnachweis bleibt ohne Ihren Namen erhalten, solange das Video oder das Transkript veröffentlicht ist.} other {# Einwilligungsnachweise bleiben ohne Ihren Namen erhalten, solange das Video oder das Transkript veröffentlicht ist.}}",
+      "doneProofs": "{count, plural, one {# Einwilligungsnachweis bleibt ohne Ihren Namen erhalten, solange das Video oder das Transkript existiert.} other {# Einwilligungsnachweise bleiben ohne Ihren Namen erhalten, solange das Video oder das Transkript existiert.}}",
       "error": "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
       "rateLimited": "Zu viele Anfragen. Bitte versuchen Sie es in einer Stunde erneut.",
       "back": "Zurück zu meinen Daten",
