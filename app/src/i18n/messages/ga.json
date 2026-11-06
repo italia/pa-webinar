@@ -142,10 +142,7 @@
       "votes": "{count, plural, =0 {gan vóta} one {1 vóta} two {2 vóta} few {# vóta} many {# vóta} other {# vóta}}",
       "topWords": "Na focail is mó a roinneadh",
       "feedback": "Meánrátáil",
-      "feedbackCount": "{count, plural, one {1 freagra} two {2 fhreagra} few {# fhreagra} many {# bhfreagra} other {# freagra}}",
-      "chatQuestions": "Ceisteanna ón gcomhrá",
-      "reactionsCount": "{count, plural, one {1 imoibriú} two {2 imoibriú} few {# imoibriú} many {# n-imoibriú} other {# imoibriú}}",
-      "answered": "freagartha"
+      "feedbackCount": "{count, plural, one {1 freagra} two {2 fhreagra} few {# fhreagra} many {# bhfreagra} other {# freagra}}"
     },
     "detail": {
       "title": "Sonraí an imeachta",
@@ -726,8 +723,6 @@
     "noQuestions": "Gan ceist fós. Bígí ar an gcéad duine!",
     "qaPersistenceNote": "Sábháiltear ceisteanna agus beidh siad ar fáil tar éis an imeachta.",
     "personalDataNotice": "Do not write other people's personal data, or your own if you do not want it made public: the text of your question may appear on the event page, without your name.",
-    "qaPostEvent": "Ceisteanna agus freagraí ón imeacht",
-    "noAnsweredQuestions": "Gan ceist freagartha don imeacht seo.",
     "filterAll": "Gach ceann",
     "showPanel": "Taispeáin Q&A",
     "hidePanel": "Folaigh Q&A",
@@ -3631,7 +3626,6 @@
       },
       "recQ": "Ar mhaith leat a bheith in ann taifeadadh?",
       "rec": {
-        "yes": "Is ea, nuair a bhrúnn tú REC",
         "yesDesc": "Tar éis an imeachta: tras-scríbhinn, achoimre agus aistriúchán",
         "reserved": "Yes, reserved",
         "reservedDesc": "Organizers and registrants can see it",
@@ -3650,7 +3644,6 @@
         "grande": "Níos mó ná 100 duine",
         "tutti": "gach duine ar fhíseán",
         "relatori": "labhraíonn na cainteoirí",
-        "si": "le taifeadadh",
         "riservata": "with reserved recording",
         "pubblica": "with public recording",
         "no": "gan taifeadadh",

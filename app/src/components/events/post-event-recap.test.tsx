@@ -80,7 +80,6 @@ describe('PostEventRecap', () => {
       chatQuestions: [{ text: 'Domanda scritta in chat', reactions: 2, answered: true }],
     });
     expect(container.textContent).not.toContain('Domanda scritta in chat');
-    expect(container.textContent).not.toContain(t.chatQuestions);
   });
 
   it('uno snapshot di versione 1 si disegna', () => {

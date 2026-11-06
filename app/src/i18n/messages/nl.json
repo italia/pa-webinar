@@ -142,10 +142,7 @@
       "votes": "{count, plural, =0 {geen stemmen} one {1 stem} other {# stemmen}}",
       "topWords": "Meest gedeelde woorden",
       "feedback": "Gemiddelde beoordeling",
-      "feedbackCount": "{count, plural, one {1 antwoord} other {# antwoorden}}",
-      "chatQuestions": "Vragen uit de chat",
-      "reactionsCount": "{count, plural, one {1 reactie} other {# reacties}}",
-      "answered": "beantwoord"
+      "feedbackCount": "{count, plural, one {1 antwoord} other {# antwoorden}}"
     },
     "detail": {
       "title": "Evenementdetails",
@@ -726,8 +723,6 @@
     "noQuestions": "Nog geen vragen. Stel de eerste!",
     "qaPersistenceNote": "Vragen worden opgeslagen en zijn beschikbaar na het evenement.",
     "personalDataNotice": "Do not write other people's personal data, or your own if you do not want it made public: the text of your question may appear on the event page, without your name.",
-    "qaPostEvent": "Vragen en antwoorden van het evenement",
-    "noAnsweredQuestions": "Geen beantwoorde vragen voor dit evenement.",
     "filterAll": "Alle",
     "showPanel": "Q&A tonen",
     "hidePanel": "Q&A verbergen",
@@ -3631,7 +3626,6 @@
       },
       "recQ": "Wil je kunnen opnemen?",
       "rec": {
-        "yes": "Ja, wanneer je op REC drukt",
         "yesDesc": "Na het evenement: transcriptie, samenvatting en vertaling",
         "reserved": "Yes, reserved",
         "reservedDesc": "Organizers and registrants can see it",
@@ -3650,7 +3644,6 @@
         "grande": "Meer dan 100 personen",
         "tutti": "iedereen in beeld",
         "relatori": "sprekers aan het woord",
-        "si": "met opname",
         "riservata": "with reserved recording",
         "pubblica": "with public recording",
         "no": "zonder opname",

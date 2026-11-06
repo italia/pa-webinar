@@ -142,10 +142,7 @@
       "votes": "{count, plural, =0 {ei ääniä} one {1 ääni} other {# ääntä}}",
       "topWords": "Eniten jaetut sanat",
       "feedback": "Keskiarvosana",
-      "feedbackCount": "{count, plural, one {1 vastaus} other {# vastausta}}",
-      "chatQuestions": "Kysymykset chatista",
-      "reactionsCount": "{count, plural, one {1 reaktio} other {# reaktiota}}",
-      "answered": "vastattu"
+      "feedbackCount": "{count, plural, one {1 vastaus} other {# vastausta}}"
     },
     "detail": {
       "title": "Tapahtuman tiedot",
@@ -726,8 +723,6 @@
     "noQuestions": "Ei vielä kysymyksiä. Ole ensimmäinen!",
     "qaPersistenceNote": "Kysymykset tallennetaan ja ovat saatavilla tapahtuman jälkeen.",
     "personalDataNotice": "Do not write other people's personal data, or your own if you do not want it made public: the text of your question may appear on the event page, without your name.",
-    "qaPostEvent": "Q&A tapahtumasta",
-    "noAnsweredQuestions": "Ei vastattuja kysymyksiä tähän tapahtumaan.",
     "filterAll": "Kaikki",
     "showPanel": "Näytä Q&A",
     "hidePanel": "Piilota Q&A",
@@ -3631,7 +3626,6 @@
       },
       "recQ": "Haluatko voida tallentaa?",
       "rec": {
-        "yes": "Kyllä, kun painat REC",
         "yesDesc": "Tapahtuman jälkeen: litterointi, tiivistelmä ja käännös",
         "reserved": "Yes, reserved",
         "reservedDesc": "Organizers and registrants can see it",
@@ -3650,7 +3644,6 @@
         "grande": "Yli 100 henkilöä",
         "tutti": "kaikki videolla",
         "relatori": "puhujat puhuvat",
-        "si": "tallenteella",
         "riservata": "with reserved recording",
         "pubblica": "with public recording",
         "no": "ilman tallennetta",

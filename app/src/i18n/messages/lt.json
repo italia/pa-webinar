@@ -142,10 +142,7 @@
       "votes": "{count, plural, =0 {balsų nėra} one {# balsas} few {# balsai} other {# balsų}}",
       "topWords": "Dažniausiai minėti žodžiai",
       "feedback": "Vidutinis įvertinimas",
-      "feedbackCount": "{count, plural, one {# atsakymas} few {# atsakymai} other {# atsakymų}}",
-      "chatQuestions": "Klausimai iš pokalbio",
-      "reactionsCount": "{count, plural, one {# reakcija} few {# reakcijos} other {# reakcijų}}",
-      "answered": "atsakyta"
+      "feedbackCount": "{count, plural, one {# atsakymas} few {# atsakymai} other {# atsakymų}}"
     },
     "detail": {
       "title": "Renginio informacija",
@@ -726,8 +723,6 @@
     "noQuestions": "Klausimų dar nėra. Būkite pirmas!",
     "qaPersistenceNote": "Klausimai yra išsaugomi ir bus prieinami po renginio.",
     "personalDataNotice": "Do not write other people's personal data, or your own if you do not want it made public: the text of your question may appear on the event page, without your name.",
-    "qaPostEvent": "Klausimai ir atsakymai iš renginio",
-    "noAnsweredQuestions": "Šiame renginyje nėra atsakytų klausimų.",
     "filterAll": "Visi",
     "showPanel": "Rodyti Q&A",
     "hidePanel": "Slėpti Q&A",
@@ -3631,7 +3626,6 @@
       },
       "recQ": "Ar norite galėti įrašyti?",
       "rec": {
-        "yes": "Taip, kai paspaudžiate REC",
         "yesDesc": "Po renginio: transkripcija, santrauka ir vertimas",
         "reserved": "Yes, reserved",
         "reservedDesc": "Organizers and registrants can see it",
@@ -3650,7 +3644,6 @@
         "grande": "Daugiau nei 100 žmonių",
         "tutti": "visi vaizdo įraše",
         "relatori": "kalba pranešėjai",
-        "si": "su įrašu",
         "riservata": "with reserved recording",
         "pubblica": "with public recording",
         "no": "be įrašo",

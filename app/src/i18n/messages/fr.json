@@ -142,10 +142,7 @@
       "votes": "{count, plural, =0 {aucun vote} one {1 vote} other {# votes}}",
       "topWords": "Mots les plus partagés",
       "feedback": "Note moyenne",
-      "feedbackCount": "{count, plural, one {# réponse} other {# réponses}}",
-      "chatQuestions": "Questions posées dans le chat",
-      "reactionsCount": "{count, plural, one {1 réaction} other {# réactions}}",
-      "answered": "répondue"
+      "feedbackCount": "{count, plural, one {# réponse} other {# réponses}}"
     },
     "detail": {
       "title": "Détails de l'événement",
@@ -726,8 +723,6 @@
     "noQuestions": "Aucune question pour le moment. Soyez le premier !",
     "qaPersistenceNote": "Les questions sont sauvegardées et seront disponibles après l'événement.",
     "personalDataNotice": "Do not write other people's personal data, or your own if you do not want it made public: the text of your question may appear on the event page, without your name.",
-    "qaPostEvent": "Q&A de l'événement",
-    "noAnsweredQuestions": "Aucune question avec réponse pour cet événement.",
     "filterAll": "Toutes",
     "showPanel": "Afficher Q&A",
     "hidePanel": "Masquer Q&A",
@@ -3631,7 +3626,6 @@
       },
       "recQ": "Voulez-vous pouvoir enregistrer ?",
       "rec": {
-        "yes": "Oui, quand vous appuyez sur REC",
         "yesDesc": "Après l'événement : transcription, synthèse et traduction",
         "reserved": "Yes, reserved",
         "reservedDesc": "Organizers and registrants can see it",
@@ -3650,7 +3644,6 @@
         "grande": "Plus de 100 personnes",
         "tutti": "tout le monde en vidéo",
         "relatori": "les intervenants parlent",
-        "si": "avec enregistrement",
         "riservata": "with reserved recording",
         "pubblica": "with public recording",
         "no": "sans enregistrement",

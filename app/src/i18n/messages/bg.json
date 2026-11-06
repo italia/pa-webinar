@@ -142,10 +142,7 @@
       "votes": "{count, plural, =0 {няма гласове} one {1 глас} other {# гласа}}",
       "topWords": "Най-споделяни думи",
       "feedback": "Средна оценка",
-      "feedbackCount": "{count, plural, one {1 отговор} other {# отговора}}",
-      "chatQuestions": "Въпроси от чата",
-      "reactionsCount": "{count, plural, one {1 реакция} other {# реакции}}",
-      "answered": "отговорен"
+      "feedbackCount": "{count, plural, one {1 отговор} other {# отговора}}"
     },
     "detail": {
       "title": "Детайли за събитието",
@@ -726,8 +723,6 @@
     "noQuestions": "Все още няма въпроси. Бъдете първи!",
     "qaPersistenceNote": "Въпросите се запазват и ще бъдат налични след събитието.",
     "personalDataNotice": "Do not write other people's personal data, or your own if you do not want it made public: the text of your question may appear on the event page, without your name.",
-    "qaPostEvent": "Въпроси и отговори от събитието",
-    "noAnsweredQuestions": "Няма отговорени въпроси за това събитие.",
     "filterAll": "Всички",
     "showPanel": "Показване на Q&A",
     "hidePanel": "Скриване на Q&A",
@@ -3631,7 +3626,6 @@
       },
       "recQ": "Искате ли да можете да записвате?",
       "rec": {
-        "yes": "Да, когато натиснете REC",
         "yesDesc": "След събитието: транскрипция, резюме и превод",
         "reserved": "Yes, reserved",
         "reservedDesc": "Organizers and registrants can see it",
@@ -3650,7 +3644,6 @@
         "grande": "Над 100 души",
         "tutti": "всички на видео",
         "relatori": "говорят говорителите",
-        "si": "със запис",
         "riservata": "with reserved recording",
         "pubblica": "with public recording",
         "no": "без запис",

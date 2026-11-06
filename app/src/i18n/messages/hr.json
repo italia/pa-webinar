@@ -142,10 +142,7 @@
       "votes": "{count, plural, =0 {nema glasova} one {# glas} few {# glasa} other {# glasova}}",
       "topWords": "Najčešće dijeljene riječi",
       "feedback": "Prosječna ocjena",
-      "feedbackCount": "{count, plural, one {# odgovor} few {# odgovora} other {# odgovora}}",
-      "chatQuestions": "Pitanja iz chata",
-      "reactionsCount": "{count, plural, one {# reakcija} few {# reakcije} other {# reakcija}}",
-      "answered": "odgovoreno"
+      "feedbackCount": "{count, plural, one {# odgovor} few {# odgovora} other {# odgovora}}"
     },
     "detail": {
       "title": "Pojedinosti o događaju",
@@ -726,8 +723,6 @@
     "noQuestions": "Još nema pitanja. Budite prvi!",
     "qaPersistenceNote": "Pitanja su spremljena i bit će dostupna nakon događaja.",
     "personalDataNotice": "Do not write other people's personal data, or your own if you do not want it made public: the text of your question may appear on the event page, without your name.",
-    "qaPostEvent": "Pitanja i odgovori s događaja",
-    "noAnsweredQuestions": "Nema odgovorenih pitanja za ovaj događaj.",
     "filterAll": "Sva",
     "showPanel": "Prikaži Q&A",
     "hidePanel": "Sakrij Q&A",
@@ -3631,7 +3626,6 @@
       },
       "recQ": "Želite li moći snimati?",
       "rec": {
-        "yes": "Da, kada pritisnete REC",
         "yesDesc": "Nakon događaja: transkript, sažetak i prijevod",
         "reserved": "Yes, reserved",
         "reservedDesc": "Organizers and registrants can see it",
@@ -3650,7 +3644,6 @@
         "grande": "Više od 100 osoba",
         "tutti": "svi na videu",
         "relatori": "govore govornici",
-        "si": "sa snimanjem",
         "riservata": "with reserved recording",
         "pubblica": "with public recording",
         "no": "bez snimanja",

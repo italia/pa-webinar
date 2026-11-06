@@ -142,10 +142,7 @@
       "votes": "{count, plural, =0 {niciun vot} one {1 vot} few {# voturi} other {# de voturi}}",
       "topWords": "Cele mai frecvente cuvinte",
       "feedback": "Evaluare medie",
-      "feedbackCount": "{count, plural, one {1 răspuns} few {# răspunsuri} other {# de răspunsuri}}",
-      "chatQuestions": "Întrebări din chat",
-      "reactionsCount": "{count, plural, one {1 reacție} few {# reacții} other {# de reacții}}",
-      "answered": "cu răspuns"
+      "feedbackCount": "{count, plural, one {1 răspuns} few {# răspunsuri} other {# de răspunsuri}}"
     },
     "detail": {
       "title": "Detalii eveniment",
@@ -726,8 +723,6 @@
     "noQuestions": "Nicio întrebare încă. Fiți primul!",
     "qaPersistenceNote": "Întrebările sunt salvate și vor fi disponibile după eveniment.",
     "personalDataNotice": "Do not write other people's personal data, or your own if you do not want it made public: the text of your question may appear on the event page, without your name.",
-    "qaPostEvent": "Întrebări și răspunsuri de la eveniment",
-    "noAnsweredQuestions": "Nicio întrebare cu răspuns pentru acest eveniment.",
     "filterAll": "Toate",
     "showPanel": "Afișați Q&A",
     "hidePanel": "Ascundeți Q&A",
@@ -3631,7 +3626,6 @@
       },
       "recQ": "Vrei să poți înregistra?",
       "rec": {
-        "yes": "Da, când apeși REC",
         "yesDesc": "După eveniment: transcriere, rezumat și traducere",
         "reserved": "Yes, reserved",
         "reservedDesc": "Organizers and registrants can see it",
@@ -3650,7 +3644,6 @@
         "grande": "Peste 100 de persoane",
         "tutti": "toți pe video",
         "relatori": "vorbesc vorbitorii",
-        "si": "cu înregistrare",
         "riservata": "with reserved recording",
         "pubblica": "with public recording",
         "no": "fără înregistrare",

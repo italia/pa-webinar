@@ -142,10 +142,7 @@
       "votes": "{count, plural, =0 {nav balsu} zero {# balsu} one {# balss} other {# balsis}}",
       "topWords": "Biežāk minētie vārdi",
       "feedback": "Vidējais vērtējums",
-      "feedbackCount": "{count, plural, zero {# atbilžu} one {# atbilde} other {# atbildes}}",
-      "chatQuestions": "Jautājumi no tērzēšanas",
-      "reactionsCount": "{count, plural, zero {# reakciju} one {# reakcija} other {# reakcijas}}",
-      "answered": "atbildēts"
+      "feedbackCount": "{count, plural, zero {# atbilžu} one {# atbilde} other {# atbildes}}"
     },
     "detail": {
       "title": "Pasākuma informācija",
@@ -726,8 +723,6 @@
     "noQuestions": "Vēl nav jautājumu. Esiet pirmais!",
     "qaPersistenceNote": "Jautājumi tiek saglabāti un būs pieejami pēc pasākuma.",
     "personalDataNotice": "Do not write other people's personal data, or your own if you do not want it made public: the text of your question may appear on the event page, without your name.",
-    "qaPostEvent": "Jautājumi un atbildes no pasākuma",
-    "noAnsweredQuestions": "Šajā pasākumā nav atbildētu jautājumu.",
     "filterAll": "Visi",
     "showPanel": "Rādīt Q&A",
     "hidePanel": "Slēpt Q&A",
@@ -3631,7 +3626,6 @@
       },
       "recQ": "Vai vēlaties ierakstīt?",
       "rec": {
-        "yes": "Jā, kad nospiežat REC",
         "yesDesc": "Pēc pasākuma: transkripcija, kopsavilkums un tulkojums",
         "reserved": "Yes, reserved",
         "reservedDesc": "Organizers and registrants can see it",
@@ -3650,7 +3644,6 @@
         "grande": "Vairāk nekā 100 cilvēku",
         "tutti": "visi video",
         "relatori": "runā runātāji",
-        "si": "ar ierakstu",
         "riservata": "with reserved recording",
         "pubblica": "with public recording",
         "no": "bez ieraksta",

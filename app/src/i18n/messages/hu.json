@@ -142,10 +142,7 @@
       "votes": "{count, plural, =0 {nincs szavazat} one {1 szavazat} other {# szavazat}}",
       "topWords": "Leggyakrabban megosztott szavak",
       "feedback": "Átlagos értékelés",
-      "feedbackCount": "{count, plural, one {1 válasz} other {# válasz}}",
-      "chatQuestions": "Kérdések a chatből",
-      "reactionsCount": "{count, plural, one {1 reakció} other {# reakció}}",
-      "answered": "megválaszolva"
+      "feedbackCount": "{count, plural, one {1 válasz} other {# válasz}}"
     },
     "detail": {
       "title": "Esemény részletei",
@@ -726,8 +723,6 @@
     "noQuestions": "Még nincsenek kérdések. Legyen Ön az első!",
     "qaPersistenceNote": "A kérdések mentésre kerülnek, és az esemény után is elérhetők lesznek.",
     "personalDataNotice": "Do not write other people's personal data, or your own if you do not want it made public: the text of your question may appear on the event page, without your name.",
-    "qaPostEvent": "Kérdések és válaszok az eseményről",
-    "noAnsweredQuestions": "Ehhez az eseményhez nincsenek megválaszolt kérdések.",
     "filterAll": "Összes",
     "showPanel": "Q&A megjelenítése",
     "hidePanel": "Q&A elrejtése",
@@ -3631,7 +3626,6 @@
       },
       "recQ": "Szeretne felvételt készíteni?",
       "rec": {
-        "yes": "Igen, amikor megnyomja a REC gombot",
         "yesDesc": "Az esemény után: átirat, összefoglaló és fordítás",
         "reserved": "Yes, reserved",
         "reservedDesc": "Organizers and registrants can see it",
@@ -3650,7 +3644,6 @@
         "grande": "Több mint 100 fő",
         "tutti": "mindenki videón",
         "relatori": "az előadók beszélnek",
-        "si": "felvétellel",
         "riservata": "with reserved recording",
         "pubblica": "with public recording",
         "no": "felvétel nélkül",

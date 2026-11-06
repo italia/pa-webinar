@@ -142,10 +142,7 @@
       "votes": "{count, plural, =0 {žiadne hlasy} one {1 hlas} few {# hlasy} many {# hlasu} other {# hlasov}}",
       "topWords": "Najčastejšie zdieľané slová",
       "feedback": "Priemerné hodnotenie",
-      "feedbackCount": "{count, plural, one {1 odpoveď} few {# odpovede} many {# odpovede} other {# odpovedí}}",
-      "chatQuestions": "Otázky z chatu",
-      "reactionsCount": "{count, plural, one {1 reakcia} few {# reakcie} many {# reakcie} other {# reakcií}}",
-      "answered": "zodpovedané"
+      "feedbackCount": "{count, plural, one {1 odpoveď} few {# odpovede} many {# odpovede} other {# odpovedí}}"
     },
     "detail": {
       "title": "Detail udalosti",
@@ -726,8 +723,6 @@
     "noQuestions": "Zatiaľ žiadne otázky. Buďte prvý!",
     "qaPersistenceNote": "Otázky sú uložené a budú dostupné aj po skončení udalosti.",
     "personalDataNotice": "Do not write other people's personal data, or your own if you do not want it made public: the text of your question may appear on the event page, without your name.",
-    "qaPostEvent": "Otázky a odpovede z udalosti",
-    "noAnsweredQuestions": "Žiadne zodpovedané otázky k tejto udalosti.",
     "filterAll": "Všetky",
     "showPanel": "Zobraziť Q&A",
     "hidePanel": "Skryť Q&A",
@@ -3631,7 +3626,6 @@
       },
       "recQ": "Chcete mať možnosť nahrávať?",
       "rec": {
-        "yes": "Áno, keď stlačíte REC",
         "yesDesc": "Po podujatí: prepis, zhrnutie a preklad",
         "reserved": "Yes, reserved",
         "reservedDesc": "Organizers and registrants can see it",
@@ -3650,7 +3644,6 @@
         "grande": "Viac ako 100 osôb",
         "tutti": "všetci na videu",
         "relatori": "hovoria rečníci",
-        "si": "so záznamom",
         "riservata": "with reserved recording",
         "pubblica": "with public recording",
         "no": "bez záznamu",

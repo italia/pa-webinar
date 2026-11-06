@@ -142,10 +142,7 @@
       "votes": "{count, plural, =0 {nenhum voto} one {1 voto} other {# votos}}",
       "topWords": "Palavras mais partilhadas",
       "feedback": "Avaliação média",
-      "feedbackCount": "{count, plural, one {1 resposta} other {# respostas}}",
-      "chatQuestions": "Perguntas do chat",
-      "reactionsCount": "{count, plural, one {1 reação} other {# reações}}",
-      "answered": "respondida"
+      "feedbackCount": "{count, plural, one {1 resposta} other {# respostas}}"
     },
     "detail": {
       "title": "Detalhes do evento",
@@ -726,8 +723,6 @@
     "noQuestions": "Ainda não há perguntas. Seja o primeiro!",
     "qaPersistenceNote": "As perguntas são guardadas e estarão disponíveis após o evento.",
     "personalDataNotice": "Do not write other people's personal data, or your own if you do not want it made public: the text of your question may appear on the event page, without your name.",
-    "qaPostEvent": "Perguntas e respostas do evento",
-    "noAnsweredQuestions": "Nenhuma pergunta respondida para este evento.",
     "filterAll": "Todas",
     "showPanel": "Mostrar Q&A",
     "hidePanel": "Ocultar Q&A",
@@ -3631,7 +3626,6 @@
       },
       "recQ": "Quer poder gravar?",
       "rec": {
-        "yes": "Sim, quando carregar em REC",
         "yesDesc": "Depois do evento: transcrição, resumo e tradução",
         "reserved": "Yes, reserved",
         "reservedDesc": "Organizers and registrants can see it",
@@ -3650,7 +3644,6 @@
         "grande": "Mais de 100 pessoas",
         "tutti": "todos em vídeo",
         "relatori": "falam os oradores",
-        "si": "com gravação",
         "riservata": "with reserved recording",
         "pubblica": "with public recording",
         "no": "sem gravação",

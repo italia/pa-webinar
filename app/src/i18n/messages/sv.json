@@ -142,10 +142,7 @@
       "votes": "{count, plural, =0 {inga röster} one {1 röst} other {# röster}}",
       "topWords": "Mest delade ord",
       "feedback": "Genomsnittligt betyg",
-      "feedbackCount": "{count, plural, one {1 svar} other {# svar}}",
-      "chatQuestions": "Frågor från chatten",
-      "reactionsCount": "{count, plural, one {1 reaktion} other {# reaktioner}}",
-      "answered": "besvarad"
+      "feedbackCount": "{count, plural, one {1 svar} other {# svar}}"
     },
     "detail": {
       "title": "Evenemangsdetaljer",
@@ -726,8 +723,6 @@
     "noQuestions": "Inga frågor ännu. Var den första!",
     "qaPersistenceNote": "Frågor sparas och kommer att vara tillgängliga efter evenemanget.",
     "personalDataNotice": "Do not write other people's personal data, or your own if you do not want it made public: the text of your question may appear on the event page, without your name.",
-    "qaPostEvent": "Q&A från evenemanget",
-    "noAnsweredQuestions": "Inga besvarade frågor för detta evenemang.",
     "filterAll": "Alla",
     "showPanel": "Visa Q&A",
     "hidePanel": "Dölj Q&A",
@@ -3631,7 +3626,6 @@
       },
       "recQ": "Vill du kunna spela in?",
       "rec": {
-        "yes": "Ja, när du trycker på REC",
         "yesDesc": "Efter evenemanget: transkription, sammanfattning och översättning",
         "reserved": "Yes, reserved",
         "reservedDesc": "Organizers and registrants can see it",
@@ -3650,7 +3644,6 @@
         "grande": "Fler än 100 personer",
         "tutti": "alla i video",
         "relatori": "talarna talar",
-        "si": "med inspelning",
         "riservata": "with reserved recording",
         "pubblica": "with public recording",
         "no": "utan inspelning",
