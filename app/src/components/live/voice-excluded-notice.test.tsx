@@ -72,6 +72,14 @@ describe('VoiceExcludedNotice', () => {
     expect(container.textContent).toContain(g.recordingNoVideo);
   });
 
+  it("il testo dell'ente scorre da se', e il pulsante ne resta fuori", () => {
+    disegna({ testoConsenso: "Testo dell'ente." });
+    const scatola = container.querySelector<HTMLElement>('.live-listen-only__testo-ente');
+    expect(scatola?.textContent).toBe("Testo dell'ente.");
+    expect(scatola?.tabIndex).toBe(0);
+    expect(scatola?.contains(pulsante())).toBe(false);
+  });
+
   it("il pulsante e' descritto da quel testo, e il clic acconsente", () => {
     const onAcconsenti = disegna({ destinazione: 'PUBLIC' });
     const id = pulsante().getAttribute('aria-describedby');
