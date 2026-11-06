@@ -687,13 +687,16 @@
         "without": {
           "soloAscolto": "Ohne diese Einwilligung hören Sie nur zu: Mikrofon, Kamera und Bildschirm bleiben geschlossen.",
           "conduce": "Ohne diese Einwilligung moderieren Sie trotzdem, aber Ihre Stimme bleibt weder in den Einzelspuren noch im Transkript.",
-          "voce": "Ohne diese Einwilligung nehmen Sie wie alle teil, bleiben aber außerhalb der Aufzeichnung: kein Name, keine Stimme, kein Bild."
+          "voce": "Ohne diese Einwilligung nehmen Sie wie alle teil, bleiben aber außerhalb der Aufzeichnung: kein Name, keine Stimme, kein Bild.",
+          "comeTutti": "Ohne diese Einwilligung nehmen Sie wie alle teil."
         },
         "alreadyRecorded": "Bereits Aufgezeichnetes bleibt im Video der Veranstaltung: Wenden Sie sich für die Entfernung an die Organisatoren.",
         "withdraw": {
           "soloAscolto": "Wenn Sie sie widerrufen, bleiben Sie im Raum und hören nur zu: Mikrofon, Kamera und Bildschirm werden geschlossen. Auch Ihre Einwilligung in die Transkription Ihrer Beiträge wird widerrufen.",
           "conduce": "Wenn Sie sie widerrufen, moderieren Sie weiter, aber ab jetzt bleibt Ihre Stimme weder in den Einzelspuren noch im Transkript. Das Video des Raums zeigt Sie, falls es aufgezeichnet wird, trotzdem.",
-          "voce": "Wenn Sie sie widerrufen, bleiben Sie wie bisher im Raum und sind ab jetzt nicht mehr in der Aufzeichnung. Sie widerrufen auch die Einwilligung zur Transkription Ihrer Beiträge."
+          "voce": "Wenn Sie sie widerrufen, bleiben Sie wie bisher im Raum und sind ab jetzt nicht mehr in der Aufzeichnung. Sie widerrufen auch die Einwilligung zur Transkription Ihrer Beiträge.",
+          "avvertenza": "Wenn Sie sie widerrufen, bleiben Sie wie bisher im Raum. Sie widerrufen auch die Einwilligung zur Transkription Ihrer Beiträge. Wenn Sie das Wort erhalten und das Event aufgezeichnet wird, ist Ihre Stimme trotzdem im Video zu hören.",
+          "assente": "Wenn Sie sie widerrufen, bleiben Sie wie bisher im Raum. Sie widerrufen auch die Einwilligung zur Transkription Ihrer Beiträge. Ab jetzt wird Ihre Stimme nicht mehr auf einer eigenen Spur aufgezeichnet."
         }
       },
       "transcription": {

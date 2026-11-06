@@ -15107,6 +15107,16 @@ button.back-to-top {
     min-width: 16rem;
     line-height: 1.4;
   }
+
+  // Il testo dell'ente puo' essere lungo, e la fascia sta sopra una conferenza che
+  // non scorre: scorre da se', e conferenza e pulsante restano sullo schermo.
+  .live-listen-only__testo-ente {
+    display: block;
+    max-height: 15vh;
+    overflow-y: auto;
+    padding-left: 0.5rem;
+    border-left: 2px solid #f0d58c;
+  }
 }
 
 .people__note {

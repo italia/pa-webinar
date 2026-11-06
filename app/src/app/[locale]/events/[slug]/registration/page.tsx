@@ -155,6 +155,7 @@ export default async function RegistrationPage({
             // alla registrazione e non la annuncia (come la sala d'attesa).
             recordingEnabled={event.recordingEnabled && disponibile}
             recordingDestination={event.recordingDestination}
+            recordingConsentText={event.recordingConsentText}
             multitrackRecordingEnabled={event.multitrackRecordingEnabled}
             captionsTranscript={captionsTranscriptActive(event, settings)}
             trascrizioneVideo={trascrizioneDalVideo(event, settings, disponibile, voce)}

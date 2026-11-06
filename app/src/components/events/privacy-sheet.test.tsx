@@ -363,6 +363,61 @@ describe('schedaInSala, la scheda con i flag di adesso', () => {
     expect(testo).toContain(t.chat.questionsText);
   });
 
+  describe('per chi conduce', () => {
+    const conScheda = (registrazione: Partial<SchedaPrivacy['registrazione']>) =>
+      schedaInSala(
+        {
+          ...accesi,
+          pseudonimi: true,
+          registrazione: { ...accesi.registrazione, ...registrazione },
+        },
+        { sottotitoli: true, chat: true, domande: true, conduce: true }
+      );
+    const g = messages.gdpr.consent;
+
+    it('compare con il proprio nome anche dove il pubblico ha uno pseudonimo', () => {
+      const testo = disegna(conScheda({ chiNonAcconsente: 'restaFuori' }));
+      expect(testo).toContain(t.name.real);
+      expect(testo).not.toContain(t.name.pseudonym);
+    });
+
+    it.each(['soloAscolto', 'avviso'] as const)(
+      'dove la voce resta nel video non legge «%s»: lo riprende comunque',
+      (chiNonAcconsente) => {
+        const testo = disegna(conScheda({ chiNonAcconsente }));
+        expect(testo).toContain(g.recordingOptionalHost);
+        expect(testo).not.toContain(t.recording.refuseListenOnly);
+        expect(testo).not.toContain(t.recording.audienceNotice);
+      }
+    );
+
+    it('dove la voce si toglie dal video resta fuori, senza la promessa al pubblico', () => {
+      const testo = disegna(conScheda({ chiNonAcconsente: 'avvisoVoce' }));
+      expect(testo).toContain(t.recording.refuseOut);
+      expect(testo).not.toContain(t.recording.audienceNoticeVoice);
+    });
+
+    it('dove conduce sempre nella registrazione non legge cosa succede a chi nega', () => {
+      const testo = disegna(conScheda({ chiNonAcconsente: 'restaFuori', conduceSempre: true }));
+      expect(testo).toContain(t.recording.hostsAlways);
+      expect(testo).not.toContain(t.recording.refuseOut);
+      expect(testo).not.toContain(g.recordingOptionalHost);
+    });
+
+    it('la scheda di chi partecipa non cambia', () => {
+      const pubblico = schedaInSala(
+        {
+          ...accesi,
+          pseudonimi: true,
+          registrazione: { ...accesi.registrazione, chiNonAcconsente: 'soloAscolto' },
+        },
+        { sottotitoli: true, chat: true, domande: true }
+      );
+      expect(pubblico.pseudonimi).toBe(true);
+      expect(pubblico.registrazione.chiNonAcconsente).toBe('soloAscolto');
+    });
+  });
+
   it('la rubrica non si promette: in sala non c\'e\' la casella', () => {
     const dopo = conSottotitoli({ ...accesi, rubrica: { mesi: 24 } }, true);
     expect(dopo.rubrica).toBeNull();

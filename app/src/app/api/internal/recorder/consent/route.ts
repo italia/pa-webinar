@@ -7,7 +7,9 @@
  * Se il registratore multitraccia puo' registrare la voce di quell'endpoint:
  * solo se la persona dietro (il posto della conferenza, da Prosody) ha dato
  * il consenso alla trascrizione dei propri interventi, e non e' entrata senza
- * quello alla registrazione. Chi non e' riconosciuto
+ * quello alla registrazione. Dove l'evento trascrive le tracce vale solo il
+ * consenso al testo che comprende la trascrizione (`versioneConsensoTrascrizione`):
+ * chi lascia vuota la casella riproposta non si registra. Chi non e' riconosciuto
  * non si registra: la risposta lo dice (`reason: 'unknown'`), perche' il
  * registratore lo segnali nel log — se nessuno e' riconosciuto, Prosody non
  * sta mandando gli occupanti (mod_pa_occupants).
@@ -15,9 +17,12 @@
  * Auth: CRON_API_KEY (header x-api-key), come gli altri endpoint /internal.
  */
 import { withErrorHandling } from '@/lib/api-handler';
+import { versioneConsensoTrascrizione } from '@/lib/ai/voice-consent';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { consensoTrascrizione, postoDellEndpoint, voceEsclusa } from '@/lib/captions/room';
+import { prisma } from '@/lib/db';
 import { AppError } from '@/lib/errors';
+import { getSettings } from '@/lib/settings';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,6 +39,19 @@ export const GET = withErrorHandling(async (request) => {
   const seatId = await postoDellEndpoint(eventId, endpoint);
   if (!seatId) return Response.json({ record: false, reason: 'unknown' });
   if (await voceEsclusa(eventId, endpoint)) return Response.json({ record: false });
-  const { dato } = await consensoTrascrizione(eventId, seatId, 1);
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+    select: {
+      eventType: true,
+      recordingEnabled: true,
+      multitrackRecordingEnabled: true,
+      captionsTranscriptEnabled: true,
+      liveCaptionsEnabled: true,
+      aiTranscriptEnabled: true,
+    },
+  });
+  if (!event) return Response.json({ record: false, reason: 'unknown' });
+  const versione = versioneConsensoTrascrizione(event, await getSettings());
+  const { dato } = await consensoTrascrizione(eventId, seatId, versione);
   return Response.json({ record: dato });
 });

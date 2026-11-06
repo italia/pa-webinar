@@ -687,13 +687,16 @@
         "without": {
           "soloAscolto": "Fără acest consimțământ doar asculți: microfonul, camera și ecranul rămân închise.",
           "conduce": "Fără acest consimțământ conduci în continuare, dar vocea ta nu rămâne în pistele per persoană și nici în transcriere.",
-          "voce": "Fără acest acord participi ca toți ceilalți, dar rămâi în afara înregistrării: nici numele, nici vocea, nici imaginea."
+          "voce": "Fără acest acord participi ca toți ceilalți, dar rămâi în afara înregistrării: nici numele, nici vocea, nici imaginea.",
+          "comeTutti": "Fără acest acord participi ca toți ceilalți."
         },
         "alreadyRecorded": "Ce a fost deja înregistrat rămâne în videoclipul evenimentului: pentru a-l elimina, scrie organizatorilor.",
         "withdraw": {
           "soloAscolto": "Dacă îl retragi, rămâi în sală doar ca ascultător: microfonul, camera și ecranul se închid. Retragi și consimțământul la transcrierea intervențiilor tale.",
           "conduce": "Dacă îl retragi, continui să conduci, dar de acum vocea ta nu rămâne în pistele per persoană și nici în transcriere. Videoclipul sălii, dacă este înregistrat, te arată în continuare.",
-          "voce": "Dacă îl retragi, rămâi în sală ca înainte, iar de acum ești în afara înregistrării. Retragi și acordul pentru transcrierea intervențiilor tale."
+          "voce": "Dacă îl retragi, rămâi în sală ca înainte, iar de acum ești în afara înregistrării. Retragi și acordul pentru transcrierea intervențiilor tale.",
+          "avvertenza": "Dacă îl retragi, rămâi în sală ca înainte. Retragi și acordul pentru transcrierea intervențiilor tale. Dacă primești cuvântul și evenimentul este înregistrat, vocea ta rămâne totuși în videoclip.",
+          "assente": "Dacă îl retragi, rămâi în sală ca înainte. Retragi și acordul pentru transcrierea intervențiilor tale. De acum vocea ta nu mai este înregistrată pe o pistă separată."
         }
       },
       "transcription": {

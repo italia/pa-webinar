@@ -6,6 +6,7 @@
 import { useId } from 'react';
 import { useTranslations } from 'next-intl';
 
+import TestoEnteFascia from '@/components/live/testo-ente-fascia';
 import { Icon } from '@/components/ui/icon';
 import { testoConsensoEvento, type VoceNelVideo } from '@/lib/live/consent-rule';
 import { chiaveConsenso, type Destinazione } from '@/lib/recording/destination';
@@ -52,7 +53,7 @@ export default function VoiceExcludedNotice({
       />
       <p className="mb-0 flex-grow-1">
         <strong>{t('title')}</strong> {t('body')}
-        {testoEvento && <span className="d-block small mt-1">{testoEvento}</span>}
+        {testoEvento && <TestoEnteFascia testo={testoEvento} />}
         <span id={idTesto} className="d-block small mt-1">
           {tGdpr(chiaveConsenso(destinazione, voce))}
         </span>

@@ -161,6 +161,11 @@ describe('pagina di iscrizione: consensi passati al modulo', () => {
     });
   });
 
+  it("passa il testo che l'ente ha scelto per l'evento", async () => {
+    evento({ recordingConsentText: 'Testo scelto per evento' });
+    expect((await propsDelModulo()).recordingConsentText).toBe('Testo scelto per evento');
+  });
+
   it('senza destinazione dichiarata passa null, non un valore di partenza', async () => {
     expect((await propsDelModulo()).recordingDestination).toBeNull();
   });

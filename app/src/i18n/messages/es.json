@@ -687,13 +687,16 @@
         "without": {
           "soloAscolto": "Sin este consentimiento sigues solo escuchando: micrófono, cámara y pantalla permanecen cerrados.",
           "conduce": "Sin este consentimiento conduces igualmente, pero tu voz no queda en las pistas por persona ni en la transcripción.",
-          "voce": "Sin este consentimiento participas como todos, pero quedas fuera de la grabación: ni nombre, ni voz, ni imagen."
+          "voce": "Sin este consentimiento participas como todos, pero quedas fuera de la grabación: ni nombre, ni voz, ni imagen.",
+          "comeTutti": "Sin este consentimiento participas como todos."
         },
         "alreadyRecorded": "Lo que ya se ha grabado queda en el vídeo del evento: para que lo quiten, escribe a quien lo organiza.",
         "withdraw": {
           "soloAscolto": "Si lo retiras, sigues en la sala solo escuchando: micrófono, cámara y pantalla se cierran. También retiras el consentimiento a la transcripción de tus intervenciones.",
           "conduce": "Si lo retiras, sigues conduciendo, pero desde ahora tu voz no queda en las pistas por persona ni en la transcripción. El vídeo de la sala, si se graba, te muestra igualmente.",
-          "voce": "Si lo retiras sigues en la sala como antes, y desde ahora estás fuera de la grabación. También retiras el consentimiento a la transcripción de tus intervenciones."
+          "voce": "Si lo retiras sigues en la sala como antes, y desde ahora estás fuera de la grabación. También retiras el consentimiento a la transcripción de tus intervenciones.",
+          "avvertenza": "Si lo retiras sigues en la sala como antes. También retiras el consentimiento a la transcripción de tus intervenciones. Si te dan la palabra y el evento se graba, tu voz sigue estando en el vídeo.",
+          "assente": "Si lo retiras sigues en la sala como antes. También retiras el consentimiento a la transcripción de tus intervenciones. Desde ahora tu voz no se graba en una pista aparte."
         }
       },
       "transcription": {

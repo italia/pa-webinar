@@ -428,8 +428,7 @@ describe('i nomi della trascrizione pubblica', () => {
     const { inputs } = (await presa.json()) as {
       inputs: { role: string; participantId: string; displayName: string | null }[];
     };
-    const traccia = inputs.find((i) => i.role === 'track')!;
-    expect(traccia.participantId).toBe(endpoint);
+    const traccia = inputs.find((i) => i.role === 'track');
 
     const lavoro = await creaLavoro(rec.id, 'DONE');
     await prisma.postprodArtifact.create({
@@ -451,27 +450,27 @@ describe('i nomi della trascrizione pubblica', () => {
       data: {
         recordingId: rec.id,
         diarLabel: endpoint,
-        displayName: traccia.displayName,
+        displayName: traccia?.displayName ?? null,
       },
     });
-    return { evento, nomeAlWorker: traccia.displayName };
+    return { evento, endpoint, traccia };
   }
 
-  it('tracce su video nuovo, consenso al testo vecchio: il nome non arriva da nessuna parte', async () => {
-    const { evento, nomeAlWorker } = await dalleTracce(1);
-    expect(nomeAlWorker).toBeNull();
+  it('tracce su video nuovo, consenso al testo vecchio: non si trascrivono e il nome non si mostra', async () => {
+    const { evento, traccia } = await dalleTracce(1);
+    expect(traccia).toBeUndefined();
     expect(await nomeMostrato(evento.slug)).toBe('Voce 1');
   });
 
   it('tracce su video nuovo, consenso al testo che comprende il nome: si mostra', async () => {
-    const { evento, nomeAlWorker } = await dalleTracce(2);
-    expect(nomeAlWorker).toBe(NOME);
+    const { evento, endpoint, traccia } = await dalleTracce(2);
+    expect(traccia).toMatchObject({ participantId: endpoint, displayName: NOME });
     expect(await nomeMostrato(evento.slug)).toBe(NOME);
   });
 
   it('tracce nate prima della regola: il nome resta con il testo vecchio', async () => {
-    const { evento, nomeAlWorker } = await dalleTracce(1, false);
-    expect(nomeAlWorker).toBe(NOME);
+    const { evento, endpoint, traccia } = await dalleTracce(1, false);
+    expect(traccia).toMatchObject({ participantId: endpoint, displayName: NOME });
     expect(await nomeMostrato(evento.slug)).toBe(NOME);
   });
 });

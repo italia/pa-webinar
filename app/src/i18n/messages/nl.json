@@ -687,13 +687,16 @@
         "without": {
           "soloAscolto": "Zonder deze toestemming luister je alleen mee: microfoon, camera en scherm blijven dicht.",
           "conduce": "Zonder deze toestemming leid je gewoon, maar je stem blijft niet in de sporen per persoon of in de transcriptie.",
-          "voce": "Zonder deze toestemming neem je deel zoals iedereen, maar blijf je buiten de opname: geen naam, stem of beeld."
+          "voce": "Zonder deze toestemming neem je deel zoals iedereen, maar blijf je buiten de opname: geen naam, stem of beeld.",
+          "comeTutti": "Zonder deze toestemming neem je deel zoals iedereen."
         },
         "alreadyRecorded": "Wat al is opgenomen, blijft in de video van het evenement: schrijf de organisatoren om het te laten verwijderen.",
         "withdraw": {
           "soloAscolto": "Als je hem intrekt, blijf je in de zaal en luister je alleen mee: microfoon, camera en scherm gaan dicht. Je toestemming voor de transcriptie van je bijdragen wordt ook ingetrokken.",
           "conduce": "Als je hem intrekt, blijf je leiden, maar vanaf nu blijft je stem niet in de sporen per persoon of in de transcriptie. De video van de zaal, als die wordt opgenomen, laat je toch zien.",
-          "voce": "Als je intrekt, blijf je in de zaal zoals eerst en sta je vanaf nu buiten de opname. Je trekt ook de toestemming voor het transcript van je bijdragen in."
+          "voce": "Als je intrekt, blijf je in de zaal zoals eerst en sta je vanaf nu buiten de opname. Je trekt ook de toestemming voor het transcript van je bijdragen in.",
+          "avvertenza": "Als je intrekt, blijf je in de zaal zoals eerst. Je trekt ook de toestemming voor het transcript van je bijdragen in. Als je het woord krijgt en het evenement wordt opgenomen, blijft je stem wel in de video.",
+          "assente": "Als je intrekt, blijf je in de zaal zoals eerst. Je trekt ook de toestemming voor het transcript van je bijdragen in. Vanaf nu wordt je stem niet op een apart spoor opgenomen."
         }
       },
       "transcription": {

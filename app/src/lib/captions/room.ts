@@ -106,7 +106,8 @@ export interface ConsensoTrascrizione {
  *
  * `versioneMinima` e' la versione del testo che il consenso deve avere
  * (lib/registration/consents): la trascrizione dai sottotitoli, con il nome,
- * chiede quella che la comprende; la traccia audio vale con ogni versione.
+ * chiede quella che la comprende; la sola traccia audio, che non si trascrive,
+ * vale con ogni versione (`versioneConsensoTrascrizione`, lib/ai/voice-consent).
  */
 export async function consensoTrascrizione(
   eventId: string,

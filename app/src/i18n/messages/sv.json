@@ -687,13 +687,16 @@
         "without": {
           "soloAscolto": "Utan detta samtycke lyssnar du bara: mikrofon, kamera och skärm förblir stängda.",
           "conduce": "Utan detta samtycke leder du ändå, men din röst sparas inte i spåren per person eller i transkriptionen.",
-          "voce": "Utan detta samtycke deltar du som alla andra, men står utanför inspelningen: varken namn, röst eller bild."
+          "voce": "Utan detta samtycke deltar du som alla andra, men står utanför inspelningen: varken namn, röst eller bild.",
+          "comeTutti": "Utan detta samtycke deltar du som alla andra."
         },
         "alreadyRecorded": "Det som redan har spelats in finns kvar i evenemangets video: skriv till arrangörerna för att få det borttaget.",
         "withdraw": {
           "soloAscolto": "Om du återkallar det stannar du i rummet och lyssnar bara: mikrofon, kamera och skärm stängs. Ditt samtycke till transkription av dina inlägg återkallas också.",
           "conduce": "Om du återkallar det fortsätter du leda, men från och med nu sparas din röst inte i spåren per person eller i transkriptionen. Rummets video visar dig ändå om den spelas in.",
-          "voce": "Om du återkallar det är du kvar i rummet som förut, och från nu står du utanför inspelningen. Du återkallar också samtycket till utskrift av dina inlägg."
+          "voce": "Om du återkallar det är du kvar i rummet som förut, och från nu står du utanför inspelningen. Du återkallar också samtycket till utskrift av dina inlägg.",
+          "avvertenza": "Om du återkallar det är du kvar i rummet som förut. Du återkallar också samtycket till utskrift av dina inlägg. Om du får ordet och evenemanget spelas in finns din röst ändå kvar i videon.",
+          "assente": "Om du återkallar det är du kvar i rummet som förut. Du återkallar också samtycket till utskrift av dina inlägg. Från och med nu spelas din röst inte in på ett eget spår."
         }
       },
       "transcription": {

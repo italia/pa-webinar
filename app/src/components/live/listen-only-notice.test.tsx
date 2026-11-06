@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: EUPL-1.2
 // SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
 
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
 import { act, type ComponentProps } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { NextIntlClientProvider } from 'next-intl';
@@ -62,6 +65,31 @@ describe('ListenOnlyNotice', () => {
     expect(container.textContent).toContain(g.recording);
     disegna({ destinazione: 'PUBLIC', voce: 'assente' });
     expect(container.textContent).toContain(g.recordingNoVideo);
+  });
+
+  it("il testo scelto dall'ente sta sopra il pulsante, dove un video c'e'", () => {
+    disegna({ testoConsenso: 'Testo scelto per evento', destinazione: 'PUBLIC' });
+    expect(container.textContent).toContain('Testo scelto per evento');
+    disegna({ testoConsenso: 'Testo scelto per evento', voce: 'assente' });
+    expect(container.textContent).not.toContain('Testo scelto per evento');
+  });
+
+  it("il testo dell'ente scorre da se', e il pulsante ne resta fuori", () => {
+    disegna({ testoConsenso: 'Testo scelto per evento' });
+    const scatola = container.querySelector<HTMLElement>('.live-listen-only__testo-ente');
+    expect(scatola?.textContent).toBe('Testo scelto per evento');
+    expect(scatola?.tabIndex).toBe(0);
+    expect(scatola?.getAttribute('aria-label')).toBe(messages.live.consents.recording.title);
+    expect(scatola?.contains(pulsante())).toBe(false);
+    expect(scatola?.textContent).not.toContain(g.recording);
+  });
+
+  it("l'altezza del testo dell'ente ha un limite che scorre", () => {
+    const regola = /\.live-listen-only__testo-ente \{([^}]*)\}/.exec(
+      readFileSync(resolve(__dirname, '../../styles/globals.scss'), 'utf8')
+    )?.[1];
+    expect(regola).toMatch(/max-height: \d+vh;/);
+    expect(regola).toContain('overflow-y: auto;');
   });
 
   it("il pulsante e' descritto da quel testo, e il clic acconsente", () => {

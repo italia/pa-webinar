@@ -5,16 +5,19 @@
  * Il consenso alla registrazione dato entrando in sala, su un database vero: la
  * prova unica dell'iscrizione, il suo aggiornamento quando il testo in vigore
  * non e' piu' coperto, e due ingressi insieme. Un client simulato non vede il
- * vincolo unico, il filtro sulla colonna nulla ne' il JSON dei periodi.
+ * vincolo unico, il filtro sulla colonna nulla ne' il JSON dei periodi. Le
+ * repliche che la pagina manda a ogni rientro non ridanno mai un consenso ritirato.
  */
 import { randomUUID } from 'node:crypto';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { POST as chiediToken } from '@/app/api/events/[param]/jitsi/token/route';
+import { consensoTrascrizione } from '@/lib/captions/room';
 import { encryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { eventAccessCookieName, signEventAccess } from '@/lib/event-session';
+import { ritiraConsensi } from '@/lib/live/consent-withdrawal';
 import type { PeriodoConsenso } from '@/lib/recording/destination';
 
 import { biscotti } from './biscotti';
@@ -29,9 +32,11 @@ beforeEach(async () => {
 afterEach(() => vi.unstubAllEnvs());
 
 interface RispostaToken {
+  jwt: string;
   voiceExcluded: boolean;
   recordingDestination: string | null;
   consentsRecorded: { recording: boolean; multitrack: boolean };
+  consentsInForce: { recording: boolean; transcription: boolean };
 }
 
 async function entra(
@@ -266,6 +271,136 @@ describe('la prova dell’iscrizione quando il testo in vigore cambia', () => {
     const [prova, ...altre] = await prove(evento.id);
     expect(altre).toEqual([]);
     expect(prova).toMatchObject({ destination: 'PUBLIC', textVersion: 1 });
+  });
+});
+
+describe('la replica di un consenso gia dato', () => {
+  const CON_TRACCE = { ...CHE_REGISTRA, multitrackRecordingEnabled: true };
+  const tracce = (eventId: string) =>
+    prisma.multitrackConsent.findMany({ where: { eventId } });
+  const posto = (jwt: string) =>
+    (JSON.parse(Buffer.from(jwt.split('.')[1]!, 'base64url').toString()) as {
+      context: { user: { id: string } };
+    }).context.user.id;
+
+  it('un ritiro dalla pagina dei propri dati resta tale al rientro nella stessa visita', async () => {
+    const evento = await creaEvento(CON_TRACCE);
+    const iscrizione = await iscrittoDa(evento.id);
+    const primo = await entra(evento.slug, {
+      accessToken: iscrizione.accessToken,
+      recordingConsent: true,
+      recordingConsentDestination: null,
+      multitrackConsent: true,
+    });
+    expect(primo.consentsInForce).toEqual({ recording: true, transcription: true });
+    await ritiraConsensi(evento.id, [], { registrazione: true }, new Date(), {
+      iscrizioni: [iscrizione.id],
+      origine: 'self-service',
+    });
+    const [ritirata] = await prove(evento.id);
+    const [ritirataTraccia] = await tracce(evento.id);
+
+    const rientro = await entra(evento.slug, {
+      accessToken: iscrizione.accessToken,
+      consentReplay: { recording: true, multitrack: true, roomTokens: [primo.jwt] },
+    });
+
+    expect(rientro.voiceExcluded).toBe(true);
+    expect(rientro.consentsRecorded).toEqual({ recording: false, multitrack: false });
+    expect(rientro.consentsInForce).toEqual({ recording: false, transcription: false });
+    expect(await prove(evento.id)).toEqual([ritirata]);
+    expect(await tracce(evento.id)).toEqual([ritirataTraccia]);
+    expect(await registro(evento.id)).toBe(0);
+  });
+
+  it('solo un clic ridà il consenso ritirato', async () => {
+    const evento = await creaEvento(CHE_REGISTRA);
+    const iscrizione = await iscrittoDa(evento.id);
+    await provaEsistente(evento.id, iscrizione.id, {
+      destination: null,
+      withdrawnAt: new Date('2026-11-02T10:00:00Z'),
+    });
+
+    const risposta = await entra(evento.slug, {
+      accessToken: iscrizione.accessToken,
+      recordingConsent: true,
+      recordingConsentDestination: null,
+    });
+
+    expect(risposta.voiceExcluded).toBe(false);
+    expect((await prove(evento.id))[0]!.withdrawnAt).toBeNull();
+    expect(await registro(evento.id)).toBe(1);
+  });
+
+  it('l ospite che rientra porta sul posto nuovo la prova di prima, con la sua data', async () => {
+    const evento = await creaEvento(CON_TRACCE);
+    const primo = await entra(evento.slug, {
+      guestName: 'Ospite',
+      recordingConsent: true,
+      recordingConsentDestination: null,
+      multitrackConsent: true,
+    });
+    const [provaPrima] = await prove(evento.id);
+
+    const rientro = await entra(evento.slug, {
+      guestName: 'Ospite',
+      consentReplay: { recording: true, multitrack: true, roomTokens: [primo.jwt] },
+    });
+
+    expect(rientro.voiceExcluded).toBe(false);
+    expect(rientro.consentsInForce).toEqual({ recording: true, transcription: true });
+    const nuova = await prisma.recordingConsent.findFirstOrThrow({
+      where: { eventId: evento.id, jitsiUserId: posto(rientro.jwt) },
+    });
+    expect(nuova.consentedAt).toEqual(provaPrima!.consentedAt);
+    expect(nuova.destination).toBe(provaPrima!.destination);
+    const traccia = await prisma.multitrackConsent.findFirstOrThrow({
+      where: { eventId: evento.id, jitsiUserId: posto(rientro.jwt) },
+    });
+    expect(traccia.textVersion).toBe(2);
+    expect((await consensoTrascrizione(evento.id, posto(rientro.jwt), 2)).dato).toBe(true);
+    expect(await registro(evento.id)).toBe(0);
+  });
+
+  it('dopo il ritiro la replica dell ospite non crea e non fa rivivere niente', async () => {
+    const evento = await creaEvento(CON_TRACCE);
+    const primo = await entra(evento.slug, {
+      guestName: 'Ospite',
+      recordingConsent: true,
+      recordingConsentDestination: null,
+      multitrackConsent: true,
+    });
+    await ritiraConsensi(evento.id, [posto(primo.jwt)], { registrazione: true });
+
+    const rientro = await entra(evento.slug, {
+      guestName: 'Ospite',
+      consentReplay: { recording: true, multitrack: true, roomTokens: [primo.jwt] },
+    });
+
+    expect(rientro.voiceExcluded).toBe(true);
+    expect(rientro.consentsInForce).toEqual({ recording: false, transcription: false });
+    expect(await prove(evento.id)).toHaveLength(1);
+    expect((await prove(evento.id))[0]!.withdrawnAt).not.toBeNull();
+    expect(await tracce(evento.id)).toHaveLength(1);
+    expect((await tracce(evento.id))[0]!.withdrawnAt).not.toBeNull();
+  });
+
+  it('il token di un altro evento non prova niente', async () => {
+    const altro = await creaEvento(CON_TRACCE);
+    const dAltrove = await entra(altro.slug, {
+      guestName: 'Ospite',
+      recordingConsent: true,
+      recordingConsentDestination: null,
+    });
+    const evento = await creaEvento(CON_TRACCE);
+
+    const risposta = await entra(evento.slug, {
+      guestName: 'Ospite',
+      consentReplay: { recording: true, roomTokens: [dAltrove.jwt] },
+    });
+
+    expect(risposta.voiceExcluded).toBe(true);
+    expect(await prove(evento.id)).toEqual([]);
   });
 });
 

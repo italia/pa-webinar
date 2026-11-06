@@ -254,6 +254,25 @@ describe('RegistrationFormClient — il testo della casella segue la destinazion
     },
   );
 
+  it("il testo scelto dall'ente sta accanto alla casella, dove un video c'e'", () => {
+    disegnaCon({
+      ...SPUNTA_REGISTRAZIONE,
+      recordingConsentText: 'Testo scelto per evento',
+      voce: 'fissa',
+    });
+    expect(container.textContent).toContain('Testo scelto per evento');
+    expect(
+      container.querySelector('#consentRecording')?.getAttribute('aria-describedby')
+    ).toContain('consentRecordingEvento');
+
+    disegnaCon({
+      ...SPUNTA_REGISTRAZIONE,
+      recordingConsentText: 'Testo scelto per evento',
+      voce: 'assente',
+    });
+    expect(container.textContent).not.toContain('Testo scelto per evento');
+  });
+
   it('manda il testo mostrato anche senza la spunta', async () => {
     disegnaCon({ ...SPUNTA_REGISTRAZIONE, recordingDestination: 'PUBLIC', voce: 'fissa' });
     await iscriviti();

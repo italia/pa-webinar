@@ -55,9 +55,16 @@ export type DestinazioneScheda = RecordingAudience | 'nonDichiarata';
  *  - `soloAscolto`: la voce non si toglie dal video, quindi partecipa ascoltando;
  *  - `avviso`: il pubblico non ha microfono, videocamera e schermo e non c'e'
  *    niente da chiedere, finche' chi conduce non gli da' la parola;
- *  - `avvisoVoce`: come sopra, e chi riceve la parola acconsente in sala.
+ *  - `avvisoVoce`: come sopra, e chi riceve la parola acconsente in sala;
+ *  - `conduceRipreso`: solo per chi conduce, che legge la scheda in sala
+ *    (`schedaInSala`): la voce non si toglie dal video, che continua a riprenderlo.
  */
-export type ChiNonAcconsente = 'restaFuori' | 'soloAscolto' | 'avviso' | 'avvisoVoce';
+export type ChiNonAcconsente =
+  | 'restaFuori'
+  | 'soloAscolto'
+  | 'avviso'
+  | 'avvisoVoce'
+  | 'conduceRipreso';
 
 export interface SchedaPrivacy {
   registrazione: {

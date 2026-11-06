@@ -687,13 +687,16 @@
         "without": {
           "soloAscolto": "Bez šīs piekrišanas jūs tikai klausāties: mikrofons, kamera un ekrāns paliek aizvērti.",
           "conduce": "Bez šīs piekrišanas jūs tāpat vadāt, bet jūsu balss nepaliek atsevišķo personu celiņos un atšifrējumā.",
-          "voce": "Bez šīs piekrišanas jūs piedalāties kā visi, bet paliekat ārpus ieraksta: ne vārds, ne balss, ne attēls."
+          "voce": "Bez šīs piekrišanas jūs piedalāties kā visi, bet paliekat ārpus ieraksta: ne vārds, ne balss, ne attēls.",
+          "comeTutti": "Bez šīs piekrišanas jūs piedalāties kā visi."
         },
         "alreadyRecorded": "Tas, kas jau ierakstīts, paliek pasākuma video: lai to izņemtu, rakstiet organizatoriem.",
         "withdraw": {
           "soloAscolto": "Ja to atsaucat, paliekat telpā tikai kā klausītājs: mikrofons, kamera un ekrāns tiek aizvērti. Tiek atsaukta arī piekrišana jūsu runas atšifrēšanai.",
           "conduce": "Ja to atsaucat, jūs turpināt vadīt, bet turpmāk jūsu balss nepaliek atsevišķo personu celiņos un atšifrējumā. Telpas video, ja tas tiek ierakstīts, jūs tāpat rāda.",
-          "voce": "Ja atsaucat, paliekat telpā kā iepriekš, un no šī brīža esat ārpus ieraksta. Atsaucat arī piekrišanu savu uzstāšanos transkripcijai."
+          "voce": "Ja atsaucat, paliekat telpā kā iepriekš, un no šī brīža esat ārpus ieraksta. Atsaucat arī piekrišanu savu uzstāšanos transkripcijai.",
+          "avvertenza": "Ja atsaucat, paliekat telpā kā iepriekš. Atsaucat arī piekrišanu savu uzstāšanos transkripcijai. Ja jums dod vārdu un pasākums tiek ierakstīts, jūsu balss tomēr paliek video.",
+          "assente": "Ja atsaucat, paliekat telpā kā iepriekš. Atsaucat arī piekrišanu savu uzstāšanos transkripcijai. No šī brīža jūsu balss netiek ierakstīta atsevišķā celiņā."
         }
       },
       "transcription": {
@@ -4435,7 +4438,7 @@
       "recordingNoVideo": "Piekrītu pasākuma ierakstīšanai. Telpas video netiek ierakstīts: paliek tikai to personu audio celiņi, kas piekrīt atšifrēšanai, ja pasākumā tie ir paredzēti.",
       "multitrack": "Piekrītu, ka manas uzstāšanās tiek atšifrētas ar manu vārdu pasākuma pārskatam. Ja pasākumā katram cilvēkam tiek ierakstīts atsevišķs audio celiņš, mana balss tiek ierakstīta tikai šim nolūkam un celiņš pēc atšifrēšanas tiek dzēsts; to neizmanto manas balss identificēšanai vai atveidošanai.",
       "multitrackRetained": "Piekrītu, ka manas uzstāšanās tiek atšifrētas ar manu vārdu pasākuma pārskatam. Ja pasākumā katram cilvēkam tiek ierakstīts atsevišķs audio celiņš, mana balss tiek ierakstīta tikai šim nolūkam un celiņš tiek glabāts kopā ar pasākuma datiem; to neizmanto manas balss identificēšanai vai atveidošanai.",
-      "multitrackOptional": "Tas nav obligāti: ja nepiekrītat, jūs tik un tā piedalāties, bet jūsu teiktais netiek iekļauts transkripcijā un jūsu balss netiek ierakstīta atsevišķā celiņā. Ja pasākums tiek ierakstīts, jūsu balss tomēr paliek video.",
+      "multitrackOptional": "Tas nav obligāti: ja nepiekrītat, jūs tik un tā piedalāties, bet jūsu teiktais netiek iekļauts atšifrējumā un jūsu balss netiek ierakstīta atsevišķā celiņā. Ja pasākums tiek ierakstīts, jūsu balss tomēr paliek video.",
       "multitrackOptionalShort": "Tas nav obligāti: ja nepiekrītat, jūs tik un tā piedalāties, bet jūsu teiktais netiek iekļauts atšifrējumā un jūsu balss netiek ierakstīta atsevišķā celiņā.",
       "stayInTouch": "Vēlos saņemt informāciju par gaidāmajiem pasākumiem un tikt iekļauts adrešu grāmatā, lai mani aicinātu uz līdzīgiem pasākumiem",
       "stayInTouchHelp": "Brīvprātīga piekrišana (VDAR 6.1.a pants). To var jebkurā laikā atsaukt ar saiti “Izņemt manus datus no kontaktu grāmatas” apstiprinājuma e-pastā, atgādinājumos un ielūgumos vai lapā “Mani dati”. Vārds, e-pasta adrese un organizācija ir no šīs reģistrācijas.",
