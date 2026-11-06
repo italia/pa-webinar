@@ -252,7 +252,7 @@ interface LiveEventClientProps {
   jitsiDomain: string;
   watermark?: WatermarkSettings;
   /** L'installazione puo' registrare (lib/recording/availability), risolto dal
-   *  Server Component. Senza, l'avviso «questo evento viene registrato» e il
+   *  Server Component. Senza, l'avviso «questo evento puo' essere registrato» e il
    *  consenso prima di entrare non si mostrano: prometterebbero una
    *  registrazione che nulla puo' fare. Default true: nel dubbio il consenso
    *  si chiede. */
@@ -2117,7 +2117,7 @@ export default function LiveEventClient({
             imageUrl: event.imageUrl,
             coverImageUrl: event.coverImageUrl,
             maxParticipants: event.maxParticipants ?? 300,
-            // L'avviso «questo evento viene registrato» solo dove qualcosa puo'
+            // L'avviso «questo evento puo' essere registrato» solo dove qualcosa puo'
             // registrare: vedi `recordingAvailable`.
             recordingEnabled: event.recordingEnabled && recordingAvailable,
             tempRecordingUrl: event.tempRecordingUrl,

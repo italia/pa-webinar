@@ -97,7 +97,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
 
   const settings = await getSettings();
   // Se qualcosa puo' registrare (Jibri o il registratore per partecipante):
-  // senza, a chi partecipa non si dice «questo evento viene registrato» e non
+  // senza, a chi partecipa non si dice «questo evento puo' essere registrato» e non
   // si chiede il consenso (lib/recording/availability).
   const canRecord = recordingAvailable();
 

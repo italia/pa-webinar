@@ -365,6 +365,14 @@ describe('RegistrationFormClient — casella della trascrizione', () => {
 });
 
 describe('RegistrationFormClient — rubrica', () => {
+  it('dice dove si trova davvero il link per uscire, senza promettere ogni email', () => {
+    const { stayInTouchHelp } = messages.gdpr.consent;
+    expect(stayInTouchHelp).not.toContain('nelle email che riceverai');
+    for (const luogo of ['email di conferma', 'promemoria', 'inviti', messages.gdpr.export.title]) {
+      expect(stayInTouchHelp).toContain(luogo);
+    }
+  });
+
   it('proposta: la casella dice per quanto si conservano i dati', () => {
     disegnaCon({});
     const aiuto = testoDi('#consentStayInTouchHelp');
