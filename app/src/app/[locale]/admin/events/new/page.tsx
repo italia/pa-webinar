@@ -11,11 +11,11 @@ import { prisma } from '@/lib/db';
 import { rubricaConPersone } from '@/lib/persons/rubrica-picker';
 import { capacitaIstanza } from '@/lib/capacity/istanza';
 import { getSettings } from '@/lib/settings';
+import { presetDelModello } from '@/lib/events/template-preset';
 import { liveCaptionsAvailable } from '@/lib/captions/availability';
 import { recordingAvailable, voceNelVideo } from '@/lib/recording/availability';
 import { traduzioneDisponibile } from '@/lib/text-translation/enqueue';
 import CreateEventWithTemplate from '@/components/admin/create-event-with-template';
-import type { PermissionMatrix } from '@/lib/utils/permission-matrix';
 import AdminPageHeader from '@/components/admin/admin-page-header';
 import { adminPageMetadata, adminPageTitle } from '@/components/admin/admin-page-title';
 
@@ -76,45 +76,7 @@ export default async function CreateEventPage({
     maxParticipants: tpl.maxParticipants,
   }));
 
-  const serializedSelected = selectedTemplate
-    ? {
-        id: selectedTemplate.id,
-        name: selectedTemplate.name,
-        qaEnabled: selectedTemplate.qaEnabled,
-        chatEnabled: selectedTemplate.chatEnabled,
-        recordingEnabled: selectedTemplate.recordingEnabled,
-        autoStartRecording: selectedTemplate.autoStartRecording,
-        agendaEnabled: selectedTemplate.agendaEnabled,
-        wordCloudEnabled: selectedTemplate.wordCloudEnabled,
-        whiteboardEnabled: selectedTemplate.whiteboardEnabled,
-        liveCaptionsEnabled: selectedTemplate.liveCaptionsEnabled,
-        waitingRoomEngine: selectedTemplate.waitingRoomEngine,
-        participantsCanUnmute: selectedTemplate.participantsCanUnmute,
-        participantsCanStartVideo: selectedTemplate.participantsCanStartVideo,
-        participantsCanShareScreen: selectedTemplate.participantsCanShareScreen,
-        maxParticipants: selectedTemplate.maxParticipants,
-        // Default wizard (semplificazione) + permissionMatrix (prima non
-        // veniva passata → la matrice del template non arrivava al wizard).
-        permissionMatrix:
-          (selectedTemplate.permissionMatrix as PermissionMatrix | null) ?? null,
-        defaultDurationMinutes: selectedTemplate.defaultDurationMinutes,
-        aiTranscriptEnabled: selectedTemplate.aiTranscriptEnabled,
-        aiSummaryEnabled: selectedTemplate.aiSummaryEnabled,
-        aiTranslationEnabled: selectedTemplate.aiTranslationEnabled,
-        // Questa serializzazione è una whitelist esplicita, non uno spread: un
-        // campo nuovo sul template resta invisibile al wizard finché non lo si
-        // nomina anche qui. È il motivo per cui i flag di cattura si perdevano.
-        aiDubbingEnabled: selectedTemplate.aiDubbingEnabled,
-        multitrackRecordingEnabled: selectedTemplate.multitrackRecordingEnabled,
-        retainParticipantTracks: selectedTemplate.retainParticipantTracks,
-        aiTargetLocales: selectedTemplate.aiTargetLocales,
-        descriptionTemplate:
-          (selectedTemplate.descriptionTemplate as Record<string, string> | null) ?? null,
-        defaultRetentionDays: selectedTemplate.defaultRetentionDays,
-        defaultExpectedSpeakers: selectedTemplate.defaultExpectedSpeakers,
-        postEventPublic: selectedTemplate.postEventPublic,
-      }
-    : null;
+  const serializedSelected = selectedTemplate ? presetDelModello(selectedTemplate) : null;
 
   return (
     <div className="container py-5">
@@ -135,9 +97,15 @@ export default async function CreateEventPage({
         }
         defaultLocale={siteSettings.defaultLocale ?? 'it'}
         defaultRetentionDays={30}
-        canUseRubrica={session.role === 'admin' && (await rubricaConPersone())}
+        // Con la rubrica spenta niente selettore, anche se resta qualcuno dentro.
+        canUseRubrica={
+          session.role === 'admin' &&
+          siteSettings.addressBookEnabled !== false &&
+          (await rubricaConPersone())
+        }
         canManageTags={session.role === 'admin'}
         publicRegistrationEnabled={siteSettings.publicRegistrationEnabled}
+        addressBookEnabled={siteSettings.addressBookEnabled}
         capacita={capacitaIstanza(siteSettings)}
         availableTags={tags.map((tg) => ({
           slug: tg.slug,

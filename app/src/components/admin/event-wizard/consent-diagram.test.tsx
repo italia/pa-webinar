@@ -154,4 +154,9 @@ describe('ConsentDiagram', () => {
     expect(apri()).not.toContain(testi.transcription);
     expect(apri({ captionsTranscript: true })).toContain(testi.transcription);
   });
+
+  it('la trascrizione del video chiede il suo consenso, senza tracce per persona', () => {
+    expect(apri()).not.toContain(testi.transcription);
+    expect(apri({ trascrizioneVideo: true })).toContain(testi.transcription);
+  });
 });

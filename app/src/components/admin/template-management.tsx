@@ -21,6 +21,7 @@ import {
 import { Icon } from '@/components/ui/icon';
 import ToggleSwitch from '@/components/ui/toggle-switch';
 import { useConfirm } from '@/components/ui/confirm-dialog';
+import type { Destinazione } from '@/lib/recording/destination';
 import { MAX_RETENTION_DAYS } from '@/lib/validation/retention';
 
 interface SerializedTemplate {
@@ -35,6 +36,11 @@ interface SerializedTemplate {
   whiteboardEnabled: boolean;
   liveCaptionsEnabled: boolean;
   postEventPublic: boolean;
+  postEventShowQA: boolean;
+  offerAddressBook: boolean;
+  audienceAnonymous: boolean;
+  hostsAlwaysRecorded: boolean;
+  recordingDestination: Destinazione;
   waitingRoomEngine: 'GARDEN' | 'GAME' | 'CLASSIC' | null;
   recordingEnabled: boolean;
   participantsCanUnmute: boolean;
@@ -78,6 +84,12 @@ interface EditingTemplate {
   whiteboardEnabled: boolean;
   liveCaptionsEnabled: boolean;
   postEventPublic: boolean;
+  postEventShowQA: boolean;
+  offerAddressBook: boolean;
+  audienceAnonymous: boolean;
+  hostsAlwaysRecorded: boolean;
+  /** Null: la sceglie chi crea l'evento. */
+  recordingDestination: Destinazione;
   waitingRoomEngine: 'GARDEN' | 'GAME' | 'CLASSIC' | null;
   recordingEnabled: boolean;
   participantsCanUnmute: boolean;
@@ -117,6 +129,12 @@ const DEFAULT_NEW: EditingTemplate = {
   // Come sugli eventi: i sottotitoli sono accesi finche' non li si spegne.
   liveCaptionsEnabled: true,
   postEventPublic: true,
+  // Come sugli eventi: valgono le colonne, finche' il modello non sceglie.
+  postEventShowQA: true,
+  offerAddressBook: true,
+  audienceAnonymous: false,
+  hostsAlwaysRecorded: false,
+  recordingDestination: null,
   waitingRoomEngine: null,
   recordingEnabled: false,
   participantsCanUnmute: false,
@@ -170,6 +188,11 @@ export default function TemplateManagement({
       whiteboardEnabled: tpl.whiteboardEnabled,
       liveCaptionsEnabled: tpl.liveCaptionsEnabled,
       postEventPublic: tpl.postEventPublic,
+      postEventShowQA: tpl.postEventShowQA,
+      offerAddressBook: tpl.offerAddressBook,
+      audienceAnonymous: tpl.audienceAnonymous,
+      hostsAlwaysRecorded: tpl.hostsAlwaysRecorded,
+      recordingDestination: tpl.recordingDestination,
       waitingRoomEngine: tpl.waitingRoomEngine,
       recordingEnabled: tpl.recordingEnabled,
       participantsCanUnmute: tpl.participantsCanUnmute,
@@ -490,6 +513,8 @@ function TemplateForm({
   // Duplicarle sotto `admin.templates` vorrebbe dire due testi da tenere
   // allineati in 24 lingue per la stessa cosa.
   const ta = useTranslations('admin.form');
+  const tw = useTranslations('admin.wizard.step2');
+  const tPost = useTranslations('postEvent');
 
   return (
     <div>
@@ -632,6 +657,10 @@ function TemplateForm({
             ['multitrackRecordingEnabled', ta('multitrackRecordingEnabled')],
             ['retainParticipantTracks', ta('retainParticipantTracks')],
             ['postEventPublic', t('postEventPublic')],
+            ['postEventShowQA', tPost('showQA')],
+            ['offerAddressBook', t('offerAddressBook')],
+            ['audienceAnonymous', tw('audienceAnonymous')],
+            ['hostsAlwaysRecorded', tw('hostsAlwaysRecorded')],
           ] as const
         )
           // Senza il servizio dei sottotitoli non c'e' niente da scegliere.
@@ -668,6 +697,30 @@ function TemplateForm({
             </div>
           );
         })}
+      </div>
+
+      {/* Dove va il video degli eventi creati dal modello (null = si sceglie
+          creando l'evento). */}
+      <div className="mb-3">
+        <label className="form-label mb-1" htmlFor="tpl-recording-destination">
+          {t('recordingDestination')}
+        </label>
+        <select
+          id="tpl-recording-destination"
+          className="form-select form-select-sm"
+          style={{ maxWidth: 340 }}
+          value={form.recordingDestination ?? ''}
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+            setField(
+              'recordingDestination',
+              e.target.value === '' ? null : (e.target.value as NonNullable<Destinazione>),
+            )
+          }
+        >
+          <option value="">{t('recordingDestinationNone')}</option>
+          <option value="REGISTRANTS">{tw('recordingDestinationReserved')}</option>
+          <option value="PUBLIC">{tw('recordingDestinationPublic')}</option>
+        </select>
       </div>
 
       {/* Motore sala d'attesa pre-popolato nel wizard (null = default sito). */}

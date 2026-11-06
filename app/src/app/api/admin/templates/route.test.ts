@@ -283,3 +283,40 @@ describe('DELETE', () => {
     });
   });
 });
+
+describe('i valori del formato', () => {
+  const campi = {
+    recordingDestination: 'REGISTRANTS',
+    offerAddressBook: false,
+    audienceAnonymous: true,
+    hostsAlwaysRecorded: true,
+    postEventShowQA: false,
+  };
+
+  it('la creazione li scrive', async () => {
+    expect((await crea({ name: 'Riunione', ...campi })).status).toBe(201);
+    expect(creato()).toMatchObject(campi);
+  });
+
+  it('la modifica li scrive', async () => {
+    expect((await modifica({ id: MODELLO, ...campi })).status).toBe(200);
+    expect(aggiornato()).toMatchObject(campi);
+  });
+
+  it('una modifica parziale non li azzera', async () => {
+    await modifica({ id: MODELLO, name: 'Solo il nome' });
+    for (const campo of Object.keys(campi)) {
+      expect(aggiornato()).not.toHaveProperty(campo);
+    }
+  });
+
+  it('la destinazione si azzera: la sceglie chi crea l evento', async () => {
+    await modifica({ id: MODELLO, recordingDestination: null });
+    expect(aggiornato().recordingDestination).toBeNull();
+  });
+
+  it('una destinazione sconosciuta si rifiuta, invece di sparire', async () => {
+    expect((await crea({ name: 'X', recordingDestination: 'TUTTI' })).status).toBe(422);
+    nessunaScrittura();
+  });
+});
