@@ -288,7 +288,7 @@ describe("sala — quello che arriva alla sala d'attesa", () => {
         recordingDestination: 'REGISTRANTS',
         videoDisponibile: true,
         trascrizioneVideo: true,
-        retainParticipantTracks: true,
+        tracceConservate: true,
       },
     });
     const a = leggiAttesa();
@@ -297,7 +297,7 @@ describe("sala — quello che arriva alla sala d'attesa", () => {
     expect(a.event).toMatchObject({
       videoDisponibile: true,
       trascrizioneVideo: true,
-      retainParticipantTracks: true,
+      tracceConservate: true,
     });
     expect(a.event).not.toHaveProperty('recordingUrl');
   });

@@ -156,8 +156,8 @@ interface WaitingRoomEvent {
    *  consenso anche cosi' (lib/registration/consents). */
   trascrizioneVideo?: boolean;
   /** Le tracce per persona si conservano: la casella della trascrizione non ne
-   *  promette la cancellazione (`chiaveConsensoTrascrizione`). */
-  retainParticipantTracks?: boolean;
+   *  promette la cancellazione (`traccePerPersonaConservate`). */
+  tracceConservate?: boolean;
   /** Descrizione, enti e persone, come sulla pagina pubblica. */
   riepilogo?: RiepilogoSala;
 }
@@ -1303,7 +1303,7 @@ export default function WaitingRoom({
               }
             />
             <label className="form-check-label" htmlFor={CAMPO_TRASCRIZIONE}>
-              {tGdpr(chiaveConsensoTrascrizione(event))}
+              {tGdpr(chiaveConsensoTrascrizione(event.tracceConservate))}
             </label>
           </div>
           {/* La voce resta nel video a prescindere solo dove non si puo' togliere:

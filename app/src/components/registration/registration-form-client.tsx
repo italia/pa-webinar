@@ -60,7 +60,7 @@ interface RegistrationFormClientProps {
   trascrizioneVideo?: boolean;
   /** Le tracce per persona si conservano: il testo della trascrizione non ne
    *  promette la cancellazione. */
-  retainParticipantTracks?: boolean;
+  tracceConservate?: boolean;
   /** La casella della rubrica si mostra (lib/persons/address-book). */
   rubricaProposta?: boolean;
   /** Cosa l'evento concede ai partecipanti: decide quali consensi chiedere
@@ -112,7 +112,7 @@ export default function RegistrationFormClient({
   multitrackRecordingEnabled = false,
   captionsTranscript = false,
   trascrizioneVideo = false,
-  retainParticipantTracks = false,
+  tracceConservate = false,
   rubricaProposta = true,
   participantsCanUnmute = false,
   participantsCanStartVideo = false,
@@ -962,7 +962,7 @@ export default function RegistrationFormClient({
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConsentMultitrack(e.target.checked)}
             />
             <Label for="consentMultitrack" check>
-              {tg(`consent.${chiaveConsensoTrascrizione({ retainParticipantTracks })}`)}{' '}
+              {tg(`consent.${chiaveConsensoTrascrizione(tracceConservate)}`)}{' '}
               <span className="consent-mark">{t('optionalMark')}</span>
             </Label>
             {/* La voce resta nel video a prescindere solo dove non si puo' togliere:

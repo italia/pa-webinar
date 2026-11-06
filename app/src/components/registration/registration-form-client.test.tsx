@@ -338,7 +338,7 @@ describe('RegistrationFormClient — casella della trascrizione', () => {
   });
 
   it('con le tracce conservate non promette la cancellazione', () => {
-    disegnaCon({ multitrackRecordingEnabled: true, retainParticipantTracks: true });
+    disegnaCon({ multitrackRecordingEnabled: true, tracceConservate: true });
     const etichetta = testoDi('label[for="consentMultitrack"]');
     expect(etichetta).toContain(consenso.multitrackRetained);
     expect(etichetta).not.toContain(consenso.multitrack);

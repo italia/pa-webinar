@@ -850,7 +850,7 @@ describe('sala d\'attesa — trascrizione', () => {
 
   it('dove le tracce si conservano il testo non ne promette la cancellazione', () => {
     render({
-      event: { ...eventoLive, multitrackRecordingEnabled: true, retainParticipantTracks: true },
+      event: { ...eventoLive, multitrackRecordingEnabled: true, tracceConservate: true },
       defaultName: 'Relatore 1',
     });
     expect(etichetta()).toBe(g.multitrackRetained);
