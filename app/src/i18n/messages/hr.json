@@ -4435,6 +4435,7 @@
       "multitrack": "Pristajem da se moja izlaganja transkribiraju s mojim imenom za izvješće o događanju. Ako događanje snima zaseban audiozapis za svaku osobu, moj se glas snima samo u tu svrhu, a zapis se briše nakon transkripcije; ne koristi se za prepoznavanje ili oponašanje mog glasa.",
       "multitrackRetained": "I consent to my contributions being transcribed, with my name, for the event's report. If the event records a separate audio track for each person, my voice is recorded for this purpose only and the track is kept with the event data; it is not used to identify or reproduce my voice.",
       "multitrackOptional": "Nije obvezno: ako ne date privolu, svejedno sudjelujete, ali vaša izlaganja ne ulaze u transkript i vaš se glas ne snima na zasebnu stazu. Ako se događaj snima, vaš glas ipak ostaje u videozapisu.",
+      "multitrackOptionalShort": "It is optional: if you do not consent you still take part, but what you say stays out of the transcript and your voice is not recorded on a separate track.",
       "stayInTouch": "Želim primati informacije o budućim događajima i biti dodan u imenik kako bih bio pozvan na slične događaje",
       "stayInTouchHelp": "Neobavezna privola (čl. 6.1.a GDPR-a). Možeš je povući u bilo kojem trenutku putem poveznice „Ukloni me iz imenika” u e-porukama koje primiš. Ime i organizacija su oni iz ove prijave.",
       "stayInTouchRetention": "We keep this data for {months} months from this consent: the period restarts only if you tick the box again.",

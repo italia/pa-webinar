@@ -16,11 +16,16 @@ import type { NextRequest } from 'next/server';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { siteSettings, tx } = vi.hoisted(() => ({
-  siteSettings: { publicRegistrationEnabled: true },
+  siteSettings: {
+    publicRegistrationEnabled: true,
+    addressBookEnabled: true,
+    aiPipelineEnabled: false,
+  },
   tx: {
     registration: { findUnique: vi.fn(), create: vi.fn() },
     gdprAuditLog: { create: vi.fn() },
     eventInvitation: { findFirst: vi.fn() },
+    person: { findUnique: vi.fn() },
   },
 }));
 
@@ -43,6 +48,7 @@ import { prisma } from '@/lib/db';
 import { hashEmail } from '@/lib/crypto/pii';
 import { sendConfirmationEmail } from '@/lib/email/confirmation';
 import { verifyRegistrationEntry } from '@/lib/events/registration-link';
+import { upsertPersonOnRegistration } from '@/lib/persons';
 import { findEventQuestionnaireByPlacement, writeResponse } from '@/lib/questionnaires';
 import type * as Questionari from '@/lib/questionnaires';
 
@@ -77,6 +83,8 @@ function iscriviti(email: string, extra: Record<string, unknown> = {}): Promise<
 beforeEach(() => {
   vi.clearAllMocks();
   siteSettings.publicRegistrationEnabled = true;
+  siteSettings.addressBookEnabled = true;
+  siteSettings.aiPipelineEnabled = false;
   vi.mocked(prisma.event.findUnique).mockResolvedValue({
     id: EVENT_ID,
     slug: SLUG,
@@ -94,6 +102,7 @@ beforeEach(() => {
   }));
   tx.gdprAuditLog.create.mockResolvedValue({});
   tx.eventInvitation.findFirst.mockResolvedValue(null);
+  tx.person.findUnique.mockResolvedValue(null);
   vi.mocked(findEventQuestionnaireByPlacement).mockResolvedValue(null);
   vi.mocked(writeResponse).mockResolvedValue({ id: 'resp-1', created: true });
 });
@@ -352,6 +361,314 @@ describe('POST registrations — consensi secondo il formato dell\'evento', () =
     } finally {
       vi.unstubAllEnvs();
     }
+  });
+});
+
+/** L'evento della prova: PUBLISHED e con la registrazione spenta, salvo `over`. */
+function eventoCon(over: Record<string, unknown>) {
+  vi.mocked(prisma.event.findUnique).mockResolvedValue({
+    id: EVENT_ID,
+    slug: SLUG,
+    status: 'PUBLISHED',
+    eventType: 'SCHEDULED',
+    endsAt: new Date(Date.now() + 3_600_000),
+    recordingEnabled: false,
+    multitrackRecordingEnabled: false,
+    participantsCanUnmute: false,
+    participantsCanStartVideo: false,
+    participantsCanShareScreen: false,
+    _count: { registrations: 0 },
+    ...over,
+  } as never);
+}
+
+const iscrizioneScritta = () =>
+  tx.registration.create.mock.calls.at(-1)?.[0]?.data as Record<string, unknown>;
+const auditScritto = () =>
+  JSON.parse(
+    (tx.gdprAuditLog.create.mock.calls.at(-1)?.[0] as { data: { details: string } }).data.details,
+  ) as Record<string, unknown>;
+
+/** Jitsi del chart, con il solo registratore per partecipante: nessun video. */
+function senzaVideo() {
+  vi.stubEnv('JITSI_WEB_INTERNAL_URL', 'http://jitsi-web');
+  vi.stubEnv('JIBRI_HEALTH_URL', '');
+  vi.stubEnv('RECORDER_CONTROLLER_URL', 'http://recorder-controller');
+}
+
+describe('POST registrations — presa visione dell\'informativa', () => {
+  it('senza la spunta: 422 con il suo messaggio, nessuna iscrizione', async () => {
+    const res = await iscriviti('anna@example.com', { consentGiven: false });
+    expect(res.status).toBe(422);
+    const corpo = (await res.json()) as { details: Array<{ path: string[]; message: string }> };
+    expect(corpo.details).toEqual([
+      { path: ['consentGiven'], message: 'registration.errors.consentRequired' },
+    ]);
+    expect(tx.registration.create).not.toHaveBeenCalled();
+  });
+
+  it('con la spunta il corpo resta consentGiven: true, e si salva con l\'ora', async () => {
+    expect((await iscriviti('anna@example.com')).status).toBe(201);
+    expect(iscrizioneScritta().consentGiven).toBe(true);
+    expect(iscrizioneScritta().consentTimestamp).toBeInstanceOf(Date);
+    expect(auditScritto().consentGiven).toBe(true);
+  });
+});
+
+describe('POST registrations — la destinazione del video nel consenso', () => {
+  const conRegistrazione = (recordingDestination: 'PUBLIC' | 'REGISTRANTS' | null) =>
+    eventoCon({ recordingEnabled: true, participantsCanUnmute: true, recordingDestination });
+
+  const errore = async (res: Response) =>
+    ((await res.json()) as { details?: Array<{ path: string[]; message: string }> }).details;
+
+  it('con il consenso salva il testo letto e la sua versione, anche nell\'audit', async () => {
+    conRegistrazione('REGISTRANTS');
+    const res = await iscriviti('anna@example.com', {
+      consentRecording: true,
+      consentRecordingDestination: 'REGISTRANTS',
+    });
+    expect(res.status).toBe(201);
+    expect(iscrizioneScritta()).toMatchObject({
+      consentRecording: true,
+      consentRecordingDestination: 'REGISTRANTS',
+      consentRecordingVersion: 1,
+    });
+    expect(auditScritto()).toMatchObject({
+      consentRecordingDestination: 'REGISTRANTS',
+      consentRecordingVersion: 1,
+    });
+  });
+
+  it('senza consenso destinazione e versione restano nulle', async () => {
+    conRegistrazione('PUBLIC');
+    const res = await iscriviti('anna@example.com', {
+      consentRecording: false,
+      consentRecordingDestination: 'PUBLIC',
+    });
+    expect(res.status).toBe(201);
+    expect(iscrizioneScritta()).toMatchObject({
+      consentRecording: false,
+      consentRecordingDestination: null,
+      consentRecordingVersion: null,
+    });
+    expect(auditScritto()).toMatchObject({
+      consentRecordingDestination: null,
+      consentRecordingVersion: null,
+    });
+  });
+
+  it.each([
+    ['allargata', 'REGISTRANTS', 'PUBLIC'],
+    ['ristretta', 'PUBLIC', 'REGISTRANTS'],
+    ['dichiarata dopo', null, 'PUBLIC'],
+    ['non piu\' dichiarata', 'REGISTRANTS', null],
+  ] as const)('destinazione %s a pagina aperta: 422 sulla casella', async (_nome, letta, evento) => {
+    conRegistrazione(evento);
+    const res = await iscriviti('anna@example.com', {
+      consentRecording: true,
+      consentRecordingDestination: letta,
+    });
+    expect(res.status).toBe(422);
+    expect(await errore(res)).toEqual([
+      { path: ['consentRecording'], message: 'registration.errors.recordingDestinationChanged' },
+    ]);
+    expect(tx.registration.create).not.toHaveBeenCalled();
+    expect(sendConfirmationEmail).not.toHaveBeenCalled();
+  });
+
+  it('il testo cambiato non ferma chi non ha spuntato la casella', async () => {
+    conRegistrazione('PUBLIC');
+    const res = await iscriviti('anna@example.com', {
+      consentRecording: false,
+      consentRecordingDestination: 'REGISTRANTS',
+    });
+    expect(res.status).toBe(201);
+    expect(iscrizioneScritta().consentRecordingDestination).toBeNull();
+  });
+
+  it('una pagina aperta prima del campo vale per il testo in vigore', async () => {
+    conRegistrazione('PUBLIC');
+    const res = await iscriviti('anna@example.com', { consentRecording: true });
+    expect(res.status).toBe(201);
+    expect(iscrizioneScritta()).toMatchObject({
+      consentRecordingDestination: 'PUBLIC',
+      consentRecordingVersion: 1,
+    });
+  });
+
+  it('su un evento senza destinazione il testo non ne dichiara una: niente versione', async () => {
+    conRegistrazione(null);
+    const res = await iscriviti('anna@example.com', {
+      consentRecording: true,
+      consentRecordingDestination: null,
+    });
+    expect(res.status).toBe(201);
+    expect(iscrizioneScritta()).toMatchObject({
+      consentRecording: true,
+      consentRecordingDestination: null,
+      consentRecordingVersion: null,
+    });
+  });
+
+  it('dove non c\'e\' un video il testo non dichiara la destinazione dell\'evento', async () => {
+    senzaVideo();
+    try {
+      conRegistrazione('REGISTRANTS');
+      const res = await iscriviti('anna@example.com', {
+        consentRecording: true,
+        consentRecordingDestination: null,
+      });
+      expect(res.status).toBe(201);
+      expect(iscrizioneScritta()).toMatchObject({
+        consentRecording: true,
+        consentRecordingDestination: null,
+        consentRecordingVersion: null,
+      });
+
+      const dichiarata = await iscriviti('anna@example.com', {
+        consentRecording: true,
+        consentRecordingDestination: 'REGISTRANTS',
+      });
+      expect(dichiarata.status).toBe(422);
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
+  it('una casella non piu\' chiesta non si rifiuta e non salva niente', async () => {
+    eventoCon({ recordingEnabled: true, recordingDestination: 'PUBLIC' });
+    const res = await iscriviti('anna@example.com', {
+      consentRecording: true,
+      consentRecordingDestination: 'REGISTRANTS',
+    });
+    expect(res.status).toBe(201);
+    expect(iscrizioneScritta()).toMatchObject({
+      consentRecording: null,
+      consentRecordingDestination: null,
+      consentRecordingVersion: null,
+    });
+  });
+
+  it('solo su invito il testo cambiato risponde a tutti allo stesso modo', async () => {
+    siteSettings.publicRegistrationEnabled = false;
+    conRegistrazione('PUBLIC');
+    const corpo = { consentRecording: true, consentRecordingDestination: 'REGISTRANTS' };
+    tx.eventInvitation.findFirst.mockResolvedValue({ id: 'inv-1' });
+    expect((await iscriviti('invitata@example.com', corpo)).status).toBe(422);
+    tx.eventInvitation.findFirst.mockResolvedValue(null);
+    expect((await iscriviti('estranea@example.com', corpo)).status).toBe(422);
+    expect(tx.eventInvitation.findFirst).not.toHaveBeenCalled();
+  });
+});
+
+describe('POST registrations — trascrizione dal video', () => {
+  const conAi = (over: Record<string, unknown> = {}) =>
+    eventoCon({ recordingEnabled: true, aiTranscriptEnabled: true, ...over });
+
+  it('la pipeline accesa chiede il consenso, anche senza tracce per persona', async () => {
+    siteSettings.aiPipelineEnabled = true;
+    conAi();
+    expect((await iscriviti('anna@example.com', { consentMultitrack: true })).status).toBe(201);
+    expect(iscrizioneScritta()).toMatchObject({
+      consentMultitrack: true,
+      consentMultitrackVersion: 2,
+    });
+  });
+
+  it('chi non spunta la casella si iscrive e il rifiuto resta scritto', async () => {
+    siteSettings.aiPipelineEnabled = true;
+    conAi();
+    expect((await iscriviti('anna@example.com')).status).toBe(201);
+    expect(iscrizioneScritta()).toMatchObject({
+      consentMultitrack: false,
+      consentMultitrackVersion: null,
+    });
+  });
+
+  it('a pipeline spenta il consenso non si chiede', async () => {
+    conAi();
+    await iscriviti('anna@example.com', { consentMultitrack: true });
+    expect(iscrizioneScritta()).toMatchObject({
+      consentMultitrack: null,
+      consentMultitrackVersion: null,
+    });
+  });
+
+  it('dove non c\'e\' un video da trascrivere il consenso non si chiede', async () => {
+    siteSettings.aiPipelineEnabled = true;
+    senzaVideo();
+    try {
+      conAi();
+      await iscriviti('anna@example.com', { consentMultitrack: true });
+      expect(iscrizioneScritta().consentMultitrack).toBeNull();
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+});
+
+describe('POST registrations — rubrica', () => {
+  const conRubrica = { consentAddressBook: true, consentFutureCommunications: true };
+
+  it('proposta: passa alla rubrica l\'email cifrata dell\'iscrizione', async () => {
+    const res = await iscriviti('anna@example.com', conRubrica);
+    expect(res.status).toBe(201);
+    const input = vi.mocked(upsertPersonOnRegistration).mock.calls[0]?.[1];
+    expect(input).toMatchObject({ emailHash: hashEmail('anna@example.com'), optedIn: true });
+    expect(input?.email).toBe(iscrizioneScritta().email);
+    expect(input?.email).not.toContain('anna@example.com');
+    expect(iscrizioneScritta().consentFutureCommunications).toBe(true);
+    expect(auditScritto()).toMatchObject({
+      consentAddressBook: true,
+      consentFutureCommunications: true,
+    });
+  });
+
+  it('proposta, senza la spunta: nessun consenso alla rubrica', async () => {
+    await iscriviti('anna@example.com');
+    expect(vi.mocked(upsertPersonOnRegistration).mock.calls[0]?.[1]?.optedIn).toBe(false);
+  });
+
+  async function nonScriveNulla() {
+    const res = await iscriviti('anna@example.com', conRubrica);
+    expect(res.status).toBe(201);
+    expect(upsertPersonOnRegistration).not.toHaveBeenCalled();
+    expect(iscrizioneScritta()).toMatchObject({
+      personId: null,
+      consentFutureCommunications: false,
+    });
+    expect(auditScritto()).toMatchObject({
+      consentAddressBook: false,
+      consentFutureCommunications: false,
+    });
+  }
+
+  it('non proposta dall\'evento: 201 e nessuna scrittura', async () => {
+    eventoCon({ offerAddressBook: false });
+    await nonScriveNulla();
+  });
+
+  it('spenta nell\'installazione: 201 e nessuna scrittura', async () => {
+    siteSettings.addressBookEnabled = false;
+    eventoCon({ offerAddressBook: true });
+    await nonScriveNulla();
+  });
+
+  it('non proposta: chi ha gia\' una voce resta legato a quella, senza scritture', async () => {
+    eventoCon({ offerAddressBook: false });
+    tx.person.findUnique.mockResolvedValue({ id: 'persona-1' });
+    const res = await iscriviti('anna@example.com', conRubrica);
+    expect(res.status).toBe(201);
+    expect(tx.person.findUnique).toHaveBeenCalledWith({
+      where: { emailHash: hashEmail('anna@example.com') },
+      select: { id: true },
+    });
+    expect(upsertPersonOnRegistration).not.toHaveBeenCalled();
+    expect(iscrizioneScritta()).toMatchObject({
+      personId: 'persona-1',
+      consentFutureCommunications: false,
+    });
   });
 });
 

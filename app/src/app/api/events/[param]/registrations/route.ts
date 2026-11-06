@@ -32,14 +32,25 @@ import { encryptPII, hashEmail } from '@/lib/crypto/pii';
 import { sendConfirmationEmail } from '@/lib/email/confirmation';
 import { getPublicEnv } from '@/lib/env';
 import { upsertPersonOnRegistration } from '@/lib/persons';
+import { rubricaProposta } from '@/lib/persons/address-book';
 import { isEventOpenForRegistration } from '@/lib/events/visibility';
 import { isInvited, publicRegistrationFor } from '@/lib/events/registration-access';
 import { registrationJoinUrl } from '@/lib/events/registration-link';
-import { consensiRichiesti, VERSIONE_TESTO_TRASCRIZIONE } from '@/lib/registration/consents';
+import {
+  consensiRichiesti,
+  trascrizioneDalVideo,
+  VERSIONE_TESTO_TRASCRIZIONE,
+} from '@/lib/registration/consents';
 import { getSettings } from '@/lib/settings';
 import { captionsTranscriptActive } from '@/lib/captions/availability';
 import { localizedUrl } from '@/lib/utils/localized-url';
 import { recordingAvailable, voceNelVideo } from '@/lib/recording/availability';
+import {
+  destinazioneDelTesto,
+  testoInVigore,
+  testoLetto,
+  VERSIONE_TESTO_REGISTRAZIONE,
+} from '@/lib/recording/destination';
 import {
   buildEventAccessSetCookie,
   eventAccessTtlSeconds,
@@ -99,7 +110,8 @@ export const POST = withErrorHandling(async (request, context) => {
 
   const {
     displayName, email, consentGiven, organization, organizationRole, organizationType,
-    consentRecording, consentMultitrack, consentFutureCommunications, consentAddressBook,
+    consentRecording, consentRecordingDestination, consentMultitrack,
+    consentFutureCommunications, consentAddressBook,
   } = parsed.data;
 
   // La lingua della pagina da cui ci si iscrive; l'intestazione del browser
@@ -112,19 +124,49 @@ export const POST = withErrorHandling(async (request, context) => {
 
   // I consensi obbligatori dipendono dal formato dell'evento: la stessa regola
   // del modulo (lib/registration/consents).
+  const settings = await getSettings();
+  const disponibile = recordingAvailable();
+  const voce = voceNelVideo();
   const richiesti = consensiRichiesti({
     ...event,
     // Come la sala d'attesa: dove l'installazione non può registrare, il
     // consenso alla registrazione non si chiede.
-    recordingEnabled: event.recordingEnabled && recordingAvailable(),
-    captionsTranscript: captionsTranscriptActive(event, await getSettings()),
+    recordingEnabled: event.recordingEnabled && disponibile,
+    captionsTranscript: captionsTranscriptActive(event, settings),
+    trascrizioneVideo: trascrizioneDalVideo(event, settings, disponibile, voce),
   });
-  // La trascrizione dei propri interventi (traccia audio per persona o
-  // sottotitoli salvati) e' facoltativa: senza, ci si iscrive lo stesso e la
-  // voce non si registra ne' si trascrive (lib/captions/room). Dove la voce di
-  // chi non acconsente alla registrazione resta fuori, senza quel consenso non
-  // vale neanche questo.
-  const regola = regolaConsenso(event, recordingAvailable(), voceNelVideo());
+
+  // Il consenso alla registrazione vale per il testo letto. Se la destinazione
+  // e' cambiata a pagina aperta, chi ha spuntato la casella rilegge prima di
+  // iscriversi; chi non l'ha spuntata non ha acconsentito a niente, e il consenso
+  // non e' mai una condizione per iscriversi. La risposta dipende solo dal modulo
+  // e dall'evento: su invito non dice niente dell'indirizzo.
+  const registrazioneData = richiesti.registrazione && consentRecording === true;
+  const destinazioneInVigore = destinazioneDelTesto(event.recordingDestination, voce);
+  if (registrazioneData && !testoInVigore(consentRecordingDestination, destinazioneInVigore)) {
+    throw new ValidationError('Validation failed', [
+      { path: ['consentRecording'], message: 'registration.errors.recordingDestinationChanged' },
+    ]);
+  }
+  // Un testo che non dichiara la destinazione non ha neanche una versione
+  // (VERSIONE_TESTO_REGISTRAZIONE).
+  const destinazioneLetta = registrazioneData
+    ? testoLetto(consentRecordingDestination, destinazioneInVigore)
+    : null;
+  const versioneLetta = destinazioneLetta !== null ? VERSIONE_TESTO_REGISTRAZIONE : null;
+
+  // La rubrica non proposta non ha casella: un valore che arriva lo stesso, da
+  // una pagina aperta prima del cambio o da chi chiama la rotta, non conta.
+  const proposta = rubricaProposta(event, settings);
+  const inRubrica = proposta && consentAddressBook === true;
+  const comunicazioniFuture = proposta && consentFutureCommunications === true;
+
+  // La trascrizione dei propri interventi (traccia audio per persona, sottotitoli
+  // salvati o video) e' facoltativa: senza, ci si iscrive lo stesso e la voce non
+  // si registra ne' si trascrive (lib/captions/room). Dove la voce di chi non
+  // acconsente alla registrazione resta fuori, senza quel consenso non vale
+  // neanche questo.
+  const regola = regolaConsenso(event, disponibile, voce);
   const senzaVoce = regola.registra && !regola.soloAscolto && consentRecording !== true;
   const trascrizioneData = !senzaVoce && consentMultitrack === true;
 
@@ -146,7 +188,7 @@ export const POST = withErrorHandling(async (request, context) => {
   // iscrive solo chi e' fra gli invitati dell'evento
   // (lib/events/registration-access), e il link personale lo consegna solo
   // l'email (lib/events/registration-link).
-  const soloInvitati = !publicRegistrationFor(event, (await getSettings()).publicRegistrationEnabled);
+  const soloInvitati = !publicRegistrationFor(event, settings.publicRegistrationEnabled);
   // Solo su invito l'errore sul questionario arriva a tutti allo stesso punto:
   // dopo il controllo degli inviti direbbe chi e' invitato. Con l'iscrizione
   // aperta arriva dopo il controllo del doppione, che ha la precedenza: chi e'
@@ -172,14 +214,21 @@ export const POST = withErrorHandling(async (request, context) => {
     }
     if (questionario.errore) throw questionario.errore;
 
-    const personId = await upsertPersonOnRegistration(tx, {
-      emailHash,
-      displayName,
-      organization: organization || null,
-      organizationRole: organizationRole || null,
-      organizationType: organizationType || null,
-      optedIn: consentAddressBook === true,
-    });
+    // Dove la rubrica non si propone, l'iscrizione non la scrive: nessuna voce
+    // nuova e nessun aggiornamento di una voce che esiste gia'. Chi ha gia' una
+    // voce resta legato a quella: le email dell'evento portano il link per
+    // uscire dalla rubrica (lib/persons/opt-out-link).
+    const personId = proposta
+      ? await upsertPersonOnRegistration(tx, {
+          emailHash,
+          email: encryptedEmail,
+          displayName,
+          organization: organization || null,
+          organizationRole: organizationRole || null,
+          organizationType: organizationType || null,
+          optedIn: inRubrica,
+        })
+      : ((await tx.person.findUnique({ where: { emailHash }, select: { id: true } }))?.id ?? null);
 
     const reg = await tx.registration.create({
       data: {
@@ -193,9 +242,11 @@ export const POST = withErrorHandling(async (request, context) => {
         consentGiven,
         consentTimestamp: new Date(),
         consentRecording: richiesti.registrazione ? (consentRecording ?? false) : null,
+        consentRecordingDestination: destinazioneLetta,
+        consentRecordingVersion: versioneLetta,
         consentMultitrack: richiesti.tracce ? trascrizioneData : null,
         consentMultitrackVersion: richiesti.tracce && trascrizioneData ? VERSIONE_TESTO_TRASCRIZIONE : null,
-        consentFutureCommunications: consentFutureCommunications ?? false,
+        consentFutureCommunications: comunicazioniFuture,
         locale: pageLocale,
         accessToken,
         personId,
@@ -224,6 +275,8 @@ export const POST = withErrorHandling(async (request, context) => {
         details: JSON.stringify({
           consentGiven: true,
           consentRecording: richiesti.registrazione ? (consentRecording ?? false) : null,
+          consentRecordingDestination: destinazioneLetta,
+          consentRecordingVersion: versioneLetta,
           // Il fatto lato server: la regola dell'evento chiedeva o no il
           // consenso alla registrazione (altrimenti l'iscrizione informa).
           recordingConsentRequired: richiesti.registrazione,
@@ -231,8 +284,8 @@ export const POST = withErrorHandling(async (request, context) => {
           recordingConsentOptional: richiesti.registrazione,
           consentMultitrack: richiesti.tracce ? trascrizioneData : null,
           consentMultitrackVersion: richiesti.tracce && trascrizioneData ? VERSIONE_TESTO_TRASCRIZIONE : null,
-          consentFutureCommunications: consentFutureCommunications ?? false,
-          consentAddressBook: consentAddressBook === true,
+          consentFutureCommunications: comunicazioniFuture,
+          consentAddressBook: inRubrica,
         }),
       },
     });

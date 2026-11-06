@@ -4435,6 +4435,7 @@
       "multitrack": "Souhlasím s přepisem svých příspěvků se svým jménem pro zprávu z akce. Pokud akce nahrává samostatnou zvukovou stopu každé osoby, můj hlas se nahrává pouze za tímto účelem a stopa se po přepisu smaže; nepoužívá se k identifikaci ani k napodobení mého hlasu.",
       "multitrackRetained": "I consent to my contributions being transcribed, with my name, for the event's report. If the event records a separate audio track for each person, my voice is recorded for this purpose only and the track is kept with the event data; it is not used to identify or reproduce my voice.",
       "multitrackOptional": "Je to dobrovolné: pokud nesouhlasíte, můžete se přesto zúčastnit, ale vaše příspěvky nebudou v přepisu a váš hlas se nebude nahrávat na samostatnou stopu. Pokud se akce nahrává, váš hlas ve videu přesto zůstane.",
+      "multitrackOptionalShort": "It is optional: if you do not consent you still take part, but what you say stays out of the transcript and your voice is not recorded on a separate track.",
       "stayInTouch": "Chci dostávat informace o připravovaných akcích a být zařazen do adresáře, abych byl zván na podobné akce",
       "stayInTouchHelp": "Nepovinný souhlas (čl. 6.1.a GDPR). Můžete ho kdykoli odvolat odkazem „Odebrat mě z adresáře“ v e-mailech, které obdržíte. Jméno a organizace jsou ty z této registrace.",
       "stayInTouchRetention": "We keep this data for {months} months from this consent: the period restarts only if you tick the box again.",
