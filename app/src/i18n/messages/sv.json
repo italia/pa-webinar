@@ -4461,7 +4461,9 @@
         "destinationUnset": "The organizers decide after the event whether to publish it.",
         "refuseOut": "If you do not consent you still take part and stay out of the recording.",
         "refuseListenOnly": "If you do not consent you take part listening only.",
-        "hostsAlways": "The hosts are always in the recording, with name, voice, image and shared screen."
+        "hostsAlways": "The hosts are always in the recording, with name, voice, image and shared screen.",
+        "audienceNotice": "You take part without microphone or camera: the recording does not contain your voice or your image, unless the hosts give you the floor.",
+        "audienceNoticeVoice": "You take part without microphone or camera: the recording contains neither your name, your voice nor your image, unless you consent in the room."
       },
       "transcript": {
         "label": "Transcript",
@@ -4478,6 +4480,7 @@
         "summary": "After the event, an AI tool may write a summary of the recording.",
         "translation": "The transcript and summary may be translated automatically.",
         "dubbing": "The video may be dubbed with a synthetic voice.",
+        "onRequest": "After the event the organisers can also ask for automatic processing of the recording not listed here: transcription, summary or translation.",
         "report": "After the event, the staff may have an AI tool write a report, using also the chat without names, questions and polls."
       },
       "list": {
@@ -4496,6 +4499,10 @@
         "videoUnpublished": "If it is not made available, the recording is deleted with them.",
         "videoPublishedDays": "If it is made available, it is deleted {days, plural, one {# day} other {# days}} later.",
         "videoPublishedOpen": "If it is made available, it stays until the organizers remove it."
+      },
+      "addressBook": {
+        "label": "Address book",
+        "offered": "When you register you can choose to stay in the events address book, to be invited to similar events. It is optional: the data stays for {months} months from your consent, unless you withdraw it."
       }
     },
     "export": {

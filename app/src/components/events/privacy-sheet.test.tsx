@@ -1,0 +1,330 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
+import { act } from 'react';
+import { createRoot, type Root } from 'react-dom/client';
+import { NextIntlClientProvider } from 'next-intl';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import messages from '@/i18n/messages/it.json';
+import type { SchedaPrivacy } from '@/lib/events/privacy-sheet';
+
+import { PrivacySheet } from './privacy-sheet';
+
+const t = messages.gdpr.sheet;
+const tSala = messages.waiting;
+
+const SCHEDA: SchedaPrivacy = {
+  registrazione: {
+    modo: 'manuale',
+    destinazione: 'PUBLIC',
+    chiNonAcconsente: 'restaFuori',
+    conduceSempre: false,
+  },
+  trascrizione: { sottotitoli: false, tracce: null, dalVideo: false },
+  sottotitoli: { attivi: false, testoConservato: false },
+  ia: null,
+  elencoVisibile: true,
+  pseudonimi: false,
+  conservazione: { giorniDati: 30, video: { giorniDopoPubblicazione: null } },
+  rubrica: null,
+};
+
+let container: HTMLDivElement;
+let root: Root;
+const errori = vi.fn();
+
+beforeEach(() => {
+  (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+  errori.mockClear();
+  container = document.createElement('div');
+  document.body.appendChild(container);
+  root = createRoot(container);
+});
+
+afterEach(() => {
+  act(() => root.unmount());
+  container.remove();
+  expect(errori).not.toHaveBeenCalled();
+});
+
+function disegna(modifiche: Partial<SchedaPrivacy> = {}, testoIa?: string | null) {
+  act(() => {
+    root.render(
+      <NextIntlClientProvider locale="it" messages={messages} onError={errori}>
+        <PrivacySheet scheda={{ ...SCHEDA, ...modifiche }} testoIa={testoIa} />
+      </NextIntlClientProvider>
+    );
+  });
+  return container.textContent ?? '';
+}
+
+const conRegistrazione = (r: Partial<SchedaPrivacy['registrazione']>) =>
+  disegna({ registrazione: { ...SCHEDA.registrazione, ...r } });
+
+const IA = {
+  sintesi: false,
+  traduzione: false,
+  doppiaggio: false,
+  elaborabileDopo: false,
+};
+
+describe('PrivacySheet, la registrazione', () => {
+  it.each([
+    ['nessuna', t.recording.none],
+    ['soloTracce', t.recording.tracksOnly],
+    ['manuale', t.recording.manual],
+    ['automatica', t.recording.auto],
+  ] as const)('modo %s', (modo, testo) => {
+    expect(conRegistrazione({ modo })).toContain(testo);
+  });
+
+  it.each([
+    ['PUBLIC', t.recording.destinationPublic],
+    ['REGISTRANTS', t.recording.destinationReserved],
+    ['nonDichiarata', t.recording.destinationUnset],
+  ] as const)('destinazione %s', (destinazione, testo) => {
+    expect(conRegistrazione({ destinazione })).toContain(testo);
+  });
+
+  it.each([
+    ['restaFuori', t.recording.refuseOut],
+    ['soloAscolto', t.recording.refuseListenOnly],
+    ['avviso', t.recording.audienceNotice],
+    ['avvisoVoce', t.recording.audienceNoticeVoice],
+  ] as const)('chi non acconsente: %s', (chiNonAcconsente, testo) => {
+    expect(conRegistrazione({ chiNonAcconsente })).toContain(testo);
+  });
+
+  it('senza un video non nomina destinazione, video da mettere a disposizione o scadenze', () => {
+    const testo = disegna({
+      registrazione: {
+        modo: 'soloTracce',
+        destinazione: null,
+        chiNonAcconsente: 'restaFuori',
+        conduceSempre: false,
+      },
+      conservazione: { giorniDati: 30, video: null },
+    });
+    expect(testo).toContain(t.recording.tracksOnly);
+    expect(testo).not.toContain(t.recording.destinationPublic);
+    expect(testo).not.toContain(t.recording.destinationReserved);
+    expect(testo).not.toContain(t.recording.destinationUnset);
+    expect(testo).not.toContain(t.retention.videoUnpublished);
+    expect(testo).not.toContain(t.retention.videoPublishedOpen);
+  });
+
+  it('con voce fissa non dice che chi non acconsente resta fuori dal video', () => {
+    const testo = conRegistrazione({ chiNonAcconsente: 'soloAscolto' });
+    expect(testo).toContain(t.recording.refuseListenOnly);
+    expect(testo).not.toContain(t.recording.refuseOut);
+  });
+
+  it('nessuna registrazione: una frase sola', () => {
+    const testo = disegna({
+      registrazione: {
+        modo: 'nessuna',
+        destinazione: null,
+        chiNonAcconsente: null,
+        conduceSempre: false,
+      },
+      conservazione: { giorniDati: 30, video: null },
+    });
+    expect(testo).toContain(t.recording.none);
+    expect(testo).not.toContain(t.recording.refuseOut);
+    expect(testo).not.toContain(t.recording.refuseListenOnly);
+  });
+
+  it('chi conduce sempre nella registrazione', () => {
+    expect(conRegistrazione({})).not.toContain(t.recording.hostsAlways);
+    expect(conRegistrazione({ conduceSempre: true })).toContain(t.recording.hostsAlways);
+  });
+});
+
+describe('PrivacySheet, trascrizione e sottotitoli', () => {
+  it('niente da dire: la riga non compare', () => {
+    const testo = disegna();
+    expect(testo).not.toContain(t.transcript.label);
+    expect(testo).not.toContain(t.captions.label);
+  });
+
+  it.each([
+    [{ sottotitoli: true, tracce: null, dalVideo: false }, t.transcript.captions],
+    [{ sottotitoli: false, tracce: 'cancellate', dalVideo: false }, t.transcript.tracks],
+    [
+      { sottotitoli: false, tracce: 'conservate', dalVideo: false },
+      t.transcript.tracksRetained,
+    ],
+    [{ sottotitoli: false, tracce: null, dalVideo: true }, t.transcript.fromVideo],
+  ] as const)('%o', (trascrizione, testo) => {
+    const resa = disegna({ trascrizione });
+    expect(resa).toContain(t.transcript.label);
+    expect(resa).toContain(testo);
+  });
+
+  it('una traccia che si conserva non promette la cancellazione', () => {
+    const resa = disegna({
+      trascrizione: { sottotitoli: false, tracce: 'conservate', dalVideo: false },
+    });
+    expect(resa).not.toContain(t.transcript.tracks);
+  });
+
+  it("i sottotitoli riusano il testo dell'avviso in sala", () => {
+    expect(disegna({ sottotitoli: { attivi: true, testoConservato: false } })).toContain(
+      tSala.captionsNotice
+    );
+    expect(disegna({ sottotitoli: { attivi: true, testoConservato: true } })).toContain(
+      tSala.captionsNoticeTranscript
+    );
+  });
+});
+
+describe('PrivacySheet, intelligenza artificiale', () => {
+  it('pipeline spenta: nessuna riga', () => {
+    expect(disegna({ ia: null })).not.toContain(t.ai.label);
+  });
+
+  it("pipeline accesa: il resoconto c'e' sempre", () => {
+    const testo = disegna({ ia: IA });
+    expect(testo).toContain(t.ai.report);
+    expect(testo).not.toContain(t.ai.summary);
+    expect(testo).not.toContain(t.ai.translation);
+    expect(testo).not.toContain(t.ai.dubbing);
+    expect(testo).not.toContain(t.ai.onRequest);
+  });
+
+  it("dice cio' che chi organizza puo' chiedere dopo l'evento, prima del resoconto", () => {
+    const testo = disegna({ ia: { ...IA, elaborabileDopo: true } });
+    expect(testo).toContain(t.ai.onRequest);
+    expect(testo.indexOf(t.ai.onRequest)).toBeLessThan(testo.indexOf(t.ai.report));
+  });
+
+  it('una frase per ogni elaborazione', () => {
+    const testo = disegna({
+      ia: { ...IA, sintesi: true, traduzione: true, doppiaggio: true },
+    });
+    expect(testo).toContain(t.ai.summary);
+    expect(testo).toContain(t.ai.translation);
+    expect(testo).toContain(t.ai.dubbing);
+  });
+
+  const SCRITTO = 'Testo scritto da chi amministra.';
+
+  it("il testo dell'amministrazione sostituisce le frasi sulle elaborazioni, non il resoconto", () => {
+    const testo = disegna({ ia: { ...IA, sintesi: true, traduzione: true } }, SCRITTO);
+    expect(testo).toContain(SCRITTO);
+    expect(testo).not.toContain(t.ai.summary);
+    expect(testo).not.toContain(t.ai.translation);
+    expect(testo).toContain(t.ai.report);
+  });
+
+  it("il testo dell'amministrazione non toglie cio' che si puo' chiedere dopo l'evento", () => {
+    const testo = disegna({ ia: { ...IA, elaborabileDopo: true } }, SCRITTO);
+    expect(testo).toContain(SCRITTO);
+    expect(testo).toContain(t.ai.onRequest);
+  });
+
+  it("vale anche se l'unica elaborazione e' la trascrizione", () => {
+    expect(
+      disegna(
+        { ia: IA, trascrizione: { sottotitoli: false, tracce: null, dalVideo: true } },
+        SCRITTO
+      )
+    ).toContain(SCRITTO);
+  });
+
+  it("senza niente da elaborare il testo dell'amministrazione non compare", () => {
+    const testo = disegna({ ia: IA }, SCRITTO);
+    expect(testo).not.toContain(SCRITTO);
+    expect(testo).toContain(t.ai.report);
+  });
+
+  it('un testo vuoto vale come assente', () => {
+    expect(disegna({ ia: { ...IA, sintesi: true } }, '   ')).toContain(t.ai.summary);
+  });
+
+  it("senza pipeline il testo dell'amministrazione non compare", () => {
+    expect(disegna({ ia: null }, SCRITTO)).not.toContain(SCRITTO);
+  });
+});
+
+describe('PrivacySheet, gli altri fatti', () => {
+  it('elenco e nome', () => {
+    const aperta = disegna();
+    expect(aperta).toContain(t.list.visible);
+    expect(aperta).toContain(t.name.real);
+
+    const pseudonimi = disegna({ elencoVisibile: false, pseudonimi: true });
+    expect(pseudonimi).toContain(t.list.hidden);
+    expect(pseudonimi).toContain(t.name.pseudonym);
+    expect(pseudonimi).not.toContain(t.name.real);
+  });
+
+  it('i giorni, al plurale e al singolare', () => {
+    expect(disegna({ conservazione: { giorniDati: 30, video: null } })).toContain(
+      '30 giorni dopo'
+    );
+    expect(disegna({ conservazione: { giorniDati: 1, video: null } })).toContain(
+      '1 giorno dopo'
+    );
+  });
+
+  it('senza una scadenza del video non compare un numero di giorni', () => {
+    const testo = disegna();
+    expect(testo).toContain(t.retention.videoUnpublished);
+    expect(testo).toContain(t.retention.videoPublishedOpen);
+    expect(testo).not.toContain('si cancella 30');
+  });
+
+  it('con una scadenza del video la dice', () => {
+    const testo = disegna({
+      conservazione: { giorniDati: 30, video: { giorniDopoPubblicazione: 90 } },
+    });
+    expect(testo).toContain('si cancella 90 giorni dopo.');
+    expect(testo).not.toContain(t.retention.videoPublishedOpen);
+  });
+
+  it('la rubrica compare solo dove si propone, con i suoi mesi', () => {
+    expect(disegna()).not.toContain(t.addressBook.label);
+    const testo = disegna({ rubrica: { mesi: 24 } });
+    expect(testo).toContain(t.addressBook.label);
+    expect(testo).toContain('24 mesi dal consenso');
+  });
+});
+
+describe('PrivacySheet, la struttura', () => {
+  it('sezione con titolo e una voce di elenco per ogni fatto', () => {
+    disegna();
+    const sezione = container.querySelector('section');
+    const titolo = container.querySelector('h2');
+    expect(titolo?.textContent).toBe(t.title);
+    expect(sezione?.getAttribute('aria-labelledby')).toBe(titolo?.id);
+    expect(container.querySelector('p')?.textContent).toBe(t.intro);
+    // Registrazione, elenco, nome e conservazione.
+    expect(container.querySelectorAll('ul.wr-facts--frasi > li.wr-fact')).toHaveLength(4);
+  });
+
+  it("le icone sono decorative e vengono dallo sprite dell'applicazione", () => {
+    disegna();
+    expect(container.querySelector('.wr-fact__icon')?.getAttribute('aria-hidden')).toBe(
+      'true'
+    );
+    expect(container.querySelector('.wr-fact__icon use')?.getAttribute('href')).toContain(
+      '/svg/sprites.svg#it-video'
+    );
+  });
+
+  it("due schede nella stessa pagina non si contendono l'id del titolo", () => {
+    act(() => {
+      root.render(
+        <NextIntlClientProvider locale="it" messages={messages} onError={errori}>
+          <PrivacySheet scheda={SCHEDA} />
+          <PrivacySheet scheda={SCHEDA} />
+        </NextIntlClientProvider>
+      );
+    });
+    const [primo, secondo] = container.querySelectorAll('h2');
+    expect(primo?.id).toBeTruthy();
+    expect(primo?.id).not.toBe(secondo?.id);
+  });
+});
