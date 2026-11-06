@@ -1239,6 +1239,18 @@ function FeaturesTab({ settings, updateField }: TabProps) {
           {t('publicRegistrationEnabledHelp')}
         </small>
       </div>
+      <div className="mb-4" data-testid="addressBookEnabled">
+        <ToggleSwitch
+          label={t('addressBookEnabled')}
+          checked={settings.addressBookEnabled ?? true}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            updateField('addressBookEnabled', e.target.checked)
+          }
+        />
+        <small className="text-muted d-block mt-1">
+          {t('addressBookEnabledHelp')}
+        </small>
+      </div>
       <div className="mb-4">
         <ToggleSwitch
           label={t('calendarPublic')}

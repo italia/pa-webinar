@@ -70,6 +70,7 @@ const POSTO: Record<string, [SettingsTab, string]> = {
   githubUrl: ['features', 'githubUrl'],
   supportEmail: ['features', 'supportEmail'],
   gravatarEnabled: ['features', 'gravatarEnabled'],
+  addressBookEnabled: ['features', 'addressBookEnabled'],
   liveCaptionsEnabled: ['features', 'liveCaptionsEnabled'],
   emailFromName: ['features', 'emailFromName'],
   emailReplyTo: ['features', 'emailReplyTo'],
