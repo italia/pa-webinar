@@ -130,7 +130,7 @@ An event with no destination is not blocked: its consents do not say where the v
 ### Chat and questions are outside the recording consent
 
 - **Chat is never published**, including questions asked in the chat. The public recap drops them when it is read, which also covers recaps saved earlier, and the AI report receives only the number of messages.
-- **Q&A questions are published as text, never with a name.** After the event the name stays with the moderators. `domandePubbliche()` is the one rule for the page, the room, the public API and the report input: with a recording reserved by its destination, or by an audience narrowed to registrants (`registrazioneRiservata()`), questions are not published, whatever the event's switch says.
+- **Q&A questions are published as text, never with a name.** After the event the name stays with the moderators. `domandePubbliche()` is the one rule for the page, the room, the public API and the input of the AI summary and report, which also needs the page after the event to be public (`domandePerIModelli()`): with a recording reserved by its destination, or by an audience narrowed to registrants (`registrazioneRiservata()`), questions are not published, whatever the event's switch says.
 - **A notice sits under both fields**, in the chat and in the Q&A composer, asking people not to write personal data.
 
 ### Proofs of consent outlive their sources

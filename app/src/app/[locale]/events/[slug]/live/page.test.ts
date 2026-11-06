@@ -192,7 +192,10 @@ function conduce(primario: boolean) {
 }
 
 interface PropsClient {
-  event: Record<string, unknown> & { postEventShow: { qa: boolean } };
+  event: Record<string, unknown> & {
+    postEventShow: { qa: boolean };
+    domandePubblicabili: boolean;
+  };
   hasRecordingConsent?: boolean;
   hasMultitrackConsent?: boolean;
   recordingAvailable?: boolean;
@@ -487,6 +490,24 @@ describe('sala — le domande dopo l evento', () => {
     expect((await clientProps()).event.postEventShow.qa).toBe(false);
     iscritto();
     expect((await clientProps(TOKEN)).event.postEventShow.qa).toBe(false);
+  });
+
+  it('una chiamata rapida nasce senza Q&A, ma le domande si possono pubblicare, nei due rami', async () => {
+    conEvento({ eventType: 'INSTANT', qaEnabled: false, recordingDestination: null });
+    const ospite = (await clientProps()).event;
+    expect(ospite.postEventShow.qa).toBe(false);
+    expect(ospite.domandePubblicabili).toBe(true);
+    iscritto();
+    const conToken = (await clientProps(TOKEN)).event;
+    expect(conToken.postEventShow.qa).toBe(false);
+    expect(conToken.domandePubblicabili).toBe(true);
+  });
+
+  it('con la registrazione riservata non si possono pubblicare, nei due rami', async () => {
+    conEvento({ recordingDestination: 'REGISTRANTS' });
+    expect((await clientProps()).event.domandePubblicabili).toBe(false);
+    iscritto();
+    expect((await clientProps(TOKEN)).event.domandePubblicabili).toBe(false);
   });
 
   it('spente da chi organizza o senza Q&A non si pubblicano', async () => {

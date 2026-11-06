@@ -365,13 +365,25 @@ export const PUT = withErrorHandling(async (request, context) => {
     'videoQuality',
   ] as const;
   const isTerminalStatus = event.status === 'ENDED' || event.status === 'ARCHIVED';
-  // A lifecycle edit (revive: pushing endsAt/startsAt to the future, or an
-  // explicit status change) legitimately brings the event back to life, so the
-  // capture flags matter again — don't strip in that case.
+  // Reviving an ENDED event: if the moderator pushes endsAt into the
+  // future we flip the status back to PUBLISHED or LIVE instead of
+  // leaving the row stuck in ENDED. Without this the call happens to
+  // be terminated permanently from a single timing mistake — which
+  // is what happened on a dry-run before a real event.
+  const revivedStatus = reviveStatus({
+    currentStatus: event.status,
+    currentStartsAt: event.startsAt,
+    newEndsAt: data.endsAt !== undefined ? new Date(data.endsAt) : undefined,
+    newStartsAt: data.startsAt !== undefined ? new Date(data.startsAt) : undefined,
+    statusExplicitlySet: data.status !== undefined,
+    now: new Date(),
+  });
+  // Uno stato nuovo o una riapertura rimettono in gioco la cattura: i suoi campi
+  // restano. Conta cio' che la richiesta fa davvero all'evento: il wizard manda
+  // sempre le date, una data corretta che resta nel passato non riapre niente, e
+  // un evento chiuso prima della fine riapre anche a date uguali.
   const isLifecycleEdit =
-    data.status !== undefined ||
-    data.endsAt !== undefined ||
-    data.startsAt !== undefined;
+    (data.status !== undefined && data.status !== event.status) || revivedStatus !== null;
   const ignoredCreationOnlyFields: string[] = [];
   // La registrazione decide il consenso chiesto a chi entra e
   // il blocco dei mezzi che la sala accende al primo ingresso
@@ -498,20 +510,6 @@ export const PUT = withErrorHandling(async (request, context) => {
         computedAt: new Date().toISOString(),
       }
     : undefined;
-
-  // Reviving an ENDED event: if the moderator pushes endsAt into the
-  // future we flip the status back to PUBLISHED or LIVE instead of
-  // leaving the row stuck in ENDED. Without this the call happens to
-  // be terminated permanently from a single timing mistake — which
-  // is what happened on a dry-run before a real event.
-  const revivedStatus = reviveStatus({
-    currentStatus: event.status,
-    currentStartsAt: event.startsAt,
-    newEndsAt: data.endsAt !== undefined ? new Date(data.endsAt) : undefined,
-    newStartsAt: data.startsAt !== undefined ? new Date(data.startsAt) : undefined,
-    statusExplicitlySet: data.status !== undefined,
-    now: new Date(),
-  });
 
   // Permission matrix (mirrors the POST/create path): when the client sends a
   // matrix, it is the source of truth — persist it AND re-derive the legacy

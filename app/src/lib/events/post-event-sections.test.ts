@@ -4,6 +4,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  domandePubblicabili,
   domandePubblicateInSala,
   domandePubbliche,
   sezioniDopoEvento,
@@ -63,27 +64,29 @@ describe('domande sulla pagina dopo l\'evento', () => {
   });
 });
 
-describe('domande in sala: si puo\' dire che compaiono sulla pagina', () => {
-  const scheda = (esitoDomande: 'soloTesto' | 'nonPubblicate') => ({ chat: { esitoDomande } });
+describe('domande pubblicabili: il Q&A si puo\' aprire dal vivo', () => {
+  const evento = {
+    postEventShowQA: true,
+    recordingDestination: null,
+    recordingAudience: 'PUBLIC',
+  } as const;
 
-  it('lo dice la scheda, anche per un Q&A aperto dal vivo', () => {
-    expect(
-      domandePubblicateInSala({
-        schedaPrivacy: scheda('soloTesto'),
-        postEventShow: { qa: false },
-      }),
-    ).toBe(true);
-    expect(
-      domandePubblicateInSala({
-        schedaPrivacy: scheda('nonPubblicate'),
-        postEventShow: { qa: true },
-      }),
-    ).toBe(false);
+  it('non dipendono dal Q&A acceso alla creazione', () => {
+    expect(domandePubbliche({ ...evento, qaEnabled: false })).toBe(false);
+    expect(domandePubblicabili(evento)).toBe(true);
   });
 
-  it('senza scheda, nelle chiamate rapide, segue la sezione della pagina', () => {
-    expect(domandePubblicateInSala({ schedaPrivacy: null, postEventShow: { qa: false } })).toBe(false);
-    expect(domandePubblicateInSala({ schedaPrivacy: null, postEventShow: { qa: true } })).toBe(true);
+  it('restano fuori se chi organizza non le mostra o la registrazione e\' riservata', () => {
+    expect(domandePubblicabili({ ...evento, postEventShowQA: false })).toBe(false);
+    expect(domandePubblicabili({ ...evento, recordingDestination: 'REGISTRANTS' })).toBe(false);
+    expect(domandePubblicabili({ ...evento, recordingAudience: 'REGISTRANTS' })).toBe(false);
+  });
+});
+
+describe('domande in sala: si puo\' dire che compaiono sulla pagina', () => {
+  it('lo dice il valore calcolato dal server', () => {
+    expect(domandePubblicateInSala({ domandePubblicabili: true })).toBe(true);
+    expect(domandePubblicateInSala({ domandePubblicabili: false })).toBe(false);
   });
 
   it('senza dati resta l\'avviso piu\' prudente', () => {

@@ -25,6 +25,18 @@ import {
 } from './live-timeline';
 
 const T0 = new Date('2026-10-08T10:00:00Z');
+/** Un evento concluso che pubblica le domande. */
+const PUBBLICATE = {
+  status: 'ENDED',
+  eventType: 'SCHEDULED',
+  endsAt: new Date('2026-10-08T11:00:00Z'),
+  postEventPublic: true,
+  postEventPublicUntil: null,
+  postEventShowQA: true,
+  qaEnabled: true,
+  recordingDestination: 'PUBLIC',
+  recordingAudience: 'PUBLIC',
+};
 const at = (min: number, sec = 0) => new Date(T0.getTime() + min * 60_000 + sec * 1000);
 const evento = prisma.event.findUnique as unknown as ReturnType<typeof vi.fn>;
 const m = <K extends keyof typeof prisma>(k: K) =>
@@ -35,11 +47,7 @@ let conteggi: Record<'chat_messages' | 'reactions' | 'live_actions', Array<{ b: 
 
 beforeEach(() => {
   vi.clearAllMocks();
-  evento.mockResolvedValue({
-    postEventShowQA: true,
-    qaEnabled: true,
-    recordingDestination: 'PUBLIC',
-  });
+  evento.mockResolvedValue(PUBBLICATE);
   m('liveAction').mockResolvedValue([]);
   m('question').mockResolvedValue([]);
   m('eventMaterial').mockResolvedValue([]);
@@ -195,10 +203,12 @@ describe('buildLiveTimeline', () => {
   });
 
   it.each([
-    ['domande spente', { postEventShowQA: false, qaEnabled: true, recordingDestination: 'PUBLIC' }],
-    ['Q&A mai acceso', { postEventShowQA: true, qaEnabled: false, recordingDestination: 'PUBLIC' }],
-    ['registrazione riservata', { postEventShowQA: true, qaEnabled: true, recordingDestination: 'REGISTRANTS' }],
-    ['video reso riservato', { postEventShowQA: true, qaEnabled: true, recordingDestination: 'PUBLIC', recordingAudience: 'REGISTRANTS' }],
+    ['domande spente', { ...PUBBLICATE, postEventShowQA: false }],
+    ['Q&A mai acceso', { ...PUBBLICATE, qaEnabled: false }],
+    ['registrazione riservata', { ...PUBBLICATE, recordingDestination: 'REGISTRANTS' }],
+    ['video reso riservato', { ...PUBBLICATE, recordingAudience: 'REGISTRANTS' }],
+    ['pagina dopo l\'evento privata', { ...PUBBLICATE, postEventPublic: false }],
+    ['pagina dopo l\'evento scaduta', { ...PUBBLICATE, postEventPublicUntil: new Date('2026-10-09T00:00:00Z') }],
     ['evento non trovato', null],
   ])('con %s nessun testo di domanda, nemmeno dalle azioni', async (_caso, riga) => {
     evento.mockResolvedValue(riga);

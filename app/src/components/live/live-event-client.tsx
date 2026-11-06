@@ -183,6 +183,8 @@ interface EventInfo {
   postEventPublic?: boolean;
   /** Le sezioni che chi organizza mostra a evento concluso (Event.postEventShow*). */
   postEventShow?: Record<SezioneDopoEvento, boolean>;
+  /** Le domande possono comparire sulla pagina, anche se il Q&A si apre dal vivo. */
+  domandePubblicabili?: boolean;
   libraryListed?: boolean;
   feedbackEnabled?: boolean;
   /** Testo di consenso alla registrazione scelto per l'evento; null = quello predefinito. */

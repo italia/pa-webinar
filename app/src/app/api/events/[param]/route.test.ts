@@ -1188,6 +1188,120 @@ describe('PUT /api/events/[param] — la destinazione della registrazione', () =
     });
   });
 
+  describe('un evento concluso salvato dal modulo', () => {
+    const GIORNO = 86_400_000;
+    const iso = (ms: number) => new Date(ms).toISOString();
+    const ORA = Date.now();
+    const INIZIO_PASSATO = ORA - 2 * GIORNO;
+    const FINE_PASSATA = INIZIO_PASSATO + 3_600_000;
+    const concluso = (over: Record<string, unknown> = {}) =>
+      riservato({
+        status: 'ENDED',
+        recordingEnabled: false,
+        recordingDestination: null,
+        recordingAudience: 'PUBLIC',
+        startsAt: new Date(INIZIO_PASSATO),
+        endsAt: new Date(FINE_PASSATA),
+        ...over,
+      });
+    const STESSE_DATE = { startsAt: iso(INIZIO_PASSATO), endsAt: iso(FINE_PASSATA) };
+
+    const senzaEffetti = (scritti: Record<string, unknown>) => {
+      expect(scritti).not.toHaveProperty('status');
+      expect(scritti).not.toHaveProperty('recordingEnabled');
+      expect(scritti).not.toHaveProperty('recordingDestination');
+      expect(scritti).not.toHaveProperty('recordingAudience');
+    };
+
+    it('a date passate invariate resta concluso e la registrazione non lo riserva', async () => {
+      const r = await modifica(concluso(), { recordingEnabled: true, ...STESSE_DATE });
+      expect(r.status).toBe(200);
+      senzaEffetti(datiScritti());
+      expect((await r.json()).ignoredCreationOnlyFields).toEqual(['recordingEnabled']);
+    });
+
+    it('le date senza i secondi, come le manda il modulo, non cambiano niente', async () => {
+      await modifica(
+        concluso({
+          startsAt: new Date(INIZIO_PASSATO + 37_000),
+          endsAt: new Date(FINE_PASSATA + 12_000),
+        }),
+        { recordingEnabled: true, ...STESSE_DATE },
+      );
+      senzaEffetti(datiScritti());
+    });
+
+    it('una data corretta che resta nel passato non lo riapre e non lo riserva', async () => {
+      const r = await modifica(concluso(), {
+        recordingEnabled: true,
+        ...STESSE_DATE,
+        endsAt: iso(FINE_PASSATA + 15 * 60_000),
+      });
+      expect(r.status).toBe(200);
+      senzaEffetti(datiScritti());
+      expect(datiScritti().endsAt).toEqual(new Date(FINE_PASSATA + 15 * 60_000));
+      expect((await r.json()).ignoredCreationOnlyFields).toEqual(['recordingEnabled']);
+    });
+
+    it('lo stato ripetuto non riapre l’evento, nemmeno con la fine nel futuro', async () => {
+      await modifica(concluso(), {
+        recordingEnabled: true,
+        status: 'ENDED',
+        ...STESSE_DATE,
+        endsAt: iso(ORA + GIORNO),
+      });
+      const scritti = datiScritti();
+      expect(scritti).not.toHaveProperty('recordingEnabled');
+      expect(scritti).not.toHaveProperty('recordingDestination');
+    });
+
+    it('spostare la fine nel futuro lo riapre: la registrazione vale e parte riservata', async () => {
+      await modifica(concluso(), {
+        recordingEnabled: true,
+        ...STESSE_DATE,
+        endsAt: iso(ORA + GIORNO),
+      });
+      expect(datiScritti()).toMatchObject({
+        status: 'LIVE',
+        recordingEnabled: true,
+        recordingDestination: 'REGISTRANTS',
+        recordingAudience: 'REGISTRANTS',
+      });
+    });
+
+    describe('chiuso prima della fine, con le date ancora nel futuro', () => {
+      const INIZIO = ORA + GIORNO;
+      const FINE = INIZIO + 3_600_000;
+      const chiuso = (over: Record<string, unknown> = {}) =>
+        concluso({ startsAt: new Date(INIZIO), endsAt: new Date(FINE), ...over });
+      const DATE = { startsAt: iso(INIZIO), endsAt: iso(FINE) };
+
+      it('lo stesso salvataggio lo riapre: i campi della cattura spenti valgono', async () => {
+        const r = await modifica(
+          chiuso({ recordingEnabled: true, autoStartRecording: true }),
+          { recordingEnabled: false, autoStartRecording: false, ...DATE },
+        );
+        expect(r.status).toBe(200);
+        expect(datiScritti()).toMatchObject({
+          status: 'PUBLISHED',
+          recordingEnabled: false,
+          autoStartRecording: false,
+        });
+        expect((await r.json()).ignoredCreationOnlyFields).toBeUndefined();
+      });
+
+      it('la registrazione accesa dal modulo vale e parte riservata', async () => {
+        await modifica(chiuso(), { recordingEnabled: true, ...DATE });
+        expect(datiScritti()).toMatchObject({
+          status: 'PUBLISHED',
+          recordingEnabled: true,
+          recordingDestination: 'REGISTRANTS',
+          recordingAudience: 'REGISTRANTS',
+        });
+      });
+    });
+  });
+
   describe('un file agganciato con recordingUrl', () => {
     const spento = (over: Record<string, unknown> = {}) =>
       riservato({

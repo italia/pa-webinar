@@ -7,7 +7,7 @@ import {
   captionsTranscriptActive,
   liveCaptionsAvailable,
 } from '@/lib/captions/availability';
-import { domandePubbliche } from '@/lib/events/post-event-sections';
+import { domandePubblicabili } from '@/lib/events/post-event-sections';
 import { tracceConfigurate } from '@/lib/live/capture-state';
 import {
   conduceSempreRegistrato,
@@ -276,9 +276,7 @@ export function schedaPrivacy({
     chat: {
       attiva: evento.chatEnabled,
       domandeAttive: evento.qaEnabled,
-      esitoDomande: domandePubbliche({ ...evento, qaEnabled: true })
-        ? 'soloTesto'
-        : 'nonPubblicate',
+      esitoDomande: domandePubblicabili(evento) ? 'soloTesto' : 'nonPubblicate',
     },
     elencoVisibile: elencoVisibileAlPubblico(evento),
     pseudonimi: evento.audienceAnonymous,

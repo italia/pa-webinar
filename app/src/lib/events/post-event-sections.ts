@@ -3,6 +3,7 @@
 
 import type { RecordingAudience } from '@prisma/client';
 
+import { isEventPageVisible } from '@/lib/events/visibility';
 import { registrazioneRiservata } from '@/lib/recording/destination';
 
 /**
@@ -42,14 +43,34 @@ export function domandePubbliche(evento: {
 }
 
 /**
- * Se in sala si puo' dire che le domande possono comparire sulla pagina
- * dell'evento. La scheda vale anche per un Q&A aperto dal vivo; le chiamate rapide
- * non ce l'hanno, e seguono la sezione della pagina.
+ * Le domande arrivano ai modelli di sintesi e resoconto solo se la pagina le
+ * pubblica adesso: `domandePubbliche`, con la pagina dell'evento visibile quando
+ * il lavoro parte. Vale per entrambi, perche' il resoconto legge anche la sintesi
+ * e cio' che il modello legge puo' uscirne riformulato.
  */
-export function domandePubblicateInSala(evento: {
-  schedaPrivacy?: { chat: { esitoDomande: 'soloTesto' | 'nonPubblicate' } } | null;
-  postEventShow?: Pick<Record<SezioneDopoEvento, boolean>, 'qa'>;
-}): boolean {
-  if (evento.schedaPrivacy) return evento.schedaPrivacy.chat.esitoDomande === 'soloTesto';
-  return evento.postEventShow?.qa ?? true;
+export function domandePerIModelli(
+  evento: Parameters<typeof domandePubbliche>[0] & Parameters<typeof isEventPageVisible>[0],
+): boolean {
+  return domandePubbliche(evento) && isEventPageVisible(evento);
+}
+
+/**
+ * Le domande possono comparire sulla pagina dell'evento anche se il Q&A si apre
+ * dal vivo: la stessa regola di `domandePubbliche`, senza `qaEnabled`, che chi
+ * conduce puo' accendere a sala aperta. E' cio' che dicono la scheda e gli
+ * avvisi in sala, anche nelle chiamate rapide, che nascono con il Q&A spento.
+ */
+export function domandePubblicabili(
+  evento: Omit<Parameters<typeof domandePubbliche>[0], 'qaEnabled'>,
+): boolean {
+  return domandePubbliche({ ...evento, qaEnabled: true });
+}
+
+/**
+ * Se in sala si puo' dire che le domande possono comparire sulla pagina
+ * dell'evento. Il valore lo calcola il server (`domandePubblicabili`): senza,
+ * resta l'avviso piu' prudente.
+ */
+export function domandePubblicateInSala(evento: { domandePubblicabili?: boolean }): boolean {
+  return evento.domandePubblicabili ?? true;
 }

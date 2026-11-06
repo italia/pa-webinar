@@ -14,7 +14,7 @@
  *    registrazione, timer, mani alzate, PDF presentati e pagine mostrate,
  *    fine evento;
  *  - le righe che un'ora ce l'hanno gia': domande del Q&A (il testo, mai chi le
- *    ha scritte, e solo se la pagina le pubblica: `domandePubbliche`), materiali
+ *    ha scritte, e solo se la pagina le pubblica: `domandePerIModelli`), materiali
  *    condivisi, e l'attivita' della chat e delle reazioni contata per finestre
  *    di cinque minuti. Della chat si contano i messaggi, il testo non si legge.
  *
@@ -26,7 +26,7 @@
 import { Prisma } from '@prisma/client';
 
 import { prisma } from '@/lib/db';
-import { domandePubbliche } from '@/lib/events/post-event-sections';
+import { domandePerIModelli } from '@/lib/events/post-event-sections';
 import type { LiveFlagField } from '@/lib/live-state/pubsub';
 import { normalizeWord } from '@/lib/wordcloud/normalize';
 
@@ -391,6 +391,11 @@ export async function buildLiveTimeline(opts: {
       prisma.event.findUnique({
         where: { id: eventId },
         select: {
+          status: true,
+          eventType: true,
+          endsAt: true,
+          postEventPublic: true,
+          postEventPublicUntil: true,
           postEventShowQA: true,
           qaEnabled: true,
           recordingDestination: true,
@@ -438,7 +443,7 @@ export async function buildLiveTimeline(opts: {
   );
 
   // Senza le righe le azioni sulle domande non hanno testo, e non entrano.
-  const domande = evento && domandePubbliche(evento) ? domandeLette : [];
+  const domande = evento && domandePerIModelli(evento) ? domandeLette : [];
   const perId = new Map(
     domande.map((q) => [q.id, { text: q.text, answerText: q.answerText }])
   );
