@@ -836,7 +836,7 @@ export default function LiveEventClient({
   // portale, la schermata giusta è già impostata). In un rientro anche un
   // portale momentaneamente in difficoltà (5xx, troppe richieste) vale
   // 'rete': si riprova da soli invece di mostrare un errore.
-  const richiediCredenziali = useCallback(async (
+  const chiediCredenziali = useCallback(async (
     rientro = false,
     // Il consenso dato dalla sala: un rifiuto qualunque resta un messaggio
     // nella fascia, non chiude la conferenza in cui si e' gia'.
@@ -1037,6 +1037,30 @@ export default function LiveEventClient({
     locale,
   ]);
 
+  // Un token e un ritiro non si sovrappongono. Il server crea il posto del token
+  // nuovo prima di rispondere: un ritiro partito senza quel token non lo trova, e
+  // il consenso resterebbe vivo su quel posto. Il ritiro aspetta i token in volo.
+  // Un token chiesto a ritiro partito non parte: lo stato di questa chiamata e' di
+  // prima del ritiro, e 'rete' lo fa richiedere con quello nuovo.
+  const tokenInVoloRef = useRef(new Set<Promise<unknown>>());
+  const ritiroInVoloRef = useRef<Promise<void> | null>(null);
+  const richiediCredenziali = useCallback(async (
+    rientro = false,
+    senzaUscire = false,
+  ): Promise<'fatto' | 'rete' | 'gestito'> => {
+    if (ritiroInVoloRef.current) {
+      await ritiroInVoloRef.current;
+      return 'rete';
+    }
+    const richiesta = chiediCredenziali(rientro, senzaUscire);
+    tokenInVoloRef.current.add(richiesta);
+    try {
+      return await richiesta;
+    } finally {
+      tokenInVoloRef.current.delete(richiesta);
+    }
+  }, [chiediCredenziali]);
+
   const fetchJwt = useCallback(async () => {
     setError('');
     const esito = await richiediCredenziali();
@@ -1185,10 +1209,22 @@ export default function LiveEventClient({
       setRiconsenso((r) => (r === 'errore' || r === 'rileggi' ? 'no' : r));
       setRitiro('in-corso');
       epocaConsensiRef.current += 1;
-      const res = await richiestaJson(`/api/events/${event.slug}/consents/withdraw`, {
-        method: 'POST',
-        body: JSON.stringify({ roomTokens: tokenSalaRef.current, recording: registrazione }),
+      let ritiroFinito = () => {};
+      ritiroInVoloRef.current = new Promise<void>((fatto) => {
+        ritiroFinito = fatto;
       });
+      const inVolo = [...tokenInVoloRef.current];
+      let res: Awaited<ReturnType<typeof richiestaJson>> = null;
+      try {
+        await Promise.allSettled(inVolo);
+        res = await richiestaJson(`/api/events/${event.slug}/consents/withdraw`, {
+          method: 'POST',
+          body: JSON.stringify({ roomTokens: tokenSalaRef.current, recording: registrazione }),
+        });
+      } finally {
+        ritiroInVoloRef.current = null;
+        ritiroFinito();
+      }
       epocaConsensiRef.current += 1;
       if (!res || !res.ok) {
         setRitiro('errore');

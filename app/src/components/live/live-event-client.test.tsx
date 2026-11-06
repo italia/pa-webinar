@@ -32,7 +32,7 @@ type PropsAttesa = {
 };
 const attesa = vi.hoisted(() => ({ props: null as unknown }));
 const leggiAttesa = () => attesa.props as PropsAttesa;
-const conferenza = vi.hoisted(() => ({ perdiConnessione: () => {} }));
+const conferenza = vi.hoisted(() => ({ perdiConnessione: () => {}, jwt: '' }));
 
 vi.mock('@/components/live/waiting-room', () => ({
   default: (props: unknown) => {
@@ -47,13 +47,16 @@ vi.mock('@/components/jitsi/jitsi-room', async () => {
     default: function ConferenzaFinta({
       onReady,
       onConnectionLost,
+      jwt,
     }: {
       onReady: () => void;
       onConnectionLost: () => void;
+      jwt: string;
     }) {
       const entra = useRef(onReady);
       useEffect(() => entra.current(), []);
       conferenza.perdiConnessione = onConnectionLost;
+      conferenza.jwt = jwt;
       return null;
     },
   };
@@ -1150,6 +1153,111 @@ describe('sala — i consensi riletti a sala aperta', () => {
       await tutti();
       expect(riletture()).toHaveLength(0);
     });
+  });
+});
+
+describe('sala — un ritiro e un token insieme', () => {
+  const CON_CONSENSO = {
+    recordingDestination: 'REGISTRANTS' as const,
+    consentsRecorded: { recording: true, multitrack: false },
+    consentsInForce: { recording: true, transcription: false },
+  };
+  const SENZA_CONSENSO = {
+    recordingDestination: 'REGISTRANTS' as const,
+    voiceExcluded: true,
+    consentsRecorded: { recording: false, multitrack: false },
+    consentsInForce: { recording: false, transcription: false },
+  };
+  const ritiri = () => chiamate.filter((c) => c.url.endsWith('/consents/withdraw'));
+  const pausa = (ms: number) => act(async () => { await new Promise((fatto) => setTimeout(fatto, ms)); });
+
+  async function dentroConConsenso() {
+    await monta({ event: { ...evento, recordingDestination: 'REGISTRANTS' }, isGuest: true });
+    risposte.push(CON_CONSENSO);
+    await entra({ recordingConsent: true, recordingConsentDestination: 'REGISTRANTS' });
+    expect(conferenza.jwt).toBe('jwt-1');
+  }
+
+  /** La prima richiesta che finisce per `fine` resta appesa finche' non la si sblocca. */
+  function trattieni(fine: string) {
+    const base = vi.mocked(fetch).getMockImplementation()!;
+    let sblocca: (r: Response) => void = () => {};
+    let attiva = true;
+    vi.mocked(fetch).mockImplementation(async (input, init) => {
+      if (String(input).endsWith(fine) && attiva) {
+        attiva = false;
+        chiamate.push({ url: String(input), method: 'POST', body: JSON.parse(String(init?.body)) });
+        return new Promise<Response>((fatto) => {
+          sblocca = fatto;
+        });
+      }
+      return base(input, init);
+    });
+    return (corpo: unknown, stato = 200) => sblocca(rispondi(corpo, stato));
+  }
+
+  async function confermaRitiro() {
+    await premi(pulsante(l.consents.button));
+    await premi(pulsante(l.consents.withdraw));
+    await premi(pulsante(l.consents.confirm));
+  }
+
+  it('il ritiro aspetta il token in volo e ritira anche il suo posto', async () => {
+    await dentroConConsenso();
+    const sblocca = trattieni('/jitsi/token');
+    await act(async () => conferenza.perdiConnessione());
+    await vi.waitFor(() => expect(richiesteToken()).toHaveLength(2));
+    expect(ultimoToken()).toMatchObject({ consentReplay: { recording: true } });
+
+    risposte.push(SENZA_CONSENSO);
+    await confermaRitiro();
+    await pausa(20);
+    expect(ritiri()).toHaveLength(0);
+
+    await act(async () => {
+      sblocca({ jwt: 'jwt-B', roomName: 'stanza', displayName: 'Relatore 1', role: 'participant', ...CON_CONSENSO });
+    });
+    await vi.waitFor(() => expect(ritiri()).toHaveLength(1));
+    expect(ritiri()[0]!.body).toEqual({ roomTokens: ['jwt-1', 'jwt-B'], recording: true });
+
+    await vi.waitFor(() => expect(richiesteToken()).toHaveLength(3));
+    expect(ultimoToken()).not.toHaveProperty('consentReplay');
+    await pausa(10);
+    expect(conferenza.jwt).toBe('jwt-3');
+    expect(testo()).not.toContain(l.consents.given);
+  });
+
+  it('un token chiesto a ritiro partito aspetta, e riparte senza il consenso', async () => {
+    await dentroConConsenso();
+    const sblocca = trattieni('/consents/withdraw');
+    await confermaRitiro();
+    await vi.waitFor(() => expect(ritiri()).toHaveLength(1));
+
+    await act(async () => conferenza.perdiConnessione());
+    await pausa(20);
+    expect(richiesteToken()).toHaveLength(1);
+
+    risposte.push(SENZA_CONSENSO, SENZA_CONSENSO);
+    await act(async () => sblocca({}));
+    await vi.waitFor(() => expect(richiesteToken().length).toBeGreaterThan(1));
+    await pausa(20);
+    for (const richiesta of richiesteToken().slice(1)) {
+      expect(richiesta.body).not.toHaveProperty('consentReplay');
+    }
+  });
+
+  it('un ritiro fallito lascia libero il token dopo', async () => {
+    await dentroConConsenso();
+    const sblocca = trattieni('/consents/withdraw');
+    await confermaRitiro();
+    await vi.waitFor(() => expect(ritiri()).toHaveLength(1));
+    await act(async () => {
+      sblocca({ error: 'no' }, 500);
+    });
+    risposte.push(CON_CONSENSO);
+    await act(async () => conferenza.perdiConnessione());
+    await vi.waitFor(() => expect(richiesteToken()).toHaveLength(2));
+    expect(ultimoToken()).toMatchObject({ consentReplay: { recording: true } });
   });
 });
 
