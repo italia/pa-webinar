@@ -106,6 +106,8 @@ type EventOverrides = Partial<{
   participantsCanShareScreen: boolean;
   accessMode: 'OPEN' | 'INVITATION' | null;
   audienceAnonymous: boolean;
+  recordingDestination: 'PUBLIC' | 'REGISTRANTS' | null;
+  aiTranscriptEnabled: boolean;
 }>;
 
 function eventRow(overrides: EventOverrides = {}) {
@@ -126,6 +128,8 @@ function eventRow(overrides: EventOverrides = {}) {
     accessMode: null,
     audienceAnonymous: false,
     hostsAlwaysRecorded: false,
+    recordingDestination: null,
+    aiTranscriptEnabled: false,
     ...overrides,
   };
 }
@@ -146,6 +150,7 @@ const DEFAULT_SETTINGS = {
   gravatarEnabled: false,
   guestAccessEnabled: true,
   publicRegistrationEnabled: true,
+  aiPipelineEnabled: false,
 };
 let siteSettings = { ...DEFAULT_SETTINGS };
 
@@ -218,6 +223,8 @@ async function minted(res: Response) {
     displayName: string;
     role: string;
     consentsRecorded?: { recording: boolean; multitrack: boolean };
+    recordingDestination?: string | null;
+    voiceExcluded?: boolean;
   };
   // Firma verificata davvero: un JWT che Prosody rifiuterebbe non fa entrare
   // nessuno, per quanto corretto sia il resto del payload.
@@ -1279,3 +1286,494 @@ describe('POST jitsi/token — pubblico anonimo', () => {
   });
 });
 
+describe('POST jitsi/token — il testo del consenso e la destinazione del video', () => {
+  // L'evento registra, chi partecipa puo' parlare, e chi non acconsente resta
+  // fuori dal video.
+  const interattivo = { recordingEnabled: true, participantsCanUnmute: true };
+  const riga = () =>
+    (vi.mocked(prisma.recordingConsent.createMany).mock.calls[0]![0] as {
+      data: { destination: string | null; textVersion: number | null }[];
+    }).data[0]!;
+  const conEvento = (campi: EventOverrides) =>
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(eventRow({ ...interattivo, ...campi }) as never);
+  const iscritto = async (campi: Record<string, unknown> = {}) => {
+    vi.mocked(prisma.registration.findUnique).mockResolvedValue(registrationRow(campi) as never);
+    cookieJar.set(eventAccessCookieName(EVENT_ID), await signEventAccess(EVENT_ID, ACCESS_TOKEN, 3600));
+  };
+  const concessione = () => ({
+    id: 'grant-1',
+    eventId: EVENT_ID,
+    revokedAt: null,
+    role: 'SPEAKER',
+    name: encryptPII('Relatore 1'),
+    email: null,
+  });
+
+  beforeEach(() => {
+    vi.stubEnv('RECORDING_VOICE_EXCLUSION', 'true');
+    vi.mocked(prisma.recordingConsent.createMany).mockResolvedValue({ count: 1 } as never);
+    vi.mocked(prisma.multitrackConsent.create).mockResolvedValue({} as never);
+    vi.mocked(prisma.multitrackConsent.findFirst).mockResolvedValue(null as never);
+    vi.mocked(prisma.eventModerator.findUnique).mockResolvedValue(concessione() as never);
+  });
+  afterEach(() => vi.unstubAllEnvs());
+
+  describe('ogni risposta dice la destinazione in vigore', () => {
+    beforeEach(() => conEvento({ recordingDestination: 'REGISTRANTS' }));
+
+    it('a chi conduce', async () => {
+      const { body } = await minted(await post({ moderatorToken: GRANT_TOKEN }));
+      expect(body.recordingDestination).toBe('REGISTRANTS');
+    });
+
+    it('all iscritto', async () => {
+      await iscritto();
+      const { body } = await minted(await post({ accessToken: ACCESS_TOKEN }));
+      expect(body.recordingDestination).toBe('REGISTRANTS');
+    });
+
+    it('a chi apre un link inoltrato', async () => {
+      vi.mocked(prisma.registration.findUnique).mockResolvedValue(registrationRow() as never);
+      const { body } = await minted(
+        await post({ accessToken: ACCESS_TOKEN, displayNameOverride: 'Chi ha ricevuto il link' }),
+      );
+      expect(body.recordingDestination).toBe('REGISTRANTS');
+    });
+
+    it('all ospite', async () => {
+      const { body } = await minted(await post({ guestName: 'Ospite' }));
+      expect(body.recordingDestination).toBe('REGISTRANTS');
+    });
+
+    it('e vale null su un evento che non l ha dichiarata', async () => {
+      conEvento({ recordingDestination: null });
+      const { body } = await minted(await post({ guestName: 'Ospite' }));
+      expect(body.recordingDestination).toBeNull();
+    });
+  });
+
+  describe('dove non c e un video', () => {
+    beforeEach(() => {
+      vi.stubEnv('JITSI_WEB_INTERNAL_URL', 'http://jitsi-web');
+      vi.stubEnv('RECORDER_CONTROLLER_URL', 'http://recorder');
+      conEvento({ recordingDestination: 'REGISTRANTS' });
+    });
+
+    it('il testo non dichiara una destinazione, mai la colonna dell evento', async () => {
+      const { body } = await minted(
+        await post({ guestName: 'Ospite', recordingConsent: true, recordingConsentDestination: null }),
+      );
+      expect(body.recordingDestination).toBeNull();
+      expect(body.consentsRecorded?.recording).toBe(true);
+      expect(riga()).toMatchObject({ destination: null, textVersion: null });
+    });
+
+    it('il consenso dato all iscrizione senza destinazione copre', async () => {
+      await iscritto({ consentRecording: true, consentRecordingDestination: null });
+      const { body } = await minted(await post({ accessToken: ACCESS_TOKEN }));
+      expect(body.voiceExcluded).toBe(false);
+    });
+  });
+
+  describe('il consenso dato con questa richiesta', () => {
+    it('un testo vecchio dopo un allargamento non vale: entra fuori dal video, senza prova', async () => {
+      conEvento({ recordingDestination: 'PUBLIC', multitrackRecordingEnabled: true });
+      const res = await post({
+        guestName: 'Ospite',
+        recordingConsent: true,
+        recordingConsentDestination: 'REGISTRANTS',
+        multitrackConsent: true,
+      });
+      expect(res.status).toBe(200);
+      const { body, user } = await minted(res);
+      expect(body.voiceExcluded).toBe(true);
+      expect(user.voiceExcluded).toBe(true);
+      expect(body.recordingDestination).toBe('PUBLIC');
+      expect(body.consentsRecorded).toEqual({ recording: false, multitrack: false });
+      expect(prisma.recordingConsent.createMany).not.toHaveBeenCalled();
+      expect(prisma.multitrackConsent.create).not.toHaveBeenCalled();
+    });
+
+    it('vale per l iscritto: quello di prima non basta, e nemmeno il testo vecchio', async () => {
+      conEvento({ recordingDestination: 'PUBLIC' });
+      await iscritto({ consentRecording: true, consentRecordingDestination: 'REGISTRANTS' });
+      const { body } = await minted(
+        await post({
+          accessToken: ACCESS_TOKEN,
+          recordingConsent: true,
+          recordingConsentDestination: 'REGISTRANTS',
+        }),
+      );
+      expect(body.voiceExcluded).toBe(true);
+      expect(body.consentsRecorded?.recording).toBe(false);
+    });
+
+    it('vale per chi apre un link inoltrato', async () => {
+      conEvento({ recordingDestination: 'PUBLIC' });
+      vi.mocked(prisma.registration.findUnique).mockResolvedValue(registrationRow() as never);
+      const { body } = await minted(
+        await post({
+          accessToken: ACCESS_TOKEN,
+          displayNameOverride: 'Chi ha ricevuto il link',
+          recordingConsent: true,
+          recordingConsentDestination: 'REGISTRANTS',
+        }),
+      );
+      expect(body.voiceExcluded).toBe(true);
+      expect(prisma.recordingConsent.createMany).not.toHaveBeenCalled();
+    });
+
+    it('un testo che non dichiarava dove va il video non copre un evento che lo dichiara', async () => {
+      conEvento({ recordingDestination: 'REGISTRANTS' });
+      const { body } = await minted(
+        await post({ guestName: 'Ospite', recordingConsent: true, recordingConsentDestination: null }),
+      );
+      expect(body.voiceExcluded).toBe(true);
+      expect(prisma.recordingConsent.createMany).not.toHaveBeenCalled();
+    });
+
+    it('al rientro dopo una restrizione resta nel video, e la prova dice il testo letto', async () => {
+      conEvento({ recordingDestination: 'REGISTRANTS' });
+      const { body } = await minted(
+        await post({
+          guestName: 'Ospite',
+          recordingConsent: true,
+          recordingConsentDestination: 'PUBLIC',
+        }),
+      );
+      expect(body.voiceExcluded).toBe(false);
+      expect(body.recordingDestination).toBe('REGISTRANTS');
+      expect(riga()).toMatchObject({ destination: 'PUBLIC', textVersion: 1 });
+    });
+
+    it('una pagina che non manda il campo vale per il testo in vigore', async () => {
+      conEvento({ recordingDestination: 'REGISTRANTS' });
+      const { body } = await minted(await post({ guestName: 'Ospite', recordingConsent: true }));
+      expect(body.voiceExcluded).toBe(false);
+      expect(riga()).toMatchObject({ destination: 'REGISTRANTS', textVersion: 1 });
+    });
+
+    it('su un evento senza destinazione la prova resta senza testo dichiarato', async () => {
+      conEvento({ recordingDestination: null });
+      const { body } = await minted(
+        await post({ guestName: 'Ospite', recordingConsent: true, recordingConsentDestination: null }),
+      );
+      expect(body.voiceExcluded).toBe(false);
+      expect(riga()).toMatchObject({ destination: null, textVersion: null });
+    });
+
+    it('la prova della trascrizione non ha il campo della destinazione', async () => {
+      conEvento({ recordingDestination: 'PUBLIC', multitrackRecordingEnabled: true });
+      await post({ guestName: 'Ospite', recordingConsent: true, multitrackConsent: true });
+      const dati = vi.mocked(prisma.multitrackConsent.create).mock.calls[0]![0].data;
+      expect(dati).not.toHaveProperty('destination');
+      expect(dati).toMatchObject({ textVersion: 2 });
+    });
+  });
+
+  describe('i consensi gia dati', () => {
+    it('quello dell iscrizione copre dopo una restrizione', async () => {
+      conEvento({ recordingDestination: 'REGISTRANTS' });
+      await iscritto({ consentRecording: true, consentRecordingDestination: 'PUBLIC' });
+      const { body } = await minted(await post({ accessToken: ACCESS_TOKEN }));
+      expect(body.voiceExcluded).toBe(false);
+    });
+
+    it('quello dell iscrizione non copre dopo un allargamento: fuori dal video', async () => {
+      conEvento({ recordingDestination: 'PUBLIC' });
+      await iscritto({ consentRecording: true, consentRecordingDestination: 'REGISTRANTS' });
+      const { body, user } = await minted(await post({ accessToken: ACCESS_TOKEN }));
+      expect(body.voiceExcluded).toBe(true);
+      expect(user.voiceExcluded).toBe(true);
+    });
+
+    it('quello dell iscrizione senza destinazione non copre un evento che la dichiara', async () => {
+      conEvento({ recordingDestination: 'REGISTRANTS' });
+      await iscritto({ consentRecording: true, consentRecordingDestination: null });
+      const { body } = await minted(await post({ accessToken: ACCESS_TOKEN }));
+      expect(body.voiceExcluded).toBe(true);
+    });
+
+    it('la prova data in sala copre dopo una restrizione', async () => {
+      conEvento({ recordingDestination: 'REGISTRANTS' });
+      await iscritto();
+      vi.mocked(prisma.recordingConsent.findFirst).mockResolvedValueOnce({ destination: 'PUBLIC' } as never);
+      const { body } = await minted(await post({ accessToken: ACCESS_TOKEN }));
+      expect(body.voiceExcluded).toBe(false);
+    });
+
+    it('la prova data in sala non copre dopo un allargamento', async () => {
+      conEvento({ recordingDestination: 'PUBLIC' });
+      await iscritto();
+      vi.mocked(prisma.recordingConsent.findFirst).mockResolvedValueOnce({ destination: 'REGISTRANTS' } as never);
+      const { body } = await minted(await post({ accessToken: ACCESS_TOKEN }));
+      expect(body.voiceExcluded).toBe(true);
+    });
+
+    it('il consenso dell iscrizione non passa a chi apre il link inoltrato', async () => {
+      conEvento({ recordingDestination: 'REGISTRANTS' });
+      vi.mocked(prisma.registration.findUnique).mockResolvedValue(
+        registrationRow({ consentRecording: true, consentRecordingDestination: 'PUBLIC' }) as never,
+      );
+      const { body } = await minted(
+        await post({ accessToken: ACCESS_TOKEN, displayNameOverride: 'Chi ha ricevuto il link' }),
+      );
+      expect(body.voiceExcluded).toBe(true);
+    });
+  });
+
+  describe('la prova che non copre piu', () => {
+    const prima = new Date('2026-11-01T10:00:00Z');
+    const aggiornamento = () =>
+      vi.mocked(prisma.recordingConsent.updateMany).mock.calls[0]![0] as {
+        where: Record<string, unknown>;
+        data: Record<string, unknown>;
+      };
+
+    it('si aggiorna sul testo nuovo, con il periodo vecchio nella prova', async () => {
+      conEvento({ recordingDestination: 'PUBLIC' });
+      await iscritto();
+      vi.mocked(prisma.recordingConsent.findFirst).mockResolvedValueOnce({
+        consentedAt: prima,
+        withdrawnAt: null,
+        earlierPeriods: null,
+        destination: 'REGISTRANTS',
+        textVersion: 1,
+      } as never);
+      vi.mocked(prisma.recordingConsent.updateMany).mockResolvedValueOnce({ count: 1 } as never);
+
+      const { body } = await minted(
+        await post({
+          accessToken: ACCESS_TOKEN,
+          recordingConsent: true,
+          recordingConsentDestination: 'PUBLIC',
+        }),
+      );
+
+      expect(body.voiceExcluded).toBe(false);
+      expect(body.consentsRecorded?.recording).toBe(true);
+      const { where, data } = aggiornamento();
+      expect(where).toEqual({
+        eventId: EVENT_ID,
+        registrationId: REGISTRATION_ID,
+        withdrawnAt: null,
+        destination: 'REGISTRANTS',
+      });
+      expect(data.destination).toBe('PUBLIC');
+      expect(data.textVersion).toBe(1);
+      expect(data.withdrawnAt).toBeNull();
+      expect(data.earlierPeriods).toEqual([
+        {
+          consentedAt: prima.toISOString(),
+          withdrawnAt: null,
+          destination: 'REGISTRANTS',
+          textVersion: 1,
+        },
+      ]);
+      const dettagli = JSON.parse(
+        vi.mocked(prisma.gdprAuditLog.create).mock.calls[0]![0].data.details as string,
+      ) as Record<string, unknown>;
+      expect(dettagli).toMatchObject({
+        givenAgain: true,
+        previousDestination: 'REGISTRANTS',
+        destination: 'PUBLIC',
+      });
+    });
+
+    it('tiene i periodi gia nella prova, in ordine', async () => {
+      conEvento({ recordingDestination: 'PUBLIC' });
+      await iscritto();
+      const vecchio = { consentedAt: '2026-10-01T10:00:00.000Z', withdrawnAt: '2026-10-02T10:00:00.000Z' };
+      vi.mocked(prisma.recordingConsent.findFirst).mockResolvedValueOnce({
+        consentedAt: prima,
+        withdrawnAt: null,
+        earlierPeriods: [vecchio],
+        destination: null,
+        textVersion: null,
+      } as never);
+      vi.mocked(prisma.recordingConsent.updateMany).mockResolvedValueOnce({ count: 1 } as never);
+      await post({ accessToken: ACCESS_TOKEN, recordingConsent: true });
+      const { where, data } = aggiornamento();
+      expect(where).toMatchObject({ destination: null });
+      expect(data.earlierPeriods).toEqual([
+        vecchio,
+        { consentedAt: prima.toISOString(), withdrawnAt: null, destination: null, textVersion: null },
+      ]);
+    });
+
+    it('un ritiro ridato sul testo nuovo porta nel periodo vecchio il suo testo', async () => {
+      conEvento({ recordingDestination: 'REGISTRANTS' });
+      await iscritto();
+      const ritiro = new Date('2026-11-01T10:30:00Z');
+      vi.mocked(prisma.recordingConsent.findFirst).mockResolvedValueOnce({
+        consentedAt: prima,
+        withdrawnAt: ritiro,
+        earlierPeriods: null,
+        destination: 'PUBLIC',
+        textVersion: 1,
+      } as never);
+      vi.mocked(prisma.recordingConsent.updateMany).mockResolvedValueOnce({ count: 1 } as never);
+      await post({
+        accessToken: ACCESS_TOKEN,
+        recordingConsent: true,
+        recordingConsentDestination: 'REGISTRANTS',
+      });
+      const { where, data } = aggiornamento();
+      expect(where).toEqual({
+        eventId: EVENT_ID,
+        registrationId: REGISTRATION_ID,
+        withdrawnAt: { not: null },
+      });
+      expect(data).toMatchObject({ destination: 'REGISTRANTS', textVersion: 1 });
+      expect(data.earlierPeriods).toEqual([
+        {
+          consentedAt: prima.toISOString(),
+          withdrawnAt: ritiro.toISOString(),
+          destination: 'PUBLIC',
+          textVersion: 1,
+        },
+      ]);
+    });
+
+    it('una prova che copre resta com e', async () => {
+      conEvento({ recordingDestination: 'REGISTRANTS' });
+      await iscritto();
+      vi.mocked(prisma.recordingConsent.findFirst).mockResolvedValueOnce({
+        consentedAt: prima,
+        withdrawnAt: null,
+        earlierPeriods: null,
+        destination: 'PUBLIC',
+        textVersion: 1,
+      } as never);
+      await post({
+        accessToken: ACCESS_TOKEN,
+        recordingConsent: true,
+        recordingConsentDestination: 'REGISTRANTS',
+      });
+      expect(prisma.recordingConsent.updateMany).not.toHaveBeenCalled();
+      expect(prisma.gdprAuditLog.create).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('chi conduce o interviene', () => {
+    afterEach(() => {
+      staffSeat.valore = null;
+    });
+
+    it('senza account: il consenso sul testo in vigore lascia la prova sulla concessione', async () => {
+      conEvento({ recordingDestination: 'REGISTRANTS' });
+      const { body } = await minted(
+        await post({
+          moderatorToken: GRANT_TOKEN,
+          recordingConsent: true,
+          recordingConsentDestination: 'REGISTRANTS',
+        }),
+      );
+      expect(body.voiceExcluded).toBe(false);
+      expect(riga()).toMatchObject({
+        destination: 'REGISTRANTS',
+        textVersion: 1,
+        eventModeratorId: 'grant-1',
+        staffAccountId: null,
+      });
+    });
+
+    it('senza account: il consenso che non copre porta fuori dal video, e modera come sempre', async () => {
+      conEvento({ recordingDestination: 'PUBLIC', multitrackRecordingEnabled: true });
+      const { body, user } = await minted(
+        await post({
+          moderatorToken: PRIMARY_TOKEN,
+          displayNameOverride: 'Moderatrice',
+          recordingConsent: true,
+          recordingConsentDestination: 'REGISTRANTS',
+          multitrackConsent: true,
+        }),
+      );
+      expect(body.voiceExcluded).toBe(true);
+      expect(body.recordingDestination).toBe('PUBLIC');
+      expect(user.moderator).toBe('true');
+      expect(body.consentsRecorded).toEqual({ recording: false, multitrack: false });
+    });
+
+    it('con l account dello staff: la prova porta il testo letto', async () => {
+      staffSeat.valore = { accountId: 'acc-1', nome: 'Ada Rossi' };
+      conEvento({ recordingDestination: 'REGISTRANTS' });
+      const { body } = await minted(
+        await post({
+          moderatorToken: PRIMARY_TOKEN,
+          recordingConsent: true,
+          recordingConsentDestination: 'PUBLIC',
+        }),
+      );
+      expect(body.voiceExcluded).toBe(false);
+      expect(riga()).toMatchObject({
+        destination: 'PUBLIC',
+        textVersion: 1,
+        staffAccountId: 'acc-1',
+        eventModeratorId: null,
+      });
+    });
+
+    it('con l account dello staff: un testo vecchio non vale', async () => {
+      staffSeat.valore = { accountId: 'acc-1', nome: 'Ada Rossi' };
+      conEvento({ recordingDestination: 'PUBLIC' });
+      const { body } = await minted(
+        await post({
+          moderatorToken: PRIMARY_TOKEN,
+          recordingConsent: true,
+          recordingConsentDestination: 'REGISTRANTS',
+        }),
+      );
+      expect(body.voiceExcluded).toBe(true);
+      expect(prisma.recordingConsent.createMany).not.toHaveBeenCalled();
+    });
+
+    it('chi e sempre nella registrazione non lascia prove, qualunque sia la destinazione', async () => {
+      conEvento({ recordingDestination: 'PUBLIC', hostsAlwaysRecorded: true });
+      const { body, user } = await minted(await post({ moderatorToken: GRANT_TOKEN }));
+      expect(body.voiceExcluded).toBe(false);
+      expect(user.voiceExcluded).toBeUndefined();
+      expect(body.recordingDestination).toBe('PUBLIC');
+      expect(prisma.recordingConsent.createMany).not.toHaveBeenCalled();
+    });
+
+    it('chi e sempre nella registrazione non salva un consenso dato su un testo vecchio', async () => {
+      conEvento({ recordingDestination: 'PUBLIC', hostsAlwaysRecorded: true });
+      const { body } = await minted(
+        await post({
+          moderatorToken: GRANT_TOKEN,
+          recordingConsent: true,
+          recordingConsentDestination: 'REGISTRANTS',
+        }),
+      );
+      expect(body.voiceExcluded).toBe(false);
+      expect(body.consentsRecorded?.recording).toBe(false);
+      expect(prisma.recordingConsent.createMany).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('la prova della trascrizione dal video', () => {
+    it('si salva anche se la trascrizione nasce solo dalla pipeline AI', async () => {
+      applySettings({ aiPipelineEnabled: true });
+      conEvento({ aiTranscriptEnabled: true });
+      const { body } = await minted(
+        await post({ guestName: 'Ospite', recordingConsent: true, multitrackConsent: true }),
+      );
+      expect(body.consentsRecorded).toEqual({ recording: true, multitrack: true });
+      expect(prisma.multitrackConsent.create).toHaveBeenCalledTimes(1);
+    });
+
+    it('con la pipeline spenta non si salva', async () => {
+      conEvento({ aiTranscriptEnabled: true });
+      await post({ guestName: 'Ospite', recordingConsent: true, multitrackConsent: true });
+      expect(prisma.multitrackConsent.create).not.toHaveBeenCalled();
+    });
+
+    it('in una chiamata rapida non si salva', async () => {
+      applySettings({ aiPipelineEnabled: true });
+      conEvento({ aiTranscriptEnabled: true, eventType: 'INSTANT' });
+      await post({ guestName: 'Ospite', multitrackConsent: true });
+      expect(prisma.multitrackConsent.create).not.toHaveBeenCalled();
+    });
+  });
+});
