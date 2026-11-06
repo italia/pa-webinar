@@ -31,7 +31,7 @@ import {
   type Destinazione,
 } from '@/lib/recording/destination';
 import { chiaveConsensoTrascrizione, consensiRichiesti } from '@/lib/registration/consents';
-import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import { testoConsensoEvento, type VoceNelVideo } from '@/lib/live/consent-rule';
 
 interface ProfilingConfig {
   requireOrganization: boolean;
@@ -52,6 +52,8 @@ interface RegistrationFormClientProps {
   /** Dove va il video: decide il testo della casella della registrazione
    *  (lib/recording/destination). */
   recordingDestination?: Destinazione;
+  /** Il testo dell'ente sulla registrazione: il consenso qui vale anche per quello. */
+  recordingConsentText?: string | null;
   multitrackRecordingEnabled?: boolean;
   /** La trascrizione dai sottotitoli e' attiva (lib/captions/availability). */
   captionsTranscript?: boolean;
@@ -109,6 +111,7 @@ export default function RegistrationFormClient({
   testoIa = null,
   recordingEnabled = false,
   recordingDestination = null,
+  recordingConsentText = null,
   multitrackRecordingEnabled = false,
   captionsTranscript = false,
   trascrizioneVideo = false,
@@ -143,6 +146,7 @@ export default function RegistrationFormClient({
   // casella per due scopi affini e dichiarati entrambi nel testo (art. 6.1.a,
   // facoltativo, mai spuntata in partenza). Si salvano entrambi i consensi.
   const [consentStayInTouch, setConsentStayInTouch] = useState(false);
+  const testoEvento = testoConsensoEvento(recordingConsentText, voce);
   const richiesti = consensiRichiesti({
     recordingEnabled,
     multitrackRecordingEnabled,
@@ -909,6 +913,7 @@ export default function RegistrationFormClient({
               aria-invalid={errors.consentRecording ? true : undefined}
               aria-describedby={
                 [
+                  testoEvento ? 'consentRecordingEvento' : null,
                   voce === 'assente' ? null : 'consentRecordingOptional',
                   errors.consentRecording ? 'consentRecordingError' : null,
                 ]
@@ -928,6 +933,12 @@ export default function RegistrationFormClient({
               {tg(`consent.${chiaveConsenso(recordingDestination, voce)}`)}{' '}
               <span className="consent-mark">{t('optionalMark')}</span>
             </Label>
+            {/* Vale per lo stesso consenso, come in sala d'attesa e in sala. */}
+            {testoEvento && (
+              <div id="consentRecordingEvento" className="form-text">
+                {testoEvento}
+              </div>
+            )}
             {/* Facoltativo davvero: si dice cosa succede senza. */}
             {voce !== 'assente' && (
               <div id="consentRecordingOptional" className="form-text">
