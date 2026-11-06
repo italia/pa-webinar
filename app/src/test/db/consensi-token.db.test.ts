@@ -1,0 +1,317 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
+/**
+ * Il consenso alla registrazione dato entrando in sala, su un database vero: la
+ * prova unica dell'iscrizione, il suo aggiornamento quando il testo in vigore
+ * non e' piu' coperto, e due ingressi insieme. Un client simulato non vede il
+ * vincolo unico, il filtro sulla colonna nulla ne' il JSON dei periodi.
+ */
+import { randomUUID } from 'node:crypto';
+
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { POST as chiediToken } from '@/app/api/events/[param]/jitsi/token/route';
+import { encryptPII } from '@/lib/crypto/pii';
+import { prisma } from '@/lib/db';
+import { eventAccessCookieName, signEventAccess } from '@/lib/event-session';
+import type { PeriodoConsenso } from '@/lib/recording/destination';
+
+import { biscotti } from './biscotti';
+import { creaEvento, creaIscrizione, richiesta, svuotaDatabase } from './fixtures';
+
+const CHE_REGISTRA = { recordingEnabled: true, participantsCanUnmute: true };
+
+beforeEach(async () => {
+  await svuotaDatabase();
+  vi.stubEnv('RECORDING_VOICE_EXCLUSION', 'true');
+});
+afterEach(() => vi.unstubAllEnvs());
+
+interface RispostaToken {
+  voiceExcluded: boolean;
+  recordingDestination: string | null;
+  consentsRecorded: { recording: boolean; multitrack: boolean };
+}
+
+async function entra(
+  slug: string,
+  corpo: Record<string, unknown>
+): Promise<RispostaToken> {
+  const risposta = await chiediToken(
+    richiesta(`/api/events/${slug}/jitsi/token`, 'POST', corpo) as never,
+    { params: Promise.resolve({ param: slug }) }
+  );
+  expect(risposta.status).toBe(200);
+  return (await risposta.json()) as RispostaToken;
+}
+
+async function iscrittoDa(eventId: string) {
+  const iscrizione = await creaIscrizione(eventId);
+  biscotti.set(
+    eventAccessCookieName(eventId),
+    await signEventAccess(eventId, iscrizione.accessToken, 3600)
+  );
+  return iscrizione;
+}
+
+function provaEsistente(
+  eventId: string,
+  registrationId: string,
+  campi: {
+    destination?: 'PUBLIC' | 'REGISTRANTS' | null;
+    textVersion?: number | null;
+    withdrawnAt?: Date | null;
+  }
+) {
+  return prisma.recordingConsent.create({
+    data: {
+      eventId,
+      registrationId,
+      jitsiUserId: `reg-${registrationId}`,
+      displayName: encryptPII('Persona Iscritta'),
+      consentedAt: new Date('2026-11-01T10:00:00Z'),
+      ...campi,
+    },
+  });
+}
+
+const prove = (eventId: string) =>
+  prisma.recordingConsent.findMany({ where: { eventId } });
+const registro = (eventId: string) =>
+  prisma.gdprAuditLog.count({ where: { eventId, action: 'CONSENT_RECORDED' } });
+
+describe('la prova dell’iscrizione quando il testo in vigore cambia', () => {
+  it('dopo un allargamento il testo vecchio non vale e la prova non cambia', async () => {
+    const evento = await creaEvento({ ...CHE_REGISTRA, recordingDestination: 'PUBLIC' });
+    const iscrizione = await iscrittoDa(evento.id);
+    await provaEsistente(evento.id, iscrizione.id, {
+      destination: 'REGISTRANTS',
+      textVersion: 1,
+    });
+
+    const risposta = await entra(evento.slug, {
+      accessToken: iscrizione.accessToken,
+      recordingConsent: true,
+      recordingConsentDestination: 'REGISTRANTS',
+    });
+
+    expect(risposta.voiceExcluded).toBe(true);
+    expect(risposta.recordingDestination).toBe('PUBLIC');
+    expect(risposta.consentsRecorded.recording).toBe(false);
+    const [prova, ...altre] = await prove(evento.id);
+    expect(altre).toEqual([]);
+    expect(prova!.destination).toBe('REGISTRANTS');
+    expect(prova!.earlierPeriods).toBeNull();
+    expect(await registro(evento.id)).toBe(0);
+  });
+
+  it('sul testo nuovo la stessa riga passa alla destinazione nuova e tiene il periodo vecchio', async () => {
+    const evento = await creaEvento({ ...CHE_REGISTRA, recordingDestination: 'PUBLIC' });
+    const iscrizione = await iscrittoDa(evento.id);
+    const vecchia = await provaEsistente(evento.id, iscrizione.id, {
+      destination: 'REGISTRANTS',
+      textVersion: 1,
+    });
+
+    const risposta = await entra(evento.slug, {
+      accessToken: iscrizione.accessToken,
+      recordingConsent: true,
+      recordingConsentDestination: 'PUBLIC',
+    });
+
+    expect(risposta.voiceExcluded).toBe(false);
+    const [prova, ...altre] = await prove(evento.id);
+    expect(altre).toEqual([]);
+    expect(prova!.id).toBe(vecchia.id);
+    expect(prova!.destination).toBe('PUBLIC');
+    expect(prova!.textVersion).toBe(1);
+    expect(prova!.consentedAt.getTime()).toBeGreaterThan(vecchia.consentedAt.getTime());
+    const periodi: PeriodoConsenso[] = [
+      {
+        consentedAt: vecchia.consentedAt.toISOString(),
+        withdrawnAt: null,
+        destination: 'REGISTRANTS',
+        textVersion: 1,
+      },
+    ];
+    expect(prova!.earlierPeriods).toEqual(periodi);
+    expect(await registro(evento.id)).toBe(1);
+  });
+
+  it('una prova senza destinazione si aggiorna: il filtro sulla colonna nulla la trova', async () => {
+    const evento = await creaEvento({
+      ...CHE_REGISTRA,
+      recordingDestination: 'REGISTRANTS',
+    });
+    const iscrizione = await iscrittoDa(evento.id);
+    await provaEsistente(evento.id, iscrizione.id, {});
+
+    await entra(evento.slug, {
+      accessToken: iscrizione.accessToken,
+      recordingConsent: true,
+      recordingConsentDestination: 'REGISTRANTS',
+    });
+
+    const [prova] = await prove(evento.id);
+    expect(prova!.destination).toBe('REGISTRANTS');
+    expect(prova!.earlierPeriods).toEqual([
+      {
+        consentedAt: '2026-11-01T10:00:00.000Z',
+        withdrawnAt: null,
+        destination: null,
+        textVersion: null,
+      },
+    ]);
+  });
+
+  it('al rientro dopo una restrizione la prova resta quella letta, senza rifarla', async () => {
+    const evento = await creaEvento({
+      ...CHE_REGISTRA,
+      recordingDestination: 'REGISTRANTS',
+    });
+    const iscrizione = await iscrittoDa(evento.id);
+    const vecchia = await provaEsistente(evento.id, iscrizione.id, {
+      destination: 'PUBLIC',
+      textVersion: 1,
+    });
+
+    const senzaRichiesta = await entra(evento.slug, {
+      accessToken: iscrizione.accessToken,
+    });
+    const riletta = await entra(evento.slug, {
+      accessToken: iscrizione.accessToken,
+      recordingConsent: true,
+      recordingConsentDestination: 'REGISTRANTS',
+    });
+
+    expect(senzaRichiesta.voiceExcluded).toBe(false);
+    expect(riletta.voiceExcluded).toBe(false);
+    const [prova, ...altre] = await prove(evento.id);
+    expect(altre).toEqual([]);
+    expect(prova!.destination).toBe('PUBLIC');
+    expect(prova!.consentedAt).toEqual(vecchia.consentedAt);
+    expect(prova!.earlierPeriods).toBeNull();
+  });
+
+  it('un consenso ritirato si ridà sul testo in vigore, con il suo periodo', async () => {
+    const evento = await creaEvento({
+      ...CHE_REGISTRA,
+      recordingDestination: 'REGISTRANTS',
+    });
+    const iscrizione = await iscrittoDa(evento.id);
+    const ritiro = new Date('2026-11-01T10:30:00Z');
+    await provaEsistente(evento.id, iscrizione.id, {
+      destination: 'PUBLIC',
+      textVersion: 1,
+      withdrawnAt: ritiro,
+    });
+
+    await entra(evento.slug, {
+      accessToken: iscrizione.accessToken,
+      recordingConsent: true,
+      recordingConsentDestination: 'REGISTRANTS',
+    });
+
+    const [prova] = await prove(evento.id);
+    expect(prova!.withdrawnAt).toBeNull();
+    expect(prova!.destination).toBe('REGISTRANTS');
+    expect(prova!.earlierPeriods).toEqual([
+      {
+        consentedAt: '2026-11-01T10:00:00.000Z',
+        withdrawnAt: ritiro.toISOString(),
+        destination: 'PUBLIC',
+        textVersion: 1,
+      },
+    ]);
+  });
+
+  it('due ingressi insieme aggiornano una volta sola', async () => {
+    const evento = await creaEvento({ ...CHE_REGISTRA, recordingDestination: 'PUBLIC' });
+    const iscrizione = await iscrittoDa(evento.id);
+    await provaEsistente(evento.id, iscrizione.id, {
+      destination: 'REGISTRANTS',
+      textVersion: 1,
+    });
+
+    const corpo = {
+      accessToken: iscrizione.accessToken,
+      recordingConsent: true,
+      recordingConsentDestination: 'PUBLIC',
+    };
+    await Promise.all([entra(evento.slug, corpo), entra(evento.slug, corpo)]);
+
+    const [prova, ...altre] = await prove(evento.id);
+    expect(altre).toEqual([]);
+    expect(prova!.destination).toBe('PUBLIC');
+    expect(prova!.earlierPeriods).toHaveLength(1);
+    expect(await registro(evento.id)).toBe(1);
+  });
+
+  it('la prima prova dell’iscrizione nasce con il testo letto e non si raddoppia', async () => {
+    const evento = await creaEvento({
+      ...CHE_REGISTRA,
+      recordingDestination: 'REGISTRANTS',
+    });
+    const iscrizione = await iscrittoDa(evento.id);
+    const corpo = {
+      accessToken: iscrizione.accessToken,
+      recordingConsent: true,
+      recordingConsentDestination: 'PUBLIC',
+    };
+
+    await entra(evento.slug, corpo);
+    await entra(evento.slug, corpo);
+
+    const [prova, ...altre] = await prove(evento.id);
+    expect(altre).toEqual([]);
+    expect(prova).toMatchObject({ destination: 'PUBLIC', textVersion: 1 });
+  });
+});
+
+describe('le prove senza iscrizione', () => {
+  it('un ospite lascia una riga per ingresso, con il testo letto', async () => {
+    const evento = await creaEvento({ ...CHE_REGISTRA, recordingDestination: 'PUBLIC' });
+
+    await entra(evento.slug, { guestName: 'Ospite', recordingConsent: true });
+    await entra(evento.slug, {
+      guestName: 'Ospite',
+      recordingConsent: true,
+      recordingConsentDestination: 'PUBLIC',
+    });
+
+    const righe = await prove(evento.id);
+    expect(righe).toHaveLength(2);
+    expect(righe.map((r) => r.destination)).toEqual(['PUBLIC', 'PUBLIC']);
+  });
+
+  it('chi conduce dal link nominale lascia la prova sulla concessione', async () => {
+    const evento = await creaEvento({
+      ...CHE_REGISTRA,
+      recordingDestination: 'REGISTRANTS',
+    });
+    const concessione = await prisma.eventModerator.create({
+      data: {
+        eventId: evento.id,
+        token: randomUUID(),
+        name: encryptPII('Relatore 1'),
+        role: 'SPEAKER',
+      },
+    });
+
+    const risposta = await entra(evento.slug, {
+      moderatorToken: concessione.token,
+      recordingConsent: true,
+      recordingConsentDestination: 'REGISTRANTS',
+    });
+
+    expect(risposta.voiceExcluded).toBe(false);
+    const [prova] = await prove(evento.id);
+    expect(prova).toMatchObject({
+      eventModeratorId: concessione.id,
+      registrationId: null,
+      destination: 'REGISTRANTS',
+      textVersion: 1,
+    });
+  });
+});
