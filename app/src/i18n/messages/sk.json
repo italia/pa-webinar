@@ -3022,6 +3022,7 @@
     "rubrica": {
       "subtitle": "Osoby, ktoré dali súhlas so zaradením do adresára (čl. 6.1.a GDPR). Meno, e-mail a organizácia sa aktualizujú iba vtedy, keď osoba políčko znova začiarkne.",
       "searchLabel": "Hľadať podľa organizácie",
+      "searchPartial": "The search looked only at the {limit} most recently updated entries: someone less recent may not appear.",
       "orgTypeLabel": "Typ organizácie",
       "allTypes": "Všetky",
       "includeOptedOut": "Zahrnúť osoby, ktoré odvolali súhlas",

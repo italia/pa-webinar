@@ -3022,6 +3022,7 @@
     "rubrica": {
       "subtitle": "Persuni li taw il-kunsens biex jiddaħħlu fid-direttorju (art. 6.1.a GDPR). L-isem, l-email u l-organizzazzjoni jiġu aġġornati biss meta l-persuna terġa' timmarka l-kaxxa.",
       "searchLabel": "Fittex skont l-organizzazzjoni",
+      "searchPartial": "The search looked only at the {limit} most recently updated entries: someone less recent may not appear.",
       "orgTypeLabel": "Tip ta' organizzazzjoni",
       "allTypes": "Kollha",
       "includeOptedOut": "Inkludi lil min irtira l-kunsens",

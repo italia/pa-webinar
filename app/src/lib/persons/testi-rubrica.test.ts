@@ -8,7 +8,7 @@ import it_ from '@/i18n/messages/it.json';
 
 /**
  * I testi della rubrica dicono quello che la rubrica fa: il profilo si aggiorna
- * solo con una nuova spunta, la ricerca guarda il solo ente (il nome e' cifrato),
+ * solo con una nuova spunta, la ricerca guarda nome, email ed ente,
  * e chi esce perde subito email e inviti ma il resto va via con la corsa del
  * giorno dopo.
  */
@@ -20,9 +20,11 @@ describe('i testi della rubrica', () => {
     expect(en.admin.rubrica.subtitle).not.toContain('every');
   });
 
-  it('la ricerca promette il solo ente', () => {
-    expect(it_.admin.rubrica.searchLabel).toBe('Cerca per ente');
-    expect(en.admin.rubrica.searchLabel).toBe('Search by organization');
+  it('la ricerca promette nome, email ed ente, nel wizard e sulla pagina', () => {
+    expect(it_.admin.rubrica.searchLabel).toBe('Cerca per nome, email o ente');
+    expect(en.admin.rubrica.searchLabel).toBe('Search by name, email or organization');
+    expect(it_.admin.wizard.step3.rubricaPick).toContain('nome, email o ente');
+    expect(en.admin.wizard.step3.rubricaPick).toContain('name, email or organization');
   });
 
   it('chi esce sa cosa va via subito e cosa entro il giorno dopo', () => {

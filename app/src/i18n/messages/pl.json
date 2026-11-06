@@ -3022,6 +3022,7 @@
     "rubrica": {
       "subtitle": "Osoby, które wyraziły zgodę na wpisanie do książki adresowej (art. 6.1.a RODO). Imię i nazwisko, adres e-mail i organizacja aktualizują się tylko wtedy, gdy dana osoba ponownie zaznaczy pole.",
       "searchLabel": "Szukaj według organizacji",
+      "searchPartial": "The search looked only at the {limit} most recently updated entries: someone less recent may not appear.",
       "orgTypeLabel": "Typ organizacji",
       "allTypes": "Wszystkie",
       "includeOptedOut": "Uwzględnij osoby, które wycofały zgodę",

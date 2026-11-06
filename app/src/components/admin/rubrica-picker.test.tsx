@@ -103,13 +103,27 @@ describe('RubricaPicker', () => {
     render(<RubricaPicker onSelect={vi.fn()} />);
     await scrivi('ent');
     expect(cerca).toHaveBeenCalledTimes(1);
-    const url = new URL(cerca.mock.calls[0]![0] as string, 'http://x');
-    expect(url.pathname).toBe('/api/admin/rubrica');
-    expect(Object.fromEntries(url.searchParams)).toEqual({
+    const [url, opzioniFetch] = cerca.mock.calls[0]! as [string, RequestInit];
+    // Il testo sta nel corpo: nell'URL finirebbe nei log di accesso.
+    expect(url).toBe('/api/admin/rubrica');
+    expect(opzioniFetch.method).toBe('POST');
+    expect(JSON.parse(opzioniFetch.body as string)).toEqual({
       q: 'ent',
-      limit: '8',
-      withEmail: '1',
+      limit: 8,
+      withEmail: true,
     });
+  });
+
+  it('dice quando la ricerca non ha guardato tutte le voci', async () => {
+    cerca.mockResolvedValue({
+      ok: true,
+      json: async () => ({ rows: [], scanLimit: 5000 }),
+    });
+    render(<RubricaPicker onSelect={vi.fn()} />);
+    await scrivi('zzz');
+    expect(container.textContent).toContain(
+      messages.admin.rubrica.searchPartial.replace('{limit}', '5000')
+    );
   });
 
   it('consegna nome, ente ed email della voce e ripulisce la ricerca', async () => {

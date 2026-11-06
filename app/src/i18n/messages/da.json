@@ -3022,6 +3022,7 @@
     "rubrica": {
       "subtitle": "Personer, der har givet samtykke til at blive optaget i adressebogen (GDPR art. 6.1.a). Navn, e-mailadresse og organisation opdateres kun, når personen sætter kryds i feltet igen.",
       "searchLabel": "Søg efter organisation",
+      "searchPartial": "The search looked only at the {limit} most recently updated entries: someone less recent may not appear.",
       "orgTypeLabel": "Organisationstype",
       "allTypes": "Alle",
       "includeOptedOut": "Medtag personer, der har trukket samtykket tilbage",

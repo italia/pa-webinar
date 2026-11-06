@@ -3022,6 +3022,7 @@
     "rubrica": {
       "subtitle": "Лица, дали съгласие за включване в адресната книга (чл. 6.1.а на ОРЗД). Името, имейлът и организацията се актуализират само когато лицето отново отметне полето.",
       "searchLabel": "Търсене по организация",
+      "searchPartial": "The search looked only at the {limit} most recently updated entries: someone less recent may not appear.",
       "orgTypeLabel": "Вид организация",
       "allTypes": "Всички",
       "includeOptedOut": "Включи лицата, оттеглили съгласието си",

@@ -3022,6 +3022,7 @@
     "rubrica": {
       "subtitle": "Personen die toestemming hebben gegeven voor opname in het adresboek (art. 6.1.a AVG). Naam, e-mailadres en organisatie worden alleen bijgewerkt wanneer de persoon het vakje opnieuw aanvinkt.",
       "searchLabel": "Zoeken op organisatie",
+      "searchPartial": "The search looked only at the {limit} most recently updated entries: someone less recent may not appear.",
       "orgTypeLabel": "Type organisatie",
       "allTypes": "Alle",
       "includeOptedOut": "Personen opnemen die hun toestemming hebben ingetrokken",

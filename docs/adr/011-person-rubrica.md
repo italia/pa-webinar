@@ -140,8 +140,9 @@ that address: with one, there is still something to withdraw. The page then call
 `POST /api/rubrica/opt-out?token=…` to confirm; the API also accepts the token in a JSON body. The
 confirmation is rate-limited per client address. Confirming sets `optedInToAddressBook` to `false`, stamps
 `optedOutAt`, clears the stored address, stops the invitations to that address and withdraws consent to
-future communications on every registration of that address. It also marks the withdrawal on the
-registrations that never had that consent, so that a later tick finds it, and drops any tick waiting for
+future communications on every registration of that address. The GDPR audit log gets one row for each
+event involved, or one row with no event when the person has no such registration. It also marks the
+withdrawal on the registrations that never had that consent, so that a later tick finds it, and drops any tick waiting for
 confirmation. The daily job deletes the record at its next run. The page warns that event registrations
 are not deleted.
 
@@ -172,7 +173,9 @@ are not deleted.
   job and a conditional step in registration.
 - **A second purpose to disclose.** The privacy notice has to describe a second purpose, basis and
   retention period ([privacy notice checklist](../privacy/privacy-notice-checklist.md)).
-- **No search by name.** The encrypted name cannot be searched or sorted.
+- **Search by reading.** SQL cannot search or sort the encrypted name and address. The search decrypts
+  the records on the server and filters them in memory, within a limit, so it costs more than a query and
+  can leave the least recent records out.
 - **An address that outlives its event.** The record keeps an encrypted address for the whole consent
   window, after the registration that supplied it has been deleted. The privacy notice has to say so.
 
@@ -232,7 +235,7 @@ limitation (Art. 5(1)(b) and Art. 5(1)(e)). Only stable profile fields carry ove
 | Opt-out token and link | `app/src/lib/persons/opt-out-token.ts` and `app/src/lib/persons/opt-out-link.ts` |
 | Opt-out page and API | `app/src/app/[locale]/rubrica/opt-out/page.tsx` and `app/src/app/api/rubrica/opt-out/route.ts` |
 | Retention job | `app/src/app/api/cron/rubrica-retention/route.ts`, with `riempiEmailRubrica()` in `app/src/lib/persons/riempimento-email.ts`. Chart template `infra/helm/pa-webinar/templates/cronjob-rubrica-retention.yaml`, with the keys `cronjobs.rubricaRetention.enabled` and `cronjobs.rubricaRetention.schedule` in `infra/helm/pa-webinar/values.yaml` |
-| Administration | **Address book** (`/admin/rubrica` and `/admin/rubrica/{id}`), backed by `GET /api/admin/rubrica`, `GET /api/admin/rubrica/{id}` and `DELETE /api/admin/rubrica/{id}` |
+| Administration | **Address book** (`/admin/rubrica` and `/admin/rubrica/{id}`), backed by `GET` and `POST /api/admin/rubrica`, `GET /api/admin/rubrica/{id}` and `DELETE /api/admin/rubrica/{id}` |
 | Picker | `app/src/components/admin/rubrica-picker.tsx`, used in the **People** step of the event wizard. `rubricaConPersone()` in `app/src/lib/persons/rubrica-picker.ts` says whether anyone can be picked |
 | Tests | `app/src/lib/persons/*.test.ts`, and `rubrica.db.test.ts` and `rubrica-spunta.db.test.ts` in `app/src/test/db/` |
 
@@ -253,7 +256,7 @@ flowchart LR
     Q3{"Record with this<br/>emailHash?"}:::ext
     N["<b>Nothing created</b><br/>Registration.personId<br/>stays null"]:::ext
     C["<b>Create the record</b><br/>profile and address from this form,<br/>optedInAt and lastActiveAt set,<br/>registration linked"]:::data
-    U["<b>Overwrite the record</b><br/>empty fields included,<br/>opt-out cleared, optedInAt and<br/>lastActiveAt set, registration linked"]:::data
+    U["<b>Update the record</b><br/>empty fields keep the stored value,<br/>unless the record was withdrawn,<br/>opt-out cleared, optedInAt and<br/>lastActiveAt set, registration linked"]:::data
     L["<b>Link only</b><br/>nothing on the record changes,<br/>the consent window does not move,<br/>registration linked"]:::job
 
     R --> Q1
@@ -279,10 +282,12 @@ flowchart LR
   changes: not the profile, not the consent state, not the retention. Leaving the box unticked is treated
   as "not now", not as a withdrawal. The same applies to an opted-out record that the daily job has not
   deleted yet: the registration is linked to it until the next run deletes it.
-- **An opt-in overwrites the whole record.** A registration with the box ticked writes that form's name,
-  address and organization fields over the stored ones, empty organization values included. The form sends the organization
-  fields only when the event asks for them. So an opted-in registration for an event that does not ask
-  for the organization clears the stored organization.
+- **An opt-in updates what the form carries.** A registration with the box ticked writes that form's name,
+  address and organization fields over the stored ones. The form sends the organization fields only when
+  the event asks for them, and an empty field leaves the stored value in place, so a tick on an event that
+  does not ask for the organization keeps it. Each field stands on its own: a new organization with no
+  role keeps the old role. On a withdrawn record the old profile does not survive: the tick leaves only
+  what this form carries.
 - **Re-consent.** Every tick that takes effect sets a new `optedInAt`, on an opted-in record too, so the
   consent window restarts.
 
@@ -325,15 +330,18 @@ is that withdrawal.
   ([ADR-014](014-organizer-role.md)).
 - **List.** By default the list shows opted-in records, most recent tick first, each with its number
   of linked registrations. It can filter by organization type and can include opted-out records. Its text
-  search matches the organization only. The name is encrypted, so neither search nor alphabetical order
-  can use it.
+  search matches the name, the address and the organization, without regard to case or accents: the route
+  decrypts the records and filters them in memory (`app/src/lib/persons/ricerca-rubrica.ts`), looking at
+  the 5,000 most recent ones, and the page says when others stayed out. The text travels in the body of a
+  `POST`, because a name or an address in a URL would end up in the access logs, and it is never logged.
+  An encrypted name cannot give an alphabetical order.
 - **Detail.** The detail page shows the profile, the consent times, the last activity, the retention window
   and the most recent linked registrations with their events and organization snapshots. So the
   participation history is visible only for as long as those registrations exist. Neither the list nor the
-  detail page shows the address: the API returns it only with `withEmail=1`, for the picker.
+  detail page shows the address: only the search can return it, on request (`withEmail` in the `POST`), for
+  the picker.
 - **Picker.** The wizard's picker searches opted-in records that keep an address. It appears only to
-  administrators, with the address book on and at least one such record. Like the list, it matches the
-  organization only, so typing a person's name finds nothing.
+  administrators, with the address book on and at least one such record. It matches like the list.
 - **Links from other records.** A pick adds the person to the moderators, the speakers or the invitations
   with the name and address from the record. The invitations API accepts a `personId` from
   administrators, and an invitation picked in the wizard stores it as a link only: the invitation keeps its

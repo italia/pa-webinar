@@ -240,6 +240,8 @@ export async function ritiraConsensi(
  * anche quelli scritti a mano e le loro email in coda (`fermaInviti`): il resto
  * della riga lo toglie la corsa successiva di api/cron/rubrica-retention. Se una
  * spunta aspettava conferma (lib/persons/spunta-in-attesa), non vale piu'.
+ * Chi esce dalla rubrica senza nessuna di queste iscrizioni lascia comunque una
+ * riga nel registro, senza evento: la voce non appartiene a nessuno di loro.
  */
 export async function ritiraComunicazioni(
   emailHash: string,
@@ -273,18 +275,25 @@ export async function ritiraComunicazioni(
       { OR: [{ emailHash }, { person: { emailHash } }] },
       { adesso, publicRegistrationEnabled }
     );
-    await tx.gdprAuditLog.createMany({
-      data: iscrizioni.map((r) => ({
-        eventId: r.eventId,
+    const righe = iscrizioni.map((r) => ({
+      eventId: r.eventId as string | null,
+      action: 'CONSENT_WITHDRAWN',
+      recordCount: 1,
+      details: JSON.stringify({
+        source: 'self-service',
+        futureCommunications: r.consentFutureCommunications ? 1 : 0,
+        ...(r.addressBookPending ? { addressBookPending: 1 } : {}),
+      }),
+    }));
+    if (righe.length === 0 && rubrica.count > 0) {
+      righe.push({
+        eventId: null,
         action: 'CONSENT_WITHDRAWN',
         recordCount: 1,
-        details: JSON.stringify({
-          source: 'self-service',
-          futureCommunications: r.consentFutureCommunications ? 1 : 0,
-          ...(r.addressBookPending ? { addressBookPending: 1 } : {}),
-        }),
-      })),
-    });
+        details: JSON.stringify({ source: 'self-service', futureCommunications: 0, addressBook: 1 }),
+      });
+    }
+    await tx.gdprAuditLog.createMany({ data: righe });
     return iscrizioni.length > 0 || rubrica.count > 0;
   });
 }

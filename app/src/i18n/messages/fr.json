@@ -3022,6 +3022,7 @@
     "rubrica": {
       "subtitle": "Personnes ayant consenti à être inscrites au carnet d'adresses (art. 6.1.a RGPD). Le nom, l'e-mail et l'organisation ne sont mis à jour que lorsque la personne coche à nouveau la case.",
       "searchLabel": "Rechercher par organisation",
+      "searchPartial": "The search looked only at the {limit} most recently updated entries: someone less recent may not appear.",
       "orgTypeLabel": "Type d'organisation",
       "allTypes": "Tous",
       "includeOptedOut": "Inclure les personnes ayant retiré leur consentement",

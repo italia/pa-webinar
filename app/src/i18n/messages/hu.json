@@ -3022,6 +3022,7 @@
     "rubrica": {
       "subtitle": "A címjegyzékbe való felvételhez hozzájárulást adó személyek (GDPR 6. cikk (1) bekezdés a) pont). A név, az e-mail cím és a szervezet csak akkor frissül, ha a személy ismét bejelöli a jelölőnégyzetet.",
       "searchLabel": "Keresés szervezet szerint",
+      "searchPartial": "The search looked only at the {limit} most recently updated entries: someone less recent may not appear.",
       "orgTypeLabel": "Szervezet típusa",
       "allTypes": "Mind",
       "includeOptedOut": "A hozzájárulásukat visszavonók is",

@@ -3022,6 +3022,7 @@
     "rubrica": {
       "subtitle": "Asmenys, davę sutikimą būti įtraukti į adresų knygą (BDAR 6.1.a str.). Vardas, el. paštas ir organizacija atnaujinami tik tada, kai asmuo vėl pažymi langelį.",
       "searchLabel": "Ieškoti pagal organizaciją",
+      "searchPartial": "The search looked only at the {limit} most recently updated entries: someone less recent may not appear.",
       "orgTypeLabel": "Organizacijos tipas",
       "allTypes": "Visi",
       "includeOptedOut": "Įtraukti atšaukusius sutikimą",

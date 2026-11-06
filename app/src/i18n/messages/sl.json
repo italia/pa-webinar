@@ -3022,6 +3022,7 @@
     "rubrica": {
       "subtitle": "Osebe, ki so privolile v vključitev v imenik (čl. 6.1.a GDPR). Ime, e-poštni naslov in organizacija se posodobijo samo, ko oseba znova označi polje.",
       "searchLabel": "Iskanje po organizaciji",
+      "searchPartial": "The search looked only at the {limit} most recently updated entries: someone less recent may not appear.",
       "orgTypeLabel": "Vrsta organizacije",
       "allTypes": "Vse",
       "includeOptedOut": "Vključi osebe, ki so preklicale privolitev",

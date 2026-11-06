@@ -529,7 +529,7 @@ When the in-cluster Redis is enabled, the Bitnami Redis subchart renders its own
 ### Audit trails
 
 - **Administrative writes.** They are recorded in `admin_audit_logs` (model `AdminAuditLog`): actor, action, target, client IP address as reported by the proxy headers, and user agent. No job deletes these rows ([Audit actor format](identity-and-access.md#audit-actor-format)).
-- **GDPR operations.** Deletions, exports and consents are recorded per event, with counts and no personal data, in `gdpr_audit_logs` (model `GdprAuditLog`).
+- **GDPR operations.** Deletions, exports and consents are recorded per event, with counts and no personal data, in `gdpr_audit_logs` (model `GdprAuditLog`). The withdrawal of an address-book entry with no registrations has a row with no event.
 
 The privacy view of both is in [Privacy and data protection](../GDPR.md).
 

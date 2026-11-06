@@ -3022,6 +3022,7 @@
     "rubrica": {
       "subtitle": "Henkilöt, jotka ovat antaneet suostumuksen osoitekirjaan lisäämiseen (GDPR art. 6.1.a). Nimi, sähköposti ja organisaatio päivittyvät vain, kun henkilö valitsee ruudun uudelleen.",
       "searchLabel": "Hae organisaatiolla",
+      "searchPartial": "The search looked only at the {limit} most recently updated entries: someone less recent may not appear.",
       "orgTypeLabel": "Organisaation tyyppi",
       "allTypes": "Kaikki",
       "includeOptedOut": "Näytä myös suostumuksensa peruneet",

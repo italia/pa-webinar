@@ -3022,6 +3022,7 @@
     "rubrica": {
       "subtitle": "Personas, kas devušas piekrišanu iekļaušanai kontaktu grāmatā (VDAR 6.1.a pants). Vārds, e-pasts un organizācija tiek atjaunināti tikai tad, kad persona atkārtoti atzīmē izvēles rūtiņu.",
       "searchLabel": "Meklēt pēc organizācijas",
+      "searchPartial": "The search looked only at the {limit} most recently updated entries: someone less recent may not appear.",
       "orgTypeLabel": "Organizācijas veids",
       "allTypes": "Visi",
       "includeOptedOut": "Iekļaut personas, kas atsaukušas piekrišanu",

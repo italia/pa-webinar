@@ -97,6 +97,59 @@ describe('upsertPersonOnRegistration', () => {
     });
   });
 
+  it('una nuova spunta senza ente, ruolo o nome non cancella quelli salvati', async () => {
+    tx.person.findUnique.mockResolvedValue({ id: 'voce', optedOutAt: null });
+    await upsertPersonOnRegistration(db, {
+      emailHash: 'impronta',
+      email: 'email-cifrata',
+      displayName: null,
+      organization: null,
+      organizationRole: '',
+      optedIn: true,
+    });
+    const scritto = tx.person.update.mock.calls[0]![0].data;
+    for (const campo of [
+      'displayName',
+      'organization',
+      'organizationRole',
+      'organizationType',
+    ]) {
+      expect(scritto[campo], campo).toBeUndefined();
+    }
+  });
+
+  it('una nuova spunta con un valore lo aggiorna campo per campo', async () => {
+    tx.person.findUnique.mockResolvedValue({ id: 'voce', optedOutAt: null });
+    await upsertPersonOnRegistration(db, {
+      ...iscrizione,
+      organizationRole: null,
+      optedIn: true,
+    });
+    expect(tx.person.update.mock.calls[0]![0].data).toMatchObject({
+      displayName: 'cifrato:Persona 1',
+      organization: 'Ente',
+      organizationRole: undefined,
+      organizationType: 'MINISTRY',
+    });
+  });
+
+  it("dopo un ritiro il profilo vecchio non sopravvive: resta solo quello dell'iscrizione", async () => {
+    tx.person.findUnique.mockResolvedValue({ id: 'voce', optedOutAt: ADESSO });
+    await upsertPersonOnRegistration(db, {
+      emailHash: 'impronta',
+      email: 'email-cifrata',
+      displayName: 'Persona 1',
+      organization: null,
+      optedIn: true,
+    });
+    expect(tx.person.update.mock.calls[0]![0].data).toMatchObject({
+      displayName: 'cifrato:Persona 1',
+      organization: null,
+      organizationRole: null,
+      organizationType: null,
+    });
+  });
+
   it('la spunta non tocca gli inviti: li riapre solo la conferma dal link personale', async () => {
     tx.person.findUnique.mockResolvedValue(null);
     await upsertPersonOnRegistration(db, { ...iscrizione, optedIn: true });

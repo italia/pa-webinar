@@ -3022,6 +3022,7 @@
     "rubrica": {
       "subtitle": "Άτομα που έχουν δώσει συγκατάθεση για ένταξη στο ευρετήριο (άρθρο 6.1.α ΓΚΠΔ). Όνομα, email και φορέας ενημερώνονται μόνο όταν το άτομο επιλέξει ξανά το πλαίσιο.",
       "searchLabel": "Αναζήτηση με φορέα",
+      "searchPartial": "The search looked only at the {limit} most recently updated entries: someone less recent may not appear.",
       "orgTypeLabel": "Είδος φορέα",
       "allTypes": "Όλοι",
       "includeOptedOut": "Συμπερίληψη ατόμων που ανακάλεσαν τη συγκατάθεση",
