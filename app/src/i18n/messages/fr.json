@@ -4565,7 +4565,12 @@
       "addressBookTitle": "Carnet d'adresses des événements",
       "addressBookIntro": "Vous avez choisi de rester dans le carnet d'adresses pour être invité à des événements similaires. Nous conservons ces données jusqu'au {date}, sauf retrait ou nouveau consentement.",
       "addressBookOptOut": "Supprimer mes données du carnet d’adresses",
-      "consentFutureEffect": "Si vous le retirez, vous ne recevez plus de communications sur les prochains événements et vous quittez le carnet d'adresses, pour toutes vos inscriptions."
+      "consentFutureEffect": "Si vous le retirez, vous ne recevez plus de communications sur les prochains événements et vous quittez le carnet d'adresses, pour toutes vos inscriptions.",
+      "addressBookPendingTitle": "Retour dans le carnet d'adresses à confirmer",
+      "addressBookPendingBody": "La case du carnet d'adresses a été cochée sur cette inscription, mais cette adresse ne recevait plus d'invitations. Rien ne change tant que vous n'avez pas confirmé.",
+      "addressBookPendingEffect": "Si vous confirmez, vous revenez dans le carnet d'adresses avec le nom et l'organisme de cette inscription et vous recevez de nouveau les invitations. Si vous annulez, ou si ce n'était pas vous, vous restez hors du carnet d'adresses et ne recevez pas d'invitations.",
+      "addressBookPendingConfirm": "Confirmer mon retour",
+      "addressBookPendingCancel": "Annuler la demande"
     },
     "erasure": {
       "title": "Effacement de vos données",

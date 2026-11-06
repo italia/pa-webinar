@@ -4565,7 +4565,12 @@
       "addressBookTitle": "Imenik dogodkov",
       "addressBookIntro": "Izbrali ste, da ostanete v imeniku, da bi vas lahko povabili na podobne dogodke. Te podatke hranimo do {date}, razen v primeru preklica ali nove privolitve.",
       "addressBookOptOut": "Odstrani moje podatke iz imenika",
-      "consentFutureEffect": "Če jo prekličete, ne boste več prejemali sporočil o prihodnjih dogodkih in izstopite iz imenika, za vse svoje prijave."
+      "consentFutureEffect": "Če jo prekličete, ne boste več prejemali sporočil o prihodnjih dogodkih in izstopite iz imenika, za vse svoje prijave.",
+      "addressBookPendingTitle": "Vrnitev v imenik je treba potrditi",
+      "addressBookPendingBody": "Pri tej prijavi je bilo označeno polje za imenik, vendar ta naslov ni več prejemal povabil. Dokler ne potrdite, se nič ne spremeni.",
+      "addressBookPendingEffect": "Če potrdite, se vrnete v imenik z imenom in organizacijo iz te prijave in znova prejemate povabila. Če prekličete ali če to niste bili vi, ostanete zunaj imenika in ne prejemate povabil.",
+      "addressBookPendingConfirm": "Potrdi vrnitev",
+      "addressBookPendingCancel": "Prekliči zahtevo"
     },
     "erasure": {
       "title": "Izbris vaših podatkov",

@@ -9,10 +9,14 @@ const mocks = vi.hoisted(() => ({
   ritiraConsensi: vi.fn(async () => ({ registrazione: true, trascrizione: true })),
   ritiraComunicazioni: vi.fn(async () => true),
   ritiraProvaConservata: vi.fn(async () => true),
+  applicaSpuntaInAttesa: vi.fn(async () => true),
   verifyGdprToken: vi.fn(),
 }));
 
 vi.mock('@/lib/db', () => ({ prisma: { registration: { findFirst: mocks.findFirst } } }));
+vi.mock('@/lib/persons/spunta-in-attesa', () => ({
+  applicaSpuntaInAttesa: mocks.applicaSpuntaInAttesa,
+}));
 vi.mock('@/lib/gdpr/request-token', () => ({ verifyGdprToken: mocks.verifyGdprToken }));
 vi.mock('@/lib/gdpr/retained-consent-proofs', () => ({
   ritiraProvaConservata: mocks.ritiraProvaConservata,
@@ -51,6 +55,7 @@ beforeEach(() => {
   mocks.verifyGdprToken.mockReturnValue({ emailHash: 'impronta' });
   mocks.findFirst.mockResolvedValue({ id: ISCRIZIONE, eventId: 'evento-1' });
   mocks.ritiraProvaConservata.mockResolvedValue(true);
+  mocks.applicaSpuntaInAttesa.mockResolvedValue(true);
 });
 
 describe('POST /api/gdpr/consents', () => {
@@ -107,6 +112,47 @@ describe('POST /api/gdpr/consents', () => {
     await richiesta({ registrationId: ISCRIZIONE, consent: 'futureCommunications' });
     expect(mocks.ritiraComunicazioni).toHaveBeenCalledWith('impronta');
     expect(mocks.ritiraConsensi).not.toHaveBeenCalled();
+  });
+
+  it('conferma la spunta della rubrica in attesa', async () => {
+    const res = await richiesta({ registrationId: ISCRIZIONE, confirmAddressBook: true });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ confirmed: 'addressBook' });
+    expect(mocks.applicaSpuntaInAttesa).toHaveBeenCalledWith(ISCRIZIONE, 'self-service');
+    expect(mocks.ritiraComunicazioni).not.toHaveBeenCalled();
+  });
+
+  it('non conferma la spunta di un altro indirizzo, né senza link firmato', async () => {
+    mocks.findFirst.mockResolvedValue(null);
+    expect(
+      (await richiesta({ registrationId: ISCRIZIONE, confirmAddressBook: true })).status
+    ).toBe(404);
+    mocks.verifyGdprToken.mockReturnValue(null);
+    expect(
+      (await richiesta({ registrationId: ISCRIZIONE, confirmAddressBook: true })).status
+    ).toBe(401);
+    expect(mocks.applicaSpuntaInAttesa).not.toHaveBeenCalled();
+  });
+
+  it('una spunta che non aspetta piu’ non risulta confermata', async () => {
+    mocks.applicaSpuntaInAttesa.mockResolvedValue(false);
+    const res = await richiesta({ registrationId: ISCRIZIONE, confirmAddressBook: true });
+    expect(res.status).toBe(404);
+  });
+
+  it('`confirmAddressBook` vale solo vero, e mai insieme a un ritiro', async () => {
+    expect(
+      (await richiesta({ registrationId: ISCRIZIONE, confirmAddressBook: false })).status
+    ).toBe(422);
+    expect(
+      (
+        await richiesta({
+          registrationId: ISCRIZIONE,
+          consent: 'recording',
+          confirmAddressBook: true,
+        })
+      ).status
+    ).toBe(422);
   });
 
   it("un consenso che non esiste e' un errore", async () => {

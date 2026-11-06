@@ -18,15 +18,18 @@ export interface ConsensiVista {
   recording: StatoConsensoVista | null;
   transcription: StatoConsensoVista | null;
   futureCommunications: StatoConsensoVista | null;
+  /** La spunta della rubrica che aspetta una conferma (lib/persons/spunta-in-attesa). */
+  addressBookPending?: boolean;
 }
 
-type Chiave = keyof ConsensiVista;
+type Chiave = 'recording' | 'transcription' | 'futureCommunications';
 
 /**
  * I consensi di un'iscrizione nella pagina dei propri dati: si ritirano uno
  * per uno, con una conferma che dice cosa cambia, senza cancellare
  * l'iscrizione. Registrazione e trascrizione si possono ridare in sala finche'
- * l'evento e' aperto.
+ * l'evento e' aperto. Una spunta della rubrica rimasta in attesa si conferma o si
+ * annulla da qui.
  */
 export default function RegistrationConsents({
   token,
@@ -50,13 +53,15 @@ export default function RegistrationConsents({
   const tc = useTranslations('common');
   const format = useFormatter();
   const [statiLocali, setStati] = useState(consensi);
-  const stati: ConsensiVista =
-    comunicazioniRitirateIl && statiLocali.futureCommunications?.dato
-      ? {
-          ...statiLocali,
-          futureCommunications: { dato: false, ritiratoIl: comunicazioniRitirateIl },
-        }
-      : statiLocali;
+  const stati: ConsensiVista = comunicazioniRitirateIl
+    ? {
+        ...statiLocali,
+        addressBookPending: false,
+        ...(statiLocali.futureCommunications?.dato
+          ? { futureCommunications: { dato: false, ritiratoIl: comunicazioniRitirateIl } }
+          : {}),
+      }
+    : statiLocali;
   const [conferma, setConferma] = useState<Chiave | null>(null);
   const [inCorso, setInCorso] = useState(false);
   const [errore, setErrore] = useState<string | null>(null);
@@ -84,21 +89,31 @@ export default function RegistrationConsents({
       },
     ];
   const visibili = voci.filter((v) => stati[v.chiave] !== null);
-  if (visibili.length === 0) return null;
+  if (visibili.length === 0 && !stati.addressBookPending) return null;
 
-  const ritira = async (chiave: Chiave) => {
+  const invia = async (azione: Record<string, unknown>, fatto: () => void) => {
     setInCorso(true);
     setErrore(null);
     try {
       const res = await fetch('/api/gdpr/consents', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, registrationId, consent: chiave }),
+        body: JSON.stringify({ token, registrationId, ...azione }),
       });
       // Il token dura un'ora: riprovare non serve, ci vuole un link nuovo.
       if (res.status === 401) return setErrore(t('linkInvalid'));
       if (res.status === 429) return setErrore(t('rateLimited'));
       if (!res.ok) return setErrore(tl('error'));
+      fatto();
+    } catch {
+      setErrore(tl('error'));
+    } finally {
+      setInCorso(false);
+    }
+  };
+
+  const ritira = (chiave: Chiave) =>
+    invia({ consent: chiave }, () => {
       const adesso = new Date().toISOString();
       setStati((prima) => ({
         ...prima,
@@ -107,15 +122,21 @@ export default function RegistrationConsents({
         ...(chiave === 'recording' && prima.transcription?.dato
           ? { transcription: { dato: false, ritiratoIl: adesso } }
           : {}),
+        // Il ritiro delle comunicazioni toglie anche la spunta in attesa.
+        ...(chiave === 'futureCommunications' ? { addressBookPending: false } : {}),
       }));
       if (chiave === 'futureCommunications') onComunicazioniRitirate?.(adesso);
       setConferma(null);
-    } catch {
-      setErrore(tl('error'));
-    } finally {
-      setInCorso(false);
-    }
-  };
+    });
+
+  const confermaRubrica = () =>
+    invia({ confirmAddressBook: true }, () => {
+      setStati((prima) => ({
+        ...prima,
+        addressBookPending: false,
+        futureCommunications: { dato: true, ritiratoIl: null },
+      }));
+    });
 
   return (
     <section className="mb-3" aria-label={tl('title')}>
@@ -124,6 +145,32 @@ export default function RegistrationConsents({
         {t('consentsIntro')}
       </p>
       <ul className="list-unstyled mb-2" style={{ fontSize: '0.9rem' }}>
+        {stati.addressBookPending && (
+          <li className="mb-3">
+            <div className="fw-semibold">{t('addressBookPendingTitle')}</div>
+            <div className="text-muted">{t('addressBookPendingBody')}</div>
+            <div className="text-muted">{t('addressBookPendingEffect')}</div>
+            <div className="d-flex flex-wrap gap-2 mt-1">
+              <Button
+                color="primary"
+                size="sm"
+                disabled={inCorso}
+                onClick={() => void confermaRubrica()}
+              >
+                {t('addressBookPendingConfirm')}
+              </Button>
+              <Button
+                color="secondary"
+                outline
+                size="sm"
+                disabled={inCorso}
+                onClick={() => void ritira('futureCommunications')}
+              >
+                {t('addressBookPendingCancel')}
+              </Button>
+            </div>
+          </li>
+        )}
         {visibili.map(({ chiave, titolo, effetto, nota }) => {
           const stato = stati[chiave]!;
           return (

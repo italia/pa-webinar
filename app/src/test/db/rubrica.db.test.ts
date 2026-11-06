@@ -18,12 +18,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DELETE as cancellaVoce } from '@/app/api/admin/rubrica/[id]/route';
 import { GET as elencoRubrica } from '@/app/api/admin/rubrica/route';
 import { GET as conservazione } from '@/app/api/cron/rubrica-retention/route';
+import { POST as cancellazione } from '@/app/api/gdpr/erasure/route';
 import { POST as esceDalLink } from '@/app/api/rubrica/opt-out/route';
 import messaggi from '@/i18n/messages/it.json';
 import { encryptPII, hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { sendInvitations } from '@/lib/email/invitation';
 import { isInvited, registrationAccessFor } from '@/lib/events/registration-access';
+import { issueGdprToken } from '@/lib/gdpr/request-token';
 import { ritiraComunicazioni } from '@/lib/live/consent-withdrawal';
 import { upsertPersonOnRegistration } from '@/lib/persons';
 import {
@@ -449,7 +451,7 @@ describe('inviti fermati', () => {
     });
   });
 
-  it('una nuova spunta riapre gli inviti fermati', async () => {
+  it('una spunta dal modulo non riapre gli inviti fermati', async () => {
     const persona = await voce();
     const evento = await creaEvento({ ...aperto, accessMode: 'INVITATION' });
     await invito(evento.id, persona);
@@ -462,7 +464,160 @@ describe('inviti fermati', () => {
       optedIn: true,
     });
 
+    expect(await sendInvitations(evento.id, { locale: 'it' })).toMatchObject({ sent: 0 });
+  });
+
+  it('il ritiro toglie le email in coda degli inviti, anche con la voce sparita', async () => {
+    const persona = await voce();
+    const evento = await creaEvento({ ...aperto, accessMode: 'OPEN' });
+    await invito(evento.id, persona);
     expect(await sendInvitations(evento.id, { locale: 'it' })).toMatchObject({ sent: 1 });
+    // Una fallita in attesa di un nuovo tentativo e una gia' partita, di due inviti.
+    const altri = await creaEvento({ ...aperto, accessMode: 'INVITATION' });
+    const fallito = await invito(altri.id, persona, { sentAt: giorni(1) });
+    const riservato = await creaEvento({ ...aperto, accessMode: 'INVITATION' });
+    const spedito = await invito(riservato.id, persona, { sentAt: giorni(1) });
+    await prisma.emailOutbox.createMany({
+      data: [
+        {
+          toAddress: persona.cifrata,
+          subject: 'Invito',
+          html: 'x',
+          status: 'FAILED',
+          dedupKey: `event-invitation:${fallito.id}:primo`,
+        },
+        {
+          toAddress: persona.cifrata,
+          subject: 'Invito',
+          html: 'x',
+          status: 'SENT',
+          dedupKey: `event-invitation:${spedito.id}:primo`,
+        },
+        // Un'altra email: non e' un invito e resta.
+        { toAddress: persona.cifrata, subject: 'Conferma', html: 'x' },
+      ],
+    });
+
+    await ritiraComunicazioni(persona.emailHash);
+
+    const rimaste = await prisma.emailOutbox.findMany({ select: { subject: true, status: true } });
+    expect(rimaste).toHaveLength(2);
+    expect(rimaste).toEqual(
+      expect.arrayContaining([
+        { subject: 'Invito', status: 'SENT' },
+        { subject: 'Conferma', status: 'PENDING' },
+      ])
+    );
+  });
+
+  it('la scadenza della voce toglie dalla coda solo gli inviti nati dalla rubrica', async () => {
+    const persona = await voce({ optedInAt: giorni(800) });
+    const evento = await creaEvento({ ...aperto, accessMode: 'OPEN' });
+    await invito(evento.id, persona, { personId: persona.persona.id });
+    expect(await sendInvitations(evento.id, { locale: 'it' })).toMatchObject({ sent: 1 });
+    const altro = nuovoIndirizzo();
+    await invito(evento.id, altro);
+    expect(await sendInvitations(evento.id, { locale: 'it' })).toMatchObject({ sent: 1 });
+    expect(await prisma.emailOutbox.count()).toBe(2);
+
+    await corsaConservazione();
+
+    expect(await prisma.emailOutbox.count()).toBe(1);
+  });
+
+  it('la cancellazione chiesta dalla persona toglie gli inviti e tutte le loro email', async () => {
+    const persona = await voce();
+    const evento = await creaEvento({ ...aperto, accessMode: 'OPEN' });
+    await invito(evento.id, persona);
+    await sendInvitations(evento.id, { locale: 'it' });
+    await prisma.emailOutbox.updateMany({ data: { status: 'SENT' } });
+    const riservato = await creaEvento({ ...aperto, accessMode: 'INVITATION' });
+    await invito(riservato.id, persona);
+    await sendInvitations(riservato.id, { locale: 'it' });
+    expect(await prisma.emailOutbox.count()).toBe(2);
+
+    const risposta = await cancellazione(
+      new Request(
+        `http://localhost/api/gdpr/erasure?t=${issueGdprToken('erasure', persona.emailHash)}`,
+        { method: 'POST', headers: { 'x-forwarded-for': '10.7.0.1' } }
+      ) as never,
+      senzaParametri
+    );
+
+    expect(risposta.status).toBe(200);
+    expect(await prisma.eventInvitation.count()).toBe(0);
+    expect(await prisma.emailOutbox.count()).toBe(0);
+  });
+});
+
+describe('indici', () => {
+  it('iscrizioni e inviti si cercano per indirizzo senza scandire la tabella', async () => {
+    const indici = await prisma.$queryRaw<{ indexname: string }[]>`
+      SELECT indexname FROM pg_indexes
+      WHERE indexdef LIKE '%(email_hash)'
+        AND tablename IN ('registrations', 'event_invitations')`;
+    expect(indici.map((i) => i.indexname).sort()).toEqual([
+      'event_invitations_email_hash_idx',
+      'registrations_email_hash_idx',
+    ]);
+  });
+});
+
+describe('la corsa e una spunta concorrente', () => {
+  /** Scrive `mentre` subito dopo la lettura numero `n` delle voci. */
+  function dopoLaLettura(n: number, mentre: () => Promise<unknown>) {
+    const originale = prisma.person.findMany.bind(prisma.person);
+    let letture = 0;
+    return vi.spyOn(prisma.person, 'findMany').mockImplementation(((args: never) => {
+      letture += 1;
+      const lettura = originale(args);
+      return letture === n ? lettura.then(async (r: unknown) => (await mentre(), r)) : lettura;
+    }) as never);
+  }
+
+  const rinnova = (emailHash: string, email: string) =>
+    upsertPersonOnRegistration(prisma, { emailHash, email, optedIn: true });
+
+  it('una voce ritirata che rispunta dopo la lettura resta, con email e inviti', async () => {
+    const persona = await voce();
+    const evento = await creaEvento({
+      status: 'PUBLISHED',
+      accessMode: 'INVITATION',
+      startsAt: giorni(-5),
+      endsAt: giorni(-6),
+    });
+    await prisma.eventInvitation.create({
+      data: {
+        eventId: evento.id,
+        email: persona.cifrata,
+        emailHash: persona.emailHash,
+        personId: persona.persona.id,
+      },
+    });
+    await ritiraComunicazioni(persona.emailHash);
+    await prisma.eventInvitation.updateMany({ data: { declinedAt: null } });
+    const spia = dopoLaLettura(1, () => rinnova(persona.emailHash, persona.cifrata));
+
+    const esito = await (await corsaConservazione()).json();
+    spia.mockRestore();
+
+    expect(esito).toMatchObject({ optedOutDeleted: 0 });
+    expect(
+      await prisma.person.findUniqueOrThrow({ where: { id: persona.persona.id } })
+    ).toMatchObject({ optedInToAddressBook: true, email: persona.cifrata });
+    expect(await prisma.eventInvitation.count({ where: { declinedAt: { not: null } } })).toBe(0);
+  });
+
+  it('una voce scaduta che rispunta dopo la lettura resta', async () => {
+    const persona = await voce({ optedInAt: giorni(800) });
+    // La seconda lettura e' quella delle voci da far scadere.
+    const spia = dopoLaLettura(2, () => rinnova(persona.emailHash, persona.cifrata));
+
+    const esito = await (await corsaConservazione()).json();
+    spia.mockRestore();
+
+    expect(esito).toMatchObject({ expiredDeleted: 0 });
+    expect(await prisma.person.count()).toBe(1);
   });
 });
 
@@ -507,7 +662,7 @@ describe('riempimento delle voci esistenti', () => {
       .split(';')
       .map((i) => i.trim())
       .filter(Boolean);
-    expect(istruzioni).toHaveLength(2);
+    expect(istruzioni).toHaveLength(3);
     for (const istruzione of istruzioni) await prisma.$executeRawUnsafe(istruzione);
   }
 
@@ -607,6 +762,137 @@ describe('riempimento delle voci esistenti', () => {
     expect(await (await corsaConservazione()).json()).toMatchObject({
       expiredDeleted: 1,
     });
+  });
+
+  it('una spunta rinnovata con la versione precedente sposta la data del consenso', async () => {
+    const { emailHash } = nuovoIndirizzo();
+    const persona = await prisma.person.create({
+      data: { emailHash, optedInToAddressBook: true, optedInAt: giorni(180) },
+    });
+    const ultimaSpunta = giorni(17);
+    await prisma.registration.update({
+      where: {
+        id: (
+          await iscrizioneDi((await creaEvento()).id, emailHash, 'p@example.org', ultimaSpunta)
+        ).id,
+      },
+      data: { consentFutureCommunications: true },
+    });
+    // Un'iscrizione piu' recente senza spunta non conta.
+    await iscrizioneDi((await creaEvento()).id, emailHash, 'p@example.org', giorni(3));
+
+    await applicaMigrazione();
+
+    expect(
+      (await prisma.person.findUniqueOrThrow({ where: { id: persona.id } })).optedInAt
+    ).toEqual(ultimaSpunta);
+  });
+
+  it('la data del consenso non scende mai, e senza spunte resta', async () => {
+    const recente = nuovoIndirizzo();
+    const consenso = giorni(5);
+    const persona = await prisma.person.create({
+      data: {
+        emailHash: recente.emailHash,
+        optedInToAddressBook: true,
+        optedInAt: consenso,
+      },
+    });
+    const vecchia = await iscrizioneDi(
+      (await creaEvento()).id,
+      recente.emailHash,
+      recente.email,
+      giorni(100)
+    );
+    await prisma.registration.update({
+      where: { id: vecchia.id },
+      data: { consentFutureCommunications: true },
+    });
+
+    await applicaMigrazione();
+
+    expect(
+      (await prisma.person.findUniqueOrThrow({ where: { id: persona.id } })).optedInAt
+    ).toEqual(consenso);
+  });
+
+  it('una spunta rinnovata non sposta la data di chi ha ritirato', async () => {
+    const { emailHash } = nuovoIndirizzo();
+    const persona = await prisma.person.create({
+      data: { emailHash, optedInToAddressBook: false, optedOutAt: giorni(1) },
+    });
+    const iscritta = await iscrizioneDi(
+      (await creaEvento()).id,
+      emailHash,
+      'p@example.org',
+      giorni(3)
+    );
+    await prisma.registration.update({
+      where: { id: iscritta.id },
+      data: { consentFutureCommunications: true },
+    });
+
+    await applicaMigrazione();
+
+    expect(await prisma.person.findUniqueOrThrow({ where: { id: persona.id } })).toEqual(
+      persona
+    );
+  });
+
+  it('senza data ma con una spunta nota prende la spunta, non l’ultima attività', async () => {
+    const { emailHash } = nuovoIndirizzo();
+    const persona = await prisma.person.create({
+      data: {
+        emailHash,
+        optedInToAddressBook: true,
+        optedInAt: null,
+        lastActiveAt: giorni(2),
+      },
+    });
+    const quando = giorni(40);
+    const iscritta = await iscrizioneDi(
+      (await creaEvento()).id,
+      emailHash,
+      'p@example.org',
+      quando
+    );
+    await prisma.registration.update({
+      where: { id: iscritta.id },
+      data: { consentFutureCommunications: true },
+    });
+
+    await applicaMigrazione();
+
+    expect(
+      (await prisma.person.findUniqueOrThrow({ where: { id: persona.id } })).optedInAt
+    ).toEqual(quando);
+  });
+
+  it('la corsa quotidiana ripara le voci scritte dopo la migrazione, come la migrazione', async () => {
+    const { email, emailHash } = nuovoIndirizzo();
+    const persona = await prisma.person.create({
+      data: { emailHash, optedInToAddressBook: true, optedInAt: new Date() },
+    });
+    const ritirata = await prisma.person.create({
+      data: {
+        emailHash: hashEmail('ritirata@example.org'),
+        optedInToAddressBook: false,
+      },
+    });
+    await iscrizioneDi((await creaEvento()).id, ritirata.emailHash, 'ritirata@example.org', giorni(1));
+    await iscrizioneDi((await creaEvento()).id, emailHash, 'vecchio@example.org', giorni(9));
+    const ultima = await iscrizioneDi((await creaEvento()).id, emailHash, email, giorni(1));
+
+    const esito = await (await corsaConservazione()).json();
+
+    expect(esito).toMatchObject({ emailsFilled: 1 });
+    expect(
+      (await prisma.person.findUniqueOrThrow({ where: { id: persona.id } })).email
+    ).toBe(ultima.email);
+    expect(
+      (await prisma.person.findUniqueOrThrow({ where: { id: ritirata.id } })).email
+    ).toBeNull();
+    expect((await selettore()).map((r) => r.email)).toEqual([email]);
   });
 
   it('una voce che ha gia’ l’email non cambia, e una seconda passata non fa niente', async () => {

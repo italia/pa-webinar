@@ -128,6 +128,83 @@ describe('RegistrationConsents', () => {
     expect(pulsante('Ritira il consenso')).toBeUndefined();
   });
 
+  describe('la spunta della rubrica in attesa', () => {
+    const { addressBookPendingConfirm: conferma, addressBookPendingCancel: annulla } =
+      messages.gdpr.export;
+
+    it('compare da sola, con cosa cambia, anche senza altri consensi', () => {
+      monta({ addressBookPending: true });
+      expect(container.textContent).toContain(messages.gdpr.export.addressBookPendingEffect);
+      expect(pulsante(conferma)).toBeDefined();
+      expect(pulsante(annulla)).toBeDefined();
+    });
+
+    it('si annulla come un ritiro delle comunicazioni, su tutte le schede', async () => {
+      const richiesta = vi.fn(async () => new Response('{}', { status: 200 }));
+      vi.stubGlobal('fetch', richiesta);
+      const avvisa = vi.fn();
+      monta({ addressBookPending: true }, { onComunicazioniRitirate: avvisa });
+
+      await clic(annulla);
+
+      expect(richiesta).toHaveBeenCalledWith(
+        '/api/gdpr/consents',
+        expect.objectContaining({
+          body: JSON.stringify({
+            token: 'tok en',
+            registrationId: 'r1',
+            consent: 'futureCommunications',
+          }),
+        })
+      );
+      expect(avvisa).toHaveBeenCalledWith(expect.any(String));
+      expect(pulsante(conferma)).toBeUndefined();
+      expect(container.textContent).toContain('Ritirato il');
+    });
+
+    it('si conferma con un pulsante, e diventa un consenso dato', async () => {
+      const richiesta = vi.fn(async () => new Response('{}', { status: 200 }));
+      vi.stubGlobal('fetch', richiesta);
+      monta({ addressBookPending: true });
+
+      await clic(conferma);
+
+      expect(richiesta).toHaveBeenCalledWith(
+        '/api/gdpr/consents',
+        expect.objectContaining({
+          body: JSON.stringify({
+            token: 'tok en',
+            registrationId: 'r1',
+            confirmAddressBook: true,
+          }),
+        })
+      );
+      expect(pulsante(conferma)).toBeUndefined();
+      expect(container.textContent).toContain(messages.live.consents.given);
+    });
+
+    it('se la conferma non riesce resta in attesa, e lo dice', async () => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(async () => new Response('{}', { status: 500 }))
+      );
+      monta({ addressBookPending: true });
+
+      await clic(conferma);
+
+      expect(pulsante(conferma)).toBeDefined();
+      expect(container.querySelector('[role="alert"]')).not.toBeNull();
+    });
+
+    it('sparisce quando un’altra scheda ritira le comunicazioni', () => {
+      monta(
+        { addressBookPending: true },
+        { comunicazioniRitirateIl: '2026-11-05T10:00:00.000Z' }
+      );
+      expect(pulsante(conferma)).toBeUndefined();
+    });
+  });
+
   it('un link scaduto chiede un link nuovo, non di riprovare', async () => {
     vi.stubGlobal(
       'fetch',

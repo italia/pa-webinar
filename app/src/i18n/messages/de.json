@@ -4565,7 +4565,12 @@
       "addressBookTitle": "Veranstaltungs-Adressbuch",
       "addressBookIntro": "Sie haben sich dafür entschieden, im Adressbuch zu bleiben, um zu ähnlichen Veranstaltungen eingeladen zu werden. Wir bewahren diese Daten bis zum {date} auf, sofern Sie nicht widerrufen oder erneut einwilligen.",
       "addressBookOptOut": "Meine Daten aus dem Adressbuch entfernen",
-      "consentFutureEffect": "Wenn Sie sie widerrufen, erhalten Sie keine Mitteilungen zu kommenden Veranstaltungen mehr und verlassen das Adressbuch, für alle Ihre Anmeldungen."
+      "consentFutureEffect": "Wenn Sie sie widerrufen, erhalten Sie keine Mitteilungen zu kommenden Veranstaltungen mehr und verlassen das Adressbuch, für alle Ihre Anmeldungen.",
+      "addressBookPendingTitle": "Rückkehr ins Adressbuch bestätigen",
+      "addressBookPendingBody": "Bei dieser Anmeldung wurde das Kästchen für das Adressbuch angekreuzt, aber diese Adresse hatte keine Einladungen mehr erhalten. Solange Sie nicht bestätigen, ändert sich nichts.",
+      "addressBookPendingEffect": "Wenn Sie bestätigen, kehren Sie mit dem Namen und der Organisation dieser Anmeldung ins Adressbuch zurück und erhalten wieder Einladungen. Wenn Sie abbrechen oder wenn Sie es nicht waren, bleiben Sie außerhalb des Adressbuchs und erhalten keine Einladungen.",
+      "addressBookPendingConfirm": "Rückkehr bestätigen",
+      "addressBookPendingCancel": "Anfrage abbrechen"
     },
     "erasure": {
       "title": "Löschung Ihrer Daten",

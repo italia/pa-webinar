@@ -584,8 +584,9 @@ model EventInvitation {
   acceptedAt DateTime? @map("accepted_at")
   // Invito fermato: chi lo riceve non va piu' contattato, e da qui in poi non
   // parte niente. La riga resta, e su un evento a iscrizione non aperta resta
-  // anche l'accesso. Una nuova spunta o un indirizzo nuovo sulla riga lo
-  // tolgono (lib/persons/inviti-fermati).
+  // anche l'accesso. Lo toglie una spunta confermata; un altro indirizzo sulla
+  // riga riparte solo se non ha smesso di ricevere inviti
+  // (lib/persons/inviti-fermati).
   declinedAt DateTime? @map("declined_at")
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -598,6 +599,8 @@ model EventInvitation {
   @@unique([eventId, emailHash])
   @@index([eventId])
   @@index([personId])
+  // Il ritiro e la spunta cercano gli inviti di un indirizzo in tutti gli eventi.
+  @@index([emailHash])
   @@map("event_invitations")
 }
 
@@ -901,6 +904,10 @@ model Registration {
   consentFutureCommunications Boolean  @default(false) @map("consent_future_communications")
   // Il ritiro dalla pagina dei propri dati: il consenso torna a false, l'ora resta.
   consentFutureCommunicationsWithdrawnAt DateTime? @map("consent_future_communications_withdrawn_at")
+  // La spunta della rubrica data su un indirizzo con un ritiro o inviti fermati:
+  // il modulo non prova di chi sia l'indirizzo, quindi non vale finche' la
+  // persona non la conferma (lib/persons/spunta-in-attesa).
+  addressBookPending Boolean @default(false) @map("address_book_pending")
 
   // Access token (for personal join link)
   accessToken String @unique @map("access_token") // nanoid
@@ -945,6 +952,9 @@ model Registration {
 
   @@unique([eventId, emailHash])
   @@index([personId])
+  // Ritiro, rubrica e richieste dell'interessato cercano per indirizzo in tutti
+  // gli eventi.
+  @@index([emailHash])
   @@map("registrations")
 }
 

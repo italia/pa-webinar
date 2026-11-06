@@ -4565,7 +4565,12 @@
       "addressBookTitle": "Adresár podujatí",
       "addressBookIntro": "Rozhodli ste sa zostať v adresári, aby ste boli pozývaní na podobné podujatia. Tieto údaje uchovávame do {date}, pokiaľ súhlas neodvoláte alebo ho neudelíte znova.",
       "addressBookOptOut": "Odstrániť moje údaje z adresára",
-      "consentFutureEffect": "Ak ho odvoláte, prestanete dostávať oznámenia o ďalších podujatiach a opustíte adresár, a to pre všetky svoje registrácie."
+      "consentFutureEffect": "Ak ho odvoláte, prestanete dostávať oznámenia o ďalších podujatiach a opustíte adresár, a to pre všetky svoje registrácie.",
+      "addressBookPendingTitle": "Návrat do adresára treba potvrdiť",
+      "addressBookPendingBody": "Pri tejto registrácii bolo začiarknuté políčko adresára, ale táto adresa prestala dostávať pozvánky. Kým nepotvrdíte, nič sa nezmení.",
+      "addressBookPendingEffect": "Ak potvrdíte, vrátite sa do adresára s menom a organizáciou z tejto registrácie a budete opäť dostávať pozvánky. Ak zrušíte alebo ak ste to neboli vy, zostanete mimo adresára a pozvánky dostávať nebudete.",
+      "addressBookPendingConfirm": "Potvrdiť návrat",
+      "addressBookPendingCancel": "Zrušiť žiadosť"
     },
     "erasure": {
       "title": "Vymazanie vašich údajov",

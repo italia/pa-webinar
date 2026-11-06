@@ -10,7 +10,9 @@
  *
  *   GET  ?token=...   — preview the target display name/organization
  *                       so the confirmation page can show who is being
- *                       opted out. Read-only.
+ *                       opted out. Read-only. Chi e' gia' uscito ma ha una
+ *                       spunta in attesa di conferma ha ancora qualcosa da
+ *                       ritirare (lib/persons/spunta-in-attesa).
  *   POST ?token=...   — ritira il consenso (`ritiraComunicazioni`): la voce
  *                       perde subito l'email, esce dal selettore e i suoi
  *                       inviti si fermano (`fermaInviti`). Il resto della riga
@@ -49,11 +51,14 @@ export const GET = withErrorHandling(async (request) => {
   const token = url.searchParams.get('token');
   if (!token) throw new ValidationError('Missing token');
   const person = await resolveToken(token);
+  const spunteInAttesa = await prisma.registration.count({
+    where: { emailHash: person.emailHash, addressBookPending: true },
+  });
   return Response.json(
     {
       displayName: tryDecryptPII(person.displayName),
       organization: person.organization,
-      alreadyOptedOut: !person.optedInToAddressBook,
+      alreadyOptedOut: !person.optedInToAddressBook && spunteInAttesa === 0,
     },
     { headers: { 'Cache-Control': 'no-store' } },
   );

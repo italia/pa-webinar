@@ -4565,7 +4565,12 @@
       "addressBookTitle": "Agenda de evenimente",
       "addressBookIntro": "Ați ales să rămâneți în agendă, pentru a fi invitat la evenimente similare. Păstrăm aceste date până la {date}, cu excepția cazului în care vă retrageți consimțământul sau dați un nou consimțământ.",
       "addressBookOptOut": "Elimină-mi datele din agendă",
-      "consentFutureEffect": "Dacă îl retragi, nu mai primești comunicări despre evenimentele viitoare și ieși din agendă, pentru toate înscrierile tale."
+      "consentFutureEffect": "Dacă îl retragi, nu mai primești comunicări despre evenimentele viitoare și ieși din agendă, pentru toate înscrierile tale.",
+      "addressBookPendingTitle": "Revenire în agendă de confirmat",
+      "addressBookPendingBody": "La această înscriere a fost bifată caseta agendei, dar această adresă nu mai primea invitații. Până nu confirmi, nu se schimbă nimic.",
+      "addressBookPendingEffect": "Dacă confirmi, revii în agendă cu numele și organizația de la această înscriere și primești din nou invitații. Dacă anulezi sau dacă nu ai fost tu, rămâi în afara agendei și nu primești invitații.",
+      "addressBookPendingConfirm": "Confirmă revenirea",
+      "addressBookPendingCancel": "Anulează cererea"
     },
     "erasure": {
       "title": "Ștergerea datelor dumneavoastră",

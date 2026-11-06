@@ -4565,7 +4565,12 @@
       "addressBookTitle": "Tapahtumien osoitekirja",
       "addressBookIntro": "Valitsit jäädä osoitekirjaan, jotta sinut voidaan kutsua vastaaviin tapahtumiin. Säilytämme näitä tietoja {date} asti, ellet peruuta suostumusta tai anna uutta suostumusta.",
       "addressBookOptOut": "Poista tietoni osoitekirjasta",
-      "consentFutureEffect": "Jos peruutat sen, et enää saa viestejä tulevista tapahtumista ja poistut osoitekirjasta kaikkien ilmoittautumistesi osalta."
+      "consentFutureEffect": "Jos peruutat sen, et enää saa viestejä tulevista tapahtumista ja poistut osoitekirjasta kaikkien ilmoittautumistesi osalta.",
+      "addressBookPendingTitle": "Vahvista paluu osoitekirjaan",
+      "addressBookPendingBody": "Tässä ilmoittautumisessa valittiin osoitekirjan valintaruutu, mutta tämä osoite oli lakannut saamasta kutsuja. Mikään ei muutu, ennen kuin vahvistat.",
+      "addressBookPendingEffect": "Jos vahvistat, palaat osoitekirjaan tämän ilmoittautumisen nimellä ja organisaatiolla ja saat taas kutsuja. Jos peruutat tai jos se et ollut sinä, pysyt osoitekirjan ulkopuolella etkä saa kutsuja.",
+      "addressBookPendingConfirm": "Vahvista paluu",
+      "addressBookPendingCancel": "Peruuta pyyntö"
     },
     "erasure": {
       "title": "Tietojesi poistaminen",

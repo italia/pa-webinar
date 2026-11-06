@@ -97,12 +97,9 @@ describe('upsertPersonOnRegistration', () => {
     });
   });
 
-  it('una spunta riapre gli inviti fermati di quell’indirizzo', async () => {
+  it('la spunta non tocca gli inviti: li riapre solo la conferma dal link personale', async () => {
     tx.person.findUnique.mockResolvedValue(null);
     await upsertPersonOnRegistration(db, { ...iscrizione, optedIn: true });
-    expect(tx.eventInvitation.updateMany).toHaveBeenCalledWith({
-      where: { emailHash: 'impronta', declinedAt: { not: null } },
-      data: { declinedAt: null },
-    });
+    expect(tx.eventInvitation.updateMany).not.toHaveBeenCalled();
   });
 });

@@ -277,6 +277,8 @@ export const GET = withErrorHandling(async (request) => {
         consentFutureCommunications: r.consentFutureCommunications,
         consentFutureCommunicationsWithdrawnAt:
           r.consentFutureCommunicationsWithdrawnAt?.toISOString() ?? null,
+        // La spunta della rubrica che aspetta una conferma (lib/persons/spunta-in-attesa).
+        addressBookPending: r.addressBookPending,
         // Lo stato di ciascun consenso, dall'iscrizione e dalla sala insieme.
         consents: consensiDellIscrizione(r),
         // La lingua delle email, che la piattaforma conserva e usa.

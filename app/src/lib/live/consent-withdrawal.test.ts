@@ -256,6 +256,16 @@ describe('ritiraComunicazioni', () => {
     expect(tx.gdprAuditLog.createMany.mock.calls[0]![0].data).toHaveLength(2);
   });
 
+  it('lascia il segno del ritiro anche sulle iscrizioni senza la spunta', async () => {
+    tx.registration.findMany.mockResolvedValue([]);
+    tx.person.updateMany.mockResolvedValue({ count: 1 });
+    await ritiraComunicazioni('impronta', ADESSO);
+    expect(tx.registration.updateMany).toHaveBeenCalledWith({
+      where: { emailHash: 'impronta', consentFutureCommunicationsWithdrawnAt: null },
+      data: { consentFutureCommunicationsWithdrawnAt: ADESSO },
+    });
+  });
+
   it("ferma gli inviti dell'indirizzo, anche quelli scritti a mano", async () => {
     tx.registration.findMany.mockResolvedValue([]);
     tx.person.updateMany.mockResolvedValue({ count: 1 });
@@ -282,6 +292,16 @@ describe('ritiraComunicazioni', () => {
         status: { in: ['PENDING', 'FAILED'] },
         OR: [{ dedupKey: { startsWith: 'event-invitation:inv-1:' } }],
       },
+    });
+  });
+
+  it('una spunta in attesa di conferma non sopravvive al ritiro', async () => {
+    tx.registration.findMany.mockResolvedValue([]);
+    tx.person.updateMany.mockResolvedValue({ count: 0 });
+    await ritiraComunicazioni('impronta', ADESSO);
+    expect(tx.registration.updateMany).toHaveBeenCalledWith({
+      where: { emailHash: 'impronta', addressBookPending: true },
+      data: { addressBookPending: false },
     });
   });
 

@@ -4565,7 +4565,12 @@
       "addressBookTitle": "Renginių adresų knyga",
       "addressBookIntro": "Pasirinkote likti adresų knygoje, kad būtumėte kviečiami į panašius renginius. Šiuos duomenis saugome iki {date}, nebent sutikimą atšauksite arba duosite naują.",
       "addressBookOptOut": "Pašalinti mano duomenis iš adresų knygos",
-      "consentFutureEffect": "Jei jį atšauksite, nebegausite pranešimų apie būsimus renginius ir pasitrauksite iš adresų knygos dėl visų savo registracijų."
+      "consentFutureEffect": "Jei jį atšauksite, nebegausite pranešimų apie būsimus renginius ir pasitrauksite iš adresų knygos dėl visų savo registracijų.",
+      "addressBookPendingTitle": "Grįžimą į adresų knygą reikia patvirtinti",
+      "addressBookPendingBody": "Šioje registracijoje buvo pažymėtas adresų knygos langelis, tačiau šis adresas nebegaudavo kvietimų. Kol nepatvirtinsite, niekas nesikeis.",
+      "addressBookPendingEffect": "Jei patvirtinsite, grįšite į adresų knygą su šios registracijos vardu ir organizacija ir vėl gausite kvietimus. Jei atšauksite arba jei tai buvote ne jūs, liksite už adresų knygos ribų ir kvietimų negausite.",
+      "addressBookPendingConfirm": "Patvirtinti grįžimą",
+      "addressBookPendingCancel": "Atšaukti prašymą"
     },
     "erasure": {
       "title": "Jūsų duomenų ištrynimas",

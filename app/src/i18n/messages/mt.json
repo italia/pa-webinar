@@ -4565,7 +4565,12 @@
       "addressBookTitle": "Direttorju tal-avvenimenti",
       "addressBookIntro": "Għażilt li tibqa' fid-direttorju biex tiġi mistieden għal avvenimenti simili. Inżommu din id-dejta sa {date}, sakemm ma tirtirax il-kunsens jew ma tagħtix kunsens ġdid.",
       "addressBookOptOut": "Neħħi d-dejta tiegħi mid-direttorju",
-      "consentFutureEffect": "Jekk tirtirah ma tibqax tirċievi komunikazzjonijiet dwar avvenimenti li ġejjin u toħroġ mill-ktieb tal-indirizzi, għar-reġistrazzjonijiet kollha tiegħek."
+      "consentFutureEffect": "Jekk tirtirah ma tibqax tirċievi komunikazzjonijiet dwar avvenimenti li ġejjin u toħroġ mill-ktieb tal-indirizzi, għar-reġistrazzjonijiet kollha tiegħek.",
+      "addressBookPendingTitle": "Ir-ritorn fid-direttorju irid jiġi kkonfermat",
+      "addressBookPendingBody": "F'din ir-reġistrazzjoni ġiet immarkata l-kaxxa tal-indirizzarju, iżda dan l-indirizz kien waqaf jirċievi stediniet. Sakemm ma tikkonfermax, ma jinbidel xejn.",
+      "addressBookPendingEffect": "Jekk tikkonferma, terġa' lura fid-direttorju bl-isem u l-organizzazzjoni ta' din ir-reġistrazzjoni u terġa' tirċievi stediniet. Jekk tikkanċella, jew jekk ma kontx int, tibqa' barra mid-direttorju u ma tirċievix stediniet.",
+      "addressBookPendingConfirm": "Ikkonferma r-ritorn",
+      "addressBookPendingCancel": "Ikkanċella t-talba"
     },
     "erasure": {
       "title": "Tħassir tad-dejta tiegħek",

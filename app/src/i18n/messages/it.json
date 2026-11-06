@@ -3214,8 +3214,8 @@
       "editPrivacy": "Modifica privacy e dati"
     },
     "rubrica": {
-      "subtitle": "Persone che hanno dato consenso all'inserimento in rubrica (art. 6.1.a GDPR). Le informazioni di profilo vengono aggiornate automaticamente ad ogni re-iscrizione.",
-      "searchLabel": "Cerca per nome o ente",
+      "subtitle": "Persone che hanno dato consenso all'inserimento in rubrica (art. 6.1.a GDPR). Nome, email e organizzazione si aggiornano solo quando la persona spunta di nuovo la casella.",
+      "searchLabel": "Cerca per ente",
       "orgTypeLabel": "Tipo di ente",
       "allTypes": "Tutti",
       "includeOptedOut": "Includi chi ha revocato il consenso",
@@ -4565,7 +4565,12 @@
       "addressBookTitle": "Rubrica degli eventi",
       "addressBookIntro": "Hai scelto di restare in rubrica per essere invitato a eventi simili. Conserviamo questi dati fino al {date}, salvo revoca o nuovo consenso.",
       "addressBookOptOut": "Rimuovi i miei dati dalla rubrica",
-      "consentFutureEffect": "Se lo ritiri non ricevi più comunicazioni sui prossimi eventi ed esci dalla rubrica, per tutte le tue iscrizioni."
+      "consentFutureEffect": "Se lo ritiri non ricevi più comunicazioni sui prossimi eventi ed esci dalla rubrica, per tutte le tue iscrizioni.",
+      "addressBookPendingTitle": "Rientro in rubrica da confermare",
+      "addressBookPendingBody": "Su questa iscrizione è stata spuntata la casella della rubrica, ma questo indirizzo aveva smesso di ricevere inviti. Finché non confermi non cambia niente.",
+      "addressBookPendingEffect": "Se confermi torni in rubrica con il nome e l'ente di questa iscrizione e ricevi di nuovo gli inviti. Se annulli, o se non sei stato tu, resti fuori dalla rubrica e non ricevi inviti.",
+      "addressBookPendingConfirm": "Conferma il rientro",
+      "addressBookPendingCancel": "Annulla la richiesta"
     },
     "erasure": {
       "title": "Cancellazione dei tuoi dati",
@@ -5869,7 +5874,7 @@
       "confirm": "Conferma la rimozione",
       "submitting": "Rimozione in corso…",
       "successTitle": "Rimozione completata",
-      "successBody": "I tuoi dati non sono più presenti nella rubrica degli eventi.",
+      "successBody": "Da questo momento non riceverai più inviti. Il tuo indirizzo email è già stato tolto; nome ed ente si cancellano dalla rubrica entro il giorno successivo.",
       "errors": {
         "generic": "Si è verificato un errore. Riprova più tardi."
       }

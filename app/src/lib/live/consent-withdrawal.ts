@@ -207,9 +207,12 @@ export async function ritiraConsensi(
  * dati o dal link delle email (api/rubrica/opt-out). La stessa casella
  * dell'iscrizione copre comunicazioni e rubrica: si tolgono entrambe, su ogni
  * iscrizione dell'indirizzo, e il registro lo annota per ogni evento toccato.
- * La voce di rubrica perde subito l'email e gli inviti dell'indirizzo si fermano,
+ * Il segno del ritiro va su tutte le iscrizioni, anche su quelle senza la spunta:
+ * sopravvive alla voce di rubrica, e una spunta successiva lo trova
+ * (`indirizzoFermato`). La voce di rubrica perde subito l'email e gli inviti dell'indirizzo si fermano,
  * anche quelli scritti a mano e le loro email in coda (`fermaInviti`): il resto
- * della riga lo toglie la corsa successiva di api/cron/rubrica-retention.
+ * della riga lo toglie la corsa successiva di api/cron/rubrica-retention. Se una
+ * spunta aspettava conferma (lib/persons/spunta-in-attesa), non vale piu'.
  */
 export async function ritiraComunicazioni(
   emailHash: string,
@@ -226,6 +229,14 @@ export async function ritiraComunicazioni(
     await tx.registration.updateMany({
       where: dove,
       data: { consentFutureCommunications: false, consentFutureCommunicationsWithdrawnAt: adesso },
+    });
+    await tx.registration.updateMany({
+      where: { emailHash, consentFutureCommunicationsWithdrawnAt: null },
+      data: { consentFutureCommunicationsWithdrawnAt: adesso },
+    });
+    await tx.registration.updateMany({
+      where: { emailHash, addressBookPending: true },
+      data: { addressBookPending: false },
     });
     const rubrica = await tx.person.updateMany({
       where: { emailHash, optedInToAddressBook: true },

@@ -10,11 +10,15 @@
  * tocca solo un'iscrizione o una prova di quell'indirizzo.
  *
  * Il corpo porta esattamente uno tra:
- *  - `registrationId`, l'iscrizione che esiste ancora: gli effetti sono gli
- *    stessi del ritiro dalla sala (lib/live/consent-withdrawal);
+ *  - `registrationId` con `consent`, l'iscrizione che esiste ancora: gli effetti
+ *    sono gli stessi del ritiro dalla sala (lib/live/consent-withdrawal);
  *  - `proofId`, la prova conservata dopo la cancellazione dell'iscrizione
  *    (lib/gdpr/retained-consent-proofs), solo per registrazione e trascrizione:
- *    le comunicazioni future non hanno una prova conservata.
+ *    le comunicazioni future non hanno una prova conservata;
+ *  - `registrationId` con `confirmAddressBook`, la conferma della spunta della
+ *    rubrica rimasta in attesa (lib/persons/spunta-in-attesa). Il token prova la
+ *    casella e il pulsante e' la scelta. Per annullarla si ritirano le
+ *    comunicazioni future, come dal link delle email.
  */
 import { z } from 'zod';
 
@@ -24,6 +28,7 @@ import { AppError, NotFoundError, RateLimitError, ValidationError } from '@/lib/
 import { verifyGdprToken } from '@/lib/gdpr/request-token';
 import { ritiraProvaConservata } from '@/lib/gdpr/retained-consent-proofs';
 import { ritiraComunicazioni, ritiraConsensi } from '@/lib/live/consent-withdrawal';
+import { applicaSpuntaInAttesa } from '@/lib/persons/spunta-in-attesa';
 import { getClientIp, rateLimit } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
@@ -44,6 +49,13 @@ const schema = z.union([
       consent: z.enum(['recording', 'transcription']),
     })
     .strict(),
+  z
+    .object({
+      token,
+      registrationId: z.guid(),
+      confirmAddressBook: z.literal(true),
+    })
+    .strict(),
 ]);
 
 export const POST = withErrorHandling(async (request) => {
@@ -56,11 +68,10 @@ export const POST = withErrorHandling(async (request) => {
   const parsed = schema.safeParse(await parseJsonBody(request, 2048));
   if (!parsed.success) throw new ValidationError('Invalid body');
   const corpo = parsed.data;
-  const { consent } = corpo;
   const verificato = verifyGdprToken(corpo.token, 'consents');
   if (!verificato) throw new AppError('Invalid or expired token', 401, 'UNAUTHORIZED');
-  const risposta = () =>
-    Response.json({ withdrawn: consent }, { headers: { 'Cache-Control': 'no-store' } });
+  const risposta = (esito: Record<string, string>) =>
+    Response.json(esito, { headers: { 'Cache-Control': 'no-store' } });
 
   if ('proofId' in corpo) {
     const trovata = await ritiraProvaConservata(
@@ -69,7 +80,7 @@ export const POST = withErrorHandling(async (request) => {
       corpo.consent
     );
     if (!trovata) throw new NotFoundError('Consent proof');
-    return risposta();
+    return risposta({ withdrawn: corpo.consent });
   }
 
   const iscrizione = await prisma.registration.findFirst({
@@ -78,6 +89,13 @@ export const POST = withErrorHandling(async (request) => {
   });
   if (!iscrizione) throw new NotFoundError('Registration');
 
+  if ('confirmAddressBook' in corpo) {
+    const confermata = await applicaSpuntaInAttesa(iscrizione.id, 'self-service');
+    if (!confermata) throw new NotFoundError('Address book request');
+    return risposta({ confirmed: 'addressBook' });
+  }
+
+  const { consent } = corpo;
   if (consent === 'futureCommunications') {
     await ritiraComunicazioni(verificato.emailHash);
   } else {
@@ -92,5 +110,5 @@ export const POST = withErrorHandling(async (request) => {
       }
     );
   }
-  return risposta();
+  return risposta({ withdrawn: consent });
 });

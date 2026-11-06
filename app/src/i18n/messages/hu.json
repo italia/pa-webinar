@@ -4565,7 +4565,12 @@
       "addressBookTitle": "Az események címjegyzéke",
       "addressBookIntro": "Ön úgy döntött, hogy a címjegyzékben marad, hogy hasonló eseményekre meghívást kapjon. Visszavonás vagy új hozzájárulás hiányában ezeket az adatokat a következő napig őrizzük meg: {date}.",
       "addressBookOptOut": "Adataim eltávolítása a címjegyzékből",
-      "consentFutureEffect": "Ha visszavonja, többé nem kap értesítést a következő eseményekről, és kikerül a címjegyzékből, minden regisztrációja esetében."
+      "consentFutureEffect": "Ha visszavonja, többé nem kap értesítést a következő eseményekről, és kikerül a címjegyzékből, minden regisztrációja esetében.",
+      "addressBookPendingTitle": "A címjegyzékbe való visszatérés megerősítése",
+      "addressBookPendingBody": "Ennél a regisztrációnál bejelölték a címjegyzék jelölőnégyzetét, de erre a címre már nem érkeztek meghívók. Amíg nem erősíti meg, semmi sem változik.",
+      "addressBookPendingEffect": "Ha megerősíti, a regisztráció nevével és szervezetével visszakerül a címjegyzékbe, és ismét kap meghívókat. Ha megszakítja, vagy ha nem Ön volt, a címjegyzéken kívül marad, és nem kap meghívókat.",
+      "addressBookPendingConfirm": "Visszatérés megerősítése",
+      "addressBookPendingCancel": "Kérés visszavonása"
     },
     "erasure": {
       "title": "Az Ön adatainak törlése",

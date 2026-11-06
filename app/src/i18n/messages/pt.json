@@ -4565,7 +4565,12 @@
       "addressBookTitle": "Agenda de eventos",
       "addressBookIntro": "Escolheu ficar na agenda para ser convidado para eventos semelhantes. Conservamos estes dados até {date}, salvo retirada ou novo consentimento.",
       "addressBookOptOut": "Remover os meus dados da agenda",
-      "consentFutureEffect": "Se o retirar, deixa de receber comunicações sobre próximos eventos e sai da lista de contactos, para todas as suas inscrições."
+      "consentFutureEffect": "Se o retirar, deixa de receber comunicações sobre próximos eventos e sai da lista de contactos, para todas as suas inscrições.",
+      "addressBookPendingTitle": "Regresso à agenda por confirmar",
+      "addressBookPendingBody": "Nesta inscrição foi assinalada a caixa da agenda, mas este endereço tinha deixado de receber convites. Até confirmares, nada muda.",
+      "addressBookPendingEffect": "Se confirmares, regressas à agenda com o nome e a organização desta inscrição e voltas a receber convites. Se cancelares, ou se não foste tu, ficas fora da agenda e não recebes convites.",
+      "addressBookPendingConfirm": "Confirmar o regresso",
+      "addressBookPendingCancel": "Cancelar o pedido"
     },
     "erasure": {
       "title": "Eliminação dos seus dados",

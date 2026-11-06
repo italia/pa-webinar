@@ -23,6 +23,25 @@ describe('consensiDellIscrizione', () => {
       recording: null,
       transcription: null,
       futureCommunications: null,
+      addressBookPending: false,
+    });
+  });
+
+  it('la spunta della rubrica in attesa si vede, e non conta come consenso dato', () => {
+    const r = consensiDellIscrizione({ ...BASE, addressBookPending: true });
+    expect(r.addressBookPending).toBe(true);
+    expect(r.futureCommunications).toBeNull();
+  });
+
+  it('il ritiro dell’indirizzo compare anche su un’iscrizione senza la spunta', () => {
+    const r = consensiDellIscrizione({
+      ...BASE,
+      consentFutureCommunications: false,
+      consentFutureCommunicationsWithdrawnAt: RITIRO,
+    });
+    expect(r.futureCommunications).toEqual({
+      dato: false,
+      ritiratoIl: RITIRO.toISOString(),
     });
   });
 

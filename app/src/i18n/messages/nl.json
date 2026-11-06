@@ -4565,7 +4565,12 @@
       "addressBookTitle": "Evenementenadresboek",
       "addressBookIntro": "U hebt ervoor gekozen in het adresboek te blijven om voor vergelijkbare evenementen te worden uitgenodigd. We bewaren deze gegevens tot {date}, tenzij u uw toestemming intrekt of opnieuw geeft.",
       "addressBookOptOut": "Verwijder mijn gegevens uit het adresboek",
-      "consentFutureEffect": "Als u deze intrekt, ontvangt u geen berichten meer over komende evenementen en verlaat u het adresboek, voor al uw inschrijvingen."
+      "consentFutureEffect": "Als u deze intrekt, ontvangt u geen berichten meer over komende evenementen en verlaat u het adresboek, voor al uw inschrijvingen.",
+      "addressBookPendingTitle": "Terugkeer in het adresboek bevestigen",
+      "addressBookPendingBody": "Bij deze inschrijving is het vakje voor het adresboek aangevinkt, maar dit adres ontving geen uitnodigingen meer. Zolang je niet bevestigt, verandert er niets.",
+      "addressBookPendingEffect": "Als je bevestigt, keer je terug in het adresboek met de naam en de organisatie van deze inschrijving en ontvang je weer uitnodigingen. Als je annuleert, of als jij het niet was, blijf je buiten het adresboek en ontvang je geen uitnodigingen.",
+      "addressBookPendingConfirm": "Terugkeer bevestigen",
+      "addressBookPendingCancel": "Verzoek annuleren"
     },
     "erasure": {
       "title": "Verwijdering van uw gegevens",

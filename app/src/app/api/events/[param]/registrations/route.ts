@@ -32,6 +32,7 @@ import { encryptPII, hashEmail } from '@/lib/crypto/pii';
 import { sendConfirmationEmail } from '@/lib/email/confirmation';
 import { getPublicEnv } from '@/lib/env';
 import { upsertPersonOnRegistration } from '@/lib/persons';
+import { indirizzoFermato } from '@/lib/persons/inviti-fermati';
 import { rubricaProposta } from '@/lib/persons/address-book';
 import { isEventOpenForRegistration } from '@/lib/events/visibility';
 import { isInvited, publicRegistrationFor } from '@/lib/events/registration-access';
@@ -218,6 +219,12 @@ export const POST = withErrorHandling(async (request, context) => {
     // nuova e nessun aggiornamento di una voce che esiste gia'. Chi ha gia' una
     // voce resta legato a quella: le email dell'evento portano il link per
     // uscire dalla rubrica (lib/persons/opt-out-link).
+    //
+    // Il modulo non prova di chi sia l'indirizzo: dopo un ritiro o con inviti
+    // fermati la spunta non vale, e aspetta una conferma
+    // (lib/persons/spunta-in-attesa).
+    const spuntaSospesa =
+      (inRubrica || comunicazioniFuture) && (await indirizzoFermato(tx, emailHash));
     const personId = proposta
       ? await upsertPersonOnRegistration(tx, {
           emailHash,
@@ -226,7 +233,7 @@ export const POST = withErrorHandling(async (request, context) => {
           organization: organization || null,
           organizationRole: organizationRole || null,
           organizationType: organizationType || null,
-          optedIn: inRubrica,
+          optedIn: inRubrica && !spuntaSospesa,
         })
       : ((await tx.person.findUnique({ where: { emailHash }, select: { id: true } }))?.id ?? null);
 
@@ -246,7 +253,8 @@ export const POST = withErrorHandling(async (request, context) => {
         consentRecordingVersion: versioneLetta,
         consentMultitrack: richiesti.tracce ? trascrizioneData : null,
         consentMultitrackVersion: richiesti.tracce && trascrizioneData ? VERSIONE_TESTO_TRASCRIZIONE : null,
-        consentFutureCommunications: comunicazioniFuture,
+        consentFutureCommunications: comunicazioniFuture && !spuntaSospesa,
+        addressBookPending: inRubrica && spuntaSospesa,
         locale: pageLocale,
         accessToken,
         personId,
@@ -284,8 +292,9 @@ export const POST = withErrorHandling(async (request, context) => {
           recordingConsentOptional: richiesti.registrazione,
           consentMultitrack: richiesti.tracce ? trascrizioneData : null,
           consentMultitrackVersion: richiesti.tracce && trascrizioneData ? VERSIONE_TESTO_TRASCRIZIONE : null,
-          consentFutureCommunications: comunicazioniFuture,
-          consentAddressBook: inRubrica,
+          consentFutureCommunications: comunicazioniFuture && !spuntaSospesa,
+          consentAddressBook: inRubrica && !spuntaSospesa,
+          addressBookPending: inRubrica && spuntaSospesa,
         }),
       },
     });
