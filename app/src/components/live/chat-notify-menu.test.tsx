@@ -59,10 +59,19 @@ afterEach(() => {
 describe('ChatNotifyMenu', () => {
   it('la campanella dice lo stato, e in silenzioso lo dice', () => {
     render();
-    expect(bottone().getAttribute('aria-label')).toBe(t.notifyButton);
+    expect(bottone().getAttribute('title')).toBe(t.notifyButton);
     expect(bottone().textContent).toContain(t.notifyMentions);
     render({ ...DEFAULT_CHAT_NOTIFY_PREFS, mode: 'off' });
-    expect(bottone().getAttribute('aria-label')).toBe(t.notifyButtonOff);
+    expect(bottone().getAttribute('title')).toBe(t.notifyButtonOff);
+  });
+
+  it('il nome accessibile contiene il testo visibile, in ogni stato', () => {
+    for (const mode of ['all', 'mentions', 'off'] as const) {
+      render({ ...DEFAULT_CHAT_NOTIFY_PREFS, mode });
+      const visibile = bottone().textContent?.trim();
+      expect(visibile).toBeTruthy();
+      expect(bottone().getAttribute('aria-label')).toContain(visibile);
+    }
   });
 
   it('scegliere «Tutti i messaggi» lo salva e chiede il permesso, perché le notifiche sono accese', () => {
