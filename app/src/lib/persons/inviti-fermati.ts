@@ -47,7 +47,8 @@ type DbMemoria = Pick<
  * Vero se questo indirizzo ha smesso di ricevere inviti, e nessuna conferma lo ha
  * rimesso in rubrica: la voce porta un ritiro, un invito e' fermato, oppure non
  * c'e' una voce attiva e un'iscrizione ricorda il ritiro. Quando anche iscrizioni
- * e inviti sono cancellati non resta traccia del ritiro, e la risposta e' falso.
+ * e inviti sono cancellati, o l'ultimo invito fermato e' stato riscritto su un
+ * altro indirizzo, non resta traccia del ritiro, e la risposta e' falso.
  */
 export async function indirizzoFermato(
   db: DbMemoria,

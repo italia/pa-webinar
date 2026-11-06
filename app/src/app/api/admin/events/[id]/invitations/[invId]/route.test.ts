@@ -7,14 +7,22 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 /**
  * Cambiare l'indirizzo di un invito lo rimette «da inviare»: l'invito non e'
  * arrivato al nuovo indirizzo, e il link di quello vecchio non deve aprire il
- * modulo con i dati nuovi. Token e impronta non escono dalla risposta.
+ * modulo con i dati nuovi: le email del vecchio indirizzo se ne vanno con lui.
+ * Token e impronta non escono dalla risposta.
  */
 const EVENTO = '11111111-2222-4333-8444-555555555555';
 const INVITO = '22222222-3333-4444-8555-666666666666';
 const db = vi.hoisted(() => ({
-  eventInvitation: { findUnique: vi.fn(), findFirst: vi.fn(), update: vi.fn() },
+  eventInvitation: {
+    findUnique: vi.fn(),
+    findFirst: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+  },
   person: { findUnique: vi.fn() },
   registration: { findFirst: vi.fn() },
+  emailOutbox: { deleteMany: vi.fn() },
+  $transaction: vi.fn(),
 }));
 vi.mock('next/headers', () => ({ cookies: async () => ({}) }));
 vi.mock('@/lib/auth/staff-session', () => ({
@@ -29,7 +37,7 @@ vi.mock('@/lib/crypto/pii', () => ({
   tryDecryptPII: (v: string | null) => (v ? v.replace(/^cif:/, '') : null),
 }));
 
-import { PATCH } from './route';
+import { DELETE, PATCH } from './route';
 
 const richiesta = (body: unknown) =>
   new Request(`http://localhost/api/admin/events/${EVENTO}/invitations/${INVITO}`, {
@@ -41,6 +49,8 @@ const ctx = { params: Promise.resolve({ id: EVENTO, invId: INVITO }) };
 
 beforeEach(() => {
   for (const f of Object.values(db.eventInvitation)) f.mockReset();
+  db.emailOutbox.deleteMany.mockReset().mockResolvedValue({ count: 0 });
+  db.$transaction.mockReset().mockImplementation((fn: (tx: typeof db) => unknown) => fn(db));
   const riga = { id: INVITO, eventId: EVENTO };
   db.eventInvitation.findUnique.mockResolvedValue(riga);
   // Un invito fermato su un altro indirizzo: di norma nessuno.
@@ -61,6 +71,28 @@ beforeEach(() => {
 });
 
 describe('PATCH un invito', () => {
+  it("con un indirizzo nuovo toglie le email del vecchio, anche gia' inviate", async () => {
+    await PATCH(richiesta({ email: 'nuova@example.org' }) as never, ctx as never);
+    expect(db.emailOutbox.deleteMany).toHaveBeenCalledWith({
+      where: { OR: [{ dedupKey: { startsWith: `event-invitation:${INVITO}:` } }] },
+    });
+    expect(db.emailOutbox.deleteMany.mock.invocationCallOrder[0]!).toBeLessThan(
+      db.eventInvitation.update.mock.invocationCallOrder[0]!
+    );
+  });
+
+  it("riscrivendo lo stesso indirizzo o solo il nome le email restano", async () => {
+    db.eventInvitation.findUnique.mockResolvedValue({
+      id: INVITO,
+      eventId: EVENTO,
+      emailHash: 'h:stessa@example.org',
+    });
+    await PATCH(richiesta({ email: 'stessa@example.org' }) as never, ctx as never);
+    await PATCH(richiesta({ name: 'Ada' }) as never, ctx as never);
+    expect(db.emailOutbox.deleteMany).not.toHaveBeenCalled();
+    expect(db.eventInvitation.update).toHaveBeenCalledTimes(2);
+  });
+
   it("con un indirizzo nuovo azzera token, invio e stop, e non restituisce token ne' impronta", async () => {
     const res = await PATCH(
       richiesta({ email: 'Nuova@Example.org' }) as never,
@@ -155,5 +187,27 @@ describe('PATCH un invito', () => {
     const data = db.eventInvitation.update.mock.calls[0]![0].data;
     expect(data).not.toHaveProperty('token');
     expect(data).not.toHaveProperty('sentAt');
+  });
+});
+
+describe('DELETE un invito', () => {
+  it('toglie le sue email ancora da inviare prima della riga', async () => {
+    db.eventInvitation.delete.mockResolvedValue({});
+    const res = await DELETE(
+      new Request(`http://localhost/api/admin/events/${EVENTO}/invitations/${INVITO}`, {
+        method: 'DELETE',
+      }) as never,
+      ctx as never
+    );
+    expect(res.status).toBe(200);
+    expect(db.emailOutbox.deleteMany).toHaveBeenCalledWith({
+      where: {
+        status: { in: ['PENDING', 'FAILED'] },
+        OR: [{ dedupKey: { startsWith: `event-invitation:${INVITO}:` } }],
+      },
+    });
+    expect(db.emailOutbox.deleteMany.mock.invocationCallOrder[0]!).toBeLessThan(
+      db.eventInvitation.delete.mock.invocationCallOrder[0]!
+    );
   });
 });

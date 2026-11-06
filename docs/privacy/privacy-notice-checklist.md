@@ -531,7 +531,8 @@ Your notice should state at least:
   sent, and invitation emails still in the queue are cancelled. On an event open
   only to invitees the invitation stays, and with it the right to register. An
   expired or deleted entry stops its invitations as well. The stop follows the
-  address: writing it again on an invitation, or on a new one, does not lift it.
+  address: writing it again on an invitation, or on a new one, does not lift it,
+  with the limit in [Known limitations](../GDPR.md#known-limitations).
 - **A tick after a withdrawal.** The form does not prove who owns an address, so
   a tick cannot undo a withdrawal. On an address that has withdrawn, or that has
   a stopped invitation, the tick stays on the registration (`addressBookPending`)
@@ -544,8 +545,9 @@ Your notice should state at least:
   its retention restarts and the stopped invitations resume. Both steps are
   written to the GDPR audit log. A new withdrawal cancels a waiting tick. The
   platform remembers a withdrawal through the entry, a stopped invitation or a
-  registration that records it: once those are deleted, a tick counts as a first
-  consent.
+  registration that records it. Once those are deleted, or the last stopped
+  invitation is moved to another address, a tick counts as a first consent, and
+  an invitation written to that address is sent.
 - Self-service erasure also deletes the person's address-book entry and their
   invitations, with every email of those invitations, queued or sent.
 

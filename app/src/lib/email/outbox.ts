@@ -238,9 +238,10 @@ export async function annullaEmailInCoda(
 }
 
 /**
- * Tutte le email di inviti cancellati su richiesta della persona, anche quelle
- * gia' inviate: portano nome, indirizzo e link d'iscrizione, e senza l'invito
- * nessun nuovo invio puo' riusare la chiave.
+ * Tutte le email di inviti cancellati su richiesta della persona o riscritti su
+ * un altro indirizzo, anche quelle gia' inviate: portano nome, indirizzo e link
+ * d'iscrizione del vecchio destinatario, e finche' restano la chiave del primo
+ * invio resta presa.
  */
 export async function cancellaEmailInviti(
   tx: DbCoda,

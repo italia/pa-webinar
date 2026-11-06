@@ -4282,6 +4282,7 @@
     "timeLabel": "Ora",
     "durationLabel": "Durata",
     "addressBookNote": "Sei nella rubrica degli eventi, per essere invitato a eventi simili: puoi revocare il consenso in qualsiasi momento.",
+    "addressBookPendingNote": "Su questa iscrizione è stata spuntata la casella della rubrica degli eventi, ma questo indirizzo aveva smesso di ricevere inviti. Se la richiesta è tua, puoi confermarla dalla pagina dei tuoi dati, con il link qui sotto. Se non è tua, ignora questo messaggio: resti fuori dalla rubrica e non ricevi inviti.",
     "addressBookOptOutLink": "Rimuovi i miei dati dalla rubrica",
     "myDataLink": "I tuoi dati: vederli, correggerli, ritirare un consenso o cancellare l’iscrizione"
   },
@@ -4589,7 +4590,8 @@
       "addressBookPendingBody": "Su questa iscrizione è stata spuntata la casella della rubrica, ma questo indirizzo aveva smesso di ricevere inviti. Finché non confermi non cambia niente.",
       "addressBookPendingEffect": "Se confermi torni in rubrica con il nome e l'ente di questa iscrizione e ricevi di nuovo gli inviti. Se annulli, o se non sei stato tu, resti fuori dalla rubrica e non ricevi inviti.",
       "addressBookPendingConfirm": "Conferma il rientro",
-      "addressBookPendingCancel": "Annulla la richiesta"
+      "addressBookPendingCancel": "Annulla la richiesta",
+      "addressBookPendingGone": "Questa richiesta non è più in attesa. Ricarica la pagina per vedere lo stato aggiornato."
     },
     "erasure": {
       "title": "Cancellazione dei tuoi dati",

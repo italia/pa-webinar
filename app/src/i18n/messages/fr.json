@@ -4072,6 +4072,7 @@
     "timeLabel": "Heure",
     "durationLabel": "Durée",
     "addressBookNote": "Vous êtes dans le carnet d’adresses des événements, pour être invité à des événements similaires : vous pouvez retirer votre consentement à tout moment.",
+    "addressBookPendingNote": "La case du carnet d’adresses des événements a été cochée sur cette inscription, mais cette adresse ne recevait plus d’invitations. Si la demande vient de vous, vous pouvez la confirmer depuis la page de vos données, avec le lien ci-dessous. Sinon, ignorez ce message : vous restez hors du carnet d’adresses et ne recevez pas d’invitations.",
     "addressBookOptOutLink": "Supprimer mes données du carnet d’adresses",
     "myDataLink": "Vos données : les consulter, les corriger, retirer un consentement ou annuler l’inscription"
   },
@@ -4589,7 +4590,8 @@
       "addressBookPendingBody": "La case du carnet d'adresses a été cochée sur cette inscription, mais cette adresse ne recevait plus d'invitations. Rien ne change tant que vous n'avez pas confirmé.",
       "addressBookPendingEffect": "Si vous confirmez, vous revenez dans le carnet d'adresses avec le nom et l'organisme de cette inscription et vous recevez de nouveau les invitations. Si vous annulez, ou si ce n'était pas vous, vous restez hors du carnet d'adresses et ne recevez pas d'invitations.",
       "addressBookPendingConfirm": "Confirmer mon retour",
-      "addressBookPendingCancel": "Annuler la demande"
+      "addressBookPendingCancel": "Annuler la demande",
+      "addressBookPendingGone": "This request is no longer waiting. Reload the page to see the current state."
     },
     "erasure": {
       "title": "Effacement de vos données",

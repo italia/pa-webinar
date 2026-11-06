@@ -48,6 +48,12 @@ interface EmailTemplateInput {
   /** La pagina «I miei dati», nella lingua della pagina dell'iscrizione. */
   /** Il link a «I miei dati», con il testo dal catalogo delle lingue. */
   myDataLink?: { url: string; label: string } | null;
+  /**
+   * Il testo per chi ha una spunta della rubrica in attesa di conferma
+   * (lib/persons/spunta-in-attesa), nell'email di conferma: rimanda al link a
+   * «I miei dati», subito sotto.
+   */
+  addressBookPendingNote?: string | null;
 }
 
 interface LocaleCopy {
@@ -430,6 +436,17 @@ function myDataText(input: EmailTemplateInput): string[] {
   return link ? [`${link.label}: ${link.url}`] : [];
 }
 
+/** La spunta in attesa di conferma, subito sopra il link a «I miei dati». */
+function addressBookPendingHtml(input: EmailTemplateInput): string {
+  const nota = input.addressBookPendingNote;
+  return nota ? `\n<p style="margin:16px 0 0;font-size:14px;">${escapeHtml(nota)}</p>` : '';
+}
+
+function addressBookPendingText(input: EmailTemplateInput): string[] {
+  const nota = input.addressBookPendingNote;
+  return nota ? ['', nota] : [];
+}
+
 function ctaButton(label: string, url: string): string {
   return `<table role="presentation" style="margin:24px 0;"><tr><td>
 <a href="${url}" style="display:inline-block;padding:12px 28px;background:#06c;color:#fff;text-decoration:none;border-radius:4px;font-weight:600;font-size:16px;">
@@ -506,7 +523,7 @@ ${detailsTable(c, input)}
 ${ctaButton(r.ctaLabel, input.joinUrl)}
 ${calendarHtml}
 ${info}
-<p style="margin:16px 0 0;font-size:14px;"><a href="${input.eventPageUrl}" style="color:#06c;">${c.viewEvent}</a></p>${myDataHtml(input)}`;
+<p style="margin:16px 0 0;font-size:14px;"><a href="${input.eventPageUrl}" style="color:#06c;">${c.viewEvent}</a></p>${addressBookPendingHtml(input)}${myDataHtml(input)}`;
 
   return layout(
     escapeHtml(r.heading),
@@ -551,6 +568,7 @@ export function confirmationText(
     '',
     ...infoLines,
     `${c.viewEvent}: ${input.eventPageUrl}`,
+    ...addressBookPendingText(input),
     ...myDataText(input),
     '',
     footerText,

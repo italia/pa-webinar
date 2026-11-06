@@ -4072,6 +4072,7 @@
     "timeLabel": "Laiks",
     "durationLabel": "Ilgums",
     "addressBookNote": "Jūs esat pasākumu kontaktu grāmatā, lai jūs aicinātu uz līdzīgiem pasākumiem: piekrišanu varat atsaukt jebkurā laikā.",
+    "addressBookPendingNote": "The events address book box was ticked on this registration, but this address had stopped receiving invitations. If the request is yours, you can confirm it from the page with your data, using the link below. If it is not, ignore this message: you stay out of the address book and receive no invitations.",
     "addressBookOptOutLink": "Izņemt manus datus no kontaktu grāmatas",
     "myDataLink": "Jūsu dati: skatīt, labot, atsaukt piekrišanu vai atcelt reģistrāciju"
   },
@@ -4589,7 +4590,8 @@
       "addressBookPendingBody": "Šajā reģistrācijā tika atzīmēta kontaktu grāmatas izvēles rūtiņa, taču šī adrese vairs nesaņēma ielūgumus. Kamēr neapstiprināsiet, nekas nemainīsies.",
       "addressBookPendingEffect": "Ja apstiprināsiet, atgriezīsieties kontaktu grāmatā ar šīs reģistrācijas vārdu un organizāciju un atkal saņemsiet ielūgumus. Ja atcelsiet vai ja tas nebijāt jūs, paliksiet ārpus kontaktu grāmatas un ielūgumus nesaņemsiet.",
       "addressBookPendingConfirm": "Apstiprināt atgriešanos",
-      "addressBookPendingCancel": "Atcelt pieprasījumu"
+      "addressBookPendingCancel": "Atcelt pieprasījumu",
+      "addressBookPendingGone": "This request is no longer waiting. Reload the page to see the current state."
     },
     "erasure": {
       "title": "Jūsu datu dzēšana",

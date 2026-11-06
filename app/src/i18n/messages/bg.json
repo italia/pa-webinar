@@ -4072,6 +4072,7 @@
     "timeLabel": "Час",
     "durationLabel": "Продължителност",
     "addressBookNote": "Вие сте в адресната книга на събитията, за да бъдете канени на подобни събития: можете да оттеглите съгласието си по всяко време.",
+    "addressBookPendingNote": "The events address book box was ticked on this registration, but this address had stopped receiving invitations. If the request is yours, you can confirm it from the page with your data, using the link below. If it is not, ignore this message: you stay out of the address book and receive no invitations.",
     "addressBookOptOutLink": "Премахни данните ми от адресната книга",
     "myDataLink": "Вашите данни: преглед, коригиране, оттегляне на съгласие или отмяна на регистрацията"
   },
@@ -4589,7 +4590,8 @@
       "addressBookPendingBody": "При тази регистрация е отметнато полето за адресната книга, но този адрес беше спрял да получава покани. Докато не потвърдите, нищо не се променя.",
       "addressBookPendingEffect": "Ако потвърдите, се връщате в адресната книга с името и организацията от тази регистрация и отново получавате покани. Ако откажете или ако не сте били вие, оставате извън адресната книга и не получавате покани.",
       "addressBookPendingConfirm": "Потвърждаване на връщането",
-      "addressBookPendingCancel": "Отказ от заявката"
+      "addressBookPendingCancel": "Отказ от заявката",
+      "addressBookPendingGone": "This request is no longer waiting. Reload the page to see the current state."
     },
     "erasure": {
       "title": "Изтриване на Вашите данни",

@@ -4072,6 +4072,7 @@
     "timeLabel": "Ħin",
     "durationLabel": "Tul",
     "addressBookNote": "Int fid-direttorju tal-avvenimenti, biex tiġi mistieden għal avvenimenti simili: tista' tirtira l-kunsens fi kwalunkwe ħin.",
+    "addressBookPendingNote": "The events address book box was ticked on this registration, but this address had stopped receiving invitations. If the request is yours, you can confirm it from the page with your data, using the link below. If it is not, ignore this message: you stay out of the address book and receive no invitations.",
     "addressBookOptOutLink": "Neħħi d-dejta tiegħi mid-direttorju",
     "myDataLink": "Id-data tiegħek: araha, ikkoreġiha, irtira kunsens jew ikkanċella r-reġistrazzjoni"
   },
@@ -4589,7 +4590,8 @@
       "addressBookPendingBody": "F'din ir-reġistrazzjoni ġiet immarkata l-kaxxa tad-direttorju, iżda dan l-indirizz kien waqaf jirċievi stediniet. Sakemm ma tikkonfermax, ma jinbidel xejn.",
       "addressBookPendingEffect": "Jekk tikkonferma, terġa' lura fid-direttorju bl-isem u l-organizzazzjoni ta' din ir-reġistrazzjoni u terġa' tirċievi stediniet. Jekk tikkanċella, jew jekk ma kontx int, tibqa' barra mid-direttorju u ma tirċievix stediniet.",
       "addressBookPendingConfirm": "Ikkonferma r-ritorn",
-      "addressBookPendingCancel": "Ikkanċella t-talba"
+      "addressBookPendingCancel": "Ikkanċella t-talba",
+      "addressBookPendingGone": "This request is no longer waiting. Reload the page to see the current state."
     },
     "erasure": {
       "title": "Tħassir tad-dejta tiegħek",

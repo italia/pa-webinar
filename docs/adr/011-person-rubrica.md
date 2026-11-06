@@ -304,12 +304,16 @@ would be without a tick. Two things confirm it:
   cookie itself and does not read an existing one, so neither shows a choice and neither confirms.
 - **The button on the person's data page**, which says what changes and with which data:
   `POST /api/gdpr/consents` with `registrationId` and `confirmAddressBook`. It answers
-  `{"confirmed": "addressBook"}`, and `404` when no tick is waiting.
+  `{"confirmed": "addressBook"}`, and `404` when no tick is waiting. Where the address book is no longer
+  offered the page shows no button.
 
 Confirming (`applicaSpuntaInAttesa()`) writes that registration's data on the record as an opt-in does,
 clears the withdrawal, lifts the stop on the invitations of that address, sets
-`consentFutureCommunications` and links the registration. A second confirmation finds nothing to apply and
-does not renew the consent. A new withdrawal drops the tick, and **Cancel the request** on the same page
+`consentFutureCommunications` and links the registration. The state belongs to the address: the other ticks
+waiting on it close too, with the flag, the link and an audit row on the events that still offer the address
+book. A second confirmation finds nothing to apply and does not renew the consent. Where the address book is
+no longer offered (`rubricaProposta()`) the tick is dropped with no address-book record and the withdrawal
+stands, and a `CONSENT_WITHDRAWN` row of that event records it with the cause. A new withdrawal drops the tick, and **Cancel the request** on the same page
 is that withdrawal.
 
 ### Who sees the address book
@@ -393,7 +397,8 @@ So the stop is written on the row, in `declinedAt`, by `fermaInviti()` before th
   retry, so nothing goes out after the stop.
 - `sendInvitations()` in `app/src/lib/email/invitation.ts` skips a stopped row and any address whose record
   is opted out, and counts them as skipped. The invitations panel shows the row as stopped.
-- Only a confirmed tick lifts the stop (`riapriInviti()`). A tick from the form alone does not
+- Only a confirmed tick lifts the stop (`riapriInviti()`), with the limit in
+  [Known limitations](../GDPR.md#known-limitations). A tick from the form alone does not
   ([A tick after a withdrawal](#a-tick-after-a-withdrawal)).
 - The stop follows the address. `PATCH` on an invitation clears it only if the new address has not stopped
   receiving invitations, and `POST` creates a row for a stopped address already stopped

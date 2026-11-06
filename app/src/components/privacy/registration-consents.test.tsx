@@ -22,6 +22,8 @@ const monta = (
     comunicazioniRitirateIl?: string;
     onComunicazioniRitirate?: (q: string) => void;
     voce?: VoceNelVideo;
+    rubricaConfermata?: boolean;
+    onRubricaConfermata?: () => void;
   } = {}
 ) =>
   act(() =>
@@ -247,6 +249,81 @@ describe('RegistrationConsents', () => {
         { comunicazioniRitirateIl: '2026-11-05T10:00:00.000Z' }
       );
       expect(pulsante(conferma)).toBeUndefined();
+    });
+
+    it('confermata, lo dice a chi ospita le schede', async () => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(async () => new Response('{}', { status: 200 }))
+      );
+      const avvisa = vi.fn();
+      monta({ addressBookPending: true }, { onRubricaConfermata: avvisa });
+
+      await clic(conferma);
+
+      expect(avvisa).toHaveBeenCalledOnce();
+    });
+
+    it('una conferma non riuscita non arriva alle altre schede', async () => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(async () => new Response('{}', { status: 500 }))
+      );
+      const avvisa = vi.fn();
+      monta({ addressBookPending: true }, { onRubricaConfermata: avvisa });
+
+      await clic(conferma);
+
+      expect(avvisa).not.toHaveBeenCalled();
+    });
+
+    it('la conferma da un’altra scheda la chiude e mostra il consenso dato', () => {
+      monta({ addressBookPending: true }, { rubricaConfermata: true });
+
+      expect(pulsante(conferma)).toBeUndefined();
+      expect(pulsante(annulla)).toBeUndefined();
+      expect(container.textContent).toContain(messages.live.consents.given);
+    });
+
+    it('la conferma da un’altra scheda non ridà un consenso a chi non aspettava', () => {
+      monta(
+        {
+          addressBookPending: false,
+          futureCommunications: { dato: false, ritiratoIl: '2026-11-05T10:00:00.000Z' },
+        },
+        { rubricaConfermata: true }
+      );
+
+      expect(container.textContent).toContain('Ritirato il');
+      expect(container.textContent).not.toContain(messages.live.consents.given);
+    });
+
+    it('un ritiro dopo la conferma vale anche sulla scheda chiusa dalla conferma', () => {
+      monta(
+        { addressBookPending: true },
+        { rubricaConfermata: true, comunicazioniRitirateIl: '2026-11-05T10:00:00.000Z' }
+      );
+
+      expect(pulsante(conferma)).toBeUndefined();
+      expect(container.textContent).toContain('Ritirato il');
+      expect(container.textContent).not.toContain(messages.live.consents.given);
+    });
+
+    it('se la spunta non aspetta piu’ toglie i pulsanti e lo dice, senza errore generico', async () => {
+      const richiesta = vi.fn(async () => new Response('{}', { status: 404 }));
+      vi.stubGlobal('fetch', richiesta);
+      const avvisa = vi.fn();
+      monta({ addressBookPending: true }, { onRubricaConfermata: avvisa });
+
+      await clic(conferma);
+
+      expect(pulsante(conferma)).toBeUndefined();
+      expect(pulsante(annulla)).toBeUndefined();
+      expect(container.querySelector('[role="alert"]')?.textContent).toBe(
+        messages.gdpr.export.addressBookPendingGone
+      );
+      expect(container.textContent).not.toContain(messages.live.consents.given);
+      expect(avvisa).not.toHaveBeenCalled();
     });
   });
 

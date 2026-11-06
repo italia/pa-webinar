@@ -135,6 +135,7 @@ export default function MyDataPage() {
   const [tokenConsensi, setTokenConsensi] = useState<string | null>(null);
   const [voce, setVoce] = useState<VoceNelVideo>('rimovibile');
   const [comunicazioniRitirateIl, setComunicazioniRitirateIl] = useState<string | null>(null);
+  const [rubricaConfermata, setRubricaConfermata] = useState(false);
   const format = useFormatter();
 
   // When the user lands here via the signed link emailed to them, the
@@ -148,6 +149,7 @@ export default function MyDataPage() {
       setLoading(true);
       setError('');
       setComunicazioniRitirateIl(null);
+      setRubricaConfermata(false);
       try {
         const res = await fetch(
           `/api/gdpr/export?t=${encodeURIComponent(token)}`,
@@ -525,6 +527,8 @@ export default function MyDataPage() {
                         voce={voce}
                         comunicazioniRitirateIl={comunicazioniRitirateIl}
                         onComunicazioniRitirate={setComunicazioniRitirateIl}
+                        rubricaConfermata={rubricaConfermata}
+                        onRubricaConfermata={() => setRubricaConfermata(true)}
                       />
                     )}
 

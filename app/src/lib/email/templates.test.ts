@@ -42,6 +42,24 @@ describe('confirmation email', () => {
     expect(occurrences).toBe(1);
   });
 
+  it('dice della spunta in attesa sopra il link a «I miei dati», e il testo si scappa', () => {
+    const url = 'https://example.gov.it/it/privacy/i-miei-dati';
+    const con = {
+      ...base(),
+      myDataLink: { url, label: 'I tuoi dati' },
+      addressBookPendingNote: 'Da confermare <subito>',
+    };
+    const html = confirmationHtml(con);
+    expect(html).toContain('Da confermare &lt;subito&gt;');
+    expect(html.indexOf('Da confermare')).toBeLessThan(html.indexOf(`href="${url}"`));
+    const testo = confirmationText(con);
+    expect(testo.indexOf('Da confermare <subito>')).toBeGreaterThan(-1);
+    expect(testo.indexOf('Da confermare')).toBeLessThan(testo.indexOf(url));
+    expect(confirmationHtml({ ...con, addressBookPendingNote: null })).not.toContain(
+      'Da confermare'
+    );
+  });
+
   it('links «I miei dati» when the page is known, in HTML and in text', () => {
     const url = 'https://example.gov.it/it/privacy/i-miei-dati';
     expect(confirmationHtml({ ...base(), myDataLink: { url, label: 'I tuoi dati' } })).toContain(`href="${url}"`);

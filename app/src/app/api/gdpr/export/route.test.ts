@@ -27,10 +27,12 @@ const { prisma } = vi.hoisted(() => ({
 }));
 
 vi.mock('@/lib/db', () => ({ prisma }));
+vi.mock('@/lib/settings', () => ({ getSettings: vi.fn(async () => ({})) }));
 
 import { encryptPII } from '@/lib/crypto/pii';
 import { issueGdprToken, verifyGdprToken } from '@/lib/gdpr/request-token';
 import { verifyRubricaOptOutToken } from '@/lib/persons/opt-out-token';
+import { getSettings } from '@/lib/settings';
 
 import { GET } from './route';
 
@@ -312,6 +314,42 @@ describe('testo letto', () => {
       data: Array<{ registration: Record<string, unknown> }>;
     };
     expect(corpo.data[0]!.registration.addressBookPending).toBe(true);
+  });
+
+  it('propone la conferma solo dove la rubrica si propone ancora', async () => {
+    const base = iscrizione('r3', 'e3').event;
+    prisma.registration.findMany.mockResolvedValue([
+      iscrizione('r1', 'e1', { addressBookPending: true }),
+      iscrizione('r2', 'e2', {
+        addressBookPending: true,
+        event: { ...base, offerAddressBook: false },
+      }),
+    ]);
+    const legge = async () => {
+      const corpo = (await (await conToken()).json()) as {
+        data: Array<{
+          registration: {
+            addressBookPending: boolean;
+            consents: { addressBookPending: boolean };
+          };
+        }>;
+      };
+      return corpo.data.map((d) => [
+        d.registration.addressBookPending,
+        d.registration.consents.addressBookPending,
+      ]);
+    };
+
+    expect(await legge()).toEqual([
+      [true, true],
+      [true, false],
+    ]);
+
+    vi.mocked(getSettings).mockResolvedValueOnce({ addressBookEnabled: false } as never);
+    expect(await legge()).toEqual([
+      [true, false],
+      [true, false],
+    ]);
   });
 
   it('riporta la destinazione e la versione del consenso alla registrazione', async () => {

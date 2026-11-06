@@ -4072,6 +4072,7 @@
     "timeLabel": "Godzina",
     "durationLabel": "Czas trwania",
     "addressBookNote": "Jesteś w książce adresowej wydarzeń, aby otrzymywać zaproszenia na podobne wydarzenia: możesz wycofać zgodę w dowolnym momencie.",
+    "addressBookPendingNote": "The events address book box was ticked on this registration, but this address had stopped receiving invitations. If the request is yours, you can confirm it from the page with your data, using the link below. If it is not, ignore this message: you stay out of the address book and receive no invitations.",
     "addressBookOptOutLink": "Usuń moje dane z książki adresowej",
     "myDataLink": "Twoje dane: wyświetl, popraw, wycofaj zgodę lub anuluj rejestrację"
   },
@@ -4589,7 +4590,8 @@
       "addressBookPendingBody": "Przy tej rejestracji zaznaczono pole książki adresowej, ale ten adres przestał otrzymywać zaproszenia. Dopóki nie potwierdzisz, nic się nie zmieni.",
       "addressBookPendingEffect": "Jeśli potwierdzisz, wrócisz do książki adresowej z imieniem i nazwiskiem oraz organizacją z tej rejestracji i znów będziesz otrzymywać zaproszenia. Jeśli anulujesz lub jeśli to nie Ty, pozostaniesz poza książką adresową i nie będziesz otrzymywać zaproszeń.",
       "addressBookPendingConfirm": "Potwierdź powrót",
-      "addressBookPendingCancel": "Anuluj prośbę"
+      "addressBookPendingCancel": "Anuluj prośbę",
+      "addressBookPendingGone": "This request is no longer waiting. Reload the page to see the current state."
     },
     "erasure": {
       "title": "Usunięcie Twoich danych",

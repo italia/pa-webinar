@@ -29,8 +29,10 @@ import { proveDiSalaDiChiConduce } from '@/lib/gdpr/consent-proofs';
 import { consensiDellIscrizione } from '@/lib/gdpr/consent-state';
 import { issueGdprToken, verifyGdprToken } from '@/lib/gdpr/request-token';
 import { proveConservateDellaPersona } from '@/lib/gdpr/retained-consent-proofs';
+import { rubricaProposta } from '@/lib/persons/address-book';
 import { issueRubricaOptOutToken } from '@/lib/persons/opt-out-token';
 import { scadenzaRubrica } from '@/lib/persons/retention';
+import { getSettings } from '@/lib/settings';
 
 export const dynamic = 'force-dynamic';
 
@@ -57,6 +59,7 @@ export const GET = withErrorHandling(async (request) => {
 
   const { emailHash } = verified;
 
+  const sito = await getSettings();
   const registrations = await prisma.registration.findMany({
     where: { emailHash },
     include: {
@@ -68,6 +71,7 @@ export const GET = withErrorHandling(async (request) => {
           startsAt: true,
           endsAt: true,
           status: true,
+          offerAddressBook: true,
         },
       },
       questions: {
@@ -294,7 +298,12 @@ export const GET = withErrorHandling(async (request) => {
         // La spunta della rubrica che aspetta una conferma (lib/persons/spunta-in-attesa).
         addressBookPending: r.addressBookPending,
         // Lo stato di ciascun consenso, dall'iscrizione e dalla sala insieme.
-        consents: consensiDellIscrizione(r),
+        // Dove la rubrica non si propone piu' la spunta non si conferma: la pagina
+        // non offre il pulsante.
+        consents: consensiDellIscrizione({
+          ...r,
+          addressBookPending: r.addressBookPending && rubricaProposta(r.event, sito),
+        }),
         // La lingua delle email, che la piattaforma conserva e usa.
         locale: r.locale,
         registeredAt: r.createdAt.toISOString(),

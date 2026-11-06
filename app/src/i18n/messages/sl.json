@@ -4072,6 +4072,7 @@
     "timeLabel": "Ura",
     "durationLabel": "Trajanje",
     "addressBookNote": "Ste v imeniku dogodkov, da bi vas lahko povabili na podobne dogodke: privolitev lahko kadar koli prekličete.",
+    "addressBookPendingNote": "The events address book box was ticked on this registration, but this address had stopped receiving invitations. If the request is yours, you can confirm it from the page with your data, using the link below. If it is not, ignore this message: you stay out of the address book and receive no invitations.",
     "addressBookOptOutLink": "Odstrani moje podatke iz imenika",
     "myDataLink": "Vaši podatki: ogled, popravek, preklic privolitve ali preklic prijave"
   },
@@ -4589,7 +4590,8 @@
       "addressBookPendingBody": "Pri tej prijavi je bilo označeno polje za imenik, vendar ta naslov ni več prejemal povabil. Dokler ne potrdite, se nič ne spremeni.",
       "addressBookPendingEffect": "Če potrdite, se vrnete v imenik z imenom in organizacijo iz te prijave in znova prejemate povabila. Če prekličete ali če to niste bili vi, ostanete zunaj imenika in ne prejemate povabil.",
       "addressBookPendingConfirm": "Potrdi vrnitev",
-      "addressBookPendingCancel": "Prekliči zahtevo"
+      "addressBookPendingCancel": "Prekliči zahtevo",
+      "addressBookPendingGone": "This request is no longer waiting. Reload the page to see the current state."
     },
     "erasure": {
       "title": "Izbris vaših podatkov",

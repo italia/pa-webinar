@@ -232,7 +232,8 @@ export async function ritiraConsensi(
  * Il ritiro del consenso alle comunicazioni future, dalla pagina dei propri
  * dati o dal link delle email (api/rubrica/opt-out). La stessa casella
  * dell'iscrizione copre comunicazioni e rubrica: si tolgono entrambe, su ogni
- * iscrizione dell'indirizzo, e il registro lo annota per ogni evento toccato.
+ * iscrizione dell'indirizzo, e il registro lo annota per ogni evento toccato, con
+ * le spunte in attesa di conferma che il ritiro annulla.
  * Il segno del ritiro va su tutte le iscrizioni, anche su quelle senza la spunta:
  * sopravvive alla voce di rubrica, e una spunta successiva lo trova
  * (`indirizzoFermato`). La voce di rubrica perde subito l'email e gli inviti dell'indirizzo si fermano,
@@ -248,9 +249,8 @@ export async function ritiraComunicazioni(
   return prisma.$transaction(async (tx) => {
     const dove = { emailHash, consentFutureCommunications: true };
     const iscrizioni = await tx.registration.findMany({
-      where: dove,
-      select: { eventId: true },
-      distinct: ['eventId'],
+      where: { emailHash, OR: [{ consentFutureCommunications: true }, { addressBookPending: true }] },
+      select: { eventId: true, consentFutureCommunications: true, addressBookPending: true },
     });
     await tx.registration.updateMany({
       where: dove,
@@ -274,11 +274,15 @@ export async function ritiraComunicazioni(
       { adesso, publicRegistrationEnabled }
     );
     await tx.gdprAuditLog.createMany({
-      data: iscrizioni.map(({ eventId }) => ({
-        eventId,
+      data: iscrizioni.map((r) => ({
+        eventId: r.eventId,
         action: 'CONSENT_WITHDRAWN',
         recordCount: 1,
-        details: JSON.stringify({ source: 'self-service', futureCommunications: 1 }),
+        details: JSON.stringify({
+          source: 'self-service',
+          futureCommunications: r.consentFutureCommunications ? 1 : 0,
+          ...(r.addressBookPending ? { addressBookPending: 1 } : {}),
+        }),
       })),
     });
     return iscrizioni.length > 0 || rubrica.count > 0;

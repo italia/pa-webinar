@@ -132,8 +132,9 @@ export const POST = withErrorHandling(async (request, context) => {
   // never stored — only its encryption and its HMAC fingerprint.
   const emailNorm = parsed.data.email.trim().toLowerCase();
   const emailHash = hashEmail(emailNorm);
-  // Cancellare un invito fermato e riscriverlo non toglie lo stop: la riga nuova
-  // nasce ferma se l'indirizzo ha smesso di ricevere inviti.
+  // La riga nuova nasce ferma se l'indirizzo ha smesso di ricevere inviti.
+  // Cancellare un invito fermato e riscriverlo toglie lo stop solo se quella riga
+  // era l'ultima traccia del ritiro (`indirizzoFermato`).
   const fermato = await indirizzoFermato(prisma, emailHash);
 
   try {
