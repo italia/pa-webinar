@@ -690,6 +690,7 @@
           "voce": "Sin este consentimiento participas como todos, pero quedas fuera de la grabación: ni nombre, ni voz, ni imagen.",
           "comeTutti": "Sin este consentimiento participas como todos."
         },
+        "withoutTranscriptHost": "Your voice is not kept in the per-person tracks or in the transcript.",
         "alreadyRecorded": "Lo que ya se ha grabado queda en el vídeo del evento: para que lo quiten, escribe a quien lo organiza.",
         "withdraw": {
           "soloAscolto": "Si lo retiras, sigues en la sala solo escuchando: micrófono, cámara y pantalla se cierran. También retiras el consentimiento a la transcripción de tus intervenciones.",
@@ -697,7 +698,9 @@
           "voce": "Si lo retiras sigues en la sala como antes, y desde ahora estás fuera de la grabación. También retiras el consentimiento a la transcripción de tus intervenciones.",
           "avvertenza": "Si lo retiras sigues en la sala como antes. También retiras el consentimiento a la transcripción de tus intervenciones. Si te dan la palabra y el evento se graba, tu voz sigue estando en el vídeo.",
           "assente": "Si lo retiras sigues en la sala como antes. También retiras el consentimiento a la transcripción de tus intervenciones. Desde ahora tu voz no se graba en una pista aparte."
-        }
+        },
+        "withdrawTranscript": "You also withdraw consent to transcribing your contributions.",
+        "withdrawTranscriptHost": "From now on your voice is not kept in the per-person tracks or in the transcript."
       },
       "transcription": {
         "title": "Transcripción de tus intervenciones",

@@ -690,6 +690,7 @@
           "voce": "Mingħajr dan il-kunsens tipparteċipa bħal kulħadd, iżda tibqa' barra mir-reġistrazzjoni: la l-isem, la l-leħen u lanqas l-immaġni.",
           "comeTutti": "Mingħajr dan il-kunsens tipparteċipa bħal kulħadd."
         },
+        "withoutTranscriptHost": "Your voice is not kept in the per-person tracks or in the transcript.",
         "alreadyRecorded": "Dak li diġà ġie rreġistrat jibqa' fil-vidjo tal-avveniment: biex jitneħħa, ikteb lill-organizzaturi.",
         "withdraw": {
           "soloAscolto": "Jekk tirtirah tibqa' fis-sala tisma' biss: il-mikrofonu, il-kamera u l-iskrin jingħalqu. Tirtira wkoll il-kunsens għat-traskrizzjoni ta' dak li tgħid.",
@@ -697,7 +698,9 @@
           "voce": "Jekk tneħħih, tibqa' fis-sala bħal qabel, u minn issa int barra mir-reġistrazzjoni. Tneħħi wkoll il-kunsens għat-traskrizzjoni tal-interventi tiegħek.",
           "avvertenza": "Jekk tirtirah, tibqa' fis-sala bħal qabel. Tirtira wkoll il-kunsens għat-traskrizzjoni tal-interventi tiegħek. Jekk tingħata l-kelma u l-avveniment jiġi rrekordjat, leħnek jibqa' fil-vidjo xorta waħda.",
           "assente": "Jekk tirtirah, tibqa' fis-sala bħal qabel. Tirtira wkoll il-kunsens għat-traskrizzjoni tal-interventi tiegħek. Minn issa 'l quddiem leħnek ma jiġix irrekordjat f'korsa separata."
-        }
+        },
+        "withdrawTranscript": "You also withdraw consent to transcribing your contributions.",
+        "withdrawTranscriptHost": "From now on your voice is not kept in the per-person tracks or in the transcript."
       },
       "transcription": {
         "title": "Traskrizzjoni ta' dak li tgħid",

@@ -686,18 +686,21 @@
         "give": "Acconsento alla registrazione",
         "without": {
           "soloAscolto": "Senza questo consenso segui in solo ascolto: microfono, videocamera e schermo restano chiusi.",
-          "conduce": "Senza questo consenso conduci lo stesso, ma la tua voce non resta nelle tracce per persona né nella trascrizione.",
+          "conduce": "Senza questo consenso conduci lo stesso.",
           "voce": "Senza questo consenso partecipi come tutti, ma resti fuori dalla registrazione: né il nome, né la voce, né l'immagine.",
           "comeTutti": "Senza questo consenso partecipi come tutti."
         },
+        "withoutTranscriptHost": "La tua voce non resta nelle tracce per persona né nella trascrizione.",
         "alreadyRecorded": "Ciò che è già stato registrato resta nel video dell'evento: per farlo togliere scrivi a chi organizza.",
         "withdraw": {
-          "soloAscolto": "Se lo ritiri resti in sala in solo ascolto: microfono, videocamera e schermo si chiudono. Ritiri anche il consenso alla trascrizione dei tuoi interventi.",
-          "conduce": "Se lo ritiri continui a condurre, ma da ora la tua voce non resta nelle tracce per persona né nella trascrizione. Il video della sala, se registrato, ti riprende comunque.",
-          "voce": "Se lo ritiri resti in sala come prima, e da ora sei fuori dalla registrazione. Ritiri anche il consenso alla trascrizione dei tuoi interventi.",
-          "avvertenza": "Se lo ritiri resti in sala come prima. Ritiri anche il consenso alla trascrizione dei tuoi interventi. Se ricevi la parola e l'evento è registrato, la tua voce resta comunque nel video.",
-          "assente": "Se lo ritiri resti in sala come prima. Ritiri anche il consenso alla trascrizione dei tuoi interventi. Da ora la tua voce non viene registrata in una traccia a parte."
-        }
+          "soloAscolto": "Se lo ritiri resti in sala in solo ascolto: microfono, videocamera e schermo si chiudono.",
+          "conduce": "Se lo ritiri continui a condurre. Il video della sala, se registrato, ti riprende comunque.",
+          "voce": "Se lo ritiri resti in sala come prima, e da ora sei fuori dalla registrazione.",
+          "avvertenza": "Se lo ritiri resti in sala come prima. Se ricevi la parola e l'evento è registrato, la tua voce resta comunque nel video.",
+          "assente": "Se lo ritiri resti in sala come prima. Da ora la tua voce non viene registrata in una traccia a parte."
+        },
+        "withdrawTranscript": "Ritiri anche il consenso alla trascrizione dei tuoi interventi.",
+        "withdrawTranscriptHost": "Da ora la tua voce non resta nelle tracce per persona né nella trascrizione."
       },
       "transcription": {
         "title": "Trascrizione dei tuoi interventi",

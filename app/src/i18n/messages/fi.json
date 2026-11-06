@@ -690,6 +690,7 @@
           "voce": "Ilman tätä suostumusta osallistut kuten kaikki, mutta jäät tallenteen ulkopuolelle: ei nimeä, ääntä eikä kuvaa.",
           "comeTutti": "Ilman tätä suostumusta osallistut kuten kaikki."
         },
+        "withoutTranscriptHost": "Your voice is not kept in the per-person tracks or in the transcript.",
         "alreadyRecorded": "Jo tallennettu jää tapahtuman videoon: pyydä poistoa järjestäjiltä.",
         "withdraw": {
           "soloAscolto": "Jos peruutat sen, jäät huoneeseen vain kuuntelijaksi: mikrofoni, kamera ja näyttö suljetaan. Myös suostumuksesi puheenvuorojesi litterointiin peruutetaan.",
@@ -697,7 +698,9 @@
           "voce": "Jos peruutat sen, pysyt huoneessa kuten ennen ja olet nyt tallenteen ulkopuolella. Peruutat samalla suostumuksen puheenvuorojesi litterointiin.",
           "avvertenza": "Jos peruutat sen, pysyt huoneessa kuten ennen. Peruutat samalla suostumuksen puheenvuorojesi litterointiin. Jos saat puheenvuoron ja tapahtuma tallennetaan, äänesi on silti mukana videossa.",
           "assente": "Jos peruutat sen, pysyt huoneessa kuten ennen. Peruutat samalla suostumuksen puheenvuorojesi litterointiin. Tästä lähtien ääntäsi ei tallenneta omalle raidalleen."
-        }
+        },
+        "withdrawTranscript": "You also withdraw consent to transcribing your contributions.",
+        "withdrawTranscriptHost": "From now on your voice is not kept in the per-person tracks or in the transcript."
       },
       "transcription": {
         "title": "Puheenvuorojesi litterointi",

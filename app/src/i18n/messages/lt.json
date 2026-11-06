@@ -690,6 +690,7 @@
           "voce": "Be šio sutikimo dalyvaujate kaip visi, bet į įrašą nepatenkate: nei vardas, nei balsas, nei vaizdas.",
           "comeTutti": "Be šio sutikimo dalyvaujate kaip visi."
         },
+        "withoutTranscriptHost": "Your voice is not kept in the per-person tracks or in the transcript.",
         "alreadyRecorded": "Tai, kas jau įrašyta, lieka renginio vaizdo įraše: norėdami tai pašalinti, parašykite organizatoriams.",
         "withdraw": {
           "soloAscolto": "Jei jį atšauksite, liksite salėje tik klausydamiesi: mikrofonas, kamera ir ekranas užsidarys. Atšauksite ir sutikimą transkribuoti jūsų pasisakymus.",
@@ -697,7 +698,9 @@
           "voce": "Jei atšauksite, liksite kambaryje kaip anksčiau, o nuo dabar į įrašą nepatenkate. Atšaukiate ir sutikimą dėl savo pasisakymų transkripcijos.",
           "avvertenza": "Jei atšauksite, liksite kambaryje kaip anksčiau. Atšaukiate ir sutikimą dėl savo pasisakymų transkripcijos. Jei jums bus suteiktas žodis ir renginys įrašomas, jūsų balsas vis tiek liks vaizdo įraše.",
           "assente": "Jei atšauksite, liksite kambaryje kaip anksčiau. Atšaukiate ir sutikimą dėl savo pasisakymų transkripcijos. Nuo dabar jūsų balsas nebus įrašomas atskirame takelyje."
-        }
+        },
+        "withdrawTranscript": "You also withdraw consent to transcribing your contributions.",
+        "withdrawTranscriptHost": "From now on your voice is not kept in the per-person tracks or in the transcript."
       },
       "transcription": {
         "title": "Jūsų pasisakymų transkripcija",

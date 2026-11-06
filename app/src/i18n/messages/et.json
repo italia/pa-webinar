@@ -690,6 +690,7 @@
           "voce": "Ilma selle nõusolekuta osaled nagu kõik, kuid jääd salvestusest välja: ei nime, häält ega pilti.",
           "comeTutti": "Ilma selle nõusolekuta osaled nagu kõik."
         },
+        "withoutTranscriptHost": "Your voice is not kept in the per-person tracks or in the transcript.",
         "alreadyRecorded": "Juba salvestatu jääb ürituse videosse: eemaldamiseks kirjuta korraldajatele.",
         "withdraw": {
           "soloAscolto": "Kui võtad selle tagasi, jääd ruumi ainult kuulajana: mikrofon, kaamera ja ekraan suletakse. Võtad tagasi ka nõusoleku oma sõnavõttude transkribeerimiseks.",
@@ -697,7 +698,9 @@
           "voce": "Kui selle tagasi võtad, jääd ruumi nagu enne ja oled nüüdsest salvestusest väljas. Võtad tagasi ka nõusoleku oma sõnavõttude transkribeerimiseks.",
           "avvertenza": "Kui selle tagasi võtad, jääd ruumi nagu enne. Võtad tagasi ka nõusoleku oma sõnavõttude transkribeerimiseks. Kui sulle antakse sõna ja üritus salvestatakse, jääb sinu hääl siiski videosse.",
           "assente": "Kui selle tagasi võtad, jääd ruumi nagu enne. Võtad tagasi ka nõusoleku oma sõnavõttude transkribeerimiseks. Nüüdsest ei salvestata sinu häält eraldi rajale."
-        }
+        },
+        "withdrawTranscript": "You also withdraw consent to transcribing your contributions.",
+        "withdrawTranscriptHost": "From now on your voice is not kept in the per-person tracks or in the transcript."
       },
       "transcription": {
         "title": "Sinu sõnavõttude transkribeerimine",

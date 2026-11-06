@@ -686,18 +686,21 @@
         "give": "I consent to the recording",
         "without": {
           "soloAscolto": "Without this consent you follow in listen-only mode: microphone, camera and screen stay closed.",
-          "conduce": "Without this consent you still host, but your voice is not kept in the per-person tracks or in the transcript.",
+          "conduce": "Without this consent you still host.",
           "voce": "Without this consent you take part like everyone else, but stay out of the recording: no name, no voice, no image.",
           "comeTutti": "Without this consent you take part like everyone else."
         },
+        "withoutTranscriptHost": "Your voice is not kept in the per-person tracks or in the transcript.",
         "alreadyRecorded": "What has already been recorded stays in the event video: to have it removed, write to the organisers.",
         "withdraw": {
-          "soloAscolto": "If you withdraw it you stay in the room in listen-only mode: microphone, camera and screen close. Your consent to the transcription of what you say is withdrawn too.",
-          "conduce": "If you withdraw it you keep hosting, but from now on your voice is not kept in the per-person tracks or in the transcript. The room video, if recorded, still shows you.",
-          "voce": "If you withdraw it you stay in the room as before, and from now on you are out of the recording. You also withdraw consent to transcribing your contributions.",
-          "avvertenza": "If you withdraw it you stay in the room as before. You also withdraw consent to transcribing your contributions. If you are given the floor and the event is recorded, your voice is still in the video.",
-          "assente": "If you withdraw it you stay in the room as before. You also withdraw consent to transcribing your contributions. From now on your voice is not recorded on a separate track."
-        }
+          "soloAscolto": "If you withdraw it you stay in the room in listen-only mode: microphone, camera and screen close.",
+          "conduce": "If you withdraw it you keep hosting. The room video, if recorded, still shows you.",
+          "voce": "If you withdraw it you stay in the room as before, and from now on you are out of the recording.",
+          "avvertenza": "If you withdraw it you stay in the room as before. If you are given the floor and the event is recorded, your voice is still in the video.",
+          "assente": "If you withdraw it you stay in the room as before. From now on your voice is not recorded on a separate track."
+        },
+        "withdrawTranscript": "You also withdraw consent to transcribing your contributions.",
+        "withdrawTranscriptHost": "From now on your voice is not kept in the per-person tracks or in the transcript."
       },
       "transcription": {
         "title": "Transcription of what you say",

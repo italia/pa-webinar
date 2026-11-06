@@ -690,6 +690,7 @@
           "voce": "Bez ovog pristanka sudjelujete kao i svi, ali ostajete izvan snimke: bez imena, glasa i slike.",
           "comeTutti": "Bez ove privole sudjelujete kao i svi."
         },
+        "withoutTranscriptHost": "Your voice is not kept in the per-person tracks or in the transcript.",
         "alreadyRecorded": "Ono što je već snimljeno ostaje u videozapisu događaja: za uklanjanje pišite organizatorima.",
         "withdraw": {
           "soloAscolto": "Ako je povučete, ostajete u dvorani i samo slušate: mikrofon, kamera i zaslon se zatvaraju. Povlačite i privolu za transkripciju svojih izlaganja.",
@@ -697,7 +698,9 @@
           "voce": "Ako ga povučete, ostajete u sobi kao prije, a od sada ste izvan snimke. Povlačite i pristanak na transkripciju svojih izlaganja.",
           "avvertenza": "Ako je povučete, ostajete u dvorani kao prije. Povlačite i privolu za transkripciju svojih izlaganja. Ako dobijete riječ i događaj se snima, vaš glas ipak ostaje u videozapisu.",
           "assente": "Ako je povučete, ostajete u dvorani kao prije. Povlačite i privolu za transkripciju svojih izlaganja. Od sada se vaš glas ne snima na zasebnu stazu."
-        }
+        },
+        "withdrawTranscript": "You also withdraw consent to transcribing your contributions.",
+        "withdrawTranscriptHost": "From now on your voice is not kept in the per-person tracks or in the transcript."
       },
       "transcription": {
         "title": "Transkripcija vaših izlaganja",

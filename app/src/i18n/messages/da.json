@@ -690,6 +690,7 @@
           "voce": "Uden dette samtykke deltager du som alle andre, men du er ikke med i optagelsen: hverken navn, stemme eller billede.",
           "comeTutti": "Uden dette samtykke deltager du som alle andre."
         },
+        "withoutTranscriptHost": "Your voice is not kept in the per-person tracks or in the transcript.",
         "alreadyRecorded": "Det, der allerede er optaget, forbliver i videoen af arrangementet: skriv til arrangørerne for at få det fjernet.",
         "withdraw": {
           "soloAscolto": "Hvis du trækker det tilbage, bliver du i rummet og lytter kun med: mikrofon, kamera og skærm lukkes. Dit samtykke til transskription af dine indlæg trækkes også tilbage.",
@@ -697,7 +698,9 @@
           "voce": "Hvis du trækker det tilbage, bliver du i rummet som før og er fra nu af ikke med i optagelsen. Du trækker også samtykket til transskription af dine indlæg tilbage.",
           "avvertenza": "Hvis du trækker det tilbage, bliver du i rummet som før. Du trækker også samtykket til transskription af dine indlæg tilbage. Hvis du får ordet, og arrangementet optages, er din stemme dog stadig med i videoen.",
           "assente": "Hvis du trækker det tilbage, bliver du i rummet som før. Du trækker også samtykket til transskription af dine indlæg tilbage. Fra nu af optages din stemme ikke på et separat spor."
-        }
+        },
+        "withdrawTranscript": "You also withdraw consent to transcribing your contributions.",
+        "withdrawTranscriptHost": "From now on your voice is not kept in the per-person tracks or in the transcript."
       },
       "transcription": {
         "title": "Transskription af dine indlæg",
