@@ -173,9 +173,13 @@ interface EventDetailClientProps {
   /** Le slide presentate in sala da mostrare accanto al video pubblicato
    *  (lib/presentation/recording-slides-data); null se non ce ne sono. */
   recordingSlides?: RecordingSlidesView | null;
-  /** Lo staff guarda la pagina come sara' pubblicata (`?anteprima=1`), con la
-   *  registrazione non ancora pubblica (lib/recording/audience). */
+  /** Lo staff guarda in anteprima (`?anteprima=1`) cio' che il pubblico non vede
+   *  ancora (lib/recording/audience). */
   previewForStaff?: boolean;
+  /** Il video e' gia' pubblicato: cio' che il pubblico non vede e' la pagina. */
+  previewPageHidden?: boolean;
+  /** La pagina nascosta si apre agli iscritti (`apertaAgliIscritti`). */
+  previewPageForRegistrants?: boolean;
   /** La registrazione e' pubblicata per i soli iscritti e questa richiesta non
    *  prova un'iscrizione: la pagina lo dice invece di tacere. */
   recordingForRegistrants?: boolean;
@@ -198,6 +202,8 @@ export default function EventDetailClient({
   tags = [],
   invalidToken = false,
   previewForStaff = false,
+  previewPageHidden = false,
+  previewPageForRegistrants = false,
   recordingForRegistrants = false,
   replayMoments = null,
   programmeVideoTimes = null,
@@ -551,7 +557,15 @@ export default function EventDetailClient({
       {previewForStaff && (
         <div className="alert alert-warning mb-4" role="status">
           <strong>{t('detail.previewTitle')}</strong>
-          <div className="mt-1">{t('detail.previewBody')}</div>
+          <div className="mt-1">
+            {t(
+              !previewPageHidden
+                ? 'detail.previewBody'
+                : previewPageForRegistrants
+                  ? 'detail.previewBodyPageRegistrants'
+                  : 'detail.previewBodyPageHidden',
+            )}
+          </div>
         </div>
       )}
 

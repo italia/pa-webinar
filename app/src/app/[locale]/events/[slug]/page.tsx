@@ -27,7 +27,11 @@ import EventDetailClient from '@/components/events/event-detail-client';
 import { linguaPrincipale, lingueTradotteInAutomatico } from '@/lib/text-translation/stato-lingue';
 import { appBaseUrl, getPublicEnv } from '@/lib/env';
 import { isEventManager } from '@/lib/auth/staff-session';
-import { accessoRegistrazione, visioneRegistrazione } from '@/lib/recording/audience';
+import {
+  accessoRegistrazione,
+  apertaAgliIscritti,
+  visioneRegistrazione,
+} from '@/lib/recording/audience';
 import {
   programmeVideoTimes,
   replayMoments,
@@ -608,6 +612,8 @@ export default async function EventDetailPage({
         replayMoments={momenti}
         programmeVideoTimes={orariNelVideo}
         previewForStaff={visione.anteprimaStaff}
+        previewPageHidden={!paginaVisibile && event.recordingPublished}
+        previewPageForRegistrants={apertaAgliIscritti(event)}
         recordingForRegistrants={visione.soloIscritti}
         hasRoomAccess={hasRoomAccess}
         registrationAccess={registrationAccess}

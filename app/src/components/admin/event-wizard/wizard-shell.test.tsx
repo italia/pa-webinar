@@ -3304,6 +3304,24 @@ describe('i valori del formato', () => {
         });
       });
 
+      it('«Ricomincia» rimette l elenco dei partecipanti a seguire il modulo', async () => {
+        localStorage.setItem(
+          'pa-wizard-draft:trasloco',
+          JSON.stringify({ at: Date.now(), dati: { participantListVisible: false } }),
+        );
+        renderWizard({
+          template: { ...modello, participantsCanUnmute: true, maxParticipants: 100 },
+        });
+        click(button(w.flow.startOver));
+        compila();
+        goToStep(w.flow.steps.advanced);
+        apriSezione('technical');
+        type(byId<HTMLInputElement>('ev-max'), '500');
+        goToStep('review');
+        await press(button(w.publish));
+        expect(corpo('POST')).toMatchObject({ maxParticipants: 500, participantListVisible: false });
+      });
+
       it('«Ricomincia» non toglie una risposta data nelle domande', () => {
         localStorage.setItem(
           'pa-wizard-draft:trasloco',

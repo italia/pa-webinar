@@ -51,56 +51,56 @@ const BODIES: Record<string, (link: string) => { html: string; text: string }> =
   it: (link) => ({
     html:
       `<p>Hai richiesto una copia dei tuoi dati personali. ` +
-      `Clicca il link qui sotto entro un'ora per scaricarli:</p>` +
+      `Clicca il link qui sotto entro un'ora per vederli:</p>` +
       `<p><a href="${escapeHtml(link)}">${escapeHtml(link)}</a></p>` +
       `<p>Se non hai effettuato tu la richiesta, puoi ignorare questa email.</p>`,
     text:
       `Hai richiesto una copia dei tuoi dati personali. ` +
-      `Apri questo link entro un'ora per scaricarli:\n\n${link}\n\n` +
+      `Apri questo link entro un'ora per vederli:\n\n${link}\n\n` +
       `Se non hai effettuato tu la richiesta, puoi ignorare questa email.`,
   }),
   en: (link) => ({
     html:
       `<p>You requested a copy of your personal data. ` +
-      `Click the link below within one hour to download it:</p>` +
+      `Click the link below within one hour to view it:</p>` +
       `<p><a href="${escapeHtml(link)}">${escapeHtml(link)}</a></p>` +
       `<p>If you did not make this request, you can ignore this email.</p>`,
     text:
       `You requested a copy of your personal data. ` +
-      `Open this link within one hour to download it:\n\n${link}\n\n` +
+      `Open this link within one hour to view it:\n\n${link}\n\n` +
       `If you did not make this request, you can ignore this email.`,
   }),
   fr: (link) => ({
     html:
       `<p>Vous avez demandé une copie de vos données personnelles. ` +
-      `Cliquez sur le lien ci-dessous dans un délai d’une heure pour les télécharger :</p>` +
+      `Cliquez sur le lien ci-dessous dans un délai d’une heure pour les consulter :</p>` +
       `<p><a href="${escapeHtml(link)}">${escapeHtml(link)}</a></p>` +
       `<p>Si vous n’êtes pas à l’origine de cette demande, vous pouvez ignorer cet e-mail.</p>`,
     text:
       `Vous avez demandé une copie de vos données personnelles. ` +
-      `Ouvrez ce lien dans un délai d’une heure pour les télécharger :\n\n${link}\n\n` +
+      `Ouvrez ce lien dans un délai d’une heure pour les consulter :\n\n${link}\n\n` +
       `Si vous n’êtes pas à l’origine de cette demande, vous pouvez ignorer cet e-mail.`,
   }),
   de: (link) => ({
     html:
       `<p>Sie haben eine Kopie Ihrer personenbezogenen Daten angefordert. ` +
-      `Klicken Sie innerhalb einer Stunde auf den folgenden Link, um sie herunterzuladen:</p>` +
+      `Klicken Sie innerhalb einer Stunde auf den folgenden Link, um sie anzusehen:</p>` +
       `<p><a href="${escapeHtml(link)}">${escapeHtml(link)}</a></p>` +
       `<p>Falls Sie diese Anfrage nicht gestellt haben, können Sie diese E-Mail ignorieren.</p>`,
     text:
       `Sie haben eine Kopie Ihrer personenbezogenen Daten angefordert. ` +
-      `Öffnen Sie diesen Link innerhalb einer Stunde, um sie herunterzuladen:\n\n${link}\n\n` +
+      `Öffnen Sie diesen Link innerhalb einer Stunde, um sie anzusehen:\n\n${link}\n\n` +
       `Falls Sie diese Anfrage nicht gestellt haben, können Sie diese E-Mail ignorieren.`,
   }),
   es: (link) => ({
     html:
       `<p>Ha solicitado una copia de sus datos personales. ` +
-      `Haga clic en el enlace que figura a continuación en el plazo de una hora para descargarlos:</p>` +
+      `Haga clic en el enlace que figura a continuación en el plazo de una hora para verlos:</p>` +
       `<p><a href="${escapeHtml(link)}">${escapeHtml(link)}</a></p>` +
       `<p>Si no ha realizado usted esta solicitud, puede ignorar este correo electrónico.</p>`,
     text:
       `Ha solicitado una copia de sus datos personales. ` +
-      `Abra este enlace en el plazo de una hora para descargarlos:\n\n${link}\n\n` +
+      `Abra este enlace en el plazo de una hora para verlos:\n\n${link}\n\n` +
       `Si no ha realizado usted esta solicitud, puede ignorar este correo electrónico.`,
   }),
 };

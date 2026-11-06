@@ -866,6 +866,26 @@ describe('scheda dell’evento — registrazione riservata con la pagina privata
     expect(eventoDi(props).recordingUrl).toBe(VIDEO);
   });
 
+  it('in anteprima dice se ciò che manca al pubblico è la pagina o la pubblicazione', async () => {
+    mockedManager.mockResolvedValue(true);
+    // Evento, pagina nascosta col video pubblicato, pagina che gli iscritti aprono.
+    const casi: [Record<string, unknown>, boolean, boolean][] = [
+      [{}, true, true],
+      [{ recordingAudience: 'PUBLIC', recordingDestination: 'PUBLIC' }, true, false],
+      [{ recordingPublished: false, transcriptPublished: true }, false, true],
+      [{ postEventPublic: true, postEventPublicUntil: new Date(Date.now() - HOUR) }, true, false],
+      [{ recordingPublished: false }, false, false],
+      [{ recordingPublished: false, postEventPublic: true }, false, false],
+    ];
+    for (const [evento, nascosta, agliIscritti] of casi) {
+      mockedEvent.mockResolvedValue(riservata(evento));
+      const props = await clientProps({ anteprima: '1' });
+      expect(props.previewForStaff, JSON.stringify(evento)).toBe(true);
+      expect(props.previewPageHidden, JSON.stringify(evento)).toBe(nascosta);
+      expect(props.previewPageForRegistrants, JSON.stringify(evento)).toBe(agliIscritti);
+    }
+  });
+
   it('iscritto e staff insieme: il link personale apre la pagina in anteprima', async () => {
     mockedEvent.mockResolvedValue(riservata());
     mockedManager.mockResolvedValue(true);
