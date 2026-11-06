@@ -4478,7 +4478,7 @@
         "summary": "After the event, an AI tool may write a summary of the recording.",
         "translation": "The transcript and summary may be translated automatically.",
         "dubbing": "The video may be dubbed with a synthetic voice.",
-        "report": "After the event, the staff may have an AI tool write a report, using also the chat without names, questions and polls."
+        "report": "After the event, the staff may have an AI tool write a report, using also the polls and, where they are published, the questions. The text of the chat is not used."
       },
       "list": {
         "label": "Participant list",

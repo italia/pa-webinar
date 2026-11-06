@@ -233,7 +233,7 @@ def _format_offset(sec: float) -> str:
 # lunga non deve portare la richiesta oltre la finestra di contesto del modello.
 MAX_TIMELINE_CHARS = 12_000
 # Le voci che si sacrificano per prime quando la cronologia non ci sta.
-_MINOR_TIMELINE_KINDS = {"chat.activity", "reactions.activity", "chat.question"}
+_MINOR_TIMELINE_KINDS = {"chat.activity", "reactions.activity"}
 
 
 def _format_timeline(timeline: Optional[dict]) -> str:

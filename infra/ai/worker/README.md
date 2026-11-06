@@ -105,9 +105,11 @@ the schema together.
   `eventId` and the `targetLanguages` of the event report.
 - **`reportInput`.** `REPORT` only: everything the event report is written
   from, gathered by the portal at claim time (event, people, agenda,
-  transcript lines, chat without names, questions, polls, words, feedback
-  and the platform's figures). A `REPORT` job has no media, inputs or upload
-  targets: the worker sends the report to `POST /api/internal/event-report`
+  transcript lines, polls, words, feedback and the platform's figures, plus
+  the questions when the event page publishes them). The text of the chat is
+  never sent, only the message count. A `REPORT` job has no media, inputs or
+  upload targets: the worker sends the report to
+  `POST /api/internal/event-report`
   ([The event report](../../../docs/POSTPROD.md#the-event-report)).
 - **`textInput`.** `TRANSLATE_TEXT` only: `sourceLanguage`,
   `targetLanguages`, `title`, `description` (Markdown) and `sourceHash`. The
