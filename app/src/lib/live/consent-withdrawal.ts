@@ -4,6 +4,8 @@
 import { prisma } from '@/lib/db';
 import { iscrizioneDelPosto } from '@/lib/captions/room';
 import { bloccaTrascrizioneEvento, togliPersoneDalleTrascrizioni } from '@/lib/captions/transcript';
+import { fermaInviti } from '@/lib/persons/inviti-fermati';
+import { getSettings } from '@/lib/settings';
 
 /**
  * Il ritiro dalla sala dei consensi dati per un evento (art. 7.3 GDPR: si
@@ -205,11 +207,15 @@ export async function ritiraConsensi(
  * dati o dal link delle email (api/rubrica/opt-out). La stessa casella
  * dell'iscrizione copre comunicazioni e rubrica: si tolgono entrambe, su ogni
  * iscrizione dell'indirizzo, e il registro lo annota per ogni evento toccato.
+ * La voce di rubrica perde subito l'email e gli inviti dell'indirizzo si fermano,
+ * anche quelli scritti a mano (`fermaInviti`): il resto della riga lo toglie la
+ * corsa successiva di api/cron/rubrica-retention.
  */
 export async function ritiraComunicazioni(
   emailHash: string,
   adesso: Date = new Date()
 ): Promise<boolean> {
+  const { publicRegistrationEnabled } = await getSettings();
   return prisma.$transaction(async (tx) => {
     const dove = { emailHash, consentFutureCommunications: true };
     const iscrizioni = await tx.registration.findMany({
@@ -223,8 +229,13 @@ export async function ritiraComunicazioni(
     });
     const rubrica = await tx.person.updateMany({
       where: { emailHash, optedInToAddressBook: true },
-      data: { optedInToAddressBook: false, optedOutAt: adesso },
+      data: { optedInToAddressBook: false, optedOutAt: adesso, email: null },
     });
+    await fermaInviti(
+      tx,
+      { OR: [{ emailHash }, { person: { emailHash } }] },
+      { adesso, publicRegistrationEnabled }
+    );
     await tx.gdprAuditLog.createMany({
       data: iscrizioni.map(({ eventId }) => ({
         eventId,

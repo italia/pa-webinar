@@ -68,6 +68,7 @@ export const PATCH = withErrorHandling(async (request, context) => {
     // vecchio non deve aprire il modulo con i dati della persona nuova.
     data.token = null;
     data.sentAt = null;
+    data.declinedAt = null;
   }
   if ('name' in data) {
     data.name = encryptPIIOrNull(data.name as string | null);

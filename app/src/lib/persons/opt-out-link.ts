@@ -7,7 +7,9 @@ import { localizedUrl } from '@/lib/utils/localized-url';
 /**
  * Il link firmato per uscire dalla rubrica, da mettere nelle email a chi ci
  * e' entrato (ADR-011). Ritirare il consenso deve essere facile quanto darlo
- * (GDPR art. 7.3): il modulo di iscrizione promette questo link in ogni email.
+ * (GDPR art. 7.3): il modulo di iscrizione promette questo link nelle email che
+ * la persona ricevera'. Lo portano conferma, promemoria, comunicazioni dopo
+ * l'evento, avviso della registrazione e inviti.
  *
  * `null` quando non va mostrato: l'iscrizione non e' legata a una persona in
  * rubrica, la persona ne e' gia' uscita, oppure il token non si puo' firmare
@@ -15,7 +17,8 @@ import { localizedUrl } from '@/lib/utils/localized-url';
  * nessun link che un link che non funziona.
  *
  * Il token e' una capacita' ristretta (solo l'uscita dalla rubrica di quella
- * persona, 90 giorni): non va nei log.
+ * persona, 90 giorni) e si emette a ogni chiamata: ogni email ha i suoi 90
+ * giorni, anche se la voce dura di piu'. Non va nei log.
  */
 export function rubricaOptOutUrl(
   person: { id: string; optedInToAddressBook: boolean } | null | undefined,

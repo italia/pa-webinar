@@ -3762,6 +3762,7 @@
       "sendNotPublished": "Pozvánky se odesílají, dokud akce přijímá registrace: po zveřejnění a před jejím koncem.",
       "invitedOn": "Pozván {date}",
       "notInvited": "Pozvánka neodeslána",
+      "stopped": "Receives no invitations",
       "send": "Poslat pozvánku",
       "resend": "Poslat znovu",
       "actions": "Akce",

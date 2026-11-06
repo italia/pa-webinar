@@ -3762,6 +3762,7 @@
       "sendNotPublished": "L-istediniet jintbagħtu sakemm l-avveniment jaċċetta reġistrazzjonijiet: wara l-pubblikazzjoni u qabel it-tmiem.",
       "invitedOn": "Mistieden fil-{date}",
       "notInvited": "Stedina mhux mibgħuta",
+      "stopped": "Receives no invitations",
       "send": "Ibgħat stedina",
       "resend": "Erġa' ibgħat",
       "actions": "Azzjonijiet",

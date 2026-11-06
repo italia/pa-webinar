@@ -3762,6 +3762,7 @@
       "sendNotPublished": "Les invitations partent tant que l'événement accepte des inscriptions : après la publication et avant la fin.",
       "invitedOn": "Invité le {date}",
       "notInvited": "Invitation non envoyée",
+      "stopped": "Receives no invitations",
       "send": "Envoyer l'invitation",
       "resend": "Renvoyer",
       "actions": "Actions",

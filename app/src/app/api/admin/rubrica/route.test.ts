@@ -8,7 +8,6 @@ const m = vi.hoisted(() => ({
   admin: vi.fn(),
   findMany: vi.fn(),
   count: vi.fn(),
-  queryRaw: vi.fn(),
 }));
 vi.mock('next/headers', () => ({
   cookies: vi.fn(async () => ({ get: () => undefined })),
@@ -18,14 +17,15 @@ vi.mock('@/lib/crypto/pii', () => ({
   tryDecryptPII: (v: string | null) => (v ? `chiaro:${v}` : null),
 }));
 vi.mock('@/lib/db', () => ({
-  prisma: { person: { findMany: m.findMany, count: m.count }, $queryRaw: m.queryRaw },
+  prisma: { person: { findMany: m.findMany, count: m.count } },
 }));
 
 import { GET } from './route';
 
-const riga = (id: string) => ({
+const riga = (id: string, email: string | null = null) => ({
   id,
   displayName: 'nome',
+  email,
   organization: 'Ente',
   organizationRole: null,
   organizationType: null,
@@ -41,9 +41,8 @@ const riga = (id: string) => ({
 beforeEach(() => {
   vi.clearAllMocks();
   m.admin.mockResolvedValue(true);
-  m.findMany.mockResolvedValue([riga('p1'), riga('p2')]);
+  m.findMany.mockResolvedValue([riga('p1', 'cifrata'), riga('p2', 'altra')]);
   m.count.mockResolvedValue(2);
-  m.queryRaw.mockResolvedValue([{ person_id: 'p1', email: 'cifrata' }]);
 });
 
 describe('GET /api/admin/rubrica', () => {
@@ -62,7 +61,7 @@ describe('GET /api/admin/rubrica', () => {
       {} as never
     );
     const body = await res.json();
-    expect(m.queryRaw).not.toHaveBeenCalled();
+    expect(m.findMany.mock.calls[0]?.[0]?.select.email).toBe(false);
     expect(body.rows[0]).not.toHaveProperty('email');
     expect(m.findMany.mock.calls[0]?.[0]?.where).toEqual({
       optedInToAddressBook: true,
@@ -70,19 +69,22 @@ describe('GET /api/admin/rubrica', () => {
     });
   });
 
-  it("con withEmail: solo chi ha un'iscrizione, con l'email dell'ultima", async () => {
+  it("con withEmail: solo le voci con un'email, letta dalla voce e decifrata", async () => {
     const res = await GET(
       new Request('http://x/api/admin/rubrica?q=ente&withEmail=1') as never,
       {} as never
     );
     const body = await res.json();
-    expect(m.findMany.mock.calls[0]?.[0]?.where).toMatchObject({
+    const query = m.findMany.mock.calls[0]?.[0];
+    expect(query?.where).toEqual({
       optedInToAddressBook: true,
-      registrations: { some: {} },
+      organization: { contains: 'ente', mode: 'insensitive' },
+      email: { not: null },
     });
+    expect(query?.select.email).toBe(true);
     expect(body.rows.map((r: { email: string | null }) => r.email)).toEqual([
       'chiaro:cifrata',
-      null,
+      'chiaro:altra',
     ]);
   });
 });

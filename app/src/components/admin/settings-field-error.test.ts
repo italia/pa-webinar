@@ -34,6 +34,14 @@ describe('settingsFieldError', () => {
     });
   });
 
+  it('la rubrica sta nella scheda Funzioni', () => {
+    expect(settingsFieldError(problemi({ addressBookEnabled: 'si' }))).toMatchObject({
+      tab: 'features',
+      inputId: 'addressBookEnabled',
+      problem: 'invalid',
+    });
+  });
+
   it('un numero oltre gli interi sicuri porta comunque il limite del campo', () => {
     expect(settingsFieldError(problemi({ jvbMaxReplicas: 1e20 }))).toMatchObject({
       inputId: 'jvbMaxReplicas',

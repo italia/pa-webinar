@@ -3762,6 +3762,7 @@
       "sendNotPublished": "Invitationer sendes, mens arrangementet tager imod tilmeldinger: efter offentliggørelsen og før slutningen.",
       "invitedOn": "Inviteret {date}",
       "notInvited": "Invitation ikke sendt",
+      "stopped": "Receives no invitations",
       "send": "Send invitation",
       "resend": "Send igen",
       "actions": "Handlinger",

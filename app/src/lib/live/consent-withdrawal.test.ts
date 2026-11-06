@@ -8,6 +8,7 @@ const tx = vi.hoisted(() => ({
   multitrackConsent: { findMany: vi.fn(), updateMany: vi.fn() },
   registration: { updateMany: vi.fn(), findMany: vi.fn() },
   person: { updateMany: vi.fn() },
+  eventInvitation: { deleteMany: vi.fn(), updateMany: vi.fn() },
   captionSegment: { updateMany: vi.fn() },
   gdprAuditLog: { create: vi.fn(), createMany: vi.fn() },
 }));
@@ -18,6 +19,9 @@ const trascrizione = vi.hoisted(() => ({
 vi.mock('@/lib/captions/transcript', () => trascrizione);
 vi.mock('@/lib/db', () => ({
   prisma: { $transaction: (fn: (t: typeof tx) => unknown) => fn(tx) },
+}));
+vi.mock('@/lib/settings', () => ({
+  getSettings: async () => ({ publicRegistrationEnabled: true }),
 }));
 
 import { ritiraComunicazioni, ritiraConsensi } from './consent-withdrawal';
@@ -245,9 +249,24 @@ describe('ritiraComunicazioni', () => {
     });
     expect(tx.person.updateMany).toHaveBeenCalledWith({
       where: { emailHash: 'impronta', optedInToAddressBook: true },
-      data: { optedInToAddressBook: false, optedOutAt: ADESSO },
+      data: { optedInToAddressBook: false, optedOutAt: ADESSO, email: null },
     });
     expect(tx.gdprAuditLog.createMany.mock.calls[0]![0].data).toHaveLength(2);
+  });
+
+  it("ferma gli inviti dell'indirizzo, anche quelli scritti a mano", async () => {
+    tx.registration.findMany.mockResolvedValue([]);
+    tx.person.updateMany.mockResolvedValue({ count: 1 });
+    await ritiraComunicazioni('impronta', ADESSO);
+    const dove = { OR: [{ emailHash: 'impronta' }, { person: { emailHash: 'impronta' } }] };
+    expect(tx.eventInvitation.deleteMany.mock.calls[0]![0].where).toMatchObject({
+      AND: [dove],
+      sentAt: null,
+    });
+    expect(tx.eventInvitation.updateMany).toHaveBeenCalledWith({
+      where: { AND: [dove], declinedAt: null },
+      data: { declinedAt: ADESSO },
+    });
   });
 
   it('senza consenso da ritirare non scrive niente nel registro', async () => {

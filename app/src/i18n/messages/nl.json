@@ -3762,6 +3762,7 @@
       "sendNotPublished": "Uitnodigingen gaan uit zolang het evenement inschrijvingen aanneemt: na publicatie en vóór het einde.",
       "invitedOn": "Uitgenodigd op {date}",
       "notInvited": "Uitnodiging niet verzonden",
+      "stopped": "Receives no invitations",
       "send": "Uitnodiging sturen",
       "resend": "Opnieuw sturen",
       "actions": "Acties",

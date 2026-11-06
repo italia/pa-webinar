@@ -22,11 +22,10 @@
  *   includeOpted?  — 'out' to include opted-out persons (default: only
  *                   opted-in). The address-book page uses it to manage every
  *                   entry; the event wizard's picker never does.
- *   withEmail?  — '1' to add each person's email, from their latest
- *                 registration (decrypted): the wizard picker needs it to add
- *                 the person to an event. Only persons that still have a
- *                 registration are returned (cleanup deletes registrations
- *                 before the address-book entry). Admin only, like the route.
+ *   withEmail?  — '1' per aggiungere l'email decifrata di ogni voce: al
+ *                 selettore del wizard serve per mettere la persona in un
+ *                 evento. Restituisce solo le voci che ne hanno una. Solo per
+ *                 l'amministrazione, come tutta la rotta.
  *   limit?      — default 200, max 1000
  *   offset?     — pagination offset
  */
@@ -63,9 +62,9 @@ export const GET = withErrorHandling(async (request) => {
   const where: Prisma.PersonWhereInput = {};
   if (includeOpted !== 'out') where.optedInToAddressBook = true;
   if (orgTypeParam) where.organizationType = orgTypeParam as OrganizationType;
-  // Senza un'iscrizione non c'e' un indirizzo: la persona non si potrebbe
-  // aggiungere a un evento, e il selettore non la propone.
-  if (withEmail) where.registrations = { some: {} };
+  // Senza un indirizzo la persona non si potrebbe aggiungere a un evento, e il
+  // selettore non la propone.
+  if (withEmail) where.email = { not: null };
   if (q) {
     // displayName is stored encrypted at rest, so a `contains` clause on
     // ciphertext would never match. We drop the displayName search and
@@ -85,6 +84,7 @@ export const GET = withErrorHandling(async (request) => {
       select: {
         id: true,
         displayName: true,
+        email: withEmail,
         organization: true,
         organizationRole: true,
         organizationType: true,
@@ -99,17 +99,6 @@ export const GET = withErrorHandling(async (request) => {
     }),
     prisma.person.count({ where }),
   ]);
-
-  // L'email dell'ultima iscrizione di ciascuno, in una lettura sola.
-  const emailPerPersona = new Map<string, string | null>();
-  if (withEmail && rows.length > 0) {
-    const ultime = await prisma.$queryRaw<Array<{ person_id: string; email: string }>>`
-      SELECT DISTINCT ON (person_id) person_id, email
-      FROM registrations
-      WHERE person_id = ANY(${rows.map((r) => r.id)}::uuid[])
-      ORDER BY person_id, created_at DESC`;
-    for (const u of ultime) emailPerPersona.set(u.person_id, tryDecryptPII(u.email));
-  }
 
   return Response.json(
     {
@@ -126,7 +115,7 @@ export const GET = withErrorHandling(async (request) => {
         retentionMonths: r.retentionMonths,
         createdAt: r.createdAt.toISOString(),
         registrationCount: r._count.registrations,
-        ...(withEmail ? { email: emailPerPersona.get(r.id) ?? null } : {}),
+        ...(withEmail ? { email: tryDecryptPII(r.email) } : {}),
       })),
       total,
       limit,

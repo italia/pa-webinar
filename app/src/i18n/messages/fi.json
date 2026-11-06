@@ -3762,6 +3762,7 @@
       "sendNotPublished": "Kutsut lähtevät, kun tapahtuma ottaa vastaan ilmoittautumisia: julkaisun jälkeen ja ennen loppua.",
       "invitedOn": "Kutsuttu {date}",
       "notInvited": "Kutsua ei lähetetty",
+      "stopped": "Receives no invitations",
       "send": "Lähetä kutsu",
       "resend": "Lähetä uudelleen",
       "actions": "Toiminnot",

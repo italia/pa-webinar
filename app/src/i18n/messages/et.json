@@ -3762,6 +3762,7 @@
       "sendNotPublished": "Kutsed saadetakse, kuni sündmus võtab registreerumisi vastu: pärast avaldamist ja enne lõppu.",
       "invitedOn": "Kutsutud {date}",
       "notInvited": "Kutse saatmata",
+      "stopped": "Receives no invitations",
       "send": "Saada kutse",
       "resend": "Saada uuesti",
       "actions": "Toimingud",

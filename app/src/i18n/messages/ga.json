@@ -3762,6 +3762,7 @@
       "sendNotPublished": "Seoltar cuirí fad a ghlacann an ócáid le clárúcháin: tar éis foilsiú agus roimh an deireadh.",
       "invitedOn": "Tugadh cuireadh ar {date}",
       "notInvited": "Cuireadh nár seoladh",
+      "stopped": "Receives no invitations",
       "send": "Seol cuireadh",
       "resend": "Seol arís",
       "actions": "Gníomhartha",

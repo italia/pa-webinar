@@ -89,7 +89,7 @@ function RubricaPickerInner(props: RubricaPickerProps) {
     setLoading(true);
     try {
       // Solo chi ha accettato di restare in rubrica (chi ha revocato il
-      // consenso non si propone), con l'email dell'ultima iscrizione: senza,
+      // consenso non si propone), con l'email conservata nella voce: senza,
       // la persona non si potrebbe aggiungere all'evento.
       const qs = new URLSearchParams({
         q,

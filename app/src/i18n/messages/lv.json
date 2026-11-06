@@ -3762,6 +3762,7 @@
       "sendNotPublished": "Ielūgumi tiek sūtīti, kamēr pasākums pieņem reģistrācijas: pēc publicēšanas un pirms beigām.",
       "invitedOn": "Uzaicināts {date}",
       "notInvited": "Ielūgums nav nosūtīts",
+      "stopped": "Receives no invitations",
       "send": "Sūtīt ielūgumu",
       "resend": "Sūtīt vēlreiz",
       "actions": "Darbības",

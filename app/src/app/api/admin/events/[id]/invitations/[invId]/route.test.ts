@@ -56,7 +56,7 @@ beforeEach(() => {
 });
 
 describe('PATCH un invito', () => {
-  it("con un indirizzo nuovo azzera token e invio, e non restituisce token ne' impronta", async () => {
+  it("con un indirizzo nuovo azzera token, invio e stop, e non restituisce token ne' impronta", async () => {
     const res = await PATCH(
       richiesta({ email: 'Nuova@Example.org' }) as never,
       ctx as never
@@ -68,6 +68,7 @@ describe('PATCH un invito', () => {
       emailHash: 'h:nuova@example.org',
       token: null,
       sentAt: null,
+      declinedAt: null,
     });
     const corpo = await res.json();
     expect(corpo).not.toHaveProperty('token');

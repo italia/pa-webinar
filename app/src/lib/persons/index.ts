@@ -4,6 +4,7 @@
 import type { OrganizationType, Prisma, PrismaClient } from '@prisma/client';
 
 import { encryptPIIOrNull } from '@/lib/crypto/pii';
+import { riapriInviti } from '@/lib/persons/inviti-fermati';
 
 export interface PersonUpsertInput {
   emailHash: string;
@@ -13,28 +14,25 @@ export interface PersonUpsertInput {
   organization?: string | null;
   organizationRole?: string | null;
   organizationType?: OrganizationType | null;
-  // true only when the participant ticked the dedicated rubrica checkbox
-  // on the registration form (Art. 6.1.a opt-in).
+  // Vero solo se chi si iscrive ha spuntato la casella della rubrica
+  // (art. 6.1.a GDPR).
   optedIn: boolean;
 }
 
 type Tx = Prisma.TransactionClient | PrismaClient;
 
 /**
- * Upsert a Person row by emailHash and return its id.
+ * Aggiorna la voce di rubrica di chi si iscrive e ne restituisce l'id.
  *
- * Behaviour:
- *   - If no Person exists and `optedIn` is false, no row is created —
- *     we never index contact data without explicit opt-in.
- *   - If a Person exists (from a prior opt-in) and `optedIn` is false,
- *     the row is left untouched (no profile refresh, no optedOutAt —
- *     "I don't want to opt in now" is not the same as "withdraw").
- *   - On opt-in (either first-time or subsequent) the latest stable
- *     profile fields are written, `lastActiveAt` is bumped, and any
- *     prior `optedOutAt` is cleared (the participant re-consented).
+ * - Senza spunta non si crea e non si tocca niente: un'iscrizione non rinnova
+ *   il consenso, e non aggiornare i dati non equivale a un ritiro. Se la voce
+ *   esiste l'iscrizione ci si collega comunque.
+ * - Con la spunta si scrivono nome, email e organizzazione di questa iscrizione,
+ *   `optedInAt` riparte da adesso (e con lui i mesi di conservazione, vedi
+ *   `lib/persons/retention`) e un ritiro precedente si annulla, con gli inviti
+ *   fermati da quel ritiro.
  *
- * Returns the Person id when a row was upserted, or null when the
- * participant is not opted in and no existing Person row exists.
+ * `null` se non c'e' una voce e la persona non l'ha chiesta.
  */
 export async function upsertPersonOnRegistration(
   tx: Tx,
@@ -42,58 +40,39 @@ export async function upsertPersonOnRegistration(
 ): Promise<string | null> {
   const existing = await tx.person.findUnique({
     where: { emailHash: input.emailHash },
-    select: { id: true, optedInToAddressBook: true },
+    select: { id: true },
   });
 
-  if (!existing && !input.optedIn) return null;
+  if (!input.optedIn) return existing?.id ?? null;
 
   const now = new Date();
+  await riapriInviti(tx, input.emailHash);
 
-  // displayName is PII and is encrypted at rest (AES-256-GCM); all other
-  // profile fields stay in plaintext because the admin search/filter
-  // surface needs to query them.
-  const encryptedDisplayName = encryptPIIOrNull(input.displayName);
+  // Nome ed email sono cifrati a riposo (AES-256-GCM). Gli altri campi restano
+  // in chiaro perche' l'elenco dello staff li cerca e li filtra.
+  const profilo = {
+    displayName: encryptPIIOrNull(input.displayName),
+    email: input.email,
+    organization: input.organization ?? null,
+    organizationRole: input.organizationRole ?? null,
+    organizationType: input.organizationType ?? null,
+    optedInToAddressBook: true,
+    optedInAt: now,
+    lastActiveAt: now,
+  };
 
   if (!existing) {
     const created = await tx.person.create({
-      data: {
-        emailHash: input.emailHash,
-        displayName: encryptedDisplayName,
-        organization: input.organization ?? null,
-        organizationRole: input.organizationRole ?? null,
-        organizationType: input.organizationType ?? null,
-        optedInToAddressBook: true,
-        optedInAt: now,
-        lastActiveAt: now,
-      },
+      data: { emailHash: input.emailHash, ...profilo },
       select: { id: true },
     });
     return created.id;
   }
 
-  if (input.optedIn) {
-    const updated = await tx.person.update({
-      where: { id: existing.id },
-      data: {
-        displayName: encryptedDisplayName,
-        organization: input.organization ?? null,
-        organizationRole: input.organizationRole ?? null,
-        organizationType: input.organizationType ?? null,
-        optedInToAddressBook: true,
-        optedInAt: existing.optedInToAddressBook ? undefined : now,
-        optedOutAt: null,
-        lastActiveAt: now,
-      },
-      select: { id: true },
-    });
-    return updated.id;
-  }
-
-  // Existing row, user did NOT re-opt-in this time: do not refresh
-  // profile (we only refresh on opt-in), but still bump activity.
-  await tx.person.update({
+  const updated = await tx.person.update({
     where: { id: existing.id },
-    data: { lastActiveAt: now },
+    data: { ...profilo, optedOutAt: null },
+    select: { id: true },
   });
-  return existing.id;
+  return updated.id;
 }
