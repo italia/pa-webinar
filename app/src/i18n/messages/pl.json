@@ -204,6 +204,8 @@
       "machineTranslationNote": "Tytuł i opis zostały przetłumaczone przez model automatyczny i nikt ich jeszcze nie sprawdził.",
       "previewTitle": "Podgląd dla zespołu",
       "previewBody": "Nagranie nie jest jeszcze opublikowane: tę wersję strony widzą tylko osoby zarządzające wydarzeniem.",
+      "previewBodyPageHidden": "This page is not visible to the public: anyone who opens the address will not find it. Only the people who manage the event see it.",
+      "previewBodyPageRegistrants": "This page is not visible to the public: anyone who opens the address will not find it. Only people registered for the event and those who manage it see it.",
       "recordingForRegistrantsTitle": "Nagranie tylko dla zarejestrowanych",
       "recordingForRegistrantsBody": "Jeśli zarejestrowałeś się na wydarzenie, otwórz osobisty link z e-maila „nagranie dostępne” lub poproś o ponowne wysłanie.",
       "recordingLinkEmailLabel": "E-mail użyty przy rejestracji",

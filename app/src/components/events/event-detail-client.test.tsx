@@ -98,6 +98,9 @@ function disegna(props: {
   hasPostEventQuestionnaire?: boolean;
   feedbackProof?: { accessToken?: string; ratingToken?: string } | null;
   recap?: EventRecap | null;
+  previewForStaff?: boolean;
+  previewPageHidden?: boolean;
+  previewPageForRegistrants?: boolean;
 }) {
   act(() => {
     root.render(
@@ -148,6 +151,56 @@ describe('scheda pubblica — video', () => {
   it('senza interventi mancanti non dice niente', () => {
     disegna({ event: concluso(false), registrationOpen: false });
     expect(container.textContent).not.toContain(messages.postprod.unrecordedSpeech);
+  });
+});
+
+describe('scheda pubblica — anteprima dello staff', () => {
+  const concluso = () => evento({ status: 'ENDED' });
+
+  it('con la registrazione non pubblicata dice questo', () => {
+    disegna({ event: concluso(), registrationOpen: false, previewForStaff: true });
+    expect(container.textContent).toContain(messages.events.detail.previewBody);
+    expect(container.textContent).not.toContain(messages.events.detail.previewBodyPageHidden);
+  });
+
+  it('con la pagina nascosta dice che la vede solo chi gestisce l\'evento', () => {
+    disegna({
+      event: concluso(),
+      registrationOpen: false,
+      previewForStaff: true,
+      previewPageHidden: true,
+    });
+    expect(container.textContent).toContain(messages.events.detail.previewBodyPageHidden);
+    expect(container.textContent).not.toContain(messages.events.detail.previewBody);
+    expect(container.textContent).not.toContain(messages.events.detail.previewBodyPageRegistrants);
+  });
+
+  it('con la pagina aperta agli iscritti dice che la vedono anche loro', () => {
+    disegna({
+      event: concluso(),
+      registrationOpen: false,
+      previewForStaff: true,
+      previewPageHidden: true,
+      previewPageForRegistrants: true,
+    });
+    expect(container.textContent).toContain(messages.events.detail.previewBodyPageRegistrants);
+    expect(container.textContent).not.toContain(messages.events.detail.previewBodyPageHidden);
+  });
+
+  it('con il video non pubblicato non parla di iscritti', () => {
+    disegna({
+      event: concluso(),
+      registrationOpen: false,
+      previewForStaff: true,
+      previewPageForRegistrants: true,
+    });
+    expect(container.textContent).toContain(messages.events.detail.previewBody);
+    expect(container.textContent).not.toContain(messages.events.detail.previewBodyPageRegistrants);
+  });
+
+  it('fuori dall\'anteprima non compare', () => {
+    disegna({ event: concluso(), registrationOpen: false, previewPageHidden: true });
+    expect(container.textContent).not.toContain(messages.events.detail.previewBodyPageHidden);
   });
 });
 

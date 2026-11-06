@@ -204,6 +204,8 @@
       "machineTranslationNote": "Naslov in opis je prevedel samodejni model in ju še nihče ni pregledal.",
       "previewTitle": "Predogled za ekipo",
       "previewBody": "Posnetek še ni objavljen: to različico strani vidijo samo tisti, ki upravljajo dogodek.",
+      "previewBodyPageHidden": "This page is not visible to the public: anyone who opens the address will not find it. Only the people who manage the event see it.",
+      "previewBodyPageRegistrants": "This page is not visible to the public: anyone who opens the address will not find it. Only people registered for the event and those who manage it see it.",
       "recordingForRegistrantsTitle": "Posnetek samo za prijavljene",
       "recordingForRegistrantsBody": "Če ste se prijavili na dogodek, odprite osebno povezavo iz e-pošte »posnetek je na voljo« ali zahtevajte, da vam jo pošljemo znova.",
       "recordingLinkEmailLabel": "E-pošta, s katero ste se prijavili",

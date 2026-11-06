@@ -204,6 +204,8 @@
       "machineTranslationNote": "Titel en beschrijving zijn vertaald door een automatisch model en nog door niemand nagelezen.",
       "previewTitle": "Voorbeeld voor het team",
       "previewBody": "De opname is nog niet gepubliceerd: alleen wie het evenement beheert, ziet deze versie van de pagina.",
+      "previewBodyPageHidden": "This page is not visible to the public: anyone who opens the address will not find it. Only the people who manage the event see it.",
+      "previewBodyPageRegistrants": "This page is not visible to the public: anyone who opens the address will not find it. Only people registered for the event and those who manage it see it.",
       "recordingForRegistrantsTitle": "Opname alleen voor ingeschrevenen",
       "recordingForRegistrantsBody": "Als je je voor het evenement hebt ingeschreven, open dan de persoonlijke link uit de e-mail 'opname beschikbaar' of laat hem opnieuw sturen.",
       "recordingLinkEmailLabel": "E-mailadres waarmee je je hebt ingeschreven",

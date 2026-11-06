@@ -204,6 +204,8 @@
       "machineTranslationNote": "Názov a opis preložil automatický model a zatiaľ ich nikto neskontroloval.",
       "previewTitle": "Náhľad pre tím",
       "previewBody": "Záznam ešte nie je zverejnený: túto verziu stránky vidia len tí, ktorí podujatie spravujú.",
+      "previewBodyPageHidden": "This page is not visible to the public: anyone who opens the address will not find it. Only the people who manage the event see it.",
+      "previewBodyPageRegistrants": "This page is not visible to the public: anyone who opens the address will not find it. Only people registered for the event and those who manage it see it.",
       "recordingForRegistrantsTitle": "Záznam len pre registrovaných",
       "recordingForRegistrantsBody": "Ak ste sa na podujatie zaregistrovali, otvorte osobný odkaz z e-mailu „záznam je k dispozícii“, alebo si ho dajte poslať znova.",
       "recordingLinkEmailLabel": "E-mail, ktorým ste sa registrovali",

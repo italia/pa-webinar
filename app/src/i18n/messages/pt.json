@@ -204,6 +204,8 @@
       "machineTranslationNote": "O título e a descrição foram traduzidos por um modelo automático e ninguém os reviu ainda.",
       "previewTitle": "Pré-visualização para a equipa",
       "previewBody": "A gravação ainda não está publicada: só quem gere o evento vê esta versão da página.",
+      "previewBodyPageHidden": "This page is not visible to the public: anyone who opens the address will not find it. Only the people who manage the event see it.",
+      "previewBodyPageRegistrants": "This page is not visible to the public: anyone who opens the address will not find it. Only people registered for the event and those who manage it see it.",
       "recordingForRegistrantsTitle": "Gravação reservada aos inscritos",
       "recordingForRegistrantsBody": "Se se inscreveu no evento, abra a ligação pessoal do e-mail «gravação disponível» ou peça para a receber de novo.",
       "recordingLinkEmailLabel": "E-mail com que se inscreveu",

@@ -204,6 +204,8 @@
       "machineTranslationNote": "Заглавието и описанието са преведени от автоматичен модел и още никой не ги е прегледал.",
       "previewTitle": "Преглед за екипа",
       "previewBody": "Записът все още не е публикуван: тази версия на страницата виждат само управляващите събитието.",
+      "previewBodyPageHidden": "This page is not visible to the public: anyone who opens the address will not find it. Only the people who manage the event see it.",
+      "previewBodyPageRegistrants": "This page is not visible to the public: anyone who opens the address will not find it. Only people registered for the event and those who manage it see it.",
       "recordingForRegistrantsTitle": "Запис само за регистрираните",
       "recordingForRegistrantsBody": "Ако сте се регистрирали за събитието, отворете личния линк от имейла „записът е наличен“ или поискайте да ви го изпратим отново.",
       "recordingLinkEmailLabel": "Имейл, с който сте се регистрирали",

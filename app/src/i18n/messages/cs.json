@@ -204,6 +204,8 @@
       "machineTranslationNote": "Název a popis přeložil automatický model a zatím je nikdo nezkontroloval.",
       "previewTitle": "Náhled pro tým",
       "previewBody": "Záznam zatím není zveřejněn: tuto verzi stránky vidí jen ti, kdo akci spravují.",
+      "previewBodyPageHidden": "This page is not visible to the public: anyone who opens the address will not find it. Only the people who manage the event see it.",
+      "previewBodyPageRegistrants": "This page is not visible to the public: anyone who opens the address will not find it. Only people registered for the event and those who manage it see it.",
       "recordingForRegistrantsTitle": "Záznam jen pro registrované",
       "recordingForRegistrantsBody": "Pokud jste se na akci zaregistrovali, otevřete osobní odkaz z e-mailu „záznam je k dispozici“, nebo si ho nechte poslat znovu.",
       "recordingLinkEmailLabel": "E-mail, kterým jste se registrovali",

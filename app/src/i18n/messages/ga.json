@@ -204,6 +204,8 @@
       "machineTranslationNote": "Rinne samhail uathoibríoch an teideal agus an cur síos a aistriú agus níl athbhreithniú déanta orthu ag aon duine fós.",
       "previewTitle": "Réamhamharc don fhoireann",
       "previewBody": "Níl an taifeadadh foilsithe fós: ní fheiceann ach iad siúd a bhainistíonn an ócáid an leagan seo den leathanach.",
+      "previewBodyPageHidden": "This page is not visible to the public: anyone who opens the address will not find it. Only the people who manage the event see it.",
+      "previewBodyPageRegistrants": "This page is not visible to the public: anyone who opens the address will not find it. Only people registered for the event and those who manage it see it.",
       "recordingForRegistrantsTitle": "Taifeadadh do chláraitheoirí amháin",
       "recordingForRegistrantsBody": "Má chláraigh tú don ócáid, oscail an nasc pearsanta sa ríomhphost \"taifeadadh ar fáil\", nó iarr go seolfaí arís é.",
       "recordingLinkEmailLabel": "An ríomhphost lenar chláraigh tú",

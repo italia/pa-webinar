@@ -204,6 +204,8 @@
       "machineTranslationNote": "Ο τίτλος και η περιγραφή μεταφράστηκαν από αυτόματο μοντέλο και δεν τα έχει ελέγξει ακόμα κανείς.",
       "previewTitle": "Προεπισκόπηση για την ομάδα",
       "previewBody": "Η καταγραφή δεν έχει δημοσιευτεί ακόμη: αυτή την έκδοση της σελίδας τη βλέπουν μόνο όσοι διαχειρίζονται την εκδήλωση.",
+      "previewBodyPageHidden": "This page is not visible to the public: anyone who opens the address will not find it. Only the people who manage the event see it.",
+      "previewBodyPageRegistrants": "This page is not visible to the public: anyone who opens the address will not find it. Only people registered for the event and those who manage it see it.",
       "recordingForRegistrantsTitle": "Καταγραφή μόνο για εγγεγραμμένους",
       "recordingForRegistrantsBody": "Αν εγγραφήκατε στην εκδήλωση, ανοίξτε τον προσωπικό σύνδεσμο του email «η καταγραφή είναι διαθέσιμη» ή ζητήστε να σας τον στείλουμε ξανά.",
       "recordingLinkEmailLabel": "Email με το οποίο εγγραφήκατε",

@@ -204,6 +204,8 @@
       "machineTranslationNote": "It-titolu u d-deskrizzjoni ġew tradotti minn mudell awtomatiku u ħadd għadu ma rrevedihom.",
       "previewTitle": "Previżjoni għat-tim",
       "previewBody": "Ir-reġistrazzjoni għadha mhix ippubblikata: din il-verżjoni tal-paġna jarawha biss dawk li jmexxu l-avveniment.",
+      "previewBodyPageHidden": "This page is not visible to the public: anyone who opens the address will not find it. Only the people who manage the event see it.",
+      "previewBodyPageRegistrants": "This page is not visible to the public: anyone who opens the address will not find it. Only people registered for the event and those who manage it see it.",
       "recordingForRegistrantsTitle": "Reġistrazzjoni riservata għar-reġistrati",
       "recordingForRegistrantsBody": "Jekk irreġistrajt għall-avveniment, iftaħ il-link personali fl-email \"reġistrazzjoni disponibbli\", jew itlob li tintbagħatlek mill-ġdid.",
       "recordingLinkEmailLabel": "L-email li rreġistrajt biha",

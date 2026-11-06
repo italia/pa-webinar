@@ -204,6 +204,8 @@
       "machineTranslationNote": "Naslov i opis preveo je automatski model i još ih nitko nije pregledao.",
       "previewTitle": "Pregled za tim",
       "previewBody": "Snimka još nije objavljena: ovu verziju stranice vide samo oni koji upravljaju događajem.",
+      "previewBodyPageHidden": "This page is not visible to the public: anyone who opens the address will not find it. Only the people who manage the event see it.",
+      "previewBodyPageRegistrants": "This page is not visible to the public: anyone who opens the address will not find it. Only people registered for the event and those who manage it see it.",
       "recordingForRegistrantsTitle": "Snimka samo za prijavljene",
       "recordingForRegistrantsBody": "Ako ste se prijavili na događaj, otvorite osobnu poveznicu iz e-pošte „snimka je dostupna” ili zatražite da vam je ponovno pošaljemo.",
       "recordingLinkEmailLabel": "E-pošta kojom ste se prijavili",

@@ -204,6 +204,8 @@
       "machineTranslationNote": "Titel och beskrivning har översatts av en automatisk modell och ingen har granskat dem än.",
       "previewTitle": "Förhandsgranskning för teamet",
       "previewBody": "Inspelningen är inte publicerad ännu: bara de som hanterar evenemanget ser den här versionen av sidan.",
+      "previewBodyPageHidden": "This page is not visible to the public: anyone who opens the address will not find it. Only the people who manage the event see it.",
+      "previewBodyPageRegistrants": "This page is not visible to the public: anyone who opens the address will not find it. Only people registered for the event and those who manage it see it.",
       "recordingForRegistrantsTitle": "Inspelning endast för anmälda",
       "recordingForRegistrantsBody": "Om du anmälde dig till evenemanget, öppna den personliga länken i e-postmeddelandet ”inspelning tillgänglig”, eller be att få den skickad igen.",
       "recordingLinkEmailLabel": "E-postadress du anmälde dig med",

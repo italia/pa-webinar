@@ -204,6 +204,8 @@
       "machineTranslationNote": "Otsikon ja kuvauksen on kääntänyt automaattinen malli, eikä kukaan ole vielä tarkistanut niitä.",
       "previewTitle": "Esikatselu tiimille",
       "previewBody": "Tallennetta ei ole vielä julkaistu: vain tapahtuman hallinnoijat näkevät tämän version sivusta.",
+      "previewBodyPageHidden": "This page is not visible to the public: anyone who opens the address will not find it. Only the people who manage the event see it.",
+      "previewBodyPageRegistrants": "This page is not visible to the public: anyone who opens the address will not find it. Only people registered for the event and those who manage it see it.",
       "recordingForRegistrantsTitle": "Tallenne vain ilmoittautuneille",
       "recordingForRegistrantsBody": "Jos ilmoittauduit tapahtumaan, avaa henkilökohtainen linkki sähköpostista ”tallenne saatavilla” tai pyydä se uudelleen.",
       "recordingLinkEmailLabel": "Sähköposti, jolla ilmoittauduit",

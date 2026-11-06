@@ -204,6 +204,8 @@
       "machineTranslationNote": "Titolo e descrizione sono stati tradotti da un modello automatico e nessuno li ha ancora riletti.",
       "previewTitle": "Anteprima per lo staff",
       "previewBody": "La registrazione non è ancora pubblicata: questa versione della pagina la vede solo chi gestisce l'evento.",
+      "previewBodyPageHidden": "Questa pagina non è visibile al pubblico: chi apre l'indirizzo non la trova. La vede solo chi gestisce l'evento.",
+      "previewBodyPageRegistrants": "Questa pagina non è visibile al pubblico: chi apre l'indirizzo non la trova. La vedono solo gli iscritti all'evento e chi lo gestisce.",
       "recordingForRegistrantsTitle": "Registrazione riservata agli iscritti",
       "recordingForRegistrantsBody": "Se ti eri iscritto all'evento, apri il link personale dell'email «registrazione disponibile», oppure fattelo rimandare.",
       "recordingLinkEmailLabel": "Email con cui ti sei iscritto",
