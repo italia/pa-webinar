@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: EUPL-1.2
 // SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
 
+import fs from 'fs';
+import path from 'path';
+
 import { act, type ComponentProps } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
@@ -198,11 +201,39 @@ describe('sala d\'attesa — gli altri campi che trattengono', () => {
     });
     const consenso = $<HTMLInputElement>('#waiting-multitrack-consent')!;
     expect(consenso.checked).toBe(false);
-    expect(document.body.textContent).toContain(messages.gdpr.consent.multitrackOptional);
+    expect($('#waiting-multitrack-consent-nota')?.textContent).toBe(
+      messages.gdpr.consent.multitrackOptionalShort,
+    );
 
     // Senza spunta si entra lo stesso, e senza consenso.
     premi(pulsante(t.joinNowBtn));
     expect(onEnterLive).toHaveBeenLastCalledWith('Relatore 1', { cameraOn: false, micOn: false });
+  });
+
+  it.each([
+    ['fissa', messages.gdpr.consent.multitrackOptional],
+    ['rimovibile', messages.gdpr.consent.multitrackOptionalShort],
+    ['assente', messages.gdpr.consent.multitrackOptionalShort],
+  ] as const)('con la voce %s la nota dice solo cio\' che vale per il video', (voce, nota) => {
+    render({
+      role: 'participant',
+      defaultName: 'Relatore 1',
+      voce,
+      event: { ...eventoLive, multitrackRecordingEnabled: true },
+    });
+    expect($('#waiting-multitrack-consent-nota')?.textContent).toBe(nota);
+  });
+
+  it('in ogni lingua la nota breve e\' la nota intera senza la frase sul video', () => {
+    const cartella = path.resolve(__dirname, '../../i18n/messages');
+    const cataloghi = fs.readdirSync(cartella).filter((nome) => nome.endsWith('.json'));
+    expect(cataloghi).toHaveLength(24);
+    for (const nome of cataloghi) {
+      const catalogo = JSON.parse(fs.readFileSync(path.join(cartella, nome), 'utf8'));
+      const { multitrackOptional: intera, multitrackOptionalShort: breve } = catalogo.gdpr.consent;
+      expect(intera.startsWith(breve), nome).toBe(true);
+      expect(breve.length, nome).toBeLessThan(intera.length);
+    }
   });
 
   it('con la spunta il consenso viaggia con l\'ingresso, anche per chi modera', () => {

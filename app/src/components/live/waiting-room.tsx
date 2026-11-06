@@ -1294,8 +1294,11 @@ export default function WaitingRoom({
               {tGdpr(chiaveConsensoTrascrizione(event))}
             </label>
           </div>
+          {/* La voce resta nel video a prescindere solo dove non si puo' togliere:
+              altrove chi nega la registrazione ne resta fuori, e il video puo'
+              non esserci. */}
           <div id={`${CAMPO_TRASCRIZIONE}-nota`} className="wr-consensi__nota">
-            {tGdpr('multitrackOptional')}
+            {tGdpr(voce === 'fissa' ? 'multitrackOptional' : 'multitrackOptionalShort')}
           </div>
         </div>
       )}
