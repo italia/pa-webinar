@@ -55,7 +55,11 @@ import {
   type WizardAdvancedSection,
 } from '@/lib/events/wizard-steps';
 import { publicRegistrationFor } from '@/lib/events/access-mode';
-import { puoCambiareDestinazione } from '@/lib/recording/destination';
+import {
+  destinazioneDiPartenza,
+  puoCambiareDestinazione,
+  videoDaDestinare,
+} from '@/lib/recording/destination';
 import type { StatoTestiEvento } from '@/lib/text-translation/auto';
 import { entroILimiti, haTesto } from '@/lib/text-translation/stato-lingue';
 
@@ -71,7 +75,7 @@ import {
   campiDaEvento,
   campiDaModello,
   campiDaSalvare,
-  videoDaDestinare,
+  destinazioneDopoIlSalvataggio,
 } from './campi-del-formato';
 import { rememberCreation, type UnsavedResource } from './created-event';
 import StepProgramma from './programme-section';
@@ -816,6 +820,12 @@ export default function EventWizard(props: WizardProps) {
     (mode === 'create' ||
       !!initialEvent?.destinazioneDaChiedere ||
       initialEvent?.event.recordingEnabled === false);
+  // Cio' che il salvataggio lascia sull'evento se il modulo non sceglie: la stessa
+  // regola del server, che a sala aperta non accende la registrazione.
+  const destinazioneSenzaScelta = destinazioneDiPartenza(
+    initialEvent?.event ?? { recordingEnabled: false },
+    form.recordingEnabled && !salaBloccata,
+  );
   const controllaPasso = useCallback(
     (passo: StepKey) =>
       validateStep(passo, form, props.defaultLocale, retentionMax, chiedeDestinazione),
@@ -2531,7 +2541,7 @@ export default function EventWizard(props: WizardProps) {
             istantanea={istantanea}
             addressBookEnabled={props.addressBookEnabled ?? true}
             chiedeDestinazione={chiedeDestinazione}
-            destinazioneSalvata={initialEvent?.event.recordingDestination ?? null}
+            destinazioneSenzaScelta={destinazioneSenzaScelta}
             onCambiaDestinazione={viaToken === null ? () => vai('advanced', 'recording') : undefined}
             iscrizioneAperta={istantanea ? undefined : iscrizioneAperta}
             onVaiPersone={() => vai('invites')}
@@ -2571,6 +2581,8 @@ export default function EventWizard(props: WizardProps) {
                   voceNelVideo={props.voceNelVideo}
                   istantanea={istantanea}
                   puoDichiarareChiConduce={viaToken === null}
+                  destinazioneDopo={destinazioneDopoIlSalvataggio(form, destinazioneSenzaScelta)}
+                  salaGiaAperta={!!initialEvent?.salaGiaAperta}
                   destinazione={
                     viaToken === null && !istantanea
                       ? {
@@ -2631,7 +2643,7 @@ export default function EventWizard(props: WizardProps) {
                   retentionMax={retentionMax}
                   onUploadBusy={segnalaCaricamento}
                   domandeDopoEvento={viaToken === null}
-                  destinazioneSalvata={initialEvent?.event.recordingDestination ?? null}
+                  destinazioneSenzaScelta={destinazioneSenzaScelta}
                 />
               ),
               technical: (

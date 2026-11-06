@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: EUPL-1.2
 // SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
 
-import type { VoceNelVideo } from '@/lib/live/consent-rule';
-import type { Destinazione } from '@/lib/recording/destination';
+import { destinazioneDiPartenza, type Destinazione } from '@/lib/recording/destination';
 
 import type { WizardForm, WizardTemplatePreset } from './wizard-shell';
 
@@ -20,25 +19,14 @@ export interface CampiDelFormato {
   postEventShowQA: boolean;
 }
 
-/** La destinazione di partenza di chi registra, se il modello non la dice. */
-export const DESTINAZIONE_DI_PARTENZA = 'REGISTRANTS';
-
-/**
- * Dove la voce non entra nel video (voce 'assente') un video da pubblicare non
- * c'e', e il testo della casella lo dice (`destinazioneDelTesto`): non c'e' una
- * destinazione da chiedere, e una riservata toglierebbe le domande dalla pagina
- * dell'evento per un video che non esiste.
- */
-export function videoDaDestinare(voce: VoceNelVideo | undefined): boolean {
-  return voce !== 'assente';
-}
-
 /**
  * I valori di partenza di un evento nuovo. `registra`: l'evento registra davvero
  * (il modello lo chiede, l'installazione puo' farlo). Solo un evento che registra
  * parte con una destinazione se il modello non ne dice una, e solo lui puo'
  * tenere chi conduce nel video: la dichiarazione non riguarda altri eventi.
- * `conVideo`: `videoDaDestinare` dell'installazione.
+ * `conVideo`: `videoDaDestinare` dell'installazione. Senza, il modulo non ha una
+ * scelta da proporre, nemmeno quella del modello, e la destinazione la decide il
+ * salvataggio (`destinazioneDiPartenza`).
  */
 export function campiDaModello(
   tpl: WizardTemplatePreset | null | undefined,
@@ -46,7 +34,7 @@ export function campiDaModello(
   conVideo = true
 ): CampiDelFormato {
   const destinazione =
-    tpl?.recordingDestination ?? (registra ? DESTINAZIONE_DI_PARTENZA : null);
+    tpl?.recordingDestination ?? destinazioneDiPartenza({ recordingEnabled: false }, registra);
   return {
     recordingDestination: conVideo ? destinazione : null,
     offerAddressBook: tpl?.offerAddressBook ?? true,
@@ -69,17 +57,19 @@ export function campiDaEvento(ev: Partial<CampiDelFormato>): CampiDelFormato {
 
 /**
  * La destinazione che l'evento avra' dopo il salvataggio, la stessa che legge
- * `domandePubbliche`. Un evento che non registra non ne dichiara una nuova: la
- * scelta resta nel modulo per quando la registrazione si riaccende, altrimenti
- * una riservata toglierebbe le domande a un evento senza video. Una destinazione
- * gia' dichiarata resta anche a registrazione spenta, e si puo' cambiare.
+ * `domandePubbliche`. `senzaScelta`: quella che tiene se il modulo non ne sceglie
+ * una (`destinazioneDiPartenza`). Un evento che non registra non ne dichiara una
+ * nuova: la scelta resta nel modulo per quando la registrazione si riaccende,
+ * altrimenti una riservata toglierebbe le domande a un evento senza video. Una
+ * destinazione gia' dichiarata resta anche a registrazione spenta, e si puo'
+ * cambiare.
  */
 export function destinazioneDopoIlSalvataggio(
   form: Pick<WizardForm, 'recordingEnabled' | 'recordingDestination'>,
-  salvata: Destinazione
+  senzaScelta: Destinazione
 ): Destinazione {
-  if (salvata === null && !form.recordingEnabled) return null;
-  return form.recordingDestination ?? salvata;
+  if (senzaScelta === null && !form.recordingEnabled) return null;
+  return form.recordingDestination ?? senzaScelta;
 }
 
 /**

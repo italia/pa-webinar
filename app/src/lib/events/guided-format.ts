@@ -161,9 +161,16 @@ export function decodificaFormato(valore: unknown): FormatoGuidato | null {
 }
 
 /** Dove l'installazione non puo' registrare il formato non promette una
- *  registrazione, neanche se arriva da un indirizzo salvato altrove. */
-export function formatoPossibile(f: FormatoGuidato, puoRegistrare: boolean): FormatoGuidato {
-  return puoRegistrare ? f : { ...f, registra: 'no' };
+ *  registrazione, neanche se arriva da un indirizzo salvato altrove. `conVideo`:
+ *  `videoDaDestinare` dell'installazione. Senza un video della sala non c'e' un
+ *  video da aprire a tutti, e l'evento parte riservato: la risposta lo dice. */
+export function formatoPossibile(
+  f: FormatoGuidato,
+  puoRegistrare: boolean,
+  conVideo = true,
+): FormatoGuidato {
+  if (!puoRegistrare) return { ...f, registra: 'no' };
+  return !conVideo && f.registra === 'pubblica' ? { ...f, registra: 'riservata' } : f;
 }
 
 /** I valori di partenza del wizard per un formato, nella forma di un modello.

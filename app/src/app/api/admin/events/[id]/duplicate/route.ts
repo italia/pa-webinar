@@ -57,6 +57,7 @@ import {
   DUPLICATE_SOURCE_INCLUDE,
   duplicatedRelations,
 } from '@/lib/events/duplicate-relations';
+import { destinazioneDiPartenza } from '@/lib/recording/destination';
 import { nextOccurrenceAfter } from '@/lib/utils/recurrence';
 import { generateUniqueSlug } from '@/lib/utils/slug';
 import type { LocalizedField } from '@/lib/utils/locale';
@@ -215,11 +216,11 @@ function destinazioneDellaCopia(source: {
   recordingEnabled: boolean;
   recordingDestination: RecordingAudience | null;
 }) {
-  if (!source.recordingEnabled || source.recordingDestination != null) return {};
-  return {
-    recordingDestination: 'REGISTRANTS',
-    recordingAudience: 'REGISTRANTS',
-  } as const;
+  if (source.recordingDestination != null) return {};
+  const destinazione = destinazioneDiPartenza({ recordingEnabled: false }, source.recordingEnabled);
+  return destinazione
+    ? { recordingDestination: destinazione, recordingAudience: destinazione }
+    : {};
 }
 
 /** Se l'account che ha creato l'originale è ancora attivo: altrimenti la

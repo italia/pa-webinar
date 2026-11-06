@@ -1247,6 +1247,8 @@
         "recordingDestinationPublicDesc": "Si può pubblicare sulla pagina dell'evento e nella libreria video. Chi partecipa acconsente anche a questo.",
         "recordingDestinationNotSet": "Non indicata: l'evento è nato prima di questa scelta.",
         "recordingDestinationStaffOnly": "Dove va la registrazione lo sceglie lo staff dell'evento: per ora non è indicata.",
+        "recordingDestinationStartsReserved": "La registrazione parte riservata: può renderla pubblica lo staff dell'evento, finché la sala non si apre.",
+        "recordingDestinationStaysReserved": "La registrazione resta riservata: la sala si è già aperta.",
         "recordingDestinationLocked": "Dopo l'apertura della sala si può solo passare a riservata: i consensi valgono per il testo che le persone hanno letto.",
         "recordingDestinationRequired": "Scegli dove va la registrazione.",
         "audienceAnonymous": "Pubblico anonimo",

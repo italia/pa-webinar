@@ -12,7 +12,7 @@ const { prisma } = vi.hoisted(() => ({
 }));
 vi.mock('@/lib/db', () => ({ prisma }));
 
-import { domandaDestinazione, salaGiaAperta } from './destination-question';
+import { domandaDestinazione } from './destination-question';
 
 const evento = (status: string) => ({ id: 'evt-1', status });
 
@@ -20,28 +20,6 @@ beforeEach(() => {
   vi.clearAllMocks();
   prisma.callSession.findFirst.mockResolvedValue(null);
   prisma.registration.findFirst.mockResolvedValue(null);
-});
-
-describe('salaGiaAperta', () => {
-  it.each(['PROVISIONING', 'LIVE', 'IDLE', 'ENDED', 'ARCHIVED'])(
-    '%s: si e gia aperta, senza leggere le sessioni',
-    async (status) => {
-      expect(await salaGiaAperta(evento(status))).toBe(true);
-      expect(prisma.callSession.findFirst).not.toHaveBeenCalled();
-    }
-  );
-
-  it.each(['DRAFT', 'PUBLISHED'])('%s senza sessioni: mai aperta', async (status) => {
-    expect(await salaGiaAperta(evento(status))).toBe(false);
-  });
-
-  it('una sessione di chiamata, anche chiusa da tempo, conta', async () => {
-    prisma.callSession.findFirst.mockResolvedValue({ id: 's-1' });
-    expect(await salaGiaAperta(evento('PUBLISHED'))).toBe(true);
-    expect(prisma.callSession.findFirst.mock.calls[0]![0].where).toEqual({
-      eventId: 'evt-1',
-    });
-  });
 });
 
 describe('domandaDestinazione', () => {

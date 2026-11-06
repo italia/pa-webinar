@@ -22,7 +22,10 @@ import { requireEventManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { AppError, NotFoundError, ValidationError } from '@/lib/errors';
-import { assertEsposizioneConsentita } from '@/lib/recording/destination';
+import {
+  assertEsposizioneConsentita,
+  destinazioneDiPartenza,
+} from '@/lib/recording/destination';
 
 export const dynamic = 'force-dynamic';
 
@@ -90,16 +93,15 @@ export const PATCH = withErrorHandling(async (request, context) => {
 
   // Il caricamento accende la registrazione: un evento che comincia a registrare
   // con questo file parte riservato, come quando la si accende dalla modifica
-  // dell'evento. Chiamate rapide ed eventi storici restano senza destinazione.
-  const cominciaRiservato =
-    !!parsed.data.recordingUrl &&
-    !prima.recordingEnabled &&
-    prima.recordingDestination === null &&
-    prima.eventType !== 'INSTANT' &&
-    prima.eventType !== 'LEGACY';
-  const destinazione = cominciaRiservato
-    ? ({ recordingDestination: 'REGISTRANTS', recordingAudience: 'REGISTRANTS' } as const)
-    : null;
+  // dell'evento. Gli eventi storici restano senza destinazione.
+  const partenza = destinazioneDiPartenza(
+    prima,
+    !!parsed.data.recordingUrl && prima.eventType !== 'LEGACY',
+  );
+  const destinazione =
+    partenza && partenza !== prima.recordingDestination
+      ? ({ recordingDestination: partenza, recordingAudience: partenza } as const)
+      : null;
 
   assertEsposizioneConsentita(prima, {
     ...prima,

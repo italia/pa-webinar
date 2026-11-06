@@ -12,7 +12,10 @@ import { prisma } from '@/lib/db';
 import { tagIdsFromSlugs } from '@/lib/events/event-tags';
 import { usablePersonPhotoId } from '@/lib/events/person-photo-store';
 import { elencoPredefinito } from '@/lib/live/participant-list';
-import { assertEsposizioneConsentita } from '@/lib/recording/destination';
+import {
+  assertEsposizioneConsentita,
+  destinazioneDiPartenza,
+} from '@/lib/recording/destination';
 import { createEventSchema } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { generateUniqueSlug } from '@/lib/utils/slug';
@@ -106,10 +109,11 @@ export const POST = withErrorHandling(async (request) => {
 
   // Un evento nuovo che registra dichiara dove va il video: senza una scelta
   // resta riservato, anche con un null esplicito, perche' allargare e' un atto
-  // esplicito. Senza registrazione non c'e' niente da dichiarare, e la
-  // destinazione deciderebbe da sola sulle domande dopo l'evento.
-  const destinazione =
-    data.recordingDestination ?? (data.recordingEnabled ? 'REGISTRANTS' : null);
+  // esplicito.
+  const destinazione = destinazioneDiPartenza(
+    { recordingEnabled: false, recordingDestination: data.recordingDestination },
+    data.recordingEnabled,
+  );
   const pubblicoRiservato = destinazione === 'REGISTRANTS';
   assertEsposizioneConsentita(null, {
     recordingDestination: destinazione,

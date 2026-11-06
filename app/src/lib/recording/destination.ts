@@ -32,6 +32,54 @@ import type { VoceNelVideo } from '@/lib/live/consent-rule';
 /** La destinazione di un evento o di un consenso. Null: non dichiarata. */
 export type Destinazione = RecordingAudience | null;
 
+/** La destinazione di un evento che registra, se nessuno ne sceglie una. */
+export const DESTINAZIONE_DI_PARTENZA = 'REGISTRANTS' satisfies RecordingAudience;
+
+/**
+ * Se c'e' un video della sala a cui dare una destinazione. Dove la voce non entra
+ * nel video (voce 'assente') quel video non c'e', e il testo della casella lo dice
+ * (`destinazioneDelTesto`): la scelta tra riservata e pubblica non si propone.
+ *
+ * Decide solo cosa si chiede a chi organizza. L'evento parte riservato comunque
+ * (`destinazioneDiPartenza`): un file caricato dopo e' un video come gli altri, e
+ * se l'installazione aggiunge il video chi ha letto quel testo va richiesto in
+ * sala, perche' il suo consenso non dichiara una destinazione (`consensoCopre`).
+ */
+export function videoDaDestinare(voce: VoceNelVideo | undefined): boolean {
+  return voce !== 'assente';
+}
+
+/**
+ * La destinazione di un evento quando nessuno ne sceglie una: quella dichiarata,
+ * o riservata se comincia a registrare adesso (`registra`, e prima non registrava).
+ * Un evento nuovo o una copia cominciano sempre: `recordingEnabled` falso.
+ *
+ * E' l'unica regola per chi non sceglie: creazione, copia, modifica, caricamento
+ * di un file e cio' che il wizard annuncia. Vale per chiunque accenda la
+ * registrazione: un link di conduzione non puo' scegliere la destinazione, quindi
+ * il suo salvataggio non si blocca e il video parte dalla scelta piu' stretta.
+ * Allargarla resta allo staff, finche' la sala non si apre.
+ *
+ * Resta null chi registrava gia' senza averla dichiarata: sono gli eventi nati
+ * prima di questa scelta, che pubblicano con un avviso. Restano null anche le
+ * chiamate rapide. Senza registrazione non si dichiara niente: la destinazione
+ * deciderebbe da sola sulle domande dopo l'evento (`domandePubbliche`).
+ */
+export function destinazioneDiPartenza(
+  evento: {
+    recordingEnabled: boolean;
+    recordingDestination?: Destinazione;
+    eventType?: string;
+  },
+  registra: boolean
+): Destinazione {
+  const comincia = registra && !evento.recordingEnabled;
+  return (
+    evento.recordingDestination ??
+    (comincia && evento.eventType !== 'INSTANT' ? DESTINAZIONE_DI_PARTENZA : null)
+  );
+}
+
 /**
  * La versione del testo del consenso alla registrazione. Si salva con il
  * consenso, accanto alla destinazione letta (Registration.consentRecordingVersion,

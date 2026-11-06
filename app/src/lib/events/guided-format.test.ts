@@ -320,6 +320,14 @@ describe('formatoPossibile', () => {
       expect(formatoPossibile(f, true)).toEqual(f);
     }
   });
+
+  it('senza il video della sala un video pubblico diventa riservato, il resto no', () => {
+    for (const f of FORMATI) {
+      const atteso = f.registra === 'pubblica' ? { ...f, registra: 'riservata' } : f;
+      expect(formatoPossibile(f, true, false)).toEqual(atteso);
+      expect(formatoPossibile(f, false, false).registra).toBe('no');
+    }
+  });
 });
 
 describe('presetDaFormato: l\'elenco dei partecipanti', () => {

@@ -9,12 +9,14 @@ import { useTranslations } from 'next-intl';
 import { useRouter, percorso } from '@/i18n/navigation';
 import GuidedFormat from '@/components/admin/guided-format';
 import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import { videoDaDestinare } from '@/lib/recording/destination';
 import TemplatePicker from '@/components/admin/template-picker';
 import {
-  FORMATO_PREDEFINITO,
   codificaFormato,
   decodificaFormato,
+  formatoConAccesso,
   formatoPossibile,
+  formatoPredefinito,
   presetDaFormato,
   type FormatoGuidato,
 } from '@/lib/events/guided-format';
@@ -115,7 +117,8 @@ export default function CreateEventWithTemplate({
   const [modelliAperti, setModelliAperti] = useState(false);
   // Le quattro risposte nell'indirizzo: aprono il wizard con i loro valori.
   const letto = selectedTemplate ? null : decodificaFormato(formatoParam);
-  const formato: FormatoGuidato | null = letto && formatoPossibile(letto, recordingAvailable);
+  const formato: FormatoGuidato | null =
+    letto && formatoPossibile(letto, recordingAvailable, videoDaDestinare(voceNelVideo));
 
   if (showInstant) {
     return (
@@ -179,7 +182,7 @@ export default function CreateEventWithTemplate({
         router.push(
           percorso(
             invitati
-              ? `/admin/events/new?scegli=${codificaFormato({ ...FORMATO_PREDEFINITO, accesso: 'invitati' })}`
+              ? `/admin/events/new?scegli=${codificaFormato(formatoPredefinito('invitati'))}`
               : '/admin/events/new',
           ),
         ),
@@ -199,11 +202,12 @@ export default function CreateEventWithTemplate({
       template: presetDaFormato(formato, nome, publicRegistrationEnabled),
       formatoLabel: nome,
       // Chi partecipa come lo si vede ora: cambiato nel passo «Persone», le
-      // domande lo mostrano cosi'.
+      // domande lo mostrano cosi'. Il passaggio agli inviti non porta con se' un
+      // video pubblico che nessuno ha scelto per loro.
       onChangeTemplate: ({ invitati }) =>
         router.push(
           percorso(
-            `/admin/events/new?scegli=${codificaFormato({ ...formato, accesso: invitati ? 'invitati' : 'tutti' })}`,
+            `/admin/events/new?scegli=${codificaFormato(formatoConAccesso(formato, invitati ? 'invitati' : 'tutti'))}`,
           ),
         ),
     });
@@ -217,6 +221,8 @@ export default function CreateEventWithTemplate({
           aiPipelineEnabled={aiPipelineEnabled}
           liveCaptionsAvailable={liveCaptionsAvailable}
           recordingAvailable={recordingAvailable}
+          voceNelVideo={voceNelVideo}
+          addressBookAvailable={addressBookEnabled}
           onContinue={(f) => router.push(percorso(`/admin/events/new?formato=${codificaFormato(f)}`))}
           // Il modello si sceglie prima di rispondere, non dopo: un'azione
           // accanto al titolo. La videochiamata istantanea non sta qui: ha il

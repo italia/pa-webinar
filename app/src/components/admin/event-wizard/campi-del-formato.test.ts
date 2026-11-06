@@ -8,9 +8,10 @@ import {
   campiDaModello,
   campiDaSalvare,
   destinazioneDopoIlSalvataggio,
-  videoDaDestinare,
   type CampiDelFormato,
 } from './campi-del-formato';
+import { videoDaDestinare } from '@/lib/recording/destination';
+
 import type { WizardForm, WizardTemplatePreset } from './wizard-shell';
 
 /**

@@ -6,7 +6,7 @@
  * database vero: cio' che le rotte scrivono, cio' che si rifiuta e cio' che resta
  * com'era. Nessun finto, salvo i cookie della richiesta.
  */
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { POST as duplica } from '@/app/api/admin/events/[id]/duplicate/route';
 import { PATCH as pubblica } from '@/app/api/admin/publications/[id]/route';
@@ -14,11 +14,19 @@ import { GET as leggi, PUT as aggiorna } from '@/app/api/events/[param]/route';
 import { POST as creaChiamata } from '@/app/api/events/instant/route';
 import { POST as crea } from '@/app/api/events/route';
 import { prisma } from '@/lib/db';
+import { voceNelVideo } from '@/lib/recording/availability';
+import {
+  consensoCopre,
+  consensoOra,
+  destinazioneDelTesto,
+} from '@/lib/recording/destination';
 
 import {
   creaEvento,
+  creaIscrizione,
   creaSessione,
   entraCome,
+  esci,
   richiesta,
   svuotaDatabase,
 } from './fixtures';
@@ -85,6 +93,23 @@ describe('alla creazione', () => {
     });
   });
 
+  it('senza registrazione anche un null esplicito resta nullo, e le domande restano', async () => {
+    const r = await creazione({
+      ...CORPO,
+      recordingEnabled: false,
+      recordingDestination: null,
+      postEventShowQA: true,
+    });
+    expect(r.status).toBe(201);
+    const { id } = (await r.json()) as { id: string };
+    expect(await riga(id)).toMatchObject({
+      recordingEnabled: false,
+      recordingDestination: null,
+      recordingAudience: 'PUBLIC',
+      postEventShowQA: true,
+    });
+  });
+
   it('senza registrazione la destinazione resta nulla', async () => {
     const r = await creazione({ ...CORPO, recordingEnabled: false });
     const { id } = (await r.json()) as { id: string };
@@ -130,6 +155,32 @@ describe('la copia', () => {
       recordingDestination: null,
       recordingAudience: 'PUBLIC',
     });
+  });
+
+  it('di un evento che non registra resta senza destinazione', async () => {
+    const originale = await creaEvento({ recordingEnabled: false, status: 'ENDED' });
+    const r = await duplica(
+      richiesta(`/api/admin/events/${originale.id}/duplicate`, 'POST') as never,
+      { params: Promise.resolve({ id: originale.id }) }
+    );
+    expect(r.status).toBe(201);
+    const { id } = (await r.json()) as { id: string };
+    expect(await riga(id)).toMatchObject({
+      recordingEnabled: false,
+      recordingDestination: null,
+      recordingAudience: 'PUBLIC',
+    });
+  });
+
+  it('di un evento riservato resta riservata, con il pubblico allineato', async () => {
+    const originale = await creaEvento({ ...RISERVATO, status: 'ENDED' });
+    const r = await duplica(
+      richiesta(`/api/admin/events/${originale.id}/duplicate`, 'POST') as never,
+      { params: Promise.resolve({ id: originale.id }) }
+    );
+    expect(r.status).toBe(201);
+    const { id } = (await r.json()) as { id: string };
+    expect(await riga(id)).toMatchObject(RISERVATO);
   });
 });
 
@@ -256,6 +307,77 @@ describe('un evento senza destinazione', () => {
     expect(await riga(evento.id)).toMatchObject(RISERVATO);
   });
 
+  describe('con un link di conduzione, senza sessione', () => {
+    beforeEach(esci);
+
+    it('accendere la registrazione non si blocca, e parte riservata', async () => {
+      const evento = await creaEvento({ recordingEnabled: false, status: 'PUBLISHED' });
+      const r = await modifica(evento, { recordingEnabled: true });
+      expect(r.status).toBe(200);
+      expect(await riga(evento.id)).toMatchObject(RISERVATO);
+    });
+
+    it('anche con gente iscritta: il consenso senza destinazione non copre', async () => {
+      const evento = await creaEvento({ recordingEnabled: false, status: 'PUBLISHED' });
+      const iscrizione = await creaIscrizione(evento.id);
+      expect((await modifica(evento, { recordingEnabled: true })).status).toBe(200);
+      expect(await riga(evento.id)).toMatchObject(RISERVATO);
+      const dopo = await prisma.registration.findUniqueOrThrow({
+        where: { id: iscrizione.id },
+      });
+      expect(consensoCopre(dopo.consentRecordingDestination, RISERVATO.recordingDestination)).toBe(
+        false
+      );
+    });
+
+    it('scegliere la destinazione resta allo staff', async () => {
+      const evento = await creaEvento({ recordingEnabled: false, status: 'PUBLISHED' });
+      const r = await modifica(evento, {
+        recordingEnabled: true,
+        recordingDestination: 'PUBLIC',
+      });
+      expect(r.status).toBe(403);
+      expect(await riga(evento.id)).toMatchObject({
+        recordingEnabled: false,
+        recordingDestination: null,
+      });
+    });
+
+    it('un evento che registrava gia resta senza destinazione', async () => {
+      const evento = await creaEvento({ recordingEnabled: true, status: 'PUBLISHED' });
+      const r = await modifica(evento, { recordingEnabled: true, maxParticipants: 50 });
+      expect(r.status).toBe(200);
+      expect(await riga(evento.id)).toMatchObject({
+        recordingDestination: null,
+        recordingAudience: 'PUBLIC',
+        maxParticipants: 50,
+      });
+    });
+
+    it('una chiamata rapida resta senza destinazione', async () => {
+      const evento = await creaEvento({
+        eventType: 'INSTANT',
+        recordingEnabled: false,
+        status: 'PUBLISHED',
+      });
+      expect((await modifica(evento, { recordingEnabled: true })).status).toBe(200);
+      expect(await riga(evento.id)).toMatchObject({
+        recordingEnabled: true,
+        recordingDestination: null,
+      });
+    });
+
+    it('a sala aperta la registrazione non si accende, e la destinazione non cambia', async () => {
+      const evento = await creaEvento({ recordingEnabled: false, status: 'LIVE' });
+      const r = await modifica(evento, { recordingEnabled: true });
+      expect(r.status).toBe(200);
+      expect(await riga(evento.id)).toMatchObject({
+        recordingEnabled: false,
+        recordingDestination: null,
+      });
+    });
+  });
+
   it('che comincia a registrare caricando un file parte riservato', async () => {
     const evento = await creaEvento({ recordingEnabled: false, status: 'ENDED' });
     expect((await modificaPubblicazione(evento.id, { recordingUrl: FILE })).status).toBe(
@@ -287,6 +409,87 @@ describe('un evento senza destinazione', () => {
       recordingEnabled: true,
       recordingUrl: FILE,
     });
+  });
+});
+
+describe('dove il video della sala non c e', () => {
+  // Il Jitsi del chart senza Jibri: solo tracce, voce assente.
+  beforeEach(() => {
+    vi.stubEnv('JITSI_WEB_INTERNAL_URL', 'http://jitsi-web.interno');
+    vi.stubEnv('JIBRI_HEALTH_URL', '');
+    vi.stubEnv('RECORDER_CONTROLLER_URL', 'http://controller.interno');
+  });
+  afterEach(() => vi.unstubAllEnvs());
+
+  async function eventoNuovo() {
+    const r = await creazione({ ...CORPO, recordingEnabled: true, recordingDestination: null });
+    expect(r.status).toBe(201);
+    const { id } = (await r.json()) as { id: string };
+    return prisma.event.findUniqueOrThrow({ where: { id } });
+  }
+
+  it('un evento nuovo che registra parte riservato, anche con un null esplicito', async () => {
+    expect(await eventoNuovo()).toMatchObject(RISERVATO);
+  });
+
+  it('un evento che accende la registrazione parte riservato', async () => {
+    const evento = await creaEvento({ recordingEnabled: false, status: 'PUBLISHED' });
+    expect((await modifica(evento, { recordingEnabled: true })).status).toBe(200);
+    expect(await riga(evento.id)).toMatchObject(RISERVATO);
+  });
+
+  it('una copia di un evento vecchio che registrava parte riservata', async () => {
+    const originale = await creaEvento({ recordingEnabled: true, status: 'ENDED' });
+    const r = await duplica(
+      richiesta(`/api/admin/events/${originale.id}/duplicate`, 'POST') as never,
+      { params: Promise.resolve({ id: originale.id }) }
+    );
+    expect(r.status).toBe(201);
+    const { id } = (await r.json()) as { id: string };
+    expect(await riga(id)).toMatchObject(RISERVATO);
+  });
+
+  it('un file caricato su un evento spento e un video, e parte riservato', async () => {
+    const evento = await creaEvento({ recordingEnabled: false, status: 'ENDED' });
+    expect((await modificaPubblicazione(evento.id, { recordingUrl: FILE })).status).toBe(200);
+    expect(await riga(evento.id)).toMatchObject(RISERVATO);
+  });
+
+  it('un file caricato su un evento nuovo che registra resta riservato', async () => {
+    const evento = await eventoNuovo();
+    expect((await modificaPubblicazione(evento.id, { recordingUrl: FILE })).status).toBe(200);
+    expect(await riga(evento.id)).toMatchObject({
+      ...RISERVATO,
+      recordingUrl: FILE,
+      recordingPublished: true,
+    });
+  });
+
+  it('un evento nuovo che registra non accetta un video esterno', async () => {
+    const evento = await eventoNuovo();
+    const r = await modificaPubblicazione(evento.id, {
+      youtubeUrl: 'https://www.youtube.com/watch?v=abc',
+    });
+    expect(r.status).toBe(409);
+    expect(await r.json()).toMatchObject(NON_COPERTA);
+  });
+
+  it('se l installazione aggiunge il video, chi ha letto quel testo va richiesto', async () => {
+    const evento = await eventoNuovo();
+    const iscrizione = await creaIscrizione(evento.id);
+    const letto = {
+      recordingConsent: true,
+      recordingConsentDestination: iscrizione.consentRecordingDestination,
+    };
+    const inVigore = () => destinazioneDelTesto(evento.recordingDestination, voceNelVideo());
+
+    expect(voceNelVideo()).toBe('assente');
+    expect(consensoOra(letto, inVigore())).toBe(true);
+
+    vi.stubEnv('JIBRI_HEALTH_URL', 'http://jibri.interno');
+    expect(voceNelVideo()).toBe('fissa');
+    expect(consensoOra(letto, inVigore())).toBe(false);
+    expect(consensoCopre(iscrizione.consentRecordingDestination, inVigore())).toBe(false);
   });
 });
 

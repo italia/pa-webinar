@@ -74,6 +74,53 @@ function scegli(testo: string) {
   });
 }
 
+describe('formato guidato, dove il video della sala non c e', () => {
+  const assente = { voceNelVideo: 'assente' } as const;
+  const risposte = () =>
+    Array.from(container.querySelectorAll<HTMLInputElement>('input[type="radio"]'))
+      .filter((i) => i.name.endsWith('-registra'))
+      .map((i) => i.value);
+
+  it('non propone un video pubblico', () => {
+    render(vi.fn(), true, assente);
+    expect(risposte()).toEqual(['riservata', 'no']);
+    expect(container.textContent).not.toContain(g.rec.publicDesc);
+  });
+
+  it('la risposta che il formato avrebbe proposto resta visibile come riservata', () => {
+    render(vi.fn(), true, assente);
+    expect(registraScelta()).toBe('riservata');
+    expect(anteprima()).toContain(f.recordingDestinationReserved);
+    expect(anteprima()).toContain(f.postEventQaHidden);
+    expect(anteprima()).not.toContain(f.recordingDestinationPublic);
+  });
+
+  it('una risposta pubblica rimasta nell indirizzo non si promette', () => {
+    const onContinue = render(vi.fn(), true, {
+      ...assente,
+      initial: { persone: 'medio', voce: 'tutti', registra: 'pubblica', accesso: 'tutti' },
+    });
+    expect(registraScelta()).toBe('riservata');
+    expect(anteprima()).toContain(f.postEventQaHidden);
+    continua();
+    expect(onContinue).toHaveBeenCalledWith(expect.objectContaining({ registra: 'riservata' }));
+  });
+
+  it('il no resta no, e le domande restano sulla pagina', () => {
+    const onContinue = render(vi.fn(), true, assente);
+    scegli(g.rec.no);
+    expect(registraScelta()).toBe('no');
+    expect(anteprima()).toContain(f.postEventQaTextOnly);
+    continua();
+    expect(onContinue).toHaveBeenCalledWith(expect.objectContaining({ registra: 'no' }));
+  });
+
+  it('con il video le tre risposte restano', () => {
+    render(vi.fn(), true, { voceNelVideo: 'fissa' });
+    expect(risposte()).toEqual(['riservata', 'pubblica', 'no']);
+  });
+});
+
 describe('formato guidato', () => {
   it('parte da «fino a 100, tutti in video, con registrazione», e l anteprima lo dice', () => {
     render();

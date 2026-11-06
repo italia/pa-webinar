@@ -25,13 +25,13 @@ import { registraChiConduce } from '@/lib/live/entry-consents';
 import { elencoVisibileAlPubblico } from '@/lib/live/participant-list';
 import { domandePubbliche } from '@/lib/events/post-event-sections';
 import { rubricaProposta } from '@/lib/persons/address-book';
-import type { Destinazione } from '@/lib/recording/destination';
+import { videoDaDestinare, type Destinazione } from '@/lib/recording/destination';
 import { consensiRichiesti, trascrizioneDalVideo } from '@/lib/registration/consents';
 import { togglesFromMatrix } from '@/lib/utils/permission-matrix';
 import { splitTitleKicker } from '@/lib/utils/title-kicker';
 import { describeRRule } from '@/lib/utils/recurrence';
 
-import { destinazioneDopoIlSalvataggio, videoDaDestinare } from './campi-del-formato';
+import { destinazioneDopoIlSalvataggio } from './campi-del-formato';
 import ConsentDiagram from './consent-diagram';
 import { vociCompilate } from './programme-plan';
 import { nomeLingua } from './text-translation';
@@ -85,8 +85,9 @@ interface Props {
   /** Porta alla scelta della destinazione. Assente con un link di conduzione:
    *  la scelta non c'e', la fa lo staff. */
   onCambiaDestinazione?: () => void;
-  /** La destinazione dell'evento salvato, null se e' nuovo o non l'ha dichiarata. */
-  destinazioneSalvata?: Destinazione;
+  /** La destinazione che l'evento tiene se il modulo non ne sceglie una
+   *  (`destinazioneDiPartenza`). */
+  destinazioneSenzaScelta?: Destinazione;
   /** La capacita' in una riga: il carico del ponte e quanto riceve chi guarda;
    *  da «attenzione» in su e' un avviso. Porta ai dettagli tecnici. */
   capacita?: RiepilogoCapacita;
@@ -127,7 +128,7 @@ export default function Step5Review({
   addressBookEnabled = true,
   chiedeDestinazione = false,
   onCambiaDestinazione,
-  destinazioneSalvata = null,
+  destinazioneSenzaScelta = null,
   capacita,
   sopratitolo = false,
   iscrizioneAperta,
@@ -202,6 +203,8 @@ export default function Step5Review({
   // partecipa, con la stessa regola (lib/registration/consents): chi crea
   // l'evento vede prima cosa si chiedera', e se la scelta e' quella voluta.
   const registra = form.recordingEnabled && recordingAvailable;
+  const destinazioneDopo = destinazioneDopoIlSalvataggio(form, destinazioneSenzaScelta);
+  const conVideo = videoDaDestinare(voceNelVideo);
   const trascrizioneVideo = trascrizioneDalVideo(
     {
       eventType: istantanea ? 'INSTANT' : null,
@@ -488,21 +491,22 @@ export default function Step5Review({
                 : form.autoStartRecording
                   ? t('summary.recordingAuto')
                   : tf('recordingManual')}
-              {/* Dove va il video, se un video c'e'. Se manca e va scelto, lo dice
-                  l'elenco in cima. */}
+              {/* Dove va il video. Se manca e va scelto, lo dice l'elenco in cima.
+                  Dove il video della sala non c'e' si dice solo quella che l'evento
+                  avra', e non si cambia: la scelta non si propone. */}
               {registra &&
                 !istantanea &&
-                videoDaDestinare(voceNelVideo) &&
+                (conVideo || destinazioneDopo !== null) &&
                 (form.recordingDestination || !chiedeDestinazione) && (
                 <span className="d-block">
-                  {form.recordingDestination === null
+                  {destinazioneDopo === null
                     ? tp(onCambiaDestinazione ? 'recordingDestinationNotSet' : 'recordingDestinationStaffOnly')
                     : tf(
-                        form.recordingDestination === 'PUBLIC'
+                        destinazioneDopo === 'PUBLIC'
                           ? 'recordingDestinationPublic'
                           : 'recordingDestinationReserved',
                       )}
-                  {onCambiaDestinazione && (
+                  {onCambiaDestinazione && conVideo && (
                     <>
                       {' '}
                       <button
@@ -607,7 +611,7 @@ export default function Step5Review({
                     domandePubbliche({
                       postEventShowQA: form.postEventShowQA,
                       qaEnabled: toggles.qaEnabled,
-                      recordingDestination: destinazioneDopoIlSalvataggio(form, destinazioneSalvata),
+                      recordingDestination: destinazioneDopo,
                     })
                       ? 'postEventQaTextOnly'
                       : 'postEventQaHidden',

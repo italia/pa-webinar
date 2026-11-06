@@ -57,6 +57,7 @@ import { unisciTesti } from '@/lib/text-translation/unione-testi';
 import { salaForseAperta, salaGiaAperta } from '@/lib/live/room-open';
 import {
   assertEsposizioneConsentita,
+  destinazioneDiPartenza,
   erroreDestinazioneNonCoperta,
   puoCambiareDestinazione,
   type Destinazione,
@@ -402,17 +403,13 @@ export const PUT = withErrorHandling(async (request, context) => {
     }
   }
 
-  // Lo stato che la richiesta scrive, dopo i campi tolti qui sopra. Un evento
-  // che comincia a registrare adesso non e' un evento storico: come alla
-  // creazione, senza una scelta la destinazione e' riservata. Le chiamate rapide
-  // restano senza. La guardia confronta prima e dopo, quindi una modifica che
-  // non espone di piu' passa: la chiusura dell'evento, un salvataggio dal wizard.
+  // Lo stato che la richiesta scrive, dopo i campi tolti qui sopra. La guardia
+  // confronta prima e dopo, quindi una modifica che non espone di piu' passa: la
+  // chiusura dell'evento, un salvataggio dal wizard.
   const destinazionePrima = event.recordingDestination ?? null;
-  const comincia = data.recordingEnabled === true && !event.recordingEnabled;
   const destinazioneDopo: Destinazione =
     data.recordingDestination ??
-    destinazionePrima ??
-    (comincia && event.eventType !== 'INSTANT' ? 'REGISTRANTS' : null);
+    destinazioneDiPartenza(event, data.recordingEnabled === true);
   const pubblicoDopo = pubblicoAllineato(
     destinazionePrima,
     destinazioneDopo,
