@@ -40,7 +40,7 @@ import { localizedPath } from '@/lib/utils/localized-url';
 import { OVERTIME_CAP_DEFAULT_MINUTES } from '@/lib/events/overtime-defaults';
 import { entiEPersonePubblici, PERSONE_PUBBLICHE_INCLUDE } from '@/lib/events/public-people';
 import { elencoVisibileAlPubblico } from '@/lib/live/participant-list';
-import { domandePubbliche } from '@/lib/events/post-event-sections';
+import { domandePubbliche, domandePubblicabili } from '@/lib/events/post-event-sections';
 
 export const dynamic = 'force-dynamic';
 
@@ -238,6 +238,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
           materials: event.postEventShowMaterials,
           feedback: event.postEventShowFeedback,
         },
+            domandePubblicabili: domandePubblicabili(event),
             libraryListed: event.libraryListed,
             recordingEnabled: isInstant ? false : event.recordingEnabled,
             autoStartRecording: isInstant ? false : event.autoStartRecording,
@@ -459,6 +460,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
           materials: event.postEventShowMaterials,
           feedback: event.postEventShowFeedback,
         },
+        domandePubblicabili: domandePubblicabili(event),
         libraryListed: event.libraryListed,
         recordingEnabled: event.recordingEnabled,
         autoStartRecording: event.autoStartRecording,

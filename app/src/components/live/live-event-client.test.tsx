@@ -110,7 +110,13 @@ vi.mock('@/components/presentation/use-presentation', async () => {
 });
 
 // I pannelli della sala non c'entrano con i consensi.
-vi.mock('@/components/qa/qa-panel', () => ({ default: () => null }));
+const pannelloDomande = vi.hoisted(() => ({ props: null as { domandePubblicate: boolean } | null }));
+vi.mock('@/components/qa/qa-panel', () => ({
+  default: (props: { domandePubblicate: boolean }) => {
+    pannelloDomande.props = props;
+    return null;
+  },
+}));
 vi.mock('@/components/polls/poll-panel', () => ({ default: () => null }));
 vi.mock('@/components/live/agenda-panel', () => ({ default: () => null }));
 vi.mock('@/components/materials/material-panel', () => ({ default: () => null }));
@@ -189,6 +195,7 @@ beforeEach(() => {
   letture = [];
   statiEvento = [];
   flagsDellaSala.dati = undefined;
+  pannelloDomande.props = null;
   vi.stubGlobal(
     'fetch',
     vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -384,6 +391,33 @@ describe("sala — quello che arriva alla sala d'attesa", () => {
         attiva: true,
         domandeAttive: true,
       });
+    });
+
+    it.each([true, false])('una chiamata rapida apre il Q&A dal vivo: domande pubblicabili %s', async (valore) => {
+      flagsDellaSala.dati = { qaEnabled: true };
+      await monta({
+        event: {
+          ...evento,
+          eventType: 'INSTANT',
+          qaEnabled: false,
+          schedaPrivacy: null,
+          postEventShow: {
+            recap: false,
+            qa: false,
+            polls: false,
+            wordCloud: false,
+            materials: false,
+            feedback: false,
+          },
+          domandePubblicabili: valore,
+        },
+      });
+      await entra();
+      const scheda = [...document.querySelectorAll('button')].find(
+        (b) => b.textContent?.trim() === l.sidebarTabQa,
+      );
+      await act(async () => scheda?.click());
+      expect(pannelloDomande.props?.domandePubblicate).toBe(valore);
     });
 
     it('la rubrica non arriva alla sala d\'attesa, che non ha quella casella', async () => {
