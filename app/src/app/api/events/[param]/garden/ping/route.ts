@@ -24,7 +24,9 @@
  * dell'evento non compare e vede soltanto quanti sono, senza nomi. Con
  * l'elenco nascosto (lib/live/participant-list) i nomi restano a chi conduce e
  * a chi interviene: il pubblico compare e cammina, ma degli altri non li riceve.
- * Rate-limited per IP. Not persistent: positions live only in Redis for 10 s.
+ * Dove il pubblico e' anonimo la piazza non c'e', e nessuna presenza si scrive:
+ * un nome in arrivo non resta. Rate-limited per IP. Not persistent: positions
+ * live only in Redis for 10 s.
  */
 
 import { createHash, createHmac, randomBytes } from 'node:crypto';
@@ -195,6 +197,10 @@ export const POST = withErrorHandling(async (request, context) => {
   // ENDED there's nothing to wait for — reject silently so stragglers
   // don't keep writing.
   if (event.status === 'ENDED' || event.status === 'DRAFT' || event.status === 'IDLE') {
+    return NextResponse.json({ peers: [], active: false });
+  }
+
+  if (event.audienceAnonymous) {
     return NextResponse.json({ peers: [], active: false });
   }
 

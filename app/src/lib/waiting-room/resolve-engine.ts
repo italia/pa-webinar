@@ -7,6 +7,8 @@
  * precedence is unit-testable independent of the React effect that gathers the
  * inputs (window.location, localStorage, matchMedia).
  *
+ * Dove il pubblico e' anonimo la piazza non c'e': niente la riapre.
+ *
  * Precedence (highest first):
  *   1. explicit `?engine=` override (debug / opt-in escape hatch) — wins over
  *      the phone default AND a saved classic preference;
@@ -28,8 +30,12 @@ export function resolveWaitingRoomMode(opts: {
   urlEngine: string | null;
   isPhone: boolean;
   classicPref: boolean;
+  /** Il pubblico dell'evento e' anonimo. */
+  pubblicoAnonimo?: boolean;
 }): WaitingRoomMode {
-  const { configured, urlEngine, isPhone, classicPref } = opts;
+  const { configured, urlEngine, isPhone, classicPref, pubblicoAnonimo } = opts;
+
+  if (pubblicoAnonimo) return 'CLASSIC';
 
   // 1) Explicit URL override wins over everything. `svg` is the legacy name of
   //    the deleted garden: it now lands on the piazza, the only game there is.

@@ -132,6 +132,7 @@ export default function RegistrationFormClient({
   const tg = useTranslations('gdpr');
   const tc = useTranslations('common');
   const tlive = useTranslations('live');
+  const tw = useTranslations('waiting');
   const router = useRouter();
 
   const [displayName, setDisplayName] = useState(invito?.name ?? '');
@@ -693,7 +694,9 @@ export default function RegistrationFormClient({
           valid={errors.displayName ? false : undefined}
         />
         <small id="displayNameHelp" className="form-text">
-          {t('namePlaceholder')}
+          {/* Lo stesso testo della sala d'attesa: dove il pubblico e' anonimo la
+              sala non mostra il nome. */}
+          {schedaPrivacy?.pseudonimi ? tw('anonymousNameHelp') : t('namePlaceholder')}
         </small>
         {errors.displayName && (
           <div id="displayNameError" className="invalid-feedback d-block">

@@ -403,6 +403,21 @@ describe('RegistrationFormClient — la scheda privacy', () => {
     rubrica: null,
   };
 
+  describe('la nota sotto il nome', () => {
+    const nota = () => container.querySelector('#displayNameHelp')?.textContent;
+
+    it('dove il pubblico e\' anonimo dice lo stesso della sala d\'attesa', () => {
+      conScheda({ schedaPrivacy: { ...SCHEDA, pseudonimi: true } });
+      expect(nota()).toBe(messages.waiting.anonymousNameHelp);
+      expect(nota()).not.toBe(messages.registration.namePlaceholder);
+    });
+
+    it('altrimenti il nome si vede in sala', () => {
+      conScheda({ schedaPrivacy: SCHEDA });
+      expect(nota()).toBe(messages.registration.namePlaceholder);
+    });
+  });
+
   function conScheda(props: Partial<ComponentProps<typeof RegistrationFormClient>> = {}) {
     act(() => {
       root.render(

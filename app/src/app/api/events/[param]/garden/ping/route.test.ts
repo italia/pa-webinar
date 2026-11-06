@@ -207,6 +207,24 @@ describe('POST /api/events/[param]/garden/ping — chi vede i nomi', () => {
   });
 });
 
+describe('POST /api/events/[param]/garden/ping — pubblico anonimo', () => {
+  it('la piazza non c\'e\': il nome in arrivo non si scrive, e degli altri non torna niente', async () => {
+    mockedEvent.mockResolvedValue({
+      id: EVENT_ID,
+      status: 'LIVE',
+      participantListVisible: true,
+      audienceAnonymous: true,
+    });
+    mockedList.mockResolvedValue([legacyPing()]);
+
+    const res = await POST(pingRequest(legacyPing()), ctx());
+
+    expect(res.status).toBe(200);
+    expect(mockedPublish).not.toHaveBeenCalled();
+    expect(await res.json()).toEqual({ peers: [], active: false });
+  });
+});
+
 describe('POST /api/events/[param]/garden/ping — canale emote', () => {
   it('inoltra l’emote fino al record del peer', async () => {
     const body = { ...legacyPing(), emote: { type: 'wave', at: 1_000 } };
