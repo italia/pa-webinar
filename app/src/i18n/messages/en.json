@@ -3810,7 +3810,7 @@
         "title": "Report",
         "pubblicato": "Published.",
         "daPubblicare": "Generated: read it and publish it.",
-        "daGenerare": "To generate, from the transcript, the chat and the ratings.",
+        "daGenerare": "To generate, from the transcript, polls, ratings and, when they are published, questions.",
         "inLavorazione": "In progress.",
         "senzaPipeline": "AI post-production is not enabled on this installation.",
         "soloStaff": "The event organizer generates and publishes it from the administration area.",
@@ -5810,7 +5810,7 @@
       "strengths": "Strengths",
       "improvements": "To improve",
       "quotes": "From the comments",
-      "aiNotice": "The text is written by an artificial intelligence model from the transcript, chat, questions, polls and ratings, and the staff reviewed it before publishing. The numbers and charts are computed by the platform. It may contain inaccuracies."
+      "aiNotice": "The text is written by an artificial intelligence model from the transcript, polls, ratings and, when they are published, questions, and the staff reviewed it before publishing. The numbers and charts are computed by the platform. It may contain inaccuracies."
     },
     "languages": {
       "title": "Watch in",

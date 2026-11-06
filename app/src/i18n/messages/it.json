@@ -4020,7 +4020,7 @@
         "title": "Resoconto",
         "pubblicato": "Pubblicato.",
         "daPubblicare": "Generato: rileggilo e pubblicalo.",
-        "daGenerare": "Da generare, a partire da trascrizione, chat e valutazioni.",
+        "daGenerare": "Da generare, a partire da trascrizione, sondaggi, valutazioni e, se sono pubblicate, domande.",
         "inLavorazione": "In lavorazione.",
         "senzaPipeline": "La post-produzione AI non è attiva su questa installazione.",
         "soloStaff": "Lo genera e lo pubblica chi organizza l'evento, dall'area riservata.",
@@ -5810,7 +5810,7 @@
       "strengths": "Punti di forza",
       "improvements": "Da migliorare",
       "quotes": "Dai commenti",
-      "aiNotice": "Il testo è scritto da un modello di intelligenza artificiale a partire da trascrizione, chat, domande, sondaggi e valutazioni, e lo staff lo ha riletto prima di pubblicarlo. I numeri e i grafici li calcola la piattaforma. Può contenere imprecisioni."
+      "aiNotice": "Il testo è scritto da un modello di intelligenza artificiale a partire da trascrizione, sondaggi, valutazioni e, se sono pubblicate, domande, e lo staff lo ha riletto prima di pubblicarlo. I numeri e i grafici li calcola la piattaforma. Può contenere imprecisioni."
     },
     "languages": {
       "title": "Guarda in",
