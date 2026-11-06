@@ -606,12 +606,15 @@ export default function Step5Review({
               )}
               {!istantanea && toggles.qaEnabled && (
                 <span className="d-block">
+                  {/* Con la pagina privata nessuno le legge, come nell'anteprima
+                      delle domande guidate. */}
                   {tf(
-                    domandePubbliche({
-                      postEventShowQA: form.postEventShowQA,
-                      qaEnabled: toggles.qaEnabled,
-                      recordingDestination: destinazioneDopo,
-                    })
+                    form.postEventPublic &&
+                      domandePubbliche({
+                        postEventShowQA: form.postEventShowQA,
+                        qaEnabled: toggles.qaEnabled,
+                        recordingDestination: destinazioneDopo,
+                      })
                       ? 'postEventQaTextOnly'
                       : 'postEventQaHidden',
                   )}
