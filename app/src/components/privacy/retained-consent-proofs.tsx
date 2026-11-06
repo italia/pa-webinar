@@ -3,7 +3,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useFormatter, useLocale, useTranslations } from 'next-intl';
 import { Button, Card, CardBody } from 'design-react-kit';
 
@@ -28,6 +28,11 @@ export interface ProvaConservataVista {
  * esiste piu', con la stessa conferma di quelli delle iscrizioni. Il ritiro di
  * una prova vale per lo stesso consenso su tutto l'evento, e quello della
  * registrazione ritira anche la trascrizione.
+ *
+ * La conferma sostituisce il bottone premuto, e il ritiro la toglie: il fuoco non
+ * si perde, passa al gruppo della conferma e torna al titolo della riga. L'esito
+ * dice evento e consenso, e si annuncia in una zona sempre presente nella pagina:
+ * il titolo della riga non dice che il ritiro e' avvenuto.
  */
 export default function RetainedConsentProofs({
   token,
@@ -45,12 +50,36 @@ export default function RetainedConsentProofs({
   const [conferma, setConferma] = useState<string | null>(null);
   const [inCorso, setInCorso] = useState(false);
   const [errore, setErrore] = useState<string | null>(null);
+  const [esito, setEsito] = useState('');
+  const gruppoConferma = useRef<HTMLDivElement>(null);
+  const titoli = useRef(new Map<string, HTMLElement>());
+  // La riga a cui riportare il fuoco quando la conferma si chiude.
+  const rigaDaRiprendere = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (conferma) {
+      gruppoConferma.current?.focus();
+    } else if (rigaDaRiprendere.current) {
+      titoli.current.get(rigaDaRiprendere.current)?.focus();
+      rigaDaRiprendere.current = null;
+    }
+  }, [conferma]);
+
+  const chiudiConferma = (id: string) => {
+    rigaDaRiprendere.current = id;
+    setConferma(null);
+  };
 
   const data = (iso: string) => format.dateTime(new Date(iso), { dateStyle: 'long' });
+  const titolo = (prova: ProvaConservataVista) =>
+    getLocalized(prova.event.title as LocalizedField, locale);
 
   const ritira = async (prova: ProvaConservataVista) => {
     setInCorso(true);
     setErrore(null);
+    // Vuota, cosi' anche un esito uguale al precedente cambia il testo e si
+    // annuncia: gli eventi di una serie hanno lo stesso titolo.
+    setEsito('');
     try {
       const res = await fetch('/api/gdpr/consents', {
         method: 'POST',
@@ -62,6 +91,9 @@ export default function RetainedConsentProofs({
       if (res.status === 429) return setErrore(t('rateLimited'));
       if (!res.ok) return setErrore(tl('error'));
       const adesso = new Date().toISOString();
+      setEsito(
+        `${titolo(prova)} · ${tl(`${prova.kind}.title`)}: ${t('consentWithdrawnOn', { date: data(adesso) })}`
+      );
       setRighe((prima) =>
         prima.map((r) =>
           r.eventId === prova.eventId &&
@@ -71,11 +103,13 @@ export default function RetainedConsentProofs({
             : r
         )
       );
-      setConferma(null);
+      chiudiConferma(prova.id);
     } catch {
       setErrore(tl('error'));
     } finally {
       setInCorso(false);
+      // Il bottone premuto era disabilitato: dopo un errore la conferma resta.
+      gruppoConferma.current?.focus();
     }
   };
 
@@ -92,8 +126,15 @@ export default function RetainedConsentProofs({
         <ul className="list-unstyled mb-0" style={{ fontSize: '0.9rem' }}>
           {righe.map((p) => (
             <li key={p.id} className="mb-3">
-              <div className="fw-semibold">
-                {getLocalized(p.event.title as LocalizedField, locale)}
+              <div
+                className="fw-semibold"
+                tabIndex={-1}
+                ref={(elemento) => {
+                  if (elemento) titoli.current.set(p.id, elemento);
+                  else titoli.current.delete(p.id);
+                }}
+              >
+                {titolo(p)}
               </div>
               <div>{tl(`${p.kind}.title`)}</div>
               {p.name && (
@@ -115,6 +156,8 @@ export default function RetainedConsentProofs({
                     className="d-flex flex-wrap align-items-center gap-2 mt-1"
                     role="group"
                     aria-label={tl('confirmTitle')}
+                    tabIndex={-1}
+                    ref={gruppoConferma}
                   >
                     <span className="fw-semibold">{tl('confirmTitle')}</span>
                     <Button
@@ -130,7 +173,7 @@ export default function RetainedConsentProofs({
                       outline
                       size="sm"
                       disabled={inCorso}
-                      onClick={() => setConferma(null)}
+                      onClick={() => chiudiConferma(p.id)}
                     >
                       {tc('cancel')}
                     </Button>
@@ -149,6 +192,9 @@ export default function RetainedConsentProofs({
             </li>
           ))}
         </ul>
+        <p className="visually-hidden" role="status">
+          {esito}
+        </p>
         {errore && (
           <p className="text-danger small mt-2 mb-0" role="alert">
             {errore}

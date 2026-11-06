@@ -13,7 +13,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const { prisma, deleteRecordingBlob } = vi.hoisted(() => ({
   prisma: {
     event: { findFirst: vi.fn(), update: vi.fn() },
-    callSession: { findFirst: vi.fn(), delete: vi.fn() },
+    callSession: { findFirst: vi.fn(), delete: vi.fn(), updateMany: vi.fn() },
     gdprAuditLog: { create: vi.fn() },
     $transaction: vi.fn(async (operazioni: unknown[]) => Promise.all(operazioni)),
   },

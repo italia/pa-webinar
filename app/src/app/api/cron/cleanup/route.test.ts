@@ -51,7 +51,7 @@ vi.mock('@/lib/db', () => ({
     eventReminder: { deleteMany: vi.fn() },
     multitrackConsent: { deleteMany: vi.fn(), findMany: vi.fn() },
     recordingConsent: { deleteMany: vi.fn(), findMany: vi.fn() },
-    retainedConsentProof: { deleteMany: vi.fn(), createMany: vi.fn() },
+    retainedConsentProof: { deleteMany: vi.fn(), createMany: vi.fn(), findMany: vi.fn() },
     roomOccupant: { deleteMany: vi.fn() },
     captionSegment: { deleteMany: vi.fn() },
     recording: { findMany: vi.fn(), deleteMany: vi.fn() },
@@ -129,7 +129,7 @@ const db = prisma as unknown as {
   $executeRaw: Mock;
   multitrackConsent: { deleteMany: Mock; findMany: Mock };
   recordingConsent: { deleteMany: Mock; findMany: Mock };
-  retainedConsentProof: { deleteMany: Mock; createMany: Mock };
+  retainedConsentProof: { deleteMany: Mock; createMany: Mock; findMany: Mock };
   roomOccupant: { deleteMany: Mock };
   captionSegment: { deleteMany: Mock };
   recording: { findMany: Mock; deleteMany: Mock };

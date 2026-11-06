@@ -21,12 +21,13 @@ const tx = {
   registration: { deleteMany: vi.fn() },
   postprodArtifact: { findMany: vi.fn() },
   recordingConsent: { deleteMany: vi.fn() },
+  multitrackConsent: { deleteMany: vi.fn() },
   $executeRaw: vi.fn(),
 };
 const invalidate = vi.hoisted(() => vi.fn());
 const prove = vi.hoisted(() => ({
   conservaProve: vi.fn(),
-  tipiDelleProve: vi.fn(),
+  tipiDelleProveEsistenti: vi.fn(),
   togliNomeDalleProve: vi.fn(),
   togliNomeDelleIscrizioni: vi.fn(),
 }));
@@ -45,6 +46,7 @@ vi.mock('@/lib/db', () => ({
     retainedConsentProof: { count: vi.fn() },
     staffAccount: { findUnique: vi.fn() },
     recordingConsent: { findMany: vi.fn() },
+    multitrackConsent: { findMany: vi.fn() },
     $transaction: vi.fn(),
   },
 }));
@@ -74,6 +76,7 @@ const db = prisma as unknown as {
   retainedConsentProof: { count: Fn };
   staffAccount: { findUnique: Fn };
   recordingConsent: { findMany: Fn };
+  multitrackConsent: { findMany: Fn };
   $transaction: Fn;
 };
 
@@ -94,8 +97,10 @@ beforeEach(() => {
   db.eventModerator.deleteMany.mockResolvedValue({ count: 1 });
   db.eventModerator.findMany.mockResolvedValue([{ id: 'grant-1', eventId: 'evt-1', token: 'tok-1', photoId: null }]);
   tx.recordingConsent.deleteMany.mockResolvedValue({ count: 1 });
+  tx.multitrackConsent.deleteMany.mockResolvedValue({ count: 1 });
+  db.multitrackConsent.findMany.mockResolvedValue([]);
   prove.conservaProve.mockResolvedValue(0);
-  prove.tipiDelleProve.mockResolvedValue([]);
+  prove.tipiDelleProveEsistenti.mockResolvedValue([]);
   prove.togliNomeDalleProve.mockResolvedValue(new Map());
   prove.togliNomeDelleIscrizioni.mockResolvedValue(0);
   db.staffAccount.findUnique.mockResolvedValue(null);
@@ -222,9 +227,14 @@ describe('POST /api/gdpr/erasure', () => {
     // il loro link smette subito di valere.
     expect(db.eventModerator.deleteMany).toHaveBeenCalledWith({ where: { emailHash: 'h'.repeat(64) } });
     // Le prove del consenso date con quelle concessioni vanno via con loro.
-    expect(tx.recordingConsent.deleteMany).toHaveBeenCalledWith({
-      where: { eventId: { in: ['evt-1'] }, OR: [{ eventModeratorId: { in: ['grant-1'] } }] },
-    });
+    const scelte = {
+      where: {
+        eventId: { in: ['evt-1'] },
+        OR: [{ emailHash: 'h'.repeat(64) }, { eventModeratorId: { in: ['grant-1'] } }],
+      },
+    };
+    expect(tx.recordingConsent.deleteMany).toHaveBeenCalledWith(scelte);
+    expect(tx.multitrackConsent.deleteMany).toHaveBeenCalledWith(scelte);
     expect(invalidate).toHaveBeenCalledWith('evt-1', 'tok-1');
     // La foto e' legata all'email: va via anche senza iscrizioni.
     expect(db.profilePhoto.deleteMany).toHaveBeenCalledWith({ where: { emailHash: 'h'.repeat(64) } });
@@ -250,7 +260,7 @@ describe('POST /api/gdpr/erasure', () => {
 
   it('copies the proofs of a grant in the transaction that deletes them, before deleting', async () => {
     db.registration.findMany.mockResolvedValue([]);
-    prove.tipiDelleProve.mockResolvedValue(['recording', 'transcription']);
+    prove.tipiDelleProveEsistenti.mockResolvedValue(['recording', 'transcription']);
     prove.conservaProve.mockResolvedValue(1);
     db.retainedConsentProof.count.mockResolvedValue(1);
 
@@ -261,6 +271,7 @@ describe('POST /api/gdpr/erasure', () => {
       tipi: ['recording', 'transcription'],
       grantIds: ['grant-1'],
       staffAccountIds: [],
+      emailHash: 'h'.repeat(64),
       senzaNome: true,
       adesso: expect.any(Date),
     });
@@ -281,7 +292,7 @@ describe('POST /api/gdpr/erasure', () => {
     db.eventModerator.deleteMany.mockResolvedValue({ count: 0 });
     db.staffAccount.findUnique.mockResolvedValue({ id: 'staff-1' });
     db.recordingConsent.findMany.mockResolvedValue([{ eventId: 'evt-2' }, { eventId: 'evt-1' }]);
-    prove.tipiDelleProve.mockResolvedValue(['recording']);
+    prove.tipiDelleProveEsistenti.mockResolvedValue(['recording']);
     prove.conservaProve.mockResolvedValue(1);
 
     await POST(req('valido') as never, ctx as never);
@@ -302,9 +313,34 @@ describe('POST /api/gdpr/erasure', () => {
     expect(tx.recordingConsent.deleteMany).toHaveBeenCalledWith({
       where: {
         eventId: { in: ['evt-1', 'evt-2'] },
-        OR: [{ eventModeratorId: { in: [] } }, { staffAccountId: 'staff-1' }],
+        OR: [
+          { emailHash: 'h'.repeat(64) },
+          { eventModeratorId: { in: [] } },
+          { staffAccountId: 'staff-1' },
+        ],
       },
     });
+  });
+
+  it('reaches the proofs of someone whose grant or account is gone, by the address', async () => {
+    db.registration.findMany.mockResolvedValue([]);
+    db.eventModerator.findMany.mockResolvedValue([]);
+    db.eventModerator.deleteMany.mockResolvedValue({ count: 0 });
+    db.staffAccount.findUnique.mockResolvedValue(null);
+    db.multitrackConsent.findMany.mockResolvedValue([{ eventId: 'evt-3' }]);
+    prove.tipiDelleProveEsistenti.mockResolvedValue(['transcription']);
+
+    await POST(req('valido') as never, ctx as never);
+
+    expect(db.multitrackConsent.findMany.mock.calls[0]![0].where.OR).toContainEqual({
+      emailHash: 'h'.repeat(64),
+    });
+    expect(prove.conservaProve.mock.calls[0]![1]).toMatchObject({
+      eventId: 'evt-3',
+      emailHash: 'h'.repeat(64),
+      senzaNome: true,
+    });
+    expect(tx.multitrackConsent.deleteMany).toHaveBeenCalled();
   });
 
   it('opens no transaction without grants or staff consents', async () => {
@@ -359,7 +395,7 @@ describe('POST /api/gdpr/erasure', () => {
 
   it('copies the proofs of a registration before it goes, without the name', async () => {
     db.registration.findMany.mockResolvedValue([{ id: 'r1', eventId: 'ev-1' }]);
-    prove.tipiDelleProve.mockResolvedValue(['recording', 'transcription']);
+    prove.tipiDelleProveEsistenti.mockResolvedValue(['recording', 'transcription']);
     prove.conservaProve.mockResolvedValue(2);
     db.retainedConsentProof.count.mockResolvedValue(2);
 

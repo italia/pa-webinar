@@ -4045,7 +4045,7 @@
         "erasedName": "(nimi poistettu pyynnöstä)",
         "unreadableName": "(nimeä ei voi lukea)"
       },
-      "retainedNote": "{count, plural, one {# todiste säilytetään} other {# todistetta säilytetään}}, niin kauan kuin video tai litterointi on julkaistuna.",
+      "retainedNote": "{count, plural, one {# todiste säilytetään} other {# todistetta säilytetään}}, niin kauan kuin video tai litterointi on olemassa.",
       "countsNote": "Lasketaan henkilöitä: ilmoittautuminen, henkilökunnan tili tai nimetty linkki lasketaan kerran; toisella käynnillä palaava vieras lasketaan uudelleen."
     }
   },
@@ -4562,7 +4562,7 @@
       "consentWithdrawnOn": "Peruutettu {date}",
       "consentNoteInRoom": "Jos olet nyt huoneessa, peruutus tulee voimaan seuraavalla kerralla: käytä huoneen Suostumukset-painiketta, jos haluat sen voimaan heti.",
       "proofsTitle": "Säilytetyt suostumusten todisteet",
-      "proofsIntro": "Näiden tapahtumien tiedot on poistettu. Nämä todisteet säilyvät niin kauan kuin video tai litterointi on julkaistuna. Voit peruuttaa suostumuksesi: se, mikä on jo videossa, säilyy, ja sen poistamiseksi sinun on kirjoitettava rekisterinpitäjälle.",
+      "proofsIntro": "Näiden tapahtumien tiedot on poistettu. Nämä todisteet säilyvät niin kauan kuin video tai litterointi on olemassa. Voit peruuttaa suostumuksesi: se, mikä on jo videossa, säilyy, ja sen poistamiseksi sinun on kirjoitettava rekisterinpitäjälle.",
       "proofGivenOn": "Annettu {date}",
       "proofSuperseded": "Korvattu myöhemmällä suostumuksella",
       "addressBookTitle": "Tapahtumien osoitekirja",
@@ -4582,13 +4582,13 @@
       "linkInvalid": "Linkki on virheellinen tai vanhentunut. Pyydä uusi linkki.",
       "confirmWarning": "Olet poistamassa pysyvästi sähköpostiosoitteeseesi liittyvät henkilötiedot alla mainittuja lukuun ottamatta.",
       "confirmBody": "Ilmoittautumiset, kysymykset, kyselyjen äänet, palautteet, muistutukset ja tietosi tapahtumien osoitekirjassa poistetaan. Toimintoa ei voi perua.",
-      "confirmProofs": "Jos tapahtumalla on julkaistu video tai litterointi, suostumuksen tyyppi, päivämäärä ja teksti, johon vastasit, säilyvät ilman nimeäsi niin kauan kuin kyseinen video tai litterointi on julkaistuna. Niillä osoitetaan suostumus. Video ei muutu: jos haluat pyytää puheenvuorojesi poistamista, kirjoita rekisterinpitäjälle.",
+      "confirmProofs": "Jos tapahtumasta on olemassa video tai litterointi, vaikka sitä ei olisi vielä julkaistu, suostumuksen tyyppi, päivämäärä ja teksti, johon vastasit, säilyvät ilman nimeäsi niin kauan kuin kyseinen video tai litterointi on olemassa. Niillä osoitetaan suostumus. Video ei muutu: jos haluat pyytää puheenvuorojesi poistamista, kirjoita rekisterinpitäjälle.",
       "confirmButton": "Vahvista poisto",
       "cancel": "Peruuta",
       "processing": "Poistetaan...",
       "doneTitle": "Poisto suoritettu",
       "doneBody": "Poistettuja ilmoittautumisia: {count}. Myös niihin liittyvät tiedot on poistettu.",
-      "doneProofs": "{count, plural, one {# suostumuksen todiste säilyy ilman nimeäsi niin kauan kuin video tai litterointi on julkaistuna.} other {# suostumuksen todistetta säilyy ilman nimeäsi niin kauan kuin video tai litterointi on julkaistuna.}}",
+      "doneProofs": "{count, plural, one {# suostumuksen todiste säilyy ilman nimeäsi niin kauan kuin video tai litterointi on olemassa.} other {# suostumuksen todistetta säilyy ilman nimeäsi niin kauan kuin video tai litterointi on olemassa.}}",
       "error": "Tapahtui virhe. Yritä myöhemmin uudelleen.",
       "rateLimited": "Liian monta pyyntöä. Yritä uudelleen tunnin kuluttua.",
       "back": "Takaisin omiin tietoihin",

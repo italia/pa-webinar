@@ -86,27 +86,72 @@ export type LettoreProve = Pick<
 export interface FiltroProve {
   /** Le prove di queste iscrizioni: all'iscrizione e in sala. */
   registrationIds?: readonly string[];
-  /** Le prove della registrazione date entrando con queste concessioni. */
+  /** Le prove date in sala entrando con queste concessioni. */
   grantIds?: readonly string[];
-  /** Le prove della registrazione date entrando dal link primario con questi
-   *  account dello staff. */
+  /** Le prove date in sala entrando dal link primario con questi account dello
+   *  staff. */
   staffAccountIds?: readonly string[];
+  /** Le prove date in sala con questa impronta dell'indirizzo, anche se la
+   *  concessione o l'account non ci sono piu'. */
+  emailHash?: string;
 }
 
-const ruoloDelPosto = (posto: string, registrationId: string | null): RuoloConsenso =>
-  registrationId || iscrizioneDelPosto(posto)
-    ? 'registrant'
-    : posto.startsWith(PREFISSO_POSTO_MODERATORE)
-      ? 'host'
-      : 'guest';
+/** Una prova di sala: lo stesso posto e gli stessi legami sulle due tabelle. */
+interface ProvaDiSala {
+  jitsiUserId: string;
+  registrationId: string | null;
+  eventModeratorId: string | null;
+  staffAccountId: string | null;
+}
+
+const ruoloDiSala = (p: ProvaDiSala): RuoloConsenso =>
+  p.eventModeratorId || p.staffAccountId
+    ? 'host'
+    : p.registrationId || iscrizioneDelPosto(p.jitsiUserId)
+      ? 'registrant'
+      : p.jitsiUserId.startsWith(PREFISSO_POSTO_MODERATORE)
+        ? 'host'
+        : 'guest';
 
 /** Il titolare delle prove di un'iscrizione, all'iscrizione e in sala. */
 export const titolareIscrizione = (registrationId: string): string => `reg:${registrationId}`;
 
-const titolareDelPosto = (posto: string, registrationId: string | null): string => {
-  const iscrizione = registrationId ?? iscrizioneDelPosto(posto);
-  return iscrizione ? titolareIscrizione(iscrizione) : `posto:${posto}`;
+const titolareDiSala = (p: ProvaDiSala): string => {
+  if (p.staffAccountId) return `staff:${p.staffAccountId}`;
+  if (p.eventModeratorId) return `concessione:${p.eventModeratorId}`;
+  const iscrizione = p.registrationId ?? iscrizioneDelPosto(p.jitsiUserId);
+  return iscrizione ? titolareIscrizione(iscrizione) : `posto:${p.jitsiUserId}`;
 };
+
+/**
+ * L'impronta dell'indirizzo di una prova di sala: quella scritta con il consenso,
+ * che resta se la concessione o l'account se ne vanno, altrimenti quella di chi
+ * la prova cita (le concessioni possono averla ricevuta dopo).
+ */
+const improntaDiSala = (p: {
+  emailHash: string | null;
+  registration: { emailHash: string | null } | null;
+  eventModerator: { emailHash: string | null } | null;
+  staffAccount: { emailHash: string | null } | null;
+}): string | null =>
+  p.emailHash ??
+  p.registration?.emailHash ??
+  p.eventModerator?.emailHash ??
+  p.staffAccount?.emailHash ??
+  null;
+
+/** I legami per trovare le prove di sala di una persona in un evento. */
+const legamiDiSala = (
+  registrationIds: string[],
+  grantIds: string[],
+  staffAccountIds: string[],
+  emailHash: string | undefined
+) => [
+  { registrationId: { in: registrationIds } },
+  { eventModeratorId: { in: grantIds } },
+  { staffAccountId: { in: staffAccountIds } },
+  ...(emailHash ? [{ emailHash }] : []),
+];
 
 const periodiPrecedenti = (v: unknown): PeriodoConsenso[] =>
   Array.isArray(v)
@@ -168,12 +213,23 @@ export function periodiSostituiti<T extends PeriodoConservato>(
 export async function leggiRigheProve(
   db: LettoreProve,
   eventId: string,
-  { nomi = true, registrationIds, grantIds, staffAccountIds }: FiltroProve & { nomi?: boolean } = {}
+  {
+    nomi = true,
+    registrationIds,
+    grantIds,
+    staffAccountIds,
+    emailHash,
+  }: FiltroProve & { nomi?: boolean } = {}
 ): Promise<RigaProva[]> {
-  const filtrate = !!registrationIds || !!grantIds || !!staffAccountIds;
+  const filtrate = !!registrationIds || !!grantIds || !!staffAccountIds || !!emailHash;
   const iscrizioniChieste = [...(registrationIds ?? [])];
   const concessioniChieste = [...(grantIds ?? [])];
   const accountChiesti = [...(staffAccountIds ?? [])];
+  const diSala = filtrate
+    ? {
+        OR: legamiDiSala(iscrizioniChieste, concessioniChieste, accountChiesti, emailHash),
+      }
+    : {};
   const [iscrizioni, registrazione, trascrizione] = await Promise.all([
     db.registration.findMany({
       where: {
@@ -197,50 +253,41 @@ export async function leggiRigheProve(
       },
     }),
     db.recordingConsent.findMany({
-      where: {
-        eventId,
-        ...(filtrate
-          ? {
-              OR: [
-                { registrationId: { in: iscrizioniChieste } },
-                { eventModeratorId: { in: concessioniChieste } },
-                { staffAccountId: { in: accountChiesti } },
-              ],
-            }
-          : {}),
-      },
+      where: { eventId, ...diSala },
       select: {
         displayName: nomi,
         jitsiUserId: true,
         registrationId: true,
         eventModeratorId: true,
         staffAccountId: true,
+        emailHash: true,
         locale: true,
         consentedAt: true,
         withdrawnAt: true,
         earlierPeriods: true,
         destination: true,
         textVersion: true,
-        // L'indirizzo non sta sulla prova: lo sa chi la lega a una persona.
         registration: { select: { emailHash: true } },
         eventModerator: { select: { emailHash: true } },
         staffAccount: { select: { emailHash: true } },
       },
     }),
     db.multitrackConsent.findMany({
-      where: {
-        eventId,
-        ...(filtrate ? { registrationId: { in: iscrizioniChieste } } : {}),
-      },
+      where: { eventId, ...diSala },
       select: {
         displayName: nomi,
         jitsiUserId: true,
         registrationId: true,
+        eventModeratorId: true,
+        staffAccountId: true,
+        emailHash: true,
         locale: true,
         consentedAt: true,
         withdrawnAt: true,
         textVersion: true,
         registration: { select: { emailHash: true } },
+        eventModerator: { select: { emailHash: true } },
+        staffAccount: { select: { emailHash: true } },
       },
     }),
   ]);
@@ -279,22 +326,11 @@ export async function leggiRigheProve(
     const base = {
       kind: 'recording' as const,
       source: 'room' as const,
-      role:
-        p.eventModeratorId || p.staffAccountId
-          ? ('host' as const)
-          : ruoloDelPosto(p.jitsiUserId, p.registrationId),
+      role: ruoloDiSala(p),
       displayName: p.displayName ?? null,
-      emailHash:
-        p.registration?.emailHash ??
-        p.eventModerator?.emailHash ??
-        p.staffAccount?.emailHash ??
-        null,
+      emailHash: improntaDiSala(p),
       locale: p.locale ?? null,
-      holder: p.staffAccountId
-        ? `staff:${p.staffAccountId}`
-        : p.eventModeratorId
-          ? `concessione:${p.eventModeratorId}`
-          : titolareDelPosto(p.jitsiUserId, p.registrationId),
+      holder: titolareDiSala(p),
     };
     // Un consenso ridato o sostituito: i periodi di prima, poi quello attuale.
     for (const periodo of periodiPrecedenti(p.earlierPeriods)) {
@@ -320,16 +356,16 @@ export async function leggiRigheProve(
     righe.push({
       kind: 'transcription',
       source: 'room',
-      role: ruoloDelPosto(p.jitsiUserId, p.registrationId),
+      role: ruoloDiSala(p),
       displayName: p.displayName ?? null,
-      emailHash: p.registration?.emailHash ?? null,
+      emailHash: improntaDiSala(p),
       locale: p.locale ?? null,
       superata: false,
       givenAt: p.consentedAt.toISOString(),
       withdrawnAt: p.withdrawnAt?.toISOString() ?? null,
       textVersion: p.textVersion,
       destination: null,
-      holder: titolareDelPosto(p.jitsiUserId, p.registrationId),
+      holder: titolareDiSala(p),
     });
   }
   return righe;

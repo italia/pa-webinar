@@ -4045,7 +4045,7 @@
         "erasedName": "(namn borttaget på begäran)",
         "unreadableName": "(namnet kan inte läsas)"
       },
-      "retainedNote": "{count, plural, one {# bevis på samtycke sparas} other {# bevis på samtycke sparas}} så länge videon eller transkriptionen förblir publicerad.",
+      "retainedNote": "{count, plural, one {# bevis på samtycke sparas} other {# bevis på samtycke sparas}} så länge videon eller transkriptionen finns.",
       "countsNote": "Personer räknas: en anmälan, ett personalkonto eller en personlig länk räknas en gång; en gäst som kommer tillbaka vid ett annat besök räknas igen."
     }
   },
@@ -4562,7 +4562,7 @@
       "consentWithdrawnOn": "Återkallat {date}",
       "consentNoteInRoom": "Om du är i rummet just nu gäller återkallelsen från nästa inträde: använd Samtycken i rummet för att den ska gälla direkt.",
       "proofsTitle": "Sparade bevis på samtycken",
-      "proofsIntro": "Uppgifterna för dessa evenemang har raderats. Dessa bevis finns kvar så länge videon eller transkriptionen är publicerad. Du kan återkalla ditt samtycke: det som redan finns i videon blir kvar, och för att få det borttaget måste du skriva till den personuppgiftsansvarige.",
+      "proofsIntro": "Uppgifterna för dessa evenemang har raderats. Dessa bevis finns kvar så länge videon eller transkriptionen finns. Du kan återkalla ditt samtycke: det som redan finns i videon blir kvar, och för att få det borttaget måste du skriva till den personuppgiftsansvarige.",
       "proofGivenOn": "Givet den {date}",
       "proofSuperseded": "Ersatt av ett senare samtycke",
       "addressBookTitle": "Evenemangsadressbok",
@@ -4582,13 +4582,13 @@
       "linkInvalid": "Länken är ogiltig eller har gått ut. Begär en ny länk.",
       "confirmWarning": "Du håller på att permanent radera de personuppgifter som är kopplade till din e-postadress, utom det som anges nedan.",
       "confirmBody": "Anmälningar, frågor, röster i omröstningar, återkoppling, påminnelser och din post i evenemangsadressboken raderas. Åtgärden kan inte ångras.",
-      "confirmProofs": "Om ett evenemang har en publicerad video eller transkription finns typen av samtycke, datumet och texten som du svarade på kvar, utan ditt namn, så länge den videon eller transkriptionen förblir publicerad. De behövs för att visa samtycket. Videon ändras inte: för att begära att dina inlägg tas bort, skriv till den personuppgiftsansvarige.",
+      "confirmProofs": "Om det finns en video eller transkription av ett evenemang, även om den ännu inte är publicerad, finns typen av samtycke, datumet och texten som du svarade på kvar, utan ditt namn, så länge den videon eller transkriptionen finns. De behövs för att visa samtycket. Videon ändras inte: för att begära att dina inlägg tas bort, skriv till den personuppgiftsansvarige.",
       "confirmButton": "Bekräfta radering",
       "cancel": "Avbryt",
       "processing": "Raderar...",
       "doneTitle": "Raderingen är klar",
       "doneBody": "Raderade anmälningar: {count}, tillsammans med tillhörande uppgifter.",
-      "doneProofs": "{count, plural, one {# bevis på samtycke finns kvar, utan ditt namn, så länge videon eller transkriptionen förblir publicerad.} other {# bevis på samtycke finns kvar, utan ditt namn, så länge videon eller transkriptionen förblir publicerad.}}",
+      "doneProofs": "{count, plural, one {# bevis på samtycke finns kvar, utan ditt namn, så länge videon eller transkriptionen finns.} other {# bevis på samtycke finns kvar, utan ditt namn, så länge videon eller transkriptionen finns.}}",
       "error": "Ett fel uppstod. Försök igen senare.",
       "rateLimited": "För många förfrågningar. Försök igen om en timme.",
       "back": "Tillbaka till mina uppgifter",

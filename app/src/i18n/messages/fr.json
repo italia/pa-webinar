@@ -4045,7 +4045,7 @@
         "erasedName": "(nom retiré sur demande)",
         "unreadableName": "(nom illisible)"
       },
-      "retainedNote": "{count, plural, one {# preuve est conservée} many {# preuves sont conservées} other {# preuves sont conservées}} tant que la vidéo ou la transcription reste publiée.",
+      "retainedNote": "{count, plural, one {# preuve est conservée} many {# preuves sont conservées} other {# preuves sont conservées}} tant que la vidéo ou la transcription existe.",
       "countsNote": "On compte les personnes : une inscription, un compte du personnel ou un lien nominatif comptent une fois ; un invité qui revient lors d'une autre visite compte à nouveau."
     }
   },
@@ -4562,7 +4562,7 @@
       "consentWithdrawnOn": "Retiré le {date}",
       "consentNoteInRoom": "Si vous êtes dans la salle en ce moment, le retrait vaut à partir de votre prochaine entrée : pour l'appliquer aussitôt, utilisez Consentements dans la salle.",
       "proofsTitle": "Preuves des consentements conservées",
-      "proofsIntro": "Les données de ces événements ont été supprimées. Ces preuves restent tant que la vidéo ou la transcription est publiée. Vous pouvez retirer votre consentement : ce qui figure déjà dans la vidéo reste, et pour le faire retirer vous devez écrire au responsable du traitement.",
+      "proofsIntro": "Les données de ces événements ont été supprimées. Ces preuves restent tant que la vidéo ou la transcription existe. Vous pouvez retirer votre consentement : ce qui figure déjà dans la vidéo reste, et pour le faire retirer vous devez écrire au responsable du traitement.",
       "proofGivenOn": "Donné le {date}",
       "proofSuperseded": "Remplacé par un consentement ultérieur",
       "addressBookTitle": "Carnet d'adresses des événements",
@@ -4582,13 +4582,13 @@
       "linkInvalid": "Ce lien n'est pas valide ou a expiré. Veuillez demander un nouveau lien.",
       "confirmWarning": "Vous êtes sur le point d'effacer définitivement les données personnelles associées à votre adresse e-mail, à l'exception de ce qui est indiqué ci-dessous.",
       "confirmBody": "Les inscriptions, les questions, les votes aux sondages, les avis, les rappels et votre fiche dans le carnet d'adresses des événements seront supprimés. Cette opération est irréversible.",
-      "confirmProofs": "Si un événement a une vidéo ou une transcription publiée, le type de consentement, la date et le texte auquel vous avez répondu restent, sans votre nom, tant que cette vidéo ou cette transcription reste publiée. Ils servent à prouver le consentement. La vidéo ne change pas : pour demander le retrait de vos interventions, écrivez au responsable du traitement.",
+      "confirmProofs": "S'il existe une vidéo ou une transcription d'un événement, même pas encore publiée, le type de consentement, la date et le texte auquel vous avez répondu restent, sans votre nom, tant que cette vidéo ou cette transcription existe. Ils servent à prouver le consentement. La vidéo ne change pas : pour demander le retrait de vos interventions, écrivez au responsable du traitement.",
       "confirmButton": "Confirmer l'effacement",
       "cancel": "Annuler",
       "processing": "Effacement en cours...",
       "doneTitle": "Effacement terminé",
       "doneBody": "{count} inscriptions et les données associées ont été supprimées.",
-      "doneProofs": "{count, plural, one {# preuve de consentement est conservée, sans votre nom, tant que la vidéo ou la transcription reste publiée.} many {# preuves de consentement sont conservées, sans votre nom, tant que la vidéo ou la transcription reste publiée.} other {# preuves de consentement sont conservées, sans votre nom, tant que la vidéo ou la transcription reste publiée.}}",
+      "doneProofs": "{count, plural, one {# preuve de consentement est conservée, sans votre nom, tant que la vidéo ou la transcription existe.} many {# preuves de consentement sont conservées, sans votre nom, tant que la vidéo ou la transcription existe.} other {# preuves de consentement sont conservées, sans votre nom, tant que la vidéo ou la transcription existe.}}",
       "error": "Une erreur s'est produite. Veuillez réessayer plus tard.",
       "rateLimited": "Trop de demandes. Veuillez réessayer dans une heure.",
       "back": "Retour à mes données",

@@ -14,6 +14,8 @@ const { prisma, sessione } = vi.hoisted(() => ({
     staffAccount: { findUnique: vi.fn() },
     adminAuditLog: { create: vi.fn() },
     event: { count: vi.fn(), findUnique: vi.fn(), update: vi.fn() },
+    callSession: { updateMany: vi.fn() },
+    $transaction: vi.fn(),
   },
   sessione: { cookie: undefined as string | undefined },
 }));
@@ -82,6 +84,9 @@ beforeEach(async () => {
   await entra('ADMIN');
   prisma.event.count.mockResolvedValue(0);
   prisma.event.findUnique.mockResolvedValue(evento());
+  prisma.$transaction.mockImplementation(async (fn: (tx: typeof prisma) => unknown) =>
+    fn(prisma)
+  );
   prisma.event.update.mockImplementation(async ({ data }: { data: object }) => ({
     id: EVENTO,
     moderatorToken: 'token-segreto-di-conduzione',

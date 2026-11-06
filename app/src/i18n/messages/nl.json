@@ -4045,7 +4045,7 @@
         "erasedName": "(naam verwijderd op verzoek)",
         "unreadableName": "(naam niet leesbaar)"
       },
-      "retainedNote": "{count, plural, one {# bewijs wordt bewaard} other {# bewijzen worden bewaard}} zolang de video of de transcriptie gepubliceerd blijft.",
+      "retainedNote": "{count, plural, one {# bewijs wordt bewaard} other {# bewijzen worden bewaard}} zolang de video of de transcriptie bestaat.",
       "countsNote": "Er worden personen geteld: een inschrijving, een medewerkersaccount of een persoonlijke link tellen één keer; een gast die in een ander bezoek terugkomt, telt opnieuw."
     }
   },
@@ -4562,7 +4562,7 @@
       "consentWithdrawnOn": "Ingetrokken op {date}",
       "consentNoteInRoom": "Bent u nu in de zaal, dan geldt de intrekking vanaf uw volgende binnenkomst: gebruik Toestemmingen in de zaal om die meteen toe te passen.",
       "proofsTitle": "Bewaarde bewijzen van toestemming",
-      "proofsIntro": "De gegevens van deze evenementen zijn verwijderd. Deze bewijzen blijven bewaard zolang de video of de transcriptie gepubliceerd is. U kunt uw toestemming intrekken: wat al in de video staat, blijft staan, en om dat te laten verwijderen moet u schrijven naar de verwerkingsverantwoordelijke.",
+      "proofsIntro": "De gegevens van deze evenementen zijn verwijderd. Deze bewijzen blijven bewaard zolang de video of de transcriptie bestaat. U kunt uw toestemming intrekken: wat al in de video staat, blijft staan, en om dat te laten verwijderen moet u schrijven naar de verwerkingsverantwoordelijke.",
       "proofGivenOn": "Gegeven op {date}",
       "proofSuperseded": "Vervangen door een latere toestemming",
       "addressBookTitle": "Evenementenadresboek",
@@ -4582,13 +4582,13 @@
       "linkInvalid": "Deze link is ongeldig of verlopen. Vraag een nieuwe link aan.",
       "confirmWarning": "U staat op het punt de persoonsgegevens die aan uw e-mailadres zijn gekoppeld definitief te verwijderen, behalve wat hieronder staat.",
       "confirmBody": "Inschrijvingen, vragen, stemmen in peilingen, feedback, herinneringen en uw vermelding in het evenementenadresboek worden verwijderd. Deze handeling kan niet ongedaan worden gemaakt.",
-      "confirmProofs": "Als een evenement een gepubliceerde video of transcriptie heeft, blijven het type toestemming, de datum en de tekst waarop u hebt geantwoord bewaard, zonder uw naam, zolang die video of transcriptie gepubliceerd blijft. Ze dienen om de toestemming aan te tonen. De video verandert niet: om te vragen uw bijdragen te verwijderen, schrijft u naar de verwerkingsverantwoordelijke.",
+      "confirmProofs": "Als er van een evenement een video of transcriptie bestaat, ook als die nog niet is gepubliceerd, blijven het type toestemming, de datum en de tekst waarop u hebt geantwoord bewaard, zonder uw naam, zolang die video of transcriptie bestaat. Ze dienen om de toestemming aan te tonen. De video verandert niet: om te vragen uw bijdragen te verwijderen, schrijft u naar de verwerkingsverantwoordelijke.",
       "confirmButton": "Verwijdering bevestigen",
       "cancel": "Annuleren",
       "processing": "Bezig met verwijderen...",
       "doneTitle": "Verwijdering voltooid",
       "doneBody": "Verwijderde inschrijvingen: {count}, samen met de gekoppelde gegevens.",
-      "doneProofs": "{count, plural, one {Er blijft # bewijs van toestemming bewaard, zonder uw naam, zolang de video of de transcriptie gepubliceerd blijft.} other {Er blijven # bewijzen van toestemming bewaard, zonder uw naam, zolang de video of de transcriptie gepubliceerd blijft.}}",
+      "doneProofs": "{count, plural, one {Er blijft # bewijs van toestemming bewaard, zonder uw naam, zolang de video of de transcriptie bestaat.} other {Er blijven # bewijzen van toestemming bewaard, zonder uw naam, zolang de video of de transcriptie bestaat.}}",
       "error": "Er is een fout opgetreden. Probeer het later opnieuw.",
       "rateLimited": "Te veel verzoeken. Probeer het over een uur opnieuw.",
       "back": "Terug naar mijn gegevens",

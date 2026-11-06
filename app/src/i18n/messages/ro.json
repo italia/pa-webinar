@@ -4045,7 +4045,7 @@
         "erasedName": "(nume eliminat la cerere)",
         "unreadableName": "(nume ilizibil)"
       },
-      "retainedNote": "{count, plural, one {# dovadă este păstrată} few {# dovezi sunt păstrate} other {# de dovezi sunt păstrate}} cât timp videoclipul sau transcrierea rămân publicate.",
+      "retainedNote": "{count, plural, one {# dovadă este păstrată} few {# dovezi sunt păstrate} other {# de dovezi sunt păstrate}} cât timp videoclipul sau transcrierea există.",
       "countsNote": "Se numără persoane: o înscriere, un cont al personalului sau un link nominal contează o dată; un invitat care revine la altă vizită contează din nou."
     }
   },
@@ -4562,7 +4562,7 @@
       "consentWithdrawnOn": "Retras la {date}",
       "consentNoteInRoom": "Dacă ești acum în sală, retragerea se aplică de la următoarea intrare: pentru a se aplica imediat, folosește Consimțăminte în sală.",
       "proofsTitle": "Dovezi păstrate ale consimțămintelor",
-      "proofsIntro": "Datele acestor evenimente au fost șterse. Aceste dovezi rămân cât timp videoclipul sau transcrierea sunt publicate. Vă puteți retrage consimțământul: ceea ce se află deja în videoclip rămâne, iar pentru a-l elimina trebuie să scrieți operatorului de date.",
+      "proofsIntro": "Datele acestor evenimente au fost șterse. Aceste dovezi rămân cât timp videoclipul sau transcrierea există. Vă puteți retrage consimțământul: ceea ce se află deja în videoclip rămâne, iar pentru a-l elimina trebuie să scrieți operatorului de date.",
       "proofGivenOn": "Dat la {date}",
       "proofSuperseded": "Înlocuit de un consimțământ ulterior",
       "addressBookTitle": "Agenda de evenimente",
@@ -4582,13 +4582,13 @@
       "linkInvalid": "Linkul nu este valid sau a expirat. Solicitați un link nou.",
       "confirmWarning": "Sunteți pe cale să ștergeți definitiv datele personale asociate adresei dumneavoastră de email, cu excepția celor indicate mai jos.",
       "confirmBody": "Vor fi șterse înscrierile, întrebările, voturile din sondaje, feedbackul, mementourile și intrarea dumneavoastră din agenda de evenimente. Operațiunea este ireversibilă.",
-      "confirmProofs": "Dacă un eveniment are un videoclip sau o transcriere publicate, rămân tipul de consimțământ, data și textul la care ați răspuns, fără numele dumneavoastră, cât timp acel videoclip sau acea transcriere rămân publicate. Acestea servesc la dovedirea consimțământului. Videoclipul nu se schimbă: pentru a cere eliminarea intervențiilor dumneavoastră, scrieți operatorului de date.",
+      "confirmProofs": "Dacă un eveniment are un videoclip sau o transcriere, chiar dacă nu au fost încă publicate, rămân tipul de consimțământ, data și textul la care ați răspuns, fără numele dumneavoastră, cât timp acel videoclip sau acea transcriere există. Acestea servesc la dovedirea consimțământului. Videoclipul nu se schimbă: pentru a cere eliminarea intervențiilor dumneavoastră, scrieți operatorului de date.",
       "confirmButton": "Confirmați ștergerea",
       "cancel": "Anulați",
       "processing": "Ștergere în curs...",
       "doneTitle": "Ștergere finalizată",
       "doneBody": "Înscrieri șterse: {count}, împreună cu datele asociate.",
-      "doneProofs": "{count, plural, one {A rămas # dovadă de consimțământ, fără numele dumneavoastră, cât timp videoclipul sau transcrierea rămân publicate.} few {Au rămas # dovezi de consimțământ, fără numele dumneavoastră, cât timp videoclipul sau transcrierea rămân publicate.} other {Au rămas # de dovezi de consimțământ, fără numele dumneavoastră, cât timp videoclipul sau transcrierea rămân publicate.}}",
+      "doneProofs": "{count, plural, one {A rămas # dovadă de consimțământ, fără numele dumneavoastră, cât timp videoclipul sau transcrierea există.} few {Au rămas # dovezi de consimțământ, fără numele dumneavoastră, cât timp videoclipul sau transcrierea există.} other {Au rămas # de dovezi de consimțământ, fără numele dumneavoastră, cât timp videoclipul sau transcrierea există.}}",
       "error": "A apărut o eroare. Reîncercați mai târziu.",
       "rateLimited": "Prea multe solicitări. Reîncercați peste o oră.",
       "back": "Înapoi la datele mele",

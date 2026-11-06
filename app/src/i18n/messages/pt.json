@@ -4045,7 +4045,7 @@
         "erasedName": "(nome removido a pedido)",
         "unreadableName": "(nome ilegível)"
       },
-      "retainedNote": "{count, plural, one {# prova é conservada} many {# provas são conservadas} other {# provas são conservadas}} enquanto o vídeo ou a transcrição permanecerem publicados.",
+      "retainedNote": "{count, plural, one {# prova é conservada} many {# provas são conservadas} other {# provas são conservadas}} enquanto o vídeo ou a transcrição existirem.",
       "countsNote": "Contam-se pessoas: uma inscrição, uma conta da equipa ou uma ligação nominal contam uma vez; um convidado que volta noutra visita conta de novo."
     }
   },
@@ -4562,7 +4562,7 @@
       "consentWithdrawnOn": "Retirado em {date}",
       "consentNoteInRoom": "Se estiver agora na sala, a retirada vale a partir da próxima entrada: para a aplicar de imediato, use Consentimentos na sala.",
       "proofsTitle": "Provas dos consentimentos conservadas",
-      "proofsIntro": "Os dados destes eventos foram eliminados. Estas provas ficam enquanto o vídeo ou a transcrição estiverem publicados. Pode retirar o consentimento: o que já está no vídeo fica e, para o retirar, tem de escrever ao responsável pelo tratamento.",
+      "proofsIntro": "Os dados destes eventos foram eliminados. Estas provas ficam enquanto o vídeo ou a transcrição existirem. Pode retirar o consentimento: o que já está no vídeo fica e, para o retirar, tem de escrever ao responsável pelo tratamento.",
       "proofGivenOn": "Dado em {date}",
       "proofSuperseded": "Substituído por um consentimento posterior",
       "addressBookTitle": "Agenda de eventos",
@@ -4582,13 +4582,13 @@
       "linkInvalid": "A ligação não é válida ou expirou. Solicite uma nova ligação.",
       "confirmWarning": "Está prestes a eliminar definitivamente os dados pessoais associados ao seu endereço de e-mail, exceto o que é indicado abaixo.",
       "confirmBody": "Serão eliminadas as inscrições, as perguntas, os votos nas sondagens, os feedbacks, os lembretes e a sua entrada na agenda de eventos. A operação é irreversível.",
-      "confirmProofs": "Se um evento tiver um vídeo ou uma transcrição publicados, ficam o tipo de consentimento, a data e o texto a que respondeu, sem o seu nome, enquanto esse vídeo ou essa transcrição permanecerem publicados. Servem para demonstrar o consentimento. O vídeo não muda: para pedir que as suas intervenções sejam retiradas, escreva ao responsável pelo tratamento.",
+      "confirmProofs": "Se existir um vídeo ou uma transcrição de um evento, mesmo que ainda não publicados, ficam o tipo de consentimento, a data e o texto a que respondeu, sem o seu nome, enquanto esse vídeo ou essa transcrição existirem. Servem para demonstrar o consentimento. O vídeo não muda: para pedir que as suas intervenções sejam retiradas, escreva ao responsável pelo tratamento.",
       "confirmButton": "Confirmar eliminação",
       "cancel": "Cancelar",
       "processing": "A eliminar...",
       "doneTitle": "Eliminação concluída",
       "doneBody": "Inscrições eliminadas: {count}, juntamente com os dados associados.",
-      "doneProofs": "{count, plural, one {Ficou # prova de consentimento, sem o seu nome, enquanto o vídeo ou a transcrição permanecerem publicados.} many {Ficaram # provas de consentimento, sem o seu nome, enquanto o vídeo ou a transcrição permanecerem publicados.} other {Ficaram # provas de consentimento, sem o seu nome, enquanto o vídeo ou a transcrição permanecerem publicados.}}",
+      "doneProofs": "{count, plural, one {Ficou # prova de consentimento, sem o seu nome, enquanto o vídeo ou a transcrição existirem.} many {Ficaram # provas de consentimento, sem o seu nome, enquanto o vídeo ou a transcrição existirem.} other {Ficaram # provas de consentimento, sem o seu nome, enquanto o vídeo ou a transcrição existirem.}}",
       "error": "Ocorreu um erro. Tente novamente mais tarde.",
       "rateLimited": "Demasiados pedidos. Tente novamente dentro de uma hora.",
       "back": "Voltar aos meus dados",

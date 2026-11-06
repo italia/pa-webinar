@@ -4255,7 +4255,7 @@
         "erasedName": "(nome rimosso su richiesta)",
         "unreadableName": "(nome non leggibile)"
       },
-      "retainedNote": "{count, plural, one {# prova è conservata} other {# prove sono conservate}} finché il video o la trascrizione restano pubblicati.",
+      "retainedNote": "{count, plural, one {# prova è conservata} other {# prove sono conservate}} finché il video o la trascrizione esistono.",
       "countsNote": "Si contano le persone: un'iscrizione, un account dello staff o un link nominale contano una volta; un ospite che torna in un'altra visita conta di nuovo."
     }
   },
@@ -4562,7 +4562,7 @@
       "consentWithdrawnOn": "Ritirato il {date}",
       "consentNoteInRoom": "Se sei in sala in questo momento, il ritiro vale dal prossimo ingresso: per farlo valere subito usa «Consensi» nella sala.",
       "proofsTitle": "Prove dei consensi conservate",
-      "proofsIntro": "I dati di questi eventi sono stati cancellati. Queste prove restano finché il video o la trascrizione sono pubblicati. Puoi ritirare il consenso: ciò che è già nel video resta, e per toglierlo devi scrivere al titolare del trattamento.",
+      "proofsIntro": "I dati di questi eventi sono stati cancellati. Queste prove restano finché il video o la trascrizione esistono. Puoi ritirare il consenso: ciò che è già nel video resta, e per toglierlo devi scrivere al titolare del trattamento.",
       "proofGivenOn": "Dato il {date}",
       "proofSuperseded": "Sostituito da un consenso successivo",
       "addressBookTitle": "Rubrica degli eventi",
@@ -4582,13 +4582,13 @@
       "linkInvalid": "Il link non è valido o è scaduto. Richiedi un nuovo link.",
       "confirmWarning": "Stai per cancellare in modo definitivo i dati personali associati al tuo indirizzo email, tranne ciò che è indicato qui sotto.",
       "confirmBody": "Verranno cancellate le iscrizioni, le domande, i voti ai sondaggi, i feedback, i reminder e la tua voce nella rubrica degli eventi. L'operazione è irreversibile.",
-      "confirmProofs": "Se un evento ha un video o una trascrizione pubblicati, restano il tipo di consenso, la data e il testo a cui hai risposto, senza il tuo nome, finché quel video o quella trascrizione restano pubblicati. Servono a dimostrare il consenso. Il video non cambia: per chiedere di togliere i tuoi interventi scrivi al titolare del trattamento.",
+      "confirmProofs": "Se di un evento esistono un video o una trascrizione, anche non ancora pubblicati, restano il tipo di consenso, la data e il testo a cui hai risposto, senza il tuo nome, finché quel video o quella trascrizione esistono. Servono a dimostrare il consenso. Il video non cambia: per chiedere di togliere i tuoi interventi scrivi al titolare del trattamento.",
       "confirmButton": "Conferma cancellazione",
       "cancel": "Annulla",
       "processing": "Cancellazione in corso...",
       "doneTitle": "Cancellazione completata",
       "doneBody": "Sono state cancellate {count} iscrizioni e i dati collegati.",
-      "doneProofs": "{count, plural, one {È rimasta # prova di consenso, senza il tuo nome, finché il video o la trascrizione restano pubblicati.} other {Sono rimaste # prove di consenso, senza il tuo nome, finché il video o la trascrizione restano pubblicati.}}",
+      "doneProofs": "{count, plural, one {È rimasta # prova di consenso, senza il tuo nome, finché il video o la trascrizione esistono.} other {Sono rimaste # prove di consenso, senza il tuo nome, finché il video o la trascrizione esistono.}}",
       "error": "Si è verificato un errore. Riprova più tardi.",
       "rateLimited": "Troppe richieste. Riprova tra un'ora.",
       "back": "Torna ai miei dati",

@@ -24,7 +24,7 @@ import {
   postoDaTokenSala,
   guestJitsiId,
 } from '@/lib/auth/jwt';
-import { decryptPII, encryptPII, tryDecryptPII } from '@/lib/crypto/pii';
+import { decryptPII, encryptPII, hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
 import { findPhotoByEmailHash, profilePhotoUrl } from '@/lib/profile-photo';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { limiteTokenOspiti } from '@/lib/room-rate-limit';
@@ -202,6 +202,8 @@ async function registraConsensi(
     /** Chi conduce o interviene: a chi si lega la prova della registrazione. */
     eventModeratorId?: string;
     staffAccountId?: string;
+    /** L'impronta dell'indirizzo di una concessione nominale. */
+    emailHash?: string;
   },
   /** La destinazione del testo in vigore (`destinazioneDelTesto`). */
   destinazione: Destinazione,
@@ -220,11 +222,23 @@ async function registraConsensi(
     return { recording: false, multitrack: false };
   }
   const { registrationId } = posto;
+  // L'impronta di chi conduce sta sulla prova: resta anche quando la concessione
+  // o l'account se ne vanno, e la cancellazione chiesta dalla persona la trova.
+  const account = posto.staffAccountId
+    ? await prisma.staffAccount.findUnique({
+        where: { id: posto.staffAccountId },
+        select: { emailHash: true },
+      })
+    : null;
+  const emailHash = posto.emailHash ?? account?.emailHash ?? null;
   const prova = () => ({
     eventId: event.id,
     jitsiUserId: posto.jitsiUserId,
     displayName: encryptPII(posto.displayName),
     registrationId: registrationId ?? null,
+    eventModeratorId: posto.eventModeratorId ?? null,
+    staffAccountId: posto.staffAccountId ?? null,
+    emailHash,
     locale: data.locale ?? null,
   });
   const destinazioneLetta = testoLetto(data.recordingConsentDestination, destinazione);
@@ -337,8 +351,6 @@ async function registraConsensi(
             {
               ...prova(),
               ...testoDellaProva,
-              eventModeratorId: posto.eventModeratorId ?? null,
-              staffAccountId: posto.staffAccountId ?? null,
             },
           ],
           skipDuplicates: true,
@@ -493,6 +505,7 @@ export const POST = withErrorHandling(async (request, context) => {
         displayName: name,
         eventModeratorId: grant.grantId ?? undefined,
         staffAccountId: staff?.accountId,
+        emailHash: grant.email ? hashEmail(grant.email) : undefined,
       },
       destinazione,
       registraVideo && !consensoConduce ? { ...replicaConduce, tracce: null } : replicaConduce,

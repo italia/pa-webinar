@@ -32,19 +32,26 @@ vi.mock('next-intl/server', async () => {
 
 import { GET as consensiAdmin } from '@/app/api/admin/events/[id]/consents/route';
 import { DELETE as cancellaIscrizione } from '@/app/api/admin/events/[id]/registrations/[regId]/route';
+import { PATCH as aggiornaPubblicazione } from '@/app/api/admin/publications/[id]/route';
 import { GET as pulizia } from '@/app/api/cron/cleanup/route';
+import { DELETE as togliVideo } from '@/app/api/events/[param]/recording/route';
+import { PUT as aggiornaEvento } from '@/app/api/events/[param]/route';
+import { DELETE as togliSessione } from '@/app/api/events/[param]/sessions/[id]/route';
 import { POST as ritira } from '@/app/api/gdpr/consents/route';
 import { POST as cancella } from '@/app/api/gdpr/erasure/route';
 import { GET as esporta } from '@/app/api/gdpr/export/route';
+import { bloccaTrascrizioneEvento, CAPTIONS_TRANSCRIPT_MODEL } from '@/lib/captions/transcript';
 import { encryptPII, hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { eraseRegistrations } from '@/lib/gdpr/erase-registrations';
 import { issueGdprToken } from '@/lib/gdpr/request-token';
+import { MULTITRACK_PREFIX } from '@/lib/recorder/lifecycle';
 
 import {
   creaEvento,
   creaLavoro,
   creaRegistrazione,
+  creaSessione,
   entraCome,
   richiesta,
   svuotaDatabase,
@@ -205,6 +212,128 @@ async function creaTrascrizione(eventId: string) {
       contentHash: 'a'.repeat(64),
     },
   });
+}
+
+/** La trascrizione dai sottotitoli di un evento: ogni persona con una sua frase, e
+ *  la sua voce nell'elenco dei parlanti, come la scrive `costruisciTrascrizione`. */
+async function trascrizioneDaiSottotitoli(
+  eventId: string,
+  persone: Array<{ registrationId: string; nome: string }>
+) {
+  const registrazione = await creaRegistrazione(eventId);
+  const lavoro = await creaLavoro(registrazione.id, 'DONE');
+  const corpo = JSON.stringify({
+    source: 'live-captions',
+    language: 'it',
+    segments: persone.map((p, i) => ({
+      start: i,
+      end: i + 1,
+      text: `Frase di ${p.nome}`,
+      speaker: `SPEAKER_0${i}`,
+    })),
+    untranscribed: [],
+    speakers: persone.map((p, i) => ({
+      diarLabel: `SPEAKER_0${i}`,
+      displayName: p.nome,
+      totalSpeechSec: 1,
+      registrationId: p.registrationId,
+    })),
+  });
+  const artefatto = await prisma.postprodArtifact.create({
+    data: {
+      recordingId: registrazione.id,
+      jobId: lavoro.id,
+      type: 'TRANSCRIPT_JSON',
+      blobKey: '',
+      mimeType: 'application/json',
+      inlineBody: encryptPII(corpo),
+      contentHash: 'b'.repeat(64),
+      modelId: CAPTIONS_TRANSCRIPT_MODEL,
+    },
+  });
+  // Il testo originale conservato alla prima correzione.
+  await prisma.postprodOriginalBody.create({
+    data: {
+      artifactId: artefatto.id,
+      recordingId: registrazione.id,
+      eventId,
+      type: 'TRANSCRIPT_JSON',
+      body: encryptPII(corpo),
+      contentHash: 'b'.repeat(64),
+    },
+  });
+  await prisma.speaker.createMany({
+    data: persone.map((p, i) => ({
+      recordingId: registrazione.id,
+      diarLabel: `SPEAKER_0${i}`,
+      displayName: p.nome,
+    })),
+  });
+  return registrazione.id;
+}
+
+/** Cosa resta della trascrizione: i testi in chiaro, i nomi delle voci. */
+async function restoDellaTrascrizione(recordingId: string) {
+  const artefatto = await prisma.postprodArtifact.findFirstOrThrow({
+    where: { recordingId, type: 'TRANSCRIPT_JSON' },
+    select: { inlineBody: true, original: { select: { body: true } } },
+  });
+  const voci = await prisma.speaker.findMany({
+    where: { recordingId },
+    select: { displayName: true },
+  });
+  return {
+    corpo: tryDecryptPII(artefatto.inlineBody!) ?? '',
+    originale: tryDecryptPII(artefatto.original!.body) ?? '',
+    voci: voci.map((v) => v.displayName),
+  };
+}
+
+/** Una persona dello staff o una concessione con il consenso dato in sala: le due
+ *  prove, con i legami e l'impronta che scrive l'ingresso in sala. */
+async function proveDiSala(
+  eventId: string,
+  legami: { eventModeratorId?: string; staffAccountId?: string; emailHash?: string },
+  { registrazione = true, posto = `mod-${eventId}-aa` } = {}
+) {
+  const base = {
+    eventId,
+    jitsiUserId: posto,
+    displayName: encryptPII('Sara Rossi'),
+    consentedAt: giorniFa(1),
+    ...legami,
+  };
+  if (registrazione) await prisma.recordingConsent.create({ data: base });
+  await prisma.multitrackConsent.create({ data: base });
+}
+
+/** Aspetta che `quanti` transazioni siano in fila sul blocco di un evento. */
+async function inFila(quanti: number) {
+  await vi.waitFor(
+    async () => {
+      const [{ n }] = await prisma.$queryRaw<[{ n: bigint }]>`
+        SELECT count(*) AS n FROM pg_locks WHERE locktype = 'advisory' AND NOT granted`;
+      expect(Number(n)).toBe(quanti);
+    },
+    { timeout: 20_000, interval: 25 }
+  );
+}
+
+/** Tiene il blocco dell'evento finche' `fatto` non si risolve. */
+function tieniIlBlocco(eventId: string, fatto: Promise<unknown>) {
+  let preso: () => void = () => undefined;
+  const bloccato = new Promise<void>((risolvi) => {
+    preso = risolvi;
+  });
+  const finito = prisma.$transaction(
+    async (tx) => {
+      await bloccaTrascrizioneEvento(tx, eventId);
+      preso();
+      await fatto;
+    },
+    { timeout: 30_000 }
+  );
+  return { bloccato, finito };
 }
 
 /** La prova di sala dell'iscritta dopo una sostituzione: il periodo di prima e'
@@ -642,6 +771,680 @@ describe('cancellazione chiesta dalla persona', () => {
   });
 });
 
+describe('la trascrizione pubblicata dopo la pulizia', () => {
+  /** Un video e una trascrizione pubblicati, due persone che parlano, la pulizia
+   *  passata: le iscrizioni non ci sono piu', la trascrizione si'. */
+  async function dopoLaPulizia() {
+    const evento = await creaEvento({ ...PUBBLICATO, transcriptPublished: true });
+    const anna = await iscritta(evento.id, 'Anna Bianchi');
+    const luca = await iscritta(evento.id, 'Luca Verdi');
+    const registrazione = await trascrizioneDaiSottotitoli(evento.id, [
+      { registrationId: anna.reg.id, nome: 'Anna Bianchi' },
+      { registrationId: luca.reg.id, nome: 'Luca Verdi' },
+    ]);
+    await giroDiPulizia();
+    expect(await prisma.registration.count({ where: { eventId: evento.id } })).toBe(0);
+    return { evento, anna, luca, registrazione };
+  }
+  const soloLuca = async (recordingId: string) => {
+    const resto = await restoDellaTrascrizione(recordingId);
+    for (const testo of [resto.corpo, resto.originale]) {
+      expect(testo).toContain('Frase di Luca Verdi');
+      expect(testo).not.toContain('Anna Bianchi');
+    }
+    expect(resto.voci).toEqual(['Luca Verdi']);
+  };
+  const ritiraLaProva = async (emailHash: string, kind: 'recording' | 'transcription') => {
+    const { retainedConsentProofs, consentsToken } = await chiediDati(emailHash);
+    const prova = retainedConsentProofs.find((p) => p.kind === kind);
+    const res = await ritira(
+      daIp('/api/gdpr/consents', 'POST', {
+        token: consentsToken,
+        proofId: prova?.id,
+        consent: kind,
+      }),
+      contesto({})
+    );
+    expect(res.status).toBe(200);
+  };
+
+  it('il ritiro della trascrizione toglie nome e frasi, non quelli degli altri', async () => {
+    const { anna, registrazione } = await dopoLaPulizia();
+    await ritiraLaProva(anna.emailHash, 'transcription');
+    await soloLuca(registrazione);
+  });
+
+  it('il ritiro della registrazione, che la trascina, li toglie anche lui', async () => {
+    const { anna, registrazione } = await dopoLaPulizia();
+    await ritiraLaProva(anna.emailHash, 'recording');
+    await soloLuca(registrazione);
+  });
+
+  it('la cancellazione chiesta dalla persona li toglie', async () => {
+    const { anna, registrazione } = await dopoLaPulizia();
+    await chiediCancellazione(anna.emailHash);
+    await soloLuca(registrazione);
+  });
+
+  it('una trascrizione che resta vuota se ne va, e il video resta', async () => {
+    const evento = await creaEvento({ ...PUBBLICATO, transcriptPublished: true });
+    const anna = await iscritta(evento.id);
+    const registrazione = await trascrizioneDaiSottotitoli(evento.id, [
+      { registrationId: anna.reg.id, nome: 'Anna Bianchi' },
+    ]);
+    await giroDiPulizia();
+
+    await chiediCancellazione(anna.emailHash);
+
+    expect(await prisma.postprodArtifact.count({ where: { recordingId: registrazione } })).toBe(0);
+    expect(await prisma.speaker.count({ where: { recordingId: registrazione } })).toBe(0);
+    expect(await prisma.recording.count({ where: { id: registrazione } })).toBe(1);
+  });
+
+  it('una richiesta ripetuta non scrive nel registro', async () => {
+    const { anna } = await dopoLaPulizia();
+    await chiediCancellazione(anna.emailHash);
+    const righe = await prisma.gdprAuditLog.count();
+    await chiediCancellazione(anna.emailHash);
+    expect(await prisma.gdprAuditLog.count()).toBe(righe);
+  });
+});
+
+describe('prove di chi conduce', () => {
+  const RECENTE = { ...PUBBLICATO, startsAt: giorniFa(2), endsAt: giorniFa(1) };
+  async function relatrice(eventId: string) {
+    const indirizzo = `${randomUUID()}@example.org`;
+    const emailHash = hashEmail(indirizzo);
+    const concessione = await prisma.eventModerator.create({
+      data: {
+        eventId,
+        name: encryptPII('Relatrice'),
+        email: encryptPII(indirizzo),
+        emailHash,
+        token: randomUUID(),
+        role: 'SPEAKER',
+      },
+    });
+    return { concessione, emailHash };
+  }
+
+  it('la concessione: anche la prova della trascrizione resta senza nome, e la pulizia non la rifa', async () => {
+    const evento = await creaEvento(RECENTE);
+    const { concessione, emailHash } = await relatrice(evento.id);
+    await proveDiSala(evento.id, { eventModeratorId: concessione.id, emailHash });
+
+    await chiediCancellazione(emailHash);
+
+    expect(await prisma.multitrackConsent.count()).toBe(0);
+    expect(await prisma.recordingConsent.count()).toBe(0);
+    const righe = await prove(evento.id);
+    expect(righe.map((r) => r.kind).sort()).toEqual(['recording', 'transcription']);
+    for (const r of righe) {
+      expect(r).toMatchObject({ role: 'host', displayName: null, emailHash });
+      expect(r.withdrawnAt).not.toBeNull();
+    }
+    // Lo stesso titolare per le due prove: una persona, non due.
+    expect(new Set(righe.map((r) => r.holderHash)).size).toBe(1);
+
+    await prisma.event.update({
+      where: { id: evento.id },
+      data: { endsAt: giorniFa(61), startsAt: giorniFa(62) },
+    });
+    await giroDiPulizia();
+    expect(await prove(evento.id)).toHaveLength(2);
+    expect((await prove(evento.id)).every((r) => r.displayName === null)).toBe(true);
+  });
+
+  it('su un video non ancora pubblicato la prova resta senza nome', async () => {
+    const evento = await creaEvento({
+      status: 'ENDED',
+      startsAt: giorniFa(2),
+      endsAt: giorniFa(1),
+      dataRetentionDays: 365,
+      recordingUrl: VIDEO,
+    });
+    const { concessione, emailHash } = await relatrice(evento.id);
+    await proveDiSala(evento.id, { eventModeratorId: concessione.id, emailHash });
+
+    expect(await chiediCancellazione(emailHash)).toMatchObject({ consentProofsKept: 2 });
+
+    expect((await prove(evento.id)).every((r) => r.displayName === null)).toBe(true);
+  });
+
+  it('chi ha dato la sola trascrizione ha lo stesso trattamento', async () => {
+    const evento = await creaEvento(RECENTE);
+    const { concessione, emailHash } = await relatrice(evento.id);
+    await proveDiSala(
+      evento.id,
+      { eventModeratorId: concessione.id, emailHash },
+      { registrazione: false }
+    );
+
+    expect(await chiediCancellazione(emailHash)).toMatchObject({ consentProofsKept: 1 });
+
+    expect(await prisma.multitrackConsent.count()).toBe(0);
+    expect(await prove(evento.id)).toMatchObject([
+      { kind: 'transcription', displayName: null, emailHash },
+    ]);
+  });
+
+  it('l’account dello staff: la prova della trascrizione resta senza nome', async () => {
+    const evento = await creaEvento(RECENTE);
+    const account = await entraCome('ORGANIZER');
+    await proveDiSala(evento.id, {
+      staffAccountId: account.id,
+      emailHash: account.emailHash,
+    });
+
+    await chiediCancellazione(account.emailHash);
+
+    expect(await prisma.multitrackConsent.count()).toBe(0);
+    expect(await prove(evento.id)).toHaveLength(2);
+    expect((await prove(evento.id)).every((r) => r.displayName === null)).toBe(true);
+    // L'account resta: la persona lavora ancora qui.
+    expect(await prisma.staffAccount.count({ where: { id: account.id } })).toBe(1);
+  });
+
+  it('una prova scritta prima dell’impronta si raggiunge dal legame con la concessione', async () => {
+    const evento = await creaEvento(RECENTE);
+    const { concessione, emailHash } = await relatrice(evento.id);
+    await proveDiSala(evento.id, { eventModeratorId: concessione.id });
+
+    await chiediCancellazione(emailHash);
+
+    expect(await prisma.multitrackConsent.count()).toBe(0);
+    expect(await prove(evento.id)).toMatchObject([
+      { displayName: null, emailHash },
+      { displayName: null, emailHash },
+    ]);
+  });
+
+  describe('l’account cancellato prima della pulizia', () => {
+    async function senzaAccount(evento: { id: string }) {
+      const account = await entraCome('ORGANIZER');
+      await proveDiSala(evento.id, {
+        staffAccountId: account.id,
+        emailHash: account.emailHash,
+      });
+      await prisma.staffAccount.delete({ where: { id: account.id } });
+      const [riga] = await prisma.recordingConsent.findMany();
+      expect(riga?.staffAccountId).toBeNull();
+      return account.emailHash;
+    }
+
+    it('la pulizia copia la prova con l’impronta, e la cancellazione le toglie il nome', async () => {
+      const evento = await creaEvento(PUBBLICATO);
+      const emailHash = await senzaAccount(evento);
+      await giroDiPulizia();
+      expect(await prove(evento.id)).toMatchObject([{ emailHash }, { emailHash }]);
+      expect((await prove(evento.id)).every((r) => r.displayName !== null)).toBe(true);
+
+      await chiediCancellazione(emailHash);
+
+      expect((await prove(evento.id)).every((r) => r.displayName === null)).toBe(true);
+    });
+
+    it('prima della pulizia la cancellazione raggiunge le sorgenti', async () => {
+      const evento = await creaEvento(RECENTE);
+      const emailHash = await senzaAccount(evento);
+
+      expect(await chiediCancellazione(emailHash)).toMatchObject({ consentProofsKept: 2 });
+
+      expect(await prisma.recordingConsent.count()).toBe(0);
+      expect(await prisma.multitrackConsent.count()).toBe(0);
+    });
+  });
+
+  it('la concessione tolta dallo staff: la cancellazione arriva lo stesso alla prova', async () => {
+    const evento = await creaEvento(PUBBLICATO);
+    const { concessione, emailHash } = await relatrice(evento.id);
+    await proveDiSala(evento.id, { eventModeratorId: concessione.id, emailHash });
+    await prisma.eventModerator.delete({ where: { id: concessione.id } });
+    await giroDiPulizia();
+
+    await chiediCancellazione(emailHash);
+
+    expect(await prove(evento.id)).toHaveLength(2);
+    expect((await prove(evento.id)).every((r) => r.displayName === null)).toBe(true);
+  });
+});
+
+describe('un video che esiste e non e’ pubblicato', () => {
+  /** Finito da poco: la conservazione dei dati non e' passata. */
+  const IN_CONSERVAZIONE = {
+    status: 'ENDED' as const,
+    startsAt: giorniFa(2),
+    endsAt: giorniFa(1),
+    dataRetentionDays: 365,
+  };
+
+  it('la cancellazione conserva la prova, e la pulizia non la toglie', async () => {
+    const evento = await creaEvento({ ...IN_CONSERVAZIONE, recordingUrl: VIDEO });
+    const { emailHash } = await iscritta(evento.id);
+
+    await chiediCancellazione(emailHash);
+    await giroDiPulizia();
+
+    const righe = await prove(evento.id);
+    expect(righe).toHaveLength(5);
+    expect(righe.every((r) => r.displayName === null && r.withdrawnAt !== null)).toBe(true);
+  });
+
+  it('vale per la registrazione temporanea e per la sola trascrizione', async () => {
+    const temporanea = await creaEvento({
+      ...IN_CONSERVAZIONE,
+      tempRecordingUrl: VIDEO,
+      tempRecordingStartedAt: new Date(),
+    });
+    const conTrascrizione = await creaEvento(IN_CONSERVAZIONE);
+    await creaTrascrizione(conTrascrizione.id);
+    const uno = await iscritta(temporanea.id);
+    const due = await iscritta(conTrascrizione.id);
+
+    await chiediCancellazione(uno.emailHash);
+    await chiediCancellazione(due.emailHash);
+    await giroDiPulizia();
+
+    expect(await prove(temporanea.id)).toHaveLength(5);
+    expect((await prove(conTrascrizione.id)).every((r) => r.kind === 'transcription')).toBe(true);
+    expect(await prove(conTrascrizione.id)).toHaveLength(2);
+  });
+
+  it('la cancellazione dallo staff conserva la prova', async () => {
+    const evento = await creaEvento({ ...IN_CONSERVAZIONE, recordingUrl: VIDEO });
+    const { reg } = await iscritta(evento.id);
+    await entraCome('ADMIN');
+
+    const res = await cancellaIscrizione(
+      richiesta(
+        `/api/admin/events/${evento.id}/registrations/${reg.id}`,
+        'DELETE'
+      ) as NextRequest,
+      contesto({ id: evento.id, regId: reg.id })
+    );
+
+    expect(res.status).toBe(200);
+    expect(await prove(evento.id)).toHaveLength(5);
+  });
+
+  it('senza video e senza trascrizione non resta niente', async () => {
+    const evento = await creaEvento(IN_CONSERVAZIONE);
+    const { emailHash } = await iscritta(evento.id);
+    await chiediCancellazione(emailHash);
+    expect(await prove(evento.id)).toHaveLength(0);
+  });
+
+  it('alla fine della conservazione, se non e’ stato pubblicato, la prova se ne va', async () => {
+    const evento = await creaEvento({ ...IN_CONSERVAZIONE, recordingUrl: VIDEO });
+    const { emailHash } = await iscritta(evento.id);
+    await chiediCancellazione(emailHash);
+    await prisma.event.update({
+      where: { id: evento.id },
+      data: { endsAt: giorniFa(61), startsAt: giorniFa(62), dataRetentionDays: 30 },
+    });
+
+    await giroDiPulizia();
+
+    expect(await prove(evento.id)).toHaveLength(0);
+  });
+});
+
+describe('prove non piu’ coperte su un evento ancora in conservazione', () => {
+  const LUNGA = {
+    ...PUBBLICATO,
+    startsAt: giorniFa(6),
+    endsAt: giorniFa(5),
+    dataRetentionDays: 365,
+  };
+
+  it('il video tolto: se ne vanno al giro dopo, con una riga nel registro', async () => {
+    const evento = await creaEvento(LUNGA);
+    const { emailHash } = await iscritta(evento.id);
+    await chiediCancellazione(emailHash);
+    expect(await prove(evento.id)).toHaveLength(5);
+
+    await prisma.event.update({
+      where: { id: evento.id },
+      data: { recordingUrl: null, recordingPublished: false, recordingPublishedAt: null },
+    });
+    const conti = await giroDiPulizia();
+
+    expect(await prove(evento.id)).toHaveLength(0);
+    expect(conti.retainedConsentProofsDeleted).toBe(5);
+    const [riga] = await prisma.gdprAuditLog.findMany({
+      where: { eventId: evento.id, action: 'DATA_DELETED', details: { contains: 'retainedConsentProofs' } },
+    });
+    expect(riga?.recordCount).toBe(5);
+  });
+
+  it('una registrazione rimasta dopo aver tolto il video non le tiene', async () => {
+    const evento = await creaEvento(LUNGA);
+    await creaRegistrazione(evento.id);
+    const { emailHash } = await iscritta(evento.id);
+    await chiediCancellazione(emailHash);
+
+    await prisma.event.update({
+      where: { id: evento.id },
+      data: { recordingUrl: null, recordingPublished: false, recordingPublishedAt: null },
+    });
+    await giroDiPulizia();
+
+    expect(await prove(evento.id)).toHaveLength(0);
+  });
+
+  it('tolto il video resta la trascrizione: resta solo la sua prova', async () => {
+    const evento = await creaEvento(LUNGA);
+    await creaTrascrizione(evento.id);
+    const { emailHash } = await iscritta(evento.id);
+    await chiediCancellazione(emailHash);
+
+    await prisma.event.update({
+      where: { id: evento.id },
+      data: { recordingUrl: null, recordingPublished: false, recordingPublishedAt: null },
+    });
+    await giroDiPulizia();
+
+    const righe = await prove(evento.id);
+    expect(righe).toHaveLength(2);
+    expect(righe.every((r) => r.kind === 'transcription')).toBe(true);
+  });
+
+  it('con il video al suo posto il giro non cambia niente e non scrive nel registro', async () => {
+    const evento = await creaEvento(LUNGA);
+    const { emailHash } = await iscritta(evento.id);
+    await chiediCancellazione(emailHash);
+    const righe = await prisma.gdprAuditLog.count();
+
+    expect((await giroDiPulizia()).retainedConsentProofsDeleted).toBe(0);
+
+    expect(await prove(evento.id)).toHaveLength(5);
+    expect(await prisma.gdprAuditLog.count()).toBe(righe);
+  });
+});
+
+describe('un evento con piu’ sessioni registrate', () => {
+  const PRIMO = 'https://storage.example.com/recordings/prima-sessione.mp4';
+  const SECONDO = 'https://storage.example.com/recordings/seconda-sessione.mp4';
+  const IN_CONSERVAZIONE = {
+    status: 'ENDED' as const,
+    startsAt: giorniFa(6),
+    endsAt: giorniFa(5),
+    dataRetentionDays: 365,
+    recordingUrl: SECONDO,
+  };
+
+  /** Come dopo due webhook: l'evento indica l'ultimo file. */
+  async function dueSessioni(campi: Parameters<typeof creaEvento>[0] = {}) {
+    const evento = await creaEvento({ ...IN_CONSERVAZIONE, ...campi });
+    const prima = await creaSessione(evento.id, {
+      recordingUrl: PRIMO,
+      recordingFilename: 'recordings/prima-sessione.mp4',
+      recordingFileSize: 10n,
+      recordingDuration: 60,
+    });
+    const seconda = await creaSessione(evento.id, {
+      recordingUrl: SECONDO,
+      recordingFilename: 'recordings/seconda-sessione.mp4',
+      recordingFileSize: 20n,
+      recordingDuration: 120,
+    });
+    return { evento, prima, seconda };
+  }
+  const cancellaSessione = async (
+    evento: { id: string; moderatorToken: string },
+    sessione: { id: string }
+  ) => {
+    const res = await togliSessione(
+      richiesta(
+        `/api/events/${evento.id}/sessions/${sessione.id}`,
+        'DELETE',
+        undefined,
+        evento.moderatorToken
+      ) as unknown as NextRequest,
+      contesto({ param: evento.id, id: sessione.id })
+    );
+    expect(res.status).toBe(200);
+  };
+  const cancellaVideo = async (evento: { id: string; moderatorToken: string }) => {
+    const res = await togliVideo(
+      richiesta(
+        `/api/events/${evento.id}/recording`,
+        'DELETE',
+        undefined,
+        evento.moderatorToken
+      ) as unknown as NextRequest,
+      contesto({ param: evento.id })
+    );
+    expect(res.status).toBe(200);
+  };
+
+  it('tolta l’ultima sessione, il file dell’altra tiene le prove', async () => {
+    const { evento, prima, seconda } = await dueSessioni();
+    const { emailHash } = await iscritta(evento.id);
+    await chiediCancellazione(emailHash);
+    expect(await prove(evento.id)).toHaveLength(5);
+
+    await cancellaSessione(evento, seconda);
+    await giroDiPulizia();
+
+    const dopo = await prisma.event.findUniqueOrThrow({ where: { id: evento.id } });
+    expect(dopo.recordingUrl).toBeNull();
+    expect(await prove(evento.id)).toHaveLength(5);
+
+    await cancellaSessione(evento, prima);
+    await giroDiPulizia();
+    expect(await prove(evento.id)).toHaveLength(0);
+  });
+
+  it('una cancellazione dopo aver tolto l’ultima sessione conserva la prova', async () => {
+    const { evento, seconda } = await dueSessioni();
+    const { emailHash } = await iscritta(evento.id);
+    await cancellaSessione(evento, seconda);
+
+    await chiediCancellazione(emailHash);
+
+    expect(await prove(evento.id)).toHaveLength(5);
+  });
+
+  it('togliere il video dell’evento toglie il file dalla sua sessione, non dall’altra', async () => {
+    const { evento, prima, seconda } = await dueSessioni();
+    const { emailHash } = await iscritta(evento.id);
+    await chiediCancellazione(emailHash);
+
+    await cancellaVideo(evento);
+    await giroDiPulizia();
+
+    expect(await prisma.callSession.findUniqueOrThrow({ where: { id: seconda.id } })).toMatchObject({
+      recordingUrl: null,
+      recordingFilename: null,
+      recordingFileSize: null,
+      recordingDuration: null,
+    });
+    expect(await prisma.callSession.findUniqueOrThrow({ where: { id: prima.id } })).toMatchObject({
+      recordingUrl: PRIMO,
+      recordingFilename: 'recordings/prima-sessione.mp4',
+    });
+    expect(await prove(evento.id)).toHaveLength(5);
+  });
+
+  it('con una sola sessione, togliere il video porta via le prove al giro dopo', async () => {
+    const evento = await creaEvento(IN_CONSERVAZIONE);
+    await creaSessione(evento.id, { recordingUrl: SECONDO });
+    const { emailHash } = await iscritta(evento.id);
+    await chiediCancellazione(emailHash);
+
+    await cancellaVideo(evento);
+    await giroDiPulizia();
+
+    expect(await prove(evento.id)).toHaveLength(0);
+  });
+
+  it('due sessioni sullo stesso file: tolta una, l’altra non lo offre piu’', async () => {
+    const evento = await creaEvento(IN_CONSERVAZIONE);
+    const prima = await creaSessione(evento.id, { recordingUrl: SECONDO });
+    const doppia = await creaSessione(evento.id, { recordingUrl: SECONDO });
+    const { emailHash } = await iscritta(evento.id);
+    await chiediCancellazione(emailHash);
+
+    await cancellaSessione(evento, doppia);
+    await giroDiPulizia();
+
+    const rimasta = await prisma.callSession.findUniqueOrThrow({ where: { id: prima.id } });
+    expect(rimasta.recordingUrl).toBeNull();
+    expect(await prove(evento.id)).toHaveLength(0);
+  });
+
+  it('togliere il video dalla modifica dell’evento lo toglie anche dalla sessione', async () => {
+    const { evento, seconda } = await dueSessioni();
+
+    const res = await aggiornaEvento(
+      richiesta(
+        `/api/events/${evento.id}`,
+        'PUT',
+        { recordingUrl: null },
+        evento.moderatorToken
+      ) as unknown as NextRequest,
+      contesto({ param: evento.id })
+    );
+
+    expect(res.status).toBe(200);
+    const sessione = await prisma.callSession.findUniqueOrThrow({ where: { id: seconda.id } });
+    expect(sessione.recordingUrl).toBeNull();
+  });
+
+  it('togliere il video dalla pubblicazione lo toglie anche dalla sessione', async () => {
+    const { evento, prima, seconda } = await dueSessioni();
+    await entraCome('ADMIN');
+
+    const res = await aggiornaPubblicazione(
+      richiesta(`/api/admin/publications/${evento.id}`, 'PATCH', {
+        recordingUrl: null,
+      }) as unknown as NextRequest,
+      contesto({ id: evento.id })
+    );
+
+    expect(res.status).toBe(200);
+    const [sessione, altra] = await Promise.all([
+      prisma.callSession.findUniqueOrThrow({ where: { id: seconda.id } }),
+      prisma.callSession.findUniqueOrThrow({ where: { id: prima.id } }),
+    ]);
+    expect(sessione.recordingUrl).toBeNull();
+    expect(altra.recordingUrl).toBe(PRIMO);
+  });
+
+  it('caricare un altro file non toglie quello della sessione', async () => {
+    const { evento, seconda } = await dueSessioni();
+    await entraCome('ADMIN');
+
+    const res = await aggiornaPubblicazione(
+      richiesta(`/api/admin/publications/${evento.id}`, 'PATCH', {
+        recordingUrl: VIDEO,
+      }) as unknown as NextRequest,
+      contesto({ id: evento.id })
+    );
+
+    expect(res.status).toBe(200);
+    const sessione = await prisma.callSession.findUniqueOrThrow({ where: { id: seconda.id } });
+    expect(sessione.recordingUrl).toBe(SECONDO);
+  });
+
+  it('il video pubblicato scaduto toglie il suo file: resta quello dell’altra sessione', async () => {
+    const { evento, prima, seconda } = await dueSessioni({
+      recordingPublished: true,
+      recordingPublishedAt: giorniFa(5),
+      recordingDeleteAfterDays: 1,
+    });
+    const { emailHash } = await iscritta(evento.id);
+    await chiediCancellazione(emailHash);
+
+    await giroDiPulizia();
+
+    const [scaduta, altra] = await Promise.all([
+      prisma.callSession.findUniqueOrThrow({ where: { id: seconda.id } }),
+      prisma.callSession.findUniqueOrThrow({ where: { id: prima.id } }),
+    ]);
+    expect(scaduta.recordingUrl).toBeNull();
+    expect(altra.recordingUrl).toBe(PRIMO);
+    expect(await prove(evento.id)).toHaveLength(5);
+  });
+});
+
+describe('tracce per persona senza un video', () => {
+  const IN_CONSERVAZIONE = {
+    status: 'ENDED' as const,
+    startsAt: giorniFa(6),
+    endsAt: giorniFa(5),
+    dataRetentionDays: 365,
+  };
+
+  /** Il segnaposto di una registrazione solo a tracce, senza webhook del video. */
+  async function soloTracce(eventId: string, audioPurgedAt: Date | null) {
+    const sessione = await creaSessione(eventId);
+    const registrazione = await prisma.recording.create({
+      data: {
+        callSessionId: sessione.id,
+        eventId,
+        blobKey: `${MULTITRACK_PREFIX}${randomUUID()}/`,
+        mediaStartedAt: giorniFa(5),
+      },
+    });
+    await prisma.recordingTrack.create({
+      data: {
+        recordingId: registrazione.id,
+        participantId: 'posto-1',
+        blobKey: `${registrazione.blobKey}posto-1-0.ogg`,
+        audioPurgedAt,
+      },
+    });
+    return registrazione;
+  }
+
+  it('finche’ le tracce ci sono, la cancellazione conserva anche la prova della registrazione', async () => {
+    const evento = await creaEvento(IN_CONSERVAZIONE);
+    await soloTracce(evento.id, null);
+    const { emailHash } = await iscritta(evento.id);
+
+    await chiediCancellazione(emailHash);
+    await giroDiPulizia();
+
+    expect(new Set((await prove(evento.id)).map((p) => p.kind))).toEqual(
+      new Set(['recording', 'transcription'])
+    );
+  });
+
+  it('audio cancellato e trascrizione rimasta: resta solo la prova della trascrizione', async () => {
+    const evento = await creaEvento(IN_CONSERVAZIONE);
+    await soloTracce(evento.id, giorniFa(1));
+    await creaTrascrizione(evento.id);
+    const { emailHash } = await iscritta(evento.id);
+
+    await chiediCancellazione(emailHash);
+
+    const righe = await prove(evento.id);
+    expect(righe).toHaveLength(2);
+    expect(righe.every((r) => r.kind === 'transcription')).toBe(true);
+  });
+
+  it('l’audio cancellato dopo la cancellazione toglie la prova della registrazione al giro dopo', async () => {
+    const evento = await creaEvento(IN_CONSERVAZIONE);
+    const registrazione = await soloTracce(evento.id, null);
+    await creaTrascrizione(evento.id);
+    const { emailHash } = await iscritta(evento.id);
+    await chiediCancellazione(emailHash);
+    expect((await prove(evento.id)).some((p) => p.kind === 'recording')).toBe(true);
+
+    await prisma.recordingTrack.updateMany({
+      where: { recordingId: registrazione.id },
+      data: { audioPurgedAt: new Date() },
+    });
+    await giroDiPulizia();
+
+    const righe = await prove(evento.id);
+    expect(righe).toHaveLength(2);
+    expect(righe.every((r) => r.kind === 'transcription')).toBe(true);
+  });
+});
+
 describe('pulizia e cancellazione insieme', () => {
   it('una cancellazione che arriva durante la pulizia non lascia una prova con il nome', async () => {
     const evento = await creaEvento(PUBBLICATO);
@@ -734,6 +1537,115 @@ describe('pulizia e cancellazione insieme', () => {
       true
     );
   });
+});
+
+describe('pulizia e ritiro insieme', () => {
+  it('il ritiro che ha letto l’iscrizione e arriva dopo la pulizia vale sulla prova', async () => {
+    const evento = await creaEvento(PUBBLICATO);
+    const { reg, emailHash } = await iscritta(evento.id);
+    const altra = await iscritta(evento.id, 'Luca Verdi');
+    const { consentsToken } = await chiediDati(emailHash);
+
+    // Il blocco tiene ferma la pulizia e poi il ritiro: la pulizia si mette in
+    // fila per prima, quindi cancella tutto mentre il ritiro aspetta.
+    let sblocca: () => void = () => undefined;
+    const via = new Promise<void>((risolvi) => {
+      sblocca = risolvi;
+    });
+    const { bloccato, finito } = tieniIlBlocco(evento.id, via);
+    await bloccato;
+    const giro = giroDiPulizia();
+    await inFila(1);
+    const risposta = ritira(
+      daIp('/api/gdpr/consents', 'POST', {
+        token: consentsToken,
+        registrationId: reg.id,
+        consent: 'recording',
+      }),
+      contesto({})
+    );
+    await inFila(2);
+    sblocca();
+    await Promise.all([finito, giro]);
+
+    expect((await risposta).status).toBe(200);
+    expect(await prisma.registration.count({ where: { eventId: evento.id } })).toBe(0);
+    const sue = await prisma.retainedConsentProof.findMany({ where: { emailHash } });
+    expect(sue).toHaveLength(5);
+    // Il periodo gia' ritirato conserva la sua ora; gli altri sono ritirati ora.
+    expect(sue.every((r) => r.withdrawnAt !== null)).toBe(true);
+    const altrui = await prisma.retainedConsentProof.findMany({
+      where: { emailHash: altra.emailHash, source: 'registration' },
+    });
+    expect(altrui.every((r) => r.withdrawnAt === null)).toBe(true);
+    const riga = await prisma.gdprAuditLog.findFirstOrThrow({
+      where: { eventId: evento.id, action: 'CONSENT_WITHDRAWN' },
+    });
+    expect(JSON.parse(riga.details ?? '{}')).toMatchObject({
+      source: 'self-service',
+      recording: 2,
+      transcription: 2,
+    });
+  });
+
+  it('ritirare la sola trascrizione lascia valida la registrazione anche nella corsa', async () => {
+    const evento = await creaEvento(PUBBLICATO);
+    const { reg, emailHash } = await iscritta(evento.id);
+    await prisma.recordingConsent.updateMany({
+      where: { registrationId: reg.id },
+      data: { earlierPeriods: [] },
+    });
+    const { consentsToken } = await chiediDati(emailHash);
+    let sblocca: () => void = () => undefined;
+    const via = new Promise<void>((risolvi) => {
+      sblocca = risolvi;
+    });
+    const { bloccato, finito } = tieniIlBlocco(evento.id, via);
+    await bloccato;
+    const giro = giroDiPulizia();
+    await inFila(1);
+    const risposta = ritira(
+      daIp('/api/gdpr/consents', 'POST', {
+        token: consentsToken,
+        registrationId: reg.id,
+        consent: 'transcription',
+      }),
+      contesto({})
+    );
+    await inFila(2);
+    sblocca();
+    await Promise.all([finito, giro]);
+
+    expect((await risposta).status).toBe(200);
+    const sue = await prisma.retainedConsentProof.findMany({ where: { emailHash } });
+    expect(sue.filter((r) => r.kind === 'transcription').every((r) => r.withdrawnAt)).toBe(true);
+    expect(sue.filter((r) => r.kind === 'recording').every((r) => !r.withdrawnAt)).toBe(true);
+  });
+
+  it('il ritiro aspetta il blocco oltre i 5 secondi predefiniti', async () => {
+    const evento = await creaEvento(PUBBLICATO);
+    const { reg, emailHash } = await iscritta(evento.id);
+    const { consentsToken } = await chiediDati(emailHash);
+    const attesa = new Promise((risolvi) => setTimeout(risolvi, 6_000));
+    const { bloccato, finito } = tieniIlBlocco(evento.id, attesa);
+    await bloccato;
+
+    const res = await ritira(
+      daIp('/api/gdpr/consents', 'POST', {
+        token: consentsToken,
+        registrationId: reg.id,
+        consent: 'recording',
+      }),
+      contesto({})
+    );
+    await finito;
+
+    expect(res.status).toBe(200);
+    expect(
+      (await prisma.registration.findUniqueOrThrow({ where: { id: reg.id } }))
+        .consentRecordingWithdrawnAt
+    ).not.toBeNull();
+  }, 15_000);
 });
 
 describe('i propri dati', () => {

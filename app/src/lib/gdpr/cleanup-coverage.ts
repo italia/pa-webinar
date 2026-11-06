@@ -32,7 +32,7 @@ export const PURGED_BY_CLEANUP: Record<string, string> = {
   EventModerator: 'concessioni nominali: nome ed email cifrati piu’ un link di accesso durevole',
   MultitrackConsent: 'prova del consenso alla registrazione per partecipante: nome cifrato e posto nella conferenza; si copia prima, se il video o la trascrizione sono pubblicati (RetainedConsentProof)',
   RecordingConsent: 'prova del consenso alla registrazione dato in sala d’attesa: nome cifrato e posto nella conferenza; si copia prima, se il video è pubblicato (RetainedConsentProof)',
-  RetainedConsentProof: 'prova del consenso che resta finché il video o la trascrizione sono pubblicati: non segue la scadenza dei dati dell’evento; la transazione cancella quelle non più coperte (lib/gdpr/cleanup-selection), e le altre se ne vanno con l’evento (cascade)',
+  RetainedConsentProof: 'prova del consenso che resta finché il video o la trascrizione esistono: non segue la scadenza dei dati dell’evento; la transazione cancella quelle non più coperte (lib/gdpr/cleanup-selection), un giro a parte fa lo stesso sugli eventi ancora in conservazione, e le altre se ne vanno con l’evento (cascade)',
   CallSession: 'ripulita, non cancellata: si azzerano le colonne con PII e restano i numeri aggregati',
   RoomOccupant: 'chi era in sala: endpoint del bridge e posto della conferenza, che rimanda a un’iscrizione',
   CaptionSegment: 'frasi dei sottotitoli salvate per la trascrizione: nome e testo cifrati di chi ha acconsentito; la trascrizione costruita resta sulla registrazione, con la sua retention',

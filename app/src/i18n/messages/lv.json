@@ -4045,7 +4045,7 @@
         "erasedName": "(vārds noņemts pēc pieprasījuma)",
         "unreadableName": "(vārds nav nolasāms)"
       },
-      "retainedNote": "{count, plural, zero {# pierādījumi tiek glabāti} one {# pierādījums tiek glabāts} other {# pierādījumi tiek glabāti}}, kamēr video vai atšifrējums paliek publicēts.",
+      "retainedNote": "{count, plural, zero {# pierādījumi tiek glabāti} one {# pierādījums tiek glabāts} other {# pierādījumi tiek glabāti}}, kamēr video vai atšifrējums pastāv.",
       "countsNote": "Tiek skaitītas personas: reģistrācija, darbinieka konts vai personalizēta saite tiek skaitīta vienreiz; viesis, kurš atgriežas citā apmeklējumā, tiek skaitīts vēlreiz."
     }
   },
@@ -4562,7 +4562,7 @@
       "consentWithdrawnOn": "Atsaukts {date}",
       "consentNoteInRoom": "Ja pašlaik esat telpā, atsaukums ir spēkā no nākamās ienākšanas: lai tas stātos spēkā uzreiz, telpā izmantojiet Piekrišanas.",
       "proofsTitle": "Saglabātie piekrišanu pierādījumi",
-      "proofsIntro": "Šo pasākumu dati ir dzēsti. Šie pierādījumi paliek, kamēr video vai atšifrējums ir publicēts. Varat atsaukt piekrišanu: tas, kas jau ir video, paliek, un, lai to izņemtu, jums jāraksta datu pārzinim.",
+      "proofsIntro": "Šo pasākumu dati ir dzēsti. Šie pierādījumi paliek, kamēr video vai atšifrējums pastāv. Varat atsaukt piekrišanu: tas, kas jau ir video, paliek, un, lai to izņemtu, jums jāraksta datu pārzinim.",
       "proofGivenOn": "Dota {date}",
       "proofSuperseded": "Aizstāta ar vēlāku piekrišanu",
       "addressBookTitle": "Pasākumu kontaktu grāmata",
@@ -4582,13 +4582,13 @@
       "linkInvalid": "Saite nav derīga vai tai ir beidzies derīguma termiņš. Pieprasiet jaunu saiti.",
       "confirmWarning": "Jūs grasāties neatgriezeniski dzēst ar jūsu e-pasta adresi saistītos personas datus, izņemot to, kas norādīts zemāk.",
       "confirmBody": "Tiks dzēstas reģistrācijas, jautājumi, balsojumi aptaujās, atsauksmes, atgādinājumi un jūsu ieraksts pasākumu kontaktu grāmatā. Darbība ir neatgriezeniska.",
-      "confirmProofs": "Ja pasākumam ir publicēts video vai atšifrējums, piekrišanas veids, datums un teksts, uz kuru atbildējāt, paliek bez jūsu vārda, kamēr šis video vai atšifrējums paliek publicēts. Tie kalpo piekrišanas pierādīšanai. Video nemainās: lai lūgtu izņemt jūsu uzstāšanās, rakstiet datu pārzinim.",
+      "confirmProofs": "Ja pasākumam ir video vai atšifrējums, pat ja tas vēl nav publicēts, piekrišanas veids, datums un teksts, uz kuru atbildējāt, paliek bez jūsu vārda, kamēr šis video vai atšifrējums pastāv. Tie kalpo piekrišanas pierādīšanai. Video nemainās: lai lūgtu izņemt jūsu uzstāšanās, rakstiet datu pārzinim.",
       "confirmButton": "Apstiprināt dzēšanu",
       "cancel": "Atcelt",
       "processing": "Notiek dzēšana...",
       "doneTitle": "Dzēšana pabeigta",
       "doneBody": "Dzēsto reģistrāciju skaits: {count}. Dzēsti arī saistītie dati.",
-      "doneProofs": "{count, plural, zero {Paliek # piekrišanas pierādījumi bez jūsu vārda, kamēr video vai atšifrējums paliek publicēts.} one {Paliek # piekrišanas pierādījums bez jūsu vārda, kamēr video vai atšifrējums paliek publicēts.} other {Paliek # piekrišanas pierādījumi bez jūsu vārda, kamēr video vai atšifrējums paliek publicēts.}}",
+      "doneProofs": "{count, plural, zero {Paliek # piekrišanas pierādījumi bez jūsu vārda, kamēr video vai atšifrējums pastāv.} one {Paliek # piekrišanas pierādījums bez jūsu vārda, kamēr video vai atšifrējums pastāv.} other {Paliek # piekrišanas pierādījumi bez jūsu vārda, kamēr video vai atšifrējums pastāv.}}",
       "error": "Radās kļūda. Lūdzu, mēģiniet vēlāk.",
       "rateLimited": "Pārāk daudz pieprasījumu. Lūdzu, mēģiniet vēlreiz pēc stundas.",
       "back": "Atpakaļ uz maniem datiem",

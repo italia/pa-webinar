@@ -4045,7 +4045,7 @@
         "erasedName": "(name removed on request)",
         "unreadableName": "(name not readable)"
       },
-      "retainedNote": "{count, plural, one {# proof is kept} other {# proofs are kept}} for as long as the video or transcript stays published.",
+      "retainedNote": "{count, plural, one {# proof is kept} other {# proofs are kept}} for as long as the video or transcript exists.",
       "countsNote": "People are counted: a registration, a staff account or a named link count once; a guest who comes back in another visit counts again."
     }
   },
@@ -4562,7 +4562,7 @@
       "consentWithdrawnOn": "Withdrawn on {date}",
       "consentNoteInRoom": "If you are in the room right now, the withdrawal counts from your next entry: to apply it at once, use Consents in the room.",
       "proofsTitle": "Consent proofs kept",
-      "proofsIntro": "The data for these events has been deleted. These proofs stay for as long as the video or transcript is published. You can withdraw your consent: what is already in the video stays, and to have it removed you must write to the data controller.",
+      "proofsIntro": "The data for these events has been deleted. These proofs stay for as long as the video or transcript exists. You can withdraw your consent: what is already in the video stays, and to have it removed you must write to the data controller.",
       "proofGivenOn": "Given on {date}",
       "proofSuperseded": "Replaced by a later consent",
       "addressBookTitle": "Events address book",
@@ -4582,13 +4582,13 @@
       "linkInvalid": "This link is invalid or expired. Please request a new link.",
       "confirmWarning": "You are about to permanently erase the personal data tied to your email, except what is listed below.",
       "confirmBody": "Registrations, questions, poll votes, feedback, reminders and your entry in the events address book will be deleted. This action is irreversible.",
-      "confirmProofs": "If an event has a published video or transcript, the type of consent, the date and the text you answered stay, without your name, for as long as that video or transcript stays published. They are there to prove the consent. The video does not change: to ask for your contributions to be removed, write to the data controller.",
+      "confirmProofs": "If a video or transcript of an event exists, even if it is not published yet, the type of consent, the date and the text you answered stay, without your name, for as long as that video or transcript exists. They are there to prove the consent. The video does not change: to ask for your contributions to be removed, write to the data controller.",
       "confirmButton": "Confirm erasure",
       "cancel": "Cancel",
       "processing": "Deleting...",
       "doneTitle": "Erasure completed",
       "doneBody": "{count} registrations and the linked data have been deleted.",
-      "doneProofs": "{count, plural, one {# consent proof remains, without your name, for as long as the video or transcript stays published.} other {# consent proofs remain, without your name, for as long as the video or transcript stays published.}}",
+      "doneProofs": "{count, plural, one {# consent proof remains, without your name, for as long as the video or transcript exists.} other {# consent proofs remain, without your name, for as long as the video or transcript exists.}}",
       "error": "An error occurred. Please try again later.",
       "rateLimited": "Too many requests. Please try again in one hour.",
       "back": "Back to my data",

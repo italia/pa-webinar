@@ -4045,7 +4045,7 @@
         "erasedName": "(nombre eliminado a petición)",
         "unreadableName": "(nombre no legible)"
       },
-      "retainedNote": "{count, plural, one {# prueba se conserva} other {# pruebas se conservan}} mientras el vídeo o la transcripción sigan publicados.",
+      "retainedNote": "{count, plural, one {# prueba se conserva} other {# pruebas se conservan}} mientras el vídeo o la transcripción existan.",
       "countsNote": "Se cuentan personas: una inscripción, una cuenta del personal o un enlace nominal cuentan una vez; un invitado que vuelve en otra visita cuenta de nuevo."
     }
   },
@@ -4562,7 +4562,7 @@
       "consentWithdrawnOn": "Retirado el {date}",
       "consentNoteInRoom": "Si ahora estás en la sala, la retirada vale desde tu próxima entrada: para aplicarla enseguida, usa Consentimientos en la sala.",
       "proofsTitle": "Pruebas del consentimiento conservadas",
-      "proofsIntro": "Los datos de estos eventos se han suprimido. Estas pruebas permanecen mientras el vídeo o la transcripción estén publicados. Puedes retirar el consentimiento: lo que ya está en el vídeo permanece y, para que lo quiten, debes escribir al responsable del tratamiento.",
+      "proofsIntro": "Los datos de estos eventos se han suprimido. Estas pruebas permanecen mientras el vídeo o la transcripción existan. Puedes retirar el consentimiento: lo que ya está en el vídeo permanece y, para que lo quiten, debes escribir al responsable del tratamiento.",
       "proofGivenOn": "Dado el {date}",
       "proofSuperseded": "Sustituido por un consentimiento posterior",
       "addressBookTitle": "Agenda de eventos",
@@ -4582,13 +4582,13 @@
       "linkInvalid": "Este enlace no es válido o ha caducado. Solicite un nuevo enlace.",
       "confirmWarning": "Está a punto de suprimir de forma definitiva los datos personales asociados a su dirección de correo electrónico, excepto lo que se indica a continuación.",
       "confirmBody": "Se suprimirán las inscripciones, las preguntas, los votos en las encuestas, las valoraciones, los recordatorios y su registro en la Agenda de eventos. La operación es irreversible.",
-      "confirmProofs": "Si un evento tiene un vídeo o una transcripción publicados, permanecen el tipo de consentimiento, la fecha y el texto al que respondió, sin su nombre, mientras ese vídeo o esa transcripción sigan publicados. Sirven para demostrar el consentimiento. El vídeo no cambia: para solicitar que se retiren sus intervenciones, escriba al responsable del tratamiento.",
+      "confirmProofs": "Si existe un vídeo o una transcripción de un evento, aunque aún no estén publicados, permanecen el tipo de consentimiento, la fecha y el texto al que respondió, sin su nombre, mientras ese vídeo o esa transcripción existan. Sirven para demostrar el consentimiento. El vídeo no cambia: para solicitar que se retiren sus intervenciones, escriba al responsable del tratamiento.",
       "confirmButton": "Confirmar la supresión",
       "cancel": "Cancelar",
       "processing": "Eliminando...",
       "doneTitle": "Supresión completada",
       "doneBody": "Se han suprimido {count} inscripciones y los datos vinculados.",
-      "doneProofs": "{count, plural, one {Permanece # prueba del consentimiento, sin su nombre, mientras el vídeo o la transcripción sigan publicados.} other {Permanecen # pruebas del consentimiento, sin su nombre, mientras el vídeo o la transcripción sigan publicados.}}",
+      "doneProofs": "{count, plural, one {Permanece # prueba del consentimiento, sin su nombre, mientras el vídeo o la transcripción existan.} other {Permanecen # pruebas del consentimiento, sin su nombre, mientras el vídeo o la transcripción existan.}}",
       "error": "Se ha producido un error. Inténtelo de nuevo más tarde.",
       "rateLimited": "Demasiadas solicitudes. Inténtelo de nuevo dentro de una hora.",
       "back": "Volver a mis datos",

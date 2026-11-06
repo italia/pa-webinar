@@ -174,6 +174,17 @@ export function shouldPurgeRecordingBlob(evt: RecordingBlobRow): boolean {
   return Boolean(evt.recordingUrl) && !evt.recordingPublished;
 }
 
+/** La transazione di un evento nella pulizia: fa decine di istruzioni, e quelle
+ *  sulle prove crescono con le persone. Il limite predefinito di Prisma (5
+ *  secondi) farebbe fallire ogni giorno un evento grande, che non si
+ *  ripulirebbe mai. */
+export const TIMEOUT_PULIZIA_EVENTO_MS = 60_000;
+
+/** Le transazioni in fila con la pulizia dello stesso evento (ritiri e
+ *  cancellazioni): l'attesa conta nel limite, quindi devono poterla aspettare
+ *  tutta e fare ancora il proprio lavoro. */
+export const TIMEOUT_DOPO_PULIZIA_MS = TIMEOUT_PULIZIA_EVENTO_MS + 30_000;
+
 export interface StatoPubblicazioneProve extends RecordingBlobRow {
   youtubeUrl: string | null;
   /** La trascrizione e' pubblicata e il suo artefatto esiste ancora. */
@@ -181,8 +192,8 @@ export interface StatoPubblicazioneProve extends RecordingBlobRow {
 }
 
 /**
- * Quali prove di consenso restano quando le loro sorgenti se ne vanno: e' la
- * definizione unica della vita di una prova conservata.
+ * Quali prove di consenso restano quando la conservazione dei dati dell'evento
+ * e' finita e il file non pubblicato se ne va: conta solo cio' che e' pubblicato.
  *
  *  - Il video e' pubblicato, sulla piattaforma o con un link esterno (come
  *    `lib/events/closing`): restano entrambe, perche' la trascrizione viene da
@@ -202,4 +213,41 @@ export function tipiDiProvaDaConservare(evt: StatoPubblicazioneProve): TipoConse
     return ['recording', 'transcription'];
   }
   return evt.trascrizionePubblicata ? ['transcription'] : [];
+}
+
+export interface StatoEsistenzaProve {
+  youtubeUrl: string | null;
+  recordingUrl: string | null;
+  tempRecordingUrl: string | null;
+  /** Il file di una sessione ancora al suo posto, anche se non e' quello
+   *  dell'evento: l'evento indica solo l'ultima sessione registrata. */
+  fileDiSessione: boolean;
+  /** Le tracce per persona ancora presenti di una registrazione che sull'evento
+   *  non ha un indirizzo. Le altre registrazioni non contano: i campi qui sopra
+   *  dicono gia' se il loro video c'e', e la riga resta anche dopo che il video e'
+   *  stato tolto. */
+  tracceArrivate: boolean;
+  /** C'e' un artefatto di trascrizione, pubblicato o no. */
+  trascrizioneEsiste: boolean;
+}
+
+/**
+ * Quali prove di consenso restano prima che finisca la conservazione dei dati
+ * dell'evento: il video puo' esistere e non essere ancora pubblicato, e la voce
+ * di chi chiede la cancellazione c'e' dentro comunque. Vale per chi cancella
+ * iscrizioni, concessioni e account, e per quando una prova cosi' conservata se
+ * ne va (lo staff ha tolto il video). Alla scadenza decide
+ * `tipiDiProvaDaConservare`.
+ */
+export function tipiDiProvaDiCioCheEsiste(evt: StatoEsistenzaProve): TipoConsenso[] {
+  if (
+    evt.youtubeUrl ||
+    evt.recordingUrl ||
+    evt.tempRecordingUrl ||
+    evt.fileDiSessione ||
+    evt.tracceArrivate
+  ) {
+    return ['recording', 'transcription'];
+  }
+  return evt.trascrizioneEsiste ? ['transcription'] : [];
 }

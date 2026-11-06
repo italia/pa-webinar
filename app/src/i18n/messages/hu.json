@@ -4045,7 +4045,7 @@
         "erasedName": "(a név kérésre eltávolítva)",
         "unreadableName": "(a név nem olvasható)"
       },
-      "retainedNote": "{count, plural, one {# igazolást őrzünk meg} other {# igazolást őrzünk meg}}, amíg a videó vagy az átirat közzétéve marad.",
+      "retainedNote": "{count, plural, one {# igazolást őrzünk meg} other {# igazolást őrzünk meg}}, amíg a videó vagy az átirat létezik.",
       "countsNote": "Személyeket számolunk: egy regisztráció, egy munkatársi fiók vagy egy névre szóló link egyszer számít; a másik látogatáskor visszatérő vendég újra számít."
     }
   },
@@ -4562,7 +4562,7 @@
       "consentWithdrawnOn": "Visszavonva: {date}",
       "consentNoteInRoom": "Ha most a teremben van, a visszavonás a következő belépéstől érvényes: az azonnali érvényhez használja a teremben a Hozzájárulások gombot.",
       "proofsTitle": "Megőrzött hozzájárulási igazolások",
-      "proofsIntro": "Ezen események adatai törölve lettek. Ezek az igazolások addig maradnak meg, amíg a videó vagy az átirat közzé van téve. A hozzájárulását visszavonhatja: ami már a videóban van, az ott marad, és az eltávolításához írnia kell az adatkezelőnek.",
+      "proofsIntro": "Ezen események adatai törölve lettek. Ezek az igazolások addig maradnak meg, amíg a videó vagy az átirat létezik. A hozzájárulását visszavonhatja: ami már a videóban van, az ott marad, és az eltávolításához írnia kell az adatkezelőnek.",
       "proofGivenOn": "Megadva: {date}",
       "proofSuperseded": "Egy későbbi hozzájárulás váltotta fel",
       "addressBookTitle": "Az események címjegyzéke",
@@ -4582,13 +4582,13 @@
       "linkInvalid": "A link érvénytelen vagy lejárt. Kérjen új linket.",
       "confirmWarning": "Az e-mail címéhez társított személyes adatok végleges törlésére készül, kivéve az alább felsoroltakat.",
       "confirmBody": "Törlésre kerülnek a regisztrációk, a kérdések, a szavazatok, a visszajelzések, az emlékeztetők és az Ön bejegyzése az események címjegyzékében. A művelet visszavonhatatlan.",
-      "confirmProofs": "Ha egy eseménynek van közzétett videója vagy átirata, a hozzájárulás típusa, a dátum és a szöveg, amelyre válaszolt, a neve nélkül megmarad, amíg az a videó vagy az az átirat közzétéve marad. Ezek a hozzájárulás igazolására szolgálnak. A videó nem változik: ha kérni szeretné a hozzászólásai eltávolítását, írjon az adatkezelőnek.",
+      "confirmProofs": "Ha egy eseménynek van videója vagy átirata, akkor is, ha még nincs közzétéve, a hozzájárulás típusa, a dátum és a szöveg, amelyre válaszolt, a neve nélkül megmarad, amíg az a videó vagy az az átirat létezik. Ezek a hozzájárulás igazolására szolgálnak. A videó nem változik: ha kérni szeretné a hozzászólásai eltávolítását, írjon az adatkezelőnek.",
       "confirmButton": "Törlés megerősítése",
       "cancel": "Mégse",
       "processing": "Törlés folyamatban...",
       "doneTitle": "A törlés befejeződött",
       "doneBody": "{count} regisztráció és a kapcsolódó adatok törölve lettek.",
-      "doneProofs": "{count, plural, one {# hozzájárulási igazolás maradt meg, az Ön neve nélkül, amíg a videó vagy az átirat közzétéve marad.} other {# hozzájárulási igazolás maradt meg, az Ön neve nélkül, amíg a videó vagy az átirat közzétéve marad.}}",
+      "doneProofs": "{count, plural, one {# hozzájárulási igazolás maradt meg, az Ön neve nélkül, amíg a videó vagy az átirat létezik.} other {# hozzájárulási igazolás maradt meg, az Ön neve nélkül, amíg a videó vagy az átirat létezik.}}",
       "error": "Hiba történt. Kérjük, próbálja újra később.",
       "rateLimited": "Túl sok kérés. Próbálja újra egy óra múlva.",
       "back": "Vissza az adataimhoz",

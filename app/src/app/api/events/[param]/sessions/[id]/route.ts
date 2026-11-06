@@ -5,7 +5,7 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { ForbiddenError, NotFoundError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { extractModeratorToken } from '@/lib/auth/moderator';
-import { CAMPI_VIDEO_VUOTI } from '@/lib/events/recording-fields';
+import { CAMPI_VIDEO_VUOTI, sessioniSenzaFile } from '@/lib/events/recording-fields';
 import { deleteRecordingBlob } from '@/lib/storage/recordings';
 import { tryDecryptJSON } from '@/lib/crypto/pii';
 
@@ -84,6 +84,11 @@ export const DELETE = withErrorHandling(async (request, context) => {
     !!session.recordingUrl && session.recordingUrl === event.recordingUrl;
   await prisma.$transaction([
     prisma.callSession.delete({ where: { id: session.id } }),
+    // Un webhook ripetuto lascia due sessioni sullo stesso file: quella che resta
+    // non deve continuare a offrirlo.
+    ...(session.recordingUrl
+      ? [prisma.callSession.updateMany(sessioniSenzaFile(event.id, session.recordingUrl))]
+      : []),
     ...(eraPubblicato
       ? [
           prisma.event.update({

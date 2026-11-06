@@ -499,6 +499,7 @@ model EventModerator {
   agendaItems EventAgendaItem[]
   // Le prove del consenso alla registrazione date entrando in sala.
   recordingConsents RecordingConsent[]
+  multitrackConsents MultitrackConsent[]
 
   presentations EventPresentation[]
 
@@ -2680,6 +2681,7 @@ model StaffAccount {
   // Le prove del consenso alla registrazione date entrando in sala dal link
   // primario con la propria sessione.
   recordingConsents RecordingConsent[]
+  multitrackConsents MultitrackConsent[]
 
   @@map("staff_accounts")
 }
@@ -2716,6 +2718,14 @@ model MultitrackConsent {
   // Nome mostrato in sala, cifrato (encryptPII).
   displayName    String   @map("display_name")
   registrationId String?  @map("registration_id") @db.Uuid
+  // Chi conduce o interviene: la concessione nominale, o l'account dello
+  // staff dietro il link primario, come in RecordingConsent. Il solo legame
+  // per chi ha dato la trascrizione e non la registrazione.
+  eventModeratorId String? @map("event_moderator_id") @db.Uuid
+  staffAccountId   String? @map("staff_account_id") @db.Uuid
+  // L'impronta dell'indirizzo di chi conduce (hashEmail), come in
+  // RecordingConsent: resta quando la concessione o l'account se ne vanno.
+  emailHash      String?  @map("email_hash") @db.VarChar(64)
   locale         String?  @db.VarChar(8)
   consentedAt    DateTime @default(now()) @map("consented_at")
   // Ritirato dalla sala (lib/live/consent-withdrawal): la prova resta, il
@@ -2726,11 +2736,16 @@ model MultitrackConsent {
   // Registration.consentMultitrackVersion).
   textVersion    Int      @default(2) @map("text_version")
 
-  event        Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  registration Registration? @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  event          Event           @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  registration   Registration?   @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  eventModerator EventModerator? @relation(fields: [eventModeratorId], references: [id], onDelete: SetNull)
+  staffAccount   StaffAccount?   @relation(fields: [staffAccountId], references: [id], onDelete: SetNull)
 
   @@index([eventId])
   @@index([registrationId])
+  @@index([eventModeratorId])
+  @@index([staffAccountId])
+  @@index([emailHash])
   @@map("multitrack_consents")
 }
 
@@ -2811,6 +2826,10 @@ model RecordingConsent {
   // richiedere il consenso a ogni ingresso.
   eventModeratorId String? @map("event_moderator_id") @db.Uuid
   staffAccountId   String? @map("staff_account_id") @db.Uuid
+  // L'impronta dell'indirizzo di chi conduce (hashEmail), scritta con il
+  // consenso: la cancellazione chiesta dalla persona raggiunge la prova anche
+  // quando la concessione o l'account non ci sono piu'.
+  emailHash      String?  @map("email_hash") @db.VarChar(64)
   locale         String?  @db.VarChar(8)
   consentedAt    DateTime @default(now()) @map("consented_at")
   // Ritirato dalla sala (lib/live/consent-withdrawal): la prova resta, il
@@ -2840,6 +2859,7 @@ model RecordingConsent {
   @@index([registrationId])
   @@index([eventModeratorId])
   @@index([staffAccountId])
+  @@index([emailHash])
   @@map("recording_consents")
 }
 

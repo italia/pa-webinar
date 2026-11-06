@@ -14,3 +14,22 @@ export const CAMPI_VIDEO_VUOTI = {
   recordingDuration: null,
   recordingDeleteAfterDays: null,
 } as const;
+
+/**
+ * Le sessioni che puntano a un file tolto dall'evento, senza piu' quel file: il
+ * pannello delle sessioni non lo offre piu', le prove dei consensi non lo contano
+ * come video (lib/gdpr/retained-consent-proofs), e se il file e' rimasto nello
+ * storage la riconciliazione lo vede come orfano. Si passa a
+ * `callSession.updateMany`, nella stessa transazione che toglie il video.
+ */
+export function sessioniSenzaFile(eventId: string, recordingUrl: string) {
+  return {
+    where: { eventId, recordingUrl },
+    data: {
+      recordingUrl: null,
+      recordingFileSize: null,
+      recordingDuration: null,
+      recordingFilename: null,
+    },
+  };
+}

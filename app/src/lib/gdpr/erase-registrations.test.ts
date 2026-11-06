@@ -21,7 +21,7 @@ const m = vi.hoisted(() => ({
   },
   transazione: vi.fn(),
   conservaProve: vi.fn(),
-  tipiDelleProve: vi.fn(),
+  tipiDelleProveEsistenti: vi.fn(),
   togliNomeDelleIscrizioni: vi.fn(),
   blocca: vi.fn(),
 }));
@@ -41,10 +41,11 @@ vi.mock('@/lib/captions/transcript', () => ({
 }));
 vi.mock('@/lib/gdpr/retained-consent-proofs', () => ({
   conservaProve: m.conservaProve,
-  tipiDelleProve: m.tipiDelleProve,
+  tipiDelleProveEsistenti: m.tipiDelleProveEsistenti,
   togliNomeDelleIscrizioni: m.togliNomeDelleIscrizioni,
 }));
 
+import { TIMEOUT_PULIZIA_EVENTO_MS } from './cleanup-selection';
 import { eraseRegistrations } from './erase-registrations';
 
 const { tx } = m;
@@ -66,7 +67,7 @@ beforeEach(() => {
   }
   tx.$executeRaw.mockResolvedValue(0);
   m.transazione.mockImplementation(async (fn: (t: typeof tx) => unknown) => fn(tx));
-  m.tipiDelleProve.mockResolvedValue(['recording', 'transcription']);
+  m.tipiDelleProveEsistenti.mockResolvedValue(['recording', 'transcription']);
   m.conservaProve.mockResolvedValue(2);
   m.togliNomeDelleIscrizioni.mockResolvedValue(0);
 });
@@ -98,6 +99,11 @@ describe('eraseRegistrations', () => {
   it('la transazione ha un timeout esplicito', async () => {
     await eraseRegistrations(ISCRIZIONI, 'prova');
     expect(m.transazione.mock.calls[0]![1].timeout).toBeGreaterThan(5_000);
+  });
+
+  it('puo\' aspettare tutta la pulizia dello stesso evento', async () => {
+    await eraseRegistrations(ISCRIZIONI, 'prova');
+    expect(m.transazione.mock.calls[0]![1].timeout).toBeGreaterThan(TIMEOUT_PULIZIA_EVENTO_MS);
   });
 
   it('blocca gli eventi in ordine prima di ogni cancellazione', async () => {

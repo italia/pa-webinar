@@ -13,6 +13,9 @@ import {
   shouldPurgeRecordingBlob,
   tempRecordingExpiryCutoff,
   tipiDiProvaDaConservare,
+  TIMEOUT_DOPO_PULIZIA_MS,
+  TIMEOUT_PULIZIA_EVENTO_MS,
+  tipiDiProvaDiCioCheEsiste,
 } from './cleanup-selection';
 
 /**
@@ -325,5 +328,43 @@ describe('tipiDiProvaDaConservare', () => {
     const evt = { ...niente, youtubeUrl: 'y', recordingUrl: 'u' };
     expect(tipiDiProvaDaConservare(evt)).toEqual(entrambe);
     expect(shouldPurgeRecordingBlob(evt)).toBe(true);
+  });
+});
+
+describe('tipiDiProvaDiCioCheEsiste', () => {
+  const niente = {
+    youtubeUrl: null,
+    recordingUrl: null,
+    tempRecordingUrl: null,
+    fileDiSessione: false,
+    tracceArrivate: false,
+    trascrizioneEsiste: false,
+  };
+
+  it.each([
+    ['il file non ancora pubblicato', { recordingUrl: 'https://file' }],
+    ['la registrazione temporanea', { tempRecordingUrl: 'https://temp' }],
+    ['il link esterno', { youtubeUrl: 'https://esterno' }],
+    ['il file di un’altra sessione', { fileDiSessione: true }],
+    ['le tracce per persona arrivate', { tracceArrivate: true }],
+  ])('%s vale come video: restano entrambe', (_nome, stato) => {
+    expect(tipiDiProvaDiCioCheEsiste({ ...niente, ...stato })).toEqual([
+      'recording',
+      'transcription',
+    ]);
+  });
+
+  it('la sola trascrizione tiene la sua prova, anche non pubblicata', () => {
+    expect(tipiDiProvaDiCioCheEsiste({ ...niente, trascrizioneEsiste: true })).toEqual([
+      'transcription',
+    ]);
+  });
+
+  it('niente video e niente trascrizione: nessuna', () => {
+    expect(tipiDiProvaDiCioCheEsiste(niente)).toEqual([]);
+  });
+
+  it('il limite di chi aspetta la pulizia supera quello della pulizia', () => {
+    expect(TIMEOUT_DOPO_PULIZIA_MS).toBeGreaterThan(TIMEOUT_PULIZIA_EVENTO_MS);
   });
 });

@@ -4045,7 +4045,7 @@
         "erasedName": "(isem imneħħi fuq talba)",
         "unreadableName": "(isem mhux leġibbli)"
       },
-      "retainedNote": "{count, plural, one {# prova tinżamm} two {# provi jinżammu} few {# provi jinżammu} many {#-il prova jinżammu} other {# prova jinżammu}} sakemm il-vidjo jew it-traskrizzjoni jibqgħu ppubblikati.",
+      "retainedNote": "{count, plural, one {# prova tinżamm} two {# provi jinżammu} few {# provi jinżammu} many {#-il prova jinżammu} other {# prova jinżammu}} sakemm il-vidjo jew it-traskrizzjoni jeżistu.",
       "countsNote": "Jingħaddu n-nies: reġistrazzjoni, kont tal-persunal jew link nominali jgħoddu darba; mistieden li jerġa' lura f'żjara oħra jgħodd mill-ġdid."
     }
   },
@@ -4562,7 +4562,7 @@
       "consentWithdrawnOn": "Irtirat fil-{date}",
       "consentNoteInRoom": "Jekk bħalissa qiegħed fis-sala, l-irtirar jgħodd mid-dħul li jmiss: biex jgħodd mill-ewwel, uża Kunsensi fis-sala.",
       "proofsTitle": "Provi tal-kunsensi miżmuma",
-      "proofsIntro": "Id-dejta ta' dawn l-avvenimenti tħassret. Dawn il-provi jibqgħu sakemm il-vidjo jew it-traskrizzjoni jkunu ppubblikati. Tista' tirtira l-kunsens: dak li diġà jinsab fil-vidjo jibqa', u biex tneħħih trid tikteb lill-kontrollur tad-dejta.",
+      "proofsIntro": "Id-dejta ta' dawn l-avvenimenti tħassret. Dawn il-provi jibqgħu sakemm il-vidjo jew it-traskrizzjoni jeżistu. Tista' tirtira l-kunsens: dak li diġà jinsab fil-vidjo jibqa', u biex tneħħih trid tikteb lill-kontrollur tad-dejta.",
       "proofGivenOn": "Mogħti fil-{date}",
       "proofSuperseded": "Sostitwit b'kunsens sussegwenti",
       "addressBookTitle": "Direttorju tal-avvenimenti",
@@ -4582,13 +4582,13 @@
       "linkInvalid": "Il-link mhuwiex validu jew skada. Jekk jogħġbok itlob link ġdid.",
       "confirmWarning": "Se tħassar b'mod permanenti d-dejta personali assoċjata mal-indirizz email tiegħek, ħlief dak li huwa indikat hawn taħt.",
       "confirmBody": "Se jitħassru r-reġistrazzjonijiet, il-mistoqsijiet, il-voti fl-istħarriġiet, il-feedback, it-tfakkiriet u l-entrata tiegħek fid-direttorju tal-avvenimenti. L-operazzjoni hija irriversibbli.",
-      "confirmProofs": "Jekk avveniment ikollu vidjo jew traskrizzjoni ppubblikati, jibqgħu t-tip ta' kunsens, id-data u t-test li weġibt għalih, mingħajr ismek, sakemm dak il-vidjo jew dik it-traskrizzjoni jibqgħu ppubblikati. Iservu biex jintwera l-kunsens. Il-vidjo ma jinbidilx: biex titlob li jitneħħew l-interventi tiegħek, ikteb lill-kontrollur tad-dejta.",
+      "confirmProofs": "Jekk avveniment ikollu vidjo jew traskrizzjoni, anki jekk għadhom mhux ippubblikati, jibqgħu t-tip ta' kunsens, id-data u t-test li weġibt għalih, mingħajr ismek, sakemm dak il-vidjo jew dik it-traskrizzjoni jeżistu. Iservu biex jintwera l-kunsens. Il-vidjo ma jinbidilx: biex titlob li jitneħħew l-interventi tiegħek, ikteb lill-kontrollur tad-dejta.",
       "confirmButton": "Ikkonferma t-tħassir",
       "cancel": "Ikkanċella",
       "processing": "Qed jitħassar...",
       "doneTitle": "Tħassir lest",
       "doneBody": "Reġistrazzjonijiet imħassra: {count}. Tħassret ukoll id-dejta relatata.",
-      "doneProofs": "{count, plural, one {Baqgħet # prova tal-kunsens, mingħajr ismek, sakemm il-vidjo jew it-traskrizzjoni jibqgħu ppubblikati.} two {Baqgħu # provi tal-kunsens, mingħajr ismek, sakemm il-vidjo jew it-traskrizzjoni jibqgħu ppubblikati.} few {Baqgħu # provi tal-kunsens, mingħajr ismek, sakemm il-vidjo jew it-traskrizzjoni jibqgħu ppubblikati.} many {Baqgħu #-il prova tal-kunsens, mingħajr ismek, sakemm il-vidjo jew it-traskrizzjoni jibqgħu ppubblikati.} other {Baqgħu # prova tal-kunsens, mingħajr ismek, sakemm il-vidjo jew it-traskrizzjoni jibqgħu ppubblikati.}}",
+      "doneProofs": "{count, plural, one {Baqgħet # prova tal-kunsens, mingħajr ismek, sakemm il-vidjo jew it-traskrizzjoni jeżistu.} two {Baqgħu # provi tal-kunsens, mingħajr ismek, sakemm il-vidjo jew it-traskrizzjoni jeżistu.} few {Baqgħu # provi tal-kunsens, mingħajr ismek, sakemm il-vidjo jew it-traskrizzjoni jeżistu.} many {Baqgħu #-il prova tal-kunsens, mingħajr ismek, sakemm il-vidjo jew it-traskrizzjoni jeżistu.} other {Baqgħu # prova tal-kunsens, mingħajr ismek, sakemm il-vidjo jew it-traskrizzjoni jeżistu.}}",
       "error": "Ġara żball. Jekk jogħġbok erġa' pprova aktar tard.",
       "rateLimited": "Wisq talbiet. Jekk jogħġbok erġa' pprova wara siegħa.",
       "back": "Lura għad-dejta tiegħi",
