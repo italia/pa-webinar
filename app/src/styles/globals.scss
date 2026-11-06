@@ -11389,8 +11389,10 @@ html.live-resizing .live-sidebar-resizer::after {
 }
 
 .formato__scelte--tre {
+  // Tre colonne solo dove ciascuna tiene icona e titolo: la griglia sta accanto
+  // all'anteprima, e la larghezza dello schermo non dice quanto spazio ha.
   @media (min-width: 576px) {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
   }
 }
 

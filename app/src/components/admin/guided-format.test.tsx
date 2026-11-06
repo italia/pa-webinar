@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: EUPL-1.2
 // SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
 
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
 import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { NextIntlClientProvider } from 'next-intl';
@@ -231,6 +234,16 @@ describe('la domanda sulla registrazione', () => {
     });
     scegli(g.people.piccolo);
     expect(registraScelta()).toBe('pubblica');
+  });
+});
+
+describe('la griglia a tre colonne', () => {
+  it('non scende sotto una larghezza che tiene icona e titolo', () => {
+    const regola = /\.formato__scelte--tre \{([\s\S]*?)\n\}/.exec(
+      readFileSync(resolve(__dirname, '../../styles/globals.scss'), 'utf8'),
+    )?.[1];
+    expect(regola).toMatch(/repeat\(auto-fit, minmax\(min\(100%, \d+rem\), 1fr\)\)/);
+    expect(regola).not.toContain('repeat(3');
   });
 });
 
