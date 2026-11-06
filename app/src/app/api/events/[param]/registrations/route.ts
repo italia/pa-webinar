@@ -122,7 +122,7 @@ export const POST = withErrorHandling(async (request, context) => {
     linguaDaIntestazione(request.headers.get('Accept-Language')) ??
     defaultLocale;
 
-  // I consensi obbligatori dipendono dal formato dell'evento: la stessa regola
+  // I consensi da chiedere dipendono dal formato dell'evento: la stessa regola
   // del modulo (lib/registration/consents).
   const settings = await getSettings();
   const disponibile = recordingAvailable();

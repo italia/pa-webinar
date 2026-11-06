@@ -6,8 +6,8 @@
  *
  * Returns all Person rows currently opted in to the cross-event address
  * book. This is the people directory, independent of a single event
- * registration. Supports filtering by organization type, text search
- * (organization only — see trade-off below), and inactivity window.
+ * registration. Supports filtering by organization type and text search
+ * (organization only — see trade-off below).
  *
  * GET params:
  *   q?          — case-insensitive substring match on organization only.

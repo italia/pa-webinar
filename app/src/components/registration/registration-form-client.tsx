@@ -82,7 +82,6 @@ interface RegistrationFormClientProps {
    *  pubblica spenta il modulo spiega che serve l'invito e che il link arriva
    *  per email; senza invitati resta solo il rinvio del link a chi è iscritto. */
   registrationAccess?: RegistrationAccess;
-  /** Chi non acconsente alla registrazione partecipa in solo ascolto. */
   /** La voce di chi non acconsente nel video (lib/recording/availability). */
   voce?: VoceNelVideo;
   /** Arrivati dall'email d'invito: nome e indirizzo dell'invito. */

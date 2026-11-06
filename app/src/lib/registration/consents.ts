@@ -23,7 +23,8 @@
  *
  * Il consenso alla registrazione e' libero (art. 7.4 GDPR): non e' mai una
  * condizione per iscriversi o per entrare. Chi non lo da' partecipa come tutti e
- * resta fuori dalla registrazione (lib/live/listen-only).
+ * resta fuori dalla registrazione; dove la voce non si puo' togliere dal video,
+ * il pubblico senza consenso resta in solo ascolto (lib/live/listen-only).
  *
  * Vale per il modulo di iscrizione, per la rotta che la salva e per l'avviso
  * all'ingresso in sala: una sola regola, perché un consenso chiesto in un
@@ -40,8 +41,11 @@ import type { VoceNelVideo } from '@/lib/live/consent-rule';
  *   2. la trascrizione dei propri interventi con il proprio nome, dalla
  *      traccia audio, dai sottotitoli live o dal video, per il resoconto
  *      dell'evento.
- * La trascrizione dai sottotitoli tiene solo i consensi dati con il testo 2:
- * chi aveva acconsentito alla sola traccia audio non ha acconsentito a questo.
+ * Dove si trascrive, dai sottotitoli, dal video o dalle tracce con la pipeline
+ * AI, valgono solo i consensi dati con il testo 2: chi aveva acconsentito alla
+ * sola traccia audio non ha acconsentito a questo. Il testo 1 basta a registrare
+ * la traccia senza trascriverla, e per mostrare i nomi nelle registrazioni nate
+ * prima della regola sul video (`regimeConsensoVoce`, lib/ai/voice-consent).
  * Si cambia insieme al testo (gdpr.consent.multitrack) quando il suo scopo
  * cambia. Le due varianti di `chiaveConsensoTrascrizione` hanno lo stesso scopo e
  * la stessa versione: cambia solo quanto resta la traccia, e una versione nuova

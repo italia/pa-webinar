@@ -184,7 +184,6 @@ interface EventInfo {
    *  la riceve con il consenso. Quella in vigore la riporta ogni risposta del
    *  token (`JitsiCredentials.recordingDestination`). */
   recordingDestination?: RecordingAudience | null;
-  /** Chi non acconsente alla registrazione entra in solo ascolto. */
   /** La voce di chi non acconsente nel video (lib/recording/availability). */
   voceNelVideo?: VoceNelVideo;
   /** L'informativa privacy dell'evento (lib/events/privacy-notice), accanto

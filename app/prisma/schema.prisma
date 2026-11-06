@@ -277,7 +277,9 @@ model Event {
   // con uno pseudonimo stabile per posto («Partecipante 7K2Q»), in video, in
   // chat e nelle domande; l'elenco dei partecipanti e la vista a griglia
   // restano a chi conduce. Chi conduce e chi interviene restano con il nome.
-  // Spento di default: negli eventi di comunita' ci si vuole conoscere.
+  // Spento sulla colonna, perche' negli eventi di comunita' ci si vuole
+  // conoscere; il formato lo accende dove il pubblico ascolta soltanto o e' su
+  // vasta scala (lib/events/guided-format).
   audienceAnonymous Boolean @default(false) @map("audience_anonymous")
 
   // L'elenco di chi partecipa, per il pubblico: la scheda Partecipanti, la
@@ -580,6 +582,10 @@ model EventInvitation {
 
   sentAt     DateTime? @map("sent_at")
   acceptedAt DateTime? @map("accepted_at")
+  // Invito fermato: chi lo riceve non va piu' contattato, e da qui in poi non
+  // parte niente. La riga resta, e su un evento a iscrizione non aperta resta
+  // anche l'accesso. Una nuova spunta o un indirizzo nuovo sulla riga lo
+  // tolgono (lib/persons/inviti-fermati).
   declinedAt DateTime? @map("declined_at")
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -870,20 +876,22 @@ model Registration {
   // GDPR consent
   consentGiven                Boolean  @map("consent_given")
   consentTimestamp            DateTime @map("consent_timestamp")
+  // Null anche dove l'evento registra e si limita ad avvisare: non lo chiede.
   consentRecording            Boolean? @map("consent_recording") // null if event has no recording
   // Il testo del consenso alla registrazione letto da chi ha spuntato: la
   // destinazione del video e la versione (lib/recording/destination). Null per
   // chi non ha spuntato e per i consensi dati prima che il testo la dichiarasse.
   consentRecordingDestination RecordingAudience? @map("consent_recording_destination")
   consentRecordingVersion     Int?     @map("consent_recording_version")
-  // ADR-013 Fase 5 — consenso esplicito SEPARATO alla registrazione audio
-  // per-partecipante (traccia isolata = PII sensibile). Null se l'evento non
-  // ha il multitrack abilitato; obbligatorio (true) per registrarsi se lo ha.
+  // ADR-013 Fase 5 — consenso esplicito SEPARATO alla trascrizione dei propri
+  // interventi con il proprio nome, che comprende la traccia audio per persona
+  // (traccia isolata = PII sensibile). Facoltativo: chi non lo da' si iscrive
+  // lo stesso. Null se l'evento non lo chiede (lib/registration/consents).
   consentMultitrack           Boolean? @map("consent_multitrack")
   // Il testo con cui e' stato dato (lib/registration/consents,
   // VERSIONE_TESTO_TRASCRIZIONE). Null per i consensi dati prima che il testo
   // comprendesse la trascrizione dei propri interventi con il nome: valgono
-  // per la traccia audio, non per la trascrizione dai sottotitoli.
+  // solo per la traccia audio.
   consentMultitrackVersion    Int?     @map("consent_multitrack_version")
   // Ritiro dalla sala dei consensi dati all'iscrizione (art. 7.3 GDPR): da
   // quel momento il consenso dell'iscrizione non vale piu'. Uno ridato in sala
@@ -2050,10 +2058,10 @@ model QuestionnaireAnswer {
 // registration (GDPR Art. 6.1.a — separate consent, not bundled with
 // the per-event Art. 6.1.b basis).
 //
-// Stable profile fields (organization, role) are copied from the latest
-// registration on every re-registration; event-specific questionnaire
-// answers are NOT — those live on QuestionnaireAnswer and expire with
-// the event retention.
+// Stable profile fields (organization, role) are copied from a registration
+// only when it ticks the address-book box: one without it links to the row
+// and changes nothing. Event-specific questionnaire answers are NOT copied —
+// those live on QuestionnaireAnswer and expire with the event retention.
 //
 // See docs/adr/011-person-rubrica.md.
 model Person {
@@ -2081,8 +2089,9 @@ model Person {
   optedInAt            DateTime? @map("opted_in_at")
   optedOutAt           DateTime? @map("opted_out_at")
 
-  // Used by the inactivity retention cron (ADR-011). Refreshed on every
-  // registration linked to this person.
+  // L'ultima spunta della rubrica: ordina l'elenco dello staff. La
+  // conservazione non la legge: `retentionMonths` conta da `optedInAt`
+  // (lib/persons/retention), e un'iscrizione senza spunta non sposta niente.
   lastActiveAt    DateTime @default(now()) @map("last_active_at")
   retentionMonths Int      @default(24) @map("retention_months")
 

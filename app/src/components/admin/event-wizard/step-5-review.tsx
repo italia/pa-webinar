@@ -67,7 +67,6 @@ interface Props {
   onVaiAlCampo?: (campo: CampoMancante) => void;
   /** Cio' che manca ancora, nell'ordine del wizard. */
   mancanti?: CampoMancante[];
-  /** La post-produzione AI e' accesa sull'installazione. */
   /** L'installazione puo' registrare: senza, non si chiede il consenso. */
   recordingAvailable?: boolean;
   /** La voce di chi non acconsente nel video (lib/recording/availability). */
