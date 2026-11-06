@@ -683,6 +683,7 @@
       "confirm": "Atšaukti",
       "working": "Atnaujinama…",
       "error": "Sutikimo atnaujinti nepavyko: bandykite dar kartą.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Renginio įrašymas",
         "give": "Sutinku su įrašymu",
@@ -704,8 +705,7 @@
         "giveEffect": "Jūsų pasisakymai patenka į renginio nuorašą su jūsų vardu. Be sutikimo vis tiek dalyvaujate.",
         "withdrawEffect": "Jei jį atšauksite, jūsų jau transkribuoti sakiniai neteks teksto ir vardo, o nuo šiol jūsų balsas nebus nei įrašomas atskirame takelyje, nei transkribuojamas.",
         "needsRecording": "Jį galite duoti sutikę su įrašymu."
-      },
-      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree."
+      }
     },
     "voiceExcluded": {
       "title": "Dalyvaujate be įrašymo.",

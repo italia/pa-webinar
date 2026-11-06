@@ -683,6 +683,7 @@
       "confirm": "Оттегли",
       "working": "Обновяване…",
       "error": "Съгласието не можа да бъде обновено: опитайте отново.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Запис на събитието",
         "give": "Съгласявам се със записа",
@@ -704,8 +705,7 @@
         "giveEffect": "Изказванията ви влизат в транскрипцията на събитието с вашето име. Без съгласие участвате въпреки това.",
         "withdrawEffect": "Ако го оттеглите, вече транскрибираните ви изречения губят текста и името, а оттук нататък гласът ви не се записва в отделен запис и не се транскрибира.",
         "needsRecording": "Можете да го дадете след съгласието за записа."
-      },
-      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree."
+      }
     },
     "voiceExcluded": {
       "title": "Участвате без запис.",

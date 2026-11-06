@@ -683,6 +683,7 @@
       "confirm": "Widerrufen",
       "working": "Wird aktualisiert…",
       "error": "Die Einwilligung konnte nicht aktualisiert werden: Bitte versuchen Sie es erneut.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Aufzeichnung der Veranstaltung",
         "give": "Ich willige in die Aufzeichnung ein",
@@ -704,8 +705,7 @@
         "giveEffect": "Ihre Beiträge kommen mit Ihrem Namen in das Transkript der Veranstaltung. Ohne Einwilligung nehmen Sie trotzdem teil.",
         "withdrawEffect": "Wenn Sie sie widerrufen, verlieren Ihre bereits transkribierten Sätze Text und Namen, und ab jetzt wird Ihre Stimme weder auf einer eigenen Spur aufgezeichnet noch transkribiert.",
         "needsRecording": "Sie können sie nach der Einwilligung in die Aufzeichnung erteilen."
-      },
-      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree."
+      }
     },
     "voiceExcluded": {
       "title": "Sie nehmen ohne Aufzeichnung teil.",

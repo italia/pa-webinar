@@ -683,6 +683,7 @@
       "confirm": "Træk tilbage",
       "working": "Opdaterer…",
       "error": "Samtykket kunne ikke opdateres: prøv igen.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Optagelse af arrangementet",
         "give": "Jeg giver samtykke til optagelsen",
@@ -704,8 +705,7 @@
         "giveEffect": "Dine indlæg kommer med i arrangementets transskription med dit navn. Uden samtykke deltager du stadig.",
         "withdrawEffect": "Hvis du trækker det tilbage, mister dine allerede transskriberede sætninger tekst og navn, og fra nu af optages din stemme hverken på et separat spor eller transskriberes.",
         "needsRecording": "Du kan give det efter samtykke til optagelsen."
-      },
-      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree."
+      }
     },
     "voiceExcluded": {
       "title": "Du deltager uden optagelse.",

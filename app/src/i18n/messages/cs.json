@@ -683,6 +683,7 @@
       "confirm": "Odvolat",
       "working": "Probíhá aktualizace…",
       "error": "Souhlas se nepodařilo aktualizovat: zkuste to znovu.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Záznam akce",
         "give": "Souhlasím se záznamem",
@@ -704,8 +705,7 @@
         "giveEffect": "Vaše příspěvky se dostanou do přepisu akce s vaším jménem. Bez souhlasu se účastníte i tak.",
         "withdrawEffect": "Pokud ho odvoláte, vaše již přepsané věty přijdou o text i jméno a od teď se váš hlas nenahrává na samostatnou stopu ani nepřepisuje.",
         "needsRecording": "Můžete ho udělit po souhlasu se záznamem."
-      },
-      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree."
+      }
     },
     "voiceExcluded": {
       "title": "Účastníte se bez nahrávání.",

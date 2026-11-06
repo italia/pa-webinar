@@ -683,6 +683,7 @@
       "confirm": "Visszavonás",
       "working": "Frissítés folyamatban…",
       "error": "A hozzájárulást nem sikerült frissíteni: próbálja újra.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Az esemény felvétele",
         "give": "Hozzájárulok a felvételhez",
@@ -704,8 +705,7 @@
         "giveEffect": "A hozzászólásai a nevével együtt bekerülnek az esemény átiratába. Hozzájárulás nélkül is részt vehet.",
         "withdrawEffect": "Ha visszavonja, a már átírt mondatai elveszítik a szövegüket és a nevét, és mostantól a hangját sem külön sávon nem rögzítjük, sem át nem írjuk.",
         "needsRecording": "A felvételhez adott hozzájárulás után adhatja meg."
-      },
-      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree."
+      }
     },
     "voiceExcluded": {
       "title": "Rögzítés nélkül vesz részt.",

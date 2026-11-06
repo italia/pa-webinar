@@ -683,6 +683,7 @@
       "confirm": "Retirar",
       "working": "Actualizando…",
       "error": "No se ha podido actualizar el consentimiento: inténtalo de nuevo.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Grabación del evento",
         "give": "Doy mi consentimiento a la grabación",
@@ -704,8 +705,7 @@
         "giveEffect": "Tus intervenciones entran en la transcripción del evento con tu nombre. Sin él, participas igualmente.",
         "withdrawEffect": "Si lo retiras, tus frases ya transcritas pierden el texto y el nombre, y desde ahora tu voz no se graba en una pista aparte ni se transcribe.",
         "needsRecording": "Puedes darlo después del consentimiento a la grabación."
-      },
-      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree."
+      }
     },
     "voiceExcluded": {
       "title": "Participas sin grabación.",

@@ -683,6 +683,7 @@
       "confirm": "Peruuta",
       "working": "Päivitetään…",
       "error": "Suostumusta ei voitu päivittää: yritä uudelleen.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Tapahtuman tallennus",
         "give": "Suostun tallennukseen",
@@ -704,8 +705,7 @@
         "giveEffect": "Puheenvuorosi tulevat tapahtuman litteraattiin nimelläsi. Ilman suostumusta osallistut silti.",
         "withdrawEffect": "Jos peruutat sen, jo litteroidut lauseesi menettävät tekstinsä ja nimesi, eikä ääntäsi tästä lähtien tallenneta omalle raidalle eikä litteroida.",
         "needsRecording": "Voit antaa sen suostuttuasi tallennukseen."
-      },
-      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree."
+      }
     },
     "voiceExcluded": {
       "title": "Osallistut ilman tallennusta.",

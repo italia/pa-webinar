@@ -683,6 +683,7 @@
       "confirm": "Wycofaj",
       "working": "Aktualizowanie…",
       "error": "Nie udało się zaktualizować zgody: spróbuj ponownie.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Nagrywanie wydarzenia",
         "give": "Wyrażam zgodę na nagrywanie",
@@ -704,8 +705,7 @@
         "giveEffect": "Twoje wypowiedzi trafiają do transkrypcji wydarzenia z twoim imieniem. Bez tej zgody nadal uczestniczysz.",
         "withdrawEffect": "Jeśli ją wycofasz, twoje już przetranskrybowane zdania tracą tekst i imię, a od teraz twój głos nie jest nagrywany na osobnej ścieżce ani transkrybowany.",
         "needsRecording": "Możesz jej udzielić po wyrażeniu zgody na nagrywanie."
-      },
-      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree."
+      }
     },
     "voiceExcluded": {
       "title": "Uczestniczysz bez nagrywania.",

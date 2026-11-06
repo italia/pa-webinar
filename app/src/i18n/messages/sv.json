@@ -683,6 +683,7 @@
       "confirm": "Återkalla",
       "working": "Uppdaterar…",
       "error": "Samtycket kunde inte uppdateras: försök igen.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Inspelning av evenemanget",
         "give": "Jag samtycker till inspelningen",
@@ -704,8 +705,7 @@
         "giveEffect": "Dina inlägg kommer med i evenemangets transkription med ditt namn. Utan samtycke deltar du ändå.",
         "withdrawEffect": "Om du återkallar det förlorar dina redan transkriberade meningar text och namn, och från och med nu spelas din röst varken in på ett eget spår eller transkriberas.",
         "needsRecording": "Du kan ge det efter samtycke till inspelningen."
-      },
-      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree."
+      }
     },
     "voiceExcluded": {
       "title": "Du deltar utan inspelning.",

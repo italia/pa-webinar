@@ -683,6 +683,7 @@
       "confirm": "Intrekken",
       "working": "Bezig met bijwerken…",
       "error": "De toestemming kon niet worden bijgewerkt: probeer het opnieuw.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Opname van het evenement",
         "give": "Ik geef toestemming voor de opname",
@@ -704,8 +705,7 @@
         "giveEffect": "Je bijdragen komen met je naam in de transcriptie van het evenement. Zonder toestemming doe je gewoon mee.",
         "withdrawEffect": "Als je hem intrekt, verliezen je al getranscribeerde zinnen hun tekst en je naam, en vanaf nu wordt je stem niet meer op een apart spoor opgenomen of getranscribeerd.",
         "needsRecording": "Je kunt hem geven na toestemming voor de opname."
-      },
-      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree."
+      }
     },
     "voiceExcluded": {
       "title": "U neemt deel zonder opname.",

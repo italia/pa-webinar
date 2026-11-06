@@ -683,6 +683,7 @@
       "confirm": "Ανάκληση",
       "working": "Ενημέρωση…",
       "error": "Δεν ήταν δυνατή η ενημέρωση της συγκατάθεσης: δοκιμάστε ξανά.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Καταγραφή της εκδήλωσης",
         "give": "Συναινώ στην καταγραφή",
@@ -704,8 +705,7 @@
         "giveEffect": "Οι παρεμβάσεις σας μπαίνουν στην απομαγνητοφώνηση της εκδήλωσης με το όνομά σας. Χωρίς αυτήν συμμετέχετε κανονικά.",
         "withdrawEffect": "Αν την ανακαλέσετε, οι ήδη απομαγνητοφωνημένες φράσεις σας χάνουν το κείμενο και το όνομά σας, και από τώρα η φωνή σας ούτε καταγράφεται σε ξεχωριστό κανάλι ούτε απομαγνητοφωνείται.",
         "needsRecording": "Μπορείτε να τη δώσετε μετά τη συγκατάθεση στην καταγραφή."
-      },
-      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree."
+      }
     },
     "voiceExcluded": {
       "title": "Συμμετέχετε χωρίς καταγραφή.",

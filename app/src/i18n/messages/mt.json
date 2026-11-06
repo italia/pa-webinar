@@ -683,6 +683,7 @@
       "confirm": "Irtira",
       "working": "Qed jaġġorna…",
       "error": "Ma kienx possibbli jiġi aġġornat il-kunsens: erġa' pprova.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Reġistrazzjoni tal-avveniment",
         "give": "Nagħti l-kunsens għar-reġistrazzjoni",
@@ -704,8 +705,7 @@
         "giveEffect": "Dak li tgħid jidħol fit-traskrizzjoni tal-avveniment b'ismek. Mingħajru xorta tipparteċipa.",
         "withdrawEffect": "Jekk tirtirah, is-sentenzi tiegħek diġà traskritti jitilfu t-test u ismek, u minn issa 'l quddiem leħnek la jiġi rreġistrat f'binarju separat u lanqas traskritt.",
         "needsRecording": "Tista' tagħtih wara l-kunsens għar-reġistrazzjoni."
-      },
-      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree."
+      }
     },
     "voiceExcluded": {
       "title": "Qed tipparteċipa mingħajr reġistrazzjoni.",

@@ -683,6 +683,7 @@
       "confirm": "Retrage",
       "working": "Se actualizează…",
       "error": "Consimțământul nu a putut fi actualizat: încearcă din nou.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Înregistrarea evenimentului",
         "give": "Sunt de acord cu înregistrarea",
@@ -704,8 +705,7 @@
         "giveEffect": "Intervențiile tale intră în transcrierea evenimentului cu numele tău. Fără acest consimțământ participi în continuare.",
         "withdrawEffect": "Dacă îl retragi, frazele tale deja transcrise își pierd textul și numele, iar de acum vocea ta nu mai este înregistrată pe o pistă separată și nici transcrisă.",
         "needsRecording": "Îl poți da după consimțământul la înregistrare."
-      },
-      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree."
+      }
     },
     "voiceExcluded": {
       "title": "Participi fără înregistrare.",

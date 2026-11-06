@@ -683,6 +683,7 @@
       "confirm": "Võta tagasi",
       "working": "Uuendamine…",
       "error": "Nõusolekut ei õnnestunud uuendada: proovi uuesti.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Ürituse salvestamine",
         "give": "Annan nõusoleku salvestamiseks",
@@ -704,8 +705,7 @@
         "giveEffect": "Sinu sõnavõtud lähevad ürituse transkriptsiooni sinu nimega. Ilma nõusolekuta osaled ikka.",
         "withdrawEffect": "Kui võtad selle tagasi, kaotavad su juba transkribeeritud laused teksti ja nime ning nüüdsest su häält ei salvestata eraldi rajale ega transkribeerita.",
         "needsRecording": "Saad selle anda pärast nõusolekut salvestamiseks."
-      },
-      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree."
+      }
     },
     "voiceExcluded": {
       "title": "Osalete ilma salvestuseta.",

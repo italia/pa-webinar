@@ -683,6 +683,7 @@
       "confirm": "Prekliči",
       "working": "Posodabljanje…",
       "error": "Privolitve ni bilo mogoče posodobiti: poskusite znova.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Snemanje dogodka",
         "give": "Privolim v snemanje",
@@ -704,8 +705,7 @@
         "giveEffect": "Vaši govori pridejo v prepis dogodka z vašim imenom. Brez privolitve vseeno sodelujete.",
         "withdrawEffect": "Če jo prekličete, vaši že prepisani stavki izgubijo besedilo in ime, od zdaj pa se vaš glas ne snema na ločeno sled in se ne prepisuje.",
         "needsRecording": "Date jo lahko po privolitvi v snemanje."
-      },
-      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree."
+      }
     },
     "voiceExcluded": {
       "title": "Sodelujete brez snemanja.",

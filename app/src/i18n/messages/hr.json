@@ -683,6 +683,7 @@
       "confirm": "Povuci",
       "working": "Ažuriranje…",
       "error": "Privolu nije bilo moguće ažurirati: pokušajte ponovno.",
+      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree.",
       "recording": {
         "title": "Snimanje događaja",
         "give": "Pristajem na snimanje",
@@ -704,8 +705,7 @@
         "giveEffect": "Vaša izlaganja ulaze u transkripciju događaja s vašim imenom. Bez privole svejedno sudjelujete.",
         "withdrawEffect": "Ako je povučete, vaše već transkribirane rečenice gube tekst i ime, a od sada se vaš glas ne snima u zaseban zapis niti transkribira.",
         "needsRecording": "Možete je dati nakon privole za snimanje."
-      },
-      "textChanged": "The consent text changed after you opened this page: read the new text and confirm if you agree."
+      }
     },
     "voiceExcluded": {
       "title": "Sudjelujete bez snimanja.",
