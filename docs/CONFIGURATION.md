@@ -83,7 +83,7 @@ The setting groups, the operational knobs and their defaults are described in [R
 
 ### Per event
 
-Some behavior is set on each event in the event wizard or on the event page, and is stored on the `Event` row. Examples are the grace period, the expected share of video senders, the video quality, the waiting-room engine, who can register, the recording and AI switches, the privacy notice and the retention period. An event template (`EventTemplate`) only pre-fills the wizard. After the event is created, its row does not depend on the template. The flows are described in [From creation to recap: the event journey](architecture/event-journey.md).
+Some behavior is set on each event in the event wizard or on the event page, and is stored on the `Event` row. Examples are the grace period, the expected share of video senders, the video quality, the waiting-room engine, who can register, the recording and AI switches, where the recording goes (`recordingDestination`), whether the registration form offers the address book (`offerAddressBook`), the privacy notice and the retention period. An event template (`EventTemplate`) and the answers to the new-event questions only pre-fill the wizard. After the event is created, its row depends on neither. The flows are described in [From creation to recap: the event journey](architecture/event-journey.md).
 
 ### Precedence
 
@@ -93,12 +93,13 @@ When two layers set the same thing, a per-event value wins over the site setting
 |---|---|
 | Email sender display name | `SiteSetting.emailFromName`, then `SMTP_FROM_NAME`, then `SiteSetting.siteName`, then `PA Webinar` (`app/src/lib/email/send.ts`) |
 | Email sender address | `SMTP_FROM` only. The administration area cannot change it, because the relay authorizes a specific sender |
-| Privacy link on the registration form and next to the waiting-room consents | `Event.privacyPolicyUrl`, then `DEFAULT_PRIVACY_POLICY_URL`, then the site privacy page in the page language (`/it/privacy`). The event's own notice text, when there is one, opens in place instead (`app/src/lib/events/privacy-notice.ts`) |
+| Privacy link on the registration form and in the waiting room | `Event.privacyPolicyUrl`, then `DEFAULT_PRIVACY_POLICY_URL`, then the site privacy page in the page language (`/it/privacy`). The event's own notice text, when there is one, opens in place instead (`app/src/lib/events/privacy-notice.ts`) |
 | Video quality | `Event.videoQuality`, then `SiteSetting.videoQuality` |
 | Grace period after the scheduled end | `Event.gracePeriodMinutes`, then `SiteSetting.eventGracePeriodMinutes` |
 | Expected share of video senders, for sizing | `Event.expectedSenderRatioPct`, then `SiteSetting.defaultSenderRatioPct` |
 | Title kicker | `Event.parseTitleKicker`, then `SiteSetting.parseTitleKicker` |
 | Who can register | `Event.accessMode` (`OPEN` or `INVITATION`), then `SiteSetting.publicRegistrationEnabled` (`app/src/lib/events/registration-access.ts`) |
+| Address book on the registration form | Offered when both `SiteSetting.addressBookEnabled` and `Event.offerAddressBook` are on (`app/src/lib/persons/address-book.ts`). With the site switch off no event offers it, whatever its own value |
 | Guest entry to a scheduled event | `SiteSetting.guestAccessEnabled`, except that an event with `Event.accessMode` `INVITATION` admits no guests (`app/src/lib/events/guest-window.ts`). Instant calls always admit them |
 | Waiting-room engine | `Event.waitingRoomEngine`, then `SiteSetting.waitingRoomEngine`. In the browser, the `?engine=` parameter, the viewer's classic-view preference and phone detection apply on top (see [The waiting room and the square](architecture/waiting-room.md#engines-classic-view-and-the-square)) |
 | Number of bridges | Each event is capped by `SiteSetting.jvbMaxReplicas`. The total is capped by `JVB_MAX_REPLICAS` |
@@ -111,7 +112,7 @@ When two layers set the same thing, a per-event value wins over the site setting
 Choose the layer by who changes the value and how often:
 
 - **An environment variable** for secrets, addresses of other services and anything that must be fixed before the first request. Read it on the server. Read `NEXT_PUBLIC_*` only with `getPublicEnv()`. Add it to the reference below, and to `values.yaml` or the Secret examples.
-- **A `SiteSetting` column** for what an administrator adjusts. It needs a migration, the validation schema in `app/src/lib/validation/site-settings.ts`, the form, and labels in all 24 languages.
+- **A `SiteSetting` column** for what an administrator adjusts. It needs a migration, the validation schema in `app/src/lib/validation/site-settings.ts`, a place in the public or the withheld list of `app/src/lib/settings/public-projection.ts`, the form, and labels in all 24 languages.
 - **An `Event` column** for what varies per event. If it can be switched on during a live event, it must follow the four-place rule in [Live interaction](architecture/live-interaction.md#live-toggleable-flags).
 
 The step-by-step recipes are in [Extending PA Webinar](development/extending.md).
@@ -137,7 +138,7 @@ Defaults: `app/src/lib/env.ts`. At startup, `app/src/instrumentation.ts` logs an
 |---|---|---|---|---|---|
 | `NEXT_PUBLIC_APP_URL` | Yes | `http://localhost:3000` | No | Chart: `https://` and `site.portalHost`; or `app.env`, which must then agree | Public base URL of the portal, with the scheme: `https://webinar.example.com`. Used for links in emails and calendar files, moderator links, avatars, preview images, the sitemap and SEO metadata. A value without `http://` or `https://` counts as missing (`appBaseUrl()`). The conference's `DYNAMIC_BRANDING_URL` (`jitsi-meet.web.extraEnvs`) is not derived from it: set it to this URL followed by `/api/jitsi-branding.json` ([Where each hostname goes](DEPLOYMENT.md#where-each-hostname-goes)) |
 | `NEXT_PUBLIC_JITSI_DOMAIN` | Yes | `localhost:8443` | No | Chart: `site.conferenceHost`; or `app.env`, which must then agree | Host of the conference front end, without the scheme: `meet.webinar.example.com`. Used by the IFrame API, the Content Security Policy, the `Permissions-Policy` header, the administration's **Infrastructure** page, and the status probes when the in-cluster addresses of the conference are not set ([Conference status probes](#conference-status-probes)) |
-| `DEFAULT_PRIVACY_POLICY_URL` | No | The site privacy page in the page language, `/<locale>/privacy` (`app/src/lib/events/privacy-notice.ts`) | No | `app.env` | Privacy link on the registration form and next to the waiting-room consents when the event has none. Set it only to point at a privacy notice published elsewhere. `values.yaml` leaves it unset |
+| `DEFAULT_PRIVACY_POLICY_URL` | No | The site privacy page in the page language, `/<locale>/privacy` (`app/src/lib/events/privacy-notice.ts`) | No | `app.env` | Privacy link on the registration form and in the waiting room when the event has none. Set it only to point at a privacy notice published elsewhere. `values.yaml` leaves it unset |
 
 ### Authentication and tokens
 
@@ -260,7 +261,7 @@ How the two capture paths work is described in [Recording](architecture/recordin
 | Name | Required | Default | Secret | Helm key | Description |
 |---|---|---|---|---|---|
 | `RECORDING_WEBHOOK_SECRET` | Recommended with Jibri | unset | Yes | Secret | HMAC-SHA256 key for the body of `POST /api/webhooks/recording`. The body is signed in the `X-Webhook-Signature: sha256=<hex>` header. When set, a request needs both the signature and the `CRON_API_KEY` bearer. When unset, the bearer alone is accepted and the app logs a warning once. The Jibri finalize script must receive the same value (`app/src/app/api/webhooks/recording/route.ts`) |
-| `RECORDER_CONTROLLER_URL` | Conditional | none | No | Chart, when `recorder.enabled`: `http://<fullname>-recorder-controller:<recorder.controller.port>`, default port `8080`. With the literal names, `http://pa-webinar-recorder-controller:8080` | When a tick of the scaler or of the lifecycle cron opens an event (`LIVE`), the portal calls `POST <url>/dispatch`, so the per-participant recorder starts without waiting for the controller's next reconcile (`dispatchRecorder()` in `app/src/lib/events/lifecycle-tick.ts`). Other paths to `LIVE`, such as **Start event** and instant calls, which are created `LIVE`, rely on that reconcile. A failed call does no harm. Its presence also tells the live room that the installation can record, so the recording notice and consent are shown for events with recording on. They are left out only when the chart installs Jitsi without Jibri, no recordings storage is declared and this variable is unset (`app/src/lib/recording/availability.ts`). Docker Compose always sets it, even when its `recorder` profile is not started |
+| `RECORDER_CONTROLLER_URL` | Conditional | none | No | Chart, when `recorder.enabled`: `http://<fullname>-recorder-controller:<recorder.controller.port>`, default port `8080`. With the literal names, `http://pa-webinar-recorder-controller:8080` | When a tick of the scaler or of the lifecycle cron opens an event (`LIVE`), the portal calls `POST <url>/dispatch`, so the per-participant recorder starts without waiting for the controller's next reconcile (`dispatchRecorder()` in `app/src/lib/events/lifecycle-tick.ts`). Other paths to `LIVE`, such as **Start event** and instant calls, which are created `LIVE`, rely on that reconcile. A failed call does no harm. Its presence also tells the live room that the installation can record, so the recording notice and consent are shown for events with recording on. They are left out only when the chart installs Jitsi without Jibri, no recordings storage is declared and this variable is unset (`app/src/lib/recording/availability.ts`). Where the chart installs Jitsi, an event's privacy sheet also announces per-participant tracks only when this variable is set. Docker Compose always sets it, even when its `recorder` profile is not started |
 
 ### Videobridge and scaler
 

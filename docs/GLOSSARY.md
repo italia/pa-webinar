@@ -224,9 +224,17 @@ recurrence rule, the copy's date moves to the next occurrence; otherwise it
 keeps the original dates, and the editor that opens says so.
 [From creation to recap](architecture/event-journey.md)
 
+**Event format**: the four questions asked before the wizard: how many
+people, who speaks and shows on video, whether to record and for whom, who can
+take part. The answers set the starting values, among them the recording
+destination, pseudonyms, the questions after the event and the address book.
+The organizer can change every value, and no answer changes a person's rights
+(`app/src/lib/events/guided-format.ts`).
+[From creation to recap](architecture/event-journey.md)
+
 **Event template** (`EventTemplate`, UI **Event templates**): a reusable set
-of defaults (features, recording and AI flags, permission matrix, duration,
-retention, description) that pre-fills the event wizard. Every field stays
+of defaults (features, recording and AI flags, consent values, permission
+matrix, duration, retention, description) that pre-fills the event wizard. Every field stays
 editable, and an event keeps no link to the template it came from.
 [From creation to recap](architecture/event-journey.md#templates)
 
@@ -253,7 +261,9 @@ page: it opens the registration page with the form filled in (`token`), and
 people you invite**; an event without a choice follows **Public registration
 enabled**. When only invitees can take part, the list is the set of addresses
 allowed to register (invitation-only registration), and an event that chose
-it admits no guests.
+it admits no guests. An invitation is stopped (`declinedAt`, UI **Receives no
+invitations**) when the person must not be contacted any more: nothing is sent
+for it, and on an event not open to anyone the row keeps its access.
 [From creation to recap](architecture/event-journey.md#invitations-and-named-grants)
 
 **Join password** (`joinPasswordHash`): an optional per-event password asked
@@ -322,11 +332,13 @@ installation and overridable per event.
 square: static, accessible and complete. A participant's choice of it is
 remembered. [The waiting room and the square](architecture/waiting-room.md)
 
-**Consent gate**: the part of the waiting room that blocks entry until
-required consents are given, such as the recording consent when an event
-records. The transcription consent, asked when an event records
-per-participant audio or keeps a transcript from captions, is optional and
-blocks nothing.
+**Consent gate**: the point where a consent decides what is captured of a
+person. A consent is never a condition for entering: whoever does not give the
+recording consent joins and stays out of the recording, or only listens where
+the voice cannot be removed from the video. The transcription consent, asked
+when an event records per-participant audio, keeps a transcript from captions
+or transcribes the full video, is optional in the same way.
+[Recording](architecture/recording.md#consent-gates),
 [The waiting room and the square](architecture/waiting-room.md)
 
 **Device check**: the camera preview, microphone level and speaker test in
@@ -402,7 +414,9 @@ moderator, then closed, and optionally published with its results.
 **Q&A** (`Question`, UI **Q&A**): the questions panel. Participants post
 questions and upvote them; moderators highlight, answer or dismiss them. It is
 controlled by `qaEnabled` and is distinct from a chat message marked as a
-question. [Live interaction and realtime](architecture/live-interaction.md)
+question. After the event a question can stay on the event page, as text only:
+never with its author, and not at all on a reserved recording.
+[Live interaction and realtime](architecture/live-interaction.md)
 
 **Raised hand** (UI **Raised hands**): Jitsi's native raise-hand. Raised hands
 come first in the **Participants** panel, where moderators give the floor or
@@ -420,7 +434,8 @@ opening. [Event lifecycle](architecture/event-lifecycle.md)
 
 **Temporary recording** (`tempRecordingUrl`, UI **Watch from the start**): an
 optional catch-up recording offered while the event is live, before any
-recording is published. [Recording](architecture/recording.md)
+recording is published, and never on a reserved destination.
+[Recording](architecture/recording.md)
 
 **Timer** (UI **Timer**): a countdown a moderator can show to the whole room.
 [Live interaction and realtime](architecture/live-interaction.md)
@@ -445,8 +460,9 @@ for attendance, interaction and engagement. The instance-wide page is
 **Event recap** (`postEventRecap`, UI **Event recap**): an anonymized,
 aggregate snapshot of an ended event (headcount, top questions, published poll
 results, word-cloud words). It is stored so it outlives the retention cleanup,
-which deletes the registrations and chat messages it counts and quotes. The
-average rating shown with it is read live, and taken from the stored snapshot
+which deletes the registrations it counts. It does not read the chat, and the
+public page never shows chat text, nor question texts when the questions are
+not published. The average rating shown with it is read live, and taken from the stored snapshot
 when fewer answers are left than it counted.
 [From creation to recap](architecture/event-journey.md)
 
@@ -458,12 +474,20 @@ count in the same average. [From creation to recap](architecture/event-journey.m
 
 **Post-event page**: what an event's page becomes once it has `ENDED`:
 recording, recap, Q&A, polls, materials, feedback and AI outputs, each shown
-or hidden per event. [From creation to recap](architecture/event-journey.md)
+or hidden per event. It can stay private and still open to registrants of a
+reserved recording. [From creation to recap](architecture/event-journey.md)
 
 **Publications** (UI **Publications**): the administration hub for every
 published video: scheduled events, instant calls, uploaded archive videos,
 and recordings still waiting to be promoted.
 [From creation to recap](architecture/event-journey.md)
+
+**Recording destination** (`Event.recordingDestination`, UI **Where the
+recording goes**, **Reserved** or **Public**): where an event's video goes,
+declared before the room opens. It is what a person consents to with the
+recording box. Compare `Event.recordingAudience`, who sees the published
+recording, which a reserved destination holds at `REGISTRANTS`.
+[Recording](architecture/recording.md#recording-destination)
 
 **Recording notice** (`recordingNotifyEnabled`, UI **Notify registrants when
 the recording is published**): the single email that tells an event's
@@ -842,7 +866,10 @@ subtitles are all derived from the transcript.
 
 **Address book** (`Person`, UI **Address book**, route `/admin/rubrica`): the
 cross-event record of people who explicitly opted in to be invited again. It
-has its own retention and a self-service opt-out.
+keeps their encrypted email, has its own retention, counted from the last
+tick of the box, and a self-service opt-out. An installation can turn it off
+(`addressBookEnabled`), and an event can choose not to offer it
+(`offerAddressBook`).
 [ADR-011](adr/011-person-rubrica.md),
 [Privacy and data protection](GDPR.md)
 
@@ -852,9 +879,11 @@ administrative writes, with the actor recorded as `admin:<accountId>`,
 [Identity, access and tokens](architecture/identity-and-access.md#audit-actor-format)
 
 **Consent**: a data subject's specific agreement, recorded per purpose in its
-own field. At registration, participation, recording, per-participant
-recording, future communications and the address book are separate choices;
-AI post-production is announced with a notice in the waiting room.
+own field. At registration, participation, recording, the transcription of
+one's own contributions and staying in touch (future communications and the
+address book, one box) are separate choices. A recording consent also keeps
+the destination its text declared. AI post-production is announced in the
+privacy sheet, or with a notice in the waiting room of an instant call.
 [Privacy and data protection](GDPR.md)
 
 **Consent snapshot** (`Recording.consentSnapshot`): the event's AI and
@@ -881,7 +910,8 @@ transcripts held in the database) are stored encrypted with AES-256-GCM under
 
 **Erasure** (right to erasure, GDPR Art. 17): deleting a data subject's
 personal data on request, alongside the automatic deletion at the end of
-retention. [Privacy and data protection](GDPR.md)
+retention. The proof of a consent to a published video or transcript stays,
+without the name. [Privacy and data protection](GDPR.md)
 
 **GDPR audit log** (`GdprAuditLog`, UI **GDPR log**): per-event records of
 personal-data operations such as consents, exports and deletions. It records
@@ -889,8 +919,9 @@ no actor. [Privacy and data protection](GDPR.md)
 
 **GDPR cleanup**: the scheduled job (`/api/cron/cleanup`; daily in the Helm
 chart, hourly in Compose) that deletes or scrubs personal data of events past
-their retention, keeps their live content without names or identifiers, and
-marks `ARCHIVED` only the events that were never ended.
+their retention, keeps their live content without names or identifiers and
+the consent proofs of what stays published, and marks `ARCHIVED` only the
+events that were never ended.
 [Privacy and data protection](GDPR.md)
 
 **Privacy notice** (UI **Privacy policy**) and **privacy notice template**
@@ -899,10 +930,23 @@ gives data subjects, set per installation and per event. Templates let the
 same text be reused across events.
 [Privacy and data protection](GDPR.md)
 
+**Privacy sheet** (UI **This event and your data**): the summary, computed from
+the settings of the event and of the installation, of what happens to a
+person's data at that event. The registration form and the waiting room show
+it above the privacy notice. It is not stored, and instant calls have none
+(`app/src/lib/events/privacy-sheet.ts`).
+[The waiting room and the square](architecture/waiting-room.md),
+[Privacy and data protection](GDPR.md)
+
 **Processor** (GDPR Art. 4(8)): a body that processes personal data on the
 controller's behalf, for example an operator or hosting provider that runs the
 installation for a public body.
 [Privacy notice checklist for controllers](privacy/privacy-notice-checklist.md)
+
+**Retained consent proof** (`RetainedConsentProof`): the copy of a consent that
+stays after its source is deleted, while the video or transcript it refers to
+is published. It goes with the event.
+[Data model](architecture/data-model.md#deleting-data)
 
 **Retention**: how long each kind of personal data is kept before deletion or
 anonymization.
@@ -998,6 +1042,7 @@ these docs and the code use *organizer*.
 | Registrazione all'evento | **Event registration** | registration (never "recording") |
 | Inviti | **Invitations** | invitations (`EventInvitation`) |
 | Chi si iscrive | **Who registers** | who can take part (`Event.accessMode`) |
+| Dove va la registrazione | **Where the recording goes** | recording destination (`Event.recordingDestination`) |
 | Notifiche | **Notifications** | reminders (`EventReminder`) |
 | Questionari | **Questionnaires** | questionnaires |
 | Questionario di pre-registrazione | **Pre-registration questionnaire** | pre-registration questionnaire (`PRE_REGISTRATION`) |
@@ -1015,6 +1060,7 @@ these docs and the code use *organizer*.
 | Sfondo virtuale | **Virtual background** | virtual backgrounds |
 | Audio sala d'attesa (facoltativo) | **Waiting-room audio (optional)** | waiting-room music (`waitingRoomAudioUrl`) |
 | Elaborazione AI dopo l'evento | **AI processing after the event** | AI post-production notice |
+| Questo evento e i tuoi dati | **This event and your data** | privacy sheet |
 
 ### Live room
 

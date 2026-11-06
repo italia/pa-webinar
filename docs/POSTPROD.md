@@ -210,10 +210,10 @@ there is work: the GPU node pool scales to zero between runs.
 
 | Input | Trigger | Root job |
 |---|---|---|
-| Composite recording | Jibri's finalize script calls `POST /api/webhooks/recording` (bearer `CRON_API_KEY`, plus an HMAC signature when `RECORDING_WEBHOOK_SECRET` is set; see [Recording](architecture/recording.md)). The portal creates the `CallSession` and `Recording` rows and enqueues when the event has `aiTranscriptEnabled`. If the event already has a per-participant recording, the webhook only attaches the MP4 to it and enqueues nothing. On an event where each person was asked for the transcription consent, the composite video holds voices of people who said no: the webhook enqueues nothing, logs a warning, and answers `postprodAwaitsVoiceConsent: true`; the recording page says so next to **Generate AI** ([Recordings, voice data and AI outputs](privacy/recordings-and-ai.md#transcript-from-live-captions)). | `TRANSCRIBE` |
+| Composite recording | Jibri's finalize script calls `POST /api/webhooks/recording` (bearer `CRON_API_KEY`, plus an HMAC signature when `RECORDING_WEBHOOK_SECRET` is set; see [Recording](architecture/recording.md)). The portal creates the `CallSession` and `Recording` rows and enqueues when the event has `aiTranscriptEnabled`. If the event already has a per-participant recording, the webhook only attaches the MP4 to it and enqueues nothing. The composite video holds every voice and cannot be divided by person, so a recording with `transcriptConsentRule` needs a confirmation from staff, even if only the hosts speak: every row created after that column was added has it, whoever creates it (`app/src/lib/ai/voice-consent.ts`). An older row needs it only on an event where each person was asked for the transcription consent. In both cases the webhook enqueues nothing, logs a warning, and answers `postprodAwaitsVoiceConsent: true`; the recording page says so next to **Generate AI**, and the event's closing checklist lists it for the staff ([Recordings, voice data and AI outputs](privacy/recordings-and-ai.md#transcript-from-live-captions)). | `TRANSCRIBE` |
 | Per-participant tracks | The recorder bot calls `POST /api/internal/multitrack-manifest` at the end of the event. The portal stores one `RecordingTrack` per track and enqueues. A silence guard marks the recording `POSTPROD_FAILED` instead when every track is silent. | `TRANSCRIBE_MULTITRACK` |
-| **End for everyone** | The moderator ticks **Generate AI transcript and summary from the recording (once processing finishes)**. The event gets `aiTranscriptEnabled` and `aiSummaryEnabled`, and the webhook enqueues when the recording arrives, except on an event with the per-voice transcription consent (see the row above). The checkbox appears only when the event records, the site switch is on and the event already uses an AI option. | as above |
-| **Generate AI now** (event page) and **Generate AI** (recording page) | `POST /api/admin/events/<id>/generate-ai` and `POST /api/admin/postprod/recordings/<id>/generate-ai` turn on transcription and summary for the event and enqueue in the same transaction, for a recording that already exists. The event-page route acts on the event's newest recording with a media file. The optional JSON body takes `summary`, `translation` (recording route only) and `allVoicesConsented`, all booleans; other fields are ignored and a body that is not JSON counts as empty. On the composite video of an event with the per-voice transcription consent, the routes answer `409 VOICE_CONSENT_REQUIRED` until `allVoicesConsented: true` confirms that everyone who speaks in it has consented; the confirmation goes to the admin audit log. | detected |
+| **End for everyone** | The moderator ticks **Generate AI transcript and summary from the recording (once processing finishes)**. The event gets `aiTranscriptEnabled` and `aiSummaryEnabled`, and the webhook enqueues when the recording arrives, except where the video waits for the confirmation (see the row above). The checkbox appears only when the event records, the site switch is on and the event already uses an AI option. | as above |
+| **Generate AI now** (event page) and **Generate AI** (recording page) | `POST /api/admin/events/<id>/generate-ai` and `POST /api/admin/postprod/recordings/<id>/generate-ai` turn on transcription and summary for the event and enqueue in the same transaction, for a recording that already exists. The event-page route acts on the event's newest recording with a media file. The optional JSON body takes `summary`, `translation` (recording route only) and `allVoicesConsented`, all booleans; other fields are ignored and a body that is not JSON counts as empty. On a composite video that needs the confirmation (see the first row), the routes answer `409 VOICE_CONSENT_REQUIRED` until `allVoicesConsented: true` confirms that everyone who speaks in it has consented; the confirmation goes to the admin audit log. | detected |
 | **Re-run** | `POST /api/admin/postprod/recordings/<id>/rerun` bumps the run counter and enqueues a new run. Same body field `allVoicesConsented` and same `409` as above. | detected |
 | **Add language** | `POST /api/admin/postprod/recordings/<id>/translations` enqueues one `TRANSLATE` job, and a `DUB` job when the event has dubbing on. | none |
 | **Generate archive** | `POST /api/admin/postprod/recordings/<id>/archive` enqueues one `ARCHIVE` job. | none |
@@ -752,7 +752,10 @@ translations and dubbing, but every line has the same speaker.
 Speaker labels become names in three ways: an administrator or the event's
 organizer maps them in the recording page; the public transcript aligns anonymous clusters with the
 dominant-speaker timeline captured live, when one exists; and any label left
-unmatched is shown as a numbered participant.
+unmatched is shown as a numbered participant. On a recording with
+`transcriptConsentRule`, the alignment names only people whose transcription
+consent was given with the current text (`VERSIONE_TESTO_TRASCRIZIONE`), the
+one that covers the name.
 
 ### Multitrack transcription
 
@@ -760,7 +763,11 @@ With per-participant recording, each track holds one known speaker, so there
 is no diarization. The worker loads the speech model once, transcribes each
 track, and merges the segments on one timeline (`infra/ai/worker/multitrack.py`).
 Speaker names come from the portal's JWT, so no mapping is needed, and two
-people talking at once produce two overlapping segments. When the composite
+people talking at once produce two overlapping segments. On a recording with
+`transcriptConsentRule` the claim passes a track's name to the worker only
+with a consent to the current text; the other tracks are transcribed under
+their track label, in the outputs and in the archive too, until staff name
+that voice. When the composite
 MP4 exists, each track's start offset is refined by cross-correlating its
 energy envelope with the mix (`align.py`); otherwise the offsets from the
 recorder's manifest are used. Several track sessions of the same participant
@@ -899,10 +906,13 @@ cannot be read: the claim then goes ahead without it.
   stop; a page left within 5 seconds for another one was only passed through
   and is dropped, and the pages shown are the first entries to go when the
   timeline is too long) and the end of the event. Beside it, rows that already carry
-  a time: the text of every Q&A question not dismissed and of every question
-  marked in the chat, never their authors; the titles of shared materials;
-  and the number of chat messages (hidden ones excluded), app reactions and
-  raised hands in each five-minute window counted from `t0`.
+  a time: the text of every Q&A question not dismissed, never its author; the
+  titles of shared materials; and the number of chat messages (hidden ones
+  excluded), app reactions and raised hands in each five-minute window counted
+  from `t0`. The summary can reach the event page, so the text of a chat
+  message is never read, and the questions enter only when the page publishes
+  them (`domandePubbliche` in `app/src/lib/events/post-event-sections.ts`):
+  otherwise the journal's actions on questions stay out too.
 - **Window.** From 30 minutes before `t0` to 5 minutes after the end of the
   recording (`t0` plus its duration). Without a known duration, to 5 minutes
   after the end of the recording's call session, or after the claim while the
@@ -943,10 +953,10 @@ cannot be read: the claim then goes ahead without it.
   The last two set `exact` to `false`, and the times can then be off by
   minutes.
 - **Size.** At most 250 entries, and each quoted text at most 280 characters.
-  Past 250, the activity counts and the chat questions go first, oldest
+  Past 250, the activity counts and the pages shown go first, oldest
   first, then the oldest entries. The worker also caps the timeline block in
-  the prompt at 12,000 characters: past that it drops the activity counts and
-  chat questions, keeps the beginning, and says the timeline was shortened.
+  the prompt at 12,000 characters: past that it drops the activity counts,
+  keeps the beginning, and says the timeline was shortened.
 - **In the prompt.** The worker (`_format_timeline` in
   `infra/ai/worker/llm.py`) writes one line per entry, with the offset as
   `[hh:mm:ss]` like the transcript, and marks actions before the start as
@@ -1011,7 +1021,7 @@ for their fields; deletion and retention are described in
 
 | Table (model) | Holds |
 |---|---|
-| `recordings` (`Recording`) | One capture, one-to-one with a call session: source key, status, run counter, `consentSnapshot`, `pipelineSnapshot`, `retentionUntil`, `mediaStartedAt` |
+| `recordings` (`Recording`) | One capture, one-to-one with a call session: source key, status, run counter, `consentSnapshot`, `pipelineSnapshot`, `retentionUntil`, `mediaStartedAt`, `transcriptConsentRule` |
 | `recording_tracks` (`RecordingTrack`) | One per-participant audio track session: participant id, encrypted display name, key, start offset, `audioPurgedAt` |
 | `postprod_jobs` (`PostprodJob`) | The queue: kind, status, attempts, lease, `idempotencyKey`, `dependsOnId`, `lastError` |
 | `postprod_artifacts` (`PostprodArtifact`) | One output per `(recording, type, language)`: key, size, MIME type, encrypted inline copy, `contentHash` (SHA-256), `isSynthetic`, `watermarkType`, model id and version, `revisedAt` |
@@ -1049,6 +1059,7 @@ erDiagram
     jsonb pipelineSnapshot "engines and models used"
     datetime retentionUntil
     datetime mediaStartedAt "first recorded frame, optional"
+    boolean transcriptConsentRule "full video needs a confirmation"
   }
   RECORDING_TRACK {
     uuid recordingId FK
@@ -1459,7 +1470,7 @@ this table gives only their effect on the pipeline.
 | `aiMaxConcurrentJobs` | **Parallel jobs** | Upper bound on concurrent workers, reached only when that many jobs are runnable at once ([The orchestrator](#the-orchestrator)) |
 | `aiJobMaxAttempts` | **Attempts before failure** | Attempt cap per job ([Retries and backoff](#retries-and-backoff)) |
 | `aiArtifactRetentionDays` | **Artifact retention (days)** | `0` sets no site-wide cap: outputs follow the event's retention, or the published video's lifetime; with only the transcript published, the transcript stays while published and the other outputs follow the event's retention. A positive value makes the daily retention job delete every artifact older than that many days, published recordings included ([Recordings, voice data and AI outputs](privacy/recordings-and-ai.md)) |
-| `aiConsentDisclosure` | **AI notice in the waiting room** | Per-language notice text; empty uses the built-in text |
+| `aiConsentDisclosure` | **AI notice in the waiting room** | Per-language text. On the privacy sheet of an event, in the form and the waiting room, it replaces the sentences on summary, translation and dubbing; on an instant call, which has no sheet, it replaces the waiting room's AI notice. Empty uses the built-in text |
 
 ### Per-event settings
 
@@ -1629,9 +1640,12 @@ transcript also when it is published on its own. Every public endpoint under
   (`transcriptPublished`, set from the **Transcript from captions** panel) is
   published;
 - the post-event page is public (`postEventPublic`) and, when set,
-  `postEventPublicUntil` has not passed.
+  `postEventPublicUntil` has not passed. A recording reserved to registrants on
+  an event with a declared destination does not need `postEventPublic`
+  ([Recording](architecture/recording.md#states-of-the-events-video)).
 
-The same `404` covers every case, so the endpoints do not reveal why an
+With the audience `REGISTRANTS`, the caller must also prove a registration, and
+the staff who manage the event pass in any case. The same `404` covers every case, so the endpoints do not reveal why an
 output is unavailable.
 
 What passes the gate depends on its scope (`ambito` in `access.ts`):
@@ -1727,7 +1741,8 @@ recording's status. The worker reports progress after each step, so a long
 transcript summarised in many chunks keeps its lease.
 
 **Inputs.** The portal gathers them when the job is claimed
-(`app/src/lib/report/input.ts`):
+(`app/src/lib/report/input.ts`). The report is meant for the event page, and
+what the model reads can come out reworded there:
 
 - the event's title, description, and public organizations and people;
 - the agenda, with the agree and disagree count of each item;
@@ -1737,13 +1752,14 @@ transcript summarised in many chunks keeps its lease.
   first summarises a long transcript in chunks, so
   that the final request fits the model's context;
 - the existing summary;
-- the chat without names, only role and time, as a sample of at most 400
-  messages spread over the event;
-- up to 40 Q&A questions with their written answers, without authors;
+- up to 40 Q&A questions with their written answers, without authors, only
+  when the event page publishes the questions (`domandePubbliche` in
+  `app/src/lib/events/post-event-sections.ts`);
 - published polls, and word-cloud words;
 - the post-event questionnaire (Likert averages and up to 100 open comments,
   without authors) and the older star ratings;
-- the platform's figures.
+- the platform's figures, where the chat appears only as a number of messages.
+  The text of the chat never reaches the model.
 
 The figures (`app/src/lib/report/metrics.ts`) are built on the same
 statistics as the **Statistics** tab (`app/src/lib/analytics/event-stats.ts`);
@@ -1760,7 +1776,7 @@ and disagreement, participation, benefits, feedback (strengths, things to
 improve, short voices from the comments in the model's own words), open
 questions and next steps. The prompt asks for facts from the inputs only,
 names only of the event's listed people and of named speakers, no attribution
-of chat or comment sentences to anyone, comments always reworded, and no
+of comment sentences to anyone, comments always reworded, and no
 personal data. The portal also removes any email address and phone number
 from the text it receives, keeping amounts, years, dates and public codes
 such as a CIG or a VAT number. The report is then translated into each
@@ -1787,7 +1803,12 @@ is published again. The public event page shows it for an `ENDED` event whose
 post-event page is visible, after the video and before the description, in
 the page's language when there is a translation, otherwise in the event's
 language with a note (`app/src/lib/report/view.ts`,
-`app/src/components/events/report/`). A section appears only when it has
+`app/src/components/events/report/`). On a reserved recording of an event with
+a declared destination it follows the recording: only those who see the
+recording get it, and a registrant gets it also with the page private. The
+figures that reach the page leave out the text of the questions. The inputs
+are read at the claim, so a stored report does not change if the questions
+stop being public later: regenerating it does. A section appears only when it has
 content: header with the abstract and the AI notice, highlights,
 participation figures, a stacked chart of participation over time, the
 topics (with **Go to** a minute when there is a video), the concept map,
@@ -2425,8 +2446,9 @@ Several of these are tracked in the [Roadmap](ROADMAP.md).
   writes or reads them. `consentSnapshot` is a record of the event's flags,
   not a gate ([Snapshots](#snapshots)). The only per-person consent is the
   transcription of one's own contributions, which decides which tracks the
-  recorder records and what the transcript from live captions keeps; a
-  composite recording is transcribed whole.
+  recorder records, whose name appears and what the transcript from live
+  captions keeps; a composite recording is transcribed whole, on the staff's
+  confirmation that every voice consented, which the platform cannot verify.
 - **Corrections do not reach derived outputs.** Translations, summaries and
   dubbing cannot be regenerated from an edited transcript without discarding
   the edits.
