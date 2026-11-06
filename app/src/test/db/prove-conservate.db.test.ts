@@ -12,6 +12,7 @@ import type { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/lib/storage/recordings', () => ({
+  assertVideoNelloStorage: vi.fn(),
   deleteRecordingBlob: vi.fn(async () => true),
 }));
 // I testi veri dell'italiano, letti per chiave puntata come next-intl.
