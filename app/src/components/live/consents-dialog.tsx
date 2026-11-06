@@ -26,8 +26,17 @@ import type { chiaveConsensoTrascrizione } from '@/lib/registration/consents';
  * (o la chiude), e un clic per sbaglio non deve farlo.
  */
 
-/** Cosa succede ritirando il consenso alla registrazione. */
-export type EffettoRitiroRegistrazione = 'voce' | 'soloAscolto' | 'conduce' | 'nessuno';
+/**
+ * Cosa cambia con il consenso alla registrazione. `avvertenza`: la voce resta nel
+ * video e l'evento si limita ad avvisare, quindi in sala non cambia nulla, e chi
+ * riceve la parola resta nel video. `assente`: un video completo non c'e'.
+ */
+export type EffettoRitiroRegistrazione =
+  | 'voce'
+  | 'soloAscolto'
+  | 'conduce'
+  | 'avvertenza'
+  | 'assente';
 
 export interface ConsensiInSala {
   /** `destinazione` e `voce` scelgono il testo a cui si acconsente; `testoEvento`
@@ -50,6 +59,10 @@ export interface ConsensiInSala {
 }
 
 type Azione = 'ritiraRegistrazione' | 'ritiraTrascrizione';
+
+/** Dove il consenso non cambia cio' che si fa in sala, la riga e' la stessa. */
+const senzaConsenso = (ritiro: EffettoRitiroRegistrazione) =>
+  ritiro === 'avvertenza' || ritiro === 'assente' ? 'comeTutti' : ritiro;
 
 export default function ConsentsDialog({
   aperta,
@@ -186,17 +199,13 @@ export default function ConsentsDialog({
               t('recording.title'),
               registrazione.dato,
               registrazione.dato
-                ? registrazione.ritiro === 'nessuno'
-                  ? ''
-                  : t(`recording.withdraw.${registrazione.ritiro}`)
-                : registrazione.ritiro === 'nessuno'
-                  ? ''
-                  : t(`recording.without.${registrazione.ritiro}`),
+                ? t(`recording.withdraw.${registrazione.ritiro}`)
+                : t(`recording.without.${senzaConsenso(registrazione.ritiro)}`),
               !registrazione.dato
                 ? [testoEvento, tGdpr(chiaveConsenso(registrazione.destinazione, registrazione.voce))]
                     .filter(Boolean)
                     .join(' ')
-                : registrazione.ritiro !== 'conduce'
+                : registrazione.ritiro !== 'conduce' && registrazione.ritiro !== 'assente'
                   ? t('recording.alreadyRecorded')
                   : null,
               registrazione.dato ? (

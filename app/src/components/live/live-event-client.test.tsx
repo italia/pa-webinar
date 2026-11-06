@@ -955,6 +955,32 @@ describe('sala — la finestra dei consensi', () => {
     expect(pulsante(l.consents.withdraw).disabled).toBe(false);
   });
 
+  it("dove l'evento avvisa soltanto, il ritiro dice cosa cambia, prima di agire", async () => {
+    await monta({
+      event: { ...soloAvviso, voceNelVideo: 'fissa' },
+      hasRecordingConsent: true,
+    });
+    risposte.push({ consentsInForce: { recording: true, transcription: false } });
+    await entra();
+    await premi(pulsante(l.consents.button));
+    expect(document.getElementById('live-consents-rec-effetto')?.textContent).toBe(
+      l.consents.recording.withdraw.avvertenza
+    );
+  });
+
+  it("senza un video il ritiro dice cosa cambia", async () => {
+    await monta({
+      event: { ...soloAvviso, voceNelVideo: 'assente' },
+      hasRecordingConsent: true,
+    });
+    risposte.push({ consentsInForce: { recording: true, transcription: false } });
+    await entra();
+    await premi(pulsante(l.consents.button));
+    expect(document.getElementById('live-consents-rec-effetto')?.textContent).toBe(
+      l.consents.recording.withdraw.assente
+    );
+  });
+
   it('senza consenso alla registrazione la trascrizione non si offre per nulla', async () => {
     await monta({ event: { ...soloAvviso, multitrackRecordingEnabled: true } });
     risposte.push({ voiceExcluded: true });

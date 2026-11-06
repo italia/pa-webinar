@@ -687,13 +687,16 @@
         "without": {
           "soloAscolto": "Bez šīs piekrišanas jūs tikai klausāties: mikrofons, kamera un ekrāns paliek aizvērti.",
           "conduce": "Bez šīs piekrišanas jūs tāpat vadāt, bet jūsu balss nepaliek atsevišķo personu celiņos un atšifrējumā.",
-          "voce": "Bez šīs piekrišanas jūs piedalāties kā visi, bet paliekat ārpus ieraksta: ne vārds, ne balss, ne attēls."
+          "voce": "Bez šīs piekrišanas jūs piedalāties kā visi, bet paliekat ārpus ieraksta: ne vārds, ne balss, ne attēls.",
+          "comeTutti": "Bez šīs piekrišanas jūs piedalāties kā visi."
         },
         "alreadyRecorded": "Tas, kas jau ierakstīts, paliek pasākuma video: lai to izņemtu, rakstiet organizatoriem.",
         "withdraw": {
           "soloAscolto": "Ja to atsaucat, paliekat telpā tikai kā klausītājs: mikrofons, kamera un ekrāns tiek aizvērti. Tiek atsaukta arī piekrišana jūsu runas atšifrēšanai.",
           "conduce": "Ja to atsaucat, jūs turpināt vadīt, bet turpmāk jūsu balss nepaliek atsevišķo personu celiņos un atšifrējumā. Telpas video, ja tas tiek ierakstīts, jūs tāpat rāda.",
-          "voce": "Ja atsaucat, paliekat telpā kā iepriekš, un no šī brīža esat ārpus ieraksta. Atsaucat arī piekrišanu savu uzstāšanos transkripcijai."
+          "voce": "Ja atsaucat, paliekat telpā kā iepriekš, un no šī brīža esat ārpus ieraksta. Atsaucat arī piekrišanu savu uzstāšanos transkripcijai.",
+          "avvertenza": "Ja atsaucat, paliekat telpā kā iepriekš. Atsaucat arī piekrišanu savu uzstāšanos transkripcijai. Ja jums dod vārdu un pasākums tiek ierakstīts, jūsu balss tomēr paliek video.",
+          "assente": "Ja atsaucat, paliekat telpā kā iepriekš. Atsaucat arī piekrišanu savu uzstāšanos transkripcijai. No šī brīža jūsu balss netiek ierakstīta atsevišķā celiņā."
         }
       },
       "transcription": {

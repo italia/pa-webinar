@@ -1122,14 +1122,14 @@ export default function LiveEventClient({
   const [ritiro, setRitiro] = useState<'no' | 'in-corso' | 'errore'>('no');
   const effettoRitiro: EffettoRitiroRegistrazione =
     voceInSala === 'assente'
-      ? 'nessuno'
+      ? 'assente'
       : voceInSala === 'rimovibile'
         ? 'voce'
         : isModerator || isSpeaker
           ? 'conduce'
-          : salaSoloAscolto
+          : salaSoloAscolto || soloAscolto
             ? 'soloAscolto'
-            : 'nessuno';
+            : 'avvertenza';
   // Dopo un ritiro la conferenza deve ricollegarsi senza il consenso: finche'
   // resta sul token di prima, microfono, videocamera e registratore per voce
   // valgono ancora. Tre tentativi; se non riesce, si esce dalla conferenza e

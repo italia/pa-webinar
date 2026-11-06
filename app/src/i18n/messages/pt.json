@@ -687,13 +687,16 @@
         "without": {
           "soloAscolto": "Sem este consentimento acompanha apenas a ouvir: microfone, câmara e ecrã ficam fechados.",
           "conduce": "Sem este consentimento conduz na mesma, mas a sua voz não fica nas faixas por pessoa nem na transcrição.",
-          "voce": "Sem este consentimento participa como todos, mas fica fora da gravação: nem nome, nem voz, nem imagem."
+          "voce": "Sem este consentimento participa como todos, mas fica fora da gravação: nem nome, nem voz, nem imagem.",
+          "comeTutti": "Sem este consentimento participa como todos."
         },
         "alreadyRecorded": "O que já foi gravado fica no vídeo do evento: para o retirar, escreva a quem organiza.",
         "withdraw": {
           "soloAscolto": "Se o retirar, fica na sala apenas a ouvir: microfone, câmara e ecrã fecham-se. Retira também o consentimento à transcrição das suas intervenções.",
           "conduce": "Se o retirar, continua a conduzir, mas a partir de agora a sua voz não fica nas faixas por pessoa nem na transcrição. O vídeo da sala, se for gravado, mostra-o na mesma.",
-          "voce": "Se o retirar, fica na sala como antes e, a partir de agora, está fora da gravação. Retira também o consentimento à transcrição das suas intervenções."
+          "voce": "Se o retirar, fica na sala como antes e, a partir de agora, está fora da gravação. Retira também o consentimento à transcrição das suas intervenções.",
+          "avvertenza": "Se o retirar, fica na sala como antes. Retira também o consentimento à transcrição das suas intervenções. Se lhe derem a palavra e o evento for gravado, a sua voz fica mesmo assim no vídeo.",
+          "assente": "Se o retirar, fica na sala como antes. Retira também o consentimento à transcrição das suas intervenções. A partir de agora, a sua voz não é gravada numa faixa à parte."
         }
       },
       "transcription": {

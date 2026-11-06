@@ -687,13 +687,16 @@
         "without": {
           "soloAscolto": "Bez ove privole samo slušate: mikrofon, kamera i zaslon ostaju zatvoreni.",
           "conduce": "Bez ove privole i dalje vodite, ali vaš glas ne ostaje u zasebnim zapisima osoba ni u transkripciji.",
-          "voce": "Bez ovog pristanka sudjelujete kao i svi, ali ostajete izvan snimke: bez imena, glasa i slike."
+          "voce": "Bez ovog pristanka sudjelujete kao i svi, ali ostajete izvan snimke: bez imena, glasa i slike.",
+          "comeTutti": "Bez ovog pristanka sudjelujete kao i svi."
         },
         "alreadyRecorded": "Ono što je već snimljeno ostaje u videozapisu događaja: za uklanjanje pišite organizatorima.",
         "withdraw": {
           "soloAscolto": "Ako je povučete, ostajete u dvorani i samo slušate: mikrofon, kamera i zaslon se zatvaraju. Povlačite i privolu za transkripciju svojih izlaganja.",
           "conduce": "Ako je povučete, nastavljate voditi, ali od sada vaš glas ne ostaje u zasebnim zapisima osoba ni u transkripciji. Videozapis dvorane, ako se snima, i dalje vas prikazuje.",
-          "voce": "Ako ga povučete, ostajete u sobi kao prije, a od sada ste izvan snimke. Povlačite i pristanak na transkripciju svojih izlaganja."
+          "voce": "Ako ga povučete, ostajete u sobi kao prije, a od sada ste izvan snimke. Povlačite i pristanak na transkripciju svojih izlaganja.",
+          "avvertenza": "Ako ga povučete, ostajete u sobi kao prije. Povlačite i pristanak na transkripciju svojih izlaganja. Ako dobijete riječ i događaj se snima, vaš glas ipak ostaje u videozapisu.",
+          "assente": "Ako ga povučete, ostajete u sobi kao prije. Povlačite i pristanak na transkripciju svojih izlaganja. Od sada se vaš glas ne snima na zasebnu stazu."
         }
       },
       "transcription": {

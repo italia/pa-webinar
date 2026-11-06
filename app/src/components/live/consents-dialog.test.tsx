@@ -153,6 +153,39 @@ describe('ConsentsDialog', () => {
     );
   });
 
+  it("dove l'evento avvisa soltanto, il ritiro dice cosa cambia e che la voce resta nel video", async () => {
+    await disegna({ registrazione: registrazione(true, 'avvertenza') });
+    expect(document.getElementById('live-consents-rec-effetto')?.textContent).toBe(
+      messages.live.consents.recording.withdraw.avvertenza
+    );
+    expect(messages.live.consents.recording.withdraw.avvertenza).toContain(
+      'trascrizione'
+    );
+    expect(document.body.textContent).toContain(
+      messages.live.consents.recording.alreadyRecorded
+    );
+  });
+
+  it("senza un video il ritiro dice cosa cambia, e non parla di un video che non c'e'", async () => {
+    await disegna({ registrazione: registrazione(true, 'assente', { voce: 'assente' }) });
+    expect(document.getElementById('live-consents-rec-effetto')?.textContent).toBe(
+      messages.live.consents.recording.withdraw.assente
+    );
+    expect(document.body.textContent).not.toContain(
+      messages.live.consents.recording.alreadyRecorded
+    );
+  });
+
+  it.each(['avvertenza', 'assente'] as const)(
+    'senza consenso la riga non resta vuota (%s)',
+    async (ritiro) => {
+      await disegna({ registrazione: registrazione(false, ritiro) });
+      expect(document.getElementById('live-consents-rec-effetto')?.textContent).toBe(
+        messages.live.consents.recording.without.comeTutti
+      );
+    }
+  );
+
   it("durante l'aggiornamento i pulsanti sono fermi; un errore si annuncia", async () => {
     await disegna(
       { trascrizione: trascrizione(false, false) },
@@ -185,7 +218,7 @@ describe('ConsentsDialog', () => {
     expect(document.body.textContent).toContain(g.recording);
 
     await disegna({
-      registrazione: registrazione(false, 'nessuno', { destinazione: 'PUBLIC', voce: 'assente' }),
+      registrazione: registrazione(false, 'assente', { destinazione: 'PUBLIC', voce: 'assente' }),
     });
     expect(document.body.textContent).toContain(g.recordingNoVideo);
   });
@@ -198,7 +231,7 @@ describe('ConsentsDialog', () => {
       `Testo scelto per evento ${messages.gdpr.consent.recording}`
     );
     await disegna({
-      registrazione: registrazione(false, 'nessuno', {
+      registrazione: registrazione(false, 'assente', {
         testoEvento: 'Testo scelto per evento',
         voce: 'assente',
       }),

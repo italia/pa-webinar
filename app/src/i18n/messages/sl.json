@@ -687,13 +687,16 @@
         "without": {
           "soloAscolto": "Brez te privolitve samo poslušate: mikrofon, kamera in zaslon ostanejo zaprti.",
           "conduce": "Brez te privolitve vseeno vodite, vendar vaš glas ne ostane v posameznih sledeh niti v prepisu.",
-          "voce": "Brez te privolitve sodelujete kot vsi, a ostanete zunaj posnetka: ne ime, ne glas, ne slika."
+          "voce": "Brez te privolitve sodelujete kot vsi, a ostanete zunaj posnetka: ne ime, ne glas, ne slika.",
+          "comeTutti": "Brez te privolitve sodelujete kot vsi."
         },
         "alreadyRecorded": "Kar je že posneto, ostane v videu dogodka: za odstranitev pišite organizatorjem.",
         "withdraw": {
           "soloAscolto": "Če jo prekličete, ostanete v dvorani in samo poslušate: mikrofon, kamera in zaslon se zaprejo. Prekličete tudi privolitev v prepis svojih govorov.",
           "conduce": "Če jo prekličete, vodite naprej, vendar od zdaj vaš glas ne ostane v posameznih sledeh niti v prepisu. Video dvorane, če se snema, vas vseeno prikazuje.",
-          "voce": "Če jo prekličete, ostanete v sobi kot prej, od zdaj pa ste zunaj posnetka. Prekličete tudi privolitev v prepis svojih prispevkov."
+          "voce": "Če jo prekličete, ostanete v sobi kot prej, od zdaj pa ste zunaj posnetka. Prekličete tudi privolitev v prepis svojih prispevkov.",
+          "avvertenza": "Če jo prekličete, ostanete v sobi kot prej. Prekličete tudi privolitev v prepis svojih prispevkov. Če dobite besedo in se dogodek snema, vaš glas kljub temu ostane v videoposnetku.",
+          "assente": "Če jo prekličete, ostanete v sobi kot prej. Prekličete tudi privolitev v prepis svojih prispevkov. Od zdaj se vaš glas ne snema na ločeno sled."
         }
       },
       "transcription": {

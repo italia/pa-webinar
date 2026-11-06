@@ -687,13 +687,16 @@
         "without": {
           "soloAscolto": "E hozzájárulás nélkül csak hallgatóként vesz részt: a mikrofon, a kamera és a képernyő zárva marad.",
           "conduce": "E hozzájárulás nélkül is vezetheti az eseményt, de a hangja nem marad meg a személyenkénti sávokban és az átiratban.",
-          "voce": "E hozzájárulás nélkül ugyanúgy részt vesz, de kimarad a felvételből: sem a neve, sem a hangja, sem a képe nem szerepel."
+          "voce": "E hozzájárulás nélkül ugyanúgy részt vesz, de kimarad a felvételből: sem a neve, sem a hangja, sem a képe nem szerepel.",
+          "comeTutti": "E hozzájárulás nélkül ugyanúgy részt vesz."
         },
         "alreadyRecorded": "Ami már felvételre került, az az esemény videójában marad: az eltávolításért írjon a szervezőknek.",
         "withdraw": {
           "soloAscolto": "Ha visszavonja, a teremben marad, de csak hallgatóként: a mikrofon, a kamera és a képernyő bezárul. A hozzászólásai átiratához adott hozzájárulását is visszavonja.",
           "conduce": "Ha visszavonja, tovább vezeti az eseményt, de mostantól a hangja nem marad meg a személyenkénti sávokban és az átiratban. A terem videója, ha készül felvétel, így is mutatja Önt.",
-          "voce": "Ha visszavonja, ugyanúgy a teremben marad, de mostantól kimarad a felvételből. A hozzászólásai átiratához adott hozzájárulást is visszavonja."
+          "voce": "Ha visszavonja, ugyanúgy a teremben marad, de mostantól kimarad a felvételből. A hozzászólásai átiratához adott hozzájárulást is visszavonja.",
+          "avvertenza": "Ha visszavonja, ugyanúgy a teremben marad. A hozzászólásai átiratához adott hozzájárulást is visszavonja. Ha szót kap, és az eseményt rögzítik, a hangja a videóban így is benne marad.",
+          "assente": "Ha visszavonja, ugyanúgy a teremben marad. A hozzászólásai átiratához adott hozzájárulást is visszavonja. Mostantól a hangját nem rögzítjük külön sávon."
         }
       },
       "transcription": {

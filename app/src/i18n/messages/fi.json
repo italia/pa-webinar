@@ -687,13 +687,16 @@
         "without": {
           "soloAscolto": "Ilman tätä suostumusta olet vain kuuntelija: mikrofoni, kamera ja näyttö pysyvät suljettuina.",
           "conduce": "Ilman tätä suostumusta johdat silti, mutta äänesi ei jää henkilökohtaisille raidoille eikä litteraattiin.",
-          "voce": "Ilman tätä suostumusta osallistut kuten kaikki, mutta jäät tallenteen ulkopuolelle: ei nimeä, ääntä eikä kuvaa."
+          "voce": "Ilman tätä suostumusta osallistut kuten kaikki, mutta jäät tallenteen ulkopuolelle: ei nimeä, ääntä eikä kuvaa.",
+          "comeTutti": "Ilman tätä suostumusta osallistut kuten kaikki."
         },
         "alreadyRecorded": "Jo tallennettu jää tapahtuman videoon: pyydä poistoa järjestäjiltä.",
         "withdraw": {
           "soloAscolto": "Jos peruutat sen, jäät huoneeseen vain kuuntelijaksi: mikrofoni, kamera ja näyttö suljetaan. Myös suostumuksesi puheenvuorojesi litterointiin peruutetaan.",
           "conduce": "Jos peruutat sen, jatkat johtamista, mutta tästä lähtien äänesi ei jää henkilökohtaisille raidoille eikä litteraattiin. Huoneen video näyttää sinut silti, jos sitä tallennetaan.",
-          "voce": "Jos peruutat sen, pysyt huoneessa kuten ennen ja olet nyt tallenteen ulkopuolella. Peruutat samalla suostumuksen puheenvuorojesi litterointiin."
+          "voce": "Jos peruutat sen, pysyt huoneessa kuten ennen ja olet nyt tallenteen ulkopuolella. Peruutat samalla suostumuksen puheenvuorojesi litterointiin.",
+          "avvertenza": "Jos peruutat sen, pysyt huoneessa kuten ennen. Peruutat samalla suostumuksen puheenvuorojesi litterointiin. Jos saat puheenvuoron ja tapahtuma tallennetaan, äänesi on silti mukana videossa.",
+          "assente": "Jos peruutat sen, pysyt huoneessa kuten ennen. Peruutat samalla suostumuksen puheenvuorojesi litterointiin. Tästä lähtien ääntäsi ei tallenneta omalle raidalleen."
         }
       },
       "transcription": {
