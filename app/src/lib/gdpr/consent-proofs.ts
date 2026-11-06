@@ -19,9 +19,10 @@ import type { Destinazione, PeriodoConsenso } from '@/lib/recording/destination'
  * dopo la cancellazione delle sorgenti (lib/gdpr/retained-consent-proofs).
  *
  * Una riga per prova, e per i periodi precedenti di un consenso ridato dopo
- * un ritiro. Chi l'ha data si dice per nome (quello con cui e'
- * entrato, o quello dell'iscrizione) e per ruolo: iscritto, ospite (anche chi
- * apre un link d'iscrizione inoltrato), chi conduce o interviene.
+ * un ritiro o sostituito da uno successivo. Chi l'ha data si dice per nome
+ * (quello con cui e' entrato, o quello dell'iscrizione) e per ruolo: iscritto,
+ * ospite (anche chi apre un link d'iscrizione inoltrato), chi conduce o
+ * interviene.
  */
 
 export type TipoConsenso = 'recording' | 'transcription';
@@ -38,6 +39,9 @@ export interface ProvaConsenso {
   nomeRimosso: boolean;
   /** La prova sopravvive alla sua sorgente, che e' stata cancellata. */
   conservata: boolean;
+  /** Un periodo sostituito da uno successivo: resta come prova di quel testo,
+   *  ma se il consenso vale lo dice il periodo che l'ha sostituito. */
+  superata: boolean;
   givenAt: string;
   withdrawnAt: string | null;
   /** La versione del testo (lib/registration/consents,
@@ -60,6 +64,9 @@ export interface RigaProva {
   /** L'impronta dell'indirizzo. Null per chi non ne ha dato uno. */
   emailHash: string | null;
   locale: string | null;
+  /** Un periodo di RecordingConsent.earlierPeriods senza ritiro: e' stato
+   *  sostituito da uno successivo, non ritirato. */
+  superata: boolean;
   givenAt: string;
   withdrawnAt: string | null;
   textVersion: number | null;
@@ -112,6 +119,46 @@ const periodiPrecedenti = (v: unknown): PeriodoConsenso[] =>
 /** L'impronta di un titolare in un evento: non dice chi e', e non vale altrove. */
 export const improntaTitolare = (eventId: string, holder: string): string =>
   createHash('sha256').update(`${eventId}|${holder}`).digest('hex');
+
+/** Quanto serve di una prova conservata per riconoscere un periodo sostituito. */
+interface PeriodoConservato {
+  kind: string;
+  source: string;
+  role: string;
+  holderHash: string;
+  givenAt: Date;
+  withdrawnAt: Date | null;
+}
+
+/**
+ * I periodi sostituiti tra le prove conservate, che non hanno una colonna per
+ * dirlo. Le prove di sala di un'iscrizione sono i periodi di un'unica prova
+ * (vincolo unico) e si susseguono: un periodo ritirato finisce prima che inizi
+ * il successivo, uno sostituito no. Un ritiro che arriva dopo la copia segna
+ * tutti i periodi ancora aperti, e non cambia questa lettura. Gli altri titolari
+ * possono avere piu' prove di sala insieme, una per posto, e restano fuori.
+ */
+export function periodiSostituiti<T extends PeriodoConservato>(
+  righe: readonly T[]
+): Set<T> {
+  const perTitolare = new Map<string, T[]>();
+  for (const r of righe) {
+    if (r.kind !== 'recording' || r.source !== 'room' || r.role !== 'registrant')
+      continue;
+    perTitolare.set(r.holderHash, [...(perTitolare.get(r.holderHash) ?? []), r]);
+  }
+  const sostituiti = new Set<T>();
+  for (const periodi of perTitolare.values()) {
+    periodi.sort((a, b) => a.givenAt.getTime() - b.givenAt.getTime());
+    periodi.forEach((periodo, i) => {
+      const dopo = periodi[i + 1];
+      if (dopo && (!periodo.withdrawnAt || periodo.withdrawnAt > dopo.givenAt)) {
+        sostituiti.add(periodo);
+      }
+    });
+  }
+  return sostituiti;
+}
 
 /**
  * Le prove sulle tabelle sorgente, senza decifrare niente: la stessa lettura per
@@ -205,6 +252,7 @@ export async function leggiRigheProve(
       displayName: r.displayName ?? null,
       emailHash: r.emailHash ?? null,
       locale: r.locale ?? null,
+      superata: false,
       givenAt: r.consentTimestamp.toISOString(),
       holder: titolareIscrizione(r.id),
     };
@@ -248,10 +296,11 @@ export async function leggiRigheProve(
           ? `concessione:${p.eventModeratorId}`
           : titolareDelPosto(p.jitsiUserId, p.registrationId),
     };
-    // Un consenso ridato dopo un ritiro: i periodi di prima, poi quello attuale.
+    // Un consenso ridato o sostituito: i periodi di prima, poi quello attuale.
     for (const periodo of periodiPrecedenti(p.earlierPeriods)) {
       righe.push({
         ...base,
+        superata: !periodo.withdrawnAt,
         givenAt: periodo.consentedAt,
         withdrawnAt: periodo.withdrawnAt ?? null,
         textVersion: periodo.textVersion ?? null,
@@ -260,6 +309,7 @@ export async function leggiRigheProve(
     }
     righe.push({
       ...base,
+      superata: false,
       givenAt: p.consentedAt.toISOString(),
       withdrawnAt: p.withdrawnAt?.toISOString() ?? null,
       textVersion: p.textVersion ?? null,
@@ -274,6 +324,7 @@ export async function leggiRigheProve(
       displayName: p.displayName ?? null,
       emailHash: p.registration?.emailHash ?? null,
       locale: p.locale ?? null,
+      superata: false,
       givenAt: p.consentedAt.toISOString(),
       withdrawnAt: p.withdrawnAt?.toISOString() ?? null,
       textVersion: p.textVersion,
@@ -315,12 +366,14 @@ export async function proveConsensoEvento(
     name: nome(r.displayName),
     nomeRimosso: false,
     conservata: false,
+    superata: r.superata,
     givenAt: r.givenAt,
     withdrawnAt: r.withdrawnAt,
     textVersion: r.textVersion,
     destination: r.destination,
     holder: improntaTitolare(eventId, r.holder),
   }));
+  const sostituite = periodiSostituiti(conservate);
   for (const p of conservate) {
     righe.push({
       kind: p.kind as TipoConsenso,
@@ -329,6 +382,7 @@ export async function proveConsensoEvento(
       name: nome(p.displayName),
       nomeRimosso: !!p.nameRemovedAt,
       conservata: true,
+      superata: sostituite.has(p),
       givenAt: p.givenAt.toISOString(),
       withdrawnAt: p.withdrawnAt?.toISOString() ?? null,
       textVersion: p.textVersion,
@@ -344,13 +398,15 @@ export async function proveConsensoEvento(
  * concessione, altrimenti un posto) hanno un consenso valido per tipo, e
  * quante l'hanno ritirato senza ridarlo. Una persona che rientra non conta
  * due volte; un ospite che torna in un'altra visita ha un posto nuovo e conta
- * di nuovo (nessun dato lo lega alla visita di prima). Senza nomi.
+ * di nuovo (nessun dato lo lega alla visita di prima). Un periodo sostituito
+ * non conta: chi ritira dopo una sostituzione ha ritirato. Senza nomi.
  */
 export function riepilogoProve(
   righe: readonly ProvaConsenso[]
 ): Record<TipoConsenso, { given: number; withdrawn: number }> {
   const stato = new Map<string, boolean>();
   for (const r of righe) {
+    if (r.superata) continue;
     const chiave = `${r.kind}|${r.holder}`;
     stato.set(chiave, (stato.get(chiave) ?? false) || !r.withdrawnAt);
   }

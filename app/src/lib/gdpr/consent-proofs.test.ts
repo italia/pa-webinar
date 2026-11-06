@@ -15,6 +15,7 @@ vi.mock('@/lib/crypto/pii', () => ({ tryDecryptPII: (v: string) => `chiaro:${v}`
 import {
   improntaTitolare,
   leggiRigheProve,
+  periodiSostituiti,
   proveConsensoEvento,
   riepilogoProve,
 } from './consent-proofs';
@@ -139,6 +140,108 @@ describe('proveConsensoEvento', () => {
     expect(riepilogoProve(righe).recording).toEqual({ given: 1, withdrawn: 0 });
   });
 
+  describe('un periodo sostituito da uno successivo', () => {
+    /** La prova di un'iscritta, con il periodo di prima chiuso da una sostituzione. */
+    const sostituita = (altri: Record<string, unknown> = {}) => {
+      db.registration.findMany.mockResolvedValue([]);
+      db.multitrackConsent.findMany.mockResolvedValue([]);
+      db.recordingConsent.findMany.mockResolvedValue([
+        {
+          displayName: 'iscritta',
+          jitsiUserId: `reg-${REG}-bb`,
+          registrationId: REG,
+          eventModeratorId: null,
+          staffAccountId: null,
+          consentedAt: t('11:00'),
+          withdrawnAt: null,
+          destination: 'PUBLIC',
+          textVersion: 1,
+          earlierPeriods: [
+            {
+              consentedAt: t('10:00').toISOString(),
+              withdrawnAt: null,
+              destination: 'REGISTRANTS',
+              textVersion: 1,
+            },
+          ],
+          ...altri,
+        },
+      ]);
+    };
+
+    it('resta come prova del suo testo, e il consenso vale una volta', async () => {
+      sostituita();
+      const righe = await proveConsensoEvento('e1');
+      expect(righe.map((r) => [r.destination, r.withdrawnAt, r.superata])).toEqual([
+        ['REGISTRANTS', null, true],
+        ['PUBLIC', null, false],
+      ]);
+      expect(riepilogoProve(righe).recording).toEqual({ given: 1, withdrawn: 0 });
+    });
+
+    it('chi ritira dopo la sostituzione ha ritirato', async () => {
+      sostituita({ withdrawnAt: t('11:30') });
+      expect(riepilogoProve(await proveConsensoEvento('e1')).recording).toEqual({
+        given: 0,
+        withdrawn: 1,
+      });
+    });
+
+    it('sostituito, ritirato e ridato: il consenso vale', async () => {
+      sostituita({
+        consentedAt: t('12:00'),
+        earlierPeriods: [
+          { consentedAt: t('10:00').toISOString(), withdrawnAt: null },
+          {
+            consentedAt: t('11:00').toISOString(),
+            withdrawnAt: t('11:30').toISOString(),
+          },
+        ],
+      });
+      const righe = await proveConsensoEvento('e1');
+      expect(righe.map((r) => r.superata)).toEqual([true, false, false]);
+      expect(riepilogoProve(righe).recording).toEqual({ given: 1, withdrawn: 0 });
+    });
+
+    it('un periodo ritirato resta un ritiro', async () => {
+      sostituita({
+        earlierPeriods: [
+          {
+            consentedAt: t('10:00').toISOString(),
+            withdrawnAt: t('10:30').toISOString(),
+          },
+        ],
+      });
+      expect((await proveConsensoEvento('e1')).map((r) => r.superata)).toEqual([
+        false,
+        false,
+      ]);
+    });
+
+    it('dopo la copia si riconosce uguale: nessun nuovo consenso valido', async () => {
+      db.registration.findMany.mockResolvedValue([]);
+      db.multitrackConsent.findMany.mockResolvedValue([]);
+      db.recordingConsent.findMany.mockResolvedValue([]);
+      const conservata = {
+        kind: 'recording',
+        source: 'room',
+        role: 'registrant',
+        holderHash: 'impronta',
+        displayName: null,
+        nameRemovedAt: null,
+        textVersion: 1,
+        destination: 'PUBLIC',
+      };
+      db.retainedConsentProof.findMany.mockResolvedValue([
+        { ...conservata, givenAt: t('10:00'), withdrawnAt: null },
+        { ...conservata, givenAt: t('11:00'), withdrawnAt: t('11:30') },
+      ]);
+      const righe = await proveConsensoEvento('e1');
+      expect(righe.map((r) => r.superata)).toEqual([true, false]);
+      expect(riepilogoProve(righe).recording).toEqual({ given: 0, withdrawn: 1 });
+    });
+  });
+
   it('riporta destinazione e versione del testo, anche dei periodi precedenti', async () => {
     db.registration.findMany.mockResolvedValue([
       {
@@ -237,6 +340,61 @@ describe('proveConsensoEvento', () => {
   it('senza nomi non legge il nome delle prove conservate', async () => {
     await proveConsensoEvento('e1', { nomi: false });
     expect(db.retainedConsentProof.findMany.mock.calls[0]![0].select.displayName).toBe(false);
+  });
+});
+
+describe('periodiSostituiti', () => {
+  const periodo = (givenAt: string, withdrawnAt: string | null, altri = {}) => ({
+    kind: 'recording',
+    source: 'room',
+    role: 'registrant',
+    holderHash: 'impronta',
+    givenAt: t(givenAt),
+    withdrawnAt: withdrawnAt ? t(withdrawnAt) : null,
+    ...altri,
+  });
+
+  it('un periodo aperto seguito da un altro e’ sostituito; l’ultimo no', () => {
+    const [primo, secondo] = [periodo('10:00', null), periodo('11:00', null)];
+    expect([...periodiSostituiti([secondo, primo])]).toEqual([primo]);
+  });
+
+  it('un periodo ritirato prima del successivo non e’ sostituito', () => {
+    expect(
+      periodiSostituiti([periodo('10:00', '10:30'), periodo('11:00', null)]).size
+    ).toBe(0);
+  });
+
+  it('un ritiro scritto dopo la copia lo lascia sostituito', () => {
+    const primo = periodo('10:00', '12:00');
+    expect([...periodiSostituiti([primo, periodo('11:00', '12:00')])]).toEqual([primo]);
+  });
+
+  it('la prova dell’iscrizione non e’ un periodo di quella di sala', () => {
+    expect(
+      periodiSostituiti([
+        periodo('09:00', null, { source: 'registration' }),
+        periodo('10:00', null),
+      ]).size
+    ).toBe(0);
+  });
+
+  it('le prove di sala di chi conduce sono una per posto, e non si sostituiscono', () => {
+    expect(
+      periodiSostituiti([
+        periodo('10:00', null, { role: 'host' }),
+        periodo('11:00', '11:30', { role: 'host' }),
+      ]).size
+    ).toBe(0);
+  });
+
+  it('non mescola titolari diversi', () => {
+    expect(
+      periodiSostituiti([
+        periodo('10:00', null),
+        periodo('11:00', null, { holderHash: 'altra' }),
+      ]).size
+    ).toBe(0);
   });
 });
 

@@ -59,6 +59,7 @@ export const GET = withErrorHandling(async (request, context) => {
       t('withdrawnAt'),
       t('textVersion'),
       t('destination'),
+      t('superseded'),
     ],
     ...righe.map((r) => [
       t(`kinds.${r.kind}`),
@@ -71,6 +72,8 @@ export const GET = withErrorHandling(async (request, context) => {
       r.withdrawnAt ?? '',
       r.textVersion === null ? '' : String(r.textVersion),
       r.kind === 'recording' ? t(`destinations.${r.destination ?? 'none'}`) : '',
+      // Un periodo sostituito non e' un ritiro, e non si scambia per uno.
+      r.superata ? t('supersededValue') : '',
     ]),
   ]);
   await prisma.gdprAuditLog.create({

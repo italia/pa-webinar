@@ -9,6 +9,7 @@ import { tipiDiProvaDaConservare } from '@/lib/gdpr/cleanup-selection';
 import {
   improntaTitolare,
   leggiRigheProve,
+  periodiSostituiti,
   titolareIscrizione,
   type FiltroProve,
   type LettoreProve,
@@ -236,6 +237,7 @@ export async function proveConservateDellaPersona(emailHash: string) {
       kind: true,
       source: true,
       role: true,
+      holderHash: true,
       displayName: true,
       nameRemovedAt: true,
       locale: true,
@@ -248,6 +250,7 @@ export async function proveConservateDellaPersona(emailHash: string) {
     },
     orderBy: { givenAt: 'asc' },
   });
+  const sostituite = periodiSostituiti(prove);
   return prove.map((p) => ({
     id: p.id,
     eventId: p.eventId,
@@ -256,6 +259,7 @@ export async function proveConservateDellaPersona(emailHash: string) {
     role: p.role,
     name: p.displayName ? tryDecryptPII(p.displayName) : null,
     nameRemoved: !!p.nameRemovedAt,
+    superseded: sostituite.has(p),
     locale: p.locale,
     textVersion: p.textVersion,
     destination: p.destination,

@@ -25,6 +25,7 @@ const prova = (
   eventId: 'e1',
   kind,
   name: null,
+  superseded: false,
   givenAt: '2026-09-01T08:00:00.000Z',
   withdrawnAt: null,
   event: { title: { it: 'Evento passato' }, startsAt: '2026-09-02T08:00:00.000Z' },
@@ -142,6 +143,28 @@ describe('RetainedConsentProofs', () => {
     monta([prova('p1', 'recording', { withdrawnAt: '2026-10-01T08:00:00.000Z' })]);
     expect(pulsanti('Ritira il consenso')).toHaveLength(0);
     expect(container.textContent).toContain('Ritirato il 1 ottobre 2026');
+  });
+
+  it('un periodo sostituito si dice, e non si ritira: si ritira il consenso che l’ha sostituito', () => {
+    monta([prova('p1', 'recording', { superseded: true }), prova('p2', 'recording')]);
+    expect(
+      container.textContent?.match(/Sostituito da un consenso successivo/g)
+    ).toHaveLength(1);
+    expect(pulsanti('Ritira il consenso')).toHaveLength(1);
+  });
+
+  it('dopo il ritiro il periodo sostituito resta riconoscibile', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('{}', { status: 200 }))
+    );
+    monta([prova('p1', 'recording', { superseded: true }), prova('p2', 'recording')]);
+
+    await clic('Ritira il consenso');
+    await clic('Ritira');
+
+    expect(container.textContent).toContain('Sostituito da un consenso successivo');
+    expect(pulsanti('Ritira il consenso')).toHaveLength(0);
   });
 
   it.each([

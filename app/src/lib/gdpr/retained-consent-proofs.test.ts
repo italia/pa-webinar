@@ -335,6 +335,32 @@ describe('ritiraProvaConservata', () => {
 });
 
 describe('proveConservateDellaPersona', () => {
+  it('dice quale periodo e’ stato sostituito', async () => {
+    const periodo = {
+      eventId: 'e1',
+      kind: 'recording',
+      source: 'room',
+      role: 'registrant',
+      holderHash: 'titolare',
+      displayName: null,
+      nameRemovedAt: null,
+      locale: 'it',
+      textVersion: 1,
+      destination: 'PUBLIC',
+      retainedAt: ADESSO,
+      event: { title: { it: 'Evento' }, startsAt: t('12:00') },
+    };
+    tx.retainedConsentProof.findMany.mockResolvedValue([
+      { ...periodo, id: 'p1', givenAt: t('09:00'), withdrawnAt: null },
+      { ...periodo, id: 'p2', givenAt: t('10:00'), withdrawnAt: t('11:00') },
+    ]);
+    const prove = await proveConservateDellaPersona('impronta');
+    expect(prove.map((p) => [p.id, p.superseded])).toEqual([
+      ['p1', true],
+      ['p2', false],
+    ]);
+  });
+
   it('decifra il nome e non espone le impronte', async () => {
     tx.retainedConsentProof.findMany.mockResolvedValue([
       {
@@ -343,6 +369,8 @@ describe('proveConservateDellaPersona', () => {
         kind: 'recording',
         source: 'room',
         role: 'registrant',
+        holderHash: 'titolare',
+        emailHash: 'impronta',
         displayName: 'cifrato',
         nameRemovedAt: null,
         locale: 'it',
@@ -359,6 +387,8 @@ describe('proveConservateDellaPersona', () => {
         kind: 'transcription',
         source: 'room',
         role: 'registrant',
+        holderHash: 'titolare',
+        emailHash: 'impronta',
         displayName: null,
         nameRemovedAt: ADESSO,
         locale: null,
@@ -371,9 +401,10 @@ describe('proveConservateDellaPersona', () => {
       },
     ]);
     const prove = await proveConservateDellaPersona('impronta');
-    expect(tx.retainedConsentProof.findMany.mock.calls[0]![0].select).not.toHaveProperty(
-      'holderHash'
-    );
+    for (const prova of prove) {
+      expect(prova).not.toHaveProperty('holderHash');
+      expect(prova).not.toHaveProperty('emailHash');
+    }
     expect(prove[0]).toMatchObject({
       name: 'chiaro:cifrato',
       nameRemoved: false,

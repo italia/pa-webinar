@@ -120,6 +120,7 @@ const chiediDati = async (emailHash: string) => {
       kind: string;
       name: string | null;
       nameRemoved: boolean;
+      superseded: boolean;
       withdrawnAt: string | null;
     }>;
   };
@@ -202,6 +203,28 @@ async function creaTrascrizione(eventId: string) {
       blobKey: 'artefatti/t.json',
       mimeType: 'application/json',
       contentHash: 'a'.repeat(64),
+    },
+  });
+}
+
+/** La prova di sala dell'iscritta dopo una sostituzione: il periodo di prima e'
+ *  chiuso senza un ritiro, come lo lascia l'ingresso in sala con un testo che la
+ *  prova non copriva. */
+async function sostituisciConsenso(registrationId: string) {
+  await prisma.recordingConsent.updateMany({
+    where: { registrationId },
+    data: {
+      consentedAt: giorniFa(61),
+      destination: 'PUBLIC',
+      textVersion: 1,
+      earlierPeriods: [
+        {
+          consentedAt: giorniFa(63).toISOString(),
+          withdrawnAt: null,
+          destination: 'REGISTRANTS',
+          textVersion: 1,
+        },
+      ],
     },
   });
 }
@@ -855,6 +878,137 @@ describe('i propri dati', () => {
         recording: { given: 1, withdrawn: 0 },
         transcription: { given: 1, withdrawn: 0 },
       },
+    });
+  });
+
+  describe('sostituzione, poi ritiro', () => {
+    const riepilogo = async (eventId: string) => {
+      await entraCome('ADMIN');
+      const res = await consensiAdmin(
+        richiesta(`/api/admin/events/${eventId}/consents`) as NextRequest,
+        contesto({ id: eventId })
+      );
+      return (await res.json()) as {
+        total: number;
+        summary: { recording: { given: number; withdrawn: number } };
+      };
+    };
+    const csv = async (eventId: string) => {
+      await entraCome('ADMIN');
+      const res = await consensiAdmin(
+        richiesta(
+          `/api/admin/events/${eventId}/consents?format=csv&locale=it`
+        ) as NextRequest,
+        contesto({ id: eventId })
+      );
+      return (await res.text()).trim().split('\n');
+    };
+    const ritiraDallaPagina = async (registrationId: string, emailHash: string) => {
+      const dati = await chiediDati(emailHash);
+      const res = await ritira(
+        daIp('/api/gdpr/consents', 'POST', {
+          token: dati.consentsToken,
+          registrationId,
+          consent: 'recording',
+        }),
+        contesto({})
+      );
+      expect(res.status).toBe(200);
+    };
+
+    it('la persona ha ritirato, prima e dopo la pulizia, e il CSV non confonde i periodi', async () => {
+      const evento = await creaEvento(PUBBLICATO);
+      const { reg, emailHash } = await iscritta(evento.id);
+      await sostituisciConsenso(reg.id);
+      await ritiraDallaPagina(reg.id, emailHash);
+
+      expect((await riepilogo(evento.id)).summary.recording).toEqual({
+        given: 0,
+        withdrawn: 1,
+      });
+      const prima = await csv(evento.id);
+      const sostituite = prima.filter((r) => r.includes('Da un consenso successivo'));
+      expect(sostituite).toHaveLength(1);
+      expect(sostituite[0]).toContain(';;1;Riservata;');
+
+      await giroDiPulizia();
+
+      expect(await prisma.recordingConsent.count()).toBe(0);
+      expect((await riepilogo(evento.id)).summary.recording).toEqual({
+        given: 0,
+        withdrawn: 1,
+      });
+      const dopo = await csv(evento.id);
+      expect(dopo.filter((r) => r.includes('Da un consenso successivo'))).toEqual(
+        sostituite
+      );
+    });
+
+    it('senza ritiro il consenso vale una volta, anche dopo la pulizia', async () => {
+      const evento = await creaEvento(PUBBLICATO);
+      const { reg, emailHash } = await iscritta(evento.id);
+      await sostituisciConsenso(reg.id);
+
+      expect((await riepilogo(evento.id)).summary.recording).toEqual({
+        given: 1,
+        withdrawn: 0,
+      });
+      await giroDiPulizia();
+      expect((await riepilogo(evento.id)).summary.recording).toEqual({
+        given: 1,
+        withdrawn: 0,
+      });
+
+      // Il periodo sostituito non e' il consenso da ritirare.
+      const dati = await chiediDati(emailHash);
+      const sostituite = dati.retainedConsentProofs.filter((p) => p.superseded);
+      expect(sostituite).toHaveLength(1);
+      expect(sostituite[0]!.withdrawnAt).toBeNull();
+    });
+
+    it('il ritiro di una prova conservata non lo fa passare per ritirato', async () => {
+      const evento = await creaEvento(PUBBLICATO);
+      const { reg, emailHash } = await iscritta(evento.id);
+      await sostituisciConsenso(reg.id);
+      await giroDiPulizia();
+      const dati = await chiediDati(emailHash);
+      const attuale = dati.retainedConsentProofs.find(
+        (p) => p.kind === 'recording' && !p.withdrawnAt && !p.superseded
+      )!;
+
+      const res = await ritira(
+        daIp('/api/gdpr/consents', 'POST', {
+          token: dati.consentsToken,
+          proofId: attuale.id,
+          consent: 'recording',
+        }),
+        contesto({})
+      );
+
+      expect(res.status).toBe(200);
+      expect((await riepilogo(evento.id)).summary.recording).toEqual({
+        given: 0,
+        withdrawn: 1,
+      });
+      expect(
+        (await csv(evento.id)).filter((r) => r.includes('Da un consenso successivo'))
+      ).toHaveLength(1);
+    });
+
+    it('la cancellazione chiesta dalla persona lascia riconoscibile il periodo sostituito', async () => {
+      const evento = await creaEvento(PUBBLICATO);
+      const { reg, emailHash } = await iscritta(evento.id);
+      await sostituisciConsenso(reg.id);
+
+      await chiediCancellazione(emailHash);
+
+      expect((await riepilogo(evento.id)).summary.recording).toEqual({
+        given: 0,
+        withdrawn: 1,
+      });
+      expect(
+        (await csv(evento.id)).filter((r) => r.includes('Da un consenso successivo'))
+      ).toHaveLength(1);
     });
   });
 

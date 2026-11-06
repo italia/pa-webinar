@@ -172,6 +172,57 @@ describe('GET admin/events/[id]/consents', () => {
     expect(testo).not.toContain('Non indicata');
   });
 
+  describe('un periodo sostituito, poi il ritiro', () => {
+    const periodo = {
+      kind: 'recording',
+      source: 'room',
+      role: 'registrant',
+      name: 'Anna Bianchi',
+      textVersion: 1,
+      nomeRimosso: false,
+      conservata: false,
+      holder: 'iscritta',
+    };
+    const RITIRO = '2026-11-03T10:00:00.000Z';
+    beforeEach(() => {
+      m.prove.mockResolvedValueOnce([
+        {
+          ...periodo,
+          givenAt: '2026-11-01T10:00:00.000Z',
+          withdrawnAt: null,
+          destination: 'REGISTRANTS',
+          superata: true,
+        },
+        {
+          ...periodo,
+          givenAt: '2026-11-02T10:00:00.000Z',
+          withdrawnAt: RITIRO,
+          destination: 'PUBLIC',
+          superata: false,
+        },
+      ]);
+    });
+
+    it('il riepilogo conta il ritiro; le prove restano due', async () => {
+      expect(await (await chiedi()).json()).toMatchObject({
+        total: 2,
+        summary: { recording: { given: 0, withdrawn: 1 } },
+      });
+    });
+
+    it('il CSV distingue il periodo sostituito dal ritiro', async () => {
+      const testo = await (await chiedi('?format=csv&locale=it')).text();
+      const [intestazione, sostituito, ritirato] = testo.trim().split('\n');
+      expect(intestazione).toContain(';Ritirato il;');
+      expect(intestazione!.trim().endsWith(';Sostituito')).toBe(true);
+      // Senza ora del ritiro, e con la colonna che dice perche'.
+      expect(sostituito!.trim().endsWith(';;1;Riservata;Da un consenso successivo')).toBe(
+        true
+      );
+      expect(ritirato!.trim().endsWith(`;${RITIRO};1;Pubblica;`)).toBe(true);
+    });
+  });
+
   it('il riepilogo comprende le prove conservate, e dice quante sono', async () => {
     m.prove.mockResolvedValueOnce([
       {

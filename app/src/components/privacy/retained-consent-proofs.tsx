@@ -15,6 +15,8 @@ export interface ProvaConservataVista {
   kind: 'recording' | 'transcription';
   /** Il nome conservato: null dopo una cancellazione, o se non si legge piu'. */
   name: string | null;
+  /** Sostituita da un consenso successivo: si ritira quello. */
+  superseded: boolean;
   givenAt: string;
   withdrawnAt: string | null;
   event: { title: unknown; startsAt: string };
@@ -104,8 +106,10 @@ export default function RetainedConsentProofs({
                 {p.withdrawnAt && (
                   <> · {t('consentWithdrawnOn', { date: data(p.withdrawnAt) })}</>
                 )}
+                {p.superseded && <> · {t('proofSuperseded')}</>}
               </div>
               {!p.withdrawnAt &&
+                !p.superseded &&
                 (conferma === p.id ? (
                   <div
                     className="d-flex flex-wrap align-items-center gap-2 mt-1"

@@ -4230,6 +4230,8 @@
         "withdrawnAt": "Ritirato il",
         "textVersion": "Versione del testo",
         "destination": "Destinazione",
+        "superseded": "Sostituito",
+        "supersededValue": "Da un consenso successivo",
         "destinations": {
           "PUBLIC": "Pubblica",
           "REGISTRANTS": "Riservata",
@@ -4545,6 +4547,7 @@
       "proofsTitle": "Prove dei consensi conservate",
       "proofsIntro": "I dati di questi eventi sono stati cancellati. Queste prove restano finché il video o la trascrizione sono pubblicati. Puoi ritirare il consenso: ciò che è già nel video resta, e per toglierlo devi scrivere al titolare del trattamento.",
       "proofGivenOn": "Dato il {date}",
+      "proofSuperseded": "Sostituito da un consenso successivo",
       "addressBookTitle": "Rubrica degli eventi",
       "addressBookIntro": "Hai scelto di restare in rubrica per essere invitato a eventi simili. Conserviamo questi dati fino al {date}, salvo revoca o nuovo consenso.",
       "addressBookOptOut": "Rimuovi i miei dati dalla rubrica",
