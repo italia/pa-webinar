@@ -18,7 +18,9 @@ import { isEventOpenForRegistration } from '@/lib/events/visibility';
 import { registrationAccessFor } from '@/lib/events/registration-access';
 import { informativaEvento } from '@/lib/events/privacy-notice';
 import { anteprimaEventoPubblico } from '@/lib/events/meta-title';
+import { rubricaProposta } from '@/lib/persons/address-book';
 import { recordingAvailable, voceNelVideo } from '@/lib/recording/availability';
+import { trascrizioneDalVideo } from '@/lib/registration/consents';
 import { findEventQuestionnaireByPlacement } from '@/lib/questionnaires';
 import { invitoDaToken } from '@/lib/email/invitation';
 
@@ -97,6 +99,9 @@ export default async function RegistrationPage({
   // iscriversi (lib/events/privacy-notice).
   const { url: privacyUrl, testo: privacyText } = informativaEvento(event, locale);
 
+  const disponibile = recordingAvailable();
+  const voce = voceNelVideo();
+
   return (
     <div className="container py-5">
       <div className="row justify-content-center">
@@ -140,14 +145,18 @@ export default async function RegistrationPage({
           <RegistrationFormClient
             eventSlug={slug}
             invito={invito}
-            voce={voceNelVideo()}
+            voce={voce}
             privacyPolicyUrl={privacyUrl}
             privacyPolicyText={privacyText}
             // Un'installazione che non può registrare non chiede il consenso
             // alla registrazione e non la annuncia (come la sala d'attesa).
-            recordingEnabled={event.recordingEnabled && recordingAvailable()}
+            recordingEnabled={event.recordingEnabled && disponibile}
+            recordingDestination={event.recordingDestination}
             multitrackRecordingEnabled={event.multitrackRecordingEnabled}
             captionsTranscript={captionsTranscriptActive(event, settings)}
+            trascrizioneVideo={trascrizioneDalVideo(event, settings, disponibile, voce)}
+            retainParticipantTracks={event.retainParticipantTracks}
+            rubricaProposta={rubricaProposta(event, settings)}
             participantsCanUnmute={event.participantsCanUnmute}
             participantsCanStartVideo={event.participantsCanStartVideo}
             participantsCanShareScreen={event.participantsCanShareScreen}
