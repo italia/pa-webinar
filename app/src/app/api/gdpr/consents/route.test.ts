@@ -8,11 +8,15 @@ const mocks = vi.hoisted(() => ({
   findFirst: vi.fn(),
   ritiraConsensi: vi.fn(async () => ({ registrazione: true, trascrizione: true })),
   ritiraComunicazioni: vi.fn(async () => true),
+  ritiraProvaConservata: vi.fn(async () => true),
   verifyGdprToken: vi.fn(),
 }));
 
 vi.mock('@/lib/db', () => ({ prisma: { registration: { findFirst: mocks.findFirst } } }));
 vi.mock('@/lib/gdpr/request-token', () => ({ verifyGdprToken: mocks.verifyGdprToken }));
+vi.mock('@/lib/gdpr/retained-consent-proofs', () => ({
+  ritiraProvaConservata: mocks.ritiraProvaConservata,
+}));
 vi.mock('@/lib/live/consent-withdrawal', () => ({
   ritiraConsensi: mocks.ritiraConsensi,
   ritiraComunicazioni: mocks.ritiraComunicazioni,
@@ -21,6 +25,7 @@ vi.mock('@/lib/live/consent-withdrawal', () => ({
 import { POST } from './route';
 
 const ISCRIZIONE = '11111111-1111-4111-8111-111111111111';
+const PROVA = '22222222-2222-4222-8222-222222222222';
 let ip = 0;
 
 function richiesta(
@@ -45,6 +50,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   mocks.verifyGdprToken.mockReturnValue({ emailHash: 'impronta' });
   mocks.findFirst.mockResolvedValue({ id: ISCRIZIONE, eventId: 'evento-1' });
+  mocks.ritiraProvaConservata.mockResolvedValue(true);
 });
 
 describe('POST /api/gdpr/consents', () => {
@@ -106,5 +112,43 @@ describe('POST /api/gdpr/consents', () => {
   it("un consenso che non esiste e' un errore", async () => {
     const res = await richiesta({ registrationId: ISCRIZIONE, consent: 'tutto' });
     expect(res.status).toBe(422);
+  });
+
+  it('una prova conservata si ritira con il suo id, per lo stesso indirizzo', async () => {
+    const res = await richiesta({ proofId: PROVA, consent: 'recording' });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ withdrawn: 'recording' });
+    expect(mocks.ritiraProvaConservata).toHaveBeenCalledWith('impronta', PROVA, 'recording');
+    expect(mocks.findFirst).not.toHaveBeenCalled();
+    expect(mocks.ritiraConsensi).not.toHaveBeenCalled();
+  });
+
+  it('una prova di un altro indirizzo risponde 404', async () => {
+    mocks.ritiraProvaConservata.mockResolvedValue(false);
+    const res = await richiesta({ proofId: PROVA, consent: 'transcription' });
+    expect(res.status).toBe(404);
+  });
+
+  it('il link scaduto non ritira neanche una prova', async () => {
+    mocks.verifyGdprToken.mockReturnValue(null);
+    const res = await richiesta({ proofId: PROVA, consent: 'recording' });
+    expect(res.status).toBe(401);
+    expect(mocks.ritiraProvaConservata).not.toHaveBeenCalled();
+  });
+
+  it('accetta esattamente uno tra iscrizione e prova', async () => {
+    expect(
+      (await richiesta({ registrationId: ISCRIZIONE, proofId: PROVA, consent: 'recording' }))
+        .status
+    ).toBe(422);
+    expect((await richiesta({ consent: 'recording' })).status).toBe(422);
+    expect(mocks.ritiraProvaConservata).not.toHaveBeenCalled();
+    expect(mocks.ritiraConsensi).not.toHaveBeenCalled();
+  });
+
+  it('le comunicazioni future non si ritirano da una prova', async () => {
+    const res = await richiesta({ proofId: PROVA, consent: 'futureCommunications' });
+    expect(res.status).toBe(422);
+    expect(mocks.ritiraComunicazioni).not.toHaveBeenCalled();
   });
 });

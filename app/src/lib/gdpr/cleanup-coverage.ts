@@ -22,7 +22,7 @@
 
 /** Tabelle che la transazione svuota (o ripulisce) alla scadenza. */
 export const PURGED_BY_CLEANUP: Record<string, string> = {
-  Registration: 'iscritti: email cifrata, nome, hash, token di accesso',
+  Registration: 'iscritti: email cifrata, nome, hash, token di accesso; le prove dei consensi dati all’iscrizione si copiano prima, se il video o la trascrizione sono pubblicati (RetainedConsentProof)',
   Question: 'anonimizzate, non cancellate: restano testo, risposta e voti contati; si tolgono nome dell’autore e iscrizione (prima di cancellare le iscrizioni, che le porterebbero via in cascata)',
   ChatMessage: 'nomi dei mittenti e testi, allegati compresi',
   Reaction: 'reazioni di quell’occorrenza',
@@ -30,8 +30,9 @@ export const PURGED_BY_CLEANUP: Record<string, string> = {
   EventReminder: 'promemoria programmati e loro invii',
   EventInvitation: 'nome, email cifrata, HMAC e token del link di registrazione precompilata',
   EventModerator: 'concessioni nominali: nome ed email cifrati piu’ un link di accesso durevole',
-  MultitrackConsent: 'prova del consenso alla registrazione per partecipante: nome cifrato e posto nella conferenza',
-  RecordingConsent: 'prova del consenso alla registrazione dato in sala d’attesa: nome cifrato e posto nella conferenza',
+  MultitrackConsent: 'prova del consenso alla registrazione per partecipante: nome cifrato e posto nella conferenza; si copia prima, se il video o la trascrizione sono pubblicati (RetainedConsentProof)',
+  RecordingConsent: 'prova del consenso alla registrazione dato in sala d’attesa: nome cifrato e posto nella conferenza; si copia prima, se il video è pubblicato (RetainedConsentProof)',
+  RetainedConsentProof: 'prova del consenso che resta finché il video o la trascrizione sono pubblicati: non segue la scadenza dei dati dell’evento; la transazione cancella quelle non più coperte (lib/gdpr/cleanup-selection), e le altre se ne vanno con l’evento (cascade)',
   CallSession: 'ripulita, non cancellata: si azzerano le colonne con PII e restano i numeri aggregati',
   RoomOccupant: 'chi era in sala: endpoint del bridge e posto della conferenza, che rimanda a un’iscrizione',
   CaptionSegment: 'frasi dei sottotitoli salvate per la trascrizione: nome e testo cifrati di chi ha acconsentito; la trascrizione costruita resta sulla registrazione, con la sua retention',
@@ -56,6 +57,5 @@ export const NOT_PURGED_BY_CLEANUP: Record<string, string> = {
   EventQuestionnaire: 'resta la configurazione, che non è un dato personale; le risposte di fine evento restano senza nome, hash dell’email e identità, quelle chieste all’iscrizione si cancellano passando dal questionario',
   Recording: 'l’albero della registrazione segue la propria retention (può essere più lunga); di suo la transazione cancella le tracce per-partecipante già purgate, che portano il nome cifrato',
   PostprodJob: 'legati all’evento ci sono solo i lavori del resoconto (REPORT): il payload tiene i numeri del resoconto, aggregati, con i testi senza autore delle domande più votate che il riepilogo conserva comunque; si tolgono nello stesso UPDATE che chiude il lavoro (alla consegna o al fallimento definitivo) e a ogni nuova richiesta. I lavori delle registrazioni seguono la retention della registrazione',
-  RetainedConsentProof: 'prova del consenso che resta finché esiste il video a cui si riferisce: non segue la scadenza dei dati dell’evento, e se ne va con l’evento (cascade)',
   PostprodOriginalBody: 'il testo come l’ha prodotto la macchina, conservato accanto alla versione rivista: segue l’artefatto da cui è copiato e la retention della registrazione, che lo cancella insieme al resto (cron di post-produzione + cascade). Cancellarlo qui, alla scadenza dell’evento, separerebbe le due versioni di un verbale che deve restare confrontabile',
 };

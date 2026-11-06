@@ -165,7 +165,7 @@ export const PATCH = withErrorHandling(async (request, context) => {
 
 export const DELETE = withErrorHandling(async (request, context) => {
   const { reg } = await iscrizione(context);
-  const counts = await eraseRegistrations([reg.id], 'admin/registration-delete');
+  const counts = await eraseRegistrations([reg], 'admin/registration-delete');
 
   await prisma.gdprAuditLog.create({
     data: {

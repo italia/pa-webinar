@@ -11,6 +11,11 @@
  * token carries the emailHash so we never accept a plaintext email here
  * — that closes the unauthenticated enumeration oracle the previous
  * version of this endpoint exposed.
+ *
+ * Oltre alle iscrizioni consegna cio' che dura piu' di loro, anche a chi non ne
+ * ha piu' nessuna: la voce di rubrica (ADR-011) con il token per uscirne e le
+ * prove dei consensi conservate (lib/gdpr/retained-consent-proofs), con il token
+ * per ritirarli.
  */
 
 import { withErrorHandling } from '@/lib/api-handler';
@@ -21,6 +26,9 @@ import { getClientIp, rateLimit } from '@/lib/rate-limit';
 import { voceNelVideo } from '@/lib/recording/availability';
 import { consensiDellIscrizione } from '@/lib/gdpr/consent-state';
 import { issueGdprToken, verifyGdprToken } from '@/lib/gdpr/request-token';
+import { proveConservateDellaPersona } from '@/lib/gdpr/retained-consent-proofs';
+import { issueRubricaOptOutToken } from '@/lib/persons/opt-out-token';
+import { scadenzaRubrica } from '@/lib/persons/retention';
 
 export const dynamic = 'force-dynamic';
 
@@ -90,7 +98,13 @@ export const GET = withErrorHandling(async (request) => {
       // Lo stesso per il consenso alla registrazione dell'evento dato in sala
       // d'attesa da chi non l'aveva dato all'iscrizione.
       recordingConsents: {
-        select: { consentedAt: true, locale: true, withdrawnAt: true },
+        select: {
+          consentedAt: true,
+          locale: true,
+          withdrawnAt: true,
+          destination: true,
+          textVersion: true,
+        },
         orderBy: { consentedAt: 'asc' },
       },
     },
@@ -151,13 +165,51 @@ export const GET = withErrorHandling(async (request) => {
     event: { title: g.event.title, startsAt: g.event.startsAt.toISOString() },
   }));
 
-  if (registrations.length === 0) {
-    return Response.json({ data: [], profilePhoto, grants });
-  }
+  // La voce di rubrica dura oltre le iscrizioni: resta l'unico modo di uscirne
+  // per chi non riceve email da piu' a lungo del link che ha in casella.
+  const voce = await prisma.person.findUnique({
+    where: { emailHash },
+    select: {
+      id: true,
+      displayName: true,
+      email: true,
+      organization: true,
+      organizationRole: true,
+      organizationType: true,
+      optedInToAddressBook: true,
+      optedInAt: true,
+      optedOutAt: true,
+      retentionMonths: true,
+    },
+  });
+  const addressBook = voce
+    ? {
+        name: voce.displayName ? tryDecryptPII(voce.displayName) : null,
+        email: voce.email ? tryDecryptPII(voce.email) : null,
+        organization: voce.organization,
+        organizationRole: voce.organizationRole,
+        organizationType: voce.organizationType,
+        optedIn: voce.optedInToAddressBook,
+        optedInAt: voce.optedInAt?.toISOString() ?? null,
+        optedOutAt: voce.optedOutAt?.toISOString() ?? null,
+        expiresAt: voce.optedInToAddressBook
+          ? (scadenzaRubrica(voce)?.toISOString() ?? null)
+          : null,
+        // Solo a chi e' in rubrica: fuori non c'e' niente da cui uscire.
+        optOutToken: voce.optedInToAddressBook ? issueRubricaOptOutToken(voce.id) : null,
+      }
+    : null;
+
+  const retainedConsentProofs = await proveConservateDellaPersona(emailHash);
 
   // Audit one row per distinct event, recording only an emailHash prefix
   // (not the address) so the log itself cannot be reversed.
-  const eventIds = [...new Set(registrations.map((r) => r.eventId))];
+  const eventIds = [
+    ...new Set([
+      ...registrations.map((r) => r.eventId),
+      ...retainedConsentProofs.map((p) => p.eventId),
+    ]),
+  ];
   for (const eventId of eventIds) {
     await prisma.gdprAuditLog.create({
       data: {
@@ -166,6 +218,19 @@ export const GET = withErrorHandling(async (request) => {
         recordCount: 1,
         details: JSON.stringify({ emailHashPrefix: emailHash.substring(0, 8) }),
       },
+    });
+  }
+
+  if (registrations.length === 0) {
+    return Response.json({
+      data: [],
+      profilePhoto,
+      grants,
+      addressBook,
+      retainedConsentProofs,
+      ...(retainedConsentProofs.length > 0 && {
+        consentsToken: issueGdprToken('consents', emailHash),
+      }),
     });
   }
 
@@ -202,6 +267,9 @@ export const GET = withErrorHandling(async (request) => {
         consentGiven: r.consentGiven,
         consentTimestamp: r.consentTimestamp.toISOString(),
         consentRecording: r.consentRecording,
+        // Il testo letto: dove quel consenso diceva che sarebbe andato il video.
+        consentRecordingDestination: r.consentRecordingDestination ?? null,
+        consentRecordingVersion: r.consentRecordingVersion ?? null,
         consentMultitrack: r.consentMultitrack,
         // Il ritiro dalla sala dei consensi dati all'iscrizione.
         consentRecordingWithdrawnAt: r.consentRecordingWithdrawnAt?.toISOString() ?? null,
@@ -224,6 +292,8 @@ export const GET = withErrorHandling(async (request) => {
           consentedAt: c.consentedAt.toISOString(),
           locale: c.locale,
           withdrawnAt: c.withdrawnAt?.toISOString() ?? null,
+          destination: c.destination ?? null,
+          textVersion: c.textVersion ?? null,
         })),
       },
       event: {
@@ -255,6 +325,8 @@ export const GET = withErrorHandling(async (request) => {
     data: result,
     profilePhoto,
     grants,
+    addressBook,
+    retainedConsentProofs,
     // Serve a ritirare un consenso dalla pagina: il link dell'email resta di
     // sola lettura, e questo non finisce negli indirizzi.
     consentsToken: issueGdprToken('consents', emailHash),

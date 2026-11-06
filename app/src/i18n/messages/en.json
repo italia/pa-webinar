@@ -4560,7 +4560,7 @@
       "requestSubmittedTitle": "Check your inbox",
       "requestSubmittedBody": "If this email matches a registration, we've sent you a link to confirm the erasure. The link is valid for 1 hour.",
       "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "confirmWarning": "You are about to permanently erase all personal data tied to your email.",
+      "confirmWarning": "You are about to permanently erase the personal data tied to your email, except what is listed below.",
       "confirmBody": "Registrations, questions, poll votes, feedback, reminders and your entry in the events address book will be deleted. This action is irreversible.",
       "confirmProofs": "If an event has a published video or transcript, the type of consent, the date and the text you answered stay, without your name, for as long as that video or transcript stays published. They are there to prove the consent. The video does not change: to ask for your contributions to be removed, write to the data controller.",
       "confirmButton": "Confirm erasure",

@@ -14,7 +14,13 @@ const { filesStorage } = vi.hoisted(() => ({
 
 vi.mock('@/lib/db', () => ({
   prisma: {
-    event: { findMany: vi.fn(), findFirst: vi.fn(), update: vi.fn(), updateMany: vi.fn() },
+    event: {
+      findMany: vi.fn(),
+      findFirst: vi.fn(),
+      findUnique: vi.fn(),
+      update: vi.fn(),
+      updateMany: vi.fn(),
+    },
     staffLoginToken: { deleteMany: vi.fn(async () => ({ count: 0 })) },
     $executeRaw: vi.fn(async () => 0),
     registration: { deleteMany: vi.fn(), findMany: vi.fn(async (): Promise<unknown[]> => []) },
@@ -43,12 +49,13 @@ vi.mock('@/lib/db', () => ({
     wordCloudRound: { deleteMany: vi.fn() },
     reminderSent: { deleteMany: vi.fn() },
     eventReminder: { deleteMany: vi.fn() },
-    multitrackConsent: { deleteMany: vi.fn() },
-    recordingConsent: { deleteMany: vi.fn() },
+    multitrackConsent: { deleteMany: vi.fn(), findMany: vi.fn() },
+    recordingConsent: { deleteMany: vi.fn(), findMany: vi.fn() },
+    retainedConsentProof: { deleteMany: vi.fn(), createMany: vi.fn() },
     roomOccupant: { deleteMany: vi.fn() },
     captionSegment: { deleteMany: vi.fn() },
     recording: { findMany: vi.fn(), deleteMany: vi.fn() },
-    postprodArtifact: { deleteMany: vi.fn() },
+    postprodArtifact: { deleteMany: vi.fn(), count: vi.fn() },
     speaker: { deleteMany: vi.fn() },
     reaction: { deleteMany: vi.fn() },
     agendaItemReaction: { deleteMany: vi.fn() },
@@ -99,7 +106,7 @@ import { GET } from './route';
 type Mock = ReturnType<typeof vi.fn>;
 
 const db = prisma as unknown as {
-  event: { findMany: Mock; findFirst: Mock; update: Mock; updateMany: Mock };
+  event: { findMany: Mock; findFirst: Mock; findUnique: Mock; update: Mock; updateMany: Mock };
   staffLoginToken: { deleteMany: Mock };
   emailOutbox: { deleteMany: Mock; updateMany: Mock };
   adminAuditLog: { updateMany: Mock };
@@ -120,12 +127,13 @@ const db = prisma as unknown as {
   eventReminder: { deleteMany: Mock };
   registration: { deleteMany: Mock; findMany: Mock };
   $executeRaw: Mock;
-  multitrackConsent: { deleteMany: Mock };
-  recordingConsent: { deleteMany: Mock };
+  multitrackConsent: { deleteMany: Mock; findMany: Mock };
+  recordingConsent: { deleteMany: Mock; findMany: Mock };
+  retainedConsentProof: { deleteMany: Mock; createMany: Mock };
   roomOccupant: { deleteMany: Mock };
   captionSegment: { deleteMany: Mock };
   recording: { findMany: Mock; deleteMany: Mock };
-  postprodArtifact: { deleteMany: Mock };
+  postprodArtifact: { deleteMany: Mock; count: Mock };
   speaker: { deleteMany: Mock };
   reaction: { deleteMany: Mock };
   agendaItemReaction: { deleteMany: Mock };
@@ -1113,6 +1121,8 @@ describe('GET /api/cron/cleanup', () => {
       registrationsDeleted: 0,
       questionsAnonymized: 0,
       pollVotesAnonymized: 0,
+      consentProofsRetained: 0,
+      retainedConsentProofsDeleted: 0,
       recordingBlobsDeleted: 0,
       chatAttachmentBlobsDeleted: 0,
       profilePhotosDeleted: 0,
@@ -1161,6 +1171,195 @@ describe('GET /api/cron/cleanup', () => {
 });
 
 
+
+describe('GET /api/cron/cleanup — prove dei consensi', () => {
+  const PUBBLICATO = {
+    youtubeUrl: null,
+    recordingUrl: 'https://storage.example/video.mp4',
+    recordingPublished: true,
+    transcriptPublished: false,
+  };
+  const iscritta = {
+    id: 'reg-1',
+    displayName: 'nome-cifrato',
+    emailHash: 'impronta',
+    locale: 'it',
+    consentTimestamp: daysAgo(70),
+    consentRecording: true,
+    consentRecordingDestination: 'PUBLIC',
+    consentRecordingVersion: 1,
+    consentRecordingWithdrawnAt: null,
+    consentMultitrack: true,
+    consentMultitrackVersion: 2,
+    consentMultitrackWithdrawnAt: null,
+  };
+
+  beforeEach(() => {
+    vi.resetAllMocks();
+    for (const delegate of Object.values(prisma as unknown as Record<string, unknown>)) {
+      if (!delegate || typeof delegate !== 'object') continue;
+      for (const [name, fn] of Object.entries(delegate as Record<string, unknown>)) {
+        const mock = fn as Mock;
+        if (typeof mock !== 'function') continue;
+        if (name === 'findMany') mock.mockResolvedValue([]);
+        else if (name === 'deleteMany' || name === 'updateMany') mock.mockResolvedValue({ count: 0 });
+        else mock.mockResolvedValue({});
+      }
+    }
+    db.postprodArtifact.count.mockResolvedValue(0);
+    db.$executeRaw.mockResolvedValue(0);
+    db.$transaction.mockImplementation(async (arg: unknown) =>
+      typeof arg === 'function' ? await (arg as (tx: unknown) => Promise<unknown>)(prisma) : arg,
+    );
+    vi.spyOn(console, 'log').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    process.env.CRON_API_KEY = CRON_KEY;
+    vi.useFakeTimers();
+    vi.setSystemTime(NOW);
+    stubEventQueries({ ended: [endedEvent({ id: 'evt-vecchio' })] });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  /** Le iscrizioni con un consenso, non le altre `findMany` su registration. */
+  const conIscritta = () => db.registration.findMany.mockResolvedValue([iscritta]);
+
+  it('copia le prove di un video pubblicato PRIMA di cancellare le sorgenti', async () => {
+    // Le cancellazioni portano via nome e indirizzo: con la copia dopo, la
+    // pulizia archivierebbe zero prove, e nessun errore lo direbbe.
+    db.event.findUnique.mockResolvedValue(PUBBLICATO);
+    conIscritta();
+
+    await runCleanup();
+
+    const copia = db.retainedConsentProof.createMany.mock.invocationCallOrder[0]!;
+    expect(copia).toBeDefined();
+    for (const cancellazione of [
+      db.multitrackConsent.deleteMany,
+      db.recordingConsent.deleteMany,
+      db.registration.deleteMany,
+      db.eventModerator.deleteMany,
+    ]) {
+      expect(copia).toBeLessThan(cancellazione.mock.invocationCallOrder[0]!);
+    }
+  });
+
+  it('il video pubblicato conserva tutto, con il nome cifrato cosi’ com’e’', async () => {
+    db.event.findUnique.mockResolvedValue(PUBBLICATO);
+    conIscritta();
+
+    const body = await (await runCleanup()).json();
+
+    const { data } = db.retainedConsentProof.createMany.mock.calls[0]![0] as {
+      data: Array<Record<string, unknown>>;
+    };
+    expect(data.map((r) => r.kind)).toEqual(['recording', 'transcription']);
+    expect(data[0]).toMatchObject({
+      eventId: 'evt-vecchio',
+      displayName: 'nome-cifrato',
+      emailHash: 'impronta',
+      nameRemovedAt: null,
+      destination: 'PUBLIC',
+      textVersion: 1,
+      withdrawnAt: null,
+    });
+    expect(body.consentProofsRetained).toBe(2);
+  });
+
+  it('la sola trascrizione pubblicata conserva la sola trascrizione', async () => {
+    db.event.findUnique.mockResolvedValue({
+      youtubeUrl: null,
+      recordingUrl: null,
+      recordingPublished: false,
+      transcriptPublished: true,
+    });
+    db.postprodArtifact.count.mockResolvedValue(1);
+    conIscritta();
+
+    await runCleanup();
+
+    const { data } = db.retainedConsentProof.createMany.mock.calls[0]![0] as {
+      data: Array<Record<string, unknown>>;
+    };
+    expect(data.map((r) => r.kind)).toEqual(['transcription']);
+    expect(db.retainedConsentProof.deleteMany).toHaveBeenCalledWith({
+      where: { eventId: 'evt-vecchio', kind: { notIn: ['transcription'] } },
+    });
+  });
+
+  it('il flag della trascrizione senza artefatto non tiene le prove', async () => {
+    db.event.findUnique.mockResolvedValue({
+      youtubeUrl: null,
+      recordingUrl: null,
+      recordingPublished: false,
+      transcriptPublished: true,
+    });
+    conIscritta();
+
+    await runCleanup();
+
+    expect(db.retainedConsentProof.createMany).not.toHaveBeenCalled();
+  });
+
+  it('niente di pubblicato: nessuna copia, e via quelle conservate prima', async () => {
+    db.event.findUnique.mockResolvedValue({
+      youtubeUrl: null,
+      recordingUrl: 'https://storage.example/video.mp4',
+      recordingPublished: false,
+      transcriptPublished: false,
+    });
+    conIscritta();
+    db.retainedConsentProof.deleteMany.mockResolvedValue({ count: 3 });
+
+    const body = await (await runCleanup()).json();
+
+    expect(db.retainedConsentProof.createMany).not.toHaveBeenCalled();
+    expect(db.retainedConsentProof.deleteMany).toHaveBeenCalledWith({
+      where: { eventId: 'evt-vecchio', kind: { notIn: [] } },
+    });
+    expect(body.retainedConsentProofsDeleted).toBe(3);
+    const riga = db.gdprAuditLog.create.mock.calls[0]![0] as { data: { details: string } };
+    expect(JSON.parse(riga.data.details)).toMatchObject({
+      consentProofsRetained: 0,
+      retainedConsentProofs: 3,
+    });
+  });
+
+  it('il secondo giro non copia e non scrive nel registro', async () => {
+    db.event.findUnique.mockResolvedValue(PUBBLICATO);
+    db.callSession.updateMany.mockResolvedValue({ count: 1 });
+
+    const body = await (await runCleanup()).json();
+
+    expect(body.eventsProcessed).toBe(1);
+    expect(db.retainedConsentProof.createMany).not.toHaveBeenCalled();
+    expect(db.gdprAuditLog.create).not.toHaveBeenCalled();
+  });
+
+  it('si mette in fila con una cancellazione dello stesso evento, per prima cosa', async () => {
+    db.event.findUnique.mockResolvedValue(PUBBLICATO);
+    conIscritta();
+
+    await runCleanup();
+
+    const [primo] = db.$executeRaw.mock.calls[0] as [TemplateStringsArray];
+    expect(primo.join('?')).toContain('pg_advisory_xact_lock');
+    expect(db.$executeRaw.mock.invocationCallOrder[0]).toBeLessThan(
+      db.retainedConsentProof.createMany.mock.invocationCallOrder[0]!,
+    );
+  });
+
+  it('la transazione di un evento ha un timeout esplicito', async () => {
+    await runCleanup();
+    const opzioni = db.$transaction.mock.calls.find((c) => typeof c[0] === 'function')?.[1] as {
+      timeout: number;
+    };
+    expect(opzioni.timeout).toBeGreaterThan(5_000);
+  });
+});
 
 describe('GET /api/cron/cleanup — giro quotidiano idempotente', () => {
   it('un giro che non toglie niente non scrive nel registro GDPR', async () => {

@@ -12,13 +12,16 @@ import { salvaRisposta } from '@/lib/utils/download';
 /**
  * Le prove dei consensi dell'evento (lib/gdpr/consent-proofs): quanti
  * consensi alla registrazione e alla trascrizione valgono, quanti sono stati
- * ritirati, e l'elenco completo in CSV, con i nomi, per dimostrarli. Solo per
- * lo staff che gestisce l'evento: la rotta non accetta il link del moderatore.
+ * ritirati, e l'elenco completo in CSV, con i nomi, per dimostrarli, comprese
+ * le prove conservate dopo la pulizia dei dati dell'evento. Solo per lo staff
+ * che gestisce l'evento: la rotta non accetta il link del moderatore.
  */
 
 interface Riepilogo {
   summary: Record<'recording' | 'transcription', { given: number; withdrawn: number }>;
   total: number;
+  /** Quante sono conservate dopo la cancellazione delle loro sorgenti. */
+  retained: number;
 }
 
 const fetcher = async (url: string): Promise<Riepilogo> => {
@@ -80,6 +83,9 @@ export default function EventConsentProofsPanel({
         ))}
       </ul>
       <p className="small text-secondary mb-3">{t('countsNote')}</p>
+      {data.retained > 0 && (
+        <p className="small text-secondary mb-3">{t('retainedNote', { count: data.retained })}</p>
+      )}
       <button
         type="button"
         className="btn btn-outline-primary btn-sm"

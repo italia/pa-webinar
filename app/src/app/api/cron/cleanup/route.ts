@@ -29,7 +29,8 @@ import {
 } from '@/lib/gdpr/log-retention';
 import { completaImprontaConcessioni } from '@/lib/events/grant-email-hash';
 import { deleteUnreferencedPersonPhotos } from '@/lib/events/person-photo-store';
-import { CAPTIONS_TRANSCRIPT_MODEL } from '@/lib/captions/transcript';
+import { bloccaTrascrizioneEvento, CAPTIONS_TRANSCRIPT_MODEL } from '@/lib/captions/transcript';
+import { conservaProve, tipiDelleProve } from '@/lib/gdpr/retained-consent-proofs';
 
 /** Giorni senza iscrizioni dopo cui una foto profilo si cancella. */
 const PROFILE_PHOTO_GRACE_DAYS = 30;
@@ -37,6 +38,11 @@ const PROFILE_PHOTO_GRACE_DAYS = 30;
 /** Giorni dopo cui la foto di una persona dell'evento che nessuno usa (mai
  *  salvata, sostituita, o di un evento cancellato) si cancella. */
 const PERSON_PHOTO_GRACE_DAYS = 7;
+
+/** La transazione di un evento fa decine di istruzioni, e quelle sulle prove
+ *  crescono con le persone: il limite predefinito di Prisma (5 secondi) farebbe
+ *  fallire ogni giorno un evento grande, che non si ripulirebbe mai. */
+const TIMEOUT_PULIZIA_EVENTO_MS = 60_000;
 
 export const dynamic = 'force-dynamic';
 
@@ -48,7 +54,9 @@ export const dynamic = 'force-dynamic';
  * invitations, named grants and their photos, the lead organizer's photo,
  * consents, reactions — and strips every identity from the content that
  * stays with the event (questions, poll votes, words, ratings, end-of-event
- * answers, materials). Ripassa ogni giorno sugli eventi
+ * answers, materials). Le prove dei consensi di un video o di una trascrizione
+ * pubblicati si copiano prima e restano finche' sono pubblicati
+ * (lib/gdpr/retained-consent-proofs). Ripassa ogni giorno sugli eventi
  * oltre la conservazione: tutto e' idempotente, e cosi' toglie anche cio' che
  * si fosse scritto dopo il primo giro o che un giro fallito avesse lasciato.
  * L'evento concluso resta com'e'.
@@ -216,6 +224,8 @@ export const GET = withErrorHandling(async (request) => {
 
   let totalRecordingBlobsDeleted = 0;
   let totalAttachmentBlobsDeleted = 0;
+  let totalConsentProofsRetained = 0;
+  let totalRetainedConsentProofsDeleted = 0;
 
   for (const evt of toClean) {
     try {
@@ -232,6 +242,11 @@ export const GET = withErrorHandling(async (request) => {
       });
 
       const result = await prisma.$transaction(async (tx) => {
+        // In fila con una cancellazione chiesta dalla persona sullo stesso
+        // evento, per prima cosa: la stessa prova non si copia due volte, una
+        // delle due con il nome.
+        await bloccaTrascrizioneEvento(tx, evt.id);
+
         const upvotesDeleted = await tx.questionUpvote.deleteMany({
           where: { question: { eventId: evt.id } },
         });
@@ -311,6 +326,22 @@ export const GET = withErrorHandling(async (request) => {
 
         const remindersDeleted = await tx.eventReminder.deleteMany({
           where: { eventId: evt.id },
+        });
+
+        // Le prove dei consensi di cio' che e' pubblicato restano, in una tabella
+        // a parte: si copiano adesso, perche' prove in sala, iscrizioni e
+        // concessioni qui sotto portano via nome e indirizzo. Quelle conservate
+        // da un giro precedente e non piu' coperte se ne vanno: il video o la
+        // trascrizione non sono piu' pubblicati. Le regole si leggono qui, sullo
+        // stato attuale dell'evento, non su quello di inizio giro.
+        const tipiProve = await tipiDelleProve(tx, evt.id);
+        const consentProofsRetained = await conservaProve(tx, {
+          eventId: evt.id,
+          tipi: tipiProve,
+          adesso: now,
+        });
+        const retainedConsentProofsDeleted = await tx.retainedConsentProof.deleteMany({
+          where: { eventId: evt.id, kind: { notIn: tipiProve } },
         });
 
         // Le prove del consenso alla registrazione per partecipante date in
@@ -489,6 +520,8 @@ export const GET = withErrorHandling(async (request) => {
           registrations: registrationsDeleted.count,
           multitrackConsents: multitrackConsentsDeleted.count,
           recordingConsents: recordingConsentsDeleted.count,
+          consentProofsRetained,
+          retainedConsentProofs: retainedConsentProofsDeleted.count,
           roomOccupants: roomOccupantsDeleted.count,
           captionSegments: captionSegmentsDeleted.count,
           captionsTranscripts: captionsTranscriptsDeleted,
@@ -518,7 +551,7 @@ export const GET = withErrorHandling(async (request) => {
         }
 
         return counts;
-      });
+      }, { timeout: TIMEOUT_PULIZIA_EVENTO_MS });
 
       // Blob deletion (network I/O) AFTER the transaction commits — best-effort.
       // tempRecordingUrl is raw pre-publish Jibri output → always safe to purge.
@@ -550,6 +583,8 @@ export const GET = withErrorHandling(async (request) => {
       totalRegistrationsDeleted += result.registrations;
       totalQuestionsAnonymized += result.questionsAnonymized;
       totalPollVotesAnonymized += result.pollVotesAnonymized;
+      totalConsentProofsRetained += result.consentProofsRetained;
+      totalRetainedConsentProofsDeleted += result.retainedConsentProofs;
       eventsProcessed++;
       if (!isFinishedEventStatus(evt.status)) unfinishedArchived++;
     } catch (err) {
@@ -730,6 +765,8 @@ export const GET = withErrorHandling(async (request) => {
       registrationsDeleted: totalRegistrationsDeleted,
       questionsAnonymized: totalQuestionsAnonymized,
       pollVotesAnonymized: totalPollVotesAnonymized,
+      consentProofsRetained: totalConsentProofsRetained,
+      retainedConsentProofsDeleted: totalRetainedConsentProofsDeleted,
       recordingBlobsDeleted: totalRecordingBlobsDeleted,
       // I file degli allegati della chat: quelli dei materiali restano con
       // l'evento e se ne vanno solo quando lo si cancella.
