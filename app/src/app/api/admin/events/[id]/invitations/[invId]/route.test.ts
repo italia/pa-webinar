@@ -13,6 +13,8 @@ const EVENTO = '11111111-2222-4333-8444-555555555555';
 const INVITO = '22222222-3333-4444-8555-666666666666';
 const db = vi.hoisted(() => ({
   eventInvitation: { findUnique: vi.fn(), findFirst: vi.fn(), update: vi.fn() },
+  person: { findUnique: vi.fn() },
+  registration: { findFirst: vi.fn() },
 }));
 vi.mock('next/headers', () => ({ cookies: async () => ({}) }));
 vi.mock('@/lib/auth/staff-session', () => ({
@@ -41,7 +43,10 @@ beforeEach(() => {
   for (const f of Object.values(db.eventInvitation)) f.mockReset();
   const riga = { id: INVITO, eventId: EVENTO };
   db.eventInvitation.findUnique.mockResolvedValue(riga);
-  db.eventInvitation.findFirst.mockResolvedValue(riga);
+  // Un invito fermato su un altro indirizzo: di norma nessuno.
+  db.eventInvitation.findFirst.mockResolvedValue(null);
+  db.person.findUnique.mockReset().mockResolvedValue(null);
+  db.registration.findFirst.mockReset().mockResolvedValue(null);
   db.eventInvitation.update.mockImplementation(
     async ({ data }: { data: Record<string, unknown> }) => ({
       id: INVITO,
@@ -74,6 +79,75 @@ describe('PATCH un invito', () => {
     expect(corpo).not.toHaveProperty('token');
     expect(corpo).not.toHaveProperty('emailHash');
     expect(corpo.email).toBe('nuova@example.org');
+  });
+
+  it('un indirizzo che ha smesso di ricevere inviti nasce fermo anche su questa riga', async () => {
+    const quando = new Date('2026-11-01T10:00:00Z');
+    db.eventInvitation.findUnique.mockResolvedValue({
+      id: INVITO,
+      eventId: EVENTO,
+      emailHash: 'h:prima@example.org',
+      declinedAt: null,
+    });
+    db.person.findUnique.mockResolvedValue({ optedInToAddressBook: false, optedOutAt: quando });
+    await PATCH(richiesta({ email: 'ritirata@example.org' }) as never, ctx as never);
+    const { data } = db.eventInvitation.update.mock.calls[0]![0] as {
+      data: Record<string, unknown>;
+    };
+    expect(data.declinedAt).toBeInstanceOf(Date);
+    expect(data.token).toBeNull();
+    expect(data.sentAt).toBeNull();
+  });
+
+  it('tornando su un indirizzo fermato lo stop resta', async () => {
+    const quando = new Date('2026-11-01T10:00:00Z');
+    db.eventInvitation.findUnique.mockResolvedValue({
+      id: INVITO,
+      eventId: EVENTO,
+      emailHash: 'h:prima@example.org',
+      declinedAt: quando,
+    });
+    db.registration.findFirst.mockResolvedValue({ id: 'iscrizione-con-ritiro' });
+    await PATCH(richiesta({ email: 'ritirata@example.org' }) as never, ctx as never);
+    const { data } = db.eventInvitation.update.mock.calls[0]![0] as {
+      data: Record<string, unknown>;
+    };
+    expect(data.declinedAt).toBe(quando);
+  });
+
+  it('riscrivendo lo stesso indirizzo uno stop del ritiro resta, con token e invio', async () => {
+    db.eventInvitation.findUnique.mockResolvedValue({
+      id: INVITO,
+      eventId: EVENTO,
+      emailHash: 'h:stessa@example.org',
+      declinedAt: new Date('2026-11-01T10:00:00Z'),
+    });
+    const res = await PATCH(
+      richiesta({ email: 'Stessa@example.org' }) as never,
+      ctx as never
+    );
+    expect(res.status).toBe(200);
+    const { data } = db.eventInvitation.update.mock.calls[0]![0] as {
+      data: Record<string, unknown>;
+    };
+    expect(data).not.toHaveProperty('declinedAt');
+    expect(data).not.toHaveProperty('token');
+    expect(data).not.toHaveProperty('sentAt');
+  });
+
+  it('una riga senza impronta si confronta sull’indirizzo: riscriverlo non toglie lo stop', async () => {
+    db.eventInvitation.findUnique.mockResolvedValue({
+      id: INVITO,
+      eventId: EVENTO,
+      email: 'cif:stessa@example.org',
+      emailHash: null,
+      declinedAt: new Date('2026-11-01T10:00:00Z'),
+    });
+    await PATCH(richiesta({ email: 'stessa@example.org' }) as never, ctx as never);
+    const { data } = db.eventInvitation.update.mock.calls[0]![0] as {
+      data: Record<string, unknown>;
+    };
+    expect(data).not.toHaveProperty('declinedAt');
   });
 
   it("cambiando solo il nome l'invito resta com'era", async () => {

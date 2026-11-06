@@ -21,19 +21,25 @@ vi.mock('@/lib/crypto/pii', () => ({
 vi.mock('@/lib/db', () => ({
   prisma: {
     event: { findUnique: vi.fn() },
-    eventInvitation: { findMany: vi.fn() },
-    registration: { findMany: vi.fn() },
+    eventInvitation: { findMany: vi.fn(), findFirst: vi.fn(), create: vi.fn() },
+    registration: { findMany: vi.fn(), findFirst: vi.fn() },
+    person: { findUnique: vi.fn() },
   },
 }));
 
 import { prisma } from '@/lib/db';
 
-import { GET } from './route';
+import { GET, POST } from './route';
 
 const db = prisma as unknown as {
   event: { findUnique: ReturnType<typeof vi.fn> };
-  eventInvitation: { findMany: ReturnType<typeof vi.fn> };
-  registration: { findMany: ReturnType<typeof vi.fn> };
+  eventInvitation: {
+    findMany: ReturnType<typeof vi.fn>;
+    findFirst: ReturnType<typeof vi.fn>;
+    create: ReturnType<typeof vi.fn>;
+  };
+  registration: { findMany: ReturnType<typeof vi.fn>; findFirst: ReturnType<typeof vi.fn> };
+  person: { findUnique: ReturnType<typeof vi.fn> };
 };
 
 const EVENT_ID = '0e5c3a9e-4b1d-4c7e-9f2a-6d8b1c3e5f70';
@@ -110,5 +116,44 @@ describe('GET /api/admin/events/[id]/invitations', () => {
     const res = await GET(new Request('https://portale.example.test/') as never, ctx as never);
     expect((await res.json()).rows).toEqual([]);
     expect(db.registration.findMany).not.toHaveBeenCalled();
+  });
+});
+
+describe('POST un invito', () => {
+  const aggiungi = () =>
+    POST(
+      new Request('https://portale.example.test/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: 'ritirata@example.org' }),
+      }) as never,
+      ctx as never
+    );
+
+  beforeEach(() => {
+    db.eventInvitation.findFirst.mockResolvedValue(null);
+    db.person.findUnique.mockResolvedValue(null);
+    db.registration.findFirst.mockResolvedValue(null);
+    db.eventInvitation.create.mockImplementation(
+      async ({ data }: { data: Record<string, unknown> }) => ({
+        id: 'nuovo',
+        person: null,
+        ...data,
+      })
+    );
+  });
+
+  it('su un indirizzo libero nasce pronto da spedire', async () => {
+    expect((await aggiungi()).status).toBe(201);
+    expect(db.eventInvitation.create.mock.calls[0]![0].data.declinedAt).toBeNull();
+  });
+
+  it('su un indirizzo che ha smesso di ricevere inviti nasce fermo', async () => {
+    db.person.findUnique.mockResolvedValue({
+      optedInToAddressBook: false,
+      optedOutAt: new Date(),
+    });
+    expect((await aggiungi()).status).toBe(201);
+    expect(db.eventInvitation.create.mock.calls[0]![0].data.declinedAt).toBeInstanceOf(Date);
   });
 });
