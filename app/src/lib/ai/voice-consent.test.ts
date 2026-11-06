@@ -3,9 +3,12 @@
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { VERSIONE_TESTO_TRASCRIZIONE } from '@/lib/registration/consents';
+
 import {
   chiedeConsensoPerVoce,
   confermaVociNecessaria,
+  erroreConfermaVoci,
   leggiCorpoAvvio,
   regimeConsensoVoce,
 } from './voice-consent';
@@ -173,11 +176,18 @@ describe('regimeConsensoVoce', () => {
     });
   });
 
-  it('una registrazione con il segno conta come consenso chiesto', async () => {
+  it('una registrazione con il segno conta come consenso chiesto, al testo con il nome', async () => {
     expect(await regimeConsensoVoce(db({}), 'e', base, {}, true)).toEqual({
       chiesto: true,
-      versione: 1,
+      versione: VERSIONE_TESTO_TRASCRIZIONE,
     });
+    expect(VERSIONE_TESTO_TRASCRIZIONE).toBe(2);
+  });
+
+  it('il segno alza il testo anche sopra le tracce per persona', async () => {
+    const e = { ...base, multitrackRecordingEnabled: true };
+    expect((await regimeConsensoVoce(db({}), 'e', e, {}, false)).versione).toBe(1);
+    expect((await regimeConsensoVoce(db({}), 'e', e, {}, true)).versione).toBe(2);
   });
 
   it('il segno non cambia il testo che vale con i sottotitoli', async () => {
@@ -189,15 +199,40 @@ describe('regimeConsensoVoce', () => {
 });
 
 describe('confermaVociNecessaria', () => {
-  const db = {
-    captionSegment: { findFirst: vi.fn(async () => null) },
-    multitrackConsent: { findFirst: vi.fn(async () => null) },
-    recordingTrack: { findFirst: vi.fn(async () => null), count: vi.fn(async () => 0) },
-  } as never;
-  const rec = { id: 'r', blobKey: 'recordings/e/a.mp4', eventId: 'e' };
+  const dbConTracce = (tracce: number) =>
+    ({
+      captionSegment: { findFirst: vi.fn(async () => null) },
+      multitrackConsent: { findFirst: vi.fn(async () => null) },
+      recordingTrack: {
+        findFirst: vi.fn(async () => null),
+        count: vi.fn(async () => tracce),
+      },
+    }) as never;
+  const db = dbConTracce(0);
+  const rec = {
+    id: 'r',
+    blobKey: 'recordings/e/a.mp4',
+    eventId: 'e',
+    transcriptConsentRule: false,
+  };
+  const nuovo = { ...rec, transcriptConsentRule: true };
 
-  it('il video di un evento con la sola AI non chiede la conferma', async () => {
+  it('il video senza segno di un evento con la sola AI non chiede la conferma', async () => {
     await expect(confermaVociNecessaria(db, rec, video, pipeline)).resolves.toBe(false);
+  });
+
+  it('il video con il segno la chiede, anche se in sala non e’ rimasta traccia del consenso', async () => {
+    await expect(confermaVociNecessaria(db, nuovo, video, pipeline)).resolves.toBe(true);
+    // Accendere l'AI dopo la fine non toglie la domanda.
+    await expect(confermaVociNecessaria(db, nuovo, base, {})).resolves.toBe(true);
+  });
+
+  it('il segno e’ quello della riga in esame: due registrazioni dello stesso evento', async () => {
+    const [vecchia, recente] = await Promise.all([
+      confermaVociNecessaria(db, rec, video, pipeline),
+      confermaVociNecessaria(db, nuovo, video, pipeline),
+    ]);
+    expect([vecchia, recente]).toEqual([false, true]);
   });
 
   it('il video di un evento che chiede il consenso voce per voce la chiede', async () => {
@@ -210,6 +245,29 @@ describe('confermaVociNecessaria', () => {
     const e = { ...base, multitrackRecordingEnabled: true };
     await expect(confermaVociNecessaria(db, rec, e, {}, true)).resolves.toBe(false);
     await expect(confermaVociNecessaria(db, { ...rec, blobKey: '' }, e, {})).resolves.toBe(false);
+  });
+
+  it('il segno non cambia niente senza video completo', async () => {
+    await expect(confermaVociNecessaria(db, nuovo, video, pipeline, true)).resolves.toBe(false);
+    await expect(
+      confermaVociNecessaria(db, { ...nuovo, blobKey: '' }, video, pipeline)
+    ).resolves.toBe(false);
+    await expect(
+      confermaVociNecessaria(dbConTracce(2), nuovo, video, pipeline)
+    ).resolves.toBe(false);
+  });
+});
+
+describe('erroreConfermaVoci', () => {
+  it('e’ il 409 che l’interfaccia trasforma in domanda', () => {
+    expect(erroreConfermaVoci()).toMatchObject({
+      statusCode: 409,
+      code: 'VOICE_CONSENT_REQUIRED',
+    });
+  });
+
+  it('non dice che l’evento ha chiesto il consenso: su un video nuovo puo’ non averlo fatto', () => {
+    expect(erroreConfermaVoci().message).not.toContain('This event asks');
   });
 });
 

@@ -59,7 +59,8 @@ import { ingressoResoconto } from '@/lib/report/input';
 import { scriviNumeriResoconto } from '@/lib/report/job';
 import { metricheResoconto } from '@/lib/report/metrics';
 import { MOTIVO_MOTORE_ASSENTE } from '@/lib/text-translation/enqueue';
-import { endpointRitirati } from '@/lib/captions/room';
+import { endpointConConsenso, endpointRitirati } from '@/lib/captions/room';
+import { VERSIONE_TESTO_TRASCRIZIONE } from '@/lib/registration/consents';
 
 export const dynamic = 'force-dynamic';
 
@@ -324,10 +325,10 @@ export const POST = withErrorHandling(async (request) => {
   }> = [];
   // Mappa diarLabel→nome reale (Speaker DB): la passiamo al worker per
   // SUMMARIZE/TRANSLATE così la SINTESI e i sottotitoli tradotti usano il
-  // nome reale del relatore invece di "SPEAKER_00". Su multitrack i nomi (JWT) ci
-  // sono sempre; su blind diarization compaiono dopo il mapping admin (→
-  // ri-esegui SUMMARIZE). Speaker.displayName è in chiaro (vedi transcript
-  // route che lo usa diretto).
+  // nome reale del relatore invece di "SPEAKER_00". Su multitrack i nomi (JWT)
+  // ci sono se le tracce li portano (tracceAlWorker); su blind diarization
+  // compaiono dopo il mapping admin (→ ri-esegui SUMMARIZE).
+  // Speaker.displayName è in chiaro (vedi transcript route che lo usa diretto).
   const speakerNames: Record<string, string> = {};
   const sourceDownloadUrl = await presignArtifactDownload({
     blobKey: recording.blobKey,
@@ -684,9 +685,15 @@ async function rispostaTraduzioneTesti(
  * portale, decifrata qui), l'offset per il merge e un indirizzo firmato. Chi
  * ha ritirato dalla sala il consenso alla trascrizione dopo che la sua traccia
  * era gia' registrata non passa piu' (lib/captions/room endpointRitirati).
+ *
+ * Su una registrazione con il segno `transcriptConsentRule` il nome passa solo
+ * con un consenso al testo che lo comprende: la traccia vale con ogni versione,
+ * il nome no. Senza nome al worker, nome e voce non si legano mai: l'etichetta
+ * della voce resta anonima nella trascrizione, nella sintesi e nell'archivio.
+ * Il nome dato dallo staff alla voce resta com'e'.
  */
 async function tracceAlWorker(
-  recording: { id: string; eventId: string },
+  recording: { id: string; eventId: string; transcriptConsentRule: boolean },
   lease: number,
 ): Promise<Array<{
   role: 'track';
@@ -701,8 +708,12 @@ async function tracceAlWorker(
     select: { participantId: true, displayName: true, blobKey: true, startOffsetMs: true },
     orderBy: { startOffsetMs: 'asc' },
   });
-  const ritirati = await endpointRitirati(recording.eventId, [
-    ...new Set(tracks.map((tr) => tr.participantId)),
+  const endpoint = [...new Set(tracks.map((tr) => tr.participantId))];
+  const [ritirati, nominabili] = await Promise.all([
+    endpointRitirati(recording.eventId, endpoint),
+    recording.transcriptConsentRule
+      ? endpointConConsenso(recording.eventId, endpoint, VERSIONE_TESTO_TRASCRIZIONE)
+      : null,
   ]);
   const tracce = [];
   for (const tr of tracks) {
@@ -712,7 +723,10 @@ async function tracceAlWorker(
       downloadUrl: await presignArtifactDownload({ blobKey: tr.blobKey, expiresInMinutes: lease }),
       blobKey: tr.blobKey,
       participantId: tr.participantId,
-      displayName: tr.displayName ? tryDecryptPII(tr.displayName) : null,
+      displayName:
+        tr.displayName && (nominabili?.has(tr.participantId) ?? true)
+          ? tryDecryptPII(tr.displayName)
+          : null,
       startOffsetMs: tr.startOffsetMs,
     });
   }

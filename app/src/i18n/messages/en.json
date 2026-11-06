@@ -702,7 +702,7 @@
         "title": "Transcription of what you say",
         "give": "I consent to the transcription",
         "giveEffect": "What you say goes into the event transcript under your name. Without it you still take part.",
-        "withdrawEffect": "If you withdraw it, your sentences already transcribed lose their text and your name, and from now on your voice is neither recorded on a separate track nor transcribed.",
+        "withdrawEffect": "If you withdraw it, your sentences already transcribed from the captions lose their text and your name, and from now on your voice is neither recorded on a separate track nor transcribed. For a video transcript that already exists, contact the organizers.",
         "needsRecording": "You can give it after consenting to the recording."
       }
     },
@@ -1940,7 +1940,7 @@
       "aiSectionHeading": "Automatic post-production",
       "aiSectionDesc": "After the event ends, the recording can be processed by an in-cluster AI pipeline to produce transcript, summary and — if requested — translations and dubbing. Everything runs on this installation's infrastructure, no data leaves to third parties.",
       "aiTranscriptEnabled": "Automatic transcription",
-      "aiTranscriptEnabledDesc": "Speech recognition with speaker identification. Required to enable summary, translations and dubbing.",
+      "aiTranscriptEnabledDesc": "Speech recognition with speaker identification. Required to enable summary, translations and dubbing. Each participant chooses whether what they say is transcribed.",
       "aiSummaryEnabled": "Summary and chapters",
       "aiSummaryEnabledDesc": "Meeting summary, decisions taken, action items and split into chapters with timestamps.",
       "aiTranslationEnabled": "Translation into other languages",
@@ -3988,7 +3988,7 @@
     },
     "voiceConsent": {
       "title": "Transcribe the full recording?",
-      "message": "This event asked each person for consent to the transcription of what they say. The full recording contains every voice, including people who did not consent: transcribe it only if everyone who speaks in it has consented. Your confirmation is kept in the activity log.",
+      "message": "The full recording contains every voice, including people who did not consent to the transcription of what they say: transcribe it only if everyone who speaks in it has consented. Your confirmation is kept in the activity log.",
       "confirm": "Yes, everyone consented",
       "cancel": "Cancel",
       "waitingNoCaptions": "The transcription of the full recording did not start on its own: each person chooses whether what they say is transcribed. Start it with {button} only if everyone who speaks in the recording has consented; otherwise the event stays without a transcript.",
@@ -5425,7 +5425,7 @@
     "classicView": "Classic view",
     "backToGarden": "Show the square",
     "aiNoticeTitle": "AI processing after the event",
-    "aiNotice": "After it ends, the recording will be processed by AI tools to generate a transcript, summary and any translations and dubbing. The artifacts may contain inaccuracies; the video remains the authoritative source.",
+    "aiNotice": "After it ends, the recording may be processed by AI tools to generate a transcript, summary and any translations and dubbing. The transcript covers only people who consented. The artifacts may contain inaccuracies; the video remains the authoritative source.",
     "multitrackConsentTitle": "Transcript of what you say",
     "recordingConsentTitle": "Event recording",
     "recordingConsentIntro": "The event is recorded (audio and video). With your consent, the recording contains your name, your voice, your image and what you share on screen.",

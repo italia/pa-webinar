@@ -113,6 +113,49 @@ describe("Chiudi l'evento", () => {
     expect(link?.getAttribute('href')).toBe('/admin/postprod/rec-1');
   });
 
+  it('il video da confermare si apre dalla pagina della registrazione', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          daFare: 1,
+          voci: [
+            {
+              voce: 'trascrizione',
+              stato: 'da-fare',
+              caso: 'daConfermare',
+              recordingId: 'rec-9',
+            },
+          ],
+        } satisfies StatoChiusura)
+      )
+    );
+    await disegna();
+    expect(container.textContent).toContain(t.trascrizione.daConfermare);
+    const link = container.querySelector('.chiusura__azione a');
+    expect(link?.getAttribute('href')).toBe('/admin/postprod/rec-9');
+    expect(link?.textContent).toBe(t.azioni.apri);
+    expect(link?.getAttribute('aria-label')).toBe(
+      `${t.azioni.apri}: ${t.trascrizione.title}`
+    );
+    expect(container.textContent).not.toContain(t.azioni.rivedi);
+  });
+
+  it('il video riservato lo dice nella voce della pagina', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          daFare: 0,
+          voci: [{ voce: 'pagina', stato: 'fatto', caso: 'libreriaRiservata' }],
+        } satisfies StatoChiusura)
+      )
+    );
+    await disegna();
+    expect(container.textContent).toContain(t.pagina.libreriaRiservata);
+    expect(container.querySelector('.chiusura__azione button')?.textContent).toBe(
+      t.azioni.apri
+    );
+  });
+
   it('chi arriva dal link del moderatore manda il token e non riceve link allo staff', async () => {
     await disegna({ token: 'TOK' });
     const [, init] = fetchMock.mock.calls[0]!;

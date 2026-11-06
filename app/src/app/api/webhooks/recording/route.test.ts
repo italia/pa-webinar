@@ -219,6 +219,14 @@ describe('il seguito della registrazione', () => {
     );
   });
 
+  it('il segno del video nuovo lo mette il default di colonna: il webhook non lo scrive', async () => {
+    await manda(CORPO);
+    const dati = tx.recording.create.mock.calls[0]![0] as {
+      data: Record<string, unknown>;
+    };
+    expect(dati.data).not.toHaveProperty('transcriptConsentRule');
+  });
+
   it('con una registrazione per tracce si arricchisce quella, senza crearne un’altra', async () => {
     tx.recording.findFirst.mockResolvedValue({
       id: 'rec-segnaposto',

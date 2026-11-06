@@ -57,9 +57,11 @@ interface TranscriptJson {
 
 /**
  * I partecipanti del registro di chi parlava il cui nome si puo' mostrare:
- * in un evento in cui il consenso voce per voce e' stato chiesto, solo chi
- * l'ha dato (dall'endpoint al posto, dal posto al consenso, con la versione
- * del testo che vale per l'evento). Negli altri eventi tutti (`null`).
+ * in una registrazione per cui il consenso voce per voce e' stato chiesto,
+ * solo chi l'ha dato (dall'endpoint al posto, dal posto al consenso, con la
+ * versione del testo che vale per questa registrazione). Altrimenti tutti
+ * (`null`). Il segno e' quello della registrazione mostrata, non dell'evento:
+ * un evento ricorrente puo' avere righe nate prima e dopo la regola sul video.
  *
  * La rotta e' pubblica e non si mette in cache, e dopo l'evento la risposta
  * cambia di rado (una cancellazione su richiesta): si tiene per qualche
@@ -70,11 +72,11 @@ const nomiInCache = new Map<string, { scade: number; ammessi: Set<string> | null
 
 async function partecipantiConNome(
   eventId: string,
-  recordingId: string,
+  registrazione: { id: string; transcriptConsentRule: boolean },
   log: Array<{ participantId: string }>,
 ): Promise<((participantId: string) => boolean) | undefined> {
   const adesso = Date.now();
-  let voce = nomiInCache.get(recordingId);
+  let voce = nomiInCache.get(registrazione.id);
   if (!voce || voce.scade < adesso) {
     const [evento, sito] = await Promise.all([
       prisma.event.findUnique({
@@ -83,15 +85,15 @@ async function partecipantiConNome(
       }),
       prisma.siteSetting.findUnique({ where: { id: 'singleton' }, select: { liveCaptionsEnabled: true } }),
     ]);
-    // `false` al posto di Recording.transcriptConsentRule: i nomi seguono la regola
-    // delle registrazioni nate prima di quella sul video.
-    const regime = evento ? await regimeConsensoVoce(prisma, eventId, evento, sito ?? {}, false) : null;
+    const regime = evento
+      ? await regimeConsensoVoce(prisma, eventId, evento, sito ?? {}, registrazione.transcriptConsentRule)
+      : null;
     const ammessi = regime?.chiesto
       ? await endpointConConsenso(eventId, [...new Set(log.map((e) => e.participantId))], regime.versione)
       : null;
     voce = { scade: adesso + NOMI_TTL_MS, ammessi };
     if (nomiInCache.size > 500) nomiInCache.clear();
-    nomiInCache.set(recordingId, voce);
+    nomiInCache.set(registrazione.id, voce);
   }
   // Senza consenso chiesto, nessun filtro: resta la regola di sempre.
   const { ammessi } = voce;
@@ -112,6 +114,7 @@ export const GET = withErrorHandling(async (request, context) => {
       id: true,
       sourceLanguage: true,
       pipelineSnapshot: true,
+      transcriptConsentRule: true,
       artifacts: {
         where: {
           type: {
@@ -175,8 +178,8 @@ export const GET = withErrorHandling(async (request, context) => {
   // usando la timeline del dominant speaker catturata in diretta. Se un
   // cluster pyannote si sovrappone prevalentemente a un partecipante
   // noto, usiamo quel nome invece di "Partecipante N". Best-effort:
-  // senza log o senza match si ricade sul fallback numerico. In un evento
-  // che chiede il consenso voce per voce, il nome solo di chi l'ha dato.
+  // senza log o senza match si ricade sul fallback numerico. Dove il consenso
+  // voce per voce e' stato chiesto, il nome solo di chi l'ha dato.
   const dominantLog = Array.isArray(recording.callSession?.dominantSpeakerLog)
     ? (recording.callSession.dominantSpeakerLog as Array<{
         atMs: number;
@@ -194,7 +197,7 @@ export const GET = withErrorHandling(async (request, context) => {
             .filter((s) => s.speaker)
             .map((s) => ({ start: s.start, end: s.end, speaker: s.speaker as string })),
           dominantLog,
-          await partecipantiConNome(eventId, recording.id, dominantLog),
+          await partecipantiConNome(eventId, recording, dominantLog),
         )
       : new Map<string, string>();
 

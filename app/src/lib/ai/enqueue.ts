@@ -39,8 +39,8 @@ export interface EnqueueOptions {
   multitrack?: boolean;
   /**
    * Chi avvia la pipeline a mano conferma che tutte le voci del video
-   * completo hanno acconsentito alla trascrizione. Senza, un evento che
-   * chiede il consenso voce per voce non trascrive il video completo
+   * completo hanno acconsentito alla trascrizione. Senza, il video di una
+   * registrazione soggetta al consenso voce per voce non si trascrive
    * (vedi `voice-consent.ts`).
    */
   allVoicesConsented?: boolean;
@@ -57,8 +57,8 @@ export interface EnqueueResult {
   skippedExisting: number;
   jobIds: string[];
   /**
-   * Niente accodato: il video completo di un evento che chiede il consenso
-   * voce per voce si trascrive solo con la conferma esplicita.
+   * Niente accodato: il video completo di una registrazione soggetta al
+   * consenso voce per voce si trascrive solo con la conferma esplicita.
    */
   voiceConsentRequired?: boolean;
 }
@@ -150,9 +150,10 @@ export async function enqueuePostprodForRecording(
   }
 
   // Le tracce per persona contengono solo chi ha acconsentito; il video
-  // completo contiene tutti. In un evento che chiede il consenso voce per
-  // voce, il video completo si trascrive solo con la conferma esplicita:
-  // la trascrizione dell'evento resta quella dai sottotitoli.
+  // completo contiene tutti. Una registrazione soggetta al consenso voce per
+  // voce (lo dice il suo segno, oppure come e' andato l'evento) si trascrive
+  // dal video solo con la conferma esplicita: fino ad allora la trascrizione
+  // dell'evento e' quella dai sottotitoli, se c'e'.
   if (
     !opts.allVoicesConsented &&
     (await confermaVociNecessaria(tx, { ...recording, eventId: recording.event.id }, recording.event, site, isMultitrack))
