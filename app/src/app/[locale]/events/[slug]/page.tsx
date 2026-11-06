@@ -18,6 +18,7 @@ import { guestAccessAllowed } from '@/lib/events/guest-window';
 import { registrationAccessFor } from '@/lib/events/registration-access';
 import { materialPhase, materialVisibilityWhere } from '@/lib/events/material-visibility';
 import { domandePubbliche } from '@/lib/events/post-event-sections';
+import { schedaPrivacyEvento } from '@/lib/events/privacy-sheet';
 import { ensureEventRecap, riepilogoPubblico, type EventRecap } from '@/lib/events/recap';
 import type { RecordingSlidesView } from '@/lib/presentation/recording-slides';
 import { publicRecordingSlides } from '@/lib/presentation/recording-slides-data';
@@ -558,7 +559,9 @@ export default async function EventDetailPage({
     youtubeUrl: riservataConDestinazione && !visione.video ? null : event.youtubeUrl,
     qaEnabled: event.qaEnabled,
     chatEnabled: event.chatEnabled,
-    recordingEnabled: event.recordingEnabled,
+    // La pagina annuncia la registrazione come la scheda: dove la scheda dice che
+    // non si registra niente, qui non si dice il contrario.
+    siRegistra: (schedaPrivacyEvento(event, settings)?.registrazione.modo ?? 'nessuna') !== 'nessuna',
     participantsCanUnmute: event.participantsCanUnmute,
     participantsCanStartVideo: event.participantsCanStartVideo,
     participantsCanShareScreen: event.participantsCanShareScreen,

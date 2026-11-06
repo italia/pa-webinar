@@ -77,7 +77,8 @@ interface EventData {
   youtubeUrl?: string | null;
   qaEnabled: boolean;
   chatEnabled: boolean;
-  recordingEnabled?: boolean;
+  /** La scheda privacy dice che si registra qualcosa. */
+  siRegistra?: boolean;
   participantsCanUnmute?: boolean;
   participantsCanStartVideo?: boolean;
   participantsCanShareScreen?: boolean;
@@ -979,7 +980,7 @@ export default function EventDetailClient({
                     )
                   )}
 
-                  {event.recordingEnabled && (
+                  {event.siRegistra && (
                     <p className="text-muted mt-3 mb-0 d-flex align-items-start gap-1" style={{ fontSize: '0.82rem', lineHeight: 1.45 }}>
                       <Icon icon="it-video" size="xs" className="flex-shrink-0" style={{ marginTop: 1 }} />
                       <span>{t('detail.willBeRecorded')}</span>
