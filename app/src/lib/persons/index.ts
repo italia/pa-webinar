@@ -9,7 +9,7 @@ import { riapriInviti } from '@/lib/persons/inviti-fermati';
 export interface PersonUpsertInput {
   emailHash: string;
   // Gia' cifrata: si copia com'e', senza una seconda cifratura.
-  email?: string;
+  email: string;
   displayName?: string | null;
   organization?: string | null;
   organizationRole?: string | null;

@@ -105,11 +105,4 @@ describe('upsertPersonOnRegistration', () => {
       data: { declinedAt: null },
     });
   });
-
-  it("senza email nell'ingresso quella della voce resta com'e'", async () => {
-    tx.person.findUnique.mockResolvedValue({ id: 'voce' });
-    const { email: _email, ...senzaEmail } = iscrizione;
-    await upsertPersonOnRegistration(db, { ...senzaEmail, optedIn: true });
-    expect(tx.person.update.mock.calls[0]![0].data.email).toBeUndefined();
-  });
 });
