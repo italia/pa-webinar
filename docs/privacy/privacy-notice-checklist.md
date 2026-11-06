@@ -188,7 +188,10 @@ shows a notice instead of a box does not show it. On an installation with no
 room video it is not shown anywhere, and the waiting room's built-in text is
 `waiting.recordingConsentIntroNoVideo`. When it is empty, the waiting room shows
 the built-in text; change it for the whole installation with that custom
-translation key. Nothing compares the field with the event: a text
+translation key. The audience of an anonymous event reads
+`waiting.recordingConsentIntroAnonymous`, which says pseudonym instead of name
+and shows the custom translation of the built-in text until it has its own: a
+custom text that says name is wrong for that audience. Nothing compares the field with the event: a text
 that calls the video public on a reserved event contradicts the box and the
 sheet, so review it when the destination changes. A
 custom translation saved under `live.recordingConsent` or

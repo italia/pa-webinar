@@ -651,6 +651,7 @@ An event's own `recordingConsentText` replaces the explanation in the waiting ro
 | `waiting.recordingNotice` | Waiting-room summary, on an event that can record | This event may be recorded. |
 | `waiting.recordingConsentTitle` | Waiting-room consents, title | Event recording |
 | `waiting.recordingConsentIntro` | Waiting-room consents, explanation, unless the event sets its own `recordingConsentText` | The event may be recorded (audio and video). With your consent, the recording contains your name, your voice, your image and what you share on screen. |
+| `waiting.recordingConsentIntroAnonymous` | The same, for the audience of an anonymous event, whose recording holds the pseudonym. Until it has its own custom translation it shows the one of `waiting.recordingConsentIntro` | The event may be recorded (audio and video). With your consent, the recording contains your pseudonym, your voice, your image and what you share on screen. |
 | `waiting.recordingConsentIntroNoVideo` | The same, where the installation records no room video | The room video is not recorded at this event. |
 | `waiting.multitrackConsentTitle` | Waiting-room consents, title of the transcription box | Transcript of what you say |
 | `gdpr.sheet.recording.destinationReserved` | Privacy sheet, reserved recording | The recording stays reserved for the organizers and registrants and is not published. Registrants can watch it for as long as their registration data is kept. |
