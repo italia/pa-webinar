@@ -22,6 +22,9 @@ import {
   VERSIONE_TESTO_REGISTRAZIONE,
   type Destinazione,
   type EsposizioneVideo,
+  destinazioneDiPartenza,
+  DESTINAZIONE_DI_PARTENZA,
+  videoDaDestinare,
 } from './destination';
 
 const DESTINAZIONI: Destinazione[] = ['PUBLIC', 'REGISTRANTS', null];
@@ -483,5 +486,59 @@ describe('puoCambiareDestinazione', () => {
     }
     expect(puoCambiareDestinazione(undefined, 'PUBLIC', false)).toBe(true);
     expect(puoCambiareDestinazione(undefined, 'PUBLIC', true)).toBe(false);
+  });
+});
+
+describe('destinazioneDiPartenza', () => {
+  const spento = { recordingEnabled: false };
+
+  it('una dichiarata resta, in ogni caso', () => {
+    for (const recordingEnabled of [false, true]) {
+      for (const registra of [false, true]) {
+        expect(
+          destinazioneDiPartenza({ recordingEnabled, recordingDestination: 'PUBLIC' }, registra)
+        ).toBe('PUBLIC');
+      }
+    }
+  });
+
+  it('chi comincia a registrare parte riservato', () => {
+    expect(destinazioneDiPartenza(spento, true)).toBe(DESTINAZIONE_DI_PARTENZA);
+    expect(DESTINAZIONE_DI_PARTENZA).toBe('REGISTRANTS');
+  });
+
+  it('senza registrazione non si dichiara niente', () => {
+    expect(destinazioneDiPartenza(spento, false)).toBeNull();
+  });
+
+  it('un evento che registrava gia senza destinazione resta com era', () => {
+    expect(destinazioneDiPartenza({ recordingEnabled: true }, true)).toBeNull();
+    expect(
+      destinazioneDiPartenza({ recordingEnabled: true, recordingDestination: null }, true)
+    ).toBeNull();
+  });
+
+  it('una chiamata rapida resta senza', () => {
+    expect(destinazioneDiPartenza({ ...spento, eventType: 'INSTANT' }, true)).toBeNull();
+    expect(destinazioneDiPartenza({ ...spento, eventType: 'SCHEDULED' }, true)).toBe('REGISTRANTS');
+  });
+
+});
+
+describe('dove il video della sala non c e', () => {
+  it('la destinazione non si chiede', () => {
+    expect(videoDaDestinare('assente')).toBe(false);
+    expect(videoDaDestinare('fissa')).toBe(true);
+    expect(videoDaDestinare('rimovibile')).toBe(true);
+    expect(videoDaDestinare(undefined)).toBe(true);
+  });
+
+  it('se l installazione aggiunge il video, chi ha letto quel testo va richiesto', () => {
+    const evento = destinazioneDiPartenza({ recordingEnabled: false }, true);
+    expect(evento).toBe('REGISTRANTS');
+    const letto = { recordingConsent: true, recordingConsentDestination: null };
+    expect(consensoOra(letto, destinazioneDelTesto(evento, 'assente'))).toBe(true);
+    expect(consensoOra(letto, destinazioneDelTesto(evento, 'fissa'))).toBe(false);
+    expect(consensoCopre(null, destinazioneDelTesto(evento, 'fissa'))).toBe(false);
   });
 });

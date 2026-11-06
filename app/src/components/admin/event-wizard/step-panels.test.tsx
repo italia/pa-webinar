@@ -188,7 +188,7 @@ describe('Dati e pagina dopo l evento — le domande', () => {
     form: WizardForm,
     onChange = vi.fn(),
     domandeDopoEvento?: boolean,
-    destinazioneSalvata?: 'PUBLIC' | 'REGISTRANTS' | null,
+    destinazioneSenzaScelta?: 'PUBLIC' | 'REGISTRANTS' | null,
   ) =>
     mount(
       <SezioneDati
@@ -196,7 +196,7 @@ describe('Dati e pagina dopo l evento — le domande', () => {
         onChange={onChange}
         gdprTemplates={[]}
         domandeDopoEvento={domandeDopoEvento}
-        destinazioneSalvata={destinazioneSalvata}
+        destinazioneSenzaScelta={destinazioneSenzaScelta}
       />,
     );
 
@@ -284,15 +284,24 @@ describe('Riepilogo — cio che il formato ha scelto', () => {
     expect(testo).not.toContain(tp.recordingDestinationNotSet);
   });
 
-  it('dove un video non c e non ne parla', () => {
+  it('dove il video della sala non c e dice quella che l evento avra, senza farla cambiare', () => {
     const testo = mostra(
-      { recordingEnabled: true, recordingDestination: 'REGISTRANTS' },
-      { voceNelVideo: 'assente' },
+      { recordingEnabled: true, recordingDestination: null },
+      {
+        voceNelVideo: 'assente',
+        destinazioneSenzaScelta: 'REGISTRANTS',
+        onCambiaDestinazione: vi.fn(),
+      },
     );
+    expect(testo).toContain(f.recordingDestinationReserved);
+    expect(testo).not.toContain(f.change);
+    expect(testo).not.toContain(tp.recordingDestinationNotSet);
+  });
+
+  it('dove il video della sala non c e, su un evento vecchio senza, non ne parla', () => {
+    const testo = mostra({ recordingEnabled: true }, { voceNelVideo: 'assente' });
+    expect(testo).not.toContain(tp.recordingDestinationStaffOnly);
     expect(testo).not.toContain(f.recordingDestinationReserved);
-    expect(mostra({ recordingEnabled: true }, { voceNelVideo: 'assente' })).not.toContain(
-      tp.recordingDestinationStaffOnly,
-    );
   });
 
   it('senza registrazione, o dove manca e va scelta, non ne parla', () => {
@@ -357,7 +366,7 @@ describe('Riepilogo — cio che il formato ha scelto', () => {
           recordingEnabled: false,
           recordingDestination: 'REGISTRANTS',
         },
-        { destinazioneSalvata: 'REGISTRANTS' },
+        { destinazioneSenzaScelta: 'REGISTRANTS' },
       ),
     ).toContain(f.postEventQaHidden);
     const senzaDomande = mostra({ postEventShowQA: true });

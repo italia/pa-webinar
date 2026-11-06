@@ -2657,6 +2657,17 @@ describe('i valori del formato', () => {
     ...resto,
     event: { ...structuredClone(ATTIVA).event, recordingEnabled: true, ...evento },
   });
+  /** Un evento con le domande accese: il riepilogo dice dove finiscono. */
+  const conDomande = {
+    postEventShowQA: true,
+    permissionMatrix: matrixFromToggles({
+      qaEnabled: true,
+      chatEnabled: true,
+      participantsCanUnmute: false,
+      participantsCanStartVideo: false,
+      participantsCanShareScreen: false,
+    }),
+  };
   const interruttore = (nome: string) =>
     container.querySelector<HTMLInputElement>(`input[aria-label="${nome}"]`);
   const destinazione = (valore: 'PUBLIC' | 'REGISTRANTS') =>
@@ -2872,24 +2883,82 @@ describe('i valori del formato', () => {
     expect(corpo('PUT').recordingDestination).toBe('REGISTRANTS');
   });
 
-  it('con un link di conduzione accenderla non blocca, e dice che la sceglie lo staff', async () => {
+  it('con un link di conduzione accenderla non blocca, e dice che parte riservata', async () => {
     renderWizard({
       mode: 'edit',
-      initialEvent: salvato({ recordingDestination: null, recordingEnabled: false }),
+      initialEvent: salvato({ ...conDomande, recordingDestination: null, recordingEnabled: false }),
       initialStep: 'advanced',
       initialSection: 'recording',
       viaToken: 'token-primario',
     });
     click(interruttore(messages.admin.form.recordingEnabled)!);
     expect(destinazione('REGISTRANTS')).toBeNull();
-    expect(container.textContent).toContain(s2.recordingDestinationStaffOnly);
+    expect(container.textContent).toContain(s2.recordingDestinationStartsReserved);
+    expect(container.textContent).not.toContain(s2.recordingDestinationStaffOnly);
     goToStep('review');
-    expect(container.textContent).toContain(s2.recordingDestinationStaffOnly);
-    expect(container.textContent).not.toContain(s2.recordingDestinationNotSet);
+    const testo = container.textContent ?? '';
+    expect(testo).toContain(w.flow.recordingDestinationReserved);
+    expect(testo).toContain(w.flow.postEventQaHidden);
+    expect(testo).not.toContain(s2.recordingDestinationStaffOnly);
+    expect(testo).not.toContain(s2.recordingDestinationNotSet);
     await press(button(w.updateEvent));
     const inviato = corpo('PUT');
     expect(inviato.recordingEnabled).toBe(true);
     expect(inviato).not.toHaveProperty('recordingDestination');
+  });
+
+  it('con un link di conduzione un evento vecchio che registra resta senza, e lo dice', async () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato({ ...conDomande, recordingDestination: null }),
+      initialStep: 'advanced',
+      initialSection: 'recording',
+      viaToken: 'token-primario',
+    });
+    expect(container.textContent).toContain(s2.recordingDestinationStaffOnly);
+    expect(container.textContent).not.toContain(s2.recordingDestinationStartsReserved);
+    goToStep('review');
+    expect(container.textContent).toContain(s2.recordingDestinationStaffOnly);
+    expect(container.textContent).toContain(w.flow.postEventQaTextOnly);
+  });
+
+  it('con un link di conduzione a sala gia aperta dice che resta riservata', async () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato(
+        { ...conDomande, recordingDestination: null, recordingEnabled: false },
+        { salaGiaAperta: true },
+      ),
+      initialStep: 'advanced',
+      initialSection: 'recording',
+      viaToken: 'token-primario',
+    });
+    click(interruttore(messages.admin.form.recordingEnabled)!);
+    expect(container.textContent).toContain(s2.recordingDestinationStaysReserved);
+    expect(container.textContent).not.toContain(s2.recordingDestinationStartsReserved);
+    expect(destinazione('REGISTRANTS')).toBeNull();
+    goToStep('review');
+    expect(container.textContent).toContain(w.flow.recordingDestinationReserved);
+    await press(button(w.updateEvent));
+    expect(corpo('PUT').recordingEnabled).toBe(true);
+    expect(corpo('PUT')).not.toHaveProperty('recordingDestination');
+  });
+
+  it('con un link di conduzione, dove il video non c e, annuncia cio che il server scrive', () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato({ ...conDomande, recordingDestination: null, recordingEnabled: false }),
+      initialStep: 'advanced',
+      initialSection: 'recording',
+      viaToken: 'token-primario',
+      voceNelVideo: 'assente',
+    });
+    click(interruttore(messages.admin.form.recordingEnabled)!);
+    expect(container.textContent).not.toContain(s2.recordingDestinationStartsReserved);
+    expect(container.textContent).not.toContain(s2.recordingDestinationStaffOnly);
+    goToStep('review');
+    expect(container.textContent).toContain(w.flow.recordingDestinationReserved);
+    expect(container.textContent).toContain(w.flow.postEventQaHidden);
   });
 
   it('una registrazione accesa e rispenta non dichiara una destinazione', async () => {
@@ -2979,7 +3048,7 @@ describe('i valori del formato', () => {
     expect(container.textContent).toContain(w.flow.postEventQaHidden);
   });
 
-  it('dove un video non c e non chiede, non parte e non si vede', async () => {
+  it('dove il video non c e non chiede, e annuncia la riservata che il server scrive', async () => {
     renderWizard({
       template: { ...modello, recordingDestination: null, postEventShowQA: true },
       voceNelVideo: 'assente',
@@ -2989,21 +3058,24 @@ describe('i valori del formato', () => {
     expect(destinazione('REGISTRANTS')).toBeNull();
     expect(container.textContent).not.toContain(s2.recordingDestination);
     goToStep('review');
-    expect(container.textContent).not.toContain(w.flow.recordingDestinationReserved);
-    expect(container.textContent).toContain(w.flow.postEventQaTextOnly);
+    expect(container.textContent).toContain(w.flow.recordingDestinationReserved);
+    expect(container.textContent).toContain(w.flow.postEventQaHidden);
     await press(button(w.publish));
     const inviato = corpo('POST');
     expect(inviato.recordingEnabled).toBe(true);
     expect(inviato).not.toHaveProperty('recordingDestination');
   });
 
-  it('dove un video non c e la destinazione di un modello non parte', async () => {
+  it('dove il video non c e un modello pubblico non parte, e il riepilogo non lo promette', async () => {
     renderWizard({
-      template: { ...modello, recordingDestination: 'REGISTRANTS' },
+      template: { ...modello, recordingDestination: 'PUBLIC', postEventShowQA: true },
       voceNelVideo: 'assente',
     });
     compila();
     goToStep('review');
+    expect(container.textContent).toContain(w.flow.recordingDestinationReserved);
+    expect(container.textContent).not.toContain(w.flow.recordingDestinationPublic);
+    expect(container.textContent).toContain(w.flow.postEventQaHidden);
     await press(button(w.publish));
     expect(corpo('POST')).not.toHaveProperty('recordingDestination');
   });
@@ -3039,6 +3111,25 @@ describe('i valori del formato', () => {
     await press(button(w.updateEvent));
     expect(corpo('PUT')).not.toHaveProperty('recordingDestination');
     expect(toastError).not.toHaveBeenCalled();
+  });
+
+  it('a sala aperta una bozza che accende la registrazione non annuncia una destinazione', () => {
+    localStorage.setItem(
+      'pa-wizard-draft:evt-prog',
+      JSON.stringify({ title: { it: 'Dalla bozza' }, recordingEnabled: true }),
+    );
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato(
+        { recordingDestination: null, recordingEnabled: false },
+        { salaGiaAperta: true },
+      ),
+      initialStep: 'base',
+      salaAperta: true,
+    });
+    click(button(w.draftRestore));
+    goToStep('review');
+    expect(container.textContent).not.toContain(w.flow.recordingDestinationReserved);
   });
 
   it('un evento vecchio, con iscrizioni o gia aperto, si salva senza destinazione e lo dice', async () => {

@@ -20,7 +20,9 @@ import ToggleSwitch from '@/components/ui/toggle-switch';
 import { Icon } from '@/components/ui/icon';
 import type { VoceNelVideo } from '@/lib/live/consent-rule';
 import {
+  DESTINAZIONE_DI_PARTENZA,
   puoCambiareDestinazione,
+  videoDaDestinare,
   type Destinazione,
 } from '@/lib/recording/destination';
 import { trascrizioneDalVideo } from '@/lib/registration/consents';
@@ -34,7 +36,6 @@ import {
   togglesFromMatrix,
 } from '@/lib/utils/permission-matrix';
 
-import { DESTINAZIONE_DI_PARTENZA, videoDaDestinare } from './campi-del-formato';
 import ConsentDiagram from './consent-diagram';
 import { nomeLingua } from './text-translation';
 
@@ -111,6 +112,11 @@ interface Props {
     /** Va scelta per salvare (validation.ts): senza, resta «non indicata». */
     chiesta: boolean;
   };
+  /** La destinazione dopo il salvataggio: con un link di conduzione la scelta non
+   *  c'e', e questa dice cosa diventa l'evento. */
+  destinazioneDopo?: Destinazione;
+  /** La sala si e' gia' aperta: da li' nessuno puo' piu' allargare la destinazione. */
+  salaGiaAperta?: boolean;
   /** Porta alle lingue dell'evento, nel passo «Evento». */
   onCambiaLingue?: () => void;
   /** La post-produzione AI e' accesa sull'installazione? Spenta, le sue
@@ -190,6 +196,8 @@ export default function StepPermissions({
   voceNelVideo = 'rimovibile',
   istantanea = false,
   puoDichiarareChiConduce = true,
+  destinazioneDopo = null,
+  salaGiaAperta = false,
   destinazione,
   onCambiaLingue,
   aiPipelineEnabled = true,
@@ -511,9 +519,9 @@ export default function StepPermissions({
                   ? aiConLaRegistrazione(value)
                   : {}),
                 // Un evento nuovo che registra parte riservato, se il modello
-                // non dice altro e c'e' un video da destinare. Su un evento
-                // salvato la scelta resta da fare. Spegnendo la registrazione la
-                // destinazione resta nel modulo.
+                // non dice altro; dove la scelta non si propone lo decide il
+                // salvataggio. Su un evento salvato la scelta resta da fare.
+                // Spegnendo la registrazione la destinazione resta nel modulo.
                 ...(!value.recordingEnabled &&
                 !editing &&
                 value.recordingDestination == null &&
@@ -604,7 +612,10 @@ export default function StepPermissions({
           </fieldset>
         )}
 
-        {/* Con un link di conduzione la scelta non c'e': manca, e la fa lo staff. */}
+        {/* Con un link di conduzione la scelta non c'e': la fa lo staff. Un evento
+            che comincia ora a registrare parte riservato, e lo staff lo puo'
+            allargare solo prima che la sala si apra. Uno che registrava gia'
+            resta senza. */}
         {value.recordingEnabled &&
           recordingAvailable &&
           !istantanea &&
@@ -612,7 +623,13 @@ export default function StepPermissions({
           value.recordingDestination === null &&
           videoDaDestinare(voceNelVideo) && (
             <p className="text-secondary mb-0 py-2" style={{ fontSize: '0.85rem', borderTop: '1px solid #e8e8e8' }}>
-              {t('recordingDestinationStaffOnly')}
+              {t(
+                destinazioneDopo === null
+                  ? 'recordingDestinationStaffOnly'
+                  : salaGiaAperta
+                    ? 'recordingDestinationStaysReserved'
+                    : 'recordingDestinationStartsReserved',
+              )}
             </p>
           )}
 

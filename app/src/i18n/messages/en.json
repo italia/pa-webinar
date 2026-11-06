@@ -1037,6 +1037,8 @@
         "recordingDestinationPublicDesc": "It can be published on the event page and in the video library. Participants consent to this too.",
         "recordingDestinationNotSet": "Not set: the event was created before this choice existed.",
         "recordingDestinationStaffOnly": "The event staff chooses where the recording goes: for now it is not set.",
+        "recordingDestinationStartsReserved": "The recording starts as reserved: the event staff can make it public until the room opens.",
+        "recordingDestinationStaysReserved": "The recording stays reserved: the room has already opened.",
         "recordingDestinationLocked": "Once the room has opened you can only switch to reserved: consents are valid for the text people read.",
         "recordingDestinationRequired": "Choose where the recording goes.",
         "audienceAnonymous": "Anonymous audience",

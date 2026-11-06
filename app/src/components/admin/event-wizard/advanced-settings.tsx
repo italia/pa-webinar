@@ -112,7 +112,7 @@ export function SezioneDati({
   retentionMax = MAX_RETENTION_DAYS,
   onUploadBusy,
   domandeDopoEvento = true,
-  destinazioneSalvata = null,
+  destinazioneSenzaScelta = null,
 }: {
   form: WizardForm;
   onChange: (patch: Partial<WizardForm>) => void;
@@ -125,14 +125,15 @@ export function SezioneDati({
   /** Si sceglie qui se le domande restano sulla pagina: non con un link di
    *  conduzione, che le cambia dalla pagina dell'evento. */
   domandeDopoEvento?: boolean;
-  /** La destinazione dell'evento salvato, null se e' nuovo o non l'ha dichiarata. */
-  destinazioneSalvata?: Destinazione;
+  /** La destinazione che l'evento tiene se il modulo non ne sceglie una
+   *  (`destinazioneDiPartenza`). */
+  destinazioneSenzaScelta?: Destinazione;
 }) {
   const t = useTranslations('admin.wizard.step5');
   const tPost = useTranslations('postEvent');
   // La regola della pagina si legge sull'evento che il salvataggio scrive: una
   // scelta rimasta nel modulo a registrazione spenta non toglie le domande.
-  const riservata = destinazioneDopoIlSalvataggio(form, destinazioneSalvata) === 'REGISTRANTS';
+  const riservata = destinazioneDopoIlSalvataggio(form, destinazioneSenzaScelta) === 'REGISTRANTS';
   return (
     <div className="row g-3">
       <div className="col-md-6">
