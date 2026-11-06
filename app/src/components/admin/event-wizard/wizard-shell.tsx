@@ -2440,6 +2440,7 @@ export default function EventWizard(props: WizardProps) {
             className="btn btn-sm btn-outline-secondary"
             onClick={() => {
               setForm(initial);
+              elencoSceltoRef.current = mode === 'edit';
               setDestinazioneScelta(mode === 'edit' || !!props.destinazioneScelta);
               setPaginaScelta(false);
               setTraslocoApplicato(false);
