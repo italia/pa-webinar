@@ -3762,6 +3762,7 @@
       "sendNotPublished": "Zaproszenia są wysyłane, dopóki wydarzenie przyjmuje zapisy: po publikacji i przed końcem.",
       "invitedOn": "Zaproszono {date}",
       "notInvited": "Zaproszenie niewysłane",
+      "stopped": "Receives no invitations",
       "send": "Wyślij zaproszenie",
       "resend": "Wyślij ponownie",
       "actions": "Działania",

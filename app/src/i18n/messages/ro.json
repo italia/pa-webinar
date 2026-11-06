@@ -3762,6 +3762,7 @@
       "sendNotPublished": "Invitațiile pleacă cât timp evenimentul acceptă înscrieri: după publicare și înainte de final.",
       "invitedOn": "Invitat la {date}",
       "notInvited": "Invitație netrimisă",
+      "stopped": "Receives no invitations",
       "send": "Trimite invitația",
       "resend": "Trimite din nou",
       "actions": "Acțiuni",

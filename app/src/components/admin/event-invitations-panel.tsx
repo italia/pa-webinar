@@ -29,6 +29,8 @@ interface Invitato {
   registered: boolean;
   /** L'ultimo invio dell'invito (ISO); null se non e' mai partito. */
   sentAt: string | null;
+  /** Verso questo indirizzo non parte piu' niente: la riga vale solo come accesso. */
+  stopped?: boolean;
   person: { displayName: string | null } | null;
 }
 
@@ -115,7 +117,7 @@ export default function EventInvitationsPanel({
   }, [carica]);
 
   const iscritti = righe.filter((r) => r.registered).length;
-  const daInvitare = righe.filter((r) => !r.registered && !r.sentAt).length;
+  const daInvitare = righe.filter((r) => !r.registered && !r.stopped && !r.sentAt).length;
 
   return (
     <section aria-labelledby="invitati-titolo">
@@ -207,6 +209,8 @@ export default function EventInvitationsPanel({
                     <td>
                       {r.registered ? (
                         <span className="badge bg-success">{t('registered')}</span>
+                      ) : r.stopped ? (
+                        <span className="badge bg-light text-dark border">{t('stopped')}</span>
                       ) : r.sentAt ? (
                         <span className="badge bg-light text-dark border">
                           {t('invitedOn', {
@@ -218,7 +222,7 @@ export default function EventInvitationsPanel({
                       )}
                     </td>
                     <td className="text-end">
-                      {!r.registered && (
+                      {!r.registered && !r.stopped && (
                         <button
                           type="button"
                           className="btn btn-link btn-sm p-0"

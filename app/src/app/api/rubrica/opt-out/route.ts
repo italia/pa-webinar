@@ -11,11 +11,11 @@
  *   GET  ?token=...   — preview the target display name/organization
  *                       so the confirmation page can show who is being
  *                       opted out. Read-only.
- *   POST ?token=...   — flip optedInToAddressBook to false and stamp
- *                       optedOutAt. Preserves the Person row (so a
- *                       future re-opt-in doesn't lose historical
- *                       lastActiveAt) but the row is no longer shown
- *                       in the rubrica.
+ *   POST ?token=...   — ritira il consenso (`ritiraComunicazioni`): la voce
+ *                       perde subito l'email, esce dal selettore e i suoi
+ *                       inviti si fermano (`fermaInviti`). Il resto della riga
+ *                       lo toglie la corsa successiva di
+ *                       /api/cron/rubrica-retention.
  *
  * Tokens are self-signed with APP_SECRET and carry a 90-day TTL.
  */

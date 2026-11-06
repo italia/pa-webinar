@@ -3762,6 +3762,7 @@
       "sendNotPublished": "Kvietimai siunčiami, kol renginys priima registracijas: po paskelbimo ir prieš pabaigą.",
       "invitedOn": "Pakviestas {date}",
       "notInvited": "Kvietimas neišsiųstas",
+      "stopped": "Receives no invitations",
       "send": "Siųsti kvietimą",
       "resend": "Siųsti dar kartą",
       "actions": "Veiksmai",

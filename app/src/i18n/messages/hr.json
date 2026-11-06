@@ -3762,6 +3762,7 @@
       "sendNotPublished": "Pozivnice se šalju dok događaj prima prijave: nakon objave i prije završetka.",
       "invitedOn": "Pozvan {date}",
       "notInvited": "Pozivnica nije poslana",
+      "stopped": "Receives no invitations",
       "send": "Pošalji pozivnicu",
       "resend": "Pošalji ponovno",
       "actions": "Radnje",

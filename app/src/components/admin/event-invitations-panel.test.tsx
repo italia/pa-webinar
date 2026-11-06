@@ -138,6 +138,27 @@ describe('EventInvitationsPanel — invio degli inviti', () => {
     expect(container.querySelector('[role="status"]')?.textContent).toContain('1');
   });
 
+  it('un invito fermato lo si dice, non si conta e non si manda', async () => {
+    fetchMock.mockResolvedValue(
+      risposta([
+        { id: 'a', name: 'Persona 1', email: 'p1@example.org', role: 'GUEST', registered: false, sentAt: null, stopped: true, person: null },
+        { id: 'b', name: 'Persona 2', email: 'p2@example.org', role: 'GUEST', registered: false, sentAt: '2026-10-30T10:00:00Z', stopped: true, person: null },
+      ]),
+    );
+    await disegna(true);
+    const righe = Array.from(container.querySelectorAll('tbody tr'));
+    expect(righe.map((tr) => tr.textContent)).toEqual([
+      expect.stringContaining(m.stopped),
+      expect.stringContaining(m.stopped),
+    ]);
+    expect(righe.flatMap((tr) => Array.from(tr.querySelectorAll('button')))).toEqual([]);
+    const perTutti = Array.from(container.querySelectorAll('button')).find((b) =>
+      b.textContent?.startsWith(m.sendAll.split('(')[0]!.trim()),
+    );
+    expect(perTutti?.textContent).toContain('(0)');
+    expect(perTutti?.disabled).toBe(true);
+  });
+
   it('su un evento non pubblicato i pulsanti sono spenti e lo si dice', async () => {
     fetchMock.mockResolvedValue(
       risposta([{ id: 'a', name: 'Persona 1', email: 'p1@example.org', role: 'GUEST', registered: false, sentAt: null, person: null }]),

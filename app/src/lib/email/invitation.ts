@@ -18,9 +18,17 @@
  *
  * La lingua e' quella della pagina da cui parte la richiesta (chi invita
  * sceglie la lingua dell'evento), con il ripiego delle lingue delle email.
+ *
+ * La rubrica si cerca per impronta dell'indirizzo, non per `personId`: un invito
+ * scritto a mano a una persona in rubrica non ha il collegamento. Chi e' in
+ * rubrica riceve a ogni invito un link nuovo per uscirne. Non parte niente verso
+ * chi ha ritirato il consenso, finche' la voce esiste, ne' per un invito fermato
+ * (`declinedAt`, vedi `lib/persons/inviti-fermati`).
  */
 
 import { randomBytes } from 'node:crypto';
+
+import { getTranslations } from 'next-intl/server';
 
 import { defaultLocale } from '@/i18n/config';
 import { hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
@@ -31,6 +39,7 @@ import { enqueueEmailOnce } from '@/lib/email/outbox';
 import { escapeHtml } from '@/lib/email/templates';
 import { publicRegistrationFor } from '@/lib/events/access-mode';
 import { isEventOpenForRegistration } from '@/lib/events/visibility';
+import { rubricaOptOutUrl } from '@/lib/persons/opt-out-link';
 import { getSettings } from '@/lib/settings';
 import { formatDate, formatTimeWithZone } from '@/lib/utils/date-format';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
@@ -124,6 +133,8 @@ export interface InvitationEmailInput {
   siteName?: string;
   /** L'iscrizione e' riservata agli invitati: lo si dice. */
   onlyInvited: boolean;
+  /** Il link per uscire dalla rubrica, con i testi gia' tradotti: solo per chi ci e'. */
+  addressBook?: { url: string; label: string; note: string } | null;
 }
 
 export function invitationEmail(input: InvitationEmailInput): {
@@ -133,6 +144,7 @@ export function invitationEmail(input: InvitationEmailInput): {
 } {
   const c = COPY[input.locale];
   const site = input.siteName || 'PA Webinar';
+  const rubrica = input.addressBook;
   const greeting = input.name
     ? `<p style="margin:0 0 16px;">${escapeHtml(c.greeting(input.name))}</p>`
     : '';
@@ -158,6 +170,7 @@ ${input.onlyInvited ? `<p style="margin:0 0 8px;">${escapeHtml(c.onlyInvited)}</
 <a href="${escapeHtml(input.registerUrl)}" style="display:inline-block;padding:12px 28px;background:#06c;color:#fff;text-decoration:none;border-radius:4px;font-weight:600;font-size:16px;">${escapeHtml(c.cta)}</a>
 </td></tr></table>
 <p style="margin:0;font-size:14px;color:#5c6f82;">${escapeHtml(c.after)}</p>
+${rubrica ? `<p style="margin:16px 0 0;font-size:14px;color:#5c6f82;">${escapeHtml(rubrica.note)} <a href="${escapeHtml(rubrica.url)}" style="color:#06c;">${escapeHtml(rubrica.label)}</a></p>` : ''}
 </td></tr>
 </table>
 </td></tr>
@@ -177,6 +190,7 @@ ${input.onlyInvited ? `<p style="margin:0 0 8px;">${escapeHtml(c.onlyInvited)}</
     `${c.cta}: ${input.registerUrl}`,
     '',
     c.after,
+    ...(rubrica ? ['', rubrica.note, `${rubrica.label}: ${rubrica.url}`] : []),
   ].join('\n');
   return { subject: c.subject(input.eventTitle), html, text };
 }
@@ -201,7 +215,9 @@ export const INVITI_PER_RICHIESTA = 200;
  * Manda l'invito agli invitati indicati (anche di nuovo), oppure, senza
  * `ids`, a quelli non ancora invitati e non iscritti, al massimo
  * INVITI_PER_RICHIESTA alla volta. Chi si e' gia' iscritto ha il suo link e
- * non riceve l'invito. Restituisce null se l'evento non esiste.
+ * non riceve l'invito; chi ha ritirato il consenso alla rubrica e gli inviti
+ * fermati si saltano e si contano fra i saltati. Restituisce null se l'evento
+ * non esiste.
  *
  * Due richieste insieme (due schede, due repliche) non mandano due email: la
  * chiave della coda e' l'invito con il suo ultimo invio, e il token si scrive
@@ -239,6 +255,7 @@ export async function sendInvitations(
       emailHash: true,
       token: true,
       sentAt: true,
+      declinedAt: true,
     },
     orderBy: { createdAt: 'asc' },
   });
@@ -261,12 +278,29 @@ export async function sendInvitations(
       : []
   );
 
+  const voci = new Map(
+    daCercare.length > 0
+      ? (
+          await prisma.person.findMany({
+            where: { emailHash: { in: daCercare } },
+            select: {
+              id: true,
+              emailHash: true,
+              optedInToAddressBook: true,
+              optedOutAt: true,
+            },
+          })
+        ).map((p) => [p.emailHash, p])
+      : []
+  );
+
   const settings = await getSettings();
   const onlyInvited = !publicRegistrationFor(event, settings.publicRegistrationEnabled);
   const pagina = linguaPagina(opts.locale) ?? defaultLocale;
   const testi = linguaEmail(pagina);
   const base = emailBaseUrl();
   const titolo = getLocalized(event.title as LocalizedField, pagina);
+  const tEmail = await getTranslations({ locale: testi, namespace: 'email' });
 
   let sent = 0;
   let skipped = 0;
@@ -278,6 +312,11 @@ export async function sendInvitations(
     // mandare. Con un elenco esplicito si dice che non sono partiti.
     if (iscritto) {
       if (!tutti) skipped += 1;
+      continue;
+    }
+    const voce = voci.get(impronte[i] ?? '');
+    if (r.declinedAt || voce?.optedOutAt) {
+      skipped += 1;
       continue;
     }
     if (trattati >= INVITI_PER_RICHIESTA) {
@@ -310,6 +349,7 @@ export async function sendInvitations(
       skipped += 1;
       continue;
     }
+    const linkRubrica = rubricaOptOutUrl(voce, base, pagina);
     const mail = invitationEmail({
       locale: testi,
       name: tryDecryptPII(r.name),
@@ -323,6 +363,13 @@ export async function sendInvitations(
       ),
       siteName: settings.siteName || undefined,
       onlyInvited,
+      addressBook: linkRubrica
+        ? {
+            url: linkRubrica,
+            label: tEmail('addressBookOptOutLink'),
+            note: tEmail('addressBookNote'),
+          }
+        : null,
     });
     // Una sola email per invito e per giro: un secondo invio uguale nello
     // stesso istante trova la chiave gia' in coda.

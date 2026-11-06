@@ -3762,6 +3762,7 @@
       "sendNotPublished": "A meghívók addig mennek ki, amíg az esemény fogad regisztrációt: közzététel után és a vége előtt.",
       "invitedOn": "Meghívva: {date}",
       "notInvited": "A meghívó nincs elküldve",
+      "stopped": "Receives no invitations",
       "send": "Meghívó küldése",
       "resend": "Újraküldés",
       "actions": "Műveletek",

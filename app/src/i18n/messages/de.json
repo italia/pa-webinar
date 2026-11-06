@@ -3762,6 +3762,7 @@
       "sendNotPublished": "Einladungen gehen raus, solange das Event Anmeldungen annimmt: nach der Veröffentlichung und vor dem Ende.",
       "invitedOn": "Eingeladen am {date}",
       "notInvited": "Einladung nicht gesendet",
+      "stopped": "Receives no invitations",
       "send": "Einladung senden",
       "resend": "Erneut senden",
       "actions": "Aktionen",

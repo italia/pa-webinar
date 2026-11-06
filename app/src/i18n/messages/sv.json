@@ -3762,6 +3762,7 @@
       "sendNotPublished": "Inbjudningar skickas medan evenemanget tar emot anmälningar: efter publiceringen och före slutet.",
       "invitedOn": "Inbjuden {date}",
       "notInvited": "Inbjudan inte skickad",
+      "stopped": "Receives no invitations",
       "send": "Skicka inbjudan",
       "resend": "Skicka igen",
       "actions": "Åtgärder",

@@ -96,6 +96,8 @@ export const GET = withErrorHandling(async (_request, context) => {
       createdAt: r.createdAt,
       // L'ultimo invio dell'invito per email; null se non e' mai partito.
       sentAt: r.sentAt,
+      // Non parte piu' niente verso questo indirizzo (lib/persons/inviti-fermati).
+      stopped: r.declinedAt !== null,
       registered: iscritte.has(impronte[i] ?? ''),
       // Person.displayName is encrypted at rest; decrypt for the response
       // so the rubrica-linked invitation row shows a readable name.

@@ -11,7 +11,8 @@
  * DELETE hard-deletes the Person record (GDPR Art. 17 — right to be
  *        forgotten). Registrations keep existing but their personId is
  *        cleared via onDelete: SetNull. Event-level consent records are
- *        unaffected.
+ *        unaffected. Gli inviti di quell'indirizzo si fermano prima
+ *        (`fermaInviti`): senza la voce partirebbero come scritti a mano.
  */
 
 import { cookies } from 'next/headers';
@@ -22,6 +23,8 @@ import { logAdminAction } from '@/lib/audit/admin-audit';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { NotFoundError, UnauthorizedError } from '@/lib/errors';
+import { fermaInviti } from '@/lib/persons/inviti-fermati';
+import { getSettings } from '@/lib/settings';
 
 export const dynamic = 'force-dynamic';
 
@@ -81,10 +84,21 @@ export const DELETE = withErrorHandling(async (request, context: { params: Promi
   if (!isAdmin) throw new UnauthorizedError();
 
   const { id } = await context.params;
-  const existing = await prisma.person.findUnique({ where: { id }, select: { id: true } });
+  const existing = await prisma.person.findUnique({
+    where: { id },
+    select: { id: true, emailHash: true },
+  });
   if (!existing) throw new NotFoundError('Person');
 
-  await prisma.person.delete({ where: { id } });
+  const { publicRegistrationEnabled } = await getSettings();
+  await prisma.$transaction(async (tx) => {
+    await fermaInviti(
+      tx,
+      { OR: [{ personId: id }, { emailHash: existing.emailHash }] },
+      { adesso: new Date(), publicRegistrationEnabled },
+    );
+    await tx.person.delete({ where: { id } });
+  });
 
   await logAdminAction({
     request,

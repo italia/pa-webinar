@@ -3762,6 +3762,7 @@
       "sendNotPublished": "Povabila se pošiljajo, dokler dogodek sprejema prijave: po objavi in pred koncem.",
       "invitedOn": "Povabljen {date}",
       "notInvited": "Povabilo ni poslano",
+      "stopped": "Receives no invitations",
       "send": "Pošlji povabilo",
       "resend": "Pošlji znova",
       "actions": "Dejanja",

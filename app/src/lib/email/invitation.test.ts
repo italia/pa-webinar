@@ -2,12 +2,14 @@
 // SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
 
 // @vitest-environment node
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { verifyRubricaOptOutToken } from '@/lib/persons/opt-out-token';
 
 /**
  * L'invito per email: porta alla pagina d'iscrizione compilata, salta chi e'
  * gia' iscritto, non parte da una bozza, e segna l'invio solo con l'email in
- * coda.
+ * coda. A chi e' in rubrica porta un link nuovo per uscirne.
  */
 const db = vi.hoisted(() => ({
   event: { findUnique: vi.fn() },
@@ -19,6 +21,7 @@ const db = vi.hoisted(() => ({
     findFirst: vi.fn(),
   },
   registration: { findMany: vi.fn() },
+  person: { findMany: vi.fn() },
 }));
 const coda = vi.hoisted(() => ({ enqueueEmailOnce: vi.fn() }));
 vi.mock('@/lib/db', () => ({ prisma: db }));
@@ -32,6 +35,10 @@ vi.mock('@/lib/settings', () => ({
 vi.mock('@/lib/crypto/pii', () => ({
   tryDecryptPII: (v: string | null) => v,
   hashEmail: (v: string) => `h:${v}`,
+}));
+vi.mock('next-intl/server', () => ({
+  getTranslations: async ({ locale }: { locale: string }) => (chiave: string) =>
+    `${locale}:${chiave}`,
 }));
 
 import {
@@ -62,12 +69,18 @@ beforeEach(() => {
     db.eventInvitation.updateMany,
     db.eventInvitation.findUnique,
     db.registration.findMany,
+    db.person.findMany,
     coda.enqueueEmailOnce,
   ])
     f.mockReset();
   db.event.findUnique.mockResolvedValue(evento);
   db.registration.findMany.mockResolvedValue([]);
+  db.person.findMany.mockResolvedValue([]);
   coda.enqueueEmailOnce.mockResolvedValue(true);
+});
+afterEach(() => {
+  vi.unstubAllEnvs();
+  vi.useRealTimers();
 });
 
 describe('invitationEmail', () => {
@@ -85,6 +98,36 @@ describe('invitationEmail', () => {
     expect(m.html).toContain('Ada &lt;b&gt;');
     expect(m.html).toContain('https://x/en/events/w/registration?invito=abc');
     expect(m.text).toContain('Registration is reserved for invited people');
+  });
+
+  const base = {
+    locale: 'en' as const,
+    name: null,
+    eventTitle: 'Webinar',
+    eventDate: '10 Nov 2026',
+    eventTime: '10:00',
+    registerUrl: 'https://x/en/events/w/registration?invito=abc',
+    onlyInvited: false,
+  };
+
+  it('con il link della rubrica mostra nota e link, protetti, in html e testo', () => {
+    const m = invitationEmail({
+      ...base,
+      addressBook: {
+        url: 'https://x/en/address-book?token=a&b',
+        label: 'Remove <me>',
+        note: 'You are in the address book.',
+      },
+    });
+    expect(m.html).toContain('You are in the address book.');
+    expect(m.html).toContain('href="https://x/en/address-book?token=a&amp;b"');
+    expect(m.html).toContain('Remove &lt;me&gt;');
+    expect(m.text).toContain('You are in the address book.');
+    expect(m.text).toContain('Remove <me>: https://x/en/address-book?token=a&b');
+  });
+
+  it('senza link nessuna traccia della rubrica', () => {
+    expect(invitationEmail({ ...base, addressBook: null })).toEqual(invitationEmail(base));
   });
 });
 
@@ -220,6 +263,121 @@ describe('sendInvitations', () => {
   it("un evento che non esiste da' null", async () => {
     db.event.findUnique.mockResolvedValue(null);
     expect(await sendInvitations('e1', { locale: 'it' })).toBeNull();
+  });
+});
+
+describe('sendInvitations e rubrica', () => {
+  const invito = (id: string, indirizzo: string, campi = {}) => ({
+    id,
+    name: null,
+    email: indirizzo,
+    emailHash: `h:${indirizzo}`,
+    token: `t-${id}`,
+    sentAt: null,
+    ...campi,
+  });
+  const voce = (id: string, indirizzo: string, campi = {}) => ({
+    id,
+    emailHash: `h:${indirizzo}`,
+    optedInToAddressBook: true,
+    optedOutAt: null,
+    ...campi,
+  });
+  const inCoda = (n = 0) =>
+    coda.enqueueEmailOnce.mock.calls[n]![0] as { to: string; html: string; text: string };
+  const tokenDi = (mail: { text: string }) =>
+    new URL(mail.text.match(/https:\S+opt-out\S+/)![0]).searchParams.get('token')!;
+
+  beforeEach(() => {
+    vi.stubEnv('APP_SECRET', 'segreto-di-prova-lungo-almeno-trentadue-byte');
+  });
+
+  it("cerca la voce per impronta: anche l'invito scritto a mano porta il link", async () => {
+    db.eventInvitation.findMany.mockResolvedValue([
+      invito('i1', 'p1@example.org', { personId: null }),
+    ]);
+    db.person.findMany.mockResolvedValue([voce('persona-1', 'p1@example.org')]);
+    await sendInvitations('e1', { locale: 'it' });
+    expect(db.person.findMany.mock.calls[0]![0].where).toEqual({
+      emailHash: { in: ['h:p1@example.org'] },
+    });
+    const mail = inCoda();
+    expect(mail.text).toContain('it:addressBookNote');
+    expect(mail.text).toContain('it:addressBookOptOutLink: https://webinar.example.org/it/');
+    expect(verifyRubricaOptOutToken(tokenDi(mail))).toEqual({ personId: 'persona-1' });
+  });
+
+  it('un link nuovo a ogni invio', async () => {
+    vi.useFakeTimers({ now: new Date('2026-11-06T10:00:00Z') });
+    db.eventInvitation.findMany.mockResolvedValue([
+      invito('i1', 'p1@example.org', { sentAt: new Date('2026-11-01T10:00:00Z') }),
+    ]);
+    db.person.findMany.mockResolvedValue([voce('persona-1', 'p1@example.org')]);
+    await sendInvitations('e1', { ids: ['i1'], locale: 'it' });
+    vi.setSystemTime(new Date('2026-11-06T10:00:05Z'));
+    await sendInvitations('e1', { ids: ['i1'], locale: 'it' });
+    expect(tokenDi(inCoda(0))).not.toBe(tokenDi(inCoda(1)));
+  });
+
+  it("i testi nella lingua dell'email, il link nella lingua della pagina", async () => {
+    db.eventInvitation.findMany.mockResolvedValue([invito('i1', 'p1@example.org')]);
+    db.person.findMany.mockResolvedValue([voce('persona-1', 'p1@example.org')]);
+    await sendInvitations('e1', { locale: 'pl' });
+    const mail = inCoda();
+    expect(mail.text).toContain('en:addressBookNote');
+    expect(mail.text).toContain('en:addressBookOptOutLink: https://webinar.example.org/pl/');
+  });
+
+  it('chi non e in rubrica non riceve il link', async () => {
+    db.eventInvitation.findMany.mockResolvedValue([
+      invito('i1', 'p1@example.org'),
+      invito('i2', 'p2@example.org'),
+    ]);
+    db.person.findMany.mockResolvedValue([
+      voce('persona-2', 'p2@example.org', { optedInToAddressBook: false }),
+    ]);
+    await sendInvitations('e1', { locale: 'it' });
+    expect(coda.enqueueEmailOnce).toHaveBeenCalledTimes(2);
+    expect(inCoda(0).text).not.toContain('addressBook');
+    expect(inCoda(1).text).not.toContain('addressBook');
+  });
+
+  it('un invito fermato non parte, anche senza voce, e si conta fra i saltati', async () => {
+    db.eventInvitation.findMany.mockResolvedValue([
+      invito('i1', 'p1@example.org', { declinedAt: new Date('2026-11-01T10:00:00Z') }),
+    ]);
+    expect(await sendInvitations('e1', { ids: ['i1'], locale: 'it' })).toEqual({
+      sent: 0,
+      skipped: 1,
+      remaining: 0,
+    });
+    expect(coda.enqueueEmailOnce).not.toHaveBeenCalled();
+  });
+
+  it('chi ha ritirato il consenso non riceve niente e si conta fra i saltati', async () => {
+    db.eventInvitation.findMany.mockResolvedValue([
+      invito('i1', 'p1@example.org'),
+      invito('i2', 'p2@example.org'),
+    ]);
+    db.person.findMany.mockResolvedValue([
+      voce('persona-1', 'p1@example.org', {
+        optedInToAddressBook: false,
+        optedOutAt: new Date('2026-11-01T10:00:00Z'),
+      }),
+    ]);
+    expect(await sendInvitations('e1', { locale: 'it' })).toEqual({
+      sent: 1,
+      skipped: 1,
+      remaining: 0,
+    });
+    expect(inCoda().to).toBe('p2@example.org');
+    expect(db.eventInvitation.update).toHaveBeenCalledTimes(1);
+  });
+
+  it('senza impronte non cerca in rubrica', async () => {
+    db.eventInvitation.findMany.mockResolvedValue([]);
+    await sendInvitations('e1', { locale: 'it' });
+    expect(db.person.findMany).not.toHaveBeenCalled();
   });
 });
 

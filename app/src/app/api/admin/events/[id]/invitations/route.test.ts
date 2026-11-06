@@ -88,6 +88,23 @@ describe('GET /api/admin/events/[id]/invitations', () => {
     });
   });
 
+  it('dice quali inviti sono fermati, senza mostrare quando', async () => {
+    db.eventInvitation.findMany.mockResolvedValue([
+      { ...invito('a', 'enc:a@example.org', 'hash:a@example.org'), declinedAt: new Date() },
+      { ...invito('b', 'enc:b@example.org', 'hash:b@example.org'), declinedAt: null },
+    ]);
+    db.registration.findMany.mockResolvedValue([]);
+
+    const res = await GET(new Request('https://portale.example.test/') as never, ctx as never);
+    const { rows } = (await res.json()) as { rows: Array<{ id: string; stopped: boolean }> };
+
+    expect(rows.map((r) => [r.id, r.stopped])).toEqual([
+      ['a', true],
+      ['b', false],
+    ]);
+    expect(rows.every((r) => !('declinedAt' in r))).toBe(true);
+  });
+
   it('senza invitati non interroga le iscrizioni', async () => {
     db.eventInvitation.findMany.mockResolvedValue([]);
     const res = await GET(new Request('https://portale.example.test/') as never, ctx as never);
