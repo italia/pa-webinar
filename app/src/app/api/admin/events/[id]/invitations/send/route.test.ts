@@ -13,14 +13,16 @@ const db = vi.hoisted(() => ({
   event: { findUnique: vi.fn() },
   eventInvitation: {
     findMany: vi.fn(),
-    update: vi.fn(),
     updateMany: vi.fn(),
     findUnique: vi.fn(),
   },
   registration: { findMany: vi.fn() },
   person: { findMany: vi.fn() },
 }));
-const coda = vi.hoisted(() => ({ enqueueEmailOnce: vi.fn(async () => true) }));
+const coda = vi.hoisted(() => ({
+  enqueueEmailOnce: vi.fn(async () => true),
+  chiaveEmailInvito: (id: string) => `event-invitation:${id}:`,
+}));
 vi.mock('next/headers', () => ({ cookies: async () => ({}) }));
 vi.mock('@/lib/auth/staff-session', () => ({
   requireEventManager: vi.fn(async () => ({ role: 'organizer' })),
@@ -69,7 +71,6 @@ beforeEach(() => {
   for (const f of [
     db.event.findUnique,
     db.eventInvitation.findMany,
-    db.eventInvitation.update,
     db.eventInvitation.updateMany,
     db.eventInvitation.findUnique,
     db.registration.findMany,

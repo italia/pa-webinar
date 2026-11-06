@@ -11,6 +11,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('@/lib/db', () => ({
   prisma: {
     person: { findUnique: vi.fn(), update: vi.fn() },
+    registration: { count: vi.fn() },
   },
 }));
 vi.mock('@/lib/live/consent-withdrawal', () => ({ ritiraComunicazioni: vi.fn() }));
@@ -21,7 +22,7 @@ vi.mock('@/lib/persons/opt-out-token', () => ({
 import { prisma } from '@/lib/db';
 import { ritiraComunicazioni } from '@/lib/live/consent-withdrawal';
 
-import { POST } from './route';
+import { GET, POST } from './route';
 
 function revoca(token: string): Promise<Response> {
   const request = new Request(`http://localhost:3000/api/rubrica/opt-out?token=${token}`, {
@@ -41,6 +42,39 @@ beforeEach(() => {
     optedInToAddressBook: true,
     optedOutAt: null,
   } as never);
+});
+
+describe('GET /api/rubrica/opt-out', () => {
+  const anteprima = async () =>
+    (
+      await GET(
+        new Request('http://localhost:3000/api/rubrica/opt-out?token=buono') as never,
+        { params: Promise.resolve({}) } as never
+      )
+    ).json();
+  const uscita = {
+    id: 'p-1',
+    emailHash: 'impronta',
+    displayName: 'x',
+    organization: null,
+    optedInToAddressBook: false,
+    optedOutAt: new Date(),
+  };
+
+  it('chi e’ gia’ uscito, senza spunte in attesa, ha finito', async () => {
+    vi.mocked(prisma.person.findUnique).mockResolvedValue(uscita as never);
+    vi.mocked(prisma.registration.count).mockResolvedValue(0);
+    expect(await anteprima()).toMatchObject({ alreadyOptedOut: true });
+  });
+
+  it('con una spunta in attesa il link propone ancora il ritiro', async () => {
+    vi.mocked(prisma.person.findUnique).mockResolvedValue(uscita as never);
+    vi.mocked(prisma.registration.count).mockResolvedValue(1);
+    expect(await anteprima()).toMatchObject({ alreadyOptedOut: false });
+    expect(prisma.registration.count).toHaveBeenCalledWith({
+      where: { emailHash: 'impronta', addressBookPending: true },
+    });
+  });
 });
 
 describe('POST /api/rubrica/opt-out', () => {

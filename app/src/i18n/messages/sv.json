@@ -4568,7 +4568,12 @@
       "addressBookTitle": "Evenemangsadressbok",
       "addressBookIntro": "Du har valt att stanna kvar i adressboken för att bjudas in till liknande evenemang. Vi sparar dessa uppgifter fram till {date}, om du inte återkallar samtycket eller ger ett nytt.",
       "addressBookOptOut": "Ta bort mina uppgifter från adressboken",
-      "consentFutureEffect": "Om du återkallar det får du inte längre meddelanden om kommande evenemang och du lämnar adressboken, för alla dina anmälningar."
+      "consentFutureEffect": "Om du återkallar det får du inte längre meddelanden om kommande evenemang och du lämnar adressboken, för alla dina anmälningar.",
+      "addressBookPendingTitle": "Återkomst till adressboken att bekräfta",
+      "addressBookPendingBody": "Rutan för adressboken kryssades i på den här anmälan, men den här adressen hade slutat ta emot inbjudningar. Inget ändras förrän du bekräftar.",
+      "addressBookPendingEffect": "Om du bekräftar kommer du tillbaka till adressboken med namnet och organisationen från den här anmälan och får inbjudningar igen. Om du avbryter, eller om det inte var du, stannar du utanför adressboken och får inga inbjudningar.",
+      "addressBookPendingConfirm": "Bekräfta min återkomst",
+      "addressBookPendingCancel": "Avbryt begäran"
     },
     "erasure": {
       "title": "Radering av dina uppgifter",

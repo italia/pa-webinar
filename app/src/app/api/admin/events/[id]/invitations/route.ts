@@ -23,6 +23,7 @@ import { logAdminAction } from '@/lib/audit/admin-audit';
 import { encryptPII, encryptPIIOrNull, hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { AppError, ForbiddenError, ValidationError } from '@/lib/errors';
+import { indirizzoFermato } from '@/lib/persons/inviti-fermati';
 
 export const dynamic = 'force-dynamic';
 
@@ -131,6 +132,9 @@ export const POST = withErrorHandling(async (request, context) => {
   // never stored — only its encryption and its HMAC fingerprint.
   const emailNorm = parsed.data.email.trim().toLowerCase();
   const emailHash = hashEmail(emailNorm);
+  // Cancellare un invito fermato e riscriverlo non toglie lo stop: la riga nuova
+  // nasce ferma se l'indirizzo ha smesso di ricevere inviti.
+  const fermato = await indirizzoFermato(prisma, emailHash);
 
   try {
     const created = await prisma.eventInvitation.create({
@@ -141,6 +145,7 @@ export const POST = withErrorHandling(async (request, context) => {
         name: encryptPIIOrNull(parsed.data.name),
         role: parsed.data.role,
         personId: parsed.data.personId ?? null,
+        declinedAt: fermato ? new Date() : null,
       },
       include: {
         person: {

@@ -8,10 +8,17 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
  * La conservazione della rubrica: i mesi si contano dal consenso, chi ha
  * ritirato esce alla prima corsa e una voce senza data non sparisce.
  */
-const db = vi.hoisted(() => ({
-  person: { findMany: vi.fn(), deleteMany: vi.fn() },
-  eventInvitation: { deleteMany: vi.fn(), updateMany: vi.fn() },
-}));
+const db = vi.hoisted(() => {
+  const db = {
+    person: { findMany: vi.fn(), deleteMany: vi.fn() },
+    eventInvitation: { findMany: vi.fn(), deleteMany: vi.fn(), updateMany: vi.fn() },
+    emailOutbox: { deleteMany: vi.fn() },
+    $queryRaw: vi.fn(),
+    $executeRaw: vi.fn(),
+    $transaction: (fn: (tx: unknown) => unknown) => fn(db),
+  };
+  return db;
+});
 vi.mock('@/lib/db', () => ({ prisma: db }));
 vi.mock('@/lib/auth/cron', () => ({ assertCronApiKey: vi.fn() }));
 vi.mock('@/lib/settings', () => ({
@@ -27,11 +34,24 @@ const riga = (id: string, optedInAt: string | null, retentionMonths = 24) => ({
   retentionMonths,
 });
 
+/** Le voci che, riletti, non sono piu' nello stato letto. */
+let cambiate: string[] = [];
+
 function corsa(
   ritirati: { id: string; emailHash: string }[],
   candidati: ReturnType<typeof riga>[]
 ) {
-  db.person.findMany.mockResolvedValueOnce(ritirati).mockResolvedValueOnce(candidati);
+  const impronte = new Map(ritirati.map((p) => [p.id, p.emailHash]));
+  db.person.findMany.mockImplementation(
+    async ({ where }: { where: { AND?: [{ id: { in: string[] } }]; optedOutAt?: unknown } }) => {
+      if (where.AND) {
+        return where.AND[0].id.in
+          .filter((id) => !cambiate.includes(id))
+          .map((id) => ({ id, emailHash: impronte.get(id) ?? 'senza' }));
+      }
+      return where.optedOutAt ? ritirati : candidati;
+    }
+  );
   return GET(
     new Request('https://portale.example.test/api/cron/rubrica-retention') as never,
     { params: Promise.resolve({}) } as never
@@ -41,8 +61,14 @@ function corsa(
 beforeEach(() => {
   vi.useFakeTimers({ now: ADESSO });
   vi.spyOn(console, 'log').mockImplementation(() => undefined);
+  cambiate = [];
   db.person.findMany.mockReset();
   db.person.deleteMany.mockReset();
+  db.eventInvitation.findMany.mockReset();
+  db.eventInvitation.findMany.mockResolvedValue([]);
+  db.$queryRaw.mockReset();
+  db.$executeRaw.mockReset();
+  db.$executeRaw.mockResolvedValue(0);
   db.eventInvitation.deleteMany.mockReset();
   db.eventInvitation.updateMany.mockReset();
   db.person.deleteMany.mockImplementation(async ({ where }) => ({
@@ -85,6 +111,7 @@ describe('GET /api/cron/rubrica-retention', () => {
       expiredDeleted: 2,
       optedOutDeleted: 0,
       scanned: 4,
+      emailsFilled: 0,
     });
   });
 
@@ -127,6 +154,34 @@ describe('GET /api/cron/rubrica-retention', () => {
       data: { declinedAt: ADESSO },
     });
     expect(ordine).toEqual(['inviti', 'voce']);
+  });
+
+  it('una voce rinnovata tra la lettura e la cancellazione resta, con i suoi inviti', async () => {
+    cambiate = ['rinnovata'];
+    const res = await corsa(
+      [{ id: 'rinnovata', emailHash: 'impronta' }],
+      [riga('scaduta', '2020-01-01T00:00:00Z')]
+    );
+    expect(db.person.deleteMany).toHaveBeenCalledTimes(1);
+    expect(db.person.deleteMany).toHaveBeenCalledWith({
+      where: { id: { in: ['scaduta'] } },
+    });
+    expect(await res.json()).toMatchObject({ optedOutDeleted: 0, expiredDeleted: 1 });
+  });
+
+  it('una voce scaduta si ricontrolla sulla data del consenso letta', async () => {
+    const letta = riga('scaduta', '2020-01-01T00:00:00Z');
+    await corsa([], [letta]);
+    const [, stato] = db.person.findMany.mock.calls[2]![0].where.AND;
+    expect(stato).toEqual({
+      OR: [{ id: 'scaduta', optedInToAddressBook: true, optedInAt: letta.optedInAt }],
+    });
+  });
+
+  it('completa le voci arrivate senza email e lo dice', async () => {
+    db.$executeRaw.mockResolvedValue(3);
+    const res = await corsa([], []);
+    expect((await res.json()).emailsFilled).toBe(3);
   });
 
   it('senza niente da cancellare non scrive', async () => {

@@ -17,6 +17,7 @@ import { logAdminAction } from '@/lib/audit/admin-audit';
 import { encryptPII, encryptPIIOrNull, hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { AppError, ForbiddenError, ValidationError } from '@/lib/errors';
+import { indirizzoFermato } from '@/lib/persons/inviti-fermati';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,7 +46,7 @@ export const PATCH = withErrorHandling(async (request, context) => {
   const { id, invId } = await context.params;
   // Di chi gestisce l'evento: l'admin, chi l'ha creato o un altro organizzatore (eventScope, ADR-014).
   const session = await requireEventManager(await cookies(), id);
-  await requireBelongs(id, invId);
+  const riga = await requireBelongs(id, invId);
 
   const body = await parseJsonBody(request);
   const parsed = patchSchema.safeParse(body);
@@ -65,10 +66,20 @@ export const PATCH = withErrorHandling(async (request, context) => {
     data.email = encryptPII(emailNorm);
     data.emailHash = hashEmail(emailNorm);
     // Un indirizzo nuovo non ha ricevuto l'invito, e il link dell'invito
-    // vecchio non deve aprire il modulo con i dati della persona nuova.
-    data.token = null;
-    data.sentAt = null;
-    data.declinedAt = null;
+    // vecchio non deve aprire il modulo con i dati della persona nuova. Lo
+    // stop segue l'indirizzo: quello nuovo riparte solo se non ha smesso di
+    // ricevere inviti, e non si toglie riscrivendo l'indirizzo, nemmeno passando
+    // da un altro. Lo stesso indirizzo riscritto resta com'era.
+    const stessoIndirizzo = riga.emailHash
+      ? riga.emailHash === data.emailHash
+      : tryDecryptPII(riga.email)?.trim().toLowerCase() === emailNorm;
+    if (!stessoIndirizzo) {
+      data.token = null;
+      data.sentAt = null;
+      data.declinedAt = (await indirizzoFermato(prisma, data.emailHash as string))
+        ? (riga.declinedAt ?? new Date())
+        : null;
+    }
   }
   if ('name' in data) {
     data.name = encryptPIIOrNull(data.name as string | null);

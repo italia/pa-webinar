@@ -3007,8 +3007,8 @@
       "editPrivacy": "Edit privacy and data"
     },
     "rubrica": {
-      "subtitle": "People who have consented to be added to the address book (GDPR art. 6.1.a). Profile information is updated automatically on every re-registration.",
-      "searchLabel": "Search by name or organization",
+      "subtitle": "People who have consented to be added to the address book (GDPR art. 6.1.a). Name, email and organization are updated only when the person ticks the box again.",
+      "searchLabel": "Search by organization",
       "orgTypeLabel": "Organization type",
       "allTypes": "All",
       "includeOptedOut": "Include people who withdrew consent",
@@ -4568,7 +4568,12 @@
       "addressBookTitle": "Events address book",
       "addressBookIntro": "You chose to stay in the address book, to be invited to similar events. We keep this data until {date}, unless you withdraw your consent or give it again.",
       "addressBookOptOut": "Remove me from the address book",
-      "consentFutureEffect": "If you withdraw it you no longer receive communications about upcoming events and you leave the address book, for all your registrations."
+      "consentFutureEffect": "If you withdraw it you no longer receive communications about upcoming events and you leave the address book, for all your registrations.",
+      "addressBookPendingTitle": "Return to the address book to confirm",
+      "addressBookPendingBody": "The address book box was ticked on this registration, but this address had stopped receiving invitations. Nothing changes until you confirm.",
+      "addressBookPendingEffect": "If you confirm, you return to the address book with the name and organisation of this registration and receive invitations again. If you cancel, or if it was not you, you stay out of the address book and receive no invitations.",
+      "addressBookPendingConfirm": "Confirm my return",
+      "addressBookPendingCancel": "Cancel the request"
     },
     "erasure": {
       "title": "Erase your data",
@@ -5872,7 +5877,7 @@
       "confirm": "Confirm removal",
       "submitting": "Removing…",
       "successTitle": "Removal complete",
-      "successBody": "Your data is no longer in the events address book.",
+      "successBody": "You will no longer receive invitations, starting now. Your email address has already been removed; your name and organization are deleted from the address book within one day.",
       "errors": {
         "generic": "Something went wrong. Please try again later."
       }

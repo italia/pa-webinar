@@ -4568,7 +4568,12 @@
       "addressBookTitle": "Pasākumu kontaktu grāmata",
       "addressBookIntro": "Jūs izvēlējāties palikt kontaktu grāmatā, lai jūs aicinātu uz līdzīgiem pasākumiem. Šos datus glabājam līdz {date}, ja vien neatsaucat piekrišanu vai nedodat jaunu.",
       "addressBookOptOut": "Izņemt manus datus no kontaktu grāmatas",
-      "consentFutureEffect": "Ja to atsauksiet, vairs nesaņemsiet paziņojumus par nākamajiem pasākumiem un izstāsieties no adrešu grāmatas visām savām reģistrācijām."
+      "consentFutureEffect": "Ja to atsauksiet, vairs nesaņemsiet paziņojumus par nākamajiem pasākumiem un izstāsieties no adrešu grāmatas visām savām reģistrācijām.",
+      "addressBookPendingTitle": "Atgriešanās kontaktu grāmatā jāapstiprina",
+      "addressBookPendingBody": "Šajā reģistrācijā tika atzīmēta kontaktu grāmatas izvēles rūtiņa, taču šī adrese vairs nesaņēma ielūgumus. Kamēr neapstiprināsi, nekas nemainīsies.",
+      "addressBookPendingEffect": "Ja apstiprināsi, atgriezīsies kontaktu grāmatā ar šīs reģistrācijas vārdu un organizāciju un atkal saņemsi ielūgumus. Ja atcelsi vai ja tas nebiji tu, paliksi ārpus kontaktu grāmatas un ielūgumus nesaņemsi.",
+      "addressBookPendingConfirm": "Apstiprināt atgriešanos",
+      "addressBookPendingCancel": "Atcelt pieprasījumu"
     },
     "erasure": {
       "title": "Jūsu datu dzēšana",

@@ -14,7 +14,8 @@ const { prisma, sessione } = vi.hoisted(() => {
     staffAccount: { findUnique: vi.fn() },
     adminAuditLog: { create: vi.fn() },
     person: { findUnique: vi.fn(), delete: vi.fn() },
-    eventInvitation: { deleteMany: vi.fn(), updateMany: vi.fn() },
+    eventInvitation: { findMany: vi.fn(), deleteMany: vi.fn(), updateMany: vi.fn() },
+    emailOutbox: { deleteMany: vi.fn() },
     $transaction: (fn: (tx: unknown) => unknown) => fn(prisma),
   };
   return { prisma, sessione: { cookie: undefined as string | undefined } };
@@ -103,6 +104,7 @@ beforeEach(async () => {
   await entra('ADMIN');
   prisma.person.findUnique.mockResolvedValue(persona());
   prisma.person.delete.mockResolvedValue({ id: PERSONA });
+  prisma.eventInvitation.findMany.mockResolvedValue([]);
 });
 
 describe('chi puo’ entrare', () => {

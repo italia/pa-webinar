@@ -37,6 +37,9 @@ vi.mock('@/lib/db', () => ({
 }));
 vi.mock('@/lib/settings', () => ({ getSettings: async () => siteSettings }));
 vi.mock('@/lib/persons', () => ({ upsertPersonOnRegistration: vi.fn(async () => null) }));
+vi.mock('@/lib/persons/inviti-fermati', () => ({
+  indirizzoFermato: vi.fn(async () => false),
+}));
 vi.mock('@/lib/email/confirmation', () => ({ sendConfirmationEmail: vi.fn() }));
 vi.mock('@/lib/questionnaires', async (importOriginal) => ({
   ...(await importOriginal<typeof Questionari>()),
@@ -49,6 +52,7 @@ import { hashEmail } from '@/lib/crypto/pii';
 import { sendConfirmationEmail } from '@/lib/email/confirmation';
 import { verifyRegistrationEntry } from '@/lib/events/registration-link';
 import { upsertPersonOnRegistration } from '@/lib/persons';
+import { indirizzoFermato } from '@/lib/persons/inviti-fermati';
 import { findEventQuestionnaireByPlacement, writeResponse } from '@/lib/questionnaires';
 import type * as Questionari from '@/lib/questionnaires';
 
@@ -628,6 +632,28 @@ describe('POST registrations — rubrica', () => {
   it('proposta, senza la spunta: nessun consenso alla rubrica', async () => {
     await iscriviti('anna@example.com');
     expect(vi.mocked(upsertPersonOnRegistration).mock.calls[0]?.[1]?.optedIn).toBe(false);
+  });
+
+  it('su un indirizzo con un ritiro la spunta resta in attesa: niente rubrica, niente consenso', async () => {
+    vi.mocked(indirizzoFermato).mockResolvedValueOnce(true);
+    await iscriviti('anna@example.com', conRubrica);
+    expect(vi.mocked(indirizzoFermato).mock.calls[0]?.[1]).toBe(hashEmail('anna@example.com'));
+    expect(vi.mocked(upsertPersonOnRegistration).mock.calls[0]?.[1]?.optedIn).toBe(false);
+    expect(iscrizioneScritta()).toMatchObject({
+      consentFutureCommunications: false,
+      addressBookPending: true,
+    });
+    expect(auditScritto()).toMatchObject({
+      consentAddressBook: false,
+      consentFutureCommunications: false,
+      addressBookPending: true,
+    });
+  });
+
+  it('senza spunta non cerca ritiri', async () => {
+    await iscriviti('anna@example.com');
+    expect(indirizzoFermato).not.toHaveBeenCalled();
+    expect(iscrizioneScritta()).toMatchObject({ addressBookPending: false });
   });
 
   async function nonScriveNulla() {

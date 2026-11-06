@@ -4,7 +4,6 @@
 import type { OrganizationType, Prisma, PrismaClient } from '@prisma/client';
 
 import { encryptPIIOrNull } from '@/lib/crypto/pii';
-import { riapriInviti } from '@/lib/persons/inviti-fermati';
 
 export interface PersonUpsertInput {
   emailHash: string;
@@ -29,8 +28,11 @@ type Tx = Prisma.TransactionClient | PrismaClient;
  *   esiste l'iscrizione ci si collega comunque.
  * - Con la spunta si scrivono nome, email e organizzazione di questa iscrizione,
  *   `optedInAt` riparte da adesso (e con lui i mesi di conservazione, vedi
- *   `lib/persons/retention`) e un ritiro precedente si annulla, con gli inviti
- *   fermati da quel ritiro.
+ *   `lib/persons/retention`) e il segno di un ritiro precedente si azzera.
+ *
+ * Una spunta dal modulo non annulla un ritiro: su un indirizzo con un ritiro o
+ * inviti fermati il chiamante passa `optedIn` falso (`indirizzoFermato`), e la
+ * spunta vale solo confermata (lib/persons/spunta-in-attesa).
  *
  * `null` se non c'e' una voce e la persona non l'ha chiesta.
  */
@@ -46,7 +48,6 @@ export async function upsertPersonOnRegistration(
   if (!input.optedIn) return existing?.id ?? null;
 
   const now = new Date();
-  await riapriInviti(tx, input.emailHash);
 
   // Nome ed email sono cifrati a riposo (AES-256-GCM). Gli altri campi restano
   // in chiaro perche' l'elenco dello staff li cerca e li filtra.

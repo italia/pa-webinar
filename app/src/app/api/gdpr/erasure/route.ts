@@ -12,7 +12,8 @@
  * ADR-011) with the same email-hash. Rows that only point at a
  * registration with onDelete SetNull, or not at all, are deleted
  * explicitly: feedback, questionnaire responses, chat messages (with
- * their attachment files), the invitations addressed to that email, the
+ * their attachment files), the invitations addressed to that email with
+ * their queued and sent emails, the
  * named grants with that email (with their photos, when no other event
  * uses them), the consents given entering the room with a staff account of
  * that email, and the outbox rows written for those registrations.
@@ -32,6 +33,7 @@
 import { withErrorHandling } from '@/lib/api-handler';
 import { AppError, RateLimitError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
+import { cancellaEmailInviti } from '@/lib/email/outbox';
 import { getClientIp, rateLimit } from '@/lib/rate-limit';
 import { TIMEOUT_DOPO_PULIZIA_MS } from '@/lib/gdpr/cleanup-selection';
 import { eraseRegistrations } from '@/lib/gdpr/erase-registrations';
@@ -81,7 +83,13 @@ export const POST = withErrorHandling(async (request) => {
 
   // Gli inviti portano nome, email cifrata e il link di iscrizione
   // precompilata: sono dati della stessa persona anche quando non si e' mai
-  // iscritta, quindi vanno via come la voce di rubrica.
+  // iscritta, quindi vanno via come la voce di rubrica, con le loro email: una
+  // persona cancellata non deve ricevere altro.
+  const inviti = await prisma.eventInvitation.findMany({
+    where: { emailHash },
+    select: { id: true },
+  });
+  await cancellaEmailInviti(prisma, inviti.map((i) => i.id));
   const invitations = await prisma.eventInvitation.deleteMany({ where: { emailHash } });
 
   // Le concessioni nominali con lo stesso indirizzo (nome, email, ente):

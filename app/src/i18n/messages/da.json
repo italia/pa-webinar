@@ -4568,7 +4568,12 @@
       "addressBookTitle": "Arrangementsadressebog",
       "addressBookIntro": "Du har valgt at blive i adressebogen for at blive inviteret til lignende arrangementer. Vi opbevarer disse data indtil {date}, medmindre du trækker samtykket tilbage eller giver et nyt.",
       "addressBookOptOut": "Fjern mine data fra adressebogen",
-      "consentFutureEffect": "Hvis du trækker det tilbage, modtager du ikke længere meddelelser om kommende arrangementer, og du fjernes fra adressebogen for alle dine tilmeldinger."
+      "consentFutureEffect": "Hvis du trækker det tilbage, modtager du ikke længere meddelelser om kommende arrangementer, og du fjernes fra adressebogen for alle dine tilmeldinger.",
+      "addressBookPendingTitle": "Tilbagevenden til adressebogen skal bekræftes",
+      "addressBookPendingBody": "Afkrydsningsfeltet til adressebogen blev markeret på denne tilmelding, men denne adresse var holdt op med at modtage invitationer. Intet ændrer sig, før du bekræfter.",
+      "addressBookPendingEffect": "Hvis du bekræfter, kommer du tilbage i adressebogen med navnet og organisationen fra denne tilmelding og modtager invitationer igen. Hvis du annullerer, eller hvis det ikke var dig, forbliver du uden for adressebogen og modtager ingen invitationer.",
+      "addressBookPendingConfirm": "Bekræft min tilbagevenden",
+      "addressBookPendingCancel": "Annuller anmodningen"
     },
     "erasure": {
       "title": "Sletning af dine data",

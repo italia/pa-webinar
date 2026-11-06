@@ -4568,7 +4568,12 @@
       "addressBookTitle": "Adresář událostí",
       "addressBookIntro": "Rozhodli jste se zůstat v adresáři, abyste byli zváni na podobné akce. Tyto údaje uchováváme do {date}, pokud souhlas neodvoláte nebo neudělíte nový.",
       "addressBookOptOut": "Odebrat mé údaje z adresáře",
-      "consentFutureEffect": "Pokud jej odvoláte, nebudete dostávat sdělení o dalších akcích a opustíte adresář, a to pro všechny své registrace."
+      "consentFutureEffect": "Pokud jej odvoláte, nebudete dostávat sdělení o dalších akcích a opustíte adresář, a to pro všechny své registrace.",
+      "addressBookPendingTitle": "Návrat do adresáře je třeba potvrdit",
+      "addressBookPendingBody": "U této registrace bylo zaškrtnuto políčko adresáře, ale tato adresa přestala dostávat pozvánky. Dokud nepotvrdíte, nic se nezmění.",
+      "addressBookPendingEffect": "Pokud potvrdíte, vrátíte se do adresáře se jménem a organizací z této registrace a budete znovu dostávat pozvánky. Pokud zrušíte nebo pokud jste to nebyli vy, zůstanete mimo adresář a pozvánky dostávat nebudete.",
+      "addressBookPendingConfirm": "Potvrdit návrat",
+      "addressBookPendingCancel": "Zrušit žádost"
     },
     "erasure": {
       "title": "Výmaz vašich údajů",

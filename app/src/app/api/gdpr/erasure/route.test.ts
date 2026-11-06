@@ -36,7 +36,8 @@ vi.mock('@/lib/auth/moderator', () => ({ invalidateModeratorCache: invalidate })
 vi.mock('@/lib/db', () => ({
   prisma: {
     person: { deleteMany: vi.fn() },
-    eventInvitation: { deleteMany: vi.fn() },
+    eventInvitation: { deleteMany: vi.fn(), findMany: vi.fn() },
+    emailOutbox: { deleteMany: vi.fn() },
     eventModerator: { deleteMany: vi.fn(), findMany: vi.fn() },
     eventPersonPhoto: { deleteMany: vi.fn() },
     profilePhoto: { deleteMany: vi.fn() },
@@ -66,7 +67,8 @@ import { POST } from './route';
 type Fn = ReturnType<typeof vi.fn>;
 const db = prisma as unknown as {
   person: { deleteMany: Fn };
-  eventInvitation: { deleteMany: Fn };
+  eventInvitation: { deleteMany: Fn; findMany: Fn };
+  emailOutbox: { deleteMany: Fn };
   eventModerator: { deleteMany: Fn; findMany: Fn };
   eventPersonPhoto: { deleteMany: Fn };
   profilePhoto: { deleteMany: Fn };
@@ -94,6 +96,8 @@ beforeEach(() => {
   vi.clearAllMocks();
   db.person.deleteMany.mockResolvedValue({ count: 1 });
   db.eventInvitation.deleteMany.mockResolvedValue({ count: 2 });
+  db.eventInvitation.findMany.mockResolvedValue([{ id: 'inv-1' }, { id: 'inv-2' }]);
+  db.emailOutbox.deleteMany.mockResolvedValue({ count: 2 });
   db.eventModerator.deleteMany.mockResolvedValue({ count: 1 });
   db.eventModerator.findMany.mockResolvedValue([{ id: 'grant-1', eventId: 'evt-1', token: 'tok-1', photoId: null }]);
   tx.recordingConsent.deleteMany.mockResolvedValue({ count: 1 });
@@ -203,6 +207,22 @@ describe('POST /api/gdpr/erasure', () => {
     expect(await res.json()).toMatchObject({ ok: true, attachmentFilesNotDeleted: 1 });
     expect(errore).toHaveBeenCalled();
     errore.mockRestore();
+  });
+
+  it('deletes the emails of the erased invitations, queued or sent, before the invitations', async () => {
+    db.registration.findMany.mockResolvedValue([]);
+    await POST(req('valido') as never, ctx as never);
+    expect(db.emailOutbox.deleteMany).toHaveBeenCalledWith({
+      where: {
+        OR: [
+          { dedupKey: { startsWith: 'event-invitation:inv-1:' } },
+          { dedupKey: { startsWith: 'event-invitation:inv-2:' } },
+        ],
+      },
+    });
+    expect(db.emailOutbox.deleteMany.mock.invocationCallOrder[0]!).toBeLessThan(
+      db.eventInvitation.deleteMany.mock.invocationCallOrder[0]!
+    );
   });
 
   it('deletes address-book entry and invitations even when no registration is left', async () => {

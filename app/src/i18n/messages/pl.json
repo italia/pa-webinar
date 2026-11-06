@@ -4568,7 +4568,12 @@
       "addressBookTitle": "Książka adresowa wydarzeń",
       "addressBookIntro": "Zdecydowałeś(-aś) się pozostać w książce adresowej, aby otrzymywać zaproszenia na podobne wydarzenia. Przechowujemy te dane do {date}, chyba że wycofasz zgodę lub wyrazisz ją ponownie.",
       "addressBookOptOut": "Usuń moje dane z książki adresowej",
-      "consentFutureEffect": "Jeśli ją wycofasz, nie będziesz już otrzymywać komunikatów o kolejnych wydarzeniach i wypiszesz się z książki adresowej, dla wszystkich swoich rejestracji."
+      "consentFutureEffect": "Jeśli ją wycofasz, nie będziesz już otrzymywać komunikatów o kolejnych wydarzeniach i wypiszesz się z książki adresowej, dla wszystkich swoich rejestracji.",
+      "addressBookPendingTitle": "Powrót do książki adresowej do potwierdzenia",
+      "addressBookPendingBody": "Przy tej rejestracji zaznaczono pole książki adresowej, ale ten adres przestał otrzymywać zaproszenia. Dopóki nie potwierdzisz, nic się nie zmieni.",
+      "addressBookPendingEffect": "Jeśli potwierdzisz, wrócisz do książki adresowej z imieniem i nazwiskiem oraz organizacją z tej rejestracji i znów będziesz otrzymywać zaproszenia. Jeśli anulujesz lub jeśli to nie Ty, pozostaniesz poza książką adresową i nie będziesz otrzymywać zaproszeń.",
+      "addressBookPendingConfirm": "Potwierdź powrót",
+      "addressBookPendingCancel": "Anuluj prośbę"
     },
     "erasure": {
       "title": "Usunięcie Twoich danych",

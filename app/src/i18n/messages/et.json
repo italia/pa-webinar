@@ -4568,7 +4568,12 @@
       "addressBookTitle": "Ürituste aadressraamat",
       "addressBookIntro": "Valisite jääda aadressraamatusse, et teid kutsutaks sarnastele üritustele. Säilitame neid andmeid kuni {date}, välja arvatud juhul, kui võtate nõusoleku tagasi või annate uue.",
       "addressBookOptOut": "Eemalda minu andmed aadressraamatust",
-      "consentFutureEffect": "Kui selle tagasi võtate, ei saa te enam teateid järgmiste ürituste kohta ja lahkute aadressiraamatust kõigi oma registreerimiste puhul."
+      "consentFutureEffect": "Kui selle tagasi võtate, ei saa te enam teateid järgmiste ürituste kohta ja lahkute aadressiraamatust kõigi oma registreerimiste puhul.",
+      "addressBookPendingTitle": "Aadressraamatusse naasmine vajab kinnitust",
+      "addressBookPendingBody": "Selle registreerimise juures märgiti aadressraamatu ruut, kuid see aadress oli lakanud kutseid saamast. Enne kinnitamist ei muutu midagi.",
+      "addressBookPendingEffect": "Kui kinnitad, naased aadressraamatusse selle registreerimise nime ja asutusega ning saad taas kutseid. Kui tühistad või kui see polnud sina, jääd aadressraamatust välja ega saa kutseid.",
+      "addressBookPendingConfirm": "Kinnita naasmine",
+      "addressBookPendingCancel": "Tühista taotlus"
     },
     "erasure": {
       "title": "Teie andmete kustutamine",

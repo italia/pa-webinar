@@ -296,6 +296,16 @@ describe('la traccia della consegna', () => {
 });
 
 describe('testo letto', () => {
+  it('riporta la spunta della rubrica che aspetta la conferma', async () => {
+    prisma.registration.findMany.mockResolvedValue([
+      iscrizione('r1', 'e1', { addressBookPending: true }),
+    ]);
+    const corpo = (await (await conToken()).json()) as {
+      data: Array<{ registration: Record<string, unknown> }>;
+    };
+    expect(corpo.data[0]!.registration.addressBookPending).toBe(true);
+  });
+
   it('riporta la destinazione e la versione del consenso alla registrazione', async () => {
     prisma.registration.findMany.mockResolvedValue([
       iscrizione('r1', 'e1', {

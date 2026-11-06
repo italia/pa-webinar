@@ -4568,7 +4568,12 @@
       "addressBookTitle": "Imenik događaja",
       "addressBookIntro": "Odabrali ste ostati u imeniku kako biste bili pozivani na slične događaje. Ove podatke čuvamo do {date}, osim ako povučete privolu ili date novu.",
       "addressBookOptOut": "Ukloni moje podatke iz imenika",
-      "consentFutureEffect": "Ako je povučete, više nećete primati obavijesti o sljedećim događajima i izlazite iz adresara, za sve svoje prijave."
+      "consentFutureEffect": "Ako je povučete, više nećete primati obavijesti o sljedećim događajima i izlazite iz adresara, za sve svoje prijave.",
+      "addressBookPendingTitle": "Povratak u imenik treba potvrditi",
+      "addressBookPendingBody": "Na ovoj prijavi označeno je polje imenika, ali ova je adresa prestala primati pozivnice. Dok ne potvrdite, ništa se ne mijenja.",
+      "addressBookPendingEffect": "Ako potvrdite, vraćate se u imenik s imenom i organizacijom iz ove prijave i ponovno primate pozivnice. Ako odustanete ili ako to niste bili vi, ostajete izvan imenika i ne primate pozivnice.",
+      "addressBookPendingConfirm": "Potvrdi povratak",
+      "addressBookPendingCancel": "Poništi zahtjev"
     },
     "erasure": {
       "title": "Brisanje vaših podataka",
