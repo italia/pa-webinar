@@ -265,7 +265,8 @@ it admits no guests. An invitation is stopped (`declinedAt`, UI **Receives no
 invitations**) when the person must not be contacted any more: nothing is sent
 for it, and on an event not open to anyone the row keeps its access. The stop
 follows the address: a new row for it starts stopped, and only a confirmed
-address-book tick lifts it.
+address-book tick lifts it, with the limit in
+[Known limitations](GDPR.md#known-limitations).
 [From creation to recap](architecture/event-journey.md#invitations-and-named-grants)
 
 **Join password** (`joinPasswordHash`): an optional per-event password asked

@@ -456,7 +456,7 @@ The wizard's **People** step handles four different things: the organizing entit
 
 Staff send the invitations from the event page (`POST /api/admin/events/{id}/invitations/send`), only while the event accepts registrations; `sendInvitations()` in `app/src/lib/email/invitation.ts` generates the personal link (`token`) and skips a stopped row.
 
-An invitation stops when the person must not be contacted any more (`declinedAt`, `fermaInviti()`), and its emails still in the outbox are cancelled. The stop follows the address: a new row for it starts stopped, a row that takes that address stays stopped, and only a confirmed address-book tick lifts it ([Invitations after a withdrawal](../adr/011-person-rubrica.md#invitations-after-a-withdrawal)). An erasure deletes the rows and their emails.
+An invitation stops when the person must not be contacted any more (`declinedAt`, `fermaInviti()`), and its emails still in the outbox are cancelled. The stop follows the address: a new row for it starts stopped, a row that takes that address stays stopped, and only a confirmed address-book tick lifts it ([Invitations after a withdrawal](../adr/011-person-rubrica.md#invitations-after-a-withdrawal)), with the limit in [Known limitations](../GDPR.md#known-limitations). An erasure deletes the rows and their emails.
 
 ## Access modes
 
