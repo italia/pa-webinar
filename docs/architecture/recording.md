@@ -574,7 +574,9 @@ milliseconds of the first recorded frame. The portal:
    marks the recording `POSTPROD_FAILED` instead of enqueueing. The tracks
    stay stored; the failure is visible in the administration area and can be
    re-run. The guard fails open: a track without size or duration disables it;
-4. otherwise enqueues post-production with a `TRANSCRIBE_MULTITRACK` root job.
+4. otherwise enqueues post-production with a `TRANSCRIBE_MULTITRACK` root job,
+   unless no track can be transcribed: then it enqueues nothing and logs a
+   warning ([How work enters the queue](../POSTPROD.md#how-work-enters-the-queue)).
    The enqueue is idempotent per recording and pipeline run
    (`Recording.runCount`).
 

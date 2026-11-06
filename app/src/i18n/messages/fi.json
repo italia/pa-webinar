@@ -5979,6 +5979,8 @@
     "recordingWithoutMedia": "Tässä tallenteessa ei ole videota: sen litterointi tulee suorista tekstityksistä.",
     "recordingWithoutVideo": "Tästä tallenteesta on osallistujien ääniraidat mutta ei videota: sitä ei tallennettu, tai se ei ole vielä saapunut. Ladattava arkisto tarvitsee myös videon.",
     "noParticipantTracks": "Osallistujista ei ole erillisiä ääniraitoja: niitä ei tallennettu tai ne on jo poistettu. Jos tarvitset niitä, ota osallistujakohtainen tallennus käyttöön ennen tapahtumaa.",
+    "noTranscribableTracks": "No track of this recording can be transcribed: they were deleted, or the people in them did not consent to a transcription with their name.",
+    "tracksPending": "The tracks of this recording have not arrived yet: the transcription will start by itself when they do.",
     "summaryMissing": "Tällä kielellä ei ole vielä muokattavaa yhteenvetoa: luo se ensin.",
     "storageUnavailable": "Tiedostojen lataaminen ei ole käytettävissä tässä asennuksessa.",
     "aiDisabledForEvent": "Tekoäly on pois päältä tässä tapahtumassa: ota se käyttöön ja käynnistä käsittely painikkeella ”Luo tekoälyllä”.",

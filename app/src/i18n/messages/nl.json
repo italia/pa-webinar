@@ -5979,6 +5979,8 @@
     "recordingWithoutMedia": "Deze opname heeft geen video: de transcriptie komt van de live-ondertiteling.",
     "recordingWithoutVideo": "Van deze opname zijn er de audiosporen van de deelnemers, maar niet de video: die is niet opgenomen of nog niet binnen. Het downloadbare archief heeft ook de video nodig.",
     "noParticipantTracks": "Er zijn geen afzonderlijke audiosporen van de deelnemers: ze zijn niet opgenomen of al verwijderd. Zet daarvoor vóór het evenement de opname per deelnemer aan.",
+    "noTranscribableTracks": "No track of this recording can be transcribed: they were deleted, or the people in them did not consent to a transcription with their name.",
+    "tracksPending": "The tracks of this recording have not arrived yet: the transcription will start by itself when they do.",
     "summaryMissing": "Er is in deze taal nog geen samenvatting om te bewerken: genereer die eerst.",
     "storageUnavailable": "Bestanden uploaden is niet beschikbaar op deze installatie.",
     "aiDisabledForEvent": "AI staat uit voor dit evenement: gebruik ‘AI genereren’ om het aan te zetten en de verwerking te starten.",

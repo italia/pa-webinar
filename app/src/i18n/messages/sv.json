@@ -5979,6 +5979,8 @@
     "recordingWithoutMedia": "Den här inspelningen har ingen video: dess transkription kommer från livetextningen.",
     "recordingWithoutVideo": "Från den här inspelningen finns deltagarnas ljudspår men inte videon: den spelades inte in, eller så har den inte kommit än. Det nedladdningsbara arkivet kräver också videon.",
     "noParticipantTracks": "Det finns inga separata ljudspår för deltagarna: de spelades inte in eller har redan raderats. Slå på inspelning per deltagare före evenemanget för att få dem.",
+    "noTranscribableTracks": "No track of this recording can be transcribed: they were deleted, or the people in them did not consent to a transcription with their name.",
+    "tracksPending": "The tracks of this recording have not arrived yet: the transcription will start by itself when they do.",
     "summaryMissing": "Det finns ännu ingen sammanfattning att redigera på det här språket: generera den först.",
     "storageUnavailable": "Filuppladdning är inte tillgänglig i den här installationen.",
     "aiDisabledForEvent": "AI är avstängd för det här evenemanget: använd ”Generera AI” för att slå på den och starta bearbetningen.",

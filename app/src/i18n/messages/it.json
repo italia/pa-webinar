@@ -5979,6 +5979,8 @@
     "recordingWithoutMedia": "Questa registrazione non ha un video: la sua trascrizione viene dai sottotitoli della diretta.",
     "recordingWithoutVideo": "Di questa registrazione ci sono le tracce audio dei partecipanti ma non il video: non è stato registrato, o non è ancora arrivato. L'archivio scaricabile richiede anche il video.",
     "noParticipantTracks": "Non ci sono tracce audio separate dei partecipanti: non sono state registrate o sono già state cancellate. Per averle, attiva la registrazione per partecipante prima dell'evento.",
+    "noTranscribableTracks": "Nessuna traccia di questa registrazione si può trascrivere: sono state cancellate, oppure chi vi compare non ha acconsentito alla trascrizione con il nome.",
+    "tracksPending": "Le tracce di questa registrazione non sono ancora arrivate: la trascrizione partirà da sola quando arrivano.",
     "summaryMissing": "Per questa lingua non c'è ancora una sintesi da modificare: generala prima.",
     "storageUnavailable": "Il caricamento di file non è disponibile su questa installazione.",
     "aiDisabledForEvent": "L'AI è spenta per questo evento: usa «Genera AI» per accenderla e avviare la pipeline.",

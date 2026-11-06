@@ -22,8 +22,13 @@ import { deriveIdempotencyKey } from './idempotency';
 import { parseTargetLocales } from './providers';
 import { SOURCE_LANGUAGE_FALLBACK } from './target-locales';
 import { isMultitrackPlaceholder } from '@/lib/recorder/lifecycle';
-import { registrazioneSoloSottotitoli, trascrizioneCorrettaDaiSottotitoli } from '@/lib/captions/transcript';
+import {
+  registrazioneConMedia,
+  registrazioneSoloSottotitoli,
+  trascrizioneCorrettaDaiSottotitoli,
+} from '@/lib/captions/transcript';
 
+import { erroreTracceAssenti, tracceUtilizzabili } from './track-inputs';
 import { confermaVociNecessaria, erroreConfermaVoci } from './voice-consent';
 
 export interface EnqueueOptions {
@@ -50,6 +55,13 @@ export interface EnqueueOptions {
    * niente in silenzio (il webhook della registrazione, che nessuno guarda).
    */
   seServeConferma?: 'errore' | 'salta';
+  /**
+   * Cosa fare se la trascrizione multitraccia nascerebbe senza tracce:
+   * `errore` (predefinito) lancia il 422 per chi la avvia a mano, salvo che le
+   * tracce debbano ancora arrivare (`tracksPending`); `salta` non accoda niente
+   * (il manifest del registratore, che nessuno guarda).
+   */
+  seMancanoTracce?: 'errore' | 'salta';
 }
 
 export interface EnqueueResult {
@@ -61,6 +73,13 @@ export interface EnqueueResult {
    * consenso voce per voce si trascrive solo con la conferma esplicita.
    */
   voiceConsentRequired?: boolean;
+  /** Niente accodato: nessuna traccia per persona si puo' trascrivere. */
+  noTranscribableTracks?: boolean;
+  /**
+   * Niente accodato: il registratore non ha ancora consegnato le tracce. Il
+   * manifest accodera' la pipeline da solo, se l'AI resta accesa sull'evento.
+   */
+  tracksPending?: boolean;
 }
 
 /**
@@ -162,6 +181,43 @@ export async function enqueuePostprodForRecording(
     return { enqueued: 0, skippedExisting: 0, jobIds: [], voiceConsentRequired: true };
   }
 
+  const payloadRadice = { runId: recording.id, sourceLanguage };
+  // Senza tracce da trascrivere il lavoro radice fallirebbe a ogni tentativo su
+  // un worker con la GPU: non nasce. Conta solo se nascerebbe davvero: su una
+  // radice in coda, in corso o conclusa, con le tracce magari gia' cancellate,
+  // questo giro puo' aggiungere soltanto sintesi e traduzioni. Una radice
+  // fallita non fara' mai partire quei lavori, quindi non vale come eccezione.
+  if (isMultitrack) {
+    const radice = await tx.postprodJob.findUnique({
+      where: {
+        idempotencyKey: deriveIdempotencyKey({
+          recordingId: recording.id,
+          kind: 'TRANSCRIBE_MULTITRACK',
+          runCount,
+          payload: payloadRadice,
+        }),
+      },
+      select: { status: true },
+    });
+    const tracce =
+      radice && radice.status !== 'FAILED'
+        ? null
+        : await tracceUtilizzabili(tx, { ...recording, eventId: recording.event.id }, { daTrascrivere: true });
+    if (tracce?.length === 0) {
+      if (opts.seMancanoTracce === 'salta') {
+        return { enqueued: 0, skippedExisting: 0, jobIds: [], noTranscribableTracks: true };
+      }
+      // Il segnaposto nasce con il registratore, le righe e l'inizio del media
+      // arrivano con il manifest: finche' mancano entrambi le tracce non ci
+      // sono ancora, non sono state cancellate.
+      const inArrivo =
+        !registrazioneConMedia(recording) &&
+        (await tx.recordingTrack.count({ where: { recordingId: recording.id } })) === 0;
+      if (!inArrivo) throw erroreTracceAssenti();
+      return { enqueued: 0, skippedExisting: 0, jobIds: [], tracksPending: true };
+    }
+  }
+
   // Snapshot consent flags at enqueue time. Even if an admin flips
   // them off later, already-produced artifacts remain governed by the
   // snapshot until manual purge.
@@ -214,10 +270,7 @@ export async function enqueuePostprodForRecording(
 
   pending.push({
     kind: isMultitrack ? 'TRANSCRIBE_MULTITRACK' : 'TRANSCRIBE',
-    payload: {
-      runId: recording.id,
-      sourceLanguage,
-    },
+    payload: payloadRadice,
     key: transcribeKey,
   });
 

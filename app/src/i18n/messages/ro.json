@@ -5979,6 +5979,8 @@
     "recordingWithoutMedia": "Această înregistrare nu are video: transcrierea ei provine din subtitrările transmisiei.",
     "recordingWithoutVideo": "Din această înregistrare există pistele audio ale participanților, dar nu și video: nu a fost înregistrat sau nu a sosit încă. Arhiva descărcabilă are nevoie și de video.",
     "noParticipantTracks": "Nu există piste audio separate ale participanților: nu au fost înregistrate sau au fost deja șterse. Pentru a le avea, activează înregistrarea pe participant înainte de eveniment.",
+    "noTranscribableTracks": "No track of this recording can be transcribed: they were deleted, or the people in them did not consent to a transcription with their name.",
+    "tracksPending": "The tracks of this recording have not arrived yet: the transcription will start by itself when they do.",
     "summaryMissing": "Încă nu există un rezumat de editat în această limbă: generează-l mai întâi.",
     "storageUnavailable": "Încărcarea fișierelor nu este disponibilă în această instalare.",
     "aiDisabledForEvent": "AI este oprită pentru acest eveniment: folosește „Generează AI” pentru a o porni și a lansa procesarea.",

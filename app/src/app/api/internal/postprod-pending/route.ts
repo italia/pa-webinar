@@ -5,7 +5,8 @@
  * GET /api/internal/postprod-pending
  *
  * Orchestrator → app: returns how many worker Jobs the cron should
- * keep running on the GPU pool. Output:
+ * keep running on the GPU pool, after closing the queued multitrack
+ * transcriptions left without tracks (lib/ai/track-inputs). Output:
  *
  *   {
  *     "pipelineEnabled": true,
@@ -52,6 +53,7 @@ import { assertCronApiKey } from '@/lib/auth/cron';
 import { prisma } from '@/lib/db';
 import { GPU_WORKER_KINDS, LLM_JOB_KINDS, MT_JOB_KINDS } from '@/lib/ai/job-classes';
 import { resolveMtProvider } from '@/lib/ai/providers';
+import { chiudiLavoriInCodaSenzaTracce } from '@/lib/ai/track-inputs';
 
 export const dynamic = 'force-dynamic';
 
@@ -94,6 +96,12 @@ export const GET = withErrorHandling(async (request) => {
       desiredWithoutMt: 0,
     });
   }
+
+  // Un lavoro rimasto senza tracce non deve accendere la GPU. Se il controllo
+  // fallisce la coda va avanti: quel lavoro si chiude comunque al claim.
+  await chiudiLavoriInCodaSenzaTracce().catch((err) => {
+    console.warn('[postprod-pending] check of queued jobs without tracks failed', err);
+  });
 
   // Pronto per il claim: le stesse condizioni dell'endpoint di claim, cosi'
   // l'orchestratore e il claim vedono la stessa coda.

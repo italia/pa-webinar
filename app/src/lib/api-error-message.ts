@@ -28,6 +28,8 @@ export type ApiErrorKey =
   | 'recordingWithoutVideo'
   | 'transcriptCorrected'
   | 'noParticipantTracks'
+  | 'noTranscribableTracks'
+  | 'tracksPending'
   | 'summaryMissing'
   | 'storageUnavailable'
   | 'aiDisabledForEvent'
@@ -44,6 +46,8 @@ export const API_ERROR_CODES = {
   RECORDING_WITHOUT_VIDEO: 'recordingWithoutVideo',
   TRANSCRIPT_CORRECTED: 'transcriptCorrected',
   NO_PARTICIPANT_TRACKS: 'noParticipantTracks',
+  NO_TRANSCRIBABLE_TRACKS: 'noTranscribableTracks',
+  TRACKS_PENDING: 'tracksPending',
   SUMMARY_MISSING: 'summaryMissing',
   STORAGE_UNAVAILABLE: 'storageUnavailable',
   AI_DISABLED_FOR_EVENT: 'aiDisabledForEvent',

@@ -5979,6 +5979,8 @@
     "recordingWithoutMedia": "Din ir-reġistrazzjoni m'għandhiex vidjo: it-traskrizzjoni tagħha ġejja mis-sottotitoli diretti.",
     "recordingWithoutVideo": "Minn din ir-reġistrazzjoni hemm il-korsiet tal-awdjo tal-parteċipanti, iżda mhux il-vidjo: ma ġiex irreġistrat jew għadu ma waslx. L-arkivju li jitniżżel jeħtieġ ukoll il-vidjo.",
     "noParticipantTracks": "M'hemmx korsiet tal-awdjo separati tal-parteċipanti: ma ġewx irreġistrati jew diġà tħassru. Biex ikollok dawn, ixgħel ir-reġistrazzjoni għal kull parteċipant qabel l-avveniment.",
+    "noTranscribableTracks": "No track of this recording can be transcribed: they were deleted, or the people in them did not consent to a transcription with their name.",
+    "tracksPending": "The tracks of this recording have not arrived yet: the transcription will start by itself when they do.",
     "summaryMissing": "Għadu m'hemmx sommarju x'teditja f'din il-lingwa: oħolqu l-ewwel.",
     "storageUnavailable": "It-tlugħ tal-fajls mhux disponibbli f'din l-installazzjoni.",
     "aiDisabledForEvent": "L-IA hija mitfija għal dan l-avveniment: uża «Iġġenera l-AI» biex tixgħelha u tibda l-ipproċessar.",

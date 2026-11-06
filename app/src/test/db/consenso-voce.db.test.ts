@@ -16,7 +16,10 @@ import { POST as generaPerRegistrazione } from '@/app/api/admin/postprod/recordi
 import { POST as rilancia } from '@/app/api/admin/postprod/recordings/[id]/rerun/route';
 import { GET as trascrizione } from '@/app/api/events/[param]/postprod/transcript/route';
 import { POST as prendiLavoro } from '@/app/api/internal/postprod-claim/route';
+import { POST as manifest } from '@/app/api/internal/multitrack-manifest/route';
+import { GET as contaCoda } from '@/app/api/internal/postprod-pending/route';
 import { POST as webhook } from '@/app/api/webhooks/recording/route';
+import { MOTIVO_TRACCE_ASSENTI } from '@/lib/ai/track-inputs';
 import { CAPTIONS_TRANSCRIPT_MODEL } from '@/lib/captions/transcript';
 import { encryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
@@ -79,6 +82,57 @@ function arriva(evento: { jitsiRoomName: string }) {
       },
       CHIAVE
     ) as never,
+    { params: Promise.resolve({}) }
+  );
+}
+
+/** Una traccia con il consenso della persona, al testo della versione data. */
+async function tracciaDiIscritto(eventId: string, recordingId: string, versione: number) {
+  const { iscrizione, endpoint } = await personaInSala(eventId, versione);
+  await prisma.recordingTrack.create({
+    data: { recordingId, participantId: endpoint, blobKey: `tracce/${randomUUID()}.ogg` },
+  });
+  return iscrizione;
+}
+
+async function personaInSala(eventId: string, versione: number) {
+  const iscrizione = await creaIscrizione(eventId);
+  await prisma.registration.update({
+    where: { id: iscrizione.id },
+    data: { consentMultitrack: true, consentMultitrackVersion: versione },
+  });
+  const endpoint = `ep-${randomUUID()}`;
+  await prisma.roomOccupant.create({
+    data: { eventId, endpointId: endpoint, seatId: `reg-${iscrizione.id}-a`, joinedAt: new Date() },
+  });
+  return { iscrizione, endpoint };
+}
+
+/** Il segnaposto multitraccia, come lo lascia il registratore in diretta. */
+async function creaSegnaposto(eventId: string) {
+  const rec = await creaRegistrazione(eventId);
+  return prisma.recording.update({
+    where: { id: rec.id },
+    data: { blobKey: `recordings/multitrack/${eventId}/` },
+  });
+}
+
+function consegnaTracce(eventId: string, recordingId: string, participantId: string) {
+  return manifest(
+    new Request('http://localhost/api/internal/multitrack-manifest', {
+      method: 'POST',
+      headers: { 'x-api-key': CHIAVE, 'content-type': 'application/json' },
+      body: JSON.stringify({
+        eventId,
+        recordingId,
+        tracks: [
+          {
+            participantId,
+            blobKey: `recordings/multitrack/${eventId}/${recordingId}/${randomUUID()}.ogg`,
+          },
+        ],
+      }),
+    }) as never,
     { params: Promise.resolve({}) }
   );
 }
@@ -199,15 +253,216 @@ describe('il video nuovo senza tracce per persona', () => {
   it('con le tracce per persona la pipeline parte da sola, senza conferma', async () => {
     const evento = await eventoConcluso({ multitrackRecordingEnabled: true });
     const rec = await creaRegistrazione(evento.id);
-    await prisma.recordingTrack.create({
-      data: { recordingId: rec.id, blobKey: 'tracce/a.opus', participantId: 'ep-1' },
-    });
+    await tracciaDiIscritto(evento.id, rec.id, 2);
     await entraCome('ADMIN');
     expect((await genera(evento.id)).status).toBe(200);
     const lavori = await prisma.postprodJob.findMany({ select: { kind: true } });
     expect(lavori.map((l) => l.kind)).toContain('TRANSCRIBE_MULTITRACK');
     await expect(voceTrascrizione(evento.id)).resolves.not.toMatchObject({
       caso: 'daConfermare',
+    });
+  });
+
+  describe('tracce che nessun consenso lascia trascrivere', () => {
+    it('avviare da’ 422, nessun lavoro, e gli interruttori tornano com’erano', async () => {
+      const evento = await eventoConcluso({
+        multitrackRecordingEnabled: true,
+        aiTranscriptEnabled: false,
+      });
+      const rec = await creaRegistrazione(evento.id);
+      await tracciaDiIscritto(evento.id, rec.id, 1);
+      await entraCome('ADMIN');
+
+      const risposta = await genera(evento.id);
+
+      expect(risposta.status).toBe(422);
+      expect(await risposta.json()).toMatchObject({ code: 'NO_TRANSCRIBABLE_TRACKS' });
+      expect(await prisma.postprodJob.count()).toBe(0);
+      const dopo = await prisma.event.findUniqueOrThrow({ where: { id: evento.id } });
+      expect(dopo.aiTranscriptEnabled).toBe(false);
+    });
+
+    it('un rilancio lascia la registrazione e il contatore dove sono', async () => {
+      const evento = await eventoConcluso({ multitrackRecordingEnabled: true });
+      const rec = await creaRegistrazione(evento.id);
+      await tracciaDiIscritto(evento.id, rec.id, 1);
+      await entraCome('ADMIN');
+
+      const risposta = await rilancia(
+        richiesta(`/api/admin/postprod/recordings/${rec.id}/rerun`, 'POST', {}) as never,
+        { params: Promise.resolve({ id: rec.id }) }
+      );
+
+      expect(risposta.status).toBe(422);
+      const dopo = await prisma.recording.findUniqueOrThrow({ where: { id: rec.id } });
+      expect(dopo).toMatchObject({ runCount: rec.runCount, status: rec.status });
+    });
+
+    it('un lavoro rimasto senza tracce in coda si chiude prima di contare la coda', async () => {
+      const evento = await eventoConcluso({ multitrackRecordingEnabled: true });
+      const rec = await creaRegistrazione(evento.id);
+      await tracciaDiIscritto(evento.id, rec.id, 1);
+      await prisma.recording.update({ where: { id: rec.id }, data: { status: 'POSTPROD_QUEUED' } });
+      const lavoro = await prisma.postprodJob.create({
+        data: {
+          recordingId: rec.id,
+          kind: 'TRANSCRIBE_MULTITRACK',
+          payload: { runId: randomUUID(), sourceLanguage: 'it' },
+          idempotencyKey: randomUUID(),
+          status: 'PENDING',
+        },
+      });
+
+      const risposta = await contaCoda(
+        new Request('http://localhost/api/internal/postprod-pending', {
+          headers: { 'x-api-key': CHIAVE },
+        }) as never,
+        { params: Promise.resolve({}) }
+      );
+
+      expect(await risposta.json()).toMatchObject({ runnable: 0, desiredGpu: 0 });
+      expect(await prisma.postprodJob.findUniqueOrThrow({ where: { id: lavoro.id } })).toMatchObject({
+        status: 'FAILED',
+        lastError: MOTIVO_TRACCE_ASSENTI,
+      });
+      expect(await prisma.recording.findUniqueOrThrow({ where: { id: rec.id } })).toMatchObject({
+        status: 'POSTPROD_PARTIAL',
+      });
+    });
+
+    it('una radice chiusa senza tracce non si riapre con Genera AI', async () => {
+      const evento = await eventoConcluso({ multitrackRecordingEnabled: true, aiSummaryEnabled: true });
+      const rec = await creaRegistrazione(evento.id);
+      const iscrizione = await tracciaDiIscritto(evento.id, rec.id, 2);
+      await entraCome('ADMIN');
+      expect((await genera(evento.id, { summary: true })).status).toBe(200);
+
+      await prisma.registration.update({
+        where: { id: iscrizione.id },
+        data: { consentMultitrackVersion: 1 },
+      });
+      const coda = await contaCoda(
+        new Request('http://localhost/api/internal/postprod-pending', {
+          headers: { 'x-api-key': CHIAVE },
+        }) as never,
+        { params: Promise.resolve({}) }
+      );
+      expect(await coda.json()).toMatchObject({ desiredGpu: 0 });
+      expect(await prisma.recording.findUniqueOrThrow({ where: { id: rec.id } })).toMatchObject({
+        status: 'POSTPROD_PARTIAL',
+      });
+
+      const risposta = await genera(evento.id, { summary: true });
+
+      expect(risposta.status).toBe(422);
+      expect(await risposta.json()).toMatchObject({ code: 'NO_TRANSCRIBABLE_TRACKS' });
+      expect(await prisma.recording.findUniqueOrThrow({ where: { id: rec.id } })).toMatchObject({
+        status: 'POSTPROD_PARTIAL',
+      });
+    });
+
+    it('un lavoro con una traccia trascrivibile resta in coda', async () => {
+      const evento = await eventoConcluso({ multitrackRecordingEnabled: true });
+      const rec = await creaRegistrazione(evento.id);
+      await tracciaDiIscritto(evento.id, rec.id, 2);
+      await prisma.postprodJob.create({
+        data: {
+          recordingId: rec.id,
+          kind: 'TRANSCRIBE_MULTITRACK',
+          payload: { runId: randomUUID(), sourceLanguage: 'it' },
+          idempotencyKey: randomUUID(),
+          status: 'PENDING',
+        },
+      });
+
+      const risposta = await contaCoda(
+        new Request('http://localhost/api/internal/postprod-pending', {
+          headers: { 'x-api-key': CHIAVE },
+        }) as never,
+        { params: Promise.resolve({}) }
+      );
+
+      expect(await risposta.json()).toMatchObject({ runnable: 1, desiredGpu: 1 });
+    });
+  });
+
+  describe('tracce che il registratore non ha ancora consegnato', () => {
+    it('Genera AI lascia accesa l’AI e il manifest fa partire la pipeline', async () => {
+      const evento = await eventoConcluso({
+        multitrackRecordingEnabled: true,
+        aiTranscriptEnabled: false,
+      });
+      const rec = await creaSegnaposto(evento.id);
+      await entraCome('ADMIN');
+
+      const risposta = await genera(evento.id, { summary: true });
+
+      expect(risposta.status).toBe(200);
+      expect(await risposta.json()).toMatchObject({ enqueued: 0, tracksPending: true });
+      expect(await prisma.postprodJob.count()).toBe(0);
+      expect(await prisma.recording.findUniqueOrThrow({ where: { id: rec.id } })).toMatchObject({
+        status: 'READY',
+      });
+      expect(await prisma.event.findUniqueOrThrow({ where: { id: evento.id } })).toMatchObject({
+        aiTranscriptEnabled: true,
+        aiSummaryEnabled: true,
+      });
+
+      const { endpoint } = await personaInSala(evento.id, 2);
+      const consegna = await consegnaTracce(evento.id, rec.id, endpoint);
+
+      expect(consegna.status).toBe(200);
+      const lavori = await prisma.postprodJob.findMany({ select: { kind: true } });
+      expect(lavori.map((l) => l.kind).sort()).toEqual(['SUMMARIZE', 'TRANSCRIBE_MULTITRACK']);
+      expect(await prisma.recording.findUniqueOrThrow({ where: { id: rec.id } })).toMatchObject({
+        status: 'POSTPROD_QUEUED',
+      });
+    });
+
+    it('Genera AI dalla registrazione risponde allo stesso modo', async () => {
+      const evento = await eventoConcluso({ aiTranscriptEnabled: false });
+      const rec = await creaSegnaposto(evento.id);
+      await entraCome('ADMIN');
+
+      const risposta = await generaPerRegistrazione(
+        richiesta(`/api/admin/postprod/recordings/${rec.id}/generate-ai`, 'POST', {}) as never,
+        { params: Promise.resolve({ id: rec.id }) }
+      );
+
+      expect(await risposta.json()).toMatchObject({ enqueued: 0, tracksPending: true });
+    });
+
+    it('un rilancio lo dice e lascia registrazione e contatore dove sono', async () => {
+      const evento = await eventoConcluso();
+      const rec = await creaSegnaposto(evento.id);
+      await entraCome('ADMIN');
+
+      const risposta = await rilancia(
+        richiesta(`/api/admin/postprod/recordings/${rec.id}/rerun`, 'POST', {}) as never,
+        { params: Promise.resolve({ id: rec.id }) }
+      );
+
+      expect(risposta.status).toBe(409);
+      expect(await risposta.json()).toMatchObject({ code: 'TRACKS_PENDING' });
+      expect(await prisma.recording.findUniqueOrThrow({ where: { id: rec.id } })).toMatchObject({
+        runCount: rec.runCount,
+        status: 'READY',
+      });
+    });
+
+    it('tracce gia\' arrivate e tolte, a segnaposto rimasto: resta il 422', async () => {
+      const evento = await eventoConcluso({ aiTranscriptEnabled: false });
+      const rec = await creaSegnaposto(evento.id);
+      await prisma.recording.update({ where: { id: rec.id }, data: { mediaStartedAt: new Date() } });
+      await entraCome('ADMIN');
+
+      const risposta = await genera(evento.id);
+
+      expect(risposta.status).toBe(422);
+      expect(await risposta.json()).toMatchObject({ code: 'NO_TRANSCRIBABLE_TRACKS' });
+      expect(await prisma.event.findUniqueOrThrow({ where: { id: evento.id } })).toMatchObject({
+        aiTranscriptEnabled: false,
+      });
     });
   });
 
@@ -424,8 +679,8 @@ describe('i nomi della trascrizione pubblica', () => {
       }) as never,
       { params: Promise.resolve({}) }
     );
-    expect(presa.status).toBe(200);
-    const { inputs } = (await presa.json()) as {
+    // Nessuna traccia da trascrivere: il worker non riceve il lavoro.
+    const { inputs } = (presa.status === 204 ? { inputs: [] } : await presa.json()) as {
       inputs: { role: string; participantId: string; displayName: string | null }[];
     };
     const traccia = inputs.find((i) => i.role === 'track');
@@ -460,6 +715,9 @@ describe('i nomi della trascrizione pubblica', () => {
     const { evento, traccia } = await dalleTracce(1);
     expect(traccia).toBeUndefined();
     expect(await nomeMostrato(evento.slug)).toBe('Voce 1');
+    await expect(
+      prisma.postprodJob.findFirstOrThrow({ where: { kind: 'TRANSCRIBE_MULTITRACK' } })
+    ).resolves.toMatchObject({ status: 'FAILED', lastError: MOTIVO_TRACCE_ASSENTI });
   });
 
   it('tracce su video nuovo, consenso al testo che comprende il nome: si mostra', async () => {

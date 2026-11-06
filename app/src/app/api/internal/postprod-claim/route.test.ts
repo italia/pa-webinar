@@ -10,7 +10,7 @@ vi.mock('@/lib/db', () => ({
     $executeRaw: vi.fn(async () => 1),
     postprodJob: { update: vi.fn() },
     siteSetting: { findUnique: vi.fn(async () => ({ aiLlmProvider: 'vllm' })) },
-    recording: { findUnique: vi.fn() },
+    recording: { findUnique: vi.fn(), updateMany: vi.fn() },
     speaker: { findMany: vi.fn(async () => []) },
     postprodArtifact: { findFirst: vi.fn(async () => null) },
     recordingTrack: { findMany: vi.fn(async () => []) },
@@ -274,6 +274,47 @@ describe('POST /api/internal/postprod-claim', () => {
         'ep-testo-2': 'Anna',
       });
       expect(conConsenso).toHaveBeenCalledWith(eventId, ['ep-testo-2', 'ep-testo-1'], 2);
+    });
+
+    it('senza tracce da trascrivere il lavoro si chiude e il worker non lo riceve', async () => {
+      fn(prisma.$queryRaw).mockResolvedValueOnce([
+        {
+          id: '66666666-7777-4888-8999-000000000004',
+          recording_id: recordingId,
+          kind: 'TRANSCRIBE_MULTITRACK',
+          payload: { runId: '77777777-8888-4999-8aaa-bbbbbbbbbbbd', sourceLanguage: 'it' },
+          attempts: 1,
+          next_attempt_at: new Date(),
+          depends_on_id: null,
+        },
+      ]);
+      fn(prisma.recording.findUnique).mockResolvedValueOnce({
+        id: recordingId,
+        eventId,
+        runCount: 1,
+        sourceLanguage: 'it',
+        blobKey: 'recordings/y.mp4',
+        transcriptConsentRule: true,
+        event: { id: eventId, slug: 'e', aiTargetLocales: [], title: { it: 'E' }, organizerName: null, speakersInfo: null, expectedSpeakers: null, agendaItems: [] },
+        callSession: null,
+        _count: { tracks: 1 },
+      });
+      fn(prisma.recordingTrack.findMany).mockResolvedValueOnce([
+        { participantId: 'ep-testo-1', displayName: null, blobKey: 'tracce/b.ogg', startOffsetMs: 0 },
+      ]);
+      conConsenso.mockResolvedValueOnce(new Set());
+
+      const res = await claim({ workerId: 'w-gpu', kinds: ['TRANSCRIBE_MULTITRACK'] });
+
+      expect(res.status).toBe(204);
+      expect(fn(prisma.$executeRaw).mock.calls).toHaveLength(1);
+      const sql = sqlOf(fn(prisma.$executeRaw).mock.calls[0]!);
+      expect(sql).toContain("status = 'FAILED'");
+      expect(sql).toContain("status = 'CLAIMED'");
+      expect(fn(prisma.recording.updateMany).mock.calls[0]![0]).toMatchObject({
+        where: { id: recordingId },
+        data: { status: 'POSTPROD_PARTIAL' },
+      });
     });
 
     it('senza il segno passa come prima, senza leggere i consensi', async () => {
