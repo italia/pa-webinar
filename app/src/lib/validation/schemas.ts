@@ -464,6 +464,14 @@ export const consentWithdrawalSchema = z.object({
   recording: z.boolean(),
 }).strict();
 
+/**
+ * La lettura dei consensi in vigore dalla sala: i token della sala di questa
+ * visita provano i posti, dal piu' vecchio al piu' recente.
+ */
+export const consentsInForceSchema = z.object({
+  roomTokens: z.array(z.string().min(1).max(4096)).min(1).max(50),
+}).strict();
+
 // ── Poll Schemas ────────────────────────────────────────
 
 export const createPollSchema = z.object({

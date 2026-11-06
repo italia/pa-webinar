@@ -42,6 +42,7 @@ import {
   stessiConsensi,
   type ProveConsenso,
 } from '@/lib/live/entry-consents';
+import type { ConsensiInVigore } from '@/lib/live/consents-in-force';
 import { chiaveConsensoTrascrizione } from '@/lib/registration/consents';
 import QAPanel from '@/components/qa/qa-panel';
 import PollPanel from '@/components/polls/poll-panel';
@@ -321,6 +322,8 @@ const LEAVE_RECONNECT_GRACE_MS = 1200;
 
 /** Quanto resta l'annuncio «Connessione ripristinata» per i lettori di schermo. */
 const ANNUNCIO_RIPRISTINO_MS = 5_000;
+/** Entro quanto chi ha un consenso lo rilegge quando cambiano i sottotitoli. */
+const ATTESA_MASSIMA_RILETTURA_MS = 5_000;
 
 /** Tempo massimo della richiesta del token durante un rientro. */
 const ATTESA_TOKEN_RIENTRO_MS = 10_000;
@@ -353,7 +356,7 @@ interface JitsiCredentials {
   consentsRecorded?: { recording: boolean; multitrack: boolean };
   /** I consensi che valgono per questo posto, valutati dal server con le regole di
    *  adesso: prendono il posto di quelli letti all'apertura della pagina. */
-  consentsInForce?: { recording: boolean; transcription: boolean };
+  consentsInForce?: ConsensiInVigore;
   /** In solo ascolto: senza consenso alla registrazione (lib/live/listen-only). */
   listenOnly?: boolean;
   /** Senza un consenso valido alla registrazione: in sala come tutti, fuori dalla
@@ -612,6 +615,22 @@ export default function LiveEventClient({
   // un ospite con la rete instabile ne riceve uno nuovo, con un posto nuovo,
   // a ogni rientro.
   const tokenSalaRef = useRef<string[]>([]);
+  // Sale a ogni richiesta del token e a ogni ritiro: una rilettura dei consensi
+  // partita prima racconta uno stato gia' superato, e non vale.
+  const epocaConsensiRef = useRef(0);
+  // Vale cio' che il server applica: un consenso ritirato altrove o dato su un
+  // testo superato smette di contare, e la sala lo richiede.
+  const applicaConsensi = useCallback((consensi: ConsensiInVigore) => {
+    const ora = { registrazione: consensi.recording, tracce: consensi.transcription };
+    setConsensiRegistrati((c) => (stessiConsensi(c, ora) ? c : ora));
+    setRitirati((r) => {
+      const fuori = {
+        registrazione: r.registrazione || !ora.registrazione,
+        tracce: r.tracce || !ora.tracce,
+      };
+      return stessiConsensi(r, fuori) ? r : fuori;
+    });
+  }, []);
   // La registrazione dell'evento, per chi entra dalla sala d'attesa: se
   // chiederne il consenso, o se basta informare.
   const chiConduceSempreRegistrato = conduceSempreRegistrato(event, event.voceNelVideo ?? 'fissa');
@@ -815,6 +834,7 @@ export default function LiveEventClient({
     // nella fascia, non chiude la conferenza in cui si e' gia'.
     senzaUscire = false,
   ): Promise<'fatto' | 'rete' | 'gestito'> => {
+    epocaConsensiRef.current += 1;
     const body: Record<string, unknown> = {};
     if (isGuest || !token) {
       // Ospite senza link personale, a evento pubblico (o con la password
@@ -934,20 +954,11 @@ export default function LiveEventClient({
 
     const data = res.data as JitsiCredentials | null;
     if (!data || typeof data.jwt !== 'string') return 'rete';
+    epocaConsensiRef.current += 1;
     const salvati = data.consentsRecorded;
     const consensiOra = data.consentsInForce;
     if (consensiOra) {
-      // Vale cio' che il server applica: un consenso ritirato altrove o dato su un
-      // testo superato smette di contare, e la sala lo richiede.
-      const ora = { registrazione: consensiOra.recording, tracce: consensiOra.transcription };
-      setConsensiRegistrati((c) => (stessiConsensi(c, ora) ? c : ora));
-      setRitirati((r) => {
-        const fuori = {
-          registrazione: r.registrazione || !ora.registrazione,
-          tracce: r.tracce || !ora.tracce,
-        };
-        return stessiConsensi(r, fuori) ? r : fuori;
-      });
+      applicaConsensi(consensiOra);
     } else if (salvati && (salvati.recording || salvati.multitrack)) {
       setConsensiRegistrati((c) => ({
         registrazione: c.registrazione || salvati.recording,
@@ -1009,6 +1020,7 @@ export default function LiveEventClient({
     markEnded,
     joinPrefs,
     consensiRegistrati,
+    applicaConsensi,
     hasRecordingConsent,
     haConsensoRegistrazione,
     ritirati.registrazione,
@@ -1164,10 +1176,12 @@ export default function LiveEventClient({
     async (registrazione: boolean) => {
       setRiconsenso((r) => (r === 'errore' || r === 'rileggi' ? 'no' : r));
       setRitiro('in-corso');
+      epocaConsensiRef.current += 1;
       const res = await richiestaJson(`/api/events/${event.slug}/consents/withdraw`, {
         method: 'POST',
         body: JSON.stringify({ roomTokens: tokenSalaRef.current, recording: registrazione }),
       });
+      epocaConsensiRef.current += 1;
       if (!res || !res.ok) {
         setRitiro('errore');
         return;
@@ -1187,6 +1201,26 @@ export default function LiveEventClient({
     },
     [event.slug],
   );
+  // I consensi cambiano anche senza un token nuovo: un ritiro dalla pagina dei
+  // propri dati, o i sottotitoli accesi dal vivo, che chiedono il testo che
+  // comprende la trascrizione. Rileggerli non ricollega la conferenza. Un errore
+  // lascia lo stato di prima, che il token successivo corregge.
+  const rileggiConsensi = useCallback(async () => {
+    if (tokenSalaRef.current.length === 0) return;
+    const epoca = epocaConsensiRef.current;
+    const res = await richiestaJson(`/api/events/${event.slug}/consents/in-force`, {
+      method: 'POST',
+      body: JSON.stringify({ roomTokens: tokenSalaRef.current }),
+    });
+    if (epoca !== epocaConsensiRef.current || !res?.ok) return;
+    const data = res.data as (Partial<ConsensiInVigore> & { recordingDestination?: Destinazione }) | null;
+    if (typeof data?.recording !== 'boolean' || typeof data.transcription !== 'boolean') return;
+    applicaConsensi({ recording: data.recording, transcription: data.transcription });
+    if (data.recordingDestination !== undefined) setDestinazioneInVigore(data.recordingDestination);
+  }, [event.slug, applicaConsensi]);
+  useEffect(() => {
+    if (consensiAperti) void rileggiConsensi();
+  }, [consensiAperti, rileggiConsensi]);
   // Sottotitoli live (ADR-018): il flag dell'evento, che chi modera cambia
   // dal vivo, arriva con gli altri flag della sala (canale push o polling,
   // stessa voce della barra laterale). Chi modera li accende nella stanza.
@@ -1207,6 +1241,20 @@ export default function LiveEventClient({
     !!event.liveCaptionsAvailable &&
     (flagsSala?.liveCaptionsEnabled ?? event.liveCaptionsEnabled ?? true);
   const chatAccesa = flagsSala?.chatEnabled ?? event.chatEnabled;
+  // Quando cambiano i sottotitoli la versione del testo richiesta puo' salire, e il
+  // consenso alla trascrizione smettere di valere. Lo legge solo chi ce l'ha, in
+  // un momento a caso: il flag arriva a tutta la sala insieme.
+  const sottotitoliLetti = useRef(sottotitoliAccesi);
+  useEffect(() => {
+    if (sottotitoliLetti.current === sottotitoliAccesi) return;
+    sottotitoliLetti.current = sottotitoliAccesi;
+    if (!haConsensoTracce) return;
+    const attesa = setTimeout(
+      () => void rileggiConsensi(),
+      Math.random() * ATTESA_MASSIMA_RILETTURA_MS,
+    );
+    return () => clearTimeout(attesa);
+  }, [sottotitoliAccesi, haConsensoTracce, rileggiConsensi]);
   // Il testo dei sottotitoli si conserva solo se i sottotitoli ci sono: la
   // scheda lo dice con il valore di adesso, e la casella della trascrizione
   // compare e scompare con lei. Le chiamate rapide non hanno scheda.

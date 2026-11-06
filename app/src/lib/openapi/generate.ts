@@ -18,6 +18,7 @@ import {
   upvoteQuestionSchema,
   jitsiTokenRequestSchema,
   consentWithdrawalSchema,
+  consentsInForceSchema,
   createPollSchema,
   updatePollStatusSchema,
   pollVoteSchema,
@@ -284,6 +285,22 @@ registry.registerPath({
   request: { params: z.object({ param: z.string() }), body: { content: { 'application/json': { schema: consentWithdrawalSchema } } } },
   responses: {
     200: { description: '`withdrawn.recording` and `withdrawn.transcription`: whether there was a consent to withdraw' },
+    401: { description: 'None of the room tokens is valid for this event' },
+  },
+});
+
+registry.registerPath({
+  method: 'post',
+  path: '/api/events/{param}/consents/in-force',
+  tags: ['Jitsi'],
+  summary: 'Read the consents in force for a seat',
+  description:
+    'Returns the consents that apply now, without issuing a new token. The caller proves its ' +
+    'seats with the room tokens (Jitsi JWTs) the portal issued to it, oldest first; the last valid ' +
+    'one is the seat in the conference. Tokens up to one day past expiry still count.',
+  request: { params: z.object({ param: z.string() }), body: { content: { 'application/json': { schema: consentsInForceSchema } } } },
+  responses: {
+    200: { description: '`recording`, `transcription` and the `recordingDestination` of the text in force' },
     401: { description: 'None of the room tokens is valid for this event' },
   },
 });

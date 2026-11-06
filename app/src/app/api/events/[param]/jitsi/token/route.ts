@@ -13,11 +13,7 @@ import {
 import { prisma } from '@/lib/db';
 import { VERSIONE_TESTO_TRASCRIZIONE } from '@/lib/registration/consents';
 import { getSettings } from '@/lib/settings';
-import {
-  chiedeConsensoPerVoce,
-  versioneConsensoTrascrizione,
-  type EventoConsensoVoce,
-} from '@/lib/ai/voice-consent';
+import { chiedeConsensoPerVoce, type EventoConsensoVoce } from '@/lib/ai/voice-consent';
 import { jitsiTokenRequestSchema } from '@/lib/validation/schemas';
 import { EventModeratorRole, verifyGrantToken } from '@/lib/auth/moderator';
 import { staffDietroIlPrimario } from '@/lib/auth/staff-seat';
@@ -28,7 +24,6 @@ import {
   postoDaTokenSala,
   guestJitsiId,
 } from '@/lib/auth/jwt';
-import { consensoTrascrizione } from '@/lib/captions/room';
 import { decryptPII, encryptPII, tryDecryptPII } from '@/lib/crypto/pii';
 import { findPhotoByEmailHash, profilePhotoUrl } from '@/lib/profile-photo';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
@@ -36,6 +31,7 @@ import { limiteTokenOspiti } from '@/lib/room-rate-limit';
 import { readOwnedEventAccess } from '@/lib/event-session';
 import { guestAccessAllowed } from '@/lib/events/guest-window';
 import { conduceSempreRegistrato } from '@/lib/live/consent-rule';
+import { registrazioneDellIscrizione, trascrizioneInVigore } from '@/lib/live/consents-in-force';
 import { mediaDelToken, regolaConsenso } from '@/lib/live/listen-only';
 import { elencoVisibileAlPubblico } from '@/lib/live/participant-list';
 import { registraChiConduce } from '@/lib/live/entry-consents';
@@ -181,9 +177,7 @@ async function consensiInVigore(
   registrazione: boolean,
 ): Promise<{ recording: boolean; transcription: boolean } | undefined> {
   try {
-    const versione = versioneConsensoTrascrizione(event, await getSettings());
-    const { dato } = await consensoTrascrizione(event.id, posto, versione);
-    return { recording: registrazione, transcription: dato };
+    return { recording: registrazione, transcription: await trascrizioneInVigore(event, posto) };
   } catch (err) {
     console.error('[jitsi/token] consents in force not read', {
       eventId: event.id,
@@ -615,19 +609,8 @@ export const POST = withErrorHandling(async (request, context) => {
     // ritirare. Un consenso ritirato non vale piu' (lib/live/consent-withdrawal),
     // e uno dato su un testo che non copre il testo in vigore non vale per
     // questo video: la sala lo richiede.
-    const provaIscritto = async () => {
-      const prova = await prisma.recordingConsent.findFirst({
-        where: { eventId: event.id, registrationId: registration.id, withdrawnAt: null },
-        select: { destination: true },
-      });
-      return prova !== null && consensoCopre(prova.destination, destinazione);
-    };
     const consensoIscritto =
-      consensoDato ||
-      (registration.consentRecording === true &&
-        !registration.consentRecordingWithdrawnAt &&
-        consensoCopre(registration.consentRecordingDestination, destinazione)) ||
-      (event.recordingEnabled && (await provaIscritto()));
+      consensoDato || (await registrazioneDellIscrizione(event, registration, destinazione));
     const mediaIscritto = mediaPartecipante(consensoIscritto);
 
     // Record the join, set-once. Kept write-free on rejoin so the reconnect

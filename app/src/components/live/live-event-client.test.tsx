@@ -165,6 +165,8 @@ let container: HTMLDivElement;
 let root: Root;
 let chiamate: { url: string; method: string; body: Record<string, unknown> }[];
 let risposte: Risposta[];
+/** Le risposte alla rilettura dei consensi, una per richiesta. */
+let letture: (Record<string, unknown> | Promise<Response>)[];
 /** Gli stati dell'evento che /lifecycle risponde, uno per richiesta. */
 let statiEvento: string[];
 
@@ -175,6 +177,7 @@ const rispondi = (data: unknown, status = 200) =>
   });
 
 const richiesteToken = () => chiamate.filter((c) => c.url.endsWith('/jitsi/token'));
+const riletture = () => chiamate.filter((c) => c.url.endsWith('/consents/in-force'));
 const ultimoToken = () => richiesteToken().at(-1)?.body;
 
 beforeEach(() => {
@@ -182,6 +185,7 @@ beforeEach(() => {
   attesa.props = null;
   chiamate = [];
   risposte = [];
+  letture = [];
   statiEvento = [];
   flagsDellaSala.dati = undefined;
   vi.stubGlobal(
@@ -210,6 +214,10 @@ beforeEach(() => {
       }
       if (url.endsWith('/lifecycle'))
         return rispondi({ status: statiEvento.shift() ?? 'LIVE' });
+      if (url.endsWith('/consents/in-force')) {
+        const lettura = letture.shift() ?? {};
+        return lettura instanceof Promise ? lettura : rispondi(lettura);
+      }
       return rispondi({});
     })
   );
@@ -1019,6 +1027,128 @@ describe('sala — la finestra dei consensi', () => {
     expect(document.getElementById('live-consents-tr-nota')?.textContent).toContain(
       g.multitrackRetained
     );
+  });
+});
+
+describe('sala — i consensi riletti a sala aperta', () => {
+  const conTrascrizione = { ...evento, multitrackRecordingEnabled: true };
+  const accesiEDati = { recording: true, transcription: true };
+  const conConsensi = { hasRecordingConsent: true, hasMultitrackConsent: true };
+  const tutti = async () => {
+    await act(async () => {
+      await new Promise((fatto) => setTimeout(fatto, 0));
+    });
+  };
+
+  async function inSalaConIConsensi() {
+    await monta({ event: conTrascrizione, ...conConsensi });
+    risposte.push({ consentsInForce: accesiEDati });
+    await entra();
+  }
+
+  it('aprendo la finestra chiede lo stato con i token della visita, senza un token nuovo', async () => {
+    await inSalaConIConsensi();
+    letture.push({ ...accesiEDati, recordingDestination: null });
+    const token = richiesteToken().length;
+    await premi(pulsante(l.consents.button));
+    await tutti();
+    expect(riletture().map((c) => c.body)).toEqual([{ roomTokens: ['jwt-1'] }]);
+    expect(richiesteToken()).toHaveLength(token);
+    expect(riletture()[0]?.method).toBe('POST');
+  });
+
+  it('un consenso che non vale piu si vede e si puo ridare', async () => {
+    await inSalaConIConsensi();
+    letture.push({ recording: true, transcription: false, recordingDestination: null });
+    await premi(pulsante(l.consents.button));
+    await tutti();
+    expect(pulsante(l.consents.transcription.give).disabled).toBe(false);
+    expect(testo()).toContain(l.consents.notGiven);
+  });
+
+  it('un ritiro altrove lo vede anche la registrazione, con il testo in vigore', async () => {
+    await inSalaConIConsensi();
+    letture.push({ recording: false, transcription: false, recordingDestination: 'PUBLIC' });
+    await premi(pulsante(l.consents.button));
+    await tutti();
+    expect(pulsante(l.consents.recording.give).disabled).toBe(false);
+    expect(document.getElementById('live-consents-rec-nota')?.textContent).toContain(
+      g.recordingPublic
+    );
+  });
+
+  it('il rientro dopo la rilettura non riporta il consenso che non vale piu', async () => {
+    await inSalaConIConsensi();
+    letture.push({ recording: true, transcription: false, recordingDestination: null });
+    await premi(pulsante(l.consents.button));
+    await tutti();
+    risposte.push({ consentsInForce: { recording: true, transcription: false } });
+    await caduta();
+    expect(ultimoToken()?.consentReplay).toMatchObject({ recording: true, multitrack: false });
+  });
+
+  it('una risposta che non dice lo stato lascia tutto com era', async () => {
+    await inSalaConIConsensi();
+    letture.push({});
+    await premi(pulsante(l.consents.button));
+    await tutti();
+    expect(pulsante(l.consents.withdraw).disabled).toBe(false);
+    expect(testo()).not.toContain(l.consents.notGiven);
+  });
+
+  it('una lettura partita prima di un token nuovo non vale', async () => {
+    await inSalaConIConsensi();
+    let rispondiTardi = (_: Response) => {};
+    letture.push(new Promise<Response>((r) => (rispondiTardi = r)));
+    await premi(pulsante(l.consents.button));
+    risposte.push({ consentsInForce: accesiEDati });
+    await caduta();
+    await act(async () => {
+      rispondiTardi(
+        rispondi({ recording: false, transcription: false, recordingDestination: null })
+      );
+    });
+    await tutti();
+    expect(testo()).not.toContain(l.consents.notGiven);
+  });
+
+  describe('quando cambiano i sottotitoli', () => {
+    const sottotitoli = {
+      ...conTrascrizione,
+      liveCaptionsAvailable: true,
+      captionsTranscript: true,
+    };
+
+    beforeEach(() => {
+      vi.spyOn(Math, 'random').mockReturnValue(0);
+    });
+    afterEach(() => vi.restoreAllMocks());
+
+    it('chi ha il consenso lo rilegge', async () => {
+      flagsDellaSala.dati = { liveCaptionsEnabled: false };
+      await monta({ event: sottotitoli, ...conConsensi });
+      risposte.push({ consentsInForce: accesiEDati });
+      await entra();
+      await tutti();
+      expect(riletture()).toHaveLength(0);
+
+      flagsDellaSala.dati = { liveCaptionsEnabled: true };
+      await monta({ event: sottotitoli, ...conConsensi });
+      await tutti();
+      expect(riletture()).toHaveLength(1);
+    });
+
+    it('chi non ha il consenso non chiede niente', async () => {
+      flagsDellaSala.dati = { liveCaptionsEnabled: false };
+      await monta({ event: sottotitoli, hasRecordingConsent: true });
+      risposte.push({ consentsInForce: { recording: true, transcription: false } });
+      await entra();
+
+      flagsDellaSala.dati = { liveCaptionsEnabled: true };
+      await monta({ event: sottotitoli, hasRecordingConsent: true });
+      await tutti();
+      expect(riletture()).toHaveLength(0);
+    });
   });
 });
 
