@@ -73,6 +73,28 @@ export function chiedeConsensoPerVoce(
   });
 }
 
+/**
+ * La versione del testo che il consenso alla trascrizione deve avere adesso:
+ * quella che comprende il nome, dove l'evento trascrive davvero dai sottotitoli,
+ * dal video o dalle tracce per persona con la pipeline AI
+ * (lib/registration/consents). Senza pipeline le tracce non si trascrivono, e il
+ * testo di prima basta. La stessa regola per la casella che si ripropone in sala
+ * d'attesa, per il registratore e per lo stato che il token riporta alla sala.
+ * Legge l'ambiente: si chiama solo sul server.
+ */
+export function versioneConsensoTrascrizione(
+  e: EventoConsensoVoce,
+  sito: SitoConsensoVoce
+): number {
+  const tracceDaTrascrivere =
+    e.multitrackRecordingEnabled && !!e.aiTranscriptEnabled && !!sito.aiPipelineEnabled;
+  const trascrive =
+    captionsTranscriptActive(e, sito) ||
+    trascrizioneDalVideo(e, sito, recordingAvailable(), voceNelVideo()) ||
+    tracceDaTrascrivere;
+  return trascrive ? VERSIONE_TESTO_TRASCRIZIONE : 1;
+}
+
 type Db = PrismaClient | Prisma.TransactionClient;
 
 export interface RegimeConsensoVoce {

@@ -7,8 +7,8 @@ import { notFound, redirect } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
-import { chiedeConsensoPerVoce } from '@/lib/ai/voice-consent';
-import { trascrizioneDalVideo, VERSIONE_TESTO_TRASCRIZIONE } from '@/lib/registration/consents';
+import { chiedeConsensoPerVoce, versioneConsensoTrascrizione } from '@/lib/ai/voice-consent';
+import { trascrizioneDalVideo } from '@/lib/registration/consents';
 import { anteprimaEventoPubblico } from '@/lib/events/meta-title';
 import { getPublicEnv } from '@/lib/env';
 import { captionsTranscriptActive, liveCaptionsAvailable } from '@/lib/captions/availability';
@@ -374,19 +374,9 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
     // Un consenso ritirato dalla sala non vale piu' (lib/live/consent-withdrawal),
     // e uno che il testo in vigore non copre si richiede in sala.
     const prove = { eventId: event.id, registrationId: registration.id, withdrawnAt: null };
-    // Per la trascrizione dai sottotitoli, dal video o dalle tracce per persona
-    // vale solo il consenso dato con il testo che la comprende
-    // (lib/registration/consents): a chi aveva dato quello per la sola traccia
-    // audio si richiede. Senza pipeline AI le tracce non si trascrivono, e il
-    // testo di prima basta.
-    const tracceDaTrascrivere =
-      event.multitrackRecordingEnabled &&
-      event.aiTranscriptEnabled &&
-      !!settings.aiPipelineEnabled;
-    const versioneMinima =
-      captionsTranscriptActive(event, settings) || trascrizioneVideo || tracceDaTrascrivere
-        ? VERSIONE_TESTO_TRASCRIZIONE
-        : 1;
+    // Vale solo il consenso dato con il testo che comprende la trascrizione
+    // dell'evento: a chi aveva dato quello per la sola traccia audio si richiede.
+    const versioneMinima = versioneConsensoTrascrizione(event, settings);
     const datoAllIscrizione =
       registration.consentMultitrack === true &&
       !registration.consentMultitrackWithdrawnAt &&

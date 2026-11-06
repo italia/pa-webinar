@@ -11,6 +11,7 @@ import {
   erroreConfermaVoci,
   leggiCorpoAvvio,
   regimeConsensoVoce,
+  versioneConsensoTrascrizione,
 } from './voice-consent';
 
 const base = {
@@ -95,6 +96,28 @@ describe('chiedeConsensoPerVoce', () => {
       });
       expect(chiedeConsensoPerVoce(video, pipeline)).toBe(true);
     });
+  });
+});
+
+describe('versioneConsensoTrascrizione', () => {
+  afterEach(() => vi.unstubAllEnvs());
+
+  const tracce = { ...base, multitrackRecordingEnabled: true };
+
+  it('le tracce che non si trascrivono si accontentano del testo sulla traccia', () => {
+    expect(versioneConsensoTrascrizione(tracce, {})).toBe(1);
+    expect(versioneConsensoTrascrizione({ ...tracce, aiTranscriptEnabled: true }, {})).toBe(1);
+    expect(versioneConsensoTrascrizione(tracce, pipeline)).toBe(1);
+  });
+
+  it('le tracce che la pipeline trascrive chiedono il testo con il nome', () => {
+    expect(versioneConsensoTrascrizione({ ...tracce, aiTranscriptEnabled: true }, pipeline)).toBe(
+      VERSIONE_TESTO_TRASCRIZIONE
+    );
+  });
+
+  it('anche la trascrizione dal video', () => {
+    expect(versioneConsensoTrascrizione(video, pipeline)).toBe(VERSIONE_TESTO_TRASCRIZIONE);
   });
 });
 

@@ -340,7 +340,7 @@ export const POST = withErrorHandling(async (request) => {
     // signed URL + l'identità certa (dal JWT del portale, decifrata qui)
     // + l'offset per il merge. Il worker trascrive ogni traccia senza
     // diarization e fonde via multitrack.merge_tracks.
-    inputs.push(...(await tracceAlWorker(recording, lease)));
+    inputs.push(...(await tracceAlWorker(recording, lease, { daTrascrivere: true })));
   }
 
   if (row.kind === 'ARCHIVE') {
@@ -352,7 +352,7 @@ export const POST = withErrorHandling(async (request) => {
     // Le tracce purgate (audioPurgedAt) non sono più disponibili: se
     // l'evento non ha retainParticipantTracks l'archivio conterrà solo
     // il video + i sottotitoli (degradazione pulita).
-    inputs.push(...(await tracceAlWorker(recording, lease)));
+    inputs.push(...(await tracceAlWorker(recording, lease, { daTrascrivere: false })));
     // Sottotitoli sorgente (best-effort): se il TRANSCRIBE non è ancora
     // completato non c'è VTT — l'archivio si genera comunque senza.
     // Corretti anch'essi, se la trascrizione e' stata rivista
@@ -687,14 +687,17 @@ async function rispostaTraduzioneTesti(
  * era gia' registrata non passa piu' (lib/captions/room endpointRitirati).
  *
  * Su una registrazione con il segno `transcriptConsentRule` il nome passa solo
- * con un consenso al testo che lo comprende: la traccia vale con ogni versione,
- * il nome no. Senza nome al worker, nome e voce non si legano mai: l'etichetta
- * della voce resta anonima nella trascrizione, nella sintesi e nell'archivio.
+ * con un consenso al testo che lo comprende, e con lo stesso consenso la traccia
+ * passa alla trascrizione (`daTrascrivere`): chi aveva acconsentito alla sola
+ * traccia audio non ha acconsentito a questo. All'archivio la traccia passa con
+ * ogni versione, il nome no. Senza nome al worker, nome e voce non si legano mai:
+ * l'etichetta della voce resta anonima nella sintesi e nell'archivio.
  * Il nome dato dallo staff alla voce resta com'e'.
  */
 async function tracceAlWorker(
   recording: { id: string; eventId: string; transcriptConsentRule: boolean },
   lease: number,
+  { daTrascrivere }: { daTrascrivere: boolean },
 ): Promise<Array<{
   role: 'track';
   downloadUrl: string;
@@ -718,6 +721,7 @@ async function tracceAlWorker(
   const tracce = [];
   for (const tr of tracks) {
     if (ritirati.has(tr.participantId)) continue;
+    if (daTrascrivere && nominabili && !nominabili.has(tr.participantId)) continue;
     tracce.push({
       role: 'track' as const,
       downloadUrl: await presignArtifactDownload({ blobKey: tr.blobKey, expiresInMinutes: lease }),

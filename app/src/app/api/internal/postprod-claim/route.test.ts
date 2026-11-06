@@ -259,17 +259,22 @@ describe('POST /api/internal/postprod-claim', () => {
       );
     }
 
-    it.each(['TRANSCRIBE_MULTITRACK', 'ARCHIVE'] as const)(
-      'con il segno passa solo con il consenso al testo che lo comprende (%s)',
-      async (kind) => {
-        conConsenso.mockResolvedValueOnce(new Set(['ep-testo-2']));
-        await expect(nomiAlWorker(kind, true)).resolves.toEqual({
-          'ep-testo-2': 'Anna',
-          'ep-testo-1': null,
-        });
-        expect(conConsenso).toHaveBeenCalledWith(eventId, ['ep-testo-2', 'ep-testo-1'], 2);
-      },
-    );
+    it("con il segno all'archivio il nome passa solo con il consenso al testo che lo comprende", async () => {
+      conConsenso.mockResolvedValueOnce(new Set(['ep-testo-2']));
+      await expect(nomiAlWorker('ARCHIVE', true)).resolves.toEqual({
+        'ep-testo-2': 'Anna',
+        'ep-testo-1': null,
+      });
+      expect(conConsenso).toHaveBeenCalledWith(eventId, ['ep-testo-2', 'ep-testo-1'], 2);
+    });
+
+    it('con il segno alla trascrizione passa solo la traccia con quel consenso', async () => {
+      conConsenso.mockResolvedValueOnce(new Set(['ep-testo-2']));
+      await expect(nomiAlWorker('TRANSCRIBE_MULTITRACK', true)).resolves.toEqual({
+        'ep-testo-2': 'Anna',
+      });
+      expect(conConsenso).toHaveBeenCalledWith(eventId, ['ep-testo-2', 'ep-testo-1'], 2);
+    });
 
     it('senza il segno passa come prima, senza leggere i consensi', async () => {
       await expect(nomiAlWorker('TRANSCRIBE_MULTITRACK', false)).resolves.toEqual({
