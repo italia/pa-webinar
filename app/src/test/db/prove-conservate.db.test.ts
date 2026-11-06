@@ -1268,6 +1268,24 @@ describe('chi conduce nei sottotitoli e nelle trascrizioni', () => {
     const voci = await prisma.speaker.findMany({ where: { recordingId } });
     expect(JSON.stringify(voci)).not.toContain('titolari');
   });
+
+  it('l’export consegna le prove di sala di chi conduce, anche la sola trascrizione', async () => {
+    const evento = await creaEvento(RECENTE);
+    const { emailHash, concessione } = await conDueVoci(evento.id);
+    await prisma.recordingConsent.deleteMany({
+      where: { eventModeratorId: concessione.id },
+    });
+
+    const res = await esporta(
+      daIp(`/api/gdpr/export?t=${issueGdprToken('export', emailHash)}`),
+      contesto({})
+    );
+    const { roomConsentProofs } = (await res.json()) as {
+      roomConsentProofs: Array<{ kind: string; eventId: string }>;
+    };
+
+    expect(roomConsentProofs).toMatchObject([{ kind: 'transcription', eventId: evento.id }]);
+  });
 });
 
 describe('un video che esiste e non e’ pubblicato', () => {

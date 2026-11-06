@@ -85,6 +85,15 @@ interface ExportGrant {
   event: { title: Record<string, string>; startsAt: string };
 }
 
+/** Un consenso dato entrando in sala con un ruolo nell'evento. */
+interface ExportRoomProof {
+  kind: 'recording' | 'transcription';
+  givenAt: string;
+  withdrawnAt: string | null;
+  superseded: boolean;
+  event: { title: Record<string, string>; startsAt: string };
+}
+
 /** La voce di rubrica: dura oltre le iscrizioni, e arriva a parte. */
 interface ExportAddressBook {
   name: string | null;
@@ -105,6 +114,7 @@ const GRANT_ROLE_KEY = {
 
 export default function MyDataPage() {
   const t = useTranslations('gdpr.export');
+  const tConsensi = useTranslations('live.consents');
   const locale = useLocale();
   const searchParams = useSearchParams();
 
@@ -117,6 +127,7 @@ export default function MyDataPage() {
   const [photo, setPhoto] = useState<{ uploadedAt: string; dataUrl: string } | null>(null);
   // I ruoli negli eventi: anche chi non si è mai iscritto può averne.
   const [grants, setGrants] = useState<ExportGrant[]>([]);
+  const [proveInSala, setProveInSala] = useState<ExportRoomProof[]>([]);
   const [rubrica, setRubrica] = useState<ExportAddressBook | null>(null);
   // Le prove restate dopo la cancellazione delle iscrizioni.
   const [prove, setProve] = useState<ProvaConservataVista[]>([]);
@@ -159,6 +170,7 @@ export default function MyDataPage() {
         setResults(json.data);
         setPhoto(json.profilePhoto ?? null);
         setGrants(Array.isArray(json.grants) ? json.grants : []);
+        setProveInSala(Array.isArray(json.roomConsentProofs) ? json.roomConsentProofs : []);
         setRubrica(json.addressBook ?? null);
         setProve(Array.isArray(json.retainedConsentProofs) ? json.retainedConsentProofs : []);
         setTokenConsensi(typeof json.consentsToken === 'string' ? json.consentsToken : null);
@@ -366,6 +378,41 @@ export default function MyDataPage() {
             </Card>
           )}
 
+          {proveInSala.length > 0 && (
+            <Card className="shadow-sm border-0 mb-4" style={{ borderRadius: 8, border: '1px solid #e8e8e8' }}>
+              <CardBody className="p-4">
+                <h2 className="h5 mb-1">{t('roomProofsTitle')}</h2>
+                <p className="text-muted mb-3" style={{ fontSize: '0.9rem' }}>
+                  {t('roomProofsIntro')}
+                </p>
+                <ul className="list-unstyled mb-0" style={{ fontSize: '0.9rem' }}>
+                  {proveInSala.map((p, i) => (
+                    <li key={i} className="mb-3">
+                      <div className="fw-semibold">
+                        {getLocalized(p.event.title as LocalizedField, locale)}
+                      </div>
+                      <div>{tConsensi(`${p.kind}.title`)}</div>
+                      <div className="text-muted">
+                        {t('proofGivenOn', {
+                          date: format.dateTime(new Date(p.givenAt), { dateStyle: 'long' }),
+                        })}
+                        {p.withdrawnAt && (
+                          <>
+                            {' · '}
+                            {t('consentWithdrawnOn', {
+                              date: format.dateTime(new Date(p.withdrawnAt), { dateStyle: 'long' }),
+                            })}
+                          </>
+                        )}
+                        {p.superseded && <> · {t('proofSuperseded')}</>}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </CardBody>
+            </Card>
+          )}
+
           {rubrica && (
             <Card className="shadow-sm border-0 mb-4" style={{ borderRadius: 8, border: '1px solid #e8e8e8' }}>
               <CardBody className="p-4">
@@ -418,6 +465,7 @@ export default function MyDataPage() {
             results.length === 0 &&
             !photo &&
             grants.length === 0 &&
+            proveInSala.length === 0 &&
             !rubrica &&
             prove.length === 0 && (
               <Alert color="info">

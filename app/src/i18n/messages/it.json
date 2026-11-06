@@ -4574,6 +4574,8 @@
         "transcription": "Le tue frasi e il tuo nome escono dalla trascrizione dai sottotitoli. Una trascrizione fatta dal video o dalle tracce audio resta: per toglierla scrivi al titolare del trattamento. Da questa pagina il ritiro non si annulla."
       },
       "proofWithdrawHost": "Le trascrizioni dai sottotitoli più vecchie non riconoscono chi conduce: lì le tue frasi e il tuo nome restano, e per toglierli devi scrivere al titolare del trattamento.",
+      "roomProofsTitle": "Consensi dati conducendo un evento",
+      "roomProofsIntro": "I consensi alla registrazione e alla trascrizione che hai dato entrando in sala con un ruolo nell'evento. Dalla finestra «Consensi» della sala si ritirano quelli dell'ingresso in corso e, con il tuo account dello staff, anche quelli degli ingressi precedenti; per gli altri, e a evento concluso, resta la cancellazione dei tuoi dati.",
       "addressBookTitle": "Rubrica degli eventi",
       "addressBookIntro": "Hai scelto di restare in rubrica per essere invitato a eventi simili. Conserviamo questi dati fino al {date}, salvo revoca o nuovo consenso.",
       "addressBookOptOut": "Rimuovi i miei dati dalla rubrica",

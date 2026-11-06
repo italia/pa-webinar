@@ -4574,6 +4574,8 @@
         "transcription": "Your sentences and your name leave the transcript from captions. A transcript made from the video or the audio tracks stays: to have it removed, write to the data controller. This withdrawal cannot be undone from this page."
       },
       "proofWithdrawHost": "Older transcripts from captions do not recognize hosts: your sentences and your name stay there, and to have them removed you must write to the data controller.",
+      "roomProofsTitle": "Consents given while leading an event",
+      "roomProofsIntro": "The recording and transcription consents you gave when entering the room with a role in the event. The Consents dialog in the room withdraws those of the current entry and, with your staff account, those of earlier entries too; for the others, and once the event is over, what remains is erasing your data.",
       "addressBookTitle": "Arrangementsadressebog",
       "addressBookIntro": "Du har valgt at blive i adressebogen for at blive inviteret til lignende arrangementer. Vi opbevarer disse data indtil {date}, medmindre du trækker samtykket tilbage eller giver et nyt.",
       "addressBookOptOut": "Fjern mine data fra adressebogen",

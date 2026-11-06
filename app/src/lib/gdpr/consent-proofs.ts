@@ -431,6 +431,49 @@ export async function leggiRigheProve(
   return righe;
 }
 
+/**
+ * Le prove di sala date conducendo un evento, per la consegna dei propri dati
+ * (art. 15): gli stessi legami con cui la cancellazione le raggiunge. Quelle di
+ * un'iscrizione arrivano con l'iscrizione.
+ */
+export async function proveDiSalaDiChiConduce(
+  db: LettoreProve & Pick<Prisma.TransactionClient, 'event'>,
+  filtro: Required<Pick<FiltroProve, 'grantIds' | 'staffAccountIds' | 'emailHash'>>
+) {
+  const dove = {
+    OR: legamiDiSala([], [...filtro.grantIds], [...filtro.staffAccountIds], filtro.emailHash),
+  };
+  const [registrazione, trascrizione] = await Promise.all([
+    db.recordingConsent.findMany({ where: dove, select: { eventId: true }, distinct: ['eventId'] }),
+    db.multitrackConsent.findMany({ where: dove, select: { eventId: true }, distinct: ['eventId'] }),
+  ]);
+  const idEventi = [...new Set([...registrazione, ...trascrizione].map((p) => p.eventId))];
+  if (idEventi.length === 0) return [];
+  const eventi = await db.event.findMany({
+    where: { id: { in: idEventi } },
+    select: { id: true, title: true, startsAt: true },
+  });
+  const prove = await Promise.all(
+    eventi.map(async (evento) =>
+      (await leggiRigheProve(db, evento.id, filtro))
+        .filter((r) => r.role === 'host')
+        .map((r) => ({
+          eventId: evento.id,
+          kind: r.kind,
+          name: r.displayName ? tryDecryptPII(r.displayName) : null,
+          locale: r.locale,
+          textVersion: r.textVersion,
+          destination: r.destination,
+          givenAt: r.givenAt,
+          withdrawnAt: r.withdrawnAt,
+          superseded: r.superata,
+          event: { title: evento.title, startsAt: evento.startsAt.toISOString() },
+        }))
+    )
+  );
+  return prove.flat().sort((a, b) => a.givenAt.localeCompare(b.givenAt));
+}
+
 export async function proveConsensoEvento(
   eventId: string,
   { nomi = true }: { nomi?: boolean } = {}

@@ -19,6 +19,10 @@ const { prisma } = vi.hoisted(() => ({
     captionSegment: { findMany: vi.fn() },
     person: { findUnique: vi.fn() },
     retainedConsentProof: { findMany: vi.fn() },
+    staffAccount: { findUnique: vi.fn() },
+    event: { findMany: vi.fn() },
+    recordingConsent: { findMany: vi.fn() },
+    multitrackConsent: { findMany: vi.fn() },
   },
 }));
 
@@ -89,6 +93,10 @@ beforeEach(() => {
   prisma.captionSegment.findMany.mockResolvedValue([]);
   prisma.person.findUnique.mockResolvedValue(null);
   prisma.retainedConsentProof.findMany.mockResolvedValue([]);
+  prisma.staffAccount.findUnique.mockResolvedValue(null);
+  prisma.event.findMany.mockResolvedValue([]);
+  prisma.recordingConsent.findMany.mockResolvedValue([]);
+  prisma.multitrackConsent.findMany.mockResolvedValue([]);
 });
 
 describe('chi puo’ scaricare', () => {
@@ -419,6 +427,7 @@ describe('prove dei consensi conservate', () => {
       grants: [],
       addressBook: null,
       retainedConsentProofs: [],
+      roomConsentProofs: [],
     });
   });
 });
@@ -494,5 +503,121 @@ describe('rubrica', () => {
       addressBook: Record<string, unknown>;
     };
     expect(corpo.addressBook).toMatchObject({ expiresAt: null, email: null });
+  });
+});
+
+describe('le prove di sala di chi conduce', () => {
+  const prova = (altri: Record<string, unknown>) => ({
+    eventId: 'ev-sala',
+    jitsiUserId: 'mod-ev-sala-aa',
+    displayName: encryptPII('Ada Rossi'),
+    registrationId: null,
+    eventModeratorId: null,
+    staffAccountId: null,
+    emailHash: null,
+    locale: 'it',
+    consentedAt: new Date('2026-10-02T08:00:00Z'),
+    withdrawnAt: null,
+    textVersion: 2,
+    registration: null,
+    eventModerator: null,
+    staffAccount: null,
+    ...altri,
+  });
+  beforeEach(() => {
+    prisma.event.findMany.mockResolvedValue([
+      { id: 'ev-sala', title: { it: 'Riunione' }, startsAt: new Date('2026-10-02T08:00:00Z') },
+    ]);
+  });
+  const leggi = async () =>
+    (await (await conToken()).json()) as {
+      roomConsentProofs: Array<Record<string, unknown>>;
+    };
+
+  it('consegna la trascrizione data con una concessione, con gli stessi legami della cancellazione', async () => {
+    prisma.eventModerator.findMany.mockResolvedValue([
+      {
+        id: 'grant-1',
+        name: encryptPII('Ada Rossi'),
+        role: 'SPEAKER',
+        organizer: false,
+        organization: null,
+        publicListed: false,
+        createdAt: new Date('2026-10-01T08:00:00Z'),
+        revokedAt: null,
+        event: { title: { it: 'Riunione' }, startsAt: new Date('2026-10-02T08:00:00Z') },
+        photo: null,
+        recordingConsents: [],
+      },
+    ]);
+    prisma.multitrackConsent.findMany.mockResolvedValue([
+      prova({ eventModeratorId: 'grant-1' }),
+    ]);
+
+    const { roomConsentProofs } = await leggi();
+
+    expect(prisma.multitrackConsent.findMany.mock.calls[0]![0].where).toEqual({
+      OR: [
+        { registrationId: { in: [] } },
+        { eventModeratorId: { in: ['grant-1'] } },
+        { staffAccountId: { in: [] } },
+        { emailHash: HASH },
+      ],
+    });
+    expect(roomConsentProofs).toEqual([
+      {
+        eventId: 'ev-sala',
+        kind: 'transcription',
+        name: 'Ada Rossi',
+        locale: 'it',
+        textVersion: 2,
+        destination: null,
+        givenAt: '2026-10-02T08:00:00.000Z',
+        withdrawnAt: null,
+        superseded: false,
+        event: { title: { it: 'Riunione' }, startsAt: '2026-10-02T08:00:00.000Z' },
+      },
+    ]);
+  });
+
+  it('trova le prove di un account dello staff, e l’evento finisce nel registro', async () => {
+    prisma.staffAccount.findUnique.mockResolvedValue({ id: 'acc-1' });
+    prisma.recordingConsent.findMany.mockResolvedValue([
+      prova({ staffAccountId: 'acc-1', destination: 'PUBLIC', earlierPeriods: null }),
+    ]);
+
+    const { roomConsentProofs } = await leggi();
+
+    expect(prisma.recordingConsent.findMany.mock.calls[0]![0].where.OR).toContainEqual({
+      staffAccountId: { in: ['acc-1'] },
+    });
+    expect(roomConsentProofs).toMatchObject([{ kind: 'recording', destination: 'PUBLIC' }]);
+    expect(prisma.gdprAuditLog.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({ eventId: 'ev-sala', action: 'DATA_EXPORTED' }),
+    });
+  });
+
+  it('una prova con l’impronta resta anche senza legami, e quella di un’iscrizione arriva con l’iscrizione', async () => {
+    prisma.multitrackConsent.findMany.mockResolvedValue([
+      prova({ emailHash: HASH }),
+      prova({
+        emailHash: HASH,
+        jitsiUserId: 'ospite-1',
+        registrationId: 'r1',
+      }),
+    ]);
+
+    const { roomConsentProofs } = await leggi();
+
+    expect(roomConsentProofs).toHaveLength(1);
+  });
+
+  it('chi ha solo queste prove le riceve anche con un’iscrizione', async () => {
+    prisma.registration.findMany.mockResolvedValue([iscrizione('r1', 'ev-1')]);
+    prisma.multitrackConsent.findMany.mockResolvedValue([prova({ emailHash: HASH })]);
+
+    const { roomConsentProofs } = await leggi();
+
+    expect(roomConsentProofs).toHaveLength(1);
   });
 });

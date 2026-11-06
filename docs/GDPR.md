@@ -443,12 +443,13 @@ Beside the registrations, the export returns the profile photo of the address as
 
 The export also returns the named grants with the same email hash as `grants`: for each, the event's title and start, the role, the name, the organization, whether the person is shown on the public page (`shownOnPublicPage`), the photo staff uploaded for the person (`photo`, a data URL, or `null`), and the creation and revocation times. The **My data** page lists them, with the photo.
 
-Two more blocks outlive the registrations, so they are returned also when none is left, and the page shows both:
+Three more blocks outlive the registrations, so they are returned also when none is left, and the page shows them:
 
 - `addressBook`, the address-book entry of the address, or `null`: name, email address, organization, role and organization type, whether the person is in the address book, the opt-in and opt-out times, the expiry (`expiresAt`), and for whoever is in it the token of the opt-out page (`optOutToken`);
-- `retainedConsentProofs`, the proofs kept with the same email hash: the event's title and start, the kind of consent, where it was given, the role, the name if it is still there, the language, the text version, the destination, the given and withdrawn times, and whether a later consent replaced it.
+- `retainedConsentProofs`, the proofs kept with the same email hash: the event's title and start, the kind of consent, where it was given, the role, the name if it is still there, the language, the text version, the destination, the given and withdrawn times, and whether a later consent replaced it;
+- `roomConsentProofs`, the recording and transcription proofs given in the room while leading an event, found through the same links as erasure: the named grants of the address, its staff account and the email HMAC on the proof. For each: the event's title and start, the kind of consent, the name, the language, the text version, the destination, the given and withdrawn times, and whether a later consent replaced it. The proofs of a registration come with the registration.
 
-It does not contain chat messages, including questions asked in the chat, questionnaire answers, feedback, word-cloud words, agenda reactions, invitations, staff accounts, recordings, audio tracks or the transcripts built from them or from the captions. Each export writes one `DATA_EXPORTED` row per event concerned, counting the events of the kept proofs. A person who has only an address-book entry leaves no row, because the log needs an event.
+It does not contain chat messages, including questions asked in the chat, questionnaire answers, feedback, word-cloud words, agenda reactions, invitations, staff accounts, recordings, audio tracks or the transcripts built from them or from the captions. Each export writes one `DATA_EXPORTED` row per event concerned, counting the events of the kept proofs and of the proofs given in the room. A person who has only an address-book entry leaves no row, because the log needs an event.
 
 ### What erasure deletes
 
