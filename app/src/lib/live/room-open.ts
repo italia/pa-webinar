@@ -30,3 +30,25 @@ export async function salaForseAperta(event: {
   });
   return aperta !== null;
 }
+
+/**
+ * La sala si e' aperta almeno una volta, anche se ora e' chiusa: da li' in poi
+ * qualcuno puo' essere nel video con cio' che ha letto prima di entrare. A
+ * differenza di `salaForseAperta` vale anche a evento concluso, e un evento
+ * concluso senza una sessione registrata conta come aperto.
+ *
+ * Serve a cio' che dipende da chi e' gia' stato in sala (la destinazione della
+ * registrazione, lib/recording/destination).
+ */
+export async function salaGiaAperta(event: {
+  id: string;
+  status: string;
+}): Promise<boolean> {
+  if (['ENDED', 'ARCHIVED'].includes(event.status)) return true;
+  if (await salaForseAperta(event)) return true;
+  const sessione = await prisma.callSession.findFirst({
+    where: { eventId: event.id },
+    select: { id: true },
+  });
+  return sessione !== null;
+}

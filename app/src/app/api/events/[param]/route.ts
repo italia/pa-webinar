@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: EUPL-1.2
 // SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
 
-import type { Prisma } from '@prisma/client';
+import type { Prisma, RecordingAudience } from '@prisma/client';
 import { cookies } from 'next/headers';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
@@ -18,6 +18,7 @@ import { LIVE_FLAG_FIELDS } from '@/lib/live-state/pubsub';
 import { recordLiveAction, recordLiveActions } from '@/lib/live/actions';
 import { reviveStatus } from '@/lib/events/lifecycle';
 import { CAMPI_VIDEO_VUOTI } from '@/lib/events/recording-fields';
+import { domandePubbliche } from '@/lib/events/post-event-sections';
 import { closeOpenSessions } from '@/lib/events/call-sessions';
 import { chiudiSondaggiAperti } from '@/lib/events/close-polls';
 import { eventTagIds, replaceEventTags, resolveTags, sameTagIds } from '@/lib/events/event-tags';
@@ -53,7 +54,13 @@ import {
   lingueDellEvento,
 } from '@/lib/text-translation/stato-lingue';
 import { unisciTesti } from '@/lib/text-translation/unione-testi';
-import { salaForseAperta } from '@/lib/live/room-open';
+import { salaForseAperta, salaGiaAperta } from '@/lib/live/room-open';
+import {
+  assertEsposizioneConsentita,
+  erroreDestinazioneNonCoperta,
+  puoCambiareDestinazione,
+  type Destinazione,
+} from '@/lib/recording/destination';
 import { annullaEmailInCoda } from '@/lib/email/outbox';
 
 export const dynamic = 'force-dynamic';
@@ -142,6 +149,8 @@ export const GET = withErrorHandling(async (request, context) => {
       audienceAnonymous: event.audienceAnonymous,
       participantListVisible: event.participantListVisible,
       hostsAlwaysRecorded: event.hostsAlwaysRecorded,
+      recordingDestination: event.recordingDestination,
+      offerAddressBook: event.offerAddressBook,
       // Al co-moderatore torna il SUO token (valido su tutte le route che
       // già lo ammettono), mai quello del primario.
       moderatorToken: isPrimaryModerator ? event.moderatorToken : token,
@@ -173,6 +182,11 @@ export const GET = withErrorHandling(async (request, context) => {
     throw new NotFoundError('Event');
   }
 
+  // Come la pagina della sala: il recupero esiste solo in diretta, e una
+  // registrazione riservata non si offre a chi legge questa risposta pubblica.
+  const recuperoInDiretta =
+    event.status === 'LIVE' && event.recordingDestination !== 'REGISTRANTS';
+
   return Response.json({
     id: event.id,
     slug: event.slug,
@@ -195,10 +209,12 @@ export const GET = withErrorHandling(async (request, context) => {
     // registrazione riservata agli iscritti passa dalla pagina e dal player,
     // che riconoscono l'iscritto (lib/recording/audience).
     recordingUrl: event.recordingPublished && event.recordingAudience === 'PUBLIC' ? event.recordingUrl : null,
-    tempRecordingUrl: event.status === 'LIVE' ? event.tempRecordingUrl : null,
-    tempRecordingStartedAt: event.status === 'LIVE' ? event.tempRecordingStartedAt?.toISOString() ?? null : null,
+    tempRecordingUrl: recuperoInDiretta ? event.tempRecordingUrl : null,
+    tempRecordingStartedAt: recuperoInDiretta ? event.tempRecordingStartedAt?.toISOString() ?? null : null,
     postEventPublic: event.postEventPublic,
-    postEventShowQA: event.postEventShowQA,
+    // Il valore efficace, non l'interruttore: con la registrazione riservata le
+    // domande non si pubblicano, qualunque sia la scelta salvata.
+    postEventShowQA: domandePubbliche(event),
     postEventShowMaterials: event.postEventShowMaterials,
     postEventShowPolls: event.postEventShowPolls,
     postEventShowFeedback: event.postEventShowFeedback,
@@ -259,6 +275,30 @@ export const PUT = withErrorHandling(async (request, context) => {
     data.hostsAlwaysRecorded !== event.hostsAlwaysRecorded
   ) {
     await soloStaffDellEvento(eventId, 'Only the event staff can change who is always recorded');
+  }
+
+  // Se il modulo propone la rubrica decide quali dati si raccolgono: come chi
+  // partecipa, non lo cambia un link di conduzione.
+  if (data.offerAddressBook !== undefined && data.offerAddressBook !== event.offerAddressBook) {
+    await soloStaffDellEvento(eventId, 'Only the event staff can change what the registration form offers');
+  }
+
+  // Dove va il video e' cio' a cui acconsente chi spunta la casella: lo dichiara
+  // chi organizza, e un cambio che lib/recording/destination non ammette si
+  // rifiuta (togliere una destinazione dichiarata, allargarla dopo la sala).
+  // Il wizard aperto con un link di conduzione non manda il campo.
+  const destinazioneChiesta = data.recordingDestination;
+  if (destinazioneChiesta !== undefined && destinazioneChiesta !== event.recordingDestination) {
+    await soloStaffDellEvento(eventId, 'Only the event staff can change where the recording goes');
+    if (
+      !puoCambiareDestinazione(
+        event.recordingDestination,
+        destinazioneChiesta,
+        await salaGiaAperta(event),
+      )
+    ) {
+      throw erroreDestinazioneNonCoperta();
+    }
   }
 
   // Le etichette le manda il wizard a ogni salvataggio, l'elenco intero: si
@@ -333,7 +373,10 @@ export const PUT = withErrorHandling(async (request, context) => {
   // cambierebbe solo per chi entra dopo.
   // Anche chi conduce sempre nella registrazione: a sala aperta chi ha gia' detto
   // no ci entrerebbe al primo rientro, e chi ha letto l'avviso ne uscirebbe.
+  // Anche la destinazione, che la sala mostra nel testo della casella: il suo
+  // allargamento si e' gia' fermato qui sopra, resta la restrizione.
   const CAMPI_DELLA_SALA = [
+    'recordingDestination',
     'recordingEnabled',
     'audienceAnonymous',
     'participantListVisible',
@@ -358,6 +401,36 @@ export const PUT = withErrorHandling(async (request, context) => {
       }
     }
   }
+
+  // Lo stato che la richiesta scrive, dopo i campi tolti qui sopra. Un evento
+  // che comincia a registrare adesso non e' un evento storico: come alla
+  // creazione, senza una scelta la destinazione e' riservata. Le chiamate rapide
+  // restano senza. La guardia confronta prima e dopo, quindi una modifica che
+  // non espone di piu' passa: la chiusura dell'evento, un salvataggio dal wizard.
+  const destinazionePrima = event.recordingDestination ?? null;
+  const comincia = data.recordingEnabled === true && !event.recordingEnabled;
+  const destinazioneDopo: Destinazione =
+    data.recordingDestination ??
+    destinazionePrima ??
+    (comincia && event.eventType !== 'INSTANT' ? 'REGISTRANTS' : null);
+  const pubblicoDopo = pubblicoAllineato(
+    destinazionePrima,
+    destinazioneDopo,
+    data.recordingAudience,
+    event.recordingAudience,
+  );
+  assertEsposizioneConsentita(event, {
+    recordingDestination: destinazioneDopo,
+    recordingAudience: pubblicoDopo,
+    recordingPublished:
+      data.recordingUrl === null
+        ? false
+        : (data.recordingPublished ?? event.recordingPublished),
+    transcriptPublished: data.transcriptPublished ?? event.transcriptPublished,
+    youtubeUrl: data.youtubeUrl !== undefined ? data.youtubeUrl : event.youtubeUrl,
+    tempRecordingUrl:
+      data.tempRecordingUrl !== undefined ? data.tempRecordingUrl : event.tempRecordingUrl,
+  });
 
   // La foto dell'organizzatore principale: una che non c'e' piu' (o di un
   // altro evento) si lascia cadere, senza rifiutare il resto della modifica.
@@ -611,12 +684,14 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.audienceAnonymous !== undefined && { audienceAnonymous: data.audienceAnonymous }),
       ...(data.participantListVisible !== undefined && { participantListVisible: data.participantListVisible }),
       ...(data.hostsAlwaysRecorded !== undefined && { hostsAlwaysRecorded: data.hostsAlwaysRecorded }),
+      ...(data.offerAddressBook !== undefined && { offerAddressBook: data.offerAddressBook }),
+      ...(destinazioneDopo !== destinazionePrima && { recordingDestination: destinazioneDopo }),
       ...(data.recordingPublished !== undefined && {
         recordingPublished: data.recordingPublished,
         ...(data.recordingPublished ? { recordingPublishedAt: new Date() } : { recordingPublishedAt: null }),
       }),
       ...(data.transcriptPublished !== undefined && { transcriptPublished: data.transcriptPublished }),
-      ...(data.recordingAudience !== undefined && { recordingAudience: data.recordingAudience }),
+      ...(pubblicoDopo !== event.recordingAudience && { recordingAudience: pubblicoDopo }),
       ...(data.recordingDeleteAfterDays !== undefined && { recordingDeleteAfterDays: data.recordingDeleteAfterDays }),
       ...(data.recordingUrl !== undefined && { recordingUrl: data.recordingUrl }),
       ...(data.tempRecordingUrl !== undefined && { tempRecordingUrl: data.tempRecordingUrl }),
@@ -836,6 +911,24 @@ export const PUT = withErrorHandling(async (request, context) => {
     ...(traduzione && { traduzione }),
   });
 });
+
+/**
+ * Il pubblico della registrazione dopo un cambio di destinazione. Una
+ * destinazione riservata lo porta sempre a REGISTRANTS: restringere vince su cio'
+ * che chiede la stessa richiesta, e non produce mai un rifiuto. Da riservata a
+ * pubblica torna per tutti, se la richiesta non dice altro: quel pubblico l'aveva
+ * imposto la destinazione. Altrimenti resta quello scelto.
+ */
+function pubblicoAllineato(
+  prima: Destinazione,
+  dopo: Destinazione,
+  chiesto: RecordingAudience | undefined,
+  attuale: RecordingAudience,
+): RecordingAudience {
+  if (dopo === 'REGISTRANTS' && prima !== 'REGISTRANTS') return 'REGISTRANTS';
+  if (chiesto) return chiesto;
+  return prima === 'REGISTRANTS' && dopo === 'PUBLIC' ? 'PUBLIC' : attuale;
+}
 
 /**
  * Un campo che decide lo staff che gestisce l'evento, non chi ha un link di

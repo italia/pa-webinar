@@ -21,7 +21,8 @@ import { materialUrlSchema } from '@/lib/validation/materials';
 import { requireEventManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
-import { AppError, ValidationError } from '@/lib/errors';
+import { AppError, NotFoundError, ValidationError } from '@/lib/errors';
+import { assertEsposizioneConsentita } from '@/lib/recording/destination';
 
 export const dynamic = 'force-dynamic';
 
@@ -68,6 +69,49 @@ export const PATCH = withErrorHandling(async (request, context) => {
     );
   }
 
+  // La destinazione dell'evento decide cosa si puo' esporre. Un file appena
+  // caricato non si rifiuta mai: e' gia' nello storage, e sugli eventi riservati
+  // lo vedono solo gli iscritti. La guardia guarda solo una pubblicazione
+  // chiesta esplicitamente e l'indirizzo esterno.
+  const prima = await prisma.event.findUnique({
+    where: { id },
+    select: {
+      eventType: true,
+      recordingEnabled: true,
+      recordingDestination: true,
+      recordingAudience: true,
+      recordingPublished: true,
+      transcriptPublished: true,
+      youtubeUrl: true,
+      tempRecordingUrl: true,
+    },
+  });
+  if (!prima) throw new NotFoundError('Event');
+
+  // Il caricamento accende la registrazione: un evento che comincia a registrare
+  // con questo file parte riservato, come quando la si accende dalla modifica
+  // dell'evento. Chiamate rapide ed eventi storici restano senza destinazione.
+  const cominciaRiservato =
+    !!parsed.data.recordingUrl &&
+    !prima.recordingEnabled &&
+    prima.recordingDestination === null &&
+    prima.eventType !== 'INSTANT' &&
+    prima.eventType !== 'LEGACY';
+  const destinazione = cominciaRiservato
+    ? ({ recordingDestination: 'REGISTRANTS', recordingAudience: 'REGISTRANTS' } as const)
+    : null;
+
+  assertEsposizioneConsentita(prima, {
+    ...prima,
+    ...destinazione,
+    recordingPublished:
+      parsed.data.recordingUrl === null
+        ? false
+        : (parsed.data.recordingPublished ?? prima.recordingPublished),
+    youtubeUrl:
+      parsed.data.youtubeUrl !== undefined ? parsed.data.youtubeUrl : prima.youtubeUrl,
+  });
+
   // Attaching a recording URL means we also flip the published switch
   // on by default — uploading a file from the admin panel is an
   // explicit intent to publish. The caller can still opt out by
@@ -97,6 +141,7 @@ export const PATCH = withErrorHandling(async (request, context) => {
         // Enable the flag even on retroactive uploads (Jibri was off
         // during the event) so the detail page surfaces the player.
         recordingEnabled: true,
+        ...destinazione,
       }),
       ...(publishWith !== undefined && {
         recordingPublished: publishWith,

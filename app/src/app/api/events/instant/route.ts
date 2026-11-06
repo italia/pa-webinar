@@ -93,6 +93,9 @@ export const POST = withErrorHandling(async (request) => {
       // Whiteboard sempre attiva nelle videocall istantanee (il client la
       // forza comunque; qui allineiamo lo stato in DB).
       whiteboardEnabled: true,
+      // Nessuna destinazione: la chiamata parte subito, non c'e' un passo in cui
+      // dichiararla. Niente blocco e un avviso a chi pubblica
+      // (lib/recording/destination).
       recordingEnabled: true,
       participantsCanUnmute: true,
       participantsCanStartVideo: true,

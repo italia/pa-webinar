@@ -18,6 +18,8 @@ import ToggleSwitch from '@/components/ui/toggle-switch';
 import { useRouter, Link, percorso } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
 import { useConfirm } from '@/components/ui/confirm-dialog';
+import { codiceErrore, messaggioErroreApi } from '@/lib/api-error-message';
+import { esitoPubblicazione, type Destinazione } from '@/lib/recording/destination';
 import RecordingUploadWidget from './recording-upload-widget';
 
 interface RecordingManagementProps {
@@ -25,7 +27,9 @@ interface RecordingManagementProps {
     id: string;
     slug: string;
     status: string;
+    eventType: string;
     recordingEnabled: boolean;
+    recordingDestination: Destinazione;
     recordingUrl: string | null;
     tempRecordingUrl: string | null;
     tempRecordingStartedAt: string | null;
@@ -71,6 +75,7 @@ export default function RecordingManagement({
   slidesRecordingId = null,
 }: RecordingManagementProps) {
   const t = useTranslations('recording');
+  const tApi = useTranslations('apiErrors');
   const toast = useToast();
   const confirm = useConfirm();
   const fmt = useFormatter();
@@ -85,6 +90,21 @@ export default function RecordingManagement({
 
   const hasRecording = !!(event.recordingUrl || event.tempRecordingUrl);
   const isLive = event.status === 'LIVE';
+  const esito = esitoPubblicazione(event);
+
+  // Un evento senza destinazione non si blocca: i consensi raccolti non dicono
+  // dove sarebbe andato il video, e lo si dice a chi pubblica, compreso chi lo
+  // fa caricando un file, che si pubblica da solo.
+  const avvisoDestinazione = esito === 'senzaDestinazione' && (
+    <Alert color="warning" className="mb-3">
+      {t('destinationMissing')}
+    </Alert>
+  );
+
+  // Il file caricato cambia pubblicazione e pubblico sul server: quando la
+  // pagina si rilegge, le scelte mostrate seguono.
+  useEffect(() => setPublished(event.recordingPublished), [event.recordingPublished]);
+  useEffect(() => setAudience(event.recordingAudience), [event.recordingAudience]);
 
   useEffect(() => {
     if (!isLive || !event.tempRecordingStartedAt) return;
@@ -98,9 +118,10 @@ export default function RecordingManagement({
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [isLive, event.tempRecordingStartedAt]);
 
-  /** Salva un campo dell'evento; false se il server non l'ha salvato. */
+  /** Salva un campo dell'evento: il motivo se il server non l'ha salvato, null
+   *  se l'ha salvato. Un rifiuto per la destinazione dice cosa non si puo' fare. */
   const updateField = useCallback(
-    async (data: Record<string, unknown>): Promise<boolean> => {
+    async (data: Record<string, unknown>): Promise<string | null> => {
       setSaving(true);
       try {
         const r = await fetch(`/api/events/${event.id}`, {
@@ -111,14 +132,15 @@ export default function RecordingManagement({
           },
           body: JSON.stringify(data),
         });
-        return r.ok;
+        if (r.ok) return null;
+        return messaggioErroreApi(r.status, tApi, t('saveFailed'), {}, await codiceErrore(r));
       } catch {
-        return false;
+        return t('saveFailed');
       } finally {
         setSaving(false);
       }
     },
-    [event.id, event.moderatorToken],
+    [event.id, event.moderatorToken, t, tApi],
   );
 
   // Pubblicazione e pubblico decidono chi vede il video: se il server non
@@ -127,22 +149,24 @@ export default function RecordingManagement({
   const handleTogglePublish = useCallback(async () => {
     const next = !published;
     setPublished(next);
-    if (!(await updateField({ recordingPublished: next }))) {
+    const errore = await updateField({ recordingPublished: next });
+    if (errore) {
       setPublished(!next);
-      toast.error(t('saveFailed'));
+      toast.error(errore);
     }
-  }, [published, updateField, toast, t]);
+  }, [published, updateField, toast]);
 
   const handleAudienceChange = useCallback(
     async (next: 'PUBLIC' | 'REGISTRANTS') => {
       const prima = audience;
       setAudience(next);
-      if (!(await updateField({ recordingAudience: next }))) {
+      const errore = await updateField({ recordingAudience: next });
+      if (errore) {
         setAudience(prima);
-        toast.error(t('saveFailed'));
+        toast.error(errore);
       }
     },
-    [audience, updateField, toast, t],
+    [audience, updateField, toast],
   );
 
   const handleRetentionChange = useCallback(
@@ -184,6 +208,7 @@ export default function RecordingManagement({
           <div className="text-muted mb-3" style={{ fontSize: '0.9rem' }}>
             {t('disabledHint')}
           </div>
+          {avvisoDestinazione}
           <RecordingUploadWidget eventId={event.id} />
         </CardBody>
       </Card>
@@ -244,6 +269,8 @@ export default function RecordingManagement({
             <Alert color="success" className="mb-3">
               <span className="fw-semibold">{t('available')}</span>
             </Alert>
+
+            {avvisoDestinazione}
 
             {event.recordingDuration && (
               <div className="text-muted mb-1" style={{ fontSize: '0.85rem' }}>
@@ -319,7 +346,7 @@ export default function RecordingManagement({
                       name="recording-audience"
                       checked={audience === value}
                       onChange={() => handleAudienceChange(value)}
-                      disabled={saving}
+                      disabled={saving || (value === 'PUBLIC' && esito === 'riservata')}
                     />
                     <label htmlFor={`audience-${value}`}>
                       {value === 'PUBLIC' ? t('audiencePublic') : t('audienceRegistrants')}
@@ -329,6 +356,11 @@ export default function RecordingManagement({
                     </label>
                   </div>
                 ))}
+                {esito === 'riservata' && (
+                  <div className="text-muted mt-2" style={{ fontSize: '0.8rem' }}>
+                    {t('audienceReservedNote')}
+                  </div>
+                )}
               </fieldset>
             </div>
 
@@ -429,7 +461,10 @@ export default function RecordingManagement({
             for a MsTeams export. Hidden while a live recording is
             running to avoid racing against Jibri's own upload. */}
         {!isLive && (
-          <RecordingUploadWidget eventId={event.id} compact />
+          <>
+            {!hasRecording && avvisoDestinazione}
+            <RecordingUploadWidget eventId={event.id} compact />
+          </>
         )}
       </CardBody>
     </Card>

@@ -21,7 +21,7 @@
 
 import { randomUUID } from 'crypto';
 import { cookies } from 'next/headers';
-import type { EventType } from '@prisma/client';
+import type { EventType, RecordingAudience } from '@prisma/client';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
@@ -49,6 +49,9 @@ interface PublicationRow {
   endsAt: string;
   libraryListed: boolean;
   postEventPublic: boolean;
+  /** Chi vede la registrazione: la libreria mostra solo quelle per tutti. */
+  recordingAudience: RecordingAudience;
+  recordingDestination: RecordingAudience | null;
   coverImageUrl: string | null;
   imageUrl: string | null;
   youtubeUrl: string | null;
@@ -119,6 +122,8 @@ export const GET = withErrorHandling(async (request) => {
       endsAt: e.endsAt.toISOString(),
       libraryListed: e.libraryListed,
       postEventPublic: e.postEventPublic,
+      recordingAudience: e.recordingAudience,
+      recordingDestination: e.recordingDestination,
       coverImageUrl: e.coverImageUrl,
       imageUrl: e.imageUrl,
       youtubeUrl: e.youtubeUrl,
