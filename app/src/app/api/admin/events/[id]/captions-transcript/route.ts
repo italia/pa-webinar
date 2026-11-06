@@ -25,6 +25,7 @@ import {
   costruisciTrascrizioneDaiSottotitoli,
 } from '@/lib/captions/transcript';
 import { prisma } from '@/lib/db';
+import { titolariDeiPosti } from '@/lib/gdpr/consent-proofs';
 import { AppError, NotFoundError } from '@/lib/errors';
 
 export const dynamic = 'force-dynamic';
@@ -71,7 +72,7 @@ export const GET = withErrorHandling(async (_request, context) => {
     // Le frasi di chi non ha dato il consenso: contate, senza testo ne' nome.
     segnaposto,
     // Le persone, non i posti: chi si ricollega ha un posto nuovo.
-    voci: contaVoci(voci),
+    voci: contaVoci(voci, await titolariDeiPosti(prisma, id)),
     trascrizione:
       registrazione && artefatto
         ? {

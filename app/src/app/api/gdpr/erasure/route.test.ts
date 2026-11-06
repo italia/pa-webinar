@@ -20,8 +20,8 @@ const tx = {
   roomOccupant: { deleteMany: vi.fn() },
   registration: { deleteMany: vi.fn() },
   postprodArtifact: { findMany: vi.fn() },
-  recordingConsent: { deleteMany: vi.fn() },
-  multitrackConsent: { deleteMany: vi.fn() },
+  recordingConsent: { deleteMany: vi.fn(), findMany: vi.fn() },
+  multitrackConsent: { deleteMany: vi.fn(), findMany: vi.fn() },
   $executeRaw: vi.fn(),
 };
 const invalidate = vi.hoisted(() => vi.fn());
@@ -102,6 +102,8 @@ beforeEach(() => {
   db.eventModerator.findMany.mockResolvedValue([{ id: 'grant-1', eventId: 'evt-1', token: 'tok-1', photoId: null }]);
   tx.recordingConsent.deleteMany.mockResolvedValue({ count: 1 });
   tx.multitrackConsent.deleteMany.mockResolvedValue({ count: 1 });
+  tx.recordingConsent.findMany.mockResolvedValue([]);
+  tx.multitrackConsent.findMany.mockResolvedValue([]);
   db.multitrackConsent.findMany.mockResolvedValue([]);
   prove.conservaProve.mockResolvedValue(0);
   prove.tipiDelleProveEsistenti.mockResolvedValue([]);
@@ -304,6 +306,32 @@ describe('POST /api/gdpr/erasure', () => {
     };
     expect(riga.data).toMatchObject({ eventId: 'evt-1', action: 'DATA_DELETED', recordCount: 1 });
     expect(JSON.parse(riga.data.details)).toMatchObject({ consentProofsWithoutName: 1 });
+  });
+
+  it('deletes the caption sentences of the seats of the proofs, before the proofs that tie them', async () => {
+    db.registration.findMany.mockResolvedValue([]);
+    const prova = (jitsiUserId: string) => ({
+      eventId: 'evt-1',
+      jitsiUserId,
+      registrationId: null,
+      eventModeratorId: 'grant-1',
+      staffAccountId: null,
+    });
+    tx.recordingConsent.findMany.mockResolvedValue([prova('mod-evt-1-aa')]);
+    tx.multitrackConsent.findMany.mockResolvedValue([prova('mod-evt-1-aa'), prova('mod-evt-1-bb')]);
+
+    await POST(req('valido') as never, ctx as never);
+
+    expect(tx.captionSegment.deleteMany).toHaveBeenCalledWith({
+      where: { eventId: 'evt-1', seatId: { in: ['mod-evt-1-aa', 'mod-evt-1-bb'] } },
+    });
+    expect(tx.captionSegment.deleteMany.mock.invocationCallOrder[0]).toBeLessThan(
+      tx.recordingConsent.deleteMany.mock.invocationCallOrder[0]!,
+    );
+    // Le stesse scelte della cancellazione: nessuna prova resta fuori.
+    expect(tx.multitrackConsent.findMany.mock.calls[0]![0].where).toEqual(
+      tx.multitrackConsent.deleteMany.mock.calls[0]![0].where,
+    );
   });
 
   it('treats the consents given with a staff account like those of a grant', async () => {

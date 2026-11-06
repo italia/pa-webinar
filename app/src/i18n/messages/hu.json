@@ -4574,6 +4574,13 @@
       "proofsIntro": "Ezen események adatai törölve lettek. Ezek az igazolások addig maradnak meg, amíg a videó vagy az átirat létezik. A hozzájárulását visszavonhatja: ami már a videóban van, az ott marad, és az eltávolításához írnia kell az adatkezelőnek.",
       "proofGivenOn": "Megadva: {date}",
       "proofSuperseded": "Egy későbbi hozzájárulás váltotta fel",
+      "proofWithdrawEffect": {
+        "recording": "You also withdraw your consent to transcription: your sentences and your name leave the transcript from captions. What is already in the video stays, and so does a transcript made from the video or the audio tracks: to have them removed, write to the data controller. This withdrawal cannot be undone from this page.",
+        "transcription": "Your sentences and your name leave the transcript from captions. A transcript made from the video or the audio tracks stays: to have it removed, write to the data controller. This withdrawal cannot be undone from this page."
+      },
+      "proofWithdrawHost": "Older transcripts from captions do not recognize hosts: your sentences and your name stay there, and to have them removed you must write to the data controller.",
+      "roomProofsTitle": "Consents given while leading an event",
+      "roomProofsIntro": "The recording and transcription consents you gave when entering the room with a role in the event. The Consents dialog in the room withdraws those of the current entry and, with your staff account, those of earlier entries too; for the others, and once the event is over, what remains is erasing your data.",
       "addressBookTitle": "Az események címjegyzéke",
       "addressBookIntro": "Ön úgy döntött, hogy a címjegyzékben marad, hogy hasonló eseményekre meghívást kapjon. Visszavonás vagy új hozzájárulás hiányában ezeket az adatokat a következő napig őrizzük meg: {date}.",
       "addressBookOptOut": "Adataim eltávolítása a címjegyzékből",

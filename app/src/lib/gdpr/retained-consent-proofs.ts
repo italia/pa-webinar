@@ -47,7 +47,9 @@ import { isMultitrackPlaceholder } from '@/lib/recorder/lifecycle';
  *
  * Chi ritira o cancella dopo la pulizia esce anche dalla trascrizione dai
  * sottotitoli: l'iscrizione non c'e' piu', e la prova la riconosce nel corpo della
- * trascrizione con l'impronta del titolare.
+ * trascrizione con l'impronta del titolare. Vale anche per concessioni e account
+ * dello staff, se il corpo porta le impronte dei titolari: uno senza impronte
+ * tiene le loro frasi (togliPersoneDalleTrascrizioni).
  *
  * Se ne vanno al primo giro della pulizia dopo che video e trascrizione non
  * esistono piu', e alla fine della conservazione dei dati se non sono pubblicati
@@ -213,7 +215,7 @@ async function togliDalleTrascrizioni(
   const iscrizioni = (await iscrizioniNelleTrascrizioni(tx, eventId)).filter((id) =>
     impronte.has(improntaTitolare(eventId, titolareIscrizione(id)))
   );
-  await togliPersoneDalleTrascrizioni(tx, [eventId], iscrizioni);
+  await togliPersoneDalleTrascrizioni(tx, [eventId], iscrizioni, [...impronte]);
 }
 
 /**
@@ -307,7 +309,8 @@ export async function ritiraProveDelleIscrizioni(
  * dalla sala (lib/live/consent-withdrawal), ritirare la registrazione ritira
  * anche la trascrizione dello stesso evento, che senza registrazione non ha
  * luogo. Vale per tutti i periodi del consenso. Il video non cambia; la persona
- * esce dalla trascrizione dai sottotitoli, come con il ritiro dalla sala.
+ * esce dalla trascrizione dai sottotitoli, come con il ritiro dalla sala, con il
+ * limite dei corpi senza impronte per chi conduce.
  *
  * Restituisce false se la prova non si trova; ritirarla due volte non cambia
  * niente e non scrive nel registro.

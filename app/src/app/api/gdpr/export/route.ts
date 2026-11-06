@@ -15,7 +15,8 @@
  * Oltre alle iscrizioni consegna cio' che dura piu' di loro, anche a chi non ne
  * ha piu' nessuna: la voce di rubrica (ADR-011) con il token per uscirne e le
  * prove dei consensi conservate (lib/gdpr/retained-consent-proofs), con il token
- * per ritirarli.
+ * per ritirarli. Lo stesso per le prove di sala date conducendo un evento, che si
+ * trovano con gli stessi legami della cancellazione.
  */
 
 import { withErrorHandling } from '@/lib/api-handler';
@@ -24,6 +25,7 @@ import { prisma } from '@/lib/db';
 import { decryptPII, tryDecryptPII } from '@/lib/crypto/pii';
 import { getClientIp, rateLimit } from '@/lib/rate-limit';
 import { voceNelVideo } from '@/lib/recording/availability';
+import { proveDiSalaDiChiConduce } from '@/lib/gdpr/consent-proofs';
 import { consensiDellIscrizione } from '@/lib/gdpr/consent-state';
 import { issueGdprToken, verifyGdprToken } from '@/lib/gdpr/request-token';
 import { proveConservateDellaPersona } from '@/lib/gdpr/retained-consent-proofs';
@@ -130,6 +132,7 @@ export const GET = withErrorHandling(async (request) => {
   const concessioni = await prisma.eventModerator.findMany({
     where: { emailHash },
     select: {
+      id: true,
       name: true,
       role: true,
       organizer: true,
@@ -201,6 +204,15 @@ export const GET = withErrorHandling(async (request) => {
     : null;
 
   const retainedConsentProofs = await proveConservateDellaPersona(emailHash);
+  const account = await prisma.staffAccount.findUnique({
+    where: { emailHash },
+    select: { id: true },
+  });
+  const roomConsentProofs = await proveDiSalaDiChiConduce(prisma, {
+    emailHash,
+    grantIds: concessioni.map((g) => g.id),
+    staffAccountIds: account ? [account.id] : [],
+  });
 
   // Audit one row per distinct event, recording only an emailHash prefix
   // (not the address) so the log itself cannot be reversed.
@@ -208,6 +220,7 @@ export const GET = withErrorHandling(async (request) => {
     ...new Set([
       ...registrations.map((r) => r.eventId),
       ...retainedConsentProofs.map((p) => p.eventId),
+      ...roomConsentProofs.map((p) => p.eventId),
     ]),
   ];
   for (const eventId of eventIds) {
@@ -228,6 +241,7 @@ export const GET = withErrorHandling(async (request) => {
       grants,
       addressBook,
       retainedConsentProofs,
+      roomConsentProofs,
       ...(retainedConsentProofs.length > 0 && {
         consentsToken: issueGdprToken('consents', emailHash),
       }),
@@ -329,6 +343,7 @@ export const GET = withErrorHandling(async (request) => {
     grants,
     addressBook,
     retainedConsentProofs,
+    roomConsentProofs,
     // Serve a ritirare un consenso dalla pagina: il link dell'email resta di
     // sola lettura, e questo non finisce negli indirizzi.
     consentsToken: issueGdprToken('consents', emailHash),

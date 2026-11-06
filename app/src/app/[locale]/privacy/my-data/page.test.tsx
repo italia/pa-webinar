@@ -8,6 +8,7 @@ import { createRoot, type Root } from 'react-dom/client';
 import { NextIntlClientProvider } from 'next-intl';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import inglese from '@/i18n/messages/en.json';
 import messages from '@/i18n/messages/it.json';
 
 vi.mock('next/navigation', () => ({
@@ -99,6 +100,38 @@ describe('I miei dati', () => {
         (b) => b.textContent?.trim() === messages.live.consents.withdraw
       )
     ).toBe(true);
+  });
+
+  it('il testo sui consensi di sala promette solo il ritiro che la sala puo fare', () => {
+    // La finestra raggiunge i posti dell'ingresso in corso, e quelli di prima solo
+    // con l'account dello staff: una concessione nominale non li ritrova.
+    expect(m.roomProofsIntro).toContain('ingresso in corso');
+    expect(m.roomProofsIntro).toContain('account dello staff');
+    expect(inglese.gdpr.export.roomProofsIntro).toContain('current entry');
+    expect(inglese.gdpr.export.roomProofsIntro).toContain('staff account');
+  });
+
+  it('chi ha condotto vede i consensi dati in sala, anche senza altri dati', async () => {
+    await monta({
+      ...VUOTO,
+      roomConsentProofs: [
+        {
+          kind: 'transcription',
+          givenAt: '2026-09-01T08:00:00.000Z',
+          withdrawnAt: '2026-09-03T08:00:00.000Z',
+          superseded: false,
+          event: { title: { it: 'Riunione' }, startsAt: '2026-09-02T08:00:00.000Z' },
+        },
+      ],
+    });
+    const testo = container.textContent ?? '';
+    expect(testo).toContain(m.roomProofsTitle);
+    expect(testo).toContain(m.roomProofsIntro);
+    expect(testo).toContain('Riunione');
+    expect(testo).toContain(messages.live.consents.transcription.title);
+    expect(testo).toContain('Dato il 1 settembre 2026');
+    expect(testo).toContain('Ritirato il 3 settembre 2026');
+    expect(testo).not.toContain(m.noData);
   });
 
   it('chi e’ solo in rubrica vede i suoi dati, la scadenza e il link per uscirne', async () => {

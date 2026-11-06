@@ -21,7 +21,7 @@ import { ritiraConsensi } from '@/lib/live/consent-withdrawal';
 import type { PeriodoConsenso } from '@/lib/recording/destination';
 
 import { biscotti } from './biscotti';
-import { creaEvento, creaIscrizione, richiesta, svuotaDatabase } from './fixtures';
+import { creaEvento, creaIscrizione, entraCome, richiesta, svuotaDatabase } from './fixtures';
 
 const CHE_REGISTRA = { recordingEnabled: true, participantsCanUnmute: true };
 
@@ -85,6 +85,12 @@ const prove = (eventId: string) =>
   prisma.recordingConsent.findMany({ where: { eventId } });
 const registro = (eventId: string) =>
   prisma.gdprAuditLog.count({ where: { eventId, action: 'CONSENT_RECORDED' } });
+const tracce = (eventId: string) =>
+  prisma.multitrackConsent.findMany({ where: { eventId } });
+const posto = (jwt: string) =>
+  (JSON.parse(Buffer.from(jwt.split('.')[1]!, 'base64url').toString()) as {
+    context: { user: { id: string } };
+  }).context.user.id;
 
 describe('la prova dell’iscrizione quando il testo in vigore cambia', () => {
   it('dopo un allargamento il testo vecchio non vale e la prova non cambia', async () => {
@@ -276,12 +282,6 @@ describe('la prova dell’iscrizione quando il testo in vigore cambia', () => {
 
 describe('la replica di un consenso gia dato', () => {
   const CON_TRACCE = { ...CHE_REGISTRA, multitrackRecordingEnabled: true };
-  const tracce = (eventId: string) =>
-    prisma.multitrackConsent.findMany({ where: { eventId } });
-  const posto = (jwt: string) =>
-    (JSON.parse(Buffer.from(jwt.split('.')[1]!, 'base64url').toString()) as {
-      context: { user: { id: string } };
-    }).context.user.id;
 
   it('un ritiro dalla pagina dei propri dati resta tale al rientro nella stessa visita', async () => {
     const evento = await creaEvento(CON_TRACCE);
@@ -405,6 +405,60 @@ describe('la replica di un consenso gia dato', () => {
 });
 
 describe('le prove senza iscrizione', () => {
+  it('chi conduce col suo account riporta la trascrizione e dal secondo ingresso la ritira tutta', async () => {
+    const evento = await creaEvento({ multitrackRecordingEnabled: true });
+    const account = await entraCome('ADMIN');
+    const primo = await entra(evento.slug, {
+      moderatorToken: evento.moderatorToken,
+      multitrackConsent: true,
+    });
+    expect(primo.consentsInForce.transcription).toBe(true);
+
+    // Un'altra visita della pagina: nessun token della sala di prima.
+    const secondo = await entra(evento.slug, {
+      moderatorToken: evento.moderatorToken,
+      consentReplay: { multitrack: true },
+    });
+    expect(secondo.consentsInForce.transcription).toBe(true);
+    const posti = [posto(primo.jwt), posto(secondo.jwt)];
+    expect(new Set(posti).size).toBe(2);
+    expect(await tracce(evento.id)).toMatchObject([
+      { staffAccountId: account.id },
+      { staffAccountId: account.id },
+    ]);
+    await prisma.captionSegment.createMany({
+      data: posti.map((seatId, i) => ({
+        eventId: evento.id,
+        messageId: `frase-${i}`,
+        endpointId: `ep-${i}`,
+        seatId,
+        speakerName: encryptPII('Persona dello staff'),
+        text: encryptPII('Una frase'),
+        startedAt: new Date(),
+        endedAt: new Date(),
+      })),
+    });
+
+    const esito = await ritiraConsensi(evento.id, [posti[1]!], { registrazione: false });
+
+    expect(esito).toEqual({ registrazione: false, trascrizione: true });
+    expect((await tracce(evento.id)).every((t) => t.withdrawnAt)).toBe(true);
+    expect(await prisma.captionSegment.count({ where: { text: { not: null } } })).toBe(0);
+  });
+
+  it('senza prova sull’account la replica della trascrizione non crea niente', async () => {
+    const evento = await creaEvento({ multitrackRecordingEnabled: true });
+    await entraCome('ADMIN');
+
+    const risposta = await entra(evento.slug, {
+      moderatorToken: evento.moderatorToken,
+      consentReplay: { multitrack: true },
+    });
+
+    expect(risposta.consentsInForce.transcription).toBe(false);
+    expect(await tracce(evento.id)).toEqual([]);
+  });
+
   it('un ospite lascia una riga per ingresso, con il testo letto', async () => {
     const evento = await creaEvento({ ...CHE_REGISTRA, recordingDestination: 'PUBLIC' });
 

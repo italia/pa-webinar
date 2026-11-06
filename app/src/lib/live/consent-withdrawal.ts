@@ -5,6 +5,7 @@ import { prisma } from '@/lib/db';
 import { iscrizioneDelPosto } from '@/lib/captions/room';
 import { bloccaTrascrizioneEvento, togliPersoneDalleTrascrizioni } from '@/lib/captions/transcript';
 import { TIMEOUT_DOPO_PULIZIA_MS } from '@/lib/gdpr/cleanup-selection';
+import { improntaTitolare, titolareAccount } from '@/lib/gdpr/consent-proofs';
 import { ritiraProveDelleIscrizioni } from '@/lib/gdpr/retained-consent-proofs';
 import { fermaInviti } from '@/lib/persons/inviti-fermati';
 import { getSettings } from '@/lib/settings';
@@ -19,8 +20,8 @@ import { getSettings } from '@/lib/settings';
  *   - l'iscrizione, per chi e' entrato dal proprio link: il consenso dato
  *     all'iscrizione e le prove legate all'iscrizione, di ogni ingresso;
  *   - per chi conduce dal link primario con la sessione del proprio account,
- *     l'account dello staff a cui e' legata la prova della registrazione, con
- *     i posti degli ingressi precedenti;
+ *     l'account dello staff a cui sono legate le prove della registrazione e
+ *     della trascrizione, con i posti degli ingressi precedenti;
  *   - per gli altri (ospiti, link inoltrati, concessioni nominali), le prove
  *     dei posti dati. Una concessione nominale e' un posto, non una persona:
  *     il link si puo' inoltrare, e il ritiro di chi lo apre non tocca i
@@ -78,8 +79,7 @@ export async function ritiraConsensi(
       // prima cosa: una gia' partita non rimette le frasi tolte qui sotto, e nessuno
       // aspetta tenendo le righe che servono all'altro.
       await bloccaTrascrizioneEvento(tx, eventId);
-      // Le prove della registrazione dei posti dati: portano l'iscrizione, la
-      // concessione nominale o l'account dello staff.
+      // Le prove dei posti dati: portano l'iscrizione o l'account dello staff.
       const proveDeiPosti = await tx.recordingConsent.findMany({
         where: { eventId, jitsiUserId: { in: [...posti] } },
         select: { registrationId: true, staffAccountId: true },
@@ -90,25 +90,29 @@ export async function ritiraConsensi(
         if (r) iscrizioni.add(r);
       }
       const tracceDeiPosti = await tx.multitrackConsent.findMany({
-        where: { eventId, jitsiUserId: { in: [...posti] }, registrationId: { not: null } },
-        select: { registrationId: true },
+        where: { eventId, jitsiUserId: { in: [...posti] } },
+        select: { registrationId: true, staffAccountId: true },
       });
       for (const p of [...proveDeiPosti, ...tracceDeiPosti]) {
         if (p.registrationId) iscrizioni.add(p.registrationId);
       }
       const account = [
         ...new Set(
-          proveDeiPosti.map((p) => p.staffAccountId).filter((v): v is string => !!v)
+          [...proveDeiPosti, ...tracceDeiPosti]
+            .map((p) => p.staffAccountId)
+            .filter((v): v is string => !!v)
         ),
       ];
       // I posti degli ingressi precedenti dello staff dietro il link primario:
-      // le prove della registrazione li legano allo stesso account.
+      // le prove, di una tabella o dell'altra, li legano allo stesso account.
+      const delleProve = { where: { eventId, staffAccountId: { in: account } } };
+      const scelta = { select: { jitsiUserId: true } };
       const postiConduce =
         account.length > 0
-          ? await tx.recordingConsent.findMany({
-              where: { eventId, staffAccountId: { in: account } },
-              select: { jitsiUserId: true },
-            })
+          ? [
+              ...(await tx.recordingConsent.findMany({ ...delleProve, ...scelta })),
+              ...(await tx.multitrackConsent.findMany({ ...delleProve, ...scelta })),
+            ]
           : [];
       const tuttiIPosti = [
         ...new Set([...posti, ...postiConduce.map((p) => p.jitsiUserId)]),
@@ -155,6 +159,7 @@ export async function ritiraConsensi(
             ...(listaIscrizioni.length > 0
               ? [{ registrationId: { in: listaIscrizioni } }]
               : []),
+            ...(account.length > 0 ? [{ staffAccountId: { in: account } }] : []),
           ],
         },
         data: { withdrawnAt: adesso },
@@ -173,8 +178,13 @@ export async function ritiraConsensi(
           : { count: 0 };
       // Dopo l'evento la trascrizione puo' essere gia' costruita: la persona se ne
       // va anche da li'.
-      if (listaIscrizioni.length > 0) {
-        await togliPersoneDalleTrascrizioni(tx, [eventId], listaIscrizioni);
+      if (listaIscrizioni.length > 0 || account.length > 0) {
+        await togliPersoneDalleTrascrizioni(
+          tx,
+          [eventId],
+          listaIscrizioni,
+          account.map((a) => improntaTitolare(eventId, titolareAccount(a)))
+        );
       }
       // Le frasi dei sottotitoli gia' salvate: restano i tempi, come per chi
       // non ha acconsentito (lib/captions/transcript).

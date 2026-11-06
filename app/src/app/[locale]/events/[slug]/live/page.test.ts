@@ -24,7 +24,7 @@ vi.mock('@/lib/db', () => ({
       findFirst: vi.fn(async (): Promise<unknown> => null),
       findMany: vi.fn(async (): Promise<unknown[]> => []),
     },
-    multitrackConsent: { count: vi.fn(async () => 0) },
+    multitrackConsent: { count: vi.fn(async (): Promise<number> => 0) },
   },
 }));
 vi.mock('next/headers', () => ({
@@ -734,6 +734,40 @@ describe('sala — il consenso alla registrazione gia dato', () => {
         where: { eventId: EVENT_ID, staffAccountId: 'acc-1', withdrawnAt: null },
         select: { destination: true },
       });
+    });
+
+    const conTracce = { multitrackRecordingEnabled: true };
+
+    it('dal link primario con l account: la trascrizione data prima resta, anche senza registrare', async () => {
+      conEvento({ ...conTracce, recordingEnabled: false });
+      conduce(true);
+      vi.mocked(staffDietroIlPrimario).mockResolvedValue(staff as never);
+      vi.mocked(prisma.multitrackConsent.count).mockResolvedValue(1);
+      expect((await clientProps(TOKEN)).hasMultitrackConsent).toBe(true);
+      expect(prisma.multitrackConsent.count).toHaveBeenCalledWith({
+        where: {
+          eventId: EVENT_ID,
+          staffAccountId: 'acc-1',
+          withdrawnAt: null,
+          textVersion: { gte: 1 },
+        },
+      });
+      expect(prisma.recordingConsent.findMany).not.toHaveBeenCalled();
+    });
+
+    it('senza account la trascrizione non si eredita', async () => {
+      conEvento(conTracce);
+      conduce(true);
+      expect((await clientProps(TOKEN)).hasMultitrackConsent).toBe(false);
+      expect(prisma.multitrackConsent.count).not.toHaveBeenCalled();
+    });
+
+    it('un evento che non chiede la trascrizione non la cerca', async () => {
+      conEvento({ recordingDestination: 'PUBLIC' });
+      conduce(true);
+      vi.mocked(staffDietroIlPrimario).mockResolvedValue(staff as never);
+      expect((await clientProps(TOKEN)).hasMultitrackConsent).toBe(false);
+      expect(prisma.multitrackConsent.count).not.toHaveBeenCalled();
     });
 
     it('dal link primario con l account: dopo un allargamento si richiede', async () => {

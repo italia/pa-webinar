@@ -41,7 +41,11 @@ import { DELETE as togliSessione } from '@/app/api/events/[param]/sessions/[id]/
 import { POST as ritira } from '@/app/api/gdpr/consents/route';
 import { POST as cancella } from '@/app/api/gdpr/erasure/route';
 import { GET as esporta } from '@/app/api/gdpr/export/route';
-import { bloccaTrascrizioneEvento, CAPTIONS_TRANSCRIPT_MODEL } from '@/lib/captions/transcript';
+import {
+  bloccaTrascrizioneEvento,
+  CAPTIONS_TRANSCRIPT_MODEL,
+  costruisciTrascrizioneDaiSottotitoli,
+} from '@/lib/captions/transcript';
 import { encryptPII, hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { eraseRegistrations } from '@/lib/gdpr/erase-registrations';
@@ -1007,6 +1011,280 @@ describe('prove di chi conduce', () => {
 
     expect(await prove(evento.id)).toHaveLength(2);
     expect((await prove(evento.id)).every((r) => r.displayName === null)).toBe(true);
+  });
+});
+
+describe('chi conduce nei sottotitoli e nelle trascrizioni', () => {
+  const RECENTE = {
+    ...PUBBLICATO,
+    transcriptPublished: true,
+    startsAt: giorniFa(2),
+    endsAt: giorniFa(1),
+  };
+  const POSTO = 'mod-sala-relatrice';
+
+  async function frase(eventId: string, posto: string, nome: string, n: number) {
+    const inizio = Date.now() - 3_600_000 + n * 10_000;
+    await prisma.captionSegment.create({
+      data: {
+        eventId,
+        messageId: randomUUID(),
+        endpointId: `ep-${n}`,
+        seatId: posto,
+        speakerName: encryptPII(nome),
+        text: encryptPII(`Frase di ${nome}`),
+        language: 'it',
+        startedAt: new Date(inizio),
+        endedAt: new Date(inizio + 5_000),
+      },
+    });
+  }
+
+  /** Una relatrice con la sua concessione e un ospite, ognuno con una frase. */
+  async function conDueVoci(eventId: string, conPosto: string = POSTO) {
+    const indirizzo = `${randomUUID()}@example.org`;
+    const emailHash = hashEmail(indirizzo);
+    const concessione = await prisma.eventModerator.create({
+      data: {
+        eventId,
+        name: encryptPII('Relatrice'),
+        email: encryptPII(indirizzo),
+        emailHash,
+        token: randomUUID(),
+        role: 'SPEAKER',
+      },
+    });
+    await proveDiSala(
+      eventId,
+      { eventModeratorId: concessione.id, emailHash },
+      { posto: conPosto }
+    );
+    await proveDiSala(eventId, {}, { posto: 'ospite-sala', registrazione: false });
+    await frase(eventId, conPosto, 'Relatrice', 1);
+    await frase(eventId, 'ospite-sala', 'Ospite', 2);
+    return { concessione, emailHash };
+  }
+
+  async function costruita(eventId: string) {
+    const esito = await costruisciTrascrizioneDaiSottotitoli(eventId);
+    if (esito.stato !== 'scritta') throw new Error(esito.stato);
+    return esito.recordingId;
+  }
+
+  const trascrizione = async (recordingId: string) => {
+    const artefatto = await prisma.postprodArtifact.findFirstOrThrow({
+      where: { recordingId, type: 'TRANSCRIPT_JSON' },
+      select: { inlineBody: true },
+    });
+    const voci = await prisma.speaker.findMany({
+      where: { recordingId },
+      select: { displayName: true },
+    });
+    return {
+      corpo: tryDecryptPII(artefatto.inlineBody!) ?? '',
+      voci: voci.map((v) => v.displayName),
+    };
+  };
+  const senzaRelatrice = async (recordingId: string) => {
+    const { corpo, voci } = await trascrizione(recordingId);
+    expect(corpo).not.toContain('Relatrice');
+    expect(corpo).toContain('Frase di Ospite');
+    expect(voci).toEqual(['Ospite']);
+  };
+  /** La pulizia a conservazione finita: restano le prove e la trascrizione. */
+  const dopoLaConservazione = async (eventId: string) => {
+    await prisma.event.update({
+      where: { id: eventId },
+      data: { startsAt: giorniFa(62), endsAt: giorniFa(61) },
+    });
+    await giroDiPulizia();
+    expect(await prisma.captionSegment.count({ where: { eventId } })).toBe(0);
+  };
+
+  it('la cancellazione toglie le frasi salvate e la trascrizione gia’ costruita', async () => {
+    const evento = await creaEvento(RECENTE);
+    const { emailHash } = await conDueVoci(evento.id);
+    const recordingId = await costruita(evento.id);
+    expect((await trascrizione(recordingId)).voci.sort()).toEqual(['Ospite', 'Relatrice']);
+
+    await chiediCancellazione(emailHash);
+
+    expect(await prisma.captionSegment.count({ where: { seatId: POSTO } })).toBe(0);
+    expect(await prisma.captionSegment.count({ where: { seatId: 'ospite-sala' } })).toBe(1);
+    await senzaRelatrice(recordingId);
+  });
+
+  it('una costruzione successiva non riporta nome e frasi', async () => {
+    const evento = await creaEvento(RECENTE);
+    const { emailHash } = await conDueVoci(evento.id);
+
+    await chiediCancellazione(emailHash);
+
+    await senzaRelatrice(await costruita(evento.id));
+  });
+
+  it('la cancellazione raggiunge i posti della sola trascrizione', async () => {
+    const evento = await creaEvento(RECENTE);
+    const { emailHash, concessione } = await conDueVoci(evento.id);
+    await proveDiSala(
+      evento.id,
+      { eventModeratorId: concessione.id, emailHash },
+      { posto: 'mod-sala-secondo-ingresso', registrazione: false }
+    );
+    await frase(evento.id, 'mod-sala-secondo-ingresso', 'Relatrice', 3);
+    const recordingId = await costruita(evento.id);
+
+    await chiediCancellazione(emailHash);
+
+    expect(await prisma.captionSegment.count({ where: { eventId: evento.id } })).toBe(1);
+    await senzaRelatrice(recordingId);
+  });
+
+  it('l’account dello staff esce allo stesso modo, e l’account resta', async () => {
+    const evento = await creaEvento(RECENTE);
+    await conDueVoci(evento.id);
+    const account = await entraCome('ORGANIZER');
+    await proveDiSala(
+      evento.id,
+      { staffAccountId: account.id, emailHash: account.emailHash },
+      { posto: 'mod-sala-staff' }
+    );
+    await frase(evento.id, 'mod-sala-staff', 'Organizzatrice', 3);
+    const recordingId = await costruita(evento.id);
+
+    await chiediCancellazione(account.emailHash);
+
+    expect(await prisma.captionSegment.count({ where: { seatId: 'mod-sala-staff' } })).toBe(0);
+    const { corpo, voci } = await trascrizione(recordingId);
+    expect(corpo).not.toContain('Organizzatrice');
+    expect(voci.sort()).toEqual(['Ospite', 'Relatrice']);
+    expect(await prisma.staffAccount.count({ where: { id: account.id } })).toBe(1);
+  });
+
+  it('due concessioni con lo stesso nome sono due voci: ne esce solo una', async () => {
+    const evento = await creaEvento(RECENTE);
+    const { emailHash } = await conDueVoci(evento.id);
+    const altra = await prisma.eventModerator.create({
+      data: {
+        eventId: evento.id,
+        name: encryptPII('Relatrice'),
+        token: randomUUID(),
+        role: 'SPEAKER',
+      },
+    });
+    await proveDiSala(
+      evento.id,
+      { eventModeratorId: altra.id },
+      { posto: 'mod-sala-omonima', registrazione: false }
+    );
+    await frase(evento.id, 'mod-sala-omonima', 'Relatrice', 3);
+    const recordingId = await costruita(evento.id);
+    expect((await trascrizione(recordingId)).voci.filter((v) => v === 'Relatrice')).toHaveLength(2);
+
+    await chiediCancellazione(emailHash);
+
+    expect((await trascrizione(recordingId)).voci.sort()).toEqual(['Ospite', 'Relatrice']);
+  });
+
+  it('il ritiro di una prova conservata toglie nome e frasi di chi ha la concessione', async () => {
+    const evento = await creaEvento(RECENTE);
+    const { emailHash } = await conDueVoci(evento.id);
+    const recordingId = await costruita(evento.id);
+    await dopoLaConservazione(evento.id);
+
+    const { retainedConsentProofs, consentsToken } = await chiediDati(emailHash);
+    const prova = retainedConsentProofs.find((p) => p.kind === 'transcription');
+    const res = await ritira(
+      daIp('/api/gdpr/consents', 'POST', {
+        token: consentsToken,
+        proofId: prova?.id,
+        consent: 'transcription',
+      }),
+      contesto({})
+    );
+
+    expect(res.status).toBe(200);
+    await senzaRelatrice(recordingId);
+  });
+
+  it('la cancellazione dopo la pulizia fa lo stesso', async () => {
+    const evento = await creaEvento(RECENTE);
+    const { emailHash } = await conDueVoci(evento.id);
+    const recordingId = await costruita(evento.id);
+    await dopoLaConservazione(evento.id);
+
+    await chiediCancellazione(emailHash);
+
+    await senzaRelatrice(recordingId);
+  });
+
+  it('un account cancellato prima della pulizia si riconosce dal posto', async () => {
+    const evento = await creaEvento(RECENTE);
+    await conDueVoci(evento.id);
+    const account = await entraCome('ORGANIZER');
+    await proveDiSala(
+      evento.id,
+      { staffAccountId: account.id, emailHash: account.emailHash },
+      { posto: 'mod-sala-staff' }
+    );
+    await frase(evento.id, 'mod-sala-staff', 'Organizzatrice', 3);
+    const recordingId = await costruita(evento.id);
+    await prisma.staffAccount.delete({ where: { id: account.id } });
+    await dopoLaConservazione(evento.id);
+
+    await chiediCancellazione(account.emailHash);
+
+    const { corpo } = await trascrizione(recordingId);
+    expect(corpo).not.toContain('Organizzatrice');
+    expect(corpo).toContain('Frase di Relatrice');
+  });
+
+  it('un corpo scritto senza impronte tiene chi conduce, e la risposta resta 200', async () => {
+    const evento = await creaEvento(RECENTE);
+    const { emailHash } = await conDueVoci(evento.id);
+    const recordingId = await costruita(evento.id);
+    const artefatto = await prisma.postprodArtifact.findFirstOrThrow({
+      where: { recordingId, type: 'TRANSCRIPT_JSON' },
+    });
+    const corpo = JSON.parse(tryDecryptPII(artefatto.inlineBody!) ?? '{}') as {
+      speakers: Array<{ titolari?: string[] }>;
+    };
+    for (const s of corpo.speakers) delete s.titolari;
+    await prisma.postprodArtifact.update({
+      where: { id: artefatto.id },
+      data: { inlineBody: encryptPII(JSON.stringify(corpo)) },
+    });
+
+    await chiediCancellazione(emailHash);
+
+    expect((await trascrizione(recordingId)).corpo).toContain('Frase di Relatrice');
+    expect(await prisma.captionSegment.count({ where: { seatId: POSTO } })).toBe(0);
+  });
+
+  it('i titolari non escono dal corpo cifrato', async () => {
+    const evento = await creaEvento(RECENTE);
+    await conDueVoci(evento.id);
+    const recordingId = await costruita(evento.id);
+    const voci = await prisma.speaker.findMany({ where: { recordingId } });
+    expect(JSON.stringify(voci)).not.toContain('titolari');
+  });
+
+  it('l’export consegna le prove di sala di chi conduce, anche la sola trascrizione', async () => {
+    const evento = await creaEvento(RECENTE);
+    const { emailHash, concessione } = await conDueVoci(evento.id);
+    await prisma.recordingConsent.deleteMany({
+      where: { eventModeratorId: concessione.id },
+    });
+
+    const res = await esporta(
+      daIp(`/api/gdpr/export?t=${issueGdprToken('export', emailHash)}`),
+      contesto({})
+    );
+    const { roomConsentProofs } = (await res.json()) as {
+      roomConsentProofs: Array<{ kind: string; eventId: string }>;
+    };
+
+    expect(roomConsentProofs).toMatchObject([{ kind: 'transcription', eventId: evento.id }]);
   });
 });
 

@@ -97,7 +97,7 @@ export interface FiltroProve {
 }
 
 /** Una prova di sala: lo stesso posto e gli stessi legami sulle due tabelle. */
-interface ProvaDiSala {
+export interface ProvaDiSala {
   jitsiUserId: string;
   registrationId: string | null;
   eventModeratorId: string | null;
@@ -116,11 +116,24 @@ const ruoloDiSala = (p: ProvaDiSala): RuoloConsenso =>
 /** Il titolare delle prove di un'iscrizione, all'iscrizione e in sala. */
 export const titolareIscrizione = (registrationId: string): string => `reg:${registrationId}`;
 
+/** Il titolare delle prove date entrando con un account dello staff. */
+export const titolareAccount = (staffAccountId: string): string => `staff:${staffAccountId}`;
+
+const titolarePosto = (posto: string): string => `posto:${posto}`;
+
+/** Chi conduce con un legame che resta da un ingresso all'altro. */
+const titolareChiConduce = (
+  p: Pick<ProvaDiSala, 'eventModeratorId' | 'staffAccountId'>
+): string | null => {
+  if (p.staffAccountId) return titolareAccount(p.staffAccountId);
+  return p.eventModeratorId ? `concessione:${p.eventModeratorId}` : null;
+};
+
 const titolareDiSala = (p: ProvaDiSala): string => {
-  if (p.staffAccountId) return `staff:${p.staffAccountId}`;
-  if (p.eventModeratorId) return `concessione:${p.eventModeratorId}`;
+  const conduce = titolareChiConduce(p);
+  if (conduce) return conduce;
   const iscrizione = p.registrationId ?? iscrizioneDelPosto(p.jitsiUserId);
-  return iscrizione ? titolareIscrizione(iscrizione) : `posto:${p.jitsiUserId}`;
+  return iscrizione ? titolareIscrizione(iscrizione) : titolarePosto(p.jitsiUserId);
 };
 
 /**
@@ -164,6 +177,53 @@ const periodiPrecedenti = (v: unknown): PeriodoConsenso[] =>
 /** L'impronta di un titolare in un evento: non dice chi e', e non vale altrove. */
 export const improntaTitolare = (eventId: string, holder: string): string =>
   createHash('sha256').update(`${eventId}|${holder}`).digest('hex');
+
+/**
+ * Le impronte con cui si riconosce una prova di sala: quella del titolare e
+ * quella del posto. La seconda serve quando la prova perde il legame con
+ * l'account cancellato, e il titolare diventa il posto.
+ */
+export const impronteDiSala = (eventId: string, p: ProvaDiSala): string[] => [
+  ...new Set([
+    improntaTitolare(eventId, titolareDiSala(p)),
+    improntaTitolare(eventId, titolarePosto(p.jitsiUserId)),
+  ]),
+];
+
+/** Chi c'e' dietro un posto senza iscrizione, per la trascrizione dai sottotitoli. */
+export interface TitolareDelPosto {
+  /** La concessione o l'account: distingue chi ha lo stesso nome. Null per gli altri. */
+  persona: string | null;
+  /** Le impronte da scrivere nel corpo della trascrizione (`impronteDiSala`). */
+  impronte: string[];
+}
+
+/** I titolari dei posti di un evento, dalle prove di sala delle due tabelle. */
+export async function titolariDeiPosti(
+  db: Pick<LettoreProve, 'recordingConsent' | 'multitrackConsent'>,
+  eventId: string
+): Promise<Map<string, TitolareDelPosto>> {
+  const legami = {
+    jitsiUserId: true,
+    registrationId: true,
+    eventModeratorId: true,
+    staffAccountId: true,
+  } as const;
+  const [registrazione, trascrizione] = await Promise.all([
+    db.recordingConsent.findMany({ where: { eventId }, select: legami }),
+    db.multitrackConsent.findMany({ where: { eventId }, select: legami }),
+  ]);
+  const posti = new Map<string, TitolareDelPosto>();
+  for (const p of [...registrazione, ...trascrizione]) {
+    if (p.registrationId || iscrizioneDelPosto(p.jitsiUserId)) continue;
+    const gia = posti.get(p.jitsiUserId);
+    posti.set(p.jitsiUserId, {
+      persona: gia?.persona ?? titolareChiConduce(p),
+      impronte: [...new Set([...(gia?.impronte ?? []), ...impronteDiSala(eventId, p)])],
+    });
+  }
+  return posti;
+}
 
 /** Quanto serve di una prova conservata per riconoscere un periodo sostituito. */
 interface PeriodoConservato {
@@ -369,6 +429,49 @@ export async function leggiRigheProve(
     });
   }
   return righe;
+}
+
+/**
+ * Le prove di sala date conducendo un evento, per la consegna dei propri dati
+ * (art. 15): gli stessi legami con cui la cancellazione le raggiunge. Quelle di
+ * un'iscrizione arrivano con l'iscrizione.
+ */
+export async function proveDiSalaDiChiConduce(
+  db: LettoreProve & Pick<Prisma.TransactionClient, 'event'>,
+  filtro: Required<Pick<FiltroProve, 'grantIds' | 'staffAccountIds' | 'emailHash'>>
+) {
+  const dove = {
+    OR: legamiDiSala([], [...filtro.grantIds], [...filtro.staffAccountIds], filtro.emailHash),
+  };
+  const [registrazione, trascrizione] = await Promise.all([
+    db.recordingConsent.findMany({ where: dove, select: { eventId: true }, distinct: ['eventId'] }),
+    db.multitrackConsent.findMany({ where: dove, select: { eventId: true }, distinct: ['eventId'] }),
+  ]);
+  const idEventi = [...new Set([...registrazione, ...trascrizione].map((p) => p.eventId))];
+  if (idEventi.length === 0) return [];
+  const eventi = await db.event.findMany({
+    where: { id: { in: idEventi } },
+    select: { id: true, title: true, startsAt: true },
+  });
+  const prove = await Promise.all(
+    eventi.map(async (evento) =>
+      (await leggiRigheProve(db, evento.id, filtro))
+        .filter((r) => r.role === 'host')
+        .map((r) => ({
+          eventId: evento.id,
+          kind: r.kind,
+          name: r.displayName ? tryDecryptPII(r.displayName) : null,
+          locale: r.locale,
+          textVersion: r.textVersion,
+          destination: r.destination,
+          givenAt: r.givenAt,
+          withdrawnAt: r.withdrawnAt,
+          superseded: r.superata,
+          event: { title: evento.title, startsAt: evento.startsAt.toISOString() },
+        }))
+    )
+  );
+  return prove.flat().sort((a, b) => a.givenAt.localeCompare(b.givenAt));
 }
 
 export async function proveConsensoEvento(

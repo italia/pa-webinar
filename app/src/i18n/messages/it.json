@@ -4574,6 +4574,13 @@
       "proofsIntro": "I dati di questi eventi sono stati cancellati. Queste prove restano finché il video o la trascrizione esistono. Puoi ritirare il consenso: ciò che è già nel video resta, e per toglierlo devi scrivere al titolare del trattamento.",
       "proofGivenOn": "Dato il {date}",
       "proofSuperseded": "Sostituito da un consenso successivo",
+      "proofWithdrawEffect": {
+        "recording": "Ritiri anche il consenso alla trascrizione: le tue frasi e il tuo nome escono dalla trascrizione dai sottotitoli. Ciò che è già nel video resta, come una trascrizione fatta dal video o dalle tracce audio: per toglierli scrivi al titolare del trattamento. Da questa pagina il ritiro non si annulla.",
+        "transcription": "Le tue frasi e il tuo nome escono dalla trascrizione dai sottotitoli. Una trascrizione fatta dal video o dalle tracce audio resta: per toglierla scrivi al titolare del trattamento. Da questa pagina il ritiro non si annulla."
+      },
+      "proofWithdrawHost": "Le trascrizioni dai sottotitoli più vecchie non riconoscono chi conduce: lì le tue frasi e il tuo nome restano, e per toglierli devi scrivere al titolare del trattamento.",
+      "roomProofsTitle": "Consensi dati conducendo un evento",
+      "roomProofsIntro": "I consensi alla registrazione e alla trascrizione che hai dato entrando in sala con un ruolo nell'evento. Dalla finestra «Consensi» della sala si ritirano quelli dell'ingresso in corso e, con il tuo account dello staff, anche quelli degli ingressi precedenti; per gli altri, e a evento concluso, resta la cancellazione dei tuoi dati.",
       "addressBookTitle": "Rubrica degli eventi",
       "addressBookIntro": "Hai scelto di restare in rubrica per essere invitato a eventi simili. Conserviamo questi dati fino al {date}, salvo revoca o nuovo consenso.",
       "addressBookOptOut": "Rimuovi i miei dati dalla rubrica",
@@ -4596,7 +4603,7 @@
       "linkInvalid": "Il link non è valido o è scaduto. Richiedi un nuovo link.",
       "confirmWarning": "Stai per cancellare in modo definitivo i dati personali associati al tuo indirizzo email, tranne ciò che è indicato qui sotto.",
       "confirmBody": "Verranno cancellate le iscrizioni, le domande, i voti ai sondaggi, i feedback, i reminder e la tua voce nella rubrica degli eventi. L'operazione è irreversibile.",
-      "confirmProofs": "Se di un evento esistono un video o una trascrizione, anche non ancora pubblicati, restano il tipo di consenso, la data e il testo a cui hai risposto, senza il tuo nome, finché quel video o quella trascrizione esistono. Servono a dimostrare il consenso. Il video non cambia: per chiedere di togliere i tuoi interventi scrivi al titolare del trattamento.",
+      "confirmProofs": "Se di un evento esistono un video o una trascrizione, anche non ancora pubblicati, restano il tipo di consenso, la data e il testo a cui hai risposto, senza il tuo nome, finché quel video o quella trascrizione esistono. Servono a dimostrare il consenso. Il video non cambia: per chiedere di togliere i tuoi interventi scrivi al titolare del trattamento. Le trascrizioni dai sottotitoli più vecchie non riconoscono chi conduce o interviene con un ruolo nell'evento: lì le tue frasi e il tuo nome restano, e per toglierli devi scrivere al titolare del trattamento.",
       "confirmButton": "Conferma cancellazione",
       "cancel": "Annulla",
       "processing": "Cancellazione in corso...",

@@ -77,12 +77,15 @@ vi.mock('swr', () => ({
   }),
 }));
 vi.mock('@/i18n/navigation', async () => {
+  // Lo stesso oggetto a ogni render, come il router vero: un riferimento nuovo
+  // rifarebbe ogni callback che lo usa e nasconderebbe le chiusure vecchie.
+  const router = { push: vi.fn(), replace: vi.fn(), refresh: vi.fn() };
   const { createElement } = await import('react');
   return {
     Link: ({ href, children }: { href: unknown; children?: unknown }) =>
       createElement('a', { href: String(href) }, children as never),
     percorso: (p: string) => p,
-    useRouter: () => ({ push: vi.fn(), replace: vi.fn(), refresh: vi.fn() }),
+    useRouter: () => router,
   };
 });
 vi.mock('@/lib/settings-context', () => ({ useSettings: () => ({}) }));
@@ -792,6 +795,35 @@ describe('sala — il testo su cui si acconsente', () => {
     expect(testo()).toContain(l.consents.notGiven);
     expect(testo()).toContain(g.recordingPublic);
     expect(testo()).toContain(l.consents.textChanged);
+  });
+
+  it('chi conduce porta la trascrizione trovata dalla pagina, come la registrazione', async () => {
+    await monta({
+      event: { ...evento, multitrackRecordingEnabled: true },
+      isModerator: true,
+      hasMultitrackConsent: true,
+    });
+    await entra();
+    expect(ultimoToken()).toMatchObject({ consentReplay: { multitrack: true, roomTokens: [] } });
+    expect(ultimoToken()).not.toHaveProperty('multitrackConsent');
+  });
+
+  it('chi conduce non riporta la trascrizione che la rilettura ha trovato decaduta', async () => {
+    await monta({
+      event: { ...evento, multitrackRecordingEnabled: true },
+      isModerator: true,
+      hasMultitrackConsent: true,
+    });
+    risposte.push({ consentsRecorded: { recording: true, multitrack: false } });
+    await entra();
+    // Cambia solo la trascrizione: registrazione e testo in vigore restano com'erano.
+    letture.push({ recording: true, transcription: false });
+    await premi(pulsante(l.consents.button));
+    await act(async () => {
+      await new Promise((fatto) => setTimeout(fatto, 0));
+    });
+    await caduta();
+    expect(ultimoToken()?.consentReplay).toMatchObject({ recording: true, multitrack: false });
   });
 
   it("il consenso dell'iscrizione decade solo se il server esclude la persona", async () => {

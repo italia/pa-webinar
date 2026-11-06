@@ -876,13 +876,16 @@ export default function LiveEventClient({
     // posto nella conferenza, uno nuovo a ogni ingresso.
     // Quelli gia' dati si riportano come repliche, con i token della sala che
     // provano i posti di prima: valgono solo se il server ne trova ancora la
-    // prova. Chi conduce e l'ha gia' dato (la pagina l'ha trovato sul suo
-    // account) lo riporta allo stesso modo.
+    // prova. Chi conduce e li ha gia' dati (la pagina li ha trovati sul suo
+    // account) li riporta allo stesso modo.
     const { dati, repliche } = consensiDaInviare(joinPrefs, {
       ...consensiRegistrati,
       registrazione:
         consensiRegistrati.registrazione ||
         ((isModerator || isSpeaker) && hasRecordingConsent && !ritirati.registrazione),
+      tracce:
+        consensiRegistrati.tracce ||
+        ((isModerator || isSpeaker) && hasMultitrackConsent && !ritirati.tracce),
     });
     if (dati.registrazione) {
       body.recordingConsent = true;
@@ -1032,8 +1035,10 @@ export default function LiveEventClient({
     consensiRegistrati,
     applicaConsensi,
     hasRecordingConsent,
+    hasMultitrackConsent,
     haConsensoRegistrazione,
     ritirati.registrazione,
+    ritirati.tracce,
     testoAcconsentito,
     destinazioneInVigore,
     locale,

@@ -21,7 +21,9 @@
  * non ancora pubblicati, restano senza nome e ritirate finche' esistono, comprese
  * quelle gia' conservate di un evento ripulito (lib/gdpr/retained-consent-proofs).
  * Le prove della stessa persona date entrando con una concessione o un account
- * si trovano anche quando la concessione o l'account non ci sono piu'.
+ * si trovano anche quando la concessione o l'account non ci sono piu'. Con loro
+ * se ne vanno le frasi dei sottotitoli di quei posti e, se il corpo porta le
+ * impronte dei titolari, il nome e le frasi nelle trascrizioni gia' costruite.
  * Recordings tied to the underlying Event are NOT deleted here — they are
  * governed by the event-level retention cron and are subject to separate
  * legal-hold rules.
@@ -39,7 +41,7 @@ import { TIMEOUT_DOPO_PULIZIA_MS } from '@/lib/gdpr/cleanup-selection';
 import { eraseRegistrations } from '@/lib/gdpr/erase-registrations';
 import { verifyGdprToken } from '@/lib/gdpr/request-token';
 import { invalidateModeratorCache } from '@/lib/auth/moderator';
-import { bloccaTrascrizioneEvento } from '@/lib/captions/transcript';
+import { bloccaTrascrizioneEvento, togliPostiDaiSottotitoli } from '@/lib/captions/transcript';
 import { deleteUnreferencedPersonPhotos } from '@/lib/events/person-photo-store';
 import {
   conservaProve,
@@ -153,6 +155,18 @@ export const POST = withErrorHandling(async (request) => {
         if (copiate > 0) proveCopiate.set(eventId, copiate);
       }
       const scelte = { eventId: { in: eventiConProve }, OR: dellaPersona };
+      const legami = {
+        eventId: true,
+        jitsiUserId: true,
+        registrationId: true,
+        eventModeratorId: true,
+        staffAccountId: true,
+      } as const;
+      // Prima di cancellare le prove: sono il solo legame tra il posto e la persona.
+      await togliPostiDaiSottotitoli(tx, [
+        ...(await tx.recordingConsent.findMany({ where: scelte, select: legami })),
+        ...(await tx.multitrackConsent.findMany({ where: scelte, select: legami })),
+      ]);
       await tx.recordingConsent.deleteMany({ where: scelte });
       await tx.multitrackConsent.deleteMany({ where: scelte });
     }, { timeout: TIMEOUT_DOPO_PULIZIA_MS });

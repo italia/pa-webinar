@@ -28,6 +28,7 @@ vi.mock('@/lib/settings', () => ({
 }));
 
 import { TIMEOUT_PULIZIA_EVENTO_MS } from '@/lib/gdpr/cleanup-selection';
+import { improntaTitolare, titolareAccount } from '@/lib/gdpr/consent-proofs';
 
 import { ritiraComunicazioni, ritiraConsensi } from './consent-withdrawal';
 
@@ -167,9 +168,48 @@ describe('ritiraConsensi', () => {
       where: {
         eventId: EVENTO,
         withdrawnAt: null,
-        OR: [{ jitsiUserId: { in: ['mod-e1-bbbb', 'mod-e1-aaaa'] } }],
+        OR: [
+          { jitsiUserId: { in: ['mod-e1-bbbb', 'mod-e1-aaaa'] } },
+          { staffAccountId: { in: ['acc-1'] } },
+        ],
       },
       data: { withdrawnAt: ADESSO },
+    });
+    expect(trascrizione.togliPersoneDalleTrascrizioni).toHaveBeenCalledWith(
+      tx,
+      [EVENTO],
+      [],
+      [improntaTitolare(EVENTO, titolareAccount('acc-1'))]
+    );
+  });
+
+  it('chi ha dato la sola trascrizione col suo account la ritira anche dagli ingressi precedenti', async () => {
+    tx.multitrackConsent.findMany
+      .mockResolvedValueOnce([{ registrationId: null, staffAccountId: 'acc-1' }])
+      .mockResolvedValueOnce([{ jitsiUserId: 'mod-e1-aaaa' }, { jitsiUserId: 'mod-e1-bbbb' }]);
+    tx.multitrackConsent.updateMany.mockResolvedValue({ count: 2 });
+    tx.captionSegment.updateMany.mockResolvedValue({ count: 4 });
+
+    const esito = await ritiraConsensi(EVENTO, ['mod-e1-bbbb'], { registrazione: false }, ADESSO);
+
+    expect(esito).toEqual({ registrazione: false, trascrizione: true });
+    expect(tx.multitrackConsent.updateMany).toHaveBeenCalledWith({
+      where: {
+        eventId: EVENTO,
+        withdrawnAt: null,
+        OR: [
+          { jitsiUserId: { in: ['mod-e1-bbbb', 'mod-e1-aaaa'] } },
+          { staffAccountId: { in: ['acc-1'] } },
+        ],
+      },
+      data: { withdrawnAt: ADESSO },
+    });
+    expect(tx.captionSegment.updateMany).toHaveBeenCalledWith({
+      where: {
+        eventId: EVENTO,
+        OR: [{ seatId: { in: ['mod-e1-bbbb', 'mod-e1-aaaa'] } }],
+      },
+      data: { seatId: null, speakerName: null, text: null },
     });
   });
 
@@ -246,7 +286,12 @@ describe('ritiraConsensi', () => {
       origine: 'self-service',
     });
     expect(trascrizione.bloccaTrascrizioneEvento).toHaveBeenCalledWith(tx, EVENTO);
-    expect(trascrizione.togliPersoneDalleTrascrizioni).toHaveBeenCalledWith(tx, [EVENTO], [ISCRIZIONE]);
+    expect(trascrizione.togliPersoneDalleTrascrizioni).toHaveBeenCalledWith(
+      tx,
+      [EVENTO],
+      [ISCRIZIONE],
+      []
+    );
   });
 
   it('senza posti non tocca niente', async () => {

@@ -883,7 +883,8 @@ registry.registerPath({
   summary: 'Fulfil a GDPR data export via signed token (Art. 15, step 2)',
   description:
     'Also answers a person with no registrations left: the address-book entry and the consent ' +
-    'proofs last longer than the registrations.',
+    'proofs last longer than the registrations. The same goes for the proofs given in the room ' +
+    'by someone who led an event, found through their named grants, staff account and email HMAC.',
   request: { query: z.object({ t: z.string() }) },
   responses: {
     200: {
@@ -943,6 +944,33 @@ registry.registerPath({
                 description:
                   'Consent proofs kept after their source was deleted, while the video or the ' +
                   'transcript stays published',
+              }),
+            roomConsentProofs: z
+              .array(
+                z.object({
+                  eventId: z.guid(),
+                  kind: z.enum(['recording', 'transcription']),
+                  name: z.string().nullable(),
+                  locale: z.string().nullable(),
+                  textVersion: z.number().int().nullable(),
+                  destination: z.enum(['PUBLIC', 'REGISTRANTS']).nullable(),
+                  givenAt: z.iso.datetime(),
+                  withdrawnAt: z.iso.datetime().nullable(),
+                  superseded: z.boolean().openapi({
+                    description: 'A later consent replaced this one',
+                  }),
+                  event: z.object({
+                    title: z.record(z.string(), z.string()).openapi({
+                      description: 'Title by language',
+                    }),
+                    startsAt: z.iso.datetime(),
+                  }),
+                })
+              )
+              .openapi({
+                description:
+                  'Recording and transcription proofs given in the room while leading an event. ' +
+                  'Those of a registration arrive with the registration',
               }),
             consentsToken: z.string().optional().openapi({
               description:

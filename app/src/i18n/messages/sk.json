@@ -4574,6 +4574,13 @@
       "proofsIntro": "Údaje týchto podujatí boli vymazané. Tieto doklady zostávajú, kým video alebo prepis existujú. Súhlas môžete odvolať: to, čo už je vo videu, zostáva, a ak to chcete odstrániť, musíte napísať prevádzkovateľovi osobných údajov.",
       "proofGivenOn": "Udelený {date}",
       "proofSuperseded": "Nahradený neskorším súhlasom",
+      "proofWithdrawEffect": {
+        "recording": "You also withdraw your consent to transcription: your sentences and your name leave the transcript from captions. What is already in the video stays, and so does a transcript made from the video or the audio tracks: to have them removed, write to the data controller. This withdrawal cannot be undone from this page.",
+        "transcription": "Your sentences and your name leave the transcript from captions. A transcript made from the video or the audio tracks stays: to have it removed, write to the data controller. This withdrawal cannot be undone from this page."
+      },
+      "proofWithdrawHost": "Older transcripts from captions do not recognize hosts: your sentences and your name stay there, and to have them removed you must write to the data controller.",
+      "roomProofsTitle": "Consents given while leading an event",
+      "roomProofsIntro": "The recording and transcription consents you gave when entering the room with a role in the event. The Consents dialog in the room withdraws those of the current entry and, with your staff account, those of earlier entries too; for the others, and once the event is over, what remains is erasing your data.",
       "addressBookTitle": "Adresár podujatí",
       "addressBookIntro": "Rozhodli ste sa zostať v adresári, aby ste boli pozývaní na podobné podujatia. Tieto údaje uchovávame do {date}, pokiaľ súhlas neodvoláte alebo ho neudelíte znova.",
       "addressBookOptOut": "Odstrániť moje údaje z adresára",
