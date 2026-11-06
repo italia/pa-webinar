@@ -45,6 +45,10 @@ describe('ingressoResoconto', () => {
     startsAt: new Date('2026-10-20T10:00:00Z'),
     endsAt: new Date('2026-10-20T11:00:00Z'),
     timezone: 'Europe/Rome',
+    status: 'ENDED',
+    eventType: 'SCHEDULED',
+    postEventPublic: true,
+    postEventPublicUntil: null,
     postEventShowQA: true,
     qaEnabled: true,
     recordingDestination: 'PUBLIC',
@@ -72,10 +76,18 @@ describe('ingressoResoconto', () => {
     ['Q&A mai acceso', { qaEnabled: false }],
     ['registrazione riservata', { recordingDestination: 'REGISTRANTS' }],
     ['video reso riservato', { recordingAudience: 'REGISTRANTS' }],
+    ['pagina dopo l\'evento privata', { postEventPublic: false }],
+    ['pagina dopo l\'evento scaduta', { postEventPublicUntil: new Date('2026-10-21T00:00:00Z') }],
   ])('con %s nessun testo di domanda', async (_caso, over) => {
     db.event.findUnique.mockResolvedValue(evento(over));
     expect((await leggi())?.questions).toEqual([]);
     expect(db.question.findMany).not.toHaveBeenCalled();
+  });
+
+  it('dentro la finestra della pagina le domande arrivano', async () => {
+    const domani = new Date(Date.now() + 86_400_000);
+    db.event.findUnique.mockResolvedValue(evento({ postEventPublicUntil: domani }));
+    expect((await leggi())?.questions).toHaveLength(1);
   });
 
   it('della chat resta il conteggio nei numeri, il testo non si legge', async () => {

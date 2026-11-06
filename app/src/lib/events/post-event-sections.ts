@@ -3,6 +3,7 @@
 
 import type { RecordingAudience } from '@prisma/client';
 
+import { isEventPageVisible } from '@/lib/events/visibility';
 import { registrazioneRiservata } from '@/lib/recording/destination';
 
 /**
@@ -39,6 +40,18 @@ export function domandePubbliche(evento: {
   recordingAudience: RecordingAudience;
 }): boolean {
   return evento.postEventShowQA && evento.qaEnabled && !registrazioneRiservata(evento);
+}
+
+/**
+ * Le domande arrivano ai modelli di sintesi e resoconto solo se la pagina le
+ * pubblica adesso: `domandePubbliche`, con la pagina dell'evento visibile quando
+ * il lavoro parte. Vale per entrambi, perche' il resoconto legge anche la sintesi
+ * e cio' che il modello legge puo' uscirne riformulato.
+ */
+export function domandePerIModelli(
+  evento: Parameters<typeof domandePubbliche>[0] & Parameters<typeof isEventPageVisible>[0],
+): boolean {
+  return domandePubbliche(evento) && isEventPageVisible(evento);
 }
 
 /**

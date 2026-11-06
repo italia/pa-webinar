@@ -12,7 +12,7 @@
  * Il resoconto e' destinato alla pagina dell'evento, e cio' che il modello legge
  * puo' uscirne riformulato: della chat arriva solo il numero dei messaggi, dentro
  * i numeri del portale, e le domande del Q&A solo se la pagina le pubblica
- * (`domandePubbliche`).
+ * adesso (`domandePerIModelli`).
  *
  * Si legge al momento del claim: i commenti arrivati fino a quel momento
  * entrano. Tutto resta nel cluster (vLLM, nessun servizio esterno).
@@ -23,7 +23,7 @@ import {
 } from '@/lib/captions/transcript';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
-import { domandePubbliche } from '@/lib/events/post-event-sections';
+import { domandePerIModelli } from '@/lib/events/post-event-sections';
 import {
   entiEPersonePubblici,
   PERSONE_PUBBLICHE_INCLUDE,
@@ -278,6 +278,10 @@ export async function ingressoResoconto(
       moderatorPhotoId: true,
       // A agenda accesa le persone seguono l'ordine del programma.
       agendaEnabled: true,
+      status: true,
+      eventType: true,
+      postEventPublic: true,
+      postEventPublicUntil: true,
       postEventShowQA: true,
       qaEnabled: true,
       recordingDestination: true,
@@ -289,7 +293,7 @@ export async function ingressoResoconto(
 
   const [trascrizione, domande, valutazioni] = await Promise.all([
     trascrizioneEvento(eventId),
-    domandePubbliche(evento)
+    domandePerIModelli(evento)
       ? prisma.question.findMany({
           where: { eventId, status: { not: 'DISMISSED' } },
           orderBy: { upvoteCount: 'desc' },

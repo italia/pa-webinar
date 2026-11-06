@@ -911,8 +911,9 @@ cannot be read: the claim then goes ahead without it.
   excluded), app reactions and raised hands in each five-minute window counted
   from `t0`. The summary can reach the event page, so the text of a chat
   message is never read, and the questions enter only when the page publishes
-  them (`domandePubbliche` in `app/src/lib/events/post-event-sections.ts`):
-  otherwise the journal's actions on questions stay out too.
+  them and is public when the job is claimed (`domandePerIModelli` in
+  `app/src/lib/events/post-event-sections.ts`): otherwise the journal's actions
+  on questions stay out too.
 - **Window.** From 30 minutes before `t0` to 5 minutes after the end of the
   recording (`t0` plus its duration). Without a known duration, to 5 minutes
   after the end of the recording's call session, or after the claim while the
@@ -1754,7 +1755,7 @@ what the model reads can come out reworded there:
   that the final request fits the model's context;
 - the existing summary;
 - up to 40 Q&A questions with their written answers, without authors, only
-  when the event page publishes the questions (`domandePubbliche` in
+  under the same rule as the summary (`domandePerIModelli` in
   `app/src/lib/events/post-event-sections.ts`);
 - published polls, and word-cloud words;
 - the post-event questionnaire (Likert averages and up to 100 open comments,
