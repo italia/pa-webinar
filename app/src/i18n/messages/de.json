@@ -723,6 +723,7 @@
     "noQuestions": "Noch keine Fragen. Stellen Sie die erste!",
     "qaPersistenceNote": "Der Text der Fragen kann auf der Seite der Veranstaltung erscheinen, ohne den Namen der Person, die sie gestellt hat.",
     "personalDataNotice": "Schreiben Sie keine personenbezogenen Daten anderer und auch keine eigenen, die Sie nicht öffentlich machen möchten: Der Text Ihrer Frage kann ohne Ihren Namen auf der Seite der Veranstaltung erscheinen.",
+    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
     "filterAll": "Alle",
     "showPanel": "Q&A anzeigen",
     "hidePanel": "Q&A ausblenden",
@@ -742,6 +743,7 @@
       "answerFieldLabel": "Antwort auf die Frage von {name}",
       "answerPlaceholder": "Antwort schreiben (max. 2000 Zeichen)",
       "answerNotice": "Die Antwort kann auf der Seite der Veranstaltung erscheinen: Schreiben Sie keine personenbezogenen Daten.",
+      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
       "sendAnswer": "Antwort veröffentlichen",
       "cancel": "Abbrechen",
       "removeAnswer": "Antwort entfernen"

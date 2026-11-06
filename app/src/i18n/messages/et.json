@@ -723,6 +723,7 @@
     "noQuestions": "Küsimusi veel pole. Olge esimene!",
     "qaPersistenceNote": "Küsimuste tekst võib ilmuda ürituse lehel ilma küsija nimeta.",
     "personalDataNotice": "Ärge kirjutage teiste inimeste isikuandmeid ega enda omi, mida te ei soovi avalikustada: küsimuse tekst võib ilmuda ürituse lehel ilma teie nimeta.",
+    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
     "filterAll": "Kõik",
     "showPanel": "Näita Q&A",
     "hidePanel": "Peida Q&A",
@@ -742,6 +743,7 @@
       "answerFieldLabel": "Vastus küsimusele, küsija {name}",
       "answerPlaceholder": "Kirjutage vastus (kuni 2000 tähemärki)",
       "answerNotice": "Vastus võib ilmuda ürituse lehel: ära kirjuta isikuandmeid.",
+      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
       "sendAnswer": "Avalda vastus",
       "cancel": "Tühista",
       "removeAnswer": "Eemalda vastus"

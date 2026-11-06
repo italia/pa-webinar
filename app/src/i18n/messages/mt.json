@@ -723,6 +723,7 @@
     "noQuestions": "L-ebda mistoqsijiet għalissa. Kun l-ewwel wieħed!",
     "qaPersistenceNote": "It-test tal-mistoqsijiet jista' jidher fil-paġna tal-avveniment, mingħajr l-isem ta' min għamilhom.",
     "personalDataNotice": "Tiktibx dejta personali ta' ħaddieħor, u lanqas tiegħek li ma tridx tagħmel pubblika: it-test tal-mistoqsija jista' jidher fil-paġna tal-avveniment, mingħajr ismek.",
+    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
     "filterAll": "Kollha",
     "showPanel": "Uri l-Q&A",
     "hidePanel": "Aħbi l-Q&A",
@@ -742,6 +743,7 @@
       "answerFieldLabel": "Tweġiba għall-mistoqsija ta' {name}",
       "answerPlaceholder": "Ikteb it-tweġiba (massimu ta' 2000 karattru)",
       "answerNotice": "It-tweġiba tista' tidher fil-paġna tal-avveniment: tiktibx dejta personali.",
+      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
       "sendAnswer": "Ippubblika t-tweġiba",
       "cancel": "Ikkanċella",
       "removeAnswer": "Neħħi t-tweġiba"

@@ -23,7 +23,11 @@ import { Icon } from '@/components/ui/icon';
 import { Link, useRouter, percorso } from '@/i18n/navigation';
 import type { JitsiMeetExternalAPI } from '@/types/jitsi';
 import { messaggioErroreApi } from '@/lib/api-error-message';
-import { sezioniDopoEvento, type SezioneDopoEvento } from '@/lib/events/post-event-sections';
+import {
+  domandePubblicateInSala,
+  sezioniDopoEvento,
+  type SezioneDopoEvento,
+} from '@/lib/events/post-event-sections';
 import type { VideoQualityPreset } from '@/lib/jitsi/config';
 import {
   faseRegistratoreStabile,
@@ -2694,6 +2698,7 @@ export default function LiveEventClient({
         </div>
 
         <LiveSidebar
+          domandePubblicate={domandePubblicateInSala(event)}
           salaSoloAscolto={salaSoloAscolto}
           salaConsensoChiesto={regolaSala.richiesto}
           guestKeyName={isGuest || !token ? chosenName.trim() : undefined}
@@ -2963,6 +2968,8 @@ interface LiveSidebarProps {
   /** Una scheda da aprire chiesta da fuori (la striscia del tempo apre la
    *  Regia); il contatore fa ripetere la stessa richiesta. */
   richiestaScheda?: { tab: SidebarTab; n: number } | null;
+  /** Le domande possono comparire sulla pagina dell'evento (`domandePubblicateInSala`). */
+  domandePubblicate: boolean;
   /** La scheda Regia, per chi conduce (non per i relatori). */
   regia?: {
     onEnded: () => void;
@@ -2975,6 +2982,7 @@ interface LiveSidebarProps {
 }
 
 function LiveSidebar({
+  domandePubblicate,
   salaSoloAscolto = false,
   salaConsensoChiesto = false,
   guestKeyName,
@@ -4042,6 +4050,7 @@ function LiveSidebar({
               guestId={!token ? voterGuestId : undefined}
               voterAccessToken={voterAccessToken}
               voterGuestId={voterGuestId}
+              domandePubblicate={domandePubblicate}
             />
           )}
           {/* ChatPanel stays mounted while the event is live so it can

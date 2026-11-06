@@ -723,6 +723,7 @@
     "noQuestions": "Nicio întrebare încă. Fiți primul!",
     "qaPersistenceNote": "Textul întrebărilor poate apărea pe pagina evenimentului, fără numele celor care le-au pus.",
     "personalDataNotice": "Nu scrieți date personale ale altor persoane și nici date proprii pe care nu doriți să le faceți publice: textul întrebării poate apărea pe pagina evenimentului, fără numele dumneavoastră.",
+    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
     "filterAll": "Toate",
     "showPanel": "Afișați Q&A",
     "hidePanel": "Ascundeți Q&A",
@@ -742,6 +743,7 @@
       "answerFieldLabel": "Răspuns la întrebarea lui {name}",
       "answerPlaceholder": "Scrieți răspunsul (max. 2000 de caractere)",
       "answerNotice": "Răspunsul poate apărea pe pagina evenimentului: nu scrieți date personale.",
+      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
       "sendAnswer": "Publică răspunsul",
       "cancel": "Anulează",
       "removeAnswer": "Elimină răspunsul"

@@ -723,6 +723,7 @@
     "noQuestions": "Gan ceist fós. Bígí ar an gcéad duine!",
     "qaPersistenceNote": "Féadfaidh téacs na gceisteanna a bheith le feiceáil ar leathanach an imeachta, gan ainm an duine a chuir iad.",
     "personalDataNotice": "Ná scríobh sonraí pearsanta daoine eile, ná do chuid sonraí féin nach mian leat a phoibliú: féadfaidh téacs na ceiste a bheith le feiceáil ar leathanach an imeachta, gan d'ainm.",
+    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
     "filterAll": "Gach ceann",
     "showPanel": "Taispeáin Q&A",
     "hidePanel": "Folaigh Q&A",
@@ -742,6 +743,7 @@
       "answerFieldLabel": "Freagra ar cheist {name}",
       "answerPlaceholder": "Scríobh an freagra (2000 carachtar ar a mhéad)",
       "answerNotice": "Féadfaidh an freagra a bheith le feiceáil ar leathanach an imeachta: ná scríobh sonraí pearsanta.",
+      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
       "sendAnswer": "Foilsigh an freagra",
       "cancel": "Cealaigh",
       "removeAnswer": "Bain an freagra"

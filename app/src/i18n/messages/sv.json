@@ -723,6 +723,7 @@
     "noQuestions": "Inga frågor ännu. Var den första!",
     "qaPersistenceNote": "Frågornas text kan visas på evenemangets sida, utan namnet på den som ställde dem.",
     "personalDataNotice": "Skriv inte andras personuppgifter, och inte heller dina egna om du inte vill att de ska bli offentliga: frågans text kan visas på evenemangets sida, utan ditt namn.",
+    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
     "filterAll": "Alla",
     "showPanel": "Visa Q&A",
     "hidePanel": "Dölj Q&A",
@@ -742,6 +743,7 @@
       "answerFieldLabel": "Svar på frågan från {name}",
       "answerPlaceholder": "Skriv svaret (max 2000 tecken)",
       "answerNotice": "Svaret kan visas på evenemangets sida: skriv inga personuppgifter.",
+      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
       "sendAnswer": "Publicera svar",
       "cancel": "Avbryt",
       "removeAnswer": "Ta bort svaret"

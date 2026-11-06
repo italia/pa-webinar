@@ -55,4 +55,23 @@ describe('QuestionForm — avviso sui dati personali', () => {
   it('dice che il testo può uscire senza il nome', () => {
     expect(t.personalDataNotice).toContain('senza il tuo nome');
   });
+
+  it('dove le domande non si pubblicano resta l’invito, senza parlare della pagina', () => {
+    act(() => {
+      root.render(
+        <NextIntlClientProvider locale="it" messages={messaggi}>
+          <QuestionForm
+            eventSlug="evento"
+            token="TOKEN"
+            onSubmitted={vi.fn()}
+            domandePubblicate={false}
+          />
+        </NextIntlClientProvider>
+      );
+    });
+    const avviso = container.querySelector('.qa-composer__notice');
+    expect(avviso?.textContent).toBe(t.personalDataNoticeNotPublished);
+    expect(avviso?.textContent).toContain('dati personali');
+    expect(avviso?.textContent).not.toContain('pagina');
+  });
 });

@@ -723,6 +723,7 @@
     "noQuestions": "Ingen spørgsmål endnu. Vær den første!",
     "qaPersistenceNote": "Teksten til spørgsmålene kan blive vist på arrangementets side uden navnet på den, der stillede dem.",
     "personalDataNotice": "Skriv ikke andres personoplysninger og heller ikke dine egne, hvis du ikke ønsker, at de bliver offentlige: teksten til dit spørgsmål kan blive vist på arrangementets side uden dit navn.",
+    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
     "filterAll": "Alle",
     "showPanel": "Vis Q&A",
     "hidePanel": "Skjul Q&A",
@@ -742,6 +743,7 @@
       "answerFieldLabel": "Svar på spørgsmålet fra {name}",
       "answerPlaceholder": "Skriv svaret (maks. 2000 tegn)",
       "answerNotice": "Svaret kan blive vist på arrangementets side: skriv ikke personoplysninger.",
+      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
       "sendAnswer": "Offentliggør svar",
       "cancel": "Annuller",
       "removeAnswer": "Fjern svaret"

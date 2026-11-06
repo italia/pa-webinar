@@ -723,6 +723,7 @@
     "noQuestions": "Še ni vprašanj. Bodite prvi!",
     "qaPersistenceNote": "Besedilo vprašanj se lahko prikaže na strani dogodka, brez imena osebe, ki jih je postavila.",
     "personalDataNotice": "Ne pišite osebnih podatkov drugih oseb niti svojih, ki jih ne želite objaviti: besedilo vprašanja se lahko prikaže na strani dogodka, brez vašega imena.",
+    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
     "filterAll": "Vsa",
     "showPanel": "Prikaži Q&A",
     "hidePanel": "Skrij Q&A",
@@ -742,6 +743,7 @@
       "answerFieldLabel": "Odgovor na vprašanje od {name}",
       "answerPlaceholder": "Napišite odgovor (največ 2000 znakov)",
       "answerNotice": "Odgovor se lahko prikaže na strani dogodka: ne pišite osebnih podatkov.",
+      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
       "sendAnswer": "Objavi odgovor",
       "cancel": "Prekliči",
       "removeAnswer": "Odstrani odgovor"

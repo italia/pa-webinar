@@ -723,6 +723,7 @@
     "noQuestions": "Καμία ερώτηση ακόμα. Γίνετε ο πρώτος!",
     "qaPersistenceNote": "Το κείμενο των ερωτήσεων μπορεί να εμφανιστεί στη σελίδα της εκδήλωσης, χωρίς το όνομα όσων τις έκαναν.",
     "personalDataNotice": "Μη γράφετε προσωπικά δεδομένα άλλων ούτε δικά σας που δεν θέλετε να δημοσιοποιηθούν: το κείμενο της ερώτησης μπορεί να εμφανιστεί στη σελίδα της εκδήλωσης, χωρίς το όνομά σας.",
+    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
     "filterAll": "Όλες",
     "showPanel": "Εμφάνιση Q&A",
     "hidePanel": "Απόκρυψη Q&A",
@@ -742,6 +743,7 @@
       "answerFieldLabel": "Απάντηση στην ερώτηση του/της {name}",
       "answerPlaceholder": "Γράψτε την απάντηση (έως 2000 χαρακτήρες)",
       "answerNotice": "Η απάντηση μπορεί να εμφανιστεί στη σελίδα της εκδήλωσης: μη γράφετε προσωπικά δεδομένα.",
+      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
       "sendAnswer": "Δημοσίευση απάντησης",
       "cancel": "Ακύρωση",
       "removeAnswer": "Αφαίρεση απάντησης"

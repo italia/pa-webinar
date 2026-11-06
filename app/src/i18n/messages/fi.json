@@ -723,6 +723,7 @@
     "noQuestions": "Ei vielä kysymyksiä. Ole ensimmäinen!",
     "qaPersistenceNote": "Kysymysten teksti voi näkyä tapahtuman sivulla ilman kysyjän nimeä.",
     "personalDataNotice": "Älä kirjoita muiden henkilötietoja äläkä omia tietojasi, joita et halua julkisiksi: kysymyksesi teksti voi näkyä tapahtuman sivulla ilman nimeäsi.",
+    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
     "filterAll": "Kaikki",
     "showPanel": "Näytä Q&A",
     "hidePanel": "Piilota Q&A",
@@ -742,6 +743,7 @@
       "answerFieldLabel": "Vastaus kysymykseen, kysyjä {name}",
       "answerPlaceholder": "Kirjoita vastaus (enintään 2000 merkkiä)",
       "answerNotice": "Vastaus voi näkyä tapahtuman sivulla: älä kirjoita henkilötietoja.",
+      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
       "sendAnswer": "Julkaise vastaus",
       "cancel": "Peruuta",
       "removeAnswer": "Poista vastaus"

@@ -45,6 +45,7 @@ async function render(props: {
   voterAccessToken?: string;
   voterGuestId?: string;
   myQuestionIds?: ReadonlySet<string>;
+  domandePubblicate?: boolean;
 }) {
   await act(async () => {
     root.render(
@@ -57,6 +58,7 @@ async function render(props: {
             voterAccessToken={props.voterAccessToken}
             voterGuestId={props.voterGuestId}
             myQuestionIds={props.myQuestionIds}
+            domandePubblicate={props.domandePubblicate}
           />
         </SWRConfig>
       </NextIntlClientProvider>,
@@ -249,6 +251,16 @@ describe('QuestionList — risposta scritta', () => {
     const avviso = document.getElementById(area.getAttribute('aria-describedby')!);
     expect(avviso?.textContent).toBe(t.moderator.answerNotice);
     expect(area.closest('form')?.contains(avviso!)).toBe(true);
+  });
+
+  it('dove le domande non si pubblicano l’avviso non parla della pagina', async () => {
+    await render({ token: 'TOKEN_MODERATORE', isModerator: true, domandePubblicate: false });
+    await clicca(pulsante(t.moderator.answer)!);
+    const area = container.querySelector('textarea')!;
+    const avviso = document.getElementById(area.getAttribute('aria-describedby')!);
+    expect(avviso?.textContent).toBe(t.moderator.answerNoticeNotPublished);
+    expect(avviso?.textContent).toContain('dati personali');
+    expect(avviso?.textContent).not.toContain('pagina');
   });
 
   it('il pubblico non ha il campo di risposta, quindi nemmeno l’avviso', async () => {

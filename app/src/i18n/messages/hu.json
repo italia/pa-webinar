@@ -723,6 +723,7 @@
     "noQuestions": "Még nincsenek kérdések. Legyen Ön az első!",
     "qaPersistenceNote": "A kérdések szövege megjelenhet az esemény oldalán, a kérdezők neve nélkül.",
     "personalDataNotice": "Ne írja le mások személyes adatait, sem a sajátjait, ha nem szeretné nyilvánossá tenni őket: a kérdés szövege megjelenhet az esemény oldalán, a neve nélkül.",
+    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
     "filterAll": "Összes",
     "showPanel": "Q&A megjelenítése",
     "hidePanel": "Q&A elrejtése",
@@ -742,6 +743,7 @@
       "answerFieldLabel": "Válasz {name} kérdésére",
       "answerPlaceholder": "Írja meg a választ (legfeljebb 2000 karakter)",
       "answerNotice": "A válasz megjelenhet az esemény oldalán: ne írjon bele személyes adatokat.",
+      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
       "sendAnswer": "Válasz közzététele",
       "cancel": "Mégse",
       "removeAnswer": "Válasz eltávolítása"

@@ -723,6 +723,7 @@
     "noQuestions": "Zatiaľ žiadne otázky. Buďte prvý!",
     "qaPersistenceNote": "Text otázok sa môže zobraziť na stránke podujatia, bez mena toho, kto ich položil.",
     "personalDataNotice": "Nepíšte osobné údaje iných osôb ani svoje, ktoré nechcete zverejniť: text otázky sa môže zobraziť na stránke podujatia, bez vášho mena.",
+    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
     "filterAll": "Všetky",
     "showPanel": "Zobraziť Q&A",
     "hidePanel": "Skryť Q&A",
@@ -742,6 +743,7 @@
       "answerFieldLabel": "Odpoveď na otázku od {name}",
       "answerPlaceholder": "Napíšte odpoveď (max. 2000 znakov)",
       "answerNotice": "Odpoveď sa môže zobraziť na stránke podujatia: nepíšte osobné údaje.",
+      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
       "sendAnswer": "Zverejniť odpoveď",
       "cancel": "Zrušiť",
       "removeAnswer": "Odstrániť odpoveď"

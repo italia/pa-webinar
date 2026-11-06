@@ -723,6 +723,7 @@
     "noQuestions": "Nessuna domanda ancora. Sii il primo!",
     "qaPersistenceNote": "Il testo delle domande può comparire sulla pagina dell'evento, senza il nome di chi le ha fatte.",
     "personalDataNotice": "Non scrivere dati personali di altri, né tuoi che non vuoi rendere pubblici: il testo della domanda può comparire sulla pagina dell'evento, senza il tuo nome.",
+    "personalDataNoticeNotPublished": "Non scrivere dati personali di altri, né tuoi che non vuoi rendere noti: chi è in sala può leggere il testo della domanda.",
     "filterAll": "Tutte",
     "showPanel": "Mostra Q&A",
     "hidePanel": "Nascondi Q&A",
@@ -742,6 +743,7 @@
       "answerFieldLabel": "Risposta alla domanda di {name}",
       "answerPlaceholder": "Scrivi la risposta (max 2000 caratteri)",
       "answerNotice": "La risposta può comparire sulla pagina dell'evento: non scrivere dati personali.",
+      "answerNoticeNotPublished": "Chi è in sala può leggere la risposta: non scrivere dati personali.",
       "sendAnswer": "Pubblica risposta",
       "cancel": "Annulla",
       "removeAnswer": "Togli la risposta"

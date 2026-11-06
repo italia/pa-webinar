@@ -723,6 +723,7 @@
     "noQuestions": "No questions yet. Be the first!",
     "qaPersistenceNote": "The text of questions may appear on the event page, without the name of the person who asked.",
     "personalDataNotice": "Do not write other people's personal data, or your own if you do not want it made public: the text of your question may appear on the event page, without your name.",
+    "personalDataNoticeNotPublished": "Do not write other people's personal data, or your own if you do not want it known: people in the room can read the text of your question.",
     "filterAll": "All",
     "showPanel": "Show Q&A",
     "hidePanel": "Hide Q&A",
@@ -742,6 +743,7 @@
       "answerFieldLabel": "Answer to {name}'s question",
       "answerPlaceholder": "Write the answer (max 2000 characters)",
       "answerNotice": "The answer may appear on the event page: do not write personal data.",
+      "answerNoticeNotPublished": "People in the room can read the answer: do not write personal data.",
       "sendAnswer": "Publish answer",
       "cancel": "Cancel",
       "removeAnswer": "Remove the answer"
