@@ -53,6 +53,6 @@
     "npm": ">=10.0.0"
   },
   "devDependencies": {
-    "minimatch": "^11.0.4"
+    "minimatch": "^11.0.5"
   }
 }
