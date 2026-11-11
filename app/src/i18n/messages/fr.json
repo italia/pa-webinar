@@ -1425,7 +1425,8 @@
         "fixedNotice": "Cette installation ne peut pas retirer une voix de la vidéo : qui reçoit la parole entre dans l'enregistrement, et l'avis le dit.",
         "questionTranscription": "La personne a-t-elle consenti à la transcription ?",
         "fixedNotRecorded": "Ni voix ni image ; le nom peut apparaître dans la vidéo."
-      }
+      },
+      "unaddedEntry": "Vous avez rempli ce formulaire sans le confirmer : appuyez sur le bouton pour l’ajouter, ou videz les champs."
     },
     "nav": {
       "events": "Événements",

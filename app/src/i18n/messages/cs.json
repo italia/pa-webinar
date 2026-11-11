@@ -1425,7 +1425,8 @@
         "fixedNotice": "Tato instalace nemůže odstranit hlas z videa: kdo dostane slovo, vstupuje do záznamu a upozornění to říká.",
         "questionTranscription": "Je dán souhlas s transkripcí?",
         "fixedNotRecorded": "Bez hlasu a obrazu; jméno se ve videu může objevit."
-      }
+      },
+      "unaddedEntry": "Tento formulář jste vyplnili, ale nepotvrdili: přidejte ho tlačítkem, nebo pole vymažte."
     },
     "nav": {
       "events": "Události",

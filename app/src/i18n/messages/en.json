@@ -1425,7 +1425,8 @@
         "fixedNotice": "This installation cannot remove a voice from the video: those given the floor enter the recording, and the notice says so.",
         "questionTranscription": "Did they consent to the transcription?",
         "fixedNotRecorded": "No voice or image; the name may appear in the video."
-      }
+      },
+      "unaddedEntry": "You filled this in without confirming it: press the button to add it, or clear the fields."
     },
     "nav": {
       "events": "Events",

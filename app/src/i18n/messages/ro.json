@@ -1425,7 +1425,8 @@
         "fixedNotice": "Această instalare nu poate scoate o voce din video: cine primește cuvântul intră în înregistrare, iar notificarea o spune.",
         "questionTranscription": "S-a dat consimțământul pentru transcriere?",
         "fixedNotRecorded": "Fără voce și imagine; numele poate apărea în videoclip."
-      }
+      },
+      "unaddedEntry": "Ați completat acest formular fără să-l confirmați: apăsați butonul pentru a-l adăuga sau goliți câmpurile."
     },
     "nav": {
       "events": "Evenimente",

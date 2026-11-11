@@ -1425,7 +1425,8 @@
         "fixedNotice": "Denne installation kan ikke fjerne en stemme fra videoen: den, der får ordet, kommer med i optagelsen, og meddelelsen siger det.",
         "questionTranscription": "Er der givet samtykke til transskriptionen?",
         "fixedNotRecorded": "Ingen stemme eller billede; navnet kan blive vist i videoen."
-      }
+      },
+      "unaddedEntry": "Du har udfyldt dette uden at bekræfte det: tryk på knappen for at tilføje det, eller ryd felterne."
     },
     "nav": {
       "events": "Begivenheder",

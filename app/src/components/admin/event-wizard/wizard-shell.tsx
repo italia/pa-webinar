@@ -65,6 +65,7 @@ import {
   newFanoutReport,
   submitQuestionnaire,
 } from './edit-fanout';
+import { creaRegistroBozze, RegistroBozzeContext } from './bozze-in-sospeso';
 import { rememberCreation, type UnsavedResource } from './created-event';
 import StepProgramma from './programme-section';
 import ProgrammeCard from './programme-card';
@@ -869,6 +870,18 @@ export default function EventWizard(props: WizardProps) {
     setSubmitError(message);
     setErrorSeq((n) => n + 1);
   }, []);
+
+  // Un modulo da confermare con un pulsante, compilato e non confermato: il
+  // passo non si lascia e non si salva finche' non lo si aggiunge o lo si
+  // svuota (bozze-in-sospeso). Il messaggio sta accanto al modulo, dove va
+  // il fuoco: l'avviso in cima porterebbe lontano.
+  const [registroBozze] = useState(creaRegistroBozze);
+  const fermaSeInSospeso = useCallback(() => {
+    const bozza = registroBozze.primaInSospeso();
+    if (!bozza) return false;
+    bozza.mostra();
+    return true;
+  }, [registroBozze]);
   useEffect(() => {
     if (errorSeq === 0 || fuocoRichiestoRef.current) return;
     alertRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
@@ -1439,6 +1452,7 @@ export default function EventWizard(props: WizardProps) {
   const indicePasso = (passi as readonly StepKey[]).indexOf(activeStep);
   const vai = (step: StepKey, sez?: WizardAdvancedSection | null) => {
     if (caricamentiInViaggio > 0) return;
+    if (step !== activeStep && fermaSeInSospeso()) return;
     if (step === 'advanced') apriSezione(sez ?? null);
     setActiveStep(step);
   };
@@ -1453,6 +1467,7 @@ export default function EventWizard(props: WizardProps) {
    *  passo a posto. */
   const goNext = () => {
     if (caricamentiInViaggio > 0) return;
+    if (fermaSeInSospeso()) return;
     const errs = validateStep(activeStep, form, props.defaultLocale, retentionMax);
     if (Object.keys(errs).length > 0) {
       chiaviClientRef.current = new Set(Object.keys(errs));
@@ -1630,6 +1645,7 @@ export default function EventWizard(props: WizardProps) {
     async (submitMode: 'draft' | 'publish', overrideRedirect?: string) => {
       // Un file ancora in viaggio non e' nel modulo: si salverebbe senza.
       if (caricamentiInViaggio > 0) return;
+      if (fermaSeInSospeso()) return;
       setAzione(submitMode);
       // Validate every step before submitting (especially on publish).
       const aggregated: Record<string, string> = {};
@@ -2131,6 +2147,7 @@ export default function EventWizard(props: WizardProps) {
       ricaricaLingue,
       scartaLetture,
       caricamentiInViaggio,
+      fermaSeInSospeso,
     ]
   );
 
@@ -2164,6 +2181,7 @@ export default function EventWizard(props: WizardProps) {
 
   return (
     <LibreriaDomandeProvider value={libreriaDomande}>
+    <RegistroBozzeContext.Provider value={registroBozze}>
     <div>
       {draftAvailable && (
         <div
@@ -2230,7 +2248,11 @@ export default function EventWizard(props: WizardProps) {
           <button
             type="button"
             className="btn btn-sm btn-outline-primary"
-            onClick={cambiaModello}
+            onClick={() => {
+              // Cio' che e' scritto e non aggiunto non viaggia con il modulo.
+              if (fermaSeInSospeso()) return;
+              cambiaModello();
+            }}
             // Un file in viaggio non arriverebbe nel formato nuovo.
             disabled={cambiandoModello || caricamentiInViaggio > 0}
           >
@@ -2666,6 +2688,7 @@ export default function EventWizard(props: WizardProps) {
         </div>
       </div>
     </div>
+    </RegistroBozzeContext.Provider>
     </LibreriaDomandeProvider>
   );
 }

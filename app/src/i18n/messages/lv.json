@@ -1425,7 +1425,8 @@
         "fixedNotice": "Šī instalācija nevar izņemt balsi no video: kam dod vārdu, nonāk ierakstā, un paziņojums to norāda.",
         "questionTranscription": "Vai ir dota piekrišana transkripcijai?",
         "fixedNotRecorded": "Bez balss un attēla; vārds video var parādīties."
-      }
+      },
+      "unaddedEntry": "Jūs aizpildījāt šo veidlapu, to neapstiprinot: nospiediet pogu, lai to pievienotu, vai notīriet laukus."
     },
     "nav": {
       "events": "Pasākumi",

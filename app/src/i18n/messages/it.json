@@ -1635,7 +1635,8 @@
         "fixedNotice": "Questa installazione non può togliere una voce dal video: chi riceve la parola entra nella registrazione, e l'avviso lo dice.",
         "questionTranscription": "Ha acconsentito alla trascrizione?",
         "fixedNotRecorded": "Niente voce né immagine; il nome può comparire nel video."
-      }
+      },
+      "unaddedEntry": "Hai compilato questo modulo senza confermarlo: premi il pulsante per aggiungerlo, oppure svuota i campi."
     },
     "nav": {
       "events": "Eventi",

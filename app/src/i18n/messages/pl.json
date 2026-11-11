@@ -1425,7 +1425,8 @@
         "fixedNotice": "Ta instalacja nie może usunąć głosu z wideo: kto otrzyma głos, trafia do nagrania, a powiadomienie o tym informuje.",
         "questionTranscription": "Czy jest zgoda na transkrypcję?",
         "fixedNotRecorded": "Bez głosu i obrazu; nazwa może pojawić się w nagraniu."
-      }
+      },
+      "unaddedEntry": "Wypełniono ten formularz bez zatwierdzenia: dodaj go przyciskiem albo wyczyść pola."
     },
     "nav": {
       "events": "Wydarzenia",

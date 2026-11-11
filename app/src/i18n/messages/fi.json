@@ -1425,7 +1425,8 @@
         "fixedNotice": "Tämä asennus ei voi poistaa ääntä videolta: puheenvuoron saanut tulee tallenteeseen, ja ilmoitus kertoo sen.",
         "questionTranscription": "Onko litterointiin annettu suostumus?",
         "fixedNotRecorded": "Ei ääntä eikä kuvaa; nimi voi näkyä videolla."
-      }
+      },
+      "unaddedEntry": "Täytit tämän lomakkeen vahvistamatta sitä: lisää se painikkeella tai tyhjennä kentät."
     },
     "nav": {
       "events": "Tapahtumat",

@@ -1425,7 +1425,8 @@
         "fixedNotice": "Deze installatie kan geen stem uit de video halen: wie het woord krijgt, komt in de opname, en de melding zegt dat.",
         "questionTranscription": "Is er toestemming voor de transcriptie?",
         "fixedNotRecorded": "Geen stem of beeld; de naam kan in de video verschijnen."
-      }
+      },
+      "unaddedEntry": "U hebt dit formulier ingevuld zonder het te bevestigen: druk op de knop om het toe te voegen, of maak de velden leeg."
     },
     "nav": {
       "events": "Evenementen",

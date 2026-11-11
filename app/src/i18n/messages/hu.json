@@ -1425,7 +1425,8 @@
         "fixedNotice": "Ez a telepítés nem tud eltávolítani egy hangot a videóból: aki szót kap, bekerül a felvételbe, és az értesítés ezt közli.",
         "questionTranscription": "Hozzájárult az átiratkészítéshez?",
         "fixedNotRecorded": "Hang és kép nélkül; a név megjelenhet a videóban."
-      }
+      },
+      "unaddedEntry": "Kitöltötte ezt az űrlapot, de nem erősítette meg: adja hozzá a gombbal, vagy ürítse ki a mezőket."
     },
     "nav": {
       "events": "Események",

@@ -1425,7 +1425,8 @@
         "fixedNotice": "Esta instalação não pode retirar uma voz do vídeo: quem recebe a palavra entra na gravação, e o aviso di-lo.",
         "questionTranscription": "Foi dado consentimento para a transcrição?",
         "fixedNotRecorded": "Sem voz nem imagem; o nome pode aparecer no vídeo."
-      }
+      },
+      "unaddedEntry": "Preencheu este formulário sem o confirmar: prima o botão para o adicionar ou limpe os campos."
     },
     "nav": {
       "events": "Eventos",

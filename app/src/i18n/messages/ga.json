@@ -1425,7 +1425,8 @@
         "fixedNotice": "Ní féidir leis an suiteáil seo guth a bhaint den fhíseán: an té a fhaigheann an focal, téann sé isteach sa taifeadadh, agus deir an fógra é.",
         "questionTranscription": "Ar tugadh toiliú leis an tras-scríobh?",
         "fixedNotRecorded": "Gan guth ná íomhá; d'fhéadfadh an t-ainm a bheith le feiceáil san fhíseán."
-      }
+      },
+      "unaddedEntry": "Líon tú an fhoirm seo gan í a dheimhniú: brúigh an cnaipe chun í a chur leis, nó glan na réimsí."
     },
     "nav": {
       "events": "Imeachtaí",

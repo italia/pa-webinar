@@ -3,7 +3,7 @@
 
 'use client';
 
-import { useContext, useEffect, useId, useState } from 'react';
+import { useContext, useEffect, useId, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { Scelta } from '@/components/admin/guided-format';
@@ -18,7 +18,8 @@ import type { PersonRole } from '@/lib/events/grant-profile';
 import { accessModeDaSalvare, publicRegistrationFor } from '@/lib/events/access-mode';
 import { logoPubblico } from '@/lib/events/public-people';
 
-import { BOZZA_VUOTA, controllaBozza, conRuolo, indirizziPresi, type Bozza } from './people-draft';
+import { useBozzaInSospeso } from './bozze-in-sospeso';
+import { BOZZA_VUOTA, bozzaCompilata, controllaBozza, conRuolo, indirizziPresi, type Bozza } from './people-draft';
 import RuoliEvento from './ruoli-evento';
 import Gruppo from './wizard-group';
 import { emailValida, nomeOrganizzatoreValido } from './validation';
@@ -528,6 +529,16 @@ function FieldError({ message }: { message: string | null }) {
   );
 }
 
+/** L'ente in preparazione ha qualcosa di scritto o caricato. */
+export function enteCompilato(e: OrganizerEntry): boolean {
+  return Boolean(e.name.trim() || e.websiteUrl?.trim() || e.logoUrl);
+}
+
+/** L'invito in preparazione ha un nome o un indirizzo. */
+export function invitoCompilato(i: { name: string; email: string }): boolean {
+  return Boolean(i.name.trim() || i.email.trim());
+}
+
 function OrganizersSection({
   value,
   onChange,
@@ -545,6 +556,8 @@ function OrganizersSection({
   // Mentre il logo va al server l'ente non si aggiunge: partirebbe senza, e
   // il logo arrivato dopo finirebbe nell'ente successivo.
   const [logoInCaricamento, setLogoInCaricamento] = useState(false);
+  const pulsante = useRef<HTMLButtonElement>(null);
+  useBozzaInSospeso(enteCompilato(draft), pulsante, setErr);
 
   const add = () => {
     if (logoInCaricamento) return;
@@ -620,6 +633,7 @@ function OrganizersSection({
         </div>
         <div className="col-md-3">
           <button
+            ref={pulsante}
             type="button"
             className="btn btn-primary w-100"
             onClick={add}
@@ -692,6 +706,8 @@ function PeopleSection({
   const [logoInCaricamento, setLogoInCaricamento] = useState(false);
   const fileInCaricamento = fotoInCaricamento || logoInCaricamento;
   const [bozzaN, setBozzaN] = useState(0);
+  const pulsante = useRef<HTMLButtonElement>(null);
+  useBozzaInSospeso(bozzaCompilata(draft), pulsante, setErr);
   const tutte = righe(moderators, speakers);
   // Una persona ha un ruolo solo: gli indirizzi gia' usati (people-draft).
   const giaPresenti = indirizziPresi(moderators, speakers, taken);
@@ -994,6 +1010,7 @@ function PeopleSection({
         </div>
         <div className="col-md-4">
           <button
+            ref={pulsante}
             type="button"
             className="btn btn-primary w-100"
             onClick={add}
@@ -1031,6 +1048,9 @@ export function InvitationsSection({
     personId: null as string | null,
   });
   const [err, setErr] = useState<string | null>(null);
+  const pulsante = useRef<HTMLButtonElement>(null);
+  // Chi non puo' invitare vede solo l'elenco: niente da confermare.
+  useBozzaInSospeso(!locked && invitoCompilato(draft), pulsante, setErr);
 
   const add = () => {
     const email = draft.email.trim().toLowerCase();
@@ -1114,7 +1134,7 @@ export function InvitationsSection({
               />
             </div>
             <div className="col-md-2">
-              <button type="button" className="btn btn-primary w-100" onClick={add}>
+              <button ref={pulsante} type="button" className="btn btn-primary w-100" onClick={add}>
                 {t('add')}
               </button>
             </div>

@@ -1425,7 +1425,8 @@
         "fixedNotice": "Ta namestitev ne more odstraniti glasu iz videa: kdor dobi besedo, vstopi v posnetek, obvestilo pa to pove.",
         "questionTranscription": "Je dano soglasje za prepis?",
         "fixedNotRecorded": "Brez glasu in slike; ime se lahko pojavi v videoposnetku."
-      }
+      },
+      "unaddedEntry": "Ta obrazec ste izpolnili, a ga niste potrdili: dodajte ga z gumbom ali izpraznite polja."
     },
     "nav": {
       "events": "Dogodki",

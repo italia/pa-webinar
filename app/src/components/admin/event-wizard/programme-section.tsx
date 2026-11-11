@@ -38,8 +38,10 @@ import { useDurataTesto } from '@/hooks/use-durata-testo';
 import { splitAgendaLines, MAX_AGENDA_ITEMS } from '@/lib/agenda/status';
 import type { PersonRole } from '@/lib/events/grant-profile';
 
+import { useBozzaInSospeso } from './bozze-in-sospeso';
 import {
   BOZZA_VUOTA,
+  bozzaCompilata,
   controllaBozza,
   conRuolo,
   indirizziPresi,
@@ -645,8 +647,13 @@ function NuovaPersona({
   const tc = useTranslations('common');
   const [bozza, setBozza] = useState<Bozza>(BOZZA_VUOTA);
   const [errore, setErrore] = useState<ErrorePersona | null>(null);
+  // Compilato e non assegnato quando si lascia il passo.
+  const [avviso, setAvviso] = useState<string | null>(null);
   const nomeRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
+  const confermaRef = useRef<HTMLButtonElement>(null);
+  // Con il programma pieno il pulsante e' spento: non si chiede di premerlo.
+  useBozzaInSospeso(!pieno && bozzaCompilata(bozza), confermaRef, setAvviso);
 
   // Aperto, si comincia dal nome.
   useEffect(() => {
@@ -657,6 +664,7 @@ function NuovaPersona({
   const cambia = (patch: Partial<Bozza>) => {
     setBozza((prima) => ({ ...prima, ...patch }));
     setErrore(null);
+    setAvviso(null);
   };
 
   const conferma = () => {
@@ -774,15 +782,16 @@ function NuovaPersona({
             {tp('newPersonPublicHelp')}
           </small>
         </div>
-        {errore && (
+        {(errore || avviso) && (
           <div className="col-12">
             <p id={`${id}-errore`} className="small text-danger fw-semibold mb-0" role="alert">
-              {t(errore)}
+              {errore ? t(errore) : avviso}
             </p>
           </div>
         )}
         <div className="col-12 d-flex flex-wrap gap-2 mt-2">
           <button
+            ref={confermaRef}
             type="button"
             className="btn btn-primary btn-sm"
             disabled={pieno}
@@ -815,12 +824,15 @@ function Aggiunta({
   const id = useId();
   const [incolla, setIncolla] = useState(false);
   const [testo, setTesto] = useState('');
+  const [avviso, setAvviso] = useState<string | null>(null);
+  const confermaRef = useRef<HTMLButtonElement>(null);
   // La riga appena aggiunta in fondo e ancora intatta (senza argomento, chi
   // interviene ne' durata) si sostituisce: non occupa posto, e non resta
   // vuota in mezzo all'elenco.
   const base = rigaIntatta(agenda.at(-1)) ? agenda.slice(0, -1) : agenda;
   const posti = MAX_AGENDA_ITEMS - base.length;
   const righe = splitAgendaLines(testo).slice(0, posti);
+  useBozzaInSospeso(incolla && righe.length > 0, confermaRef, setAvviso);
 
   return (
     <>
@@ -856,19 +868,29 @@ function Aggiunta({
             rows={4}
             value={testo}
             aria-describedby={`${id}-aiuto`}
-            onChange={(e) => setTesto(e.target.value)}
+            onChange={(e) => {
+              setTesto(e.target.value);
+              setAvviso(null);
+            }}
           />
           <small id={`${id}-aiuto`} className="d-block text-secondary mt-1">
             {t('programPasteHelp')}
           </small>
+          {avviso && (
+            <p className="small text-danger fw-semibold mt-2 mb-0" role="alert">
+              {avviso}
+            </p>
+          )}
           <div className="d-flex flex-wrap gap-2 mt-2">
             <button
+              ref={confermaRef}
               type="button"
               className="btn btn-primary btn-sm"
               disabled={righe.length === 0}
               onClick={() => {
                 onAggiunte([...base, ...righe.map((r) => nuovaVoce(r))], base.length);
                 setTesto('');
+                setAvviso(null);
                 setIncolla(false);
               }}
             >
@@ -879,6 +901,7 @@ function Aggiunta({
               className="btn btn-outline-secondary btn-sm"
               onClick={() => {
                 setTesto('');
+                setAvviso(null);
                 setIncolla(false);
               }}
             >

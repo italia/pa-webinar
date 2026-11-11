@@ -1425,7 +1425,8 @@
         "fixedNotice": "Ova instalacija ne može ukloniti glas iz videa: tko dobije riječ, ulazi u snimku, a obavijest to kaže.",
         "questionTranscription": "Je li dana privola za transkripciju?",
         "fixedNotRecorded": "Bez glasa i slike; ime se može pojaviti u videozapisu."
-      }
+      },
+      "unaddedEntry": "Ispunili ste ovaj obrazac, ali ga niste potvrdili: dodajte ga gumbom ili ispraznite polja."
     },
     "nav": {
       "events": "Događaji",

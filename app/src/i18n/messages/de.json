@@ -1425,7 +1425,8 @@
         "fixedNotice": "Diese Installation kann keine Stimme aus dem Video entfernen: Wer das Wort erhält, kommt in die Aufzeichnung, und der Hinweis sagt es.",
         "questionTranscription": "Liegt die Einwilligung in die Transkription vor?",
         "fixedNotRecorded": "Keine Stimme und kein Bild; der Name kann im Video erscheinen."
-      }
+      },
+      "unaddedEntry": "Sie haben dieses Formular ausgefüllt, aber nicht bestätigt: Fügen Sie es mit der Schaltfläche hinzu oder leeren Sie die Felder."
     },
     "nav": {
       "events": "Veranstaltungen",

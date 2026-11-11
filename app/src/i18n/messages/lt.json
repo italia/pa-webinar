@@ -1425,7 +1425,8 @@
         "fixedNotice": "Ši diegtis negali pašalinti balso iš vaizdo įrašo: gavęs žodį patenka į įrašą, o pranešime tai nurodoma.",
         "questionTranscription": "Ar duotas sutikimas dėl transkripcijos?",
         "fixedNotRecorded": "Be balso ir vaizdo; vardas vaizdo įraše gali matytis."
-      }
+      },
+      "unaddedEntry": "Užpildėte šią formą jos nepatvirtinę: paspauskite mygtuką, kad ją pridėtumėte, arba išvalykite laukus."
     },
     "nav": {
       "events": "Renginiai",

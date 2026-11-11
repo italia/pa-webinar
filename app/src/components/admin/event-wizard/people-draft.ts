@@ -39,6 +39,18 @@ export const BOZZA_VUOTA: Bozza = {
   photoId: null,
 };
 
+/** La bozza ha qualcosa di scritto: il ruolo e la casella della pagina
+ *  pubblica da soli non contano, partono gia' impostati. */
+export function bozzaCompilata(b: Bozza): boolean {
+  return Boolean(
+    b.name.trim() ||
+    b.email.trim() ||
+    b.organization?.trim() ||
+    b.organizationLogoUrl ||
+    b.photoId
+  );
+}
+
 /** Perche' una persona non si aggiunge: le chiavi dei messaggi del passo
  *  «Persone» (`admin.wizard.step3`). */
 export type ErrorePersona = 'personRequired' | 'invalidEmail' | 'duplicateEmail';

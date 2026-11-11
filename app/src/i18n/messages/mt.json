@@ -1425,7 +1425,8 @@
         "fixedNotice": "Din l-installazzjoni ma tistax tneħħi leħen mill-vidjo: min jingħata l-kelma jidħol fir-reġistrazzjoni, u l-avviż jgħid dan.",
         "questionTranscription": "Ingħata l-kunsens għat-traskrizzjoni?",
         "fixedNotRecorded": "Ebda vuċi jew immaġni; l-isem jista' jidher fil-vidjo."
-      }
+      },
+      "unaddedEntry": "Imlejt din il-formola mingħajr ma kkonfermajtha: agħfas il-buttuna biex iżżidha, jew battal il-oqsma."
     },
     "nav": {
       "events": "Avvenimenti",

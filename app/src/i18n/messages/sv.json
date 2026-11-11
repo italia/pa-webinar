@@ -1425,7 +1425,8 @@
         "fixedNotice": "Den här installationen kan inte ta bort en röst från videon: den som får ordet hamnar i inspelningen, och avisering anger det.",
         "questionTranscription": "Finns samtycke till transkriberingen?",
         "fixedNotRecorded": "Ingen röst eller bild; namnet kan synas i videon."
-      }
+      },
+      "unaddedEntry": "Du har fyllt i detta utan att bekräfta det: tryck på knappen för att lägga till det, eller töm fälten."
     },
     "nav": {
       "events": "Evenemang",

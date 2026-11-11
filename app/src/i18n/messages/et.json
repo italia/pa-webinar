@@ -1425,7 +1425,8 @@
         "fixedNotice": "See paigaldus ei saa häält videost eemaldada: sõna saanu satub salvestusse ja teavitus ütleb seda.",
         "questionTranscription": "Kas transkriptsiooniks on antud nõusolek?",
         "fixedNotRecorded": "Ei häält ega pilti; nimi võib videos näha olla."
-      }
+      },
+      "unaddedEntry": "Täitsite selle vormi, kuid ei kinnitanud seda: lisage see nupuga või tühjendage väljad."
     },
     "nav": {
       "events": "Üritused",

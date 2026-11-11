@@ -2621,3 +2621,105 @@ describe('file in viaggio verso il server', () => {
     expect(container.querySelector('[data-testid="rev-privacy-doc"]')).toBeNull();
   });
 });
+
+describe('moduli da confermare — cio che e scritto e non aggiunto', () => {
+  const sulPassoPersone = () => container.querySelector('#person-name') !== null;
+  const avviso = () => container.textContent?.includes(w.unaddedEntry) ?? false;
+
+  function eventoBase() {
+    renderWizard();
+    type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
+    type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
+    organizzatore();
+  }
+
+  it('una persona scritta e non aggiunta ferma il cambio di passo, con il fuoco sul suo «Aggiungi»', () => {
+    eventoBase();
+    type(byId<HTMLInputElement>('person-name'), 'Laura Bianchi');
+    type(byId<HTMLInputElement>('person-email'), 'laura.bianchi@example.org');
+
+    goToStep('review');
+    expect(sulPassoPersone()).toBe(true);
+    expect(avviso()).toBe(true);
+    const aggiungi = button(w.step3.add, byId('person-email').closest('.row') ?? container);
+    expect(document.activeElement).toBe(aggiungi);
+
+    click(aggiungi);
+    expect(avviso()).toBe(false);
+    goToStep('review');
+    expect(sulPassoPersone()).toBe(false);
+    expect(container.textContent).toContain('Laura Bianchi');
+  });
+
+  it('«Avanti» con un invito scritto e non aggiunto resta sul passo', () => {
+    eventoBase();
+    type(byId<HTMLInputElement>('inv-email'), 'mario.rossi@example.org');
+    click(button(`${messages.common.next} →`));
+    expect(sulPassoPersone()).toBe(true);
+    expect(avviso()).toBe(true);
+  });
+
+  it('«Salva bozza» con un ente scritto e non aggiunto non chiama il server', async () => {
+    eventoBase();
+    type(byId<HTMLInputElement>('org-name'), 'Comune di Valleverde');
+    await press(button(w.saveDraft));
+    expect(chiamateAlServer()).toHaveLength(0);
+    expect(push).not.toHaveBeenCalled();
+    expect(avviso()).toBe(true);
+  });
+
+  it('svuotando i campi l avviso se ne va e il passo si lascia', () => {
+    eventoBase();
+    type(byId<HTMLInputElement>('org-name'), 'Comune di Valleverde');
+    goToStep('review');
+    expect(avviso()).toBe(true);
+    type(byId<HTMLInputElement>('org-name'), '');
+    expect(avviso()).toBe(false);
+    goToStep('review');
+    expect(sulPassoPersone()).toBe(false);
+  });
+
+  it('anche «Indietro» resta sul passo: lasciandolo, la bozza andrebbe persa', () => {
+    eventoBase();
+    type(byId<HTMLInputElement>('inv-email'), 'mario.rossi@example.org');
+    click(button(`← ${messages.common.back}`));
+    expect(sulPassoPersone()).toBe(true);
+    expect(avviso()).toBe(true);
+  });
+
+  it('una categoria nuova scritta e non creata ferma il passo «Evento»', () => {
+    renderWizard({ canManageTags: true });
+    type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
+    type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
+    click(button(w.step1.newTag));
+    const campo = Array.from(container.querySelectorAll<HTMLInputElement>('input')).find(
+      (el) => el.id.endsWith('-nome'),
+    )!;
+    type(campo, 'Servizi pubblici');
+    click(button(`${messages.common.next} →`));
+    expect(container.querySelector('#ev-title')).not.toBeNull();
+    expect(avviso()).toBe(true);
+  });
+
+  it('un elenco incollato e non aggiunto ferma il passo «Programma»', () => {
+    eventoBase();
+    goToStep(w.flow.steps.programme);
+    click(button(w.step3.programPaste));
+    const testo = Array.from(container.querySelectorAll<HTMLTextAreaElement>('textarea')).find(
+      (el) => el.id.endsWith('-testo'),
+    )!;
+    type(testo, 'Apertura dei lavori\nConclusioni');
+    goToStep('review');
+    expect(container.querySelector('textarea[id$="-testo"]')).not.toBeNull();
+    expect(avviso()).toBe(true);
+  });
+
+  it('un modulo svuotato non ferma niente', () => {
+    eventoBase();
+    type(byId<HTMLInputElement>('person-name'), 'Laura Bianchi');
+    type(byId<HTMLInputElement>('person-name'), '');
+    goToStep('review');
+    expect(sulPassoPersone()).toBe(false);
+    expect(avviso()).toBe(false);
+  });
+});
