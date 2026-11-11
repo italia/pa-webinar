@@ -15,8 +15,12 @@ export default function AdminLoginPage() {
   const locale = useLocale();
 
   const tl = useTranslations('admin.staffLogin');
+  const te = useTranslations('apiErrors');
   const [key, setKey] = useState('');
-  const [error, setError] = useState(false);
+  // Perche' l'accesso con la chiave non e' riuscito: la chiave, troppi
+  // tentativi dalla stessa rete (in sala escono tutti dallo stesso indirizzo:
+  // «chiave non valida» farebbe riprovare, e allungare l'attesa), o la rete.
+  const [error, setError] = useState<'chiave' | 'tentativi' | 'rete' | null>(null);
   const [loading, setLoading] = useState(false);
 
   // Accesso con link per email (ADR-014): la strada di chi organizza eventi.
@@ -42,7 +46,7 @@ export default function AdminLoginPage() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    setError(false);
+    setError(null);
     setLoading(true);
 
     try {
@@ -61,10 +65,10 @@ export default function AdminLoginPage() {
         window.location.assign(localizedPath('/admin/events', locale));
         return;
       } else {
-        setError(true);
+        setError(res.status === 429 ? 'tentativi' : 'chiave');
       }
     } catch {
-      setError(true);
+      setError('rete');
     } finally {
       setLoading(false);
     }
@@ -119,7 +123,11 @@ export default function AdminLoginPage() {
           <div className="pt-3">
             {error && (
               <Alert color="danger" className="mb-3">
-                {t('login.invalidKey')}
+                {error === 'tentativi'
+                  ? te('rateLimited')
+                  : error === 'rete'
+                    ? tl('error')
+                    : t('login.invalidKey')}
               </Alert>
             )}
 
