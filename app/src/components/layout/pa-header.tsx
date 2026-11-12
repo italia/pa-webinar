@@ -14,6 +14,11 @@ import {
 
 import { Icon } from '@/components/ui/icon';
 import { Link, usePathname } from '@/i18n/navigation';
+import {
+  eNomeDelProdotto,
+  larghezzaMarchioIntero,
+  MARCHIO_INTERO_NEGATIVO,
+} from '@/lib/branding/marchio';
 import { useSettings } from '@/lib/settings-context';
 import { mottoDelSito } from '@/lib/utils/locale';
 
@@ -138,15 +143,35 @@ function CenterHeader({
             <img src={logoUrl} alt={appName} style={{ height: 40, marginRight: 8 }} />
             <h2>{appName}</h2>
           </HeaderBrand>
+        ) : eNomeDelProdotto(appName) ? (
+          <HeaderBrand tag={Link} href="/">
+            {/* Il marchio intero, nella versione negativa per il fondo blu: il
+                logotipo e' gia' nell'immagine, che quindi e' decorativa. Il
+                nome resta nel titolo, nascosto alla vista, e sui telefoni (dove
+                il kit toglie il titolo) nel primo figlio, come sotto. */}
+            <span className="d-inline-flex align-items-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={MARCHIO_INTERO_NEGATIVO}
+                alt=""
+                aria-hidden="true"
+                width={larghezzaMarchioIntero(40)}
+                height={40}
+                style={{ height: 40, width: 'auto' }}
+              />
+              <span className="visually-hidden d-md-none">{appName}</span>
+            </span>
+            <h2 className="visually-hidden">{appName}</h2>
+          </HeaderBrand>
         ) : (
           <HeaderBrand tag={Link} href="/">
-            {/* Default PA Webinar mark (white knockout) — appName text sits
-                next to it, so the image is decorative (aria-hidden). */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
+            {/* Il simbolo di PA Webinar in negativo: il nome dell'installazione
+                gli sta accanto, quindi l'immagine e' decorativa. */}
             {/* Il kit nasconde sui telefoni ogni figlio dopo il primo (qui il
                 titolo): il nome del link resta nel primo, per i lettori di
                 schermo, solo dove il titolo non si vede. */}
             <span className="d-inline-flex align-items-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/logo/pa-webinar-mark-white.svg"
                 alt=""

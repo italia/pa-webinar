@@ -99,6 +99,12 @@ import {
 } from '@/lib/jitsi/riconnessione';
 import { useRientro } from '@/hooks/use-rientro';
 import { splitTitleKicker } from '@/lib/utils/title-kicker';
+import {
+  eNomeDelProdotto,
+  larghezzaMarchioIntero,
+  MARCHIO_INTERO_NEGATIVO,
+  NOME_PRODOTTO,
+} from '@/lib/branding/marchio';
 import { useSettings } from '@/lib/settings-context';
 import { OVERTIME_CAP_DEFAULT_MINUTES } from '@/lib/events/overtime-defaults';
 import { eventAdminPath } from '@/lib/events/admin-links';
@@ -4071,7 +4077,7 @@ function LiveTopBar({
   const t = useTranslations('live');
   const tr = useTranslations('live.role');
   const settings = useSettings();
-  const brandName = settings.siteName || 'PA Webinar';
+  const brandName = settings.siteName || NOME_PRODOTTO;
   const badgeColors = ROLE_BADGE_COLORS[role];
   const { kicker, main } = splitTitleKicker(title, parseTitleKicker);
   const thumbUrl = imageUrl ?? coverImageUrl ?? null;
@@ -4099,6 +4105,17 @@ function LiveTopBar({
             <img
               src={settings.logoUrl}
               alt={brandName}
+              style={{ height: 22, width: 'auto' }}
+            />
+          ) : eNomeDelProdotto(brandName) ? (
+            // Il marchio intero, negativo per la barra blu, all'altezza che il
+            // manuale del marchio fissa per la sala (lib/branding/marchio).
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={MARCHIO_INTERO_NEGATIVO}
+              alt={brandName}
+              width={larghezzaMarchioIntero(22)}
+              height={22}
               style={{ height: 22, width: 'auto' }}
             />
           ) : (

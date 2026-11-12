@@ -156,14 +156,14 @@ to another configured field:
 | Footer second line | **Parent organization** | **Site tagline** | nothing |
 | Institutional and plain-language landings | **Organization name** | **Application name** | |
 | Event structured data (search engines) | **Organization name** | "PA Webinar" | |
-| Center header image | **Custom logo URL** | the PA Webinar mark | |
-| Live-room top bar (medium screens and up) | **Custom logo URL** | **Application name** as text | |
+| Center header image | **Custom logo URL** | the full PA Webinar logo, when **Application name** is "PA Webinar" in any capitalisation | the PA Webinar symbol next to **Application name** |
+| Live-room top bar (medium screens and up) | **Custom logo URL** | the full PA Webinar logo, when **Application name** is "PA Webinar" in any capitalisation | **Application name** as text |
 
 ### Logo guidance
 
 The center header and the live-room top bar are .italia blue. A logo reads best as a light or knockout
 mark on a transparent background. It is drawn 40 px high in the header and 22 px high in the live room,
-with its width following the aspect ratio. The footer always shows the PA Webinar mark next to the
+with its width following the aspect ratio. The footer always shows the PA Webinar symbol next to the
 organization name. The custom logo does not replace it (see [Known limitations](#known-limitations)).
 
 ## Home page
@@ -315,7 +315,7 @@ SMTP settings are in [email delivery](email.md).
 | Label | Column | Behavior |
 |---|---|---|
 | **Watermark enabled** | `jitsiWatermarkEnabled` | Shows or hides the overlay |
-| **Watermark URL** | `jitsiWatermarkUrl` | Transparent SVG or PNG. Empty falls back to **Custom logo URL**, then to `/images/default-watermark.svg` (the PA Webinar mark in white) |
+| **Watermark URL** | `jitsiWatermarkUrl` | Transparent SVG or PNG. Empty falls back to **Custom logo URL**, then to `/images/default-watermark.svg` (the PA Webinar symbol, negative version) |
 | **Opacity** | `jitsiWatermarkOpacity` | 10 to 80 percent in the form, in steps of 5 |
 | **Position** | `jitsiWatermarkPosition` | **Bottom left**, **Bottom right**, **Top left**, **Top right** |
 
