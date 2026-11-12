@@ -2904,6 +2904,7 @@
       "editEvent": "Editar evento",
       "featureSummary": "Funcionalidades activas",
       "organizers": "Organizadores",
+      "peopleTabLink": "Todos los detalles en la pestaña «{tab}»",
       "privacyGdpr": "Privacidad y RGPD",
       "postEventTitle": "Posevento y comentarios",
       "recordingSection": "Vídeo del evento",

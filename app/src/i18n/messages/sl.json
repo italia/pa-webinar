@@ -2904,6 +2904,7 @@
       "editEvent": "Uredi dogodek",
       "featureSummary": "Aktivne funkcije",
       "organizers": "Organizatorji",
+      "peopleTabLink": "Vse podrobnosti na zavihku »{tab}«",
       "privacyGdpr": "Zasebnost in GDPR",
       "postEventTitle": "Po dogodku in povratne informacije",
       "recordingSection": "Videoposnetek dogodka",

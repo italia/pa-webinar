@@ -114,7 +114,15 @@ export default async function EventManagePage({
       questionnaires: true,
       // Le registrazioni con un file: quella «solo sottotitoli» non ha niente
       // da dare alla pipeline AI.
-      _count: { select: { registrations: true, recordings: { where: { blobKey: { not: '' } } } } },
+      _count: {
+        select: {
+          registrations: true,
+          // Gli ospiti invitati e non ancora rifiutati: l'invito a un
+          // relatore, una volta mandato, e' gia' fra i relatori.
+          invitations: { where: { role: 'GUEST', declinedAt: null } },
+          recordings: { where: { blobKey: { not: '' } } },
+        },
+      },
     },
   });
 
@@ -230,8 +238,12 @@ export default async function EventManagePage({
       name: tryDecryptPII(m.name) ?? m.name,
       email: tryDecryptPII(m.email),
       role: m.role,
+      organizer: m.organizer,
       revokedAt: m.revokedAt?.toISOString() ?? null,
     })),
+    // La sezione degli inviti e' dello staff: con il solo link di conduzione
+    // la panoramica non ne dice il numero.
+    invitationCount: staff ? event._count.invitations : 0,
     questionnaireCount: event.questionnaires.length,
     registrations: event.registrations.map((r) => ({
       id: r.id,

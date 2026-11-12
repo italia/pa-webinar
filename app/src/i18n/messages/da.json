@@ -2904,6 +2904,7 @@
       "editEvent": "Rediger arrangement",
       "featureSummary": "Aktive funktioner",
       "organizers": "Arrangører",
+      "peopleTabLink": "Alle detaljer under fanen »{tab}«",
       "privacyGdpr": "Privatliv og GDPR",
       "postEventTitle": "Efter arrangementet og feedback",
       "recordingSection": "Begivenhedens video",

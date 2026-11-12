@@ -3114,6 +3114,7 @@
       "editEvent": "Modifica evento",
       "featureSummary": "Funzionalità attive",
       "organizers": "Organizzatori",
+      "peopleTabLink": "Tutti i dettagli nella scheda «{tab}»",
       "privacyGdpr": "Privacy & GDPR",
       "postEventTitle": "Post-evento & feedback",
       "recordingSection": "Video dell’evento",

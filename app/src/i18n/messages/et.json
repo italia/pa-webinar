@@ -2904,6 +2904,7 @@
       "editEvent": "Muuda sündmust",
       "featureSummary": "Aktiivsed funktsioonid",
       "organizers": "Korraldajad",
+      "peopleTabLink": "Kõik üksikasjad vahekaardil „{tab}“",
       "privacyGdpr": "Privaatsus ja IKÜM",
       "postEventTitle": "Pärast sündmust ja tagasiside",
       "recordingSection": "Sündmuse video",
