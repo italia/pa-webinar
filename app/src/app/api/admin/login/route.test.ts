@@ -107,6 +107,19 @@ describe('chi entra', () => {
     expect(prisma.adminAuditLog.create).not.toHaveBeenCalled();
   });
 
+  it('copiata con spazi o un a capo ai lati entra lo stesso', async () => {
+    for (const key of [` ${CHIAVE}`, `${CHIAVE} `, `  ${CHIAVE}\n`, `\t${CHIAVE}\r\n`]) {
+      expect((await accedi({ key })).status).toBe(200);
+    }
+  });
+
+  it('gli spazi in mezzo restano una chiave diversa', async () => {
+    const meta = Math.floor(CHIAVE.length / 2);
+    const r = await accedi({ key: `${CHIAVE.slice(0, meta)} ${CHIAVE.slice(meta)}` });
+    expect(r.status).toBe(401);
+    expect((await accedi({ key: '   ' })).status).toBe(401);
+  });
+
   it('senza chiave nel corpo e’ 401', async () => {
     expect((await accedi({})).status).toBe(401);
     expect((await accedi({ key: null })).status).toBe(401);
