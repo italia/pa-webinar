@@ -38,7 +38,7 @@ interface EventPeopleSummaryProps {
 }
 
 // Le righe hanno la misura della riga degli enti sopra: il foglio di stile
-// del design system da' a dt e dd una misura loro.
+// del design system da' a dl, dt e dd una misura loro.
 const RIGA: CSSProperties = { fontSize: 'inherit', lineHeight: 'inherit' };
 
 export default function EventPeopleSummary({
@@ -73,7 +73,7 @@ export default function EventPeopleSummary({
 
   return (
     <div className="mt-1" style={style} data-testid="event-people-summary">
-      <dl className="mb-0">
+      <dl className="mb-0" style={RIGA}>
         {righe.map(([etichetta, valore]) => (
           <div key={etichetta} className="d-flex flex-wrap gap-2">
             <dt className="fw-semibold" style={RIGA}>
