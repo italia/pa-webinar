@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il protocollo tra il bridge Jitsi e il servizio di trascrizione ("mediajson",
  * derivato dal formato di VoxImplant): JSON su WebSocket.

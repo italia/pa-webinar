@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import type { ReactNode } from 'react';
 import { act, useState } from 'react';
 import { createRoot, type Root } from 'react-dom/client';

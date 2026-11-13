@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * ╔══════════════════════════════════════════════════════════════════════╗
  * ║  MODULO WEBRTC — RICHIEDE UN JITSI REALE. NON È UNIT-TESTABILE.        ║
@@ -575,6 +578,13 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
       seenParticipant = true;
       if (idleTimer) clearTimeout(idleTimer);
       const pid: string = track.getParticipantId?.() ?? 'unknown';
+      // Il consenso alla registrazione manca (lo dice la presenza, che viene
+      // dal token: mod_pa_media_lock): la sua voce non si registra, qualunque
+      // altra cosa abbia acconsentito.
+      if (conference?.getParticipantById?.(pid)?.isHiddenFromRecorder?.() === true) {
+        log(`TRACK_SKIPPED pid=${pid}: nessun consenso alla registrazione`);
+        return;
+      }
       // Solo chi ha dato il consenso alla trascrizione dei propri interventi:
       // chi non l'ha dato partecipa, ma la sua voce non finisce in un file.
       const trackId: string | undefined = track.getId?.();
@@ -749,6 +759,8 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
         // a initJitsiConference; il recorder deve fare lo stesso.
         conference = connection.initJitsiConference(cfg.room, {
           ...jcfg,
+          // Senza, la presenza perde il segno di chi non ha il consenso.
+          hiddenFromRecorderFeatureEnabled: true,
           iceTransportPolicy: 'all',
           useStunTurn: false,
         });

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * I link di navigazione del sito pubblico, in un posto solo: li leggono
  * intestazione e piè di pagina, e il test di raggiungibilità

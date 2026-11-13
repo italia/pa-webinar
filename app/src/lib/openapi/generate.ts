@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import {
   OpenAPIRegistry,
   OpenApiGeneratorV31,
@@ -849,6 +852,31 @@ registry.registerPath({
   summary: 'Fulfil a GDPR data export via signed token (Art. 15, step 2)',
   request: { query: z.object({ t: z.string() }) },
   responses: { 200: { description: 'Exported personal data' } },
+});
+
+registry.registerPath({
+  method: 'post',
+  path: '/api/gdpr/consents',
+  tags: ['GDPR'],
+  summary: 'Withdraw one consent of a registration (Art. 7.3), with the token the export returns',
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: z.object({
+            token: z.string(),
+            registrationId: z.guid(),
+            consent: z.enum(['recording', 'transcription', 'futureCommunications']),
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: { description: 'Consent withdrawn' },
+    401: { description: 'Invalid or expired token' },
+    404: { description: 'No such registration for this address' },
+  },
 });
 
 registry.registerPath({

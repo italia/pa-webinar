@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """Transcription stage — WhisperX + pyannote.audio diarization.
 
 Two paths exist intentionally:

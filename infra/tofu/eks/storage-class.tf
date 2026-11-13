@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # StorageClass predefinita.
 #
 # Un cluster EKS creato dalla versione 1.30 in poi non ha nessuna StorageClass

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 // @vitest-environment jsdom
 /**
  * La sala di chi modera manda a Jitsi la scelta dei sottotitoli all'ingresso e

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il segnaposto della sala mentre il server la prepara: la forma della sala
  * d'attesa e la sua altezza minima (.waiting-shell), cosi' il piede della

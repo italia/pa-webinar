@@ -52,9 +52,8 @@ assessment belongs to the controller of each installation.
   machine-generated. Subtitles in the player and downloaded files carry no
   marker. The models used for a recording appear on the event page only when
   the pipeline produced a summary.
-- Dubbing uses catalog synthetic voices, never a participant's voice. The
-  worker picks each voice's gender from a guess based on the speaker's first
-  name.
+- Dubbing uses catalog synthetic voices, never a participant's voice, assigned
+  by speaking time. Nothing is inferred about the speaker from their name.
 - Every model runs inside the installation; no recording or transcript is sent
   to an external AI service.
 - AI outputs, and the transcript from captions, follow the event's retention
@@ -67,7 +66,7 @@ assessment belongs to the controller of each installation.
 
 | Capture | Turned on by | Consent collected | What it contains | Where it is stored |
 |---|---|---|---|---|
-| Composite video (Jibri) | **Enable video recording** (`recordingEnabled`). A moderator starts it, or it starts on its own with `autoStartRecording` | `consentRecording` at registration; in the waiting room, a checkbox for whoever has not given it, stored as proof (`RecordingConsent`): blocking, or free with listen-only; for moderators and speakers always free, stored with their grant or staff account | One MP4 file with the conference video and the mixed audio of everyone | `recordings/` in the recordings storage domain |
+| Composite video (Jibri) | **Enable video recording** (`recordingEnabled`). A moderator starts it, or it starts on its own with `autoStartRecording` | `consentRecording` at registration; in the waiting room, a checkbox for whoever has not given it, stored as proof (`RecordingConsent`), never a condition of entering; for moderators and speakers too, stored with their grant or staff account | One MP4 file with the conference video and the mixed audio of everyone who consented: Jibri's session does not see the others | `recordings/` in the recordings storage domain |
 | Per-participant audio (recorder bot) | **Per-participant recording (high accuracy)** (`multitrackRecordingEnabled`). The toggle appears only with recording and **Automatic transcription** on. The bot starts when the event goes `LIVE` | The optional transcription consent: `consentMultitrack` at registration, or a checkbox in the waiting room stored for the conference seat (`MultitrackConsent`). The bot records only the tracks of people who gave it | One audio file per consenting participant and per track session, plus a manifest that names the participant of each file | `recordings/multitrack/<eventId>/<recordingId>/` in the recordings storage domain |
 | Live caption sentences | **Transcript from captions** (`captionsTranscriptEnabled`), with live captions running for the event | The same transcription consent | For people who consented: the text of each final caption sentence and the speaker's name. For everyone else: the times of their sentences only | `caption_segments` in PostgreSQL, text and name encrypted |
 | Who is in the room | Every event of an installation where live captions are available and on for the instance, whatever the event's own captions switch, and every event with per-participant recording, while Prosody loads `mod_pa_occupants` (the chart and Docker Compose load it); otherwise nothing | No dedicated consent | The bridge endpoint and the conference seat of each occupant who joined with a token, with join and leave times. No name | `room_occupants` in PostgreSQL |
@@ -82,7 +81,8 @@ pipeline ([Transcript from live captions](#transcript-from-live-captions)).
 ### Composite video
 
 Jibri records the conference as seen by a participant: the video layout and
-one mixed audio track. Its retention (the temporary catch-up copy,
+one mixed audio track, without the voice and image of people who have no valid
+recording consent ([Consent model](../GDPR.md#consent-model)). Its retention (the temporary catch-up copy,
 publication, `recordingDeleteAfterDays`) is described in
 [Privacy and data protection](../GDPR.md). When post-production transcribes a
 composite video, it separates the voices with diarization. See
@@ -424,9 +424,9 @@ this section covers what matters for privacy.
   shown to everyone in the room for accessibility; the consent governs what
   is kept, not what is captioned live.
 - **The full room recording.** In an event where this consent was asked (same
-  rule as above), the
-  composite video contains every voice, including those of people who said
-  no. The AI pipeline therefore does not transcribe it on its own: the
+  rule as above), the composite video contains the voice of everyone who
+  consented to the recording, including people who said no to the
+  transcription. The AI pipeline therefore does not transcribe it on its own: the
   recording webhook enqueues nothing for it, and the event's transcript stays
   the one from captions (or from the per-participant tracks). Staff can still
   start the transcription of the composite video from the administration
@@ -546,14 +546,9 @@ reads the translated subtitles and speaks them with Piper voices from a
 catalog that ships inside the worker image. Voice cloning is not implemented.
 
 Voices are assigned in order of speaking time, with no link to the speaker's
-own voice. The worker also matches each voice's gender to a gender guessed
-from the speaker's first name (`infra/ai/worker/name_gender.py`: a built-in
-list of Italian first names, then the `gender_guesser` library). A speaker
-with no name, or with a name the guess cannot place, gets the next unused
-voice of any gender. The guess is never stored in the database, but the
-worker's log records the first-name-to-gender map of each dubbing job. The
-site settings describe the assignment under **Editorial line on voice**
-without mentioning the gender guess.
+own voice and without reading their name, so a dubbed voice says nothing about
+the person. The site settings describe the assignment under **Editorial line
+on voice**.
 
 The worker then embeds an inaudible AudioSeal watermark in the dubbed audio
 and records `watermarkType` on the output. Watermarking is best effort. If the
@@ -935,17 +930,14 @@ Points for the controller's assessment:
 
 - A public body often relies on Art. 6(1)(e), a task in the public interest,
   rather than on (b). Nothing in the platform depends on which one is chosen.
-- Registration is refused without the recording consent. Consider whether a
-  consent that conditions participation is freely given in your context, or
-  whether another basis fits better, with the gate kept as transparency. The
-  transcription consent does not condition participation: whoever refuses it
-  takes part, and is neither recorded on a track of their own nor kept in the
-  transcript from captions.
+- Neither consent conditions participation. Whoever refuses the recording
+  consent takes part and can speak without being recorded. Whoever refuses the
+  transcription consent takes part, and is neither recorded on a track of their
+  own nor kept in the transcript from captions. Consider whether a note next to
+  the video and a `***` mark in the transcript are enough for your context.
 - Live captions process the voice of everyone who speaks, consenting or not,
   to show the captions in the room. Only the transcript from captions depends
   on consent.
-- Dubbing infers a gender from each speaker's first name. Consider whether
-  that inference, and its presence in the worker's log, needs to be disclosed.
 
 ## Encryption at rest
 
@@ -974,6 +966,13 @@ Key handling and the secrets map are in
 
 Consent and transparency:
 
+- **Leaving a person out of the composite video depends on Jitsi and on
+  Prosody.** It uses Jitsi's `hidden-from-recorder` feature, and the mark comes
+  from the current `mod_pa_media_lock`: with an old module loaded nobody is left
+  out, and the room still says so. Retry it after every Jitsi upgrade, and
+  restart Prosody after an upgrade that changes the modules.
+- **What is already in the composite video stays after a withdrawal.** Removing
+  a person's passages is a request to the controller.
 - **The consent text promises deletion even when tracks are kept.**
   `gdpr.consent.multitrack` says the track is deleted after transcription
   whatever **Keep per-participant tracks** says.
@@ -991,8 +990,6 @@ Consent and transparency:
   and downloaded files (`.txt`, `.srt`, `.vtt`, `.md`) carry no AI marker; the
   disclosure comes from the transcript panel and the transparency panel.
 - **The watermark is best effort.** Dubbed audio can be published without it.
-- **Dubbing guesses gender from first names.** The **Editorial line on voice**
-  text does not mention it, and the worker's log records the guesses.
 - **The speaking timeline has no dedicated consent.** It is collected in every
   live room that a moderator attends and stored with plain-text names until the
   event's retention.

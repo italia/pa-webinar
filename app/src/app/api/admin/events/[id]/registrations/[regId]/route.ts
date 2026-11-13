@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * PATCH  /api/admin/events/:id/registrations/:regId — rettifica (art. 16)
  * DELETE /api/admin/events/:id/registrations/:regId — cancellazione (art. 17)

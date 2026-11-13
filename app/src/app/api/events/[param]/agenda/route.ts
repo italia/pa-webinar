@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * L'agenda dell'incontro. Funzione opt-in (Event.agendaEnabled). Pattern
  * allineato a Q&A/poll:

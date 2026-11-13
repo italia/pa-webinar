@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * La cronologia della sala per la post-produzione: cosa e' successo e quando,
  * sulla stessa base dei tempi della trascrizione (secondi dall'inizio della

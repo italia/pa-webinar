@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
@@ -523,6 +526,7 @@ export default async function EventDetailPage({
     status: event.status,
     recordingUrl: videoVisibile ? event.recordingUrl : null,
     transcriptPublished: vedeRegistrazione && event.transcriptPublished,
+    unrecordedSpeech: videoVisibile && event.unrecordedSpeech,
     // Il video su YouTube e' fuori dalla piattaforma: il pubblico della
     // registrazione non lo governa.
     youtubeUrl: event.youtubeUrl,

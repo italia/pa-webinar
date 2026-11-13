@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * POST /api/internal/jitsi/occupants
  *
@@ -43,6 +46,8 @@ const occupanteSchema = z.discriminatedUnion('action', [
     ...comuni,
     endpointId: z.string().min(1).max(64),
     seatId: z.string().min(1).max(80),
+    /** Senza consenso alla registrazione: lo dice il token (mod_pa_occupants). */
+    voiceExcluded: z.boolean().optional(),
     action: z.enum(['joined', 'left']),
   }),
   // Ogni trenta secondi, per una stanza con qualcuno dentro: solo la domanda
@@ -107,9 +112,15 @@ export const POST = withErrorHandling(async (request) => {
   // I sottotitoli contano dove il servizio c'e' ed e' acceso per l'istanza
   // (lib/captions/availability), qualunque sia il flag dell'evento: si puo'
   // accendere a evento iniziato, e chi e' gia' in sala deve essere
-  // riconosciuto.
-  if (dati.action !== 'check' && (sottotitoli || event.multitrackRecordingEnabled)) {
+  // riconosciuto. Serve anche dove si registra il video: chi parla senza
+  // consenso alla registrazione non lascia il nome, e la pagina dell'evento lo
+  // dice.
+  if (
+    dati.action !== 'check' &&
+    (sottotitoli || event.multitrackRecordingEnabled || event.recordingEnabled)
+  ) {
     const { endpointId, seatId, meetingId } = dati;
+    const voiceExcluded = dati.voiceExcluded === true;
     const adesso = new Date();
     if (dati.action === 'joined') {
       await prisma.roomOccupant.upsert({
@@ -119,9 +130,10 @@ export const POST = withErrorHandling(async (request) => {
           endpointId,
           seatId,
           meetingId: meetingId ?? null,
+          voiceExcluded,
           joinedAt: adesso,
         },
-        update: { seatId, meetingId: meetingId ?? null, joinedAt: adesso, leftAt: null },
+        update: { seatId, meetingId: meetingId ?? null, voiceExcluded, joinedAt: adesso, leftAt: null },
       });
     } else {
       await prisma.roomOccupant.updateMany({

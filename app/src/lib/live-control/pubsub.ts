@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Redis pub/sub for transient, targeted live-control signals — kept
  * SEPARATE from chat (lib/chat/pubsub) on purpose:

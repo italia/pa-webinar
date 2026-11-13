@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Authentication utilities for pa-webinar.
  *
@@ -103,6 +106,9 @@ interface JitsiTokenPayload {
   mediaAdmit?: MediaLock;
   /** In solo ascolto: senza consenso alla registrazione, mai ammesso. */
   listenOnly?: boolean;
+  /** Senza un consenso valido alla registrazione: in sala come tutti, fuori
+   *  dalla registrazione. mod_pa_media_lock lo scrive nella presenza. */
+  voiceExcluded?: boolean;
   /** Evento con il solo ascolto: la sala non toglie i blocchi. */
   consentLock?: boolean;
 }
@@ -214,6 +220,7 @@ export async function generateJitsiJwt(
         ...(payload.mediaExempt ? { mediaExempt: true } : {}),
         ...(payload.mediaAdmit ? { mediaAdmit: payload.mediaAdmit } : {}),
         ...(payload.listenOnly ? { listenOnly: true } : {}),
+        ...(payload.voiceExcluded ? { voiceExcluded: true } : {}),
         ...(payload.consentLock ? { consentLock: true } : {}),
       },
       features,
@@ -263,7 +270,11 @@ export async function postoDaTokenSala(
   /** Vale anche il token di chi modera: per il ritiro dei consensi, che
    *  riguarda ogni posto (lib/live/consent-withdrawal). */
   opzioni: { ancheChiModera?: boolean } = {},
-): Promise<{ posto: string; iscrizioneId: string | null; listenOnly: boolean } | null> {
+): Promise<{
+  posto: string;
+  iscrizioneId: string | null;
+  listenOnly: boolean;
+} | null> {
   try {
     const { payload } = await jwtVerify(token, getJitsiJwtSecret(), {
       issuer: getJitsiJwtIssuer(),
@@ -271,7 +282,9 @@ export async function postoDaTokenSala(
       clockTolerance: PROVA_PRESENZA_SECONDI,
     });
     if (payload.room !== roomName || (payload.moderator === true && !opzioni.ancheChiModera)) return null;
-    const user = (payload.context as { user?: { id?: unknown; listenOnly?: unknown } } | undefined)?.user;
+    const user = (
+      payload.context as { user?: { id?: unknown; listenOnly?: unknown } } | undefined
+    )?.user;
     const id = user?.id;
     if (typeof id !== 'string' || id.length === 0) return null;
     return {

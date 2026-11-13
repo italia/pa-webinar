@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Dev harness — sala d'attesa a 3 zone (chat | gioco Phaser | controlli).
  *

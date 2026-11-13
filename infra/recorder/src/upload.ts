@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Upload tracce + manifest allo storage e notifica webhook al portale
  * (ADR-013, Fase 3).

@@ -16,7 +16,11 @@ permissions: read-all
 jobs:
   analysis:
     name: Scorecard analysis
-    runs-on: arc-runner-pa-webinar
+    # Runner ospitato da GitHub, non quello in-cluster: l'API di Scorecard
+    # accetta i risultati pubblicati solo da un runner Ubuntu di GitHub e
+    # rifiuta gli altri. Senza pubblicazione il visore su scorecard.dev,
+    # linkato dalle pagine Sicurezza e Changelog, resta vuoto.
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       actions: read

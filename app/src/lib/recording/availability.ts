@@ -1,4 +1,8 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { jibriRecordingExpected } from '@/lib/infrastructure';
+import type { VoceNelVideo } from '@/lib/live/consent-rule';
 
 /**
  * Se questa installazione puo' registrare un evento. Decide cosa si dice a chi
@@ -26,4 +30,18 @@ export function recordingAvailable(
     !!env.JIBRI_HEALTH_URL?.trim() ||
     !!env.RECORDER_CONTROLLER_URL?.trim()
   );
+}
+
+/**
+ * La voce di chi non ha un consenso valido nel video completo. La sessione del
+ * registratore (Jibri) non la riproduce: il testo della conferenza del chart, che
+ * lo dichiara con RECORDING_VOICE_EXCLUSION. Senza Jibri non c'e' un video
+ * completo, e le tracce per persona non contengono chi non ha acconsentito. Con
+ * un Jitsi esterno non si sa chi registra: vale la risposta prudente, come sopra.
+ */
+export function voceNelVideo(env: Record<string, string | undefined> = process.env): VoceNelVideo {
+  const jitsiDelChart = !!env.JITSI_WEB_INTERNAL_URL?.trim();
+  const conJibri = !jitsiDelChart || jibriRecordingExpected(env) || !!env.JIBRI_HEALTH_URL?.trim();
+  if (!conJibri) return 'assente';
+  return env.RECORDING_VOICE_EXCLUSION?.trim() === 'true' ? 'rimovibile' : 'fissa';
 }

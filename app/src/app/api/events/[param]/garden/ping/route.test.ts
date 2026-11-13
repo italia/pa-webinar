@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import type { NextRequest } from 'next/server';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
@@ -89,7 +92,7 @@ function publishedPeer(): Record<string, unknown> {
 beforeEach(() => {
   vi.clearAllMocks();
   ipCounter = 0;
-  mockedEvent.mockResolvedValue({ id: EVENT_ID, status: 'LIVE' });
+  mockedEvent.mockResolvedValue({ id: EVENT_ID, status: 'LIVE', participantListVisible: true });
   mockedList.mockResolvedValue([]);
   mockedAccess.mockResolvedValue({ kind: 'guest', registrationId: null, isModerator: false });
 });
@@ -135,6 +138,51 @@ describe('POST /api/events/[param]/garden/ping — chi vede i nomi', () => {
     expect(mockedPublish).toHaveBeenCalledTimes(1);
     const body = (await res.json()) as { peers: Array<{ displayName: string }> };
     expect(body.peers[0]!.displayName).toBe('Carla');
+  });
+
+  describe('con l\'elenco nascosto', () => {
+    const io = legacyPing();
+    const conLettore = (kind: string, participantListVisible = false) => {
+      mockedEvent.mockResolvedValue({ id: EVENT_ID, status: 'LIVE', participantListVisible });
+      mockedAccess.mockResolvedValue({ kind, registrationId: null, isModerator: kind === 'moderator' });
+      mockedList.mockResolvedValue([presente, { ...io, displayName: 'Io' }]);
+    };
+    type Risposta = { peers: Array<{ userId: string; displayName: string }>; anonymous?: boolean };
+
+    it('il pubblico compare ma non riceve i nomi degli altri', async () => {
+      conLettore('participant');
+      const res = await POST(pingRequest(io, 'token-pubblico-1'), ctx());
+      const body = (await res.json()) as Risposta;
+      expect(mockedPublish).toHaveBeenCalledTimes(1);
+      expect(body.anonymous).toBe(true);
+      const altro = body.peers.find((p) => p.userId !== io.userId);
+      expect(altro?.displayName).toBe('');
+      expect(altro?.userId).toMatch(/^anon_/);
+      // Il proprio record resta riconoscibile: il client lo esclude dagli altri.
+      expect(body.peers.find((p) => p.userId === io.userId)?.displayName).toBe('Io');
+    });
+
+    it('vale anche per chi entra da ospite', async () => {
+      conLettore('guest');
+      const res = await POST(pingRequest(io), ctx());
+      const body = (await res.json()) as Risposta;
+      expect(body.peers.find((p) => p.userId !== io.userId)?.displayName).toBe('');
+    });
+
+    it.each(['moderator', 'speaker'])('%s vede sempre i nomi', async (kind) => {
+      conLettore(kind);
+      const res = await POST(pingRequest(io, `token-${kind}`), ctx());
+      const body = (await res.json()) as Risposta;
+      expect(body.peers[0]).toMatchObject({ userId: presente.userId, displayName: 'Carla' });
+    });
+
+    it('mostrato da chi organizza, il pubblico vede i nomi', async () => {
+      conLettore('participant', true);
+      const res = await POST(pingRequest(io, 'token-pubblico-2'), ctx());
+      const body = (await res.json()) as Risposta;
+      expect(body.anonymous).toBeUndefined();
+      expect(body.peers[0]?.displayName).toBe('Carla');
+    });
   });
 
   it('decide una volta per token, non a ogni ping', async () => {

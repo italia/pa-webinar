@@ -1,4 +1,7 @@
 #!/bin/sh
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Scarica il modello del motore e ne verifica l'impronta. Gira come
 # initContainer: se il file c'è già con l'impronta giusta (volume
 # persistente), non scarica nulla. Un'impronta sbagliata ferma il pod.

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * La cronologia della sala: ogni azione dal vivo si scrive qui, con l'ora del
  * server come unica base dei tempi. La post-produzione la mette accanto alla

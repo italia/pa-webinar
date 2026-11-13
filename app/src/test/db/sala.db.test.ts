@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Voti sull'agenda e reazioni in chat su un database vero: unicita' per
  * identita', cascate e gare fra richieste, che un client simulato non vede.

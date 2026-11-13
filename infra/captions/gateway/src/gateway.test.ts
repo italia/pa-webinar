@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il gateway per intero, su WebSocket vere: un finto bridge manda audio
  * Opus (frame da 20 ms di tono e di silenzio), un finto motore risponde con

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 'use client';
 
 /**
@@ -59,6 +62,7 @@ import EventQuestionsPreview from './event-questions-preview';
 import EventInvitationsPanel from './event-invitations-panel';
 import EventRemindersEditor from './event-reminders-editor';
 import EventModeratorsPanel from './event-moderators-panel';
+import EventPeopleSummary from './event-people-summary';
 import RegistrationRowActions from './registration-row-actions';
 import PostEventConfig, { type PostEventVisibility } from './post-event-config';
 import RecordingManagement from './recording-management';
@@ -158,7 +162,7 @@ interface TagData { id: string; slug: string; name: Record<string, string>; colo
 interface OrganizerData { id: string; name: string; logoUrl: string | null; websiteUrl: string | null }
 interface EventModeratorData {
   id: string; name: string; email: string | null;
-  role: 'MODERATOR' | 'SPEAKER'; revokedAt: string | null;
+  role: 'MODERATOR' | 'SPEAKER'; organizer: boolean; revokedAt: string | null;
 }
 
 interface EventData {
@@ -200,6 +204,9 @@ interface EventData {
   privacyPolicyUrl: string | null; privacyPolicyText: string | null;
   createdAt: string;
   tags: TagData[]; organizers: OrganizerData[]; eventModerators: EventModeratorData[];
+  /** Gli inviti dell'evento (gli ospiti non rifiutati), per la panoramica;
+   *  0 per chi entra con il link di conduzione, che non vede la loro sezione. */
+  invitationCount: number;
   questionnaireCount: number;
   registrations: Registration[]; materials: MaterialData[];
   reminders: ReminderData[]; gdprAuditLogs: GdprAuditLogData[];
@@ -305,6 +312,10 @@ export default function EventManagementClient({
     aggiornaQuery((params) => params.set('tab', tab));
   }, []);
   const tabsRef = useRef<HTMLDivElement>(null);
+  const apriPersone = useCallback(() => {
+    scegliScheda('persone');
+    tabsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [scegliScheda]);
 
   // Appena creato dal wizard (`?created=1`): un riepilogo in cima che dice se
   // l'evento e' pubblicato o in bozza, da' il link per i partecipanti e
@@ -563,10 +574,7 @@ export default function EventManagementClient({
           unsaved={appenaCreato.unsaved}
           onPublish={status === 'DRAFT' ? togglePublish : undefined}
           publishing={updating}
-          onPeople={() => {
-            scegliScheda('persone');
-            tabsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }}
+          onPeople={apriPersone}
           onClose={chiudiRiepilogo}
         />
       )}
@@ -628,6 +636,13 @@ export default function EventManagementClient({
                 ))}
               </div>
             )}
+            <EventPeopleSummary
+              moderatorName={event.moderatorName}
+              eventModerators={event.eventModerators}
+              invitationCount={event.invitationCount}
+              onPeople={apriPersone}
+              style={{ ...CAPTION, fontSize: '0.82rem' }}
+            />
           </div>
 
           {/* Right CTAs — senza nessuna (chiamata rapida chiusa e senza
@@ -1275,6 +1290,9 @@ function PeopleTab({ event, baseUrl, locale, onExportCsv, canEditRegistrations, 
   const te = useTranslations('events');
   const format = useFormatter();
   const orgTypeLabel = useOrgTypeLabel();
+  // Dopo un'aggiunta o una revoca la testata della pagina (le persone sotto
+  // gli enti) si rilegge dal server.
+  const router = useRouter();
 
   // Aggregated org-type histogram for the intro chip row.
   const orgTypeCounts = event.registrations.reduce<Record<string, number>>((acc, r) => {
@@ -1328,7 +1346,8 @@ function PeopleTab({ event, baseUrl, locale, onExportCsv, canEditRegistrations, 
                               eventTitle={getLocalized(event.title as LocalizedField, locale)}
                               moderatorToken={event.moderatorToken}
                               baseUrl={baseUrl} locale={locale} isDraft={isDraft}
-                              canResend={linksMailable} />
+                              canResend={linksMailable}
+                              onChange={() => router.refresh()} />
       </div>
 
       {/* Gli invitati: la rotta e' dello staff, non del link del moderatore. */}

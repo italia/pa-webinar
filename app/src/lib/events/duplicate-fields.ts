@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Which Event columns a duplicate inherits, and which it deliberately does not.
  *
@@ -81,8 +84,8 @@ export const DUPLICATED_EVENT_FIELDS = [
   'privacyPolicyText',
   'gdprTemplateId',
   'recordingConsentText',
-  'listenOnlyWithoutConsent',
   'audienceAnonymous',
+  'participantListVisible',
 
   // recording & AI post-production
   'recordingEnabled',
@@ -115,6 +118,8 @@ export const DUPLICATED_EVENT_FIELDS = [
 
 /** Columns a duplicate must NOT inherit, each with the reason it is excluded. */
 export const NOT_DUPLICATED_EVENT_FIELDS: Record<string, string> = {
+  unrecordedSpeech: 'un fatto di QUELLA occorrenza, non configurazione',
+  hostsAlwaysRecorded: 'dichiara che chi conduce QUELLA occorrenza ha accettato: si rifa\' ogni volta',
   id: 'new row',
   createdAt: 'new row',
   updatedAt: 'new row',

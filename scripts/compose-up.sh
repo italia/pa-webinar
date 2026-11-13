@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 #
 # Avvia lo stack locale di Docker Compose: costruisce le immagini dai sorgenti o
 # preleva quelle pubblicate, applica le migrazioni, carica i dati dimostrativi

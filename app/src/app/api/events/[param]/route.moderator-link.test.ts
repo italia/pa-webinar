@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * La modifica di un evento e il link del moderatore principale: parte alla
  * pubblicazione e quando cambia l'indirizzo, non a ogni salvataggio del

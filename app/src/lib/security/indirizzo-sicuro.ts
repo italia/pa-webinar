@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Un indirizzo da mettere in un link, un'immagine o un audio della pagina:
  * solo http(s), un file scelto ora (`blob:`), un'immagine o un audio

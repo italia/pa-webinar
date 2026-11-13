@@ -1,5 +1,9 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { prisma } from '@/lib/db';
 import { iscrizioneDelPosto } from '@/lib/captions/room';
+import { bloccaTrascrizioneEvento, togliPersoneDalleTrascrizioni } from '@/lib/captions/transcript';
 
 /**
  * Il ritiro dalla sala dei consensi dati per un evento (art. 7.3 GDPR: si
@@ -27,13 +31,15 @@ import { iscrizioneDelPosto } from '@/lib/captions/room';
  *     chi non ha acconsentito), e le tracce audio per persona non passano piu'
  *     alla trascrizione (lib/captions/room endpointRitirati).
  *
+ * Lo stesso ritiro si fa dalla pagina dei propri dati (POST /api/gdpr/consents):
+ * li' non ci sono posti, si parte dall'iscrizione provata dal link firmato.
+ *
  * Ogni ritiro lascia una riga nel registro GDPR dell'evento
  * (`CONSENT_WITHDRAWN`, senza dati personali): quante prove, e quando.
  *
- * Il video completo dell'evento non si modifica: chi ritira il consenso alla
- * registrazione esce dalla registrazione da quel momento (solo ascolto, o
- * fuori dalla sala), e per il tratto gia' registrato vale la richiesta di
- * cancellazione a chi organizza (docs/GDPR.md).
+ * Il video gia' registrato non si modifica: chi ritira il consenso alla
+ * registrazione esce dalla registrazione da quel momento, e per il tratto gia'
+ * registrato vale la richiesta di cancellazione a chi organizza (docs/GDPR.md).
  */
 
 export interface EsitoRitiro {
@@ -42,21 +48,35 @@ export interface EsitoRitiro {
   trascrizione: boolean;
 }
 
+export interface OpzioniRitiro {
+  /** Iscrizioni gia' provate da chi ritira, oltre a quelle dei posti. */
+  iscrizioni?: readonly string[];
+  /** Da dove arriva il ritiro, per il registro GDPR. */
+  origine?: 'room' | 'self-service';
+}
+
 export async function ritiraConsensi(
   eventId: string,
   posti: readonly string[],
   cosa: { registrazione: boolean },
-  adesso: Date = new Date()
+  adesso: Date = new Date(),
+  { iscrizioni: dalleIscrizioni = [], origine = 'room' }: OpzioniRitiro = {}
 ): Promise<EsitoRitiro> {
-  if (posti.length === 0) return { registrazione: false, trascrizione: false };
+  if (posti.length === 0 && dalleIscrizioni.length === 0) {
+    return { registrazione: false, trascrizione: false };
+  }
   return prisma.$transaction(async (tx) => {
+    // In fila con le costruzioni della trascrizione e con le cancellazioni, per
+    // prima cosa: una gia' partita non rimette le frasi tolte qui sotto, e nessuno
+    // aspetta tenendo le righe che servono all'altro.
+    await bloccaTrascrizioneEvento(tx, eventId);
     // Le prove della registrazione dei posti dati: portano l'iscrizione, la
     // concessione nominale o l'account dello staff.
     const proveDeiPosti = await tx.recordingConsent.findMany({
       where: { eventId, jitsiUserId: { in: [...posti] } },
       select: { registrationId: true, staffAccountId: true },
     });
-    const iscrizioni = new Set<string>();
+    const iscrizioni = new Set<string>(dalleIscrizioni);
     for (const p of posti) {
       const r = iscrizioneDelPosto(p);
       if (r) iscrizioni.add(r);
@@ -143,6 +163,11 @@ export async function ritiraConsensi(
             data: { consentMultitrackWithdrawnAt: adesso },
           })
         : { count: 0 };
+    // Dopo l'evento la trascrizione puo' essere gia' costruita: la persona se ne
+    // va anche da li'.
+    if (listaIscrizioni.length > 0) {
+      await togliPersoneDalleTrascrizioni(tx, [eventId], listaIscrizioni);
+    }
     // Le frasi dei sottotitoli gia' salvate: restano i tempi, come per chi
     // non ha acconsentito (lib/captions/transcript).
     const frasi = await tx.captionSegment.updateMany({
@@ -163,7 +188,7 @@ export async function ritiraConsensi(
           action: 'CONSENT_WITHDRAWN',
           recordCount: proveRegistrazione + proveTrascrizione,
           details: JSON.stringify({
-            source: 'room',
+            source: origine,
             recording: proveRegistrazione,
             transcription: proveTrascrizione,
             captionSegmentsCleared: frasi.count,
@@ -172,5 +197,42 @@ export async function ritiraConsensi(
       });
     }
     return { registrazione: proveRegistrazione > 0, trascrizione: proveTrascrizione > 0 };
+  });
+}
+
+/**
+ * Il ritiro del consenso alle comunicazioni future, dalla pagina dei propri
+ * dati o dal link delle email (api/rubrica/opt-out). La stessa casella
+ * dell'iscrizione copre comunicazioni e rubrica: si tolgono entrambe, su ogni
+ * iscrizione dell'indirizzo, e il registro lo annota per ogni evento toccato.
+ */
+export async function ritiraComunicazioni(
+  emailHash: string,
+  adesso: Date = new Date()
+): Promise<boolean> {
+  return prisma.$transaction(async (tx) => {
+    const dove = { emailHash, consentFutureCommunications: true };
+    const iscrizioni = await tx.registration.findMany({
+      where: dove,
+      select: { eventId: true },
+      distinct: ['eventId'],
+    });
+    await tx.registration.updateMany({
+      where: dove,
+      data: { consentFutureCommunications: false, consentFutureCommunicationsWithdrawnAt: adesso },
+    });
+    const rubrica = await tx.person.updateMany({
+      where: { emailHash, optedInToAddressBook: true },
+      data: { optedInToAddressBook: false, optedOutAt: adesso },
+    });
+    await tx.gdprAuditLog.createMany({
+      data: iscrizioni.map(({ eventId }) => ({
+        eventId,
+        action: 'CONSENT_WITHDRAWN',
+        recordCount: 1,
+        details: JSON.stringify({ source: 'self-service', futureCommunications: 1 }),
+      })),
+    });
+    return iscrizioni.length > 0 || rubrica.count > 0;
   });
 }

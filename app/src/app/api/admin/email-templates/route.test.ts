@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 // @vitest-environment node
 /**
  * I testi delle email dell’istanza: li cambia solo l’amministrazione, una riga

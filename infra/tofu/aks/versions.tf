@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Infrastruttura di riferimento per PA Webinar su Azure Kubernetes Service.
 #
 # Modulo radice autonomo: resource group, rete, cluster con i suoi pool di

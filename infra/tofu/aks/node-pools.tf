@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Pool di nodi utente. Ogni pool ha un solo compito, e i pool che scendono a
 # zero (bridge, Jibri, GPU) hanno un taint che tiene lontano tutto il resto:
 # un pod qualsiasi posato lì impedirebbe all'autoscaler di spegnerli.

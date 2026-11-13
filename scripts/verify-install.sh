@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 #
 # Controlla che un'installazione di PA Webinar funzioni: dopo la prima
 # installazione, dopo un aggiornamento o un ripristino, e periodicamente da

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 'use client';
 
 import { useState } from 'react';
@@ -8,8 +11,7 @@ import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'design-react
  * I consensi della persona per questo evento, dalla sala: si danno e si
  * ritirano qui, in qualunque momento (art. 7.3 GDPR: ritirarli e' facile come
  * darli). Ogni cambio porta un token nuovo e la conferenza si ricollega per
- * qualche secondo; il ritiro del consenso alla registrazione, dove senza non
- * si puo' restare, riporta in sala d'attesa.
+ * qualche secondo.
  *
  * La finestra mostra solo i consensi che l'evento chiede a questa persona;
  * cosa cambia lo dice la riga sotto ciascuno, prima di agire. Il ritiro
@@ -18,7 +20,7 @@ import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'design-react
  */
 
 /** Cosa succede ritirando il consenso alla registrazione. */
-export type EffettoRitiroRegistrazione = 'soloAscolto' | 'uscita' | 'conduce';
+export type EffettoRitiroRegistrazione = 'voce' | 'soloAscolto' | 'conduce' | 'nessuno';
 
 export interface ConsensiInSala {
   registrazione?: { dato: boolean; ritiro: EffettoRitiroRegistrazione };
@@ -152,8 +154,12 @@ export default function ConsentsDialog({
               t('recording.title'),
               registrazione.dato,
               registrazione.dato
-                ? t(`recording.withdraw.${registrazione.ritiro}`)
-                : t(`recording.without.${registrazione.ritiro}`),
+                ? registrazione.ritiro === 'nessuno'
+                  ? ''
+                  : t(`recording.withdraw.${registrazione.ritiro}`)
+                : registrazione.ritiro === 'nessuno'
+                  ? ''
+                  : t(`recording.without.${registrazione.ritiro}`),
               registrazione.dato && registrazione.ritiro !== 'conduce'
                 ? t('recording.alreadyRecorded')
                 : null,

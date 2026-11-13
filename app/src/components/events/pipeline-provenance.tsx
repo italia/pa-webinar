@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 'use client';
 
 /**
@@ -54,7 +57,6 @@ export interface PipelineSnapshot {
     diarLabel?: string;
     displayName?: string | null;
     voiceId?: string;
-    gender?: string;
     totalSpeechSec?: number;
   }>;
   languages?: {
@@ -260,11 +262,6 @@ export default function PipelineProvenance({ snapshot, locale }: Props) {
                       {va.voiceId && (
                         <span style={{ color: 'var(--app-muted)' }}>
                           → {va.voiceId}
-                        </span>
-                      )}
-                      {va.gender && va.gender !== 'N' && (
-                        <span style={{ color: 'var(--app-muted)', fontSize: '0.7rem' }}>
-                          {va.gender === 'M' ? t('voices.male') : t('voices.female')}
                         </span>
                       )}
                     </div>

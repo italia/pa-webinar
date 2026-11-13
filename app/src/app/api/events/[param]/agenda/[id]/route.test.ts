@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Stato degli argomenti dell'agenda: uno solo in corso, e la spunta dei
  * client precedenti che continua a funzionare.

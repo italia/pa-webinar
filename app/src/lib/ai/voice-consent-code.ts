@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il codice con cui le rotte che avviano la pipeline chiedono la conferma
  * che tutte le voci del video completo hanno acconsentito alla trascrizione

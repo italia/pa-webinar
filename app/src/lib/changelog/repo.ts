@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Normalize the admin-set `githubUrl` to a trusted github.com repo base, or
  * null. Shared by the changelog page (which builds release/source/Scorecard

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 // @vitest-environment node
 /**
  * Il clic sul link di accesso apre la sessione dello staff: un link scaduto,

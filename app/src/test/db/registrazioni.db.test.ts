@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Cancellazione e pubblicazione dei video, annullamento della post-produzione:
  * transazioni, cascate e tipi delle colonne su un database vero. Lo storage dei

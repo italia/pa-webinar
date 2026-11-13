@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Ruoli IAM dei controller del cluster, consegnati con EKS Pod Identity: il
 # ruolo si lega a un ServiceAccount (namespace + nome) e l'agente di Pod
 # Identity dà le credenziali ai pod che lo usano. I controller si installano

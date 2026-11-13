@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Apre il caricamento diretto dal browser di un video (MP4 / WebM / MOV /
  * M4V) nello storage delle registrazioni, senza passare dall'app: nessun

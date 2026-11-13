@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 'use client';
 
 /**
@@ -558,6 +561,7 @@ export default function TranscriptPanel({
       <code style={{ minWidth: 56, color: 'var(--app-muted)', fontVariantNumeric: 'tabular-nums' }}>
         {formatTs(v.start)}
       </code>
+      <span aria-hidden="true">***</span>
       <span>{t('untranscribed')}</span>
     </div>
   );

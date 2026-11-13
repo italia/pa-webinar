@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Preferenze di avviso della chat, scelte da ogni partecipante e ricordate dal
  * browser: quando suonare e quando mostrare una notifica di sistema.

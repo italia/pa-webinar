@@ -1,4 +1,9 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { describe, expect, it } from 'vitest';
+
+import { elencoPredefinito } from '@/lib/live/participant-list';
 
 import { codificaFormato, decodificaFormato, presetDaFormato } from './guided-format';
 
@@ -61,5 +66,17 @@ describe('formato guidato', () => {
     expect(decodificaFormato('medio.tutti.si')).toBeNull();
     expect(decodificaFormato(['medio.tutti.si'])).toBeNull();
     expect(decodificaFormato('constructor')).toBeNull();
+  });
+});
+
+describe('presetDaFormato: l\'elenco dei partecipanti', () => {
+  const elenco = (persone: 'piccolo' | 'medio' | 'grande', voce: 'tutti' | 'relatori') =>
+    elencoPredefinito(presetDaFormato({ persone, voce, registra: 'no', accesso: 'tutti' }, 'Prova'));
+
+  it('si vede tra chi si conosce, non su vasta scala ne\' dove parlano solo i relatori', () => {
+    expect(elenco('piccolo', 'tutti')).toBe(true);
+    expect(elenco('medio', 'tutti')).toBe(true);
+    expect(elenco('grande', 'tutti')).toBe(false);
+    expect(elenco('medio', 'relatori')).toBe(false);
   });
 });

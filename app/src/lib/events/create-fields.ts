@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Quali campi accettati alla creazione di un evento finiscono davvero in
  * banca dati, e quali no — con il motivo.
@@ -67,8 +70,9 @@ export const CREATED_EVENT_FIELDS = [
   'privacyPolicyText',
   'gdprTemplateId',
   'recordingConsentText',
-  'listenOnlyWithoutConsent',
   'audienceAnonymous',
+  'participantListVisible',
+  'hostsAlwaysRecorded',
 
   // registrazione e pubblicazione
   'recordingEnabled',

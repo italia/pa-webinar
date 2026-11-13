@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 #
 # Installa PA Webinar su un server k3s, dalla postazione dell'amministratore
 # (--host utente@server, via ssh) o sul server stesso (--local): controlla il

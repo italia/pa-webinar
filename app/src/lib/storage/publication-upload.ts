@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Caricamento manuale di un video dall'amministrazione (nuova pubblicazione
  * o registrazione di un evento esistente): nome dell'oggetto, tipi ammessi e

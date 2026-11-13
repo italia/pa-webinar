@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Runner Kubernetes (full mode). Sottile wrapper attorno a `reconcile`:
  * legge i Job recorder reali, ne crea di nuovi dal template (CronJob

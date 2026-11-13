@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il posto nella conferenza del registratore multitraccia: il prefisso
  * dell'identificativo nel suo token (route recorder-claim). Chi legge chi e'

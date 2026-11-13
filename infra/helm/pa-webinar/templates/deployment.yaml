@@ -1,3 +1,6 @@
+{{- /* SPDX-License-Identifier: EUPL-1.2 */ -}}
+{{- /* SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale */ -}}
+
 {{- include "pa-webinar.validateRnnoise" . }}
 {{- include "pa-webinar.validateJitsiVersions" . }}
 {{- include "pa-webinar.validateDatastoreSecret" . }}
@@ -113,6 +116,15 @@ spec:
             {{- with include "pa-webinar.jibriHealthUrl" . }}
             - name: JIBRI_HEALTH_URL
               value: {{ . | quote }}
+            {{- end }}
+            {{- /*
+              Il testo della conferenza del chart fa si' che il registratore non
+              veda chi non ha acconsentito. Un file di valori che lo sostituisce
+              lo perde: senza, il portale tiene quelle persone in solo ascolto.
+            */}}
+            {{- if contains "hiddenFromRecorderFeatureEnabled" (toString (dig "web" "custom" "configs" "_custom_config_js" "" (index .Values "jitsi-meet" | default dict))) }}
+            - name: RECORDING_VOICE_EXCLUSION
+              value: "true"
             {{- end }}
             {{- end }}
             {{- with include "pa-webinar.extraCaCerts" . }}

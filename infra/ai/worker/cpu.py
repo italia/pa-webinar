@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """Punto d'ingresso del worker senza GPU (`python -m worker.cpu`).
 
 Esegue lo stesso ciclo di ``worker.main`` ma solo per i tipi di job in

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 // @vitest-environment node
 /**
  * La cronologia di chi parla in diretta. L'ingresso e' pubblico: lo proteggono un
@@ -9,17 +12,23 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { prisma } = vi.hoisted(() => ({
   prisma: {
-    event: { findFirst: vi.fn() },
+    event: { findFirst: vi.fn(), updateMany: vi.fn() },
+    liveAction: { findFirst: vi.fn() },
     callSession: { findFirst: vi.fn(), update: vi.fn() },
   },
 }));
 
 vi.mock('@/lib/db', () => ({ prisma }));
+const room = vi.hoisted(() => ({ endpointSenzaRegistrazione: vi.fn() }));
+vi.mock('@/lib/captions/room', () => room);
+const jwt = vi.hoisted(() => ({ postoDaTokenSala: vi.fn() }));
+vi.mock('@/lib/auth/jwt', () => jwt);
 
 import { POST } from './route';
 
 const EVENTO = '11111111-1111-4111-8111-111111111111';
 const VOCE = { atMs: 1000, participantId: 'p1', displayName: 'Anna Bianchi' };
+const INIZIO = new Date('2026-11-05T10:00:00Z');
 
 let contatore = 0;
 let indirizzo = '';
@@ -48,8 +57,11 @@ beforeEach(() => {
   vi.spyOn(console, 'log').mockImplementation(() => {});
   indirizzo = `203.0.113.${++contatore}`;
   prisma.event.findFirst.mockResolvedValue({ id: EVENTO });
-  prisma.callSession.findFirst.mockResolvedValue({ id: 's1', dominantSpeakerLog: [] });
+  prisma.callSession.findFirst.mockResolvedValue({ id: 's1', startedAt: INIZIO, dominantSpeakerLog: [] });
   prisma.callSession.update.mockResolvedValue({ id: 's1' });
+  room.endpointSenzaRegistrazione.mockResolvedValue([]);
+  prisma.liveAction.findFirst.mockResolvedValue(null);
+  jwt.postoDaTokenSala.mockResolvedValue({ posto: 'reg-1', iscrizioneId: 'r1', listenOnly: false });
 });
 
 describe('cosa si accetta', () => {
@@ -123,6 +135,101 @@ describe('dove si scrive', () => {
 });
 
 describe('il registro', () => {
+  it('il nome di chi non ha acconsentito alla registrazione non resta', async () => {
+    room.endpointSenzaRegistrazione.mockResolvedValue(['escluso']);
+    prisma.liveAction.findFirst.mockResolvedValue({ kind: 'recording.started', at: new Date() });
+    await manda({
+      roomToken: 'token-di-sala',
+      events: [
+        { atMs: 1, participantId: 'escluso', displayName: 'Senza consenso' },
+        { atMs: 2, participantId: 'altro', displayName: 'Relatore 1' },
+      ],
+    });
+    expect(registroScritto()).toEqual([
+      { atMs: 1, participantId: 'escluso' },
+      { atMs: 2, participantId: 'altro', displayName: 'Relatore 1' },
+    ]);
+    // L'evento ricorda che qualcuno ha parlato senza: lo dice la sua pagina.
+    expect(prisma.event.updateMany).toHaveBeenCalledWith({
+      where: { id: EVENTO, unrecordedSpeech: false },
+      data: { unrecordedSpeech: true },
+    });
+  });
+
+  describe('la nota accanto al video', () => {
+    const escluso = { atMs: 1, participantId: 'escluso' };
+    const conTracce = {
+      id: EVENTO,
+      status: 'LIVE',
+      recordingEnabled: true,
+      aiTranscriptEnabled: true,
+      multitrackRecordingEnabled: true,
+      jitsiRoomName: 'stanza',
+    };
+
+    beforeEach(() => {
+      room.endpointSenzaRegistrazione.mockResolvedValue(['escluso']);
+      prisma.event.findFirst.mockResolvedValue(conTracce);
+    });
+
+    it('a video fermo non si scrive, anche se il registratore per persona gira', async () => {
+      prisma.liveAction.findFirst.mockResolvedValue({
+        kind: 'recording.stopped',
+        at: new Date(Date.now() - 60_000),
+      });
+      await manda({ roomToken: 'token-di-sala', events: [escluso] });
+      expect(prisma.event.updateMany).not.toHaveBeenCalled();
+    });
+
+    it('un lotto arrivato subito dopo lo stop conta ancora', async () => {
+      prisma.liveAction.findFirst.mockResolvedValue({
+        kind: 'recording.stopped',
+        at: new Date(Date.now() - 5_000),
+      });
+      await manda({ roomToken: 'token-di-sala', events: [escluso] });
+      expect(prisma.event.updateMany).toHaveBeenCalledTimes(1);
+    });
+
+    it('guarda solo i comandi della sessione aperta', async () => {
+      await manda({ roomToken: 'token-di-sala', events: [escluso] });
+      expect(prisma.liveAction.findFirst).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({ at: { gte: INIZIO } }),
+        }),
+      );
+    });
+
+    it('con la nota gia\u2019 scritta non rilegge niente', async () => {
+      prisma.event.findFirst.mockResolvedValue({ ...conTracce, unrecordedSpeech: true });
+      await manda({ roomToken: 'token-di-sala', events: [escluso] });
+      expect(jwt.postoDaTokenSala).not.toHaveBeenCalled();
+      expect(prisma.event.updateMany).not.toHaveBeenCalled();
+    });
+
+    it('senza comandi di sala vale il registratore per persona', async () => {
+      await manda({ roomToken: 'token-di-sala', events: [escluso] });
+      expect(prisma.event.updateMany).toHaveBeenCalledTimes(1);
+    });
+
+    it('la scrive solo chi prova di essere in sala', async () => {
+      prisma.liveAction.findFirst.mockResolvedValue({ kind: 'recording.started', at: new Date() });
+      await manda({ events: [escluso] });
+      jwt.postoDaTokenSala.mockResolvedValue(null);
+      await manda({ roomToken: 'di-un-altra-sala', events: [escluso] });
+      expect(prisma.event.updateMany).not.toHaveBeenCalled();
+      // Il token si legge sulla stanza di questo evento, e vale anche per chi modera.
+      expect(jwt.postoDaTokenSala).toHaveBeenCalledWith('di-un-altra-sala', 'stanza', {
+        ancheChiModera: true,
+      });
+    });
+
+    it('senza chi e\u2019 escluso il token non serve', async () => {
+      room.endpointSenzaRegistrazione.mockResolvedValue([]);
+      await manda({ roomToken: 'token-di-sala', events: [escluso] });
+      expect(jwt.postoDaTokenSala).not.toHaveBeenCalled();
+    });
+  });
+
   it('le voci nuove si accodano a quelle che ci sono', async () => {
     prisma.callSession.findFirst.mockResolvedValue({
       id: 's1',

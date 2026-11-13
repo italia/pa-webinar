@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """
-Dubbing sintetico EN con Piper TTS — **multivoce gender-aware**.
+Dubbing sintetico EN con Piper TTS — **multivoce**.
 
 Estensioni vs V1:
-  - **Pool gender-aware**: F per Anna/Giulia, M per Mario/Luca
-    (logica in `name_gender.py`, catalogo voci in `voice_pool.py`).
+  - **Pool di voci** (`voice_pool.py`): assegnate per tempo di parola, senza
+    guardare il nome di chi parla.
   - **Pitch variants**: per estendere il pool delle lingue povere
-    (IT, RO, CS) genero ±300 cents variants dalla stessa voce-base,
-    preservando il gender.
+    (IT, RO, CS) genero ±300 cents variants dalla stessa voce-base.
   - **Multi-speaker datasets**: se la PVC contiene `en_GB-vctk-medium`
     (109 voci interne), il builder le espande tutte.
 
@@ -29,7 +31,6 @@ HERE = Path(__file__).resolve().parent
 WORKER_DIR = HERE.parent / "worker"
 sys.path.insert(0, str(WORKER_DIR))
 import voice_pool as vp   # noqa: E402
-import name_gender as ng  # noqa: E402
 
 VOICES_PATH = str(HERE / "piper-voices")
 LANGUAGE = "en_US"  # alias: la dir reale è piper-voices/ (no subfolder)
@@ -111,9 +112,7 @@ def dub_one(lang: str, sm: dict, tx: dict) -> str | None:
             n = names.get(sp_row["diarLabel"])
             if isinstance(n, str) and n.strip():
                 sp_row["displayName"] = n
-    display_names = [s.get("displayName") or "" for s in speakers]
-    gender_map = ng.name_gender_map(display_names)
-    voice_map = vp.assign_voices(speakers, pool, name_gender=gender_map)
+    voice_map = vp.assign_voices(speakers, pool)
     print(f"[{lang}] pool={len(pool)} voci; dubbing {len(segs)} segmenti, dur {duration:.0f}s; "
           f"assign={ {k: v.voice_id for k, v in voice_map.items()} }")
 

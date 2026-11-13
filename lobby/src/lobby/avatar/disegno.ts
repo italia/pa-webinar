@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il personaggio della piazza, disegnato in vettoriale piatto nello stile del
  * design system: forme morbide, colori pieni, un contorno blu notte leggero.

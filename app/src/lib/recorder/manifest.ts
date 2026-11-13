@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il manifesto `tracks.json` di una registrazione multitraccia segue le sue
  * tracce: va via con l'ultima. Lo cancellano i due lavori che cancellano

@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Configurazione del Traefik che k3s installa da sé. install-server.sh la
 # copia in /var/lib/rancher/k3s/server/manifests/ prima del primo avvio; dopo,
 # k3s riapplica il file a ogni modifica (Traefik si reinstalla da solo). Si

@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Postprod AI worker — single container that:
 #   1. Claims one PostprodJob from the app's /api/internal/postprod-claim
 #   2. Downloads the source MP4 from the signed URL
@@ -63,11 +66,10 @@ RUN pip uninstall -y apex flash-attn flash_attn transformer-engine transformer_e
 # is fine because Piper only READS the .onnx. This removes the DUB
 # dependency on a seeded /models PVC: worker/tts.py `resolve_voices_path`
 # falls back here when the configured AI_TTS_VOICES_PATH dir is empty
-# (e.g. /models is an unseeded emptyDir). en/fr/de/es get an M+F pair
-# for gender-aware multivoice dubbing; it gets paola (source-lang
-# context). The German female voice exists only in "low" quality; the
-# Spanish one is the Argentine "daniela" (the es_ES female voices are
-# multi-speaker without a gender per speaker).
+# (e.g. /models is an unseeded emptyDir). en/fr/de/es get two voices
+# for multivoice dubbing; it gets paola (source-lang context). One
+# German voice exists only in "low" quality; one Spanish voice is the
+# Argentine "daniela".
 RUN set -eux; \
     base="https://huggingface.co/rhasspy/piper-voices/resolve/main"; \
     for spec in \

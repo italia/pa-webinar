@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Infrastruttura di riferimento per PA Webinar su Amazon EKS.
 #
 # Modulo radice autonomo: rete, cluster, pool di nodi, storage degli oggetti e

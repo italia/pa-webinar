@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """Traduzione di titolo e descrizione dell'evento (job TRANSLATE_TEXT).
 
 Il testo lo traduce il motore di traduzione su CPU dell'installazione

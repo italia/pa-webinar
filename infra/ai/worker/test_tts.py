@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """Test della risoluzione del path voci Piper (fallback all'immagine).
 
 Garantisce che il DUB usi le voci bakate in /opt/piper-voices quando il

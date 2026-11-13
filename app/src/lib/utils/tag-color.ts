@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Colori delle etichette (tag) leggibili. Il colore di un'etichetta lo sceglie
  * chi amministra: usato tale e quale come testo sulla sua tinta chiara, o

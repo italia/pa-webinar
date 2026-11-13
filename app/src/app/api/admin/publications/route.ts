@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Publications hub — unified feed of every event that has a playable
  * recording (self-hosted or YouTube) or is otherwise relevant to an

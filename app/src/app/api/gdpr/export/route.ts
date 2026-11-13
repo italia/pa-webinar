@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * GET /api/gdpr/export?t=<signed-token>
  *
@@ -15,7 +18,9 @@ import { AppError, RateLimitError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { decryptPII, tryDecryptPII } from '@/lib/crypto/pii';
 import { getClientIp, rateLimit } from '@/lib/rate-limit';
-import { verifyGdprToken } from '@/lib/gdpr/request-token';
+import { voceNelVideo } from '@/lib/recording/availability';
+import { consensiDellIscrizione } from '@/lib/gdpr/consent-state';
+import { issueGdprToken, verifyGdprToken } from '@/lib/gdpr/request-token';
 
 export const dynamic = 'force-dynamic';
 
@@ -187,6 +192,8 @@ export const GET = withErrorHandling(async (request) => {
 
     return {
       registration: {
+        // Serve alla pagina per ritirare un consenso di questa iscrizione.
+        id: r.id,
         displayName: tryDecryptPII(r.displayName) ?? r.displayName,
         email: decryptedEmail,
         organization: r.organization,
@@ -200,6 +207,10 @@ export const GET = withErrorHandling(async (request) => {
         consentRecordingWithdrawnAt: r.consentRecordingWithdrawnAt?.toISOString() ?? null,
         consentMultitrackWithdrawnAt: r.consentMultitrackWithdrawnAt?.toISOString() ?? null,
         consentFutureCommunications: r.consentFutureCommunications,
+        consentFutureCommunicationsWithdrawnAt:
+          r.consentFutureCommunicationsWithdrawnAt?.toISOString() ?? null,
+        // Lo stato di ciascun consenso, dall'iscrizione e dalla sala insieme.
+        consents: consensiDellIscrizione(r),
         // La lingua delle email, che la piattaforma conserva e usa.
         locale: r.locale,
         registeredAt: r.createdAt.toISOString(),
@@ -240,5 +251,13 @@ export const GET = withErrorHandling(async (request) => {
     };
   });
 
-  return Response.json({ data: result, profilePhoto, grants });
+  return Response.json({
+    data: result,
+    profilePhoto,
+    grants,
+    // Serve a ritirare un consenso dalla pagina: il link dell'email resta di
+    // sola lettura, e questo non finisce negli indirizzi.
+    consentsToken: issueGdprToken('consents', emailHash),
+    voiceInVideo: voceNelVideo(),
+  });
 });

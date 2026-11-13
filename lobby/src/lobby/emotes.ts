@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import type { EmoteType } from './ports/types';
 
 /** I gesti della piazza: il glifo che compare sopra l'avatar e il tasto che lo

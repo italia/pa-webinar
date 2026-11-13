@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il testo del resoconto come arriva dal worker, ricondotto alla forma che la
  * pagina sa disegnare (lib/report/types). Il worker normalizza gia', ma un

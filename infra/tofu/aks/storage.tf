@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Storage dell'applicazione: uno storage account con due container privati,
 # uno per dominio (file e registrazioni). Le due connection string del Secret
 # dell'applicazione puntano allo stesso account (vedi l'output

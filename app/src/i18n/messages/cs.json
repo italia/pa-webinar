@@ -330,6 +330,14 @@
     "exitFullscreen": "Ukončit celou obrazovku",
     "recordingActive": "Probíhá nahrávání",
     "recordingShort": "REC",
+    "transcriptionActive": "Probíhá transkripce",
+    "transcriptionShort": "Transkripce",
+    "captureNoticeRecordingOn": "Nahrávání spuštěno: od této chvíle se místnost nahrává.",
+    "captureNoticeRecordingOff": "Nahrávání skončilo.",
+    "captureNoticeVoicesOn": "Nahrávání hlasů spuštěno: od této chvíle se nahrává hlas těch, kdo dali souhlas.",
+    "captureNoticeVoicesOff": "Nahrávání hlasů skončilo.",
+    "captureNoticeTranscriptionOn": "Transkripce spuštěna: od této chvíle se uchovává text těch, kdo dali souhlas.",
+    "captureNoticeTranscriptionOff": "Transkripce skončila.",
     "enterRoom": "Vstoupit do místnosti",
     "leaveRoom": "Opustit místnost",
     "leaveChoice": {
@@ -535,7 +543,9 @@
       "handsRaised": "{count, plural, one {# zvednutá ruka} few {# zvednuté ruce} other {# zvednutých rukou}}",
       "locksByConsent": "Mikrofony a kamery se řídí souhlasem se záznamem: kdo ho dal, používá, co akce povoluje, ostatní jen poslouchají. Zámky místnosti zůstávají zapnuté.",
       "listenOnlyBadge": "jen poslech",
-      "listenOnlyNoFloor": "Nedal souhlas se záznamem: nemůže vystoupit, dokud ho neudělí ve své místnosti."
+      "listenOnlyNoFloor": "Nedal souhlas se záznamem: nemůže vystoupit, dokud ho neudělí ve své místnosti.",
+      "voiceExcludedBadge": "bez nahrávání",
+      "voiceExcludedFloor": "Bez souhlasu se záznamem: může vystoupit, ale zůstává mimo záznam."
     },
     "moderator": {
       "muteAll": "Ztlumit všechny",
@@ -677,13 +687,13 @@
         "without": {
           "soloAscolto": "Bez tohoto souhlasu jste pouze posluchač: mikrofon, kamera a obrazovka zůstávají zavřené.",
           "conduce": "Bez tohoto souhlasu moderujete dál, ale váš hlas nezůstane ve stopách jednotlivých osob ani v přepisu.",
-          "uscita": "Účast na této akci vyžaduje souhlas se záznamem."
+          "voce": "Bez tohoto souhlasu se účastníte jako všichni, ale zůstáváte mimo záznam: bez jména, hlasu i obrazu."
         },
         "alreadyRecorded": "Co už bylo zaznamenáno, zůstává ve videu akce: o odstranění požádejte pořadatele.",
         "withdraw": {
           "soloAscolto": "Pokud ho odvoláte, zůstanete v místnosti jen jako posluchač: mikrofon, kamera a obrazovka se zavřou. Odvoláte i souhlas s přepisem svých příspěvků.",
-          "uscita": "Pokud ho odvoláte, opustíte konferenci a vrátíte se do čekárny: účast na akci vyžaduje souhlas se záznamem. Odvoláte i souhlas s přepisem svých příspěvků.",
-          "conduce": "Pokud ho odvoláte, moderujete dál, ale od teď váš hlas nezůstane ve stopách jednotlivých osob ani v přepisu. Video místnosti, pokud se nahrává, vás zachytí i tak."
+          "conduce": "Pokud ho odvoláte, moderujete dál, ale od teď váš hlas nezůstane ve stopách jednotlivých osob ani v přepisu. Video místnosti, pokud se nahrává, vás zachytí i tak.",
+          "voce": "Pokud jej odvoláte, zůstanete v místnosti jako dříve a od nynějška jste mimo záznam. Odvoláte i souhlas s přepisem svých příspěvků."
         }
       },
       "transcription": {
@@ -693,6 +703,11 @@
         "withdrawEffect": "Pokud ho odvoláte, vaše již přepsané věty přijdou o text i jméno a od teď se váš hlas nenahrává na samostatnou stopu ani nepřepisuje.",
         "needsRecording": "Můžete ho udělit po souhlasu se záznamem."
       }
+    },
+    "voiceExcluded": {
+      "title": "Účastníte se bez nahrávání.",
+      "consent": "Souhlasím s nahráváním",
+      "body": "Nesouhlasili jste se záznamem: účastníte se jako všichni, ale vaše jméno, hlas a obraz do záznamu nevstoupí."
     }
   },
   "qa": {
@@ -1010,13 +1025,17 @@
           }
         },
         "recordingManualNote": "Záznam se nikdy nespustí sám: moderátor ho spustí tlačítkem REC.",
-        "listenOnlyWithoutConsent": "Kdo nesouhlasí, vstoupí pouze jako posluchač",
-        "listenOnlyWithoutConsentOn": "Souhlas se záznamem je dobrovolný: kdo ho nedá, účastní se i tak, sleduje a píše do chatu, ale mikrofon, kamera a obrazovka zůstávají vypnuté.",
-        "listenOnlyWithoutConsentOff": "Bez souhlasu se záznamem se nevstoupí.",
-        "listenOnlyLockedLive": "Dokud může být místnost otevřená, záznam a režim pouze poslechu nelze měnit: platí od prvního vstupu.",
         "audienceAnonymous": "Anonymní publikum",
         "audienceAnonymousDesc": "Účastníci se ostatním zobrazují pod pseudonymem („Účastník“ a kód) ve videu, v chatu i v dotazech; seznam účastníků vidí jen moderátoři a náměstí není k dispozici. Hodí se pro velké akce; na komunitních akcích se lidé chtějí poznat.",
-        "audienceAnonymousLocked": "Dokud může být místnost otevřená, nelze to změnit: propojilo by to pseudonymy se jmény."
+        "audienceAnonymousLocked": "Dokud může být místnost otevřená, nelze to změnit: propojilo by to pseudonymy se jmény.",
+        "participantListVisible": "Zobrazit publiku seznam účastníků",
+        "participantListVisibleDesc": "Vypnuto: seznam, mřížka a jména na náměstí zůstávají moderátorům a řečníkům; publikum vidí jen toho, kdo mluví. Zapnuto: všichni vidí, kdo je v místnosti.",
+        "participantListAnonymous": "U anonymního publika zůstává seznam skrytý.",
+        "participantListLocked": "Při otevřené místnosti to nelze změnit: lidé uvnitř by změnu neviděli.",
+        "participantListCameraNote": "Při skrytém seznamu nevidí ten, kdo zapne kameru, své vlastní okno. Pro schůzku, kde se všichni vidí, seznam zobrazte.",
+        "recordingLockedLive": "Při otevřené místnosti nelze nahrávání změnit: platí od prvního vstupu.",
+        "hostsAlwaysRecorded": "Moderátoři a řečníci jsou vždy v záznamu",
+        "hostsAlwaysRecordedDesc": "Vypnuto: moderátoři a řečníci rozhodují jako všichni. Zapněte jen pokud už se natáčením souhlasili: políčko nevidí a informace o akci to musí uvádět."
       },
       "step3": {
         "heading": "Osoby a pozvánky",
@@ -1309,13 +1328,17 @@
         "permissionsHeading": "Kdo co může v místnosti",
         "permissionsIntro": "Co mohou účastníci dělat a které funkce místnosti jsou zapnuté. Vše lze měnit i během akce.",
         "consentsLine": "Souhlasy při registraci a v místnosti: {list}",
-        "consentRecordingRequired": "záznam, povinný pro vstup",
         "consentRecordingFree": "záznam, dobrovolný (bez něj jen poslech)",
         "consentRecordingNotice": "k záznamu jen upozornění (účastníci nemluví ani se neukazují)",
         "consentTranscription": "přepis vlastních příspěvků, dobrovolný",
         "consentsNone": "Žádný souhlas kromě souhlasu při registraci.",
         "consentsHosts": "Moderátoři a řečníci jsou o souhlas se záznamem požádáni v místnosti, dobrovolně.",
-        "consentsWithdraw": "Účastníci je mohou v místnosti odvolat tlačítkem „Souhlasy“."
+        "consentsWithdraw": "Účastníci je mohou v místnosti odvolat tlačítkem „Souhlasy“.",
+        "participantListShown": "Seznam účastníků: viditelný pro všechny.",
+        "participantListHidden": "Seznam účastníků: jen pro moderátory a řečníky.",
+        "consentRecordingOptional": "nahrávání, dobrovolné",
+        "consentRecordingVoice": "záznam, dobrovolný (bez souhlasu zůstává osoba mimo záznam)",
+        "consentsHostsAlways": "Moderátoři a řečníci jsou vždy v záznamu: políčko nevidí."
       },
       "preview": {
         "title": "Náhled stránky",
@@ -1373,7 +1396,37 @@
         "toggleOffWarningCreate": "Vypnutý program ({count, plural, one {# téma} few {# témata} many {# tématu} other {# témat}}) se na stránce nezobrazuje a s akcí se neuloží: zapněte ho, abyste ho zachovali.",
         "reviewOffCreate": "Program: vypnuto, s akcí se neuloží ({count, plural, one {# téma} few {# témata} many {# tématu} other {# témat}})"
       },
-      "saveCopy": "Uložit kopii"
+      "saveCopy": "Uložit kopii",
+      "consentMap": {
+        "show": "Ukázat, co se děje se souhlasy",
+        "hide": "Skrýt diagram",
+        "title": "Souhlasy se záznamem v této akci",
+        "person": "Kdo vstupuje",
+        "question": "Souhlasil(a) se záznamem?",
+        "yes": "Ano",
+        "no": "Ne",
+        "room": "V místnosti",
+        "recording": "V záznamu",
+        "roomSame": "Účastní se podle pravidel akce.",
+        "roomListenOnly": "Jen poslech a chat.",
+        "recordedFull": "Jméno, hlas, obraz a sdílená obrazovka.",
+        "notRecorded": "Nevystupuje: žádné jméno, hlas, obraz ani sdílená obrazovka.",
+        "recordedVoice": "Jeho hlas, na samostatné stopě.",
+        "notRecordedVoice": "Jeho hlas se nenahrává.",
+        "othersSame": "Ostatní se nemění: zámky mikrofonů, slovo a vzhled videa zůstávají podle akce.",
+        "audienceNotice": "Publikum nemá mikrofon, kameru ani obrazovku: dostane jen upozornění. Pokud dostane slovo, může souhlasit v místnosti; pokud ne, zůstane mimo záznam.",
+        "hostsChoose": "Moderátoři a řečníci rozhodují jako všichni: kdo nesouhlasí, vede akci normálně, ale zůstává mimo záznam.",
+        "hostsAlways": "Moderátoři a řečníci jsou vždy v záznamu: políčko nevidí.",
+        "hostsFixed": "Moderátoři a řečníci vedou akci v každém případě a video je zaznamenává.",
+        "trace": "Pokud promluví během záznamu, poznámka u videa uvede, že chybí příspěvek, a přepis zaznamená *** s časem.",
+        "anytime": "Souhlas se uděluje a odvolává v místnosti, kdykoli.",
+        "transcription": "Přepis vlastních příspěvků je samostatný, dobrovolný souhlas.",
+        "fixedVoice": "Tato instalace nemůže odstranit hlas z videa: kdo nesouhlasí, zůstane jen posluchačem a zámky místnosti sledují souhlas.",
+        "fixedNotice": "Tato instalace nemůže odstranit hlas z videa: kdo dostane slovo, vstupuje do záznamu a upozornění to říká.",
+        "questionTranscription": "Je dán souhlas s transkripcí?",
+        "fixedNotRecorded": "Bez hlasu a obrazu; jméno se ve videu může objevit."
+      },
+      "unaddedEntry": "Tento formulář jste vyplnili, ale nepotvrdili: přidejte ho tlačítkem, nebo pole vymažte."
     },
     "nav": {
       "events": "Události",
@@ -2851,6 +2904,7 @@
       "editEvent": "Upravit událost",
       "featureSummary": "Aktivní funkce",
       "organizers": "Organizátoři",
+      "peopleTabLink": "Všechny podrobnosti na kartě „{tab}“",
       "privacyGdpr": "Soukromí a GDPR",
       "postEventTitle": "Po události a zpětná vazba",
       "recordingSection": "Video události",
@@ -3958,7 +4012,8 @@
     "eventLabel": "Událost",
     "dateLabel": "Datum",
     "timeLabel": "Čas",
-    "durationLabel": "Délka trvání"
+    "durationLabel": "Délka trvání",
+    "myDataLink": "Vaše údaje: zobrazit, opravit, odvolat souhlas nebo zrušit registraci"
   },
   "home": {
     "hero": {
@@ -4326,14 +4381,16 @@
   "gdpr": {
     "consent": {
       "recording": "Souhlasím s audio/video záznamem této události",
-      "recordingRequired": "Pro účast na této události je nutný souhlas s nahráváním",
-      "recordingNotice": "Akce se nahrává (zvuk a video). Účastníte se bez mikrofonu a kamery: záznam neobsahuje váš hlas ani obraz, pokud vám moderátor neudělí slovo.",
       "multitrack": "Souhlasím s přepisem svých příspěvků se svým jménem pro zprávu z akce. Pokud akce nahrává samostatnou zvukovou stopu každé osoby, můj hlas se nahrává pouze za tímto účelem a stopa se po přepisu smaže; nepoužívá se k identifikaci ani k napodobení mého hlasu.",
       "multitrackOptional": "Je to dobrovolné: pokud nesouhlasíte, můžete se přesto zúčastnit, ale vaše příspěvky nebudou v přepisu a váš hlas se nebude nahrávat na samostatnou stopu. Pokud se akce nahrává, váš hlas ve videu přesto zůstane.",
       "stayInTouch": "Chci dostávat informace o připravovaných akcích a být zařazen do adresáře, abych byl zván na podobné akce",
       "stayInTouchHelp": "Nepovinný souhlas (čl. 6.1.a GDPR). Můžete ho kdykoli odvolat odkazem „Odebrat mě z adresáře“ v e-mailech, které obdržíte. Jméno a organizace jsou ty z této registrace.",
       "recordingOptionalListenOnly": "Pokud nesouhlasíte, účastníte se i tak, pouze jako posluchač: sledujete a píšete do chatu, ale mikrofon, kamera a sdílení obrazovky zůstávají vypnuté. Souhlas můžete dát později v místnosti.",
-      "recordingOptionalHost": "Pokud nesouhlasíte, vstoupíte i tak a vedete jako obvykle, ale váš hlas se neuchová v samostatných stopách účastníků ani v přepisu. Video místnosti, pokud se nahrává, vás přesto zachytí."
+      "recordingOptionalHost": "Pokud nesouhlasíte, vstoupíte i tak a vedete jako obvykle, ale váš hlas se neuchová v samostatných stopách účastníků ani v přepisu. Video místnosti, pokud se nahrává, vás přesto zachytí.",
+      "recordingOptionalVoice": "Pokud nesouhlasíte, účastníte se i tak a můžete mluvit, ale zůstáváte mimo záznam: bez jména, hlasu i obrazu. Souhlas můžete dát později v místnosti.",
+      "recordingNotice": "Akce se nahrává (zvuk a video). Účastníte se bez mikrofonu a kamery: záznam neobsahuje váš hlas ani obraz, pokud vám moderátor neudělí slovo.",
+      "recordingNoticeVoice": "Akce se nahrává (zvuk i video). Účastníte se bez mikrofonu a kamery: záznam neobsahuje vaše jméno, hlas ani obraz, pokud nesouhlasíte v místnosti.",
+      "recordingHostAlways": "Vedete tuto akci: jste vždy v záznamu, se jménem, hlasem, obrazem a sdílenou obrazovkou."
     },
     "export": {
       "title": "Moje údaje",
@@ -4374,7 +4431,12 @@
       "grantSince": "Od {date}",
       "grantPublic": "zobrazen na veřejné stránce",
       "grantPhoto": "Fotografie nahraná týmem akce",
-      "grantRevoked": "přístup zrušen {date}"
+      "grantRevoked": "přístup zrušen {date}",
+      "consentsIntro": "Každý souhlas můžete kdykoli odvolat, před akcí i po ní. Vaše registrace zůstává platná.",
+      "consentFuture": "Budoucí sdělení",
+      "consentWithdrawnOn": "Odvoláno {date}",
+      "consentNoteInRoom": "Pokud jste právě v místnosti, odvolání platí od příštího vstupu: aby platilo hned, použijte v místnosti Souhlasy.",
+      "consentFutureEffect": "Pokud jej odvoláte, nebudete dostávat sdělení o dalších akcích a opustíte adresář, a to pro všechny své registrace."
     },
     "erasure": {
       "title": "Výmaz vašich údajů",
@@ -5161,9 +5223,7 @@
         "none": "Žádné"
       },
       "voices": {
-        "title": "Syntetické hlasy přiřazené mluvčím",
-        "male": "mužský hlas",
-        "female": "ženský hlas"
+        "title": "Syntetické hlasy přiřazené mluvčím"
       },
       "runAt": "Zpracování dokončeno dne",
       "version": "Verze pipeline"
@@ -5171,7 +5231,8 @@
     "overlapBadge": "současně",
     "overlapTitle": "Souběžná řeč: v tomto úseku mluví více osob najednou.",
     "anonymousSpeaker": "Účastník {n}",
-    "untranscribed": "Nepřepsáno: mluvčí nedal souhlas"
+    "untranscribed": "Nepřepsáno: mluvčí nedal souhlas",
+    "unrecordedSpeech": "Některé příspěvky v záznamu nejsou: mluvčí nedali souhlas."
   },
   "waiting": {
     "startsIn": "Událost začne za",
@@ -5242,8 +5303,7 @@
     "aiNotice": "Po skončení bude nahrávka zpracována nástroji umělé inteligence, aby vznikl přepis, shrnutí a případné překlady a dabing. Výstupy mohou obsahovat nepřesnosti; závazným zdrojem zůstává video.",
     "multitrackConsentTitle": "Přepis vašich příspěvků",
     "recordingConsentTitle": "Záznam akce",
-    "recordingConsentIntro": "Akce se nahrává (zvuk i obraz). Pokud vystoupíte, záznam obsahuje váš hlas, vaši podobu a to, co sdílíte na obrazovce.",
-    "recordingConsentRequired": "Pro vstup je nutný váš souhlas se záznamem.",
+    "recordingConsentIntro": "Akce se nahrává (zvuk i video). S vaším souhlasem záznam obsahuje vaše jméno, hlas, obraz a to, co sdílíte na obrazovce.",
     "enterGardenTitle": "Vstupte na náměstí",
     "enterGardenHint": "Jiné místo pro čekání: projděte se, potkejte ostatní čekající a vstupte do přenosu branou, až se místnost otevře.",
     "backToWaitingRoom": "Zpět do čekárny",

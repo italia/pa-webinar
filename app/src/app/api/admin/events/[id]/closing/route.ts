@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * GET /api/admin/events/[id]/closing — «Chiudi l'evento»: lo stato di ogni
  * voce del dopo-evento (registrazione, trascrizione, resoconto, sala,

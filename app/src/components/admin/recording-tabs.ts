@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Le schede della pagina di una registrazione (components/admin/
  * recording-manage-client). A parte, senza `'use client'`: la pagina del

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Recordings storage — thin adapter on top of the StorageProvider
  * abstraction (`./index.ts`). Historically this module was Azure-only

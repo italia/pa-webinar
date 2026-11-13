@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # jitsi/web patchata — tre correzioni che upstream non ha, applicate al bundle
 # gia' costruito perche' non esiste un punto di configurazione per nessuna:
 #

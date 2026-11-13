@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Le notifiche di Prosody al portale (mod_pa_occupants) sono firmate con il
  * segreto dei token della conferenza (JITSI_JWT_SECRET, in Prosody

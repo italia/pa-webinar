@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 // @vitest-environment node
 import type { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -12,6 +15,7 @@ vi.mock('@/lib/db', () => ({
 }));
 const staff = vi.hoisted(() => ({ valore: null as { accountId: string; nome: string } | null }));
 vi.mock('@/lib/auth/staff-seat', () => ({ staffDietroIlPrimario: vi.fn(async () => staff.valore) }));
+vi.mock('@/lib/captions/room', () => ({ endpointSenzaRegistrazione: vi.fn(async () => []) }));
 vi.mock('@/lib/redis', () => ({
   getRedis: () => null,
   withDeadline: <T,>(op: Promise<T>) => op,

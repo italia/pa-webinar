@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { createHmac, timingSafeEqual } from 'crypto';
 
 import { requireAppSecret } from '@/lib/auth/app-secret';
@@ -19,7 +22,9 @@ import { requireAppSecret } from '@/lib/auth/app-secret';
  */
 
 const TOKEN_TTL_SECONDS = 60 * 60;
-export type GdprAction = 'export' | 'erasure';
+// `consents` non arriva per email: lo consegna la pagina dei propri dati a chi
+// ha gia' aperto il link di accesso, cosi' quel link resta di sola lettura.
+export type GdprAction = 'export' | 'erasure' | 'consents';
 
 function b64urlEncode(buf: Buffer): string {
   return buf

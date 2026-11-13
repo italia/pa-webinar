@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Kubernetes CronJobs for pa-webinar scheduled tasks.
 # Both reference CRON_API_KEY from the pa-webinar-secrets Secret.
 #

@@ -1,3 +1,6 @@
+{{- /* SPDX-License-Identifier: EUPL-1.2 */ -}}
+{{- /* SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale */ -}}
+
 {{- /*
   L'Ingress della conferenza reso da questo chart, al posto di quello del
   sottochart (jitsi-meet.web.ingress), quando jitsi.conferenceIngress.enabled.

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * L'aspetto di un personaggio della piazza: ogni parte si sceglie da sola
  * (pelle, capelli, vestiti, cappello, occhiali, colori). I tre stili di

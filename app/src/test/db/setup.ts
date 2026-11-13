@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { vi } from 'vitest';
 
 // Fuori da una richiesta `cookies()` di Next lancia: e' l'unica cosa finta di

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Le lingue di un evento e lo stato del testo (titolo e descrizione) in
  * ciascuna: chi l'ha scritto, se viene dal testo principale di adesso, se

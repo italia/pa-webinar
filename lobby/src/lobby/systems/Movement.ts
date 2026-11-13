@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { MOVE_SPEED, PLAYER_RADIUS } from '../constants';
 import { emoteForKey } from '../emotes';
 import type { EmoteType, Facing } from '../ports/types';

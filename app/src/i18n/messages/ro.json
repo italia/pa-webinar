@@ -330,6 +330,14 @@
     "exitFullscreen": "Ieși din ecran complet",
     "recordingActive": "Înregistrare în curs",
     "recordingShort": "REC",
+    "transcriptionActive": "Transcriere în curs",
+    "transcriptionShort": "Transcriere",
+    "captureNoticeRecordingOn": "Înregistrarea a pornit: de acum sala este înregistrată.",
+    "captureNoticeRecordingOff": "Înregistrarea s-a încheiat.",
+    "captureNoticeVoicesOn": "Înregistrarea vocilor a pornit: de acum se înregistrează vocea celor care și-au dat consimțământul.",
+    "captureNoticeVoicesOff": "Înregistrarea vocilor s-a încheiat.",
+    "captureNoticeTranscriptionOn": "Transcrierea a pornit: de acum se păstrează textul celor care și-au dat consimțământul.",
+    "captureNoticeTranscriptionOff": "Transcrierea s-a încheiat.",
     "enterRoom": "Intrați în sală",
     "leaveRoom": "Ieșiți din sală",
     "leaveChoice": {
@@ -535,7 +543,9 @@
       "handsRaised": "{count, plural, one {# mână ridicată} few {# mâini ridicate} other {# de mâini ridicate}}",
       "locksByConsent": "Microfoanele și camerele urmează acordul pentru înregistrare: cei care l-au dat folosesc ce permite evenimentul, ceilalți doar ascultă. Blocările sălii rămân active.",
       "listenOnlyBadge": "doar ascultă",
-      "listenOnlyNoFloor": "Nu și-a dat consimțământul la înregistrare: nu poate interveni până nu îl dă din sala sa."
+      "listenOnlyNoFloor": "Nu și-a dat consimțământul la înregistrare: nu poate interveni până nu îl dă din sala sa.",
+      "voiceExcludedBadge": "fără înregistrare",
+      "voiceExcludedFloor": "Nu și-a dat acordul pentru înregistrare: poate interveni, dar rămâne în afara înregistrării."
     },
     "moderator": {
       "muteAll": "Dezactivați sunetul tuturor",
@@ -677,13 +687,13 @@
         "without": {
           "soloAscolto": "Fără acest consimțământ doar asculți: microfonul, camera și ecranul rămân închise.",
           "conduce": "Fără acest consimțământ conduci în continuare, dar vocea ta nu rămâne în pistele per persoană și nici în transcriere.",
-          "uscita": "Pentru a participa la acest eveniment este necesar consimțământul la înregistrare."
+          "voce": "Fără acest acord participi ca toți ceilalți, dar rămâi în afara înregistrării: nici numele, nici vocea, nici imaginea."
         },
         "alreadyRecorded": "Ce a fost deja înregistrat rămâne în videoclipul evenimentului: pentru a-l elimina, scrie organizatorilor.",
         "withdraw": {
           "soloAscolto": "Dacă îl retragi, rămâi în sală doar ca ascultător: microfonul, camera și ecranul se închid. Retragi și consimțământul la transcrierea intervențiilor tale.",
-          "uscita": "Dacă îl retragi, ieși din conferință și revii în sala de așteptare: pentru a participa este necesar consimțământul la înregistrare. Retragi și consimțământul la transcrierea intervențiilor tale.",
-          "conduce": "Dacă îl retragi, continui să conduci, dar de acum vocea ta nu rămâne în pistele per persoană și nici în transcriere. Videoclipul sălii, dacă este înregistrat, te arată în continuare."
+          "conduce": "Dacă îl retragi, continui să conduci, dar de acum vocea ta nu rămâne în pistele per persoană și nici în transcriere. Videoclipul sălii, dacă este înregistrat, te arată în continuare.",
+          "voce": "Dacă îl retragi, rămâi în sală ca înainte, iar de acum ești în afara înregistrării. Retragi și acordul pentru transcrierea intervențiilor tale."
         }
       },
       "transcription": {
@@ -693,6 +703,11 @@
         "withdrawEffect": "Dacă îl retragi, frazele tale deja transcrise își pierd textul și numele, iar de acum vocea ta nu mai este înregistrată pe o pistă separată și nici transcrisă.",
         "needsRecording": "Îl poți da după consimțământul la înregistrare."
       }
+    },
+    "voiceExcluded": {
+      "title": "Participi fără înregistrare.",
+      "consent": "Îmi dau consimțământul pentru înregistrare",
+      "body": "Nu ți-ai dat acordul pentru înregistrare: participi ca toți ceilalți, dar numele, vocea și imaginea ta nu intră în înregistrare."
     }
   },
   "qa": {
@@ -1010,13 +1025,17 @@
           }
         },
         "recordingManualNote": "Înregistrarea nu pornește niciodată singură: un moderator o pornește cu butonul REC.",
-        "listenOnlyWithoutConsent": "Cine nu își dă acordul intră doar ca ascultător",
-        "listenOnlyWithoutConsentOn": "Acordul pentru înregistrare este liber: cine nu îl dă participă totuși, urmărește și scrie în chat, dar microfonul, camera și ecranul rămân oprite.",
-        "listenOnlyWithoutConsentOff": "Fără acord pentru înregistrare nu se intră.",
-        "listenOnlyLockedLive": "Cât timp sala poate fi deschisă, înregistrarea și modul doar ascultare nu se pot schimba: se aplică de la prima intrare.",
         "audienceAnonymous": "Public anonim",
         "audienceAnonymousDesc": "Participanții apar celorlalți sub un pseudonim („Participant” și un cod) în video, în chat și la întrebări; lista participanților rămâne la moderatori și nu există piață. Util pentru evenimente mari; la evenimentele comunității oamenii vor să se cunoască.",
-        "audienceAnonymousLocked": "Nu se poate schimba cât timp sala poate fi deschisă: ar lega pseudonimele de nume."
+        "audienceAnonymousLocked": "Nu se poate schimba cât timp sala poate fi deschisă: ar lega pseudonimele de nume.",
+        "participantListVisible": "Afișează publicului lista participanților",
+        "participantListVisibleDesc": "Dezactivat: lista, grila și numele din piață rămân la moderatori și vorbitori; publicul vede doar cine vorbește. Activat: toată lumea vede cine este în sală.",
+        "participantListAnonymous": "Cu public anonim, lista rămâne ascunsă.",
+        "participantListLocked": "Nu se poate schimba cu sala deschisă: cei deja înăuntru nu ar vedea modificarea.",
+        "participantListCameraNote": "Cu lista ascunsă, cine pornește camera nu își vede propria imagine. Pentru o întâlnire în care toți se văd, afișează lista.",
+        "recordingLockedLive": "Cu sala deschisă înregistrarea nu se schimbă: e valabilă de la prima intrare.",
+        "hostsAlwaysRecorded": "Cine conduce este mereu în înregistrare",
+        "hostsAlwaysRecordedDesc": "Dezactivată, moderatorii și vorbitorii aleg ca toți ceilalți. Activeaz-o doar dacă au acceptat deja să fie filmați: nu văd căsuța, iar informarea evenimentului trebuie să o spună."
       },
       "step3": {
         "heading": "Persoane și invitații",
@@ -1309,13 +1328,17 @@
         "permissionsHeading": "Cine ce poate face în sală",
         "permissionsIntro": "Ce pot face participanții și ce funcții ale sălii sunt pornite. Totul se poate schimba și în timpul evenimentului.",
         "consentsLine": "Consimțăminte la înscriere și în sală: {list}",
-        "consentRecordingRequired": "înregistrare, obligatorie pentru a intra",
         "consentRecordingFree": "înregistrare, liberă (fără ea, doar ascultare)",
         "consentRecordingNotice": "pentru înregistrare doar o informare (participanții nu vorbesc și nu apar)",
         "consentTranscription": "transcrierea propriilor intervenții, opțională",
         "consentsNone": "Niciun consimțământ în afara celui de la înscriere.",
         "consentsHosts": "Celor care conduc și intervin li se cere înregistrarea în sală, opțional.",
-        "consentsWithdraw": "Participanții le pot retrage în sală, cu butonul „Consimțăminte”."
+        "consentsWithdraw": "Participanții le pot retrage în sală, cu butonul „Consimțăminte”.",
+        "participantListShown": "Lista participanților: vizibilă pentru toți.",
+        "participantListHidden": "Lista participanților: doar pentru moderatori și vorbitori.",
+        "consentRecordingOptional": "înregistrare, facultativă",
+        "consentRecordingVoice": "înregistrare, liberă (fără acord, persoana rămâne în afara înregistrării)",
+        "consentsHostsAlways": "Cine conduce și intervine este mereu în înregistrare: nu vede căsuța."
       },
       "preview": {
         "title": "Previzualizarea paginii",
@@ -1373,7 +1396,37 @@
         "toggleOffWarningCreate": "Dezactivat, programul ({count, plural, one {# temă} few {# teme} other {# de teme}}) nu apare pe pagină și nu se salvează odată cu evenimentul: activați-l pentru a-l păstra.",
         "reviewOffCreate": "Program: dezactivat, nu se salvează odată cu evenimentul ({count, plural, one {# temă} few {# teme} other {# de teme}})"
       },
-      "saveCopy": "Salvează copia"
+      "saveCopy": "Salvează copia",
+      "consentMap": {
+        "show": "Arată ce se întâmplă cu acordurile",
+        "hide": "Ascunde diagrama",
+        "title": "Acordurile pentru înregistrare la acest eveniment",
+        "person": "Cine intră",
+        "question": "A fost de acord cu înregistrarea?",
+        "yes": "Da",
+        "no": "Nu",
+        "room": "În sală",
+        "recording": "În înregistrare",
+        "roomSame": "Participă cu regulile evenimentului.",
+        "roomListenOnly": "Doar ascultă și scrie în chat.",
+        "recordedFull": "Nume, voce, imagine și ecran partajat.",
+        "notRecorded": "Nu apare: nici numele, nici vocea, nici imaginea, nici ecranul partajat.",
+        "recordedVoice": "Vocea sa, pe o pistă separată.",
+        "notRecordedVoice": "Vocea sa nu este înregistrată.",
+        "othersSame": "Ceilalți nu se schimbă: blocările microfoanelor, acordarea cuvântului și aspectul video rămân cele ale evenimentului.",
+        "audienceNotice": "Participanții nu au microfon, cameră sau ecran: primesc doar o notificare. Dacă li se dă cuvântul, pot fi de acord în sală; dacă nu, rămân în afara înregistrării.",
+        "hostsChoose": "Moderatorii și vorbitorii aleg ca toți ceilalți: cine nu este de acord conduce normal, dar rămâne în afara înregistrării.",
+        "hostsAlways": "Moderatorii și vorbitorii sunt mereu în înregistrare: nu văd căsuța.",
+        "hostsFixed": "Moderatorii și vorbitorii conduc oricum, iar videoul îi surprinde.",
+        "trace": "Dacă intervine în timpul înregistrării, o notă de lângă video spune că lipsește o intervenție, iar transcrierea marchează *** cu ora.",
+        "anytime": "Acordul se dă și se retrage în sală, oricând.",
+        "transcription": "Transcrierea propriilor intervenții este un acord separat, facultativ.",
+        "fixedVoice": "Această instalare nu poate scoate o voce din video: cine nu este de acord rămâne doar în ascultare, iar blocările sălii urmează acordul.",
+        "fixedNotice": "Această instalare nu poate scoate o voce din video: cine primește cuvântul intră în înregistrare, iar notificarea o spune.",
+        "questionTranscription": "S-a dat consimțământul pentru transcriere?",
+        "fixedNotRecorded": "Fără voce și imagine; numele poate apărea în videoclip."
+      },
+      "unaddedEntry": "Ați completat acest formular fără să-l confirmați: apăsați butonul pentru a-l adăuga sau goliți câmpurile."
     },
     "nav": {
       "events": "Evenimente",
@@ -2851,6 +2904,7 @@
       "editEvent": "Modificați evenimentul",
       "featureSummary": "Funcționalități active",
       "organizers": "Organizatori",
+      "peopleTabLink": "Toate detaliile în fila „{tab}”",
       "privacyGdpr": "Confidențialitate și RGPD",
       "postEventTitle": "Post-eveniment și feedback",
       "recordingSection": "Videoclipul evenimentului",
@@ -3958,7 +4012,8 @@
     "eventLabel": "Eveniment",
     "dateLabel": "Data",
     "timeLabel": "Ora",
-    "durationLabel": "Durată"
+    "durationLabel": "Durată",
+    "myDataLink": "Datele tale: vizualizare, corectare, retragerea unui consimțământ sau anularea înscrierii"
   },
   "home": {
     "hero": {
@@ -4326,14 +4381,16 @@
   "gdpr": {
     "consent": {
       "recording": "Consimt la înregistrarea audio/video a evenimentului",
-      "recordingRequired": "Consimțământul pentru înregistrare este obligatoriu pentru a participa la acest eveniment",
-      "recordingNotice": "Evenimentul este înregistrat (audio și video). Participi fără microfon și cameră: înregistrarea nu conține vocea sau imaginea ta, decât dacă moderatorul îți dă cuvântul.",
       "multitrack": "Sunt de acord ca intervențiile mele să fie transcrise, cu numele meu, pentru raportul evenimentului. Dacă evenimentul înregistrează o pistă audio separată pentru fiecare persoană, vocea mea este înregistrată numai în acest scop, iar pista se șterge după transcriere; nu este folosită pentru a-mi identifica sau reproduce vocea.",
       "multitrackOptional": "Este opțional: dacă nu îți dai consimțământul, participi oricum, dar intervențiile tale nu intră în transcriere și vocea ta nu este înregistrată pe o pistă separată. Dacă evenimentul este înregistrat, vocea ta rămâne totuși în videoclip.",
       "stayInTouch": "Vreau să primesc informații despre evenimentele viitoare și să fiu adăugat în agenda de contacte, pentru a fi invitat la evenimente similare",
       "stayInTouchHelp": "Consimțământ opțional (art. 6.1.a GDPR). Îl poți retrage oricând prin linkul „Elimină-mă din agenda de contacte” din e-mailurile pe care le primești. Numele și organizația sunt cele din această înscriere.",
       "recordingOptionalListenOnly": "Dacă nu îți dai acordul, participi totuși, doar ascultând: urmărești și scrii în chat, dar microfonul, camera și partajarea ecranului rămân oprite. Poți să îți dai acordul mai târziu, din sală.",
-      "recordingOptionalHost": "Dacă nu îți dai consimțământul, intri oricum și conduci ca de obicei, dar vocea ta nu rămâne în pistele pe persoană și nici în transcriere. Videoclipul sălii, dacă este înregistrat, te include oricum."
+      "recordingOptionalHost": "Dacă nu îți dai consimțământul, intri oricum și conduci ca de obicei, dar vocea ta nu rămâne în pistele pe persoană și nici în transcriere. Videoclipul sălii, dacă este înregistrat, te include oricum.",
+      "recordingOptionalVoice": "Dacă nu îți dai acordul, participi totuși și poți interveni, dar rămâi în afara înregistrării: nici numele, nici vocea, nici imaginea. Poți să îți dai acordul mai târziu, din sală.",
+      "recordingNotice": "Evenimentul este înregistrat (audio și video). Participi fără microfon și cameră: înregistrarea nu conține vocea sau imaginea ta, decât dacă moderatorul îți dă cuvântul.",
+      "recordingNoticeVoice": "Evenimentul este înregistrat (audio și video). Participi fără microfon sau cameră: înregistrarea nu conține numele, vocea sau imaginea ta, decât dacă îți dai acordul în sală.",
+      "recordingHostAlways": "Conduci acest eveniment: ești mereu în înregistrare, cu nume, voce, imagine și ecran partajat."
     },
     "export": {
       "title": "Datele mele",
@@ -4374,7 +4431,12 @@
       "grantSince": "Din {date}",
       "grantPublic": "afișat pe pagina publică",
       "grantPhoto": "Fotografie încărcată de echipa evenimentului",
-      "grantRevoked": "acces revocat la {date}"
+      "grantRevoked": "acces revocat la {date}",
+      "consentsIntro": "Poți retrage fiecare consimțământ oricând, înainte sau după eveniment. Înscrierea ta rămâne valabilă.",
+      "consentFuture": "Comunicări viitoare",
+      "consentWithdrawnOn": "Retras la {date}",
+      "consentNoteInRoom": "Dacă ești acum în sală, retragerea se aplică de la următoarea intrare: pentru a se aplica imediat, folosește Consimțăminte în sală.",
+      "consentFutureEffect": "Dacă îl retragi, nu mai primești comunicări despre evenimentele viitoare și ieși din agendă, pentru toate înscrierile tale."
     },
     "erasure": {
       "title": "Ștergerea datelor dumneavoastră",
@@ -5161,9 +5223,7 @@
         "none": "Niciuna"
       },
       "voices": {
-        "title": "Voci sintetice atribuite vorbitorilor",
-        "male": "voce masculină",
-        "female": "voce feminină"
+        "title": "Voci sintetice atribuite vorbitorilor"
       },
       "runAt": "Procesare finalizată la",
       "version": "Versiunea pipeline-ului"
@@ -5171,7 +5231,8 @@
     "overlapBadge": "simultan",
     "overlapTitle": "Vorbire simultană: în acest interval vorbesc mai multe persoane în același timp.",
     "anonymousSpeaker": "Participant {n}",
-    "untranscribed": "Netranscris: vorbitorul nu și-a dat consimțământul"
+    "untranscribed": "Netranscris: vorbitorul nu și-a dat consimțământul",
+    "unrecordedSpeech": "Unele intervenții nu sunt în înregistrare: cei care au vorbit nu și-au dat consimțământul."
   },
   "waiting": {
     "startsIn": "Evenimentul va începe în",
@@ -5242,8 +5303,7 @@
     "aiNotice": "La final, înregistrarea va fi procesată cu instrumente de inteligență artificială pentru a genera transcriere, rezumat și eventuale traduceri și dublaje. Rezultatele pot conține inexactități; înregistrarea video rămâne sursa de referință.",
     "multitrackConsentTitle": "Transcrierea intervențiilor dvs.",
     "recordingConsentTitle": "Înregistrarea evenimentului",
-    "recordingConsentIntro": "Evenimentul este înregistrat (audio și video). Dacă intervii, înregistrarea conține vocea ta, imaginea ta și ce partajezi pe ecran.",
-    "recordingConsentRequired": "Pentru a intra este nevoie de consimțământul tău pentru înregistrare.",
+    "recordingConsentIntro": "Evenimentul este înregistrat (audio și video). Cu acordul tău, înregistrarea conține numele, vocea, imaginea ta și ce partajezi pe ecran.",
     "enterGardenTitle": "Intră în piață",
     "enterGardenHint": "Un alt loc în care să aștepți: plimbă-te, întâlnește-i pe cei care așteaptă și intră în transmisiunea live pe poartă când se deschide sala.",
     "backToWaitingRoom": "Înapoi la sala de așteptare",

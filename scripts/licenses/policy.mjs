@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Politica delle licenze per le dipendenze di produzione: quali licenze sono
  * ammesse, quali vietate, e come si valuta un'espressione SPDX.

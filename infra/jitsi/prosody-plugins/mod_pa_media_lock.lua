@@ -1,3 +1,6 @@
+-- SPDX-License-Identifier: EUPL-1.2
+-- SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 -- mod_pa_media_lock.lua
 --
 -- Blocca davvero microfono, videocamera e condivisione dello schermo dei
@@ -23,10 +26,22 @@
 --   context.user.consentLock = true in ogni token di un evento con il solo
 --                              ascolto: la moderazione non si spegne;
 --   context.user.listenOnly  = true per chi è entrato in solo ascolto (non
---                              ha dato il consenso alla registrazione): mai
---                              tra gli ammessi, nemmeno se un moderatore gli
---                              dà la parola. Per parlare rientra con il
---                              consenso (il portale gli dà un token nuovo).
+--                              ha dato il consenso alla registrazione e
+--                              l'installazione non può togliere la sua voce
+--                              dal video): mai tra gli ammessi, nemmeno se un
+--                              moderatore gli dà la parola. Per parlare
+--                              rientra con il consenso (il portale gli dà un
+--                              token nuovo);
+--   context.user.voiceExcluded = true per chi non ha un consenso valido alla
+--                              registrazione in un evento che registra: in sala
+--                              non cambia niente, per lui e per gli altri. Il
+--                              modulo lo scrive nella presenza come
+--                              hidden-from-recorder (l'identità del token non
+--                              basta: Jitsi lo legge anche dal JWT e spegnerebbe
+--                              microfono e videocamera), e la sessione del
+--                              registratore non lo vede: non riproduce la sua
+--                              voce né la sua immagine, e non mostra il suo nome.
+--                              Stesso segno per chi è in solo ascolto.
 -- I moderatori (owner) sono ammessi anche loro: Jicofo controlla solo
 -- l'elenco, non il ruolo.
 --
@@ -316,8 +331,14 @@ local function on_occupant_joined(event)
     end
 
     if room:get_role(occupant.nick) == 'moderator' then
-        if not is_listen_only(user) then
-            admit(room, occupant, 'moderatore');
+        admit(room, occupant, 'moderatore', function() return not is_listen_only(user) end);
+        -- Il componente ammette gli owner a ogni mezzo prima di questo punto.
+        local nick = internal_room_jid_match_rewrite(occupant.nick);
+        for _, m in ipairs(MEDIA_TYPES) do
+            local whitelist = room.av_moderation and room.av_moderation[m];
+            if whitelist and is_listen_only(user) and remove_all(whitelist, nick) then
+                notify_whitelist(room, m);
+            end
         end
     elseif admitted_for_any(user) then
         -- Già tra gli ammessi se è stato lui ad accendere il blocco: il
@@ -345,16 +366,17 @@ local function on_affiliation_changed(event)
     if not room.av_moderation or is_healthcheck_room(room.jid) or is_admin(event.jid) then
         return;
     end
-    -- Chi e' in solo ascolto resta fuori dagli ammessi anche se diventa
+    -- Chi è in solo ascolto resta fuori dagli ammessi anche se diventa
     -- moderatore: il componente aggiunge gli owner, qui si tolgono.
     if event.affiliation == 'owner' then
         for _, occupant in room:each_occupant() do
-            if occupant.bare_jid == event.jid and is_listen_only(context_user(occupant)) then
+            local user = occupant.bare_jid == event.jid and context_user(occupant) or nil;
+            if user then
                 local nick = internal_room_jid_match_rewrite(occupant.nick);
                 for _, m in ipairs(MEDIA_TYPES) do
                     local whitelist = room.av_moderation[m];
-                    if whitelist and remove_all(whitelist, nick) then
-                        module:log('info', 'Tolto %s (in solo ascolto) dagli ammessi per %s in %s', nick, m, room.jid);
+                    if whitelist and is_listen_only(user) and remove_all(whitelist, nick) then
+                        module:log('info', 'Tolto %s (solo ascolto) dagli ammessi per %s in %s', nick, m, room.jid);
                         notify_whitelist(room, m);
                     end
                 end
@@ -400,14 +422,13 @@ local function on_av_command(event)
     if not room then
         return;
     end
-    -- «Dai la parola» a chi è in solo ascolto: non si ammette. Ha scelto di
-    -- non essere registrato; per parlare rientra dando il consenso (la sala
-    -- glielo propone). Il comando si ferma qui, prima del componente.
+    -- «Dai la parola» a chi è in solo ascolto: non si ammette. Il comando si
+    -- ferma qui, prima del componente.
     local target = command.attr.jidToWhitelist;
     if target then
         local occupant = room:get_occupant_by_nick(room_jid_match_rewrite(target));
         if occupant and is_listen_only(context_user(occupant)) then
-            module:log('info', 'Non ammesso %s: in solo ascolto, in %s', target, room.jid);
+            module:log('info', 'Non ammesso %s in %s: solo ascolto', target, room.jid);
             return true;
         end
         return;
@@ -495,4 +516,56 @@ module:hook('iq/full', on_iq_to_occupant, 10);
 -- Prima del componente, che ferma l'evento quando lo gestisce.
 process_host_module(av_host, function(host_module)
     host_module:hook('message/host', on_av_command, 10);
+end);
+
+-- La presenza di chi non ha un consenso valido lo dice alla sessione del
+-- registratore: con hiddenFromRecorderFeatureEnabled (il testo della conferenza,
+-- jitsi-meet.web.custom.configs) Jitsi non la mette nella sala che registra, e
+-- il video resta com'è per tutti gli altri. Chi è in solo ascolto ha lo stesso
+-- segno: dove il testo c'è, nome e riquadro restano fuori anche per lui.
+--
+-- Vale il token: il client non se lo può togliere né dare. Il modulo gira dopo
+-- mod_presence_identity (priorità 0), che ricostruisce l'identità e cancellerebbe
+-- il segno; a chi è segnato toglie ogni identità, a tutti gli altri il segno
+-- scritto dal client.
+local HIDDEN_TAG = 'hidden-from-recorder';
+
+local function without_mark(identity)
+    identity:maptags(function(user_tag)
+        if user_tag.name == 'user' then
+            user_tag:maptags(function(tag)
+                if tag.name == HIDDEN_TAG then
+                    return nil;
+                end
+                return tag;
+            end);
+        end
+        return user_tag;
+    end);
+end
+
+local function mark_no_recording(event)
+    local stanza, session = event.stanza, event.origin;
+    if not stanza or not session then
+        return;
+    end
+    local user = session.jitsi_meet_context_user;
+    local marked = type(user) == 'table' and (user.voiceExcluded == true or user.listenOnly == true);
+    stanza:maptags(function(tag)
+        if tag.name ~= 'identity' then
+            return tag;
+        end
+        if marked then
+            return nil;
+        end
+        without_mark(tag);
+        return tag;
+    end);
+    if marked then
+        stanza:add_child(st.stanza('identity'):add_child(st.stanza('user'):add_child(st.stanza(HIDDEN_TAG):text('true'))));
+    end
+end
+
+process_host_module(main_domain, function(host_module)
+    host_module:hook('pre-presence/full', mark_no_recording, -10);
 end);

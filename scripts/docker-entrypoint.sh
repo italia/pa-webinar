@@ -1,4 +1,7 @@
 #!/bin/sh
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 set -e
 
 # Parse host:port from DATABASE_URL for readiness check

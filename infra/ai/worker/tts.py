@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """Text-to-Speech (TTS) per il job DUB.
 
 Usa **Piper** (rhasspy/piper, MIT license) per la sintesi vocale
@@ -150,7 +153,7 @@ def _find_voice(voices_path: str, language: str) -> tuple[str, str]:
 
 
 # Pitch variants di default: ±300 cents (~3 semitoni). Generano 3
-# timbri distinguibili dalla stessa voce-base preservando il gender.
+# timbri distinguibili dalla stessa voce-base.
 # Utile per lingue povere (IT, RO, CS) dove il pool single-speaker è
 # piccolo. Per EN il pool è già abbondante senza pitch.
 DEFAULT_PITCH_VARIANTS: tuple[int, ...] = (0, -300, +300)
@@ -264,7 +267,6 @@ def dub_with_piper(
     voices_path: str,
     total_duration_sec: float,
     speakers: Optional[list[dict]] = None,
-    speaker_names: Optional[dict[str, str]] = None,
 ) -> DubResult:
     """Genera audio TTS allineato ai timestamp dei segmenti tradotti.
 
@@ -285,7 +287,6 @@ def dub_with_piper(
     # Import locale per evitare di pesare a livello modulo: il pool
     # builder gira solo in handler DUB.
     from . import voice_pool as vp
-    from . import name_gender as ng
 
     # Risolvi il path voci: se quello configurato è vuoto (es. /models/piper
     # su emptyDir non seedato), ricadi sulle voci bakate nell'immagine.
@@ -309,26 +310,14 @@ def dub_with_piper(
                 0.0, float(s.get("end", 0)) - float(s.get("start", 0))
             )
         speakers = [
-            {"diarLabel": k, "displayName": (speaker_names or {}).get(k), "totalSpeechSec": v}
+            {"diarLabel": k, "totalSpeechSec": v}
             for k, v in times.items()
         ]
-    elif speaker_names:
-        # arricchisci con displayName se fornito separatamente
-        for sp in speakers:
-            if not sp.get("displayName"):
-                sp["displayName"] = speaker_names.get(sp.get("diarLabel"))
 
-    # Pre-compute gender map (firstname.lower → "M"|"F"|"N")
-    display_names = [s.get("displayName") or "" for s in speakers]
-    gender_map = ng.name_gender_map(display_names)
-
-    voice_map: dict[str, vp.VoiceEntry] = vp.assign_voices(
-        speakers, pool, name_gender=gender_map,
-    )
+    voice_map: dict[str, vp.VoiceEntry] = vp.assign_voices(speakers, pool)
     log.info(
-        "Piper pool=%d entries, gender map=%s, assignment=%s",
+        "Piper pool=%d entries, assignment=%s",
         len(pool),
-        gender_map,
         {k: v.voice_id for k, v in voice_map.items()},
     )
 

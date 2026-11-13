@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Cluster GKE Standard, regionale, VPC nativo, con Dataplane V2.
 #
 # Standard e non Autopilot: il bridge vuole un pool di nodi suo (etichetta e

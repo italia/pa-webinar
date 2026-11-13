@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Le etichette di un evento: dagli slug scelti nel wizard alle righe di
  * collegamento. Le usano la creazione, la modifica dell'evento e la rotta

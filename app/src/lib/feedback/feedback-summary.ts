@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * La valutazione complessiva di un evento, calcolata in un modo solo per la
  * pagina pubblica, il riepilogo e le statistiche: una media per risposta

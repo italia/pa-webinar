@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * POST /api/internal/captions/segments  (ADR-018)
  *
@@ -16,7 +19,7 @@ import { z } from 'zod';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
-import { consensoTrascrizione, eventoDellaConferenza, postoDellEndpoint, type ConsensoTrascrizione } from '@/lib/captions/room';
+import { consensoTrascrizione, eventoDellaConferenza, postoDellEndpoint, voceEsclusa, type ConsensoTrascrizione } from '@/lib/captions/room';
 import { encryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { VERSIONE_TESTO_TRASCRIZIONE } from '@/lib/registration/consents';
@@ -63,9 +66,12 @@ export const POST = withErrorHandling(async (request) => {
     const gia = persone.get(endpointId);
     if (gia) return gia;
     const seatId = await postoDellEndpoint(event.id, endpointId);
-    const consenso = seatId
-      ? await consensoTrascrizione(event.id, seatId, VERSIONE_TESTO_TRASCRIZIONE)
-      : { dato: false, nome: null };
+    // Senza consenso alla registrazione non si tiene il testo, qualunque altra
+    // cosa abbia acconsentito: la trascrizione ne segna solo i tempi.
+    const consenso =
+      seatId && !(await voceEsclusa(event.id, endpointId))
+        ? await consensoTrascrizione(event.id, seatId, VERSIONE_TESTO_TRASCRIZIONE)
+        : { dato: false, nome: null };
     const persona = { seatId, consenso };
     persone.set(endpointId, persona);
     return persona;

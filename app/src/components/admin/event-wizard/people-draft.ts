@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Una persona nuova dell'evento, prima di entrare nell'elenco: la usano il
  * modulo del passo «Persone» e quello breve del passo «Programma», con le
@@ -35,6 +38,18 @@ export const BOZZA_VUOTA: Bozza = {
   publicListed: false,
   photoId: null,
 };
+
+/** La bozza ha qualcosa di scritto: il ruolo e la casella della pagina
+ *  pubblica da soli non contano, partono gia' impostati. */
+export function bozzaCompilata(b: Bozza): boolean {
+  return Boolean(
+    b.name.trim() ||
+    b.email.trim() ||
+    b.organization?.trim() ||
+    b.organizationLogoUrl ||
+    b.photoId
+  );
+}
 
 /** Perche' una persona non si aggiunge: le chiavi dei messaggi del passo
  *  «Persone» (`admin.wizard.step3`). */

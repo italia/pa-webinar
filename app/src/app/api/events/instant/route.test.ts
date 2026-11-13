@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 // @vitest-environment node
 /**
  * La chiamata rapida: la crea solo lo staff, nasce gia' in diretta, usa e getta

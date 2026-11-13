@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """
 Costruisce il payload finale e lo passa a `push_to_db.js` via stdin
 attraverso `kubectl exec`. Carica anche i dubbed audio (per lingua) su
@@ -88,7 +91,7 @@ def build_pipeline_snapshot(tx: dict, sm: dict, target_langs: list, dub_langs: l
         "tts": {
             "engine": "piper-tts",
             "license": "MIT",
-            "voiceAssignmentPolicy": "deterministic-by-speech-time, gender-aware",
+            "voiceAssignmentPolicy": "deterministic-by-speech-time",
         },
         "voiceAssignments": voice_assignments,
         "languages": {

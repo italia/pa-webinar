@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { mediaLockOf, type MediaLock } from '@/lib/auth/jwt';
 import type { EventoConsenso, RegolaConsenso } from './consent-rule';
 
@@ -5,21 +8,26 @@ import type { EventoConsenso, RegolaConsenso } from './consent-rule';
  * Il consenso alla registrazione all'ingresso nella conferenza, e cosa ne
  * segue nel token di Jitsi.
  *
- * Il consenso si chiede a chi partecipa quando l'evento registra e concede ai
- * partecipanti microfono, videocamera o schermo (lib/registration/consents).
- * Senza consenso:
- *   - con il solo ascolto (Event.listenOnlyWithoutConsent) si entra lo stesso,
- *     in solo ascolto: il token lo dice (`listenOnly`) e il bridge non apre
- *     mai microfono, videocamera ne' schermo di quella persona, nemmeno se un
- *     moderatore le da' la parola (mod_pa_media_lock). Per intervenire si
- *     rientra dando il consenso;
- *   - altrimenti non si entra: il server lo verifica, non solo la sala
- *     d'attesa.
+ * Il consenso non e' mai una condizione per entrare, e un consenso negato tocca
+ * solo chi lo nega. In un evento che registra, chi non ha un consenso valido in
+ * quel momento (pubblico, ospiti, moderatori, relatori, e chi non ha mai visto la
+ * casella perche' l'evento si limita ad avvisare) entra con i limiti di tutti e
+ * con `voiceExcluded`: in sala fa cio' che l'evento concede, nella registrazione
+ * non c'e'. mod_pa_media_lock lo scrive nella presenza, e la sessione del
+ * registratore non lo vede affatto (`hidden-from-recorder` di Jitsi); il
+ * registratore per persona salta la sua traccia. Blocchi della sala, parola e
+ * aspetto del video restano quelli dell'evento, per tutti. La sala glielo dice,
+ * con il consenso a un clic.
  *
- * Perche' il blocco valga per una persona sola, con il solo ascolto il blocco
- * della sala riguarda ogni mezzo, in ogni token dell'evento (chi entra per
- * primo lo accende), e chi ha dato il consenso e' ammesso per cio' che
- * l'evento concede (`mediaAdmit`): per lui non cambia niente.
+ * Il segno non va mai nel token come `hidden-from-recorder`: il client di Jitsi,
+ * che lo legge dal JWT, spegnerebbe microfono e videocamera di quella persona.
+ *
+ * Dove la voce non si puo' escludere (lib/recording/availability) il pubblico
+ * senza consenso resta in solo ascolto (`listenOnly`): il bridge non apre
+ * niente, nemmeno se un moderatore gli da' la parola. Chi conduce resta com'e',
+ * con l'avviso che il video lo riprende. Solo qui il blocco della sala riguarda
+ * ogni mezzo e ogni token dell'evento (chi entra per primo lo accende), e chi ha
+ * dato il consenso e' ammesso per cio' che l'evento concede (`mediaAdmit`).
  */
 
 export { regolaConsenso, type RegolaConsenso } from './consent-rule';
@@ -28,29 +36,29 @@ const TUTTO_BLOCCATO: MediaLock = { audio: true, video: true, desktop: true };
 
 export interface MediaDelToken {
   mediaLock: MediaLock;
-  /** In ogni token di un evento con il solo ascolto: la sala non toglie i
-   *  blocchi (mod_pa_media_lock rifiuta di spegnere la moderazione). */
+  /** Dove la voce non si puo' escludere: la sala non toglie i blocchi
+   *  (mod_pa_media_lock rifiuta di spegnere la moderazione). */
   consentLock?: boolean;
   mediaExempt?: boolean;
   mediaAdmit?: MediaLock;
   listenOnly?: boolean;
+  voiceExcluded?: boolean;
 }
 
-/**
- * I limiti dei mezzi nel token di una persona. `consenso` conta solo per chi
- * partecipa: chi conduce e chi interviene per incarico non lo danno qui.
- */
+/** I limiti dei mezzi nel token di una persona. */
 export function mediaDelToken(
   event: EventoConsenso,
   regola: RegolaConsenso,
   chi: 'moderatore' | 'relatore' | 'partecipante',
   consenso: boolean
 ): MediaDelToken {
+  const comeLEvento: MediaDelToken = {
+    mediaLock: mediaLockOf(event),
+    ...(chi === 'relatore' ? { mediaExempt: true } : {}),
+  };
+  if (!regola.registra) return comeLEvento;
   if (!regola.soloAscolto) {
-    return {
-      mediaLock: mediaLockOf(event),
-      ...(chi === 'relatore' ? { mediaExempt: true } : {}),
-    };
+    return consenso ? comeLEvento : { ...comeLEvento, voiceExcluded: true };
   }
   const base = { mediaLock: TUTTO_BLOCCATO, consentLock: true };
   if (chi === 'moderatore') return base;

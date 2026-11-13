@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """Test del parsing WebVTT per il dubbing (regression del blocker).
 
 segments_to_vtt scrive "<v LABEL>LABEL: testo": parse_translated_vtt deve

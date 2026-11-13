@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 // @vitest-environment node
 /**
  * La revoca dal link delle email: un solo consenso copre rubrica e
@@ -8,15 +11,15 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('@/lib/db', () => ({
   prisma: {
     person: { findUnique: vi.fn(), update: vi.fn() },
-    registration: { updateMany: vi.fn() },
-    $transaction: vi.fn(async (ops: unknown[]) => ops),
   },
 }));
+vi.mock('@/lib/live/consent-withdrawal', () => ({ ritiraComunicazioni: vi.fn() }));
 vi.mock('@/lib/persons/opt-out-token', () => ({
   verifyRubricaOptOutToken: (token: string) => (token === 'buono' ? { personId: 'p-1' } : null),
 }));
 
 import { prisma } from '@/lib/db';
+import { ritiraComunicazioni } from '@/lib/live/consent-withdrawal';
 
 import { POST } from './route';
 
@@ -32,6 +35,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   vi.mocked(prisma.person.findUnique).mockResolvedValue({
     id: 'p-1',
+    emailHash: 'impronta',
     displayName: 'x',
     organization: null,
     optedInToAddressBook: true,
@@ -43,22 +47,13 @@ describe('POST /api/rubrica/opt-out', () => {
   it('toglie la persona dalla rubrica e revoca le informazioni sui prossimi eventi', async () => {
     const res = await revoca('buono');
     expect(res.status).toBe(200);
-    expect(prisma.person.update).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: { id: 'p-1' },
-        data: expect.objectContaining({ optedInToAddressBook: false }),
-      }),
-    );
-    expect(prisma.registration.updateMany).toHaveBeenCalledWith({
-      where: { personId: 'p-1', consentFutureCommunications: true },
-      data: { consentFutureCommunications: false },
-    });
+    // Lo stesso ritiro della pagina dei propri dati, con la sua riga di audit.
+    expect(ritiraComunicazioni).toHaveBeenCalledWith('impronta');
   });
 
   it('un token non valido non tocca niente', async () => {
     const res = await revoca('cattivo');
     expect(res.status).toBe(401);
-    expect(prisma.person.update).not.toHaveBeenCalled();
-    expect(prisma.registration.updateMany).not.toHaveBeenCalled();
+    expect(ritiraComunicazioni).not.toHaveBeenCalled();
   });
 });

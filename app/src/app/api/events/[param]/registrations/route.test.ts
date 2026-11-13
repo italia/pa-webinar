@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 // @vitest-environment node
 /**
  * Chi può iscriversi quando l'amministrazione spegne l'iscrizione pubblica.
@@ -307,9 +310,9 @@ describe('POST registrations — consensi secondo il formato dell\'evento', () =
     expect(audit.recordingConsentRequired).toBe(false);
   });
 
-  it('con il microfono concesso la registrazione e\' obbligatoria, la trascrizione no', async () => {
+  it('con il microfono concesso la registrazione si chiede, ma non e\' mai una condizione', async () => {
     evento({ participantsCanUnmute: true });
-    expect((await iscrivitiCon({})).status).toBe(422);
+    expect((await iscrivitiCon({})).status).toBe(201);
     expect((await iscrivitiCon({ consentRecording: true })).status).toBe(201);
     const ok = await iscrivitiCon({ consentRecording: true, consentMultitrack: true });
     expect(ok.status).toBe(201);
@@ -317,8 +320,25 @@ describe('POST registrations — consensi secondo il formato dell\'evento', () =
 
   it('con il solo schermo condiviso si chiede il consenso alla registrazione', async () => {
     evento({ participantsCanShareScreen: true, multitrackRecordingEnabled: false });
-    expect((await iscrivitiCon({})).status).toBe(422);
+    expect((await iscrivitiCon({})).status).toBe(201);
     expect((await iscrivitiCon({ consentRecording: true })).status).toBe(201);
+  });
+
+  it('dove la voce resta fuori dal video, senza registrazione la trascrizione non vale', async () => {
+    vi.stubEnv('JIBRI_HEALTH_URL', 'http://jibri');
+    vi.stubEnv('RECORDING_VOICE_EXCLUSION', 'true');
+    try {
+      evento({ participantsCanUnmute: true });
+      expect((await iscrivitiCon({ consentMultitrack: true })).status).toBe(201);
+      const data = tx.registration.create.mock.calls.at(-1)?.[0]?.data as Record<string, unknown>;
+      expect(data.consentMultitrack).toBe(false);
+      expect(data.consentMultitrackVersion).toBeNull();
+      await iscrivitiCon({ consentRecording: true, consentMultitrack: true });
+      const dopo = tx.registration.create.mock.calls.at(-1)?.[0]?.data as Record<string, unknown>;
+      expect(dopo.consentMultitrack).toBe(true);
+    } finally {
+      vi.unstubAllEnvs();
+    }
   });
 
   it('dove l\'installazione non puo\' registrare il consenso alla registrazione non si chiede', async () => {

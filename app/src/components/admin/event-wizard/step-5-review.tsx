@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 'use client';
 
 /**
@@ -17,12 +20,15 @@ import { Icon } from '@/components/ui/icon';
 import { useDurataTesto } from '@/hooks/use-durata-testo';
 import { durataProgramma } from '@/lib/agenda/programme';
 import { parseLocaleList } from '@/lib/ai/target-locales';
+import { conduceSempreRegistrato, type VoceNelVideo } from '@/lib/live/consent-rule';
 import { registraChiConduce } from '@/lib/live/entry-consents';
+import { elencoVisibileAlPubblico } from '@/lib/live/participant-list';
 import { consensiRichiesti } from '@/lib/registration/consents';
 import { togglesFromMatrix } from '@/lib/utils/permission-matrix';
 import { splitTitleKicker } from '@/lib/utils/title-kicker';
 import { describeRRule } from '@/lib/utils/recurrence';
 
+import ConsentDiagram from './consent-diagram';
 import { vociCompilate } from './programme-plan';
 import { nomeLingua } from './text-translation';
 import type { CampoMancante } from './validation';
@@ -60,6 +66,8 @@ interface Props {
   /** La post-produzione AI e' accesa sull'installazione. */
   /** L'installazione puo' registrare: senza, non si chiede il consenso. */
   recordingAvailable?: boolean;
+  /** La voce di chi non acconsente nel video (lib/recording/availability). */
+  voceNelVideo?: VoceNelVideo;
   /** Chiamata rapida: nessuna iscrizione, e chi conduce non e' interpellato. */
   istantanea?: boolean;
   aiPipelineEnabled?: boolean;
@@ -99,6 +107,7 @@ export default function Step5Review({
   mancanti = [],
   aiPipelineEnabled = true,
   recordingAvailable = true,
+  voceNelVideo = 'rimovibile',
   istantanea = false,
   liveCaptionsAvailable = false,
   capacita,
@@ -182,13 +191,16 @@ export default function Step5Review({
     participantsCanUnmute: toggles.participantsCanUnmute,
     participantsCanStartVideo: toggles.participantsCanStartVideo,
     participantsCanShareScreen: toggles.participantsCanShareScreen,
-    listenOnlyWithoutConsent: form.listenOnlyWithoutConsent,
   });
   const vociConsenso = [
     consensi.registrazione &&
-      (consensi.registrazioneFacoltativa
-        ? tf('consentRecordingFree')
-        : tf('consentRecordingRequired')),
+      tf(
+        voceNelVideo === 'rimovibile'
+          ? 'consentRecordingVoice'
+          : voceNelVideo === 'fissa'
+            ? 'consentRecordingFree'
+            : 'consentRecordingOptional'
+      ),
     consensi.avvisoRegistrazione && tf('consentRecordingNotice'),
     consensi.tracce && tf('consentTranscription'),
   ].filter((x): x is string => !!x);
@@ -489,14 +501,46 @@ export default function Step5Review({
                 ? tf('consentsLine', { list: vociConsenso.join(' · ') })
                 : tf('consentsNone')}
               {registraChiConduce({ recordingEnabled: form.recordingEnabled, eventType: istantanea ? 'INSTANT' : null }, recordingAvailable) && (
-                <span className="d-block text-secondary small mt-1">{tf('consentsHosts')}</span>
+                <span className="d-block text-secondary small mt-1">
+                  {tf(conduceSempreRegistrato(form, voceNelVideo) ? 'consentsHostsAlways' : 'consentsHosts')}
+                </span>
               )}
               {(consensi.registrazione || consensi.tracce) && (
                 <span className="d-block text-secondary small">{tf('consentsWithdraw')}</span>
               )}
             </span>
           </li>
+          <li>
+            <span className="anteprima-righe__icona">
+              <Icon icon="it-user" size="sm" />
+            </span>
+            <span>
+              {elencoVisibileAlPubblico({
+                participantListVisible: form.participantListVisible,
+                audienceAnonymous: form.audienceAnonymous,
+                eventType: istantanea ? 'INSTANT' : null,
+              })
+                ? tf('participantListShown')
+                : tf('participantListHidden')}
+              {!form.participantListVisible && toggles.participantsCanStartVideo && (
+                <span className="d-block text-secondary small mt-1">{tp('participantListCameraNote')}</span>
+              )}
+            </span>
+          </li>
         </ul>
+        {registra && !istantanea && (
+          <ConsentDiagram
+            multitrackRecordingEnabled={form.recordingEnabled && !!form.multitrackRecordingEnabled}
+            captionsTranscript={
+              liveCaptionsAvailable && form.liveCaptionsEnabled && !!form.captionsTranscriptEnabled
+            }
+            participantsCanUnmute={toggles.participantsCanUnmute}
+            participantsCanStartVideo={toggles.participantsCanStartVideo}
+            participantsCanShareScreen={toggles.participantsCanShareScreen}
+            hostsAlwaysRecorded={form.hostsAlwaysRecorded}
+            voce={voceNelVideo}
+          />
+        )}
         {capacita && (
           <RigaCapacita
             capacita={capacita}

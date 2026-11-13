@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """Ancora la radice del pacchetto per pytest.
 
 I test importano i moduli del worker per nome (`import align`, `import llm`,

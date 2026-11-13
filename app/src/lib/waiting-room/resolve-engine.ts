@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Resolve which waiting-room view to render, from the configured default
  * (admin site + per-event) and the client-side signals. Kept pure so the

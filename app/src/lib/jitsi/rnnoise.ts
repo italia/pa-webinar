@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Chi decide se la soppressione rumore avanzata (rnnoise) di Jitsi è accesa,
  * e soprattutto QUANDO quella decisione viene presa.

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Caricamento di un video dal browser direttamente nello storage delle
  * registrazioni, per i componenti dell'amministrazione.

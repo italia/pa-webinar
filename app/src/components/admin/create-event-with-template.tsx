@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 'use client';
 
 import { useState } from 'react';
@@ -5,6 +8,7 @@ import { useTranslations } from 'next-intl';
 
 import { useRouter, percorso } from '@/i18n/navigation';
 import GuidedFormat from '@/components/admin/guided-format';
+import type { VoceNelVideo } from '@/lib/live/consent-rule';
 import TemplatePicker from '@/components/admin/template-picker';
 import {
   FORMATO_PREDEFINITO,
@@ -85,6 +89,7 @@ interface Props {
   /** I sottotitoli live ci sono nell'installazione (lib/captions/availability). */
   liveCaptionsAvailable?: boolean;
   recordingAvailable?: boolean;
+  voceNelVideo?: VoceNelVideo;
   defaultTargetLocales?: string | null;
   /** La post-produzione AI e' accesa sull'installazione. */
   aiPipelineEnabled?: boolean;
@@ -121,6 +126,7 @@ export default function CreateEventWithTemplate({
   whiteboardInfraReady,
   liveCaptionsAvailable = false,
   recordingAvailable = true,
+  voceNelVideo,
   defaultTargetLocales = null,
   aiPipelineEnabled = true,
   textTranslationAvailable = false,
@@ -180,6 +186,7 @@ export default function CreateEventWithTemplate({
       whiteboardInfraReady={whiteboardInfraReady}
       liveCaptionsAvailable={liveCaptionsAvailable}
       recordingAvailable={recordingAvailable}
+      voceNelVideo={voceNelVideo}
       defaultTargetLocales={defaultTargetLocales}
       aiPipelineEnabled={aiPipelineEnabled}
       textTranslationAvailable={textTranslationAvailable}

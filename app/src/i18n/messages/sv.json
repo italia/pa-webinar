@@ -330,6 +330,14 @@
     "exitFullscreen": "Avsluta helskärm",
     "recordingActive": "Inspelning pågår",
     "recordingShort": "REC",
+    "transcriptionActive": "Transkribering pågår",
+    "transcriptionShort": "Transkribering",
+    "captureNoticeRecordingOn": "Inspelningen har startat: rummet spelas in från och med nu.",
+    "captureNoticeRecordingOff": "Inspelningen har stoppats.",
+    "captureNoticeVoicesOn": "Röstinspelningen har startat: från och med nu spelas rösterna in från dem som har samtyckt.",
+    "captureNoticeVoicesOff": "Röstinspelningen har stoppats.",
+    "captureNoticeTranscriptionOn": "Transkriberingen har startat: från och med nu sparas texten från dem som har samtyckt.",
+    "captureNoticeTranscriptionOff": "Transkriberingen har stoppats.",
     "enterRoom": "Gå in i rummet",
     "leaveRoom": "Lämna rummet",
     "leaveChoice": {
@@ -535,7 +543,9 @@
       "handsRaised": "{count, plural, one {# uppräckt hand} other {# uppräckta händer}}",
       "locksByConsent": "Mikrofoner och kameror följer samtycket till inspelningen: de som gett det använder det evenemanget tillåter, övriga lyssnar bara. Rummets lås förblir på.",
       "listenOnlyBadge": "lyssnar bara",
-      "listenOnlyNoFloor": "Har inte samtyckt till inspelningen: kan inte tala förrän samtycke ges i det egna rummet."
+      "listenOnlyNoFloor": "Har inte samtyckt till inspelningen: kan inte tala förrän samtycke ges i det egna rummet.",
+      "voiceExcludedBadge": "utan inspelning",
+      "voiceExcludedFloor": "Har inte samtyckt till inspelningen: kan yttra sig men står utanför inspelningen."
     },
     "moderator": {
       "muteAll": "Tysta alla",
@@ -677,13 +687,13 @@
         "without": {
           "soloAscolto": "Utan detta samtycke lyssnar du bara: mikrofon, kamera och skärm förblir stängda.",
           "conduce": "Utan detta samtycke leder du ändå, men din röst sparas inte i spåren per person eller i transkriptionen.",
-          "uscita": "För att delta i evenemanget krävs samtycke till inspelningen."
+          "voce": "Utan detta samtycke deltar du som alla andra, men står utanför inspelningen: varken namn, röst eller bild."
         },
         "alreadyRecorded": "Det som redan har spelats in finns kvar i evenemangets video: skriv till arrangörerna för att få det borttaget.",
         "withdraw": {
           "soloAscolto": "Om du återkallar det stannar du i rummet och lyssnar bara: mikrofon, kamera och skärm stängs. Ditt samtycke till transkription av dina inlägg återkallas också.",
-          "uscita": "Om du återkallar det lämnar du mötet och går tillbaka till väntrummet: deltagande kräver samtycke till inspelningen. Ditt samtycke till transkription av dina inlägg återkallas också.",
-          "conduce": "Om du återkallar det fortsätter du leda, men från och med nu sparas din röst inte i spåren per person eller i transkriptionen. Rummets video visar dig ändå om den spelas in."
+          "conduce": "Om du återkallar det fortsätter du leda, men från och med nu sparas din röst inte i spåren per person eller i transkriptionen. Rummets video visar dig ändå om den spelas in.",
+          "voce": "Om du återkallar det är du kvar i rummet som förut, och från nu står du utanför inspelningen. Du återkallar också samtycket till utskrift av dina inlägg."
         }
       },
       "transcription": {
@@ -693,6 +703,11 @@
         "withdrawEffect": "Om du återkallar det förlorar dina redan transkriberade meningar text och namn, och från och med nu spelas din röst varken in på ett eget spår eller transkriberas.",
         "needsRecording": "Du kan ge det efter samtycke till inspelningen."
       }
+    },
+    "voiceExcluded": {
+      "title": "Du deltar utan inspelning.",
+      "consent": "Jag samtycker till inspelningen",
+      "body": "Du har inte samtyckt till inspelningen: du deltar som alla andra, men ditt namn, din röst och din bild kommer inte med i inspelningen."
     }
   },
   "qa": {
@@ -1010,13 +1025,17 @@
           }
         },
         "recordingManualNote": "Inspelningen startar aldrig av sig själv: en moderator startar den med REC-knappen.",
-        "listenOnlyWithoutConsent": "Den som inte samtycker deltar bara som lyssnare",
-        "listenOnlyWithoutConsentOn": "Samtycke till inspelningen är frivilligt: den som inte ger det deltar ändå, följer och skriver i chatten, men mikrofon, kamera och skärm förblir avstängda.",
-        "listenOnlyWithoutConsentOff": "Utan samtycke till inspelningen kommer ingen in.",
-        "listenOnlyLockedLive": "Medan rummet kan vara öppet går inspelning och endast lyssning inte att ändra: de gäller från första inträdet.",
         "audienceAnonymous": "Anonym publik",
         "audienceAnonymousDesc": "Deltagare visas för andra under en pseudonym (”Deltagare” och en kod) i video, chatt och frågor; deltagarlistan stannar hos värdarna och det finns inget torg. Bra för stora evenemang; på gemenskapsevenemang vill man lära känna varandra.",
-        "audienceAnonymousLocked": "Kan inte ändras medan rummet kan vara öppet: det skulle koppla pseudonymer till namn."
+        "audienceAnonymousLocked": "Kan inte ändras medan rummet kan vara öppet: det skulle koppla pseudonymer till namn.",
+        "participantListVisible": "Visa deltagarlistan för publiken",
+        "participantListVisibleDesc": "Av: listan, rutnätet och namnen på torget stannar hos värdar och talare; publiken ser bara den som talar. På: alla ser vilka som är i rummet.",
+        "participantListAnonymous": "Med anonym publik förblir listan dold.",
+        "participantListLocked": "Kan inte ändras när rummet är öppet: de som redan är inne skulle inte se ändringen.",
+        "participantListCameraNote": "Med dold lista ser den som slår på kameran inte sin egen ruta. Visa listan vid ett möte där alla ser varandra.",
+        "recordingLockedLive": "Inspelning kan inte ändras när rummet är öppet: den gäller från första inträdet.",
+        "hostsAlwaysRecorded": "De som leder finns alltid med i inspelningen",
+        "hostsAlwaysRecordedDesc": "Avstängt väljer moderatorer och talare som alla andra. Slå på det bara om de redan har gått med på att filmas: de ser inte rutan, och evenemangets information måste ange det."
       },
       "step3": {
         "heading": "Personer och inbjudningar",
@@ -1309,13 +1328,17 @@
         "permissionsHeading": "Vem som får göra vad i rummet",
         "permissionsIntro": "Vad deltagarna kan göra och vilka funktioner i rummet som är på. Allt kan också ändras under evenemanget.",
         "consentsLine": "Samtycken vid anmälan och i rummet: {list}",
-        "consentRecordingRequired": "inspelning, krävs för att komma in",
         "consentRecordingFree": "inspelning, frivillig (utan: bara lyssna)",
         "consentRecordingNotice": "för inspelningen bara ett meddelande (deltagarna varken talar eller syns)",
         "consentTranscription": "transkription av egna inlägg, frivillig",
         "consentsNone": "Inget samtycke utöver det vid anmälan.",
         "consentsHosts": "Moderatorer och talare tillfrågas om inspelningen i rummet, frivilligt.",
-        "consentsWithdraw": "Deltagarna kan återkalla dem i rummet med knappen ”Samtycken”."
+        "consentsWithdraw": "Deltagarna kan återkalla dem i rummet med knappen ”Samtycken”.",
+        "participantListShown": "Deltagarlista: synlig för alla.",
+        "participantListHidden": "Deltagarlista: endast för värdar och talare.",
+        "consentRecordingOptional": "inspelning, frivillig",
+        "consentRecordingVoice": "inspelning, valfri (utan samtycke står personen utanför inspelningen)",
+        "consentsHostsAlways": "De som leder och talar finns alltid med i inspelningen: de ser inte rutan."
       },
       "preview": {
         "title": "Förhandsvisning av sidan",
@@ -1373,7 +1396,37 @@
         "toggleOffWarningCreate": "Avslaget visas programmet ({count, plural, one {# ämne} other {# ämnen}}) inte på sidan och sparas inte med evenemanget: slå på det för att behålla det.",
         "reviewOffCreate": "Program: av, sparas inte med evenemanget ({count, plural, one {# ämne} other {# ämnen}})"
       },
-      "saveCopy": "Spara kopian"
+      "saveCopy": "Spara kopian",
+      "consentMap": {
+        "show": "Visa vad som händer med samtycken",
+        "hide": "Dölj diagrammet",
+        "title": "Samtycken till inspelning vid detta evenemang",
+        "person": "Den som kommer in",
+        "question": "Har samtyckt till inspelningen?",
+        "yes": "Ja",
+        "no": "Nej",
+        "room": "I rummet",
+        "recording": "I inspelningen",
+        "roomSame": "Deltar enligt evenemangets regler.",
+        "roomListenOnly": "Lyssnar och chattar bara.",
+        "recordedFull": "Namn, röst, bild och delad skärm.",
+        "notRecorded": "Syns inte: varken namn, röst, bild eller delad skärm.",
+        "recordedVoice": "Rösten, på ett separat spår.",
+        "notRecordedVoice": "Rösten spelas inte in.",
+        "othersSame": "Övriga ändras inte: mikrofonlås, ordet och videons utseende förblir som i evenemanget.",
+        "audienceNotice": "Deltagare har ingen mikrofon, kamera eller skärm: de får bara en avisering. Får de ordet kan de samtycka i rummet; gör de inte det står de utanför inspelningen.",
+        "hostsChoose": "Moderatorer och talare väljer som alla andra: den som inte samtycker leder som vanligt men står utanför inspelningen.",
+        "hostsAlways": "Moderatorer och talare finns alltid med i inspelningen: de ser inte rutan.",
+        "hostsFixed": "Moderatorer och talare leder i alla fall, och videon filmar dem.",
+        "trace": "Om personen talar under inspelningen anger en notering bredvid videon att ett inlägg saknas, och utskriften markerar *** med klockslaget.",
+        "anytime": "Samtycke ges och återkallas i rummet, när som helst.",
+        "transcription": "Utskrift av de egna inläggen är ett separat, frivilligt samtycke.",
+        "fixedVoice": "Den här installationen kan inte ta bort en röst från videon: den som inte samtycker förblir enbart lyssnare, och rummets lås följer samtycket.",
+        "fixedNotice": "Den här installationen kan inte ta bort en röst från videon: den som får ordet hamnar i inspelningen, och avisering anger det.",
+        "questionTranscription": "Finns samtycke till transkriberingen?",
+        "fixedNotRecorded": "Ingen röst eller bild; namnet kan synas i videon."
+      },
+      "unaddedEntry": "Du har fyllt i detta utan att bekräfta det: tryck på knappen för att lägga till det, eller töm fälten."
     },
     "nav": {
       "events": "Evenemang",
@@ -2851,6 +2904,7 @@
       "editEvent": "Redigera evenemang",
       "featureSummary": "Aktiva funktioner",
       "organizers": "Arrangörer",
+      "peopleTabLink": "Alla detaljer på fliken ”{tab}”",
       "privacyGdpr": "Integritet och GDPR",
       "postEventTitle": "Efter evenemanget och feedback",
       "recordingSection": "Evenemangets video",
@@ -3958,7 +4012,8 @@
     "eventLabel": "Evenemang",
     "dateLabel": "Datum",
     "timeLabel": "Tid",
-    "durationLabel": "Längd"
+    "durationLabel": "Längd",
+    "myDataLink": "Dina uppgifter: se dem, rätta dem, återkalla ett samtycke eller avbryt anmälan"
   },
   "home": {
     "hero": {
@@ -4326,14 +4381,16 @@
   "gdpr": {
     "consent": {
       "recording": "Jag samtycker till ljud-/videoinspelning av detta evenemang",
-      "recordingRequired": "Samtycke till inspelning krävs för att delta i detta evenemang",
-      "recordingNotice": "Evenemanget spelas in (ljud och bild). Du deltar utan mikrofon och kamera: inspelningen innehåller inte din röst eller bild, om inte värden ger dig ordet.",
       "multitrack": "Jag samtycker till att mina inlägg transkriberas med mitt namn för evenemangets sammanfattning. Om evenemanget spelar in ett separat ljudspår för varje person spelas min röst in enbart i detta syfte och spåret raderas efter transkriberingen; det används inte för att identifiera eller återskapa min röst.",
       "multitrackOptional": "Det är frivilligt: om du inte samtycker deltar du ändå, men det du säger kommer inte med i transkriptionen och din röst spelas inte in på ett eget spår. Om evenemanget spelas in finns din röst ändå kvar i videon.",
       "stayInTouch": "Jag vill få information om kommande evenemang och läggas till i adressboken för att bjudas in till liknande evenemang",
       "stayInTouchHelp": "Frivilligt samtycke (art. 6.1.a GDPR). Du kan när som helst återkalla det via länken ”Ta bort mig från adressboken” i de e-postmeddelanden du får. Namn och organisation är de från den här anmälan.",
       "recordingOptionalListenOnly": "Om du inte samtycker deltar du ändå, bara som lyssnare: du följer och skriver i chatten, men mikrofon, kamera och skärmdelning förblir avstängda. Du kan samtycka senare, från rummet.",
-      "recordingOptionalHost": "Om du inte samtycker kommer du ändå in och leder som vanligt, men din röst sparas inte i spåren per person eller i transkriptionen. Videon av rummet, om den spelas in, visar dig ändå."
+      "recordingOptionalHost": "Om du inte samtycker kommer du ändå in och leder som vanligt, men din röst sparas inte i spåren per person eller i transkriptionen. Videon av rummet, om den spelas in, visar dig ändå.",
+      "recordingOptionalVoice": "Om du inte samtycker deltar du ändå och kan yttra dig, men står utanför inspelningen: varken namn, röst eller bild. Du kan samtycka senare, från rummet.",
+      "recordingNotice": "Evenemanget spelas in (ljud och bild). Du deltar utan mikrofon och kamera: inspelningen innehåller inte din röst eller bild, om inte värden ger dig ordet.",
+      "recordingNoticeVoice": "Evenemanget spelas in (ljud och video). Du deltar utan mikrofon och kamera: inspelningen innehåller varken ditt namn, din röst eller din bild, om du inte samtycker i rummet.",
+      "recordingHostAlways": "Du leder det här evenemanget: du är alltid med i inspelningen, med namn, röst, bild och delad skärm."
     },
     "export": {
       "title": "Mina uppgifter",
@@ -4374,7 +4431,12 @@
       "grantSince": "Sedan {date}",
       "grantPublic": "visas på den offentliga sidan",
       "grantPhoto": "Foto uppladdat av evenemangets team",
-      "grantRevoked": "åtkomst återkallad {date}"
+      "grantRevoked": "åtkomst återkallad {date}",
+      "consentsIntro": "Du kan när som helst återkalla varje samtycke, före eller efter evenemanget. Din anmälan gäller fortfarande.",
+      "consentFuture": "Framtida meddelanden",
+      "consentWithdrawnOn": "Återkallat {date}",
+      "consentNoteInRoom": "Om du är i rummet just nu gäller återkallelsen från nästa inträde: använd Samtycken i rummet för att den ska gälla direkt.",
+      "consentFutureEffect": "Om du återkallar det får du inte längre meddelanden om kommande evenemang och du lämnar adressboken, för alla dina anmälningar."
     },
     "erasure": {
       "title": "Radering av dina uppgifter",
@@ -5161,9 +5223,7 @@
         "none": "Inga"
       },
       "voices": {
-        "title": "Syntetiska röster tilldelade talarna",
-        "male": "manlig röst",
-        "female": "kvinnlig röst"
+        "title": "Syntetiska röster tilldelade talarna"
       },
       "runAt": "Bearbetningen slutfördes den",
       "version": "Pipelineversion"
@@ -5171,7 +5231,8 @@
     "overlapBadge": "samtidigt",
     "overlapTitle": "Samtidigt tal: i det här intervallet talar mer än en person samtidigt.",
     "anonymousSpeaker": "Deltagare {n}",
-    "untranscribed": "Inte transkriberat: talaren gav inte sitt samtycke"
+    "untranscribed": "Inte transkriberat: talaren gav inte sitt samtycke",
+    "unrecordedSpeech": "Vissa inlägg finns inte i inspelningen: de som talade samtyckte inte."
   },
   "waiting": {
     "startsIn": "Evenemanget börjar om",
@@ -5242,8 +5303,7 @@
     "aiNotice": "När det är slut bearbetas inspelningen av AI-verktyg för att skapa transkription, sammanfattning och eventuella översättningar och dubbning. Resultaten kan innehålla felaktigheter; videon är fortfarande den auktoritativa källan.",
     "multitrackConsentTitle": "Transkription av dina inlägg",
     "recordingConsentTitle": "Inspelning av evenemanget",
-    "recordingConsentIntro": "Evenemanget spelas in (ljud och bild). Om du tar ordet innehåller inspelningen din röst, din bild och det du delar på skärmen.",
-    "recordingConsentRequired": "Ditt samtycke till inspelningen krävs för att komma in.",
+    "recordingConsentIntro": "Evenemanget spelas in (ljud och video). Med ditt samtycke innehåller inspelningen ditt namn, din röst, din bild och det du delar på skärmen.",
     "enterGardenTitle": "Gå in på torget",
     "enterGardenHint": "En annan plats att vänta på: gå runt, träffa de andra som väntar och gå in i livesändningen genom grinden när rummet öppnar.",
     "backToWaitingRoom": "Tillbaka till väntrummet",

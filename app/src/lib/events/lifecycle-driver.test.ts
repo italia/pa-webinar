@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Chi conduce il ciclo di vita: lo scaler, se il suo battito c'è; altrimenti
  * il giro a bridge fisso. Il ripiego senza Redis è JVB_SCALER_ENABLED.

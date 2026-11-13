@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
@@ -9,7 +12,7 @@ import { anteprimaEventoPubblico } from '@/lib/events/meta-title';
 import { getPublicEnv } from '@/lib/env';
 import { captionsTranscriptActive, liveCaptionsAvailable } from '@/lib/captions/availability';
 import { getSettings } from '@/lib/settings';
-import { recordingAvailable } from '@/lib/recording/availability';
+import { recordingAvailable, voceNelVideo } from '@/lib/recording/availability';
 import { registraChiConduce } from '@/lib/live/entry-consents';
 import { informativaEvento } from '@/lib/events/privacy-notice';
 import LiveEventClient from '@/components/live/live-event-client';
@@ -28,6 +31,7 @@ import { resolveWhiteboardInfraReady } from '@/lib/jitsi/whiteboard';
 import { localizedPath } from '@/lib/utils/localized-url';
 import { OVERTIME_CAP_DEFAULT_MINUTES } from '@/lib/events/overtime-defaults';
 import { entiEPersonePubblici, PERSONE_PUBBLICHE_INCLUDE } from '@/lib/events/public-people';
+import { elencoVisibileAlPubblico } from '@/lib/live/participant-list';
 
 export const dynamic = 'force-dynamic';
 
@@ -188,6 +192,8 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             // Pubblico anonimo: niente piazza, dove ci si riconosce dal nome.
             waitingRoomEngine: event.audienceAnonymous ? 'CLASSIC' : (event.waitingRoomEngine ?? settings.waitingRoomEngine),
             audienceAnonymous: event.audienceAnonymous,
+            participantListVisible: elencoVisibileAlPubblico(event),
+            hostsAlwaysRecorded: event.hostsAlwaysRecorded,
             videoQuality,
             startsAt: event.startsAt.toISOString(),
             endsAt: event.endsAt.toISOString(),
@@ -223,7 +229,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             tempRecordingUrl: event.tempRecordingUrl,
             feedbackEnabled: event.feedbackEnabled,
             recordingConsentText: isInstant ? null : event.recordingConsentText,
-            listenOnlyWithoutConsent: event.listenOnlyWithoutConsent,
+            voceNelVideo: voceNelVideo(),
             privacy,
             timezone: event.timezone,
             registrationCount: event._count.registrations,
@@ -397,6 +403,8 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         // Pubblico anonimo: niente piazza, dove ci si riconosce dal nome.
         waitingRoomEngine: event.audienceAnonymous ? 'CLASSIC' : (event.waitingRoomEngine ?? settings.waitingRoomEngine),
         audienceAnonymous: event.audienceAnonymous,
+        participantListVisible: elencoVisibileAlPubblico(event),
+        hostsAlwaysRecorded: event.hostsAlwaysRecorded,
         startsAt: event.startsAt.toISOString(),
         endsAt: event.endsAt.toISOString(),
         status: event.status,
@@ -432,7 +440,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         tempRecordingUrl: event.tempRecordingUrl,
         feedbackEnabled: event.feedbackEnabled,
         recordingConsentText: event.recordingConsentText,
-        listenOnlyWithoutConsent: event.listenOnlyWithoutConsent,
+        voceNelVideo: voceNelVideo(),
         privacy,
         timezone: event.timezone,
         registrationCount: event._count.registrations,

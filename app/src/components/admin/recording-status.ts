@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Lo stato di una registrazione come lo dice l'interfaccia: la chiave di
  * admin.postprod per ciascun valore di RecordingStatus. Un valore sconosciuto

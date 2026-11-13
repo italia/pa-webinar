@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * La traduzione automatica di titolo e descrizione dell'evento: i lavori di
  * traduzione e cio' che succede quando il worker consegna.

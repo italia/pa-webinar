@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il corpo con cui il modulo del Q&A (QuestionForm) invia una domanda, fuori
  * dal componente perché si possa verificare senza caricare design-react-kit.

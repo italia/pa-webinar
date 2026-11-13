@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Contratto di scrittura della modifica di un evento.
  *
@@ -55,6 +58,8 @@ const { sessioni } = vi.hoisted(() => ({
   sessioni: { closeOpenSessions: vi.fn(async () => 0) },
 }));
 vi.mock('@/lib/events/call-sessions', () => sessioni);
+const sala = vi.hoisted(() => ({ salaForseAperta: vi.fn(async () => false) }));
+vi.mock('@/lib/live/room-open', () => sala);
 const sondaggi = vi.hoisted(() => ({ chiudiSondaggiAperti: vi.fn(async () => 0) }));
 vi.mock('@/lib/events/close-polls', () => sondaggi);
 
@@ -126,6 +131,7 @@ function eventoEsistente(status = 'PUBLISHED') {
     participantsCanUnmute: false,
     participantsCanStartVideo: false,
     participantsCanShareScreen: false,
+    participantListVisible: false,
     expectedSenderRatioPct: null,
     // La configurazione che una modifica parziale non deve poter cancellare.
     requireOrganization: true,
@@ -167,6 +173,7 @@ const MAI_SENZA_INVIO = [
   'accessMode',
   'privacyPolicyText',
   'gdprTemplateId',
+  'participantListVisible',
 ] as const;
 
 describe('PUT /api/events/[param] — le modifiche parziali restano parziali', () => {
@@ -194,6 +201,34 @@ describe('PUT /api/events/[param] — le modifiche parziali restano parziali', (
     for (const campo of MAI_SENZA_INVIO) {
       expect(dati).not.toHaveProperty(campo);
     }
+  });
+
+  it("l'elenco dei partecipanti non cambia a sala aperta", async () => {
+    sala.salaForseAperta.mockResolvedValueOnce(true);
+
+    await PUT(richiesta({ participantListVisible: true, title: { it: 'Altro' } }), contesto as never);
+
+    expect(datiScritti()).not.toHaveProperty('participantListVisible');
+  });
+
+  it('l\'opzione di chi conduce non si azzera con un aggiornamento che non la nomina', async () => {
+    await PUT(richiesta({ title: { it: 'Altro' } }), contesto as never);
+    expect(datiScritti()).not.toHaveProperty('hostsAlwaysRecorded');
+  });
+
+  it('l\'opzione di chi conduce non cambia a sala aperta', async () => {
+    sala.salaForseAperta.mockResolvedValueOnce(true);
+
+    await PUT(richiesta({ hostsAlwaysRecorded: true, title: { it: 'Altro' } }), contesto as never);
+
+    expect(datiScritti()).not.toHaveProperty('hostsAlwaysRecorded');
+  });
+
+
+  it("l'elenco dei partecipanti si sceglie a sala chiusa", async () => {
+    await PUT(richiesta({ participantListVisible: true }), contesto as never);
+
+    expect(datiScritti()).toMatchObject({ participantListVisible: true });
   });
 
   it("l'avvio automatico della registrazione si puo' spegnere, non accendere", async () => {
@@ -347,6 +382,17 @@ describe('PUT /api/events/[param] — le modifiche parziali restano parziali', (
     staff.requireEventManager.mockResolvedValueOnce({ role: 'organizer' });
     await PUT(richiesta({ accessMode: 'INVITATION' }), contesto as never);
     expect(datiScritti().accessMode).toBe('INVITATION');
+  });
+
+  it('l opzione di chi conduce la cambia solo lo staff dell evento', async () => {
+    staff.requireEventManager.mockRejectedValueOnce(new UnauthorizedError());
+    const res = await PUT(richiesta({ hostsAlwaysRecorded: true }), contesto as never);
+    expect(res.status).toBe(403);
+    expect(mocked.event.update).not.toHaveBeenCalled();
+
+    staff.requireEventManager.mockResolvedValueOnce({ role: 'organizer' });
+    await PUT(richiesta({ hostsAlwaysRecorded: true }), contesto as never);
+    expect(datiScritti().hostsAlwaysRecorded).toBe(true);
   });
 
   it('rimandare la scelta che c e gia non chiede lo staff', async () => {

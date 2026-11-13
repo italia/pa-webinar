@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # shellcheck shell=bash
 #
 # Funzioni comuni a install-server.sh e install-agent.sh (sul nodo), e a

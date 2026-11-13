@@ -197,11 +197,9 @@ language and ignores an `.onnx` without its JSON. A multi-speaker model
 contributes up to 20 voices. Each voice then gets pitch variants at 0, -300
 and +300 cents. The pool lists all base voices first, then their variants.
 `voice_pool.assign_voices` gives each speaker label its own voice, in order
-of speaking time, and reuses voices only when the pool runs out. `run_dub`
-passes no display names, so every speaker counts as gender-unknown and
-receives the next unused voice in pool order. The first-name matching in
-`name_gender.py` runs only when a caller supplies names. The output is
-always a catalog synthetic voice, never a cloned one.
+of speaking time, and reuses voices only when the pool runs out. It does not
+read the speaker's name. The output is always a catalog synthetic voice, never
+a cloned one.
 
 ## Module map
 
@@ -225,7 +223,6 @@ always a catalog synthetic voice, never a cloned one.
   per cue, silence padding, pitch shifts, the AudioSeal watermark and the
   stub tone.
 - `voice_pool.py`: builds the voice pool and assigns voices to speakers.
-- `name_gender.py`: infers M, F or N from a first name, for voice matching.
 - `archive.py`: builds and runs the ffmpeg command that muxes the composite
   video, the per-participant tracks and the subtitles into one MKV.
 - `text_translate.py`: the translation of an event's title and description

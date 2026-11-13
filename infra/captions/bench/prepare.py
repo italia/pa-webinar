@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """Prepara il corpus del banco di prova a partire da FLEURS italiano (test).
 
 Produce, sotto la cartella di lavoro:

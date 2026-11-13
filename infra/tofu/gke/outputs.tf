@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Uscite: ciò che serve per collegarsi al cluster, per i record DNS e per i
 # valori del chart. Nessun segreto in chiaro: il segreto HMAC è marcato
 # sensibile e si legge solo con `tofu output -raw storage_hmac_secret`.

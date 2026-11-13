@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 'use client';
 
 /**
@@ -26,6 +29,8 @@ import { useLocale, useTranslations } from 'next-intl';
 
 import { useRouter, percorso } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
+import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import { elencoPredefinito } from '@/lib/live/participant-list';
 import { profiloSalvato } from '@/lib/events/grant-profile';
 import { eventAdminPath } from '@/lib/events/admin-links';
 import { MAX_RETENTION_DAYS } from '@/lib/validation/retention';
@@ -60,6 +65,7 @@ import {
   newFanoutReport,
   submitQuestionnaire,
 } from './edit-fanout';
+import { creaRegistroBozze, RegistroBozzeContext } from './bozze-in-sospeso';
 import { rememberCreation, type UnsavedResource } from './created-event';
 import StepProgramma from './programme-section';
 import ProgrammeCard from './programme-card';
@@ -200,6 +206,8 @@ export interface WizardProps {
   /** L'installazione puo' registrare (lib/recording/availability): senza,
    *  il riepilogo non promette consensi alla registrazione. */
   recordingAvailable?: boolean;
+  /** La voce di chi non acconsente nel video (lib/recording/availability). */
+  voceNelVideo?: VoceNelVideo;
   /** Le lingue di traduzione predefinite dell'istanza (SiteSetting). */
   defaultTargetLocales?: string | null;
   /** La post-produzione AI e' accesa sull'installazione: spenta, il passo Permessi
@@ -289,8 +297,9 @@ export interface InitialEventShape {
     liveCaptionsEnabled?: boolean | null;
     captionsTranscriptEnabled?: boolean | null;
     autoStartRecording: boolean;
-    listenOnlyWithoutConsent?: boolean;
     audienceAnonymous?: boolean;
+    participantListVisible?: boolean;
+    hostsAlwaysRecorded?: boolean;
     aiTranscriptEnabled?: boolean | null;
     aiSummaryEnabled?: boolean | null;
     aiTranslationEnabled?: boolean | null;
@@ -518,8 +527,9 @@ export default function EventWizard(props: WizardProps) {
         liveCaptionsEnabled: ev.liveCaptionsEnabled ?? true,
         captionsTranscriptEnabled: ev.captionsTranscriptEnabled ?? false,
         autoStartRecording: ev.autoStartRecording,
-        listenOnlyWithoutConsent: ev.listenOnlyWithoutConsent ?? false,
         audienceAnonymous: ev.audienceAnonymous ?? false,
+        participantListVisible: ev.participantListVisible ?? false,
+        hostsAlwaysRecorded: ev.hostsAlwaysRecorded ?? false,
         aiTranscriptEnabled: ev.aiTranscriptEnabled ?? false,
         aiSummaryEnabled: ev.aiSummaryEnabled ?? false,
         aiTranslationEnabled: ev.aiTranslationEnabled ?? false,
@@ -669,10 +679,12 @@ export default function EventWizard(props: WizardProps) {
       // La registrazione non parte mai da sola: la avvia chi conduce con il
       // pulsante REC, qualunque cosa dica un modello salvato prima.
       autoStartRecording: false,
-      // Il consenso alla registrazione e' libero: chi non lo da' entra in
-      // solo ascolto (si puo' spegnere nei permessi).
-      listenOnlyWithoutConsent: true,
       audienceAnonymous: false,
+      hostsAlwaysRecorded: false,
+      participantListVisible: elencoPredefinito({
+        ...togglesFromMatrix(matrix),
+        maxParticipants: tpl?.maxParticipants ?? 300,
+      }),
       // Default AI dal template (semplificazione): un template "registrato"
       // può pre-attivare trascrizione/sintesi. La trascrizione richiede la
       // registrazione, quindi la attiviamo solo se recordingEnabled, e solo
@@ -858,6 +870,18 @@ export default function EventWizard(props: WizardProps) {
     setSubmitError(message);
     setErrorSeq((n) => n + 1);
   }, []);
+
+  // Un modulo da confermare con un pulsante, compilato e non confermato: il
+  // passo non si lascia e non si salva finche' non lo si aggiunge o lo si
+  // svuota (bozze-in-sospeso). Il messaggio sta accanto al modulo, dove va
+  // il fuoco: l'avviso in cima porterebbe lontano.
+  const [registroBozze] = useState(creaRegistroBozze);
+  const fermaSeInSospeso = useCallback(() => {
+    const bozza = registroBozze.primaInSospeso();
+    if (!bozza) return false;
+    bozza.mostra();
+    return true;
+  }, [registroBozze]);
   useEffect(() => {
     if (errorSeq === 0 || fuocoRichiestoRef.current) return;
     alertRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
@@ -985,10 +1009,20 @@ export default function EventWizard(props: WizardProps) {
       agendaBloccata ? modulo : senzaRelatoriAssenti(modulo).form,
     [agendaBloccata],
   );
+  // Finche' chi organizza non sceglie, l'elenco segue chi puo' parlare o
+  // mostrarsi e quante persone si aspettano: non su un evento che esiste gia'.
+  const elencoSceltoRef = useRef(mode === 'edit');
   const updateForm = useCallback(
     (patch: Partial<WizardForm>) => {
+      if ('participantListVisible' in patch) elencoSceltoRef.current = true;
       setForm((prev) => {
         const next = { ...prev, ...patch };
+        if (('permissionMatrix' in patch || 'maxParticipants' in patch) && !elencoSceltoRef.current) {
+          next.participantListVisible = elencoPredefinito({
+            ...togglesFromMatrix(next.permissionMatrix),
+            maxParticipants: next.maxParticipants,
+          });
+        }
         return 'moderators' in patch || 'speakers' in patch ? conSceltePulite(next) : next;
       });
     },
@@ -1265,6 +1299,7 @@ export default function EventWizard(props: WizardProps) {
       const { at, dati } = JSON.parse(raw) as { at?: number; dati?: Partial<WizardForm> };
       if (!dati || typeof at !== 'number' || Date.now() - at > TRASLOCO_VALIDO_MS) return;
       traslocoRef.current = true;
+      if (dati.participantListVisible !== undefined) elencoSceltoRef.current = true;
       setForm((prima) => conDatiDellEvento(prima, dati));
       setTraslocoApplicato(true);
     } catch {
@@ -1321,6 +1356,7 @@ export default function EventWizard(props: WizardProps) {
   }, []);
 
   const restoreDraft = useCallback(() => {
+    elencoSceltoRef.current = true;
     const salvata = savedDraftRef.current;
     // Sopra il modulo di partenza, non al suo posto: una bozza salvata prima
     // che il modulo avesse un campo nuovo non lo lascerebbe vuoto.
@@ -1378,7 +1414,9 @@ export default function EventWizard(props: WizardProps) {
         ...(datiBozza.title || datiBozza.description
           ? { title: testiBozza(prima).title, description: testiBozza(prima).description }
           : {}),
-        ...(viaToken !== null ? { accessMode: prima.accessMode } : {}),
+        ...(viaToken !== null
+          ? { accessMode: prima.accessMode, hostsAlwaysRecorded: prima.hostsAlwaysRecorded }
+          : {}),
         ...((risposte?.pre ?? 0) > 0 ? { preEventQuestionnaire: prima.preEventQuestionnaire } : {}),
         ...((risposte?.post ?? 0) > 0 ? { postEventQuestionnaire: prima.postEventQuestionnaire } : {}),
         // Un'agenda gia' usata in sala non si cambia da qui, come sopra; una
@@ -1414,6 +1452,7 @@ export default function EventWizard(props: WizardProps) {
   const indicePasso = (passi as readonly StepKey[]).indexOf(activeStep);
   const vai = (step: StepKey, sez?: WizardAdvancedSection | null) => {
     if (caricamentiInViaggio > 0) return;
+    if (step !== activeStep && fermaSeInSospeso()) return;
     if (step === 'advanced') apriSezione(sez ?? null);
     setActiveStep(step);
   };
@@ -1428,6 +1467,7 @@ export default function EventWizard(props: WizardProps) {
    *  passo a posto. */
   const goNext = () => {
     if (caricamentiInViaggio > 0) return;
+    if (fermaSeInSospeso()) return;
     const errs = validateStep(activeStep, form, props.defaultLocale, retentionMax);
     if (Object.keys(errs).length > 0) {
       chiaviClientRef.current = new Set(Object.keys(errs));
@@ -1534,6 +1574,8 @@ export default function EventWizard(props: WizardProps) {
     fermaAutosalvataggio();
     try {
       const dati = datiCambiati(form, initial);
+      // Non scelto da nessuno: lo decide il formato nuovo.
+      if (!elencoSceltoRef.current) delete dati.participantListVisible;
       if (Object.keys(dati).length > 0) {
         localStorage.setItem(TRASLOCO_KEY, JSON.stringify({ at: Date.now(), dati }));
       }
@@ -1603,6 +1645,7 @@ export default function EventWizard(props: WizardProps) {
     async (submitMode: 'draft' | 'publish', overrideRedirect?: string) => {
       // Un file ancora in viaggio non e' nel modulo: si salverebbe senza.
       if (caricamentiInViaggio > 0) return;
+      if (fermaSeInSospeso()) return;
       setAzione(submitMode);
       // Validate every step before submitting (especially on publish).
       const aggregated: Record<string, string> = {};
@@ -1688,8 +1731,10 @@ export default function EventWizard(props: WizardProps) {
           // Senza sottotitoli non c'e' niente da trascrivere.
           captionsTranscriptEnabled: form.liveCaptionsEnabled && form.captionsTranscriptEnabled,
           autoStartRecording: form.recordingEnabled && form.autoStartRecording,
-          listenOnlyWithoutConsent: form.listenOnlyWithoutConsent,
           audienceAnonymous: form.audienceAnonymous,
+          participantListVisible: form.participantListVisible,
+          // Una dichiarazione di chi organizza: un link di conduzione non la cambia.
+          hostsAlwaysRecorded: viaToken !== null ? undefined : form.hostsAlwaysRecorded,
 
           // Postprod AI — subordinate al recording (server-side resta
           // un'invariante: senza recordingEnabled non c'è transcript).
@@ -2102,6 +2147,7 @@ export default function EventWizard(props: WizardProps) {
       ricaricaLingue,
       scartaLetture,
       caricamentiInViaggio,
+      fermaSeInSospeso,
     ]
   );
 
@@ -2135,6 +2181,7 @@ export default function EventWizard(props: WizardProps) {
 
   return (
     <LibreriaDomandeProvider value={libreriaDomande}>
+    <RegistroBozzeContext.Provider value={registroBozze}>
     <div>
       {draftAvailable && (
         <div
@@ -2201,7 +2248,11 @@ export default function EventWizard(props: WizardProps) {
           <button
             type="button"
             className="btn btn-sm btn-outline-primary"
-            onClick={cambiaModello}
+            onClick={() => {
+              // Cio' che e' scritto e non aggiunto non viaggia con il modulo.
+              if (fermaSeInSospeso()) return;
+              cambiaModello();
+            }}
             // Un file in viaggio non arriverebbe nel formato nuovo.
             disabled={cambiandoModello || caricamentiInViaggio > 0}
           >
@@ -2426,6 +2477,7 @@ export default function EventWizard(props: WizardProps) {
             aiPipelineEnabled={props.aiPipelineEnabled ?? true}
             liveCaptionsAvailable={props.liveCaptionsAvailable ?? false}
             recordingAvailable={props.recordingAvailable ?? true}
+            voceNelVideo={props.voceNelVideo}
             istantanea={istantanea}
             iscrizioneAperta={istantanea ? undefined : iscrizioneAperta}
             onVaiPersone={() => vai('invites')}
@@ -2462,6 +2514,10 @@ export default function EventWizard(props: WizardProps) {
                   fieldErrors={fieldErrors}
                   whiteboardInfraReady={props.whiteboardInfraReady}
                   recordingAvailable={props.recordingAvailable ?? true}
+                  voceNelVideo={props.voceNelVideo}
+                  istantanea={istantanea}
+                  puoDichiarareChiConduce={viaToken === null}
+                  liveCaptionsAvailable={props.liveCaptionsAvailable ?? false}
                   aiPipelineEnabled={props.aiPipelineEnabled ?? true}
                   onCambiaLingue={() =>
                     vaiAlCampo({ key: 'aiTargetLocales', step: 'base', perPubblicare: false })
@@ -2632,6 +2688,7 @@ export default function EventWizard(props: WizardProps) {
         </div>
       </div>
     </div>
+    </RegistroBozzeContext.Provider>
     </LibreriaDomandeProvider>
   );
 }

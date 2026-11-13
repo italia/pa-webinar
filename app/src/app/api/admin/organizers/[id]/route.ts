@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * /api/admin/organizers/:id — attivazione, nome, ruolo, eliminazione
  * (ADR-014).

@@ -1,4 +1,7 @@
 #!/bin/bash
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Jibri finalize script — runs after recording completes.
 # 1. Extracts duration/size via ffprobe
 # 2. Re-muxes with faststart for streaming (no re-encode)

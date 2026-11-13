@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Infrastruttura di riferimento per PA Webinar su Google Kubernetes Engine.
 #
 # Modulo radice autonomo: rete, cluster Standard, pool di nodi, bucket di Cloud

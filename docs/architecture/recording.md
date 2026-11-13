@@ -85,13 +85,24 @@ options that were weighed.
 
 The two capture paths treat consent differently.
 
-- **Composite video.** `Event.recordingEnabled` adds a recording consent to
-  registration and, when the installation can record (Jibri is expected, or
-  `RECORDER_CONTROLLER_URL` is set: `app/src/lib/recording/availability.ts`), a
-  notice in the waiting room and, for whoever has not consented at
-  registration, a waiting-room gate. Holders of moderator and speaker links
-  skip that gate. Jibri records the conference as it is: the consent is
-  collected before entry, not applied to the video.
+- **Composite video.** `Event.recordingEnabled` adds an optional recording
+  consent to registration and, when the installation can record (Jibri is
+  expected, or `RECORDER_CONTROLLER_URL` is set:
+  `app/src/lib/recording/availability.ts`), a notice in the waiting room and,
+  for whoever has not consented, a box there. Nobody is kept out, and whoever
+  speaks without the consent is not recorded: `mod_pa_media_lock` marks their
+  presence from the token, and Jitsi's `hidden-from-recorder` feature keeps that
+  person out of Jibri's session: no name, voice, image or shared screen reaches
+  the video ([Jitsi integration](jitsi-integration.md)). Everyone else appears as
+  in any recording, with the speaker, the thumbnails and the names. The session
+  needs `hiddenFromRecorderFeatureEnabled`
+  (`jitsi-meet.web.custom.configs._custom_config_js` in the chart,
+  `infra/jitsi/web/custom-config.js` for Docker Compose). A values file that sets
+  `_custom_config_js` replaces that text and has to carry it over: without it
+  `RECORDING_VOICE_EXCLUSION` is unset and a person without the consent listens
+  only. The same fallback holds with a Jitsi other than the chart's.
+  `Event.hostsAlwaysRecorded` keeps moderators and speakers in the recording,
+  with a notice instead of the box.
 - **Per-participant audio.** `Event.multitrackRecordingEnabled` adds the
   optional consent to the transcription of one's own contributions
   (`consentMultitrack` at registration, a box in the waiting room for everyone
@@ -904,6 +915,11 @@ title. The event page puts the pages back beside the published video
 
 ## Known limitations
 
+- **People without the consent in the composite.** Jibri's session leaves them
+  out through a Jitsi feature and a mark written by `mod_pa_media_lock`: retry it
+  after every Jitsi upgrade, and restart Prosody when the module changes. A
+  dedicated track for each person would keep them out by construction
+  ([Roadmap](../ROADMAP.md)).
 - **Consent text.** The per-participant consent text states that the track is
   deleted after transcription, and does not change when **Keep
   per-participant tracks** is on.
@@ -916,8 +932,13 @@ title. The event page puts the pages back beside the published video
   `XMPP_MUC_MODULES` does not load `pa_occupants`. A track whose seat the
   portal still does not know after the last retry is skipped for its whole
   session.
-- **Recording indicator.** Only Jibri raises the in-room **Recording in
-  progress** banner.
+- **Recording indicator.** The room signals a recording from two sources:
+  Jibri's own status event, and the `capture` field of
+  `GET /api/events/{slug}/lifecycle` (`app/src/lib/live/capture-state.ts`),
+  which the room reads every five seconds and which says from the event's
+  configuration that the per-participant recorder should be running. A recorder
+  that is still starting counts as running, so the signal can come on a few
+  seconds before the bot joins.
 - **A PDF presented in the room is not in the video.** Jibri records the
   Jitsi page, and the presentation area belongs to the portal around it; the
   multitrack recorder captures audio only. The pages reach the recording only

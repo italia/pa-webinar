@@ -133,6 +133,7 @@ Tick only what is true, and explain any unticked item.
 - [ ] Every new page is declared in the `pathnames` map in `app/src/i18n/routing.ts`.
 - [ ] A schema change comes with its committed migration SQL. The migration is additive, and no migration that has been merged or applied anywhere is edited.
 - [ ] A dependency change comes with a regenerated `license-report.json`, committed together with `package-lock.json`.
+- [ ] Every new source file starts with its SPDX header.
 - [ ] A new model that holds participants' personal data is purged by the `/api/cron/cleanup` transaction and its test, and classified in `app/src/lib/gdpr/cleanup-coverage.ts`. If the model points to a stored file, the cleanup deletes the file too. The guard test covers only tables with an `eventId` column, so check any other model by hand. See [Rules for developers](docs/GDPR.md#rules-for-developers).
 - [ ] A change to a shared contract or a default (a response shape, a guard, an enum value, a token rule, an i18n key used elsewhere, or a default in `values.yaml`, `schema.prisma` or the site settings) lists the consumers you checked in the pull request description.
 - [ ] The owner page in `docs/` describes the new behavior.
@@ -167,6 +168,8 @@ Documentation follows the same review as code. [docs/README.md](docs/README.md) 
 ## License of contributions
 
 PA Webinar is distributed under the European Union Public Licence ([EUPL-1.2](LICENSE)). By opening a pull request, you agree that your contribution is released under the same license: inbound equals outbound. The project does not use a separate contributor license agreement.
+
+Every new source file starts with the SPDX header that names the license and the copyright holder. `npm run license:headers -- --fix` adds it to the files Git tracks, so stage a new file first. The tool names the Dipartimento as the holder, which fits work done for it. If the copyright is yours or your administration's, put that name in the `SPDX-FileCopyrightText` line. A third-party file keeps its own license and holder: write its header by hand.
 
 Contribute only code and assets that you have the right to license this way. Any third-party code, font, image or sound you add must keep PA Webinar distributable under EUPL-1.2 (see the [license policy](THIRD-PARTY-LICENSES.md#license-policy)), and must be recorded as described in [Adding a third-party component](THIRD-PARTY-LICENSES.md#adding-a-third-party-component). For the production npm dependencies of the root workspaces, the recorder, the recorder controller and the captions gateway, the License Compliance job of [`.github/workflows/ci.yml`](.github/workflows/ci.yml) accepts only licenses on an allowed list and fails on forbidden ones.
 

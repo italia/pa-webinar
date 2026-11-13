@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import * as Phaser from 'phaser';
 
 import { AV_H, AV_W, DIREZIONI, disegnaPersonaggio, PASSI } from '../avatar/disegno';

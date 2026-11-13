@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { NextResponse, type NextRequest } from 'next/server';
 import { SignJWT } from 'jose';
 
@@ -23,7 +26,10 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   }
 
   const body = (await parseJsonBody(request)) as { key?: unknown } | null;
-  const key = typeof body?.key === 'string' ? body.key : '';
+  // La chiave si copia da una chat o da un file: uno spazio o un a capo ai
+  // lati non e' una chiave diversa, e ogni rifiuto consuma i tentativi che
+  // chi accede dalla stessa rete condivide.
+  const key = typeof body?.key === 'string' ? body.key.trim() : '';
 
   const adminKey = process.env.ADMIN_API_KEY;
   if (!adminKey || !constantTimeEqual(key, adminKey)) {

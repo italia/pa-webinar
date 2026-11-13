@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # =============================================================================
 # jitsi-meet-torture MalleusJitsificus load Job (Selenium-remote mode)
 # The `namespace:` below and the `jitsi-meet.instance.url` are EXAMPLE values:

@@ -1,3 +1,6 @@
+{{- /* SPDX-License-Identifier: EUPL-1.2 */ -}}
+{{- /* SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale */ -}}
+
 {{- /*
 Service interno per l'API REST di Jicofo (porta 8888), letta dalla pagina di
 stato dell'applicazione (JICOFO_HEALTH_URL). Il sottochart accende l'API

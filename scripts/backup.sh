@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 #
 # Backup di un'installazione di PA Webinar: il database PostgreSQL (pg_dump in
 # formato custom, dal pod del chart o da DATABASE_URL), a richiesta l'object

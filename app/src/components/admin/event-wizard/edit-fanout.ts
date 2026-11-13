@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il salvataggio delle risorse collegate a un evento: organizzatori,
  * co-moderatori e relatori, il programma, inviti, materiali, questionari.

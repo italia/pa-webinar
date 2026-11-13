@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * /api/admin/organizers — gli account dello staff, organizzatori e
  * amministratori (ADR-014). Solo l'amministrazione dell'istanza.

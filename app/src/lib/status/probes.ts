@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Sonde HTTP della pagina di stato, della mappa dell'infrastruttura e del
  * pannello di amministrazione.

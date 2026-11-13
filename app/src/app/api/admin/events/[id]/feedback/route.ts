@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * GET /api/admin/events/[id]/feedback — le valutazioni dell'evento per la sua
  * pagina in amministrazione (lib/feedback/event-feedback-report): statistiche

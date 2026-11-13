@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Una sessione del motore di riconoscimento (NeMo-Speech.cpp, rotta
  * `/v1/audio/transcriptions/realtime`) per una voce.

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * I passi del wizard dell'evento, in ordine: le domande semplici («Evento»,
  * «Quando», «Persone», il «Programma», facoltativo, i «Permessi» e il

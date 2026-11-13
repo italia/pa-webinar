@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Pool GPU per la post-produzione AI su AKS: la definizione sta nel modulo
 # infra/tofu/aks, risorsa azurerm_kubernetes_cluster_node_pool.gpu in
 # node-pools.tf, accesa con gpu_pool = { enabled = true }. Istruzioni:

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Accesso dello staff e pannelli di amministrazione su un database vero:
  * consumo atomico del link, filtri sugli enum, unicita', JSON e colonne uuid.

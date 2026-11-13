@@ -1,3 +1,6 @@
 #!/bin/sh
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Hook installato da `npm install` (core.hooksPath): vedi hooks.mjs.
 exec node "$(git rev-parse --show-toplevel)/scripts/git-hooks/hooks.mjs" commit-msg "$@"

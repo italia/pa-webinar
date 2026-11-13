@@ -1,4 +1,7 @@
 #!/bin/bash
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Verify that Jitsi roles are correctly enforced end-to-end.
 #
 # This script creates a test event, generates moderator and participant JWTs,

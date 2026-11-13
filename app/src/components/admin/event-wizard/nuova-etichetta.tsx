@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 'use client';
 
 /**
@@ -13,6 +16,8 @@ import { useTranslations } from 'next-intl';
 import { Link, percorso } from '@/i18n/navigation';
 import { Icon } from '@/components/ui/icon';
 import { toKebab } from '@/lib/utils/kebab';
+
+import { useBozzaInSospeso } from './bozze-in-sospeso';
 
 export interface EtichettaCreata {
   slug: string;
@@ -41,6 +46,9 @@ export default function NuovaEtichetta({
   const [salvando, setSalvando] = useState(false);
   const campo = useRef<HTMLInputElement>(null);
   const apri = useRef<HTMLButtonElement>(null);
+  const conferma = useRef<HTMLButtonElement>(null);
+  // Durante la creazione il nome e' gia' confermato: si aspetta la risposta.
+  useBozzaInSospeso(aperta && !salvando && nome.trim() !== '', conferma, setErrore);
 
   useEffect(() => {
     if (aperta) campo.current?.focus();
@@ -148,6 +156,7 @@ export default function NuovaEtichetta({
               }}
             />
             <button
+              ref={conferma}
               type="button"
               className="btn btn-sm btn-primary"
               onClick={() => void crea()}

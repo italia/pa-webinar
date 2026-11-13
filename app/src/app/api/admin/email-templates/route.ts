@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Admin endpoints for per-(key, locale) email template overrides.
  * Each override is an upsert — clearing every field is the "reset to default"

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Avatar a iniziali delle persone in sala (chat, domande, anteprime): stesso
  * nome, stesso colore, ovunque compaia. Colori del design system con contrasto

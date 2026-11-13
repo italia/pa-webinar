@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Titolo, descrizione e stato per lingua da scrivere quando si salva un
  * evento (POST /api/events, PUT /api/events/[param]).

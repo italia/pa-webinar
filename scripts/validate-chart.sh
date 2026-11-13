@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 #
 # Rende il chart per ogni profilo e verifica le invarianti che, se violate,
 # fanno fallire l'installazione o la lasciano a metà. Serve perché nessun altro
@@ -1870,6 +1873,35 @@ done
 # un messaggio che nomina il valore da correggere. Una guardia che non scatta
 # più non la nota nessun altro controllo.
 echo "guardie"
+# Chi non ha acconsentito resta fuori dal video finche' il testo della
+# conferenza del chart lo fa: un testo sostituito lo perde, e il portale deve
+# saperlo (senza la variabile quelle persone restano in solo ascolto).
+if ! helm template videocall "$CHART" -n videocall "${comuni[@]}" \
+    -f "$CHART/examples/values-simple.yaml" | grep -q RECORDING_VOICE_EXCLUSION; then
+  errore "testo della conferenza del chart: RECORDING_VOICE_EXCLUSION assente"
+fi
+if helm template videocall "$CHART" -n videocall "${comuni[@]}" \
+    -f "$CHART/examples/values-simple.yaml" \
+    --set-string 'jitsi-meet.web.custom.configs._custom_config_js=// altro' \
+    | grep -q RECORDING_VOICE_EXCLUSION; then
+  errore "testo della conferenza sostituito: RECORDING_VOICE_EXCLUSION ancora presente"
+fi
+# I moduli di Prosody si caricano all'avvio: senza il riavvio dopo un
+# aggiornamento, la regola del consenso resta quella vecchia.
+if ! helm template videocall "$CHART" -n videocall "${comuni[@]}" \
+    -f "$CHART/examples/values-simple.yaml" \
+    | grep -q 'kubectl rollout restart -n "$ns" "$sts"'; then
+  errore "hook di aggiornamento: Prosody non riparte quando cambiano i moduli"
+fi
+# Lo stesso testo per il chart e per Docker Compose.
+testo_chart=$(awk '/_custom_config_js: \|/ { dentro = 1; next }
+  dentro && /^ {0,9}[^ ]/ { exit }
+  dentro { sub(/^ {10}/, ""); print }' "$CHART/values.yaml")
+testo_compose=$(sed -n '/^config.hiddenFromRecorderFeatureEnabled/,$p' infra/jitsi/web/custom-config.js)
+if [ "$testo_chart" != "$testo_compose" ]; then
+  errore "testo della sessione del registratore diverso tra values.yaml e infra/jitsi/web/custom-config.js"
+fi
+
 deve_fallire() {
   local descrizione="$1" atteso="$2"
   shift 2

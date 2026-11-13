@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Da un salvataggio delle impostazioni rifiutato (422) al campo da
  * correggere: in quale scheda sta, quale elemento prende il fuoco e che cosa

@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Recorder controller (ADR-013, Fase 3).
 # Operator riconciliante: pod fisso che crea/elimina i Job recorder.
 # Immagine leggera — NESSUN Chrome/puppeteer (a differenza del recorder):

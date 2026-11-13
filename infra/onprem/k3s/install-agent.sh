@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 #
 # Unisce un nodo agent al server k3s di PA Webinar (install-server.sh). Con
 # --jvb il nodo nasce riservato al bridge: etichetta e taint

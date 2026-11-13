@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // Solo la pubblicazione è finta: l'elenco dei flag arriva da quello vero, così

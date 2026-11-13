@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { NextIntlClientProvider } from 'next-intl';
@@ -23,7 +26,7 @@ const fetchMock = vi.fn();
 let container: HTMLDivElement;
 let root: Root;
 
-async function disegna(locale: string, canResend = true) {
+async function disegna(locale: string, canResend = true, onChange?: () => void) {
   await act(async () => {
     root.render(
       <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
@@ -35,6 +38,7 @@ async function disegna(locale: string, canResend = true) {
           baseUrl={BASE}
           locale={locale}
           canResend={canResend}
+          onChange={onChange}
         />
       </NextIntlClientProvider>,
     );
@@ -49,7 +53,8 @@ async function disegna(locale: string, canResend = true) {
 beforeEach(() => {
   (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
   fetchMock.mockReset();
-  fetchMock.mockResolvedValue(
+  // Una risposta nuova a ogni lettura: dopo una revoca l'elenco si rilegge.
+  fetchMock.mockImplementation(async () =>
     new Response(
       JSON.stringify({
         rows: [
@@ -159,3 +164,45 @@ describe('EventModeratorsPanel — «Reinvia link»', () => {
   });
 });
 
+describe('EventModeratorsPanel — chi mostra le persone altrove si rilegge', () => {
+  // La panoramica dell'evento elenca moderatori e relatori: dopo una revoca
+  // fatta qui non deve continuare a mostrare chi non c'e' piu'.
+  const revoca = () =>
+    Array.from(container.querySelectorAll<HTMLButtonElement>('button')).find((b) =>
+      b.textContent?.startsWith(messages.admin.coModerators.revoke),
+    )!;
+
+  it('dopo una revoca riuscita', async () => {
+    const onChange = vi.fn();
+    await disegna('it', true, onChange);
+    fetchMock.mockResolvedValueOnce(new Response(null, { status: 204 }));
+    await act(async () => {
+      revoca().click();
+    });
+    for (let i = 0; i < 3; i++) {
+      await act(async () => {
+        await new Promise((r) => setTimeout(r, 0));
+      });
+    }
+    expect(fetchMock).toHaveBeenCalledWith('/api/events/evento-1/moderators/g1', {
+      method: 'DELETE',
+      headers: { Authorization: 'Bearer TOKEN_MODERATORE' },
+    });
+    expect(onChange).toHaveBeenCalledTimes(1);
+  });
+
+  it('non se la revoca non riesce', async () => {
+    const onChange = vi.fn();
+    await disegna('it', true, onChange);
+    fetchMock.mockResolvedValueOnce(new Response('{}', { status: 500 }));
+    await act(async () => {
+      revoca().click();
+    });
+    for (let i = 0; i < 3; i++) {
+      await act(async () => {
+        await new Promise((r) => setTimeout(r, 0));
+      });
+    }
+    expect(onChange).not.toHaveBeenCalled();
+  });
+});

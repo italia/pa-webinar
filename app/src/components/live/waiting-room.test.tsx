@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { act, type ComponentProps } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
@@ -353,26 +356,25 @@ describe('sala d\'attesa — avviso di registrazione', () => {
 
   it('di solo ascolto informa e non chiede niente', () => {
     render({ event: { ...eventoLive, recordingEnabled: true }, recordingListenOnly: true });
-    expect(container.textContent).toContain(messages.gdpr.consent.recordingNotice);
+    expect(container.textContent).toContain(messages.gdpr.consent.recordingNoticeVoice);
     expect($('#waiting-recording-consent')).toBeNull();
+    // Dove la voce non si puo' escludere, resta l'avviso di sempre.
+    render({
+      event: { ...eventoLive, recordingEnabled: true },
+      recordingListenOnly: true,
+      voce: 'fissa',
+    });
+    expect(container.textContent).toContain(messages.gdpr.consent.recordingNotice);
   });
 });
 
 describe('sala d\'attesa — consenso alla registrazione', () => {
   const evento: Evento = { ...eventoLive, recordingEnabled: true };
 
-  it('chi non l\'ha dato all\'iscrizione lo da\' qui: senza la spunta non si entra', () => {
+  it('chi non l\'ha dato all\'iscrizione lo da\' qui, e la spunta viaggia con l\'ingresso', () => {
     render({ event: evento, defaultName: 'Relatore 1', recordingConsentRequired: true });
     expect(container.textContent).toContain(t.recordingConsentIntro);
-    const entra = pulsante(t.joinNowBtn);
-    expect(entra.getAttribute('aria-describedby')).toBe('waiting-recording-consent-required');
-
-    premi(entra);
-    expect(onEnterLive).not.toHaveBeenCalled();
-    const consenso = $<HTMLInputElement>('#waiting-recording-consent')!;
-    expect(document.activeElement).toBe(consenso);
-
-    premi(consenso);
+    premi($<HTMLInputElement>('#waiting-recording-consent')!);
     premi(pulsante(t.joinNowBtn));
     // Il consenso viaggia con l'ingresso: il server ne conserva la prova.
     expect(onEnterLive).toHaveBeenCalledWith('Relatore 1', {
@@ -380,6 +382,18 @@ describe('sala d\'attesa — consenso alla registrazione', () => {
       micOn: false,
       recordingConsent: true,
     });
+  });
+
+  it('senza la spunta si entra lo stesso, e la sala dice cosa succede', () => {
+    render({ event: evento, defaultName: 'Relatore 1', recordingConsentRequired: true });
+    expect(container.textContent).toContain(messages.gdpr.consent.recordingOptionalVoice);
+    premi(pulsante(t.joinNowBtn));
+    expect(onEnterLive).toHaveBeenCalledWith('Relatore 1', { cameraOn: false, micOn: false });
+  });
+
+  it('dove la voce non si puo\' togliere dal video dice che si resta in ascolto', () => {
+    render({ event: evento, defaultName: 'Relatore 1', recordingConsentRequired: true, voce: 'fissa' });
+    expect(container.textContent).toContain(messages.gdpr.consent.recordingOptionalListenOnly);
   });
 
   it('chi l\'ha gia\' dato entra con un clic, senza casella', () => {
@@ -418,14 +432,12 @@ describe('sala d\'attesa — consenso alla registrazione', () => {
     expect(link?.getAttribute('href')).toBe('/it/privacy');
   });
 
-  it('con la registrazione per partecipante si chiedono entrambi: solo la registrazione ferma', () => {
+  it('con la registrazione per partecipante si chiedono entrambi, e nessuno ferma', () => {
     render({
       event: { ...evento, multitrackRecordingEnabled: true },
       defaultName: 'Relatore 1',
       recordingConsentRequired: true,
     });
-    premi(pulsante(t.joinNowBtn));
-    expect(document.activeElement).toBe($('#waiting-recording-consent'));
     premi($<HTMLInputElement>('#waiting-recording-consent')!);
     premi($<HTMLInputElement>('#waiting-multitrack-consent')!);
     premi(pulsante(t.joinNowBtn));
@@ -437,7 +449,7 @@ describe('sala d\'attesa — consenso alla registrazione', () => {
     });
   });
 
-  it('il consenso non chiude la piazza: il cancello porta alla casella', () => {
+  it('il consenso non chiude la piazza: dal cancello si entra', () => {
     render({
       event: { ...evento, waitingRoomEngine: 'GAME' },
       defaultName: 'Relatore 1',
@@ -445,10 +457,9 @@ describe('sala d\'attesa — consenso alla registrazione', () => {
     });
     premi(pulsante(t.enterGardenTitle));
     act(() => {
-      expect(() => piazza.onEnterLive?.('', { cameraOn: false, micOn: false })).toThrow();
+      piazza.onEnterLive?.('', { cameraOn: false, micOn: false });
     });
-    expect(onEnterLive).not.toHaveBeenCalled();
-    expect(document.activeElement).toBe($('#waiting-recording-consent'));
+    expect(onEnterLive).toHaveBeenCalled();
   });
 });
 
@@ -683,7 +694,7 @@ describe('sala d\'attesa — consenso alla registrazione di chi conduce o interv
 
   it('facoltativo: dice cosa succede senza, e si entra lo stesso', () => {
     render(conduce);
-    expect(container.textContent).toContain(messages.gdpr.consent.recordingOptionalHost);
+    expect(container.textContent).toContain(messages.gdpr.consent.recordingOptionalVoice);
     expect(container.textContent).not.toContain(messages.gdpr.consent.recordingOptionalListenOnly);
     premi(pulsante(t.joinNowBtn));
     expect(onEnterLive).toHaveBeenCalledWith('Relatore 1', { cameraOn: false, micOn: false });

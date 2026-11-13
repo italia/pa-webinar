@@ -1,17 +1,26 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const tx = vi.hoisted(() => ({
   recordingConsent: { findMany: vi.fn(), updateMany: vi.fn() },
   multitrackConsent: { findMany: vi.fn(), updateMany: vi.fn() },
-  registration: { updateMany: vi.fn() },
+  registration: { updateMany: vi.fn(), findMany: vi.fn() },
+  person: { updateMany: vi.fn() },
   captionSegment: { updateMany: vi.fn() },
-  gdprAuditLog: { create: vi.fn() },
+  gdprAuditLog: { create: vi.fn(), createMany: vi.fn() },
 }));
+const trascrizione = vi.hoisted(() => ({
+  bloccaTrascrizioneEvento: vi.fn(async () => undefined),
+  togliPersoneDalleTrascrizioni: vi.fn(async () => 0),
+}));
+vi.mock('@/lib/captions/transcript', () => trascrizione);
 vi.mock('@/lib/db', () => ({
   prisma: { $transaction: (fn: (t: typeof tx) => unknown) => fn(tx) },
 }));
 
-import { ritiraConsensi } from './consent-withdrawal';
+import { ritiraComunicazioni, ritiraConsensi } from './consent-withdrawal';
 
 const EVENTO = 'e1';
 const ISCRIZIONE = '11111111-2222-4333-8444-555555555555';
@@ -191,11 +200,60 @@ describe('ritiraConsensi', () => {
     expect(where.OR).toEqual([{ jitsiUserId: { in: ['guest-inoltro'] } }]);
   });
 
+  it('dalla pagina dei propri dati parte dall\'iscrizione, senza posti', async () => {
+    tx.registration.updateMany.mockResolvedValue({ count: 1 });
+    const esito = await ritiraConsensi(EVENTO, [], { registrazione: true }, ADESSO, {
+      iscrizioni: [ISCRIZIONE],
+      origine: 'self-service',
+    });
+    expect(esito.registrazione).toBe(true);
+    expect(tx.registration.updateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({ id: { in: [ISCRIZIONE] }, consentRecording: true }),
+      }),
+    );
+    const dettagli = JSON.parse(tx.gdprAuditLog.create.mock.calls[0]![0].data.details);
+    expect(dettagli.source).toBe('self-service');
+  });
+
+  it('dopo l\'evento la persona se ne va anche dalla trascrizione gia\' costruita', async () => {
+    await ritiraConsensi(EVENTO, [], { registrazione: false }, ADESSO, {
+      iscrizioni: [ISCRIZIONE],
+      origine: 'self-service',
+    });
+    expect(trascrizione.bloccaTrascrizioneEvento).toHaveBeenCalledWith(tx, EVENTO);
+    expect(trascrizione.togliPersoneDalleTrascrizioni).toHaveBeenCalledWith(tx, [EVENTO], [ISCRIZIONE]);
+  });
+
   it('senza posti non tocca niente', async () => {
     expect(await ritiraConsensi(EVENTO, [], { registrazione: true })).toEqual({
       registrazione: false,
       trascrizione: false,
     });
     expect(tx.recordingConsent.findMany).not.toHaveBeenCalled();
+  });
+});
+
+describe('ritiraComunicazioni', () => {
+  it('toglie comunicazioni e rubrica, su ogni iscrizione dell\'indirizzo', async () => {
+    tx.registration.findMany.mockResolvedValue([{ eventId: 'e1' }, { eventId: 'e2' }]);
+    tx.person.updateMany.mockResolvedValue({ count: 1 });
+    expect(await ritiraComunicazioni('impronta', ADESSO)).toBe(true);
+    expect(tx.registration.updateMany).toHaveBeenCalledWith({
+      where: { emailHash: 'impronta', consentFutureCommunications: true },
+      data: { consentFutureCommunications: false, consentFutureCommunicationsWithdrawnAt: ADESSO },
+    });
+    expect(tx.person.updateMany).toHaveBeenCalledWith({
+      where: { emailHash: 'impronta', optedInToAddressBook: true },
+      data: { optedInToAddressBook: false, optedOutAt: ADESSO },
+    });
+    expect(tx.gdprAuditLog.createMany.mock.calls[0]![0].data).toHaveLength(2);
+  });
+
+  it('senza consenso da ritirare non scrive niente nel registro', async () => {
+    tx.registration.findMany.mockResolvedValue([]);
+    tx.person.updateMany.mockResolvedValue({ count: 0 });
+    expect(await ritiraComunicazioni('impronta', ADESSO)).toBe(false);
+    expect(tx.gdprAuditLog.createMany).toHaveBeenCalledWith({ data: [] });
   });
 });

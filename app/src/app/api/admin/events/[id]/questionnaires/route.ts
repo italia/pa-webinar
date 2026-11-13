@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * List both placements of questionnaires attached to an event. Returns
  * an array with at most two entries (PRE_REGISTRATION, POST_EVENT) —

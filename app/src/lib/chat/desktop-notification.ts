@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * La notifica di sistema della sala (chat e Domande e risposte). Parte solo
  * con il permesso gia' concesso: chiederlo spetta a un gesto di chi guarda

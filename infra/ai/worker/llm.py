@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """LLM client used for SUMMARIZE and TRANSLATE.
 
 We hit a cluster-internal vLLM endpoint that speaks the OpenAI

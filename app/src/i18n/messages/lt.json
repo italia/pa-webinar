@@ -330,6 +330,14 @@
     "exitFullscreen": "Išjungti viso ekrano režimą",
     "recordingActive": "Vyksta įrašymas",
     "recordingShort": "REC",
+    "transcriptionActive": "Vyksta transkribavimas",
+    "transcriptionShort": "Transkripcija",
+    "captureNoticeRecordingOn": "Įrašymas pradėtas: nuo šiol salė įrašoma.",
+    "captureNoticeRecordingOff": "Įrašymas baigtas.",
+    "captureNoticeVoicesOn": "Balsų įrašymas pradėtas: nuo šiol įrašomi sutikimą davusiųjų balsai.",
+    "captureNoticeVoicesOff": "Balsų įrašymas baigtas.",
+    "captureNoticeTranscriptionOn": "Transkribavimas pradėtas: nuo šiol saugomas sutikimą davusiųjų tekstas.",
+    "captureNoticeTranscriptionOff": "Transkribavimas baigtas.",
     "enterRoom": "Įeiti į salę",
     "leaveRoom": "Išeiti iš salės",
     "leaveChoice": {
@@ -535,7 +543,9 @@
       "handsRaised": "{count, plural, one {# pakelta ranka} few {# pakeltos rankos} other {# pakeltų rankų}}",
       "locksByConsent": "Mikrofonai ir kameros paiso sutikimo dėl įrašymo: davusieji naudoja tai, ką leidžia renginys, kiti tik klausosi. Kambario užraktai lieka įjungti.",
       "listenOnlyBadge": "tik klausosi",
-      "listenOnlyNoFloor": "Nedavė sutikimo įrašymui: negali kalbėti, kol neduos jo savo salėje."
+      "listenOnlyNoFloor": "Nedavė sutikimo įrašymui: negali kalbėti, kol neduos jo savo salėje.",
+      "voiceExcludedBadge": "be įrašymo",
+      "voiceExcludedFloor": "Nesutiko su įrašymu: gali kalbėti, bet į įrašą nepatenka."
     },
     "moderator": {
       "muteAll": "Nutildyti visus",
@@ -677,13 +687,13 @@
         "without": {
           "soloAscolto": "Be šio sutikimo tik klausotės: mikrofonas, kamera ir ekranas lieka uždaryti.",
           "conduce": "Be šio sutikimo vis tiek vedate, bet jūsų balsas nelieka atskirų asmenų takeliuose ir nuorašuose.",
-          "uscita": "Norint dalyvauti šiame renginyje, reikia sutikimo įrašymui."
+          "voce": "Be šio sutikimo dalyvaujate kaip visi, bet į įrašą nepatenkate: nei vardas, nei balsas, nei vaizdas."
         },
         "alreadyRecorded": "Tai, kas jau įrašyta, lieka renginio vaizdo įraše: norėdami tai pašalinti, parašykite organizatoriams.",
         "withdraw": {
           "soloAscolto": "Jei jį atšauksite, liksite salėje tik klausydamiesi: mikrofonas, kamera ir ekranas užsidarys. Atšauksite ir sutikimą transkribuoti jūsų pasisakymus.",
-          "uscita": "Jei jį atšauksite, išeisite iš konferencijos ir grįšite į laukiamąjį: dalyvauti galima tik sutikus su įrašymu. Atšauksite ir sutikimą transkribuoti jūsų pasisakymus.",
-          "conduce": "Jei jį atšauksite, toliau vesite, bet nuo šiol jūsų balsas neliks atskirų asmenų takeliuose ir nuorašuose. Salės vaizdo įrašas, jei įrašinėjamas, jus vis tiek rodo."
+          "conduce": "Jei jį atšauksite, toliau vesite, bet nuo šiol jūsų balsas neliks atskirų asmenų takeliuose ir nuorašuose. Salės vaizdo įrašas, jei įrašinėjamas, jus vis tiek rodo.",
+          "voce": "Jei atšauksite, liksite kambaryje kaip anksčiau, o nuo dabar į įrašą nepatenkate. Atšaukiate ir sutikimą dėl savo pasisakymų transkripcijos."
         }
       },
       "transcription": {
@@ -693,6 +703,11 @@
         "withdrawEffect": "Jei jį atšauksite, jūsų jau transkribuoti sakiniai neteks teksto ir vardo, o nuo šiol jūsų balsas nebus nei įrašomas atskirame takelyje, nei transkribuojamas.",
         "needsRecording": "Jį galite duoti sutikę su įrašymu."
       }
+    },
+    "voiceExcluded": {
+      "title": "Dalyvaujate be įrašymo.",
+      "consent": "Sutinku su įrašymu",
+      "body": "Nesutikote su įrašymu: dalyvaujate kaip visi, bet jūsų vardas, balsas ir vaizdas į įrašą nepatenka."
     }
   },
   "qa": {
@@ -1010,13 +1025,17 @@
           }
         },
         "recordingManualNote": "Įrašymas niekada neprasideda savaime: vedėjas jį pradeda mygtuku REC.",
-        "listenOnlyWithoutConsent": "Nesutikusieji įeina tik klausytis",
-        "listenOnlyWithoutConsentOn": "Sutikimas dėl įrašymo yra laisvas: jo nedavusieji vis tiek dalyvauja, seka ir rašo pokalbyje, bet mikrofonas, kamera ir ekranas lieka išjungti.",
-        "listenOnlyWithoutConsentOff": "Be sutikimo dėl įrašymo neįeinama.",
-        "listenOnlyLockedLive": "Kol kambarys gali būti atviras, įrašymo ir tik klausymo keisti negalima: jie galioja nuo pirmojo įėjimo.",
         "audienceAnonymous": "Anoniminė auditorija",
         "audienceAnonymousDesc": "Dalyviai kitiems rodomi slapyvardžiu („Dalyvis“ ir kodas) vaizdo įraše, pokalbyje ir klausimuose; dalyvių sąrašas lieka vedėjams, aikštės nėra. Naudinga dideliems renginiams; bendruomenės renginiuose žmonės nori susipažinti.",
-        "audienceAnonymousLocked": "Kol kambarys gali būti atviras, keisti negalima: tai susietų slapyvardžius su vardais."
+        "audienceAnonymousLocked": "Kol kambarys gali būti atviras, keisti negalima: tai susietų slapyvardžius su vardais.",
+        "participantListVisible": "Rodyti dalyvių sąrašą auditorijai",
+        "participantListVisibleDesc": "Išjungta: sąrašas, tinklelis ir vardai aikštėje lieka vedėjams ir pranešėjams; auditorija mato tik kalbantįjį. Įjungta: visi mato, kas yra salėje.",
+        "participantListAnonymous": "Esant anoniminei auditorijai sąrašas lieka paslėptas.",
+        "participantListLocked": "Kai salė atidaryta, keisti negalima: jau esantys viduje pakeitimo nematytų.",
+        "participantListCameraNote": "Kai sąrašas paslėptas, kamerą įjungęs asmuo nemato savo vaizdo. Susitikimui, kuriame visi mato vieni kitus, parodykite sąrašą.",
+        "recordingLockedLive": "Kai salė atidaryta, įrašymo keisti negalima: jis galioja nuo pirmo įėjimo.",
+        "hostsAlwaysRecorded": "Vedantieji visada patenka į įrašą",
+        "hostsAlwaysRecordedDesc": "Išjungus, moderatoriai ir pranešėjai renkasi kaip visi. Įjunkite tik jei jie jau sutiko būti filmuojami: jie nemato langelio, o renginio informaciniame pranešime tai turi būti nurodyta."
       },
       "step3": {
         "heading": "Asmenys ir kvietimai",
@@ -1309,13 +1328,17 @@
         "permissionsHeading": "Kas ką gali daryti kambaryje",
         "permissionsIntro": "Ką gali daryti dalyviai ir kurios kambario funkcijos įjungtos. Viską galima keisti ir renginio metu.",
         "consentsLine": "Sutikimai registruojantis ir salėje: {list}",
-        "consentRecordingRequired": "įrašymas, privalomas norint įeiti",
         "consentRecordingFree": "įrašymas, savanoriškas (be jo tik klausymas)",
         "consentRecordingNotice": "dėl įrašymo tik pranešimas (dalyviai nekalba ir nesirodo)",
         "consentTranscription": "savo pasisakymų transkripcija, neprivaloma",
         "consentsNone": "Jokių sutikimų, išskyrus registracijos.",
         "consentsHosts": "Vedėjų ir pranešėjų apie įrašymą klausiama salėje, neprivalomai.",
-        "consentsWithdraw": "Dalyviai gali juos atšaukti salėje mygtuku „Sutikimai“."
+        "consentsWithdraw": "Dalyviai gali juos atšaukti salėje mygtuku „Sutikimai“.",
+        "participantListShown": "Dalyvių sąrašas: matomas visiems.",
+        "participantListHidden": "Dalyvių sąrašas: tik vedėjams ir pranešėjams.",
+        "consentRecordingOptional": "įrašymas, neprivalomas",
+        "consentRecordingVoice": "įrašymas, laisvas (be jo asmuo į įrašą nepatenka)",
+        "consentsHostsAlways": "Renginį vedantieji ir kalbantieji visada patenka į įrašą: jie nemato langelio."
       },
       "preview": {
         "title": "Puslapio peržiūra",
@@ -1373,7 +1396,37 @@
         "toggleOffWarningCreate": "Išjungta programa ({count, plural, one {# tema} few {# temos} many {# temos} other {# temų}}) puslapyje nerodoma ir neišsaugoma kartu su renginiu: įjunkite ją, kad ją išlaikytumėte.",
         "reviewOffCreate": "Programa: išjungta, neišsaugoma kartu su renginiu ({count, plural, one {# tema} few {# temos} many {# temos} other {# temų}})"
       },
-      "saveCopy": "Išsaugoti kopiją"
+      "saveCopy": "Išsaugoti kopiją",
+      "consentMap": {
+        "show": "Parodyti, kas vyksta su sutikimais",
+        "hide": "Slėpti diagramą",
+        "title": "Sutikimai įrašyti šiame renginyje",
+        "person": "Kas prisijungia",
+        "question": "Ar sutiko, kad būtų įrašoma?",
+        "yes": "Taip",
+        "no": "Ne",
+        "room": "Kambaryje",
+        "recording": "Įraše",
+        "roomSame": "Dalyvauja pagal renginio taisykles.",
+        "roomListenOnly": "Tik klauso ir rašo pokalbyje.",
+        "recordedFull": "Vardas, balsas, vaizdas ir bendrinamas ekranas.",
+        "notRecorded": "Nepatenka: nei vardas, nei balsas, nei vaizdas, nei bendrinamas ekranas.",
+        "recordedVoice": "Jo balsas, atskirame take.",
+        "notRecordedVoice": "Jo balsas neįrašomas.",
+        "othersSame": "Kiti nesikeičia: mikrofonų užraktai, žodžio suteikimas ir vaizdo išvaizda lieka kaip renginio.",
+        "audienceNotice": "Dalyviai neturi mikrofono, kameros ir ekrano: gauna tik pranešimą. Jei jiems suteikiamas žodis, gali sutikti kambaryje; jei nesutinka, lieka už įrašo ribų.",
+        "hostsChoose": "Moderatoriai ir pranešėjai renkasi kaip visi: nesutikęs veda kaip įprasta, bet į įrašą nepatenka.",
+        "hostsAlways": "Moderatoriai ir pranešėjai visada patenka į įrašą: jie nemato langelio.",
+        "hostsFixed": "Moderatoriai ir pranešėjai vis tiek veda, ir vaizdo įrašas juos fiksuoja.",
+        "trace": "Jei kalba įrašymo metu, šalia vaizdo esanti pastaba nurodo, kad trūksta pasisakymo, o stenograma nurodo *** su laiku.",
+        "anytime": "Sutikimą galima duoti ir atšaukti kambaryje bet kada.",
+        "transcription": "Savo pasisakymų transkripcija yra atskiras, neprivalomas sutikimas.",
+        "fixedVoice": "Ši diegtis negali pašalinti balso iš vaizdo įrašo: nesutikęs lieka tik klausytojas, o kambario užraktai seka sutikimą.",
+        "fixedNotice": "Ši diegtis negali pašalinti balso iš vaizdo įrašo: gavęs žodį patenka į įrašą, o pranešime tai nurodoma.",
+        "questionTranscription": "Ar duotas sutikimas dėl transkripcijos?",
+        "fixedNotRecorded": "Be balso ir vaizdo; vardas vaizdo įraše gali matytis."
+      },
+      "unaddedEntry": "Užpildėte šią formą jos nepatvirtinę: paspauskite mygtuką, kad ją pridėtumėte, arba išvalykite laukus."
     },
     "nav": {
       "events": "Renginiai",
@@ -2851,6 +2904,7 @@
       "editEvent": "Redaguoti renginį",
       "featureSummary": "Aktyvios funkcijos",
       "organizers": "Organizatoriai",
+      "peopleTabLink": "Visa informacija skirtuke „{tab}“",
       "privacyGdpr": "Privatumas ir GDPR/BDAR",
       "postEventTitle": "Po renginio ir atsiliepimai",
       "recordingSection": "Renginio vaizdo įrašas",
@@ -3958,7 +4012,8 @@
     "eventLabel": "Renginys",
     "dateLabel": "Data",
     "timeLabel": "Laikas",
-    "durationLabel": "Trukmė"
+    "durationLabel": "Trukmė",
+    "myDataLink": "Jūsų duomenys: peržiūrėti, ištaisyti, atšaukti sutikimą arba atšaukti registraciją"
   },
   "home": {
     "hero": {
@@ -4326,14 +4381,16 @@
   "gdpr": {
     "consent": {
       "recording": "Sutinku su šio renginio garso/vaizdo įrašymu",
-      "recordingRequired": "Norint dalyvauti šiame renginyje, būtinas sutikimas dėl įrašymo",
-      "recordingNotice": "Renginys įrašomas (garsas ir vaizdas). Dalyvaujate be mikrofono ir kameros: įraše nebus jūsų balso ar atvaizdo, nebent vedėjas suteiks jums žodį.",
       "multitrack": "Sutinku, kad mano pasisakymai būtų transkribuoti su mano vardu renginio ataskaitai. Jei renginyje kiekvienam asmeniui įrašomas atskiras garso takelis, mano balsas įrašomas tik šiuo tikslu, o takelis ištrinamas po transkribavimo; jis nenaudojamas mano balsui atpažinti ar atkurti.",
       "multitrackOptional": "Tai neprivaloma: jei nesutinkate, vis tiek dalyvaujate, bet jūsų pasisakymai nepateks į transkripciją ir jūsų balsas nebus įrašomas atskirame takelyje. Jei renginys įrašomas, jūsų balsas vis tiek liks vaizdo įraše.",
       "stayInTouch": "Noriu gauti informaciją apie būsimus renginius ir būti įtrauktas į adresų knygą, kad būčiau kviečiamas į panašius renginius",
       "stayInTouchHelp": "Neprivalomas sutikimas (BDAR 6.1.a str.). Galite jį bet kada atšaukti gautuose el. laiškuose esančia nuoroda „Pašalinti mane iš adresų knygos“. Vardas ir organizacija – iš šios registracijos.",
       "recordingOptionalListenOnly": "Jei nesutinkate, vis tiek dalyvaujate, tik klausydamiesi: sekate ir rašote pokalbyje, bet mikrofonas, kamera ir ekrano bendrinimas lieka išjungti. Sutikti galite vėliau, iš kambario.",
-      "recordingOptionalHost": "Jei nesutinkate, vis tiek įeinate ir vedate kaip įprastai, tačiau jūsų balsas neišsaugomas atskirų asmenų įrašuose ir transkripcijoje. Kambario vaizdo įraše, jei jis įrašomas, vis tiek būsite."
+      "recordingOptionalHost": "Jei nesutinkate, vis tiek įeinate ir vedate kaip įprastai, tačiau jūsų balsas neišsaugomas atskirų asmenų įrašuose ir transkripcijoje. Kambario vaizdo įraše, jei jis įrašomas, vis tiek būsite.",
+      "recordingOptionalVoice": "Jei nesutinkate, vis tiek dalyvaujate ir galite kalbėti, bet į įrašą nepatenkate: nei vardas, nei balsas, nei vaizdas. Sutikti galite vėliau, iš kambario.",
+      "recordingNotice": "Renginys įrašomas (garsas ir vaizdas). Dalyvaujate be mikrofono ir kameros: įraše nebus jūsų balso ar atvaizdo, nebent vedėjas suteiks jums žodį.",
+      "recordingNoticeVoice": "Renginys įrašomas (garsas ir vaizdas). Dalyvaujate be mikrofono ir kameros: įraše nėra jūsų vardo, balso ir vaizdo, nebent sutiksite kambaryje.",
+      "recordingHostAlways": "Jūs vedate šį renginį: visada patenkate į įrašą su vardu, balsu, vaizdu ir bendrinamu ekranu."
     },
     "export": {
       "title": "Mano duomenys",
@@ -4374,7 +4431,12 @@
       "grantSince": "Nuo {date}",
       "grantPublic": "rodomas viešame puslapyje",
       "grantPhoto": "Renginio komandos įkelta nuotrauka",
-      "grantRevoked": "prieiga atšaukta {date}"
+      "grantRevoked": "prieiga atšaukta {date}",
+      "consentsIntro": "Kiekvieną sutikimą galite atšaukti bet kada, prieš renginį arba po jo. Jūsų registracija lieka galioti.",
+      "consentFuture": "Būsimi pranešimai",
+      "consentWithdrawnOn": "Atšaukta {date}",
+      "consentNoteInRoom": "Jei dabar esate salėje, atšaukimas galioja nuo kito įėjimo: kad galiotų iš karto, salėje naudokite Sutikimai.",
+      "consentFutureEffect": "Jei jį atšauksite, nebegausite pranešimų apie būsimus renginius ir pasitrauksite iš adresų knygos dėl visų savo registracijų."
     },
     "erasure": {
       "title": "Jūsų duomenų ištrynimas",
@@ -5161,9 +5223,7 @@
         "none": "Nėra"
       },
       "voices": {
-        "title": "Kalbėtojams priskirti sintetiniai balsai",
-        "male": "vyriškas balsas",
-        "female": "moteriškas balsas"
+        "title": "Kalbėtojams priskirti sintetiniai balsai"
       },
       "runAt": "Apdorojimas baigtas",
       "version": "Grandinės versija"
@@ -5171,7 +5231,8 @@
     "overlapBadge": "vienu metu",
     "overlapTitle": "Kalbėjimas vienu metu: šiame intervale kalba daugiau nei vienas asmuo.",
     "anonymousSpeaker": "Dalyvis {n}",
-    "untranscribed": "Netranskribuota: kalbėtojas nedavė sutikimo"
+    "untranscribed": "Netranskribuota: kalbėtojas nedavė sutikimo",
+    "unrecordedSpeech": "Kai kurių pasisakymų įraše nėra: kalbėję asmenys nedavė sutikimo."
   },
   "waiting": {
     "startsIn": "Renginys prasidės po",
@@ -5242,8 +5303,7 @@
     "aiNotice": "Pabaigoje įrašas bus apdorotas dirbtinio intelekto įrankiais, kad būtų sukurtas transkriptas, santrauka ir galimi vertimai bei įgarsinimai. Rezultatuose gali pasitaikyti netikslumų; vaizdo įrašas lieka autoritetingas šaltinis.",
     "multitrackConsentTitle": "Jūsų pasisakymų stenograma",
     "recordingConsentTitle": "Renginio įrašas",
-    "recordingConsentIntro": "Renginys įrašomas (garsas ir vaizdas). Jei kalbate, įraše bus jūsų balsas, atvaizdas ir tai, ką bendrinate ekrane.",
-    "recordingConsentRequired": "Norint įeiti, reikia jūsų sutikimo įrašyti.",
+    "recordingConsentIntro": "Renginys įrašomas (garsas ir vaizdas). Sutikus, įraše bus jūsų vardas, balsas, vaizdas ir tai, ką bendrinate ekrane.",
     "enterGardenTitle": "Įeik į aikštę",
     "enterGardenHint": "Kita vieta laukti: pasivaikščiokite, susitikite su kitais laukiančiais ir įeikite į tiesioginę transliaciją pro vartus, kai kambarys atsidarys.",
     "backToWaitingRoom": "Atgal į laukiamąjį",

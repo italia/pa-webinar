@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il genere di un materiale, per l'icona e l'etichetta breve nella sala: un
  * PDF, un documento, delle slide, un foglio di calcolo, un testo, un link.

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * GET /api/events/[slug]/lifecycle
  *
@@ -15,6 +18,9 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { NotFoundError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { scalerDriverActive } from '@/lib/events/lifecycle-driver';
+import { statoCattura } from '@/lib/live/capture-state';
+import { recordingAvailable } from '@/lib/recording/availability';
+import { getSettings } from '@/lib/settings';
 import { readJvbSnapshot, type JvbSnapshot } from '@/lib/jvb-snapshot';
 
 export const dynamic = 'force-dynamic';
@@ -80,6 +86,11 @@ export const GET = withErrorHandling(async (_request, context) => {
       endsAt: true,
       provisioningStartedAt: true,
       lastActiveAt: true,
+      recordingEnabled: true,
+      aiTranscriptEnabled: true,
+      multitrackRecordingEnabled: true,
+      captionsTranscriptEnabled: true,
+      liveCaptionsEnabled: true,
     },
   });
 
@@ -112,9 +123,13 @@ export const GET = withErrorHandling(async (_request, context) => {
       ? event.provisioningStartedAt!.toISOString()
       : null;
 
+  // Cosa si sta catturando: la sala lo mostra a chi e' dentro.
+  const cattura = statoCattura(event, await getSettings(), recordingAvailable());
+
   return Response.json(
     {
       status: event.status,
+      capture: { recording: cattura.registrazione, transcription: cattura.trascrizione },
       startsAt: event.startsAt.toISOString(),
       endsAt: event.endsAt.toISOString(),
       provisioningStartedAt: event.provisioningStartedAt?.toISOString() ?? null,

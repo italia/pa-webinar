@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Rete: una rete virtuale con due subnet (nodi e bridge), un NSG sulle due
 # subnet e gli indirizzi pubblici fissi che il chart mette davanti ai Service.
 #

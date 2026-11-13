@@ -46,7 +46,7 @@ installation. [Languages](#languages) lists them.
 ### EUPL-1.2 in plain words
 
 PA Webinar is released under the European Union Public Licence (EUPL-1.2). The
-[`LICENSE`](../LICENSE) file carries the notice, and the
+[`LICENSE`](../LICENSE) file holds the full English text, and the
 [official text](https://interoperable-europe.ec.europa.eu/collection/eupl/eupl-text-eupl-12)
 is published on the Interoperable Europe Portal (formerly Joinup) in every EU
 language. In practice:
@@ -589,8 +589,9 @@ proves a backup restores is in
 
 ### Support
 
-There is no support contract and no service level. The repository accepts
-issues for bugs and proposals, and private reports for vulnerabilities.
+There is no support contract and no service level for an installation. The
+repository accepts issues for bugs and proposals, with a first answer within
+two working days, and private reports for vulnerabilities.
 [GOVERNANCE](../GOVERNANCE.md) states who maintains the project and how
 decisions are made. Budget for the skills listed under
 [What you need](#what-you-need), whether they are internal or contracted.

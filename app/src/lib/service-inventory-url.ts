@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * L'indirizzo dell'inventario dei servizi (`SERVICE_INVENTORY_URL`), o null se
  * non e' impostato: la pagina, il piè di pagina e la home lo leggono da qui,

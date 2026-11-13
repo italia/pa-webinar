@@ -1,4 +1,7 @@
 #!/bin/sh
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Recorder entrypoint (ADR-013).
 #
 # Best-effort virtual audio SINK so headless Chrome's WebRTC AudioDeviceModule

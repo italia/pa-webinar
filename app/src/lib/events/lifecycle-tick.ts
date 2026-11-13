@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il giro del ciclo di vita degli eventi: le transizioni di stato automatiche
  * e la chiusura delle sessioni di chiamata.

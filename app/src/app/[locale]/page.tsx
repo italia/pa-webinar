@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { Fragment } from 'react';
 import { getTranslations, getLocale } from 'next-intl/server';
 
@@ -234,7 +237,7 @@ async function LandingHome({
 
   const projectPoints: { key: string; icon: string }[] = [
     { key: 'sovereignty', icon: 'it-locked' },
-    { key: 'openSource', icon: 'it-open-source' },
+    { key: 'openSource', icon: 'it-code-circle' },
     { key: 'gdpr', icon: 'it-lock' },
   ];
 

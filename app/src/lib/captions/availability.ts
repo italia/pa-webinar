@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * I sottotitoli live sono disponibili nell'istanza: l'amministrazione li ha
  * lasciati accesi e il servizio è installato. Il chart dà al portale

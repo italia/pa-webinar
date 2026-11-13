@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Public rubrica opt-out endpoint.
  *
@@ -21,6 +24,7 @@ import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { NotFoundError, ValidationError, UnauthorizedError } from '@/lib/errors';
+import { ritiraComunicazioni } from '@/lib/live/consent-withdrawal';
 import { verifyRubricaOptOutToken } from '@/lib/persons/opt-out-token';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
@@ -32,7 +36,7 @@ async function resolveToken(token: string) {
   const person = await prisma.person.findUnique({
     where: { id: verified.personId },
     select: {
-      id: true, displayName: true, organization: true,
+      id: true, emailHash: true, displayName: true, organization: true,
       optedInToAddressBook: true, optedOutAt: true,
     },
   });
@@ -66,22 +70,7 @@ export const POST = withErrorHandling(async (request) => {
 
   const person = await resolveToken(token);
 
-  // Lo stesso consenso dell'iscrizione copre rubrica e informazioni sui
-  // prossimi eventi (una sola casella): revocarlo li toglie entrambi, su ogni
-  // iscrizione della persona.
-  await prisma.$transaction([
-    prisma.person.update({
-      where: { id: person.id },
-      data: {
-        optedInToAddressBook: false,
-        optedOutAt: new Date(),
-      },
-    }),
-    prisma.registration.updateMany({
-      where: { personId: person.id, consentFutureCommunications: true },
-      data: { consentFutureCommunications: false },
-    }),
-  ]);
+  await ritiraComunicazioni(person.emailHash);
 
   return Response.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } });
 });

@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """Test delle funzioni pure della sintesi strutturata (no LLM reale)."""
 
 import llm

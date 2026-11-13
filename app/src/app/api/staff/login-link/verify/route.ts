@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * POST /api/staff/login-link/verify — consuma il link e apre la sessione
  * dell'account dello staff, organizzatore o amministratore (ADR-014).

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Chi c'e' dietro ogni riquadro della chiamata, per chi modera.
  *
@@ -142,47 +145,49 @@ export async function readSeats(eventId: string): Promise<Record<string, Seat>> 
 /** Solo per i test: svuota la memoria del processo. */
 export function resetSeatsMemoryForTests(): void {
   memoria.clear();
-  memoriaAscolto.clear();
+  memoriaElenchi.clear();
 }
 
 // ── Solo ascolto ──
-// Gli endpoint di chi e' in solo ascolto, dichiarati dal proprio browser con
-// il token della sala che lo dice (`listenOnly`, il valore che il bridge
-// applica: mod_pa_media_lock). Chi modera li legge con i posti, per non dare
-// la parola a chi non puo' prenderla. Stessa durata e stesso ripiego in
-// memoria dei posti.
-const chiaveAscolto = (eventId: string) => `live:listen-only:${eventId}`;
-const memoriaAscolto = new Map<string, Map<string, number>>();
+// Gli endpoint di chi e' in solo ascolto, dichiarati dal proprio browser con il
+// token della sala che lo dice (`listenOnly`: il valore che il bridge applica,
+// mod_pa_media_lock). Chi modera li legge con i posti, per sapere a chi puo'
+// dare la parola. Stessa durata e stesso ripiego in memoria dei posti.
+type Elenco = 'listen-only';
+const chiaveElenco = (elenco: Elenco, eventId: string) => `live:${elenco}:${eventId}`;
+const memoriaElenchi = new Map<string, Map<string, number>>();
 
-export async function segnaSoloAscolto(eventId: string, endpointId: string): Promise<void> {
+async function segnaInElenco(elenco: Elenco, eventId: string, endpointId: string): Promise<void> {
   const redis = getRedis();
+  const chiave = chiaveElenco(elenco, eventId);
   if (redis) {
     const fatto = await withDeadline(
-      redis
-        .multi()
-        .hset(chiaveAscolto(eventId), endpointId, '1')
-        .expire(chiaveAscolto(eventId), SEATS_TTL_SECONDS)
-        .exec(),
+      redis.multi().hset(chiave, endpointId, '1').expire(chiave, SEATS_TTL_SECONDS).exec(),
       REDIS_TIMEOUT_MS,
       null,
     );
     if (fatto) return;
   }
   const scadenza = Date.now() - SEATS_TTL_SECONDS * 1000;
-  for (const [ev, endpoint] of memoriaAscolto) {
+  for (const [ev, endpoint] of memoriaElenchi) {
     for (const [id, at] of endpoint) if (at < scadenza) endpoint.delete(id);
-    if (endpoint.size === 0 && ev !== eventId) memoriaAscolto.delete(ev);
+    if (endpoint.size === 0 && ev !== chiave) memoriaElenchi.delete(ev);
   }
-  const m = memoriaAscolto.get(eventId) ?? new Map<string, number>();
+  const m = memoriaElenchi.get(chiave) ?? new Map<string, number>();
   if (m.size < MEMORY_CAP) m.set(endpointId, Date.now());
-  memoriaAscolto.set(eventId, m);
+  memoriaElenchi.set(chiave, m);
 }
 
-export async function leggiSoloAscolto(eventId: string): Promise<string[]> {
+async function leggiElenco(elenco: Elenco, eventId: string): Promise<string[]> {
   const redis = getRedis();
+  const chiave = chiaveElenco(elenco, eventId);
   if (redis) {
-    const tutti = await withDeadline(redis.hkeys(chiaveAscolto(eventId)), REDIS_TIMEOUT_MS, null);
+    const tutti = await withDeadline(redis.hkeys(chiave), REDIS_TIMEOUT_MS, null);
     if (tutti) return tutti;
   }
-  return [...(memoriaAscolto.get(eventId)?.keys() ?? [])];
+  return [...(memoriaElenchi.get(chiave)?.keys() ?? [])];
 }
+
+export const segnaSoloAscolto = (eventId: string, endpointId: string) =>
+  segnaInElenco('listen-only', eventId, endpointId);
+export const leggiSoloAscolto = (eventId: string) => leggiElenco('listen-only', eventId);

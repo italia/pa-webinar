@@ -6,8 +6,9 @@ The page is maintained by hand and describes the repository as it is. It is not 
 
 ## PA Webinar's license
 
-- **License.** EUPL-1.2. The [LICENSE](LICENSE) file is a short notice that links to the full text on Joinup. Neither the repository nor the images carry the full text. See [Open points](#open-points). The same identifier appears in `publiccode.yml` (`legal.license`).
+- **License.** EUPL-1.2. The [LICENSE](LICENSE) file holds the full English text, unchanged. The images do not carry it. See [Open points](#open-points). The same identifier appears in `publiccode.yml` (`legal.license`).
 - **Copyright owner.** `publiccode.yml` names the Dipartimento per la Trasformazione Digitale (Italian Department for Digital Transformation) as `mainCopyrightOwner`.
+- **Source files.** Every source file starts with an SPDX header that names the license and the copyright holder. `npm run license:headers` lists the files without it, and `npm run license:headers -- --fix` adds it. A third-party file keeps its own license and holder in the same header, written by hand. CI workflows, `publiccode.yml`, generated files, SQL migrations and the assets in `app/public/` carry no header: an applied migration must not change, and the assets keep their own licenses.
 - **Contributions.** Contributions come in under the same license: inbound equals outbound. See [CONTRIBUTING.md](CONTRIBUTING.md#license-of-contributions).
 - **npm manifests.** Every `package.json` in the repository declares `EUPL-1.2` in its `license` field: the root, the `app` and `lobby` workspaces, and the recorder, recorder controller and captions gateway services.
 
@@ -243,7 +244,6 @@ No Python counterpart of `license-report.json` exists. `infra/ai/worker/requirem
 | vLLM | LLM inference server | Apache-2.0 (PyPI metadata) | Deployed by the operator. |
 | `piper-tts` | Speech synthesis for dubbing | MIT (PyPI metadata) | Catalog synthetic voices only, no voice cloning. |
 | `piper-phonemize` with espeak-ng | Phonemization. The wheel ships `libespeak-ng` as a shared library. | `piper-phonemize`: MIT. espeak-ng: GPL-3.0-or-later. | **To verify.** This puts GPL code in the worker image. |
-| `gender-guesser` | First-name gender hint for choosing a dubbing voice (`infra/ai/worker/name_gender.py`) | GPLv3 (PyPI metadata) | **To verify.** This puts GPL code in the worker image. |
 | `audioseal` and the `audioseal_wm_16bits` weights | Inaudible watermark on dubbed audio | MIT (PyPI metadata, `facebook/audioseal` model card) | The weights are not read from `/models`: `torch.hub` fetches them from huggingface.co unless they are seeded under `AUDIOSEAL_CACHE_DIR` (see above). |
 | Punkt sentence-splitting parameters | Sentence splitting during word alignment | Written at image build by `infra/ai/worker/punkt_params.py` | NLTK's pretrained Punkt data is not shipped: the terms of its training corpora are not declared. |
 | torch, torchaudio, torchvision, torchcodec, transformers, numpy, pandas, NLTK, httpx, pydantic, webvtt-py, onnxruntime | Runtime libraries | Permissive (BSD-style, Apache-2.0, MIT) | Confirm them with a listing from the built image. |
@@ -313,9 +313,9 @@ Record every new component here, or in `license-report.json` for the npm workspa
 
 These points need a decision by the maintainers. Each one is described in the section it links to.
 
-- **Full EUPL text.** `LICENSE` carries a notice and a link, not the text. Redistributors must include a copy of the license (EUPL Article 5), so adding the official EUPL-1.2 text to the repository and the image would make that obligation easy to meet. [Reusing PA Webinar](docs/REUSE.md#eupl-12-in-plain-words) already tells adopters to include a copy. See [PA Webinar's license](#pa-webinars-license).
+- **EUPL text in the images.** `LICENSE` holds the full text, but the images do not carry it. Redistributors must include a copy of the license (EUPL Article 5), so adding it to the images would make that obligation easy to meet. [Reusing PA Webinar](docs/REUSE.md#eupl-12-in-plain-words) already tells adopters to include a copy. See [PA Webinar's license](#pa-webinars-license).
 - **Report generator.** It omits platform-specific packages because it assumes they share their parent's license. That assumption does not hold for libvips. The omitted binaries can be seen in the image SBOM. See [The npm report](#the-npm-report-license-reportjson) and [Release SBOMs](#release-sboms).
-- **GPL code in the AI worker image.** `gender-guesser` and espeak-ng (through `piper-phonemize`). See [AI stack and model weights](#ai-stack-and-model-weights).
+- **GPL code in the AI worker image.** espeak-ng, through `piper-phonemize`. See [AI stack and model weights](#ai-stack-and-model-weights).
 - **Non-commercial alignment weights.** The default alignment models for Italian, French, German and Spanish are CC BY-NC 4.0. See [AI stack and model weights](#ai-stack-and-model-weights).
 - **Piper voices.** `fr_FR-tom-medium` is AGPLv3, several voices descend from `lessac`, whose data is under a research license, `de_DE-kerstin-low` descends from `en_US-ryan-low`, whose data is CC BY-NC-SA 4.0, and `es_AR-daniela-high` is trained on CC BY-SA 4.0 data. See [Piper voices](#piper-voices).
 - **Redis license.** The release pinned by the chart is in the Redis 8 line (RSALv2, SSPLv1 or AGPLv3), and Compose uses the 7.4 line (RSALv2 or SSPLv1). No option is permissive. See [Redis](#redis).

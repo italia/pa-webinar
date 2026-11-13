@@ -15,6 +15,7 @@ PA Webinar is open-source software that lets a public administration (PA) run pu
 | Maturity | Beta, `0.x` release series | [Releases and versioning](#releases-and-versioning) |
 | Architecture decisions | Recorded as ADRs | [How decisions are made](#how-decisions-are-made) |
 | Security fixes | Covered in the security policy | [Support](#support) |
+| Answers to issues and pull requests | Within two working days | [Support](#support) |
 
 ## Ownership and maintenance
 
@@ -137,7 +138,9 @@ To propose an item, open a feature request issue. Describe the problem, who has 
 
 - [SECURITY.md](SECURITY.md) defines which versions receive security fixes.
 - There are no long-term-support or maintenance branches. Fixes land on `dev` and ship in the next release, and earlier minor versions receive no backports.
-- Response commitments exist only for vulnerability reports, and [SECURITY.md](SECURITY.md) states them. No response time is committed for ordinary issues and pull requests.
+- A maintainer answers issues and pull requests from outside the project within two working days. The first answer can be a short assessment. A bug report stays open until the fix is in.
+- [SECURITY.md](SECURITY.md) states the commitments for vulnerability reports.
+- A published advisory or a known incompatibility in a dependency has a public issue until it is resolved. A vulnerability that is not public yet follows [SECURITY.md](SECURITY.md) instead.
 - There is no support service for installations run by other administrations, and no commercial support is defined. Operators start from [docs/operations/troubleshooting.md](docs/operations/troubleshooting.md) and open an issue for a defect in PA Webinar itself.
 
 ## Communication channels
@@ -154,7 +157,7 @@ The repository has no discussion forum, wiki, mailing list or chat channel.
 
 ## Licensing
 
-PA Webinar is released under the European Union Public Licence (EUPL-1.2). The [LICENSE](LICENSE) file is a short notice that links to the full text on Joinup.
+PA Webinar is released under the European Union Public Licence (EUPL-1.2). The [LICENSE](LICENSE) file holds the full text, and every source file carries an SPDX header that names the license and the copyright holder.
 
 - Contributions are accepted under the same license, as [CONTRIBUTING.md](CONTRIBUTING.md) states. No separate contributor license agreement or sign-off is defined.
 - [docs/REUSE.md](docs/REUSE.md) explains what the license means in practice for a reusing administration.

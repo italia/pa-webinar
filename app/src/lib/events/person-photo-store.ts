@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Le foto delle persone dell'evento nel database (EventPersonPhoto): il
  * salvataggio di una foto caricata, il controllo degli id che arrivano dal

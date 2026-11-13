@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { afterEach, beforeEach, describe, it, expect } from 'vitest';
 
 import { generateEventICal, icsSequence } from './generate';

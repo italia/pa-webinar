@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * La disposizione della mappa concettuale del resoconto, senza librerie: i
  * temi su un anello interno attorno al titolo, gli altri nodi (concetti,

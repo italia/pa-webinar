@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """La traduzione di titolo e descrizione dell'evento (lavoro TRANSLATE_TEXT):
 richiesta al motore, Markdown, link, segnaposto, lingue, consegna."""
 

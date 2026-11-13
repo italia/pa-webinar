@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * I byte del PDF di un materiale, letti lato server come fa `/api/assets`: il
  * browser non raggiunge lo storage (nessun host in più nella CSP), e il file

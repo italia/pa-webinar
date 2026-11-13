@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Chat attachment helpers: the MIME allow-list + size cap shared by the upload
  * route and the message POST validation, plus safe conversions between the

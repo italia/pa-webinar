@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /** I gesti della piazza (EMOTE_TYPES della lobby): solo questi arrivano agli
  *  altri, quello che il server ripete è quello che loro mostrano. */
 export const GARDEN_EMOTE_TYPES = ['wave', 'heart', 'clap', 'laugh', 'idea', 'caffe'] as const;

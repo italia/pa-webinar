@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 // @vitest-environment node
 /**
  * L'ingresso con la chiave dell'istanza: la sessione nasce solo dalla chiave
@@ -102,6 +105,19 @@ describe('chi entra', () => {
       expect(r.headers.get('set-cookie')).toBeNull();
     }
     expect(prisma.adminAuditLog.create).not.toHaveBeenCalled();
+  });
+
+  it('copiata con spazi o un a capo ai lati entra lo stesso', async () => {
+    for (const key of [` ${CHIAVE}`, `${CHIAVE} `, `  ${CHIAVE}\n`, `\t${CHIAVE}\r\n`]) {
+      expect((await accedi({ key })).status).toBe(200);
+    }
+  });
+
+  it('gli spazi in mezzo restano una chiave diversa', async () => {
+    const meta = Math.floor(CHIAVE.length / 2);
+    const r = await accedi({ key: `${CHIAVE.slice(0, meta)} ${CHIAVE.slice(meta)}` });
+    expect(r.status).toBe(401);
+    expect((await accedi({ key: '   ' })).status).toBe(401);
   });
 
   it('senza chiave nel corpo e’ 401', async () => {

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Chi c'e' dietro ogni riquadro della chiamata (vedi lib/live/seats).
  *
@@ -24,6 +27,7 @@ import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { ForbiddenError, NotFoundError, RateLimitError, UnauthorizedError, ValidationError } from '@/lib/errors';
 import { readOwnedEventAccessToken } from '@/lib/event-session';
+import { endpointSenzaRegistrazione } from '@/lib/captions/room';
 import { claimSeat, leggiSoloAscolto, readSeats, type Seat } from '@/lib/live/seats';
 import { rateLimit } from '@/lib/rate-limit';
 
@@ -148,6 +152,13 @@ export const GET = withErrorHandling(async (request, context) => {
   }
   // Chi e' in solo ascolto (dichiarato dal suo browser con il token che lo
   // dice): chi modera non gli da' una parola che il bridge non apre.
-  const listenOnly = await leggiSoloAscolto(event.id);
-  return Response.json({ seats: out, listenOnly }, { headers: { 'Cache-Control': 'no-store' } });
+  // Chi non ha un consenso valido partecipa come tutti, e non viene registrato.
+  const [listenOnly, voiceExcluded] = await Promise.all([
+    leggiSoloAscolto(event.id),
+    endpointSenzaRegistrazione(event.id),
+  ]);
+  return Response.json(
+    { seats: out, listenOnly, voiceExcluded },
+    { headers: { 'Cache-Control': 'no-store' } },
+  );
 });

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /** Format a millisecond duration as mm:ss (or h:mm:ss past an hour). */
 export function formatClock(ms: number): string {
   const total = Math.max(0, Math.floor(ms / 1000));

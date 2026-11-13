@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Le alzate di mano: nel log della sessione come prima (endpoint e stato),
  * e nella cronologia della sala all'ora del server, senza l'endpoint.

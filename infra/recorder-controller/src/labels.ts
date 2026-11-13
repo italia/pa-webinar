@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Identificatori condivisi fra i runner (K8s label / Docker label) così il
  * dedup e l'elenco usano le stesse chiavi indipendentemente dall'ambiente.

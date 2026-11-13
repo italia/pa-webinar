@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /** Le lingue di traduzione predefinite di un'istanza nuova: inglese,
  *  francese, spagnolo e tedesco (SiteSetting.aiDefaultTargetLocales). */
 export const DEFAULT_TARGET_LOCALES = 'en,fr,es,de';

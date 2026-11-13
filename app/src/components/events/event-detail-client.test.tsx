@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { act, type ReactNode } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { NextIntlClientProvider } from 'next-intl';
@@ -121,6 +124,28 @@ afterEach(() => {
   act(() => root.unmount());
   container.remove();
   vi.unstubAllGlobals();
+});
+
+describe('scheda pubblica — video', () => {
+  const concluso = (unrecordedSpeech: boolean) =>
+    ({
+      ...evento(),
+      status: 'ENDED',
+      startsAt: new Date(Date.now() - 4 * HOUR).toISOString(),
+      endsAt: new Date(Date.now() - 2 * HOUR).toISOString(),
+      recordingUrl: 'https://esempio.invalid/video.mp4',
+      unrecordedSpeech,
+    }) as unknown as ReturnType<typeof evento>;
+
+  it('dice che nel video mancano gli interventi di chi non ha acconsentito', () => {
+    disegna({ event: concluso(true), registrationOpen: false });
+    expect(container.textContent).toContain(messages.postprod.unrecordedSpeech);
+  });
+
+  it('senza interventi mancanti non dice niente', () => {
+    disegna({ event: concluso(false), registrationOpen: false });
+    expect(container.textContent).not.toContain(messages.postprod.unrecordedSpeech);
+  });
 });
 
 describe('scheda pubblica — iscrizione', () => {

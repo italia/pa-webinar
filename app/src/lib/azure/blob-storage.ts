@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * @deprecated Thin shim over `@/lib/storage` preserved to avoid
  * touching a pile of call-sites in one go. New code should import

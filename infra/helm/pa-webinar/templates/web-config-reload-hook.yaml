@@ -1,3 +1,6 @@
+{{- /* SPDX-License-Identifier: EUPL-1.2 */ -}}
+{{- /* SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale */ -}}
+
 {{- /*
 Post-upgrade/post-install hook: restart the Jitsi web deployment so config.js
 is regenerated from the (possibly changed) custom-config configmap.
@@ -14,8 +17,14 @@ automates that restart on every upgrade/install.
 Disable with `configReloadHook.enabled: false`. Restart only when you change
 web custom config in practice — an extra web restart per deploy is cheap and
 safe between events (the web tier is stateless; live media is client↔JVB).
+
+Prosody loads the project modules at startup, and the rule that keeps people
+without the recording consent out of the recording lives there: the hook
+restarts it when the modules change, and only then, because that drops the
+conferences in progress. The fingerprint stays on the StatefulSet.
 */}}
 {{- if .Values.configReloadHook.enabled }}
+{{- $moduliProsody := (.Files.Glob "files/prosody-plugins/*").AsConfig | sha256sum }}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -39,7 +48,7 @@ rules:
   # `kubectl rollout restart` patches the Deployment object (sets
   # spec.template.metadata.annotations[kubectl.kubernetes.io/restartedAt]).
   - apiGroups: ["apps"]
-    resources: ["deployments"]
+    resources: ["deployments", "statefulsets"]
     verbs: ["get", "list", "patch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -101,6 +110,18 @@ spec:
                   kubectl rollout restart -n "$ns" $dep
                 else
                   echo "config-reload: no deployment for component=$comp (skip)"
+                fi
+              done
+              impronta="{{ $moduliProsody }}"
+              installazione="{{ .Release.IsInstall }}"
+              for sts in $(kubectl get sts -n "$ns" -l "app.kubernetes.io/component=prosody" -o name 2>/dev/null || true); do
+                vista=$(kubectl get -n "$ns" "$sts" -o "jsonpath={.metadata.annotations.pa-webinar/prosody-modules}" 2>/dev/null || true)
+                if [ "$vista" != "$impronta" ]; then
+                  if [ "$installazione" != "true" ]; then
+                    echo "config-reload: Prosody modules changed, rollout restart $sts"
+                    kubectl rollout restart -n "$ns" "$sts"
+                  fi
+                  kubectl annotate -n "$ns" "$sts" --overwrite "pa-webinar/prosody-modules=$impronta"
                 fi
               done
           resources:

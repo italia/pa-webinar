@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import type { ConferenceState } from './ports/ConferenceState';
 import type { EventSchedule } from './ports/EventSchedule';
 import type { MediaDevices } from './ports/MediaDevices';

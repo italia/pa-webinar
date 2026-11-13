@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Costruzione del `Recording.pipelineSnapshot` — fotografia degli
  * engine/modelli/voci/lingue usati dalla pipeline AI, per la trasparenza

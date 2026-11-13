@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * I momenti in cui un evento puo' mandare una notifica a chi si e' iscritto:
  * lo scarto dall'inizio, la chiave del testo (`reminders.presets.*`) e

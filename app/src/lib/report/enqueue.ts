@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * La richiesta del resoconto dell'evento, dallo staff dopo l'evento
  * (api/admin/events/[id]/report), e il suo salvataggio quando il worker lo

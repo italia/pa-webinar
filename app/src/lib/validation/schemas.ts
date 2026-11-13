@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { z } from 'zod';
 
 import { CODICE_LINGUA } from '@/lib/ai/target-locales';
@@ -111,11 +114,14 @@ export const eventBaseSchema = z.object({
   /** La spiegazione sopra la casella del consenso alla registrazione in sala
    *  d'attesa, al posto di quella predefinita. */
   recordingConsentText: z.string().max(5000).optional(),
-  // Chi non acconsente alla registrazione entra in solo ascolto: acceso per
-  // gli eventi nuovi (il consenso e' libero, art. 7.4 GDPR).
-  listenOnlyWithoutConsent: z.boolean().default(true),
   // Pubblico anonimo: pseudonimi per chi partecipa (spento: ci si conosce).
   audienceAnonymous: z.boolean().default(false),
+  // L'elenco di chi partecipa, per il pubblico: senza una scelta, lo decide il
+  // formato dell'evento (lib/live/participant-list).
+  participantListVisible: z.boolean().optional(),
+  // Moderatori e relatori sempre nella registrazione, per dichiarazione di chi
+  // organizza. Niente default: un aggiornamento parziale non lo azzera.
+  hostsAlwaysRecorded: z.boolean().optional(),
 
   // Recurrence (RFC 5545 RRULE). Null = one-off.
   recurrenceRule: z.string().max(500).nullable().optional(),

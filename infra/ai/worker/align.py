@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """Allineamento preciso delle tracce per-partecipante alla timeline del mix
 Jibri via cross-correlazione dell'inviluppo di energia (ADR-013, raffinamento
 sincronizzazione — "Opzione C").

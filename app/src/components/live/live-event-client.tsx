@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
@@ -51,10 +54,17 @@ import ClosingNotice from '@/components/live/closing-notice';
 import LiveCaptions from '@/components/live/live-captions';
 import { impostaPulsante } from '@/lib/jitsi/custom-buttons';
 import { FULLSCREEN_BUTTON_ID, fullscreenToolbarButton } from '@/lib/jitsi/fullscreen-button';
+import CaptureNotice from '@/components/live/capture-notice';
+import VoiceExcludedNotice from '@/components/live/voice-excluded-notice';
+import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import { catturaDallaRisposta, type StatoCattura } from '@/lib/live/capture-state';
 import StageName from '@/components/live/stage-name';
 import ListenOnlyNotice from '@/components/live/listen-only-notice';
-import ConsentsDialog, { type ConsensiInSala } from '@/components/live/consents-dialog';
-import { regolaConsenso } from '@/lib/live/consent-rule';
+import ConsentsDialog, {
+  type ConsensiInSala,
+  type EffettoRitiroRegistrazione,
+} from '@/components/live/consents-dialog';
+import { conduceSempreRegistrato, regolaConsenso } from '@/lib/live/consent-rule';
 import ControlRoomPanel, { type FunzioneSala } from '@/components/live/control-room-panel';
 import { useCaptionsControl } from '@/hooks/use-captions-control';
 import { useRecordingControl, type ControlloRegistrazione } from '@/hooks/use-recording-control';
@@ -89,6 +99,12 @@ import {
 } from '@/lib/jitsi/riconnessione';
 import { useRientro } from '@/hooks/use-rientro';
 import { splitTitleKicker } from '@/lib/utils/title-kicker';
+import {
+  eNomeDelProdotto,
+  larghezzaMarchioIntero,
+  MARCHIO_INTERO_NEGATIVO,
+  NOME_PRODOTTO,
+} from '@/lib/branding/marchio';
 import { useSettings } from '@/lib/settings-context';
 import { OVERTIME_CAP_DEFAULT_MINUTES } from '@/lib/events/overtime-defaults';
 import { eventAdminPath } from '@/lib/events/admin-links';
@@ -103,6 +119,10 @@ interface EventInfo {
   waitingRoomEngine?: 'GARDEN' | 'GAME' | 'CLASSIC';
   /** Pubblico anonimo: chi partecipa compare con uno pseudonimo. */
   audienceAnonymous?: boolean;
+  /** L'elenco di chi partecipa e' visibile al pubblico (lib/live/participant-list). */
+  participantListVisible?: boolean;
+  /** Chi conduce e' sempre nella registrazione: non vede la casella. */
+  hostsAlwaysRecorded?: boolean;
   /** Resolved video/audio quality preset (per-event override merged with site default). */
   videoQuality?: VideoQualityPreset;
   startsAt: string;
@@ -150,7 +170,8 @@ interface EventInfo {
   /** Testo di consenso alla registrazione scelto per l'evento; null = quello predefinito. */
   recordingConsentText?: string | null;
   /** Chi non acconsente alla registrazione entra in solo ascolto. */
-  listenOnlyWithoutConsent?: boolean;
+  /** La voce di chi non acconsente nel video (lib/recording/availability). */
+  voceNelVideo?: VoceNelVideo;
   /** L'informativa privacy dell'evento (lib/events/privacy-notice), accanto
    *  al consenso chiesto in sala d'attesa. */
   privacy?: { url: string; testo?: string };
@@ -307,6 +328,11 @@ interface JitsiCredentials {
   consentsRecorded?: { recording: boolean; multitrack: boolean };
   /** In solo ascolto: senza consenso alla registrazione (lib/live/listen-only). */
   listenOnly?: boolean;
+  /** Senza un consenso valido alla registrazione: in sala come tutti, fuori dalla
+   *  registrazione. */
+  voiceExcluded?: boolean;
+  /** L'elenco di chi partecipa, al momento dell'ingresso. */
+  participantListVisible?: boolean;
 }
 
 /** La notifica di Jitsi «Il moderatore ti chiede di intervenire» (il suo uid). */
@@ -380,6 +406,7 @@ export default function LiveEventClient({
   const participantCountRef = useRef(0);
   useEffect(() => { participantCountRef.current = participantCount; }, [participantCount]);
   const [isRecording, setIsRecording] = useState(false);
+  const [cattura, setCattura] = useState<StatoCattura | null>(null);
   const [error, setError] = useState('');
   const [jitsiApi, setJitsiApi] = useState<JitsiMeetExternalAPI | null>(null);
   // App-owned fullscreen: fullscreen the whole live wrapper (video +
@@ -527,6 +554,7 @@ export default function LiveEventClient({
   const tokenSalaRef = useRef<string[]>([]);
   // La registrazione dell'evento, per chi entra dalla sala d'attesa: se
   // chiederne il consenso, o se basta informare.
+  const chiConduceSempreRegistrato = conduceSempreRegistrato(event, event.voceNelVideo ?? 'fissa');
   const argomentiRegistrazione = {
     formato: {
       recordingEnabled: event.recordingEnabled,
@@ -534,11 +562,11 @@ export default function LiveEventClient({
       participantsCanUnmute: event.participantsCanUnmute,
       participantsCanStartVideo: event.participantsCanStartVideo,
       participantsCanShareScreen: event.participantsCanShareScreen,
-      listenOnlyWithoutConsent: event.listenOnlyWithoutConsent ?? false,
     },
     registrazioneDisponibile: recordingAvailable,
     conduce: isModerator || isSpeaker,
     istantanea: event.eventType === 'INSTANT',
+    conduceSempreRegistrato: chiConduceSempreRegistrato,
   };
   const consensoRegistrazione = consensoRegistrazioneIngresso({
     ...argomentiRegistrazione,
@@ -550,9 +578,10 @@ export default function LiveEventClient({
     ...argomentiRegistrazione,
     giaDato: false,
   }).richiesto;
-  // L'evento ha il solo ascolto per chi non acconsente (la stessa regola del
-  // server, lib/live/listen-only): i blocchi della sala restano accesi.
-  const salaSoloAscolto = regolaConsenso(
+  // La stessa regola del server (lib/live/consent-rule): solo dove la voce non si
+  // puo' togliere dal video chi non acconsente resta in solo ascolto, e i blocchi
+  // della sala seguono il consenso.
+  const regolaSala = regolaConsenso(
     {
       eventType: event.eventType,
       recordingEnabled: event.recordingEnabled,
@@ -560,10 +589,11 @@ export default function LiveEventClient({
       participantsCanUnmute: event.participantsCanUnmute,
       participantsCanStartVideo: event.participantsCanStartVideo,
       participantsCanShareScreen: event.participantsCanShareScreen,
-      listenOnlyWithoutConsent: event.listenOnlyWithoutConsent ?? false,
     },
     recordingAvailable,
-  ).soloAscolto;
+    event.voceNelVideo ?? 'fissa',
+  );
+  const salaSoloAscolto = regolaSala.soloAscolto;
   const [joinPrefs, setJoinPrefs] = useState<WaitingRoomJoinPrefs>({
     cameraOn: false,
     micOn: false,
@@ -809,15 +839,6 @@ export default function LiveEventClient({
           return 'gestito';
         }
       }
-      // Il server vuole il consenso alla registrazione che la sala non ha
-      // mandato: si torna in sala d'attesa, dove c'e' la casella.
-      if (errore.code === 'RECORDING_CONSENT_REQUIRED') {
-        setPhase('waiting');
-        // Le regole dell'evento possono essere cambiate da quando la pagina
-        // e' stata aperta: si rileggono, e la sala d'attesa mostra la casella.
-        router.refresh();
-        return 'gestito';
-      }
       // L'amministrazione ha chiuso l'ingresso da ospite mentre si era in
       // sala d'attesa: il testo del server non e' tradotto, e «Riprova»
       // non cambierebbe l'esito.
@@ -913,6 +934,10 @@ export default function LiveEventClient({
   // chiede un token nuovo con il consenso; la conferenza rientra con quello
   // (JitsiRoom si ricollega quando cambia il token).
   const soloAscolto = !!credentials?.listenOnly;
+  const voceEsclusa = !!credentials?.voiceExcluded;
+  // Ha aperto microfono o videocamera: con la parola data, anche dove di norma
+  // non si parla.
+  const [mezzoUsato, setMezzoUsato] = useState(false);
   // Chi e' in solo ascolto dice al server quale riquadro e' il suo, con il
   // token della sala che lo dice: chi modera lo vede nella scheda Partecipanti
   // e non gli offre una parola che il bridge non apre (api/events/listen-only).
@@ -959,11 +984,20 @@ export default function LiveEventClient({
   // token nuovo con il consenso. Ritirare lo dice al server, con i token della
   // sala di questa visita come prova dei posti, e poi chiede un token nuovo
   // senza: la conferenza si ricollega e il registratore smette di registrare
-  // la voce. Chi senza consenso alla registrazione non puo' restare (niente
-  // solo ascolto) torna in sala d'attesa, dove la casella lo aspetta.
+  // la voce.
   const [consensiAperti, setConsensiAperti] = useState(false);
   const [ritiro, setRitiro] = useState<'no' | 'in-corso' | 'errore'>('no');
-  const effettoRitiro = isModerator || isSpeaker ? 'conduce' : salaSoloAscolto ? 'soloAscolto' : 'uscita';
+  const voceInSala = event.voceNelVideo ?? 'fissa';
+  const effettoRitiro: EffettoRitiroRegistrazione =
+    voceInSala === 'assente'
+      ? 'nessuno'
+      : voceInSala === 'rimovibile'
+        ? 'voce'
+        : isModerator || isSpeaker
+          ? 'conduce'
+          : salaSoloAscolto
+            ? 'soloAscolto'
+            : 'nessuno';
   // Dopo un ritiro la conferenza deve ricollegarsi senza il consenso: finche'
   // resta sul token di prima, microfono, videocamera e registratore per voce
   // valgono ancora. Tre tentativi; se non riesce, si esce dalla conferenza e
@@ -1017,20 +1051,15 @@ export default function LiveEventClient({
         ...(registrazione ? { recordingConsent: false } : {}),
       }));
       setRitiro('no');
-      if (registrazione && effettoRitiro === 'uscita') {
-        setConsensiAperti(false);
-        setPhase('waiting');
-        return;
-      }
       setRicollegamento('chiesto');
     },
-    [event.slug, effettoRitiro],
+    [event.slug],
   );
   const trascrizioneInSala =
     (!!event.multitrackRecordingEnabled || !!event.captionsTranscript) && eventStatus !== 'ENDED';
-  const registrazioneData = haConsensoRegistrazione && !soloAscolto;
+  const registrazioneData = haConsensoRegistrazione && !soloAscolto && !voceEsclusa;
   const consensiInSala: ConsensiInSala = {
-    ...(registrazioneChiesta
+    ...(registrazioneChiesta || consensiRegistrati.registrazione
       ? { registrazione: { dato: registrazioneData, ritiro: effettoRitiro } }
       : {}),
     ...(trascrizioneInSala
@@ -1103,7 +1132,7 @@ export default function LiveEventClient({
     const aggiornaRete = () => {
       setReteInstabile(connessioneInstabile(proveFalliteRef.current, navigator.onLine));
     };
-    const pollInterval = setInterval(async () => {
+    const controlla = async () => {
       // Durante un rientro le stesse domande le fa il rientro.
       if (rientroRef.current) return;
       // Qui serve solo lo `status`, e questa chiamata la ripete ogni
@@ -1117,6 +1146,11 @@ export default function LiveEventClient({
       // portale (un aggiornamento in corso) no: la rete c'è.
       proveFalliteRef.current = res ? 0 : proveFalliteRef.current + 1;
       aggiornaRete();
+      // Il registratore per persona e la trascrizione dai sottotitoli non
+      // passano da un comando in sala: li dice il server. Una risposta senza
+      // lo stato tiene l'ultimo noto: nel dubbio il segnale resta acceso.
+      const statoCatturaOra = catturaDallaRisposta(res?.ok ? res.data : null);
+      if (statoCatturaOra) setCattura(statoCatturaOra);
       if (statoEvento(res) === 'ENDED' && eventStatus !== 'ENDED') {
         markEnded();
         // La schermata «Evento concluso» invece di restare in 'ready', che
@@ -1127,7 +1161,9 @@ export default function LiveEventClient({
         // La valutazione e' dentro la schermata di chiusura (phase 'ended').
         setPhase('ended');
       }
-    }, 5000);
+    };
+    void controlla();
+    const pollInterval = setInterval(() => void controlla(), 5000);
     window.addEventListener('online', aggiornaRete);
     window.addEventListener('offline', aggiornaRete);
     return () => {
@@ -1151,7 +1187,10 @@ export default function LiveEventClient({
     // Jitsi la riferisce chiusa anche a chi la riaprirà appena entrato.
     if (rientroRef.current) return;
     mediaRef.current = conCambioMedia(mediaRef.current, mezzo, muto);
+    if (!muto) setMezzoUsato(true);
   }, [rientroRef]);
+
+  const handleScreenShareStarted = useCallback(() => setMezzoUsato(true), []);
 
   // «Rientra» dalla schermata di uscita: di nuovo il token e la sala, con le
   // scelte della sala d'attesa. Il consenso alla registrazione e' gia' stato
@@ -1831,6 +1870,8 @@ export default function LiveEventClient({
   useEffect(() => {
     riaffermaSottotitoliRef.current = riaffermaSottotitoliOra;
   }, [riaffermaSottotitoliOra]);
+  const registrazioneInCorso = isRecording || !!cattura?.registrazione;
+  const trascrizioneInCorso = !!cattura?.trascrizione;
   // L'ora d'avvio della registrazione secondo il server (la cronologia della
   // sala), per un tempo uguale per tutti i moderatori, anche entrati dopo.
   // Si chiede finché la registrazione è in corso e il server non la sa. Una
@@ -2021,8 +2062,9 @@ export default function LiveEventClient({
           // data (all'iscrizione, o in sala in questa visita della pagina).
           multitrackConsentExempt={haConsensoTracce}
           recordingConsentRequired={consensoRegistrazione.richiesto}
-          recordingConsentOptional={consensoRegistrazione.facoltativo}
+          voce={event.voceNelVideo ?? 'fissa'}
           recordingListenOnly={consensoRegistrazione.soloAscolto}
+          recordingHostAlways={chiConduceSempreRegistrato && (isModerator || isSpeaker)}
           recordingConsentText={event.recordingConsentText}
           privacy={event.privacy}
         />
@@ -2192,6 +2234,12 @@ export default function LiveEventClient({
 
   // ── Ready: Jitsi room ──
   const isActualModerator = credentials.role === 'moderator';
+  // L'elenco nascosto riguarda il pubblico, e vale la scelta di quando si e'
+  // entrati: chi aspettava da prima non ha un valore vecchio.
+  const elencoNascosto =
+    !(credentials.participantListVisible ?? event.participantListVisible) &&
+    !isActualModerator &&
+    !isSpeaker;
   const isInstantCall = event.eventType === 'INSTANT';
   // Lavagna in sala: scelta dell'evento (le chiamate istantanee l'hanno
   // sempre) E backend presente nell'installazione. Senza backend nessuna
@@ -2240,6 +2288,8 @@ export default function LiveEventClient({
         registrationCount={event.registrationCount}
         maxParticipants={event.maxParticipants}
         isRecording={isRecording}
+        inRegistrazione={registrazioneInCorso}
+        inTrascrizione={trascrizioneInCorso}
         role={isActualModerator ? 'moderator' : isGuest ? 'guest' : 'participant'}
         slug={event.slug}
         locale={locale}
@@ -2250,10 +2300,30 @@ export default function LiveEventClient({
         onApriConsensi={haConsensiInSala ? () => setConsensiAperti(true) : undefined}
       />
 
+      <CaptureNotice video={isRecording} voci={!!cattura?.registrazione} trascrizione={trascrizioneInCorso} />
+
       {/* Chi e' in solo ascolto lo vede, con il modo di acconsentire e
           intervenire. */}
       {soloAscolto && !showJvbOverlay && (
         <ListenOnlyNotice
+          onAcconsenti={acconsentiInSala}
+          inCorso={riconsenso === 'in-corso'}
+          errore={riconsenso === 'errore'}
+        />
+      )}
+      {/* Chi non ha dato il consenso e puo' parlare o mostrarsi lo sa, anche se ha
+          soltanto dimenticato la casella: non viene registrato. In un evento di
+          solo ascolto, da quando ha la parola. */}
+      {voceEsclusa &&
+        !showJvbOverlay &&
+        (event.participantsCanUnmute ||
+          event.participantsCanStartVideo ||
+          event.participantsCanShareScreen ||
+          isActualModerator ||
+          isSpeaker ||
+          mezzoUsato) && (
+        <VoiceExcludedNotice
+          testoConsenso={event.recordingConsentText}
           onAcconsenti={acconsentiInSala}
           inCorso={riconsenso === 'in-corso'}
           errore={riconsenso === 'errore'}
@@ -2413,8 +2483,7 @@ export default function LiveEventClient({
                 enableFileSharing={isInstantCall}
                 whiteboardEnabled={whiteboardOn}
                 whiteboardInfraReady={whiteboardInfraReady}
-                // Chi interviene resta con il nome e la griglia, come chi conduce.
-                pubblicoAnonimo={(event.audienceAnonymous ?? false) && !isSpeaker}
+                elencoNascosto={elencoNascosto}
                 videoQuality={event.videoQuality}
                 reactionsMode={reactionsMode}
                 liveCaptions={Boolean(event.liveCaptionsAvailable)}
@@ -2428,6 +2497,7 @@ export default function LiveEventClient({
                 onReadyToClose={handleReadyToClose}
                 onConnectionLost={avviaRientro}
                 onMediaChanged={handleMediaChanged}
+                onScreenShareStarted={handleScreenShareStarted}
                 inRientro={rientro !== null}
                 onParticipantCountChanged={handleParticipantCountChanged}
                 onRecordingStatusChanged={handleRecordingStatusChanged}
@@ -2456,7 +2526,10 @@ export default function LiveEventClient({
             )}
             <div className="live-stage-bottom" hidden={showJvbOverlay}>
               <LiveCaptions api={jitsiApi} active={sottotitoliAccesi} alto={sottotitoliAlto} />
-              <StageName api={jitsiApi} />
+              <StageName
+                api={jitsiApi}
+                soloChiParla={elencoNascosto}
+              />
             </div>
             {/* Custom reactions bar only in CUSTOM mode; NATIVE mode uses
                 Jitsi's own reactions button in the toolbar instead. */}
@@ -2473,8 +2546,9 @@ export default function LiveEventClient({
 
         <LiveSidebar
           salaSoloAscolto={salaSoloAscolto}
+          salaConsensoChiesto={regolaSala.richiesto}
           guestKeyName={isGuest || !token ? chosenName.trim() : undefined}
-          pubblicoAnonimo={event.audienceAnonymous ?? false}
+          elencoNascosto={elencoNascosto}
           nascosta={soloContenuto}
           onNascondi={nascondiColonna}
           onMostra={mostraColonna}
@@ -2684,11 +2758,14 @@ type SidebarTab =
 interface LiveSidebarProps {
   /** Evento con il solo ascolto per chi non acconsente (lib/live/listen-only). */
   salaSoloAscolto?: boolean;
+  /** Il consenso si chiede al pubblico: chi non l'ha dato ha scelto cosi'. */
+  salaConsensoChiesto?: boolean;
   /** L'ospite: il nome scritto in sala d'attesa, chiave del suo posto in chat
    *  e nelle domande (il nome mostrato puo' essere uno pseudonimo). */
   guestKeyName?: string;
-  /** Pubblico anonimo: l'elenco dei partecipanti solo per chi conduce. */
-  pubblicoAnonimo?: boolean;
+  /** L'elenco dei partecipanti resta a chi conduce e a chi interviene: niente
+   *  scheda e niente nomi suggeriti per le @menzioni. */
+  elencoNascosto?: boolean;
   /** Solo il contenuto: la colonna e' chiusa del tutto (desktop). */
   nascosta?: boolean;
   /** La «×» della colonna: chiude tutto, si riapre dalla barra in alto. */
@@ -2749,8 +2826,9 @@ interface LiveSidebarProps {
 
 function LiveSidebar({
   salaSoloAscolto = false,
+  salaConsensoChiesto = false,
   guestKeyName,
-  pubblicoAnonimo = false,
+  elencoNascosto = false,
   nascosta = false,
   onNascondi,
   onMostra,
@@ -3324,8 +3402,8 @@ function LiveSidebar({
       badge: isModerator && handsCount > 0 ? handsCount : presenti,
       badgeTone: isModerator && handsCount > 0 ? 'alert' : 'neutral',
       dotLabel: isModerator && handsCount > 0 ? tp('handsRaised', { count: handsCount }) : undefined,
-      // Pubblico anonimo: l'elenco di chi partecipa resta a chi conduce.
-      show: isModerator || !pubblicoAnonimo,
+      // Nascosto al pubblico finche' chi organizza non sceglie di mostrarlo.
+      show: !elencoNascosto,
     },
     // La Regia per chi conduce, in fondo e dopo i Partecipanti: è un'altra
     // cosa rispetto ai pannelli della sala, e lì non si confonde con loro.
@@ -3841,7 +3919,7 @@ function LiveSidebar({
                 onUnreadCountChange={setChatUnread}
                 onPreview={setChatPreview}
                 onUnreadMentionsChange={setChatMentions}
-                getRoster={getRoster}
+                getRoster={elencoNascosto ? undefined : getRoster}
               />
             </div>
           )}
@@ -3906,6 +3984,7 @@ function LiveSidebar({
               eventSlug={eventSlug}
               token={token}
               bloccoDaConsenso={salaSoloAscolto}
+              consensoChiesto={salaConsensoChiesto}
             />
           </div>
         </div>
@@ -3947,6 +4026,10 @@ interface LiveTopBarProps {
    *  pill in the top bar and as fallback when no one has joined yet. */
   maxParticipants?: number;
   isRecording: boolean;
+  /** Si registra: Jibri o il registratore per persona. */
+  inRegistrazione: boolean;
+  /** Si conserva il testo degli interventi. */
+  inTrascrizione: boolean;
   role: UserRole;
   /** Event slug + active locale → build the shareable, token-free call and
    *  event-page links (never derived from the current URL, which carries the
@@ -3978,6 +4061,8 @@ function LiveTopBar({
   registrationCount,
   maxParticipants: _maxParticipants,
   isRecording,
+  inRegistrazione,
+  inTrascrizione,
   role,
   slug,
   locale,
@@ -3992,7 +4077,7 @@ function LiveTopBar({
   const t = useTranslations('live');
   const tr = useTranslations('live.role');
   const settings = useSettings();
-  const brandName = settings.siteName || 'PA Webinar';
+  const brandName = settings.siteName || NOME_PRODOTTO;
   const badgeColors = ROLE_BADGE_COLORS[role];
   const { kicker, main } = splitTitleKicker(title, parseTitleKicker);
   const thumbUrl = imageUrl ?? coverImageUrl ?? null;
@@ -4020,6 +4105,17 @@ function LiveTopBar({
             <img
               src={settings.logoUrl}
               alt={brandName}
+              style={{ height: 22, width: 'auto' }}
+            />
+          ) : eNomeDelProdotto(brandName) ? (
+            // Il marchio intero, negativo per la barra blu, all'altezza che il
+            // manuale del marchio fissa per la sala (lib/branding/marchio).
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={MARCHIO_INTERO_NEGATIVO}
+              alt={brandName}
+              width={larghezzaMarchioIntero(22)}
+              height={22}
               style={{ height: 22, width: 'auto' }}
             />
           ) : (
@@ -4083,21 +4179,26 @@ function LiveTopBar({
           va su una riga sua, sotto titolo e comandi. */}
       <AgendaTicker eventSlug={slug} isModerator={role === 'moderator'} />
       <div className="live-top-bar__actions d-flex align-items-center gap-2">
-        {/* Un'icona, non una fascia: chi è in sala sa che si registra senza
-            perdere una riga di video. Il ruolo status la annuncia quando
-            compare. Chi conduce la trova, con la durata, nella striscia del
-            tempo. */}
-        {isRecording && role !== 'moderator' && (
-          <span className="live-rec-indicator" title={t('recordingActive')} aria-hidden="true">
+        {/* Un segnale fisso, non una fascia: chi è in sala sa che si registra o
+            si trascrive senza perdere una riga di video. All'avvio c'è anche
+            l'avviso, con il suono (CaptureNotice). Chi conduce trova la
+            registrazione di Jibri, con la durata, nella striscia del tempo. */}
+        {inRegistrazione && (role !== 'moderator' || !isRecording) && (
+          <span className="live-rec-indicator" title={t('recordingActive')} role="img" aria-label={t('recordingActive')}>
             <span className="live-rec-indicator__dot" />
             {t('recordingShort')}
           </span>
         )}
-        {/* La regione resta montata e cambia testo: un contenitore che nasce
-            già pieno molti lettori di schermo non lo annunciano. */}
-        <span className="visually-hidden" role="status">
-          {isRecording ? t('recordingActive') : ''}
-        </span>
+        {inTrascrizione && (
+          <span
+            className="live-rec-indicator live-rec-indicator--testo"
+            title={t('transcriptionActive')}
+            role="img"
+            aria-label={t('transcriptionActive')}
+          >
+            {t('transcriptionShort')}
+          </span>
+        )}
         {/* The "active vs registered" figure is moderator-only:
             participants shouldn't see attendance numbers. The live people-count
             now lives only in the participants sidebar, so non-moderators get

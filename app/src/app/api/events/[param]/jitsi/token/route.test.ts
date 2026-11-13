@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 // @vitest-environment node
 /**
  * Questa route decide CHI entra nella sala e con quali poteri: è l'unico punto
@@ -8,7 +11,7 @@
  */
 import { createHash } from 'crypto';
 
-import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest';
+import { describe, it, expect, vi, afterEach, beforeAll, beforeEach } from 'vitest';
 import { SignJWT, jwtVerify } from 'jose';
 import type { NextRequest } from 'next/server';
 
@@ -92,6 +95,7 @@ beforeAll(() => {
 });
 
 type EventOverrides = Partial<{
+  hostsAlwaysRecorded: boolean;
   status: string;
   eventType: string;
   joinPasswordHash: string | null;
@@ -101,7 +105,6 @@ type EventOverrides = Partial<{
   participantsCanStartVideo: boolean;
   participantsCanShareScreen: boolean;
   accessMode: 'OPEN' | 'INVITATION' | null;
-  listenOnlyWithoutConsent: boolean;
   audienceAnonymous: boolean;
 }>;
 
@@ -121,8 +124,8 @@ function eventRow(overrides: EventOverrides = {}) {
     participantsCanStartVideo: false,
     participantsCanShareScreen: false,
     accessMode: null,
-    listenOnlyWithoutConsent: false,
     audienceAnonymous: false,
+    hostsAlwaysRecorded: false,
     ...overrides,
   };
 }
@@ -205,6 +208,8 @@ interface JitsiUser {
   mediaExempt?: boolean;
   mediaAdmit?: { audio: boolean; video: boolean; desktop: boolean };
   listenOnly?: boolean;
+  voiceExcluded?: boolean;
+  consentLock?: boolean;
 }
 
 async function minted(res: Response) {
@@ -1054,11 +1059,101 @@ describe('POST jitsi/token — consenso alla registrazione verificato dal server
     vi.mocked(prisma.recordingConsent.createMany).mockResolvedValue({ count: 1 } as never);
   });
 
-  it('senza solo ascolto, chi non acconsente non entra (anche chiamando la rotta)', async () => {
-    vi.mocked(prisma.event.findUnique).mockResolvedValue(eventRow(interattivo) as never);
-    const res = await post({ guestName: 'Ospite' });
-    expect(res.status).toBe(403);
-    expect(((await res.json()) as { code: string }).code).toBe('RECORDING_CONSENT_REQUIRED');
+  describe('con la voce che il registratore non riproduce', () => {
+    beforeEach(() => vi.stubEnv('RECORDING_VOICE_EXCLUSION', 'true'));
+    afterEach(() => vi.unstubAllEnvs());
+
+    it('chi non acconsente entra con i limiti di tutti, segnato per la registrazione', async () => {
+      const aperto = { ...interattivo, participantsCanStartVideo: true, participantsCanShareScreen: true };
+      vi.mocked(prisma.event.findUnique).mockResolvedValue(eventRow(aperto) as never);
+      const res = await post({ guestName: 'Ospite' });
+      expect(res.status).toBe(200);
+      const { body, user } = await minted(res);
+      expect((body as { voiceExcluded?: boolean }).voiceExcluded).toBe(true);
+      expect((body as { listenOnly?: boolean }).listenOnly).toBe(false);
+      expect(user.voiceExcluded).toBe(true);
+      expect(user.mediaLock).toEqual({ audio: false, video: false, desktop: false });
+      expect(user.mediaAdmit).toBeUndefined();
+      expect(user.consentLock).toBeUndefined();
+    });
+
+    it('il segno non finisce mai nel token come hidden-from-recorder: Jitsi spegnerebbe i mezzi', async () => {
+      vi.mocked(prisma.event.findUnique).mockResolvedValue(eventRow(interattivo) as never);
+      const { user } = await minted(await post({ guestName: 'Ospite' }));
+      expect(user).not.toHaveProperty('hidden-from-recorder');
+    });
+
+    it('senza consenso alla registrazione non salva la prova della trascrizione', async () => {
+      vi.mocked(prisma.event.findUnique).mockResolvedValue(
+        eventRow({ ...interattivo, multitrackRecordingEnabled: true }) as never,
+      );
+      const res = await post({ guestName: 'Ospite', multitrackConsent: true });
+      expect(res.status).toBe(200);
+      expect(prisma.multitrackConsent.create).not.toHaveBeenCalled();
+    });
+
+    it('il microfono segue le regole dell\'evento: chiuso, si apre con la parola', async () => {
+      vi.mocked(prisma.event.findUnique).mockResolvedValue(
+        eventRow({ recordingEnabled: true, participantsCanStartVideo: true }) as never,
+      );
+      const { user } = await minted(await post({ guestName: 'Ospite' }));
+      expect(user.voiceExcluded).toBe(true);
+      expect(user.mediaLock).toEqual({ audio: true, video: false, desktop: true });
+    });
+
+    it('vale anche dove l\'evento si limita ad avvisare: chi non ha consenso non ha la voce nel video', async () => {
+      vi.mocked(prisma.event.findUnique).mockResolvedValue(eventRow({ recordingEnabled: true }) as never);
+      const { user } = await minted(await post({ guestName: 'Ospite' }));
+      expect(user.voiceExcluded).toBe(true);
+    });
+
+    it('vale anche per chi conduce: resta fuori dalla registrazione, e modera come sempre', async () => {
+      vi.mocked(prisma.event.findUnique).mockResolvedValue(eventRow(interattivo) as never);
+      const res = await post({ moderatorToken: PRIMARY_TOKEN, displayNameOverride: 'Moderatrice' });
+      expect(res.status).toBe(200);
+      const { body, user } = await minted(res);
+      expect((body as { voiceExcluded?: boolean }).voiceExcluded).toBe(true);
+      expect(user.voiceExcluded).toBe(true);
+      expect(user.consentLock).toBeUndefined();
+    });
+
+    it('dove chi conduce e\' sempre nella registrazione non viene segnato, e non c\'e\' prova', async () => {
+      vi.mocked(prisma.event.findUnique).mockResolvedValue(
+        eventRow({ ...interattivo, hostsAlwaysRecorded: true }) as never,
+      );
+      const res = await post({ moderatorToken: PRIMARY_TOKEN, displayNameOverride: 'Moderatrice' });
+      const { body, user } = await minted(res);
+      expect((body as { voiceExcluded?: boolean }).voiceExcluded).toBe(false);
+      expect(user.voiceExcluded).toBeUndefined();
+      expect(prisma.recordingConsent.createMany).not.toHaveBeenCalled();
+    });
+
+    it('l\'opzione per chi conduce non vale per il pubblico', async () => {
+      vi.mocked(prisma.event.findUnique).mockResolvedValue(
+        eventRow({ ...interattivo, hostsAlwaysRecorded: true }) as never,
+      );
+      const { user } = await minted(await post({ guestName: 'Ospite' }));
+      expect(user.voiceExcluded).toBe(true);
+    });
+
+    it('chi acconsente non ha limiti in piu\'', async () => {
+      vi.mocked(prisma.event.findUnique).mockResolvedValue(eventRow(interattivo) as never);
+      const { body, user } = await minted(await post({ guestName: 'Ospite', recordingConsent: true }));
+      expect((body as { voiceExcluded?: boolean }).voiceExcluded).toBe(false);
+      expect(user.voiceExcluded).toBeUndefined();
+    });
+  });
+
+  it('dove la voce non si puo\' togliere l\'opzione di chi conduce non conta', async () => {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(
+      eventRow({ ...interattivo, multitrackRecordingEnabled: true, hostsAlwaysRecorded: true }) as never,
+    );
+    await post({
+      moderatorToken: PRIMARY_TOKEN,
+      displayNameOverride: 'Moderatrice',
+      multitrackConsent: true,
+    });
+    expect(prisma.multitrackConsent.create).not.toHaveBeenCalled();
   });
 
   it("l'iscritto che l'ha dato all'iscrizione entra senza ridarlo", async () => {
@@ -1070,9 +1165,9 @@ describe('POST jitsi/token — consenso alla registrazione verificato dal server
     expect(((await minted(res)).body as { listenOnly?: boolean }).listenOnly).toBe(false);
   });
 
-  it('con il solo ascolto, chi non acconsente entra con i mezzi chiusi per lui', async () => {
+  it('dove la voce non si puo\' togliere, chi non acconsente entra con i mezzi chiusi per lui', async () => {
     vi.mocked(prisma.event.findUnique).mockResolvedValue(
-      eventRow({ ...interattivo, listenOnlyWithoutConsent: true }) as never,
+      eventRow(interattivo) as never,
     );
     const res = await post({ guestName: 'Ospite' });
     expect(res.status).toBe(200);
@@ -1083,9 +1178,9 @@ describe('POST jitsi/token — consenso alla registrazione verificato dal server
     expect(user.mediaAdmit).toBeUndefined();
   });
 
-  it('con il solo ascolto, chi acconsente e\' ammesso per cio\' che l\'evento concede', async () => {
+  it('dove la voce non si puo\' togliere, chi acconsente e\' ammesso per cio\' che l\'evento concede', async () => {
     vi.mocked(prisma.event.findUnique).mockResolvedValue(
-      eventRow({ ...interattivo, listenOnlyWithoutConsent: true }) as never,
+      eventRow(interattivo) as never,
     );
     const res = await post({ guestName: 'Ospite', recordingConsent: true });
     const { body, user } = await minted(res);
@@ -1097,7 +1192,7 @@ describe('POST jitsi/token — consenso alla registrazione verificato dal server
 
   it("il consenso dell'iscrizione ritirato dalla sala non vale piu': si entra in solo ascolto", async () => {
     vi.mocked(prisma.event.findUnique).mockResolvedValue(
-      eventRow({ ...interattivo, listenOnlyWithoutConsent: true }) as never,
+      eventRow(interattivo) as never,
     );
     vi.mocked(prisma.registration.findUnique).mockResolvedValue(
       registrationRow({ consentRecording: true, consentRecordingWithdrawnAt: new Date() }) as never,
@@ -1116,7 +1211,7 @@ describe('POST jitsi/token — consenso alla registrazione verificato dal server
 
   it("ridato dopo un ritiro, la prova dell'iscrizione torna valida con l'ora nuova", async () => {
     vi.mocked(prisma.event.findUnique).mockResolvedValue(
-      eventRow({ ...interattivo, listenOnlyWithoutConsent: true }) as never,
+      eventRow(interattivo) as never,
     );
     vi.mocked(prisma.registration.findUnique).mockResolvedValue(
       registrationRow({ consentRecording: true, consentRecordingWithdrawnAt: new Date() }) as never,

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * La foto di una persona dell'evento (EventPersonPhoto nello schema): la
  * persona la manda a chi organizza, che la carica nel wizard. Qui solo ciò che

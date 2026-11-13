@@ -158,8 +158,6 @@ ollama pull mistral-small3.2:24b
 ```
 
 - Quote `"torch>=2.7"`: unquoted, the shell reads `>` as a redirection.
-- `gender-guesser` is optional. When it is installed, `dub.py` uses it to
-  guess the gender of first names that are not in the worker's Italian table.
 - On first use, faster-whisper downloads `large-v3` and SpeechBrain downloads
   `speechbrain/spkrec-ecapa-voxceleb` (cached in `/tmp/ecapa-cache`) from
   Hugging Face. Only model weights are downloaded; no audio or text is sent
@@ -287,11 +285,9 @@ transcript and subtitles.
 
 ### Dubbing: `dub.py`
 
-`dub.py` imports `voice_pool.py` and `name_gender.py` from `../worker`, so it
-follows the worker's voice pool: every voice for the language, multi-speaker
-models up to 20 speakers, and pitch variants at 0, -300 and +300 cents. Unlike
-the worker, it passes the guessed names, so voices are matched to the gender
-inferred from each first name. Each line is synthesized by the `piper` CLI,
+`dub.py` imports `voice_pool.py` from `../worker`, so it follows the worker's
+voice pool: every voice for the language, multi-speaker models up to 20
+speakers, and pitch variants at 0, -300 and +300 cents. Each line is synthesized by the `piper` CLI,
 sped up when it overruns its slot by more than 5 percent, placed at its start
 time and encoded as AAC at 96 kbit/s. A language without a voice in
 `piper-voices/` is skipped. No watermark is applied.
@@ -328,7 +324,7 @@ other code is passed to the model as is.
 | Speaker names | Mapped by an administrator, taken from the tracks on multitrack, or aligned with the live speaking timeline | Guessed by the LLM from the transcript |
 | Language model | vLLM; model set by `AI_VLLM_MODEL_ID` (default in `app/src/lib/ai/providers.ts`) | Ollama or any OpenAI-compatible server; defaults differ per script |
 | Source and target languages | `Recording.sourceLanguage` (`it` when empty); targets from the event's `aiTargetLocales` or the site default, only when translation is enabled for the event, never the source language | `it`, and `TARGET_LANGS` |
-| Dubbing | Piper, voices in pool order, AudioSeal watermark when it succeeds | Piper, gender-matched to guessed names, no watermark |
+| Dubbing | Piper, voices in pool order, AudioSeal watermark when it succeeds | Piper, voices in pool order, no watermark |
 | Extra outputs | `WAVEFORM_JSON`, optional `DUBBED_VIDEO`, `ARCHIVE_MKV` on demand | None |
 | Storage | Every artifact uploaded under its canonical key; text up to 64 KiB also copied inline, encrypted | Text inline in plain text with no file behind it; only dubbed audio uploaded; non-canonical keys |
 | Transparency snapshot | Built from the registered artifacts by `app/src/lib/ai/pipeline-snapshot.ts` | Written by `package_and_push.py`, partly with fixed values |

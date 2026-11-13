@@ -119,7 +119,8 @@ The page `/<locale>/rubrica/opt-out?token=…` reads the token from the query st
 in every language. The page calls `GET /api/rubrica/opt-out?token=…` to show the name and organization on
 the record. It then calls `POST /api/rubrica/opt-out?token=…` to confirm; the API also accepts the token
 in a JSON body. The confirmation is rate-limited per client address. Confirming sets
-`optedInToAddressBook` to `false` and stamps `optedOutAt`. The daily job deletes the record at its next
+`optedInToAddressBook` to `false`, stamps `optedOutAt`, and withdraws consent to future communications on
+every registration of that address. The daily job deletes the record at its next
 run. The page warns that event registrations are not deleted.
 
 ### What the record never holds
@@ -283,7 +284,7 @@ flowchart LR
 |---|---|
 | Opt-in at registration | The `consentAddressBook` flag in the `CONSENT_RECORDED` row of `GdprAuditLog`, which holds no personal data, and `optedInAt` on the record |
 | Profile refresh, link or activity | Only the record's own `updatedAt` and `lastActiveAt` |
-| Opt-out | `optedOutAt` on the record, until the record is deleted. No audit row |
+| Opt-out | `optedOutAt` on the record, until the record is deleted, and a `CONSENT_WITHDRAWN` row in `GdprAuditLog` for each event whose registration still held that consent |
 | Deletion by an administrator | `RUBRICA_PERSON_DELETE` in `AdminAuditLog`, with the record id, the actor, the client IP and the user agent |
 | Deletion by the retention job | No audit row. A log line and the job's JSON response give the counts |
 | Deletion by self-service erasure | `addressBookDeleted` in the details of the erasure's `DATA_DELETED` rows in `GdprAuditLog`, written only when the person also had registrations; the response carries the same flag |

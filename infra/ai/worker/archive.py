@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """Archivio scaricabile multi-traccia (job ARCHIVE — ADR-013).
 
 Muxa in un singolo file MKV:

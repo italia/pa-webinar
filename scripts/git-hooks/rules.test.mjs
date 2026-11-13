@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 // Regole dei git hook. Si esegue con `npm run test:scripts`.
 // I segreti di prova sono costruiti a pezzi, perche' nessuno scanner li
 // scambi per segreti veri nel repository.

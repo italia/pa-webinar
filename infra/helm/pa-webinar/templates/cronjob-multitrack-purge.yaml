@@ -1,3 +1,6 @@
+{{- /* SPDX-License-Identifier: EUPL-1.2 */ -}}
+{{- /* SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale */ -}}
+
 {{- if or .Values.postprod.enabled .Values.recorder.enabled }}
 # ADR-013 Fase 5 — purge frequente delle tracce audio per-partecipante
 # dopo la trascrizione (minimizzazione GDPR), e alla scadenza dei dati

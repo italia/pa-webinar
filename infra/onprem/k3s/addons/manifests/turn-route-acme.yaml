@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # TURNS sulla 443 condivisa con il portale, con il certificato che Traefik
 # ottiene dal suo resolver ACME per questo nome. Come turn-route.yaml per il
 # resto. Modello di turn.sh (--cert-resolver).

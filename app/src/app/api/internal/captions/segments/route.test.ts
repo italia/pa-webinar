@@ -1,9 +1,13 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import type { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const m = vi.hoisted(() => ({
   evento: vi.fn(),
   posto: vi.fn(),
+  esclusa: vi.fn(async () => false),
   consenso: vi.fn(),
   createMany: vi.fn(),
   updateMany: vi.fn(),
@@ -13,6 +17,7 @@ vi.mock('@/lib/captions/room', () => ({
   eventoDellaConferenza: m.evento,
   postoDellEndpoint: m.posto,
   consensoTrascrizione: m.consenso,
+  voceEsclusa: m.esclusa,
 }));
 vi.mock('@/lib/crypto/pii', () => ({ encryptPII: (v: string) => `cif:${v}` }));
 vi.mock('@/lib/db', () => ({ prisma: { captionSegment: { createMany: m.createMany, updateMany: m.updateMany } } }));

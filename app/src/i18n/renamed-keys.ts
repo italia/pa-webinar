@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Chiavi dei cataloghi che hanno cambiato nome: la personalizzazione salvata
  * dall'amministrazione con il nome vecchio (`SiteSetting.translationOverrides`)

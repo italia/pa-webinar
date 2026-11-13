@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes } from 'crypto';
 
 const ALGORITHM = 'aes-256-gcm';

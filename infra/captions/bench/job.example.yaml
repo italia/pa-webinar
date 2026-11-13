@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # Banco di prova dei sottotitoli live su un nodo del cluster.
 #
 # Misura quante voci simultanee regge il budget di CPU del container

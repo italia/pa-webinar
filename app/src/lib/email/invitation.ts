@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * L'invito a un evento, per email, a chi e' nell'elenco degli invitati
  * (`EventInvitation`).

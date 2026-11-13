@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -78,6 +81,16 @@ describe('StageName', () => {
     expect(nome()).toBe('Ospite di prova');
     act(() => emit('participantLeft', { id: 'aa' }));
     expect(nome()).toBeNull();
+  });
+
+  it('con l\'elenco nascosto non nomina chi sta solo guardando', () => {
+    const { api, emit, onStage } = fakeApi({ aa: 'Ospite di prova', me: 'Pubblico' });
+    act(() => root.render(<StageName api={api} soloChiParla />));
+    act(() => emit('videoConferenceJoined', { id: 'me' }));
+    act(() => onStage('aa'));
+    expect(nome()).toBeNull();
+    act(() => emit('dominantSpeakerChanged', { id: 'aa' }));
+    expect(nome()).toBe('Ospite di prova');
   });
 
   it('una sala nuova riparte da zero, senza il palco né la griglia di prima', () => {

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
@@ -40,6 +43,9 @@ interface Props {
   /** «Reinvia link»: il portale manda i link per email (evento pubblicato e
    *  non concluso). */
   canResend?: boolean;
+  /** Dopo un'aggiunta o una revoca: chi mostra le persone altrove (la
+   *  panoramica dell'evento) si rilegge. */
+  onChange?: () => void;
 }
 
 export default function EventModeratorsPanel({
@@ -51,6 +57,7 @@ export default function EventModeratorsPanel({
   locale,
   isDraft = false,
   canResend = false,
+  onChange,
 }: Props) {
   const t = useTranslations('admin.coModerators');
   const toast = useToast();
@@ -124,11 +131,12 @@ export default function EventModeratorsPanel({
         setPublicListed(false);
         setShowForm(false);
         await fetchRows();
+        onChange?.();
       } finally {
         setSubmitting(false);
       }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [name, email, role, organization, publicListed, eventId, moderatorToken, fetchRows, t],
+    }, [name, email, role, organization, publicListed, eventId, moderatorToken, fetchRows, t, onChange],
   );
 
   const handleRevoke = useCallback(
@@ -144,9 +152,12 @@ export default function EventModeratorsPanel({
         method: 'DELETE',
         headers: authHeader,
       });
-      if (res.ok) fetchRows();
+      if (res.ok) {
+        fetchRows();
+        onChange?.();
+      }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [eventId, moderatorToken, fetchRows, t, confirm],
+    }, [eventId, moderatorToken, fetchRows, t, confirm, onChange],
   );
 
   // «Reinvia link»: l'email con il link personale, di nuovo, a chi l'ha

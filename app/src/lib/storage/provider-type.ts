@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Quale fornitore serve ciascun dominio di storage, letto dalle variabili
  * d'ambiente. Modulo senza dipendenze: lo usano sia la factory

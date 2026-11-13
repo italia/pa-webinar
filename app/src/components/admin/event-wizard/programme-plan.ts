@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Il programma nel wizard: gli argomenti preparati prima dell'evento, con la
  * durata prevista e chi interviene, e il loro passaggio verso l'API

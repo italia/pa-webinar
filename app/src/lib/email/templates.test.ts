@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { describe, it, expect } from 'vitest';
 
 import {
@@ -41,8 +44,8 @@ describe('confirmation email', () => {
 
   it('links «I miei dati» when the page is known, in HTML and in text', () => {
     const url = 'https://example.gov.it/it/privacy/i-miei-dati';
-    expect(confirmationHtml({ ...base(), myDataUrl: url })).toContain(`href="${url}"`);
-    expect(confirmationText({ ...base(), myDataUrl: url })).toContain(url);
+    expect(confirmationHtml({ ...base(), myDataLink: { url, label: 'I tuoi dati' } })).toContain(`href="${url}"`);
+    expect(confirmationText({ ...base(), myDataLink: { url, label: 'I tuoi dati' } })).toContain(url);
     expect(confirmationHtml(base())).not.toContain('i-miei-dati');
   });
 

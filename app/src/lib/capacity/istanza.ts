@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Cio' che la stima della capacita' sa dell'istanza: dalle impostazioni del
  * sito i core di un ponte, le soglie di sforzo, la quota di webcam e la

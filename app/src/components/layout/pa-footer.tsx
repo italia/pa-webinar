@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 'use client';
 
 import { useFormatter, useLocale, useTranslations } from 'next-intl';
@@ -156,8 +159,8 @@ export default function PAFooter({
               <div className="col-sm-12">
                 <div className="it-brand-wrapper">
                   <Link href="/" className="d-inline-flex align-items-center">
-                    {/* PA Webinar mark (white knockout) on the dark footer —
-                        decorative next to the org name text. */}
+                    {/* Il simbolo di PA Webinar in negativo sul piè di pagina
+                        scuro: decorativo, accanto al nome dell'ente. */}
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src="/images/logo/pa-webinar-mark-white.svg"

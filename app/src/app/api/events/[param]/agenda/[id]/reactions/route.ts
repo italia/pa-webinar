@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Audience pulse su un punto d'agenda: il partecipante esprime assenso o
  * dissenso. Funzione opt-in (Event.agendaEnabled), pattern allineato a

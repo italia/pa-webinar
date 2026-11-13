@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 # API del progetto, rete VPC, subnet dei nodi e uscita verso Internet.
 
 locals {

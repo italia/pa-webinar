@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * Confinamento delle object key che il recorder può far firmare
  * (`POST /api/internal/recorder-upload-url`, ADR-013 Fase 3).

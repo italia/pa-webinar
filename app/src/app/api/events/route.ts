@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { randomUUID } from 'crypto';
 
 import type { EventStatus, Prisma } from '@prisma/client';
@@ -8,6 +11,7 @@ import { RateLimitError, ValidationError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { tagIdsFromSlugs } from '@/lib/events/event-tags';
 import { usablePersonPhotoId } from '@/lib/events/person-photo-store';
+import { elencoPredefinito } from '@/lib/live/participant-list';
 import { createEventSchema } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { generateUniqueSlug } from '@/lib/utils/slug';
@@ -209,8 +213,11 @@ export const POST = withErrorHandling(async (request) => {
       ...(data.recordingConsentText !== undefined && {
         recordingConsentText: data.recordingConsentText,
       }),
-      listenOnlyWithoutConsent: data.listenOnlyWithoutConsent,
       audienceAnonymous: data.audienceAnonymous,
+      participantListVisible:
+        data.participantListVisible ??
+        elencoPredefinito({ ...effectiveToggles, maxParticipants: data.maxParticipants }),
+      ...(data.hostsAlwaysRecorded !== undefined && { hostsAlwaysRecorded: data.hostsAlwaysRecorded }),
       ...(data.wordCloudEnabled !== undefined && {
         wordCloudEnabled: data.wordCloudEnabled,
       }),

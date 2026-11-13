@@ -1,7 +1,11 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { decryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
+import { linkIMieiDati } from '@/lib/email/my-data-link';
 import { enqueueEmail } from '@/lib/email/outbox';
 import { publicRegistrationFor } from '@/lib/events/registration-access';
 import { getSettings } from '@/lib/settings';
@@ -92,6 +96,15 @@ export const GET = withErrorHandling(async (request) => {
   let emailsFailed = 0;
 
   const overridePerLingua = new Map<string, Awaited<ReturnType<typeof loadEmailTemplateOverride>>>();
+  const linkPerLingua = new Map<string, Awaited<ReturnType<typeof linkIMieiDati>>>();
+  const linkDatiPerLingua = async (lingua: string) => {
+    let link = linkPerLingua.get(lingua);
+    if (!link) {
+      link = await linkIMieiDati(baseUrl, lingua);
+      linkPerLingua.set(lingua, link);
+    }
+    return link;
+  };
   for (const promemoria of perEvento.values()) {
     const event = promemoria[0]!.event;
     const corrente = currentReminder(promemoria, event.startsAt, now);
@@ -173,7 +186,7 @@ export const GET = withErrorHandling(async (request) => {
           },
           eventImageUrl: absoluteEventImage(event, baseUrl),
           addressBookOptOutUrl: rubricaOptOutUrl(reg.person, baseUrl, locale),
-          myDataUrl: localizedUrl(baseUrl, '/privacy/my-data', locale),
+          myDataLink: await linkDatiPerLingua(locale),
         };
 
         // Lo stesso invito personale della conferma (stesso UID): il

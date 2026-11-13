@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: EUPL-1.2
+# SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 """Parametri Punkt di NLTK per la divisione in frasi dell'allineamento.
 
 L'allineamento di WhisperX divide il testo in frasi con il tokenizer Punkt di

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 'use client';
 
 import {
@@ -17,8 +20,10 @@ import {
   CardBody,
 } from 'design-react-kit';
 
+import RegistrationConsents, { type ConsensiVista } from '@/components/privacy/registration-consents';
 import { Icon } from '@/components/ui/icon';
 import { Link, percorso } from '@/i18n/navigation';
+import type { VoceNelVideo } from '@/lib/live/consent-rule';
 import { localizedPath } from '@/lib/utils/localized-url';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
@@ -30,6 +35,8 @@ interface ExportEventData {
 }
 
 interface ExportRegistration {
+  id: string;
+  consents: ConsensiVista;
   displayName: string;
   email: string | null;
   organization: string | null;
@@ -95,6 +102,10 @@ export default function MyDataPage() {
   const [photo, setPhoto] = useState<{ uploadedAt: string; dataUrl: string } | null>(null);
   // I ruoli negli eventi: anche chi non si è mai iscritto può averne.
   const [grants, setGrants] = useState<ExportGrant[]>([]);
+  // Il token per ritirare un consenso: lo consegna la lettura dei dati.
+  const [tokenConsensi, setTokenConsensi] = useState<string | null>(null);
+  const [voce, setVoce] = useState<VoceNelVideo>('rimovibile');
+  const [comunicazioniRitirateIl, setComunicazioniRitirateIl] = useState<string | null>(null);
   const format = useFormatter();
 
   // When the user lands here via the signed link emailed to them, the
@@ -107,6 +118,7 @@ export default function MyDataPage() {
     (async () => {
       setLoading(true);
       setError('');
+      setComunicazioniRitirateIl(null);
       try {
         const res = await fetch(
           `/api/gdpr/export?t=${encodeURIComponent(token)}`,
@@ -129,6 +141,8 @@ export default function MyDataPage() {
         setResults(json.data);
         setPhoto(json.profilePhoto ?? null);
         setGrants(Array.isArray(json.grants) ? json.grants : []);
+        setTokenConsensi(typeof json.consentsToken === 'string' ? json.consentsToken : null);
+        if (json.voiceInVideo) setVoce(json.voiceInVideo);
       } catch {
         if (!cancelled) setError(t('error'));
       } finally {
@@ -381,6 +395,17 @@ export default function MyDataPage() {
                         {new Date(entry.registration.consentTimestamp).toLocaleString()}
                       </dd>
                     </dl>
+
+                    {tokenConsensi && (
+                      <RegistrationConsents
+                        token={tokenConsensi}
+                        registrationId={entry.registration.id}
+                        consensi={entry.registration.consents}
+                        voce={voce}
+                        comunicazioniRitirateIl={comunicazioniRitirateIl}
+                        onComunicazioniRitirate={setComunicazioniRitirateIl}
+                      />
+                    )}
 
                     {/* Questions */}
                     {entry.questions.length > 0 && (

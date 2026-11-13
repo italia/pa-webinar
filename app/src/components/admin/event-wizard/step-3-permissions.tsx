@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 'use client';
 
 /**
@@ -15,6 +18,7 @@ import { useTranslations } from 'next-intl';
 import { parseLocaleList } from '@/components/admin/language-checklist';
 import ToggleSwitch from '@/components/ui/toggle-switch';
 import { Icon } from '@/components/ui/icon';
+import type { VoceNelVideo } from '@/lib/live/consent-rule';
 import {
   EVENT_ROLES,
   EVENT_FEATURES,
@@ -22,18 +26,23 @@ import {
   type EventRole,
   type EventFeature,
   type PermissionMatrix,
+  togglesFromMatrix,
 } from '@/lib/utils/permission-matrix';
 
+import ConsentDiagram from './consent-diagram';
 import { nomeLingua } from './text-translation';
 
 export interface StepPermissionsValue {
   permissionMatrix: PermissionMatrix;
   recordingEnabled: boolean;
   autoStartRecording: boolean;
-  /** Chi non acconsente alla registrazione entra in solo ascolto. */
-  listenOnlyWithoutConsent: boolean;
+  /** Moderatori e relatori sempre nella registrazione, per dichiarazione di
+   *  chi organizza: non vedono la casella. */
+  hostsAlwaysRecorded: boolean;
   /** Pubblico anonimo: chi partecipa compare con uno pseudonimo. */
   audienceAnonymous: boolean;
+  /** L'elenco di chi partecipa, per il pubblico: spento di default. */
+  participantListVisible: boolean;
   /** Agenda/note live (checklist opt-in). */
   agendaEnabled: boolean;
   /** Nuvola di parole live (opt-in). */
@@ -76,6 +85,13 @@ interface Props {
   /** L'installazione puo' registrare. Senza, la registrazione non si propone:
    *  si mostra solo se l'evento ce l'ha gia' accesa, per poterla spegnere. */
   recordingAvailable?: boolean;
+  /** Cosa succede alla voce di chi non acconsente, in questa installazione. */
+  voceNelVideo?: VoceNelVideo;
+  /** Una chiamata rapida non chiede consensi: niente diagramma, niente opzione. */
+  istantanea?: boolean;
+  /** Tenere chi conduce nella registrazione lo dichiara lo staff dell'evento, non
+   *  un link di conduzione. */
+  puoDichiarareChiConduce?: boolean;
   /** Porta alle lingue dell'evento, nel passo «Evento». */
   onCambiaLingue?: () => void;
   /** La post-produzione AI e' accesa sull'installazione? Spenta, le sue
@@ -138,6 +154,9 @@ export default function StepPermissions({
   whiteboardInfraReady,
   liveCaptionsAvailable = false,
   recordingAvailable = true,
+  voceNelVideo = 'rimovibile',
+  istantanea = false,
+  puoDichiarareChiConduce = true,
   onCambiaLingue,
   aiPipelineEnabled = true,
   editing = false,
@@ -197,6 +216,36 @@ export default function StepPermissions({
       {soloAscoltoBloccato && (
         <p className="text-secondary" style={{ fontSize: '0.85rem' }}>
           {t('audienceAnonymousLocked')}
+        </p>
+      )}
+
+      {/* L'elenco di chi partecipa: parte dal formato dell'evento, e lo decide
+          chi organizza. Con gli pseudonimi resta nascosto. */}
+      <div className="py-2 mb-3 d-flex justify-content-between align-items-start" style={{ borderBottom: '1px solid #e8e8e8' }}>
+        <div className="me-3">
+          <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
+            {t('participantListVisible')}
+          </div>
+          <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
+            {value.audienceAnonymous ? t('participantListAnonymous') : t('participantListVisibleDesc')}
+          </div>
+          {!value.participantListVisible && togglesFromMatrix(value.permissionMatrix).participantsCanStartVideo && (
+            <div className="text-secondary mt-1" style={{ fontSize: '0.85rem' }}>
+              {t('participantListCameraNote')}
+            </div>
+          )}
+        </div>
+        <ToggleSwitch
+          label=""
+          ariaLabel={t('participantListVisible')}
+          checked={value.participantListVisible && !value.audienceAnonymous}
+          disabled={soloAscoltoBloccato || value.audienceAnonymous}
+          onChange={() => onChange({ participantListVisible: !value.participantListVisible })}
+        />
+      </div>
+      {soloAscoltoBloccato && (
+        <p className="text-secondary" style={{ fontSize: '0.85rem' }}>
+          {t('participantListLocked')}
         </p>
       )}
 
@@ -434,34 +483,49 @@ export default function StepPermissions({
           </p>
         )}
 
-        {/* Il consenso alla registrazione e' libero: chi non lo da' entra lo
-            stesso, in solo ascolto. Spento, senza consenso non si entra. */}
-        {value.recordingEnabled && (
+        {soloAscoltoBloccato && (
+          <p className="text-secondary mb-0 pb-2" style={{ fontSize: '0.85rem' }}>
+            {t('recordingLockedLive')}
+          </p>
+        )}
+
+        {value.recordingEnabled &&
+          recordingAvailable &&
+          !istantanea &&
+          puoDichiarareChiConduce &&
+          voceNelVideo === 'rimovibile' && (
           <div
             className="py-2 d-flex justify-content-between align-items-start"
             style={{ borderTop: '1px solid #e8e8e8' }}
           >
             <div className="me-3">
               <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
-                {t('listenOnlyWithoutConsent')}
+                {t('hostsAlwaysRecorded')}
               </div>
               <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
-                {value.listenOnlyWithoutConsent ? t('listenOnlyWithoutConsentOn') : t('listenOnlyWithoutConsentOff')}
+                {t('hostsAlwaysRecordedDesc')}
               </div>
             </div>
             <ToggleSwitch
               label=""
-              ariaLabel={t('listenOnlyWithoutConsent')}
-              checked={value.listenOnlyWithoutConsent}
+              ariaLabel={t('hostsAlwaysRecorded')}
+              checked={value.hostsAlwaysRecorded}
               disabled={soloAscoltoBloccato}
-              onChange={() => onChange({ listenOnlyWithoutConsent: !value.listenOnlyWithoutConsent })}
+              onChange={() => onChange({ hostsAlwaysRecorded: !value.hostsAlwaysRecorded })}
             />
           </div>
         )}
-        {soloAscoltoBloccato && (
-          <p className="text-secondary mb-0 pb-2" style={{ fontSize: '0.85rem' }}>
-            {t('listenOnlyLockedLive')}
-          </p>
+
+        {value.recordingEnabled && recordingAvailable && !istantanea && (
+          <ConsentDiagram
+            multitrackRecordingEnabled={value.multitrackRecordingEnabled}
+            captionsTranscript={
+              liveCaptionsAvailable && value.liveCaptionsEnabled && value.captionsTranscriptEnabled
+            }
+            {...togglesFromMatrix(value.permissionMatrix)}
+            hostsAlwaysRecorded={value.hostsAlwaysRecorded}
+            voce={voceNelVideo}
+          />
         )}
 
         {value.recordingEnabled && showAutoStart && (

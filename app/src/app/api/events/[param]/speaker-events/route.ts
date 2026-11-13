@@ -1,10 +1,17 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
 import { parseJsonBody, withErrorHandling } from '@/lib/api-handler';
+import { postoDaTokenSala } from '@/lib/auth/jwt';
 import { prisma } from '@/lib/db';
 import { NotFoundError, RateLimitError, ValidationError } from '@/lib/errors';
+import { endpointSenzaRegistrazione } from '@/lib/captions/room';
+import { statoCattura } from '@/lib/live/capture-state';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
+import { recordingAvailable } from '@/lib/recording/availability';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,6 +24,8 @@ const MAX_LOG_ENTRIES = 5000;
 const MAX_BATCH = 2000;
 /** Cap difensivo sulla lunghezza dei campi stringa (PII / ids). */
 const MAX_STR = 256;
+/** I lotti arrivano ogni 10 secondi: chi ha parlato appena prima dello stop conta ancora. */
+const MARGINE_LOTTO_MS = 15_000;
 
 const speakerEventSchema = z.object({
   atMs: z.number().int().min(0),
@@ -26,6 +35,8 @@ const speakerEventSchema = z.object({
 
 const bodySchema = z.object({
   events: z.array(speakerEventSchema).min(1).max(MAX_BATCH),
+  /** Il token di sala: serve solo per la nota pubblica accanto al video. */
+  roomToken: z.string().min(1).max(8192).optional(),
 });
 
 type SpeakerEvent = z.infer<typeof speakerEventSchema>;
@@ -68,19 +79,29 @@ export const POST = withErrorHandling(async (request, context) => {
   if (!parsed.success) {
     throw new ValidationError('Invalid speaker-events payload');
   }
-  const { events } = parsed.data;
+  const { events, roomToken } = parsed.data;
 
   // Risolvi evento → CallSession ATTIVA (più recente senza endedAt).
   const event = await prisma.event.findFirst({
     where: eventWhereClause(param),
-    select: { id: true },
+    select: {
+      id: true,
+      status: true,
+      jitsiRoomName: true,
+      unrecordedSpeech: true,
+      recordingEnabled: true,
+      aiTranscriptEnabled: true,
+      multitrackRecordingEnabled: true,
+      captionsTranscriptEnabled: true,
+      liveCaptionsEnabled: true,
+    },
   });
   if (!event) throw new NotFoundError('Event');
 
   const session = await prisma.callSession.findFirst({
     where: { eventId: event.id, endedAt: null },
     orderBy: { startedAt: 'desc' },
-    select: { id: true, dominantSpeakerLog: true },
+    select: { id: true, startedAt: true, dominantSpeakerLog: true },
   });
   if (!session) throw new NotFoundError('Active call session');
 
@@ -89,7 +110,43 @@ export const POST = withErrorHandling(async (request, context) => {
     ? (session.dominantSpeakerLog as unknown as SpeakerEvent[])
     : [];
 
-  const merged = existing.concat(events);
+  // Il nome di chi non ha un consenso valido alla registrazione non resta nella
+  // cronologia. E se parla mentre si registra resta sull'evento: la pagina lo
+  // dice accanto al video, dove il suo intervento non c'e'. La nota e' pubblica,
+  // quindi serve la prova di essere in sala: chi e' in sala sente chi parla.
+  const senzaNome = new Set(await endpointSenzaRegistrazione(event.id));
+  const nuovi = events.map(({ displayName, ...evento }) => ({
+    ...evento,
+    ...(senzaNome.has(evento.participantId) ? {} : { displayName }),
+  }));
+  const parlaChiEscluso = nuovi.some((e) => senzaNome.has(e.participantId));
+  if (parlaChiEscluso && roomToken && !event.unrecordedSpeech) {
+    const presente = await postoDaTokenSala(roomToken, event.jitsiRoomName, { ancheChiModera: true });
+    if (presente) {
+      // Il comando di sala dice se il video sta girando. Senza comandi, in questa
+      // sessione, c'e' solo il registratore per persona, che dura per tutta la diretta.
+      const ultima = await prisma.liveAction.findFirst({
+        where: {
+          eventId: event.id,
+          at: { gte: session.startedAt },
+          kind: { in: ['recording.started', 'recording.stopped'] },
+        },
+        orderBy: { at: 'desc' },
+        select: { kind: true, at: true },
+      });
+      const siRegistra = ultima
+        ? ultima.kind === 'recording.started' || Date.now() - ultima.at.getTime() < MARGINE_LOTTO_MS
+        : statoCattura(event, {}, recordingAvailable()).registrazione;
+      if (siRegistra) {
+        await prisma.event.updateMany({
+          where: { id: event.id, unrecordedSpeech: false },
+          data: { unrecordedSpeech: true },
+        });
+      }
+    }
+  }
+
+  const merged = existing.concat(nuovi);
   // Mantieni gli ultimi MAX_LOG_ENTRIES (i più recenti sono i più utili in
   // caso di troncamento; comunque è una protezione, non il caso normale).
   const capped =

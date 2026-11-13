@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 // Solo lato server (legge next-intl/server, la sessione e il database): i
 // componenti client usano admin-nav-model.
 import type { Metadata } from 'next';

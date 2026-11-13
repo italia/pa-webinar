@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
 /**
  * L'umore della piazza: ognuno può dire come arriva, e accanto al laboratorio
  * un cartello conta quanti per ciascuno. Si vedono solo i conteggi, non chi;
