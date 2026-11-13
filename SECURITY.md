@@ -212,7 +212,7 @@ As a result, code from a pull request reaches the self-hosted runner only after 
   | `scorecard.yml` | `read-all` | The analysis job gets `security-events: write`, plus `id-token: write` to publish results |
   | `dev.yml` | `contents: read` | The jobs that push images get `packages: write` |
   | `jitsi-web.yml` | `contents: read` | The job that pushes the image gets `packages: write` |
-  | `release.yml` | `contents: read` | The application image job gets `packages: write` and `contents: write`. The auxiliary images job gets `packages: write`. The chart job gets `contents: write` to attach files to the GitHub Release.|
+  | `release.yml` | `contents: read` | The application image job gets `packages: write` and `contents: write`. The auxiliary images job gets `packages: write`. The chart job gets `contents: write` to attach files to the GitHub Release. The attestation job, on a GitHub-hosted runner with no checkout and no third-party code, gets `id-token: write` and `attestations: write` to sign the provenance of the release files, and `contents: write` to attach it |
   | `buildcache-cleanup.yml` | `contents: read` | The prune job gets `packages: write` to delete old untagged versions of the layer-cache package |
 
 - **Jobs without a `permissions` block.** Such a job receives the workflow default, or, when the workflow declares none, the repository's default token permissions, a repository setting that the workflow files do not show. The change-detection jobs in `dev.yml` take the workflow's read-only default.
@@ -262,11 +262,12 @@ What the scanners do not cover:
 - **`sbom.spdx.json`:** an SPDX JSON SBOM of the published application image, generated with Syft (`anchore/sbom-action`).
 - **`npm-sbom.json`:** a CycloneDX SBOM of the npm dependencies of the `app` workspace, generated with `@cyclonedx/cyclonedx-npm`. This file is best effort: its step is allowed to fail, so a release can lack it.
 - **The packaged Helm chart.**
+- **Signed provenance:** `pa-webinar-X.Y.Z.intoto.jsonl`, a Sigstore bundle with one SLSA build provenance attestation covering the files above, by the digests computed when they were built, made by `actions/attest-build-provenance` and signed keylessly with the identity of the release workflow at that tag. It is made in a separate job, so a Sigstore outage leaves the release complete without it. The same attestations are stored on GitHub, so a downloaded file can be checked with `gh attestation verify <file> --repo italia/pa-webinar`, or against the attached bundle with `--bundle`, without the GitHub attestations API (the Sigstore trusted root is still fetched unless `--custom-trusted-root` is given).
 
 These artifacts have limits:
 
 - Only the application image has SBOMs. The migration image, the auxiliary images and the patched jitsi/web image have none.
-- No workflow signs images. The release application image carries the OCI labels set by `docker/metadata-action`, which include `org.opencontainers.image.revision`, the commit the image was built from. The release auxiliary images set the same revision label, and the version, in the workflow. The release migration image is built without these labels.
+- No workflow signs images: the provenance covers the files attached to the release, not the container images. The release application image carries the OCI labels set by `docker/metadata-action`, which include `org.opencontainers.image.revision`, the commit the image was built from. The release auxiliary images set the same revision label, and the version, in the workflow. The release migration image is built without these labels.
 
 Installations show an **SBOM** button on `/changelog` for releases flagged `sbom`; see [docs/development/ci-and-release.md](docs/development/ci-and-release.md#sboms).
 
