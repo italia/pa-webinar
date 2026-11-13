@@ -25,10 +25,19 @@
 # non c'e' piu' (upstream ha cambiato struttura, o ha risolto), piu' di una =
 # ambiguo: in entrambi i casi la costruzione si ferma invece di indovinare.
 # Bumpare la versione e' quindi un cambio di tag, non un lavoro di archeologia.
+#
+# La base e' fissata anche per impronta (digest dell'indice multi-architettura):
+# le assunzioni sulla forma del bundle valgono per quella build esatta, non per
+# qualunque cosa il tag indichi domani. L'immagine si scarica per impronta: il
+# tag da solo non la sceglie, e sovrascrivere BASE_TAG senza BASE_DIGEST
+# costruisce sulla base vecchia. Questo e' l'unico posto dove la base e'
+# scritta: .github/workflows/jitsi-web.yml legge questi default e si ferma se
+# il tag a monte non punta piu' all'impronta.
 ARG BASE_TAG=stable-11031
-FROM jitsi/web:${BASE_TAG} AS base
+ARG BASE_DIGEST=sha256:2183593bbbe1b5e27c368e3737efc51915ce7742de93f594e5ca7950c864c233
+FROM jitsi/web:${BASE_TAG}@${BASE_DIGEST} AS base
 
-FROM node:22-alpine AS patcher
+FROM node:22-alpine@sha256:1314fb30ec37592d5845e5a160d522c0e680972aa534549940b8d73bde88481a AS patcher
 COPY --from=base /usr/share/jitsi-meet/libs/app.bundle.min.js /work/app.bundle.min.js
 COPY patch-bundle.mjs /work/patch-bundle.mjs
 RUN node /work/patch-bundle.mjs /work/app.bundle.min.js

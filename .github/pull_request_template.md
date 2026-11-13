@@ -66,7 +66,7 @@ Tick what you ran. For the others, write "not applicable: <area> not touched" or
 
 - [ ] `lobby/`: `npm run lobby:typecheck`
 - [ ] `infra/recorder/`, `infra/recorder-controller/` or `infra/captions/gateway/`: in that folder, `npm ci`, then `npx tsc --noEmit -p tsconfig.json && npm test`
-- [ ] `infra/ai/worker/`: in that folder, `pip install -r requirements-test.txt`, then `python -m pytest -q`
+- [ ] `infra/ai/worker/`: in that folder, with Python 3.11, `pip install -r requirements-test.txt`, then `python -m pytest -q`
 - [ ] `infra/helm/`: `./scripts/validate-chart.sh`
 - [ ] Live-room flows: the E2E smoke tests, `npx playwright test --project=chromium` from `app/` against the local stack
 - [ ] Security Scan, on every change: `trivy fs --severity CRITICAL,HIGH --exit-code 1 .` from the repository root. It also looks for secrets in every file.

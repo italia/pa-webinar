@@ -451,7 +451,7 @@ The AI event report (`REPORT`) needs no GPU of its own and no media, only a lang
 
 1. In the app's environment set `AI_VLLM_BASE_URL` to the server's base URL, as the worker will reach it (it ends in `/v1`), and `AI_VLLM_MODEL_ID` to the model it serves. The portal hands both to the worker when the job is claimed.
 2. In the site settings, turn on **Post-event pipeline active**. On an ended event within its data retention, request the report from the **AI event report** panel of the **After the event** tab.
-3. From `infra/ai`, install `worker/requirements-cpu.txt` and run the worker without a GPU for that kind only. It claims one job, runs it and exits:
+3. From `infra/ai`, install `worker/requirements-cpu.txt` with Python 3.13, the version of the worker image that the file is compiled for, and run the worker without a GPU for that kind only. It claims one job, runs it and exits:
 
    ```bash
    cd infra/ai

@@ -12,7 +12,14 @@
 # busy day). The mirror is content-addressable and serves the exact
 # same digests as docker.io/library — overridable at build time:
 #   docker build --build-arg NODE_BASE=node:22-alpine .
-ARG NODE_BASE=mirror.gcr.io/library/node:22-alpine
+#
+# L'immagine di base e' fissata per impronta (digest dell'indice
+# multi-architettura) su una riga FROM letterale, cosi' Dependabot la
+# aggiorna: un FROM che legge un ARG non lo vede. Gli stadi partono da
+# NODE_BASE, che di default nomina lo stadio `node-base`.
+ARG NODE_BASE=node-base
+
+FROM mirror.gcr.io/library/node:22-alpine@sha256:1314fb30ec37592d5845e5a160d522c0e680972aa534549940b8d73bde88481a AS node-base
 
 # ── Stage 1: Dependencies ────────────────────────────────────
 FROM ${NODE_BASE} AS deps

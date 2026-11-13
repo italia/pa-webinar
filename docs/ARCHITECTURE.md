@@ -372,7 +372,7 @@ Losing Redis loses no data. Real-time delivery degrades until it returns ([Live 
 
 ## Technology stack
 
-Names and roles only. Versions are in `package.json` (root, `app/`, `lobby/`, `infra/recorder/`, `infra/recorder-controller/`), `infra/helm/pa-webinar/Chart.yaml` and `Chart.lock`, `infra/ai/worker/requirements.txt`, and `.github/workflows/jitsi-web.yml` for the Jitsi base image.
+Names and roles only. Versions are in `package.json` (root, `app/`, `lobby/`, `infra/recorder/`, `infra/recorder-controller/`), `infra/helm/pa-webinar/Chart.yaml` and `Chart.lock`, `infra/ai/worker/requirements.txt`, and `infra/jitsi-web-patched/Dockerfile` (`BASE_TAG` and `BASE_DIGEST`) for the Jitsi base image.
 
 | Layer | Technology | Role |
 |---|---|---|

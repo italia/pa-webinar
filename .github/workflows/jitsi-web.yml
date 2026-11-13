@@ -30,8 +30,8 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: italia/pa-webinar-jitsi-web
   IMAGE_TAG: stable-11031-rnnoise
-  BASE_TAG: stable-11031
-  BASE_IMAGE: jitsi/web:stable-11031
+  # La base (tag e impronta) sta in un posto solo: i default di BASE_TAG e
+  # BASE_DIGEST nel Dockerfile. Il primo passo li legge e ne ricava BASE_IMAGE.
 
 jobs:
   build:
@@ -55,6 +55,32 @@ jobs:
 
       - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
 
+      # La base si legge dal Dockerfile, l'unico posto dove e' scritta, e si
+      # confronta con il registro: se il tag a monte non punta piu'
+      # all'impronta fissata (spostato, o impronta non aggiornata insieme al
+      # tag) la costruzione si ferma qui invece di patchare una base diversa da
+      # quella dichiarata.
+      - name: Read and check the pinned base
+        run: |
+          set -euo pipefail
+          df=infra/jitsi-web-patched/Dockerfile
+          tag="$(sed -n 's/^ARG BASE_TAG=//p' "$df")"
+          digest="$(sed -n 's/^ARG BASE_DIGEST=//p' "$df")"
+          if [ -z "$tag" ] || [ -z "$digest" ]; then
+            echo "::error::${df} must set defaults for BASE_TAG and BASE_DIGEST"
+            exit 1
+          fi
+          actual="$(docker buildx imagetools inspect "jitsi/web:${tag}" --format '{{json .Manifest.Digest}}' | tr -d '"')"
+          if [ "$actual" != "$digest" ]; then
+            echo "::error::jitsi/web:${tag} is ${actual}; the Dockerfile pins ${digest}"
+            exit 1
+          fi
+          {
+            echo "BASE_TAG=${tag}"
+            echo "BASE_DIGEST=${digest}"
+            echo "BASE_IMAGE=jitsi/web:${tag}@${digest}"
+          } >> "$GITHUB_ENV"
+
       - name: Login to GHCR
         uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         with:
@@ -74,8 +100,8 @@ jobs:
           # local daemon refuses to load. Disable so the exact validated image
           # loads and is then `docker push`ed unchanged.
           provenance: false
-          build-args: |
-            BASE_TAG=${{ env.BASE_TAG }}
+          # Nessun build-arg: la base e' quella dei default del Dockerfile,
+          # appena controllata.
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
 
       # Independent post-build gate on the EXACT image that will be pushed.
@@ -139,16 +165,73 @@ jobs:
           test "$(grep -oE "$SELV" orig.js | wc -l | tr -d ' ')" = "1"
           echo "self-view selector patched exactly once, and the upstream form is gone"
 
+      # Un tag pubblicato non si riscrive con un contenuto diverso: chi lo usa
+      # (il default del chart, le installazioni che lo fissano) non potrebbe
+      # piu' tornare all'immagine di prima. Se IMAGE_TAG esiste gia', si
+      # confrontano gli strati della base, la configurazione dell'immagine e
+      # l'impronta di ogni file e collegamento: tutto uguale, la ricostruzione
+      # non porta niente e non si pubblica; qualunque differenza ferma il job,
+      # che chiede un IMAGE_TAG nuovo. Solo un "not found" del registro vale
+      # come "tag mai pubblicato": ogni altro errore ferma il job.
+      - name: Decide whether to push
+        id: publish
+        run: |
+          set -euo pipefail
+          IMG="${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
+          if out="$(docker buildx imagetools inspect "$IMG" 2>&1)"; then
+            :
+          elif printf '%s' "$out" | grep -qiE 'not found|manifest unknown'; then
+            echo "push=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          else
+            echo "::error::cannot tell whether ${IMG} is published: ${out}"
+            exit 1
+          fi
+          docker tag "$IMG" pa-webinar-jitsi-web:candidate
+          docker pull --quiet "$IMG" > /dev/null
+          strati() { docker image inspect -f '{{range .RootFS.Layers}}{{println .}}{{end}}' "$1" | head -n "$2"; }
+          config() { docker image inspect -f '{{json .Config.Env}} {{json .Config.Entrypoint}} {{json .Config.Cmd}} {{json .Config.User}} {{json .Config.WorkingDir}} {{json .Config.ExposedPorts}} {{json .Config.Volumes}}' "$1"; }
+          # Ogni voce del filesystem con tipo, permessi, proprietario e
+          # destinazione dei collegamenti, piu' l'impronta di ogni file. Senza
+          # -xdev: le cartelle VOLUME dell'immagine arrivano come mount, con il
+          # contenuto dell'immagine, e vanno contate. Restano fuori solo i
+          # filesystem virtuali e i file che il motore dei container scrive.
+          contenuto() {
+            docker run --rm --network none --entrypoint sh "$1" -c '
+              salta="-path /proc -o -path /sys -o -path /dev -o -path /etc/hosts -o -path /etc/hostname -o -path /etc/resolv.conf"
+              find / \( $salta \) -prune -o -printf "%y %m %U:%G %p -> %l\n" | sort
+              find / \( $salta \) -prune -o -type f -print0 | sort -z | xargs -0 sha256sum
+            ' | sha256sum | cut -d' ' -f1
+          }
+          n="$(docker image inspect -f '{{len .RootFS.Layers}}' "$BASE_IMAGE")"
+          diverso=""
+          [ "$(strati pa-webinar-jitsi-web:candidate "$n")" = "$(strati "$IMG" "$n")" ] || diverso="the base layers"
+          [ -n "$diverso" ] || [ "$(config pa-webinar-jitsi-web:candidate)" = "$(config "$IMG")" ] || diverso="the image configuration"
+          [ -n "$diverso" ] || [ "$(contenuto pa-webinar-jitsi-web:candidate)" = "$(contenuto "$IMG")" ] || diverso="the files"
+          if [ -n "$diverso" ]; then
+            echo "::error::${IMG} is already published and differs in ${diverso}: give this change a new IMAGE_TAG"
+            exit 1
+          fi
+          echo "::notice::${IMG} is already published with the same base, configuration and files: nothing to push"
+          echo "push=false" >> "$GITHUB_OUTPUT"
+
       # Push the EXACT image that was validated above (loaded into the local
       # daemon in the build step) — do NOT rebuild, or the pushed artifact could
       # diverge from the validated one (mutable base tag, cache drift).
       - name: Push validated image
+        if: steps.publish.outputs.push == 'true'
         run: docker push "${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
 
       - name: Summary
+        env:
+          PUSHED: ${{ steps.publish.outputs.push }}
         run: |
           {
-            echo "### Patched jitsi/web pushed"
+            if [ "$PUSHED" = "true" ]; then
+              echo "### Patched jitsi/web pushed"
+            else
+              echo "### Patched jitsi/web unchanged: already published, nothing pushed"
+            fi
             echo ""
             echo "\`${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}\` — base \`${BASE_IMAGE}\`, rnnoise AudioContext at 48 kHz, reaction overlay pointer-events:none, self-view config-overridable."
           } >> "$GITHUB_STEP_SUMMARY"

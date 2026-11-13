@@ -432,7 +432,7 @@ function prePush() {
     else
       salta(
         'Unit Tests (worker AI)',
-        'pytest not available: pip install -r infra/ai/worker/requirements-test.txt'
+        'pytest not available: in a Python 3.11 environment, pip install -r infra/ai/worker/requirements-test.txt'
       );
   }
   controlliLicenze(c, { report: true });

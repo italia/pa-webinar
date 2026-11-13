@@ -6,7 +6,7 @@
 # modello qui dentro: solo Node e il decodificatore Opus (WebAssembly).
 
 # ── Stage 1: build TypeScript → dist/ ────────────────────────────────────
-FROM node:22-bookworm-slim AS build
+FROM node:22-bookworm-slim@sha256:e9f565d32859f0cbfb52125eafe8be39390f24dac302dc3cdf566e8ba3ab21ee AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
@@ -16,7 +16,7 @@ RUN npm run build \
     && npm prune --omit=dev
 
 # ── Stage 2: runtime ─────────────────────────────────────────────────────
-FROM node:22-bookworm-slim AS runtime
+FROM node:22-bookworm-slim@sha256:e9f565d32859f0cbfb52125eafe8be39390f24dac302dc3cdf566e8ba3ab21ee AS runtime
 ENV NODE_ENV=production
 # Come l'immagine del portale: pacchetti di sistema aggiornati, e niente npm,
 # che a runtime non serve e porta con sé dipendenze vulnerabili.

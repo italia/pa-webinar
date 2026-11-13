@@ -202,6 +202,7 @@ As a result, code from a pull request reaches the self-hosted runner only after 
 ### Pinned actions and least-privilege tokens
 
 - **Pinned actions.** Every `uses:` in `.github/workflows/` references a full commit SHA, with the tag in a trailing comment (`actions/checkout@<sha> # v4`). No workflow uses a floating reference such as `@v4` or `@main`. Dependabot updates the SHA and the comment together.
+- **Pinned installs.** Builds and CI install packages from lockfiles that fix every version and its hash: `npm ci` everywhere (never an `npm install` fallback), and pip with `--require-hashes` for the CPU post-production worker, the worker's test suite, WhisperX and the PyYAML of the chart validation. Two installs are pinned by version only: the CUDA stack of the GPU worker (`infra/ai/worker/requirements.txt`), on top of the NGC base image, for the reason in [infra/ai/worker/README.md](infra/ai/worker/README.md#dependency-constraints); and the CycloneDX generator that `release.yml` runs with `npx` for the best-effort npm SBOM, in a job that holds no signing token.
 - **Least-privilege tokens.** `ci.yml`, `codeql.yml`, `scorecard.yml`, `dev.yml`, `release.yml`, `buildcache-cleanup.yml` and `jitsi-web.yml` set a read-only workflow default. Only the jobs that need more than read access get it:
 
   | Workflow | Workflow-level permissions | Elevated jobs |
@@ -211,7 +212,7 @@ As a result, code from a pull request reaches the self-hosted runner only after 
   | `scorecard.yml` | `read-all` | The analysis job gets `security-events: write`, plus `id-token: write` to publish results |
   | `dev.yml` | `contents: read` | The jobs that push images get `packages: write` |
   | `jitsi-web.yml` | `contents: read` | The job that pushes the image gets `packages: write` |
-  | `release.yml` | `contents: read` | The application image job gets `packages: write` and `contents: write`. The auxiliary images job gets `packages: write`. The chart job gets `contents: write` to attach files to the GitHub Release |
+  | `release.yml` | `contents: read` | The application image job gets `packages: write` and `contents: write`. The auxiliary images job gets `packages: write`. The chart job gets `contents: write` to attach files to the GitHub Release.|
   | `buildcache-cleanup.yml` | `contents: read` | The prune job gets `packages: write` to delete old untagged versions of the layer-cache package |
 
 - **Jobs without a `permissions` block.** Such a job receives the workflow default, or, when the workflow declares none, the repository's default token permissions, a repository setting that the workflow files do not show. The change-detection jobs in `dev.yml` take the workflow's read-only default.
@@ -221,8 +222,8 @@ As a result, code from a pull request reaches the self-hosted runner only after 
 `.github/dependabot.yml` checks for updates every week. It is the authoritative list of what is covered:
 
 - **npm:** the root project with its workspaces (the app and the lobby share one lockfile), the recorder, the recorder controller and the live captions gateway.
-- **pip:** the AI post-production worker.
-- **Docker:** Dependabot updates a base image only when a `FROM` line names it literally: the recorder, recorder-controller, captions gateway, captions engine and CPU post-production worker bases, and the build-only `node` stage of the patched jitsi/web image. The app, GPU worker and patched-image Dockerfiles take their runtime base from a build argument (`NODE_BASE`, `BASE_IMAGE`, `BASE_TAG`), which Dependabot does not update, so those bases are manual bumps.
+- **pip:** the AI post-production worker, and the PyYAML that the chart validation needs in CI.
+- **Docker:** every base image is pinned by the digest of its multi-architecture index (`tag@sha256:…`), so every build starts from the same base whatever the tag points to later. Build steps that upgrade system packages (`apk upgrade` in the app image, for example) can still add newer packages on top. Dependabot updates the bases that a `FROM` line names literally, digest included, with one pull request per image that updates every directory using it: the app (its `node-base` stage), the recorder, recorder-controller, captions gateway, captions engine and CPU post-production worker, and the load-test tool. The GPU worker takes its base from a build argument (`BASE_IMAGE`), which Dependabot does not update. The patched jitsi/web image is left out on purpose: its base (`BASE_TAG` with `BASE_DIGEST`) and its build-only `node` stage move by hand with the Jitsi release, and its workflow never republishes a tag with different content. Those bases are manual bumps.
 - **GitHub Actions:** every action used by the workflows.
 - **Not covered:** the Helm subchart versions in `infra/helm/pa-webinar/Chart.lock`, and the image references in the chart's values.
 
@@ -232,7 +233,7 @@ For npm, minor and patch updates are grouped into one pull request per directory
 
 The `update-types` exclusions (`version-update:semver-major`, plus `version-update:semver-minor` where minors are held back) apply to routine version updates only. When Dependabot security updates are enabled for the repository, a vulnerable dependency still gets its pull request.
 
-Moving to a new upstream Jitsi web build means changing `BASE_TAG`, `BASE_IMAGE` and `IMAGE_TAG` in `.github/workflows/jitsi-web.yml`, so it is always a deliberate change. The procedure is in [infra/jitsi-web-patched/README.md](infra/jitsi-web-patched/README.md).
+Moving to a new upstream Jitsi web build means changing the `BASE_TAG` and `BASE_DIGEST` defaults in `infra/jitsi-web-patched/Dockerfile` and `IMAGE_TAG` in `.github/workflows/jitsi-web.yml`, so it is always a deliberate change. The procedure is in [infra/jitsi-web-patched/README.md](infra/jitsi-web-patched/README.md).
 
 ### Scanners
 

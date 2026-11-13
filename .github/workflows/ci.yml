@@ -149,8 +149,8 @@ jobs:
       - name: PyYAML
         # `validate-chart.sh` legge i manifesti resi con PyYAML e si ferma se
         # non lo trova: senza questo passo il gate fallirebbe sul runner
-        # self-hosted, che è minimale.
-        run: pip install pyyaml
+        # self-hosted, che è minimale. Versione e impronte dal file compilato.
+        run: pip install --require-hashes -r scripts/requirements-validate-chart.txt
       - name: Accesso a Docker Hub
         # I sottocharts Bitnami arrivano da registry-1.docker.io e Helm 3 legge
         # ~/.docker/config.json: senza credenziali la pull è anonima e il
@@ -225,11 +225,10 @@ jobs:
       - name: Dipendenze minime per i test puri
         working-directory: infra/ai/worker
         run: |
-          python -m pip install --upgrade pip
           # I moduli importano torch/whisperx solo dentro le funzioni: bastano
-          # le due leggere che compaiono in cima (numpy, httpx). Vedi
-          # requirements-test.txt.
-          pip install -r requirements-test.txt
+          # le dipendenze leggere di requirements-test.in, installate dal file
+          # compilato con le impronte.
+          pip install --require-hashes -r requirements-test.txt
       - name: pytest
         working-directory: infra/ai/worker
         # I test che richiedono modelli o GPU si escludono da soli via skip;

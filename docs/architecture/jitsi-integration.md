@@ -1002,8 +1002,8 @@ order, and roll out through [upgrades and rollback](../operations/upgrades.md).
    the profiles that use the stock web image (`examples/values-k3s.yaml`, `values-minikube.yaml`,
    `values-eks.yaml`). Run `helm dependency update infra/helm/pa-webinar` if the dependency changed,
    commit the vendored chart and `Chart.lock`, and run `./scripts/validate-chart.sh`.
-2. **Rebuild the patched web image on the same Jitsi release.** Update `BASE_TAG` in
-   `infra/jitsi-web-patched/Dockerfile`, and `BASE_TAG`, `BASE_IMAGE` and a new `IMAGE_TAG` in
+2. **Rebuild the patched web image on the same Jitsi release.** Update `BASE_TAG` and `BASE_DIGEST` in
+   `infra/jitsi-web-patched/Dockerfile`, and set a new `IMAGE_TAG` in
    `.github/workflows/jitsi-web.yml`. Every exactly-one-match assertion and every workflow check must
    pass. If one fails, find out whether upstream changed shape or fixed the bug; do not loosen the
    assertion.

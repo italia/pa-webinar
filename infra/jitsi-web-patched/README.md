@@ -6,7 +6,7 @@ Jitsi release and for operators who choose which web image their conference serv
 
 | File | Role |
 |---|---|
-| `Dockerfile` | Multi-stage build: takes `jitsi/web:${BASE_TAG}`, runs the bundle patcher, appends one CSS rule |
+| `Dockerfile` | Multi-stage build: takes `jitsi/web:${BASE_TAG}@${BASE_DIGEST}`, runs the bundle patcher, appends one CSS rule |
 | `patch-bundle.mjs` | Rewrites `app.bundle.min.js` by shape, with an exactly-one-match assertion per patch |
 | [`.github/workflows/jitsi-web.yml`](../../.github/workflows/jitsi-web.yml) | Builds the image, validates the exact image, then pushes it |
 
@@ -183,8 +183,11 @@ flowchart LR
 
 ### The Dockerfile stages
 
-1. `base` is `jitsi/web:${BASE_TAG}`. The `BASE_TAG` build argument has a default in the Dockerfile,
-   which local builds use; the workflow passes its own value.
+1. `base` is `jitsi/web:${BASE_TAG}@${BASE_DIGEST}`: the upstream tag, pinned to the digest of its
+   multi-architecture index, so the shape assertions always run against the exact build they were
+   written for. The defaults of both build arguments are the only place where the base is written:
+   local builds and the workflow use them. The image is pulled by digest, so overriding `BASE_TAG`
+   without `BASE_DIGEST` builds on the old base.
 2. `patcher` is a Node.js image. It copies `libs/app.bundle.min.js` out of the base and runs
    `patch-bundle.mjs` on it.
 3. The final stage is the base image with the patched bundle copied back and the CSS rule appended.
@@ -192,7 +195,7 @@ flowchart LR
 To build locally from the repository root:
 
 ```sh
-docker build --build-arg BASE_TAG=<jitsi-build> -t pa-webinar-jitsi-web:local infra/jitsi-web-patched
+docker build -t pa-webinar-jitsi-web:local infra/jitsi-web-patched
 ```
 
 With `--progress=plain`, a successful build shows one `OK:` line from the patcher and one from the CSS
@@ -205,14 +208,22 @@ workflow itself, and on manual dispatch. It does not run for pull requests or fo
 image has its own tag and is not tied to an application release. The job runs on the project's
 self-hosted runner, like the other build workflows, with `contents: read` and `packages: write`.
 
-1. **Build without pushing.** The image is built into the local Docker daemon (`load: true`,
+1. **Read and check the base.** The job reads `BASE_TAG` and `BASE_DIGEST` from the Dockerfile and
+   stops if the upstream tag no longer points to that digest. It derives `BASE_IMAGE`,
+   `jitsi/web:<BASE_TAG>@<BASE_DIGEST>`, for the later steps.
+2. **Build without pushing.** The image is built into the local Docker daemon (`load: true`,
    `push: false`), with `provenance: false`, because the local exporter cannot load an image that carries
    attestations.
-2. **Validate the exact image.** The job extracts the bundle and the stylesheet from the new image and
+3. **Validate the exact image.** The job extracts the bundle and the stylesheet from the new image and
    from `BASE_IMAGE`, and repeats the patch checks on them (see the table below).
-3. **Push the validated image.** It runs `docker push` on the image it validated. It does not rebuild,
+4. **Refuse to rewrite a published tag.** If `IMAGE_TAG` already exists in the registry, the job compares
+   the base layers, the image configuration and the hash of every file and link with the published
+   image. When all are equal the rebuild adds nothing and nothing is pushed; any difference fails the
+   job, which asks for a new `IMAGE_TAG`. Only a "not found" answer from the registry counts as an
+   unpublished tag: any other registry error fails the job.
+5. **Push the validated image.** It runs `docker push` on the image it validated. It does not rebuild,
    so the published artifact cannot drift from the validated one through a moved base tag or a cache.
-4. **Summary.** It writes the published reference and its base to the job summary.
+6. **Summary.** It writes the reference, whether it was pushed, and its base to the job summary.
 
 | Check on the extracted files | Passes when |
 |---|---|
@@ -231,19 +242,20 @@ The mechanics of all workflows, including this one, are in
 
 ### Tags
 
-The workflow's `env` block holds every name the build uses:
+The names the build uses:
 
-| Variable | Meaning |
-|---|---|
-| `REGISTRY`, `IMAGE_NAME` | Where the image is pushed (`ghcr.io`, `italia/pa-webinar-jitsi-web`) |
-| `BASE_TAG` | The upstream `jitsi/web` tag, passed to the Dockerfile as a build argument |
-| `BASE_IMAGE` | The upstream image the validation step compares against. It must name the same build as `BASE_TAG` |
-| `IMAGE_TAG` | The published tag, named after the upstream build (`<BASE_TAG>-rnnoise`), with a revision suffix when a patch changes on the same base |
+| Variable | Where | Meaning |
+|---|---|---|
+| `REGISTRY`, `IMAGE_NAME` | Workflow `env` | Where the image is pushed (`ghcr.io`, `italia/pa-webinar-jitsi-web`) |
+| `BASE_TAG` | Dockerfile `ARG` default | The upstream `jitsi/web` tag |
+| `BASE_DIGEST` | Dockerfile `ARG` default | The digest of the multi-architecture index that `BASE_TAG` names. Read it with `docker buildx imagetools inspect jitsi/web:<BASE_TAG>` |
+| `BASE_IMAGE` | Derived by the workflow | The upstream image the validation step compares against: `jitsi/web:<BASE_TAG>@<BASE_DIGEST>` |
+| `IMAGE_TAG` | Workflow `env` | The published tag, named after the upstream build (`<BASE_TAG>-rnnoise`), with a revision suffix when a patch changes on the same base |
 
-The workflow pushes whatever `IMAGE_TAG` says. If a patch changes and `IMAGE_TAG` does not, the new
-image overwrites the old one under the same tag, the running build can no longer be identified from the
-tag, and a rollback to the previous image is impossible. Give every patch change a new, unused tag, for
-example with a revision suffix, in the same commit as the change. The chart pulls the web image with
+The workflow never rewrites a published tag with different content: if a patch or the base changes and
+`IMAGE_TAG` does not, the job fails before pushing, because the running build could no longer be
+identified from the tag and a rollback to the previous image would be impossible. Give every patch change
+a new, unused tag, for example with a revision suffix, in the same commit as the change. The chart pulls the web image with
 `pullPolicy: Always`, as a safety net in case a tag is ever rewritten.
 
 ### Keeping the chart default aligned
@@ -287,10 +299,13 @@ A new web image is one step of the wider
 upstream web build must match the Jitsi release of the `jitsi-meet` subchart, because the web client and
 the backend components are released together.
 
-1. **Change the base in three places, in one commit:**
-   - the default of `ARG BASE_TAG` in `Dockerfile`;
-   - `BASE_TAG` and `BASE_IMAGE` in the `env` block of `.github/workflows/jitsi-web.yml`;
-   - `IMAGE_TAG` in the same block, to a tag that has never been pushed.
+1. **Change the base, in one commit:**
+   - the defaults of `ARG BASE_TAG` and `ARG BASE_DIGEST` in `Dockerfile`;
+   - `IMAGE_TAG` in the `env` block of `.github/workflows/jitsi-web.yml`, to a tag that has never been
+     pushed.
+
+   Refresh the digest of the `node` patcher stage in the same commit. Dependabot does not update this
+   directory: the image changes only with a deliberate bump.
 2. **Build locally first**, with the command in [The Dockerfile stages](#the-dockerfile-stages). Bumping
    is normally just a change of tag: the shapes still match and the build passes.
 3. **If an assertion fails, investigate. Do not loosen it.** Find out whether upstream restructured the

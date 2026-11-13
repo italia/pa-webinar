@@ -131,7 +131,8 @@ jobs:
         continue-on-error: true
         run: |
           npm ci --legacy-peer-deps
-          npx @cyclonedx/cyclonedx-npm --workspace app --output-file npm-sbom.json || true
+          # Versione fissata: npx scaricherebbe l'ultima uscita al momento del tag.
+          npx --yes @cyclonedx/cyclonedx-npm@6.0.1 --workspace app --output-file npm-sbom.json || true
 
       - name: Generate release notes from git log
         id: notes

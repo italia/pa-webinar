@@ -374,8 +374,9 @@ python -m pytest -q
   `sys.path`, so the bare `pytest -q` that CI runs collects the same tests.
   A `ModuleNotFoundError` from a bare `pytest` means another interpreter is
   running it.
-- **CPU only, with light dependencies.** `requirements-test.txt` holds
-  `numpy`, `nltk`, `httpx`, `pydantic` and `pytest`. The modules import
+- **CPU only, with light dependencies.** `requirements-test.in` lists
+  `numpy`, `nltk`, `httpx`, `pydantic` and `pytest`; `requirements-test.txt`
+  is compiled from it (see [Dependency constraints](#dependency-constraints)). The modules import
   `torch`, `whisperx`, `piper` and `audioseal` inside functions, so the tests
   never load them. Keep it that way: a heavy import at module level breaks
   the suite. CI runs Python 3.11; with a newer system Python, create a 3.11
@@ -426,6 +427,20 @@ rollback is in
 
 `requirements.txt` holds a balanced stack. Check these constraints before you
 bump anything:
+
+- The files installed outside the GPU image are pinned with their whole
+  dependency tree and the hash of every file: `requirements-cpu.txt` (the
+  worker without a GPU) and `requirements-test.txt` (the test suite) are
+  compiled by `pip-compile --generate-hashes` from `requirements-cpu.in` and
+  `requirements-test.in`, and are installed with `--require-hashes`. Edit the
+  `.in` file, then regenerate the `.txt` with the command in its header,
+  under Python 3.13 for both: Dependabot reads one Python version per folder
+  from these headers. `requirements-test.in` keeps numpy below 2.5, so the
+  compiled file still installs on the Python 3.11 that CI uses.
+  `requirements-whisperx.txt` carries the hashes of its single package. The
+  CUDA stack in `requirements.txt` is pinned by version only: its transitive
+  dependencies come from the NGC base image and from the resolution at build
+  time.
 
 - The CUDA set (`torch`, `torchvision`, `torchaudio`, `torchcodec`) is
   pinned from the cu126 wheel index with the `+cu126` label written out,

@@ -9,7 +9,7 @@
 # sue librerie di sistema.
 #
 # ── Stage 1: build TypeScript → dist/ ────────────────────────────────────
-FROM node:22-bookworm-slim AS build
+FROM node:22-bookworm-slim@sha256:e9f565d32859f0cbfb52125eafe8be39390f24dac302dc3cdf566e8ba3ab21ee AS build
 WORKDIR /app
 
 # Puppeteer scarica il Chrome compatibile durante l'install: lo dirigiamo in
@@ -25,8 +25,8 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends unzip \
     && rm -rf /var/lib/apt/lists/*
 
-COPY package.json package-lock.json* ./
-RUN npm ci --no-audit --no-fund || npm install --no-audit --no-fund
+COPY package.json package-lock.json ./
+RUN npm ci --no-audit --no-fund
 
 # Il download di Chrome non fallisce da solo: se lo scompattamento non
 # avviene, `npm ci` esce comunque con successo e lascia una cartella vuota.
@@ -42,7 +42,7 @@ RUN npm run build
 RUN npm prune --omit=dev
 
 # ── Stage 2: runtime con Chrome ──────────────────────────────────────────
-FROM node:22-bookworm-slim AS runtime
+FROM node:22-bookworm-slim@sha256:e9f565d32859f0cbfb52125eafe8be39390f24dac302dc3cdf566e8ba3ab21ee AS runtime
 WORKDIR /app
 
 # Dipendenze di sistema per Chrome headless (allineate alla doc Puppeteer).
@@ -59,7 +59,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       wget xdg-utils \
     && rm -rf /var/lib/apt/lists/*
 
-# Puppeteer scarica il Chrome compatibile durante `npm install`; copiamo la
+# Puppeteer scarica il Chrome compatibile durante `npm ci`; copiamo la
 # cache insieme a node_modules.
 ENV PUPPETEER_CACHE_DIR=/app/.cache/puppeteer
 COPY --from=build /app/.cache/puppeteer ./.cache/puppeteer

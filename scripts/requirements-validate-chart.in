@@ -1,0 +1,5 @@
+# Quello che serve a validate-chart.sh: legge i manifesti resi con PyYAML per
+# verificare le invarianti sui Secret. La CI installa il file compilato
+# (requirements-validate-chart.txt, con le impronte) in modalita'
+# --require-hashes; lo si rigenera con pip-compile, come dice la sua intestazione.
+pyyaml==6.0.3
