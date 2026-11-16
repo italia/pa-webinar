@@ -183,8 +183,15 @@ export function controlliPerFile(file) {
     lobby: sotto('lobby').length > 0,
     servizi: SERVIZI_NODE.filter((dir) => sotto(dir).length > 0),
     chart: sotto('infra/helm').length > 0,
-    worker: sotto('infra/ai/worker').length > 0,
-    licenze: lockfile.length > 0,
+    // I test del worker leggono anche il registro dei pesi dei modelli.
+    worker:
+      sotto('infra/ai/worker').length > 0 || file.includes('scripts/licenses/models.json'),
+    // Il registro dei pesi dei modelli cerca modelli in ogni file tracciato
+    // (scripts/licenses/models.mjs) e costa meno di un secondo: gira su ogni
+    // cambio che non sia solo documentazione, e sulla pagina delle licenze.
+    licenze:
+      lockfile.length > 0 ||
+      file.some((f) => !/\.md$/i.test(f) || f === 'THIRD-PARTY-LICENSES.md'),
     reportLicenze: file.includes('package-lock.json'),
     immagine:
       radiceNpm ||

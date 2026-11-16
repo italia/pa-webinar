@@ -100,14 +100,14 @@ The only GitHub Actions artifact any workflow uploads is the Playwright report o
 
 | Job, as named in the checks list | What it runs | Waits for | Blocking |
 |---|---|---|---|
-| Lint & Typecheck | `npm run lint --workspace=app`, `npx tsc --noEmit --project app/tsconfig.json` and `npm run test:scripts` (the Git-hook rules and the license policy) | | Yes |
+| Lint & Typecheck | `npm run lint --workspace=app`, `npx tsc --noEmit --project app/tsconfig.json` and `npm run test:scripts` (the Git-hook rules, the license policy and the model registry) | | Yes |
 | Unit Tests | `npm run test:coverage --workspace=app`, which fails when coverage falls below the thresholds in `app/vitest.config.ts`, which work as a ratchet. Then `npm run test:db --workspace=app` against a PostgreSQL service container | | Yes |
 | Unit Tests (recorder, controller) | For `infra/recorder`, `infra/recorder-controller` and `infra/captions/gateway`, which sit outside the npm workspaces: `npm ci`, `npx tsc --noEmit -p tsconfig.json`, `npm test` | | Yes |
 | Typecheck (lobby) | `npx tsc --noEmit -p lobby/tsconfig.json` | | Yes |
 | Helm Chart | Builds the subcharts at the versions pinned in `Chart.lock`, runs `./scripts/validate-chart.sh`, then renders the `simple`, `standard` and `full` example values and applies each result with `kubectl apply --dry-run=server` to a throwaway kind cluster | | Yes |
 | Unit Tests (worker AI) | In `infra/ai/worker`, with Python 3.11: `pip install -r requirements-test.txt`, then `pytest -q`. No GPU is involved: tests that need models skip themselves | | Yes |
 | Security Scan | Trivy filesystem scan of the repository for CRITICAL and HIGH findings. `.trivyignore` at the root records the accepted ones | | Yes |
-| License Compliance | `npm run license:check` reads the lockfiles and fails on forbidden or missing licenses among production dependencies ([policy](../../THIRD-PARTY-LICENSES.md#what-ci-runs)). The job then regenerates `license-report.json` and fails if the committed file differs | | Yes |
+| License Compliance | `npm run license:check` reads the lockfiles and fails on forbidden or missing licenses among production dependencies ([policy](../../THIRD-PARTY-LICENSES.md#what-ci-runs)), and checks the [model registry](../../THIRD-PARTY-LICENSES.md#the-model-registry). The job then regenerates `license-report.json` and fails if the committed file differs | | Yes |
 | Migration Integrity | `prisma migrate deploy` on an empty database, then `prisma migrate diff --from-migrations app/prisma/migrations --to-schema-datamodel app/prisma/schema.prisma --shadow-database-url <the same throwaway database> --exit-code` | | Yes |
 | E2E Smoke Tests | Starts the Docker Compose stack, loads the demo data with the `db-seed` service and runs Playwright on Chromium. It uploads the `playwright-report` artifact | Lint & Typecheck, Unit Tests | No (`continue-on-error`) |
 | Docker Build & Scan | Builds the app image from the checkout with `push: false`, then scans that local image with Trivy for CRITICAL and HIGH findings | Lint & Typecheck, Unit Tests | Yes |

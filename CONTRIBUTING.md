@@ -134,6 +134,7 @@ Tick only what is true, and explain any unticked item.
 - [ ] A schema change comes with its committed migration SQL. The migration is additive, and no migration that has been merged or applied anywhere is edited.
 - [ ] A dependency change comes with a regenerated `license-report.json`, committed together with `package-lock.json`.
 - [ ] Every new source file starts with its SPDX header.
+- [ ] New or replaced model weights, or a new default model, are registered in `scripts/licenses/models.json`, described in `THIRD-PARTY-LICENSES.md` and pass `npm run license:check`, and the pull request reports how the model was measured (see [AI models and weights](#ai-models-and-weights)).
 - [ ] A new model that holds participants' personal data is purged by the `/api/cron/cleanup` transaction and its test, and classified in `app/src/lib/gdpr/cleanup-coverage.ts`. If the model points to a stored file, the cleanup deletes the file too. The guard test covers only tables with an `eventId` column, so check any other model by hand. See [Rules for developers](docs/GDPR.md#rules-for-developers).
 - [ ] A change to a shared contract or a default (a response shape, a guard, an enum value, a token rule, an i18n key used elsewhere, or a default in `values.yaml`, `schema.prisma` or the site settings) lists the consumers you checked in the pull request description.
 - [ ] The owner page in `docs/` describes the new behavior.
@@ -164,6 +165,18 @@ Documentation follows the same review as code. [docs/README.md](docs/README.md) 
 - Write in English (American spelling) and describe current behavior only, verified against the code. If a page and the code disagree, the code wins: fix the page.
 - Update the page that owns a subject and link to it from elsewhere, instead of writing a second description.
 - Render every Mermaid diagram before you commit it, for example with `npx -y @mermaid-js/mermaid-cli -i diagram.mmd -o diagram.svg`, because GitHub shows a diagram that fails to parse as an error box. Color diagrams with `classDef` strokes from the house palette (primary `#0066CC`, dark `#17324D`, teal `#00A3A3`, green `#008055`, amber `#CC7A00`, red `#D1344C`, neutral `#5C6F82`), with a light tint of the stroke color as fill and dark text, so they read in both GitHub themes.
+
+## AI models and weights
+
+Every model in PA Webinar runs inside the installation, so model weights are a dependency like any other: they have a license, they reach every installation that turns the feature on, and they cost the operator CPU, GPU and memory. A pull request that adds or replaces model weights, or changes which model is the default:
+
+- registers the weights in `scripts/licenses/models.json` and describes them in [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md#the-model-registry). `npm run license:check` checks the entry, and fails on the models it can find in the repository without one: a download URL, a weights file, a load by a name written out in full. A new default model id also needs its entry, or the tests of the portal and of the worker fail;
+- uses a file format that does not run code when it is loaded: GGUF, CTranslate2, safetensors, ONNX, TensorFlow Lite, or NumPy arrays loaded without `allow_pickle`. PyTorch pickles (`.pt`, `.pth` and pickled `.bin` checkpoints) are not accepted for new models; the ones already in use are recorded in the registry as gaps;
+- pins every download to a fixed revision and its SHA-256, as `captions.model` and `postprod.mt.model` in `infra/helm/pa-webinar/values.yaml` do. Weights are downloaded when an installation needs them, not committed: the small model that the browser loads for the background preview is the only one in the repository;
+- keeps every default under a license on the [allowed list](THIRD-PARTY-LICENSES.md#the-rule). A model under non-commercial or otherwise restricted terms can be documented as an option that an operator configures after accepting its terms, and is never a default of the chart, of Compose or of the code;
+- reports what the model was measured on. For a live captions model, attach the `REPORT.md` of the benchmark in [`infra/captions/bench/`](infra/captions/bench/README.md) with the full profile (`BENCH_PROFILE=full`): processing delay, CPU per speaker and word error rate. The benchmark uses Italian read speech; for any other claim, such as accuracy on another language or a dialect, describe the method and the data. The data must be public and downloadable at a fixed revision, so that a maintainer can repeat the measurement.
+
+Audio and transcripts of real events never go in the repository, in a pull request or in an issue, not even as test data.
 
 ## License of contributions
 

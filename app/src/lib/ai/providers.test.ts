@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: EUPL-1.2
 // SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
 
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import {
@@ -138,5 +141,33 @@ describe('resolveMtProvider', () => {
   it("un indirizzo che non e' http(s) non vale", () => {
     expect(resolveMtProvider({ AI_MT_BASE_URL: 'non un indirizzo' })).toBeNull();
     expect(resolveMtProvider({ AI_MT_BASE_URL: 'ftp://pa-webinar-mt/v1' })).toBeNull();
+  });
+});
+
+describe('modelli di default nel registro dei pesi', () => {
+  // Il registro (scripts/licenses/models.json) e' la lista che la CI controlla
+  // per licenza, formato e fissaggio: un default nuovo che non ci sta
+  // entrerebbe nelle installazioni senza quei controlli.
+  const registro = JSON.parse(
+    readFileSync(path.join(__dirname, '../../../../scripts/licenses/models.json'), 'utf8')
+  ) as { models: Array<{ ids?: string[] }> };
+  const registrati = new Set(registro.models.flatMap((m) => m.ids ?? []));
+
+  const origEnv = { ...process.env };
+  beforeEach(() => {
+    delete process.env.AI_VLLM_MODEL_ID;
+    delete process.env.AI_ASR_MODEL_ID;
+  });
+  afterEach(() => {
+    process.env = { ...origEnv };
+  });
+
+  it('il modello linguistico, la trascrizione e la traduzione di default sono registrati', () => {
+    const predefiniti = [
+      resolveLlmProvider({ siteProvider: 'vllm' }).modelId,
+      resolveAsrProvider({ siteProvider: 'whisperx' }).modelId,
+      resolveMtProvider({ AI_MT_BASE_URL: 'http://pa-webinar-mt:8080/v1' })?.modelId,
+    ];
+    for (const id of predefiniti) expect(registrati, String(id)).toContain(id);
   });
 });

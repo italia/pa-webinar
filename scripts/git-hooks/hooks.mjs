@@ -108,7 +108,7 @@ const relativo = (dir, file) => file.map((f) => f.slice(dir.length + 1));
 
 function controlliLicenze(c, { report }) {
   if (!c.licenze) return;
-  controllo('Dependency licenses', 'node', ['scripts/licenses/check.mjs']);
+  controllo('Licenses of dependencies and model weights', 'node', ['scripts/licenses/check.mjs']);
   if (report && c.reportLicenze) {
     if (!existsSync(join(RADICE, 'node_modules'))) {
       salta('license-report.json', 'node_modules missing: run npm ci');

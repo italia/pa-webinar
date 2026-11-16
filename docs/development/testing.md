@@ -15,7 +15,7 @@ Run every command from the repository root unless a row or block says otherwise.
 | App database tests | Route handlers against real PostgreSQL: constraints, cascades, transactions, races between requests, column types | `npm run test:db --workspace=app` | A disposable PostgreSQL in `TEST_DATABASE_URL`, with a superuser and a database name ending in `_test` | **Unit Tests** |
 | Recorder bot, recorder controller and captions gateway | Pure logic of `infra/recorder` and `infra/recorder-controller`; the captions gateway, end to end over WebSockets with a fake bridge and a fake engine | In each folder: `npm ci`, then `npx tsc --noEmit -p tsconfig.json && npm test` | Each folder's own dependencies | **Unit Tests (recorder, controller)** |
 | Lobby | Type check of the Phaser square | `npm run lobby:typecheck` | Nothing | **Typecheck (lobby)** |
-| Repository tooling | The rules of the Git hooks (commit message, secret patterns, choice of checks) the license policy (SPDX expressions, lockfile reading) and the SPDX header of every source file | `npm run test:scripts` (Node's built-in test runner) | Nothing | **Lint & Typecheck** |
+| Repository tooling | The rules of the Git hooks (commit message, secret patterns, choice of checks) the license policy (SPDX expressions, lockfile reading, the model registry) and the SPDX header of every source file | `npm run test:scripts` (Node's built-in test runner) | Nothing | **Lint & Typecheck** |
 | AI worker | Pure logic of the post-production worker | In `infra/ai/worker/`, with Python 3.11: `pip install -r requirements-test.txt`, then `python -m pytest -q` | Python. No GPU, no models | **Unit Tests (worker AI)** |
 | Helm chart | The chart renders on every profile and meets the installation invariants | `./scripts/validate-chart.sh` | Helm, `python3` with PyYAML, `openssl`, the subcharts | **Helm Chart**, plus a server-side dry run on kind |
 | Migration integrity | Migrations apply to an empty database and match `schema.prisma` | `prisma migrate deploy`, then `prisma migrate diff --exit-code`, against a throwaway database | A disposable PostgreSQL | **Migration Integrity** |
@@ -213,7 +213,7 @@ The tests cover pure logic:
 
 ### Repository tooling
 
-`scripts/git-hooks/rules.test.mjs` and `scripts/licenses/policy.test.mjs` cover the logic behind the [Git hooks](methodology.md#git-hooks) and the license check: which commit messages pass, which added lines look like secrets or conflict markers, which checks a set of changed files calls for, how an SPDX expression is judged and which lockfile entries count as production packages. They use `node:test`, with no dependency to install. Test secrets are assembled from fragments, so that no scanner mistakes them for real ones.
+`scripts/git-hooks/rules.test.mjs`, `scripts/licenses/policy.test.mjs` and `scripts/licenses/models.test.mjs` cover the logic behind the [Git hooks](methodology.md#git-hooks) and the license check: which commit messages pass, which added lines look like secrets or conflict markers, which checks a set of changed files calls for, how an SPDX expression is judged, which lockfile entries count as production packages, and which model registry entries pass. The last test also runs the check on the registry in the repository. They use `node:test`, with no dependency to install. Test secrets are assembled from fragments, so that no scanner mistakes them for real ones.
 
 ### AI worker
 
@@ -328,6 +328,7 @@ All of the tests below run in the app unit suite.
 | `app/src/lib/settings/public-projection.test.ts` | Every `SiteSetting` column is classified as public or withheld, with no overlap and no stale entry. This matters because `GET /api/admin/settings` serves the public projection to anonymous callers with a public cache header. | Classify the column in `app/src/lib/settings/public-projection.ts`. Withhold anything an anonymous visitor does not need. |
 | `app/src/lib/jitsi/rnnoise.test.ts` and `whiteboard.test.ts` | No source file reads `NEXT_PUBLIC_JITSI_RNNOISE_ENFORCE` or `NEXT_PUBLIC_WHITEBOARD_ENABLED` with dotted `process.env`, because the build would freeze the value into the image. The live page reads each flag at runtime with `getPublicEnv()` and passes it through every mount. | Read public variables with `getPublicEnv()` from `app/src/lib/env.ts`. See [Configuration reference](../CONFIGURATION.md). |
 | `app/src/app/api/assets/[...path]/route.test.ts` | The public asset route does not import the database client, so serving a logo or an Open Graph image never costs a query. | Keep database access out of that route. |
+| `app/src/lib/ai/providers.test.ts` | The default model ids in `app/src/lib/ai/providers.ts` (language model, transcription, translation) are listed in the model registry, `scripts/licenses/models.json`. `infra/ai/worker/test_model_registry.py` does the same for the worker's defaults, in the worker's pytest suite. | Register the model. See [The model registry](../../THIRD-PARTY-LICENSES.md#the-model-registry). |
 
 Other rules are enforced outside the unit suite:
 
@@ -339,6 +340,7 @@ Other rules are enforced outside the unit suite:
 
   `no-console`, the project rule `local/no-console-with-pii` (in `app/eslint-rules/`) and `import/order` are warnings. Warnings do not fail the gate.
 - **Chart invariants.** `scripts/validate-chart.sh`, described in [Helm chart](#helm-chart).
+- **Model registry.** `npm run license:check` fails on model weights whose license, file format or pinning breaks the rules, and on a model that the repository downloads, bakes into an image or contains without a registry entry. Described in [The model registry](../../THIRD-PARTY-LICENSES.md#the-model-registry).
 - **Patched bundle shape.** The shape assertions of `infra/jitsi-web-patched/`, described in [Patched jitsi/web bundle](#patched-jitsiweb-bundle).
 - **Build wiring of the CSS repair.** `app/e2e/design-system.spec.ts`, described in [End-to-end tests](#end-to-end-tests-playwright).
 

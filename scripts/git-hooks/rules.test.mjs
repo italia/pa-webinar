@@ -163,6 +163,28 @@ describe('controlliPerFile', () => {
     assert.equal(c.salaLive, true);
   });
 
+  it('il controllo licenze gira su ogni cambio che non sia solo documentazione', () => {
+    for (const f of [
+      'scripts/licenses/models.json',
+      'THIRD-PARTY-LICENSES.md',
+      'infra/ai/Dockerfile.worker',
+      'infra/ai/worker/transcribe.py',
+      'infra/helm/pa-webinar/templates/app.yaml',
+      'app/src/lib/ai/enqueue.ts',
+      'altro/pytorch_model.bin',
+    ]) {
+      const c = controlliPerFile([f]);
+      assert.equal(c.licenze, true, f);
+      assert.equal(c.reportLicenze, false, f);
+    }
+    assert.equal(controlliPerFile(['docs/POSTPROD.md', 'CONTRIBUTING.md']).licenze, false);
+  });
+
+  it('il registro dei modelli chiede anche i test del worker, che lo leggono', () => {
+    assert.equal(controlliPerFile(['scripts/licenses/models.json']).worker, true);
+    assert.equal(controlliPerFile(['scripts/licenses/check.mjs']).worker, false);
+  });
+
   it('il lockfile della radice tocca app, licenze, report e immagine', () => {
     const c = controlliPerFile(['package-lock.json']);
     assert.equal(c.app, true);
