@@ -5704,7 +5704,8 @@
     "overlapTitle": "Istodobni govor: u ovom intervalu istovremeno govori više osoba.",
     "anonymousSpeaker": "Sudionik {n}",
     "untranscribed": "Nije transkribirano: govornik nije dao privolu",
-    "unrecordedSpeech": "Neka izlaganja nisu u snimci: govornici nisu dali privolu."
+    "unrecordedSpeech": "Neka izlaganja nisu u snimci: govornici nisu dali privolu.",
+    "unrecordedSpeechHostsOnly": "Neka izlaganja nisu u snimci: u videozapisu se vide i čuju samo voditelji."
   },
   "waiting": {
     "startsIn": "Događaj počinje za",

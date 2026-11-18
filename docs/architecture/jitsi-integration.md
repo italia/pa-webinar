@@ -470,7 +470,9 @@ endpoint with its room token (`POST /api/events/{param}/listen-only`), and only 
 value the bridge enforces marks it. A dominant-speaker event from a `voiceExcluded` endpoint keeps no
 name. While a recording runs, a batch sent with a valid room token (`roomToken`) also sets
 `Event.unrecordedSpeech`, which puts the note next to the published video; the caption segments of
-that endpoint are kept as times only.
+that endpoint are kept as times only. Where participants never enter the video (`esclusi`), a batch
+from any endpoint that is not a host's (`mod-` seat) sets it too, and the note says that only the hosts
+are seen and heard.
 Only where the voice cannot be left out, every token of such an event locks all three media, whoever
 consented carries `mediaAdmit` with the media the event concedes, and every token carries `consentLock`:
 in that room the module refuses to switch the moderation off (the **Participants** tab shows a note instead of **Microphones locked** and **Video

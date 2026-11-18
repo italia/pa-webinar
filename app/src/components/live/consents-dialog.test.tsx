@@ -330,6 +330,15 @@ describe('ConsentsDialog', () => {
     expect(document.body.textContent).not.toContain(messages.gdpr.consent.recordingPublic);
   });
 
+  it('chi conduce legge che e’ nella registrazione, senza un consenso da dare o ritirare', async () => {
+    await disegna({ conduce: { destinazione: 'REGISTRANTS' } });
+    expect(document.body.textContent).toContain(
+      messages.gdpr.consent.recordingHostAlwaysReserved
+    );
+    expect(document.body.textContent).not.toContain(messages.live.consents.recording.give);
+    expect(document.body.textContent).not.toContain(messages.live.consents.withdraw);
+  });
+
   it('un testo cambiato si annuncia, senza un messaggio di errore', async () => {
     await disegna({ registrazione: registrazione(false, 'voce') }, azioni(), { testoCambiato: true });
     expect(document.querySelector('[role="alert"]')!.textContent).toBe(

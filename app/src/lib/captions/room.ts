@@ -6,8 +6,10 @@
  * persona: le due corrispondenze che servono per tenere la trascrizione (o
  * registrare l'audio) solo di chi ha dato il consenso.
  */
+import { PREFISSO_POSTO_MODERATORE } from '@/lib/auth/jwt';
 import { prisma } from '@/lib/db';
 import { tryDecryptPII } from '@/lib/crypto/pii';
+import type { PartecipantiNelVideo } from '@/lib/live/consent-rule';
 import { nicknameDellIscrizione } from '@/lib/live/nickname';
 
 const CAMPI_EVENTO = {
@@ -61,6 +63,24 @@ export async function eventoDellaConferenza(c: { room?: string | null; meetingId
 export async function endpointSenzaRegistrazione(eventId: string): Promise<string[]> {
   const righe = await prisma.roomOccupant.findMany({
     where: { eventId, voiceExcluded: true },
+    select: { endpointId: true },
+  });
+  return righe.map((r) => r.endpointId);
+}
+
+/**
+ * Gli endpoint la cui voce non e' nel video completo: chi non ha un consenso
+ * valido (`endpointSenzaRegistrazione`) o, dove chi partecipa non entra mai nel
+ * video ('esclusi', lib/live/consent-rule), chiunque non conduca. Chi conduce
+ * entra con un posto `mod-` (lib/auth/jwt `PREFISSO_POSTO_MODERATORE`).
+ */
+export async function endpointFuoriDalVideo(
+  eventId: string,
+  partecipanti: PartecipantiNelVideo
+): Promise<string[]> {
+  if (partecipanti !== 'esclusi') return endpointSenzaRegistrazione(eventId);
+  const righe = await prisma.roomOccupant.findMany({
+    where: { eventId, NOT: { seatId: { startsWith: PREFISSO_POSTO_MODERATORE } } },
     select: { endpointId: true },
   });
   return righe.map((r) => r.endpointId);

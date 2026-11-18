@@ -25,6 +25,7 @@ import LiveEventClient from './live-event-client';
 type PropsAttesa = {
   event: Record<string, unknown>;
   recordingConsentRequired?: boolean;
+  recordingAskedInRoom?: boolean;
   recordingDestination?: unknown;
   partecipanti?: unknown;
   schedaPrivacy?: SchedaPrivacy | null;
@@ -655,7 +656,6 @@ describe('sala — il testo su cui si acconsente', () => {
   it('il server decide se un consenso copre il testo in vigore', async () => {
     await monta({
       event: { ...evento, recordingDestination: 'REGISTRANTS' },
-      isModerator: true,
       hasRecordingConsent: true,
     });
     risposte.push({
@@ -840,13 +840,20 @@ describe('sala — il testo su cui si acconsente', () => {
       },
       isModerator: true,
     });
-    risposte.push({ recordingDestination: 'PUBLIC' });
+    // Anche un consenso alla registrazione che il server riportasse non si offre
+    // ne' si ritira: chi conduce e' nel video, e la finestra glielo dice.
+    risposte.push({
+      recordingDestination: 'PUBLIC',
+      consentsInForce: { recording: true, transcription: false },
+    });
     await entra();
     expect(ultimoToken()).not.toHaveProperty('recordingConsent');
     expect(ultimoToken()?.consentReplay).toBeUndefined();
     await premi(pulsante(l.consents.button));
-    expect(testo()).not.toContain(l.consents.recording.title);
+    expect(testo()).toContain(messages.gdpr.consent.recordingHostAlwaysPublic);
     expect(testo()).not.toContain(g.recordingPublic);
+    expect(testo()).not.toContain(l.consents.recording.give);
+    expect(testo()).not.toContain(l.consents.recording.withdraw.conduce);
     expect(testo()).toContain(l.consents.transcription.title);
   });
 
@@ -1671,6 +1678,17 @@ describe('sala — la chiamata rapida chiede a chi partecipa, all\'avvio della r
     await entra();
     await registra(true);
     expect(testo()).not.toContain(q.question);
+  });
+
+  it("dove chi partecipa puo' comparire nel video la sala d'attesa non annuncia una registrazione", async () => {
+    await monta({
+      event: { ...rapida, partecipantiNelVideo: 'visibili' },
+      isGuest: true,
+      token: '',
+      recordingAvailable: true,
+    });
+    expect(leggiAttesa().recordingAskedInRoom).toBe(false);
+    expect(leggiAttesa().event.recordingEnabled).toBe(false);
   });
 
   it("dove chi partecipa non entra mai nel video si registra senza domanda", async () => {

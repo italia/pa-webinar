@@ -5704,7 +5704,8 @@
     "overlapTitle": "Caint chomhuaineach: labhraíonn níos mó ná duine amháin ag an am céanna san eatramh seo.",
     "anonymousSpeaker": "Rannpháirtí {n}",
     "untranscribed": "Níor tras-scríobhadh é: níor thug an cainteoir toiliú",
-    "unrecordedSpeech": "Níl roinnt ráiteas sa taifeadadh: níor thug na cainteoirí toiliú."
+    "unrecordedSpeech": "Níl roinnt ráiteas sa taifeadadh: níor thug na cainteoirí toiliú.",
+    "unrecordedSpeechHostsOnly": "Níl roinnt ráiteas sa taifeadadh: ní fheictear ná ní chloistear san fhíseán ach na hóstaigh."
   },
   "waiting": {
     "startsIn": "Tosóidh an t-imeacht i gceann",

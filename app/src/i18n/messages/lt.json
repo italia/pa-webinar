@@ -5704,7 +5704,8 @@
     "overlapTitle": "Kalbėjimas vienu metu: šiame intervale kalba daugiau nei vienas asmuo.",
     "anonymousSpeaker": "Dalyvis {n}",
     "untranscribed": "Netranskribuota: kalbėtojas nedavė sutikimo",
-    "unrecordedSpeech": "Kai kurių pasisakymų įraše nėra: kalbėję asmenys nedavė sutikimo."
+    "unrecordedSpeech": "Kai kurių pasisakymų įraše nėra: kalbėję asmenys nedavė sutikimo.",
+    "unrecordedSpeechHostsOnly": "Kai kurių pasisakymų įraše nėra: vaizdo įraše matomi ir girdimi tik vedėjai."
   },
   "waiting": {
     "startsIn": "Renginys prasidės po",

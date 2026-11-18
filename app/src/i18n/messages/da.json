@@ -5704,7 +5704,8 @@
     "overlapTitle": "Samtidig tale: i dette interval taler mere end én person på samme tid.",
     "anonymousSpeaker": "Deltager {n}",
     "untranscribed": "Ikke transskriberet: den, der talte, gav ikke samtykke",
-    "unrecordedSpeech": "Nogle indlæg er ikke med i optagelsen: de, der talte, gav ikke samtykke."
+    "unrecordedSpeech": "Nogle indlæg er ikke med i optagelsen: de, der talte, gav ikke samtykke.",
+    "unrecordedSpeechHostsOnly": "Nogle indlæg er ikke med i optagelsen: i videoen ses og høres kun ordstyrerne."
   },
   "waiting": {
     "startsIn": "Begivenheden starter om",

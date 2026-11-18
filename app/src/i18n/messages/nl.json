@@ -5704,7 +5704,8 @@
     "overlapTitle": "Gelijktijdig spreken: in dit interval spreekt meer dan één persoon tegelijk.",
     "anonymousSpeaker": "Deelnemer {n}",
     "untranscribed": "Niet getranscribeerd: de spreker gaf geen toestemming",
-    "unrecordedSpeech": "Sommige bijdragen staan niet in de opname: wie sprak, gaf geen toestemming."
+    "unrecordedSpeech": "Sommige bijdragen staan niet in de opname: wie sprak, gaf geen toestemming.",
+    "unrecordedSpeechHostsOnly": "Sommige bijdragen staan niet in de opname: alleen de moderatoren zijn in de video te zien en te horen."
   },
   "waiting": {
     "startsIn": "Het evenement begint over",

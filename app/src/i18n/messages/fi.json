@@ -5704,7 +5704,8 @@
     "overlapTitle": "Päällekkäinen puhe: tällä aikavälillä puhuu useampi kuin yksi henkilö samanaikaisesti.",
     "anonymousSpeaker": "Osallistuja {n}",
     "untranscribed": "Ei litteroitu: puhuja ei antanut suostumusta",
-    "unrecordedSpeech": "Osa puheenvuoroista ei ole tallenteessa: puhujat eivät antaneet suostumusta."
+    "unrecordedSpeech": "Osa puheenvuoroista ei ole tallenteessa: puhujat eivät antaneet suostumusta.",
+    "unrecordedSpeechHostsOnly": "Osa puheenvuoroista ei ole tallenteessa: videolla näkyvät ja kuuluvat vain juontajat."
   },
   "waiting": {
     "startsIn": "Tapahtuma alkaa",

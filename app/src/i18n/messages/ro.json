@@ -5704,7 +5704,8 @@
     "overlapTitle": "Vorbire simultană: în acest interval vorbesc mai multe persoane în același timp.",
     "anonymousSpeaker": "Participant {n}",
     "untranscribed": "Netranscris: vorbitorul nu și-a dat consimțământul",
-    "unrecordedSpeech": "Unele intervenții nu sunt în înregistrare: cei care au vorbit nu și-au dat consimțământul."
+    "unrecordedSpeech": "Unele intervenții nu sunt în înregistrare: cei care au vorbit nu și-au dat consimțământul.",
+    "unrecordedSpeechHostsOnly": "Unele intervenții nu sunt în înregistrare: în videoclip se văd și se aud doar moderatorii."
   },
   "waiting": {
     "startsIn": "Evenimentul va începe în",

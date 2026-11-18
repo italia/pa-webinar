@@ -74,6 +74,9 @@ interface EventData {
   transcriptPublished?: boolean;
   /** Qualcuno ha parlato senza consenso: nel video il suo intervento non c'e'. */
   unrecordedSpeech?: boolean;
+  /** Nel video c'e' solo chi conduce (lib/recording/availability 'esclusi'): la
+   *  nota dice questo, non che manca un consenso. */
+  unrecordedSpeechHostsOnly?: boolean;
   youtubeUrl?: string | null;
   qaEnabled: boolean;
   chatEnabled: boolean;
@@ -493,7 +496,9 @@ export default function EventDetailClient({
         poster={event.imageUrl}
       />
       {event.unrecordedSpeech && (
-        <p className="small text-secondary mt-2 mb-0">{tp('unrecordedSpeech')}</p>
+        <p className="small text-secondary mt-2 mb-0">
+          {tp(event.unrecordedSpeechHostsOnly ? 'unrecordedSpeechHostsOnly' : 'unrecordedSpeech')}
+        </p>
       )}
 
       {/* Mini-transcript inline sotto al video: 3 righe

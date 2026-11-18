@@ -5704,7 +5704,8 @@
     "overlapTitle": "Parlato simultaneo: in questo intervallo parla più di una persona contemporaneamente.",
     "anonymousSpeaker": "Partecipante {n}",
     "untranscribed": "Intervento non trascritto: chi parlava non ha dato il consenso",
-    "unrecordedSpeech": "Alcuni interventi non sono nella registrazione: chi ha parlato non ha dato il consenso."
+    "unrecordedSpeech": "Alcuni interventi non sono nella registrazione: chi ha parlato non ha dato il consenso.",
+    "unrecordedSpeechHostsOnly": "Alcuni interventi non sono nella registrazione: nel video compare e si sente solo chi conduce."
   },
   "waiting": {
     "startsIn": "L'evento inizierà tra",

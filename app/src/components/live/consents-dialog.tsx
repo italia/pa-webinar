@@ -8,7 +8,11 @@ import { useTranslations } from 'next-intl';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'design-react-kit';
 
 import { testoConsensoEvento, type PartecipantiNelVideo } from '@/lib/live/consent-rule';
-import { chiaveConsenso, type Destinazione } from '@/lib/recording/destination';
+import {
+  chiaveAvvisoConduce,
+  chiaveConsenso,
+  type Destinazione,
+} from '@/lib/recording/destination';
 import type { chiaveConsensoTrascrizione } from '@/lib/registration/consents';
 
 /**
@@ -24,6 +28,11 @@ import type { chiaveConsensoTrascrizione } from '@/lib/registration/consents';
  * dall'ente per la registrazione: il clic vale per quello. Il ritiro chiede una
  * conferma: ricollega la conferenza
  * (o la chiude), e un clic per sbaglio non deve farlo.
+ *
+ * Chi conduce non da' il consenso alla registrazione: e' sempre nel video
+ * (lib/live/consent-rule). La finestra non glielo offre e non lo nasconde:
+ * dice al suo posto che e' nella registrazione, con dove va il video, come la
+ * sala d'attesa (`conduce`).
  */
 
 /**
@@ -39,6 +48,9 @@ export type EffettoRitiroRegistrazione =
   | 'assente';
 
 export interface ConsensiInSala {
+  /** Chi conduce, dove c'e' un video della sala: e' nella registrazione, con
+   *  nome e immagine. Nessuna casella: solo l'avviso, con la destinazione. */
+  conduce?: { destinazione: Destinazione };
   /** `destinazione` e `partecipanti` scelgono il testo a cui si acconsente;
    *  `testoEvento` e' quello scelto dall'ente, che vale per lo stesso consenso. */
   registrazione?: {
@@ -98,7 +110,7 @@ export default function ConsentsDialog({
     setConferma(null);
     onChiudi();
   };
-  const { registrazione, trascrizione } = consensi;
+  const { registrazione, trascrizione, conduce } = consensi;
   const testoEvento = registrazione
     ? testoConsensoEvento(registrazione.testoEvento, registrazione.partecipanti)
     : null;
@@ -212,6 +224,16 @@ export default function ConsentsDialog({
       <ModalBody>
         <p className="small mb-3">{t('intro')}</p>
         <div className="d-flex flex-column gap-3">
+          {conduce && (
+            <section className="live-consents__voce" aria-labelledby="live-consents-host-titolo">
+              <h3 id="live-consents-host-titolo" className="h6 mb-1" tabIndex={-1}>
+                {t('recording.title')}
+              </h3>
+              <p className="mb-0 small text-secondary">
+                {tGdpr(chiaveAvvisoConduce(conduce.destinazione))}
+              </p>
+            </section>
+          )}
           {registrazione &&
             blocco(
               'live-consents-rec',

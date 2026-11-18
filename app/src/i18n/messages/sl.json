@@ -5704,7 +5704,8 @@
     "overlapTitle": "Hkraten govor: v tem odseku govori več oseb hkrati.",
     "anonymousSpeaker": "Udeleženec {n}",
     "untranscribed": "Ni prepisano: govornik ni dal privolitve",
-    "unrecordedSpeech": "Nekaterih izjav ni v posnetku: govorci niso dali privolitve."
+    "unrecordedSpeech": "Nekaterih izjav ni v posnetku: govorci niso dali privolitve.",
+    "unrecordedSpeechHostsOnly": "Nekaterih izjav ni v posnetku: v videu se vidijo in slišijo samo voditelji."
   },
   "waiting": {
     "startsIn": "Dogodek se začne čez",

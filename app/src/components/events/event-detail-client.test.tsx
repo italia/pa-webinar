@@ -148,6 +148,15 @@ describe('scheda pubblica — video', () => {
     expect(container.textContent).toContain(messages.postprod.unrecordedSpeech);
   });
 
+  it('dove nel video c’e’ solo chi conduce lo dice, senza parlare di consensi', () => {
+    disegna({
+      event: { ...concluso(true), unrecordedSpeechHostsOnly: true } as ReturnType<typeof evento>,
+      registrationOpen: false,
+    });
+    expect(container.textContent).toContain(messages.postprod.unrecordedSpeechHostsOnly);
+    expect(container.textContent).not.toContain(messages.postprod.unrecordedSpeech);
+  });
+
   it('senza interventi mancanti non dice niente', () => {
     disegna({ event: concluso(false), registrationOpen: false });
     expect(container.textContent).not.toContain(messages.postprod.unrecordedSpeech);

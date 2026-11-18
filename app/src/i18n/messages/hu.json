@@ -5704,7 +5704,8 @@
     "overlapTitle": "Egyidejű beszéd: ebben az intervallumban egyszerre több személy beszél.",
     "anonymousSpeaker": "{n}. résztvevő",
     "untranscribed": "Nincs átírva: a beszélő nem járult hozzá",
-    "unrecordedSpeech": "Egyes felszólalások nincsenek a felvételen: a felszólalók nem adtak hozzájárulást."
+    "unrecordedSpeech": "Egyes felszólalások nincsenek a felvételen: a felszólalók nem adtak hozzájárulást.",
+    "unrecordedSpeechHostsOnly": "Egyes felszólalások nincsenek a felvételen: a videón csak a moderátorok látszanak és hallatszanak."
   },
   "waiting": {
     "startsIn": "Az esemény kezdéséig hátralévő idő",

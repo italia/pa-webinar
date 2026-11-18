@@ -5704,7 +5704,8 @@
     "overlapTitle": "Simultaneous speech: more than one person is speaking at the same time in this interval.",
     "anonymousSpeaker": "Participant {n}",
     "untranscribed": "Not transcribed: the speaker did not consent",
-    "unrecordedSpeech": "Some contributions are not in the recording: the people who spoke did not consent."
+    "unrecordedSpeech": "Some contributions are not in the recording: the people who spoke did not consent.",
+    "unrecordedSpeechHostsOnly": "Some contributions are not in the recording: only the hosts are seen and heard in the video."
   },
   "waiting": {
     "startsIn": "The event starts in",

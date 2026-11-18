@@ -5704,7 +5704,8 @@
     "overlapTitle": "Súbežná reč: v tomto intervale hovorí viac osôb naraz.",
     "anonymousSpeaker": "Účastník {n}",
     "untranscribed": "Neprepísané: rečník nedal súhlas",
-    "unrecordedSpeech": "Niektoré príspevky v zázname nie sú: rečníci nedali súhlas."
+    "unrecordedSpeech": "Niektoré príspevky v zázname nie sú: rečníci nedali súhlas.",
+    "unrecordedSpeechHostsOnly": "Niektoré príspevky v zázname nie sú: vo videu je vidieť a počuť len moderátorov."
   },
   "waiting": {
     "startsIn": "Udalosť začne o",

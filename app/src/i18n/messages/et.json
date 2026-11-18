@@ -5704,7 +5704,8 @@
     "overlapTitle": "Samaaegne kõne: selles vahemikus räägib korraga rohkem kui üks inimene.",
     "anonymousSpeaker": "Osaleja {n}",
     "untranscribed": "Ei transkribeeritud: kõneleja ei andnud nõusolekut",
-    "unrecordedSpeech": "Mõned sõnavõtud pole salvestuses: kõnelejad ei andnud nõusolekut."
+    "unrecordedSpeech": "Mõned sõnavõtud pole salvestuses: kõnelejad ei andnud nõusolekut.",
+    "unrecordedSpeechHostsOnly": "Mõned sõnavõtud pole salvestuses: videol on näha ja kuulda ainult juhte."
   },
   "waiting": {
     "startsIn": "Üritus algab",

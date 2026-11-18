@@ -5704,7 +5704,8 @@
     "overlapTitle": "Gleichzeitiges Sprechen: In diesem Abschnitt spricht mehr als eine Person zur selben Zeit.",
     "anonymousSpeaker": "Teilnehmende Person {n}",
     "untranscribed": "Nicht transkribiert: Die sprechende Person hat nicht eingewilligt",
-    "unrecordedSpeech": "Einige Beiträge sind nicht in der Aufzeichnung: Die Sprechenden haben nicht zugestimmt."
+    "unrecordedSpeech": "Einige Beiträge sind nicht in der Aufzeichnung: Die Sprechenden haben nicht zugestimmt.",
+    "unrecordedSpeechHostsOnly": "Einige Beiträge sind nicht in der Aufzeichnung: Im Video ist nur die Moderation zu sehen und zu hören."
   },
   "waiting": {
     "startsIn": "Die Veranstaltung beginnt in",

@@ -5704,7 +5704,8 @@
     "overlapTitle": "Diskors simultanju: f'dan l-intervall qed titkellem aktar minn persuna waħda fl-istess ħin.",
     "anonymousSpeaker": "Parteċipant {n}",
     "untranscribed": "Mhux traskritt: min kien qed jitkellem ma tax il-kunsens",
-    "unrecordedSpeech": "Xi interventi mhumiex fir-reġistrazzjoni: min tkellem ma tax il-kunsens."
+    "unrecordedSpeech": "Xi interventi mhumiex fir-reġistrazzjoni: min tkellem ma tax il-kunsens.",
+    "unrecordedSpeechHostsOnly": "Xi interventi mhumiex fir-reġistrazzjoni: fil-vidjo jidhru u jinstemgħu biss dawk li jmexxu."
   },
   "waiting": {
     "startsIn": "L-avveniment jibda fi",

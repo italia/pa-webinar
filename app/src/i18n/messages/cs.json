@@ -5704,7 +5704,8 @@
     "overlapTitle": "Souběžná řeč: v tomto úseku mluví více osob najednou.",
     "anonymousSpeaker": "Účastník {n}",
     "untranscribed": "Nepřepsáno: mluvčí nedal souhlas",
-    "unrecordedSpeech": "Některé příspěvky v záznamu nejsou: mluvčí nedali souhlas."
+    "unrecordedSpeech": "Některé příspěvky v záznamu nejsou: mluvčí nedali souhlas.",
+    "unrecordedSpeechHostsOnly": "Některé příspěvky v záznamu nejsou: ve videu jsou vidět a slyšet jen moderátoři."
   },
   "waiting": {
     "startsIn": "Událost začne za",

@@ -5704,7 +5704,8 @@
     "overlapTitle": "Samtidigt tal: i det här intervallet talar mer än en person samtidigt.",
     "anonymousSpeaker": "Deltagare {n}",
     "untranscribed": "Inte transkriberat: talaren gav inte sitt samtycke",
-    "unrecordedSpeech": "Vissa inlägg finns inte i inspelningen: de som talade samtyckte inte."
+    "unrecordedSpeech": "Vissa inlägg finns inte i inspelningen: de som talade samtyckte inte.",
+    "unrecordedSpeechHostsOnly": "Vissa inlägg finns inte i inspelningen: i videon syns och hörs bara moderatorerna."
   },
   "waiting": {
     "startsIn": "Evenemanget börjar om",

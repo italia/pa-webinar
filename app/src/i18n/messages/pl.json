@@ -5704,7 +5704,8 @@
     "overlapTitle": "Mowa równoczesna: w tym przedziale mówi jednocześnie więcej niż jedna osoba.",
     "anonymousSpeaker": "Uczestnik {n}",
     "untranscribed": "Nie transkrybowano: mówca nie wyraził zgody",
-    "unrecordedSpeech": "Niektórych wypowiedzi nie ma w nagraniu: osoby mówiące nie wyraziły zgody."
+    "unrecordedSpeech": "Niektórych wypowiedzi nie ma w nagraniu: osoby mówiące nie wyraziły zgody.",
+    "unrecordedSpeechHostsOnly": "Niektórych wypowiedzi nie ma w nagraniu: w nagraniu wideo widać i słychać tylko osoby prowadzące."
   },
   "waiting": {
     "startsIn": "Wydarzenie rozpocznie się za",

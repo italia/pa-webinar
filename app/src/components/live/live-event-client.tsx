@@ -1462,13 +1462,19 @@ export default function LiveEventClient({
   // si offre mentre qualcuno registra (e la domanda lo chiede, piu' sotto), e
   // resta ritirabile una volta dato.
   const registrazioneDaOffrire = registrazioneNecessaria && (!istantanea || isRecording);
+  const conduceQui = isModerator || isSpeaker;
   const consensiInSala: ConsensiInSala = {
+    // Chi conduce e' nel video, con nome e immagine: nessun consenso da dare o
+    // ritirare, la finestra glielo dice al posto della casella.
+    ...(conduceInVideo ? { conduce: { destinazione: destinazioneInVigore } } : {}),
     // Il consenso dato resta ritirabile, anche se l'evento non lo chiede piu'.
     // Non dove chi partecipa non entra mai nel video: li' non copre niente, il
     // segno della voce segue la trascrizione, e ritirarlo dalla sala ritirerebbe
     // anche quella (lib/live/consent-withdrawal). Resta ritirabile dalla pagina
     // dei propri dati.
-    ...(!voceDallaTrascrizione && (registrazioneDaOffrire || haConsensoRegistrazione)
+    ...(!conduceQui &&
+    !voceDallaTrascrizione &&
+    (registrazioneDaOffrire || haConsensoRegistrazione)
       ? {
           registrazione: {
             dato: registrazioneData,

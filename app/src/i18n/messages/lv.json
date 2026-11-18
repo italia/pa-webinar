@@ -5704,7 +5704,8 @@
     "overlapTitle": "Vienlaicīga runa: šajā intervālā vienlaikus runā vairāk nekā viena persona.",
     "anonymousSpeaker": "Dalībnieks {n}",
     "untranscribed": "Nav transkribēts: runātājs nedeva piekrišanu",
-    "unrecordedSpeech": "Daži izteikumi nav ierakstā: runātāji nav devuši piekrišanu."
+    "unrecordedSpeech": "Daži izteikumi nav ierakstā: runātāji nav devuši piekrišanu.",
+    "unrecordedSpeechHostsOnly": "Daži izteikumi nav ierakstā: video ir redzami un dzirdami tikai vadītāji."
   },
   "waiting": {
     "startsIn": "Pasākums sāksies pēc",

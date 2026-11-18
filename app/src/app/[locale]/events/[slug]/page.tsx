@@ -39,6 +39,7 @@ import {
   type ProgrammeVideoTime,
   type ReplayMoment,
 } from '@/lib/replay/moments';
+import { partecipantiNelVideo } from '@/lib/recording/availability';
 import { getSettings } from '@/lib/settings';
 import { localizedUrl } from '@/lib/utils/localized-url';
 import {
@@ -561,6 +562,9 @@ export default async function EventDetailPage({
     recordingUrl: visione.video && event.recordingUrl ? videoDellApp(event.slug) : null,
     transcriptPublished: visione.registrazione && event.transcriptPublished,
     unrecordedSpeech: visione.video && event.unrecordedSpeech,
+    // Dove chi partecipa non entra mai nel video manca la voce di chiunque non
+    // conduca, con o senza consenso: la nota dice quel motivo.
+    unrecordedSpeechHostsOnly: partecipantiNelVideo() === 'esclusi',
     // Il video su YouTube e' fuori dalla piattaforma: il link segue il video.
     youtubeUrl: riservataConDestinazione && !visione.video ? null : event.youtubeUrl,
     qaEnabled: event.qaEnabled,
