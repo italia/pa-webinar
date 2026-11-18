@@ -306,9 +306,16 @@ describe('POST', () => {
 
   it('lascia traccia dell’evento creato', async () => {
     await importa(ARCHIVIO);
+    const { data } = prisma.event.create.mock.calls[0]![0] as { data: { id: string } };
     expect(prisma.adminAuditLog.create.mock.calls[0]![0].data).toMatchObject({
       action: 'LEGACY_EVENT_CREATE',
-      target: 'evento-nuovo',
+      target: data.id,
     });
+  });
+
+  it('chi la carica la organizza: ne vede il contenuto anche ritirata', async () => {
+    await importa(ARCHIVIO);
+    const { data } = prisma.event.create.mock.calls[0]![0] as { data: { createdById: unknown } };
+    expect(data.createdById).toBe(ACCOUNT);
   });
 });

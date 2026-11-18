@@ -115,6 +115,13 @@ export async function eraseRegistrations(
       await tx.captionSegment.deleteMany({ where: { OR: postiInSala } });
       await tx.roomOccupant.deleteMany({ where: { OR: postiInSala } });
     }
+    // Le richieste di non comparire in una registrazione gia' evase (chiuse o
+    // respinte) portano il nome cifrato della persona: se ne vanno. Una
+    // richiesta ancora aperta resta, perche' lo staff la deve evadere
+    // (lib/recording/redaction); la pulizia la togliera' dopo.
+    await tx.recordingRedactionRequest.deleteMany({
+      where: { registrationId: { in: registrationIds }, status: { in: ['CLOSED', 'REJECTED'] } },
+    });
     // Le email accodate per queste iscrizioni (conferma, promemoria, cambio
     // data, riepilogo) contengono indirizzo e link personali: il solo aggancio
     // e' l'id dell'iscrizione nei metadati. Anche quelle non ancora partite:

@@ -67,7 +67,7 @@ describe('home — il video degli eventi in programma', () => {
       }
     ).props;
     expect(upcoming.map((e) => [e.id, e.recordingUrl])).toEqual([
-      ['a', 'recordings/a.mp4'],
+      ['a', '/api/events/evento-a/recording'],
       ['b', null],
     ]);
   });

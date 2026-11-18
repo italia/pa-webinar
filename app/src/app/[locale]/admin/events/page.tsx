@@ -5,7 +5,8 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import type { Prisma } from '@prisma/client';
 
 import { staffOLogin } from '@/lib/auth/staff-page';
-import { eventScope } from '@/lib/auth/staff-session';
+import { eventScope, type StaffSession } from '@/lib/auth/staff-session';
+import { eventiOrganizzati } from '@/lib/recording/content-access';
 import { prisma } from '@/lib/db';
 import { getSettings } from '@/lib/settings';
 import { Link } from '@/i18n/navigation';
@@ -17,7 +18,7 @@ interface EventsListPageProps {
   searchParams: Promise<{ token?: string }>;
 }
 
-async function loadEvents(scope: Prisma.EventWhereInput, token?: string) {
+async function loadEvents(session: StaffSession, scope: Prisma.EventWhereInput, token?: string) {
   // Col token si vede l'evento di quel token, chi lo possiede lo modera
   // comunque; senza, quelli che la sessione puo' gestire (ADR-014).
   const where = token ? { moderatorToken: token } : scope;
@@ -40,6 +41,13 @@ async function loadEvents(scope: Prisma.EventWhereInput, token?: string) {
   const conteggi = new Map(perRuolo.map((r) => [`${r.eventId}:${r.role}`, r._count._all]));
   const quanti = (eventId: string, role: 'MODERATOR' | 'SPEAKER') =>
     conteggi.get(`${eventId}:${role}`) ?? 0;
+  // Il link di conduzione apre la pubblicazione e la cancellazione del video:
+  // si consegna solo a chi organizza l'evento, non all'admin che non lo
+  // organizza (lib/recording/content-access). Vuoto: chi guarda non conduce.
+  // Col token nell'indirizzo, l'evento e' quello del token.
+  const organizzati = token
+    ? null
+    : await eventiOrganizzati(session, events.map((e) => e.id));
 
   return events.map((e) => ({
     id: e.id,
@@ -53,7 +61,7 @@ async function loadEvents(scope: Prisma.EventWhereInput, token?: string) {
     registrationCount: e._count.registrations,
     maxParticipants: e.maxParticipants,
     peakParticipants: e.peakParticipants,
-    moderatorToken: e.moderatorToken,
+    moderatorToken: !organizzati || organizzati.has(e.id) ? e.moderatorToken : '',
     coverImageUrl: e.coverImageUrl,
     imageUrl: e.imageUrl,
     organizerName: e.organizerName,
@@ -92,7 +100,7 @@ export default async function EventsListPage({
   const session = await staffOLogin(locale);
   const t = await getTranslations('admin');
   const [events, availableTags, settings] = await Promise.all([
-    loadEvents(eventScope(session), token),
+    loadEvents(session, eventScope(session), token),
     loadAvailableTags(),
     getSettings(),
   ]);

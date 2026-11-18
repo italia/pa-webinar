@@ -165,6 +165,26 @@ export const translateTextPayloadSchema = z.object({
 });
 
 /**
+ * La rimozione di una persona da un video (lib/recording/redaction/job): gli
+ * intervalli, in secondi dall'inizio del video, si coprono con un cartello e si
+ * silenziano. `sourceKey` e' il video da cui partire (se nel frattempo la
+ * registrazione ne ha un altro, il lavoro si chiude), `targetKey` dove va il
+ * risultato. `language` e' la lingua del cartello.
+ */
+export const redactPayloadSchema = z.object({
+  eventId: uuidSchema,
+  recordingId: uuidSchema,
+  requestId: uuidSchema,
+  sourceKey: z.string().min(1).max(1024),
+  targetKey: z.string().regex(/^recordings\/redacted\/[0-9a-f-]{36}\/[0-9a-f-]{36}\/[0-9a-f-]{36}\.mp4$/),
+  intervals: z
+    .array(z.object({ start: z.number().finite().min(0), end: z.number().finite().min(0) }))
+    .min(1)
+    .max(500),
+  language: languageCodeSchema,
+});
+
+/**
  * Discriminated union over all known kinds. Use it to validate a row
  * before handing it to a worker:
  *
@@ -183,6 +203,7 @@ export const postprodJobPayloadSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('ARCHIVE'), payload: archivePayloadSchema }),
   z.object({ kind: z.literal('REPORT'), payload: reportPayloadSchema }),
   z.object({ kind: z.literal('TRANSLATE_TEXT'), payload: translateTextPayloadSchema }),
+  z.object({ kind: z.literal('REDACT'), payload: redactPayloadSchema }),
 ]);
 
 export type PostprodJobPayload = z.infer<typeof postprodJobPayloadSchema>;

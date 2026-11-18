@@ -789,7 +789,8 @@
     "accessDenied": {
       "title": "Dit onderdeel is niet beschikbaar voor uw rol",
       "body": "Als organisator beheert u uw eigen evenementen: aanmaken, publiceren, materialen, vragenlijsten en nabewerking. De platforminstellingen en de gegevens van alle evenementen blijven bij de beheerders.",
-      "back": "Naar uw evenementen"
+      "back": "Naar uw evenementen",
+      "organizerOnly": "Alleen de organisatoren van dit evenement kunnen het bewerken. Als beheerder ziet u de status en de details en kunt u het archiveren of verwijderen. De opnamen en hun inhoud zijn van de organisatoren en de deelnemers."
     },
     "staffLogin": {
       "title": "Inloggen in het beheergedeelte",
@@ -1520,7 +1521,9 @@
       "breadcrumbAriaLabel": "Kruimelpad",
       "skipToPage": "Naar de inhoud van de pagina",
       "openMenu": "Menu openen",
-      "closeMenu": "Menu sluiten"
+      "closeMenu": "Menu sluiten",
+      "recordingRemovals": "Verwijderingsverzoeken",
+      "recordingRemovalDetail": "Verwijderingsverzoek"
     },
     "publications": {
       "subtitle": "Centrale redactiehub voor alle gepubliceerde video's: geplande evenementen, snelgesprekken, geladen archieven en sessies die wachten op promotie.",
@@ -1664,7 +1667,8 @@
       "detailFilename": "Bestandsnaam",
       "transcriptManage": "Transcriptie / AI beheren",
       "transcriptReady": "Getranscribeerd",
-      "transcriptProcessing": "In verwerking"
+      "transcriptProcessing": "In verwerking",
+      "organizerOnly": "Alleen organisatoren"
     },
     "gdprAudit": {
       "subtitle": "Logboek van privacy-acties op persoonsgegevens: verwijderingen, toestemmingen, exports",
@@ -1679,7 +1683,11 @@
         "DATA_DELETED": "Gegevens verwijderd",
         "CONSENT_RECORDED": "Toestemming geregistreerd",
         "DATA_EXPORTED": "Gegevens geëxporteerd",
-        "CONSENT_WITHDRAWN": "Toestemming ingetrokken"
+        "CONSENT_WITHDRAWN": "Toestemming ingetrokken",
+        "RECORDING_CONTENT_READ": "Inhoud van de opname gelezen door medewerkers",
+        "RECORDING_REDACTION_REQUESTED": "Verwijdering uit een opname aangevraagd",
+        "RECORDING_REDACTION_REJECTED": "Verwijderingsverzoek afgewezen",
+        "RECORDING_REDACTED": "Persoon uit een opname verwijderd"
       },
       "recordsAffected": "{count} betrokken records",
       "colWhen": "Wanneer",
@@ -1705,7 +1713,8 @@
       "rotating": "Genereren…",
       "regenerateTitle": "Moderatortoken opnieuw genereren (oude link wordt ongeldig)",
       "confirmRegenerate": "Weet u zeker dat u het token opnieuw wilt genereren? De oude link werkt dan niet meer.",
-      "noResults": "Geen evenementen gevonden."
+      "noResults": "Geen evenementen gevonden.",
+      "organizerOnlyLink": "Link alleen zichtbaar voor de organisatoren van het evenement"
     },
     "registrations": {
       "subtitle": "Alle personen die zich voor evenementen hebben aangemeld — zoeken, filteren en exporteren",
@@ -2137,7 +2146,8 @@
         "DATA_DELETED": "Gegevens verwijderd",
         "CONSENT_RECORDED": "Toestemming geregistreerd",
         "DATA_EXPORTED": "Gegevens geëxporteerd",
-        "CONSENT_WITHDRAWN": "Toestemming ingetrokken"
+        "CONSENT_WITHDRAWN": "Toestemming ingetrokken",
+        "RECORDING_CONTENT_READ": "Inhoud van de opname gelezen door medewerkers"
       }
     },
     "settings": {
@@ -2449,6 +2459,40 @@
         "avgParticipantsPerEvent": "Gemiddelde deelnemers per evenement",
         "avgFeedbackRating": "Gemiddelde feedbackbeoordeling",
         "totalFeedback": "Feedbackreacties"
+      },
+      "catalog": {
+        "title": "Typen evenementen en sjablonen",
+        "intro": "Hoeveel evenementen van elk type en uit elk sjabloon, maand per maand. Alleen aantallen en gemiddelden, geen persoonsgegevens. Concepten tellen niet mee.",
+        "periodLabel": "Periode",
+        "months": "{count, plural, one {# maand} other {# maanden}}",
+        "groupByLabel": "Groeperen op",
+        "groupBy": {
+          "type": "Type evenement",
+          "template": "Sjabloon"
+        },
+        "rankingTypes": "Meest voorkomende typen",
+        "rankingTemplates": "Meest gebruikte sjablonen",
+        "columns": {
+          "type": "Type",
+          "template": "Sjabloon",
+          "events": "Evenementen",
+          "held": "Gehouden",
+          "avgParticipants": "Gem. deelnemers",
+          "avgDuration": "Gem. duur",
+          "total": "Hele periode"
+        },
+        "measuresNote": "Gehouden: evenementen waarvan de ruimte is geopend. Gemiddeld aantal deelnemers: het hoogste aantal gelijktijdig aanwezigen, gasten inbegrepen, gemiddeld over de gehouden evenementen. Gemiddelde duur: de gemeten tijd in de ruimte, niet de geplande.",
+        "byMonth": "Maand per maand",
+        "measureLabel": "Maatstaf",
+        "measures": {
+          "events": "Evenementen",
+          "avgParticipants": "Gemiddeld aantal deelnemers",
+          "avgDurationMinutes": "Gemiddelde duur"
+        },
+        "byMonthCaption": "{measure} per maand",
+        "empty": "Geen evenementen in deze periode.",
+        "deletedTemplate": "{name} (verwijderd)",
+        "uncatalogedNote": "Niet-gecatalogiseerde evenementen: {count}. Ze zijn gemaakt vóór de catalogus, of zonder sjabloon en zonder formaat; u kunt ze catalogiseren bij het bewerken van het evenement, onder technische details."
       }
     },
     "recurrence": {
@@ -2517,7 +2561,8 @@
       "postEventPublic": "Openbare pagina na het evenement",
       "offerAddressBook": "Biedt wie zich inschrijft het adresboek aan",
       "invalidFields": "Controleer deze velden: {fields}.",
-      "descriptionOtherLanguages": "Er zijn ook versies in: {languages}, die hier niet te bewerken zijn. Als u de Italiaanse tekst wijzigt, worden ze verwijderd."
+      "descriptionOtherLanguages": "Er zijn ook versies in: {languages}, die hier niet te bewerken zijn. Als u de Italiaanse tekst wijzigt, worden ze verwijderd.",
+      "usedBy": "Evenementen gemaakt uit dit sjabloon: {count}"
     },
     "instantCall": {
       "title": "Directe videogesprek",
@@ -3029,7 +3074,20 @@
         "publishNow": "Nu publiceren"
       },
       "editFeatures": "Functies bewerken",
-      "editPrivacy": "Privacy en gegevens bewerken"
+      "editPrivacy": "Privacy en gegevens bewerken",
+      "governance": {
+        "title": "U beheert dit evenement als beheerder",
+        "body": "U bent geen organisator ervan: u ziet de status, de details, de inschrijvingen en de toestemmingen en kunt het archiveren of verwijderen. Het leiden van het evenement, de moderatorlink en de inhoud van de opnamen (video, transcripties, samenvattingen) zijn voor de organisatoren.",
+        "recording": "De inhoud van de opname is alleen beschikbaar voor de organisatoren van het evenement en de deelnemers. Hier ziet u of ze bestaat en wat de details zijn.",
+        "recordingFile": "Opname",
+        "present": "Aanwezig",
+        "absent": "Geen",
+        "recordingPublished": "Gepubliceerd",
+        "yes": "Ja",
+        "no": "Nee",
+        "recordingDuration": "Duur",
+        "recordingSize": "Grootte"
+      }
     },
     "rubrica": {
       "subtitle": "Personen die toestemming hebben gegeven voor opname in het adresboek (art. 6.1.a AVG). Naam, e-mailadres en organisatie worden alleen bijgewerkt wanneer de persoon het vakje opnieuw aanvinkt.",
@@ -3299,7 +3357,8 @@
         "metricsTitle": "Metrieken van de samenvatting (LLM)",
         "chars": "tekens",
         "model": "Model",
-        "notAvailable": "n.v.t."
+        "notAvailable": "n.v.t.",
+        "contentHidden": "Alleen beschikbaar voor de organisatoren van het evenement."
       },
       "rel": {
         "title": "Betrouwbaarheid van de AI",
@@ -3456,7 +3515,8 @@
         "alignNone": "Geen diawissel om uit te lijnen.",
         "previewTitle": "Voorbeeld",
         "previewHelp": "De video met de dia's zoals het publiek ze zal zien, met de hierboven ingevoerde correctie."
-      }
+      },
+      "contentOrganizerOnly": "Alleen de organisatoren van dit evenement kunnen de inhoud van deze opname bekijken en bewerken (video, sporen, transcriptie, samenvatting, vertalingen). Hier ziet u de status, de verwerkingstaken en de details van de bestanden."
     },
     "questionnairesPage": {
       "subtitle": "Herbruikbare vraagsjablonen voor aanmeldings- en post-event vragenlijsten."
@@ -3748,7 +3808,9 @@
       "publishDesc": "Lees het na voordat u het publiceert: de tekst is geschreven door een AI-model. Een opnieuw gemaakt verslag moet opnieuw worden gepubliceerd.",
       "preview": "Voorbeeld",
       "hidePreview": "Voorbeeld verbergen",
-      "previewLanguage": "Taal"
+      "previewLanguage": "Taal",
+      "organizerOnly": "Alleen de organisatoren van dit evenement kunnen het verslag aanvragen, lezen en publiceren.",
+      "organizerOnlyExists": "Het verslag bestaat. Alleen de organisatoren van dit evenement kunnen het lezen en publiceren."
     },
     "endEvent": "Evenement beëindigen",
     "endEventConfirmTitle": "Het evenement voor iedereen beëindigen?",
@@ -4073,6 +4135,122 @@
       },
       "retainedNote": "{count, plural, one {# bewijs wordt bewaard} other {# bewijzen worden bewaard}} zolang de video of de transcriptie bestaat.",
       "countsNote": "Er worden personen geteld: een inschrijving, een medewerkersaccount of een persoonlijke link tellen één keer; een gast die in een ander bezoek terugkomt, telt opnieuw."
+    },
+    "recordingRemovals": {
+      "subtitle": "Personen die hebben gevraagd niet in een opname voor te komen. Zolang een verzoek openstaat, kunt u die opname openen vanuit de verwijderingseditor, en elke toegang blijft vastgelegd in het logboek van handelingen.",
+      "filterOpen": "Open",
+      "filterAll": "Alle",
+      "filterLabel": "Welke verzoeken",
+      "empty": "Geen verzoeken.",
+      "loadError": "De verzoeken konden niet worden geladen.",
+      "colReceived": "Ontvangen",
+      "colPerson": "Persoon",
+      "colEvent": "Evenement",
+      "colSource": "Herkomst",
+      "colStatus": "Status",
+      "open": "Openen",
+      "unnamed": "Persoon zonder naam",
+      "sources": {
+        "self-service": "Mijn gegevens",
+        "admin": "Team"
+      },
+      "statuses": {
+        "OPEN": "Open",
+        "IN_PROGRESS": "In behandeling",
+        "PROCESSING": "Wordt verwerkt",
+        "CLOSED": "Gesloten",
+        "REJECTED": "Afgewezen"
+      },
+      "kinds": {
+        "registrant": "Ingeschreven",
+        "host": "Leidt",
+        "guest": "Gast"
+      },
+      "newOpen": "Een verzoek registreren",
+      "newTitle": "Een verzoek dat via een andere weg is binnengekomen",
+      "newIntro": "Voor een verzoek dat de verwerkingsverantwoordelijke per e-mail, per post of persoonlijk heeft bereikt. Kies de opname en, als u die herkent, de persoon onder wie in de zaal was.",
+      "recordingSearch": "Evenement zoeken",
+      "recordingLabel": "Opname",
+      "recordingChoose": "Kies een opname",
+      "recordingOption": "{title} · {date}",
+      "recordingNone": "Geen opname met een video of met sporen per deelnemer.",
+      "peopleLabel": "Wie in de zaal was",
+      "peopleNone": "De zaal heeft niet bijgehouden wie er was: vul de naam in, de intervallen markeert u dan met de hand.",
+      "personNotInVideo": "buiten beeld",
+      "personTimes": "van {from} tot {to}",
+      "personStill": "van {from} tot het einde",
+      "nameLabel": "Naam van de persoon",
+      "noteLabel": "Hoe het verzoek is binnengekomen (optioneel)",
+      "create": "Verzoek registreren",
+      "createError": "Het verzoek kon niet worden geregistreerd.",
+      "cancel": "Annuleren",
+      "back": "Alle verzoeken",
+      "fieldPerson": "Persoon",
+      "fieldEvent": "Evenement",
+      "fieldReceived": "Ontvangen",
+      "fieldSource": "Herkomst",
+      "fieldStatus": "Status",
+      "fieldNote": "Notitie",
+      "externalCopy": "Dit evenement heeft een video op een externe site (bijvoorbeeld YouTube): de verwijdering heeft daar geen effect op. Verwijder of vervang de video ook daar.",
+      "publishedElsewhere": "De gepubliceerde video van het evenement is een ander bestand dan deze opname: de verwijdering verandert die niet. Vervang de video of haal hem van de evenementpagina.",
+      "pipelineOff": "De nabewerking staat uit: de verwijderingstaak blijft in de wachtrij totdat u die aanzet, en de transcriptie wordt niet opnieuw gemaakt.",
+      "noVideo": "Deze opname heeft geen video, alleen sporen per deelnemer: de sporen van de persoon worden verwijderd en de transcriptie wordt opnieuw gemaakt uit de sporen die overblijven.",
+      "noRecording": "De opname bestaat niet meer: er valt niets meer te verwijderen.",
+      "keyOnly": "Met de instantiesleutel opent u geen opname: meld u aan met uw beheerdersaccount.",
+      "startIntro": "Om de persoon te verwijderen moet u de opname openen. De toegang geldt alleen voor dit verzoek en wordt met uw account vastgelegd in het logboek van handelingen.",
+      "start": "Verwijderingseditor openen",
+      "processing": "Verwijdering bezig: de opgeschoonde video komt in de plaats van het origineel. Status van de taak: {status}.",
+      "closed": "Verzoek gesloten op {date}.",
+      "closedIntervals": "{count, plural, =0 {Geen interval afgedekt.} one {# interval afgedekt.} other {# intervallen afgedekt.}}",
+      "rejected": "Verzoek afgewezen op {date}.",
+      "lastError": "De laatste verwerking is mislukt: {error}. Controleer de intervallen en verstuur opnieuw.",
+      "rejectTitle": "Verzoek afwijzen",
+      "rejectLabel": "Reden",
+      "reject": "Afwijzen",
+      "rejectConfirm": "Het verzoek afwijzen? De persoon ziet dat het is afgewezen.",
+      "actionError": "De bewerking is mislukt (HTTP {code}).",
+      "editorTitle": "Af te dekken intervallen",
+      "editorHint": "De voorstellen komen van wie in de zaal was, wie aan het woord was en de sporen per deelnemer: de spreektijden zijn bij benadering. Bekijk de video en corrigeer. In elk interval wordt de video de tekstkaart ‘inhoud op verzoek verwijderd’ en wordt het geluid gedempt; de duur verandert niet.",
+      "sourcePresence": "In de zaal",
+      "sourceSpeech": "Spreekt",
+      "sourceTrack": "Spoor",
+      "selectedLegend": "Af te dekken",
+      "useProposals": "Opnieuw beginnen vanaf de voorstellen",
+      "addInterval": "Hier een interval toevoegen",
+      "fieldStart": "Begin",
+      "fieldEnd": "Einde",
+      "setStart": "Begin hier",
+      "setEnd": "Einde hier",
+      "seek": "Ga",
+      "remove": "Verwijderen",
+      "intervalLabel": "Interval {n}",
+      "noIntervalsVideo": "Geen interval af te dekken. Komt de persoon niet in de video voor, wijs het verzoek dan af en vermeld de reden.",
+      "total": "{count, plural, one {# interval} other {# intervallen}} · {seconds} s af te dekken",
+      "timeHint": "Tijden in uren:minuten:seconden, zoals in de speler.",
+      "invalidTime": "Ongeldige tijd",
+      "preview": "Voorbeeld van de verwijdering",
+      "timelineLabel": "Tijdlijn van de opname",
+      "mediaError": "De video laadt niet. Laad de pagina opnieuw.",
+      "submit": "Persoon uit de opname verwijderen",
+      "submitConfirm": "De originele video en de sporen van de persoon worden verwijderd en de nabewerking wordt opnieuw uitgevoerd. Dit kan niet ongedaan worden gemaakt. Doorgaan?",
+      "submitDone": "Verzoek gesloten: de persoon is verwijderd."
+    },
+    "catalog": {
+      "fieldTitle": "Catalogus",
+      "fieldHelp": "Het type evenement en het sjabloon waaruit het is gemaakt, dienen alleen voor de statistieken van de instantie en wijzigen geen enkele instelling. Corrigeer ze als het evenement verkeerd of helemaal niet is gecatalogiseerd.",
+      "typeLabel": "Type evenement",
+      "templateLabel": "Sjabloon",
+      "noTemplate": "Geen sjabloon",
+      "deletedTemplate": "Gemaakt uit het sjabloon ‘{name}’, dat inmiddels is verwijderd.",
+      "deletedOption": "{name} (verwijderd)",
+      "types": {
+        "MEETING": "Vergadering",
+        "PARTICIPATORY": "Participatief evenement",
+        "PUBLIC": "Openbaar evenement",
+        "INSTANT": "Directe oproep",
+        "LEGACY": "Geïmporteerde publicatie",
+        "UNCATALOGED": "Niet gecatalogiseerd"
+      }
     }
   },
   "email": {
@@ -4609,7 +4787,19 @@
       "addressBookPendingEffect": "Als u bevestigt, keert u terug in het adresboek met de naam en de organisatie van deze inschrijving en ontvangt u weer uitnodigingen. Als u annuleert, of als u het niet was, blijft u buiten het adresboek en ontvangt u geen uitnodigingen.",
       "addressBookPendingConfirm": "Terugkeer bevestigen",
       "addressBookPendingCancel": "Verzoek annuleren",
-      "addressBookPendingGone": "Dit verzoek staat niet meer open. Laad de pagina opnieuw om de actuele status te zien."
+      "addressBookPendingGone": "Dit verzoek staat niet meer open. Laad de pagina opnieuw om de actuele status te zien.",
+      "removalTitle": "De opname van het evenement",
+      "removalIntro": "Dit evenement is opgenomen. Wilt u niet in de opname voorkomen, dan kunt u vragen om eruit verwijderd te worden: de delen waarin u te zien bent of spreekt, worden afgedekt met een tekstkaart en gedempt, en de transcriptie, de ondertiteling en de samenvatting worden opnieuw gemaakt. Het verzoek gaat naar de verwerkingsverantwoordelijke, die het beoordeelt.",
+      "removalButton": "Ik wil niet in deze opname voorkomen",
+      "removalConfirmTitle": "Verzoek bevestigen?",
+      "removalConfirmBody": "De verwerkingsverantwoordelijke verwijdert uit de opname de delen waarin u te zien bent of spreekt. Kopieën die op andere sites zijn gepubliceerd, bijvoorbeeld op YouTube, moeten apart worden verwijderd door wie ze heeft gepubliceerd.",
+      "removalConfirm": "Verzoek versturen",
+      "removalCancel": "Annuleren",
+      "removalSent": "Verzoek verstuurd. De verwerkingsverantwoordelijke zal het beoordelen.",
+      "removalError": "Het verzoek kon niet worden verstuurd. Probeer het later opnieuw.",
+      "removalStatusOpen": "Verzoek van {date}: in behandeling.",
+      "removalStatusClosed": "Verzoek van {date}: afgehandeld op {closed}.",
+      "removalStatusRejected": "Verzoek van {date}: afgewezen. Schrijf naar de verwerkingsverantwoordelijke om de reden te vernemen."
     },
     "erasure": {
       "title": "Verwijdering van uw gegevens",
@@ -6022,6 +6212,11 @@
     "captionsTranscriptNotTranslatable": "Deze transcriptie komt uit de live-ondertiteling: automatische vertaling vereist een AI-transcriptie van de opname.",
     "sameLanguage": "De gekozen taal is de oorspronkelijke taal van de opname: kies een andere.",
     "recordingDestinationNotCovered": "De toestemmingen voor dit evenement gelden voor een opname alleen voor ingeschrevenen: je kunt haar niet voor iedereen zichtbaar maken en geen externe video koppelen.",
-    "mtUnavailable": "Automatische vertaling is niet geïnstalleerd op deze instantie."
+    "mtUnavailable": "Automatische vertaling is niet geïnstalleerd op deze instantie.",
+    "recordingContentOrganizerOnly": "Alleen de organisatoren van dit evenement kunnen de inhoud van de opnamen openen, wijzigen of publiceren."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Inhoud op verzoek verwijderd",
+    "cardBody": "Dit deel van de opname is verwijderd op verzoek van een persoon die erin voorkwam."
   }
 }

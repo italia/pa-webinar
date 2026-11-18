@@ -371,6 +371,19 @@ export const GET = withErrorHandling(async (request) => {
           where: { eventId: evt.id },
         });
 
+        // Le richieste di rimozione da una registrazione: nome cifrato,
+        // impronta dell'indirizzo e posti della conferenza. Quelle evase
+        // (chiuse o respinte) se ne vanno; il registro GDPR ne tiene la storia
+        // senza dati personali. Una richiesta ancora aperta resta finche'
+        // qualcuno non la evade, salvo quella di una registrazione che non
+        // c'e' piu': non resta niente da togliere.
+        const redactionRequestsDeleted = await tx.recordingRedactionRequest.deleteMany({
+          where: {
+            eventId: evt.id,
+            OR: [{ status: { in: ['CLOSED', 'REJECTED'] } }, { recordingId: null }],
+          },
+        });
+
         // La trascrizione costruita da quelle frasi porta nomi e parole: se
         // ne va qui, salvo che sia pubblicata (con il video o da sola). La
         // pulizia della post-produzione la toglierebbe solo dove quella gira.
@@ -528,6 +541,7 @@ export const GET = withErrorHandling(async (request) => {
           retainedConsentProofs: retainedConsentProofsDeleted.count,
           roomOccupants: roomOccupantsDeleted.count,
           captionSegments: captionSegmentsDeleted.count,
+          redactionRequests: redactionRequestsDeleted.count,
           captionsTranscripts: captionsTranscriptsDeleted,
           chatMessages: chatMessagesDeleted.count,
           reactions: reactionsDeleted.count,

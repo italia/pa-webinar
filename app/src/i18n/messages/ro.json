@@ -789,7 +789,8 @@
     "accessDenied": {
       "title": "Această secțiune nu este disponibilă pentru rolul tău",
       "body": "Ca organizator îți gestionezi propriile evenimente: crearea și publicarea lor, materialele, chestionarele și post-producția. Setările platformei și datele tuturor evenimentelor rămân la administrație.",
-      "back": "Mergi la evenimentele tale"
+      "back": "Mergi la evenimentele tale",
+      "organizerOnly": "Doar organizatorii acestui eveniment îl pot modifica. Ca administrator îi vezi starea și detaliile și îl poți arhiva sau șterge. Înregistrările și conținutul lor aparțin organizatorilor și participanților."
     },
     "staffLogin": {
       "title": "Autentificare în zona de administrare",
@@ -1520,7 +1521,9 @@
       "breadcrumbAriaLabel": "Cale de navigare",
       "skipToPage": "Salt la conținutul paginii",
       "openMenu": "Deschide meniul",
-      "closeMenu": "Închide meniul"
+      "closeMenu": "Închide meniul",
+      "recordingRemovals": "Cereri de eliminare",
+      "recordingRemovalDetail": "Cerere de eliminare"
     },
     "publications": {
       "subtitle": "Hub editorial unic pentru toate clipurile video publicate: evenimente programate, apeluri instant, arhive istorice încărcate și sesiuni în așteptare de promovare.",
@@ -1664,7 +1667,8 @@
       "detailFilename": "Nume fișier",
       "transcriptManage": "Gestionează transcrierea / AI",
       "transcriptReady": "Transcris",
-      "transcriptProcessing": "În curs"
+      "transcriptProcessing": "În curs",
+      "organizerOnly": "Doar pentru organizatori"
     },
     "gdprAudit": {
       "subtitle": "Registrul acțiunilor de confidențialitate asupra datelor cu caracter personal: ștergeri, consimțăminte, exporturi",
@@ -1679,7 +1683,11 @@
         "DATA_DELETED": "Date șterse",
         "CONSENT_RECORDED": "Consimțământ înregistrat",
         "DATA_EXPORTED": "Date exportate",
-        "CONSENT_WITHDRAWN": "Consimțământ retras"
+        "CONSENT_WITHDRAWN": "Consimțământ retras",
+        "RECORDING_CONTENT_READ": "Conținutul înregistrării citit de personal",
+        "RECORDING_REDACTION_REQUESTED": "Eliminare dintr-o înregistrare solicitată",
+        "RECORDING_REDACTION_REJECTED": "Cerere de eliminare respinsă",
+        "RECORDING_REDACTED": "Persoană eliminată dintr-o înregistrare"
       },
       "recordsAffected": "{count} înregistrări afectate",
       "colWhen": "Când",
@@ -1705,7 +1713,8 @@
       "rotating": "Se regenerează…",
       "regenerateTitle": "Regenerați tokenul de moderator (vechiul link devine nevalid)",
       "confirmRegenerate": "Sigur regenerați tokenul? Vechiul link nu va mai funcționa.",
-      "noResults": "Niciun eveniment găsit."
+      "noResults": "Niciun eveniment găsit.",
+      "organizerOnlyLink": "Link vizibil doar organizatorilor evenimentului"
     },
     "registrations": {
       "subtitle": "Toate persoanele înscrise la evenimente — căutați, filtrați și exportați",
@@ -2137,7 +2146,8 @@
         "DATA_DELETED": "Date șterse",
         "CONSENT_RECORDED": "Consimțământ înregistrat",
         "DATA_EXPORTED": "Date exportate",
-        "CONSENT_WITHDRAWN": "Consimțământ retras"
+        "CONSENT_WITHDRAWN": "Consimțământ retras",
+        "RECORDING_CONTENT_READ": "Conținutul înregistrării citit de personal"
       }
     },
     "settings": {
@@ -2449,6 +2459,40 @@
         "avgParticipantsPerEvent": "Participanți medii per eveniment",
         "avgFeedbackRating": "Evaluarea medie feedback",
         "totalFeedback": "Răspunsuri feedback"
+      },
+      "catalog": {
+        "title": "Tipuri de evenimente și șabloane",
+        "intro": "Câte evenimente din fiecare tip și din fiecare șablon, lună de lună. Doar numărători și medii, fără date personale. Ciornele nu se numără.",
+        "periodLabel": "Perioadă",
+        "months": "{count, plural, one {# lună} few {# luni} other {# de luni}}",
+        "groupByLabel": "Grupare după",
+        "groupBy": {
+          "type": "Tipul evenimentului",
+          "template": "Șablon"
+        },
+        "rankingTypes": "Cele mai frecvente tipuri",
+        "rankingTemplates": "Cele mai folosite șabloane",
+        "columns": {
+          "type": "Tip",
+          "template": "Șablon",
+          "events": "Evenimente",
+          "held": "Desfășurate",
+          "avgParticipants": "Participanți medii",
+          "avgDuration": "Durată medie",
+          "total": "Toată perioada"
+        },
+        "measuresNote": "Desfășurate: evenimentele a căror sală s-a deschis. Participanți medii: vârful de persoane prezente simultan, inclusiv invitații, în medie pe evenimentele desfășurate. Durată medie: timpul de sală măsurat, nu cel programat.",
+        "byMonth": "Lună de lună",
+        "measureLabel": "Măsură",
+        "measures": {
+          "events": "Evenimente",
+          "avgParticipants": "Participanți medii",
+          "avgDurationMinutes": "Durată medie"
+        },
+        "byMonthCaption": "{measure} pe lună",
+        "empty": "Niciun eveniment în această perioadă.",
+        "deletedTemplate": "{name} (șters)",
+        "uncatalogedNote": "Evenimente necatalogate: {count}. Au fost create înainte de catalog sau fără șablon și fără format; le puteți cataloga la editarea evenimentului, în detaliile tehnice."
       }
     },
     "recurrence": {
@@ -2517,7 +2561,8 @@
       "postEventPublic": "Pagină publică după eveniment",
       "offerAddressBook": "Le propune celor care se înscriu să rămână în agendă",
       "invalidFields": "Verificați aceste câmpuri: {fields}.",
-      "descriptionOtherLanguages": "Există și versiuni în: {languages}, care nu se editează aici. Dacă modificați textul în italiană, sunt eliminate."
+      "descriptionOtherLanguages": "Există și versiuni în: {languages}, care nu se editează aici. Dacă modificați textul în italiană, sunt eliminate.",
+      "usedBy": "Evenimente create din acest șablon: {count}"
     },
     "instantCall": {
       "title": "Apel video instant",
@@ -3029,7 +3074,20 @@
         "publishNow": "Publică acum"
       },
       "editFeatures": "Editează funcțiile",
-      "editPrivacy": "Editează confidențialitatea și datele"
+      "editPrivacy": "Editează confidențialitatea și datele",
+      "governance": {
+        "title": "Gestionezi acest eveniment ca administrator",
+        "body": "Nu faci parte dintre organizatorii lui: vezi starea, detaliile, înscrierile și consimțămintele și îl poți arhiva sau șterge. Conducerea evenimentului, linkul moderatorului și conținutul înregistrărilor (video, transcrieri, rezumate) revin organizatorilor.",
+        "recording": "Conținutul înregistrării este disponibil doar organizatorilor evenimentului și participanților. Aici vezi dacă există și detaliile ei.",
+        "recordingFile": "Înregistrare",
+        "present": "Există",
+        "absent": "Niciuna",
+        "recordingPublished": "Publicată",
+        "yes": "Da",
+        "no": "Nu",
+        "recordingDuration": "Durată",
+        "recordingSize": "Dimensiune"
+      }
     },
     "rubrica": {
       "subtitle": "Persoane care și-au dat consimțământul pentru includerea în agendă (art. 6.1.a RGPD). Numele, e-mailul și organizația se actualizează doar când persoana bifează din nou caseta.",
@@ -3299,7 +3357,8 @@
         "metricsTitle": "Metrici ale rezumatului (LLM)",
         "chars": "caractere",
         "model": "Model",
-        "notAvailable": "n/a"
+        "notAvailable": "n/a",
+        "contentHidden": "Disponibil doar organizatorilor evenimentului."
       },
       "rel": {
         "title": "Fiabilitatea AI",
@@ -3456,7 +3515,8 @@
         "alignNone": "Nicio schimbare de diapozitiv de aliniat.",
         "previewTitle": "Previzualizare",
         "previewHelp": "Videoclipul cu diapozitivele așa cum le va vedea publicul, cu corecția scrisă mai sus."
-      }
+      },
+      "contentOrganizerOnly": "Doar organizatorii acestui eveniment pot vedea și modifica conținutul acestei înregistrări (video, piste, transcriere, rezumat, traduceri). Aici vezi starea ei, prelucrările și detaliile fișierelor."
     },
     "questionnairesPage": {
       "subtitle": "Șabloane reutilizabile de întrebări pentru chestionarele de preînregistrare și post-eveniment."
@@ -3748,7 +3808,9 @@
       "publishDesc": "Revizuiește-l înainte de publicare: textul este scris de un model de inteligență artificială. Un raport generat din nou trebuie publicat din nou.",
       "preview": "Previzualizare",
       "hidePreview": "Ascunde previzualizarea",
-      "previewLanguage": "Limba"
+      "previewLanguage": "Limba",
+      "organizerOnly": "Doar organizatorii acestui eveniment pot cere, citi și publica raportul.",
+      "organizerOnlyExists": "Raportul există. Doar organizatorii acestui eveniment îl pot citi și publica."
     },
     "endEvent": "Încheie evenimentul",
     "endEventConfirmTitle": "Închei evenimentul pentru toți?",
@@ -4073,6 +4135,122 @@
       },
       "retainedNote": "{count, plural, one {# dovadă este păstrată} few {# dovezi sunt păstrate} other {# de dovezi sunt păstrate}} cât timp videoclipul sau transcrierea există.",
       "countsNote": "Se numără persoane: o înscriere, un cont al personalului sau un link nominal contează o dată; un invitat care revine la altă vizită contează din nou."
+    },
+    "recordingRemovals": {
+      "subtitle": "Persoane care au cerut să nu apară într-o înregistrare. Cât timp o cerere este deschisă, puteți deschide acea înregistrare din editorul de eliminare, iar fiecare acces rămâne în jurnalul operațiunilor.",
+      "filterOpen": "Deschise",
+      "filterAll": "Toate",
+      "filterLabel": "Ce cereri",
+      "empty": "Nicio cerere.",
+      "loadError": "Cererile nu au putut fi încărcate.",
+      "colReceived": "Primită",
+      "colPerson": "Persoană",
+      "colEvent": "Eveniment",
+      "colSource": "Origine",
+      "colStatus": "Stare",
+      "open": "Deschide",
+      "unnamed": "Persoană fără nume",
+      "sources": {
+        "self-service": "Datele mele",
+        "admin": "Echipă"
+      },
+      "statuses": {
+        "OPEN": "Deschisă",
+        "IN_PROGRESS": "În lucru",
+        "PROCESSING": "În procesare",
+        "CLOSED": "Închisă",
+        "REJECTED": "Respinsă"
+      },
+      "kinds": {
+        "registrant": "Înscris",
+        "host": "Conduce",
+        "guest": "Invitat"
+      },
+      "newOpen": "Adaugă o cerere",
+      "newTitle": "O cerere primită pe alte căi",
+      "newIntro": "Pentru o cerere ajunsă la operatorul de date prin e-mail, prin poștă sau personal. Alegeți înregistrarea și, dacă o recunoașteți, persoana dintre cei care erau în sală.",
+      "recordingSearch": "Caută evenimentul",
+      "recordingLabel": "Înregistrare",
+      "recordingChoose": "Alege o înregistrare",
+      "recordingOption": "{title} · {date}",
+      "recordingNone": "Nicio înregistrare cu video sau cu piste pe participant.",
+      "peopleLabel": "Cine era în sală",
+      "peopleNone": "Sala nu a păstrat evidența celor prezenți: indicați numele, iar intervalele le veți marca manual.",
+      "personNotInVideo": "în afara cadrului",
+      "personTimes": "de la {from} la {to}",
+      "personStill": "de la {from} până la sfârșit",
+      "nameLabel": "Numele persoanei",
+      "noteLabel": "Cum a sosit cererea (opțional)",
+      "create": "Salvează cererea",
+      "createError": "Cererea nu a putut fi salvată.",
+      "cancel": "Anulează",
+      "back": "Toate cererile",
+      "fieldPerson": "Persoană",
+      "fieldEvent": "Eveniment",
+      "fieldReceived": "Primită",
+      "fieldSource": "Origine",
+      "fieldStatus": "Stare",
+      "fieldNote": "Notă",
+      "externalCopy": "Acest eveniment are un videoclip pe un site extern (de exemplu YouTube): eliminarea nu ajunge acolo. Eliminați-l sau înlocuiți-l și acolo.",
+      "publishedElsewhere": "Videoclipul publicat al evenimentului este un fișier diferit de această înregistrare: eliminarea nu îl modifică. Înlocuiți-l sau retrageți-l de pe pagina evenimentului.",
+      "pipelineOff": "Postproducția este oprită: lucrarea de eliminare rămâne în coadă până când o porniți, iar transcrierea nu este refăcută.",
+      "noVideo": "Această înregistrare nu are video, doar piste pe participant: pistele persoanei sunt șterse, iar transcrierea este refăcută din cele rămase.",
+      "noRecording": "Înregistrarea nu mai există: nu mai este nimic de eliminat.",
+      "keyOnly": "Cu cheia instanței nu se poate deschide o înregistrare: autentificați-vă cu contul dumneavoastră de administrator.",
+      "startIntro": "Pentru a elimina persoana, trebuie să deschideți înregistrarea. Accesul este valabil doar pentru această cerere și rămâne în jurnalul operațiunilor, împreună cu contul dumneavoastră.",
+      "start": "Deschide editorul de eliminare",
+      "processing": "Eliminare în curs: videoclipul curățat va lua locul originalului. Starea lucrării: {status}.",
+      "closed": "Cerere închisă pe {date}.",
+      "closedIntervals": "{count, plural, =0 {Niciun interval acoperit.} one {# interval acoperit.} few {# intervale acoperite.} other {# de intervale acoperite.}}",
+      "rejected": "Cerere respinsă pe {date}.",
+      "lastError": "Ultima procesare nu a reușit: {error}. Verificați intervalele și trimiteți din nou.",
+      "rejectTitle": "Respinge cererea",
+      "rejectLabel": "Motiv",
+      "reject": "Respinge",
+      "rejectConfirm": "Respingeți cererea? Persoana va vedea că a fost respinsă.",
+      "actionError": "Operațiunea nu a reușit (HTTP {code}).",
+      "editorTitle": "Intervale de acoperit",
+      "editorHint": "Propunerile provin din prezența în sală, din intervențiile vorbite și din pistele pe participant: timpii de vorbire sunt aproximativi. Urmăriți videoclipul și corectați. În fiecare interval, în locul videoclipului apare panoul „conținut eliminat la cerere”, iar sunetul este oprit; durata nu se schimbă.",
+      "sourcePresence": "În sală",
+      "sourceSpeech": "Vorbește",
+      "sourceTrack": "Pistă",
+      "selectedLegend": "De acoperit",
+      "useProposals": "Reia de la propuneri",
+      "addInterval": "Adaugă un interval aici",
+      "fieldStart": "Început",
+      "fieldEnd": "Sfârșit",
+      "setStart": "Începutul aici",
+      "setEnd": "Sfârșitul aici",
+      "seek": "Mergi la",
+      "remove": "Elimină",
+      "intervalLabel": "Intervalul {n}",
+      "noIntervalsVideo": "Niciun interval de acoperit. Dacă persoana nu apare în videoclip, respingeți cererea indicând motivul.",
+      "total": "{count, plural, one {# interval} few {# intervale} other {# de intervale}} · {seconds} s de acoperit",
+      "timeHint": "Timpii în ore:minute:secunde, ca în player.",
+      "invalidTime": "Timp nevalid",
+      "preview": "Previzualizarea eliminării",
+      "timelineLabel": "Cronologia înregistrării",
+      "mediaError": "Videoclipul nu se încarcă. Reîncărcați pagina.",
+      "submit": "Elimină persoana din înregistrare",
+      "submitConfirm": "Videoclipul original și pistele persoanei vor fi șterse, iar postproducția va fi refăcută. Operațiunea nu poate fi anulată. Continuați?",
+      "submitDone": "Cerere închisă: persoana a fost eliminată."
+    },
+    "catalog": {
+      "fieldTitle": "Catalog",
+      "fieldHelp": "Tipul evenimentului și șablonul din care a fost creat servesc doar statisticilor instanței și nu modifică nicio setare. Corectați-le dacă evenimentul este catalogat greșit sau nu este catalogat.",
+      "typeLabel": "Tipul evenimentului",
+      "templateLabel": "Șablon",
+      "noTemplate": "Fără șablon",
+      "deletedTemplate": "Creat din șablonul „{name}”, între timp șters.",
+      "deletedOption": "{name} (șters)",
+      "types": {
+        "MEETING": "Ședință",
+        "PARTICIPATORY": "Eveniment participativ",
+        "PUBLIC": "Eveniment public",
+        "INSTANT": "Apel rapid",
+        "LEGACY": "Publicație importată",
+        "UNCATALOGED": "Necatalogat"
+      }
     }
   },
   "email": {
@@ -4609,7 +4787,19 @@
       "addressBookPendingEffect": "Dacă confirmați, reveniți în agendă cu numele și instituția de la această înscriere și primiți din nou invitații. Dacă anulați sau dacă nu ați fost dumneavoastră, rămâneți în afara agendei și nu primiți invitații.",
       "addressBookPendingConfirm": "Confirmați revenirea",
       "addressBookPendingCancel": "Anulați cererea",
-      "addressBookPendingGone": "Această cerere nu mai este în așteptare. Reîncărcați pagina pentru a vedea starea actualizată."
+      "addressBookPendingGone": "Această cerere nu mai este în așteptare. Reîncărcați pagina pentru a vedea starea actualizată.",
+      "removalTitle": "Înregistrarea evenimentului",
+      "removalIntro": "Acest eveniment a fost înregistrat. Dacă nu doriți să apăreți în înregistrare, puteți cere să nu mai apăreți în ea: părțile în care apăreți sau vorbiți sunt acoperite cu un panou informativ și fără sunet, iar transcrierea, subtitrările și rezumatul sunt refăcute. Cererea ajunge la operatorul de date, care o examinează.",
+      "removalButton": "Nu vreau să apar în această înregistrare",
+      "removalConfirmTitle": "Confirmați cererea?",
+      "removalConfirmBody": "Operatorul de date va elimina din înregistrare părțile în care apăreți sau vorbiți. Copiile publicate pe alte site-uri, de exemplu pe YouTube, trebuie eliminate separat de cei care le-au publicat.",
+      "removalConfirm": "Trimite cererea",
+      "removalCancel": "Anulează",
+      "removalSent": "Cererea a fost trimisă. Operatorul de date o va examina.",
+      "removalError": "Cererea nu a putut fi trimisă. Reîncercați mai târziu.",
+      "removalStatusOpen": "Cererea din {date}: în curs de soluționare.",
+      "removalStatusClosed": "Cererea din {date}: finalizată pe {closed}.",
+      "removalStatusRejected": "Cererea din {date}: respinsă. Scrieți operatorului de date pentru a afla motivul."
     },
     "erasure": {
       "title": "Ștergerea datelor dumneavoastră",
@@ -6022,6 +6212,11 @@
     "captionsTranscriptNotTranslatable": "Această transcriere provine din subtitrările live: traducerea automată necesită o transcriere AI a înregistrării.",
     "sameLanguage": "Limba aleasă este cea originală a înregistrării: alege alta.",
     "recordingDestinationNotCovered": "Consimțămintele acestui eveniment sunt valabile pentru o înregistrare rezervată înscrișilor: nu o poți face vizibilă pentru toți și nici nu poți lega un videoclip extern.",
-    "mtUnavailable": "Traducerea automată nu este instalată pe această instanță."
+    "mtUnavailable": "Traducerea automată nu este instalată pe această instanță.",
+    "recordingContentOrganizerOnly": "Doar organizatorii acestui eveniment pot deschide, modifica sau publica conținutul înregistrărilor sale."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Conținut eliminat la cerere",
+    "cardBody": "Această parte a înregistrării a fost eliminată la cererea unei persoane care apărea în ea."
   }
 }

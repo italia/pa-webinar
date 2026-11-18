@@ -20,6 +20,7 @@ import {
   CardBody,
 } from 'design-react-kit';
 
+import RecordingRemoval, { type RimozioneVista } from '@/components/privacy/recording-removal';
 import RegistrationConsents, { type ConsensiVista } from '@/components/privacy/registration-consents';
 import RetainedConsentProofs, {
   type ProvaConservataVista,
@@ -51,6 +52,8 @@ interface ExportRegistration {
   consentFutureCommunications: boolean;
   registeredAt: string;
   joinedAt: string | null;
+  /** Se si puo' chiedere di non comparire nella registrazione dell'evento, e le richieste fatte. */
+  recordingRemoval?: RimozioneVista;
 }
 
 interface ExportQuestion {
@@ -529,6 +532,14 @@ export default function MyDataPage() {
                         onComunicazioniRitirate={setComunicazioniRitirateIl}
                         rubricaConfermata={rubricaConfermata}
                         onRubricaConfermata={() => setRubricaConfermata(true)}
+                      />
+                    )}
+
+                    {tokenConsensi && entry.registration.recordingRemoval && (
+                      <RecordingRemoval
+                        token={tokenConsensi}
+                        registrationId={entry.registration.id}
+                        rimozione={entry.registration.recordingRemoval}
                       />
                     )}
 

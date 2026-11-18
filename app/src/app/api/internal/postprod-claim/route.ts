@@ -40,7 +40,7 @@ import {
   expectedArtifactsForJob,
   postprodJobPayloadSchema,
 } from '@/lib/ai';
-import type { reportPayloadSchema, translateTextPayloadSchema } from '@/lib/ai/schemas';
+import type { redactPayloadSchema, reportPayloadSchema, translateTextPayloadSchema } from '@/lib/ai/schemas';
 import {
   resolveAsrProvider,
   resolveLlmProvider,
@@ -59,6 +59,9 @@ import { ingressoResoconto } from '@/lib/report/input';
 import { scriviNumeriResoconto } from '@/lib/report/job';
 import { metricheResoconto } from '@/lib/report/metrics';
 import { MOTIVO_MOTORE_ASSENTE } from '@/lib/text-translation/enqueue';
+import { cartelloRimozione } from '@/lib/recording/redaction/card';
+import { MOTIVO_VIDEO_CAMBIATO, URL_RIMOZIONE_MINUTI } from '@/lib/recording/redaction/job';
+import { riapriRichiesteSenzaLavoro } from '@/lib/recording/redaction/requests';
 import {
   chiudiLavoroPresoSenzaTracce,
   tracceUtilizzabili,
@@ -175,6 +178,12 @@ export const POST = withErrorHandling(async (request) => {
   // api/internal/event-text-translation.
   if (parsed.data.kind === 'TRANSLATE_TEXT') {
     return rispostaTraduzioneTesti(row, parsed.data.payload, leaseUntil);
+  }
+  // La rimozione di una persona da un video: il video, dove caricare quello
+  // ripulito, gli intervalli e il cartello; il risultato torna a
+  // api/internal/recording-redaction.
+  if (parsed.data.kind === 'REDACT') {
+    return rispostaRimozione(row, parsed.data.payload, leaseUntil);
   }
   if (!row.recording_id) {
     throw new ValidationError(`postprod_job ${row.id} (${row.kind}) has no recording`);
@@ -686,6 +695,73 @@ async function rispostaTraduzioneTesti(
       mtModelId: motore.modelId,
       glossary: glossaryHints(glossary),
     },
+  });
+}
+
+/**
+ * Il claim di un lavoro REDACT: il video da cui partire, dove caricare quello
+ * ripulito, gli intervalli e il cartello nella lingua della registrazione. Se
+ * nel frattempo la registrazione ha un altro video (o non c'e' piu'), il lavoro
+ * si chiude come fallito: la richiesta torna allo staff, che la invia di nuovo.
+ * Gli indirizzi firmati durano piu' del lease: ricodificare un video lungo
+ * richiede tempo, e il caricamento arriva alla fine.
+ */
+async function rispostaRimozione(
+  row: ClaimedRow,
+  payload: z.infer<typeof redactPayloadSchema>,
+  leaseUntil: Date
+): Promise<Response> {
+  const registrazione = await prisma.recording.findUnique({
+    where: { id: payload.recordingId },
+    select: { blobKey: true, durationSec: true },
+  });
+  if (!registrazione || registrazione.blobKey !== payload.sourceKey) {
+    const chiusi = await prisma.$executeRaw`
+      UPDATE postprod_jobs
+      SET status = 'FAILED', completed_at = NOW(), leased_at = NULL, leased_by = NULL,
+          last_error = ${MOTIVO_VIDEO_CAMBIATO}, updated_at = NOW()
+      WHERE id = ${row.id}::uuid AND status = 'CLAIMED' AND attempts = ${row.attempts}
+    `;
+    if (chiusi > 0) {
+      postprodJobsCompletedTotal.labels('REDACT', 'FAILED').inc();
+      await riapriRichiesteSenzaLavoro(prisma, row.id);
+    }
+    return new Response(null, { status: 204 });
+  }
+  const sourceDownloadUrl = await presignArtifactDownload({
+    blobKey: payload.sourceKey,
+    expiresInMinutes: URL_RIMOZIONE_MINUTI,
+  });
+  const { uploadUrl } = await presignArtifactUpload({
+    blobKey: payload.targetKey,
+    contentType: 'video/mp4',
+    expiresInMinutes: URL_RIMOZIONE_MINUTI,
+  });
+  return Response.json({
+    claimed: true,
+    jobId: row.id,
+    recordingId: null,
+    kind: row.kind,
+    payload: {
+      requestId: payload.requestId,
+      recordingId: payload.recordingId,
+      intervals: payload.intervals,
+      language: payload.language,
+    },
+    attempts: row.attempts,
+    leaseExpiresAt: leaseUntil.toISOString(),
+    sourceDownloadUrl,
+    uploadTargets: {
+      redactedVideo: { url: uploadUrl, blobKey: payload.targetKey, contentType: 'video/mp4' },
+    },
+    inputs: [],
+    redaction: {
+      intervals: payload.intervals,
+      durationSec: registrazione.durationSec,
+      // Il cartello in PNG (base64), o null: il worker copre allora con un riquadro scuro.
+      card: await cartelloRimozione(payload.language),
+    },
+    providerHints: {},
   });
 }
 

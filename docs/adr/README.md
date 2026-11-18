@@ -37,13 +37,14 @@ ADR-001 to ADR-010 record the platform's founding decisions. Later records take 
 | [011](011-person-rubrica.md) | Cross-event person record and opt-in address book | Accepted; extended by [020](020-consents-follow-event-format.md) | Constrains [014](014-organizer-role.md): the address book stays admin-only | [Privacy and data protection](../GDPR.md) |
 | [012](012-garden-waiting-room.md) | An optional 2D social waiting room | Accepted | Builds on [005](005-live-interaction-in-portal.md) | [The waiting room and the square](../architecture/waiting-room.md) |
 | [013](013-multitrack-speaker-attribution.md) | Per-participant multitrack recording for speaker attribution | Accepted | Extends [006](006-recording-and-storage.md); builds on [004](004-jitsi-jwt.md); exception to [001](001-jitsi-iframe-api.md); feeds [016](016-in-cluster-ai-postproduction.md) | [Recording](../architecture/recording.md) |
-| [014](014-organizer-role.md) | The organizer role | Accepted; extended by [015](015-named-administrators.md) | Extends [009](009-admin-session.md); builds on [003](003-moderator-magic-links.md); respects [011](011-person-rubrica.md) | [Identity, access and tokens](../architecture/identity-and-access.md) |
-| [015](015-named-administrators.md) | Named administrators alongside the instance key | Accepted | Extends [014](014-organizer-role.md) and, through it, [009](009-admin-session.md) | [Identity, access and tokens](../architecture/identity-and-access.md) |
+| [014](014-organizer-role.md) | The organizer role | Accepted; extended by [015](015-named-administrators.md) and [021](021-recording-content-access.md) | Extends [009](009-admin-session.md); builds on [003](003-moderator-magic-links.md); respects [011](011-person-rubrica.md) | [Identity, access and tokens](../architecture/identity-and-access.md) |
+| [015](015-named-administrators.md) | Named administrators alongside the instance key | Accepted; extended by [021](021-recording-content-access.md) | Extends [014](014-organizer-role.md) and, through it, [009](009-admin-session.md) | [Identity, access and tokens](../architecture/identity-and-access.md) |
 | [016](016-in-cluster-ai-postproduction.md) | In-cluster AI post-production | Accepted | Builds on [006](006-recording-and-storage.md) and [013](013-multitrack-speaker-attribution.md); reuses [007](007-jvb-scale-to-zero.md)'s scale-to-zero split | [AI post-production](../POSTPROD.md) |
 | [017](017-patched-jitsi-web-image.md) | Patch the jitsi/web bundle by shape for fixes with no configuration point | Accepted | The one sanctioned exception to [001](001-jitsi-iframe-api.md)'s rule against modifying Jitsi | [Jitsi integration](../architecture/jitsi-integration.md), [component README](../../infra/jitsi-web-patched/README.md) |
 | [018](018-live-captions.md) | Live captions from an in-cluster streaming recognizer, fed by Jitsi's bridge | Accepted | Respects [001](001-jitsi-iframe-api.md) (IFrame API command and event, server-side configuration); reuses [007](007-jvb-scale-to-zero.md)'s scale-to-zero split, [013](013-multitrack-speaker-attribution.md)'s per-participant consent and [016](016-in-cluster-ai-postproduction.md)'s sovereignty rule, glossary and transcript artifact | [Live captions](../architecture/live-captions.md) |
 | [019](019-event-languages-text-translation.md) | One language list per event, and automatic translation of its texts at save | Accepted | Builds on [008](008-eu-languages.md) (the site languages) and on [016](016-in-cluster-ai-postproduction.md)'s CPU translation engine and queue | [AI post-production: Event text translation](../POSTPROD.md#event-text-translation) |
 | [020](020-consents-follow-event-format.md) | Consents follow the event format, which sets starting values and never rights | Accepted | Extends [011](011-person-rubrica.md); builds on [006](006-recording-and-storage.md) (the audience of a published recording) and on [013](013-multitrack-speaker-attribution.md) (the transcription consent) | [Privacy and data protection](../GDPR.md#consent-model) |
+| [021](021-recording-content-access.md) | Recording content belongs to the organizers and the participants | Accepted | Extends [014](014-organizer-role.md) and [015](015-named-administrators.md); builds on [006](006-recording-and-storage.md), [016](016-in-cluster-ai-postproduction.md) and [020](020-consents-follow-event-format.md) | [Privacy and data protection](../GDPR.md#who-sees-a-recording) |
 
 "Accepted" means that the decision is in force. It does not mean that the component runs by default. Several accepted decisions govern optional parts that an installation turns on. In `infra/helm/pa-webinar/values.yaml`, these keys default to `false`: `jvbScaler.enabled` (ADR-007), `jitsi-meet.jibri.enabled` (the composite path of ADR-006), `recorder.enabled` (ADR-013) and `postprod.enabled` (ADR-016). Live captions (ADR-018) are the exception: `global.captions.enabled` defaults to `true`.
 
@@ -68,6 +69,7 @@ flowchart LR
     A018["018 · AI<br/>Live captions"]:::job
     A019["019 · AI<br/>Event languages and<br/>text translation"]:::job
     A020["020 · Data and privacy<br/>Consents follow<br/>the event format"]:::data
+    A021["021 · Access<br/>Recording content for<br/>organizers and participants"]:::risk
     A005["005 · Realtime<br/>Live interaction<br/>in the portal"]:::portal
     A012["012 · Realtime<br/>Optional 2D square"]:::portal
     A010["010 · Platform<br/>SiteSetting singleton"]:::portal
@@ -81,6 +83,9 @@ flowchart LR
     A009 -->|"extended by"| A014
     A003 -->|"sign-in by link;<br/>moderator stays a seat"| A014
     A014 -->|"extended by"| A015
+    A014 -->|"organizer rule,<br/>without the admin shortcut"| A021
+    A015 -->|"extended by"| A021
+    A020 -->|"who watches a<br/>reserved recording"| A021
     A001 -->|"the one sanctioned<br/>patch"| A017
     A001 -->|"lib-jitsi-meet<br/>exception"| A013
     A004 -->|"display name<br/>labels each track"| A013
@@ -108,9 +113,9 @@ flowchart LR
 | If you are | Read first |
 |---|---|
 | Evaluating PA Webinar for reuse | [Reusing PA Webinar](../REUSE.md), then [001](001-jitsi-iframe-api.md), [002](002-nextjs-fullstack.md), [007](007-jvb-scale-to-zero.md), [016](016-in-cluster-ai-postproduction.md), [017](017-patched-jitsi-web-image.md) |
-| Changing sign-in, roles or permissions | [003](003-moderator-magic-links.md), [004](004-jitsi-jwt.md), [009](009-admin-session.md), [014](014-organizer-role.md), [015](015-named-administrators.md), then [011](011-person-rubrica.md) |
+| Changing sign-in, roles or permissions | [003](003-moderator-magic-links.md), [004](004-jitsi-jwt.md), [009](009-admin-session.md), [014](014-organizer-role.md), [015](015-named-administrators.md), [021](021-recording-content-access.md), then [011](011-person-rubrica.md) |
 | Adding a live feature | [005](005-live-interaction-in-portal.md), then [012](012-garden-waiting-room.md) for presence |
-| Working on recording or transcripts | [006](006-recording-and-storage.md), [013](013-multitrack-speaker-attribution.md), [016](016-in-cluster-ai-postproduction.md), [020](020-consents-follow-event-format.md) |
+| Working on recording or transcripts | [006](006-recording-and-storage.md), [013](013-multitrack-speaker-attribution.md), [016](016-in-cluster-ai-postproduction.md), [020](020-consents-follow-event-format.md), [021](021-recording-content-access.md) |
 | Changing consents, formats or the address book | [020](020-consents-follow-event-format.md), then [011](011-person-rubrica.md) and [013](013-multitrack-speaker-attribution.md) |
 | Adding a language or a runtime setting | [008](008-eu-languages.md), [010](010-site-settings-singleton.md) |
 

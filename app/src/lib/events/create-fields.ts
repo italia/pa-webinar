@@ -119,6 +119,10 @@ export const CREATED_EVENT_FIELDS = [
   // serie
   'recurrenceRule',
   'recurrenceSeriesId',
+
+  // catalogo (lib/events/catalog): il modello si verifica e se ne fotografa il nome
+  'templateId',
+  'formatClass',
 ] as const;
 
 /**

@@ -87,7 +87,10 @@ vi.mock('@/lib/text-translation/auto', () => traduzioni);
 vi.mock('@/lib/db', () => ({
   prisma: {
     $queryRaw: vi.fn(async () => []),
-    event: { findUnique: vi.fn(), update: vi.fn() },
+    event: { findUnique: vi.fn(), update: vi.fn(), findMany: vi.fn(async () => []) },
+    // Di chi e' un file dello storage (lib/storage/recordings): nessun altro evento.
+    recording: { findMany: vi.fn(async () => []) },
+    callSession: { findMany: vi.fn(async () => []) },
     gdprTemplate: { findUnique: vi.fn() },
     tag: { findMany: vi.fn() },
     eventTagLink: { findMany: vi.fn(), deleteMany: vi.fn(), createMany: vi.fn() },
@@ -1365,6 +1368,15 @@ describe('PUT /api/events/[param] — la destinazione della registrazione', () =
       expect((await modifica(riservato(), { recordingUrl: FILE })).status).toBe(200);
     });
 
+    it('il file di un altro evento non si aggancia: 422', async () => {
+      storage.getRecordingsStorage.mockReturnValue({
+        keyFromUrl: () => 'postprod/99999999-9999-4999-8999-999999999999/r/mix.mp4',
+      });
+      const r = await modifica(riservato(), { recordingUrl: FILE });
+      expect(r.status).toBe(422);
+      expect(((await r.json()) as { code?: string }).code).toBe('RECORDING_URL_NOT_OWNED');
+    });
+
     it('fuori dallo storage, su un evento per tutti, passa come prima', async () => {
       storage.getRecordingsStorage.mockReturnValue({ keyFromUrl: () => null });
       const r = await modifica(riservato({ recordingDestination: 'PUBLIC', recordingAudience: 'PUBLIC' }), {
@@ -1544,10 +1556,11 @@ describe('GET /api/events/[param] — le domande dopo l’evento', () => {
       expect(corpo).not.toContain(VIDEO);
     });
 
-    it('concluso con la pagina visibile: il video pubblico esce', async () => {
+    it('concluso con la pagina visibile: il video pubblico esce, dalla rotta dell’app', async () => {
       mocked.event.findUnique.mockResolvedValue(evento(pubblicato));
       const corpo = await (await lettura()).json();
-      expect(corpo.recordingUrl).toBe(VIDEO);
+      expect(corpo.recordingUrl).toBe('/api/events/evento-esistente/recording');
+      expect(JSON.stringify(corpo)).not.toContain(VIDEO);
     });
 
     it('in diretta il video resta chiuso se la pagina dopo l’evento e’ privata', async () => {
@@ -1570,7 +1583,8 @@ describe('GET /api/events/[param] — le domande dopo l’evento', () => {
       );
       const r = await lettura();
       expect(r.status).toBe(200);
-      expect((await r.json()).recordingUrl).toBe(VIDEO);
+      // Anche a chi conduce, la rotta dell'app: mai l'indirizzo dello storage.
+      expect((await r.json()).recordingUrl).toBe('/api/events/evento-esistente/recording');
     });
   });
 

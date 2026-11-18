@@ -14,8 +14,10 @@
  *   status?  comma-separated RecordingStatus values for filtering
  *   eventId? scope to a single event
  *
- * Auth: admin session cookie (no API key — same as the rest of
- * /admin/* endpoints).
+ * Auth: staff session (ADR-014). The rows are metadata for whoever manages
+ * the event; what comes from the content (a sample sentence per speaker, the
+ * names proposed or given to the voices) only for the event organizers
+ * (lib/recording/content-access): `contenuto` says which rows carry it.
  */
 
 import { cookies } from 'next/headers';
@@ -28,6 +30,7 @@ import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { isUuid } from '@/lib/events/event-param';
 import { AppError } from '@/lib/errors';
+import { eventiOrganizzati, tracciaLetturaContenuto } from '@/lib/recording/content-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -116,14 +119,33 @@ export const GET = withErrorHandling(async (request) => {
     }),
     prisma.recording.count({ where }),
   ]);
+  const organizzati = await eventiOrganizzati(session, rows.map((r) => r.eventId));
+  // Le frasi d'esempio e i nomi proposti vengono dalla trascrizione: per ogni
+  // registrazione che li mostra, la lettura si traccia.
+  await Promise.all(
+    rows
+      .filter((r) => organizzati.has(r.eventId) && r.speakers.length > 0)
+      .map((r) =>
+        tracciaLetturaContenuto({
+          session,
+          via: 'organizzatore',
+          eventId: r.eventId,
+          recordingId: r.id,
+          superficie: 'relatori',
+        }),
+      ),
+  );
 
   return Response.json({
     total,
     limit,
     offset,
-    rows: rows.map((r) => ({
+    rows: rows.map((r) => {
+      const contenuto = organizzati.has(r.eventId);
+      return {
       id: r.id,
       eventId: r.eventId,
+      contenuto,
       eventSlug: r.event.slug,
       eventTitle: getLocalized(r.event.title as LocalizedField, 'it'),
       blobKey: r.blobKey,
@@ -154,19 +176,20 @@ export const GET = withErrorHandling(async (request) => {
       speakers: r.speakers.map((s) => ({
         id: s.id,
         diarLabel: s.diarLabel,
-        displayName: s.displayName,
-        personId: s.personId,
+        displayName: contenuto ? s.displayName : null,
+        personId: contenuto ? s.personId : null,
         totalSpeechSec: s.totalSpeechSec,
         // Estraggo dal TRANSCRIPT_JSON la prima frase pronunciata da
-        // questo speaker — serve all'admin per riconoscere chi è
+        // questo speaker — serve a chi organizza per riconoscere chi è
         // (anziché doversi ascoltare la registrazione).
-        sampleText: extractSampleText(r.artifacts, s.diarLabel),
+        sampleText: contenuto ? extractSampleText(r.artifacts, s.diarLabel) : null,
         // Suggerimento di nome derivato dal LLM in fase di
         // pipeline (Mistral `speakers_named` → pipelineSnapshot).
-        // L'admin può applicarlo con un click invece di scrivere.
-        suggestedName: extractSuggestedName(r.pipelineSnapshot, s.diarLabel),
+        // Chi organizza può applicarlo con un click invece di scrivere.
+        suggestedName: contenuto ? extractSuggestedName(r.pipelineSnapshot, s.diarLabel) : null,
       })),
-    })),
+      };
+    }),
   });
 });
 

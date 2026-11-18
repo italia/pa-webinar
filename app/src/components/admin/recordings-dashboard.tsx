@@ -57,7 +57,10 @@ interface RecordingRow {
   endedAt: string | null;
   durationSeconds: number | null;
   peakParticipants: number;
+  /** La rotta dell'app che serve il file, solo per chi organizza l'evento. */
   recordingUrl: string | null;
+  /** Il file c'e', anche quando chi guarda non lo puo' aprire. */
+  hasFile?: boolean;
   recordingFilename: string | null;
   recordingFileSize: string | null;
   jitsiRoomName: string | null;
@@ -482,6 +485,10 @@ export default function RecordingsDashboard({
                                   )}
                                 </Link>
                               </div>
+                            ) : r.hasFile ? (
+                              // Il file c'e', ma e' di chi organizza l'evento
+                              // (lib/recording/content-access).
+                              <span className="text-muted" style={{ fontSize: '0.78rem' }}>{t('organizerOnly')}</span>
                             ) : (
                               <span className="text-muted" style={{ fontSize: '0.78rem' }}>{t('noFile')}</span>
                             )}

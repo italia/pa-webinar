@@ -4,12 +4,15 @@
 /**
  * Cross-event moderator directory.
  *
- * Surfaces the moderator magic link for every event so an admin can
- * resend / copy / regenerate it without digging into individual events.
- * The moderator token is intentionally included in the response (admin
- * session only, no-store) because it's the whole point of the page.
+ * Lists the moderator magic link of every event so an admin can copy or
+ * regenerate it without digging into individual events. The link opens the
+ * publication and deletion of the event's recording, so the token is only
+ * returned for the events the admin organizes (lib/recording/content-access);
+ * for the others `moderatorToken` is null.
  *
- * POST with { eventId, action: 'regenerate' } rotates the token.
+ * POST with { eventId, action: 'regenerate' } rotates the token: allowed on
+ * every event (it locks out a leaked link), but the new token comes back only
+ * to an organizer of the event.
  */
 
 import { randomUUID } from 'node:crypto';
@@ -20,18 +23,18 @@ import { EventStatus, type Prisma } from '@prisma/client';
 import { z } from 'zod';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { requireAdmin } from '@/lib/auth/staff-session';
+import { eventiOrganizzati, organizzaEvento } from '@/lib/recording/content-access';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
-import { NotFoundError, UnauthorizedError, ValidationError } from '@/lib/errors';
+import { NotFoundError, ValidationError } from '@/lib/errors';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
 export const dynamic = 'force-dynamic';
 
 export const GET = withErrorHandling(async (request) => {
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) throw new UnauthorizedError();
+  const session = await requireAdmin(await cookies());
 
   const url = new URL(request.url);
   const search = url.searchParams.get('q')?.trim() ?? '';
@@ -73,6 +76,8 @@ export const GET = withErrorHandling(async (request) => {
     },
   });
 
+  const organizzati = await eventiOrganizzati(session, rows.map((e) => e.id));
+
   return Response.json(
     {
       rows: rows.map((e) => ({
@@ -85,7 +90,7 @@ export const GET = withErrorHandling(async (request) => {
         endsAt: e.endsAt.toISOString(),
         moderatorName: e.moderatorName,
         moderatorEmail: tryDecryptPII(e.moderatorEmail),
-        moderatorToken: e.moderatorToken,
+        moderatorToken: organizzati.has(e.id) ? e.moderatorToken : null,
       })),
     },
     { headers: { 'Cache-Control': 'no-store' } },
@@ -98,8 +103,7 @@ const rotateSchema = z.object({
 });
 
 export const POST = withErrorHandling(async (request) => {
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) throw new UnauthorizedError();
+  const session = await requireAdmin(await cookies());
 
   const parsed = rotateSchema.safeParse(await parseJsonBody(request));
   if (!parsed.success) {
@@ -131,6 +135,7 @@ export const POST = withErrorHandling(async (request) => {
 
   return Response.json({
     eventId: eventId,
-    moderatorToken: newToken,
+    // Il link nuovo, come il vecchio, solo a chi organizza l'evento.
+    moderatorToken: (await organizzaEvento(session, eventId)) ? newToken : null,
   }, { headers: { 'Cache-Control': 'no-store' } });
 });

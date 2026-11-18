@@ -789,7 +789,8 @@
     "accessDenied": {
       "title": "Esta sección no está disponible para tu rol",
       "body": "Como organizador gestionas tus propios eventos: crearlos, publicarlos, los materiales, los cuestionarios y la posproducción. La configuración de la plataforma y los datos de todos los eventos quedan en manos de la administración.",
-      "back": "Ir a tus eventos"
+      "back": "Ir a tus eventos",
+      "organizerOnly": "Solo quienes organizan este evento pueden modificarlo. Como administrador ves su estado y sus detalles, y puedes archivarlo o eliminarlo. Las grabaciones y su contenido pertenecen a quienes lo organizan y a quienes participaron."
     },
     "staffLogin": {
       "title": "Acceder al área de administración",
@@ -1520,7 +1521,9 @@
       "breadcrumbAriaLabel": "Ruta de navegación",
       "skipToPage": "Ir al contenido de la página",
       "openMenu": "Abrir el menú",
-      "closeMenu": "Cerrar el menú"
+      "closeMenu": "Cerrar el menú",
+      "recordingRemovals": "Solicitudes de retirada",
+      "recordingRemovalDetail": "Solicitud de retirada"
     },
     "publications": {
       "subtitle": "Hub editorial único para todos los vídeos publicados: eventos planificados, llamadas instantáneas, archivos históricos cargados y sesiones a la espera de promoción.",
@@ -1664,7 +1667,8 @@
       "detailFilename": "Nombre del archivo",
       "transcriptManage": "Gestionar la transcripción / IA",
       "transcriptReady": "Transcrito",
-      "transcriptProcessing": "En proc."
+      "transcriptProcessing": "En proc.",
+      "organizerOnly": "Solo para quienes organizan"
     },
     "gdprAudit": {
       "subtitle": "Registro de las acciones de privacidad sobre datos personales: eliminaciones, consentimientos, exportaciones",
@@ -1679,7 +1683,11 @@
         "DATA_DELETED": "Datos eliminados",
         "CONSENT_RECORDED": "Consentimiento registrado",
         "DATA_EXPORTED": "Datos exportados",
-        "CONSENT_WITHDRAWN": "Consentimiento retirado"
+        "CONSENT_WITHDRAWN": "Consentimiento retirado",
+        "RECORDING_CONTENT_READ": "Contenido de la grabación leído por el personal",
+        "RECORDING_REDACTION_REQUESTED": "Retirada de una grabación solicitada",
+        "RECORDING_REDACTION_REJECTED": "Solicitud de retirada rechazada",
+        "RECORDING_REDACTED": "Persona retirada de una grabación"
       },
       "recordsAffected": "{count} registros afectados",
       "colWhen": "Cuándo",
@@ -1705,7 +1713,8 @@
       "rotating": "Regenerando…",
       "regenerateTitle": "Regenerar el token de moderador (invalida el enlace antiguo)",
       "confirmRegenerate": "¿Está seguro de que desea regenerar el token? El enlace antiguo dejará de funcionar.",
-      "noResults": "No se ha encontrado ningún evento."
+      "noResults": "No se ha encontrado ningún evento.",
+      "organizerOnlyLink": "Enlace visible solo para quienes organizan el evento"
     },
     "registrations": {
       "subtitle": "Todas las personas inscritas a los eventos: busque, filtre y exporte",
@@ -2137,7 +2146,8 @@
         "DATA_DELETED": "Datos eliminados",
         "CONSENT_RECORDED": "Consentimiento registrado",
         "DATA_EXPORTED": "Datos exportados",
-        "CONSENT_WITHDRAWN": "Consentimiento retirado"
+        "CONSENT_WITHDRAWN": "Consentimiento retirado",
+        "RECORDING_CONTENT_READ": "Contenido de la grabación leído por el personal"
       }
     },
     "settings": {
@@ -2449,6 +2459,40 @@
         "avgParticipantsPerEvent": "Participantes medios por evento",
         "avgFeedbackRating": "Valoración media",
         "totalFeedback": "Respuestas de valoración"
+      },
+      "catalog": {
+        "title": "Tipos de evento y plantillas",
+        "intro": "Cuántos eventos de cada tipo y de cada plantilla, mes a mes. Solo recuentos y medias, ningún dato personal. Los borradores no cuentan.",
+        "periodLabel": "Periodo",
+        "months": "{count, plural, one {# mes} other {# meses}}",
+        "groupByLabel": "Agrupar por",
+        "groupBy": {
+          "type": "Tipo de evento",
+          "template": "Plantilla"
+        },
+        "rankingTypes": "Los tipos más frecuentes",
+        "rankingTemplates": "Las plantillas más usadas",
+        "columns": {
+          "type": "Tipo",
+          "template": "Plantilla",
+          "events": "Eventos",
+          "held": "Celebrados",
+          "avgParticipants": "Participantes medios",
+          "avgDuration": "Duración media",
+          "total": "Todo el periodo"
+        },
+        "measuresNote": "Celebrados: eventos cuya sala se abrió. Participantes medios: el pico de personas presentes a la vez, invitados incluidos, de media en los eventos celebrados. Duración media: el tiempo de sala medido, no el programado.",
+        "byMonth": "Mes a mes",
+        "measureLabel": "Medida",
+        "measures": {
+          "events": "Eventos",
+          "avgParticipants": "Participantes medios",
+          "avgDurationMinutes": "Duración media"
+        },
+        "byMonthCaption": "{measure} por mes",
+        "empty": "No hay eventos en este periodo.",
+        "deletedTemplate": "{name} (eliminada)",
+        "uncatalogedNote": "Eventos sin catalogar: {count}. Se crearon antes del catálogo, o sin plantilla y sin formato; puedes catalogarlos al editar el evento, en los detalles técnicos."
       }
     },
     "recurrence": {
@@ -2517,7 +2561,8 @@
       "postEventPublic": "Página posterior al evento pública",
       "offerAddressBook": "Propone la agenda a quien se inscribe",
       "invalidFields": "Revise estos campos: {fields}.",
-      "descriptionOtherLanguages": "También hay versiones en: {languages}, que no se pueden editar aquí. Si cambia el texto en italiano, se eliminan."
+      "descriptionOtherLanguages": "También hay versiones en: {languages}, que no se pueden editar aquí. Si cambia el texto en italiano, se eliminan.",
+      "usedBy": "Eventos creados con esta plantilla: {count}"
     },
     "instantCall": {
       "title": "Videollamada instantánea",
@@ -3029,7 +3074,20 @@
         "publishNow": "Publicar ahora"
       },
       "editFeatures": "Editar funciones",
-      "editPrivacy": "Editar privacidad y datos"
+      "editPrivacy": "Editar privacidad y datos",
+      "governance": {
+        "title": "Gestionas este evento como administrador",
+        "body": "No estás entre quienes lo organizan: ves el estado, los detalles, las inscripciones y los consentimientos, y puedes archivarlo o eliminarlo. Conducir el evento, el enlace del moderador y el contenido de las grabaciones (vídeo, transcripciones, resúmenes) corresponden a quienes lo organizan.",
+        "recording": "El contenido de la grabación solo está disponible para quienes organizan el evento y para quienes participaron. Aquí ves si existe y sus detalles.",
+        "recordingFile": "Grabación",
+        "present": "Disponible",
+        "absent": "Ninguna",
+        "recordingPublished": "Publicada",
+        "yes": "Sí",
+        "no": "No",
+        "recordingDuration": "Duración",
+        "recordingSize": "Tamaño"
+      }
     },
     "rubrica": {
       "subtitle": "Personas que han dado consentimiento para ser incluidas en la agenda (art. 6.1.a RGPD). El nombre, el correo electrónico y la organización solo se actualizan cuando la persona vuelve a marcar la casilla.",
@@ -3299,7 +3357,8 @@
         "metricsTitle": "Métricas del resumen (LLM)",
         "chars": "caracteres",
         "model": "Modelo",
-        "notAvailable": "n/d"
+        "notAvailable": "n/d",
+        "contentHidden": "Disponible solo para quienes organizan el evento."
       },
       "rel": {
         "title": "Fiabilidad de la IA",
@@ -3456,7 +3515,8 @@
         "alignNone": "No hay ningún cambio de diapositiva que alinear.",
         "previewTitle": "Vista previa",
         "previewHelp": "El vídeo con las diapositivas tal como las verá el público, con la corrección indicada arriba."
-      }
+      },
+      "contentOrganizerOnly": "Solo quienes organizan este evento pueden ver y modificar el contenido de esta grabación (vídeo, pistas, transcripción, resumen, traducciones). Aquí ves su estado, los procesos y los detalles de los archivos."
     },
     "questionnairesPage": {
       "subtitle": "Plantillas reutilizables de preguntas para los cuestionarios de pre-registro y posevento."
@@ -3748,7 +3808,9 @@
       "publishDesc": "Revísalo antes de publicarlo: el texto lo escribe un modelo de inteligencia artificial. Un informe regenerado debe publicarse de nuevo.",
       "preview": "Vista previa",
       "hidePreview": "Ocultar la vista previa",
-      "previewLanguage": "Idioma"
+      "previewLanguage": "Idioma",
+      "organizerOnly": "Solo quienes organizan este evento pueden solicitar, leer y publicar el informe.",
+      "organizerOnlyExists": "El informe existe. Solo quienes organizan este evento pueden leerlo y publicarlo."
     },
     "endEvent": "Finalizar evento",
     "endEventConfirmTitle": "¿Finalizar el evento para todos?",
@@ -4073,6 +4135,122 @@
       },
       "retainedNote": "{count, plural, one {# prueba se conserva} other {# pruebas se conservan}} mientras el vídeo o la transcripción existan.",
       "countsNote": "Se cuentan personas: una inscripción, una cuenta del personal o un enlace nominal cuentan una vez; un invitado que vuelve en otra visita cuenta de nuevo."
+    },
+    "recordingRemovals": {
+      "subtitle": "Personas que han pedido no aparecer en una grabación. Mientras una solicitud esté abierta, puedes abrir esa grabación desde el editor de retirada, y cada acceso queda en el registro de operaciones.",
+      "filterOpen": "Abiertas",
+      "filterAll": "Todas",
+      "filterLabel": "Qué solicitudes",
+      "empty": "Ninguna solicitud.",
+      "loadError": "No se han podido cargar las solicitudes.",
+      "colReceived": "Recibida",
+      "colPerson": "Persona",
+      "colEvent": "Evento",
+      "colSource": "Origen",
+      "colStatus": "Estado",
+      "open": "Abrir",
+      "unnamed": "Persona sin nombre",
+      "sources": {
+        "self-service": "Mis datos",
+        "admin": "Personal"
+      },
+      "statuses": {
+        "OPEN": "Abierta",
+        "IN_PROGRESS": "En trámite",
+        "PROCESSING": "En procesamiento",
+        "CLOSED": "Cerrada",
+        "REJECTED": "Rechazada"
+      },
+      "kinds": {
+        "registrant": "Inscrito",
+        "host": "Conduce",
+        "guest": "Invitado"
+      },
+      "newOpen": "Registrar una solicitud",
+      "newTitle": "Una solicitud recibida por otras vías",
+      "newIntro": "Para una solicitud que ha llegado al responsable del tratamiento por correo electrónico, por correo postal o en persona. Elige la grabación y, si la reconoces, a la persona entre quienes estaban en la sala.",
+      "recordingSearch": "Buscar el evento",
+      "recordingLabel": "Grabación",
+      "recordingChoose": "Elige una grabación",
+      "recordingOption": "{title} · {date}",
+      "recordingNone": "Ninguna grabación con vídeo o con pistas por participante.",
+      "peopleLabel": "Quién estaba en la sala",
+      "peopleNone": "La sala no ha dejado constancia de quién estaba: indica el nombre, y los intervalos los marcarás a mano.",
+      "personNotInVideo": "fuera del vídeo",
+      "personTimes": "de {from} a {to}",
+      "personStill": "de {from} hasta el final",
+      "nameLabel": "Nombre de la persona",
+      "noteLabel": "Cómo llegó la solicitud (opcional)",
+      "create": "Registrar la solicitud",
+      "createError": "No se ha podido registrar la solicitud.",
+      "cancel": "Cancelar",
+      "back": "Todas las solicitudes",
+      "fieldPerson": "Persona",
+      "fieldEvent": "Evento",
+      "fieldReceived": "Recibida",
+      "fieldSource": "Origen",
+      "fieldStatus": "Estado",
+      "fieldNote": "Nota",
+      "externalCopy": "Este evento tiene un vídeo en un sitio externo (por ejemplo, YouTube): la retirada no lo alcanza. Retíralo o sustitúyelo también allí.",
+      "publishedElsewhere": "El vídeo publicado del evento es un archivo distinto de esta grabación: la retirada no lo cambia. Sustitúyelo o retíralo de la página del evento.",
+      "pipelineOff": "La posproducción está desactivada: el trabajo de retirada queda en cola hasta que la actives, y la transcripción no se vuelve a generar.",
+      "noVideo": "Esta grabación no tiene vídeo, solo pistas por participante: las pistas de la persona se eliminan y la transcripción se rehace a partir de las que quedan.",
+      "noRecording": "La grabación ya no existe: no queda nada que retirar.",
+      "keyOnly": "Con la clave de la instancia no se abre una grabación: accede con tu cuenta de administración.",
+      "startIntro": "Para retirar a la persona tienes que abrir la grabación. El acceso vale solo para esta solicitud y queda en el registro de operaciones con tu cuenta.",
+      "start": "Abrir el editor de retirada",
+      "processing": "Retirada en curso: el vídeo depurado sustituirá al original. Estado del trabajo: {status}.",
+      "closed": "Solicitud cerrada el {date}.",
+      "closedIntervals": "{count, plural, =0 {Ningún intervalo cubierto.} one {# intervalo cubierto.} many {# de intervalos cubiertos.} other {# intervalos cubiertos.}}",
+      "rejected": "Solicitud rechazada el {date}.",
+      "lastError": "El último procesamiento no ha salido bien: {error}. Revisa los intervalos y vuelve a enviar.",
+      "rejectTitle": "Rechazar la solicitud",
+      "rejectLabel": "Motivo",
+      "reject": "Rechazar",
+      "rejectConfirm": "¿Rechazar la solicitud? La persona verá que se ha rechazado.",
+      "actionError": "La operación no se ha completado (HTTP {code}).",
+      "editorTitle": "Intervalos que cubrir",
+      "editorHint": "Las propuestas vienen de quién estaba en la sala, de quién hablaba y de las pistas por participante: los tiempos de quien hablaba son aproximados. Mira el vídeo y corrige. En cada intervalo el vídeo pasa a ser el cartel «contenido retirado a petición» y el audio se silencia; la duración no cambia.",
+      "sourcePresence": "En la sala",
+      "sourceSpeech": "Habla",
+      "sourceTrack": "Pista",
+      "selectedLegend": "Por cubrir",
+      "useProposals": "Volver a las propuestas",
+      "addInterval": "Añadir un intervalo aquí",
+      "fieldStart": "Inicio",
+      "fieldEnd": "Fin",
+      "setStart": "Inicio aquí",
+      "setEnd": "Fin aquí",
+      "seek": "Ir",
+      "remove": "Quitar",
+      "intervalLabel": "Intervalo {n}",
+      "noIntervalsVideo": "Ningún intervalo por cubrir. Si la persona no aparece en el vídeo, rechaza la solicitud indicando el motivo.",
+      "total": "{count, plural, one {# intervalo} many {# de intervalos} other {# intervalos}} · {seconds} s por cubrir",
+      "timeHint": "Tiempos en horas:minutos:segundos, como en el reproductor.",
+      "invalidTime": "Tiempo no válido",
+      "preview": "Vista previa de la retirada",
+      "timelineLabel": "Línea de tiempo de la grabación",
+      "mediaError": "El vídeo no se carga. Recarga la página.",
+      "submit": "Retirar a la persona de la grabación",
+      "submitConfirm": "El vídeo original y las pistas de la persona se eliminarán y la posproducción se rehará. No se puede deshacer. ¿Continuar?",
+      "submitDone": "Solicitud cerrada: la persona se ha retirado."
+    },
+    "catalog": {
+      "fieldTitle": "Catálogo",
+      "fieldHelp": "El tipo de evento y la plantilla a partir de la cual se creó solo sirven para las estadísticas de la instancia y no cambian ningún ajuste. Corrígelos si el evento está mal catalogado o no está catalogado.",
+      "typeLabel": "Tipo de evento",
+      "templateLabel": "Plantilla",
+      "noTemplate": "Sin plantilla",
+      "deletedTemplate": "Creado a partir de la plantilla «{name}», ya eliminada.",
+      "deletedOption": "{name} (eliminada)",
+      "types": {
+        "MEETING": "Reunión",
+        "PARTICIPATORY": "Evento participativo",
+        "PUBLIC": "Evento público",
+        "INSTANT": "Llamada rápida",
+        "LEGACY": "Publicación importada",
+        "UNCATALOGED": "Sin catalogar"
+      }
     }
   },
   "email": {
@@ -4609,7 +4787,19 @@
       "addressBookPendingEffect": "Si confirmas, vuelves a la agenda con el nombre y el organismo de esta inscripción y recibes de nuevo las invitaciones. Si cancelas, o si no has sido tú, sigues fuera de la agenda y no recibes invitaciones.",
       "addressBookPendingConfirm": "Confirmar mi regreso",
       "addressBookPendingCancel": "Cancelar la solicitud",
-      "addressBookPendingGone": "Esta solicitud ya no está pendiente. Recarga la página para ver el estado actualizado."
+      "addressBookPendingGone": "Esta solicitud ya no está pendiente. Recarga la página para ver el estado actualizado.",
+      "removalTitle": "La grabación del evento",
+      "removalIntro": "Este evento se ha grabado. Si no quieres aparecer en la grabación, puedes pedir que te retiren de ella: las partes en las que apareces o hablas se cubren con un cartel y se silencian, y la transcripción, los subtítulos y el resumen se vuelven a generar. La solicitud llega al responsable del tratamiento, que la examina.",
+      "removalButton": "No quiero aparecer en esta grabación",
+      "removalConfirmTitle": "¿Confirmas la solicitud?",
+      "removalConfirmBody": "El responsable del tratamiento retirará de la grabación las partes en las que apareces o hablas. Las copias publicadas en otros sitios, por ejemplo en YouTube, debe retirarlas por separado quien las haya publicado.",
+      "removalConfirm": "Enviar la solicitud",
+      "removalCancel": "Cancelar",
+      "removalSent": "Solicitud enviada. El responsable del tratamiento la examinará.",
+      "removalError": "No se ha podido enviar la solicitud. Inténtalo de nuevo más tarde.",
+      "removalStatusOpen": "Solicitud del {date}: en trámite.",
+      "removalStatusClosed": "Solicitud del {date}: completada el {closed}.",
+      "removalStatusRejected": "Solicitud del {date}: rechazada. Escribe al responsable del tratamiento para conocer el motivo."
     },
     "erasure": {
       "title": "Supresión de sus datos",
@@ -6022,6 +6212,11 @@
     "captionsTranscriptNotTranslatable": "Esta transcripción procede de los subtítulos en directo: la traducción automática necesita una transcripción con IA de la grabación.",
     "sameLanguage": "El idioma elegido es el original de la grabación: elige otro.",
     "recordingDestinationNotCovered": "Los consentimientos de este evento valen para una grabación reservada a los inscritos: no puedes hacerla visible para todos ni vincular un vídeo externo.",
-    "mtUnavailable": "La traducción automática no está instalada en esta instancia."
+    "mtUnavailable": "La traducción automática no está instalada en esta instancia.",
+    "recordingContentOrganizerOnly": "Solo quienes organizan este evento pueden abrir, modificar o publicar el contenido de sus grabaciones."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Contenido retirado a petición",
+    "cardBody": "Esta parte de la grabación se ha retirado a petición de una persona que aparecía en ella."
   }
 }

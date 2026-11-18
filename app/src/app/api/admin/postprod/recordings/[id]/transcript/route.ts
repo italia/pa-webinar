@@ -30,14 +30,15 @@
  * (lib/ai/transcript-input). An erasure, instead, rewrites the stored files
  * here and now, so that the removed sentence does not stay in them.
  *
- * Auth: admin session cookie (same as the rest of /api/admin/postprod).
+ * Auth: the event organizers only (lib/recording/content-access); reads are
+ * written to the event's GDPR audit log.
  */
 
 import { z } from 'zod';
 import { cookies } from 'next/headers';
 
 import { withErrorHandling } from '@/lib/api-handler';
-import { requireRecordingManager } from '@/lib/auth/staff-session';
+import { requireRecordingContent, tracciaLetturaContenuto } from '@/lib/recording/content-access';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { applicaRedazione, conservaOriginali } from '@/lib/ai/original-body';
@@ -123,8 +124,10 @@ function parseTranscript(inlineBody: string | null): TranscriptJson {
 
 export const GET = withErrorHandling(async (_request, context) => {
   const { id } = await (context as { params: Promise<{ id: string }> }).params;
-  // Dell'evento della registrazione: l'admin o chi l'ha creato (ADR-014).
-  await requireRecordingManager(await cookies(), id);
+  // Il contenuto e' di chi organizza l'evento, non dell'admin che non lo
+  // organizza (lib/recording/content-access); la lettura si traccia.
+  const accesso = await requireRecordingContent(await cookies(), id, 'trascrizione');
+  await tracciaLetturaContenuto({ ...accesso, recordingId: id, superficie: 'trascrizione' });
 
   const recording = await loadRecording(id);
   if (!recording) throw new NotFoundError('Recording');
@@ -259,8 +262,9 @@ const bodySchema = z.object({
 
 export const PUT = withErrorHandling(async (request, context) => {
   const { id } = await (context as { params: Promise<{ id: string }> }).params;
-  // Dell'evento della registrazione: l'admin o chi l'ha creato (ADR-014).
-  await requireRecordingManager(await cookies(), id);
+  // Il contenuto e' di chi organizza l'evento, non dell'admin che non lo
+  // organizza (lib/recording/content-access).
+  await requireRecordingContent(await cookies(), id, 'trascrizione');
   const { edits, redactOriginal } = bodySchema.parse(await request.json());
 
   const recording = await loadRecording(id);

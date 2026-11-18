@@ -36,6 +36,7 @@ export const PURGED_BY_CLEANUP: Record<string, string> = {
   CallSession: 'ripulita, non cancellata: si azzerano le colonne con PII e restano i numeri aggregati',
   RoomOccupant: 'chi era in sala: endpoint del bridge e posto della conferenza, che rimanda a un’iscrizione',
   CaptionSegment: 'frasi dei sottotitoli salvate per la trascrizione: nome e testo cifrati di chi ha acconsentito; la trascrizione costruita resta sulla registrazione, con la sua retention',
+  RecordingRedactionRequest: 'richiesta di rimozione da una registrazione: nome cifrato, impronta dell’indirizzo e posti della conferenza; se ne vanno le richieste chiuse o respinte e quelle di una registrazione che non c’è più, mentre una richiesta aperta resta finché qualcuno non la evade (il giro successivo la cancella); la storia resta nel registro GDPR, senza dati personali',
 };
 
 /**

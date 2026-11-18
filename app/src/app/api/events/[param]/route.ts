@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: EUPL-1.2
 // SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
 
-import type { Prisma } from '@prisma/client';
+import type { EventFormatClass, Prisma } from '@prisma/client';
 import { cookies } from 'next/headers';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
@@ -65,8 +65,8 @@ import {
   recuperoAperto,
   type Destinazione,
 } from '@/lib/recording/destination';
-import { videoPerTutti } from '@/lib/recording/audience';
-import { assertVideoNelloStorage } from '@/lib/storage/recordings';
+import { videoDellApp, videoPerTutti } from '@/lib/recording/audience';
+import { assertVideoDellEvento, assertVideoNelloStorage } from '@/lib/storage/recordings';
 import { annullaEmailInCoda } from '@/lib/email/outbox';
 
 export const dynamic = 'force-dynamic';
@@ -133,7 +133,9 @@ export const GET = withErrorHandling(async (request, context) => {
       participantsCanStartVideo: event.participantsCanStartVideo,
       participantsCanShareScreen: event.participantsCanShareScreen,
       status: event.status,
-      recordingUrl: event.recordingUrl,
+      // La rotta dell'app, che firma il file per chi lo puo' vedere, mai
+      // l'indirizzo dello storage (lib/recording/audience).
+      recordingUrl: event.recordingUrl ? videoDellApp(event.slug) : null,
       tempRecordingUrl: event.tempRecordingUrl,
       tempRecordingStartedAt: event.tempRecordingStartedAt?.toISOString() ?? null,
       recordingPublished: event.recordingPublished,
@@ -342,6 +344,35 @@ export const PUT = withErrorHandling(async (request, context) => {
     }
   }
 
+  // Il catalogo (lib/events/catalog) lo corregge lo staff dell'evento, come le
+  // etichette, anche a evento concluso: le statistiche sono degli eventi
+  // passati. Il wizard lo manda solo se cambiato. Un modello nuovo si verifica e
+  // se ne fotografa il nome; togliere il modello toglie anche il nome, anche
+  // quello di un modello cancellato (il riferimento e' gia' vuoto).
+  const catalogo: CatalogoDaScrivere = {};
+  const togliNome =
+    data.templateId === null && event.templateId === null && event.templateName !== null;
+  if (data.templateId !== undefined && (data.templateId !== event.templateId || togliNome)) {
+    await soloStaffDellEvento(eventId, 'Only the event staff can change the event catalog');
+    const modello = data.templateId
+      ? await prisma.eventTemplate.findUnique({
+          where: { id: data.templateId },
+          select: { id: true, name: true },
+        })
+      : null;
+    if (data.templateId && !modello) {
+      throw new ValidationError('Validation failed', [
+        { path: ['templateId'], message: 'Unknown event template' },
+      ]);
+    }
+    catalogo.templateId = modello?.id ?? null;
+    catalogo.templateName = modello?.name ?? null;
+  }
+  if (data.formatClass !== undefined && data.formatClass !== event.formatClass) {
+    await soloStaffDellEvento(eventId, 'Only the event staff can change the event catalog');
+    catalogo.formatClass = data.formatClass;
+  }
+
   // Guard against the illusion of post-event configurability. These flags govern
   // LIVE capture — once an event is ENDED/ARCHIVED nothing can be captured
   // retroactively, so writing them does nothing but mislead. Strip them from a
@@ -443,6 +474,11 @@ export const PUT = withErrorHandling(async (request, context) => {
     event.recordingAudience,
   );
   assertVideoNelloStorage(destinazioneDopo, event.recordingUrl, data.recordingUrl);
+  // Un file del nostro storage si aggancia solo se e' di questo evento: l'app
+  // firma l'indirizzo per chi vede il video (lib/storage/recordings).
+  if (data.recordingUrl && data.recordingUrl !== event.recordingUrl) {
+    await assertVideoDellEvento(eventId, data.recordingUrl);
+  }
   assertEsposizioneConsentita(event, {
     recordingDestination: destinazioneDopo,
     recordingAudience: pubblicoDopo,
@@ -695,6 +731,7 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.participantListVisible !== undefined && { participantListVisible: data.participantListVisible }),
       ...(data.hostsAlwaysRecorded !== undefined && { hostsAlwaysRecorded: data.hostsAlwaysRecorded }),
       ...(data.offerAddressBook !== undefined && { offerAddressBook: data.offerAddressBook }),
+      ...catalogo,
       ...(destinazioneDopo !== destinazionePrima && { recordingDestination: destinazioneDopo }),
       ...(data.recordingPublished !== undefined && {
         recordingPublished: data.recordingPublished,
@@ -924,6 +961,13 @@ export const PUT = withErrorHandling(async (request, context) => {
     ...(traduzione && { traduzione }),
   });
 });
+
+/** Le colonne del catalogo che un salvataggio cambia (lib/events/catalog). */
+interface CatalogoDaScrivere {
+  templateId?: string | null;
+  templateName?: string | null;
+  formatClass?: EventFormatClass | null;
+}
 
 /**
  * Un campo che decide lo staff che gestisce l'evento, non chi ha un link di

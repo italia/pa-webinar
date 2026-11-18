@@ -23,6 +23,8 @@ const { prisma } = vi.hoisted(() => ({
     event: { findMany: vi.fn() },
     recordingConsent: { findMany: vi.fn() },
     multitrackConsent: { findMany: vi.fn() },
+    recording: { findMany: vi.fn() },
+    recordingRedactionRequest: { findMany: vi.fn() },
   },
 }));
 
@@ -99,6 +101,8 @@ beforeEach(() => {
   prisma.event.findMany.mockResolvedValue([]);
   prisma.recordingConsent.findMany.mockResolvedValue([]);
   prisma.multitrackConsent.findMany.mockResolvedValue([]);
+  prisma.recording.findMany.mockResolvedValue([]);
+  prisma.recordingRedactionRequest.findMany.mockResolvedValue([]);
 });
 
 describe('chi puo’ scaricare', () => {
@@ -376,6 +380,38 @@ describe('testo letto', () => {
       consentRecordingVersion: 1,
       recordingConsentsInRoom: [{ destination: 'PUBLIC', textVersion: 1 }],
     });
+  });
+});
+
+describe('rimozione da una registrazione', () => {
+  it('dice dove si puo’ chiedere e lo stato delle richieste fatte, senza altri dati', async () => {
+    prisma.registration.findMany.mockResolvedValue([iscrizione('r1', 'e1'), iscrizione('r2', 'e2')]);
+    prisma.recording.findMany.mockResolvedValue([
+      { eventId: 'e1', blobKey: 'recordings/sala.mp4', mediaStartedAt: null },
+      // Una registrazione con la sola trascrizione dai sottotitoli non ha media.
+      { eventId: 'e2', blobKey: '', mediaStartedAt: null },
+    ]);
+    prisma.recordingRedactionRequest.findMany.mockResolvedValue([
+      {
+        registrationId: 'r1',
+        status: 'CLOSED',
+        createdAt: new Date('2026-11-01T08:00:00Z'),
+        closedAt: new Date('2026-11-03T08:00:00Z'),
+      },
+    ]);
+    const corpo = (await (await conToken()).json()) as {
+      data: Array<{ registration: { recordingRemoval: unknown } }>;
+    };
+    expect(corpo.data[0]!.registration.recordingRemoval).toEqual({
+      available: true,
+      requests: [
+        { status: 'CLOSED', createdAt: '2026-11-01T08:00:00.000Z', closedAt: '2026-11-03T08:00:00.000Z' },
+      ],
+    });
+    expect(corpo.data[1]!.registration.recordingRemoval).toEqual({ available: false, requests: [] });
+    expect(prisma.recordingRedactionRequest.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { emailHash: HASH, registrationId: { not: null } } }),
+    );
   });
 });
 

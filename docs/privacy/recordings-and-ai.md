@@ -72,6 +72,16 @@ assessment belongs to the controller of each installation.
   unless the video is published, in which case they live as long as the
   published video. A transcript published on its own stays while it is
   published, and the event's other outputs still go at its retention.
+- The content of a recording (video, voices, transcripts, summaries, report,
+  translations, subtitles, dubbing) is for the organizers of the event and its
+  participants. An administrator who does not organize the event sees only that
+  it exists, its status and its processing jobs; the instance key never sees
+  content. Staff reads are written to the GDPR log
+  ([Who can see recording content](#who-can-see-recording-content)).
+- A person can ask not to appear in a recording, from **My data** or through
+  the controller. An administrator covers and mutes the intervals in which
+  the person appears or speaks, the person's tracks go, and post-production
+  runs again ([Removing a person from a recording](#removing-a-person-from-a-recording)).
 - Several gaps need operator attention: see [Known limitations](#known-limitations).
 
 ## What is captured and when
@@ -109,7 +119,7 @@ recording box. The rules are in `app/src/lib/recording/destination.ts`.
 
 | Destination | Who can see the video | Box |
 |---|---|---|
-| Reserved (`REGISTRANTS`) | The staff who manage the event, and registrants for as long as their registration exists. It is not public and not in the video library | `gdpr.consent.recordingReserved` |
+| Reserved (`REGISTRANTS`) | The organizers of the event, and registrants for as long as their registration exists. It is not public and not in the video library | `gdpr.consent.recordingReserved` |
 | Public (`PUBLIC`) | Anyone, once staff publish it | `gdpr.consent.recordingPublic` |
 | Not declared (null) | What staff decide after the event, with a warning when they publish. Only events that recorded before the choice existed, events that received a file after their room opened, instant calls, and imported archives, which publish with no warning | `gdpr.consent.recording` |
 
@@ -292,6 +302,47 @@ in the waiting room and in the room, **Consents** dialog included
 ([Custom recording consent text](privacy-notice-checklist.md#custom-recording-consent-text),
 [Recording: consent gates](../architecture/recording.md#consent-gates)).
 
+## Who can see recording content
+
+The content of a recording is what it shows or says and what is derived from
+it: the composite video, the per-participant tracks and the archive, the
+waveform, the transcripts (AI and from captions), the summaries, the event
+report, the translations, the subtitles and the dubbed audio. The rule is in
+`app/src/lib/recording/content-access.ts` for staff and in
+`app/src/lib/recording/audience.ts` for everyone else
+([ADR-021](../adr/021-recording-content-access.md)).
+
+| Who | Content |
+|---|---|
+| The organizers of the event (the staff account that created it, and every staff account with a valid organizer grant on it, administrators included) | Everything, before and after publication: reading it, correcting it, producing more of it and publishing it |
+| An administrator who does not organize the event | None. They see that the recording exists, its status, duration, size and files, the processing jobs and their errors, the quality figures of the transcript and the languages produced, and can cancel queued jobs |
+| The instance API key | None |
+| Registrants | A recording reserved for registrants, while their registration exists |
+| Whoever was in an instant call while it was recorded | The recording of that call, from the call's link, until the call is deleted |
+| Anyone | A recording published for everyone |
+
+- **Instant calls.** When the recording starts, the room of each person present
+  asks the portal for a presence pass, proving its seat with the room tokens of
+  that visit. The portal checks that the recording is running and that a token
+  of the call came from the portal, then sets an `HttpOnly` cookie
+  (`rec_pass_<eventId>`) that expires when the call's retention ends.
+  Consent does not matter: someone who stayed out of the video was still in
+  the call. Nothing is emailed and there is no link to forward.
+- **Every staff read is logged.** A staff member who reads content as staff
+  writes a `RECORDING_CONTENT_READ` row in the event's GDPR log, with the
+  surface, the recording, the role and the account ID, and no name or address
+  ([Audit trails](../GDPR.md#audit-trails)).
+- **No storage addresses in browsers.** Pages, APIs and emails carry the
+  portal's route for a video, which checks access again and redirects to a
+  signed address valid for 120 minutes. The portal signs only files of the
+  event being asked for.
+- **Post-production is the organizers' work.** Correcting transcripts, naming
+  speakers, editing summaries, translating, archiving and publishing need an
+  organizer of the event.
+- **The block is in the application.** Whoever holds the storage or database
+  credentials, `PII_ENCRYPTION_KEY` or the cluster can read the files and
+  decrypt the texts. The worker and the recorder keep their own access.
+
 ## Voice data
 
 ### No voiceprints
@@ -409,9 +460,10 @@ on. It serves two features of the administration area:
   video, one audio track per participant labeled with the name, and the
   subtitles into one MKV file.
 
-Only staff who manage the event can use them: administrators, and the
-organizer who created it. The audio and archive links are signed URLs that
-expire after 120 minutes
+Only the organizers of the event can use them: the staff account that created
+it and those with an organizer grant on it, administrators included only when
+they organize it. Each use is written to the event's GDPR log. The audio and
+archive links are signed URLs that expire after 120 minutes
 (`app/src/app/api/admin/postprod/recordings/[id]/tracks/route.ts`). Nothing
 from this feature appears on public pages.
 
@@ -445,7 +497,7 @@ event's privacy notice and in its own communication to participants.
 | Track audio | Object storage, `recordings/multitrack/<eventId>/<recordingId>/audio/` | The recorder bot writes each file through its own signed upload URL. The worker reads the files through signed URLs valid for its job lease. Staff play retained tracks | Never public. At-rest encryption is the storage provider's |
 | `tracks.json` | Same prefix | Anyone allowed to list the bucket | Display names in plain text. Nothing reads it after the upload; the purge jobs delete it with the recording's last track |
 | Track rows (`RecordingTrack`) | PostgreSQL | The portal | Display name encrypted |
-| Downloadable archive | Object storage, `postprod/…/archive.mkv` | Staff who manage the event, through a signed URL | Never public |
+| Downloadable archive | Object storage, `postprod/…/archive.mkv` | The organizers of the event, through a signed URL | Never public |
 | Mixed audio | Inside the composite MP4 | Anyone who reaches the waiting room, guests included, through the temporary catch-up copy (24 hours), which a reserved recording does not offer; the public, once the video is published for everyone; registrants, for a reserved video | See [Privacy and data protection](../GDPR.md) |
 
 The worker receives each participant's name in clear text through the internal
@@ -714,9 +766,16 @@ where the rule is enforced. See
   the speaking timeline while the log exists, or else a numbered label
   (**Participant N**, in the page language). In the downloads
   and subtitles, an unnamed cluster keeps its raw label (`SPEAKER_00`).
-- **Staff who manage the event** (administrators and the organizer who created
-  it) see everything in the administration area. That includes raw
-  diarization labels, retained tracks and the archive.
+- **The organizers of the event** (the staff account that created it and those
+  with an organizer grant on it, whatever their role) see everything in the
+  administration area. That includes raw diarization labels, retained tracks
+  and the archive. An administrator who does not organize the event sees the
+  status of the recording and of its jobs, not the outputs
+  ([Who can see recording content](#who-can-see-recording-content)).
+- **During a removal request**, a named administrator account opens the
+  recording of the request from the removal editor, for as long as the request
+  is open, and each opening is logged
+  ([Removing a person from a recording](#removing-a-person-from-a-recording)).
 
 ### The event report
 
@@ -952,8 +1011,9 @@ the removal can be repeated.
 
 Erasure works on text. The spoken words stay in the recording itself: in the
 composite video, which is public once published, and in the per-participant
-tracks while they exist. Removing them means editing or unpublishing the
-video.
+tracks while they exist. Removing them is a removal from the recording
+([Removing a person from a recording](#removing-a-person-from-a-recording)),
+or unpublishing the video.
 
 ```mermaid
 flowchart LR
@@ -1009,13 +1069,45 @@ not regenerated:
 - **Dubbed audio and video, and an archive already built:** keep the passage
   until they are purged.
 
+### Removing a person from a recording
+
+A person who appears in a recording can ask not to appear in it. A registrant
+asks from **My data**; anyone else asks the controller, and an administrator
+registers the request. The request, its statuses and its audit are described
+in [Privacy and data protection](../GDPR.md#removal-from-a-recording); the job
+in [AI post-production](../POSTPROD.md#removal-from-a-recording).
+
+The administrator opens the recording of the request in the removal editor,
+by exception: only with a named administrator account, only that recording,
+only while the request is open, and every opening is written to the admin
+audit log. The editor proposes where the person appears and speaks, from the
+record of who was in the room with the voice in the video, the caption
+sentences, the speaking timeline and the per-participant tracks, all
+anchored to the recording's time zero; the administrator corrects the
+intervals while watching the video and previews the result.
+
+| Data | What the removal does |
+|---|---|
+| Composite video | Each interval becomes a full-frame card, **Content removed on request**, with the audio muted; the duration does not change. The redacted file replaces the original as the recording's source and, when it was the same file, as the event's published video. The original file is deleted |
+| Per-participant tracks of the person | Deleted whole, files and rows, with the recording's `tracks.json` |
+| Caption sentences of the person | Deleted for the whole event; the person leaves the transcript built from captions |
+| Speaking timeline | Kept until the event's retention, without the person's name |
+| Transcript, subtitles, summaries, translations, dubbing, waveform, archive | Deleted, with the files of every earlier run; when the recording had an AI transcript and the pipeline is on, a new run produces them again from the redacted video or from the remaining tracks |
+| Speaker labels of an AI transcript | Deleted with it; the new run creates its own |
+| Copies outside the platform (a video on another site, downloads, a different published file) | Not reached: the editor reminds the administrator |
+
+A new run from the composite video does not ask again for the confirmation
+that every voice consented: the redacted video holds fewer voices than the
+one it was given for. A recording transcribed from per-participant tracks runs
+again from the remaining tracks only, never from the composite video.
+
 ### Data-subject requests
 
 The self-service privacy pages (`/en/privacy/my-data`,
 `/it/privacy/i-miei-dati`; see
 [Privacy and data protection](../GDPR.md#self-service-access-and-erasure)) do
-not reach recordings or AI outputs, with one exception, the transcript from
-captions:
+not reach recordings or AI outputs, with two exceptions, the transcript from
+captions and the request not to appear in a recording:
 
 - the export lists registrations and their consent flags, including
   `consentMultitrack`, the consent proofs kept for what is published, and the
@@ -1025,7 +1117,11 @@ captions:
   stored sentences, and removes the person from the transcript built from
   captions ([Transcript from live captions](#transcript-from-live-captions));
   it does not reach recordings, tracks or AI outputs. The proof of a consent to
-  a video or transcript that exists, published or not, stays, without a name.
+  a video or transcript that exists, published or not, stays, without a name;
+- the access page offers, for each registration to an event with a
+  recording, **I don't want to appear in this recording**: the request goes to
+  the controller and the page shows its status
+  ([Removing a person from a recording](#removing-a-person-from-a-recording)).
 
 Requests about recordings and transcripts therefore go to the controller, who
 handles them in the administration area:
@@ -1035,7 +1131,8 @@ handles them in the administration area:
 | Access | Read the transcript in the transcript editor and provide a copy |
 | Rectification | Correct a line, reassign a segment to another speaker, or rename a speaker label. A rename writes a `POSTPROD_SPEAKER_MAP` entry to the admin audit log that holds the new name until the GDPR cleanup empties its detail. A correction changes the database copies: outputs generated later (an added translation language, a new archive) start from the corrected text, and outputs already produced stay as they are |
 | Erasure of words | Use **Erase from the original too**, then handle the derived outputs listed above and, if needed, the video |
-| Erasure of a voice track | No control deletes a single track. **Delete session** removes the recording's rows but leaves its track and output files in storage, so delete those in storage as well. Otherwise tracks go at the next purge or orphan sweep, or have to be deleted in storage |
+| Erasure from the recording: image, voice and what derives from them | Handle the removal request in the removal editor, or register it there when it arrived by other means ([Removing a person from a recording](#removing-a-person-from-a-recording)) |
+| Erasure of a voice track | A removal request deletes all the tracks of the person. Otherwise no control deletes a single track: **Delete session** removes the recording's rows but leaves its track and output files in storage, so delete those in storage as well, or wait for the next purge or orphan sweep |
 
 Once a track has been purged, the audio no longer exists. The attribution
 inside the transcript remains, and a request about it is handled on the
@@ -1100,6 +1197,12 @@ Key handling and the secrets map are in
 
 ## Known limitations
 
+Access:
+
+- **Recording content is protected by the application, not by encryption.**
+  Storage, database and cluster credentials read it whatever the portal
+  allows; signed addresses already handed out stay valid until they expire.
+
 Consent and transparency:
 
 - **Leaving a person out of the composite video depends on Jitsi and on
@@ -1108,7 +1211,13 @@ Consent and transparency:
   out, and the room still says so. Retry it after every Jitsi upgrade, and
   restart Prosody after an upgrade that changes the modules.
 - **What is already in the composite video stays after a withdrawal.** Removing
-  a person's passages is a request to the controller.
+  a person's passages is a removal request, which an administrator handles in
+  the removal editor.
+- **A removal does not reach copies outside the platform,** nor a published
+  video that is a different file from the recording, nor the AI event report
+  and the recap. On an installation without the post-production worker a
+  removal from a video never runs, and with the post-production switch off it
+  waits.
 - **Keep per-participant tracks can change after people have consented.** A
   consent given to the text that promises deletion stays valid
   ([The consent text and retained tracks](#the-consent-text-and-retained-tracks)).
@@ -1173,14 +1282,16 @@ Data-subject rights:
 
 - **Self-service export and erasure exclude recordings, tracks and AI
   outputs.** Only the transcript from captions is reached, by erasure and by the
-  withdrawal of a consent.
+  withdrawal of a consent. A registrant can ask not to appear in a recording,
+  and an administrator handles the request.
 - **A correction reaches the stored files only when a job needs them.** The
   file stays as it was until a summary, translation, dubbing or archive job
   takes it. If that write fails, the job reads the previous file, and only
   the application log says so.
-- **Redaction does not reach derived outputs or the recording.** No control
-  regenerates translations or dubbing from a revised transcript, and the
-  spoken words stay in the video and the tracks.
+- **Erasing a passage does not reach derived outputs or the recording.** No
+  control regenerates translations or dubbing from a revised transcript, and
+  the spoken words stay in the video and the tracks. A removal from the
+  recording does reach them, by the intervals, and redoes the outputs.
 
 ## Related pages
 

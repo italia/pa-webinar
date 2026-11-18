@@ -32,6 +32,11 @@ export const DUPLICATED_EVENT_FIELDS = [
   'textLocaleState',
   'timezone',
   'eventType',
+  // Il catalogo (lib/events/catalog): la copia e' lo stesso tipo di evento,
+  // dallo stesso modello, con il nome che il modello aveva per l'originale.
+  'templateId',
+  'templateName',
+  'formatClass',
 
   // capacity & sizing
   'maxParticipants',

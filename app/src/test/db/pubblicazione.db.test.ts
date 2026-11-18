@@ -26,6 +26,7 @@ import {
   creaIscrizione,
   creaSessione,
   entraCome,
+  organizza,
   esci,
   richiesta,
   svuotaDatabase,
@@ -57,7 +58,9 @@ function modifica(evento: { id: string; moderatorToken: string }, corpo: unknown
   );
 }
 
-function modificaPubblicazione(id: string, corpo: unknown) {
+/** La pubblicazione la decide chi organizza l'evento: lo staff della prova lo organizza. */
+async function modificaPubblicazione(id: string, corpo: unknown) {
+  await organizza(id);
   return pubblica(richiesta(`/api/admin/publications/${id}`, 'PATCH', corpo) as never, {
     params: Promise.resolve({ id }),
   });

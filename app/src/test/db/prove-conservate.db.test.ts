@@ -13,6 +13,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/lib/storage/recordings', () => ({
   assertVideoNelloStorage: vi.fn(),
+  assertVideoDellEvento: vi.fn(async () => undefined),
   deleteRecordingBlob: vi.fn(async () => true),
 }));
 // I testi veri dell'italiano, letti per chiave puntata come next-intl.
@@ -58,6 +59,7 @@ import {
   creaRegistrazione,
   creaSessione,
   entraCome,
+  organizza,
   richiesta,
   svuotaDatabase,
 } from './fixtures';
@@ -1594,6 +1596,7 @@ describe('un evento con piu’ sessioni registrate', () => {
   it('togliere il video dalla pubblicazione lo toglie anche dalla sessione', async () => {
     const { evento, prima, seconda } = await dueSessioni();
     await entraCome('ADMIN');
+    await organizza(evento.id);
 
     const res = await aggiornaPubblicazione(
       richiesta(`/api/admin/publications/${evento.id}`, 'PATCH', {
@@ -1614,6 +1617,7 @@ describe('un evento con piu’ sessioni registrate', () => {
   it('caricare un altro file non toglie quello della sessione', async () => {
     const { evento, seconda } = await dueSessioni();
     await entraCome('ADMIN');
+    await organizza(evento.id);
 
     const res = await aggiornaPubblicazione(
       richiesta(`/api/admin/publications/${evento.id}`, 'PATCH', {

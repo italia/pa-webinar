@@ -56,6 +56,8 @@ vi.mock('@/lib/auth/staff-seat', () => ({
   staffDietroIlPrimario: vi.fn(async () => null),
 }));
 vi.mock('@/lib/auth/staff-session', () => ({ isEventManager: vi.fn(async () => false) }));
+// Lo staff che gestisce l'evento, qui, lo organizza (test/contenuto-come-gestore).
+vi.mock('@/lib/recording/content-access', () => import('@/test/contenuto-come-gestore'));
 vi.mock('@/lib/events/meta-title', () => ({
   anteprimaEventoPubblico: vi.fn(async () => null),
 }));
@@ -311,6 +313,64 @@ describe('sala — la scheda privacy', () => {
     stato.impostazioni.aiConsentDisclosure = { it: 'Testo scritto.', fr: 'Texte écrit.' };
     conEvento();
     expect((await clientProps()).event.aiConsentDisclosure).toBe('Testo scritto.');
+  });
+});
+
+describe('chiamata rapida conclusa: il link mostra la registrazione a chi c’era', () => {
+  const chiusa = {
+    eventType: 'INSTANT',
+    status: 'ENDED',
+    startsAt: new Date(Date.now() - 4 * HOUR),
+    endsAt: new Date(Date.now() - 2 * HOUR),
+    dataRetentionDays: 7,
+    recordingUrl: VIDEO,
+    recordingPublished: false,
+    postEventPublic: false,
+  };
+  const pagina = () =>
+    LivePage({ params: Promise.resolve({ slug: SLUG }), searchParams: Promise.resolve({}) });
+  async function conPass() {
+    vi.stubEnv('APP_SECRET', 'segreto-di-prova-della-sala-abbastanza-lungo');
+    const { issuePresencePass, presencePassCookieName } = await import('@/lib/recording/presence-pass');
+    stato.biscotti.set(
+      presencePassCookieName(EVENT_ID),
+      issuePresencePass(EVENT_ID, new Date(Date.now() + 86_400_000))!
+    );
+  }
+
+  it('a chi non c’era e non la organizza: non trovato, come prima', async () => {
+    conEvento(chiusa);
+    await expect(pagina()).rejects.toThrow('NOT_FOUND');
+  });
+
+  it('chi era in sala mentre si registrava la vede, senza pubblicazione, e mai dall’indirizzo', async () => {
+    conEvento(chiusa);
+    await conPass();
+    const { event } = await clientProps();
+    expect(event.status).toBe('ENDED');
+    expect(event.videoDisponibile).toBe(true);
+    expect(JSON.stringify(event)).not.toContain(VIDEO);
+  });
+
+  it('chi la organizza la vede senza pass', async () => {
+    conEvento(chiusa);
+    vi.mocked(isEventManager).mockResolvedValue(true);
+    expect((await clientProps()).event.videoDisponibile).toBe(true);
+  });
+
+  it('senza video, o con il pass di un’altra chiamata: non trovato', async () => {
+    conEvento({ ...chiusa, recordingUrl: null });
+    await conPass();
+    await expect(pagina()).rejects.toThrow('NOT_FOUND');
+    stato.biscotti.clear();
+    conEvento(chiusa);
+    vi.stubEnv('APP_SECRET', 'segreto-di-prova-della-sala-abbastanza-lungo');
+    const { issuePresencePass, presencePassCookieName } = await import('@/lib/recording/presence-pass');
+    stato.biscotti.set(
+      presencePassCookieName(EVENT_ID),
+      issuePresencePass('99999999-9999-4999-8999-999999999999', new Date(Date.now() + 86_400_000))!
+    );
+    await expect(pagina()).rejects.toThrow('NOT_FOUND');
   });
 });
 

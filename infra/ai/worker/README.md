@@ -40,6 +40,9 @@ flowchart TD
   kind -- "REPORT" --> report["run_report"]
   report --> deliver["POST the report<br/>to the portal"]
   deliver --> done
+  kind -- "REDACT" --> redact["run_redact"]
+  redact --> deliverv["PUT the redacted video,<br/>then POST it to the portal"]
+  deliverv --> done
   asr --> out["for each output:<br/>PUT to its upload target,<br/>then register_artifact"]
   llm --> out
   media --> out
@@ -82,8 +85,9 @@ job of an event. All are `POST` and authenticated with the header
 | `/api/internal/postprod-artifact` | `AppClient.register_artifact(...)` | After each output is uploaded |
 | `/api/internal/event-report` | `AppClient.deliver_report(...)` | `REPORT`: once, with the report text in each language |
 | `/api/internal/event-text-translation` | `AppClient.deliver_text_translation(...)` | `TRANSLATE_TEXT`: once, with the title and description in each language |
+| `/api/internal/recording-redaction` | `AppClient.deliver_redaction(...)` | `REDACT`: once, after the redacted video is uploaded to its target |
 
-The jobs of an event (`REPORT`, `TRANSLATE_TEXT`) send their claim number
+The jobs of an event (`REPORT`, `TRANSLATE_TEXT`, `REDACT`) send their claim number
 (`attempt`) with every progress report and with the delivery. An answer with
 `superseded`, `alreadyDelivered` or `closed`, or a progress answer with status
 `DONE` or `FAILED`, means another attempt owns the job or it is closed: the
@@ -116,6 +120,11 @@ the schema together.
   job has no media, inputs or upload targets: the worker sends the
   translations to `POST /api/internal/event-text-translation`
   ([Event text translation](../../../docs/POSTPROD.md#event-text-translation)).
+- **`redaction`.** `REDACT` only: `intervals` (seconds from the start of
+  the video), `durationSec` and `card`, the removal card as a base64 PNG
+  drawn by the portal in the recording's language, or `null`. The upload
+  target is `redactedVideo`, and the job registers no artifact
+  ([Removal from a recording](../../../docs/POSTPROD.md#removal-from-a-recording)).
 - **`sourceDownloadUrl`.** A presigned GET for the recording's composite
   media.
 - **`inputs[]`.** Presigned GETs for dependencies, each with a `role`:
@@ -192,6 +201,7 @@ the schema together.
 | `SUBTITLE` | none | - | - | Reported `DONE` with no artifacts: `TRANSCRIBE` already writes the source-language VTT, and the portal does not enqueue this kind |
 | `REPORT` | `run_report` | `reportInput` | none: delivered to `/api/internal/event-report` | vLLM |
 | `TRANSLATE_TEXT` | `run_translate_text` | `textInput` | none: delivered to `/api/internal/event-text-translation` | the CPU translation engine (llama.cpp with EuroLLM-9B-Instruct), one request per line, never vLLM |
+| `REDACT` | `run_redact` | composite media, `redaction` | none: the redacted MP4 goes to `redactedVideo` and is delivered to `/api/internal/recording-redaction` | ffmpeg on CPU: one pass with `overlay` (or `drawbox` without a card) and `volume` enabled on the intervals, H.264 and AAC in MP4 |
 
 **How dubbing picks voices.** A voice is an `.onnx` file plus its
 `.onnx.json`. `voice_pool.build_voice_pool` lists every such voice for the
@@ -233,6 +243,10 @@ a cloned one.
   into `⟦n⟧` placeholders, splits the title on its kicker, and waits for the
   engine's cold start (`MT_CONNECT_WAIT_S`). It needs only `httpx`, and
   `main.py` imports it inside `run_translate_text`.
+- `redact.py`: the removal of a person from a video. It merges the
+  intervals, builds the ffmpeg filtergraph and command (pure, tested without
+  ffmpeg), probes the source with ffprobe and runs the encode, reporting
+  progress at most every 30 seconds so the lease stays alive.
 - `waveform.py`: a normalized peak envelope, drawn by the transcript editor.
 - `conftest.py`: adds this folder to `sys.path` for pytest.
 - `test_*.py`: the unit tests.
@@ -353,6 +367,7 @@ the public views without a GPU or a seeded models volume:
 - `DUB` produces a sine tone as long as the subtitles, with engine `stub`.
   The watermark and the video mux are still attempted.
 - `ARCHIVE` has no stub. It needs no models and runs the real ffmpeg mux.
+- `REDACT` has no stub either: it runs the real ffmpeg encode.
 
 The stub still needs ffmpeg, the portal and storage. With `gpu.enabled:
 false` and an empty `nodeSelector` and `tolerations`, it runs on ordinary

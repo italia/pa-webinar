@@ -789,7 +789,8 @@
     "accessDenied": {
       "title": "Táto sekcia nie je pre vašu rolu dostupná",
       "body": "Ako organizátor spravujete svoje vlastné podujatia: ich vytváranie a zverejňovanie, materiály, dotazníky a postprodukciu. Nastavenia platformy a údaje všetkých podujatí zostávajú správe.",
-      "back": "Prejsť na vaše podujatia"
+      "back": "Prejsť na vaše podujatia",
+      "organizerOnly": "Toto podujatie môžu upravovať len jeho organizátori. Ako administrátor vidíte jeho stav a podrobnosti a môžete ho archivovať alebo vymazať. Záznamy a ich obsah patria organizátorom a účastníkom."
     },
     "staffLogin": {
       "title": "Prihlásenie do administrácie",
@@ -1520,7 +1521,9 @@
       "breadcrumbAriaLabel": "Navigačná cesta",
       "skipToPage": "Prejsť na obsah stránky",
       "openMenu": "Otvoriť ponuku",
-      "closeMenu": "Zavrieť ponuku"
+      "closeMenu": "Zavrieť ponuku",
+      "recordingRemovals": "Žiadosti o odstránenie",
+      "recordingRemovalDetail": "Žiadosť o odstránenie"
     },
     "publications": {
       "subtitle": "Jednotný redakčný hub pre všetky zverejnené videá: naplánované podujatia, rýchle hovory, nahrané historické archívy a relácie čakajúce na zverejnenie.",
@@ -1664,7 +1667,8 @@
       "detailFilename": "Názov súboru",
       "transcriptManage": "Spravovať prepis / AI",
       "transcriptReady": "Prepísané",
-      "transcriptProcessing": "Spracúva sa"
+      "transcriptProcessing": "Spracúva sa",
+      "organizerOnly": "Len pre organizátorov"
     },
     "gdprAudit": {
       "subtitle": "Register akcií ochrany súkromia na osobných údajoch: vymazania, súhlasy, exporty",
@@ -1679,7 +1683,11 @@
         "DATA_DELETED": "Údaje vymazané",
         "CONSENT_RECORDED": "Súhlas zaznamenaný",
         "DATA_EXPORTED": "Údaje exportované",
-        "CONSENT_WITHDRAWN": "Súhlas odvolaný"
+        "CONSENT_WITHDRAWN": "Súhlas odvolaný",
+        "RECORDING_CONTENT_READ": "Obsah záznamu prečítaný personálom",
+        "RECORDING_REDACTION_REQUESTED": "Požiadané o odstránenie zo záznamu",
+        "RECORDING_REDACTION_REJECTED": "Žiadosť o odstránenie zamietnutá",
+        "RECORDING_REDACTED": "Osoba odstránená zo záznamu"
       },
       "recordsAffected": "{count} dotknutých záznamov",
       "colWhen": "Kedy",
@@ -1705,7 +1713,8 @@
       "rotating": "Regeneruje sa…",
       "regenerateTitle": "Regenerovať token moderátora (zruší starý odkaz)",
       "confirmRegenerate": "Naozaj chcete regenerovať token? Starý odkaz prestane fungovať.",
-      "noResults": "Žiadne podujatie nebolo nájdené."
+      "noResults": "Žiadne podujatie nebolo nájdené.",
+      "organizerOnlyLink": "Odkaz vidia len organizátori podujatia"
     },
     "registrations": {
       "subtitle": "Všetky osoby registrované na podujatia — vyhľadávanie, filtrovanie a export",
@@ -2137,7 +2146,8 @@
         "DATA_DELETED": "Údaje zmazané",
         "CONSENT_RECORDED": "Súhlas zaznamenaný",
         "DATA_EXPORTED": "Údaje exportované",
-        "CONSENT_WITHDRAWN": "Súhlas odvolaný"
+        "CONSENT_WITHDRAWN": "Súhlas odvolaný",
+        "RECORDING_CONTENT_READ": "Obsah záznamu prečítaný personálom"
       }
     },
     "settings": {
@@ -2449,6 +2459,40 @@
         "avgParticipantsPerEvent": "Priemerný počet účastníkov na udalosť",
         "avgFeedbackRating": "Priemerné hodnotenie spätnej väzby",
         "totalFeedback": "Odpovedí spätnej väzby"
+      },
+      "catalog": {
+        "title": "Typy udalostí a šablóny",
+        "intro": "Koľko udalostí každého typu a z každej šablóny, mesiac po mesiaci. Len počty a priemery, žiadne osobné údaje. Koncepty sa nepočítajú.",
+        "periodLabel": "Obdobie",
+        "months": "{count, plural, one {# mesiac} few {# mesiace} many {# mesiaca} other {# mesiacov}}",
+        "groupByLabel": "Zoskupiť podľa",
+        "groupBy": {
+          "type": "Typ udalosti",
+          "template": "Šablóna"
+        },
+        "rankingTypes": "Najčastejšie typy",
+        "rankingTemplates": "Najpoužívanejšie šablóny",
+        "columns": {
+          "type": "Typ",
+          "template": "Šablóna",
+          "events": "Udalosti",
+          "held": "Uskutočnené",
+          "avgParticipants": "Priem. účastníci",
+          "avgDuration": "Priem. trvanie",
+          "total": "Celé obdobie"
+        },
+        "measuresNote": "Uskutočnené: udalosti, ktorých miestnosť sa otvorila. Priemerný počet účastníkov: najvyšší počet súčasne prítomných osôb vrátane hostí, v priemere za uskutočnené udalosti. Priemerné trvanie: nameraný čas v miestnosti, nie plánovaný.",
+        "byMonth": "Mesiac po mesiaci",
+        "measureLabel": "Ukazovateľ",
+        "measures": {
+          "events": "Udalosti",
+          "avgParticipants": "Priemerný počet účastníkov",
+          "avgDurationMinutes": "Priemerné trvanie"
+        },
+        "byMonthCaption": "{measure} po mesiacoch",
+        "empty": "V tomto období nie sú žiadne udalosti.",
+        "deletedTemplate": "{name} (odstránená)",
+        "uncatalogedNote": "Nezaradené udalosti: {count}. Vznikli pred zavedením katalógu alebo bez šablóny a bez formátu; zaradiť ich môžete pri úprave udalosti, v technických údajoch."
       }
     },
     "recurrence": {
@@ -2517,7 +2561,8 @@
       "postEventPublic": "Verejná stránka po udalosti",
       "offerAddressBook": "Ponúka adresár osobám, ktoré sa registrujú",
       "invalidFields": "Skontrolujte tieto polia: {fields}.",
-      "descriptionOtherLanguages": "Existujú aj verzie v jazykoch: {languages}, ktoré tu nemožno upraviť. Ak zmeníte taliansky text, odstránia sa."
+      "descriptionOtherLanguages": "Existujú aj verzie v jazykoch: {languages}, ktoré tu nemožno upraviť. Ak zmeníte taliansky text, odstránia sa.",
+      "usedBy": "Udalosti vytvorené z tejto šablóny: {count}"
     },
     "instantCall": {
       "title": "Okamžitý videohovor",
@@ -3029,7 +3074,20 @@
         "publishNow": "Zverejniť teraz"
       },
       "editFeatures": "Upraviť funkcie",
-      "editPrivacy": "Upraviť súkromie a údaje"
+      "editPrivacy": "Upraviť súkromie a údaje",
+      "governance": {
+        "title": "Toto podujatie spravujete ako administrátor",
+        "body": "Nepatríte medzi jeho organizátorov: vidíte stav, podrobnosti, registrácie a súhlasy a môžete ho archivovať alebo vymazať. Vedenie podujatia, odkaz moderátora a obsah záznamov (video, prepisy, zhrnutia) patria organizátorom.",
+        "recording": "Obsah záznamu je dostupný len organizátorom podujatia a jeho účastníkom. Tu vidíte, či existuje, a jeho podrobnosti.",
+        "recordingFile": "Záznam",
+        "present": "Existuje",
+        "absent": "Žiadny",
+        "recordingPublished": "Zverejnené",
+        "yes": "Áno",
+        "no": "Nie",
+        "recordingDuration": "Trvanie",
+        "recordingSize": "Veľkosť"
+      }
     },
     "rubrica": {
       "subtitle": "Osoby, ktoré dali súhlas so zaradením do adresára (čl. 6.1.a GDPR). Meno, e-mail a organizácia sa aktualizujú iba vtedy, keď osoba políčko znova začiarkne.",
@@ -3299,7 +3357,8 @@
         "metricsTitle": "Metriky zhrnutia (LLM)",
         "chars": "znakov",
         "model": "Model",
-        "notAvailable": "neuv."
+        "notAvailable": "neuv.",
+        "contentHidden": "Dostupné len organizátorom podujatia."
       },
       "rel": {
         "title": "Spoľahlivosť AI",
@@ -3456,7 +3515,8 @@
         "alignNone": "Žiadna zmena snímky na zarovnanie.",
         "previewTitle": "Náhľad",
         "previewHelp": "Video so snímkami tak, ako ich uvidia diváci, s korekciou zadanou vyššie."
-      }
+      },
+      "contentOrganizerOnly": "Obsah tohto záznamu (video, stopy, prepis, zhrnutie, preklady) môžu vidieť a upravovať len organizátori tohto podujatia. Tu vidíte jeho stav, úlohy spracovania a podrobnosti súborov."
     },
     "questionnairesPage": {
       "subtitle": "Opakovane použiteľné šablóny otázok pre predregistračné a po-podujatie dotazníky."
@@ -3748,7 +3808,9 @@
       "publishDesc": "Pred zverejnením ju skontrolujte: text napísal model umelej inteligencie. Znova vytvorenú správu treba znova zverejniť.",
       "preview": "Náhľad",
       "hidePreview": "Skryť náhľad",
-      "previewLanguage": "Jazyk"
+      "previewLanguage": "Jazyk",
+      "organizerOnly": "Správu môžu vyžiadať, čítať a zverejniť len organizátori tohto podujatia.",
+      "organizerOnlyExists": "Správa existuje. Čítať a zverejniť ju môžu len organizátori tohto podujatia."
     },
     "endEvent": "Ukončiť podujatie",
     "endEventConfirmTitle": "Ukončiť podujatie pre všetkých?",
@@ -4073,6 +4135,122 @@
       },
       "retainedNote": "{count, plural, one {# doklad sa uchováva} few {# doklady sa uchovávajú} many {# dokladu sa uchováva} other {# dokladov sa uchováva}}, kým video alebo prepis existujú.",
       "countsNote": "Počítajú sa osoby: registrácia, účet tímu alebo menný odkaz sa počítajú raz; hosť, ktorý sa vráti pri inej návšteve, sa počíta znova."
+    },
+    "recordingRemovals": {
+      "subtitle": "Ľudia, ktorí požiadali, aby sa neobjavovali v zázname. Kým je žiadosť otvorená, môžete daný záznam otvoriť v editore odstránenia a každý prístup zostáva v protokole operácií.",
+      "filterOpen": "Otvorené",
+      "filterAll": "Všetky",
+      "filterLabel": "Ktoré žiadosti",
+      "empty": "Žiadne žiadosti.",
+      "loadError": "Žiadosti sa nepodarilo načítať.",
+      "colReceived": "Prijatá",
+      "colPerson": "Osoba",
+      "colEvent": "Podujatie",
+      "colSource": "Pôvod",
+      "colStatus": "Stav",
+      "open": "Otvoriť",
+      "unnamed": "Osoba bez mena",
+      "sources": {
+        "self-service": "Moje údaje",
+        "admin": "Tím"
+      },
+      "statuses": {
+        "OPEN": "Otvorená",
+        "IN_PROGRESS": "Vybavuje sa",
+        "PROCESSING": "Spracúva sa",
+        "CLOSED": "Uzavretá",
+        "REJECTED": "Zamietnutá"
+      },
+      "kinds": {
+        "registrant": "Prihlásený",
+        "host": "Moderuje",
+        "guest": "Hosť"
+      },
+      "newOpen": "Zaevidovať žiadosť",
+      "newTitle": "Žiadosť prijatá inou cestou",
+      "newIntro": "Pre žiadosť, ktorá prišla prevádzkovateľovi e-mailom, poštou alebo osobne. Vyberte záznam a, ak ju spoznáte, osobu spomedzi tých, ktorí boli v miestnosti.",
+      "recordingSearch": "Hľadať podujatie",
+      "recordingLabel": "Záznam",
+      "recordingChoose": "Vyberte záznam",
+      "recordingOption": "{title} · {date}",
+      "recordingNone": "Žiadny záznam s videom alebo so stopami jednotlivých účastníkov.",
+      "peopleLabel": "Kto bol v miestnosti",
+      "peopleNone": "Miestnosť nezanechala záznam o tom, kto v nej bol: zadajte meno a intervaly vyznačíte ručne.",
+      "personNotInVideo": "mimo záberu",
+      "personTimes": "od {from} do {to}",
+      "personStill": "od {from} až do konca",
+      "nameLabel": "Meno osoby",
+      "noteLabel": "Ako žiadosť prišla (nepovinné)",
+      "create": "Zaevidovať žiadosť",
+      "createError": "Žiadosť sa nepodarilo zaevidovať.",
+      "cancel": "Zrušiť",
+      "back": "Všetky žiadosti",
+      "fieldPerson": "Osoba",
+      "fieldEvent": "Podujatie",
+      "fieldReceived": "Prijatá",
+      "fieldSource": "Pôvod",
+      "fieldStatus": "Stav",
+      "fieldNote": "Poznámka",
+      "externalCopy": "Toto podujatie má video na externom webe (napríklad YouTube): odstránenie sa ho netýka. Odstráňte ho alebo nahraďte aj tam.",
+      "publishedElsewhere": "Zverejnené video podujatia je iný súbor ako tento záznam: odstránenie ho nezmení. Nahraďte ho alebo ho stiahnite zo stránky podujatia.",
+      "pipelineOff": "Postprodukcia je vypnutá: úloha odstránenia čaká vo fronte, kým ju nezapnete, a prepis sa znova nevytvorí.",
+      "noVideo": "Tento záznam nemá video, iba stopy jednotlivých účastníkov: stopy danej osoby sa vymažú a prepis sa vytvorí znova zo zvyšných.",
+      "noRecording": "Záznam už neexistuje: nie je čo odstrániť.",
+      "keyOnly": "Kľúčom inštancie záznam neotvoríte: prihláste sa svojím administrátorským účtom.",
+      "startIntro": "Ak chcete osobu odstrániť, musíte otvoriť záznam. Prístup platí len pre túto žiadosť a zostáva v protokole operácií s vaším účtom.",
+      "start": "Otvoriť editor odstránenia",
+      "processing": "Prebieha odstraňovanie: upravené video nahradí originál. Stav úlohy: {status}.",
+      "closed": "Žiadosť uzavretá {date}.",
+      "closedIntervals": "{count, plural, =0 {Nebol zakrytý žiadny interval.} one {# interval zakrytý.} few {# intervaly zakryté.} many {# intervalu zakrytého.} other {# intervalov zakrytých.}}",
+      "rejected": "Žiadosť zamietnutá {date}.",
+      "lastError": "Posledné spracovanie sa nepodarilo: {error}. Skontrolujte intervaly a odošlite znova.",
+      "rejectTitle": "Zamietnuť žiadosť",
+      "rejectLabel": "Dôvod",
+      "reject": "Zamietnuť",
+      "rejectConfirm": "Zamietnuť žiadosť? Osoba uvidí, že bola zamietnutá.",
+      "actionError": "Operácia sa nepodarila (HTTP {code}).",
+      "editorTitle": "Intervaly na zakrytie",
+      "editorHint": "Návrhy vychádzajú z toho, kto bol v miestnosti, kto hovoril, a zo stôp jednotlivých účastníkov: časy hovorenia sú približné. Pozrite si video a opravte ich. V každom intervale sa video zmení na tabuľu „obsah odstránený na žiadosť“ a zvuk sa stlmí; dĺžka sa nemení.",
+      "sourcePresence": "V miestnosti",
+      "sourceSpeech": "Hovorí",
+      "sourceTrack": "Stopa",
+      "selectedLegend": "Na zakrytie",
+      "useProposals": "Začať znova od návrhov",
+      "addInterval": "Pridať interval sem",
+      "fieldStart": "Začiatok",
+      "fieldEnd": "Koniec",
+      "setStart": "Začiatok tu",
+      "setEnd": "Koniec tu",
+      "seek": "Prejsť",
+      "remove": "Odobrať",
+      "intervalLabel": "Interval {n}",
+      "noIntervalsVideo": "Žiadny interval na zakrytie. Ak sa osoba vo videu neobjavuje, žiadosť zamietnite a uveďte dôvod.",
+      "total": "{count, plural, one {# interval} few {# intervaly} many {# intervalu} other {# intervalov}} · {seconds} s na zakrytie",
+      "timeHint": "Časy vo formáte hodiny:minúty:sekundy, ako v prehrávači.",
+      "invalidTime": "Neplatný čas",
+      "preview": "Náhľad odstránenia",
+      "timelineLabel": "Časová os záznamu",
+      "mediaError": "Video sa nenačítava. Načítajte stránku znova.",
+      "submit": "Odstrániť osobu zo záznamu",
+      "submitConfirm": "Pôvodné video a stopy danej osoby sa vymažú a postprodukcia sa vykoná znova. Nedá sa to vrátiť späť. Pokračovať?",
+      "submitDone": "Žiadosť uzavretá: osoba bola odstránená."
+    },
+    "catalog": {
+      "fieldTitle": "Katalóg",
+      "fieldHelp": "Typ udalosti a šablóna, z ktorej vznikla, slúžia len na štatistiky inštancie a nemenia žiadne nastavenie. Opravte ich, ak je udalosť zaradená nesprávne alebo nie je zaradená vôbec.",
+      "typeLabel": "Typ udalosti",
+      "templateLabel": "Šablóna",
+      "noTemplate": "Bez šablóny",
+      "deletedTemplate": "Vytvorené zo šablóny „{name}“, ktorá bola medzitým odstránená.",
+      "deletedOption": "{name} (odstránená)",
+      "types": {
+        "MEETING": "Porada",
+        "PARTICIPATORY": "Participatívna udalosť",
+        "PUBLIC": "Verejná udalosť",
+        "INSTANT": "Rýchly hovor",
+        "LEGACY": "Importovaná publikácia",
+        "UNCATALOGED": "Nezaradené"
+      }
     }
   },
   "email": {
@@ -4609,7 +4787,19 @@
       "addressBookPendingEffect": "Ak potvrdíte, vrátite sa do adresára s menom a organizáciou z tejto registrácie a budete opäť dostávať pozvánky. Ak zrušíte alebo ak ste to neboli vy, zostanete mimo adresára a pozvánky dostávať nebudete.",
       "addressBookPendingConfirm": "Potvrdiť návrat",
       "addressBookPendingCancel": "Zrušiť žiadosť",
-      "addressBookPendingGone": "Táto žiadosť už nečaká na potvrdenie. Znova načítajte stránku, aby ste videli aktuálny stav."
+      "addressBookPendingGone": "Táto žiadosť už nečaká na potvrdenie. Znova načítajte stránku, aby ste videli aktuálny stav.",
+      "removalTitle": "Záznam podujatia",
+      "removalIntro": "Toto podujatie bolo zaznamenané. Ak sa v zázname nechcete objaviť, môžete požiadať o odstránenie: časti, v ktorých sa objavujete alebo hovoríte, sa prekryjú informačnou tabuľou a stlmia a prepis, titulky a zhrnutie sa vytvoria znova. Žiadosť ide prevádzkovateľovi osobných údajov, ktorý ju posúdi.",
+      "removalButton": "Nechcem sa objaviť v tomto zázname",
+      "removalConfirmTitle": "Potvrdzujete žiadosť?",
+      "removalConfirmBody": "Prevádzkovateľ odstráni zo záznamu časti, v ktorých sa objavujete alebo hovoríte. Kópie zverejnené na iných weboch, napríklad na YouTube, musí osobitne odstrániť ten, kto ich zverejnil.",
+      "removalConfirm": "Odoslať žiadosť",
+      "removalCancel": "Zrušiť",
+      "removalSent": "Žiadosť odoslaná. Prevádzkovateľ ju posúdi.",
+      "removalError": "Žiadosť sa nepodarilo odoslať. Skúste to neskôr.",
+      "removalStatusOpen": "Žiadosť zo dňa {date}: vybavuje sa.",
+      "removalStatusClosed": "Žiadosť zo dňa {date}: vybavená {closed}.",
+      "removalStatusRejected": "Žiadosť zo dňa {date}: zamietnutá. Napíšte prevádzkovateľovi, aby ste sa dozvedeli dôvod."
     },
     "erasure": {
       "title": "Vymazanie vašich údajov",
@@ -6022,6 +6212,11 @@
     "captionsTranscriptNotTranslatable": "Tento prepis pochádza zo živých titulkov: automatický preklad vyžaduje AI prepis záznamu.",
     "sameLanguage": "Zvolený jazyk je pôvodný jazyk záznamu: vyberte iný.",
     "recordingDestinationNotCovered": "Súhlasy pre toto podujatie platia pre záznam len pre registrovaných: nemôžete ho sprístupniť všetkým ani pripojiť externé video.",
-    "mtUnavailable": "Strojový preklad nie je na tejto inštancii nainštalovaný."
+    "mtUnavailable": "Strojový preklad nie je na tejto inštancii nainštalovaný.",
+    "recordingContentOrganizerOnly": "Obsah záznamov tohto podujatia môžu otvárať, meniť alebo zverejňovať len jeho organizátori."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Obsah odstránený na žiadosť",
+    "cardBody": "Táto časť záznamu bola odstránená na žiadosť osoby, ktorá sa v ňom objavila."
   }
 }

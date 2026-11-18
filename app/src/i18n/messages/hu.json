@@ -789,7 +789,8 @@
     "accessDenied": {
       "title": "Ez a rész az Ön szerepköre számára nem érhető el",
       "body": "Szervezőként a saját eseményeit kezeli: létrehozás, közzététel, anyagok, kérdőívek és utómunka. A platform beállításai és az összes esemény adatai az adminisztrációnál maradnak.",
-      "back": "Ugrás a saját eseményeihez"
+      "back": "Ugrás a saját eseményeihez",
+      "organizerOnly": "Ezt az eseményt csak a szervezői szerkeszthetik. Adminisztrátorként látja az állapotát és a részleteit, és archiválhatja vagy törölheti. A felvételek és tartalmuk a szervezőké és a résztvevőké."
     },
     "staffLogin": {
       "title": "Belépés az adminisztrációs felületre",
@@ -1520,7 +1521,9 @@
       "breadcrumbAriaLabel": "Morzsamenü",
       "skipToPage": "Ugrás az oldal tartalmára",
       "openMenu": "Menü megnyitása",
-      "closeMenu": "Menü bezárása"
+      "closeMenu": "Menü bezárása",
+      "recordingRemovals": "Eltávolítási kérelmek",
+      "recordingRemovalDetail": "Eltávolítási kérelem"
     },
     "publications": {
       "subtitle": "Egységes szerkesztőségi központ minden közzétett videóhoz: ütemezett események, azonnali hívások, feltöltött archív felvételek és előléptetésre váró munkamenetek.",
@@ -1664,7 +1667,8 @@
       "detailFilename": "Fájlnév",
       "transcriptManage": "Átirat / AI kezelése",
       "transcriptReady": "Átirat kész",
-      "transcriptProcessing": "Feldolg. alatt"
+      "transcriptProcessing": "Feldolg. alatt",
+      "organizerOnly": "Csak szervezőknek"
     },
     "gdprAudit": {
       "subtitle": "A személyes adatokon végzett adatvédelmi műveletek naplója: törlések, hozzájárulások, exportok",
@@ -1679,7 +1683,11 @@
         "DATA_DELETED": "Adatok törölve",
         "CONSENT_RECORDED": "Hozzájárulás rögzítve",
         "DATA_EXPORTED": "Adatok exportálva",
-        "CONSENT_WITHDRAWN": "Hozzájárulás visszavonva"
+        "CONSENT_WITHDRAWN": "Hozzájárulás visszavonva",
+        "RECORDING_CONTENT_READ": "A felvétel tartalmát a személyzet olvasta",
+        "RECORDING_REDACTION_REQUESTED": "Felvételből való eltávolítás kérelmezve",
+        "RECORDING_REDACTION_REJECTED": "Eltávolítási kérelem elutasítva",
+        "RECORDING_REDACTED": "Személy eltávolítva egy felvételből"
       },
       "recordsAffected": "{count} érintett rekord",
       "colWhen": "Mikor",
@@ -1705,7 +1713,8 @@
       "rotating": "Újragenerálás…",
       "regenerateTitle": "Moderátori token újragenerálása (a régi hivatkozás érvénytelenné válik)",
       "confirmRegenerate": "Biztosan újragenerálja a tokent? A régi hivatkozás többé nem fog működni.",
-      "noResults": "Nem található esemény."
+      "noResults": "Nem található esemény.",
+      "organizerOnlyLink": "A hivatkozást csak az esemény szervezői látják"
     },
     "registrations": {
       "subtitle": "Az eseményekre regisztrált összes személy — keresés, szűrés és exportálás",
@@ -2137,7 +2146,8 @@
         "DATA_DELETED": "Adatok törölve",
         "CONSENT_RECORDED": "Hozzájárulás rögzítve",
         "DATA_EXPORTED": "Adatok exportálva",
-        "CONSENT_WITHDRAWN": "Hozzájárulás visszavonva"
+        "CONSENT_WITHDRAWN": "Hozzájárulás visszavonva",
+        "RECORDING_CONTENT_READ": "A felvétel tartalmát a személyzet olvasta"
       }
     },
     "settings": {
@@ -2449,6 +2459,40 @@
         "avgParticipantsPerEvent": "Átlagos résztvevőszám eseményenként",
         "avgFeedbackRating": "Átlagos visszajelzési értékelés",
         "totalFeedback": "Visszajelzési válaszok"
+      },
+      "catalog": {
+        "title": "Eseménytípusok és sablonok",
+        "intro": "Hány esemény van az egyes típusokból és sablonokból, hónapról hónapra. Csak darabszámok és átlagok, személyes adatok nélkül. A piszkozatok nem számítanak.",
+        "periodLabel": "Időszak",
+        "months": "{count, plural, one {# hónap} other {# hónap}}",
+        "groupByLabel": "Csoportosítás",
+        "groupBy": {
+          "type": "Eseménytípus",
+          "template": "Sablon"
+        },
+        "rankingTypes": "A leggyakoribb típusok",
+        "rankingTemplates": "A leggyakrabban használt sablonok",
+        "columns": {
+          "type": "Típus",
+          "template": "Sablon",
+          "events": "Események",
+          "held": "Megtartva",
+          "avgParticipants": "Átl. résztvevő",
+          "avgDuration": "Átl. időtartam",
+          "total": "A teljes időszak"
+        },
+        "measuresNote": "Megtartva: azok az események, amelyek terme megnyílt. Átlagos résztvevőszám: az egyszerre jelen lévők legmagasabb száma a vendégekkel együtt, a megtartott események átlagában. Átlagos időtartam: a mért teremidő, nem a tervezett.",
+        "byMonth": "Hónapról hónapra",
+        "measureLabel": "Mutató",
+        "measures": {
+          "events": "Események",
+          "avgParticipants": "Átlagos résztvevőszám",
+          "avgDurationMinutes": "Átlagos időtartam"
+        },
+        "byMonthCaption": "{measure} havonta",
+        "empty": "Ebben az időszakban nincs esemény.",
+        "deletedTemplate": "{name} (törölve)",
+        "uncatalogedNote": "Nem katalogizált események: {count}. A katalógus előtt, vagy sablon és formátum nélkül jöttek létre; az esemény szerkesztésekor, a technikai részleteknél katalogizálhatók."
       }
     },
     "recurrence": {
@@ -2517,7 +2561,8 @@
       "postEventPublic": "Nyilvános esemény utáni oldal",
       "offerAddressBook": "Felajánlja a címjegyzéket a regisztrálóknak",
       "invalidFields": "Ellenőrizze ezeket a mezőket: {fields}.",
-      "descriptionOtherLanguages": "Más nyelvű változatok is vannak: {languages}, amelyek itt nem szerkeszthetők. Ha módosítja az olasz szöveget, törlődnek."
+      "descriptionOtherLanguages": "Más nyelvű változatok is vannak: {languages}, amelyek itt nem szerkeszthetők. Ha módosítja az olasz szöveget, törlődnek.",
+      "usedBy": "Ebből a sablonból létrehozott események: {count}"
     },
     "instantCall": {
       "title": "Azonnali videohívás",
@@ -3029,7 +3074,20 @@
         "publishNow": "Közzététel most"
       },
       "editFeatures": "Funkciók szerkesztése",
-      "editPrivacy": "Adatvédelem és adatok szerkesztése"
+      "editPrivacy": "Adatvédelem és adatok szerkesztése",
+      "governance": {
+        "title": "Ezt az eseményt adminisztrátorként kezeli",
+        "body": "Ön nem tartozik a szervezői közé: látja az állapotot, a részleteket, a regisztrációkat és a hozzájárulásokat, és archiválhatja vagy törölheti az eseményt. Az esemény levezetése, a moderátori hivatkozás és a felvételek tartalma (videó, átiratok, összefoglalók) a szervezőké.",
+        "recording": "A felvétel tartalma csak az esemény szervezői és résztvevői számára érhető el. Itt látja, hogy létezik-e, és a részleteit.",
+        "recordingFile": "Felvétel",
+        "present": "Van",
+        "absent": "Nincs",
+        "recordingPublished": "Közzétéve",
+        "yes": "Igen",
+        "no": "Nem",
+        "recordingDuration": "Időtartam",
+        "recordingSize": "Méret"
+      }
     },
     "rubrica": {
       "subtitle": "A címjegyzékbe való felvételhez hozzájárulást adó személyek (GDPR 6. cikk (1) bekezdés a) pont). A név, az e-mail cím és a szervezet csak akkor frissül, ha a személy ismét bejelöli a jelölőnégyzetet.",
@@ -3299,7 +3357,8 @@
         "metricsTitle": "Az összefoglaló mutatói (LLM)",
         "chars": "karakter",
         "model": "Modell",
-        "notAvailable": "n. a."
+        "notAvailable": "n. a.",
+        "contentHidden": "Csak az esemény szervezői számára érhető el."
       },
       "rel": {
         "title": "Az AI megbízhatósága",
@@ -3456,7 +3515,8 @@
         "alignNone": "Nincs igazítandó diaváltás.",
         "previewTitle": "Előnézet",
         "previewHelp": "A videó a diákkal úgy, ahogy a közönség látni fogja, a fent megadott javítással."
-      }
+      },
+      "contentOrganizerOnly": "Ennek a felvételnek a tartalmát (videó, sávok, átirat, összefoglaló, fordítások) csak az esemény szervezői láthatják és szerkeszthetik. Itt látja az állapotát, a feldolgozási feladatokat és a fájlok részleteit."
     },
     "questionnairesPage": {
       "subtitle": "Újrafelhasználható kérdéssablonok regisztráció előtti és esemény utáni kérdőívekhez."
@@ -3748,7 +3808,9 @@
       "publishDesc": "Közzététel előtt nézze át: a szöveget mesterségesintelligencia-modell írta. Az újrakészített beszámolót újra közzé kell tenni.",
       "preview": "Előnézet",
       "hidePreview": "Előnézet elrejtése",
-      "previewLanguage": "Nyelv"
+      "previewLanguage": "Nyelv",
+      "organizerOnly": "A beszámolót csak az esemény szervezői kérhetik, olvashatják és tehetik közzé.",
+      "organizerOnlyExists": "A beszámoló elkészült. Csak az esemény szervezői olvashatják és tehetik közzé."
     },
     "endEvent": "Esemény befejezése",
     "endEventConfirmTitle": "Befejezi az eseményt mindenkinek?",
@@ -4073,6 +4135,122 @@
       },
       "retainedNote": "{count, plural, one {# igazolást őrzünk meg} other {# igazolást őrzünk meg}}, amíg a videó vagy az átirat létezik.",
       "countsNote": "Személyeket számolunk: egy regisztráció, egy munkatársi fiók vagy egy névre szóló link egyszer számít; a másik látogatáskor visszatérő vendég újra számít."
+    },
+    "recordingRemovals": {
+      "subtitle": "Azok a személyek, akik kérték, hogy ne szerepeljenek egy felvételen. Amíg egy kérelem nyitott, megnyithatja az adott felvételt az eltávolítási szerkesztőből, és minden hozzáférés megmarad a műveleti naplóban.",
+      "filterOpen": "Nyitottak",
+      "filterAll": "Mind",
+      "filterLabel": "Mely kérelmek",
+      "empty": "Nincs kérelem.",
+      "loadError": "A kérelmeket nem sikerült betölteni.",
+      "colReceived": "Beérkezett",
+      "colPerson": "Személy",
+      "colEvent": "Esemény",
+      "colSource": "Forrás",
+      "colStatus": "Állapot",
+      "open": "Megnyitás",
+      "unnamed": "Névtelen személy",
+      "sources": {
+        "self-service": "Az én adataim",
+        "admin": "Munkatársak"
+      },
+      "statuses": {
+        "OPEN": "Nyitott",
+        "IN_PROGRESS": "Folyamatban",
+        "PROCESSING": "Feldolgozás alatt",
+        "CLOSED": "Lezárva",
+        "REJECTED": "Elutasítva"
+      },
+      "kinds": {
+        "registrant": "Jelentkezett",
+        "host": "Vezet",
+        "guest": "Vendég"
+      },
+      "newOpen": "Kérelem rögzítése",
+      "newTitle": "Más úton érkezett kérelem",
+      "newIntro": "Olyan kérelemhez, amely e-mailben, postán vagy személyesen jutott el az adatkezelőhöz. Válassza ki a felvételt és, ha felismeri, a személyt a teremben jelen lévők közül.",
+      "recordingSearch": "Esemény keresése",
+      "recordingLabel": "Felvétel",
+      "recordingChoose": "Válasszon felvételt",
+      "recordingOption": "{title} · {date}",
+      "recordingNone": "Nincs videót vagy résztvevőnkénti sávokat tartalmazó felvétel.",
+      "peopleLabel": "Kik voltak a teremben",
+      "peopleNone": "A terem nem rögzítette, kik voltak jelen: adja meg a nevet, az intervallumokat pedig kézzel jelöli majd ki.",
+      "personNotInVideo": "nem látható a videón",
+      "personTimes": "{from} és {to} között",
+      "personStill": "{from} időponttól a végéig",
+      "nameLabel": "A személy neve",
+      "noteLabel": "Hogyan érkezett a kérelem (nem kötelező)",
+      "create": "Kérelem rögzítése",
+      "createError": "A kérelmet nem sikerült rögzíteni.",
+      "cancel": "Mégse",
+      "back": "Összes kérelem",
+      "fieldPerson": "Személy",
+      "fieldEvent": "Esemény",
+      "fieldReceived": "Beérkezett",
+      "fieldSource": "Forrás",
+      "fieldStatus": "Állapot",
+      "fieldNote": "Megjegyzés",
+      "externalCopy": "Ennek az eseménynek van videója egy külső oldalon (például a YouTube-on): az eltávolítás arra nem terjed ki. Ott is távolítsa el vagy cserélje le.",
+      "publishedElsewhere": "Az esemény közzétett videója más fájl, mint ez a felvétel: az eltávolítás nem változtatja meg. Cserélje le, vagy vegye le az esemény oldaláról.",
+      "pipelineOff": "Az utómunka ki van kapcsolva: az eltávolítási feladat a sorban vár, amíg be nem kapcsolja, és az átirat nem készül el újra.",
+      "noVideo": "Ennek a felvételnek nincs videója, csak résztvevőnkénti sávjai: a személy sávjai törlődnek, és az átirat a megmaradtakból készül el újra.",
+      "noRecording": "A felvétel már nem létezik: nincs mit eltávolítani.",
+      "keyOnly": "A példány kulcsával nem nyitható meg felvétel: jelentkezzen be adminisztrátori fiókjával.",
+      "startIntro": "A személy eltávolításához meg kell nyitnia a felvételt. A hozzáférés csak erre a kérelemre érvényes, és a fiókjával együtt megmarad a műveleti naplóban.",
+      "start": "Eltávolítási szerkesztő megnyitása",
+      "processing": "Eltávolítás folyamatban: a megtisztított videó az eredeti helyére kerül. A feladat állapota: {status}.",
+      "closed": "Kérelem lezárva: {date}.",
+      "closedIntervals": "{count, plural, =0 {Nincs letakart intervallum.} one {# intervallum letakarva.} other {# intervallum letakarva.}}",
+      "rejected": "Kérelem elutasítva: {date}.",
+      "lastError": "Az utolsó feldolgozás nem sikerült: {error}. Ellenőrizze az intervallumokat, és küldje el újra.",
+      "rejectTitle": "Kérelem elutasítása",
+      "rejectLabel": "Indok",
+      "reject": "Elutasítás",
+      "rejectConfirm": "Elutasítja a kérelmet? A személy látni fogja, hogy elutasították.",
+      "actionError": "A művelet nem sikerült (HTTP {code}).",
+      "editorTitle": "Letakarandó intervallumok",
+      "editorHint": "A javaslatok abból származnak, kik voltak a teremben és kik beszéltek, valamint a résztvevőnkénti sávokból: a beszédidők közelítőek. Nézze meg a videót, és javítsa ki őket. Minden intervallumban a videó helyén a „kérelemre eltávolított tartalom” tábla jelenik meg, a hang pedig elnémul; az időtartam nem változik.",
+      "sourcePresence": "A teremben",
+      "sourceSpeech": "Beszél",
+      "sourceTrack": "Sáv",
+      "selectedLegend": "Letakarandó",
+      "useProposals": "Újrakezdés a javaslatokból",
+      "addInterval": "Intervallum hozzáadása ide",
+      "fieldStart": "Kezdet",
+      "fieldEnd": "Vége",
+      "setStart": "Kezdet itt",
+      "setEnd": "Vége itt",
+      "seek": "Ugrás",
+      "remove": "Eltávolítás",
+      "intervalLabel": "{n}. intervallum",
+      "noIntervalsVideo": "Nincs letakarandó intervallum. Ha a személy nem látható a videón, utasítsa el a kérelmet az indok megadásával.",
+      "total": "{count, plural, one {# intervallum} other {# intervallum}} · {seconds} mp letakarandó",
+      "timeHint": "Az idők óra:perc:másodperc formátumban, mint a lejátszóban.",
+      "invalidTime": "Érvénytelen idő",
+      "preview": "Az eltávolítás előnézete",
+      "timelineLabel": "A felvétel idővonala",
+      "mediaError": "A videó nem töltődik be. Töltse be újra az oldalt.",
+      "submit": "Személy eltávolítása a felvételből",
+      "submitConfirm": "Az eredeti videó és a személy sávjai törlődnek, az utómunka pedig újra lefut. Ez nem vonható vissza. Folytatja?",
+      "submitDone": "Kérelem lezárva: a személyt eltávolították."
+    },
+    "catalog": {
+      "fieldTitle": "Katalógus",
+      "fieldHelp": "Az esemény típusa és a sablon, amelyből létrejött, csak a példány statisztikáihoz kell, és egyetlen beállítást sem módosít. Javítsa ki őket, ha az esemény hibásan vagy egyáltalán nincs katalogizálva.",
+      "typeLabel": "Eseménytípus",
+      "templateLabel": "Sablon",
+      "noTemplate": "Nincs sablon",
+      "deletedTemplate": "A(z) „{name}” sablonból készült, amelyet azóta töröltek.",
+      "deletedOption": "{name} (törölve)",
+      "types": {
+        "MEETING": "Megbeszélés",
+        "PARTICIPATORY": "Részvételi esemény",
+        "PUBLIC": "Nyilvános esemény",
+        "INSTANT": "Azonnali hívás",
+        "LEGACY": "Importált közzététel",
+        "UNCATALOGED": "Nincs katalogizálva"
+      }
     }
   },
   "email": {
@@ -4609,7 +4787,19 @@
       "addressBookPendingEffect": "Ha megerősíti, az ebben a regisztrációban szereplő névvel és szervezettel visszakerül a címjegyzékbe, és ismét kap meghívókat. Ha visszavonja a kérést, vagy ha nem Ön volt, a címjegyzéken kívül marad, és nem kap meghívókat.",
       "addressBookPendingConfirm": "Visszatérés megerősítése",
       "addressBookPendingCancel": "Kérés visszavonása",
-      "addressBookPendingGone": "Ez a kérés már nem vár megerősítésre. Töltse be újra az oldalt a jelenlegi állapot megtekintéséhez."
+      "addressBookPendingGone": "Ez a kérés már nem vár megerősítésre. Töltse be újra az oldalt a jelenlegi állapot megtekintéséhez.",
+      "removalTitle": "Az esemény felvétele",
+      "removalIntro": "Ezt az eseményt rögzítették. Ha nem szeretne szerepelni a felvételen, kérheti, hogy eltávolítsák belőle: azokat a részeket, ahol Ön látható vagy beszél, egy tájékoztató tábla takarja el és elnémítják, az átiratot, a feliratokat és az összefoglalót pedig újra elkészítik. A kérelem az adatkezelőhöz kerül, aki megvizsgálja.",
+      "removalButton": "Nem szeretnék szerepelni ezen a felvételen",
+      "removalConfirmTitle": "Megerősíti a kérelmet?",
+      "removalConfirmBody": "Az adatkezelő eltávolítja a felvételből azokat a részeket, ahol Ön látható vagy beszél. A más oldalakon, például a YouTube-on közzétett másolatokat külön kell eltávolítania annak, aki közzétette őket.",
+      "removalConfirm": "Kérelem elküldése",
+      "removalCancel": "Mégse",
+      "removalSent": "A kérelmet elküldtük. Az adatkezelő megvizsgálja.",
+      "removalError": "A kérelmet nem sikerült elküldeni. Próbálja újra később.",
+      "removalStatusOpen": "Kérelem ({date}): folyamatban.",
+      "removalStatusClosed": "Kérelem ({date}): teljesítve ({closed}).",
+      "removalStatusRejected": "Kérelem ({date}): elutasítva. Az ok megismeréséhez írjon az adatkezelőnek."
     },
     "erasure": {
       "title": "Az Ön adatainak törlése",
@@ -6022,6 +6212,11 @@
     "captionsTranscriptNotTranslatable": "Ez az átirat az élő feliratokból származik: az automatikus fordításhoz a felvétel MI-átirata szükséges.",
     "sameLanguage": "A választott nyelv a felvétel eredeti nyelve: válasszon másikat.",
     "recordingDestinationNotCovered": "Az esemény hozzájárulásai csak regisztráltaknak szóló felvételre érvényesek: nem teheti mindenki számára láthatóvá, és nem kapcsolhat hozzá külső videót.",
-    "mtUnavailable": "A gépi fordítás nincs telepítve ezen a példányon."
+    "mtUnavailable": "A gépi fordítás nincs telepítve ezen a példányon.",
+    "recordingContentOrganizerOnly": "Az esemény felvételeinek tartalmát csak az esemény szervezői nyithatják meg, módosíthatják vagy tehetik közzé."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Kérelemre eltávolított tartalom",
+    "cardBody": "A felvétel ezen részét egy benne szereplő személy kérelmére eltávolították."
   }
 }

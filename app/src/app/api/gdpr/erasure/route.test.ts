@@ -18,6 +18,7 @@ const tx = {
   chatMessageReaction: { deleteMany: vi.fn() },
   captionSegment: { deleteMany: vi.fn() },
   roomOccupant: { deleteMany: vi.fn() },
+  recordingRedactionRequest: { deleteMany: vi.fn() },
   registration: { deleteMany: vi.fn() },
   postprodArtifact: { findMany: vi.fn() },
   recordingConsent: { deleteMany: vi.fn(), findMany: vi.fn() },
@@ -124,6 +125,7 @@ beforeEach(() => {
   tx.chatMessageReaction.deleteMany.mockResolvedValue({ count: 0 });
   tx.captionSegment.deleteMany.mockResolvedValue({ count: 0 });
   tx.roomOccupant.deleteMany.mockResolvedValue({ count: 0 });
+  tx.recordingRedactionRequest.deleteMany.mockResolvedValue({ count: 0 });
   tx.registration.deleteMany.mockResolvedValue({ count: 1 });
   tx.postprodArtifact.findMany.mockResolvedValue([]);
   tx.$executeRaw.mockResolvedValue(2);
@@ -178,6 +180,10 @@ describe('POST /api/gdpr/erasure', () => {
       }),
     );
     expect(tx.roomOccupant.deleteMany).toHaveBeenCalledWith({ where: postiInSala });
+    // Le richieste di rimozione gia' evase portano il nome: se ne vanno.
+    expect(tx.recordingRedactionRequest.deleteMany).toHaveBeenCalledWith({
+      where: { registrationId: { in: expect.any(Array) }, status: { in: ['CLOSED', 'REJECTED'] } },
+    });
     // Le parole di «In una parola» non hanno una chiave verso l'iscrizione:
     // la cascata non le porta via, e dopo la conservazione restano.
     expect(tx.wordCloudSubmission.deleteMany).toHaveBeenCalledWith({ where: { registrationId: ids } });

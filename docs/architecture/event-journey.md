@@ -60,6 +60,7 @@ An event is one row of the `Event` model (table `events`) plus a handful of rela
 | Content | `title`, `description` and `speakersInfo` are JSONB objects keyed by language code (`{ "it": "…", "en": "…" }`). Empty translations of the title and description are dropped on write. Reads fall back from the requested language to Italian, then to any non-empty value (`getLocalized()` in `app/src/lib/utils/locale.ts`). |
 | Address | `slug`, derived from the Italian title (or the first available one) in kebab case, with a numeric suffix when taken (`app/src/lib/utils/slug.ts`). Public URLs are localized: `/it/eventi/<slug>`, `/en/events/<slug>` ([i18n.md](i18n.md)). |
 | Type | `eventType`: `SCHEDULED` (the default), `INSTANT` for [instant calls](#instant-calls), `LEGACY` for recordings imported from an external source, which have no live room. |
+| Catalog | `formatClass` (`MEETING`, `PARTICIPATORY` or `PUBLIC`), `templateId` and `templateName`: what kind of event it is and which template it was created from, for the instance statistics only ([The event catalog](#the-event-catalog)). |
 | Status | `status`, one of `DRAFT`, `PUBLISHED`, `PROVISIONING`, `LIVE`, `IDLE`, `ENDED`, `ARCHIVED` ([event-lifecycle.md](event-lifecycle.md)). |
 | Tags | `Tag` (slug, multilingual name, color, sort order) linked through `EventTagLink`. |
 | Co-organizing organizations | `EventOrganizer` rows: a name, an optional logo and an optional website, shown on the public page under **Organized by**. Display metadata only: they grant no access and receive no email. The older single-string `organizerName` column is still read as a fallback when the event has none. |
@@ -195,7 +196,7 @@ The browser keeps an unsaved copy of the form in `localStorage` under `pa-wizard
 
 1. The wizard sends the whole form to `PUT /api/events/{id}` with the moderator token. The server:
    - ignores the capture flags (`recordingEnabled`, `autoStartRecording`, `whiteboardEnabled`, `multitrackRecordingEnabled`, `waitingRoomEngine`, `videoQuality`) on an `ENDED` or `ARCHIVED` event unless the request changes the status or reopens the event, and lists them in `ignoredCreationOnlyFields`. A date corrected on an event that stays concluded reopens nothing, and an event closed before its end reopens with the same dates, because the end is still in the future;
-   - answers `403` to a moderator link that changes `recordingDestination`, `offerAddressBook` or `hostsAlwaysRecorded`, which only staff who manage the event decide; the wizard opened with that link does not send them;
+   - answers `403` to a moderator link that changes `recordingDestination`, `offerAddressBook`, `hostsAlwaysRecorded` or the catalog (`formatClass`, `templateId`), which only staff who manage the event decide; the wizard opened with that link does not send them;
    - applies the rules of [The recording destination](#the-recording-destination);
    - revives an ended event when the end it saves is in the future: a later end, or the same dates on an event closed before its end ([event-lifecycle.md](event-lifecycle.md#revival));
    - recomputes the capacity estimate when the request carries any of its inputs, which a wizard save always does;
@@ -243,7 +244,7 @@ An event template (`EventTemplate`, UI **Event templates** at `/admin/events/tem
 
 The dependencies of **Recording and AI** apply when a template is loaded: a template that turns on transcription without recording pre-fills neither.
 
-System templates (`isSystem`) are inserted by database migrations that skip templates already present. Administrators can edit and delete them like any other: events copy the template's values at creation and keep no reference to it, so deleting a template never changes an existing event.
+System templates (`isSystem`) are inserted by database migrations that skip templates already present. Administrators can edit and delete them like any other: events copy the template's values at creation, so editing or deleting a template never changes an existing event's settings. An event keeps only a catalog reference to its template, which deleting the template clears ([The event catalog](#the-event-catalog)). Each template card shows how many events were created from it.
 
 | System template | Recording destination | Audience names | Questions after the event | Address book |
 |---|---|---|---|---|
@@ -258,6 +259,17 @@ The migration that sets these values skips a system template already edited, and
 The API is `/api/admin/templates`: every method requires the administrator session, and `POST`, `PUT` and `DELETE` write an audit entry. Organizers use templates but cannot manage them.
 
 For developers: the new-event page passes the selected template to the wizard through `presetDelModello()` in `app/src/lib/events/template-preset.ts`, an explicit list of fields. A new template column goes in that list and in `WizardTemplatePreset`, or in `NOT_PRESET_TEMPLATE_FIELDS` with its reason: a test compares them with the schema.
+
+## The event catalog
+
+Every event records what kind of event it is and which template it came from, so that the instance statistics can compare kinds of events over time (`app/src/lib/events/catalog.ts`). The catalog changes no setting of the event.
+
+- **Type.** `formatClass` is the family of the format: `MEETING` (up to 20 people, everyone on video), `PARTICIPATORY` (more people, everyone can speak) or `PUBLIC` (only speakers and moderators speak, or 300 people or more). It is the class that `classeFormato()` in `app/src/lib/events/guided-format.ts` derives from the first two questions. Instant calls and imported archives are types of their own, read from `eventType`, and get no family.
+- **Template.** `templateId` points to the `EventTemplate` the event was created from (`ON DELETE SET NULL`), and `templateName` keeps the template's name at that moment, so the statistics still name a template that was renamed or deleted.
+
+`POST /api/events` accepts `formatClass` and `templateId`. The wizard sends the family when the event comes from the four questions, and the template when it comes from a template; the server then stores the template's name and, without a family, the template's own: the same rule applied to its expected participants and to whether participants can speak or show themselves (`classeDelModello()`). An unknown template is a `422` on the field. An event created without either, through the API or before the catalog existed, is **Not cataloged**: nothing guesses its type. A copy keeps the catalog of its original.
+
+Staff who manage the event correct the catalog when editing it, under **Advanced settings**, **Technical details**: a type (or **Not cataloged**) and a template (or **No template**). When the template the event came from was deleted, the field offers it under the name it had until another template or **No template** is chosen, which also clears the stored name. The wizard sends the two values only when they change since the last save, and a moderator link can neither see nor change them. Changing the template does not change the type: the two are corrected separately. A correction is accepted on a concluded event too.
 
 ## Duplication and series
 
@@ -282,7 +294,7 @@ The rule is that a copy inherits the configuration, not the life of the occurren
 
 | Inherited | Not inherited |
 |---|---|
-| Description, time zone, event type, sizing and quality settings, every live-feature and permission setting, registration rules (who can register, `accessMode`, and what the form asks), the moderator contact with its organization, branding, whether the address book is offered, the privacy and retention settings, recording and AI post-production flags, where the recording goes, the post-event page settings and the library listing, the recurrence rule | Title (suffixed), slug, dates (resolved as above), status, room name, moderator token, owner, join password, whether the lead moderator is shown on the public page, the statement that the hosts are always in the recording, series membership, `postEventPublicUntil`, `youtubeUrl`, and all runtime, analytics and recording state |
+| Description, time zone, event type, the catalog (type and template), sizing and quality settings, every live-feature and permission setting, registration rules (who can register, `accessMode`, and what the form asks), the moderator contact with its organization, branding, whether the address book is offered, the privacy and retention settings, recording and AI post-production flags, where the recording goes, the post-event page settings and the library listing, the recurrence rule | Title (suffixed), slug, dates (resolved as above), status, room name, moderator token, owner, join password, whether the lead moderator is shown on the public page, the statement that the hosts are always in the recording, series membership, `postEventPublicUntil`, `youtubeUrl`, and all runtime, analytics and recording state |
 | Tags, co-organizing organizations, active named grants (each with a fresh token, its role and organization, and not shown on the public page until chosen again), agenda topics (title, order, planned duration and who speaks, pointing at the copied person), questionnaires, reminder schedule | The agenda's progress (status and times), registrations, invitations, questions, chat, reactions, polls, word-cloud rounds, feedback, call sessions, recordings, materials, GDPR audit entries |
 
 A copy of an event that records without a destination starts reserved, except a copy of an instant call or of a `LEGACY` event, which stays without one ([The recording destination](#the-recording-destination)). Revoked grants are not recreated. Invitations are not copied, so a copy open only to invitees (`accessMode` `INVITATION`) accepts no registrations until invitees are added. Materials and polls are left out on purpose: they are the content of a specific day. The permission matrix is copied normalized, like every write of it.
@@ -658,7 +670,7 @@ The **Statistics** tab reads `GET /api/admin/events/{id}/analytics`, open to adm
 
 Per-person speaker figures are pseudonymous by default. Guests and people who used a forwarded link never record a join time, so the headcount prefers the call session's peak. Call sessions are described in [event-lifecycle.md](event-lifecycle.md#call-sessions).
 
-The platform-wide **Analytics** page (`/admin/events/statistics`) is for administrators only.
+The platform-wide **Analytics** page (`/admin/events/statistics`) and `GET /api/admin/analytics` are for administrators only. Besides the overall figures, the page has **Event types and templates** (`app/src/lib/analytics/catalog-stats.ts`): for a period of 3, 6, 12 or 24 months, grouped by [catalog](#the-event-catalog) type or by template, how many events there were, how many were held, their average participants and their average duration, ranked from the most recurring, and month by month one measure at a time (`?months=` on the API, 12 by default). The page reads the two halves separately, so that changing one period does not reload the other: `?section=catalog` returns the catalog only and `?section=overview` everything else. It holds counts and averages only, no titles and no names. Drafts do not count; an event counts in the month it starts, in the installation's time zone (`SiteSetting.defaultTimezone`). An event was held when its room opened (at least one call session); its participants are its peak of people present at the same time, guests included (`Event.peakParticipants`); its duration is the sum of its closed call sessions, not the scheduled window, which for an instant call is hours longer than the call. Both averages are over the events held. A template that was deleted keeps its row under the name it had.
 
 ## Instant calls
 
@@ -711,7 +723,8 @@ These describe the current code. Planned work is tracked in [ROADMAP.md](../ROAD
 | Materials | `app/api/admin/events/[id]/materials/`, `app/api/events/[param]/materials/`, `app/api/events/[param]/files/`, `lib/events/material-visibility.ts`, `lib/events/material-access.ts`, `lib/validation/materials.ts` |
 | Post-event | `app/[locale]/events/[slug]/page.tsx`, `components/events/post-event-*.tsx`, `components/admin/post-event-config.tsx`, `lib/events/recap.ts`, `lib/events/post-event-sections.ts`, `lib/recording/audience.ts`, `app/api/events/[param]/recording/access/route.ts` |
 | Library and publications | `app/api/public/video-library/route.ts`, `app/api/admin/publications/` |
-| Analytics | `app/api/admin/events/[id]/analytics/route.ts`, `lib/analytics/event-analytics.ts` |
+| Analytics | `app/api/admin/events/[id]/analytics/route.ts`, `lib/analytics/event-analytics.ts`, `app/api/admin/analytics/route.ts`, `lib/analytics/catalog-stats.ts`, `lib/analytics/catalog-stats-query.ts` |
+| Event catalog | `lib/events/catalog.ts`, `components/admin/event-wizard/catalogo.ts`, `components/admin/event-wizard/campo-catalogo.tsx`, `components/admin/catalog-stats-panel.tsx` |
 | Instant calls | `app/api/events/instant/route.ts`, `components/admin/create-instant-call.tsx`, `components/admin/instant-calls-list.tsx` |
 
 ## Related pages

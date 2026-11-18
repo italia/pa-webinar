@@ -10,7 +10,11 @@ const { mockManager, mockRegCount, mockEventAccess } = vi.hoisted(() => ({
 }));
 
 vi.mock('@/lib/db', () => ({ prisma: { registration: { count: mockRegCount } } }));
-vi.mock('@/lib/auth/staff-session', () => ({ isEventManager: mockManager }));
+// Lo staff che vede il contenuto: l'organizzatore (lib/recording/content-access).
+vi.mock('./content-access', () => ({
+  contenutoStaffDellaRichiesta: async (...a: unknown[]) =>
+    (await mockManager(...a)) ? { session: { role: 'organizer' }, via: 'organizzatore' } : null,
+}));
 vi.mock('@/lib/auth/app-secret', () => ({
   tryGetAppSecret: () => 'segreto-di-prova-abbastanza-lungo-per-hmac',
 }));
@@ -41,6 +45,7 @@ const barattolo = (valori: Record<string, string> = {}) =>
 const NOW = new Date('2026-10-21T15:00:00Z');
 const evento = (over: Record<string, unknown> = {}) => ({
   id: 'ev-1',
+  slug: 'ev-slug',
   recordingPublished: true,
   transcriptPublished: false,
   recordingAudience: 'PUBLIC' as 'PUBLIC' | 'REGISTRANTS',
@@ -85,10 +90,10 @@ describe('videoPerTutti', () => {
     recordingUrl,
   });
 
-  it('dà l’indirizzo del video pubblicato per tutti, dentro la finestra', () => {
-    expect(videoPerTutti(conFile(), NOW)).toBe('recordings/a.mp4');
+  it('dà la rotta dell’app del video pubblicato per tutti, dentro la finestra, mai l’indirizzo dello storage', () => {
+    expect(videoPerTutti(conFile(), NOW)).toBe('/api/events/ev-slug/recording');
     const domani = new Date(NOW.getTime() + 86_400_000);
-    expect(videoPerTutti(conFile({ postEventPublicUntil: domani }), NOW)).toBe('recordings/a.mp4');
+    expect(videoPerTutti(conFile({ postEventPublicUntil: domani }), NOW)).toBe('/api/events/ev-slug/recording');
   });
 
   it.each([
@@ -116,7 +121,7 @@ describe('accessoRegistrazione', () => {
     expect(mockManager).not.toHaveBeenCalled();
   });
 
-  it("lo staff che gestisce l'evento vede anche prima della pubblicazione", async () => {
+  it("lo staff che organizza l'evento vede anche prima della pubblicazione", async () => {
     mockManager.mockResolvedValue(true);
     expect(
       await accessoRegistrazione(evento({ recordingPublished: false }), barattolo(), NOW)

@@ -22,6 +22,8 @@ vi.mock('next/headers', () => ({
 vi.mock('@/lib/auth/staff-session', () => ({
   requireRecordingManager: m.requireRecordingManager,
 }));
+// L'accesso al contenuto segue la guardia qui sopra (test/contenuto-come-gestore).
+vi.mock('@/lib/recording/content-access', () => import('@/test/contenuto-come-gestore'));
 vi.mock('@/lib/audit/admin-audit', () => ({ logAdminAction: m.logAdminAction }));
 vi.mock('@/lib/db', () => ({
   prisma: { recording: { findUnique: m.findUnique, update: m.update } },
@@ -115,6 +117,7 @@ describe('GET slides', () => {
       eventVideoPublished: false,
       eventShowsMaterials: true,
       eventSlug: 'evento-di-prova',
+      contenuto: true,
       mediaUrl: `/api/admin/postprod/recordings/${ID}/media`,
       marks: [{ t: 12, kind: 'started', materialId: A, page: 1 }],
       materials: [

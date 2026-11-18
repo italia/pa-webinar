@@ -789,7 +789,8 @@
     "accessDenied": {
       "title": "This section is not available for your role",
       "body": "As an organizer you manage your own events: creating and publishing them, materials, questionnaires and post-production. Platform settings and data across all events stay with the administration.",
-      "back": "Go to your events"
+      "back": "Go to your events",
+      "organizerOnly": "Only the organizers of this event can edit it. As an administrator you can see its status and details, and archive or delete it. Its recordings and their content belong to the organizers and the participants."
     },
     "staffLogin": {
       "title": "Sign in to the administration area",
@@ -1520,7 +1521,9 @@
       "breadcrumbAriaLabel": "Breadcrumb",
       "skipToPage": "Skip to page content",
       "openMenu": "Open menu",
-      "closeMenu": "Close menu"
+      "closeMenu": "Close menu",
+      "recordingRemovals": "Removal requests",
+      "recordingRemovalDetail": "Removal request"
     },
     "publications": {
       "subtitle": "Single editorial hub for every published video: scheduled events, instant calls, uploaded archive recordings, and sessions waiting to be promoted.",
@@ -1664,7 +1667,8 @@
       "detailFilename": "File name",
       "transcriptManage": "Manage transcript / AI",
       "transcriptReady": "Transcribed",
-      "transcriptProcessing": "Processing"
+      "transcriptProcessing": "Processing",
+      "organizerOnly": "Organizers only"
     },
     "gdprAudit": {
       "subtitle": "Log of privacy actions on personal data: deletions, consent, exports",
@@ -1679,7 +1683,11 @@
         "DATA_DELETED": "Data deleted",
         "CONSENT_RECORDED": "Consent recorded",
         "DATA_EXPORTED": "Data exported",
-        "CONSENT_WITHDRAWN": "Consent withdrawn"
+        "CONSENT_WITHDRAWN": "Consent withdrawn",
+        "RECORDING_CONTENT_READ": "Recording content read by staff",
+        "RECORDING_REDACTION_REQUESTED": "Removal from a recording requested",
+        "RECORDING_REDACTION_REJECTED": "Removal request rejected",
+        "RECORDING_REDACTED": "Person removed from a recording"
       },
       "recordsAffected": "{count} records affected",
       "colWhen": "When",
@@ -1705,7 +1713,8 @@
       "rotating": "Rotating…",
       "regenerateTitle": "Regenerate moderator token (old link stops working)",
       "confirmRegenerate": "Regenerate the token? The old link will stop working.",
-      "noResults": "No events found."
+      "noResults": "No events found.",
+      "organizerOnlyLink": "Link visible to the event organizers only"
     },
     "registrations": {
       "subtitle": "All people signed up to events — search, filter and export",
@@ -2137,7 +2146,8 @@
         "DATA_DELETED": "Data deleted",
         "CONSENT_RECORDED": "Consent recorded",
         "DATA_EXPORTED": "Data exported",
-        "CONSENT_WITHDRAWN": "Consent withdrawn"
+        "CONSENT_WITHDRAWN": "Consent withdrawn",
+        "RECORDING_CONTENT_READ": "Recording content read by staff"
       }
     },
     "settings": {
@@ -2449,6 +2459,40 @@
         "avgParticipantsPerEvent": "Avg participants per event",
         "avgFeedbackRating": "Avg feedback rating",
         "totalFeedback": "Feedback responses"
+      },
+      "catalog": {
+        "title": "Event types and templates",
+        "intro": "How many events of each type and from each template, month by month. Counts and averages only, no personal data. Drafts are not counted.",
+        "periodLabel": "Period",
+        "months": "{count, plural, one {# month} other {# months}}",
+        "groupByLabel": "Group by",
+        "groupBy": {
+          "type": "Event type",
+          "template": "Template"
+        },
+        "rankingTypes": "Most recurring types",
+        "rankingTemplates": "Most used templates",
+        "columns": {
+          "type": "Type",
+          "template": "Template",
+          "events": "Events",
+          "held": "Held",
+          "avgParticipants": "Avg. participants",
+          "avgDuration": "Avg. duration",
+          "total": "Whole period"
+        },
+        "measuresNote": "Held: events whose room opened. Average participants: the peak of people present at the same time, guests included, averaged over the events held. Average duration: the measured room time, not the scheduled one.",
+        "byMonth": "Month by month",
+        "measureLabel": "Measure",
+        "measures": {
+          "events": "Events",
+          "avgParticipants": "Average participants",
+          "avgDurationMinutes": "Average duration"
+        },
+        "byMonthCaption": "{measure} by month",
+        "empty": "No events in this period.",
+        "deletedTemplate": "{name} (deleted)",
+        "uncatalogedNote": "Events not cataloged: {count}. They were created before the catalog, or without a template or a format; you can catalog them when editing the event, under technical details."
       }
     },
     "recurrence": {
@@ -2517,7 +2561,8 @@
       "postEventPublic": "Public post-event page",
       "offerAddressBook": "Offers the address book to people who register",
       "invalidFields": "Check these fields: {fields}.",
-      "descriptionOtherLanguages": "There are also versions in: {languages}, which cannot be edited here. If you change the Italian text they are removed."
+      "descriptionOtherLanguages": "There are also versions in: {languages}, which cannot be edited here. If you change the Italian text they are removed.",
+      "usedBy": "Events created from this template: {count}"
     },
     "instantCall": {
       "title": "Instant video call",
@@ -3029,7 +3074,20 @@
         "publishNow": "Publish now"
       },
       "editFeatures": "Edit features",
-      "editPrivacy": "Edit privacy and data"
+      "editPrivacy": "Edit privacy and data",
+      "governance": {
+        "title": "You manage this event as an administrator",
+        "body": "You are not one of its organizers: you can see status, details, registrations and consents, and archive or delete it. Running the event, the moderator link and the content of its recordings (video, transcripts, summaries) are for the organizers.",
+        "recording": "The content of the recording is available only to the organizers of the event and to its participants. Here you can see whether it exists and its details.",
+        "recordingFile": "Recording",
+        "present": "Present",
+        "absent": "None",
+        "recordingPublished": "Published",
+        "yes": "Yes",
+        "no": "No",
+        "recordingDuration": "Duration",
+        "recordingSize": "Size"
+      }
     },
     "rubrica": {
       "subtitle": "People who have consented to be added to the address book (GDPR art. 6.1.a). Name, email and organization are updated only when the person ticks the box again.",
@@ -3299,7 +3357,8 @@
         "metricsTitle": "Summary metrics (LLM)",
         "chars": "characters",
         "model": "Model",
-        "notAvailable": "n/a"
+        "notAvailable": "n/a",
+        "contentHidden": "Available to the event organizers only."
       },
       "rel": {
         "title": "AI reliability",
@@ -3456,7 +3515,8 @@
         "alignNone": "No slide change to align.",
         "previewTitle": "Preview",
         "previewHelp": "The video with the slides as the public will see them, with the correction written above."
-      }
+      },
+      "contentOrganizerOnly": "Only the organizers of this event can see and edit the content of this recording (video, tracks, transcript, summary, translations). Here you can see its status, the processing jobs and the file details."
     },
     "questionnairesPage": {
       "subtitle": "Reusable question templates for pre-registration and post-event questionnaires."
@@ -3748,7 +3808,9 @@
       "publishDesc": "Review it before publishing: the text is written by an artificial intelligence model. A regenerated report must be published again.",
       "preview": "Preview",
       "hidePreview": "Hide preview",
-      "previewLanguage": "Language"
+      "previewLanguage": "Language",
+      "organizerOnly": "Only the organizers of this event can request, read and publish the report.",
+      "organizerOnlyExists": "The report exists. Only the organizers of this event can read and publish it."
     },
     "endEvent": "End event",
     "endEventConfirmTitle": "End the event for everyone?",
@@ -4073,6 +4135,122 @@
       },
       "retainedNote": "{count, plural, one {# proof is kept} other {# proofs are kept}} for as long as the video or transcript exists.",
       "countsNote": "People are counted: a registration, a staff account or a named link count once; a guest who comes back in another visit counts again."
+    },
+    "recordingRemovals": {
+      "subtitle": "People who asked not to appear in a recording. While a request is open you can open that recording from the removal editor, and every access stays in the operations log.",
+      "filterOpen": "Open",
+      "filterAll": "All",
+      "filterLabel": "Which requests",
+      "empty": "No requests.",
+      "loadError": "The requests could not be loaded.",
+      "colReceived": "Received",
+      "colPerson": "Person",
+      "colEvent": "Event",
+      "colSource": "Origin",
+      "colStatus": "Status",
+      "open": "Open",
+      "unnamed": "Person without a name",
+      "sources": {
+        "self-service": "My data",
+        "admin": "Staff"
+      },
+      "statuses": {
+        "OPEN": "Open",
+        "IN_PROGRESS": "In progress",
+        "PROCESSING": "Processing",
+        "CLOSED": "Closed",
+        "REJECTED": "Rejected"
+      },
+      "kinds": {
+        "registrant": "Registrant",
+        "host": "Host",
+        "guest": "Guest"
+      },
+      "newOpen": "Register a request",
+      "newTitle": "A request received by other means",
+      "newIntro": "For a request that reached the controller by email, post or in person. Choose the recording and, if you recognize them, the person among those who were in the room.",
+      "recordingSearch": "Search the event",
+      "recordingLabel": "Recording",
+      "recordingChoose": "Choose a recording",
+      "recordingOption": "{title} · {date}",
+      "recordingNone": "No recording with a video or per-participant tracks.",
+      "peopleLabel": "Who was in the room",
+      "peopleNone": "The room left no record of who was there: enter the name, and you will mark the intervals by hand.",
+      "personNotInVideo": "out of the video",
+      "personTimes": "from {from} to {to}",
+      "personStill": "from {from} to the end",
+      "nameLabel": "Name of the person",
+      "noteLabel": "How the request arrived (optional)",
+      "create": "Register the request",
+      "createError": "The request could not be registered.",
+      "cancel": "Cancel",
+      "back": "All requests",
+      "fieldPerson": "Person",
+      "fieldEvent": "Event",
+      "fieldReceived": "Received",
+      "fieldSource": "Origin",
+      "fieldStatus": "Status",
+      "fieldNote": "Note",
+      "externalCopy": "This event has a video on an external site (for example YouTube): the removal does not reach it. Remove or replace it there too.",
+      "publishedElsewhere": "The event's published video is a different file from this recording: the removal does not change it. Replace it or withdraw it from the event page.",
+      "pipelineOff": "Post-production is switched off: the removal job waits in the queue until you switch it on, and the transcript is not produced again.",
+      "noVideo": "This recording has no video, only per-participant tracks: the person's tracks are deleted and the transcript is produced again from those that remain.",
+      "noRecording": "The recording no longer exists: there is nothing left to remove.",
+      "keyOnly": "The instance key does not open a recording: sign in with your administrator account.",
+      "startIntro": "To remove the person you have to open the recording. The access is allowed only for this request and stays in the operations log with your account.",
+      "start": "Open the removal editor",
+      "processing": "Removal in progress: the redacted video will take the place of the original. Job status: {status}.",
+      "closed": "Request closed on {date}.",
+      "closedIntervals": "{count, plural, =0 {No interval covered.} one {# interval covered.} other {# intervals covered.}}",
+      "rejected": "Request rejected on {date}.",
+      "lastError": "The last processing did not succeed: {error}. Check the intervals and send again.",
+      "rejectTitle": "Reject the request",
+      "rejectLabel": "Reason",
+      "reject": "Reject",
+      "rejectConfirm": "Reject the request? The person will see that it was rejected.",
+      "actionError": "The operation did not succeed (HTTP {code}).",
+      "editorTitle": "Intervals to cover",
+      "editorHint": "The proposals come from who was in the room, who was speaking and the per-participant tracks: the speaking times are approximate. Watch the video and correct them. In each interval the video becomes the card \"content removed on request\" and the audio is muted; the duration does not change.",
+      "sourcePresence": "In the room",
+      "sourceSpeech": "Speaking",
+      "sourceTrack": "Track",
+      "selectedLegend": "To cover",
+      "useProposals": "Start again from the proposals",
+      "addInterval": "Add an interval here",
+      "fieldStart": "Start",
+      "fieldEnd": "End",
+      "setStart": "Start here",
+      "setEnd": "End here",
+      "seek": "Go",
+      "remove": "Remove",
+      "intervalLabel": "Interval {n}",
+      "noIntervalsVideo": "No interval to cover. If the person does not appear in the video, reject the request with the reason.",
+      "total": "{count, plural, one {# interval} other {# intervals}} · {seconds} s to cover",
+      "timeHint": "Times in hours:minutes:seconds, as in the player.",
+      "invalidTime": "Invalid time",
+      "preview": "Preview the removal",
+      "timelineLabel": "Recording timeline",
+      "mediaError": "The video does not load. Reload the page.",
+      "submit": "Remove the person from the recording",
+      "submitConfirm": "The original video and the person's tracks will be deleted and post-production redone. This cannot be undone. Continue?",
+      "submitDone": "Request closed: the person has been removed."
+    },
+    "catalog": {
+      "fieldTitle": "Catalog",
+      "fieldHelp": "The event type and the template it was created from are used only for the instance statistics and change no setting. Correct them if the event is cataloged wrongly, or not at all.",
+      "typeLabel": "Event type",
+      "templateLabel": "Template",
+      "noTemplate": "No template",
+      "deletedTemplate": "Created from the template “{name}”, since deleted.",
+      "deletedOption": "{name} (deleted)",
+      "types": {
+        "MEETING": "Meeting",
+        "PARTICIPATORY": "Participatory event",
+        "PUBLIC": "Public event",
+        "INSTANT": "Instant call",
+        "LEGACY": "Imported publication",
+        "UNCATALOGED": "Not cataloged"
+      }
     }
   },
   "email": {
@@ -4609,7 +4787,19 @@
       "addressBookPendingEffect": "If you confirm, you return to the address book with the name and organisation of this registration and receive invitations again. If you cancel, or if it was not you, you stay out of the address book and receive no invitations.",
       "addressBookPendingConfirm": "Confirm my return",
       "addressBookPendingCancel": "Cancel the request",
-      "addressBookPendingGone": "This request is no longer waiting. Reload the page to see the current state."
+      "addressBookPendingGone": "This request is no longer waiting. Reload the page to see the current state.",
+      "removalTitle": "The event recording",
+      "removalIntro": "This event was recorded. If you do not want to appear in the recording, you can ask to be removed: the parts where you appear or speak are covered by a card and muted, and the transcript, subtitles and summary are produced again. The request goes to the data controller, who reviews it.",
+      "removalButton": "I don't want to appear in this recording",
+      "removalConfirmTitle": "Confirm the request?",
+      "removalConfirmBody": "The controller will remove the parts of the recording where you appear or speak. Copies published on other sites, for example on YouTube, have to be removed separately by whoever published them.",
+      "removalConfirm": "Send the request",
+      "removalCancel": "Cancel",
+      "removalSent": "Request sent. The controller will review it.",
+      "removalError": "The request could not be sent. Try again later.",
+      "removalStatusOpen": "Request of {date}: being processed.",
+      "removalStatusClosed": "Request of {date}: completed on {closed}.",
+      "removalStatusRejected": "Request of {date}: rejected. Write to the controller to learn why."
     },
     "erasure": {
       "title": "Erase your data",
@@ -6022,6 +6212,11 @@
     "captionsTranscriptNotTranslatable": "This transcript comes from the live captions: automatic translation needs an AI transcript of the recording.",
     "sameLanguage": "The chosen language is the recording's original one: pick another.",
     "recordingDestinationNotCovered": "The consents for this event cover a reserved recording: you cannot make it visible to everyone or link an external video.",
-    "mtUnavailable": "Machine translation is not installed on this instance."
+    "mtUnavailable": "Machine translation is not installed on this instance.",
+    "recordingContentOrganizerOnly": "Only the organizers of this event can open, change or publish the content of its recordings."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Content removed on request",
+    "cardBody": "This part of the recording was removed at the request of a person who appeared in it."
   }
 }

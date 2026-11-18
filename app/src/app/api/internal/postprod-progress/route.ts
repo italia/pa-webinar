@@ -29,6 +29,7 @@ import { progressPayloadSchema } from '@/lib/ai/schemas';
 import { EVENT_JOB_KINDS } from '@/lib/ai/job-classes';
 import { avanzamentoLavoroEvento } from '@/lib/report/job';
 import { riconciliaTraduzioni } from '@/lib/text-translation/auto';
+import { riapriRichiesteSenzaLavoro } from '@/lib/recording/redaction/requests';
 import {
   postprodJobDurationSeconds,
   postprodJobsCompletedTotal,
@@ -107,6 +108,10 @@ export const POST = withErrorHandling(async (request) => {
       // riprova a mano, lib/text-translation/auto).
       if (job.kind === 'TRANSLATE_TEXT' && risposta.status === 'FAILED' && job.eventId) {
         await riconciliaTraduzioni(job.eventId, { request, actor: 'system', dopoConsegna: true });
+      }
+      // Una rimozione fallita per sempre torna allo staff, che la invia di nuovo.
+      if (job.kind === 'REDACT' && risposta.status === 'FAILED') {
+        await riapriRichiesteSenzaLavoro(prisma, job.id);
       }
     }
     return Response.json({ ok: true, ...risposta });

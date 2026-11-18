@@ -789,7 +789,8 @@
     "accessDenied": {
       "title": "Šis skyrius jūsų vaidmeniui nepasiekiamas",
       "body": "Kaip organizatorius tvarkote savo renginius: jų kūrimą ir skelbimą, medžiagą, klausimynus ir postprodukciją. Platformos nustatymai ir visų renginių duomenys lieka administracijai.",
-      "back": "Eiti į savo renginius"
+      "back": "Eiti į savo renginius",
+      "organizerOnly": "Tik šio renginio organizatoriai gali jį redaguoti. Kaip administratorius matote jo būseną ir išsamią informaciją ir galite jį archyvuoti arba ištrinti. Įrašai ir jų turinys priklauso organizatoriams ir dalyviams."
     },
     "staffLogin": {
       "title": "Prisijungimas prie administravimo srities",
@@ -1520,7 +1521,9 @@
       "breadcrumbAriaLabel": "Naršymo kelias",
       "skipToPage": "Pereiti į puslapio turinį",
       "openMenu": "Atidaryti meniu",
-      "closeMenu": "Uždaryti meniu"
+      "closeMenu": "Uždaryti meniu",
+      "recordingRemovals": "Pašalinimo prašymai",
+      "recordingRemovalDetail": "Pašalinimo prašymas"
     },
     "publications": {
       "subtitle": "Bendras redakcinis centras visiems paskelbtiems vaizdo įrašams: planuoti renginiai, greitieji skambučiai, įkelti istoriniai archyvai ir sesijos, laukiančios paskelbimo.",
@@ -1664,7 +1667,8 @@
       "detailFilename": "Failo pavadinimas",
       "transcriptManage": "Tvarkyti transkripciją / DI",
       "transcriptReady": "Transkribuota",
-      "transcriptProcessing": "Apdorojama"
+      "transcriptProcessing": "Apdorojama",
+      "organizerOnly": "Tik organizatoriams"
     },
     "gdprAudit": {
       "subtitle": "Privatumo veiksmų su asmens duomenimis registras: pašalinimai, sutikimai, eksportai",
@@ -1679,7 +1683,11 @@
         "DATA_DELETED": "Duomenys pašalinti",
         "CONSENT_RECORDED": "Sutikimas užregistruotas",
         "DATA_EXPORTED": "Duomenys eksportuoti",
-        "CONSENT_WITHDRAWN": "Sutikimas atšauktas"
+        "CONSENT_WITHDRAWN": "Sutikimas atšauktas",
+        "RECORDING_CONTENT_READ": "Įrašo turinį perskaitė darbuotojai",
+        "RECORDING_REDACTION_REQUESTED": "Paprašyta pašalinti iš įrašo",
+        "RECORDING_REDACTION_REJECTED": "Pašalinimo prašymas atmestas",
+        "RECORDING_REDACTED": "Asmuo pašalintas iš įrašo"
       },
       "recordsAffected": "{count} susiję įrašai",
       "colWhen": "Kada",
@@ -1705,7 +1713,8 @@
       "rotating": "Generuojama iš naujo…",
       "regenerateTitle": "Iš naujo generuoti moderatoriaus žetoną (sena nuoroda nustos veikti)",
       "confirmRegenerate": "Ar tikrai norite iš naujo generuoti žetoną? Sena nuoroda nustos veikti.",
-      "noResults": "Renginių nerasta."
+      "noResults": "Renginių nerasta.",
+      "organizerOnlyLink": "Nuorodą mato tik renginio organizatoriai"
     },
     "registrations": {
       "subtitle": "Visi renginiuose užsiregistravę asmenys — paieška, filtravimas ir eksportas",
@@ -2137,7 +2146,8 @@
         "DATA_DELETED": "Duomenys ištrinti",
         "CONSENT_RECORDED": "Sutikimas užregistruotas",
         "DATA_EXPORTED": "Duomenys eksportuoti",
-        "CONSENT_WITHDRAWN": "Sutikimas atšauktas"
+        "CONSENT_WITHDRAWN": "Sutikimas atšauktas",
+        "RECORDING_CONTENT_READ": "Įrašo turinį perskaitė darbuotojai"
       }
     },
     "settings": {
@@ -2449,6 +2459,40 @@
         "avgParticipantsPerEvent": "Vidutiniškai dalyvių vienam renginiui",
         "avgFeedbackRating": "Vidutinis atsiliepimų įvertinimas",
         "totalFeedback": "Atsiliepimų atsakymų"
+      },
+      "catalog": {
+        "title": "Renginių tipai ir šablonai",
+        "intro": "Kiek kiekvieno tipo ir iš kiekvieno šablono renginių kiekvieną mėnesį. Tik skaičiai ir vidurkiai, jokių asmens duomenų. Juodraščiai neskaičiuojami.",
+        "periodLabel": "Laikotarpis",
+        "months": "{count, plural, one {# mėnuo} few {# mėnesiai} many {# mėnesio} other {# mėnesių}}",
+        "groupByLabel": "Grupuoti pagal",
+        "groupBy": {
+          "type": "Renginio tipas",
+          "template": "Šablonas"
+        },
+        "rankingTypes": "Dažniausi tipai",
+        "rankingTemplates": "Dažniausiai naudojami šablonai",
+        "columns": {
+          "type": "Tipas",
+          "template": "Šablonas",
+          "events": "Renginiai",
+          "held": "Įvykę",
+          "avgParticipants": "Vid. dalyvių",
+          "avgDuration": "Vid. trukmė",
+          "total": "Visas laikotarpis"
+        },
+        "measuresNote": "Įvykę: renginiai, kurių kambarys buvo atidarytas. Vidutinis dalyvių skaičius: didžiausias vienu metu buvusių žmonių skaičius, įskaitant svečius, įvykusių renginių vidurkis. Vidutinė trukmė: išmatuotas laikas kambaryje, o ne suplanuotas.",
+        "byMonth": "Pagal mėnesius",
+        "measureLabel": "Rodiklis",
+        "measures": {
+          "events": "Renginiai",
+          "avgParticipants": "Vidutinis dalyvių skaičius",
+          "avgDurationMinutes": "Vidutinė trukmė"
+        },
+        "byMonthCaption": "{measure} pagal mėnesius",
+        "empty": "Šiuo laikotarpiu renginių nėra.",
+        "deletedTemplate": "{name} (ištrintas)",
+        "uncatalogedNote": "Nekatalogizuotų renginių: {count}. Jie sukurti prieš atsirandant katalogui arba be šablono ir be formato; juos galite katalogizuoti redaguodami renginį, techninėje informacijoje."
       }
     },
     "recurrence": {
@@ -2517,7 +2561,8 @@
       "postEventPublic": "Viešas puslapis po renginio",
       "offerAddressBook": "Siūlo adresų knygą besiregistruojantiems",
       "invalidFields": "Patikrinkite šiuos laukus: {fields}.",
-      "descriptionOtherLanguages": "Yra ir versijos kalbomis: {languages}, kurių čia redaguoti negalima. Jei pakeisite tekstą italų kalba, jos bus pašalintos."
+      "descriptionOtherLanguages": "Yra ir versijos kalbomis: {languages}, kurių čia redaguoti negalima. Jei pakeisite tekstą italų kalba, jos bus pašalintos.",
+      "usedBy": "Iš šio šablono sukurtų renginių: {count}"
     },
     "instantCall": {
       "title": "Momentinis vaizdo skambutis",
@@ -3029,7 +3074,20 @@
         "publishNow": "Skelbti dabar"
       },
       "editFeatures": "Redaguoti funkcijas",
-      "editPrivacy": "Redaguoti privatumą ir duomenis"
+      "editPrivacy": "Redaguoti privatumą ir duomenis",
+      "governance": {
+        "title": "Šį renginį tvarkote kaip administratorius",
+        "body": "Nesate vienas iš jo organizatorių: matote būseną, išsamią informaciją, registracijas ir sutikimus ir galite jį archyvuoti arba ištrinti. Renginio vedimas, moderatoriaus nuoroda ir įrašų turinys (vaizdo įrašas, transkripcijos, santraukos) priklauso organizatoriams.",
+        "recording": "Įrašo turinys prieinamas tik renginio organizatoriams ir dalyviams. Čia matote, ar jis yra, ir išsamią informaciją.",
+        "recordingFile": "Įrašas",
+        "present": "Yra",
+        "absent": "Nėra",
+        "recordingPublished": "Paskelbtas",
+        "yes": "Taip",
+        "no": "Ne",
+        "recordingDuration": "Trukmė",
+        "recordingSize": "Dydis"
+      }
     },
     "rubrica": {
       "subtitle": "Asmenys, davę sutikimą būti įtraukti į adresų knygą (BDAR 6.1.a str.). Vardas, el. paštas ir organizacija atnaujinami tik tada, kai asmuo vėl pažymi langelį.",
@@ -3299,7 +3357,8 @@
         "metricsTitle": "Santraukos rodikliai (LLM)",
         "chars": "simboliai",
         "model": "Modelis",
-        "notAvailable": "n. d."
+        "notAvailable": "n. d.",
+        "contentHidden": "Prieinama tik renginio organizatoriams."
       },
       "rel": {
         "title": "DI patikimumas",
@@ -3456,7 +3515,8 @@
         "alignNone": "Nėra skaidrės keitimo, kurį reikėtų suderinti.",
         "previewTitle": "Peržiūra",
         "previewHelp": "Vaizdo įrašas su skaidrėmis taip, kaip jį matys žiūrovai, su aukščiau įrašyta pataisa."
-      }
+      },
+      "contentOrganizerOnly": "Tik šio renginio organizatoriai gali matyti ir redaguoti šio įrašo turinį (vaizdo įrašą, takelius, transkripciją, santrauką, vertimus). Čia matote jo būseną, apdorojimo užduotis ir failų informaciją."
     },
     "questionnairesPage": {
       "subtitle": "Daugkartinio naudojimo klausimų šablonai išankstinės registracijos ir po renginio pildomiems klausimynams."
@@ -3748,7 +3808,9 @@
       "publishDesc": "Prieš skelbdami ją peržiūrėkite: tekstą parašė dirbtinio intelekto modelis. Iš naujo sukurtą ataskaitą reikia paskelbti iš naujo.",
       "preview": "Peržiūra",
       "hidePreview": "Slėpti peržiūrą",
-      "previewLanguage": "Kalba"
+      "previewLanguage": "Kalba",
+      "organizerOnly": "Tik šio renginio organizatoriai gali užsakyti, skaityti ir skelbti ataskaitą.",
+      "organizerOnlyExists": "Ataskaita yra. Tik šio renginio organizatoriai gali ją skaityti ir skelbti."
     },
     "endEvent": "Baigti renginį",
     "endEventConfirmTitle": "Baigti renginį visiems?",
@@ -4073,6 +4135,122 @@
       },
       "retainedNote": "{count, plural, one {# įrodymas saugomas} few {# įrodymai saugomi} many {# įrodymo saugoma} other {# įrodymų saugoma}}, kol vaizdo įrašas arba transkripcija egzistuoja.",
       "countsNote": "Skaičiuojami asmenys: registracija, darbuotojo paskyra ar vardinė nuoroda skaičiuojamos vieną kartą; svečias, grįžęs kito apsilankymo metu, skaičiuojamas iš naujo."
+    },
+    "recordingRemovals": {
+      "subtitle": "Asmenys, paprašę, kad jų nebūtų įraše. Kol prašymas atviras, tą įrašą galite atidaryti pašalinimo redaktoriuje, o kiekviena prieiga lieka operacijų žurnale.",
+      "filterOpen": "Atviri",
+      "filterAll": "Visi",
+      "filterLabel": "Kurie prašymai",
+      "empty": "Prašymų nėra.",
+      "loadError": "Nepavyko įkelti prašymų.",
+      "colReceived": "Gautas",
+      "colPerson": "Asmuo",
+      "colEvent": "Renginys",
+      "colSource": "Šaltinis",
+      "colStatus": "Būsena",
+      "open": "Atidaryti",
+      "unnamed": "Asmuo be vardo",
+      "sources": {
+        "self-service": "Mano duomenys",
+        "admin": "Komanda"
+      },
+      "statuses": {
+        "OPEN": "Atviras",
+        "IN_PROGRESS": "Vykdomas",
+        "PROCESSING": "Apdorojamas",
+        "CLOSED": "Uždarytas",
+        "REJECTED": "Atmestas"
+      },
+      "kinds": {
+        "registrant": "Užsiregistravęs",
+        "host": "Veda",
+        "guest": "Svečias"
+      },
+      "newOpen": "Užregistruoti prašymą",
+      "newTitle": "Kitu būdu gautas prašymas",
+      "newIntro": "Prašymui, kurį duomenų valdytojas gavo el. paštu, paštu ar asmeniškai. Pasirinkite įrašą ir, jei atpažįstate, asmenį iš tų, kurie buvo salėje.",
+      "recordingSearch": "Ieškoti renginio",
+      "recordingLabel": "Įrašas",
+      "recordingChoose": "Pasirinkite įrašą",
+      "recordingOption": "{title} · {date}",
+      "recordingNone": "Nėra įrašo su vaizdu ar atskirų dalyvių takeliais.",
+      "peopleLabel": "Kas buvo salėje",
+      "peopleNone": "Salėje neliko duomenų apie tai, kas joje buvo: įrašykite vardą, o intervalus pažymėsite rankiniu būdu.",
+      "personNotInVideo": "už kadro",
+      "personTimes": "nuo {from} iki {to}",
+      "personStill": "nuo {from} iki pabaigos",
+      "nameLabel": "Asmens vardas",
+      "noteLabel": "Kaip gautas prašymas (neprivaloma)",
+      "create": "Užregistruoti prašymą",
+      "createError": "Nepavyko užregistruoti prašymo.",
+      "cancel": "Atšaukti",
+      "back": "Visi prašymai",
+      "fieldPerson": "Asmuo",
+      "fieldEvent": "Renginys",
+      "fieldReceived": "Gautas",
+      "fieldSource": "Šaltinis",
+      "fieldStatus": "Būsena",
+      "fieldNote": "Pastaba",
+      "externalCopy": "Šio renginio vaizdo įrašas yra išorinėje svetainėje (pavyzdžiui, YouTube): pašalinimas jo nepasiekia. Pašalinkite arba pakeiskite jį ir ten.",
+      "publishedElsewhere": "Paskelbtas renginio vaizdo įrašas yra kitas failas nei šis įrašas: pašalinimas jo nekeičia. Pakeiskite jį arba pašalinkite iš renginio puslapio.",
+      "pipelineOff": "Pogamyba išjungta: pašalinimo užduotis laukia eilėje, kol ją įjungsite, o transkripcija iš naujo nerengiama.",
+      "noVideo": "Šis įrašas neturi vaizdo, tik atskirų dalyvių takelius: asmens takeliai ištrinami, o transkripcija parengiama iš naujo iš likusių.",
+      "noRecording": "Įrašo nebėra: nebeliko ką pašalinti.",
+      "keyOnly": "Egzemplioriaus raktu įrašo atidaryti negalima: prisijunkite savo administratoriaus paskyra.",
+      "startIntro": "Norėdami pašalinti asmenį, turite atidaryti įrašą. Prieiga galioja tik šiam prašymui ir lieka operacijų žurnale su jūsų paskyra.",
+      "start": "Atidaryti pašalinimo redaktorių",
+      "processing": "Vyksta pašalinimas: išvalytas vaizdo įrašas pakeis originalą. Užduoties būsena: {status}.",
+      "closed": "Prašymas uždarytas {date}.",
+      "closedIntervals": "{count, plural, =0 {Neuždengtas nė vienas intervalas.} one {# intervalas uždengtas.} few {# intervalai uždengti.} many {# intervalo uždengta.} other {# intervalų uždengta.}}",
+      "rejected": "Prašymas atmestas {date}.",
+      "lastError": "Paskutinis apdorojimas nepavyko: {error}. Patikrinkite intervalus ir siųskite dar kartą.",
+      "rejectTitle": "Atmesti prašymą",
+      "rejectLabel": "Priežastis",
+      "reject": "Atmesti",
+      "rejectConfirm": "Atmesti prašymą? Asmuo matys, kad jis atmestas.",
+      "actionError": "Operacija nepavyko (HTTP {code}).",
+      "editorTitle": "Uždengtini intervalai",
+      "editorHint": "Pasiūlymai sudaromi pagal tai, kas buvo salėje, kas kalbėjo, ir pagal atskirų dalyvių takelius: kalbėjimo laikai apytiksliai. Peržiūrėkite vaizdo įrašą ir pataisykite. Kiekviename intervale vietoj vaizdo rodomas užrašas „turinys pašalintas pagal prašymą“, o garsas nutildomas; trukmė nesikeičia.",
+      "sourcePresence": "Salėje",
+      "sourceSpeech": "Kalba",
+      "sourceTrack": "Takelis",
+      "selectedLegend": "Uždengti",
+      "useProposals": "Pradėti iš naujo nuo pasiūlymų",
+      "addInterval": "Pridėti intervalą čia",
+      "fieldStart": "Pradžia",
+      "fieldEnd": "Pabaiga",
+      "setStart": "Pradžia čia",
+      "setEnd": "Pabaiga čia",
+      "seek": "Pereiti",
+      "remove": "Pašalinti",
+      "intervalLabel": "Intervalas {n}",
+      "noIntervalsVideo": "Nėra uždengtinų intervalų. Jei asmuo vaizdo įraše nepasirodo, atmeskite prašymą nurodydami priežastį.",
+      "total": "{count, plural, one {# intervalas} few {# intervalai} many {# intervalo} other {# intervalų}} · {seconds} s uždengti",
+      "timeHint": "Laikas formatu valandos:minutės:sekundės, kaip grotuve.",
+      "invalidTime": "Netinkamas laikas",
+      "preview": "Pašalinimo peržiūra",
+      "timelineLabel": "Įrašo laiko juosta",
+      "mediaError": "Vaizdo įrašas neįkeliamas. Įkelkite puslapį iš naujo.",
+      "submit": "Pašalinti asmenį iš įrašo",
+      "submitConfirm": "Originalus vaizdo įrašas ir asmens takeliai bus ištrinti, o pogamyba atlikta iš naujo. To atšaukti negalima. Tęsti?",
+      "submitDone": "Prašymas uždarytas: asmuo pašalintas."
+    },
+    "catalog": {
+      "fieldTitle": "Katalogas",
+      "fieldHelp": "Renginio tipas ir šablonas, iš kurio jis sukurtas, naudojami tik egzemplioriaus statistikai ir nekeičia jokių nustatymų. Pataisykite juos, jei renginys katalogizuotas neteisingai arba visai nekatalogizuotas.",
+      "typeLabel": "Renginio tipas",
+      "templateLabel": "Šablonas",
+      "noTemplate": "Be šablono",
+      "deletedTemplate": "Sukurta iš šablono „{name}“, kuris vėliau ištrintas.",
+      "deletedOption": "{name} (ištrintas)",
+      "types": {
+        "MEETING": "Susitikimas",
+        "PARTICIPATORY": "Dalyvaujamasis renginys",
+        "PUBLIC": "Viešas renginys",
+        "INSTANT": "Greitasis skambutis",
+        "LEGACY": "Importuota publikacija",
+        "UNCATALOGED": "Nekatalogizuota"
+      }
     }
   },
   "email": {
@@ -4609,7 +4787,19 @@
       "addressBookPendingEffect": "Jei patvirtinsite, grįšite į adresų knygą su šios registracijos vardu ir organizacija ir vėl gausite kvietimus. Jei atšauksite arba jei tai buvote ne jūs, liksite už adresų knygos ribų ir kvietimų negausite.",
       "addressBookPendingConfirm": "Patvirtinti grįžimą",
       "addressBookPendingCancel": "Atšaukti prašymą",
-      "addressBookPendingGone": "Šis prašymas nebelaukia patvirtinimo. Įkelkite puslapį iš naujo, kad pamatytumėte dabartinę būseną."
+      "addressBookPendingGone": "Šis prašymas nebelaukia patvirtinimo. Įkelkite puslapį iš naujo, kad pamatytumėte dabartinę būseną.",
+      "removalTitle": "Renginio įrašas",
+      "removalIntro": "Šis renginys buvo įrašytas. Jei nenorite būti įraše, galite paprašyti, kad būtumėte iš jo pašalinti: vietos, kuriose pasirodote ar kalbate, uždengiamos užrašu ir nutildomos, o transkripcija, subtitrai ir santrauka parengiami iš naujo. Prašymas siunčiamas duomenų valdytojui, kuris jį išnagrinėja.",
+      "removalButton": "Nenoriu būti šiame įraše",
+      "removalConfirmTitle": "Patvirtinate prašymą?",
+      "removalConfirmBody": "Duomenų valdytojas pašalins iš įrašo vietas, kuriose pasirodote ar kalbate. Kitose svetainėse, pavyzdžiui, YouTube, paskelbtas kopijas atskirai turi pašalinti tas, kas jas paskelbė.",
+      "removalConfirm": "Siųsti prašymą",
+      "removalCancel": "Atšaukti",
+      "removalSent": "Prašymas išsiųstas. Duomenų valdytojas jį išnagrinės.",
+      "removalError": "Prašymo nepavyko išsiųsti. Bandykite vėliau.",
+      "removalStatusOpen": "{date} prašymas: nagrinėjamas.",
+      "removalStatusClosed": "{date} prašymas: įvykdytas {closed}.",
+      "removalStatusRejected": "{date} prašymas: atmestas. Norėdami sužinoti priežastį, parašykite duomenų valdytojui."
     },
     "erasure": {
       "title": "Jūsų duomenų ištrynimas",
@@ -6022,6 +6212,11 @@
     "captionsTranscriptNotTranslatable": "Ši transkripcija gauta iš tiesioginių subtitrų: automatiniam vertimui reikia įrašo DI transkripcijos.",
     "sameLanguage": "Pasirinkta kalba yra originali įrašo kalba: pasirinkite kitą.",
     "recordingDestinationNotCovered": "Šio renginio sutikimai galioja įrašui tik užsiregistravusiems: negalite padaryti jo matomo visiems ar susieti išorinio vaizdo įrašo.",
-    "mtUnavailable": "Šioje diegtyje mašininis vertimas neįdiegtas."
+    "mtUnavailable": "Šioje diegtyje mašininis vertimas neįdiegtas.",
+    "recordingContentOrganizerOnly": "Tik šio renginio organizatoriai gali atidaryti, keisti ar skelbti jo įrašų turinį."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Turinys pašalintas pagal prašymą",
+    "cardBody": "Ši įrašo dalis pašalinta pagal joje pasirodžiusio asmens prašymą."
   }
 }

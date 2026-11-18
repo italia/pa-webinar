@@ -789,7 +789,8 @@
     "accessDenied": {
       "title": "Dieser Bereich ist für Ihre Rolle nicht verfügbar",
       "body": "Als Veranstaltende verwalten Sie Ihre eigenen Veranstaltungen: anlegen, veröffentlichen, Materialien, Fragebögen und Nachbearbeitung. Die Plattformeinstellungen und die Daten aller Veranstaltungen bleiben bei der Administration.",
-      "back": "Zu Ihren Veranstaltungen"
+      "back": "Zu Ihren Veranstaltungen",
+      "organizerOnly": "Nur die Veranstaltenden können diese Veranstaltung bearbeiten. Als Administrator sehen Sie Status und Details und können sie archivieren oder löschen. Die Aufzeichnungen und ihr Inhalt gehören den Veranstaltenden und den Teilnehmenden."
     },
     "staffLogin": {
       "title": "Anmeldung im Verwaltungsbereich",
@@ -1520,7 +1521,9 @@
       "breadcrumbAriaLabel": "Brotkrümelnavigation",
       "skipToPage": "Zum Seiteninhalt springen",
       "openMenu": "Menü öffnen",
-      "closeMenu": "Menü schließen"
+      "closeMenu": "Menü schließen",
+      "recordingRemovals": "Anträge auf Entfernung",
+      "recordingRemovalDetail": "Antrag auf Entfernung"
     },
     "publications": {
       "subtitle": "Zentraler Redaktions-Hub für alle veröffentlichten Videos: geplante Events, Sofortanrufe, hochgeladene Archivaufzeichnungen und auf Promotion wartende Sitzungen.",
@@ -1664,7 +1667,8 @@
       "detailFilename": "Dateiname",
       "transcriptManage": "Transkript / KI verwalten",
       "transcriptReady": "Transkribiert",
-      "transcriptProcessing": "In Verarb."
+      "transcriptProcessing": "In Verarb.",
+      "organizerOnly": "Nur Veranstaltende"
     },
     "gdprAudit": {
       "subtitle": "Protokoll der Datenschutzmaßnahmen für personenbezogene Daten: Löschungen, Einwilligungen, Exporte",
@@ -1679,7 +1683,11 @@
         "DATA_DELETED": "Daten gelöscht",
         "CONSENT_RECORDED": "Einwilligung erfasst",
         "DATA_EXPORTED": "Daten exportiert",
-        "CONSENT_WITHDRAWN": "Einwilligung widerrufen"
+        "CONSENT_WITHDRAWN": "Einwilligung widerrufen",
+        "RECORDING_CONTENT_READ": "Aufzeichnungsinhalt vom Personal gelesen",
+        "RECORDING_REDACTION_REQUESTED": "Entfernung aus einer Aufzeichnung beantragt",
+        "RECORDING_REDACTION_REJECTED": "Antrag auf Entfernung abgelehnt",
+        "RECORDING_REDACTED": "Person aus einer Aufzeichnung entfernt"
       },
       "recordsAffected": "{count} betroffene Datensätze",
       "colWhen": "Wann",
@@ -1705,7 +1713,8 @@
       "rotating": "Wird neu generiert…",
       "regenerateTitle": "Moderator-Token neu generieren (alter Link wird ungültig)",
       "confirmRegenerate": "Sind Sie sicher, dass Sie den Token neu generieren möchten? Der alte Link funktioniert dann nicht mehr.",
-      "noResults": "Keine Events gefunden."
+      "noResults": "Keine Events gefunden.",
+      "organizerOnlyLink": "Link nur für die Veranstaltenden sichtbar"
     },
     "registrations": {
       "subtitle": "Alle zu Events angemeldeten Personen — suchen, filtern und exportieren",
@@ -2137,7 +2146,8 @@
         "DATA_DELETED": "Daten gelöscht",
         "CONSENT_RECORDED": "Einwilligung erfasst",
         "DATA_EXPORTED": "Daten exportiert",
-        "CONSENT_WITHDRAWN": "Einwilligung widerrufen"
+        "CONSENT_WITHDRAWN": "Einwilligung widerrufen",
+        "RECORDING_CONTENT_READ": "Aufzeichnungsinhalt vom Personal gelesen"
       }
     },
     "settings": {
@@ -2449,6 +2459,40 @@
         "avgParticipantsPerEvent": "Durchschnittliche Teilnehmende pro Veranstaltung",
         "avgFeedbackRating": "Durchschnittliche Feedback-Bewertung",
         "totalFeedback": "Feedback-Antworten"
+      },
+      "catalog": {
+        "title": "Veranstaltungstypen und Vorlagen",
+        "intro": "Wie viele Veranstaltungen jedes Typs und aus jeder Vorlage, Monat für Monat. Nur Anzahlen und Mittelwerte, keine personenbezogenen Daten. Entwürfe zählen nicht.",
+        "periodLabel": "Zeitraum",
+        "months": "{count, plural, one {# Monat} other {# Monate}}",
+        "groupByLabel": "Gruppieren nach",
+        "groupBy": {
+          "type": "Veranstaltungstyp",
+          "template": "Vorlage"
+        },
+        "rankingTypes": "Häufigste Typen",
+        "rankingTemplates": "Meistgenutzte Vorlagen",
+        "columns": {
+          "type": "Typ",
+          "template": "Vorlage",
+          "events": "Veranstaltungen",
+          "held": "Durchgeführt",
+          "avgParticipants": "Ø Teilnehmende",
+          "avgDuration": "Ø Dauer",
+          "total": "Gesamter Zeitraum"
+        },
+        "measuresNote": "Durchgeführt: Veranstaltungen, deren Raum geöffnet wurde. Durchschnittliche Teilnehmende: die höchste Zahl gleichzeitig Anwesender, Gäste eingeschlossen, gemittelt über die durchgeführten Veranstaltungen. Durchschnittliche Dauer: die gemessene Raumzeit, nicht die geplante.",
+        "byMonth": "Monat für Monat",
+        "measureLabel": "Messgröße",
+        "measures": {
+          "events": "Veranstaltungen",
+          "avgParticipants": "Durchschnittliche Teilnehmende",
+          "avgDurationMinutes": "Durchschnittliche Dauer"
+        },
+        "byMonthCaption": "{measure} pro Monat",
+        "empty": "Keine Veranstaltungen in diesem Zeitraum.",
+        "deletedTemplate": "{name} (gelöscht)",
+        "uncatalogedNote": "Nicht katalogisierte Veranstaltungen: {count}. Sie sind vor dem Katalog entstanden oder ohne Vorlage und ohne Format; Sie können sie beim Bearbeiten der Veranstaltung unter „Technische Details“ katalogisieren."
       }
     },
     "recurrence": {
@@ -2517,7 +2561,8 @@
       "postEventPublic": "Öffentliche Seite nach der Veranstaltung",
       "offerAddressBook": "Bietet bei der Anmeldung das Adressbuch an",
       "invalidFields": "Prüfen Sie diese Felder: {fields}.",
-      "descriptionOtherLanguages": "Es gibt auch Fassungen in: {languages}, die hier nicht bearbeitet werden können. Wenn Sie den italienischen Text ändern, werden sie entfernt."
+      "descriptionOtherLanguages": "Es gibt auch Fassungen in: {languages}, die hier nicht bearbeitet werden können. Wenn Sie den italienischen Text ändern, werden sie entfernt.",
+      "usedBy": "Aus dieser Vorlage erstellte Veranstaltungen: {count}"
     },
     "instantCall": {
       "title": "Sofort-Videoanruf",
@@ -3029,7 +3074,20 @@
         "publishNow": "Jetzt veröffentlichen"
       },
       "editFeatures": "Funktionen bearbeiten",
-      "editPrivacy": "Datenschutz und Daten bearbeiten"
+      "editPrivacy": "Datenschutz und Daten bearbeiten",
+      "governance": {
+        "title": "Sie verwalten diese Veranstaltung als Administrator",
+        "body": "Sie gehören nicht zu den Veranstaltenden: Sie sehen Status, Details, Anmeldungen und Einwilligungen und können die Veranstaltung archivieren oder löschen. Die Durchführung, der Moderationslink und der Inhalt der Aufzeichnungen (Video, Transkripte, Zusammenfassungen) sind Sache der Veranstaltenden.",
+        "recording": "Der Inhalt der Aufzeichnung steht nur den Veranstaltenden und den Teilnehmenden zur Verfügung. Hier sehen Sie, ob es sie gibt, und ihre Details.",
+        "recordingFile": "Aufzeichnung",
+        "present": "Vorhanden",
+        "absent": "Keine",
+        "recordingPublished": "Veröffentlicht",
+        "yes": "Ja",
+        "no": "Nein",
+        "recordingDuration": "Dauer",
+        "recordingSize": "Größe"
+      }
     },
     "rubrica": {
       "subtitle": "Personen, die der Aufnahme in das Adressbuch zugestimmt haben (Art. 6.1.a DSGVO). Name, E-Mail-Adresse und Organisation werden nur aktualisiert, wenn die Person das Kästchen erneut ankreuzt.",
@@ -3299,7 +3357,8 @@
         "metricsTitle": "Kennzahlen der Zusammenfassung (LLM)",
         "chars": "Zeichen",
         "model": "Modell",
-        "notAvailable": "k. A."
+        "notAvailable": "k. A.",
+        "contentHidden": "Nur für die Veranstaltenden verfügbar."
       },
       "rel": {
         "title": "Verlässlichkeit der KI",
@@ -3456,7 +3515,8 @@
         "alignNone": "Kein Folienwechsel zum Ausrichten.",
         "previewTitle": "Vorschau",
         "previewHelp": "Das Video mit den Folien, wie das Publikum sie sehen wird, mit der oben eingegebenen Korrektur."
-      }
+      },
+      "contentOrganizerOnly": "Nur die Veranstaltenden können den Inhalt dieser Aufzeichnung sehen und bearbeiten (Video, Spuren, Transkript, Zusammenfassung, Übersetzungen). Hier sehen Sie den Status, die Verarbeitungsaufträge und die Dateidetails."
     },
     "questionnairesPage": {
       "subtitle": "Wiederverwendbare Fragenvorlagen für Voranmeldungs- und Nach-Event-Fragebögen."
@@ -3748,7 +3808,9 @@
       "publishDesc": "Prüfen Sie ihn vor der Veröffentlichung: Der Text stammt von einem KI-Modell. Ein neu erstellter Bericht muss erneut veröffentlicht werden.",
       "preview": "Vorschau",
       "hidePreview": "Vorschau ausblenden",
-      "previewLanguage": "Sprache"
+      "previewLanguage": "Sprache",
+      "organizerOnly": "Nur die Veranstaltenden können den Bericht anfordern, lesen und veröffentlichen.",
+      "organizerOnlyExists": "Der Bericht liegt vor. Nur die Veranstaltenden können ihn lesen und veröffentlichen."
     },
     "endEvent": "Veranstaltung beenden",
     "endEventConfirmTitle": "Veranstaltung für alle beenden?",
@@ -4073,6 +4135,122 @@
       },
       "retainedNote": "{count, plural, one {# Einwilligungsnachweis wird} other {# Einwilligungsnachweise werden}} aufbewahrt, solange das Video oder das Transkript existiert.",
       "countsNote": "Gezählt werden Personen: eine Anmeldung, ein Mitarbeiterkonto oder ein persönlicher Link zählen einmal; ein Gast, der in einem anderen Besuch zurückkehrt, zählt erneut."
+    },
+    "recordingRemovals": {
+      "subtitle": "Personen, die beantragt haben, nicht in einer Aufzeichnung zu erscheinen. Solange ein Antrag offen ist, können Sie die betreffende Aufzeichnung im Entfernungseditor öffnen, und jeder Zugriff wird im Vorgangsprotokoll festgehalten.",
+      "filterOpen": "Offen",
+      "filterAll": "Alle",
+      "filterLabel": "Welche Anträge",
+      "empty": "Keine Anträge.",
+      "loadError": "Die Anträge konnten nicht geladen werden.",
+      "colReceived": "Eingegangen",
+      "colPerson": "Person",
+      "colEvent": "Veranstaltung",
+      "colSource": "Herkunft",
+      "colStatus": "Status",
+      "open": "Öffnen",
+      "unnamed": "Person ohne Namen",
+      "sources": {
+        "self-service": "Meine Daten",
+        "admin": "Team"
+      },
+      "statuses": {
+        "OPEN": "Offen",
+        "IN_PROGRESS": "In Bearbeitung",
+        "PROCESSING": "Wird verarbeitet",
+        "CLOSED": "Abgeschlossen",
+        "REJECTED": "Abgelehnt"
+      },
+      "kinds": {
+        "registrant": "Angemeldet",
+        "host": "Moderiert",
+        "guest": "Gast"
+      },
+      "newOpen": "Antrag erfassen",
+      "newTitle": "Ein auf anderem Weg eingegangener Antrag",
+      "newIntro": "Für einen Antrag, der den Verantwortlichen per E-Mail, Post oder persönlich erreicht hat. Wählen Sie die Aufzeichnung und, falls Sie sie erkennen, die Person unter denen, die im Raum waren.",
+      "recordingSearch": "Veranstaltung suchen",
+      "recordingLabel": "Aufzeichnung",
+      "recordingChoose": "Aufzeichnung auswählen",
+      "recordingOption": "{title} · {date}",
+      "recordingNone": "Keine Aufzeichnung mit Video oder mit Spuren pro Teilnehmer.",
+      "peopleLabel": "Wer im Raum war",
+      "peopleNone": "Der Raum hat nicht festgehalten, wer anwesend war: Geben Sie den Namen ein, die Intervalle markieren Sie dann von Hand.",
+      "personNotInVideo": "nicht im Bild",
+      "personTimes": "von {from} bis {to}",
+      "personStill": "von {from} bis zum Ende",
+      "nameLabel": "Name der Person",
+      "noteLabel": "Wie der Antrag eingegangen ist (optional)",
+      "create": "Antrag erfassen",
+      "createError": "Der Antrag konnte nicht erfasst werden.",
+      "cancel": "Abbrechen",
+      "back": "Alle Anträge",
+      "fieldPerson": "Person",
+      "fieldEvent": "Veranstaltung",
+      "fieldReceived": "Eingegangen",
+      "fieldSource": "Herkunft",
+      "fieldStatus": "Status",
+      "fieldNote": "Notiz",
+      "externalCopy": "Diese Veranstaltung hat ein Video auf einer externen Website (zum Beispiel YouTube): Die Entfernung wirkt sich darauf nicht aus. Entfernen oder ersetzen Sie es auch dort.",
+      "publishedElsewhere": "Das veröffentlichte Video der Veranstaltung ist eine andere Datei als diese Aufzeichnung: Die Entfernung ändert es nicht. Ersetzen Sie es oder nehmen Sie es von der Veranstaltungsseite.",
+      "pipelineOff": "Die Nachbearbeitung ist ausgeschaltet: Der Entfernungsauftrag bleibt in der Warteschlange, bis Sie sie einschalten, und das Transkript wird nicht neu erstellt.",
+      "noVideo": "Diese Aufzeichnung hat kein Video, nur Spuren pro Teilnehmer: Die Spuren der Person werden gelöscht und das Transkript wird aus den verbleibenden neu erstellt.",
+      "noRecording": "Die Aufzeichnung existiert nicht mehr: Es gibt nichts mehr zu entfernen.",
+      "keyOnly": "Mit dem Instanzschlüssel lässt sich keine Aufzeichnung öffnen: Melden Sie sich mit Ihrem Administratorkonto an.",
+      "startIntro": "Um die Person zu entfernen, müssen Sie die Aufzeichnung öffnen. Der Zugriff gilt nur für diesen Antrag und wird mit Ihrem Konto im Vorgangsprotokoll festgehalten.",
+      "start": "Entfernungseditor öffnen",
+      "processing": "Entfernung läuft: Das bereinigte Video ersetzt das Original. Auftragsstatus: {status}.",
+      "closed": "Antrag abgeschlossen am {date}.",
+      "closedIntervals": "{count, plural, =0 {Kein Intervall abgedeckt.} one {# Intervall abgedeckt.} other {# Intervalle abgedeckt.}}",
+      "rejected": "Antrag abgelehnt am {date}.",
+      "lastError": "Die letzte Verarbeitung ist fehlgeschlagen: {error}. Prüfen Sie die Intervalle und senden Sie erneut.",
+      "rejectTitle": "Antrag ablehnen",
+      "rejectLabel": "Grund",
+      "reject": "Ablehnen",
+      "rejectConfirm": "Antrag ablehnen? Die Person wird sehen, dass er abgelehnt wurde.",
+      "actionError": "Vorgang fehlgeschlagen (HTTP {code}).",
+      "editorTitle": "Abzudeckende Intervalle",
+      "editorHint": "Die Vorschläge stammen daraus, wer im Raum war, wer gesprochen hat, und aus den Spuren pro Teilnehmer: Die Sprechzeiten sind ungefähr. Sehen Sie sich das Video an und korrigieren Sie. In jedem Intervall zeigt das Video die Hinweistafel „Inhalt auf Antrag entfernt“ und der Ton wird stummgeschaltet; die Dauer ändert sich nicht.",
+      "sourcePresence": "Im Raum",
+      "sourceSpeech": "Spricht",
+      "sourceTrack": "Spur",
+      "selectedLegend": "Abzudecken",
+      "useProposals": "Mit den Vorschlägen neu beginnen",
+      "addInterval": "Hier ein Intervall hinzufügen",
+      "fieldStart": "Beginn",
+      "fieldEnd": "Ende",
+      "setStart": "Beginn hier",
+      "setEnd": "Ende hier",
+      "seek": "Springen",
+      "remove": "Entfernen",
+      "intervalLabel": "Intervall {n}",
+      "noIntervalsVideo": "Kein Intervall abzudecken. Wenn die Person nicht im Video zu sehen ist, lehnen Sie den Antrag unter Angabe des Grundes ab.",
+      "total": "{count, plural, one {# Intervall} other {# Intervalle}} · {seconds} s abzudecken",
+      "timeHint": "Zeiten in Stunden:Minuten:Sekunden, wie im Player.",
+      "invalidTime": "Ungültige Zeit",
+      "preview": "Vorschau der Entfernung",
+      "timelineLabel": "Zeitleiste der Aufzeichnung",
+      "mediaError": "Das Video lässt sich nicht laden. Laden Sie die Seite neu.",
+      "submit": "Person aus der Aufzeichnung entfernen",
+      "submitConfirm": "Das Originalvideo und die Spuren der Person werden gelöscht und die Nachbearbeitung wird neu ausgeführt. Das lässt sich nicht rückgängig machen. Fortfahren?",
+      "submitDone": "Antrag abgeschlossen: Die Person wurde entfernt."
+    },
+    "catalog": {
+      "fieldTitle": "Katalog",
+      "fieldHelp": "Der Veranstaltungstyp und die Vorlage, aus der sie entstanden ist, dienen nur der Statistik der Instanz und ändern keine Einstellung. Korrigieren Sie sie, wenn die Veranstaltung falsch oder gar nicht katalogisiert ist.",
+      "typeLabel": "Veranstaltungstyp",
+      "templateLabel": "Vorlage",
+      "noTemplate": "Keine Vorlage",
+      "deletedTemplate": "Aus der Vorlage „{name}“ erstellt, die inzwischen gelöscht wurde.",
+      "deletedOption": "{name} (gelöscht)",
+      "types": {
+        "MEETING": "Besprechung",
+        "PARTICIPATORY": "Partizipative Veranstaltung",
+        "PUBLIC": "Öffentliche Veranstaltung",
+        "INSTANT": "Sofortanruf",
+        "LEGACY": "Importierte Veröffentlichung",
+        "UNCATALOGED": "Nicht katalogisiert"
+      }
     }
   },
   "email": {
@@ -4609,7 +4787,19 @@
       "addressBookPendingEffect": "Wenn Sie bestätigen, kehren Sie mit dem Namen und der Organisation dieser Anmeldung ins Adressbuch zurück und erhalten wieder Einladungen. Wenn Sie abbrechen oder wenn Sie es nicht waren, bleiben Sie außerhalb des Adressbuchs und erhalten keine Einladungen.",
       "addressBookPendingConfirm": "Rückkehr bestätigen",
       "addressBookPendingCancel": "Anfrage abbrechen",
-      "addressBookPendingGone": "Diese Anfrage steht nicht mehr aus. Laden Sie die Seite neu, um den aktuellen Stand zu sehen."
+      "addressBookPendingGone": "Diese Anfrage steht nicht mehr aus. Laden Sie die Seite neu, um den aktuellen Stand zu sehen.",
+      "removalTitle": "Die Aufzeichnung der Veranstaltung",
+      "removalIntro": "Diese Veranstaltung wurde aufgezeichnet. Wenn Sie nicht in der Aufzeichnung erscheinen möchten, können Sie beantragen, daraus entfernt zu werden: Die Stellen, an denen Sie zu sehen sind oder sprechen, werden mit einer Hinweistafel überdeckt und stummgeschaltet, und Transkript, Untertitel und Zusammenfassung werden neu erstellt. Der Antrag geht an den Verantwortlichen für die Datenverarbeitung, der ihn prüft.",
+      "removalButton": "Ich möchte nicht in dieser Aufzeichnung erscheinen",
+      "removalConfirmTitle": "Antrag bestätigen?",
+      "removalConfirmBody": "Der Verantwortliche entfernt aus der Aufzeichnung die Stellen, an denen Sie zu sehen sind oder sprechen. Auf anderen Websites veröffentlichte Kopien, zum Beispiel auf YouTube, müssen gesondert von denjenigen entfernt werden, die sie veröffentlicht haben.",
+      "removalConfirm": "Antrag senden",
+      "removalCancel": "Abbrechen",
+      "removalSent": "Antrag gesendet. Der Verantwortliche wird ihn prüfen.",
+      "removalError": "Der Antrag konnte nicht gesendet werden. Bitte versuchen Sie es später erneut.",
+      "removalStatusOpen": "Antrag vom {date}: in Bearbeitung.",
+      "removalStatusClosed": "Antrag vom {date}: erledigt am {closed}.",
+      "removalStatusRejected": "Antrag vom {date}: abgelehnt. Schreiben Sie an den Verantwortlichen, um den Grund zu erfahren."
     },
     "erasure": {
       "title": "Löschung Ihrer Daten",
@@ -6022,6 +6212,11 @@
     "captionsTranscriptNotTranslatable": "Dieses Transkript stammt aus den Live-Untertiteln: Die automatische Übersetzung benötigt ein KI-Transkript der Aufzeichnung.",
     "sameLanguage": "Die gewählte Sprache ist die Originalsprache der Aufzeichnung: Wählen Sie eine andere.",
     "recordingDestinationNotCovered": "Die Einwilligungen dieser Veranstaltung gelten für eine Aufzeichnung nur für Angemeldete: Sie können sie nicht für alle sichtbar machen und auch kein externes Video verknüpfen.",
-    "mtUnavailable": "Die automatische Übersetzung ist auf dieser Instanz nicht installiert."
+    "mtUnavailable": "Die automatische Übersetzung ist auf dieser Instanz nicht installiert.",
+    "recordingContentOrganizerOnly": "Nur die Veranstaltenden dieser Veranstaltung können den Inhalt ihrer Aufzeichnungen öffnen, ändern oder veröffentlichen."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Inhalt auf Antrag entfernt",
+    "cardBody": "Dieser Teil der Aufzeichnung wurde auf Antrag einer Person entfernt, die darin vorkam."
   }
 }

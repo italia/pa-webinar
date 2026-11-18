@@ -789,7 +789,8 @@
     "accessDenied": {
       "title": "Tämä osio ei ole käytettävissä roolillesi",
       "body": "Järjestäjänä hallinnoit omia tapahtumiasi: niiden luomista ja julkaisua, materiaaleja, kyselyitä ja jälkituotantoa. Alustan asetukset ja kaikkien tapahtumien tiedot pysyvät ylläpidolla.",
-      "back": "Siirry omiin tapahtumiisi"
+      "back": "Siirry omiin tapahtumiisi",
+      "organizerOnly": "Vain tämän tapahtuman järjestäjät voivat muokata sitä. Ylläpitäjänä näet sen tilan ja tiedot ja voit arkistoida tai poistaa sen. Tallenteet ja niiden sisältö kuuluvat järjestäjille ja osallistujille."
     },
     "staffLogin": {
       "title": "Kirjaudu ylläpitoon",
@@ -1520,7 +1521,9 @@
       "breadcrumbAriaLabel": "Murupolku",
       "skipToPage": "Siirry sivun sisältöön",
       "openMenu": "Avaa valikko",
-      "closeMenu": "Sulje valikko"
+      "closeMenu": "Sulje valikko",
+      "recordingRemovals": "Poistopyynnöt",
+      "recordingRemovalDetail": "Poistopyyntö"
     },
     "publications": {
       "subtitle": "Yhtenäinen toimituksellinen keskus kaikille julkaistuille videoille: aikataulutetut tapahtumat, pikapuhelut, ladatut arkistotallenteet ja istunnot, jotka odottavat julkaisua.",
@@ -1664,7 +1667,8 @@
       "detailFilename": "Tiedostonimi",
       "transcriptManage": "Hallinnoi litterointia / tekoälyä",
       "transcriptReady": "Litteroitu",
-      "transcriptProcessing": "Käsitellään"
+      "transcriptProcessing": "Käsitellään",
+      "organizerOnly": "Vain järjestäjille"
     },
     "gdprAudit": {
       "subtitle": "Lokirekisteri henkilötietoihin kohdistuvista yksityisyystoimista: poistot, suostumukset, viennit",
@@ -1679,7 +1683,11 @@
         "DATA_DELETED": "Tiedot poistettu",
         "CONSENT_RECORDED": "Suostumus kirjattu",
         "DATA_EXPORTED": "Tiedot viety",
-        "CONSENT_WITHDRAWN": "Suostumus peruutettu"
+        "CONSENT_WITHDRAWN": "Suostumus peruutettu",
+        "RECORDING_CONTENT_READ": "Henkilökunta luki tallenteen sisällön",
+        "RECORDING_REDACTION_REQUESTED": "Poistoa tallenteesta pyydetty",
+        "RECORDING_REDACTION_REJECTED": "Poistopyyntö hylätty",
+        "RECORDING_REDACTED": "Henkilö poistettu tallenteesta"
       },
       "recordsAffected": "{count} tietuetta vaikuttunut",
       "colWhen": "Milloin",
@@ -1705,7 +1713,8 @@
       "rotating": "Luodaan uudelleen…",
       "regenerateTitle": "Luo moderaattoritunnus uudelleen (vanha linkki ei enää toimi)",
       "confirmRegenerate": "Luodaanko tunnus uudelleen? Vanha linkki lakkaa toimimasta.",
-      "noResults": "Tapahtumia ei löytynyt."
+      "noResults": "Tapahtumia ei löytynyt.",
+      "organizerOnlyLink": "Linkki näkyy vain tapahtuman järjestäjille"
     },
     "registrations": {
       "subtitle": "Kaikki tapahtumiin ilmoittautuneet henkilöt — hae, suodata ja vie",
@@ -2137,7 +2146,8 @@
         "DATA_DELETED": "Tiedot poistettu",
         "CONSENT_RECORDED": "Suostumus kirjattu",
         "DATA_EXPORTED": "Tiedot viety",
-        "CONSENT_WITHDRAWN": "Suostumus peruutettu"
+        "CONSENT_WITHDRAWN": "Suostumus peruutettu",
+        "RECORDING_CONTENT_READ": "Henkilökunta luki tallenteen sisällön"
       }
     },
     "settings": {
@@ -2449,6 +2459,40 @@
         "avgParticipantsPerEvent": "Osallistujia keskimäärin tapahtumaa kohti",
         "avgFeedbackRating": "Palautteen keskiarvo",
         "totalFeedback": "Palautevastaukset"
+      },
+      "catalog": {
+        "title": "Tapahtumatyypit ja mallit",
+        "intro": "Kuinka monta tapahtumaa kustakin tyypistä ja kustakin mallista kuukausittain. Vain määriä ja keskiarvoja, ei henkilötietoja. Luonnoksia ei lasketa.",
+        "periodLabel": "Ajanjakso",
+        "months": "{count, plural, one {# kuukausi} other {# kuukautta}}",
+        "groupByLabel": "Ryhmittele",
+        "groupBy": {
+          "type": "Tapahtuman tyyppi",
+          "template": "Malli"
+        },
+        "rankingTypes": "Yleisimmät tyypit",
+        "rankingTemplates": "Käytetyimmät mallit",
+        "columns": {
+          "type": "Tyyppi",
+          "template": "Malli",
+          "events": "Tapahtumat",
+          "held": "Pidetyt",
+          "avgParticipants": "Osallistujia keskim.",
+          "avgDuration": "Kesto keskim.",
+          "total": "Koko ajanjakso"
+        },
+        "measuresNote": "Pidetyt: tapahtumat, joiden tila avattiin. Osallistujia keskimäärin: samanaikaisesti paikalla olleiden enimmäismäärä vieraat mukaan lukien, keskimäärin pidetyissä tapahtumissa. Keskimääräinen kesto: mitattu aika tilassa, ei suunniteltu aika.",
+        "byMonth": "Kuukausittain",
+        "measureLabel": "Mittari",
+        "measures": {
+          "events": "Tapahtumat",
+          "avgParticipants": "Osallistujia keskimäärin",
+          "avgDurationMinutes": "Keskimääräinen kesto"
+        },
+        "byMonthCaption": "{measure} kuukausittain",
+        "empty": "Tällä ajanjaksolla ei ole tapahtumia.",
+        "deletedTemplate": "{name} (poistettu)",
+        "uncatalogedNote": "Luetteloimattomia tapahtumia: {count}. Ne on luotu ennen luetteloa tai ilman mallia ja muotoa; voit luetteloida ne tapahtuman muokkauksessa teknisten tietojen kohdassa."
       }
     },
     "recurrence": {
@@ -2517,7 +2561,8 @@
       "postEventPublic": "Julkinen tapahtuman jälkeinen sivu",
       "offerAddressBook": "Tarjoaa ilmoittautuville osoitekirjaan jäämistä",
       "invalidFields": "Tarkista nämä kentät: {fields}.",
-      "descriptionOtherLanguages": "Tekstistä on myös versiot kielillä: {languages}, joita ei voi muokata täällä. Jos muutat italiankielistä tekstiä, ne poistetaan."
+      "descriptionOtherLanguages": "Tekstistä on myös versiot kielillä: {languages}, joita ei voi muokata täällä. Jos muutat italiankielistä tekstiä, ne poistetaan.",
+      "usedBy": "Tästä mallista luotuja tapahtumia: {count}"
     },
     "instantCall": {
       "title": "Pikavideopuhelu",
@@ -3029,7 +3074,20 @@
         "publishNow": "Julkaise nyt"
       },
       "editFeatures": "Muokkaa toimintoja",
-      "editPrivacy": "Muokkaa tietosuojaa ja tietoja"
+      "editPrivacy": "Muokkaa tietosuojaa ja tietoja",
+      "governance": {
+        "title": "Hallinnoit tätä tapahtumaa ylläpitäjänä",
+        "body": "Et ole sen järjestäjä: näet tilan, tiedot, ilmoittautumiset ja suostumukset ja voit arkistoida tai poistaa sen. Tapahtuman vetäminen, moderaattorin linkki ja tallenteiden sisältö (video, litteroinnit, yhteenvedot) kuuluvat järjestäjille.",
+        "recording": "Tallenteen sisältö on vain tapahtuman järjestäjien ja osallistujien käytettävissä. Tässä näet, onko se olemassa, ja sen tiedot.",
+        "recordingFile": "Tallenne",
+        "present": "On",
+        "absent": "Ei ole",
+        "recordingPublished": "Julkaistu",
+        "yes": "Kyllä",
+        "no": "Ei",
+        "recordingDuration": "Kesto",
+        "recordingSize": "Koko"
+      }
     },
     "rubrica": {
       "subtitle": "Henkilöt, jotka ovat antaneet suostumuksen osoitekirjaan lisäämiseen (GDPR art. 6.1.a). Nimi, sähköposti ja organisaatio päivittyvät vain, kun henkilö valitsee ruudun uudelleen.",
@@ -3299,7 +3357,8 @@
         "metricsTitle": "Yhteenvedon mittarit (LLM)",
         "chars": "merkkiä",
         "model": "Malli",
-        "notAvailable": "ei tietoa"
+        "notAvailable": "ei tietoa",
+        "contentHidden": "Vain tapahtuman järjestäjien käytettävissä."
       },
       "rel": {
         "title": "Tekoälyn luotettavuus",
@@ -3456,7 +3515,8 @@
         "alignNone": "Ei kohdistettavia dian vaihtoja.",
         "previewTitle": "Esikatselu",
         "previewHelp": "Video ja diat siten kuin yleisö ne näkee, yllä kirjoitetulla korjauksella."
-      }
+      },
+      "contentOrganizerOnly": "Vain tämän tapahtuman järjestäjät voivat nähdä ja muokata tämän tallenteen sisältöä (video, raidat, litterointi, yhteenveto, käännökset). Tässä näet sen tilan, käsittelytyöt ja tiedostojen tiedot."
     },
     "questionnairesPage": {
       "subtitle": "Uudelleenkäytettävät kysymysmallit ennakkoilmoittautumis- ja tapahtuman jälkeisiä kyselyitä varten."
@@ -3748,7 +3808,9 @@
       "publishDesc": "Tarkista se ennen julkaisua: tekstin on kirjoittanut tekoälymalli. Uudelleen luotu raportti on julkaistava uudelleen.",
       "preview": "Esikatselu",
       "hidePreview": "Piilota esikatselu",
-      "previewLanguage": "Kieli"
+      "previewLanguage": "Kieli",
+      "organizerOnly": "Vain tämän tapahtuman järjestäjät voivat pyytää, lukea ja julkaista raportin.",
+      "organizerOnlyExists": "Raportti on olemassa. Vain tämän tapahtuman järjestäjät voivat lukea ja julkaista sen."
     },
     "endEvent": "Päätä tapahtuma",
     "endEventConfirmTitle": "Päätetäänkö tapahtuma kaikilta?",
@@ -4073,6 +4135,122 @@
       },
       "retainedNote": "{count, plural, one {# todiste säilytetään} other {# todistetta säilytetään}}, niin kauan kuin video tai litterointi on olemassa.",
       "countsNote": "Lasketaan henkilöitä: ilmoittautuminen, henkilökunnan tili tai nimetty linkki lasketaan kerran; toisella käynnillä palaava vieras lasketaan uudelleen."
+    },
+    "recordingRemovals": {
+      "subtitle": "Henkilöt, jotka ovat pyytäneet, ettei heitä näytetä tallenteessa. Niin kauan kuin pyyntö on avoinna, voit avata tallenteen poistoeditorista, ja jokainen käyttökerta jää toimintolokiin.",
+      "filterOpen": "Avoimet",
+      "filterAll": "Kaikki",
+      "filterLabel": "Mitkä pyynnöt",
+      "empty": "Ei pyyntöjä.",
+      "loadError": "Pyyntöjä ei voitu ladata.",
+      "colReceived": "Saapunut",
+      "colPerson": "Henkilö",
+      "colEvent": "Tapahtuma",
+      "colSource": "Lähde",
+      "colStatus": "Tila",
+      "open": "Avaa",
+      "unnamed": "Nimetön henkilö",
+      "sources": {
+        "self-service": "Omat tietoni",
+        "admin": "Henkilökunta"
+      },
+      "statuses": {
+        "OPEN": "Avoin",
+        "IN_PROGRESS": "Työn alla",
+        "PROCESSING": "Käsittelyssä",
+        "CLOSED": "Suljettu",
+        "REJECTED": "Hylätty"
+      },
+      "kinds": {
+        "registrant": "Ilmoittautunut",
+        "host": "Juontaa",
+        "guest": "Vieras"
+      },
+      "newOpen": "Kirjaa pyyntö",
+      "newTitle": "Muuta kautta saapunut pyyntö",
+      "newIntro": "Pyynnölle, joka on tullut rekisterinpitäjälle sähköpostilla, postitse tai henkilökohtaisesti. Valitse tallenne ja, jos tunnistat henkilön, hänet niiden joukosta, jotka olivat huoneessa.",
+      "recordingSearch": "Hae tapahtumaa",
+      "recordingLabel": "Tallenne",
+      "recordingChoose": "Valitse tallenne",
+      "recordingOption": "{title} · {date}",
+      "recordingNone": "Ei tallenteita, joissa on video tai osallistujakohtaiset raidat.",
+      "peopleLabel": "Ketkä olivat huoneessa",
+      "peopleNone": "Huoneesta ei jäänyt tietoa paikalla olleista: kirjoita nimi, niin merkitset aikavälit käsin.",
+      "personNotInVideo": "ei kuvassa",
+      "personTimes": "kohdasta {from} kohtaan {to}",
+      "personStill": "kohdasta {from} loppuun asti",
+      "nameLabel": "Henkilön nimi",
+      "noteLabel": "Miten pyyntö saapui (valinnainen)",
+      "create": "Kirjaa pyyntö",
+      "createError": "Pyyntöä ei voitu kirjata.",
+      "cancel": "Peruuta",
+      "back": "Kaikki pyynnöt",
+      "fieldPerson": "Henkilö",
+      "fieldEvent": "Tapahtuma",
+      "fieldReceived": "Saapunut",
+      "fieldSource": "Lähde",
+      "fieldStatus": "Tila",
+      "fieldNote": "Huomautus",
+      "externalCopy": "Tällä tapahtumalla on video ulkoisella sivustolla (esimerkiksi YouTubessa): poisto ei ulotu siihen. Poista tai korvaa video myös siellä.",
+      "publishedElsewhere": "Tapahtuman julkaistu video on eri tiedosto kuin tämä tallenne: poisto ei muuta sitä. Korvaa video tai poista se tapahtuman sivulta.",
+      "pipelineOff": "Jälkikäsittely on pois päältä: poistotyö odottaa jonossa, kunnes kytket sen päälle, eikä litterointia tehdä uudelleen.",
+      "noVideo": "Tässä tallenteessa ei ole videota, vain osallistujakohtaiset raidat: henkilön raidat poistetaan ja litterointi tehdään uudelleen jäljelle jäävistä.",
+      "noRecording": "Tallennetta ei enää ole: poistettavaa ei ole jäljellä.",
+      "keyOnly": "Instanssin avaimella ei voi avata tallennetta: kirjaudu sisään ylläpitäjätililläsi.",
+      "startIntro": "Poistaaksesi henkilön sinun on avattava tallenne. Pääsy koskee vain tätä pyyntöä ja jää toimintolokiin tililläsi.",
+      "start": "Avaa poistoeditori",
+      "processing": "Poisto käynnissä: siistitty video korvaa alkuperäisen. Työn tila: {status}.",
+      "closed": "Pyyntö suljettu {date}.",
+      "closedIntervals": "{count, plural, =0 {Ei peitettyjä aikavälejä.} one {# aikaväli peitetty.} other {# aikaväliä peitetty.}}",
+      "rejected": "Pyyntö hylätty {date}.",
+      "lastError": "Viimeisin käsittely epäonnistui: {error}. Tarkista aikavälit ja lähetä uudelleen.",
+      "rejectTitle": "Hylkää pyyntö",
+      "rejectLabel": "Syy",
+      "reject": "Hylkää",
+      "rejectConfirm": "Hylätäänkö pyyntö? Henkilö näkee, että se on hylätty.",
+      "actionError": "Toiminto epäonnistui (HTTP {code}).",
+      "editorTitle": "Peitettävät aikavälit",
+      "editorHint": "Ehdotukset perustuvat siihen, ketkä olivat huoneessa ja ketkä puhuivat, sekä osallistujakohtaisiin raitoihin: puheajat ovat likimääräisiä. Katso video ja korjaa. Jokaisella aikavälillä videossa näkyy kyltti ”sisältö poistettu pyynnöstä” ja ääni mykistetään; kesto ei muutu.",
+      "sourcePresence": "Huoneessa",
+      "sourceSpeech": "Puhuu",
+      "sourceTrack": "Raita",
+      "selectedLegend": "Peitettävä",
+      "useProposals": "Aloita alusta ehdotuksista",
+      "addInterval": "Lisää aikaväli tähän",
+      "fieldStart": "Alku",
+      "fieldEnd": "Loppu",
+      "setStart": "Alku tähän",
+      "setEnd": "Loppu tähän",
+      "seek": "Siirry",
+      "remove": "Poista",
+      "intervalLabel": "Aikaväli {n}",
+      "noIntervalsVideo": "Ei peitettäviä aikavälejä. Jos henkilö ei näy videossa, hylkää pyyntö ja kerro syy.",
+      "total": "{count, plural, one {# aikaväli} other {# aikaväliä}} · {seconds} s peitettävänä",
+      "timeHint": "Ajat muodossa tunnit:minuutit:sekunnit, kuten toistimessa.",
+      "invalidTime": "Virheellinen aika",
+      "preview": "Poiston esikatselu",
+      "timelineLabel": "Tallenteen aikajana",
+      "mediaError": "Video ei lataudu. Lataa sivu uudelleen.",
+      "submit": "Poista henkilö tallenteesta",
+      "submitConfirm": "Alkuperäinen video ja henkilön raidat poistetaan ja jälkikäsittely tehdään uudelleen. Tätä ei voi perua. Jatketaanko?",
+      "submitDone": "Pyyntö suljettu: henkilö on poistettu."
+    },
+    "catalog": {
+      "fieldTitle": "Luettelo",
+      "fieldHelp": "Tapahtuman tyyppi ja malli, josta se luotiin, ovat vain instanssin tilastoja varten eivätkä muuta mitään asetusta. Korjaa ne, jos tapahtuma on luetteloitu väärin tai sitä ei ole luetteloitu.",
+      "typeLabel": "Tapahtuman tyyppi",
+      "templateLabel": "Malli",
+      "noTemplate": "Ei mallia",
+      "deletedTemplate": "Luotu mallista ”{name}”, joka on sittemmin poistettu.",
+      "deletedOption": "{name} (poistettu)",
+      "types": {
+        "MEETING": "Kokous",
+        "PARTICIPATORY": "Osallistava tapahtuma",
+        "PUBLIC": "Julkinen tapahtuma",
+        "INSTANT": "Pikapuhelu",
+        "LEGACY": "Tuotu julkaisu",
+        "UNCATALOGED": "Luetteloimaton"
+      }
     }
   },
   "email": {
@@ -4609,7 +4787,19 @@
       "addressBookPendingEffect": "Jos vahvistat, palaat osoitekirjaan tämän ilmoittautumisen nimellä ja organisaatiolla ja saat taas kutsuja. Jos peruutat tai jos se et ollut sinä, pysyt osoitekirjan ulkopuolella etkä saa kutsuja.",
       "addressBookPendingConfirm": "Vahvista paluu",
       "addressBookPendingCancel": "Peruuta pyyntö",
-      "addressBookPendingGone": "Tämä pyyntö ei enää odota vahvistusta. Lataa sivu uudelleen nähdäksesi ajantasaisen tilan."
+      "addressBookPendingGone": "Tämä pyyntö ei enää odota vahvistusta. Lataa sivu uudelleen nähdäksesi ajantasaisen tilan.",
+      "removalTitle": "Tapahtuman tallenne",
+      "removalIntro": "Tämä tapahtuma on tallennettu. Jos et halua esiintyä tallenteessa, voit pyytää, että sinut poistetaan siitä: kohdat, joissa näyt tai puhut, peitetään kyltillä ja mykistetään, ja litterointi, tekstitykset ja yhteenveto tehdään uudelleen. Pyyntö menee rekisterinpitäjälle, joka käsittelee sen.",
+      "removalButton": "En halua esiintyä tässä tallenteessa",
+      "removalConfirmTitle": "Vahvistatko pyynnön?",
+      "removalConfirmBody": "Rekisterinpitäjä poistaa tallenteesta kohdat, joissa näyt tai puhut. Muille sivustoille, esimerkiksi YouTubeen, julkaistut kopiot poistaa erikseen se, joka ne on julkaissut.",
+      "removalConfirm": "Lähetä pyyntö",
+      "removalCancel": "Peruuta",
+      "removalSent": "Pyyntö lähetetty. Rekisterinpitäjä käsittelee sen.",
+      "removalError": "Pyyntöä ei voitu lähettää. Yritä myöhemmin uudelleen.",
+      "removalStatusOpen": "{date} tehty pyyntö: käsittelyssä.",
+      "removalStatusClosed": "{date} tehty pyyntö: valmistui {closed}.",
+      "removalStatusRejected": "{date} tehty pyyntö: hylätty. Kirjoita rekisterinpitäjälle saadaksesi tietää syyn."
     },
     "erasure": {
       "title": "Tietojesi poistaminen",
@@ -6022,6 +6212,11 @@
     "captionsTranscriptNotTranslatable": "Tämä litterointi on peräisin livetekstityksestä: automaattinen käännös edellyttää tallenteen tekoälylitterointia.",
     "sameLanguage": "Valittu kieli on tallenteen alkuperäinen kieli: valitse toinen.",
     "recordingDestinationNotCovered": "Tämän tapahtuman suostumukset koskevat tallennetta, joka on vain ilmoittautuneille: et voi tehdä siitä kaikille näkyvää etkä liittää ulkoista videota.",
-    "mtUnavailable": "Konekäännöstä ei ole asennettu tähän instanssiin."
+    "mtUnavailable": "Konekäännöstä ei ole asennettu tähän instanssiin.",
+    "recordingContentOrganizerOnly": "Vain tämän tapahtuman järjestäjät voivat avata, muuttaa tai julkaista sen tallenteiden sisällön."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Sisältö poistettu pyynnöstä",
+    "cardBody": "Tämä tallenteen osa on poistettu siinä esiintyneen henkilön pyynnöstä."
   }
 }

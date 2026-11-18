@@ -9,6 +9,8 @@ import type * as Accodamento from '@/lib/report/enqueue';
 const m = vi.hoisted(() => ({ accoda: vi.fn(), evento: vi.fn(), aggiorna: vi.fn(), audit: vi.fn() }));
 vi.mock('next/headers', () => ({ cookies: vi.fn(async () => ({ get: () => undefined })) }));
 vi.mock('@/lib/auth/staff-session', () => ({ requireEventManager: vi.fn(async () => ({ role: 'admin' })) }));
+// L'accesso al contenuto segue la guardia qui sopra (test/contenuto-come-gestore).
+vi.mock('@/lib/recording/content-access', () => import('@/test/contenuto-come-gestore'));
 vi.mock('@/lib/audit/admin-audit', () => ({ logAdminAction: m.audit }));
 vi.mock('@/lib/captions/transcript', () => ({ conservazioneFinita: () => false, registrazionePubblica: vi.fn() }));
 vi.mock('@/lib/report/enqueue', async (orig) => ({

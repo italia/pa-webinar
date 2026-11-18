@@ -26,6 +26,7 @@ import {
 } from '@/lib/email/templates';
 import { ensureEventRecap, formatRecapSummary } from '@/lib/events/recap';
 import { rubricaOptOutUrl } from '@/lib/persons/opt-out-link';
+import { videoPerTutti } from '@/lib/recording/audience';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { localizedUrl } from '@/lib/utils/localized-url';
 
@@ -70,6 +71,14 @@ export async function finalizePostEventEmails(opts: {
       moderatorEmail: true,
       recordingPublished: true,
       recordingUrl: true,
+      // Il link al video va nell'email solo se il video e' aperto a tutti:
+      // chi la riceve puo' non avere una sessione dello staff ne'
+      // un'iscrizione (lib/recording/audience).
+      transcriptPublished: true,
+      recordingAudience: true,
+      recordingDestination: true,
+      postEventPublic: true,
+      postEventPublicUntil: true,
     },
   });
 
@@ -151,7 +160,13 @@ export async function finalizePostEventEmails(opts: {
           eventPageUrl: localizedUrl(baseUrl, `/events/${event.slug}`, pagina),
           siteName,
           recapSummary: recap ? formatRecapSummary(recap, testi) : '',
-          recordingUrl: event.recordingPublished ? event.recordingUrl : null,
+          // La rotta dell'app, che ripete il controllo, e solo per un video
+          // aperto a tutti: mai l'indirizzo dello storage in un'email, ne' un
+          // link che chi la riceve non potrebbe aprire (lib/recording/audience).
+          recordingUrl: (() => {
+            const percorso = videoPerTutti(event, now);
+            return percorso ? `${baseUrl.replace(/\/+$/, '')}${percorso}` : null;
+          })(),
         });
         await enqueueEmail({
           to: moderatorEmail,

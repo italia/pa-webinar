@@ -119,6 +119,7 @@ import {
   type StatoMedia,
 } from '@/lib/jitsi/riconnessione';
 import { useRientro } from '@/hooks/use-rientro';
+import { usePresencePass } from '@/hooks/use-presence-pass';
 import { splitTitleKicker } from '@/lib/utils/title-kicker';
 import { useSettings } from '@/lib/settings-context';
 import { OVERTIME_CAP_DEFAULT_MINUTES } from '@/lib/events/overtime-defaults';
@@ -628,6 +629,8 @@ export default function LiveEventClient({
   // un ospite con la rete instabile ne riceve uno nuovo, con un posto nuovo,
   // a ogni rientro.
   const tokenSalaRef = useRef<string[]>([]);
+  // Chiamata rapida registrata: il pass di presenza per rivederla dal link.
+  usePresencePass(event.slug, event.eventType === 'INSTANT' && isRecording, tokenSalaRef);
   // Sale a ogni richiesta del token e a ogni ritiro: una rilettura dei consensi
   // partita prima racconta uno stato gia' superato, e non vale.
   const epocaConsensiRef = useRef(0);

@@ -12,9 +12,11 @@
  * whatever bucket/container the provider is pointed to.
  */
 
+import { prisma } from '@/lib/db';
+import { AppError } from '@/lib/errors';
 import { erroreDestinazioneNonCoperta, type Destinazione } from '@/lib/recording/destination';
 
-import type { BrowserUpload } from './provider';
+import type { BrowserUpload, StorageProvider } from './provider';
 
 import { getRecordingsStorage, recordingsProviderLabel } from './index';
 
@@ -109,23 +111,112 @@ export async function abortRecordingBrowserUpload(
 }
 
 /**
- * Return a short-lived signed GET URL for an existing recording, given
- * the canonical URL we stored in the DB. Returns `recordingUrl` unchanged
- * if no provider is configured (local/dev mode — URL is assumed usable
- * as-is). Returns null if the URL can't be parsed against the configured
- * provider (corrupt DB row, moved bucket, etc.).
+ * Return a short-lived signed GET URL for an existing recording of the
+ * event `eventId`, given the canonical URL we stored in the DB. Returns
+ * `recordingUrl` unchanged if no provider is configured (local/dev mode —
+ * URL is assumed usable as-is). Returns null if the URL can't be parsed
+ * against the configured provider (corrupt DB row, moved bucket, etc.) or
+ * if the object belongs to another event (`appartenenzaChiave`): a signed
+ * URL is a read grant, and it is only ever given for the event's own files.
  */
 export async function generateRecordingSasUrl(
   recordingUrl: string,
   expiresInMinutes: number,
+  eventId: string,
 ): Promise<string | null> {
   const provider = getRecordingsStorage();
   if (!provider) return recordingUrl;
 
   const key = provider.keyFromUrl(recordingUrl);
   if (!key) return null;
+  if ((await appartenenzaChiave(provider, key, eventId)) === 'altrui') {
+    console.warn(`[storage] refusing to sign a file of another event (event ${eventId})`);
+    return null;
+  }
 
   return provider.getDownloadUrl(key, { expiresInMinutes });
+}
+
+/** Le chiavi che portano nel nome l'evento a cui appartengono. */
+const PREFISSI_CON_EVENTO = /^(?:postprod|recordings\/multitrack)\/([0-9a-f-]{36})\//i;
+
+/**
+ * Una chiave che lo storage, o qualcuno lungo la strada, potrebbe leggere come
+ * un'altra: segmenti vuoti, `.` o `..`, barre rovesciate, barre e punti
+ * codificati. Un confronto fra stringhe sul prefisso non dice dove finisce
+ * davvero (lib/recorder/blob-key): una chiave cosi' non si attribuisce a
+ * nessun evento e non si firma.
+ */
+function chiaveAmbigua(key: string): boolean {
+  if (/%(2e|2f|5c)/i.test(key) || key.includes('\\')) return true;
+  return key.split('/').some((seg) => seg === '' || seg === '.' || seg === '..');
+}
+
+/**
+ * Di chi e' un oggetto dello storage delle registrazioni, rispetto a un evento.
+ *
+ *  - `dell-evento`: porta l'evento nel nome (postprod, tracce per persona), e'
+ *    il file di una sua registrazione o sessione, oppure nessun altro evento lo
+ *    usa (un video caricato a mano, il cui nome non dice l'evento);
+ *  - `altrui`: porta nel nome un altro evento, o e' il video, il recupero in
+ *    diretta, una registrazione o una sessione di un altro evento; oppure e'
+ *    una chiave ambigua (`chiaveAmbigua`), che non si attribuisce a nessuno.
+ *
+ * L'indirizzo si confronta per chiave, non per testo: due forme dello stesso
+ * oggetto (path-style e virtual-host) sono lo stesso file.
+ */
+export async function appartenenzaChiave(
+  provider: StorageProvider,
+  key: string,
+  eventId: string,
+): Promise<'dell-evento' | 'altrui'> {
+  if (chiaveAmbigua(key)) return 'altrui';
+  const conEvento = PREFISSI_CON_EVENTO.exec(key);
+  if (conEvento) return conEvento[1]!.toLowerCase() === eventId.toLowerCase() ? 'dell-evento' : 'altrui';
+
+  const [registrazioni, eventi, sessioni] = await Promise.all([
+    prisma.recording.findMany({ where: { blobKey: key }, select: { eventId: true } }),
+    // Anche il recupero in diretta di un altro evento: e' un suo file.
+    prisma.event.findMany({
+      where: {
+        id: { not: eventId },
+        OR: [{ recordingUrl: { contains: key } }, { tempRecordingUrl: { contains: key } }],
+      },
+      select: { recordingUrl: true, tempRecordingUrl: true },
+    }),
+    prisma.callSession.findMany({
+      where: { eventId: { not: eventId }, recordingUrl: { contains: key } },
+      select: { recordingUrl: true },
+    }),
+  ]);
+  const stessaChiave = (url: string | null) => !!url && provider.keyFromUrl(url) === key;
+  if (registrazioni.some((r) => r.eventId !== eventId)) return 'altrui';
+  if (eventi.some((e) => stessaChiave(e.recordingUrl) || stessaChiave(e.tempRecordingUrl))) return 'altrui';
+  if (sessioni.some((c) => stessaChiave(c.recordingUrl))) return 'altrui';
+  return 'dell-evento';
+}
+
+/**
+ * Un indirizzo nuovo per il video di un evento: se e' un file del nostro
+ * storage, deve essere suo (`appartenenzaChiave`). Un indirizzo esterno, o
+ * senza storage configurato, non e' un file che l'app firma: passa com'e'
+ * (le regole su dove puo' stare le applica `assertVideoNelloStorage`).
+ */
+export async function assertVideoDellEvento(
+  eventId: string,
+  url: string | null | undefined,
+): Promise<void> {
+  if (!url) return;
+  const provider = getRecordingsStorage();
+  const key = provider?.keyFromUrl(url);
+  if (!provider || !key) return;
+  if ((await appartenenzaChiave(provider, key, eventId)) === 'altrui') {
+    throw new AppError(
+      'The recording URL points to a file of another event',
+      422,
+      'RECORDING_URL_NOT_OWNED',
+    );
+  }
 }
 
 /**
@@ -170,6 +261,12 @@ export function assertVideoNelloStorage(
   if (destinazione !== 'REGISTRANTS' || !dopo || dopo === prima) return;
   const provider = getRecordingsStorage();
   if (provider && !provider.keyFromUrl(dopo)) throw erroreDestinazioneNonCoperta();
+}
+
+/** Se l'indirizzo e' un file del nostro storage delle registrazioni. */
+export function fileDelloStorage(url: string): boolean {
+  const provider = getRecordingsStorage();
+  return !!provider && provider.keyFromUrl(url) !== null;
 }
 
 /** True when a recordings provider is configured and wired. */
