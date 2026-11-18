@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: EUPL-1.2
 // SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
 
-import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import type { PartecipantiNelVideo } from '@/lib/live/consent-rule';
 import {
   consensiRichiesti,
   trascrizioneRichiesta,
@@ -19,25 +19,28 @@ import {
  * sempre facoltativo: chi non lo da' entra lo stesso (lib/live/listen-only). Chi
  * conduce o interviene non lo vede: e' sempre nel video, e la sala glielo dice
  * (lib/live/consent-rule). Senza nulla che possa registrare
- * (lib/recording/availability) non si chiede e non si informa. Nelle chiamate
- * rapide non si chiede all'ingresso: chi partecipa entra con la voce fuori dalla
- * registrazione, e la sala lo chiede quando qualcuno la avvia
+ * (lib/recording/availability) non si chiede e non si informa. Dove chi
+ * partecipa non entra mai nel video ('esclusi') non si chiede: si informa. Nelle
+ * chiamate rapide non si chiede all'ingresso: chi partecipa entra con la voce
+ * fuori dalla registrazione, e la sala lo chiede quando qualcuno la avvia
  * (components/live/recording-question).
  */
 /**
  * L'evento registra, e chi conduce o interviene e' nella registrazione: la
  * stessa regola per la sala d'attesa, la pagina della sala e la rotta del token.
  * Una chiamata rapida registra solo dove la voce di chi non acconsente resta
- * fuori (`voce` 'rimovibile', lib/live/consent-rule): altrove la sala non offre
- * la registrazione.
+ * fuori ('solo-voce' o 'esclusi', lib/live/consent-rule): altrove la sala non
+ * offre la registrazione.
  */
 export function registraChiConduce(
   evento: { recordingEnabled: boolean; eventType?: string | null },
   registrazioneDisponibile: boolean,
-  voce?: VoceNelVideo,
+  partecipanti?: PartecipantiNelVideo,
 ): boolean {
   if (!evento.recordingEnabled || !registrazioneDisponibile) return false;
-  return evento.eventType !== 'INSTANT' || voce === 'rimovibile';
+  return (
+    evento.eventType !== 'INSTANT' || partecipanti === 'solo-voce' || partecipanti === 'esclusi'
+  );
 }
 
 export function consensoRegistrazioneIngresso(i: {
@@ -51,12 +54,17 @@ export function consensoRegistrazioneIngresso(i: {
   /** Chiamata rapida (eventType INSTANT): la domanda arriva in sala, quando
    *  qualcuno avvia la registrazione. */
   istantanea?: boolean;
+  /** Come compaiono nel video i partecipanti (lib/recording/availability). */
+  partecipanti: PartecipantiNelVideo;
 }): { richiesto: boolean; soloAscolto: boolean } {
   if (i.istantanea || i.conduce) return { richiesto: false, soloAscolto: false };
-  const formato = consensiRichiesti({
-    ...i.formato,
-    recordingEnabled: i.formato.recordingEnabled && i.registrazioneDisponibile,
-  });
+  const formato = consensiRichiesti(
+    {
+      ...i.formato,
+      recordingEnabled: i.formato.recordingEnabled && i.registrazioneDisponibile,
+    },
+    i.partecipanti,
+  );
   const richiesto = formato.registrazione && !i.giaDato;
   return {
     richiesto,
@@ -78,8 +86,8 @@ export function consensoTrascrizioneIngresso(i: {
   concluso: boolean;
   /** Dato all'iscrizione o in sala: la casella non si ripropone. */
   giaDato?: boolean;
-  /** La voce di chi non acconsente nel video (lib/recording/availability). */
-  voce?: VoceNelVideo;
+  /** Come compaiono nel video i partecipanti (lib/recording/availability). */
+  partecipanti?: PartecipantiNelVideo;
   /** Il `soloAscolto` di `consensoRegistrazioneIngresso`: si avvisa e basta. */
   soloAscolto?: boolean;
   /** Il consenso alla registrazione si chiede solo in sala, quando qualcuno la
@@ -88,7 +96,10 @@ export function consensoTrascrizioneIngresso(i: {
 }): boolean {
   // Dove si avvisa soltanto, e nelle chiamate rapide, la voce non si registra
   // senza il consenso, che si da' in sala: la trascrizione, qui, non varrebbe.
-  const nonVarrebbe = (i.voce === 'rimovibile' && !!i.soloAscolto) || !!i.registrazioneInSala;
+  // Dove chi partecipa non entra mai nel video ('esclusi') la trascrizione non
+  // aspetta un altro consenso, e vale da subito.
+  const nonVarrebbe =
+    (i.partecipanti === 'solo-voce' && !!i.soloAscolto) || !!i.registrazioneInSala;
   return trascrizioneRichiesta(i.formato) && !i.concluso && !i.giaDato && !nonVarrebbe;
 }
 

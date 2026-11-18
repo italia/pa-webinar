@@ -25,6 +25,7 @@ const CON_TRACCE = {
 beforeEach(async () => {
   await svuotaDatabase();
   vi.stubEnv('RECORDING_VOICE_EXCLUSION', 'true');
+  vi.stubEnv('RECORDING_PARTICIPANT_VOICE', 'true');
   vi.stubEnv('CAPTIONS_STATUS_URL', 'http://captions.example.org/health');
 });
 afterEach(() => vi.unstubAllEnvs());

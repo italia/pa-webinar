@@ -358,6 +358,7 @@ describe('testo letto', () => {
 
   it('dice quali consensi si danno di nuovo: solo finche’ l’evento li chiede', async () => {
     vi.stubEnv('RECORDING_VOICE_EXCLUSION', 'true');
+    vi.stubEnv('RECORDING_PARTICIPANT_VOICE', 'true');
     const evento = (campi: Record<string, unknown>) => ({
       ...iscrizione('x', 'x').event,
       eventType: 'SCHEDULED',
@@ -381,6 +382,7 @@ describe('testo letto', () => {
       recording: {
         destination: 'PUBLIC',
         voice: 'rimovibile',
+        participants: 'solo-voce',
         eventText: 'Testo dell’ente',
         // Il consenso all'iscrizione non dichiara la destinazione: non copre un
         // video pubblico, e va dato di nuovo.

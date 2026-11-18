@@ -30,7 +30,7 @@ import type { EventFormatClass, RecordingAudience } from '@prisma/client';
 
 import { useRouter, percorso } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
-import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import type { PartecipantiNelVideo } from '@/lib/live/consent-rule';
 import { elencoPredefinito } from '@/lib/live/participant-list';
 import { profiloSalvato } from '@/lib/events/grant-profile';
 import { eventAdminPath } from '@/lib/events/admin-links';
@@ -246,8 +246,8 @@ export interface WizardProps {
   /** L'installazione puo' registrare (lib/recording/availability): senza,
    *  il riepilogo non promette consensi alla registrazione. */
   recordingAvailable?: boolean;
-  /** La voce di chi non acconsente nel video (lib/recording/availability). */
-  voceNelVideo?: VoceNelVideo;
+  /** Come compaiono nel video i partecipanti (lib/recording/availability). */
+  partecipantiNelVideo?: PartecipantiNelVideo;
   /** Le lingue di traduzione predefinite dell'istanza (SiteSetting). */
   defaultTargetLocales?: string | null;
   /** La post-produzione AI e' accesa sull'installazione: spenta, il passo Permessi
@@ -523,7 +523,7 @@ export default function EventWizard(props: WizardProps) {
       ? (props.recordingAvailable ?? true)
       : registrazioneProponibile(
           props.recordingAvailable ?? true,
-          props.voceNelVideo,
+          props.partecipantiNelVideo,
           props.aiPipelineEnabled ?? true,
         );
   // Un evento gia' salvato con una conservazione piu' lunga del massimo (le
@@ -725,7 +725,7 @@ export default function EventWizard(props: WizardProps) {
     // Dove non si puo' registrare un modello non accende la registrazione.
     const registra = (tpl?.recordingEnabled ?? false) && recordingAvailable;
     const conAi = registra && (props.aiPipelineEnabled ?? true);
-    const campiDelModello = campiDaModello(tpl, registra, videoDaDestinare(props.voceNelVideo));
+    const campiDelModello = campiDaModello(tpl, registra, videoDaDestinare(props.partecipantiNelVideo));
     const suInvito = !publicRegistrationFor(
       { accessMode: tpl?.accessMode ?? null },
       props.publicRegistrationEnabled ?? true,
@@ -908,7 +908,7 @@ export default function EventWizard(props: WizardProps) {
     !istantanea &&
     !salaBloccata &&
     recordingAvailable &&
-    videoDaDestinare(props.voceNelVideo) &&
+    videoDaDestinare(props.partecipantiNelVideo) &&
     (mode === 'create' ||
       !!initialEvent?.destinazioneDaChiedere ||
       initialEvent?.event.recordingEnabled === false);
@@ -1763,7 +1763,7 @@ export default function EventWizard(props: WizardProps) {
     !iscrizioneAperta &&
     form.recordingEnabled &&
     recordingAvailable &&
-    videoDaDestinare(props.voceNelVideo)
+    videoDaDestinare(props.partecipantiNelVideo)
   ) {
     if (form.recordingDestination === 'PUBLIC') {
       // Con la pagina privata il video non lo vede nessuno: lo dice notaPagina.
@@ -1781,7 +1781,7 @@ export default function EventWizard(props: WizardProps) {
     if (
       videoPubblico(form) &&
       !form.postEventPublic &&
-      !registrazioneVuota(form, props.voceNelVideo, recordingAvailable)
+      !registrazioneVuota(form, props.partecipantiNelVideo, recordingAvailable)
     ) {
       notaPagina = 'postEventPagePrivateVideoHidden';
     } else if (!paginaScelta && form.postEventPublic !== paginaDiPartenza) {
@@ -2540,7 +2540,7 @@ export default function EventWizard(props: WizardProps) {
                     props.etichettaFormato?.({
                       registra:
                         !form.recordingEnabled ||
-                        registrazioneVuota(form, props.voceNelVideo, recordingAvailable)
+                        registrazioneVuota(form, props.partecipantiNelVideo, recordingAvailable)
                           ? 'no'
                           : form.recordingDestination === 'PUBLIC'
                             ? 'pubblica'
@@ -2773,7 +2773,7 @@ export default function EventWizard(props: WizardProps) {
               whiteboardInfraReady={props.whiteboardInfraReady}
               liveCaptionsAvailable={props.liveCaptionsAvailable ?? false}
               recordingAvailable={recordingAvailable}
-              voceNelVideo={props.voceNelVideo}
+              partecipantiNelVideo={props.partecipantiNelVideo}
               aiPipelineEnabled={props.aiPipelineEnabled ?? true}
               editing={mode === 'edit'}
             />
@@ -2792,7 +2792,7 @@ export default function EventWizard(props: WizardProps) {
             aiPipelineEnabled={props.aiPipelineEnabled ?? true}
             liveCaptionsAvailable={props.liveCaptionsAvailable ?? false}
             recordingAvailable={recordingAvailable}
-            voceNelVideo={props.voceNelVideo}
+            partecipantiNelVideo={props.partecipantiNelVideo}
             istantanea={istantanea}
             addressBookEnabled={props.addressBookEnabled ?? true}
             chiedeDestinazione={chiedeDestinazione}
@@ -2836,7 +2836,7 @@ export default function EventWizard(props: WizardProps) {
                   fieldErrors={fieldErrors}
                   whiteboardInfraReady={props.whiteboardInfraReady}
                   recordingAvailable={recordingAvailable}
-                  voceNelVideo={props.voceNelVideo}
+                  partecipantiNelVideo={props.partecipantiNelVideo}
                   istantanea={istantanea}
                   puoDichiarareChiConduce={viaToken === null}
                   destinazioneDopo={destinazioneDopoIlSalvataggio(form, destinazioneSenzaScelta)}

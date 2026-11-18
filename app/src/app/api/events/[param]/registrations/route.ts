@@ -45,12 +45,13 @@ import {
 import { getSettings } from '@/lib/settings';
 import { captionsTranscriptActive } from '@/lib/captions/availability';
 import { localizedUrl } from '@/lib/utils/localized-url';
-import { recordingAvailableFor, voceNelVideo } from '@/lib/recording/availability';
+import { partecipantiNelVideo, recordingAvailableFor } from '@/lib/recording/availability';
 import {
   destinazioneDelTesto,
   testoInVigore,
   testoLetto,
-  VERSIONE_TESTO_REGISTRAZIONE,
+  versioneCopre,
+  versioneLetta,
 } from '@/lib/recording/destination';
 import {
   buildEventAccessSetCookie,
@@ -111,7 +112,7 @@ export const POST = withErrorHandling(async (request, context) => {
 
   const {
     displayName, email, consentGiven, organization, organizationRole, organizationType,
-    consentRecording, consentRecordingDestination, consentMultitrack,
+    consentRecording, consentRecordingDestination, consentRecordingVersion, consentMultitrack,
     consentFutureCommunications, consentAddressBook,
   } = parsed.data;
 
@@ -127,16 +128,19 @@ export const POST = withErrorHandling(async (request, context) => {
   // del modulo (lib/registration/consents).
   const settings = await getSettings();
   const disponibile = recordingAvailableFor(event);
-  const voce = voceNelVideo();
-  const richiesti = consensiRichiesti({
-    ...event,
-    // Come la sala d'attesa: dove la scheda dice che non si registra niente, il
-    // consenso alla registrazione non si chiede.
-    recordingEnabled: event.recordingEnabled && disponibile,
-    multitrackRecordingEnabled: event.multitrackRecordingEnabled && disponibile,
-    captionsTranscript: captionsTranscriptActive(event, settings),
-    trascrizioneVideo: trascrizioneDalVideo(event, settings, disponibile, voce),
-  });
+  const partecipanti = partecipantiNelVideo();
+  const richiesti = consensiRichiesti(
+    {
+      ...event,
+      // Come la sala d'attesa: dove la scheda dice che non si registra niente, il
+      // consenso alla registrazione non si chiede.
+      recordingEnabled: event.recordingEnabled && disponibile,
+      multitrackRecordingEnabled: event.multitrackRecordingEnabled && disponibile,
+      captionsTranscript: captionsTranscriptActive(event, settings),
+      trascrizioneVideo: trascrizioneDalVideo(event, settings, disponibile, partecipanti),
+    },
+    partecipanti,
+  );
 
   // Il consenso alla registrazione vale per il testo letto. Se la destinazione
   // e' cambiata a pagina aperta, chi ha spuntato la casella rilegge prima di
@@ -144,18 +148,27 @@ export const POST = withErrorHandling(async (request, context) => {
   // non e' mai una condizione per iscriversi. La risposta dipende solo dal modulo
   // e dall'evento: su invito non dice niente dell'indirizzo.
   const registrazioneData = richiesti.registrazione && consentRecording === true;
-  const destinazioneInVigore = destinazioneDelTesto(event.recordingDestination, voce);
-  if (registrazioneData && !testoInVigore(consentRecordingDestination, destinazioneInVigore)) {
+  const destinazioneInVigore = destinazioneDelTesto(event.recordingDestination, partecipanti);
+  // Anche il testo: dove chi partecipa puo' comparire nel video vale solo quello
+  // che lo dice, e una pagina aperta prima che l'installazione cambiasse ne
+  // mostrava un altro (`versioneCopre`).
+  const versioneValida = versioneCopre(consentRecordingVersion, partecipanti);
+  if (
+    registrazioneData &&
+    (!testoInVigore(consentRecordingDestination, destinazioneInVigore) || !versioneValida)
+  ) {
     throw new ValidationError('Validation failed', [
       { path: ['consentRecording'], message: 'registration.errors.recordingDestinationChanged' },
     ]);
   }
-  // Un testo che non dichiara la destinazione non ha neanche una versione
-  // (VERSIONE_TESTO_REGISTRAZIONE).
+  // La versione del testo mostrato si salva con o senza destinazione
+  // (`versioneLetta`).
   const destinazioneLetta = registrazioneData
     ? testoLetto(consentRecordingDestination, destinazioneInVigore)
     : null;
-  const versioneLetta = destinazioneLetta !== null ? VERSIONE_TESTO_REGISTRAZIONE : null;
+  const versioneDelTesto = registrazioneData
+    ? versioneLetta(consentRecordingVersion, partecipanti)
+    : null;
 
   // La rubrica non proposta non ha casella: un valore che arriva lo stesso, da
   // una pagina aperta prima del cambio o da chi chiama la rotta, non conta.
@@ -167,9 +180,14 @@ export const POST = withErrorHandling(async (request, context) => {
   // salvati o video) e' facoltativa: senza, ci si iscrive lo stesso e la voce non
   // si registra ne' si trascrive (lib/captions/room). Dove la voce di chi non
   // acconsente alla registrazione resta fuori, senza quel consenso non vale
-  // neanche questo.
-  const regola = regolaConsenso(event, disponibile, voce);
-  const senzaVoce = regola.registra && !regola.soloAscolto && consentRecording !== true;
+  // neanche questo; dove chi partecipa non entra mai nel video ('esclusi') il
+  // consenso alla registrazione non si chiede, e questo vale da solo.
+  const regola = regolaConsenso(event, disponibile, partecipanti);
+  const senzaVoce =
+    regola.registra &&
+    !regola.soloAscolto &&
+    !regola.voceDallaTrascrizione &&
+    consentRecording !== true;
   const trascrizioneData = !senzaVoce && consentMultitrack === true;
 
   // L'ente, quando l'evento lo chiede: la regola del modulo vale anche per chi
@@ -251,7 +269,7 @@ export const POST = withErrorHandling(async (request, context) => {
         consentTimestamp: new Date(),
         consentRecording: richiesti.registrazione ? (consentRecording ?? false) : null,
         consentRecordingDestination: destinazioneLetta,
-        consentRecordingVersion: versioneLetta,
+        consentRecordingVersion: versioneDelTesto,
         consentMultitrack: richiesti.tracce ? trascrizioneData : null,
         consentMultitrackVersion: richiesti.tracce && trascrizioneData ? VERSIONE_TESTO_TRASCRIZIONE : null,
         consentFutureCommunications: comunicazioniFuture && !spuntaSospesa,
@@ -285,7 +303,7 @@ export const POST = withErrorHandling(async (request, context) => {
           consentGiven: true,
           consentRecording: richiesti.registrazione ? (consentRecording ?? false) : null,
           consentRecordingDestination: destinazioneLetta,
-          consentRecordingVersion: versioneLetta,
+          consentRecordingVersion: versioneDelTesto,
           // Il fatto lato server: la regola dell'evento chiedeva o no il
           // consenso alla registrazione (altrimenti l'iscrizione informa).
           recordingConsentRequired: richiesti.registrazione,

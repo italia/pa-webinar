@@ -4,7 +4,7 @@
 import type { RecordingAudience } from '@prisma/client';
 
 import { AppError } from '@/lib/errors';
-import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import type { PartecipantiNelVideo } from '@/lib/live/consent-rule';
 
 /**
  * La destinazione della registrazione di un evento: cio' a cui acconsente chi
@@ -36,17 +36,19 @@ export type Destinazione = RecordingAudience | null;
 export const DESTINAZIONE_DI_PARTENZA = 'REGISTRANTS' satisfies RecordingAudience;
 
 /**
- * Se c'e' un video della sala a cui dare una destinazione. Dove la voce non entra
- * nel video (voce 'assente') quel video non c'e', e il testo della casella lo dice
+ * Se c'e' un video della sala a cui dare una destinazione. Senza un video completo
+ * ('assente') quel video non c'e', e il testo della casella lo dice
  * (`destinazioneDelTesto`): la scelta tra riservata e pubblica non si propone.
+ * Dove chi partecipa non entra mai nel video ('esclusi') il video c'e', con chi
+ * conduce, e la destinazione conta per loro.
  *
  * Decide solo cosa si chiede a chi organizza. L'evento parte riservato comunque
  * (`destinazioneDiPartenza`): un file caricato dopo e' un video come gli altri, e
  * se l'installazione aggiunge il video chi ha letto quel testo va richiesto in
  * sala, perche' il suo consenso non dichiara una destinazione (`consensoCopre`).
  */
-export function videoDaDestinare(voce: VoceNelVideo | undefined): boolean {
-  return voce !== 'assente';
+export function videoDaDestinare(partecipanti: PartecipantiNelVideo | undefined): boolean {
+  return partecipanti !== 'assente';
 }
 
 /**
@@ -137,23 +139,84 @@ export function recuperoAperto(evento: {
 /**
  * La versione del testo del consenso alla registrazione. Si salva con il
  * consenso, accanto alla destinazione letta (Registration.consentRecordingVersion,
- * RecordingConsent.textVersion), solo se il testo la dichiara:
+ * RecordingConsent.textVersion), come dice `versioneDellaProva`:
  *   1. il testo che dice dove va il video (gdpr.consent.recordingReserved,
  *      gdpr.consent.recordingPublic), con nome, voce e immagine di chi acconsente;
  *   2. lo stesso testo per la sola voce: nel video compare solo chi conduce, e di
- *      chi acconsente si registra la voce quando interviene (lib/live/consent-rule).
+ *      chi acconsente si registra la voce quando interviene (lib/live/consent-rule);
+ *   3. il testo senza video (`VERSIONE_TESTO_SENZA_VIDEO`).
  * Un consenso dato con il testo 1 copre anche il 2, che chiede meno: non si
- * richiede.
- * Due testi non lo dicono, e destinazione e versione restano null, come sui
- * consensi dati prima: gdpr.consent.recording, su un evento senza destinazione,
- * e gdpr.consent.recordingNoVideo, dove non c'e' un video da pubblicare. Per
+ * richiede. Dove l'installazione non tiene chi partecipa fuori dal video
+ * ('visibili') la casella mostra di nuovo il testo 1, con le sue parole, la
+ * prova salva 1 (`versioneDellaProva`), e un consenso dato sul testo 2 non copre
+ * piu' (`versioneCopre`): prometteva che volto e nome restavano fuori.
+ * Due testi non dicono la destinazione, che resta null come sui consensi dati
+ * prima: gdpr.consent.recording (o recordingVisible), su un evento senza
+ * destinazione, e gdpr.consent.recordingNoVideo, dove non c'e' un video da
+ * pubblicare. La versione si salva comunque (`versioneDellaProva`): il testo
+ * senza video ha un numero suo, perche' non copre un video. Per
  * questo i consensi si confrontano con `destinazioneDelTesto`, non con la colonna
  * dell'evento: dove non c'e' un video un consenso senza destinazione copre. Se
- * poi l'installazione registra il video, su un evento con destinazione non copre
- * piu', perche' quel testo diceva che il video non c'era, e si richiede in sala.
+ * poi l'installazione registra il video, quel consenso non copre piu', perche'
+ * il testo diceva che il video non c'era, e si richiede in sala.
  * Si cambia insieme al testo, quando il suo scopo cambia.
  */
 export const VERSIONE_TESTO_REGISTRAZIONE = 2;
+
+/** Il testo 1: nome, voce e immagine (gdpr.consent.recordingVisible*). */
+export const VERSIONE_TESTO_VISIBILI = 1;
+
+/**
+ * Il testo dove l'installazione non registra il video della sala
+ * (gdpr.consent.recordingNoVideo). Non e' un seguito degli altri due: e' il
+ * numero che lo distingue nella prova, perche' non copre un video.
+ */
+export const VERSIONE_TESTO_SENZA_VIDEO = 3;
+
+/**
+ * La versione del testo che la casella mostra in questa installazione, da
+ * salvare con la prova con o senza destinazione. Una prova senza versione e'
+ * stata data prima che i testi la dichiarassero, quando ogni testo con un video
+ * diceva audio e video.
+ */
+export function versioneDellaProva(partecipanti: PartecipantiNelVideo): number {
+  if (partecipanti === 'assente') return VERSIONE_TESTO_SENZA_VIDEO;
+  return partecipanti === 'visibili' ? VERSIONE_TESTO_VISIBILI : VERSIONE_TESTO_REGISTRAZIONE;
+}
+
+/**
+ * Se un consenso dato sul testo `versione` vale per il video di questa
+ * installazione. Dove chi partecipa puo' comparire ('visibili') vale il testo che
+ * diceva nome, voce e immagine, e una prova senza versione, data quando ogni
+ * testo con un video diceva audio e video; il testo per la sola voce no, perche'
+ * prometteva che volto e nome restavano fuori. Dove c'e' un video, il testo
+ * senza video non vale: diceva che il video non c'era. Senza un video vale ogni
+ * testo.
+ */
+export function versioneCopre(
+  versione: number | null | undefined,
+  partecipanti: PartecipantiNelVideo
+): boolean {
+  if (partecipanti === 'assente') return true;
+  if (versione === VERSIONE_TESTO_SENZA_VIDEO) return false;
+  return partecipanti !== 'visibili' || versione == null || versione === VERSIONE_TESTO_VISIBILI;
+}
+
+/**
+ * Una prova di consenso gia' data copre il testo in vigore: la destinazione
+ * (`consensoCopre`) e il testo (`versioneCopre`). Chi ha una prova che non copre
+ * entra fuori dal video, o in solo ascolto, e lo si richiede in sala, sul testo
+ * che dice cosa riprende il video.
+ */
+export function provaCopre(
+  prova: { destination: Destinazione | undefined; textVersion?: number | null },
+  inVigore: Destinazione | undefined,
+  partecipanti: PartecipantiNelVideo
+): boolean {
+  return (
+    consensoCopre(prova.destination, inVigore) && versioneCopre(prova.textVersion, partecipanti)
+  );
+}
 
 /**
  * Un elemento di RecordingConsent.earlierPeriods, il periodo di un consenso
@@ -200,14 +263,14 @@ export function consensoCopre(
 /**
  * La destinazione che il testo della casella dichiara: quella con cui si
  * confrontano i consensi e che si salva nella prova. E' quella dell'evento,
- * salvo dove non c'e' un video (voce 'assente'): quel testo non dice dove va,
+ * salvo dove non c'e' un video ('assente'): quel testo non dice dove va,
  * perche' non c'e' niente da pubblicare.
  */
 export function destinazioneDelTesto(
   destinazione: Destinazione | undefined,
-  voce: VoceNelVideo
+  partecipanti: PartecipantiNelVideo
 ): Destinazione {
-  return voce === 'assente' ? null : (destinazione ?? null);
+  return partecipanti === 'assente' ? null : (destinazione ?? null);
 }
 
 /**
@@ -246,6 +309,11 @@ export function testoInVigore(
  * non la dichiarava, il consenso non c'e'. La persona entra lo stesso, fuori dal
  * video: il consenso non e' mai una condizione per entrare.
  *
+ * Dove chi partecipa puo' comparire nel video ('visibili') conta anche la versione
+ * del testo che la pagina dice di aver mostrato (`provaCopre`): un consenso dato
+ * sul testo per la sola voce, su una pagina aperta prima che l'installazione
+ * cambiasse, non vale.
+ *
  * Una pagina aperta non si aggiorna da sola. La risposta del token riporta la
  * destinazione in vigore (`recordingDestination`, da `destinazioneDelTesto`), e
  * la sala mostra quel testo, cosi' la persona rilegge prima di acconsentire. Il
@@ -257,11 +325,33 @@ export function consensoOra(
   corpo: {
     recordingConsent?: boolean;
     recordingConsentDestination?: Destinazione;
+    recordingConsentVersion?: number;
   },
-  inVigore: Destinazione | undefined
+  inVigore: Destinazione | undefined,
+  partecipanti: PartecipantiNelVideo
 ): boolean {
   if (corpo.recordingConsent !== true) return false;
-  return consensoCopre(testoLetto(corpo.recordingConsentDestination, inVigore), inVigore);
+  return provaCopre(
+    {
+      destination: testoLetto(corpo.recordingConsentDestination, inVigore),
+      textVersion: corpo.recordingConsentVersion,
+    },
+    inVigore,
+    partecipanti
+  );
+}
+
+/**
+ * La versione del testo su cui e' stato dato un consenso ora: quella che la
+ * pagina dice di aver mostrato, o, da una pagina aperta prima che il campo
+ * esistesse, quella del testo in vigore. Si salva con la prova: dice cio' che la
+ * persona ha letto, anche se l'installazione e' cambiata intanto.
+ */
+export function versioneLetta(
+  letta: number | undefined,
+  partecipanti: PartecipantiNelVideo
+): number {
+  return letta ?? versioneDellaProva(partecipanti);
 }
 
 const TESTO_CASELLA = {
@@ -269,19 +359,43 @@ const TESTO_CASELLA = {
   REGISTRANTS: 'recordingReserved',
 } as const;
 
+const TESTO_CASELLA_VISIBILI = {
+  PUBLIC: 'recordingVisiblePublic',
+  REGISTRANTS: 'recordingVisibleReserved',
+} as const;
+
 /**
  * Il testo della casella di consenso alla registrazione, come chiave sotto
  * `gdpr.consent`: lo stesso nel modulo, in sala d'attesa e nei punti della sala
- * in cui si da' il consenso. Dove non c'e' un video (voce 'assente') dice questo,
- * qualunque sia la destinazione dell'evento: si salva come dice
- * `VERSIONE_TESTO_REGISTRAZIONE`.
+ * in cui si da' il consenso. Dove non c'e' un video ('assente') dice questo,
+ * qualunque sia la destinazione dell'evento. Dove chi partecipa puo' comparire
+ * ('visibili') non promette che volto e nome restano fuori: e' il testo 1, nome,
+ * voce e immagine. Si salva come dice `versioneDellaProva`. Dove chi
+ * partecipa non entra mai nel video ('esclusi') la casella non si mostra: resta
+ * il testo per la sola voce, quello su cui un consenso dato prima si ritira.
  */
 export function chiaveConsenso(
   destinazione: Destinazione | undefined,
-  voce: VoceNelVideo
+  partecipanti: PartecipantiNelVideo
 ) {
-  if (voce === 'assente') return 'recordingNoVideo';
+  if (partecipanti === 'assente') return 'recordingNoVideo';
+  if (partecipanti === 'visibili') {
+    return destinazione ? TESTO_CASELLA_VISIBILI[destinazione] : 'recordingVisible';
+  }
   return destinazione ? TESTO_CASELLA[destinazione] : 'recording';
+}
+
+/**
+ * L'informativa sulla registrazione dove non si chiede niente
+ * (`consensiRichiesti(...).avvisoRegistrazione`), come chiave sotto
+ * `gdpr.consent`: il pubblico non ha microfono, videocamera ne' schermo, oppure
+ * nel video non entra mai ('esclusi'). Dove chi partecipa puo' comparire
+ * ('visibili') non promette che volto e nome restano fuori, e la pagina aggiunge
+ * `gdpr.consent.namesMayAppear`.
+ */
+export function chiaveAvvisoRegistrazione(partecipanti: PartecipantiNelVideo) {
+  if (partecipanti === 'esclusi') return 'recordingHostsOnly';
+  return partecipanti === 'visibili' ? 'recordingNotice' : 'recordingNoticeVoice';
 }
 
 const TESTO_CHI_CONDUCE = {

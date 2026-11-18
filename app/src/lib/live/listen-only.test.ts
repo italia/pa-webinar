@@ -24,22 +24,24 @@ const TUTTO = { audio: true, video: true, desktop: true };
 
 describe('regolaConsenso', () => {
   it('chiede il consenso dove si registra e si puo\' parlare', () => {
-    expect(regolaConsenso(evento, true, 'rimovibile')).toEqual({
+    expect(regolaConsenso(evento, true, 'solo-voce')).toEqual({
       registra: true,
       richiesto: true,
       soloAscolto: false,
+      voceDallaTrascrizione: false,
     });
   });
 
   it('dove la voce non si puo\' togliere, senza consenso solo ascolto', () => {
-    expect(regolaConsenso(evento, true, 'fissa').soloAscolto).toBe(true);
+    expect(regolaConsenso(evento, true, 'visibili').soloAscolto).toBe(true);
   });
 
   it('dove non si puo\' registrare non conta niente', () => {
-    expect(regolaConsenso(evento, false, 'rimovibile')).toEqual({
+    expect(regolaConsenso(evento, false, 'solo-voce')).toEqual({
       registra: false,
       richiesto: false,
       soloAscolto: false,
+      voceDallaTrascrizione: false,
     });
   });
 
@@ -48,41 +50,92 @@ describe('regolaConsenso', () => {
       registra: false,
       richiesto: true,
       soloAscolto: false,
+      voceDallaTrascrizione: false,
     });
   });
 
   it('un evento che avvisa soltanto, dove la voce resta nel video, tiene i suoi limiti', () => {
-    const regola = regolaConsenso({ ...evento, participantsCanUnmute: false }, true, 'fissa');
-    expect(regola).toEqual({ registra: false, richiesto: false, soloAscolto: false });
+    const regola = regolaConsenso({ ...evento, participantsCanUnmute: false }, true, 'visibili');
+    expect(regola).toEqual({ registra: false, richiesto: false, soloAscolto: false, voceDallaTrascrizione: false });
   });
 
   it('un evento che avvisa soltanto registra lo stesso', () => {
-    const regola = regolaConsenso({ ...evento, participantsCanUnmute: false }, true, 'rimovibile');
-    expect(regola).toEqual({ registra: true, richiesto: false, soloAscolto: false });
+    const regola = regolaConsenso({ ...evento, participantsCanUnmute: false }, true, 'solo-voce');
+    expect(regola).toEqual({ registra: true, richiesto: false, soloAscolto: false, voceDallaTrascrizione: false });
   });
 
   it('una chiamata rapida registra chi acconsente, dove la voce si puo\' togliere', () => {
     const rapida = { ...evento, eventType: 'INSTANT' };
-    expect(regolaConsenso(rapida, true, 'rimovibile')).toEqual({
+    expect(regolaConsenso(rapida, true, 'solo-voce')).toEqual({
       registra: true,
       richiesto: true,
       soloAscolto: false,
+      voceDallaTrascrizione: false,
     });
     // Anche quando il pubblico non parla: si registra solo chi dice si'.
-    expect(regolaConsenso({ ...rapida, participantsCanUnmute: false }, true, 'rimovibile')).toEqual({
+    expect(regolaConsenso({ ...rapida, participantsCanUnmute: false }, true, 'solo-voce')).toEqual({
       registra: true,
       richiesto: true,
       soloAscolto: false,
+      voceDallaTrascrizione: false,
     });
   });
 
   it('una chiamata rapida non va mai in solo ascolto: dove la voce resta, non registra', () => {
-    const niente = { registra: false, richiesto: false, soloAscolto: false };
+    const niente = { registra: false, richiesto: false, soloAscolto: false, voceDallaTrascrizione: false };
     const rapida = { ...evento, eventType: 'INSTANT' };
-    expect(regolaConsenso(rapida, true, 'fissa')).toEqual(niente);
+    expect(regolaConsenso(rapida, true, 'visibili')).toEqual(niente);
     expect(regolaConsenso(rapida, true, 'assente')).toEqual(niente);
-    expect(regolaConsenso(rapida, false, 'rimovibile')).toEqual(niente);
-    expect(regolaConsenso({ ...rapida, recordingEnabled: false }, true, 'rimovibile')).toEqual(niente);
+    expect(regolaConsenso(rapida, false, 'solo-voce')).toEqual(niente);
+    expect(regolaConsenso({ ...rapida, recordingEnabled: false }, true, 'solo-voce')).toEqual(niente);
+  });
+});
+
+describe("regolaConsenso dove chi partecipa non entra mai nel video ('esclusi')", () => {
+  it("registra chi conduce e non chiede niente: la voce la decide la trascrizione", () => {
+    expect(regolaConsenso(evento, true, 'esclusi')).toEqual({
+      registra: true,
+      richiesto: false,
+      soloAscolto: false,
+      voceDallaTrascrizione: true,
+    });
+    // Anche dove il pubblico non parla, e mai il solo ascolto.
+    expect(regolaConsenso({ ...evento, participantsCanUnmute: false }, true, 'esclusi')).toEqual({
+      registra: true,
+      richiesto: false,
+      soloAscolto: false,
+      voceDallaTrascrizione: true,
+    });
+  });
+
+  it('una chiamata rapida registra chi conduce, senza la domanda', () => {
+    expect(regolaConsenso({ ...evento, eventType: 'INSTANT' }, true, 'esclusi')).toEqual({
+      registra: true,
+      richiesto: false,
+      soloAscolto: false,
+      voceDallaTrascrizione: true,
+    });
+  });
+
+  it("dove non si registra non c'e' niente da decidere", () => {
+    const niente = { registra: false, richiesto: false, soloAscolto: false, voceDallaTrascrizione: false };
+    expect(regolaConsenso(evento, false, 'esclusi')).toEqual(niente);
+    expect(regolaConsenso({ ...evento, recordingEnabled: false }, true, 'esclusi')).toEqual(niente);
+    expect(regolaConsenso({ ...evento, eventType: 'INSTANT' }, false, 'esclusi')).toEqual(niente);
+  });
+
+  it('il segno della voce segue il consenso alla trascrizione; chi conduce resta nel video', () => {
+    const regola = regolaConsenso(evento, true, 'esclusi');
+    const limiti = { audio: false, video: true, desktop: true };
+    expect(mediaDelToken(evento, regola, 'partecipante', false)).toEqual({
+      mediaLock: limiti,
+      voiceExcluded: true,
+    });
+    expect(mediaDelToken(evento, regola, 'partecipante', true)).toEqual({ mediaLock: limiti });
+    expect(mediaDelToken(evento, regola, 'moderatore', false)).toEqual({
+      mediaLock: limiti,
+      paInVideo: true,
+    });
   });
 });
 
@@ -96,7 +149,7 @@ describe('mediaDelToken in una chiamata rapida', () => {
   const aperto = { audio: false, video: false, desktop: false };
 
   it('chi partecipa entra con la voce fuori; chi modera e\' nel video', () => {
-    const regola = regolaConsenso(rapida, true, 'rimovibile');
+    const regola = regolaConsenso(rapida, true, 'solo-voce');
     expect(mediaDelToken(rapida, regola, 'moderatore', false)).toEqual({
       mediaLock: aperto,
       paInVideo: true,
@@ -109,7 +162,7 @@ describe('mediaDelToken in una chiamata rapida', () => {
   });
 
   it('dove la voce resta nel video nessuno e\' escluso ne\' bloccato', () => {
-    for (const voce of ['fissa', 'assente'] as const) {
+    for (const voce of ['visibili', 'assente'] as const) {
       const regola = regolaConsenso(rapida, true, voce);
       for (const chi of ['moderatore', 'relatore', 'partecipante'] as const) {
         const media = mediaDelToken(rapida, regola, chi, false);
@@ -124,7 +177,7 @@ describe('mediaDelToken in una chiamata rapida', () => {
 });
 
 describe('mediaDelToken', () => {
-  const regola = regolaConsenso(evento, true, 'rimovibile');
+  const regola = regolaConsenso(evento, true, 'solo-voce');
   const limiti = { audio: false, video: true, desktop: true };
 
   it('con il consenso, i limiti dell\'evento; chi conduce e\' nel video', () => {
@@ -160,7 +213,7 @@ describe('mediaDelToken', () => {
       participantsCanStartVideo: true,
       participantsCanShareScreen: true,
     };
-    const r = regolaConsenso(aperto, true, 'rimovibile');
+    const r = regolaConsenso(aperto, true, 'solo-voce');
     const media = mediaDelToken(aperto, r, 'partecipante', false);
     expect(media.mediaLock).toEqual({ audio: false, video: false, desktop: false });
     expect(media.consentLock).toBeUndefined();
@@ -168,7 +221,7 @@ describe('mediaDelToken', () => {
   });
 
   it('dove la voce non si puo\' togliere il pubblico resta in solo ascolto, chi conduce no', () => {
-    const r = regolaConsenso(evento, true, 'fissa');
+    const r = regolaConsenso(evento, true, 'visibili');
     const base = { mediaLock: TUTTO, consentLock: true };
     expect(mediaDelToken(evento, r, 'partecipante', false)).toEqual({ ...base, listenOnly: true });
     expect(mediaDelToken(evento, r, 'partecipante', true)).toEqual({
@@ -184,7 +237,7 @@ describe('mediaDelToken', () => {
   });
 
   it('senza registrazione restano i limiti dell\'evento, e chi conduce ha il segno', () => {
-    const r = regolaConsenso(evento, false, 'rimovibile');
+    const r = regolaConsenso(evento, false, 'solo-voce');
     expect(mediaDelToken(evento, r, 'partecipante', false)).toEqual({ mediaLock: limiti });
     expect(mediaDelToken(evento, r, 'relatore', false)).toEqual({
       mediaLock: limiti,

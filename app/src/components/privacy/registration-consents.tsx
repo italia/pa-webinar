@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { Button } from 'design-react-kit';
 
-import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import type { PartecipantiNelVideo, VoceNelVideo } from '@/lib/live/consent-rule';
 import { MESI_RUBRICA_PREDEFINITI } from '@/lib/persons/retention';
 import { chiaveConsenso, type Destinazione } from '@/lib/recording/destination';
 
@@ -32,6 +32,7 @@ export interface OffertaVista {
   recording: {
     destination: Destinazione;
     voice: VoceNelVideo;
+    participants: PartecipantiNelVideo;
     eventText: string | null;
     /** Il consenso dato vale per il testo in vigore: uno su un testo che non lo
      *  copre resta dato, ma va dato di nuovo. Assente nelle risposte di prima. */
@@ -128,7 +129,7 @@ export default function RegistrationConsents({
     recording: offerta?.recording
       ? [
           offerta.recording.eventText,
-          tGdpr(chiaveConsenso(offerta.recording.destination, offerta.recording.voice)),
+          tGdpr(chiaveConsenso(offerta.recording.destination, offerta.recording.participants)),
         ]
           .filter(Boolean)
           .join(' ')

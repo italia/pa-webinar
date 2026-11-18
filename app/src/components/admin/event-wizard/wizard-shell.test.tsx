@@ -3521,7 +3521,7 @@ describe('i valori del formato', () => {
 
   describe('dove la registrazione non produrrebbe nulla', () => {
     const s2 = w.step2;
-    const senzaVideo = { voceNelVideo: 'assente', aiPipelineEnabled: false } as const;
+    const senzaVideo = { partecipantiNelVideo: 'assente', aiPipelineEnabled: false } as const;
 
     it('senza video e senza AI il modello non accende la registrazione', async () => {
       renderWizard({ template: modello, ...senzaVideo });
@@ -3536,7 +3536,7 @@ describe('i valori del formato', () => {
     it('senza video ma con l AI le tracce restano e la registrazione si propone', () => {
       renderWizard({
         template: { ...modello, aiTranscriptEnabled: true, multitrackRecordingEnabled: true },
-        voceNelVideo: 'assente',
+        partecipantiNelVideo: 'assente',
       });
       goToStep('review');
       expect(container.textContent).toContain(w.flow.recordingManual);
@@ -3546,7 +3546,7 @@ describe('i valori del formato', () => {
     it('spegnendo le tracce il wizard smette di prometterla', () => {
       renderWizard({
         template: { ...modello, aiTranscriptEnabled: false, multitrackRecordingEnabled: false },
-        voceNelVideo: 'assente',
+        partecipantiNelVideo: 'assente',
       });
       goToStep('recording');
       expect(container.textContent).toContain(s2.recordingNothingToCapture);
@@ -3565,7 +3565,7 @@ describe('i valori del formato', () => {
           multitrackRecordingEnabled: false,
           aiTargetLocales: 'en',
         },
-        voceNelVideo: 'assente',
+        partecipantiNelVideo: 'assente',
       });
       goToStep('review');
       expect(container.textContent).toContain(s2.recordingNothingToCapture);
@@ -3582,7 +3582,7 @@ describe('i valori del formato', () => {
           multitrackRecordingEnabled: true,
           aiTargetLocales: 'en',
         },
-        voceNelVideo: 'assente',
+        partecipantiNelVideo: 'assente',
       });
       goToStep('review');
       expect(container.textContent).toContain(w.flow.aiAfter.split('{list}')[0]);
@@ -3883,7 +3883,7 @@ describe('i valori del formato', () => {
       initialStep: 'advanced',
       initialSection: 'recording',
       viaToken: 'token-primario',
-      voceNelVideo: 'assente',
+      partecipantiNelVideo: 'assente',
     });
     click(interruttore(messages.admin.form.recordingEnabled)!);
     expect(container.textContent).not.toContain(s2.recordingDestinationStartsReserved);
@@ -3989,7 +3989,7 @@ describe('i valori del formato', () => {
         aiTranscriptEnabled: true,
         multitrackRecordingEnabled: true,
       },
-      voceNelVideo: 'assente',
+      partecipantiNelVideo: 'assente',
     });
     compila();
     goToStep('recording');
@@ -4013,7 +4013,7 @@ describe('i valori del formato', () => {
         aiTranscriptEnabled: true,
         multitrackRecordingEnabled: true,
       },
-      voceNelVideo: 'assente',
+      partecipantiNelVideo: 'assente',
     });
     compila();
     goToStep('review');
@@ -4033,7 +4033,7 @@ describe('i valori del formato', () => {
         aiTranscriptEnabled: false,
         recordingDestination: 'REGISTRANTS',
       }),
-      voceNelVideo: 'assente',
+      partecipantiNelVideo: 'assente',
       aiPipelineEnabled: false,
     });
     goToStep('review');
@@ -4052,7 +4052,7 @@ describe('i valori del formato', () => {
         aiTranscriptEnabled: true,
         multitrackRecordingEnabled: true,
       }),
-      voceNelVideo: 'assente',
+      partecipantiNelVideo: 'assente',
       recordingAvailable: false,
     });
     goToStep('review');
@@ -4070,7 +4070,7 @@ describe('i valori del formato', () => {
         recordingDestination: 'PUBLIC',
         postEventPublic: false,
       }),
-      voceNelVideo: 'assente',
+      partecipantiNelVideo: 'assente',
       aiPipelineEnabled: false,
     });
     goToStep('review');
@@ -4080,7 +4080,7 @@ describe('i valori del formato', () => {
   it('la fascia del formato non annuncia una registrazione a vuoto', () => {
     renderWizard({
       template: { ...modello, aiTranscriptEnabled: false, multitrackRecordingEnabled: false },
-      voceNelVideo: 'assente',
+      partecipantiNelVideo: 'assente',
       formatoLabel: 'dalle domande',
       etichettaFormato: ({ registra }) => `registra ${registra}`,
       onChangeTemplate: vi.fn(),
@@ -4094,7 +4094,7 @@ describe('i valori del formato', () => {
       copia: true,
       initialEvent: salvato({ recordingDestination: null }, { destinazioneDaChiedere: true }),
       initialStep: 'base',
-      voceNelVideo: 'assente',
+      partecipantiNelVideo: 'assente',
     });
     await press(button(w.saveCopy));
     expect(corpo('PUT')).not.toHaveProperty('recordingDestination');

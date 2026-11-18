@@ -20,6 +20,7 @@ const SCHEDA: SchedaPrivacy = {
     destinazione: 'PUBLIC',
     chiNonAcconsente: 'restaFuori',
     conduceSempre: false,
+    partecipanti: null,
   },
   trascrizione: { chiesta: false, sottotitoli: false, tracce: null, dalVideo: false },
   sottotitoli: { attivi: false, testoConservato: false },
@@ -104,6 +105,7 @@ describe('PrivacySheet, la registrazione', () => {
         destinazione: null,
         chiNonAcconsente: 'restaFuori',
         conduceSempre: false,
+        partecipanti: null,
       },
       conservazione: { giorniDati: 30, registrazione: null },
     });
@@ -128,6 +130,7 @@ describe('PrivacySheet, la registrazione', () => {
         destinazione: null,
         chiNonAcconsente: null,
         conduceSempre: false,
+        partecipanti: null,
       },
       conservazione: { giorniDati: 30, registrazione: null },
     });
@@ -138,7 +141,33 @@ describe('PrivacySheet, la registrazione', () => {
 
   it('chi conduce sempre nella registrazione', () => {
     expect(conRegistrazione({})).not.toContain(t.recording.hostsAlways);
-    expect(conRegistrazione({ conduceSempre: true })).toContain(t.recording.hostsAlways);
+    expect(conRegistrazione({ conduceSempre: true, partecipanti: 'solo-voce' })).toContain(
+      t.recording.hostsAlways
+    );
+  });
+
+  it("la frase su chi e' nel video non promette piu' di quanto l'installazione garantisce", () => {
+    const esclusi = conRegistrazione({
+      conduceSempre: true,
+      partecipanti: 'esclusi',
+      chiNonAcconsente: 'maiNelVideo',
+    });
+    expect(esclusi).toContain(t.recording.hostsOnly);
+    expect(esclusi).not.toContain(t.recording.hostsAlways);
+    expect(esclusi).not.toContain(t.recording.refuseOut);
+
+    const visibili = conRegistrazione({
+      conduceSempre: true,
+      partecipanti: 'visibili',
+      chiNonAcconsente: 'soloAscolto',
+    });
+    expect(visibili).toContain(t.recording.hostsAlwaysVisible);
+    expect(visibili).toContain(messages.gdpr.consent.namesMayAppear);
+    expect(visibili).not.toContain(t.recording.hostsAlways);
+    // Senza l'informazione, la frase che non promette niente su chi partecipa.
+    expect(conRegistrazione({ conduceSempre: true, partecipanti: null })).toContain(
+      t.recording.hostsAlwaysVisible
+    );
   });
 });
 
@@ -417,7 +446,9 @@ describe('schedaInSala, la scheda con i flag di adesso', () => {
     it.each(['soloAscolto', 'avviso', 'avvisoVoce', 'restaFuori'] as const)(
       'dove c\'e\' un video non legge cosa succede a chi nega («%s»): e\' nel video',
       (chiNonAcconsente) => {
-        const testo = disegna(conScheda({ chiNonAcconsente, conduceSempre: true }));
+        const testo = disegna(
+          conScheda({ chiNonAcconsente, conduceSempre: true, partecipanti: 'solo-voce' })
+        );
         expect(testo).toContain(t.recording.hostsAlways);
         expect(testo).not.toContain(t.recording.refuseOut);
         expect(testo).not.toContain(t.recording.refuseListenOnly);

@@ -346,7 +346,7 @@ describe('Riepilogo — cio che il formato ha scelto', () => {
         multitrackRecordingEnabled: true,
       },
       {
-        voceNelVideo: 'assente',
+        partecipantiNelVideo: 'assente',
         destinazioneSenzaScelta: 'REGISTRANTS',
         onCambiaDestinazione: vi.fn(),
       },
@@ -359,7 +359,7 @@ describe('Riepilogo — cio che il formato ha scelto', () => {
   it('dove il video della sala non c e, su un evento vecchio senza, non ne parla', () => {
     const testo = mostra(
       { recordingEnabled: true, aiTranscriptEnabled: true, multitrackRecordingEnabled: true },
-      { voceNelVideo: 'assente' },
+      { partecipantiNelVideo: 'assente' },
     );
     expect(testo).not.toContain(tp.recordingDestinationStaffOnly);
     expect(testo).not.toContain(f.recordingDestinationReserved);

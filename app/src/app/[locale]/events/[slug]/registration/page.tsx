@@ -20,7 +20,7 @@ import { informativaEvento } from '@/lib/events/privacy-notice';
 import { schedaPrivacyEvento, testoIaDelSito } from '@/lib/events/privacy-sheet';
 import { anteprimaEventoPubblico } from '@/lib/events/meta-title';
 import { rubricaProposta } from '@/lib/persons/address-book';
-import { recordingAvailableFor, voceNelVideo } from '@/lib/recording/availability';
+import { partecipantiNelVideo, recordingAvailableFor } from '@/lib/recording/availability';
 import { traccePerPersonaConservate, trascrizioneDalVideo } from '@/lib/registration/consents';
 import { findEventQuestionnaireByPlacement } from '@/lib/questionnaires';
 import { invitoDaToken } from '@/lib/email/invitation';
@@ -101,7 +101,7 @@ export default async function RegistrationPage({
   const { url: privacyUrl, testo: privacyText } = informativaEvento(event, locale);
 
   const disponibile = recordingAvailableFor(event);
-  const voce = voceNelVideo();
+  const partecipanti = partecipantiNelVideo();
 
   return (
     <div className="container py-5">
@@ -146,7 +146,7 @@ export default async function RegistrationPage({
           <RegistrationFormClient
             eventSlug={slug}
             invito={invito}
-            voce={voce}
+            partecipanti={partecipanti}
             privacyPolicyUrl={privacyUrl}
             privacyPolicyText={privacyText}
             schedaPrivacy={schedaPrivacyEvento(event, settings)}
@@ -158,7 +158,7 @@ export default async function RegistrationPage({
             recordingConsentText={event.recordingConsentText}
             multitrackRecordingEnabled={event.multitrackRecordingEnabled && disponibile}
             captionsTranscript={captionsTranscriptActive(event, settings)}
-            trascrizioneVideo={trascrizioneDalVideo(event, settings, disponibile, voce)}
+            trascrizioneVideo={trascrizioneDalVideo(event, settings, disponibile, partecipanti)}
             tracceConservate={traccePerPersonaConservate(event, settings)}
             rubricaProposta={rubricaProposta(event, settings)}
             participantsCanUnmute={event.participantsCanUnmute}

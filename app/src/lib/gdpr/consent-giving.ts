@@ -45,11 +45,13 @@ import { isEventOpenForRegistration } from '@/lib/events/visibility';
 import {
   regolaConsenso,
   testoConsensoEvento,
+  voceDi,
+  type PartecipantiNelVideo,
   type VoceNelVideo,
 } from '@/lib/live/consent-rule';
 import { rubricaProposta } from '@/lib/persons/address-book';
 import { ridaiComunicazioni } from '@/lib/persons/spunta-in-attesa';
-import { recordingAvailableFor, voceNelVideo } from '@/lib/recording/availability';
+import { partecipantiNelVideo, recordingAvailableFor } from '@/lib/recording/availability';
 import {
   consensoCopre,
   destinazioneDelTesto,
@@ -108,6 +110,8 @@ export interface OffertaConsensi {
     /** La destinazione del testo in vigore: la pagina la rimanda con il consenso. */
     destination: Destinazione;
     voice: VoceNelVideo;
+    /** Come compaiono nel video i partecipanti: sceglie il testo della casella. */
+    participants: PartecipantiNelVideo;
     /** Il testo scelto per l'evento, che precede quello della casella. */
     eventText: string | null;
     /** Un consenso dato vale per il testo in vigore. Uno dato su un testo che non
@@ -172,25 +176,31 @@ export function consensiInVigore(
 /** Le regole dell'evento per i consensi da dare, con i fatti dell'installazione. */
 function regole(evento: EventoConsensi, sito: SitoConsensi) {
   const disponibile = recordingAvailableFor(evento);
-  const voce = voceNelVideo();
+  const partecipanti = partecipantiNelVideo();
   // La regola della rotta d'iscrizione: dove la scheda dice che non si registra
   // niente, il consenso alla registrazione non si chiede.
-  const richiesti = consensiRichiesti({
-    ...evento,
-    recordingEnabled: evento.recordingEnabled && disponibile,
-    multitrackRecordingEnabled: evento.multitrackRecordingEnabled && disponibile,
-    captionsTranscript: captionsTranscriptActive(evento, sito),
-    trascrizioneVideo: trascrizioneDalVideo(evento, sito, disponibile, voce),
-  });
-  const regola = regolaConsenso(evento, disponibile, voce);
+  const richiesti = consensiRichiesti(
+    {
+      ...evento,
+      recordingEnabled: evento.recordingEnabled && disponibile,
+      multitrackRecordingEnabled: evento.multitrackRecordingEnabled && disponibile,
+      captionsTranscript: captionsTranscriptActive(evento, sito),
+      trascrizioneVideo: trascrizioneDalVideo(evento, sito, disponibile, partecipanti),
+    },
+    partecipanti
+  );
+  const regola = regolaConsenso(evento, disponibile, partecipanti);
   return {
-    voce,
+    partecipanti,
+    voce: voceDi(partecipanti),
     richiesti,
     aperto: isEventOpenForRegistration(evento),
-    destinazione: destinazioneDelTesto(evento.recordingDestination, voce),
+    destinazione: destinazioneDelTesto(evento.recordingDestination, partecipanti),
     // Senza consenso alla registrazione la voce non entra nel token: la
-    // trascrizione non avrebbe niente da trascrivere (`conVoce` nel token).
-    serveRegistrazione: regola.registra && !regola.soloAscolto,
+    // trascrizione non avrebbe niente da trascrivere (`conVoce` nel token). Dove
+    // chi partecipa non entra mai nel video la voce la decide la trascrizione da
+    // sola, come nella rotta d'iscrizione.
+    serveRegistrazione: regola.registra && !regola.soloAscolto && !regola.voceDallaTrascrizione,
   };
 }
 
@@ -211,7 +221,8 @@ export function offertaConsensi(
         ? {
             destination: r.destinazione,
             voice: r.voce,
-            eventText: testoConsensoEvento(evento.recordingConsentText, r.voce),
+            participants: r.partecipanti,
+            eventText: testoConsensoEvento(evento.recordingConsentText, r.partecipanti),
             inForce: vigore.recording,
           }
         : null,

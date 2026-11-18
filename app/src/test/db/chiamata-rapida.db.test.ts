@@ -28,6 +28,7 @@ const RAPIDA = {
 beforeEach(async () => {
   await svuotaDatabase();
   vi.stubEnv('RECORDING_VOICE_EXCLUSION', 'true');
+  vi.stubEnv('RECORDING_PARTICIPANT_VOICE', 'true');
 });
 afterEach(() => vi.unstubAllEnvs());
 
@@ -100,10 +101,11 @@ describe('chiamata rapida', () => {
     const [prova] = await prisma.recordingConsent.findMany({
       where: { eventId: evento.id },
     });
+    // Senza destinazione, ma con la versione del testo per la sola voce.
     expect(prova).toMatchObject({
       jitsiUserId: utente(primo.jwt).id,
       destination: null,
-      textVersion: null,
+      textVersion: 2,
     });
 
     // La rete cade: un posto nuovo, il consenso torna come replica con il token di prima.

@@ -13,13 +13,10 @@ import { anteprimaEventoPubblico } from '@/lib/events/meta-title';
 import { getPublicEnv } from '@/lib/env';
 import { captionsTranscriptActive, liveCaptionsAvailable } from '@/lib/captions/availability';
 import { getSettings } from '@/lib/settings';
-import { recordingAvailableFor, voceNelVideo } from '@/lib/recording/availability';
+import { partecipantiNelVideo, recordingAvailableFor } from '@/lib/recording/availability';
 import { accessoRegistrazione, vedeVideo } from '@/lib/recording/audience';
-import {
-  consensoCopre,
-  destinazioneDelTesto,
-  recuperoAperto,
-} from '@/lib/recording/destination';
+import { destinazioneDelTesto, recuperoAperto } from '@/lib/recording/destination';
+import { registrazioneDellIscrizione } from '@/lib/live/consents-in-force';
 import { informativaEvento } from '@/lib/events/privacy-notice';
 import { schedaPrivacyEvento, testoIaDelSito } from '@/lib/events/privacy-sheet';
 import LiveEventClient from '@/components/live/live-event-client';
@@ -157,13 +154,13 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
   const isInstant = event.eventType === 'INSTANT';
 
   const cookieStore = await cookies();
-  const voce = voceNelVideo();
+  const partecipanti = partecipantiNelVideo();
   // La destinazione del testo in vigore: la stessa regola della rotta del token,
   // o la sala non richiederebbe il consenso a chi il token esclude dal video.
-  const destinazione = destinazioneDelTesto(event.recordingDestination, voce);
+  const destinazione = destinazioneDelTesto(event.recordingDestination, partecipanti);
   // La pipeline AI trascrive il video: anche questo chiede il consenso. Mai
   // nelle chiamate rapide.
-  const trascrizioneVideo = trascrizioneDalVideo(event, settings, canRecord, voce);
+  const trascrizioneVideo = trascrizioneDalVideo(event, settings, canRecord, partecipanti);
 
   // Il video non arriva mai alla pagina come indirizzo: il client sa solo se chi
   // guarda puo' vederlo, e il link porta alla rotta che ripete il controllo
@@ -266,7 +263,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             tempRecordingUrl: recuperoInDiretta,
             feedbackEnabled: event.feedbackEnabled,
             recordingConsentText: event.recordingConsentText,
-            voceNelVideo: voce,
+            partecipantiNelVideo: partecipanti,
             privacy,
             schedaPrivacy,
             timezone: event.timezone,
@@ -339,6 +336,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         eventId: true,
         consentRecording: true,
         consentRecordingDestination: true,
+        consentRecordingVersion: true,
         consentMultitrack: true,
         consentMultitrackVersion: true,
         consentRecordingWithdrawnAt: true,
@@ -388,25 +386,18 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       registration.consentMultitrack === true &&
       !registration.consentMultitrackWithdrawnAt &&
       (registration.consentMultitrackVersion ?? 1) >= versioneMinima;
-    const registrazioneAllIscrizione =
-      registration.consentRecording === true &&
-      !registration.consentRecordingWithdrawnAt &&
-      consensoCopre(registration.consentRecordingDestination, destinazione);
-    const [proveTracce, provaRegistrazione] = ownsToken
+    // La stessa regola del token (lib/live/consents-in-force): l'iscrizione, poi
+    // la prova data in sala.
+    const [proveTracce, registrazioneValida] = ownsToken
       ? await Promise.all([
           !datoAllIscrizione && chiedeConsensoPerVoce(event, settings)
             ? prisma.multitrackConsent.count({ where: { ...prove, textVersion: { gte: versioneMinima } } })
             : 0,
-          !registrazioneAllIscrizione && event.recordingEnabled
-            ? prisma.recordingConsent.findFirst({ where: prove, select: { destination: true } })
-            : null,
+          registrazioneDellIscrizione(event, registration, destinazione, partecipanti),
         ])
-      : ([0, null] as const);
+      : ([0, false] as const);
     hasMultitrackConsent = ownsToken && (datoAllIscrizione || proveTracce > 0);
-    hasRecordingConsent =
-      ownsToken &&
-      (registrazioneAllIscrizione ||
-        (!!provaRegistrazione && consensoCopre(provaRegistrazione.destination, destinazione)));
+    hasRecordingConsent = ownsToken && registrazioneValida;
     // Solo per chi ha il proprio link: un link inoltrato non risponde a nome
     // di chi l'ha ricevuto.
     iscrizioneEntrata = ownsToken && registration.joinedAt !== null;
@@ -490,7 +481,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         tempRecordingUrl: recuperoInDiretta,
         feedbackEnabled: event.feedbackEnabled,
         recordingConsentText: event.recordingConsentText,
-        voceNelVideo: voce,
+        partecipantiNelVideo: partecipanti,
         privacy,
         schedaPrivacy,
         timezone: event.timezone,

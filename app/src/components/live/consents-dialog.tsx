@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'design-react-kit';
 
-import { testoConsensoEvento, type VoceNelVideo } from '@/lib/live/consent-rule';
+import { testoConsensoEvento, type PartecipantiNelVideo } from '@/lib/live/consent-rule';
 import { chiaveConsenso, type Destinazione } from '@/lib/recording/destination';
 import type { chiaveConsensoTrascrizione } from '@/lib/registration/consents';
 
@@ -39,22 +39,23 @@ export type EffettoRitiroRegistrazione =
   | 'assente';
 
 export interface ConsensiInSala {
-  /** `destinazione` e `voce` scelgono il testo a cui si acconsente; `testoEvento`
-   *  e' quello scelto dall'ente, che vale per lo stesso consenso. */
+  /** `destinazione` e `partecipanti` scelgono il testo a cui si acconsente;
+   *  `testoEvento` e' quello scelto dall'ente, che vale per lo stesso consenso. */
   registrazione?: {
     dato: boolean;
     ritiro: EffettoRitiroRegistrazione;
     destinazione: Destinazione;
-    voce: VoceNelVideo;
+    partecipanti: PartecipantiNelVideo;
     testoEvento?: string | null;
   };
   /** `serveRegistrazione`: si puo' dare solo dopo il consenso alla registrazione.
-   *  `testo` e `voce` scelgono il testo della casella e la nota che l'accompagna. */
+   *  `testo` e `partecipanti` scelgono il testo della casella e la nota che
+   *  l'accompagna. */
   trascrizione?: {
     dato: boolean;
     serveRegistrazione: boolean;
     testo: ReturnType<typeof chiaveConsensoTrascrizione>;
-    voce: VoceNelVideo;
+    partecipanti: PartecipantiNelVideo;
   };
 }
 
@@ -99,15 +100,20 @@ export default function ConsentsDialog({
   };
   const { registrazione, trascrizione } = consensi;
   const testoEvento = registrazione
-    ? testoConsensoEvento(registrazione.testoEvento, registrazione.voce)
+    ? testoConsensoEvento(registrazione.testoEvento, registrazione.partecipanti)
     : null;
   // La trascrizione si nomina dove la finestra la mostra: l'evento la chiede, o
   // la persona l'ha data. Il ritiro la comprende solo se c'e' un consenso da
   // ritirare; per chi conduce la riga dice che cosa succede alle sue tracce.
   const effettoRegistrazione = (r: NonNullable<ConsensiInSala['registrazione']>) => {
+    // Dove chi partecipa puo' comparire nel video, chi non ha acconsentito sa che
+    // il suo nome puo' finirci anche senza intervenire. Chi conduce c'e' comunque.
+    const nomiVisibili = !r.dato && r.partecipanti === 'visibili' && r.ritiro !== 'conduce';
     const effetto = r.dato
       ? t(`recording.withdraw.${r.ritiro}`)
-      : t(`recording.without.${senzaConsenso(r.ritiro)}`);
+      : nomiVisibili
+        ? `${t(`recording.without.${senzaConsenso(r.ritiro)}`)} ${tGdpr('namesMayAppear')}`
+        : t(`recording.without.${senzaConsenso(r.ritiro)}`);
     if (!trascrizione) return effetto;
     if (r.ritiro === 'conduce') {
       return `${effetto} ${t(r.dato ? 'recording.withdrawTranscriptHost' : 'recording.withoutTranscriptHost')}`;
@@ -213,7 +219,7 @@ export default function ConsentsDialog({
               registrazione.dato,
               effettoRegistrazione(registrazione),
               !registrazione.dato
-                ? [testoEvento, tGdpr(chiaveConsenso(registrazione.destinazione, registrazione.voce))]
+                ? [testoEvento, tGdpr(chiaveConsenso(registrazione.destinazione, registrazione.partecipanti))]
                     .filter(Boolean)
                     .join(' ')
                 : registrazione.ritiro !== 'conduce' && registrazione.ritiro !== 'assente'
@@ -251,7 +257,9 @@ export default function ConsentsDialog({
                 : [
                     tGdpr(trascrizione.testo),
                     tGdpr(
-                      trascrizione.voce === 'fissa' ? 'multitrackOptional' : 'multitrackOptionalShort'
+                      trascrizione.partecipanti === 'visibili'
+                        ? 'multitrackOptional'
+                        : 'multitrackOptionalShort'
                     ),
                   ].join(' '),
               trascrizione.dato ? (

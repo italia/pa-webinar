@@ -28,6 +28,7 @@ const CHE_REGISTRA = { recordingEnabled: true, participantsCanUnmute: true };
 beforeEach(async () => {
   await svuotaDatabase();
   vi.stubEnv('RECORDING_VOICE_EXCLUSION', 'true');
+  vi.stubEnv('RECORDING_PARTICIPANT_VOICE', 'true');
 });
 afterEach(() => vi.unstubAllEnvs());
 
@@ -533,5 +534,98 @@ describe('le prove senza iscrizione', () => {
     expect(
       await prisma.multitrackConsent.findMany({ where: { eventId: evento.id } })
     ).toMatchObject([legami]);
+  });
+});
+
+describe("dove chi partecipa non entra mai nel video ('esclusi')", () => {
+  beforeEach(() => vi.stubEnv('RECORDING_PARTICIPANT_VOICE', ''));
+
+  it("la trascrizione data all'iscrizione toglie il segno, senza consenso alla registrazione", async () => {
+    const evento = await creaEvento({ ...CHE_REGISTRA, multitrackRecordingEnabled: true });
+    const iscrizione = await iscrittoDa(evento.id);
+    await prisma.registration.update({
+      where: { id: iscrizione.id },
+      data: { consentMultitrack: true, consentMultitrackVersion: 2 },
+    });
+
+    const risposta = await entra(evento.slug, { accessToken: iscrizione.accessToken });
+
+    expect(risposta.voiceExcluded).toBe(false);
+    expect(await prove(evento.id)).toEqual([]);
+  });
+
+  it("senza la trascrizione resta fuori, e un consenso alla registrazione non lascia una prova", async () => {
+    const evento = await creaEvento({ ...CHE_REGISTRA, multitrackRecordingEnabled: true });
+    const iscrizione = await iscrittoDa(evento.id);
+
+    const risposta = await entra(evento.slug, {
+      accessToken: iscrizione.accessToken,
+      recordingConsent: true,
+    });
+
+    expect(risposta.voiceExcluded).toBe(true);
+    expect(risposta.consentsRecorded.recording).toBe(false);
+    expect(await prove(evento.id)).toEqual([]);
+    expect(await tracce(evento.id)).toEqual([]);
+  });
+
+  it('la trascrizione data entrando vale da sola, con la sua prova', async () => {
+    const evento = await creaEvento({ ...CHE_REGISTRA, multitrackRecordingEnabled: true });
+    const iscrizione = await iscrittoDa(evento.id);
+
+    const risposta = await entra(evento.slug, {
+      accessToken: iscrizione.accessToken,
+      multitrackConsent: true,
+    });
+
+    expect(risposta.voiceExcluded).toBe(false);
+    expect(risposta.consentsRecorded.multitrack).toBe(true);
+    expect(await tracce(evento.id)).toHaveLength(1);
+  });
+});
+
+describe("dove chi partecipa puo' comparire nel video ('visibili')", () => {
+  beforeEach(() => vi.stubEnv('RECORDING_VOICE_EXCLUSION', ''));
+
+  it('un consenso dato sul testo per la sola voce non copre, e ridato si aggiorna al testo che lo dice', async () => {
+    const evento = await creaEvento({ ...CHE_REGISTRA, recordingDestination: 'REGISTRANTS' });
+    const iscrizione = await iscrittoDa(evento.id);
+    await provaEsistente(evento.id, iscrizione.id, { destination: 'REGISTRANTS', textVersion: 2 });
+
+    const senza = (await entra(evento.slug, { accessToken: iscrizione.accessToken })) as RispostaToken & {
+      listenOnly: boolean;
+    };
+    expect(senza.listenOnly).toBe(true);
+    expect(senza.consentsInForce.recording).toBe(false);
+
+    const ridato = (await entra(evento.slug, {
+      accessToken: iscrizione.accessToken,
+      recordingConsent: true,
+      recordingConsentDestination: 'REGISTRANTS',
+    })) as RispostaToken & { listenOnly: boolean };
+    expect(ridato.listenOnly).toBe(false);
+    const [prova, ...altre] = await prove(evento.id);
+    expect(altre).toEqual([]);
+    expect(prova!.textVersion).toBe(1);
+    expect(prova!.earlierPeriods as unknown as PeriodoConsenso[]).toMatchObject([
+      { destination: 'REGISTRANTS', textVersion: 2 },
+    ]);
+
+    const dopo = (await entra(evento.slug, { accessToken: iscrizione.accessToken })) as RispostaToken & {
+      listenOnly: boolean;
+    };
+    expect(dopo.listenOnly).toBe(false);
+  });
+
+  it('senza destinazione la prova dice comunque su quale testo e\' stata data', async () => {
+    const evento = await creaEvento({ ...CHE_REGISTRA, recordingDestination: null });
+    const risposta = await entra(evento.slug, {
+      guestName: 'Ospite',
+      recordingConsent: true,
+      recordingConsentDestination: null,
+    });
+    expect(risposta.consentsRecorded.recording).toBe(true);
+    const [prova] = await prove(evento.id);
+    expect(prova).toMatchObject({ destination: null, textVersion: 1 });
   });
 });

@@ -80,7 +80,7 @@ describe('POST consents/in-force', () => {
       transcription: false,
       recordingDestination: 'PUBLIC',
     });
-    expect(leggi).toHaveBeenCalledWith(EVENTO, ['guest-a', 'mod-e1-b'], 'PUBLIC');
+    expect(leggi).toHaveBeenCalledWith(EVENTO, ['guest-a', 'mod-e1-b'], 'PUBLIC', 'visibili');
     expect(res.headers.get('Cache-Control')).toBe('no-store');
   });
 
@@ -91,7 +91,7 @@ describe('POST consents/in-force', () => {
         await tokenSala('guest-b', { stanza: 'altra' }),
       ],
     });
-    expect(leggi).toHaveBeenCalledWith(EVENTO, ['guest-a'], 'PUBLIC');
+    expect(leggi).toHaveBeenCalledWith(EVENTO, ['guest-a'], 'PUBLIC', 'visibili');
   });
 
   it('senza un token valido non si legge niente', async () => {

@@ -29,7 +29,7 @@ import {
   type FormatoRegistra,
 } from '@/lib/events/guided-format';
 import { domandePubbliche } from '@/lib/events/post-event-sections';
-import { conduceNelVideo, type VoceNelVideo } from '@/lib/live/consent-rule';
+import { conduceNelVideo, type PartecipantiNelVideo } from '@/lib/live/consent-rule';
 import { rubricaProposta } from '@/lib/persons/address-book';
 import { videoDaDestinare } from '@/lib/recording/destination';
 
@@ -149,7 +149,7 @@ export default function GuidedFormat({
   aiPipelineEnabled = true,
   liveCaptionsAvailable = false,
   recordingAvailable = true,
-  voceNelVideo,
+  partecipantiNelVideo,
   addressBookAvailable = true,
   accessoPredefinito = 'tutti',
   azioneTitolo,
@@ -167,9 +167,9 @@ export default function GuidedFormat({
   /** L'installazione puo' registrare: senza, la domanda non si fa e il formato
    *  esce sempre senza registrazione (vedi formatoPossibile). */
   recordingAvailable?: boolean;
-  /** Dov'e' la voce di chi non ha un consenso valido, secondo l'installazione. Senza
-   *  un video della sala (voce 'assente') un video pubblico non si propone. */
-  voceNelVideo?: VoceNelVideo;
+  /** Come compaiono nel video i partecipanti, secondo l'installazione. Senza un
+   *  video della sala ('assente') un video pubblico non si propone. */
+  partecipantiNelVideo?: PartecipantiNelVideo;
   /** L'installazione tiene la rubrica: senza, l'anteprima non la promette. */
   addressBookAvailable?: boolean;
   /** Accanto al titolo: l'azione secondaria (partire da un modello). */
@@ -203,7 +203,7 @@ export default function GuidedFormat({
     setRegistraToccata(true);
     setF((prima) => ({ ...prima, registra }));
   };
-  const conVideo = videoDaDestinare(voceNelVideo);
+  const conVideo = videoDaDestinare(partecipantiNelVideo);
   const formato = formatoPossibile(f, recordingAvailable, conVideo);
   const preset = presetDaFormato(formato, '');
 
@@ -379,7 +379,7 @@ export default function GuidedFormat({
                           : tf('recordingDestinationPublic')}
                       </span>
                       <span className="d-block text-secondary">
-                        {conduceNelVideo(voceNelVideo ?? 'fissa') && tf('consentsHostsAlways')}
+                        {conduceNelVideo(partecipantiNelVideo ?? 'visibili') && tf('consentsHostsAlways')}
                       </span>
                       {aiPipelineEnabled && (
                         <span className="d-block text-secondary">{t('rec.yesDesc')}</span>

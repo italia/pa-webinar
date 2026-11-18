@@ -33,6 +33,14 @@ import type { EventoConsenso, RegolaConsenso } from './consent-rule';
  * con l'avviso che il video lo riprende. Solo qui il blocco della sala riguarda
  * ogni mezzo e ogni token dell'evento (chi entra per primo lo accende), e chi ha
  * dato il consenso e' ammesso per cio' che l'evento concede (`mediaAdmit`).
+ *
+ * Dove chi partecipa non entra mai nel video, nemmeno con la voce ('esclusi',
+ * `voceDallaTrascrizione`), il consenso alla registrazione non si chiede: la
+ * voce di chi partecipa la registrano solo le tracce per persona e la
+ * trascrizione dai sottotitoli, e il segno segue il consenso alla trascrizione.
+ * Chi non l'ha dato ha `voiceExcluded`, come sempre; chi l'ha dato ha il segno
+ * della voce (pa-recorder-voice), che il testo della conferenza di questa
+ * installazione non riproduce nel video.
  */
 
 export { regolaConsenso, type RegolaConsenso } from './consent-rule';
@@ -54,7 +62,9 @@ export interface MediaDelToken {
 
 /**
  * I limiti dei mezzi nel token di una persona. `consenso` e' quello di chi
- * partecipa alla registrazione della propria voce: chi conduce non lo da'.
+ * partecipa alla registrazione della propria voce: chi conduce non lo da'. Con
+ * `regola.voceDallaTrascrizione` e' il consenso alla trascrizione dei propri
+ * interventi.
  */
 export function mediaDelToken(
   event: EventoConsenso,

@@ -340,6 +340,7 @@ describe('POST registrations — consensi secondo il formato dell\'evento', () =
   it('dove la voce resta fuori dal video, senza registrazione la trascrizione non vale', async () => {
     vi.stubEnv('JIBRI_HEALTH_URL', 'http://jibri');
     vi.stubEnv('RECORDING_VOICE_EXCLUSION', 'true');
+    vi.stubEnv('RECORDING_PARTICIPANT_VOICE', 'true');
     try {
       evento({ participantsCanUnmute: true });
       expect((await iscrivitiCon({ consentMultitrack: true })).status).toBe(201);
@@ -349,6 +350,21 @@ describe('POST registrations — consensi secondo il formato dell\'evento', () =
       await iscrivitiCon({ consentRecording: true, consentMultitrack: true });
       const dopo = tx.registration.create.mock.calls.at(-1)?.[0]?.data as Record<string, unknown>;
       expect(dopo.consentMultitrack).toBe(true);
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
+  it("dove chi partecipa non entra mai nel video la trascrizione vale da sola", async () => {
+    vi.stubEnv('JIBRI_HEALTH_URL', 'http://jibri');
+    vi.stubEnv('RECORDING_VOICE_EXCLUSION', 'true');
+    try {
+      evento({ participantsCanUnmute: true });
+      expect((await iscrivitiCon({ consentMultitrack: true })).status).toBe(201);
+      const data = tx.registration.create.mock.calls.at(-1)?.[0]?.data as Record<string, unknown>;
+      expect(data.consentMultitrack).toBe(true);
+      // Il consenso alla registrazione non c'e' da dare: non resta nemmeno se arriva.
+      expect(data.consentRecording).toBeNull();
     } finally {
       vi.unstubAllEnvs();
     }
@@ -447,6 +463,68 @@ describe('POST registrations — dove non si registra niente', () => {
 describe('POST registrations — la destinazione del video nel consenso', () => {
   const conRegistrazione = (recordingDestination: 'PUBLIC' | 'REGISTRANTS' | null) =>
     eventoCon({ recordingEnabled: true, participantsCanUnmute: true, recordingDestination });
+  // Il testo per la sola voce: il chart dichiara che chi partecipa resta fuori
+  // dal video e che la sua voce, con il consenso, si sente.
+  beforeEach(() => {
+    vi.stubEnv('RECORDING_VOICE_EXCLUSION', 'true');
+    vi.stubEnv('RECORDING_PARTICIPANT_VOICE', 'true');
+  });
+  afterEach(() => vi.unstubAllEnvs());
+
+  it("dove chi partecipa puo' comparire, un modulo che mostrava il testo per la sola voce va riletto: 422", async () => {
+    vi.stubEnv('RECORDING_VOICE_EXCLUSION', '');
+    conRegistrazione('REGISTRANTS');
+    const res = await iscriviti('anna@example.com', {
+      consentRecording: true,
+      consentRecordingDestination: 'REGISTRANTS',
+      consentRecordingVersion: 2,
+    });
+    expect(res.status).toBe(422);
+    expect(await errore(res)).toEqual([
+      { path: ['consentRecording'], message: 'registration.errors.recordingDestinationChanged' },
+    ]);
+  });
+
+  it('si salva la versione del testo che il modulo ha mostrato', async () => {
+    conRegistrazione('REGISTRANTS');
+    const res = await iscriviti('anna@example.com', {
+      consentRecording: true,
+      consentRecordingDestination: 'REGISTRANTS',
+      consentRecordingVersion: 1,
+    });
+    expect(res.status).toBe(201);
+    expect(iscrizioneScritta()).toMatchObject({ consentRecordingVersion: 1 });
+  });
+
+  it("dove chi partecipa puo' comparire si salva la versione del testo che lo dice", async () => {
+    vi.stubEnv('RECORDING_VOICE_EXCLUSION', '');
+    conRegistrazione('REGISTRANTS');
+    const res = await iscriviti('anna@example.com', {
+      consentRecording: true,
+      consentRecordingDestination: 'REGISTRANTS',
+    });
+    expect(res.status).toBe(201);
+    expect(iscrizioneScritta()).toMatchObject({
+      consentRecording: true,
+      consentRecordingDestination: 'REGISTRANTS',
+      consentRecordingVersion: 1,
+    });
+  });
+
+  it("dove chi partecipa non entra mai nel video il consenso non si chiede: niente prova", async () => {
+    vi.stubEnv('RECORDING_PARTICIPANT_VOICE', '');
+    conRegistrazione('REGISTRANTS');
+    const res = await iscriviti('anna@example.com', {
+      consentRecording: true,
+      consentRecordingDestination: 'REGISTRANTS',
+    });
+    expect(res.status).toBe(201);
+    expect(iscrizioneScritta()).toMatchObject({
+      consentRecording: null,
+      consentRecordingDestination: null,
+      consentRecordingVersion: null,
+    });
+  });
 
   const errore = async (res: Response) =>
     ((await res.json()) as { details?: Array<{ path: string[]; message: string }> }).details;
@@ -526,7 +604,7 @@ describe('POST registrations — la destinazione del video nel consenso', () => 
     });
   });
 
-  it('su un evento senza destinazione il testo non ne dichiara una: niente versione', async () => {
+  it('su un evento senza destinazione il testo non ne dichiara una, ma la versione si', async () => {
     conRegistrazione(null);
     const res = await iscriviti('anna@example.com', {
       consentRecording: true,
@@ -536,7 +614,7 @@ describe('POST registrations — la destinazione del video nel consenso', () => 
     expect(iscrizioneScritta()).toMatchObject({
       consentRecording: true,
       consentRecordingDestination: null,
-      consentRecordingVersion: null,
+      consentRecordingVersion: 2,
     });
   });
 
@@ -555,10 +633,11 @@ describe('POST registrations — la destinazione del video nel consenso', () => 
         consentRecordingDestination: null,
       });
       expect(res.status).toBe(201);
+      // Il testo senza video ha un numero suo: non copre un video.
       expect(iscrizioneScritta()).toMatchObject({
         consentRecording: true,
         consentRecordingDestination: null,
-        consentRecordingVersion: null,
+        consentRecordingVersion: 3,
       });
 
       const dichiarata = await iscriviti('anna@example.com', {

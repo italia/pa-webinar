@@ -234,6 +234,7 @@ beforeEach(() => {
   };
   vi.stubEnv('JITSI_WEB_INTERNAL_URL', '');
   vi.stubEnv('RECORDING_VOICE_EXCLUSION', 'true');
+  vi.stubEnv('RECORDING_PARTICIPANT_VOICE', 'true');
   vi.mocked(prisma.registration.count).mockResolvedValue(0);
   vi.mocked(prisma.recordingConsent.findFirst).mockResolvedValue(null);
   vi.mocked(prisma.recordingConsent.findMany).mockResolvedValue([]);
@@ -282,7 +283,7 @@ describe('sala — la scheda privacy', () => {
     vi.stubEnv('RECORDER_CONTROLLER_URL', 'http://recorder-controller');
     conEvento();
     const { event } = await clientProps();
-    expect(event.voceNelVideo).toBe('assente');
+    expect(event.partecipantiNelVideo).toBe('assente');
     expect(scheda({ event } as PropsClient)?.registrazione.destinazione).toBeNull();
   });
 
@@ -775,8 +776,25 @@ describe('sala — il consenso alla registrazione gia dato', () => {
     expect((await clientProps(TOKEN)).hasRecordingConsent).toBe(true);
     expect(prisma.recordingConsent.findFirst).toHaveBeenCalledWith({
       where: { eventId: EVENT_ID, registrationId: REGISTRATION_ID, withdrawnAt: null },
-      select: { destination: true },
+      select: { destination: true, textVersion: true },
     });
+  });
+
+  it("dove chi partecipa puo' comparire vale solo il consenso dato sul testo che lo diceva", async () => {
+    vi.stubEnv('RECORDING_VOICE_EXCLUSION', '');
+    conEvento({ recordingDestination: 'REGISTRANTS' });
+    iscritto({
+      consentRecording: true,
+      consentRecordingDestination: 'REGISTRANTS',
+      consentRecordingVersion: 2,
+    });
+    expect((await clientProps(TOKEN)).hasRecordingConsent).toBe(false);
+    iscritto({
+      consentRecording: true,
+      consentRecordingDestination: 'REGISTRANTS',
+      consentRecordingVersion: 1,
+    });
+    expect((await clientProps(TOKEN)).hasRecordingConsent).toBe(true);
   });
 
   it('la prova data in sala non vale se non copre', async () => {

@@ -83,6 +83,10 @@ afterEach(() => {
 
 describe('destinazione del consenso alla registrazione', () => {
   it('con il consenso si salvano destinazione e versione del testo', async () => {
+    // Il testo per la sola voce: il chart dichiara che chi partecipa resta fuori
+    // dal video e che, con il consenso, la sua voce si sente.
+    vi.stubEnv('RECORDING_VOICE_EXCLUSION', 'true');
+    vi.stubEnv('RECORDING_PARTICIPANT_VOICE', 'true');
     const evento = await eventoAperto({ recordingDestination: 'REGISTRANTS' });
     const email = nuovaEmail();
 
@@ -103,6 +107,21 @@ describe('destinazione del consenso alla registrazione', () => {
     });
   });
 
+  it("dove chi partecipa puo' comparire si salva la versione del testo che lo dice", async () => {
+    const evento = await eventoAperto({ recordingDestination: 'REGISTRANTS' });
+    const email = nuovaEmail();
+
+    await iscriviti(evento.slug, email, {
+      consentRecording: true,
+      consentRecordingDestination: 'REGISTRANTS',
+    });
+
+    expect(await iscrizioneDi(email)).toMatchObject({
+      consentRecordingDestination: 'REGISTRANTS',
+      consentRecordingVersion: 1,
+    });
+  });
+
   it('senza consenso restano nulle', async () => {
     const evento = await eventoAperto({ recordingDestination: 'PUBLIC' });
     const email = nuovaEmail();
@@ -120,7 +139,9 @@ describe('destinazione del consenso alla registrazione', () => {
     });
   });
 
-  it("un evento senza destinazione non salva ne' destinazione ne' versione", async () => {
+  it("un evento senza destinazione non la salva, ma salva la versione del testo", async () => {
+    vi.stubEnv('RECORDING_VOICE_EXCLUSION', 'true');
+    vi.stubEnv('RECORDING_PARTICIPANT_VOICE', 'true');
     const evento = await eventoAperto();
     const email = nuovaEmail();
 
@@ -132,7 +153,22 @@ describe('destinazione del consenso alla registrazione', () => {
     expect(await iscrizioneDi(email)).toMatchObject({
       consentRecording: true,
       consentRecordingDestination: null,
-      consentRecordingVersion: null,
+      consentRecordingVersion: 2,
+    });
+  });
+
+  it("dove chi partecipa puo' comparire la versione si salva anche senza destinazione", async () => {
+    const evento = await eventoAperto();
+    const email = nuovaEmail();
+
+    await iscriviti(evento.slug, email, {
+      consentRecording: true,
+      consentRecordingDestination: null,
+    });
+
+    expect(await iscrizioneDi(email)).toMatchObject({
+      consentRecordingDestination: null,
+      consentRecordingVersion: 1,
     });
   });
 
@@ -195,10 +231,11 @@ describe('destinazione del consenso alla registrazione', () => {
     });
 
     expect(risposta.status).toBe(201);
+    // Il testo senza video ha un numero suo: non copre un video.
     expect(await iscrizioneDi(email)).toMatchObject({
       consentRecording: true,
       consentRecordingDestination: null,
-      consentRecordingVersion: null,
+      consentRecordingVersion: 3,
     });
   });
 });

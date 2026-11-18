@@ -364,6 +364,7 @@ describe('RegistrationConsents', () => {
       recording: {
         destination: 'REGISTRANTS',
         voice: 'rimovibile',
+        participants: 'solo-voce',
         eventText: 'Testo dell’ente.',
         inForce: false,
       },

@@ -3,7 +3,13 @@
 
 import { jibriRecordingExpected } from '@/lib/infrastructure';
 import { tracceConfigurate } from '@/lib/live/capture-state';
-import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import {
+  voceDi,
+  type PartecipantiNelVideo,
+  type VoceNelVideo,
+} from '@/lib/live/consent-rule';
+
+export type { PartecipantiNelVideo } from '@/lib/live/consent-rule';
 
 /**
  * Se questa installazione puo' registrare un evento. Decide cosa si dice a chi
@@ -47,26 +53,11 @@ export function tracceDisponibili(
 }
 
 /**
- * La voce di chi non ha un consenso valido nel video completo. La sessione del
- * registratore (Jibri) non la riproduce: il testo della conferenza del chart, che
- * lo dichiara con RECORDING_VOICE_EXCLUSION. Senza Jibri non c'e' un video
- * completo, e le tracce per persona non contengono chi non ha acconsentito. Con
- * un Jitsi esterno non si sa chi registra: vale la risposta prudente, come sopra.
- */
-export function voceNelVideo(env: Record<string, string | undefined> = process.env): VoceNelVideo {
-  const jitsiDelChart = !!env.JITSI_WEB_INTERNAL_URL?.trim();
-  const conJibri = !jitsiDelChart || jibriRecordingExpected(env) || !!env.JIBRI_HEALTH_URL?.trim();
-  if (!conJibri) return 'assente';
-  return env.RECORDING_VOICE_EXCLUSION?.trim() === 'true' ? 'rimovibile' : 'fissa';
-}
-
-/** Come compaiono i partecipanti nel video completo: vedi `partecipantiNelVideo`. */
-export type PartecipantiNelVideo = 'assente' | 'solo-voce' | 'esclusi' | 'visibili';
-
-/**
  * Come compaiono nel video completo i partecipanti, cioe' chi non conduce (il
- * token di chi conduce porta `paInVideo`):
- *   - 'assente': non c'e' un video completo (niente Jibri);
+ * token di chi conduce porta `paInVideo`). E' l'unica lettura dell'ambiente su
+ * cui poggiano la regola del consenso e i testi (lib/live/consent-rule):
+ *   - 'assente': non c'e' un video completo (niente Jibri), e le tracce per
+ *     persona non contengono chi non ha acconsentito;
  *   - 'solo-voce': mai volto, nome o riquadro; la voce di chi ha il consenso si';
  *   - 'esclusi': mai volto, nome o riquadro, e nemmeno la voce: il testo della
  *     conferenza non la riproduce (le tracce per persona restano);
@@ -77,14 +68,26 @@ export type PartecipantiNelVideo = 'assente' | 'solo-voce' | 'esclusi' | 'visibi
  * Il modulo Prosody segna chi non conduce in ogni installazione; lo onora la
  * sessione con il testo che il chart dichiara con RECORDING_VOICE_EXCLUSION, e
  * la voce la riproduce il testo che dichiara con RECORDING_PARTICIPANT_VOICE.
+ * Con un Jitsi esterno non si sa chi registra: vale la risposta prudente, come
+ * sopra ('visibili').
  */
 export function partecipantiNelVideo(
   env: Record<string, string | undefined> = process.env,
 ): PartecipantiNelVideo {
-  const voce = voceNelVideo(env);
-  if (voce === 'assente') return 'assente';
-  if (voce === 'fissa') return 'visibili';
+  const jitsiDelChart = !!env.JITSI_WEB_INTERNAL_URL?.trim();
+  const conJibri = !jitsiDelChart || jibriRecordingExpected(env) || !!env.JIBRI_HEALTH_URL?.trim();
+  if (!conJibri) return 'assente';
+  if (env.RECORDING_VOICE_EXCLUSION?.trim() !== 'true') return 'visibili';
   return env.RECORDING_PARTICIPANT_VOICE?.trim() === 'true' ? 'solo-voce' : 'esclusi';
+}
+
+/**
+ * La voce di chi non ha un consenso valido nel video completo, ricavata da
+ * `partecipantiNelVideo`: per chi deve sapere solo se resta fuori ('rimovibile'),
+ * se resta ('fissa') o se il video non c'e' ('assente').
+ */
+export function voceNelVideo(env: Record<string, string | undefined> = process.env): VoceNelVideo {
+  return voceDi(partecipantiNelVideo(env));
 }
 
 /**
@@ -102,13 +105,13 @@ export function eventoRegistrabile(
   },
   ambiente: {
     registrazioneDisponibile: boolean;
-    voce: VoceNelVideo;
+    partecipanti: PartecipantiNelVideo;
     tracceDisponibili: boolean;
   },
 ): boolean {
   return (
     ambiente.registrazioneDisponibile &&
-    (ambiente.voce !== 'assente' || tracceConfigurate(evento, ambiente.tracceDisponibili))
+    (ambiente.partecipanti !== 'assente' || tracceConfigurate(evento, ambiente.tracceDisponibili))
   );
 }
 
@@ -119,7 +122,7 @@ export function recordingAvailableFor(
 ): boolean {
   return eventoRegistrabile(evento, {
     registrazioneDisponibile: recordingAvailable(env),
-    voce: voceNelVideo(env),
+    partecipanti: partecipantiNelVideo(env),
     tracceDisponibili: tracceDisponibili(env),
   });
 }

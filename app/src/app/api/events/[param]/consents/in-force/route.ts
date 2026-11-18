@@ -21,7 +21,7 @@ import { prisma } from '@/lib/db';
 import { AppError, NotFoundError, RateLimitError, ValidationError } from '@/lib/errors';
 import { consensiInVigoreDeiPosti } from '@/lib/live/consents-in-force';
 import { getClientIp, rateLimit } from '@/lib/rate-limit';
-import { voceNelVideo } from '@/lib/recording/availability';
+import { partecipantiNelVideo } from '@/lib/recording/availability';
 import { destinazioneDelTesto } from '@/lib/recording/destination';
 import { limiteDellaSala } from '@/lib/room-rate-limit';
 import { consentsInForceSchema } from '@/lib/validation/schemas';
@@ -69,8 +69,9 @@ export const POST = withErrorHandling(async (request, context) => {
     throw new AppError('No valid room token for this event', 401, 'ROOM_TOKEN_INVALID');
   }
 
-  const destinazione = destinazioneDelTesto(event.recordingDestination, voceNelVideo());
-  const consensi = await consensiInVigoreDeiPosti(event, posti, destinazione);
+  const partecipanti = partecipantiNelVideo();
+  const destinazione = destinazioneDelTesto(event.recordingDestination, partecipanti);
+  const consensi = await consensiInVigoreDeiPosti(event, posti, destinazione, partecipanti);
   return Response.json(
     { ...consensi, recordingDestination: destinazione },
     { headers: { 'Cache-Control': 'no-store' } }

@@ -351,7 +351,7 @@ describe('trascriveSenzaRegistrare', () => {
   });
 
   it('dove la domanda si fa decide la risposta', () => {
-    expect(trascriveSenzaRegistrare(true, 'fissa', false, true)).toBe(false);
+    expect(trascriveSenzaRegistrare(true, 'visibili', false, true)).toBe(false);
     expect(trascriveSenzaRegistrare(true, 'assente', true, true)).toBe(false);
   });
 
@@ -371,7 +371,7 @@ describe('trascriveSenzaRegistrare', () => {
 
 describe('registrazioneProponibile', () => {
   it('con il video della sala si propone, anche senza AI', () => {
-    expect(registrazioneProponibile(true, 'fissa', false)).toBe(true);
+    expect(registrazioneProponibile(true, 'visibili', false)).toBe(true);
     expect(registrazioneProponibile(true, undefined, false)).toBe(true);
   });
 
@@ -381,6 +381,6 @@ describe('registrazioneProponibile', () => {
   });
 
   it('dove non si puo registrare non si propone mai', () => {
-    expect(registrazioneProponibile(false, 'fissa', true)).toBe(false);
+    expect(registrazioneProponibile(false, 'visibili', true)).toBe(false);
   });
 });

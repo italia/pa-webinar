@@ -10,6 +10,7 @@ import { AppError } from '@/lib/errors';
 import {
   assertEsposizioneConsentita,
   chiaveAvvisoConduce,
+  chiaveAvvisoRegistrazione,
   chiaveConsenso,
   consensoCopre,
   consensoOra,
@@ -20,6 +21,11 @@ import {
   testoInVigore,
   testoLetto,
   VERSIONE_TESTO_REGISTRAZIONE,
+  VERSIONE_TESTO_SENZA_VIDEO,
+  VERSIONE_TESTO_VISIBILI,
+  provaCopre,
+  versioneDellaProva,
+  versioneLetta,
   type Destinazione,
   type EsposizioneVideo,
   destinazioneDiPartenza,
@@ -78,7 +84,7 @@ describe('consensoCopre', () => {
 
 describe('destinazioneDelTesto', () => {
   it("e' quella dell'evento dove c'e' un video", () => {
-    for (const voce of ['rimovibile', 'fissa'] as const) {
+    for (const voce of ['solo-voce', 'esclusi', 'visibili'] as const) {
       expect(destinazioneDelTesto('PUBLIC', voce)).toBe('PUBLIC');
       expect(destinazioneDelTesto('REGISTRANTS', voce)).toBe('REGISTRANTS');
       expect(destinazioneDelTesto(null, voce)).toBeNull();
@@ -97,8 +103,8 @@ describe('destinazioneDelTesto', () => {
     expect(consensoCopre(null, destinazioneDelTesto('REGISTRANTS', 'assente'))).toBe(
       true
     );
-    expect(consensoCopre(null, destinazioneDelTesto('PUBLIC', 'rimovibile'))).toBe(false);
-    expect(consensoCopre(null, destinazioneDelTesto('REGISTRANTS', 'fissa'))).toBe(false);
+    expect(consensoCopre(null, destinazioneDelTesto('PUBLIC', 'solo-voce'))).toBe(false);
+    expect(consensoCopre(null, destinazioneDelTesto('REGISTRANTS', 'visibili'))).toBe(false);
   });
 });
 
@@ -150,21 +156,21 @@ describe('consensoOra', () => {
   });
 
   it('senza consenso non conta il testo', () => {
-    expect(consensoOra({}, 'PUBLIC')).toBe(false);
-    expect(consensoOra({ recordingConsent: false }, 'PUBLIC')).toBe(false);
+    expect(consensoOra({}, 'PUBLIC', 'solo-voce')).toBe(false);
+    expect(consensoOra({ recordingConsent: false }, 'PUBLIC', 'solo-voce')).toBe(false);
     expect(
       consensoOra(
         { recordingConsent: false, recordingConsentDestination: 'PUBLIC' },
-        'PUBLIC'
+        'PUBLIC', 'solo-voce'
       )
     ).toBe(false);
   });
 
   it('una pagina che non manda il campo vale per il testo in vigore', () => {
     for (const inVigore of DESTINAZIONI) {
-      expect(consensoOra({ recordingConsent: true }, inVigore)).toBe(true);
+      expect(consensoOra({ recordingConsent: true }, inVigore, 'solo-voce')).toBe(true);
     }
-    expect(consensoOra({ recordingConsent: true }, undefined)).toBe(true);
+    expect(consensoOra({ recordingConsent: true }, undefined, 'solo-voce')).toBe(true);
   });
 
   it.each([
@@ -183,13 +189,13 @@ describe('consensoOra', () => {
     ['PUBLIC', null, true],
     ['REGISTRANTS', null, true],
   ] as const)('testo %s, destinazione %s: %s', (letta, inVigore, vale) => {
-    expect(consensoOra(acconsente(letta), inVigore)).toBe(vale);
+    expect(consensoOra(acconsente(letta), inVigore, 'solo-voce')).toBe(vale);
   });
 
   it('giudica come consensoCopre tutti i testi dichiarati', () => {
     for (const letta of DESTINAZIONI) {
       for (const inVigore of DESTINAZIONI) {
-        expect(consensoOra(acconsente(letta), inVigore)).toBe(
+        expect(consensoOra(acconsente(letta), inVigore, 'solo-voce')).toBe(
           consensoCopre(letta, inVigore)
         );
       }
@@ -199,12 +205,78 @@ describe('consensoOra', () => {
 
 describe('testo del consenso', () => {
   it('la casella segue la destinazione, senza destinazione resta quella di prima', () => {
-    for (const voce of ['rimovibile', 'fissa'] as const) {
+    for (const voce of ['solo-voce', 'esclusi'] as const) {
       expect(chiaveConsenso('PUBLIC', voce)).toBe('recordingPublic');
       expect(chiaveConsenso('REGISTRANTS', voce)).toBe('recordingReserved');
       expect(chiaveConsenso(null, voce)).toBe('recording');
       expect(chiaveConsenso(undefined, voce)).toBe('recording');
     }
+  });
+
+  it("dove chi partecipa puo' comparire la casella non promette che volto e nome restano fuori", () => {
+    expect(chiaveConsenso('PUBLIC', 'visibili')).toBe('recordingVisiblePublic');
+    expect(chiaveConsenso('REGISTRANTS', 'visibili')).toBe('recordingVisibleReserved');
+    expect(chiaveConsenso(null, 'visibili')).toBe('recordingVisible');
+    for (const destinazione of [...DESTINAZIONI, null]) {
+      const testo = messages.gdpr.consent[chiaveConsenso(destinazione, 'visibili')];
+      expect(testo).not.toMatch(/volto|nome non/i);
+    }
+    // La prova dice su quale testo e' stata data, con o senza destinazione.
+    expect(versioneDellaProva('visibili')).toBe(VERSIONE_TESTO_VISIBILI);
+    for (const voce of ['solo-voce', 'esclusi'] as const) {
+      expect(versioneDellaProva(voce)).toBe(VERSIONE_TESTO_REGISTRAZIONE);
+    }
+    expect(versioneDellaProva('assente')).toBe(VERSIONE_TESTO_SENZA_VIDEO);
+  });
+
+  it("dove chi partecipa puo' comparire un consenso dato ora vale sul testo che la pagina ha mostrato", () => {
+    const dato = { recordingConsent: true, recordingConsentDestination: 'PUBLIC' as const };
+    expect(consensoOra({ ...dato, recordingConsentVersion: 1 }, 'PUBLIC', 'visibili')).toBe(true);
+    // Una pagina aperta prima che l'installazione cambiasse mostrava la sola voce.
+    expect(consensoOra({ ...dato, recordingConsentVersion: 2 }, 'PUBLIC', 'visibili')).toBe(false);
+    // Altrove il testo 1 copre il 2, che chiede meno.
+    expect(consensoOra({ ...dato, recordingConsentVersion: 1 }, 'PUBLIC', 'solo-voce')).toBe(true);
+    // La versione salvata e' quella letta; da una pagina che non la manda, quella in vigore.
+    expect(versioneLetta(1, 'solo-voce')).toBe(1);
+    expect(versioneLetta(undefined, 'visibili')).toBe(1);
+    expect(versioneLetta(undefined, 'assente')).toBe(VERSIONE_TESTO_SENZA_VIDEO);
+  });
+
+  it("dove chi partecipa puo' comparire copre solo il testo che lo diceva", () => {
+    // Il testo per la sola voce prometteva che volto e nome restavano fuori.
+    expect(provaCopre({ destination: 'PUBLIC', textVersion: 2 }, 'PUBLIC', 'visibili')).toBe(false);
+    expect(provaCopre({ destination: null, textVersion: 2 }, null, 'visibili')).toBe(false);
+    expect(provaCopre({ destination: 'PUBLIC', textVersion: 1 }, 'REGISTRANTS', 'visibili')).toBe(true);
+    expect(provaCopre({ destination: null, textVersion: 1 }, null, 'visibili')).toBe(true);
+    // Senza versione: data quando ogni testo diceva audio e video.
+    expect(provaCopre({ destination: null, textVersion: null }, null, 'visibili')).toBe(true);
+    // La destinazione conta comunque.
+    expect(provaCopre({ destination: 'REGISTRANTS', textVersion: 1 }, 'PUBLIC', 'visibili')).toBe(false);
+    // Il testo senza video non copre un video, nemmeno senza destinazione.
+    for (const voce of ['solo-voce', 'esclusi', 'visibili'] as const) {
+      expect(provaCopre({ destination: null, textVersion: VERSIONE_TESTO_SENZA_VIDEO }, null, voce)).toBe(
+        false,
+      );
+    }
+    expect(
+      provaCopre({ destination: null, textVersion: VERSIONE_TESTO_SENZA_VIDEO }, null, 'assente'),
+    ).toBe(true);
+    // Altrove il testo 1 copre il 2, che chiede meno, e decide la destinazione.
+    for (const voce of ['solo-voce', 'esclusi', 'assente'] as const) {
+      expect(provaCopre({ destination: 'PUBLIC', textVersion: 2 }, 'PUBLIC', voce)).toBe(true);
+      expect(provaCopre({ destination: 'PUBLIC', textVersion: 1 }, 'PUBLIC', voce)).toBe(true);
+      expect(provaCopre({ destination: null, textVersion: null }, null, voce)).toBe(true);
+    }
+  });
+
+  it("l'informativa dove non si chiede niente dice cio' che l'installazione garantisce", () => {
+    expect(chiaveAvvisoRegistrazione('esclusi')).toBe('recordingHostsOnly');
+    expect(chiaveAvvisoRegistrazione('visibili')).toBe('recordingNotice');
+    expect(chiaveAvvisoRegistrazione('solo-voce')).toBe('recordingNoticeVoice');
+    expect(chiaveAvvisoRegistrazione('assente')).toBe('recordingNoticeVoice');
+    // Dove chi partecipa puo' comparire non promette che volto e nome restano fuori.
+    expect(messages.gdpr.consent[chiaveAvvisoRegistrazione('visibili')]).not.toMatch(/volto/i);
+    expect(messages.gdpr.consent.namesMayAppear).toBeTruthy();
   });
 
   it("dove non c'e' un video la casella non ne parla, qualunque destinazione abbia l'evento", () => {
@@ -222,8 +294,9 @@ describe('testo del consenso', () => {
 
   it('ogni testo esiste nel catalogo: una chiave sbagliata si vedrebbe nuda nella casella', () => {
     for (const destinazione of DESTINAZIONI) {
-      for (const voce of ['assente', 'rimovibile', 'fissa'] as const) {
+      for (const voce of ['assente', 'solo-voce', 'esclusi', 'visibili'] as const) {
         expect(messages.gdpr.consent[chiaveConsenso(destinazione, voce)]).toBeTruthy();
+        expect(messages.gdpr.consent[chiaveAvvisoRegistrazione(voce)]).toBeTruthy();
       }
       expect(messages.gdpr.consent[chiaveAvvisoConduce(destinazione)]).toBeTruthy();
     }
@@ -589,8 +662,10 @@ describe('destinazioneDiPartenza', () => {
 describe('dove il video della sala non c e', () => {
   it('la destinazione non si chiede', () => {
     expect(videoDaDestinare('assente')).toBe(false);
-    expect(videoDaDestinare('fissa')).toBe(true);
-    expect(videoDaDestinare('rimovibile')).toBe(true);
+    expect(videoDaDestinare('visibili')).toBe(true);
+    expect(videoDaDestinare('solo-voce')).toBe(true);
+    // Chi conduce e' nel video anche dove chi partecipa non ci entra mai.
+    expect(videoDaDestinare('esclusi')).toBe(true);
     expect(videoDaDestinare(undefined)).toBe(true);
   });
 
@@ -598,8 +673,8 @@ describe('dove il video della sala non c e', () => {
     const evento = destinazioneDiPartenza({ recordingEnabled: false }, true);
     expect(evento).toBe('REGISTRANTS');
     const letto = { recordingConsent: true, recordingConsentDestination: null };
-    expect(consensoOra(letto, destinazioneDelTesto(evento, 'assente'))).toBe(true);
-    expect(consensoOra(letto, destinazioneDelTesto(evento, 'fissa'))).toBe(false);
-    expect(consensoCopre(null, destinazioneDelTesto(evento, 'fissa'))).toBe(false);
+    expect(consensoOra(letto, destinazioneDelTesto(evento, 'assente'), 'assente')).toBe(true);
+    expect(consensoOra(letto, destinazioneDelTesto(evento, 'visibili'), 'visibili')).toBe(false);
+    expect(consensoCopre(null, destinazioneDelTesto(evento, 'visibili'))).toBe(false);
   });
 });

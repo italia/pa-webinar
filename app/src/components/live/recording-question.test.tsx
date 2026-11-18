@@ -41,7 +41,7 @@ function disegna(props: Partial<Props> = {}) {
   const tutte: Props = {
     aperta: true,
     destinazione: null,
-    voce: 'rimovibile',
+    partecipanti: 'solo-voce',
     onSi: vi.fn(),
     onNo: vi.fn(),
     inCorso: false,

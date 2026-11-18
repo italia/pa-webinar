@@ -66,12 +66,13 @@ import { impostaPulsante } from '@/lib/jitsi/custom-buttons';
 import { FULLSCREEN_BUTTON_ID, fullscreenToolbarButton } from '@/lib/jitsi/fullscreen-button';
 import CaptureNotice from '@/components/live/capture-notice';
 import VoiceExcludedNotice from '@/components/live/voice-excluded-notice';
-import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import type { PartecipantiNelVideo } from '@/lib/live/consent-rule';
 import {
   consensoCopre,
   destinazioneDelTesto,
   registrazioneRiservata,
   testoLetto,
+  versioneDellaProva,
   type Destinazione,
 } from '@/lib/recording/destination';
 import { catturaDallaRisposta, type StatoCattura } from '@/lib/live/capture-state';
@@ -83,7 +84,7 @@ import ConsentsDialog, {
 } from '@/components/live/consents-dialog';
 import RecordingQuestion from '@/components/live/recording-question';
 import { useRecordingQuestion } from '@/hooks/use-recording-question';
-import { conduceNelVideo, regolaConsenso } from '@/lib/live/consent-rule';
+import { conduceNelVideo, regolaConsenso, voceDi } from '@/lib/live/consent-rule';
 import {
   elencoRegistrazione,
   type ElencoRegistrazione,
@@ -204,8 +205,10 @@ interface EventInfo {
   /** Il pubblico della registrazione (Event.recordingAudience): puo' restringere
    *  anche una destinazione pubblica (`registrazioneRiservata`). */
   recordingAudience: RecordingAudience;
-  /** La voce di chi non acconsente nel video (lib/recording/availability). */
-  voceNelVideo?: VoceNelVideo;
+  /** Come compaiono nel video i partecipanti (lib/recording/availability):
+   *  decide la regola del consenso e i testi della sala. Senza, nessuna
+   *  promessa ('visibili'). */
+  partecipantiNelVideo?: PartecipantiNelVideo;
   /** L'informativa privacy dell'evento (lib/events/privacy-notice), accanto
    *  al consenso chiesto in sala d'attesa. */
   privacy?: { url: string; testo?: string };
@@ -609,14 +612,14 @@ export default function LiveEventClient({
   // o altrove, come dice il token: quelli che la pagina aveva trovato dati non
   // valgono piu'.
   const [ritirati, setRitirati] = useState<ProveConsenso>({ registrazione: false, tracce: false });
-  const voceInSala = event.voceNelVideo ?? 'fissa';
+  const partecipantiInSala = event.partecipantiNelVideo ?? 'visibili';
   // La destinazione del video e il testo che la dichiara: la pagina puo' essere
   // rimasta aperta mentre cambiava, e quella in vigore la riporta ogni risposta
   // del token. La sala mostra sempre quella in vigore. Il testo su cui la persona
   // ha acconsentito resta separato: un consenso vale per cio' che si e' letto.
   // Dove parte da uno gia' dato, che la pagina ha trovato valido, vale il testo
   // dell'apertura.
-  const testoDellaPagina = destinazioneDelTesto(event.recordingDestination, voceInSala);
+  const testoDellaPagina = destinazioneDelTesto(event.recordingDestination, partecipantiInSala);
   const [destinazioneInVigore, setDestinazioneInVigore] = useState<Destinazione>(testoDellaPagina);
   const [testoAcconsentito, setTestoAcconsentito] = useState<Destinazione>(testoDellaPagina);
   // Il consenso dato dalla sala, e il consenso decaduto: un testo cambiato si
@@ -663,6 +666,7 @@ export default function LiveEventClient({
     registrazioneDisponibile: recordingAvailable,
     conduce: isModerator || isSpeaker,
     istantanea: event.eventType === 'INSTANT',
+    partecipanti: partecipantiInSala,
   };
   const consensoRegistrazione = consensoRegistrazioneIngresso({
     ...argomentiRegistrazione,
@@ -687,19 +691,23 @@ export default function LiveEventClient({
       participantsCanShareScreen: event.participantsCanShareScreen,
     },
     recordingAvailable,
-    event.voceNelVideo ?? 'fissa',
+    partecipantiInSala,
   );
   const salaSoloAscolto = regolaSala.soloAscolto;
+  // Chi partecipa non entra mai nel video ('esclusi'): il consenso alla
+  // registrazione non si chiede, e la voce la decide quello alla trascrizione.
+  const voceDallaTrascrizione = regolaSala.voceDallaTrascrizione;
   // Dove la scheda dice che non si registra niente la sala non offre il comando.
   // Una chiamata rapida lo offre solo dove chi non acconsente resta fuori dal
   // video (lib/live/entry-consents): altrove la Regia lo mostra spento, e dice
   // perche'.
   const istantanea = event.eventType === 'INSTANT';
-  const registraInSala = registraChiConduce(event, recordingAvailable, voceInSala);
+  const registraInSala = registraChiConduce(event, recordingAvailable, partecipantiInSala);
   const registrazioneNonOfferta = istantanea && event.recordingEnabled && recordingAvailable && !registraInSala;
   // Chi conduce o interviene e' nel video, con nome e immagine, dove c'e' un
   // video della sala: la sala d'attesa glielo dice al posto della casella.
-  const conduceInVideo = (isModerator || isSpeaker) && registraInSala && conduceNelVideo(voceInSala);
+  const conduceInVideo =
+    (isModerator || isSpeaker) && registraInSala && conduceNelVideo(partecipantiInSala);
   const [joinPrefs, setJoinPrefs] = useState<WaitingRoomJoinPrefs>({
     cameraOn: false,
     micOn: false,
@@ -907,6 +915,9 @@ export default function LiveEventClient({
     if (dati.registrazione) {
       body.recordingConsent = true;
       body.recordingConsentDestination = testoAcconsentito;
+      // Il testo mostrato da questa pagina: dove chi partecipa puo' comparire
+      // nel video il server accetta solo quello che lo dice.
+      body.recordingConsentVersion = versioneDellaProva(partecipantiInSala);
     }
     if (dati.tracce) body.multitrackConsent = true;
     if (repliche.registrazione || repliche.tracce) {
@@ -1058,6 +1069,7 @@ export default function LiveEventClient({
     ritirati.tracce,
     testoAcconsentito,
     destinazioneInVigore,
+    partecipantiInSala,
     locale,
   ]);
 
@@ -1188,6 +1200,7 @@ export default function LiveEventClient({
   // la voce.
   const [consensiAperti, setConsensiAperti] = useState(false);
   const [ritiro, setRitiro] = useState<'no' | 'in-corso' | 'errore'>('no');
+  const voceInSala = voceDi(partecipantiInSala);
   const effettoRitiro: EffettoRitiroRegistrazione =
     voceInSala === 'assente'
       ? 'assente'
@@ -1335,21 +1348,28 @@ export default function LiveEventClient({
   });
   const registrazioneData = haConsensoRegistrazione && !soloAscolto && !voceEsclusa;
   // Chi e' fuori dalla registrazione puo' rientrarvi anche dove l'evento non
-  // chiede il consenso, e senza non vale nemmeno quello alla trascrizione.
-  const registrazioneNecessaria = registrazioneChiesta || voceEsclusa || soloAscolto;
+  // chiede il consenso, e senza non vale nemmeno quello alla trascrizione. Dove
+  // chi partecipa non entra mai nel video il consenso non c'e' da dare: la voce
+  // fuori dipende dalla trascrizione.
+  const registrazioneNecessaria =
+    !voceDallaTrascrizione && (registrazioneChiesta || voceEsclusa || soloAscolto);
   // In una chiamata rapida tutti entrano fuori dalla registrazione: il consenso
   // si offre mentre qualcuno registra (e la domanda lo chiede, piu' sotto), e
   // resta ritirabile una volta dato.
   const registrazioneDaOffrire = registrazioneNecessaria && (!istantanea || isRecording);
   const consensiInSala: ConsensiInSala = {
     // Il consenso dato resta ritirabile, anche se l'evento non lo chiede piu'.
-    ...(registrazioneDaOffrire || haConsensoRegistrazione
+    // Non dove chi partecipa non entra mai nel video: li' non copre niente, il
+    // segno della voce segue la trascrizione, e ritirarlo dalla sala ritirerebbe
+    // anche quella (lib/live/consent-withdrawal). Resta ritirabile dalla pagina
+    // dei propri dati.
+    ...(!voceDallaTrascrizione && (registrazioneDaOffrire || haConsensoRegistrazione)
       ? {
           registrazione: {
             dato: registrazioneData,
             ritiro: effettoRitiro,
             destinazione: destinazioneInVigore,
-            voce: voceInSala,
+            partecipanti: partecipantiInSala,
             testoEvento: event.recordingConsentText,
           },
         }
@@ -1361,7 +1381,7 @@ export default function LiveEventClient({
             dato: haConsensoTracce,
             serveRegistrazione: registrazioneNecessaria && !registrazioneData,
             testo: chiaveConsensoTrascrizione(event.tracceConservate),
-            voce: voceInSala,
+            partecipanti: partecipantiInSala,
           },
         }
       : {}),
@@ -2180,7 +2200,9 @@ export default function LiveEventClient({
   // della registrazione (lib/live/recording-question). Non mentre e' aperta la
   // finestra dei consensi, dove la persona sta gia' scegliendo.
   const domandaRegistrazione = useRecordingQuestion({
-    attiva: istantanea && registraInSala && phase === 'ready',
+    // Solo dove la voce di chi partecipa entra nel video con il consenso: dove
+    // non entra mai ('esclusi') non c'e' niente da chiedere.
+    attiva: istantanea && regolaSala.richiesto && phase === 'ready',
     inCorso: isRecording,
     fuori: credentials ? !!credentials.voiceExcluded : null,
   });
@@ -2379,7 +2401,7 @@ export default function LiveEventClient({
           multitrackConsentExempt={haConsensoTracce}
           recordingConsentRequired={consensoRegistrazione.richiesto}
           recordingDestination={destinazioneInVigore}
-          voce={voceInSala}
+          partecipanti={partecipantiInSala}
           recordingListenOnly={consensoRegistrazione.soloAscolto}
           recordingAskedInRoom={istantanea && registraInSala && !isModerator && !isSpeaker}
           recordingHostAlways={conduceInVideo}
@@ -2637,7 +2659,7 @@ export default function LiveEventClient({
         <ListenOnlyNotice
           testoConsenso={event.recordingConsentText}
           destinazione={destinazioneInVigore}
-          voce={voceInSala}
+          partecipanti={partecipantiInSala}
           onAcconsenti={acconsentiInSala}
           inCorso={riconsenso === 'in-corso'}
           errore={riconsenso === 'errore'}
@@ -2649,9 +2671,11 @@ export default function LiveEventClient({
           soltanto dimenticato la casella: non viene registrato. In un evento di
           solo ascolto, da quando ha la parola. */}
       {/* Nella chiamata rapida lo chiede la domanda all'avvio della
-          registrazione (RecordingQuestion): fuori e' come entrano tutti. */}
+          registrazione (RecordingQuestion): fuori e' come entrano tutti. Dove
+          chi partecipa non entra mai nel video non c'e' un consenso da offrire. */}
       {voceEsclusa &&
         !istantanea &&
+        !voceDallaTrascrizione &&
         !showJvbOverlay &&
         !fasciaChiusa &&
         (event.participantsCanUnmute ||
@@ -2663,7 +2687,7 @@ export default function LiveEventClient({
         <VoiceExcludedNotice
           testoConsenso={event.recordingConsentText}
           destinazione={destinazioneInVigore}
-          voce={voceInSala}
+          partecipanti={partecipantiInSala}
           onAcconsenti={acconsentiInSala}
           inCorso={riconsenso === 'in-corso'}
           errore={riconsenso === 'errore'}
@@ -2945,7 +2969,7 @@ export default function LiveEventClient({
       <RecordingQuestion
         aperta={domandaRegistrazione.aperta && !consensiAperti}
         destinazione={destinazioneInVigore}
-        voce={voceInSala}
+        partecipanti={partecipantiInSala}
         testoConsenso={event.recordingConsentText}
         onSi={acconsentiInSala}
         onNo={domandaRegistrazione.rispondi}

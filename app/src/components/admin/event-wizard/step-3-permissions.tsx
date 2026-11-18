@@ -18,7 +18,7 @@ import { useTranslations } from 'next-intl';
 import { parseLocaleList } from '@/components/admin/language-checklist';
 import ToggleSwitch from '@/components/ui/toggle-switch';
 import { Icon } from '@/components/ui/icon';
-import { conduceNelVideo, type VoceNelVideo } from '@/lib/live/consent-rule';
+import { conduceNelVideo, type PartecipantiNelVideo } from '@/lib/live/consent-rule';
 import { registraChiConduce } from '@/lib/live/entry-consents';
 import {
   DESTINAZIONE_DI_PARTENZA,
@@ -97,8 +97,8 @@ interface Props {
   /** L'installazione puo' registrare. Senza, la registrazione non si propone:
    *  si mostra solo se l'evento ce l'ha gia' accesa, per poterla spegnere. */
   recordingAvailable?: boolean;
-  /** Cosa succede alla voce di chi non acconsente, in questa installazione. */
-  voceNelVideo?: VoceNelVideo;
+  /** Come compaiono nel video i partecipanti, in questa installazione. */
+  partecipantiNelVideo?: PartecipantiNelVideo;
   /** Una chiamata rapida chiede il consenso in sala, all'avvio della
    *  registrazione: niente diagramma. */
   istantanea?: boolean;
@@ -200,7 +200,7 @@ export default function StepPermissions({
   whiteboardInfraReady,
   liveCaptionsAvailable = false,
   recordingAvailable = true,
-  voceNelVideo = 'rimovibile',
+  partecipantiNelVideo = 'visibili',
   istantanea = false,
   puoDichiarareChiConduce = true,
   destinazioneDopo = null,
@@ -235,7 +235,7 @@ export default function StepPermissions({
       f !== 'recording_control' ||
       (value.recordingEnabled &&
         recordingAvailable &&
-        !registrazioneVuota(value, voceNelVideo, recordingAvailable)),
+        !registrazioneVuota(value, partecipantiNelVideo, recordingAvailable)),
   );
 
   // Le due parti: il passo «Permessi» (partecipazione e funzioni della sala)
@@ -536,7 +536,7 @@ export default function StepPermissions({
                 ...(!value.recordingEnabled &&
                 !editing &&
                 value.recordingDestination == null &&
-                videoDaDestinare(voceNelVideo)
+                videoDaDestinare(partecipantiNelVideo)
                   ? { recordingDestination: DESTINAZIONE_DI_PARTENZA }
                   : {}),
               })
@@ -547,7 +547,7 @@ export default function StepPermissions({
         {value.recordingEnabled && !value.autoStartRecording && (
           <p className="text-secondary mb-0 py-2" style={{ fontSize: '0.85rem', borderTop: '1px solid #e8e8e8' }}>
             {t(
-              registrazioneVuota(value, voceNelVideo, recordingAvailable)
+              registrazioneVuota(value, partecipantiNelVideo, recordingAvailable)
                 ? 'recordingNothingToCapture'
                 : 'recordingManualNote',
             )}
@@ -563,7 +563,7 @@ export default function StepPermissions({
         {value.recordingEnabled &&
           recordingAvailable &&
           destinazione &&
-          videoDaDestinare(voceNelVideo) && (
+          videoDaDestinare(partecipantiNelVideo) && (
           <fieldset id="wiz-destinazione" className="py-2" style={{ borderTop: '1px solid #e8e8e8' }}>
             <legend
               className="fw-semibold mb-1 float-none"
@@ -646,7 +646,7 @@ export default function StepPermissions({
           !istantanea &&
           !puoDichiarareChiConduce &&
           value.recordingDestination === null &&
-          videoDaDestinare(voceNelVideo) && (
+          videoDaDestinare(partecipantiNelVideo) && (
             <p className="text-secondary mb-0 py-2" style={{ fontSize: '0.85rem', borderTop: '1px solid #e8e8e8' }}>
               {t(
                 destinazioneDopo === null
@@ -664,15 +664,22 @@ export default function StepPermissions({
         {registraChiConduce(
           { recordingEnabled: value.recordingEnabled, eventType: istantanea ? 'INSTANT' : null },
           recordingAvailable,
-          voceNelVideo,
+          partecipantiNelVideo,
         ) &&
-          conduceNelVideo(voceNelVideo) && (
+          conduceNelVideo(partecipantiNelVideo) && (
           <div className="py-2" style={{ borderTop: '1px solid #e8e8e8' }}>
             <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
               {t('hostsAlwaysRecorded')}
             </div>
             <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
-              {t('hostsAlwaysRecordedDesc')}
+              {/* Di chi partecipa, cio' che l'installazione garantisce davvero. */}
+              {t(
+                partecipantiNelVideo === 'esclusi'
+                  ? 'hostsAlwaysRecordedDescHostsOnly'
+                  : partecipantiNelVideo === 'visibili'
+                    ? 'hostsAlwaysRecordedDescVisible'
+                    : 'hostsAlwaysRecordedDesc',
+              )}
             </div>
           </div>
         )}
@@ -687,10 +694,10 @@ export default function StepPermissions({
               value,
               { aiPipelineEnabled },
               recordingAvailable,
-              voceNelVideo,
+              partecipantiNelVideo,
             )}
             {...togglesFromMatrix(value.permissionMatrix)}
-            voce={voceNelVideo}
+            partecipanti={partecipantiNelVideo}
           />
         )}
 

@@ -26,7 +26,7 @@ type PropsAttesa = {
   event: Record<string, unknown>;
   recordingConsentRequired?: boolean;
   recordingDestination?: unknown;
-  voce?: unknown;
+  partecipanti?: unknown;
   schedaPrivacy?: SchedaPrivacy | null;
   onEnterLive: (nome: string, prefs: WaitingRoomJoinPrefs) => void;
 };
@@ -172,7 +172,7 @@ const evento: Props['event'] = {
   participantsCanUnmute: true,
   participantsCanStartVideo: true,
   participantsCanShareScreen: true,
-  voceNelVideo: 'rimovibile',
+  partecipantiNelVideo: 'solo-voce',
 };
 
 interface Risposta {
@@ -328,7 +328,7 @@ describe("sala — quello che arriva alla sala d'attesa", () => {
     });
     const a = leggiAttesa();
     expect(a.recordingDestination).toBe('REGISTRANTS');
-    expect(a.voce).toBe('rimovibile');
+    expect(a.partecipanti).toBe('solo-voce');
     expect(a.event).toMatchObject({
       videoDisponibile: true,
       trascrizioneVideo: true,
@@ -344,6 +344,7 @@ describe("sala — quello che arriva alla sala d'attesa", () => {
         destinazione: 'PUBLIC',
         chiNonAcconsente: 'restaFuori',
         conduceSempre: false,
+        partecipanti: null,
       },
       trascrizione: { chiesta: true, sottotitoli: true, tracce: null, dalVideo: false },
       sottotitoli: { attivi: true, testoConservato: true },
@@ -533,7 +534,7 @@ describe("sala — quello che arriva alla sala d'attesa", () => {
 
   it('senza video il testo non dichiara una destinazione', async () => {
     await monta({
-      event: { ...evento, recordingDestination: 'PUBLIC', voceNelVideo: 'assente' },
+      event: { ...evento, recordingDestination: 'PUBLIC', partecipantiNelVideo: 'assente' },
     });
     expect(leggiAttesa().recordingDestination).toBeNull();
   });
@@ -579,12 +580,14 @@ describe('sala — il testo su cui si acconsente', () => {
 
   it('in solo ascolto il testo cambiato si spiega anche entrando', async () => {
     await monta({
-      event: { ...evento, recordingDestination: 'REGISTRANTS', voceNelVideo: 'fissa' },
+      event: { ...evento, recordingDestination: 'REGISTRANTS', partecipantiNelVideo: 'visibili' },
     });
     risposte.push({ recordingDestination: 'PUBLIC', listenOnly: true });
     await entra({ recordingConsent: true, recordingConsentDestination: 'REGISTRANTS' });
     expect(testo()).toContain(l.listenOnly.title);
-    expect(testo()).toContain(g.recordingPublic);
+    // Il solo ascolto c'e' dove chi partecipa puo' comparire: il testo lo dice.
+    expect(testo()).toContain(g.recordingVisiblePublic);
+    expect(testo()).toContain(g.namesMayAppear);
     expect(testo()).toContain(l.consents.textChanged);
     expect(testo()).not.toContain(l.listenOnly.error);
   });
@@ -943,15 +946,15 @@ describe('sala — acconsentire dalla sala', () => {
     const e: Props['event'] = {
       ...evento,
       recordingDestination: 'REGISTRANTS',
-      voceNelVideo: 'fissa',
+      partecipantiNelVideo: 'visibili',
     };
     await monta({ event: e });
     risposte.push({ recordingDestination: 'REGISTRANTS', listenOnly: true });
     await entra();
-    expect(testo()).toContain(g.recordingReserved);
+    expect(testo()).toContain(g.recordingVisibleReserved);
     risposte.push({ recordingDestination: 'PUBLIC', listenOnly: true });
     await premi(pulsante(l.listenOnly.consent));
-    expect(testo()).toContain(g.recordingPublic);
+    expect(testo()).toContain(g.recordingVisiblePublic);
     expect(testo()).toContain(l.consents.textChanged);
   });
 
@@ -1045,7 +1048,7 @@ describe('sala — la finestra dei consensi', () => {
 
   it("dove l'evento avvisa soltanto, il ritiro dice cosa cambia, prima di agire", async () => {
     await monta({
-      event: { ...soloAvviso, voceNelVideo: 'fissa' },
+      event: { ...soloAvviso, partecipantiNelVideo: 'visibili' },
       hasRecordingConsent: true,
     });
     risposte.push({ consentsInForce: { recording: true, transcription: false } });
@@ -1058,7 +1061,7 @@ describe('sala — la finestra dei consensi', () => {
 
   it("senza un video il ritiro dice cosa cambia", async () => {
     await monta({
-      event: { ...soloAvviso, voceNelVideo: 'assente' },
+      event: { ...soloAvviso, partecipantiNelVideo: 'assente' },
       hasRecordingConsent: true,
     });
     risposte.push({ consentsInForce: { recording: true, transcription: false } });
@@ -1089,7 +1092,7 @@ describe('sala — la finestra dei consensi', () => {
 
   it("in solo ascolto il testo dell'ente sta sopra il pulsante", async () => {
     await monta({
-      event: { ...evento, voceNelVideo: 'fissa', recordingConsentText: TESTO_ENTE },
+      event: { ...evento, partecipantiNelVideo: 'visibili', recordingConsentText: TESTO_ENTE },
     });
     risposte.push({ listenOnly: true });
     await entra();
@@ -1352,7 +1355,7 @@ describe('sala — la fascia di chi resta fuori dalla registrazione', () => {
 
   it.each<[string, Risposta, Props['event']]>([
     ['chi non acconsente', { voiceExcluded: true }, eventoRiservato],
-    ['chi segue in solo ascolto', { listenOnly: true }, { ...eventoRiservato, voceNelVideo: 'fissa' }],
+    ['chi segue in solo ascolto', { listenOnly: true }, { ...eventoRiservato, partecipantiNelVideo: 'visibili' }],
   ])('%s la chiude e tiene il pulsante dei consensi, che prende il fuoco', async (_chi, risposta, e) => {
     await dentro(risposta, e);
     await chiudi();
@@ -1419,6 +1422,7 @@ describe("sala — la scheda in sala d'attesa", () => {
       destinazione: 'PUBLIC',
       chiNonAcconsente: 'soloAscolto',
       conduceSempre: false,
+      partecipanti: null,
     },
     trascrizione: { chiesta: false, sottotitoli: false, tracce: null, dalVideo: false },
     sottotitoli: { attivi: false, testoConservato: false },
@@ -1656,5 +1660,55 @@ describe('sala — la chiamata rapida chiede a chi partecipa, all\'avvio della r
     await entra();
     await registra(true);
     expect(testo()).not.toContain(q.question);
+  });
+
+  it("dove chi partecipa non entra mai nel video si registra senza domanda", async () => {
+    await monta({
+      event: { ...rapida, partecipantiNelVideo: 'esclusi' },
+      isGuest: true,
+      token: '',
+    });
+    risposte.push({ voiceExcluded: true });
+    await entra();
+    await registra(true);
+    expect(testo()).not.toContain(q.question);
+  });
+});
+
+describe("sala — chi partecipa non entra mai nel video ('esclusi')", () => {
+  const esclusi: Props['event'] = {
+    ...evento,
+    recordingDestination: 'REGISTRANTS',
+    partecipantiNelVideo: 'esclusi',
+    multitrackRecordingEnabled: true,
+  };
+
+  it("fuori dalla registrazione non c'e' una fascia ne' un consenso da dare", async () => {
+    await monta({ event: esclusi });
+    risposte.push({ recordingDestination: 'REGISTRANTS', voiceExcluded: true });
+    await entra();
+    expect(testo()).not.toContain(l.voiceExcluded.title);
+    expect(document.querySelector('.live-listen-only')).toBeNull();
+
+    // La finestra dei consensi offre solo la trascrizione, senza aspettare la
+    // registrazione.
+    await premi(document.querySelector<HTMLElement>('.live-consents-btn')!);
+    expect(testo()).toContain(l.consents.transcription.title);
+    expect(testo()).not.toContain(l.consents.recording.give);
+    expect(testo()).not.toContain(l.consents.transcription.needsRecording);
+  });
+
+  it("un consenso alla registrazione dato prima non compare: non copre niente, e il suo ritiro toglierebbe la trascrizione", async () => {
+    await monta({ event: esclusi, hasRecordingConsent: true });
+    risposte.push({
+      recordingDestination: 'REGISTRANTS',
+      voiceExcluded: true,
+      consentsInForce: { recording: true, transcription: false },
+    });
+    await entra();
+    await premi(document.querySelector<HTMLElement>('.live-consents-btn')!);
+    expect(testo()).toContain(l.consents.transcription.title);
+    expect(testo()).not.toContain(l.consents.recording.title);
+    expect(testo()).not.toContain(l.consents.recording.give);
   });
 });

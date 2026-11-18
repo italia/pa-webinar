@@ -24,7 +24,7 @@ import { z } from 'zod';
 
 import { captionsTranscriptActive } from '@/lib/captions/availability';
 import { isMultitrackPlaceholder } from '@/lib/recorder/lifecycle';
-import { recordingAvailable, voceNelVideo } from '@/lib/recording/availability';
+import { partecipantiNelVideo, recordingAvailable } from '@/lib/recording/availability';
 import { AppError, ValidationError } from '@/lib/errors';
 import {
   trascrizioneDalVideo,
@@ -68,7 +68,7 @@ export function chiedeConsensoPerVoce(
       e,
       sito,
       recordingAvailable(),
-      voceNelVideo()
+      partecipantiNelVideo()
     ),
   });
 }
@@ -90,7 +90,7 @@ export function versioneConsensoTrascrizione(
     e.multitrackRecordingEnabled && !!e.aiTranscriptEnabled && !!sito.aiPipelineEnabled;
   const trascrive =
     captionsTranscriptActive(e, sito) ||
-    trascrizioneDalVideo(e, sito, recordingAvailable(), voceNelVideo()) ||
+    trascrizioneDalVideo(e, sito, recordingAvailable(), partecipantiNelVideo()) ||
     tracceDaTrascrivere;
   return trascrive ? VERSIONE_TESTO_TRASCRIZIONE : 1;
 }

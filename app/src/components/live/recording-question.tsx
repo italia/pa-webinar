@@ -7,7 +7,7 @@ import { useEffect, useId, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'design-react-kit';
 
-import { testoConsensoEvento, type VoceNelVideo } from '@/lib/live/consent-rule';
+import { testoConsensoEvento, type PartecipantiNelVideo } from '@/lib/live/consent-rule';
 import { chiaveConsenso, type Destinazione } from '@/lib/recording/destination';
 
 /**
@@ -24,7 +24,7 @@ import { chiaveConsenso, type Destinazione } from '@/lib/recording/destination';
 export default function RecordingQuestion({
   aperta,
   destinazione,
-  voce,
+  partecipanti,
   testoConsenso,
   onSi,
   onNo,
@@ -36,7 +36,8 @@ export default function RecordingQuestion({
   aperta: boolean;
   /** La destinazione in vigore: il testo a cui si acconsente. */
   destinazione: Destinazione;
-  voce: VoceNelVideo;
+  /** Come compaiono nel video i partecipanti (lib/recording/availability). */
+  partecipanti: PartecipantiNelVideo;
   /** Il testo dell'ente sulla registrazione, se c'e'. */
   testoConsenso?: string | null;
   onSi: () => void;
@@ -62,7 +63,7 @@ export default function RecordingQuestion({
   useEffect(() => {
     if (!aperta) setRisposto(false);
   }, [aperta]);
-  const testoEvento = testoConsensoEvento(testoConsenso, voce);
+  const testoEvento = testoConsensoEvento(testoConsenso, partecipanti);
   const chiudi = () => {
     if (!inCorso) onNo();
   };
@@ -88,7 +89,7 @@ export default function RecordingQuestion({
         <p className="mb-2">{t('question')}</p>
         <p className="small mb-2">{t('body')}</p>
         <p id={idTesto} className="small mb-2 text-secondary">
-          {[testoEvento, tGdpr(chiaveConsenso(destinazione, voce))]
+          {[testoEvento, tGdpr(chiaveConsenso(destinazione, partecipanti))]
             .filter(Boolean)
             .join(' ')}
         </p>

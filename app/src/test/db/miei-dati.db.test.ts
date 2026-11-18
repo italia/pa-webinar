@@ -50,6 +50,7 @@ const CON_TRACCE = {
 beforeEach(async () => {
   await svuotaDatabase();
   vi.stubEnv('RECORDING_VOICE_EXCLUSION', 'true');
+  vi.stubEnv('RECORDING_PARTICIPANT_VOICE', 'true');
 });
 afterEach(() => vi.unstubAllEnvs());
 
@@ -122,7 +123,7 @@ describe('un consenso dato di nuovo da «I miei dati»', () => {
     const prima = await prisma.registration.findUniqueOrThrow({
       where: { id: iscrizione.id },
     });
-    expect(await registrazioneDellIscrizione(evento, prima, null)).toBe(false);
+    expect(await registrazioneDellIscrizione(evento, prima, null, 'solo-voce')).toBe(false);
 
     const res = await dai(token, iscrizione.id, {
       consent: 'recording',
@@ -140,7 +141,7 @@ describe('un consenso dato di nuovo da «I miei dati»', () => {
       expect.objectContaining({ withdrawnAt: expect.any(String) }),
     ]);
     // Il prossimo ingresso lo trova: il token della sala legge la stessa regola.
-    expect(await registrazioneDellIscrizione(evento, prima, null)).toBe(true);
+    expect(await registrazioneDellIscrizione(evento, prima, null, 'solo-voce')).toBe(true);
     // La trascrizione ritirata con la registrazione resta ritirata.
     expect(
       await prisma.multitrackConsent.count({
@@ -272,14 +273,14 @@ describe('un consenso dato di nuovo da «I miei dati»', () => {
     const prima = await prisma.registration.findUniqueOrThrow({
       where: { id: iscrizione.id },
     });
-    expect(await registrazioneDellIscrizione(evento, prima, 'PUBLIC')).toBe(false);
+    expect(await registrazioneDellIscrizione(evento, prima, 'PUBLIC', 'solo-voce')).toBe(false);
     const res = await dai(token, iscrizione.id, {
       consent: 'recording',
       recordingDestination: 'PUBLIC',
     });
     expect(res.status).toBe(200);
     expect(await righeRegistro(evento.id, 'CONSENT_RECORDED')).toHaveLength(1);
-    expect(await registrazioneDellIscrizione(evento, prima, 'PUBLIC')).toBe(true);
+    expect(await registrazioneDellIscrizione(evento, prima, 'PUBLIC', 'solo-voce')).toBe(true);
   });
 
   it("a evento concluso, o dove l'evento non lo chiede, non si da'", async () => {

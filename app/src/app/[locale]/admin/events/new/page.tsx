@@ -13,7 +13,7 @@ import { capacitaIstanza } from '@/lib/capacity/istanza';
 import { getSettings } from '@/lib/settings';
 import { presetDelModello } from '@/lib/events/template-preset';
 import { liveCaptionsAvailable } from '@/lib/captions/availability';
-import { recordingAvailable, voceNelVideo } from '@/lib/recording/availability';
+import { partecipantiNelVideo, recordingAvailable } from '@/lib/recording/availability';
 import { traduzioneDisponibile } from '@/lib/text-translation/enqueue';
 import CreateEventWithTemplate from '@/components/admin/create-event-with-template';
 import AdminPageHeader from '@/components/admin/admin-page-header';
@@ -122,7 +122,7 @@ export default async function CreateEventPage({
         )}
         liveCaptionsAvailable={liveCaptionsAvailable(siteSettings)}
         recordingAvailable={recordingAvailable()}
-        voceNelVideo={voceNelVideo()}
+        partecipantiNelVideo={partecipantiNelVideo()}
         defaultTargetLocales={siteSettings.aiDefaultTargetLocales}
         aiPipelineEnabled={siteSettings.aiPipelineEnabled}
         textTranslationAvailable={traduzioneDisponibile(siteSettings)}
