@@ -2450,6 +2450,40 @@
         "avgParticipantsPerEvent": "Gns. deltagere pr. begivenhed",
         "avgFeedbackRating": "Gns. feedbackvurdering",
         "totalFeedback": "Feedbackbesvarelser"
+      },
+      "catalog": {
+        "title": "Begivenhedstyper og skabeloner",
+        "intro": "Hvor mange begivenheder af hver type og fra hver skabelon, måned for måned. Kun antal og gennemsnit, ingen personoplysninger. Kladder tælles ikke med.",
+        "periodLabel": "Periode",
+        "months": "{count, plural, one {# måned} other {# måneder}}",
+        "groupByLabel": "Gruppér efter",
+        "groupBy": {
+          "type": "Begivenhedstype",
+          "template": "Skabelon"
+        },
+        "rankingTypes": "Hyppigste typer",
+        "rankingTemplates": "Mest brugte skabeloner",
+        "columns": {
+          "type": "Type",
+          "template": "Skabelon",
+          "events": "Begivenheder",
+          "held": "Afholdt",
+          "avgParticipants": "Gns. deltagere",
+          "avgDuration": "Gns. varighed",
+          "total": "Hele perioden"
+        },
+        "measuresNote": "Afholdt: begivenheder, hvis rum blev åbnet. Gennemsnitligt antal deltagere: det højeste antal samtidigt tilstedeværende, inklusive gæster, i gennemsnit over de afholdte begivenheder. Gennemsnitlig varighed: den målte tid i rummet, ikke den planlagte.",
+        "byMonth": "Måned for måned",
+        "measureLabel": "Mål",
+        "measures": {
+          "events": "Begivenheder",
+          "avgParticipants": "Gennemsnitligt antal deltagere",
+          "avgDurationMinutes": "Gennemsnitlig varighed"
+        },
+        "byMonthCaption": "{measure} pr. måned",
+        "empty": "Ingen begivenheder i denne periode.",
+        "deletedTemplate": "{name} (slettet)",
+        "uncatalogedNote": "Ikke-katalogiserede begivenheder: {count}. De er oprettet før kataloget eller uden skabelon og uden format; du kan katalogisere dem, når du redigerer begivenheden, under tekniske detaljer."
       }
     },
     "recurrence": {
@@ -2518,7 +2552,8 @@
       "postEventPublic": "Offentlig side efter begivenheden",
       "offerAddressBook": "Tilbyder adressebogen til dem, der tilmelder sig",
       "invalidFields": "Tjek disse felter: {fields}.",
-      "descriptionOtherLanguages": "Der findes også versioner på: {languages}, som ikke kan redigeres her. Hvis du ændrer den italienske tekst, fjernes de."
+      "descriptionOtherLanguages": "Der findes også versioner på: {languages}, som ikke kan redigeres her. Hvis du ændrer den italienske tekst, fjernes de.",
+      "usedBy": "Begivenheder oprettet ud fra denne skabelon: {count}"
     },
     "instantCall": {
       "title": "Øjeblikkeligt videoopkald",
@@ -4190,6 +4225,23 @@
       "submit": "Fjern personen fra optagelsen",
       "submitConfirm": "Den oprindelige video og personens spor slettes, og efterbehandlingen køres igen. Det kan ikke fortrydes. Fortsæt?",
       "submitDone": "Anmodning lukket: personen er fjernet."
+    },
+    "catalog": {
+      "fieldTitle": "Katalog",
+      "fieldHelp": "Begivenhedstypen og skabelonen, den blev oprettet ud fra, bruges kun til instansens statistik og ændrer ingen indstillinger. Ret dem, hvis begivenheden er katalogiseret forkert eller slet ikke.",
+      "typeLabel": "Begivenhedstype",
+      "templateLabel": "Skabelon",
+      "noTemplate": "Ingen skabelon",
+      "deletedTemplate": "Oprettet ud fra skabelonen “{name}”, som siden er slettet.",
+      "deletedOption": "{name} (slettet)",
+      "types": {
+        "MEETING": "Møde",
+        "PARTICIPATORY": "Deltagende begivenhed",
+        "PUBLIC": "Offentlig begivenhed",
+        "INSTANT": "Hurtigopkald",
+        "LEGACY": "Importeret publikation",
+        "UNCATALOGED": "Ikke katalogiseret"
+      }
     }
   },
   "email": {

@@ -2450,6 +2450,40 @@
         "avgParticipantsPerEvent": "Meán rannpháirtithe in aghaidh an imeachta",
         "avgFeedbackRating": "Meánrátáil aiseolais",
         "totalFeedback": "Freagraí aiseolais"
+      },
+      "catalog": {
+        "title": "Cineálacha imeachtaí agus teimpléid",
+        "intro": "Cé mhéad imeacht de gach cineál agus ó gach teimpléad, mí ar mhí. Comhaireamh agus meáin amháin, gan aon sonraí pearsanta. Ní áirítear dréachtaí.",
+        "periodLabel": "Tréimhse",
+        "months": "{count, plural, one {# mhí} two {# mhí} few {# mhí} many {# mí} other {# mí}}",
+        "groupByLabel": "Grúpáil de réir",
+        "groupBy": {
+          "type": "Cineál imeachta",
+          "template": "Teimpléad"
+        },
+        "rankingTypes": "Na cineálacha is minice",
+        "rankingTemplates": "Na teimpléid is mó a úsáidtear",
+        "columns": {
+          "type": "Cineál",
+          "template": "Teimpléad",
+          "events": "Imeachtaí",
+          "held": "Reáchtáilte",
+          "avgParticipants": "Meán rannpháirtithe",
+          "avgDuration": "Meánfhad",
+          "total": "An tréimhse ar fad"
+        },
+        "measuresNote": "Reáchtáilte: imeachtaí ar osclaíodh a seomra. Meán rannpháirtithe: buaicuimhir na ndaoine a bhí i láthair san am céanna, aíonna san áireamh, ar an meán thar na himeachtaí a reáchtáladh. Meánfhad: an t-am seomra tomhaiste, ní an t-am sceidealaithe.",
+        "byMonth": "Mí ar mhí",
+        "measureLabel": "Tomhas",
+        "measures": {
+          "events": "Imeachtaí",
+          "avgParticipants": "Meán rannpháirtithe",
+          "avgDurationMinutes": "Meánfhad"
+        },
+        "byMonthCaption": "{measure} de réir míosa",
+        "empty": "Níl aon imeachtaí sa tréimhse seo.",
+        "deletedTemplate": "{name} (scriosta)",
+        "uncatalogedNote": "Imeachtaí gan chatalógú: {count}. Cruthaíodh iad roimh an gcatalóg, nó gan teimpléad agus gan fhormáid; is féidir iad a chatalógú agus an t-imeacht á chur in eagar, faoi na sonraí teicniúla."
       }
     },
     "recurrence": {
@@ -2518,7 +2552,8 @@
       "postEventPublic": "Leathanach poiblí tar éis an imeachta",
       "offerAddressBook": "Tairgeann sé an leabhar seoltaí do dhaoine a chláraíonn",
       "invalidFields": "Seiceálaigí na réimsí seo: {fields}.",
-      "descriptionOtherLanguages": "Tá leaganacha ann freisin i: {languages}, nach féidir a chur in eagar anseo. Má athraíonn sibh an téacs Iodáilise, bainfear iad."
+      "descriptionOtherLanguages": "Tá leaganacha ann freisin i: {languages}, nach féidir a chur in eagar anseo. Má athraíonn sibh an téacs Iodáilise, bainfear iad.",
+      "usedBy": "Imeachtaí a cruthaíodh ón teimpléad seo: {count}"
     },
     "instantCall": {
       "title": "Glao físe láithreach",
@@ -4190,6 +4225,23 @@
       "submit": "Bain an duine as an taifeadadh",
       "submitConfirm": "Scriosfar an físeán bunaidh agus rianta an duine agus déanfar an t-iarléiriú arís. Ní féidir é seo a chealú. Ar aghaidh?",
       "submitDone": "Dúnadh an t-iarratas: baineadh an duine."
+    },
+    "catalog": {
+      "fieldTitle": "Catalóg",
+      "fieldHelp": "Ní úsáidtear cineál an imeachta agus an teimpléad as ar cruthaíodh é ach do staitisticí an chórais, agus ní athraíonn siad socrú ar bith. Ceartaigh iad má tá an t-imeacht catalógaithe go mícheart, nó gan catalógú.",
+      "typeLabel": "Cineál imeachta",
+      "templateLabel": "Teimpléad",
+      "noTemplate": "Gan teimpléad",
+      "deletedTemplate": "Cruthaithe ón teimpléad “{name}”, a scriosadh ó shin.",
+      "deletedOption": "{name} (scriosta)",
+      "types": {
+        "MEETING": "Cruinniú",
+        "PARTICIPATORY": "Imeacht rannpháirteach",
+        "PUBLIC": "Imeacht poiblí",
+        "INSTANT": "Glao tapa",
+        "LEGACY": "Foilseachán iompórtáilte",
+        "UNCATALOGED": "Gan chatalógú"
+      }
     }
   },
   "email": {

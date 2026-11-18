@@ -171,7 +171,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
     if (!staffOrganizza) return <AccessDenied motivo="organizzatore" />;
   }
 
-  const [event, siteSettings, tags, gdprTemplates, ultimaTraduzione] = await Promise.all([
+  const [event, siteSettings, tags, gdprTemplates, ultimaTraduzione, modelliCatalogo] = await Promise.all([
     prisma.event.findUnique({
       where: { id },
       include: {
@@ -212,6 +212,13 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       select: { id: true, name: true, isDefault: true },
     }),
     ultimoLavoroTraduzione(id),
+    // I modelli fra cui correggere il catalogo dell'evento: solo per lo staff.
+    staffCanManage
+      ? prisma.eventTemplate.findMany({
+          orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+          select: { id: true, name: true },
+        })
+      : undefined,
   ]);
 
   if (!event || (token && event.moderatorToken !== token)) {
@@ -327,6 +334,9 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       moderatorPublicListed: event.moderatorPublicListed,
       moderatorPhotoId: event.moderatorPhotoId,
       eventType: event.eventType,
+      templateId: event.templateId,
+      templateName: event.templateName,
+      formatClass: event.formatClass,
       accessMode: event.accessMode,
       requireOrganization: event.requireOrganization,
       requireOrganizationRole: event.requireOrganizationRole,
@@ -425,6 +435,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
         addressBookEnabled={siteSettings.addressBookEnabled}
         viaToken={staffCanManage ? null : (token ?? null)}
         initialEvent={initialEvent}
+        modelliCatalogo={modelliCatalogo}
         siteTimezone={event.timezone}
         salaAperta={await salaForseAperta(event)}
         enabledLocales={

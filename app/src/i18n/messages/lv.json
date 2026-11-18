@@ -2450,6 +2450,40 @@
         "avgParticipantsPerEvent": "Vidēji dalībnieki pasākumā",
         "avgFeedbackRating": "Vidējais atsauksmju vērtējums",
         "totalFeedback": "Atsauksmju atbildes"
+      },
+      "catalog": {
+        "title": "Pasākumu veidi un veidnes",
+        "intro": "Cik pasākumu katrā veidā un no katras veidnes, pa mēnešiem. Tikai skaiti un vidējās vērtības, bez personas datiem. Melnraksti netiek skaitīti.",
+        "periodLabel": "Periods",
+        "months": "{count, plural, zero {# mēnešu} one {# mēnesis} other {# mēneši}}",
+        "groupByLabel": "Grupēt pēc",
+        "groupBy": {
+          "type": "Pasākuma veids",
+          "template": "Veidne"
+        },
+        "rankingTypes": "Biežākie veidi",
+        "rankingTemplates": "Visvairāk izmantotās veidnes",
+        "columns": {
+          "type": "Veids",
+          "template": "Veidne",
+          "events": "Pasākumi",
+          "held": "Notikuši",
+          "avgParticipants": "Vid. dalībnieki",
+          "avgDuration": "Vid. ilgums",
+          "total": "Viss periods"
+        },
+        "measuresNote": "Notikuši: pasākumi, kuru telpa tika atvērta. Vidējais dalībnieku skaits: vienlaikus klātesošo cilvēku maksimālais skaits, ieskaitot viesus, vidēji notikušajos pasākumos. Vidējais ilgums: izmērītais laiks telpā, nevis plānotais.",
+        "byMonth": "Pa mēnešiem",
+        "measureLabel": "Rādītājs",
+        "measures": {
+          "events": "Pasākumi",
+          "avgParticipants": "Vidējais dalībnieku skaits",
+          "avgDurationMinutes": "Vidējais ilgums"
+        },
+        "byMonthCaption": "{measure} pa mēnešiem",
+        "empty": "Šajā periodā pasākumu nav.",
+        "deletedTemplate": "{name} (dzēsta)",
+        "uncatalogedNote": "Nekatalogizēti pasākumi: {count}. Tie izveidoti pirms kataloga vai bez veidnes un bez formāta; tos var katalogizēt, rediģējot pasākumu, sadaļā par tehnisko informāciju."
       }
     },
     "recurrence": {
@@ -2518,7 +2552,8 @@
       "postEventPublic": "Publiska lapa pēc pasākuma",
       "offerAddressBook": "Piedāvā kontaktu grāmatu tiem, kas reģistrējas",
       "invalidFields": "Pārbaudiet šos laukus: {fields}.",
-      "descriptionOtherLanguages": "Ir arī versijas valodās: {languages}, kuras šeit nevar rediģēt. Ja maināt itāļu tekstu, tās tiek noņemtas."
+      "descriptionOtherLanguages": "Ir arī versijas valodās: {languages}, kuras šeit nevar rediģēt. Ja maināt itāļu tekstu, tās tiek noņemtas.",
+      "usedBy": "No šīs veidnes izveidotie pasākumi: {count}"
     },
     "instantCall": {
       "title": "Tūlītējs video zvans",
@@ -4190,6 +4225,23 @@
       "submit": "Izņemt personu no ieraksta",
       "submitConfirm": "Oriģinālais video un personas celiņi tiks dzēsti, un pēcapstrāde tiks veikta no jauna. To nevar atsaukt. Turpināt?",
       "submitDone": "Pieprasījums slēgts: persona ir izņemta."
+    },
+    "catalog": {
+      "fieldTitle": "Katalogs",
+      "fieldHelp": "Pasākuma veids un veidne, no kuras tas izveidots, tiek izmantoti tikai instances statistikai un nemaina nevienu iestatījumu. Labojiet tos, ja pasākums katalogizēts nepareizi vai nav katalogizēts vispār.",
+      "typeLabel": "Pasākuma veids",
+      "templateLabel": "Veidne",
+      "noTemplate": "Bez veidnes",
+      "deletedTemplate": "Izveidots no veidnes “{name}”, kas pēc tam dzēsta.",
+      "deletedOption": "{name} (dzēsta)",
+      "types": {
+        "MEETING": "Sanāksme",
+        "PARTICIPATORY": "Līdzdalības pasākums",
+        "PUBLIC": "Publisks pasākums",
+        "INSTANT": "Ātrais zvans",
+        "LEGACY": "Importēta publikācija",
+        "UNCATALOGED": "Nav katalogizēts"
+      }
     }
   },
   "email": {

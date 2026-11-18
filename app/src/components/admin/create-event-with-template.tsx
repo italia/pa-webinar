@@ -11,7 +11,9 @@ import GuidedFormat from '@/components/admin/guided-format';
 import type { VoceNelVideo } from '@/lib/live/consent-rule';
 import { videoDaDestinare } from '@/lib/recording/destination';
 import TemplatePicker from '@/components/admin/template-picker';
+import { classeDaFormato } from '@/lib/events/catalog';
 import {
+  classeFormato,
   codificaFormato,
   decodificaFormato,
   formatoConAccesso,
@@ -148,6 +150,7 @@ export default function CreateEventWithTemplate({
     formatoLabel?: string;
     etichettaFormato?: React.ComponentProps<typeof EventWizard>['etichettaFormato'];
     destinazioneScelta?: boolean;
+    catalogo: React.ComponentProps<typeof EventWizard>['catalogo'];
     onChangeTemplate: (stato: { invitati: boolean }) => void;
   }) => (
     <EventWizard
@@ -158,6 +161,7 @@ export default function CreateEventWithTemplate({
       formatoLabel={props.formatoLabel}
       etichettaFormato={props.etichettaFormato}
       destinazioneScelta={props.destinazioneScelta}
+      catalogo={props.catalogo}
       onChangeTemplate={props.onChangeTemplate}
       siteTimezone={siteTimezone}
       enabledLocales={enabledLocales}
@@ -188,6 +192,8 @@ export default function CreateEventWithTemplate({
   if (selectedTemplate) {
     return wizard({
       template: selectedTemplate,
+      // Il catalogo: il modello (la famiglia la ricava il server dal modello).
+      catalogo: { templateId: selectedTemplate.id, formatClass: null },
       // Le domande ripartono dai loro valori, ma con chi partecipa come lo si
       // vede ora: una scelta «solo su invito» non si perde cambiando modello.
       onChangeTemplate: ({ invitati }) =>
@@ -229,6 +235,8 @@ export default function CreateEventWithTemplate({
       ),
       formatoLabel: nome,
       etichettaFormato: etichetta,
+      // Il catalogo: la famiglia delle risposte, senza modello.
+      catalogo: { templateId: null, formatClass: classeDaFormato(classeFormato(formato)) },
       // Su invito le domande propongono riservata: un video pubblico e' una
       // risposta data a mano.
       destinazioneScelta: formato.accesso === 'invitati' && formato.registra === 'pubblica',

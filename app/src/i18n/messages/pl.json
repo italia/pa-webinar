@@ -2450,6 +2450,40 @@
         "avgParticipantsPerEvent": "Średnio uczestników na wydarzenie",
         "avgFeedbackRating": "Średnia ocena z ankiet",
         "totalFeedback": "Odpowiedzi zwrotne"
+      },
+      "catalog": {
+        "title": "Typy wydarzeń i szablony",
+        "intro": "Ile wydarzeń każdego typu i z każdego szablonu, miesiąc po miesiącu. Tylko liczby i średnie, bez danych osobowych. Wersje robocze nie są liczone.",
+        "periodLabel": "Okres",
+        "months": "{count, plural, one {# miesiąc} few {# miesiące} many {# miesięcy} other {# miesiąca}}",
+        "groupByLabel": "Grupuj według",
+        "groupBy": {
+          "type": "Typ wydarzenia",
+          "template": "Szablon"
+        },
+        "rankingTypes": "Najczęstsze typy",
+        "rankingTemplates": "Najczęściej używane szablony",
+        "columns": {
+          "type": "Typ",
+          "template": "Szablon",
+          "events": "Wydarzenia",
+          "held": "Odbyte",
+          "avgParticipants": "Śr. uczestników",
+          "avgDuration": "Śr. czas trwania",
+          "total": "Cały okres"
+        },
+        "measuresNote": "Odbyte: wydarzenia, których sala została otwarta. Średnia liczba uczestników: najwyższa liczba osób obecnych jednocześnie, łącznie z gośćmi, średnio dla odbytych wydarzeń. Średni czas trwania: zmierzony czas w sali, a nie planowany.",
+        "byMonth": "Miesiąc po miesiącu",
+        "measureLabel": "Miara",
+        "measures": {
+          "events": "Wydarzenia",
+          "avgParticipants": "Średnia liczba uczestników",
+          "avgDurationMinutes": "Średni czas trwania"
+        },
+        "byMonthCaption": "{measure} w podziale na miesiące",
+        "empty": "Brak wydarzeń w tym okresie.",
+        "deletedTemplate": "{name} (usunięty)",
+        "uncatalogedNote": "Nieskatalogowane wydarzenia: {count}. Powstały przed katalogiem albo bez szablonu i bez formatu; możesz je skatalogować podczas edycji wydarzenia, w szczegółach technicznych."
       }
     },
     "recurrence": {
@@ -2518,7 +2552,8 @@
       "postEventPublic": "Publiczna strona po wydarzeniu",
       "offerAddressBook": "Proponuje książkę adresową osobom rejestrującym się",
       "invalidFields": "Sprawdź te pola: {fields}.",
-      "descriptionOtherLanguages": "Istnieją też wersje w językach: {languages}, których nie można tu edytować. Jeśli zmienisz tekst włoski, zostaną usunięte."
+      "descriptionOtherLanguages": "Istnieją też wersje w językach: {languages}, których nie można tu edytować. Jeśli zmienisz tekst włoski, zostaną usunięte.",
+      "usedBy": "Wydarzenia utworzone z tego szablonu: {count}"
     },
     "instantCall": {
       "title": "Wideorozmowa natychmiastowa",
@@ -4190,6 +4225,23 @@
       "submit": "Usuń osobę z nagrania",
       "submitConfirm": "Oryginalne wideo i ścieżki tej osoby zostaną usunięte, a postprodukcja zostanie wykonana ponownie. Nie można tego cofnąć. Kontynuować?",
       "submitDone": "Wniosek zamknięty: osoba została usunięta."
+    },
+    "catalog": {
+      "fieldTitle": "Katalog",
+      "fieldHelp": "Typ wydarzenia i szablon, z którego powstało, służą wyłącznie do statystyk instancji i nie zmieniają żadnych ustawień. Popraw je, jeśli wydarzenie jest skatalogowane błędnie lub wcale.",
+      "typeLabel": "Typ wydarzenia",
+      "templateLabel": "Szablon",
+      "noTemplate": "Bez szablonu",
+      "deletedTemplate": "Utworzone z szablonu „{name}”, który został później usunięty.",
+      "deletedOption": "{name} (usunięty)",
+      "types": {
+        "MEETING": "Spotkanie",
+        "PARTICIPATORY": "Wydarzenie partycypacyjne",
+        "PUBLIC": "Wydarzenie publiczne",
+        "INSTANT": "Szybkie połączenie",
+        "LEGACY": "Zaimportowana publikacja",
+        "UNCATALOGED": "Nieskatalogowane"
+      }
     }
   },
   "email": {

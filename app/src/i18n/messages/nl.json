@@ -2450,6 +2450,40 @@
         "avgParticipantsPerEvent": "Gemiddelde deelnemers per evenement",
         "avgFeedbackRating": "Gemiddelde feedbackbeoordeling",
         "totalFeedback": "Feedbackreacties"
+      },
+      "catalog": {
+        "title": "Typen evenementen en sjablonen",
+        "intro": "Hoeveel evenementen van elk type en uit elk sjabloon, maand per maand. Alleen aantallen en gemiddelden, geen persoonsgegevens. Concepten tellen niet mee.",
+        "periodLabel": "Periode",
+        "months": "{count, plural, one {# maand} other {# maanden}}",
+        "groupByLabel": "Groeperen op",
+        "groupBy": {
+          "type": "Type evenement",
+          "template": "Sjabloon"
+        },
+        "rankingTypes": "Meest voorkomende typen",
+        "rankingTemplates": "Meest gebruikte sjablonen",
+        "columns": {
+          "type": "Type",
+          "template": "Sjabloon",
+          "events": "Evenementen",
+          "held": "Gehouden",
+          "avgParticipants": "Gem. deelnemers",
+          "avgDuration": "Gem. duur",
+          "total": "Hele periode"
+        },
+        "measuresNote": "Gehouden: evenementen waarvan de ruimte is geopend. Gemiddeld aantal deelnemers: het hoogste aantal gelijktijdig aanwezigen, gasten inbegrepen, gemiddeld over de gehouden evenementen. Gemiddelde duur: de gemeten tijd in de ruimte, niet de geplande.",
+        "byMonth": "Maand per maand",
+        "measureLabel": "Maatstaf",
+        "measures": {
+          "events": "Evenementen",
+          "avgParticipants": "Gemiddeld aantal deelnemers",
+          "avgDurationMinutes": "Gemiddelde duur"
+        },
+        "byMonthCaption": "{measure} per maand",
+        "empty": "Geen evenementen in deze periode.",
+        "deletedTemplate": "{name} (verwijderd)",
+        "uncatalogedNote": "Niet-gecatalogiseerde evenementen: {count}. Ze zijn gemaakt vóór de catalogus, of zonder sjabloon en zonder formaat; u kunt ze catalogiseren bij het bewerken van het evenement, onder technische details."
       }
     },
     "recurrence": {
@@ -2518,7 +2552,8 @@
       "postEventPublic": "Openbare pagina na het evenement",
       "offerAddressBook": "Biedt wie zich inschrijft het adresboek aan",
       "invalidFields": "Controleer deze velden: {fields}.",
-      "descriptionOtherLanguages": "Er zijn ook versies in: {languages}, die hier niet te bewerken zijn. Als u de Italiaanse tekst wijzigt, worden ze verwijderd."
+      "descriptionOtherLanguages": "Er zijn ook versies in: {languages}, die hier niet te bewerken zijn. Als u de Italiaanse tekst wijzigt, worden ze verwijderd.",
+      "usedBy": "Evenementen gemaakt uit dit sjabloon: {count}"
     },
     "instantCall": {
       "title": "Directe videogesprek",
@@ -4190,6 +4225,23 @@
       "submit": "Persoon uit de opname verwijderen",
       "submitConfirm": "De originele video en de sporen van de persoon worden verwijderd en de nabewerking wordt opnieuw uitgevoerd. Dit kan niet ongedaan worden gemaakt. Doorgaan?",
       "submitDone": "Verzoek gesloten: de persoon is verwijderd."
+    },
+    "catalog": {
+      "fieldTitle": "Catalogus",
+      "fieldHelp": "Het type evenement en het sjabloon waaruit het is gemaakt, dienen alleen voor de statistieken van de instantie en wijzigen geen enkele instelling. Corrigeer ze als het evenement verkeerd of helemaal niet is gecatalogiseerd.",
+      "typeLabel": "Type evenement",
+      "templateLabel": "Sjabloon",
+      "noTemplate": "Geen sjabloon",
+      "deletedTemplate": "Gemaakt uit het sjabloon ‘{name}’, dat inmiddels is verwijderd.",
+      "deletedOption": "{name} (verwijderd)",
+      "types": {
+        "MEETING": "Vergadering",
+        "PARTICIPATORY": "Participatief evenement",
+        "PUBLIC": "Openbaar evenement",
+        "INSTANT": "Directe oproep",
+        "LEGACY": "Geïmporteerde publicatie",
+        "UNCATALOGED": "Niet gecatalogiseerd"
+      }
     }
   },
   "email": {

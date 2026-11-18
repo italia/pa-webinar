@@ -2450,6 +2450,40 @@
         "avgParticipantsPerEvent": "Átlagos résztvevőszám eseményenként",
         "avgFeedbackRating": "Átlagos visszajelzési értékelés",
         "totalFeedback": "Visszajelzési válaszok"
+      },
+      "catalog": {
+        "title": "Eseménytípusok és sablonok",
+        "intro": "Hány esemény van az egyes típusokból és sablonokból, hónapról hónapra. Csak darabszámok és átlagok, személyes adatok nélkül. A piszkozatok nem számítanak.",
+        "periodLabel": "Időszak",
+        "months": "{count, plural, one {# hónap} other {# hónap}}",
+        "groupByLabel": "Csoportosítás",
+        "groupBy": {
+          "type": "Eseménytípus",
+          "template": "Sablon"
+        },
+        "rankingTypes": "A leggyakoribb típusok",
+        "rankingTemplates": "A leggyakrabban használt sablonok",
+        "columns": {
+          "type": "Típus",
+          "template": "Sablon",
+          "events": "Események",
+          "held": "Megtartva",
+          "avgParticipants": "Átl. résztvevő",
+          "avgDuration": "Átl. időtartam",
+          "total": "A teljes időszak"
+        },
+        "measuresNote": "Megtartva: azok az események, amelyek terme megnyílt. Átlagos résztvevőszám: az egyszerre jelen lévők legmagasabb száma a vendégekkel együtt, a megtartott események átlagában. Átlagos időtartam: a mért teremidő, nem a tervezett.",
+        "byMonth": "Hónapról hónapra",
+        "measureLabel": "Mutató",
+        "measures": {
+          "events": "Események",
+          "avgParticipants": "Átlagos résztvevőszám",
+          "avgDurationMinutes": "Átlagos időtartam"
+        },
+        "byMonthCaption": "{measure} havonta",
+        "empty": "Ebben az időszakban nincs esemény.",
+        "deletedTemplate": "{name} (törölve)",
+        "uncatalogedNote": "Nem katalogizált események: {count}. A katalógus előtt, vagy sablon és formátum nélkül jöttek létre; az esemény szerkesztésekor, a technikai részleteknél katalogizálhatók."
       }
     },
     "recurrence": {
@@ -2518,7 +2552,8 @@
       "postEventPublic": "Nyilvános esemény utáni oldal",
       "offerAddressBook": "Felajánlja a címjegyzéket a regisztrálóknak",
       "invalidFields": "Ellenőrizze ezeket a mezőket: {fields}.",
-      "descriptionOtherLanguages": "Más nyelvű változatok is vannak: {languages}, amelyek itt nem szerkeszthetők. Ha módosítja az olasz szöveget, törlődnek."
+      "descriptionOtherLanguages": "Más nyelvű változatok is vannak: {languages}, amelyek itt nem szerkeszthetők. Ha módosítja az olasz szöveget, törlődnek.",
+      "usedBy": "Ebből a sablonból létrehozott események: {count}"
     },
     "instantCall": {
       "title": "Azonnali videohívás",
@@ -4190,6 +4225,23 @@
       "submit": "Személy eltávolítása a felvételből",
       "submitConfirm": "Az eredeti videó és a személy sávjai törlődnek, az utómunka pedig újra lefut. Ez nem vonható vissza. Folytatja?",
       "submitDone": "Kérelem lezárva: a személyt eltávolították."
+    },
+    "catalog": {
+      "fieldTitle": "Katalógus",
+      "fieldHelp": "Az esemény típusa és a sablon, amelyből létrejött, csak a példány statisztikáihoz kell, és egyetlen beállítást sem módosít. Javítsa ki őket, ha az esemény hibásan vagy egyáltalán nincs katalogizálva.",
+      "typeLabel": "Eseménytípus",
+      "templateLabel": "Sablon",
+      "noTemplate": "Nincs sablon",
+      "deletedTemplate": "A(z) „{name}” sablonból készült, amelyet azóta töröltek.",
+      "deletedOption": "{name} (törölve)",
+      "types": {
+        "MEETING": "Megbeszélés",
+        "PARTICIPATORY": "Részvételi esemény",
+        "PUBLIC": "Nyilvános esemény",
+        "INSTANT": "Azonnali hívás",
+        "LEGACY": "Importált közzététel",
+        "UNCATALOGED": "Nincs katalogizálva"
+      }
     }
   },
   "email": {

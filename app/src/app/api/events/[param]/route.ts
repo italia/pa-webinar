@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: EUPL-1.2
 // SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
 
-import type { Prisma } from '@prisma/client';
+import type { EventFormatClass, Prisma } from '@prisma/client';
 import { cookies } from 'next/headers';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
@@ -342,6 +342,35 @@ export const PUT = withErrorHandling(async (request, context) => {
         { path: ['gdprTemplateId'], message: 'Unknown GDPR template' },
       ]);
     }
+  }
+
+  // Il catalogo (lib/events/catalog) lo corregge lo staff dell'evento, come le
+  // etichette, anche a evento concluso: le statistiche sono degli eventi
+  // passati. Il wizard lo manda solo se cambiato. Un modello nuovo si verifica e
+  // se ne fotografa il nome; togliere il modello toglie anche il nome, anche
+  // quello di un modello cancellato (il riferimento e' gia' vuoto).
+  const catalogo: CatalogoDaScrivere = {};
+  const togliNome =
+    data.templateId === null && event.templateId === null && event.templateName !== null;
+  if (data.templateId !== undefined && (data.templateId !== event.templateId || togliNome)) {
+    await soloStaffDellEvento(eventId, 'Only the event staff can change the event catalog');
+    const modello = data.templateId
+      ? await prisma.eventTemplate.findUnique({
+          where: { id: data.templateId },
+          select: { id: true, name: true },
+        })
+      : null;
+    if (data.templateId && !modello) {
+      throw new ValidationError('Validation failed', [
+        { path: ['templateId'], message: 'Unknown event template' },
+      ]);
+    }
+    catalogo.templateId = modello?.id ?? null;
+    catalogo.templateName = modello?.name ?? null;
+  }
+  if (data.formatClass !== undefined && data.formatClass !== event.formatClass) {
+    await soloStaffDellEvento(eventId, 'Only the event staff can change the event catalog');
+    catalogo.formatClass = data.formatClass;
   }
 
   // Guard against the illusion of post-event configurability. These flags govern
@@ -702,6 +731,7 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.participantListVisible !== undefined && { participantListVisible: data.participantListVisible }),
       ...(data.hostsAlwaysRecorded !== undefined && { hostsAlwaysRecorded: data.hostsAlwaysRecorded }),
       ...(data.offerAddressBook !== undefined && { offerAddressBook: data.offerAddressBook }),
+      ...catalogo,
       ...(destinazioneDopo !== destinazionePrima && { recordingDestination: destinazioneDopo }),
       ...(data.recordingPublished !== undefined && {
         recordingPublished: data.recordingPublished,
@@ -931,6 +961,13 @@ export const PUT = withErrorHandling(async (request, context) => {
     ...(traduzione && { traduzione }),
   });
 });
+
+/** Le colonne del catalogo che un salvataggio cambia (lib/events/catalog). */
+interface CatalogoDaScrivere {
+  templateId?: string | null;
+  templateName?: string | null;
+  formatClass?: EventFormatClass | null;
+}
 
 /**
  * Un campo che decide lo staff che gestisce l'evento, non chi ha un link di

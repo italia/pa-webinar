@@ -2450,6 +2450,40 @@
         "avgParticipantsPerEvent": "Medja ta' parteċipanti għal kull avveniment",
         "avgFeedbackRating": "Valutazzjoni medja tal-feedback",
         "totalFeedback": "Tweġibiet tal-feedback"
+      },
+      "catalog": {
+        "title": "Tipi ta’ avvenimenti u mudelli",
+        "intro": "Kemm-il avveniment ta’ kull tip u minn kull mudell, xahar b’xahar. Għadd u medji biss, l-ebda data personali. L-abbozzi ma jgħoddux.",
+        "periodLabel": "Perjodu",
+        "months": "{count, plural, one {# xahar} few {# xhur} many {# xahar} other {# xahar}}",
+        "groupByLabel": "Iġbor skont",
+        "groupBy": {
+          "type": "Tip ta’ avveniment",
+          "template": "Mudell"
+        },
+        "rankingTypes": "L-aktar tipi frekwenti",
+        "rankingTemplates": "L-aktar mudelli użati",
+        "columns": {
+          "type": "Tip",
+          "template": "Mudell",
+          "events": "Avvenimenti",
+          "held": "Saru",
+          "avgParticipants": "Medja ta’ parteċipanti",
+          "avgDuration": "Tul medju",
+          "total": "Il-perjodu kollu"
+        },
+        "measuresNote": "Saru: avvenimenti li l-kamra tagħhom infetħet. Medja ta’ parteċipanti: l-ogħla numru ta’ persuni preżenti fl-istess ħin, inklużi l-mistednin, bħala medja fuq l-avvenimenti li saru. Tul medju: il-ħin imkejjel fil-kamra, mhux dak ippjanat.",
+        "byMonth": "Xahar b’xahar",
+        "measureLabel": "Kejl",
+        "measures": {
+          "events": "Avvenimenti",
+          "avgParticipants": "Medja ta’ parteċipanti",
+          "avgDurationMinutes": "Tul medju"
+        },
+        "byMonthCaption": "{measure} skont ix-xahar",
+        "empty": "L-ebda avveniment f’dan il-perjodu.",
+        "deletedTemplate": "{name} (imħassar)",
+        "uncatalogedNote": "Avvenimenti mhux ikkatalogati: {count}. Inħolqu qabel il-katalgu, jew mingħajr mudell u mingħajr format; tista’ tikkatalogahom meta teditja l-avveniment, fid-dettalji tekniċi."
       }
     },
     "recurrence": {
@@ -2518,7 +2552,8 @@
       "postEventPublic": "Paġna pubblika wara l-avveniment",
       "offerAddressBook": "Jipproponi d-direttorju lil min jirreġistra",
       "invalidFields": "Iċċekkja dawn l-oqsma: {fields}.",
-      "descriptionOtherLanguages": "Hemm ukoll verżjonijiet bil-: {languages}, li ma jistgħux jiġu editjati hawn. Jekk tibdel it-test bit-Taljan, jitneħħew."
+      "descriptionOtherLanguages": "Hemm ukoll verżjonijiet bil-: {languages}, li ma jistgħux jiġu editjati hawn. Jekk tibdel it-test bit-Taljan, jitneħħew.",
+      "usedBy": "Avvenimenti maħluqa minn dan il-mudell: {count}"
     },
     "instantCall": {
       "title": "Videocall istantanja",
@@ -4190,6 +4225,23 @@
       "submit": "Neħħi l-persuna mir-reġistrazzjoni",
       "submitConfirm": "Il-vidjo oriġinali u t-traċċi tal-persuna se jitħassru u l-post-produzzjoni ssir mill-ġdid. Ma tistax terġa’ lura. Tkompli?",
       "submitDone": "Talba magħluqa: il-persuna tneħħiet."
+    },
+    "catalog": {
+      "fieldTitle": "Katalgu",
+      "fieldHelp": "It-tip tal-avveniment u l-mudell li minnu nħoloq jintużaw biss għall-istatistika tal-istanza u ma jibdlu l-ebda settings. Ikkoreġihom jekk l-avveniment huwa kkatalogat ħażin, jew mhuwiex ikkatalogat.",
+      "typeLabel": "Tip ta’ avveniment",
+      "templateLabel": "Mudell",
+      "noTemplate": "L-ebda mudell",
+      "deletedTemplate": "Maħluq mill-mudell “{name}”, li minn dak iż-żmien tħassar.",
+      "deletedOption": "{name} (imħassar)",
+      "types": {
+        "MEETING": "Laqgħa",
+        "PARTICIPATORY": "Avveniment parteċipattiv",
+        "PUBLIC": "Avveniment pubbliku",
+        "INSTANT": "Sejħa rapida",
+        "LEGACY": "Pubblikazzjoni importata",
+        "UNCATALOGED": "Mhux ikkatalogat"
+      }
     }
   },
   "email": {

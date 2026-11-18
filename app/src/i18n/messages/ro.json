@@ -2450,6 +2450,40 @@
         "avgParticipantsPerEvent": "Participanți medii per eveniment",
         "avgFeedbackRating": "Evaluarea medie feedback",
         "totalFeedback": "Răspunsuri feedback"
+      },
+      "catalog": {
+        "title": "Tipuri de evenimente și șabloane",
+        "intro": "Câte evenimente din fiecare tip și din fiecare șablon, lună de lună. Doar numărători și medii, fără date personale. Ciornele nu se numără.",
+        "periodLabel": "Perioadă",
+        "months": "{count, plural, one {# lună} few {# luni} other {# de luni}}",
+        "groupByLabel": "Grupare după",
+        "groupBy": {
+          "type": "Tipul evenimentului",
+          "template": "Șablon"
+        },
+        "rankingTypes": "Cele mai frecvente tipuri",
+        "rankingTemplates": "Cele mai folosite șabloane",
+        "columns": {
+          "type": "Tip",
+          "template": "Șablon",
+          "events": "Evenimente",
+          "held": "Desfășurate",
+          "avgParticipants": "Participanți medii",
+          "avgDuration": "Durată medie",
+          "total": "Toată perioada"
+        },
+        "measuresNote": "Desfășurate: evenimentele a căror sală s-a deschis. Participanți medii: vârful de persoane prezente simultan, inclusiv invitații, în medie pe evenimentele desfășurate. Durată medie: timpul de sală măsurat, nu cel programat.",
+        "byMonth": "Lună de lună",
+        "measureLabel": "Măsură",
+        "measures": {
+          "events": "Evenimente",
+          "avgParticipants": "Participanți medii",
+          "avgDurationMinutes": "Durată medie"
+        },
+        "byMonthCaption": "{measure} pe lună",
+        "empty": "Niciun eveniment în această perioadă.",
+        "deletedTemplate": "{name} (șters)",
+        "uncatalogedNote": "Evenimente necatalogate: {count}. Au fost create înainte de catalog sau fără șablon și fără format; le puteți cataloga la editarea evenimentului, în detaliile tehnice."
       }
     },
     "recurrence": {
@@ -2518,7 +2552,8 @@
       "postEventPublic": "Pagină publică după eveniment",
       "offerAddressBook": "Le propune celor care se înscriu să rămână în agendă",
       "invalidFields": "Verificați aceste câmpuri: {fields}.",
-      "descriptionOtherLanguages": "Există și versiuni în: {languages}, care nu se editează aici. Dacă modificați textul în italiană, sunt eliminate."
+      "descriptionOtherLanguages": "Există și versiuni în: {languages}, care nu se editează aici. Dacă modificați textul în italiană, sunt eliminate.",
+      "usedBy": "Evenimente create din acest șablon: {count}"
     },
     "instantCall": {
       "title": "Apel video instant",
@@ -4190,6 +4225,23 @@
       "submit": "Elimină persoana din înregistrare",
       "submitConfirm": "Videoclipul original și pistele persoanei vor fi șterse, iar postproducția va fi refăcută. Operațiunea nu poate fi anulată. Continuați?",
       "submitDone": "Cerere închisă: persoana a fost eliminată."
+    },
+    "catalog": {
+      "fieldTitle": "Catalog",
+      "fieldHelp": "Tipul evenimentului și șablonul din care a fost creat servesc doar statisticilor instanței și nu modifică nicio setare. Corectați-le dacă evenimentul este catalogat greșit sau nu este catalogat.",
+      "typeLabel": "Tipul evenimentului",
+      "templateLabel": "Șablon",
+      "noTemplate": "Fără șablon",
+      "deletedTemplate": "Creat din șablonul „{name}”, între timp șters.",
+      "deletedOption": "{name} (șters)",
+      "types": {
+        "MEETING": "Ședință",
+        "PARTICIPATORY": "Eveniment participativ",
+        "PUBLIC": "Eveniment public",
+        "INSTANT": "Apel rapid",
+        "LEGACY": "Publicație importată",
+        "UNCATALOGED": "Necatalogat"
+      }
     }
   },
   "email": {

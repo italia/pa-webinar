@@ -371,6 +371,160 @@ describe('modifica — revoca di un co-moderatore', () => {
   });
 });
 
+/**
+ * Il catalogo dell'evento (lib/events/catalog): in creazione viene dalla scelta
+ * fatta prima del wizard e non si mostra; in modifica lo corregge lo staff dai
+ * dettagli tecnici, e il salvataggio manda solo cio' che cambia.
+ */
+describe('catalogo dell evento', () => {
+  const tc = messages.admin.catalog;
+
+  function corpoInviato(metodo: 'POST' | 'PUT'): Record<string, unknown> {
+    const chiamata = (fetchMock.mock.calls as Array<[string, RequestInit]>).find(
+      ([url, init]) => url.startsWith('/api/events') && init?.method === metodo,
+    );
+    return JSON.parse(String(chiamata?.[1].body)) as Record<string, unknown>;
+  }
+
+  function scegli(id: string, valore: string) {
+    const campo = byId<HTMLSelectElement>(id);
+    act(() => {
+      campo.value = valore;
+      campo.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+  }
+
+  const evento = (campi: Record<string, unknown> = {}): InitialEventShape =>
+    ({
+      id: 'evt-cat',
+      slug: 'evento-catalogo',
+      moderatorToken: 'token-primario',
+      event: {
+        title: { it: 'Evento di prova' },
+        description: { it: 'Una descrizione valida per il wizard.' },
+        startsAt: '2030-01-10T09:00:00.000Z',
+        endsAt: '2030-01-10T10:00:00.000Z',
+        timezone: 'Europe/Rome',
+        maxParticipants: 50,
+        dataRetentionDays: 30,
+        postEventPublic: true,
+        status: 'PUBLISHED',
+        accessMode: null,
+        requireOrganization: false,
+        requireOrganizationRole: false,
+        requireOrganizationType: false,
+        eventType: 'SCHEDULED',
+        templateId: null,
+        templateName: 'Modello cancellato',
+        formatClass: null,
+        ...campi,
+      } as unknown as InitialEventShape['event'],
+      organizers: [],
+      eventModerators: [],
+      invitations: [],
+      materials: [],
+      preEventQuestionnaire: null,
+      postEventQuestionnaire: null,
+    }) as InitialEventShape;
+
+  const MODELLI = [{ id: 'tpl-1', name: 'Riunione di lavoro' }];
+
+  it('in creazione manda la scelta di partenza, senza mostrarla', async () => {
+    fetchMock.mockImplementation(async (input: RequestInfo | URL, init: RequestInit = {}) =>
+      String(input) === '/api/events' && init.method === 'POST'
+        ? json(201, { id: 'evt-nuovo', slug: 'evento-nuovo', moderatorToken: 'token' })
+        : json(200, {}),
+    );
+    renderWizard({ catalogo: { templateId: null, formatClass: 'MEETING' }, modelliCatalogo: MODELLI });
+    goToStep(w.flow.steps.advanced);
+    apriSezione('technical');
+    expect(container.querySelector('#ev-catalog-type')).toBeNull();
+
+    goToStep('base');
+    type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
+    type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
+    organizzatore();
+    goToStep('review');
+    await press(button(w.saveDraft));
+    const corpo = corpoInviato('POST');
+    expect(corpo.formatClass).toBe('MEETING');
+    expect('templateId' in corpo).toBe(false);
+  });
+
+  it('in modifica lo staff lo corregge, e si manda solo cio che cambia', async () => {
+    fetchMock.mockImplementation(async () => json(200, {}));
+    renderWizard({ mode: 'edit', initialEvent: evento(), modelliCatalogo: MODELLI });
+    goToStep(w.flow.steps.advanced);
+    apriSezione('technical');
+    // Il modello da cui l'evento e' nato, poi cancellato, si nomina.
+    expect(container.textContent).toContain(
+      tc.deletedTemplate.replace('{name}', 'Modello cancellato'),
+    );
+    expect(byId<HTMLSelectElement>('ev-catalog-type').value).toBe('');
+
+    scegli('ev-catalog-type', 'MEETING');
+    await press(button(w.updateEvent));
+    const corpo = corpoInviato('PUT');
+    expect(corpo.formatClass).toBe('MEETING');
+    expect('templateId' in corpo).toBe(false);
+  });
+
+  it('«nessun modello» toglie il modello cancellato, che finche resta si nomina', async () => {
+    fetchMock.mockImplementation(async () => json(200, {}));
+    renderWizard({ mode: 'edit', initialEvent: evento(), modelliCatalogo: MODELLI });
+    goToStep(w.flow.steps.advanced);
+    apriSezione('technical');
+    const modello = byId<HTMLSelectElement>('ev-catalog-template');
+    expect(modello.selectedOptions[0]?.textContent).toBe(
+      tc.deletedOption.replace('{name}', 'Modello cancellato')
+    );
+
+    scegli('ev-catalog-template', '');
+    expect(container.textContent).not.toContain(
+      tc.deletedTemplate.replace('{name}', 'Modello cancellato')
+    );
+    await press(button(w.updateEvent));
+    expect(corpoInviato('PUT').templateId).toBeNull();
+  });
+
+  it('un salvataggio che non lo tocca non lo manda', async () => {
+    fetchMock.mockImplementation(async () => json(200, {}));
+    renderWizard({
+      mode: 'edit',
+      initialEvent: evento({ templateId: 'tpl-1', templateName: 'Riunione', formatClass: 'MEETING' }),
+      modelliCatalogo: MODELLI,
+    });
+    await press(button(w.updateEvent));
+    const corpo = corpoInviato('PUT');
+    expect('templateId' in corpo).toBe(false);
+    expect('formatClass' in corpo).toBe(false);
+  });
+
+  it('non si mostra con il link di conduzione, ne in una chiamata rapida', () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: evento(),
+      modelliCatalogo: MODELLI,
+      viaToken: 'token-primario',
+    });
+    goToStep(w.flow.steps.advanced);
+    apriSezione('technical');
+    expect(container.querySelector('#ev-catalog-type')).toBeNull();
+
+    act(() => root.unmount());
+    root = createRoot(container);
+    localStorage.clear();
+    renderWizard({
+      mode: 'edit',
+      initialEvent: evento({ eventType: 'INSTANT' }),
+      modelliCatalogo: MODELLI,
+    });
+    goToStep(w.flow.steps.advanced);
+    apriSezione('technical');
+    expect(container.querySelector('#ev-catalog-type')).toBeNull();
+  });
+});
+
 describe('modifica — salvataggio da un passo intermedio', () => {
   it('si parte dal passo chiesto e si salva da lì, senza arrivare al riepilogo', async () => {
     fetchMock.mockImplementation(async () => json(200, {}));
