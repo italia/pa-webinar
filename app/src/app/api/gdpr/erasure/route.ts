@@ -81,7 +81,7 @@ export const POST = withErrorHandling(async (request) => {
   // dura oltre la conservazione degli eventi). Inviti e relatori che la
   // citano restano, con il collegamento azzerato.
   const addressBook = await prisma.person.deleteMany({ where: { emailHash } });
-  const addressBookDeleted = addressBook.count > 0;
+  let addressBookDeleted = addressBook.count > 0;
 
   // Gli inviti portano nome, email cifrata e il link di iscrizione
   // precompilata: sono dati della stessa persona anche quando non si e' mai
@@ -195,6 +195,12 @@ export const POST = withErrorHandling(async (request) => {
   // cio' che la cancellazione cambia, e deve restarne traccia nel registro. Dopo
   // le iscrizioni, cosi' prende anche cio' che una pulizia in corso ha copiato
   // con il nome mentre questa richiesta aspettava il suo turno.
+  // Un rientro in rubrica confermato da un'altra scheda mentre questa richiesta
+  // cancellava (lib/persons/spunta-in-attesa) puo' aver ricreato la voce con i
+  // dati di un'iscrizione: dopo le iscrizioni non c'e' piu' niente che la rifaccia.
+  const voceRifatta = await prisma.person.deleteMany({ where: { emailHash } });
+  addressBookDeleted ||= voceRifatta.count > 0;
+
   const proveToccate = await togliNomeDalleProve(emailHash, adesso);
   for (const [eventId, copiate] of proveCopiate) {
     proveToccate.set(eventId, (proveToccate.get(eventId) ?? 0) + copiate);

@@ -494,7 +494,7 @@ It does not contain chat messages, including questions asked in the chat, questi
 
 Erasure deletes every `Registration` with the requester's email hash. The database cascade removes the person's Q&A questions and upvotes, poll votes, agenda reactions, reminder bookkeeping and waiting-room recording consents with it. The route also deletes, explicitly, what a cascade does not reach:
 
-- the address-book entry (`Person`) with the same email hash, even when no registration is left; the response reports it as `addressBookDeleted`, and the confirmation page says so;
+- the address-book entry (`Person`) with the same email hash, even when no registration is left, and once more after the registrations, in case a return to the address book confirmed from another tab re-created it meanwhile; the response reports it as `addressBookDeleted`, and the confirmation page says so;
 - the invitations addressed to the same email hash, even when no registration is left, with their emails in the outbox, sent or not;
 - the profile photo (`ProfilePhoto`) of the same email hash, even when no registration is left; the response reports it as `profilePhotoDeleted`;
 - the named grants (`EventModerator`) with the same email hash, even when no registration is left, which ends their personal links at once, and the photos staff uploaded for them, unless another event still uses them; the response reports them as `grantsDeleted` and `grantPhotosDeleted`;
