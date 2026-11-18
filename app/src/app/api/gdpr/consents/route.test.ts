@@ -253,17 +253,17 @@ describe('POST /api/gdpr/consents', () => {
       expect(
         (await richiesta({ registrationId: ISCRIZIONE, consent: 'recording', give: true })).status
       ).toBe(422);
-      // La destinazione senza la versione del testo non basta.
-      expect(
-        (
-          await richiesta({
-            registrationId: ISCRIZIONE,
-            consent: 'recording',
-            give: true,
-            recordingDestination: null,
-          })
-        ).status
-      ).toBe(422);
+      // Senza la versione del testo decide la libreria: «testo cambiato».
+      await richiesta({
+        registrationId: ISCRIZIONE,
+        consent: 'recording',
+        give: true,
+        recordingDestination: null,
+      });
+      expect(mocks.daiConsenso).toHaveBeenLastCalledWith('impronta', ISCRIZIONE, 'recording', {
+        letto: { destinazione: null, versione: undefined, trascrizione: undefined },
+        locale: null,
+      });
       // Senza la casella letta decide la libreria: «testo cambiato», si ricarica.
       await richiesta({ registrationId: ISCRIZIONE, consent: 'transcription', give: true });
       expect(mocks.daiConsenso).toHaveBeenLastCalledWith('impronta', ISCRIZIONE, 'transcription', {

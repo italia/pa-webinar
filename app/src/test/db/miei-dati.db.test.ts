@@ -279,16 +279,14 @@ describe('un consenso dato di nuovo da «I miei dati»', () => {
     });
     expect(vecchio.status).toBe(409);
     expect((await vecchio.json()).code).toBe('CONSENT_TEXT_CHANGED');
-    // Una pagina che non dice la versione non da' niente.
-    expect(
-      (
-        await dai(token, iscrizione.id, {
-          consent: 'recording',
-          recordingDestination: null,
-          recordingVersion: undefined,
-        })
-      ).status
-    ).toBe(422);
+    // Una pagina che non dice la versione e' di prima: rilegge.
+    const senzaVersione = await dai(token, iscrizione.id, {
+      consent: 'recording',
+      recordingDestination: null,
+      recordingVersion: undefined,
+    });
+    expect(senzaVersione.status).toBe(409);
+    expect((await senzaVersione.json()).code).toBe('CONSENT_TEXT_CHANGED');
     const giusto = await dai(token, iscrizione.id, {
       consent: 'recording',
       recordingDestination: null,

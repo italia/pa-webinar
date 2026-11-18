@@ -44,6 +44,7 @@ import { ritiraComunicazioni, ritiraConsensi } from '@/lib/live/consent-withdraw
 import { applicaSpuntaInAttesa } from '@/lib/persons/spunta-in-attesa';
 import { getClientIp, rateLimit } from '@/lib/rate-limit';
 import { partecipantiNelVideo } from '@/lib/recording/availability';
+import { versioneTestoRegistrazione } from '@/lib/validation/schemas';
 
 export const dynamic = 'force-dynamic';
 
@@ -78,19 +79,15 @@ const schema = z.union([
       consent: z.enum(['recording', 'transcription', 'futureCommunications']),
       give: z.literal(true),
       recordingDestination: destinatariVideo.nullable().optional(),
-      recordingVersion: z.number().int().positive().max(1000).optional(),
+      recordingVersion: versioneTestoRegistrazione.optional(),
       transcriptionText: z.enum(['multitrack', 'multitrackRetained']).optional(),
       locale: z.string().max(10).optional(),
     })
     .strict()
-    // Il consenso alla registrazione vale per il testo letto: la pagina lo dice,
-    // destinazione e versione. Senza la casella della trascrizione la risposta e'
-    // «testo cambiato», che fa ricaricare la pagina.
-    .refine(
-      (c) =>
-        c.consent !== 'recording' ||
-        (c.recordingDestination !== undefined && c.recordingVersion !== undefined)
-    ),
+    // Il consenso alla registrazione vale per il testo letto: la pagina lo dice.
+    // Senza la versione, o senza la casella della trascrizione, la risposta e'
+    // «testo cambiato», che fa ricaricare la pagina (lib/gdpr/consent-giving).
+    .refine((c) => c.consent !== 'recording' || c.recordingDestination !== undefined),
 ]);
 
 /** Perche' un consenso non si e' potuto dare: la pagina lo spiega. */

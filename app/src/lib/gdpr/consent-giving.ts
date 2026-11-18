@@ -493,7 +493,9 @@ export async function daiConsenso(
         if (!r.richiesti.registrazione) return 'nonOfferto';
         // La destinazione, e il testo: dove chi partecipa puo' comparire nel video
         // vale solo quello che lo dice (`versioneCopre`), come nel modulo.
+        // Una pagina che non dice la versione e' di prima: rilegge.
         if (
+          letto.versione === undefined ||
           !testoInVigore(letto.destinazione, r.destinazione) ||
           !versioneCopre(letto.versione, r.partecipanti)
         ) {

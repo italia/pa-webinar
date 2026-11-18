@@ -24,8 +24,9 @@ const destinatariVideo = z.enum(['PUBLIC', 'REGISTRANTS']);
 // La versione del testo del consenso alla registrazione letto
 // (lib/recording/destination, `versioneDellaProva`). Un numero che il server non
 // conosce non ferma la richiesta: il consenso non e' mai una condizione per
-// entrare, e `versioneCopre` decide se vale.
-const versioneTestoRegistrazione = z.number().int().positive();
+// entrare, e `versioneCopre` decide se vale. Il tetto tiene il valore dentro la
+// colonna intera in cui si salva: oltre, la richiesta e' costruita a mano.
+export const versioneTestoRegistrazione = z.number().int().positive().max(1000);
 
 export const eventBaseSchema = z.object({
   title: localizedStringField.refine(
