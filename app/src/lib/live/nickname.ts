@@ -165,16 +165,31 @@ export async function nomiDiChiConduce(eventId: string): Promise<string[]> {
 
 // Una chiave per nickname, con la sua scadenza: un nickname lasciato (cambiato,
 // o di chi se n'e' andato) si libera dodici ore dopo l'ultimo ingresso di chi
-// l'aveva, qualunque cosa facciano gli altri.
+// l'aveva, qualunque cosa facciano gli altri. Il valore dice chi l'ha preso (la
+// chiave dell'ospite) e con quale posto della sala e' entrato l'ultima volta:
+// il posto e' cio' che un token della sala prova, il nome no.
 const OSPITI_TTL_SECONDS = 12 * 60 * 60;
 const REDIS_TIMEOUT_MS = 1500;
 const MEMORIA_TETTO = 5000;
-const chiaveOspite = (eventId: string, impronta: string) =>
+const chiaveRedis = (eventId: string, impronta: string) =>
   `live:nickname:${eventId}:${impronta}`;
-const memoria = new Map<string, Map<string, { chi: string; at: number }>>();
+
+/** Chi tiene un nickname: la chiave dell'ospite e il suo ultimo posto. */
+interface Presa {
+  chi: string;
+  posto: string;
+}
+const scrivi = (p: Presa) => `${p.chi}|${p.posto}`;
+function leggi(v: string | null | undefined): Presa | null {
+  if (!v) return null;
+  const i = v.indexOf('|');
+  return i < 0 ? { chi: v, posto: '' } : { chi: v.slice(0, i), posto: v.slice(i + 1) };
+}
+
+const memoria = new Map<string, Map<string, { valore: string; at: number }>>();
 let ultimaPulizia = 0;
 
-function memoriaEvento(eventId: string): Map<string, { chi: string; at: number }> {
+function memoriaEvento(eventId: string): Map<string, { valore: string; at: number }> {
   // La pulizia di tutta la memoria al piu' una volta al minuto: la si legge a
   // ogni messaggio in chat di un ospite.
   if (Date.now() - ultimaPulizia > 60_000) {
@@ -193,8 +208,8 @@ function memoriaEvento(eventId: string): Map<string, { chi: string; at: number }
   return m;
 }
 
-/** Chi ha preso queste impronte fra gli ospiti, nello stesso ordine. */
-async function presiDaOspiti(
+/** I valori grezzi di queste impronte fra gli ospiti, nello stesso ordine. */
+async function valoriOspiti(
   eventId: string,
   impronte: readonly string[]
 ): Promise<Array<string | null>> {
@@ -202,7 +217,7 @@ async function presiDaOspiti(
   const redis = getRedis();
   if (redis) {
     const valori = await withDeadline(
-      redis.mget(...impronte.map((k) => chiaveOspite(eventId, k))),
+      redis.mget(...impronte.map((k) => chiaveRedis(eventId, k))),
       REDIS_TIMEOUT_MS,
       null
     );
@@ -212,46 +227,59 @@ async function presiDaOspiti(
   const scadenza = Date.now() - OSPITI_TTL_SECONDS * 1000;
   return impronte.map((k) => {
     const v = m.get(k);
-    return v && v.at >= scadenza ? v.chi : null;
+    return v && v.at >= scadenza ? v.valore : null;
   });
 }
 
-/**
- * Prende l'impronta per l'ospite. Vero se ora e' sua (anche se lo era gia', e
- * allora la scadenza riparte). `ripresa`: l'ospite prova di averla avuta in
- * questa visita, e la riprende anche se risulta di un'altra chiave (un'altra
- * rete).
- */
-async function prendiPerOspite(
+/** Chi ha preso queste impronte fra gli ospiti, nello stesso ordine. */
+async function presiDaOspiti(
+  eventId: string,
+  impronte: readonly string[]
+): Promise<Array<string | null>> {
+  return (await valoriOspiti(eventId, impronte)).map((v) => leggi(v)?.chi ?? null);
+}
+
+// Scrive il valore nuovo solo se c'e' ancora quello letto (o nessuno, con ''):
+// una presa scaduta e ripresa da un altro nel frattempo non si sovrascrive.
+const SOSTITUISCI = `
+local v = redis.call('GET', KEYS[1])
+if (v == false and ARGV[1] == '') or v == ARGV[1] then
+  redis.call('SET', KEYS[1], ARGV[2], 'EX', tonumber(ARGV[3]))
+  return 1
+end
+return 0`;
+
+/** Sostituisce `atteso` (null: nessuno) con `nuovo`. Vero se e' riuscito. */
+async function sostituisci(
   eventId: string,
   impronta: string,
-  chi: string,
-  ripresa = false
+  atteso: string | null,
+  nuovo: string
 ): Promise<boolean> {
   const redis = getRedis();
   if (redis) {
-    const k = chiaveOspite(eventId, impronta);
     const esito = await withDeadline(
-      (ripresa
-        ? redis.multi().set(k, chi, 'EX', OSPITI_TTL_SECONDS).get(k)
-        : redis.multi().set(k, chi, 'EX', OSPITI_TTL_SECONDS, 'NX').get(k)
-      ).exec(),
+      redis.eval(
+        SOSTITUISCI,
+        1,
+        chiaveRedis(eventId, impronta),
+        atteso ?? '',
+        nuovo,
+        String(OSPITI_TTL_SECONDS)
+      ) as Promise<unknown>,
       REDIS_TIMEOUT_MS,
       null
     );
-    if (esito) {
-      if (esito[1]?.[1] !== chi) return false;
-      await withDeadline(redis.expire(k, OSPITI_TTL_SECONDS), REDIS_TIMEOUT_MS, 0);
-      return true;
-    }
+    if (esito !== null) return esito === 1;
     // Redis non risponde: si ripiega sulla memoria, come senza Redis.
   }
   const m = memoriaEvento(eventId);
   const prima = m.get(impronta);
-  const viva = prima && prima.at >= Date.now() - OSPITI_TTL_SECONDS * 1000;
-  if (viva && prima.chi !== chi && !ripresa) return false;
+  const viva =
+    prima && prima.at >= Date.now() - OSPITI_TTL_SECONDS * 1000 ? prima.valore : null;
+  if (viva !== atteso) return false;
   if (!prima && m.size >= MEMORIA_TETTO) return false;
-  m.set(impronta, { chi, at: Date.now() });
+  m.set(impronta, { valore: nuovo, at: Date.now() });
   return true;
 }
 
@@ -372,40 +400,44 @@ export async function salvaNicknameIscrizione(
 /**
  * Il nickname di un ospite per la visita: controllato e preso per la sua
  * chiave (`guestSenderId` dell'indirizzo e del nickname, la stessa con cui
- * scrive in chat), per dodici ore dall'ultimo ingresso. Lo stesso ospite che
- * rientra lo ritrova suo senza ripetere le regole, che valgono quando lo si
- * prende: un relatore aggiunto dopo non fa uscire chi e' gia' in sala.
- * `provato`: un token della sala di questa visita porta gia' questo nickname, e
- * l'ospite lo riprende anche da un'altra rete.
+ * scrive in chat) e per il posto del token che sta per entrare, per dodici ore
+ * dall'ultimo ingresso. Le regole valgono quando lo si prende: chi lo tiene lo
+ * ritrova a ogni rientro senza ripeterle, cosi' un relatore aggiunto dopo non
+ * fa uscire chi e' gia' in sala.
+ *
+ * `postiDellaVisita`: i posti provati dai token della sala di questa visita,
+ * letti solo se servono. Se uno e' l'ultimo posto di chi tiene il nickname,
+ * l'ospite e' lo stesso tornato da un'altra rete, e lo riprende. Conta il
+ * posto, non il nome: un token con lo stesso nome, preso scrivendolo come nome,
+ * non prova niente.
  */
 export async function prendiNicknameOspite(
   eventId: string,
   raw: string,
   chiaveOspite: (nickname: string) => string,
-  provato = false
+  posto: string,
+  postiDellaVisita: () => Promise<ReadonlySet<string>> = async () => new Set()
 ): Promise<EsitoNickname> {
   const nick = normalizzaNickname(raw);
   const chi = { ospite: chiaveOspite(nick) };
   const forma = difettoDiForma(nick);
   if (forma) return { ok: false, motivo: forma };
   const impronta = improntaNickname(eventId, nick);
-  const [gia] = await presiDaOspiti(eventId, [impronta]);
-  if (gia === chi.ospite || (gia !== null && provato)) {
-    if (await prendiPerOspite(eventId, impronta, chi.ospite, true)) {
-      return { ok: true, nickname: nick };
-    }
-  }
-  // Gia' in sala con questo nickname, e nessuno l'ha preso nel frattempo: lo
-  // riprende senza ripetere le regole.
-  if (provato) {
-    const [libero] = await liberi(eventId, [nick], chi);
-    if (libero && (await prendiPerOspite(eventId, impronta, chi.ospite))) {
-      return { ok: true, nickname: nick };
-    }
+  const nuovo = scrivi({ chi: chi.ospite, posto });
+  const valore = (await valoriOspiti(eventId, [impronta]))[0] ?? null;
+  const presa = leggi(valore);
+  if (
+    valore !== null &&
+    presa &&
+    (presa.chi === chi.ospite ||
+      (presa.posto !== '' && (await postiDellaVisita()).has(presa.posto))) &&
+    (await sostituisci(eventId, impronta, valore, nuovo))
+  ) {
+    return { ok: true, nickname: nick };
   }
   const esito = await verificaNickname(eventId, nick, chi);
   if (!esito.ok) return esito;
-  if (!(await prendiPerOspite(eventId, impronta, chi.ospite))) {
+  if (!(await sostituisci(eventId, impronta, null, nuovo))) {
     return {
       ok: false,
       motivo: 'taken',

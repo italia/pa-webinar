@@ -39,7 +39,6 @@ import {
   prendiNicknameOspite,
   rispostaNicknameRifiutato,
 } from '@/lib/live/nickname';
-import { normalizzaNickname } from '@/lib/live/nickname-rule';
 import { guestSenderId } from '@/lib/chat/sender-key';
 import { recordingAvailableFor, voceNelVideo } from '@/lib/recording/availability';
 import {
@@ -394,18 +393,16 @@ async function registraConsensi(
 }
 
 /**
- * Un token della sala di questa visita porta gia' questo nickname: l'ospite
- * lo riprende anche se nel frattempo ha cambiato rete (lib/live/nickname).
+ * I posti provati dai token della sala di questa visita: l'ospite che li porta
+ * riprende il nickname tenuto dall'ultimo di quei posti, anche da un'altra rete
+ * (lib/live/nickname). Si verificano solo se servono.
  */
-async function nicknameGiaInSala(
-  roomName: string,
-  nickname: string,
-  prove: readonly string[] | undefined,
-): Promise<boolean> {
-  if (!prove?.length) return false;
-  const nick = normalizzaNickname(nickname);
-  const posti = await Promise.all(prove.map((t) => postoDaTokenSala(t, roomName)));
-  return posti.some((p) => p?.nome === nick);
+function postiDellaVisita(roomName: string, prove: readonly string[] | undefined) {
+  return async (): Promise<ReadonlySet<string>> => {
+    if (!prove?.length) return new Set();
+    const posti = await Promise.all(prove.map((t) => postoDaTokenSala(t, roomName)));
+    return new Set(posti.filter((p) => p !== null).map((p) => p.posto));
+  };
 }
 
 export const POST = withErrorHandling(async (request, context) => {
@@ -587,18 +584,19 @@ export const POST = withErrorHandling(async (request, context) => {
       // quello di un ospite. Col pubblico anonimo resta lo pseudonimo del
       // posto: la chat lo nomina dall'iscrizione, e i due nomi non si
       // accostano.
+      const postoOspite = guestJitsiId();
       let nicknameInoltro: string | null = null;
       if (parsed.data.nickname && event.nicknamesEnabled && !event.audienceAnonymous) {
         const esito = await prendiNicknameOspite(
           event.id,
           parsed.data.nickname,
           (n) => guestSenderId(ip, n),
-          await nicknameGiaInSala(event.jitsiRoomName, parsed.data.nickname, parsed.data.nicknameProof),
+          postoOspite,
+          postiDellaVisita(event.jitsiRoomName, parsed.data.nicknameProof),
         );
         if (!esito.ok) return rispostaNicknameRifiutato(esito);
         nicknameInoltro = esito.nickname;
       }
-      const postoOspite = guestJitsiId();
       // Il consenso dell'iscritto non passa a chi ha il suo link: vale quello
       // dato da chi ha aperto il link, ora o a un ingresso di questa visita.
       const replicaInoltro = await provaDellaReplica(event, parsed.data.consentReplay, destinazione);
@@ -771,18 +769,19 @@ export const POST = withErrorHandling(async (request, context) => {
     // Il nickname dell'ospite vale per la visita: controllato e preso per la
     // sua chiave in chat (lib/live/nickname), che e' quella con cui la sala
     // poi scrive e chiede.
+    const postoOspite = guestJitsiId();
     let nicknameOspite: string | null = null;
     if (parsed.data.nickname && event.nicknamesEnabled) {
       const esito = await prendiNicknameOspite(
         event.id,
         parsed.data.nickname,
         (n) => guestSenderId(ip, n),
-        await nicknameGiaInSala(event.jitsiRoomName, parsed.data.nickname, parsed.data.nicknameProof),
+        postoOspite,
+        postiDellaVisita(event.jitsiRoomName, parsed.data.nicknameProof),
       );
       if (!esito.ok) return rispostaNicknameRifiutato(esito);
       nicknameOspite = esito.nickname;
     }
-    const postoOspite = guestJitsiId();
     const replicaOspite = await provaDellaReplica(event, parsed.data.consentReplay, destinazione);
     const mediaOspite = mediaPartecipante(consensoDato || !!replicaOspite.registrazione);
     // Pubblico anonimo: lo pseudonimo del posto in chat (la chiave dell'ospite).

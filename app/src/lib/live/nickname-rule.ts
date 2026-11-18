@@ -93,13 +93,16 @@ const NOME_MINIMO = 4;
 /**
  * Il nickname somiglia a una di queste persone? Vale se coincide con il nome
  * intero o con una sua parola di almeno tre lettere («Mario» per «Mario
- * Rossi»: in chat lo menzionerebbe chi cerca lui), o se contiene il nome
- * intero di almeno due parole («MarioRossi99»). Un nome di una parola sola
- * conta solo uguale: «Giovanna» non imita «Anna».
+ * Rossi»: in chat lo menzionerebbe chi cerca lui), anche con un numero in fondo
+ * («Mario2», «Raffaele_1»), o se contiene il nome intero di almeno due parole
+ * («MarioRossi99»). Una parola contenuta in un'altra non conta: «Giovanna» non
+ * imita «Anna».
  */
 export function imitaUnNome(nick: string, nomi: readonly string[]): boolean {
   const n = formaDiConfronto(nick);
   if (!n) return false;
+  const conNumero = (p: string) =>
+    n.startsWith(p) && /^\p{Nd}+$/u.test(n.slice(p.length));
   for (const nome of nomi) {
     const intero = formaDiConfronto(nome);
     if (!intero) continue;
@@ -107,10 +110,11 @@ export function imitaUnNome(nick: string, nomi: readonly string[]): boolean {
       .split(/[\s'’.,_-]+/u)
       .map(formaDiConfronto)
       .filter(Boolean);
-    if (n === intero) return true;
+    if (n === intero || conNumero(intero)) return true;
     if (parole.length >= 2 && intero.length >= NOME_MINIMO && n.includes(intero))
       return true;
-    if (parole.some((p) => p.length >= PAROLA_MINIMA && n === p)) return true;
+    if (parole.some((p) => p.length >= PAROLA_MINIMA && (n === p || conNumero(p))))
+      return true;
   }
   return false;
 }

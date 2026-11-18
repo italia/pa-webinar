@@ -58,10 +58,10 @@ const CONCLUSO = ['ENDED', 'ARCHIVED'];
 export const PUT = withErrorHandling(async (request, context) => {
   const { param: slug } = await context.params;
   const ip = getClientIp(request);
-  // Una persona lo prova qualche volta: un tetto per indirizzo basta, e ferma
-  // chi volesse scoprire quali nickname sono presi.
-  // Scala come gli altri limiti della sala: un ufficio dietro un solo
-  // indirizzo entra tutto insieme.
+  // Una persona lo prova qualche volta, ma un ufficio dietro un solo indirizzo
+  // entra tutto insieme: il tetto scala come gli altri limiti della sala. Chi
+  // volesse scoprire quali nickname sono presi deve poter entrare (sotto), e
+  // da dentro li vede comunque in sala.
   const rl = rateLimit(`nickname:${ip}`, {
     limit: limiteDellaSala(120),
     windowMs: 60_000,

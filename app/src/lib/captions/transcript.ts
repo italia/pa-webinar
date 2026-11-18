@@ -137,7 +137,11 @@ function chiParla(
   return `${persona ? `${persona}|` : ''}nome:${nome.trim().toLowerCase()}`;
 }
 
-/** Quante persone hanno parlato, con lo stesso criterio della trascrizione. */
+/**
+ * Quante persone hanno parlato, con lo stesso criterio della trascrizione per
+ * riconoscerle. Un iscritto che cambia nickname durante l'evento e' una persona
+ * sola, anche se la trascrizione gli da' un'etichetta per nome.
+ */
 export function contaVoci(
   frasi: ReadonlyArray<{ seatId: string | null; speakerName: string | null }>,
   titolari?: ReadonlyMap<string, TitolareDelPosto>,

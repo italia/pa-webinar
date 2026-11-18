@@ -11,7 +11,6 @@ import {
   type MotivoNickname,
 } from '@/lib/live/nickname-rule';
 
-/** Perche' il nickname non e' passato: un motivo delle regole, o la rete. */
 /** Perche' il nickname non e' passato: un motivo delle regole, l'evento che non
  *  ne accetta di nuovi (`disabled`) o la rete. `nickname`: quello rifiutato,
  *  quando il rifiuto arriva dalla sala all'ingresso. */
@@ -136,7 +135,9 @@ export function useNickname({
                   motivo: dati.reason,
                   ...(dati.suggestion ? { suggerimento: dati.suggestion } : {}),
                 }
-              : { motivo: dati?.code === 'NICKNAMES_DISABLED' ? 'disabled' : 'rete' }
+              : // Un rifiuto (403) non cambia riprovando: l'evento non ne
+                // accetta, o la sala non e' aperta a chi lo chiede.
+                { motivo: res.status === 403 ? 'disabled' : 'rete' }
           );
           return false;
         }

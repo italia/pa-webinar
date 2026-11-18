@@ -2132,11 +2132,31 @@ describe('POST jitsi/token — nickname di chi partecipa', () => {
     expect(senza.status).toBe(409);
     const con = await post({ guestName: 'Mario Rossi', nickname: 'Pippo', nicknameProof: [body.jwt] });
     expect(con.status).toBe(200);
-    expect((await minted(con)).user.name).toBe('Pippo');
-    // Un token con un altro nome non prova niente.
-    const altro = await minted(await post({ guestName: 'Mario Rossi', nickname: 'Pluto' }));
-    const falso = await post({ guestName: 'Mario Rossi', nickname: 'Pippo', nicknameProof: [altro.body.jwt] });
-    expect(falso.status).toBe(409);
+    const ripreso = await minted(con);
+    expect(ripreso.user.name).toBe('Pippo');
+    // Da qui la prova e' il token nuovo: quello di prima non tiene piu' il nickname.
+    const vecchio = await post({ guestName: 'Mario Rossi', nickname: 'Pippo', nicknameProof: [body.jwt] });
+    expect(vecchio.status).toBe(409);
+    const nuovo = await post({ guestName: 'Mario Rossi', nickname: 'Pippo', nicknameProof: [ripreso.body.jwt] });
+    expect(nuovo.status).toBe(200);
+  });
+
+  it('un token con lo stesso nome non prova niente: conta il posto, non il nome', async () => {
+    conNickname();
+    await post({ guestName: 'Mario Rossi', nickname: 'Pippo' });
+    // Un altro ospite entra scrivendo «Pippo» come nome, e prova a usarne il token.
+    const furbo = await minted(await post({ guestName: 'Pippo' }));
+    expect(furbo.user.name).toBe('Pippo');
+    const furto = await post({ guestName: 'Pippo', nickname: 'Pippo', nicknameProof: [furbo.body.jwt] });
+    expect(furto.status).toBe(409);
+    // Ne' fa passare un nickname riservato o di chi conduce.
+    const moderatore = await minted(await post({ guestName: 'Moderatore' }));
+    const riservato = await post({
+      guestName: 'Moderatore',
+      nickname: 'Moderatore',
+      nicknameProof: [moderatore.body.jwt],
+    });
+    expect(riservato.status).toBe(422);
   });
 
   it("col pubblico anonimo il nickname dell'ospite prende il posto dello pseudonimo", async () => {

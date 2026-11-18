@@ -101,13 +101,18 @@ describe('imitaUnNome', () => {
   it('un nome di una parola sola conta solo uguale', () => {
     expect(imitaUnNome('Anna', ['Anna'])).toBe(true);
     expect(imitaUnNome('Giovanna', ['Anna'])).toBe(false);
+    // Con un numero in fondo resta lo stesso nome.
+    expect(imitaUnNome('Raffaele1', ['Raffaele'])).toBe(true);
+    expect(imitaUnNome('raffaele_22', ['Raffaele'])).toBe(true);
+    expect(imitaUnNome('Mario2', ['Mario Rossi'])).toBe(true);
     expect(imitaUnNome('Direttore', ['Direttore Generale'])).toBe(true);
     expect(imitaUnNome('Direttorissimo', ['Direttore Generale'])).toBe(false);
   });
 
   it('non tocca i nickname che solo somigliano', () => {
     expect(imitaUnNome('Mar', chiConduce)).toBe(false);
-    expect(imitaUnNome('Rossi99', chiConduce)).toBe(false);
+    expect(imitaUnNome('Rossini', chiConduce)).toBe(false);
+    expect(imitaUnNome('Rossi99', chiConduce)).toBe(true);
     // «Al» ha due lettere: da sola non conta.
     expect(imitaUnNome('Al', chiConduce)).toBe(false);
     expect(imitaUnNome('Pippo', chiConduce)).toBe(false);

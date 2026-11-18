@@ -204,7 +204,9 @@ describe('prendiNicknameOspite e nicknameDellOspite', () => {
 
   it('chi rientra lo ritrova senza ripetere le regole: un relatore aggiunto dopo non lo fa uscire', async () => {
     const ev = nuovoEvento();
-    expect(await prendiNicknameOspite(ev, 'Marta', chiave('1'))).toMatchObject({
+    expect(
+      await prendiNicknameOspite(ev, 'Marta', chiave('1'), `guest-seat-1`)
+    ).toMatchObject({
       ok: true,
     });
     const prima = db.evento.additionalMods;
@@ -219,7 +221,9 @@ describe('prendiNicknameOspite e nicknameDellOspite', () => {
         motivo: 'host',
       });
       // ...chi l'aveva gia' lo ritrova.
-      expect(await prendiNicknameOspite(ev, 'Marta', chiave('1'))).toEqual({
+      expect(
+        await prendiNicknameOspite(ev, 'Marta', chiave('1'), `guest-seat-1`)
+      ).toEqual({
         ok: true,
         nickname: 'Marta',
       });
@@ -228,42 +232,81 @@ describe('prendiNicknameOspite e nicknameDellOspite', () => {
     }
   });
 
-  it("da un'altra rete lo riprende solo chi prova di averlo avuto in sala", async () => {
+  it("da un'altra rete lo riprende solo chi porta il posto che lo tiene", async () => {
     const ev = nuovoEvento();
-    await prendiNicknameOspite(ev, 'Pippo', chiave('wifi'));
-    expect(await prendiNicknameOspite(ev, 'Pippo', chiave('4g'))).toMatchObject({
+    await prendiNicknameOspite(ev, 'Pippo', chiave('wifi'), 'guest-posto-1');
+    expect(
+      await prendiNicknameOspite(ev, 'Pippo', chiave('4g'), 'guest-posto-2')
+    ).toMatchObject({
       ok: false,
       motivo: 'taken',
     });
-    expect(await prendiNicknameOspite(ev, 'Pippo', chiave('4g'), true)).toEqual({
-      ok: true,
-      nickname: 'Pippo',
-    });
-    // Da li' in poi e' della chiave nuova.
+    // Un token di un altro posto (anche con lo stesso nome) non prova niente.
+    expect(
+      await prendiNicknameOspite(
+        ev,
+        'Pippo',
+        chiave('4g'),
+        'guest-posto-2',
+        async () => new Set(['guest-altro'])
+      )
+    ).toMatchObject({ ok: false, motivo: 'taken' });
+    expect(
+      await prendiNicknameOspite(
+        ev,
+        'Pippo',
+        chiave('4g'),
+        'guest-posto-3',
+        async () => new Set(['guest-posto-1'])
+      )
+    ).toEqual({ ok: true, nickname: 'Pippo' });
+    // Da li' in poi e' della chiave nuova, con l'ultimo posto.
     expect(await nicknameDellOspite(ev, 'Pippo', 'guest-4g-Pippo')).toBe(true);
     expect(await nicknameDellOspite(ev, 'Pippo', 'guest-wifi-Pippo')).toBe(false);
+    expect(
+      await prendiNicknameOspite(
+        ev,
+        'Pippo',
+        chiave('wifi'),
+        'guest-posto-4',
+        async () => new Set(['guest-posto-1'])
+      )
+    ).toMatchObject({ ok: false, motivo: 'taken' });
+  });
+
+  it('i posti della visita si leggono solo se servono', async () => {
+    const ev = nuovoEvento();
+    const posti = vi.fn(async () => new Set<string>());
+    await prendiNicknameOspite(ev, 'Pippo', chiave('1'), 'guest-posto-1', posti);
+    await prendiNicknameOspite(ev, 'Pippo', chiave('1'), 'guest-posto-2', posti);
+    expect(posti).not.toHaveBeenCalled();
   });
 
   it('la prova non scavalca il nickname salvato da un iscritto', async () => {
     const ev = nuovoEvento();
     db.iscrizioni = [{ id: 'r1', nicknameKey: improntaNickname(ev, 'Pippo') }];
-    expect(await prendiNicknameOspite(ev, 'Pippo', chiave('1'), true)).toMatchObject({
-      ok: false,
-      motivo: 'taken',
-    });
+    expect(
+      await prendiNicknameOspite(
+        ev,
+        'Pippo',
+        chiave('1'),
+        'guest-posto-1',
+        async () => new Set(['x'])
+      )
+    ).toMatchObject({ ok: false, motivo: 'taken' });
   });
 
   it("il primo lo prende; lo stesso ospite lo ritrova; un altro trova un'alternativa", async () => {
     const ev = nuovoEvento();
-    expect(await prendiNicknameOspite(ev, 'Pippo', chiave('1'))).toEqual({
+    expect(await prendiNicknameOspite(ev, 'Pippo', chiave('1'), `guest-seat-1`)).toEqual({
       ok: true,
       nickname: 'Pippo',
     });
-    expect(await prendiNicknameOspite(ev, 'Pippo', chiave('1'))).toEqual({
+    expect(await prendiNicknameOspite(ev, 'Pippo', chiave('1'), `guest-seat-1`)).toEqual({
       ok: true,
       nickname: 'Pippo',
     });
-    expect(await prendiNicknameOspite(ev, 'PIPPO', chiave('2'))).toEqual({
+    expect(await prendiNicknameOspite(ev, 'PIPPO', chiave('2'), `guest-seat-2`)).toEqual({
       ok: false,
       motivo: 'taken',
       suggerimento: 'PIPPO2',
@@ -272,7 +315,7 @@ describe('prendiNicknameOspite e nicknameDellOspite', () => {
 
   it('un nickname preso da un ospite non passa a un iscritto', async () => {
     const ev = nuovoEvento();
-    await prendiNicknameOspite(ev, 'Pippo', chiave('1'));
+    await prendiNicknameOspite(ev, 'Pippo', chiave('1'), `guest-seat-1`);
     expect(await verificaNickname(ev, 'Pippo', { iscrizione: 'r1' })).toMatchObject({
       ok: false,
       motivo: 'taken',
@@ -281,7 +324,7 @@ describe('prendiNicknameOspite e nicknameDellOspite', () => {
 
   it("chat e domande lo riconoscono solo per chi l'ha preso", async () => {
     const ev = nuovoEvento();
-    await prendiNicknameOspite(ev, 'Pippo', chiave('1'));
+    await prendiNicknameOspite(ev, 'Pippo', chiave('1'), `guest-seat-1`);
     expect(await nicknameDellOspite(ev, 'Pippo', 'guest-1-Pippo')).toBe(true);
     expect(await nicknameDellOspite(ev, 'Pippo', 'guest-2-Pippo')).toBe(false);
     expect(await nicknameDellOspite(ev, 'Mario Rossi', 'guest-1-Mario Rossi')).toBe(

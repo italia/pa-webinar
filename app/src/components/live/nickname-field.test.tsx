@@ -129,6 +129,16 @@ describe('NicknameDialog', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
+  it('un rifiuto che non cambia riprovando lo dice, invece di invitare a riprovare', async () => {
+    fetchMock.mockResolvedValueOnce(risposta(403, { code: 'NICKNAMES_DISABLED' }));
+    render('Pippo');
+    scrivi('Pluto');
+    await premi(pulsante(tn.apply));
+    expect(onApplica).not.toHaveBeenCalled();
+    expect(document.body.textContent).toContain(tn.errors.disabled);
+    expect(document.body.textContent).not.toContain(tn.errors.rete);
+  });
+
   it('togliere il nickname fa rientrare senza', async () => {
     render('Pippo');
     await premi(pulsante(tn.remove));
