@@ -59,6 +59,7 @@ export const NOT_DUPLICATED_EVENT_RELATIONS: Record<string, string> = {
   retainedConsentProofs: 'prova conservata del consenso dato per QUELL’occorrenza, finché ne esiste il video: non si trasferisce a un’altra',
   roomOccupants: 'chi era in sala in QUELL’occorrenza: dato della diretta, non configurazione',
   captionSegments: 'frasi dette in QUELL’occorrenza, per la sua trascrizione: non si copiano',
+  redactionRequests: 'richieste di togliere una persona dalle registrazioni di QUELL’occorrenza: non si trasferiscono a un’altra',
 
   // Vita dell'evento.
   questions: 'domande poste durante quell’evento',

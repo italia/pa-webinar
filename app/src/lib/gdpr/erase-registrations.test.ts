@@ -16,6 +16,7 @@ const m = vi.hoisted(() => ({
     chatMessageReaction: { deleteMany: vi.fn() },
     captionSegment: { deleteMany: vi.fn() },
     roomOccupant: { deleteMany: vi.fn() },
+    recordingRedactionRequest: { deleteMany: vi.fn() },
     registration: { deleteMany: vi.fn() },
     $executeRaw: vi.fn(),
   },
@@ -87,6 +88,13 @@ describe('eraseRegistrations', () => {
       tx.registration.deleteMany.mock.invocationCallOrder[0]!
     );
     expect(conti.consentProofsKept).toBe(4);
+  });
+
+  it('toglie le richieste di rimozione evase, non quelle ancora da evadere', async () => {
+    await eraseRegistrations(ISCRIZIONI, 'prova');
+    expect(tx.recordingRedactionRequest.deleteMany).toHaveBeenCalledWith({
+      where: { registrationId: { in: ['r1', 'r2'] }, status: { in: ['CLOSED', 'REJECTED'] } },
+    });
   });
 
   it('niente di pubblicato: nessuna prova conservata', async () => {

@@ -54,6 +54,7 @@ vi.mock('@/lib/db', () => ({
     retainedConsentProof: { deleteMany: vi.fn(), createMany: vi.fn(), findMany: vi.fn() },
     roomOccupant: { deleteMany: vi.fn() },
     captionSegment: { deleteMany: vi.fn() },
+    recordingRedactionRequest: { deleteMany: vi.fn() },
     recording: { findMany: vi.fn(), deleteMany: vi.fn() },
     postprodArtifact: { deleteMany: vi.fn(), count: vi.fn() },
     speaker: { deleteMany: vi.fn() },
@@ -132,6 +133,7 @@ const db = prisma as unknown as {
   retainedConsentProof: { deleteMany: Mock; createMany: Mock; findMany: Mock };
   roomOccupant: { deleteMany: Mock };
   captionSegment: { deleteMany: Mock };
+  recordingRedactionRequest: { deleteMany: Mock };
   recording: { findMany: Mock; deleteMany: Mock };
   postprodArtifact: { deleteMany: Mock; count: Mock };
   speaker: { deleteMany: Mock };
@@ -590,6 +592,30 @@ describe('GET /api/cron/cleanup', () => {
     expect(db.reaction.deleteMany).toHaveBeenCalledWith(byEvent);
     expect(db.agendaItemReaction.deleteMany).toHaveBeenCalledWith({
       where: { agendaItem: { eventId: 'evt-vecchio' } },
+    });
+  });
+
+  it('fase 3: le richieste di rimozione evase se ne vanno, quelle aperte restano', async () => {
+    // Nome cifrato, impronta dell'indirizzo, posti della conferenza: alla
+    // scadenza dell'evento se ne vanno quelle chiuse o respinte, e quelle di
+    // una registrazione che non c'e' piu'. Una richiesta aperta e' un diritto
+    // esercitato e non ancora evaso: resta, e il giro successivo la toglie.
+    stubEventQueries({ ended: [endedEvent({ id: 'evt-vecchio' })] });
+    db.recordingRedactionRequest.deleteMany.mockResolvedValue({ count: 2 });
+
+    await runCleanup();
+
+    expect(db.recordingRedactionRequest.deleteMany).toHaveBeenCalledWith({
+      where: {
+        eventId: 'evt-vecchio',
+        OR: [{ status: { in: ['CLOSED', 'REJECTED'] } }, { recordingId: null }],
+      },
+    });
+    const riga = db.gdprAuditLog.create.mock.calls.find(
+      (c) => (c[0] as { data: { action: string } }).data.action === 'DATA_DELETED'
+    );
+    expect(JSON.parse((riga![0] as { data: { details: string } }).data.details)).toMatchObject({
+      redactionRequests: 2,
     });
   });
 

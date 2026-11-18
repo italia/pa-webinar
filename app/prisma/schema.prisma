@@ -425,6 +425,7 @@ model Event {
   retainedConsentProofs RetainedConsentProof[]
   roomOccupants         RoomOccupant[]
   captionSegments       CaptionSegment[]
+  redactionRequests     RecordingRedactionRequest[]
   @@index([gdprTemplateId], map: "events_gdpr_template_id_idx")
   // FK lookup index: "find all events in this recurring series".
   @@index([recurrenceSeriesId], map: "events_recurrence_series_id_idx")
@@ -2373,6 +2374,7 @@ model Recording {
   artifacts   PostprodArtifact[]
   tracks      RecordingTrack[]
   speakers    Speaker[]
+  redactionRequests RecordingRedactionRequest[]
 
   @@index([eventId])
   @@index([status])
@@ -2511,6 +2513,7 @@ model PostprodJob {
   dependsOn  PostprodJob?       @relation("PostprodJobDeps", fields: [dependsOnId], references: [id], onDelete: SetNull)
   dependents PostprodJob[]      @relation("PostprodJobDeps")
   artifacts  PostprodArtifact[]
+  redactionRequests RecordingRedactionRequest[]
 
   @@index([status, nextAttemptAt])
   @@index([recordingId])
@@ -2978,4 +2981,80 @@ model EventPersonPhoto {
   grants EventModerator[]
 
   @@map("event_person_photos")
+}
+
+// La richiesta di una persona di non comparire in una registrazione: diritto
+// alla cancellazione, o semplice ripensamento. Arriva da «I miei dati» o dallo
+// staff, per una richiesta giunta al titolare per altre vie. Finche' e' aperta
+// l'amministrazione accede a quella registrazione solo dall'editor di
+// rimozione (lib/recording/redaction/access), e ogni accesso si traccia.
+// L'esito: gli intervalli in cui la persona compare o parla diventano un
+// cartello muto, il file originale e le tracce della persona si cancellano, la
+// post-produzione si rifa'.
+//
+// DATI PERSONALI: il nome cifrato, l'impronta dell'indirizzo e i posti della
+// conferenza, che rimandano a un'iscrizione. La pulizia GDPR la cancella alla
+// scadenza dell'evento una volta chiusa o respinta; una richiesta aperta resta
+// finche' qualcuno non la evade (lib/gdpr/cleanup-coverage).
+enum RecordingRedactionStatus {
+  // Arrivata, nessuno l'ha ancora presa.
+  OPEN
+  // L'amministrazione ha aperto l'editor.
+  IN_PROGRESS
+  // Gli intervalli sono confermati e il lavoro di rimozione e' in coda o gira.
+  PROCESSING
+  // Il video e' sostituito, gli originali cancellati, la post-produzione rifatta.
+  CLOSED
+  // Respinta dallo staff, con la nota del motivo.
+  REJECTED
+}
+
+model RecordingRedactionRequest {
+  id          String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId     String                   @map("event_id") @db.Uuid
+  // Null quando la registrazione e' stata cancellata: non resta niente da togliere.
+  recordingId String?                  @map("recording_id") @db.Uuid
+  // 'self-service' (dalla pagina dei propri dati) o 'admin'.
+  source      String                   @map("source") @db.VarChar(16)
+  status      RecordingRedactionStatus @default(OPEN)
+  // Il nome con cui la persona e' riconosciuta, cifrato (encryptPII).
+  displayName String                   @map("display_name")
+  // Chi l'ha chiesta da «I miei dati»: la pagina ne mostra lo stato.
+  emailHash   String?                  @map("email_hash") @db.VarChar(64)
+  // L'iscrizione da cui viene, senza chiave esterna: la richiesta resta anche
+  // se la persona cancella l'iscrizione.
+  registrationId String?               @map("registration_id") @db.Uuid
+  // I posti della conferenza (`context.user.id` del JWT) e gli endpoint del
+  // bridge della persona: legano la richiesta alla presenza in sala, al
+  // registro di chi parla e alle tracce per persona.
+  seatIds     String[]                 @default([]) @map("seat_ids")
+  endpointIds String[]                 @default([]) @map("endpoint_ids")
+  // Gli intervalli proposti all'arrivo, in secondi dall'inizio del video
+  // ([{ start, end, source }]): fotografati perche' i dati da cui nascono si
+  // cancellano alla scadenza dell'evento.
+  proposedIntervals Json               @default("[]") @map("proposed_intervals") @db.JsonB
+  // Gli intervalli confermati dallo staff all'invio ([{ start, end }]).
+  intervals   Json?                    @map("intervals") @db.JsonB
+  // Il lavoro di rimozione del video, quando c'e' un video.
+  jobId       String?                  @map("job_id") @db.Uuid
+  // La nota dello staff (per esempio il motivo del rifiuto), cifrata.
+  note        String?                  @map("note")
+  // L'ultimo errore del lavoro, senza dati personali.
+  lastError   String?                  @map("last_error") @db.Text
+  createdAt   DateTime                 @default(now()) @map("created_at")
+  updatedAt   DateTime                 @updatedAt @map("updated_at")
+  startedAt   DateTime?                @map("started_at")
+  submittedAt DateTime?                @map("submitted_at")
+  closedAt    DateTime?                @map("closed_at")
+
+  event     Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  recording Recording?   @relation(fields: [recordingId], references: [id], onDelete: SetNull)
+  job       PostprodJob? @relation(fields: [jobId], references: [id], onDelete: SetNull)
+
+  @@index([eventId])
+  @@index([recordingId])
+  @@index([status])
+  @@index([emailHash])
+  @@index([jobId])
+  @@map("recording_redaction_requests")
 }
