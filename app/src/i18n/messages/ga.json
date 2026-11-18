@@ -728,6 +728,9 @@
       "title": "Tá tú rannpháirteach gan taifeadadh.",
       "consent": "Toilím leis an taifeadadh",
       "body": "Níor thoiligh tú leis an taifeadadh: glacann tú páirt cosúil le cách, ach fanann do ghuth lasmuigh den taifeadadh. Ní thaispeántar d'aghaidh ná d'ainm san fhíseán riamh ar aon nós."
+    },
+    "nickname": {
+      "reserved": "Modhnóir,Cainteoir,Rannpháirtí,Aoi,Eagraí,Riarthóir,Óstach"
     }
   },
   "qa": {
@@ -1746,6 +1749,8 @@
       "colCreatedAt": "Cláraithe",
       "colEvent": "Imeacht",
       "colName": "Ainm",
+      "colNickname": "Leasainm",
+      "nicknameShown": "Feiceann daoine eile é mar “{nickname}”",
       "colEmail": "Ríomhphost",
       "colOrg": "Eagraíocht",
       "colJoined": "Páirteach",
@@ -4745,6 +4750,7 @@
       "resultsDescription": "{count, plural, one {Aimsíodh sonraí a bhaineann le # imeacht.} two {Aimsíodh sonraí a bhaineann le # imeacht.} few {Aimsíodh sonraí a bhaineann le # imeacht.} many {Aimsíodh sonraí a bhaineann le # n-imeacht.} other {Aimsíodh sonraí a bhaineann le # imeacht.}}",
       "registrationData": "Sonraí cláraithe",
       "fieldName": "Ainm",
+      "fieldNickname": "Leasainm",
       "fieldEmail": "Ríomhphost",
       "fieldOrganization": "Eagraíocht",
       "fieldRegisteredAt": "Dáta cláraithe",

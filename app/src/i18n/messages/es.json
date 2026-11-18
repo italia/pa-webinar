@@ -728,6 +728,9 @@
       "title": "Participas sin grabación.",
       "consent": "Doy mi consentimiento a la grabación",
       "body": "No has dado tu consentimiento a la grabación: participas como todos, pero tu voz queda fuera de la grabación. Tu cara y tu nombre nunca aparecen en el vídeo de todos modos."
+    },
+    "nickname": {
+      "reserved": "Moderador,Moderadora,Ponente,Orador,Oradora,Participante,Invitado,Invitada,Organizador,Organizadora,Administrador,Administradora,Anfitrión,Anfitriona"
     }
   },
   "qa": {
@@ -1746,6 +1749,8 @@
       "colCreatedAt": "Fecha de inscripción",
       "colEvent": "Evento",
       "colName": "Nombre",
+      "colNickname": "Apodo",
+      "nicknameShown": "Los demás lo ven como «{nickname}»",
       "colEmail": "Correo electrónico",
       "colOrg": "Organización",
       "colJoined": "Asistido",
@@ -4745,6 +4750,7 @@
       "resultsDescription": "{count, plural, one {Se encontraron datos relativos a # evento.} many {Se encontraron datos relativos a # de eventos.} other {Se encontraron datos relativos a # eventos.}}",
       "registrationData": "Datos de inscripción",
       "fieldName": "Nombre",
+      "fieldNickname": "Apodo",
       "fieldEmail": "Correo electrónico",
       "fieldOrganization": "Organismo",
       "fieldRegisteredAt": "Fecha de inscripción",

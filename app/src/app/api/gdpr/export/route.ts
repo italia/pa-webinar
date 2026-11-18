@@ -284,6 +284,8 @@ export const GET = withErrorHandling(async (request) => {
         // Serve alla pagina per ritirare un consenso di questa iscrizione.
         id: r.id,
         displayName: tryDecryptPII(r.displayName) ?? r.displayName,
+        // Il nickname scelto per l'evento (lib/live/nickname), se c'e'.
+        nickname: tryDecryptPII(r.nickname),
         email: decryptedEmail,
         organization: r.organization,
         organizationRole: r.organizationRole,

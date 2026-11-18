@@ -432,6 +432,10 @@ export const jitsiTokenRequestSchema = z.object({
   moderatorToken: z.guid().optional(),
   guestName: z.string().min(2).max(100).optional(),
   displayNameOverride: z.string().min(2).max(100).optional(),
+  /** Il nickname per la visita di un ospite, o di chi apre il link di un altro
+   *  (lib/live/nickname): il server lo controlla e lo prende. Quello di chi
+   *  apre il proprio link sta sull'iscrizione, e qui non conta. */
+  nickname: z.string().min(1).max(100).optional(),
   /** Consenso alla registrazione dell'evento dato ora con un clic: in sala
    *  d'attesa o dalla sala. I consensi gia' dati si riportano in `consentReplay`. */
   recordingConsent: z.boolean().optional(),

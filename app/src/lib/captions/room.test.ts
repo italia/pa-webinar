@@ -55,6 +55,22 @@ describe('consensoTrascrizione', () => {
     });
   });
 
+  it("un iscritto con il nickname compare con quello, al posto del nome della prova", async () => {
+    db.registration.findFirst.mockResolvedValue({
+      displayName: 'nome',
+      nickname: 'nick',
+      consentMultitrack: false,
+    });
+    db.multitrackConsent.findFirst.mockResolvedValue({ displayName: 'in-sala' });
+    expect(await consensoTrascrizione(EVENTO, `reg-${ISCRIZIONE}-ab12cd34`, 2)).toEqual({
+      dato: true,
+      nome: 'chiaro:nick',
+    });
+    // Senza consenso il nickname non si tiene, come il nome.
+    db.multitrackConsent.findFirst.mockResolvedValue(null);
+    expect(await consensoTrascrizione(EVENTO, `reg-${ISCRIZIONE}-ab12cd34`, 2)).toEqual({ dato: false, nome: null });
+  });
+
   it('un iscritto senza consenso, o di un altro evento', async () => {
     db.registration.findFirst.mockResolvedValueOnce({ displayName: 'nome', consentMultitrack: false });
     db.multitrackConsent.findFirst.mockResolvedValueOnce(null);

@@ -728,6 +728,9 @@
       "title": "You are taking part without being recorded.",
       "consent": "I consent to the recording",
       "body": "You have not consented to the recording: you take part like everyone else, but your voice stays out of the recording. Your face and your name never appear in the video anyway."
+    },
+    "nickname": {
+      "reserved": "Moderator,Speaker,Participant,Guest,Organizer,Organiser,Administrator,Host,Presenter"
     }
   },
   "qa": {
@@ -1746,6 +1749,8 @@
       "colCreatedAt": "Signed up",
       "colEvent": "Event",
       "colName": "Name",
+      "colNickname": "Nickname",
+      "nicknameShown": "Others see them as “{nickname}”",
       "colEmail": "Email",
       "colOrg": "Organization",
       "colJoined": "Joined",
@@ -4745,6 +4750,7 @@
       "resultsDescription": "{count, plural, one {Found data related to # event.} other {Found data related to # events.}}",
       "registrationData": "Registration data",
       "fieldName": "Name",
+      "fieldNickname": "Nickname",
       "fieldEmail": "Email",
       "fieldOrganization": "Organization",
       "fieldRegisteredAt": "Registration date",

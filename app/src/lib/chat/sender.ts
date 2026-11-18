@@ -21,6 +21,7 @@
 
 import { resolveGrantForEvent } from '@/lib/auth/moderator';
 import { staffDietroIlPrimario } from '@/lib/auth/staff-seat';
+import { nicknameDellIscrizione, nomeDiChiPartecipa } from '@/lib/live/nickname';
 import { pseudonimo } from '@/lib/live/pseudonym';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
@@ -108,7 +109,7 @@ export async function resolveTokenSender(
 
   const registration = await prisma.registration.findUnique({
     where: { accessToken: token },
-    select: { id: true, displayName: true, eventId: true },
+    select: { id: true, displayName: true, nickname: true, eventId: true },
   });
   if (registration && registration.eventId === event.id) {
     // Ownership gate (read the cookie only now that a registration matched, so grants
@@ -124,14 +125,22 @@ export async function resolveTokenSender(
     // a legitimate cross-device / cookieless registrant still merges with their
     // own Q&A/poll activity instead of splitting into a second analytics identity.
     const owns = (await readOwnedEventAccessToken(event.id)) === token;
+    const posto = `reg-${registration.id}`;
     return {
       eventId: event.id,
-      senderId: `reg-${registration.id}`,
-      // Pubblico anonimo: lo pseudonimo del posto, lo stesso del video.
-      senderName: event.audienceAnonymous
-        ? await pseudonimo(event.id, `reg-${registration.id}`)
-        : owns
-          ? (tryDecryptPII(registration.displayName) ?? registration.displayName)
+      senderId: posto,
+      // Il nickname dell'iscrizione o, col pubblico anonimo, lo pseudonimo del
+      // posto: gli stessi del video (lib/live/nickname). Chi ha il link di un
+      // altro scrive con il nome che la sala gli ha dato.
+      senderName: owns
+        ? await nomeDiChiPartecipa(
+            event,
+            posto,
+            nicknameDellIscrizione(registration),
+            tryDecryptPII(registration.displayName) ?? registration.displayName,
+          )
+        : event.audienceAnonymous
+          ? await pseudonimo(event.id, posto)
           : displayNameOverride?.trim() || 'Partecipante',
       isModerator: false,
       // Only the browser that registered — the one holding the signed

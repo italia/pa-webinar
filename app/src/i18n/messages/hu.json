@@ -728,6 +728,9 @@
       "title": "Rögzítés nélkül vesz részt.",
       "consent": "Hozzájárulok a rögzítéshez",
       "body": "Nem járult hozzá a felvételhez: ugyanúgy részt vesz, mint mindenki, de a hangja kimarad a felvételből. Az arca és a neve egyébként sem jelenik meg soha a videón."
+    },
+    "nickname": {
+      "reserved": "Moderátor,Előadó,Felszólaló,Résztvevő,Vendég,Szervező,Adminisztrátor,Házigazda"
     }
   },
   "qa": {
@@ -1746,6 +1749,8 @@
       "colCreatedAt": "Regisztráció dátuma",
       "colEvent": "Esemény",
       "colName": "Név",
+      "colNickname": "Becenév",
+      "nicknameShown": "Mások így látják: „{nickname}”",
       "colEmail": "E-mail",
       "colOrg": "Szervezet",
       "colJoined": "Részt vett",
@@ -4745,6 +4750,7 @@
       "resultsDescription": "{count, plural, one {# eseményhez kapcsolódó adatok találhatók.} other {# eseményhez kapcsolódó adatok találhatók.}}",
       "registrationData": "Regisztrációs adatok",
       "fieldName": "Név",
+      "fieldNickname": "Becenév",
       "fieldEmail": "E-mail",
       "fieldOrganization": "Szervezet",
       "fieldRegisteredAt": "Regisztráció dátuma",

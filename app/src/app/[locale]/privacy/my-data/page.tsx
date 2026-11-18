@@ -42,6 +42,8 @@ interface ExportRegistration {
   id: string;
   consents: ConsensiVista;
   displayName: string;
+  /** Il nickname scelto per l'evento, se c'e'. */
+  nickname?: string | null;
   email: string | null;
   organization: string | null;
   organizationRole: string | null;
@@ -502,6 +504,12 @@ export default function MyDataPage() {
                     <dl className="row mb-3" style={{ fontSize: '0.9rem' }}>
                       <dt className="col-sm-4">{t('fieldName')}</dt>
                       <dd className="col-sm-8">{entry.registration.displayName}</dd>
+                      {entry.registration.nickname && (
+                        <>
+                          <dt className="col-sm-4">{t('fieldNickname')}</dt>
+                          <dd className="col-sm-8">{entry.registration.nickname}</dd>
+                        </>
+                      )}
                       <dt className="col-sm-4">{t('fieldEmail')}</dt>
                       <dd className="col-sm-8">{entry.registration.email ?? '—'}</dd>
                       {entry.registration.organization && (

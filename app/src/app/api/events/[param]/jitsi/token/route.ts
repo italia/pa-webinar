@@ -33,7 +33,12 @@ import { guestAccessAllowed } from '@/lib/events/guest-window';
 import { registrazioneDellIscrizione, trascrizioneInVigore } from '@/lib/live/consents-in-force';
 import { mediaDelToken, regolaConsenso } from '@/lib/live/listen-only';
 import { elencoVisibileAlPubblico } from '@/lib/live/participant-list';
-import { pseudonimo } from '@/lib/live/pseudonym';
+import {
+  nicknameDellIscrizione,
+  nomeDiChiPartecipa,
+  prendiNicknameOspite,
+  rispostaNicknameRifiutato,
+} from '@/lib/live/nickname';
 import { guestSenderId } from '@/lib/chat/sender-key';
 import { recordingAvailableFor, voceNelVideo } from '@/lib/recording/availability';
 import {
@@ -562,15 +567,23 @@ export const POST = withErrorHandling(async (request, context) => {
       if (!rl.allowed) {
         throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
       }
+      // Il nickname di chi apre il link di un altro vale per la visita, come
+      // quello di un ospite. Col pubblico anonimo resta lo pseudonimo del
+      // posto: la chat lo nomina dall'iscrizione, e i due nomi non si
+      // accostano.
+      let nicknameInoltro: string | null = null;
+      if (parsed.data.nickname && event.nicknamesEnabled && !event.audienceAnonymous) {
+        const esito = await prendiNicknameOspite(event.id, parsed.data.nickname, (n) => guestSenderId(ip, n));
+        if (!esito.ok) return rispostaNicknameRifiutato(esito);
+        nicknameInoltro = esito.nickname;
+      }
       const postoOspite = guestJitsiId();
       // Il consenso dell'iscritto non passa a chi ha il suo link: vale quello
       // dato da chi ha aperto il link, ora o a un ingresso di questa visita.
       const replicaInoltro = await provaDellaReplica(event, parsed.data.consentReplay, destinazione);
       const mediaInoltro = mediaPartecipante(consensoDato || !!replicaInoltro.registrazione);
       // Pubblico anonimo: lo pseudonimo del posto (lo stesso della chat).
-      const nomeInoltro = event.audienceAnonymous
-        ? await pseudonimo(event.id, `reg-${registration.id}`)
-        : typedName;
+      const nomeInoltro = await nomeDiChiPartecipa(event, `reg-${registration.id}`, nicknameInoltro, typedName);
       const guestJwt = await generateJitsiJwt({
         roomName: event.jitsiRoomName,
         displayName: nomeInoltro,
@@ -579,10 +592,12 @@ export const POST = withErrorHandling(async (request, context) => {
         ...mediaInoltro,
         expiresInSeconds: 2 * 60 * 60,
       });
+      // La prova porta il nome con cui si e' in sala: la trascrizione dai
+      // sottotitoli nomina il posto da qui (lib/captions/room).
       const consentsRecorded = await registraConsensi(
         eventoConsensi,
         conVoce(parsed.data, mediaInoltro),
-        { jitsiUserId: postoOspite, displayName: typedName },
+        { jitsiUserId: postoOspite, displayName: nicknameInoltro ?? typedName },
         destinazione,
         replicaConVoce(replicaInoltro, mediaInoltro),
       );
@@ -591,6 +606,7 @@ export const POST = withErrorHandling(async (request, context) => {
           jwt: guestJwt,
           roomName: event.jitsiRoomName,
           displayName: nomeInoltro,
+          nickname: nicknameInoltro,
           role: 'participant',
           consentsRecorded,
           consentsInForce: await consensiInVigore(
@@ -646,12 +662,17 @@ export const POST = withErrorHandling(async (request, context) => {
     const fotoIscritto = accesso?.emailVerified
       ? await findPhotoByEmailHash(registration.emailHash)
       : null;
+    // Il nickname salvato sull'iscrizione (lib/live/nickname) vale finche' la
+    // persona non lo toglie, anche se l'opzione si spegne dopo: spegnerla non
+    // rimette il nome al posto di un nickname gia' scelto.
     // Pubblico anonimo: in sala lo pseudonimo del posto, senza indirizzo ne'
-    // foto (niente che porti alla persona). Chi e' in solo ascolto ha
-    // rifiutato la registrazione: in sala con le iniziali, senza la sua foto.
-    // Chi resta fuori dalla registrazione tiene la sua: non entra nel video.
-    const anonimo = event.audienceAnonymous;
-    const nomeInSala = anonimo ? await pseudonimo(event.id, `reg-${registration.id}`) : name;
+    // foto (niente che porti alla persona). Lo stesso con il nickname. Chi e'
+    // in solo ascolto ha rifiutato la registrazione: in sala con le iniziali,
+    // senza la sua foto. Chi resta fuori dalla registrazione tiene la sua: non
+    // entra nel video.
+    const nickname = nicknameDellIscrizione(registration);
+    const anonimo = event.audienceAnonymous || !!nickname;
+    const nomeInSala = await nomeDiChiPartecipa(event, `reg-${registration.id}`, nickname, name);
     const conVolto = !anonimo && !mediaIscritto.listenOnly;
     const jwt = await generateJitsiJwt({
       roomName: event.jitsiRoomName,
@@ -676,6 +697,7 @@ export const POST = withErrorHandling(async (request, context) => {
       jwt,
       roomName: event.jitsiRoomName,
       displayName: nomeInSala,
+      nickname,
       role: 'participant',
       consentsRecorded,
       consentsInForce: await consensiInVigore(
@@ -725,13 +747,25 @@ export const POST = withErrorHandling(async (request, context) => {
       throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
     }
 
+    // Il nickname dell'ospite vale per la visita: controllato e preso per la
+    // sua chiave in chat (lib/live/nickname), che e' quella con cui la sala
+    // poi scrive e chiede.
+    let nicknameOspite: string | null = null;
+    if (parsed.data.nickname && event.nicknamesEnabled) {
+      const esito = await prendiNicknameOspite(event.id, parsed.data.nickname, (n) => guestSenderId(ip, n));
+      if (!esito.ok) return rispostaNicknameRifiutato(esito);
+      nicknameOspite = esito.nickname;
+    }
     const postoOspite = guestJitsiId();
     const replicaOspite = await provaDellaReplica(event, parsed.data.consentReplay, destinazione);
     const mediaOspite = mediaPartecipante(consensoDato || !!replicaOspite.registrazione);
     // Pubblico anonimo: lo pseudonimo del posto in chat (la chiave dell'ospite).
-    const nomeOspite = event.audienceAnonymous
-      ? await pseudonimo(event.id, guestSenderId(ip, guestName))
-      : guestName;
+    const nomeOspite = await nomeDiChiPartecipa(
+      event,
+      guestSenderId(ip, guestName),
+      nicknameOspite,
+      guestName,
+    );
     const jwt = await generateJitsiJwt({
       roomName: event.jitsiRoomName,
       displayName: nomeOspite,
@@ -740,10 +774,11 @@ export const POST = withErrorHandling(async (request, context) => {
       ...mediaOspite,
       expiresInSeconds: 2 * 60 * 60,
     });
+    // Il nome con cui l'ospite e' in sala: la trascrizione lo prende da qui.
     const consentsRecorded = await registraConsensi(
       eventoConsensi,
       conVoce(parsed.data, mediaOspite),
-      { jitsiUserId: postoOspite, displayName: guestName },
+      { jitsiUserId: postoOspite, displayName: nicknameOspite ?? guestName },
       destinazione,
       replicaConVoce(replicaOspite, mediaOspite),
     );
@@ -752,6 +787,7 @@ export const POST = withErrorHandling(async (request, context) => {
       jwt,
       roomName: event.jitsiRoomName,
       displayName: nomeOspite,
+      nickname: nicknameOspite,
       role: 'guest',
       consentsRecorded,
       consentsInForce: await consensiInVigore(

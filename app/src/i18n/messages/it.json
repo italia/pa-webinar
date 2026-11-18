@@ -728,6 +728,9 @@
       "title": "Partecipi senza registrazione.",
       "consent": "Acconsento alla registrazione",
       "body": "Non hai dato il consenso alla registrazione: partecipi come tutti, ma la tua voce resta fuori dalla registrazione. Il tuo volto e il tuo nome non compaiono comunque mai nel video."
+    },
+    "nickname": {
+      "reserved": "Moderatore,Moderatrice,Relatore,Relatrice,Partecipante,Ospite,Organizzatore,Organizzatrice,Amministratore,Amministratrice,Conduttore,Conduttrice"
     }
   },
   "qa": {
@@ -1956,6 +1959,8 @@
       "colCreatedAt": "Data iscrizione",
       "colEvent": "Evento",
       "colName": "Nome",
+      "colNickname": "Nickname",
+      "nicknameShown": "Agli altri compare come «{nickname}»",
       "colEmail": "Email",
       "colOrg": "Organizzazione",
       "colJoined": "Partecipato",
@@ -4745,6 +4750,7 @@
       "resultsDescription": "{count, plural, one {Trovati dati relativi a # evento.} other {Trovati dati relativi a # eventi.}}",
       "registrationData": "Dati di registrazione",
       "fieldName": "Nome",
+      "fieldNickname": "Nickname",
       "fieldEmail": "Email",
       "fieldOrganization": "Ente",
       "fieldRegisteredAt": "Data registrazione",

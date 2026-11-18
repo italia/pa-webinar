@@ -728,6 +728,9 @@
       "title": "U neemt deel zonder opname.",
       "consent": "Ik geef toestemming voor de opname",
       "body": "Je hebt geen toestemming gegeven voor de opname: je neemt deel zoals iedereen, maar je stem blijft buiten de opname. Je gezicht en je naam komen sowieso nooit in de video."
+    },
+    "nickname": {
+      "reserved": "Moderator,Spreker,Deelnemer,Gast,Organisator,Beheerder,Gastheer,Gastvrouw,Presentator"
     }
   },
   "qa": {
@@ -1746,6 +1749,8 @@
       "colCreatedAt": "Aanmelddatum",
       "colEvent": "Evenement",
       "colName": "Naam",
+      "colNickname": "Bijnaam",
+      "nicknameShown": "Anderen zien deze persoon als ‘{nickname}’",
       "colEmail": "E-mail",
       "colOrg": "Organisatie",
       "colJoined": "Deelgenomen",
@@ -4745,6 +4750,7 @@
       "resultsDescription": "{count, plural, one {Gegevens gevonden met betrekking tot # evenement.} other {Gegevens gevonden met betrekking tot # evenementen.}}",
       "registrationData": "Inschrijvingsgegevens",
       "fieldName": "Naam",
+      "fieldNickname": "Bijnaam",
       "fieldEmail": "E-mail",
       "fieldOrganization": "Organisatie",
       "fieldRegisteredAt": "Datum inschrijving",

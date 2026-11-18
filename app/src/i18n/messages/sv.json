@@ -728,6 +728,9 @@
       "title": "Du deltar utan inspelning.",
       "consent": "Jag samtycker till inspelningen",
       "body": "Du har inte samtyckt till inspelningen: du deltar som alla andra, men din röst står utanför inspelningen. Ditt ansikte och ditt namn syns ändå aldrig i videon."
+    },
+    "nickname": {
+      "reserved": "Moderator,Talare,Föreläsare,Deltagare,Gäst,Arrangör,Organisatör,Administratör,Värd"
     }
   },
   "qa": {
@@ -1746,6 +1749,8 @@
       "colCreatedAt": "Anmäld",
       "colEvent": "Evenemang",
       "colName": "Namn",
+      "colNickname": "Smeknamn",
+      "nicknameShown": "De andra ser personen som ”{nickname}”",
       "colEmail": "E-post",
       "colOrg": "Organisation",
       "colJoined": "Deltagit",
@@ -4745,6 +4750,7 @@
       "resultsDescription": "{count, plural, one {Uppgifter hittades för # evenemang.} other {Uppgifter hittades för # evenemang.}}",
       "registrationData": "Anmälningsuppgifter",
       "fieldName": "Namn",
+      "fieldNickname": "Smeknamn",
       "fieldEmail": "E-post",
       "fieldOrganization": "Organisation",
       "fieldRegisteredAt": "Anmälningsdatum",

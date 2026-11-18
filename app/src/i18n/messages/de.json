@@ -728,6 +728,9 @@
       "title": "Sie nehmen ohne Aufzeichnung teil.",
       "consent": "Ich stimme der Aufzeichnung zu",
       "body": "Sie haben nicht in die Aufzeichnung eingewilligt: Sie nehmen wie alle teil, aber Ihre Stimme bleibt außerhalb der Aufzeichnung. Ihr Gesicht und Ihr Name erscheinen ohnehin nie im Video."
+    },
+    "nickname": {
+      "reserved": "Moderator,Moderatorin,Referent,Referentin,Sprecher,Sprecherin,Teilnehmer,Teilnehmerin,Teilnehmende,Gast,Veranstalter,Veranstalterin,Organisator,Organisatorin,Administrator,Administratorin"
     }
   },
   "qa": {
@@ -1746,6 +1749,8 @@
       "colCreatedAt": "Anmeldedatum",
       "colEvent": "Veranstaltung",
       "colName": "Name",
+      "colNickname": "Spitzname",
+      "nicknameShown": "Für die anderen sichtbar als „{nickname}“",
       "colEmail": "E-Mail",
       "colOrg": "Organisation",
       "colJoined": "Teilgenommen",
@@ -4745,6 +4750,7 @@
       "resultsDescription": "{count, plural, one {Daten zu # Veranstaltung gefunden.} other {Daten zu # Veranstaltungen gefunden.}}",
       "registrationData": "Anmeldedaten",
       "fieldName": "Name",
+      "fieldNickname": "Spitzname",
       "fieldEmail": "E-Mail",
       "fieldOrganization": "Organisation",
       "fieldRegisteredAt": "Anmeldedatum",

@@ -728,6 +728,9 @@
       "title": "Osalete ilma salvestuseta.",
       "consent": "Annan nõusoleku salvestamiseks",
       "body": "Sa ei ole andnud nõusolekut salvestamiseks: osaled nagu kõik, kuid sinu hääl jääb salvestisest välja. Sinu nägu ja nimi ei ilmu videole niikuinii kunagi."
+    },
+    "nickname": {
+      "reserved": "Moderaator,Esineja,Kõneleja,Osaleja,Külaline,Korraldaja,Administraator,Võõrustaja"
     }
   },
   "qa": {
@@ -1746,6 +1749,8 @@
       "colCreatedAt": "Registreerimise kuupäev",
       "colEvent": "Sündmus",
       "colName": "Nimi",
+      "colNickname": "Hüüdnimi",
+      "nicknameShown": "Teised näevad teda kui „{nickname}“",
       "colEmail": "E-post",
       "colOrg": "Organisatsioon",
       "colJoined": "Osales",
@@ -4745,6 +4750,7 @@
       "resultsDescription": "{count, plural, one {Leiti andmeid # ürituse kohta.} other {Leiti andmeid # ürituse kohta.}}",
       "registrationData": "Registreerimisandmed",
       "fieldName": "Nimi",
+      "fieldNickname": "Hüüdnimi",
       "fieldEmail": "E-post",
       "fieldOrganization": "Organisatsioon",
       "fieldRegisteredAt": "Registreerimise kuupäev",

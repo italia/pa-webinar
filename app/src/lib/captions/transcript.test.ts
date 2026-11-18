@@ -81,6 +81,19 @@ describe('componiTrascrizione', () => {
     expect(t.speakers.map((s) => s.displayName)).toEqual(['Relatore 1', 'Moderatrice', 'Relatore 2']);
   });
 
+  it("un iscritto che cambia nickname durante l'evento e' uno solo, con l'ultimo", () => {
+    const iscrizione = '0b1f6c1e-2a3b-4c5d-8e9f-0a1b2c3d4e5f';
+    const t = componiTrascrizione(
+      [
+        frase(`reg-${iscrizione}-aaaa1111`, 'Pippo', 'Prima.', 1, 2),
+        frase(`reg-${iscrizione}-bbbb2222`, 'Pluto', 'Dopo.', 3, 4),
+      ],
+      t0,
+    );
+    expect(t.speakers).toHaveLength(1);
+    expect(t.speakers[0]!.displayName).toBe('Pluto');
+  });
+
   it('di chi non ha acconsentito restano solo i tempi, senza testo ne\' nome', () => {
     const t = componiTrascrizione([frase(null, null, null, 1, 2), frase('mod-1', 'M', 'Si.', 3, 4)], t0);
     expect(t.segments).toHaveLength(1);

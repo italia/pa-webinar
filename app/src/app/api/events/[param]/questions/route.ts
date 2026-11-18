@@ -20,6 +20,7 @@ import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { limiteDellaSala } from '@/lib/room-rate-limit';
 import { authorizePanelRead } from '@/lib/events/panel-read-access';
 import { getCached, setCache, deleteCacheByPrefix } from '@/lib/cache';
+import { nicknameDellIscrizione, nicknameDellOspite, nomeDiChiPartecipa } from '@/lib/live/nickname';
 import { pseudonimo } from '@/lib/live/pseudonym';
 import { guestSenderId } from '@/lib/chat/sender-key';
 
@@ -214,14 +215,18 @@ export const POST = withErrorHandling(async (request, context) => {
   if (token) {
     const registration = await prisma.registration.findUnique({
       where: { accessToken: token as string },
-      select: { id: true, eventId: true, displayName: true },
+      select: { id: true, eventId: true, displayName: true, nickname: true },
     });
     if (registration && registration.eventId === event.id) {
       registrationId = registration.id;
-      // Pubblico anonimo: lo pseudonimo del posto, lo stesso di video e chat.
-      authorName = event.audienceAnonymous
-        ? await pseudonimo(event.id, `reg-${registration.id}`)
-        : (tryDecryptPII(registration.displayName) ?? registration.displayName);
+      // Il nickname o, col pubblico anonimo, lo pseudonimo del posto: gli
+      // stessi di video e chat (lib/live/nickname).
+      authorName = await nomeDiChiPartecipa(
+        event,
+        `reg-${registration.id}`,
+        nicknameDellIscrizione(registration),
+        tryDecryptPII(registration.displayName) ?? registration.displayName,
+      );
     } else {
       // Un relatore ha un grant nominale, non una registrazione: cercarlo
       // solo fra gli iscritti gli faceva rifiutare la domanda con un errore
@@ -249,9 +254,14 @@ export const POST = withErrorHandling(async (request, context) => {
     if (name.length < 2) {
       throw new UnauthorizedError('guestName required for anonymous Q&A');
     }
-    authorName = event.audienceAnonymous
-      ? await pseudonimo(event.id, guestSenderId(getClientIp(request), name))
-      : name.slice(0, 80);
+    // Un ospite con il nickname lo usa anche qui, come in chat: vale se l'ha
+    // preso entrando (lib/live/nickname). Col pubblico anonimo, senza,
+    // lo pseudonimo.
+    const chiave = guestSenderId(getClientIp(request), name);
+    const conNickname =
+      event.audienceAnonymous && event.nicknamesEnabled && (await nicknameDellOspite(event.id, name, chiave));
+    authorName =
+      event.audienceAnonymous && !conNickname ? await pseudonimo(event.id, chiave) : name.slice(0, 80);
   }
 
   const parsed = createQuestionSchema.safeParse(rest);

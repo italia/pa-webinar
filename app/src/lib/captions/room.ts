@@ -8,6 +8,7 @@
  */
 import { prisma } from '@/lib/db';
 import { tryDecryptPII } from '@/lib/crypto/pii';
+import { nicknameDellIscrizione } from '@/lib/live/nickname';
 
 const CAMPI_EVENTO = {
   id: true,
@@ -108,7 +109,10 @@ export function iscrizioneDelPosto(seatId: string): string | null {
 
 export interface ConsensoTrascrizione {
   dato: boolean;
-  /** Il nome con cui la persona e' entrata, quando ha dato il consenso. */
+  /** Il nome con cui la persona e' in sala, quando ha dato il consenso: il
+   *  nickname dell'iscrizione se c'e' (lib/live/nickname), altrimenti quello
+   *  della prova o dell'iscrizione. Per gli altri posti la prova porta gia' il
+   *  nome della sala, nickname compreso. */
   nome: string | null;
 }
 
@@ -135,6 +139,7 @@ export async function consensoTrascrizione(
         where: { id: iscrizione, eventId },
         select: {
           displayName: true,
+          nickname: true,
           consentMultitrack: true,
           consentMultitrackVersion: true,
           consentMultitrackWithdrawnAt: true,
@@ -153,7 +158,11 @@ export async function consensoTrascrizione(
     if (!allIscrizione && !prova) return { dato: false, nome: null };
     return {
       dato: true,
-      nome: (prova ? tryDecryptPII(prova.displayName) : null) ?? tryDecryptPII(registrazione.displayName) ?? null,
+      nome:
+        nicknameDellIscrizione(registrazione) ??
+        (prova ? tryDecryptPII(prova.displayName) : null) ??
+        tryDecryptPII(registrazione.displayName) ??
+        null,
     };
   }
   const prova = await prisma.multitrackConsent.findFirst({

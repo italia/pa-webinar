@@ -207,6 +207,9 @@ export function componiTrascrizione(
     }
     const p = parlanti.get(etichetta);
     if (p) {
+      // Un iscritto puo' cambiare nickname durante l'evento: vale l'ultimo.
+      // Gli altri posti sono una persona per nome, e il nome non cambia.
+      if (nome && iscrizioneDelPosto(f.seatId)) p.displayName = nome;
       p.totalSpeechSec += end - start;
       for (const impronta of titolari?.get(f.seatId)?.impronte ?? []) p.titolari.add(impronta);
     }

@@ -728,6 +728,9 @@
       "title": "Dalyvaujate be įrašymo.",
       "consent": "Sutinku su įrašymu",
       "body": "Nesutikote su įrašymu: dalyvaujate kaip visi, bet jūsų balsas į įrašą nepatenka. Jūsų veidas ir vardas vaizdo įraše vis tiek niekada nerodomi."
+    },
+    "nickname": {
+      "reserved": "Moderatorius,Moderatorė,Pranešėjas,Pranešėja,Kalbėtojas,Kalbėtoja,Dalyvis,Dalyvė,Svečias,Viešnia,Organizatorius,Organizatorė,Administratorius,Administratorė"
     }
   },
   "qa": {
@@ -1746,6 +1749,8 @@
       "colCreatedAt": "Registracijos data",
       "colEvent": "Renginys",
       "colName": "Vardas",
+      "colNickname": "Pravardė",
+      "nicknameShown": "Kiti mato kaip „{nickname}“",
       "colEmail": "El. paštas",
       "colOrg": "Organizacija",
       "colJoined": "Dalyvavo",
@@ -4745,6 +4750,7 @@
       "resultsDescription": "{count, plural, one {Rasta duomenų, susijusių su # renginiu.} few {Rasta duomenų, susijusių su # renginiais.} many {Rasta duomenų, susijusių su # renginio.} other {Rasta duomenų, susijusių su # renginių.}}",
       "registrationData": "Registracijos duomenys",
       "fieldName": "Vardas",
+      "fieldNickname": "Pravardė",
       "fieldEmail": "El. paštas",
       "fieldOrganization": "Organizacija",
       "fieldRegisteredAt": "Registracijos data",

@@ -728,6 +728,9 @@
       "title": "Uczestniczysz bez nagrywania.",
       "consent": "Wyrażam zgodę na nagrywanie",
       "body": "Bez zgody na nagrywanie uczestniczysz jak wszyscy, ale twój głos pozostaje poza nagraniem. Twoja twarz oraz twoje imię i nazwisko i tak nigdy nie pojawiają się w nagraniu wideo."
+    },
+    "nickname": {
+      "reserved": "Moderator,Moderatorka,Prelegent,Prelegentka,Mówca,Uczestnik,Uczestniczka,Gość,Organizator,Organizatorka,Administrator,Administratorka,Prowadzący,Prowadząca"
     }
   },
   "qa": {
@@ -1746,6 +1749,8 @@
       "colCreatedAt": "Data rejestracji",
       "colEvent": "Wydarzenie",
       "colName": "Imię i nazwisko",
+      "colNickname": "Nick",
+      "nicknameShown": "Inni widzą tę osobę jako „{nickname}”",
       "colEmail": "E-mail",
       "colOrg": "Organizacja",
       "colJoined": "Uczestniczył",
@@ -4745,6 +4750,7 @@
       "resultsDescription": "{count, plural, one {Znaleziono dane dotyczące # wydarzenia.} few {Znaleziono dane dotyczące # wydarzeń.} many {Znaleziono dane dotyczące # wydarzeń.} other {Znaleziono dane dotyczące # wydarzenia.}}",
       "registrationData": "Dane rejestracyjne",
       "fieldName": "Imię",
+      "fieldNickname": "Nick",
       "fieldEmail": "E-mail",
       "fieldOrganization": "Instytucja",
       "fieldRegisteredAt": "Data rejestracji",

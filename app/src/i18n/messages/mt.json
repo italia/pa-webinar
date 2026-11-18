@@ -728,6 +728,9 @@
       "title": "Qed tipparteċipa mingħajr reġistrazzjoni.",
       "consent": "Nagħti l-kunsens għar-reġistrazzjoni",
       "body": "Ma tajtx il-kunsens għar-reġistrazzjoni: qed tipparteċipa bħal kulħadd, iżda leħnek jibqa' barra mir-reġistrazzjoni. Wiċċek u ismek xorta qatt ma jidhru fil-vidjo."
+    },
+    "nickname": {
+      "reserved": "Moderatur,Moderatriċi,Kelliem,Kelliema,Parteċipant,Mistieden,Mistiedna,Organizzatur,Organizzatriċi,Amministratur,Amministratriċi"
     }
   },
   "qa": {
@@ -1746,6 +1749,8 @@
       "colCreatedAt": "Data reġistrazzjoni",
       "colEvent": "Avveniment",
       "colName": "Isem",
+      "colNickname": "Laqam",
+      "nicknameShown": "L-oħrajn jarawh bħala “{nickname}”",
       "colEmail": "Email",
       "colOrg": "Organizzazzjoni",
       "colJoined": "Ipparteċipato",
@@ -4745,6 +4750,7 @@
       "resultsDescription": "{count, plural, one {Dejta misjuba relatata ma' # avveniment.} two {Dejta misjuba relatata ma' # avvenimenti.} few {Dejta misjuba relatata ma' # avvenimenti.} many {Dejta misjuba relatata ma' #-il avveniment.} other {Dejta misjuba relatata ma' # avveniment.}}",
       "registrationData": "Dejta tar-reġistrazzjoni",
       "fieldName": "Isem",
+      "fieldNickname": "Laqam",
       "fieldEmail": "Email",
       "fieldOrganization": "Entità",
       "fieldRegisteredAt": "Data tar-reġistrazzjoni",

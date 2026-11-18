@@ -42,6 +42,8 @@ interface RegistrationRow {
   eventSlug: string;
   eventStartsAt: string;
   displayName: string;
+  /** Il nickname con cui la persona compare agli altri (lib/live/nickname). */
+  nickname: string | null;
   email: string;
   organization: string | null;
   organizationRole: string | null;
@@ -133,6 +135,7 @@ export const GET = withErrorHandling(async (request) => {
     eventSlug: r.event.slug,
     eventStartsAt: r.event.startsAt.toISOString(),
     displayName: tryDecryptPII(r.displayName) ?? r.displayName,
+    nickname: tryDecryptPII(r.nickname),
     email: bestEffortDecrypt(r.email),
     organization: r.organization,
     organizationRole: r.organizationRole,
@@ -163,6 +166,8 @@ export const GET = withErrorHandling(async (request) => {
       'consent_multitrack',
       'consent_future_communications',
       'joined',
+      // In fondo: chi legge le colonne per posizione le ritrova dov'erano.
+      'nickname',
     ];
     const lines = [header.join(',')];
     for (const r of mapped) {
@@ -180,6 +185,7 @@ export const GET = withErrorHandling(async (request) => {
         r.consentMultitrack === null ? '' : r.consentMultitrack ? 'yes' : 'no',
         r.consentFutureCommunications ? 'yes' : 'no',
         r.joinedAt ? 'yes' : 'no',
+        csvEscape(r.nickname),
       ].join(','));
     }
     const body = lines.join('\n');

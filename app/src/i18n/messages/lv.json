@@ -728,6 +728,9 @@
       "title": "Jūs piedalāties bez ierakstīšanas.",
       "consent": "Piekrītu ierakstīšanai",
       "body": "Jūs neesat devis piekrišanu ierakstīšanai: jūs piedalāties kā visi, bet jūsu balss paliek ārpus ieraksta. Jūsu seja un vārds video tik un tā nekad neparādās."
+    },
+    "nickname": {
+      "reserved": "Moderators,Moderatore,Runātājs,Runātāja,Lektors,Lektore,Dalībnieks,Dalībniece,Viesis,Viešņa,Organizators,Organizatore,Administrators,Administratore"
     }
   },
   "qa": {
@@ -1746,6 +1749,8 @@
       "colCreatedAt": "Reģistrēts",
       "colEvent": "Pasākums",
       "colName": "Vārds",
+      "colNickname": "Segvārds",
+      "nicknameShown": "Citi redz kā “{nickname}”",
       "colEmail": "E-pasts",
       "colOrg": "Organizācija",
       "colJoined": "Piedalījies",
@@ -4745,6 +4750,7 @@
       "resultsDescription": "{count, plural, zero {Atrasti dati, kas saistīti ar # pasākumiem.} one {Atrasti dati, kas saistīti ar # pasākumu.} other {Atrasti dati, kas saistīti ar # pasākumiem.}}",
       "registrationData": "Reģistrācijas dati",
       "fieldName": "Vārds",
+      "fieldNickname": "Segvārds",
       "fieldEmail": "E-pasts",
       "fieldOrganization": "Organizācija",
       "fieldRegisteredAt": "Reģistrācijas datums",

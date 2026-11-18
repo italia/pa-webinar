@@ -728,6 +728,9 @@
       "title": "Participi fără înregistrare.",
       "consent": "Îmi dau consimțământul pentru înregistrare",
       "body": "Nu ți-ai dat consimțământul pentru înregistrare: participi ca toți ceilalți, dar vocea ta rămâne în afara înregistrării. Fața și numele tău nu apar oricum niciodată în videoclip."
+    },
+    "nickname": {
+      "reserved": "Moderator,Moderatoare,Vorbitor,Vorbitoare,Participant,Participantă,Invitat,Invitată,Organizator,Organizatoare,Administrator,Administratoare,Gazdă"
     }
   },
   "qa": {
@@ -1746,6 +1749,8 @@
       "colCreatedAt": "Data înscrierii",
       "colEvent": "Eveniment",
       "colName": "Nume",
+      "colNickname": "Poreclă",
+      "nicknameShown": "Ceilalți îl văd ca „{nickname}”",
       "colEmail": "E-mail",
       "colOrg": "Organizație",
       "colJoined": "Au participat",
@@ -4745,6 +4750,7 @@
       "resultsDescription": "{count, plural, one {S-au găsit date referitoare la # eveniment.} few {S-au găsit date referitoare la # evenimente.} other {S-au găsit date referitoare la # de evenimente.}}",
       "registrationData": "Date de înregistrare",
       "fieldName": "Nume",
+      "fieldNickname": "Poreclă",
       "fieldEmail": "E-mail",
       "fieldOrganization": "Instituție",
       "fieldRegisteredAt": "Data înregistrării",

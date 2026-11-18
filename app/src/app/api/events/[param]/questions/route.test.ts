@@ -36,10 +36,16 @@ vi.mock('@/lib/live/pseudonym', () => ({
 }));
 const { siteSettings } = vi.hoisted(() => ({ siteSettings: { guestAccessEnabled: true } }));
 vi.mock('@/lib/settings', () => ({ getSettings: async () => siteSettings }));
+const nick = vi.hoisted(() => ({ presi: new Set<string>() }));
+vi.mock('@/lib/live/nickname', async (orig) => ({
+  ...(await orig<typeof Nickname>()),
+  nicknameDellOspite: vi.fn(async (_e: string, nome: string) => nick.presi.has(nome)),
+}));
 
 import { getCached, setCache } from '@/lib/cache';
 import { prisma } from '@/lib/db';
 import { hasJoinGrant } from '@/lib/events/join-grant';
+import type * as Nickname from '@/lib/live/nickname';
 
 import { GET, POST } from './route';
 
@@ -427,6 +433,40 @@ describe('POST /api/events/[slug]/questions — pubblico anonimo', () => {
     );
     expect(res.status).toBe(201);
     expect(nomeSalvato()).toBe('Relatrice');
+  });
+
+  it('l’iscritto con un nickname chiede con quello, al posto dello pseudonimo', async () => {
+    mockedRegistration.mockResolvedValue({
+      id: 'reg-43',
+      eventId: EVENT_ID,
+      displayName: 'Anna Rossi',
+      nickname: 'Pippo',
+    });
+    await POST(chiedi({ text: 'Domanda col nickname', accessToken: 'TOKEN_ISCRITTO' }, '203.0.113.75'), ctx());
+    expect(nomeSalvato()).toBe('Pippo');
+  });
+
+  it('l’ospite con il nickname preso entrando chiede con quello; senza l’opzione, lo pseudonimo', async () => {
+    nick.presi.add('Pippo');
+    try {
+      mockedEvent.mockResolvedValue({
+        id: EVENT_ID,
+        status: 'LIVE',
+        eventType: 'SCHEDULED',
+        moderatorToken: PRIMARY_TOKEN,
+        joinPasswordHash: null,
+        qaEnabled: true,
+        audienceAnonymous: true,
+        nicknamesEnabled: true,
+      });
+      await POST(chiedi({ text: 'Domanda da ospite', guestName: 'Pippo' }, '203.0.113.76'), ctx());
+      expect(nomeSalvato()).toBe('Pippo');
+      mockedCreate.mockClear();
+      await POST(chiedi({ text: 'Altra domanda', guestName: 'Pluto' }, '203.0.113.77'), ctx());
+      expect(nomeSalvato()).toMatch(/^Pseudo /);
+    } finally {
+      nick.presi.clear();
+    }
   });
 
   it('senza pseudonimi l’iscritto chiede col suo nome', async () => {

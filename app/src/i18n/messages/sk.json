@@ -728,6 +728,9 @@
       "title": "Zúčastňujete sa bez nahrávania.",
       "consent": "Súhlasím s nahrávaním",
       "body": "Nedali ste súhlas s nahrávaním: zúčastňujete sa ako všetci, ale váš hlas zostáva mimo záznamu. Vaša tvár a vaše meno sa vo videu aj tak nikdy nezobrazia."
+    },
+    "nickname": {
+      "reserved": "Moderátor,Moderátorka,Rečník,Rečníčka,Prednášajúci,Účastník,Účastníčka,Hosť,Organizátor,Organizátorka,Administrátor,Správca"
     }
   },
   "qa": {
@@ -1746,6 +1749,8 @@
       "colCreatedAt": "Dátum registrácie",
       "colEvent": "Podujatie",
       "colName": "Meno",
+      "colNickname": "Prezývka",
+      "nicknameShown": "Ostatným sa zobrazuje ako „{nickname}“",
       "colEmail": "E-mail",
       "colOrg": "Organizácia",
       "colJoined": "Zúčastnil sa",
@@ -4745,6 +4750,7 @@
       "resultsDescription": "{count, plural, one {Nájdené údaje vzťahujúce sa k # udalosti.} few {Nájdené údaje vzťahujúce sa k # udalostiam.} many {Nájdené údaje vzťahujúce sa k # udalosti.} other {Nájdené údaje vzťahujúce sa k # udalostiam.}}",
       "registrationData": "Registračné údaje",
       "fieldName": "Meno",
+      "fieldNickname": "Prezývka",
       "fieldEmail": "E-mail",
       "fieldOrganization": "Organizácia",
       "fieldRegisteredAt": "Dátum registrácie",

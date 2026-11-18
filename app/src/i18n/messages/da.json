@@ -728,6 +728,9 @@
       "title": "Du deltager uden optagelse.",
       "consent": "Jeg giver samtykke til optagelsen",
       "body": "Du har ikke givet samtykke til optagelsen: du deltager som alle andre, men din stemme er ikke med i optagelsen. Dit ansigt og dit navn vises under alle omstændigheder aldrig i videoen."
+    },
+    "nickname": {
+      "reserved": "Moderator,Taler,Oplægsholder,Deltager,Gæst,Arrangør,Administrator,Vært"
     }
   },
   "qa": {
@@ -1746,6 +1749,8 @@
       "colCreatedAt": "Tilmeldingsdato",
       "colEvent": "Arrangement",
       "colName": "Navn",
+      "colNickname": "Kaldenavn",
+      "nicknameShown": "De andre ser personen som »{nickname}«",
       "colEmail": "E-mail",
       "colOrg": "Organisation",
       "colJoined": "Deltaget",
@@ -4745,6 +4750,7 @@
       "resultsDescription": "{count, plural, one {Data fundet for # begivenhed.} other {Data fundet for # begivenheder.}}",
       "registrationData": "Tilmeldingsdata",
       "fieldName": "Navn",
+      "fieldNickname": "Kaldenavn",
       "fieldEmail": "E-mail",
       "fieldOrganization": "Organisation",
       "fieldRegisteredAt": "Tilmeldingsdato",

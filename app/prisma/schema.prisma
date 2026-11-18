@@ -945,6 +945,14 @@ model Registration {
   // persona non la conferma (lib/persons/spunta-in-attesa).
   addressBookPending Boolean @default(false) @map("address_book_pending")
 
+  // Il nickname scelto in sala d'attesa o in sala (Event.nicknamesEnabled),
+  // cifrato come il nome: gli altri lo vedono al posto del nome. Null: nessuno.
+  // `nicknameKey` e' la sua impronta per l'evento (lib/live/nickname), per
+  // tenerlo unico senza decifrare gli altri. Dato personale: va via con
+  // l'iscrizione.
+  nickname    String? @map("nickname")
+  nicknameKey String? @map("nickname_key") @db.VarChar(64)
+
   // Access token (for personal join link)
   accessToken String @unique @map("access_token") // nanoid
 
@@ -987,6 +995,7 @@ model Registration {
   recordingConsents      RecordingConsent[]
 
   @@unique([eventId, emailHash])
+  @@unique([eventId, nicknameKey])
   @@index([personId])
   // Ritiro, rubrica e richieste dell'interessato cercano per indirizzo in tutti
   // gli eventi.

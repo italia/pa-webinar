@@ -728,6 +728,9 @@
       "title": "Osallistut ilman tallennusta.",
       "consent": "Annan suostumuksen tallennukseen",
       "body": "Et ole antanut suostumusta tallennukseen: osallistut kuten kaikki, mutta äänesi jää tallenteen ulkopuolelle. Kasvosi ja nimesi eivät muutenkaan koskaan näy videolla."
+    },
+    "nickname": {
+      "reserved": "Moderaattori,Puhuja,Esiintyjä,Osallistuja,Vieras,Järjestäjä,Ylläpitäjä,Juontaja"
     }
   },
   "qa": {
@@ -1746,6 +1749,8 @@
       "colCreatedAt": "Ilmoittautumispäivä",
       "colEvent": "Tapahtuma",
       "colName": "Nimi",
+      "colNickname": "Nimimerkki",
+      "nicknameShown": "Muille näkyy nimellä ”{nickname}”",
       "colEmail": "Sähköposti",
       "colOrg": "Organisaatio",
       "colJoined": "Osallistunut",
@@ -4745,6 +4750,7 @@
       "resultsDescription": "{count, plural, one {Löydettiin tietoja # tapahtumasta.} other {Löydettiin tietoja # tapahtumasta.}}",
       "registrationData": "Ilmoittautumistiedot",
       "fieldName": "Nimi",
+      "fieldNickname": "Nimimerkki",
       "fieldEmail": "Sähköposti",
       "fieldOrganization": "Organisaatio",
       "fieldRegisteredAt": "Ilmoittautumispäivä",

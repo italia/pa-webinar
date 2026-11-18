@@ -414,6 +414,8 @@ export const GET = withErrorHandling(async (request) => {
           captionsTranscriptsDeleted = conSottotitoli.length;
         }
 
+        // Con le iscrizioni vanno anche i nickname scelti (cifrati, con la loro
+        // impronta). Quelli degli ospiti stavano solo in Redis, con scadenza.
         const registrationsDeleted = await tx.registration.deleteMany({
           where: { eventId: evt.id },
         });

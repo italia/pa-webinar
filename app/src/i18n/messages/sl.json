@@ -728,6 +728,9 @@
       "title": "Sodelujete brez snemanja.",
       "consent": "Privolim v snemanje",
       "body": "Niste privolili v snemanje: sodelujete kot vsi, vaš glas pa ostane zunaj posnetka. Vaš obraz in vaše ime se v videu tako ali tako nikoli ne pojavita."
+    },
+    "nickname": {
+      "reserved": "Moderator,Moderatorka,Govornik,Govornica,Predavatelj,Predavateljica,Udeleženec,Udeleženka,Gost,Gostja,Organizator,Organizatorka,Administrator,Skrbnik,Gostitelj"
     }
   },
   "qa": {
@@ -1746,6 +1749,8 @@
       "colCreatedAt": "Datum prijave",
       "colEvent": "Dogodek",
       "colName": "Ime",
+      "colNickname": "Vzdevek",
+      "nicknameShown": "Drugi ga vidijo kot »{nickname}«",
       "colEmail": "E-pošta",
       "colOrg": "Organizacija",
       "colJoined": "Udeležil se",
@@ -4745,6 +4750,7 @@
       "resultsDescription": "{count, plural, one {Najdeni podatki za # dogodek.} two {Najdeni podatki za # dogodka.} few {Najdeni podatki za # dogodke.} other {Najdeni podatki za # dogodkov.}}",
       "registrationData": "Podatki o prijavi",
       "fieldName": "Ime",
+      "fieldNickname": "Vzdevek",
       "fieldEmail": "E-pošta",
       "fieldOrganization": "Organizacija",
       "fieldRegisteredAt": "Datum prijave",

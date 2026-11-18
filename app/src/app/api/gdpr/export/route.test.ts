@@ -162,6 +162,17 @@ describe('cosa si consegna', () => {
     expect(testo).not.toContain(HASH);
   });
 
+  it('il nickname scelto per l’evento è nei propri dati, in chiaro, ma non la sua impronta', async () => {
+    prisma.registration.findMany.mockResolvedValue([
+      iscrizione('r1', 'e1', { nickname: encryptPII('Pippo'), nicknameKey: 'impronta-del-nickname' }),
+      iscrizione('r2', 'e2'),
+    ]);
+    const testo = await (await conToken()).text();
+    const corpo = JSON.parse(testo) as { data: Array<{ registration: Record<string, unknown> }> };
+    expect(corpo.data.map((d) => d.registration.nickname)).toEqual(['Pippo', null]);
+    expect(testo).not.toContain('impronta-del-nickname');
+  });
+
   it('un’email che non si decifra non blocca il resto', async () => {
     prisma.registration.findMany.mockResolvedValue([
       iscrizione('r1', 'e1', { email: 'guasta' }),
