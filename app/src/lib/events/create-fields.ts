@@ -73,6 +73,7 @@ export const CREATED_EVENT_FIELDS = [
   'recordingConsentText',
   'audienceAnonymous',
   'participantListVisible',
+  'nicknamesEnabled',
   'hostsAlwaysRecorded',
 
   // registrazione e pubblicazione

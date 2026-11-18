@@ -295,6 +295,14 @@ model Event {
   // vasta scala (lib/events/guided-format).
   audienceAnonymous Boolean @default(false) @map("audience_anonymous")
 
+  // Chi partecipa (non chi conduce) puo' scegliere un nickname, che gli altri
+  // vedono al posto del nome: in video, in chat, nelle domande e nella
+  // trascrizione (lib/live/nickname). Col pubblico anonimo prende il posto
+  // dello pseudonimo. Il formato lo accende dove l'elenco e' nascosto; chi
+  // organizza lo accende anche per un incontro riservato. A sala aperta non
+  // si cambia: spegnerlo rimetterebbe i nomi al posto dei nickname.
+  nicknamesEnabled Boolean @default(false) @map("nicknames_enabled")
+
   // L'elenco di chi partecipa, per il pubblico: la scheda Partecipanti, la
   // griglia e la striscia dei video, i nomi nella piazza. Parte dal formato
   // dell'evento, e lo decide chi organizza. Chi conduce e chi interviene lo
@@ -1440,6 +1448,7 @@ model EventTemplate {
   // - hostsAlwaysRecorded: spento, chi conduce sceglie come tutti.
   recordingDestination RecordingAudience? @map("recording_destination")
   audienceAnonymous    Boolean @default(false) @map("audience_anonymous")
+  nicknamesEnabled     Boolean @default(false) @map("nicknames_enabled")
   hostsAlwaysRecorded  Boolean @default(false) @map("hosts_always_recorded")
   offerAddressBook     Boolean @default(true) @map("offer_address_book")
 

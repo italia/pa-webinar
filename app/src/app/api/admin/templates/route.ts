@@ -37,6 +37,9 @@ const templateSchema = z.object({
   offerAddressBook: z.boolean().optional(),
   // Chi partecipa compare con uno pseudonimo (Event.audienceAnonymous).
   audienceAnonymous: z.boolean().optional(),
+  // Chi partecipa puo' usare un nickname anche dove l'elenco si vede
+  // (Event.nicknamesEnabled; dove e' nascosto lo e' comunque, di partenza).
+  nicknamesEnabled: z.boolean().optional(),
   // Chi conduce e' sempre nella registrazione (Event.hostsAlwaysRecorded).
   hostsAlwaysRecorded: z.boolean().optional(),
   whiteboardEnabled: z.boolean().optional(),

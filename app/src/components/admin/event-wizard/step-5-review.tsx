@@ -633,6 +633,9 @@ export default function Step5Review({
                   {tf(form.audienceAnonymous ? 'audiencePseudonyms' : 'audienceRealNames')}
                 </span>
               )}
+              {form.nicknamesEnabled && (
+                <span className="d-block">{tf('audienceNicknames')}</span>
+              )}
               {!istantanea && toggles.qaEnabled && (
                 <span className="d-block">
                   {/* Con la pagina privata nessuno le legge, come nell'anteprima

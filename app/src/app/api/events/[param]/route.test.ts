@@ -144,6 +144,7 @@ function eventoEsistente(status = 'PUBLISHED') {
     participantsCanStartVideo: false,
     participantsCanShareScreen: false,
     participantListVisible: false,
+    nicknamesEnabled: false,
     expectedSenderRatioPct: null,
     // La configurazione che una modifica parziale non deve poter cancellare.
     requireOrganization: true,
@@ -186,6 +187,7 @@ const MAI_SENZA_INVIO = [
   'privacyPolicyText',
   'gdprTemplateId',
   'participantListVisible',
+  'nicknamesEnabled',
 ] as const;
 
 describe('PUT /api/events/[param] — le modifiche parziali restano parziali', () => {
@@ -236,6 +238,20 @@ describe('PUT /api/events/[param] — le modifiche parziali restano parziali', (
     expect(datiScritti()).not.toHaveProperty('hostsAlwaysRecorded');
   });
 
+
+  it('i nickname non si accendono ne\' si spengono a sala aperta', async () => {
+    sala.salaForseAperta.mockResolvedValueOnce(true);
+
+    await PUT(richiesta({ nicknamesEnabled: true, title: { it: 'Altro' } }), contesto as never);
+
+    expect(datiScritti()).not.toHaveProperty('nicknamesEnabled');
+  });
+
+  it('i nickname si scelgono a sala chiusa', async () => {
+    await PUT(richiesta({ nicknamesEnabled: true }), contesto as never);
+
+    expect(datiScritti()).toMatchObject({ nicknamesEnabled: true });
+  });
 
   it("l'elenco dei partecipanti si sceglie a sala chiusa", async () => {
     await PUT(richiesta({ participantListVisible: true }), contesto as never);

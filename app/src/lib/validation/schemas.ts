@@ -123,6 +123,9 @@ export const eventBaseSchema = z.object({
   // L'elenco di chi partecipa, per il pubblico: senza una scelta, lo decide il
   // formato dell'evento (lib/live/participant-list).
   participantListVisible: z.boolean().optional(),
+  // Chi partecipa puo' usare un nickname (lib/live/nickname): senza una
+  // scelta, acceso dove l'elenco e' nascosto (nicknamePredefinito).
+  nicknamesEnabled: z.boolean().optional(),
   // Moderatori e relatori sempre nella registrazione, per dichiarazione di chi
   // organizza. Niente default: un aggiornamento parziale non lo azzera.
   hostsAlwaysRecorded: z.boolean().optional(),

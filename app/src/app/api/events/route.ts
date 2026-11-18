@@ -12,7 +12,7 @@ import { prisma } from '@/lib/db';
 import { catalogoDiCreazione, MODELLO_PER_CATALOGO } from '@/lib/events/catalog';
 import { tagIdsFromSlugs } from '@/lib/events/event-tags';
 import { usablePersonPhotoId } from '@/lib/events/person-photo-store';
-import { elencoPredefinito } from '@/lib/live/participant-list';
+import { elencoPredefinito, nicknamePredefinito } from '@/lib/live/participant-list';
 import {
   assertEsposizioneConsentita,
   destinazioneDiPartenza,
@@ -124,6 +124,10 @@ export const POST = withErrorHandling(async (request) => {
         participantsCanStartVideo: data.participantsCanStartVideo,
         participantsCanShareScreen: data.participantsCanShareScreen,
       };
+  // L'elenco di partenza, e il nickname che ne segue senza una scelta.
+  const elencoDiPartenza =
+    data.participantListVisible ??
+    elencoPredefinito({ ...effectiveToggles, maxParticipants: data.maxParticipants });
 
   // Un evento nuovo che registra dichiara dove va il video: senza una scelta
   // resta riservato, anche con un null esplicito, perche' allargare e' un atto
@@ -258,9 +262,13 @@ export const POST = withErrorHandling(async (request) => {
         recordingConsentText: data.recordingConsentText,
       }),
       audienceAnonymous: data.audienceAnonymous,
-      participantListVisible:
-        data.participantListVisible ??
-        elencoPredefinito({ ...effectiveToggles, maxParticipants: data.maxParticipants }),
+      participantListVisible: elencoDiPartenza,
+      nicknamesEnabled:
+        data.nicknamesEnabled ??
+        nicknamePredefinito({
+          audienceAnonymous: data.audienceAnonymous,
+          participantListVisible: elencoDiPartenza,
+        }),
       ...(data.hostsAlwaysRecorded !== undefined && { hostsAlwaysRecorded: data.hostsAlwaysRecorded }),
       ...(data.offerAddressBook !== undefined && { offerAddressBook: data.offerAddressBook }),
       ...(data.wordCloudEnabled !== undefined && {

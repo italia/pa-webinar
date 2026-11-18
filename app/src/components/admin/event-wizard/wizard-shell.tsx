@@ -31,7 +31,7 @@ import type { EventFormatClass, RecordingAudience } from '@prisma/client';
 import { useRouter, percorso } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
 import type { VoceNelVideo } from '@/lib/live/consent-rule';
-import { elencoPredefinito } from '@/lib/live/participant-list';
+import { elencoPredefinito, nicknamePredefinito } from '@/lib/live/participant-list';
 import { profiloSalvato } from '@/lib/events/grant-profile';
 import { eventAdminPath } from '@/lib/events/admin-links';
 import { MAX_RETENTION_DAYS } from '@/lib/validation/retention';
@@ -192,6 +192,8 @@ export interface WizardTemplatePreset {
   offerAddressBook?: boolean;
   /** Chi partecipa compare con uno pseudonimo. */
   audienceAnonymous?: boolean;
+  /** Chi partecipa puo' usare un nickname, anche dove l'elenco si vede. */
+  nicknamesEnabled?: boolean;
   /** Chi conduce e' sempre nella registrazione. */
   hostsAlwaysRecorded?: boolean;
   /** Le domande restano sulla pagina dopo l'evento. */
@@ -357,6 +359,7 @@ export interface InitialEventShape {
     autoStartRecording: boolean;
     audienceAnonymous?: boolean;
     participantListVisible?: boolean;
+    nicknamesEnabled?: boolean;
     hostsAlwaysRecorded?: boolean;
     recordingDestination?: RecordingAudience | null;
     recordingAudience: RecordingAudience;
@@ -624,6 +627,7 @@ export default function EventWizard(props: WizardProps) {
         captionsTranscriptEnabled: ev.captionsTranscriptEnabled ?? false,
         autoStartRecording: ev.autoStartRecording,
         participantListVisible: ev.participantListVisible ?? false,
+        nicknamesEnabled: ev.nicknamesEnabled ?? false,
         ...campiDaEvento(ev),
         aiTranscriptEnabled: ev.aiTranscriptEnabled ?? false,
         aiSummaryEnabled: ev.aiSummaryEnabled ?? false,
@@ -745,6 +749,10 @@ export default function EventWizard(props: WizardProps) {
           participantsCanShareScreen: tpl.participantsCanShareScreen,
         }))
       : defaultMatrix();
+    const elencoDiPartenza = elencoPredefinito({
+      ...togglesFromMatrix(matrix),
+      maxParticipants: tpl?.maxParticipants ?? 300,
+    });
     return {
       // Step 1
       title: { it: '', en: '' },
@@ -789,10 +797,15 @@ export default function EventWizard(props: WizardProps) {
       autoStartRecording: false,
       ...campiDelModello,
       recordingDestination: destinazione,
-      participantListVisible: elencoPredefinito({
-        ...togglesFromMatrix(matrix),
-        maxParticipants: tpl?.maxParticipants ?? 300,
-      }),
+      participantListVisible: elencoDiPartenza,
+      // Il nickname segue l'elenco (nicknamePredefinito), o il modello che lo
+      // accende comunque.
+      nicknamesEnabled:
+        (tpl?.nicknamesEnabled ?? false) ||
+        nicknamePredefinito({
+          participantListVisible: elencoDiPartenza,
+          audienceAnonymous: campiDelModello.audienceAnonymous,
+        }),
       // Default AI dal template (semplificazione): un template "registrato"
       // può pre-attivare trascrizione/sintesi. La trascrizione richiede la
       // registrazione, quindi la attiviamo solo se recordingEnabled, e solo
@@ -1152,6 +1165,8 @@ export default function EventWizard(props: WizardProps) {
   // Finche' chi organizza non sceglie, l'elenco segue chi puo' parlare o
   // mostrarsi e quante persone si aspettano: non su un evento che esiste gia'.
   const elencoSceltoRef = useRef(mode === 'edit');
+  // Lo stesso per il nickname, che di partenza segue l'elenco.
+  const nicknameSceltoRef = useRef(mode === 'edit');
   // Finche' chi organizza non sceglie, un evento che diventa su invito torna alla
   // destinazione proposta. Quella di un evento che esiste gia' e' stata dichiarata.
   const [destinazioneScelta, setDestinazioneScelta] = useState(
@@ -1164,6 +1179,7 @@ export default function EventWizard(props: WizardProps) {
   const updateForm = useCallback(
     (patch: Partial<WizardForm>) => {
       if ('participantListVisible' in patch) elencoSceltoRef.current = true;
+      if ('nicknamesEnabled' in patch) nicknameSceltoRef.current = true;
       if ('recordingDestination' in patch) setDestinazioneScelta(true);
       if ('postEventPublic' in patch) setPaginaScelta(true);
       setForm((prev) => {
@@ -1190,6 +1206,16 @@ export default function EventWizard(props: WizardProps) {
             maxParticipants: next.maxParticipants,
           });
         }
+        // Finche' chi organizza non sceglie, il nickname segue l'elenco e il
+        // pubblico anonimo: acceso dove gli altri non si vedono per nome.
+        if (
+          !nicknameSceltoRef.current &&
+          (next.participantListVisible !== prev.participantListVisible ||
+            next.audienceAnonymous !== prev.audienceAnonymous)
+        ) {
+          next.nicknamesEnabled =
+            (props.template?.nicknamesEnabled ?? false) || nicknamePredefinito(next);
+        }
         return 'moderators' in patch || 'speakers' in patch ? conSceltePulite(next) : next;
       });
     },
@@ -1199,6 +1225,7 @@ export default function EventWizard(props: WizardProps) {
       initial,
       paginaScelta,
       props.publicRegistrationEnabled,
+      props.template?.nicknamesEnabled,
       viaToken,
     ],
   );
@@ -1474,6 +1501,7 @@ export default function EventWizard(props: WizardProps) {
       if (!dati || typeof at !== 'number' || Date.now() - at > TRASLOCO_VALIDO_MS) return;
       traslocoRef.current = true;
       if (dati.participantListVisible !== undefined) elencoSceltoRef.current = true;
+      if (dati.nicknamesEnabled !== undefined) nicknameSceltoRef.current = true;
       setForm((prima) => conDatiDellEvento(prima, dati));
       setTraslocoApplicato(true);
     } catch {
@@ -1536,6 +1564,7 @@ export default function EventWizard(props: WizardProps) {
 
   const restoreDraft = useCallback(() => {
     elencoSceltoRef.current = true;
+    nicknameSceltoRef.current = true;
     const salvata = savedDraftRef.current;
     // Sopra il modulo di partenza, non al suo posto: una bozza salvata prima
     // che il modulo avesse un campo nuovo non lo lascerebbe vuoto.
@@ -1836,6 +1865,7 @@ export default function EventWizard(props: WizardProps) {
       const dati = datiCambiati(form, initial);
       // Non scelto da nessuno: lo decide il formato nuovo.
       if (!elencoSceltoRef.current) delete dati.participantListVisible;
+      if (!nicknameSceltoRef.current) delete dati.nicknamesEnabled;
       if (Object.keys(dati).length > 0) {
         localStorage.setItem(TRASLOCO_KEY, JSON.stringify({ at: Date.now(), dati }));
       }
@@ -1998,6 +2028,7 @@ export default function EventWizard(props: WizardProps) {
           captionsTranscriptEnabled: form.liveCaptionsEnabled && form.captionsTranscriptEnabled,
           autoStartRecording: form.recordingEnabled && form.autoStartRecording,
           participantListVisible: form.participantListVisible,
+          nicknamesEnabled: form.nicknamesEnabled,
           // I valori del formato: destinazione, rubrica, nomi del pubblico, chi
           // conduce e domande dopo l'evento.
           ...campiDaSalvare(
@@ -2499,6 +2530,7 @@ export default function EventWizard(props: WizardProps) {
             onClick={() => {
               setForm(initial);
               elencoSceltoRef.current = mode === 'edit';
+              nicknameSceltoRef.current = mode === 'edit';
               setDestinazioneScelta(mode === 'edit' || !!props.destinazioneScelta);
               setPaginaScelta(false);
               setTraslocoApplicato(false);
