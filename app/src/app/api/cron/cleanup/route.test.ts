@@ -57,7 +57,7 @@ vi.mock('@/lib/db', () => ({
     recordingRedactionRequest: { deleteMany: vi.fn() },
     recording: { findMany: vi.fn(), deleteMany: vi.fn(), updateMany: vi.fn() },
     postprodArtifact: { deleteMany: vi.fn(), count: vi.fn() },
-    postprodJob: { updateMany: vi.fn() },
+    postprodJob: { updateMany: vi.fn(), count: vi.fn() },
     speaker: { deleteMany: vi.fn() },
     reaction: { deleteMany: vi.fn() },
     agendaItemReaction: { deleteMany: vi.fn() },
@@ -74,7 +74,10 @@ vi.mock('@/lib/db', () => ({
 vi.mock('@/lib/settings', () => ({
   getSettings: vi.fn(async () => ({ eventGracePeriodMinutes: 15 })),
 }));
-vi.mock('@/lib/storage/recordings', () => ({ deleteRecordingBlob: vi.fn() }));
+vi.mock('@/lib/storage/recordings', () => ({
+  deleteRecordingBlob: vi.fn(),
+  deleteRecordingBlobByName: vi.fn(),
+}));
 // L'impronta delle concessioni ha il suo test (lib/events/grant-email-hash).
 vi.mock('@/lib/events/grant-email-hash', () => ({ completaImprontaConcessioni: vi.fn(async () => 0) }));
 vi.mock('@/lib/azure/blob-storage', () => ({
@@ -86,7 +89,7 @@ vi.mock('@/lib/storage', () => ({
 }));
 
 import { prisma } from '@/lib/db';
-import { deleteRecordingBlob } from '@/lib/storage/recordings';
+import { deleteRecordingBlob, deleteRecordingBlobByName } from '@/lib/storage/recordings';
 import { deleteBlob, isAzureConfigured } from '@/lib/azure/blob-storage';
 
 import { GET } from './route';
@@ -137,7 +140,7 @@ const db = prisma as unknown as {
   recordingRedactionRequest: { deleteMany: Mock };
   recording: { findMany: Mock; deleteMany: Mock; updateMany: Mock };
   postprodArtifact: { deleteMany: Mock; count: Mock };
-  postprodJob: { updateMany: Mock };
+  postprodJob: { updateMany: Mock; count: Mock };
   speaker: { deleteMany: Mock };
   reaction: { deleteMany: Mock };
   agendaItemReaction: { deleteMany: Mock };
@@ -151,6 +154,7 @@ const db = prisma as unknown as {
   $transaction: Mock;
 };
 const deleteRecordingBlobMock = deleteRecordingBlob as unknown as Mock;
+const deleteRecordingBlobByNameMock = deleteRecordingBlobByName as unknown as Mock;
 const deleteBlobMock = deleteBlob as unknown as Mock;
 const isAzureConfiguredMock = isAzureConfigured as unknown as Mock;
 
@@ -371,6 +375,7 @@ describe('GET /api/cron/cleanup', () => {
       recordingPublished: false,
       recordingPublishedAt: null,
       recordingDeleteAfterDays: 30,
+      recordingRetentionFrom: null,
       callSessions: [],
       ...over,
     };
@@ -519,9 +524,9 @@ describe('GET /api/cron/cleanup', () => {
     expect(db.speaker.deleteMany).toHaveBeenCalledWith({
       where: { recordingId: { in: ['rec-video'] } },
     });
-    // …i lavori aperti si fermano…
+    // …i lavori in coda si fermano…
     expect(db.postprodJob.updateMany).toHaveBeenCalledWith({
-      where: { recordingId: { in: ['rec-video'] }, status: { in: ['PENDING', 'CLAIMED', 'RUNNING'] } },
+      where: { recordingId: { in: ['rec-solo-sottotitoli', 'rec-video'] }, status: 'PENDING' },
       data: { status: 'FAILED', completedAt: NOW, lastError: 'recording expired' },
     });
     // …e il resto lo toglie postprod-retention da adesso.
@@ -532,6 +537,58 @@ describe('GET /api/cron/cleanup', () => {
       },
       data: { retentionUntil: NOW },
     });
+  });
+
+  it('fase 2: con un lavoro in mano a un worker rinvia, senza toccare file ne’ evento', async () => {
+    stubEventQueries({ expiringRecordings: [expiringEvent()] });
+    db.recording.findMany.mockImplementation(async (args: { where: Record<string, unknown> }) =>
+      args.where.status ? [{ id: 'rec-video', blobKey: 'recordings/evt-scaduto/a.mp4' }] : []
+    );
+    db.postprodJob.count.mockResolvedValue(1);
+
+    const body = await (await runCleanup()).json();
+
+    expect(body.recordingsDeferred).toBe(1);
+    expect(body.recordingsExpired).toBe(0);
+    expect(deleteRecordingBlobMock).not.toHaveBeenCalled();
+    expect(db.event.update).not.toHaveBeenCalled();
+    expect(db.recording.updateMany).not.toHaveBeenCalled();
+    // Quelli in coda si fermano comunque: non partiranno piu'.
+    expect(db.postprodJob.updateMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { recordingId: { in: ['rec-video'] }, status: 'PENDING' } })
+    );
+  });
+
+  it('fase 2: i file si cancellano dopo la transazione, anche quelli con il solo nome', async () => {
+    stubEventQueries({
+      expiringRecordings: [
+        expiringEvent({
+          callSessions: [
+            { recordingUrl: 'https://blob/scaduto.mp4', recordingFilename: 'recordings/scaduto.mp4' },
+            { recordingUrl: null, recordingFilename: 'recordings/solo-nome.mp4' },
+          ],
+        }),
+      ],
+    });
+
+    await runCleanup();
+
+    expect(deleteRecordingBlobMock).toHaveBeenCalledWith('https://blob/scaduto.mp4');
+    expect(deleteRecordingBlobByNameMock).toHaveBeenCalledWith('recordings/solo-nome.mp4');
+    expect(deleteRecordingBlobByNameMock).toHaveBeenCalledTimes(1);
+    const fineTransazione = db.gdprAuditLog.create.mock.invocationCallOrder[0]!;
+    expect(deleteRecordingBlobMock.mock.invocationCallOrder[0]!).toBeGreaterThan(fineTransazione);
+  });
+
+  it('fase 2: una durata scelta da poco su un evento vecchio non scade ancora', async () => {
+    stubEventQueries({
+      expiringRecordings: [expiringEvent({ recordingRetentionFrom: daysAgo(2) })],
+    });
+
+    const body = await (await runCleanup()).json();
+
+    expect(body.recordingsExpired).toBe(0);
+    expect(deleteRecordingBlobMock).not.toHaveBeenCalled();
   });
 
   it('fase 2: scrive la cancellazione nel registro GDPR, senza dati personali', async () => {
@@ -1111,13 +1168,24 @@ describe('GET /api/cron/cleanup', () => {
     const res = await runCleanup();
     const body = await res.json();
 
-    // Il grezzo per il recupero si', il video no: e' la registrazione, che non
-    // segue la conservazione dei dati e ha la sua scadenza (fase 2). La fase 3
-    // non legge nemmeno il suo indirizzo.
+    // Il grezzo per il recupero si', e il suo indirizzo si toglie prima delle
+    // prove; il video no: e' la registrazione, che non segue la conservazione
+    // dei dati e ha la sua scadenza (fase 2). La fase 3 non legge nemmeno il
+    // suo indirizzo.
     expect(deleteRecordingBlobMock.mock.calls.map((c) => c[0])).toEqual([
       'https://blob/grezzo.mp4',
     ]);
     expect(body.recordingBlobsDeleted).toBe(1);
+    const tolto = db.event.update.mock.calls.findIndex(
+      (c) => (c[0] as { where: { id: string } }).where.id === 'evt-pubblicato'
+    );
+    expect(db.event.update.mock.calls[tolto]![0]).toEqual({
+      where: { id: 'evt-pubblicato' },
+      data: { tempRecordingUrl: null, tempRecordingStartedAt: null },
+    });
+    expect(db.event.update.mock.invocationCallOrder[tolto]!).toBeLessThan(
+      db.event.findUnique.mock.invocationCallOrder[0]!
+    );
     const phase3 = db.event.findMany.mock.calls
       .map((c) => c[0] as { where: Record<string, unknown>; select: Record<string, unknown> })
       .find((a) => 'OR' in a.where && !('recordingDeleteAfterDays' in a.where));
@@ -1282,6 +1350,7 @@ describe('GET /api/cron/cleanup', () => {
       auditLogRowsScrubbed: 0,
       tempRecordingsCleaned: 0,
       recordingsExpired: 0,
+      recordingsDeferred: 0,
       eventsProcessed: 0,
       unfinishedEventsArchived: 0,
       registrationsDeleted: 0,

@@ -480,6 +480,16 @@ export const PUT = withErrorHandling(async (request, context) => {
     !!data.recordingUrl &&
     data.recordingUrl !== event.recordingUrl &&
     !(await salaGiaAperta(event));
+  // Da quando, al piu' presto, conta la durata della registrazione non
+  // pubblicata (Event.recordingRetentionFrom): da adesso se la si sceglie, se
+  // si toglie la pubblicazione o se si aggancia un file nuovo. Nessuna di queste
+  // scelte, su un evento finito da tempo, cancella la registrazione al giro
+  // dopo della pulizia.
+  const durataDaAdesso =
+    (data.recordingDeleteAfterDays !== undefined &&
+      data.recordingDeleteAfterDays !== event.recordingDeleteAfterDays) ||
+    (data.recordingPublished === false && event.recordingPublished) ||
+    (!!data.recordingUrl && data.recordingUrl !== event.recordingUrl);
   const destinazioneDopo: Destinazione =
     data.recordingDestination ??
     destinazioneDiPartenza(event, data.recordingEnabled === true || fileNuovo);
@@ -756,6 +766,7 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.transcriptPublished !== undefined && { transcriptPublished: data.transcriptPublished }),
       ...(pubblicoDopo !== event.recordingAudience && { recordingAudience: pubblicoDopo }),
       ...(data.recordingDeleteAfterDays !== undefined && { recordingDeleteAfterDays: data.recordingDeleteAfterDays }),
+      ...(durataDaAdesso && { recordingRetentionFrom: new Date() }),
       ...(data.recordingUrl !== undefined && { recordingUrl: data.recordingUrl }),
       ...(data.tempRecordingUrl !== undefined && { tempRecordingUrl: data.tempRecordingUrl }),
       ...(data.recordingFileSize !== undefined && { recordingFileSize: data.recordingFileSize }),

@@ -29,11 +29,15 @@ export const CAMPI_VIDEO_VUOTI = {
 export function sessioniSenzaFile(eventId: string, recordingUrl: string) {
   return {
     where: { eventId, recordingUrl },
-    data: {
-      recordingUrl: null,
-      recordingFileSize: null,
-      recordingDuration: null,
-      recordingFilename: null,
-    },
+    data: CAMPI_FILE_SESSIONE_VUOTI,
   };
 }
+
+/** I campi del file di una sessione, azzerati insieme: l'indirizzo, il nome
+ *  nello storage, peso e durata. */
+export const CAMPI_FILE_SESSIONE_VUOTI = {
+  recordingUrl: null,
+  recordingFileSize: null,
+  recordingDuration: null,
+  recordingFilename: null,
+} as const;

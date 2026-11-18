@@ -202,6 +202,12 @@ model Event {
   recordingFileSize        BigInt?   @map("recording_file_size")
   recordingDuration        Int?      @map("recording_duration")
   recordingDeleteAfterDays Int?      @map("recording_delete_after_days")
+  // Da quando, al piu' presto, conta la durata della registrazione non
+  // pubblicata (lib/gdpr/cleanup-selection): l'ultima volta che si e' scelta
+  // la durata, si e' tolta la pubblicazione o si e' agganciato un file nuovo.
+  // Cosi' nessuna di queste scelte cancella la registrazione al giro dopo.
+  // Null: conta dalla fine dell'evento.
+  recordingRetentionFrom   DateTime? @map("recording_retention_from")
 
   // Optional YouTube URL for legacy / mirrored recordings. When set, the
   // public video library prefers the embed over the self-hosted blob —

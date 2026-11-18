@@ -14,6 +14,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const m = vi.hoisted(() => ({
   cancellaVideo: vi.fn(async (_url: string) => true),
+  cancellaVideoPerNome: vi.fn(async (_nome: string) => true),
   cancellaOutput: vi.fn(async (_chiave: string) => true),
   cancellaDallaPostProduzione: vi.fn(async (_chiave: string) => true),
 }));
@@ -21,6 +22,7 @@ vi.mock('@/lib/storage/recordings', () => ({
   assertVideoNelloStorage: vi.fn(),
   assertVideoDellEvento: vi.fn(async () => undefined),
   deleteRecordingBlob: m.cancellaVideo,
+  deleteRecordingBlobByName: m.cancellaVideoPerNome,
 }));
 vi.mock('@/lib/storage/postprod', () => ({
   isPostprodStorageConfigured: () => true,
@@ -30,11 +32,20 @@ vi.mock('@/lib/storage/postprod', () => ({
 
 import { GET as pulizia } from '@/app/api/cron/cleanup/route';
 import { GET as puliziaPostProduzione } from '@/app/api/cron/postprod-retention/route';
+import { PUT as aggiornaEvento } from '@/app/api/events/[param]/route';
 import { CAPTIONS_TRANSCRIPT_MODEL } from '@/lib/captions/transcript';
 import { encryptPII, hashEmail } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 
-import { creaEvento, creaLavoro, creaRegistrazione, svuotaDatabase } from './fixtures';
+import {
+  creaEvento,
+  creaLavoro,
+  creaRegistrazione,
+  entraCome,
+  organizza,
+  richiesta,
+  svuotaDatabase,
+} from './fixtures';
 
 const GIORNO = 86_400_000;
 const giorniFa = (n: number) => new Date(Date.now() - n * GIORNO);
@@ -410,6 +421,81 @@ describe('la scadenza scelta da chi organizza', () => {
     expect(
       (await prisma.event.findUniqueOrThrow({ where: { id: evento.id } })).recordingUrl
     ).toBe(VIDEO);
+  });
+});
+
+describe('le scelte che non fanno scadere la registrazione al giro dopo', () => {
+  async function modifica(eventId: string, token: string, corpo: Record<string, unknown>) {
+    const risposta = await aggiornaEvento(
+      richiesta(`/api/events/${eventId}`, 'PUT', corpo, token) as never,
+      { params: Promise.resolve({ param: eventId }) }
+    );
+    expect(risposta.status).toBe(200);
+  }
+
+  it('scegliere la durata su un evento finito da tempo la fa contare da adesso', async () => {
+    const { evento } = await eventoRegistrato();
+
+    await modifica(evento.id, evento.moderatorToken, { recordingDeleteAfterDays: 1 });
+    const esito = await giroDiPulizia();
+
+    expect(esito.recordingsExpired).toBe(0);
+    expect(m.cancellaVideo).not.toHaveBeenCalled();
+    // Passato il giorno, se ne va.
+    await prisma.event.update({
+      where: { id: evento.id },
+      data: { recordingRetentionFrom: giorniFa(2) },
+    });
+    expect((await giroDiPulizia()).recordingsExpired).toBe(1);
+  });
+
+  it('togliere la pubblicazione non la fa scadere dalla fine dell’evento', async () => {
+    const { evento } = await eventoRegistrato({
+      recordingPublished: true,
+      recordingPublishedAt: giorniFa(10),
+      recordingDeleteAfterDays: 30,
+    });
+
+    await modifica(evento.id, evento.moderatorToken, { recordingPublished: false });
+    const esito = await giroDiPulizia();
+
+    expect(esito.recordingsExpired).toBe(0);
+    expect(
+      (await prisma.event.findUniqueOrThrow({ where: { id: evento.id } })).recordingUrl
+    ).toBe(VIDEO);
+  });
+
+  it('un file agganciato dopo la scadenza non se ne va al giro dopo', async () => {
+    await entraCome('ORGANIZER');
+    const evento = await creaEvento({ ...CONCLUSO, recordingDeleteAfterDays: 30 });
+    await organizza(evento.id);
+
+    await modifica(evento.id, evento.moderatorToken, { recordingUrl: VIDEO });
+    const esito = await giroDiPulizia();
+
+    expect(esito.recordingsExpired).toBe(0);
+    expect(
+      (await prisma.event.findUniqueOrThrow({ where: { id: evento.id } })).recordingUrl
+    ).toBe(VIDEO);
+  });
+
+  it('un lavoro in mano a un worker rinvia la scadenza', async () => {
+    const { evento, registrazione } = await eventoRegistrato({ recordingDeleteAfterDays: 30 });
+    await creaLavoro(registrazione.id, 'RUNNING');
+
+    const esito = await giroDiPulizia();
+
+    expect(esito.recordingsDeferred).toBe(1);
+    expect(m.cancellaVideo).not.toHaveBeenCalled();
+    expect(
+      (await prisma.event.findUniqueOrThrow({ where: { id: evento.id } })).recordingUrl
+    ).toBe(VIDEO);
+    // Quello in coda si ferma comunque.
+    expect(
+      await prisma.postprodJob.count({
+        where: { recordingId: registrazione.id, status: 'PENDING' },
+      })
+    ).toBe(0);
   });
 });
 

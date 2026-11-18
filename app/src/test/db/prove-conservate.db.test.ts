@@ -15,6 +15,7 @@ vi.mock('@/lib/storage/recordings', () => ({
   assertVideoNelloStorage: vi.fn(),
   assertVideoDellEvento: vi.fn(async () => undefined),
   deleteRecordingBlob: vi.fn(async () => true),
+  deleteRecordingBlobByName: vi.fn(async () => true),
 }));
 // I testi veri dell'italiano, letti per chiave puntata come next-intl.
 vi.mock('next-intl/server', async () => {

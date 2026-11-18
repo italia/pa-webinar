@@ -17,10 +17,10 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import CapacityPanel, { type RiepilogoCapacita } from '@/components/admin/capacity-panel';
+import RecordingRetentionSelect from '@/components/admin/recording-retention-select';
 import FileOrUrlInput from '@/components/ui/file-or-url-input';
 import ToggleSwitch from '@/components/ui/toggle-switch';
 import { registrazioneRiservata, type Destinazione } from '@/lib/recording/destination';
-import { NESSUNA_CANCELLAZIONE, RETENTION_OPTIONS } from '@/lib/recording/retention-options';
 import { togglesFromMatrix } from '@/lib/utils/permission-matrix';
 import { MAX_RETENTION_DAYS } from '@/lib/validation/retention';
 import {
@@ -140,7 +140,6 @@ export function SezioneDati({
 }) {
   const t = useTranslations('admin.wizard.step5');
   const tPost = useTranslations('postEvent');
-  const tRec = useTranslations('recording');
   // La durata si sceglie dove l'evento registra qualcosa: il video, o la
   // trascrizione dai sottotitoli.
   const registraQualcosa = form.recordingEnabled || form.captionsTranscriptEnabled;
@@ -240,24 +239,12 @@ export function SezioneDati({
           <label className="form-label" htmlFor="rev-recording-retention">
             {t('recordingRetention')}
           </label>
-          <select
+          <RecordingRetentionSelect
             id="rev-recording-retention"
-            className="form-select"
-            value={form.recordingDeleteAfterDays ?? NESSUNA_CANCELLAZIONE}
-            onChange={(e) => {
-              const giorni = Number(e.target.value);
-              onChange({
-                recordingDeleteAfterDays: giorni === NESSUNA_CANCELLAZIONE ? null : giorni,
-              });
-            }}
-            aria-describedby="rev-recording-retention-help"
-          >
-            {RETENTION_OPTIONS.map(({ value, labelKey }) => (
-              <option key={value} value={value}>
-                {tRec(labelKey)}
-              </option>
-            ))}
-          </select>
+            value={form.recordingDeleteAfterDays ?? null}
+            onChange={(giorni) => onChange({ recordingDeleteAfterDays: giorni })}
+            describedBy="rev-recording-retention-help"
+          />
           <small id="rev-recording-retention-help" className="form-text text-muted">
             {t('recordingRetentionHelp')}
           </small>

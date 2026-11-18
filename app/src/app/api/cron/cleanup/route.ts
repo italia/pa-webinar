@@ -6,8 +6,8 @@ import { Prisma } from '@prisma/client';
 import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { assertCronApiKey } from '@/lib/auth/cron';
-import { CAMPI_VIDEO_VUOTI } from '@/lib/events/recording-fields';
-import { deleteRecordingBlob } from '@/lib/storage/recordings';
+import { CAMPI_FILE_SESSIONE_VUOTI, CAMPI_VIDEO_VUOTI } from '@/lib/events/recording-fields';
+import { deleteRecordingBlob, deleteRecordingBlobByName } from '@/lib/storage/recordings';
 import { deleteBlob, isAzureConfigured } from '@/lib/azure/blob-storage';
 import { closeStaleSessions, type OvertimeLimits } from '@/lib/events/call-sessions';
 import { OVERTIME_CAP_DEFAULT_MINUTES, OVERTIME_EMPTY_DEFAULT_MINUTES } from '@/lib/events/overtime-defaults';
@@ -144,7 +144,7 @@ export const GET = withErrorHandling(async (request) => {
   // (fasi 3 e 4). Il link esterno resta: la piattaforma non lo cancella.
   // Si cercano solo gli eventi in cui resta qualcosa da cancellare: dopo il
   // giro l'evento esce dalla selezione da solo, e la durata resta sull'evento
-  // per la registrazione che verra' dopo.
+  // per cio' che verra' dopo.
   const recordingRetentionEvents = await prisma.event.findMany({
     where: {
       recordingDeleteAfterDays: { not: null },
@@ -178,34 +178,61 @@ export const GET = withErrorHandling(async (request) => {
       recordingPublished: true,
       recordingPublishedAt: true,
       recordingDeleteAfterDays: true,
-      callSessions: { where: { recordingUrl: { not: null } }, select: { recordingUrl: true } },
+      recordingRetentionFrom: true,
+      callSessions: {
+        where: { OR: [{ recordingUrl: { not: null } }, { recordingFilename: { not: null } }] },
+        select: { recordingUrl: true, recordingFilename: true },
+      },
     },
   });
   const expiredRecordings = recordingRetentionEvents.filter((evt) =>
     isRecordingRetentionExpired(evt, now)
   );
   let recordingsExpired = 0;
+  let recordingsDeferred = 0;
 
   for (const evt of expiredRecordings) {
+    // I file da togliere: per indirizzo quelli dell'evento e delle sessioni,
+    // per nome quelli di una sessione che ha solo il nome nello storage.
+    const indirizzi = [
+      ...new Set(
+        [evt.recordingUrl, evt.tempRecordingUrl, ...evt.callSessions.map((c) => c.recordingUrl)].filter(
+          (u): u is string => !!u
+        )
+      ),
+    ];
+    const soloNomi = [
+      ...new Set(
+        evt.callSessions
+          .filter((c) => !c.recordingUrl && c.recordingFilename)
+          .map((c) => c.recordingFilename as string)
+      ),
+    ];
     try {
-      const files = [
-        ...new Set(
-          [evt.recordingUrl, evt.tempRecordingUrl, ...evt.callSessions.map((c) => c.recordingUrl)].filter(
-            (u): u is string => !!u
-          )
-        ),
-      ];
-      // I file prima, fuori dalla transazione e senza fermarla: un file che lo
-      // storage non cancella resta senza riferimenti, e la riconciliazione lo
-      // toglie come orfano.
-      for (const url of files) {
-        await deleteRecordingBlob(url).catch(() => false);
-      }
-      await prisma.$transaction(
+      const esito = await prisma.$transaction(
         async (tx) => {
           // In fila con chi scrive la trascrizione dell'evento e con chi copia
           // le prove (pulizia, cancellazioni).
           await bloccaTrascrizioneEvento(tx, evt.id);
+          const registrazioni = await tx.recording.findMany({
+            where: { eventId: evt.id, status: { not: 'ARCHIVED' } },
+            select: { id: true, blobKey: true },
+          });
+          const ids = registrazioni.map((r) => r.id);
+          // Un lavoro che non partira' piu' si ferma; uno che un worker sta gia'
+          // facendo no: scriverebbe i suoi risultati su una registrazione
+          // gia' tolta. Si riprova al giro dopo, quando ha finito o quando il
+          // recupero dei lavori l'ha rimesso in coda.
+          if (ids.length > 0) {
+            await tx.postprodJob.updateMany({
+              where: { recordingId: { in: ids }, status: 'PENDING' },
+              data: { status: 'FAILED', completedAt: now, lastError: 'recording expired' },
+            });
+            const inCorso = await tx.postprodJob.count({
+              where: { recordingId: { in: ids }, status: { in: ['CLAIMED', 'RUNNING'] } },
+            });
+            if (inCorso > 0) return 'rinviata' as const;
+          }
           await tx.event.update({
             where: { id: evt.id },
             data: {
@@ -220,16 +247,7 @@ export const GET = withErrorHandling(async (request) => {
               eventId: evt.id,
               OR: [{ recordingUrl: { not: null } }, { recordingFilename: { not: null } }],
             },
-            data: {
-              recordingUrl: null,
-              recordingFileSize: null,
-              recordingDuration: null,
-              recordingFilename: null,
-            },
-          });
-          const registrazioni = await tx.recording.findMany({
-            where: { eventId: evt.id, status: { not: 'ARCHIVED' } },
-            select: { id: true, blobKey: true },
+            data: CAMPI_FILE_SESSIONE_VUOTI,
           });
           // La registrazione «solo sottotitoli» non ha altro: va via tutta
           // (lavoro, artefatti, testi originali e parlanti a cascata).
@@ -250,11 +268,6 @@ export const GET = withErrorHandling(async (request) => {
               where: { recordingId: { in: conFile }, modelId: CAPTIONS_TRANSCRIPT_MODEL },
             });
             await tx.speaker.deleteMany({ where: { recordingId: { in: conFile } } });
-            // Un lavoro che lavorerebbe su un video che non c'e' piu' non parte.
-            await tx.postprodJob.updateMany({
-              where: { recordingId: { in: conFile }, status: { in: ['PENDING', 'CLAIMED', 'RUNNING'] } },
-              data: { status: 'FAILED', completedAt: now, lastError: 'recording expired' },
-            });
             // Il resto lo toglie postprod-retention da questa data; una data
             // piu' vicina resta.
             await tx.recording.updateMany({
@@ -274,14 +287,28 @@ export const GET = withErrorHandling(async (request) => {
                 reason: 'retention_expired',
                 retentionDays: evt.recordingDeleteAfterDays,
                 countedFrom: evt.recordingPublished ? 'publication' : 'event_end',
-                files: files.length,
+                files: indirizzi.length + soloNomi.length,
                 recordings: registrazioni.length,
               }),
             },
           });
+          return 'cancellata' as const;
         },
         { timeout: TIMEOUT_PULIZIA_EVENTO_MS }
       );
+      if (esito === 'rinviata') {
+        recordingsDeferred++;
+        continue;
+      }
+      // I file dopo, fuori dalla transazione e senza fermarla: un file che lo
+      // storage non cancella resta senza riferimenti, e la riconciliazione lo
+      // toglie come orfano.
+      for (const url of indirizzi) {
+        await deleteRecordingBlob(url).catch(() => false);
+      }
+      for (const nome of soloNomi) {
+        await deleteRecordingBlobByName(nome).catch(() => false);
+      }
       recordingsExpired++;
       console.log(`[cron/cleanup] Recording expired for event ${evt.id} (${evt.slug})`);
     } catch (err) {
@@ -435,6 +462,16 @@ export const GET = withErrorHandling(async (request) => {
         const remindersDeleted = await tx.eventReminder.deleteMany({
           where: { eventId: evt.id },
         });
+
+        // La registrazione temporanea (il recupero per chi arriva tardi) non e'
+        // la registrazione che resta: si toglie qui, il file dopo la
+        // transazione, e non tiene in vita le prove qui sotto.
+        if (evt.tempRecordingUrl) {
+          await tx.event.update({
+            where: { id: evt.id },
+            data: { tempRecordingUrl: null, tempRecordingStartedAt: null },
+          });
+        }
 
         // Le prove dei consensi delle voci che stanno nella registrazione
         // restano finche' la registrazione esiste, pubblicata o no, in una
@@ -886,6 +923,7 @@ export const GET = withErrorHandling(async (request) => {
       auditLogRowsScrubbed: auditScrubbed,
       tempRecordingsCleaned: tempRecordingEvents.length,
       recordingsExpired,
+      recordingsDeferred,
       eventsProcessed,
       unfinishedEventsArchived: unfinishedArchived,
       registrationsDeleted: totalRegistrationsDeleted,

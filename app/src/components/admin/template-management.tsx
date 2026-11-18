@@ -21,8 +21,8 @@ import {
 import { Icon } from '@/components/ui/icon';
 import ToggleSwitch from '@/components/ui/toggle-switch';
 import { useConfirm } from '@/components/ui/confirm-dialog';
+import RecordingRetentionSelect from '@/components/admin/recording-retention-select';
 import type { Destinazione } from '@/lib/recording/destination';
-import { NESSUNA_CANCELLAZIONE, RETENTION_OPTIONS } from '@/lib/recording/retention-options';
 import { MAX_RETENTION_DAYS } from '@/lib/validation/retention';
 
 interface SerializedTemplate {
@@ -525,7 +525,6 @@ function TemplateForm({
   // Duplicarle sotto `admin.templates` vorrebbe dire due testi da tenere
   // allineati in 24 lingue per la stessa cosa.
   const ta = useTranslations('admin.form');
-  const tRec = useTranslations('recording');
   const tw = useTranslations('admin.wizard.step2');
   const tPost = useTranslations('postEvent');
 
@@ -610,22 +609,12 @@ function TemplateForm({
         <label className="form-label" htmlFor="tpl-recording-retention">
           {t('recordingRetentionLabel')}
         </label>
-        <select
+        <RecordingRetentionSelect
           id="tpl-recording-retention"
-          className="form-select"
-          value={form.recordingDeleteAfterDays ?? NESSUNA_CANCELLAZIONE}
-          onChange={(e) => {
-            const giorni = Number(e.target.value);
-            setField('recordingDeleteAfterDays', giorni === NESSUNA_CANCELLAZIONE ? null : giorni);
-          }}
-          aria-describedby="tpl-recording-retention-help"
-        >
-          {RETENTION_OPTIONS.map(({ value, labelKey }) => (
-            <option key={value} value={value}>
-              {tRec(labelKey)}
-            </option>
-          ))}
-        </select>
+          value={form.recordingDeleteAfterDays}
+          onChange={(giorni) => setField('recordingDeleteAfterDays', giorni)}
+          describedBy="tpl-recording-retention-help"
+        />
         <small id="tpl-recording-retention-help" className="form-text text-muted">
           {t('recordingRetentionHint')}
         </small>

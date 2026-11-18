@@ -62,6 +62,7 @@ describe('isRecordingRetentionExpired', () => {
     recordingPublished: false,
     recordingPublishedAt: null,
     recordingDeleteAfterDays: null,
+    recordingRetentionFrom: null,
   };
   const pubblicato = (giorniFa: number, durata: number | null) => ({
     ...evento,
@@ -119,6 +120,23 @@ describe('isRecordingRetentionExpired', () => {
     expect(isRecordingRetentionExpired({ ...evento, recordingDeleteAfterDays: 90 }, NOW)).toBe(
       false
     );
+  });
+
+  it('non pubblicata, mai da prima della scelta, della pubblicazione tolta o del file nuovo', () => {
+    // Evento finito 40 giorni fa: dalla fine 30 giorni sarebbero gia' passati,
+    // ma la durata e' stata scelta (o il video tolto dalla pubblicazione) 2
+    // giorni fa, e conta da li'.
+    const scelta = { ...evento, recordingDeleteAfterDays: 30, recordingRetentionFrom: daysFromNow(-2) };
+    expect(recordingExpiresAt(scelta)).toEqual(daysFromNow(28));
+    expect(isRecordingRetentionExpired(scelta, NOW)).toBe(false);
+    // Un punto di partenza piu' vecchio della fine non anticipa niente.
+    expect(
+      recordingExpiresAt({ ...scelta, recordingRetentionFrom: daysFromNow(-100) })
+    ).toEqual(daysFromNow(-10));
+    // Pubblicata, conta solo la pubblicazione, come prima.
+    expect(
+      recordingExpiresAt({ ...pubblicato(31, 30), recordingRetentionFrom: daysFromNow(-1) })
+    ).toEqual(daysFromNow(-1));
   });
 
   it('non pubblicata, il confine e’ stretto', () => {

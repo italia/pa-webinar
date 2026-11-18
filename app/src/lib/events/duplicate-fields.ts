@@ -157,6 +157,7 @@ export const NOT_DUPLICATED_EVENT_FIELDS: Record<string, string> = {
   recordingPublished: 'artefact of the occurrence that ran',
   transcriptPublished: 'artefact of the occurrence that ran: the copy has its own transcript to review',
   recordingPublishedAt: 'artefact of the occurrence that ran',
+  recordingRetentionFrom: "da quando conta la durata della registrazione di QUELLA occorrenza: la copia parte dalla sua fine",
   recordingNotifiedAt: 'artefact of the occurrence that ran: the copy has its own recording to announce',
   recordingDuration: 'artefact of the occurrence that ran',
   recordingFileSize: 'artefact of the occurrence that ran',

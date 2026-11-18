@@ -224,11 +224,14 @@ describe('cosa si scrive', () => {
 
   it('chi rinuncia a pubblicare carica il video e basta', async () => {
     await aggiorna({ recordingUrl: VIDEO, recordingPublished: false });
-    expect(dati()).toEqual({
+    const { recordingRetentionFrom, ...resto } = dati();
+    expect(resto).toEqual({
       recordingUrl: VIDEO,
       recordingEnabled: true,
       recordingPublished: false,
     });
+    // Un file nuovo: la durata della registrazione non pubblicata conta da qui.
+    expect(recordingRetentionFrom).toBeInstanceOf(Date);
   });
 
   it('togliere il video toglie la pubblicazione', async () => {
