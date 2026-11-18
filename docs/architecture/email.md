@@ -154,7 +154,7 @@ This is the complete list of producers: every call to `enqueueEmail()` in the ap
 | Staff sign-in link | A request from the sign-in page (`POST /api/staff/login-link`), an administrator creating a staff account with the invitation option, or re-sending the link from **Staff accounts** | An active staff account | One-time sign-in link ([lifetime](#what-each-link-is)) | No | `staff-login` |
 | Data export link | A data subject asks for a copy of their data (`POST /api/gdpr/export/request`, right of access, Art. 15) | The address typed in the form | Signed link to `/privacy/my-data` ([lifetime](#what-each-link-is)) | No | `gdpr-export-request` |
 | Erasure link | A data subject asks for erasure (`POST /api/gdpr/erasure/request`, right to erasure, Art. 17) | The address typed in the form | Signed link to `/privacy/my-data/erasure` ([lifetime](#what-each-link-is)) | No | `gdpr-erasure-request` |
-| Confirmation code | A data subject asks, from the **My data** page, to correct or delete one registration (`POST /api/gdpr/registrations/edit` or `/cancel` without a code) | The registration's address | A six-digit code valid 15 minutes, in the body only, and what it confirms; no link ([Data-subject rights](../GDPR.md#self-service-access-and-erasure)) | No | `gdpr-confirmation-code` |
+| Confirmation code | A data subject asks, from the **My data** page, to correct or delete one registration or to set or remove its nickname (`POST /api/gdpr/registrations/edit`, `/nickname` or `/cancel` without a code) | The registration's address | A six-digit code valid 15 minutes, in the body only, and what it confirms; no link ([Data-subject rights](../GDPR.md#self-service-access-and-erasure)) | No | `gdpr-confirmation-code` |
 
 ### What each link is
 

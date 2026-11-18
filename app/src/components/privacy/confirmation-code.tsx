@@ -24,6 +24,16 @@ export interface EsitoRichiesta {
   corpo?: Record<string, unknown>;
   /** Gli errori dei campi (422): il campo e la chiave del testo sotto `gdpr.export`. */
   campi?: Record<string, ChiaveErrore>;
+  /** Un rifiuto del nickname (lib/live/nickname): chi chiama lo spiega. */
+  rifiuto?: RifiutoNickname;
+}
+
+/** I codici con cui la rotta del nickname lo rifiuta, con motivo e alternativa. */
+const CODICI_RIFIUTO = ['NICKNAME_INVALID', 'NICKNAME_TAKEN', 'NICKNAMES_DISABLED'] as const;
+export interface RifiutoNickname {
+  codice: (typeof CODICI_RIFIUTO)[number];
+  motivo?: string;
+  suggerimento?: string;
 }
 
 /** I testi degli errori dei campi che la rotta della correzione puo' dare. */
@@ -75,6 +85,17 @@ export function useCodiceDiConferma(url: string) {
         return { ok: false };
       }
       if (res.ok) return { ok: true, corpo: json };
+      const codice = (CODICI_RIFIUTO as readonly string[]).find((c) => c === json.code);
+      if ((res.status === 409 || res.status === 422) && codice) {
+        return {
+          ok: false,
+          rifiuto: {
+            codice: codice as RifiutoNickname['codice'],
+            ...(typeof json.reason === 'string' ? { motivo: json.reason } : {}),
+            ...(typeof json.suggestion === 'string' ? { suggerimento: json.suggestion } : {}),
+          },
+        };
+      }
       // Il token della pagina dura un'ora: ci vuole un link nuovo.
       if (res.status === 401) setErrore(t('linkInvalid'));
       else if (res.status === 429) setErrore(t('rateLimited'));

@@ -7,7 +7,8 @@ import { requireAppSecret } from '@/lib/auth/app-secret';
 
 /**
  * Il codice di conferma delle modifiche a un'iscrizione dalla pagina dei propri
- * dati: correggere nome ed ente, cancellare l'iscrizione.
+ * dati: correggere nome ed ente, scegliere o togliere il nickname, cancellare
+ * l'iscrizione.
  *
  * La pagina si apre con il link dell'email, firmato e valido un'ora ma non a uso
  * singolo, e riceve un token per agire che vale quanto il link: chi lo ha visto
@@ -30,7 +31,7 @@ import { requireAppSecret } from '@/lib/auth/app-secret';
 export const DURATA_CODICE_MINUTI = 15;
 const DURATA_CODICE_SECONDI = DURATA_CODICE_MINUTI * 60;
 
-export type AzioneConfermata = 'edit' | 'cancel';
+export type AzioneConfermata = 'edit' | 'nickname' | 'cancel';
 
 export interface RichiestaConfermata {
   azione: AzioneConfermata;

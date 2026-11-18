@@ -16,6 +16,7 @@ import { POST as chiediToken } from '@/app/api/events/[param]/jitsi/token/route'
 import { POST as consensi } from '@/app/api/gdpr/consents/route';
 import { POST as annulla } from '@/app/api/gdpr/registrations/cancel/route';
 import { POST as correggi } from '@/app/api/gdpr/registrations/edit/route';
+import { POST as soprannome } from '@/app/api/gdpr/registrations/nickname/route';
 import { decryptPII, encryptPII, hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { eventAccessCookieName, signEventAccess } from '@/lib/event-session';
@@ -23,6 +24,7 @@ import { leggiRigheProve, postoDaIMieiDati } from '@/lib/gdpr/consent-proofs';
 import { issueGdprToken } from '@/lib/gdpr/request-token';
 import { ritiraComunicazioni, ritiraConsensi } from '@/lib/live/consent-withdrawal';
 import { registrazioneDellIscrizione } from '@/lib/live/consents-in-force';
+import { improntaNickname, resetNicknameCachesForTests } from '@/lib/live/nickname';
 
 import { biscotti } from './biscotti';
 import { creaEvento, richiesta, svuotaDatabase } from './fixtures';
@@ -530,6 +532,108 @@ async function chiamaCorreggi(corpo: Record<string, unknown>) {
   r.headers.set('x-forwarded-for', `10.10.${Math.floor(ip / 250)}.${ip % 250}`);
   return correggi(r as never, { params: Promise.resolve({}) });
 }
+
+async function chiamaNickname(corpo: Record<string, unknown>) {
+  ip += 1;
+  const r = richiesta('/api/gdpr/registrations/nickname', 'POST', { locale: 'it', ...corpo });
+  r.headers.set('x-forwarded-for', `10.11.${Math.floor(ip / 250)}.${ip % 250}`);
+  return soprannome(r as never, { params: Promise.resolve({}) });
+}
+
+describe('il nickname da «I miei dati»', () => {
+  beforeEach(() => resetNicknameCachesForTests());
+
+  it('si sceglie con il codice, con le regole della sala, e si toglie sempre', async () => {
+    const evento = await creaEvento({
+      nicknamesEnabled: true,
+      moderatorName: encryptPII('Giulia Verdi'),
+    });
+    const { iscrizione, token, emailHash } = await iscritto(evento.id);
+    const corpo = { token, registrationId: iscrizione.id, nickname: ' Lupo ' };
+
+    // Un nome di chi conduce non passa, e non parte nessun codice.
+    const simile = await chiamaNickname({ ...corpo, nickname: 'Giulia' });
+    expect(simile.status).toBe(422);
+    expect(await simile.json()).toMatchObject({ code: 'NICKNAME_INVALID', reason: 'host' });
+    expect(await prisma.emailOutbox.count()).toBe(0);
+
+    const richiesto = await chiamaNickname(corpo);
+    expect(richiesto.status).toBe(202);
+    const { issuedAt } = (await richiesto.json()) as { issuedAt: number };
+    const { codice } = await codiceArrivato();
+    // Il codice vale solo per quel nickname.
+    expect(
+      (await chiamaNickname({ ...corpo, nickname: 'Volpe', code: codice, issuedAt })).status
+    ).toBe(403);
+    const fatto = await chiamaNickname({ ...corpo, code: codice, issuedAt });
+    expect(fatto.status).toBe(200);
+    expect(await fatto.json()).toEqual({ nickname: 'Lupo', updated: true });
+    const dopo = await prisma.registration.findUniqueOrThrow({ where: { id: iscrizione.id } });
+    expect(tryDecryptPII(dopo.nickname)).toBe('Lupo');
+    expect(dopo.nicknameKey).toBe(improntaNickname(evento.id, 'Lupo'));
+    const [riga] = await righeRegistro(evento.id, 'DATA_RECTIFIED');
+    expect(JSON.parse(riga!.details!)).toEqual({
+      source: 'self-service',
+      scope: 'registration',
+      fields: ['nickname'],
+      emailHashPrefix: emailHash.substring(0, 8),
+    });
+    expect(riga!.details).not.toContain('Lupo');
+
+    // Lo stesso nickname: niente da fare, nessun codice.
+    expect((await chiamaNickname(corpo)).status).toBe(200);
+
+    // A opzione spenta se ne sceglie uno nuovo no, ma si toglie.
+    await prisma.event.update({ where: { id: evento.id }, data: { nicknamesEnabled: false } });
+    const spento = await chiamaNickname({ ...corpo, nickname: 'Volpe' });
+    expect(spento.status).toBe(409);
+    expect((await spento.json()).code).toBe('NICKNAMES_DISABLED');
+    const togli = await chiamaNickname({ ...corpo, nickname: null });
+    expect(togli.status).toBe(202);
+    const t2 = (await togli.json()) as { issuedAt: number };
+    const c2 = await codiceArrivato();
+    const tolto = await chiamaNickname({
+      ...corpo,
+      nickname: null,
+      code: c2.codice,
+      issuedAt: t2.issuedAt,
+    });
+    expect(tolto.status).toBe(200);
+    expect(
+      await prisma.registration.findUniqueOrThrow({
+        where: { id: iscrizione.id },
+        select: { nickname: true, nicknameKey: true },
+      })
+    ).toEqual({ nickname: null, nicknameKey: null });
+  });
+
+  it("unico nell'evento: chi lo trova preso riceve un'alternativa", async () => {
+    const evento = await creaEvento({ nicknamesEnabled: true });
+    const altro = await iscritto(evento.id, {
+      nickname: encryptPII('Lupo'),
+      nicknameKey: improntaNickname(evento.id, 'Lupo'),
+    });
+    expect(altro.iscrizione.id).toBeDefined();
+    const { iscrizione, token } = await iscritto(evento.id);
+    const res = await chiamaNickname({ token, registrationId: iscrizione.id, nickname: 'lupo' });
+    expect(res.status).toBe(409);
+    const corpo = (await res.json()) as { code: string; suggestion?: string };
+    expect(corpo.code).toBe('NICKNAME_TAKEN');
+    expect(corpo.suggestion).toBeTruthy();
+  });
+
+  it('a evento concluso non se ne sceglie uno nuovo', async () => {
+    const evento = await creaEvento({
+      nicknamesEnabled: true,
+      status: 'ENDED',
+      endsAt: new Date(Date.now() - 60_000),
+    });
+    const { iscrizione, token } = await iscritto(evento.id);
+    const res = await chiamaNickname({ token, registrationId: iscrizione.id, nickname: 'Lupo' });
+    expect(res.status).toBe(409);
+    expect((await res.json()).code).toBe('NICKNAMES_DISABLED');
+  });
+});
 
 describe('la correzione di nome ed ente', () => {
   it('chiede il codice, lo manda all’indirizzo e corregge solo con quello', async () => {

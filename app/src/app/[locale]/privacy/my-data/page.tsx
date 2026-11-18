@@ -23,6 +23,7 @@ import {
 import RecordingRemoval, { type RimozioneVista } from '@/components/privacy/recording-removal';
 import RegistrationCancel from '@/components/privacy/registration-cancel';
 import RegistrationEdit, { type DatiCorretti } from '@/components/privacy/registration-edit';
+import RegistrationNickname from '@/components/privacy/registration-nickname';
 import RegistrationConsents, {
   type ConsensiVista,
   type OffertaVista,
@@ -51,6 +52,8 @@ interface ExportRegistration {
   displayName: string;
   /** Il nickname scelto per l'evento, se c'e'. */
   nickname?: string | null;
+  /** L'evento accetta nickname nuovi: la pagina lo fa scegliere o cambiare. */
+  nicknameEditable?: boolean;
   email: string | null;
   organization: string | null;
   organizationRole: string | null;
@@ -222,6 +225,19 @@ export default function MyDataPage() {
         prima?.optedIn ? { ...prima, name: dati.displayName, organization: dati.organization } : prima
       );
     }
+  }, []);
+
+  // Il nickname cambiato o tolto si vede subito nei dati dell'iscrizione.
+  const nicknameCambiato = useCallback((registrationId: string, nickname: string | null) => {
+    setResults((prima) =>
+      prima
+        ? prima.map((e) =>
+            e.registration.id === registrationId
+              ? { ...e, registration: { ...e.registration, nickname } }
+              : e
+          )
+        : prima
+    );
   }, []);
 
   // La conferma di una spunta in attesa, o le comunicazioni ridate, riportano
@@ -600,6 +616,17 @@ export default function MyDataPage() {
                         quanteIscrizioni={results.length - cancellate.size}
                         locale={locale}
                         onCorretta={(dati) => corretta(entry.registration.id, dati)}
+                      />
+                    )}
+
+                    {tokenConsensi && (
+                      <RegistrationNickname
+                        token={tokenConsensi}
+                        registrationId={entry.registration.id}
+                        nickname={entry.registration.nickname ?? null}
+                        modificabile={!!entry.registration.nicknameEditable}
+                        locale={locale}
+                        onCambiato={(n) => nicknameCambiato(entry.registration.id, n)}
                       />
                     )}
 

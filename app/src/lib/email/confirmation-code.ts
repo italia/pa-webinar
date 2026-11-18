@@ -3,8 +3,8 @@
 
 /**
  * L'email con il codice che conferma una modifica a un'iscrizione dalla pagina
- * dei propri dati (lib/gdpr/confirmation-code): correggere nome ed ente, o
- * cancellare l'iscrizione.
+ * dei propri dati (lib/gdpr/confirmation-code): correggere nome ed ente,
+ * scegliere o togliere il nickname, o cancellare l'iscrizione.
  *
  * Il codice sta solo nel corpo, che l'outbox salva cifrato: l'oggetto resta in
  * chiaro e non lo porta. Nessun link: il codice si scrive nella pagina da cui e'
@@ -27,6 +27,8 @@ export interface CodiceDaInviare {
   azione: AzioneConfermata;
   /** Per una correzione: una sola iscrizione o tutte quelle dell'indirizzo. */
   tutte?: boolean;
+  /** Per il nickname: toglierlo invece di sceglierne uno. */
+  togli?: boolean;
   eventTitle: string;
   codice: string;
   minuti: number;
@@ -43,7 +45,9 @@ export async function inviaCodiceDiConferma(input: CodiceDaInviare): Promise<voi
   const intro =
     input.azione === 'cancel'
       ? t('introCancel', { event: input.eventTitle })
-      : input.tutte
+      : input.azione === 'nickname'
+        ? t(input.togli ? 'introNicknameRemove' : 'introNickname', { event: input.eventTitle })
+        : input.tutte
         ? t('introEditAll')
         : t('introEdit', { event: input.eventTitle });
   const istruzioni = t('instructions', { minutes: input.minuti });

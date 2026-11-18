@@ -71,6 +71,10 @@ describe('l’email del codice di conferma', () => {
     expect(inviata().text).toContain(italiano.email.confirmationCode.introEditAll);
     await inviaCodiceDiConferma({ ...base, azione: 'cancel' });
     expect(inviata().text).toContain('Hai chiesto di cancellare la tua iscrizione');
+    await inviaCodiceDiConferma({ ...base, azione: 'nickname' });
+    expect(inviata().text).toContain('Hai chiesto di cambiare il nickname');
+    await inviaCodiceDiConferma({ ...base, azione: 'nickname', togli: true });
+    expect(inviata().text).toContain('Hai chiesto di togliere il nickname');
   });
 
   it('nella lingua email della pagina, con l’inglese per le altre', async () => {

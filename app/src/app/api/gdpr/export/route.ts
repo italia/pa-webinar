@@ -71,6 +71,8 @@ export const GET = withErrorHandling(async (request) => {
         select: {
           // Cio' che decide quali consensi si possono dare di nuovo da qui.
           ...CAMPI_EVENTO_CONSENSI,
+          // Se l'evento accetta nickname nuovi (lib/live/nickname).
+          nicknamesEnabled: true,
           slug: true,
           title: true,
           startsAt: true,
@@ -285,8 +287,12 @@ export const GET = withErrorHandling(async (request) => {
         // Serve alla pagina per ritirare un consenso di questa iscrizione.
         id: r.id,
         displayName: tryDecryptPII(r.displayName) ?? r.displayName,
-        // Il nickname scelto per l'evento (lib/live/nickname), se c'e'.
+        // Il nickname scelto per l'evento (lib/live/nickname), se c'e', e se
+        // l'evento ne accetta di nuovi: la pagina lo fa scegliere o cambiare,
+        // e toglierlo resta sempre possibile.
         nickname: tryDecryptPII(r.nickname),
+        nicknameEditable:
+          r.event.nicknamesEnabled && !['ENDED', 'ARCHIVED'].includes(r.event.status),
         email: decryptedEmail,
         organization: r.organization,
         organizationRole: r.organizationRole,

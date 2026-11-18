@@ -3,7 +3,7 @@
 
 /**
  * I passi comuni delle rotte che modificano un'iscrizione dalla pagina dei propri
- * dati (api/gdpr/registrations/edit, /cancel), in due tempi:
+ * dati (api/gdpr/registrations/edit, /nickname, /cancel), in due tempi:
  *
  *  1. senza `code`: il token della pagina prova la casella e dice di chi e'
  *     l'iscrizione; il server controlla la richiesta e manda il codice
@@ -92,7 +92,11 @@ type IscrizioneDelToken = Awaited<ReturnType<typeof iscrizioneDelToken>>['iscriz
 export async function mandaCodice(
   richiesta: RichiestaConfermata,
   iscrizione: IscrizioneDelToken,
-  { locale, tutte = false }: { locale?: string; tutte?: boolean }
+  {
+    locale,
+    tutte = false,
+    togli = false,
+  }: { locale?: string; tutte?: boolean; togli?: boolean }
 ): Promise<Response> {
   const to = tryDecryptPII(iscrizione.email);
   if (!to)
@@ -115,6 +119,7 @@ export async function mandaCodice(
       locale: lingua,
       azione: richiesta.azione,
       tutte,
+      togli,
       eventTitle: getLocalized(iscrizione.event.title as LocalizedField, lingua),
       codice,
       minuti: DURATA_CODICE_MINUTI,
