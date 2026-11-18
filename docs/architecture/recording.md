@@ -28,6 +28,7 @@ their owner pages:
 |---|---|---|
 | Output | One MP4 per recording session, mixed audio and video | One Opus track per participant session, plus a `tracks.json` manifest |
 | Purpose | Playback, publication, video library, AI transcript from the mix | Exact speaker attribution in the AI transcript; optionally a downloadable archive |
+| Who is in it | The hosts, with image, name and voice; participants who consented to the recording, voice only | The voice of each person whose recording and transcription consents allow it |
 | Who starts it | A moderator (**Start recording**), or automatically when a moderator's room loads with `Event.autoStartRecording` on | The recorder controller, when an eligible event is `LIVE` |
 | Event flags | `recordingEnabled` (+ optional `autoStartRecording`) | `recordingEnabled` + `aiTranscriptEnabled` + `multitrackRecordingEnabled` |
 | Default | Off: `jitsi-meet.jibri.enabled: false`, every event flag `false` | Off: `recorder.enabled: false`, every event flag `false` |
@@ -94,9 +95,7 @@ The two capture paths treat consent differently.
   speaks without the consent is not recorded: `mod_pa_media_lock` marks their
   presence from the token, and Jitsi's `hidden-from-recorder` feature keeps that
   person out of Jibri's session: no name, voice, image or shared screen reaches
-  the video ([Jitsi integration](jitsi-integration.md)). Everyone else appears as
-  in any recording, with the speaker, the thumbnails and the names. The session
-  needs `hiddenFromRecorderFeatureEnabled`
+  the video ([Jitsi integration](jitsi-integration.md)). The session needs `hiddenFromRecorderFeatureEnabled`
   (`jitsi-meet.web.custom.configs._custom_config_js` in the chart,
   `infra/jitsi/web/custom-config.js` for Docker Compose). A values file that sets
   `_custom_config_js` replaces that text and has to carry it over: without it
@@ -106,8 +105,10 @@ The two capture paths treat consent differently.
   read a notice instead of the box; participants never appear in it, and the
   box asks only for the recording of their voice
   ([Who is in the video](../GDPR.md#who-is-in-the-video)). The conference token
-  of a host carries `context.user.paInVideo = true`, and no other token does: it
-  is the mark that tells the recorder whose image and name to show.
+  of a host carries `context.user.paInVideo = true`, and no other token does:
+  Prosody hides everyone without it from Jibri's session, which plays only the
+  voice of participants who consented
+  ([Only hosts in the video](jitsi-integration.md#per-event-participant-policies)).
   `Event.hostsAlwaysRecorded` stays in the database and is no longer read. A
   consent counts only while the text the person read covers the event's
   [destination](#recording-destination).

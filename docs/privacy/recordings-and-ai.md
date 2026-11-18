@@ -1209,7 +1209,12 @@ Consent and transparency:
   Prosody.** It uses Jitsi's `hidden-from-recorder` feature, and the mark comes
   from the current `mod_pa_media_lock`: with an old module loaded nobody is left
   out, and the room still says so. Retry it after every Jitsi upgrade, and
-  restart Prosody after an upgrade that changes the modules.
+  restart Prosody after an upgrade that changes the modules. The same holds for
+  keeping participants out of the video while their voice stays in it: the voice
+  comes from a script in the chart's conference text, which only adds sound, so
+  when it stops working participants' voices are missing from the video and
+  nobody appears who should not
+  ([Only hosts in the video](../architecture/jitsi-integration.md#per-event-participant-policies)).
 - **What is already in the composite video stays after a withdrawal.** Removing
   a person's passages is a removal request, which an administrator handles in
   the removal editor.

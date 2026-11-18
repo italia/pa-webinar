@@ -582,8 +582,12 @@ The room-role wiring is such a change: Prosody's module volume and `XMPP_MUC_MOD
 ([Server-side role enforcement](../architecture/jitsi-integration.md#server-side-role-enforcement)).
 The upgrade that first brings them to an installation restarts Prosody and Jicofo, and calls in
 progress drop: run it outside events. Adding a module to `XMPP_MUC_MODULES`, as the upgrade that
-brings `pa_media_lock` does, is the same kind of change. A later change to a module file alone does
-not restart Prosody; restart its StatefulSet when no call is running. A values file that sets its own
+brings `pa_media_lock` does, is the same kind of change. A change to a module file alone does not
+change Prosody's checksums: the chart's post-upgrade hook (`configReloadHook`) compares a fingerprint
+of the module files with the one it stored on the StatefulSet and restarts Prosody when they differ,
+which drops the calls in progress. Who appears in the recording depends on those modules, so run such
+an upgrade outside events; with `configReloadHook.enabled: false`, restart Prosody's StatefulSet
+yourself before the next event. A values file that sets its own
 `XMPP_MUC_MODULES` keeps its list: add `pa_media_lock` to it, or participant limits stay enforced only
 by the room's toolbar.
 

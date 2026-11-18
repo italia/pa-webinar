@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   eventoRegistrabile,
+  partecipantiNelVideo,
   recordingAvailable,
   recordingAvailableFor,
   tracceDisponibili,
@@ -74,6 +75,54 @@ describe('voceNelVideo', () => {
 
   it('con un Jitsi esterno non si sa chi registra: vale la risposta prudente', () => {
     expect(voceNelVideo({})).toBe('fissa');
+  });
+});
+
+describe('partecipantiNelVideo', () => {
+  const conJibri = { JITSI_WEB_INTERNAL_URL: 'http://jitsi-web', JIBRI_HEALTH_URL: 'http://jibri' };
+
+  it('il testo del chart riproduce la voce dei partecipanti: solo voce', () => {
+    expect(
+      partecipantiNelVideo({
+        ...conJibri,
+        RECORDING_VOICE_EXCLUSION: 'true',
+        RECORDING_PARTICIPANT_VOICE: 'true',
+      }),
+    ).toBe('solo-voce');
+  });
+
+  it('il testo onora i segni ma non riproduce la voce: fuori anche la voce', () => {
+    expect(partecipantiNelVideo({ ...conJibri, RECORDING_VOICE_EXCLUSION: 'true' })).toBe('esclusi');
+  });
+
+  it('la voce dichiarata senza la funzione nascosta non basta: i segni non valgono', () => {
+    expect(partecipantiNelVideo({ ...conJibri, RECORDING_PARTICIPANT_VOICE: 'true' })).toBe('visibili');
+  });
+
+  it('con un Jitsi esterno non si sa cosa mostra il registratore: possono comparire', () => {
+    expect(partecipantiNelVideo({})).toBe('visibili');
+  });
+
+  it('fuori dal chart valgono le variabili dichiarate a mano (Docker Compose con un Jibri suo)', () => {
+    expect(
+      partecipantiNelVideo({ RECORDING_VOICE_EXCLUSION: 'true', RECORDING_PARTICIPANT_VOICE: 'true' }),
+    ).toBe('solo-voce');
+  });
+
+  it('senza Jibri non c\'e\' un video completo', () => {
+    expect(
+      partecipantiNelVideo({
+        JITSI_WEB_INTERNAL_URL: 'http://jitsi-web',
+        RECORDER_CONTROLLER_URL: 'http://registratore',
+        RECORDING_PARTICIPANT_VOICE: 'true',
+      }),
+    ).toBe('assente');
+  });
+
+  it('un valore diverso da «true» non dichiara niente', () => {
+    expect(
+      partecipantiNelVideo({ ...conJibri, RECORDING_VOICE_EXCLUSION: 'true', RECORDING_PARTICIPANT_VOICE: '1' }),
+    ).toBe('esclusi');
   });
 });
 

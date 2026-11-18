@@ -8,7 +8,9 @@ Moduli Prosody del progetto, montati in /prosody-plugins-custom dal volume che
   - mod_token_affiliation_custom assegna il ruolo nella sala dal token del
     portale prima dell'ingresso;
   - mod_pa_media_lock accende la moderazione audio e video quando l'evento non
-    concede microfono, videocamera o schermo ai partecipanti.
+    concede microfono, videocamera o schermo ai partecipanti, e segna nella
+    presenza chi resta fuori dal video registrato (chi non conduce) e chi
+    resta fuori anche con la voce (chi non ha il consenso).
   - mod_pa_captions rende le stanze trascrivibili per i sottotitoli live, se
     Prosody ha PA_CAPTIONS_ENABLED=true (global.captions.enabled).
   - mod_pa_occupants dice al portale chi c'e' in sala (endpoint del bridge e
