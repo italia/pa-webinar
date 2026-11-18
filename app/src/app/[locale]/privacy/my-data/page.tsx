@@ -222,6 +222,13 @@ export default function MyDataPage() {
     }
   }, []);
 
+  // La conferma di una spunta in attesa, o le comunicazioni ridate, riportano
+  // l'indirizzo in rubrica: la voce mostrata sopra non dice piu' che ne e' uscito.
+  const rientroInRubrica = useCallback(() => {
+    setRubricaConfermata(true);
+    setRubrica((prima) => (prima ? { ...prima, optedIn: true, optedOutAt: null } : prima));
+  }, []);
+
   const handleSubmit = useCallback(
     async (e: FormEvent) => {
       e.preventDefault();
@@ -582,7 +589,7 @@ export default function MyDataPage() {
                         registrationId={entry.registration.id}
                         displayName={entry.registration.displayName}
                         organization={entry.registration.organization}
-                        quanteIscrizioni={results.length}
+                        quanteIscrizioni={results.length - cancellate.size}
                         locale={locale}
                         onCorretta={(dati) => corretta(entry.registration.id, dati)}
                       />
@@ -597,7 +604,7 @@ export default function MyDataPage() {
                         comunicazioniRitirateIl={comunicazioniRitirateIl}
                         onComunicazioniRitirate={setComunicazioniRitirateIl}
                         rubricaConfermata={rubricaConfermata}
-                        onRubricaConfermata={() => setRubricaConfermata(true)}
+                        onRubricaConfermata={rientroInRubrica}
                         offerta={entry.registration.consentOffer ?? null}
                         locale={locale}
                       />

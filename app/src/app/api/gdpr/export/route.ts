@@ -98,7 +98,7 @@ export const GET = withErrorHandling(async (request) => {
       // Le prove del consenso alla registrazione per partecipante date in sala
       // d'attesa: quando e in quale lingua (il nome e' quello dell'iscrizione).
       multitrackConsents: {
-        select: { consentedAt: true, locale: true, withdrawnAt: true },
+        select: { consentedAt: true, locale: true, withdrawnAt: true, textVersion: true },
         orderBy: { consentedAt: 'asc' },
       },
       // Lo stesso per il consenso alla registrazione dell'evento dato in sala
@@ -311,7 +311,7 @@ export const GET = withErrorHandling(async (request) => {
         }),
         // I consensi che la pagina puo' far dare di nuovo, con il testo da
         // mostrare (lib/gdpr/consent-giving).
-        consentOffer: offertaConsensi(r.event, sito),
+        consentOffer: offertaConsensi(r.event, sito, r),
         // La lingua delle email, che la piattaforma conserva e usa.
         locale: r.locale,
         registeredAt: r.createdAt.toISOString(),

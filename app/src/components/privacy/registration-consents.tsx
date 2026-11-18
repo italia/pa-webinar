@@ -29,11 +29,19 @@ export interface ConsensiVista {
  * (lib/gdpr/consent-giving, `offertaConsensi`). `null`: oggi non si da' da qui.
  */
 export interface OffertaVista {
-  recording: { destination: Destinazione; voice: VoceNelVideo; eventText: string | null } | null;
+  recording: {
+    destination: Destinazione;
+    voice: VoceNelVideo;
+    eventText: string | null;
+    /** Il consenso dato vale per il testo in vigore: uno su un testo che non lo
+     *  copre resta dato, ma va dato di nuovo. Assente nelle risposte di prima. */
+    inForce?: boolean;
+  } | null;
   transcription: {
     text: 'multitrack' | 'multitrackRetained';
     voice: VoceNelVideo;
     needsRecording: boolean;
+    inForce?: boolean;
   } | null;
   futureCommunications: boolean;
 }
@@ -87,6 +95,8 @@ export default function RegistrationConsents({
   // pagina: il ritiro piu' vecchio non le spegne di nuovo.
   const [comunicazioniRidateIl, setComunicazioniRidateIl] = useState<string | null>(null);
   const [dato, setDato] = useState<Chiave | null>(null);
+  // Cio' che la pagina ha cambiato da quando ha letto i dati: prevale su `inForce`.
+  const [vigoreLocale, setVigoreLocale] = useState<Partial<Record<Chiave, boolean>>>({});
   const dopoConferma: ConsensiVista =
     rubricaConfermata && statiLocali.addressBookPending
       ? {
@@ -148,9 +158,17 @@ export default function RegistrationConsents({
     transcription: tl('transcription.give'),
     futureCommunications: t('consentFutureGive'),
   };
+  // Vale per il testo in vigore: lo dice il server alla lettura, poi cio' che la
+  // pagina ha dato o ritirato.
+  const inVigore = (chiave: Chiave): boolean => {
+    if (vigoreLocale[chiave] !== undefined) return vigoreLocale[chiave]!;
+    const dalServer =
+      chiave === 'futureCommunications' ? undefined : offerta?.[chiave]?.inForce;
+    return dalServer ?? !!stati[chiave]?.dato;
+  };
   // La trascrizione senza la registrazione non avrebbe la voce: va data dopo.
   const serveRegistrazione =
-    !!offerta?.transcription?.needsRecording && !stati.recording?.dato;
+    !!offerta?.transcription?.needsRecording && !inVigore('recording');
 
   const voci: Array<{ chiave: Chiave; titolo: string; effetto: string; nota?: string }> =
     [
@@ -231,6 +249,11 @@ export default function RegistrationConsents({
         ...(chiave === 'futureCommunications' ? { addressBookPending: false } : {}),
       }));
       if (chiave === 'futureCommunications') onComunicazioniRitirate?.(adesso);
+      setVigoreLocale((prima) => ({
+        ...prima,
+        [chiave]: false,
+        ...(chiave === 'recording' ? { transcription: false } : {}),
+      }));
       setConferma(null);
     });
 
@@ -243,6 +266,7 @@ export default function RegistrationConsents({
         ...(chiave === 'recording'
           ? { recordingDestination: offerta?.recording?.destination ?? null }
           : {}),
+        ...(chiave === 'transcription' ? { transcriptionText: offerta?.transcription?.text } : {}),
       },
       () => {
         setStati((prima) => ({
@@ -250,6 +274,7 @@ export default function RegistrationConsents({
           [chiave]: { dato: true, ritiratoIl: null },
           ...(chiave === 'futureCommunications' ? { addressBookPending: false } : {}),
         }));
+        setVigoreLocale((prima) => ({ ...prima, [chiave]: true }));
         if (chiave === 'futureCommunications') {
           setComunicazioniRidateIl(new Date().toISOString());
           // Il rientro in rubrica chiude anche le spunte in attesa delle altre
@@ -329,6 +354,9 @@ export default function RegistrationConsents({
                     : tl('notGiven')}
               </div>
               {stato.dato && nota && <div className="text-muted">{nota}</div>}
+              {stato.dato && !inVigore(chiave) && testoDaDare[chiave] && (
+                <div className="text-muted">{t('consentGiveNewText')}</div>
+              )}
               {stato.dato &&
                 (conferma === chiave ? (
                   <div
@@ -367,7 +395,7 @@ export default function RegistrationConsents({
                     {tl('withdraw')}
                   </Button>
                 ))}
-              {!stato.dato && testoDaDare[chiave] && (
+              {!inVigore(chiave) && testoDaDare[chiave] && (
                 <div className="mt-1">
                   <div id={`${registrationId}-${chiave}-testo`} className="text-muted">
                     {testoDaDare[chiave]}
@@ -388,7 +416,7 @@ export default function RegistrationConsents({
                   </Button>
                 </div>
               )}
-              {stato.dato && dato === chiave && (
+              {inVigore(chiave) && dato === chiave && (
                 <div className="text-success" role="status">
                   {chiave === 'futureCommunications'
                     ? t('consentFutureGiveDone')

@@ -9,15 +9,17 @@
  *     l'iscrizione; il server controlla la richiesta e manda il codice
  *     all'indirizzo dell'iscrizione (lib/gdpr/confirmation-code). Risponde 202
  *     con `issuedAt`, che la pagina rimanda;
- *  2. con `code` e `issuedAt`: se il codice torna per la stessa richiesta, la
- *     modifica si fa.
+ *  2. con `code` e `issuedAt`: se quel codice e' stato mandato davvero, ha ancora
+ *     tentativi e torna per la stessa richiesta, la modifica si fa e il codice
+ *     non vale piu'.
  *
- * Limiti: per IP su tutte e due le fasi, come le altre rotte dei propri dati;
- * per indirizzo tre codici l'ora, come le email di accesso e cancellazione, e dieci
- * verifiche l'ora, che con sei cifre lasciano a chi tira a indovinare una
- * probabilita' trascurabile. Contati nella memoria di ogni pod, come gli altri.
- * Chi chiama ha gia' il token di quell'indirizzo: un 429 non gli dice niente che
- * non sappia. Nei log non va niente della persona.
+ * Limiti, nel registro condiviso fra le repliche (lib/gdpr/confirmation-store):
+ * cinque codici l'ora per indirizzo e cinque tentativi per codice, che con sei
+ * cifre lasciano a chi tira a indovinare una probabilita' trascurabile, e solo
+ * dopo che la persona ha ricevuto l'email. In piu', nella memoria di ogni pod come
+ * le altre rotte dei propri dati: trenta chiamate l'ora per IP e dieci verifiche
+ * l'ora per indirizzo. Chi chiama ha gia' il token di quell'indirizzo: un 429 non
+ * gli dice niente che non sappia. Nei log non va niente della persona.
  */
 import { AppError, NotFoundError, RateLimitError } from '@/lib/errors';
 import { tryDecryptPII } from '@/lib/crypto/pii';
@@ -30,6 +32,12 @@ import {
   verificaCodice,
   type RichiestaConfermata,
 } from '@/lib/gdpr/confirmation-code';
+import {
+  chiudiEmissione,
+  contaInvio,
+  contaTentativo,
+  registraEmissione,
+} from '@/lib/gdpr/confirmation-store';
 import { verifyGdprToken } from '@/lib/gdpr/request-token';
 import { getClientIp, rateLimit } from '@/lib/rate-limit';
 import { getSettings } from '@/lib/settings';
@@ -37,6 +45,9 @@ import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { defaultLocale } from '@/i18n/config';
 
 const ORA_MS = 3_600_000;
+
+const nonDisponibile = () =>
+  new AppError('Confirmation codes are unavailable, try again later', 503, 'SERVICE_UNAVAILABLE');
 
 function limita(chiave: string, limit: number): void {
   const rl = rateLimit(chiave, { limit, windowMs: ORA_MS });
@@ -77,12 +88,16 @@ export async function mandaCodice(
   iscrizione: IscrizioneDelToken,
   { locale, tutte = false }: { locale?: string; tutte?: boolean }
 ): Promise<Response> {
-  limita(`gdpr-registration-code:${richiesta.emailHash}`, 3);
   const to = tryDecryptPII(iscrizione.email);
   if (!to)
     throw new AppError('Registration address unavailable', 409, 'ADDRESS_UNAVAILABLE');
+  const conto = await contaInvio(richiesta.emailHash);
+  if (conto === 'troppi') throw new RateLimitError(ORA_MS / 1000);
+  if (conto === 'nonDisponibile') throw nonDisponibile();
   const lingua = linguaPagina(locale) ?? linguaPagina(iscrizione.locale) ?? defaultLocale;
   const { codice, emessoIl } = emettiCodice(richiesta);
+  // Prima si annota, poi si manda: un codice che parte vale anche sulle altre repliche.
+  if ((await registraEmissione(richiesta, emessoIl)) !== 'ok') throw nonDisponibile();
   await inviaCodiceDiConferma({
     to,
     locale: lingua,
@@ -100,14 +115,20 @@ export async function mandaCodice(
   );
 }
 
-/** Il codice torna per questa richiesta, o la modifica non si fa (403). */
-export function controllaCodice(
+/**
+ * Il codice e' stato mandato per questa richiesta, ha ancora tentativi e torna:
+ * altrimenti la modifica non si fa (403). Confermato, non vale piu'.
+ */
+export async function controllaCodice(
   richiesta: RichiestaConfermata,
   issuedAt: number,
   code: string
-): void {
+): Promise<void> {
   limita(`gdpr-registration-verify:${richiesta.emailHash}`, 10);
-  if (!verificaCodice(richiesta, issuedAt, code)) {
+  const tentativo = await contaTentativo(richiesta, issuedAt);
+  if (tentativo === 'nonDisponibile') throw nonDisponibile();
+  if (tentativo !== 'ammesso' || !verificaCodice(richiesta, issuedAt, code)) {
     throw new AppError('Invalid or expired confirmation code', 403, 'INVALID_CODE');
   }
+  await chiudiEmissione(richiesta, issuedAt);
 }

@@ -387,7 +387,7 @@ The values below come from the route files. To list every call site with its val
 | Data-subject export or erasure request | `POST /api/gdpr/export/request`, `POST /api/gdpr/erasure/request` | IP / email hash | 5 / 3 per hour |
 | Export download, erasure confirmation | `GET /api/gdpr/export`, `POST /api/gdpr/erasure` | IP | 10 per hour |
 | Withdrawal or giving of a consent, confirmation of an address-book tick | `POST /api/gdpr/consents` | IP | 30 per hour |
-| Correction or deletion of one registration from **My data** | `POST /api/gdpr/registrations/edit`, `POST /api/gdpr/registrations/cancel` | IP / email hash for the codes sent / email hash for the codes checked | 30 / 3 / 10 per hour |
+| Correction or deletion of one registration from **My data** | `POST /api/gdpr/registrations/edit`, `POST /api/gdpr/registrations/cancel` | IP / email hash for the codes checked; in Redis, shared by the replicas: email hash for the codes sent, and each code | 30 / 10 per hour; 5 codes per hour, 5 attempts per code |
 | Reading the consents in force from the room | `POST …/consents/in-force` | IP | 300 per minute × `ROOM_RATE_LIMIT_MULTIPLIER` |
 | Address-book opt-out | `POST /api/rubrica/opt-out` | IP | 10 per minute |
 | Link-preview image | `GET /api/og/event/{slug}` | IP | 60 per minute |

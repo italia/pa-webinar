@@ -378,7 +378,14 @@ describe('testo letto', () => {
     };
     vi.unstubAllEnvs();
     expect(corpo.data[0]!.registration.consentOffer).toEqual({
-      recording: { destination: 'PUBLIC', voice: 'rimovibile', eventText: 'Testo dell’ente' },
+      recording: {
+        destination: 'PUBLIC',
+        voice: 'rimovibile',
+        eventText: 'Testo dell’ente',
+        // Il consenso all'iscrizione non dichiara la destinazione: non copre un
+        // video pubblico, e va dato di nuovo.
+        inForce: false,
+      },
       transcription: null,
       futureCommunications: true,
     });

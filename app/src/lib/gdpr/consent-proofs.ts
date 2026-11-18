@@ -124,6 +124,30 @@ export function origineDelPosto(jitsiUserId: string): 'room' | 'self-service' {
     : 'room';
 }
 
+/**
+ * Il periodo di una prova di registrazione che un consenso nuovo sostituisce o
+ * ridà dopo un ritiro: resta nella prova (`earlierPeriods`) con il suo testo. Un
+ * periodo dato dalla pagina dei propri dati lo dice; senza, era in sala. Lo
+ * scrivono la sala (api/events/[param]/jitsi/token) e la pagina dei propri dati
+ * (lib/gdpr/consent-giving).
+ */
+export function periodoSostituito(p: {
+  jitsiUserId: string;
+  consentedAt: Date;
+  withdrawnAt: Date | null;
+  destination: Destinazione;
+  textVersion: number | null;
+}) {
+  // Il tipo resta quello del letterale: un'interfaccia non passa come JSON a Prisma.
+  return {
+    consentedAt: p.consentedAt.toISOString(),
+    withdrawnAt: p.withdrawnAt?.toISOString() ?? null,
+    destination: p.destination,
+    textVersion: p.textVersion,
+    ...(origineDelPosto(p.jitsiUserId) === 'self-service' && { source: 'self-service' as const }),
+  } satisfies PeriodoConsenso;
+}
+
 const ruoloDiSala = (p: ProvaDiSala): RuoloConsenso =>
   p.eventModeratorId || p.staffAccountId
     ? 'host'

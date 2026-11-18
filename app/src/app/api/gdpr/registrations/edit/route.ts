@@ -49,16 +49,13 @@ const schema = z
   .strict()
   .refine((b) => (b.code === undefined) === (b.issuedAt === undefined));
 
-/** Gli errori dei valori con le chiavi dei messaggi del modulo d'iscrizione. */
+/** Gli errori dei valori, con le chiavi dei testi della pagina dei propri dati. */
 const ERRORI = {
-  nameInvalid: { path: ['displayName'], message: 'registration.errors.nameRequired' },
-  organizationTooLong: {
-    path: ['organization'],
-    message: 'registration.errors.organizationTooLong',
-  },
+  nameInvalid: { path: ['displayName'], message: 'gdpr.export.editNameInvalid' },
+  organizationTooLong: { path: ['organization'], message: 'gdpr.export.editOrganizationTooLong' },
   organizationRequired: {
     path: ['organization'],
-    message: 'registration.errors.organizationRequired',
+    message: 'gdpr.export.editOrganizationRequired',
   },
 } as const;
 
@@ -92,7 +89,7 @@ export const POST = withErrorHandling(async (request) => {
       tutte: corpo.scope === 'address',
     });
   }
-  controllaCodice(richiesta, corpo.issuedAt, corpo.code);
+  await controllaCodice(richiesta, corpo.issuedAt, corpo.code);
   const esito = await correggiIscrizioni(emailHash, iscrizione.id, corpo.scope, valori);
   return Response.json(
     {

@@ -23,7 +23,8 @@
  *    (lib/gdpr/consent-giving), con la stessa prova di quello dato in sala. Per
  *    la registrazione la pagina rimanda la destinazione del testo che ha mostrato
  *    (`recordingDestination`, null se non ne dichiara una), come il modulo
- *    d'iscrizione. Vale dal prossimo ingresso in sala.
+ *    d'iscrizione, e per la trascrizione la casella (`transcriptionText`). Vale
+ *    dal prossimo ingresso in sala.
  */
 import { z } from 'zod';
 
@@ -71,11 +72,13 @@ const schema = z.union([
       consent: z.enum(['recording', 'transcription', 'futureCommunications']),
       give: z.literal(true),
       recordingDestination: destinatariVideo.nullable().optional(),
+      transcriptionText: z.enum(['multitrack', 'multitrackRetained']).optional(),
       locale: z.string().max(10).optional(),
     })
     .strict()
-    // Il consenso alla registrazione vale per il testo letto: la pagina lo dice.
-    .refine((c) => c.consent !== 'recording' || c.recordingDestination !== undefined),
+    // Il consenso vale per il testo letto: la pagina lo dice.
+    .refine((c) => c.consent !== 'recording' || c.recordingDestination !== undefined)
+    .refine((c) => c.consent !== 'transcription' || c.transcriptionText !== undefined),
 ]);
 
 /** Perche' un consenso non si e' potuto dare: la pagina lo spiega. */
@@ -105,7 +108,10 @@ export const POST = withErrorHandling(async (request) => {
 
   if ('give' in corpo) {
     const esito = await daiConsenso(verificato.emailHash, corpo.registrationId, corpo.consent, {
-      letta: corpo.recordingDestination ?? null,
+      letto: {
+        destinazione: corpo.recordingDestination ?? null,
+        trascrizione: corpo.transcriptionText,
+      },
       locale: linguaPagina(corpo.locale),
     });
     if (esito === 'nonTrovata') throw new NotFoundError('Registration');

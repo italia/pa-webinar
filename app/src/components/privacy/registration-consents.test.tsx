@@ -361,8 +361,18 @@ describe('RegistrationConsents', () => {
   describe('un consenso dato di nuovo', () => {
     const ritirato = { dato: false, ritiratoIl: '2026-11-05T10:00:00.000Z' };
     const offerta: OffertaVista = {
-      recording: { destination: 'REGISTRANTS', voice: 'rimovibile', eventText: 'Testo dell’ente.' },
-      transcription: { text: 'multitrack', voice: 'rimovibile', needsRecording: true },
+      recording: {
+        destination: 'REGISTRANTS',
+        voice: 'rimovibile',
+        eventText: 'Testo dell’ente.',
+        inForce: false,
+      },
+      transcription: {
+        text: 'multitrack',
+        voice: 'rimovibile',
+        needsRecording: true,
+        inForce: false,
+      },
       futureCommunications: true,
     };
     const g = messages.gdpr.consent;
@@ -435,6 +445,25 @@ describe('RegistrationConsents', () => {
       monta({ futureCommunications: ritirato, addressBookPending: true }, { offerta });
       expect(pulsante(messages.gdpr.export.consentFutureGive)).toBeUndefined();
       expect(pulsante(messages.gdpr.export.addressBookPendingConfirm)).toBeDefined();
+    });
+
+    it('un consenso dato su un testo che non copre quello in vigore si da di nuovo', async () => {
+      const richiesta = vi.fn(async () => new Response('{}', { status: 200 }));
+      vi.stubGlobal('fetch', richiesta);
+      monta({ recording: dato, transcription: ritirato }, { offerta });
+      expect(container.textContent).toContain(messages.gdpr.export.consentGiveNewText);
+      expect(pulsante(l.withdraw)).toBeDefined();
+      // La trascrizione aspetta il consenso valido, non quello vecchio.
+      expect(pulsante(l.transcription.give)?.disabled).toBe(true);
+      await clic(l.recording.give);
+      expect(pulsante(l.transcription.give)?.disabled).toBe(false);
+      await clic(l.transcription.give);
+      const ultima = richiesta.mock.calls.at(-1) as unknown as [string, { body: string }];
+      expect(JSON.parse(ultima[1].body)).toMatchObject({
+        consent: 'transcription',
+        give: true,
+        transcriptionText: 'multitrack',
+      });
     });
   });
 });

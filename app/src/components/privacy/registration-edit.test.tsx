@@ -174,7 +174,9 @@ describe('RegistrationEdit', () => {
           new Response(
             JSON.stringify({
               code: 'VALIDATION_ERROR',
-              details: [{ path: ['organization'], message: 'x' }],
+              details: [
+                { path: ['organization'], message: 'gdpr.export.editOrganizationRequired' },
+              ],
             }),
             { status: 422 }
           )
@@ -185,5 +187,24 @@ describe('RegistrationEdit', () => {
     await clic(m.codeSend);
     expect(container.textContent).toContain(m.editOrganizationRequired);
     expect(campo(m.fieldOrganization).getAttribute('aria-invalid')).toBe('true');
+  });
+
+  it('un 422 senza campi riconosciuti non lascia la pagina muta', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockResolvedValueOnce(new Response(JSON.stringify({ issuedAt: 1 }), { status: 202 }))
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({ code: 'VALIDATION_ERROR' }), { status: 422 })
+        )
+    );
+    monta();
+    await clic(m.editButton);
+    await clic(m.codeSend);
+    scrivi(container.querySelector<HTMLInputElement>('input[autocomplete="one-time-code"]')!, '111111');
+    await clic(m.codeConfirmEdit);
+    expect(container.querySelector('[role="alert"]')?.textContent).toBe(m.error);
+    expect(pulsante(m.codeConfirmEdit)).toBeDefined();
   });
 });

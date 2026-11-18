@@ -71,6 +71,7 @@ export async function applicaSpuntaInAttesa(
     });
     if (count === 0) return false;
     const iscrizione = await leggiIscrizione(tx, registrationId);
+    if (!iscrizione) return false;
     if (!rubricaProposta(iscrizione.event, sito)) {
       await tx.gdprAuditLog.create({ data: rigaSpuntaTolta(iscrizione.eventId, origine) });
       return false;
@@ -93,12 +94,8 @@ export async function ridaiComunicazioni(
   const sito = await getSettings();
   return prisma.$transaction(async (tx) => {
     // Cancellata mentre la richiesta arrivava: non c'e' piu' niente da ridare.
-    const esiste = await tx.registration.findUnique({
-      where: { id: registrationId },
-      select: { id: true },
-    });
-    if (!esiste) return 'nonTrovata';
     const iscrizione = await leggiIscrizione(tx, registrationId);
+    if (!iscrizione) return 'nonTrovata';
     if (!rubricaProposta(iscrizione.event, sito)) return 'nonProposta';
     // Due richieste insieme: solo la prima trova il consenso spento.
     const { count } = await tx.registration.updateMany({
@@ -114,7 +111,7 @@ export async function ridaiComunicazioni(
 }
 
 function leggiIscrizione(tx: Prisma.TransactionClient, registrationId: string) {
-  return tx.registration.findUniqueOrThrow({
+  return tx.registration.findUnique({
     where: { id: registrationId },
     select: {
       eventId: true,
@@ -137,7 +134,7 @@ function leggiIscrizione(tx: Prisma.TransactionClient, registrationId: string) {
 async function rientraInRubrica(
   tx: Prisma.TransactionClient,
   registrationId: string,
-  iscrizione: Awaited<ReturnType<typeof leggiIscrizione>>,
+  iscrizione: NonNullable<Awaited<ReturnType<typeof leggiIscrizione>>>,
   sito: Awaited<ReturnType<typeof getSettings>>,
   origine: OrigineConferma,
   dettagli: Record<string, unknown>

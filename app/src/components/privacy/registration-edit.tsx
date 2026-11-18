@@ -13,7 +13,7 @@ import { useId, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Alert, Button } from 'design-react-kit';
 
-import { CampoCodice, useCodiceDiConferma } from './confirmation-code';
+import { CampoCodice, useCodiceDiConferma, type ChiaveErrore } from './confirmation-code';
 
 export type AmbitoVista = 'registration' | 'address';
 
@@ -48,7 +48,7 @@ export default function RegistrationEdit({
   const [nome, setNome] = useState(displayName);
   const [ente, setEnte] = useState(organization ?? '');
   const [ambito, setAmbito] = useState<AmbitoVista>('registration');
-  const [erroriCampi, setErroriCampi] = useState<string[]>([]);
+  const [erroriCampi, setErroriCampi] = useState<Record<string, ChiaveErrore>>({});
   const [fatta, setFatta] = useState(false);
   const codice = useCodiceDiConferma('/api/gdpr/registrations/edit');
 
@@ -62,12 +62,12 @@ export default function RegistrationEdit({
   });
   const chiudi = () => {
     setAperta(false);
-    setErroriCampi([]);
+    setErroriCampi({});
     codice.ricomincia();
   };
 
   const chiediCodice = async () => {
-    setErroriCampi([]);
+    setErroriCampi({});
     setFatta(false);
     const esito = await codice.chiedi(corpo());
     if (esito.campi) setErroriCampi(esito.campi);
@@ -136,15 +136,15 @@ export default function RegistrationEdit({
           maxLength={100}
           required
           disabled={bloccato}
-          aria-invalid={erroriCampi.includes('displayName')}
+          aria-invalid={!!erroriCampi.displayName}
           aria-describedby={
-            erroriCampi.includes('displayName') ? `${id}-nome-errore` : undefined
+            erroriCampi.displayName ? `${id}-nome-errore` : undefined
           }
           onChange={(e) => setNome(e.target.value)}
         />
-        {erroriCampi.includes('displayName') && (
+        {erroriCampi.displayName && (
           <p id={`${id}-nome-errore`} className="text-danger small mb-2">
-            {t('editNameInvalid')}
+            {t(erroriCampi.displayName)}
           </p>
         )}
         <label htmlFor={`${id}-ente`} className="form-label fw-semibold mt-2">
@@ -156,15 +156,15 @@ export default function RegistrationEdit({
           value={ente}
           maxLength={200}
           disabled={bloccato}
-          aria-invalid={erroriCampi.includes('organization')}
+          aria-invalid={!!erroriCampi.organization}
           aria-describedby={
-            erroriCampi.includes('organization') ? `${id}-ente-errore` : undefined
+            erroriCampi.organization ? `${id}-ente-errore` : undefined
           }
           onChange={(e) => setEnte(e.target.value)}
         />
-        {erroriCampi.includes('organization') && (
+        {erroriCampi.organization && (
           <p id={`${id}-ente-errore`} className="text-danger small mb-2">
-            {t('editOrganizationRequired')}
+            {t(erroriCampi.organization)}
           </p>
         )}
         {quanteIscrizioni > 1 && (

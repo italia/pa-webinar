@@ -19,10 +19,15 @@
  * Quando si puo' dare. Registrazione e trascrizione solo finche' l'evento chiede
  * quel consenso a chi si iscrive (la regola del modulo, lib/registration/consents)
  * e accetta ancora iscrizioni (`isEventOpenForRegistration`): prima dell'inizio e
- * mentre e' in diretta. Il consenso vale dal prossimo ingresso in sala e non tocca
- * cio' che e' gia' stato registrato; a evento concluso non ci sarebbe un ingresso,
- * e un consenso dato dopo non deve rimettere in gioco tracce o frasi di un periodo
- * in cui la persona era fuori. Dove la voce di chi non acconsente resta fuori dalla
+ * mentre e' in diretta. La registrazione vale dal prossimo ingresso in sala (il
+ * token in uso resta com'e'); la trascrizione dove il server la legge mentre la
+ * persona parla (le frasi dei sottotitoli) e comunque dal prossimo ingresso. Il
+ * video gia' registrato non cambia. A evento concluso non ci sarebbe un ingresso,
+ * e il consenso alla trascrizione si legge per iscrizione, non per periodo
+ * (lib/captions/room): dato dopo, rimetterebbe nella trascrizione le tracce di un
+ * periodo in cui la persona l'aveva ritirato e che la pulizia non ha ancora tolto.
+ * Durante l'evento succede lo stesso, come per il consenso ridato in sala.
+ * Dove la voce di chi non acconsente resta fuori dalla
  * registrazione, la trascrizione chiede prima il consenso alla registrazione, come
  * in sala. Le comunicazioni future non riguardano l'evento: tornano finche'
  * l'evento e l'installazione propongono la rubrica (`rubricaProposta`), come la
@@ -33,8 +38,9 @@ import type { Prisma } from '@prisma/client';
 import { versioneConsensoTrascrizione } from '@/lib/ai/voice-consent';
 import { captionsTranscriptActive } from '@/lib/captions/availability';
 import { bloccaTrascrizioneEvento } from '@/lib/captions/transcript';
-import { origineDelPosto, postoDaIMieiDati } from '@/lib/gdpr/consent-proofs';
 import { prisma } from '@/lib/db';
+import { TIMEOUT_DOPO_PULIZIA_MS } from '@/lib/gdpr/cleanup-selection';
+import { periodoSostituito, postoDaIMieiDati } from '@/lib/gdpr/consent-proofs';
 import { isEventOpenForRegistration } from '@/lib/events/visibility';
 import {
   regolaConsenso,
@@ -51,7 +57,6 @@ import {
   testoLetto,
   VERSIONE_TESTO_REGISTRAZIONE,
   type Destinazione,
-  type PeriodoConsenso,
 } from '@/lib/recording/destination';
 import {
   chiaveConsensoTrascrizione,
@@ -105,14 +110,59 @@ export interface OffertaConsensi {
     voice: VoceNelVideo;
     /** Il testo scelto per l'evento, che precede quello della casella. */
     eventText: string | null;
+    /** Un consenso dato vale per il testo in vigore. Uno dato su un testo che non
+     *  lo copre resta dato, ma non vale: si da' di nuovo. */
+    inForce: boolean;
   } | null;
   transcription: {
+    /** Il testo della casella: la pagina lo rimanda con il consenso. */
     text: ReturnType<typeof chiaveConsensoTrascrizione>;
     voice: VoceNelVideo;
     /** Senza il consenso alla registrazione la voce resta fuori: va dato prima. */
     needsRecording: boolean;
+    /** Come per la registrazione, con la versione del testo richiesta. */
+    inForce: boolean;
   } | null;
   futureCommunications: boolean;
+}
+
+/** Cio' che serve a dire se i consensi di un'iscrizione valgono adesso. */
+export interface ConsensiDellIscrizione {
+  consentRecording: boolean | null;
+  consentRecordingWithdrawnAt: Date | null;
+  consentRecordingDestination: Destinazione;
+  consentMultitrack: boolean | null;
+  consentMultitrackVersion: number | null;
+  consentMultitrackWithdrawnAt: Date | null;
+  /** Le prove di sala dell'iscrizione: il ritiro e, per la registrazione, la
+   *  destinazione, per la trascrizione la versione del testo. */
+  recordingConsents: readonly { withdrawnAt: Date | null; destination: Destinazione }[];
+  multitrackConsents: readonly { withdrawnAt: Date | null; textVersion: number }[];
+}
+
+/**
+ * I consensi dell'iscrizione che valgono per il testo in vigore, con le regole del
+ * token della sala (lib/live/consents-in-force) e della trascrizione
+ * (lib/captions/room): dati all'iscrizione o in sala, non ritirati, su un testo che
+ * copre la destinazione del video e con la versione richiesta.
+ */
+export function consensiInVigore(
+  c: ConsensiDellIscrizione,
+  destinazione: Destinazione,
+  versioneTrascrizione: number
+): { recording: boolean; transcription: boolean } {
+  return {
+    recording:
+      (c.consentRecording === true &&
+        !c.consentRecordingWithdrawnAt &&
+        consensoCopre(c.consentRecordingDestination, destinazione)) ||
+      c.recordingConsents.some((p) => !p.withdrawnAt && consensoCopre(p.destination, destinazione)),
+    transcription:
+      (c.consentMultitrack === true &&
+        !c.consentMultitrackWithdrawnAt &&
+        (c.consentMultitrackVersion ?? 1) >= versioneTrascrizione) ||
+      c.multitrackConsents.some((p) => !p.withdrawnAt && p.textVersion >= versioneTrascrizione),
+  };
 }
 
 /** Le regole dell'evento per i consensi da dare, con i fatti dell'installazione. */
@@ -142,9 +192,15 @@ function regole(evento: EventoConsensi, sito: SitoConsensi) {
 
 export function offertaConsensi(
   evento: EventoConsensi,
-  sito: SitoConsensi
+  sito: SitoConsensi,
+  iscrizione: ConsensiDellIscrizione
 ): OffertaConsensi {
   const r = regole(evento, sito);
+  const vigore = consensiInVigore(
+    iscrizione,
+    r.destinazione,
+    versioneConsensoTrascrizione(evento, sito)
+  );
   return {
     recording:
       r.aperto && r.richiesti.registrazione
@@ -152,6 +208,7 @@ export function offertaConsensi(
             destination: r.destinazione,
             voice: r.voce,
             eventText: testoConsensoEvento(evento.recordingConsentText, r.voce),
+            inForce: vigore.recording,
           }
         : null,
     transcription:
@@ -160,6 +217,7 @@ export function offertaConsensi(
             text: chiaveConsensoTrascrizione(traccePerPersonaConservate(evento, sito)),
             voice: r.voce,
             needsRecording: r.serveRegistrazione,
+            inForce: vigore.transcription,
           }
         : null,
     futureCommunications: rubricaProposta(evento, sito),
@@ -179,6 +237,13 @@ export type EsitoConsensoDato =
   /** Il testo letto non e' quello in vigore: la pagina va ricaricata. */
   | 'testoCambiato';
 
+/** Il testo che la pagina ha mostrato: per la registrazione la destinazione, per la
+ *  trascrizione la casella (con la traccia che si cancella o che si conserva). */
+export interface TestoLetto {
+  destinazione?: Destinazione;
+  trascrizione?: ReturnType<typeof chiaveConsensoTrascrizione>;
+}
+
 const CAMPI_ISCRIZIONE = {
   id: true,
   eventId: true,
@@ -191,36 +256,14 @@ const CAMPI_ISCRIZIONE = {
   consentMultitrackWithdrawnAt: true,
   consentFutureCommunications: true,
   consentFutureCommunicationsWithdrawnAt: true,
+  recordingConsents: { select: { withdrawnAt: true, destination: true } },
+  multitrackConsents: { select: { withdrawnAt: true, textVersion: true } },
   event: { select: CAMPI_EVENTO_CONSENSI },
 } as const satisfies Prisma.RegistrationSelect;
 
 type IscrizioneConsensi = Prisma.RegistrationGetPayload<{
   select: typeof CAMPI_ISCRIZIONE;
 }>;
-
-/** Il consenso alla registrazione dell'iscrizione vale per il testo in vigore. */
-async function registrazioneInVigore(
-  tx: Prisma.TransactionClient,
-  iscrizione: IscrizioneConsensi,
-  destinazione: Destinazione
-): Promise<boolean> {
-  if (
-    iscrizione.consentRecording === true &&
-    !iscrizione.consentRecordingWithdrawnAt &&
-    consensoCopre(iscrizione.consentRecordingDestination, destinazione)
-  ) {
-    return true;
-  }
-  const prova = await tx.recordingConsent.findFirst({
-    where: {
-      eventId: iscrizione.eventId,
-      registrationId: iscrizione.id,
-      withdrawnAt: null,
-    },
-    select: { destination: true },
-  });
-  return prova !== null && consensoCopre(prova.destination, destinazione);
-}
 
 async function registro(
   tx: Prisma.TransactionClient,
@@ -244,7 +287,6 @@ async function daiRegistrazione(
   letta: Destinazione | undefined,
   locale: string | null
 ): Promise<EsitoConsensoDato> {
-  if (await registrazioneInVigore(tx, iscrizione, destinazione)) return 'gia';
   const destinazioneLetta = testoLetto(letta, destinazione);
   const testo = {
     destination: destinazioneLetta,
@@ -281,16 +323,7 @@ async function daiRegistrazione(
         consentedAt: new Date(),
         earlierPeriods: [
           ...(Array.isArray(esistente.earlierPeriods) ? esistente.earlierPeriods : []),
-          {
-            consentedAt: esistente.consentedAt.toISOString(),
-            withdrawnAt: esistente.withdrawnAt?.toISOString() ?? null,
-            destination: esistente.destination,
-            textVersion: esistente.textVersion,
-            // Un periodo dato da qui lo dice; senza, in sala.
-            ...(origineDelPosto(esistente.jitsiUserId) === 'self-service' && {
-              source: 'self-service' as const,
-            }),
-          } satisfies PeriodoConsenso,
+          periodoSostituito(esistente),
         ],
         ...testo,
         // Il periodo in corso viene da qui: il posto lo dice all'elenco delle prove.
@@ -333,36 +366,10 @@ async function daiRegistrazione(
 async function daiTrascrizione(
   tx: Prisma.TransactionClient,
   iscrizione: IscrizioneConsensi,
-  sito: SitoConsensi,
   locale: string | null
 ): Promise<EsitoConsensoDato> {
-  const versione = versioneConsensoTrascrizione(iscrizione.event, sito);
-  const allIscrizione =
-    iscrizione.consentMultitrack === true &&
-    !iscrizione.consentMultitrackWithdrawnAt &&
-    (iscrizione.consentMultitrackVersion ?? 1) >= versione;
-  const prova = allIscrizione
-    ? null
-    : await tx.multitrackConsent.findFirst({
-        where: {
-          eventId: iscrizione.eventId,
-          registrationId: iscrizione.id,
-          textVersion: { gte: versione },
-          withdrawnAt: null,
-        },
-        select: { id: true },
-      });
-  if (allIscrizione || prova) return 'gia';
   // Una prova nuova accanto a quelle ritirate, che restano come erano: la stessa
   // regola del consenso dato in sala.
-  const ritirata = await tx.multitrackConsent.findFirst({
-    where: {
-      eventId: iscrizione.eventId,
-      registrationId: iscrizione.id,
-      withdrawnAt: { not: null },
-    },
-    select: { id: true },
-  });
   await tx.multitrackConsent.create({
     data: {
       eventId: iscrizione.eventId,
@@ -375,7 +382,9 @@ async function daiTrascrizione(
   });
   await registro(tx, iscrizione.eventId, {
     kind: 'transcription',
-    givenAgain: !!ritirata || !!iscrizione.consentMultitrackWithdrawnAt,
+    givenAgain:
+      iscrizione.multitrackConsents.some((p) => !!p.withdrawnAt) ||
+      !!iscrizione.consentMultitrackWithdrawnAt,
     textVersion: VERSIONE_TESTO_TRASCRIZIONE,
   });
   return 'dato';
@@ -383,20 +392,19 @@ async function daiTrascrizione(
 
 /**
  * Da' di nuovo un consenso di un'iscrizione dell'indirizzo provato dal token.
- * `letta` e' la destinazione del testo mostrato per la registrazione, come nel
- * modulo d'iscrizione: se nel frattempo e' cambiata, non vale.
+ * `letto` e' il testo che la pagina ha mostrato, come nel modulo d'iscrizione: se
+ * nel frattempo e' cambiato, non vale.
  */
 export async function daiConsenso(
   emailHash: string,
   registrationId: string,
   consenso: ConsensoDaDare,
-  { letta, locale = null }: { letta?: Destinazione; locale?: string | null } = {}
+  { letto = {}, locale = null }: { letto?: TestoLetto; locale?: string | null } = {}
 ): Promise<EsitoConsensoDato> {
-  const sito = await getSettings();
   if (consenso === 'futureCommunications') {
     const iscrizione = await prisma.registration.findFirst({
       where: { id: registrationId, emailHash },
-      select: CAMPI_ISCRIZIONE,
+      select: { id: true, consentFutureCommunications: true, consentFutureCommunicationsWithdrawnAt: true },
     });
     if (!iscrizione) return 'nonTrovata';
     if (iscrizione.consentFutureCommunications) return 'gia';
@@ -405,35 +413,44 @@ export async function daiConsenso(
     const esito = await ridaiComunicazioni(iscrizione.id);
     return esito === 'nonProposta' ? 'nonOfferto' : esito;
   }
+  const sito = await getSettings();
   const prima = await prisma.registration.findFirst({
     where: { id: registrationId, emailHash },
     select: { eventId: true },
   });
   if (!prima) return 'nonTrovata';
-  return prisma.$transaction(async (tx) => {
-    // In fila con i ritiri, le cancellazioni e la pulizia dello stesso evento:
-    // l'iscrizione si rilegge dopo il turno, e se nel frattempo e' stata
-    // cancellata non c'e' piu' niente a cui legare la prova.
-    await bloccaTrascrizioneEvento(tx, prima.eventId);
-    const iscrizione = await tx.registration.findFirst({
-      where: { id: registrationId, emailHash },
-      select: CAMPI_ISCRIZIONE,
-    });
-    if (!iscrizione) return 'nonTrovata';
-    const r = regole(iscrizione.event, sito);
-    if (!r.aperto) return 'nonOfferto';
-    if (consenso === 'recording') {
-      if (!r.richiesti.registrazione) return 'nonOfferto';
-      if (!testoInVigore(letta, r.destinazione)) return 'testoCambiato';
-      return daiRegistrazione(tx, iscrizione, r.destinazione, letta, locale);
-    }
-    if (!r.richiesti.tracce) return 'nonOfferto';
-    if (
-      r.serveRegistrazione &&
-      !(await registrazioneInVigore(tx, iscrizione, r.destinazione))
-    ) {
-      return 'serveRegistrazione';
-    }
-    return daiTrascrizione(tx, iscrizione, sito, locale);
-  });
+  return prisma.$transaction(
+    async (tx) => {
+      // In fila con i ritiri, le cancellazioni e la pulizia dello stesso evento:
+      // l'iscrizione si rilegge dopo il turno, e se nel frattempo e' stata
+      // cancellata non c'e' piu' niente a cui legare la prova.
+      await bloccaTrascrizioneEvento(tx, prima.eventId);
+      const iscrizione = await tx.registration.findFirst({
+        where: { id: registrationId, emailHash },
+        select: CAMPI_ISCRIZIONE,
+      });
+      if (!iscrizione) return 'nonTrovata';
+      const r = regole(iscrizione.event, sito);
+      if (!r.aperto) return 'nonOfferto';
+      const vigore = consensiInVigore(
+        iscrizione,
+        r.destinazione,
+        versioneConsensoTrascrizione(iscrizione.event, sito)
+      );
+      if (consenso === 'recording') {
+        if (!r.richiesti.registrazione) return 'nonOfferto';
+        if (!testoInVigore(letto.destinazione, r.destinazione)) return 'testoCambiato';
+        if (vigore.recording) return 'gia';
+        return daiRegistrazione(tx, iscrizione, r.destinazione, letto.destinazione, locale);
+      }
+      if (!r.richiesti.tracce) return 'nonOfferto';
+      const testo = chiaveConsensoTrascrizione(traccePerPersonaConservate(iscrizione.event, sito));
+      if (letto.trascrizione !== testo) return 'testoCambiato';
+      if (r.serveRegistrazione && !vigore.recording) return 'serveRegistrazione';
+      if (vigore.transcription) return 'gia';
+      return daiTrascrizione(tx, iscrizione, locale);
+    },
+    // Aspetta il suo turno come gli altri che prendono lo stesso blocco.
+    { timeout: TIMEOUT_DOPO_PULIZIA_MS }
+  );
 }

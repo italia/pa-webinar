@@ -214,31 +214,41 @@ describe('POST /api/gdpr/consents', () => {
       expect(await res.json()).toEqual({ given: 'recording' });
       expect(mocks.verifyGdprToken).toHaveBeenCalledWith('token-valido', 'consents');
       expect(mocks.daiConsenso).toHaveBeenCalledWith('impronta', ISCRIZIONE, 'recording', {
-        letta: 'PUBLIC',
+        letto: { destinazione: 'PUBLIC', trascrizione: undefined },
         locale: 'de',
       });
       expect(mocks.ritiraConsensi).not.toHaveBeenCalled();
     });
 
-    it('la registrazione senza il testo letto non vale; una lingua sconosciuta si ignora', async () => {
+    it('senza il testo letto non vale; una lingua sconosciuta si ignora', async () => {
       expect(
         (await richiesta({ registrationId: ISCRIZIONE, consent: 'recording', give: true })).status
+      ).toBe(422);
+      expect(
+        (await richiesta({ registrationId: ISCRIZIONE, consent: 'transcription', give: true }))
+          .status
       ).toBe(422);
       await richiesta({
         registrationId: ISCRIZIONE,
         consent: 'transcription',
         give: true,
+        transcriptionText: 'multitrackRetained',
         locale: 'xx',
       });
       expect(mocks.daiConsenso).toHaveBeenCalledWith('impronta', ISCRIZIONE, 'transcription', {
-        letta: null,
+        letto: { destinazione: null, trascrizione: 'multitrackRetained' },
         locale: null,
       });
     });
 
     it('senza link valido, o per un altro indirizzo, non si da niente', async () => {
       mocks.verifyGdprToken.mockReturnValue(null);
-      const corpo = { registrationId: ISCRIZIONE, consent: 'transcription', give: true };
+      const corpo = {
+        registrationId: ISCRIZIONE,
+        consent: 'transcription',
+        give: true,
+        transcriptionText: 'multitrack',
+      };
       expect((await richiesta(corpo)).status).toBe(401);
       expect(mocks.daiConsenso).not.toHaveBeenCalled();
       mocks.verifyGdprToken.mockReturnValue({ emailHash: 'impronta' });
@@ -256,6 +266,7 @@ describe('POST /api/gdpr/consents', () => {
         registrationId: ISCRIZIONE,
         consent: 'transcription',
         give: true,
+        transcriptionText: 'multitrack',
       });
       expect(res.status).toBe(409);
       expect((await res.json()).code).toBe(codice);

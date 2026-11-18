@@ -107,14 +107,15 @@ export async function correggiIscrizioni(
         ...((r.organization ?? null) !== valori.organization ? ['organization'] : []),
       ];
       if (campi.length === 0) continue;
-      await tx.registration.update({
-        where: { id: r.id },
+      // Cancellata nel frattempo (dalla pulizia o da un'altra scheda): si salta.
+      const { count } = await tx.registration.updateMany({
+        where: { id: r.id, emailHash },
         data: {
           ...(campi.includes('displayName') && { displayName: nomeCifrato }),
           ...(campi.includes('organization') && { organization: valori.organization }),
         },
       });
-      righe.push({ eventId: r.eventId, campi });
+      if (count > 0) righe.push({ eventId: r.eventId, campi });
     }
     // La voce di rubrica e' della stessa persona: la correzione di tutte le
     // iscrizioni la raggiunge. Una sola iscrizione puo' avere un ente diverso

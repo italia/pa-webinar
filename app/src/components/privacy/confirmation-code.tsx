@@ -22,8 +22,24 @@ export interface EsitoRichiesta {
   ok: boolean;
   /** Il corpo della risposta riuscita. */
   corpo?: Record<string, unknown>;
-  /** Gli errori dei campi (422), per chi li mostra accanto al campo. */
-  campi?: string[];
+  /** Gli errori dei campi (422): il campo e la chiave del testo sotto `gdpr.export`. */
+  campi?: Record<string, ChiaveErrore>;
+}
+
+/** I testi degli errori dei campi che la rotta della correzione puo' dare. */
+const CHIAVI_ERRORE = ['editNameInvalid', 'editOrganizationTooLong', 'editOrganizationRequired'] as const;
+export type ChiaveErrore = (typeof CHIAVI_ERRORE)[number];
+
+function erroriDeiCampi(dettagli: unknown): Record<string, ChiaveErrore> {
+  const campi: Record<string, ChiaveErrore> = {};
+  for (const d of Array.isArray(dettagli) ? dettagli : []) {
+    const { path, message } = (d ?? {}) as { path?: unknown[]; message?: unknown };
+    const chiave = typeof message === 'string' ? message.replace(/^gdpr\.export\./, '') : '';
+    if (typeof path?.[0] === 'string' && (CHIAVI_ERRORE as readonly string[]).includes(chiave)) {
+      campi[path[0]] = chiave as ChiaveErrore;
+    }
+  }
+  return campi;
 }
 
 export function useCodiceDiConferma(url: string) {
@@ -56,13 +72,11 @@ export function useCodiceDiConferma(url: string) {
       else if (res.status === 429) setErrore(t('rateLimited'));
       else if (res.status === 403) setErrore(t('codeInvalid'));
       else if (res.status === 422) {
-        const dettagli = Array.isArray(json.details) ? json.details : [];
-        return {
-          ok: false,
-          campi: dettagli
-            .map((d) => (d as { path?: unknown[] }).path?.[0])
-            .filter((p): p is string => typeof p === 'string'),
-        };
+        const campi = erroriDeiCampi(json.details);
+        // Un errore che non riguarda un campo (una richiesta malformata) si dice
+        // comunque: la pagina non resta muta.
+        if (Object.keys(campi).length > 0) return { ok: false, campi };
+        setErrore(t('error'));
       } else setErrore(t('error'));
       return { ok: false };
     } catch {

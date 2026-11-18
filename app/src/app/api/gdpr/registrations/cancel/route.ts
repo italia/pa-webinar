@@ -58,7 +58,7 @@ export const POST = withErrorHandling(async (request) => {
   if (corpo.code === undefined || corpo.issuedAt === undefined) {
     return mandaCodice(richiesta, iscrizione, { locale: corpo.locale });
   }
-  controllaCodice(richiesta, corpo.issuedAt, corpo.code);
+  await controllaCodice(richiesta, corpo.issuedAt, corpo.code);
   const counts = await cancellaIscrizione(emailHash, iscrizione.id);
   if (!counts) throw new NotFoundError('Registration');
   return Response.json(
