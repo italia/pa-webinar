@@ -1684,6 +1684,7 @@
         "DATA_DELETED": "Dati dzēsti",
         "CONSENT_RECORDED": "Piekrišana reģistrēta",
         "DATA_EXPORTED": "Dati eksportēti",
+        "DATA_RECTIFIED": "Dati laboti",
         "CONSENT_WITHDRAWN": "Piekrišana atsaukta",
         "RECORDING_CONTENT_READ": "Ieraksta saturs, ko lasījuši darbinieki",
         "RECORDING_REDACTION_REQUESTED": "Pieprasīta izņemšana no ieraksta",
@@ -2147,6 +2148,7 @@
         "DATA_DELETED": "Dati dzēsti",
         "CONSENT_RECORDED": "Piekrišana reģistrēta",
         "DATA_EXPORTED": "Dati eksportēti",
+        "DATA_RECTIFIED": "Dati laboti",
         "CONSENT_WITHDRAWN": "Piekrišana atsaukta",
         "RECORDING_CONTENT_READ": "Ieraksta saturs, ko lasījuši darbinieki"
       }
@@ -4129,7 +4131,8 @@
         },
         "sources": {
           "registration": "reģistrācija",
-          "room": "telpa"
+          "room": "telpa",
+          "self-service": "Mani dati"
         },
         "roles": {
           "registrant": "reģistrējies",
@@ -4276,7 +4279,17 @@
     "addressBookNote": "Jūs esat pasākumu kontaktu grāmatā, lai jūs aicinātu uz līdzīgiem pasākumiem: piekrišanu varat atsaukt jebkurā laikā.",
     "addressBookPendingNote": "Šajā reģistrācijā tika atzīmēta pasākumu kontaktu grāmatas izvēles rūtiņa, taču šī adrese vairs nesaņēma ielūgumus. Ja pieprasījums ir jūsu, varat to apstiprināt savu datu lapā, izmantojot zemāk esošo saiti. Ja tas nav jūsu, neņemiet vērā šo ziņojumu: paliekat ārpus kontaktu grāmatas un ielūgumus nesaņemat.",
     "addressBookOptOutLink": "Izņemt manus datus no kontaktu grāmatas",
-    "myDataLink": "Jūsu dati: skatīt, labot, atsaukt piekrišanu vai atcelt reģistrāciju"
+    "myDataLink": "Jūsu dati: skatīt, labot, atsaukt piekrišanu vai atcelt reģistrāciju",
+    "confirmationCode": {
+      "subject": "{site}: apstiprinājuma kods",
+      "heading": "Jūsu apstiprinājuma kods",
+      "introEdit": "Jūs lūdzāt labot vārdu un organizāciju savā reģistrācijā pasākumam “{event}”.",
+      "introEditAll": "Jūs lūdzāt labot vārdu un organizāciju visās savās reģistrācijās.",
+      "introCancel": "Jūs lūdzāt dzēst savu reģistrāciju pasākumam “{event}”.",
+      "codeLabel": "Kods ir:",
+      "instructions": "Ievadiet to lapā “Mani dati”, no kuras iesniedzāt pieprasījumu. Tas ir derīgs {minutes, plural, zero {# minūtes} one {# minūte} other {# minūtes}}.",
+      "ignore": "Ja pieprasījumu neiesniedzāt jūs, ignorējiet šo e-pastu: bez koda nekas nemainās. Nevienam neatklājiet kodu."
+    }
   },
   "home": {
     "hero": {
@@ -4773,6 +4786,7 @@
       "consentFuture": "Turpmākie paziņojumi",
       "consentWithdrawnOn": "Atsaukts {date}",
       "consentNoteInRoom": "Ja pašlaik esat telpā, atsaukums ir spēkā no nākamās ienākšanas: lai tas stātos spēkā uzreiz, telpā izmantojiet Piekrišanas.",
+      "consentGiveNoteInRoom": "Šeit dota piekrišana ir spēkā no jūsu nākamās ienākšanas telpā, nevis tam, kas jau ierakstīts. Piekrišanu ierakstam un transkripcijai var dot, līdz pasākums beidzas.",
       "proofsTitle": "Saglabātie piekrišanu pierādījumi",
       "proofsIntro": "Šo pasākumu dati ir dzēsti. Šie pierādījumi paliek, kamēr video vai atšifrējums pastāv. Varat atsaukt piekrišanu: tas, kas jau ir video, paliek, un, lai to izņemtu, jums jāraksta datu pārzinim.",
       "proofGivenOn": "Dota {date}",
@@ -4788,6 +4802,13 @@
       "addressBookIntro": "Jūs izvēlējāties palikt kontaktu grāmatā, lai jūs aicinātu uz līdzīgiem pasākumiem. Šos datus glabājam līdz {date}, ja vien neatsaucat piekrišanu vai nedodat jaunu.",
       "addressBookOptOut": "Izņemt manus datus no kontaktu grāmatas",
       "consentFutureEffect": "Ja to atsauksiet, vairs nesaņemsiet paziņojumus par nākamajiem pasākumiem un izstāsieties no adrešu grāmatas visām savām reģistrācijām.",
+      "consentFutureGive": "Piekrītu turpmākiem paziņojumiem",
+      "consentFutureGiveEffect": "Jūs atgriežaties pasākumu kontaktu grāmatā ar šīs reģistrācijas vārdu un organizāciju un atkal saņemat ielūgumus; glabāšanas laiks sākas no jauna šodien.",
+      "consentGiveDone": "Piekrišana dota: tā ir spēkā no jūsu nākamās ienākšanas telpā.",
+      "consentFutureGiveDone": "Piekrišana dota: jūs atkal esat pasākumu kontaktu grāmatā.",
+      "consentGiveTextChanged": "Piekrišanas teksts mainījās pēc tam, kad atvērāt lapu: pārlādējiet to, lai izlasītu jauno.",
+      "consentGiveClosed": "Šo piekrišanu vairs nevar dot no šejienes: pasākums ir beidzies vai to vairs neprasa. Pārlādējiet lapu, lai redzētu pašreizējo stāvokli.",
+      "consentGiveNewText": "Šīs piekrišanas teksts mainījās pēc tam, kad to devāt: pašreizējam tekstam tā jādod no jauna.",
       "addressBookPendingTitle": "Atgriešanās kontaktu grāmatā jāapstiprina",
       "addressBookPendingBody": "Šajā reģistrācijā tika atzīmēta kontaktu grāmatas izvēles rūtiņa, taču šī adrese vairs nesaņēma ielūgumus. Kamēr neapstiprināsiet, nekas nemainīsies.",
       "addressBookPendingEffect": "Ja apstiprināsiet, atgriezīsieties kontaktu grāmatā ar šīs reģistrācijas vārdu un organizāciju un atkal saņemsiet ielūgumus. Ja atcelsiet vai ja tas nebijāt jūs, paliksiet ārpus kontaktu grāmatas un ielūgumus nesaņemsiet.",
@@ -4805,7 +4826,29 @@
       "removalError": "Pieprasījumu neizdevās nosūtīt. Mēģiniet vēlāk.",
       "removalStatusOpen": "Pieprasījums no {date}: tiek izskatīts.",
       "removalStatusClosed": "Pieprasījums no {date}: izpildīts {closed}.",
-      "removalStatusRejected": "Pieprasījums no {date}: noraidīts. Lai uzzinātu iemeslu, rakstiet datu pārzinim."
+      "removalStatusRejected": "Pieprasījums no {date}: noraidīts. Lai uzzinātu iemeslu, rakstiet datu pārzinim.",
+      "editButton": "Labot vārdu un organizāciju",
+      "editScopeLegend": "Uz kurām reģistrācijām tas attiecas",
+      "editScopeOne": "Tikai šī reģistrācija",
+      "editScopeAll": "Visas manas reģistrācijas ({count}) un pasākumu kontaktu grāmata",
+      "editEffect": "Labojums attiecas uz nākamajiem e-pastiem un ir spēkā no jūsu nākamās ienākšanas telpā. Tas nemaina to, kas jau ierakstīts, transkribēts vai uzrakstīts tērzēšanā, un piekrišanas pierādījumus.",
+      "editNameInvalid": "Vārdam jābūt no 2 līdz 100 rakstzīmēm.",
+      "editOrganizationRequired": "Pasākums, kuram esat reģistrējies, prasa organizāciju: lauku nevar atstāt tukšu.",
+      "editOrganizationTooLong": "Organizācijā var būt ne vairāk kā 200 rakstzīmes.",
+      "editDone": "Dati ir laboti.",
+      "codeWhy": "Drošības nolūkos labojumus un dzēšanu apstiprina ar kodu, ko nosūtām uz reģistrācijas e-pasta adresi.",
+      "codeSend": "Nosūtīt man apstiprinājuma kodu",
+      "codeSent": "Mēs jums pa e-pastu nosūtījām 6 ciparu kodu. Ievadiet to šeit: tas ir derīgs {minutes, plural, zero {# minūtes} one {# minūte} other {# minūtes}}.",
+      "codeLabel": "Apstiprinājuma kods",
+      "codeConfirmEdit": "Apstiprināt labojumu",
+      "codeInvalid": "Kods nav pareizs vai tam ir beidzies derīguma termiņš. Pārbaudiet pēdējo saņemto e-pastu vai atceliet un pieprasiet jaunu.",
+      "cancelTitle": "Šīs reģistrācijas dzēšana",
+      "cancelIntro": "Varat dzēst tikai šo reģistrāciju, neskarot citas un pārējos savus datus.",
+      "cancelButton": "Dzēst šo reģistrāciju",
+      "cancelDeletes": "Tiek dzēsta reģistrācija šim pasākumam un tas, ko ar to darījāt: jautājumi, balsojumi, tērzēšanas ziņas, atsauksmes, aptauju atbildes, jūsu teikumi transkripcijā no subtitriem un rindā esošie e-pasti. Jūsu personīgā saite vairs nedarbojas, un vieta atbrīvojas.",
+      "cancelKeeps": "Paliek citas jūsu reģistrācijas, pasākumu kontaktu grāmata, profila fotoattēls un vēl izskatīšanā esošs pieprasījums par izņemšanu no ieraksta. Ja šim pasākumam ir video vai transkripcija, jūsu piekrišanas pierādījums paliek bez jūsu vārda, kamēr tie pastāv. Dzēšanu nevar atsaukt; kamēr pasākums pieņem reģistrācijas, varat reģistrēties no jauna.",
+      "codeConfirmCancel": "Dzēst reģistrāciju",
+      "cancelDone": "Reģistrācija ir dzēsta."
     },
     "erasure": {
       "title": "Jūsu datu dzēšana",

@@ -1894,6 +1894,7 @@
         "DATA_DELETED": "Dati cancellati",
         "CONSENT_RECORDED": "Consenso registrato",
         "DATA_EXPORTED": "Dati esportati",
+        "DATA_RECTIFIED": "Dati corretti",
         "CONSENT_WITHDRAWN": "Consenso ritirato",
         "RECORDING_CONTENT_READ": "Contenuto della registrazione letto dallo staff",
         "RECORDING_REDACTION_REQUESTED": "Rimozione da una registrazione chiesta",
@@ -2357,6 +2358,7 @@
         "DATA_DELETED": "Dati eliminati",
         "CONSENT_RECORDED": "Consenso registrato",
         "DATA_EXPORTED": "Dati esportati",
+        "DATA_RECTIFIED": "Dati corretti",
         "CONSENT_WITHDRAWN": "Consenso ritirato",
         "RECORDING_CONTENT_READ": "Contenuto della registrazione letto dallo staff"
       }
@@ -4339,7 +4341,8 @@
         },
         "sources": {
           "registration": "iscrizione",
-          "room": "sala"
+          "room": "sala",
+          "self-service": "I miei dati"
         },
         "roles": {
           "registrant": "iscritto",
@@ -4486,7 +4489,17 @@
     "addressBookNote": "Sei nella rubrica degli eventi, per essere invitato a eventi simili: puoi revocare il consenso in qualsiasi momento.",
     "addressBookPendingNote": "Su questa iscrizione è stata spuntata la casella della rubrica degli eventi, ma questo indirizzo aveva smesso di ricevere inviti. Se la richiesta è tua, puoi confermarla dalla pagina dei tuoi dati, con il link qui sotto. Se non è tua, ignora questo messaggio: resti fuori dalla rubrica e non ricevi inviti.",
     "addressBookOptOutLink": "Rimuovi i miei dati dalla rubrica",
-    "myDataLink": "I tuoi dati: vederli, correggerli, ritirare un consenso o cancellare l’iscrizione"
+    "myDataLink": "I tuoi dati: vederli, correggerli, ritirare un consenso o cancellare l’iscrizione",
+    "confirmationCode": {
+      "subject": "{site}: codice di conferma",
+      "heading": "Il tuo codice di conferma",
+      "introEdit": "Hai chiesto di correggere nome ed ente della tua iscrizione a «{event}».",
+      "introEditAll": "Hai chiesto di correggere nome ed ente di tutte le tue iscrizioni.",
+      "introCancel": "Hai chiesto di cancellare la tua iscrizione a «{event}».",
+      "codeLabel": "Il codice è:",
+      "instructions": "Scrivilo nella pagina «I miei dati» da cui hai fatto la richiesta. Vale {minutes, plural, one {# minuto} other {# minuti}}.",
+      "ignore": "Se non hai fatto tu la richiesta, ignora questa email: senza il codice non cambia niente. Non dare il codice a nessuno."
+    }
   },
   "home": {
     "hero": {
@@ -4773,6 +4786,7 @@
       "consentFuture": "Comunicazioni future",
       "consentWithdrawnOn": "Ritirato il {date}",
       "consentNoteInRoom": "Se sei in sala in questo momento, il ritiro vale dal prossimo ingresso: per farlo valere subito usa «Consensi» nella sala.",
+      "consentGiveNoteInRoom": "Un consenso dato da qui vale dal prossimo ingresso in sala, non per ciò che è già stato registrato. Registrazione e trascrizione si possono dare finché l'evento non è concluso.",
       "proofsTitle": "Prove dei consensi conservate",
       "proofsIntro": "I dati di questi eventi sono stati cancellati. Queste prove restano finché il video o la trascrizione esistono. Puoi ritirare il consenso: ciò che è già nel video resta, e per toglierlo devi scrivere al titolare del trattamento.",
       "proofGivenOn": "Dato il {date}",
@@ -4788,6 +4802,13 @@
       "addressBookIntro": "Hai scelto di restare in rubrica per essere invitato a eventi simili. Conserviamo questi dati fino al {date}, salvo revoca o nuovo consenso.",
       "addressBookOptOut": "Rimuovi i miei dati dalla rubrica",
       "consentFutureEffect": "Se lo ritiri non ricevi più comunicazioni sui prossimi eventi ed esci dalla rubrica, per tutte le tue iscrizioni.",
+      "consentFutureGive": "Acconsento alle comunicazioni future",
+      "consentFutureGiveEffect": "Torni nella rubrica degli eventi con il nome e l'ente di questa iscrizione e ricevi di nuovo gli inviti; il periodo di conservazione riparte da oggi.",
+      "consentGiveDone": "Consenso dato: vale dal prossimo ingresso in sala.",
+      "consentFutureGiveDone": "Consenso dato: sei di nuovo nella rubrica degli eventi.",
+      "consentGiveTextChanged": "Il testo del consenso è cambiato dopo che hai aperto la pagina: ricaricala per leggere quello nuovo.",
+      "consentGiveClosed": "Questo consenso non si può più dare da qui: l'evento è concluso o non lo chiede più. Ricarica la pagina per vedere lo stato aggiornato.",
+      "consentGiveNewText": "Il testo di questo consenso è cambiato dopo che l'hai dato: per il testo attuale va dato di nuovo.",
       "addressBookPendingTitle": "Rientro in rubrica da confermare",
       "addressBookPendingBody": "Su questa iscrizione è stata spuntata la casella della rubrica, ma questo indirizzo aveva smesso di ricevere inviti. Finché non confermi non cambia niente.",
       "addressBookPendingEffect": "Se confermi torni in rubrica con il nome e l'ente di questa iscrizione e ricevi di nuovo gli inviti. Se annulli, o se non sei stato tu, resti fuori dalla rubrica e non ricevi inviti.",
@@ -4805,7 +4826,29 @@
       "removalError": "Non è stato possibile inviare la richiesta. Riprova più tardi.",
       "removalStatusOpen": "Richiesta del {date}: in lavorazione.",
       "removalStatusClosed": "Richiesta del {date}: completata il {closed}.",
-      "removalStatusRejected": "Richiesta del {date}: respinta. Scrivi al titolare per conoscerne il motivo."
+      "removalStatusRejected": "Richiesta del {date}: respinta. Scrivi al titolare per conoscerne il motivo.",
+      "editButton": "Correggi nome ed ente",
+      "editScopeLegend": "A quali iscrizioni si applica",
+      "editScopeOne": "Solo a questa iscrizione",
+      "editScopeAll": "Tutte le mie iscrizioni ({count}) e la rubrica degli eventi",
+      "editEffect": "La correzione vale per le prossime email e dal prossimo ingresso in sala. Non cambia ciò che è già stato registrato, trascritto o scritto in chat, né le prove dei consensi.",
+      "editNameInvalid": "Il nome deve avere da 2 a 100 caratteri.",
+      "editOrganizationRequired": "Un evento a cui sei iscritto chiede l'ente: non si può lasciare vuoto.",
+      "editOrganizationTooLong": "L'ente può avere al massimo 200 caratteri.",
+      "editDone": "Dati corretti.",
+      "codeWhy": "Per sicurezza, correzioni e cancellazioni si confermano con un codice che mandiamo all'indirizzo email dell'iscrizione.",
+      "codeSend": "Mandami il codice di conferma",
+      "codeSent": "Ti abbiamo mandato per email un codice di 6 cifre. Scrivilo qui: vale {minutes, plural, one {# minuto} other {# minuti}}.",
+      "codeLabel": "Codice di conferma",
+      "codeConfirmEdit": "Conferma la correzione",
+      "codeInvalid": "Il codice non è corretto o è scaduto. Controlla l'ultima email ricevuta, oppure annulla e chiedine uno nuovo.",
+      "cancelTitle": "Cancellare questa iscrizione",
+      "cancelIntro": "Puoi cancellare solo questa iscrizione, senza toccare le altre e il resto dei tuoi dati.",
+      "cancelButton": "Cancella questa iscrizione",
+      "cancelDeletes": "Si cancellano l'iscrizione a questo evento e ciò che hai fatto con lei: domande, voti, messaggi in chat, feedback, risposte ai questionari, le tue frasi nella trascrizione dai sottotitoli ed email in coda. Il tuo link personale smette di funzionare e il posto si libera.",
+      "cancelKeeps": "Restano le altre iscrizioni, la rubrica degli eventi, la foto profilo e una richiesta di rimozione da una registrazione ancora in lavorazione. Se di questo evento esistono un video o una trascrizione, la prova del tuo consenso resta senza il tuo nome finché esistono. La cancellazione non si annulla; finché l'evento accetta iscrizioni puoi iscriverti di nuovo.",
+      "codeConfirmCancel": "Cancella l'iscrizione",
+      "cancelDone": "Iscrizione cancellata."
     },
     "erasure": {
       "title": "Cancellazione dei tuoi dati",

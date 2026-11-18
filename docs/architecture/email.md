@@ -154,6 +154,7 @@ This is the complete list of producers: every call to `enqueueEmail()` in the ap
 | Staff sign-in link | A request from the sign-in page (`POST /api/staff/login-link`), an administrator creating a staff account with the invitation option, or re-sending the link from **Staff accounts** | An active staff account | One-time sign-in link ([lifetime](#what-each-link-is)) | No | `staff-login` |
 | Data export link | A data subject asks for a copy of their data (`POST /api/gdpr/export/request`, right of access, Art. 15) | The address typed in the form | Signed link to `/privacy/my-data` ([lifetime](#what-each-link-is)) | No | `gdpr-export-request` |
 | Erasure link | A data subject asks for erasure (`POST /api/gdpr/erasure/request`, right to erasure, Art. 17) | The address typed in the form | Signed link to `/privacy/my-data/erasure` ([lifetime](#what-each-link-is)) | No | `gdpr-erasure-request` |
+| Confirmation code | A data subject asks, from the **My data** page, to correct or delete one registration (`POST /api/gdpr/registrations/edit` or `/cancel` without a code) | The registration's address | A six-digit code valid 15 minutes, in the body only, and what it confirms; no link ([Data-subject rights](../GDPR.md#self-service-access-and-erasure)) | No | `gdpr-confirmation-code` |
 
 ### What each link is
 
@@ -241,7 +242,7 @@ Staff can still copy the links from the administration area (**Copy moderator li
 ### What the platform does not email
 
 - **Announcements of future events.** Where an event offers the address book, the form's single stay-in-touch box records both `consentAddressBook` and `consentFutureCommunications`, but the platform sends nothing by itself based on them: the only email that can follow is an invitation that staff send. The flag is included in the **Export CSV** file of **Sign-ups** and in the data subject's own data export, for the controller to use outside the platform ([Privacy and data protection](../GDPR.md)).
-- **The outcome of a data-subject request.** The export is delivered in the browser that opens the signed link, and a completed erasure is confirmed on screen only.
+- **The outcome of a data-subject request.** The export is delivered in the browser that opens the signed link, and a completed erasure, correction or deletion of one registration is confirmed on screen only.
 - **Event cancellation.** Archiving or deleting an event notifies nobody.
 
 Several texts in the administration area say otherwise; they are listed under [Known gaps](#known-gaps).
@@ -412,7 +413,7 @@ Administrators can override the text of two emails from **Email templates** (`/a
 - **Plain text only.** The heading, intro, info note and footer note are HTML-escaped when inserted. The button label is inserted as is, so it must stay plain text, and it should not contain `{{eventTitle}}` ([Known gaps](#known-gaps)).
 - **Defaults are visible.** The editor shows the built-in text of every field from `GET /api/admin/email-templates/defaults`, with placeholders in place of real values, except the reminder offset, which is shown for one hour.
 
-The date-change notice, the post-event emails, the recording notice, the staff sign-in email and the data-subject emails have fixed texts in code: `app/src/lib/email/notification.ts`, `app/src/lib/email/templates.ts` and the two `request` routes under `app/src/app/api/gdpr/`.
+The date-change notice, the post-event emails, the recording notice, the staff sign-in email and the data-subject emails have fixed texts in code: `app/src/lib/email/notification.ts`, `app/src/lib/email/templates.ts` and the two `request` routes under `app/src/app/api/gdpr/`. The confirmation code email takes its texts from the message catalogues (`email.confirmationCode`, `app/src/lib/email/confirmation-code.ts`).
 
 ### What the emails look like
 

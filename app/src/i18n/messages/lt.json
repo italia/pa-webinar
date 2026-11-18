@@ -1684,6 +1684,7 @@
         "DATA_DELETED": "Duomenys pašalinti",
         "CONSENT_RECORDED": "Sutikimas užregistruotas",
         "DATA_EXPORTED": "Duomenys eksportuoti",
+        "DATA_RECTIFIED": "Duomenys pataisyti",
         "CONSENT_WITHDRAWN": "Sutikimas atšauktas",
         "RECORDING_CONTENT_READ": "Įrašo turinį perskaitė darbuotojai",
         "RECORDING_REDACTION_REQUESTED": "Paprašyta pašalinti iš įrašo",
@@ -2147,6 +2148,7 @@
         "DATA_DELETED": "Duomenys ištrinti",
         "CONSENT_RECORDED": "Sutikimas užregistruotas",
         "DATA_EXPORTED": "Duomenys eksportuoti",
+        "DATA_RECTIFIED": "Duomenys pataisyti",
         "CONSENT_WITHDRAWN": "Sutikimas atšauktas",
         "RECORDING_CONTENT_READ": "Įrašo turinį perskaitė darbuotojai"
       }
@@ -4129,7 +4131,8 @@
         },
         "sources": {
           "registration": "registracija",
-          "room": "salė"
+          "room": "salė",
+          "self-service": "Mano duomenys"
         },
         "roles": {
           "registrant": "užsiregistravęs",
@@ -4276,7 +4279,17 @@
     "addressBookNote": "Esate renginių adresų knygoje, kad būtumėte kviečiami į panašius renginius: sutikimą galite atšaukti bet kada.",
     "addressBookPendingNote": "Šioje registracijoje buvo pažymėtas renginių adresų knygos langelis, tačiau šis adresas nebegaudavo kvietimų. Jei prašymas jūsų, galite jį patvirtinti savo duomenų puslapyje, pasinaudoję toliau pateikta nuoroda. Jei ne jūsų, nekreipkite dėmesio į šį pranešimą: liksite už adresų knygos ribų ir kvietimų negausite.",
     "addressBookOptOutLink": "Pašalinti mano duomenis iš adresų knygos",
-    "myDataLink": "Jūsų duomenys: peržiūrėti, ištaisyti, atšaukti sutikimą arba atšaukti registraciją"
+    "myDataLink": "Jūsų duomenys: peržiūrėti, ištaisyti, atšaukti sutikimą arba atšaukti registraciją",
+    "confirmationCode": {
+      "subject": "{site}: patvirtinimo kodas",
+      "heading": "Jūsų patvirtinimo kodas",
+      "introEdit": "Paprašėte pataisyti vardą ir organizaciją savo registracijoje į „{event}“.",
+      "introEditAll": "Paprašėte pataisyti vardą ir organizaciją visose savo registracijose.",
+      "introCancel": "Paprašėte ištrinti savo registraciją į „{event}“.",
+      "codeLabel": "Kodas:",
+      "instructions": "Įveskite jį puslapyje „Mano duomenys“, iš kurio pateikėte prašymą. Jis galioja {minutes, plural, one {# minutė} few {# minutės} other {# minučių}}.",
+      "ignore": "Jei prašymo neteikėte, nekreipkite dėmesio į šį laišką: be kodo niekas nepasikeis. Niekam neatskleiskite kodo."
+    }
   },
   "home": {
     "hero": {
@@ -4773,6 +4786,7 @@
       "consentFuture": "Būsimi pranešimai",
       "consentWithdrawnOn": "Atšaukta {date}",
       "consentNoteInRoom": "Jei dabar esate salėje, atšaukimas galioja nuo kito įėjimo: kad galiotų iš karto, salėje naudokite Sutikimai.",
+      "consentGiveNoteInRoom": "Čia duotas sutikimas galioja nuo kito jūsų įėjimo į salę, o ne tam, kas jau įrašyta. Sutikimą įrašyti ir transkribuoti galima duoti, kol renginys nesibaigė.",
       "proofsTitle": "Saugomi sutikimų įrodymai",
       "proofsIntro": "Šių renginių duomenys ištrinti. Šie įrodymai lieka, kol vaizdo įrašas arba transkripcija egzistuoja. Sutikimą galite atšaukti: tai, kas jau yra vaizdo įraše, lieka, o norėdami tai pašalinti turite rašyti duomenų valdytojui.",
       "proofGivenOn": "Duotas {date}",
@@ -4788,6 +4802,13 @@
       "addressBookIntro": "Pasirinkote likti adresų knygoje, kad būtumėte kviečiami į panašius renginius. Šiuos duomenis saugome iki {date}, nebent sutikimą atšauksite arba duosite naują.",
       "addressBookOptOut": "Pašalinti mano duomenis iš adresų knygos",
       "consentFutureEffect": "Jei jį atšauksite, nebegausite pranešimų apie būsimus renginius ir pasitrauksite iš adresų knygos dėl visų savo registracijų.",
+      "consentFutureGive": "Sutinku gauti būsimus pranešimus",
+      "consentFutureGiveEffect": "Grįšite į renginių adresų knygą su šios registracijos vardu ir organizacija ir vėl gausite kvietimus; saugojimo laikotarpis vėl prasideda nuo šiandien.",
+      "consentGiveDone": "Sutikimas duotas: jis galioja nuo kito jūsų įėjimo į salę.",
+      "consentFutureGiveDone": "Sutikimas duotas: vėl esate renginių adresų knygoje.",
+      "consentGiveTextChanged": "Sutikimo tekstas pasikeitė po to, kai atidarėte puslapį: įkelkite jį iš naujo, kad perskaitytumėte naują.",
+      "consentGiveClosed": "Šio sutikimo nebegalima duoti iš čia: renginys baigėsi arba jo nebeprašo. Įkelkite puslapį iš naujo, kad pamatytumėte dabartinę būseną.",
+      "consentGiveNewText": "Šio sutikimo tekstas pasikeitė po to, kai jį davėte: dabartiniam tekstui jį reikia duoti iš naujo.",
       "addressBookPendingTitle": "Grįžimą į adresų knygą reikia patvirtinti",
       "addressBookPendingBody": "Šioje registracijoje buvo pažymėtas adresų knygos langelis, tačiau šis adresas nebegaudavo kvietimų. Kol nepatvirtinsite, niekas nesikeis.",
       "addressBookPendingEffect": "Jei patvirtinsite, grįšite į adresų knygą su šios registracijos vardu ir organizacija ir vėl gausite kvietimus. Jei atšauksite arba jei tai buvote ne jūs, liksite už adresų knygos ribų ir kvietimų negausite.",
@@ -4805,7 +4826,29 @@
       "removalError": "Prašymo nepavyko išsiųsti. Bandykite vėliau.",
       "removalStatusOpen": "{date} prašymas: nagrinėjamas.",
       "removalStatusClosed": "{date} prašymas: įvykdytas {closed}.",
-      "removalStatusRejected": "{date} prašymas: atmestas. Norėdami sužinoti priežastį, parašykite duomenų valdytojui."
+      "removalStatusRejected": "{date} prašymas: atmestas. Norėdami sužinoti priežastį, parašykite duomenų valdytojui.",
+      "editButton": "Taisyti vardą ir organizaciją",
+      "editScopeLegend": "Kurioms registracijoms taikoma",
+      "editScopeOne": "Tik ši registracija",
+      "editScopeAll": "Visos mano registracijos ({count}) ir renginių adresų knyga",
+      "editEffect": "Pataisymas galioja kitiems el. laiškams ir nuo kito jūsų įėjimo į salę. Jis nekeičia to, kas jau įrašyta, transkribuota ar parašyta pokalbyje, ir sutikimų įrodymų.",
+      "editNameInvalid": "Vardas turi būti nuo 2 iki 100 simbolių.",
+      "editOrganizationRequired": "Renginys, į kurį esate užsiregistravę, prašo organizacijos: lauko negalima palikti tuščio.",
+      "editOrganizationTooLong": "Organizacija gali turėti ne daugiau kaip 200 simbolių.",
+      "editDone": "Duomenys pataisyti.",
+      "codeWhy": "Saugumo sumetimais pataisymai ir ištrynimai patvirtinami kodu, kurį siunčiame registracijos el. pašto adresu.",
+      "codeSend": "Atsiųskite man patvirtinimo kodą",
+      "codeSent": "El. paštu atsiuntėme jums 6 skaitmenų kodą. Įveskite jį čia: jis galioja {minutes, plural, one {# minutė} few {# minutės} other {# minučių}}.",
+      "codeLabel": "Patvirtinimo kodas",
+      "codeConfirmEdit": "Patvirtinti pataisymą",
+      "codeInvalid": "Kodas neteisingas arba nebegalioja. Patikrinkite paskutinį gautą el. laišką arba atšaukite ir paprašykite naujo.",
+      "cancelTitle": "Šios registracijos ištrynimas",
+      "cancelIntro": "Galite ištrinti tik šią registraciją, neliesdami kitų ir likusių savo duomenų.",
+      "cancelButton": "Ištrinti šią registraciją",
+      "cancelDeletes": "Ištrinama registracija į šį renginį ir tai, ką su ja darėte: klausimai, balsai, pokalbio žinutės, atsiliepimai, klausimynų atsakymai, jūsų sakiniai transkripcijoje iš subtitrų ir eilėje laukiantys el. laiškai. Jūsų asmeninė nuoroda nebeveiks, o vieta atsilaisvins.",
+      "cancelKeeps": "Lieka kitos jūsų registracijos, renginių adresų knyga, profilio nuotrauka ir dar nagrinėjamas prašymas pašalinti iš įrašo. Jei iš šio renginio yra vaizdo įrašas ar transkripcija, jūsų sutikimo įrodymas lieka be jūsų vardo, kol jie egzistuoja. Ištrynimo atšaukti negalima; kol renginys priima registracijas, galite užsiregistruoti iš naujo.",
+      "codeConfirmCancel": "Ištrinti registraciją",
+      "cancelDone": "Registracija ištrinta."
     },
     "erasure": {
       "title": "Jūsų duomenų ištrynimas",

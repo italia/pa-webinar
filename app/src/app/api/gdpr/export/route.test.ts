@@ -356,6 +356,45 @@ describe('testo letto', () => {
     ]);
   });
 
+  it('dice quali consensi si danno di nuovo: solo finche’ l’evento li chiede', async () => {
+    vi.stubEnv('RECORDING_VOICE_EXCLUSION', 'true');
+    const evento = (campi: Record<string, unknown>) => ({
+      ...iscrizione('x', 'x').event,
+      eventType: 'SCHEDULED',
+      recordingEnabled: true,
+      participantsCanUnmute: true,
+      recordingDestination: 'PUBLIC',
+      recordingConsentText: 'Testo dell’ente',
+      ...campi,
+    });
+    prisma.registration.findMany.mockResolvedValue([
+      iscrizione('r1', 'e1', {
+        event: evento({ status: 'PUBLISHED', endsAt: new Date(Date.now() + 3_600_000) }),
+      }),
+      iscrizione('r2', 'e2', { event: evento({ status: 'ENDED' }) }),
+    ]);
+    const corpo = (await (await conToken()).json()) as {
+      data: Array<{ registration: { consentOffer: Record<string, unknown> } }>;
+    };
+    vi.unstubAllEnvs();
+    expect(corpo.data[0]!.registration.consentOffer).toEqual({
+      recording: {
+        destination: 'PUBLIC',
+        voice: 'rimovibile',
+        eventText: 'Testo dell’ente',
+        // Il consenso all'iscrizione non dichiara la destinazione: non copre un
+        // video pubblico, e va dato di nuovo.
+        inForce: false,
+      },
+      transcription: null,
+      futureCommunications: true,
+    });
+    expect(corpo.data[1]!.registration.consentOffer).toMatchObject({
+      recording: null,
+      transcription: null,
+    });
+  });
+
   it('riporta la destinazione e la versione del consenso alla registrazione', async () => {
     prisma.registration.findMany.mockResolvedValue([
       iscrizione('r1', 'e1', {

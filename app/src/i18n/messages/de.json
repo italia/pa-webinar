@@ -1684,6 +1684,7 @@
         "DATA_DELETED": "Daten gelöscht",
         "CONSENT_RECORDED": "Einwilligung erfasst",
         "DATA_EXPORTED": "Daten exportiert",
+        "DATA_RECTIFIED": "Daten berichtigt",
         "CONSENT_WITHDRAWN": "Einwilligung widerrufen",
         "RECORDING_CONTENT_READ": "Aufzeichnungsinhalt vom Personal gelesen",
         "RECORDING_REDACTION_REQUESTED": "Entfernung aus einer Aufzeichnung beantragt",
@@ -2147,6 +2148,7 @@
         "DATA_DELETED": "Daten gelöscht",
         "CONSENT_RECORDED": "Einwilligung erfasst",
         "DATA_EXPORTED": "Daten exportiert",
+        "DATA_RECTIFIED": "Daten berichtigt",
         "CONSENT_WITHDRAWN": "Einwilligung widerrufen",
         "RECORDING_CONTENT_READ": "Aufzeichnungsinhalt vom Personal gelesen"
       }
@@ -4129,7 +4131,8 @@
         },
         "sources": {
           "registration": "Anmeldung",
-          "room": "Raum"
+          "room": "Raum",
+          "self-service": "Meine Daten"
         },
         "roles": {
           "registrant": "angemeldet",
@@ -4276,7 +4279,17 @@
     "addressBookNote": "Sie stehen im Veranstaltungs-Adressbuch, um zu ähnlichen Veranstaltungen eingeladen zu werden: Sie können Ihre Einwilligung jederzeit widerrufen.",
     "addressBookPendingNote": "Bei dieser Anmeldung wurde das Kästchen für das Veranstaltungs-Adressbuch angekreuzt, aber diese Adresse hatte keine Einladungen mehr erhalten. Wenn die Anfrage von Ihnen stammt, können Sie sie auf der Seite mit Ihren Daten über den Link unten bestätigen. Andernfalls ignorieren Sie diese Nachricht: Sie bleiben außerhalb des Adressbuchs und erhalten keine Einladungen.",
     "addressBookOptOutLink": "Meine Daten aus dem Adressbuch entfernen",
-    "myDataLink": "Ihre Daten: einsehen, berichtigen, eine Einwilligung widerrufen oder die Anmeldung löschen"
+    "myDataLink": "Ihre Daten: einsehen, berichtigen, eine Einwilligung widerrufen oder die Anmeldung löschen",
+    "confirmationCode": {
+      "subject": "{site}: Bestätigungscode",
+      "heading": "Ihr Bestätigungscode",
+      "introEdit": "Sie haben beantragt, Name und Organisation Ihrer Anmeldung für „{event}“ zu berichtigen.",
+      "introEditAll": "Sie haben beantragt, Name und Organisation in allen Ihren Anmeldungen zu berichtigen.",
+      "introCancel": "Sie haben beantragt, Ihre Anmeldung für „{event}“ zu löschen.",
+      "codeLabel": "Der Code lautet:",
+      "instructions": "Geben Sie ihn auf der Seite „Meine Daten“ ein, von der aus Sie die Anfrage gestellt haben. Er gilt {minutes, plural, one {# Minute} other {# Minuten}}.",
+      "ignore": "Wenn Sie die Anfrage nicht gestellt haben, ignorieren Sie diese E-Mail: Ohne den Code ändert sich nichts. Geben Sie den Code an niemanden weiter."
+    }
   },
   "home": {
     "hero": {
@@ -4773,6 +4786,7 @@
       "consentFuture": "Künftige Mitteilungen",
       "consentWithdrawnOn": "Widerrufen am {date}",
       "consentNoteInRoom": "Wenn Sie gerade im Raum sind, gilt der Widerruf ab dem nächsten Eintritt: Damit er sofort gilt, nutzen Sie „Einwilligungen“ im Raum.",
+      "consentGiveNoteInRoom": "Eine hier erteilte Einwilligung gilt ab Ihrem nächsten Eintritt in den Raum, nicht für bereits Aufgezeichnetes. Aufzeichnung und Transkription können bis zum Ende der Veranstaltung erteilt werden.",
       "proofsTitle": "Aufbewahrte Einwilligungsnachweise",
       "proofsIntro": "Die Daten dieser Veranstaltungen wurden gelöscht. Diese Nachweise bleiben erhalten, solange das Video oder das Transkript existiert. Sie können Ihre Einwilligung widerrufen: Was bereits im Video enthalten ist, bleibt, und um es entfernen zu lassen, müssen Sie an den Verantwortlichen für die Datenverarbeitung schreiben.",
       "proofGivenOn": "Erteilt am {date}",
@@ -4788,6 +4802,13 @@
       "addressBookIntro": "Sie haben sich dafür entschieden, im Adressbuch zu bleiben, um zu ähnlichen Veranstaltungen eingeladen zu werden. Wir bewahren diese Daten bis zum {date} auf, sofern Sie nicht widerrufen oder erneut einwilligen.",
       "addressBookOptOut": "Meine Daten aus dem Adressbuch entfernen",
       "consentFutureEffect": "Wenn Sie sie widerrufen, erhalten Sie keine Mitteilungen zu kommenden Veranstaltungen mehr und verlassen das Adressbuch, für alle Ihre Anmeldungen.",
+      "consentFutureGive": "Ich willige in künftige Mitteilungen ein",
+      "consentFutureGiveEffect": "Sie kehren mit dem Namen und der Organisation dieser Anmeldung ins Veranstaltungs-Adressbuch zurück und erhalten wieder Einladungen; die Aufbewahrungsfrist beginnt heute neu.",
+      "consentGiveDone": "Einwilligung erteilt: Sie gilt ab Ihrem nächsten Eintritt in den Raum.",
+      "consentFutureGiveDone": "Einwilligung erteilt: Sie sind wieder im Veranstaltungs-Adressbuch.",
+      "consentGiveTextChanged": "Der Einwilligungstext hat sich geändert, nachdem Sie die Seite geöffnet haben: Laden Sie sie neu, um den neuen Text zu lesen.",
+      "consentGiveClosed": "Diese Einwilligung kann hier nicht mehr erteilt werden: Die Veranstaltung ist beendet oder fragt nicht mehr danach. Laden Sie die Seite neu, um den aktuellen Stand zu sehen.",
+      "consentGiveNewText": "Der Text dieser Einwilligung hat sich geändert, nachdem Sie sie erteilt haben: Für den aktuellen Text muss sie erneut erteilt werden.",
       "addressBookPendingTitle": "Rückkehr ins Adressbuch noch zu bestätigen",
       "addressBookPendingBody": "Bei dieser Anmeldung wurde das Kästchen für das Adressbuch angekreuzt, aber diese Adresse hatte keine Einladungen mehr erhalten. Solange Sie nicht bestätigen, ändert sich nichts.",
       "addressBookPendingEffect": "Wenn Sie bestätigen, kehren Sie mit dem Namen und der Organisation dieser Anmeldung ins Adressbuch zurück und erhalten wieder Einladungen. Wenn Sie abbrechen oder wenn Sie es nicht waren, bleiben Sie außerhalb des Adressbuchs und erhalten keine Einladungen.",
@@ -4805,7 +4826,29 @@
       "removalError": "Der Antrag konnte nicht gesendet werden. Bitte versuchen Sie es später erneut.",
       "removalStatusOpen": "Antrag vom {date}: in Bearbeitung.",
       "removalStatusClosed": "Antrag vom {date}: erledigt am {closed}.",
-      "removalStatusRejected": "Antrag vom {date}: abgelehnt. Schreiben Sie an den Verantwortlichen, um den Grund zu erfahren."
+      "removalStatusRejected": "Antrag vom {date}: abgelehnt. Schreiben Sie an den Verantwortlichen, um den Grund zu erfahren.",
+      "editButton": "Name und Organisation berichtigen",
+      "editScopeLegend": "Für welche Anmeldungen sie gilt",
+      "editScopeOne": "Nur diese Anmeldung",
+      "editScopeAll": "Alle meine Anmeldungen ({count}) und das Veranstaltungs-Adressbuch",
+      "editEffect": "Die Berichtigung gilt für die nächsten E-Mails und ab Ihrem nächsten Eintritt in den Raum. Sie ändert nichts an bereits Aufgezeichnetem, Transkribiertem oder im Chat Geschriebenem und auch nicht an den Einwilligungsnachweisen.",
+      "editNameInvalid": "Der Name muss zwischen 2 und 100 Zeichen lang sein.",
+      "editOrganizationRequired": "Eine Veranstaltung, für die Sie angemeldet sind, verlangt die Organisation: Das Feld darf nicht leer bleiben.",
+      "editOrganizationTooLong": "Die Organisation darf höchstens 200 Zeichen lang sein.",
+      "editDone": "Daten berichtigt.",
+      "codeWhy": "Aus Sicherheitsgründen werden Berichtigungen und Löschungen mit einem Code bestätigt, den wir an die E-Mail-Adresse der Anmeldung senden.",
+      "codeSend": "Bestätigungscode senden",
+      "codeSent": "Wir haben Ihnen einen 6-stelligen Code per E-Mail geschickt. Geben Sie ihn hier ein: Er gilt {minutes, plural, one {# Minute} other {# Minuten}}.",
+      "codeLabel": "Bestätigungscode",
+      "codeConfirmEdit": "Berichtigung bestätigen",
+      "codeInvalid": "Der Code ist falsch oder abgelaufen. Prüfen Sie die zuletzt erhaltene E-Mail oder brechen Sie ab und fordern Sie einen neuen an.",
+      "cancelTitle": "Diese Anmeldung löschen",
+      "cancelIntro": "Sie können nur diese Anmeldung löschen, ohne die anderen und Ihre übrigen Daten zu berühren.",
+      "cancelButton": "Diese Anmeldung löschen",
+      "cancelDeletes": "Gelöscht werden die Anmeldung zu dieser Veranstaltung und alles, was Sie damit getan haben: Fragen, Abstimmungen, Chatnachrichten, Feedback, Antworten auf Fragebögen, Ihre Sätze im Transkript aus den Untertiteln und E-Mails in der Warteschlange. Ihr persönlicher Link funktioniert nicht mehr, und der Platz wird frei.",
+      "cancelKeeps": "Bestehen bleiben Ihre anderen Anmeldungen, das Veranstaltungs-Adressbuch, Ihr Profilfoto und ein noch bearbeiteter Antrag auf Entfernung aus einer Aufzeichnung. Gibt es zu dieser Veranstaltung ein Video oder ein Transkript, bleibt der Nachweis Ihrer Einwilligung ohne Ihren Namen erhalten, solange sie existieren. Die Löschung kann nicht rückgängig gemacht werden; solange die Veranstaltung Anmeldungen annimmt, können Sie sich erneut anmelden.",
+      "codeConfirmCancel": "Anmeldung löschen",
+      "cancelDone": "Anmeldung gelöscht."
     },
     "erasure": {
       "title": "Löschung Ihrer Daten",

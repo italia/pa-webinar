@@ -26,6 +26,7 @@ import { decryptPII, tryDecryptPII } from '@/lib/crypto/pii';
 import { getClientIp, rateLimit } from '@/lib/rate-limit';
 import { voceNelVideo } from '@/lib/recording/availability';
 import { proveDiSalaDiChiConduce } from '@/lib/gdpr/consent-proofs';
+import { CAMPI_EVENTO_CONSENSI, offertaConsensi } from '@/lib/gdpr/consent-giving';
 import { consensiDellIscrizione } from '@/lib/gdpr/consent-state';
 import { issueGdprToken, verifyGdprToken } from '@/lib/gdpr/request-token';
 import { proveConservateDellaPersona } from '@/lib/gdpr/retained-consent-proofs';
@@ -66,13 +67,11 @@ export const GET = withErrorHandling(async (request) => {
     include: {
       event: {
         select: {
-          id: true,
+          // Cio' che decide quali consensi si possono dare di nuovo da qui.
+          ...CAMPI_EVENTO_CONSENSI,
           slug: true,
           title: true,
           startsAt: true,
-          endsAt: true,
-          status: true,
-          offerAddressBook: true,
         },
       },
       questions: {
@@ -99,7 +98,7 @@ export const GET = withErrorHandling(async (request) => {
       // Le prove del consenso alla registrazione per partecipante date in sala
       // d'attesa: quando e in quale lingua (il nome e' quello dell'iscrizione).
       multitrackConsents: {
-        select: { consentedAt: true, locale: true, withdrawnAt: true },
+        select: { consentedAt: true, locale: true, withdrawnAt: true, textVersion: true },
         orderBy: { consentedAt: 'asc' },
       },
       // Lo stesso per il consenso alla registrazione dell'evento dato in sala
@@ -310,6 +309,9 @@ export const GET = withErrorHandling(async (request) => {
           ...r,
           addressBookPending: r.addressBookPending && rubricaProposta(r.event, sito),
         }),
+        // I consensi che la pagina puo' far dare di nuovo, con il testo da
+        // mostrare (lib/gdpr/consent-giving).
+        consentOffer: offertaConsensi(r.event, sito, r),
         // La lingua delle email, che la piattaforma conserva e usa.
         locale: r.locale,
         registeredAt: r.createdAt.toISOString(),

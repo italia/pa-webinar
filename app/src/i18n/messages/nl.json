@@ -1684,6 +1684,7 @@
         "DATA_DELETED": "Gegevens verwijderd",
         "CONSENT_RECORDED": "Toestemming geregistreerd",
         "DATA_EXPORTED": "Gegevens geëxporteerd",
+        "DATA_RECTIFIED": "Gegevens gecorrigeerd",
         "CONSENT_WITHDRAWN": "Toestemming ingetrokken",
         "RECORDING_CONTENT_READ": "Inhoud van de opname gelezen door medewerkers",
         "RECORDING_REDACTION_REQUESTED": "Verwijdering uit een opname aangevraagd",
@@ -2147,6 +2148,7 @@
         "DATA_DELETED": "Gegevens verwijderd",
         "CONSENT_RECORDED": "Toestemming geregistreerd",
         "DATA_EXPORTED": "Gegevens geëxporteerd",
+        "DATA_RECTIFIED": "Gegevens gecorrigeerd",
         "CONSENT_WITHDRAWN": "Toestemming ingetrokken",
         "RECORDING_CONTENT_READ": "Inhoud van de opname gelezen door medewerkers"
       }
@@ -4129,7 +4131,8 @@
         },
         "sources": {
           "registration": "inschrijving",
-          "room": "zaal"
+          "room": "zaal",
+          "self-service": "Mijn gegevens"
         },
         "roles": {
           "registrant": "ingeschreven",
@@ -4276,7 +4279,17 @@
     "addressBookNote": "U staat in het evenementenadresboek, om voor vergelijkbare evenementen te worden uitgenodigd: u kunt uw toestemming op elk moment intrekken.",
     "addressBookPendingNote": "Bij deze inschrijving is het vakje voor het evenementenadresboek aangevinkt, maar dit adres ontving geen uitnodigingen meer. Als het verzoek van u komt, kunt u het bevestigen op de pagina met uw gegevens, via de link hieronder. Zo niet, negeer dan dit bericht: u blijft buiten het adresboek en ontvangt geen uitnodigingen.",
     "addressBookOptOutLink": "Verwijder mijn gegevens uit het adresboek",
-    "myDataLink": "Uw gegevens: bekijken, corrigeren, een toestemming intrekken of de inschrijving annuleren"
+    "myDataLink": "Uw gegevens: bekijken, corrigeren, een toestemming intrekken of de inschrijving annuleren",
+    "confirmationCode": {
+      "subject": "{site}: bevestigingscode",
+      "heading": "Uw bevestigingscode",
+      "introEdit": "U hebt gevraagd de naam en organisatie van uw inschrijving voor ‘{event}’ te corrigeren.",
+      "introEditAll": "U hebt gevraagd de naam en organisatie van al uw inschrijvingen te corrigeren.",
+      "introCancel": "U hebt gevraagd uw inschrijving voor ‘{event}’ te verwijderen.",
+      "codeLabel": "De code is:",
+      "instructions": "Vul hem in op de pagina Mijn gegevens waarvandaan u het verzoek hebt gedaan. Hij is {minutes, plural, one {# minuut} other {# minuten}} geldig.",
+      "ignore": "Als u het verzoek niet hebt gedaan, negeer deze e-mail dan: zonder de code verandert er niets. Deel de code met niemand."
+    }
   },
   "home": {
     "hero": {
@@ -4773,6 +4786,7 @@
       "consentFuture": "Toekomstige berichten",
       "consentWithdrawnOn": "Ingetrokken op {date}",
       "consentNoteInRoom": "Bent u nu in de zaal, dan geldt de intrekking vanaf uw volgende binnenkomst: gebruik Toestemmingen in de zaal om die meteen toe te passen.",
+      "consentGiveNoteInRoom": "Een toestemming die u hier geeft, geldt vanaf uw volgende binnenkomst in de zaal, niet voor wat al is opgenomen. Toestemming voor opname en transcriptie kunt u geven tot het evenement is afgelopen.",
       "proofsTitle": "Bewaarde bewijzen van toestemming",
       "proofsIntro": "De gegevens van deze evenementen zijn verwijderd. Deze bewijzen blijven bewaard zolang de video of de transcriptie bestaat. U kunt uw toestemming intrekken: wat al in de video staat, blijft staan, en om dat te laten verwijderen moet u schrijven naar de verwerkingsverantwoordelijke.",
       "proofGivenOn": "Gegeven op {date}",
@@ -4788,6 +4802,13 @@
       "addressBookIntro": "U hebt ervoor gekozen in het adresboek te blijven om voor vergelijkbare evenementen te worden uitgenodigd. We bewaren deze gegevens tot {date}, tenzij u uw toestemming intrekt of opnieuw geeft.",
       "addressBookOptOut": "Verwijder mijn gegevens uit het adresboek",
       "consentFutureEffect": "Als u deze intrekt, ontvangt u geen berichten meer over komende evenementen en verlaat u het adresboek, voor al uw inschrijvingen.",
+      "consentFutureGive": "Ik geef toestemming voor toekomstige berichten",
+      "consentFutureGiveEffect": "U keert terug in het evenementenadresboek met de naam en de organisatie van deze inschrijving en ontvangt weer uitnodigingen; de bewaartermijn begint vandaag opnieuw.",
+      "consentGiveDone": "Toestemming gegeven: deze geldt vanaf uw volgende binnenkomst in de zaal.",
+      "consentFutureGiveDone": "Toestemming gegeven: u staat weer in het evenementenadresboek.",
+      "consentGiveTextChanged": "De toestemmingstekst is gewijzigd nadat u de pagina opende: laad haar opnieuw om de nieuwe te lezen.",
+      "consentGiveClosed": "Deze toestemming kan hier niet meer worden gegeven: het evenement is afgelopen of vraagt er niet meer om. Laad de pagina opnieuw om de actuele status te zien.",
+      "consentGiveNewText": "De tekst van deze toestemming is gewijzigd nadat u die gaf: voor de huidige tekst moet u die opnieuw geven.",
       "addressBookPendingTitle": "Terugkeer in het adresboek nog te bevestigen",
       "addressBookPendingBody": "Bij deze inschrijving is het vakje voor het adresboek aangevinkt, maar dit adres ontving geen uitnodigingen meer. Zolang u niet bevestigt, verandert er niets.",
       "addressBookPendingEffect": "Als u bevestigt, keert u terug in het adresboek met de naam en de organisatie van deze inschrijving en ontvangt u weer uitnodigingen. Als u annuleert, of als u het niet was, blijft u buiten het adresboek en ontvangt u geen uitnodigingen.",
@@ -4805,7 +4826,29 @@
       "removalError": "Het verzoek kon niet worden verstuurd. Probeer het later opnieuw.",
       "removalStatusOpen": "Verzoek van {date}: in behandeling.",
       "removalStatusClosed": "Verzoek van {date}: afgehandeld op {closed}.",
-      "removalStatusRejected": "Verzoek van {date}: afgewezen. Schrijf naar de verwerkingsverantwoordelijke om de reden te vernemen."
+      "removalStatusRejected": "Verzoek van {date}: afgewezen. Schrijf naar de verwerkingsverantwoordelijke om de reden te vernemen.",
+      "editButton": "Naam en organisatie corrigeren",
+      "editScopeLegend": "Op welke inschrijvingen dit van toepassing is",
+      "editScopeOne": "Alleen deze inschrijving",
+      "editScopeAll": "Al mijn inschrijvingen ({count}) en het evenementenadresboek",
+      "editEffect": "De correctie geldt voor de volgende e-mails en vanaf uw volgende binnenkomst in de zaal. Ze verandert niets aan wat al is opgenomen, getranscribeerd of in de chat geschreven, noch aan de bewijzen van toestemming.",
+      "editNameInvalid": "De naam moet tussen 2 en 100 tekens lang zijn.",
+      "editOrganizationRequired": "Een evenement waarvoor u bent ingeschreven, vraagt om de organisatie: het veld mag niet leeg blijven.",
+      "editOrganizationTooLong": "De organisatie mag hoogstens 200 tekens lang zijn.",
+      "editDone": "Gegevens gecorrigeerd.",
+      "codeWhy": "Voor de veiligheid worden correcties en verwijderingen bevestigd met een code die we naar het e-mailadres van de inschrijving sturen.",
+      "codeSend": "Stuur mij de bevestigingscode",
+      "codeSent": "We hebben u een code van 6 cijfers gemaild. Vul die hier in: hij is {minutes, plural, one {# minuut} other {# minuten}} geldig.",
+      "codeLabel": "Bevestigingscode",
+      "codeConfirmEdit": "Correctie bevestigen",
+      "codeInvalid": "De code is onjuist of verlopen. Controleer de laatst ontvangen e-mail, of annuleer en vraag een nieuwe aan.",
+      "cancelTitle": "Deze inschrijving verwijderen",
+      "cancelIntro": "U kunt alleen deze inschrijving verwijderen, zonder de andere en de rest van uw gegevens aan te raken.",
+      "cancelButton": "Deze inschrijving verwijderen",
+      "cancelDeletes": "De inschrijving voor dit evenement wordt verwijderd met wat u ermee hebt gedaan: vragen, stemmen, chatberichten, feedback, antwoorden op vragenlijsten, uw zinnen in het transcript uit de ondertiteling en e-mails in de wachtrij. Uw persoonlijke link werkt niet meer en de plaats komt vrij.",
+      "cancelKeeps": "Uw andere inschrijvingen, het evenementenadresboek, uw profielfoto en een verzoek om verwijdering uit een opname dat nog in behandeling is, blijven bestaan. Als er van dit evenement een video of transcript bestaat, blijft het bewijs van uw toestemming zonder uw naam bewaard zolang die bestaan. Het verwijderen kan niet ongedaan worden gemaakt; zolang het evenement inschrijvingen aanneemt, kunt u zich opnieuw inschrijven.",
+      "codeConfirmCancel": "Inschrijving verwijderen",
+      "cancelDone": "Inschrijving verwijderd."
     },
     "erasure": {
       "title": "Verwijdering van uw gegevens",

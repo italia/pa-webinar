@@ -1684,6 +1684,7 @@
         "DATA_DELETED": "Smazaná data",
         "CONSENT_RECORDED": "Souhlas zaznamenán",
         "DATA_EXPORTED": "Data exportována",
+        "DATA_RECTIFIED": "Opravené údaje",
         "CONSENT_WITHDRAWN": "Souhlas odvolán",
         "RECORDING_CONTENT_READ": "Obsah záznamu přečtený personálem",
         "RECORDING_REDACTION_REQUESTED": "Požádáno o odstranění ze záznamu",
@@ -2147,6 +2148,7 @@
         "DATA_DELETED": "Data smazána",
         "CONSENT_RECORDED": "Souhlas zaznamenán",
         "DATA_EXPORTED": "Data exportována",
+        "DATA_RECTIFIED": "Opravené údaje",
         "CONSENT_WITHDRAWN": "Souhlas odvolán",
         "RECORDING_CONTENT_READ": "Obsah záznamu přečtený personálem"
       }
@@ -4129,7 +4131,8 @@
         },
         "sources": {
           "registration": "registrace",
-          "room": "místnost"
+          "room": "místnost",
+          "self-service": "Moje údaje"
         },
         "roles": {
           "registrant": "registrovaný",
@@ -4276,7 +4279,17 @@
     "addressBookNote": "Jste v adresáři událostí, abyste byli zváni na podobné akce: souhlas můžete kdykoli odvolat.",
     "addressBookPendingNote": "U této registrace bylo zaškrtnuto políčko adresáře událostí, ale tato adresa přestala dostávat pozvánky. Pokud je žádost vaše, můžete ji potvrdit na stránce se svými údaji pomocí odkazu níže. Pokud vaše není, tuto zprávu ignorujte: zůstanete mimo adresář a pozvánky dostávat nebudete.",
     "addressBookOptOutLink": "Odebrat mé údaje z adresáře",
-    "myDataLink": "Vaše údaje: zobrazit, opravit, odvolat souhlas nebo zrušit registraci"
+    "myDataLink": "Vaše údaje: zobrazit, opravit, odvolat souhlas nebo zrušit registraci",
+    "confirmationCode": {
+      "subject": "{site}: potvrzovací kód",
+      "heading": "Váš potvrzovací kód",
+      "introEdit": "Požádali jste o opravu jména a organizace ve své registraci na akci „{event}“.",
+      "introEditAll": "Požádali jste o opravu jména a organizace ve všech svých registracích.",
+      "introCancel": "Požádali jste o smazání své registrace na akci „{event}“.",
+      "codeLabel": "Kód je:",
+      "instructions": "Zadejte ho na stránce Moje údaje, ze které jste žádost odeslali. Platí {minutes, plural, one {# minuta} few {# minuty} other {# minut}}.",
+      "ignore": "Pokud jste žádost neodeslali vy, tento e-mail ignorujte: bez kódu se nic nezmění. Kód nikomu nesdělujte."
+    }
   },
   "home": {
     "hero": {
@@ -4773,6 +4786,7 @@
       "consentFuture": "Budoucí sdělení",
       "consentWithdrawnOn": "Odvoláno {date}",
       "consentNoteInRoom": "Pokud jste právě v místnosti, odvolání platí od příštího vstupu: aby platilo hned, použijte v místnosti Souhlasy.",
+      "consentGiveNoteInRoom": "Souhlas udělený zde platí od příštího vstupu do místnosti, ne pro to, co už bylo zaznamenáno. Souhlas se záznamem a s přepisem lze udělit, dokud akce neskončí.",
       "proofsTitle": "Uchovávané doklady o souhlasu",
       "proofsIntro": "Údaje k těmto akcím byly vymazány. Tyto doklady zůstávají, dokud video nebo přepis existují. Souhlas můžete odvolat: co už je ve videu, zůstává, a k jeho odstranění musíte napsat správci osobních údajů.",
       "proofGivenOn": "Udělen {date}",
@@ -4788,6 +4802,13 @@
       "addressBookIntro": "Rozhodli jste se zůstat v adresáři, abyste byli zváni na podobné akce. Tyto údaje uchováváme do {date}, pokud souhlas neodvoláte nebo neudělíte nový.",
       "addressBookOptOut": "Odebrat mé údaje z adresáře",
       "consentFutureEffect": "Pokud jej odvoláte, nebudete dostávat sdělení o dalších akcích a opustíte adresář, a to pro všechny své registrace.",
+      "consentFutureGive": "Souhlasím s budoucími sděleními",
+      "consentFutureGiveEffect": "Vrátíte se do adresáře událostí se jménem a organizací z této registrace a budete znovu dostávat pozvánky; doba uchování začíná znovu dnešním dnem.",
+      "consentGiveDone": "Souhlas udělen: platí od příštího vstupu do místnosti.",
+      "consentFutureGiveDone": "Souhlas udělen: jste znovu v adresáři událostí.",
+      "consentGiveTextChanged": "Text souhlasu se změnil poté, co jste stránku otevřeli: načtěte ji znovu a přečtěte si nový.",
+      "consentGiveClosed": "Tento souhlas už odsud udělit nelze: akce skončila nebo ho už nevyžaduje. Načtěte stránku znovu, abyste viděli aktuální stav.",
+      "consentGiveNewText": "Text tohoto souhlasu se změnil poté, co jste ho udělili: pro aktuální text je třeba ho udělit znovu.",
       "addressBookPendingTitle": "Návrat do adresáře je třeba potvrdit",
       "addressBookPendingBody": "U této registrace bylo zaškrtnuto políčko adresáře, ale tato adresa přestala dostávat pozvánky. Dokud nepotvrdíte, nic se nezmění.",
       "addressBookPendingEffect": "Pokud potvrdíte, vrátíte se do adresáře se jménem a organizací z této registrace a budete znovu dostávat pozvánky. Pokud zrušíte nebo pokud jste to nebyli vy, zůstanete mimo adresář a pozvánky dostávat nebudete.",
@@ -4805,7 +4826,29 @@
       "removalError": "Žádost se nepodařilo odeslat. Zkuste to později.",
       "removalStatusOpen": "Žádost ze dne {date}: vyřizuje se.",
       "removalStatusClosed": "Žádost ze dne {date}: vyřízena {closed}.",
-      "removalStatusRejected": "Žádost ze dne {date}: zamítnuta. Napište správci, abyste se dozvěděli důvod."
+      "removalStatusRejected": "Žádost ze dne {date}: zamítnuta. Napište správci, abyste se dozvěděli důvod.",
+      "editButton": "Opravit jméno a organizaci",
+      "editScopeLegend": "Na které registrace se vztahuje",
+      "editScopeOne": "Jen tato registrace",
+      "editScopeAll": "Všechny moje registrace ({count}) a adresář událostí",
+      "editEffect": "Oprava platí pro další e-maily a od příštího vstupu do místnosti. Nemění to, co už bylo zaznamenáno, přepsáno nebo napsáno v chatu, ani doklady o souhlasu.",
+      "editNameInvalid": "Jméno musí mít 2 až 100 znaků.",
+      "editOrganizationRequired": "Akce, na kterou jste registrováni, vyžaduje organizaci: nelze ji nechat prázdnou.",
+      "editOrganizationTooLong": "Organizace může mít nejvýše 200 znaků.",
+      "editDone": "Údaje byly opraveny.",
+      "codeWhy": "Z bezpečnostních důvodů se opravy a smazání potvrzují kódem, který pošleme na e-mailovou adresu registrace.",
+      "codeSend": "Pošlete mi potvrzovací kód",
+      "codeSent": "Poslali jsme vám e-mailem šestimístný kód. Zadejte ho sem: platí {minutes, plural, one {# minuta} few {# minuty} other {# minut}}.",
+      "codeLabel": "Potvrzovací kód",
+      "codeConfirmEdit": "Potvrdit opravu",
+      "codeInvalid": "Kód není správný nebo vypršel. Zkontrolujte poslední přijatý e-mail, nebo akci zrušte a požádejte o nový.",
+      "cancelTitle": "Smazání této registrace",
+      "cancelIntro": "Můžete smazat jen tuto registraci, aniž byste se dotkli ostatních a zbytku svých údajů.",
+      "cancelButton": "Smazat tuto registraci",
+      "cancelDeletes": "Smaže se registrace na tuto akci a to, co jste s ní udělali: otázky, hlasy, zprávy v chatu, zpětná vazba, odpovědi na dotazníky, vaše věty v přepisu z titulků a e-maily ve frontě. Váš osobní odkaz přestane fungovat a místo se uvolní.",
+      "cancelKeeps": "Zůstávají ostatní registrace, adresář událostí, profilová fotografie a žádost o odstranění ze záznamu, která se ještě vyřizuje. Pokud k této akci existuje video nebo přepis, doklad o vašem souhlasu zůstane bez vašeho jména, dokud existují. Smazání nelze vrátit; dokud akce přijímá registrace, můžete se znovu zaregistrovat.",
+      "codeConfirmCancel": "Smazat registraci",
+      "cancelDone": "Registrace byla smazána."
     },
     "erasure": {
       "title": "Výmaz vašich údajů",

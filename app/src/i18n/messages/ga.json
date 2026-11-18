@@ -1684,6 +1684,7 @@
         "DATA_DELETED": "Sonraí scriosta",
         "CONSENT_RECORDED": "Toiliú taifeadta",
         "DATA_EXPORTED": "Sonraí easpórtáilte",
+        "DATA_RECTIFIED": "Sonraí ceartaithe",
         "CONSENT_WITHDRAWN": "Toiliú tarraingthe siar",
         "RECORDING_CONTENT_READ": "Ábhar an taifeadta léite ag an bhfoireann",
         "RECORDING_REDACTION_REQUESTED": "Baint as taifeadadh iarrtha",
@@ -2147,6 +2148,7 @@
         "DATA_DELETED": "Sonraí scriosta",
         "CONSENT_RECORDED": "Toiliú taifeadta",
         "DATA_EXPORTED": "Sonraí easpórtáilte",
+        "DATA_RECTIFIED": "Sonraí ceartaithe",
         "CONSENT_WITHDRAWN": "Toiliú tarraingthe siar",
         "RECORDING_CONTENT_READ": "Ábhar an taifeadta léite ag an bhfoireann"
       }
@@ -4129,7 +4131,8 @@
         },
         "sources": {
           "registration": "clárú",
-          "room": "seomra"
+          "room": "seomra",
+          "self-service": "Mo chuid sonraí"
         },
         "roles": {
           "registrant": "cláraithe",
@@ -4276,7 +4279,17 @@
     "addressBookNote": "Tá tú i leabhar seoltaí na n-imeachtaí, chun cuireadh a fháil chuig imeachtaí comhchosúla: is féidir leat do thoiliú a tharraingt siar am ar bith.",
     "addressBookPendingNote": "Ticeáladh bosca leabhar seoltaí na n-imeachtaí ar an gclárú seo, ach bhí deireadh curtha ag an seoladh seo le cuirí a fháil. Más tusa a rinne an t-iarratas, is féidir leat é a dheimhniú ar leathanach do shonraí, leis an nasc thíos. Murarbh tusa a rinne é, déan neamhaird den teachtaireacht seo: fanfaidh tú lasmuigh den leabhar seoltaí agus ní bhfaighidh tú cuirí.",
     "addressBookOptOutLink": "Bain mo shonraí den leabhar seoltaí",
-    "myDataLink": "Do shonraí: iad a fheiceáil, a cheartú, toiliú a tharraingt siar nó do chlárú a chealú"
+    "myDataLink": "Do shonraí: iad a fheiceáil, a cheartú, toiliú a tharraingt siar nó do chlárú a chealú",
+    "confirmationCode": {
+      "subject": "{site}: cód deimhnithe",
+      "heading": "Do chód deimhnithe",
+      "introEdit": "D'iarr tú ainm agus eagraíocht do chláraithe do “{event}” a cheartú.",
+      "introEditAll": "D'iarr tú ainm agus eagraíocht do chláruithe go léir a cheartú.",
+      "introCancel": "D'iarr tú do chlárú do “{event}” a scriosadh.",
+      "codeLabel": "Is é an cód:",
+      "instructions": "Cuir isteach é ar an leathanach Mo chuid sonraí ónar rinne tú an iarraidh. Tá sé bailí ar feadh {minutes, plural, one {# nóiméad} other {# nóiméad}}.",
+      "ignore": "Murab tusa a rinne an iarraidh, déan neamhaird den ríomhphost seo: ní athraíonn aon rud gan an cód. Ná roinn an cód le duine ar bith."
+    }
   },
   "home": {
     "hero": {
@@ -4773,6 +4786,7 @@
       "consentFuture": "Cumarsáid amach anseo",
       "consentWithdrawnOn": "Tarraingthe siar ar {date}",
       "consentNoteInRoom": "Má tá tú sa seomra faoi láthair, tá an tarraingt siar i bhfeidhm ó do chéad iontráil eile: chun é a chur i bhfeidhm láithreach, úsáid Toilithe sa seomra.",
+      "consentGiveNoteInRoom": "Tá toiliú a thugtar anseo i bhfeidhm ó do chéad iontráil eile sa seomra, ní don mhéid atá taifeadta cheana. Is féidir toiliú leis an taifeadadh agus leis an tras-scríbhinn a thabhairt go dtí go gcríochnaíonn an t-imeacht.",
       "proofsTitle": "Cruthúnais toilithe atá coinnithe",
       "proofsIntro": "Scriosadh sonraí na n-imeachtaí seo. Fanann na cruthúnais seo fad atá an físeán nó an tras-scríbhinn ann. Is féidir leat do thoiliú a tharraingt siar: fanann a bhfuil san fhíseán cheana, agus chun é a bhaint ní mór duit scríobh chuig an rialaitheoir sonraí.",
       "proofGivenOn": "Tugtha ar {date}",
@@ -4788,6 +4802,13 @@
       "addressBookIntro": "Roghnaigh tú fanacht sa leabhar seoltaí chun cuireadh a fháil chuig imeachtaí comhchosúla. Coinnímid na sonraí seo go dtí {date}, mura dtarraingíonn tú siar do thoiliú nó mura dtugann tú toiliú nua.",
       "addressBookOptOut": "Bain mo shonraí den leabhar seoltaí",
       "consentFutureEffect": "Má tharraingíonn tú siar é ní bhfaighidh tú cumarsáid faoi imeachtaí amach anseo a thuilleadh agus fágann tú an leabhar seoltaí, do do chláruithe go léir.",
+      "consentFutureGive": "Toilím le cumarsáid amach anseo",
+      "consentFutureGiveEffect": "Fillfidh tú ar leabhar seoltaí na n-imeachtaí le hainm agus eagraíocht an chláraithe seo agus gheobhaidh tú cuirí arís; tosaíonn an tréimhse choinneála as an nua inniu.",
+      "consentGiveDone": "Toiliú tugtha: tá sé i bhfeidhm ó do chéad iontráil eile sa seomra.",
+      "consentFutureGiveDone": "Toiliú tugtha: tá tú ar ais i leabhar seoltaí na n-imeachtaí.",
+      "consentGiveTextChanged": "Athraíodh téacs an toilithe tar éis duit an leathanach a oscailt: athlódáil é chun an ceann nua a léamh.",
+      "consentGiveClosed": "Ní féidir an toiliú seo a thabhairt anseo a thuilleadh: tá an t-imeacht thart nó ní iarrann sé é a thuilleadh. Athlódáil an leathanach chun an stádas reatha a fheiceáil.",
+      "consentGiveNewText": "Athraíodh téacs an toilithe seo tar éis duit é a thabhairt: don téacs reatha caithfear é a thabhairt arís.",
       "addressBookPendingTitle": "Filleadh ar an leabhar seoltaí le deimhniú",
       "addressBookPendingBody": "Ticeáladh bosca an leabhair seoltaí ar an gclárú seo, ach bhí deireadh curtha ag an seoladh seo le cuirí a fháil. Ní athróidh aon rud go dtí go ndeimhníonn tú.",
       "addressBookPendingEffect": "Má dheimhníonn tú, fillfidh tú ar an leabhar seoltaí le hainm agus eagraíocht an chláraithe seo agus gheobhaidh tú cuirí arís. Má chuireann tú ar ceal, nó murarbh tusa a rinne é, fanfaidh tú lasmuigh den leabhar seoltaí agus ní bhfaighidh tú cuirí.",
@@ -4805,7 +4826,29 @@
       "removalError": "Níorbh fhéidir an t-iarratas a sheoladh. Bain triail eile as ar ball.",
       "removalStatusOpen": "Iarratas an {date}: á phróiseáil.",
       "removalStatusClosed": "Iarratas an {date}: curtha i gcrích an {closed}.",
-      "removalStatusRejected": "Iarratas an {date}: diúltaithe. Scríobh chuig an rialaitheoir chun an chúis a fháil amach."
+      "removalStatusRejected": "Iarratas an {date}: diúltaithe. Scríobh chuig an rialaitheoir chun an chúis a fháil amach.",
+      "editButton": "Ceartaigh an t-ainm agus an eagraíocht",
+      "editScopeLegend": "Cé na clárúcháin lena mbaineann sé",
+      "editScopeOne": "An clárú seo amháin",
+      "editScopeAll": "Mo chláruithe go léir ({count}) agus leabhar seoltaí na n-imeachtaí",
+      "editEffect": "Tá an ceartúchán i bhfeidhm do na ríomhphoist eile agus ó do chéad iontráil eile sa seomra. Ní athraíonn sé an méid atá taifeadta, tras-scríofa nó scríofa sa chomhrá cheana, ná na cruthúnais toilithe.",
+      "editNameInvalid": "Caithfidh idir 2 agus 100 carachtar a bheith san ainm.",
+      "editOrganizationRequired": "Iarrann imeacht a bhfuil tú cláraithe dó an eagraíocht: ní féidir é a fhágáil folamh.",
+      "editOrganizationTooLong": "Is féidir 200 carachtar ar a mhéad a bheith san eagraíocht.",
+      "editDone": "Ceartaíodh na sonraí.",
+      "codeWhy": "Ar mhaithe le slándáil, deimhnítear ceartúcháin agus scriosadh le cód a sheolaimid chuig seoladh ríomhphoist an chláraithe.",
+      "codeSend": "Seol an cód deimhnithe chugam",
+      "codeSent": "Sheolamar cód 6 dhigit chugat i ríomhphost. Cuir isteach anseo é: tá sé bailí ar feadh {minutes, plural, one {# nóiméad} other {# nóiméad}}.",
+      "codeLabel": "Cód deimhnithe",
+      "codeConfirmEdit": "Deimhnigh an ceartúchán",
+      "codeInvalid": "Tá an cód mícheart nó imithe in éag. Seiceáil an ríomhphost is déanaí a fuair tú, nó cealaigh agus iarr ceann nua.",
+      "cancelTitle": "An clárú seo a scriosadh",
+      "cancelIntro": "Is féidir leat an clárú seo amháin a scriosadh, gan baint leis na cinn eile ná le do chuid sonraí eile.",
+      "cancelButton": "Scrios an clárú seo",
+      "cancelDeletes": "Scriostar an clárú don imeacht seo agus a ndearna tú leis: ceisteanna, vótaí, teachtaireachtaí comhrá, aiseolas, freagraí ar cheistneoirí, d'abairtí sa tras-scríbhinn ó na fotheidil agus ríomhphoist sa scuaine. Stopann do nasc pearsanta ag obair agus scaoiltear an áit.",
+      "cancelKeeps": "Fanann do chláruithe eile, leabhar seoltaí na n-imeachtaí, do ghrianghraf próifíle agus iarraidh ar bhaint ó thaifeadadh atá fós á próiseáil. Má tá físeán nó tras-scríbhinn ag an imeacht seo, fanann cruthúnas do thoilithe gan d'ainm fad is atá siad ann. Ní féidir an scriosadh a chealú; fad is a ghlacann an t-imeacht le clárúcháin, is féidir leat clárú arís.",
+      "codeConfirmCancel": "Scrios an clárú",
+      "cancelDone": "Scriosadh an clárú."
     },
     "erasure": {
       "title": "Scriosadh bhur gcuid sonraí",

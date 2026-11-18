@@ -10,7 +10,7 @@ import messages from '@/i18n/messages/it.json';
 
 import type { VoceNelVideo } from '@/lib/live/consent-rule';
 
-import RegistrationConsents, { type ConsensiVista } from './registration-consents';
+import RegistrationConsents, { type ConsensiVista, type OffertaVista } from './registration-consents';
 
 let container: HTMLDivElement;
 let root: Root;
@@ -24,6 +24,8 @@ const monta = (
     voce?: VoceNelVideo;
     rubricaConfermata?: boolean;
     onRubricaConfermata?: () => void;
+    offerta?: OffertaVista | null;
+    locale?: string;
   } = {}
 ) =>
   act(() =>
@@ -354,5 +356,140 @@ describe('RegistrationConsents', () => {
 
     expect(container.querySelector('[role="alert"]')).not.toBeNull();
     expect(container.textContent).not.toContain('Ritirato il');
+  });
+
+  describe('un consenso dato di nuovo', () => {
+    const ritirato = { dato: false, ritiratoIl: '2026-11-05T10:00:00.000Z' };
+    const offerta: OffertaVista = {
+      recording: {
+        destination: 'REGISTRANTS',
+        voice: 'rimovibile',
+        eventText: 'Testo dell’ente.',
+        inForce: false,
+      },
+      transcription: {
+        text: 'multitrack',
+        voice: 'rimovibile',
+        needsRecording: true,
+        inForce: false,
+      },
+      futureCommunications: true,
+    };
+    const g = messages.gdpr.consent;
+    const l = messages.live.consents;
+
+    it('mostra il testo della casella e lo manda con il testo letto', async () => {
+      const richiesta = vi.fn(async () => new Response('{}', { status: 200 }));
+      vi.stubGlobal('fetch', richiesta);
+      monta({ recording: ritirato }, { offerta, locale: 'it' });
+
+      expect(container.textContent).toContain(`Testo dell’ente. ${g.recordingReserved}`);
+      await clic(l.recording.give);
+
+      expect(richiesta).toHaveBeenCalledWith(
+        '/api/gdpr/consents',
+        expect.objectContaining({
+          body: JSON.stringify({
+            token: 'tok en',
+            registrationId: 'r1',
+            consent: 'recording',
+            give: true,
+            locale: 'it',
+            recordingDestination: 'REGISTRANTS',
+          }),
+        })
+      );
+      expect(container.textContent).toContain(messages.gdpr.export.consentGiveDone);
+      expect(pulsante(l.withdraw)).toBeDefined();
+    });
+
+    it('senza offerta non si da: resta solo lo stato', () => {
+      monta({ recording: ritirato }, { offerta: { ...offerta, recording: null } });
+      expect(pulsante(l.recording.give)).toBeUndefined();
+    });
+
+    it('la trascrizione aspetta il consenso alla registrazione', () => {
+      monta({ recording: ritirato, transcription: ritirato }, { offerta });
+      expect(pulsante(l.transcription.give)?.disabled).toBe(true);
+      expect(container.textContent).toContain(l.transcription.needsRecording);
+    });
+
+    it('un testo cambiato a pagina aperta lo dice', async () => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(
+          async () =>
+            new Response(JSON.stringify({ code: 'CONSENT_TEXT_CHANGED' }), { status: 409 })
+        )
+      );
+      monta({ recording: ritirato }, { offerta });
+      await clic(l.recording.give);
+      expect(container.textContent).toContain(messages.gdpr.export.consentGiveTextChanged);
+      expect(pulsante(l.withdraw)).toBeUndefined();
+    });
+
+    it("le comunicazioni ridate valgono anche dopo un ritiro fatto da un'altra scheda", async () => {
+      vi.stubGlobal('fetch', vi.fn(async () => new Response('{}', { status: 200 })));
+      const confermata = vi.fn();
+      monta(
+        { futureCommunications: ritirato },
+        { offerta, comunicazioniRitirateIl: ritirato.ritiratoIl, onRubricaConfermata: confermata }
+      );
+      expect(container.textContent).toContain(messages.gdpr.export.consentFutureGiveEffect);
+      await clic(messages.gdpr.export.consentFutureGive);
+      expect(confermata).toHaveBeenCalled();
+      expect(pulsante(l.withdraw)).toBeDefined();
+    });
+
+    it('le comunicazioni ridate qui e poi ritirate da un’altra scheda si ridanno ancora', async () => {
+      vi.stubGlobal('fetch', vi.fn(async () => new Response('{}', { status: 200 })));
+      const pagina = (ritirateIl: string | undefined) =>
+        act(() =>
+          root.render(
+            <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
+              <RegistrationConsents
+                token="tok en"
+                registrationId="r1"
+                consensi={{ recording: null, transcription: null, futureCommunications: ritirato }}
+                offerta={offerta}
+                comunicazioniRitirateIl={ritirateIl}
+              />
+            </NextIntlClientProvider>
+          )
+        );
+      pagina(ritirato.ritiratoIl);
+      await clic(messages.gdpr.export.consentFutureGive);
+      expect(pulsante(l.withdraw)).toBeDefined();
+      // Un ritiro piu' recente, fatto su un'altra scheda.
+      pagina(new Date(Date.now() + 60_000).toISOString());
+      expect(pulsante(l.withdraw)).toBeUndefined();
+      expect(pulsante(messages.gdpr.export.consentFutureGive)).toBeDefined();
+      expect(container.textContent).not.toContain(messages.gdpr.export.consentFutureGiveDone);
+    });
+
+    it('con una spunta in attesa si conferma quella, non un secondo pulsante', () => {
+      monta({ futureCommunications: ritirato, addressBookPending: true }, { offerta });
+      expect(pulsante(messages.gdpr.export.consentFutureGive)).toBeUndefined();
+      expect(pulsante(messages.gdpr.export.addressBookPendingConfirm)).toBeDefined();
+    });
+
+    it('un consenso dato su un testo che non copre quello in vigore si da di nuovo', async () => {
+      const richiesta = vi.fn(async () => new Response('{}', { status: 200 }));
+      vi.stubGlobal('fetch', richiesta);
+      monta({ recording: dato, transcription: ritirato }, { offerta });
+      expect(container.textContent).toContain(messages.gdpr.export.consentGiveNewText);
+      expect(pulsante(l.withdraw)).toBeDefined();
+      // La trascrizione aspetta il consenso valido, non quello vecchio.
+      expect(pulsante(l.transcription.give)?.disabled).toBe(true);
+      await clic(l.recording.give);
+      expect(pulsante(l.transcription.give)?.disabled).toBe(false);
+      await clic(l.transcription.give);
+      const ultima = richiesta.mock.calls.at(-1) as unknown as [string, { body: string }];
+      expect(JSON.parse(ultima[1].body)).toMatchObject({
+        consent: 'transcription',
+        give: true,
+        transcriptionText: 'multitrack',
+      });
+    });
   });
 });

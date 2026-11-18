@@ -1684,6 +1684,7 @@
         "DATA_DELETED": "Data raderad",
         "CONSENT_RECORDED": "Samtycke registrerat",
         "DATA_EXPORTED": "Data exporterad",
+        "DATA_RECTIFIED": "Uppgifter rättade",
         "CONSENT_WITHDRAWN": "Samtycke återkallat",
         "RECORDING_CONTENT_READ": "Inspelningens innehåll läst av personal",
         "RECORDING_REDACTION_REQUESTED": "Borttagning ur en inspelning begärd",
@@ -2147,6 +2148,7 @@
         "DATA_DELETED": "Data raderad",
         "CONSENT_RECORDED": "Samtycke registrerat",
         "DATA_EXPORTED": "Data exporterad",
+        "DATA_RECTIFIED": "Uppgifter rättade",
         "CONSENT_WITHDRAWN": "Samtycke återkallat",
         "RECORDING_CONTENT_READ": "Inspelningens innehåll läst av personal"
       }
@@ -4129,7 +4131,8 @@
         },
         "sources": {
           "registration": "anmälan",
-          "room": "rum"
+          "room": "rum",
+          "self-service": "Mina uppgifter"
         },
         "roles": {
           "registrant": "anmäld",
@@ -4276,7 +4279,17 @@
     "addressBookNote": "Du finns i evenemangsadressboken för att bjudas in till liknande evenemang: du kan när som helst återkalla ditt samtycke.",
     "addressBookPendingNote": "Rutan för evenemangsadressboken kryssades i på den här anmälan, men den här adressen hade slutat ta emot inbjudningar. Om begäran är din kan du bekräfta den på sidan med dina uppgifter, via länken nedan. Om den inte är din kan du bortse från det här meddelandet: du stannar utanför adressboken och får inga inbjudningar.",
     "addressBookOptOutLink": "Ta bort mina uppgifter från adressboken",
-    "myDataLink": "Dina uppgifter: se dem, rätta dem, återkalla ett samtycke eller avbryt anmälan"
+    "myDataLink": "Dina uppgifter: se dem, rätta dem, återkalla ett samtycke eller avbryt anmälan",
+    "confirmationCode": {
+      "subject": "{site}: bekräftelsekod",
+      "heading": "Din bekräftelsekod",
+      "introEdit": "Du har bett om att rätta namn och organisation i din anmälan till ”{event}”.",
+      "introEditAll": "Du har bett om att rätta namn och organisation i alla dina anmälningar.",
+      "introCancel": "Du har bett om att radera din anmälan till ”{event}”.",
+      "codeLabel": "Koden är:",
+      "instructions": "Skriv den på sidan Mina uppgifter där du gjorde begäran. Den gäller i {minutes, plural, one {# minut} other {# minuter}}.",
+      "ignore": "Om det inte var du som gjorde begäran kan du strunta i det här meddelandet: utan koden ändras ingenting. Dela inte koden med någon."
+    }
   },
   "home": {
     "hero": {
@@ -4773,6 +4786,7 @@
       "consentFuture": "Framtida meddelanden",
       "consentWithdrawnOn": "Återkallat {date}",
       "consentNoteInRoom": "Om du är i rummet just nu gäller återkallelsen från nästa inträde: använd Samtycken i rummet för att den ska gälla direkt.",
+      "consentGiveNoteInRoom": "Ett samtycke som ges här gäller från ditt nästa inträde i rummet, inte för det som redan har spelats in. Samtycke till inspelning och transkribering kan ges tills evenemanget är slut.",
       "proofsTitle": "Sparade bevis på samtycken",
       "proofsIntro": "Uppgifterna för dessa evenemang har raderats. Dessa bevis finns kvar så länge videon eller transkriptionen finns. Du kan återkalla ditt samtycke: det som redan finns i videon blir kvar, och för att få det borttaget måste du skriva till den personuppgiftsansvarige.",
       "proofGivenOn": "Givet den {date}",
@@ -4788,6 +4802,13 @@
       "addressBookIntro": "Du har valt att stanna kvar i adressboken för att bjudas in till liknande evenemang. Vi sparar dessa uppgifter fram till {date}, om du inte återkallar samtycket eller ger ett nytt.",
       "addressBookOptOut": "Ta bort mina uppgifter från adressboken",
       "consentFutureEffect": "Om du återkallar det får du inte längre meddelanden om kommande evenemang och du lämnar adressboken, för alla dina anmälningar.",
+      "consentFutureGive": "Jag samtycker till framtida meddelanden",
+      "consentFutureGiveEffect": "Du kommer tillbaka till evenemangsadressboken med namnet och organisationen från den här anmälan och får inbjudningar igen; lagringstiden börjar om i dag.",
+      "consentGiveDone": "Samtycke givet: det gäller från ditt nästa inträde i rummet.",
+      "consentFutureGiveDone": "Samtycke givet: du finns i evenemangsadressboken igen.",
+      "consentGiveTextChanged": "Samtyckestexten ändrades efter att du öppnade sidan: ladda om den för att läsa den nya.",
+      "consentGiveClosed": "Det här samtycket kan inte längre ges härifrån: evenemanget är slut eller ber inte längre om det. Ladda om sidan för att se aktuell status.",
+      "consentGiveNewText": "Texten till det här samtycket ändrades efter att du gav det: för den aktuella texten måste det ges igen.",
       "addressBookPendingTitle": "Återkomst till adressboken väntar på bekräftelse",
       "addressBookPendingBody": "Rutan för adressboken kryssades i på den här anmälan, men den här adressen hade slutat ta emot inbjudningar. Inget ändras förrän du bekräftar.",
       "addressBookPendingEffect": "Om du bekräftar kommer du tillbaka till adressboken med namnet och organisationen från den här anmälan och får inbjudningar igen. Om du avbryter, eller om det inte var du, stannar du utanför adressboken och får inga inbjudningar.",
@@ -4805,7 +4826,29 @@
       "removalError": "Begäran kunde inte skickas. Försök igen senare.",
       "removalStatusOpen": "Begäran från {date}: under behandling.",
       "removalStatusClosed": "Begäran från {date}: slutförd {closed}.",
-      "removalStatusRejected": "Begäran från {date}: avslagen. Skriv till den personuppgiftsansvarige för att få veta varför."
+      "removalStatusRejected": "Begäran från {date}: avslagen. Skriv till den personuppgiftsansvarige för att få veta varför.",
+      "editButton": "Rätta namn och organisation",
+      "editScopeLegend": "Vilka anmälningar det gäller",
+      "editScopeOne": "Endast den här anmälan",
+      "editScopeAll": "Alla mina anmälningar ({count}) och evenemangsadressboken",
+      "editEffect": "Rättelsen gäller för nästa e-postmeddelanden och från ditt nästa inträde i rummet. Den ändrar inte det som redan har spelats in, transkriberats eller skrivits i chatten, och inte heller bevisen på samtycke.",
+      "editNameInvalid": "Namnet måste ha mellan 2 och 100 tecken.",
+      "editOrganizationRequired": "Ett evenemang som du är anmäld till kräver organisationen: fältet får inte lämnas tomt.",
+      "editOrganizationTooLong": "Organisationen får ha högst 200 tecken.",
+      "editDone": "Uppgifterna har rättats.",
+      "codeWhy": "Av säkerhetsskäl bekräftas rättelser och raderingar med en kod som vi skickar till anmälans e-postadress.",
+      "codeSend": "Skicka bekräftelsekoden till mig",
+      "codeSent": "Vi har mejlat dig en sexsiffrig kod. Skriv den här: den gäller i {minutes, plural, one {# minut} other {# minuter}}.",
+      "codeLabel": "Bekräftelsekod",
+      "codeConfirmEdit": "Bekräfta rättelsen",
+      "codeInvalid": "Koden är fel eller har gått ut. Kontrollera det senaste e-postmeddelandet du fått, eller avbryt och be om en ny.",
+      "cancelTitle": "Radera den här anmälan",
+      "cancelIntro": "Du kan radera bara den här anmälan utan att röra de andra eller resten av dina uppgifter.",
+      "cancelButton": "Radera den här anmälan",
+      "cancelDeletes": "Anmälan till det här evenemanget raderas tillsammans med det du har gjort med den: frågor, röster, chattmeddelanden, feedback, enkätsvar, dina meningar i transkriptionen från undertexterna och e-postmeddelanden i kö. Din personliga länk slutar fungera och platsen blir ledig.",
+      "cancelKeeps": "Kvar finns dina andra anmälningar, evenemangsadressboken, din profilbild och en begäran om borttagning ur en inspelning som fortfarande handläggs. Om det finns en video eller en transkription av evenemanget finns beviset på ditt samtycke kvar utan ditt namn så länge de finns. Raderingen kan inte ångras; så länge evenemanget tar emot anmälningar kan du anmäla dig igen.",
+      "codeConfirmCancel": "Radera anmälan",
+      "cancelDone": "Anmälan har raderats."
     },
     "erasure": {
       "title": "Radering av dina uppgifter",

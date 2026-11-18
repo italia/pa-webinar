@@ -1684,6 +1684,7 @@
         "DATA_DELETED": "Adatok törölve",
         "CONSENT_RECORDED": "Hozzájárulás rögzítve",
         "DATA_EXPORTED": "Adatok exportálva",
+        "DATA_RECTIFIED": "Adatok javítva",
         "CONSENT_WITHDRAWN": "Hozzájárulás visszavonva",
         "RECORDING_CONTENT_READ": "A felvétel tartalmát a személyzet olvasta",
         "RECORDING_REDACTION_REQUESTED": "Felvételből való eltávolítás kérelmezve",
@@ -2147,6 +2148,7 @@
         "DATA_DELETED": "Adatok törölve",
         "CONSENT_RECORDED": "Hozzájárulás rögzítve",
         "DATA_EXPORTED": "Adatok exportálva",
+        "DATA_RECTIFIED": "Adatok javítva",
         "CONSENT_WITHDRAWN": "Hozzájárulás visszavonva",
         "RECORDING_CONTENT_READ": "A felvétel tartalmát a személyzet olvasta"
       }
@@ -4129,7 +4131,8 @@
         },
         "sources": {
           "registration": "regisztráció",
-          "room": "terem"
+          "room": "terem",
+          "self-service": "Az én adataim"
         },
         "roles": {
           "registrant": "regisztrált",
@@ -4276,7 +4279,17 @@
     "addressBookNote": "Ön szerepel az események címjegyzékében, hogy hasonló eseményekre meghívást kapjon: hozzájárulását bármikor visszavonhatja.",
     "addressBookPendingNote": "Ennél a regisztrációnál bejelölték az események címjegyzékének jelölőnégyzetét, de erre a címre már nem érkeztek meghívók. Ha a kérés az Öné, a saját adatait tartalmazó oldalon erősítheti meg, az alábbi hivatkozással. Ha nem az Öné, hagyja figyelmen kívül ezt az üzenetet: a címjegyzéken kívül marad, és nem kap meghívókat.",
     "addressBookOptOutLink": "Adataim eltávolítása a címjegyzékből",
-    "myDataLink": "Az adatai: megtekintés, javítás, hozzájárulás visszavonása vagy a regisztráció törlése"
+    "myDataLink": "Az adatai: megtekintés, javítás, hozzájárulás visszavonása vagy a regisztráció törlése",
+    "confirmationCode": {
+      "subject": "{site}: megerősítő kód",
+      "heading": "Az Ön megerősítő kódja",
+      "introEdit": "Kérte a(z) „{event}” eseményre szóló regisztrációjában szereplő név és szervezet javítását.",
+      "introEditAll": "Kérte a név és a szervezet javítását az összes regisztrációjában.",
+      "introCancel": "Kérte a(z) „{event}” eseményre szóló regisztrációja törlését.",
+      "codeLabel": "A kód:",
+      "instructions": "Írja be az Az én adataim oldalon, ahonnan a kérést küldte. {minutes, plural, one {# percig} other {# percig}} érvényes.",
+      "ignore": "Ha nem Ön küldte a kérést, hagyja figyelmen kívül ezt az e-mailt: a kód nélkül semmi sem változik. A kódot ne adja meg senkinek."
+    }
   },
   "home": {
     "hero": {
@@ -4773,6 +4786,7 @@
       "consentFuture": "Jövőbeli értesítések",
       "consentWithdrawnOn": "Visszavonva: {date}",
       "consentNoteInRoom": "Ha most a teremben van, a visszavonás a következő belépéstől érvényes: az azonnali érvényhez használja a teremben a Hozzájárulások gombot.",
+      "consentGiveNoteInRoom": "Az itt adott hozzájárulás a következő teremben való belépésétől érvényes, a már rögzítettekre nem. A felvételhez és az átiratkészítéshez az esemény végéig lehet hozzájárulni.",
       "proofsTitle": "Megőrzött hozzájárulási igazolások",
       "proofsIntro": "Ezen események adatai törölve lettek. Ezek az igazolások addig maradnak meg, amíg a videó vagy az átirat létezik. A hozzájárulását visszavonhatja: ami már a videóban van, az ott marad, és az eltávolításához írnia kell az adatkezelőnek.",
       "proofGivenOn": "Megadva: {date}",
@@ -4788,6 +4802,13 @@
       "addressBookIntro": "Ön úgy döntött, hogy a címjegyzékben marad, hogy hasonló eseményekre meghívást kapjon. Visszavonás vagy új hozzájárulás hiányában ezeket az adatokat a következő napig őrizzük meg: {date}.",
       "addressBookOptOut": "Adataim eltávolítása a címjegyzékből",
       "consentFutureEffect": "Ha visszavonja, többé nem kap értesítést a következő eseményekről, és kikerül a címjegyzékből, minden regisztrációja esetében.",
+      "consentFutureGive": "Hozzájárulok a jövőbeli értesítésekhez",
+      "consentFutureGiveEffect": "Az ebben a regisztrációban szereplő névvel és szervezettel visszakerül az események címjegyzékébe, és ismét kap meghívókat; a megőrzési idő ma újraindul.",
+      "consentGiveDone": "Hozzájárulás megadva: a következő teremben való belépésétől érvényes.",
+      "consentFutureGiveDone": "Hozzájárulás megadva: ismét szerepel az események címjegyzékében.",
+      "consentGiveTextChanged": "A hozzájárulás szövege megváltozott, miután megnyitotta az oldalt: töltse be újra, hogy elolvassa az újat.",
+      "consentGiveClosed": "Ezt a hozzájárulást innen már nem lehet megadni: az esemény véget ért, vagy már nem kéri. Töltse be újra az oldalt az aktuális állapotért.",
+      "consentGiveNewText": "A hozzájárulás szövege megváltozott, miután megadta: a jelenlegi szöveghez újra meg kell adni.",
       "addressBookPendingTitle": "A címjegyzékbe való visszatérés megerősítésre vár",
       "addressBookPendingBody": "Ennél a regisztrációnál bejelölték a címjegyzék jelölőnégyzetét, de erre a címre már nem érkeztek meghívók. Amíg nem erősíti meg, semmi sem változik.",
       "addressBookPendingEffect": "Ha megerősíti, az ebben a regisztrációban szereplő névvel és szervezettel visszakerül a címjegyzékbe, és ismét kap meghívókat. Ha visszavonja a kérést, vagy ha nem Ön volt, a címjegyzéken kívül marad, és nem kap meghívókat.",
@@ -4805,7 +4826,29 @@
       "removalError": "A kérelmet nem sikerült elküldeni. Próbálja újra később.",
       "removalStatusOpen": "Kérelem ({date}): folyamatban.",
       "removalStatusClosed": "Kérelem ({date}): teljesítve ({closed}).",
-      "removalStatusRejected": "Kérelem ({date}): elutasítva. Az ok megismeréséhez írjon az adatkezelőnek."
+      "removalStatusRejected": "Kérelem ({date}): elutasítva. Az ok megismeréséhez írjon az adatkezelőnek.",
+      "editButton": "Név és szervezet javítása",
+      "editScopeLegend": "Mely regisztrációkra vonatkozik",
+      "editScopeOne": "Csak ez a regisztráció",
+      "editScopeAll": "Az összes regisztrációm ({count}) és az események címjegyzéke",
+      "editEffect": "A javítás a következő e-mailekre és a következő teremben való belépésétől érvényes. Nem változtat a már rögzített, átírt vagy a csevegésben leírt tartalmon, sem a hozzájárulási igazolásokon.",
+      "editNameInvalid": "A névnek 2 és 100 karakter közötti hosszúságúnak kell lennie.",
+      "editOrganizationRequired": "Az egyik esemény, amelyre regisztrált, kéri a szervezetet: nem hagyható üresen.",
+      "editOrganizationTooLong": "A szervezet legfeljebb 200 karakter lehet.",
+      "editDone": "Az adatok javítva.",
+      "codeWhy": "Biztonsági okból a javításokat és törléseket egy kóddal kell megerősíteni, amelyet a regisztráció e-mail-címére küldünk.",
+      "codeSend": "Kérem a megerősítő kódot",
+      "codeSent": "E-mailben elküldtünk Önnek egy 6 jegyű kódot. Írja be ide: {minutes, plural, one {# percig} other {# percig}} érvényes.",
+      "codeLabel": "Megerősítő kód",
+      "codeConfirmEdit": "Javítás megerősítése",
+      "codeInvalid": "A kód hibás vagy lejárt. Nézze meg a legutóbb kapott e-mailt, vagy szakítsa meg, és kérjen újat.",
+      "cancelTitle": "A regisztráció törlése",
+      "cancelIntro": "Csak ezt a regisztrációt törölheti, a többi regisztráció és a többi adata érintetlen marad.",
+      "cancelButton": "Regisztráció törlése",
+      "cancelDeletes": "Törlődik az erre az eseményre szóló regisztráció és mindaz, amit vele tett: kérdések, szavazatok, csevegőüzenetek, visszajelzések, kérdőívekre adott válaszok, az Ön mondatai a feliratokból készült átiratban és a sorban álló e-mailek. A személyes linkje nem működik tovább, a hely felszabadul.",
+      "cancelKeeps": "Megmaradnak a többi regisztrációja, az események címjegyzéke, a profilképe és egy még folyamatban lévő kérelem a felvételből való eltávolításra. Ha erről az eseményről van videó vagy átirat, a hozzájárulásának igazolása az Ön neve nélkül megmarad, amíg ezek léteznek. A törlés nem vonható vissza; amíg az esemény fogad regisztrációkat, újra regisztrálhat.",
+      "codeConfirmCancel": "Regisztráció törlése",
+      "cancelDone": "A regisztráció törölve."
     },
     "erasure": {
       "title": "Az Ön adatainak törlése",

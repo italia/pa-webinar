@@ -1684,6 +1684,7 @@
         "DATA_DELETED": "Dane usunięte",
         "CONSENT_RECORDED": "Zgoda zarejestrowana",
         "DATA_EXPORTED": "Dane wyeksportowane",
+        "DATA_RECTIFIED": "Dane poprawione",
         "CONSENT_WITHDRAWN": "Zgoda wycofana",
         "RECORDING_CONTENT_READ": "Zawartość nagrania odczytana przez personel",
         "RECORDING_REDACTION_REQUESTED": "Złożono wniosek o usunięcie z nagrania",
@@ -2147,6 +2148,7 @@
         "DATA_DELETED": "Dane usunięte",
         "CONSENT_RECORDED": "Zgoda zarejestrowana",
         "DATA_EXPORTED": "Dane wyeksportowane",
+        "DATA_RECTIFIED": "Dane poprawione",
         "CONSENT_WITHDRAWN": "Zgoda wycofana",
         "RECORDING_CONTENT_READ": "Zawartość nagrania odczytana przez personel"
       }
@@ -4129,7 +4131,8 @@
         },
         "sources": {
           "registration": "rejestracja",
-          "room": "sala"
+          "room": "sala",
+          "self-service": "Moje dane"
         },
         "roles": {
           "registrant": "zarejestrowany",
@@ -4276,7 +4279,17 @@
     "addressBookNote": "Jesteś w książce adresowej wydarzeń, aby otrzymywać zaproszenia na podobne wydarzenia: możesz wycofać zgodę w dowolnym momencie.",
     "addressBookPendingNote": "Przy tej rejestracji zaznaczono pole książki adresowej wydarzeń, ale ten adres przestał otrzymywać zaproszenia. Jeśli to Twoja prośba, możesz ją potwierdzić na stronie ze swoimi danymi, korzystając z linku poniżej. Jeśli nie, zignoruj tę wiadomość: pozostaniesz poza książką adresową i nie będziesz otrzymywać zaproszeń.",
     "addressBookOptOutLink": "Usuń moje dane z książki adresowej",
-    "myDataLink": "Twoje dane: wyświetl, popraw, wycofaj zgodę lub anuluj rejestrację"
+    "myDataLink": "Twoje dane: wyświetl, popraw, wycofaj zgodę lub anuluj rejestrację",
+    "confirmationCode": {
+      "subject": "{site}: kod potwierdzający",
+      "heading": "Twój kod potwierdzający",
+      "introEdit": "Poprosiłeś o poprawienie imienia i nazwiska oraz instytucji w rejestracji na „{event}”.",
+      "introEditAll": "Poprosiłeś o poprawienie imienia i nazwiska oraz instytucji we wszystkich swoich rejestracjach.",
+      "introCancel": "Poprosiłeś o usunięcie swojej rejestracji na „{event}”.",
+      "codeLabel": "Kod:",
+      "instructions": "Wpisz go na stronie Moje dane, z której wysłano prośbę. Jest ważny przez {minutes, plural, one {# minuta} few {# minuty} many {# minut} other {# minuty}}.",
+      "ignore": "Jeśli to nie Ty wysłałeś prośbę, zignoruj tę wiadomość: bez kodu nic się nie zmieni. Nie przekazuj kodu nikomu."
+    }
   },
   "home": {
     "hero": {
@@ -4773,6 +4786,7 @@
       "consentFuture": "Przyszłe komunikaty",
       "consentWithdrawnOn": "Wycofano {date}",
       "consentNoteInRoom": "Jeśli jesteś teraz w sali, wycofanie działa od następnego wejścia: aby zadziałało od razu, użyj Zgody w sali.",
+      "consentGiveNoteInRoom": "Zgoda wyrażona tutaj obowiązuje od Twojego następnego wejścia do sali, a nie dla tego, co już zostało nagrane. Zgodę na nagrywanie i transkrypcję można wyrazić do zakończenia wydarzenia.",
       "proofsTitle": "Zachowane dowody zgód",
       "proofsIntro": "Dane tych wydarzeń zostały usunięte. Te dowody pozostają, dopóki wideo lub transkrypcja istnieją. Możesz wycofać zgodę: to, co jest już w wideo, pozostaje, a aby to usunąć, musisz napisać do administratora danych.",
       "proofGivenOn": "Wyrażono {date}",
@@ -4788,6 +4802,13 @@
       "addressBookIntro": "Zdecydowałeś(-aś) się pozostać w książce adresowej, aby otrzymywać zaproszenia na podobne wydarzenia. Przechowujemy te dane do {date}, chyba że wycofasz zgodę lub wyrazisz ją ponownie.",
       "addressBookOptOut": "Usuń moje dane z książki adresowej",
       "consentFutureEffect": "Jeśli ją wycofasz, nie będziesz już otrzymywać komunikatów o kolejnych wydarzeniach i wypiszesz się z książki adresowej, dla wszystkich swoich rejestracji.",
+      "consentFutureGive": "Wyrażam zgodę na przyszłe komunikaty",
+      "consentFutureGiveEffect": "Wrócisz do książki adresowej wydarzeń z imieniem i nazwiskiem oraz organizacją z tej rejestracji i znów będziesz otrzymywać zaproszenia; okres przechowywania zaczyna się od nowa od dziś.",
+      "consentGiveDone": "Zgoda wyrażona: obowiązuje od Twojego następnego wejścia do sali.",
+      "consentFutureGiveDone": "Zgoda wyrażona: znów jesteś w książce adresowej wydarzeń.",
+      "consentGiveTextChanged": "Treść zgody zmieniła się po otwarciu strony: odśwież ją, aby przeczytać nową.",
+      "consentGiveClosed": "Tej zgody nie można już wyrazić tutaj: wydarzenie się zakończyło albo już jej nie wymaga. Odśwież stronę, aby zobaczyć aktualny stan.",
+      "consentGiveNewText": "Treść tej zgody zmieniła się po jej wyrażeniu: dla obecnej treści trzeba ją wyrazić ponownie.",
       "addressBookPendingTitle": "Powrót do książki adresowej do potwierdzenia",
       "addressBookPendingBody": "Przy tej rejestracji zaznaczono pole książki adresowej, ale ten adres przestał otrzymywać zaproszenia. Dopóki nie potwierdzisz, nic się nie zmieni.",
       "addressBookPendingEffect": "Jeśli potwierdzisz, wrócisz do książki adresowej z imieniem i nazwiskiem oraz organizacją z tej rejestracji i znów będziesz otrzymywać zaproszenia. Jeśli anulujesz lub jeśli to nie Ty, pozostaniesz poza książką adresową i nie będziesz otrzymywać zaproszeń.",
@@ -4805,7 +4826,29 @@
       "removalError": "Nie udało się wysłać wniosku. Spróbuj ponownie później.",
       "removalStatusOpen": "Wniosek z {date}: w trakcie rozpatrywania.",
       "removalStatusClosed": "Wniosek z {date}: zrealizowany {closed}.",
-      "removalStatusRejected": "Wniosek z {date}: odrzucony. Napisz do administratora danych, aby poznać powód."
+      "removalStatusRejected": "Wniosek z {date}: odrzucony. Napisz do administratora danych, aby poznać powód.",
+      "editButton": "Popraw imię i nazwisko oraz instytucję",
+      "editScopeLegend": "Do których rejestracji się odnosi",
+      "editScopeOne": "Tylko ta rejestracja",
+      "editScopeAll": "Wszystkie moje rejestracje ({count}) i książka adresowa wydarzeń",
+      "editEffect": "Poprawka obowiązuje dla kolejnych e-maili i od Twojego następnego wejścia do sali. Nie zmienia tego, co już zostało nagrane, przepisane lub napisane na czacie, ani dowodów zgody.",
+      "editNameInvalid": "Imię i nazwisko musi mieć od 2 do 100 znaków.",
+      "editOrganizationRequired": "Wydarzenie, na które jesteś zapisany, wymaga instytucji: pole nie może pozostać puste.",
+      "editOrganizationTooLong": "Nazwa instytucji może mieć najwyżej 200 znaków.",
+      "editDone": "Dane zostały poprawione.",
+      "codeWhy": "Ze względów bezpieczeństwa poprawki i usunięcia potwierdza się kodem, który wysyłamy na adres e-mail rejestracji.",
+      "codeSend": "Wyślij mi kod potwierdzający",
+      "codeSent": "Wysłaliśmy Ci e-mailem 6-cyfrowy kod. Wpisz go tutaj: jest ważny przez {minutes, plural, one {# minuta} few {# minuty} many {# minut} other {# minuty}}.",
+      "codeLabel": "Kod potwierdzający",
+      "codeConfirmEdit": "Potwierdź poprawkę",
+      "codeInvalid": "Kod jest nieprawidłowy lub wygasł. Sprawdź ostatni otrzymany e-mail albo anuluj i poproś o nowy.",
+      "cancelTitle": "Usunięcie tej rejestracji",
+      "cancelIntro": "Możesz usunąć tylko tę rejestrację, bez naruszania pozostałych i reszty swoich danych.",
+      "cancelButton": "Usuń tę rejestrację",
+      "cancelDeletes": "Usuwana jest rejestracja na to wydarzenie i to, co z nią zrobiłeś: pytania, głosy, wiadomości na czacie, opinie, odpowiedzi na ankiety, Twoje zdania w transkrypcji z napisów i e-maile w kolejce. Twój osobisty link przestaje działać, a miejsce się zwalnia.",
+      "cancelKeeps": "Pozostają Twoje inne rejestracje, książka adresowa wydarzeń, zdjęcie profilowe i wciąż rozpatrywana prośba o usunięcie z nagrania. Jeśli z tego wydarzenia istnieje nagranie wideo lub transkrypcja, dowód Twojej zgody pozostaje bez Twojego imienia i nazwiska, dopóki istnieją. Usunięcia nie można cofnąć; dopóki wydarzenie przyjmuje rejestracje, możesz zarejestrować się ponownie.",
+      "codeConfirmCancel": "Usuń rejestrację",
+      "cancelDone": "Rejestracja została usunięta."
     },
     "erasure": {
       "title": "Usunięcie Twoich danych",

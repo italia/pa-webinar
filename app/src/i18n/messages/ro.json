@@ -1684,6 +1684,7 @@
         "DATA_DELETED": "Date șterse",
         "CONSENT_RECORDED": "Consimțământ înregistrat",
         "DATA_EXPORTED": "Date exportate",
+        "DATA_RECTIFIED": "Date corectate",
         "CONSENT_WITHDRAWN": "Consimțământ retras",
         "RECORDING_CONTENT_READ": "Conținutul înregistrării citit de personal",
         "RECORDING_REDACTION_REQUESTED": "Eliminare dintr-o înregistrare solicitată",
@@ -2147,6 +2148,7 @@
         "DATA_DELETED": "Date șterse",
         "CONSENT_RECORDED": "Consimțământ înregistrat",
         "DATA_EXPORTED": "Date exportate",
+        "DATA_RECTIFIED": "Date corectate",
         "CONSENT_WITHDRAWN": "Consimțământ retras",
         "RECORDING_CONTENT_READ": "Conținutul înregistrării citit de personal"
       }
@@ -4129,7 +4131,8 @@
         },
         "sources": {
           "registration": "înscriere",
-          "room": "sală"
+          "room": "sală",
+          "self-service": "Datele mele"
         },
         "roles": {
           "registrant": "înscris",
@@ -4276,7 +4279,17 @@
     "addressBookNote": "Sunteți în agenda de evenimente, pentru a fi invitat la evenimente similare: vă puteți retrage consimțământul în orice moment.",
     "addressBookPendingNote": "La această înscriere a fost bifată caseta agendei de evenimente, dar această adresă nu mai primea invitații. Dacă cererea vă aparține, o puteți confirma din pagina cu datele dumneavoastră, folosind linkul de mai jos. Dacă nu vă aparține, ignorați acest mesaj: rămâneți în afara agendei și nu primiți invitații.",
     "addressBookOptOutLink": "Elimină-mi datele din agendă",
-    "myDataLink": "Datele tale: vizualizare, corectare, retragerea unui consimțământ sau anularea înscrierii"
+    "myDataLink": "Datele tale: vizualizare, corectare, retragerea unui consimțământ sau anularea înscrierii",
+    "confirmationCode": {
+      "subject": "{site}: cod de confirmare",
+      "heading": "Codul tău de confirmare",
+      "introEdit": "Ai cerut corectarea numelui și a instituției din înscrierea ta la „{event}”.",
+      "introEditAll": "Ai cerut corectarea numelui și a instituției în toate înscrierile tale.",
+      "introCancel": "Ai cerut ștergerea înscrierii tale la „{event}”.",
+      "codeLabel": "Codul este:",
+      "instructions": "Scrie-l în pagina Datele mele de pe care ai făcut cererea. Este valabil {minutes, plural, one {# minut} few {# minute} other {# de minute}}.",
+      "ignore": "Dacă nu tu ai făcut cererea, ignoră acest e-mail: fără cod nu se schimbă nimic. Nu da codul nimănui."
+    }
   },
   "home": {
     "hero": {
@@ -4773,6 +4786,7 @@
       "consentFuture": "Comunicări viitoare",
       "consentWithdrawnOn": "Retras la {date}",
       "consentNoteInRoom": "Dacă ești acum în sală, retragerea se aplică de la următoarea intrare: pentru a se aplica imediat, folosește Consimțăminte în sală.",
+      "consentGiveNoteInRoom": "Un consimțământ dat de aici se aplică de la următoarea ta intrare în sală, nu pentru ceea ce a fost deja înregistrat. Consimțământul pentru înregistrare și transcriere se poate da până la încheierea evenimentului.",
       "proofsTitle": "Dovezi păstrate ale consimțămintelor",
       "proofsIntro": "Datele acestor evenimente au fost șterse. Aceste dovezi rămân cât timp videoclipul sau transcrierea există. Vă puteți retrage consimțământul: ceea ce se află deja în videoclip rămâne, iar pentru a-l elimina trebuie să scrieți operatorului de date.",
       "proofGivenOn": "Dat la {date}",
@@ -4788,6 +4802,13 @@
       "addressBookIntro": "Ați ales să rămâneți în agendă, pentru a fi invitat la evenimente similare. Păstrăm aceste date până la {date}, cu excepția cazului în care vă retrageți consimțământul sau dați un nou consimțământ.",
       "addressBookOptOut": "Elimină-mi datele din agendă",
       "consentFutureEffect": "Dacă îl retragi, nu mai primești comunicări despre evenimentele viitoare și ieși din agendă, pentru toate înscrierile tale.",
+      "consentFutureGive": "Sunt de acord cu comunicările viitoare",
+      "consentFutureGiveEffect": "Revii în agenda de evenimente cu numele și instituția de la această înscriere și primești din nou invitații; perioada de păstrare începe din nou de astăzi.",
+      "consentGiveDone": "Consimțământ dat: se aplică de la următoarea ta intrare în sală.",
+      "consentFutureGiveDone": "Consimțământ dat: ești din nou în agenda de evenimente.",
+      "consentGiveTextChanged": "Textul consimțământului s-a schimbat după ce ai deschis pagina: reîncarc-o pentru a-l citi pe cel nou.",
+      "consentGiveClosed": "Acest consimțământ nu mai poate fi dat de aici: evenimentul s-a încheiat sau nu îl mai cere. Reîncarcă pagina pentru a vedea starea actuală.",
+      "consentGiveNewText": "Textul acestui consimțământ s-a schimbat după ce l-ai dat: pentru textul actual trebuie dat din nou.",
       "addressBookPendingTitle": "Revenire în agendă de confirmat",
       "addressBookPendingBody": "La această înscriere a fost bifată caseta agendei, dar această adresă nu mai primea invitații. Până nu confirmați, nu se schimbă nimic.",
       "addressBookPendingEffect": "Dacă confirmați, reveniți în agendă cu numele și instituția de la această înscriere și primiți din nou invitații. Dacă anulați sau dacă nu ați fost dumneavoastră, rămâneți în afara agendei și nu primiți invitații.",
@@ -4805,7 +4826,29 @@
       "removalError": "Cererea nu a putut fi trimisă. Reîncercați mai târziu.",
       "removalStatusOpen": "Cererea din {date}: în curs de soluționare.",
       "removalStatusClosed": "Cererea din {date}: finalizată pe {closed}.",
-      "removalStatusRejected": "Cererea din {date}: respinsă. Scrieți operatorului de date pentru a afla motivul."
+      "removalStatusRejected": "Cererea din {date}: respinsă. Scrieți operatorului de date pentru a afla motivul.",
+      "editButton": "Corectează numele și instituția",
+      "editScopeLegend": "Căror înscrieri li se aplică",
+      "editScopeOne": "Doar această înscriere",
+      "editScopeAll": "Toate înscrierile mele ({count}) și agenda de evenimente",
+      "editEffect": "Corectura se aplică următoarelor e-mailuri și de la următoarea ta intrare în sală. Nu schimbă ce a fost deja înregistrat, transcris sau scris în chat, nici dovezile consimțămintelor.",
+      "editNameInvalid": "Numele trebuie să aibă între 2 și 100 de caractere.",
+      "editOrganizationRequired": "Un eveniment la care ești înscris cere instituția: câmpul nu poate rămâne gol.",
+      "editOrganizationTooLong": "Instituția poate avea cel mult 200 de caractere.",
+      "editDone": "Datele au fost corectate.",
+      "codeWhy": "Din motive de securitate, corecturile și ștergerile se confirmă cu un cod pe care îl trimitem la adresa de e-mail a înscrierii.",
+      "codeSend": "Trimite-mi codul de confirmare",
+      "codeSent": "Ți-am trimis pe e-mail un cod de 6 cifre. Scrie-l aici: este valabil {minutes, plural, one {# minut} few {# minute} other {# de minute}}.",
+      "codeLabel": "Cod de confirmare",
+      "codeConfirmEdit": "Confirmă corectura",
+      "codeInvalid": "Codul nu este corect sau a expirat. Verifică ultimul e-mail primit sau anulează și cere unul nou.",
+      "cancelTitle": "Ștergerea acestei înscrieri",
+      "cancelIntro": "Poți șterge doar această înscriere, fără să atingi celelalte înscrieri și restul datelor tale.",
+      "cancelButton": "Șterge această înscriere",
+      "cancelDeletes": "Se șterg înscrierea la acest eveniment și ce ai făcut cu ea: întrebări, voturi, mesaje în chat, feedback, răspunsuri la chestionare, frazele tale din transcrierea subtitrărilor și e-mailurile în așteptare. Linkul tău personal nu mai funcționează, iar locul se eliberează.",
+      "cancelKeeps": "Rămân celelalte înscrieri, agenda de evenimente, fotografia de profil și o cerere de eliminare dintr-o înregistrare care este încă în lucru. Dacă pentru acest eveniment există un videoclip sau o transcriere, dovada consimțământului tău rămâne fără numele tău cât timp acestea există. Ștergerea nu se poate anula; cât timp evenimentul acceptă înscrieri, te poți înscrie din nou.",
+      "codeConfirmCancel": "Șterge înscrierea",
+      "cancelDone": "Înscrierea a fost ștearsă."
     },
     "erasure": {
       "title": "Ștergerea datelor dumneavoastră",

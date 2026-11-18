@@ -1684,6 +1684,7 @@
         "DATA_DELETED": "Données supprimées",
         "CONSENT_RECORDED": "Consentement enregistré",
         "DATA_EXPORTED": "Données exportées",
+        "DATA_RECTIFIED": "Données corrigées",
         "CONSENT_WITHDRAWN": "Consentement retiré",
         "RECORDING_CONTENT_READ": "Contenu de l’enregistrement lu par le personnel",
         "RECORDING_REDACTION_REQUESTED": "Retrait d'un enregistrement demandé",
@@ -2147,6 +2148,7 @@
         "DATA_DELETED": "Données supprimées",
         "CONSENT_RECORDED": "Consentement enregistré",
         "DATA_EXPORTED": "Données exportées",
+        "DATA_RECTIFIED": "Données corrigées",
         "CONSENT_WITHDRAWN": "Consentement retiré",
         "RECORDING_CONTENT_READ": "Contenu de l’enregistrement lu par le personnel"
       }
@@ -4129,7 +4131,8 @@
         },
         "sources": {
           "registration": "inscription",
-          "room": "salle"
+          "room": "salle",
+          "self-service": "Mes données"
         },
         "roles": {
           "registrant": "inscrit",
@@ -4276,7 +4279,17 @@
     "addressBookNote": "Vous êtes dans le carnet d’adresses des événements, pour être invité à des événements similaires : vous pouvez retirer votre consentement à tout moment.",
     "addressBookPendingNote": "La case du carnet d’adresses des événements a été cochée sur cette inscription, mais cette adresse ne recevait plus d’invitations. Si la demande vient de vous, vous pouvez la confirmer depuis la page de vos données, avec le lien ci-dessous. Sinon, ignorez ce message : vous restez hors du carnet d’adresses et ne recevez pas d’invitations.",
     "addressBookOptOutLink": "Supprimer mes données du carnet d’adresses",
-    "myDataLink": "Vos données : les consulter, les corriger, retirer un consentement ou annuler l’inscription"
+    "myDataLink": "Vos données : les consulter, les corriger, retirer un consentement ou annuler l’inscription",
+    "confirmationCode": {
+      "subject": "{site} : code de confirmation",
+      "heading": "Votre code de confirmation",
+      "introEdit": "Vous avez demandé à corriger le nom et l'organisme de votre inscription à « {event} ».",
+      "introEditAll": "Vous avez demandé à corriger le nom et l'organisme de toutes vos inscriptions.",
+      "introCancel": "Vous avez demandé à supprimer votre inscription à « {event} ».",
+      "codeLabel": "Le code est :",
+      "instructions": "Saisissez-le sur la page Mes données depuis laquelle vous avez fait la demande. Il est valable {minutes, plural, one {# minute} other {# minutes}}.",
+      "ignore": "Si vous n'êtes pas à l'origine de la demande, ignorez cet e-mail : sans le code, rien ne change. Ne communiquez le code à personne."
+    }
   },
   "home": {
     "hero": {
@@ -4773,6 +4786,7 @@
       "consentFuture": "Communications futures",
       "consentWithdrawnOn": "Retiré le {date}",
       "consentNoteInRoom": "Si vous êtes dans la salle en ce moment, le retrait vaut à partir de votre prochaine entrée : pour l'appliquer aussitôt, utilisez Consentements dans la salle.",
+      "consentGiveNoteInRoom": "Un consentement donné ici vaut à partir de votre prochaine entrée dans la salle, pas pour ce qui a déjà été enregistré. L'enregistrement et la transcription peuvent être acceptés jusqu'à la fin de l'événement.",
       "proofsTitle": "Preuves des consentements conservées",
       "proofsIntro": "Les données de ces événements ont été supprimées. Ces preuves restent tant que la vidéo ou la transcription existe. Vous pouvez retirer votre consentement : ce qui figure déjà dans la vidéo reste, et pour le faire retirer vous devez écrire au responsable du traitement.",
       "proofGivenOn": "Donné le {date}",
@@ -4788,6 +4802,13 @@
       "addressBookIntro": "Vous avez choisi de rester dans le carnet d'adresses pour être invité à des événements similaires. Nous conservons ces données jusqu'au {date}, sauf retrait ou nouveau consentement.",
       "addressBookOptOut": "Supprimer mes données du carnet d’adresses",
       "consentFutureEffect": "Si vous le retirez, vous ne recevez plus de communications sur les prochains événements et vous quittez le carnet d'adresses, pour toutes vos inscriptions.",
+      "consentFutureGive": "Je consens aux communications futures",
+      "consentFutureGiveEffect": "Vous revenez dans le carnet d'adresses des événements avec le nom et l'organisme de cette inscription et vous recevez de nouveau les invitations ; la durée de conservation repart d'aujourd'hui.",
+      "consentGiveDone": "Consentement donné : il vaut à partir de votre prochaine entrée dans la salle.",
+      "consentFutureGiveDone": "Consentement donné : vous êtes de nouveau dans le carnet d'adresses des événements.",
+      "consentGiveTextChanged": "Le texte du consentement a changé après l'ouverture de la page : rechargez-la pour lire le nouveau.",
+      "consentGiveClosed": "Ce consentement ne peut plus être donné ici : l'événement est terminé ou ne le demande plus. Rechargez la page pour voir l'état actuel.",
+      "consentGiveNewText": "Le texte de ce consentement a changé après que vous l'avez donné : pour le texte actuel, il doit être donné de nouveau.",
       "addressBookPendingTitle": "Retour dans le carnet d'adresses à confirmer",
       "addressBookPendingBody": "La case du carnet d'adresses a été cochée sur cette inscription, mais cette adresse ne recevait plus d'invitations. Rien ne change tant que vous n'avez pas confirmé.",
       "addressBookPendingEffect": "Si vous confirmez, vous revenez dans le carnet d'adresses avec le nom et l'organisme de cette inscription et vous recevez de nouveau les invitations. Si vous annulez, ou si ce n'était pas vous, vous restez hors du carnet d'adresses et ne recevez pas d'invitations.",
@@ -4805,7 +4826,29 @@
       "removalError": "La demande n'a pas pu être envoyée. Réessayez plus tard.",
       "removalStatusOpen": "Demande du {date} : en cours de traitement.",
       "removalStatusClosed": "Demande du {date} : traitée le {closed}.",
-      "removalStatusRejected": "Demande du {date} : rejetée. Écrivez au responsable du traitement pour en connaître le motif."
+      "removalStatusRejected": "Demande du {date} : rejetée. Écrivez au responsable du traitement pour en connaître le motif.",
+      "editButton": "Corriger le nom et l'organisme",
+      "editScopeLegend": "À quelles inscriptions elle s'applique",
+      "editScopeOne": "Uniquement cette inscription",
+      "editScopeAll": "Toutes mes inscriptions ({count}) et le carnet d'adresses des événements",
+      "editEffect": "La correction vaut pour les prochains e-mails et à partir de votre prochaine entrée dans la salle. Elle ne change pas ce qui a déjà été enregistré, transcrit ou écrit dans le chat, ni les preuves de consentement.",
+      "editNameInvalid": "Le nom doit comporter entre 2 et 100 caractères.",
+      "editOrganizationRequired": "Un événement auquel vous êtes inscrit demande l'organisme : le champ ne peut pas rester vide.",
+      "editOrganizationTooLong": "L'organisme peut comporter au plus 200 caractères.",
+      "editDone": "Données corrigées.",
+      "codeWhy": "Par sécurité, les corrections et les suppressions se confirment avec un code que nous envoyons à l'adresse e-mail de l'inscription.",
+      "codeSend": "M'envoyer le code de confirmation",
+      "codeSent": "Nous vous avons envoyé par e-mail un code à 6 chiffres. Saisissez-le ici : il est valable {minutes, plural, one {# minute} other {# minutes}}.",
+      "codeLabel": "Code de confirmation",
+      "codeConfirmEdit": "Confirmer la correction",
+      "codeInvalid": "Le code est incorrect ou a expiré. Vérifiez le dernier e-mail reçu, ou annulez et demandez-en un nouveau.",
+      "cancelTitle": "Supprimer cette inscription",
+      "cancelIntro": "Vous pouvez supprimer uniquement cette inscription, sans toucher aux autres ni au reste de vos données.",
+      "cancelButton": "Supprimer cette inscription",
+      "cancelDeletes": "Sont supprimés l'inscription à cet événement et ce que vous avez fait avec elle : questions, votes, messages dans le chat, avis, réponses aux questionnaires, vos phrases dans la transcription des sous-titres et e-mails en attente. Votre lien personnel cesse de fonctionner et la place se libère.",
+      "cancelKeeps": "Restent vos autres inscriptions, le carnet d'adresses des événements, votre photo de profil et une demande de retrait d'un enregistrement encore en cours de traitement. Si cet événement a une vidéo ou une transcription, la preuve de votre consentement reste sans votre nom tant qu'elles existent. La suppression est irréversible ; tant que l'événement accepte des inscriptions, vous pouvez vous réinscrire.",
+      "codeConfirmCancel": "Supprimer l'inscription",
+      "cancelDone": "Inscription supprimée."
     },
     "erasure": {
       "title": "Effacement de vos données",

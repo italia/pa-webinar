@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: EUPL-1.2
 // SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
 
+import type { Prisma } from '@prisma/client';
+
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { upsertPersonOnRegistration } from '@/lib/persons';
@@ -68,65 +70,116 @@ export async function applicaSpuntaInAttesa(
       data: { addressBookPending: false },
     });
     if (count === 0) return false;
-    const iscrizione = await tx.registration.findUniqueOrThrow({
-      where: { id: registrationId },
-      select: {
-        eventId: true,
-        emailHash: true,
-        email: true,
-        displayName: true,
-        organization: true,
-        organizationRole: true,
-        organizationType: true,
-        event: { select: { offerAddressBook: true } },
-      },
-    });
+    const iscrizione = await leggiIscrizione(tx, registrationId);
+    if (!iscrizione) return false;
     if (!rubricaProposta(iscrizione.event, sito)) {
       await tx.gdprAuditLog.create({ data: rigaSpuntaTolta(iscrizione.eventId, origine) });
       return false;
     }
-    const altre = await tx.registration.findMany({
-      where: { emailHash: iscrizione.emailHash, addressBookPending: true },
-      select: { id: true, eventId: true, event: { select: { offerAddressBook: true } } },
-    });
-    await tx.registration.updateMany({
-      where: { id: { in: altre.map((a) => a.id) } },
-      data: { addressBookPending: false },
-    });
-    const altreConfermate = altre.filter((a) => rubricaProposta(a.event, sito));
-    const tolte = altre.filter((a) => !rubricaProposta(a.event, sito));
-    const confermate = [{ id: registrationId, eventId: iscrizione.eventId }, ...altreConfermate];
-    // Prima la voce, poi gli inviti: lo stesso ordine del ritiro e della
-    // conservazione, che non si aspettano a vicenda.
-    const personId = await upsertPersonOnRegistration(tx, {
-      emailHash: iscrizione.emailHash,
-      email: iscrizione.email,
-      displayName: tryDecryptPII(iscrizione.displayName),
-      organization: iscrizione.organization,
-      organizationRole: iscrizione.organizationRole,
-      organizationType: iscrizione.organizationType,
-      optedIn: true,
-    });
-    await riapriInviti(tx, iscrizione.emailHash);
-    await tx.registration.updateMany({
-      where: { id: { in: confermate.map((c) => c.id) } },
-      data: { consentFutureCommunications: true, personId },
-    });
-    await tx.gdprAuditLog.createMany({
-      data: [
-        ...confermate.map(({ eventId }) => ({
-          eventId,
-          action: 'CONSENT_RECORDED',
-          recordCount: 1,
-          details: JSON.stringify({
-            source: origine,
-            consentFutureCommunications: true,
-            consentAddressBook: true,
-          }),
-        })),
-        ...tolte.map(({ eventId }) => rigaSpuntaTolta(eventId, origine)),
-      ],
-    });
+    await rientraInRubrica(tx, registrationId, iscrizione, sito, origine, {});
     return true;
+  });
+}
+
+/**
+ * Le comunicazioni future date di nuovo dalla pagina dei propri dati, dopo un
+ * ritiro (lib/gdpr/consent-giving): lo stesso effetto della conferma di una
+ * spunta in attesa. Il token della pagina prova la casella e il pulsante e' la
+ * scelta, quindi il ritiro dell'indirizzo si annulla. La riga del registro dice
+ * che il consenso e' stato ridato.
+ */
+export async function ridaiComunicazioni(
+  registrationId: string
+): Promise<'dato' | 'gia' | 'nonProposta' | 'nonTrovata'> {
+  const sito = await getSettings();
+  return prisma.$transaction(async (tx) => {
+    // Cancellata mentre la richiesta arrivava: non c'e' piu' niente da ridare.
+    const iscrizione = await leggiIscrizione(tx, registrationId);
+    if (!iscrizione) return 'nonTrovata';
+    if (!rubricaProposta(iscrizione.event, sito)) return 'nonProposta';
+    // Due richieste insieme: solo la prima trova il consenso spento.
+    const { count } = await tx.registration.updateMany({
+      where: { id: registrationId, consentFutureCommunications: false },
+      data: { consentFutureCommunications: true, addressBookPending: false },
+    });
+    if (count === 0) return 'gia';
+    await rientraInRubrica(tx, registrationId, iscrizione, sito, 'self-service', {
+      givenAgain: true,
+    });
+    return 'dato';
+  });
+}
+
+function leggiIscrizione(tx: Prisma.TransactionClient, registrationId: string) {
+  return tx.registration.findUnique({
+    where: { id: registrationId },
+    select: {
+      eventId: true,
+      emailHash: true,
+      email: true,
+      displayName: true,
+      organization: true,
+      organizationRole: true,
+      organizationType: true,
+      event: { select: { offerAddressBook: true } },
+    },
+  });
+}
+
+/**
+ * Il rientro in rubrica con i dati di un'iscrizione: la voce, gli inviti, le
+ * altre spunte in attesa dello stesso indirizzo e una riga del registro per ogni
+ * evento toccato.
+ */
+async function rientraInRubrica(
+  tx: Prisma.TransactionClient,
+  registrationId: string,
+  iscrizione: NonNullable<Awaited<ReturnType<typeof leggiIscrizione>>>,
+  sito: Awaited<ReturnType<typeof getSettings>>,
+  origine: OrigineConferma,
+  dettagli: Record<string, unknown>
+): Promise<void> {
+  const altre = await tx.registration.findMany({
+    where: { emailHash: iscrizione.emailHash, addressBookPending: true },
+    select: { id: true, eventId: true, event: { select: { offerAddressBook: true } } },
+  });
+  await tx.registration.updateMany({
+    where: { id: { in: altre.map((a) => a.id) } },
+    data: { addressBookPending: false },
+  });
+  const altreConfermate = altre.filter((a) => rubricaProposta(a.event, sito));
+  const tolte = altre.filter((a) => !rubricaProposta(a.event, sito));
+  const confermate = [{ id: registrationId, eventId: iscrizione.eventId }, ...altreConfermate];
+  // Prima la voce, poi gli inviti: lo stesso ordine del ritiro e della
+  // conservazione, che non si aspettano a vicenda.
+  const personId = await upsertPersonOnRegistration(tx, {
+    emailHash: iscrizione.emailHash,
+    email: iscrizione.email,
+    displayName: tryDecryptPII(iscrizione.displayName),
+    organization: iscrizione.organization,
+    organizationRole: iscrizione.organizationRole,
+    organizationType: iscrizione.organizationType,
+    optedIn: true,
+  });
+  await riapriInviti(tx, iscrizione.emailHash);
+  await tx.registration.updateMany({
+    where: { id: { in: confermate.map((c) => c.id) } },
+    data: { consentFutureCommunications: true, personId },
+  });
+  await tx.gdprAuditLog.createMany({
+    data: [
+      ...confermate.map(({ eventId }) => ({
+        eventId,
+        action: 'CONSENT_RECORDED',
+        recordCount: 1,
+        details: JSON.stringify({
+          source: origine,
+          consentFutureCommunications: true,
+          consentAddressBook: true,
+          ...dettagli,
+        }),
+      })),
+      ...tolte.map(({ eventId }) => rigaSpuntaTolta(eventId, origine)),
+    ],
   });
 }

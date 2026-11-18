@@ -30,6 +30,7 @@ import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { limiteTokenOspiti } from '@/lib/room-rate-limit';
 import { readOwnedEventAccess } from '@/lib/event-session';
 import { guestAccessAllowed } from '@/lib/events/guest-window';
+import { periodoSostituito } from '@/lib/gdpr/consent-proofs';
 import { registrazioneDellIscrizione, trascrizioneInVigore } from '@/lib/live/consents-in-force';
 import { mediaDelToken, regolaConsenso } from '@/lib/live/listen-only';
 import { elencoVisibileAlPubblico } from '@/lib/live/participant-list';
@@ -43,7 +44,6 @@ import {
   testoLetto,
   VERSIONE_TESTO_REGISTRAZIONE,
   type Destinazione,
-  type PeriodoConsenso,
 } from '@/lib/recording/destination';
 import { hasJoinGrant } from '@/lib/events/join-grant';
 import type { JitsiTokenRequest } from '@/lib/validation/schemas';
@@ -284,6 +284,7 @@ async function registraConsensi(
           ? await prisma.recordingConsent.findFirst({
               where: { eventId: event.id, registrationId },
               select: {
+                jitsiUserId: true,
                 consentedAt: true,
                 withdrawnAt: true,
                 earlierPeriods: true,
@@ -312,12 +313,7 @@ async function registraConsensi(
               // Con `withdrawnAt` nullo e' stato sostituito, non ritirato.
               earlierPeriods: [
                 ...(Array.isArray(esistente.earlierPeriods) ? esistente.earlierPeriods : []),
-                {
-                  consentedAt: esistente.consentedAt.toISOString(),
-                  withdrawnAt: esistente.withdrawnAt?.toISOString() ?? null,
-                  destination: esistente.destination,
-                  textVersion: esistente.textVersion,
-                } satisfies PeriodoConsenso,
+                periodoSostituito(esistente),
               ],
               ...testoDellaProva,
               jitsiUserId: posto.jitsiUserId,

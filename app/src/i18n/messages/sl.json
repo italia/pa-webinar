@@ -1684,6 +1684,7 @@
         "DATA_DELETED": "Izbrisani podatki",
         "CONSENT_RECORDED": "Zabeleženo soglasje",
         "DATA_EXPORTED": "Izvoženi podatki",
+        "DATA_RECTIFIED": "Popravljeni podatki",
         "CONSENT_WITHDRAWN": "Privolitev preklicana",
         "RECORDING_CONTENT_READ": "Vsebino posnetka je prebralo osebje",
         "RECORDING_REDACTION_REQUESTED": "Zahtevana odstranitev iz posnetka",
@@ -2147,6 +2148,7 @@
         "DATA_DELETED": "Podatki izbrisani",
         "CONSENT_RECORDED": "Soglasje zabeleženo",
         "DATA_EXPORTED": "Podatki izvoženi",
+        "DATA_RECTIFIED": "Popravljeni podatki",
         "CONSENT_WITHDRAWN": "Privolitev preklicana",
         "RECORDING_CONTENT_READ": "Vsebino posnetka je prebralo osebje"
       }
@@ -4129,7 +4131,8 @@
         },
         "sources": {
           "registration": "prijava",
-          "room": "dvorana"
+          "room": "dvorana",
+          "self-service": "Moji podatki"
         },
         "roles": {
           "registrant": "prijavljen",
@@ -4276,7 +4279,17 @@
     "addressBookNote": "Ste v imeniku dogodkov, da bi vas lahko povabili na podobne dogodke: privolitev lahko kadar koli prekličete.",
     "addressBookPendingNote": "Pri tej prijavi je bilo označeno polje za imenik dogodkov, vendar ta naslov ni več prejemal povabil. Če je zahteva vaša, jo lahko potrdite na strani s svojimi podatki prek spodnje povezave. Če ni vaša, prezrite to sporočilo: ostanete zunaj imenika in ne prejemate povabil.",
     "addressBookOptOutLink": "Odstrani moje podatke iz imenika",
-    "myDataLink": "Vaši podatki: ogled, popravek, preklic privolitve ali preklic prijave"
+    "myDataLink": "Vaši podatki: ogled, popravek, preklic privolitve ali preklic prijave",
+    "confirmationCode": {
+      "subject": "{site}: potrditvena koda",
+      "heading": "Vaša potrditvena koda",
+      "introEdit": "Zahtevali ste popravek imena in organizacije v svoji prijavi na »{event}«.",
+      "introEditAll": "Zahtevali ste popravek imena in organizacije v vseh svojih prijavah.",
+      "introCancel": "Zahtevali ste izbris svoje prijave na »{event}«.",
+      "codeLabel": "Koda je:",
+      "instructions": "Vpišite jo na strani Moji podatki, s katere ste poslali zahtevo. Velja {minutes, plural, one {# minuta} two {# minuti} few {# minute} other {# minut}}.",
+      "ignore": "Če zahteve niste poslali vi, to e-sporočilo prezrite: brez kode se nič ne spremeni. Kode ne dajte nikomur."
+    }
   },
   "home": {
     "hero": {
@@ -4773,6 +4786,7 @@
       "consentFuture": "Prihodnja sporočila",
       "consentWithdrawnOn": "Preklicano {date}",
       "consentNoteInRoom": "Če ste zdaj v dvorani, preklic velja od naslednjega vstopa: da velja takoj, uporabite Privolitve v dvorani.",
+      "consentGiveNoteInRoom": "Privolitev, dana tukaj, velja od vašega naslednjega vstopa v dvorano, ne za tisto, kar je že posneto. Privolitev v snemanje in prepis lahko daste, dokler se dogodek ne konča.",
       "proofsTitle": "Shranjena dokazila o privolitvah",
       "proofsIntro": "Podatki teh dogodkov so bili izbrisani. Ta dokazila ostanejo, dokler video ali prepis obstaja. Privolitev lahko prekličete: kar je že v videu, ostane, za odstranitev pa morate pisati upravljavcu podatkov.",
       "proofGivenOn": "Dana {date}",
@@ -4788,6 +4802,13 @@
       "addressBookIntro": "Izbrali ste, da ostanete v imeniku, da bi vas lahko povabili na podobne dogodke. Te podatke hranimo do {date}, razen v primeru preklica ali nove privolitve.",
       "addressBookOptOut": "Odstrani moje podatke iz imenika",
       "consentFutureEffect": "Če jo prekličete, ne boste več prejemali sporočil o prihodnjih dogodkih in izstopite iz imenika, za vse svoje prijave.",
+      "consentFutureGive": "Privolim v prihodnja sporočila",
+      "consentFutureGiveEffect": "Vrnete se v imenik dogodkov z imenom in organizacijo iz te prijave in znova prejemate povabila; obdobje hrambe se začne znova danes.",
+      "consentGiveDone": "Privolitev je dana: velja od vašega naslednjega vstopa v dvorano.",
+      "consentFutureGiveDone": "Privolitev je dana: znova ste v imeniku dogodkov.",
+      "consentGiveTextChanged": "Besedilo privolitve se je spremenilo, potem ko ste odprli stran: znova jo naložite, da preberete novo.",
+      "consentGiveClosed": "Te privolitve ni več mogoče dati tukaj: dogodek se je končal ali je ne zahteva več. Znova naložite stran, da vidite trenutno stanje.",
+      "consentGiveNewText": "Besedilo te privolitve se je spremenilo, potem ko ste jo dali: za trenutno besedilo jo je treba dati znova.",
       "addressBookPendingTitle": "Vrnitev v imenik je treba potrditi",
       "addressBookPendingBody": "Pri tej prijavi je bilo označeno polje za imenik, vendar ta naslov ni več prejemal povabil. Dokler ne potrdite, se nič ne spremeni.",
       "addressBookPendingEffect": "Če potrdite, se vrnete v imenik z imenom in organizacijo iz te prijave in znova prejemate povabila. Če prekličete ali če to niste bili vi, ostanete zunaj imenika in ne prejemate povabil.",
@@ -4805,7 +4826,29 @@
       "removalError": "Zahteve ni bilo mogoče poslati. Poskusite znova pozneje.",
       "removalStatusOpen": "Zahteva z dne {date}: v obravnavi.",
       "removalStatusClosed": "Zahteva z dne {date}: zaključena {closed}.",
-      "removalStatusRejected": "Zahteva z dne {date}: zavrnjena. Pišite upravljavcu, da izveste razlog."
+      "removalStatusRejected": "Zahteva z dne {date}: zavrnjena. Pišite upravljavcu, da izveste razlog.",
+      "editButton": "Popravi ime in organizacijo",
+      "editScopeLegend": "Za katere prijave velja",
+      "editScopeOne": "Samo ta prijava",
+      "editScopeAll": "Vse moje prijave ({count}) in imenik dogodkov",
+      "editEffect": "Popravek velja za naslednja e-sporočila in od vašega naslednjega vstopa v dvorano. Ne spremeni tistega, kar je že posneto, prepisano ali napisano v klepetu, niti dokazil o privolitvah.",
+      "editNameInvalid": "Ime mora imeti od 2 do 100 znakov.",
+      "editOrganizationRequired": "Dogodek, na katerega ste prijavljeni, zahteva organizacijo: polje ne sme ostati prazno.",
+      "editOrganizationTooLong": "Organizacija ima lahko največ 200 znakov.",
+      "editDone": "Podatki so popravljeni.",
+      "codeWhy": "Zaradi varnosti se popravki in izbrisi potrdijo s kodo, ki jo pošljemo na e-poštni naslov prijave.",
+      "codeSend": "Pošljite mi potrditveno kodo",
+      "codeSent": "Po e-pošti smo vam poslali 6-mestno kodo. Vpišite jo tukaj: velja {minutes, plural, one {# minuta} two {# minuti} few {# minute} other {# minut}}.",
+      "codeLabel": "Potrditvena koda",
+      "codeConfirmEdit": "Potrdi popravek",
+      "codeInvalid": "Koda ni pravilna ali je potekla. Preverite zadnje prejeto e-sporočilo ali prekličite in zahtevajte novo.",
+      "cancelTitle": "Izbris te prijave",
+      "cancelIntro": "Izbrišete lahko samo to prijavo, ne da bi se dotaknili drugih in preostalih podatkov.",
+      "cancelButton": "Izbriši to prijavo",
+      "cancelDeletes": "Izbrišejo se prijava na ta dogodek in tisto, kar ste z njo naredili: vprašanja, glasovi, sporočila v klepetu, povratne informacije, odgovori na vprašalnike, vaši stavki v prepisu iz podnapisov in e-sporočila v čakalni vrsti. Vaša osebna povezava preneha delovati in mesto se sprosti.",
+      "cancelKeeps": "Ostanejo vaše druge prijave, imenik dogodkov, profilna fotografija in zahteva za odstranitev iz posnetka, ki je še v obdelavi. Če za ta dogodek obstaja video ali prepis, dokazilo o vaši privolitvi ostane brez vašega imena, dokler obstajata. Izbrisa ni mogoče razveljaviti; dokler dogodek sprejema prijave, se lahko znova prijavite.",
+      "codeConfirmCancel": "Izbriši prijavo",
+      "cancelDone": "Prijava je izbrisana."
     },
     "erasure": {
       "title": "Izbris vaših podatkov",

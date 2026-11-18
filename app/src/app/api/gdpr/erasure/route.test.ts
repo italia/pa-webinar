@@ -465,6 +465,18 @@ describe('POST /api/gdpr/erasure', () => {
     expect(await res.json()).toMatchObject({ deleted: 1, consentProofsKept: 2 });
   });
 
+  it('deletes again an address-book entry re-created while the erasure ran', async () => {
+    // La prima volta non c'era piu' niente; poi un rientro confermato da un'altra
+    // scheda l'ha rifatta prima che le iscrizioni se ne andassero.
+    db.person.deleteMany.mockResolvedValueOnce({ count: 0 }).mockResolvedValueOnce({ count: 1 });
+    const res = await POST(req('valido') as never, ctx as never);
+    expect(db.person.deleteMany).toHaveBeenCalledTimes(2);
+    expect(db.person.deleteMany.mock.invocationCallOrder[1]!).toBeGreaterThan(
+      tx.registration.deleteMany.mock.invocationCallOrder[0]!
+    );
+    expect(await res.json()).toMatchObject({ addressBookDeleted: true });
+  });
+
   it('touches nothing with an invalid token', async () => {
     const res = await POST(req('falso') as never, ctx as never);
     expect(res.status).toBe(401);

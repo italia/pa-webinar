@@ -1684,6 +1684,7 @@
         "DATA_DELETED": "Data slettet",
         "CONSENT_RECORDED": "Samtykke registreret",
         "DATA_EXPORTED": "Data eksporteret",
+        "DATA_RECTIFIED": "Oplysninger rettet",
         "CONSENT_WITHDRAWN": "Samtykke trukket tilbage",
         "RECORDING_CONTENT_READ": "Optagelsens indhold læst af personale",
         "RECORDING_REDACTION_REQUESTED": "Fjernelse fra en optagelse anmodet",
@@ -2147,6 +2148,7 @@
         "DATA_DELETED": "Data slettet",
         "CONSENT_RECORDED": "Samtykke registreret",
         "DATA_EXPORTED": "Data eksporteret",
+        "DATA_RECTIFIED": "Oplysninger rettet",
         "CONSENT_WITHDRAWN": "Samtykke trukket tilbage",
         "RECORDING_CONTENT_READ": "Optagelsens indhold læst af personale"
       }
@@ -4129,7 +4131,8 @@
         },
         "sources": {
           "registration": "tilmelding",
-          "room": "rum"
+          "room": "rum",
+          "self-service": "Mine data"
         },
         "roles": {
           "registrant": "tilmeldt",
@@ -4276,7 +4279,17 @@
     "addressBookNote": "Du er i arrangementsadressebogen for at blive inviteret til lignende arrangementer: du kan til enhver tid trække dit samtykke tilbage.",
     "addressBookPendingNote": "Afkrydsningsfeltet til arrangementsadressebogen blev markeret på denne tilmelding, men denne adresse var holdt op med at modtage invitationer. Hvis anmodningen er din, kan du bekræfte den på siden med dine data via linket nedenfor. Hvis den ikke er din, kan du se bort fra denne besked: du forbliver uden for adressebogen og modtager ingen invitationer.",
     "addressBookOptOutLink": "Fjern mine data fra adressebogen",
-    "myDataLink": "Dine data: se dem, ret dem, træk et samtykke tilbage eller annullér tilmeldingen"
+    "myDataLink": "Dine data: se dem, ret dem, træk et samtykke tilbage eller annullér tilmeldingen",
+    "confirmationCode": {
+      "subject": "{site}: bekræftelseskode",
+      "heading": "Din bekræftelseskode",
+      "introEdit": "Du har bedt om at rette navn og organisation i din tilmelding til “{event}”.",
+      "introEditAll": "Du har bedt om at rette navn og organisation i alle dine tilmeldinger.",
+      "introCancel": "Du har bedt om at slette din tilmelding til “{event}”.",
+      "codeLabel": "Koden er:",
+      "instructions": "Indtast den på siden Mine data, som du sendte anmodningen fra. Den gælder i {minutes, plural, one {# minut} other {# minutter}}.",
+      "ignore": "Hvis det ikke var dig, der sendte anmodningen, så ignorer denne e-mail: uden koden ændres intet. Del ikke koden med nogen."
+    }
   },
   "home": {
     "hero": {
@@ -4773,6 +4786,7 @@
       "consentFuture": "Fremtidige meddelelser",
       "consentWithdrawnOn": "Trukket tilbage den {date}",
       "consentNoteInRoom": "Hvis du er i rummet lige nu, gælder tilbagetrækningen fra din næste indgang: brug Samtykker i rummet, hvis den skal gælde straks.",
+      "consentGiveNoteInRoom": "Et samtykke, der gives her, gælder fra din næste indgang i rummet, ikke for det, der allerede er optaget. Samtykke til optagelse og transskription kan gives, indtil arrangementet er slut.",
       "proofsTitle": "Opbevaret dokumentation for samtykker",
       "proofsIntro": "Dataene for disse arrangementer er blevet slettet. Denne dokumentation bevares, så længe videoen eller transskriptionen findes. Du kan trække dit samtykke tilbage: det, der allerede er i videoen, forbliver der, og for at få det fjernet skal du skrive til den dataansvarlige.",
       "proofGivenOn": "Givet den {date}",
@@ -4788,6 +4802,13 @@
       "addressBookIntro": "Du har valgt at blive i adressebogen for at blive inviteret til lignende arrangementer. Vi opbevarer disse data indtil {date}, medmindre du trækker samtykket tilbage eller giver et nyt.",
       "addressBookOptOut": "Fjern mine data fra adressebogen",
       "consentFutureEffect": "Hvis du trækker det tilbage, modtager du ikke længere meddelelser om kommende arrangementer, og du fjernes fra adressebogen for alle dine tilmeldinger.",
+      "consentFutureGive": "Jeg giver samtykke til fremtidige meddelelser",
+      "consentFutureGiveEffect": "Du kommer tilbage i arrangementsadressebogen med navnet og organisationen fra denne tilmelding og modtager invitationer igen; opbevaringsperioden starter forfra i dag.",
+      "consentGiveDone": "Samtykke givet: det gælder fra din næste indgang i rummet.",
+      "consentFutureGiveDone": "Samtykke givet: du er igen i arrangementsadressebogen.",
+      "consentGiveTextChanged": "Samtykketeksten er ændret, efter du åbnede siden: genindlæs den for at læse den nye.",
+      "consentGiveClosed": "Dette samtykke kan ikke længere gives herfra: arrangementet er slut eller beder ikke længere om det. Genindlæs siden for at se den aktuelle status.",
+      "consentGiveNewText": "Teksten til dette samtykke er ændret, efter du gav det: til den aktuelle tekst skal det gives igen.",
       "addressBookPendingTitle": "Tilbagevenden til adressebogen skal bekræftes",
       "addressBookPendingBody": "Afkrydsningsfeltet til adressebogen blev markeret på denne tilmelding, men denne adresse var holdt op med at modtage invitationer. Intet ændrer sig, før du bekræfter.",
       "addressBookPendingEffect": "Hvis du bekræfter, kommer du tilbage i adressebogen med navnet og organisationen fra denne tilmelding og modtager invitationer igen. Hvis du annullerer, eller hvis det ikke var dig, forbliver du uden for adressebogen og modtager ingen invitationer.",
@@ -4805,7 +4826,29 @@
       "removalError": "Anmodningen kunne ikke sendes. Prøv igen senere.",
       "removalStatusOpen": "Anmodning af {date}: under behandling.",
       "removalStatusClosed": "Anmodning af {date}: gennemført {closed}.",
-      "removalStatusRejected": "Anmodning af {date}: afvist. Skriv til den dataansvarlige for at få begrundelsen."
+      "removalStatusRejected": "Anmodning af {date}: afvist. Skriv til den dataansvarlige for at få begrundelsen.",
+      "editButton": "Ret navn og organisation",
+      "editScopeLegend": "Hvilke tilmeldinger det gælder for",
+      "editScopeOne": "Kun denne tilmelding",
+      "editScopeAll": "Alle mine tilmeldinger ({count}) og arrangementsadressebogen",
+      "editEffect": "Rettelsen gælder for de næste e-mails og fra din næste indgang i rummet. Den ændrer ikke det, der allerede er optaget, transskriberet eller skrevet i chatten, og heller ikke dokumentationen for samtykker.",
+      "editNameInvalid": "Navnet skal have mellem 2 og 100 tegn.",
+      "editOrganizationRequired": "Et arrangement, du er tilmeldt, kræver organisationen: feltet må ikke være tomt.",
+      "editOrganizationTooLong": "Organisationen må højst have 200 tegn.",
+      "editDone": "Oplysningerne er rettet.",
+      "codeWhy": "Af sikkerhedshensyn bekræftes rettelser og sletninger med en kode, som vi sender til tilmeldingens e-mailadresse.",
+      "codeSend": "Send mig bekræftelseskoden",
+      "codeSent": "Vi har sendt dig en 6-cifret kode pr. e-mail. Indtast den her: den gælder i {minutes, plural, one {# minut} other {# minutter}}.",
+      "codeLabel": "Bekræftelseskode",
+      "codeConfirmEdit": "Bekræft rettelsen",
+      "codeInvalid": "Koden er forkert eller udløbet. Tjek den seneste e-mail, du har modtaget, eller annuller og bed om en ny.",
+      "cancelTitle": "Slet denne tilmelding",
+      "cancelIntro": "Du kan slette kun denne tilmelding uden at røre de andre eller resten af dine data.",
+      "cancelButton": "Slet denne tilmelding",
+      "cancelDeletes": "Tilmeldingen til dette arrangement slettes sammen med det, du har gjort med den: spørgsmål, stemmer, chatbeskeder, feedback, svar på spørgeskemaer, dine sætninger i transskriptionen fra undertekster og e-mails i kø. Dit personlige link holder op med at virke, og pladsen bliver ledig.",
+      "cancelKeeps": "Dine andre tilmeldinger, arrangementsadressebogen, dit profilbillede og en anmodning om fjernelse fra en optagelse, der stadig behandles, forbliver. Hvis der findes en video eller en transskription af dette arrangement, forbliver dokumentationen for dit samtykke uden dit navn, så længe de findes. Sletningen kan ikke fortrydes; så længe arrangementet tager imod tilmeldinger, kan du tilmelde dig igen.",
+      "codeConfirmCancel": "Slet tilmeldingen",
+      "cancelDone": "Tilmeldingen er slettet."
     },
     "erasure": {
       "title": "Sletning af dine data",

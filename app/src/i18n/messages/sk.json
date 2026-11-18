@@ -1684,6 +1684,7 @@
         "DATA_DELETED": "Údaje vymazané",
         "CONSENT_RECORDED": "Súhlas zaznamenaný",
         "DATA_EXPORTED": "Údaje exportované",
+        "DATA_RECTIFIED": "Opravené údaje",
         "CONSENT_WITHDRAWN": "Súhlas odvolaný",
         "RECORDING_CONTENT_READ": "Obsah záznamu prečítaný personálom",
         "RECORDING_REDACTION_REQUESTED": "Požiadané o odstránenie zo záznamu",
@@ -2147,6 +2148,7 @@
         "DATA_DELETED": "Údaje zmazané",
         "CONSENT_RECORDED": "Súhlas zaznamenaný",
         "DATA_EXPORTED": "Údaje exportované",
+        "DATA_RECTIFIED": "Opravené údaje",
         "CONSENT_WITHDRAWN": "Súhlas odvolaný",
         "RECORDING_CONTENT_READ": "Obsah záznamu prečítaný personálom"
       }
@@ -4129,7 +4131,8 @@
         },
         "sources": {
           "registration": "registrácia",
-          "room": "miestnosť"
+          "room": "miestnosť",
+          "self-service": "Moje údaje"
         },
         "roles": {
           "registrant": "registrovaný",
@@ -4276,7 +4279,17 @@
     "addressBookNote": "Ste v adresári podujatí, aby ste boli pozývaní na podobné podujatia: súhlas môžete kedykoľvek odvolať.",
     "addressBookPendingNote": "Pri tejto registrácii bolo začiarknuté políčko adresára podujatí, ale táto adresa prestala dostávať pozvánky. Ak je žiadosť vaša, môžete ju potvrdiť na stránke so svojimi údajmi pomocou odkazu nižšie. Ak nie je vaša, túto správu ignorujte: zostanete mimo adresára a pozvánky dostávať nebudete.",
     "addressBookOptOutLink": "Odstrániť moje údaje z adresára",
-    "myDataLink": "Vaše údaje: zobraziť, opraviť, odvolať súhlas alebo zrušiť registráciu"
+    "myDataLink": "Vaše údaje: zobraziť, opraviť, odvolať súhlas alebo zrušiť registráciu",
+    "confirmationCode": {
+      "subject": "{site}: potvrdzovací kód",
+      "heading": "Váš potvrdzovací kód",
+      "introEdit": "Požiadali ste o opravu mena a organizácie vo svojej registrácii na „{event}“.",
+      "introEditAll": "Požiadali ste o opravu mena a organizácie vo všetkých svojich registráciách.",
+      "introCancel": "Požiadali ste o vymazanie svojej registrácie na „{event}“.",
+      "codeLabel": "Kód je:",
+      "instructions": "Zadajte ho na stránke Moje údaje, z ktorej ste žiadosť odoslali. Platí {minutes, plural, one {# minúta} few {# minúty} other {# minút}}.",
+      "ignore": "Ak ste žiadosť neodoslali vy, tento e-mail ignorujte: bez kódu sa nič nezmení. Kód nikomu neprezrádzajte."
+    }
   },
   "home": {
     "hero": {
@@ -4773,6 +4786,7 @@
       "consentFuture": "Budúce oznámenia",
       "consentWithdrawnOn": "Odvolané {date}",
       "consentNoteInRoom": "Ak ste práve v miestnosti, odvolanie platí od ďalšieho vstupu: aby platilo hneď, použite v miestnosti Súhlasy.",
+      "consentGiveNoteInRoom": "Súhlas udelený tu platí od vášho ďalšieho vstupu do miestnosti, nie pre to, čo už bolo zaznamenané. Súhlas so záznamom a s prepisom možno udeliť, kým sa podujatie neskončí.",
       "proofsTitle": "Uchovávané doklady o súhlase",
       "proofsIntro": "Údaje týchto podujatí boli vymazané. Tieto doklady zostávajú, kým video alebo prepis existujú. Súhlas môžete odvolať: to, čo už je vo videu, zostáva, a ak to chcete odstrániť, musíte napísať prevádzkovateľovi osobných údajov.",
       "proofGivenOn": "Udelený {date}",
@@ -4788,6 +4802,13 @@
       "addressBookIntro": "Rozhodli ste sa zostať v adresári, aby ste boli pozývaní na podobné podujatia. Tieto údaje uchovávame do {date}, pokiaľ súhlas neodvoláte alebo ho neudelíte znova.",
       "addressBookOptOut": "Odstrániť moje údaje z adresára",
       "consentFutureEffect": "Ak ho odvoláte, prestanete dostávať oznámenia o ďalších podujatiach a opustíte adresár, a to pre všetky svoje registrácie.",
+      "consentFutureGive": "Súhlasím s budúcimi oznámeniami",
+      "consentFutureGiveEffect": "Vrátite sa do adresára podujatí s menom a organizáciou z tejto registrácie a budete opäť dostávať pozvánky; doba uchovávania sa začína odznova dnes.",
+      "consentGiveDone": "Súhlas udelený: platí od vášho ďalšieho vstupu do miestnosti.",
+      "consentFutureGiveDone": "Súhlas udelený: ste opäť v adresári podujatí.",
+      "consentGiveTextChanged": "Text súhlasu sa zmenil po tom, čo ste stránku otvorili: načítajte ju znova a prečítajte si nový.",
+      "consentGiveClosed": "Tento súhlas už odtiaľto nemožno udeliť: podujatie sa skončilo alebo ho už nevyžaduje. Načítajte stránku znova, aby ste videli aktuálny stav.",
+      "consentGiveNewText": "Text tohto súhlasu sa zmenil po tom, čo ste ho udelili: pre aktuálny text ho treba udeliť znova.",
       "addressBookPendingTitle": "Návrat do adresára treba potvrdiť",
       "addressBookPendingBody": "Pri tejto registrácii bolo začiarknuté políčko adresára, ale táto adresa prestala dostávať pozvánky. Kým nepotvrdíte, nič sa nezmení.",
       "addressBookPendingEffect": "Ak potvrdíte, vrátite sa do adresára s menom a organizáciou z tejto registrácie a budete opäť dostávať pozvánky. Ak zrušíte alebo ak ste to neboli vy, zostanete mimo adresára a pozvánky dostávať nebudete.",
@@ -4805,7 +4826,29 @@
       "removalError": "Žiadosť sa nepodarilo odoslať. Skúste to neskôr.",
       "removalStatusOpen": "Žiadosť zo dňa {date}: vybavuje sa.",
       "removalStatusClosed": "Žiadosť zo dňa {date}: vybavená {closed}.",
-      "removalStatusRejected": "Žiadosť zo dňa {date}: zamietnutá. Napíšte prevádzkovateľovi, aby ste sa dozvedeli dôvod."
+      "removalStatusRejected": "Žiadosť zo dňa {date}: zamietnutá. Napíšte prevádzkovateľovi, aby ste sa dozvedeli dôvod.",
+      "editButton": "Opraviť meno a organizáciu",
+      "editScopeLegend": "Na ktoré registrácie sa vzťahuje",
+      "editScopeOne": "Iba táto registrácia",
+      "editScopeAll": "Všetky moje registrácie ({count}) a adresár podujatí",
+      "editEffect": "Oprava platí pre ďalšie e-maily a od vášho ďalšieho vstupu do miestnosti. Nemení to, čo už bolo zaznamenané, prepísané alebo napísané v chate, ani doklady o súhlase.",
+      "editNameInvalid": "Meno musí mať 2 až 100 znakov.",
+      "editOrganizationRequired": "Podujatie, na ktoré ste registrovaní, vyžaduje organizáciu: pole nemôže zostať prázdne.",
+      "editOrganizationTooLong": "Organizácia môže mať najviac 200 znakov.",
+      "editDone": "Údaje boli opravené.",
+      "codeWhy": "Z bezpečnostných dôvodov sa opravy a vymazania potvrdzujú kódom, ktorý pošleme na e-mailovú adresu registrácie.",
+      "codeSend": "Pošlite mi potvrdzovací kód",
+      "codeSent": "Poslali sme vám e-mailom šesťmiestny kód. Zadajte ho sem: platí {minutes, plural, one {# minúta} few {# minúty} other {# minút}}.",
+      "codeLabel": "Potvrdzovací kód",
+      "codeConfirmEdit": "Potvrdiť opravu",
+      "codeInvalid": "Kód nie je správny alebo jeho platnosť vypršala. Skontrolujte posledný prijatý e-mail, alebo akciu zrušte a požiadajte o nový.",
+      "cancelTitle": "Vymazanie tejto registrácie",
+      "cancelIntro": "Môžete vymazať iba túto registráciu bez toho, aby ste sa dotkli ostatných a zvyšku svojich údajov.",
+      "cancelButton": "Vymazať túto registráciu",
+      "cancelDeletes": "Vymaže sa registrácia na toto podujatie a to, čo ste s ňou urobili: otázky, hlasy, správy v chate, spätná väzba, odpovede na dotazníky, vaše vety v prepise z titulkov a e-maily v poradí. Váš osobný odkaz prestane fungovať a miesto sa uvoľní.",
+      "cancelKeeps": "Zostávajú vaše ostatné registrácie, adresár podujatí, profilová fotografia a žiadosť o odstránenie zo záznamu, ktorá sa ešte vybavuje. Ak k tomuto podujatiu existuje video alebo prepis, doklad o vašom súhlase zostane bez vášho mena, kým existujú. Vymazanie nemožno vrátiť; kým podujatie prijíma registrácie, môžete sa znova zaregistrovať.",
+      "codeConfirmCancel": "Vymazať registráciu",
+      "cancelDone": "Registrácia bola vymazaná."
     },
     "erasure": {
       "title": "Vymazanie vašich údajov",

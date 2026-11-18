@@ -1684,6 +1684,7 @@
         "DATA_DELETED": "Data imħassrin",
         "CONSENT_RECORDED": "Kunsens reġistrat",
         "DATA_EXPORTED": "Data esportati",
+        "DATA_RECTIFIED": "Dejta kkoreġuta",
         "CONSENT_WITHDRAWN": "Kunsens irtirat",
         "RECORDING_CONTENT_READ": "Kontenut tar-reġistrazzjoni moqri mill-persunal",
         "RECORDING_REDACTION_REQUESTED": "Intalbet tneħħija minn reġistrazzjoni",
@@ -2147,6 +2148,7 @@
         "DATA_DELETED": "Dejta mħassra",
         "CONSENT_RECORDED": "Kunsens irreġistrat",
         "DATA_EXPORTED": "Dejta esportata",
+        "DATA_RECTIFIED": "Dejta kkoreġuta",
         "CONSENT_WITHDRAWN": "Kunsens irtirat",
         "RECORDING_CONTENT_READ": "Kontenut tar-reġistrazzjoni moqri mill-persunal"
       }
@@ -4129,7 +4131,8 @@
         },
         "sources": {
           "registration": "reġistrazzjoni",
-          "room": "sala"
+          "room": "sala",
+          "self-service": "Id-dejta tiegħi"
         },
         "roles": {
           "registrant": "reġistrat",
@@ -4276,7 +4279,17 @@
     "addressBookNote": "Int fid-direttorju tal-avvenimenti, biex tiġi mistieden għal avvenimenti simili: tista' tirtira l-kunsens fi kwalunkwe ħin.",
     "addressBookPendingNote": "F'din ir-reġistrazzjoni ġiet immarkata l-kaxxa tad-direttorju tal-avvenimenti, iżda dan l-indirizz kien waqaf jirċievi stediniet. Jekk it-talba hija tiegħek, tista' tikkonfermaha mill-paġna tad-dejta tiegħek, bil-link hawn taħt. Jekk mhix tiegħek, injora dan il-messaġġ: tibqa' barra mid-direttorju u ma tirċievix stediniet.",
     "addressBookOptOutLink": "Neħħi d-dejta tiegħi mid-direttorju",
-    "myDataLink": "Id-data tiegħek: araha, ikkoreġiha, irtira kunsens jew ikkanċella r-reġistrazzjoni"
+    "myDataLink": "Id-data tiegħek: araha, ikkoreġiha, irtira kunsens jew ikkanċella r-reġistrazzjoni",
+    "confirmationCode": {
+      "subject": "{site}: kodiċi ta' konferma",
+      "heading": "Il-kodiċi ta' konferma tiegħek",
+      "introEdit": "Tlabt li jiġu kkoreġuti l-isem u l-entità tar-reġistrazzjoni tiegħek għal “{event}”.",
+      "introEditAll": "Tlabt li jiġu kkoreġuti l-isem u l-entità tar-reġistrazzjonijiet kollha tiegħek.",
+      "introCancel": "Tlabt li titħassar ir-reġistrazzjoni tiegħek għal “{event}”.",
+      "codeLabel": "Il-kodiċi huwa:",
+      "instructions": "Iktbu fil-paġna Id-dejta tiegħi minn fejn għamilt it-talba. Jibqa' validu għal {minutes, plural, one {# minuta} few {# minuti} other {# minuta}}.",
+      "ignore": "Jekk ma għamiltx int it-talba, injora din l-email: mingħajr il-kodiċi ma jinbidel xejn. Tagħti l-kodiċi lil ħadd."
+    }
   },
   "home": {
     "hero": {
@@ -4773,6 +4786,7 @@
       "consentFuture": "Komunikazzjonijiet futuri",
       "consentWithdrawnOn": "Irtirat fil-{date}",
       "consentNoteInRoom": "Jekk bħalissa qiegħed fis-sala, l-irtirar jgħodd mid-dħul li jmiss: biex jgħodd mill-ewwel, uża Kunsensi fis-sala.",
+      "consentGiveNoteInRoom": "Kunsens mogħti minn hawn jgħodd mid-dħul li jmiss tiegħek fis-sala, mhux għal dak li diġà ġie rreġistrat. Il-kunsens għar-reġistrazzjoni u t-traskrizzjoni jista' jingħata sakemm jintemm l-avveniment.",
       "proofsTitle": "Provi tal-kunsensi miżmuma",
       "proofsIntro": "Id-dejta ta' dawn l-avvenimenti tħassret. Dawn il-provi jibqgħu sakemm il-vidjo jew it-traskrizzjoni jeżistu. Tista' tirtira l-kunsens: dak li diġà jinsab fil-vidjo jibqa', u biex tneħħih trid tikteb lill-kontrollur tad-dejta.",
       "proofGivenOn": "Mogħti fil-{date}",
@@ -4788,6 +4802,13 @@
       "addressBookIntro": "Għażilt li tibqa' fid-direttorju biex tiġi mistieden għal avvenimenti simili. Inżommu din id-dejta sa {date}, sakemm ma tirtirax il-kunsens jew ma tagħtix kunsens ġdid.",
       "addressBookOptOut": "Neħħi d-dejta tiegħi mid-direttorju",
       "consentFutureEffect": "Jekk tirtirah ma tibqax tirċievi komunikazzjonijiet dwar avvenimenti li ġejjin u toħroġ mill-ktieb tal-indirizzi, għar-reġistrazzjonijiet kollha tiegħek.",
+      "consentFutureGive": "Nagħti l-kunsens għal komunikazzjonijiet futuri",
+      "consentFutureGiveEffect": "Terġa' lura fid-direttorju tal-avvenimenti bl-isem u l-organizzazzjoni ta' din ir-reġistrazzjoni u terġa' tirċievi stediniet; il-perjodu taż-żamma jerġa' jibda llum.",
+      "consentGiveDone": "Kunsens mogħti: jgħodd mid-dħul li jmiss tiegħek fis-sala.",
+      "consentFutureGiveDone": "Kunsens mogħti: erġajt fid-direttorju tal-avvenimenti.",
+      "consentGiveTextChanged": "It-test tal-kunsens inbidel wara li ftaħt il-paġna: erġa' tellagħha biex taqra l-ġdid.",
+      "consentGiveClosed": "Dan il-kunsens ma jistax jibqa' jingħata minn hawn: l-avveniment intemm jew ma għadux jitolbu. Erġa' tella' l-paġna biex tara l-istat attwali.",
+      "consentGiveNewText": "It-test ta' dan il-kunsens inbidel wara li tajtu: għat-test attwali jrid jerġa' jingħata.",
       "addressBookPendingTitle": "Ir-ritorn fid-direttorju irid jiġi kkonfermat",
       "addressBookPendingBody": "F'din ir-reġistrazzjoni ġiet immarkata l-kaxxa tad-direttorju, iżda dan l-indirizz kien waqaf jirċievi stediniet. Sakemm ma tikkonfermax, ma jinbidel xejn.",
       "addressBookPendingEffect": "Jekk tikkonferma, terġa' lura fid-direttorju bl-isem u l-organizzazzjoni ta' din ir-reġistrazzjoni u terġa' tirċievi stediniet. Jekk tikkanċella, jew jekk ma kontx int, tibqa' barra mid-direttorju u ma tirċievix stediniet.",
@@ -4805,7 +4826,29 @@
       "removalError": "It-talba ma setgħetx tintbagħat. Erġa’ pprova aktar tard.",
       "removalStatusOpen": "Talba tal-{date}: qed tiġi pproċessata.",
       "removalStatusClosed": "Talba tal-{date}: imlestija fil-{closed}.",
-      "removalStatusRejected": "Talba tal-{date}: miċħuda. Ikteb lill-kontrollur biex issir taf ir-raġuni."
+      "removalStatusRejected": "Talba tal-{date}: miċħuda. Ikteb lill-kontrollur biex issir taf ir-raġuni.",
+      "editButton": "Ikkoreġi l-isem u l-entità",
+      "editScopeLegend": "Għal liema reġistrazzjonijiet tapplika",
+      "editScopeOne": "Din ir-reġistrazzjoni biss",
+      "editScopeAll": "Ir-reġistrazzjonijiet kollha tiegħi ({count}) u d-direttorju tal-avvenimenti",
+      "editEffect": "Il-korrezzjoni tgħodd għall-emails li jmiss u mid-dħul li jmiss tiegħek fis-sala. Ma tbiddilx dak li diġà ġie rreġistrat, traskritt jew miktub fiċ-chat, u lanqas il-provi tal-kunsensi.",
+      "editNameInvalid": "L-isem irid ikollu bejn 2 u 100 karattru.",
+      "editOrganizationRequired": "Avveniment li inti rreġistrat għalih jitlob l-entità: ma tistax titħalla vojta.",
+      "editOrganizationTooLong": "L-entità jista' jkollha mhux aktar minn 200 karattru.",
+      "editDone": "Id-dejta ġiet ikkoreġuta.",
+      "codeWhy": "Għas-sigurtà, il-korrezzjonijiet u t-tħassir jiġu kkonfermati b'kodiċi li nibagħtu fl-indirizz tal-email tar-reġistrazzjoni.",
+      "codeSend": "Ibagħtli l-kodiċi ta' konferma",
+      "codeSent": "Bgħatnielek kodiċi ta' 6 ċifri bl-email. Iktbu hawn: jibqa' validu għal {minutes, plural, one {# minuta} few {# minuti} other {# minuta}}.",
+      "codeLabel": "Kodiċi ta' konferma",
+      "codeConfirmEdit": "Ikkonferma l-korrezzjoni",
+      "codeInvalid": "Il-kodiċi mhuwiex korrett jew skada. Iċċekkja l-aħħar email li rċevejt, jew ikkanċella u itlob wieħed ġdid.",
+      "cancelTitle": "Tħassir ta' din ir-reġistrazzjoni",
+      "cancelIntro": "Tista' tħassar din ir-reġistrazzjoni biss, mingħajr ma tmiss lill-oħrajn u l-bqija tad-dejta tiegħek.",
+      "cancelButton": "Ħassar din ir-reġistrazzjoni",
+      "cancelDeletes": "Titħassar ir-reġistrazzjoni għal dan l-avveniment u dak li għamilt biha: mistoqsijiet, voti, messaġġi fiċ-chat, feedback, tweġibiet għall-kwestjonarji, is-sentenzi tiegħek fit-traskrizzjoni mis-sottotitoli u l-emails fil-kju. Il-link personali tiegħek ma jibqax jaħdem u l-post jinħeles.",
+      "cancelKeeps": "Jibqgħu r-reġistrazzjonijiet l-oħra tiegħek, id-direttorju tal-avvenimenti, ir-ritratt tal-profil u talba għat-tneħħija minn reġistrazzjoni li għadha qed tiġi pproċessata. Jekk għal dan l-avveniment hemm vidjo jew traskrizzjoni, il-prova tal-kunsens tiegħek tibqa' mingħajr ismek sakemm jeżistu. It-tħassir ma jistax jitreġġa' lura; sakemm l-avveniment jaċċetta reġistrazzjonijiet, tista' terġa' tirreġistra.",
+      "codeConfirmCancel": "Ħassar ir-reġistrazzjoni",
+      "cancelDone": "Ir-reġistrazzjoni tħassret."
     },
     "erasure": {
       "title": "Tħassir tad-dejta tiegħek",

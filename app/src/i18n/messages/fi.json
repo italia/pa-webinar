@@ -1684,6 +1684,7 @@
         "DATA_DELETED": "Tiedot poistettu",
         "CONSENT_RECORDED": "Suostumus kirjattu",
         "DATA_EXPORTED": "Tiedot viety",
+        "DATA_RECTIFIED": "Tiedot korjattu",
         "CONSENT_WITHDRAWN": "Suostumus peruutettu",
         "RECORDING_CONTENT_READ": "Henkilökunta luki tallenteen sisällön",
         "RECORDING_REDACTION_REQUESTED": "Poistoa tallenteesta pyydetty",
@@ -2147,6 +2148,7 @@
         "DATA_DELETED": "Tiedot poistettu",
         "CONSENT_RECORDED": "Suostumus kirjattu",
         "DATA_EXPORTED": "Tiedot viety",
+        "DATA_RECTIFIED": "Tiedot korjattu",
         "CONSENT_WITHDRAWN": "Suostumus peruutettu",
         "RECORDING_CONTENT_READ": "Henkilökunta luki tallenteen sisällön"
       }
@@ -4129,7 +4131,8 @@
         },
         "sources": {
           "registration": "ilmoittautuminen",
-          "room": "huone"
+          "room": "huone",
+          "self-service": "Omat tietoni"
         },
         "roles": {
           "registrant": "ilmoittautunut",
@@ -4276,7 +4279,17 @@
     "addressBookNote": "Olet tapahtumien osoitekirjassa, jotta sinut voidaan kutsua vastaaviin tapahtumiin: voit peruuttaa suostumuksesi milloin tahansa.",
     "addressBookPendingNote": "Tässä ilmoittautumisessa valittiin tapahtumien osoitekirjan valintaruutu, mutta tämä osoite oli lakannut saamasta kutsuja. Jos pyyntö on sinun, voit vahvistaa sen tietojesi sivulla alla olevan linkin kautta. Jos se ei ole sinun, jätä tämä viesti huomiotta: pysyt osoitekirjan ulkopuolella etkä saa kutsuja.",
     "addressBookOptOutLink": "Poista tietoni osoitekirjasta",
-    "myDataLink": "Tietosi: tarkastele, korjaa, peruuta suostumus tai peru ilmoittautuminen"
+    "myDataLink": "Tietosi: tarkastele, korjaa, peruuta suostumus tai peru ilmoittautuminen",
+    "confirmationCode": {
+      "subject": "{site}: vahvistuskoodi",
+      "heading": "Vahvistuskoodisi",
+      "introEdit": "Pyysit korjaamaan nimen ja organisaation ilmoittautumisessasi tapahtumaan ”{event}”.",
+      "introEditAll": "Pyysit korjaamaan nimen ja organisaation kaikissa ilmoittautumisissasi.",
+      "introCancel": "Pyysit poistamaan ilmoittautumisesi tapahtumaan ”{event}”.",
+      "codeLabel": "Koodi on:",
+      "instructions": "Kirjoita se Omat tietoni -sivulle, jolta teit pyynnön. Se on voimassa {minutes, plural, one {# minuutti} other {# minuuttia}}.",
+      "ignore": "Jos et tehnyt pyyntöä, voit jättää tämän viestin huomiotta: ilman koodia mikään ei muutu. Älä anna koodia kenellekään."
+    }
   },
   "home": {
     "hero": {
@@ -4773,6 +4786,7 @@
       "consentFuture": "Tulevat viestit",
       "consentWithdrawnOn": "Peruutettu {date}",
       "consentNoteInRoom": "Jos olet nyt huoneessa, peruutus tulee voimaan seuraavalla kerralla: käytä huoneen Suostumukset-painiketta, jos haluat sen voimaan heti.",
+      "consentGiveNoteInRoom": "Täällä annettu suostumus on voimassa seuraavasta huoneeseen tulosta alkaen, ei jo tallennetulle. Suostumuksen tallennukseen ja litterointiin voi antaa tapahtuman loppuun asti.",
       "proofsTitle": "Säilytetyt suostumusten todisteet",
       "proofsIntro": "Näiden tapahtumien tiedot on poistettu. Nämä todisteet säilyvät niin kauan kuin video tai litterointi on olemassa. Voit peruuttaa suostumuksesi: se, mikä on jo videossa, säilyy, ja sen poistamiseksi sinun on kirjoitettava rekisterinpitäjälle.",
       "proofGivenOn": "Annettu {date}",
@@ -4788,6 +4802,13 @@
       "addressBookIntro": "Valitsit jäädä osoitekirjaan, jotta sinut voidaan kutsua vastaaviin tapahtumiin. Säilytämme näitä tietoja {date} asti, ellet peruuta suostumusta tai anna uutta suostumusta.",
       "addressBookOptOut": "Poista tietoni osoitekirjasta",
       "consentFutureEffect": "Jos peruutat sen, et enää saa viestejä tulevista tapahtumista ja poistut osoitekirjasta kaikkien ilmoittautumistesi osalta.",
+      "consentFutureGive": "Suostun tuleviin viesteihin",
+      "consentFutureGiveEffect": "Palaat tapahtumien osoitekirjaan tämän ilmoittautumisen nimellä ja organisaatiolla ja saat taas kutsuja; säilytysaika alkaa alusta tänään.",
+      "consentGiveDone": "Suostumus annettu: se on voimassa seuraavasta huoneeseen tulosta alkaen.",
+      "consentFutureGiveDone": "Suostumus annettu: olet taas tapahtumien osoitekirjassa.",
+      "consentGiveTextChanged": "Suostumuksen teksti muuttui sen jälkeen, kun avasit sivun: lataa se uudelleen lukeaksesi uuden.",
+      "consentGiveClosed": "Tätä suostumusta ei voi enää antaa täältä: tapahtuma on päättynyt tai ei enää pyydä sitä. Lataa sivu uudelleen nähdäksesi nykyisen tilan.",
+      "consentGiveNewText": "Tämän suostumuksen teksti muuttui sen jälkeen, kun annoit sen: nykyiselle tekstille se on annettava uudelleen.",
       "addressBookPendingTitle": "Paluu osoitekirjaan odottaa vahvistusta",
       "addressBookPendingBody": "Tässä ilmoittautumisessa valittiin osoitekirjan valintaruutu, mutta tämä osoite oli lakannut saamasta kutsuja. Mikään ei muutu, ennen kuin vahvistat.",
       "addressBookPendingEffect": "Jos vahvistat, palaat osoitekirjaan tämän ilmoittautumisen nimellä ja organisaatiolla ja saat taas kutsuja. Jos peruutat tai jos se et ollut sinä, pysyt osoitekirjan ulkopuolella etkä saa kutsuja.",
@@ -4805,7 +4826,29 @@
       "removalError": "Pyyntöä ei voitu lähettää. Yritä myöhemmin uudelleen.",
       "removalStatusOpen": "{date} tehty pyyntö: käsittelyssä.",
       "removalStatusClosed": "{date} tehty pyyntö: valmistui {closed}.",
-      "removalStatusRejected": "{date} tehty pyyntö: hylätty. Kirjoita rekisterinpitäjälle saadaksesi tietää syyn."
+      "removalStatusRejected": "{date} tehty pyyntö: hylätty. Kirjoita rekisterinpitäjälle saadaksesi tietää syyn.",
+      "editButton": "Korjaa nimi ja organisaatio",
+      "editScopeLegend": "Mihin ilmoittautumisiin se koskee",
+      "editScopeOne": "Vain tämä ilmoittautuminen",
+      "editScopeAll": "Kaikki ilmoittautumiseni ({count}) ja tapahtumien osoitekirja",
+      "editEffect": "Korjaus koskee seuraavia sähköposteja ja on voimassa seuraavasta huoneeseen tulosta alkaen. Se ei muuta jo tallennettua, litteroitua tai chattiin kirjoitettua eikä suostumusten todisteita.",
+      "editNameInvalid": "Nimessä on oltava 2–100 merkkiä.",
+      "editOrganizationRequired": "Tapahtuma, johon olet ilmoittautunut, vaatii organisaation: kenttää ei voi jättää tyhjäksi.",
+      "editOrganizationTooLong": "Organisaatiossa voi olla enintään 200 merkkiä.",
+      "editDone": "Tiedot korjattu.",
+      "codeWhy": "Turvallisuussyistä korjaukset ja poistot vahvistetaan koodilla, jonka lähetämme ilmoittautumisen sähköpostiosoitteeseen.",
+      "codeSend": "Lähetä minulle vahvistuskoodi",
+      "codeSent": "Lähetimme sinulle sähköpostilla 6-numeroisen koodin. Kirjoita se tähän: se on voimassa {minutes, plural, one {# minuutti} other {# minuuttia}}.",
+      "codeLabel": "Vahvistuskoodi",
+      "codeConfirmEdit": "Vahvista korjaus",
+      "codeInvalid": "Koodi on väärä tai vanhentunut. Tarkista viimeisin saamasi sähköposti tai peruuta ja pyydä uusi.",
+      "cancelTitle": "Tämän ilmoittautumisen poistaminen",
+      "cancelIntro": "Voit poistaa vain tämän ilmoittautumisen koskematta muihin tai muihin tietoihisi.",
+      "cancelButton": "Poista tämä ilmoittautuminen",
+      "cancelDeletes": "Ilmoittautuminen tähän tapahtumaan poistetaan sekä se, mitä teit sen kautta: kysymykset, äänet, chat-viestit, palaute, kyselyvastaukset, lauseesi tekstityksistä tehdyssä litteroinnissa ja jonossa olevat sähköpostit. Henkilökohtainen linkkisi lakkaa toimimasta ja paikka vapautuu.",
+      "cancelKeeps": "Muut ilmoittautumisesi, tapahtumien osoitekirja, profiilikuvasi ja vielä käsiteltävänä oleva pyyntö tallenteesta poistamisesta säilyvät. Jos tästä tapahtumasta on video tai litterointi, suostumuksesi todiste säilyy ilman nimeäsi niin kauan kuin ne ovat olemassa. Poistoa ei voi perua; niin kauan kuin tapahtumaan voi ilmoittautua, voit ilmoittautua uudelleen.",
+      "codeConfirmCancel": "Poista ilmoittautuminen",
+      "cancelDone": "Ilmoittautuminen poistettu."
     },
     "erasure": {
       "title": "Tietojesi poistaminen",

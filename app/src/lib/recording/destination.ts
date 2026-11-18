@@ -172,6 +172,9 @@ export interface PeriodoConsenso {
   withdrawnAt: string | null;
   destination?: Destinazione;
   textVersion?: number | null;
+  /** Dove era stato dato: in sala o dalla pagina dei propri dati. Assente nei
+   *  periodi scritti prima che si annotasse: in sala. */
+  source?: 'room' | 'self-service';
 }
 
 /**

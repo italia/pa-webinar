@@ -1684,6 +1684,7 @@
         "DATA_DELETED": "Dados eliminados",
         "CONSENT_RECORDED": "Consentimento registado",
         "DATA_EXPORTED": "Dados exportados",
+        "DATA_RECTIFIED": "Dados corrigidos",
         "CONSENT_WITHDRAWN": "Consentimento retirado",
         "RECORDING_CONTENT_READ": "Conteúdo da gravação lido pela equipa",
         "RECORDING_REDACTION_REQUESTED": "Remoção de uma gravação pedida",
@@ -2147,6 +2148,7 @@
         "DATA_DELETED": "Dados eliminados",
         "CONSENT_RECORDED": "Consentimento registado",
         "DATA_EXPORTED": "Dados exportados",
+        "DATA_RECTIFIED": "Dados corrigidos",
         "CONSENT_WITHDRAWN": "Consentimento retirado",
         "RECORDING_CONTENT_READ": "Conteúdo da gravação lido pela equipa"
       }
@@ -4129,7 +4131,8 @@
         },
         "sources": {
           "registration": "inscrição",
-          "room": "sala"
+          "room": "sala",
+          "self-service": "Os meus dados"
         },
         "roles": {
           "registrant": "inscrito",
@@ -4276,7 +4279,17 @@
     "addressBookNote": "Está na agenda de eventos, para ser convidado para eventos semelhantes: pode retirar o consentimento a qualquer momento.",
     "addressBookPendingNote": "Nesta inscrição foi assinalada a caixa da agenda de eventos, mas este endereço tinha deixado de receber convites. Se o pedido for seu, pode confirmá-lo na página dos seus dados, com a ligação abaixo. Se não for, ignore esta mensagem: fica fora da agenda e não recebe convites.",
     "addressBookOptOutLink": "Remover os meus dados da agenda",
-    "myDataLink": "Os seus dados: consultá-los, corrigi-los, retirar um consentimento ou cancelar a inscrição"
+    "myDataLink": "Os seus dados: consultá-los, corrigi-los, retirar um consentimento ou cancelar a inscrição",
+    "confirmationCode": {
+      "subject": "{site}: código de confirmação",
+      "heading": "O seu código de confirmação",
+      "introEdit": "Pediu para corrigir o nome e o organismo da sua inscrição em «{event}».",
+      "introEditAll": "Pediu para corrigir o nome e o organismo de todas as suas inscrições.",
+      "introCancel": "Pediu para eliminar a sua inscrição em «{event}».",
+      "codeLabel": "O código é:",
+      "instructions": "Escreva-o na página Os meus dados a partir da qual fez o pedido. É válido durante {minutes, plural, one {# minuto} other {# minutos}}.",
+      "ignore": "Se não foi você a fazer o pedido, ignore este e-mail: sem o código nada muda. Não partilhe o código com ninguém."
+    }
   },
   "home": {
     "hero": {
@@ -4773,6 +4786,7 @@
       "consentFuture": "Comunicações futuras",
       "consentWithdrawnOn": "Retirado em {date}",
       "consentNoteInRoom": "Se estiver agora na sala, a retirada vale a partir da próxima entrada: para a aplicar de imediato, use Consentimentos na sala.",
+      "consentGiveNoteInRoom": "Um consentimento dado aqui vale a partir da sua próxima entrada na sala, não para o que já foi gravado. A gravação e a transcrição podem ser consentidas até ao fim do evento.",
       "proofsTitle": "Provas dos consentimentos conservadas",
       "proofsIntro": "Os dados destes eventos foram eliminados. Estas provas ficam enquanto o vídeo ou a transcrição existirem. Pode retirar o consentimento: o que já está no vídeo fica e, para o retirar, tem de escrever ao responsável pelo tratamento.",
       "proofGivenOn": "Dado em {date}",
@@ -4788,6 +4802,13 @@
       "addressBookIntro": "Escolheu ficar na agenda para ser convidado para eventos semelhantes. Conservamos estes dados até {date}, salvo retirada ou novo consentimento.",
       "addressBookOptOut": "Remover os meus dados da agenda",
       "consentFutureEffect": "Se o retirar, deixa de receber comunicações sobre próximos eventos e sai da lista de contactos, para todas as suas inscrições.",
+      "consentFutureGive": "Dou o meu consentimento a comunicações futuras",
+      "consentFutureGiveEffect": "Regressa à agenda de eventos com o nome e o organismo desta inscrição e volta a receber convites; o prazo de conservação recomeça hoje.",
+      "consentGiveDone": "Consentimento dado: vale a partir da sua próxima entrada na sala.",
+      "consentFutureGiveDone": "Consentimento dado: voltou a estar na agenda de eventos.",
+      "consentGiveTextChanged": "O texto do consentimento mudou depois de abrir a página: recarregue-a para ler o novo.",
+      "consentGiveClosed": "Este consentimento já não pode ser dado aqui: o evento terminou ou já não o pede. Recarregue a página para ver o estado atual.",
+      "consentGiveNewText": "O texto deste consentimento mudou depois de o ter dado: para o texto atual tem de ser dado de novo.",
       "addressBookPendingTitle": "Regresso à agenda por confirmar",
       "addressBookPendingBody": "Nesta inscrição foi assinalada a caixa da agenda, mas este endereço tinha deixado de receber convites. Até confirmar, nada muda.",
       "addressBookPendingEffect": "Se confirmar, regressa à agenda com o nome e o organismo desta inscrição e volta a receber convites. Se cancelar, ou se não tiver sido você, fica fora da agenda e não recebe convites.",
@@ -4805,7 +4826,29 @@
       "removalError": "Não foi possível enviar o pedido. Tente novamente mais tarde.",
       "removalStatusOpen": "Pedido de {date}: em tratamento.",
       "removalStatusClosed": "Pedido de {date}: concluído em {closed}.",
-      "removalStatusRejected": "Pedido de {date}: recusado. Escreva ao responsável pelo tratamento para saber o motivo."
+      "removalStatusRejected": "Pedido de {date}: recusado. Escreva ao responsável pelo tratamento para saber o motivo.",
+      "editButton": "Corrigir nome e organismo",
+      "editScopeLegend": "A que inscrições se aplica",
+      "editScopeOne": "Apenas esta inscrição",
+      "editScopeAll": "Todas as minhas inscrições ({count}) e a agenda de eventos",
+      "editEffect": "A correção vale para os próximos e-mails e a partir da sua próxima entrada na sala. Não altera o que já foi gravado, transcrito ou escrito no chat, nem as provas dos consentimentos.",
+      "editNameInvalid": "O nome deve ter entre 2 e 100 caracteres.",
+      "editOrganizationRequired": "Um evento em que está inscrito pede o organismo: não pode ficar vazio.",
+      "editOrganizationTooLong": "O organismo pode ter no máximo 200 caracteres.",
+      "editDone": "Dados corrigidos.",
+      "codeWhy": "Por segurança, as correções e as eliminações são confirmadas com um código que enviamos para o endereço de e-mail da inscrição.",
+      "codeSend": "Enviar-me o código de confirmação",
+      "codeSent": "Enviámos-lhe por e-mail um código de 6 dígitos. Escreva-o aqui: é válido durante {minutes, plural, one {# minuto} other {# minutos}}.",
+      "codeLabel": "Código de confirmação",
+      "codeConfirmEdit": "Confirmar a correção",
+      "codeInvalid": "O código não está correto ou expirou. Verifique o último e-mail recebido, ou cancele e peça um novo.",
+      "cancelTitle": "Eliminar esta inscrição",
+      "cancelIntro": "Pode eliminar apenas esta inscrição, sem mexer nas outras nem no resto dos seus dados.",
+      "cancelButton": "Eliminar esta inscrição",
+      "cancelDeletes": "São eliminados a inscrição neste evento e o que fez com ela: perguntas, votos, mensagens no chat, comentários, respostas a questionários, as suas frases na transcrição das legendas e e-mails em fila. A sua ligação pessoal deixa de funcionar e o lugar fica livre.",
+      "cancelKeeps": "Mantêm-se as suas outras inscrições, a agenda de eventos, a fotografia de perfil e um pedido de remoção de uma gravação ainda em tratamento. Se deste evento existir um vídeo ou uma transcrição, a prova do seu consentimento fica sem o seu nome enquanto existirem. A eliminação não pode ser anulada; enquanto o evento aceitar inscrições, pode inscrever-se de novo.",
+      "codeConfirmCancel": "Eliminar a inscrição",
+      "cancelDone": "Inscrição eliminada."
     },
     "erasure": {
       "title": "Eliminação dos seus dados",

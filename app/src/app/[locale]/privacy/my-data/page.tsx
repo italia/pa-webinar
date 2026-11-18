@@ -21,7 +21,12 @@ import {
 } from 'design-react-kit';
 
 import RecordingRemoval, { type RimozioneVista } from '@/components/privacy/recording-removal';
-import RegistrationConsents, { type ConsensiVista } from '@/components/privacy/registration-consents';
+import RegistrationCancel from '@/components/privacy/registration-cancel';
+import RegistrationEdit, { type DatiCorretti } from '@/components/privacy/registration-edit';
+import RegistrationConsents, {
+  type ConsensiVista,
+  type OffertaVista,
+} from '@/components/privacy/registration-consents';
 import RetainedConsentProofs, {
   type ProvaConservataVista,
 } from '@/components/privacy/retained-consent-proofs';
@@ -41,6 +46,8 @@ interface ExportEventData {
 interface ExportRegistration {
   id: string;
   consents: ConsensiVista;
+  /** I consensi che si possono dare di nuovo da qui, con il loro testo. */
+  consentOffer?: OffertaVista;
   displayName: string;
   email: string | null;
   organization: string | null;
@@ -117,6 +124,7 @@ const GRANT_ROLE_KEY = {
 
 export default function MyDataPage() {
   const t = useTranslations('gdpr.export');
+  const tCancellazione = useTranslations('gdpr.erasure');
   const tConsensi = useTranslations('live.consents');
   const locale = useLocale();
   const searchParams = useSearchParams();
@@ -139,6 +147,9 @@ export default function MyDataPage() {
   const [voce, setVoce] = useState<VoceNelVideo>('rimovibile');
   const [comunicazioniRitirateIl, setComunicazioniRitirateIl] = useState<string | null>(null);
   const [rubricaConfermata, setRubricaConfermata] = useState(false);
+  // Le iscrizioni cancellate da qui, con le prove rimaste senza nome: la scheda
+  // resta per dirlo, senza piu' dati.
+  const [cancellate, setCancellate] = useState<Map<string, number>>(new Map());
   const format = useFormatter();
 
   // When the user lands here via the signed link emailed to them, the
@@ -190,6 +201,33 @@ export default function MyDataPage() {
       cancelled = true;
     };
   }, [token, t]);
+
+  // Una correzione si vede subito: sull'iscrizione, o su tutte quelle
+  // dell'indirizzo e sulla voce di rubrica.
+  const corretta = useCallback((registrationId: string, dati: DatiCorretti) => {
+    const nuovi = { displayName: dati.displayName, organization: dati.organization };
+    setResults((prima) =>
+      prima
+        ? prima.map((e) =>
+            dati.scope === 'address' || e.registration.id === registrationId
+              ? { ...e, registration: { ...e.registration, ...nuovi } }
+              : e
+          )
+        : prima
+    );
+    if (dati.scope === 'address') {
+      setRubrica((prima) =>
+        prima?.optedIn ? { ...prima, name: dati.displayName, organization: dati.organization } : prima
+      );
+    }
+  }, []);
+
+  // La conferma di una spunta in attesa, o le comunicazioni ridate, riportano
+  // l'indirizzo in rubrica: la voce mostrata sopra non dice piu' che ne e' uscito.
+  const rientroInRubrica = useCallback(() => {
+    setRubricaConfermata(true);
+    setRubrica((prima) => (prima ? { ...prima, optedIn: true, optedOutAt: null } : prima));
+  }, []);
 
   const handleSubmit = useCallback(
     async (e: FormEvent) => {
@@ -486,9 +524,32 @@ export default function MyDataPage() {
                 {t('resultsDescription', { count: results.length })}
               </p>
 
-              {results.map((entry, idx) => (
+              {results.map((entry) =>
+                cancellate.has(entry.registration.id) ? (
+                  <Card
+                    key={entry.registration.id}
+                    className="shadow-sm border-0 mb-3"
+                    style={{ borderRadius: 8, border: '1px solid #e8e8e8' }}
+                  >
+                    <CardBody className="p-4">
+                      <h3 className="h5 mb-3">
+                        {getLocalized(entry.event.title as LocalizedField, locale)}
+                      </h3>
+                      <Alert color="success" className="mb-0" role="status">
+                        <p className="mb-0">{t('cancelDone')}</p>
+                        {(cancellate.get(entry.registration.id) ?? 0) > 0 && (
+                          <p className="mb-0 mt-2">
+                            {tCancellazione('doneProofs', {
+                              count: cancellate.get(entry.registration.id) ?? 0,
+                            })}
+                          </p>
+                        )}
+                      </Alert>
+                    </CardBody>
+                  </Card>
+                ) : (
                 <Card
-                  key={idx}
+                  key={entry.registration.id}
                   className="shadow-sm border-0 mb-3"
                   style={{ borderRadius: 8, border: '1px solid #e8e8e8' }}
                 >
@@ -523,6 +584,18 @@ export default function MyDataPage() {
                     </dl>
 
                     {tokenConsensi && (
+                      <RegistrationEdit
+                        token={tokenConsensi}
+                        registrationId={entry.registration.id}
+                        displayName={entry.registration.displayName}
+                        organization={entry.registration.organization}
+                        quanteIscrizioni={results.length - cancellate.size}
+                        locale={locale}
+                        onCorretta={(dati) => corretta(entry.registration.id, dati)}
+                      />
+                    )}
+
+                    {tokenConsensi && (
                       <RegistrationConsents
                         token={tokenConsensi}
                         registrationId={entry.registration.id}
@@ -531,7 +604,9 @@ export default function MyDataPage() {
                         comunicazioniRitirateIl={comunicazioniRitirateIl}
                         onComunicazioniRitirate={setComunicazioniRitirateIl}
                         rubricaConfermata={rubricaConfermata}
-                        onRubricaConfermata={() => setRubricaConfermata(true)}
+                        onRubricaConfermata={rientroInRubrica}
+                        offerta={entry.registration.consentOffer ?? null}
+                        locale={locale}
                       />
                     )}
 
@@ -578,9 +653,25 @@ export default function MyDataPage() {
                         </ul>
                       </>
                     )}
+
+                    {tokenConsensi && (
+                      <div className="mt-3">
+                        <RegistrationCancel
+                          token={tokenConsensi}
+                          registrationId={entry.registration.id}
+                          locale={locale}
+                          onCancellata={(prove) =>
+                            setCancellate((prima) =>
+                              new Map(prima).set(entry.registration.id, prove)
+                            )
+                          }
+                        />
+                      </div>
+                    )}
                   </CardBody>
                 </Card>
-              ))}
+                )
+              )}
             </div>
           )}
         </div>

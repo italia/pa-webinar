@@ -1684,6 +1684,7 @@
         "DATA_DELETED": "Data deleted",
         "CONSENT_RECORDED": "Consent recorded",
         "DATA_EXPORTED": "Data exported",
+        "DATA_RECTIFIED": "Data corrected",
         "CONSENT_WITHDRAWN": "Consent withdrawn",
         "RECORDING_CONTENT_READ": "Recording content read by staff",
         "RECORDING_REDACTION_REQUESTED": "Removal from a recording requested",
@@ -2147,6 +2148,7 @@
         "DATA_DELETED": "Data deleted",
         "CONSENT_RECORDED": "Consent recorded",
         "DATA_EXPORTED": "Data exported",
+        "DATA_RECTIFIED": "Data corrected",
         "CONSENT_WITHDRAWN": "Consent withdrawn",
         "RECORDING_CONTENT_READ": "Recording content read by staff"
       }
@@ -4129,7 +4131,8 @@
         },
         "sources": {
           "registration": "registration",
-          "room": "room"
+          "room": "room",
+          "self-service": "My data"
         },
         "roles": {
           "registrant": "registrant",
@@ -4276,7 +4279,17 @@
     "addressBookNote": "You are in the events address book, to be invited to similar events: you can withdraw your consent at any time.",
     "addressBookPendingNote": "The events address book box was ticked on this registration, but this address had stopped receiving invitations. If the request is yours, you can confirm it from the page with your data, using the link below. If it is not, ignore this message: you stay out of the address book and receive no invitations.",
     "addressBookOptOutLink": "Remove me from the address book",
-    "myDataLink": "Your data: see it, correct it, withdraw a consent or cancel your registration"
+    "myDataLink": "Your data: see it, correct it, withdraw a consent or cancel your registration",
+    "confirmationCode": {
+      "subject": "{site}: confirmation code",
+      "heading": "Your confirmation code",
+      "introEdit": "You asked to correct the name and organization of your registration for “{event}”.",
+      "introEditAll": "You asked to correct the name and organization of all your registrations.",
+      "introCancel": "You asked to delete your registration for “{event}”.",
+      "codeLabel": "The code is:",
+      "instructions": "Enter it on the My data page you made the request from. It is valid for {minutes, plural, one {# minute} other {# minutes}}.",
+      "ignore": "If you did not make the request, ignore this email: nothing changes without the code. Do not share the code with anyone."
+    }
   },
   "home": {
     "hero": {
@@ -4773,6 +4786,7 @@
       "consentFuture": "Future communications",
       "consentWithdrawnOn": "Withdrawn on {date}",
       "consentNoteInRoom": "If you are in the room right now, the withdrawal counts from your next entry: to apply it at once, use Consents in the room.",
+      "consentGiveNoteInRoom": "A consent given here counts from your next entry into the room, not for what has already been recorded. Recording and transcription can be given until the event ends.",
       "proofsTitle": "Consent proofs kept",
       "proofsIntro": "The data for these events has been deleted. These proofs stay for as long as the video or transcript exists. You can withdraw your consent: what is already in the video stays, and to have it removed you must write to the data controller.",
       "proofGivenOn": "Given on {date}",
@@ -4788,6 +4802,13 @@
       "addressBookIntro": "You chose to stay in the address book, to be invited to similar events. We keep this data until {date}, unless you withdraw your consent or give it again.",
       "addressBookOptOut": "Remove me from the address book",
       "consentFutureEffect": "If you withdraw it you no longer receive communications about upcoming events and you leave the address book, for all your registrations.",
+      "consentFutureGive": "I consent to future communications",
+      "consentFutureGiveEffect": "You return to the events address book with the name and organization of this registration and receive invitations again; the retention period starts again today.",
+      "consentGiveDone": "Consent given: it counts from your next entry into the room.",
+      "consentFutureGiveDone": "Consent given: you are back in the events address book.",
+      "consentGiveTextChanged": "The consent text changed after you opened the page: reload it to read the new one.",
+      "consentGiveClosed": "This consent can no longer be given from here: the event has ended or no longer asks for it. Reload the page to see the current status.",
+      "consentGiveNewText": "The text of this consent changed after you gave it: for the current text it has to be given again.",
       "addressBookPendingTitle": "Return to the address book to confirm",
       "addressBookPendingBody": "The address book box was ticked on this registration, but this address had stopped receiving invitations. Nothing changes until you confirm.",
       "addressBookPendingEffect": "If you confirm, you return to the address book with the name and organisation of this registration and receive invitations again. If you cancel, or if it was not you, you stay out of the address book and receive no invitations.",
@@ -4805,7 +4826,29 @@
       "removalError": "The request could not be sent. Try again later.",
       "removalStatusOpen": "Request of {date}: being processed.",
       "removalStatusClosed": "Request of {date}: completed on {closed}.",
-      "removalStatusRejected": "Request of {date}: rejected. Write to the controller to learn why."
+      "removalStatusRejected": "Request of {date}: rejected. Write to the controller to learn why.",
+      "editButton": "Correct name and organization",
+      "editScopeLegend": "Which registrations it applies to",
+      "editScopeOne": "Only this registration",
+      "editScopeAll": "All my registrations ({count}) and the events address book",
+      "editEffect": "The correction applies to the next emails and from your next entry into the room. It does not change what has already been recorded, transcribed or written in the chat, nor the consent proofs.",
+      "editNameInvalid": "The name must have between 2 and 100 characters.",
+      "editOrganizationRequired": "An event you are registered for asks for the organization: it cannot be left empty.",
+      "editOrganizationTooLong": "The organization can have at most 200 characters.",
+      "editDone": "Data corrected.",
+      "codeWhy": "For security, corrections and deletions are confirmed with a code we send to the email address of the registration.",
+      "codeSend": "Send me the confirmation code",
+      "codeSent": "We have emailed you a 6-digit code. Enter it here: it is valid for {minutes, plural, one {# minute} other {# minutes}}.",
+      "codeLabel": "Confirmation code",
+      "codeConfirmEdit": "Confirm the correction",
+      "codeInvalid": "The code is wrong or has expired. Check the latest email you received, or cancel and ask for a new one.",
+      "cancelTitle": "Delete this registration",
+      "cancelIntro": "You can delete only this registration, without touching the others or the rest of your data.",
+      "cancelButton": "Delete this registration",
+      "cancelDeletes": "The registration for this event is deleted with what you did through it: questions, votes, chat messages, feedback, questionnaire answers, your sentences in the transcript from captions and queued emails. Your personal link stops working and the seat is freed.",
+      "cancelKeeps": "Your other registrations, the events address book, your profile photo and a request of removal from a recording still being handled stay. If this event has a video or a transcript, the proof of your consent stays without your name for as long as they exist. The deletion cannot be undone; while the event takes registrations you can register again.",
+      "codeConfirmCancel": "Delete the registration",
+      "cancelDone": "Registration deleted."
     },
     "erasure": {
       "title": "Erase your data",
