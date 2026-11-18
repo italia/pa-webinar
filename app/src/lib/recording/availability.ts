@@ -60,6 +60,33 @@ export function voceNelVideo(env: Record<string, string | undefined> = process.e
   return env.RECORDING_VOICE_EXCLUSION?.trim() === 'true' ? 'rimovibile' : 'fissa';
 }
 
+/** Come compaiono i partecipanti nel video completo: vedi `partecipantiNelVideo`. */
+export type PartecipantiNelVideo = 'assente' | 'solo-voce' | 'esclusi' | 'visibili';
+
+/**
+ * Come compaiono nel video completo i partecipanti, cioe' chi non conduce (il
+ * token di chi conduce porta `paInVideo`):
+ *   - 'assente': non c'e' un video completo (niente Jibri);
+ *   - 'solo-voce': mai volto, nome o riquadro; la voce di chi ha il consenso si';
+ *   - 'esclusi': mai volto, nome o riquadro, e nemmeno la voce: il testo della
+ *     conferenza non la riproduce (le tracce per persona restano);
+ *   - 'visibili': la sessione del registratore non legge i segni di Prosody
+ *     (Jitsi esterno, testo della conferenza sostituito), e i partecipanti
+ *     possono comparire con volto e nome, anche in silenzio nelle miniature. Qui
+ *     la promessa «volto e nome non compaiono mai» non vale.
+ * Il modulo Prosody segna chi non conduce in ogni installazione; lo onora la
+ * sessione con il testo che il chart dichiara con RECORDING_VOICE_EXCLUSION, e
+ * la voce la riproduce il testo che dichiara con RECORDING_PARTICIPANT_VOICE.
+ */
+export function partecipantiNelVideo(
+  env: Record<string, string | undefined> = process.env,
+): PartecipantiNelVideo {
+  const voce = voceNelVideo(env);
+  if (voce === 'assente') return 'assente';
+  if (voce === 'fissa') return 'visibili';
+  return env.RECORDING_PARTICIPANT_VOICE?.trim() === 'true' ? 'solo-voce' : 'esclusi';
+}
+
 /**
  * Se c'e' qualcosa che possa registrare questo evento: la regola unica di scheda
  * privacy, modulo d'iscrizione, sala d'attesa, sala e token. Senza un video
