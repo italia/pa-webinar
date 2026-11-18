@@ -461,11 +461,11 @@ describe('POST registrations — la destinazione del video nel consenso', () => 
     expect(iscrizioneScritta()).toMatchObject({
       consentRecording: true,
       consentRecordingDestination: 'REGISTRANTS',
-      consentRecordingVersion: 1,
+      consentRecordingVersion: 2,
     });
     expect(auditScritto()).toMatchObject({
       consentRecordingDestination: 'REGISTRANTS',
-      consentRecordingVersion: 1,
+      consentRecordingVersion: 2,
     });
   });
 
@@ -522,7 +522,7 @@ describe('POST registrations — la destinazione del video nel consenso', () => 
     expect(res.status).toBe(201);
     expect(iscrizioneScritta()).toMatchObject({
       consentRecordingDestination: 'PUBLIC',
-      consentRecordingVersion: 1,
+      consentRecordingVersion: 2,
     });
   });
 

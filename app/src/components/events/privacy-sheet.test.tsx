@@ -407,7 +407,6 @@ describe('schedaInSala, la scheda con i flag di adesso', () => {
         },
         { sottotitoli: true, chat: true, domande: true, conduce: true }
       );
-    const g = messages.gdpr.consent;
 
     it('compare con il proprio nome anche dove il pubblico ha uno pseudonimo', () => {
       const testo = disegna(conScheda({ chiNonAcconsente: 'restaFuori' }));
@@ -415,27 +414,22 @@ describe('schedaInSala, la scheda con i flag di adesso', () => {
       expect(testo).not.toContain(t.name.pseudonym);
     });
 
-    it.each(['soloAscolto', 'avviso'] as const)(
-      'dove la voce resta nel video non legge «%s»: lo riprende comunque',
+    it.each(['soloAscolto', 'avviso', 'avvisoVoce', 'restaFuori'] as const)(
+      'dove c\'e\' un video non legge cosa succede a chi nega («%s»): e\' nel video',
       (chiNonAcconsente) => {
-        const testo = disegna(conScheda({ chiNonAcconsente }));
-        expect(testo).toContain(g.recordingOptionalHost);
+        const testo = disegna(conScheda({ chiNonAcconsente, conduceSempre: true }));
+        expect(testo).toContain(t.recording.hostsAlways);
+        expect(testo).not.toContain(t.recording.refuseOut);
         expect(testo).not.toContain(t.recording.refuseListenOnly);
         expect(testo).not.toContain(t.recording.audienceNotice);
+        expect(testo).not.toContain(t.recording.audienceNoticeVoice);
       }
     );
 
-    it('dove la voce si toglie dal video resta fuori, senza la promessa al pubblico', () => {
-      const testo = disegna(conScheda({ chiNonAcconsente: 'avvisoVoce' }));
-      expect(testo).toContain(t.recording.refuseOut);
-      expect(testo).not.toContain(t.recording.audienceNoticeVoice);
-    });
-
-    it('dove conduce sempre nella registrazione non legge cosa succede a chi nega', () => {
-      const testo = disegna(conScheda({ chiNonAcconsente: 'restaFuori', conduceSempre: true }));
-      expect(testo).toContain(t.recording.hostsAlways);
+    it('senza un video non legge una scelta che non gli si offre: restano le tracce', () => {
+      const testo = disegna(conScheda({ chiNonAcconsente: 'avvisoVoce', conduceSempre: false }));
       expect(testo).not.toContain(t.recording.refuseOut);
-      expect(testo).not.toContain(g.recordingOptionalHost);
+      expect(testo).not.toContain(t.recording.audienceNoticeVoice);
     });
 
     it('la scheda di chi partecipa non cambia', () => {

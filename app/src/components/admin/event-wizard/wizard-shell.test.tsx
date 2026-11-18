@@ -4020,7 +4020,7 @@ describe('i valori del formato', () => {
     goToStep('review');
     expect(container.textContent).toContain(w.step5.summary.recordingOff);
     expect(container.textContent).not.toContain(w.flow.recordingDestinationReserved);
-    expect(container.textContent).not.toContain(w.flow.consentsHosts);
+    expect(container.textContent).not.toContain(w.flow.consentsHostsAlways);
     goToStep('permissions');
     expect(container.textContent).not.toContain(w.step2.feature.recording_control.label);
   });

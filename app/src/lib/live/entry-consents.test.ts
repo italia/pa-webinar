@@ -29,22 +29,10 @@ describe('consensoRegistrazioneIngresso', () => {
     expect(consensoRegistrazioneIngresso({ ...base, giaDato: true }).richiesto).toBe(false);
   });
 
-  it('moderatori e relatori lo danno in ogni evento che registra, facoltativo', () => {
-    expect(consensoRegistrazioneIngresso({ ...base, conduce: true })).toEqual({
-      richiesto: true,
-      soloAscolto: false,
-    });
-    // Anche quando chi partecipa e' di solo ascolto: e' la loro voce a essere registrata.
-    expect(consensoRegistrazioneIngresso({ ...base, formato: soloAscolto, conduce: true })).toEqual({
-      richiesto: true,
-      soloAscolto: false,
-    });
-  });
-
-  it('l\'evento che tiene chi conduce sempre nella registrazione non glielo chiede', () => {
-    const sempre = { ...base, conduceSempreRegistrato: true };
-    expect(consensoRegistrazioneIngresso({ ...sempre, conduce: true }).richiesto).toBe(false);
-    expect(consensoRegistrazioneIngresso(sempre).richiesto).toBe(true);
+  it('moderatori e relatori non lo danno: sono sempre nel video', () => {
+    const niente = { richiesto: false, soloAscolto: false };
+    expect(consensoRegistrazioneIngresso({ ...base, conduce: true })).toEqual(niente);
+    expect(consensoRegistrazioneIngresso({ ...base, formato: soloAscolto, conduce: true })).toEqual(niente);
   });
 
   it('moderatori e relatori: non a chi l\'ha gia\' dato, non senza registrazione, non in una chiamata rapida', () => {

@@ -665,7 +665,8 @@ function TemplateForm({
             ['postEventShowQA', tPost('showQA')],
             ['offerAddressBook', t('offerAddressBook')],
             ['audienceAnonymous', tw('audienceAnonymous')],
-            ['hostsAlwaysRecorded', tw('hostsAlwaysRecorded')],
+            // Chi conduce e' sempre nel video (lib/live/consent-rule): non e'
+            // piu' una scelta, e il modello non la propone.
           ] as const
         )
           // Senza il servizio dei sottotitoli non c'e' niente da scegliere.

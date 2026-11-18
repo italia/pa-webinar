@@ -10,7 +10,7 @@ import {
 import { domandePubblicabili } from '@/lib/events/post-event-sections';
 import { tracceConfigurate } from '@/lib/live/capture-state';
 import {
-  conduceSempreRegistrato,
+  conduceNelVideo,
   regolaConsenso,
   type VoceNelVideo,
 } from '@/lib/live/consent-rule';
@@ -56,20 +56,13 @@ export type DestinazioneScheda = RecordingAudience | 'nonDichiarata';
 
 /**
  * Cosa succede a chi non acconsente:
- *  - `restaFuori`: partecipa e non entra nella registrazione;
+ *  - `restaFuori`: partecipa, e la sua voce non entra nella registrazione;
  *  - `soloAscolto`: la voce non si toglie dal video, quindi partecipa ascoltando;
  *  - `avviso`: il pubblico non ha microfono, videocamera e schermo e non c'e'
  *    niente da chiedere, finche' chi conduce non gli da' la parola;
  *  - `avvisoVoce`: come sopra, e chi riceve la parola acconsente in sala;
- *  - `conduceRipreso`: solo per chi conduce, che legge la scheda in sala
- *    (`schedaInSala`): la voce non si toglie dal video, che continua a riprenderlo.
  */
-export type ChiNonAcconsente =
-  | 'restaFuori'
-  | 'soloAscolto'
-  | 'avviso'
-  | 'avvisoVoce'
-  | 'conduceRipreso';
+export type ChiNonAcconsente = 'restaFuori' | 'soloAscolto' | 'avviso' | 'avvisoVoce';
 
 export interface SchedaPrivacy {
   registrazione: {
@@ -78,7 +71,8 @@ export interface SchedaPrivacy {
     destinazione: DestinazioneScheda | null;
     /** Null se non si registra niente. */
     chiNonAcconsente: ChiNonAcconsente | null;
-    /** Chi conduce e' sempre nella registrazione (lib/live/consent-rule). */
+    /** C'e' un video, e chi conduce ci e' sempre, con nome e immagine; chi
+     *  partecipa mai, solo la sua voce con il consenso (lib/live/consent-rule). */
     conduceSempre: boolean;
   };
   trascrizione: {
@@ -242,7 +236,7 @@ export function schedaPrivacy({
         ? (destinazioneDelTesto(evento.recordingDestination, voce) ?? 'nonDichiarata')
         : null,
       chiNonAcconsente: siRegistra ? chiNonAcconsente(evento, ambiente) : null,
-      conduceSempre: siRegistra && conduceSempreRegistrato(evento, voce),
+      conduceSempre: siRegistra && conduceNelVideo(voce),
     },
     trascrizione: {
       chiesta: trascrizioneRichiesta({

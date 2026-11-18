@@ -20,7 +20,6 @@ import {
   destinazioneDelTesto,
   recuperoAperto,
 } from '@/lib/recording/destination';
-import { registraChiConduce } from '@/lib/live/entry-consents';
 import { informativaEvento } from '@/lib/events/privacy-notice';
 import { schedaPrivacyEvento, testoIaDelSito } from '@/lib/events/privacy-sheet';
 import LiveEventClient from '@/components/live/live-event-client';
@@ -225,7 +224,6 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             waitingRoomEngine: event.audienceAnonymous ? 'CLASSIC' : (event.waitingRoomEngine ?? settings.waitingRoomEngine),
             audienceAnonymous: event.audienceAnonymous,
             participantListVisible: elencoVisibileAlPubblico(event),
-            hostsAlwaysRecorded: event.hostsAlwaysRecorded,
             recordingDestination: event.recordingDestination,
             recordingAudience: event.recordingAudience,
             tracceConservate: traccePerPersonaConservate(event, settings),
@@ -413,29 +411,23 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
     // di chi l'ha ricevuto.
     iscrizioneEntrata = ownsToken && registration.joinedAt !== null;
   } else if (isPrimaryModerator) {
-    // Chi conduce dal link primario con la sessione del proprio account: i
-    // consensi dati a un ingresso precedente non si richiedono, e si possono
-    // ritirare da questo. Solo qui, dove dietro il link c'e' una persona: un
-    // link nominale puo' essere inoltrato, e chi lo apre non eredita il consenso
-    // di un altro (lo da' a ogni visita della pagina).
+    // Chi conduce dal link primario con la sessione del proprio account: il
+    // consenso alla trascrizione dato a un ingresso precedente non si richiede, e
+    // si puo' ritirare da questo. Solo qui, dove dietro il link c'e' una persona:
+    // un link nominale puo' essere inoltrato, e chi lo apre non eredita il
+    // consenso di un altro (lo da' a ogni visita della pagina). Alla
+    // registrazione chi conduce non acconsente: e' sempre nel video
+    // (lib/live/consent-rule).
     const staff = await staffDietroIlPrimario(event.id);
-    if (staff) {
-      const dellAccount = { eventId: event.id, staffAccountId: staff.accountId, withdrawnAt: null };
-      const [proveStaff, tracceStaff] = await Promise.all([
-        registraChiConduce(event, canRecord, voce)
-          ? prisma.recordingConsent.findMany({ where: dellAccount, select: { destination: true } })
-          : [],
-        chiedeConsensoPerVoce(event, settings)
-          ? prisma.multitrackConsent.count({
-              where: {
-                ...dellAccount,
-                textVersion: { gte: versioneConsensoTrascrizione(event, settings) },
-              },
-            })
-          : 0,
-      ]);
-      // Una prova per ingresso: basta che una copra il testo in vigore.
-      hasRecordingConsent = proveStaff.some((p) => consensoCopre(p.destination, destinazione));
+    if (staff && chiedeConsensoPerVoce(event, settings)) {
+      const tracceStaff = await prisma.multitrackConsent.count({
+        where: {
+          eventId: event.id,
+          staffAccountId: staff.accountId,
+          withdrawnAt: null,
+          textVersion: { gte: versioneConsensoTrascrizione(event, settings) },
+        },
+      });
       hasMultitrackConsent = tracceStaff > 0;
     }
   }
@@ -459,7 +451,6 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         waitingRoomEngine: event.audienceAnonymous ? 'CLASSIC' : (event.waitingRoomEngine ?? settings.waitingRoomEngine),
         audienceAnonymous: event.audienceAnonymous,
         participantListVisible: elencoVisibileAlPubblico(event),
-        hostsAlwaysRecorded: event.hostsAlwaysRecorded,
         recordingDestination: event.recordingDestination,
         recordingAudience: event.recordingAudience,
         tracceConservate: traccePerPersonaConservate(event, settings),

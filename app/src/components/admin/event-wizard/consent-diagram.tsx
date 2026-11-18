@@ -7,11 +7,7 @@ import { useId, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { Icon } from '@/components/ui/icon';
-import {
-  conduceSempreRegistrato,
-  regolaConsenso,
-  type VoceNelVideo,
-} from '@/lib/live/consent-rule';
+import { regolaConsenso, type VoceNelVideo } from '@/lib/live/consent-rule';
 import { consensiRichiesti } from '@/lib/registration/consents';
 
 /**
@@ -19,7 +15,9 @@ import { consensiRichiesti } from '@/lib/registration/consents';
  * diagramma che chi organizza apre quando serve: si mostra solo su un evento che
  * registra, dove si puo' registrare. Esce dalla stessa regola della
  * rotta del token e della sala (lib/live/consent-rule), con le scelte fatte fin
- * qui: quello che mostra e' quello che succedera'.
+ * qui: quello che mostra e' quello che succedera'. I rami sono di chi partecipa,
+ * che nel video non compare mai: con il consenso si registra la sua voce. Chi
+ * conduce e' sempre nel video, e lo dice una nota.
  */
 export default function ConsentDiagram({
   multitrackRecordingEnabled,
@@ -28,7 +26,6 @@ export default function ConsentDiagram({
   participantsCanUnmute,
   participantsCanStartVideo,
   participantsCanShareScreen,
-  hostsAlwaysRecorded,
   voce,
 }: {
   multitrackRecordingEnabled: boolean;
@@ -38,7 +35,6 @@ export default function ConsentDiagram({
   participantsCanUnmute: boolean;
   participantsCanStartVideo: boolean;
   participantsCanShareScreen: boolean;
-  hostsAlwaysRecorded: boolean;
   voce: VoceNelVideo;
 }) {
   const t = useTranslations('admin.wizard.consentMap');
@@ -67,13 +63,8 @@ export default function ConsentDiagram({
     !conRami && t('fixedNotice'),
     !regola.soloAscolto && conRami && t('othersSame'),
     puoRestareFuori && !regola.richiesto && t('audienceNotice'),
-    voce === 'fissa' && t('hostsFixed'),
-    puoRestareFuori &&
-      t(
-        conduceSempreRegistrato({ hostsAlwaysRecorded }, voce)
-          ? 'hostsAlways'
-          : 'hostsChoose'
-      ),
+    // Chi conduce e' nel video sempre, senza casella (lib/live/consent-rule).
+    !senzaVideo && t('hostsAlways'),
     puoRestareFuori && t('trace'),
     conRami && t('anytime'),
     !senzaVideo && consensi.tracce && t('transcription'),

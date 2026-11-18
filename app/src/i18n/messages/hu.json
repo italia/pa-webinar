@@ -545,7 +545,9 @@
       "locksByConsent": "A mikrofonok és kamerák a felvételhez adott hozzájárulást követik: aki megadta, használja, amit az esemény enged, a többiek csak hallgatnak. A terem zárolásai bekapcsolva maradnak.",
       "listenOnlyBadge": "csak hallgat",
       "listenOnlyNoFloor": "Nem járult hozzá a felvételhez: amíg a saját termében hozzá nem járul, nem szólalhat fel.",
-      "voiceExcludedBadge": "rögzítés nélkül",
+      "inVideoBadge": "a videón",
+      "voiceRecordedBadge": "hang rögzítve",
+      "voiceExcludedBadge": "hang nincs rögzítve",
       "voiceExcludedFloor": "Nem járult hozzá a felvételhez: felszólalhat, de kimarad a felvételből."
     },
     "moderator": {
@@ -691,7 +693,7 @@
         "without": {
           "soloAscolto": "E hozzájárulás nélkül csak hallgatóként vesz részt: a mikrofon, a kamera és a képernyő zárva marad.",
           "conduce": "E hozzájárulás nélkül is vezetheti az eseményt.",
-          "voce": "E hozzájárulás nélkül ugyanúgy részt vesz, de kimarad a felvételből: sem a neve, sem a hangja, sem a képe nem szerepel.",
+          "voce": "E hozzájárulás nélkül ugyanúgy részt vesz, mint mindenki, de a hangja kimarad a felvételből. Az arca és a neve egyébként sem jelenik meg soha a videón.",
           "comeTutti": "E hozzájárulás nélkül ugyanúgy részt vesz, mint mindenki más."
         },
         "withoutTranscriptHost": "A hangja nem marad meg a személyenkénti sávokban és az átiratban.",
@@ -716,16 +718,16 @@
     },
     "recordingQuestion": {
       "title": "A hívásról felvétel készül",
-      "question": "Szeretne szerepelni a felvételen?",
-      "body": "Ha igennel válaszol, a hívás néhány másodpercre újracsatlakozik, és attól kezdve a neve, a hangja és a képe a felvétel része. Ha nemmel válaszol, vagy bezárja ezt az ablakot, ugyanúgy részt vesz, mint eddig, és kimarad a felvételből.",
+      "question": "Szeretné, hogy rögzítsük a hangját?",
+      "body": "A videón csak a moderátorok jelennek meg: az Ön arca és neve soha. Ha igennel válaszol, a hívás néhány másodpercre újracsatlakozik, és attól kezdve a hangját rögzítjük, amikor beszél. Ha nemmel válaszol, vagy bezárja ezt az ablakot, ugyanúgy részt vesz, mint eddig, és a hangját nem rögzítjük.",
       "later": "Ha nemmel válaszol, a következő felvételnél újra megkérdezzük. Bármikor meggondolhatja magát a felső {button} gombbal.",
-      "yes": "Igen, szerepelni szeretnék",
-      "no": "Nem, nélkülem"
+      "yes": "Igen, rögzítsék a hangomat",
+      "no": "Nem, ne rögzítsék"
     },
     "voiceExcluded": {
       "title": "Rögzítés nélkül vesz részt.",
       "consent": "Hozzájárulok a rögzítéshez",
-      "body": "Nem járult hozzá a felvételhez: ugyanúgy részt vesz, de a neve, a hangja és a képe nem kerül a felvételbe."
+      "body": "Nem járult hozzá a felvételhez: ugyanúgy részt vesz, mint mindenki, de a hangja kimarad a felvételből. Az arca és a neve egyébként sem jelenik meg soha a videón."
     }
   },
   "qa": {
@@ -1074,7 +1076,7 @@
         "participantListCameraNote": "Rejtett listánál aki bekapcsolja a kameráját, nem látja a saját képét. Olyan találkozónál, ahol mindenki látja egymást, jelenítse meg a listát.",
         "recordingLockedLive": "Nyitott teremnél a rögzítés nem módosítható: az első belépéstől érvényes.",
         "hostsAlwaysRecorded": "Az esemény vezetői mindig szerepelnek a felvételen",
-        "hostsAlwaysRecordedDesc": "Kikapcsolva a moderátorok és az előadók is úgy döntenek, mint mindenki más. Csak akkor kapcsolja be, ha már beleegyeztek a felvételbe: nem látják a jelölőnégyzetet, és az esemény adatkezelési tájékoztatójának ezt jeleznie kell."
+        "hostsAlwaysRecordedDesc": "A moderátorok és az előadók névvel és képpel jelennek meg a videón, jelölőnégyzet nélkül: az esemény adatvédelmi tájékoztatójának ezt ki kell mondania. A résztvevőknek csak a hangját rögzítjük, és csak a hozzájárulásukkal."
       },
       "step3": {
         "heading": "Személyek és meghívók",
@@ -1376,7 +1378,6 @@
         "consentRecordingNotice": "a felvételhez csak tájékoztatás (a résztvevők nem beszélnek és nem látszanak)",
         "consentTranscription": "a saját hozzászólások átirata, önkéntes",
         "consentsNone": "Nincs kérendő hozzájárulás: a regisztrációkor elegendő az adatvédelmi tájékoztató tudomásulvétele.",
-        "consentsHosts": "A moderátoroktól és előadóktól a teremben kérjük a felvételhez való hozzájárulást, önkéntesen.",
         "consentsWithdraw": "A résztvevők a teremben a „Hozzájárulások” gombbal vonhatják vissza őket.",
         "participantListShown": "Résztvevők listája: mindenki számára látható.",
         "participantListHidden": "Résztvevők listája: csak a házigazdáknak és az előadóknak.",
@@ -1459,22 +1460,20 @@
         "recording": "A felvételen",
         "roomSame": "Az esemény szabályai szerint vesz részt.",
         "roomListenOnly": "Csak hallgat és csetel.",
-        "recordedFull": "Név, hang, kép és megosztott képernyő.",
+        "recordedFull": "Csak a hangja, amikor beszél: arc és név soha nem jelenik meg.",
         "notRecorded": "Nem szerepel: sem név, sem hang, sem kép, sem megosztott képernyő.",
         "recordedVoice": "A hangja, külön sávon.",
         "notRecordedVoice": "A hangja nem kerül rögzítésre.",
         "othersSame": "A többiek nem változnak: a mikrofonzárak, a szó megadása és a videó megjelenése az esemény szerint marad.",
         "audienceNotice": "A résztvevőknek nincs mikrofonjuk, kamerájuk és képernyőmegosztásuk: csak értesítést kapnak. Ha szót kapnak, a teremben hozzájárulhatnak; ha nem teszik, kimaradnak a felvételből.",
-        "hostsChoose": "A moderátorok és az előadók úgy döntenek, mint mindenki más: aki nem járul hozzá, ugyanúgy vezet, de kimarad a felvételből.",
         "hostsAlways": "A moderátorok és az előadók mindig szerepelnek a felvételen: nem látják a jelölőnégyzetet.",
-        "hostsFixed": "A moderátorok és az előadók mindenképp vezetnek, és a videó rögzíti őket.",
         "trace": "Ha felszólal a felvétel alatt, a videó melletti megjegyzés jelzi, hogy egy hozzászólás hiányzik, az átirat pedig *** jelet tesz az időponttal.",
         "anytime": "A hozzájárulást a teremben bármikor meg lehet adni és vissza lehet vonni.",
         "transcription": "A saját hozzászólások átirata külön, választható hozzájárulás.",
         "fixedVoice": "Ez a telepítés nem tud eltávolítani egy hangot a videóból: aki nem járul hozzá, csak hallgató marad, és a terem zárai a hozzájárulást követik.",
         "fixedNotice": "Ez a telepítés nem tud eltávolítani egy hangot a videóból: aki szót kap, bekerül a felvételbe, és az értesítés ezt közli.",
         "questionTranscription": "Hozzájárult az átiratkészítéshez?",
-        "fixedNotRecorded": "Hang és kép nélkül; a név megjelenhet a videóban."
+        "fixedNotRecorded": "Se hang, se kép, se név."
       }
     },
     "nav": {
@@ -4637,9 +4636,9 @@
   },
   "gdpr": {
     "consent": {
-      "recording": "Hozzájárulok az esemény audió/videó felvételéhez",
-      "recordingReserved": "Hozzájárulok az esemény videófelvételének elkészítéséhez (hang és kép). A videó csak a szervezők és a regisztráltak számára érhető el: nem kerül közzétételre. A regisztráltak addig nézhetik meg, amíg a regisztrációs adataikat megőrizzük.",
-      "recordingPublic": "Hozzájárulok az esemény videófelvételének elkészítéséhez (hang és kép) és közzétételéhez: a videót bárki megnézheti az esemény oldalán és a videótárban.",
+      "recording": "Hozzájárulok, hogy a hangomat rögzítsék, amikor felszólalok az eseményen. Az arcom és a nevem soha nem jelenik meg a videón.",
+      "recordingReserved": "Hozzájárulok, hogy a hangomat rögzítsék, amikor felszólalok az eseményen. Az arcom és a nevem soha nem jelenik meg a videón. A videó csak a szervezők és a regisztráltak számára érhető el: nem kerül közzétételre. A regisztráltak addig nézhetik meg, amíg a regisztrációs adataikat megőrizzük.",
+      "recordingPublic": "Hozzájárulok, hogy a hangomat rögzítsék, amikor felszólalok az eseményen. Hozzájárulok a videó közzétételéhez is: a videót bárki megnézheti az esemény oldalán és a videótárban. Az arcom és a nevem soha nem jelenik meg a videón.",
       "recordingNoVideo": "Hozzájárulok az esemény felvételéhez. A terem videójáról nem készül felvétel: csak azok hangsávjai maradnak meg, akik hozzájárulnak az átíráshoz, ha az esemény ilyeneket használ.",
       "multitrack": "Hozzájárulok, hogy a felszólalásaimat a nevemmel átírják az esemény beszámolójához. Ha az esemény minden résztvevőről külön hangsávot rögzít, a hangomat csak erre a célra rögzítik, és a sáv az átírás után törlődik; nem használják a hangom azonosítására vagy utánzására.",
       "multitrackRetained": "Hozzájárulok, hogy a felszólalásaimat a nevemmel átírják az esemény beszámolójához. Ha az esemény minden résztvevőről külön hangsávot rögzít, a hangomat csak erre a célra rögzítik, és a sávot az esemény adataival együtt őrzik meg; nem használják a hangom azonosítására vagy utánzására.",
@@ -4649,10 +4648,9 @@
       "stayInTouchHelp": "Nem kötelező hozzájárulás (GDPR 6.1.a cikk). Bármikor visszavonhatja a visszaigazoló e-mailben, az emlékeztetőkben és a meghívókban található „Adataim eltávolítása a címjegyzékből” hivatkozással, vagy az „Az én adataim” oldalon. A név, az e-mail cím és a szervezet ebből a regisztrációból származik.",
       "stayInTouchRetention": "Ezeket az adatokat a jelen hozzájárulástól számított {months} hónapig őrizzük meg: az időszak csak akkor indul újra, ha ismét bejelöli a jelölőnégyzetet.",
       "recordingOptionalListenOnly": "Ha nem járul hozzá, akkor is részt vesz, csak hallgatóként: követi az eseményt és ír a csevegésbe, de a mikrofon, a kamera és a képernyőmegosztás kikapcsolva marad. Később a teremből is hozzájárulhat.",
-      "recordingOptionalHost": "Hozzájárulás nélkül is belép és a szokásos módon vezet, de a hangja nem marad meg a személyenkénti sávokban és az átiratban. A terem videója, ha rögzítik, így is tartalmazza Önt.",
       "recordingOptionalVoice": "Ha nem járul hozzá, ugyanúgy részt vesz és felszólalhat, de kimarad a felvételből: sem a neve, sem a hangja, sem a képe nem szerepel. Később a teremből is hozzájárulhat.",
-      "recordingNotice": "Az eseményről felvétel készülhet. Mikrofon és kamera nélkül vesz részt: a felvétel nem tartalmazza a hangját és a képét, kivéve, ha a moderátorok szót adnak Önnek.",
-      "recordingNoticeVoice": "Az eseményről felvétel készülhet. Mikrofon és kamera nélkül vesz részt: a felvétel nem tartalmazza a nevét, a hangját és a képét, hacsak nem járul hozzá a teremben.",
+      "recordingNotice": "Az eseményről felvétel készülhet. Mikrofon és kamera nélkül vesz részt: az arca és a neve soha nem jelenik meg a videón, a hangja pedig csak akkor, ha a moderátor szót ad Önnek.",
+      "recordingNoticeVoice": "Az eseményről felvétel készülhet. Mikrofon és kamera nélkül vesz részt: az arca és a neve soha nem jelenik meg a videón, a hangja pedig csak akkor, ha a teremben hozzájárul.",
       "recordingHostAlwaysReserved": "Ön vezeti ezt az eseményt: mindig szerepel a felvételen, névvel, hanggal, képpel és megosztott képernyővel. A videó csak a szervezők és a regisztráltak számára érhető el: nem kerül közzétételre. A regisztráltak addig nézhetik meg, amíg a regisztrációs adataikat megőrizzük.",
       "recordingHostAlwaysPublic": "Ön vezeti ezt az eseményt: mindig szerepel a felvételen, névvel, hanggal, képpel és megosztott képernyővel. A videó közzétehető, és bárki megnézheti.",
       "recordingHostAlways": "Ön vezeti ezt az eseményt: mindig szerepel a felvételen, névvel, hanggal, képpel és megosztott képernyővel."
@@ -4671,9 +4669,9 @@
         "destinationUnset": "Az esemény után a szervezők döntik el, hogy közzéteszik-e.",
         "refuseOut": "Ha nem járul hozzá, ugyanúgy részt vesz, és kimarad a felvételből.",
         "refuseListenOnly": "Ha nem járul hozzá, csak hallgatóként vesz részt.",
-        "hostsAlways": "A moderátorok mindig szerepelnek a felvételen, névvel, hanggal, képpel és megosztott képernyővel.",
-        "audienceNotice": "Mikrofon és kamera nélkül vesz részt: a felvétel nem tartalmazza a hangját és a képét, kivéve, ha a moderátorok szót adnak Önnek.",
-        "audienceNoticeVoice": "Mikrofon és kamera nélkül vesz részt: a felvétel nem tartalmazza a nevét, a hangját és a képét, hacsak nem járul hozzá a teremben."
+        "hostsAlways": "A videón csak a moderátorok jelennek meg, névvel, hanggal, képpel és megosztott képernyővel. A résztvevők arca és neve soha nem jelenik meg.",
+        "audienceNotice": "Mikrofon és kamera nélkül vesz részt: az arca és a neve soha nem jelenik meg a videón, a hangja pedig csak akkor, ha a moderátor szót ad Önnek.",
+        "audienceNoticeVoice": "Mikrofon és kamera nélkül vesz részt: az arca és a neve soha nem jelenik meg a videón, a hangja pedig csak akkor, ha a teremben hozzájárul."
       },
       "transcript": {
         "label": "Átirat",
@@ -5615,7 +5613,7 @@
     "switchToLive": "Váltás élő közvetítésre",
     "enterRoom": "Belépés a szobába",
     "recordingNotice": "Erről az eseményről felvétel készülhet.",
-    "recordingNoticeInstant": "A hívásról felvétel készülhet. A felvételen kívül lép be: ha valaki elindítja, megkérdezzük, szeretne-e szerepelni rajta.",
+    "recordingNoticeInstant": "A hívásról felvétel készülhet. A videón csak a moderátorok jelennek meg: az Ön arca és neve soha. Ha valaki elindítja a felvételt, megkérdezzük, hozzájárul-e a hangja rögzítéséhez.",
     "recordingAvailableAfter": "A felvétel az esemény után lesz elérhető.",
     "autoRefreshHint": "Az oldal automatikusan frissül, amikor az esemény elkezdődik.",
     "startEventButton": "Esemény indítása",
@@ -5668,9 +5666,9 @@
     "aiNoticeTitle": "MI-feldolgozás az esemény után",
     "aiNotice": "A végén a felvételt mesterséges intelligencia eszközök dolgozhatják fel átirat, összefoglaló, valamint esetleges fordítások és szinkron készítéséhez. Az átirat csak a hozzájárulókra vonatkozik. Az eredmények pontatlanságokat tartalmazhatnak; a mérvadó forrás továbbra is a videó.",
     "multitrackConsentTitle": "Felszólalásai átirata",
-    "recordingConsentTitle": "Az esemény felvétele",
-    "recordingConsentIntro": "Az eseményről felvétel készülhet (hang és videó). Hozzájárulás esetén a felvétel tartalmazza a nevét, a hangját, a képét és azt, amit a képernyőn megoszt.",
-    "recordingConsentIntroAnonymous": "Az eseményről felvétel készülhet (hang és videó). Hozzájárulás esetén a felvétel tartalmazza az álnevét, a hangját, a képét és azt, amit a képernyőn megoszt.",
+    "recordingConsentTitle": "Az Ön hangjának rögzítése",
+    "recordingConsentIntro": "Az eseményről felvétel készülhet. A videón csak a moderátorok jelennek meg: az Ön arca és neve soha. Hozzájárulásával a hangját rögzítjük, amikor beszél.",
+    "recordingConsentIntroAnonymous": "Az eseményről felvétel készülhet. A videón csak a moderátorok jelennek meg: az Ön arca és álneve soha. Hozzájárulásával a hangját rögzítjük, amikor beszél.",
     "recordingConsentIntroNoVideo": "Ezen az eseményen a terem videójáról nem készül felvétel.",
     "enterGardenTitle": "Lépj be a térre",
     "enterGardenHint": "Egy másik hely a várakozáshoz: sétáljon, találkozzon a többi várakozóval, és lépjen be az élő eseménybe a kapun, amikor a terem megnyílik.",

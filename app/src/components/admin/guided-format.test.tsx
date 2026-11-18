@@ -159,7 +159,7 @@ describe('formato guidato', () => {
     expect(container.textContent).not.toContain(f.recordingDestinationPublic);
     expect(container.textContent).not.toContain(f.recordingDestinationReserved);
     expect(container.textContent).not.toContain(g.rec.reserved);
-    expect(container.textContent).not.toContain(f.consentsHosts);
+    expect(container.textContent).not.toContain(f.consentsHostsAlways);
     continua();
     expect(onContinue).toHaveBeenCalledWith(expect.objectContaining({ registra: 'no' }));
   });
@@ -281,7 +281,7 @@ describe('l anteprima dice cosa viene dal formato', () => {
     render();
     scegli(g.people.piccolo);
     expect(anteprima()).toContain(f.recordingDestinationReserved);
-    expect(anteprima()).toContain(f.consentsHosts);
+    expect(anteprima()).toContain(f.consentsHostsAlways);
     expect(anteprima()).toContain(g.previewRealNames);
     expect(anteprima()).toContain(f.postEventQaHidden);
     expect(anteprima()).toContain(f.addressBookNotOffered);
@@ -333,7 +333,7 @@ describe('l anteprima dice cosa viene dal formato', () => {
     scegli(g.rec.no);
     expect(anteprima()).not.toContain(f.recordingDestinationPublic);
     expect(anteprima()).not.toContain(f.recordingDestinationReserved);
-    expect(anteprima()).not.toContain(f.consentsHosts);
+    expect(anteprima()).not.toContain(f.consentsHostsAlways);
     expect(anteprima()).not.toContain(f.recordingManual);
   });
 

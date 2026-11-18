@@ -95,11 +95,11 @@ describe('mediaDelToken in una chiamata rapida', () => {
   };
   const aperto = { audio: false, video: false, desktop: false };
 
-  it('senza consenso tutti entrano fuori dalla registrazione, chi conduce compreso', () => {
+  it('chi partecipa entra con la voce fuori; chi modera e\' nel video', () => {
     const regola = regolaConsenso(rapida, true, 'rimovibile');
     expect(mediaDelToken(rapida, regola, 'moderatore', false)).toEqual({
       mediaLock: aperto,
-      voiceExcluded: true,
+      paInVideo: true,
     });
     expect(mediaDelToken(rapida, regola, 'partecipante', false)).toEqual({
       mediaLock: aperto,
@@ -117,6 +117,7 @@ describe('mediaDelToken in una chiamata rapida', () => {
         expect(media.listenOnly).toBeUndefined();
         expect(media.consentLock).toBeUndefined();
         expect(media.mediaLock).toEqual(aperto);
+        expect(media.paInVideo).toBe(chi === 'partecipante' ? undefined : true);
       }
     }
   });
@@ -126,18 +127,30 @@ describe('mediaDelToken', () => {
   const regola = regolaConsenso(evento, true, 'rimovibile');
   const limiti = { audio: false, video: true, desktop: true };
 
-  it('con il consenso, i limiti dell\'evento', () => {
-    expect(mediaDelToken(evento, regola, 'moderatore', true)).toEqual({ mediaLock: limiti });
-    expect(mediaDelToken(evento, regola, 'relatore', true)).toEqual({ mediaLock: limiti, mediaExempt: true });
+  it('con il consenso, i limiti dell\'evento; chi conduce e\' nel video', () => {
+    expect(mediaDelToken(evento, regola, 'moderatore', true)).toEqual({ mediaLock: limiti, paInVideo: true });
+    expect(mediaDelToken(evento, regola, 'relatore', true)).toEqual({
+      mediaLock: limiti,
+      mediaExempt: true,
+      paInVideo: true,
+    });
     expect(mediaDelToken(evento, regola, 'partecipante', true)).toEqual({ mediaLock: limiti });
   });
 
-  it('senza il consenso cambia solo il segno per la registrazione, chiunque sia', () => {
-    for (const chi of ['moderatore', 'relatore', 'partecipante'] as const) {
-      expect(mediaDelToken(evento, regola, chi, false)).toEqual({
-        ...mediaDelToken(evento, regola, chi, true),
-        voiceExcluded: true,
-      });
+  it('senza il consenso cambia solo il segno per la voce di chi partecipa', () => {
+    expect(mediaDelToken(evento, regola, 'partecipante', false)).toEqual({
+      mediaLock: limiti,
+      voiceExcluded: true,
+    });
+  });
+
+  it('chi conduce non da\' il consenso: e\' nel video comunque, e solo lui ha il segno', () => {
+    for (const chi of ['moderatore', 'relatore'] as const) {
+      expect(mediaDelToken(evento, regola, chi, false)).toEqual(mediaDelToken(evento, regola, chi, true));
+      expect(mediaDelToken(evento, regola, chi, false).voiceExcluded).toBeUndefined();
+    }
+    for (const consenso of [false, true]) {
+      expect(mediaDelToken(evento, regola, 'partecipante', consenso).paInVideo).toBeUndefined();
     }
   });
 
@@ -162,13 +175,21 @@ describe('mediaDelToken', () => {
       ...base,
       mediaAdmit: { audio: true, video: false, desktop: false },
     });
-    expect(mediaDelToken(evento, r, 'moderatore', false)).toEqual(base);
-    expect(mediaDelToken(evento, r, 'relatore', false)).toEqual({ ...base, mediaExempt: true });
+    expect(mediaDelToken(evento, r, 'moderatore', false)).toEqual({ ...base, paInVideo: true });
+    expect(mediaDelToken(evento, r, 'relatore', false)).toEqual({
+      ...base,
+      mediaExempt: true,
+      paInVideo: true,
+    });
   });
 
-  it('senza registrazione restano i limiti dell\'evento', () => {
+  it('senza registrazione restano i limiti dell\'evento, e chi conduce ha il segno', () => {
     const r = regolaConsenso(evento, false, 'rimovibile');
     expect(mediaDelToken(evento, r, 'partecipante', false)).toEqual({ mediaLock: limiti });
-    expect(mediaDelToken(evento, r, 'relatore', false)).toEqual({ mediaLock: limiti, mediaExempt: true });
+    expect(mediaDelToken(evento, r, 'relatore', false)).toEqual({
+      mediaLock: limiti,
+      mediaExempt: true,
+      paInVideo: true,
+    });
   });
 });

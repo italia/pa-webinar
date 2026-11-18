@@ -83,7 +83,12 @@ import ConsentsDialog, {
 } from '@/components/live/consents-dialog';
 import RecordingQuestion from '@/components/live/recording-question';
 import { useRecordingQuestion } from '@/hooks/use-recording-question';
-import { conduceSempreRegistrato, regolaConsenso } from '@/lib/live/consent-rule';
+import { conduceNelVideo, regolaConsenso } from '@/lib/live/consent-rule';
+import {
+  elencoRegistrazione,
+  type ElencoRegistrazione,
+  type PresenzaNellaRegistrazione,
+} from '@/lib/live/recording-badge';
 import ControlRoomPanel, { type FunzioneSala } from '@/components/live/control-room-panel';
 import { useCaptionsControl } from '@/hooks/use-captions-control';
 import { useRecordingControl, type ControlloRegistrazione } from '@/hooks/use-recording-control';
@@ -137,8 +142,6 @@ interface EventInfo {
   audienceAnonymous?: boolean;
   /** L'elenco di chi partecipa e' visibile al pubblico (lib/live/participant-list). */
   participantListVisible?: boolean;
-  /** Chi conduce e' sempre nella registrazione: non vede la casella. */
-  hostsAlwaysRecorded?: boolean;
   /** Resolved video/audio quality preset (per-event override merged with site default). */
   videoQuality?: VideoQualityPreset;
   startsAt: string;
@@ -647,9 +650,8 @@ export default function LiveEventClient({
       return stessiConsensi(r, fuori) ? r : fuori;
     });
   }, []);
-  // La registrazione dell'evento, per chi entra dalla sala d'attesa: se
-  // chiederne il consenso, o se basta informare.
-  const chiConduceSempreRegistrato = conduceSempreRegistrato(event, event.voceNelVideo ?? 'fissa');
+  // La registrazione della propria voce, per chi entra dalla sala d'attesa: se
+  // chiederne il consenso, o se basta informare. Chi conduce non lo da'.
   const argomentiRegistrazione = {
     formato: {
       recordingEnabled: event.recordingEnabled,
@@ -661,7 +663,6 @@ export default function LiveEventClient({
     registrazioneDisponibile: recordingAvailable,
     conduce: isModerator || isSpeaker,
     istantanea: event.eventType === 'INSTANT',
-    conduceSempreRegistrato: chiConduceSempreRegistrato,
   };
   const consensoRegistrazione = consensoRegistrazioneIngresso({
     ...argomentiRegistrazione,
@@ -696,6 +697,9 @@ export default function LiveEventClient({
   const istantanea = event.eventType === 'INSTANT';
   const registraInSala = registraChiConduce(event, recordingAvailable, voceInSala);
   const registrazioneNonOfferta = istantanea && event.recordingEnabled && recordingAvailable && !registraInSala;
+  // Chi conduce o interviene e' nel video, con nome e immagine, dove c'e' un
+  // video della sala: la sala d'attesa glielo dice al posto della casella.
+  const conduceInVideo = (isModerator || isSpeaker) && registraInSala && conduceNelVideo(voceInSala);
   const [joinPrefs, setJoinPrefs] = useState<WaitingRoomJoinPrefs>({
     cameraOn: false,
     micOn: false,
@@ -2377,8 +2381,8 @@ export default function LiveEventClient({
           recordingDestination={destinazioneInVigore}
           voce={voceInSala}
           recordingListenOnly={consensoRegistrazione.soloAscolto}
-          recordingAskedInRoom={istantanea && registraInSala}
-          recordingHostAlways={chiConduceSempreRegistrato && (isModerator || isSpeaker)}
+          recordingAskedInRoom={istantanea && registraInSala && !isModerator && !isSpeaker}
+          recordingHostAlways={conduceInVideo}
           recordingConsentText={event.recordingConsentText}
           privacy={event.privacy}
           schedaPrivacy={
@@ -2885,7 +2889,18 @@ export default function LiveEventClient({
         <LiveSidebar
           domandePubblicate={domandePubblicateInSala(event)}
           salaSoloAscolto={salaSoloAscolto}
-          salaConsensoChiesto={regolaSala.richiesto}
+          statoRegistrazione={elencoRegistrazione({
+            regola: regolaSala,
+            istantanea,
+            inCorso: isRecording,
+          })}
+          statoProprio={
+            isSpeaker || isActualModerator
+              ? 'video'
+              : credentials.voiceExcluded || credentials.listenOnly
+                ? 'nessuna'
+                : 'voce'
+          }
           guestKeyName={isGuest || !token ? chosenName.trim() : undefined}
           elencoNascosto={elencoNascosto}
           nascosta={soloContenuto}
@@ -3113,8 +3128,10 @@ type SidebarTab =
 interface LiveSidebarProps {
   /** Evento con il solo ascolto per chi non acconsente (lib/live/listen-only). */
   salaSoloAscolto?: boolean;
-  /** Il consenso si chiede al pubblico: chi non l'ha dato ha scelto cosi'. */
-  salaConsensoChiesto?: boolean;
+  /** Per chi l'elenco dice come e' nella registrazione (lib/live/recording-badge). */
+  statoRegistrazione?: ElencoRegistrazione;
+  /** La propria presenza nella registrazione, per chi non modera. */
+  statoProprio?: PresenzaNellaRegistrazione;
   /** L'ospite: il nome scritto in sala d'attesa, chiave del suo posto in chat
    *  e nelle domande (il nome mostrato puo' essere uno pseudonimo). */
   guestKeyName?: string;
@@ -3186,7 +3203,8 @@ interface LiveSidebarProps {
 function LiveSidebar({
   domandePubblicate,
   salaSoloAscolto = false,
-  salaConsensoChiesto = false,
+  statoRegistrazione = 'nessuno',
+  statoProprio,
   guestKeyName,
   elencoNascosto = false,
   nascosta = false,
@@ -4346,7 +4364,8 @@ function LiveSidebar({
               eventSlug={eventSlug}
               token={token}
               bloccoDaConsenso={salaSoloAscolto}
-              consensoChiesto={salaConsensoChiesto}
+              statoRegistrazione={statoRegistrazione}
+              statoProprio={statoProprio}
             />
           </div>
         </div>

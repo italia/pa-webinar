@@ -139,7 +139,11 @@ export function recuperoAperto(evento: {
  * consenso, accanto alla destinazione letta (Registration.consentRecordingVersion,
  * RecordingConsent.textVersion), solo se il testo la dichiara:
  *   1. il testo che dice dove va il video (gdpr.consent.recordingReserved,
- *      gdpr.consent.recordingPublic).
+ *      gdpr.consent.recordingPublic), con nome, voce e immagine di chi acconsente;
+ *   2. lo stesso testo per la sola voce: nel video compare solo chi conduce, e di
+ *      chi acconsente si registra la voce quando interviene (lib/live/consent-rule).
+ * Un consenso dato con il testo 1 copre anche il 2, che chiede meno: non si
+ * richiede.
  * Due testi non lo dicono, e destinazione e versione restano null, come sui
  * consensi dati prima: gdpr.consent.recording, su un evento senza destinazione,
  * e gdpr.consent.recordingNoVideo, dove non c'e' un video da pubblicare. Per
@@ -149,7 +153,7 @@ export function recuperoAperto(evento: {
  * piu', perche' quel testo diceva che il video non c'era, e si richiede in sala.
  * Si cambia insieme al testo, quando il suo scopo cambia.
  */
-export const VERSIONE_TESTO_REGISTRAZIONE = 1;
+export const VERSIONE_TESTO_REGISTRAZIONE = 2;
 
 /**
  * Un elemento di RecordingConsent.earlierPeriods, il periodo di un consenso

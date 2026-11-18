@@ -29,7 +29,7 @@ import {
   type FormatoRegistra,
 } from '@/lib/events/guided-format';
 import { domandePubbliche } from '@/lib/events/post-event-sections';
-import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import { conduceNelVideo, type VoceNelVideo } from '@/lib/live/consent-rule';
 import { rubricaProposta } from '@/lib/persons/address-book';
 import { videoDaDestinare } from '@/lib/recording/destination';
 
@@ -379,7 +379,7 @@ export default function GuidedFormat({
                           : tf('recordingDestinationPublic')}
                       </span>
                       <span className="d-block text-secondary">
-                        {preset.hostsAlwaysRecorded ? tf('consentsHostsAlways') : tf('consentsHosts')}
+                        {conduceNelVideo(voceNelVideo ?? 'fissa') && tf('consentsHostsAlways')}
                       </span>
                       {aiPipelineEnabled && (
                         <span className="d-block text-secondary">{t('rec.yesDesc')}</span>

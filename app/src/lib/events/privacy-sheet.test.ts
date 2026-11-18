@@ -91,21 +91,21 @@ function scheda(
 }
 
 describe('schedaPrivacy, la voce di chi non acconsente', () => {
-  it('rimovibile: chi non acconsente partecipa e resta fuori dal video', () => {
+  it('rimovibile: chi non acconsente partecipa e la sua voce resta fuori; chi conduce e\' nel video', () => {
     expect(scheda({}, { voce: 'rimovibile' }).registrazione).toEqual({
       modo: 'manuale',
       destinazione: 'PUBLIC',
       chiNonAcconsente: 'restaFuori',
-      conduceSempre: false,
+      conduceSempre: true,
     });
   });
 
-  it('fissa: chi non acconsente partecipa in solo ascolto', () => {
+  it('fissa: chi non acconsente partecipa in solo ascolto; chi conduce e\' nel video', () => {
     expect(scheda({}, { voce: 'fissa' }).registrazione).toEqual({
       modo: 'manuale',
       destinazione: 'PUBLIC',
       chiNonAcconsente: 'soloAscolto',
-      conduceSempre: false,
+      conduceSempre: true,
     });
   });
 
@@ -175,15 +175,17 @@ describe('schedaPrivacy, la voce di chi non acconsente', () => {
     }
   });
 
-  it('chi conduce sempre nel video conta solo con voce rimovibile', () => {
-    const evento = { hostsAlwaysRecorded: true };
-    expect(scheda(evento, { voce: 'rimovibile' }).registrazione.conduceSempre).toBe(true);
-    expect(scheda(evento, { voce: 'fissa' }).registrazione.conduceSempre).toBe(false);
-    expect(scheda(evento, { voce: 'assente' }).registrazione.conduceSempre).toBe(false);
-    expect(
-      scheda({ ...evento, recordingEnabled: false }, { voce: 'rimovibile' }).registrazione
-        .conduceSempre
-    ).toBe(false);
+  it('chi conduce e\' nel video dove c\'e\' un video, qualunque valore resti sulla colonna', () => {
+    for (const hostsAlwaysRecorded of [false, true]) {
+      const evento = { hostsAlwaysRecorded };
+      expect(scheda(evento, { voce: 'rimovibile' }).registrazione.conduceSempre).toBe(true);
+      expect(scheda(evento, { voce: 'fissa' }).registrazione.conduceSempre).toBe(true);
+      expect(scheda(evento, { voce: 'assente' }).registrazione.conduceSempre).toBe(false);
+      expect(
+        scheda({ ...evento, recordingEnabled: false }, { voce: 'rimovibile' }).registrazione
+          .conduceSempre
+      ).toBe(false);
+    }
   });
 });
 
@@ -613,7 +615,7 @@ describe('schedaPrivacy, i formati guidati', () => {
     expect(s.registrazione.chiNonAcconsente).toBe(
       !registra ? null : formato.voce === 'tutti' ? 'restaFuori' : 'avvisoVoce'
     );
-    expect(s.registrazione.conduceSempre).toBe(false);
+    expect(s.registrazione.conduceSempre).toBe(registra);
     expect(s.trascrizione.tracce).toBe(registra ? 'cancellate' : null);
     expect(s.elencoVisibile).toBe(!pubblico);
     expect(s.pseudonimi).toBe(pubblico);
