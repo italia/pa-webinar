@@ -44,7 +44,7 @@ import { getSettings } from '@/lib/settings';
 import { encryptPIIOrNull, tryDecryptPII } from '@/lib/crypto/pii';
 import { calculateEstimates } from '@/lib/estimates';
 import { hashJoinPassword } from '@/lib/auth/password';
-import { isEventManager, requireEventManager } from '@/lib/auth/staff-session';
+import { getStaffSession, isEventManager, requireEventManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { coerceMatrix, togglesFromMatrix } from '@/lib/utils/permission-matrix';
 import { riconciliaTraduzioni } from '@/lib/text-translation/auto';
@@ -66,6 +66,7 @@ import {
   type Destinazione,
 } from '@/lib/recording/destination';
 import { videoDellApp, videoPerTutti } from '@/lib/recording/audience';
+import { organizzaEvento } from '@/lib/recording/content-access';
 import { assertVideoDellEvento, assertVideoNelloStorage } from '@/lib/storage/recordings';
 import { annullaEmailInCoda } from '@/lib/email/outbox';
 
@@ -312,6 +313,21 @@ export const PUT = withErrorHandling(async (request, context) => {
   // l'indirizzo che c'e' gia'.
   if (data.recordingUrl && data.recordingUrl !== event.recordingUrl) {
     await soloStaffDellEvento(eventId, 'Only the event staff can attach a recording');
+  }
+
+  // Quanto dura la registrazione lo decide chi organizza l'evento, come la sua
+  // cancellazione: il link principale di conduzione, o una sessione dello staff
+  // che organizza l'evento. Un co-moderatore, o l'admin che non lo organizza,
+  // no (lib/recording/content-access). Il wizard la manda solo se cambiata.
+  if (
+    data.recordingDeleteAfterDays !== undefined &&
+    data.recordingDeleteAfterDays !== event.recordingDeleteAfterDays &&
+    !isPrimaryModerator
+  ) {
+    const staff = await getStaffSession(await cookies());
+    if (!staff || !(await organizzaEvento(staff, eventId))) {
+      throw new ForbiddenError('Only the event organizers can change how long the recording is kept');
+    }
   }
 
   // Le etichette le manda il wizard a ogni salvataggio, l'elenco intero: si

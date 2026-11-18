@@ -3077,7 +3077,10 @@
         "yes": "Ano",
         "no": "Ne",
         "recordingDuration": "Délka",
-        "recordingSize": "Velikost"
+        "recordingSize": "Velikost",
+        "recordingRetention": "Automatické smazání záznamu",
+        "recordingRetentionNone": "Žádné",
+        "recordingRetentionDays": "{days, plural, one {# den} few {# dny} many {# dne} other {# dní}} po skončení akce, nebo, pokud je zveřejněn, po zveřejnění"
       }
     },
     "rubrica": {
@@ -5909,11 +5912,12 @@
       "7d": "7 dní",
       "30d": "30 dní",
       "90d": "90 dní",
+      "1y": "1 rok",
       "forever": "Bez automatického smazání"
     },
-    "retentionNote": "Zveřejněné video se neřídí dobou uchování údajů události: bez stanovené doby zůstane veřejné, dokud ho někdo nesmaže.",
+    "retentionNote": "Záznam se neřídí dobou uchování údajů události: bez stanovené doby zůstane, zveřejněný i nezveřejněný, dokud ho někdo nesmaže. Doba se počítá od zveřejnění, nebo, pokud video zveřejněno není, od skončení události; po jejím uplynutí se smaže video i to, co z něj vzniklo (přepisy, shrnutí, překlady).",
     "delete": "Smazat záznam",
-    "deleteConfirm": "Jste si jisti? Video bude trvale smazáno.",
+    "deleteConfirm": "Jste si jisti? Video bude trvale smazáno. Přepisy, shrnutí a překlady se s ním nesmažou: řídí se dobou záznamu zvolenou zde.",
     "notConfigured": "Jibri není nakonfigurován. Videozáznam není k dispozici.",
     "disabledHint": "Záznam videa není pro tuto událost povolen. Pro aktivaci otevřete sekci Nastavení výše a zapněte přepínač „Záznam“.",
     "play": "Přehrát",

@@ -3077,7 +3077,10 @@
         "yes": "Iva",
         "no": "Le",
         "recordingDuration": "Tul",
-        "recordingSize": "Daqs"
+        "recordingSize": "Daqs",
+        "recordingRetention": "Tħassir awtomatiku tar-rekording",
+        "recordingRetentionNone": "Xejn",
+        "recordingRetentionDays": "{days, plural, one {# ġurnata} two {# ġranet} few {# ġranet} many {#-il ġurnata} other {# ġurnata}} wara t-tmiem tal-avveniment jew, jekk ippubblikat, wara l-pubblikazzjoni"
       }
     },
     "rubrica": {
@@ -5909,11 +5912,12 @@
       "7d": "7 ijiem",
       "30d": "30 ġurnata",
       "90d": "90 ġurnata",
+      "1y": "1 sena",
       "forever": "L-ebda tħassir awtomatiku"
     },
-    "retentionNote": "Vidjo ppubblikat ma jsegwix iż-żamma tad-data tal-avveniment: mingħajr perjodu, jibqa' pubbliku sakemm xi ħadd iħassru.",
+    "retentionNote": "Ir-rekording ma jsegwix iż-żamma tad-data tal-avveniment: mingħajr perjodu jibqa', ippubblikat jew le, sakemm xi ħadd iħassru. Il-perjodu jgħodd mill-pubblikazzjoni jew, jekk il-vidjo mhuwiex ippubblikat, mit-tmiem tal-avveniment; meta jiskadi, jitħassru l-vidjo u dak li jsir minnu (traskrizzjonijiet, sommarji, traduzzjonijiet).",
     "delete": "Ħassar ir-reġistrazzjoni",
-    "deleteConfirm": "Żgur? Il-vidjo se jiġi mħassar definittivament.",
+    "deleteConfirm": "Żgur? Il-vidjo se jiġi mħassar definittivament. It-traskrizzjonijiet, is-sommarji u t-traduzzjonijiet ma jitħassrux miegħu: isegwu l-perjodu tar-rekording magħżul hawn.",
     "notConfigured": "Jibri mhux ikkonfigurat. Ir-reġistrazzjoni bil-vidjo mhijiex disponibbli.",
     "disabledHint": "La rekording tal-vidjo mhux abilitata għal dan avveniment. Għal attivarla, iftaħ il-sezionu Impostazioni aktar in alto u accendi il-togglu \"Reġistrazzjoni\".",
     "play": "Iddoqq",

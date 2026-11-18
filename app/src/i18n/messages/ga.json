@@ -3077,7 +3077,10 @@
         "yes": "Tá",
         "no": "Níl",
         "recordingDuration": "Fad",
-        "recordingSize": "Méid"
+        "recordingSize": "Méid",
+        "recordingRetention": "Scriosadh uathoibríoch an taifeadta",
+        "recordingRetentionNone": "Níl",
+        "recordingRetentionDays": "{days, plural, one {# lá} two {# lá} few {# lá} many {# lá} other {# lá}} tar éis dheireadh an imeachta nó, má fhoilsítear é, tar éis an fhoilsithe"
       }
     },
     "rubrica": {
@@ -5909,11 +5912,12 @@
       "7d": "7 lá",
       "30d": "30 lá",
       "90d": "90 lá",
+      "1y": "1 bhliain",
       "forever": "Gan scriosadh uathoibríoch"
     },
-    "retentionNote": "Ní leanann físeán foilsithe coinneáil sonraí an imeachta: gan tréimhse, fanann sé poiblí go dtí go scriosann duine é.",
+    "retentionNote": "Ní leanann an taifeadadh coinneáil sonraí an imeachta: gan tréimhse fanann sé, foilsithe nó nach ea, go dtí go scriosann duine é. Áirítear an tréimhse ón bhfoilsiú nó, mura bhfuil an físeán foilsithe, ó dheireadh an imeachta; nuair a théann sí in éag, scriostar an físeán agus a ndéantar as (tras-scríbhinní, achoimrí, aistriúcháin).",
     "delete": "Scrios taifeadadh",
-    "deleteConfirm": "An bhfuil sibh cinnte? Scriosfar an físeán go buan.",
+    "deleteConfirm": "An bhfuil sibh cinnte? Scriosfar an físeán go buan. Ní scriostar na tras-scríbhinní, na hachoimrí ná na haistriúcháin leis: leanann siad tréimhse an taifeadta a roghnaítear anseo.",
     "notConfigured": "Níl Jibri cumraithe. Níl taifeadadh físe ar fáil.",
     "disabledHint": "Níl an taifeadadh físe cumasaithe don imeacht seo. Chun é a chumasú, oscail an rannóg Socruithe thuas agus athraigh an t-athroghnóir \"Taifeadadh\".",
     "play": "Seinn",

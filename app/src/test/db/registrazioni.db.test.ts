@@ -297,6 +297,60 @@ describe('modifica dell’evento col link di conduzione', () => {
   });
 });
 
+describe('durata della registrazione', () => {
+  function cambia(eventId: string, giorni: number | null, token: string) {
+    return aggiornaEvento(
+      richiesta(`/api/events/${eventId}`, 'PUT', { recordingDeleteAfterDays: giorni }, token) as never,
+      { params: Promise.resolve({ param: eventId }) }
+    );
+  }
+  async function coModeratore(eventId: string) {
+    const token = randomUUID();
+    await prisma.eventModerator.create({
+      data: { eventId, name: encryptPII('Co-moderatrice'), token, role: 'MODERATOR' },
+    });
+    return token;
+  }
+
+  it('la cambia il link principale di conduzione, come la cancellazione', async () => {
+    const evento = await creaEvento(CON_VIDEO);
+    const risposta = await cambia(evento.id, 90, evento.moderatorToken);
+    expect(risposta.status).toBe(200);
+    expect(
+      (await prisma.event.findUniqueOrThrow({ where: { id: evento.id } })).recordingDeleteAfterDays
+    ).toBe(90);
+  });
+
+  it('un co-moderatore non la cambia, e un salvataggio che la lascia com’e’ passa', async () => {
+    const evento = await creaEvento({ ...CON_VIDEO, recordingDeleteAfterDays: 30 });
+    const token = await coModeratore(evento.id);
+
+    expect((await cambia(evento.id, null, token)).status).toBe(403);
+    expect((await cambia(evento.id, 30, token)).status).toBe(200);
+    expect(
+      (await prisma.event.findUniqueOrThrow({ where: { id: evento.id } })).recordingDeleteAfterDays
+    ).toBe(30);
+  });
+
+  it('chi organizza l’evento la cambia anche con un altro link', async () => {
+    await entraCome('ORGANIZER');
+    const evento = await creaEvento(CON_VIDEO);
+    await organizza(evento.id);
+    const token = await coModeratore(evento.id);
+
+    expect((await cambia(evento.id, 7, token)).status).toBe(200);
+  });
+
+  it('l’admin che non organizza l’evento, con un altro link, no', async () => {
+    await entraCome('ADMIN');
+    const evento = await creaEvento(CON_VIDEO);
+    const token = await coModeratore(evento.id);
+
+    expect((await cambia(evento.id, 7, token)).status).toBe(403);
+    esci();
+  });
+});
+
 describe('pubblicazione', () => {
   function aggiorna(id: string, corpo: unknown) {
     return pubblica(richiesta(`/api/admin/publications/${id}`, 'PATCH', corpo) as never, {

@@ -3077,7 +3077,10 @@
         "yes": "Kyllä",
         "no": "Ei",
         "recordingDuration": "Kesto",
-        "recordingSize": "Koko"
+        "recordingSize": "Koko",
+        "recordingRetention": "Tallenteen automaattinen poisto",
+        "recordingRetentionNone": "Ei ole",
+        "recordingRetentionDays": "{days, plural, one {# päivä} other {# päivää}} tapahtuman päättymisen jälkeen tai, jos se on julkaistu, julkaisemisen jälkeen"
       }
     },
     "rubrica": {
@@ -5909,11 +5912,12 @@
       "7d": "7 päivää",
       "30d": "30 päivää",
       "90d": "90 päivää",
+      "1y": "1 vuosi",
       "forever": "Ei automaattista poistoa"
     },
-    "retentionNote": "Julkaistu video ei noudata tapahtuman tietojen säilytysaikaa: ilman määräaikaa se pysyy julkisena, kunnes joku poistaa sen.",
+    "retentionNote": "Tallenne ei noudata tapahtuman tietojen säilytysaikaa: ilman määräaikaa se säilyy, julkaistuna tai ei, kunnes joku poistaa sen. Määräaika lasketaan julkaisusta tai, jos videota ei ole julkaistu, tapahtuman päättymisestä; kun se umpeutuu, video ja siitä tehty aineisto (litteroinnit, tiivistelmät, käännökset) poistetaan.",
     "delete": "Poista tallenne",
-    "deleteConfirm": "Oletko varma? Video poistetaan pysyvästi.",
+    "deleteConfirm": "Oletko varma? Video poistetaan pysyvästi. Litterointeja, tiivistelmiä ja käännöksiä ei poisteta sen mukana: ne noudattavat tässä valittua tallenteen määräaikaa.",
     "notConfigured": "Jibri ei ole määritetty. Videotallennus ei ole käytettävissä.",
     "disabledHint": "Videotallennus ei ole käytössä tässä tapahtumassa. Ota se käyttöön avaamalla yllä oleva Asetukset-osio ja kytkemällä \"Tallennus\"-valitsin päälle.",
     "play": "Toista",

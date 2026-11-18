@@ -3077,7 +3077,10 @@
         "yes": "Tak",
         "no": "Nie",
         "recordingDuration": "Czas trwania",
-        "recordingSize": "Rozmiar"
+        "recordingSize": "Rozmiar",
+        "recordingRetention": "Automatyczne usunięcie nagrania",
+        "recordingRetentionNone": "Brak",
+        "recordingRetentionDays": "{days, plural, one {# dzień} few {# dni} many {# dni} other {# dnia}} po zakończeniu wydarzenia lub, jeśli zostało opublikowane, po publikacji"
       }
     },
     "rubrica": {
@@ -5909,11 +5912,12 @@
       "7d": "7 dni",
       "30d": "30 dni",
       "90d": "90 dni",
+      "1y": "1 rok",
       "forever": "Bez automatycznego usuwania"
     },
-    "retentionNote": "Opublikowane wideo nie podlega okresowi przechowywania danych wydarzenia: bez ustalonego okresu pozostaje publiczne, dopóki ktoś go nie usunie.",
+    "retentionNote": "Nagranie nie podlega okresowi przechowywania danych wydarzenia: bez ustalonego okresu pozostaje, opublikowane czy nie, dopóki ktoś go nie usunie. Okres liczy się od publikacji lub, jeśli wideo nie jest opublikowane, od zakończenia wydarzenia; po jego upływie usuwane są wideo i to, co z niego powstało (transkrypcje, podsumowania, tłumaczenia).",
     "delete": "Usuń nagranie",
-    "deleteConfirm": "Czy na pewno? Wideo zostanie trwale usunięte.",
+    "deleteConfirm": "Czy na pewno? Wideo zostanie trwale usunięte. Transkrypcje, podsumowania i tłumaczenia nie są usuwane razem z nim: podlegają wybranemu tutaj okresowi przechowywania nagrania.",
     "notConfigured": "Jibri nie jest skonfigurowany w infrastrukturze. Nagrywanie wideo nie jest dostępne.",
     "disabledHint": "Nagrywanie wideo nie jest włączone dla tego wydarzenia. Aby je włączyć, otwórz sekcję Ustawienia powyżej i włącz przełącznik \"Nagrywanie\".",
     "play": "Odtwórz",

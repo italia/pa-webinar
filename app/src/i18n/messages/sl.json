@@ -3077,7 +3077,10 @@
         "yes": "Da",
         "no": "Ne",
         "recordingDuration": "Trajanje",
-        "recordingSize": "Velikost"
+        "recordingSize": "Velikost",
+        "recordingRetention": "Samodejno brisanje posnetka",
+        "recordingRetentionNone": "Brez",
+        "recordingRetentionDays": "{days, plural, one {# dan} two {# dneva} few {# dni} other {# dni}} po koncu dogodka ali, če je objavljen, po objavi"
       }
     },
     "rubrica": {
@@ -5909,11 +5912,12 @@
       "7d": "7 dni",
       "30d": "30 dni",
       "90d": "90 dni",
+      "1y": "1 leto",
       "forever": "Brez samodejnega brisanja"
     },
-    "retentionNote": "Objavljeni videoposnetek ne sledi hrambi podatkov dogodka: brez določenega roka ostane javen, dokler ga kdo ne izbriše.",
+    "retentionNote": "Posnetek ne sledi hrambi podatkov dogodka: brez določenega roka ostane, objavljen ali ne, dokler ga kdo ne izbriše. Rok se šteje od objave ali, če video ni objavljen, od konca dogodka; ko poteče, se izbrišeta video in to, kar iz njega nastane (prepisi, povzetki, prevodi).",
     "delete": "Izbriši posnetek",
-    "deleteConfirm": "Ali ste prepričani? Video bo trajno izbrisan.",
+    "deleteConfirm": "Ali ste prepričani? Video bo trajno izbrisan. Prepisi, povzetki in prevodi se z njim ne izbrišejo: sledijo roku posnetka, izbranemu tukaj.",
     "notConfigured": "Jibri ni konfiguriran v infrastrukturi. Video snemanje ni na voljo.",
     "disabledHint": "Video snemanje za ta dogodek ni omogočeno. Za vklop odprite zgornji razdelek Nastavitve in vklopite stikalo „Snemanje“.",
     "play": "Predvajaj",

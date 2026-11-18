@@ -3077,7 +3077,10 @@
         "yes": "Yes",
         "no": "No",
         "recordingDuration": "Duration",
-        "recordingSize": "Size"
+        "recordingSize": "Size",
+        "recordingRetention": "Automatic deletion of the recording",
+        "recordingRetentionNone": "None",
+        "recordingRetentionDays": "{days, plural, one {# day} other {# days}} after the event ends or, if published, after publication"
       }
     },
     "rubrica": {
@@ -5909,11 +5912,12 @@
       "7d": "7 days",
       "30d": "30 days",
       "90d": "90 days",
+      "1y": "1 year",
       "forever": "No automatic deletion"
     },
-    "retentionNote": "A published video does not follow the event's data retention: without a period, it stays public until someone deletes it.",
+    "retentionNote": "The recording does not follow the event's data retention: without a period it stays, published or not, until someone deletes it. The period counts from publication or, if the video is not published, from the end of the event; when it expires, the video and what is made from it (transcripts, summaries, translations) are deleted.",
     "delete": "Delete recording",
-    "deleteConfirm": "Are you sure? The video will be permanently deleted.",
+    "deleteConfirm": "Are you sure? The video will be permanently deleted. Transcripts, summaries and translations are not deleted with it: they follow the recording period chosen here.",
     "notConfigured": "Jibri is not configured. Video recording is not available.",
     "disabledHint": "Video recording is not enabled for this event. To enable it open the Settings section above and toggle \"Recording\" on.",
     "play": "Play",

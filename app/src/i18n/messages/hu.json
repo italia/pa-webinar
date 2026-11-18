@@ -3077,7 +3077,10 @@
         "yes": "Igen",
         "no": "Nem",
         "recordingDuration": "Időtartam",
-        "recordingSize": "Méret"
+        "recordingSize": "Méret",
+        "recordingRetention": "A felvétel automatikus törlése",
+        "recordingRetentionNone": "Nincs",
+        "recordingRetentionDays": "az esemény vége után {days, plural, one {# nappal} other {# nappal}}, vagy ha közzétették, a közzététel után"
       }
     },
     "rubrica": {
@@ -5909,11 +5912,12 @@
       "7d": "7 nap",
       "30d": "30 nap",
       "90d": "90 nap",
+      "1y": "1 év",
       "forever": "Nincs automatikus törlés"
     },
-    "retentionNote": "A közzétett videóra nem vonatkozik az esemény adatainak megőrzési ideje: időtartam nélkül nyilvános marad, amíg valaki nem törli.",
+    "retentionNote": "A felvételre nem vonatkozik az esemény adatainak megőrzési ideje: időtartam nélkül megmarad, akár közzétették, akár nem, amíg valaki nem törli. Az időtartam a közzétételtől, vagy ha a videót nem tették közzé, az esemény végétől számít; lejártakor törlődik a videó és ami belőle készült (átiratok, összefoglalók, fordítások).",
     "delete": "Felvétel törlése",
-    "deleteConfirm": "Biztos benne? A videó véglegesen törlésre kerül.",
+    "deleteConfirm": "Biztos benne? A videó véglegesen törlésre kerül. Az átiratok, összefoglalók és fordítások nem törlődnek vele együtt: a felvételhez itt választott időtartamot követik.",
     "notConfigured": "Jibri nincs konfigurálva. A videofelvétel nem elérhető.",
     "disabledHint": "A videófelvétel nincs engedélyezve ehhez az eseményhez. Az engedélyezéshez nyissa meg fent a Beállítások szakaszt, és kapcsolja be a „Felvétel” kapcsolót.",
     "play": "Lejátszás",

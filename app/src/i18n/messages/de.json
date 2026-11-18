@@ -3077,7 +3077,10 @@
         "yes": "Ja",
         "no": "Nein",
         "recordingDuration": "Dauer",
-        "recordingSize": "Größe"
+        "recordingSize": "Größe",
+        "recordingRetention": "Automatische Löschung der Aufzeichnung",
+        "recordingRetentionNone": "Keine",
+        "recordingRetentionDays": "{days, plural, one {# Tag} other {# Tage}} nach dem Ende der Veranstaltung oder, wenn veröffentlicht, nach der Veröffentlichung"
       }
     },
     "rubrica": {
@@ -5909,11 +5912,12 @@
       "7d": "7 Tage",
       "30d": "30 Tage",
       "90d": "90 Tage",
+      "1y": "1 Jahr",
       "forever": "Keine automatische Löschung"
     },
-    "retentionNote": "Ein veröffentlichtes Video folgt nicht der Aufbewahrung der Veranstaltungsdaten: Ohne Frist bleibt es öffentlich, bis es jemand löscht.",
+    "retentionNote": "Die Aufzeichnung folgt nicht der Aufbewahrung der Veranstaltungsdaten: Ohne Frist bleibt sie, ob veröffentlicht oder nicht, bis jemand sie löscht. Die Frist läuft ab der Veröffentlichung oder, wenn das Video nicht veröffentlicht ist, ab dem Ende der Veranstaltung; danach werden das Video und alles daraus Entstandene (Transkripte, Zusammenfassungen, Übersetzungen) gelöscht.",
     "delete": "Aufzeichnung löschen",
-    "deleteConfirm": "Sind Sie sicher? Das Video wird endgültig gelöscht.",
+    "deleteConfirm": "Sind Sie sicher? Das Video wird endgültig gelöscht. Transkripte, Zusammenfassungen und Übersetzungen werden nicht mit ihm gelöscht: Sie folgen der hier gewählten Frist der Aufzeichnung.",
     "notConfigured": "Jibri ist nicht konfiguriert. Die Videoaufzeichnung ist nicht verfügbar.",
     "disabledHint": "Für dieses Event ist die Videoaufzeichnung nicht aktiviert. Um sie zu aktivieren, öffnen Sie den Bereich \"Einstellungen\" oben und schalten den Schalter \"Aufzeichnung\" ein.",
     "play": "Abspielen",

@@ -3077,7 +3077,10 @@
         "yes": "Ja",
         "no": "Nee",
         "recordingDuration": "Duur",
-        "recordingSize": "Grootte"
+        "recordingSize": "Grootte",
+        "recordingRetention": "Automatische verwijdering van de opname",
+        "recordingRetentionNone": "Geen",
+        "recordingRetentionDays": "{days, plural, one {# dag} other {# dagen}} na het einde van het evenement of, als ze is gepubliceerd, na de publicatie"
       }
     },
     "rubrica": {
@@ -5909,11 +5912,12 @@
       "7d": "7 dagen",
       "30d": "30 dagen",
       "90d": "90 dagen",
+      "1y": "1 jaar",
       "forever": "Geen automatische verwijdering"
     },
-    "retentionNote": "Een gepubliceerde video volgt de bewaartermijn van de evenementgegevens niet: zonder termijn blijft hij openbaar tot iemand hem verwijdert.",
+    "retentionNote": "De opname volgt de bewaartermijn van de evenementgegevens niet: zonder termijn blijft ze, gepubliceerd of niet, bewaard tot iemand haar verwijdert. De termijn loopt vanaf de publicatie of, als de video niet gepubliceerd is, vanaf het einde van het evenement; daarna worden de video en wat ervan is gemaakt (transcripties, samenvattingen, vertalingen) verwijderd.",
     "delete": "Opname verwijderen",
-    "deleteConfirm": "Weet u het zeker? De video wordt definitief verwijderd.",
+    "deleteConfirm": "Weet u het zeker? De video wordt definitief verwijderd. Transcripties, samenvattingen en vertalingen worden niet samen met de video verwijderd: ze volgen de hier gekozen termijn van de opname.",
     "notConfigured": "Jibri is niet geconfigureerd in de infrastructuur. Video-opname is niet beschikbaar.",
     "disabledHint": "Video-opname is niet ingeschakeld voor dit evenement. Open het gedeelte Instellingen hierboven en zet de schakelaar \"Opname\" aan.",
     "play": "Afspelen",

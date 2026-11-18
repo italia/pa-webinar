@@ -3077,7 +3077,10 @@
         "yes": "Jā",
         "no": "Nē",
         "recordingDuration": "Ilgums",
-        "recordingSize": "Izmērs"
+        "recordingSize": "Izmērs",
+        "recordingRetention": "Ieraksta automātiska dzēšana",
+        "recordingRetentionNone": "Nav",
+        "recordingRetentionDays": "{days, plural, zero {# dienas} one {# dienu} other {# dienas}} pēc pasākuma beigām vai, ja publicēts, pēc publicēšanas"
       }
     },
     "rubrica": {
@@ -5909,11 +5912,12 @@
       "7d": "7 dienas",
       "30d": "30 dienas",
       "90d": "90 dienas",
+      "1y": "1 gads",
       "forever": "Bez automātiskas dzēšanas"
     },
-    "retentionNote": "Publicēts video neievēro pasākuma datu glabāšanas termiņu: bez noteikta termiņa tas paliek publisks, līdz kāds to izdzēš.",
+    "retentionNote": "Ieraksts neievēro pasākuma datu glabāšanas termiņu: bez noteikta termiņa tas paliek, publicēts vai nē, līdz kāds to izdzēš. Termiņu skaita no publicēšanas vai, ja video nav publicēts, no pasākuma beigām; kad tas beidzas, tiek dzēsts video un tas, kas no tā sagatavots (atšifrējumi, kopsavilkumi, tulkojumi).",
     "delete": "Dzēst ierakstu",
-    "deleteConfirm": "Vai esat pārliecināts? Video tiks neatgriezeniski dzēsts.",
+    "deleteConfirm": "Vai esat pārliecināts? Video tiks neatgriezeniski dzēsts. Atšifrējumi, kopsavilkumi un tulkojumi kopā ar to netiek dzēsti: tiem ir šeit izvēlētais ieraksta termiņš.",
     "notConfigured": "Jibri nav konfigurēts infrastruktūrā. Video ierakstīšana nav pieejama.",
     "disabledHint": "Šim pasākumam video ierakstīšana nav iespējota. Lai to iespējotu, atveriet sadaļu Iestatījumi augstāk un ieslēdziet slēdzi \"Ierakstīšana\".",
     "play": "Atskaņot",

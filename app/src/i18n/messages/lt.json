@@ -3077,7 +3077,10 @@
         "yes": "Taip",
         "no": "Ne",
         "recordingDuration": "Trukmė",
-        "recordingSize": "Dydis"
+        "recordingSize": "Dydis",
+        "recordingRetention": "Automatinis įrašo ištrynimas",
+        "recordingRetentionNone": "Nėra",
+        "recordingRetentionDays": "praėjus {days, plural, one {# dienai} few {# dienoms} many {# dienos} other {# dienų}} nuo renginio pabaigos arba, jei paskelbtas, nuo paskelbimo"
       }
     },
     "rubrica": {
@@ -5909,11 +5912,12 @@
       "7d": "7 dienos",
       "30d": "30 dienų",
       "90d": "90 dienų",
+      "1y": "1 metai",
       "forever": "Be automatinio ištrynimo"
     },
-    "retentionNote": "Paskelbtam vaizdo įrašui netaikomas renginio duomenų saugojimo laikotarpis: nenustačius laikotarpio, jis lieka viešas, kol kas nors jį ištrins.",
+    "retentionNote": "Įrašui netaikomas renginio duomenų saugojimo laikotarpis: nenustačius laikotarpio jis lieka, paskelbtas ar ne, kol kas nors jį ištrins. Laikotarpis skaičiuojamas nuo paskelbimo arba, jei vaizdo įrašas nepaskelbtas, nuo renginio pabaigos; jam pasibaigus ištrinamas vaizdo įrašas ir tai, kas iš jo parengta (transkripcijos, santraukos, vertimai).",
     "delete": "Ištrinti įrašą",
-    "deleteConfirm": "Ar esate tikri? Vaizdo įrašas bus ištrintas negrįžtamai.",
+    "deleteConfirm": "Ar esate tikri? Vaizdo įrašas bus ištrintas negrįžtamai. Transkripcijos, santraukos ir vertimai kartu su juo neištrinami: jiems taikomas čia pasirinktas įrašo laikotarpis.",
     "notConfigured": "Jibri nesukonfigūruotas infrastruktūroje. Vaizdo įrašymas neprieinamas.",
     "disabledHint": "Vaizdo įrašymas šiam renginiui neįjungtas. Norėdami įjungti, atidarykite Nustatymų skiltį aukščiau ir įjunkite jungiklį „Įrašymas“.",
     "play": "Atkurti",

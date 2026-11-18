@@ -3077,7 +3077,10 @@
         "yes": "Jah",
         "no": "Ei",
         "recordingDuration": "Kestus",
-        "recordingSize": "Suurus"
+        "recordingSize": "Suurus",
+        "recordingRetention": "Salvestise automaatne kustutamine",
+        "recordingRetentionNone": "Puudub",
+        "recordingRetentionDays": "{days, plural, one {# päev} other {# päeva}} pärast ürituse lõppu või, kui see on avaldatud, pärast avaldamist"
       }
     },
     "rubrica": {
@@ -5909,11 +5912,12 @@
       "7d": "7 päeva",
       "30d": "30 päeva",
       "90d": "90 päeva",
+      "1y": "1 aasta",
       "forever": "Automaatset kustutamist pole"
     },
-    "retentionNote": "Avaldatud video ei järgi ürituse andmete säilitamisaega: ilma tähtajata jääb see avalikuks, kuni keegi selle kustutab.",
+    "retentionNote": "Salvestis ei järgi ürituse andmete säilitamisaega: ilma tähtajata jääb see alles, avaldatud või mitte, kuni keegi selle kustutab. Tähtaeg loetakse avaldamisest või, kui video pole avaldatud, ürituse lõpust; kui see möödub, kustutatakse video ja sellest tehtu (transkriptsioonid, kokkuvõtted, tõlked).",
     "delete": "Kustuta salvestis",
-    "deleteConfirm": "Kas olete kindel? Video kustutatakse jäädavalt.",
+    "deleteConfirm": "Kas olete kindel? Video kustutatakse jäädavalt. Transkriptsioone, kokkuvõtteid ja tõlkeid koos sellega ei kustutata: need järgivad siin valitud salvestise tähtaega.",
     "notConfigured": "Jibri pole infrastruktuuris seadistatud. Videosalvestamine pole saadaval.",
     "disabledHint": "Selle sündmuse jaoks pole videosalvestus lubatud. Selle aktiveerimiseks avage ülal asuv jaotis Seaded ja lülitage sisse \"Salvestus\".",
     "play": "Esita",

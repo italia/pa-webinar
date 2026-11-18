@@ -3077,7 +3077,10 @@
         "yes": "Sim",
         "no": "Não",
         "recordingDuration": "Duração",
-        "recordingSize": "Tamanho"
+        "recordingSize": "Tamanho",
+        "recordingRetention": "Eliminação automática da gravação",
+        "recordingRetentionNone": "Nenhuma",
+        "recordingRetentionDays": "{days, plural, one {# dia} many {# dias} other {# dias}} depois do fim do evento ou, se for publicada, depois da publicação"
       }
     },
     "rubrica": {
@@ -5909,11 +5912,12 @@
       "7d": "7 dias",
       "30d": "30 dias",
       "90d": "90 dias",
+      "1y": "1 ano",
       "forever": "Sem eliminação automática"
     },
-    "retentionNote": "Um vídeo publicado não segue a conservação dos dados do evento: sem um prazo, fica público até alguém o eliminar.",
+    "retentionNote": "A gravação não segue a conservação dos dados do evento: sem um prazo, fica, publicada ou não, até alguém a eliminar. O prazo conta a partir da publicação ou, se o vídeo não estiver publicado, do fim do evento; quando termina, são eliminados o vídeo e o que dele resulta (transcrições, resumos, traduções).",
     "delete": "Eliminar gravação",
-    "deleteConfirm": "Tem a certeza? O vídeo será eliminado definitivamente.",
+    "deleteConfirm": "Tem a certeza? O vídeo será eliminado definitivamente. As transcrições, os resumos e as traduções não são eliminados com ele: seguem o prazo da gravação escolhido aqui.",
     "notConfigured": "Jibri não está configurado na infraestrutura. A gravação de vídeo não está disponível.",
     "disabledHint": "A gravação de vídeo não está ativada para este evento. Para a ativar, abra a secção Definições acima e ligue o interruptor \"Gravação\".",
     "play": "Reproduzir",

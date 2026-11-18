@@ -3077,7 +3077,10 @@
         "yes": "Ja",
         "no": "Nej",
         "recordingDuration": "Längd",
-        "recordingSize": "Storlek"
+        "recordingSize": "Storlek",
+        "recordingRetention": "Automatisk radering av inspelningen",
+        "recordingRetentionNone": "Ingen",
+        "recordingRetentionDays": "{days, plural, one {# dag} other {# dagar}} efter att evenemanget har avslutats eller, om den publiceras, efter publiceringen"
       }
     },
     "rubrica": {
@@ -5909,11 +5912,12 @@
       "7d": "7 dagar",
       "30d": "30 dagar",
       "90d": "90 dagar",
+      "1y": "1 år",
       "forever": "Ingen automatisk radering"
     },
-    "retentionNote": "En publicerad video följer inte lagringstiden för evenemangets data: utan en period förblir den offentlig tills någon raderar den.",
+    "retentionNote": "Inspelningen följer inte lagringstiden för evenemangets data: utan en period finns den kvar, publicerad eller inte, tills någon raderar den. Perioden räknas från publiceringen eller, om videon inte är publicerad, från evenemangets slut; när den löper ut raderas videon och det som gjorts av den (transkriptioner, sammanfattningar, översättningar).",
     "delete": "Radera inspelning",
-    "deleteConfirm": "Är du säker? Videon raderas permanent.",
+    "deleteConfirm": "Är du säker? Videon raderas permanent. Transkriptioner, sammanfattningar och översättningar raderas inte med den: de följer den period för inspelningen som väljs här.",
     "notConfigured": "Jibri är inte konfigurerat. Videoinspelning är inte tillgänglig.",
     "disabledHint": "Videoinspelning är inte aktiverad för detta evenemang. För att aktivera, öppna avsnittet Inställningar ovan och slå på \"Inspelning\".",
     "play": "Spela upp",
