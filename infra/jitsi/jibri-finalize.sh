@@ -5,7 +5,8 @@
 # Jibri finalize script — runs after recording completes.
 # 1. Extracts duration/size via ffprobe
 # 2. Re-muxes with faststart for streaming (no re-encode)
-# 3. Tags MP4 metadata from the portal (event title, organizer, participants)
+# 3. Tags MP4 metadata from the portal (event title, organizer, hosts). Only
+#    hosts appear in the video, so participants are never written to the file.
 # 4. Uploads to configured object storage
 # 5. Notifies the portal webhook with enriched payload
 #
@@ -73,7 +74,7 @@ EVENT_TITLE=""
 EVENT_ORGANIZER=""
 EVENT_DESCRIPTION=""
 EVENT_DATE=""
-PARTICIPANTS_JSON="[]"
+HOSTS_JSON="[]"
 
 if [ -n "$APP_INTERNAL_URL" ] && [ -n "$CRON_API_KEY" ] && command -v ffmpeg >/dev/null 2>&1; then
   log "Fetching event metadata from portal..."
@@ -86,7 +87,7 @@ if [ -n "$APP_INTERNAL_URL" ] && [ -n "$CRON_API_KEY" ] && command -v ffmpeg >/d
     EVENT_ORGANIZER=$(echo "$EVENT_META" | jq -r '.organizer // ""')
     EVENT_DESCRIPTION=$(echo "$EVENT_META" | jq -r '.description // ""')
     EVENT_DATE=$(echo "$EVENT_META" | jq -r '.date // ""')
-    PARTICIPANTS_JSON=$(echo "$EVENT_META" | jq -c '.participants // []')
+    HOSTS_JSON=$(echo "$EVENT_META" | jq -c '.hosts // []')
 
     if [ -n "$EVENT_TITLE" ]; then
       TAGGED_FILE="${MP4_FILE%.mp4}_tagged.mp4"
@@ -96,7 +97,7 @@ if [ -n "$APP_INTERNAL_URL" ] && [ -n "$CRON_API_KEY" ] && command -v ffmpeg >/d
         -metadata artist="$EVENT_ORGANIZER" \
         -metadata date="$EVENT_DATE" \
         -metadata description="$EVENT_DESCRIPTION" \
-        -metadata comment="participants: $PARTICIPANTS_JSON" \
+        -metadata comment="hosts: $HOSTS_JSON" \
         "$TAGGED_FILE" 2>/dev/null
       mv "$TAGGED_FILE" "$MP4_FILE"
       log "MP4 metadata tagged"
@@ -169,8 +170,7 @@ if [ -n "$RECORDING_WEBHOOK_URL" ] && [ "${RECORDING_URL}" != "file://"* ]; then
       --arg file "$FILENAME" \
       --argjson duration "${DURATION:-0}" \
       --argjson fileSize "${FILE_SIZE:-0}" \
-      --argjson participants "$PARTICIPANTS_JSON" \
-      '{roomName: $room, recordingUrl: $url, filename: $file, duration: $duration, fileSize: $fileSize, participants: $participants}')
+      '{roomName: $room, recordingUrl: $url, filename: $file, duration: $duration, fileSize: $fileSize}')
   elif command -v python3 >/dev/null 2>&1; then
     PAYLOAD=$(python3 -c "
 import json,sys
@@ -179,9 +179,8 @@ print(json.dumps({
   'recordingUrl': sys.argv[2],
   'filename': sys.argv[3],
   'duration': int(sys.argv[4]),
-  'fileSize': int(sys.argv[5]),
-  'participants': json.loads(sys.argv[6])
-}))" "$ROOM_NAME" "$RECORDING_URL" "$FILENAME" "${DURATION:-0}" "${FILE_SIZE:-0}" "$PARTICIPANTS_JSON")
+  'fileSize': int(sys.argv[5])
+}))" "$ROOM_NAME" "$RECORDING_URL" "$FILENAME" "${DURATION:-0}" "${FILE_SIZE:-0}")
   else
     PAYLOAD="{\"roomName\":\"$ROOM_NAME\",\"recordingUrl\":\"$RECORDING_URL\",\"filename\":\"$FILENAME\",\"duration\":${DURATION:-0},\"fileSize\":${FILE_SIZE:-0}}"
   fi

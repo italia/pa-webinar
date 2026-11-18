@@ -15,7 +15,14 @@ vi.mock('@/lib/crypto/pii', () => ({
 
 import { GET } from './route';
 
-/** I metadati che finiscono nel file del video: chi ha un nickname vi compare con quello. */
+const chiedi = async () =>
+  (await (
+    await GET(new NextRequest('http://localhost/api/internal/recording-metadata?room=stanza'), {
+      params: Promise.resolve({}),
+    } as never)
+  ).json()) as Record<string, unknown>;
+
+/** I metadati che finiscono nel file del video: solo chi conduce, come nel video. */
 describe('GET /api/internal/recording-metadata', () => {
   beforeEach(() => {
     db.event.findUnique.mockResolvedValue({
@@ -26,32 +33,30 @@ describe('GET /api/internal/recording-metadata', () => {
       moderatorName: 'Chi modera',
       startsAt: new Date('2026-11-18T09:00:00Z'),
       endsAt: new Date('2026-11-18T10:00:00Z'),
-      registrations: [
-        {
-          displayName: 'enc:Maria Rossi',
-          nickname: 'enc:Luna',
-          joinedAt: new Date(),
-          leftAt: null,
-        },
-        {
-          displayName: 'enc:Luca Neri',
-          nickname: null,
-          joinedAt: new Date(),
-          leftAt: null,
-        },
+      additionalMods: [
+        { name: 'enc:Anna Relatrice', role: 'SPEAKER' },
+        { name: 'enc:Chi modera', role: 'MODERATOR' },
+        { name: 'enc:Bruno Moderatore', role: 'MODERATOR' },
       ],
     });
   });
 
-  it('il nickname al posto del nome, il nome per chi non ne ha', async () => {
-    const res = await GET(
-      new NextRequest('http://localhost/api/internal/recording-metadata?room=stanza'),
-      {
-        params: Promise.resolve({}),
-      } as never
-    );
-    const corpo = (await res.json()) as { participantNames: string[] };
-    expect(corpo.participantNames).toEqual(['Luna', 'Luca Neri']);
-    expect(JSON.stringify(corpo)).not.toContain('Maria Rossi');
+  it('nomina chi conduce, una volta per nome, con il ruolo', async () => {
+    expect((await chiedi()).hosts).toEqual([
+      { name: 'Chi modera', role: 'moderator' },
+      { name: 'Anna Relatrice', role: 'speaker' },
+      { name: 'Bruno Moderatore', role: 'moderator' },
+    ]);
+  });
+
+  it('non legge ne restituisce chi partecipa, ne nomi ne nickname', async () => {
+    const corpo = await chiedi();
+    expect(corpo).not.toHaveProperty('participants');
+    expect(corpo).not.toHaveProperty('participantNames');
+    const select = db.event.findUnique.mock.calls[0]![0].select as Record<string, unknown>;
+    expect(select).not.toHaveProperty('registrations');
+    expect(db.event.findUnique.mock.calls[0]![0].select.additionalMods.where).toEqual({
+      revokedAt: null,
+    });
   });
 });
