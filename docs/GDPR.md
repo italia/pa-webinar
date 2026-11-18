@@ -179,6 +179,12 @@ Where the installation records no room video, the box says so (`gdpr.consent.rec
 - The AI event report follows the recording.
 - An external link already on the event stays there, and the page shows it only to whoever can see the video. The copy on the external site is the controller's to remove.
 
+### What the video shows
+
+The composite video shows only the people who host the event: organizers, moderators and speakers, whose conference token says so (`paInVideo`). They appear with their image and name. Participants never appear: no tile, no image, no name, no shared screen, and the stage never moves to them when they speak. Of a participant with a valid recording consent the video keeps only the voice; without that consent, not even the voice. The rule is enforced on the server: `mod_pa_media_lock` writes marks into each presence from the token, which the client can neither add nor remove, and Jibri's session leaves out everyone without the host's mark ([Only hosts in the video](architecture/jitsi-integration.md#per-event-participant-policies)). The per-participant recorder keeps its own consent rules and records voices only.
+
+The guarantee holds only where Jibri's session reads those marks, which the chart declares with `RECORDING_VOICE_EXCLUSION`. With an external Jitsi, or a values file that replaced the chart's conference text, participants can appear with face and name, even silent in the thumbnails, and the portal can tell (`partecipantiNelVideo` answers `visibili`). Where the conference text does not play participants' voices (`RECORDING_PARTICIPANT_VOICE` unset), the video has the hosts only and no participant is heard in it.
+
 ### At registration
 
 The registration form shows the event's [privacy sheet](#the-privacy-sheet-of-an-event), the link to its privacy notice, and then the boxes below. All start unticked (`app/src/components/registration/registration-form-client.tsx`). Only the first is needed to register: without it `POST /api/events/{slug}/registrations` rejects the request with a validation error (`422`). It records that the person read the notice, and is not a consent to the purposes that follow, each of which is optional.

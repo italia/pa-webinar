@@ -607,8 +607,9 @@ what the chart does not configure on the Prosody side, is in
 
 ### Pin the conference's internal credentials
 
-A release that changes the Prosody modules takes effect only after Prosody restarts: the rule that keeps
-people without the recording consent out of the recording depends on `mod_pa_media_lock`. The post-upgrade
+A release that changes the Prosody modules takes effect only after Prosody restarts: the rules that keep
+people without the recording consent out of the recording, and participants out of the video, depend on
+`mod_pa_media_lock`. The post-upgrade
 hook restarts Prosody when the modules changed, which drops the conferences in progress, so run that
 upgrade with no event running. With `configReloadHook.enabled: false`, restart Prosody yourself before the
 next event.
@@ -1179,6 +1180,12 @@ subchart's checksum does not cover, so changing them would not restart the web p
 `configReloadHook.components` (default `web`). Add `jicofo` or `prosody` if you change their custom
 configuration. The Job uses `configReloadHook.image`, then `jvbScaler.image`, then the chart's
 digest-pinned `kubectlImage`.
+The chart's own `_custom_config_js` keeps participants out of the recorded video and plays the voice of
+those who consented ([Only hosts in the video](architecture/jitsi-integration.md#per-event-participant-policies)).
+A values file that sets `_custom_config_js` replaces that text: copy it in full from the chart's
+`values.yaml` and add your lines after it. The chart reads the result: it sets `RECORDING_VOICE_EXCLUSION`
+and `RECORDING_PARTICIPANT_VOICE` for the portal only when the text still carries the logic, and the
+portal reads from them what the video can hold (`partecipantiNelVideo`).
 The web tier is stateless, but the restart happens on every upgrade: plan upgrades between events
 ([Upgrades and rollback](operations/upgrades.md)).
 
