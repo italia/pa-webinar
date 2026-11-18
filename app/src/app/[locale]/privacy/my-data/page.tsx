@@ -21,7 +21,10 @@ import {
 } from 'design-react-kit';
 
 import RecordingRemoval, { type RimozioneVista } from '@/components/privacy/recording-removal';
-import RegistrationConsents, { type ConsensiVista } from '@/components/privacy/registration-consents';
+import RegistrationConsents, {
+  type ConsensiVista,
+  type OffertaVista,
+} from '@/components/privacy/registration-consents';
 import RetainedConsentProofs, {
   type ProvaConservataVista,
 } from '@/components/privacy/retained-consent-proofs';
@@ -41,6 +44,8 @@ interface ExportEventData {
 interface ExportRegistration {
   id: string;
   consents: ConsensiVista;
+  /** I consensi che si possono dare di nuovo da qui, con il loro testo. */
+  consentOffer?: OffertaVista;
   displayName: string;
   email: string | null;
   organization: string | null;
@@ -532,6 +537,8 @@ export default function MyDataPage() {
                         onComunicazioniRitirate={setComunicazioniRitirateIl}
                         rubricaConfermata={rubricaConfermata}
                         onRubricaConfermata={() => setRubricaConfermata(true)}
+                        offerta={entry.registration.consentOffer ?? null}
+                        locale={locale}
                       />
                     )}
 

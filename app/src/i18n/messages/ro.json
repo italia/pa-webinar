@@ -4114,7 +4114,8 @@
         },
         "sources": {
           "registration": "înscriere",
-          "room": "sală"
+          "room": "sală",
+          "self-service": "Datele mele"
         },
         "roles": {
           "registrant": "înscris",
@@ -4758,6 +4759,7 @@
       "consentFuture": "Comunicări viitoare",
       "consentWithdrawnOn": "Retras la {date}",
       "consentNoteInRoom": "Dacă ești acum în sală, retragerea se aplică de la următoarea intrare: pentru a se aplica imediat, folosește Consimțăminte în sală.",
+      "consentGiveNoteInRoom": "Un consimțământ dat de aici se aplică de la următoarea ta intrare în sală, nu pentru ceea ce a fost deja înregistrat. Consimțământul pentru înregistrare și transcriere se poate da până la încheierea evenimentului.",
       "proofsTitle": "Dovezi păstrate ale consimțămintelor",
       "proofsIntro": "Datele acestor evenimente au fost șterse. Aceste dovezi rămân cât timp videoclipul sau transcrierea există. Vă puteți retrage consimțământul: ceea ce se află deja în videoclip rămâne, iar pentru a-l elimina trebuie să scrieți operatorului de date.",
       "proofGivenOn": "Dat la {date}",
@@ -4773,6 +4775,12 @@
       "addressBookIntro": "Ați ales să rămâneți în agendă, pentru a fi invitat la evenimente similare. Păstrăm aceste date până la {date}, cu excepția cazului în care vă retrageți consimțământul sau dați un nou consimțământ.",
       "addressBookOptOut": "Elimină-mi datele din agendă",
       "consentFutureEffect": "Dacă îl retragi, nu mai primești comunicări despre evenimentele viitoare și ieși din agendă, pentru toate înscrierile tale.",
+      "consentFutureGive": "Sunt de acord cu comunicările viitoare",
+      "consentFutureGiveEffect": "Revii în agenda de evenimente cu numele și instituția de la această înscriere și primești din nou invitații; perioada de păstrare începe din nou de astăzi.",
+      "consentGiveDone": "Consimțământ dat: se aplică de la următoarea ta intrare în sală.",
+      "consentFutureGiveDone": "Consimțământ dat: ești din nou în agenda de evenimente.",
+      "consentGiveTextChanged": "Textul consimțământului s-a schimbat după ce ai deschis pagina: reîncarc-o pentru a-l citi pe cel nou.",
+      "consentGiveClosed": "Acest consimțământ nu mai poate fi dat de aici: evenimentul s-a încheiat sau nu îl mai cere. Reîncarcă pagina pentru a vedea starea actuală.",
       "addressBookPendingTitle": "Revenire în agendă de confirmat",
       "addressBookPendingBody": "La această înscriere a fost bifată caseta agendei, dar această adresă nu mai primea invitații. Până nu confirmați, nu se schimbă nimic.",
       "addressBookPendingEffect": "Dacă confirmați, reveniți în agendă cu numele și instituția de la această înscriere și primiți din nou invitații. Dacă anulați sau dacă nu ați fost dumneavoastră, rămâneți în afara agendei și nu primiți invitații.",

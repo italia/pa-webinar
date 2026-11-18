@@ -15,7 +15,9 @@ vi.mock('@/lib/crypto/pii', () => ({ tryDecryptPII: (v: string) => `chiaro:${v}`
 import {
   improntaTitolare,
   leggiRigheProve,
+  origineDelPosto,
   periodiSostituiti,
+  postoDaIMieiDati,
   proveConsensoEvento,
   riepilogoProve,
 } from './consent-proofs';
@@ -395,6 +397,24 @@ describe('periodiSostituiti', () => {
         periodo('11:00', null, { holderHash: 'altra' }),
       ]).size
     ).toBe(0);
+  });
+
+  it('un periodo dato dai propri dati e’ un periodo della stessa prova di sala', () => {
+    const primo = periodo('10:00', null, { source: 'self-service' });
+    expect([...periodiSostituiti([primo, periodo('11:00', null)])]).toEqual([primo]);
+  });
+});
+
+describe('origineDelPosto', () => {
+  it('il posto di «I miei dati» e’ quello dell’iscrizione, non un ingresso', () => {
+    expect(postoDaIMieiDati(REG)).toBe(`reg-${REG}-mydata`);
+    expect(origineDelPosto(postoDaIMieiDati(REG))).toBe('self-service');
+  });
+
+  it('ogni altro posto e’ un ingresso in sala', () => {
+    expect(origineDelPosto(`reg-${REG}-abcd1234`)).toBe('room');
+    expect(origineDelPosto('guest-1-mydata')).toBe('room');
+    expect(origineDelPosto('mod-e-1')).toBe('room');
   });
 });
 

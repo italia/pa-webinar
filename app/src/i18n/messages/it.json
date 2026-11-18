@@ -4324,7 +4324,8 @@
         },
         "sources": {
           "registration": "iscrizione",
-          "room": "sala"
+          "room": "sala",
+          "self-service": "I miei dati"
         },
         "roles": {
           "registrant": "iscritto",
@@ -4758,6 +4759,7 @@
       "consentFuture": "Comunicazioni future",
       "consentWithdrawnOn": "Ritirato il {date}",
       "consentNoteInRoom": "Se sei in sala in questo momento, il ritiro vale dal prossimo ingresso: per farlo valere subito usa «Consensi» nella sala.",
+      "consentGiveNoteInRoom": "Un consenso dato da qui vale dal prossimo ingresso in sala, non per ciò che è già stato registrato. Registrazione e trascrizione si possono dare finché l'evento non è concluso.",
       "proofsTitle": "Prove dei consensi conservate",
       "proofsIntro": "I dati di questi eventi sono stati cancellati. Queste prove restano finché il video o la trascrizione esistono. Puoi ritirare il consenso: ciò che è già nel video resta, e per toglierlo devi scrivere al titolare del trattamento.",
       "proofGivenOn": "Dato il {date}",
@@ -4773,6 +4775,12 @@
       "addressBookIntro": "Hai scelto di restare in rubrica per essere invitato a eventi simili. Conserviamo questi dati fino al {date}, salvo revoca o nuovo consenso.",
       "addressBookOptOut": "Rimuovi i miei dati dalla rubrica",
       "consentFutureEffect": "Se lo ritiri non ricevi più comunicazioni sui prossimi eventi ed esci dalla rubrica, per tutte le tue iscrizioni.",
+      "consentFutureGive": "Acconsento alle comunicazioni future",
+      "consentFutureGiveEffect": "Torni nella rubrica degli eventi con il nome e l'ente di questa iscrizione e ricevi di nuovo gli inviti; il periodo di conservazione riparte da oggi.",
+      "consentGiveDone": "Consenso dato: vale dal prossimo ingresso in sala.",
+      "consentFutureGiveDone": "Consenso dato: sei di nuovo nella rubrica degli eventi.",
+      "consentGiveTextChanged": "Il testo del consenso è cambiato dopo che hai aperto la pagina: ricaricala per leggere quello nuovo.",
+      "consentGiveClosed": "Questo consenso non si può più dare da qui: l'evento è concluso o non lo chiede più. Ricarica la pagina per vedere lo stato aggiornato.",
       "addressBookPendingTitle": "Rientro in rubrica da confermare",
       "addressBookPendingBody": "Su questa iscrizione è stata spuntata la casella della rubrica, ma questo indirizzo aveva smesso di ricevere inviti. Finché non confermi non cambia niente.",
       "addressBookPendingEffect": "Se confermi torni in rubrica con il nome e l'ente di questa iscrizione e ricevi di nuovo gli inviti. Se annulli, o se non sei stato tu, resti fuori dalla rubrica e non ricevi inviti.",

@@ -30,6 +30,7 @@ import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { limiteTokenOspiti } from '@/lib/room-rate-limit';
 import { readOwnedEventAccess } from '@/lib/event-session';
 import { guestAccessAllowed } from '@/lib/events/guest-window';
+import { origineDelPosto } from '@/lib/gdpr/consent-proofs';
 import { conduceSempreRegistrato } from '@/lib/live/consent-rule';
 import { registrazioneDellIscrizione, trascrizioneInVigore } from '@/lib/live/consents-in-force';
 import { mediaDelToken, regolaConsenso } from '@/lib/live/listen-only';
@@ -286,6 +287,7 @@ async function registraConsensi(
           ? await prisma.recordingConsent.findFirst({
               where: { eventId: event.id, registrationId },
               select: {
+                jitsiUserId: true,
                 consentedAt: true,
                 withdrawnAt: true,
                 earlierPeriods: true,
@@ -319,6 +321,10 @@ async function registraConsensi(
                   withdrawnAt: esistente.withdrawnAt?.toISOString() ?? null,
                   destination: esistente.destination,
                   textVersion: esistente.textVersion,
+                  // Un periodo dato dalla pagina dei propri dati lo dice; senza, in sala.
+                  ...(origineDelPosto(esistente.jitsiUserId) === 'self-service' && {
+                    source: 'self-service' as const,
+                  }),
                 } satisfies PeriodoConsenso,
               ],
               ...testoDellaProva,

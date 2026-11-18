@@ -4114,7 +4114,8 @@
         },
         "sources": {
           "registration": "inscrição",
-          "room": "sala"
+          "room": "sala",
+          "self-service": "Os meus dados"
         },
         "roles": {
           "registrant": "inscrito",
@@ -4758,6 +4759,7 @@
       "consentFuture": "Comunicações futuras",
       "consentWithdrawnOn": "Retirado em {date}",
       "consentNoteInRoom": "Se estiver agora na sala, a retirada vale a partir da próxima entrada: para a aplicar de imediato, use Consentimentos na sala.",
+      "consentGiveNoteInRoom": "Um consentimento dado aqui vale a partir da sua próxima entrada na sala, não para o que já foi gravado. A gravação e a transcrição podem ser consentidas até ao fim do evento.",
       "proofsTitle": "Provas dos consentimentos conservadas",
       "proofsIntro": "Os dados destes eventos foram eliminados. Estas provas ficam enquanto o vídeo ou a transcrição existirem. Pode retirar o consentimento: o que já está no vídeo fica e, para o retirar, tem de escrever ao responsável pelo tratamento.",
       "proofGivenOn": "Dado em {date}",
@@ -4773,6 +4775,12 @@
       "addressBookIntro": "Escolheu ficar na agenda para ser convidado para eventos semelhantes. Conservamos estes dados até {date}, salvo retirada ou novo consentimento.",
       "addressBookOptOut": "Remover os meus dados da agenda",
       "consentFutureEffect": "Se o retirar, deixa de receber comunicações sobre próximos eventos e sai da lista de contactos, para todas as suas inscrições.",
+      "consentFutureGive": "Dou o meu consentimento a comunicações futuras",
+      "consentFutureGiveEffect": "Regressa à agenda de eventos com o nome e o organismo desta inscrição e volta a receber convites; o prazo de conservação recomeça hoje.",
+      "consentGiveDone": "Consentimento dado: vale a partir da sua próxima entrada na sala.",
+      "consentFutureGiveDone": "Consentimento dado: voltou a estar na agenda de eventos.",
+      "consentGiveTextChanged": "O texto do consentimento mudou depois de abrir a página: recarregue-a para ler o novo.",
+      "consentGiveClosed": "Este consentimento já não pode ser dado aqui: o evento terminou ou já não o pede. Recarregue a página para ver o estado atual.",
       "addressBookPendingTitle": "Regresso à agenda por confirmar",
       "addressBookPendingBody": "Nesta inscrição foi assinalada a caixa da agenda, mas este endereço tinha deixado de receber convites. Até confirmar, nada muda.",
       "addressBookPendingEffect": "Se confirmar, regressa à agenda com o nome e o organismo desta inscrição e volta a receber convites. Se cancelar, ou se não tiver sido você, fica fora da agenda e não recebe convites.",

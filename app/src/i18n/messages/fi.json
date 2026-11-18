@@ -4114,7 +4114,8 @@
         },
         "sources": {
           "registration": "ilmoittautuminen",
-          "room": "huone"
+          "room": "huone",
+          "self-service": "Omat tietoni"
         },
         "roles": {
           "registrant": "ilmoittautunut",
@@ -4758,6 +4759,7 @@
       "consentFuture": "Tulevat viestit",
       "consentWithdrawnOn": "Peruutettu {date}",
       "consentNoteInRoom": "Jos olet nyt huoneessa, peruutus tulee voimaan seuraavalla kerralla: käytä huoneen Suostumukset-painiketta, jos haluat sen voimaan heti.",
+      "consentGiveNoteInRoom": "Täällä annettu suostumus on voimassa seuraavasta huoneeseen tulosta alkaen, ei jo tallennetulle. Suostumuksen tallennukseen ja litterointiin voi antaa tapahtuman loppuun asti.",
       "proofsTitle": "Säilytetyt suostumusten todisteet",
       "proofsIntro": "Näiden tapahtumien tiedot on poistettu. Nämä todisteet säilyvät niin kauan kuin video tai litterointi on olemassa. Voit peruuttaa suostumuksesi: se, mikä on jo videossa, säilyy, ja sen poistamiseksi sinun on kirjoitettava rekisterinpitäjälle.",
       "proofGivenOn": "Annettu {date}",
@@ -4773,6 +4775,12 @@
       "addressBookIntro": "Valitsit jäädä osoitekirjaan, jotta sinut voidaan kutsua vastaaviin tapahtumiin. Säilytämme näitä tietoja {date} asti, ellet peruuta suostumusta tai anna uutta suostumusta.",
       "addressBookOptOut": "Poista tietoni osoitekirjasta",
       "consentFutureEffect": "Jos peruutat sen, et enää saa viestejä tulevista tapahtumista ja poistut osoitekirjasta kaikkien ilmoittautumistesi osalta.",
+      "consentFutureGive": "Suostun tuleviin viesteihin",
+      "consentFutureGiveEffect": "Palaat tapahtumien osoitekirjaan tämän ilmoittautumisen nimellä ja organisaatiolla ja saat taas kutsuja; säilytysaika alkaa alusta tänään.",
+      "consentGiveDone": "Suostumus annettu: se on voimassa seuraavasta huoneeseen tulosta alkaen.",
+      "consentFutureGiveDone": "Suostumus annettu: olet taas tapahtumien osoitekirjassa.",
+      "consentGiveTextChanged": "Suostumuksen teksti muuttui sen jälkeen, kun avasit sivun: lataa se uudelleen lukeaksesi uuden.",
+      "consentGiveClosed": "Tätä suostumusta ei voi enää antaa täältä: tapahtuma on päättynyt tai ei enää pyydä sitä. Lataa sivu uudelleen nähdäksesi nykyisen tilan.",
       "addressBookPendingTitle": "Paluu osoitekirjaan odottaa vahvistusta",
       "addressBookPendingBody": "Tässä ilmoittautumisessa valittiin osoitekirjan valintaruutu, mutta tämä osoite oli lakannut saamasta kutsuja. Mikään ei muutu, ennen kuin vahvistat.",
       "addressBookPendingEffect": "Jos vahvistat, palaat osoitekirjaan tämän ilmoittautumisen nimellä ja organisaatiolla ja saat taas kutsuja. Jos peruutat tai jos se et ollut sinä, pysyt osoitekirjan ulkopuolella etkä saa kutsuja.",

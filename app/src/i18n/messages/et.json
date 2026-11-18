@@ -4114,7 +4114,8 @@
         },
         "sources": {
           "registration": "registreerimine",
-          "room": "ruum"
+          "room": "ruum",
+          "self-service": "Minu andmed"
         },
         "roles": {
           "registrant": "registreerunud",
@@ -4758,6 +4759,7 @@
       "consentFuture": "Tulevased teated",
       "consentWithdrawnOn": "Tagasi võetud {date}",
       "consentNoteInRoom": "Kui olete praegu ruumis, kehtib tagasivõtmine järgmisest sisenemisest: et see kehtiks kohe, kasutage ruumis nuppu Nõusolekud.",
+      "consentGiveNoteInRoom": "Siin antud nõusolek kehtib järgmisest ruumi sisenemisest, mitte juba salvestatu kohta. Salvestamise ja transkriptsiooni nõusoleku saab anda kuni ürituse lõpuni.",
       "proofsTitle": "Säilitatud nõusolekute tõendid",
       "proofsIntro": "Nende ürituste andmed on kustutatud. Need tõendid jäävad alles seni, kuni video või transkriptsioon on olemas. Võite nõusoleku tagasi võtta: see, mis on juba videos, jääb alles, ja selle eemaldamiseks peate kirjutama vastutavale töötlejale.",
       "proofGivenOn": "Antud {date}",
@@ -4773,6 +4775,12 @@
       "addressBookIntro": "Valisite jääda aadressraamatusse, et teid kutsutaks sarnastele üritustele. Säilitame neid andmeid kuni {date}, välja arvatud juhul, kui võtate nõusoleku tagasi või annate uue.",
       "addressBookOptOut": "Eemalda minu andmed aadressraamatust",
       "consentFutureEffect": "Kui selle tagasi võtate, ei saa te enam teateid järgmiste ürituste kohta ja lahkute aadressiraamatust kõigi oma registreerimiste puhul.",
+      "consentFutureGive": "Annan nõusoleku tulevaste teadete saamiseks",
+      "consentFutureGiveEffect": "Naasete ürituste aadressraamatusse selle registreerumise nime ja organisatsiooniga ning saate taas kutseid; säilitusaeg algab uuesti tänasest.",
+      "consentGiveDone": "Nõusolek antud: see kehtib järgmisest ruumi sisenemisest.",
+      "consentFutureGiveDone": "Nõusolek antud: olete taas ürituste aadressraamatus.",
+      "consentGiveTextChanged": "Nõusoleku tekst muutus pärast lehe avamist: laadige leht uuesti, et uut teksti lugeda.",
+      "consentGiveClosed": "Seda nõusolekut ei saa siit enam anda: üritus on lõppenud või ei küsi seda enam. Laadige leht uuesti, et näha praegust olekut.",
       "addressBookPendingTitle": "Aadressraamatusse naasmine vajab kinnitust",
       "addressBookPendingBody": "Selle registreerumise juures märgiti aadressraamatu lahter, kuid see aadress oli lakanud kutseid saamast. Enne kinnitamist ei muutu midagi.",
       "addressBookPendingEffect": "Kui kinnitate, naasete aadressraamatusse selle registreerumise nime ja organisatsiooniga ning saate taas kutseid. Kui tühistate või kui see polnud teie, jääte aadressraamatust välja ega saa kutseid.",

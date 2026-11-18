@@ -10,7 +10,7 @@ import messages from '@/i18n/messages/it.json';
 
 import type { VoceNelVideo } from '@/lib/live/consent-rule';
 
-import RegistrationConsents, { type ConsensiVista } from './registration-consents';
+import RegistrationConsents, { type ConsensiVista, type OffertaVista } from './registration-consents';
 
 let container: HTMLDivElement;
 let root: Root;
@@ -24,6 +24,8 @@ const monta = (
     voce?: VoceNelVideo;
     rubricaConfermata?: boolean;
     onRubricaConfermata?: () => void;
+    offerta?: OffertaVista | null;
+    locale?: string;
   } = {}
 ) =>
   act(() =>
@@ -354,5 +356,85 @@ describe('RegistrationConsents', () => {
 
     expect(container.querySelector('[role="alert"]')).not.toBeNull();
     expect(container.textContent).not.toContain('Ritirato il');
+  });
+
+  describe('un consenso dato di nuovo', () => {
+    const ritirato = { dato: false, ritiratoIl: '2026-11-05T10:00:00.000Z' };
+    const offerta: OffertaVista = {
+      recording: { destination: 'REGISTRANTS', voice: 'rimovibile', eventText: 'Testo dell’ente.' },
+      transcription: { text: 'multitrack', voice: 'rimovibile', needsRecording: true },
+      futureCommunications: true,
+    };
+    const g = messages.gdpr.consent;
+    const l = messages.live.consents;
+
+    it('mostra il testo della casella e lo manda con il testo letto', async () => {
+      const richiesta = vi.fn(async () => new Response('{}', { status: 200 }));
+      vi.stubGlobal('fetch', richiesta);
+      monta({ recording: ritirato }, { offerta, locale: 'it' });
+
+      expect(container.textContent).toContain(`Testo dell’ente. ${g.recordingReserved}`);
+      await clic(l.recording.give);
+
+      expect(richiesta).toHaveBeenCalledWith(
+        '/api/gdpr/consents',
+        expect.objectContaining({
+          body: JSON.stringify({
+            token: 'tok en',
+            registrationId: 'r1',
+            consent: 'recording',
+            give: true,
+            locale: 'it',
+            recordingDestination: 'REGISTRANTS',
+          }),
+        })
+      );
+      expect(container.textContent).toContain(messages.gdpr.export.consentGiveDone);
+      expect(pulsante(l.withdraw)).toBeDefined();
+    });
+
+    it('senza offerta non si da: resta solo lo stato', () => {
+      monta({ recording: ritirato }, { offerta: { ...offerta, recording: null } });
+      expect(pulsante(l.recording.give)).toBeUndefined();
+    });
+
+    it('la trascrizione aspetta il consenso alla registrazione', () => {
+      monta({ recording: ritirato, transcription: ritirato }, { offerta });
+      expect(pulsante(l.transcription.give)?.disabled).toBe(true);
+      expect(container.textContent).toContain(l.transcription.needsRecording);
+    });
+
+    it('un testo cambiato a pagina aperta lo dice', async () => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(
+          async () =>
+            new Response(JSON.stringify({ code: 'CONSENT_TEXT_CHANGED' }), { status: 409 })
+        )
+      );
+      monta({ recording: ritirato }, { offerta });
+      await clic(l.recording.give);
+      expect(container.textContent).toContain(messages.gdpr.export.consentGiveTextChanged);
+      expect(pulsante(l.withdraw)).toBeUndefined();
+    });
+
+    it("le comunicazioni ridate valgono anche dopo un ritiro fatto da un'altra scheda", async () => {
+      vi.stubGlobal('fetch', vi.fn(async () => new Response('{}', { status: 200 })));
+      const confermata = vi.fn();
+      monta(
+        { futureCommunications: ritirato },
+        { offerta, comunicazioniRitirateIl: ritirato.ritiratoIl, onRubricaConfermata: confermata }
+      );
+      expect(container.textContent).toContain(messages.gdpr.export.consentFutureGiveEffect);
+      await clic(messages.gdpr.export.consentFutureGive);
+      expect(confermata).toHaveBeenCalled();
+      expect(pulsante(l.withdraw)).toBeDefined();
+    });
+
+    it('con una spunta in attesa si conferma quella, non un secondo pulsante', () => {
+      monta({ futureCommunications: ritirato, addressBookPending: true }, { offerta });
+      expect(pulsante(messages.gdpr.export.consentFutureGive)).toBeUndefined();
+      expect(pulsante(messages.gdpr.export.addressBookPendingConfirm)).toBeDefined();
+    });
   });
 });

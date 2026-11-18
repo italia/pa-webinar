@@ -4114,7 +4114,8 @@
         },
         "sources": {
           "registration": "prijava",
-          "room": "dvorana"
+          "room": "dvorana",
+          "self-service": "Moji podatki"
         },
         "roles": {
           "registrant": "prijavljen",
@@ -4758,6 +4759,7 @@
       "consentFuture": "Prihodnja sporočila",
       "consentWithdrawnOn": "Preklicano {date}",
       "consentNoteInRoom": "Če ste zdaj v dvorani, preklic velja od naslednjega vstopa: da velja takoj, uporabite Privolitve v dvorani.",
+      "consentGiveNoteInRoom": "Privolitev, dana tukaj, velja od vašega naslednjega vstopa v dvorano, ne za tisto, kar je že posneto. Privolitev v snemanje in prepis lahko daste, dokler se dogodek ne konča.",
       "proofsTitle": "Shranjena dokazila o privolitvah",
       "proofsIntro": "Podatki teh dogodkov so bili izbrisani. Ta dokazila ostanejo, dokler video ali prepis obstaja. Privolitev lahko prekličete: kar je že v videu, ostane, za odstranitev pa morate pisati upravljavcu podatkov.",
       "proofGivenOn": "Dana {date}",
@@ -4773,6 +4775,12 @@
       "addressBookIntro": "Izbrali ste, da ostanete v imeniku, da bi vas lahko povabili na podobne dogodke. Te podatke hranimo do {date}, razen v primeru preklica ali nove privolitve.",
       "addressBookOptOut": "Odstrani moje podatke iz imenika",
       "consentFutureEffect": "Če jo prekličete, ne boste več prejemali sporočil o prihodnjih dogodkih in izstopite iz imenika, za vse svoje prijave.",
+      "consentFutureGive": "Privolim v prihodnja sporočila",
+      "consentFutureGiveEffect": "Vrnete se v imenik dogodkov z imenom in organizacijo iz te prijave in znova prejemate povabila; obdobje hrambe se začne znova danes.",
+      "consentGiveDone": "Privolitev je dana: velja od vašega naslednjega vstopa v dvorano.",
+      "consentFutureGiveDone": "Privolitev je dana: znova ste v imeniku dogodkov.",
+      "consentGiveTextChanged": "Besedilo privolitve se je spremenilo, potem ko ste odprli stran: znova jo naložite, da preberete novo.",
+      "consentGiveClosed": "Te privolitve ni več mogoče dati tukaj: dogodek se je končal ali je ne zahteva več. Znova naložite stran, da vidite trenutno stanje.",
       "addressBookPendingTitle": "Vrnitev v imenik je treba potrditi",
       "addressBookPendingBody": "Pri tej prijavi je bilo označeno polje za imenik, vendar ta naslov ni več prejemal povabil. Dokler ne potrdite, se nič ne spremeni.",
       "addressBookPendingEffect": "Če potrdite, se vrnete v imenik z imenom in organizacijo iz te prijave in znova prejemate povabila. Če prekličete ali če to niste bili vi, ostanete zunaj imenika in ne prejemate povabil.",

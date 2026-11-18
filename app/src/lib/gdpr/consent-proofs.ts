@@ -26,7 +26,9 @@ import type { Destinazione, PeriodoConsenso } from '@/lib/recording/destination'
  */
 
 export type TipoConsenso = 'recording' | 'transcription';
-export type OrigineConsenso = 'registration' | 'room';
+/** `self-service`: dato di nuovo dalla pagina dei propri dati (lib/gdpr/consent-giving),
+ *  con la stessa prova di quello dato in sala. */
+export type OrigineConsenso = 'registration' | 'room' | 'self-service';
 export type RuoloConsenso = 'registrant' | 'guest' | 'host';
 
 export interface ProvaConsenso {
@@ -102,6 +104,24 @@ export interface ProvaDiSala {
   registrationId: string | null;
   eventModeratorId: string | null;
   staffAccountId: string | null;
+}
+
+/** Il suffisso del posto di una prova data dalla pagina dei propri dati. */
+const SUFFISSO_I_MIEI_DATI = '-mydata';
+
+/**
+ * Il posto di una prova data dalla pagina dei propri dati: quello dell'iscrizione
+ * (`reg-<id>-…`, come lo legge iscrizioneDelPosto), che nessuna conferenza usa.
+ */
+export function postoDaIMieiDati(registrationId: string): string {
+  return `reg-${registrationId}${SUFFISSO_I_MIEI_DATI}`;
+}
+
+/** Dove e' stata data una prova legata a un posto: in sala o dai propri dati. */
+export function origineDelPosto(jitsiUserId: string): 'room' | 'self-service' {
+  return iscrizioneDelPosto(jitsiUserId) && jitsiUserId.endsWith(SUFFISSO_I_MIEI_DATI)
+    ? 'self-service'
+    : 'room';
 }
 
 const ruoloDiSala = (p: ProvaDiSala): RuoloConsenso =>
@@ -248,7 +268,7 @@ export function periodiSostituiti<T extends PeriodoConservato>(
 ): Set<T> {
   const perTitolare = new Map<string, T[]>();
   for (const r of righe) {
-    if (r.kind !== 'recording' || r.source !== 'room' || r.role !== 'registrant')
+    if (r.kind !== 'recording' || r.source === 'registration' || r.role !== 'registrant')
       continue;
     perTitolare.set(r.holderHash, [...(perTitolare.get(r.holderHash) ?? []), r]);
   }
@@ -385,7 +405,6 @@ export async function leggiRigheProve(
   for (const p of registrazione) {
     const base = {
       kind: 'recording' as const,
-      source: 'room' as const,
       role: ruoloDiSala(p),
       displayName: p.displayName ?? null,
       emailHash: improntaDiSala(p),
@@ -396,6 +415,8 @@ export async function leggiRigheProve(
     for (const periodo of periodiPrecedenti(p.earlierPeriods)) {
       righe.push({
         ...base,
+        // I periodi scritti prima che la prova dicesse da dove veniva: in sala.
+        source: periodo.source ?? 'room',
         superata: !periodo.withdrawnAt,
         givenAt: periodo.consentedAt,
         withdrawnAt: periodo.withdrawnAt ?? null,
@@ -405,6 +426,7 @@ export async function leggiRigheProve(
     }
     righe.push({
       ...base,
+      source: origineDelPosto(p.jitsiUserId),
       superata: false,
       givenAt: p.consentedAt.toISOString(),
       withdrawnAt: p.withdrawnAt?.toISOString() ?? null,
@@ -415,7 +437,7 @@ export async function leggiRigheProve(
   for (const p of trascrizione) {
     righe.push({
       kind: 'transcription',
-      source: 'room',
+      source: origineDelPosto(p.jitsiUserId),
       role: ruoloDiSala(p),
       displayName: p.displayName ?? null,
       emailHash: improntaDiSala(p),

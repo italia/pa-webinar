@@ -4114,7 +4114,8 @@
         },
         "sources": {
           "registration": "inscription",
-          "room": "salle"
+          "room": "salle",
+          "self-service": "Mes données"
         },
         "roles": {
           "registrant": "inscrit",
@@ -4758,6 +4759,7 @@
       "consentFuture": "Communications futures",
       "consentWithdrawnOn": "Retiré le {date}",
       "consentNoteInRoom": "Si vous êtes dans la salle en ce moment, le retrait vaut à partir de votre prochaine entrée : pour l'appliquer aussitôt, utilisez Consentements dans la salle.",
+      "consentGiveNoteInRoom": "Un consentement donné ici vaut à partir de votre prochaine entrée dans la salle, pas pour ce qui a déjà été enregistré. L'enregistrement et la transcription peuvent être acceptés jusqu'à la fin de l'événement.",
       "proofsTitle": "Preuves des consentements conservées",
       "proofsIntro": "Les données de ces événements ont été supprimées. Ces preuves restent tant que la vidéo ou la transcription existe. Vous pouvez retirer votre consentement : ce qui figure déjà dans la vidéo reste, et pour le faire retirer vous devez écrire au responsable du traitement.",
       "proofGivenOn": "Donné le {date}",
@@ -4773,6 +4775,12 @@
       "addressBookIntro": "Vous avez choisi de rester dans le carnet d'adresses pour être invité à des événements similaires. Nous conservons ces données jusqu'au {date}, sauf retrait ou nouveau consentement.",
       "addressBookOptOut": "Supprimer mes données du carnet d’adresses",
       "consentFutureEffect": "Si vous le retirez, vous ne recevez plus de communications sur les prochains événements et vous quittez le carnet d'adresses, pour toutes vos inscriptions.",
+      "consentFutureGive": "Je consens aux communications futures",
+      "consentFutureGiveEffect": "Vous revenez dans le carnet d'adresses des événements avec le nom et l'organisme de cette inscription et vous recevez de nouveau les invitations ; la durée de conservation repart d'aujourd'hui.",
+      "consentGiveDone": "Consentement donné : il vaut à partir de votre prochaine entrée dans la salle.",
+      "consentFutureGiveDone": "Consentement donné : vous êtes de nouveau dans le carnet d'adresses des événements.",
+      "consentGiveTextChanged": "Le texte du consentement a changé après l'ouverture de la page : rechargez-la pour lire le nouveau.",
+      "consentGiveClosed": "Ce consentement ne peut plus être donné ici : l'événement est terminé ou ne le demande plus. Rechargez la page pour voir l'état actuel.",
       "addressBookPendingTitle": "Retour dans le carnet d'adresses à confirmer",
       "addressBookPendingBody": "La case du carnet d'adresses a été cochée sur cette inscription, mais cette adresse ne recevait plus d'invitations. Rien ne change tant que vous n'avez pas confirmé.",
       "addressBookPendingEffect": "Si vous confirmez, vous revenez dans le carnet d'adresses avec le nom et l'organisme de cette inscription et vous recevez de nouveau les invitations. Si vous annulez, ou si ce n'était pas vous, vous restez hors du carnet d'adresses et ne recevez pas d'invitations.",

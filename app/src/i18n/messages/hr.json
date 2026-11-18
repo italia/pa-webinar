@@ -4114,7 +4114,8 @@
         },
         "sources": {
           "registration": "prijava",
-          "room": "dvorana"
+          "room": "dvorana",
+          "self-service": "Moji podaci"
         },
         "roles": {
           "registrant": "prijavljen",
@@ -4758,6 +4759,7 @@
       "consentFuture": "Buduće obavijesti",
       "consentWithdrawnOn": "Povučeno {date}",
       "consentNoteInRoom": "Ako ste trenutačno u dvorani, povlačenje vrijedi od sljedećeg ulaska: da vrijedi odmah, upotrijebite Privole u dvorani.",
+      "consentGiveNoteInRoom": "Privola dana ovdje vrijedi od vašeg sljedećeg ulaska u dvoranu, a ne za ono što je već snimljeno. Privolu za snimanje i transkripciju možete dati dok događaj ne završi.",
       "proofsTitle": "Sačuvani dokazi o privolama",
       "proofsIntro": "Podaci o ovim događajima su izbrisani. Ovi dokazi ostaju dok videozapis ili transkript postoje. Možete povući privolu: ono što je već u videozapisu ostaje, a za uklanjanje morate pisati voditelju obrade.",
       "proofGivenOn": "Dano {date}",
@@ -4773,6 +4775,12 @@
       "addressBookIntro": "Odabrali ste ostati u imeniku kako biste bili pozivani na slične događaje. Ove podatke čuvamo do {date}, osim ako povučete privolu ili date novu.",
       "addressBookOptOut": "Ukloni moje podatke iz imenika",
       "consentFutureEffect": "Ako je povučete, više nećete primati obavijesti o sljedećim događajima i izlazite iz adresara, za sve svoje prijave.",
+      "consentFutureGive": "Pristajem na buduće obavijesti",
+      "consentFutureGiveEffect": "Vraćate se u imenik događaja s imenom i organizacijom iz ove prijave i ponovno primate pozivnice; razdoblje čuvanja počinje iznova od danas.",
+      "consentGiveDone": "Privola je dana: vrijedi od vašeg sljedećeg ulaska u dvoranu.",
+      "consentFutureGiveDone": "Privola je dana: ponovno ste u imeniku događaja.",
+      "consentGiveTextChanged": "Tekst privole promijenio se nakon što ste otvorili stranicu: ponovno je učitajte da biste pročitali novi.",
+      "consentGiveClosed": "Ovu privolu više nije moguće dati ovdje: događaj je završio ili je više ne traži. Ponovno učitajte stranicu da biste vidjeli trenutačno stanje.",
       "addressBookPendingTitle": "Povratak u imenik treba potvrditi",
       "addressBookPendingBody": "Na ovoj prijavi označeno je polje imenika, ali ova je adresa prestala primati pozivnice. Dok ne potvrdite, ništa se ne mijenja.",
       "addressBookPendingEffect": "Ako potvrdite, vraćate se u imenik s imenom i organizacijom iz ove prijave i ponovno primate pozivnice. Ako odustanete ili ako to niste bili vi, ostajete izvan imenika i ne primate pozivnice.",

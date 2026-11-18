@@ -4114,7 +4114,8 @@
         },
         "sources": {
           "registration": "registrácia",
-          "room": "miestnosť"
+          "room": "miestnosť",
+          "self-service": "Moje údaje"
         },
         "roles": {
           "registrant": "registrovaný",
@@ -4758,6 +4759,7 @@
       "consentFuture": "Budúce oznámenia",
       "consentWithdrawnOn": "Odvolané {date}",
       "consentNoteInRoom": "Ak ste práve v miestnosti, odvolanie platí od ďalšieho vstupu: aby platilo hneď, použite v miestnosti Súhlasy.",
+      "consentGiveNoteInRoom": "Súhlas udelený tu platí od vášho ďalšieho vstupu do miestnosti, nie pre to, čo už bolo zaznamenané. Súhlas so záznamom a s prepisom možno udeliť, kým sa podujatie neskončí.",
       "proofsTitle": "Uchovávané doklady o súhlase",
       "proofsIntro": "Údaje týchto podujatí boli vymazané. Tieto doklady zostávajú, kým video alebo prepis existujú. Súhlas môžete odvolať: to, čo už je vo videu, zostáva, a ak to chcete odstrániť, musíte napísať prevádzkovateľovi osobných údajov.",
       "proofGivenOn": "Udelený {date}",
@@ -4773,6 +4775,12 @@
       "addressBookIntro": "Rozhodli ste sa zostať v adresári, aby ste boli pozývaní na podobné podujatia. Tieto údaje uchovávame do {date}, pokiaľ súhlas neodvoláte alebo ho neudelíte znova.",
       "addressBookOptOut": "Odstrániť moje údaje z adresára",
       "consentFutureEffect": "Ak ho odvoláte, prestanete dostávať oznámenia o ďalších podujatiach a opustíte adresár, a to pre všetky svoje registrácie.",
+      "consentFutureGive": "Súhlasím s budúcimi oznámeniami",
+      "consentFutureGiveEffect": "Vrátite sa do adresára podujatí s menom a organizáciou z tejto registrácie a budete opäť dostávať pozvánky; doba uchovávania sa začína odznova dnes.",
+      "consentGiveDone": "Súhlas udelený: platí od vášho ďalšieho vstupu do miestnosti.",
+      "consentFutureGiveDone": "Súhlas udelený: ste opäť v adresári podujatí.",
+      "consentGiveTextChanged": "Text súhlasu sa zmenil po tom, čo ste stránku otvorili: načítajte ju znova a prečítajte si nový.",
+      "consentGiveClosed": "Tento súhlas už odtiaľto nemožno udeliť: podujatie sa skončilo alebo ho už nevyžaduje. Načítajte stránku znova, aby ste videli aktuálny stav.",
       "addressBookPendingTitle": "Návrat do adresára treba potvrdiť",
       "addressBookPendingBody": "Pri tejto registrácii bolo začiarknuté políčko adresára, ale táto adresa prestala dostávať pozvánky. Kým nepotvrdíte, nič sa nezmení.",
       "addressBookPendingEffect": "Ak potvrdíte, vrátite sa do adresára s menom a organizáciou z tejto registrácie a budete opäť dostávať pozvánky. Ak zrušíte alebo ak ste to neboli vy, zostanete mimo adresára a pozvánky dostávať nebudete.",

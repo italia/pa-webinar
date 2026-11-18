@@ -4114,7 +4114,8 @@
         },
         "sources": {
           "registration": "regisztráció",
-          "room": "terem"
+          "room": "terem",
+          "self-service": "Az én adataim"
         },
         "roles": {
           "registrant": "regisztrált",
@@ -4758,6 +4759,7 @@
       "consentFuture": "Jövőbeli értesítések",
       "consentWithdrawnOn": "Visszavonva: {date}",
       "consentNoteInRoom": "Ha most a teremben van, a visszavonás a következő belépéstől érvényes: az azonnali érvényhez használja a teremben a Hozzájárulások gombot.",
+      "consentGiveNoteInRoom": "Az itt adott hozzájárulás a következő teremben való belépésétől érvényes, a már rögzítettekre nem. A felvételhez és az átiratkészítéshez az esemény végéig lehet hozzájárulni.",
       "proofsTitle": "Megőrzött hozzájárulási igazolások",
       "proofsIntro": "Ezen események adatai törölve lettek. Ezek az igazolások addig maradnak meg, amíg a videó vagy az átirat létezik. A hozzájárulását visszavonhatja: ami már a videóban van, az ott marad, és az eltávolításához írnia kell az adatkezelőnek.",
       "proofGivenOn": "Megadva: {date}",
@@ -4773,6 +4775,12 @@
       "addressBookIntro": "Ön úgy döntött, hogy a címjegyzékben marad, hogy hasonló eseményekre meghívást kapjon. Visszavonás vagy új hozzájárulás hiányában ezeket az adatokat a következő napig őrizzük meg: {date}.",
       "addressBookOptOut": "Adataim eltávolítása a címjegyzékből",
       "consentFutureEffect": "Ha visszavonja, többé nem kap értesítést a következő eseményekről, és kikerül a címjegyzékből, minden regisztrációja esetében.",
+      "consentFutureGive": "Hozzájárulok a jövőbeli értesítésekhez",
+      "consentFutureGiveEffect": "Az ebben a regisztrációban szereplő névvel és szervezettel visszakerül az események címjegyzékébe, és ismét kap meghívókat; a megőrzési idő ma újraindul.",
+      "consentGiveDone": "Hozzájárulás megadva: a következő teremben való belépésétől érvényes.",
+      "consentFutureGiveDone": "Hozzájárulás megadva: ismét szerepel az események címjegyzékében.",
+      "consentGiveTextChanged": "A hozzájárulás szövege megváltozott, miután megnyitotta az oldalt: töltse be újra, hogy elolvassa az újat.",
+      "consentGiveClosed": "Ezt a hozzájárulást innen már nem lehet megadni: az esemény véget ért, vagy már nem kéri. Töltse be újra az oldalt az aktuális állapotért.",
       "addressBookPendingTitle": "A címjegyzékbe való visszatérés megerősítésre vár",
       "addressBookPendingBody": "Ennél a regisztrációnál bejelölték a címjegyzék jelölőnégyzetét, de erre a címre már nem érkeztek meghívók. Amíg nem erősíti meg, semmi sem változik.",
       "addressBookPendingEffect": "Ha megerősíti, az ebben a regisztrációban szereplő névvel és szervezettel visszakerül a címjegyzékbe, és ismét kap meghívókat. Ha visszavonja a kérést, vagy ha nem Ön volt, a címjegyzéken kívül marad, és nem kap meghívókat.",

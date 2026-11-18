@@ -4114,7 +4114,8 @@
         },
         "sources": {
           "registration": "Anmeldung",
-          "room": "Raum"
+          "room": "Raum",
+          "self-service": "Meine Daten"
         },
         "roles": {
           "registrant": "angemeldet",
@@ -4758,6 +4759,7 @@
       "consentFuture": "Künftige Mitteilungen",
       "consentWithdrawnOn": "Widerrufen am {date}",
       "consentNoteInRoom": "Wenn Sie gerade im Raum sind, gilt der Widerruf ab dem nächsten Eintritt: Damit er sofort gilt, nutzen Sie „Einwilligungen“ im Raum.",
+      "consentGiveNoteInRoom": "Eine hier erteilte Einwilligung gilt ab Ihrem nächsten Eintritt in den Raum, nicht für bereits Aufgezeichnetes. Aufzeichnung und Transkription können bis zum Ende der Veranstaltung erteilt werden.",
       "proofsTitle": "Aufbewahrte Einwilligungsnachweise",
       "proofsIntro": "Die Daten dieser Veranstaltungen wurden gelöscht. Diese Nachweise bleiben erhalten, solange das Video oder das Transkript existiert. Sie können Ihre Einwilligung widerrufen: Was bereits im Video enthalten ist, bleibt, und um es entfernen zu lassen, müssen Sie an den Verantwortlichen für die Datenverarbeitung schreiben.",
       "proofGivenOn": "Erteilt am {date}",
@@ -4773,6 +4775,12 @@
       "addressBookIntro": "Sie haben sich dafür entschieden, im Adressbuch zu bleiben, um zu ähnlichen Veranstaltungen eingeladen zu werden. Wir bewahren diese Daten bis zum {date} auf, sofern Sie nicht widerrufen oder erneut einwilligen.",
       "addressBookOptOut": "Meine Daten aus dem Adressbuch entfernen",
       "consentFutureEffect": "Wenn Sie sie widerrufen, erhalten Sie keine Mitteilungen zu kommenden Veranstaltungen mehr und verlassen das Adressbuch, für alle Ihre Anmeldungen.",
+      "consentFutureGive": "Ich willige in künftige Mitteilungen ein",
+      "consentFutureGiveEffect": "Sie kehren mit dem Namen und der Organisation dieser Anmeldung ins Veranstaltungs-Adressbuch zurück und erhalten wieder Einladungen; die Aufbewahrungsfrist beginnt heute neu.",
+      "consentGiveDone": "Einwilligung erteilt: Sie gilt ab Ihrem nächsten Eintritt in den Raum.",
+      "consentFutureGiveDone": "Einwilligung erteilt: Sie sind wieder im Veranstaltungs-Adressbuch.",
+      "consentGiveTextChanged": "Der Einwilligungstext hat sich geändert, nachdem Sie die Seite geöffnet haben: Laden Sie sie neu, um den neuen Text zu lesen.",
+      "consentGiveClosed": "Diese Einwilligung kann hier nicht mehr erteilt werden: Die Veranstaltung ist beendet oder fragt nicht mehr danach. Laden Sie die Seite neu, um den aktuellen Stand zu sehen.",
       "addressBookPendingTitle": "Rückkehr ins Adressbuch noch zu bestätigen",
       "addressBookPendingBody": "Bei dieser Anmeldung wurde das Kästchen für das Adressbuch angekreuzt, aber diese Adresse hatte keine Einladungen mehr erhalten. Solange Sie nicht bestätigen, ändert sich nichts.",
       "addressBookPendingEffect": "Wenn Sie bestätigen, kehren Sie mit dem Namen und der Organisation dieser Anmeldung ins Adressbuch zurück und erhalten wieder Einladungen. Wenn Sie abbrechen oder wenn Sie es nicht waren, bleiben Sie außerhalb des Adressbuchs und erhalten keine Einladungen.",

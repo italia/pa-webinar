@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => ({
   ritiraProvaConservata: vi.fn(async () => true),
   applicaSpuntaInAttesa: vi.fn(async () => true),
   verifyGdprToken: vi.fn(),
+  daiConsenso: vi.fn(async (): Promise<string> => 'dato'),
 }));
 
 vi.mock('@/lib/db', () => ({ prisma: { registration: { findFirst: mocks.findFirst } } }));
@@ -18,6 +19,7 @@ vi.mock('@/lib/persons/spunta-in-attesa', () => ({
   applicaSpuntaInAttesa: mocks.applicaSpuntaInAttesa,
 }));
 vi.mock('@/lib/gdpr/request-token', () => ({ verifyGdprToken: mocks.verifyGdprToken }));
+vi.mock('@/lib/gdpr/consent-giving', () => ({ daiConsenso: mocks.daiConsenso }));
 vi.mock('@/lib/gdpr/retained-consent-proofs', () => ({
   ritiraProvaConservata: mocks.ritiraProvaConservata,
 }));
@@ -56,6 +58,7 @@ beforeEach(() => {
   mocks.findFirst.mockResolvedValue({ id: ISCRIZIONE, eventId: 'evento-1' });
   mocks.ritiraProvaConservata.mockResolvedValue(true);
   mocks.applicaSpuntaInAttesa.mockResolvedValue(true);
+  mocks.daiConsenso.mockResolvedValue('dato');
 });
 
 describe('POST /api/gdpr/consents', () => {
@@ -196,5 +199,82 @@ describe('POST /api/gdpr/consents', () => {
     const res = await richiesta({ proofId: PROVA, consent: 'futureCommunications' });
     expect(res.status).toBe(422);
     expect(mocks.ritiraComunicazioni).not.toHaveBeenCalled();
+  });
+
+  describe('un consenso dato di nuovo', () => {
+    it('con il token della pagina, per la registrazione con il testo letto', async () => {
+      const res = await richiesta({
+        registrationId: ISCRIZIONE,
+        consent: 'recording',
+        give: true,
+        recordingDestination: 'PUBLIC',
+        locale: 'de',
+      });
+      expect(res.status).toBe(200);
+      expect(await res.json()).toEqual({ given: 'recording' });
+      expect(mocks.verifyGdprToken).toHaveBeenCalledWith('token-valido', 'consents');
+      expect(mocks.daiConsenso).toHaveBeenCalledWith('impronta', ISCRIZIONE, 'recording', {
+        letta: 'PUBLIC',
+        locale: 'de',
+      });
+      expect(mocks.ritiraConsensi).not.toHaveBeenCalled();
+    });
+
+    it('la registrazione senza il testo letto non vale; una lingua sconosciuta si ignora', async () => {
+      expect(
+        (await richiesta({ registrationId: ISCRIZIONE, consent: 'recording', give: true })).status
+      ).toBe(422);
+      await richiesta({
+        registrationId: ISCRIZIONE,
+        consent: 'transcription',
+        give: true,
+        locale: 'xx',
+      });
+      expect(mocks.daiConsenso).toHaveBeenCalledWith('impronta', ISCRIZIONE, 'transcription', {
+        letta: null,
+        locale: null,
+      });
+    });
+
+    it('senza link valido, o per un altro indirizzo, non si da niente', async () => {
+      mocks.verifyGdprToken.mockReturnValue(null);
+      const corpo = { registrationId: ISCRIZIONE, consent: 'transcription', give: true };
+      expect((await richiesta(corpo)).status).toBe(401);
+      expect(mocks.daiConsenso).not.toHaveBeenCalled();
+      mocks.verifyGdprToken.mockReturnValue({ emailHash: 'impronta' });
+      mocks.daiConsenso.mockResolvedValue('nonTrovata');
+      expect((await richiesta(corpo)).status).toBe(404);
+    });
+
+    it.each([
+      ['nonOfferto', 'CONSENT_NOT_OFFERED'],
+      ['serveRegistrazione', 'RECORDING_CONSENT_REQUIRED'],
+      ['testoCambiato', 'CONSENT_TEXT_CHANGED'],
+    ])('%s risponde 409 con il suo codice', async (esito, codice) => {
+      mocks.daiConsenso.mockResolvedValue(esito);
+      const res = await richiesta({
+        registrationId: ISCRIZIONE,
+        consent: 'transcription',
+        give: true,
+      });
+      expect(res.status).toBe(409);
+      expect((await res.json()).code).toBe(codice);
+    });
+
+    it('un consenso che vale gia risponde come uno dato', async () => {
+      mocks.daiConsenso.mockResolvedValue('gia');
+      const res = await richiesta({
+        registrationId: ISCRIZIONE,
+        consent: 'futureCommunications',
+        give: true,
+      });
+      expect(res.status).toBe(200);
+    });
+
+    it('non si da da una prova conservata', async () => {
+      const res = await richiesta({ proofId: PROVA, consent: 'recording', give: true });
+      expect(res.status).toBe(422);
+      expect(mocks.daiConsenso).not.toHaveBeenCalled();
+    });
   });
 });

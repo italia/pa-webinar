@@ -4114,7 +4114,8 @@
         },
         "sources": {
           "registration": "registration",
-          "room": "room"
+          "room": "room",
+          "self-service": "My data"
         },
         "roles": {
           "registrant": "registrant",
@@ -4758,6 +4759,7 @@
       "consentFuture": "Future communications",
       "consentWithdrawnOn": "Withdrawn on {date}",
       "consentNoteInRoom": "If you are in the room right now, the withdrawal counts from your next entry: to apply it at once, use Consents in the room.",
+      "consentGiveNoteInRoom": "A consent given here counts from your next entry into the room, not for what has already been recorded. Recording and transcription can be given until the event ends.",
       "proofsTitle": "Consent proofs kept",
       "proofsIntro": "The data for these events has been deleted. These proofs stay for as long as the video or transcript exists. You can withdraw your consent: what is already in the video stays, and to have it removed you must write to the data controller.",
       "proofGivenOn": "Given on {date}",
@@ -4773,6 +4775,12 @@
       "addressBookIntro": "You chose to stay in the address book, to be invited to similar events. We keep this data until {date}, unless you withdraw your consent or give it again.",
       "addressBookOptOut": "Remove me from the address book",
       "consentFutureEffect": "If you withdraw it you no longer receive communications about upcoming events and you leave the address book, for all your registrations.",
+      "consentFutureGive": "I consent to future communications",
+      "consentFutureGiveEffect": "You return to the events address book with the name and organisation of this registration and receive invitations again; the retention period starts again today.",
+      "consentGiveDone": "Consent given: it counts from your next entry into the room.",
+      "consentFutureGiveDone": "Consent given: you are back in the events address book.",
+      "consentGiveTextChanged": "The consent text changed after you opened the page: reload it to read the new one.",
+      "consentGiveClosed": "This consent can no longer be given from here: the event has ended or no longer asks for it. Reload the page to see the current status.",
       "addressBookPendingTitle": "Return to the address book to confirm",
       "addressBookPendingBody": "The address book box was ticked on this registration, but this address had stopped receiving invitations. Nothing changes until you confirm.",
       "addressBookPendingEffect": "If you confirm, you return to the address book with the name and organisation of this registration and receive invitations again. If you cancel, or if it was not you, you stay out of the address book and receive no invitations.",

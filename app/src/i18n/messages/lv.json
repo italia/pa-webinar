@@ -4114,7 +4114,8 @@
         },
         "sources": {
           "registration": "reģistrācija",
-          "room": "telpa"
+          "room": "telpa",
+          "self-service": "Mani dati"
         },
         "roles": {
           "registrant": "reģistrējies",
@@ -4758,6 +4759,7 @@
       "consentFuture": "Turpmākie paziņojumi",
       "consentWithdrawnOn": "Atsaukts {date}",
       "consentNoteInRoom": "Ja pašlaik esat telpā, atsaukums ir spēkā no nākamās ienākšanas: lai tas stātos spēkā uzreiz, telpā izmantojiet Piekrišanas.",
+      "consentGiveNoteInRoom": "Šeit dota piekrišana ir spēkā no jūsu nākamās ienākšanas telpā, nevis tam, kas jau ierakstīts. Piekrišanu ierakstam un transkripcijai var dot, līdz pasākums beidzas.",
       "proofsTitle": "Saglabātie piekrišanu pierādījumi",
       "proofsIntro": "Šo pasākumu dati ir dzēsti. Šie pierādījumi paliek, kamēr video vai atšifrējums pastāv. Varat atsaukt piekrišanu: tas, kas jau ir video, paliek, un, lai to izņemtu, jums jāraksta datu pārzinim.",
       "proofGivenOn": "Dota {date}",
@@ -4773,6 +4775,12 @@
       "addressBookIntro": "Jūs izvēlējāties palikt kontaktu grāmatā, lai jūs aicinātu uz līdzīgiem pasākumiem. Šos datus glabājam līdz {date}, ja vien neatsaucat piekrišanu vai nedodat jaunu.",
       "addressBookOptOut": "Izņemt manus datus no kontaktu grāmatas",
       "consentFutureEffect": "Ja to atsauksiet, vairs nesaņemsiet paziņojumus par nākamajiem pasākumiem un izstāsieties no adrešu grāmatas visām savām reģistrācijām.",
+      "consentFutureGive": "Piekrītu turpmākiem paziņojumiem",
+      "consentFutureGiveEffect": "Jūs atgriežaties pasākumu kontaktu grāmatā ar šīs reģistrācijas vārdu un organizāciju un atkal saņemat ielūgumus; glabāšanas laiks sākas no jauna šodien.",
+      "consentGiveDone": "Piekrišana dota: tā ir spēkā no jūsu nākamās ienākšanas telpā.",
+      "consentFutureGiveDone": "Piekrišana dota: jūs atkal esat pasākumu kontaktu grāmatā.",
+      "consentGiveTextChanged": "Piekrišanas teksts mainījās pēc tam, kad atvērāt lapu: pārlādējiet to, lai izlasītu jauno.",
+      "consentGiveClosed": "Šo piekrišanu vairs nevar dot no šejienes: pasākums ir beidzies vai to vairs neprasa. Pārlādējiet lapu, lai redzētu pašreizējo stāvokli.",
       "addressBookPendingTitle": "Atgriešanās kontaktu grāmatā jāapstiprina",
       "addressBookPendingBody": "Šajā reģistrācijā tika atzīmēta kontaktu grāmatas izvēles rūtiņa, taču šī adrese vairs nesaņēma ielūgumus. Kamēr neapstiprināsiet, nekas nemainīsies.",
       "addressBookPendingEffect": "Ja apstiprināsiet, atgriezīsieties kontaktu grāmatā ar šīs reģistrācijas vārdu un organizāciju un atkal saņemsiet ielūgumus. Ja atcelsiet vai ja tas nebijāt jūs, paliksiet ārpus kontaktu grāmatas un ielūgumus nesaņemsiet.",

@@ -4114,7 +4114,8 @@
         },
         "sources": {
           "registration": "tilmelding",
-          "room": "rum"
+          "room": "rum",
+          "self-service": "Mine data"
         },
         "roles": {
           "registrant": "tilmeldt",
@@ -4758,6 +4759,7 @@
       "consentFuture": "Fremtidige meddelelser",
       "consentWithdrawnOn": "Trukket tilbage den {date}",
       "consentNoteInRoom": "Hvis du er i rummet lige nu, gælder tilbagetrækningen fra din næste indgang: brug Samtykker i rummet, hvis den skal gælde straks.",
+      "consentGiveNoteInRoom": "Et samtykke, der gives her, gælder fra din næste indgang i rummet, ikke for det, der allerede er optaget. Samtykke til optagelse og transskription kan gives, indtil arrangementet er slut.",
       "proofsTitle": "Opbevaret dokumentation for samtykker",
       "proofsIntro": "Dataene for disse arrangementer er blevet slettet. Denne dokumentation bevares, så længe videoen eller transskriptionen findes. Du kan trække dit samtykke tilbage: det, der allerede er i videoen, forbliver der, og for at få det fjernet skal du skrive til den dataansvarlige.",
       "proofGivenOn": "Givet den {date}",
@@ -4773,6 +4775,12 @@
       "addressBookIntro": "Du har valgt at blive i adressebogen for at blive inviteret til lignende arrangementer. Vi opbevarer disse data indtil {date}, medmindre du trækker samtykket tilbage eller giver et nyt.",
       "addressBookOptOut": "Fjern mine data fra adressebogen",
       "consentFutureEffect": "Hvis du trækker det tilbage, modtager du ikke længere meddelelser om kommende arrangementer, og du fjernes fra adressebogen for alle dine tilmeldinger.",
+      "consentFutureGive": "Jeg giver samtykke til fremtidige meddelelser",
+      "consentFutureGiveEffect": "Du kommer tilbage i arrangementsadressebogen med navnet og organisationen fra denne tilmelding og modtager invitationer igen; opbevaringsperioden starter forfra i dag.",
+      "consentGiveDone": "Samtykke givet: det gælder fra din næste indgang i rummet.",
+      "consentFutureGiveDone": "Samtykke givet: du er igen i arrangementsadressebogen.",
+      "consentGiveTextChanged": "Samtykketeksten er ændret, efter du åbnede siden: genindlæs den for at læse den nye.",
+      "consentGiveClosed": "Dette samtykke kan ikke længere gives herfra: arrangementet er slut eller beder ikke længere om det. Genindlæs siden for at se den aktuelle status.",
       "addressBookPendingTitle": "Tilbagevenden til adressebogen skal bekræftes",
       "addressBookPendingBody": "Afkrydsningsfeltet til adressebogen blev markeret på denne tilmelding, men denne adresse var holdt op med at modtage invitationer. Intet ændrer sig, før du bekræfter.",
       "addressBookPendingEffect": "Hvis du bekræfter, kommer du tilbage i adressebogen med navnet og organisationen fra denne tilmelding og modtager invitationer igen. Hvis du annullerer, eller hvis det ikke var dig, forbliver du uden for adressebogen og modtager ingen invitationer.",

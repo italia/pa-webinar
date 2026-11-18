@@ -4114,7 +4114,8 @@
         },
         "sources": {
           "registration": "anmälan",
-          "room": "rum"
+          "room": "rum",
+          "self-service": "Mina uppgifter"
         },
         "roles": {
           "registrant": "anmäld",
@@ -4758,6 +4759,7 @@
       "consentFuture": "Framtida meddelanden",
       "consentWithdrawnOn": "Återkallat {date}",
       "consentNoteInRoom": "Om du är i rummet just nu gäller återkallelsen från nästa inträde: använd Samtycken i rummet för att den ska gälla direkt.",
+      "consentGiveNoteInRoom": "Ett samtycke som ges här gäller från ditt nästa inträde i rummet, inte för det som redan har spelats in. Samtycke till inspelning och transkribering kan ges tills evenemanget är slut.",
       "proofsTitle": "Sparade bevis på samtycken",
       "proofsIntro": "Uppgifterna för dessa evenemang har raderats. Dessa bevis finns kvar så länge videon eller transkriptionen finns. Du kan återkalla ditt samtycke: det som redan finns i videon blir kvar, och för att få det borttaget måste du skriva till den personuppgiftsansvarige.",
       "proofGivenOn": "Givet den {date}",
@@ -4773,6 +4775,12 @@
       "addressBookIntro": "Du har valt att stanna kvar i adressboken för att bjudas in till liknande evenemang. Vi sparar dessa uppgifter fram till {date}, om du inte återkallar samtycket eller ger ett nytt.",
       "addressBookOptOut": "Ta bort mina uppgifter från adressboken",
       "consentFutureEffect": "Om du återkallar det får du inte längre meddelanden om kommande evenemang och du lämnar adressboken, för alla dina anmälningar.",
+      "consentFutureGive": "Jag samtycker till framtida meddelanden",
+      "consentFutureGiveEffect": "Du kommer tillbaka till evenemangsadressboken med namnet och organisationen från den här anmälan och får inbjudningar igen; lagringstiden börjar om i dag.",
+      "consentGiveDone": "Samtycke givet: det gäller från ditt nästa inträde i rummet.",
+      "consentFutureGiveDone": "Samtycke givet: du finns i evenemangsadressboken igen.",
+      "consentGiveTextChanged": "Samtyckestexten ändrades efter att du öppnade sidan: ladda om den för att läsa den nya.",
+      "consentGiveClosed": "Det här samtycket kan inte längre ges härifrån: evenemanget är slut eller ber inte längre om det. Ladda om sidan för att se aktuell status.",
       "addressBookPendingTitle": "Återkomst till adressboken väntar på bekräftelse",
       "addressBookPendingBody": "Rutan för adressboken kryssades i på den här anmälan, men den här adressen hade slutat ta emot inbjudningar. Inget ändras förrän du bekräftar.",
       "addressBookPendingEffect": "Om du bekräftar kommer du tillbaka till adressboken med namnet och organisationen från den här anmälan och får inbjudningar igen. Om du avbryter, eller om det inte var du, stannar du utanför adressboken och får inga inbjudningar.",

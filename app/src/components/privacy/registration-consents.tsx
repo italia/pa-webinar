@@ -8,6 +8,8 @@ import { useFormatter, useTranslations } from 'next-intl';
 import { Button } from 'design-react-kit';
 
 import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import { MESI_RUBRICA_PREDEFINITI } from '@/lib/persons/retention';
+import { chiaveConsenso, type Destinazione } from '@/lib/recording/destination';
 
 export interface StatoConsensoVista {
   dato: boolean;
@@ -22,14 +24,29 @@ export interface ConsensiVista {
   addressBookPending?: boolean;
 }
 
+/**
+ * I consensi che la pagina puo' far dare di nuovo, con il testo da mostrare
+ * (lib/gdpr/consent-giving, `offertaConsensi`). `null`: oggi non si da' da qui.
+ */
+export interface OffertaVista {
+  recording: { destination: Destinazione; voice: VoceNelVideo; eventText: string | null } | null;
+  transcription: {
+    text: 'multitrack' | 'multitrackRetained';
+    voice: VoceNelVideo;
+    needsRecording: boolean;
+  } | null;
+  futureCommunications: boolean;
+}
+
 type Chiave = 'recording' | 'transcription' | 'futureCommunications';
 
 /**
  * I consensi di un'iscrizione nella pagina dei propri dati: si ritirano uno
  * per uno, con una conferma che dice cosa cambia, senza cancellare
- * l'iscrizione. Registrazione e trascrizione si possono ridare in sala finche'
- * l'evento e' aperto. Una spunta della rubrica rimasta in attesa si conferma o si
- * annulla da qui.
+ * l'iscrizione. Uno non dato o ritirato si da' di nuovo da qui, con il testo
+ * della casella davanti, finche' l'evento lo chiede (`offerta`): vale dal
+ * prossimo ingresso in sala. Una spunta della rubrica rimasta in attesa si
+ * conferma o si annulla da qui.
  */
 export default function RegistrationConsents({
   token,
@@ -40,8 +57,14 @@ export default function RegistrationConsents({
   onComunicazioniRitirate,
   rubricaConfermata = false,
   onRubricaConfermata,
+  offerta = null,
+  locale,
 }: {
   voce?: VoceNelVideo;
+  /** Cosa si puo' dare di nuovo, e con quale testo. */
+  offerta?: OffertaVista | null;
+  /** La lingua della pagina: va con la prova del consenso dato. */
+  locale?: string;
   token: string;
   registrationId: string;
   consensi: ConsensiVista;
@@ -57,8 +80,13 @@ export default function RegistrationConsents({
   const t = useTranslations('gdpr.export');
   const tl = useTranslations('live.consents');
   const tc = useTranslations('common');
+  const tGdpr = useTranslations('gdpr.consent');
   const format = useFormatter();
   const [statiLocali, setStati] = useState(consensi);
+  // Le comunicazioni ridate da qui dopo un ritiro fatto da un'altra scheda della
+  // pagina: il ritiro piu' vecchio non le spegne di nuovo.
+  const [comunicazioniRidateIl, setComunicazioniRidateIl] = useState<string | null>(null);
+  const [dato, setDato] = useState<Chiave | null>(null);
   const dopoConferma: ConsensiVista =
     rubricaConfermata && statiLocali.addressBookPending
       ? {
@@ -67,18 +95,62 @@ export default function RegistrationConsents({
           futureCommunications: { dato: true, ritiratoIl: null },
         }
       : statiLocali;
-  const stati: ConsensiVista = comunicazioniRitirateIl
+  const ritiroDaFuori =
+    comunicazioniRitirateIl &&
+    !(comunicazioniRidateIl && comunicazioniRidateIl > comunicazioniRitirateIl)
+      ? comunicazioniRitirateIl
+      : null;
+  const stati: ConsensiVista = ritiroDaFuori
     ? {
         ...dopoConferma,
         addressBookPending: false,
         ...(dopoConferma.futureCommunications?.dato
-          ? { futureCommunications: { dato: false, ritiratoIl: comunicazioniRitirateIl } }
+          ? { futureCommunications: { dato: false, ritiratoIl: ritiroDaFuori } }
           : {}),
       }
     : dopoConferma;
   const [conferma, setConferma] = useState<Chiave | null>(null);
   const [inCorso, setInCorso] = useState(false);
   const [errore, setErrore] = useState<string | null>(null);
+
+  // Il testo a cui si acconsente, lo stesso della casella del modulo e della sala.
+  const testoDaDare: Record<Chiave, string | null> = {
+    recording: offerta?.recording
+      ? [
+          offerta.recording.eventText,
+          tGdpr(chiaveConsenso(offerta.recording.destination, offerta.recording.voice)),
+        ]
+          .filter(Boolean)
+          .join(' ')
+      : null,
+    transcription: offerta?.transcription
+      ? [
+          tGdpr(offerta.transcription.text),
+          tGdpr(
+            offerta.transcription.voice === 'fissa'
+              ? 'multitrackOptional'
+              : 'multitrackOptionalShort'
+          ),
+        ].join(' ')
+      : null,
+    // Con una spunta in attesa si conferma quella, piu' su: un secondo pulsante
+    // per la stessa cosa confonderebbe.
+    futureCommunications: offerta?.futureCommunications && !stati.addressBookPending
+      ? [
+          tGdpr('stayInTouch'),
+          tGdpr('stayInTouchRetention', { months: MESI_RUBRICA_PREDEFINITI }),
+          t('consentFutureGiveEffect'),
+        ].join(' ')
+      : null,
+  };
+  const etichettaDai: Record<Chiave, string> = {
+    recording: tl('recording.give'),
+    transcription: tl('transcription.give'),
+    futureCommunications: t('consentFutureGive'),
+  };
+  // La trascrizione senza la registrazione non avrebbe la voce: va data dopo.
+  const serveRegistrazione =
+    !!offerta?.transcription?.needsRecording && !stati.recording?.dato;
 
   const voci: Array<{ chiave: Chiave; titolo: string; effetto: string; nota?: string }> =
     [
@@ -115,6 +187,7 @@ export default function RegistrationConsents({
   ) => {
     setInCorso(true);
     setErrore(null);
+    setDato(null);
     try {
       const res = await fetch('/api/gdpr/consents', {
         method: 'POST',
@@ -125,6 +198,16 @@ export default function RegistrationConsents({
       if (res.status === 401) return setErrore(t('linkInvalid'));
       if (res.status === 429) return setErrore(t('rateLimited'));
       if (res.status === 404 && nonTrovato) return nonTrovato();
+      if (res.status === 409) {
+        const { code } = (await res.json().catch(() => ({}))) as { code?: string };
+        return setErrore(
+          code === 'CONSENT_TEXT_CHANGED'
+            ? t('consentGiveTextChanged')
+            : code === 'RECORDING_CONSENT_REQUIRED'
+              ? tl('transcription.needsRecording')
+              : t('consentGiveClosed')
+        );
+      }
       if (!res.ok) return setErrore(tl('error'));
       fatto();
     } catch {
@@ -150,6 +233,32 @@ export default function RegistrationConsents({
       if (chiave === 'futureCommunications') onComunicazioniRitirate?.(adesso);
       setConferma(null);
     });
+
+  const dai = (chiave: Chiave) =>
+    invia(
+      {
+        consent: chiave,
+        give: true,
+        locale,
+        ...(chiave === 'recording'
+          ? { recordingDestination: offerta?.recording?.destination ?? null }
+          : {}),
+      },
+      () => {
+        setStati((prima) => ({
+          ...prima,
+          [chiave]: { dato: true, ritiratoIl: null },
+          ...(chiave === 'futureCommunications' ? { addressBookPending: false } : {}),
+        }));
+        if (chiave === 'futureCommunications') {
+          setComunicazioniRidateIl(new Date().toISOString());
+          // Il rientro in rubrica chiude anche le spunte in attesa delle altre
+          // iscrizioni dell'indirizzo, come la conferma.
+          onRubricaConfermata?.();
+        }
+        setDato(chiave);
+      }
+    );
 
   const confermaRubrica = () =>
     invia(
@@ -258,6 +367,34 @@ export default function RegistrationConsents({
                     {tl('withdraw')}
                   </Button>
                 ))}
+              {!stato.dato && testoDaDare[chiave] && (
+                <div className="mt-1">
+                  <div id={`${registrationId}-${chiave}-testo`} className="text-muted">
+                    {testoDaDare[chiave]}
+                  </div>
+                  {chiave === 'transcription' && serveRegistrazione && (
+                    <div className="text-muted">{tl('transcription.needsRecording')}</div>
+                  )}
+                  <Button
+                    className="mt-1"
+                    color="primary"
+                    outline
+                    size="sm"
+                    disabled={inCorso || (chiave === 'transcription' && serveRegistrazione)}
+                    aria-describedby={`${registrationId}-${chiave}-testo`}
+                    onClick={() => void dai(chiave)}
+                  >
+                    {etichettaDai[chiave]}
+                  </Button>
+                </div>
+              )}
+              {stato.dato && dato === chiave && (
+                <div className="text-success" role="status">
+                  {chiave === 'futureCommunications'
+                    ? t('consentFutureGiveDone')
+                    : t('consentGiveDone')}
+                </div>
+              )}
             </li>
           );
         })}
@@ -268,6 +405,9 @@ export default function RegistrationConsents({
         </p>
       )}
       <p className="text-muted small mb-0">{t('consentNoteInRoom')}</p>
+      {(offerta?.recording || offerta?.transcription) && (
+        <p className="text-muted small mb-0 mt-1">{t('consentGiveNoteInRoom')}</p>
+      )}
     </section>
   );
 }

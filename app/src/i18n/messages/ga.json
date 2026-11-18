@@ -4114,7 +4114,8 @@
         },
         "sources": {
           "registration": "clárú",
-          "room": "seomra"
+          "room": "seomra",
+          "self-service": "Mo chuid sonraí"
         },
         "roles": {
           "registrant": "cláraithe",
@@ -4758,6 +4759,7 @@
       "consentFuture": "Cumarsáid amach anseo",
       "consentWithdrawnOn": "Tarraingthe siar ar {date}",
       "consentNoteInRoom": "Má tá tú sa seomra faoi láthair, tá an tarraingt siar i bhfeidhm ó do chéad iontráil eile: chun é a chur i bhfeidhm láithreach, úsáid Toilithe sa seomra.",
+      "consentGiveNoteInRoom": "Tá toiliú a thugtar anseo i bhfeidhm ó do chéad iontráil eile sa seomra, ní don mhéid atá taifeadta cheana. Is féidir toiliú leis an taifeadadh agus leis an tras-scríbhinn a thabhairt go dtí go gcríochnaíonn an t-imeacht.",
       "proofsTitle": "Cruthúnais toilithe atá coinnithe",
       "proofsIntro": "Scriosadh sonraí na n-imeachtaí seo. Fanann na cruthúnais seo fad atá an físeán nó an tras-scríbhinn ann. Is féidir leat do thoiliú a tharraingt siar: fanann a bhfuil san fhíseán cheana, agus chun é a bhaint ní mór duit scríobh chuig an rialaitheoir sonraí.",
       "proofGivenOn": "Tugtha ar {date}",
@@ -4773,6 +4775,12 @@
       "addressBookIntro": "Roghnaigh tú fanacht sa leabhar seoltaí chun cuireadh a fháil chuig imeachtaí comhchosúla. Coinnímid na sonraí seo go dtí {date}, mura dtarraingíonn tú siar do thoiliú nó mura dtugann tú toiliú nua.",
       "addressBookOptOut": "Bain mo shonraí den leabhar seoltaí",
       "consentFutureEffect": "Má tharraingíonn tú siar é ní bhfaighidh tú cumarsáid faoi imeachtaí amach anseo a thuilleadh agus fágann tú an leabhar seoltaí, do do chláruithe go léir.",
+      "consentFutureGive": "Toilím le cumarsáid amach anseo",
+      "consentFutureGiveEffect": "Fillfidh tú ar leabhar seoltaí na n-imeachtaí le hainm agus eagraíocht an chláraithe seo agus gheobhaidh tú cuirí arís; tosaíonn an tréimhse choinneála as an nua inniu.",
+      "consentGiveDone": "Toiliú tugtha: tá sé i bhfeidhm ó do chéad iontráil eile sa seomra.",
+      "consentFutureGiveDone": "Toiliú tugtha: tá tú ar ais i leabhar seoltaí na n-imeachtaí.",
+      "consentGiveTextChanged": "Athraíodh téacs an toilithe tar éis duit an leathanach a oscailt: athlódáil é chun an ceann nua a léamh.",
+      "consentGiveClosed": "Ní féidir an toiliú seo a thabhairt anseo a thuilleadh: tá an t-imeacht thart nó ní iarrann sé é a thuilleadh. Athlódáil an leathanach chun an stádas reatha a fheiceáil.",
       "addressBookPendingTitle": "Filleadh ar an leabhar seoltaí le deimhniú",
       "addressBookPendingBody": "Ticeáladh bosca an leabhair seoltaí ar an gclárú seo, ach bhí deireadh curtha ag an seoladh seo le cuirí a fháil. Ní athróidh aon rud go dtí go ndeimhníonn tú.",
       "addressBookPendingEffect": "Má dheimhníonn tú, fillfidh tú ar an leabhar seoltaí le hainm agus eagraíocht an chláraithe seo agus gheobhaidh tú cuirí arís. Má chuireann tú ar ceal, nó murarbh tusa a rinne é, fanfaidh tú lasmuigh den leabhar seoltaí agus ní bhfaighidh tú cuirí.",
