@@ -21,6 +21,8 @@ import {
   testoInVigore,
   testoLetto,
   VERSIONE_TESTO_REGISTRAZIONE,
+  VERSIONE_TESTO_SENZA_VIDEO,
+  VERSIONE_TESTO_VISIBILI,
   provaCopre,
   versioneDellaProva,
   versioneLetta,
@@ -219,12 +221,12 @@ describe('testo del consenso', () => {
       const testo = messages.gdpr.consent[chiaveConsenso(destinazione, 'visibili')];
       expect(testo).not.toMatch(/volto|nome non/i);
     }
-    // La prova dice su quale testo e' stata data, con o senza destinazione: la 2
-    // ne' volto ne' nome, anche per il testo senza video.
-    expect(versioneDellaProva('visibili')).toBe(1);
-    for (const voce of ['solo-voce', 'esclusi', 'assente'] as const) {
+    // La prova dice su quale testo e' stata data, con o senza destinazione.
+    expect(versioneDellaProva('visibili')).toBe(VERSIONE_TESTO_VISIBILI);
+    for (const voce of ['solo-voce', 'esclusi'] as const) {
       expect(versioneDellaProva(voce)).toBe(VERSIONE_TESTO_REGISTRAZIONE);
     }
+    expect(versioneDellaProva('assente')).toBe(VERSIONE_TESTO_SENZA_VIDEO);
   });
 
   it("dove chi partecipa puo' comparire un consenso dato ora vale sul testo che la pagina ha mostrato", () => {
@@ -237,7 +239,7 @@ describe('testo del consenso', () => {
     // La versione salvata e' quella letta; da una pagina che non la manda, quella in vigore.
     expect(versioneLetta(1, 'solo-voce')).toBe(1);
     expect(versioneLetta(undefined, 'visibili')).toBe(1);
-    expect(versioneLetta(undefined, 'assente')).toBe(VERSIONE_TESTO_REGISTRAZIONE);
+    expect(versioneLetta(undefined, 'assente')).toBe(VERSIONE_TESTO_SENZA_VIDEO);
   });
 
   it("dove chi partecipa puo' comparire copre solo il testo che lo diceva", () => {
@@ -250,6 +252,15 @@ describe('testo del consenso', () => {
     expect(provaCopre({ destination: null, textVersion: null }, null, 'visibili')).toBe(true);
     // La destinazione conta comunque.
     expect(provaCopre({ destination: 'REGISTRANTS', textVersion: 1 }, 'PUBLIC', 'visibili')).toBe(false);
+    // Il testo senza video non copre un video, nemmeno senza destinazione.
+    for (const voce of ['solo-voce', 'esclusi', 'visibili'] as const) {
+      expect(provaCopre({ destination: null, textVersion: VERSIONE_TESTO_SENZA_VIDEO }, null, voce)).toBe(
+        false,
+      );
+    }
+    expect(
+      provaCopre({ destination: null, textVersion: VERSIONE_TESTO_SENZA_VIDEO }, null, 'assente'),
+    ).toBe(true);
     // Altrove il testo 1 copre il 2, che chiede meno, e decide la destinazione.
     for (const voce of ['solo-voce', 'esclusi', 'assente'] as const) {
       expect(provaCopre({ destination: 'PUBLIC', textVersion: 2 }, 'PUBLIC', voce)).toBe(true);

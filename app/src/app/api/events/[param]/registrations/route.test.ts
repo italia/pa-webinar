@@ -633,11 +633,11 @@ describe('POST registrations — la destinazione del video nel consenso', () => 
         consentRecordingDestination: null,
       });
       expect(res.status).toBe(201);
-      // Il testo senza video non riprende ne' volto ne' nome: versione 2.
+      // Il testo senza video ha un numero suo: non copre un video.
       expect(iscrizioneScritta()).toMatchObject({
         consentRecording: true,
         consentRecordingDestination: null,
-        consentRecordingVersion: 2,
+        consentRecordingVersion: 3,
       });
 
       const dichiarata = await iscriviti('anna@example.com', {

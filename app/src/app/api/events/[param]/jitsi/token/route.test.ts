@@ -1578,7 +1578,7 @@ describe('POST jitsi/token — il testo del consenso e la destinazione del video
       );
       expect(body.recordingDestination).toBeNull();
       expect(body.consentsRecorded?.recording).toBe(true);
-      expect(riga()).toMatchObject({ destination: null, textVersion: 2 });
+      expect(riga()).toMatchObject({ destination: null, textVersion: 3 });
     });
 
     it('chi conduce: con le tracce la trascrizione vale da sola', async () => {

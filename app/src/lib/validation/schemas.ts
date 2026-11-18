@@ -21,9 +21,11 @@ const localizedStringField = z.record(z.string(), z.string());
 
 /** A chi va un video: a tutti, o a iscritti e staff (RecordingAudience). */
 const destinatariVideo = z.enum(['PUBLIC', 'REGISTRANTS']);
-// Le versioni del testo del consenso alla registrazione (lib/recording/destination):
-// 1 nome, voce e immagine; 2 ne' volto ne' nome.
-const versioneTestoRegistrazione = z.union([z.literal(1), z.literal(2)]);
+// La versione del testo del consenso alla registrazione letto
+// (lib/recording/destination, `versioneDellaProva`). Un numero che il server non
+// conosce non ferma la richiesta: il consenso non e' mai una condizione per
+// entrare, e `versioneCopre` decide se vale.
+const versioneTestoRegistrazione = z.number().int().positive();
 
 export const eventBaseSchema = z.object({
   title: localizedStringField.refine(

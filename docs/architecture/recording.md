@@ -219,23 +219,24 @@ are in `app/src/lib/recording/destination.ts`.
   or without a destination, on the registration
   (`consentRecordingDestination`, `consentRecordingVersion`) and on the room
   proof (`RecordingConsent.destination`, `textVersion`): 1 for the text that
-  covers name, voice and image, 2 for a text that covers neither face nor name
-  (`versioneDellaProva`). A consent replaced
+  covers name, voice and image, 2 for the voice-only text, 3 for the text
+  without a video (`versioneDellaProva`). A consent replaced
   on a new text keeps the earlier period in `earlierPeriods`. A registration
   form left open across a change answers `422` if the box is ticked. The token
   route does not save a consent on a text that does not cover the destination
   in force, or, where participants can appear in the video, on a version other
-  than 1 (`provaCopre`), and every answer carries `recordingDestination`, so
-  that an open page shows the current text and asks again.
+  than 1 (`versioneCopre`), and every answer carries `recordingDestination`, so
+  that an open page shows the current destination and asks again; a room opened
+  before the installation changed what the video holds needs a reload to show
+  the current text.
 - **Without a video.** Where the installation records no composite video
   (`partecipantiNelVideo` is `assente`), the box says so
   (`gdpr.consent.recordingNoVideo`) and the consent declares no destination; its
-  version is 2, because it covers neither face nor name.
+  version (3) is its own, because it covers no video.
   An event without per-person tracks records nothing there: no box, no notice
   and no recording command. The event can still hold a destination, for a file
   uploaded later. If the installation
-  adds the video afterwards, those consents no longer cover an event with a
-  destination, nor any event where participants can appear, and the person is
+  adds the video afterwards, those consents no longer cover, and the person is
   asked again in the room.
 - **What else follows.** With a recording reserved by its destination, or by
   the audience `REGISTRANTS` on an event whose destination is `PUBLIC` or null

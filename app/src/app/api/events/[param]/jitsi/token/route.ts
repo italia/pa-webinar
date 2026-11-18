@@ -177,13 +177,17 @@ async function consensiInVigore(
   registrazione: boolean,
   /** La trascrizione gia' letta per questo posto in questa richiesta, se nessuna
    *  prova e' stata scritta dopo: non si rilegge. Null: la lettura non e'
-   *  riuscita, e si riprova qui. */
+   *  riuscita, e il token l'ha trattata come assente; la sala riceve lo stesso,
+   *  e la puo' ridare. */
   trascrizioneLetta?: boolean | null,
 ): Promise<{ recording: boolean; transcription: boolean } | undefined> {
+  if (trascrizioneLetta !== undefined) {
+    return { recording: registrazione, transcription: trascrizioneLetta === true };
+  }
   try {
     return {
       recording: registrazione,
-      transcription: trascrizioneLetta ?? (await trascrizioneInVigore(event, posto)),
+      transcription: await trascrizioneInVigore(event, posto),
     };
   } catch (err) {
     console.error('[jitsi/token] consents in force not read', {

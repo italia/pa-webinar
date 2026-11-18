@@ -231,11 +231,11 @@ describe('destinazione del consenso alla registrazione', () => {
     });
 
     expect(risposta.status).toBe(201);
-    // Il testo senza video non riprende ne' volto ne' nome: versione 2.
+    // Il testo senza video ha un numero suo: non copre un video.
     expect(await iscrizioneDi(email)).toMatchObject({
       consentRecording: true,
       consentRecordingDestination: null,
-      consentRecordingVersion: 2,
+      consentRecordingVersion: 3,
     });
   });
 });

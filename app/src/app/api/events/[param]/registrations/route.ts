@@ -50,7 +50,7 @@ import {
   destinazioneDelTesto,
   testoInVigore,
   testoLetto,
-  provaCopre,
+  versioneCopre,
   versioneLetta,
 } from '@/lib/recording/destination';
 import {
@@ -151,12 +151,8 @@ export const POST = withErrorHandling(async (request, context) => {
   const destinazioneInVigore = destinazioneDelTesto(event.recordingDestination, partecipanti);
   // Anche il testo: dove chi partecipa puo' comparire nel video vale solo quello
   // che lo dice, e una pagina aperta prima che l'installazione cambiasse ne
-  // mostrava un altro (`provaCopre`).
-  const versioneValida = provaCopre(
-    { destination: destinazioneInVigore, textVersion: consentRecordingVersion },
-    destinazioneInVigore,
-    partecipanti,
-  );
+  // mostrava un altro (`versioneCopre`).
+  const versioneValida = versioneCopre(consentRecordingVersion, partecipanti);
   if (
     registrazioneData &&
     (!testoInVigore(consentRecordingDestination, destinazioneInVigore) || !versioneValida)
@@ -165,8 +161,8 @@ export const POST = withErrorHandling(async (request, context) => {
       { path: ['consentRecording'], message: 'registration.errors.recordingDestinationChanged' },
     ]);
   }
-  // La versione del testo mostrato si salva con o senza destinazione, tranne
-  // per il testo senza video (`versioneDellaProva`).
+  // La versione del testo mostrato si salva con o senza destinazione
+  // (`versioneLetta`).
   const destinazioneLetta = registrazioneData
     ? testoLetto(consentRecordingDestination, destinazioneInVigore)
     : null;

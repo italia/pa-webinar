@@ -911,8 +911,7 @@ model Registration {
   consentRecording            Boolean? @map("consent_recording") // null if event has no recording
   // Il testo del consenso alla registrazione letto da chi ha spuntato: la
   // destinazione del video e la versione (lib/recording/destination). Null per
-  // chi non ha spuntato e per i consensi dati prima che il testo le dichiarasse;
-  // la versione anche per il testo senza video.
+  // chi non ha spuntato e per i consensi dati prima che il testo le dichiarasse.
   consentRecordingDestination RecordingAudience? @map("consent_recording_destination")
   consentRecordingVersion     Int?     @map("consent_recording_version")
   // ADR-013 Fase 5 — consenso esplicito SEPARATO alla trascrizione dei propri
@@ -2895,7 +2894,7 @@ model RecordingConsent {
   earlierPeriods Json?    @map("earlier_periods") @db.JsonB
   // Il testo del consenso del periodo in corso: destinazione del video e
   // versione (lib/recording/destination). Null per i consensi dati prima che
-  // il testo le dichiarasse; la versione anche per il testo senza video.
+  // il testo le dichiarasse.
   destination    RecordingAudience? @map("destination")
   textVersion    Int?     @map("text_version")
 
