@@ -118,6 +118,14 @@ describe('GET /api/events/[slug]/recording', () => {
     expect(traccia).not.toHaveBeenCalled();
   });
 
+  it('il pass di presenza vale senza pubblicazione solo per una chiamata rapida', async () => {
+    accesso.accessoRegistrazione.mockResolvedValue('presente');
+    db.event.findFirst.mockResolvedValue(evento({ recordingPublished: false, eventType: 'INSTANT' }));
+    expect((await GET(req(), ctx())).status).toBe(302);
+    db.event.findFirst.mockResolvedValue(evento({ recordingPublished: false, eventType: 'SCHEDULED' }));
+    expect((await GET(req(), ctx())).status).toBe(403);
+  });
+
   it('si firma solo un file dell’evento: un file dello storage che non si firma e’ 404, mai il rinvio', async () => {
     accesso.accessoRegistrazione.mockResolvedValue('pubblico');
     storage.generateRecordingSasUrl.mockResolvedValueOnce(null);

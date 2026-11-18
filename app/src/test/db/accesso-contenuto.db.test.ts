@@ -5,7 +5,7 @@
  * Il contenuto delle registrazioni su un database vero
  * (docs/adr/021-recording-content-access.md): lo vede chi organizza l'evento
  * (chi l'ha creato, o un account con una concessione da organizzatore), chi
- * ha partecipato (l'iscritto) e, se e'
+ * ha partecipato (l'iscritto, chi era in sala in una chiamata rapida) e, se e'
  * pubblicato per tutti, chiunque. L'admin che non lo organizza vede i
  * metadati; la chiave dell'istanza mai il contenuto. Lo storage dei file e'
  * finto, il resto no.
@@ -33,10 +33,13 @@ import { GET as elencoPostprod } from '@/app/api/admin/postprod/route';
 import { PUT as rinominaVoce } from '@/app/api/admin/postprod/speakers/[id]/route';
 import { GET as elencoModeratori } from '@/app/api/admin/moderators/route';
 import { POST as chiediResoconto } from '@/app/api/admin/events/[id]/report/route';
+import { POST as passDiPresenza } from '@/app/api/events/[param]/recording/presence/route';
 import { GET as video } from '@/app/api/events/[param]/recording/route';
 import { GET as fileSessione } from '@/app/api/events/[param]/sessions/[id]/recording/route';
+import { generateJitsiJwt } from '@/lib/auth/jwt';
 import { hashEmail } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
+import { presencePassCookieName } from '@/lib/recording/presence-pass';
 import { issueViewingToken, viewingCookieName } from '@/lib/recording/viewing';
 
 import { biscotti } from './biscotti';
@@ -327,6 +330,147 @@ describe('il video dell’evento (/api/events/[slug]/recording)', () => {
     // Senza storage configurato l'indirizzo vale com'e' (ambiente locale): la
     // regola la provano i test dello storage. Qui: la rotta non si rompe.
     expect([302, 404]).toContain((await guarda(evento.slug)).status);
+  });
+});
+
+describe('la chiamata rapida e il pass di presenza', () => {
+  async function chiamata(campi: Record<string, unknown> = {}) {
+    return creaEvento({
+      eventType: 'INSTANT',
+      status: 'LIVE',
+      dataRetentionDays: 7,
+      ...campi,
+    });
+  }
+  const tokenDellaSala = (stanza: string, scadenza?: number) =>
+    generateJitsiJwt({
+      roomName: stanza,
+      displayName: 'Ospite',
+      uniqueId: `guest-${randomUUID()}`,
+      isModerator: false,
+      ...(scadenza !== undefined && { expiresInSeconds: scadenza }),
+    });
+  const chiedi = (slug: string, roomTokens: string[]) =>
+    passDiPresenza(
+      richiesta(`/api/events/${slug}/recording/presence`, 'POST', {
+        roomTokens,
+      }) as never,
+      conSlug(slug) as never
+    );
+  const avviaRegistrazione = (eventId: string) =>
+    prisma.liveAction.create({
+      data: { eventId, kind: 'recording.started', actor: 'moderator' },
+    });
+
+  it('chi e’ in sala mentre si registra riceve il pass; dopo la chiamata vede il video, gli altri no', async () => {
+    const evento = await chiamata();
+    await avviaRegistrazione(evento.id);
+    const r = await chiedi(evento.slug, [await tokenDellaSala(evento.jitsiRoomName)]);
+    expect(r.status).toBe(204);
+    const cookie = r.headers.get('set-cookie')!;
+    expect(cookie).toContain(`${presencePassCookieName(evento.id)}=`);
+    expect(cookie).toContain('HttpOnly');
+    const pass = cookie.split(';')[0]!.split('=').slice(1).join('=');
+
+    await prisma.event.update({
+      where: { id: evento.id },
+      data: { status: 'ENDED', recordingUrl: VIDEO },
+    });
+    const guarda = () =>
+      video(
+        richiesta(`/api/events/${evento.slug}/recording`) as never,
+        conSlug(evento.slug) as never
+      );
+    expect((await guarda()).status).toBe(403);
+    biscotti.set(presencePassCookieName(evento.id), pass);
+    expect((await guarda()).status).toBe(302);
+    // Il pass non e' una lettura dello staff.
+    expect(await righeDiLettura(evento.id)).toHaveLength(0);
+    // Non vale per un'altra chiamata.
+    const altra = await chiamata({ status: 'ENDED', recordingUrl: VIDEO });
+    biscotti.set(presencePassCookieName(altra.id), pass);
+    expect(
+      (
+        await video(
+          richiesta(`/api/events/${altra.slug}/recording`) as never,
+          conSlug(altra.slug) as never
+        )
+      ).status
+    ).toBe(403);
+  });
+
+  it('chi organizza la chiamata vede il video dal link, senza pass', async () => {
+    const admin = await entraCome('ADMIN');
+    const evento = await chiamata({
+      status: 'ENDED',
+      recordingUrl: VIDEO,
+      createdById: admin.id,
+    });
+    expect(
+      (
+        await video(
+          richiesta(`/api/events/${evento.slug}/recording`) as never,
+          conSlug(evento.slug) as never
+        )
+      ).status
+    ).toBe(302);
+  });
+
+  it('senza registrazione in corso niente pass: 409, e il client riprova', async () => {
+    const evento = await chiamata();
+    expect(
+      (await chiedi(evento.slug, [await tokenDellaSala(evento.jitsiRoomName)])).status
+    ).toBe(409);
+    await avviaRegistrazione(evento.id);
+    await prisma.liveAction.create({
+      data: {
+        eventId: evento.id,
+        kind: 'recording.stopped',
+        actor: 'moderator',
+        at: new Date(Date.now() + 1000),
+      },
+    });
+    expect(
+      (await chiedi(evento.slug, [await tokenDellaSala(evento.jitsiRoomName)])).status
+    ).toBe(409);
+  });
+
+  it('serve un token di questa sala; scaduto da poco vale, perche’ la sala non lo rinnova', async () => {
+    const evento = await chiamata();
+    await avviaRegistrazione(evento.id);
+    expect(
+      (await chiedi(evento.slug, [await tokenDellaSala('altra-stanza')])).status
+    ).toBe(401);
+    expect((await chiedi(evento.slug, ['non-un-token'])).status).toBe(401);
+    expect(
+      (
+        await chiedi(evento.slug, [
+          await tokenDellaSala(evento.jitsiRoomName, -2 * 86_400),
+        ])
+      ).status
+    ).toBe(401);
+    // Entrato tre ore prima dell'avvio: il token e' scaduto, la persona c'e'.
+    expect(
+      (
+        await chiedi(evento.slug, [
+          await tokenDellaSala(evento.jitsiRoomName, -3 * 3_600),
+        ])
+      ).status
+    ).toBe(204);
+  });
+
+  it('solo per le chiamate rapide aperte', async () => {
+    const programmato = await creaEvento({ status: 'LIVE' });
+    await avviaRegistrazione(programmato.id);
+    expect(
+      (await chiedi(programmato.slug, [await tokenDellaSala(programmato.jitsiRoomName)]))
+        .status
+    ).toBe(404);
+    const chiusa = await chiamata({ status: 'ENDED' });
+    await avviaRegistrazione(chiusa.id);
+    expect(
+      (await chiedi(chiusa.slug, [await tokenDellaSala(chiusa.jitsiRoomName)])).status
+    ).toBe(409);
   });
 });
 

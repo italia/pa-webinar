@@ -71,6 +71,14 @@ describe('assertPostprodAccessible', () => {
     expect(tracciate).not.toHaveBeenCalled();
   });
 
+  it('chiamata rapida: chi era in sala (pass di presenza) vede la trascrizione senza pubblicazione', async () => {
+    const { issuePresencePass, presencePassCookieName } = await import('@/lib/recording/presence-pass');
+    mockEvent.mockResolvedValue({ ...base, postEventPublic: false });
+    cookieJar.set(presencePassCookieName('ev-1'), issuePresencePass('ev-1', new Date(Date.now() + 86_400_000))!);
+    await expect(assertPostprodAccessible('s')).resolves.toMatchObject({ ambito: 'tutto' });
+    expect(tracciate).not.toHaveBeenCalled();
+  });
+
   it('riservata agli iscritti: chiusa a chi non prova l\'iscrizione', async () => {
     mockEvent.mockResolvedValue({ ...base, recordingPublished: true, recordingAudience: 'REGISTRANTS' });
     await expect(assertPostprodAccessible('s')).rejects.toThrow();

@@ -206,7 +206,12 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       // still require a personal token for any non-LIVE status — via
       // /registration — and for LIVE too when the administration turns guest
       // access off. La regola e' la stessa di chat e pannelli.
-      guestWindowOpen(event, settings.guestAccessEnabled)
+      guestWindowOpen(event, settings.guestAccessEnabled) ||
+      // Chiamata rapida conclusa: il link mostra la registrazione a chi era in
+      // sala mentre si registrava (pass di presenza) e a chi la organizza
+      // (lib/recording/audience), con la stessa pagina di fine chiamata. A
+      // tutti gli altri risponde «non trovato», come prima.
+      (isInstant && event.status === 'ENDED' && videoDisponibile)
     ) {
       const title = getLocalized(event.title as LocalizedField, locale);
       return (

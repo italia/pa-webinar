@@ -18,7 +18,8 @@
  *      iscritti secondo `recordingAudience`, che su un evento con destinazione
  *      non dipendono da `postEventPublic`; oppure lo staff che organizza
  *      l'evento, anche prima della pubblicazione (l'anteprima della pagina),
- *      con la lettura tracciata (lib/recording/content-access).
+ *      con la lettura tracciata (lib/recording/content-access); oppure, in
+ *      una chiamata rapida, chi era in sala mentre si registrava.
  *
  * Passati i cancelli, il perimetro (`ambito`) dice che cosa si mostra:
  *   - `tutto`: il video e' pubblicato (o lo guarda lo staff) e la pipeline AI
@@ -82,8 +83,10 @@ export async function assertPostprodAccessible(
     await tracciaLetturaContenuto({ ...staff, eventId: event.id, recordingId: null, superficie });
   }
   // Lo staff vede cio' che vedra' il pubblico; prima della pubblicazione,
-  // l'anteprima del video pubblicato.
-  const anteprima = accesso === 'staff' && !pubblicazioneAperta(event);
+  // l'anteprima del video pubblicato. Chi era in sala in una chiamata rapida
+  // vede cio' che c'e': la chiamata non si pubblica.
+  const anteprima =
+    (accesso === 'staff' && !pubblicazioneAperta(event)) || accesso === 'presente';
 
   return {
     eventId: event.id,

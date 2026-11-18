@@ -41,6 +41,7 @@ export const GET = withErrorHandling(async (_request, context) => {
       id: true,
       recordingUrl: true,
       status: true,
+      eventType: true,
       recordingPublished: true,
       transcriptPublished: true,
       recordingAudience: true,
@@ -56,9 +57,12 @@ export const GET = withErrorHandling(async (_request, context) => {
   }
   // Chi puo' vedere la registrazione (lib/recording/audience): pubblicata nella
   // finestra post-evento, per tutti o per i soli iscritti; lo staff che
-  // organizza l'evento anche prima, per l'anteprima della pagina.
+  // organizza l'evento anche prima, per l'anteprima della pagina; di una
+  // chiamata rapida, chi era in sala (pass di presenza) e chi la organizza.
   const { accesso, staff } = await accessoRegistrazioneConStaff(event, await cookies());
-  if (!accesso || (!event.recordingPublished && accesso !== 'staff')) {
+  const senzaPubblicazione =
+    accesso === 'staff' || (accesso === 'presente' && event.eventType === 'INSTANT');
+  if (!accesso || (!event.recordingPublished && !senzaPubblicazione)) {
     throw new ForbiddenError('Recording not published');
   }
   if (staff) {

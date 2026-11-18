@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: EUPL-1.2
 // SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
 
-import type { EventStatus, RecordingAudience } from '@prisma/client';
+import type { EventStatus, EventType, RecordingAudience } from '@prisma/client';
 import type { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
 
 import { prisma } from '@/lib/db';
 import { eventAccessCookieName, verifyEventAccess } from '@/lib/event-session';
 
 import { contenutoStaffDellaRichiesta } from './content-access';
+import { haPassDiPresenza } from './presence-pass';
 import { verifyViewingToken, viewingCookieName } from './viewing';
 
 /**
@@ -35,9 +36,12 @@ import { verifyViewingToken, viewingCookieName } from './viewing';
  *    servono; la pagina la mostra solo su richiesta (`?anteprima=1`).
  *    L'admin che non lo organizza no, e la chiave dell'istanza mai
  *    (lib/recording/content-access): vale `'staff'` solo per chi la vede.
+ *  - Chiamata rapida: chi era in sala mentre si registrava ha nel browser il
+ *    pass di presenza (lib/recording/presence-pass) e la vede dal link della
+ *    chiamata, senza pubblicazione, finche' la chiamata e' conservata.
  */
 
-export type AccessoRegistrazione = 'pubblico' | 'iscritto' | 'staff' | null;
+export type AccessoRegistrazione = 'pubblico' | 'iscritto' | 'presente' | 'staff' | null;
 
 export interface EventoPerAccesso {
   id: string;
@@ -145,11 +149,16 @@ export async function accessoRegistrazioneConStaff(
   if (aperta && (await iscrittoDellaRichiesta(event.id, cookieStore))) {
     return { accesso: 'iscritto', staff: null };
   }
-  return { accesso: null, staff: null };
+  // Il pass esiste solo per le chiamate rapide (la rotta che lo posa lo
+  // verifica): la visione lo conta solo li'.
+  return { accesso: haPassDiPresenza(cookieStore, event.id, now) ? 'presente' : null, staff: null };
 }
 
 export interface EventoPerVisione extends EventoPerAccesso {
   status: EventStatus;
+  /** Una chiamata rapida non si pubblica: chi la organizza e chi c'era la
+   *  vedono senza pubblicazione. Assente: un evento a calendario. */
+  eventType?: EventType;
 }
 
 /** L'anteprima dello staff: la chiede solo la pagina dell'evento. */
@@ -199,16 +208,24 @@ export function visioneRegistrazione(
 ): VisioneRegistrazione {
   if (event.status !== 'ENDED') return NESSUNA_VISIONE;
   const aperta = pubblicazioneAperta(event, now);
+  // La chiamata rapida non ha pubblicazione ne' pagina: la vedono chi c'era e
+  // chi la organizza, dal link della chiamata.
+  const dellaChiamata =
+    event.eventType === 'INSTANT' && (accesso === 'presente' || accesso === 'staff');
   const anteprimaStaff =
-    accesso === 'staff' && anteprima.chiesta && (!aperta || !anteprima.paginaVisibile);
+    !dellaChiamata &&
+    accesso === 'staff' &&
+    anteprima.chiesta &&
+    (!aperta || !anteprima.paginaVisibile);
   const registrazione =
+    dellaChiamata ||
     accesso === 'pubblico' ||
     accesso === 'iscritto' ||
     (accesso === 'staff' && (aperta || anteprimaStaff));
   return {
     anteprimaStaff,
     registrazione,
-    video: registrazione && (event.recordingPublished || anteprimaStaff),
+    video: registrazione && (event.recordingPublished || anteprimaStaff || dellaChiamata),
     soloIscritti: aperta && event.recordingAudience === 'REGISTRANTS' && !registrazione,
   };
 }
