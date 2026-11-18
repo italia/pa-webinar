@@ -110,6 +110,26 @@ const ROTTE_METADATI: Record<string, { perche: string; filtra?: true }> = {
   },
 };
 
+/**
+ * Le rotte della rimozione da una registrazione (lib/recording/redaction):
+ * l'admin apre il contenuto solo in deroga, finche' la richiesta e' aperta e
+ * soltanto per la registrazione della richiesta. Le altre trattano la
+ * richiesta e i suoi intervalli, non il contenuto.
+ */
+const ROTTE_RIMOZIONE_CONTENUTO: Record<string, string> = {
+  'api/admin/recording-removals/[id]/media/route.ts': 'il video da coprire',
+  'api/admin/recording-removals/[id]/waveform/route.ts': 'la forma d’onda della voce',
+};
+const ROTTE_RIMOZIONE_METADATI: Record<string, string> = {
+  'api/admin/recording-removals/route.ts': 'elenco e inserimento delle richieste',
+  'api/admin/recording-removals/[id]/route.ts': 'la richiesta e i suoi intervalli',
+  'api/admin/recording-removals/people/route.ts': 'chi era in sala, per scegliere la persona',
+  'api/admin/recording-removals/recordings/route.ts': 'le registrazioni di un evento',
+  'api/admin/recording-removals/[id]/reject/route.ts': 'respinge la richiesta',
+  'api/admin/recording-removals/[id]/start/route.ts': 'prende in carico la richiesta',
+  'api/admin/recording-removals/[id]/submit/route.ts': 'manda gli intervalli al lavoro',
+};
+
 /** Le rotte che consegnano il link di conduzione: solo a chi organizza l'evento. */
 const ROTTE_LINK_CONDUZIONE = [
   'api/admin/moderators/route.ts',
@@ -160,6 +180,18 @@ describe('rotte del contenuto delle registrazioni', () => {
     const rotte = [...file(path.join(APP, 'api/admin/postprod'), 'route.ts')].map(rel);
     const mute = rotte.filter((r) => !(r in ROTTE_CONTENUTO) && !(r in ROTTE_METADATI));
     expect(mute).toEqual([]);
+  });
+
+  it('le rotte della rimozione aprono il contenuto solo in deroga, e sono tutte dichiarate', () => {
+    const rotte = [...file(path.join(APP, 'api/admin/recording-removals'), 'route.ts')].map(rel);
+    const mute = rotte.filter(
+      (r) => !(r in ROTTE_RIMOZIONE_CONTENUTO) && !(r in ROTTE_RIMOZIONE_METADATI)
+    );
+    expect(mute).toEqual([]);
+    const senzaDeroga = Object.keys(ROTTE_RIMOZIONE_CONTENUTO).filter(
+      (r) => !/\brichiestaInDeroga\(/.test(readFileSync(path.join(APP, r), 'utf-8'))
+    );
+    expect(senzaDeroga).toEqual([]);
   });
 
   it('il link di conduzione esce solo per gli eventi che chi guarda organizza', () => {
