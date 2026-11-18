@@ -189,9 +189,10 @@ jobs:
           fi
           docker tag "$IMG" pa-webinar-jitsi-web:candidate
           docker pull --quiet "$IMG" > /dev/null
-          # `sed` e non `head`: legge tutto l'ingresso, quindi con pipefail
+          # `awk` e non `head`: legge tutto l'ingresso, quindi con pipefail
           # docker non muore di SIGPIPE e lo stato della pipeline e' il suo.
-          strati() { docker image inspect -f '{{range .RootFS.Layers}}{{println .}}{{end}}' "$1" | sed -n "1,${2}p"; }
+          # Con 0 strati non stampa nulla, come `head -n 0`.
+          strati() { docker image inspect -f '{{range .RootFS.Layers}}{{println .}}{{end}}' "$1" | awk -v n="$2" 'NR <= n'; }
           config() { docker image inspect -f '{{json .Config.Env}} {{json .Config.Entrypoint}} {{json .Config.Cmd}} {{json .Config.User}} {{json .Config.WorkingDir}} {{json .Config.ExposedPorts}} {{json .Config.Volumes}}' "$1"; }
           # Ogni voce del filesystem con tipo, permessi, proprietario e
           # destinazione dei collegamenti, piu' l'impronta di ogni file. Senza
