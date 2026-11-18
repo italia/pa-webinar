@@ -160,11 +160,12 @@ export default function RegistrationConsents({
   };
   // Vale per il testo in vigore: lo dice il server alla lettura, poi cio' che la
   // pagina ha dato o ritirato.
+  // Le comunicazioni future non hanno un testo che cambia: vale lo stato, che segue
+  // anche i ritiri e le conferme fatti da altre schede della pagina.
   const inVigore = (chiave: Chiave): boolean => {
+    if (chiave === 'futureCommunications') return !!stati.futureCommunications?.dato;
     if (vigoreLocale[chiave] !== undefined) return vigoreLocale[chiave]!;
-    const dalServer =
-      chiave === 'futureCommunications' ? undefined : offerta?.[chiave]?.inForce;
-    return dalServer ?? !!stati[chiave]?.dato;
+    return offerta?.[chiave]?.inForce ?? !!stati[chiave]?.dato;
   };
   // La trascrizione senza la registrazione non avrebbe la voce: va data dopo.
   const serveRegistrazione =
@@ -249,11 +250,13 @@ export default function RegistrationConsents({
         ...(chiave === 'futureCommunications' ? { addressBookPending: false } : {}),
       }));
       if (chiave === 'futureCommunications') onComunicazioniRitirate?.(adesso);
-      setVigoreLocale((prima) => ({
-        ...prima,
-        [chiave]: false,
-        ...(chiave === 'recording' ? { transcription: false } : {}),
-      }));
+      if (chiave !== 'futureCommunications') {
+        setVigoreLocale((prima) => ({
+          ...prima,
+          [chiave]: false,
+          ...(chiave === 'recording' ? { transcription: false } : {}),
+        }));
+      }
       setConferma(null);
     });
 
@@ -274,7 +277,9 @@ export default function RegistrationConsents({
           [chiave]: { dato: true, ritiratoIl: null },
           ...(chiave === 'futureCommunications' ? { addressBookPending: false } : {}),
         }));
-        setVigoreLocale((prima) => ({ ...prima, [chiave]: true }));
+        if (chiave !== 'futureCommunications') {
+          setVigoreLocale((prima) => ({ ...prima, [chiave]: true }));
+        }
         if (chiave === 'futureCommunications') {
           setComunicazioniRidateIl(new Date().toISOString());
           // Il rientro in rubrica chiude anche le spunte in attesa delle altre

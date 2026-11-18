@@ -11,7 +11,7 @@
  *     con `issuedAt`, che la pagina rimanda;
  *  2. con `code` e `issuedAt`: se quel codice e' stato mandato davvero, ha ancora
  *     tentativi e torna per la stessa richiesta, la modifica si fa e il codice
- *     non vale piu'.
+ *     non vale piu' (`conCodice`).
  *
  * Limiti, nel registro condiviso fra le repliche (lib/gdpr/confirmation-store):
  * cinque codici l'ora per indirizzo e cinque tentativi per codice, che con sei
@@ -33,10 +33,12 @@ import {
   type RichiestaConfermata,
 } from '@/lib/gdpr/confirmation-code';
 import {
-  chiudiEmissione,
+  annullaInvio,
   contaInvio,
   contaTentativo,
+  prendiEmissione,
   registraEmissione,
+  restituisciEmissione,
 } from '@/lib/gdpr/confirmation-store';
 import { verifyGdprToken } from '@/lib/gdpr/request-token';
 import { getClientIp, rateLimit } from '@/lib/rate-limit';
@@ -96,19 +98,30 @@ export async function mandaCodice(
   if (conto === 'nonDisponibile') throw nonDisponibile();
   const lingua = linguaPagina(locale) ?? linguaPagina(iscrizione.locale) ?? defaultLocale;
   const { codice, emessoIl } = emettiCodice(richiesta);
-  // Prima si annota, poi si manda: un codice che parte vale anche sulle altre repliche.
-  if ((await registraEmissione(richiesta, emessoIl)) !== 'ok') throw nonDisponibile();
-  await inviaCodiceDiConferma({
-    to,
-    locale: lingua,
-    azione: richiesta.azione,
-    tutte,
-    eventTitle: getLocalized(iscrizione.event.title as LocalizedField, lingua),
-    codice,
-    minuti: DURATA_CODICE_MINUTI,
-    registrationId: iscrizione.id,
-    siteName: (await getSettings()).siteName,
-  });
+  // Prima si annota, poi si manda: un codice che parte vale anche sulle altre
+  // repliche. Se qualcosa va storto, l'invio non resta nel conto e l'emissione
+  // non resta nel registro senza un'email che la annunci.
+  if ((await registraEmissione(richiesta, emessoIl)) !== 'ok') {
+    await annullaInvio(richiesta.emailHash);
+    throw nonDisponibile();
+  }
+  try {
+    await inviaCodiceDiConferma({
+      to,
+      locale: lingua,
+      azione: richiesta.azione,
+      tutte,
+      eventTitle: getLocalized(iscrizione.event.title as LocalizedField, lingua),
+      codice,
+      minuti: DURATA_CODICE_MINUTI,
+      registrationId: iscrizione.id,
+      siteName: (await getSettings()).siteName,
+    });
+  } catch (err) {
+    await prendiEmissione(richiesta, emessoIl);
+    await annullaInvio(richiesta.emailHash);
+    throw err;
+  }
   return Response.json(
     { codeSent: true, issuedAt: emessoIl, expiresInMinutes: DURATA_CODICE_MINUTI },
     { status: 202, headers: { 'Cache-Control': 'no-store' } }
@@ -116,19 +129,30 @@ export async function mandaCodice(
 }
 
 /**
- * Il codice e' stato mandato per questa richiesta, ha ancora tentativi e torna:
- * altrimenti la modifica non si fa (403). Confermato, non vale piu'.
+ * Fa la modifica solo se il codice e' stato mandato per questa richiesta, ha
+ * ancora tentativi e torna (altrimenti 403). Il codice si prende prima della
+ * modifica: con due richieste insieme, una sola la fa. Se la modifica fallisce,
+ * il codice torna valido e si puo' riprovare.
  */
-export async function controllaCodice(
+export async function conCodice<T>(
   richiesta: RichiestaConfermata,
   issuedAt: number,
-  code: string
-): Promise<void> {
+  code: string,
+  modifica: () => Promise<T>
+): Promise<T> {
   limita(`gdpr-registration-verify:${richiesta.emailHash}`, 10);
-  const tentativo = await contaTentativo(richiesta, issuedAt);
-  if (tentativo === 'nonDisponibile') throw nonDisponibile();
-  if (tentativo !== 'ammesso' || !verificaCodice(richiesta, issuedAt, code)) {
-    throw new AppError('Invalid or expired confirmation code', 403, 'INVALID_CODE');
+  const { esito, tentativi } = await contaTentativo(richiesta, issuedAt);
+  if (esito === 'nonDisponibile') throw nonDisponibile();
+  const sbagliato = () =>
+    new AppError('Invalid or expired confirmation code', 403, 'INVALID_CODE');
+  if (esito !== 'ammesso' || !verificaCodice(richiesta, issuedAt, code)) throw sbagliato();
+  const preso = await prendiEmissione(richiesta, issuedAt);
+  if (preso === 'nonDisponibile') throw nonDisponibile();
+  if (!preso) throw sbagliato();
+  try {
+    return await modifica();
+  } catch (err) {
+    await restituisciEmissione(richiesta, issuedAt, tentativi);
+    throw err;
   }
-  await chiudiEmissione(richiesta, issuedAt);
 }

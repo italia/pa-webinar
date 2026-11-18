@@ -19,7 +19,7 @@ import { z } from 'zod';
 import { parseJsonBody, withErrorHandling } from '@/lib/api-handler';
 import { NotFoundError, ValidationError } from '@/lib/errors';
 import {
-  controllaCodice,
+  conCodice,
   iscrizioneDelToken,
   limitePerIp,
   mandaCodice,
@@ -58,8 +58,9 @@ export const POST = withErrorHandling(async (request) => {
   if (corpo.code === undefined || corpo.issuedAt === undefined) {
     return mandaCodice(richiesta, iscrizione, { locale: corpo.locale });
   }
-  await controllaCodice(richiesta, corpo.issuedAt, corpo.code);
-  const counts = await cancellaIscrizione(emailHash, iscrizione.id);
+  const counts = await conCodice(richiesta, corpo.issuedAt, corpo.code, () =>
+    cancellaIscrizione(emailHash, iscrizione.id)
+  );
   if (!counts) throw new NotFoundError('Registration');
   return Response.json(
     { deleted: counts.registrations, consentProofsKept: counts.consentProofsKept },

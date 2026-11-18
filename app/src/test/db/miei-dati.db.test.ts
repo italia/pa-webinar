@@ -336,6 +336,9 @@ describe('un consenso dato di nuovo da «I miei dati»', () => {
       transcriptionText: 'multitrack',
     });
     expect((await vecchio.json()).code).toBe('CONSENT_TEXT_CHANGED');
+    // Una pagina che non dice quale casella ha mostrato rilegge.
+    const senzaTesto = await dai(token, iscrizione.id, { consent: 'transcription' });
+    expect((await senzaTesto.json()).code).toBe('CONSENT_TEXT_CHANGED');
     expect(
       (
         await dai(token, iscrizione.id, {

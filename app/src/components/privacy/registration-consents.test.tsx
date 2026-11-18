@@ -441,6 +441,32 @@ describe('RegistrationConsents', () => {
       expect(pulsante(l.withdraw)).toBeDefined();
     });
 
+    it('le comunicazioni ridate qui e poi ritirate da un’altra scheda si ridanno ancora', async () => {
+      vi.stubGlobal('fetch', vi.fn(async () => new Response('{}', { status: 200 })));
+      const pagina = (ritirateIl: string | undefined) =>
+        act(() =>
+          root.render(
+            <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
+              <RegistrationConsents
+                token="tok en"
+                registrationId="r1"
+                consensi={{ recording: null, transcription: null, futureCommunications: ritirato }}
+                offerta={offerta}
+                comunicazioniRitirateIl={ritirateIl}
+              />
+            </NextIntlClientProvider>
+          )
+        );
+      pagina(ritirato.ritiratoIl);
+      await clic(messages.gdpr.export.consentFutureGive);
+      expect(pulsante(l.withdraw)).toBeDefined();
+      // Un ritiro piu' recente, fatto su un'altra scheda.
+      pagina(new Date(Date.now() + 60_000).toISOString());
+      expect(pulsante(l.withdraw)).toBeUndefined();
+      expect(pulsante(messages.gdpr.export.consentFutureGive)).toBeDefined();
+      expect(container.textContent).not.toContain(messages.gdpr.export.consentFutureGiveDone);
+    });
+
     it('con una spunta in attesa si conferma quella, non un secondo pulsante', () => {
       monta({ futureCommunications: ritirato, addressBookPending: true }, { offerta });
       expect(pulsante(messages.gdpr.export.consentFutureGive)).toBeUndefined();

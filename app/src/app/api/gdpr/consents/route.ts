@@ -76,9 +76,10 @@ const schema = z.union([
       locale: z.string().max(10).optional(),
     })
     .strict()
-    // Il consenso vale per il testo letto: la pagina lo dice.
-    .refine((c) => c.consent !== 'recording' || c.recordingDestination !== undefined)
-    .refine((c) => c.consent !== 'transcription' || c.transcriptionText !== undefined),
+    // Il consenso alla registrazione vale per il testo letto: la pagina lo dice.
+    // Senza la casella della trascrizione la risposta e' «testo cambiato», che fa
+    // ricaricare la pagina.
+    .refine((c) => c.consent !== 'recording' || c.recordingDestination !== undefined),
 ]);
 
 /** Perche' un consenso non si e' potuto dare: la pagina lo spiega. */

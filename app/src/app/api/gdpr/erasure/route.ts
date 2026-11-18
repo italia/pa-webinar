@@ -191,16 +191,16 @@ export const POST = withErrorHandling(async (request) => {
   const counts =
     registrations.length > 0 ? await eraseRegistrations(registrations, 'gdpr/erasure') : null;
 
-  // Le prove gia' conservate di eventi ripuliti: per chi ha solo quelle e' tutto
-  // cio' che la cancellazione cambia, e deve restarne traccia nel registro. Dopo
-  // le iscrizioni, cosi' prende anche cio' che una pulizia in corso ha copiato
-  // con il nome mentre questa richiesta aspettava il suo turno.
   // Un rientro in rubrica confermato da un'altra scheda mentre questa richiesta
   // cancellava (lib/persons/spunta-in-attesa) puo' aver ricreato la voce con i
   // dati di un'iscrizione: dopo le iscrizioni non c'e' piu' niente che la rifaccia.
   const voceRifatta = await prisma.person.deleteMany({ where: { emailHash } });
   addressBookDeleted ||= voceRifatta.count > 0;
 
+  // Le prove gia' conservate di eventi ripuliti: per chi ha solo quelle e' tutto
+  // cio' che la cancellazione cambia, e deve restarne traccia nel registro. Dopo
+  // le iscrizioni, cosi' prende anche cio' che una pulizia in corso ha copiato
+  // con il nome mentre questa richiesta aspettava il suo turno.
   const proveToccate = await togliNomeDalleProve(emailHash, adesso);
   for (const [eventId, copiate] of proveCopiate) {
     proveToccate.set(eventId, (proveToccate.get(eventId) ?? 0) + copiate);

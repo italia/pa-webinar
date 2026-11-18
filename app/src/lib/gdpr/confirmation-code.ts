@@ -22,10 +22,9 @@ import { requireAppSecret } from '@/lib/auth/app-secret';
  * dell'indirizzo, iscrizione (o tutto l'indirizzo), impronta dei valori nuovi e
  * ora di emissione, ridotto a sei cifre. Vale solo per quella richiesta: con un
  * nome diverso, per un'altra iscrizione o un'altra azione non torna. Dura
- * `DURATA_CODICE_MINUTI`. Rifatto con gli stessi dati entro la durata ripete la
- * stessa modifica, che non cambia niente, o non trova piu' l'iscrizione
- * cancellata: in pratica vale una volta. I tentativi sono limitati per indirizzo
- * e per IP dalle rotte (api/gdpr/registrations).
+ * `DURATA_CODICE_MINUTI`. Che sia partito, quanti tentativi ha avuto e che sia
+ * gia' stato usato lo annota il registro condiviso fra le repliche
+ * (lib/gdpr/confirmation-store), con le sole impronte.
  */
 
 export const DURATA_CODICE_MINUTI = 15;

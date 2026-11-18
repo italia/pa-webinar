@@ -120,6 +120,25 @@ describe('POST /api/gdpr/registrations/edit', () => {
     expect(mocks.correggi).toHaveBeenCalledTimes(1);
   });
 
+  it('due richieste insieme con il codice giusto: la modifica si fa una volta', async () => {
+    const { codice, issuedAt } = await codiceMandato();
+    const conCodice = { ...corpo(), code: codice, issuedAt };
+    const stati = (await Promise.all([chiama(conCodice), chiama(conCodice)])).map(
+      (r) => r.status
+    );
+    expect(stati.sort()).toEqual([200, 403]);
+    expect(mocks.correggi).toHaveBeenCalledTimes(1);
+  });
+
+  it('se la correzione fallisce il codice torna valido', async () => {
+    const { codice, issuedAt } = await codiceMandato();
+    mocks.correggi.mockRejectedValueOnce(new Error('database lento'));
+    const conCodice = { ...corpo(), code: codice, issuedAt };
+    expect((await chiama(conCodice)).status).toBe(500);
+    expect((await chiama(conCodice)).status).toBe(200);
+    expect(mocks.correggi).toHaveBeenCalledTimes(2);
+  });
+
   it('un codice giusto ma mai mandato non vale: si indovina solo dopo un’email', async () => {
     const { codice, emessoIl } = emettiCodice({
       azione: 'edit',

@@ -21,7 +21,7 @@ import { parseJsonBody, withErrorHandling } from '@/lib/api-handler';
 import { ValidationError } from '@/lib/errors';
 import { improntaValori } from '@/lib/gdpr/confirmation-code';
 import {
-  controllaCodice,
+  conCodice,
   iscrizioneDelToken,
   limitePerIp,
   mandaCodice,
@@ -89,8 +89,9 @@ export const POST = withErrorHandling(async (request) => {
       tutte: corpo.scope === 'address',
     });
   }
-  await controllaCodice(richiesta, corpo.issuedAt, corpo.code);
-  const esito = await correggiIscrizioni(emailHash, iscrizione.id, corpo.scope, valori);
+  const esito = await conCodice(richiesta, corpo.issuedAt, corpo.code, () =>
+    correggiIscrizioni(emailHash, iscrizione.id, corpo.scope, valori)
+  );
   return Response.json(
     {
       updated: esito.iscrizioni,
