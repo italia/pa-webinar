@@ -29,6 +29,7 @@ import {
   chiaveAvvisoRegistrazione,
   chiaveConsenso,
   destinazioneDelTesto,
+  versioneDellaProva,
   type Destinazione,
 } from '@/lib/recording/destination';
 import { chiaveConsensoTrascrizione, consensiRichiesti } from '@/lib/registration/consents';
@@ -312,6 +313,9 @@ export default function RegistrationFormClient({
           consentFutureCommunications: consentStayInTouch,
           consentAddressBook: consentStayInTouch,
           consentRecordingDestination: destinazioneMostrata,
+          // La versione del testo mostrato: il server non accetta un consenso dato
+          // su un testo che non copre piu' cio' che il video riprende.
+          consentRecordingVersion: versioneDellaProva(partecipanti),
           locale,
         };
         if (richiesti.registrazione) body.consentRecording = consentRecording;
@@ -397,7 +401,7 @@ export default function RegistrationFormClient({
         setSubmitting(false);
       }
     },
-    [displayName, email, consentGiven, consentRecording, consentMultitrack, consentStayInTouch, organization, organizationRole, organizationType, eventSlug, validate, t, showOrg, showRole, showType, richiesti.registrazione, richiesti.tracce, destinazioneMostrata, locale, questionario],
+    [displayName, email, consentGiven, consentRecording, consentMultitrack, consentStayInTouch, organization, organizationRole, organizationType, eventSlug, validate, t, showOrg, showRole, showType, richiesti.registrazione, richiesti.tracce, destinazioneMostrata, partecipanti, locale, questionario],
   );
 
   // Duplicate sign-up recovery: re-send the original confirmation email

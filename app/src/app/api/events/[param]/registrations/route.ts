@@ -50,7 +50,8 @@ import {
   destinazioneDelTesto,
   testoInVigore,
   testoLetto,
-  versioneDellaProva,
+  provaCopre,
+  versioneLetta,
 } from '@/lib/recording/destination';
 import {
   buildEventAccessSetCookie,
@@ -111,7 +112,7 @@ export const POST = withErrorHandling(async (request, context) => {
 
   const {
     displayName, email, consentGiven, organization, organizationRole, organizationType,
-    consentRecording, consentRecordingDestination, consentMultitrack,
+    consentRecording, consentRecordingDestination, consentRecordingVersion, consentMultitrack,
     consentFutureCommunications, consentAddressBook,
   } = parsed.data;
 
@@ -148,7 +149,18 @@ export const POST = withErrorHandling(async (request, context) => {
   // e dall'evento: su invito non dice niente dell'indirizzo.
   const registrazioneData = richiesti.registrazione && consentRecording === true;
   const destinazioneInVigore = destinazioneDelTesto(event.recordingDestination, partecipanti);
-  if (registrazioneData && !testoInVigore(consentRecordingDestination, destinazioneInVigore)) {
+  // Anche il testo: dove chi partecipa puo' comparire nel video vale solo quello
+  // che lo dice, e una pagina aperta prima che l'installazione cambiasse ne
+  // mostrava un altro (`provaCopre`).
+  const versioneValida = provaCopre(
+    { destination: destinazioneInVigore, textVersion: consentRecordingVersion },
+    destinazioneInVigore,
+    partecipanti,
+  );
+  if (
+    registrazioneData &&
+    (!testoInVigore(consentRecordingDestination, destinazioneInVigore) || !versioneValida)
+  ) {
     throw new ValidationError('Validation failed', [
       { path: ['consentRecording'], message: 'registration.errors.recordingDestinationChanged' },
     ]);
@@ -158,7 +170,9 @@ export const POST = withErrorHandling(async (request, context) => {
   const destinazioneLetta = registrazioneData
     ? testoLetto(consentRecordingDestination, destinazioneInVigore)
     : null;
-  const versioneLetta = registrazioneData ? versioneDellaProva(partecipanti) : null;
+  const versioneDelTesto = registrazioneData
+    ? versioneLetta(consentRecordingVersion, partecipanti)
+    : null;
 
   // La rubrica non proposta non ha casella: un valore che arriva lo stesso, da
   // una pagina aperta prima del cambio o da chi chiama la rotta, non conta.
@@ -259,7 +273,7 @@ export const POST = withErrorHandling(async (request, context) => {
         consentTimestamp: new Date(),
         consentRecording: richiesti.registrazione ? (consentRecording ?? false) : null,
         consentRecordingDestination: destinazioneLetta,
-        consentRecordingVersion: versioneLetta,
+        consentRecordingVersion: versioneDelTesto,
         consentMultitrack: richiesti.tracce ? trascrizioneData : null,
         consentMultitrackVersion: richiesti.tracce && trascrizioneData ? VERSIONE_TESTO_TRASCRIZIONE : null,
         consentFutureCommunications: comunicazioniFuture && !spuntaSospesa,
@@ -293,7 +307,7 @@ export const POST = withErrorHandling(async (request, context) => {
           consentGiven: true,
           consentRecording: richiesti.registrazione ? (consentRecording ?? false) : null,
           consentRecordingDestination: destinazioneLetta,
-          consentRecordingVersion: versioneLetta,
+          consentRecordingVersion: versioneDelTesto,
           // Il fatto lato server: la regola dell'evento chiedeva o no il
           // consenso alla registrazione (altrimenti l'iscrizione informa).
           recordingConsentRequired: richiesti.registrazione,

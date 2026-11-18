@@ -525,11 +525,11 @@ describe('dove il video della sala non c e', () => {
     const inVigore = () => destinazioneDelTesto(evento.recordingDestination, partecipantiNelVideo());
 
     expect(partecipantiNelVideo()).toBe('assente');
-    expect(consensoOra(letto, inVigore())).toBe(true);
+    expect(consensoOra(letto, inVigore(), partecipantiNelVideo())).toBe(true);
 
     vi.stubEnv('JIBRI_HEALTH_URL', 'http://jibri.interno');
     expect(partecipantiNelVideo()).toBe('visibili');
-    expect(consensoOra(letto, inVigore())).toBe(false);
+    expect(consensoOra(letto, inVigore(), partecipantiNelVideo())).toBe(false);
     expect(consensoCopre(iscrizione.consentRecordingDestination, inVigore())).toBe(false);
   });
 });

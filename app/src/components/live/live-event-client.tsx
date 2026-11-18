@@ -72,6 +72,7 @@ import {
   destinazioneDelTesto,
   registrazioneRiservata,
   testoLetto,
+  versioneDellaProva,
   type Destinazione,
 } from '@/lib/recording/destination';
 import { catturaDallaRisposta, type StatoCattura } from '@/lib/live/capture-state';
@@ -914,6 +915,9 @@ export default function LiveEventClient({
     if (dati.registrazione) {
       body.recordingConsent = true;
       body.recordingConsentDestination = testoAcconsentito;
+      // Il testo mostrato da questa pagina: dove chi partecipa puo' comparire
+      // nel video il server accetta solo quello che lo dice.
+      body.recordingConsentVersion = versioneDellaProva(partecipantiInSala);
     }
     if (dati.tracce) body.multitrackConsent = true;
     if (repliche.registrazione || repliche.tracce) {
@@ -1065,6 +1069,7 @@ export default function LiveEventClient({
     ritirati.tracce,
     testoAcconsentito,
     destinazioneInVigore,
+    partecipantiInSala,
     locale,
   ]);
 

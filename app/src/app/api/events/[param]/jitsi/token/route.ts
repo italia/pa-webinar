@@ -42,7 +42,7 @@ import {
   destinazioneDelTesto,
   provaCopre,
   testoLetto,
-  versioneDellaProva,
+  versioneLetta,
   type Destinazione,
   type PeriodoConsenso,
 } from '@/lib/recording/destination';
@@ -177,10 +177,9 @@ async function consensiInVigore(
   registrazione: boolean,
   /** La trascrizione gia' letta per questo posto in questa richiesta, se nessuna
    *  prova e' stata scritta dopo: non si rilegge. Null: la lettura non e'
-   *  riuscita, e la sala tiene l'ultimo stato noto. */
+   *  riuscita, e si riprova qui. */
   trascrizioneLetta?: boolean | null,
 ): Promise<{ recording: boolean; transcription: boolean } | undefined> {
-  if (trascrizioneLetta === null) return undefined;
   try {
     return {
       recording: registrazione,
@@ -200,6 +199,7 @@ async function registraConsensi(
   data: {
     recordingConsent?: boolean;
     recordingConsentDestination?: Destinazione;
+    recordingConsentVersion?: number;
     multitrackConsent?: boolean;
     locale?: string;
   },
@@ -221,7 +221,7 @@ async function registraConsensi(
   /** Le prove che il posto nuovo porta con se': mai a posto di un clic. */
   replica: ReplicaValida = NESSUNA_REPLICA,
 ): Promise<ConsensiSalvati> {
-  const registrazione = event.recordingEnabled && consensoOra(data, destinazione);
+  const registrazione = event.recordingEnabled && consensoOra(data, destinazione, partecipanti);
   // La trascrizione dei propri interventi, dalla traccia audio per persona, dai
   // sottotitoli o dal video. La prova serve al registratore e alla trascrizione
   // per sapere, voce per voce, chi l'ha data (lib/captions/room).
@@ -255,7 +255,7 @@ async function registraConsensi(
   const destinazioneLetta = testoLetto(data.recordingConsentDestination, destinazione);
   const testoDellaProva = {
     destination: destinazioneLetta,
-    textVersion: versioneDellaProva(partecipanti),
+    textVersion: versioneLetta(data.recordingConsentVersion, partecipanti),
   };
   const alMeglio = async (quale: string, scrivi: () => Promise<unknown>): Promise<boolean> => {
     try {
@@ -444,7 +444,7 @@ export const POST = withErrorHandling(async (request, context) => {
   // testo giusto e non rimanda un consenso dato su quello vecchio. Dove non c'e'
   // un video vale null, mai la colonna dell'evento.
   const destinazione = destinazioneDelTesto(event.recordingDestination, partecipanti);
-  const consensoDato = consensoOra(parsed.data, destinazione);
+  const consensoDato = consensoOra(parsed.data, destinazione, partecipanti);
   // Vale da quando si entra: chi aspetta da prima non ha una scelta vecchia.
   const participantListVisible = elencoVisibileAlPubblico(event);
   // Il token di chi partecipa: il consenso non e' mai una condizione per

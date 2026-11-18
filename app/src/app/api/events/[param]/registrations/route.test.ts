@@ -471,6 +471,31 @@ describe('POST registrations — la destinazione del video nel consenso', () => 
   });
   afterEach(() => vi.unstubAllEnvs());
 
+  it("dove chi partecipa puo' comparire, un modulo che mostrava il testo per la sola voce va riletto: 422", async () => {
+    vi.stubEnv('RECORDING_VOICE_EXCLUSION', '');
+    conRegistrazione('REGISTRANTS');
+    const res = await iscriviti('anna@example.com', {
+      consentRecording: true,
+      consentRecordingDestination: 'REGISTRANTS',
+      consentRecordingVersion: 2,
+    });
+    expect(res.status).toBe(422);
+    expect(await errore(res)).toEqual([
+      { path: ['consentRecording'], message: 'registration.errors.recordingDestinationChanged' },
+    ]);
+  });
+
+  it('si salva la versione del testo che il modulo ha mostrato', async () => {
+    conRegistrazione('REGISTRANTS');
+    const res = await iscriviti('anna@example.com', {
+      consentRecording: true,
+      consentRecordingDestination: 'REGISTRANTS',
+      consentRecordingVersion: 1,
+    });
+    expect(res.status).toBe(201);
+    expect(iscrizioneScritta()).toMatchObject({ consentRecordingVersion: 1 });
+  });
+
   it("dove chi partecipa puo' comparire si salva la versione del testo che lo dice", async () => {
     vi.stubEnv('RECORDING_VOICE_EXCLUSION', '');
     conRegistrazione('REGISTRANTS');
@@ -608,10 +633,11 @@ describe('POST registrations — la destinazione del video nel consenso', () => 
         consentRecordingDestination: null,
       });
       expect(res.status).toBe(201);
+      // Il testo senza video non riprende ne' volto ne' nome: versione 2.
       expect(iscrizioneScritta()).toMatchObject({
         consentRecording: true,
         consentRecordingDestination: null,
-        consentRecordingVersion: null,
+        consentRecordingVersion: 2,
       });
 
       const dichiarata = await iscriviti('anna@example.com', {

@@ -215,22 +215,28 @@ are in `app/src/lib/recording/destination.ts`.
 - **The text is stored with the consent.** The box text follows the destination
   (`gdpr.consent.recordingPublic`, `recordingReserved`, or `recording` on an
   event without one), and the form and the waiting room send the destination
-  they showed. It is saved with a text version on the registration
+  and the version of the text they showed. It is saved with that version, with
+  or without a destination, on the registration
   (`consentRecordingDestination`, `consentRecordingVersion`) and on the room
-  proof (`RecordingConsent.destination`, `textVersion`). A consent replaced
+  proof (`RecordingConsent.destination`, `textVersion`): 1 for the text that
+  covers name, voice and image, 2 for a text that covers neither face nor name
+  (`versioneDellaProva`). A consent replaced
   on a new text keeps the earlier period in `earlierPeriods`. A registration
   form left open across a change answers `422` if the box is ticked. The token
   route does not save a consent on a text that does not cover the destination
-  in force, and every answer carries `recordingDestination`, so that an open
-  page shows the current text and asks again.
+  in force, or, where participants can appear in the video, on a version other
+  than 1 (`provaCopre`), and every answer carries `recordingDestination`, so
+  that an open page shows the current text and asks again.
 - **Without a video.** Where the installation records no composite video
   (`partecipantiNelVideo` is `assente`), the box says so
-  (`gdpr.consent.recordingNoVideo`) and the consent declares no destination.
+  (`gdpr.consent.recordingNoVideo`) and the consent declares no destination; its
+  version is 2, because it covers neither face nor name.
   An event without per-person tracks records nothing there: no box, no notice
   and no recording command. The event can still hold a destination, for a file
   uploaded later. If the installation
   adds the video afterwards, those consents no longer cover an event with a
-  destination, and the person is asked again in the room.
+  destination, nor any event where participants can appear, and the person is
+  asked again in the room.
 - **What else follows.** With a recording reserved by its destination, or by
   the audience `REGISTRANTS` on an event whose destination is `PUBLIC` or null
   (`registrazioneRiservata`), the questions are not published after the event

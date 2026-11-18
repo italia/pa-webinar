@@ -1453,6 +1453,22 @@ describe("POST jitsi/token — cio' che il video tiene di chi partecipa (parteci
       expect(rigaRegistrazione()).toMatchObject({ destination: 'REGISTRANTS', textVersion: 1 });
     });
 
+    it('un consenso dato su una pagina che mostrava il testo per la sola voce non vale', async () => {
+      vi.mocked(prisma.event.findUnique).mockResolvedValue(
+        eventRow({ ...interattivo, recordingDestination: 'REGISTRANTS' }) as never,
+      );
+      const { user } = await minted(
+        await post({
+          guestName: 'Ospite',
+          recordingConsent: true,
+          recordingConsentDestination: 'REGISTRANTS',
+          recordingConsentVersion: 2,
+        }),
+      );
+      expect(user.listenOnly).toBe(true);
+      expect(prisma.recordingConsent.createMany).not.toHaveBeenCalled();
+    });
+
     it('in una chiamata rapida non si registra: nessun segno, nessun blocco', async () => {
       vi.mocked(prisma.event.findUnique).mockResolvedValue(
         eventRow({ ...interattivo, eventType: 'INSTANT' }) as never,
@@ -1562,7 +1578,7 @@ describe('POST jitsi/token — il testo del consenso e la destinazione del video
       );
       expect(body.recordingDestination).toBeNull();
       expect(body.consentsRecorded?.recording).toBe(true);
-      expect(riga()).toMatchObject({ destination: null, textVersion: null });
+      expect(riga()).toMatchObject({ destination: null, textVersion: 2 });
     });
 
     it('chi conduce: con le tracce la trascrizione vale da sola', async () => {

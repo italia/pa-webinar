@@ -21,6 +21,9 @@ const localizedStringField = z.record(z.string(), z.string());
 
 /** A chi va un video: a tutti, o a iscritti e staff (RecordingAudience). */
 const destinatariVideo = z.enum(['PUBLIC', 'REGISTRANTS']);
+// Le versioni del testo del consenso alla registrazione (lib/recording/destination):
+// 1 nome, voce e immagine; 2 ne' volto ne' nome.
+const versioneTestoRegistrazione = z.union([z.literal(1), z.literal(2)]);
 
 export const eventBaseSchema = z.object({
   title: localizedStringField.refine(
@@ -355,6 +358,9 @@ export const createRegistrationSchema = z.object({
   // per un testo che non ne dichiara una. Assente solo da una pagina aperta da
   // prima che il campo esistesse (lib/recording/destination, `testoLetto`).
   consentRecordingDestination: destinatariVideo.nullable().optional(),
+  // La versione del testo letto (lib/recording/destination, `versioneDellaProva`).
+  // Assente solo da una pagina aperta da prima che il campo esistesse.
+  consentRecordingVersion: versioneTestoRegistrazione.optional(),
   // ADR-013 Fase 5 — consenso separato alla registrazione per-partecipante.
   // Facoltativo: chi non lo da' si iscrive, ma la sua voce non si registra
   // ne' si trascrive (lo decide il server, voce per voce).
@@ -436,6 +442,9 @@ export const jitsiTokenRequestSchema = z.object({
    *  non ne dichiara una. Assente solo da una pagina aperta da prima che il campo
    *  esistesse (lib/recording/destination, `testoLetto`). */
   recordingConsentDestination: destinatariVideo.nullable().optional(),
+  /** La versione di quel testo (lib/recording/destination, `versioneDellaProva`).
+   *  Assente solo da una pagina aperta da prima che il campo esistesse. */
+  recordingConsentVersion: versioneTestoRegistrazione.optional(),
   /** Consenso alla trascrizione dei propri interventi dato ora con un clic. */
   multitrackConsent: z.boolean().optional(),
   /** I consensi gia' dati che la pagina riporta da sola a un nuovo ingresso. Non

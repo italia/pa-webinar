@@ -152,9 +152,8 @@ export function recuperoAperto(evento: {
  * Due testi non dicono la destinazione, che resta null come sui consensi dati
  * prima: gdpr.consent.recording (o recordingVisible), su un evento senza
  * destinazione, e gdpr.consent.recordingNoVideo, dove non c'e' un video da
- * pubblicare. La versione si salva comunque, tranne per il testo senza video
- * (`versioneDellaProva`): una prova senza versione e' stata data prima che i
- * testi la dichiarassero, quando ogni testo diceva audio e video. Per
+ * pubblicare. La versione si salva comunque (`versioneDellaProva`): il testo
+ * senza video, che non riprende ne' volto ne' nome, ha la 2. Per
  * questo i consensi si confrontano con `destinazioneDelTesto`, non con la colonna
  * dell'evento: dove non c'e' un video un consenso senza destinazione copre. Se
  * poi l'installazione registra il video, su un evento con destinazione non copre
@@ -164,13 +163,14 @@ export function recuperoAperto(evento: {
 export const VERSIONE_TESTO_REGISTRAZIONE = 2;
 
 /**
- * La versione da salvare con la prova di un consenso dato ora, con o senza
- * destinazione: il testo 1, nome, voce e immagine, dove chi partecipa puo'
- * comparire nel video ('visibili'), altrove il testo per la sola voce. Il testo
- * senza video (gdpr.consent.recordingNoVideo) non ha versione: null.
+ * La versione del testo che la casella mostra in questa installazione, da
+ * salvare con la prova con o senza destinazione: il testo 1, nome, voce e
+ * immagine, dove chi partecipa puo' comparire nel video ('visibili'); altrove un
+ * testo che non riprende ne' volto ne' nome (2), quello per la sola voce o quello
+ * senza video. Una prova senza versione e' stata data prima che i testi la
+ * dichiarassero, quando ogni testo con un video diceva audio e video.
  */
-export function versioneDellaProva(partecipanti: PartecipantiNelVideo): number | null {
-  if (partecipanti === 'assente') return null;
+export function versioneDellaProva(partecipanti: PartecipantiNelVideo): number {
   return partecipanti === 'visibili' ? 1 : VERSIONE_TESTO_REGISTRAZIONE;
 }
 
@@ -280,6 +280,11 @@ export function testoInVigore(
  * non la dichiarava, il consenso non c'e'. La persona entra lo stesso, fuori dal
  * video: il consenso non e' mai una condizione per entrare.
  *
+ * Dove chi partecipa puo' comparire nel video ('visibili') conta anche la versione
+ * del testo che la pagina dice di aver mostrato (`provaCopre`): un consenso dato
+ * sul testo per la sola voce, su una pagina aperta prima che l'installazione
+ * cambiasse, non vale.
+ *
  * Una pagina aperta non si aggiorna da sola. La risposta del token riporta la
  * destinazione in vigore (`recordingDestination`, da `destinazioneDelTesto`), e
  * la sala mostra quel testo, cosi' la persona rilegge prima di acconsentire. Il
@@ -291,11 +296,33 @@ export function consensoOra(
   corpo: {
     recordingConsent?: boolean;
     recordingConsentDestination?: Destinazione;
+    recordingConsentVersion?: number;
   },
-  inVigore: Destinazione | undefined
+  inVigore: Destinazione | undefined,
+  partecipanti: PartecipantiNelVideo
 ): boolean {
   if (corpo.recordingConsent !== true) return false;
-  return consensoCopre(testoLetto(corpo.recordingConsentDestination, inVigore), inVigore);
+  return provaCopre(
+    {
+      destination: testoLetto(corpo.recordingConsentDestination, inVigore),
+      textVersion: corpo.recordingConsentVersion,
+    },
+    inVigore,
+    partecipanti
+  );
+}
+
+/**
+ * La versione del testo su cui e' stato dato un consenso ora: quella che la
+ * pagina dice di aver mostrato, o, da una pagina aperta prima che il campo
+ * esistesse, quella del testo in vigore. Si salva con la prova: dice cio' che la
+ * persona ha letto, anche se l'installazione e' cambiata intanto.
+ */
+export function versioneLetta(
+  letta: number | undefined,
+  partecipanti: PartecipantiNelVideo
+): number {
+  return letta ?? versioneDellaProva(partecipanti);
 }
 
 const TESTO_CASELLA = {
