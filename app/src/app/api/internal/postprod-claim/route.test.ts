@@ -10,14 +10,18 @@ vi.mock('@/lib/db', () => ({
     $executeRaw: vi.fn(async () => 1),
     postprodJob: { update: vi.fn() },
     siteSetting: { findUnique: vi.fn(async () => ({ aiLlmProvider: 'vllm' })) },
-    recording: { findUnique: vi.fn() },
+    recording: { findUnique: vi.fn(), updateMany: vi.fn() },
     speaker: { findMany: vi.fn(async () => []) },
     postprodArtifact: { findFirst: vi.fn(async () => null) },
     recordingTrack: { findMany: vi.fn(async () => []) },
   },
 }));
 const ritirati = vi.hoisted(() => vi.fn(async () => new Set<string>()));
-vi.mock('@/lib/captions/room', () => ({ endpointRitirati: ritirati }));
+const conConsenso = vi.hoisted(() => vi.fn(async () => new Set<string>()));
+vi.mock('@/lib/captions/room', () => ({
+  endpointRitirati: ritirati,
+  endpointConConsenso: conConsenso,
+}));
 const ingressi = vi.hoisted(() => ({
   trascrizione: vi.fn(async () => ({ downloadUrl: 'https://archivio/trascrizione', blobKey: 'postprod/e/r/001/transcript.raw.json' })),
   sottotitoli: vi.fn(async () => null),
@@ -42,6 +46,7 @@ vi.mock('@/lib/report/input', () => ({ ingressoResoconto: r.ingresso }));
 const scrivi = vi.hoisted(() => vi.fn(async () => true));
 vi.mock('@/lib/report/job', () => ({ scriviNumeriResoconto: scrivi }));
 vi.mock('@/lib/ai/glossary', () => ({ glossaryForEvent: vi.fn(async () => []), glossaryHints: () => [] }));
+vi.mock('@/lib/crypto/pii', () => ({ tryDecryptPII: (v: string) => v.replace('cifrato:', '') }));
 
 import { prisma } from '@/lib/db';
 
@@ -208,6 +213,117 @@ describe('POST /api/internal/postprod-claim', () => {
     const body = (await res.json()) as { inputs: Array<{ role: string; participantId?: string }> };
     const tracce = body.inputs.filter((i) => i.role === 'track').map((i) => i.participantId);
     expect(tracce).toEqual(['ep-resta']);
+  });
+
+  describe('il nome delle tracce', () => {
+    const recordingId = '22222222-3333-4444-8555-666666666668';
+    const eventId = '11111111-2222-4333-8444-555555555555';
+
+    async function nomiAlWorker(
+      kind: 'TRANSCRIBE_MULTITRACK' | 'ARCHIVE',
+      transcriptConsentRule: boolean,
+    ) {
+      fn(prisma.$queryRaw).mockResolvedValueOnce([
+        {
+          id: '66666666-7777-4888-8999-000000000003',
+          recording_id: recordingId,
+          kind,
+          payload: { runId: '77777777-8888-4999-8aaa-bbbbbbbbbbbd', sourceLanguage: 'it' },
+          attempts: 1,
+          next_attempt_at: new Date(),
+          depends_on_id: null,
+        },
+      ]);
+      fn(prisma.recording.findUnique).mockResolvedValueOnce({
+        id: recordingId,
+        eventId,
+        runCount: 1,
+        sourceLanguage: 'it',
+        blobKey: 'recordings/y.mp4',
+        transcriptConsentRule,
+        event: { id: eventId, slug: 'e', aiTargetLocales: [], title: { it: 'E' }, organizerName: null, speakersInfo: null, expectedSpeakers: null, agendaItems: [] },
+        callSession: null,
+        _count: { tracks: 2 },
+      });
+      fn(prisma.recordingTrack.findMany).mockResolvedValueOnce([
+        { participantId: 'ep-testo-2', displayName: 'cifrato:Anna', blobKey: 'tracce/a.ogg', startOffsetMs: 0 },
+        { participantId: 'ep-testo-1', displayName: 'cifrato:Bruno', blobKey: 'tracce/b.ogg', startOffsetMs: 10 },
+      ]);
+      const res = await claim({ workerId: 'w-gpu', kinds: [kind] });
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as {
+        inputs: Array<{ role: string; participantId?: string; displayName?: string | null }>;
+      };
+      return Object.fromEntries(
+        body.inputs.filter((i) => i.role === 'track').map((i) => [i.participantId, i.displayName]),
+      );
+    }
+
+    it("con il segno all'archivio il nome passa solo con il consenso al testo che lo comprende", async () => {
+      conConsenso.mockResolvedValueOnce(new Set(['ep-testo-2']));
+      await expect(nomiAlWorker('ARCHIVE', true)).resolves.toEqual({
+        'ep-testo-2': 'Anna',
+        'ep-testo-1': null,
+      });
+      expect(conConsenso).toHaveBeenCalledWith(eventId, ['ep-testo-2', 'ep-testo-1'], 2);
+    });
+
+    it('con il segno alla trascrizione passa solo la traccia con quel consenso', async () => {
+      conConsenso.mockResolvedValueOnce(new Set(['ep-testo-2']));
+      await expect(nomiAlWorker('TRANSCRIBE_MULTITRACK', true)).resolves.toEqual({
+        'ep-testo-2': 'Anna',
+      });
+      expect(conConsenso).toHaveBeenCalledWith(eventId, ['ep-testo-2', 'ep-testo-1'], 2);
+    });
+
+    it('senza tracce da trascrivere il lavoro si chiude e il worker non lo riceve', async () => {
+      fn(prisma.$queryRaw).mockResolvedValueOnce([
+        {
+          id: '66666666-7777-4888-8999-000000000004',
+          recording_id: recordingId,
+          kind: 'TRANSCRIBE_MULTITRACK',
+          payload: { runId: '77777777-8888-4999-8aaa-bbbbbbbbbbbd', sourceLanguage: 'it' },
+          attempts: 1,
+          next_attempt_at: new Date(),
+          depends_on_id: null,
+        },
+      ]);
+      fn(prisma.recording.findUnique).mockResolvedValueOnce({
+        id: recordingId,
+        eventId,
+        runCount: 1,
+        sourceLanguage: 'it',
+        blobKey: 'recordings/y.mp4',
+        transcriptConsentRule: true,
+        event: { id: eventId, slug: 'e', aiTargetLocales: [], title: { it: 'E' }, organizerName: null, speakersInfo: null, expectedSpeakers: null, agendaItems: [] },
+        callSession: null,
+        _count: { tracks: 1 },
+      });
+      fn(prisma.recordingTrack.findMany).mockResolvedValueOnce([
+        { participantId: 'ep-testo-1', displayName: null, blobKey: 'tracce/b.ogg', startOffsetMs: 0 },
+      ]);
+      conConsenso.mockResolvedValueOnce(new Set());
+
+      const res = await claim({ workerId: 'w-gpu', kinds: ['TRANSCRIBE_MULTITRACK'] });
+
+      expect(res.status).toBe(204);
+      expect(fn(prisma.$executeRaw).mock.calls).toHaveLength(1);
+      const sql = sqlOf(fn(prisma.$executeRaw).mock.calls[0]!);
+      expect(sql).toContain("status = 'FAILED'");
+      expect(sql).toContain("status = 'CLAIMED'");
+      expect(fn(prisma.recording.updateMany).mock.calls[0]![0]).toMatchObject({
+        where: { id: recordingId },
+        data: { status: 'POSTPROD_PARTIAL' },
+      });
+    });
+
+    it('senza il segno passa come prima, senza leggere i consensi', async () => {
+      await expect(nomiAlWorker('TRANSCRIBE_MULTITRACK', false)).resolves.toEqual({
+        'ep-testo-2': 'Anna',
+        'ep-testo-1': 'Bruno',
+      });
+      expect(conConsenso).not.toHaveBeenCalled();
+    });
   });
 
   describe('traduzione di titolo e descrizione (TRANSLATE_TEXT)', () => {

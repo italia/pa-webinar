@@ -3,6 +3,9 @@
 
 import { describe, expect, it } from 'vitest';
 
+import enMessaggi from '@/i18n/messages/en.json';
+import itMessaggi from '@/i18n/messages/it.json';
+
 import { statoChiusura, type DatiChiusura, type VoceChiusura } from './closing';
 
 const FINE = new Date('2026-10-10T12:00:00Z');
@@ -19,11 +22,13 @@ const base: DatiChiusura = {
   recordingEnabled: true,
   recordingUrl: null,
   recordingPublished: false,
+  recordingAudience: 'PUBLIC',
   youtubeUrl: null,
   transcriptPublished: false,
   captionsTranscriptEnabled: false,
   trascrizione: null,
   trascrizioneInLavorazione: false,
+  trascrizioneDaConfermare: null,
   pipelineAi: true,
   resocontoGenerato: false,
   resocontoPubblicato: false,
@@ -124,6 +129,70 @@ describe("chiudi l'evento — trascrizione", () => {
     ).toBe('nessuna');
   });
 
+  describe('il video che aspetta la conferma sulle voci', () => {
+    const fermo = { recordingUrl: 'https://x/v.mp4', trascrizioneDaConfermare: 'r9' };
+
+    it('da fare per lo staff, con la registrazione da aprire', () => {
+      expect(voce(fermo, 'trascrizione')).toEqual({
+        voce: 'trascrizione',
+        stato: 'da-fare',
+        caso: 'daConfermare',
+        recordingId: 'r9',
+      });
+    });
+
+    it('conta tra le cose da fare', () => {
+      const s = statoChiusura(
+        { ...base, ...fermo, recordingPublished: true },
+        { adesso: DOPO_UN_GIORNO }
+      );
+      expect(s.voci.filter((v) => v.stato === 'da-fare').map((v) => v.voce)).toEqual([
+        'trascrizione',
+        'resoconto',
+      ]);
+      expect(s.daFare).toBe(2);
+    });
+
+    it('con il solo link del moderatore non e’ da fare: la conferma la da’ lo staff', () => {
+      const v = voce(fermo, 'trascrizione', { staff: false });
+      expect(v).toMatchObject({ stato: 'non-serve', caso: 'soloStaff' });
+      expect(v.recordingId).toBeUndefined();
+    });
+
+    it('una trascrizione dai sottotitoli pronta vince: la pagina mostra quella', () => {
+      expect(
+        voce(
+          {
+            ...fermo,
+            captionsTranscriptEnabled: true,
+            trascrizione: { recordingId: 'r2', origine: 'sottotitoli' },
+          },
+          'trascrizione'
+        ).caso
+      ).toBe('prontaSottotitoli');
+    });
+
+    it('un lavoro in corso vince: la conferma e’ gia’ stata data', () => {
+      expect(
+        voce({ ...fermo, trascrizioneInLavorazione: true }, 'trascrizione').caso
+      ).toBe('inLavorazione');
+    });
+
+    it('evento archiviato o pipeline spenta: non si avvia niente', () => {
+      expect(voce({ ...fermo, status: 'ARCHIVED' }, 'trascrizione')).toMatchObject({
+        stato: 'non-serve',
+        caso: 'nessuna',
+      });
+      expect(voce({ ...fermo, pipelineAi: false }, 'trascrizione').caso).toBe('nessuna');
+    });
+
+    it('senza video fermo resta «nessuna»', () => {
+      expect(voce({ recordingUrl: 'https://x/v.mp4' }, 'trascrizione').caso).toBe(
+        'nessuna'
+      );
+    });
+  });
+
   it('un lavoro in corso vince su una trascrizione non pubblicata', () => {
     expect(
       voce({ trascrizione: ai, trascrizioneInLavorazione: true }, 'trascrizione').stato
@@ -132,6 +201,14 @@ describe("chiudi l'evento — trascrizione", () => {
 });
 
 describe("chiudi l'evento — resoconto", () => {
+  it.each([
+    ['it', itMessaggi.admin.closing.resoconto.daGenerare, 'domande'],
+    ['en', enMessaggi.admin.closing.resoconto.daGenerare, 'questions'],
+  ])('%s: non dice che il testo nasce dalla chat, e le domande solo se pubblicate', (_l, testo, domande) => {
+    expect(testo.toLowerCase()).not.toContain('chat');
+    expect(testo).toMatch(new RegExp(`(pubblicate|published), ${domande}`));
+  });
+
   it('senza pipeline non serve; con la pipeline va generato e poi pubblicato', () => {
     expect(voce({ pipelineAi: false }, 'resoconto').stato).toBe('non-serve');
     expect(voce({}, 'resoconto').caso).toBe('daGenerare');
@@ -222,6 +299,59 @@ describe("chiudi l'evento — sala, materiali, valutazioni, pagina", () => {
       voce({ postEventPublicUntil: new Date(FINE.getTime() + ORA) }, 'pagina').caso
     ).toBe('scaduta');
     expect(voce({ status: 'ARCHIVED' }, 'pagina').stato).toBe('non-serve');
+  });
+
+  describe('libreria e video riservato', () => {
+    const riservata = { libraryListed: true, recordingAudience: 'REGISTRANTS' as const };
+
+    it('con il video pubblicato per i soli iscritti non si dice «nella libreria»', () => {
+      expect(
+        voce(
+          { ...riservata, recordingUrl: 'https://x/v.mp4', recordingPublished: true },
+          'pagina'
+        )
+      ).toEqual({ voce: 'pagina', stato: 'fatto', caso: 'libreriaRiservata' });
+      expect(
+        voce({ ...riservata, youtubeUrl: 'https://youtu.be/x' }, 'pagina').caso
+      ).toBe('libreriaRiservata');
+    });
+
+    it('senza video non si promette che arrivera’ in libreria', () => {
+      expect(voce(riservata, 'pagina').caso).toBe('libreriaRiservata');
+    });
+
+    it('non in libreria: resta «visibile»', () => {
+      expect(voce({ recordingAudience: 'REGISTRANTS' }, 'pagina').caso).toBe('visibile');
+    });
+
+    it('la pagina privata o archiviata resta com’e’', () => {
+      expect(voce({ ...riservata, postEventPublic: false }, 'pagina').caso).toBe(
+        'privata'
+      );
+      expect(voce({ ...riservata, status: 'ARCHIVED' }, 'pagina').caso).toBe(
+        'archiviato'
+      );
+    });
+
+    it('un evento aperto a tutti non cambia', () => {
+      expect(
+        voce(
+          {
+            libraryListed: true,
+            recordingUrl: 'https://x/v.mp4',
+            recordingPublished: true,
+          },
+          'pagina'
+        ).caso
+      ).toBe('nellaLibreria');
+    });
+
+    it('ogni caso ha il suo testo', () => {
+      for (const lingua of [itMessaggi, enMessaggi]) {
+        expect(lingua.admin.closing.pagina.libreriaRiservata).toBeTruthy();
+        expect(lingua.admin.closing.trascrizione.daConfermare).toBeTruthy();
+      }
+    });
   });
 
   it('conta le voci da fare', () => {

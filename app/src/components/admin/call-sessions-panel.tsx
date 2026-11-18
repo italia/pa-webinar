@@ -41,7 +41,11 @@ interface Session {
   duration: number | null;
   peakParticipants: number;
   participants: Participant[];
+  /** La rotta che serve il file, solo per chi organizza l'evento
+   *  (lib/recording/content-access). */
   recordingUrl: string | null;
+  /** La sessione ha un file, anche quando chi guarda non lo puo' aprire. */
+  hasRecording?: boolean;
   recordingFileSize: number | null;
   recordingDuration: number | null;
   recordingFilename: string | null;
@@ -175,8 +179,8 @@ export default function CallSessionsPanel({
                       </div>
                       <div className="d-flex gap-2 text-muted" style={{ fontSize: '0.78rem' }}>
                         <span>{formatDuration(session.duration)}</span>
-                        <span>{session.peakParticipants} {t('participants')}</span>
-                        {session.recordingUrl && (
+                        <span>{t('participantsCount', { count: session.peakParticipants })}</span>
+                        {(session.hasRecording ?? !!session.recordingUrl) && (
                           <Badge color="success" pill style={{ fontSize: '0.68rem' }}>REC</Badge>
                         )}
                       </div>
@@ -192,9 +196,14 @@ export default function CallSessionsPanel({
                 <Collapse isOpen={isExpanded}>
                   <div className="px-3 pb-3" style={{ borderTop: '1px solid #e8e8e8' }}>
                     {/* Recording player */}
-                    {session.recordingUrl && (
+                    {(session.hasRecording ?? !!session.recordingUrl) && (
                       <div className="mt-3">
                         <div className="d-flex align-items-center gap-2 mb-2">
+                          {/* Riprodurre e scaricare: chi organizza l'evento. Chi
+                              ha solo il link di conduzione vede che il file c'e'
+                              e puo' cancellarlo. */}
+                          {session.recordingUrl && (
+                            <>
                           <Button
                             color="primary"
                             size="sm"
@@ -212,6 +221,8 @@ export default function CallSessionsPanel({
                             <Icon icon="it-download" size="sm" />
                             {t('download')}
                           </a>
+                            </>
+                          )}
                           <Button
                             color="danger"
                             size="sm"
@@ -225,7 +236,7 @@ export default function CallSessionsPanel({
                             {session.recordingDuration ? ` · ${formatDuration(session.recordingDuration)}` : ''}
                           </span>
                         </div>
-                        {isPlaying && <VideoPlayer src={session.recordingUrl} />}
+                        {isPlaying && session.recordingUrl && <VideoPlayer src={session.recordingUrl} />}
                       </div>
                     )}
 

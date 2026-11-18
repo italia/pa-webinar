@@ -18,6 +18,11 @@ import ToggleSwitch from '@/components/ui/toggle-switch';
 import { useRouter, Link, percorso } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
 import { useConfirm } from '@/components/ui/confirm-dialog';
+import { codiceErrore, messaggioErroreApi } from '@/lib/api-error-message';
+import { esitoPubblicazione, type Destinazione } from '@/lib/recording/destination';
+import { NESSUNA_CANCELLAZIONE, RETENTION_OPTIONS } from '@/lib/recording/retention-options';
+import { durataEffettiva, limiteDurataPrecedente } from '@/lib/recording/legacy-retention';
+
 import RecordingUploadWidget from './recording-upload-widget';
 
 interface RecordingManagementProps {
@@ -25,7 +30,9 @@ interface RecordingManagementProps {
     id: string;
     slug: string;
     status: string;
+    eventType: string;
     recordingEnabled: boolean;
+    recordingDestination: Destinazione;
     recordingUrl: string | null;
     tempRecordingUrl: string | null;
     tempRecordingStartedAt: string | null;
@@ -35,21 +42,22 @@ interface RecordingManagementProps {
     recordingFileSize: number | null;
     recordingDuration: number | null;
     recordingDeleteAfterDays: number | null;
+    /** Evento nato prima che la registrazione si separasse dai dati
+     *  (lib/recording/legacy-retention): con `dataRetentionDays`, il limite della
+     *  durata finche' il video non e' pubblicato. */
+    legacyRecordingRetention?: boolean;
+    dataRetentionDays?: number;
     moderatorToken: string;
   };
   jibriAvailable?: boolean;
+  /** Chi guarda puo' aprire il file dalla rotta dell'app: chi organizza
+   *  l'evento, o chiunque se e' pubblicato per tutti. Con il solo link di
+   *  conduzione la rotta lo rifiuterebbe: niente riproduci e scarica. */
+  riproducibile?: boolean;
   /** La registrazione del video, quando ha slide presentate in sala da
    *  regolare (pagina della post-produzione, scheda «Slide»). */
   slidesRecordingId?: string | null;
 }
-
-const RETENTION_OPTIONS = [
-  { value: 1, labelKey: 'retention.24h' },
-  { value: 7, labelKey: 'retention.7d' },
-  { value: 30, labelKey: 'retention.30d' },
-  { value: 90, labelKey: 'retention.90d' },
-  { value: -1, labelKey: 'retention.forever' },
-] as const;
 
 function formatDuration(seconds: number): string {
   const h = Math.floor(seconds / 3600);
@@ -68,9 +76,11 @@ function formatFileSize(bytes: number): string {
 export default function RecordingManagement({
   event,
   jibriAvailable = true,
+  riproducibile = true,
   slidesRecordingId = null,
 }: RecordingManagementProps) {
   const t = useTranslations('recording');
+  const tApi = useTranslations('apiErrors');
   const toast = useToast();
   const confirm = useConfirm();
   const fmt = useFormatter();
@@ -84,7 +94,44 @@ export default function RecordingManagement({
   const intervalRef = useRef<ReturnType<typeof setInterval>>(undefined);
 
   const hasRecording = !!(event.recordingUrl || event.tempRecordingUrl);
+  // Negli eventi nati prima della regola, finche' il video non e' pubblicato, la
+  // durata non va oltre la conservazione dei dati: le scelte piu' lunghe e
+  // «nessuna cancellazione» si spengono, e il pannello mostra quella che vale.
+  const vecchiaRegola = {
+    legacyRecordingRetention: event.legacyRecordingRetention,
+    recordingPublished: published,
+    dataRetentionDays: event.dataRetentionDays ?? 30,
+  };
+  const limiteDurata = limiteDurataPrecedente(vecchiaRegola);
+  const durataMostrata = durataEffettiva({
+    ...vecchiaRegola,
+    recordingDeleteAfterDays: retentionDays,
+  });
+  const sceltePossibili = [
+    ...RETENTION_OPTIONS.map((o) => ({ value: o.value as number, label: t(o.labelKey) })),
+    // La conservazione dei dati come scelta, se non e' gia' fra le altre.
+    ...(limiteDurata !== null && !RETENTION_OPTIONS.some((o) => o.value === limiteDurata)
+      ? [{ value: limiteDurata, label: t('retention.days', { count: limiteDurata }) }]
+      : []),
+  ].sort((a, b) =>
+    a.value === NESSUNA_CANCELLAZIONE ? 1 : b.value === NESSUNA_CANCELLAZIONE ? -1 : a.value - b.value
+  );
   const isLive = event.status === 'LIVE';
+  const esito = esitoPubblicazione(event);
+
+  // Un evento senza destinazione non si blocca: i consensi raccolti non dicono
+  // dove sarebbe andato il video, e lo si dice a chi pubblica, compreso chi lo
+  // fa caricando un file, che si pubblica da solo.
+  const avvisoDestinazione = esito === 'senzaDestinazione' && (
+    <Alert color="warning" className="mb-3">
+      {t('destinationMissing')}
+    </Alert>
+  );
+
+  // Il file caricato cambia pubblicazione e pubblico sul server: quando la
+  // pagina si rilegge, le scelte mostrate seguono.
+  useEffect(() => setPublished(event.recordingPublished), [event.recordingPublished]);
+  useEffect(() => setAudience(event.recordingAudience), [event.recordingAudience]);
 
   useEffect(() => {
     if (!isLive || !event.tempRecordingStartedAt) return;
@@ -98,9 +145,10 @@ export default function RecordingManagement({
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [isLive, event.tempRecordingStartedAt]);
 
-  /** Salva un campo dell'evento; false se il server non l'ha salvato. */
+  /** Salva un campo dell'evento: il motivo se il server non l'ha salvato, null
+   *  se l'ha salvato. Un rifiuto per la destinazione dice cosa non si puo' fare. */
   const updateField = useCallback(
-    async (data: Record<string, unknown>): Promise<boolean> => {
+    async (data: Record<string, unknown>): Promise<string | null> => {
       setSaving(true);
       try {
         const r = await fetch(`/api/events/${event.id}`, {
@@ -111,14 +159,15 @@ export default function RecordingManagement({
           },
           body: JSON.stringify(data),
         });
-        return r.ok;
+        if (r.ok) return null;
+        return messaggioErroreApi(r.status, tApi, t('saveFailed'), {}, await codiceErrore(r));
       } catch {
-        return false;
+        return t('saveFailed');
       } finally {
         setSaving(false);
       }
     },
-    [event.id, event.moderatorToken],
+    [event.id, event.moderatorToken, t, tApi],
   );
 
   // Pubblicazione e pubblico decidono chi vede il video: se il server non
@@ -127,31 +176,44 @@ export default function RecordingManagement({
   const handleTogglePublish = useCallback(async () => {
     const next = !published;
     setPublished(next);
-    if (!(await updateField({ recordingPublished: next }))) {
+    const errore = await updateField({ recordingPublished: next });
+    if (errore) {
       setPublished(!next);
-      toast.error(t('saveFailed'));
+      toast.error(errore);
     }
-  }, [published, updateField, toast, t]);
+  }, [published, updateField, toast]);
 
   const handleAudienceChange = useCallback(
     async (next: 'PUBLIC' | 'REGISTRANTS') => {
       const prima = audience;
       setAudience(next);
-      if (!(await updateField({ recordingAudience: next }))) {
+      const errore = await updateField({ recordingAudience: next });
+      if (errore) {
         setAudience(prima);
-        toast.error(t('saveFailed'));
+        toast.error(errore);
+        return;
       }
+      // Il pubblico decide anche cio' che la pagina dice delle domande e della
+      // libreria: il pannello qui accanto rilegge l'evento.
+      router.refresh();
     },
-    [audience, updateField, toast, t],
+    [audience, updateField, toast, router],
   );
 
+  // La durata decide quando la registrazione si cancella: se il server non la
+  // salva, la scelta torna com'era e lo si dice.
   const handleRetentionChange = useCallback(
     async (days: number) => {
-      const val = days === -1 ? null : days;
+      const prima = retentionDays;
+      const val = days === NESSUNA_CANCELLAZIONE ? null : days;
       setRetentionDays(val);
-      await updateField({ recordingDeleteAfterDays: val });
+      const errore = await updateField({ recordingDeleteAfterDays: val });
+      if (errore) {
+        setRetentionDays(prima);
+        toast.error(errore);
+      }
     },
-    [updateField],
+    [retentionDays, updateField, toast],
   );
 
   const handleDelete = useCallback(async () => {
@@ -184,6 +246,7 @@ export default function RecordingManagement({
           <div className="text-muted mb-3" style={{ fontSize: '0.9rem' }}>
             {t('disabledHint')}
           </div>
+          {avvisoDestinazione}
           <RecordingUploadWidget eventId={event.id} />
         </CardBody>
       </Card>
@@ -244,6 +307,8 @@ export default function RecordingManagement({
             <Alert color="success" className="mb-3">
               <span className="fw-semibold">{t('available')}</span>
             </Alert>
+
+            {avvisoDestinazione}
 
             {event.recordingDuration && (
               <div className="text-muted mb-1" style={{ fontSize: '0.85rem' }}>
@@ -319,7 +384,7 @@ export default function RecordingManagement({
                       name="recording-audience"
                       checked={audience === value}
                       onChange={() => handleAudienceChange(value)}
-                      disabled={saving}
+                      disabled={saving || (value === 'PUBLIC' && esito === 'riservata')}
                     />
                     <label htmlFor={`audience-${value}`}>
                       {value === 'PUBLIC' ? t('audiencePublic') : t('audienceRegistrants')}
@@ -329,46 +394,17 @@ export default function RecordingManagement({
                     </label>
                   </div>
                 ))}
-              </fieldset>
-            </div>
-
-            {/* Retention options */}
-            {/* Le scelte del design system (form-check): il pallino nativo
-                da 13 px era troppo piccolo da colpire. */}
-            {/* Il bordo sul contenitore: su quello del fieldset la legenda si
-                siederebbe sopra la linea, tagliandola. */}
-            <div className="border rounded p-3 mb-3">
-              <fieldset className="border-0 p-0 m-0">
-                <legend
-                  className="fw-semibold mb-2 fs-6 float-none w-auto p-0"
-                  style={{ color: 'var(--app-text)' }}
-                >
-                  {t('retentionLabel')}
-                </legend>
-                {RETENTION_OPTIONS.map(({ value, labelKey }) => (
-                  <div key={value} className="form-check my-1">
-                    <input
-                      type="radio"
-                      id={`retention-${value}`}
-                      name="retention"
-                      checked={value === -1 ? retentionDays === null : retentionDays === value}
-                      onChange={() => handleRetentionChange(value)}
-                      disabled={saving}
-                    />
-                    <label htmlFor={`retention-${value}`} style={{ fontSize: '0.88rem' }}>
-                      {t(labelKey)}
-                    </label>
+                {esito === 'riservata' && (
+                  <div className="text-muted mt-2" style={{ fontSize: '0.8rem' }}>
+                    {t('audienceReservedNote')}
                   </div>
-                ))}
-                <div className="text-muted mt-2" style={{ fontSize: '0.8rem' }}>
-                  {t('retentionNote')}
-                </div>
+                )}
               </fieldset>
             </div>
 
             {/* Action buttons */}
             <div className="d-flex align-items-center gap-3 flex-wrap">
-              {event.recordingUrl && (
+              {event.recordingUrl && riproducibile && (
                 <>
                   <a
                     href={event.recordingUrl}
@@ -424,12 +460,64 @@ export default function RecordingManagement({
           </>
         )}
 
+        {/* La durata della registrazione: una scelta dell'evento, non del
+            file. Vale anche prima che il video ci sia, e dopo che lo si e'
+            tolto, per cio' che resta (trascrizioni, sintesi, traduzioni). Le
+            scelte del design system (form-check): il pallino nativo da 13 px
+            era troppo piccolo da colpire. Il bordo sul contenitore: su quello
+            del fieldset la legenda si siederebbe sopra la linea, tagliandola. */}
+        {!isLive && (
+          <div className="border rounded p-3 mb-3">
+            <fieldset className="border-0 p-0 m-0">
+              <legend
+                className="fw-semibold mb-2 fs-6 float-none w-auto p-0"
+                style={{ color: 'var(--app-text)' }}
+              >
+                {t('retentionLabel')}
+              </legend>
+              {sceltePossibili.map(({ value, label }) => (
+                <div key={value} className="form-check my-1">
+                  <input
+                    type="radio"
+                    id={`retention-${value}`}
+                    name="retention"
+                    checked={
+                      value === NESSUNA_CANCELLAZIONE ? durataMostrata === null : durataMostrata === value
+                    }
+                    onChange={() => handleRetentionChange(value)}
+                    disabled={
+                      saving ||
+                      (limiteDurata !== null &&
+                        (value === NESSUNA_CANCELLAZIONE || value > limiteDurata))
+                    }
+                    aria-describedby={limiteDurata !== null ? 'retention-legacy' : undefined}
+                  />
+                  <label htmlFor={`retention-${value}`} style={{ fontSize: '0.88rem' }}>
+                    {label}
+                  </label>
+                </div>
+              ))}
+              {limiteDurata !== null && (
+                <div id="retention-legacy" className="mt-2" style={{ fontSize: '0.8rem' }}>
+                  {t('retentionLegacy', { days: limiteDurata })}
+                </div>
+              )}
+              <div className="text-muted mt-2" style={{ fontSize: '0.8rem' }}>
+                {t('retentionNote')}
+              </div>
+            </fieldset>
+          </div>
+        )}
+
         {/* Replace the existing recording with a different MP4 —
             useful after editing the Jibri output offline or swapping
             for a MsTeams export. Hidden while a live recording is
             running to avoid racing against Jibri's own upload. */}
         {!isLive && (
-          <RecordingUploadWidget eventId={event.id} compact />
+          <>
+            {!hasRecording && avvisoDestinazione}
+            <RecordingUploadWidget eventId={event.id} compact />
+          </>
         )}
       </CardBody>
     </Card>

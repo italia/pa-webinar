@@ -23,6 +23,7 @@ import { logAdminAction } from '@/lib/audit/admin-audit';
 import { encryptPII, encryptPIIOrNull, hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { AppError, ForbiddenError, ValidationError } from '@/lib/errors';
+import { indirizzoFermato } from '@/lib/persons/inviti-fermati';
 
 export const dynamic = 'force-dynamic';
 
@@ -96,6 +97,8 @@ export const GET = withErrorHandling(async (_request, context) => {
       createdAt: r.createdAt,
       // L'ultimo invio dell'invito per email; null se non e' mai partito.
       sentAt: r.sentAt,
+      // Non parte piu' niente verso questo indirizzo (lib/persons/inviti-fermati).
+      stopped: r.declinedAt !== null,
       registered: iscritte.has(impronte[i] ?? ''),
       // Person.displayName is encrypted at rest; decrypt for the response
       // so the rubrica-linked invitation row shows a readable name.
@@ -129,6 +132,10 @@ export const POST = withErrorHandling(async (request, context) => {
   // never stored — only its encryption and its HMAC fingerprint.
   const emailNorm = parsed.data.email.trim().toLowerCase();
   const emailHash = hashEmail(emailNorm);
+  // La riga nuova nasce ferma se l'indirizzo ha smesso di ricevere inviti.
+  // Cancellare un invito fermato e riscriverlo toglie lo stop solo se quella riga
+  // era l'ultima traccia del ritiro (`indirizzoFermato`).
+  const fermato = await indirizzoFermato(prisma, emailHash);
 
   try {
     const created = await prisma.eventInvitation.create({
@@ -139,6 +146,7 @@ export const POST = withErrorHandling(async (request, context) => {
         name: encryptPIIOrNull(parsed.data.name),
         role: parsed.data.role,
         personId: parsed.data.personId ?? null,
+        declinedAt: fermato ? new Date() : null,
       },
       include: {
         person: {

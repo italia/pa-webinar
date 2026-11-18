@@ -42,8 +42,7 @@ function apri(patch: Partial<ComponentProps<typeof ConsentDiagram>> = {}) {
           participantsCanUnmute
           participantsCanStartVideo
           participantsCanShareScreen={false}
-          hostsAlwaysRecorded={false}
-          voce="rimovibile"
+          partecipanti="solo-voce"
           {...patch}
         />
       </NextIntlClientProvider>
@@ -76,22 +75,21 @@ describe('ConsentDiagram', () => {
     expect(testo).not.toContain(testi.roomListenOnly);
   });
 
-  it("dice l'opzione di chi conduce", () => {
-    expect(apri()).toContain(testi.hostsChoose);
-    expect(apri({ hostsAlwaysRecorded: true })).toContain(testi.hostsAlways);
+  it('chi conduce e\' sempre nel video, dove c\'e\' un video: non e\' una scelta', () => {
+    expect(apri()).toContain(testi.hostsAlways);
+    expect(apri({ partecipanti: 'visibili' })).toContain(testi.hostsAlways);
   });
 
   it('dove la voce resta nel video, senza consenso solo ascolto, e lo dichiara', () => {
-    const testo = apri({ voce: 'fissa' });
+    const testo = apri({ partecipanti: 'visibili' });
     expect(testo).toContain(testi.fixedVoice);
     expect(testo).toContain(testi.roomListenOnly);
-    expect(testo).toContain(testi.hostsFixed);
     expect(testo).not.toContain(testi.othersSame);
   });
 
   it("dove la voce resta nel video e l'evento avvisa soltanto, nessuno sceglie", () => {
     const testo = apri({
-      voce: 'fissa',
+      partecipanti: 'visibili',
       participantsCanUnmute: false,
       participantsCanStartVideo: false,
     });
@@ -100,18 +98,19 @@ describe('ConsentDiagram', () => {
   });
 
   it('dove la voce resta nel video non promette che il nome resti fuori', () => {
-    const testo = apri({ voce: 'fissa' });
+    const testo = apri({ partecipanti: 'visibili' });
     expect(testo).toContain(testi.fixedNotRecorded);
     expect(testo).not.toContain(testi.notRecorded);
   });
 
   it('senza un video completo decide il consenso alla trascrizione', () => {
-    const testo = apri({ voce: 'assente', multitrackRecordingEnabled: true });
+    const testo = apri({ partecipanti: 'assente', multitrackRecordingEnabled: true });
     expect(testo).toContain(testi.questionTranscription);
     expect(testo).toContain(testi.recordedVoice);
     expect(testo).toContain(testi.notRecordedVoice);
     expect(testo).not.toContain(testi.trace);
-    expect(testo).not.toContain(testi.hostsChoose);
+    // Senza video chi conduce segue il consenso alla trascrizione come tutti.
+    expect(testo).not.toContain(testi.hostsAlways);
   });
 
   it("senza video e senza tracce non c'e' niente da mostrare", () => {
@@ -124,22 +123,12 @@ describe('ConsentDiagram', () => {
             participantsCanUnmute
             participantsCanStartVideo
             participantsCanShareScreen={false}
-            hostsAlwaysRecorded={false}
-            voce="assente"
+            partecipanti="assente"
           />
         </NextIntlClientProvider>
       );
     });
     expect(container.querySelector('.mappa-consensi')).toBeNull();
-  });
-
-  it("l'opzione di chi conduce conta solo dove si puo' restare fuori", () => {
-    expect(apri({ voce: 'fissa', hostsAlwaysRecorded: true })).toContain(
-      testi.hostsFixed
-    );
-    expect(apri({ voce: 'fissa', hostsAlwaysRecorded: true })).not.toContain(
-      testi.hostsAlways
-    );
   });
 
   it("chi non puo' parlare riceve solo un avviso", () => {
@@ -153,5 +142,10 @@ describe('ConsentDiagram', () => {
   it("la trascrizione compare solo se l'evento la chiede", () => {
     expect(apri()).not.toContain(testi.transcription);
     expect(apri({ captionsTranscript: true })).toContain(testi.transcription);
+  });
+
+  it('la trascrizione del video chiede il suo consenso, senza tracce per persona', () => {
+    expect(apri()).not.toContain(testi.transcription);
+    expect(apri({ trascrizioneVideo: true })).toContain(testi.transcription);
   });
 });

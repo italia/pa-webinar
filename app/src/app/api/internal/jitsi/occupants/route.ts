@@ -12,8 +12,15 @@
  * Auth: la firma di Prosody (header x-pa-signature, lib/auth/prosody-signature,
  * con il segreto dei token della conferenza), oppure CRON_API_KEY (header
  * x-api-key) come gli altri endpoint /internal.
- * Una stanza che non e' di un evento si ignora (204): la chiamata rapida,
- * una stanza di prova.
+ * Una stanza che non e' di un evento si ignora (204): una stanza di prova.
+ * Le chiamate rapide sono eventi: le loro righe valgono come le altre.
+ *
+ * Ogni ingresso nella conferenza ha un endpoint nuovo, quindi una riga sua, con
+ * il segno della voce (`voiceExcluded`) e il periodo (`joinedAt`, `leftAt`):
+ * un consenso dato o ritirato in sala riconnette con un token nuovo, e i periodi
+ * di prima restano. La rimozione su richiesta li legge
+ * (lib/recording/redaction). Il posto dei link di conduzione (`mod-`) e' chi
+ * conduce, che e' nel video.
  *
  * A un ingresso, dove il servizio dei sottotitoli e' installato, la risposta
  * dice se l'evento li vuole adesso (`{ captions: boolean }`): Prosody

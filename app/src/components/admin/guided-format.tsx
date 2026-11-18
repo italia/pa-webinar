@@ -5,8 +5,8 @@
 
 /**
  * La prima pagina di un evento nuovo: quattro domande (quante persone, chi
- * parla e si mostra in video, se registrare, chi puo' partecipare) e, accanto,
- * l'evento che ne viene.
+ * parla e si mostra in video, se registrare e per chi, chi puo' partecipare) e,
+ * accanto, l'evento che ne viene.
  * «Continua» apre il wizard con quei valori di partenza
  * (lib/events/guided-format). I modelli salvati restano sotto, per
  * chi li usa.
@@ -18,12 +18,21 @@ import { useTranslations } from 'next-intl';
 import { pulisciTraslocoScaduto } from '@/components/admin/event-wizard/drafts';
 import { Icon } from '@/components/ui/icon';
 import {
-  FORMATO_PREDEFINITO,
   PARTECIPANTI_ATTESI,
+  formatoConAccesso,
   formatoPossibile,
+  formatoPredefinito,
+  presetDaFormato,
+  registrazioneProposta,
   type FormatoAccesso,
   type FormatoGuidato,
+  type FormatoRegistra,
 } from '@/lib/events/guided-format';
+import { domandePubbliche } from '@/lib/events/post-event-sections';
+import { conduceNelVideo, type PartecipantiNelVideo } from '@/lib/live/consent-rule';
+import { elencoPredefinito, nicknamePredefinito } from '@/lib/live/participant-list';
+import { rubricaProposta } from '@/lib/persons/address-book';
+import { videoDaDestinare } from '@/lib/recording/destination';
 
 /** Una persona, due persone: chi partecipa (SVG: lo sprite non ha l'icona). */
 export function IconaPersone() {
@@ -141,6 +150,8 @@ export default function GuidedFormat({
   aiPipelineEnabled = true,
   liveCaptionsAvailable = false,
   recordingAvailable = true,
+  partecipantiNelVideo,
+  addressBookAvailable = true,
   accessoPredefinito = 'tutti',
   azioneTitolo,
   children,
@@ -157,6 +168,11 @@ export default function GuidedFormat({
   /** L'installazione puo' registrare: senza, la domanda non si fa e il formato
    *  esce sempre senza registrazione (vedi formatoPossibile). */
   recordingAvailable?: boolean;
+  /** Come compaiono nel video i partecipanti, secondo l'installazione. Senza un
+   *  video della sala ('assente') un video pubblico non si propone. */
+  partecipantiNelVideo?: PartecipantiNelVideo;
+  /** L'installazione tiene la rubrica: senza, l'anteprima non la promette. */
+  addressBookAvailable?: boolean;
   /** Accanto al titolo: l'azione secondaria (partire da un modello). */
   azioneTitolo?: React.ReactNode;
   /** Sotto il titolo, prima delle domande: i modelli, quando si aprono. */
@@ -167,15 +183,30 @@ export default function GuidedFormat({
   const tForm = useTranslations('admin.form');
   const tp = useTranslations('admin.wizard.step2');
   const base = useId();
-  const [f, setF] = useState<FormatoGuidato>(
-    initial ?? { ...FORMATO_PREDEFINITO, accesso: accessoPredefinito },
-  );
+  const [f, setF] = useState<FormatoGuidato>(initial ?? formatoPredefinito(accessoPredefinito));
+  // La risposta sulla registrazione segue le altre finche' nessuno l'ha scelta:
+  // chi passa a una riunione non si ritrova un video pubblico che non ha chiesto.
+  const [registraScelta, setRegistraScelta] = useState(initial != null);
+  // Una risposta ripresa e non toccata in questa schermata puo' essere stata solo
+  // proposta: passando agli inviti un video pubblico torna alla proposta.
+  const [registraToccata, setRegistraToccata] = useState(false);
   // I dati di «Cambia formato» rimasti nel browser oltre il loro tempo se ne
   // vanno anche se il wizard non si riapre.
   useEffect(() => pulisciTraslocoScaduto(), []);
   const cambia = (patch: Partial<FormatoGuidato>) =>
-    setF((prima) => ({ ...prima, ...patch }));
-  const formato = formatoPossibile(f, recordingAvailable);
+    setF((prima) => {
+      const dopo = { ...prima, ...patch };
+      if (!registraScelta) return { ...dopo, registra: registrazioneProposta(dopo) };
+      return patch.accesso && !registraToccata ? formatoConAccesso(prima, patch.accesso) : dopo;
+    });
+  const scegliRegistra = (registra: FormatoRegistra) => {
+    setRegistraScelta(true);
+    setRegistraToccata(true);
+    setF((prima) => ({ ...prima, registra }));
+  };
+  const conVideo = videoDaDestinare(partecipantiNelVideo);
+  const formato = formatoPossibile(f, recordingAvailable, conVideo);
+  const preset = presetDaFormato(formato, '');
 
   const funzioni = [
     tp('feature.chat.label'),
@@ -247,21 +278,32 @@ export default function GuidedFormat({
           {recordingAvailable && (
             <fieldset className="formato__domanda">
               <legend>{t('recQ')}</legend>
-              <div className="formato__scelte">
+              <div className={`formato__scelte${conVideo ? ' formato__scelte--tre' : ''}`}>
                 <Scelta
                   name={`${base}-registra`}
-                  value="si"
-                  current={f.registra}
-                  onChange={(registra) => cambia({ registra })}
-                  title={t('rec.yes')}
-                  desc={aiPipelineEnabled ? t('rec.yesDesc') : undefined}
-                  icon={<IconaRec />}
+                  value="riservata"
+                  current={formato.registra}
+                  onChange={scegliRegistra}
+                  title={t('rec.reserved')}
+                  desc={t('rec.reservedDesc')}
+                  icon={<Icon icon="it-lock" size="sm" />}
                 />
+                {conVideo && (
+                  <Scelta
+                    name={`${base}-registra`}
+                    value="pubblica"
+                    current={formato.registra}
+                    onChange={scegliRegistra}
+                    title={t('rec.public')}
+                    desc={t('rec.publicDesc')}
+                    icon={<IconaRec />}
+                  />
+                )}
                 <Scelta
                   name={`${base}-registra`}
                   value="no"
-                  current={f.registra}
-                  onChange={(registra) => cambia({ registra })}
+                  current={formato.registra}
+                  onChange={scegliRegistra}
                   title={t('rec.no')}
                   desc={t('rec.noDesc')}
                   icon={<Icon icon="it-close-circle" size="sm" />}
@@ -329,13 +371,63 @@ export default function GuidedFormat({
                   <IconaRec />
                 </span>
                 <span>
-                  {f.registra === 'si' ? tf('recordingManual') : t('rec.noDesc')}
-                  {f.registra === 'si' && aiPipelineEnabled && (
-                    <span className="d-block text-secondary">{t('rec.yesDesc')}</span>
+                  {preset.recordingEnabled ? tf('recordingManual') : t('rec.noDesc')}
+                  {preset.recordingEnabled && (
+                    <>
+                      <span className="d-block text-secondary">
+                        {preset.recordingDestination === 'REGISTRANTS'
+                          ? tf('recordingDestinationReserved')
+                          : tf('recordingDestinationPublic')}
+                      </span>
+                      <span className="d-block text-secondary">
+                        {conduceNelVideo(partecipantiNelVideo ?? 'visibili') && tf('consentsHostsAlways')}
+                      </span>
+                      {aiPipelineEnabled && (
+                        <span className="d-block text-secondary">{t('rec.yesDesc')}</span>
+                      )}
+                    </>
                   )}
                 </span>
               </li>
             )}
+            <li>
+              <span className="anteprima-righe__icona">
+                <Icon icon="it-user" size="sm" />
+              </span>
+              <span>
+                {preset.audienceAnonymous ? t('previewPseudonyms') : t('previewRealNames')}
+                {/* Il nickname segue l'elenco, come nel wizard. */}
+                {nicknamePredefinito({
+                  audienceAnonymous: preset.audienceAnonymous,
+                  participantListVisible: elencoPredefinito(preset),
+                }) && <span className="d-block text-secondary">{t('previewNicknames')}</span>}
+              </span>
+            </li>
+            <li>
+              <span className="anteprima-righe__icona">
+                <Icon icon="it-help-circle" size="sm" />
+              </span>
+              <span>
+                {/* Con la pagina privata nessuno le legge: dopo l'evento non c'e' dove pubblicarle. */}
+                {preset.postEventPublic &&
+                domandePubbliche({
+                  ...preset,
+                  recordingAudience: preset.recordingDestination ?? 'PUBLIC',
+                })
+                  ? tf('postEventQaTextOnly')
+                  : tf('postEventQaHidden')}
+              </span>
+            </li>
+            <li>
+              <span className="anteprima-righe__icona">
+                <Icon icon="it-bookmark" size="sm" />
+              </span>
+              <span>
+                {rubricaProposta(preset, { addressBookEnabled: addressBookAvailable })
+                  ? tf('addressBookOffered')
+                  : tf('addressBookNotOffered')}
+              </span>
+            </li>
             <li>
               <span className="anteprima-righe__icona">
                 <Icon icon={f.accesso === 'invitati' ? 'it-mail' : 'it-unlocked'} size="sm" />

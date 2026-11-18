@@ -13,6 +13,8 @@ import type { SiteSetting } from '@prisma/client';
 
 import type { PercorsoStatico } from '@/i18n/percorsi';
 
+type ImpostazioniDeiLink = Pick<SiteSetting, 'calendarPublic' | 'statusPageEnabled'>;
+
 export interface LinkPubblico {
   href: PercorsoStatico;
   /** Chiave di traduzione, dalla radice dei messaggi. */
@@ -20,7 +22,7 @@ export interface LinkPubblico {
   /** Icona dello sprite, per l'intestazione. */
   icon?: string;
   /** Il link compare solo se questa impostazione e' accesa. */
-  soloSe?: keyof Pick<SiteSetting, 'calendarPublic' | 'statusPageEnabled'>;
+  soloSe?: keyof ImpostazioniDeiLink;
 }
 
 /** Intestazione, a destra: su ogni pagina. */
@@ -38,6 +40,6 @@ export const LINK_PIEDE_EVENTI: readonly LinkPubblico[] = [
 ];
 
 /** Il link va mostrato con queste impostazioni? */
-export function linkVisibile(link: LinkPubblico, settings: SiteSetting): boolean {
+export function linkVisibile(link: LinkPubblico, settings: ImpostazioniDeiLink): boolean {
   return !link.soloSe || settings[link.soloSe] === true;
 }

@@ -13,9 +13,11 @@ import {
 import {
   generateRecordingSasUrl,
   deleteRecordingBlob,
+  fileDelloStorage,
 } from '@/lib/storage/recordings';
-import { CAMPI_VIDEO_VUOTI } from '@/lib/events/recording-fields';
-import { accessoRegistrazione } from '@/lib/recording/audience';
+import { CAMPI_VIDEO_VUOTI, sessioniSenzaFile } from '@/lib/events/recording-fields';
+import { accessoRegistrazioneConStaff } from '@/lib/recording/audience';
+import { tracciaLetturaContenuto } from '@/lib/recording/content-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,9 +41,11 @@ export const GET = withErrorHandling(async (_request, context) => {
       id: true,
       recordingUrl: true,
       status: true,
+      eventType: true,
       recordingPublished: true,
       transcriptPublished: true,
       recordingAudience: true,
+      recordingDestination: true,
       postEventPublic: true,
       postEventPublicUntil: true,
     },
@@ -53,21 +57,32 @@ export const GET = withErrorHandling(async (_request, context) => {
   }
   // Chi puo' vedere la registrazione (lib/recording/audience): pubblicata nella
   // finestra post-evento, per tutti o per i soli iscritti; lo staff che
-  // gestisce l'evento anche prima, per l'anteprima della pagina.
-  const accesso = await accessoRegistrazione(event, await cookies());
-  if (!accesso || (!event.recordingPublished && accesso !== 'staff')) {
+  // organizza l'evento anche prima, per l'anteprima della pagina; di una
+  // chiamata rapida, chi era in sala (pass di presenza) e chi la organizza.
+  const { accesso, staff } = await accessoRegistrazioneConStaff(event, await cookies());
+  const senzaPubblicazione =
+    accesso === 'staff' || (accesso === 'presente' && event.eventType === 'INSTANT');
+  if (!accesso || (!event.recordingPublished && !senzaPubblicazione)) {
     throw new ForbiddenError('Recording not published');
+  }
+  if (staff) {
+    await tracciaLetturaContenuto({ ...staff, eventId: event.id, recordingId: null, superficie: 'video' });
   }
 
   // 302 to a signed blob URL so the browser streams directly from
   // Azure (range requests, no bandwidth through our pod) while the
-  // private-container permission is still enforced by SAS. Falling
-  // back to the bare URL only if signing fails (dev / non-azure
-  // storage): better than a dead redirect.
+  // private-container permission is still enforced by SAS. Only the
+  // event's own files are signed (lib/storage/recordings): a URL that
+  // points to another event's file answers 404, never a redirect to it.
+  // An external URL (not a file of our storage) is followed as stored.
   const signed = await generateRecordingSasUrl(
     event.recordingUrl,
     PLAYBACK_SAS_EXPIRY_MINUTES,
+    event.id,
   ).catch(() => null);
+  if (!signed && fileDelloStorage(event.recordingUrl)) {
+    throw new NotFoundError('Recording');
+  }
 
   // Chi viene rimandato dipende dalla richiesta: niente cache condivise.
   return new Response(null, {
@@ -92,6 +107,7 @@ export const DELETE = withErrorHandling(async (request, context) => {
       moderatorToken: true,
       recordingUrl: true,
       tempRecordingUrl: true,
+      recordingPublished: true,
     },
   });
 
@@ -120,8 +136,15 @@ export const DELETE = withErrorHandling(async (request, context) => {
         ...CAMPI_VIDEO_VUOTI,
         tempRecordingUrl: null,
         tempRecordingStartedAt: null,
+        // Cio' che resta (trascrizioni, sintesi) ha la durata della
+        // registrazione: tolto il video pubblicato, conta al piu' presto da
+        // adesso, non dalla fine dell'evento (lib/gdpr/cleanup-selection).
+        ...(event.recordingPublished && { recordingRetentionFrom: new Date() }),
       },
     }),
+    ...(event.recordingUrl
+      ? [prisma.callSession.updateMany(sessioniSenzaFile(event.id, event.recordingUrl))]
+      : []),
     prisma.gdprAuditLog.create({
       data: {
         eventId: event.id,

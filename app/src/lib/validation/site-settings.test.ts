@@ -56,6 +56,11 @@ describe('schema delle impostazioni', () => {
     expect(updateSettingsSchema.safeParse({ campoCheNonEsiste: true }).success).toBe(false);
   });
 
+  it('l’interruttore della rubrica accetta solo un valore vero o falso', () => {
+    expect(updateSettingsSchema.safeParse({ addressBookEnabled: false }).success).toBe(true);
+    expect(updateSettingsSchema.safeParse({ addressBookEnabled: 'no' }).success).toBe(false);
+  });
+
   it('gli interruttori dell’anteprima dei link sono accettati', () => {
     const esito = updateSettingsSchema.safeParse({
       ogCardEnabled: false,

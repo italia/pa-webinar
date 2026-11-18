@@ -67,6 +67,11 @@ export const routing = defineRouting({
     // L'atterraggio del link d'accesso mandato per email (ADR-014).
     '/admin/access': { it: '/admin/accesso', en: '/admin/access' },
     '/admin/gdpr-audit': { it: '/admin/gdpr-audit', en: '/admin/gdpr-audit' },
+    '/admin/recording-removals': { it: '/admin/rimozioni-video', en: '/admin/recording-removals' },
+    '/admin/recording-removals/[id]': {
+      it: '/admin/rimozioni-video/[id]',
+      en: '/admin/recording-removals/[id]',
+    },
     '/admin/publications': { it: '/admin/pubblicazioni', en: '/admin/publications' },
     '/admin/publications/new': { it: '/admin/pubblicazioni/nuova', en: '/admin/publications/new' },
     '/admin/settings': { it: '/admin/impostazioni', en: '/admin/settings' },

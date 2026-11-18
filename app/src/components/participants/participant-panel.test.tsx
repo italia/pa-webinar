@@ -414,3 +414,93 @@ describe('ParticipantPanel — conteggio', () => {
     expect(conteggio()).toBe('2');
   });
 });
+
+describe('ParticipantPanel — chi e\' nella registrazione', () => {
+  const persone = [
+    { participantId: 'io', displayName: 'Moderatore' },
+    { participantId: 'p2', displayName: 'Laura Verdi' },
+    { participantId: 'p3', displayName: 'Pippo' },
+  ];
+  function apiCon() {
+    const ascolto = new Map<string, Array<(e: unknown) => void>>();
+    const api = {
+      getParticipantsInfo: () => persone.map((p) => ({ ...p, formattedDisplayName: p.displayName })),
+      getNumberOfParticipants: () => persone.length,
+      getRoomsInfo: () => Promise.resolve(undefined),
+      getConnectionQuality: () => Promise.resolve({}),
+      addListener: (nome: string, fn: (e: unknown) => void) =>
+        ascolto.set(nome, [...(ascolto.get(nome) ?? []), fn]),
+      removeListener: vi.fn(),
+    } as unknown as JitsiMeetExternalAPI;
+    const emetti = (nome: string, e: unknown) => ascolto.get(nome)?.forEach((fn) => fn(e));
+    return { api, emetti };
+  }
+  const recording = { io: 'video', p2: 'voce', p3: 'nessuna' };
+
+  async function renderCon(
+    api: JitsiMeetExternalAPI,
+    props: Partial<Parameters<typeof ParticipantPanel>[0]>,
+  ) {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(JSON.stringify({ seats: {}, recording }))),
+    );
+    await act(async () => {
+      root.render(
+        <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
+          <ParticipantPanel
+            api={api}
+            isModerator
+            localParticipantId="io"
+            eventSlug="evento"
+            token="tok-mod"
+            {...props}
+          />
+        </NextIntlClientProvider>,
+      );
+    });
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 0));
+    });
+  }
+  const riga = (nome: string) =>
+    Array.from(container.querySelectorAll('.people-row')).find((r) => r.textContent?.includes(nome));
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('chi modera vede per tutti: nel video chi conduce, la voce degli altri', async () => {
+    await renderCon(apiCon().api, { statoRegistrazione: 'tutti' });
+    expect(riga('Moderatore')?.textContent).toContain(tp.inVideoBadge);
+    expect(riga('Laura Verdi')?.textContent).toContain(tp.voiceRecordedBadge);
+    expect(riga('Pippo')?.textContent).toContain(tp.voiceExcludedBadge);
+  });
+
+  it('dove il pubblico non parla, solo chi chiede la parola', async () => {
+    const { api, emetti } = apiCon();
+    await renderCon(api, { statoRegistrazione: 'mani' });
+    expect(riga('Pippo')?.textContent).not.toContain(tp.voiceExcludedBadge);
+    await act(async () => emetti('raiseHandUpdated', { id: 'p3', handRaised: 1000 }));
+    expect(riga('Pippo')?.textContent).toContain(tp.voiceExcludedBadge);
+    expect(riga('Laura Verdi')?.textContent).not.toContain(tp.voiceRecordedBadge);
+  });
+
+  it('dove non si registra nessun segno', async () => {
+    await renderCon(apiCon().api, { statoRegistrazione: 'nessuno' });
+    for (const segno of [tp.inVideoBadge, tp.voiceRecordedBadge, tp.voiceExcludedBadge]) {
+      expect(container.textContent).not.toContain(segno);
+    }
+  });
+
+  it('chi partecipa vede solo la propria riga', async () => {
+    await renderCon(apiCon().api, {
+      isModerator: false,
+      statoRegistrazione: 'tutti',
+      statoProprio: 'voce',
+    });
+    expect(riga('Moderatore')?.textContent).toContain(tp.voiceRecordedBadge);
+    expect(riga('Laura Verdi')?.textContent).not.toContain(tp.voiceRecordedBadge);
+    expect(riga('Pippo')?.textContent).not.toContain(tp.voiceExcludedBadge);
+  });
+});

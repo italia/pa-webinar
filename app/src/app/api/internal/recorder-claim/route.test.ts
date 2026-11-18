@@ -156,6 +156,8 @@ describe('il token del recorder', () => {
       moderator: 'false',
       affiliation: 'member',
     });
+    // Il registratore non e' una persona: non e' «nel video» (lib/live/listen-only).
+    expect(token.context.user).not.toHaveProperty('paInVideo');
   });
 
   it('la consegna contiene solo cio’ che serve al recorder', async () => {

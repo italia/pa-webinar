@@ -733,3 +733,31 @@ da una versione precedente) non si controlla niente.
 {{- end -}}
 {{- end -}}
 {{- end -}}
+
+{{- /*
+I controlli con cui Jibri chiude da solo una registrazione
+(global.jibri.callStatusChecks): li legge Jibri dalle opzioni della JVM
+(jitsi-meet.jibri.extraEnvs.JAVA_TOOL_OPTIONS), separate da spazi, quindi una
+durata non puo' contenere spazi. Un file di valori che riscrive quelle opzioni
+senza i controlli lascerebbe i valori di Jibri senza errori: la registrazione
+finirebbe 30 secondi dopo l'uscita dell'ultimo conduttore. Senza la chiave
+(aggiornamento --reuse-values da una versione precedente) non si controlla
+niente.
+*/}}
+{{- define "pa-webinar.validateJibriCallChecks" -}}
+{{- $controlli := dig "jibri" "callStatusChecks" dict (.Values.global | default dict) | default dict -}}
+{{- $jm := index .Values "jitsi-meet" | default dict -}}
+{{- $opzioni := regexSplit "\\s+" (trim (tpl (toString (dig "jibri" "extraEnvs" "JAVA_TOOL_OPTIONS" "" $jm | default "")) .)) -1 -}}
+{{- $conJibri := and .Values.jitsi.enabled (dig "jibri" "enabled" false $jm) (not (dig "jibri" "useExternalJibri" false $jm)) -}}
+{{- range $chiave, $proprieta := dict "defaultCallEmptyTimeout" "default-call-empty-timeout" "allMutedTimeout" "all-muted-timeout" "noMediaTimeout" "no-media-timeout" -}}
+{{- $valore := toString (dig $chiave "" $controlli | default "") -}}
+{{- if $valore -}}
+{{- if not (regexMatch "^[0-9]+(ms|s|m|h|d)$" $valore) -}}
+{{- fail (printf "global.jibri.callStatusChecks.%s è %q: serve una durata senza spazi, come 300s, 5m, 2h o 30d. Viaggia fra le opzioni della JVM di Jibri, separate da spazi." $chiave $valore) -}}
+{{- end -}}
+{{- if and $conJibri (not (has (printf "-Djibri.call-status-checks.%s=%s" $proprieta $valore) $opzioni)) -}}
+{{- fail (printf "global.jibri.callStatusChecks.%s è %s, ma le opzioni della JVM di Jibri (jitsi-meet.jibri.extraEnvs.JAVA_TOOL_OPTIONS) non lo portano: un file di valori che imposta JAVA_TOOL_OPTIONS sostituisce il valore del chart. Riparti da quello di values.yaml e aggiungi le tue opzioni in fondo, separate da uno spazio." $chiave $valore) -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}

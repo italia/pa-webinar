@@ -14,6 +14,7 @@ import {
 } from 'design-react-kit';
 
 import ToggleSwitch from '@/components/ui/toggle-switch';
+import { registrazioneRiservata, type Destinazione } from '@/lib/recording/destination';
 
 /** I due campi che decidono se la pagina post-evento e' pubblica. */
 export interface PostEventVisibility {
@@ -31,6 +32,8 @@ interface PostEventConfigProps {
     postEventPublic: boolean;
     postEventPublicUntil: string | null;
     libraryListed: boolean;
+    recordingDestination: Destinazione;
+    recordingAudience: 'PUBLIC' | 'REGISTRANTS';
     hasPlayableRecording: boolean;
     postEventShowQA: boolean;
     postEventShowMaterials: boolean;
@@ -52,6 +55,10 @@ export default function PostEventConfig({ event, onPublicPageChange }: PostEvent
   const format = useFormatter();
   // Un salvataggio non riuscito: l'interruttore torna com'era e lo si dice.
   const [saveFailed, setSaveFailed] = useState(false);
+  // Con la registrazione riservata la libreria non la mostra e le domande non si
+  // pubblicano (lib/events/post-event-sections): i due interruttori non
+  // cambierebbero niente, e lo si dice. La scelta salvata resta quella.
+  const riservata = registrazioneRiservata(event);
 
   const [pageVisible, setPageVisible] = useState(event.postEventPublic);
   const [libraryListed, setLibraryListed] = useState(event.libraryListed);
@@ -178,14 +185,16 @@ export default function PostEventConfig({ event, onPublicPageChange }: PostEvent
                 label=""
                 ariaLabel={t('libraryListed')}
                 checked={libraryListed}
+                // Una riga gia' in libreria si puo' comunque togliere.
+                disabled={riservata && !libraryListed}
                 onChange={() =>
                   handleToggle('libraryListed', !libraryListed, setLibraryListed)
                 }
               />
             </div>
             <small className="text-muted" style={{ fontSize: '0.78rem' }}>
-              {t('libraryListedHelp')}
-              {libraryListed && !event.hasPlayableRecording && (
+              {riservata ? t('libraryListedReserved') : t('libraryListedHelp')}
+              {libraryListed && !event.hasPlayableRecording && !riservata && (
                 <span className="d-block text-warning mt-1">
                   {t('libraryListedNoRecording')}
                 </span>
@@ -193,14 +202,22 @@ export default function PostEventConfig({ event, onPublicPageChange }: PostEvent
             </small>
           </div>
 
-          <div className="d-flex justify-content-between align-items-center">
-            <span style={{ fontSize: '0.9rem' }}>{t('showQA')}</span>
-            <ToggleSwitch
-              label=""
-            ariaLabel={t('showQA')}
-              checked={showQA}
-              onChange={() => handleToggle('postEventShowQA', !showQA, setShowQA)}
-            />
+          <div>
+            <div className="d-flex justify-content-between align-items-center">
+              <span style={{ fontSize: '0.9rem' }}>{t('showQA')}</span>
+              <ToggleSwitch
+                label=""
+                ariaLabel={t('showQA')}
+                checked={showQA && !riservata}
+                disabled={riservata}
+                onChange={() => handleToggle('postEventShowQA', !showQA, setShowQA)}
+              />
+            </div>
+            {riservata && (
+              <small className="text-muted" style={{ fontSize: '0.78rem' }}>
+                {t('qaReservedNote')}
+              </small>
+            )}
           </div>
 
           <div className="d-flex justify-content-between align-items-center">

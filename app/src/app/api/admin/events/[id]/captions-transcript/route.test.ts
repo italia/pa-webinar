@@ -16,6 +16,8 @@ vi.mock('next/headers', () => ({
 vi.mock('@/lib/auth/staff-session', () => ({
   requireEventManager: vi.fn(async () => ({ role: 'admin', accountId: null })),
 }));
+// L'accesso al contenuto segue la guardia qui sopra (test/contenuto-come-gestore).
+vi.mock('@/lib/recording/content-access', () => import('@/test/contenuto-come-gestore'));
 vi.mock('@/lib/audit/admin-audit', () => ({ logAdminAction: vi.fn(async () => undefined) }));
 vi.mock('@/lib/captions/transcript', () => ({
   CAPTIONS_TRANSCRIPT_MODEL: 'live-captions',
@@ -27,6 +29,8 @@ vi.mock('@/lib/db', () => ({
     event: { findUnique: vi.fn() },
     captionSegment: { count: vi.fn(), findMany: vi.fn() },
     recording: { findFirst: vi.fn() },
+    recordingConsent: { findMany: vi.fn(async () => []) },
+    multitrackConsent: { findMany: vi.fn(async () => []) },
   },
 }));
 

@@ -26,11 +26,12 @@
 
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
+import type { EventFormatClass, RecordingAudience } from '@prisma/client';
 
 import { useRouter, percorso } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
-import type { VoceNelVideo } from '@/lib/live/consent-rule';
-import { elencoPredefinito } from '@/lib/live/participant-list';
+import type { PartecipantiNelVideo } from '@/lib/live/consent-rule';
+import { elencoPredefinito, nicknamePredefinito } from '@/lib/live/participant-list';
 import { profiloSalvato } from '@/lib/events/grant-profile';
 import { eventAdminPath } from '@/lib/events/admin-links';
 import { MAX_RETENTION_DAYS } from '@/lib/validation/retention';
@@ -53,7 +54,15 @@ import {
   wizardStepFromParam,
   type WizardAdvancedSection,
 } from '@/lib/events/wizard-steps';
+import { messaggioErroreApi } from '@/lib/api-error-message';
 import { publicRegistrationFor } from '@/lib/events/access-mode';
+import { registrazioneProponibile, type FormatoRegistra } from '@/lib/events/guided-format';
+import {
+  destinazioneDiPartenza,
+  pubblicoAllineato,
+  puoCambiareDestinazione,
+  videoDaDestinare,
+} from '@/lib/recording/destination';
 import type { StatoTestiEvento } from '@/lib/text-translation/auto';
 import { entroILimiti, haTesto } from '@/lib/text-translation/stato-lingue';
 
@@ -66,6 +75,18 @@ import {
   submitQuestionnaire,
 } from './edit-fanout';
 import { creaRegistroBozze, RegistroBozzeContext } from './bozze-in-sospeso';
+import {
+  campiDaEvento,
+  campiDaModello,
+  campiDaSalvare,
+  destinazioneDopoIlSalvataggio,
+  destinazioneSuInvito,
+  paginaCheSegue,
+  registrazioneVuota,
+  videoPubblico,
+  type NotaDestinazione,
+  type NotaPagina,
+} from './campi-del-formato';
 import { rememberCreation, type UnsavedResource } from './created-event';
 import StepProgramma from './programme-section';
 import ProgrammeCard from './programme-card';
@@ -88,6 +109,13 @@ import {
   useLingueEvento,
 } from './text-translation';
 import { BOZZA_NUOVO_KEY, TRASLOCO_KEY, TRASLOCO_VALIDO_MS } from './drafts';
+import CampoCatalogo from './campo-catalogo';
+import {
+  catalogoDaSalvare,
+  catalogoDellEvento,
+  catalogoDopoIlSalvataggio,
+  type CampiCatalogo,
+} from './catalogo';
 import {
   LibreriaDomandeProvider,
   RiepilogoQuestionari,
@@ -154,11 +182,26 @@ export interface WizardTemplatePreset {
   aiTargetLocales?: string | null;
   descriptionTemplate?: Record<string, string> | null;
   defaultRetentionDays?: number | null;
+  /** La durata della registrazione (Event.recordingDeleteAfterDays); null =
+   *  nessuna cancellazione automatica. */
+  recordingDeleteAfterDays?: number | null;
   defaultExpectedSpeakers?: number | null;
   /** La pagina dopo l'evento e' pubblica (false per una riunione di lavoro). */
   postEventPublic?: boolean;
   /** Chi partecipa: chiunque si iscrive, o solo gli invitati. */
   accessMode?: EventAccessModeValue | null;
+  /** La destinazione del video; null = la sceglie il wizard. */
+  recordingDestination?: RecordingAudience | null;
+  /** Il modulo d'iscrizione propone la rubrica. */
+  offerAddressBook?: boolean;
+  /** Chi partecipa compare con uno pseudonimo. */
+  audienceAnonymous?: boolean;
+  /** Chi partecipa puo' usare un nickname, anche dove l'elenco si vede. */
+  nicknamesEnabled?: boolean;
+  /** Chi conduce e' sempre nella registrazione. */
+  hostsAlwaysRecorded?: boolean;
+  /** Le domande restano sulla pagina dopo l'evento. */
+  postEventShowQA?: boolean;
 }
 
 /** Chi partecipa a un evento (Event.accessMode); null = come dice il sito. */
@@ -206,8 +249,8 @@ export interface WizardProps {
   /** L'installazione puo' registrare (lib/recording/availability): senza,
    *  il riepilogo non promette consensi alla registrazione. */
   recordingAvailable?: boolean;
-  /** La voce di chi non acconsente nel video (lib/recording/availability). */
-  voceNelVideo?: VoceNelVideo;
+  /** Come compaiono nel video i partecipanti (lib/recording/availability). */
+  partecipantiNelVideo?: PartecipantiNelVideo;
   /** Le lingue di traduzione predefinite dell'istanza (SiteSetting). */
   defaultTargetLocales?: string | null;
   /** La post-produzione AI e' accesa sull'installazione: spenta, il passo Permessi
@@ -238,6 +281,9 @@ export interface WizardProps {
   /** L'iscrizione pubblica dell'installazione (SiteSetting): dice che cosa
    *  vuol dire l'elenco degli invitati nel passo «Persone». */
   publicRegistrationEnabled?: boolean;
+  /** La rubrica e' accesa sull'installazione (SiteSetting): spenta, il wizard
+   *  non la propone. */
+  addressBookEnabled?: boolean;
   /** When `'edit'`, the wizard seeds state from `initialEvent`, PUTs to
    *  /api/events/:id on submit, and redirects to the admin detail page.
    *  When `'create'` (default), it POSTs to /api/events and falls into the
@@ -254,6 +300,18 @@ export interface WizardProps {
   /** I valori di partenza vengono dalle quattro domande del formato, riassunte
    *  qui: la fascia in cima le dice al posto del nome di un modello. */
   formatoLabel?: string;
+  /** La stessa fascia con accesso e registrazione come sono ora nel modulo: si
+   *  cambiano anche nei passi, senza tornare alle domande. */
+  etichettaFormato?: (stato: { registra: FormatoRegistra; invitati: boolean }) => string;
+  /** La destinazione del modello e' una risposta data a mano, non una proposta:
+   *  su un evento su invito resta. */
+  destinazioneScelta?: boolean;
+  /** In creazione: il catalogo dell'evento, cioe' il modello o la famiglia del
+   *  formato scelti prima del wizard (lib/events/catalog). */
+  catalogo?: Pick<CampiCatalogo, 'templateId' | 'formatClass'>;
+  /** In modifica, per lo staff: i modelli fra cui correggere il catalogo.
+   *  Senza, il catalogo non si mostra. */
+  modelliCatalogo?: ReadonlyArray<{ id: string; name: string }>;
 }
 
 /**
@@ -265,6 +323,12 @@ export interface InitialEventShape {
   id: string;
   slug: string;
   moderatorToken: string;
+  /** La sala si e' aperta almeno una volta (lib/events/destination-question). */
+  salaGiaAperta?: boolean;
+  /** Evento mai aperto e senza iscrizioni, copie comprese: se registra, la
+   *  destinazione va scelta per salvare (lib/events/destination-question). Va
+   *  scelta anche dove il salvataggio accende la registrazione. */
+  destinazioneDaChiedere?: boolean;
   /** Raw event row (partial; only the fields the wizard needs). */
   event: {
     title: Record<string, string>;
@@ -299,7 +363,10 @@ export interface InitialEventShape {
     autoStartRecording: boolean;
     audienceAnonymous?: boolean;
     participantListVisible?: boolean;
+    nicknamesEnabled?: boolean;
     hostsAlwaysRecorded?: boolean;
+    recordingDestination?: RecordingAudience | null;
+    recordingAudience: RecordingAudience;
     aiTranscriptEnabled?: boolean | null;
     aiSummaryEnabled?: boolean | null;
     aiTranslationEnabled?: boolean | null;
@@ -309,7 +376,9 @@ export interface InitialEventShape {
     aiTargetLocales?: string | null;
     expectedSpeakers?: number | null;
     dataRetentionDays: number;
+    recordingDeleteAfterDays?: number | null;
     postEventPublic: boolean;
+    postEventShowQA?: boolean;
     gdprTemplateId: string | null;
     privacyPolicyText: string | null;
     privacyPolicyUrl: string | null;
@@ -321,10 +390,16 @@ export interface InitialEventShape {
     moderatorPhotoId: string | null;
     /** Una chiamata istantanea non ha iscrizione. */
     eventType?: string;
+    /** Il catalogo (lib/events/catalog): il modello, il suo nome di allora e
+     *  la famiglia del formato. */
+    templateId?: string | null;
+    templateName?: string | null;
+    formatClass?: EventFormatClass | null;
     accessMode: EventAccessModeValue | null;
     requireOrganization: boolean;
     requireOrganizationRole: boolean;
     requireOrganizationType: boolean;
+    offerAddressBook?: boolean;
   };
   /** Each organizer with its DB id so we can DELETE on removal. */
   organizers: Array<{
@@ -382,8 +457,13 @@ export interface InitialEventShape {
 
 export interface Step5ReviewFields {
   dataRetentionDays: number;
+  /** Event.recordingDeleteAfterDays: quanto dura la registrazione, che non segue
+   *  la conservazione dei dati. Null = nessuna cancellazione automatica. */
+  recordingDeleteAfterDays: number | null;
   /** Event.postEventPublic: la pagina dell'evento concluso resta visibile. */
   postEventPublic: boolean;
+  /** Event.postEventShowQA: le domande restano sulla pagina dell'evento concluso. */
+  postEventShowQA: boolean;
   gdprTemplateId: string | null;
   privacyPolicyText: string;
   privacyPolicyUrl: string | null;
@@ -402,22 +482,33 @@ export interface Step5ReviewFields {
   requireOrganization: boolean;
   requireOrganizationRole: boolean;
   requireOrganizationType: boolean;
+  /** Il modulo d'iscrizione propone la rubrica. */
+  offerAddressBook: boolean;
 }
 
-/** La bozza nel browser: il modulo e le lingue toccate quando la si e' scritta. */
-type BozzaDelModulo = WizardForm & { lingueToccate?: string[] };
+/** La bozza nel browser: il modulo, e cio' che chi organizza ha toccato quando la
+ *  si e' scritta. */
+type BozzaDelModulo = WizardForm & {
+  lingueToccate?: string[];
+  /** Destinazione e pagina dopo l'evento le ha scelte chi organizza: una proposta
+   *  ripresa resta una proposta. Assenti in una bozza di prima (vedi restoreDraft). */
+  destinazioneScelta?: boolean;
+  paginaScelta?: boolean;
+};
 
 export type WizardForm = Step1Value &
   StepPermissionsValue &
   StepPeopleValue &
   StepProgrammeValue &
   Step4Value &
-  Step5ReviewFields;
+  Step5ReviewFields &
+  CampiCatalogo;
 
 export default function EventWizard(props: WizardProps) {
   const t = useTranslations('admin.wizard');
   const tc = useTranslations('common');
   const tDetail = useTranslations('admin.eventDetail');
+  const tErr = useTranslations('apiErrors');
   const router = useRouter();
   const toast = useToast();
 
@@ -429,6 +520,16 @@ export default function EventWizard(props: WizardProps) {
   const [etichetteCreate, setEtichetteCreate] = useState<WizardProps['availableTags']>([]);
   const etichette = viaToken !== null ? [] : [...props.availableTags, ...etichetteCreate];
   const initialEvent = props.initialEvent;
+  // Dove registrare non produce nulla il wizard non lo propone. Un evento salvato
+  // che registra resta com'e': i suoi consensi non cambiano perche' lo si riapre.
+  const recordingAvailable =
+    mode === 'edit' && initialEvent?.event.recordingEnabled
+      ? (props.recordingAvailable ?? true)
+      : registrazioneProponibile(
+          props.recordingAvailable ?? true,
+          props.partecipantiNelVideo,
+          props.aiPipelineEnabled ?? true,
+        );
   // Un evento gia' salvato con una conservazione piu' lunga del massimo (le
   // pubblicazioni in libreria) si puo' modificare senza toccarla: in quel caso
   // il valore non si rimanda (vedi il payload).
@@ -447,6 +548,12 @@ export default function EventWizard(props: WizardProps) {
   if (initialEvent && snapshotRef.current === null) {
     snapshotRef.current = structuredClone(initialEvent);
   }
+  // Il catalogo come lo ha il server dopo l'ultimo salvataggio riuscito: il
+  // prossimo manda solo cio' che cambia rispetto a questo, anche dopo un
+  // salvataggio rimasto sulla pagina per un fallimento parziale.
+  const catalogoSalvatoRef = useRef<CampiCatalogo | null>(
+    initialEvent ? catalogoDellEvento(initialEvent.event) : null
+  );
   // Le risposte dei questionari come le conosce l'ultimo salvataggio: un
   // rifiuto per risposte arrivate a wizard aperto rende subito il blocco di
   // sola lettura, invece di lasciarlo modificabile senza effetto.
@@ -527,9 +634,9 @@ export default function EventWizard(props: WizardProps) {
         liveCaptionsEnabled: ev.liveCaptionsEnabled ?? true,
         captionsTranscriptEnabled: ev.captionsTranscriptEnabled ?? false,
         autoStartRecording: ev.autoStartRecording,
-        audienceAnonymous: ev.audienceAnonymous ?? false,
         participantListVisible: ev.participantListVisible ?? false,
-        hostsAlwaysRecorded: ev.hostsAlwaysRecorded ?? false,
+        nicknamesEnabled: ev.nicknamesEnabled ?? false,
+        ...campiDaEvento(ev),
         aiTranscriptEnabled: ev.aiTranscriptEnabled ?? false,
         aiSummaryEnabled: ev.aiSummaryEnabled ?? false,
         aiTranslationEnabled: ev.aiTranslationEnabled ?? false,
@@ -598,6 +705,7 @@ export default function EventWizard(props: WizardProps) {
 
         // Step 5
         dataRetentionDays: ev.dataRetentionDays,
+        recordingDeleteAfterDays: ev.recordingDeleteAfterDays ?? null,
         postEventPublic: ev.postEventPublic,
         gdprTemplateId: ev.gdprTemplateId,
         privacyPolicyText: ev.privacyPolicyText ?? '',
@@ -612,13 +720,26 @@ export default function EventWizard(props: WizardProps) {
         requireOrganization: ev.requireOrganization,
         requireOrganizationRole: ev.requireOrganizationRole,
         requireOrganizationType: ev.requireOrganizationType,
+
+        // Catalogo
+        ...catalogoDellEvento(ev),
       } satisfies WizardForm;
     }
 
     const tpl = props.template;
     // Dove non si puo' registrare un modello non accende la registrazione.
-    const registra = (tpl?.recordingEnabled ?? false) && (props.recordingAvailable ?? true);
+    const registra = (tpl?.recordingEnabled ?? false) && recordingAvailable;
     const conAi = registra && (props.aiPipelineEnabled ?? true);
+    const campiDelModello = campiDaModello(tpl, registra, videoDaDestinare(props.partecipantiNelVideo));
+    const suInvito = !publicRegistrationFor(
+      { accessMode: tpl?.accessMode ?? null },
+      props.publicRegistrationEnabled ?? true,
+    );
+    const destinazione = destinazioneSuInvito(
+      campiDelModello.recordingDestination,
+      suInvito,
+      !!props.destinazioneScelta,
+    );
     // Le lingue dell'evento, del modello o dell'istanza. La traduzione di
     // sottotitoli e sintesi parte solo se ce n'e' almeno una: senza, il
     // wizard chiederebbe di scegliere lingue che nessuno ha chiesto.
@@ -637,6 +758,10 @@ export default function EventWizard(props: WizardProps) {
           participantsCanShareScreen: tpl.participantsCanShareScreen,
         }))
       : defaultMatrix();
+    const elencoDiPartenza = elencoPredefinito({
+      ...togglesFromMatrix(matrix),
+      maxParticipants: tpl?.maxParticipants ?? 300,
+    });
     return {
       // Step 1
       title: { it: '', en: '' },
@@ -679,12 +804,17 @@ export default function EventWizard(props: WizardProps) {
       // La registrazione non parte mai da sola: la avvia chi conduce con il
       // pulsante REC, qualunque cosa dica un modello salvato prima.
       autoStartRecording: false,
-      audienceAnonymous: false,
-      hostsAlwaysRecorded: false,
-      participantListVisible: elencoPredefinito({
-        ...togglesFromMatrix(matrix),
-        maxParticipants: tpl?.maxParticipants ?? 300,
-      }),
+      ...campiDelModello,
+      recordingDestination: destinazione,
+      participantListVisible: elencoDiPartenza,
+      // Il nickname segue l'elenco (nicknamePredefinito), o il modello che lo
+      // accende comunque.
+      nicknamesEnabled:
+        (tpl?.nicknamesEnabled ?? false) ||
+        nicknamePredefinito({
+          participantListVisible: elencoDiPartenza,
+          audienceAnonymous: campiDelModello.audienceAnonymous,
+        }),
       // Default AI dal template (semplificazione): un template "registrato"
       // può pre-attivare trascrizione/sintesi. La trascrizione richiede la
       // registrazione, quindi la attiviamo solo se recordingEnabled, e solo
@@ -738,7 +868,13 @@ export default function EventWizard(props: WizardProps) {
         tpl?.defaultRetentionDays ?? props.defaultRetentionDays,
         MAX_RETENTION_DAYS
       ),
-      postEventPublic: tpl?.postEventPublic ?? true,
+      // La durata della registrazione che il modello propone; senza, nessuna.
+      recordingDeleteAfterDays: tpl?.recordingDeleteAfterDays ?? null,
+      // Il valore del modello vale su invito solo con il video pubblico per scelta.
+      postEventPublic:
+        (tpl?.postEventPublic ?? true) &&
+        (!suInvito ||
+          videoPubblico({ recordingEnabled: registra, recordingDestination: destinazione })),
       // Il modello marcato come predefinito esiste per essere pre-scelto sui
       // nuovi eventi: senza questo la colonna resterebbe vuota su ogni evento
       // creato da qui, e quella marcatura non avrebbe alcun effetto.
@@ -755,6 +891,11 @@ export default function EventWizard(props: WizardProps) {
       requireOrganization: false,
       requireOrganizationRole: false,
       requireOrganizationType: false,
+
+      // Il catalogo viene dalla scelta fatta prima del wizard.
+      templateId: props.catalogo?.templateId ?? null,
+      deletedTemplateName: null,
+      formatClass: props.catalogo?.formatClass ?? null,
     } satisfies WizardForm;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.template, mode, initialEvent]);
@@ -769,6 +910,41 @@ export default function EventWizard(props: WizardProps) {
   // «Permessi»). Una chiamata
   // istantanea non ha il programma: chi lo chiede arriva a «Persone».
   const istantanea = initialEvent?.event.eventType === 'INSTANT';
+  // La destinazione si sceglie su un evento nuovo, su uno mai aperto e senza
+  // iscrizioni, copie comprese, e su uno che non registrava: accendere ora la
+  // registrazione e' una decisione nuova, anche con gente iscritta. Non da un
+  // link di conduzione: la decide lo staff dell'evento, e chi conduce non deve
+  // restare fermo per una scelta non sua. Non dove non c'e' un video da destinare,
+  // e non a sala aperta, con interruttore e scelta bloccati.
+  const salaBloccata = mode === 'edit' && !!props.salaAperta;
+  const chiedeDestinazione =
+    viaToken === null &&
+    !istantanea &&
+    !salaBloccata &&
+    recordingAvailable &&
+    videoDaDestinare(props.partecipantiNelVideo) &&
+    (mode === 'create' ||
+      !!initialEvent?.destinazioneDaChiedere ||
+      initialEvent?.event.recordingEnabled === false);
+  // Cio' che il salvataggio lascia sull'evento se il modulo non sceglie: la stessa
+  // regola del server, che a sala aperta non accende la registrazione.
+  const destinazioneSenzaScelta = destinazioneDiPartenza(
+    initialEvent?.event ?? { recordingEnabled: false },
+    form.recordingEnabled && !salaBloccata,
+  );
+  // Cio' che il salvataggio lascia sul pubblico del video, per l'anteprima delle
+  // domande: la stessa regola della PUT, che il modulo non chiede mai di cambiare.
+  const pubblicoDopo = pubblicoAllineato(
+    initialEvent?.event.recordingDestination ?? null,
+    destinazioneDopoIlSalvataggio(form, destinazioneSenzaScelta),
+    undefined,
+    initialEvent?.event.recordingAudience ?? 'PUBLIC',
+  );
+  const controllaPasso = useCallback(
+    (passo: StepKey) =>
+      validateStep(passo, form, props.defaultLocale, retentionMax, chiedeDestinazione),
+    [form, props.defaultLocale, retentionMax, chiedeDestinazione],
+  );
   const partenza = mode === 'edit' ? wizardStepFromParam(props.initialStep) : null;
   const [activeStep, setActiveStep] = useState<StepKey>(
     partenza ? passoDisponibile(partenza.step, istantanea) : 'base',
@@ -894,7 +1070,7 @@ export default function EventWizard(props: WizardProps) {
     if (chiavi.size === 0) return;
     const ancora: Record<string, string> = { ...validatePublish(form) };
     for (const k of STEP_KEYS)
-      Object.assign(ancora, validateStep(k, form, props.defaultLocale, retentionMax));
+      Object.assign(ancora, controllaPasso(k));
     const risolte = [...chiavi].filter((k) => !(k in ancora));
     if (risolte.length === 0) return;
     for (const k of risolte) chiavi.delete(k);
@@ -1012,21 +1188,69 @@ export default function EventWizard(props: WizardProps) {
   // Finche' chi organizza non sceglie, l'elenco segue chi puo' parlare o
   // mostrarsi e quante persone si aspettano: non su un evento che esiste gia'.
   const elencoSceltoRef = useRef(mode === 'edit');
+  // Lo stesso per il nickname, che di partenza segue l'elenco.
+  const nicknameSceltoRef = useRef(mode === 'edit');
+  // Finche' chi organizza non sceglie, un evento che diventa su invito torna alla
+  // destinazione proposta. Quella di un evento che esiste gia' e' stata dichiarata.
+  const [destinazioneScelta, setDestinazioneScelta] = useState(
+    mode === 'edit' || !!props.destinazioneScelta,
+  );
+  // Finche' chi organizza non tocca l'interruttore, la pagina dopo l'evento segue il
+  // passaggio a su invito e quello a video pubblico (paginaCheSegue). Un link di
+  // conduzione non decide chi vede il video, e non la muove.
+  const [paginaScelta, setPaginaScelta] = useState(false);
   const updateForm = useCallback(
     (patch: Partial<WizardForm>) => {
       if ('participantListVisible' in patch) elencoSceltoRef.current = true;
+      if ('nicknamesEnabled' in patch) nicknameSceltoRef.current = true;
+      if ('recordingDestination' in patch) setDestinazioneScelta(true);
+      if ('postEventPublic' in patch) setPaginaScelta(true);
       setForm((prev) => {
         const next = { ...prev, ...patch };
+        const sitoAperto = props.publicRegistrationEnabled ?? true;
+        const suInvito = !publicRegistrationFor(next, sitoAperto);
+        if ('accessMode' in patch) {
+          next.recordingDestination = destinazioneSuInvito(
+            next.recordingDestination,
+            suInvito,
+            destinazioneScelta,
+          );
+        }
+        if (viaToken === null && !paginaScelta) {
+          next.postEventPublic = paginaCheSegue(
+            initial,
+            { suInvito: !publicRegistrationFor(prev, sitoAperto), form: prev },
+            { suInvito, form: next },
+          );
+        }
         if (('permissionMatrix' in patch || 'maxParticipants' in patch) && !elencoSceltoRef.current) {
           next.participantListVisible = elencoPredefinito({
             ...togglesFromMatrix(next.permissionMatrix),
             maxParticipants: next.maxParticipants,
           });
         }
+        // Finche' chi organizza non sceglie, il nickname segue l'elenco e il
+        // pubblico anonimo: acceso dove gli altri non si vedono per nome.
+        if (
+          !nicknameSceltoRef.current &&
+          (next.participantListVisible !== prev.participantListVisible ||
+            next.audienceAnonymous !== prev.audienceAnonymous)
+        ) {
+          next.nicknamesEnabled =
+            (props.template?.nicknamesEnabled ?? false) || nicknamePredefinito(next);
+        }
         return 'moderators' in patch || 'speakers' in patch ? conSceltePulite(next) : next;
       });
     },
-    [conSceltePulite],
+    [
+      conSceltePulite,
+      destinazioneScelta,
+      initial,
+      paginaScelta,
+      props.publicRegistrationEnabled,
+      props.template?.nicknamesEnabled,
+      viaToken,
+    ],
   );
   // Il passo «Programma», quando si apre, dice quanti argomenti hanno perso
   // chi interviene da quando lo si e' visto l'ultima volta: il confronto e'
@@ -1300,6 +1524,7 @@ export default function EventWizard(props: WizardProps) {
       if (!dati || typeof at !== 'number' || Date.now() - at > TRASLOCO_VALIDO_MS) return;
       traslocoRef.current = true;
       if (dati.participantListVisible !== undefined) elencoSceltoRef.current = true;
+      if (dati.nicknamesEnabled !== undefined) nicknameSceltoRef.current = true;
       setForm((prima) => conDatiDellEvento(prima, dati));
       setTraslocoApplicato(true);
     } catch {
@@ -1319,7 +1544,12 @@ export default function EventWizard(props: WizardProps) {
       try {
         // Con le lingue toccate: riprendendo la bozza, solo quelle tornano
         // come le si era scritte (vedi restoreDraft).
-        const bozza: BozzaDelModulo = { ...form, lingueToccate: [...toccate] };
+        const bozza: BozzaDelModulo = {
+          ...form,
+          lingueToccate: [...toccate],
+          destinazioneScelta,
+          paginaScelta,
+        };
         localStorage.setItem(draftKey, JSON.stringify(bozza));
       } catch {
         /* quota / unavailable — best effort */
@@ -1328,7 +1558,7 @@ export default function EventWizard(props: WizardProps) {
     return () => {
       if (autosaveRef.current) clearTimeout(autosaveRef.current);
     };
-  }, [form, draftKey, toccate]);
+  }, [form, draftKey, toccate, destinazioneScelta, paginaScelta]);
 
   const savedDraftRef = useRef<{ key: string; form: Partial<BozzaDelModulo> } | null>(null);
   const [draftAvailable, setDraftAvailable] = useState(false);
@@ -1357,6 +1587,7 @@ export default function EventWizard(props: WizardProps) {
 
   const restoreDraft = useCallback(() => {
     elencoSceltoRef.current = true;
+    nicknameSceltoRef.current = true;
     const salvata = savedDraftRef.current;
     // Sopra il modulo di partenza, non al suo posto: una bozza salvata prima
     // che il modulo avesse un campo nuovo non lo lascerebbe vuoto.
@@ -1375,7 +1606,26 @@ export default function EventWizard(props: WizardProps) {
     // avere una traduzione piu' nuova di quella che la bozza ricorda. Una
     // bozza di prima, che non dice le lingue toccate, riporta le lingue che
     // cambia e che hanno un testo (mai una lingua svuotata).
-    const { lingueToccate, ...datiBozza } = salvata?.form ?? {};
+    const {
+      lingueToccate,
+      destinazioneScelta: destinazioneDellaBozza,
+      paginaScelta: paginaDellaBozza,
+      ...datiBozza
+    } = salvata?.form ?? {};
+    // Una proposta ripresa resta una proposta. Una bozza di prima non lo dice:
+    // conta come scelta solo cio' che si allontana dai valori di partenza.
+    setDestinazioneScelta(
+      mode === 'edit' ||
+        !!props.destinazioneScelta ||
+        (destinazioneDellaBozza ??
+          (datiBozza.recordingDestination !== undefined &&
+            datiBozza.recordingDestination !== initial.recordingDestination)),
+    );
+    setPaginaScelta(
+      paginaDellaBozza ??
+        (datiBozza.postEventPublic !== undefined &&
+          datiBozza.postEventPublic !== initial.postEventPublic),
+    );
     const testiBozza = (prima: WizardForm) => {
       const titoli = (datiBozza.title ?? {}) as Record<string, string>;
       const descrizioni = (datiBozza.description ?? {}) as Record<string, string>;
@@ -1415,7 +1665,23 @@ export default function EventWizard(props: WizardProps) {
           ? { title: testiBozza(prima).title, description: testiBozza(prima).description }
           : {}),
         ...(viaToken !== null
-          ? { accessMode: prima.accessMode, hostsAlwaysRecorded: prima.hostsAlwaysRecorded }
+          ? {
+              accessMode: prima.accessMode,
+              hostsAlwaysRecorded: prima.hostsAlwaysRecorded,
+              recordingDestination: prima.recordingDestination,
+              offerAddressBook: prima.offerAddressBook,
+              postEventShowQA: prima.postEventShowQA,
+            }
+          : {}),
+        // Una bozza non toglie una destinazione dichiarata, e non la allarga
+        // dopo l'apertura della sala: il server rifiuterebbe il salvataggio.
+        ...(datiBozza.recordingDestination == null ||
+        !puoCambiareDestinazione(
+          initialEvent?.event.recordingDestination,
+          datiBozza.recordingDestination,
+          !!initialEvent?.salaGiaAperta,
+        )
+          ? { recordingDestination: prima.recordingDestination }
           : {}),
         ...((risposte?.pre ?? 0) > 0 ? { preEventQuestionnaire: prima.preEventQuestionnaire } : {}),
         ...((risposte?.post ?? 0) > 0 ? { postEventQuestionnaire: prima.postEventQuestionnaire } : {}),
@@ -1433,7 +1699,17 @@ export default function EventWizard(props: WizardProps) {
       /* ignore */
     }
     setDraftAvailable(false);
-  }, [draftKey, viaToken, initialEvent, conSceltePulite, tocca, props.defaultLocale]);
+  }, [
+    draftKey,
+    viaToken,
+    initialEvent,
+    initial,
+    mode,
+    conSceltePulite,
+    tocca,
+    props.defaultLocale,
+    props.destinazioneScelta,
+  ]);
   const dismissDraft = useCallback(() => {
     try {
       const salvata = savedDraftRef.current;
@@ -1468,7 +1744,7 @@ export default function EventWizard(props: WizardProps) {
   const goNext = () => {
     if (caricamentiInViaggio > 0) return;
     if (fermaSeInSospeso()) return;
-    const errs = validateStep(activeStep, form, props.defaultLocale, retentionMax);
+    const errs = controllaPasso(activeStep);
     if (Object.keys(errs).length > 0) {
       chiaviClientRef.current = new Set(Object.keys(errs));
       fuocoRichiestoRef.current = true;
@@ -1521,11 +1797,49 @@ export default function EventWizard(props: WizardProps) {
     form,
     props.publicRegistrationEnabled ?? true
   );
+  // Un evento su invito che registra: se il video resta pubblico lo si dice, e
+  // se il modello lo proponeva pubblico ed e' riservato senza una scelta anche,
+  // sia che sia tornato tale nel modulo sia che sia partito cosi'.
+  let notaDestinazione: NotaDestinazione | null = null;
+  if (
+    viaToken === null &&
+    !istantanea &&
+    !iscrizioneAperta &&
+    form.recordingEnabled &&
+    recordingAvailable &&
+    videoDaDestinare(props.partecipantiNelVideo)
+  ) {
+    if (form.recordingDestination === 'PUBLIC') {
+      // Con la pagina privata il video non lo vede nessuno: lo dice notaPagina.
+      if (form.postEventPublic) notaDestinazione = 'recordingDestinationPublicOnInvitation';
+    } else if (!destinazioneScelta && props.template?.recordingDestination === 'PUBLIC') {
+      notaDestinazione = 'recordingDestinationReservedOnInvitation';
+    }
+  }
+  // La pagina dopo l'evento: se si e' mossa da sola lo si dice, e se resta privata
+  // con un video pubblico anche, perche' quel video non lo vedrebbe nessuno.
+  let notaPagina: NotaPagina | null = null;
+  if (viaToken === null && !istantanea) {
+    const paginaDiPartenza =
+      mode === 'edit' ? initial.postEventPublic : (props.template?.postEventPublic ?? true);
+    if (
+      videoPubblico(form) &&
+      !form.postEventPublic &&
+      !registrazioneVuota(form, props.partecipantiNelVideo, recordingAvailable)
+    ) {
+      notaPagina = 'postEventPagePrivateVideoHidden';
+    } else if (!paginaScelta && form.postEventPublic !== paginaDiPartenza) {
+      if (form.postEventPublic) notaPagina = 'postEventPagePublicWithVideo';
+      else if (iscrizioneAperta) notaPagina = 'postEventPageStaysPrivate';
+      else notaPagina = 'postEventPagePrivateOnInvitation';
+    }
+  }
 
   // Cio' che manca ancora: la barra lo dice per passo, il riepilogo per campo.
   const mancanti = useMemo(
-    () => campiMancanti(form, props.defaultLocale, retentionMax, mode === 'create'),
-    [form, props.defaultLocale, retentionMax, mode]
+    () =>
+      campiMancanti(form, props.defaultLocale, retentionMax, mode === 'create', chiedeDestinazione),
+    [form, props.defaultLocale, retentionMax, mode, chiedeDestinazione]
   );
   // Al campo che manca: si apre il suo passo e, appena e' sullo schermo, il
   // fuoco va su di lui.
@@ -1576,6 +1890,7 @@ export default function EventWizard(props: WizardProps) {
       const dati = datiCambiati(form, initial);
       // Non scelto da nessuno: lo decide il formato nuovo.
       if (!elencoSceltoRef.current) delete dati.participantListVisible;
+      if (!nicknameSceltoRef.current) delete dati.nicknamesEnabled;
       if (Object.keys(dati).length > 0) {
         localStorage.setItem(TRASLOCO_KEY, JSON.stringify({ at: Date.now(), dati }));
       }
@@ -1604,14 +1919,17 @@ export default function EventWizard(props: WizardProps) {
    * dove correggere. Resta, dentro una frase localizzata, solo per gli errori
    * che nessun campo del wizard sa mostrare.
    */
+  const testoRisposta = useCallback(
+    (err: { error?: string; message?: string; code?: string }, status: number): string =>
+      messaggioErroreApi(status, tErr, err.error ?? err.message ?? `HTTP ${status}`, {}, err.code),
+    [tErr]
+  );
   const serverErrorMessage = useCallback(
     (
-      err: { error?: string; message?: string; details?: unknown },
+      err: { error?: string; message?: string; code?: string; details?: unknown },
       status: number
     ): string => {
-      if (!Array.isArray(err.details)) {
-        return err.error ?? err.message ?? `HTTP ${status}`;
-      }
+      if (!Array.isArray(err.details)) return testoRisposta(err, status);
       const mapped = mapServerIssues(err.details, props.defaultLocale);
       chiaviClientRef.current = new Set();
       fuocoRichiestoRef.current = true;
@@ -1629,7 +1947,7 @@ export default function EventWizard(props: WizardProps) {
       }
       return parti.join('\n');
     },
-    [props.defaultLocale, t]
+    [props.defaultLocale, t, testoRisposta]
   );
 
   /**
@@ -1650,10 +1968,7 @@ export default function EventWizard(props: WizardProps) {
       // Validate every step before submitting (especially on publish).
       const aggregated: Record<string, string> = {};
       for (const key of STEP_KEYS) {
-        Object.assign(
-          aggregated,
-          validateStep(key, form, props.defaultLocale, retentionMax)
-        );
+        Object.assign(aggregated, controllaPasso(key));
       }
       if (submitMode === 'publish') {
         Object.assign(aggregated, validatePublish(form));
@@ -1669,13 +1984,12 @@ export default function EventWizard(props: WizardProps) {
         // suoi (altrimenti il messaggio resta senza campo evidenziato).
         const firstFailing = STEP_KEYS.find(
           (k) =>
-            Object.keys(validateStep(k, form, props.defaultLocale, retentionMax)).length >
-              0 ||
+            Object.keys(controllaPasso(k)).length > 0 ||
             (k === 'invites' && !!(aggregated.moderatorName || aggregated.moderatorEmail))
         );
         if (firstFailing) {
           if (firstFailing === 'advanced')
-            apriSezione(sezioniDegliErrori(Object.keys(validateStep('advanced', form, props.defaultLocale, retentionMax))));
+            apriSezione(sezioniDegliErrori(Object.keys(controllaPasso('advanced'))));
           setActiveStep(firstFailing);
         }
         return;
@@ -1699,6 +2013,14 @@ export default function EventWizard(props: WizardProps) {
         // Il testo mandato delle lingue toccate: dopo il salvataggio restano
         // toccate solo quelle cambiate di nuovo mentre la richiesta viaggiava.
         const testiMandati = { title: { ...form.title }, description: { ...form.description } };
+        // Il catalogo: in creazione la scelta di partenza, in modifica solo se
+        // cambiato, e mai con un link di conduzione.
+        const catalogoInviato = catalogoDaSalvare(
+          form,
+          mode === 'edit' ? catalogoSalvatoRef.current : null,
+          viaToken !== null,
+          props.modelliCatalogo
+        );
         const payload: Record<string, unknown> = {
           title: form.title,
           description: form.description,
@@ -1731,10 +2053,15 @@ export default function EventWizard(props: WizardProps) {
           // Senza sottotitoli non c'e' niente da trascrivere.
           captionsTranscriptEnabled: form.liveCaptionsEnabled && form.captionsTranscriptEnabled,
           autoStartRecording: form.recordingEnabled && form.autoStartRecording,
-          audienceAnonymous: form.audienceAnonymous,
           participantListVisible: form.participantListVisible,
-          // Una dichiarazione di chi organizza: un link di conduzione non la cambia.
-          hostsAlwaysRecorded: viaToken !== null ? undefined : form.hostsAlwaysRecorded,
+          nicknamesEnabled: form.nicknamesEnabled,
+          // I valori del formato: destinazione, rubrica, nomi del pubblico, chi
+          // conduce e domande dopo l'evento.
+          ...campiDaSalvare(
+            form,
+            initialEvent ? campiDaEvento(initialEvent.event) : null,
+            viaToken !== null,
+          ),
 
           // Postprod AI — subordinate al recording (server-side resta
           // un'invariante: senza recordingEnabled non c'è transcript).
@@ -1778,6 +2105,17 @@ export default function EventWizard(props: WizardProps) {
             mode === 'edit' && form.dataRetentionDays === initialRetention
               ? undefined
               : form.dataRetentionDays,
+          // La durata della registrazione la sceglie chi organizza: mai con un
+          // link di conduzione, e in modifica solo se cambiata qui (la cambia
+          // anche il pannello della registrazione). Una bozza di prima non ce
+          // l'ha: nessuna durata.
+          recordingDeleteAfterDays:
+            viaToken !== null ||
+            (mode === 'edit' &&
+              (form.recordingDeleteAfterDays ?? null) ===
+                (initialEvent?.event.recordingDeleteAfterDays ?? null))
+              ? undefined
+              : (form.recordingDeleteAfterDays ?? null),
           gdprTemplateId: form.gdprTemplateId,
           // In modifica solo se cambiato qui: la pagina dell'evento ha il suo
           // interruttore, e un salvataggio del wizard non deve rimettere un
@@ -1815,6 +2153,8 @@ export default function EventWizard(props: WizardProps) {
           requireOrganization: form.requireOrganization,
           requireOrganizationRole: form.requireOrganizationRole,
           requireOrganizationType: form.requireOrganizationType,
+
+          ...catalogoInviato,
         };
 
         // ── Edit mode: PUT the event, diff-based fan-out, then redirect
@@ -1836,6 +2176,12 @@ export default function EventWizard(props: WizardProps) {
           if (!putRes.ok) {
             const err = await putRes.json().catch(() => ({}));
             throw new Error(serverErrorMessage(err, putRes.status));
+          }
+          if (catalogoSalvatoRef.current) {
+            catalogoSalvatoRef.current = catalogoDopoIlSalvataggio(
+              catalogoSalvatoRef.current,
+              catalogoInviato
+            );
           }
           // Il testo salvato e' ora quello del modulo: le lingue mandate non
           // sono piu' «toccate» (il server ha il loro testo, e una traduzione
@@ -2074,10 +2420,9 @@ export default function EventWizard(props: WizardProps) {
             const err = (await pubRes.json().catch(() => ({}))) as {
               error?: string;
               message?: string;
+              code?: string;
             };
-            publishProblem = {
-              reason: err.error ?? err.message ?? `HTTP ${pubRes.status}`,
-            };
+            publishProblem = { reason: testoRisposta(err, pubRes.status) };
           }
         }
 
@@ -2134,20 +2479,22 @@ export default function EventWizard(props: WizardProps) {
       fermaAutosalvataggio,
       viaToken,
       props.defaultLocale,
+      props.modelliCatalogo,
       t,
       tc,
       tDetail,
       mode,
       initialEvent,
       initialRetention,
-      retentionMax,
       showError,
       serverErrorMessage,
+      testoRisposta,
       toccate,
       ricaricaLingue,
       scartaLetture,
       caricamentiInViaggio,
       fermaSeInSospeso,
+      controllaPasso,
     ]
   );
 
@@ -2221,6 +2568,10 @@ export default function EventWizard(props: WizardProps) {
             className="btn btn-sm btn-outline-secondary"
             onClick={() => {
               setForm(initial);
+              elencoSceltoRef.current = mode === 'edit';
+              nicknameSceltoRef.current = mode === 'edit';
+              setDestinazioneScelta(mode === 'edit' || !!props.destinazioneScelta);
+              setPaginaScelta(false);
               setTraslocoApplicato(false);
             }}
           >
@@ -2235,7 +2586,20 @@ export default function EventWizard(props: WizardProps) {
           <span>
             {props.formatoLabel
               ? t.rich('flow.formatInUse', {
-                  name: props.formatoLabel,
+                  name:
+                    props.etichettaFormato?.({
+                      registra:
+                        !form.recordingEnabled ||
+                        registrazioneVuota(form, props.partecipantiNelVideo, recordingAvailable)
+                          ? 'no'
+                          : form.recordingDestination === 'PUBLIC'
+                            ? 'pubblica'
+                            : 'riservata',
+                      invitati: !publicRegistrationFor(
+                        form,
+                        props.publicRegistrationEnabled ?? true,
+                      ),
+                    }) ?? props.formatoLabel,
                   b: (c) => <strong>{c}</strong>,
                 })
               : props.template
@@ -2368,11 +2732,15 @@ export default function EventWizard(props: WizardProps) {
                     requireOrganization={form.requireOrganization}
                     requireOrganizationRole={form.requireOrganizationRole}
                     requireOrganizationType={form.requireOrganizationType}
+                    offerAddressBook={form.offerAddressBook}
+                    rubricaAttiva={props.addressBookEnabled ?? true}
                     onChange={updateForm}
                     siteOpen={props.publicRegistrationEnabled ?? true}
                     invitati={form.invitations.length}
                     bloccato={viaToken !== null}
                     iniziale={initial.accessMode}
+                    notaDestinazione={notaDestinazione}
+                    notaPagina={notaPagina}
                     elencoInvitati={
                       <InvitationsSection
                         value={form.invitations}
@@ -2444,7 +2812,7 @@ export default function EventWizard(props: WizardProps) {
             </p>
             <StepPermissions
               parte="partecipazione"
-              soloAscoltoBloccato={mode === 'edit' && !!props.salaAperta}
+              soloAscoltoBloccato={salaBloccata}
               programma={
                 istantanea
                   ? undefined
@@ -2458,7 +2826,8 @@ export default function EventWizard(props: WizardProps) {
               fieldErrors={fieldErrors}
               whiteboardInfraReady={props.whiteboardInfraReady}
               liveCaptionsAvailable={props.liveCaptionsAvailable ?? false}
-              recordingAvailable={props.recordingAvailable ?? true}
+              recordingAvailable={recordingAvailable}
+              partecipantiNelVideo={props.partecipantiNelVideo}
               aiPipelineEnabled={props.aiPipelineEnabled ?? true}
               editing={mode === 'edit'}
             />
@@ -2476,10 +2845,17 @@ export default function EventWizard(props: WizardProps) {
             mancanti={mancanti}
             aiPipelineEnabled={props.aiPipelineEnabled ?? true}
             liveCaptionsAvailable={props.liveCaptionsAvailable ?? false}
-            recordingAvailable={props.recordingAvailable ?? true}
-            voceNelVideo={props.voceNelVideo}
+            recordingAvailable={recordingAvailable}
+            partecipantiNelVideo={props.partecipantiNelVideo}
             istantanea={istantanea}
+            addressBookEnabled={props.addressBookEnabled ?? true}
+            chiedeDestinazione={chiedeDestinazione}
+            destinazioneSenzaScelta={destinazioneSenzaScelta}
+            pubblicoDopo={pubblicoDopo}
+            onCambiaDestinazione={viaToken === null ? () => vai('advanced', 'recording') : undefined}
             iscrizioneAperta={istantanea ? undefined : iscrizioneAperta}
+            notaDestinazione={notaDestinazione}
+            notaPagina={notaPagina}
             onVaiPersone={() => vai('invites')}
             onVaiProgramma={istantanea ? undefined : () => vai('programme')}
             programmaInCreazione={mode === 'create'}
@@ -2513,10 +2889,23 @@ export default function EventWizard(props: WizardProps) {
                   onChange={updateForm}
                   fieldErrors={fieldErrors}
                   whiteboardInfraReady={props.whiteboardInfraReady}
-                  recordingAvailable={props.recordingAvailable ?? true}
-                  voceNelVideo={props.voceNelVideo}
+                  recordingAvailable={recordingAvailable}
+                  partecipantiNelVideo={props.partecipantiNelVideo}
                   istantanea={istantanea}
                   puoDichiarareChiConduce={viaToken === null}
+                  destinazioneDopo={destinazioneDopoIlSalvataggio(form, destinazioneSenzaScelta)}
+                  salaGiaAperta={!!initialEvent?.salaGiaAperta}
+                  destinazione={
+                    viaToken === null && !istantanea
+                      ? {
+                          iniziale: initial.recordingDestination,
+                          salaGiaAperta: !!initialEvent?.salaGiaAperta,
+                          chiesta: chiedeDestinazione,
+                          nota: notaDestinazione,
+                          notaPagina,
+                        }
+                      : undefined
+                  }
                   liveCaptionsAvailable={props.liveCaptionsAvailable ?? false}
                   aiPipelineEnabled={props.aiPipelineEnabled ?? true}
                   onCambiaLingue={() =>
@@ -2526,7 +2915,7 @@ export default function EventWizard(props: WizardProps) {
                   showAutoStart={
                     mode === 'edit' && !!initialEvent?.event.autoStartRecording
                   }
-                  soloAscoltoBloccato={mode === 'edit' && !!props.salaAperta}
+                  soloAscoltoBloccato={salaBloccata}
                 />
               ),
               content: (
@@ -2567,16 +2956,39 @@ export default function EventWizard(props: WizardProps) {
                   fieldErrors={fieldErrors}
                   retentionMax={retentionMax}
                   onUploadBusy={segnalaCaricamento}
+                  domandeDopoEvento={viaToken === null}
+                  durataRegistrazione={viaToken === null}
+                  destinazioneSenzaScelta={destinazioneSenzaScelta}
+                  pubblicoDopo={pubblicoDopo}
                 />
               ),
               technical: (
-                <SezioneTecnica
-                  form={form}
-                  onChange={updateForm}
-                  capacita={props.capacita}
-                  onCambiaQualita={() => apriSezione('room')}
-                  errorePartecipanti={!!fieldErrors.maxParticipants}
-                />
+                <>
+                  <SezioneTecnica
+                    form={form}
+                    onChange={updateForm}
+                    capacita={props.capacita}
+                    onCambiaQualita={() => apriSezione('room')}
+                    errorePartecipanti={!!fieldErrors.maxParticipants}
+                  />
+                  {/* Il catalogo si corregge in modifica, dallo staff: le
+                      chiamate rapide e gli archivi importati sono tipi a se'. */}
+                  {mode === 'edit' &&
+                    viaToken === null &&
+                    props.modelliCatalogo &&
+                    initialEvent &&
+                    (initialEvent.event.eventType ?? 'SCHEDULED') === 'SCHEDULED' && (
+                      <CampoCatalogo
+                        value={form}
+                        onChange={updateForm}
+                        modelli={props.modelliCatalogo}
+                        salvato={{
+                          templateId: initialEvent.event.templateId ?? null,
+                          templateName: initialEvent.event.templateName ?? null,
+                        }}
+                      />
+                    )}
+                </>
               ),
             }}
           />
@@ -2799,6 +3211,8 @@ function idDelCampo(key: string, defaultLocale: string): string | null {
       return 'ev-lingue-cambia';
     case 'dataRetentionDays':
       return 'rev-retention';
+    case 'recordingDestination':
+      return 'wiz-destinazione';
     default:
       return null;
   }

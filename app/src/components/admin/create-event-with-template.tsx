@@ -8,18 +8,24 @@ import { useTranslations } from 'next-intl';
 
 import { useRouter, percorso } from '@/i18n/navigation';
 import GuidedFormat from '@/components/admin/guided-format';
-import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import type { PartecipantiNelVideo } from '@/lib/live/consent-rule';
+import { videoDaDestinare } from '@/lib/recording/destination';
 import TemplatePicker from '@/components/admin/template-picker';
+import { classeDaFormato } from '@/lib/events/catalog';
 import {
-  FORMATO_PREDEFINITO,
+  classeFormato,
   codificaFormato,
   decodificaFormato,
+  formatoConAccesso,
   formatoPossibile,
+  formatoPredefinito,
   presetDaFormato,
+  registrazioneProponibile,
+  trascriveSenzaRegistrare,
   type FormatoGuidato,
+  type FormatoRegistra,
 } from '@/lib/events/guided-format';
-import EventWizard from '@/components/admin/event-wizard/wizard-shell';
-import type { PermissionMatrix } from '@/lib/utils/permission-matrix';
+import EventWizard, { type WizardTemplatePreset } from '@/components/admin/event-wizard/wizard-shell';
 import CreateInstantCall from '@/components/admin/create-instant-call';
 import type { CapacitaIstanza } from '@/lib/capacity/model';
 import type { VideoQualityPreset } from '@/lib/jitsi/config';
@@ -39,39 +45,9 @@ interface TemplateSummary {
   maxParticipants: number;
 }
 
-interface TemplatePreset {
-  id: string;
-  name: string;
-  qaEnabled: boolean;
-  chatEnabled: boolean;
-  recordingEnabled: boolean;
-  autoStartRecording: boolean;
-  agendaEnabled?: boolean;
-  wordCloudEnabled?: boolean;
-  whiteboardEnabled?: boolean;
-  liveCaptionsEnabled?: boolean;
-  waitingRoomEngine?: 'GARDEN' | 'GAME' | 'CLASSIC' | null;
-  participantsCanUnmute: boolean;
-  participantsCanStartVideo: boolean;
-  participantsCanShareScreen: boolean;
-  maxParticipants: number;
-  permissionMatrix?: PermissionMatrix | null;
-  defaultDurationMinutes?: number | null;
-  aiTranscriptEnabled?: boolean;
-  aiSummaryEnabled?: boolean;
-  aiTranslationEnabled?: boolean;
-  aiDubbingEnabled?: boolean;
-  multitrackRecordingEnabled?: boolean;
-  retainParticipantTracks?: boolean;
-  aiTargetLocales?: string | null;
-  descriptionTemplate?: Record<string, string> | null;
-  defaultRetentionDays?: number | null;
-  defaultExpectedSpeakers?: number | null;
-}
-
 interface Props {
   templates: TemplateSummary[];
-  selectedTemplate: TemplatePreset | null;
+  selectedTemplate: WizardTemplatePreset | null;
   siteTimezone: string;
   enabledLocales: string[];
   defaultLocale: string;
@@ -89,7 +65,7 @@ interface Props {
   /** I sottotitoli live ci sono nell'installazione (lib/captions/availability). */
   liveCaptionsAvailable?: boolean;
   recordingAvailable?: boolean;
-  voceNelVideo?: VoceNelVideo;
+  partecipantiNelVideo?: PartecipantiNelVideo;
   defaultTargetLocales?: string | null;
   /** La post-produzione AI e' accesa sull'installazione. */
   aiPipelineEnabled?: boolean;
@@ -100,6 +76,8 @@ interface Props {
   defaultModerator?: { name: string; email: string } | null;
   /** L'iscrizione pubblica dell'installazione: vedi il passo «Persone». */
   publicRegistrationEnabled?: boolean;
+  /** La rubrica dell'installazione: vedi il passo «Persone». */
+  addressBookEnabled?: boolean;
   /** Apre direttamente il modulo della chiamata rapida (dal pulsante della
    *  lista eventi), senza passare dalla scelta del modello. */
   initialInstant?: boolean;
@@ -125,25 +103,32 @@ export default function CreateEventWithTemplate({
   siteDefaultVideoQuality,
   whiteboardInfraReady,
   liveCaptionsAvailable = false,
-  recordingAvailable = true,
-  voceNelVideo,
+  recordingAvailable: installazioneRegistra = true,
+  partecipantiNelVideo,
   defaultTargetLocales = null,
   aiPipelineEnabled = true,
   textTranslationAvailable = false,
   isSiteAdmin = false,
   defaultModerator = null,
   publicRegistrationEnabled = true,
+  addressBookEnabled = true,
   initialInstant = false,
   formatoParam = null,
   scegliParam = null,
 }: Props) {
   const tg = useTranslations('admin.guided');
   const router = useRouter();
+  const recordingAvailable = registrazioneProponibile(
+    installazioneRegistra,
+    partecipantiNelVideo,
+    aiPipelineEnabled,
+  );
   const [showInstant, setShowInstant] = useState(initialInstant);
   const [modelliAperti, setModelliAperti] = useState(false);
   // Le quattro risposte nell'indirizzo: aprono il wizard con i loro valori.
   const letto = selectedTemplate ? null : decodificaFormato(formatoParam);
-  const formato: FormatoGuidato | null = letto && formatoPossibile(letto, recordingAvailable);
+  const formato: FormatoGuidato | null =
+    letto && formatoPossibile(letto, recordingAvailable, videoDaDestinare(partecipantiNelVideo));
 
   if (showInstant) {
     return (
@@ -163,6 +148,9 @@ export default function CreateEventWithTemplate({
   const wizard = (props: {
     template: React.ComponentProps<typeof EventWizard>['template'];
     formatoLabel?: string;
+    etichettaFormato?: React.ComponentProps<typeof EventWizard>['etichettaFormato'];
+    destinazioneScelta?: boolean;
+    catalogo: React.ComponentProps<typeof EventWizard>['catalogo'];
     onChangeTemplate: (stato: { invitati: boolean }) => void;
   }) => (
     <EventWizard
@@ -171,6 +159,9 @@ export default function CreateEventWithTemplate({
       key={props.template?.id ?? 'vuoto'}
       template={props.template}
       formatoLabel={props.formatoLabel}
+      etichettaFormato={props.etichettaFormato}
+      destinazioneScelta={props.destinazioneScelta}
+      catalogo={props.catalogo}
       onChangeTemplate={props.onChangeTemplate}
       siteTimezone={siteTimezone}
       enabledLocales={enabledLocales}
@@ -186,13 +177,14 @@ export default function CreateEventWithTemplate({
       whiteboardInfraReady={whiteboardInfraReady}
       liveCaptionsAvailable={liveCaptionsAvailable}
       recordingAvailable={recordingAvailable}
-      voceNelVideo={voceNelVideo}
+      partecipantiNelVideo={partecipantiNelVideo}
       defaultTargetLocales={defaultTargetLocales}
       aiPipelineEnabled={aiPipelineEnabled}
       textTranslationAvailable={textTranslationAvailable}
       isSiteAdmin={isSiteAdmin}
       defaultModerator={defaultModerator}
       publicRegistrationEnabled={publicRegistrationEnabled}
+      addressBookEnabled={addressBookEnabled}
     />
   );
 
@@ -200,13 +192,15 @@ export default function CreateEventWithTemplate({
   if (selectedTemplate) {
     return wizard({
       template: selectedTemplate,
+      // Il catalogo: il modello (la famiglia la ricava il server dal modello).
+      catalogo: { templateId: selectedTemplate.id, formatClass: null },
       // Le domande ripartono dai loro valori, ma con chi partecipa come lo si
       // vede ora: una scelta «solo su invito» non si perde cambiando modello.
       onChangeTemplate: ({ invitati }) =>
         router.push(
           percorso(
             invitati
-              ? `/admin/events/new?scegli=${codificaFormato({ ...FORMATO_PREDEFINITO, accesso: 'invitati' })}`
+              ? `/admin/events/new?scegli=${codificaFormato(formatoPredefinito('invitati'))}`
               : '/admin/events/new',
           ),
         ),
@@ -216,21 +210,43 @@ export default function CreateEventWithTemplate({
   // Le quattro risposte: il wizard parte dai loro valori, e «Cambia formato»
   // riporta alle domande con le risposte gia' date.
   if (formato) {
-    const nome = [
-      tg(`summary.${formato.persone}`),
-      tg(`summary.${formato.voce}`),
-      tg(`summary.${formato.registra}`),
-      tg(formato.accesso === 'invitati' ? 'summary.inviteOnly' : 'summary.openAccess'),
-    ].join(' · ');
+    const etichetta = ({ registra, invitati }: { registra: FormatoRegistra; invitati: boolean }) =>
+      [
+        tg(`summary.${formato.persone}`),
+        tg(`summary.${formato.voce}`),
+        tg(`summary.${registra}`),
+        tg(invitati ? 'summary.inviteOnly' : 'summary.openAccess'),
+      ].join(' · ');
+    const nome = etichetta({
+      registra: formato.registra,
+      invitati: formato.accesso === 'invitati',
+    });
     return wizard({
-      template: presetDaFormato(formato, nome, publicRegistrationEnabled),
+      template: presetDaFormato(
+        formato,
+        nome,
+        publicRegistrationEnabled,
+        trascriveSenzaRegistrare(
+          installazioneRegistra,
+          partecipantiNelVideo,
+          aiPipelineEnabled,
+          liveCaptionsAvailable,
+        ),
+      ),
       formatoLabel: nome,
+      etichettaFormato: etichetta,
+      // Il catalogo: la famiglia delle risposte, senza modello.
+      catalogo: { templateId: null, formatClass: classeDaFormato(classeFormato(formato)) },
+      // Su invito le domande propongono riservata: un video pubblico e' una
+      // risposta data a mano.
+      destinazioneScelta: formato.accesso === 'invitati' && formato.registra === 'pubblica',
       // Chi partecipa come lo si vede ora: cambiato nel passo «Persone», le
-      // domande lo mostrano cosi'.
+      // domande lo mostrano cosi'. Il passaggio agli inviti non porta con se' un
+      // video pubblico che nessuno ha scelto per loro.
       onChangeTemplate: ({ invitati }) =>
         router.push(
           percorso(
-            `/admin/events/new?scegli=${codificaFormato({ ...formato, accesso: invitati ? 'invitati' : 'tutti' })}`,
+            `/admin/events/new?scegli=${codificaFormato(formatoConAccesso(formato, invitati ? 'invitati' : 'tutti'))}`,
           ),
         ),
     });
@@ -244,6 +260,8 @@ export default function CreateEventWithTemplate({
           aiPipelineEnabled={aiPipelineEnabled}
           liveCaptionsAvailable={liveCaptionsAvailable}
           recordingAvailable={recordingAvailable}
+          partecipantiNelVideo={partecipantiNelVideo}
+          addressBookAvailable={addressBookEnabled}
           onContinue={(f) => router.push(percorso(`/admin/events/new?formato=${codificaFormato(f)}`))}
           // Il modello si sceglie prima di rispondere, non dopo: un'azione
           // accanto al titolo. La videochiamata istantanea non sta qui: ha il
@@ -267,6 +285,7 @@ export default function CreateEventWithTemplate({
               <p className="text-secondary small mb-3">{tg('templateReplaces')}</p>
               <TemplatePicker
                 showSubtitle={false}
+                registrazioneProponibile={recordingAvailable}
                 templates={templates}
                 onSelect={(tpl) => {
                   router.push(percorso(`/admin/events/new?template=${tpl.id}`));

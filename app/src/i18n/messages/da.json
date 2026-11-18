@@ -142,10 +142,7 @@
       "votes": "{count, plural, =0 {ingen stemmer} one {1 stemme} other {# stemmer}}",
       "topWords": "Mest delte ord",
       "feedback": "Gennemsnitlig bedømmelse",
-      "feedbackCount": "{count, plural, one {1 svar} other {# svar}}",
-      "chatQuestions": "Spørgsmål fra chatten",
-      "reactionsCount": "{count, plural, one {1 reaktion} other {# reaktioner}}",
-      "answered": "besvaret"
+      "feedbackCount": "{count, plural, one {1 svar} other {# svar}}"
     },
     "detail": {
       "title": "Begivenhedsdetaljer",
@@ -191,7 +188,7 @@
       },
       "chatNotSaved": "Chatbeskeder offentliggøres ikke efter begivenheden: de slettes sammen med begivenhedens øvrige data.",
       "qaPostEvent": "Q&A fra begivenheden",
-      "peakParticipants": "Højeste antal: {count} deltagere",
+      "peakParticipants": "{count, plural, one {Højeste antal: # deltager} other {Højeste antal: # deltagere}}",
       "calendar": {
         "addToCalendar": "Tilføj til kalender",
         "google": "Google Calendar",
@@ -202,11 +199,13 @@
       "registrationEnded": "Begivenheden er afsluttet: tilmeldingen er lukket.",
       "joinAsGuest": "Deltag som gæst",
       "registeredUseEmailLink": "Allerede tilmeldt? Brug det personlige link fra din e-mail.",
-      "willBeRecorded": "Arrangementet bliver optaget.",
+      "willBeRecorded": "Arrangementet kan blive optaget.",
       "machineTranslation": "Automatisk oversættelse",
       "machineTranslationNote": "Titel og beskrivelse er oversat af en automatisk model, og ingen har gennemlæst dem endnu.",
       "previewTitle": "Forhåndsvisning for teamet",
       "previewBody": "Optagelsen er endnu ikke offentliggjort: kun dem, der administrerer begivenheden, ser denne version af siden.",
+      "previewBodyPageHidden": "Denne side er ikke synlig for offentligheden: hvis man åbner adressen, finder man den ikke. Kun dem, der administrerer begivenheden, kan se den.",
+      "previewBodyPageRegistrants": "Denne side er ikke synlig for offentligheden: hvis man åbner adressen, finder man den ikke. Kun de tilmeldte til begivenheden og dem, der administrerer den, kan se siden.",
       "recordingForRegistrantsTitle": "Optagelse kun for tilmeldte",
       "recordingForRegistrantsBody": "Hvis du tilmeldte dig begivenheden, så åbn det personlige link i e-mailen \"optagelse tilgængelig\", eller få det sendt igen.",
       "recordingLinkEmailLabel": "E-mail, du tilmeldte dig med",
@@ -243,8 +242,8 @@
     "namePlaceholder": "Dit navn vises i begivenhedsrummet",
     "email": "E-mail",
     "emailPlaceholder": "Du modtager adgangslinket til begivenheden",
-    "gdprConsent": "Jeg giver samtykke til behandling af mine personoplysninger (navn, e-mail) i henhold til EU-forordning 2016/679 (GDPR) med henblik på deltagelse i denne begivenhed.",
-    "consentsLegend": "Samtykker",
+    "gdprConsent": "Jeg har læst privatlivspolitikken om behandling af personoplysninger (navn, e-mail) med henblik på deltagelse i denne begivenhed.",
+    "consentsLegend": "Privatlivspolitik og samtykker",
     "requiredMark": "påkrævet",
     "optionalMark": "valgfrit",
     "gdprLink": "Læs den fulde privatlivspolitik",
@@ -292,12 +291,13 @@
       "emailRequired": "Indtast venligst din e-mail",
       "emailInvalid": "Indtast venligst en gyldig e-mail",
       "organizationRequired": "Indtast venligst din organisation",
-      "consentRequired": "Samtykke til databehandling er påkrævet",
+      "consentRequired": "For at tilmelde dig skal du bekræfte, at du har læst privatlivspolitikken",
       "recordingConsentRequired": "Samtykke til optagelse er påkrævet for denne begivenhed",
       "eventFull": "Begivenheden har nået det maksimale antal deltagere",
       "generic": "Fejl ved tilmelding. Prøv venligst igen.",
       "questionnaireRequired": "Besvar spørgsmålene i spørgeskemaet for at tilmelde dig.",
       "questionnaireIncomplete": "Besvar alle de obligatoriske spørgsmål i spørgeskemaet.",
+      "recordingDestinationChanged": "Teksten om optagelsen er blevet ændret, mens du udfyldte formularen: genindlæs siden, og læs den igen.",
       "questionnaireChanged": "Spørgeskemaet blev ændret, mens du udfyldte formularen: genindlæs siden, og svar igen."
     }
   },
@@ -363,7 +363,7 @@
       "publicHelpNone": "Siden for det afsluttede arrangement forbliver synlig, med titel og beskrivelse.",
       "sections": {
         "recap": "opsummeringen",
-        "qa": "spørgsmålene fra Q&A",
+        "qa": "teksten til spørgsmålene fra Q&A",
         "polls": "de offentliggjorte afstemninger",
         "wordCloud": "ordskyen",
         "materials": "materialerne",
@@ -424,6 +424,7 @@
       "noMessages": "Ingen beskeder endnu",
       "empty": "Ingen beskeder endnu. Skriv den første!",
       "inputLabel": "Chatbesked",
+      "personalDataNotice": "Skriv ikke andres personoplysninger og heller ikke dine egne, hvis du ikke ønsker, at de bliver kendt: de, der er i rummet, kan læse og downloade chatten.",
       "moderatorBadge": "Moderator",
       "attach": "Vedhæft en fil",
       "emojiPicker": "Indsæt emoji",
@@ -544,7 +545,9 @@
       "locksByConsent": "Mikrofoner og kameraer følger samtykket til optagelsen: de, der har givet det, bruger det, arrangementet tillader, de øvrige lytter kun. Rummets låse forbliver slået til.",
       "listenOnlyBadge": "lytter kun",
       "listenOnlyNoFloor": "Har ikke givet samtykke til optagelsen: kan ikke tale, før vedkommende giver det i sit rum.",
-      "voiceExcludedBadge": "uden optagelse",
+      "inVideoBadge": "i videoen",
+      "voiceRecordedBadge": "stemme optages",
+      "voiceExcludedBadge": "stemme optages ikke",
       "voiceExcludedFloor": "Har ikke givet samtykke til optagelsen: kan tale, men er ikke med i optagelsen."
     },
     "moderator": {
@@ -621,6 +624,7 @@
       "tab": "Styring",
       "recordingHeading": "Optagelse",
       "recordingOff": "Optager ikke",
+      "recordingNotOfferedInstant": "I hurtige opkald tilbydes optagelse kun, hvor den, der ikke giver samtykke, holdes uden for videoen, og denne installation kan ikke det.",
       "stopConfirm": "Stop optagelsen nu?",
       "featuresHeading": "Rummets funktioner",
       "featuresHelp": "De slås til og fra for alle, med det samme.",
@@ -681,33 +685,78 @@
       "confirm": "Træk tilbage",
       "working": "Opdaterer…",
       "error": "Samtykket kunne ikke opdateres: prøv igen.",
+      "textChanged": "Teksten til samtykket er ændret, efter at du åbnede siden: læs den nye tekst, og bekræft, hvis du er enig.",
+      "closeNotice": "Luk denne meddelelse: dine samtykker er stadig tilgængelige via knappen øverst",
       "recording": {
         "title": "Optagelse af arrangementet",
         "give": "Jeg giver samtykke til optagelsen",
         "without": {
           "soloAscolto": "Uden dette samtykke lytter du kun med: mikrofon, kamera og skærm forbliver lukket.",
-          "conduce": "Uden dette samtykke leder du stadig, men din stemme gemmes ikke i sporene pr. person eller i transskriptionen.",
-          "voce": "Uden dette samtykke deltager du som alle andre, men du er ikke med i optagelsen: hverken navn, stemme eller billede."
+          "conduce": "Uden dette samtykke leder du stadig.",
+          "voce": "Uden dette samtykke deltager du som alle andre, men din stemme er ikke med i optagelsen. Dit ansigt og dit navn vises under alle omstændigheder aldrig i videoen.",
+          "comeTutti": "Uden dette samtykke deltager du som alle andre."
         },
+        "withoutTranscriptHost": "Din stemme gemmes ikke i sporene pr. person eller i transskriptionen.",
         "alreadyRecorded": "Det, der allerede er optaget, forbliver i videoen af arrangementet: skriv til arrangørerne for at få det fjernet.",
         "withdraw": {
-          "soloAscolto": "Hvis du trækker det tilbage, bliver du i rummet og lytter kun med: mikrofon, kamera og skærm lukkes. Dit samtykke til transskription af dine indlæg trækkes også tilbage.",
-          "conduce": "Hvis du trækker det tilbage, leder du videre, men fra nu af gemmes din stemme ikke i sporene pr. person eller i transskriptionen. Videoen af rummet viser dig stadig, hvis den optages.",
-          "voce": "Hvis du trækker det tilbage, bliver du i rummet som før og er fra nu af ikke med i optagelsen. Du trækker også samtykket til transskription af dine indlæg tilbage."
-        }
+          "soloAscolto": "Hvis du trækker det tilbage, bliver du i rummet og lytter kun med: mikrofon, kamera og skærm lukkes.",
+          "conduce": "Hvis du trækker det tilbage, leder du videre. Videoen af rummet viser dig stadig, hvis den optages.",
+          "voce": "Hvis du trækker det tilbage, bliver du i rummet som før og er fra nu af ikke med i optagelsen.",
+          "avvertenza": "Hvis du trækker det tilbage, bliver du i rummet som før. Hvis du får ordet, og arrangementet optages, er din stemme dog stadig med i videoen.",
+          "assente": "Hvis du trækker det tilbage, bliver du i rummet som før. Fra nu af optages din stemme ikke på et separat spor."
+        },
+        "withdrawTranscript": "Du trækker også samtykket til transskription af dine indlæg tilbage.",
+        "withdrawTranscriptHost": "Fra nu af gemmes din stemme ikke i sporene pr. person eller i transskriptionen."
       },
       "transcription": {
         "title": "Transskription af dine indlæg",
         "give": "Jeg giver samtykke til transskriptionen",
         "giveEffect": "Dine indlæg kommer med i arrangementets transskription med dit navn. Uden samtykke deltager du stadig.",
-        "withdrawEffect": "Hvis du trækker det tilbage, mister dine allerede transskriberede sætninger tekst og navn, og fra nu af optages din stemme hverken på et separat spor eller transskriberes.",
+        "withdrawEffect": "Hvis du trækker det tilbage, mister dine sætninger, der allerede er transskriberet fra underteksterne, tekst og navn, og fra nu af optages din stemme hverken på et separat spor eller transskriberes. For en transskription af videoen, der allerede er lavet, skal du henvende dig til arrangørerne.",
         "needsRecording": "Du kan give det efter samtykke til optagelsen."
       }
+    },
+    "recordingQuestion": {
+      "title": "Opkaldet bliver optaget",
+      "question": "Vil du have, at din stemme optages?",
+      "body": "I videoen vises kun ordstyrerne: dit ansigt og dit navn aldrig. Hvis du svarer ja, forbindes opkaldet igen i nogle sekunder, og fra da af optages din stemme, når du taler. Hvis du svarer nej eller lukker dette vindue, deltager du som før, og din stemme optages ikke.",
+      "later": "Hvis du svarer nej, spørger vi igen ved næste optagelse. Du kan til enhver tid ombestemme dig med knappen {button} øverst.",
+      "yes": "Ja, optag min stemme",
+      "no": "Nej, optag ikke"
     },
     "voiceExcluded": {
       "title": "Du deltager uden optagelse.",
       "consent": "Jeg giver samtykke til optagelsen",
-      "body": "Du har ikke givet samtykke til optagelsen: du deltager som alle andre, men dit navn, din stemme og dit billede kommer ikke med i optagelsen."
+      "body": "Du har ikke givet samtykke til optagelsen: du deltager som alle andre, men din stemme er ikke med i optagelsen. Dit ansigt og dit navn vises under alle omstændigheder aldrig i videoen."
+    },
+    "nickname": {
+      "reserved": "Moderator,Taler,Oplægsholder,Deltager,Gæst,Arrangør,Administrator,Vært",
+      "label": "Kaldenavn (valgfrit)",
+      "help": "Ét ord på 2 til 24 tegn: bogstaver, tal og . _ -. De andre ser det i stedet for dit navn i videoen, i chatten, i spørgsmålene og i transskriptionen.",
+      "helpName": "Hvis du lader feltet stå tomt, vises du med dit navn.",
+      "helpAnonymous": "Hvis du lader feltet stå tomt, vises du med et automatisk pseudonym.",
+      "checking": "Kaldenavnet kontrolleres…",
+      "shownAs": "De andre vil se dig som »{nickname}«.",
+      "useSuggestion": "Brug »{suggestion}«",
+      "errors": {
+        "length": "Kaldenavnet skal være på 2 til 24 tegn.",
+        "format": "Ét ord: det begynder med et bogstav og slutter med et bogstav eller et tal; derimellem bogstaver, tal og . _ -, aldrig to i træk.",
+        "scripts": "Brug bogstaver fra ét alfabet.",
+        "reserved": "Det indeholder et reserveret ord, fx navnet på en rolle: vælg et andet.",
+        "host": "Det ligner navnet på en af dem, der leder arrangementet: vælg et andet.",
+        "taken": "Nogen i arrangementet bruger allerede dette kaldenavn.",
+        "disabled": "Dette arrangement tager ikke imod nye kaldenavne: du kan kun fjerne dit.",
+        "rete": "Kaldenavnet kunne ikke kontrolleres. Prøv igen."
+      },
+      "button": "Kaldenavn",
+      "open": "Skift dit kaldenavn",
+      "dialogTitle": "Dit kaldenavn",
+      "dialogIntro": "De andre ser kaldenavnet i stedet for dit navn. For at skifte det forbinder rummet dig igen et øjeblik.",
+      "apply": "Gem og forbind igen",
+      "remove": "Fjern kaldenavnet",
+      "reconnecting": "Forbinder igen…",
+      "done": "Færdig: du vises nu som »{nickname}«.",
+      "doneRemoved": "Færdig: kaldenavnet er fjernet."
     }
   },
   "qa": {
@@ -721,9 +770,9 @@
     "upvote": "Stem op",
     "upvoted": "Stemt",
     "noQuestions": "Ingen spørgsmål endnu. Vær den første!",
-    "qaPersistenceNote": "Spørgsmål gemmes og vil være tilgængelige efter begivenheden.",
-    "qaPostEvent": "Q&A fra begivenheden",
-    "noAnsweredQuestions": "Ingen besvarede spørgsmål for denne begivenhed.",
+    "qaPersistenceNote": "Teksten til spørgsmålene kan blive vist på arrangementets side uden navnet på den, der stillede dem.",
+    "personalDataNotice": "Skriv ikke andres personoplysninger og heller ikke dine egne, hvis du ikke ønsker, at de bliver offentlige: teksten til dit spørgsmål kan blive vist på arrangementets side uden dit navn.",
+    "personalDataNoticeNotPublished": "Skriv ikke andres personoplysninger og heller ikke dine egne, hvis du ikke ønsker, at de bliver kendt: de, der er i rummet, kan læse teksten til dit spørgsmål.",
     "filterAll": "Alle",
     "showPanel": "Vis Q&A",
     "hidePanel": "Skjul Q&A",
@@ -742,6 +791,8 @@
       "editAnswer": "Rediger svar",
       "answerFieldLabel": "Svar på spørgsmålet fra {name}",
       "answerPlaceholder": "Skriv svaret (maks. 2000 tegn)",
+      "answerNotice": "Svaret kan blive vist på arrangementets side: skriv ikke personoplysninger.",
+      "answerNoticeNotPublished": "De, der er i rummet, kan læse svaret: skriv ikke personoplysninger.",
       "sendAnswer": "Offentliggør svar",
       "cancel": "Annuller",
       "removeAnswer": "Fjern svaret"
@@ -769,7 +820,8 @@
     "accessDenied": {
       "title": "Denne sektion er ikke tilgængelig for din rolle",
       "body": "Som arrangør administrerer du dine egne arrangementer: oprettelse, udgivelse, materialer, spørgeskemaer og efterbehandling. Platformens indstillinger og data for alle arrangementer forbliver hos administrationen.",
-      "back": "Gå til dine arrangementer"
+      "back": "Gå til dine arrangementer",
+      "organizerOnly": "Kun arrangørerne af dette arrangement kan redigere det. Som administrator ser du dets status og detaljer og kan arkivere eller slette det. Optagelserne og deres indhold tilhører arrangørerne og deltagerne."
     },
     "staffLogin": {
       "title": "Log ind i administrationen",
@@ -1025,6 +1077,24 @@
           }
         },
         "recordingManualNote": "Optagelsen starter aldrig af sig selv: en ordstyrer starter den med REC-knappen.",
+        "recordingDestination": "Hvor optagelsen skal hen",
+        "recordingDestinationReserved": "Kun for tilmeldte",
+        "recordingDestinationReservedDesc": "Arrangørerne og de tilmeldte kan se den, de tilmeldte så længe deres tilmeldingsdata opbevares. Den offentliggøres ikke. Når rummet er åbnet, kan den ikke længere gøres offentlig.",
+        "recordingDestinationPublic": "Offentlig",
+        "recordingDestinationPublicDesc": "Den kan offentliggøres på arrangementets side og i videobiblioteket. Deltagerne giver også samtykke til dette.",
+        "recordingDestinationNotSet": "Ikke angivet: arrangementet blev oprettet før dette valg.",
+        "recordingDestinationStaffOnly": "Arrangementets team vælger, hvor optagelsen skal hen: indtil videre er det ikke angivet.",
+        "recordingDestinationStartsReserved": "Optagelsen er fra start kun for tilmeldte: arrangementets team kan gøre den offentlig, indtil rummet åbnes.",
+        "recordingDestinationStaysReserved": "Optagelsen forbliver kun for tilmeldte: rummet er allerede åbnet.",
+        "recordingDestinationLocked": "Når rummet er åbnet, kan optagelsen kun ændres til »Kun for tilmeldte«: samtykkerne gælder den tekst, personerne har læst.",
+        "recordingDestinationPublicOnInvitation": "Arrangementet er kun for inviterede, men optagelsen forbliver offentlig: alle vil kunne se videoen, ikke kun de inviterede.",
+        "recordingDestinationReservedOnInvitation": "Arrangementet er kun for inviterede: optagelsen er ændret til »Kun for tilmeldte«. Du kan ændre det under »Optagelse og AI«.",
+        "postEventPagePrivateOnInvitation": "Arrangementet er kun for inviterede: siden efter arrangementet er ændret til privat. Du kan ændre det under »Privatliv, data og siden efter arrangementet«.",
+        "postEventPagePublicWithVideo": "Optagelsen er offentlig: siden efter arrangementet er ændret til offentlig, ellers ville ingen kunne se videoen. Du kan ændre det under »Privatliv, data og siden efter arrangementet«.",
+        "postEventPageStaysPrivate": "Arrangementet er åbent for alle, der tilmelder sig, men siden efter arrangementet er forblevet privat: den åbner ikke af sig selv igen. Du kan ændre det under »Privatliv, data og siden efter arrangementet«.",
+        "postEventPagePrivateVideoHidden": "Optagelsen er offentlig, men siden efter arrangementet er privat: ingen vil kunne se videoen, heller ikke de tilmeldte, så længe siden forbliver privat.",
+        "recordingNothingToCapture": "Denne installation har ingen video af rummet: uden transskriptionen og sporene pr. deltager optages der intet.",
+        "recordingDestinationRequired": "Vælg, hvor optagelsen skal hen.",
         "audienceAnonymous": "Anonymt publikum",
         "audienceAnonymousDesc": "Deltagerne vises for de andre under et pseudonym (»Deltager« og en kode) i video, chat og spørgsmål; deltagerlisten er kun for værterne, og der er ingen plads. Nyttigt til store arrangementer; til fællesskabsarrangementer vil folk gerne lære hinanden at kende.",
         "audienceAnonymousLocked": "Kan ikke ændres, mens rummet kan være åbent: det ville koble pseudonymer til navne.",
@@ -1032,10 +1102,15 @@
         "participantListVisibleDesc": "Fra: listen, gitteret og navnene på pladsen forbeholdes værter og talere; publikum ser kun den, der taler. Til: alle kan se, hvem der er i rummet.",
         "participantListAnonymous": "Med anonymt publikum forbliver listen skjult.",
         "participantListLocked": "Kan ikke ændres, mens rummet er åbent: dem, der allerede er inde, ville ikke se ændringen.",
+        "nicknamesEnabled": "Kaldenavne for deltagere",
+        "nicknamesEnabledDesc": "Deltagere kan vælge et kaldenavn: de andre ser det i stedet for navnet i videoen, i chatten, i spørgsmålene og i transskriptionen. Arrangører og moderatorer kan se, hvem der står bag. Værterne beholder deres eget navn. Fra start er det slået til, hvor deltagerlisten er skjult.",
+        "nicknamesLocked": "Det kan ikke ændres, mens rummet er åbent: de, der allerede er inde, valgte efter den tidligere regel.",
         "participantListCameraNote": "Med skjult liste kan den, der tænder kameraet, ikke se sit eget billede. Vis listen til et møde, hvor alle ser hinanden.",
         "recordingLockedLive": "Optagelse kan ikke ændres, mens rummet er åbent: den gælder fra første indgang.",
         "hostsAlwaysRecorded": "Ordstyrere og talere er altid med i optagelsen",
-        "hostsAlwaysRecordedDesc": "Slukket vælger moderatorer og talere som alle andre. Tænd den kun, hvis de allerede har accepteret at blive filmet: de ser ikke feltet, og arrangementets information skal sige det."
+        "hostsAlwaysRecordedDesc": "Ordstyrere og talere vises i videoen med navn og billede, uden et felt at krydse af: arrangementets privatlivsmeddelelse skal sige det. Af deltagerne optages kun stemmen, og kun med deres samtykke.",
+        "hostsAlwaysRecordedDescHostsOnly": "Ordstyrere og talere vises i videoen med navn og billede, uden et felt at krydse af: arrangementets privatlivsmeddelelse skal sige det. Deltagerne ses og høres aldrig i videoen.",
+        "hostsAlwaysRecordedDescVisible": "Ordstyrere og talere vises i videoen med navn og billede, uden et felt at krydse af: arrangementets privatlivsmeddelelse skal sige det. Denne installation kan ikke holde deltagerne ude af videoen: den, der giver samtykke, deltager med navn, stemme og billede, og navnet på enhver, der følger med, kan blive vist, også uden at vedkommende taler."
       },
       "step3": {
         "heading": "Personer og invitationer",
@@ -1053,7 +1128,7 @@
         "remove": "Fjern",
         "invalidEmail": "Ugyldig e-mailadresse.",
         "duplicateEmail": "Adressen er allerede tilføjet.",
-        "rubricaPick": "Søg i adressebogen efter organisation…",
+        "rubricaPick": "Søg i adressebogen efter navn, e-mail eller organisation…",
         "rubricaOrAdd": "eller tilføj manuelt",
         "removeItem": "Fjern {name}",
         "invitationsStaffOnly": "Invitationerne administreres af begivenhedens personale.",
@@ -1135,6 +1210,7 @@
         "askOrganization": "Organisation (krævet for at tilmelde sig)",
         "askRole": "Rolle (valgfri)",
         "askType": "Organisationstype (valgfri)",
+        "askAddressBook": "Tilbyd at blive i adressebogen (frivilligt for dem, der tilmelder sig)",
         "questionnairesHeading": "Spørgeskemaer",
         "questionsBefore": "Før arrangementet, ved tilmelding: {count, plural, =0 {ingen ekstra spørgsmål} one {# ekstra spørgsmål} other {# ekstra spørgsmål}}",
         "questionsAfter": "Efter arrangementet: {count, plural, =0 {ingen tilfredshedsundersøgelse} one {tilfredshedsundersøgelse, # spørgsmål} other {tilfredshedsundersøgelse, # spørgsmål}}",
@@ -1230,6 +1306,8 @@
         "gdprHeading": "Privatliv og opbevaring af data",
         "retentionDays": "Opbevaringsdage",
         "retentionHelp": "Efter denne grænse slettes personoplysninger automatisk.",
+        "recordingRetention": "Optagelsens opbevaringsperiode",
+        "recordingRetentionHelp": "Optagelsen og det, der laves ud fra den, slettes ikke sammen med personernes data. Med en periode slettes de så mange dage efter arrangementets afslutning eller, hvis videoen er offentliggjort, efter offentliggørelsen. Den kan også ændres senere i optagelsespanelet.",
         "gdprTemplate": "Privatlivsskabelon",
         "gdprTemplateNone": "— Brug brugerdefineret tekst —",
         "gdprTemplateUnknown": "Den valgte skabelon til privatlivsoplysninger findes ikke længere: vælg en anden, eller gå tilbage til tilpasset tekst",
@@ -1281,7 +1359,10 @@
         "participantsCan": "Deltagere: {list}",
         "none": "ingen",
         "recordingManual": "Tilgængelig: starter først, når en ordstyrer trykker på REC.",
+        "recordingDestinationReserved": "Destination: forbeholdt arrangørerne og de tilmeldte.",
+        "recordingDestinationPublic": "Destination: offentlig.",
         "aiAfter": "Efter optagelsen: {list}.",
+        "aiConfirmVideo": "Uden spor pr. person starter transskriptionen af videoen først efter bekræftelse af, at alle stemmer har givet samtykke.",
         "scheduleHeading": "Hvornår det finder sted",
         "scheduleIntro": "Hvornår arrangementet finder sted: dato, klokkeslæt og tidszone.",
         "advancedIntro": "Værdier, som skabelonen allerede har valgt: ret kun det, der er brug for.",
@@ -1325,17 +1406,25 @@
         "askOrganization": "organisation",
         "askRole": "rolle",
         "askType": "organisationstype",
+        "askAddressBook": "om vedkommende vil blive i adressebogen",
         "permissionsHeading": "Hvem kan gøre hvad i rummet",
         "permissionsIntro": "Hvad deltagerne kan, og hvilke funktioner i rummet der er slået til. Alt kan også ændres under arrangementet.",
         "consentsLine": "Samtykker ved tilmelding og i rummet: {list}",
         "consentRecordingFree": "optagelse, frivillig (uden: kun lytte med)",
         "consentRecordingNotice": "for optagelsen kun en meddelelse (deltagerne hverken taler eller vises)",
+        "consentRecordingHostsOnly": "for optagelsen kun en meddelelse (i videoen vises kun ordstyrerne)",
         "consentTranscription": "transskription af egne indlæg, frivillig",
-        "consentsNone": "Intet samtykke ud over det ved tilmeldingen.",
-        "consentsHosts": "Ordstyrere og talere bliver spurgt om optagelsen i rummet, frivilligt.",
+        "consentsNone": "Der skal ikke indhentes samtykke: ved tilmeldingen er kendskab til privatlivspolitikken tilstrækkeligt.",
         "consentsWithdraw": "Deltagerne kan trække dem tilbage i rummet med knappen “Samtykker”.",
         "participantListShown": "Deltagerliste: synlig for alle.",
         "participantListHidden": "Deltagerliste: kun værter og talere.",
+        "audiencePseudonyms": "Publikums navne: pseudonymer.",
+        "audienceNicknames": "Deltagere kan bruge et kaldenavn.",
+        "audienceRealNames": "Publikums navne: de rigtige navne.",
+        "postEventQaHidden": "Spørgsmål efter arrangementet: offentliggøres ikke.",
+        "postEventQaTextOnly": "Spørgsmål efter arrangementet: kun teksten, uden navn.",
+        "addressBookOffered": "Adressebog: tilbydes dem, der tilmelder sig.",
+        "addressBookNotOffered": "Adressebog: tilbydes ikke.",
         "consentRecordingOptional": "optagelse, frivillig",
         "consentRecordingVoice": "optagelse, frivillig (uden samtykke er personen ikke med i optagelsen)",
         "consentsHostsAlways": "Ordstyrere og talere er altid med i optagelsen: de ser ikke feltet."
@@ -1409,15 +1498,15 @@
         "recording": "I optagelsen",
         "roomSame": "Deltager efter arrangementets regler.",
         "roomListenOnly": "Kun lytning og chat.",
-        "recordedFull": "Navn, stemme, billede og delt skærm.",
+        "recordedFull": "Kun stemmen, når personen taler: ansigt og navn vises aldrig.",
+        "recordedVisible": "Navn, stemme, billede og delt skærm.",
         "notRecorded": "Optræder ikke: intet navn, ingen stemme, intet billede, ingen delt skærm.",
         "recordedVoice": "Stemmen, på et separat spor.",
         "notRecordedVoice": "Stemmen optages ikke.",
         "othersSame": "De andre ændres ikke: mikrofonlåse, ordet og videoens udseende er som i arrangementet.",
         "audienceNotice": "Publikum har hverken mikrofon, kamera eller skærm: de får kun en meddelelse. Får de ordet, kan de give samtykke i rummet; gør de det ikke, er de ikke med i optagelsen.",
-        "hostsChoose": "Moderatorer og talere vælger som alle andre: uden samtykke leder de som normalt, men er ikke med i optagelsen.",
         "hostsAlways": "Moderatorer og talere er altid med i optagelsen: de ser ikke feltet.",
-        "hostsFixed": "Moderatorer og talere leder under alle omstændigheder, og videoen optager dem.",
+        "hostsOnly": "Denne installation optager kun ordstyrerne i videoen: deltagerne hverken ses eller høres, og de bliver ikke bedt om samtykke til optagelsen.",
         "trace": "Hvis personen taler under optagelsen, viser en note ved videoen, at et indlæg mangler, og transskriptionen viser *** med klokkeslæt.",
         "anytime": "Samtykket gives og trækkes tilbage i rummet, når som helst.",
         "transcription": "Transskription af egne indlæg er et særskilt, frivilligt samtykke.",
@@ -1472,7 +1561,9 @@
       "breadcrumbAriaLabel": "Brødkrumme",
       "skipToPage": "Gå til sidens indhold",
       "openMenu": "Åbn menuen",
-      "closeMenu": "Luk menuen"
+      "closeMenu": "Luk menuen",
+      "recordingRemovals": "Anmodninger om fjernelse",
+      "recordingRemovalDetail": "Anmodning om fjernelse"
     },
     "publications": {
       "subtitle": "Samlet redaktionel hub for alle offentliggjorte videoer: planlagte arrangementer, hurtige opkald, uploadede arkivoptagelser og sessioner, der venter på udgivelse.",
@@ -1543,6 +1634,8 @@
           "saveFailed": "Lagring af metadata mislykkedes."
         }
       },
+      "reservedBadge": "Kun for tilmeldte",
+      "reservedHelp": "Optagelsen er forbeholdt de tilmeldte: den kan ikke vises i videobiblioteket.",
       "updateFailed": "Opdateringen mislykkedes."
     },
     "recordingsLibrary": {
@@ -1614,7 +1707,8 @@
       "detailFilename": "Filnavn",
       "transcriptManage": "Administrér transskription / AI",
       "transcriptReady": "Transskriberet",
-      "transcriptProcessing": "Behandles"
+      "transcriptProcessing": "Behandles",
+      "organizerOnly": "Kun arrangører"
     },
     "gdprAudit": {
       "subtitle": "Logbog over privatlivshandlinger på personoplysninger: sletninger, samtykker, eksport",
@@ -1629,7 +1723,12 @@
         "DATA_DELETED": "Data slettet",
         "CONSENT_RECORDED": "Samtykke registreret",
         "DATA_EXPORTED": "Data eksporteret",
-        "CONSENT_WITHDRAWN": "Samtykke trukket tilbage"
+        "DATA_RECTIFIED": "Oplysninger rettet",
+        "CONSENT_WITHDRAWN": "Samtykke trukket tilbage",
+        "RECORDING_CONTENT_READ": "Optagelsens indhold læst af personale",
+        "RECORDING_REDACTION_REQUESTED": "Fjernelse fra en optagelse anmodet",
+        "RECORDING_REDACTION_REJECTED": "Anmodning om fjernelse afvist",
+        "RECORDING_REDACTED": "Person fjernet fra en optagelse"
       },
       "recordsAffected": "{count} berørte poster",
       "colWhen": "Hvornår",
@@ -1655,7 +1754,8 @@
       "rotating": "Regenererer…",
       "regenerateTitle": "Regenerér moderator-token (det gamle link bliver ugyldigt)",
       "confirmRegenerate": "Er du sikker på, at du vil regenerere tokenet? Det gamle link vil ikke længere virke.",
-      "noResults": "Ingen arrangementer fundet."
+      "noResults": "Ingen arrangementer fundet.",
+      "organizerOnlyLink": "Linket er kun synligt for arrangementets arrangører"
     },
     "registrations": {
       "subtitle": "Alle personer, der er tilmeldt arrangementer — søg, filtrér og eksportér",
@@ -1684,6 +1784,8 @@
       "colCreatedAt": "Tilmeldingsdato",
       "colEvent": "Arrangement",
       "colName": "Navn",
+      "colNickname": "Kaldenavn",
+      "nicknameShown": "De andre ser personen som »{nickname}«",
       "colEmail": "E-mail",
       "colOrg": "Organisation",
       "colJoined": "Deltaget",
@@ -1917,7 +2019,7 @@
       "aiSectionHeading": "Automatisk efterbehandling",
       "aiSectionDesc": "Når arrangementet er slut, kan optagelsen behandles af en AI-pipeline i klyngen, der producerer transskription, resumé og — hvis det ønskes — oversættelser og eftersynkronisering. Alt foregår på denne installations infrastruktur, og ingen data sendes til tredjeparter.",
       "aiTranscriptEnabled": "Automatisk transskription",
-      "aiTranscriptEnabledDesc": "Talegenkendelse med identifikation af talerne. Nødvendig for at kunne aktivere resumé, oversættelser og eftersynkronisering.",
+      "aiTranscriptEnabledDesc": "Talegenkendelse med identifikation af talerne. Nødvendig for at kunne aktivere resumé, oversættelser og eftersynkronisering. Deltagerne vælger selv, om deres indlæg transskriberes.",
       "aiSummaryEnabled": "Resumé og kapitler",
       "aiSummaryEnabledDesc": "Resumé af mødet, trufne beslutninger, opgaver og opdeling i kapitler med tidsangivelser.",
       "aiTranslationEnabled": "Oversættelse til andre sprog",
@@ -2023,7 +2125,7 @@
     },
     "recordingUpload": {
       "title": "Upload eksisterende optagelse",
-      "subtitle": "Hvis du allerede har en videofil af arrangementet (for eksempel optaget med en anden platform), så upload den her: den vises som den officielle optagelse på den offentlige side.",
+      "subtitle": "Hvis du allerede har en videofil af arrangementet (for eksempel optaget med en anden platform), så upload den her: den bliver arrangementets officielle optagelse.",
       "fileLabel": "Videofil",
       "upload": "Upload og tilknyt",
       "signing": "Forbereder…",
@@ -2087,7 +2189,9 @@
         "DATA_DELETED": "Data slettet",
         "CONSENT_RECORDED": "Samtykke registreret",
         "DATA_EXPORTED": "Data eksporteret",
-        "CONSENT_WITHDRAWN": "Samtykke trukket tilbage"
+        "DATA_RECTIFIED": "Oplysninger rettet",
+        "CONSENT_WITHDRAWN": "Samtykke trukket tilbage",
+        "RECORDING_CONTENT_READ": "Optagelsens indhold læst af personale"
       }
     },
     "settings": {
@@ -2130,7 +2234,7 @@
         "jobMaxAttempts": "Forsøg før fejl",
         "jobMaxAttemptsHelp": "Hvor mange gange pipelinen forsøger et job igen, før det markeres som mislykket. Ventetiden mellem forsøgene vokser eksponentielt (fra 30 sekunder op til 2 timer). Den typiske værdi er 5.",
         "artifactRetentionDays": "Opbevaring af artefakter (dage)",
-        "artifactRetentionDaysHelp": "Ved 0 er der ingen grænse for hele webstedet: AI-artefakterne følger opbevaringsperioden for deres optagelse eller arrangement. En værdi over nul får et dagligt job til at slette alle artefakter, der er oprettet for mere end det antal dage siden, offentliggjort eller ej: den kan forkorte opbevaringen, aldrig forlænge den. Talernes navne og jobbenes payload er ikke omfattet: de følger optagelsens eller arrangementets opbevaringsperiode. Detaljer i docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "Ved 0 er der ingen grænse for hele webstedet: AI-artefakterne følger opbevaringsperioden for deres optagelse. En værdi over nul får et dagligt job til at slette alle artefakter, der er oprettet for mere end det antal dage siden, offentliggjort eller ej: den kan forkorte opbevaringen, aldrig forlænge den. Talernes navne og jobbenes payload er ikke omfattet: de følger optagelsens opbevaringsperiode. Detaljer i docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "AI-oplysning i venteværelset",
         "consentDisclosureHelp": "Tekst, der vises for deltagerne i venteværelset, når arrangementet bruger AI-efterbehandling (transskription, resumé, oversættelse, eftersynkronisering). Kan tilpasses pr. sprog. Lad feltet stå tomt for at bruge systemets standardtekst.",
         "consentDisclosurePlaceholder": "F.eks. Dette arrangement bliver automatisk transskriberet og resumeret med AI-værktøjer efter den direkte udsendelse…"
@@ -2307,6 +2411,8 @@
         "guestAccessEnabledHelp": "Personer, der ikke er tilmeldt, kan deltage i igangværende begivenheder alene med deres navn. Når det er slået fra, kan man kun deltage i planlagte begivenheder med tilmelding eller med et moderator- eller oplægsholderlink; øjeblikkelige videoopkald forbliver åbne for alle med linket. Et arrangement kun for inviterede lukker aldrig gæster ind.",
         "publicRegistrationEnabled": "Offentlig registrering aktiveret",
         "publicRegistrationEnabledHelp": "Alle kan tilmelde sig begivenheder. Når det er slået fra, kan kun personer på begivenhedens invitationsliste tilmelde sig, og det personlige link til at deltage sendes kun via e-mail; allerede tilmeldte og moderator- og oplægsholderlinks virker fortsat. Det er valget, der foreslås for nye arrangementer: hvert arrangement kan vælge anderledes i trinnet “Personer”.",
+        "addressBookEnabled": "Arrangementsadressebog",
+        "addressBookEnabledHelp": "Tilbyder dem, der tilmelder sig, at blive i adressebogen for at blive inviteret til lignende arrangementer. Når funktionen er slået fra, forsvinder afkrydsningsfeltet fra formularerne og vælgeren fra guiden; eksisterende poster forbliver, indtil de tilbagekaldes eller udløber.",
         "calendarPublic": "Offentlig kalender",
         "calendarPublicHelp": "Offentliggør begivenhedskalenderen. Besøgende kan se planlagte begivenheder.",
         "parseTitleKicker": "Titler med redaktionel kicker",
@@ -2397,6 +2503,40 @@
         "avgParticipantsPerEvent": "Gns. deltagere pr. begivenhed",
         "avgFeedbackRating": "Gns. feedbackvurdering",
         "totalFeedback": "Feedbackbesvarelser"
+      },
+      "catalog": {
+        "title": "Begivenhedstyper og skabeloner",
+        "intro": "Hvor mange begivenheder af hver type og fra hver skabelon, måned for måned. Kun antal og gennemsnit, ingen personoplysninger. Kladder tælles ikke med.",
+        "periodLabel": "Periode",
+        "months": "{count, plural, one {# måned} other {# måneder}}",
+        "groupByLabel": "Gruppér efter",
+        "groupBy": {
+          "type": "Begivenhedstype",
+          "template": "Skabelon"
+        },
+        "rankingTypes": "Hyppigste typer",
+        "rankingTemplates": "Mest brugte skabeloner",
+        "columns": {
+          "type": "Type",
+          "template": "Skabelon",
+          "events": "Begivenheder",
+          "held": "Afholdt",
+          "avgParticipants": "Gns. deltagere",
+          "avgDuration": "Gns. varighed",
+          "total": "Hele perioden"
+        },
+        "measuresNote": "Afholdt: begivenheder, hvis rum blev åbnet. Gennemsnitligt antal deltagere: det højeste antal samtidigt tilstedeværende, inklusive gæster, i gennemsnit over de afholdte begivenheder. Gennemsnitlig varighed: den målte tid i rummet, ikke den planlagte.",
+        "byMonth": "Måned for måned",
+        "measureLabel": "Mål",
+        "measures": {
+          "events": "Begivenheder",
+          "avgParticipants": "Gennemsnitligt antal deltagere",
+          "avgDurationMinutes": "Gennemsnitlig varighed"
+        },
+        "byMonthCaption": "{measure} pr. måned",
+        "empty": "Ingen begivenheder i denne periode.",
+        "deletedTemplate": "{name} (slettet)",
+        "uncatalogedNote": "Ikke-katalogiserede begivenheder: {count}. De er oprettet før kataloget eller uden skabelon og uden format; du kan katalogisere dem, når du redigerer begivenheden, under tekniske detaljer."
       }
     },
     "recurrence": {
@@ -2439,6 +2579,8 @@
       "featuresLabel": "Funktioner",
       "whiteboardLabel": "Whiteboard",
       "recordingLabel": "Optagelse",
+      "recordingDestination": "Optagelsens destination",
+      "recordingDestinationNone": "Vælges, når arrangementet oprettes",
       "waitingRoomEngineLabel": "Venteværelse (skabelonens standard)",
       "waitingRoomEngineSiteDefault": "Sitets standard",
       "waitingRoomEngineGarden": "Have (almindelig)",
@@ -2451,17 +2593,22 @@
       "durationLabel": "Standardvarighed (minutter)",
       "durationHint": "Forudfylder arrangementets sluttidspunkt (start + varighed). Brugeren kan ændre det. Tomt = 2 timer.",
       "retentionLabel": "Standardopbevaring af data (dage)",
+      "recordingRetentionLabel": "Standardperiode for optagelsen",
+      "recordingRetentionHint": "For arrangementer oprettet ud fra denne skabelon; den ændres i guiden og i optagelsespanelet. Optagelsen følger ikke opbevaringen af data.",
       "expectedSpeakersLabel": "Forventet antal talere (standard)",
       "descriptionTemplateLabel": "Standardbeskrivelse",
       "descriptionTemplateHint": "Tekst, der forudfyldes i arrangementets beskrivelse (kan redigeres).",
       "aiTranscript": "Automatisk transskription (standard)",
       "aiSummary": "Automatisk resumé (standard)",
       "aiTranslation": "Automatisk oversættelse (standard)",
+      "noRecording": "På denne installation optages der ikke: skabelonerne starter uden optagelse.",
       "pickerSubtitle": "Vælg en skabelon for at forkonfigurere begivenhedsindstillingerne, eller spring over for at konfigurere alt manuelt.",
       "skipTemplate": "Konfigurer manuelt",
       "postEventPublic": "Offentlig side efter begivenheden",
+      "offerAddressBook": "Tilbyder adressebogen til dem, der tilmelder sig",
       "invalidFields": "Tjek disse felter: {fields}.",
-      "descriptionOtherLanguages": "Der findes også versioner på: {languages}, som ikke kan redigeres her. Hvis du ændrer den italienske tekst, fjernes de."
+      "descriptionOtherLanguages": "Der findes også versioner på: {languages}, som ikke kan redigeres her. Hvis du ændrer den italienske tekst, fjernes de.",
+      "usedBy": "Begivenheder oprettet ud fra denne skabelon: {count}"
     },
     "instantCall": {
       "title": "Øjeblikkeligt videoopkald",
@@ -2724,7 +2871,7 @@
       "title": "Opkaldssessioner",
       "empty": "Ingen sessioner registreret. Live-sessioner vises her automatisk, så snart moderatoren går ind i lokalet.",
       "loading": "Indlæser sessioner...",
-      "participants": "deltagere",
+      "participantsCount": "{count, plural, one {# deltager} other {# deltagere}}",
       "participantList": "Deltagere",
       "name": "Navn",
       "joined": "Tilsluttet",
@@ -2974,11 +3121,28 @@
         "publishNow": "Offentliggør nu"
       },
       "editFeatures": "Redigér funktioner",
-      "editPrivacy": "Redigér privatliv og data"
+      "editPrivacy": "Redigér privatliv og data",
+      "governance": {
+        "title": "Du administrerer dette arrangement som administrator",
+        "body": "Du er ikke en af dets arrangører: du ser status, detaljer, tilmeldinger og samtykker og kan arkivere eller slette det. At lede arrangementet, moderatorlinket og indholdet af optagelserne (video, transskriptioner, resuméer) er arrangørernes opgave.",
+        "recording": "Indholdet af optagelsen er kun tilgængeligt for arrangementets arrangører og deltagere. Her ser du, om den findes, og dens detaljer.",
+        "recordingFile": "Optagelse",
+        "present": "Findes",
+        "absent": "Ingen",
+        "recordingPublished": "Udgivet",
+        "yes": "Ja",
+        "no": "Nej",
+        "recordingDuration": "Varighed",
+        "recordingSize": "Størrelse",
+        "recordingRetention": "Automatisk sletning af optagelsen",
+        "recordingRetentionNone": "Ingen",
+        "recordingRetentionDays": "{days, plural, one {# dag} other {# dage}} efter arrangementets afslutning eller, hvis den er offentliggjort, efter offentliggørelsen"
+      }
     },
     "rubrica": {
-      "subtitle": "Personer, der har givet samtykke til at blive optaget i adressebogen (GDPR art. 6.1.a). Profiloplysninger opdateres automatisk ved hver ny tilmelding.",
-      "searchLabel": "Søg efter navn eller organisation",
+      "subtitle": "Personer, der har givet samtykke til at blive optaget i adressebogen (GDPR art. 6.1.a). Navn, e-mailadresse og organisation opdateres kun, når personen sætter kryds i feltet igen.",
+      "searchLabel": "Søg efter navn, e-mail eller organisation",
+      "searchPartial": "Søgningen har kun omfattet de {limit} senest opdaterede poster: en person med en ældre post vises måske ikke.",
       "orgTypeLabel": "Organisationstype",
       "allTypes": "Alle",
       "includeOptedOut": "Medtag personer, der har trukket samtykket tilbage",
@@ -3243,7 +3407,8 @@
         "metricsTitle": "Målinger for resuméet (LLM)",
         "chars": "tegn",
         "model": "Model",
-        "notAvailable": "n/a"
+        "notAvailable": "n/a",
+        "contentHidden": "Kun tilgængeligt for arrangementets arrangører."
       },
       "rel": {
         "title": "AI-pålidelighed",
@@ -3400,7 +3565,8 @@
         "alignNone": "Intet slideskift at justere.",
         "previewTitle": "Forhåndsvisning",
         "previewHelp": "Videoen med slides, som publikum vil se dem, med den korrektion, der er angivet ovenfor."
-      }
+      },
+      "contentOrganizerOnly": "Kun arrangørerne af dette arrangement kan se og redigere indholdet af denne optagelse (video, spor, transskription, resumé, oversættelser). Her ser du dens status, behandlingsjobbene og filernes detaljer."
     },
     "questionnairesPage": {
       "subtitle": "Genbrugelige skabeloner til spørgsmål til før-tilmelding og efter-arrangement-spørgeskemaer."
@@ -3597,10 +3763,13 @@
         "speakers": "Talere og ordstyrere",
         "speakersDesc": "Publikum skriver i chatten og stiller spørgsmål"
       },
-      "recQ": "Vil du kunne optage?",
+      "recQ": "Vil du kunne optage, og for hvem?",
       "rec": {
-        "yes": "Ja, når du trykker på REC",
         "yesDesc": "Efter arrangementet: transskription, resumé og oversættelse",
+        "reserved": "Ja, kun for tilmeldte",
+        "reservedDesc": "Arrangørerne og de tilmeldte kan se den",
+        "public": "Ja, offentlig",
+        "publicDesc": "Den kan offentliggøres på arrangementets side",
         "no": "Nej",
         "noDesc": "Ingen optagelse, intet samtykke at indhente"
       },
@@ -3614,7 +3783,8 @@
         "grande": "Over 100 personer",
         "tutti": "alle på video",
         "relatori": "talerne taler",
-        "si": "med optagelse",
+        "riservata": "med optagelse kun for tilmeldte",
+        "pubblica": "med offentlig optagelse",
         "no": "uden optagelse",
         "openAccess": "åbent for alle",
         "inviteOnly": "kun for inviterede"
@@ -3627,6 +3797,9 @@
         "invitationDesc": "Siden er stadig synlig, men kun personer på listen kan tilmelde sig; invitationen med tilmeldingslinket sender du på e-mail fra arrangementets side"
       },
       "previewInvitation": "Kun inviterede tilmelder sig; uden tilmelding kommer man ikke ind.",
+      "previewPseudonyms": "Publikum vises under et pseudonym",
+      "previewNicknames": "Deltagere kan bruge et kaldenavn",
+      "previewRealNames": "Publikum vises med deres eget navn",
       "templateReplaces": "En skabelon bruger sine egne indstillinger i stedet for svarene nedenfor. Titel, datoer og personer skriver du i de næste trin.",
       "instantBack": "Opret i stedet et planlagt arrangement"
     },
@@ -3686,7 +3859,9 @@
       "publishDesc": "Gennemlæs det før offentliggørelse: teksten er skrevet af en AI-model. Et nyoprettet referat skal offentliggøres igen.",
       "preview": "Forhåndsvisning",
       "hidePreview": "Skjul forhåndsvisning",
-      "previewLanguage": "Sprog"
+      "previewLanguage": "Sprog",
+      "organizerOnly": "Kun arrangørerne af dette arrangement kan bestille, læse og udgive referatet.",
+      "organizerOnlyExists": "Referatet findes. Kun arrangørerne af dette arrangement kan læse og udgive det."
     },
     "endEvent": "Afslut arrangement",
     "endEventConfirmTitle": "Afslut arrangementet for alle?",
@@ -3722,11 +3897,12 @@
       "organizersEmpty": "Ingen organisation angivet: den offentlige side viser ikke, hvem der arrangerer.",
       "sendAll": "Send invitationen til dem, der ikke har fået den ({count})",
       "sending": "Sender…",
-      "sendDone": "Invitationer på vej: {sent}. Sprunget over (allerede tilmeldt eller uden adresse): {skipped}.",
+      "sendDone": "Invitationer på vej: {sent}. Sprunget over (allerede tilmeldt, uden adresse eller uden samtykke til kommunikation): {skipped}.",
       "sendError": "Afsendelsen mislykkedes: prøv igen.",
       "sendNotPublished": "Invitationer sendes, mens arrangementet tager imod tilmeldinger: efter offentliggørelsen og før slutningen.",
       "invitedOn": "Inviteret {date}",
       "notInvited": "Invitation ikke sendt",
+      "stopped": "Modtager ikke invitationer",
       "send": "Send invitation",
       "resend": "Send igen",
       "actions": "Handlinger",
@@ -3764,6 +3940,7 @@
         "pubblicata": "Offentliggjort.",
         "prontaAi": "Klar fra efterbehandlingen: gennemgå den; den offentliggøres sammen med videoen.",
         "prontaSottotitoli": "Klar fra underteksterne: tjek navnene og offentliggør den.",
+        "daConfermare": "Skal startes: videoen transskriberes kun med bekræftelse af, at alle stemmer har givet samtykke.",
         "inLavorazione": "Under behandling.",
         "nessuna": "Ingen: hverken undertekster eller efterbehandling.",
         "soloStaff": "Arrangøren gennemgår og offentliggør den i administrationen.",
@@ -3773,7 +3950,7 @@
         "title": "Referat",
         "pubblicato": "Offentliggjort.",
         "daPubblicare": "Genereret: læs det igennem og offentliggør det.",
-        "daGenerare": "Skal genereres ud fra udskriften, chatten og vurderingerne.",
+        "daGenerare": "Skal genereres ud fra transskriptionen, afstemningerne, vurderingerne og, hvis de er offentliggjort, spørgsmålene.",
         "inLavorazione": "Under behandling.",
         "senzaPipeline": "AI-efterbehandling er ikke aktiveret på denne installation.",
         "soloStaff": "Arrangøren genererer og offentliggør det i administrationen.",
@@ -3803,6 +3980,7 @@
         "title": "Offentlig side",
         "visibile": "Synlig for alle.",
         "nellaLibreria": "Synlig for alle og i videobiblioteket.",
+        "libreriaRiservata": "Siden er synlig, men videoen er forbeholdt de tilmeldte: den vises ikke i videobiblioteket.",
         "privata": "Trukket tilbage: offentligheden kan ikke se den.",
         "scaduta": "Ikke længere synlig: udløbsdatoen er passeret.",
         "archiviato": "Arrangementet er arkiveret: siden er ikke offentlig.",
@@ -3950,9 +4128,10 @@
     },
     "voiceConsent": {
       "title": "Transskribere hele optagelsen?",
-      "message": "Dette arrangement bad hver person om samtykke til transskription af deres indlæg. Hele optagelsen indeholder alle stemmer, også dem der ikke gav samtykke: transskribér den kun, hvis alle, der taler i den, har givet samtykke. Din bekræftelse gemmes i aktivitetsloggen.",
+      "message": "Hele videoen indeholder alle stemmer, også fra dem, der ikke har givet samtykke til transskription af deres indlæg: transskribér den kun, hvis alle, der taler i videoen, har givet samtykke. Din bekræftelse gemmes i aktivitetsloggen.",
       "confirm": "Ja, alle har givet samtykke",
       "cancel": "Annuller",
+      "waitingNoCaptions": "Transskriptionen af hele videoen er ikke startet af sig selv: hver person vælger, om vedkommendes indlæg transskriberes. Start den med {button} kun, hvis alle, der taler i videoen, har givet samtykke; ellers forbliver arrangementet uden transskription.",
       "waiting": "Transskriptionen af hele optagelsen startede ikke af sig selv: dette arrangement bad hver person om samtykke til transskription af deres indlæg. Start den med {button} kun hvis alle, der taler i optagelsen, har givet samtykke; ellers bevares transskriptionen fra underteksterne."
     },
     "editCopyTitle": "Kopi af arrangementet",
@@ -3981,22 +4160,149 @@
         "givenAt": "Givet",
         "withdrawnAt": "Trukket tilbage",
         "textVersion": "Tekstversion",
+        "destination": "Destination",
+        "superseded": "Erstattet",
+        "supersededValue": "Af et senere samtykke",
+        "destinations": {
+          "PUBLIC": "Offentlig",
+          "REGISTRANTS": "Kun for tilmeldte",
+          "none": "Ikke angivet"
+        },
         "kinds": {
           "recording": "Optagelse",
           "transcription": "Transskription af indlæg"
         },
         "sources": {
           "registration": "tilmelding",
-          "room": "rum"
+          "room": "rum",
+          "self-service": "Mine data"
         },
         "roles": {
           "registrant": "tilmeldt",
           "guest": "gæst",
           "host": "leder eller taler"
         },
+        "erasedName": "(navn fjernet efter anmodning)",
         "unreadableName": "(navn kan ikke læses)"
       },
+      "retainedNote": "{count, plural, one {# dokumentation for samtykke opbevares} other {# dokumentationer for samtykke opbevares}}, så længe videoen eller transskriptionen findes.",
       "countsNote": "Der tælles personer: en tilmelding, en personalekonto eller et personligt link tæller én gang; en gæst, der kommer igen ved et andet besøg, tæller igen."
+    },
+    "recordingRemovals": {
+      "subtitle": "Personer, der har bedt om ikke at optræde i en optagelse. Så længe en anmodning er åben, kan du åbne optagelsen fra fjernelseseditoren, og hver adgang registreres i handlingsloggen.",
+      "filterOpen": "Åbne",
+      "filterAll": "Alle",
+      "filterLabel": "Hvilke anmodninger",
+      "empty": "Ingen anmodninger.",
+      "loadError": "Anmodningerne kunne ikke indlæses.",
+      "colReceived": "Modtaget",
+      "colPerson": "Person",
+      "colEvent": "Arrangement",
+      "colSource": "Oprindelse",
+      "colStatus": "Status",
+      "open": "Åbn",
+      "unnamed": "Person uden navn",
+      "sources": {
+        "self-service": "Mine data",
+        "admin": "Personale"
+      },
+      "statuses": {
+        "OPEN": "Åben",
+        "IN_PROGRESS": "I gang",
+        "PROCESSING": "Bearbejdes",
+        "CLOSED": "Lukket",
+        "REJECTED": "Afvist"
+      },
+      "kinds": {
+        "registrant": "Tilmeldt",
+        "host": "Leder",
+        "guest": "Gæst"
+      },
+      "newOpen": "Registrér en anmodning",
+      "newTitle": "En anmodning modtaget ad anden vej",
+      "newIntro": "Til en anmodning, som den dataansvarlige har modtaget via e-mail, post eller personligt. Vælg optagelsen og, hvis du genkender personen, vedkommende blandt dem, der var i rummet.",
+      "recordingSearch": "Søg efter arrangementet",
+      "recordingLabel": "Optagelse",
+      "recordingChoose": "Vælg en optagelse",
+      "recordingOption": "{title} · {date}",
+      "recordingNone": "Ingen optagelse med video eller med spor pr. deltager.",
+      "peopleLabel": "Hvem der var i rummet",
+      "peopleNone": "Rummet har ikke registreret, hvem der var til stede: angiv navnet, så markerer du intervallerne manuelt.",
+      "personNotInVideo": "uden for billedet",
+      "personTimes": "fra {from} til {to}",
+      "personStill": "fra {from} til slutningen",
+      "nameLabel": "Personens navn",
+      "noteLabel": "Hvordan anmodningen kom ind (valgfrit)",
+      "create": "Registrér anmodningen",
+      "createError": "Anmodningen kunne ikke registreres.",
+      "cancel": "Annullér",
+      "back": "Alle anmodninger",
+      "fieldPerson": "Person",
+      "fieldEvent": "Arrangement",
+      "fieldReceived": "Modtaget",
+      "fieldSource": "Oprindelse",
+      "fieldStatus": "Status",
+      "fieldNote": "Note",
+      "externalCopy": "Dette arrangement har en video på et eksternt websted (for eksempel YouTube): fjernelsen når ikke derud. Fjern eller erstat den også dér.",
+      "publishedElsewhere": "Arrangementets offentliggjorte video er en anden fil end denne optagelse: fjernelsen ændrer den ikke. Erstat den, eller tag den af arrangementets side.",
+      "pipelineOff": "Efterbehandlingen er slået fra: fjernelsesjobbet venter i køen, indtil du slår den til, og transskriptionen laves ikke på ny.",
+      "noVideo": "Denne optagelse har ingen video, kun spor pr. deltager: personens spor slettes, og transskriptionen laves på ny ud fra de resterende.",
+      "noRecording": "Optagelsen findes ikke længere: der er intet tilbage at fjerne.",
+      "keyOnly": "Instansnøglen åbner ikke en optagelse: log ind med din administratorkonto.",
+      "startIntro": "For at fjerne personen skal du åbne optagelsen. Adgangen gælder kun for denne anmodning og registreres i handlingsloggen med din konto.",
+      "start": "Åbn fjernelseseditoren",
+      "processing": "Fjernelse i gang: den rensede video erstatter originalen. Jobstatus: {status}.",
+      "closed": "Anmodning lukket {date}.",
+      "closedIntervals": "{count, plural, =0 {Intet interval dækket.} one {# interval dækket.} other {# intervaller dækket.}}",
+      "rejected": "Anmodning afvist {date}.",
+      "lastError": "Den seneste behandling mislykkedes: {error}. Kontrollér intervallerne, og send igen.",
+      "rejectTitle": "Afvis anmodningen",
+      "rejectLabel": "Begrundelse",
+      "reject": "Afvis",
+      "rejectConfirm": "Afvis anmodningen? Personen vil kunne se, at den er afvist.",
+      "actionError": "Handlingen mislykkedes (HTTP {code}).",
+      "editorTitle": "Intervaller, der skal dækkes",
+      "editorHint": "Forslagene bygger på, hvem der var i rummet, hvem der talte, og sporene pr. deltager: taletiderne er omtrentlige. Se videoen, og ret dem. I hvert interval bliver videoen til skiltet »indhold fjernet efter anmodning«, og lyden slås fra; varigheden ændres ikke.",
+      "sourcePresence": "I rummet",
+      "sourceSpeech": "Taler",
+      "sourceTrack": "Spor",
+      "selectedLegend": "Skal dækkes",
+      "useProposals": "Start forfra fra forslagene",
+      "addInterval": "Tilføj et interval her",
+      "fieldStart": "Start",
+      "fieldEnd": "Slut",
+      "setStart": "Start her",
+      "setEnd": "Slut her",
+      "seek": "Gå til",
+      "remove": "Fjern",
+      "intervalLabel": "Interval {n}",
+      "noIntervalsVideo": "Intet interval at dække. Hvis personen ikke optræder i videoen, så afvis anmodningen med en begrundelse.",
+      "total": "{count, plural, one {# interval} other {# intervaller}} · {seconds} s skal dækkes",
+      "timeHint": "Tider i timer:minutter:sekunder som i afspilleren.",
+      "invalidTime": "Ugyldig tid",
+      "preview": "Forhåndsvisning af fjernelsen",
+      "timelineLabel": "Optagelsens tidslinje",
+      "mediaError": "Videoen kan ikke indlæses. Genindlæs siden.",
+      "submit": "Fjern personen fra optagelsen",
+      "submitConfirm": "Den oprindelige video og personens spor slettes, og efterbehandlingen køres igen. Det kan ikke fortrydes. Fortsæt?",
+      "submitDone": "Anmodning lukket: personen er fjernet."
+    },
+    "catalog": {
+      "fieldTitle": "Katalog",
+      "fieldHelp": "Begivenhedstypen og skabelonen, den blev oprettet ud fra, bruges kun til instansens statistik og ændrer ingen indstillinger. Ret dem, hvis begivenheden er katalogiseret forkert eller slet ikke.",
+      "typeLabel": "Begivenhedstype",
+      "templateLabel": "Skabelon",
+      "noTemplate": "Ingen skabelon",
+      "deletedTemplate": "Oprettet ud fra skabelonen “{name}”, som siden er slettet.",
+      "deletedOption": "{name} (slettet)",
+      "types": {
+        "MEETING": "Møde",
+        "PARTICIPATORY": "Deltagende begivenhed",
+        "PUBLIC": "Offentlig begivenhed",
+        "INSTANT": "Hurtigopkald",
+        "LEGACY": "Importeret publikation",
+        "UNCATALOGED": "Ikke katalogiseret"
+      }
     }
   },
   "email": {
@@ -4013,7 +4319,22 @@
     "dateLabel": "Dato",
     "timeLabel": "Klokkeslæt",
     "durationLabel": "Varighed",
-    "myDataLink": "Dine data: se dem, ret dem, træk et samtykke tilbage eller annullér tilmeldingen"
+    "addressBookNote": "Du er i arrangementsadressebogen for at blive inviteret til lignende arrangementer: du kan til enhver tid trække dit samtykke tilbage.",
+    "addressBookPendingNote": "Afkrydsningsfeltet til arrangementsadressebogen blev markeret på denne tilmelding, men denne adresse var holdt op med at modtage invitationer. Hvis anmodningen er din, kan du bekræfte den på siden med dine data via linket nedenfor. Hvis den ikke er din, kan du se bort fra denne besked: du forbliver uden for adressebogen og modtager ingen invitationer.",
+    "addressBookOptOutLink": "Fjern mine data fra adressebogen",
+    "myDataLink": "Dine data: se dem, ret dem, træk et samtykke tilbage eller annullér tilmeldingen",
+    "confirmationCode": {
+      "subject": "{site}: bekræftelseskode",
+      "heading": "Din bekræftelseskode",
+      "introEdit": "Du har bedt om at rette navn og organisation i din tilmelding til “{event}”.",
+      "introEditAll": "Du har bedt om at rette navn og organisation i alle dine tilmeldinger.",
+      "introNickname": "Du har bedt om at ændre kaldenavnet i din tilmelding til “{event}”.",
+      "introNicknameRemove": "Du har bedt om at fjerne kaldenavnet fra din tilmelding til “{event}”.",
+      "introCancel": "Du har bedt om at slette din tilmelding til “{event}”.",
+      "codeLabel": "Koden er:",
+      "instructions": "Indtast den på siden Mine data, som du sendte anmodningen fra. Den gælder i {minutes, plural, one {# minut} other {# minutter}}.",
+      "ignore": "Hvis det ikke var dig, der sendte anmodningen, så ignorer denne e-mail: uden koden ændres intet. Del ikke koden med nogen."
+    }
   },
   "home": {
     "hero": {
@@ -4380,17 +4701,100 @@
   },
   "gdpr": {
     "consent": {
-      "recording": "Jeg giver samtykke til lyd-/videooptagelse af denne begivenhed",
-      "multitrack": "Jeg giver samtykke til, at mine indlæg udskrives med mit navn til arrangementets referat. Hvis arrangementet optager et separat lydspor for hver person, optages min stemme kun til dette formål, og sporet slettes efter udskrivningen; det bruges ikke til at identificere eller gengive min stemme.",
+      "recording": "Jeg giver samtykke til, at min stemme optages, når jeg taler under arrangementet. Mit ansigt og mit navn vises aldrig i videoen.",
+      "recordingReserved": "Jeg giver samtykke til, at min stemme optages, når jeg taler under arrangementet. Mit ansigt og mit navn vises aldrig i videoen. Videoen forbliver forbeholdt arrangørerne og de tilmeldte: den offentliggøres ikke. De tilmeldte kan se den, så længe deres tilmeldingsdata opbevares.",
+      "recordingPublic": "Jeg giver samtykke til, at min stemme optages, når jeg taler under arrangementet. Jeg giver også samtykke til offentliggørelse af videoen: videoen kan ses af alle på arrangementets side og i videobiblioteket. Mit ansigt og mit navn vises aldrig i videoen.",
+      "recordingVisible": "Jeg giver samtykke til lyd-/videooptagelse af denne begivenhed.",
+      "recordingVisibleReserved": "Jeg giver samtykke til videooptagelse af arrangementet (lyd og video). Videoen forbliver forbeholdt arrangørerne og de tilmeldte: den offentliggøres ikke. De tilmeldte kan se den, så længe deres tilmeldingsdata opbevares.",
+      "recordingVisiblePublic": "Jeg giver samtykke til videooptagelse af arrangementet (lyd og video) og til offentliggørelse af den: videoen kan ses af alle på arrangementets side og i videobiblioteket.",
+      "recordingNoVideo": "Jeg giver samtykke til optagelse af arrangementet. Videoen af rummet optages ikke: kun lydsporene fra dem, der giver samtykke til transskription, bevares, hvis arrangementet bruger dem.",
+      "multitrack": "Jeg giver samtykke til, at mine indlæg transskriberes med mit navn til arrangementets referat. Hvis arrangementet optager et separat lydspor for hver person, optages min stemme kun til dette formål, og sporet slettes efter transskriptionen; det bruges ikke til at identificere eller gengive min stemme.",
+      "multitrackRetained": "Jeg giver samtykke til, at mine indlæg transskriberes med mit navn til arrangementets referat. Hvis arrangementet optager et separat lydspor for hver person, optages min stemme kun til dette formål, og sporet opbevares sammen med arrangementets data; det bruges ikke til at identificere eller gengive min stemme.",
       "multitrackOptional": "Det er frivilligt: Hvis du ikke giver samtykke, deltager du stadig, men dine indlæg kommer ikke med i transskriptionen, og din stemme optages ikke på et separat spor. Hvis arrangementet optages, er din stemme dog stadig med i videoen.",
+      "multitrackOptionalShort": "Det er frivilligt: Hvis du ikke giver samtykke, deltager du stadig, men dine indlæg kommer ikke med i transskriptionen, og din stemme optages ikke på et separat spor.",
       "stayInTouch": "Jeg vil gerne modtage information om kommende arrangementer og føjes til adressebogen for at blive inviteret til lignende arrangementer",
-      "stayInTouchHelp": "Valgfrit samtykke (GDPR art. 6.1.a). Du kan til enhver tid trække det tilbage via linket »Fjern mig fra adressebogen« i de e-mails, du modtager. Navn og organisation er dem fra denne tilmelding.",
+      "stayInTouchHelp": "Valgfrit samtykke (GDPR art. 6.1.a). Du kan til enhver tid trække det tilbage via linket »Fjern mine data fra adressebogen« i bekræftelsesmailen, i påmindelserne og i invitationerne eller fra siden »Mine data«. Navn, e-mailadresse og organisation er dem fra denne tilmelding.",
+      "stayInTouchRetention": "Vi opbevarer disse data i {months} måneder fra dette samtykke: perioden starter kun forfra, hvis du sætter kryds i feltet igen.",
       "recordingOptionalListenOnly": "Hvis du ikke giver samtykke, deltager du alligevel, kun som lytter: du følger med og skriver i chatten, men mikrofon, kamera og skærmdeling forbliver slukket. Du kan give samtykke senere fra rummet.",
-      "recordingOptionalHost": "Hvis du ikke giver samtykke, kommer du stadig ind og leder som sædvanligt, men din stemme gemmes ikke i sporene pr. person eller i transskriptionen. Videoen af rummet viser dig stadig, hvis den optages.",
       "recordingOptionalVoice": "Hvis du ikke giver samtykke, deltager du stadig og kan tale, men du er ikke med i optagelsen: hverken navn, stemme eller billede. Du kan give samtykke senere fra rummet.",
-      "recordingNotice": "Arrangementet optages (lyd og video). Du deltager uden mikrofon og kamera: optagelsen indeholder ikke din stemme eller dit billede, medmindre værten giver dig ordet.",
-      "recordingNoticeVoice": "Arrangementet optages (lyd og video). Du deltager uden mikrofon og kamera: optagelsen indeholder hverken dit navn, din stemme eller dit billede, medmindre du giver samtykke i rummet.",
+      "recordingNotice": "Arrangementet kan blive optaget. Du deltager uden mikrofon og kamera: optagelsen indeholder ikke din stemme eller dit billede, medmindre ordstyrerne giver dig ordet.",
+      "recordingNoticeVoice": "Arrangementet kan blive optaget. Du deltager uden mikrofon og kamera: dit ansigt og dit navn vises aldrig i videoen, og din stemme kun hvis du giver samtykke i rummet.",
+      "namesMayAppear": "Det navn, du deltager med, kan blive vist i videoen, også selvom du ikke taler.",
+      "recordingHostsOnly": "Arrangementet kan blive optaget. I videoen ses og høres kun ordstyrerne: deltagernes ansigt, navn og stemme er aldrig med.",
+      "recordingHostAlwaysReserved": "Du leder dette arrangement: du er altid med i optagelsen, med navn, stemme, billede og delt skærm. Videoen forbliver forbeholdt arrangørerne og de tilmeldte: den offentliggøres ikke. De tilmeldte kan se den, så længe deres tilmeldingsdata opbevares.",
+      "recordingHostAlwaysPublic": "Du leder dette arrangement: du er altid med i optagelsen, med navn, stemme, billede og delt skærm. Videoen kan offentliggøres og ses af alle.",
       "recordingHostAlways": "Du leder dette arrangement: du er altid med i optagelsen, med navn, stemme, billede og delt skærm."
+    },
+    "sheet": {
+      "title": "Dette arrangement og dine data",
+      "intro": "Det afhænger af, hvordan arrangørerne har indstillet arrangementet. Resten står i privatlivspolitikken.",
+      "recording": {
+        "label": "Optagelse",
+        "none": "Der er ikke planlagt nogen optagelse til dette arrangement.",
+        "manual": "Ordstyrerne kan starte optagelsen med lyd og video. Når den er i gang, angives det i rummet.",
+        "auto": "Arrangementet optages med lyd og video, fra det starter. Det angives i rummet.",
+        "tracksOnly": "Videoen af rummet optages ikke: kun ét lydspor for hver person, der giver samtykke.",
+        "destinationReserved": "Optagelsen forbliver forbeholdt arrangørerne og de tilmeldte og offentliggøres ikke. De tilmeldte kan se den, så længe deres tilmeldingsdata opbevares.",
+        "destinationPublic": "Optagelsen kan blive offentliggjort efter arrangementet.",
+        "destinationUnset": "Arrangørerne beslutter efter arrangementet, om den skal offentliggøres.",
+        "refuseOut": "Hvis du ikke giver samtykke, deltager du stadig og er ikke med i optagelsen.",
+        "refuseListenOnly": "Hvis du ikke giver samtykke, lytter du kun med.",
+        "hostsAlways": "I videoen vises kun ordstyrerne, med navn, stemme, billede og delt skærm. Deltagernes ansigt og navn vises aldrig.",
+        "hostsAlwaysVisible": "Ordstyrerne er altid med i optagelsen, med navn, stemme, billede og delt skærm.",
+        "hostsOnly": "I videoen ses og høres kun ordstyrerne, med navn, stemme, billede og delt skærm. Deltagernes ansigt, navn og stemme er aldrig med.",
+        "audienceNotice": "Du deltager uden mikrofon og kamera: optagelsen indeholder ikke din stemme eller dit billede, medmindre ordstyrerne giver dig ordet.",
+        "audienceNoticeVoice": "Du deltager uden mikrofon og kamera: dit ansigt og dit navn vises aldrig i videoen, og din stemme kun hvis du giver samtykke i rummet."
+      },
+      "transcript": {
+        "label": "Transskription",
+        "captions": "Teksten fra underteksterne gemmes med navn kun for dem, der giver samtykke, og bliver til arrangementets transskription.",
+        "tracks": "For dem, der giver samtykke, optages et lydspor, som slettes efter transskriptionen.",
+        "tracksRetained": "For dem, der giver samtykke, optages et lydspor, som opbevares sammen med arrangementets data.",
+        "fromVideo": "Efter arrangementet kan arrangørerne kun få videoen transskriberet, hvis alle, der taler, har givet samtykke."
+      },
+      "captions": {
+        "label": "Undertekster"
+      },
+      "ai": {
+        "label": "Kunstig intelligens",
+        "summary": "Efter arrangementet kan et værktøj med kunstig intelligens skrive et resumé af optagelsen.",
+        "translation": "Transskription og resumé kan oversættes automatisk.",
+        "dubbing": "Videoen kan få en eftersynkronisering med syntetisk stemme.",
+        "onRequest": "Efter arrangementet kan arrangørerne også anmode om automatisk behandling af optagelsen, som ikke er angivet her: transskription, resumé eller oversættelse.",
+        "report": "Efter arrangementet kan teamet få skrevet et referat med kunstig intelligens, også ud fra afstemningerne og, hvis de er offentliggjort, spørgsmålene. Chattens tekst bruges ikke.",
+        "accuracy": "Tekster, der er lavet med kunstig intelligens, kan indeholde unøjagtigheder."
+      },
+      "list": {
+        "label": "Deltagerliste",
+        "visible": "Deltagerne kan i rummet se listen over de tilstedeværende.",
+        "hidden": "I rummet kan publikum ikke se listen over de tilstedeværende. Det kan ordstyrerne og dem, der taler."
+      },
+      "name": {
+        "label": "Dit navn",
+        "real": "I rummet, i chatten og i spørgsmålene vises du med dit navn.",
+        "pseudonym": "I rummet, i chatten og i spørgsmålene vises du under et pseudonym. Arrangørerne kan se dine tilmeldingsdata.",
+        "pseudonymTranscript": "Hvis du giver samtykke til transskriptionen, står dit navn der fortsat.",
+        "nickname": "Du kan vælge et kaldenavn: de andre ser det i stedet for dit navn. Arrangører og moderatorer ved, hvem der står bag.",
+        "nicknameTranscript": "Hvis du giver samtykke til transskriptionen, vises du dér med dit kaldenavn, hvis du har valgt et, ellers med dit navn."
+      },
+      "retention": {
+        "label": "Opbevaring",
+        "data": "Tilmeldings- og rumdata slettes {days, plural, one {# dag} other {# dage}} efter arrangementets afslutning. Spørgsmål og afstemninger bevares uden navne.",
+        "recordingKept": "Optagelsen og det, der laves ud fra den (transskription, resumé, oversættelser), slettes ikke sammen med disse data: uanset om de stilles til rådighed eller ej, bevares de, indtil arrangørerne sletter dem.",
+        "recordingDays": "Optagelsen og det, der laves ud fra den, slettes {days, plural, one {# dag} other {# dage}} efter arrangementets afslutning eller, hvis optagelsen stilles til rådighed, efter offentliggørelsen.",
+        "transcriptKept": "Transskriptionen slettes ikke sammen med disse data: den bevares, indtil arrangørerne sletter den.",
+        "transcriptDays": "Transskriptionen slettes {days, plural, one {# dag} other {# dage}} efter arrangementets afslutning."
+      },
+      "addressBook": {
+        "label": "Adressebog",
+        "offered": "Når du tilmelder dig, kan du vælge at blive i arrangementsadressebogen for at blive inviteret til lignende arrangementer. Det er frivilligt: dataene opbevares i {months} måneder fra dit samtykke, medmindre du trækker det tilbage."
+      },
+      "chat": {
+        "label": "Chat og spørgsmål",
+        "messages": "Chatbeskeder offentliggøres aldrig, heller ikke spørgsmål stillet i chatten.",
+        "questionsText": "Efter arrangementet kan teksten til spørgsmålene fra Q&A blive offentliggjort, men aldrig navnet på den, der stillede dem.",
+        "questionsNone": "Spørgsmålene fra Q&A offentliggøres ikke."
+      }
     },
     "export": {
       "title": "Mine data",
@@ -4401,20 +4805,21 @@
       "submit": "Anmod om mine data",
       "loading": "Søger...",
       "requestSubmittedTitle": "Tjek din indbakke",
-      "requestSubmittedBody": "Hvis e-mailadressen svarer til en tilmelding, har vi sendt dig et link til at downloade dine data. Linket er gyldigt i 1 time.",
+      "requestSubmittedBody": "Hvis e-mailadressen svarer til en tilmelding, har vi sendt dig et link til at se dine data. Linket er gyldigt i 1 time.",
       "linkInvalid": "Linket er ugyldigt eller udløbet. Anmod om et nyt link.",
       "requestNew": "Anmod om et nyt link",
       "noData": "Ingen data fundet for denne e-mailadresse.",
       "error": "Der opstod en fejl. Prøv venligst igen senere.",
       "rateLimited": "For mange anmodninger. Prøv igen om en time.",
       "results": "Dine data",
-      "resultsDescription": "Data fundet for {count} begivenheder.",
+      "resultsDescription": "{count, plural, one {Data fundet for # begivenhed.} other {Data fundet for # begivenheder.}}",
       "registrationData": "Tilmeldingsdata",
       "fieldName": "Navn",
+      "fieldNickname": "Kaldenavn",
       "fieldEmail": "E-mail",
       "fieldOrganization": "Organisation",
       "fieldRegisteredAt": "Tilmeldingsdato",
-      "fieldConsent": "Samtykke",
+      "fieldConsent": "Kendskab til privatlivspolitikken",
       "questionsTitle": "Q&A-spørgsmål",
       "pollVotesTitle": "Afstemningsstemmer",
       "optionLabel": "Valgmulighed",
@@ -4436,7 +4841,74 @@
       "consentFuture": "Fremtidige meddelelser",
       "consentWithdrawnOn": "Trukket tilbage den {date}",
       "consentNoteInRoom": "Hvis du er i rummet lige nu, gælder tilbagetrækningen fra din næste indgang: brug Samtykker i rummet, hvis den skal gælde straks.",
-      "consentFutureEffect": "Hvis du trækker det tilbage, modtager du ikke længere meddelelser om kommende arrangementer, og du fjernes fra adressebogen for alle dine tilmeldinger."
+      "consentGiveNoteInRoom": "Et samtykke, der gives her, gælder fra din næste indgang i rummet, ikke for det, der allerede er optaget. Samtykke til optagelse og transskription kan gives, indtil arrangementet er slut.",
+      "proofsTitle": "Opbevaret dokumentation for samtykker",
+      "proofsIntro": "Dataene for disse arrangementer er blevet slettet. Denne dokumentation bevares, så længe videoen eller transskriptionen findes. Du kan trække dit samtykke tilbage: det, der allerede er i videoen, forbliver der, og for at få det fjernet skal du skrive til den dataansvarlige.",
+      "proofGivenOn": "Givet den {date}",
+      "proofSuperseded": "Erstattet af et senere samtykke",
+      "proofWithdrawEffect": {
+        "recording": "Du trækker også dit samtykke til transskription tilbage: dine sætninger og dit navn fjernes fra transskriptionen baseret på underteksterne. Det, der allerede er i videoen, forbliver der, og det samme gør en transskription lavet ud fra videoen eller lydsporene: for at få dem fjernet skal du skrive til den dataansvarlige. Tilbagetrækningen kan ikke fortrydes fra denne side.",
+        "transcription": "Dine sætninger og dit navn fjernes fra transskriptionen baseret på underteksterne. En transskription lavet ud fra videoen eller lydsporene forbliver: for at få den fjernet skal du skrive til den dataansvarlige. Tilbagetrækningen kan ikke fortrydes fra denne side."
+      },
+      "proofWithdrawHost": "Ældre transskriptioner baseret på underteksterne genkender ikke ordstyrerne: dér står dine sætninger og dit navn fortsat, og for at få dem fjernet skal du skrive til den dataansvarlige.",
+      "roomProofsTitle": "Samtykker givet som ordstyrer af et arrangement",
+      "roomProofsIntro": "De samtykker til optagelse og transskription, du gav, da du kom ind i rummet med en rolle i arrangementet. I vinduet Samtykker i rummet trækker du samtykkerne fra den aktuelle indgang tilbage og, med din personalekonto, også dem fra tidligere indgange; for de øvrige, og når arrangementet er slut, er der kun sletning af dine data tilbage.",
+      "addressBookTitle": "Arrangementsadressebog",
+      "addressBookIntro": "Du har valgt at blive i adressebogen for at blive inviteret til lignende arrangementer. Vi opbevarer disse data indtil {date}, medmindre du trækker samtykket tilbage eller giver et nyt.",
+      "addressBookOptOut": "Fjern mine data fra adressebogen",
+      "consentFutureEffect": "Hvis du trækker det tilbage, modtager du ikke længere meddelelser om kommende arrangementer, og du fjernes fra adressebogen for alle dine tilmeldinger.",
+      "consentFutureGive": "Jeg giver samtykke til fremtidige meddelelser",
+      "consentFutureGiveEffect": "Du kommer tilbage i arrangementsadressebogen med navnet og organisationen fra denne tilmelding og modtager invitationer igen; opbevaringsperioden starter forfra i dag.",
+      "consentGiveDone": "Samtykke givet: det gælder fra din næste indgang i rummet.",
+      "consentFutureGiveDone": "Samtykke givet: du er igen i arrangementsadressebogen.",
+      "consentGiveTextChanged": "Samtykketeksten er ændret, efter du åbnede siden: genindlæs den for at læse den nye.",
+      "consentGiveClosed": "Dette samtykke kan ikke længere gives herfra: arrangementet er slut eller beder ikke længere om det. Genindlæs siden for at se den aktuelle status.",
+      "consentGiveNewText": "Teksten til dette samtykke er ændret, efter du gav det: til den aktuelle tekst skal det gives igen.",
+      "addressBookPendingTitle": "Tilbagevenden til adressebogen skal bekræftes",
+      "addressBookPendingBody": "Afkrydsningsfeltet til adressebogen blev markeret på denne tilmelding, men denne adresse var holdt op med at modtage invitationer. Intet ændrer sig, før du bekræfter.",
+      "addressBookPendingEffect": "Hvis du bekræfter, kommer du tilbage i adressebogen med navnet og organisationen fra denne tilmelding og modtager invitationer igen. Hvis du annullerer, eller hvis det ikke var dig, forbliver du uden for adressebogen og modtager ingen invitationer.",
+      "addressBookPendingConfirm": "Bekræft min tilbagevenden",
+      "addressBookPendingCancel": "Annuller anmodningen",
+      "addressBookPendingGone": "Denne anmodning afventer ikke længere. Genindlæs siden for at se den aktuelle status.",
+      "removalTitle": "Optagelsen af arrangementet",
+      "removalIntro": "Dette arrangement er blevet optaget. Hvis du ikke vil optræde i optagelsen, kan du bede om at blive fjernet: de dele, hvor du ses eller taler, dækkes af et skilt og gøres lydløse, og transskription, undertekster og resumé laves på ny. Anmodningen går til den dataansvarlige, som behandler den.",
+      "removalButton": "Jeg vil ikke optræde i denne optagelse",
+      "removalConfirmTitle": "Bekræfter du anmodningen?",
+      "removalConfirmBody": "Den dataansvarlige fjerner de dele af optagelsen, hvor du ses eller taler. Kopier, der er offentliggjort på andre websteder, for eksempel på YouTube, skal fjernes separat af dem, der har offentliggjort dem.",
+      "removalConfirm": "Send anmodningen",
+      "removalCancel": "Annullér",
+      "removalSent": "Anmodningen er sendt. Den dataansvarlige vil behandle den.",
+      "removalError": "Anmodningen kunne ikke sendes. Prøv igen senere.",
+      "removalStatusOpen": "Anmodning af {date}: under behandling.",
+      "removalStatusClosed": "Anmodning af {date}: gennemført {closed}.",
+      "removalStatusRejected": "Anmodning af {date}: afvist. Skriv til den dataansvarlige for at få begrundelsen.",
+      "editButton": "Ret navn og organisation",
+      "editScopeLegend": "Hvilke tilmeldinger det gælder for",
+      "editScopeOne": "Kun denne tilmelding",
+      "editScopeAll": "Alle mine tilmeldinger ({count}) og arrangementsadressebogen",
+      "editEffect": "Rettelsen gælder for de næste e-mails og fra din næste indgang i rummet. Den ændrer ikke det, der allerede er optaget, transskriberet eller skrevet i chatten, og heller ikke dokumentationen for samtykker.",
+      "editNameInvalid": "Navnet skal have mellem 2 og 100 tegn.",
+      "editOrganizationRequired": "Et arrangement, du er tilmeldt, kræver organisationen: feltet må ikke være tomt.",
+      "editOrganizationTooLong": "Organisationen må højst have 200 tegn.",
+      "editDone": "Oplysningerne er rettet.",
+      "nicknameChoose": "Vælg et kaldenavn",
+      "nicknameChange": "Skift kaldenavn",
+      "nicknameEffect": "Andre ser kaldenavnet i stedet for dit navn: i chatten og i spørgsmålene med det samme, i videoen fra næste gang du går ind i rummet. Det, der allerede er optaget, transskriberet eller skrevet, ændres ikke.",
+      "nicknameDone": "Kaldenavnet er gemt.",
+      "codeWhy": "Af sikkerhedshensyn bekræftes rettelser og sletninger med en kode, som vi sender til tilmeldingens e-mailadresse.",
+      "codeSend": "Send mig bekræftelseskoden",
+      "codeSent": "Vi har sendt dig en 6-cifret kode pr. e-mail. Indtast den her: den gælder i {minutes, plural, one {# minut} other {# minutter}}.",
+      "codeLabel": "Bekræftelseskode",
+      "codeConfirmEdit": "Bekræft rettelsen",
+      "codeConfirmNickname": "Bekræft kaldenavnet",
+      "codeInvalid": "Koden er forkert eller udløbet. Tjek den seneste e-mail, du har modtaget, eller annuller og bed om en ny.",
+      "cancelTitle": "Slet denne tilmelding",
+      "cancelIntro": "Du kan slette kun denne tilmelding uden at røre de andre eller resten af dine data.",
+      "cancelButton": "Slet denne tilmelding",
+      "cancelDeletes": "Tilmeldingen til dette arrangement slettes sammen med det, du har gjort med den: spørgsmål, stemmer, chatbeskeder, feedback, svar på spørgeskemaer, dine sætninger i transskriptionen fra undertekster og e-mails i kø. Dit personlige link holder op med at virke, og pladsen bliver ledig.",
+      "cancelKeeps": "Dine andre tilmeldinger, arrangementsadressebogen, dit profilbillede og en anmodning om fjernelse fra en optagelse, der stadig behandles, forbliver. Hvis der findes en video eller en transskription af dette arrangement, forbliver dokumentationen for dit samtykke uden dit navn, så længe de findes. Sletningen kan ikke fortrydes; så længe arrangementet tager imod tilmeldinger, kan du tilmelde dig igen.",
+      "codeConfirmCancel": "Slet tilmeldingen",
+      "cancelDone": "Tilmeldingen er slettet."
     },
     "erasure": {
       "title": "Sletning af dine data",
@@ -4448,13 +4920,15 @@
       "requestSubmittedTitle": "Tjek din indbakke",
       "requestSubmittedBody": "Hvis e-mailadressen svarer til en tilmelding, har vi sendt dig et link til at bekræfte sletningen. Linket er gyldigt i 1 time.",
       "linkInvalid": "Linket er ugyldigt eller udløbet. Anmod om et nyt link.",
-      "confirmWarning": "Du er ved at slette alle personoplysninger tilknyttet din e-mailadresse permanent.",
+      "confirmWarning": "Du er ved at slette personoplysningerne tilknyttet din e-mailadresse permanent, bortset fra det, der er anført nedenfor.",
       "confirmBody": "Tilmeldinger, spørgsmål, afstemningsstemmer, feedback, påmindelser og din post i arrangementsadressebogen slettes. Handlingen kan ikke fortrydes.",
+      "confirmProofs": "Hvis der findes en video eller transskription af et arrangement, også selvom den endnu ikke er offentliggjort, bevares samtykketypen, datoen og den tekst, du svarede på, uden dit navn, så længe videoen eller transskriptionen findes. De tjener til at dokumentere samtykket. Videoen ændres ikke: for at bede om at få dine indlæg fjernet skal du skrive til den dataansvarlige. Ældre transskriptioner baseret på underteksterne genkender ikke personer, der leder eller taler med en rolle i arrangementet: dér står dine sætninger og dit navn fortsat, og for at få dem fjernet skal du skrive til den dataansvarlige.",
       "confirmButton": "Bekræft sletning",
       "cancel": "Annuller",
       "processing": "Sletter...",
       "doneTitle": "Sletning gennemført",
-      "doneBody": "{count} tilmeldinger og de tilknyttede data er blevet slettet.",
+      "doneBody": "{count, plural, =0 {Ingen tilmeldinger at slette.} one {# tilmelding og de tilknyttede data er blevet slettet.} other {# tilmeldinger og de tilknyttede data er blevet slettet.}}",
+      "doneProofs": "{count, plural, one {# dokumentation for samtykke er bevaret uden dit navn, så længe videoen eller transskriptionen findes.} other {# dokumentationer for samtykke er bevaret uden dit navn, så længe videoen eller transskriptionen findes.}}",
       "error": "Der opstod en fejl. Prøv igen senere.",
       "rateLimited": "For mange anmodninger. Prøv igen om en time.",
       "back": "Tilbage til mine data",
@@ -5232,7 +5706,8 @@
     "overlapTitle": "Samtidig tale: i dette interval taler mere end én person på samme tid.",
     "anonymousSpeaker": "Deltager {n}",
     "untranscribed": "Ikke transskriberet: den, der talte, gav ikke samtykke",
-    "unrecordedSpeech": "Nogle indlæg er ikke med i optagelsen: de, der talte, gav ikke samtykke."
+    "unrecordedSpeech": "Nogle indlæg er ikke med i optagelsen: de, der talte, gav ikke samtykke.",
+    "unrecordedSpeechHostsOnly": "Nogle indlæg er ikke med i optagelsen: i videoen ses og høres kun ordstyrerne."
   },
   "waiting": {
     "startsIn": "Begivenheden starter om",
@@ -5249,7 +5724,9 @@
     "watchNow": "Se",
     "switchToLive": "Skift til live",
     "enterRoom": "Gå ind i rummet",
-    "recordingNotice": "Denne begivenhed optages.",
+    "recordingNotice": "Denne begivenhed kan blive optaget.",
+    "recordingNoticeInstant": "Opkaldet kan blive optaget. I videoen vises kun ordstyrerne: dit ansigt og dit navn aldrig. Hvis nogen starter optagelsen, spørger vi, om du giver samtykke til, at din stemme optages.",
+    "recordingNoticeInstantHostsOnly": "Opkaldet kan blive optaget. I videoen ses og høres kun ordstyrerne: deltagernes ansigt, navn og stemme er aldrig med.",
     "recordingAvailableAfter": "Optagelsen vil være tilgængelig efter begivenheden.",
     "autoRefreshHint": "Siden opdateres automatisk, når begivenheden starter.",
     "startEventButton": "Start begivenhed",
@@ -5300,10 +5777,15 @@
     "classicView": "Klassisk visning",
     "backToGarden": "Vis pladsen",
     "aiNoticeTitle": "AI-behandling efter begivenheden",
-    "aiNotice": "Når det er slut, behandles optagelsen af AI-værktøjer for at lave transskription, resumé og eventuelle oversættelser og eftersynkronisering. Resultaterne kan indeholde unøjagtigheder; videoen er fortsat den autoritative kilde.",
+    "aiNotice": "Når det er slut, kan optagelsen behandles af AI-værktøjer for at lave transskription, resumé og eventuelle oversættelser og eftersynkronisering. Transskriptionen omfatter kun dem, der har givet samtykke. Resultaterne kan indeholde unøjagtigheder; videoen er fortsat den autoritative kilde.",
     "multitrackConsentTitle": "Udskrift af dine indlæg",
-    "recordingConsentTitle": "Optagelse af arrangementet",
-    "recordingConsentIntro": "Arrangementet optages (lyd og video). Med dit samtykke indeholder optagelsen dit navn, din stemme, dit billede og det, du deler på skærmen.",
+    "recordingConsentTitle": "Optagelse af din stemme",
+    "recordingConsentTitleVisible": "Optagelse af arrangementet",
+    "recordingConsentIntro": "Arrangementet kan blive optaget. I videoen vises kun ordstyrerne: dit ansigt og dit navn aldrig. Med dit samtykke optages din stemme, når du taler.",
+    "recordingConsentIntroAnonymous": "Arrangementet kan blive optaget. I videoen vises kun ordstyrerne: dit ansigt og dit pseudonym aldrig. Med dit samtykke optages din stemme, når du taler.",
+    "recordingConsentIntroVisible": "Arrangementet kan blive optaget (lyd og video). Med dit samtykke indeholder optagelsen dit navn, din stemme, dit billede og det, du deler på skærmen.",
+    "recordingConsentIntroVisibleAnonymous": "Arrangementet kan blive optaget (lyd og video). Med dit samtykke indeholder optagelsen dit pseudonym, din stemme, dit billede og det, du deler på skærmen.",
+    "recordingConsentIntroNoVideo": "Ved dette arrangement optages videoen af rummet ikke.",
     "enterGardenTitle": "Gå ind på pladsen",
     "enterGardenHint": "Et andet sted at vente: gå rundt, mød de andre, der venter, og gå ind i livebegivenheden gennem porten, når rummet åbner.",
     "backToWaitingRoom": "Tilbage til venteværelset",
@@ -5550,11 +6032,14 @@
       "7d": "7 dage",
       "30d": "30 dage",
       "90d": "90 dage",
+      "1y": "1 år",
+      "days": "{count, plural, one {# dag} other {# dage}}",
       "forever": "Ingen automatisk sletning"
     },
-    "retentionNote": "En offentliggjort video følger ikke opbevaringen af begivenhedens data: uden en periode forbliver den offentlig, indtil nogen sletter den.",
+    "retentionNote": "Optagelsen følger ikke opbevaringen af begivenhedens data: uden en periode forbliver den, offentliggjort eller ej, indtil nogen sletter den. Perioden regnes fra offentliggørelsen eller, hvis videoen ikke er offentliggjort, fra begivenhedens afslutning; når den udløber, slettes videoen og det, der er lavet ud fra den (transskriptioner, resuméer, oversættelser).",
+    "retentionLegacy": "De tilmeldte til dette arrangement har fået at vide, at en optagelse, der ikke er offentliggjort, slettes sammen med deres data {days, plural, one {# dag} other {# dage}} efter arrangementets afslutning. Så længe videoen ikke er offentliggjort, kan du forkorte perioden, men ikke fjerne eller forlænge den.",
     "delete": "Slet optagelse",
-    "deleteConfirm": "Er du sikker? Videoen slettes permanent.",
+    "deleteConfirm": "Er du sikker? Videoen slettes permanent. Transskriptioner, resuméer og oversættelser slettes ikke sammen med den: de følger den periode for optagelsen, der er valgt her.",
     "notConfigured": "Jibri er ikke konfigureret. Videooptagelse er ikke tilgængelig.",
     "disabledHint": "Videooptagelse er ikke aktiveret for dette arrangement. For at aktivere den åbnes afsnittet Indstillinger ovenfor, og kontakten \"Optagelse\" slås til.",
     "play": "Afspil",
@@ -5570,6 +6055,8 @@
     "audiencePublicDesc": "Alle, der åbner begivenhedens side. Den kan vises i videoteket.",
     "audienceRegistrants": "Kun tilmeldte",
     "audienceRegistrantsDesc": "Dem, der har tilmeldt sig begivenheden, også selvom de ikke kom ind i rummet, via det personlige link i e-mailbeskeden. Den vises ikke i videoteket.",
+    "audienceReservedNote": "De, der har givet samtykke, har gjort det til en optagelse kun for tilmeldte: videoen kan kun ses af de tilmeldte og arrangørerne.",
+    "destinationMissing": "Dette arrangement angiver ikke, hvor optagelsen skal hen: de indsamlede samtykker siger ikke, om videoen ville blive offentliggjort. Kontrollér det, før du offentliggør den.",
     "saveFailed": "Ændringen blev ikke gemt. Prøv igen."
   },
   "postEvent": {
@@ -5579,7 +6066,9 @@
     "libraryListed": "Udgiv i videobiblioteket",
     "libraryListedHelp": "Vis dette arrangement i det offentlige bibliotek (/video-library). Kræver en udgivet optagelse eller en YouTube-video, og at arrangementets side er synlig.",
     "libraryListedNoRecording": "Ingen udgivet optagelse: arrangementet vises ikke i biblioteket, før du udgiver optagelsen eller tilføjer en YouTube-video.",
-    "showQA": "Vis Q&A-spørgsmål",
+    "libraryListedReserved": "Optagelse kun for tilmeldte: arrangementet vises ikke i videobiblioteket.",
+    "showQA": "Vis teksten til Q&A-spørgsmålene uden navne",
+    "qaReservedNote": "Med en optagelse kun for tilmeldte offentliggøres spørgsmålene ikke.",
     "showMaterials": "Vis delte materialer",
     "showPolls": "Vis afstemningsresultater",
     "showFeedback": "Vis feedback",
@@ -5591,7 +6080,7 @@
     "visibilityAlways": "Altid synlig",
     "visibilityUntil": "Synlig indtil:",
     "dataRetentionNote": "Deltagernes personoplysninger slettes i henhold til begivenhedens opbevaringspolitik ({days} dage). Begivenhedsindholdet forbliver tilgængeligt, så længe siden er synlig.",
-    "availableUntil": "Denne begivenhed og dens indhold vil være tilgængelige indtil {date}.",
+    "participantDataUntil": "Deltagernes personoplysninger slettes den {date}.",
     "tabs": {
       "qa": "Spørgsmål og svar",
       "materials": "Materialer",
@@ -5672,7 +6161,7 @@
       "strengths": "Styrker",
       "improvements": "Kan forbedres",
       "quotes": "Fra kommentarerne",
-      "aiNotice": "Teksten er skrevet af en AI-model ud fra udskriften, chatten, spørgsmålene, afstemningerne og vurderingerne, og teamet har gennemlæst den før offentliggørelsen. Tallene og diagrammerne beregner platformen. Den kan indeholde unøjagtigheder."
+      "aiNotice": "Teksten er skrevet af en AI-model ud fra transskriptionen, afstemningerne, vurderingerne og, hvis de er offentliggjort, spørgsmålene, og teamet har gennemlæst den før offentliggørelsen. Tallene og diagrammerne beregner platformen. Teksten kan indeholde unøjagtigheder."
     },
     "languages": {
       "title": "Se på",
@@ -5733,7 +6222,7 @@
       "confirm": "Bekræft fjernelse",
       "submitting": "Fjerner…",
       "successTitle": "Fjernelse fuldført",
-      "successBody": "Dine data findes ikke længere i arrangementsadressebogen.",
+      "successBody": "Fra nu af modtager du ikke flere invitationer. Din e-mailadresse er allerede fjernet; navn og organisation slettes fra adressebogen senest dagen efter.",
       "errors": {
         "generic": "Der opstod en fejl. Prøv igen senere."
       }
@@ -5831,12 +6320,21 @@
     "recordingWithoutMedia": "Denne optagelse har ingen video: dens transskription kommer fra liveundertekster.",
     "recordingWithoutVideo": "Fra denne optagelse findes deltagernes lydspor, men ikke videoen: den blev ikke optaget, eller den er ikke kommet endnu. Det downloadbare arkiv kræver også videoen.",
     "noParticipantTracks": "Der er ingen separate lydspor af deltagerne: de blev ikke optaget eller er allerede slettet. Slå optagelse pr. deltager til før arrangementet for at få dem.",
+    "noTranscribableTracks": "Ingen spor fra denne optagelse kan transskriberes: de er blevet slettet, eller de personer, der optræder i dem, har ikke givet samtykke til en transskription med deres navn.",
+    "tracksPending": "Sporene fra denne optagelse er ikke kommet endnu: transskriptionen starter af sig selv, når de kommer.",
     "summaryMissing": "Der er endnu ikke et resumé at redigere på dette sprog: generer det først.",
     "storageUnavailable": "Upload af filer er ikke tilgængelig på denne installation.",
     "aiDisabledForEvent": "AI er slået fra for dette arrangement: brug »Generér AI« for at slå den til og starte behandlingen.",
     "sourceTranscriptMissing": "Denne optagelse er endnu ikke transskriberet: transskriber den, før du tilføjer en oversættelse.",
     "captionsTranscriptNotTranslatable": "Denne transskription kommer fra liveundertekster: automatisk oversættelse kræver en AI-transskription af optagelsen.",
     "sameLanguage": "Det valgte sprog er optagelsens originalsprog: vælg et andet.",
-    "mtUnavailable": "Maskinoversættelse er ikke installeret på denne instans."
+    "recordingDestinationNotCovered": "Samtykkerne til dette arrangement gælder en optagelse kun for tilmeldte: du kan ikke gøre den synlig for alle eller tilknytte en ekstern video.",
+    "mtUnavailable": "Maskinoversættelse er ikke installeret på denne instans.",
+    "recordingContentOrganizerOnly": "Kun arrangørerne af dette arrangement kan åbne, ændre eller udgive indholdet af dets optagelser.",
+    "recordingRetentionLegacy": "De tilmeldte til dette arrangement har fået at vide, at en optagelse, der ikke er offentliggjort, slettes sammen med deres data: så længe videoen ikke er offentliggjort, kan perioden forkortes, men ikke fjernes eller forlænges."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Indhold fjernet efter anmodning",
+    "cardBody": "Denne del af optagelsen er fjernet efter anmodning fra en person, der optrådte i den."
   }
 }

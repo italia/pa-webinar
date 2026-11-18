@@ -21,10 +21,12 @@
 
 import { randomUUID } from 'crypto';
 import { cookies } from 'next/headers';
-import type { EventType } from '@prisma/client';
+import type { EventType, RecordingAudience } from '@prisma/client';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { requireAdmin } from '@/lib/auth/staff-session';
+import { assertVideoDellEvento } from '@/lib/storage/recordings';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { UnauthorizedError, ValidationError } from '@/lib/errors';
@@ -49,6 +51,9 @@ interface PublicationRow {
   endsAt: string;
   libraryListed: boolean;
   postEventPublic: boolean;
+  /** Chi vede la registrazione: la libreria mostra solo quelle per tutti. */
+  recordingAudience: RecordingAudience;
+  recordingDestination: RecordingAudience | null;
   coverImageUrl: string | null;
   imageUrl: string | null;
   youtubeUrl: string | null;
@@ -119,6 +124,8 @@ export const GET = withErrorHandling(async (request) => {
       endsAt: e.endsAt.toISOString(),
       libraryListed: e.libraryListed,
       postEventPublic: e.postEventPublic,
+      recordingAudience: e.recordingAudience,
+      recordingDestination: e.recordingDestination,
       coverImageUrl: e.coverImageUrl,
       imageUrl: e.imageUrl,
       youtubeUrl: e.youtubeUrl,
@@ -175,8 +182,7 @@ export const GET = withErrorHandling(async (request) => {
  * all we do here is persist the metadata row and point at the blob URL.
  */
 export const POST = withErrorHandling(async (request) => {
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) throw new UnauthorizedError();
+  const session = await requireAdmin(await cookies());
 
   const body = await parseJsonBody(request);
   const parsed = createLegacyEventSchema.safeParse(body);
@@ -191,9 +197,19 @@ export const POST = withErrorHandling(async (request) => {
   const titleIt = data.title.it ?? '';
   const slug = await generateUniqueSlug({ it: titleIt });
 
+  // L'evento nasce qui: il file caricato non deve essere quello di un altro
+  // evento (lib/storage/recordings), che l'app firmerebbe per questo.
+  const id = randomUUID();
+  await assertVideoDellEvento(id, data.recordingUrl);
+
   const event = await prisma.event.create({
     data: {
+      id,
       slug,
+      // Chi la carica ne e' l'organizzatore: ne vede il contenuto anche se la
+      // si ritira dalla pubblicazione (lib/recording/content-access). Con la
+      // chiave dell'istanza non c'e' una persona, e nessuno la organizza.
+      createdById: session.accountId,
       // LEGACY has no live Jitsi room — the unique placeholder is kept
       // so downstream joins / queries that assume jitsiRoomName is set
       // don't trip.

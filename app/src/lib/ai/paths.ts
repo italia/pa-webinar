@@ -227,6 +227,10 @@ export function expectedArtifactsForJob(
       // api/internal/event-text-translation e restano sull'evento come
       // proposta.
       return [];
+    case 'REDACT':
+      // Nessun artefatto: il video ripulito sostituisce quello della
+      // registrazione e si consegna a api/internal/recording-redaction.
+      return [];
     default: {
       const _exhaustive: never = kind;
       throw new Error(`unknown job kind: ${String(_exhaustive)}`);

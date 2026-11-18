@@ -24,6 +24,8 @@ interface QuestionFormProps {
   guestId?: string;
   /** Riceve l'identificativo della domanda appena accettata, se il server lo dice. */
   onSubmitted: (questionId?: string) => void;
+  /** Il testo puo' comparire sulla pagina dell'evento: l'avviso lo dice solo qui. */
+  domandePubblicate?: boolean;
 }
 
 export default function QuestionForm({
@@ -32,6 +34,7 @@ export default function QuestionForm({
   guestName,
   guestId,
   onSubmitted,
+  domandePubblicate = true,
 }: QuestionFormProps) {
   const t = useTranslations('qa');
 
@@ -131,11 +134,14 @@ export default function QuestionForm({
         rows={3}
         maxLength={MAX_LENGTH}
         placeholder={t('placeholderInviting')}
-        aria-describedby="qa-question-hint"
+        aria-describedby="qa-question-hint qa-question-notice"
         value={text}
         onChange={(e) => setText(e.target.value)}
         disabled={submitting || cooldown > 0}
       />
+      <p id="qa-question-notice" className="qa-composer__notice">
+        {t(domandePubblicate ? 'personalDataNotice' : 'personalDataNoticeNotPublished')}
+      </p>
 
       {error && (
         <p className="qa-error" role="alert">

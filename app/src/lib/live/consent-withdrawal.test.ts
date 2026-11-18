@@ -8,7 +8,10 @@ const tx = vi.hoisted(() => ({
   multitrackConsent: { findMany: vi.fn(), updateMany: vi.fn() },
   registration: { updateMany: vi.fn(), findMany: vi.fn() },
   person: { updateMany: vi.fn() },
+  eventInvitation: { findMany: vi.fn(), deleteMany: vi.fn(), updateMany: vi.fn() },
+  emailOutbox: { deleteMany: vi.fn() },
   captionSegment: { updateMany: vi.fn() },
+  retainedConsentProof: { updateMany: vi.fn() },
   gdprAuditLog: { create: vi.fn(), createMany: vi.fn() },
 }));
 const trascrizione = vi.hoisted(() => ({
@@ -16,9 +19,16 @@ const trascrizione = vi.hoisted(() => ({
   togliPersoneDalleTrascrizioni: vi.fn(async () => 0),
 }));
 vi.mock('@/lib/captions/transcript', () => trascrizione);
+const transazione = vi.hoisted(() => vi.fn());
 vi.mock('@/lib/db', () => ({
-  prisma: { $transaction: (fn: (t: typeof tx) => unknown) => fn(tx) },
+  prisma: { $transaction: transazione },
 }));
+vi.mock('@/lib/settings', () => ({
+  getSettings: async () => ({ publicRegistrationEnabled: true }),
+}));
+
+import { TIMEOUT_PULIZIA_EVENTO_MS } from '@/lib/gdpr/cleanup-selection';
+import { improntaTitolare, titolareAccount } from '@/lib/gdpr/consent-proofs';
 
 import { ritiraComunicazioni, ritiraConsensi } from './consent-withdrawal';
 
@@ -28,15 +38,30 @@ const ADESSO = new Date('2026-11-01T10:00:00Z');
 
 beforeEach(() => {
   vi.clearAllMocks();
+  transazione.mockImplementation((fn: (t: typeof tx) => unknown) => fn(tx));
+  tx.retainedConsentProof.updateMany.mockResolvedValue({ count: 0 });
   tx.recordingConsent.findMany.mockResolvedValue([]);
   tx.multitrackConsent.findMany.mockResolvedValue([]);
   tx.recordingConsent.updateMany.mockResolvedValue({ count: 0 });
   tx.multitrackConsent.updateMany.mockResolvedValue({ count: 0 });
   tx.registration.updateMany.mockResolvedValue({ count: 0 });
   tx.captionSegment.updateMany.mockResolvedValue({ count: 0 });
+  tx.eventInvitation.findMany.mockResolvedValue([]);
 });
 
 describe('ritiraConsensi', () => {
+  it('puo\' aspettare tutta la pulizia dello stesso evento', async () => {
+    await ritiraConsensi(EVENTO, [], { registrazione: true }, ADESSO, {
+      iscrizioni: [ISCRIZIONE],
+    });
+    expect(transazione.mock.calls[0]![1].timeout).toBeGreaterThan(TIMEOUT_PULIZIA_EVENTO_MS);
+  });
+
+  it('senza iscrizioni non cerca prove conservate', async () => {
+    await ritiraConsensi(EVENTO, ['ospite-1'], { registrazione: true }, ADESSO);
+    expect(tx.retainedConsentProof.updateMany).not.toHaveBeenCalled();
+  });
+
   it("l'iscritto ritira tutto cio' che porta la sua iscrizione, di ogni ingresso", async () => {
     tx.registration.updateMany.mockResolvedValue({ count: 1 });
     const esito = await ritiraConsensi(
@@ -143,9 +168,48 @@ describe('ritiraConsensi', () => {
       where: {
         eventId: EVENTO,
         withdrawnAt: null,
-        OR: [{ jitsiUserId: { in: ['mod-e1-bbbb', 'mod-e1-aaaa'] } }],
+        OR: [
+          { jitsiUserId: { in: ['mod-e1-bbbb', 'mod-e1-aaaa'] } },
+          { staffAccountId: { in: ['acc-1'] } },
+        ],
       },
       data: { withdrawnAt: ADESSO },
+    });
+    expect(trascrizione.togliPersoneDalleTrascrizioni).toHaveBeenCalledWith(
+      tx,
+      [EVENTO],
+      [],
+      [improntaTitolare(EVENTO, titolareAccount('acc-1'))]
+    );
+  });
+
+  it('chi ha dato la sola trascrizione col suo account la ritira anche dagli ingressi precedenti', async () => {
+    tx.multitrackConsent.findMany
+      .mockResolvedValueOnce([{ registrationId: null, staffAccountId: 'acc-1' }])
+      .mockResolvedValueOnce([{ jitsiUserId: 'mod-e1-aaaa' }, { jitsiUserId: 'mod-e1-bbbb' }]);
+    tx.multitrackConsent.updateMany.mockResolvedValue({ count: 2 });
+    tx.captionSegment.updateMany.mockResolvedValue({ count: 4 });
+
+    const esito = await ritiraConsensi(EVENTO, ['mod-e1-bbbb'], { registrazione: false }, ADESSO);
+
+    expect(esito).toEqual({ registrazione: false, trascrizione: true });
+    expect(tx.multitrackConsent.updateMany).toHaveBeenCalledWith({
+      where: {
+        eventId: EVENTO,
+        withdrawnAt: null,
+        OR: [
+          { jitsiUserId: { in: ['mod-e1-bbbb', 'mod-e1-aaaa'] } },
+          { staffAccountId: { in: ['acc-1'] } },
+        ],
+      },
+      data: { withdrawnAt: ADESSO },
+    });
+    expect(tx.captionSegment.updateMany).toHaveBeenCalledWith({
+      where: {
+        eventId: EVENTO,
+        OR: [{ seatId: { in: ['mod-e1-bbbb', 'mod-e1-aaaa'] } }],
+      },
+      data: { seatId: null, speakerName: null, text: null },
     });
   });
 
@@ -222,7 +286,12 @@ describe('ritiraConsensi', () => {
       origine: 'self-service',
     });
     expect(trascrizione.bloccaTrascrizioneEvento).toHaveBeenCalledWith(tx, EVENTO);
-    expect(trascrizione.togliPersoneDalleTrascrizioni).toHaveBeenCalledWith(tx, [EVENTO], [ISCRIZIONE]);
+    expect(trascrizione.togliPersoneDalleTrascrizioni).toHaveBeenCalledWith(
+      tx,
+      [EVENTO],
+      [ISCRIZIONE],
+      []
+    );
   });
 
   it('senza posti non tocca niente', async () => {
@@ -245,9 +314,117 @@ describe('ritiraComunicazioni', () => {
     });
     expect(tx.person.updateMany).toHaveBeenCalledWith({
       where: { emailHash: 'impronta', optedInToAddressBook: true },
-      data: { optedInToAddressBook: false, optedOutAt: ADESSO },
+      data: { optedInToAddressBook: false, optedOutAt: ADESSO, email: null },
     });
     expect(tx.gdprAuditLog.createMany.mock.calls[0]![0].data).toHaveLength(2);
+  });
+
+  it("una voce senza iscrizioni lascia una riga nel registro, senza evento", async () => {
+    tx.registration.findMany.mockResolvedValue([]);
+    tx.person.updateMany.mockResolvedValue({ count: 1 });
+    expect(await ritiraComunicazioni('impronta', ADESSO)).toBe(true);
+    const [riga, ...altre] = tx.gdprAuditLog.createMany.mock.calls[0]![0].data;
+    expect(altre).toEqual([]);
+    expect(riga).toMatchObject({
+      eventId: null,
+      action: 'CONSENT_WITHDRAWN',
+      recordCount: 1,
+    });
+    expect(JSON.parse(riga.details)).toEqual({
+      source: 'self-service',
+      futureCommunications: 0,
+      addressBook: 1,
+    });
+  });
+
+  it('con le iscrizioni la riga sta sui loro eventi, senza una in piu', async () => {
+    tx.registration.findMany.mockResolvedValue([{ eventId: 'e1' }]);
+    tx.person.updateMany.mockResolvedValue({ count: 1 });
+    await ritiraComunicazioni('impronta', ADESSO);
+    const righe = tx.gdprAuditLog.createMany.mock.calls[0]![0].data;
+    expect(righe.map((r: { eventId: string | null }) => r.eventId)).toEqual(['e1']);
+  });
+
+  it('un ritiro che non trova niente da ritirare non scrive righe', async () => {
+    tx.registration.findMany.mockResolvedValue([]);
+    tx.person.updateMany.mockResolvedValue({ count: 0 });
+    expect(await ritiraComunicazioni('impronta', ADESSO)).toBe(false);
+    expect(tx.gdprAuditLog.createMany.mock.calls[0]![0].data).toEqual([]);
+  });
+
+  it('lascia il segno del ritiro anche sulle iscrizioni senza la spunta', async () => {
+    tx.registration.findMany.mockResolvedValue([]);
+    tx.person.updateMany.mockResolvedValue({ count: 1 });
+    await ritiraComunicazioni('impronta', ADESSO);
+    expect(tx.registration.updateMany).toHaveBeenCalledWith({
+      where: { emailHash: 'impronta', consentFutureCommunicationsWithdrawnAt: null },
+      data: { consentFutureCommunicationsWithdrawnAt: ADESSO },
+    });
+  });
+
+  it("ferma gli inviti dell'indirizzo, anche quelli scritti a mano", async () => {
+    tx.registration.findMany.mockResolvedValue([]);
+    tx.person.updateMany.mockResolvedValue({ count: 1 });
+    await ritiraComunicazioni('impronta', ADESSO);
+    const dove = { OR: [{ emailHash: 'impronta' }, { person: { emailHash: 'impronta' } }] };
+    expect(tx.eventInvitation.deleteMany.mock.calls[0]![0].where).toMatchObject({
+      AND: [dove],
+      sentAt: null,
+    });
+    expect(tx.eventInvitation.updateMany).toHaveBeenCalledWith({
+      where: { AND: [dove], declinedAt: null },
+      data: { declinedAt: ADESSO },
+    });
+  });
+
+  it('toglie le email degli inviti ancora in coda', async () => {
+    tx.registration.findMany.mockResolvedValue([]);
+    tx.person.updateMany.mockResolvedValue({ count: 1 });
+    tx.eventInvitation.findMany.mockResolvedValue([{ id: 'inv-1' }]);
+    tx.emailOutbox.deleteMany.mockResolvedValue({ count: 1 });
+    await ritiraComunicazioni('impronta', ADESSO);
+    expect(tx.emailOutbox.deleteMany).toHaveBeenCalledWith({
+      where: {
+        status: { in: ['PENDING', 'FAILED'] },
+        OR: [{ dedupKey: { startsWith: 'event-invitation:inv-1:' } }],
+      },
+    });
+  });
+
+  it('una spunta in attesa di conferma non sopravvive al ritiro', async () => {
+    tx.registration.findMany.mockResolvedValue([]);
+    tx.person.updateMany.mockResolvedValue({ count: 0 });
+    await ritiraComunicazioni('impronta', ADESSO);
+    expect(tx.registration.updateMany).toHaveBeenCalledWith({
+      where: { emailHash: 'impronta', addressBookPending: true },
+      data: { addressBookPending: false },
+    });
+  });
+
+  it('la spunta in attesa annullata lascia una riga nel registro', async () => {
+    tx.registration.findMany.mockResolvedValue([
+      { eventId: 'e1', consentFutureCommunications: false, addressBookPending: true },
+      { eventId: 'e2', consentFutureCommunications: true, addressBookPending: false },
+    ]);
+    tx.person.updateMany.mockResolvedValue({ count: 0 });
+    expect(await ritiraComunicazioni('impronta', ADESSO)).toBe(true);
+    expect(tx.registration.findMany.mock.calls[0]![0].where).toEqual({
+      emailHash: 'impronta',
+      OR: [{ consentFutureCommunications: true }, { addressBookPending: true }],
+    });
+    const righe = tx.gdprAuditLog.createMany.mock.calls[0]![0].data as {
+      eventId: string;
+      action: string;
+      details: string;
+    }[];
+    expect(righe.map((r) => [r.eventId, r.action, JSON.parse(r.details)])).toEqual([
+      [
+        'e1',
+        'CONSENT_WITHDRAWN',
+        { source: 'self-service', futureCommunications: 0, addressBookPending: 1 },
+      ],
+      ['e2', 'CONSENT_WITHDRAWN', { source: 'self-service', futureCommunications: 1 }],
+    ]);
   });
 
   it('senza consenso da ritirare non scrive niente nel registro', async () => {

@@ -37,6 +37,7 @@ interface RegistrationRow {
   eventSlug: string;
   eventStartsAt: string;
   displayName: string;
+  nickname?: string | null;
   email: string;
   organization: string | null;
   organizationRole: string | null;
@@ -339,7 +340,14 @@ export default function RegistrationsDashboard({
                           {r.eventTitle}
                         </a>
                       </td>
-                      <td>{r.displayName}</td>
+                      <td>
+                        {r.displayName}
+                        {r.nickname && (
+                          <div className="text-muted" style={{ fontSize: '0.72rem' }}>
+                            {t('nicknameShown', { nickname: r.nickname })}
+                          </div>
+                        )}
+                      </td>
                       <td className="text-muted">{r.email}</td>
                       <td>
                         {r.organization ? (

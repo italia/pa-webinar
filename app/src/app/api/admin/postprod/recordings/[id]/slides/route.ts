@@ -15,7 +15,10 @@
  *           ogni correzione dello scarto, senza salvare.
  *   PATCH — `{ enabled?, offsetSec? }` (Zod). Audit log.
  *
- * Auth: chi gestisce l'evento della registrazione (ADR-014).
+ * Auth: GET per chi gestisce l'evento della registrazione (ADR-014), con il
+ * video del pannello solo per chi lo organizza; PATCH, che cambia come il
+ * video si mostra sulla pagina, solo per chi lo organizza
+ * (lib/recording/content-access).
  */
 
 import { cookies } from 'next/headers';
@@ -31,6 +34,7 @@ import {
   readRecordingSlides,
 } from '@/lib/presentation/recording-slides-data';
 import { recordingSlidesSettingsSchema } from '@/lib/validation/presentation';
+import { accessoContenutoStaff, requireRecordingContent } from '@/lib/recording/content-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -47,7 +51,7 @@ function fileUrlStaff(recordingId: string, materialId: string): string {
 
 export const GET = withErrorHandling(async (_request, context) => {
   const { id } = await idDa(context);
-  await requireRecordingManager(await cookies(), id);
+  const session = await requireRecordingManager(await cookies(), id);
 
   const recording = await prisma.recording.findUnique({
     where: { id },
@@ -68,6 +72,14 @@ export const GET = withErrorHandling(async (_request, context) => {
 
   const data = await readRecordingSlides(recording);
   const conVideo = registrazioneConVideo(recording);
+  // Il video si vede solo dove si vede il contenuto: all'admin che non
+  // organizza l'evento restano le scelte e i materiali.
+  const contenuto =
+    (await accessoContenutoStaff(session, {
+      eventId: recording.eventId,
+      recordingId: id,
+      superficie: 'video',
+    })) !== null;
   // Il video della pagina pubblica è questo: lo stesso file della sessione.
   const videoDellEvento =
     !!recording.event.recordingUrl &&
@@ -86,7 +98,8 @@ export const GET = withErrorHandling(async (_request, context) => {
       // Le slide sono materiali: con la sezione spenta la pagina non le mostra.
       eventShowsMaterials: recording.event.postEventShowMaterials,
       eventSlug: recording.event.slug,
-      mediaUrl: conVideo ? `/api/admin/postprod/recordings/${id}/media` : null,
+      contenuto,
+      mediaUrl: conVideo && contenuto ? `/api/admin/postprod/recordings/${id}/media` : null,
       marks: data.marks,
       materials: data.materials.map((m) => ({
         id: m.id,
@@ -101,7 +114,7 @@ export const GET = withErrorHandling(async (_request, context) => {
 
 export const PATCH = withErrorHandling(async (request, context) => {
   const { id } = await idDa(context);
-  await requireRecordingManager(await cookies(), id);
+  await requireRecordingContent(await cookies(), id, 'pubblicazione');
 
   const parsed = recordingSlidesSettingsSchema.safeParse(await parseJsonBody(request));
   if (!parsed.success) {

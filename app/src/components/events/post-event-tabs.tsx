@@ -19,7 +19,6 @@ interface QuestionData {
   text: string;
   /** Risposta scritta durante l'evento, se c'e'. */
   answerText: string | null;
-  authorName: string;
   upvotes: number;
   status: string;
 }
@@ -227,19 +226,13 @@ function QATabContent({ questions }: { questions: QuestionData[] }) {
                 <p className="fw-semibold mb-1" style={{ color: 'var(--app-text)' }}>
                   {q.text}
                 </p>
-                <div className="text-muted" style={{ fontSize: '0.82rem' }}>
-                  {q.authorName}
-                  {q.status === 'ANSWERED' && (
-                    <Badge
-                      color="success"
-                      pill
-                      className="ms-2"
-                      style={{ fontSize: '0.68rem' }}
-                    >
+                {q.status === 'ANSWERED' && (
+                  <div className="text-muted" style={{ fontSize: '0.82rem' }}>
+                    <Badge color="success" pill style={{ fontSize: '0.68rem' }}>
                       {t('status.ANSWERED')}
                     </Badge>
-                  )}
-                </div>
+                  </div>
+                )}
                 {q.answerText && (
                   <div className="qa-answer">
                     <span className="qa-answer__label">{t('answerLabel')}</span>

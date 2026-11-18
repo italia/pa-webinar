@@ -14,11 +14,15 @@
  * cleanup, which deletes the raw questions/polls/word-cloud/feedback/
  * registration rows. Nothing here carries a personal identifier: question text
  * is included without its author, votes/words are counts only.
+ *
+ * Lo snapshot non legge la chat: la chat non si pubblica. Chi lo mostra al
+ * pubblico passa da `riepilogoPubblico`, che vale anche sugli snapshot gia'
+ * salvati; lo snapshot intero resta allo staff (statistiche, email di fine
+ * evento).
  */
 
 import type { Prisma } from '@prisma/client';
 
-import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { countWordsByPerson } from '@/lib/wordcloud/normalize';
 import { getFeedbackSummary } from '@/lib/feedback/feedback-summary';
@@ -35,11 +39,7 @@ export interface RecapPoll {
 }
 
 export interface EventRecap {
-  /**
-   * 1 = senza `chatQuestions` (snapshot persistiti prima delle domande in chat).
-   * Il campo nuovo è OPZIONALE proprio per questo: gli snapshot già scritti
-   * restano leggibili senza migrazione né rigenerazione.
-   */
+  /** Gli snapshot salvati restano leggibili senza migrazione né rigenerazione. */
   version: 1 | 2;
   generatedAt: string;
   /** Peak concurrent participants during the live event. */
@@ -49,15 +49,8 @@ export interface EventRecap {
   /** Top answered/highlighted questions by upvotes — text only, no author. */
   topQuestions: { text: string; upvotes: number }[];
   /**
-   * Domande poste in chat, dal più votato. Testo soltanto: niente nome di chi ha
-   * chiesto, come per `topQuestions`.
-   *
-   * Perché stanno QUI e non si leggono dalla chat quando serve: il cleanup GDPR
-   * cancella `chat_messages` alla scadenza della retention, quindi una pagina
-   * che interrogasse la chat mostrerebbe l'archivio per N giorni e poi lo
-   * troverebbe vuoto, senza errori e senza che nessuno se ne accorga. Lo
-   * snapshot invece si congela alla prima visita della pagina conclusa, mentre i
-   * messaggi ci sono ancora.
+   * Domande poste in chat: solo in snapshot gia' salvati, e solo per lo staff.
+   * Non escono mai verso il pubblico (`riepilogoPubblico`).
    */
   chatQuestions?: { text: string; reactions: number; answered: boolean }[];
   /** Published polls with per-option vote counts. */
@@ -130,8 +123,8 @@ export function formatRecapSummary(recap: EventRecap, locale: EmailLocale): stri
   const lines: string[] = [];
   if (recap.headcount > 0) lines.push(`${L.participants}: ${recap.headcount}`);
   if (recap.registrations > 0) lines.push(`${L.registered}: ${recap.registrations}`);
-  // Le domande poste in chat contano come domande: per chi legge il riepilogo
-  // sono la stessa cosa, cambia solo dove sono state scritte.
+  // In uno snapshot salvato le domande poste in chat contano come domande: per
+  // chi legge l'email di fine evento sono la stessa cosa.
   const questionCount = recap.topQuestions.length + (recap.chatQuestions?.length ?? 0);
   if (questionCount > 0) lines.push(`${L.questions}: ${questionCount}`);
   if (recap.polls.length > 0) lines.push(`${L.polls}: ${recap.polls.length}`);
@@ -156,9 +149,20 @@ export function isRecapEmpty(recap: EventRecap): boolean {
   );
 }
 
+/**
+ * Il riepilogo come arriva alla pagina pubblica: mai le domande poste in chat, e
+ * il testo delle domande solo se l'evento le pubblica (`domande`). Si applica in
+ * lettura, cosi' vale anche per gli snapshot gia' salvati: lo snapshot intero
+ * serve allo staff, quindi mai in `ensureEventRecap`.
+ */
+export function riepilogoPubblico(recap: EventRecap, { domande }: { domande: boolean }): EventRecap {
+  const { chatQuestions: _chat, ...pubblico } = recap;
+  return domande ? pubblico : { ...pubblico, topQuestions: [] };
+}
+
 /** Compute the recap from the current raw rows (does not persist). */
 export async function buildRecap(eventId: string): Promise<EventRecap> {
-  const [event, registrations, questions, polls, words, feedback, chatQuestions] = await Promise.all([
+  const [event, registrations, questions, polls, words, feedback] = await Promise.all([
     prisma.event.findUnique({
       where: { id: eventId },
       select: { peakParticipants: true },
@@ -182,23 +186,7 @@ export async function buildRecap(eventId: string): Promise<EventRecap> {
       select: { word: true, registrationId: true, guestId: true, roundId: true },
     }),
     getFeedbackSummary(eventId),
-    // Domande poste in chat. Le scartate NON entrano nell'archivio pubblico —
-    // stessa regola del Q&A storico, che pubblicava solo ANSWERED/HIGHLIGHTED:
-    // un archivio che mostra "questa non verrà trattata" espone chi ha chiesto.
-    // Le nascoste dalla moderazione sono escluse a maggior ragione.
-    prisma.chatMessage.findMany({
-      where: { eventId, isQuestion: true, hiddenAt: null, dismissedAt: null },
-      select: {
-        text: true,
-        answeredAt: true,
-        // Il conteggio, non gli autori delle reazioni: qui non deve entrare
-        // nessun identificativo di persona.
-        _count: { select: { reactions: true } },
-      },
-    }),
   ]);
-
-
 
   const recapPolls: RecapPoll[] = polls.map((p) => {
     const optionTexts = Array.isArray(p.options) ? (p.options as string[]) : [];
@@ -215,26 +203,12 @@ export async function buildRecap(eventId: string): Promise<EventRecap> {
     };
   });
 
-  // Il testo della chat è cifrato a riposo: qui si decifra una volta sola,
-  // mentre lo snapshot si forma. L'ordinamento è per reazioni ricevute — è il
-  // "voto" che la chat ha già — e si fa in memoria perché le reazioni sono
-  // righe, non un contatore denormalizzato come sulle vecchie domande.
-  const recapChatQuestions = chatQuestions
-    .map((m) => ({
-      text: tryDecryptPII(m.text) ?? m.text,
-      reactions: m._count.reactions,
-      answered: m.answeredAt !== null,
-    }))
-    .sort((a, b) => b.reactions - a.reactions)
-    .slice(0, MAX_QUESTIONS);
-
   return {
     version: 2,
     generatedAt: new Date().toISOString(),
     headcount: event?.peakParticipants ?? 0,
     registrations,
     topQuestions: questions.map((q) => ({ text: q.text, upvotes: q.upvoteCount })),
-    chatQuestions: recapChatQuestions,
     polls: recapPolls,
     topWords: countWordsByPerson(words).slice(0, MAX_WORDS),
     feedback: {

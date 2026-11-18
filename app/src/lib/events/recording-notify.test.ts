@@ -98,6 +98,72 @@ describe('notifyPublishedRecordings', () => {
     expect(enqueueEmail).not.toHaveBeenCalled();
   });
 
+  describe('registrazione riservata su un evento con destinazione', () => {
+    const riservata = (over: Record<string, unknown> = {}) =>
+      evento({
+        recordingAudience: 'REGISTRANTS',
+        recordingDestination: 'REGISTRANTS',
+        postEventPublic: false,
+        ...over,
+      });
+
+    it('con la pagina privata parte lo stesso, con il link personale', async () => {
+      fn(prisma.event.findMany).mockResolvedValue([riservata()]);
+      const esito = await notifyPublishedRecordings(opts);
+      expect(esito).toEqual({ eventsNotified: 1, emailsQueued: 2, emailsFailed: 0 });
+      const invio = fn(enqueueEmail).mock.calls[0]?.[0];
+      expect(invio.html).toContain('/api/events/webinar/recording/access?t=');
+    });
+
+    it('legge la destinazione: senza la colonna la pagina privata fermerebbe l’avviso', async () => {
+      fn(prisma.event.findMany).mockResolvedValue([]);
+      await notifyPublishedRecordings(opts);
+      const select = fn(prisma.event.findMany).mock.calls[0]?.[0].select;
+      expect(select).toMatchObject({ recordingAudience: true, recordingDestination: true });
+    });
+
+    it('oltre la finestra dopo l’evento non parte', async () => {
+      fn(prisma.event.findMany).mockResolvedValue([
+        riservata({ postEventPublicUntil: new Date('2026-10-09T10:00:00Z') }),
+      ]);
+      expect((await notifyPublishedRecordings(opts)).eventsNotified).toBe(0);
+      expect(prisma.event.updateMany).not.toHaveBeenCalled();
+    });
+
+    it('con il solo video esterno aspetta: la pagina non lo mostra', async () => {
+      fn(prisma.event.findMany).mockResolvedValue([
+        riservata({ recordingPublished: false, youtubeUrl: 'https://youtu.be/abc' }),
+        riservata({ id: 'e2', recordingPublished: false, postEventPublic: true }),
+        riservata({ id: 'e3', recordingPublished: false, transcriptPublished: true }),
+      ]);
+      expect((await notifyPublishedRecordings(opts)).eventsNotified).toBe(0);
+      expect(prisma.event.updateMany).not.toHaveBeenCalled();
+      expect(enqueueEmail).not.toHaveBeenCalled();
+    });
+  });
+
+  it('riservata senza destinazione: la pagina privata ferma l’avviso, come sempre', async () => {
+    fn(prisma.event.findMany).mockResolvedValue([
+      evento({
+        recordingAudience: 'REGISTRANTS',
+        recordingDestination: null,
+        postEventPublic: false,
+      }),
+    ]);
+    expect((await notifyPublishedRecordings(opts)).eventsNotified).toBe(0);
+    expect(enqueueEmail).not.toHaveBeenCalled();
+  });
+
+  it('un video esterno su un evento senza nulla di riservato avvisa con la pagina visibile', async () => {
+    fn(prisma.event.findMany).mockResolvedValue([
+      evento({ recordingPublished: false, recordingDestination: null, youtubeUrl: 'https://youtu.be/abc' }),
+    ]);
+    expect((await notifyPublishedRecordings(opts)).emailsQueued).toBe(2);
+    expect(fn(enqueueEmail).mock.calls[0]?.[0].html).toContain(
+      'https://webinar.example.gov.it/it/eventi/webinar'
+    );
+  });
+
   it('un altro giro ha gia’ prenotato: nessun secondo avviso', async () => {
     fn(prisma.event.findMany).mockResolvedValue([evento()]);
     fn(prisma.event.updateMany).mockResolvedValue({ count: 0 });

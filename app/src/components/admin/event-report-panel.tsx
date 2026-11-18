@@ -21,6 +21,11 @@ import type { StoredReport } from '@/lib/report/types';
 import { localeDisplayName } from '@/lib/utils/locale-display';
 
 interface Stato {
+  /** Chi guarda organizza l'evento: legge, chiede e pubblica il resoconto.
+   *  Falso per l'admin che non lo organizza (lib/recording/content-access). */
+  contenuto?: boolean;
+  /** Il resoconto c'e', anche quando chi guarda non lo puo' leggere. */
+  reportExists?: boolean;
   report: StoredReport | null;
   published: boolean;
   job: { status: string; lastError: string | null; createdAt: string; completedAt: string | null } | null;
@@ -197,6 +202,12 @@ export default function EventReportPanel({ eventId, locale }: { eventId: string;
         </div>
       </details>
 
+      {stato.contenuto === false ? (
+        <div className="alert alert-info mb-0" role="note" style={{ fontSize: '0.88rem' }}>
+          {stato.reportExists ? t('organizerOnlyExists') : t('organizerOnly')}
+        </div>
+      ) : (
+      <>
       <div className="d-flex flex-wrap align-items-center gap-2 mb-2">
         <button
           type="button"
@@ -280,6 +291,8 @@ export default function EventReportPanel({ eventId, locale }: { eventId: string;
             </div>
           )}
         </>
+      )}
+      </>
       )}
     </div>
   );

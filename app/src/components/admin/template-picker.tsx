@@ -30,6 +30,9 @@ interface TemplatePickerProps {
   /** La riga che invita a scegliere o a saltare; spenta sotto le domande del
    *  formato, che la sostituiscono. */
   showSubtitle?: boolean;
+  /** Falso dove l'installazione non registra niente: i modelli partono senza
+   *  registrazione, e le schede non la promettono. */
+  registrazioneProponibile?: boolean;
 }
 
 export default function TemplatePicker({
@@ -37,6 +40,7 @@ export default function TemplatePicker({
   onSelect,
   onSkip,
   showSubtitle = true,
+  registrazioneProponibile = true,
 }: TemplatePickerProps) {
   const t = useTranslations('admin.templates');
   // Le funzioni con i nomi della matrice dei permessi del wizard.
@@ -45,6 +49,7 @@ export default function TemplatePicker({
   return (
     <div>
       {showSubtitle && <p className="text-secondary mb-4">{t('pickerSubtitle')}</p>}
+      {!registrazioneProponibile && <p className="text-secondary small">{t('noRecording')}</p>}
 
       <div className="row g-3 mb-4">
         {templates.map((tpl) => (
@@ -110,7 +115,9 @@ export default function TemplatePicker({
                   >
                     {tpl.qaEnabled && <Badge color="primary">{tf('qa.label')}</Badge>}
                     {tpl.chatEnabled && <Badge color="primary">{tf('chat.label')}</Badge>}
-                    {tpl.recordingEnabled && <Badge color="primary">{t('recordingLabel')}</Badge>}
+                    {registrazioneProponibile && tpl.recordingEnabled && (
+                      <Badge color="primary">{t('recordingLabel')}</Badge>
+                    )}
                     {tpl.participantsCanUnmute && (
                       <Badge color="info">{tf('mic.label')}</Badge>
                     )}

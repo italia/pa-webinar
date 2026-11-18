@@ -36,6 +36,7 @@ let conteggio: number;
 let esitoVoto: number;
 let risposta: string | null;
 let esitoModifica: number;
+let autore: string;
 const fetchMock = vi.fn();
 
 async function render(props: {
@@ -44,6 +45,7 @@ async function render(props: {
   voterAccessToken?: string;
   voterGuestId?: string;
   myQuestionIds?: ReadonlySet<string>;
+  domandePubblicate?: boolean;
 }) {
   await act(async () => {
     root.render(
@@ -56,6 +58,7 @@ async function render(props: {
             voterAccessToken={props.voterAccessToken}
             voterGuestId={props.voterGuestId}
             myQuestionIds={props.myQuestionIds}
+            domandePubblicate={props.domandePubblicate}
           />
         </SWRConfig>
       </NextIntlClientProvider>,
@@ -100,6 +103,7 @@ beforeEach(() => {
   esitoVoto = 200;
   risposta = null;
   esitoModifica = 200;
+  autore = 'Ospite A';
   fetchMock.mockReset();
   fetchMock.mockImplementation(async (url: string, init?: RequestInit) => {
     if (init?.method === 'PATCH') {
@@ -124,7 +128,7 @@ beforeEach(() => {
         questions: [
           {
             id: QID,
-            authorName: 'Ospite A',
+            authorName: autore,
             text: 'Ci sarà la registrazione?',
             answerText: risposta,
             status: risposta ? 'ANSWERED' : 'PENDING',
@@ -238,6 +242,39 @@ describe('QuestionList — risposta scritta', () => {
     expect(container.querySelector('textarea')).toBeNull();
     expect(container.querySelector('.qa-answer__text')?.textContent).toBe('Sì, entro una settimana.');
     expect(pulsante(t.moderator.editAnswer)).toBeDefined();
+  });
+
+  it('sotto il campo di risposta ricorda che il testo può uscire sulla pagina', async () => {
+    await render({ token: 'TOKEN_MODERATORE', isModerator: true });
+    await clicca(pulsante(t.moderator.answer)!);
+    const area = container.querySelector('textarea')!;
+    const avviso = document.getElementById(area.getAttribute('aria-describedby')!);
+    expect(avviso?.textContent).toBe(t.moderator.answerNotice);
+    expect(area.closest('form')?.contains(avviso!)).toBe(true);
+  });
+
+  it('dove le domande non si pubblicano l’avviso non parla della pagina', async () => {
+    await render({ token: 'TOKEN_MODERATORE', isModerator: true, domandePubblicate: false });
+    await clicca(pulsante(t.moderator.answer)!);
+    const area = container.querySelector('textarea')!;
+    const avviso = document.getElementById(area.getAttribute('aria-describedby')!);
+    expect(avviso?.textContent).toBe(t.moderator.answerNoticeNotPublished);
+    expect(avviso?.textContent).toContain('dati personali');
+    expect(avviso?.textContent).not.toContain('pagina');
+  });
+
+  it('il pubblico non ha il campo di risposta, quindi nemmeno l’avviso', async () => {
+    await render({ voterGuestId: 'ospite-1' });
+    expect(container.textContent).not.toContain(t.moderator.answerNotice);
+  });
+
+  it('una domanda senza nome si legge lo stesso', async () => {
+    autore = '';
+    await render({ voterGuestId: 'ospite-1' });
+    expect(avvisi()).toEqual([]);
+    expect(container.querySelector('.qa-card__text')?.textContent).toBe('Ci sarà la registrazione?');
+    expect(container.querySelector('.qa-card__name')?.textContent).toBe('');
+    expect(container.querySelector('.qa-card__avatar')?.textContent).toBe('');
   });
 
   it('una risposta respinta lo dice e lascia aperto il modulo', async () => {

@@ -50,6 +50,8 @@ vi.mock('@/components/ui/markdown', () => ({
   MarkdownRenderer: ({ content }: { content: string }) => <p>{content}</p>,
 }));
 
+import type { EventRecap } from '@/lib/events/recap';
+
 import EventDetailClient from './event-detail-client';
 
 const SLUG = 'evento-di-prova';
@@ -95,6 +97,10 @@ function disegna(props: {
   invalidToken?: boolean;
   hasPostEventQuestionnaire?: boolean;
   feedbackProof?: { accessToken?: string; ratingToken?: string } | null;
+  recap?: EventRecap | null;
+  previewForStaff?: boolean;
+  previewPageHidden?: boolean;
+  previewPageForRegistrants?: boolean;
 }) {
   act(() => {
     root.render(
@@ -142,9 +148,76 @@ describe('scheda pubblica — video', () => {
     expect(container.textContent).toContain(messages.postprod.unrecordedSpeech);
   });
 
+  it('dove nel video c’e’ solo chi conduce lo dice, senza parlare di consensi', () => {
+    disegna({
+      event: { ...concluso(true), unrecordedSpeechHostsOnly: true } as ReturnType<typeof evento>,
+      registrationOpen: false,
+    });
+    expect(container.textContent).toContain(messages.postprod.unrecordedSpeechHostsOnly);
+    expect(container.textContent).not.toContain(messages.postprod.unrecordedSpeech);
+  });
+
   it('senza interventi mancanti non dice niente', () => {
     disegna({ event: concluso(false), registrationOpen: false });
     expect(container.textContent).not.toContain(messages.postprod.unrecordedSpeech);
+  });
+});
+
+describe('scheda pubblica — anteprima dello staff', () => {
+  const concluso = () => evento({ status: 'ENDED' });
+
+  it('con la registrazione non pubblicata dice questo', () => {
+    disegna({ event: concluso(), registrationOpen: false, previewForStaff: true });
+    expect(container.textContent).toContain(messages.events.detail.previewBody);
+    expect(container.textContent).not.toContain(messages.events.detail.previewBodyPageHidden);
+  });
+
+  it('con la pagina nascosta dice che la vede solo chi gestisce l\'evento', () => {
+    disegna({
+      event: concluso(),
+      registrationOpen: false,
+      previewForStaff: true,
+      previewPageHidden: true,
+    });
+    expect(container.textContent).toContain(messages.events.detail.previewBodyPageHidden);
+    expect(container.textContent).not.toContain(messages.events.detail.previewBody);
+    expect(container.textContent).not.toContain(messages.events.detail.previewBodyPageRegistrants);
+  });
+
+  it('con la pagina aperta agli iscritti dice che la vedono anche loro', () => {
+    disegna({
+      event: concluso(),
+      registrationOpen: false,
+      previewForStaff: true,
+      previewPageHidden: true,
+      previewPageForRegistrants: true,
+    });
+    expect(container.textContent).toContain(messages.events.detail.previewBodyPageRegistrants);
+    expect(container.textContent).not.toContain(messages.events.detail.previewBodyPageHidden);
+  });
+
+  it('con il video non pubblicato non parla di iscritti', () => {
+    disegna({
+      event: concluso(),
+      registrationOpen: false,
+      previewForStaff: true,
+      previewPageForRegistrants: true,
+    });
+    expect(container.textContent).toContain(messages.events.detail.previewBody);
+    expect(container.textContent).not.toContain(messages.events.detail.previewBodyPageRegistrants);
+  });
+
+  it('fuori dall\'anteprima non compare', () => {
+    disegna({ event: concluso(), registrationOpen: false, previewPageHidden: true });
+    expect(container.textContent).not.toContain(messages.events.detail.previewBodyPageHidden);
+  });
+});
+
+describe('scheda pubblica — picco di partecipanti', () => {
+  it('al singolare con una persona', () => {
+    disegna({ event: evento({ status: 'ENDED', peakParticipants: 1 }), registrationOpen: false });
+    expect(container.textContent).toContain('Picco: 1 partecipante');
+    expect(container.textContent).not.toContain('1 partecipanti');
   });
 });
 
@@ -271,10 +344,10 @@ describe('scheda pubblica — stato e ingresso leggibili', () => {
     expect(link(`/events/${SLUG}/registration`)?.textContent).toContain(detail.registerAndJoin);
   });
 
-  it('dice prima che l’evento sarà registrato', () => {
-    disegna({ event: evento({ recordingEnabled: true }), registrationOpen: true });
+  it('dice prima che l’evento può essere registrato', () => {
+    disegna({ event: evento({ siRegistra: true }), registrationOpen: true });
     expect(container.textContent).toContain(detail.willBeRecorded);
-    disegna({ event: evento({ recordingEnabled: false }), registrationOpen: true });
+    disegna({ event: evento({ siRegistra: false }), registrationOpen: true });
     expect(container.textContent).not.toContain(detail.willBeRecorded);
   });
 });
@@ -321,6 +394,64 @@ describe('scheda pubblica — lingue di titolo e descrizione', () => {
     expect(titolo().textContent).toBe('Evento di prova');
     expect(titolo().getAttribute('lang')).toBe('it');
     expect(container.querySelector('.traduzione-automatica')).toBeNull();
+  });
+});
+
+describe('scheda pubblica — video esterno', () => {
+  const concluso = (youtubeUrl: string | null) =>
+    evento({
+      status: 'ENDED',
+      youtubeUrl,
+      startsAt: new Date(Date.now() - 4 * HOUR).toISOString(),
+      endsAt: new Date(Date.now() - 2 * HOUR).toISOString(),
+    });
+  const linkEsterno = () =>
+    container.querySelector<HTMLAnchorElement>('a[href*="youtube.com"], a[href*="youtu.be"]');
+
+  it('il link si mostra solo se il server lo manda', () => {
+    disegna({
+      event: concluso('https://www.youtube.com/watch?v=abc'),
+      registrationOpen: false,
+    });
+    expect(linkEsterno()).not.toBeNull();
+    disegna({ event: concluso(null), registrationOpen: false });
+    expect(linkEsterno()).toBeNull();
+  });
+});
+
+describe('scheda pubblica — riepilogo senza domande', () => {
+  const concluso = () =>
+    evento({
+      status: 'ENDED',
+      postEventShowQA: false,
+      postEventShowRecap: true,
+      startsAt: new Date(Date.now() - 4 * HOUR).toISOString(),
+      endsAt: new Date(Date.now() - 2 * HOUR).toISOString(),
+    });
+  const riepilogo = {
+    version: 2 as const,
+    generatedAt: '2026-09-22T12:00:00.000Z',
+    headcount: 0,
+    registrations: 0,
+    topQuestions: [],
+    polls: [],
+    topWords: [],
+    feedback: { average: null, count: 0 },
+  };
+
+  it('una scheda che conteneva solo domande non compare', () => {
+    disegna({ event: concluso(), registrationOpen: false, recap: riepilogo });
+    expect(container.textContent).not.toContain(messages.events.recap.title);
+  });
+
+  it('con altri dati compare, senza domande', () => {
+    disegna({
+      event: concluso(),
+      registrationOpen: false,
+      recap: { ...riepilogo, headcount: 12 },
+    });
+    expect(container.textContent).toContain(messages.events.recap.title);
+    expect(container.textContent).not.toContain(messages.events.recap.topQuestions);
   });
 });
 

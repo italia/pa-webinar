@@ -4,21 +4,33 @@
 /**
  * Il consenso alla trascrizione voce per voce.
  *
- * Un evento che registra una traccia audio per persona, o che tiene la
- * trascrizione dai sottotitoli, chiede a ognuno se i propri interventi
- * possono entrare nella trascrizione con il proprio nome. In quegli eventi
- * il video completo della sala contiene anche le voci di chi ha detto no:
+ * Un evento che registra una traccia audio per persona, tiene la trascrizione
+ * dai sottotitoli o trascrive il video con la pipeline AI chiede a ognuno se i
+ * propri interventi possono entrare nella trascrizione con il proprio nome.
+ * Il video completo della sala contiene anche le voci di chi ha detto no:
  * trascriverlo in blocco annullerebbe la scelta. Per questo la pipeline non
- * lo trascrive da sola, e chi la avvia a mano deve confermare che tutte le
- * voci del video hanno acconsentito.
+ * trascrive da sola un video senza tracce per persona, e chi la avvia a mano
+ * deve confermare che tutte le voci del video hanno acconsentito. La conferma
+ * si chiede anche se parla solo chi conduce: il video non dice chi ha parlato.
+ *
+ * Le regole sono due, e non vanno confuse. `chiedeConsensoPerVoce` decide cosa
+ * chiedere a chi entra. `regimeConsensoVoce` decide gli effetti su una
+ * registrazione gia' fatta: una domanda nata dopo non si applica a chi non
+ * l'ha mai ricevuta, e il segno `Recording.transcriptConsentRule` distingue le
+ * registrazioni nate sotto la regola sul video da quelle nate prima.
  */
 import type { Prisma, PrismaClient } from '@prisma/client';
 import { z } from 'zod';
 
 import { captionsTranscriptActive } from '@/lib/captions/availability';
 import { isMultitrackPlaceholder } from '@/lib/recorder/lifecycle';
+import { partecipantiNelVideo, recordingAvailable } from '@/lib/recording/availability';
 import { AppError, ValidationError } from '@/lib/errors';
-import { VERSIONE_TESTO_TRASCRIZIONE } from '@/lib/registration/consents';
+import {
+  trascrizioneDalVideo,
+  trascrizioneRichiesta,
+  VERSIONE_TESTO_TRASCRIZIONE,
+} from '@/lib/registration/consents';
 
 import { CODICE_CONFERMA_VOCI } from './voice-consent-code';
 
@@ -26,22 +38,61 @@ export interface EventoConsensoVoce {
   multitrackRecordingEnabled: boolean;
   captionsTranscriptEnabled: boolean;
   liveCaptionsEnabled?: boolean | null;
+  // Per la trascrizione dal video: senza, il video non conta.
+  eventType?: string | null;
+  recordingEnabled?: boolean;
+  aiTranscriptEnabled?: boolean;
 }
 
 export interface SitoConsensoVoce {
   liveCaptionsEnabled?: boolean | null;
+  // Per la trascrizione dal video: senza, il video non conta.
+  aiPipelineEnabled?: boolean | null;
 }
 
 /**
- * La regola di adesso, la stessa della sala d'attesa: si chiede il consenso
- * se l'evento registra una traccia per persona o tiene davvero la
- * trascrizione dai sottotitoli (scelta, sottotitoli accesi, servizio presente).
+ * La regola di adesso, la stessa del modulo d'iscrizione e della sala d'attesa
+ * (lib/registration/consents): si chiede il consenso se l'evento registra una
+ * traccia per persona, tiene davvero la trascrizione dai sottotitoli (scelta,
+ * sottotitoli accesi, servizio presente) o trascrive il video con la pipeline
+ * AI. Legge l'ambiente: si chiama solo sul server.
  */
 export function chiedeConsensoPerVoce(
   e: EventoConsensoVoce,
   sito: SitoConsensoVoce
 ): boolean {
-  return e.multitrackRecordingEnabled || captionsTranscriptActive(e, sito);
+  return trascrizioneRichiesta({
+    multitrackRecordingEnabled: e.multitrackRecordingEnabled,
+    captionsTranscript: captionsTranscriptActive(e, sito),
+    trascrizioneVideo: trascrizioneDalVideo(
+      e,
+      sito,
+      recordingAvailable(),
+      partecipantiNelVideo()
+    ),
+  });
+}
+
+/**
+ * La versione del testo che il consenso alla trascrizione deve avere adesso:
+ * quella che comprende il nome, dove l'evento trascrive davvero dai sottotitoli,
+ * dal video o dalle tracce per persona con la pipeline AI
+ * (lib/registration/consents). Senza pipeline le tracce non si trascrivono, e il
+ * testo di prima basta. La stessa regola per la casella che si ripropone in sala
+ * d'attesa, per il registratore e per lo stato che il token riporta alla sala.
+ * Legge l'ambiente: si chiama solo sul server.
+ */
+export function versioneConsensoTrascrizione(
+  e: EventoConsensoVoce,
+  sito: SitoConsensoVoce
+): number {
+  const tracceDaTrascrivere =
+    e.multitrackRecordingEnabled && !!e.aiTranscriptEnabled && !!sito.aiPipelineEnabled;
+  const trascrive =
+    captionsTranscriptActive(e, sito) ||
+    trascrizioneDalVideo(e, sito, recordingAvailable(), partecipantiNelVideo()) ||
+    tracceDaTrascrivere;
+  return trascrive ? VERSIONE_TESTO_TRASCRIZIONE : 1;
 }
 
 type Db = PrismaClient | Prisma.TransactionClient;
@@ -49,27 +100,42 @@ type Db = PrismaClient | Prisma.TransactionClient;
 export interface RegimeConsensoVoce {
   /** Il consenso voce per voce e' stato chiesto. */
   chiesto: boolean;
-  /** La versione minima del testo che conta per mostrare un nome. */
+  /**
+   * La versione minima del testo che conta per mostrare un nome: quella che lo
+   * comprende, con la trascrizione dai sottotitoli o con il segno della
+   * registrazione.
+   */
   versione: number;
 }
 
 /**
  * Se il consenso voce per voce e' stato chiesto, e con quale testo: la
- * regola di adesso, oppure le tracce che solo il controllo in sala lascia
- * (frasi dei sottotitoli salvate, prove di consenso date in sala d'attesa,
- * tracce per persona registrate). Un interruttore spento dopo l'evento non
- * restituisce cosi' i nomi di chi aveva detto no, ne' fa trascrivere il video
- * completo senza conferma; e se la trascrizione dai sottotitoli ha girato,
- * vale il testo che comprende il nome anche dopo.
+ * traccia per persona o la trascrizione dai sottotitoli dell'evento, oppure
+ * le tracce che solo il controllo in sala lascia (frasi dei sottotitoli
+ * salvate, prove di consenso date in sala d'attesa, tracce per persona
+ * registrate), oppure il segno della registrazione. Un interruttore spento
+ * dopo l'evento non restituisce cosi' i nomi di chi aveva detto no, ne' fa
+ * trascrivere il video completo senza conferma; e se la trascrizione dai
+ * sottotitoli ha girato, vale il testo che comprende il nome anche dopo.
  *
  * Le sole risposte all'iscrizione non bastano: l'interruttore puo' essere
  * stato spento prima dell'evento, e allora in sala nessuno ha chiesto niente.
+ *
+ * Non passa da `chiedeConsensoPerVoce`, che comprende il video: chi era in
+ * una registrazione nata prima di quella regola non ha ricevuto la domanda, e
+ * applicarla toglierebbe i nomi da trascrizioni pubblicate e chiederebbe una
+ * conferma a ogni rilancio. Per questo `segnoRegistrazione` e' obbligatorio:
+ * legge Recording.transcriptConsentRule della registrazione in esame, non
+ * dell'evento, perche' un evento ricorrente puo' avere righe vecchie e nuove.
+ * Vero, la domanda vale anche per il video e servono consensi al testo che
+ * comprende il nome; falso, restano le altre condizioni.
  */
 export async function regimeConsensoVoce(
   db: Db,
   eventId: string,
   e: EventoConsensoVoce,
-  sito: SitoConsensoVoce
+  sito: SitoConsensoVoce,
+  segnoRegistrazione: boolean
 ): Promise<RegimeConsensoVoce> {
   const [frase, prova, traccia] = await Promise.all([
     db.captionSegment.findFirst({ where: { eventId }, select: { id: true } }),
@@ -81,8 +147,12 @@ export async function regimeConsensoVoce(
   ]);
   const sottotitoli = captionsTranscriptActive(e, sito) || Boolean(frase);
   return {
-    chiesto: chiedeConsensoPerVoce(e, sito) || Boolean(frase || prova || traccia),
-    versione: sottotitoli ? VERSIONE_TESTO_TRASCRIZIONE : 1,
+    chiesto:
+      segnoRegistrazione ||
+      e.multitrackRecordingEnabled ||
+      sottotitoli ||
+      Boolean(prova || traccia),
+    versione: segnoRegistrazione || sottotitoli ? VERSIONE_TESTO_TRASCRIZIONE : 1,
   };
 }
 
@@ -99,20 +169,22 @@ export async function registrazioneMultitraccia(
 
 /**
  * Trascrivere questa registrazione richiede la conferma che tutte le voci
- * hanno acconsentito: e' il video completo (non le tracce per persona) di un
- * evento in cui il consenso voce per voce e' stato chiesto. La stessa regola
- * per la pipeline e per la pagina che la avvia.
+ * hanno acconsentito: e' il video completo (non le tracce per persona) e il
+ * consenso voce per voce e' stato chiesto, oppure la registrazione ha il segno.
+ * La stessa regola per la pipeline, per la pagina che la avvia e per la
+ * chiusura dell'evento.
  */
 export async function confermaVociNecessaria(
   db: Db,
-  rec: { id: string; blobKey: string; eventId: string },
+  rec: { id: string; blobKey: string; eventId: string; transcriptConsentRule: boolean },
   e: EventoConsensoVoce,
   sito: SitoConsensoVoce,
   multitraccia?: boolean
 ): Promise<boolean> {
   if (rec.blobKey === '') return false;
   if (multitraccia ?? (await registrazioneMultitraccia(db, rec))) return false;
-  return (await regimeConsensoVoce(db, rec.eventId, e, sito)).chiesto;
+  return (await regimeConsensoVoce(db, rec.eventId, e, sito, rec.transcriptConsentRule))
+    .chiesto;
 }
 
 export { CODICE_CONFERMA_VOCI };
@@ -125,7 +197,7 @@ export { CODICE_CONFERMA_VOCI };
  */
 export function erroreConfermaVoci(): AppError {
   return new AppError(
-    'This event asks each person for consent to the transcription of what they say, and the full room recording contains every voice. Confirm that every voice in the recording has consented to transcribe it.',
+    'The full room recording contains every voice, including people who did not consent to the transcription of what they say. Confirm that every voice in the recording has consented to transcribe it.',
     409,
     CODICE_CONFERMA_VOCI
   );

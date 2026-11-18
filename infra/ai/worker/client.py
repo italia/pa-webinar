@@ -98,6 +98,9 @@ class ClaimResponse(BaseModel):
     # Lavoro TRANSLATE_TEXT: il testo da tradurre {sourceLanguage,
     # targetLanguages, title, description, sourceHash}.
     textInput: Optional[Dict[str, Any]] = None
+    # Lavoro REDACT: gli intervalli da togliere dal video {intervals:
+    # [{start, end}], durationSec, card: PNG in base64 o null}.
+    redaction: Optional[Dict[str, Any]] = None
 
 
 # ---------------------------------------------------------------------------
@@ -299,6 +302,36 @@ class AppClient:
         if model_version is not None:
             payload["modelVersion"] = model_version
         r = self._client.post("/api/internal/event-text-translation", json=payload)
+        r.raise_for_status()
+        try:
+            risposta = r.json()
+        except ValueError:
+            return {}
+        return risposta if isinstance(risposta, dict) else {}
+
+    def deliver_redaction(
+        self,
+        *,
+        job_id: str,
+        blob_key: str,
+        size_bytes: int,
+        attempt: int,
+        duration_sec: Optional[float] = None,
+    ) -> Dict[str, Any]:
+        """Consegna il video ripulito (lavoro REDACT), gia' caricato nella sua
+        chiave: il portale lo mette al posto dell'originale. La risposta dice,
+        come per il resoconto, se lo aveva gia' fatto un altro tentativo o se il
+        lavoro non e' piu' di questo (``superseded``, ``closed``)."""
+        payload: Dict[str, Any] = {
+            "jobId": job_id,
+            "attempt": attempt,
+            "blobKey": blob_key,
+            "sizeBytes": size_bytes,
+        }
+        if duration_sec:
+            payload["durationSec"] = duration_sec
+        # Il portale sostituisce il video e cancella gli originali: puo' volerci.
+        r = self._client.post("/api/internal/recording-redaction", json=payload, timeout=120.0)
         r.raise_for_status()
         try:
             risposta = r.json()

@@ -6,8 +6,11 @@
  * persona: le due corrispondenze che servono per tenere la trascrizione (o
  * registrare l'audio) solo di chi ha dato il consenso.
  */
+import { PREFISSO_POSTO_MODERATORE } from '@/lib/auth/jwt';
 import { prisma } from '@/lib/db';
 import { tryDecryptPII } from '@/lib/crypto/pii';
+import type { PartecipantiNelVideo } from '@/lib/live/consent-rule';
+import { nicknameDellIscrizione } from '@/lib/live/nickname';
 
 const CAMPI_EVENTO = {
   id: true,
@@ -65,6 +68,38 @@ export async function endpointSenzaRegistrazione(eventId: string): Promise<strin
   return righe.map((r) => r.endpointId);
 }
 
+/**
+ * Gli endpoint la cui voce non e' nel video completo: chi non ha un consenso
+ * valido (`endpointSenzaRegistrazione`) o, dove chi partecipa non entra mai nel
+ * video ('esclusi', lib/live/consent-rule), chiunque non conduca. Chi conduce
+ * entra con un posto `mod-` (lib/auth/jwt `PREFISSO_POSTO_MODERATORE`).
+ */
+export async function endpointFuoriDalVideo(
+  eventId: string,
+  partecipanti: PartecipantiNelVideo
+): Promise<string[]> {
+  if (partecipanti !== 'esclusi') return endpointSenzaRegistrazione(eventId);
+  const righe = await prisma.roomOccupant.findMany({
+    where: { eventId, NOT: { seatId: { startsWith: PREFISSO_POSTO_MODERATORE } } },
+    select: { endpointId: true },
+  });
+  return righe.map((r) => r.endpointId);
+}
+
+/**
+ * Chi e' in sala adesso, con il posto e il segno della voce: l'elenco dei
+ * partecipanti ne ricava chi e' nel video, chi solo con la voce, chi no
+ * (lib/live/recording-badge).
+ */
+export async function occupantiInSala(
+  eventId: string
+): Promise<Array<{ endpointId: string; seatId: string; voiceExcluded: boolean }>> {
+  return prisma.roomOccupant.findMany({
+    where: { eventId, leftAt: null },
+    select: { endpointId: true, seatId: true, voiceExcluded: true },
+  });
+}
+
 /** Se dietro l'endpoint c'e' chi non ha il consenso alla registrazione. */
 export async function voceEsclusa(eventId: string, endpointId: string): Promise<boolean> {
   const riga = await prisma.roomOccupant.findUnique({
@@ -94,7 +129,10 @@ export function iscrizioneDelPosto(seatId: string): string | null {
 
 export interface ConsensoTrascrizione {
   dato: boolean;
-  /** Il nome con cui la persona e' entrata, quando ha dato il consenso. */
+  /** Il nome con cui la persona e' in sala, quando ha dato il consenso: il
+   *  nickname dell'iscrizione se c'e' (lib/live/nickname), altrimenti quello
+   *  della prova o dell'iscrizione. Per gli altri posti la prova porta gia' il
+   *  nome della sala, nickname compreso. */
   nome: string | null;
 }
 
@@ -106,7 +144,8 @@ export interface ConsensoTrascrizione {
  *
  * `versioneMinima` e' la versione del testo che il consenso deve avere
  * (lib/registration/consents): la trascrizione dai sottotitoli, con il nome,
- * chiede quella che la comprende; la traccia audio vale con ogni versione.
+ * chiede quella che la comprende; la sola traccia audio, che non si trascrive,
+ * vale con ogni versione (`versioneConsensoTrascrizione`, lib/ai/voice-consent).
  */
 export async function consensoTrascrizione(
   eventId: string,
@@ -120,6 +159,7 @@ export async function consensoTrascrizione(
         where: { id: iscrizione, eventId },
         select: {
           displayName: true,
+          nickname: true,
           consentMultitrack: true,
           consentMultitrackVersion: true,
           consentMultitrackWithdrawnAt: true,
@@ -138,7 +178,11 @@ export async function consensoTrascrizione(
     if (!allIscrizione && !prova) return { dato: false, nome: null };
     return {
       dato: true,
-      nome: (prova ? tryDecryptPII(prova.displayName) : null) ?? tryDecryptPII(registrazione.displayName) ?? null,
+      nome:
+        nicknameDellIscrizione(registrazione) ??
+        (prova ? tryDecryptPII(prova.displayName) : null) ??
+        tryDecryptPII(registrazione.displayName) ??
+        null,
     };
   }
   const prova = await prisma.multitrackConsent.findFirst({

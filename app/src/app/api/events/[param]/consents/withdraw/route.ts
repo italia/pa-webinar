@@ -9,7 +9,9 @@
  * Chi ritira prova i propri posti con i token della sala che il portale gli
  * ha consegnato in questa visita della pagina (lib/auth/jwt
  * postoDaTokenSala): nessun altro dato, e nessun link personale da mandare.
- * Cosa cambia lo dice lib/live/consent-withdrawal. Dopo il ritiro la sala
+ * Cosa cambia lo dice lib/live/consent-withdrawal: dove chi partecipa non entra
+ * mai nel video la registrazione si ritira da sola (`ritiroPortaTrascrizione`),
+ * anche se la sala li' non la offre. Dopo il ritiro la sala
  * chiede un token nuovo senza quei consensi (o esce, se senza consenso alla
  * registrazione non si puo' restare).
  */
@@ -17,8 +19,10 @@ import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { postoDaTokenSala } from '@/lib/auth/jwt';
 import { prisma } from '@/lib/db';
 import { AppError, NotFoundError, RateLimitError, ValidationError } from '@/lib/errors';
+import { ritiroPortaTrascrizione } from '@/lib/live/consent-rule';
 import { ritiraConsensi } from '@/lib/live/consent-withdrawal';
 import { getClientIp, rateLimit } from '@/lib/rate-limit';
+import { partecipantiNelVideo } from '@/lib/recording/availability';
 import { consentWithdrawalSchema } from '@/lib/validation/schemas';
 
 export const dynamic = 'force-dynamic';
@@ -56,6 +60,7 @@ export const POST = withErrorHandling(async (request, context) => {
 
   const esito = await ritiraConsensi(event.id, posti, {
     registrazione: parsed.data.recording,
+    trascrizione: ritiroPortaTrascrizione(partecipantiNelVideo()),
   });
   return Response.json(
     { withdrawn: { recording: esito.registrazione, transcription: esito.trascrizione } },

@@ -7,7 +7,9 @@
  * pagina dell'evento (pdf.js) e per lo scaricamento.
  *
  * CHI. Chiunque veda la pagina post-evento: evento concluso con la pagina
- * pubblica (`isEventPageVisible`) e il video pubblicato.
+ * pubblica (`isEventPageVisible`) e il video pubblicato. Una registrazione
+ * riservata agli iscritti su un evento con destinazione la vedono anche con la
+ * pagina privata (`apertaAgliIscritti`), come il video.
  *
  * COSA. Solo un materiale che la pagina mostra accanto al video, ricalcolato
  * qui con le stesse regole (lib/presentation/recording-slides-data): presentato
@@ -28,7 +30,7 @@ import { NotFoundError, RateLimitError } from '@/lib/errors';
 import { eventParamWhere } from '@/lib/events/event-param';
 import { isEventPageVisible } from '@/lib/events/visibility';
 import { publicSlideFileKey } from '@/lib/presentation/recording-slides-data';
-import { accessoRegistrazione } from '@/lib/recording/audience';
+import { accessoRegistrazione, apertaAgliIscritti } from '@/lib/recording/audience';
 import { streamMaterialPdf } from '@/lib/presentation/serve-pdf';
 import { getClientIp, rateLimit } from '@/lib/rate-limit';
 import { recordingSlidesFileQuerySchema } from '@/lib/validation/presentation';
@@ -64,6 +66,7 @@ export const GET = withErrorHandling(async (request, context) => {
       recordingPublished: true,
       transcriptPublished: true,
       recordingAudience: true,
+      recordingDestination: true,
       postEventShowMaterials: true,
     },
   });
@@ -77,9 +80,12 @@ export const GET = withErrorHandling(async (request, context) => {
 
   // Le slide vanno con il video: le vede chi vede la registrazione
   // (lib/recording/audience) sulla pagina pubblica; lo staff anche prima della
-  // pubblicazione o con la pagina nascosta, per l'anteprima.
+  // pubblicazione o con la pagina nascosta, per l'anteprima; l'iscritto anche con
+  // la pagina privata, se la registrazione e' aperta a lui.
   const accesso = await accessoRegistrazione(event, await cookies());
-  if (!accesso || (accesso !== 'staff' && !isEventPageVisible(event))) {
+  const paginaAperta =
+    accesso === 'staff' || isEventPageVisible(event) || apertaAgliIscritti(event);
+  if (!accesso || !paginaAperta) {
     throw new NotFoundError('Slides');
   }
 

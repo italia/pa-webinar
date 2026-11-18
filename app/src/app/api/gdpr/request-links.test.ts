@@ -89,3 +89,24 @@ describe('GDPR request emails link to the running instance', () => {
     expect(sentLink()).toBe('https://altro-ente.example.test/en/privacy/my-data?t=tok-export');
   });
 });
+
+// Il link apre la pagina a schermo: nessun file da scaricare.
+describe('l’email con il link ai propri dati dice cosa apre', () => {
+  it.each([
+    ['it', 'per vederli'],
+    ['en', 'to view it'],
+    ['fr', 'pour les consulter'],
+    ['de', 'um sie anzusehen'],
+    ['es', 'para verlos'],
+  ])('%s: promette di vederli, non di scaricarli', async (locale, attesa) => {
+    await exportRequest(
+      post('/api/gdpr/export/request', { email: `testo-${locale}@example.test`, locale }) as never,
+      ctx as never,
+    );
+    const mail = mockedEnqueue.mock.calls[0]?.[0] as { html: string; text: string };
+    for (const corpo of [mail.html, mail.text]) {
+      expect(corpo).toContain(attesa);
+      expect(corpo).not.toMatch(/scaric|download|télécharg|herunterlad|descarg/i);
+    }
+  });
+});

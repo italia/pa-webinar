@@ -23,7 +23,13 @@ vi.mock('next/headers', () => ({
     get: (name: string) => (cookieJar.has(name) ? { name, value: cookieJar.get(name)! } : undefined),
   }),
 }));
-vi.mock('@/lib/auth/staff-session', () => ({ isEventManager: mockManager }));
+// Lo staff che vede il contenuto: chi organizza l'evento (lib/recording/content-access).
+const tracciate = vi.hoisted(() => vi.fn());
+vi.mock('@/lib/recording/content-access', () => ({
+  contenutoStaffDellaRichiesta: async () =>
+    (await mockManager()) ? { session: { role: 'organizer', accountId: 'a' }, via: 'organizzatore' } : null,
+  tracciaLetturaContenuto: tracciate,
+}));
 vi.mock('@/lib/auth/app-secret', () => ({ tryGetAppSecret: () => 'segreto-di-prova-abbastanza-lungo-per-hmac' }));
 
 import { issueViewingToken, viewingCookieName } from '@/lib/recording/viewing';
@@ -38,6 +44,7 @@ const base = {
   postEventPublicUntil: null as Date | null,
   captionsTranscriptEnabled: false,
   recordingAudience: 'PUBLIC' as 'PUBLIC' | 'REGISTRANTS',
+  recordingDestination: null as 'PUBLIC' | 'REGISTRANTS' | null,
 };
 
 describe('assertPostprodAccessible', () => {
@@ -49,10 +56,27 @@ describe('assertPostprodAccessible', () => {
     cookieJar.clear();
   });
 
-  it('lo staff che gestisce l\'evento vede tutto anche prima della pubblicazione', async () => {
+  it('lo staff che organizza l\'evento vede tutto anche prima della pubblicazione, e la lettura si traccia', async () => {
     mockEvent.mockResolvedValue({ ...base });
     mockManager.mockResolvedValue(true);
+    await expect(assertPostprodAccessible('s', 'sintesi')).resolves.toMatchObject({ ambito: 'tutto' });
+    expect(tracciate).toHaveBeenCalledWith(
+      expect.objectContaining({ eventId: 'ev-1', superficie: 'sintesi', via: 'organizzatore' })
+    );
+  });
+
+  it('chi non organizza (l\'admin dell\'istanza) non vede una registrazione non pubblicata', async () => {
+    mockEvent.mockResolvedValue({ ...base });
+    await expect(assertPostprodAccessible('s')).rejects.toMatchObject({ statusCode: 404 });
+    expect(tracciate).not.toHaveBeenCalled();
+  });
+
+  it('chiamata rapida: chi era in sala (pass di presenza) vede la trascrizione senza pubblicazione', async () => {
+    const { issuePresencePass, presencePassCookieName } = await import('@/lib/recording/presence-pass');
+    mockEvent.mockResolvedValue({ ...base, postEventPublic: false });
+    cookieJar.set(presencePassCookieName('ev-1'), issuePresencePass('ev-1', new Date(Date.now() + 86_400_000))!);
     await expect(assertPostprodAccessible('s')).resolves.toMatchObject({ ambito: 'tutto' });
+    expect(tracciate).not.toHaveBeenCalled();
   });
 
   it('riservata agli iscritti: chiusa a chi non prova l\'iscrizione', async () => {
@@ -66,6 +90,23 @@ describe('assertPostprodAccessible', () => {
     mockRegCount.mockResolvedValue(1);
     await expect(assertPostprodAccessible('s')).resolves.toMatchObject({ ambito: 'tutto' });
     expect(mockRegCount).toHaveBeenCalledWith({ where: { id: 'reg-1', eventId: 'ev-1' } });
+  });
+
+  it('riservata con la pagina privata: l\'iscritto apre la trascrizione, se l\'evento ha una destinazione', async () => {
+    const privata = {
+      ...base,
+      recordingPublished: true,
+      recordingAudience: 'REGISTRANTS' as const,
+      postEventPublic: false,
+    };
+    cookieJar.set(viewingCookieName('ev-1'), issueViewingToken('ev-1', 'reg-1')!);
+    mockRegCount.mockResolvedValue(1);
+
+    mockEvent.mockResolvedValue({ ...privata, recordingDestination: 'REGISTRANTS' });
+    await expect(assertPostprodAccessible('s')).resolves.toMatchObject({ ambito: 'tutto' });
+
+    mockEvent.mockResolvedValue(privata);
+    await expect(assertPostprodAccessible('s')).rejects.toThrow();
   });
 
   it('riservata agli iscritti: un\'iscrizione cancellata non apre piu\'', async () => {

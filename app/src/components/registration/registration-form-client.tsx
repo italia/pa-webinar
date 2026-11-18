@@ -16,14 +16,24 @@ import {
 
 import { Icon } from '@/components/ui/icon';
 import { Link, useRouter, percorso } from '@/i18n/navigation';
+import { PrivacySheet } from '@/components/events/privacy-sheet';
 import QuestionnaireForm, {
   type QuestionnaireState,
   type RenderedQuestionnaire,
 } from '@/components/questionnaires/questionnaire-form';
 import { createRegistrationSchema, ORGANIZATION_TYPES } from '@/lib/validation/schemas';
 import type { RegistrationAccess } from '@/lib/events/registration-access';
-import { consensiRichiesti } from '@/lib/registration/consents';
-import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import type { SchedaPrivacy } from '@/lib/events/privacy-sheet';
+import { MESI_RUBRICA_PREDEFINITI } from '@/lib/persons/retention';
+import {
+  chiaveAvvisoRegistrazione,
+  chiaveConsenso,
+  destinazioneDelTesto,
+  versioneDellaProva,
+  type Destinazione,
+} from '@/lib/recording/destination';
+import { chiaveConsensoTrascrizione, consensiRichiesti } from '@/lib/registration/consents';
+import { testoConsensoEvento, type PartecipantiNelVideo } from '@/lib/live/consent-rule';
 
 interface ProfilingConfig {
   requireOrganization: boolean;
@@ -35,10 +45,28 @@ interface RegistrationFormClientProps {
   eventSlug: string;
   privacyPolicyUrl: string;
   privacyPolicyText?: string;
+  /** La scheda privacy dell'evento (lib/events/privacy-sheet), calcolata sul
+   *  server con la riga delle impostazioni. */
+  schedaPrivacy?: SchedaPrivacy | null;
+  /** Il testo dell'amministrazione sull'elaborazione della registrazione. */
+  testoIa?: string | null;
   recordingEnabled?: boolean;
+  /** Dove va il video: decide il testo della casella della registrazione
+   *  (lib/recording/destination). */
+  recordingDestination?: Destinazione;
+  /** Il testo dell'ente sulla registrazione: il consenso qui vale anche per quello. */
+  recordingConsentText?: string | null;
   multitrackRecordingEnabled?: boolean;
   /** La trascrizione dai sottotitoli e' attiva (lib/captions/availability). */
   captionsTranscript?: boolean;
+  /** La pipeline AI trascrive il video (lib/registration/consents): lo calcola
+   *  il server, che conosce l'installazione. */
+  trascrizioneVideo?: boolean;
+  /** Le tracce per persona si conservano: il testo della trascrizione non ne
+   *  promette la cancellazione. */
+  tracceConservate?: boolean;
+  /** La casella della rubrica si mostra (lib/persons/address-book). */
+  rubricaProposta?: boolean;
   /** Cosa l'evento concede ai partecipanti: decide quali consensi chiedere
    *  (lib/registration/consents). */
   participantsCanUnmute?: boolean;
@@ -58,9 +86,9 @@ interface RegistrationFormClientProps {
    *  pubblica spenta il modulo spiega che serve l'invito e che il link arriva
    *  per email; senza invitati resta solo il rinvio del link a chi è iscritto. */
   registrationAccess?: RegistrationAccess;
-  /** Chi non acconsente alla registrazione partecipa in solo ascolto. */
-  /** La voce di chi non acconsente nel video (lib/recording/availability). */
-  voce?: VoceNelVideo;
+  /** Come compaiono nel video i partecipanti (lib/recording/availability):
+   *  decide la casella e i testi, che non promettono piu' di cosi'. */
+  partecipanti?: PartecipantiNelVideo;
   /** Arrivati dall'email d'invito: nome e indirizzo dell'invito. */
   invito?: { name: string | null; email: string } | null;
 }
@@ -82,9 +110,16 @@ export default function RegistrationFormClient({
   eventSlug,
   privacyPolicyUrl,
   privacyPolicyText,
+  schedaPrivacy = null,
+  testoIa = null,
   recordingEnabled = false,
+  recordingDestination = null,
+  recordingConsentText = null,
   multitrackRecordingEnabled = false,
   captionsTranscript = false,
+  trascrizioneVideo = false,
+  tracceConservate = false,
+  rubricaProposta = true,
   participantsCanUnmute = false,
   participantsCanStartVideo = false,
   participantsCanShareScreen = false,
@@ -94,12 +129,13 @@ export default function RegistrationFormClient({
   profiling,
   registrationAccess = 'open',
   invito = null,
-  voce = 'rimovibile',
+  partecipanti = 'visibili',
 }: RegistrationFormClientProps) {
   const t = useTranslations('registration');
   const tg = useTranslations('gdpr');
   const tc = useTranslations('common');
   const tlive = useTranslations('live');
+  const tw = useTranslations('waiting');
   const router = useRouter();
 
   const [displayName, setDisplayName] = useState(invito?.name ?? '');
@@ -114,17 +150,29 @@ export default function RegistrationFormClient({
   // casella per due scopi affini e dichiarati entrambi nel testo (art. 6.1.a,
   // facoltativo, mai spuntata in partenza). Si salvano entrambi i consensi.
   const [consentStayInTouch, setConsentStayInTouch] = useState(false);
-  const richiesti = consensiRichiesti({
-    recordingEnabled,
-    multitrackRecordingEnabled,
-    captionsTranscript,
-    participantsCanUnmute,
-    participantsCanStartVideo,
-    participantsCanShareScreen,
-  });
+  const testoEvento = testoConsensoEvento(recordingConsentText, partecipanti);
+  const richiesti = consensiRichiesti(
+    {
+      recordingEnabled,
+      multitrackRecordingEnabled,
+      captionsTranscript,
+      trascrizioneVideo,
+      participantsCanUnmute,
+      participantsCanStartVideo,
+      participantsCanShareScreen,
+    },
+    partecipanti,
+  );
+  // La destinazione dichiarata dal testo della casella: parte con il modulo, e il
+  // server rifiuta un consenso dato su un testo che non e' piu' in vigore.
+  const destinazioneMostrata = destinazioneDelTesto(recordingDestination, partecipanti);
   // Dove la voce di chi non acconsente alla registrazione resta fuori, senza
   // quel consenso la trascrizione non vale.
-  const trascrizioneSospesa = voce === 'rimovibile' && richiesti.registrazione && !consentRecording;
+  const voceSoloConConsenso = partecipanti === 'solo-voce';
+  const trascrizioneSospesa = voceSoloConConsenso && richiesti.registrazione && !consentRecording;
+  // Dove chi partecipa puo' comparire nel video, il modulo lo dice: anche senza
+  // intervenire il suo nome puo' finirci.
+  const nomiVisibili = partecipanti === 'visibili';
   const [privacyExpanded, setPrivacyExpanded] = useState(false);
 
   const [orgSuggestions, setOrgSuggestions] = useState<string[]>([]);
@@ -264,6 +312,10 @@ export default function RegistrationFormClient({
           displayName, email, consentGiven,
           consentFutureCommunications: consentStayInTouch,
           consentAddressBook: consentStayInTouch,
+          consentRecordingDestination: destinazioneMostrata,
+          // La versione del testo mostrato: il server non accetta un consenso dato
+          // su un testo che non copre piu' cio' che il video riprende.
+          consentRecordingVersion: versioneDellaProva(partecipanti),
           locale,
         };
         if (richiesti.registrazione) body.consentRecording = consentRecording;
@@ -317,6 +369,15 @@ export default function RegistrationFormClient({
             });
             return;
           }
+          // Il testo della casella non e' piu' quello in vigore: l'errore va
+          // sulla casella, e chi ha acconsentito rilegge dopo aver ricaricato.
+          if (res.status === 422 && data.details?.some((d) => d.path?.[0] === 'consentRecording')) {
+            setErrors({ consentRecording: 'registration.errors.recordingDestinationChanged' });
+            requestAnimationFrame(() => {
+              formRef.current?.querySelector<HTMLElement>('#consentRecording')?.focus();
+            });
+            return;
+          }
           setServerError(t('errors.generic'));
           return;
         }
@@ -340,7 +401,7 @@ export default function RegistrationFormClient({
         setSubmitting(false);
       }
     },
-    [displayName, email, consentGiven, consentRecording, consentMultitrack, consentStayInTouch, organization, organizationRole, organizationType, eventSlug, validate, t, showOrg, showRole, showType, richiesti.registrazione, richiesti.tracce, locale, questionario],
+    [displayName, email, consentGiven, consentRecording, consentMultitrack, consentStayInTouch, organization, organizationRole, organizationType, eventSlug, validate, t, showOrg, showRole, showType, richiesti.registrazione, richiesti.tracce, destinazioneMostrata, partecipanti, locale, questionario],
   );
 
   // Duplicate sign-up recovery: re-send the original confirmation email
@@ -646,7 +707,9 @@ export default function RegistrationFormClient({
           valid={errors.displayName ? false : undefined}
         />
         <small id="displayNameHelp" className="form-text">
-          {t('namePlaceholder')}
+          {/* Lo stesso testo della sala d'attesa: dove il pubblico e' anonimo la
+              sala non mostra il nome. */}
+          {schedaPrivacy?.pseudonimi ? tw('anonymousNameHelp') : t('namePlaceholder')}
         </small>
         {errors.displayName && (
           <div id="displayNameError" className="invalid-feedback d-block">
@@ -754,6 +817,13 @@ export default function RegistrationFormClient({
         </FormGroup>
       )}
 
+      {/* La scheda dell'evento, poi l'informativa a cui rimanda. */}
+      {schedaPrivacy && (
+        <div className="mb-3">
+          <PrivacySheet scheda={schedaPrivacy} testoIa={testoIa} />
+        </div>
+      )}
+
       {/* ── Privacy policy (inline text or link) ── */}
       {privacyPolicyText ? (
         <div className="mb-4">
@@ -823,7 +893,7 @@ export default function RegistrationFormClient({
       <fieldset className="registration-consents mb-4">
         <legend className="registration-consents__legend">{t('consentsLegend')}</legend>
 
-        {/* ── Trattamento dei dati (obbligatorio) ── */}
+        {/* ── Presa visione dell'informativa (obbligatoria) ── */}
         <FormGroup check className="mb-3">
           <Input
             type="checkbox"
@@ -849,45 +919,71 @@ export default function RegistrationFormClient({
           )}
         </FormGroup>
 
-        {/* ── Registrazione (obbligatorio se i partecipanti hanno voce o
-            immagine; altrimenti un'informativa) ── */}
+        {/* ── Registrazione (facoltativa, si chiede se i partecipanti hanno voce
+            o immagine; altrimenti un'informativa) ── */}
         {richiesti.registrazione && (
           <FormGroup check className="mb-3">
             <Input
               type="checkbox"
               id="consentRecording"
-              aria-describedby={voce === 'assente' ? undefined : 'consentRecordingOptional'}
+              aria-invalid={errors.consentRecording ? true : undefined}
+              aria-describedby={
+                [
+                  testoEvento ? 'consentRecordingEvento' : null,
+                  partecipanti === 'assente' ? null : 'consentRecordingOptional',
+                  errors.consentRecording ? 'consentRecordingError' : null,
+                ]
+                  .filter(Boolean)
+                  .join(' ') || undefined
+              }
               checked={consentRecording}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setConsentRecording(e.target.checked);
                 // La trascrizione dipende dalla registrazione: tolta questa,
                 // non deve ricomparire gia' spuntata.
-                if (!e.target.checked && voce === 'rimovibile') setConsentMultitrack(false);
+                if (!e.target.checked && voceSoloConConsenso) setConsentMultitrack(false);
                 pulisciErrore('consentRecording');
               }}
             />
             <Label for="consentRecording" check>
-              {tg('consent.recording')}{' '}
+              {tg(`consent.${chiaveConsenso(recordingDestination, partecipanti)}`)}{' '}
               <span className="consent-mark">{t('optionalMark')}</span>
             </Label>
+            {/* Vale per lo stesso consenso, come in sala d'attesa e in sala. */}
+            {testoEvento && (
+              <div id="consentRecordingEvento" className="form-text">
+                {testoEvento}
+              </div>
+            )}
             {/* Facoltativo davvero: si dice cosa succede senza. */}
-            {voce !== 'assente' && (
+            {partecipanti !== 'assente' && (
               <div id="consentRecordingOptional" className="form-text">
-                {tg(voce === 'rimovibile' ? 'consent.recordingOptionalVoice' : 'consent.recordingOptionalListenOnly')}
+                {tg(
+                  partecipanti === 'visibili'
+                    ? 'consent.recordingOptionalListenOnly'
+                    : 'consent.recordingOptionalVoice'
+                )}
+                {nomiVisibili && <> {tg('consent.namesMayAppear')}</>}
+              </div>
+            )}
+            {errors.consentRecording && (
+              <div id="consentRecordingError" className="text-danger small mt-1">
+                {t('errors.recordingDestinationChanged')}
               </div>
             )}
           </FormGroup>
         )}
         {richiesti.avvisoRegistrazione && (
           <p className="registration-consents__notice mb-3">
-            {tg(voce === 'fissa' ? 'consent.recordingNotice' : 'consent.recordingNoticeVoice')}
+            {tg(`consent.${chiaveAvvisoRegistrazione(partecipanti)}`)}
+            {nomiVisibili && <> {tg('consent.namesMayAppear')}</>}
           </p>
         )}
 
-        {/* ── Trascrizione dei propri interventi (traccia audio per persona o
-            sottotitoli salvati): facoltativa, chi non la da' partecipa lo
-            stesso, ma la sua voce non si registra ne' si trascrive ── */}
-        {richiesti.tracce && !(voce === 'rimovibile' && richiesti.avvisoRegistrazione) && (
+        {/* ── Trascrizione dei propri interventi (traccia audio per persona,
+            sottotitoli salvati o video): facoltativa, chi non la da' partecipa
+            lo stesso, ma la sua voce non si registra ne' si trascrive ── */}
+        {richiesti.tracce && !(voceSoloConConsenso && richiesti.avvisoRegistrazione) && (
           <FormGroup check className="mb-3">
             <Input
               type="checkbox"
@@ -898,32 +994,42 @@ export default function RegistrationFormClient({
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConsentMultitrack(e.target.checked)}
             />
             <Label for="consentMultitrack" check>
-              {tg('consent.multitrack')}{' '}
+              {tg(`consent.${chiaveConsensoTrascrizione(tracceConservate)}`)}{' '}
               <span className="consent-mark">{t('optionalMark')}</span>
             </Label>
+            {/* La voce resta nel video a prescindere solo dove non si puo' togliere:
+                altrove chi nega la registrazione ne resta fuori, e il video puo'
+                non esserci. */}
             <div id="consentMultitrackNota" className="text-secondary small mt-1">
-              {tg('consent.multitrackOptional')}
+              {tg(
+                partecipanti === 'visibili'
+                  ? 'consent.multitrackOptional'
+                  : 'consent.multitrackOptionalShort'
+              )}
             </div>
           </FormGroup>
         )}
 
-        {/* ── Restare in contatto (facoltativo) ── */}
-        <FormGroup check className="mb-0">
-          <Input
-            type="checkbox"
-            id="consentStayInTouch"
-            aria-describedby="consentStayInTouchHelp"
-            checked={consentStayInTouch}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConsentStayInTouch(e.target.checked)}
-          />
-          <Label for="consentStayInTouch" check>
-            {tg('consent.stayInTouch')}{' '}
-            <span className="consent-mark">{t('optionalMark')}</span>
-          </Label>
-          <div id="consentStayInTouchHelp" className="form-text text-muted small ms-1">
-            {tg('consent.stayInTouchHelp')}
-          </div>
-        </FormGroup>
+        {/* ── Restare in contatto (facoltativo, dove la rubrica si propone) ── */}
+        {rubricaProposta && (
+          <FormGroup check className="mb-0">
+            <Input
+              type="checkbox"
+              id="consentStayInTouch"
+              aria-describedby="consentStayInTouchHelp"
+              checked={consentStayInTouch}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConsentStayInTouch(e.target.checked)}
+            />
+            <Label for="consentStayInTouch" check>
+              {tg('consent.stayInTouch')}{' '}
+              <span className="consent-mark">{t('optionalMark')}</span>
+            </Label>
+            <div id="consentStayInTouchHelp" className="form-text text-muted small ms-1">
+              {tg('consent.stayInTouchHelp')}{' '}
+              {tg('consent.stayInTouchRetention', { months: MESI_RUBRICA_PREDEFINITI })}
+            </div>
+          </FormGroup>
+        )}
       </fieldset>
 
       <Button

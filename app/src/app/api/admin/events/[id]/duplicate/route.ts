@@ -25,6 +25,10 @@
  * peakParticipants, recording URLs/metadata, capacityEstimateJson) and the join
  * password — a fresh copy must not inherit a secret the operator cannot see.
  *
+ * What we fill in: a source that records without a recording destination gives a
+ * copy that starts reserved, except instant calls and imported archives, which
+ * stay without one (lib/recording/destination).
+ *
  * Optional body:
  *   { "nextOccurrence": true }        project the date from the source's RRULE,
  *                                     in the event's timezone, to the first
@@ -36,6 +40,7 @@
  */
 import { randomUUID } from 'crypto';
 
+import type { RecordingAudience } from '@prisma/client';
 import { cookies } from 'next/headers';
 import { z } from 'zod';
 
@@ -53,6 +58,7 @@ import {
   DUPLICATE_SOURCE_INCLUDE,
   duplicatedRelations,
 } from '@/lib/events/duplicate-relations';
+import { destinazioneDiPartenza } from '@/lib/recording/destination';
 import { nextOccurrenceAfter } from '@/lib/utils/recurrence';
 import { generateUniqueSlug } from '@/lib/utils/slug';
 import type { LocalizedField } from '@/lib/utils/locale';
@@ -201,6 +207,28 @@ function resolveSchedule(
   return { startsAt: source.startsAt, endsAt: source.endsAt, projected: false };
 }
 
+/**
+ * La destinazione di una copia che eredita un evento senza destinazione: e' un
+ * evento nuovo, e un evento nuovo che registra la dichiara. Parte riservata con
+ * il pubblico allineato, come POST /api/events: senza, una serie duplicata da un
+ * evento nato prima di questa scelta resterebbe per sempre senza destinazione.
+ * Chiamate rapide e archivi importati restano senza: li esclude la regola unica.
+ */
+function destinazioneDellaCopia(source: {
+  eventType: string;
+  recordingEnabled: boolean;
+  recordingDestination: RecordingAudience | null;
+}) {
+  if (source.recordingDestination != null) return {};
+  const destinazione = destinazioneDiPartenza(
+    { recordingEnabled: false, eventType: source.eventType },
+    source.recordingEnabled,
+  );
+  return destinazione
+    ? { recordingDestination: destinazione, recordingAudience: destinazione }
+    : {};
+}
+
 /** Se l'account che ha creato l'originale è ancora attivo: altrimenti la
  *  copia andrebbe a un account che nessuno usa più. */
 async function creatoreAttivo(accountId: string): Promise<boolean> {
@@ -259,6 +287,7 @@ export const POST = withErrorHandling(async (request, context) => {
         // Everything the copy inherits, from the single classified list — see
         // lib/events/duplicate-fields.ts for why this is not spelled out inline.
         ...duplicatedConfig(source),
+        ...destinazioneDellaCopia(source),
 
         // …and the handful of values a copy must NOT inherit.
         slug: newSlug,

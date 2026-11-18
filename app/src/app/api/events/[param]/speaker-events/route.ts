@@ -8,10 +8,10 @@ import { parseJsonBody, withErrorHandling } from '@/lib/api-handler';
 import { postoDaTokenSala } from '@/lib/auth/jwt';
 import { prisma } from '@/lib/db';
 import { NotFoundError, RateLimitError, ValidationError } from '@/lib/errors';
-import { endpointSenzaRegistrazione } from '@/lib/captions/room';
+import { endpointFuoriDalVideo, endpointSenzaRegistrazione } from '@/lib/captions/room';
 import { statoCattura } from '@/lib/live/capture-state';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
-import { recordingAvailable } from '@/lib/recording/availability';
+import { partecipantiNelVideo, recordingAvailable } from '@/lib/recording/availability';
 
 export const dynamic = 'force-dynamic';
 
@@ -119,8 +119,18 @@ export const POST = withErrorHandling(async (request, context) => {
     ...evento,
     ...(senzaNome.has(evento.participantId) ? {} : { displayName }),
   }));
-  const parlaChiEscluso = nuovi.some((e) => senzaNome.has(e.participantId));
-  if (parlaChiEscluso && roomToken && !event.unrecordedSpeech) {
+  // Chi non e' nel video: chi non ha il consenso o, dove chi partecipa non entra
+  // mai nel video, chiunque non conduca. La nota lo dice con il motivo giusto.
+  // Si legge solo se la nota non c'e' ancora.
+  const partecipanti = partecipantiNelVideo();
+  const parlaChiEscluso = async (): Promise<boolean> => {
+    const fuoriDalVideo =
+      partecipanti === 'esclusi'
+        ? new Set(await endpointFuoriDalVideo(event.id, partecipanti))
+        : senzaNome;
+    return nuovi.some((e) => fuoriDalVideo.has(e.participantId));
+  };
+  if (roomToken && !event.unrecordedSpeech && (await parlaChiEscluso())) {
     const presente = await postoDaTokenSala(roomToken, event.jitsiRoomName, { ancheChiModera: true });
     if (presente) {
       // Il comando di sala dice se il video sta girando. Senza comandi, in questa

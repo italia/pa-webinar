@@ -96,6 +96,7 @@ export default function ChatNotifyMenu({
 
   const silenziosa = prefs.mode === 'off';
   const etichetta = silenziosa ? t('notifyButtonOff') : t('notifyButton');
+  const stato = silenziosa ? t('notifyOff') : prefs.mode === 'all' ? t('notifyAll') : t('notifyMentions');
 
   return (
     <div className="chat-notify" ref={wrapRef}>
@@ -105,7 +106,8 @@ export default function ChatNotifyMenu({
         className={`chat-notify__btn${silenziosa ? ' is-off' : ''}`}
         aria-haspopup="dialog"
         aria-expanded={open}
-        aria-label={etichetta}
+        // Il nome contiene il testo visibile: chi usa i comandi vocali dice quello.
+        aria-label={`${stato} – ${t('notifyButton')}`}
         title={etichetta}
         onClick={() => setOpen((o) => !o)}
       >
@@ -125,9 +127,7 @@ export default function ChatNotifyMenu({
             <path d="M13.73 21a2 2 0 0 1-3.46 0" />
           </svg>
         )}
-        <span className="chat-notify__state">
-          {silenziosa ? t('notifyOff') : prefs.mode === 'all' ? t('notifyAll') : t('notifyMentions')}
-        </span>
+        <span className="chat-notify__state">{stato}</span>
       </button>
 
       {open && (

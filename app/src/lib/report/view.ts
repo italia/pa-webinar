@@ -11,7 +11,8 @@ import type { ReportMetrics, ReportView } from './types';
 
 /**
  * Nella pagina arrivano solo i numeri che la pagina mostra: l'indice di
- * attenzione e i tempi di permanenza restano all'amministrazione.
+ * attenzione e i tempi di permanenza restano all'amministrazione. Il testo delle
+ * domande non si disegna, e con la loro sezione spenta non deve uscire da qui.
  */
 function soloMostrati(m: ReportMetrics | null): ReportMetrics | null {
   if (!m) return null;
@@ -19,6 +20,7 @@ function soloMostrati(m: ReportMetrics | null): ReportMetrics | null {
     ...m,
     attendance: { ...m.attendance, avgDwellSec: null, retentionPct: null },
     participation: { ...m.participation, attention: null },
+    questions: { ...m.questions, top: [] },
   };
 }
 

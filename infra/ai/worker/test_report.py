@@ -29,7 +29,6 @@ def _ingresso(righe=None):
         "agenda": [{"label": "Apertura", "status": "DONE", "plannedMinutes": 10, "actualMinutes": 12, "agree": 7, "disagree": 1}],
         "transcript": {"source": "live-captions", "lines": righe or ["[00:05] Relatore 1: Buongiorno a tutti."], "truncated": False},
         "summary": None,
-        "chat": {"total": 2, "messages": [{"at": "10:05", "role": "participant", "question": True, "text": "Si puo' registrare?"}]},
         "questions": [{"text": "Quando esce la versione nuova?", "upvotes": 3, "answered": True, "answer": "A novembre."}],
         "polls": [{"question": "Vi e' utile?", "options": [{"text": "Si'", "votes": 9}, {"text": "No", "votes": 1}], "totalVotes": 10}],
         "words": [{"word": "accessibilita'", "count": 4}],
@@ -59,14 +58,28 @@ def _risposta_valida(**extra):
     return base
 
 
-def test_componi_richiesta_ha_i_blocchi_e_nessun_nome_in_chat():
+def test_componi_richiesta_ha_i_blocchi():
     testo = rep.componi_richiesta(_ingresso(), "# Trascrizione\n[00:05] Relatore 1: Buongiorno.")
     for blocco in ("# Evento", "# Agenda", "# Numeri della piattaforma", "# Sondaggi pubblicati",
-                   "# Domande del pubblico", "# Trascrizione", "# Chat", "# Valutazioni dopo l'evento"):
+                   "# Domande del pubblico", "# Trascrizione", "# Valutazioni dopo l'evento"):
         assert blocco in testo
     assert "d'accordo 7, non d'accordo 1" in testo
     assert "Relatore 1 (speaker, Ente di prova)" in testo
-    assert "(partecipante, domanda) Si puo' registrare?" in testo
+
+
+def test_componi_richiesta_senza_il_testo_della_chat():
+    # Un portale meno recente puo' ancora mandarlo: al modello non arriva.
+    ingresso = _ingresso()
+    ingresso["chat"] = {"total": 1, "messages": [{"at": "10:05", "role": "participant", "text": "Scritto in chat"}]}
+    testo = rep.componi_richiesta(ingresso, "# Trascrizione\n[00:05] Relatore 1: Buongiorno.")
+    assert "Scritto in chat" not in testo
+    assert "# Chat" not in testo
+
+
+def test_componi_richiesta_senza_domande_niente_blocco():
+    ingresso = _ingresso()
+    ingresso["questions"] = []
+    assert "# Domande del pubblico" not in rep.componi_richiesta(ingresso, "# Trascrizione\n")
 
 
 def test_pezzi_trascrizione_rispetta_il_limite():

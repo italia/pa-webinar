@@ -192,6 +192,7 @@ The [ADR index](adr/README.md) gives each record's status and relations, the sta
 | [017](adr/017-patched-jitsi-web-image.md) | Patch the jitsi/web bundle by shape for fixes with no configuration point |
 | [018](adr/018-live-captions.md) | Live captions from an in-cluster streaming recognizer, fed by Jitsi's bridge |
 | [019](adr/019-event-languages-text-translation.md) | One language list per event, and automatic translation of its texts at save |
+| [020](adr/020-consents-follow-event-format.md) | Consents follow the event format, which sets starting values and never rights |
 
 ## Develop and contribute
 
@@ -215,7 +216,7 @@ For controllers, DPOs, security reviewers and anyone who handles a vulnerability
 
 | Page | What it answers |
 |---|---|
-| [Privacy and data protection](GDPR.md) | Personal data in PA Webinar: controller and processor roles, the data inventory and retention table, the consent model, the daily GDPR cleanup, data-subject rights, the address book, cookies, logs, audit trails and the consent texts. |
+| [Privacy and data protection](GDPR.md) | Personal data in PA Webinar: controller and processor roles, the data inventory and retention table, the consent model and its proofs, the daily GDPR cleanup, data-subject rights, the address book, cookies, logs, audit trails and the consent texts. |
 | [Recordings, voice data and AI outputs](privacy/recordings-and-ai.md) | The privacy side of recording, per-participant audio and AI post-production: what is captured, voice-data minimization, retention regimes, editing and erasure, and legal bases. |
 | [Accessibility](ACCESSIBILITY.md) | What the project checks for WCAG 2.1 AA and how, the known non-conformities, and how an administration writes its own accessibility statement. |
 | [Privacy notice checklist for controllers](privacy/privacy-notice-checklist.md) | The platform facts a controller's privacy notice has to cover, each mapped to the setting that controls it, and the settings to review before the first public event. It is not legal advice. |
@@ -277,6 +278,7 @@ Each of these files sits next to the code it describes.
 | How do I put our logo and colors on the portal? | [Branding and white-labeling](configuration/branding.md) |
 | How long is personal data kept, and what deletes it? | [Privacy: data inventory and retention](GDPR.md#data-inventory-and-retention) |
 | What must our privacy notice say? | [Privacy notice checklist](privacy/privacy-notice-checklist.md) |
+| Who can watch a recording reserved for registrants? | [Recording: states of the event's video](architecture/recording.md#states-of-the-events-video) |
 | What do we need for our accessibility statement? | [Accessibility](ACCESSIBILITY.md#writing-the-administrations-statement) |
 | How do I report a vulnerability? | [Security policy: reporting a vulnerability](../SECURITY.md#reporting-a-vulnerability) |
 | How do I add interface text or a new page? | [Extending: UI text and languages](development/extending.md#adding-ui-text-or-a-language) and [adding a page](development/extending.md#adding-a-page) |

@@ -40,7 +40,7 @@ import {
   expectedArtifactsForJob,
   postprodJobPayloadSchema,
 } from '@/lib/ai';
-import type { reportPayloadSchema, translateTextPayloadSchema } from '@/lib/ai/schemas';
+import type { redactPayloadSchema, reportPayloadSchema, translateTextPayloadSchema } from '@/lib/ai/schemas';
 import {
   resolveAsrProvider,
   resolveLlmProvider,
@@ -59,7 +59,14 @@ import { ingressoResoconto } from '@/lib/report/input';
 import { scriviNumeriResoconto } from '@/lib/report/job';
 import { metricheResoconto } from '@/lib/report/metrics';
 import { MOTIVO_MOTORE_ASSENTE } from '@/lib/text-translation/enqueue';
-import { endpointRitirati } from '@/lib/captions/room';
+import { cartelloRimozione } from '@/lib/recording/redaction/card';
+import { MOTIVO_VIDEO_CAMBIATO, URL_RIMOZIONE_MINUTI } from '@/lib/recording/redaction/job';
+import { riapriRichiesteSenzaLavoro } from '@/lib/recording/redaction/requests';
+import {
+  chiudiLavoroPresoSenzaTracce,
+  tracceUtilizzabili,
+  type RegistrazioneConTracce,
+} from '@/lib/ai/track-inputs';
 
 export const dynamic = 'force-dynamic';
 
@@ -171,6 +178,12 @@ export const POST = withErrorHandling(async (request) => {
   // api/internal/event-text-translation.
   if (parsed.data.kind === 'TRANSLATE_TEXT') {
     return rispostaTraduzioneTesti(row, parsed.data.payload, leaseUntil);
+  }
+  // La rimozione di una persona da un video: il video, dove caricare quello
+  // ripulito, gli intervalli e il cartello; il risultato torna a
+  // api/internal/recording-redaction.
+  if (parsed.data.kind === 'REDACT') {
+    return rispostaRimozione(row, parsed.data.payload, leaseUntil);
   }
   if (!row.recording_id) {
     throw new ValidationError(`postprod_job ${row.id} (${row.kind}) has no recording`);
@@ -324,10 +337,10 @@ export const POST = withErrorHandling(async (request) => {
   }> = [];
   // Mappa diarLabel→nome reale (Speaker DB): la passiamo al worker per
   // SUMMARIZE/TRANSLATE così la SINTESI e i sottotitoli tradotti usano il
-  // nome reale del relatore invece di "SPEAKER_00". Su multitrack i nomi (JWT) ci
-  // sono sempre; su blind diarization compaiono dopo il mapping admin (→
-  // ri-esegui SUMMARIZE). Speaker.displayName è in chiaro (vedi transcript
-  // route che lo usa diretto).
+  // nome reale del relatore invece di "SPEAKER_00". Su multitrack i nomi (JWT)
+  // ci sono se le tracce li portano (tracceAlWorker); su blind diarization
+  // compaiono dopo il mapping admin (→ ri-esegui SUMMARIZE).
+  // Speaker.displayName è in chiaro (vedi transcript route che lo usa diretto).
   const speakerNames: Record<string, string> = {};
   const sourceDownloadUrl = await presignArtifactDownload({
     blobKey: recording.blobKey,
@@ -339,7 +352,14 @@ export const POST = withErrorHandling(async (request) => {
     // signed URL + l'identità certa (dal JWT del portale, decifrata qui)
     // + l'offset per il merge. Il worker trascrive ogni traccia senza
     // diarization e fonde via multitrack.merge_tracks.
-    inputs.push(...(await tracceAlWorker(recording, lease)));
+    const tracce = await tracceAlWorker(recording, lease, { daTrascrivere: true });
+    // Le tracce sono sparite dopo l'accodamento: al worker il lavoro fallirebbe a
+    // ogni tentativo, quindi si chiude qui.
+    if (tracce.length === 0) {
+      await chiudiLavoroPresoSenzaTracce(row.id, recording.id, row.attempts);
+      return new Response(null, { status: 204 });
+    }
+    inputs.push(...tracce);
   }
 
   if (row.kind === 'ARCHIVE') {
@@ -351,7 +371,7 @@ export const POST = withErrorHandling(async (request) => {
     // Le tracce purgate (audioPurgedAt) non sono più disponibili: se
     // l'evento non ha retainParticipantTracks l'archivio conterrà solo
     // il video + i sottotitoli (degradazione pulita).
-    inputs.push(...(await tracceAlWorker(recording, lease)));
+    inputs.push(...(await tracceAlWorker(recording, lease, { daTrascrivere: false })));
     // Sottotitoli sorgente (best-effort): se il TRANSCRIBE non è ancora
     // completato non c'è VTT — l'archivio si genera comunque senza.
     // Corretti anch'essi, se la trascrizione e' stata rivista
@@ -679,15 +699,84 @@ async function rispostaTraduzioneTesti(
 }
 
 /**
+ * Il claim di un lavoro REDACT: il video da cui partire, dove caricare quello
+ * ripulito, gli intervalli e il cartello nella lingua della registrazione. Se
+ * nel frattempo la registrazione ha un altro video (o non c'e' piu'), il lavoro
+ * si chiude come fallito: la richiesta torna allo staff, che la invia di nuovo.
+ * Gli indirizzi firmati durano piu' del lease: ricodificare un video lungo
+ * richiede tempo, e il caricamento arriva alla fine.
+ */
+async function rispostaRimozione(
+  row: ClaimedRow,
+  payload: z.infer<typeof redactPayloadSchema>,
+  leaseUntil: Date
+): Promise<Response> {
+  const registrazione = await prisma.recording.findUnique({
+    where: { id: payload.recordingId },
+    select: { blobKey: true, durationSec: true },
+  });
+  if (!registrazione || registrazione.blobKey !== payload.sourceKey) {
+    const chiusi = await prisma.$executeRaw`
+      UPDATE postprod_jobs
+      SET status = 'FAILED', completed_at = NOW(), leased_at = NULL, leased_by = NULL,
+          last_error = ${MOTIVO_VIDEO_CAMBIATO}, updated_at = NOW()
+      WHERE id = ${row.id}::uuid AND status = 'CLAIMED' AND attempts = ${row.attempts}
+    `;
+    if (chiusi > 0) {
+      postprodJobsCompletedTotal.labels('REDACT', 'FAILED').inc();
+      await riapriRichiesteSenzaLavoro(prisma, row.id);
+    }
+    return new Response(null, { status: 204 });
+  }
+  const sourceDownloadUrl = await presignArtifactDownload({
+    blobKey: payload.sourceKey,
+    expiresInMinutes: URL_RIMOZIONE_MINUTI,
+  });
+  const { uploadUrl } = await presignArtifactUpload({
+    blobKey: payload.targetKey,
+    contentType: 'video/mp4',
+    expiresInMinutes: URL_RIMOZIONE_MINUTI,
+  });
+  return Response.json({
+    claimed: true,
+    jobId: row.id,
+    recordingId: null,
+    kind: row.kind,
+    payload: {
+      requestId: payload.requestId,
+      recordingId: payload.recordingId,
+      intervals: payload.intervals,
+      language: payload.language,
+    },
+    attempts: row.attempts,
+    leaseExpiresAt: leaseUntil.toISOString(),
+    sourceDownloadUrl,
+    uploadTargets: {
+      redactedVideo: { url: uploadUrl, blobKey: payload.targetKey, contentType: 'video/mp4' },
+    },
+    inputs: [],
+    redaction: {
+      intervals: payload.intervals,
+      durationSec: registrazione.durationSec,
+      // Il cartello in PNG (base64), o null: il worker copre allora con un riquadro scuro.
+      card: await cartelloRimozione(payload.language),
+    },
+    providerHints: {},
+  });
+}
+
+/**
  * Le tracce per partecipante da passare al worker (trascrizione multitraccia,
- * archivio): quelle ancora presenti, con l'identita' certa (dal JWT del
- * portale, decifrata qui), l'offset per il merge e un indirizzo firmato. Chi
- * ha ritirato dalla sala il consenso alla trascrizione dopo che la sua traccia
- * era gia' registrata non passa piu' (lib/captions/room endpointRitirati).
+ * archivio): quelle utilizzabili (lib/ai/track-inputs), con l'identita' certa
+ * (dal JWT del portale, decifrata qui), l'offset per il merge e un indirizzo
+ * firmato. Senza nome al worker, nome e voce non si legano mai: l'etichetta
+ * della voce resta anonima nella sintesi e nell'archivio. Il nome dato dallo
+ * staff alla voce resta com'e'.
  */
 async function tracceAlWorker(
-  recording: { id: string; eventId: string },
+  recording: RegistrazioneConTracce,
   lease: number,
+  { daTrascrivere }: { daTrascrivere: boolean },
 ): Promise<Array<{
   role: 'track';
   downloadUrl: string;
@@ -696,23 +785,14 @@ async function tracceAlWorker(
   displayName: string | null;
   startOffsetMs: number;
 }>> {
-  const tracks = await prisma.recordingTrack.findMany({
-    where: { recordingId: recording.id, audioPurgedAt: null },
-    select: { participantId: true, displayName: true, blobKey: true, startOffsetMs: true },
-    orderBy: { startOffsetMs: 'asc' },
-  });
-  const ritirati = await endpointRitirati(recording.eventId, [
-    ...new Set(tracks.map((tr) => tr.participantId)),
-  ]);
   const tracce = [];
-  for (const tr of tracks) {
-    if (ritirati.has(tr.participantId)) continue;
+  for (const tr of await tracceUtilizzabili(prisma, recording, { daTrascrivere })) {
     tracce.push({
       role: 'track' as const,
       downloadUrl: await presignArtifactDownload({ blobKey: tr.blobKey, expiresInMinutes: lease }),
       blobKey: tr.blobKey,
       participantId: tr.participantId,
-      displayName: tr.displayName ? tryDecryptPII(tr.displayName) : null,
+      displayName: tr.displayName && tr.nominabile ? tryDecryptPII(tr.displayName) : null,
       startOffsetMs: tr.startOffsetMs,
     });
   }

@@ -36,6 +36,9 @@ describe('Chat i18n keys present in all locales', () => {
     'live.chat.placeholder',
     'live.chat.send',
     'live.chat.noMessages',
+    'live.chat.personalDataNotice',
+    'qa.personalDataNotice',
+    'qa.moderator.answerNotice',
   ];
 
   it('has at least 2 locale files', () => {

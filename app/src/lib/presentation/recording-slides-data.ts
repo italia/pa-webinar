@@ -341,7 +341,7 @@ async function slidePubbliche(
  * pagina, slide spente dallo staff, nessuna presentazione nel tempo del
  * video, o nessun materiale presentato che si possa ancora mostrare.
  *
- * Chi la chiama ha già deciso che la pagina post-evento è pubblica.
+ * Chi la chiama ha già deciso che chi guarda la pagina post-evento vede il video.
  */
 export async function publicRecordingSlides(
   event: PublicSlidesEvent

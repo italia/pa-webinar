@@ -17,7 +17,9 @@ import { isEventOpenForRegistration, isEventPageVisible } from '@/lib/events/vis
 import { guestAccessAllowed } from '@/lib/events/guest-window';
 import { registrationAccessFor } from '@/lib/events/registration-access';
 import { materialPhase, materialVisibilityWhere } from '@/lib/events/material-visibility';
-import { ensureEventRecap, type EventRecap } from '@/lib/events/recap';
+import { domandePubbliche } from '@/lib/events/post-event-sections';
+import { schedaPrivacyEvento } from '@/lib/events/privacy-sheet';
+import { ensureEventRecap, riepilogoPubblico, type EventRecap } from '@/lib/events/recap';
 import type { RecordingSlidesView } from '@/lib/presentation/recording-slides';
 import { publicRecordingSlides } from '@/lib/presentation/recording-slides-data';
 import { getFeedbackSummary } from '@/lib/feedback/feedback-summary';
@@ -25,13 +27,19 @@ import EventDetailClient from '@/components/events/event-detail-client';
 import { linguaPrincipale, lingueTradotteInAutomatico } from '@/lib/text-translation/stato-lingue';
 import { appBaseUrl, getPublicEnv } from '@/lib/env';
 import { isEventManager } from '@/lib/auth/staff-session';
-import { accessoRegistrazione, pubblicazioneAperta } from '@/lib/recording/audience';
+import {
+  accessoRegistrazione,
+  apertaAgliIscritti,
+  videoDellApp,
+  visioneRegistrazione,
+} from '@/lib/recording/audience';
 import {
   programmeVideoTimes,
   replayMoments,
   type ProgrammeVideoTime,
   type ReplayMoment,
 } from '@/lib/replay/moments';
+import { partecipantiNelVideo } from '@/lib/recording/availability';
 import { getSettings } from '@/lib/settings';
 import { localizedUrl } from '@/lib/utils/localized-url';
 import {
@@ -140,13 +148,29 @@ export default async function EventDetailPage({
   if (!event) notFound();
   const cookieStore = await cookies();
 
-  // PROVISIONING/IDLE (pre-warm/pausa di un evento schedulato) restano
-  // raggiungibili: chi apre il link pubblico poco prima dell'inizio non
-  // deve trovare un 404. Vedi lib/events/visibility.ts. Lo staff che
-  // gestisce l'evento la apre anche nascosta, in anteprima (`?anteprima=1`).
+  // Chi vede la registrazione e cio' che ne deriva (lib/recording/audience):
+  // tutti o i soli iscritti, se pubblicata; lo staff che gestisce l'evento
+  // anche prima, ma solo quando chiede l'anteprima (`?anteprima=1`), cosi'
+  // la pagina che guarda di solito e' quella di tutti.
   const paginaVisibile = isEventPageVisible(event);
   const chiedeAnteprima = parametri?.anteprima === '1';
-  if (!paginaVisibile && !(chiedeAnteprima && (await isEventManager(cookieStore, event.id)))) {
+  const accesso = event.status === 'ENDED' ? await accessoRegistrazione(event, cookieStore) : null;
+  const visione = visioneRegistrazione(event, accesso, {
+    chiesta: chiedeAnteprima,
+    paginaVisibile,
+  });
+
+  // PROVISIONING/IDLE (pre-warm/pausa di un evento schedulato) restano
+  // raggiungibili: chi apre il link pubblico poco prima dell'inizio non
+  // deve trovare un 404. Vedi lib/events/visibility.ts. Una pagina nascosta la
+  // apre l'iscritto a cui spetta la registrazione, che e' dove porta il suo link
+  // personale, e lo staff che gestisce l'evento, in anteprima (`?anteprima=1`).
+  const iscrittoConRegistrazione = accesso === 'iscritto' && visione.registrazione;
+  if (
+    !paginaVisibile &&
+    !iscrittoConRegistrazione &&
+    !(chiedeAnteprima && (await isEventManager(cookieStore, event.id)))
+  ) {
     notFound();
   }
 
@@ -161,18 +185,14 @@ export default async function EventDetailPage({
     cookieStore.get(eventAccessCookieName(event.id))?.value,
   ));
 
-  // Chi vede la registrazione e cio' che ne deriva (lib/recording/audience):
-  // tutti o i soli iscritti, se pubblicata; lo staff che gestisce l'evento
-  // anche prima, ma solo quando chiede l'anteprima (`?anteprima=1`), cosi'
-  // la pagina che guarda di solito e' quella di tutti.
-  const accesso = event.status === 'ENDED' ? await accessoRegistrazione(event, cookieStore) : null;
-  const aperta = pubblicazioneAperta(event);
-  const previewForStaff = accesso === 'staff' && chiedeAnteprima && (!aperta || !paginaVisibile);
-  const vedeRegistrazione =
-    accesso === 'pubblico' || accesso === 'iscritto' || (accesso === 'staff' && (aperta || previewForStaff));
-  const videoVisibile = vedeRegistrazione && (event.recordingPublished || previewForStaff);
-  const recordingForRegistrants =
-    event.status === 'ENDED' && aperta && event.recordingAudience === 'REGISTRANTS' && !vedeRegistrazione;
+  // Le domande del Q&A sulla pagina, con una sola regola per la scheda delle
+  // domande, il riepilogo e il client (lib/events/post-event-sections).
+  const mostraDomande = domandePubbliche(event);
+  // Una registrazione riservata su un evento con destinazione resta riservata
+  // anche in cio' che esce dalla piattaforma o ne deriva fuori dalle sue rotte.
+  // Sugli altri eventi il pubblico della registrazione non li governa.
+  const riservataConDestinazione =
+    event.recordingAudience === 'REGISTRANTS' && event.recordingDestination != null;
 
   // Le due scelte che decidono i pulsanti della scheda: chi può iscriversi,
   // e se in diretta si entra anche senza iscrizione (dell'evento, o del sito).
@@ -296,7 +316,6 @@ export default async function EventDetailPage({
     id: string;
     text: string;
     answerText: string | null;
-    authorName: string;
     upvotes: number;
     status: string;
   }[] = [];
@@ -326,7 +345,8 @@ export default async function EventDetailPage({
   if (event.status === 'ENDED') {
     // Generate + persist the aggregate recap on first view (idempotent). Done
     // regardless of the display toggle so it survives retention for the future
-    // follow-up email; the page gates DISPLAY on postEventShowRecap below.
+    // follow-up email; the page gates DISPLAY on postEventShowRecap below, and
+    // only the public view of it reaches the client (`riepilogoPubblico`).
     recap = await ensureEventRecap(event.id);
     // Il riepilogo si congela alla prima visita, ma le valutazioni arrivano
     // anche dopo: si leggono al momento. Pubbliche solo se lo sono i feedback.
@@ -340,6 +360,9 @@ export default async function EventDetailPage({
             ? { average: valutazioni.average, count: valutazioni.count }
             : recap.feedback,
       };
+      // Le parole della nuvola restano anche a riepilogo spento: le usa la loro
+      // sezione. Il testo delle domande esce solo se una sezione lo mostra.
+      recap = riepilogoPubblico(recap, { domande: mostraDomande && event.postEventShowRecap });
     }
 
     const [
@@ -361,7 +384,7 @@ export default async function EventDetailPage({
             orderBy: { createdAt: 'desc' },
           })
         : Promise.resolve([]),
-      event.postEventShowQA && event.qaEnabled
+      mostraDomande
         ? prisma.question.findMany({
             where: {
               eventId: event.id,
@@ -373,6 +396,18 @@ export default async function EventDetailPage({
               ],
             },
             orderBy: { upvoteCount: 'desc' },
+            // Mai il nome di chi ha chiesto: la pagina non lo mostra, e cio' che
+            // si legge qui finisce nel payload. Le due date servono ai momenti
+            // del video.
+            select: {
+              id: true,
+              text: true,
+              answerText: true,
+              upvoteCount: true,
+              status: true,
+              answeredAt: true,
+              highlightedAt: true,
+            },
           })
         : Promise.resolve([]),
       event.postEventShowPolls
@@ -398,7 +433,7 @@ export default async function EventDetailPage({
 
     // Un contorno del video: se non si leggono, la pagina resta quella di
     // sempre, con il video senza slide.
-    if (videoVisibile && event.recordingUrl) {
+    if (visione.video && event.recordingUrl) {
       try {
         recordingSlides = await publicRecordingSlides({ ...event, recordingPublished: true });
       } catch (err) {
@@ -449,7 +484,6 @@ export default async function EventDetailPage({
       id: q.id,
       text: q.text,
       answerText: q.answerText,
-      authorName: q.authorName,
       upvotes: q.upvoteCount,
       status: q.status,
     }));
@@ -474,7 +508,7 @@ export default async function EventDetailPage({
     // I momenti della diretta e il programma come indice della registrazione,
     // sul tempo del video, con il contenuto che la pagina mostra gia'
     // (lib/replay/moments). Uno che non si legge non toglie l'altro.
-    if (videoVisibile && event.recordingUrl) {
+    if (visione.video && event.recordingUrl) {
       const [momentiLetti, orariLetti] = await Promise.allSettled([
         replayMoments(event, {
           questions: questionsRaw,
@@ -524,15 +558,20 @@ export default async function EventDetailPage({
     maxParticipants: event.maxParticipants,
     registrationCount: event._count.registrations,
     status: event.status,
-    recordingUrl: videoVisibile ? event.recordingUrl : null,
-    transcriptPublished: vedeRegistrazione && event.transcriptPublished,
-    unrecordedSpeech: videoVisibile && event.unrecordedSpeech,
-    // Il video su YouTube e' fuori dalla piattaforma: il pubblico della
-    // registrazione non lo governa.
-    youtubeUrl: event.youtubeUrl,
+    // La rotta dell'app, mai l'indirizzo dello storage (lib/recording/audience).
+    recordingUrl: visione.video && event.recordingUrl ? videoDellApp(event.slug) : null,
+    transcriptPublished: visione.registrazione && event.transcriptPublished,
+    unrecordedSpeech: visione.video && event.unrecordedSpeech,
+    // Dove chi partecipa non entra mai nel video manca la voce di chiunque non
+    // conduca, con o senza consenso: la nota dice quel motivo.
+    unrecordedSpeechHostsOnly: partecipantiNelVideo() === 'esclusi',
+    // Il video su YouTube e' fuori dalla piattaforma: il link segue il video.
+    youtubeUrl: riservataConDestinazione && !visione.video ? null : event.youtubeUrl,
     qaEnabled: event.qaEnabled,
     chatEnabled: event.chatEnabled,
-    recordingEnabled: event.recordingEnabled,
+    // La pagina annuncia la registrazione come la scheda: dove la scheda dice che
+    // non si registra niente, qui non si dice il contrario.
+    siRegistra: (schedaPrivacyEvento(event, settings)?.registrazione.modo ?? 'nessuna') !== 'nessuna',
     participantsCanUnmute: event.participantsCanUnmute,
     participantsCanStartVideo: event.participantsCanStartVideo,
     participantsCanShareScreen: event.participantsCanShareScreen,
@@ -554,7 +593,7 @@ export default async function EventDetailPage({
     peakParticipants: event.peakParticipants,
     postEventPublic: event.postEventPublic,
     postEventPublicUntil: event.postEventPublicUntil?.toISOString() ?? null,
-    postEventShowQA: event.postEventShowQA,
+    postEventShowQA: mostraDomande,
     postEventShowMaterials: event.postEventShowMaterials,
     postEventShowPolls: event.postEventShowPolls,
     postEventShowFeedback: event.postEventShowFeedback,
@@ -578,15 +617,22 @@ export default async function EventDetailPage({
         invalidToken={invalidToken}
         replayMoments={momenti}
         programmeVideoTimes={orariNelVideo}
-        previewForStaff={previewForStaff}
-        recordingForRegistrants={recordingForRegistrants}
+        previewForStaff={visione.anteprimaStaff}
+        previewPageHidden={!paginaVisibile && event.recordingPublished}
+        previewPageForRegistrants={apertaAgliIscritti(event)}
+        recordingForRegistrants={visione.soloIscritti}
         hasRoomAccess={hasRoomAccess}
         registrationAccess={registrationAccess}
         registrationOpen={registrationOpen}
         guestEntryOpen={guestEntryOpen}
         hasPostEventQuestionnaire={hasPostEventQuestionnaire}
         feedbackProof={feedbackProof}
-        report={vistaResoconto(event, locale)}
+        // Il resoconto si scrive dalla trascrizione: segue la registrazione.
+        report={
+          riservataConDestinazione && !visione.registrazione
+            ? null
+            : vistaResoconto(event, locale)
+        }
         parseTitleKicker={resolveKickerEnabled(event, settings.parseTitleKicker)}
         answeredQuestions={answeredQuestions}
         materials={eventMaterials}

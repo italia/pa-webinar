@@ -43,6 +43,8 @@ interface QuestionListProps extends QaVoter {
   isModerator: boolean;
   /** Le domande fatte da questo browser (lib/qa/alerts): portano il segno «La tua domanda». */
   myQuestionIds?: ReadonlySet<string>;
+  /** Le risposte possono comparire sulla pagina dell'evento. */
+  domandePubblicate?: boolean;
 }
 
 type FilterTab = 'ALL' | 'PENDING' | 'HIGHLIGHTED' | 'ANSWERED' | 'DISMISSED';
@@ -54,6 +56,7 @@ export default function QuestionList({
   voterAccessToken,
   voterGuestId,
   myQuestionIds,
+  domandePubblicate = true,
 }: QuestionListProps) {
   const t = useTranslations('qa');
   const apiUrl = questionsReadUrl(`/api/events/${eventSlug}/questions`, { voterGuestId });
@@ -236,6 +239,7 @@ export default function QuestionList({
             onUpvote={handleUpvote}
             onStatusChange={handleStatusChange}
             onAnswer={handleAnswer}
+            domandePubblicate={domandePubblicate}
           />
         ))}
       </div>
@@ -253,6 +257,7 @@ interface QuestionCardProps {
   onUpvote: (id: string) => void;
   onStatusChange: (id: string, status: string) => void;
   onAnswer: (id: string, answer: string | null) => Promise<boolean>;
+  domandePubblicate: boolean;
 }
 
 function QuestionCard({
@@ -263,6 +268,7 @@ function QuestionCard({
   onUpvote,
   onStatusChange,
   onAnswer,
+  domandePubblicate,
 }: QuestionCardProps) {
   const t = useTranslations('qa');
   const format = useFormatter();
@@ -379,6 +385,7 @@ function QuestionCard({
             maxLength={QUESTION_ANSWER_MAX}
             value={draft}
             placeholder={t('moderator.answerPlaceholder')}
+            aria-describedby={`${answerId}-notice`}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => {
               if (e.key !== 'Escape') return;
@@ -388,6 +395,9 @@ function QuestionCard({
             }}
             autoFocus
           />
+          <p id={`${answerId}-notice`} className="qa-answer-form__notice">
+            {t(domandePubblicate ? 'moderator.answerNotice' : 'moderator.answerNoticeNotPublished')}
+          </p>
           <div className="qa-answer-form__actions">
             {question.answerText && (
               <button

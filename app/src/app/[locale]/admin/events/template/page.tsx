@@ -25,12 +25,17 @@ export default async function TemplatesPage() {
   const t = await getTranslations('admin.templates');
 
   const [templates, settings] = await Promise.all([
-    prisma.eventTemplate.findMany({ orderBy: { sortOrder: 'asc' } }),
+    prisma.eventTemplate.findMany({
+      orderBy: { sortOrder: 'asc' },
+      // Quanti eventi ne sono nati: il catalogo (Event.templateId).
+      include: { _count: { select: { events: true } } },
+    }),
     getSettings(),
   ]);
 
-  const serialized = templates.map((tpl) => ({
+  const serialized = templates.map(({ _count, ...tpl }) => ({
     ...tpl,
+    eventCount: _count.events,
     descriptionTemplate:
       (tpl.descriptionTemplate as Record<string, string> | null) ?? null,
     createdAt: tpl.createdAt.toISOString(),

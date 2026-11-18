@@ -3459,6 +3459,15 @@ button.live-time-strip__rec {
     }
   }
 
+  // Sempre visibile sotto la casella: va a capo e cede altezza all'elenco dei
+  // messaggi, mai al testo.
+  &__notice {
+    margin: 6px 2px 0;
+    font-size: 0.72rem;
+    line-height: 1.35;
+    color: var(--app-muted);
+  }
+
   &__input {
     display: block;
     width: 100%;
@@ -3767,6 +3776,13 @@ button.live-time-strip__rec {
       border-color: var(--app-primary) !important;
       box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15) !important;
     }
+  }
+
+  &__notice {
+    margin: 0.4rem 0 0;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: var(--app-muted);
   }
 
   &__foot {
@@ -4144,6 +4160,13 @@ button.live-time-strip__rec {
       border-color: var(--app-primary);
       box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
     }
+  }
+
+  &__notice {
+    margin: 0.35rem 0 0;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: var(--app-muted);
   }
 
   &__actions {
@@ -7856,6 +7879,20 @@ button.live-time-strip__rec {
   }
 }
 
+// Frasi intere invece di valori brevi: una colonna sola a ogni larghezza, anche
+// fuori dalla scheda della sala d'attesa, e peso normale per reggere la lettura.
+.wr-facts.wr-facts--frasi {
+  grid-template-columns: 1fr;
+
+  .wr-fact__value {
+    font-weight: 400;
+  }
+
+  .wr-fact__value + .wr-fact__value {
+    margin-top: 0.35rem;
+  }
+}
+
 .wr-fact {
   display: flex;
   align-items: flex-start;
@@ -11352,8 +11389,10 @@ html.live-resizing .live-sidebar-resizer::after {
 }
 
 .formato__scelte--tre {
+  // Tre colonne solo dove ciascuna tiene icona e titolo: la griglia sta accanto
+  // all'anteprima, e la larghezza dello schermo non dice quanto spazio ha.
   @media (min-width: 576px) {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
   }
 }
 
@@ -15050,11 +15089,12 @@ button.back-to-top {
 
 // In solo ascolto: una fascia sopra la conferenza, con il modo di intervenire.
 .live-listen-only {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem 0.75rem;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 2.75rem 0.5rem 1rem;
   background: #fff8e6;
   border-bottom: 1px solid #f0d58c;
   color: #3d2e00;
@@ -15069,6 +15109,34 @@ button.back-to-top {
     flex: 1 1 0;
     min-width: 16rem;
     line-height: 1.4;
+  }
+
+  // Il testo dell'ente puo' essere lungo, e la fascia sta sopra una conferenza che
+  // non scorre: scorre da se', e conferenza e pulsante restano sullo schermo.
+  .live-listen-only__testo-ente {
+    display: block;
+    max-height: 15vh;
+    overflow-y: auto;
+    padding-left: 0.5rem;
+    border-left: 2px solid #f0d58c;
+  }
+
+  // Una x di 44 px, nell'angolo, anche quando il pulsante va a capo.
+  .live-listen-only__chiudi {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    box-shadow: none;
+
+    .icon {
+      fill: #3d2e00;
+    }
   }
 }
 

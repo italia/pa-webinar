@@ -3,10 +3,15 @@
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { VERSIONE_TESTO_TRASCRIZIONE } from '@/lib/registration/consents';
+
 import {
   chiedeConsensoPerVoce,
+  confermaVociNecessaria,
+  erroreConfermaVoci,
   leggiCorpoAvvio,
   regimeConsensoVoce,
+  versioneConsensoTrascrizione,
 } from './voice-consent';
 
 const base = {
@@ -14,6 +19,9 @@ const base = {
   captionsTranscriptEnabled: false,
   liveCaptionsEnabled: true,
 };
+// L'evento trascrive il video con la pipeline AI, senza tracce ne' sottotitoli.
+const video = { ...base, recordingEnabled: true, aiTranscriptEnabled: true };
+const pipeline = { aiPipelineEnabled: true };
 
 describe('chiedeConsensoPerVoce', () => {
   afterEach(() => vi.unstubAllEnvs());
@@ -35,6 +43,81 @@ describe('chiedeConsensoPerVoce', () => {
 
   it('non vale per un evento che registra solo il video della sala', () => {
     expect(chiedeConsensoPerVoce(base, {})).toBe(false);
+  });
+
+  describe('con la trascrizione dal video', () => {
+    // Senza variabili e' un Jitsi esterno: non si sa chi registra, e la risposta
+    // e' quella prudente.
+    const installazione = (env: Record<string, string> = {}) => {
+      for (const nome of [
+        'JITSI_WEB_INTERNAL_URL',
+        'JIBRI_HEALTH_URL',
+        'RECORDER_CONTROLLER_URL',
+        'RECORDING_STORAGE_TYPE',
+        'RECORDING_VOICE_EXCLUSION',
+      ]) {
+        vi.stubEnv(nome, env[nome] ?? '');
+      }
+    };
+
+    it('vale con registrazione, AI e pipeline accese', () => {
+      installazione();
+      expect(chiedeConsensoPerVoce(video, pipeline)).toBe(true);
+      installazione({ RECORDING_VOICE_EXCLUSION: 'true' });
+      expect(chiedeConsensoPerVoce(video, pipeline)).toBe(true);
+    });
+
+    it('non vale se manca una delle condizioni', () => {
+      installazione();
+      expect(chiedeConsensoPerVoce(video, {})).toBe(false);
+      expect(chiedeConsensoPerVoce(video, { aiPipelineEnabled: false })).toBe(false);
+      expect(chiedeConsensoPerVoce({ ...video, aiTranscriptEnabled: false }, pipeline)).toBe(false);
+      expect(chiedeConsensoPerVoce({ ...video, recordingEnabled: false }, pipeline)).toBe(false);
+    });
+
+    it('non vale in una chiamata rapida', () => {
+      installazione();
+      expect(chiedeConsensoPerVoce({ ...video, eventType: 'INSTANT' }, pipeline)).toBe(false);
+    });
+
+    it("segue l'installazione: serve un video completo", () => {
+      // Il Jitsi del chart senza niente che registri.
+      installazione({ JITSI_WEB_INTERNAL_URL: 'http://jitsi' });
+      expect(chiedeConsensoPerVoce(video, pipeline)).toBe(false);
+      // Solo il registratore per persona: le tracce ci sono, il video no.
+      installazione({
+        JITSI_WEB_INTERNAL_URL: 'http://jitsi',
+        RECORDER_CONTROLLER_URL: 'http://controller',
+      });
+      expect(chiedeConsensoPerVoce(video, pipeline)).toBe(false);
+      installazione({
+        JITSI_WEB_INTERNAL_URL: 'http://jitsi',
+        JIBRI_HEALTH_URL: 'http://jibri',
+      });
+      expect(chiedeConsensoPerVoce(video, pipeline)).toBe(true);
+    });
+  });
+});
+
+describe('versioneConsensoTrascrizione', () => {
+  afterEach(() => vi.unstubAllEnvs());
+
+  const tracce = { ...base, multitrackRecordingEnabled: true };
+
+  it('le tracce che non si trascrivono si accontentano del testo sulla traccia', () => {
+    expect(versioneConsensoTrascrizione(tracce, {})).toBe(1);
+    expect(versioneConsensoTrascrizione({ ...tracce, aiTranscriptEnabled: true }, {})).toBe(1);
+    expect(versioneConsensoTrascrizione(tracce, pipeline)).toBe(1);
+  });
+
+  it('le tracce che la pipeline trascrive chiedono il testo con il nome', () => {
+    expect(versioneConsensoTrascrizione({ ...tracce, aiTranscriptEnabled: true }, pipeline)).toBe(
+      VERSIONE_TESTO_TRASCRIZIONE
+    );
+  });
+
+  it('anche la trascrizione dal video', () => {
+    expect(versioneConsensoTrascrizione(video, pipeline)).toBe(VERSIONE_TESTO_TRASCRIZIONE);
   });
 });
 
@@ -59,7 +142,8 @@ describe('regimeConsensoVoce', () => {
         db({}),
         'e',
         { ...base, multitrackRecordingEnabled: true },
-        {}
+        {},
+        false
       )
     ).toEqual({
       chiesto: true,
@@ -74,7 +158,8 @@ describe('regimeConsensoVoce', () => {
         db({}),
         'e',
         { ...base, captionsTranscriptEnabled: true },
-        {}
+        {},
+        false
       )
     ).toEqual({
       chiesto: true,
@@ -83,25 +168,129 @@ describe('regimeConsensoVoce', () => {
   });
 
   it("dopo l'evento le tracce lasciate in sala tengono la regola, anche a interruttori spenti", async () => {
-    expect(await regimeConsensoVoce(db({ frase: true }), 'e', base, {})).toEqual({
+    expect(await regimeConsensoVoce(db({ frase: true }), 'e', base, {}, false)).toEqual({
       chiesto: true,
       versione: 2,
     });
-    expect(await regimeConsensoVoce(db({ prova: true }), 'e', base, {})).toEqual({
+    expect(await regimeConsensoVoce(db({ prova: true }), 'e', base, {}, false)).toEqual({
       chiesto: true,
       versione: 1,
     });
-    expect(await regimeConsensoVoce(db({ traccia: true }), 'e', base, {})).toEqual({
+    expect(await regimeConsensoVoce(db({ traccia: true }), 'e', base, {}, false)).toEqual({
       chiesto: true,
       versione: 1,
     });
   });
 
   it("senza regola ne' tracce non e' stato chiesto", async () => {
-    expect(await regimeConsensoVoce(db({}), 'e', base, {})).toEqual({
+    expect(await regimeConsensoVoce(db({}), 'e', base, {}, false)).toEqual({
       chiesto: false,
       versione: 1,
     });
+  });
+
+  it('una registrazione senza segno non segue la regola sul video', async () => {
+    // La stessa configurazione fa chiedere il consenso a chi entra.
+    vi.stubEnv('JITSI_WEB_INTERNAL_URL', '');
+    expect(chiedeConsensoPerVoce(video, pipeline)).toBe(true);
+    expect(await regimeConsensoVoce(db({}), 'e', video, pipeline, false)).toEqual({
+      chiesto: false,
+      versione: 1,
+    });
+  });
+
+  it('una registrazione con il segno conta come consenso chiesto, al testo con il nome', async () => {
+    expect(await regimeConsensoVoce(db({}), 'e', base, {}, true)).toEqual({
+      chiesto: true,
+      versione: VERSIONE_TESTO_TRASCRIZIONE,
+    });
+    expect(VERSIONE_TESTO_TRASCRIZIONE).toBe(2);
+  });
+
+  it('il segno alza il testo anche sopra le tracce per persona', async () => {
+    const e = { ...base, multitrackRecordingEnabled: true };
+    expect((await regimeConsensoVoce(db({}), 'e', e, {}, false)).versione).toBe(1);
+    expect((await regimeConsensoVoce(db({}), 'e', e, {}, true)).versione).toBe(2);
+  });
+
+  it('il segno non cambia il testo che vale con i sottotitoli', async () => {
+    expect(await regimeConsensoVoce(db({ frase: true }), 'e', base, {}, true)).toEqual({
+      chiesto: true,
+      versione: 2,
+    });
+  });
+});
+
+describe('confermaVociNecessaria', () => {
+  const dbConTracce = (tracce: number) =>
+    ({
+      captionSegment: { findFirst: vi.fn(async () => null) },
+      multitrackConsent: { findFirst: vi.fn(async () => null) },
+      recordingTrack: {
+        findFirst: vi.fn(async () => null),
+        count: vi.fn(async () => tracce),
+      },
+    }) as never;
+  const db = dbConTracce(0);
+  const rec = {
+    id: 'r',
+    blobKey: 'recordings/e/a.mp4',
+    eventId: 'e',
+    transcriptConsentRule: false,
+  };
+  const nuovo = { ...rec, transcriptConsentRule: true };
+
+  it('il video senza segno di un evento con la sola AI non chiede la conferma', async () => {
+    await expect(confermaVociNecessaria(db, rec, video, pipeline)).resolves.toBe(false);
+  });
+
+  it('il video con il segno la chiede, anche se in sala non e’ rimasta traccia del consenso', async () => {
+    await expect(confermaVociNecessaria(db, nuovo, video, pipeline)).resolves.toBe(true);
+    // Accendere l'AI dopo la fine non toglie la domanda.
+    await expect(confermaVociNecessaria(db, nuovo, base, {})).resolves.toBe(true);
+  });
+
+  it('il segno e’ quello della riga in esame: due registrazioni dello stesso evento', async () => {
+    const [vecchia, recente] = await Promise.all([
+      confermaVociNecessaria(db, rec, video, pipeline),
+      confermaVociNecessaria(db, nuovo, video, pipeline),
+    ]);
+    expect([vecchia, recente]).toEqual([false, true]);
+  });
+
+  it('il video di un evento che chiede il consenso voce per voce la chiede', async () => {
+    await expect(
+      confermaVociNecessaria(db, rec, { ...base, multitrackRecordingEnabled: true }, {})
+    ).resolves.toBe(true);
+  });
+
+  it("non la chiedono le tracce per persona ne' una registrazione senza file", async () => {
+    const e = { ...base, multitrackRecordingEnabled: true };
+    await expect(confermaVociNecessaria(db, rec, e, {}, true)).resolves.toBe(false);
+    await expect(confermaVociNecessaria(db, { ...rec, blobKey: '' }, e, {})).resolves.toBe(false);
+  });
+
+  it('il segno non cambia niente senza video completo', async () => {
+    await expect(confermaVociNecessaria(db, nuovo, video, pipeline, true)).resolves.toBe(false);
+    await expect(
+      confermaVociNecessaria(db, { ...nuovo, blobKey: '' }, video, pipeline)
+    ).resolves.toBe(false);
+    await expect(
+      confermaVociNecessaria(dbConTracce(2), nuovo, video, pipeline)
+    ).resolves.toBe(false);
+  });
+});
+
+describe('erroreConfermaVoci', () => {
+  it('e’ il 409 che l’interfaccia trasforma in domanda', () => {
+    expect(erroreConfermaVoci()).toMatchObject({
+      statusCode: 409,
+      code: 'VOICE_CONSENT_REQUIRED',
+    });
+  });
+
+  it('non dice che l’evento ha chiesto il consenso: su un video nuovo puo’ non averlo fatto', () => {
+    expect(erroreConfermaVoci().message).not.toContain('This event asks');
   });
 });
 

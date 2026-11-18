@@ -17,6 +17,8 @@ import { traduzioneDisponibile } from '@/lib/text-translation/enqueue';
 import { guestAccessAllowed } from '@/lib/events/guest-window';
 import { publicRegistrationFor } from '@/lib/events/registration-access';
 import { recordingOfEventVideo } from '@/lib/presentation/recording-slides-data';
+import { videoDellApp, videoPerTutti } from '@/lib/recording/audience';
+import { organizzaEvento } from '@/lib/recording/content-access';
 import EventManagementClient from '@/components/admin/event-management-client';
 import { localizedPath } from '@/lib/utils/localized-url';
 import { eventPageMetadata } from '@/components/admin/admin-page-title';
@@ -53,11 +55,13 @@ export default async function EventManagePage({
   // l'organizzatore solo sugli eventi che gestisce (eventScope, ADR-014).
   const session = await getStaffSession(await cookies());
 
-  // Con una sessione che puo' gestire l'evento il token nell'indirizzo non
+  // Con una sessione che organizza l'evento il token nell'indirizzo non
   // serve: si torna all'indirizzo pulito, che non lo espone a cronologia,
   // log e condivisioni dello schermo. Chi ha solo il link del moderatore
-  // (anche un organizzatore su un evento altrui) continua a entrare col token.
-  if (token && session && UUID_RE.test(id) && (await puoGestire(session, id))) {
+  // (anche un organizzatore su un evento altrui, o l'admin che non lo
+  // organizza: senza il token perderebbe la conduzione) continua a entrare col
+  // token.
+  if (token && session && UUID_RE.test(id) && (await organizzaEvento(session, id))) {
     redirect(localizedPath(`/admin/events/${id}`, locale));
   }
   const staff = token ? null : session;
@@ -81,6 +85,11 @@ export default async function EventManagePage({
     notFound();
   }
   if (staff && !(await puoGestire(staff, id))) return <AccessDenied />;
+  // L'admin che non organizza l'evento lo governa (stato, metadati, consensi,
+  // archivio) ma non lo conduce: niente link di conduzione, che apre la
+  // pubblicazione e la cancellazione del video, e niente contenuto delle
+  // registrazioni (lib/recording/content-access).
+  const governo = !!staff && !(await organizzaEvento(staff, id));
 
   const event = await prisma.event.findUnique({
     where: { id },
@@ -89,6 +98,7 @@ export default async function EventManagePage({
         select: {
           id: true,
           displayName: true,
+          nickname: true,
           organization: true,
           organizationRole: true,
           organizationType: true,
@@ -140,7 +150,7 @@ export default async function EventManagePage({
   // dell'evento, dalla pagina della post-produzione (solo staff): il link
   // compare quando quel video e' della sala e in sala si e' presentato un PDF.
   const [videoDellaSala, presentazione] =
-    staff && event.recordingUrl
+    staff && !governo && event.recordingUrl
       ? await Promise.all([
           recordingOfEventVideo(event.id, event.recordingUrl),
           prisma.liveAction.findFirst({
@@ -177,15 +187,22 @@ export default async function EventManagePage({
     imageUrl: event.imageUrl,
     parseTitleKicker: event.parseTitleKicker,
     expectedSenderRatioPct: event.expectedSenderRatioPct,
-    recordingUrl: event.recordingUrl,
+    // La rotta dell'app, che firma il file per chi lo puo' vedere: mai
+    // l'indirizzo dello storage (lib/recording/audience).
+    recordingUrl: event.recordingUrl ? videoDellApp(event.slug) : null,
+    // Con il solo link di conduzione la rotta apre il video solo se e'
+    // pubblicato per tutti; chi organizza lo apre sempre.
+    recordingPlayable: !!staff || videoPerTutti(event) !== null,
     tempRecordingUrl: event.tempRecordingUrl,
     tempRecordingStartedAt: event.tempRecordingStartedAt?.toISOString() ?? null,
     recordingPublished: event.recordingPublished,
     recordingPublishedAt: event.recordingPublishedAt?.toISOString() ?? null,
     recordingAudience: event.recordingAudience,
+    recordingDestination: event.recordingDestination,
     recordingFileSize: event.recordingFileSize ? Number(event.recordingFileSize) : null,
     recordingDuration: event.recordingDuration,
     recordingDeleteAfterDays: event.recordingDeleteAfterDays,
+    legacyRecordingRetention: event.legacyRecordingRetention,
     youtubeUrl: event.youtubeUrl,
     libraryListed: event.libraryListed,
     // A Recording ROW exists (live capture happened) → the AI pipeline can run.
@@ -207,7 +224,7 @@ export default async function EventManagePage({
     recordingNotifiedAt: event.recordingNotifiedAt?.toISOString() ?? null,
     feedbackEnabled: event.feedbackEnabled,
     recordingConsentText: event.recordingConsentText,
-    moderatorToken: event.moderatorToken,
+    moderatorToken: governo ? '' : event.moderatorToken,
     moderatorName: event.moderatorName,
     moderatorEmail: tryDecryptPII(event.moderatorEmail),
     jitsiRoomName: event.jitsiRoomName,
@@ -248,6 +265,8 @@ export default async function EventManagePage({
     registrations: event.registrations.map((r) => ({
       id: r.id,
       displayName: tryDecryptPII(r.displayName) ?? r.displayName,
+      // Chi organizza vede chi c'e' dietro un nickname (lib/live/nickname).
+      nickname: tryDecryptPII(r.nickname),
       organization: r.organization,
       organizationRole: r.organizationRole,
       organizationType: r.organizationType,
@@ -315,6 +334,7 @@ export default async function EventManagePage({
         // orologio, cosi' la prima passata del client coincide col server.
         renderedAt={Date.now()}
         viaToken={staff ? null : (token ?? null)}
+        governo={governo}
         textTranslationAvailable={!!staff && traduzioneDisponibile(settings)}
       />
     </div>

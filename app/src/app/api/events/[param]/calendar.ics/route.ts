@@ -6,6 +6,7 @@ import { NextResponse } from 'next/server';
 import { withErrorHandling } from '@/lib/api-handler';
 import { NotFoundError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
+import { isEventPageVisible } from '@/lib/events/visibility';
 import { generateEventICal } from '@/lib/ical/generate';
 import { nomeOrganizzatoreCalendario } from '@/lib/ical/organizer';
 import { resolveLocale, localiseEvent } from '@/lib/utils/locale';
@@ -19,7 +20,8 @@ export const GET = withErrorHandling(async (request, context) => {
 
   const event = await prisma.event.findUnique({ where: { slug } });
 
-  if (!event || event.status === 'DRAFT') {
+  // Come la pagina dell'evento: senza pagina, niente titolo e descrizione qui.
+  if (!event || !isEventPageVisible(event)) {
     throw new NotFoundError('Event');
   }
 

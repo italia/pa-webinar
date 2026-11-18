@@ -25,7 +25,7 @@ export function elencoVisibileAlPubblico(evento: {
 }
 
 /** Da qui in su un evento e' su vasta scala. */
-const VASTA_SCALA = 300;
+export const VASTA_SCALA = 300;
 
 /**
  * Il valore di partenza: dove chi partecipa parla o si mostra ci si conosce
@@ -39,4 +39,18 @@ export function elencoPredefinito(evento: {
 }): boolean {
   if ((evento.maxParticipants ?? 0) >= VASTA_SCALA) return false;
   return !!evento.participantsCanUnmute || !!evento.participantsCanStartVideo;
+}
+
+/**
+ * Il nickname per chi partecipa (Event.nicknamesEnabled), di partenza: dove
+ * l'elenco e' nascosto al pubblico, quindi su vasta scala, dove il pubblico
+ * ascolta soltanto e col pubblico anonimo. Chi organizza lo accende anche per
+ * un incontro riservato, e lo spegne dove non serve.
+ */
+export function nicknamePredefinito(evento: {
+  participantListVisible?: boolean | null;
+  audienceAnonymous?: boolean | null;
+  eventType?: string | null;
+}): boolean {
+  return !elencoVisibileAlPubblico(evento);
 }

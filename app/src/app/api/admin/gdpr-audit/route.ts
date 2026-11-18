@@ -65,8 +65,9 @@ export const GET = withErrorHandling(async (request) => {
         details: r.details,
         createdAt: r.createdAt.toISOString(),
         eventId: r.eventId,
-        eventSlug: r.event.slug,
-        eventTitle: getLocalized(r.event.title as LocalizedField, 'it'),
+        // Senza evento per il ritiro di una voce di rubrica senza iscrizioni.
+        eventSlug: r.event?.slug ?? null,
+        eventTitle: r.event ? getLocalized(r.event.title as LocalizedField, 'it') : null,
       })),
       actionSummary: actionCounts.map((a) => ({
         action: a.action,

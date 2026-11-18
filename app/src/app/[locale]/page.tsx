@@ -10,6 +10,7 @@ import { Link } from '@/i18n/navigation';
 import NessunEvento from '@/components/home/nessun-evento';
 import { serviceInventoryUrl } from '@/lib/service-inventory-url';
 import { publicEventStatusWhere } from '@/lib/events/visibility';
+import { videoPerTutti } from '@/lib/recording/audience';
 import EventList from '@/components/events/event-list';
 import LandingIstituzionale from '@/components/home/landing-istituzionale';
 import LandingSemplice from '@/components/home/landing-semplice';
@@ -35,7 +36,7 @@ async function loadUpcomingEvents() {
     maxParticipants: e.maxParticipants,
     registrationCount: e._count.registrations,
     status: e.status,
-    recordingUrl: e.recordingPublished && e.recordingAudience === 'PUBLIC' ? e.recordingUrl : null,
+    recordingUrl: videoPerTutti(e),
     speakersInfo: e.speakersInfo as Record<string, string> | null,
     organizerName: e.organizerName,
     imageUrl: e.imageUrl,

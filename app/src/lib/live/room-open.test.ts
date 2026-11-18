@@ -7,7 +7,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const db = vi.hoisted(() => ({ callSession: { findFirst: vi.fn() } }));
 vi.mock('@/lib/db', () => ({ prisma: db }));
 
-import { salaForseAperta } from './room-open';
+import { salaForseAperta, salaGiaAperta } from './room-open';
 
 beforeEach(() => db.callSession.findFirst.mockReset());
 
@@ -29,5 +29,30 @@ describe('salaForseAperta', () => {
   it('bozza o concluso, no', async () => {
     expect(await salaForseAperta({ id: 'e1', status: 'DRAFT' })).toBe(false);
     expect(await salaForseAperta({ id: 'e1', status: 'ENDED' })).toBe(false);
+  });
+});
+
+describe('salaGiaAperta', () => {
+  it.each(['PROVISIONING', 'LIVE', 'IDLE', 'ENDED', 'ARCHIVED'])(
+    '%s: si e gia aperta, senza leggere le sessioni',
+    async (status) => {
+      expect(await salaGiaAperta({ id: 'e1', status })).toBe(true);
+      expect(db.callSession.findFirst).not.toHaveBeenCalled();
+    }
+  );
+
+  it('pubblicato, con una sessione già chiusa: si', async () => {
+    db.callSession.findFirst.mockResolvedValue({ id: 'chiusa' });
+    expect(await salaGiaAperta({ id: 'e1', status: 'PUBLISHED' })).toBe(true);
+    expect(db.callSession.findFirst).toHaveBeenCalledTimes(1);
+    expect(db.callSession.findFirst).toHaveBeenLastCalledWith({
+      where: { eventId: 'e1' },
+      select: { id: true },
+    });
+  });
+
+  it.each(['DRAFT', 'PUBLISHED'])('%s senza sessioni: mai aperta', async (status) => {
+    db.callSession.findFirst.mockResolvedValue(null);
+    expect(await salaGiaAperta({ id: 'e1', status })).toBe(false);
   });
 });

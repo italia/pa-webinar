@@ -147,6 +147,13 @@ describe('POST /api/internal/multitrack-manifest', () => {
     const res = await POST(post({ eventId: EVENT_ID, recordingId: REC_ID, tracks: [track], interrupted: true }), ctx());
     expect(await res.json()).toMatchObject({ enqueued: 1, partial: false });
     expect(enqueuePostprodForRecording).toHaveBeenCalledTimes(1);
+    // Le tracce contengono solo chi ha acconsentito: la pipeline non chiede
+    // conferme, e si dice che sono tracce.
+    expect(enqueuePostprodForRecording).toHaveBeenCalledWith(expect.anything(), {
+      recordingId: expect.any(String),
+      multitrack: true,
+      seMancanoTracce: 'salta',
+    });
   });
 
   it('anche in pausa (IDLE) l\'evento e\' aperto: una cattura fermata non avvia la trascrizione', async () => {
@@ -158,6 +165,21 @@ describe('POST /api/internal/multitrack-manifest', () => {
     const res = await POST(post({ eventId: EVENT_ID, recordingId: REC_ID, tracks: [track], interrupted: true }), ctx());
     expect(await res.json()).toMatchObject({ enqueued: 0, partial: true });
     expect(enqueuePostprodForRecording).not.toHaveBeenCalled();
+  });
+
+  it('senza tracce da trascrivere non si accoda niente, e il log lo dice', async () => {
+    vi.mocked(enqueuePostprodForRecording).mockResolvedValueOnce({
+      enqueued: 0,
+      skippedExisting: 0,
+      jobIds: [],
+      noTranscribableTracks: true,
+    });
+    const avviso = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const res = await POST(post({ eventId: EVENT_ID, recordingId: REC_ID, tracks: [track] }), ctx());
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({ ok: true, enqueued: 0 });
+    expect(avviso).toHaveBeenCalledWith(expect.stringContaining('no track can be transcribed'));
+    avviso.mockRestore();
   });
 
   it('il silenzio si giudica su tutte le tracce: una seconda esecuzione muta non butta la prima', async () => {

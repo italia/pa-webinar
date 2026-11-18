@@ -142,10 +142,7 @@
       "votes": "{count, plural, =0 {ni glasov} one {# glas} two {# glasova} few {# glasovi} other {# glasov}}",
       "topWords": "Najpogosteje deljene besede",
       "feedback": "Povprečna ocena",
-      "feedbackCount": "{count, plural, one {# odgovor} two {# odgovora} few {# odgovori} other {# odgovorov}}",
-      "chatQuestions": "Vprašanja iz klepeta",
-      "reactionsCount": "{count, plural, one {1 reakcija} two {# reakciji} few {# reakcije} other {# reakcij}}",
-      "answered": "odgovorjeno"
+      "feedbackCount": "{count, plural, one {# odgovor} two {# odgovora} few {# odgovori} other {# odgovorov}}"
     },
     "detail": {
       "title": "Podrobnosti dogodka",
@@ -191,7 +188,7 @@
       },
       "chatNotSaved": "Sporočila klepeta se po dogodku ne objavijo: izbrišejo se skupaj z drugimi podatki dogodka.",
       "qaPostEvent": "Vprašanja in odgovori z dogodka",
-      "peakParticipants": "Vrh: {count} udeležencev",
+      "peakParticipants": "{count, plural, one {Vrh: # udeleženec} two {Vrh: # udeleženca} few {Vrh: # udeleženci} other {Vrh: # udeležencev}}",
       "calendar": {
         "addToCalendar": "Dodaj v koledar",
         "google": "Google Calendar",
@@ -202,11 +199,13 @@
       "registrationEnded": "Dogodek se je zaključil: prijave so zaprte.",
       "joinAsGuest": "Pridruži se kot gost",
       "registeredUseEmailLink": "Ste že prijavljeni? Vstopite z osebno povezavo iz e-pošte.",
-      "willBeRecorded": "Dogodek bo posnet.",
+      "willBeRecorded": "Dogodek se lahko snema.",
       "machineTranslation": "Samodejni prevod",
       "machineTranslationNote": "Naslov in opis je prevedel samodejni model in ju še nihče ni pregledal.",
       "previewTitle": "Predogled za ekipo",
       "previewBody": "Posnetek še ni objavljen: to različico strani vidijo samo tisti, ki upravljajo dogodek.",
+      "previewBodyPageHidden": "Ta stran ni vidna javnosti: kdor odpre njen naslov, je ne najde. Vidijo jo samo tisti, ki upravljajo dogodek.",
+      "previewBodyPageRegistrants": "Ta stran ni vidna javnosti: kdor odpre njen naslov, je ne najde. Vidijo jo samo prijavljeni na dogodek in tisti, ki ga upravljajo.",
       "recordingForRegistrantsTitle": "Posnetek samo za prijavljene",
       "recordingForRegistrantsBody": "Če ste se prijavili na dogodek, odprite osebno povezavo iz e-pošte »posnetek je na voljo« ali zahtevajte, da vam jo pošljemo znova.",
       "recordingLinkEmailLabel": "E-pošta, s katero ste se prijavili",
@@ -243,8 +242,8 @@
     "namePlaceholder": "Ime bo prikazano v dvorani dogodka",
     "email": "E-pošta",
     "emailPlaceholder": "Prejeli boste povezavo za dostop do dogodka",
-    "gdprConsent": "Soglašam z obdelavo mojih osebnih podatkov (ime, e-pošta) v skladu z Uredbo EU 2016/679 (GDPR) za udeležbo na tem dogodku.",
-    "consentsLegend": "Soglasja",
+    "gdprConsent": "Prebral(a) sem politiko zasebnosti o obdelavi osebnih podatkov (ime, e-pošta) za udeležbo na tem dogodku.",
+    "consentsLegend": "Politika zasebnosti in privolitve",
     "requiredMark": "obvezno",
     "optionalMark": "neobvezno",
     "gdprLink": "Preberite celotno politiko zasebnosti",
@@ -292,12 +291,13 @@
       "emailRequired": "Vnesite svojo e-pošto",
       "emailInvalid": "Vnesite veljaven e-poštni naslov",
       "organizationRequired": "Vnesite svojo organizacijo",
-      "consentRequired": "Soglasje z obdelavo podatkov je obvezno",
+      "consentRequired": "Za prijavo potrdite, da ste prebrali politiko zasebnosti",
       "recordingConsentRequired": "Soglasje s snemanjem je obvezno za ta dogodek",
       "eventFull": "Dogodek je dosegel največje število udeležencev",
       "generic": "Napaka pri prijavi. Prosimo, poskusite znova.",
       "questionnaireRequired": "Za prijavo odgovorite na vprašanja vprašalnika.",
       "questionnaireIncomplete": "Odgovorite na vsa obvezna vprašanja vprašalnika.",
+      "recordingDestinationChanged": "Besedilo o snemanju se je spremenilo med izpolnjevanjem obrazca: znova naložite stran in ga ponovno preberite.",
       "questionnaireChanged": "Vprašalnik se je spremenil, medtem ko ste izpolnjevali obrazec: znova naložite stran in odgovorite znova."
     }
   },
@@ -363,7 +363,7 @@
       "publicHelpNone": "Stran končanega dogodka ostane vidna, z naslovom in opisom.",
       "sections": {
         "recap": "povzetek",
-        "qa": "vprašanja iz Q&A",
+        "qa": "besedilo vprašanj iz Q&A",
         "polls": "objavljene ankete",
         "wordCloud": "oblak besed",
         "materials": "gradiva",
@@ -424,6 +424,7 @@
       "noMessages": "Ni sporočil",
       "empty": "Še ni sporočil. Bodite prvi!",
       "inputLabel": "Sporočilo klepeta",
+      "personalDataNotice": "Ne pišite osebnih podatkov drugih oseb niti svojih, ki jih ne želite razkriti: osebe v dvorani lahko klepet berejo in prenesejo.",
       "moderatorBadge": "Moderator",
       "attach": "Pripni datoteko",
       "emojiPicker": "Vstavi emodži",
@@ -544,7 +545,9 @@
       "locksByConsent": "Mikrofoni in kamere sledijo privolitvi v snemanje: kdor jo je dal, uporablja, kar dogodek dovoljuje, ostali le poslušajo. Zaklepi sobe ostanejo vklopljeni.",
       "listenOnlyBadge": "samo posluša",
       "listenOnlyNoFloor": "Ni dal privolitve v snemanje: ne more govoriti, dokler je ne da v svoji dvorani.",
-      "voiceExcludedBadge": "brez snemanja",
+      "inVideoBadge": "v videu",
+      "voiceRecordedBadge": "glas se snema",
+      "voiceExcludedBadge": "glas se ne snema",
       "voiceExcludedFloor": "Ni privolil v snemanje: lahko nastopa, a ostane zunaj posnetka."
     },
     "moderator": {
@@ -621,6 +624,7 @@
       "tab": "Režija",
       "recordingHeading": "Snemanje",
       "recordingOff": "Ne snema",
+      "recordingNotOfferedInstant": "V hitrih klicih se snemanje ponuja le tam, kjer osebe brez privolitve ostanejo zunaj videa, ta namestitev pa tega ne omogoča.",
       "stopConfirm": "Ustavim snemanje zdaj?",
       "featuresHeading": "Funkcije sobe",
       "featuresHelp": "Vklopijo in izklopijo se za vse, takoj.",
@@ -681,33 +685,78 @@
       "confirm": "Prekliči",
       "working": "Posodabljanje…",
       "error": "Privolitve ni bilo mogoče posodobiti: poskusite znova.",
+      "textChanged": "Besedilo privolitve se je spremenilo, potem ko ste odprli stran: preberite novo besedilo in potrdite, če se strinjate.",
+      "closeNotice": "Zapri to obvestilo: vaše privolitve ostanejo pod gumbom na vrhu",
       "recording": {
         "title": "Snemanje dogodka",
         "give": "Privolim v snemanje",
         "without": {
           "soloAscolto": "Brez te privolitve samo poslušate: mikrofon, kamera in zaslon ostanejo zaprti.",
-          "conduce": "Brez te privolitve vseeno vodite, vendar vaš glas ne ostane v posameznih sledeh niti v prepisu.",
-          "voce": "Brez te privolitve sodelujete kot vsi, a ostanete zunaj posnetka: ne ime, ne glas, ne slika."
+          "conduce": "Brez te privolitve vseeno vodite.",
+          "voce": "Brez te privolitve sodelujete kot vsi, vaš glas pa ostane zunaj posnetka. Vaš obraz in vaše ime se v videu tako ali tako nikoli ne pojavita.",
+          "comeTutti": "Brez te privolitve sodelujete kot vsi."
         },
+        "withoutTranscriptHost": "Vaš glas ne ostane v sledeh po osebah niti v prepisu.",
         "alreadyRecorded": "Kar je že posneto, ostane v videu dogodka: za odstranitev pišite organizatorjem.",
         "withdraw": {
-          "soloAscolto": "Če jo prekličete, ostanete v dvorani in samo poslušate: mikrofon, kamera in zaslon se zaprejo. Prekličete tudi privolitev v prepis svojih govorov.",
-          "conduce": "Če jo prekličete, vodite naprej, vendar od zdaj vaš glas ne ostane v posameznih sledeh niti v prepisu. Video dvorane, če se snema, vas vseeno prikazuje.",
-          "voce": "Če jo prekličete, ostanete v sobi kot prej, od zdaj pa ste zunaj posnetka. Prekličete tudi privolitev v prepis svojih prispevkov."
-        }
+          "soloAscolto": "Če jo prekličete, ostanete v dvorani in samo poslušate: mikrofon, kamera in zaslon se zaprejo.",
+          "conduce": "Če jo prekličete, vodite naprej. Video dvorane, če se snema, vas vseeno prikazuje.",
+          "voce": "Če jo prekličete, ostanete v dvorani kot prej, od zdaj pa ste zunaj posnetka.",
+          "avvertenza": "Če jo prekličete, ostanete v dvorani kot prej. Če dobite besedo in se dogodek snema, vaš glas kljub temu ostane v videoposnetku.",
+          "assente": "Če jo prekličete, ostanete v dvorani kot prej. Od zdaj se vaš glas ne snema na ločeno sled."
+        },
+        "withdrawTranscript": "Prekličete tudi privolitev v prepis svojih prispevkov.",
+        "withdrawTranscriptHost": "Od zdaj vaš glas ne ostane v sledeh po osebah niti v prepisu."
       },
       "transcription": {
-        "title": "Prepis vaših govorov",
+        "title": "Prepis vaših prispevkov",
         "give": "Privolim v prepis",
         "giveEffect": "Vaši govori pridejo v prepis dogodka z vašim imenom. Brez privolitve vseeno sodelujete.",
-        "withdrawEffect": "Če jo prekličete, vaši že prepisani stavki izgubijo besedilo in ime, od zdaj pa se vaš glas ne snema na ločeno sled in se ne prepisuje.",
+        "withdrawEffect": "Če jo prekličete, vaši stavki, že prepisani iz podnapisov, izgubijo besedilo in ime, od zdaj pa se vaš glas ne snema na ločeno sled in se ne prepisuje. Za že izdelan prepis videa se obrnite na organizatorje.",
         "needsRecording": "Date jo lahko po privolitvi v snemanje."
       }
+    },
+    "recordingQuestion": {
+      "title": "Klic se snema",
+      "question": "Ali želite, da se vaš glas snema?",
+      "body": "V videu so samo voditelji: vaš obraz in vaše ime nikoli. Če odgovorite da, se klic za nekaj sekund znova poveže in od tedaj se vaš glas snema, ko govorite. Če odgovorite ne ali zaprete to okno, sodelujete naprej kot prej in vaš glas se ne snema.",
+      "later": "Če odgovorite ne, vas bomo ob naslednjem snemanju vprašali znova. Premislite si lahko kadar koli z gumbom {button} na vrhu.",
+      "yes": "Da, snemaj moj glas",
+      "no": "Ne, ne snemaj"
     },
     "voiceExcluded": {
       "title": "Sodelujete brez snemanja.",
       "consent": "Privolim v snemanje",
-      "body": "Niste privolili v snemanje: sodelujete kot vsi, vaše ime, glas in slika pa ne pridejo v posnetek."
+      "body": "Niste privolili v snemanje: sodelujete kot vsi, vaš glas pa ostane zunaj posnetka. Vaš obraz in vaše ime se v videu tako ali tako nikoli ne pojavita."
+    },
+    "nickname": {
+      "reserved": "Moderator,Moderatorka,Govornik,Govornica,Predavatelj,Predavateljica,Udeleženec,Udeleženka,Gost,Gostja,Organizator,Organizatorka,Administrator,Skrbnik,Gostitelj",
+      "label": "Vzdevek (neobvezno)",
+      "help": "Ena beseda, od 2 do 24 znakov: črke, števke in . _ -. Drugi ga vidijo namesto vašega imena v videu, v klepetu, pri vprašanjih in v prepisu.",
+      "helpName": "Če ga pustite praznega, ste prikazani s svojim imenom.",
+      "helpAnonymous": "Če ga pustite praznega, ste prikazani s samodejnim psevdonimom.",
+      "checking": "Preverjanje vzdevka…",
+      "shownAs": "Drugi vas bodo videli kot »{nickname}«.",
+      "useSuggestion": "Uporabi »{suggestion}«",
+      "errors": {
+        "length": "Vzdevek mora imeti od 2 do 24 znakov.",
+        "format": "Ena beseda: začne se s črko in konča s črko ali števko; vmes črke, števke in . _ -, nikoli dva zapored.",
+        "scripts": "Uporabite črke ene same abecede.",
+        "reserved": "Vsebuje rezervirano besedo, na primer ime vloge: izberite drugega.",
+        "host": "Spominja na ime nekoga, ki vodi dogodek: izberite drugega.",
+        "taken": "Nekdo na dogodku že uporablja ta vzdevek.",
+        "disabled": "Ta dogodek ne sprejema novih vzdevkov: svojega lahko le odstranite.",
+        "rete": "Vzdevka ni bilo mogoče preveriti. Poskusite znova."
+      },
+      "button": "Vzdevek",
+      "open": "Spremenite vzdevek",
+      "dialogTitle": "Vaš vzdevek",
+      "dialogIntro": "Drugi vidijo vzdevek namesto vašega imena. Za spremembo vas soba za trenutek znova poveže.",
+      "apply": "Shrani in znova poveži",
+      "remove": "Odstrani vzdevek",
+      "reconnecting": "Ponovno povezovanje…",
+      "done": "Končano: zdaj ste prikazani kot »{nickname}«.",
+      "doneRemoved": "Končano: vzdevek je odstranjen."
     }
   },
   "qa": {
@@ -721,9 +770,9 @@
     "upvote": "Glasuj",
     "upvoted": "Glasovano",
     "noQuestions": "Še ni vprašanj. Bodite prvi!",
-    "qaPersistenceNote": "Vprašanja so shranjena in bodo na voljo po dogodku.",
-    "qaPostEvent": "Vprašanja in odgovori z dogodka",
-    "noAnsweredQuestions": "Za ta dogodek ni vprašanj z odgovori.",
+    "qaPersistenceNote": "Besedilo vprašanj se lahko prikaže na strani dogodka, brez imena osebe, ki jih je postavila.",
+    "personalDataNotice": "Ne pišite osebnih podatkov drugih oseb niti svojih, ki jih ne želite objaviti: besedilo vprašanja se lahko prikaže na strani dogodka, brez vašega imena.",
+    "personalDataNoticeNotPublished": "Ne pišite osebnih podatkov drugih oseb niti svojih, ki jih ne želite razkriti: besedilo vprašanja lahko preberejo osebe v dvorani.",
     "filterAll": "Vsa",
     "showPanel": "Prikaži Q&A",
     "hidePanel": "Skrij Q&A",
@@ -742,6 +791,8 @@
       "editAnswer": "Uredi odgovor",
       "answerFieldLabel": "Odgovor na vprašanje od {name}",
       "answerPlaceholder": "Napišite odgovor (največ 2000 znakov)",
+      "answerNotice": "Odgovor se lahko prikaže na strani dogodka: ne pišite osebnih podatkov.",
+      "answerNoticeNotPublished": "Odgovor lahko preberejo osebe v dvorani: ne pišite osebnih podatkov.",
       "sendAnswer": "Objavi odgovor",
       "cancel": "Prekliči",
       "removeAnswer": "Odstrani odgovor"
@@ -769,7 +820,8 @@
     "accessDenied": {
       "title": "Ta razdelek za vašo vlogo ni na voljo",
       "body": "Kot organizator upravljate svoje dogodke: ustvarjanje, objavo, gradiva, vprašalnike in postprodukcijo. Nastavitve platforme in podatki vseh dogodkov ostanejo administraciji.",
-      "back": "Pojdi na svoje dogodke"
+      "back": "Pojdi na svoje dogodke",
+      "organizerOnly": "Ta dogodek lahko urejajo samo njegovi organizatorji. Kot skrbnik vidite njegovo stanje in podrobnosti ter ga lahko arhivirate ali izbrišete. Posnetki in njihova vsebina pripadajo organizatorjem in udeležencem."
     },
     "staffLogin": {
       "title": "Prijava v administracijo",
@@ -1025,6 +1077,24 @@
           }
         },
         "recordingManualNote": "Snemanje se nikoli ne začne samo: moderator ga zažene z gumbom REC.",
+        "recordingDestination": "Komu je posnetek namenjen",
+        "recordingDestinationReserved": "Samo za prijavljene",
+        "recordingDestinationReservedDesc": "Vidijo ga organizatorji in prijavljene osebe, slednje, dokler se hranijo podatki o njihovi prijavi. Ne objavi se. Po odprtju dvorane ga ni več mogoče narediti javnega.",
+        "recordingDestinationPublic": "Javni",
+        "recordingDestinationPublicDesc": "Objaviti ga je mogoče na strani dogodka in v videoknjižnici. Udeleženci privolijo tudi v to.",
+        "recordingDestinationNotSet": "Ni navedeno: dogodek je bil ustvarjen pred uvedbo te izbire.",
+        "recordingDestinationStaffOnly": "Komu je posnetek namenjen, izbere osebje dogodka: zaenkrat to ni navedeno.",
+        "recordingDestinationStartsReserved": "Posnetek je na začetku samo za prijavljene: javnega ga lahko naredi osebje dogodka, dokler se dvorana ne odpre.",
+        "recordingDestinationStaysReserved": "Posnetek ostane samo za prijavljene: dvorana se je že odprla.",
+        "recordingDestinationLocked": "Po odprtju dvorane je posnetek mogoče spremeniti le v posnetek samo za prijavljene: privolitve veljajo za besedilo, ki so ga osebe prebrale.",
+        "recordingDestinationPublicOnInvitation": "Dogodek je samo za povabljene, vendar posnetek ostane javen: video si bo lahko ogledal kdor koli, ne le povabljeni.",
+        "recordingDestinationReservedOnInvitation": "Dogodek je samo za povabljene: posnetek je bil spremenjen v posnetek samo za prijavljene. To lahko spremenite v razdelku »Snemanje in UI«.",
+        "postEventPagePrivateOnInvitation": "Dogodek je samo za povabljene: stran po dogodku je bila spremenjena v zasebno. To lahko spremenite v razdelku »Zasebnost, podatki in stran po dogodku«.",
+        "postEventPagePublicWithVideo": "Posnetek je javen: stran po dogodku je bila spremenjena v javno, sicer videa ne bi videl nihče. To lahko spremenite v razdelku »Zasebnost, podatki in stran po dogodku«.",
+        "postEventPageStaysPrivate": "Dogodek je odprt za vse, ki se prijavijo, vendar je stran po dogodku ostala zasebna: sama se ne odpre znova. To lahko spremenite v razdelku »Zasebnost, podatki in stran po dogodku«.",
+        "postEventPagePrivateVideoHidden": "Posnetek je javen, vendar je stran po dogodku zasebna: videa ne bo videl nihče, niti prijavljeni, dokler stran ostane zasebna.",
+        "recordingNothingToCapture": "V tej namestitvi ni videa dvorane: brez prepisa in sledi posameznih udeležencev se nič ne posname.",
+        "recordingDestinationRequired": "Izberite, komu je posnetek namenjen.",
         "audienceAnonymous": "Anonimno občinstvo",
         "audienceAnonymousDesc": "Udeleženci so drugim vidni pod psevdonimom (»Udeleženec« in koda) v videu, klepetu in vprašanjih; seznam udeležencev ostane voditeljem, trga ni. Uporabno za velike dogodke; na dogodkih skupnosti se ljudje želijo spoznati.",
         "audienceAnonymousLocked": "Dokler je soba lahko odprta, se ne da spremeniti: povezalo bi psevdonime z imeni.",
@@ -1032,10 +1102,15 @@
         "participantListVisibleDesc": "Izklopljeno: seznam, mreža in imena na trgu ostanejo voditeljem in govorcem; občinstvo vidi samo tistega, ki govori. Vklopljeno: vsi vidijo, kdo je v dvorani.",
         "participantListAnonymous": "Pri anonimnem občinstvu seznam ostane skrit.",
         "participantListLocked": "Ko je dvorana odprta, tega ni mogoče spremeniti: tisti, ki so že v njej, spremembe ne bi videli.",
+        "nicknamesEnabled": "Vzdevki za udeležence",
+        "nicknamesEnabledDesc": "Udeleženci lahko izberejo vzdevek: drugi ga vidijo namesto imena v videu, v klepetu, pri vprašanjih in v prepisu. Organizatorji in moderatorji vidijo, kdo je za njim. Kdor vodi, ostane s svojim imenom. Privzeto je vklopljeno tam, kjer je seznam udeležencev skrit.",
+        "nicknamesLocked": "Ko je soba odprta, se tega ne da spremeniti: kdor je že notri, je izbiral po prejšnjem pravilu.",
         "participantListCameraNote": "Ko je seznam skrit, tisti, ki vklopi kamero, ne vidi svojega okna. Za srečanje, na katerem se vsi vidijo, pokažite seznam.",
         "recordingLockedLive": "Ko je dvorana odprta, snemanja ni mogoče spremeniti: velja od prvega vstopa.",
         "hostsAlwaysRecorded": "Voditelji so vedno v posnetku",
-        "hostsAlwaysRecordedDesc": "Ko je izklopljeno, moderatorji in govorniki izbirajo kot vsi. Vklopite le, če so že privolili v snemanje: polja ne vidijo, obvestilo o dogodku pa mora to navesti."
+        "hostsAlwaysRecordedDesc": "Moderatorji in govorci so v videu z imenom in sliko, brez potrditvenega polja: obvestilo o zasebnosti dogodka mora to navesti. Od udeležencev se snema samo glas in samo z njihovo privolitvijo.",
+        "hostsAlwaysRecordedDescHostsOnly": "Moderatorji in govorci so v videu z imenom in sliko, brez potrditvenega polja: obvestilo o zasebnosti dogodka mora to navesti. Udeleženci se v videu nikoli ne vidijo in ne slišijo.",
+        "hostsAlwaysRecordedDescVisible": "Moderatorji in govorci so v videu z imenom in sliko, brez potrditvenega polja: obvestilo o zasebnosti dogodka mora to navesti. Ta namestitev ne more obdržati udeležencev zunaj videa: kdor privoli, govori z imenom, glasom in sliko, ime vsakogar, ki spremlja, pa se lahko pojavi, tudi če ne spregovori."
       },
       "step3": {
         "heading": "Osebe in vabila",
@@ -1053,7 +1128,7 @@
         "remove": "Odstrani",
         "invalidEmail": "Neveljaven e-poštni naslov.",
         "duplicateEmail": "Naslov je že dodan.",
-        "rubricaPick": "Išči v imeniku po organizaciji…",
+        "rubricaPick": "Išči v imeniku po imenu, e-pošti ali organizaciji…",
         "rubricaOrAdd": "ali dodajte ročno",
         "removeItem": "Odstrani {name}",
         "invitationsStaffOnly": "Vabila upravlja osebje dogodka.",
@@ -1135,6 +1210,7 @@
         "askOrganization": "Organizacija (obvezno za prijavo)",
         "askRole": "Vloga (neobvezno)",
         "askType": "Vrsta organizacije (neobvezno)",
+        "askAddressBook": "Predlagaj, da ostanejo v imeniku (neobvezno za osebe, ki se prijavijo)",
         "questionnairesHeading": "Vprašalniki",
         "questionsBefore": "Pred dogodkom, ob prijavi: {count, plural, =0 {brez dodatnih vprašanj} one {# dodatno vprašanje} two {# dodatni vprašanji} few {# dodatna vprašanja} other {# dodatnih vprašanj}}",
         "questionsAfter": "Po dogodku: {count, plural, =0 {brez vprašalnika o zadovoljstvu} one {vprašalnik o zadovoljstvu, # vprašanje} two {vprašalnik o zadovoljstvu, # vprašanji} few {vprašalnik o zadovoljstvu, # vprašanja} other {vprašalnik o zadovoljstvu, # vprašanj}}",
@@ -1230,6 +1306,8 @@
         "gdprHeading": "Zasebnost in hramba podatkov",
         "retentionDays": "Dnevi hrambe",
         "retentionHelp": "Nad tem pragom se osebni podatki samodejno izbrišejo.",
+        "recordingRetention": "Hramba posnetka",
+        "recordingRetentionHelp": "Posnetek in to, kar iz njega nastane, se ne izbrišejo s podatki oseb. Z določenim rokom se izbrišejo toliko dni po koncu dogodka ali, če je video objavljen, po objavi. Spremeni se lahko tudi pozneje, na plošči posnetka.",
         "gdprTemplate": "Predloga obvestila",
         "gdprTemplateNone": "— Uporabi prilagojeno besedilo —",
         "gdprTemplateUnknown": "Izbrana predloga obvestila o zasebnosti ne obstaja več: izberite drugo ali se vrnite k besedilu po meri",
@@ -1281,7 +1359,10 @@
         "participantsCan": "Udeleženci: {list}",
         "none": "nobene",
         "recordingManual": "Na voljo: začne se šele, ko moderator pritisne REC.",
+        "recordingDestinationReserved": "Dostop do posnetka: samo organizatorji in prijavljene osebe.",
+        "recordingDestinationPublic": "Dostop do posnetka: javni.",
         "aiAfter": "Po snemanju: {list}.",
+        "aiConfirmVideo": "Brez sledi po osebah se prepis videa začne šele po potrditvi, da so privolili vsi, ki v njem govorijo.",
         "scheduleHeading": "Kdaj poteka",
         "scheduleIntro": "Kdaj bo dogodek: datum, ura in časovni pas.",
         "advancedIntro": "Vrednosti, ki jih je predloga že izbrala: spremenite le, kar je treba.",
@@ -1325,17 +1406,25 @@
         "askOrganization": "organizacija",
         "askRole": "vloga",
         "askType": "vrsta organizacije",
+        "askAddressBook": "ali želi ostati v imeniku",
         "permissionsHeading": "Kdo lahko kaj počne v sobi",
         "permissionsIntro": "Kaj lahko počnejo udeleženci in katere funkcije sobe so vklopljene. Vse se lahko spremeni tudi med dogodkom.",
         "consentsLine": "Privolitve ob prijavi in v dvorani: {list}",
         "consentRecordingFree": "snemanje, prostovoljno (brez njega samo poslušanje)",
         "consentRecordingNotice": "za snemanje samo obvestilo (udeleženci ne govorijo in se ne kažejo)",
+        "consentRecordingHostsOnly": "za snemanje samo obvestilo (v videu so samo voditelji)",
         "consentTranscription": "prepis lastnih govorov, neobvezen",
-        "consentsNone": "Nobene privolitve razen tiste ob prijavi.",
-        "consentsHosts": "Moderatorje in govornike za snemanje vprašamo v dvorani, neobvezno.",
+        "consentsNone": "Privolitve ni treba zahtevati: ob prijavi zadošča seznanitev s politiko zasebnosti.",
         "consentsWithdraw": "Udeleženci jih lahko v dvorani prekličejo z gumbom »Privolitve«.",
         "participantListShown": "Seznam udeležencev: viden vsem.",
         "participantListHidden": "Seznam udeležencev: samo za voditelje in govorce.",
+        "audiencePseudonyms": "Imena občinstva: psevdonimi.",
+        "audienceNicknames": "Udeleženci lahko uporabljajo vzdevek.",
+        "audienceRealNames": "Imena občinstva: prava imena.",
+        "postEventQaHidden": "Vprašanja po dogodku: niso objavljena.",
+        "postEventQaTextOnly": "Vprašanja po dogodku: samo besedilo, brez imena.",
+        "addressBookOffered": "Imenik: predlagan osebam, ki se prijavijo.",
+        "addressBookNotOffered": "Imenik: ni predlagan.",
         "consentRecordingOptional": "snemanje, neobvezno",
         "consentRecordingVoice": "snemanje, prosto (brez privolitve oseba ostane zunaj posnetka)",
         "consentsHostsAlways": "Kdor vodi dogodek in nastopa, je vedno v posnetku: polja ne vidi."
@@ -1409,15 +1498,15 @@
         "recording": "V posnetku",
         "roomSame": "Sodeluje po pravilih dogodka.",
         "roomListenOnly": "Samo posluša in piše v klepet.",
-        "recordedFull": "Ime, glas, slika in deljeni zaslon.",
+        "recordedFull": "Samo glas, ko oseba govori: obraz in ime se nikoli ne pojavita.",
+        "recordedVisible": "Ime, glas, slika in deljeni zaslon.",
         "notRecorded": "Ni v posnetku: ne ime, ne glas, ne slika, ne deljeni zaslon.",
         "recordedVoice": "Njegov glas, na ločeni sledi.",
         "notRecordedVoice": "Njegov glas se ne snema.",
         "othersSame": "Drugi se ne spremenijo: zaklepi mikrofonov, dodeljevanje besede in videz videa ostanejo po pravilih dogodka.",
         "audienceNotice": "Udeleženci nimajo mikrofona, kamere ali zaslona: prejmejo le obvestilo. Če dobijo besedo, lahko privolijo v sobi; če ne, ostanejo zunaj posnetka.",
-        "hostsChoose": "Moderatorji in govorniki izbirajo kot vsi: kdor ne privoli, vodi običajno, a ostane zunaj posnetka.",
         "hostsAlways": "Moderatorji in govorniki so vedno v posnetku: polja ne vidijo.",
-        "hostsFixed": "Moderatorji in govorniki vodijo v vsakem primeru, video pa jih posname.",
+        "hostsOnly": "Ta namestitev v video snema samo voditelje: udeleženci se ne vidijo in ne slišijo, za privolitev v snemanje pa jih ne sprašuje.",
         "trace": "Če nastopi med snemanjem, opomba ob videu pove, da manjka prispevek, prepis pa označi *** s časom.",
         "anytime": "Privolitev se da in prekliče v sobi, kadar koli.",
         "transcription": "Prepis lastnih prispevkov je ločena, neobvezna privolitev.",
@@ -1472,7 +1561,9 @@
       "breadcrumbAriaLabel": "Drobtinice",
       "skipToPage": "Pojdi na vsebino strani",
       "openMenu": "Odpri meni",
-      "closeMenu": "Zapri meni"
+      "closeMenu": "Zapri meni",
+      "recordingRemovals": "Zahteve za odstranitev",
+      "recordingRemovalDetail": "Zahteva za odstranitev"
     },
     "publications": {
       "subtitle": "Enotno uredniško središče za vse objavljene videe: načrtovani dogodki, hitri klici, naloženi zgodovinski arhivi in seje, ki čakajo na promocijo.",
@@ -1543,6 +1634,8 @@
           "saveFailed": "Shranjevanje metapodatkov ni uspelo."
         }
       },
+      "reservedBadge": "Samo za prijavljene",
+      "reservedHelp": "Posnetek je samo za prijavljene: v videoknjižnici se ne more prikazati.",
       "updateFailed": "Posodobitev ni uspela."
     },
     "recordingsLibrary": {
@@ -1614,7 +1707,8 @@
       "detailFilename": "Ime datoteke",
       "transcriptManage": "Upravljaj prepis / AI",
       "transcriptReady": "Prepisano",
-      "transcriptProcessing": "V obdelavi"
+      "transcriptProcessing": "V obdelavi",
+      "organizerOnly": "Samo za organizatorje"
     },
     "gdprAudit": {
       "subtitle": "Dnevnik dejanj zasebnosti nad osebnimi podatki: izbrisi, soglasja, izvozi",
@@ -1629,7 +1723,12 @@
         "DATA_DELETED": "Izbrisani podatki",
         "CONSENT_RECORDED": "Zabeleženo soglasje",
         "DATA_EXPORTED": "Izvoženi podatki",
-        "CONSENT_WITHDRAWN": "Privolitev preklicana"
+        "DATA_RECTIFIED": "Popravljeni podatki",
+        "CONSENT_WITHDRAWN": "Privolitev preklicana",
+        "RECORDING_CONTENT_READ": "Vsebino posnetka je prebralo osebje",
+        "RECORDING_REDACTION_REQUESTED": "Zahtevana odstranitev iz posnetka",
+        "RECORDING_REDACTION_REJECTED": "Zahteva za odstranitev zavrnjena",
+        "RECORDING_REDACTED": "Oseba odstranjena iz posnetka"
       },
       "recordsAffected": "{count} prizadetih zapisov",
       "colWhen": "Kdaj",
@@ -1655,7 +1754,8 @@
       "rotating": "Obnavljam …",
       "regenerateTitle": "Obnovi žeton moderatorja (stara povezava preneha delovati)",
       "confirmRegenerate": "Ali ste prepričani, da želite obnoviti žeton? Stara povezava ne bo več delovala.",
-      "noResults": "Ni najdenih dogodkov."
+      "noResults": "Ni najdenih dogodkov.",
+      "organizerOnlyLink": "Povezava je vidna samo organizatorjem dogodka"
     },
     "registrations": {
       "subtitle": "Vse osebe, prijavljene na dogodke — iskanje, filtriranje in izvoz",
@@ -1684,6 +1784,8 @@
       "colCreatedAt": "Datum prijave",
       "colEvent": "Dogodek",
       "colName": "Ime",
+      "colNickname": "Vzdevek",
+      "nicknameShown": "Drugi ga vidijo kot »{nickname}«",
       "colEmail": "E-pošta",
       "colOrg": "Organizacija",
       "colJoined": "Udeležil se",
@@ -1917,7 +2019,7 @@
       "aiSectionHeading": "Samodejna postprodukcija",
       "aiSectionDesc": "Po koncu dogodka lahko posnetek obdela cevovod umetne inteligence v gruči in pripravi prepis, povzetek ter — če je tako zahtevano — prevode in sinhronizacijo. Vse poteka na infrastrukturi te namestitve, noben podatek ne odide k tretjim osebam.",
       "aiTranscriptEnabled": "Samodejni prepis",
-      "aiTranscriptEnabledDesc": "Razpoznava govora s prepoznavanjem govorcev. Potrebna je za povzetek, prevode in sinhronizacijo.",
+      "aiTranscriptEnabledDesc": "Razpoznava govora s prepoznavanjem govorcev. Potrebna je za vklop povzetka, prevodov in sinhronizacije. Udeleženci sami izberejo, ali se njihovi prispevki prepišejo.",
       "aiSummaryEnabled": "Povzetek in poglavja",
       "aiSummaryEnabledDesc": "Povzetek srečanja, sprejete odločitve, naloge in razdelitev na poglavja s časovnimi oznakami.",
       "aiTranslationEnabled": "Prevod v druge jezike",
@@ -2023,7 +2125,7 @@
     },
     "recordingUpload": {
       "title": "Naloži obstoječ posnetek",
-      "subtitle": "Če že imate videoposnetek dogodka (na primer posnet na drugi platformi), ga naložite tukaj: prikazan bo kot uradni posnetek na javni strani.",
+      "subtitle": "Če že imate videoposnetek dogodka (na primer posnet na drugi platformi), ga naložite tukaj: to bo uradni posnetek dogodka.",
       "fileLabel": "Video datoteka",
       "upload": "Naloži in poveži",
       "signing": "Priprava …",
@@ -2087,7 +2189,9 @@
         "DATA_DELETED": "Podatki izbrisani",
         "CONSENT_RECORDED": "Soglasje zabeleženo",
         "DATA_EXPORTED": "Podatki izvoženi",
-        "CONSENT_WITHDRAWN": "Privolitev preklicana"
+        "DATA_RECTIFIED": "Popravljeni podatki",
+        "CONSENT_WITHDRAWN": "Privolitev preklicana",
+        "RECORDING_CONTENT_READ": "Vsebino posnetka je prebralo osebje"
       }
     },
     "settings": {
@@ -2130,7 +2234,7 @@
         "jobMaxAttempts": "Poskusi pred neuspehom",
         "jobMaxAttemptsHelp": "Kolikokrat cevovod ponovi opravilo, preden ga označi kot neuspešno. Zamik med poskusi narašča eksponentno (od 30 sekund do 2 ur). Običajna vrednost je 5.",
         "artifactRetentionDays": "Hramba artefaktov (dnevi)",
-        "artifactRetentionDaysHelp": "Pri vrednosti 0 ni omejitve za celotno spletno mesto: artefakti AI sledijo roku hrambe svojega posnetka ali dogodka. Vrednost, večja od nič, poskrbi, da dnevno opravilo izbriše vsak artefakt, ustvarjen pred več kot toliko dnevi, objavljen ali ne: rok hrambe lahko skrajša, nikoli pa ga ne podaljša. Imena govorcev in vsebina opravil niso zajeti: sledijo roku hrambe posnetka ali dogodka. Podrobnosti v docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "Pri vrednosti 0 ni omejitve za celotno spletno mesto: artefakti AI sledijo roku hrambe svojega posnetka. Vrednost, večja od nič, poskrbi, da dnevno opravilo izbriše vsak artefakt, ustvarjen pred več kot toliko dnevi, objavljen ali ne: rok hrambe lahko skrajša, nikoli pa ga ne podaljša. Imena govorcev in vsebina opravil niso zajeti: sledijo roku hrambe posnetka. Podrobnosti v docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "Obvestilo o AI v čakalnici",
         "consentDisclosureHelp": "Besedilo, prikazano udeležencem v čakalnici, kadar dogodek uporablja postprodukcijo z AI (prepis, povzetek, prevod, sinhronizacija). Prilagodljivo po jezikih. Pustite prazno, da se uporabi privzeto sistemsko besedilo.",
         "consentDisclosurePlaceholder": "Npr. Ta dogodek bo po prenosu v živo samodejno prepisan in povzet z orodji umetne inteligence …"
@@ -2307,6 +2411,8 @@
         "guestAccessEnabledHelp": "Neprijavljeni se lahko pridružijo dogodkom v teku samo s svojim imenom. Ko je izklopljeno, se na načrtovane dogodke vstopi samo s prijavo ali s povezavo za moderatorja ali govorca; takojšnji video klici ostanejo odprti za vse, ki imajo povezavo. Dogodek samo na povabilo nikoli ne sprejme gostov.",
         "publicRegistrationEnabled": "Javna registracija aktivna",
         "publicRegistrationEnabledHelp": "Na dogodke se lahko prijavi kdorkoli. Ko je izklopljena, se lahko prijavijo samo osebe s seznama povabljenih na dogodek, osebna povezava za vstop pa se pošlje samo po e-pošti; že prijavljeni ter povezave moderatorjev in govorcev še naprej delujejo. To je izbira, predlagana novim dogodkom: vsak dogodek se lahko v koraku »Osebe« odloči drugače.",
+        "addressBookEnabled": "Imenik dogodkov",
+        "addressBookEnabledHelp": "Osebam, ki se prijavijo, predlaga, da ostanejo v imeniku, da bi jih lahko povabili na podobne dogodke. Ko je izklopljen, polje izgine iz obrazcev, izbirnik pa iz čarovnika; obstoječi vnosi ostanejo do preklica ali izteka.",
         "calendarPublic": "Javni koledar",
         "calendarPublicHelp": "Objavi koledar dogodkov. Obiskovalci lahko vidijo načrtovane dogodke.",
         "parseTitleKicker": "Naslovi z uredniškim podnaslovom",
@@ -2397,6 +2503,40 @@
         "avgParticipantsPerEvent": "Povprečno udeležencev na dogodek",
         "avgFeedbackRating": "Povprečna ocena povratnih informacij",
         "totalFeedback": "Odgovori povratnih informacij"
+      },
+      "catalog": {
+        "title": "Vrste dogodkov in predloge",
+        "intro": "Koliko dogodkov posamezne vrste in iz posamezne predloge, mesec za mesecem. Samo števila in povprečja, brez osebnih podatkov. Osnutki se ne štejejo.",
+        "periodLabel": "Obdobje",
+        "months": "{count, plural, one {# mesec} two {# meseca} few {# meseci} other {# mesecev}}",
+        "groupByLabel": "Združi po",
+        "groupBy": {
+          "type": "Vrsta dogodka",
+          "template": "Predloga"
+        },
+        "rankingTypes": "Najpogostejše vrste",
+        "rankingTemplates": "Najpogosteje uporabljene predloge",
+        "columns": {
+          "type": "Vrsta",
+          "template": "Predloga",
+          "events": "Dogodki",
+          "held": "Izvedeni",
+          "avgParticipants": "Povpr. udeležencev",
+          "avgDuration": "Povpr. trajanje",
+          "total": "Celotno obdobje"
+        },
+        "measuresNote": "Izvedeni: dogodki, katerih soba se je odprla. Povprečno število udeležencev: največje število hkrati prisotnih oseb, vključno z gosti, v povprečju za izvedene dogodke. Povprečno trajanje: izmerjeni čas v sobi, ne načrtovani.",
+        "byMonth": "Mesec za mesecem",
+        "measureLabel": "Merilo",
+        "measures": {
+          "events": "Dogodki",
+          "avgParticipants": "Povprečno število udeležencev",
+          "avgDurationMinutes": "Povprečno trajanje"
+        },
+        "byMonthCaption": "{measure} po mesecih",
+        "empty": "V tem obdobju ni dogodkov.",
+        "deletedTemplate": "{name} (izbrisana)",
+        "uncatalogedNote": "Nekatalogizirani dogodki: {count}. Nastali so pred katalogom ali brez predloge in brez formata; katalogizirate jih lahko pri urejanju dogodka, v tehničnih podrobnostih."
       }
     },
     "recurrence": {
@@ -2439,6 +2579,8 @@
       "featuresLabel": "Funkcionalnosti",
       "whiteboardLabel": "Tabla",
       "recordingLabel": "Snemanje",
+      "recordingDestination": "Dostop do posnetka",
+      "recordingDestinationNone": "Izbere se ob ustvarjanju dogodka",
       "waitingRoomEngineLabel": "Čakalnica (privzeto za predlogo)",
       "waitingRoomEngineSiteDefault": "Privzeto za spletišče",
       "waitingRoomEngineGarden": "Vrt (standardna)",
@@ -2451,17 +2593,22 @@
       "durationLabel": "Privzeto trajanje (minute)",
       "durationHint": "Vnaprej izpolni konec dogodka (začetek + trajanje). Uporabnik ga lahko spremeni. Prazno = 2 uri.",
       "retentionLabel": "Privzeta hramba podatkov (dnevi)",
+      "recordingRetentionLabel": "Privzeta hramba posnetka",
+      "recordingRetentionHint": "Za dogodke, ustvarjene iz te predloge; spremeni se v čarovniku in na plošči posnetka. Posnetek ne sledi hrambi podatkov.",
       "expectedSpeakersLabel": "Pričakovano število govorcev (privzeto)",
       "descriptionTemplateLabel": "Privzeti opis",
       "descriptionTemplateHint": "Besedilo, vnaprej vneseno v opis dogodka (mogoče ga je urediti).",
       "aiTranscript": "Samodejni prepis (privzeto)",
       "aiSummary": "Samodejni povzetek (privzeto)",
       "aiTranslation": "Samodejno prevajanje (privzeto)",
+      "noRecording": "V tej namestitvi se ne snema: predloge se začnejo brez posnetka.",
       "pickerSubtitle": "Izberite predlogo za predkonfiguracijo nastavitev dogodka ali preskočite za ročno konfiguracijo.",
       "skipTemplate": "Konfiguriraj ročno",
       "postEventPublic": "Javna stran po dogodku",
+      "offerAddressBook": "Osebam, ki se prijavijo, predlaga imenik",
       "invalidFields": "Preverite ta polja: {fields}.",
-      "descriptionOtherLanguages": "Obstajajo tudi različice v jezikih: {languages}, ki jih tukaj ni mogoče urejati. Če spremenite italijansko besedilo, se odstranijo."
+      "descriptionOtherLanguages": "Obstajajo tudi različice v jezikih: {languages}, ki jih tukaj ni mogoče urejati. Če spremenite italijansko besedilo, se odstranijo.",
+      "usedBy": "Dogodki, ustvarjeni iz te predloge: {count}"
     },
     "instantCall": {
       "title": "Takojšnji video klic",
@@ -2724,7 +2871,7 @@
       "title": "Seje klicev",
       "empty": "Še ni zabeleženih sej. Seje v živo so samodejno navedene, ko moderator vstopi v sobo.",
       "loading": "Nalaganje sej ...",
-      "participants": "udeležencev",
+      "participantsCount": "{count, plural, one {# udeleženec} two {# udeleženca} few {# udeleženci} other {# udeležencev}}",
       "participantList": "Udeleženci",
       "name": "Ime",
       "joined": "Vstop",
@@ -2974,11 +3121,28 @@
         "publishNow": "Objavi zdaj"
       },
       "editFeatures": "Uredi funkcije",
-      "editPrivacy": "Uredi zasebnost in podatke"
+      "editPrivacy": "Uredi zasebnost in podatke",
+      "governance": {
+        "title": "Ta dogodek upravljate kot skrbnik",
+        "body": "Niste med njegovimi organizatorji: vidite stanje, podrobnosti, prijave in privolitve ter ga lahko arhivirate ali izbrišete. Vodenje dogodka, povezava moderatorja in vsebina posnetkov (video, prepisi, povzetki) so stvar organizatorjev.",
+        "recording": "Vsebina posnetka je na voljo samo organizatorjem dogodka in udeležencem. Tukaj vidite, ali obstaja, in njegove podrobnosti.",
+        "recordingFile": "Posnetek",
+        "present": "Obstaja",
+        "absent": "Ni ga",
+        "recordingPublished": "Objavljen",
+        "yes": "Da",
+        "no": "Ne",
+        "recordingDuration": "Trajanje",
+        "recordingSize": "Velikost",
+        "recordingRetention": "Samodejno brisanje posnetka",
+        "recordingRetentionNone": "Brez",
+        "recordingRetentionDays": "{days, plural, one {# dan} two {# dneva} few {# dni} other {# dni}} po koncu dogodka ali, če je objavljen, po objavi"
+      }
     },
     "rubrica": {
-      "subtitle": "Osebe, ki so privolile v vključitev v imenik (čl. 6.1.a GDPR). Profilne informacije se ob vsaki ponovni prijavi samodejno posodobijo.",
-      "searchLabel": "Iskanje po imenu ali organizaciji",
+      "subtitle": "Osebe, ki so privolile v vključitev v imenik (čl. 6.1.a GDPR). Ime, e-poštni naslov in organizacija se posodobijo samo, ko oseba znova označi polje.",
+      "searchLabel": "Iskanje po imenu, e-pošti ali organizaciji",
+      "searchPartial": "Iskanje je zajelo samo {limit} nazadnje posodobljenih vnosov: oseba s starejšo posodobitvijo se morda ne prikaže.",
       "orgTypeLabel": "Vrsta organizacije",
       "allTypes": "Vse",
       "includeOptedOut": "Vključi osebe, ki so preklicale privolitev",
@@ -3243,7 +3407,8 @@
         "metricsTitle": "Meritve povzetka (LLM)",
         "chars": "znakov",
         "model": "Model",
-        "notAvailable": "ni podatka"
+        "notAvailable": "ni podatka",
+        "contentHidden": "Na voljo samo organizatorjem dogodka."
       },
       "rel": {
         "title": "Zanesljivost AI",
@@ -3400,7 +3565,8 @@
         "alignNone": "Ni menjave prosojnice za uskladitev.",
         "previewTitle": "Predogled",
         "previewHelp": "Videoposnetek s prosojnicami, kot jih bo videlo občinstvo, s popravkom, vpisanim zgoraj."
-      }
+      },
+      "contentOrganizerOnly": "Vsebino tega posnetka (video, sledi, prepis, povzetek, prevodi) lahko vidijo in urejajo samo organizatorji tega dogodka. Tukaj vidite njegovo stanje, obdelave in podrobnosti datotek."
     },
     "questionnairesPage": {
       "subtitle": "Predloge vprašanj za večkratno uporabo za vprašalnike pred prijavo in po dogodku."
@@ -3597,10 +3763,13 @@
         "speakers": "Govorci in moderatorji",
         "speakersDesc": "Občinstvo piše v klepet in postavlja vprašanja"
       },
-      "recQ": "Želite imeti možnost snemanja?",
+      "recQ": "Želite imeti možnost snemanja in za koga?",
       "rec": {
-        "yes": "Da, ko pritisnete REC",
         "yesDesc": "Po dogodku: prepis, povzetek in prevod",
+        "reserved": "Da, samo za prijavljene",
+        "reservedDesc": "Vidijo ga organizatorji in prijavljene osebe",
+        "public": "Da, javni",
+        "publicDesc": "Objaviti ga je mogoče na strani dogodka",
         "no": "Ne",
         "noDesc": "Brez snemanja, brez soglasja"
       },
@@ -3614,7 +3783,8 @@
         "grande": "Več kot 100 oseb",
         "tutti": "vsi na videu",
         "relatori": "govorijo govorci",
-        "si": "s snemanjem",
+        "riservata": "s posnetkom samo za prijavljene",
+        "pubblica": "z javnim posnetkom",
         "no": "brez snemanja",
         "openAccess": "odprto za vse",
         "inviteOnly": "samo na povabilo"
@@ -3627,6 +3797,9 @@
         "invitationDesc": "Stran ostane vidna, prijavijo pa se lahko le osebe s seznama; povabilo s povezavo za prijavo pošljete po e-pošti s strani dogodka"
       },
       "previewInvitation": "Prijavijo se le povabljeni; brez prijave ni vstopa.",
+      "previewPseudonyms": "Občinstvo je prikazano pod psevdonimom",
+      "previewNicknames": "Udeleženci lahko uporabljajo vzdevek",
+      "previewRealNames": "Občinstvo je prikazano s svojimi imeni",
       "templateReplaces": "Predloga prinese svoje nastavitve namesto spodnjih odgovorov. Naslov, datume in osebe vpišete v naslednjih korakih.",
       "instantBack": "Namesto tega ustvari načrtovan dogodek"
     },
@@ -3686,7 +3859,9 @@
       "publishDesc": "Pred objavo ga preberite: besedilo je napisal model umetne inteligence. Ponovno ustvarjeno poročilo je treba znova objaviti.",
       "preview": "Predogled",
       "hidePreview": "Skrij predogled",
-      "previewLanguage": "Jezik"
+      "previewLanguage": "Jezik",
+      "organizerOnly": "Poročilo lahko zahtevajo, berejo in objavijo samo organizatorji tega dogodka.",
+      "organizerOnlyExists": "Poročilo obstaja. Brati in objaviti ga lahko samo organizatorji tega dogodka."
     },
     "endEvent": "Končaj dogodek",
     "endEventConfirmTitle": "Končam dogodek za vse?",
@@ -3722,11 +3897,12 @@
       "organizersEmpty": "Ni navedene ustanove: javna stran ne prikazuje, kdo organizira.",
       "sendAll": "Pošlji povabilo tistim, ki ga še niso prejeli ({count})",
       "sending": "Pošiljanje…",
-      "sendDone": "Povabila na poti: {sent}. Preskočena (že prijavljeni ali brez naslova): {skipped}.",
+      "sendDone": "Povabila na poti: {sent}. Preskočena (že prijavljeni, brez naslova ali brez privolitve v obveščanje): {skipped}.",
       "sendError": "Pošiljanje ni uspelo: poskusite znova.",
       "sendNotPublished": "Povabila se pošiljajo, dokler dogodek sprejema prijave: po objavi in pred koncem.",
       "invitedOn": "Povabljen {date}",
       "notInvited": "Povabilo ni poslano",
+      "stopped": "Ne prejema povabil",
       "send": "Pošlji povabilo",
       "resend": "Pošlji znova",
       "actions": "Dejanja",
@@ -3764,6 +3940,7 @@
         "pubblicata": "Objavljen.",
         "prontaAi": "Pripravljen iz poprodukcije: preglejte ga; objavi se skupaj z videoposnetkom.",
         "prontaSottotitoli": "Pripravljen iz podnapisov: preverite imena in ga objavite.",
+        "daConfermare": "Treba zagnati: video se prepiše samo ob potrditvi, da so privolili vsi, ki v njem govorijo.",
         "inLavorazione": "V obdelavi.",
         "nessuna": "Ga ni: ni ne podnapisov ne poprodukcije.",
         "soloStaff": "Pregleda ga in objavi organizator dogodka v administraciji.",
@@ -3773,7 +3950,7 @@
         "title": "Poročilo",
         "pubblicato": "Objavljeno.",
         "daPubblicare": "Ustvarjeno: preberite ga in objavite.",
-        "daGenerare": "Treba ga je ustvariti iz prepisa, klepeta in ocen.",
+        "daGenerare": "Treba ga je ustvariti iz prepisa, anket, ocen in, če so objavljena, vprašanj.",
         "inLavorazione": "V obdelavi.",
         "senzaPipeline": "Poprodukcija z UI v tej namestitvi ni aktivna.",
         "soloStaff": "Ustvari ga in objavi organizator dogodka v administraciji.",
@@ -3803,6 +3980,7 @@
         "title": "Javna stran",
         "visibile": "Vidna vsem.",
         "nellaLibreria": "Vidna vsem in v video knjižnici.",
+        "libreriaRiservata": "Stran je vidna, vendar je video namenjen samo prijavljenim: v videoknjižnici se ne prikaže.",
         "privata": "Umaknjena: javnost je ne vidi.",
         "scaduta": "Ni več vidna: datum poteka je minil.",
         "archiviato": "Dogodek arhiviran: stran ni javna.",
@@ -3950,9 +4128,10 @@
     },
     "voiceConsent": {
       "title": "Prepisati celoten posnetek?",
-      "message": "Ta dogodek je vsakogar prosil za privolitev za prepis njegovih prispevkov. Celoten posnetek vsebuje vse glasove, tudi tistih, ki privolitve niso dali: prepišite ga le, če so privolili vsi, ki v njem govorijo. Vaša potrditev ostane v dnevniku dejavnosti.",
+      "message": "Celoten posnetek vsebuje vse glasove, tudi tistih, ki niso dali privolitve v prepis svojih prispevkov: prepišite ga le, če so privolili vsi, ki v njem govorijo. Vaša potrditev ostane v dnevniku dejavnosti.",
       "confirm": "Da, vsi so privolili",
       "cancel": "Prekliči",
+      "waitingNoCaptions": "Prepis celotnega posnetka se ni začel sam: vsak sam izbere, ali se njegovi prispevki prepišejo. Zaženite ga z gumbom {button} le, če so privolili vsi, ki v njem govorijo; sicer dogodek ostane brez prepisa.",
       "waiting": "Prepis celotnega posnetka se ni začel sam: ta dogodek je vsakogar prosil za privolitev za prepis njegovih prispevkov. Zaženite ga z gumbom {button} le, če so privolili vsi, ki v posnetku govorijo; sicer ostane prepis iz podnapisov."
     },
     "editCopyTitle": "Kopija dogodka",
@@ -3981,22 +4160,149 @@
         "givenAt": "Dano",
         "withdrawnAt": "Preklicano",
         "textVersion": "Različica besedila",
+        "destination": "Dostop do posnetka",
+        "superseded": "Zamenjano",
+        "supersededValue": "S poznejšo privolitvijo",
+        "destinations": {
+          "PUBLIC": "Javni",
+          "REGISTRANTS": "Samo za prijavljene",
+          "none": "Ni navedeno"
+        },
         "kinds": {
           "recording": "Snemanje",
           "transcription": "Prepis govorov"
         },
         "sources": {
           "registration": "prijava",
-          "room": "dvorana"
+          "room": "dvorana",
+          "self-service": "Moji podatki"
         },
         "roles": {
           "registrant": "prijavljen",
           "guest": "gost",
           "host": "vodi ali govori"
         },
+        "erasedName": "(ime odstranjeno na zahtevo)",
         "unreadableName": "(ime ni berljivo)"
       },
+      "retainedNote": "{count, plural, one {# dokazilo se hrani} two {# dokazili se hranita} few {# dokazila se hranijo} other {# dokazil se hrani}}, dokler video ali prepis obstaja.",
       "countsNote": "Štejejo se osebe: prijava, račun osebja ali poimenska povezava štejejo enkrat; gost, ki se vrne ob drugem obisku, šteje znova."
+    },
+    "recordingRemovals": {
+      "subtitle": "Osebe, ki so zahtevale, da se ne pojavijo v posnetku. Dokler je zahteva odprta, lahko ta posnetek odprete v urejevalniku odstranitve in vsak dostop ostane v dnevniku operacij.",
+      "filterOpen": "Odprte",
+      "filterAll": "Vse",
+      "filterLabel": "Katere zahteve",
+      "empty": "Ni zahtev.",
+      "loadError": "Zahtev ni bilo mogoče naložiti.",
+      "colReceived": "Prejeta",
+      "colPerson": "Oseba",
+      "colEvent": "Dogodek",
+      "colSource": "Izvor",
+      "colStatus": "Stanje",
+      "open": "Odpri",
+      "unnamed": "Oseba brez imena",
+      "sources": {
+        "self-service": "Moji podatki",
+        "admin": "Osebje"
+      },
+      "statuses": {
+        "OPEN": "Odprta",
+        "IN_PROGRESS": "V obravnavi",
+        "PROCESSING": "V obdelavi",
+        "CLOSED": "Zaprta",
+        "REJECTED": "Zavrnjena"
+      },
+      "kinds": {
+        "registrant": "Prijavljen",
+        "host": "Vodi",
+        "guest": "Gost"
+      },
+      "newOpen": "Zabeleži zahtevo",
+      "newTitle": "Zahteva, prejeta po drugi poti",
+      "newIntro": "Za zahtevo, ki je do upravljavca prišla po e-pošti, pošti ali osebno. Izberite posnetek in, če jo prepoznate, osebo med tistimi, ki so bili v dvorani.",
+      "recordingSearch": "Poišči dogodek",
+      "recordingLabel": "Posnetek",
+      "recordingChoose": "Izberite posnetek",
+      "recordingOption": "{title} · {date}",
+      "recordingNone": "Ni posnetka z videom ali s sledmi po udeležencih.",
+      "peopleLabel": "Kdo je bil v dvorani",
+      "peopleNone": "Dvorana ni pustila sledi o tem, kdo je bil prisoten: vpišite ime, intervale pa boste označili ročno.",
+      "personNotInVideo": "zunaj kadra",
+      "personTimes": "od {from} do {to}",
+      "personStill": "od {from} do konca",
+      "nameLabel": "Ime osebe",
+      "noteLabel": "Kako je zahteva prispela (neobvezno)",
+      "create": "Zabeleži zahtevo",
+      "createError": "Zahteve ni bilo mogoče zabeležiti.",
+      "cancel": "Prekliči",
+      "back": "Vse zahteve",
+      "fieldPerson": "Oseba",
+      "fieldEvent": "Dogodek",
+      "fieldReceived": "Prejeta",
+      "fieldSource": "Izvor",
+      "fieldStatus": "Stanje",
+      "fieldNote": "Opomba",
+      "externalCopy": "Ta dogodek ima video na zunanjem spletnem mestu (na primer YouTube): odstranitev ga ne doseže. Odstranite ali zamenjajte ga tudi tam.",
+      "publishedElsewhere": "Objavljeni video dogodka je druga datoteka kot ta posnetek: odstranitev ga ne spremeni. Zamenjajte ga ali ga umaknite s strani dogodka.",
+      "pipelineOff": "Postprodukcija je izklopljena: opravilo odstranitve čaka v vrsti, dokler je ne vklopite, prepis pa se ne izdela znova.",
+      "noVideo": "Ta posnetek nima videa, le sledi po udeležencih: sledi osebe se izbrišejo, prepis pa se znova izdela iz preostalih.",
+      "noRecording": "Posnetek ne obstaja več: ni več ničesar za odstraniti.",
+      "keyOnly": "S ključem instance posnetka ni mogoče odpreti: prijavite se s svojim skrbniškim računom.",
+      "startIntro": "Za odstranitev osebe morate odpreti posnetek. Dostop velja samo za to zahtevo in ostane v dnevniku operacij z vašim računom.",
+      "start": "Odpri urejevalnik odstranitve",
+      "processing": "Odstranjevanje poteka: očiščeni video bo nadomestil izvirnik. Stanje opravila: {status}.",
+      "closed": "Zahteva zaprta {date}.",
+      "closedIntervals": "{count, plural, =0 {Noben interval ni prekrit.} one {# interval prekrit.} two {# intervala prekrita.} few {# intervali prekriti.} other {# intervalov prekritih.}}",
+      "rejected": "Zahteva zavrnjena {date}.",
+      "lastError": "Zadnja obdelava ni uspela: {error}. Preverite intervale in znova pošljite.",
+      "rejectTitle": "Zavrni zahtevo",
+      "rejectLabel": "Razlog",
+      "reject": "Zavrni",
+      "rejectConfirm": "Želite zavrniti zahtevo? Oseba bo videla, da je bila zavrnjena.",
+      "actionError": "Operacija ni uspela (HTTP {code}).",
+      "editorTitle": "Intervali za prekritje",
+      "editorHint": "Predlogi izhajajo iz tega, kdo je bil v dvorani in kdo je govoril, ter iz sledi po udeležencih: časi govorjenja so približni. Oglejte si video in popravite. V vsakem intervalu video postane obvestilo »vsebina odstranjena na zahtevo«, zvok pa se utiša; trajanje se ne spremeni.",
+      "sourcePresence": "V dvorani",
+      "sourceSpeech": "Govori",
+      "sourceTrack": "Sled",
+      "selectedLegend": "Za prekritje",
+      "useProposals": "Začni znova od predlogov",
+      "addInterval": "Dodaj interval tukaj",
+      "fieldStart": "Začetek",
+      "fieldEnd": "Konec",
+      "setStart": "Začetek tukaj",
+      "setEnd": "Konec tukaj",
+      "seek": "Pojdi",
+      "remove": "Odstrani",
+      "intervalLabel": "Interval {n}",
+      "noIntervalsVideo": "Ni intervalov za prekritje. Če se oseba v videu ne pojavi, zavrnite zahtevo in navedite razlog.",
+      "total": "{count, plural, one {# interval} two {# intervala} few {# intervali} other {# intervalov}} · {seconds} s za prekritje",
+      "timeHint": "Časi v obliki ure:minute:sekunde, kot v predvajalniku.",
+      "invalidTime": "Neveljaven čas",
+      "preview": "Predogled odstranitve",
+      "timelineLabel": "Časovnica posnetka",
+      "mediaError": "Video se ne naloži. Znova naložite stran.",
+      "submit": "Odstrani osebo iz posnetka",
+      "submitConfirm": "Izvirni video in sledi osebe bodo izbrisani, postprodukcija pa izvedena znova. Tega ni mogoče razveljaviti. Želite nadaljevati?",
+      "submitDone": "Zahteva zaprta: oseba je bila odstranjena."
+    },
+    "catalog": {
+      "fieldTitle": "Katalog",
+      "fieldHelp": "Vrsta dogodka in predloga, iz katere je nastal, služita samo statistiki instance in ne spremenita nobene nastavitve. Popravite ju, če je dogodek napačno katalogiziran ali sploh ni.",
+      "typeLabel": "Vrsta dogodka",
+      "templateLabel": "Predloga",
+      "noTemplate": "Brez predloge",
+      "deletedTemplate": "Ustvarjeno iz predloge »{name}«, ki je bila medtem izbrisana.",
+      "deletedOption": "{name} (izbrisana)",
+      "types": {
+        "MEETING": "Sestanek",
+        "PARTICIPATORY": "Participativni dogodek",
+        "PUBLIC": "Javni dogodek",
+        "INSTANT": "Hitri klic",
+        "LEGACY": "Uvožena objava",
+        "UNCATALOGED": "Nekatalogizirano"
+      }
     }
   },
   "email": {
@@ -4013,7 +4319,22 @@
     "dateLabel": "Datum",
     "timeLabel": "Ura",
     "durationLabel": "Trajanje",
-    "myDataLink": "Vaši podatki: ogled, popravek, preklic privolitve ali preklic prijave"
+    "addressBookNote": "Ste v imeniku dogodkov, da bi vas lahko povabili na podobne dogodke: privolitev lahko kadar koli prekličete.",
+    "addressBookPendingNote": "Pri tej prijavi je bilo označeno polje za imenik dogodkov, vendar ta naslov ni več prejemal povabil. Če je zahteva vaša, jo lahko potrdite na strani s svojimi podatki prek spodnje povezave. Če ni vaša, prezrite to sporočilo: ostanete zunaj imenika in ne prejemate povabil.",
+    "addressBookOptOutLink": "Odstrani moje podatke iz imenika",
+    "myDataLink": "Vaši podatki: ogled, popravek, preklic privolitve ali preklic prijave",
+    "confirmationCode": {
+      "subject": "{site}: potrditvena koda",
+      "heading": "Vaša potrditvena koda",
+      "introEdit": "Zahtevali ste popravek imena in organizacije v svoji prijavi na »{event}«.",
+      "introEditAll": "Zahtevali ste popravek imena in organizacije v vseh svojih prijavah.",
+      "introNickname": "Zahtevali ste spremembo vzdevka v svoji prijavi na »{event}«.",
+      "introNicknameRemove": "Zahtevali ste odstranitev vzdevka iz svoje prijave na »{event}«.",
+      "introCancel": "Zahtevali ste izbris svoje prijave na »{event}«.",
+      "codeLabel": "Koda je:",
+      "instructions": "Vpišite jo na strani Moji podatki, s katere ste poslali zahtevo. Velja {minutes, plural, one {# minuta} two {# minuti} few {# minute} other {# minut}}.",
+      "ignore": "Če zahteve niste poslali vi, to e-sporočilo prezrite: brez kode se nič ne spremeni. Kode ne dajte nikomur."
+    }
   },
   "home": {
     "hero": {
@@ -4380,17 +4701,100 @@
   },
   "gdpr": {
     "consent": {
-      "recording": "Soglašam z avdio/video snemanjem dogodka",
+      "recording": "Privolim v snemanje svojega glasu, ko med dogodkom spregovorim. Moj obraz in moje ime se v videu nikoli ne pojavita.",
+      "recordingReserved": "Privolim v snemanje svojega glasu, ko med dogodkom spregovorim. Moj obraz in moje ime se v videu nikoli ne pojavita. Video ostane na voljo samo organizatorjem in prijavljenim osebam in se ne objavi. Prijavljena oseba si ga lahko ogleda, dokler se hranijo podatki o njeni prijavi.",
+      "recordingPublic": "Privolim v snemanje svojega glasu, ko med dogodkom spregovorim. Privolim tudi v objavo videa: video si lahko kdor koli ogleda na strani dogodka in v videoknjižnici. Moj obraz in moje ime se v videu nikoli ne pojavita.",
+      "recordingVisible": "Soglašam z avdio/video snemanjem dogodka.",
+      "recordingVisibleReserved": "Privolim v snemanje dogodka (zvok in video). Video ostane na voljo samo organizatorjem in prijavljenim osebam in se ne objavi. Prijavljena oseba si ga lahko ogleda, dokler se hranijo podatki o njeni prijavi.",
+      "recordingVisiblePublic": "Privolim v snemanje dogodka (zvok in video) in v objavo posnetka: video si lahko kdor koli ogleda na strani dogodka in v videoknjižnici.",
+      "recordingNoVideo": "Privolim v snemanje dogodka. Video dvorane se ne snema: ostanejo samo zvočne sledi oseb, ki privolijo v prepis, če jih dogodek predvideva.",
       "multitrack": "Privolim, da se moji prispevki prepišejo z mojim imenom za poročilo o dogodku. Če dogodek snema ločen zvočni posnetek za vsako osebo, se moj glas snema samo za ta namen, posnetek pa se po prepisu izbriše; ne uporablja se za prepoznavanje ali posnemanje mojega glasu.",
+      "multitrackRetained": "Privolim, da se moji prispevki prepišejo z mojim imenom za poročilo o dogodku. Če dogodek snema ločen zvočni posnetek za vsako osebo, se moj glas snema samo za ta namen, posnetek pa se hrani s podatki dogodka; ne uporablja se za prepoznavanje ali posnemanje mojega glasu.",
       "multitrackOptional": "Ni obvezno: če ne date privolitve, vseeno sodelujete, vendar vaši prispevki ne pridejo v prepis in vaš glas se ne snema na ločeno sled. Če se dogodek snema, vaš glas kljub temu ostane v videoposnetku.",
+      "multitrackOptionalShort": "Ni obvezno: če ne date privolitve, vseeno sodelujete, vendar vaši prispevki ne pridejo v prepis in vaš glas se ne snema na ločeno sled.",
       "stayInTouch": "Želim prejemati informacije o prihodnjih dogodkih in biti dodan v imenik, da me povabijo na podobne dogodke",
-      "stayInTouchHelp": "Neobvezno soglasje (člen 6.1.a GDPR). Kadar koli ga lahko prekličeš s povezavo »Odstrani me iz imenika« v e-poštnih sporočilih, ki jih prejmeš. Ime in organizacija sta iz te prijave.",
+      "stayInTouchHelp": "Neobvezna privolitev (člen 6.1.a GDPR). Kadar koli jo lahko prekličete s povezavo »Odstrani moje podatke iz imenika« v potrditvenem e-sporočilu, v opomnikih in povabilih ali na strani »Moji podatki«. Ime, e-poštni naslov in organizacija so tisti iz te prijave.",
+      "stayInTouchRetention": "Te podatke hranimo {months} mesecev od te privolitve: obdobje se začne znova samo, če znova označite polje.",
       "recordingOptionalListenOnly": "Če ne privolite, vseeno sodelujete, samo kot poslušalec: spremljate in pišete v klepet, mikrofon, kamera in deljenje zaslona pa ostanejo izklopljeni. Privolite lahko pozneje, iz sobe.",
-      "recordingOptionalHost": "Če ne privolite, vseeno vstopite in vodite kot običajno, vendar se vaš glas ne ohrani v posnetkih po osebah niti v prepisu. Video sobe, če se snema, vas vseeno zajame.",
       "recordingOptionalVoice": "Če ne privolite, vseeno sodelujete in lahko nastopate, a ostanete zunaj posnetka: ne ime, ne glas, ne slika. Privolite lahko pozneje, iz sobe.",
-      "recordingNotice": "Dogodek se snema (zvok in slika). Sodeluješ brez mikrofona in kamere: posnetek ne vsebuje tvojega glasu ali podobe, razen če ti voditelj da besedo.",
-      "recordingNoticeVoice": "Dogodek se snema (zvok in video). Sodelujete brez mikrofona in kamere: posnetek ne vsebuje vašega imena, glasu ali slike, razen če privolite v sobi.",
+      "recordingNotice": "Dogodek se lahko snema. Sodelujete brez mikrofona in kamere: posnetek ne vsebuje vašega glasu ali slike, razen če vam voditelji dajo besedo.",
+      "recordingNoticeVoice": "Dogodek se lahko snema. Sodelujete brez mikrofona in kamere: vaš obraz in vaše ime se v videu nikoli ne pojavita, vaš glas pa le, če privolite v sobi.",
+      "namesMayAppear": "Ime, s katerim sodelujete, se lahko pojavi v videu, tudi če ne spregovorite.",
+      "recordingHostsOnly": "Dogodek se lahko snema. V videu se vidijo in slišijo samo voditelji: obraza, imena in glasu udeležencev v njem ni nikoli.",
+      "recordingHostAlwaysReserved": "Vodite ta dogodek: ste vedno v posnetku, z imenom, glasom, sliko in deljenim zaslonom. Video ostane na voljo samo organizatorjem in prijavljenim osebam in se ne objavi. Prijavljena oseba si ga lahko ogleda, dokler se hranijo podatki o njeni prijavi.",
+      "recordingHostAlwaysPublic": "Vodite ta dogodek: ste vedno v posnetku, z imenom, glasom, sliko in deljenim zaslonom. Video je lahko objavljen in si ga lahko ogleda kdor koli.",
       "recordingHostAlways": "Vodite ta dogodek: ste vedno v posnetku, z imenom, glasom, sliko in deljenim zaslonom."
+    },
+    "sheet": {
+      "title": "Ta dogodek in vaši podatki",
+      "intro": "Odvisno je od tega, kako so organizatorji nastavili dogodek. Vse drugo je v politiki zasebnosti.",
+      "recording": {
+        "label": "Snemanje",
+        "none": "Za ta dogodek snemanje ni predvideno.",
+        "manual": "Voditelji lahko začnejo snemanje, zvok in video. Ko je vklopljeno, je to v dvorani označeno.",
+        "auto": "Dogodek se snema, zvok in video, od začetka. V dvorani je to označeno.",
+        "tracksOnly": "Video dvorane se ne snema: samo po ena zvočna sled za vsako osebo, ki privoli.",
+        "destinationReserved": "Posnetek ostane na voljo samo organizatorjem in prijavljenim osebam in se ne objavi. Prijavljena oseba si ga lahko ogleda, dokler se hranijo podatki o njeni prijavi.",
+        "destinationPublic": "Posnetek je lahko objavljen po dogodku.",
+        "destinationUnset": "Organizatorji po dogodku odločijo, ali ga bodo objavili.",
+        "refuseOut": "Če ne privolite, vseeno sodelujete in ostanete zunaj posnetka.",
+        "refuseListenOnly": "Če ne privolite, sodelujete samo kot poslušalec.",
+        "hostsAlways": "V videu so samo voditelji, z imenom, glasom, sliko in deljenim zaslonom. Obraz in ime udeležencev se nikoli ne pojavita.",
+        "hostsAlwaysVisible": "Voditelji so vedno v posnetku, z imenom, glasom, sliko in deljenim zaslonom.",
+        "hostsOnly": "V videu se vidijo in slišijo samo voditelji, z imenom, glasom, sliko in deljenim zaslonom. Obraza, imena in glasu udeležencev v njem ni nikoli.",
+        "audienceNotice": "Sodelujete brez mikrofona in kamere: posnetek ne vsebuje vašega glasu ali slike, razen če vam voditelji dajo besedo.",
+        "audienceNoticeVoice": "Sodelujete brez mikrofona in kamere: vaš obraz in vaše ime se v videu nikoli ne pojavita, vaš glas pa le, če privolite v sobi."
+      },
+      "transcript": {
+        "label": "Prepis",
+        "captions": "Besedilo podnapisov se z imenom ohrani samo za osebe, ki privolijo, in postane prepis dogodka.",
+        "tracks": "Za osebe, ki privolijo, se snema zvočna sled, ki se po prepisu izbriše.",
+        "tracksRetained": "Za osebe, ki privolijo, se snema zvočna sled, ki se hrani s podatki dogodka.",
+        "fromVideo": "Po dogodku lahko organizatorji dajo video prepisati samo, če so privolili vsi, ki v njem govorijo."
+      },
+      "captions": {
+        "label": "Podnapisi"
+      },
+      "ai": {
+        "label": "Umetna inteligenca",
+        "summary": "Po dogodku lahko orodje umetne inteligence napiše povzetek posnetka.",
+        "translation": "Prepis in povzetek se lahko prevedeta samodejno.",
+        "dubbing": "Video ima lahko sinhronizacijo s sintetičnim glasom.",
+        "onRequest": "Po dogodku lahko organizatorji zahtevajo tudi samodejne obdelave posnetka, ki tu niso navedene: prepis, povzetek ali prevod.",
+        "report": "Po dogodku lahko osebje z umetno inteligenco pripravi poročilo, tudi na podlagi anket in, če so objavljena, vprašanj. Besedilo klepeta se ne uporablja.",
+        "accuracy": "Besedila, ustvarjena z umetno inteligenco, lahko vsebujejo netočnosti."
+      },
+      "list": {
+        "label": "Seznam udeležencev",
+        "visible": "Udeleženci v dvorani vidijo seznam prisotnih.",
+        "hidden": "V dvorani občinstvo ne vidi seznama prisotnih. Voditelji in govorci ga vidijo."
+      },
+      "name": {
+        "label": "Vaše ime",
+        "real": "V dvorani, klepetu in vprašanjih ste prikazani s svojim imenom.",
+        "pseudonym": "V dvorani, klepetu in vprašanjih ste prikazani pod psevdonimom. Organizatorji vidijo podatke o prijavi.",
+        "pseudonymTranscript": "Če privolite v prepis, tam ostane vaše ime.",
+        "nickname": "Izberete lahko vzdevek: drugi ga vidijo namesto vašega imena. Organizatorji in moderatorji vedo, kdo je za njim.",
+        "nicknameTranscript": "Če privolite v prepis, ste v njem prikazani z vzdevkom, če ste ga izbrali, sicer s svojim imenom."
+      },
+      "retention": {
+        "label": "Hramba",
+        "data": "Podatki o prijavi in iz dvorane se izbrišejo {days, plural, one {# dan} two {# dneva} few {# dni} other {# dni}} po koncu dogodka. Vprašanja in ankete ostanejo brez imen.",
+        "recordingKept": "Posnetek in to, kar iz njega nastane (prepis, povzetek, prevodi), se ne izbrišejo skupaj s temi podatki: ne glede na to, ali so dani na voljo, ostanejo, dokler jih organizatorji ne izbrišejo.",
+        "recordingDays": "Posnetek in to, kar iz njega nastane, se izbrišejo {days, plural, one {# dan} two {# dneva} few {# dni} other {# dni}} po koncu dogodka ali, če je posnetek dan na voljo, po njegovi objavi.",
+        "transcriptKept": "Prepis se ne izbriše skupaj s temi podatki: ostane, dokler ga organizatorji ne izbrišejo.",
+        "transcriptDays": "Prepis se izbriše {days, plural, one {# dan} two {# dneva} few {# dni} other {# dni}} po koncu dogodka."
+      },
+      "addressBook": {
+        "label": "Imenik",
+        "offered": "Ob prijavi lahko izberete, da ostanete v imeniku dogodkov, da bi vas lahko povabili na podobne dogodke. Ni obvezno: podatki ostanejo {months} mesecev od privolitve, razen če jo prekličete."
+      },
+      "chat": {
+        "label": "Klepet in vprašanja",
+        "messages": "Sporočila klepeta se nikoli ne objavijo, niti vprašanja, postavljena v klepetu.",
+        "questionsText": "Po dogodku se lahko objavi besedilo vprašanj iz Q&A, nikoli pa ime osebe, ki jih je postavila.",
+        "questionsNone": "Vprašanja iz Q&A se ne objavijo."
+      }
     },
     "export": {
       "title": "Moji podatki",
@@ -4401,20 +4805,21 @@
       "submit": "Zahtevaj moje podatke",
       "loading": "Iskanje...",
       "requestSubmittedTitle": "Preverite svoj e-poštni predal",
-      "requestSubmittedBody": "Če se ta e-poštni naslov ujema s prijavo, smo vam poslali povezavo za prenos vaših podatkov. Povezava velja 1 uro.",
+      "requestSubmittedBody": "Če se ta e-poštni naslov ujema s prijavo, smo vam poslali povezavo za ogled vaših podatkov. Povezava velja 1 uro.",
       "linkInvalid": "Povezava ni veljavna ali je potekla. Zahtevajte novo povezavo.",
       "requestNew": "Zahtevaj novo povezavo",
       "noData": "Za ta e-poštni naslov ni najdenih podatkov.",
       "error": "Prišlo je do napake. Prosimo, poskusite znova pozneje.",
       "rateLimited": "Preveč zahtevkov. Prosimo, poskusite znova čez eno uro.",
       "results": "Vaši podatki",
-      "resultsDescription": "Najdeni podatki, povezani z {count} dogodki.",
+      "resultsDescription": "{count, plural, one {Najdeni podatki za # dogodek.} two {Najdeni podatki za # dogodka.} few {Najdeni podatki za # dogodke.} other {Najdeni podatki za # dogodkov.}}",
       "registrationData": "Podatki o prijavi",
       "fieldName": "Ime",
+      "fieldNickname": "Vzdevek",
       "fieldEmail": "E-pošta",
       "fieldOrganization": "Organizacija",
       "fieldRegisteredAt": "Datum prijave",
-      "fieldConsent": "Soglasje",
+      "fieldConsent": "Seznanitev s politiko zasebnosti",
       "questionsTitle": "Vprašanja Q&A",
       "pollVotesTitle": "Glasovi v anketah",
       "optionLabel": "Možnost",
@@ -4436,7 +4841,74 @@
       "consentFuture": "Prihodnja sporočila",
       "consentWithdrawnOn": "Preklicano {date}",
       "consentNoteInRoom": "Če ste zdaj v dvorani, preklic velja od naslednjega vstopa: da velja takoj, uporabite Privolitve v dvorani.",
-      "consentFutureEffect": "Če jo prekličete, ne boste več prejemali sporočil o prihodnjih dogodkih in izstopite iz imenika, za vse svoje prijave."
+      "consentGiveNoteInRoom": "Privolitev, dana tukaj, velja od vašega naslednjega vstopa v dvorano, ne za tisto, kar je že posneto. Privolitev v snemanje in prepis lahko daste, dokler se dogodek ne konča.",
+      "proofsTitle": "Shranjena dokazila o privolitvah",
+      "proofsIntro": "Podatki teh dogodkov so bili izbrisani. Ta dokazila ostanejo, dokler video ali prepis obstaja. Privolitev lahko prekličete: kar je že v videu, ostane, za odstranitev pa morate pisati upravljavcu podatkov.",
+      "proofGivenOn": "Dana {date}",
+      "proofSuperseded": "Zamenjana s poznejšo privolitvijo",
+      "proofWithdrawEffect": {
+        "recording": "Prekličete tudi privolitev v prepis: vaši stavki in vaše ime izginejo iz prepisa iz podnapisov. Kar je že v videu, ostane, prav tako prepis, izdelan iz videa ali zvočnih sledi: za njihovo odstranitev pišite upravljavcu podatkov. S te strani preklica ni mogoče razveljaviti.",
+        "transcription": "Vaši stavki in vaše ime izginejo iz prepisa iz podnapisov. Prepis, izdelan iz videa ali zvočnih sledi, ostane: za njegovo odstranitev pišite upravljavcu podatkov. S te strani preklica ni mogoče razveljaviti."
+      },
+      "proofWithdrawHost": "Starejši prepisi iz podnapisov ne prepoznajo voditeljev: vaši stavki in vaše ime tam ostanejo, za njihovo odstranitev pa morate pisati upravljavcu podatkov.",
+      "roomProofsTitle": "Privolitve, dane pri vodenju dogodka",
+      "roomProofsIntro": "Privolitve v snemanje in prepis, ki ste jih dali ob vstopu v dvorano z vlogo na dogodku. V oknu »Privolitve« v dvorani prekličete privolitve iz trenutnega vstopa, s svojim računom osebja pa tudi tiste iz prejšnjih vstopov; za druge in po koncu dogodka ostane izbris vaših podatkov.",
+      "addressBookTitle": "Imenik dogodkov",
+      "addressBookIntro": "Izbrali ste, da ostanete v imeniku, da bi vas lahko povabili na podobne dogodke. Te podatke hranimo do {date}, razen v primeru preklica ali nove privolitve.",
+      "addressBookOptOut": "Odstrani moje podatke iz imenika",
+      "consentFutureEffect": "Če jo prekličete, ne boste več prejemali sporočil o prihodnjih dogodkih in izstopite iz imenika, za vse svoje prijave.",
+      "consentFutureGive": "Privolim v prihodnja sporočila",
+      "consentFutureGiveEffect": "Vrnete se v imenik dogodkov z imenom in organizacijo iz te prijave in znova prejemate povabila; obdobje hrambe se začne znova danes.",
+      "consentGiveDone": "Privolitev je dana: velja od vašega naslednjega vstopa v dvorano.",
+      "consentFutureGiveDone": "Privolitev je dana: znova ste v imeniku dogodkov.",
+      "consentGiveTextChanged": "Besedilo privolitve se je spremenilo, potem ko ste odprli stran: znova jo naložite, da preberete novo.",
+      "consentGiveClosed": "Te privolitve ni več mogoče dati tukaj: dogodek se je končal ali je ne zahteva več. Znova naložite stran, da vidite trenutno stanje.",
+      "consentGiveNewText": "Besedilo te privolitve se je spremenilo, potem ko ste jo dali: za trenutno besedilo jo je treba dati znova.",
+      "addressBookPendingTitle": "Vrnitev v imenik je treba potrditi",
+      "addressBookPendingBody": "Pri tej prijavi je bilo označeno polje za imenik, vendar ta naslov ni več prejemal povabil. Dokler ne potrdite, se nič ne spremeni.",
+      "addressBookPendingEffect": "Če potrdite, se vrnete v imenik z imenom in organizacijo iz te prijave in znova prejemate povabila. Če prekličete ali če to niste bili vi, ostanete zunaj imenika in ne prejemate povabil.",
+      "addressBookPendingConfirm": "Potrdi vrnitev",
+      "addressBookPendingCancel": "Prekliči zahtevo",
+      "addressBookPendingGone": "Ta zahteva ne čaka več na potrditev. Znova naložite stran, da vidite trenutno stanje.",
+      "removalTitle": "Posnetek dogodka",
+      "removalIntro": "Ta dogodek je bil posnet. Če se v posnetku ne želite pojaviti, lahko zahtevate, da vas iz njega odstranijo: deli, v katerih se pojavite ali govorite, se prekrijejo z obvestilom in utišajo, prepis, podnapisi in povzetek pa se izdelajo znova. Zahteva gre upravljavcu podatkov, ki jo pregleda.",
+      "removalButton": "Ne želim se pojaviti v tem posnetku",
+      "removalConfirmTitle": "Potrdite zahtevo?",
+      "removalConfirmBody": "Upravljavec bo iz posnetka odstranil dele, v katerih se pojavite ali govorite. Kopije, objavljene na drugih spletnih mestih, na primer na YouTubu, mora posebej odstraniti tisti, ki jih je objavil.",
+      "removalConfirm": "Pošlji zahtevo",
+      "removalCancel": "Prekliči",
+      "removalSent": "Zahteva poslana. Upravljavec jo bo pregledal.",
+      "removalError": "Zahteve ni bilo mogoče poslati. Poskusite znova pozneje.",
+      "removalStatusOpen": "Zahteva z dne {date}: v obravnavi.",
+      "removalStatusClosed": "Zahteva z dne {date}: zaključena {closed}.",
+      "removalStatusRejected": "Zahteva z dne {date}: zavrnjena. Pišite upravljavcu, da izveste razlog.",
+      "editButton": "Popravi ime in organizacijo",
+      "editScopeLegend": "Za katere prijave velja",
+      "editScopeOne": "Samo ta prijava",
+      "editScopeAll": "Vse moje prijave ({count}) in imenik dogodkov",
+      "editEffect": "Popravek velja za naslednja e-sporočila in od vašega naslednjega vstopa v dvorano. Ne spremeni tistega, kar je že posneto, prepisano ali napisano v klepetu, niti dokazil o privolitvah.",
+      "editNameInvalid": "Ime mora imeti od 2 do 100 znakov.",
+      "editOrganizationRequired": "Dogodek, na katerega ste prijavljeni, zahteva organizacijo: polje ne sme ostati prazno.",
+      "editOrganizationTooLong": "Organizacija ima lahko največ 200 znakov.",
+      "editDone": "Podatki so popravljeni.",
+      "nicknameChoose": "Izberi vzdevek",
+      "nicknameChange": "Spremeni vzdevek",
+      "nicknameEffect": "Drugi vidijo vzdevek namesto vašega imena: v klepetu in pri vprašanjih takoj, v videu od vašega naslednjega vstopa v sobo. Kar je že posneto, prepisano ali napisano, se ne spremeni.",
+      "nicknameDone": "Vzdevek je shranjen.",
+      "codeWhy": "Zaradi varnosti se popravki in izbrisi potrdijo s kodo, ki jo pošljemo na e-poštni naslov prijave.",
+      "codeSend": "Pošljite mi potrditveno kodo",
+      "codeSent": "Po e-pošti smo vam poslali 6-mestno kodo. Vpišite jo tukaj: velja {minutes, plural, one {# minuta} two {# minuti} few {# minute} other {# minut}}.",
+      "codeLabel": "Potrditvena koda",
+      "codeConfirmEdit": "Potrdi popravek",
+      "codeConfirmNickname": "Potrdi vzdevek",
+      "codeInvalid": "Koda ni pravilna ali je potekla. Preverite zadnje prejeto e-sporočilo ali prekličite in zahtevajte novo.",
+      "cancelTitle": "Izbris te prijave",
+      "cancelIntro": "Izbrišete lahko samo to prijavo, ne da bi se dotaknili drugih in preostalih podatkov.",
+      "cancelButton": "Izbriši to prijavo",
+      "cancelDeletes": "Izbrišejo se prijava na ta dogodek in tisto, kar ste z njo naredili: vprašanja, glasovi, sporočila v klepetu, povratne informacije, odgovori na vprašalnike, vaši stavki v prepisu iz podnapisov in e-sporočila v čakalni vrsti. Vaša osebna povezava preneha delovati in mesto se sprosti.",
+      "cancelKeeps": "Ostanejo vaše druge prijave, imenik dogodkov, profilna fotografija in zahteva za odstranitev iz posnetka, ki je še v obdelavi. Če za ta dogodek obstaja video ali prepis, dokazilo o vaši privolitvi ostane brez vašega imena, dokler obstajata. Izbrisa ni mogoče razveljaviti; dokler dogodek sprejema prijave, se lahko znova prijavite.",
+      "codeConfirmCancel": "Izbriši prijavo",
+      "cancelDone": "Prijava je izbrisana."
     },
     "erasure": {
       "title": "Izbris vaših podatkov",
@@ -4448,13 +4920,15 @@
       "requestSubmittedTitle": "Preverite svoj e-poštni predal",
       "requestSubmittedBody": "Če se ta e-poštni naslov ujema s prijavo, smo vam poslali povezavo za potrditev izbrisa. Povezava velja 1 uro.",
       "linkInvalid": "Povezava ni veljavna ali je potekla. Zahtevajte novo povezavo.",
-      "confirmWarning": "Dokončno boste izbrisali vse osebne podatke, povezane z vašim e-poštnim naslovom.",
+      "confirmWarning": "Dokončno boste izbrisali osebne podatke, povezane z vašim e-poštnim naslovom, razen tistega, kar je navedeno spodaj.",
       "confirmBody": "Izbrisani bodo prijave, vprašanja, glasovi v anketah, povratne informacije, opomniki in vaš vnos v imeniku dogodkov. Postopka ni mogoče razveljaviti.",
+      "confirmProofs": "Če ima dogodek video ali prepis, tudi če še nista objavljena, ostanejo vrsta privolitve, datum in besedilo, na katero ste odgovorili, brez vašega imena, dokler ta video ali prepis obstaja. Služijo kot dokazilo o privolitvi. Video se ne spremeni: če želite zahtevati odstranitev svojih prispevkov, pišite upravljavcu podatkov. Starejši prepisi iz podnapisov ne prepoznajo voditeljev niti oseb, ki nastopajo z vlogo na dogodku: vaši stavki in vaše ime tam ostanejo, za njihovo odstranitev pa morate pisati upravljavcu podatkov.",
       "confirmButton": "Potrdi izbris",
       "cancel": "Prekliči",
       "processing": "Brisanje poteka...",
       "doneTitle": "Izbris zaključen",
-      "doneBody": "Izbrisane prijave: {count}, skupaj s povezanimi podatki.",
+      "doneBody": "{count, plural, =0 {Ni prijav za izbris.} one {Izbrisana je bila # prijava, skupaj s povezanimi podatki.} two {Izbrisani sta bili # prijavi, skupaj s povezanimi podatki.} few {Izbrisane so bile # prijave, skupaj s povezanimi podatki.} other {Izbrisanih je bilo # prijav, skupaj s povezanimi podatki.}}",
+      "doneProofs": "{count, plural, one {Ostane # dokazilo o privolitvi, brez vašega imena, dokler video ali prepis obstaja.} two {Ostaneta # dokazili o privolitvi, brez vašega imena, dokler video ali prepis obstaja.} few {Ostanejo # dokazila o privolitvi, brez vašega imena, dokler video ali prepis obstaja.} other {Ostane # dokazil o privolitvi, brez vašega imena, dokler video ali prepis obstaja.}}",
       "error": "Prišlo je do napake. Poskusite znova pozneje.",
       "rateLimited": "Preveč zahtev. Poskusite znova čez eno uro.",
       "back": "Nazaj na moje podatke",
@@ -5232,7 +5706,8 @@
     "overlapTitle": "Hkraten govor: v tem odseku govori več oseb hkrati.",
     "anonymousSpeaker": "Udeleženec {n}",
     "untranscribed": "Ni prepisano: govornik ni dal privolitve",
-    "unrecordedSpeech": "Nekaterih izjav ni v posnetku: govorci niso dali privolitve."
+    "unrecordedSpeech": "Nekaterih izjav ni v posnetku: govorci niso dali privolitve.",
+    "unrecordedSpeechHostsOnly": "Nekaterih izjav ni v posnetku: v videu se vidijo in slišijo samo voditelji."
   },
   "waiting": {
     "startsIn": "Dogodek se začne čez",
@@ -5249,7 +5724,9 @@
     "watchNow": "Glejte",
     "switchToLive": "Preklopi na živo",
     "enterRoom": "Vstopite v dvorano",
-    "recordingNotice": "Ta dogodek se snema.",
+    "recordingNotice": "Ta dogodek se lahko snema.",
+    "recordingNoticeInstant": "Klic se lahko snema. V videu so samo voditelji: vaš obraz in vaše ime nikoli. Če kdo začne snemanje, vas bomo vprašali, ali privolite v snemanje svojega glasu.",
+    "recordingNoticeInstantHostsOnly": "Klic se lahko snema. V videu se vidijo in slišijo samo voditelji: obraza, imena in glasu udeležencev v njem ni nikoli.",
     "recordingAvailableAfter": "Posnetek bo na voljo po dogodku.",
     "autoRefreshHint": "Stran se bo samodejno osvežila, ko se bo dogodek začel.",
     "startEventButton": "Zaženi dogodek",
@@ -5300,10 +5777,15 @@
     "classicView": "Klasični pogled",
     "backToGarden": "Prikaži trg",
     "aiNoticeTitle": "Obdelava z UI po dogodku",
-    "aiNotice": "Ob koncu bo posnetek obdelan z orodji umetne inteligence za izdelavo prepisa, povzetka ter morebitnih prevodov in sinhronizacij. Rezultati lahko vsebujejo netočnosti; merodajen ostaja videoposnetek.",
+    "aiNotice": "Ob koncu lahko posnetek obdelajo orodja umetne inteligence za izdelavo prepisa, povzetka ter morebitnih prevodov in sinhronizacij. Prepis zajema samo osebe, ki so dale privolitev. Rezultati lahko vsebujejo netočnosti; merodajen ostaja videoposnetek.",
     "multitrackConsentTitle": "Prepis vaših prispevkov",
-    "recordingConsentTitle": "Snemanje dogodka",
-    "recordingConsentIntro": "Dogodek se snema (zvok in video). Ob privolitvi posnetek vsebuje vaše ime, glas, sliko in to, kar delite na zaslonu.",
+    "recordingConsentTitle": "Snemanje vašega glasu",
+    "recordingConsentTitleVisible": "Snemanje dogodka",
+    "recordingConsentIntro": "Dogodek se lahko snema. V videu so samo voditelji: vaš obraz in vaše ime nikoli. Z vašo privolitvijo se vaš glas snema, ko govorite.",
+    "recordingConsentIntroAnonymous": "Dogodek se lahko snema. V videu so samo voditelji: vaš obraz in vaš psevdonim nikoli. Z vašo privolitvijo se vaš glas snema, ko govorite.",
+    "recordingConsentIntroVisible": "Dogodek se lahko snema (zvok in video). Ob privolitvi posnetek vsebuje vaše ime, glas, sliko in to, kar delite na zaslonu.",
+    "recordingConsentIntroVisibleAnonymous": "Dogodek se lahko snema (zvok in video). Ob privolitvi posnetek vsebuje vaš psevdonim, glas, sliko in to, kar delite na zaslonu.",
+    "recordingConsentIntroNoVideo": "Na tem dogodku se video dvorane ne snema.",
     "enterGardenTitle": "Vstopi na trg",
     "enterGardenHint": "Drug kraj za čakanje: sprehodite se, spoznajte druge, ki čakajo, in vstopite v prenos skozi vrata, ko se soba odpre.",
     "backToWaitingRoom": "Nazaj v čakalnico",
@@ -5550,11 +6032,14 @@
       "7d": "7 dni",
       "30d": "30 dni",
       "90d": "90 dni",
+      "1y": "1 leto",
+      "days": "{count, plural, one {# dan} two {# dneva} few {# dni} other {# dni}}",
       "forever": "Brez samodejnega brisanja"
     },
-    "retentionNote": "Objavljeni videoposnetek ne sledi hrambi podatkov dogodka: brez določenega roka ostane javen, dokler ga kdo ne izbriše.",
+    "retentionNote": "Posnetek ne sledi hrambi podatkov dogodka: brez določenega roka ostane, objavljen ali ne, dokler ga kdo ne izbriše. Rok se šteje od objave ali, če video ni objavljen, od konca dogodka; ko poteče, se izbrišeta video in to, kar iz njega nastane (prepisi, povzetki, prevodi).",
+    "retentionLegacy": "Prijavljenim na ta dogodek je bilo rečeno, da se neobjavljen posnetek izbriše skupaj z njihovimi podatki, {days, plural, one {# dan} two {# dneva} few {# dni} other {# dni}} po koncu dogodka. Dokler video ni objavljen, lahko to obdobje skrajšate, ne morete pa ga odstraniti ali podaljšati.",
     "delete": "Izbriši posnetek",
-    "deleteConfirm": "Ali ste prepričani? Video bo trajno izbrisan.",
+    "deleteConfirm": "Ali ste prepričani? Video bo trajno izbrisan. Prepisi, povzetki in prevodi se z njim ne izbrišejo: sledijo roku posnetka, izbranemu tukaj.",
     "notConfigured": "Jibri ni konfiguriran v infrastrukturi. Video snemanje ni na voljo.",
     "disabledHint": "Video snemanje za ta dogodek ni omogočeno. Za vklop odprite zgornji razdelek Nastavitve in vklopite stikalo „Snemanje“.",
     "play": "Predvajaj",
@@ -5570,6 +6055,8 @@
     "audiencePublicDesc": "Vsakdo, ki odpre stran dogodka. Lahko se prikaže v videoteki.",
     "audienceRegistrants": "Samo prijavljeni",
     "audienceRegistrantsDesc": "Tisti, ki so se prijavili na dogodek, tudi če niso vstopili v sobo, prek osebne povezave iz obvestila po e-pošti. V videoteki se ne prikaže.",
+    "audienceReservedNote": "Osebe, ki so privolile, so to storile za posnetek samo za prijavljene: video lahko vidijo le prijavljene osebe in organizatorji.",
+    "destinationMissing": "Ta dogodek ne navaja, komu je posnetek namenjen: zbrane privolitve ne povedo, ali bi bil video objavljen. Pred objavo preverite.",
     "saveFailed": "Sprememba ni shranjena. Poskusite znova."
   },
   "postEvent": {
@@ -5579,7 +6066,9 @@
     "libraryListed": "Objavi v videoknjižnici",
     "libraryListedHelp": "Ta dogodek prikaže v javni knjižnici (/video-library). Zahteva objavljen posnetek ali videoposnetek na YouTubu in vidno stran dogodka.",
     "libraryListedNoRecording": "Ni objavljenega posnetka: dogodek se v knjižnici ne bo prikazal, dokler ne objavite posnetka ali dodate videoposnetka na YouTubu.",
-    "showQA": "Prikaži vprašanja Q&A",
+    "libraryListedReserved": "Posnetek samo za prijavljene: dogodek se ne prikaže v videoknjižnici.",
+    "showQA": "Prikaži besedilo vprašanj Q&A, brez imen",
+    "qaReservedNote": "Pri posnetku samo za prijavljene se vprašanja ne objavijo.",
     "showMaterials": "Prikaži deljena gradiva",
     "showPolls": "Prikaži rezultate anket",
     "showFeedback": "Prikaži povratne informacije",
@@ -5591,7 +6080,7 @@
     "visibilityAlways": "Vedno vidno",
     "visibilityUntil": "Vidno do:",
     "dataRetentionNote": "Osebni podatki udeležencev bodo izbrisani v skladu s hrambo dogodka ({days} dni). Vsebina dogodka bo ostala na voljo, dokler je stran vidna.",
-    "availableUntil": "Ta dogodek in njegova vsebina bodo na voljo do {date}.",
+    "participantDataUntil": "Osebni podatki udeležencev se izbrišejo {date}.",
     "tabs": {
       "qa": "Vprašanja in odgovori",
       "materials": "Gradiva",
@@ -5672,7 +6161,7 @@
       "strengths": "Prednosti",
       "improvements": "Za izboljšanje",
       "quotes": "Iz komentarjev",
-      "aiNotice": "Besedilo je napisal model umetne inteligence na podlagi prepisa, klepeta, vprašanj, anket in ocen, ekipa pa ga je pred objavo pregledala. Številke in grafe izračuna platforma. Lahko vsebuje netočnosti."
+      "aiNotice": "Besedilo je napisal model umetne inteligence na podlagi prepisa, anket, ocen in, če so objavljena, vprašanj, ekipa pa ga je pred objavo pregledala. Številke in grafe izračuna platforma. Lahko vsebuje netočnosti."
     },
     "languages": {
       "title": "Glej v jeziku",
@@ -5733,7 +6222,7 @@
       "confirm": "Potrdi odstranitev",
       "submitting": "Odstranjevanje poteka …",
       "successTitle": "Odstranitev zaključena",
-      "successBody": "Vaših podatkov ni več v imeniku dogodkov.",
+      "successBody": "Od tega trenutka ne boste več prejemali povabil. Vaš e-poštni naslov je že odstranjen; ime in organizacija se iz imenika izbrišeta najpozneje naslednji dan.",
       "errors": {
         "generic": "Prišlo je do napake. Poskusite znova pozneje."
       }
@@ -5831,12 +6320,21 @@
     "recordingWithoutMedia": "Ta posnetek nima videa: njegov prepis izhaja iz podnapisov v živo.",
     "recordingWithoutVideo": "Iz tega posnetka so zvočne sledi udeležencev, videa pa ni: ni bil posnet ali še ni prispel. Arhiv za prenos potrebuje tudi video.",
     "noParticipantTracks": "Ni ločenih zvočnih sledi udeležencev: niso bile posnete ali so že izbrisane. Če jih želite, pred dogodkom vklopite snemanje po udeležencih.",
+    "noTranscribableTracks": "Nobene sledi tega posnetka ni mogoče prepisati: izbrisane so bile ali pa osebe, ki se v njih pojavljajo, niso privolile v prepis s svojim imenom.",
+    "tracksPending": "Sledi tega posnetka še niso prispele: prepis se bo začel sam, ko prispejo.",
     "summaryMissing": "V tem jeziku še ni povzetka za urejanje: najprej ga ustvarite.",
     "storageUnavailable": "Nalaganje datotek v tej namestitvi ni na voljo.",
     "aiDisabledForEvent": "UI je za ta dogodek izklopljena: z »Ustvari z AI« jo vklopite in zaženete obdelavo.",
     "sourceTranscriptMissing": "Ta posnetek še ni prepisan: najprej ga prepišite, nato dodajte prevod.",
     "captionsTranscriptNotTranslatable": "Ta prepis izvira iz podnapisov v živo: samodejni prevod potrebuje prepis posnetka z UI.",
     "sameLanguage": "Izbrani jezik je izvirni jezik posnetka: izberite drugega.",
-    "mtUnavailable": "Strojno prevajanje na tej instanci ni nameščeno."
+    "recordingDestinationNotCovered": "Privolitve za ta dogodek veljajo za posnetek samo za prijavljene: ne morete ga narediti vidnega vsem niti povezati zunanjega videa.",
+    "mtUnavailable": "Strojno prevajanje na tej instanci ni nameščeno.",
+    "recordingContentOrganizerOnly": "Vsebino posnetkov tega dogodka lahko odprejo, spremenijo ali objavijo samo njegovi organizatorji.",
+    "recordingRetentionLegacy": "Prijavljenim na ta dogodek je bilo rečeno, da se neobjavljen posnetek izbriše skupaj z njihovimi podatki: dokler video ni objavljen, se njegovo obdobje lahko skrajša, ne pa odstrani ali podaljša."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Vsebina odstranjena na zahtevo",
+    "cardBody": "Ta del posnetka je bil odstranjen na zahtevo osebe, ki se je v njem pojavila."
   }
 }

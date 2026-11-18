@@ -49,6 +49,7 @@ export const NOT_DUPLICATED_EVENT_RELATIONS: Record<string, string> = {
   recurrenceSeries: 'idem con recurrenceSeriesId: l’appartenenza a una serie si assegna, non si eredita',
   seriesChildren: 'lato inverso: le occorrenze figlie restano dell’originale',
   moderatorPhoto: 'il legame viaggia con la colonna moderatorPhotoId: la copia usa la stessa foto',
+  template: 'il legame viaggia con la colonna templateId: la copia viene dallo stesso modello',
 
   // Persone e loro azioni: copiarle significherebbe iscrivere o invitare
   // qualcuno a un evento a cui non ha mai detto di sì.
@@ -56,8 +57,10 @@ export const NOT_DUPLICATED_EVENT_RELATIONS: Record<string, string> = {
   invitations: 'un invito è un’azione verso una persona, non configurazione: la copia nasce in bozza e gli inviti si mandano quando la data è confermata',
   multitrackConsents: 'prova del consenso dato da una persona per QUELL’occorrenza: non si trasferisce a un’altra',
   recordingConsents: 'prova del consenso dato da una persona per QUELL’occorrenza: non si trasferisce a un’altra',
+  retainedConsentProofs: 'prova conservata del consenso dato per QUELL’occorrenza, finché ne esiste il video: non si trasferisce a un’altra',
   roomOccupants: 'chi era in sala in QUELL’occorrenza: dato della diretta, non configurazione',
   captionSegments: 'frasi dette in QUELL’occorrenza, per la sua trascrizione: non si copiano',
+  redactionRequests: 'richieste di togliere una persona dalle registrazioni di QUELL’occorrenza: non si trasferiscono a un’altra',
 
   // Vita dell'evento.
   questions: 'domande poste durante quell’evento',

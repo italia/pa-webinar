@@ -4,6 +4,7 @@
 import { z } from 'zod';
 
 import { CODICE_LINGUA } from '@/lib/ai/target-locales';
+import { CLASSI_FORMATO } from '@/lib/events/catalog';
 import { REMINDER_PRESETS } from '@/lib/events/reminder-presets';
 
 import {
@@ -17,6 +18,15 @@ import { MAX_RETENTION_DAYS } from './retention';
 // ── Event Schemas ────────────────────────────────────
 
 const localizedStringField = z.record(z.string(), z.string());
+
+/** A chi va un video: a tutti, o a iscritti e staff (RecordingAudience). */
+const destinatariVideo = z.enum(['PUBLIC', 'REGISTRANTS']);
+// La versione del testo del consenso alla registrazione letto
+// (lib/recording/destination, `versioneDellaProva`). Un numero che il server non
+// conosce non ferma la richiesta: il consenso non e' mai una condizione per
+// entrare, e `versioneCopre` decide se vale. Il tetto tiene il valore dentro la
+// colonna intera in cui si salva: oltre, la richiesta e' costruita a mano.
+export const versioneTestoRegistrazione = z.number().int().positive().max(1000);
 
 export const eventBaseSchema = z.object({
   title: localizedStringField.refine(
@@ -59,6 +69,9 @@ export const eventBaseSchema = z.object({
   requireOrganizationRole: z.boolean().default(false),
   requireOrganizationType: z.boolean().default(false),
   dataRetentionDays: z.number().int().min(1).max(MAX_RETENTION_DAYS).default(30),
+  // Quanto dura la registrazione: non segue la conservazione dei dati. Null =
+  // nessuna cancellazione automatica (lib/gdpr/cleanup-selection).
+  recordingDeleteAfterDays: z.number().int().min(1).max(365).nullable().optional(),
   privacyPolicyUrl: materialUrlSchema.optional(),
   // Un testo vuoto non e' un'informativa: vale "nessun testo dell'evento", e
   // all'iscrizione si mostra quella del template GDPR scelto.
@@ -119,9 +132,19 @@ export const eventBaseSchema = z.object({
   // L'elenco di chi partecipa, per il pubblico: senza una scelta, lo decide il
   // formato dell'evento (lib/live/participant-list).
   participantListVisible: z.boolean().optional(),
+  // Chi partecipa puo' usare un nickname (lib/live/nickname): senza una
+  // scelta, acceso dove l'elenco e' nascosto (nicknamePredefinito).
+  nicknamesEnabled: z.boolean().optional(),
   // Moderatori e relatori sempre nella registrazione, per dichiarazione di chi
   // organizza. Niente default: un aggiornamento parziale non lo azzera.
   hostsAlwaysRecorded: z.boolean().optional(),
+  // La destinazione del video, cioe' cio' a cui acconsente chi spunta la casella
+  // (lib/recording/destination). Niente default: un aggiornamento parziale non
+  // la azzera.
+  recordingDestination: destinatariVideo.nullable().optional(),
+  // Il modulo d'iscrizione propone la rubrica. Senza una scelta vale il default
+  // della colonna.
+  offerAddressBook: z.boolean().optional(),
 
   // Recurrence (RFC 5545 RRULE). Null = one-off.
   recurrenceRule: z.string().max(500).nullable().optional(),
@@ -189,6 +212,13 @@ export const eventBaseSchema = z.object({
   // postprod forza k=N nel clustering della diarization invece di
   // auto-detect via silhouette. Null = lascia decidere al modello.
   expectedSpeakers: z.number().int().min(1).max(30).nullable().optional(),
+
+  // Il catalogo dell'evento, per le statistiche dell'istanza
+  // (lib/events/catalog): il modello da cui nasce e la famiglia del formato.
+  // Niente default: un aggiornamento parziale non li tocca, e senza l'uno e
+  // l'altro l'evento resta non catalogato. Null toglie il valore.
+  templateId: z.guid().nullable().optional(),
+  formatClass: z.enum(CLASSI_FORMATO).nullable().optional(),
 });
 
 export const createEventSchema = eventBaseSchema.refine(
@@ -203,10 +233,9 @@ export const updateEventSchema = parzialeSenzaDefault(eventBaseSchema).extend({
   recordingPublished: z.boolean().optional(),
   transcriptPublished: z.boolean().optional(),
   // Chi vede la registrazione pubblicata: tutti o i soli iscritti (lib/recording/audience).
-  recordingAudience: z.enum(['PUBLIC', 'REGISTRANTS']).optional(),
+  recordingAudience: destinatariVideo.optional(),
   // In modifica null toglie il documento dell'informativa dell'evento.
   privacyPolicyUrl: materialUrlSchema.nullable().optional(),
-  recordingDeleteAfterDays: z.number().int().min(1).max(365).nullable().optional(),
   recordingUrl: materialUrlSchema.nullable().optional(),
   tempRecordingUrl: materialUrlSchema.nullable().optional(),
   recordingFileSize: z.number().int().nullable().optional(),
@@ -333,6 +362,13 @@ export const createRegistrationSchema = z.object({
   consentGiven: z
     .literal(true, { error: 'registration.errors.consentRequired' }),
   consentRecording: z.boolean().optional(),
+  // La destinazione del video nel testo letto da chi ha spuntato la casella, null
+  // per un testo che non ne dichiara una. Assente solo da una pagina aperta da
+  // prima che il campo esistesse (lib/recording/destination, `testoLetto`).
+  consentRecordingDestination: destinatariVideo.nullable().optional(),
+  // La versione del testo letto (lib/recording/destination, `versioneDellaProva`).
+  // Assente solo da una pagina aperta da prima che il campo esistesse.
+  consentRecordingVersion: versioneTestoRegistrazione.optional(),
   // ADR-013 Fase 5 — consenso separato alla registrazione per-partecipante.
   // Facoltativo: chi non lo da' si iscrive, ma la sua voce non si registra
   // ne' si trascrive (lo decide il server, voce per voce).
@@ -407,11 +443,33 @@ export const jitsiTokenRequestSchema = z.object({
   moderatorToken: z.guid().optional(),
   guestName: z.string().min(2).max(100).optional(),
   displayNameOverride: z.string().min(2).max(100).optional(),
-  /** Consenso alla registrazione dell'evento dato in sala d'attesa, da chi
-   *  non l'aveva dato all'iscrizione. */
+  /** Il nickname per la visita di un ospite, o di chi apre il link di un altro
+   *  (lib/live/nickname): il server lo controlla e lo prende. Quello di chi
+   *  apre il proprio link sta sull'iscrizione, e qui non conta. */
+  nickname: z.string().min(1).max(100).optional(),
+  /** I token della sala di questa visita: se uno e' del posto che tiene gia' quel
+   *  nickname, l'ospite lo riprende anche da un'altra rete. */
+  nicknameProof: z.array(z.string().min(1).max(4096)).max(50).optional(),
+  /** Consenso alla registrazione dell'evento dato ora con un clic: in sala
+   *  d'attesa o dalla sala. I consensi gia' dati si riportano in `consentReplay`. */
   recordingConsent: z.boolean().optional(),
-  /** Consenso alla registrazione per partecipante dato in sala d'attesa. */
+  /** La destinazione del video nel testo di quel consenso, null per un testo che
+   *  non ne dichiara una. Assente solo da una pagina aperta da prima che il campo
+   *  esistesse (lib/recording/destination, `testoLetto`). */
+  recordingConsentDestination: destinatariVideo.nullable().optional(),
+  /** La versione di quel testo (lib/recording/destination, `versioneDellaProva`).
+   *  Assente solo da una pagina aperta da prima che il campo esistesse. */
+  recordingConsentVersion: versioneTestoRegistrazione.optional(),
+  /** Consenso alla trascrizione dei propri interventi dato ora con un clic. */
   multitrackConsent: z.boolean().optional(),
+  /** I consensi gia' dati che la pagina riporta da sola a un nuovo ingresso. Non
+   *  valgono come un clic: il server li accetta solo se ne trova ancora la prova,
+   *  sui posti dei token della sala di questa visita o sull'account di chi conduce. */
+  consentReplay: z.object({
+    recording: z.boolean().optional(),
+    multitrack: z.boolean().optional(),
+    roomTokens: z.array(z.string().min(1).max(4096)).max(50).optional(),
+  }).strict().optional(),
   /** Lingua della pagina in cui il consenso e' stato dato. */
   locale: z.string().min(2).max(8).optional(),
 }).refine(
@@ -436,6 +494,14 @@ export type JitsiTokenRequest = z.infer<typeof jitsiTokenRequestSchema>;
 export const consentWithdrawalSchema = z.object({
   roomTokens: z.array(z.string().min(1).max(4096)).min(1).max(50),
   recording: z.boolean(),
+}).strict();
+
+/**
+ * La lettura dei consensi in vigore dalla sala: i token della sala di questa
+ * visita provano i posti, dal piu' vecchio al piu' recente.
+ */
+export const consentsInForceSchema = z.object({
+  roomTokens: z.array(z.string().min(1).max(4096)).min(1).max(50),
 }).strict();
 
 // ── Poll Schemas ────────────────────────────────────────

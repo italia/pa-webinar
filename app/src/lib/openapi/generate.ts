@@ -18,6 +18,7 @@ import {
   upvoteQuestionSchema,
   jitsiTokenRequestSchema,
   consentWithdrawalSchema,
+  consentsInForceSchema,
   createPollSchema,
   updatePollStatusSchema,
   pollVoteSchema,
@@ -151,7 +152,10 @@ registry.registerPath({
   summary: 'Create a new event',
   security: [{ [cookieAuth.name]: [] }],
   request: { body: { content: { 'application/json': { schema: createEventSchema } } } },
-  responses: { 201: { description: 'Event created with moderator link' } },
+  responses: {
+    201: { description: 'Event created with moderator link' },
+    409: { description: 'RECORDING_DESTINATION_NOT_COVERED: a reserved recording cannot be linked to an external video. An event that records and declares no destination starts reserved' },
+  },
 });
 
 registry.registerPath({
@@ -179,7 +183,10 @@ registry.registerPath({
   tags: ['Events'],
   summary: 'Get event detail',
   request: { params: z.object({ param: z.string() }) },
-  responses: { 200: { description: 'Full event object' } },
+  responses: {
+    200: { description: 'Public view of the event, or the full view with a moderator token' },
+    404: { description: 'No such event, or, without a moderator token, an event with no public page' },
+  },
 });
 
 registry.registerPath({
@@ -189,7 +196,11 @@ registry.registerPath({
   summary: 'Update event',
   security: [{ [moderatorToken.name]: [] }],
   request: { params: z.object({ param: z.string() }), body: { content: { 'application/json': { schema: updateEventSchema } } } },
-  responses: { 200: { description: 'Updated event' } },
+  responses: {
+    200: { description: 'Updated event' },
+    403: { description: 'The token is not valid for this event, or the field needs a staff session: the destination, who can take part, a new recording address' },
+    409: { description: 'RECORDING_DESTINATION_NOT_COVERED: the change exposes a reserved recording (audience PUBLIC, an external video or a file outside the recordings storage), removes a declared destination, or widens it after the room has opened' },
+  },
 });
 
 registry.registerPath({
@@ -212,6 +223,7 @@ registry.registerPath({
     201: { description: 'Registration created with access token and join URL (public registration on)' },
     202: { description: 'Public registration off: the same body ({ eventSlug, delivery: "email" }) for every address. An invited address is registered, and an already registered one gets its link again; either way the personal link goes only to that mailbox. No access token, join URL or access cookie in the response' },
     409: { description: 'ALREADY_REGISTERED (public registration on only)' },
+    422: { description: 'Validation failed, including a recording destination that changed while the form was open' },
   },
 });
 
@@ -245,8 +257,34 @@ registry.registerPath({
   summary: 'Get Jitsi JWT for room join',
   request: { params: z.object({ param: z.string() }), body: { content: { 'application/json': { schema: jitsiTokenRequestSchema } } } },
   responses: {
-    200: { description: 'JWT token, room name, display name, role' },
+    200: { description: 'JWT token, room name, display name, role; for participants the nickname in use (null without one)' },
+    409: { description: 'CONFLICT: the event does not admit this entry now; or NICKNAME_TAKEN: the visit nickname is already in use, with a free `suggestion`' },
+    422: { description: 'NICKNAME_INVALID: the visit nickname of a guest is not allowed, with the `reason`' },
     403: { description: 'Guest request refused: GUEST_ACCESS_DISABLED (guest access turned off, scheduled events only) or JOIN_PASSWORD_REQUIRED (password-protected event without the join grant cookie)' },
+  },
+});
+
+registry.registerPath({
+  method: 'put',
+  path: '/api/events/{param}/nickname',
+  tags: ['Jitsi'],
+  summary: 'Choose, check or remove a participant nickname',
+  description:
+    'A registrant, from the browser that registered (`Authorization: Bearer <accessToken>` and the event cookie), ' +
+    'saves the nickname on the registration, or removes it with null. A guest or someone opening another ' +
+    "person's link only checks it, and a guest only where guests may enter: their nickname lasts for the visit " +
+    'and the token route takes it on entry (`nickname`, with `nicknameProof`, the room tokens of the visit). ' +
+    'One word that starts with a letter, 2 to 24 characters, letters of a single script; no platform role ' +
+    'words, nothing resembling the names of the hosts, unique in the event. Hosts keep their own name.',
+  request: {
+    params: z.object({ param: z.string() }),
+    body: { content: { 'application/json': { schema: z.object({ nickname: z.string().max(100).nullable() }) } } },
+  },
+  responses: {
+    200: { description: '`nickname` (canonical form, or null) and `saved`: whether it is stored on the registration' },
+    403: { description: 'NICKNAMES_DISABLED (the event does not allow them), HOSTS_USE_THEIR_NAME, or a token not of this event' },
+    409: { description: 'NICKNAME_TAKEN, with a free `suggestion` when there is one; EVENT_ENDED' },
+    422: { description: 'NICKNAME_INVALID, with the `reason`: length, format, scripts, reserved or host' },
   },
 });
 
@@ -277,6 +315,22 @@ registry.registerPath({
   request: { params: z.object({ param: z.string() }), body: { content: { 'application/json': { schema: consentWithdrawalSchema } } } },
   responses: {
     200: { description: '`withdrawn.recording` and `withdrawn.transcription`: whether there was a consent to withdraw' },
+    401: { description: 'None of the room tokens is valid for this event' },
+  },
+});
+
+registry.registerPath({
+  method: 'post',
+  path: '/api/events/{param}/consents/in-force',
+  tags: ['Jitsi'],
+  summary: 'Read the consents in force for a seat',
+  description:
+    'Returns the consents that apply now, without issuing a new token. The caller proves its ' +
+    'seats with the room tokens (Jitsi JWTs) the portal issued to it, oldest first; the last valid ' +
+    'one is the seat in the conference. Tokens up to one day past expiry still count.',
+  request: { params: z.object({ param: z.string() }), body: { content: { 'application/json': { schema: consentsInForceSchema } } } },
+  responses: {
+    200: { description: '`recording`, `transcription` and the `recordingDestination` of the text in force' },
     401: { description: 'None of the room tokens is valid for this event' },
   },
 });
@@ -716,7 +770,10 @@ registry.registerPath({
   tags: ['Events'],
   summary: 'Download iCal file for event',
   request: { params: z.object({ param: z.string() }) },
-  responses: { 200: { description: 'iCal file', content: { 'text/calendar': { schema: z.string() } } } },
+  responses: {
+    200: { description: 'iCal file', content: { 'text/calendar': { schema: z.string() } } },
+    404: { description: 'No such event, or an event with no public page' },
+  },
 });
 
 registry.registerPath({
@@ -727,13 +784,60 @@ registry.registerPath({
   description:
     'Redirects to a short-lived signed URL of the video for whoever may see the recording ' +
     '(lib/recording/audience.ts): published inside the post-event window, to anyone or to ' +
-    'registrants only (`recordingAudience`), or the staff who manage the event, also before ' +
-    'publication. A registrant is recognized by the event access cookie or the viewing cookie.',
+    'registrants only (`recordingAudience`); the staff who organize the event, also before ' +
+    'publication, with the read written to the GDPR log (lib/recording/content-access.ts); for an ' +
+    'instant call, whoever holds its presence pass. A registrant is recognized by the event access ' +
+    'cookie or the viewing cookie. Only a file of this event is signed: a storage address of ' +
+    'another event answers 404.',
   request: { params: z.object({ param: z.string() }) },
   responses: {
     302: { description: 'Redirect to recording' },
     403: { description: 'Not published, or reserved to registrants' },
     404: { description: 'No recording' },
+  },
+});
+
+registry.registerPath({
+  method: 'post',
+  path: '/api/events/{param}/recording/presence',
+  tags: ['Recording'],
+  summary: 'Presence pass of an instant call',
+  description:
+    'Called by the room of whoever is in an instant call while it is recorded. With a room token ' +
+    'of the call and the recording running, sets the `HttpOnly` cookie ' +
+    '`rec_pass_<eventId>`, which expires with the call retention; after the call the ' +
+    "call's link shows the recording to that browser (lib/recording/presence-pass.ts).",
+  request: {
+    params: z.object({ param: z.string() }),
+    body: {
+      content: {
+        'application/json': { schema: z.object({ roomTokens: z.array(z.string()).min(1).max(50) }) },
+      },
+    },
+  },
+  responses: {
+    204: { description: 'Pass set' },
+    401: { description: 'No room token of this call (`ROOM_TOKEN_INVALID`)' },
+    404: { description: 'Not an instant call' },
+    409: { description: 'Room closed (`CALL_NOT_OPEN`) or not recording (`RECORDING_NOT_RUNNING`)' },
+  },
+});
+
+registry.registerPath({
+  method: 'get',
+  path: '/api/events/{param}/sessions/{id}/recording',
+  tags: ['Recording'],
+  summary: 'The recorded file of a call session',
+  description:
+    'For the staff who organize the event (lib/recording/content-access.ts): redirects to a ' +
+    "short-lived signed URL of the session's file and writes the read to the GDPR log. An " +
+    'administrator who does not organize the event gets 403 `RECORDING_CONTENT_ORGANIZER_ONLY`.',
+  request: { params: z.object({ param: z.string(), id: z.string() }) },
+  responses: {
+    302: { description: 'Redirect to the file' },
+    401: { description: 'No staff session' },
+    403: { description: 'Not an organizer of the event' },
+    404: { description: 'No such session or no file' },
   },
 });
 
@@ -850,24 +954,140 @@ registry.registerPath({
   path: '/api/gdpr/export',
   tags: ['GDPR'],
   summary: 'Fulfil a GDPR data export via signed token (Art. 15, step 2)',
+  description:
+    'Also answers a person with no registrations left: the address-book entry and the consent ' +
+    'proofs last longer than the registrations. The same goes for the proofs given in the room ' +
+    'by someone who led an event, found through their named grants, staff account and email HMAC.',
   request: { query: z.object({ t: z.string() }) },
-  responses: { 200: { description: 'Exported personal data' } },
+  responses: {
+    200: {
+      description: 'Exported personal data',
+      content: {
+        'application/json': {
+          schema: z.object({
+            data: z.array(z.record(z.string(), z.unknown())).openapi({
+              description: 'One entry per registration, with its event and its live activity',
+            }),
+            addressBook: z
+              .object({
+                name: z.string().nullable(),
+                email: z.string().nullable(),
+                organization: z.string().nullable(),
+                organizationRole: z.string().nullable(),
+                organizationType: z.string().nullable(),
+                optedIn: z.boolean(),
+                optedInAt: z.iso.datetime().nullable(),
+                optedOutAt: z.iso.datetime().nullable(),
+                expiresAt: z.iso.datetime().nullable().openapi({
+                  description: 'When the entry expires. Null when the person is not opted in',
+                }),
+                optOutToken: z.string().nullable().openapi({
+                  description: 'Leaves the address book. Null when the person is not opted in',
+                }),
+              })
+              .nullable()
+              .openapi({ description: 'Address-book entry. Null when there is none' }),
+            retainedConsentProofs: z
+              .array(
+                z.object({
+                  id: z.guid().openapi({ description: 'The `proofId` of POST /api/gdpr/consents' }),
+                  eventId: z.guid(),
+                  kind: z.enum(['recording', 'transcription']),
+                  source: z.enum(['registration', 'room']),
+                  role: z.enum(['registrant', 'guest', 'host']),
+                  name: z.string().nullable(),
+                  nameRemoved: z.boolean().openapi({
+                    description: 'The person asked to remove the name from the proof',
+                  }),
+                  locale: z.string().nullable(),
+                  textVersion: z.number().int().nullable(),
+                  destination: z.enum(['PUBLIC', 'REGISTRANTS']).nullable(),
+                  givenAt: z.iso.datetime(),
+                  withdrawnAt: z.iso.datetime().nullable(),
+                  retainedAt: z.iso.datetime(),
+                  event: z.object({
+                    title: z.record(z.string(), z.string()).openapi({
+                      description: 'Title by language',
+                    }),
+                    startsAt: z.iso.datetime(),
+                  }),
+                })
+              )
+              .openapi({
+                description:
+                  'Consent proofs kept after their source was deleted, while the video or the ' +
+                  'transcript stays published',
+              }),
+            roomConsentProofs: z
+              .array(
+                z.object({
+                  eventId: z.guid(),
+                  kind: z.enum(['recording', 'transcription']),
+                  name: z.string().nullable(),
+                  locale: z.string().nullable(),
+                  textVersion: z.number().int().nullable(),
+                  destination: z.enum(['PUBLIC', 'REGISTRANTS']).nullable(),
+                  givenAt: z.iso.datetime(),
+                  withdrawnAt: z.iso.datetime().nullable(),
+                  superseded: z.boolean().openapi({
+                    description: 'A later consent replaced this one',
+                  }),
+                  event: z.object({
+                    title: z.record(z.string(), z.string()).openapi({
+                      description: 'Title by language',
+                    }),
+                    startsAt: z.iso.datetime(),
+                  }),
+                })
+              )
+              .openapi({
+                description:
+                  'Recording and transcription proofs given in the room while leading an event. ' +
+                  'Those of a registration arrive with the registration',
+              }),
+            consentsToken: z.string().optional().openapi({
+              description:
+                'Token for POST /api/gdpr/consents. Missing when the person has no registrations ' +
+                'and no kept proofs',
+            }),
+          }),
+        },
+      },
+    },
+  },
 });
 
 registry.registerPath({
   method: 'post',
   path: '/api/gdpr/consents',
   tags: ['GDPR'],
-  summary: 'Withdraw one consent of a registration (Art. 7.3), with the token the export returns',
+  summary: 'Withdraw one consent (Art. 7.3), with the token the export returns',
+  description:
+    'Takes exactly one of `registrationId` (a registration that still exists) and `proofId` ' +
+    '(the proof kept after the registration was deleted). With `proofId`, `consent` is ' +
+    '`recording` or `transcription`: future communications have no kept proof.',
   request: {
     body: {
       content: {
         'application/json': {
-          schema: z.object({
-            token: z.string(),
-            registrationId: z.guid(),
-            consent: z.enum(['recording', 'transcription', 'futureCommunications']),
-          }),
+          schema: z
+            .union([
+              z
+                .object({
+                  token: z.string(),
+                  registrationId: z.guid(),
+                  consent: z.enum(['recording', 'transcription', 'futureCommunications']),
+                })
+                .strict(),
+              z
+                .object({
+                  token: z.string(),
+                  proofId: z.guid(),
+                  consent: z.enum(['recording', 'transcription']),
+                })
+                .strict(),
+            ])
+            .openapi({}, { unionPreferredType: 'oneOf' }),
         },
       },
     },
@@ -875,7 +1095,36 @@ registry.registerPath({
   responses: {
     200: { description: 'Consent withdrawn' },
     401: { description: 'Invalid or expired token' },
-    404: { description: 'No such registration for this address' },
+    404: { description: 'No such registration or consent proof for this address' },
+  },
+});
+
+registry.registerPath({
+  method: 'post',
+  path: '/api/gdpr/recording-removal',
+  tags: ['GDPR'],
+  summary: 'Ask not to appear in the recordings of an event (Art. 17), with the token the export returns',
+  description:
+    'Creates one removal request for each recording with media of the registration\'s event, ' +
+    'unless the registration already has an open one. Nothing is removed at once: the controller ' +
+    'handles the request. The export reports, per registration, whether a request can be made ' +
+    '(`recordingRemoval.available`) and the status of those made.',
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: z.object({ token: z.string(), registrationId: z.guid() }).strict(),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Requests created',
+      content: { 'application/json': { schema: z.object({ requested: z.number().int().min(0) }) } },
+    },
+    401: { description: 'Invalid or expired token' },
+    404: { description: 'No such registration for this address, or its event has no recording' },
   },
 });
 

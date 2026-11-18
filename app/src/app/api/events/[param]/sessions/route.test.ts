@@ -18,6 +18,13 @@ const { prisma } = vi.hoisted(() => ({
 }));
 
 vi.mock('@/lib/db', () => ({ prisma }));
+// I file si aprono dalla rotta dell'app, e solo chi organizza l'evento la riceve.
+const organizza = vi.hoisted(() => ({ valore: false }));
+vi.mock('next/headers', () => ({ cookies: async () => ({ get: () => undefined }) }));
+vi.mock('@/lib/recording/content-access', () => ({
+  contenutoStaffDellaRichiesta: async () =>
+    organizza.valore ? { session: { role: 'organizer', accountId: 'a' }, via: 'organizzatore' } : null,
+}));
 
 import { encryptJSON } from '@/lib/crypto/pii';
 
@@ -85,7 +92,7 @@ beforeEach(() => {
   prisma.event.findFirst.mockImplementation(
     async ({ where }: { where: { moderatorToken?: string } }) =>
       where.moderatorToken === undefined || where.moderatorToken === TOKEN
-        ? { id: EVENTO, status: statoEvento, jitsiRoomName: 'stanza-1' }
+        ? { id: EVENTO, slug: 'evento', status: statoEvento, jitsiRoomName: 'stanza-1' }
         : null
   );
   prisma.callSession.findMany.mockResolvedValue([sessione()]);
@@ -143,6 +150,18 @@ describe('l’elenco delle sessioni', () => {
     const testo = await (await elenca()).text();
     expect(testo).not.toContain('Luca Verdi');
     expect(testo).not.toContain('endpoint-opaco');
+  });
+
+  it('il file si apre dalla rotta dell’app, solo per chi organizza; il link di conduzione sa che c’e’', async () => {
+    organizza.valore = false;
+    type Riga = { recordingUrl: string | null; hasRecording: boolean };
+    const conLink = (await (await elenca()).json()) as { sessions: Riga[] };
+    expect(conLink.sessions[0]).toMatchObject({ recordingUrl: null, hasRecording: true });
+    organizza.valore = true;
+    const conSessione = (await (await elenca()).json()) as { sessions: Riga[] };
+    expect(conSessione.sessions[0]!.recordingUrl).toMatch(/^\/api\/events\/[^/]+\/sessions\/[^/]+\/recording$/);
+    expect(JSON.stringify(conSessione)).not.toContain('archivio.example.com');
+    organizza.valore = false;
   });
 
   it('la dimensione del file e’ un numero, o null se manca', async () => {

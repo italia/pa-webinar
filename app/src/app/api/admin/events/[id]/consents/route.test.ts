@@ -59,6 +59,10 @@ beforeEach(() => {
       givenAt: '2026-11-01T10:00:00.000Z',
       withdrawnAt: null,
       textVersion: null,
+      destination: 'PUBLIC',
+      nomeRimosso: false,
+      conservata: false,
+      holder: 'ospite',
     },
   ]);
 });
@@ -78,6 +82,7 @@ describe('GET admin/events/[id]/consents', () => {
         transcription: { given: 0, withdrawn: 0 },
       },
       total: 1,
+      retained: 0,
     });
     expect(m.audit).not.toHaveBeenCalled();
   });
@@ -88,6 +93,8 @@ describe('GET admin/events/[id]/consents', () => {
     const testo = await res.text();
     expect(testo).toContain('Mario Rossi');
     expect(testo).toContain('Registrazione;sala;ospite');
+    expect(testo.split('\n')[0]).toContain(';Destinazione');
+    expect(testo).toContain(';Pubblica');
     expect(m.audit).toHaveBeenCalledWith({
       data: expect.objectContaining({
         eventId: ID,
@@ -113,10 +120,125 @@ describe('GET admin/events/[id]/consents', () => {
         givenAt: '2026-11-01T10:00:00.000Z',
         withdrawnAt: null,
         textVersion: 2,
+        destination: null,
+        nomeRimosso: false,
+        conservata: false,
         holder: 'posto:g',
       },
     ]);
     const testo = await (await chiedi('?format=csv&locale=it-IT')).text();
     expect(testo).toContain('(nome non leggibile)');
+  });
+
+  it('un nome tolto su richiesta si dice per quello che e’', async () => {
+    m.prove.mockResolvedValueOnce([
+      {
+        kind: 'recording',
+        source: 'registration',
+        role: 'registrant',
+        name: null,
+        givenAt: '2026-11-01T10:00:00.000Z',
+        withdrawnAt: '2026-11-02T10:00:00.000Z',
+        textVersion: null,
+        destination: null,
+        nomeRimosso: true,
+        conservata: true,
+        holder: 'impronta',
+      },
+    ]);
+    const testo = await (await chiedi('?format=csv&locale=it')).text();
+    expect(testo).toContain('(nome rimosso su richiesta)');
+    expect(testo).not.toContain('(nome non leggibile)');
+    expect(testo).toContain(';Non indicata');
+  });
+
+  it('la destinazione si dice solo per la registrazione', async () => {
+    m.prove.mockResolvedValueOnce([
+      {
+        kind: 'transcription',
+        source: 'room',
+        role: 'guest',
+        name: 'Mario Rossi',
+        givenAt: '2026-11-01T10:00:00.000Z',
+        withdrawnAt: null,
+        textVersion: 2,
+        destination: null,
+        nomeRimosso: false,
+        conservata: false,
+        holder: 'posto:g',
+      },
+    ]);
+    const testo = await (await chiedi('?format=csv&locale=it')).text();
+    expect(testo).not.toContain('Non indicata');
+  });
+
+  describe('un periodo sostituito, poi il ritiro', () => {
+    const periodo = {
+      kind: 'recording',
+      source: 'room',
+      role: 'registrant',
+      name: 'Anna Bianchi',
+      textVersion: 1,
+      nomeRimosso: false,
+      conservata: false,
+      holder: 'iscritta',
+    };
+    const RITIRO = '2026-11-03T10:00:00.000Z';
+    beforeEach(() => {
+      m.prove.mockResolvedValueOnce([
+        {
+          ...periodo,
+          givenAt: '2026-11-01T10:00:00.000Z',
+          withdrawnAt: null,
+          destination: 'REGISTRANTS',
+          superata: true,
+        },
+        {
+          ...periodo,
+          givenAt: '2026-11-02T10:00:00.000Z',
+          withdrawnAt: RITIRO,
+          destination: 'PUBLIC',
+          superata: false,
+        },
+      ]);
+    });
+
+    it('il riepilogo conta il ritiro; le prove restano due', async () => {
+      expect(await (await chiedi()).json()).toMatchObject({
+        total: 2,
+        summary: { recording: { given: 0, withdrawn: 1 } },
+      });
+    });
+
+    it('il CSV distingue il periodo sostituito dal ritiro', async () => {
+      const testo = await (await chiedi('?format=csv&locale=it')).text();
+      const [intestazione, sostituito, ritirato] = testo.trim().split('\n');
+      expect(intestazione).toContain(';Ritirato il;');
+      expect(intestazione!.trim().endsWith(';Sostituito')).toBe(true);
+      // Senza ora del ritiro, e con la colonna che dice perche'.
+      expect(sostituito!.trim().endsWith(';;1;Riservata;Da un consenso successivo')).toBe(
+        true
+      );
+      expect(ritirato!.trim().endsWith(`;${RITIRO};1;Pubblica;`)).toBe(true);
+    });
+  });
+
+  it('il riepilogo comprende le prove conservate, e dice quante sono', async () => {
+    m.prove.mockResolvedValueOnce([
+      {
+        kind: 'recording',
+        source: 'room',
+        role: 'registrant',
+        name: null,
+        givenAt: '2026-11-01T10:00:00.000Z',
+        withdrawnAt: null,
+        textVersion: null,
+        destination: null,
+        nomeRimosso: false,
+        conservata: true,
+        holder: 'impronta',
+      },
+    ]);
+    expect(await (await chiedi()).json()).toMatchObject({ total: 1, retained: 1 });
   });
 });

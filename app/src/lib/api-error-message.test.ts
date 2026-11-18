@@ -31,6 +31,12 @@ describe('messaggioErroreApi', () => {
     expect(messaggioErroreApi(503, t, 'ripiego', {}, 'STORAGE_UNAVAILABLE')).toBe('[storageUnavailable]');
   });
 
+  it('una registrazione che la destinazione non consente dice il perche\'', () => {
+    expect(
+      messaggioErroreApi(409, t, 'ripiego', {}, 'RECORDING_DESTINATION_NOT_COVERED'),
+    ).toBe('[recordingDestinationNotCovered]');
+  });
+
   it('un codice generico o sconosciuto non cambia niente', () => {
     expect(messaggioErroreApi(422, t, 'ripiego', {}, 'VALIDATION_ERROR')).toBe('ripiego');
     expect(messaggioErroreApi(404, t, 'ripiego', {}, 'toString')).toBe('[notFound]');

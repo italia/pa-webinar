@@ -104,3 +104,172 @@ describe('TemplateManagement — sottotitoli', () => {
     expect(interruttore()).toBeNull();
   });
 });
+
+describe('TemplateManagement — i valori del formato', () => {
+  const salvato = {
+    id: 'tpl-1',
+    name: 'Webinar',
+    description: null,
+    icon: 'it-video',
+    qaEnabled: false,
+    chatEnabled: true,
+    agendaEnabled: false,
+    wordCloudEnabled: false,
+    whiteboardEnabled: false,
+    liveCaptionsEnabled: true,
+    postEventPublic: true,
+    postEventShowQA: false,
+    offerAddressBook: false,
+    audienceAnonymous: true,
+    nicknamesEnabled: true,
+    hostsAlwaysRecorded: true,
+    recordingDestination: 'PUBLIC' as const,
+    waitingRoomEngine: null,
+    recordingEnabled: true,
+    participantsCanUnmute: false,
+    participantsCanStartVideo: false,
+    participantsCanShareScreen: false,
+    maxParticipants: 300,
+    defaultDurationMinutes: 60,
+    aiTranscriptEnabled: false,
+    aiSummaryEnabled: false,
+    aiTranslationEnabled: false,
+    aiDubbingEnabled: false,
+    multitrackRecordingEnabled: false,
+    retainParticipantTracks: false,
+    descriptionTemplate: null,
+    defaultRetentionDays: null,
+    recordingDeleteAfterDays: 90 as number | null,
+    defaultExpectedSpeakers: null,
+    isSystem: true,
+    sortOrder: 1,
+    createdAt: '2030-01-01T00:00:00.000Z',
+    updatedAt: '2030-01-01T00:00:00.000Z',
+  };
+  const w = messages.admin.wizard.step2;
+  const interruttori = {
+    postEventShowQA: messages.postEvent.showQA,
+    offerAddressBook: t.offerAddressBook,
+    audienceAnonymous: w.audienceAnonymous,
+  };
+  const interruttore = (nome: string) =>
+    container.querySelector<HTMLInputElement>(`input[aria-label="${nome}"]`)!;
+  const destinazione = () =>
+    container.querySelector<HTMLSelectElement>('#tpl-recording-destination')!;
+  const durata = () =>
+    container.querySelector<HTMLSelectElement>('#tpl-recording-retention')!;
+  const fetchMock = vi.fn();
+
+  function apri() {
+    act(() => {
+      root.render(
+        <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
+          <TemplateManagement
+            templates={[salvato]}
+            whiteboardInfraReady
+            liveCaptionsAvailable
+          />
+        </NextIntlClientProvider>,
+      );
+    });
+    const modifica = Array.from(container.querySelectorAll('button')).find(
+      (b) => b.textContent?.trim() === messages.common.edit,
+    );
+    act(() => modifica?.click());
+  }
+
+  async function salva() {
+    const pulsante = Array.from(container.querySelectorAll('button')).find(
+      (b) => b.textContent?.trim() === messages.common.save,
+    );
+    await act(async () => {
+      pulsante?.click();
+    });
+    return JSON.parse(String(fetchMock.mock.calls[0]![1].body)) as Record<string, unknown>;
+  }
+
+  beforeEach(() => {
+    fetchMock.mockReset();
+    fetchMock.mockResolvedValue(
+      new Response(JSON.stringify(salvato), { status: 200 }),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('un modello nuovo parte dai valori delle colonne', () => {
+    render(true);
+    expect(interruttore(interruttori.postEventShowQA)).toBeChecked();
+    expect(interruttore(interruttori.offerAddressBook)).toBeChecked();
+    expect(interruttore(interruttori.audienceAnonymous)).not.toBeChecked();
+    // Chi conduce e' sempre nel video: non e' una scelta del modello.
+    expect(interruttore(w.hostsAlwaysRecorded)).toBeNull();
+    expect(destinazione().value).toBe('');
+    expect(destinazione().textContent).toContain(t.recordingDestinationNone);
+  });
+
+  it('un modello salvato mostra i suoi valori', () => {
+    apri();
+    expect(interruttore(interruttori.postEventShowQA)).not.toBeChecked();
+    expect(interruttore(interruttori.offerAddressBook)).not.toBeChecked();
+    expect(interruttore(interruttori.audienceAnonymous)).toBeChecked();
+    expect(interruttore(w.hostsAlwaysRecorded)).toBeNull();
+    expect(destinazione().value).toBe('PUBLIC');
+  });
+
+  it('i valori non toccati ripartono com erano', async () => {
+    apri();
+    expect(await salva()).toMatchObject({
+      id: 'tpl-1',
+      postEventShowQA: false,
+      offerAddressBook: false,
+      audienceAnonymous: true,
+      hostsAlwaysRecorded: true,
+      recordingDestination: 'PUBLIC',
+    });
+  });
+
+  it('i valori cambiati partono nel salvataggio', async () => {
+    apri();
+    for (const nome of Object.values(interruttori)) {
+      act(() => interruttore(nome).click());
+    }
+    act(() => {
+      destinazione().value = 'REGISTRANTS';
+      destinazione().dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    expect(await salva()).toMatchObject({
+      postEventShowQA: true,
+      offerAddressBook: true,
+      audienceAnonymous: false,
+      recordingDestination: 'REGISTRANTS',
+    });
+  });
+
+  it('la durata della registrazione: nessuna in un modello nuovo, la sua in uno salvato', async () => {
+    render(true);
+    expect(durata().value).toBe('-1');
+    expect(durata().textContent).toContain(messages.recording.retention.forever);
+    act(() => root.unmount());
+    root = createRoot(container);
+    apri();
+    expect(durata().value).toBe('90');
+    act(() => {
+      durata().value = '-1';
+      durata().dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    expect((await salva()).recordingDeleteAfterDays).toBeNull();
+  });
+
+  it('la destinazione si puo lasciare a chi crea l evento', async () => {
+    apri();
+    act(() => {
+      destinazione().value = '';
+      destinazione().dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    expect((await salva()).recordingDestination).toBeNull();
+  });
+});

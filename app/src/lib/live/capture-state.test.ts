@@ -3,7 +3,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { catturaDallaRisposta, statoCattura } from './capture-state';
+import { catturaDallaRisposta, statoCattura, tracceConfigurate } from './capture-state';
 
 const EVENTO = {
   status: 'LIVE',
@@ -83,5 +83,45 @@ describe('catturaDallaRisposta', () => {
     expect(catturaDallaRisposta(null)).toBeNull();
     expect(catturaDallaRisposta({ status: 'LIVE' })).toBeNull();
     expect(catturaDallaRisposta({ capture: { recording: 'si' } })).toBeNull();
+  });
+});
+
+describe('tracceConfigurate', () => {
+  it('risponde come il registratore per persona, a prescindere dallo stato', () => {
+    expect(tracceConfigurate(EVENTO, true)).toBe(true);
+    expect(tracceConfigurate({ ...EVENTO, status: 'PUBLISHED' } as typeof EVENTO, true)).toBe(true);
+    expect(tracceConfigurate(EVENTO, false)).toBe(false);
+  });
+
+  it.each([
+    'recordingEnabled',
+    'aiTranscriptEnabled',
+    'multitrackRecordingEnabled',
+  ] as const)('senza %s non si registra una traccia', (campo) => {
+    expect(tracceConfigurate({ ...EVENTO, [campo]: false }, true)).toBe(false);
+  });
+
+  it('statoCattura resta la stessa regola, in diretta', () => {
+    const booleani = [true, false];
+    for (const recordingEnabled of booleani)
+      for (const aiTranscriptEnabled of booleani)
+        for (const multitrackRecordingEnabled of booleani)
+          for (const disponibile of booleani)
+            for (const status of ['LIVE', 'PUBLISHED', 'ENDED']) {
+              const evento = {
+                ...EVENTO,
+                status,
+                recordingEnabled,
+                aiTranscriptEnabled,
+                multitrackRecordingEnabled,
+              };
+              expect(statoCattura(evento, {}, disponibile).registrazione).toBe(
+                disponibile &&
+                  status === 'LIVE' &&
+                  recordingEnabled &&
+                  aiTranscriptEnabled &&
+                  multitrackRecordingEnabled
+              );
+            }
   });
 });

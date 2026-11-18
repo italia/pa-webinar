@@ -28,13 +28,18 @@ export type ApiErrorKey =
   | 'recordingWithoutVideo'
   | 'transcriptCorrected'
   | 'noParticipantTracks'
+  | 'noTranscribableTracks'
+  | 'tracksPending'
   | 'summaryMissing'
   | 'storageUnavailable'
   | 'aiDisabledForEvent'
   | 'sourceTranscriptMissing'
   | 'captionsTranscriptNotTranslatable'
   | 'sameLanguage'
-  | 'mtUnavailable';
+  | 'mtUnavailable'
+  | 'recordingDestinationNotCovered'
+  | 'recordingContentOrganizerOnly'
+  | 'recordingRetentionLegacy';
 
 /** I codici d'errore che le rotte usano per le condizioni sopra. */
 export const API_ERROR_CODES = {
@@ -43,6 +48,8 @@ export const API_ERROR_CODES = {
   RECORDING_WITHOUT_VIDEO: 'recordingWithoutVideo',
   TRANSCRIPT_CORRECTED: 'transcriptCorrected',
   NO_PARTICIPANT_TRACKS: 'noParticipantTracks',
+  NO_TRANSCRIBABLE_TRACKS: 'noTranscribableTracks',
+  TRACKS_PENDING: 'tracksPending',
   SUMMARY_MISSING: 'summaryMissing',
   STORAGE_UNAVAILABLE: 'storageUnavailable',
   AI_DISABLED_FOR_EVENT: 'aiDisabledForEvent',
@@ -50,6 +57,9 @@ export const API_ERROR_CODES = {
   CAPTIONS_TRANSCRIPT_NOT_TRANSLATABLE: 'captionsTranscriptNotTranslatable',
   SAME_LANGUAGE: 'sameLanguage',
   MT_UNAVAILABLE: 'mtUnavailable',
+  RECORDING_DESTINATION_NOT_COVERED: 'recordingDestinationNotCovered',
+  RECORDING_CONTENT_ORGANIZER_ONLY: 'recordingContentOrganizerOnly',
+  RECORDING_RETENTION_LEGACY: 'recordingRetentionLegacy',
 } as const satisfies Record<string, ApiErrorKey>;
 
 const PER_STATO: Partial<Record<number, ApiErrorKey>> = {

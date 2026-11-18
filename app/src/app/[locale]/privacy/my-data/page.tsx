@@ -20,10 +20,20 @@ import {
   CardBody,
 } from 'design-react-kit';
 
-import RegistrationConsents, { type ConsensiVista } from '@/components/privacy/registration-consents';
+import RecordingRemoval, { type RimozioneVista } from '@/components/privacy/recording-removal';
+import RegistrationCancel from '@/components/privacy/registration-cancel';
+import RegistrationEdit, { type DatiCorretti } from '@/components/privacy/registration-edit';
+import RegistrationNickname from '@/components/privacy/registration-nickname';
+import RegistrationConsents, {
+  type ConsensiVista,
+  type OffertaVista,
+} from '@/components/privacy/registration-consents';
+import RetainedConsentProofs, {
+  type ProvaConservataVista,
+} from '@/components/privacy/retained-consent-proofs';
 import { Icon } from '@/components/ui/icon';
 import { Link, percorso } from '@/i18n/navigation';
-import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import type { PartecipantiNelVideo } from '@/lib/live/consent-rule';
 import { localizedPath } from '@/lib/utils/localized-url';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
@@ -37,7 +47,13 @@ interface ExportEventData {
 interface ExportRegistration {
   id: string;
   consents: ConsensiVista;
+  /** I consensi che si possono dare di nuovo da qui, con il loro testo. */
+  consentOffer?: OffertaVista;
   displayName: string;
+  /** Il nickname scelto per l'evento, se c'e'. */
+  nickname?: string | null;
+  /** L'evento accetta nickname nuovi: la pagina lo fa scegliere o cambiare. */
+  nicknameEditable?: boolean;
   email: string | null;
   organization: string | null;
   organizationRole: string | null;
@@ -48,6 +64,8 @@ interface ExportRegistration {
   consentFutureCommunications: boolean;
   registeredAt: string;
   joinedAt: string | null;
+  /** Se si puo' chiedere di non comparire nella registrazione dell'evento, e le richieste fatte. */
+  recordingRemoval?: RimozioneVista;
 }
 
 interface ExportQuestion {
@@ -82,6 +100,27 @@ interface ExportGrant {
   event: { title: Record<string, string>; startsAt: string };
 }
 
+/** Un consenso dato entrando in sala con un ruolo nell'evento. */
+interface ExportRoomProof {
+  kind: 'recording' | 'transcription';
+  givenAt: string;
+  withdrawnAt: string | null;
+  superseded: boolean;
+  event: { title: Record<string, string>; startsAt: string };
+}
+
+/** La voce di rubrica: dura oltre le iscrizioni, e arriva a parte. */
+interface ExportAddressBook {
+  name: string | null;
+  email: string | null;
+  organization: string | null;
+  optedIn: boolean;
+  optedOutAt: string | null;
+  expiresAt: string | null;
+  /** Vale per la pagina di uscita dalla rubrica. */
+  optOutToken: string | null;
+}
+
 const GRANT_ROLE_KEY = {
   organizer: 'grantRoleOrganizer',
   moderator: 'grantRoleModerator',
@@ -90,6 +129,8 @@ const GRANT_ROLE_KEY = {
 
 export default function MyDataPage() {
   const t = useTranslations('gdpr.export');
+  const tCancellazione = useTranslations('gdpr.erasure');
+  const tConsensi = useTranslations('live.consents');
   const locale = useLocale();
   const searchParams = useSearchParams();
 
@@ -102,10 +143,18 @@ export default function MyDataPage() {
   const [photo, setPhoto] = useState<{ uploadedAt: string; dataUrl: string } | null>(null);
   // I ruoli negli eventi: anche chi non si è mai iscritto può averne.
   const [grants, setGrants] = useState<ExportGrant[]>([]);
+  const [proveInSala, setProveInSala] = useState<ExportRoomProof[]>([]);
+  const [rubrica, setRubrica] = useState<ExportAddressBook | null>(null);
+  // Le prove restate dopo la cancellazione delle iscrizioni.
+  const [prove, setProve] = useState<ProvaConservataVista[]>([]);
   // Il token per ritirare un consenso: lo consegna la lettura dei dati.
   const [tokenConsensi, setTokenConsensi] = useState<string | null>(null);
-  const [voce, setVoce] = useState<VoceNelVideo>('rimovibile');
+  const [partecipanti, setPartecipanti] = useState<PartecipantiNelVideo>('solo-voce');
   const [comunicazioniRitirateIl, setComunicazioniRitirateIl] = useState<string | null>(null);
+  const [rubricaConfermata, setRubricaConfermata] = useState(false);
+  // Le iscrizioni cancellate da qui, con le prove rimaste senza nome: la scheda
+  // resta per dirlo, senza piu' dati.
+  const [cancellate, setCancellate] = useState<Map<string, number>>(new Map());
   const format = useFormatter();
 
   // When the user lands here via the signed link emailed to them, the
@@ -119,6 +168,7 @@ export default function MyDataPage() {
       setLoading(true);
       setError('');
       setComunicazioniRitirateIl(null);
+      setRubricaConfermata(false);
       try {
         const res = await fetch(
           `/api/gdpr/export?t=${encodeURIComponent(token)}`,
@@ -141,8 +191,11 @@ export default function MyDataPage() {
         setResults(json.data);
         setPhoto(json.profilePhoto ?? null);
         setGrants(Array.isArray(json.grants) ? json.grants : []);
+        setProveInSala(Array.isArray(json.roomConsentProofs) ? json.roomConsentProofs : []);
+        setRubrica(json.addressBook ?? null);
+        setProve(Array.isArray(json.retainedConsentProofs) ? json.retainedConsentProofs : []);
         setTokenConsensi(typeof json.consentsToken === 'string' ? json.consentsToken : null);
-        if (json.voiceInVideo) setVoce(json.voiceInVideo);
+        if (json.participantsInVideo) setPartecipanti(json.participantsInVideo);
       } catch {
         if (!cancelled) setError(t('error'));
       } finally {
@@ -153,6 +206,46 @@ export default function MyDataPage() {
       cancelled = true;
     };
   }, [token, t]);
+
+  // Una correzione si vede subito: sull'iscrizione, o su tutte quelle
+  // dell'indirizzo e sulla voce di rubrica.
+  const corretta = useCallback((registrationId: string, dati: DatiCorretti) => {
+    const nuovi = { displayName: dati.displayName, organization: dati.organization };
+    setResults((prima) =>
+      prima
+        ? prima.map((e) =>
+            dati.scope === 'address' || e.registration.id === registrationId
+              ? { ...e, registration: { ...e.registration, ...nuovi } }
+              : e
+          )
+        : prima
+    );
+    if (dati.scope === 'address') {
+      setRubrica((prima) =>
+        prima?.optedIn ? { ...prima, name: dati.displayName, organization: dati.organization } : prima
+      );
+    }
+  }, []);
+
+  // Il nickname cambiato o tolto si vede subito nei dati dell'iscrizione.
+  const nicknameCambiato = useCallback((registrationId: string, nickname: string | null) => {
+    setResults((prima) =>
+      prima
+        ? prima.map((e) =>
+            e.registration.id === registrationId
+              ? { ...e, registration: { ...e.registration, nickname } }
+              : e
+          )
+        : prima
+    );
+  }, []);
+
+  // La conferma di una spunta in attesa, o le comunicazioni ridate, riportano
+  // l'indirizzo in rubrica: la voce mostrata sopra non dice piu' che ne e' uscito.
+  const rientroInRubrica = useCallback(() => {
+    setRubricaConfermata(true);
+    setRubrica((prima) => (prima ? { ...prima, optedIn: true, optedOutAt: null } : prima));
+  }, []);
 
   const handleSubmit = useCallback(
     async (e: FormEvent) => {
@@ -346,12 +439,101 @@ export default function MyDataPage() {
             </Card>
           )}
 
-          {results !== null && results.length === 0 && !photo && grants.length === 0 && (
-            <Alert color="info">
-              <Icon icon="it-info-circle" className="me-2" />
-              {t('noData')}
-            </Alert>
+          {proveInSala.length > 0 && (
+            <Card className="shadow-sm border-0 mb-4" style={{ borderRadius: 8, border: '1px solid #e8e8e8' }}>
+              <CardBody className="p-4">
+                <h2 className="h5 mb-1">{t('roomProofsTitle')}</h2>
+                <p className="text-muted mb-3" style={{ fontSize: '0.9rem' }}>
+                  {t('roomProofsIntro')}
+                </p>
+                <ul className="list-unstyled mb-0" style={{ fontSize: '0.9rem' }}>
+                  {proveInSala.map((p, i) => (
+                    <li key={i} className="mb-3">
+                      <div className="fw-semibold">
+                        {getLocalized(p.event.title as LocalizedField, locale)}
+                      </div>
+                      <div>{tConsensi(`${p.kind}.title`)}</div>
+                      <div className="text-muted">
+                        {t('proofGivenOn', {
+                          date: format.dateTime(new Date(p.givenAt), { dateStyle: 'long' }),
+                        })}
+                        {p.withdrawnAt && (
+                          <>
+                            {' · '}
+                            {t('consentWithdrawnOn', {
+                              date: format.dateTime(new Date(p.withdrawnAt), { dateStyle: 'long' }),
+                            })}
+                          </>
+                        )}
+                        {p.superseded && <> · {t('proofSuperseded')}</>}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </CardBody>
+            </Card>
           )}
+
+          {rubrica && (
+            <Card className="shadow-sm border-0 mb-4" style={{ borderRadius: 8, border: '1px solid #e8e8e8' }}>
+              <CardBody className="p-4">
+                <h2 className="h5 mb-1">{t('addressBookTitle')}</h2>
+                {rubrica.expiresAt && (
+                  <p className="text-muted mb-3" style={{ fontSize: '0.9rem' }}>
+                    {t('addressBookIntro', {
+                      date: format.dateTime(new Date(rubrica.expiresAt), { dateStyle: 'long' }),
+                    })}
+                  </p>
+                )}
+                <dl className="row mb-3" style={{ fontSize: '0.9rem' }}>
+                  <dt className="col-sm-4">{t('fieldName')}</dt>
+                  <dd className="col-sm-8">{rubrica.name ?? '—'}</dd>
+                  <dt className="col-sm-4">{t('fieldEmail')}</dt>
+                  <dd className="col-sm-8">{rubrica.email ?? '—'}</dd>
+                  {rubrica.organization && (
+                    <>
+                      <dt className="col-sm-4">{t('fieldOrganization')}</dt>
+                      <dd className="col-sm-8">{rubrica.organization}</dd>
+                    </>
+                  )}
+                </dl>
+                {!rubrica.optedIn && rubrica.optedOutAt && (
+                  <p className="text-muted mb-0" style={{ fontSize: '0.9rem' }}>
+                    {t('consentWithdrawnOn', {
+                      date: format.dateTime(new Date(rubrica.optedOutAt), { dateStyle: 'long' }),
+                    })}
+                  </p>
+                )}
+                {rubrica.optOutToken && (
+                  <Link
+                    className="btn btn-outline-primary btn-sm"
+                    href={percorso(
+                      `/rubrica/opt-out?token=${encodeURIComponent(rubrica.optOutToken)}`,
+                    )}
+                  >
+                    {t('addressBookOptOut')}
+                  </Link>
+                )}
+              </CardBody>
+            </Card>
+          )}
+
+          {prove.length > 0 && tokenConsensi && (
+            <RetainedConsentProofs token={tokenConsensi} prove={prove} />
+          )}
+
+          {results !== null &&
+            results.length === 0 &&
+            !photo &&
+            grants.length === 0 &&
+            proveInSala.length === 0 &&
+            !rubrica &&
+            prove.length === 0 && (
+              <Alert color="info">
+                <Icon icon="it-info-circle" className="me-2" />
+                {t('noData')}
+              </Alert>
+            )}
 
           {results !== null && results.length > 0 && (
             <div>
@@ -360,9 +542,32 @@ export default function MyDataPage() {
                 {t('resultsDescription', { count: results.length })}
               </p>
 
-              {results.map((entry, idx) => (
+              {results.map((entry) =>
+                cancellate.has(entry.registration.id) ? (
+                  <Card
+                    key={entry.registration.id}
+                    className="shadow-sm border-0 mb-3"
+                    style={{ borderRadius: 8, border: '1px solid #e8e8e8' }}
+                  >
+                    <CardBody className="p-4">
+                      <h3 className="h5 mb-3">
+                        {getLocalized(entry.event.title as LocalizedField, locale)}
+                      </h3>
+                      <Alert color="success" className="mb-0" role="status">
+                        <p className="mb-0">{t('cancelDone')}</p>
+                        {(cancellate.get(entry.registration.id) ?? 0) > 0 && (
+                          <p className="mb-0 mt-2">
+                            {tCancellazione('doneProofs', {
+                              count: cancellate.get(entry.registration.id) ?? 0,
+                            })}
+                          </p>
+                        )}
+                      </Alert>
+                    </CardBody>
+                  </Card>
+                ) : (
                 <Card
-                  key={idx}
+                  key={entry.registration.id}
                   className="shadow-sm border-0 mb-3"
                   style={{ borderRadius: 8, border: '1px solid #e8e8e8' }}
                 >
@@ -376,6 +581,12 @@ export default function MyDataPage() {
                     <dl className="row mb-3" style={{ fontSize: '0.9rem' }}>
                       <dt className="col-sm-4">{t('fieldName')}</dt>
                       <dd className="col-sm-8">{entry.registration.displayName}</dd>
+                      {entry.registration.nickname && (
+                        <>
+                          <dt className="col-sm-4">{t('fieldNickname')}</dt>
+                          <dd className="col-sm-8">{entry.registration.nickname}</dd>
+                        </>
+                      )}
                       <dt className="col-sm-4">{t('fieldEmail')}</dt>
                       <dd className="col-sm-8">{entry.registration.email ?? '—'}</dd>
                       {entry.registration.organization && (
@@ -397,13 +608,48 @@ export default function MyDataPage() {
                     </dl>
 
                     {tokenConsensi && (
+                      <RegistrationEdit
+                        token={tokenConsensi}
+                        registrationId={entry.registration.id}
+                        displayName={entry.registration.displayName}
+                        organization={entry.registration.organization}
+                        quanteIscrizioni={results.length - cancellate.size}
+                        locale={locale}
+                        onCorretta={(dati) => corretta(entry.registration.id, dati)}
+                      />
+                    )}
+
+                    {tokenConsensi && (
+                      <RegistrationNickname
+                        token={tokenConsensi}
+                        registrationId={entry.registration.id}
+                        nickname={entry.registration.nickname ?? null}
+                        modificabile={!!entry.registration.nicknameEditable}
+                        locale={locale}
+                        onCambiato={(n) => nicknameCambiato(entry.registration.id, n)}
+                      />
+                    )}
+
+                    {tokenConsensi && (
                       <RegistrationConsents
                         token={tokenConsensi}
                         registrationId={entry.registration.id}
                         consensi={entry.registration.consents}
-                        voce={voce}
+                        partecipanti={partecipanti}
                         comunicazioniRitirateIl={comunicazioniRitirateIl}
                         onComunicazioniRitirate={setComunicazioniRitirateIl}
+                        rubricaConfermata={rubricaConfermata}
+                        onRubricaConfermata={rientroInRubrica}
+                        offerta={entry.registration.consentOffer ?? null}
+                        locale={locale}
+                      />
+                    )}
+
+                    {tokenConsensi && entry.registration.recordingRemoval && (
+                      <RecordingRemoval
+                        token={tokenConsensi}
+                        registrationId={entry.registration.id}
+                        rimozione={entry.registration.recordingRemoval}
                       />
                     )}
 
@@ -442,9 +688,25 @@ export default function MyDataPage() {
                         </ul>
                       </>
                     )}
+
+                    {tokenConsensi && (
+                      <div className="mt-3">
+                        <RegistrationCancel
+                          token={tokenConsensi}
+                          registrationId={entry.registration.id}
+                          locale={locale}
+                          onCancellata={(prove) =>
+                            setCancellate((prima) =>
+                              new Map(prima).set(entry.registration.id, prove)
+                            )
+                          }
+                        />
+                      </div>
+                    )}
                   </CardBody>
                 </Card>
-              ))}
+                )
+              )}
             </div>
           )}
         </div>

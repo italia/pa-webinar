@@ -20,6 +20,22 @@ describe('chiavi rinominate', () => {
     });
   });
 
+  it('una variante eredita la personalizzazione del testo di partenza', () => {
+    const variante = 'waiting.recordingConsentIntroAnonymous';
+    expect(conChiaviRinominate({ 'live.recordingConsent': 'Testo dell’ente' })[variante]).toBe(
+      'Testo dell’ente',
+    );
+    expect(
+      conChiaviRinominate({ 'waiting.recordingConsentIntro': 'Testo dell’ente' })[variante],
+    ).toBe('Testo dell’ente');
+    expect(
+      conChiaviRinominate({
+        'waiting.recordingConsentIntro': 'Testo dell’ente',
+        [variante]: 'Testo per gli anonimi',
+      })[variante],
+    ).toBe('Testo per gli anonimi');
+  });
+
   it('una personalizzazione del nome nuovo vince su quella del vecchio', () => {
     const out = conChiaviRinominate({
       'live.recordingConsent': 'Vecchio',

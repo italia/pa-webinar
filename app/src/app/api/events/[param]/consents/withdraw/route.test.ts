@@ -72,8 +72,23 @@ describe('POST consents/withdraw', () => {
     });
     expect(ritira).toHaveBeenCalledWith('e1', ['guest-a', 'mod-e1-b'], {
       registrazione: true,
+      trascrizione: true,
     });
     expect(res.headers.get('Cache-Control')).toBe('no-store');
+  });
+
+  it('dove chi partecipa non entra nel video la registrazione si ritira da sola', async () => {
+    vi.stubEnv('RECORDING_VOICE_EXCLUSION', 'true');
+    vi.stubEnv('RECORDING_PARTICIPANT_VOICE', '');
+    try {
+      await post({ roomTokens: [await tokenSala('guest-a')], recording: true });
+      expect(ritira).toHaveBeenCalledWith('e1', ['guest-a'], {
+        registrazione: true,
+        trascrizione: false,
+      });
+    } finally {
+      vi.unstubAllEnvs();
+    }
   });
 
   it("i token di un'altra stanza o non firmati dal portale non provano niente", async () => {
@@ -93,7 +108,10 @@ describe('POST consents/withdraw', () => {
       ],
       recording: false,
     });
-    expect(ritira).toHaveBeenCalledWith('e1', ['guest-a'], { registrazione: false });
+    expect(ritira).toHaveBeenCalledWith('e1', ['guest-a'], {
+      registrazione: false,
+      trascrizione: true,
+    });
   });
 
   it('corpo non valido: 422, nessun ritiro', async () => {

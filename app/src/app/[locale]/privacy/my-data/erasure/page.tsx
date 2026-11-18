@@ -31,6 +31,7 @@ export default function ErasurePage() {
   const [error, setError] = useState('');
   const [deletedCount, setDeletedCount] = useState(0);
   const [grantsDeleted, setGrantsDeleted] = useState(0);
+  const [proofsKept, setProofsKept] = useState(0);
 
   const handleRequest = useCallback(
     async (e: FormEvent) => {
@@ -90,6 +91,7 @@ export default function ErasurePage() {
       const json = await res.json();
       setDeletedCount(typeof json.deleted === 'number' ? json.deleted : 0);
       setGrantsDeleted(typeof json.grantsDeleted === 'number' ? json.grantsDeleted : 0);
+      setProofsKept(typeof json.consentProofsKept === 'number' ? json.consentProofsKept : 0);
       setPhase('confirmed');
     } catch {
       setError(t('error'));
@@ -151,6 +153,7 @@ export default function ErasurePage() {
                   {t('confirmWarning')}
                 </Alert>
                 <p>{t('confirmBody')}</p>
+                <p>{t('confirmProofs')}</p>
                 <div className="d-flex gap-2 mt-3">
                   <Button color="danger" onClick={handleConfirm}>
                     {t('confirmButton')}
@@ -176,6 +179,9 @@ export default function ErasurePage() {
               <p className="mb-0">{t('doneBody', { count: deletedCount })}</p>
               {grantsDeleted > 0 && (
                 <p className="mb-0 mt-2">{t('doneGrants', { count: grantsDeleted })}</p>
+              )}
+              {proofsKept > 0 && (
+                <p className="mb-0 mt-2">{t('doneProofs', { count: proofsKept })}</p>
               )}
             </Alert>
           )}

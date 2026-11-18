@@ -4,6 +4,11 @@
 import { prisma } from '@/lib/db';
 import { iscrizioneDelPosto } from '@/lib/captions/room';
 import { bloccaTrascrizioneEvento, togliPersoneDalleTrascrizioni } from '@/lib/captions/transcript';
+import { TIMEOUT_DOPO_PULIZIA_MS } from '@/lib/gdpr/cleanup-selection';
+import { improntaTitolare, titolareAccount } from '@/lib/gdpr/consent-proofs';
+import { ritiraProveDelleIscrizioni } from '@/lib/gdpr/retained-consent-proofs';
+import { fermaInviti } from '@/lib/persons/inviti-fermati';
+import { getSettings } from '@/lib/settings';
 
 /**
  * Il ritiro dalla sala dei consensi dati per un evento (art. 7.3 GDPR: si
@@ -15,8 +20,8 @@ import { bloccaTrascrizioneEvento, togliPersoneDalleTrascrizioni } from '@/lib/c
  *   - l'iscrizione, per chi e' entrato dal proprio link: il consenso dato
  *     all'iscrizione e le prove legate all'iscrizione, di ogni ingresso;
  *   - per chi conduce dal link primario con la sessione del proprio account,
- *     l'account dello staff a cui e' legata la prova della registrazione, con
- *     i posti degli ingressi precedenti;
+ *     l'account dello staff a cui sono legate le prove della registrazione e
+ *     della trascrizione, con i posti degli ingressi precedenti;
  *   - per gli altri (ospiti, link inoltrati, concessioni nominali), le prove
  *     dei posti dati. Una concessione nominale e' un posto, non una persona:
  *     il link si puo' inoltrare, e il ritiro di chi lo apre non tocca i
@@ -25,14 +30,19 @@ import { bloccaTrascrizioneEvento, togliPersoneDalleTrascrizioni } from '@/lib/c
  * Cosa cambia:
  *   - la registrazione dell'evento (`registrazione`): la prova resta, con
  *     l'ora del ritiro, e il consenso non vale piu'; con esso si ritira anche
- *     quello alla trascrizione, che senza registrazione non ha luogo;
- *   - la trascrizione dei propri interventi (sempre): le frasi dei sottotitoli
+ *     quello alla trascrizione, che senza registrazione non ha luogo, salvo
+ *     dove chi partecipa non entra mai nel video (`trascrizione: false`, da
+ *     lib/live/consent-rule `ritiroPortaTrascrizione`);
+ *   - la trascrizione dei propri interventi (salvo `trascrizione: false`): le frasi dei sottotitoli
  *     gia' salvate perdono testo, nome e posto (ne restano i tempi, come per
  *     chi non ha acconsentito), e le tracce audio per persona non passano piu'
  *     alla trascrizione (lib/captions/room endpointRitirati).
  *
  * Lo stesso ritiro si fa dalla pagina dei propri dati (POST /api/gdpr/consents):
  * li' non ci sono posti, si parte dall'iscrizione provata dal link firmato.
+ *
+ * Un ritiro che ha letto l'iscrizione mentre la pulizia dello stesso evento la
+ * cancellava aspetta il suo turno e vale sulla prova che la pulizia ha conservato.
  *
  * Ogni ritiro lascia una riga nel registro GDPR dell'evento
  * (`CONSENT_WITHDRAWN`, senza dati personali): quante prove, e quando.
@@ -55,184 +65,258 @@ export interface OpzioniRitiro {
   origine?: 'room' | 'self-service';
 }
 
+/**
+ * Cosa si ritira: la registrazione, se `registrazione`, e la trascrizione dei
+ * propri interventi, salvo `trascrizione: false` (solo con `registrazione`).
+ */
+export interface DaRitirare {
+  registrazione: boolean;
+  trascrizione?: boolean;
+}
+
 export async function ritiraConsensi(
   eventId: string,
   posti: readonly string[],
-  cosa: { registrazione: boolean },
+  cosa: DaRitirare,
   adesso: Date = new Date(),
   { iscrizioni: dalleIscrizioni = [], origine = 'room' }: OpzioniRitiro = {}
 ): Promise<EsitoRitiro> {
   if (posti.length === 0 && dalleIscrizioni.length === 0) {
     return { registrazione: false, trascrizione: false };
   }
-  return prisma.$transaction(async (tx) => {
-    // In fila con le costruzioni della trascrizione e con le cancellazioni, per
-    // prima cosa: una gia' partita non rimette le frasi tolte qui sotto, e nessuno
-    // aspetta tenendo le righe che servono all'altro.
-    await bloccaTrascrizioneEvento(tx, eventId);
-    // Le prove della registrazione dei posti dati: portano l'iscrizione, la
-    // concessione nominale o l'account dello staff.
-    const proveDeiPosti = await tx.recordingConsent.findMany({
-      where: { eventId, jitsiUserId: { in: [...posti] } },
-      select: { registrationId: true, staffAccountId: true },
-    });
-    const iscrizioni = new Set<string>(dalleIscrizioni);
-    for (const p of posti) {
-      const r = iscrizioneDelPosto(p);
-      if (r) iscrizioni.add(r);
-    }
-    const tracceDeiPosti = await tx.multitrackConsent.findMany({
-      where: { eventId, jitsiUserId: { in: [...posti] }, registrationId: { not: null } },
-      select: { registrationId: true },
-    });
-    for (const p of [...proveDeiPosti, ...tracceDeiPosti]) {
-      if (p.registrationId) iscrizioni.add(p.registrationId);
-    }
-    const account = [
-      ...new Set(
-        proveDeiPosti.map((p) => p.staffAccountId).filter((v): v is string => !!v)
-      ),
-    ];
-    // I posti degli ingressi precedenti dello staff dietro il link primario:
-    // le prove della registrazione li legano allo stesso account.
-    const postiConduce =
-      account.length > 0
-        ? await tx.recordingConsent.findMany({
-            where: { eventId, staffAccountId: { in: account } },
-            select: { jitsiUserId: true },
-          })
-        : [];
-    const tuttiIPosti = [
-      ...new Set([...posti, ...postiConduce.map((p) => p.jitsiUserId)]),
-    ];
-    const listaIscrizioni = [...iscrizioni];
-
-    let proveRegistrazione = 0;
-    if (cosa.registrazione) {
-      const prove = await tx.recordingConsent.updateMany({
-        where: {
-          eventId,
-          withdrawnAt: null,
-          OR: [
-            { jitsiUserId: { in: tuttiIPosti } },
-            ...(listaIscrizioni.length > 0
-              ? [{ registrationId: { in: listaIscrizioni } }]
-              : []),
-            ...(account.length > 0 ? [{ staffAccountId: { in: account } }] : []),
-          ],
-        },
-        data: { withdrawnAt: adesso },
+  // Senza la registrazione da ritirare resta solo la trascrizione: c'e' sempre.
+  const conTrascrizione = !cosa.registrazione || cosa.trascrizione !== false;
+  return prisma.$transaction(
+    async (tx) => {
+      // In fila con le costruzioni della trascrizione e con le cancellazioni, per
+      // prima cosa: una gia' partita non rimette le frasi tolte qui sotto, e nessuno
+      // aspetta tenendo le righe che servono all'altro.
+      await bloccaTrascrizioneEvento(tx, eventId);
+      // Le prove dei posti dati: portano l'iscrizione o l'account dello staff.
+      const proveDeiPosti = await tx.recordingConsent.findMany({
+        where: { eventId, jitsiUserId: { in: [...posti] } },
+        select: { registrationId: true, staffAccountId: true },
       });
-      const dateAllIscrizione =
-        listaIscrizioni.length > 0
+      const iscrizioni = new Set<string>(dalleIscrizioni);
+      for (const p of posti) {
+        const r = iscrizioneDelPosto(p);
+        if (r) iscrizioni.add(r);
+      }
+      const tracceDeiPosti = await tx.multitrackConsent.findMany({
+        where: { eventId, jitsiUserId: { in: [...posti] } },
+        select: { registrationId: true, staffAccountId: true },
+      });
+      for (const p of [...proveDeiPosti, ...tracceDeiPosti]) {
+        if (p.registrationId) iscrizioni.add(p.registrationId);
+      }
+      const account = [
+        ...new Set(
+          [...proveDeiPosti, ...tracceDeiPosti]
+            .map((p) => p.staffAccountId)
+            .filter((v): v is string => !!v)
+        ),
+      ];
+      // I posti degli ingressi precedenti dello staff dietro il link primario:
+      // le prove, di una tabella o dell'altra, li legano allo stesso account.
+      const delleProve = { where: { eventId, staffAccountId: { in: account } } };
+      const scelta = { select: { jitsiUserId: true } };
+      const postiConduce =
+        account.length > 0
+          ? [
+              ...(await tx.recordingConsent.findMany({ ...delleProve, ...scelta })),
+              ...(await tx.multitrackConsent.findMany({ ...delleProve, ...scelta })),
+            ]
+          : [];
+      const tuttiIPosti = [
+        ...new Set([...posti, ...postiConduce.map((p) => p.jitsiUserId)]),
+      ];
+      const listaIscrizioni = [...iscrizioni];
+
+      let proveRegistrazione = 0;
+      if (cosa.registrazione) {
+        const prove = await tx.recordingConsent.updateMany({
+          where: {
+            eventId,
+            withdrawnAt: null,
+            OR: [
+              { jitsiUserId: { in: tuttiIPosti } },
+              ...(listaIscrizioni.length > 0
+                ? [{ registrationId: { in: listaIscrizioni } }]
+                : []),
+              ...(account.length > 0 ? [{ staffAccountId: { in: account } }] : []),
+            ],
+          },
+          data: { withdrawnAt: adesso },
+        });
+        const dateAllIscrizione =
+          listaIscrizioni.length > 0
+            ? await tx.registration.updateMany({
+                where: {
+                  eventId,
+                  id: { in: listaIscrizioni },
+                  consentRecording: true,
+                  consentRecordingWithdrawnAt: null,
+                },
+                data: { consentRecordingWithdrawnAt: adesso },
+              })
+            : { count: 0 };
+        proveRegistrazione = prove.count + dateAllIscrizione.count;
+      }
+
+      const proveTracce = conTrascrizione
+        ? await tx.multitrackConsent.updateMany({
+            where: {
+              eventId,
+              withdrawnAt: null,
+              OR: [
+                { jitsiUserId: { in: tuttiIPosti } },
+                ...(listaIscrizioni.length > 0
+                  ? [{ registrationId: { in: listaIscrizioni } }]
+                  : []),
+                ...(account.length > 0 ? [{ staffAccountId: { in: account } }] : []),
+              ],
+            },
+            data: { withdrawnAt: adesso },
+          })
+        : { count: 0 };
+      const tracceAllIscrizione =
+        conTrascrizione && listaIscrizioni.length > 0
           ? await tx.registration.updateMany({
               where: {
                 eventId,
                 id: { in: listaIscrizioni },
-                consentRecording: true,
-                consentRecordingWithdrawnAt: null,
+                consentMultitrack: true,
+                consentMultitrackWithdrawnAt: null,
               },
-              data: { consentRecordingWithdrawnAt: adesso },
+              data: { consentMultitrackWithdrawnAt: adesso },
             })
           : { count: 0 };
-      proveRegistrazione = prove.count + dateAllIscrizione.count;
-    }
-
-    const proveTracce = await tx.multitrackConsent.updateMany({
-      where: {
-        eventId,
-        withdrawnAt: null,
-        OR: [
-          { jitsiUserId: { in: tuttiIPosti } },
-          ...(listaIscrizioni.length > 0
-            ? [{ registrationId: { in: listaIscrizioni } }]
-            : []),
-        ],
-      },
-      data: { withdrawnAt: adesso },
-    });
-    const tracceAllIscrizione =
-      listaIscrizioni.length > 0
-        ? await tx.registration.updateMany({
+      // Dopo l'evento la trascrizione puo' essere gia' costruita: la persona se ne
+      // va anche da li'.
+      if (conTrascrizione && (listaIscrizioni.length > 0 || account.length > 0)) {
+        await togliPersoneDalleTrascrizioni(
+          tx,
+          [eventId],
+          listaIscrizioni,
+          account.map((a) => improntaTitolare(eventId, titolareAccount(a)))
+        );
+      }
+      // Le frasi dei sottotitoli gia' salvate: restano i tempi, come per chi
+      // non ha acconsentito (lib/captions/transcript).
+      const frasi = conTrascrizione
+        ? await tx.captionSegment.updateMany({
             where: {
               eventId,
-              id: { in: listaIscrizioni },
-              consentMultitrack: true,
-              consentMultitrackWithdrawnAt: null,
+              OR: [
+                { seatId: { in: tuttiIPosti } },
+                ...listaIscrizioni.map((r) => ({ seatId: { startsWith: `reg-${r}-` } })),
+              ],
             },
-            data: { consentMultitrackWithdrawnAt: adesso },
+            data: { seatId: null, speakerName: null, text: null },
           })
         : { count: 0 };
-    // Dopo l'evento la trascrizione puo' essere gia' costruita: la persona se ne
-    // va anche da li'.
-    if (listaIscrizioni.length > 0) {
-      await togliPersoneDalleTrascrizioni(tx, [eventId], listaIscrizioni);
-    }
-    // Le frasi dei sottotitoli gia' salvate: restano i tempi, come per chi
-    // non ha acconsentito (lib/captions/transcript).
-    const frasi = await tx.captionSegment.updateMany({
-      where: {
-        eventId,
-        OR: [
-          { seatId: { in: tuttiIPosti } },
-          ...listaIscrizioni.map((r) => ({ seatId: { startsWith: `reg-${r}-` } })),
-        ],
-      },
-      data: { seatId: null, speakerName: null, text: null },
-    });
-    const proveTrascrizione = proveTracce.count + tracceAllIscrizione.count;
-    if (proveRegistrazione + proveTrascrizione + frasi.count > 0) {
-      await tx.gdprAuditLog.create({
-        data: {
-          eventId,
-          action: 'CONSENT_WITHDRAWN',
-          recordCount: proveRegistrazione + proveTrascrizione,
-          details: JSON.stringify({
-            source: origine,
-            recording: proveRegistrazione,
-            transcription: proveTrascrizione,
-            captionSegmentsCleared: frasi.count,
-          }),
-        },
-      });
-    }
-    return { registrazione: proveRegistrazione > 0, trascrizione: proveTrascrizione > 0 };
-  });
+      // Le iscrizioni possono essere gia' cancellate da una pulizia che ha preso il
+      // turno prima: restano le prove che ha copiato.
+      const conservate =
+        listaIscrizioni.length > 0
+          ? await ritiraProveDelleIscrizioni(
+              tx,
+              eventId,
+              listaIscrizioni,
+              { registrazione: cosa.registrazione, trascrizione: conTrascrizione },
+              adesso
+            )
+          : { recording: 0, transcription: 0 };
+      proveRegistrazione += conservate.recording;
+      const proveTrascrizione =
+        proveTracce.count + tracceAllIscrizione.count + conservate.transcription;
+      if (proveRegistrazione + proveTrascrizione + frasi.count > 0) {
+        await tx.gdprAuditLog.create({
+          data: {
+            eventId,
+            action: 'CONSENT_WITHDRAWN',
+            recordCount: proveRegistrazione + proveTrascrizione,
+            details: JSON.stringify({
+              source: origine,
+              recording: proveRegistrazione,
+              transcription: proveTrascrizione,
+              captionSegmentsCleared: frasi.count,
+            }),
+          },
+        });
+      }
+      return { registrazione: proveRegistrazione > 0, trascrizione: proveTrascrizione > 0 };
+    },
+    { timeout: TIMEOUT_DOPO_PULIZIA_MS }
+  );
 }
 
 /**
  * Il ritiro del consenso alle comunicazioni future, dalla pagina dei propri
  * dati o dal link delle email (api/rubrica/opt-out). La stessa casella
  * dell'iscrizione copre comunicazioni e rubrica: si tolgono entrambe, su ogni
- * iscrizione dell'indirizzo, e il registro lo annota per ogni evento toccato.
+ * iscrizione dell'indirizzo, e il registro lo annota per ogni evento toccato, con
+ * le spunte in attesa di conferma che il ritiro annulla.
+ * Il segno del ritiro va su tutte le iscrizioni, anche su quelle senza la spunta:
+ * sopravvive alla voce di rubrica, e una spunta successiva lo trova
+ * (`indirizzoFermato`). La voce di rubrica perde subito l'email e gli inviti dell'indirizzo si fermano,
+ * anche quelli scritti a mano e le loro email in coda (`fermaInviti`): il resto
+ * della riga lo toglie la corsa successiva di api/cron/rubrica-retention. Se una
+ * spunta aspettava conferma (lib/persons/spunta-in-attesa), non vale piu'.
+ * Chi esce dalla rubrica senza nessuna di queste iscrizioni lascia comunque una
+ * riga nel registro, senza evento: la voce non appartiene a nessuno di loro.
  */
 export async function ritiraComunicazioni(
   emailHash: string,
   adesso: Date = new Date()
 ): Promise<boolean> {
+  const { publicRegistrationEnabled } = await getSettings();
   return prisma.$transaction(async (tx) => {
     const dove = { emailHash, consentFutureCommunications: true };
     const iscrizioni = await tx.registration.findMany({
-      where: dove,
-      select: { eventId: true },
-      distinct: ['eventId'],
+      where: { emailHash, OR: [{ consentFutureCommunications: true }, { addressBookPending: true }] },
+      select: { eventId: true, consentFutureCommunications: true, addressBookPending: true },
     });
     await tx.registration.updateMany({
       where: dove,
       data: { consentFutureCommunications: false, consentFutureCommunicationsWithdrawnAt: adesso },
     });
+    await tx.registration.updateMany({
+      where: { emailHash, consentFutureCommunicationsWithdrawnAt: null },
+      data: { consentFutureCommunicationsWithdrawnAt: adesso },
+    });
+    await tx.registration.updateMany({
+      where: { emailHash, addressBookPending: true },
+      data: { addressBookPending: false },
+    });
     const rubrica = await tx.person.updateMany({
       where: { emailHash, optedInToAddressBook: true },
-      data: { optedInToAddressBook: false, optedOutAt: adesso },
+      data: { optedInToAddressBook: false, optedOutAt: adesso, email: null },
     });
-    await tx.gdprAuditLog.createMany({
-      data: iscrizioni.map(({ eventId }) => ({
-        eventId,
+    await fermaInviti(
+      tx,
+      { OR: [{ emailHash }, { person: { emailHash } }] },
+      { adesso, publicRegistrationEnabled }
+    );
+    const righe = iscrizioni.map((r) => ({
+      eventId: r.eventId as string | null,
+      action: 'CONSENT_WITHDRAWN',
+      recordCount: 1,
+      details: JSON.stringify({
+        source: 'self-service',
+        futureCommunications: r.consentFutureCommunications ? 1 : 0,
+        ...(r.addressBookPending ? { addressBookPending: 1 } : {}),
+      }),
+    }));
+    if (righe.length === 0 && rubrica.count > 0) {
+      righe.push({
+        eventId: null,
         action: 'CONSENT_WITHDRAWN',
         recordCount: 1,
-        details: JSON.stringify({ source: 'self-service', futureCommunications: 1 }),
-      })),
-    });
+        details: JSON.stringify({ source: 'self-service', futureCommunications: 0, addressBook: 1 }),
+      });
+    }
+    await tx.gdprAuditLog.createMany({ data: righe });
     return iscrizioni.length > 0 || rubrica.count > 0;
   });
 }

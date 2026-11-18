@@ -5,17 +5,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/lib/db', () => ({
   prisma: {
+    event: { findUnique: vi.fn() },
     liveAction: { findMany: vi.fn() },
     question: { findMany: vi.fn() },
-    chatMessage: { findMany: vi.fn() },
     eventMaterial: { findMany: vi.fn() },
     wordCloudSubmission: { findMany: vi.fn() },
     $queryRaw: vi.fn(),
   },
-}));
-// Il testo della chat e' cifrato a riposo: nei test «cifrato:» lo simula.
-vi.mock('@/lib/crypto/pii', () => ({
-  tryDecryptPII: (v: string) => (v.startsWith('cifrato:') ? v.slice('cifrato:'.length) : null),
 }));
 
 import { prisma } from '@/lib/db';
@@ -29,7 +25,20 @@ import {
 } from './live-timeline';
 
 const T0 = new Date('2026-10-08T10:00:00Z');
+/** Un evento concluso che pubblica le domande. */
+const PUBBLICATE = {
+  status: 'ENDED',
+  eventType: 'SCHEDULED',
+  endsAt: new Date('2026-10-08T11:00:00Z'),
+  postEventPublic: true,
+  postEventPublicUntil: null,
+  postEventShowQA: true,
+  qaEnabled: true,
+  recordingDestination: 'PUBLIC',
+  recordingAudience: 'PUBLIC',
+};
 const at = (min: number, sec = 0) => new Date(T0.getTime() + min * 60_000 + sec * 1000);
+const evento = prisma.event.findUnique as unknown as ReturnType<typeof vi.fn>;
 const m = <K extends keyof typeof prisma>(k: K) =>
   (prisma[k] as unknown as { findMany: ReturnType<typeof vi.fn> }).findMany;
 const raw = prisma.$queryRaw as unknown as ReturnType<typeof vi.fn>;
@@ -38,9 +47,9 @@ let conteggi: Record<'chat_messages' | 'reactions' | 'live_actions', Array<{ b: 
 
 beforeEach(() => {
   vi.clearAllMocks();
+  evento.mockResolvedValue(PUBBLICATE);
   m('liveAction').mockResolvedValue([]);
   m('question').mockResolvedValue([]);
-  m('chatMessage').mockResolvedValue([]);
   m('eventMaterial').mockResolvedValue([]);
   m('wordCloudSubmission').mockResolvedValue([]);
   conteggi = { chat_messages: [], reactions: [], live_actions: [] };
@@ -185,19 +194,46 @@ describe('buildLiveTimeline', () => {
     expect(tl.entries[0]?.text).toBe('Risposte a «Una parola?»: fiducia (3)');
   });
 
-  it('le domande in chat: il testo decifrato, mai chi le ha scritte', async () => {
-    m('chatMessage').mockResolvedValueOnce([
-      { text: 'cifrato:Ci sara’ la registrazione?', createdAt: at(30) },
-      { text: 'illeggibile', createdAt: at(31) },
+  it('della chat non si legge il testo: solo i conteggi per finestra', async () => {
+    conteggi.chat_messages = [{ b: 6, n: 2 }];
+    const tl = await buildLiveTimeline({ eventId: 'e1', t0: T0, exact: true, until: at(60) });
+    expect(tl.entries).toEqual([
+      { offsetSec: 1800, kind: 'chat.activity', text: 'Chat: 2 messaggi in cinque minuti' },
+    ]);
+  });
+
+  it.each([
+    ['domande spente', { ...PUBBLICATE, postEventShowQA: false }],
+    ['Q&A mai acceso', { ...PUBBLICATE, qaEnabled: false }],
+    ['registrazione riservata', { ...PUBBLICATE, recordingDestination: 'REGISTRANTS' }],
+    ['video reso riservato', { ...PUBBLICATE, recordingAudience: 'REGISTRANTS' }],
+    ['pagina dopo l\'evento privata', { ...PUBBLICATE, postEventPublic: false }],
+    ['pagina dopo l\'evento scaduta', { ...PUBBLICATE, postEventPublicUntil: new Date('2026-10-09T00:00:00Z') }],
+    ['evento non trovato', null],
+  ])('con %s nessun testo di domanda, nemmeno dalle azioni', async (_caso, riga) => {
+    evento.mockResolvedValue(riga);
+    m('liveAction').mockResolvedValue([
+      { at: at(25), kind: 'question.status', data: { questionId: 'q1', status: 'HIGHLIGHTED' } },
+      { at: at(26), kind: 'question.status', data: { questionId: 'q1', status: 'ANSWERED', answered: true } },
+    ]);
+    m('question').mockResolvedValue([
+      { id: 'q1', text: 'Le slide?', answerText: 'Domani.', status: 'ANSWERED', createdAt: at(20) },
     ]);
     const tl = await buildLiveTimeline({ eventId: 'e1', t0: T0, exact: true, until: at(60) });
-    expect(tl.entries[0]).toEqual({
-      offsetSec: 1800,
-      kind: 'chat.question',
-      text: 'Domanda in chat: «Ci sara’ la registrazione?»',
-    });
-    const dove = m('chatMessage').mock.calls[0]?.[0] as { select: Record<string, boolean> };
-    expect(Object.keys(dove.select)).toEqual(['text', 'createdAt']);
+    expect(tl.entries).toEqual([]);
+  });
+
+  it('con le domande pubbliche le azioni riportano domanda e risposta', async () => {
+    m('liveAction').mockResolvedValue([
+      { at: at(26), kind: 'question.status', data: { questionId: 'q1', status: 'ANSWERED', answered: true } },
+    ]);
+    m('question').mockResolvedValue([
+      { id: 'q1', text: 'Le slide?', answerText: 'Domani.', status: 'ANSWERED', createdAt: at(70) },
+    ]);
+    const tl = await buildLiveTimeline({ eventId: 'e1', t0: T0, exact: true, until: at(60) });
+    expect(tl.entries).toEqual([
+      { offsetSec: 1560, kind: 'question.status', text: 'Risposta scritta alla domanda «Le slide?»: «Domani.»' },
+    ]);
   });
 
   it('i capitoli: l’agenda si legge dall’inizio dell’evento, fino alla fine della registrazione', async () => {
@@ -241,9 +277,7 @@ describe('buildLiveTimeline', () => {
     m('liveAction').mockResolvedValue([
       { at: at(5), kind: 'agenda.topic', data: { label: 'Uno', status: 'CURRENT' } },
     ]);
-    m('chatMessage').mockResolvedValueOnce(
-      Array.from({ length: 450 }, (_, i) => ({ text: `cifrato:Domanda ${i}`, createdAt: at(0, i) })),
-    );
+    conteggi.chat_messages = Array.from({ length: 450 }, (_, i) => ({ b: i, n: 1 }));
     const tl = await buildLiveTimeline({ eventId: 'e1', t0: T0, exact: true, until: at(60) });
     expect(tl.entries).toHaveLength(250);
     expect(tl.entries.some((e) => e.kind === 'agenda.topic')).toBe(true);

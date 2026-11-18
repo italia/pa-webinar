@@ -69,6 +69,7 @@ toolbar. The portal writes these claims into the tokens of an event (`app/src/li
 | `context.user.consentLock` | `true` in every token of an event with listen-only participants: the module refuses to switch the moderation off in that room |
 | `context.user.listenOnly` | `true` for a participant who entered without the recording consent: never admitted, and a moderator's approval for them is dropped before it reaches the moderation component |
 | `context.user.voiceExcluded` | `true` for whoever has no valid recording consent where the recording can leave them out: nothing changes in the room, moderators and speakers included. The module writes `hidden-from-recorder` into the identity of the person's presence, where the client can neither add nor remove it, and Jibri's session does not see them. It never goes into the JWT under that name: Jitsi would mute that person's microphone and camera |
+| `context.user.paInVideo` | `true` for whoever hosts (organizers, moderators, speakers): they appear in the recorded video with image and name. Every other session, one without a token included, gets `hidden-from-recorder` in its presence, so Jibri's session never shows it; a participant without `voiceExcluded` or `listenOnly` also gets `pa-recorder-voice`, and the chart's conference text plays that participant's voice in Jibri's session ([Only hosts in the video](../../docs/architecture/jitsi-integration.md#per-event-participant-policies)). `voiceExcluded` and `listenOnly` win over it. A token without the key counts as a host's when its affiliation is `owner`, as tokens issued before this rule are; `false` keeps a moderator out of the video |
 
 When the first person whose token carries a lock is about to join a room, the module switches on Jitsi's
 audio/video moderation (the stock `av_moderation_component`) for each locked media type, before any
@@ -310,7 +311,7 @@ service, so no finalize script runs there.
 `infra/jitsi/jibri-finalize.sh` is a standalone variant that nothing in the repository runs: no chart
 template, Compose service or workflow references it. The code comments in
 `infra/recorder/src/upload.ts` cite it for the webhook signature and the payload shape. The chart's
-script uses the same signature and the same payload fields, without `participants`.
+script uses the same signature and the same payload fields.
 
 ### How the two scripts differ
 
@@ -319,8 +320,8 @@ script uses the same signature and the same payload fields, without `participant
 | Shipped by | The chart, as ConfigMap `pa-webinar-jibri-finalize`, mounted in Jibri | Nothing |
 | Upload | A `PUT` to a single-object write URL from `POST /api/internal/recording-upload-url`. Storage credentials stay in the portal | The command-line tool selected by `RECORDING_STORAGE_TYPE`: `azcopy`, `aws`, `gcloud` or `mc`. `local` skips the upload. Storage credentials must be in the Jibri container |
 | Webhook address | Always `$APP_INTERNAL_URL/api/webhooks/recording` | `$RECORDING_WEBHOOK_URL`. No webhook when it is unset |
-| Webhook payload | `roomName`, `recordingUrl`, `filename`, `duration`, `fileSize` | The same fields plus `participants`, which the portal stores encrypted on the `CallSession`. Without `jq` or `python3`, `participants` is left out |
-| MP4 metadata | Unchanged apart from the faststart re-mux | Also writes the event title, the organizer name shown on the event, the date, the description and the list of registrants who joined (display name, join and leave times) into the file's metadata, read from `GET /api/internal/recording-metadata` |
+| Webhook payload | `roomName`, `recordingUrl`, `filename`, `duration`, `fileSize` | The same fields |
+| MP4 metadata | Unchanged apart from the faststart re-mux | Also writes the event title, the organizer name shown on the event, the date, the description and the event's hosts (the primary moderator's name and the active named moderators and speakers, with their role) into the file's metadata, read from `GET /api/internal/recording-metadata`. Participants are never in the video, so they are never in the file either, by name or by nickname |
 | Room name taken from | The MP4 file name | The recording directory's name |
 | `APP_INTERNAL_URL` or `CRON_API_KEY` missing | Exits with an error before uploading | Skips the metadata step and uploads anyway |
 | Local recording directory | Deleted when the script reaches the end, including after a failed webhook call. Kept when the upload-URL request or the upload fails | Deleted at the end unless `RECORDING_STORAGE_TYPE` is exactly `local`. Kept when a command such as an upload fails and the script stops (`set -e`) |
@@ -332,9 +333,8 @@ The repository has two scripts named `jibri-finalize.sh`; only the chart's is sh
 
 - **Two scripts share one name.**
   - While both exist, check every change to the upload or webhook contract against both scripts.
-  - `GET /api/internal/recording-metadata` returns the decrypted names and join and leave times of
-    registrants who joined, to any caller holding `CRON_API_KEY`. The standalone script is its only
-    caller in the repository.
+  - `GET /api/internal/recording-metadata` returns the decrypted names of the event's hosts, to any
+    caller holding `CRON_API_KEY`. The standalone script is its only caller in the repository.
 - **The standalone script has defects**, which matter only if someone runs it:
   - The `azure-blob` branch uses `RECORDING_AZURE_CONTAINER` as the storage account's host name, always
     writes to a container named `recordings`, never reads `RECORDING_AZURE_CONNECTION_STRING`, and

@@ -9,9 +9,15 @@ import { cookies } from 'next/headers';
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { RateLimitError, ValidationError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
+import { catalogoDiCreazione, MODELLO_PER_CATALOGO } from '@/lib/events/catalog';
 import { tagIdsFromSlugs } from '@/lib/events/event-tags';
 import { usablePersonPhotoId } from '@/lib/events/person-photo-store';
-import { elencoPredefinito } from '@/lib/live/participant-list';
+import { elencoPredefinito, nicknamePredefinito } from '@/lib/live/participant-list';
+import {
+  assertEsposizioneConsentita,
+  destinazioneDiPartenza,
+} from '@/lib/recording/destination';
+import { videoDellApp, videoPerTutti } from '@/lib/recording/audience';
 import { createEventSchema } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { generateUniqueSlug } from '@/lib/utils/slug';
@@ -83,6 +89,22 @@ export const POST = withErrorHandling(async (request) => {
     }
   }
 
+  // Il modello da cui l'evento nasce, per il catalogo: come per l'informativa,
+  // un id che non esiste e' un errore sul campo, non un 500. Se ne fotografa il
+  // nome (lib/events/catalog).
+  const modello = data.templateId
+    ? await prisma.eventTemplate.findUnique({
+        where: { id: data.templateId },
+        select: MODELLO_PER_CATALOGO,
+      })
+    : null;
+  if (data.templateId && !modello) {
+    throw new ValidationError('Validation failed', [
+      { path: ['templateId'], message: 'Unknown event template' },
+    ]);
+  }
+  const catalogo = catalogoDiCreazione(modello, data.formatClass);
+
   // If the wizard supplied a permission matrix, keep the boolean toggles
   // in sync so legacy code paths stay correct. Matrix wins when both are
   // present.
@@ -102,6 +124,27 @@ export const POST = withErrorHandling(async (request) => {
         participantsCanStartVideo: data.participantsCanStartVideo,
         participantsCanShareScreen: data.participantsCanShareScreen,
       };
+  // L'elenco di partenza, e il nickname che ne segue senza una scelta.
+  const elencoDiPartenza =
+    data.participantListVisible ??
+    elencoPredefinito({ ...effectiveToggles, maxParticipants: data.maxParticipants });
+
+  // Un evento nuovo che registra dichiara dove va il video: senza una scelta
+  // resta riservato, anche con un null esplicito, perche' allargare e' un atto
+  // esplicito.
+  const destinazione = destinazioneDiPartenza(
+    { recordingEnabled: false, recordingDestination: data.recordingDestination },
+    data.recordingEnabled,
+  );
+  const pubblicoRiservato = destinazione === 'REGISTRANTS';
+  assertEsposizioneConsentita(null, {
+    recordingDestination: destinazione,
+    recordingAudience: pubblicoRiservato ? 'REGISTRANTS' : 'PUBLIC',
+    recordingPublished: false,
+    transcriptPublished: false,
+    youtubeUrl: data.youtubeUrl ?? null,
+    tempRecordingUrl: null,
+  });
 
   const slug = await generateUniqueSlug(data.title);
   const jitsiRoomName = `evt-${randomUUID()}`;
@@ -173,6 +216,8 @@ export const POST = withErrorHandling(async (request) => {
       qaEnabled: effectiveToggles.qaEnabled,
       chatEnabled: effectiveToggles.chatEnabled,
       recordingEnabled: data.recordingEnabled,
+      recordingDestination: destinazione,
+      ...(pubblicoRiservato && { recordingAudience: 'REGISTRANTS' as const }),
       // La registrazione non parte mai da sola: la avvia chi conduce con REC.
       autoStartRecording: false,
       participantsCanUnmute: effectiveToggles.participantsCanUnmute,
@@ -186,7 +231,11 @@ export const POST = withErrorHandling(async (request) => {
       postEventShowFeedback: data.postEventShowFeedback,
       recurrenceRule: data.recurrenceRule ?? null,
       recurrenceSeriesId: data.recurrenceSeriesId ?? null,
+      templateId: catalogo.templateId,
+      templateName: catalogo.templateName,
+      formatClass: catalogo.formatClass,
       dataRetentionDays: data.dataRetentionDays,
+      recordingDeleteAfterDays: data.recordingDeleteAfterDays ?? null,
       privacyPolicyUrl: data.privacyPolicyUrl,
       privacyPolicyText: data.privacyPolicyText,
       // Accettati dallo schema e inviati dai moduli, ma finora mai scritti:
@@ -214,10 +263,15 @@ export const POST = withErrorHandling(async (request) => {
         recordingConsentText: data.recordingConsentText,
       }),
       audienceAnonymous: data.audienceAnonymous,
-      participantListVisible:
-        data.participantListVisible ??
-        elencoPredefinito({ ...effectiveToggles, maxParticipants: data.maxParticipants }),
+      participantListVisible: elencoDiPartenza,
+      nicknamesEnabled:
+        data.nicknamesEnabled ??
+        nicknamePredefinito({
+          audienceAnonymous: data.audienceAnonymous,
+          participantListVisible: elencoDiPartenza,
+        }),
       ...(data.hostsAlwaysRecorded !== undefined && { hostsAlwaysRecorded: data.hostsAlwaysRecorded }),
+      ...(data.offerAddressBook !== undefined && { offerAddressBook: data.offerAddressBook }),
       ...(data.wordCloudEnabled !== undefined && {
         wordCloudEnabled: data.wordCloudEnabled,
       }),
@@ -381,7 +435,8 @@ export const GET = withErrorHandling(async (request) => {
         recordingEnabled: event.recordingEnabled,
         status: event.status,
         eventType: event.eventType,
-        recordingUrl: event.recordingUrl,
+        // La rotta dell'app, mai l'indirizzo dello storage (lib/recording/audience).
+        recordingUrl: event.recordingUrl ? videoDellApp(event.slug) : null,
         moderatorToken: event.moderatorToken,
       };
     });
@@ -425,8 +480,9 @@ export const GET = withErrorHandling(async (request) => {
       recordingEnabled: event.recordingEnabled,
       status: event.status,
       eventType: event.eventType,
-      // Come la rotta del singolo evento: il video solo se pubblicato per tutti.
-      recordingUrl: event.recordingPublished && event.recordingAudience === 'PUBLIC' ? event.recordingUrl : null,
+      // Come la rotta del singolo evento (`videoPerTutti`): risposta in cache
+      // condivisa, senza chi legge.
+      recordingUrl: videoPerTutti(event),
     };
   });
 

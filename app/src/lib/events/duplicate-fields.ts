@@ -32,6 +32,11 @@ export const DUPLICATED_EVENT_FIELDS = [
   'textLocaleState',
   'timezone',
   'eventType',
+  // Il catalogo (lib/events/catalog): la copia e' lo stesso tipo di evento,
+  // dallo stesso modello, con il nome che il modello aveva per l'originale.
+  'templateId',
+  'templateName',
+  'formatClass',
 
   // capacity & sizing
   'maxParticipants',
@@ -63,6 +68,7 @@ export const DUPLICATED_EVENT_FIELDS = [
   'requireOrganization',
   'requireOrganizationRole',
   'requireOrganizationType',
+  'offerAddressBook',
 
   // people & branding
   'moderatorName',
@@ -86,9 +92,11 @@ export const DUPLICATED_EVENT_FIELDS = [
   'recordingConsentText',
   'audienceAnonymous',
   'participantListVisible',
+  'nicknamesEnabled',
 
   // recording & AI post-production
   'recordingEnabled',
+  'recordingDestination',
   'autoStartRecording',
   'multitrackRecordingEnabled',
   'retainParticipantTracks',
@@ -150,6 +158,10 @@ export const NOT_DUPLICATED_EVENT_FIELDS: Record<string, string> = {
   recordingPublished: 'artefact of the occurrence that ran',
   transcriptPublished: 'artefact of the occurrence that ran: the copy has its own transcript to review',
   recordingPublishedAt: 'artefact of the occurrence that ran',
+  recordingRetentionFrom: "da quando conta la durata della registrazione di QUELLA occorrenza: la copia parte dalla sua fine",
+  legacyRecordingRetention:
+    'the promise made to the registrants of the occurrence that ran: the copy collects consents ' +
+    'with the current texts',
   recordingNotifiedAt: 'artefact of the occurrence that ran: the copy has its own recording to announce',
   recordingDuration: 'artefact of the occurrence that ran',
   recordingFileSize: 'artefact of the occurrence that ran',

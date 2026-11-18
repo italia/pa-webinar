@@ -112,6 +112,9 @@ export function creaLavoro(
 }
 
 /** Un account dello staff con la sua sessione: la prossima richiesta arriva da lui. */
+/** L'account dell'ultima `entraCome`: `organizza` lo rende organizzatore. */
+let accountInUso: string | null = null;
+
 export async function entraCome(role: StaffRole) {
   const email = `${randomUUID()}@example.org`;
   const account = await prisma.staffAccount.create({
@@ -123,7 +126,18 @@ export async function entraCome(role: StaffRole) {
     },
   });
   biscotti.set('admin_session', await signStaffSession(account));
+  accountInUso = account.id;
   return account;
+}
+
+/**
+ * L'evento diventa di chi e' entrato per ultimo: lo organizza, e ne vede il
+ * contenuto delle registrazioni (lib/recording/content-access). Un admin che
+ * non lo organizza ne vede solo i metadati.
+ */
+export async function organizza(eventId: string): Promise<void> {
+  if (!accountInUso) throw new Error('organizza: nessuno e’ entrato');
+  await prisma.event.update({ where: { id: eventId }, data: { createdById: accountInUso } });
 }
 
 export function esci(): void {

@@ -223,6 +223,85 @@ describe('POST /api/events — persistenza dei campi accettati', () => {
   });
 });
 
+describe('POST /api/events — destinazione della registrazione', () => {
+  const contesto = { params: Promise.resolve({}) } as never;
+  // La rotta limita le creazioni per indirizzo: ogni caso ha il suo.
+  let ultimo = 40;
+  const crea = (corpoRichiesta: unknown) =>
+    POST(
+      new Request('http://localhost/api/events', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-forwarded-for': `10.20.0.${(ultimo += 1)}`,
+        },
+        body: JSON.stringify(corpoRichiesta),
+      }) as unknown as NextRequest,
+      contesto,
+    );
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocked.event.create.mockImplementation(
+      async ({ data }: { data: Record<string, unknown> }) => ({
+        id: '9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d',
+        moderatorToken: data.moderatorToken,
+        slug: data.slug,
+      }),
+    );
+  });
+
+  it.each([
+    ['senza il campo', {}],
+    ['con null esplicito', { recordingDestination: null }],
+  ])('un evento che registra, %s, parte riservato con il pubblico allineato', async (_n, extra) => {
+    const r = await crea(corpo({ recordingEnabled: true, ...extra }));
+    expect(r.status).toBe(201);
+    expect(datiScritti()).toMatchObject({
+      recordingDestination: 'REGISTRANTS',
+      recordingAudience: 'REGISTRANTS',
+    });
+  });
+
+  it('senza registrazione non c’e’ niente da dichiarare', async () => {
+    await crea(corpo({ recordingEnabled: false, recordingDestination: null }));
+    expect(datiScritti().recordingDestination).toBeNull();
+    expect(datiScritti()).not.toHaveProperty('recordingAudience');
+  });
+
+  it('una destinazione pubblica resta tale, e il pubblico resta il predefinito', async () => {
+    await crea(corpo({ recordingEnabled: true, recordingDestination: 'PUBLIC' }));
+    expect(datiScritti().recordingDestination).toBe('PUBLIC');
+    expect(datiScritti()).not.toHaveProperty('recordingAudience');
+  });
+
+  it('un video esterno su un evento riservato e’ 409, e non nasce niente', async () => {
+    const r = await crea(corpo({
+          recordingEnabled: true,
+          recordingDestination: 'REGISTRANTS',
+          youtubeUrl: 'https://www.youtube.com/watch?v=abc',
+        }),);
+    expect(r.status).toBe(409);
+    expect(await r.json()).toMatchObject({ code: 'RECORDING_DESTINATION_NOT_COVERED' });
+    expect(mocked.event.create).not.toHaveBeenCalled();
+  });
+
+  it('un video esterno su un evento pubblico si accetta', async () => {
+    const youtubeUrl = 'https://www.youtube.com/watch?v=abc';
+    const r = await crea(corpo({ recordingEnabled: true, recordingDestination: 'PUBLIC', youtubeUrl }));
+    expect(r.status).toBe(201);
+    expect(datiScritti().youtubeUrl).toBe(youtubeUrl);
+  });
+
+  it('la scelta sulla rubrica si salva, e senza scelta vale il default della colonna', async () => {
+    await crea(corpo({ offerAddressBook: false }));
+    expect(datiScritti().offerAddressBook).toBe(false);
+    vi.clearAllMocks();
+    await crea(corpo());
+    expect(datiScritti()).not.toHaveProperty('offerAddressBook');
+  });
+});
+
 describe('POST /api/events — link del moderatore principale', () => {
   beforeEach(() => {
     vi.clearAllMocks();

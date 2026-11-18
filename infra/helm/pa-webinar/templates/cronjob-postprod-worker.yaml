@@ -186,8 +186,11 @@ spec:
 {{- $gpuRes := dict "requests" (dict "cpu" ($w.resources.requests.cpu | default "2") "memory" ($w.resources.requests.memory | default "16Gi")) "limits" (dict "cpu" ($w.resources.limits.cpu | default "8") "memory" ($w.resources.limits.memory | default "48Gi")) }}
 {{- /* Senza la variante CPU il worker con la GPU prende tutti i tipi tranne
        la traduzione dei testi (TRANSLATE_TEXT), che non deve mai accendere
-       la GPU: gira solo sul worker senza GPU (pa-webinar.validateMt). */}}
-{{- $gpuKinds := list "TRANSCRIBE" "TRANSCRIBE_MULTITRACK" "SUMMARIZE" "TRANSLATE" "SUBTITLE" "DUB" "ARCHIVE" "REPORT" }}
+       la GPU: gira solo sul worker senza GPU (pa-webinar.validateMt). La
+       rimozione da un video (REDACT) e' ffmpeg su CPU: con la variante CPU va
+       li', senza la prende il worker del nodo GPU, come archivio e sintesi,
+       senza usare la GPU. */}}
+{{- $gpuKinds := list "TRANSCRIBE" "TRANSCRIBE_MULTITRACK" "SUMMARIZE" "TRANSLATE" "SUBTITLE" "DUB" "ARCHIVE" "REPORT" "REDACT" }}
 {{- if $cpu.enabled }}
 {{- $gpuKinds = list "TRANSCRIBE" "TRANSCRIBE_MULTITRACK" "DUB" }}
 {{- end }}
@@ -204,6 +207,6 @@ spec:
        col tag dell'app. */}}
 {{- $cpuImage := $cpu.image | default $w.image | default (include "pa-webinar.auxImage" (list . "" "postprod-worker-cpu")) }}
 ---
-{{ include "pa-webinar.postprodWorker" (dict "root" . "v" (dict "component" "postprod-worker-cpu" "gpu" false "nodeSelector" ($cpu.nodeSelector | default .Values.app.nodeSelector) "tolerations" ($cpu.tolerations | default .Values.app.tolerations) "affinity" ($cpu.affinity | default dict) "resources" $cpuRes "kinds" (list "SUMMARIZE" "TRANSLATE" "SUBTITLE" "ARCHIVE" "REPORT" "TRANSLATE_TEXT") "args" (list "python" "-m" "worker.cpu") "models" false "extraEnv" ($cpu.extraEnv | default dict) "image" $cpuImage)) }}
+{{ include "pa-webinar.postprodWorker" (dict "root" . "v" (dict "component" "postprod-worker-cpu" "gpu" false "nodeSelector" ($cpu.nodeSelector | default .Values.app.nodeSelector) "tolerations" ($cpu.tolerations | default .Values.app.tolerations) "affinity" ($cpu.affinity | default dict) "resources" $cpuRes "kinds" (list "SUMMARIZE" "TRANSLATE" "SUBTITLE" "ARCHIVE" "REPORT" "TRANSLATE_TEXT" "REDACT") "args" (list "python" "-m" "worker.cpu") "models" false "extraEnv" ($cpu.extraEnv | default dict) "image" $cpuImage)) }}
 {{- end }}
 {{- end }}
