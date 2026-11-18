@@ -189,7 +189,9 @@ jobs:
           fi
           docker tag "$IMG" pa-webinar-jitsi-web:candidate
           docker pull --quiet "$IMG" > /dev/null
-          strati() { docker image inspect -f '{{range .RootFS.Layers}}{{println .}}{{end}}' "$1" | head -n "$2"; }
+          # `sed` e non `head`: legge tutto l'ingresso, quindi con pipefail
+          # docker non muore di SIGPIPE e lo stato della pipeline e' il suo.
+          strati() { docker image inspect -f '{{range .RootFS.Layers}}{{println .}}{{end}}' "$1" | sed -n "1,${2}p"; }
           config() { docker image inspect -f '{{json .Config.Env}} {{json .Config.Entrypoint}} {{json .Config.Cmd}} {{json .Config.User}} {{json .Config.WorkingDir}} {{json .Config.ExposedPorts}} {{json .Config.Volumes}}' "$1"; }
           # Ogni voce del filesystem con tipo, permessi, proprietario e
           # destinazione dei collegamenti, piu' l'impronta di ogni file. Senza
@@ -203,11 +205,34 @@ jobs:
               find / \( $salta \) -prune -o -type f -print0 | sort -z | xargs -0 sha256sum
             ' | sha256sum | cut -d' ' -f1
           }
+          # Ogni misura in un'assegnazione a parte, mai dentro gli argomenti di
+          # `[`: li' un errore di docker si perdeva, e due misure fallite
+          # (vuote, o l'impronta di un testo vuoto) risultavano uguali, cioe'
+          # "niente da pubblicare" anche con file diversi. Qui un errore, o una
+          # misura vuota, ferma il job.
+          misura() {
+            local valore
+            if ! valore="$("$@")" || [ -z "$valore" ]; then
+              echo "::error::cannot compare with the published image: '$1' failed on $2" >&2
+              return 1
+            fi
+            printf '%s\n' "$valore"
+          }
           n="$(docker image inspect -f '{{len .RootFS.Layers}}' "$BASE_IMAGE")"
           diverso=""
-          [ "$(strati pa-webinar-jitsi-web:candidate "$n")" = "$(strati "$IMG" "$n")" ] || diverso="the base layers"
-          [ -n "$diverso" ] || [ "$(config pa-webinar-jitsi-web:candidate)" = "$(config "$IMG")" ] || diverso="the image configuration"
-          [ -n "$diverso" ] || [ "$(contenuto pa-webinar-jitsi-web:candidate)" = "$(contenuto "$IMG")" ] || diverso="the files"
+          a="$(misura strati pa-webinar-jitsi-web:candidate "$n")"
+          b="$(misura strati "$IMG" "$n")"
+          [ "$a" = "$b" ] || diverso="the base layers"
+          if [ -z "$diverso" ]; then
+            a="$(misura config pa-webinar-jitsi-web:candidate)"
+            b="$(misura config "$IMG")"
+            [ "$a" = "$b" ] || diverso="the image configuration"
+          fi
+          if [ -z "$diverso" ]; then
+            a="$(misura contenuto pa-webinar-jitsi-web:candidate)"
+            b="$(misura contenuto "$IMG")"
+            [ "$a" = "$b" ] || diverso="the files"
+          fi
           if [ -n "$diverso" ]; then
             echo "::error::${IMG} is already published and differs in ${diverso}: give this change a new IMAGE_TAG"
             exit 1

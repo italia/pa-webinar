@@ -220,7 +220,8 @@ self-hosted runner, like the other build workflows, with `contents: read` and `p
    the base layers, the image configuration and the hash of every file and link with the published
    image. When all are equal the rebuild adds nothing and nothing is pushed; any difference fails the
    job, which asks for a new `IMAGE_TAG`. Only a "not found" answer from the registry counts as an
-   unpublished tag: any other registry error fails the job.
+   unpublished tag: any other registry error fails the job, and so does a comparison that cannot be
+   made (a `docker` command that fails or returns nothing), which never counts as "equal".
 5. **Push the validated image.** It runs `docker push` on the image it validated. It does not rebuild,
    so the published artifact cannot drift from the validated one through a moved base tag or a cache.
 6. **Summary.** It writes the reference, whether it was pushed, and its base to the job summary.
