@@ -28,6 +28,7 @@ type PropsAttesa = {
   recordingDestination?: unknown;
   voce?: unknown;
   schedaPrivacy?: SchedaPrivacy | null;
+  nickname?: { eventId: string; iniziale: string | null; errore?: { motivo: string; suggerimento?: string } | null };
   onEnterLive: (nome: string, prefs: WaitingRoomJoinPrefs) => void;
 };
 const attesa = vi.hoisted(() => ({ props: null as unknown }));
@@ -177,6 +178,11 @@ const evento: Props['event'] = {
 
 interface Risposta {
   recordingDestination?: 'PUBLIC' | 'REGISTRANTS' | null;
+  /** Il nickname in uso, o il rifiuto di uno (`code`, `reason`, `suggestion`). */
+  nickname?: string | null;
+  code?: string;
+  reason?: string;
+  suggestion?: string;
   voiceExcluded?: boolean;
   listenOnly?: boolean;
   role?: 'moderator';
@@ -351,6 +357,7 @@ describe("sala — quello che arriva alla sala d'attesa", () => {
       chat: { attiva: true, domandeAttive: true, esitoDomande: 'soloTesto' },
       elencoVisibile: true,
       pseudonimi: false,
+      nickname: false,
       conservazione: { giorniDati: 30, video: null },
       rubrica: null,
     };
@@ -1656,5 +1663,50 @@ describe('sala — la chiamata rapida chiede a chi partecipa, all\'avvio della r
     await entra();
     await registra(true);
     expect(testo()).not.toContain(q.question);
+  });
+});
+
+describe('sala — il nickname', () => {
+  const conNickname = { ...evento, nicknamesEnabled: true };
+
+  it("senza l'opzione la sala d'attesa non lo offre e il token non lo porta", async () => {
+    await monta({ token: '', isGuest: true });
+    expect(leggiAttesa().nickname).toBeUndefined();
+    await entra({ nickname: 'Pippo' });
+    expect(ultimoToken()).not.toHaveProperty('nickname');
+  });
+
+  it("l'ospite lo manda con il token, per la visita", async () => {
+    await monta({ event: conNickname, token: '', isGuest: true });
+    expect(leggiAttesa().nickname).toMatchObject({ eventId: evento.id, iniziale: null });
+    risposte.push({ nickname: 'Pippo' });
+    await entra({ nickname: 'Pippo' });
+    expect(ultimoToken()).toMatchObject({ guestName: 'Relatore 1', nickname: 'Pippo' });
+  });
+
+  it("chi apre il proprio link non lo manda: il server lo legge dall'iscrizione", async () => {
+    await monta({ event: conNickname, registrantOwnsLink: true, initialNickname: 'Pippo' });
+    expect(leggiAttesa().nickname).toMatchObject({ iniziale: 'Pippo' });
+    await entra({ nickname: 'Pippo' });
+    expect(ultimoToken()).not.toHaveProperty('nickname');
+  });
+
+  it('chi conduce non ne ha uno', async () => {
+    await monta({ event: conNickname, isModerator: true, token: 'token-moderatore' });
+    expect(leggiAttesa().nickname).toBeUndefined();
+  });
+
+  it("chi apre il link di un altro col pubblico anonimo resta con lo pseudonimo", async () => {
+    await monta({ event: { ...conNickname, audienceAnonymous: true } });
+    expect(leggiAttesa().nickname).toBeUndefined();
+  });
+
+  it("un nickname rifiutato all'ingresso riporta in sala d'attesa, con il motivo e l'alternativa", async () => {
+    await monta({ event: conNickname, token: '', isGuest: true });
+    risposte.push({ stato: 409, code: 'NICKNAME_TAKEN', reason: 'taken', suggestion: 'Pippo2' });
+    await entra({ nickname: 'Pippo' });
+    await vi.waitFor(() => {
+      expect(leggiAttesa().nickname?.errore).toEqual({ motivo: 'taken', suggerimento: 'Pippo2' });
+    });
   });
 });

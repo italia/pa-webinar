@@ -730,7 +730,32 @@
       "body": "Nem járult hozzá a felvételhez: ugyanúgy részt vesz, mint mindenki, de a hangja kimarad a felvételből. Az arca és a neve egyébként sem jelenik meg soha a videón."
     },
     "nickname": {
-      "reserved": "Moderátor,Előadó,Felszólaló,Résztvevő,Vendég,Szervező,Adminisztrátor,Házigazda"
+      "reserved": "Moderátor,Előadó,Felszólaló,Résztvevő,Vendég,Szervező,Adminisztrátor,Házigazda",
+      "label": "Becenév (nem kötelező)",
+      "help": "Egy szó, 2–24 karakter: betűk, számjegyek és . _ -. A többiek ezt látják a neved helyett a videóban, a csevegésben, a kérdéseknél és az átiratban.",
+      "helpName": "Ha üresen hagyod, a saját neveddel jelensz meg.",
+      "helpAnonymous": "Ha üresen hagyod, automatikus álnévvel jelensz meg.",
+      "checking": "A becenév ellenőrzése…",
+      "shownAs": "A többiek így látnak majd: „{nickname}”.",
+      "useSuggestion": "„{suggestion}” használata",
+      "errors": {
+        "length": "A becenévnek 2–24 karakterből kell állnia.",
+        "format": "Egy szó: betűvel kezdődik, és betűvel vagy számjeggyel végződik; közte betűk, számjegyek és . _ -, soha nem kettő egymás után.",
+        "scripts": "Egyetlen ábécé betűit használd.",
+        "reserved": "Foglalt szót tartalmaz, például egy szerepkör nevét: válassz másikat.",
+        "host": "Hasonlít az esemény egyik vezetőjének nevére: válassz másikat.",
+        "taken": "Valaki az eseményen már használja ezt a becenevet.",
+        "rete": "A becenevet nem sikerült ellenőrizni. Próbáld újra."
+      },
+      "button": "Becenév",
+      "open": "Becenév módosítása",
+      "dialogTitle": "A beceneved",
+      "dialogIntro": "A többiek a becenevet látják a neved helyett. A módosításhoz a terem egy pillanatra újracsatlakoztat.",
+      "apply": "Mentés és újracsatlakozás",
+      "remove": "Becenév törlése",
+      "reconnecting": "Újracsatlakozás…",
+      "done": "Kész: most így jelensz meg: „{nickname}”.",
+      "doneRemoved": "Kész: a becenevet eltávolítottuk."
     }
   },
   "qa": {
@@ -4711,7 +4736,9 @@
         "label": "Az Ön neve",
         "real": "A teremben, a csevegésben és a kérdéseknél a saját nevén jelenik meg.",
         "pseudonym": "A teremben, a csevegésben és a kérdéseknél álnéven jelenik meg. A szervezők látják a regisztrációs adatait.",
-        "pseudonymTranscript": "Ha hozzájárul az átirathoz, ott a neve megmarad."
+        "pseudonymTranscript": "Ha hozzájárul az átirathoz, ott a neve megmarad.",
+        "nickname": "Választhatsz becenevet: a többiek ezt látják a neved helyett. A szervezők és a moderátorok tudják, ki áll mögötte.",
+        "nicknameTranscript": "Ha hozzájárulsz az átirathoz, ott a beceneveddel jelensz meg, ha választottál, különben a neveddel."
       },
       "retention": {
         "label": "Megőrzés",

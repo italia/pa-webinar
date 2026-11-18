@@ -730,7 +730,32 @@
       "body": "Niste privolili v snemanje: sodelujete kot vsi, vaš glas pa ostane zunaj posnetka. Vaš obraz in vaše ime se v videu tako ali tako nikoli ne pojavita."
     },
     "nickname": {
-      "reserved": "Moderator,Moderatorka,Govornik,Govornica,Predavatelj,Predavateljica,Udeleženec,Udeleženka,Gost,Gostja,Organizator,Organizatorka,Administrator,Skrbnik,Gostitelj"
+      "reserved": "Moderator,Moderatorka,Govornik,Govornica,Predavatelj,Predavateljica,Udeleženec,Udeleženka,Gost,Gostja,Organizator,Organizatorka,Administrator,Skrbnik,Gostitelj",
+      "label": "Vzdevek (neobvezno)",
+      "help": "Ena beseda, od 2 do 24 znakov: črke, števke in . _ -. Drugi ga vidijo namesto vašega imena v videu, v klepetu, pri vprašanjih in v prepisu.",
+      "helpName": "Če ga pustite praznega, ste prikazani s svojim imenom.",
+      "helpAnonymous": "Če ga pustite praznega, ste prikazani s samodejnim psevdonimom.",
+      "checking": "Preverjanje vzdevka…",
+      "shownAs": "Drugi vas bodo videli kot »{nickname}«.",
+      "useSuggestion": "Uporabi »{suggestion}«",
+      "errors": {
+        "length": "Vzdevek mora imeti od 2 do 24 znakov.",
+        "format": "Ena beseda: začne se s črko in konča s črko ali števko; vmes črke, števke in . _ -, nikoli dva zapored.",
+        "scripts": "Uporabite črke ene same abecede.",
+        "reserved": "Vsebuje rezervirano besedo, na primer ime vloge: izberite drugega.",
+        "host": "Spominja na ime nekoga, ki vodi dogodek: izberite drugega.",
+        "taken": "Nekdo na dogodku že uporablja ta vzdevek.",
+        "rete": "Vzdevka ni bilo mogoče preveriti. Poskusite znova."
+      },
+      "button": "Vzdevek",
+      "open": "Spremenite vzdevek",
+      "dialogTitle": "Vaš vzdevek",
+      "dialogIntro": "Drugi vidijo vzdevek namesto vašega imena. Za spremembo vas soba za trenutek znova poveže.",
+      "apply": "Shrani in znova poveži",
+      "remove": "Odstrani vzdevek",
+      "reconnecting": "Ponovno povezovanje…",
+      "done": "Končano: zdaj ste prikazani kot »{nickname}«.",
+      "doneRemoved": "Končano: vzdevek je odstranjen."
     }
   },
   "qa": {
@@ -4711,7 +4736,9 @@
         "label": "Vaše ime",
         "real": "V dvorani, klepetu in vprašanjih ste prikazani s svojim imenom.",
         "pseudonym": "V dvorani, klepetu in vprašanjih ste prikazani pod psevdonimom. Organizatorji vidijo podatke o prijavi.",
-        "pseudonymTranscript": "Če privolite v prepis, tam ostane vaše ime."
+        "pseudonymTranscript": "Če privolite v prepis, tam ostane vaše ime.",
+        "nickname": "Izberete lahko vzdevek: drugi ga vidijo namesto vašega imena. Organizatorji in moderatorji vedo, kdo je za njim.",
+        "nicknameTranscript": "Če privolite v prepis, ste v njem prikazani z vzdevkom, če ste ga izbrali, sicer s svojim imenom."
       },
       "retention": {
         "label": "Hramba",

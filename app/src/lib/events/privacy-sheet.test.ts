@@ -51,6 +51,7 @@ const EVENTO: EventoScheda = {
   postEventShowQA: true,
   participantListVisible: true,
   audienceAnonymous: false,
+  nicknamesEnabled: false,
   dataRetentionDays: 30,
   recordingDeleteAfterDays: null,
   offerAddressBook: true,

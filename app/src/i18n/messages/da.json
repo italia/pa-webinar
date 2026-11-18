@@ -730,7 +730,32 @@
       "body": "Du har ikke givet samtykke til optagelsen: du deltager som alle andre, men din stemme er ikke med i optagelsen. Dit ansigt og dit navn vises under alle omstændigheder aldrig i videoen."
     },
     "nickname": {
-      "reserved": "Moderator,Taler,Oplægsholder,Deltager,Gæst,Arrangør,Administrator,Vært"
+      "reserved": "Moderator,Taler,Oplægsholder,Deltager,Gæst,Arrangør,Administrator,Vært",
+      "label": "Kaldenavn (valgfrit)",
+      "help": "Ét ord på 2 til 24 tegn: bogstaver, tal og . _ -. De andre ser det i stedet for dit navn i videoen, i chatten, i spørgsmålene og i transskriptionen.",
+      "helpName": "Hvis du lader feltet stå tomt, vises du med dit navn.",
+      "helpAnonymous": "Hvis du lader feltet stå tomt, vises du med et automatisk pseudonym.",
+      "checking": "Kaldenavnet kontrolleres…",
+      "shownAs": "De andre vil se dig som »{nickname}«.",
+      "useSuggestion": "Brug »{suggestion}«",
+      "errors": {
+        "length": "Kaldenavnet skal være på 2 til 24 tegn.",
+        "format": "Ét ord: det begynder med et bogstav og slutter med et bogstav eller et tal; derimellem bogstaver, tal og . _ -, aldrig to i træk.",
+        "scripts": "Brug bogstaver fra ét alfabet.",
+        "reserved": "Det indeholder et reserveret ord, fx navnet på en rolle: vælg et andet.",
+        "host": "Det ligner navnet på en af dem, der leder arrangementet: vælg et andet.",
+        "taken": "Nogen i arrangementet bruger allerede dette kaldenavn.",
+        "rete": "Kaldenavnet kunne ikke kontrolleres. Prøv igen."
+      },
+      "button": "Kaldenavn",
+      "open": "Skift dit kaldenavn",
+      "dialogTitle": "Dit kaldenavn",
+      "dialogIntro": "De andre ser kaldenavnet i stedet for dit navn. For at skifte det forbinder rummet dig igen et øjeblik.",
+      "apply": "Gem og forbind igen",
+      "remove": "Fjern kaldenavnet",
+      "reconnecting": "Forbinder igen…",
+      "done": "Færdig: du vises nu som »{nickname}«.",
+      "doneRemoved": "Færdig: kaldenavnet er fjernet."
     }
   },
   "qa": {
@@ -4711,7 +4736,9 @@
         "label": "Dit navn",
         "real": "I rummet, i chatten og i spørgsmålene vises du med dit navn.",
         "pseudonym": "I rummet, i chatten og i spørgsmålene vises du under et pseudonym. Arrangørerne kan se dine tilmeldingsdata.",
-        "pseudonymTranscript": "Hvis du giver samtykke til transskriptionen, står dit navn der fortsat."
+        "pseudonymTranscript": "Hvis du giver samtykke til transskriptionen, står dit navn der fortsat.",
+        "nickname": "Du kan vælge et kaldenavn: de andre ser det i stedet for dit navn. Arrangører og moderatorer ved, hvem der står bag.",
+        "nicknameTranscript": "Hvis du giver samtykke til transskriptionen, vises du dér med dit kaldenavn, hvis du har valgt et, ellers med dit navn."
       },
       "retention": {
         "label": "Opbevaring",

@@ -730,7 +730,32 @@
       "body": "Níor thoiligh tú leis an taifeadadh: glacann tú páirt cosúil le cách, ach fanann do ghuth lasmuigh den taifeadadh. Ní thaispeántar d'aghaidh ná d'ainm san fhíseán riamh ar aon nós."
     },
     "nickname": {
-      "reserved": "Modhnóir,Cainteoir,Rannpháirtí,Aoi,Eagraí,Riarthóir,Óstach"
+      "reserved": "Modhnóir,Cainteoir,Rannpháirtí,Aoi,Eagraí,Riarthóir,Óstach",
+      "label": "Leasainm (roghnach)",
+      "help": "Focal amháin, 2 go 24 carachtar: litreacha, digití agus . _ -. Feiceann daoine eile é in ionad d'ainm san fhíseán, sa chomhrá, sna ceisteanna agus sa tras-scríbhinn.",
+      "helpName": "Má fhágann tú folamh é, feictear thú faoi d'ainm féin.",
+      "helpAnonymous": "Má fhágann tú folamh é, feictear thú faoi ainm cleite uathoibríoch.",
+      "checking": "An leasainm á sheiceáil…",
+      "shownAs": "Feicfidh daoine eile thú mar “{nickname}”.",
+      "useSuggestion": "Úsáid “{suggestion}”",
+      "errors": {
+        "length": "Caithfidh an leasainm a bheith idir 2 agus 24 carachtar.",
+        "format": "Focal amháin: tosaíonn sé le litir agus críochnaíonn sé le litir nó digit; eatarthu litreacha, digití agus . _ -, riamh dhá cheann i ndiaidh a chéile.",
+        "scripts": "Úsáid litreacha ó aibítir amháin.",
+        "reserved": "Tá focal forchoimeádta ann, cosúil le hainm róil: roghnaigh ceann eile.",
+        "host": "Tá sé cosúil le hainm duine atá i mbun na hócáide: roghnaigh ceann eile.",
+        "taken": "Tá an leasainm seo in úsáid cheana ag duine éigin san ócáid.",
+        "rete": "Níorbh fhéidir an leasainm a sheiceáil. Bain triail eile as."
+      },
+      "button": "Leasainm",
+      "open": "Athraigh do leasainm",
+      "dialogTitle": "Do leasainm",
+      "dialogIntro": "Feiceann daoine eile an leasainm in ionad d'ainm. Chun é a athrú, ceanglaíonn an seomra thú arís ar feadh nóiméid.",
+      "apply": "Sábháil agus ceangail arís",
+      "remove": "Bain an leasainm",
+      "reconnecting": "Ag ceangal arís…",
+      "done": "Déanta: feictear thú anois mar “{nickname}”.",
+      "doneRemoved": "Déanta: baineadh an leasainm."
     }
   },
   "qa": {
@@ -4711,7 +4736,9 @@
         "label": "D'ainm",
         "real": "Sa seomra, sa chomhrá agus sna ceisteanna taispeántar thú faoi d'ainm féin.",
         "pseudonym": "Sa seomra, sa chomhrá agus sna ceisteanna taispeántar thú faoi ainm cleite. Feiceann na heagraithe do shonraí cláraithe.",
-        "pseudonymTranscript": "Má thoilíonn tú leis an tras-scríobh, fanann d'ainm sa tras-scríbhinn."
+        "pseudonymTranscript": "Má thoilíonn tú leis an tras-scríobh, fanann d'ainm sa tras-scríbhinn.",
+        "nickname": "Is féidir leat leasainm a roghnú: feiceann daoine eile é in ionad d'ainm. Tá a fhios ag eagraithe agus ag modhnóirí cé atá taobh thiar de.",
+        "nicknameTranscript": "Má thugann tú toiliú don tras-scríbhinn, feictear thú ansin faoi do leasainm má roghnaigh tú ceann, nó faoi d'ainm mura ndearna."
       },
       "retention": {
         "label": "Coinneáil",

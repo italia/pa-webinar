@@ -976,6 +976,7 @@ describe('sala d\'attesa — la scheda privacy', () => {
     chat: { attiva: true, domandeAttive: true, esitoDomande: 'soloTesto' },
     elencoVisibile: true,
     pseudonimi: false,
+    nickname: false,
     conservazione: { giorniDati: 30, video: { giorniDopoPubblicazione: null } },
     rubrica: null,
   };
@@ -1178,5 +1179,115 @@ describe('sala d\'attesa — video a evento concluso', () => {
     render({ event: { ...concluso, trascrizioneVideo: true }, recordingConsentRequired: true });
     expect($('#waiting-multitrack-consent')).toBeNull();
     expect($('#waiting-recording-consent')).toBeNull();
+  });
+});
+
+describe('sala d\'attesa — nickname', () => {
+  const tn = messages.live.nickname;
+  const conNickname = (extra: Partial<NonNullable<Props['nickname']>> = {}) => ({
+    nickname: { eventId: 'ev-1', iniziale: null, ...extra },
+  });
+  let fetchMock: ReturnType<typeof vi.fn>;
+  const risposta = (status: number, corpo: unknown) =>
+    new Response(JSON.stringify(corpo), { status, headers: { 'content-type': 'application/json' } });
+  async function attendi() {
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 0));
+    });
+  }
+
+  beforeEach(() => {
+    window.sessionStorage.clear();
+    fetchMock = vi.fn(async (_url: string, init: RequestInit) => {
+      const { nickname } = JSON.parse(String(init.body)) as { nickname: string | null };
+      return risposta(200, { nickname, saved: false });
+    });
+    vi.stubGlobal('fetch', fetchMock);
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('senza l\'opzione il campo non c\'e\' e si entra come prima', () => {
+    render({ defaultName: 'Mario Rossi' });
+    expect($('#waiting-nickname')).toBeNull();
+    premi(pulsante(t.joinNowBtn));
+    expect(onEnterLive).toHaveBeenCalledTimes(1);
+    expect(onEnterLive.mock.calls[0]![1]).not.toHaveProperty('nickname');
+  });
+
+  it('vuoto: si entra senza nickname', () => {
+    render({ defaultName: 'Mario Rossi', ...conNickname() });
+    expect($('#waiting-nickname')).not.toBeNull();
+    premi(pulsante(t.joinNowBtn));
+    expect(onEnterLive.mock.calls[0]![1]).toMatchObject({ nickname: null });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('scritto e non ancora controllato: si controlla, poi si entra con quello', async () => {
+    render({ defaultName: 'Mario Rossi', ...conNickname() });
+    scrivi('#waiting-nickname', ' Pippo ');
+    premi(pulsante(t.joinNowBtn));
+    await attendi();
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/events/evento-di-prova/nickname',
+      expect.objectContaining({ method: 'PUT', body: JSON.stringify({ nickname: 'Pippo' }) }),
+    );
+    expect(onEnterLive).toHaveBeenCalledTimes(1);
+    expect(onEnterLive.mock.calls[0]![1]).toMatchObject({ nickname: 'Pippo' });
+    // La visita lo ricorda: non e' salvato sull'iscrizione.
+    expect(window.sessionStorage.getItem('pa-nickname:ev-1')).toBe('Pippo');
+  });
+
+  it('una forma sbagliata non parte nemmeno, e il campo dice perche\'', async () => {
+    render({ defaultName: 'Mario Rossi', ...conNickname() });
+    scrivi('#waiting-nickname', 'Pippo Rossi');
+    premi(pulsante(t.joinNowBtn));
+    await attendi();
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(onEnterLive).not.toHaveBeenCalled();
+    expect(container.textContent).toContain(tn.errors.format);
+  });
+
+  it('occupato: resta qui, con l\'alternativa da usare con un clic', async () => {
+    fetchMock.mockResolvedValueOnce(
+      risposta(409, { code: 'NICKNAME_TAKEN', reason: 'taken', suggestion: 'Pippo2' }),
+    );
+    render({ defaultName: 'Mario Rossi', ...conNickname() });
+    scrivi('#waiting-nickname', 'Pippo');
+    premi(pulsante(t.joinNowBtn));
+    await attendi();
+    expect(onEnterLive).not.toHaveBeenCalled();
+    expect(container.textContent).toContain(tn.errors.taken);
+    premi(pulsante('Pippo2'));
+    await attendi();
+    expect($<HTMLInputElement>('#waiting-nickname')!.value).toBe('Pippo2');
+    premi(pulsante(t.joinNowBtn));
+    expect(onEnterLive.mock.calls[0]![1]).toMatchObject({ nickname: 'Pippo2' });
+  });
+
+  it('il rifiuto della sala all\'ingresso torna accanto al campo', () => {
+    render({
+      defaultName: 'Mario Rossi',
+      ...conNickname({ iniziale: 'Pippo', errore: { motivo: 'host' } }),
+    });
+    expect(container.textContent).toContain(tn.errors.host);
+  });
+
+  it('chi si e\' iscritto lo salva con il suo token', async () => {
+    fetchMock.mockImplementation(async (url: string) =>
+      String(url).endsWith('/nickname')
+        ? risposta(200, { nickname: 'Pippo', saved: true })
+        : risposta(200, {}),
+    );
+    render({ defaultName: 'Mario Rossi', chatToken: 'TOKEN', role: 'participant', ...conNickname() });
+    scrivi('#waiting-nickname', 'Pippo');
+    premi(pulsante(t.joinNowBtn));
+    await attendi();
+    const put = fetchMock.mock.calls.find(([url]) => String(url).endsWith('/nickname'));
+    expect((put![1] as RequestInit).headers).toMatchObject({ Authorization: 'Bearer TOKEN' });
+    expect(onEnterLive.mock.calls[0]![1]).toMatchObject({ nickname: 'Pippo' });
+    // Salvato sull'iscrizione: la scheda non deve ricordarlo.
+    expect(window.sessionStorage.getItem('pa-nickname:ev-1')).toBeNull();
   });
 });

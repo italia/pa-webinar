@@ -730,7 +730,32 @@
       "body": "Nedali ste súhlas s nahrávaním: zúčastňujete sa ako všetci, ale váš hlas zostáva mimo záznamu. Vaša tvár a vaše meno sa vo videu aj tak nikdy nezobrazia."
     },
     "nickname": {
-      "reserved": "Moderátor,Moderátorka,Rečník,Rečníčka,Prednášajúci,Účastník,Účastníčka,Hosť,Organizátor,Organizátorka,Administrátor,Správca"
+      "reserved": "Moderátor,Moderátorka,Rečník,Rečníčka,Prednášajúci,Účastník,Účastníčka,Hosť,Organizátor,Organizátorka,Administrátor,Správca",
+      "label": "Prezývka (nepovinné)",
+      "help": "Jedno slovo, 2 až 24 znakov: písmená, číslice a . _ -. Ostatní ju vidia namiesto vášho mena vo videu, v chate, v otázkach a v prepise.",
+      "helpName": "Ak ju necháte prázdnu, zobrazíte sa pod svojím menom.",
+      "helpAnonymous": "Ak ju necháte prázdnu, zobrazíte sa pod automatickým pseudonymom.",
+      "checking": "Kontrola prezývky…",
+      "shownAs": "Ostatní vás uvidia ako „{nickname}“.",
+      "useSuggestion": "Použiť „{suggestion}“",
+      "errors": {
+        "length": "Prezývka musí mať 2 až 24 znakov.",
+        "format": "Jedno slovo: začína písmenom a končí písmenom alebo číslicou; medzi nimi písmená, číslice a . _ -, nikdy dva za sebou.",
+        "scripts": "Použite písmená jedinej abecedy.",
+        "reserved": "Obsahuje vyhradené slovo, napríklad názov roly: zvoľte inú.",
+        "host": "Pripomína meno niekoho, kto podujatie vedie: zvoľte inú.",
+        "taken": "Túto prezývku už na podujatí niekto používa.",
+        "rete": "Prezývku sa nepodarilo skontrolovať. Skúste to znova."
+      },
+      "button": "Prezývka",
+      "open": "Zmeniť prezývku",
+      "dialogTitle": "Vaša prezývka",
+      "dialogIntro": "Ostatní vidia prezývku namiesto vášho mena. Pri zmene vás miestnosť na chvíľu znova pripojí.",
+      "apply": "Uložiť a znova pripojiť",
+      "remove": "Odstrániť prezývku",
+      "reconnecting": "Opätovné pripájanie…",
+      "done": "Hotovo: teraz sa zobrazujete ako „{nickname}“.",
+      "doneRemoved": "Hotovo: prezývka bola odstránená."
     }
   },
   "qa": {
@@ -4711,7 +4736,9 @@
         "label": "Vaše meno",
         "real": "V miestnosti, v chate a v otázkach sa zobrazujete pod svojím menom.",
         "pseudonym": "V miestnosti, v chate a v otázkach sa zobrazujete pod pseudonymom. Organizátori vidia údaje z registrácie.",
-        "pseudonymTranscript": "Ak súhlasíte s prepisom, zostane v ňom vaše meno."
+        "pseudonymTranscript": "Ak súhlasíte s prepisom, zostane v ňom vaše meno.",
+        "nickname": "Môžete si zvoliť prezývku: ostatní ju vidia namiesto vášho mena. Organizátori a moderátori vedia, kto sa za ňou skrýva.",
+        "nicknameTranscript": "Ak súhlasíte s prepisom, zobrazíte sa v ňom pod prezývkou, ak ste si ju zvolili, inak pod svojím menom."
       },
       "retention": {
         "label": "Uchovávanie",

@@ -730,7 +730,32 @@
       "body": "Jūs neesat devis piekrišanu ierakstīšanai: jūs piedalāties kā visi, bet jūsu balss paliek ārpus ieraksta. Jūsu seja un vārds video tik un tā nekad neparādās."
     },
     "nickname": {
-      "reserved": "Moderators,Moderatore,Runātājs,Runātāja,Lektors,Lektore,Dalībnieks,Dalībniece,Viesis,Viešņa,Organizators,Organizatore,Administrators,Administratore"
+      "reserved": "Moderators,Moderatore,Runātājs,Runātāja,Lektors,Lektore,Dalībnieks,Dalībniece,Viesis,Viešņa,Organizators,Organizatore,Administrators,Administratore",
+      "label": "Segvārds (nav obligāts)",
+      "help": "Viens vārds, 2–24 rakstzīmes: burti, cipari un . _ -. Citi to redz jūsu vārda vietā video, tērzēšanā, jautājumos un atšifrējumā.",
+      "helpName": "Ja atstāsiet tukšu, būsiet redzams ar savu vārdu.",
+      "helpAnonymous": "Ja atstāsiet tukšu, būsiet redzams ar automātisku pseidonīmu.",
+      "checking": "Pārbauda segvārdu…",
+      "shownAs": "Citi jūs redzēs kā “{nickname}”.",
+      "useSuggestion": "Izmantot “{suggestion}”",
+      "errors": {
+        "length": "Segvārdam jābūt 2–24 rakstzīmes garam.",
+        "format": "Viens vārds: sākas ar burtu un beidzas ar burtu vai ciparu; starp tiem burti, cipari un . _ -, nekad divi pēc kārtas.",
+        "scripts": "Izmantojiet tikai vienas alfabēta burtus.",
+        "reserved": "Tas satur rezervētu vārdu, piemēram, lomas nosaukumu: izvēlieties citu.",
+        "host": "Tas atgādina pasākuma vadītāja vārdu: izvēlieties citu.",
+        "taken": "Kāds pasākumā jau izmanto šo segvārdu.",
+        "rete": "Segvārdu neizdevās pārbaudīt. Mēģiniet vēlreiz."
+      },
+      "button": "Segvārds",
+      "open": "Mainīt segvārdu",
+      "dialogTitle": "Jūsu segvārds",
+      "dialogIntro": "Citi redz segvārdu jūsu vārda vietā. Lai to mainītu, telpa jūs uz brīdi pievieno no jauna.",
+      "apply": "Saglabāt un pievienoties no jauna",
+      "remove": "Noņemt segvārdu",
+      "reconnecting": "Pievienojas no jauna…",
+      "done": "Gatavs: tagad esat redzams kā “{nickname}”.",
+      "doneRemoved": "Gatavs: segvārds ir noņemts."
     }
   },
   "qa": {
@@ -4711,7 +4736,9 @@
         "label": "Jūsu vārds",
         "real": "Telpā, tērzēšanā un jautājumos jūs parādāties ar savu vārdu.",
         "pseudonym": "Telpā, tērzēšanā un jautājumos jūs parādāties ar pseidonīmu. Organizatori redz reģistrācijas datus.",
-        "pseudonymTranscript": "Ja piekrītat atšifrēšanai, tur paliek jūsu vārds."
+        "pseudonymTranscript": "Ja piekrītat atšifrēšanai, tur paliek jūsu vārds.",
+        "nickname": "Varat izvēlēties segvārdu: citi to redz jūsu vārda vietā. Organizatori un moderatori zina, kas aiz tā slēpjas.",
+        "nicknameTranscript": "Ja piekrītat atšifrējumam, tajā esat redzams ar segvārdu, ja to izvēlējāties, citādi ar savu vārdu."
       },
       "retention": {
         "label": "Glabāšana",

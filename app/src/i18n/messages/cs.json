@@ -730,7 +730,32 @@
       "body": "Nedali jste souhlas s nahráváním: účastníte se jako všichni, ale váš hlas zůstává mimo záznam. Váš obličej a vaše jméno se ve videu stejně nikdy neobjeví."
     },
     "nickname": {
-      "reserved": "Moderátor,Moderátorka,Řečník,Řečnice,Přednášející,Účastník,Účastnice,Host,Organizátor,Organizátorka,Administrátor,Správce"
+      "reserved": "Moderátor,Moderátorka,Řečník,Řečnice,Přednášející,Účastník,Účastnice,Host,Organizátor,Organizátorka,Administrátor,Správce",
+      "label": "Přezdívka (nepovinné)",
+      "help": "Jedno slovo, 2 až 24 znaků: písmena, číslice a . _ -. Ostatní ji vidí místo vašeho jména ve videu, v chatu, v dotazech a v přepisu.",
+      "helpName": "Když ji necháte prázdnou, zobrazíte se pod svým jménem.",
+      "helpAnonymous": "Když ji necháte prázdnou, zobrazíte se pod automatickým pseudonymem.",
+      "checking": "Kontrola přezdívky…",
+      "shownAs": "Ostatní vás uvidí jako „{nickname}“.",
+      "useSuggestion": "Použít „{suggestion}“",
+      "errors": {
+        "length": "Přezdívka musí mít 2 až 24 znaků.",
+        "format": "Jedno slovo: začíná písmenem a končí písmenem nebo číslicí; mezi tím písmena, číslice a . _ -, nikdy dva za sebou.",
+        "scripts": "Použijte písmena jediné abecedy.",
+        "reserved": "Obsahuje vyhrazené slovo, například název role: zvolte jinou.",
+        "host": "Připomíná jméno někoho, kdo akci vede: zvolte jinou.",
+        "taken": "Tuto přezdívku už v akci někdo používá.",
+        "rete": "Přezdívku se nepodařilo zkontrolovat. Zkuste to znovu."
+      },
+      "button": "Přezdívka",
+      "open": "Změnit přezdívku",
+      "dialogTitle": "Vaše přezdívka",
+      "dialogIntro": "Ostatní vidí přezdívku místo vašeho jména. Při změně vás místnost na okamžik znovu připojí.",
+      "apply": "Uložit a znovu připojit",
+      "remove": "Odstranit přezdívku",
+      "reconnecting": "Opětovné připojování…",
+      "done": "Hotovo: nyní se zobrazujete jako „{nickname}“.",
+      "doneRemoved": "Hotovo: přezdívka byla odstraněna."
     }
   },
   "qa": {
@@ -4711,7 +4736,9 @@
         "label": "Vaše jméno",
         "real": "V místnosti, v chatu a v otázkách se zobrazujete pod svým jménem.",
         "pseudonym": "V místnosti, v chatu a v otázkách se zobrazujete pod pseudonymem. Pořadatelé vidí údaje z registrace.",
-        "pseudonymTranscript": "Pokud souhlasíte s přepisem, vaše jméno v něm zůstane."
+        "pseudonymTranscript": "Pokud souhlasíte s přepisem, vaše jméno v něm zůstane.",
+        "nickname": "Můžete si zvolit přezdívku: ostatní ji vidí místo vašeho jména. Organizátoři a moderátoři vědí, kdo se za ní skrývá.",
+        "nicknameTranscript": "Pokud souhlasíte s přepisem, zobrazíte se v něm pod přezdívkou, pokud jste si ji zvolili, jinak pod svým jménem."
       },
       "retention": {
         "label": "Uchovávání",

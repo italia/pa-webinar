@@ -30,6 +30,8 @@ import {
 import ProfilePhotoField from '@/components/live/profile-photo-field';
 import AudioPlayer from '@/components/live/audio-player';
 import ChatPanel from '@/components/live/chat-panel';
+import { NicknameField } from '@/components/live/nickname-field';
+import { useNickname, type ErroreNickname } from '@/hooks/use-nickname';
 import DeviceCheck from '@/components/live/device-check';
 import { InsecureContextNotice } from '@/components/live/insecure-context';
 import VideoPlayer from '@/components/events/video-player';
@@ -184,6 +186,8 @@ export interface WaitingRoomJoinPrefs {
   /** Consenso alla registrazione per partecipante dato qui: il server lo
    *  registra come prova quando rilascia il JWT. */
   multitrackConsent?: boolean;
+  /** Il nickname confermato (null: nessuno), dove l'evento lo consente. */
+  nickname?: string | null;
 }
 
 /** Telemetria warm-up dal poll /lifecycle: alimenta il pannello di attesa
@@ -284,6 +288,9 @@ interface WaitingRoomProps {
    *  aperte per link e ammettono ospiti già durante il warm-up, un evento
    *  schedulato no (vedi lib/chat/read-access). */
   eventType?: 'SCHEDULED' | 'INSTANT';
+  /** Il nickname, dove l'evento lo consente a questa persona (lib/live/nickname):
+   *  quello gia' scelto, e il rifiuto della sala a un ingresso appena tentato. */
+  nickname?: { eventId: string; iniziale: string | null; errore?: ErroreNickname | null };
 }
 
 const PARTICIPANT_NAME_KEY = 'pawebinar.participant.name';
@@ -300,6 +307,8 @@ const ARCADE_CLASSIC_KEY = 'pawebinar.arcade.classic';
 const CAMPO_DEL_BLOCCO: Record<BloccoModulo, string> = {
   name: 'waiting-name',
 };
+/** Il nickname: facoltativo, si controlla prima di entrare. */
+const CAMPO_NICKNAME = 'waiting-nickname';
 /** La casella del consenso alla registrazione: facoltativa, non blocca. */
 const CAMPO_REGISTRAZIONE = 'waiting-recording-consent';
 const NOTA_REGISTRAZIONE = 'waiting-recording-consent-required';
@@ -347,6 +356,7 @@ export default function WaitingRoom({
   schedaPrivacy = null,
   chatToken = '',
   eventType = 'SCHEDULED',
+  nickname: nicknameSala,
 }: WaitingRoomProps) {
   const t = useTranslations('waiting');
   const te = useTranslations('events');
@@ -527,6 +537,24 @@ export default function WaitingRoom({
   const canEnterLive = isLive;
   const trimmedName = name.trim();
   const nameValid = trimmedName.length >= 2;
+  // Il nickname: chi si e' iscritto lo salva subito, cosi' vale gia' nella chat
+  // dell'attesa; gli altri lo provano, e la sala lo prende all'ingresso.
+  const nick = useNickname({
+    eventSlug: event.slug,
+    eventId: nicknameSala?.eventId ?? '',
+    token: chatToken || undefined,
+    iniziale: nicknameSala?.iniziale ?? null,
+  });
+  const nicknameOfferto = !!nicknameSala;
+  const erroreDallaSala = nicknameSala?.errore ?? null;
+  const { setErrore: segnaErroreNickname } = nick;
+  useEffect(() => {
+    if (!erroreDallaSala) return;
+    segnaErroreNickname(erroreDallaSala);
+    document.getElementById(CAMPO_NICKNAME)?.focus();
+  }, [erroreDallaSala, segnaErroreNickname]);
+  // Il nome che gli altri vedono: nella chat dell'attesa e nella piazza.
+  const nomeMostrato = (nicknameOfferto && nick.confermato) || trimmedName;
   // La trascrizione dei propri interventi, con il proprio nome: la stessa regola
   // del modulo d'iscrizione (lib/live/entry-consents).
   const trascrizioneChiesta = consensoTrascrizioneIngresso({
@@ -815,41 +843,68 @@ export default function WaitingRoom({
   // L'unico cancello del modulo: il pulsante «Entra» resta premibile, quindi
   // nome e consenso alla registrazione li trattiene questo controllo.
   // Ogni ingresso passa di qui (waiting-room.test.tsx lo verifica).
+  const entraCon = useCallback(
+    (nickname: string | null | undefined) => {
+      // Persist the last-used identity so guests don't have to retype on
+      // reconnects / accidental reloads.
+      if (typeof window !== 'undefined') {
+        try {
+          window.localStorage.setItem(PARTICIPANT_NAME_KEY, trimmedName);
+        } catch {
+          /* ignore */
+        }
+      }
+      onEnterLive(trimmedName, {
+        ...devicePrefs,
+        ...(recordingRequired && recordingConsent
+          ? { recordingConsent: true, recordingConsentDestination: testoSpuntato }
+          : {}),
+        ...(trascrizioneChiesta && multitrackConsent && !trascrizioneSospesa
+          ? { multitrackConsent: true }
+          : {}),
+        ...(nickname !== undefined ? { nickname } : {}),
+      });
+    },
+    [
+      onEnterLive,
+      trimmedName,
+      devicePrefs,
+      recordingRequired,
+      recordingConsent,
+      testoSpuntato,
+      trascrizioneChiesta,
+      multitrackConsent,
+      trascrizioneSospesa,
+    ],
+  );
+  const { daConfermare: nicknameDaConfermare, conferma: confermaNickname, confermato: nicknameConfermato } = nick;
   const handleEnterLive = useCallback(() => {
     if (!canEnter) {
       segnalaCampoMancante();
       return;
     }
-    // Persist the last-used identity so guests don't have to retype on
-    // reconnects / accidental reloads.
-    if (typeof window !== 'undefined') {
-      try {
-        window.localStorage.setItem(PARTICIPANT_NAME_KEY, trimmedName);
-      } catch {
-        /* ignore */
-      }
+    if (!nicknameOfferto) {
+      entraCon(undefined);
+      return;
     }
-    onEnterLive(trimmedName, {
-      ...devicePrefs,
-      ...(recordingRequired && recordingConsent
-        ? { recordingConsent: true, recordingConsentDestination: testoSpuntato }
-        : {}),
-      ...(trascrizioneChiesta && multitrackConsent && !trascrizioneSospesa
-        ? { multitrackConsent: true }
-        : {}),
-    });
+    // Un nickname scritto e non ancora controllato si controlla adesso: se non
+    // passa si resta qui, con il motivo accanto al campo.
+    if (nicknameDaConfermare) {
+      void confermaNickname().then((esito) => {
+        if (esito === false) document.getElementById(CAMPO_NICKNAME)?.focus();
+        else entraCon(esito);
+      });
+      return;
+    }
+    entraCon(nicknameConfermato);
   }, [
     canEnter,
     segnalaCampoMancante,
-    onEnterLive,
-    trimmedName,
-    devicePrefs,
-    recordingRequired,
-    recordingConsent,
-    testoSpuntato,
-    trascrizioneChiesta,
-    multitrackConsent,
-    trascrizioneSospesa,
+    nicknameOfferto,
+    nicknameDaConfermare,
+    confermaNickname,
+    nicknameConfermato,
+    entraCon,
   ]);
 
   // Si entra da soli solo quando tutto e' a posto davvero. Altrimenti resta
@@ -1138,6 +1193,12 @@ export default function WaitingRoom({
           <span>{t('nameRequiredToEnter')}</span>
         </div>
       )}
+      {/* Il nickname, dove l'evento lo consente: sotto il nome, facoltativo. */}
+      {nicknameOfferto && (
+        <div className="mt-3">
+          <NicknameField id={CAMPO_NICKNAME} stato={nick} anonimo={!!event.audienceAnonymous} />
+        </div>
+      )}
     </FormGroup>
   );
 
@@ -1357,7 +1418,7 @@ export default function WaitingRoom({
           <ChatPanel
             eventSlug={event.slug}
             token={chatToken}
-            displayName={trimmedName}
+            displayName={nomeMostrato}
             isGuest={!chatToken}
             onMessaggioNuovo={ponteChat.messaggio}
             onMessaggioModificato={ponteChat.modificato}
@@ -1736,7 +1797,7 @@ export default function WaitingRoom({
           hostOwnsEntry
           eventSlug={event.slug}
           accessToken={chatToken}
-          displayName={trimmedName}
+          displayName={nomeMostrato}
           status={event.status}
           startsAtMs={startsAtMs}
           isHost={isModerator}

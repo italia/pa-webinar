@@ -730,7 +730,32 @@
       "body": "Niste dali pristanak za snimanje: sudjelujete kao i svi, ali vaš glas ostaje izvan snimke. Vaše lice i vaše ime ionako se nikada ne pojavljuju u videozapisu."
     },
     "nickname": {
-      "reserved": "Moderator,Moderatorica,Govornik,Govornica,Predavač,Predavačica,Sudionik,Sudionica,Gost,Gošća,Organizator,Organizatorica,Administrator,Administratorica,Domaćin"
+      "reserved": "Moderator,Moderatorica,Govornik,Govornica,Predavač,Predavačica,Sudionik,Sudionica,Gost,Gošća,Organizator,Organizatorica,Administrator,Administratorica,Domaćin",
+      "label": "Nadimak (neobavezno)",
+      "help": "Jedna riječ, od 2 do 24 znaka: slova, brojke i . _ -. Drugi ga vide umjesto vašeg imena u videu, u chatu, u pitanjima i u transkriptu.",
+      "helpName": "Ako ga ostavite praznim, prikazujete se svojim imenom.",
+      "helpAnonymous": "Ako ga ostavite praznim, prikazujete se automatskim pseudonimom.",
+      "checking": "Provjera nadimka…",
+      "shownAs": "Drugi će vas vidjeti kao „{nickname}”.",
+      "useSuggestion": "Upotrijebi „{suggestion}”",
+      "errors": {
+        "length": "Nadimak mora imati od 2 do 24 znaka.",
+        "format": "Jedna riječ: počinje slovom i završava slovom ili brojkom; između slova, brojke i . _ -, nikad dva zaredom.",
+        "scripts": "Upotrijebite slova samo jednog pisma.",
+        "reserved": "Sadrži rezerviranu riječ, poput naziva uloge: odaberite drugi.",
+        "host": "Nalikuje imenu nekoga tko vodi događaj: odaberite drugi.",
+        "taken": "Netko na događaju već koristi ovaj nadimak.",
+        "rete": "Nadimak nije moguće provjeriti. Pokušajte ponovno."
+      },
+      "button": "Nadimak",
+      "open": "Promijenite nadimak",
+      "dialogTitle": "Vaš nadimak",
+      "dialogIntro": "Drugi vide nadimak umjesto vašeg imena. Za promjenu vas soba na trenutak ponovno povezuje.",
+      "apply": "Spremi i ponovno se poveži",
+      "remove": "Ukloni nadimak",
+      "reconnecting": "Ponovno povezivanje…",
+      "done": "Gotovo: sada se prikazujete kao „{nickname}”.",
+      "doneRemoved": "Gotovo: nadimak je uklonjen."
     }
   },
   "qa": {
@@ -4711,7 +4736,9 @@
         "label": "Vaše ime",
         "real": "U dvorani, chatu i pitanjima prikazujete se pod svojim imenom.",
         "pseudonym": "U dvorani, chatu i pitanjima prikazujete se pod pseudonimom. Organizatori vide podatke o vašoj prijavi.",
-        "pseudonymTranscript": "Ako date privolu za transkripciju, u transkriptu ostaje vaše ime."
+        "pseudonymTranscript": "Ako date privolu za transkripciju, u transkriptu ostaje vaše ime.",
+        "nickname": "Možete odabrati nadimak: drugi ga vide umjesto vašeg imena. Organizatori i moderatori znaju tko se iza njega krije.",
+        "nicknameTranscript": "Ako pristanete na transkript, u njemu se prikazujete nadimkom ako ste ga odabrali, a inače svojim imenom."
       },
       "retention": {
         "label": "Čuvanje",

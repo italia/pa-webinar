@@ -730,7 +730,32 @@
       "body": "Non hai dato il consenso alla registrazione: partecipi come tutti, ma la tua voce resta fuori dalla registrazione. Il tuo volto e il tuo nome non compaiono comunque mai nel video."
     },
     "nickname": {
-      "reserved": "Moderatore,Moderatrice,Relatore,Relatrice,Partecipante,Ospite,Organizzatore,Organizzatrice,Amministratore,Amministratrice,Conduttore,Conduttrice"
+      "reserved": "Moderatore,Moderatrice,Relatore,Relatrice,Partecipante,Ospite,Organizzatore,Organizzatrice,Amministratore,Amministratrice,Conduttore,Conduttrice",
+      "label": "Nickname (facoltativo)",
+      "help": "Una parola sola, da 2 a 24 caratteri: lettere, cifre e . _ -. Gli altri lo vedono al posto del tuo nome in video, in chat, nelle domande e nella trascrizione.",
+      "helpName": "Se lo lasci vuoto, compari con il tuo nome.",
+      "helpAnonymous": "Se lo lasci vuoto, compari con uno pseudonimo automatico.",
+      "checking": "Controllo del nickname…",
+      "shownAs": "Gli altri ti vedranno come «{nickname}».",
+      "useSuggestion": "Usa «{suggestion}»",
+      "errors": {
+        "length": "Il nickname va da 2 a 24 caratteri.",
+        "format": "Una parola sola: comincia con una lettera e finisce con una lettera o una cifra; in mezzo lettere, cifre e . _ -, mai due di fila.",
+        "scripts": "Usa le lettere di un solo alfabeto.",
+        "reserved": "Contiene una parola riservata, come il nome di un ruolo: scegline un altro.",
+        "host": "Somiglia al nome di chi conduce l'evento: scegline un altro.",
+        "taken": "Nell'evento c'è già qualcuno con questo nickname.",
+        "rete": "Non è stato possibile controllare il nickname. Riprova."
+      },
+      "button": "Nickname",
+      "open": "Cambia il tuo nickname",
+      "dialogTitle": "Il tuo nickname",
+      "dialogIntro": "Gli altri vedono il nickname al posto del tuo nome. Per cambiarlo la sala ti ricollega per un attimo.",
+      "apply": "Salva e ricollegati",
+      "remove": "Togli il nickname",
+      "reconnecting": "Ricollegamento in corso…",
+      "done": "Fatto: ora compari come «{nickname}».",
+      "doneRemoved": "Fatto: il nickname è stato tolto."
     }
   },
   "qa": {
@@ -4711,7 +4736,9 @@
         "label": "Il tuo nome",
         "real": "In sala, in chat e nelle domande compari con il tuo nome.",
         "pseudonym": "In sala, in chat e nelle domande compari con uno pseudonimo. Chi organizza vede i dati dell'iscrizione.",
-        "pseudonymTranscript": "Se acconsenti alla trascrizione, lì resta il tuo nome."
+        "pseudonymTranscript": "Se acconsenti alla trascrizione, lì resta il tuo nome.",
+        "nickname": "Puoi scegliere un nickname: gli altri lo vedono al posto del tuo nome. Chi organizza e chi modera sanno chi c'è dietro.",
+        "nicknameTranscript": "Se acconsenti alla trascrizione, lì compari con il nickname, se ne hai scelto uno, altrimenti con il tuo nome."
       },
       "retention": {
         "label": "Conservazione",

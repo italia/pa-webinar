@@ -730,7 +730,32 @@
       "body": "Ma tajtx il-kunsens għar-reġistrazzjoni: qed tipparteċipa bħal kulħadd, iżda leħnek jibqa' barra mir-reġistrazzjoni. Wiċċek u ismek xorta qatt ma jidhru fil-vidjo."
     },
     "nickname": {
-      "reserved": "Moderatur,Moderatriċi,Kelliem,Kelliema,Parteċipant,Mistieden,Mistiedna,Organizzatur,Organizzatriċi,Amministratur,Amministratriċi"
+      "reserved": "Moderatur,Moderatriċi,Kelliem,Kelliema,Parteċipant,Mistieden,Mistiedna,Organizzatur,Organizzatriċi,Amministratur,Amministratriċi",
+      "label": "Laqam (mhux obbligatorju)",
+      "help": "Kelma waħda, minn 2 sa 24 karattru: ittri, ċifri u . _ -. L-oħrajn jarawh minflok ismek fil-vidjo, fiċ-chat, fil-mistoqsijiet u fit-traskrizzjoni.",
+      "helpName": "Jekk tħallih vojt, tidher b'ismek.",
+      "helpAnonymous": "Jekk tħallih vojt, tidher b'psewdonimu awtomatiku.",
+      "checking": "Il-laqam qed jiġi vverifikat…",
+      "shownAs": "L-oħrajn se jarawk bħala “{nickname}”.",
+      "useSuggestion": "Uża “{suggestion}”",
+      "errors": {
+        "length": "Il-laqam irid ikun minn 2 sa 24 karattru.",
+        "format": "Kelma waħda: tibda b'ittra u tispiċċa b'ittra jew ċifra; bejniethom ittri, ċifri u . _ -, qatt tnejn wara xulxin.",
+        "scripts": "Uża l-ittri ta' alfabett wieħed biss.",
+        "reserved": "Fih kelma riżervata, bħall-isem ta' rwol: agħżel ieħor.",
+        "host": "Jixbah l-isem ta' xi ħadd li qed imexxi l-avveniment: agħżel ieħor.",
+        "taken": "Xi ħadd fl-avveniment diġà juża dan il-laqam.",
+        "rete": "Ma kienx possibbli li jiġi vverifikat il-laqam. Erġa' pprova."
+      },
+      "button": "Laqam",
+      "open": "Ibdel il-laqam tiegħek",
+      "dialogTitle": "Il-laqam tiegħek",
+      "dialogIntro": "L-oħrajn jaraw il-laqam minflok ismek. Biex tibdlu, il-kamra terġa' tqabbdek għal mument.",
+      "apply": "Issejvja u erġa' qabbad",
+      "remove": "Neħħi l-laqam",
+      "reconnecting": "Qed terġa' tiġi mqabbad…",
+      "done": "Lest: issa tidher bħala “{nickname}”.",
+      "doneRemoved": "Lest: il-laqam tneħħa."
     }
   },
   "qa": {
@@ -4711,7 +4736,9 @@
         "label": "Ismek",
         "real": "Fis-sala, fiċ-chat u fil-mistoqsijiet tidher b'ismek.",
         "pseudonym": "Fis-sala, fiċ-chat u fil-mistoqsijiet tidher b'psewdonimu. Min jorganizza jara d-dejta tar-reġistrazzjoni.",
-        "pseudonymTranscript": "Jekk tagħti l-kunsens għat-traskrizzjoni, hemmhekk jibqa' ismek."
+        "pseudonymTranscript": "Jekk tagħti l-kunsens għat-traskrizzjoni, hemmhekk jibqa' ismek.",
+        "nickname": "Tista' tagħżel laqam: l-oħrajn jarawh minflok ismek. L-organizzaturi u l-moderaturi jafu min hemm warajh.",
+        "nicknameTranscript": "Jekk tagħti l-kunsens għat-traskrizzjoni, hemmhekk tidher bil-laqam tiegħek jekk għażilt wieħed, inkella b'ismek."
       },
       "retention": {
         "label": "Żamma",

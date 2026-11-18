@@ -730,7 +730,32 @@
       "body": "Du har inte samtyckt till inspelningen: du deltar som alla andra, men din röst står utanför inspelningen. Ditt ansikte och ditt namn syns ändå aldrig i videon."
     },
     "nickname": {
-      "reserved": "Moderator,Talare,Föreläsare,Deltagare,Gäst,Arrangör,Organisatör,Administratör,Värd"
+      "reserved": "Moderator,Talare,Föreläsare,Deltagare,Gäst,Arrangör,Organisatör,Administratör,Värd",
+      "label": "Smeknamn (valfritt)",
+      "help": "Ett ord, 2 till 24 tecken: bokstäver, siffror och . _ -. De andra ser det i stället för ditt namn i videon, i chatten, bland frågorna och i transkriptionen.",
+      "helpName": "Om du lämnar det tomt visas du med ditt namn.",
+      "helpAnonymous": "Om du lämnar det tomt visas du med en automatisk pseudonym.",
+      "checking": "Smeknamnet kontrolleras…",
+      "shownAs": "De andra kommer att se dig som ”{nickname}”.",
+      "useSuggestion": "Använd ”{suggestion}”",
+      "errors": {
+        "length": "Smeknamnet måste vara 2 till 24 tecken långt.",
+        "format": "Ett ord: det börjar med en bokstav och slutar med en bokstav eller siffra; däremellan bokstäver, siffror och . _ -, aldrig två i rad.",
+        "scripts": "Använd bokstäver från ett enda alfabet.",
+        "reserved": "Det innehåller ett reserverat ord, till exempel namnet på en roll: välj ett annat.",
+        "host": "Det liknar namnet på någon som leder evenemanget: välj ett annat.",
+        "taken": "Någon i evenemanget använder redan det här smeknamnet.",
+        "rete": "Smeknamnet kunde inte kontrolleras. Försök igen."
+      },
+      "button": "Smeknamn",
+      "open": "Ändra ditt smeknamn",
+      "dialogTitle": "Ditt smeknamn",
+      "dialogIntro": "De andra ser smeknamnet i stället för ditt namn. För att ändra det ansluter rummet dig på nytt en kort stund.",
+      "apply": "Spara och anslut igen",
+      "remove": "Ta bort smeknamnet",
+      "reconnecting": "Ansluter igen…",
+      "done": "Klart: du visas nu som ”{nickname}”.",
+      "doneRemoved": "Klart: smeknamnet har tagits bort."
     }
   },
   "qa": {
@@ -4711,7 +4736,9 @@
         "label": "Ditt namn",
         "real": "I rummet, i chatten och i frågorna visas du med ditt namn.",
         "pseudonym": "I rummet, i chatten och i frågorna visas du under en pseudonym. Arrangörerna ser uppgifterna från din anmälan.",
-        "pseudonymTranscript": "Om du samtycker till transkriptionen står ditt namn kvar där."
+        "pseudonymTranscript": "Om du samtycker till transkriptionen står ditt namn kvar där.",
+        "nickname": "Du kan välja ett smeknamn: de andra ser det i stället för ditt namn. Arrangörer och moderatorer vet vem som står bakom.",
+        "nicknameTranscript": "Om du samtycker till transkriptionen visas du där med ditt smeknamn om du har valt ett, annars med ditt namn."
       },
       "retention": {
         "label": "Lagring",

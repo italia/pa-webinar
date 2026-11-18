@@ -730,7 +730,32 @@
       "body": "Não deu o seu consentimento à gravação: participa como todos, mas a sua voz fica fora da gravação. O seu rosto e o seu nome nunca aparecem no vídeo, de qualquer forma."
     },
     "nickname": {
-      "reserved": "Moderador,Moderadora,Orador,Oradora,Palestrante,Participante,Convidado,Convidada,Organizador,Organizadora,Administrador,Administradora,Anfitrião,Anfitriã"
+      "reserved": "Moderador,Moderadora,Orador,Oradora,Palestrante,Participante,Convidado,Convidada,Organizador,Organizadora,Administrador,Administradora,Anfitrião,Anfitriã",
+      "label": "Alcunha (opcional)",
+      "help": "Uma só palavra, de 2 a 24 caracteres: letras, algarismos e . _ -. Os outros veem-na em vez do seu nome no vídeo, no chat, nas perguntas e na transcrição.",
+      "helpName": "Se a deixar vazia, aparece com o seu nome.",
+      "helpAnonymous": "Se a deixar vazia, aparece com um pseudónimo automático.",
+      "checking": "A verificar a alcunha…",
+      "shownAs": "Os outros vão vê-lo como «{nickname}».",
+      "useSuggestion": "Usar «{suggestion}»",
+      "errors": {
+        "length": "A alcunha deve ter entre 2 e 24 caracteres.",
+        "format": "Uma só palavra: começa por uma letra e termina com uma letra ou um algarismo; pelo meio letras, algarismos e . _ -, nunca dois seguidos.",
+        "scripts": "Use as letras de um só alfabeto.",
+        "reserved": "Contém uma palavra reservada, como o nome de uma função: escolha outra.",
+        "host": "Parece-se com o nome de quem conduz o evento: escolha outra.",
+        "taken": "Alguém no evento já usa esta alcunha.",
+        "rete": "Não foi possível verificar a alcunha. Tente novamente."
+      },
+      "button": "Alcunha",
+      "open": "Alterar a sua alcunha",
+      "dialogTitle": "A sua alcunha",
+      "dialogIntro": "Os outros veem a alcunha em vez do seu nome. Para a alterar, a sala volta a ligá-lo por um momento.",
+      "apply": "Guardar e voltar a ligar",
+      "remove": "Remover a alcunha",
+      "reconnecting": "A voltar a ligar…",
+      "done": "Feito: agora aparece como «{nickname}».",
+      "doneRemoved": "Feito: a alcunha foi removida."
     }
   },
   "qa": {
@@ -4711,7 +4736,9 @@
         "label": "O seu nome",
         "real": "Na sala, no chat e nas perguntas aparece com o seu nome.",
         "pseudonym": "Na sala, no chat e nas perguntas aparece com um pseudónimo. Quem organiza vê os dados da inscrição.",
-        "pseudonymTranscript": "Se consentir na transcrição, nela fica o seu nome."
+        "pseudonymTranscript": "Se consentir na transcrição, nela fica o seu nome.",
+        "nickname": "Pode escolher uma alcunha: os outros veem-na em vez do seu nome. Quem organiza e quem modera sabe quem está por trás.",
+        "nicknameTranscript": "Se der consentimento à transcrição, aparece lá com a sua alcunha, se tiver escolhido uma; caso contrário, com o seu nome."
       },
       "retention": {
         "label": "Conservação",

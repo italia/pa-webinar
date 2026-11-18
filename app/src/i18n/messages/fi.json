@@ -730,7 +730,32 @@
       "body": "Et ole antanut suostumusta tallennukseen: osallistut kuten kaikki, mutta äänesi jää tallenteen ulkopuolelle. Kasvosi ja nimesi eivät muutenkaan koskaan näy videolla."
     },
     "nickname": {
-      "reserved": "Moderaattori,Puhuja,Esiintyjä,Osallistuja,Vieras,Järjestäjä,Ylläpitäjä,Juontaja"
+      "reserved": "Moderaattori,Puhuja,Esiintyjä,Osallistuja,Vieras,Järjestäjä,Ylläpitäjä,Juontaja",
+      "label": "Nimimerkki (vapaaehtoinen)",
+      "help": "Yksi sana, 2–24 merkkiä: kirjaimia, numeroita ja . _ -. Muut näkevät sen nimesi sijaan videossa, chatissa, kysymyksissä ja litteroinnissa.",
+      "helpName": "Jos jätät sen tyhjäksi, näyt omalla nimelläsi.",
+      "helpAnonymous": "Jos jätät sen tyhjäksi, näyt automaattisella salanimellä.",
+      "checking": "Nimimerkkiä tarkistetaan…",
+      "shownAs": "Muut näkevät sinut nimellä ”{nickname}”.",
+      "useSuggestion": "Käytä nimeä ”{suggestion}”",
+      "errors": {
+        "length": "Nimimerkin on oltava 2–24 merkkiä pitkä.",
+        "format": "Yksi sana: se alkaa kirjaimella ja päättyy kirjaimeen tai numeroon; välissä kirjaimia, numeroita ja . _ -, ei koskaan kahta peräkkäin.",
+        "scripts": "Käytä yhden aakkoston kirjaimia.",
+        "reserved": "Siinä on varattu sana, kuten roolin nimi: valitse toinen.",
+        "host": "Se muistuttaa tapahtuman vetäjän nimeä: valitse toinen.",
+        "taken": "Joku tapahtumassa käyttää jo tätä nimimerkkiä.",
+        "rete": "Nimimerkkiä ei voitu tarkistaa. Yritä uudelleen."
+      },
+      "button": "Nimimerkki",
+      "open": "Vaihda nimimerkkisi",
+      "dialogTitle": "Nimimerkkisi",
+      "dialogIntro": "Muut näkevät nimimerkin nimesi sijaan. Vaihtamista varten huone yhdistää sinut hetkeksi uudelleen.",
+      "apply": "Tallenna ja yhdistä uudelleen",
+      "remove": "Poista nimimerkki",
+      "reconnecting": "Yhdistetään uudelleen…",
+      "done": "Valmis: näyt nyt nimellä ”{nickname}”.",
+      "doneRemoved": "Valmis: nimimerkki on poistettu."
     }
   },
   "qa": {
@@ -4711,7 +4736,9 @@
         "label": "Nimesi",
         "real": "Huoneessa, chatissa ja kysymyksissä näyt omalla nimelläsi.",
         "pseudonym": "Huoneessa, chatissa ja kysymyksissä näyt salanimellä. Järjestäjät näkevät ilmoittautumistietosi.",
-        "pseudonymTranscript": "Jos annat suostumuksen litterointiin, nimesi jää siihen."
+        "pseudonymTranscript": "Jos annat suostumuksen litterointiin, nimesi jää siihen.",
+        "nickname": "Voit valita nimimerkin: muut näkevät sen nimesi sijaan. Järjestäjät ja moderaattorit tietävät, kuka sen takana on.",
+        "nicknameTranscript": "Jos annat suostumuksen litterointiin, näyt siinä nimimerkilläsi, jos olet valinnut sellaisen, muuten omalla nimelläsi."
       },
       "retention": {
         "label": "Säilytys",

@@ -730,7 +730,32 @@
       "body": "Nesutikote su įrašymu: dalyvaujate kaip visi, bet jūsų balsas į įrašą nepatenka. Jūsų veidas ir vardas vaizdo įraše vis tiek niekada nerodomi."
     },
     "nickname": {
-      "reserved": "Moderatorius,Moderatorė,Pranešėjas,Pranešėja,Kalbėtojas,Kalbėtoja,Dalyvis,Dalyvė,Svečias,Viešnia,Organizatorius,Organizatorė,Administratorius,Administratorė"
+      "reserved": "Moderatorius,Moderatorė,Pranešėjas,Pranešėja,Kalbėtojas,Kalbėtoja,Dalyvis,Dalyvė,Svečias,Viešnia,Organizatorius,Organizatorė,Administratorius,Administratorė",
+      "label": "Pravardė (neprivaloma)",
+      "help": "Vienas žodis, nuo 2 iki 24 simbolių: raidės, skaitmenys ir . _ -. Kiti ją mato vietoj jūsų vardo vaizdo įraše, pokalbyje, klausimuose ir stenogramoje.",
+      "helpName": "Jei paliksite tuščią, būsite rodomi savo vardu.",
+      "helpAnonymous": "Jei paliksite tuščią, būsite rodomi su automatiniu slapyvardžiu.",
+      "checking": "Tikrinama pravardė…",
+      "shownAs": "Kiti jus matys kaip „{nickname}“.",
+      "useSuggestion": "Naudoti „{suggestion}“",
+      "errors": {
+        "length": "Pravardė turi būti nuo 2 iki 24 simbolių.",
+        "format": "Vienas žodis: prasideda raide ir baigiasi raide arba skaitmeniu; tarp jų raidės, skaitmenys ir . _ -, niekada du iš eilės.",
+        "scripts": "Naudokite vienos abėcėlės raides.",
+        "reserved": "Joje yra rezervuotas žodis, pavyzdžiui, vaidmens pavadinimas: pasirinkite kitą.",
+        "host": "Ji panaši į renginį vedančio asmens vardą: pasirinkite kitą.",
+        "taken": "Kažkas renginyje jau naudoja šią pravardę.",
+        "rete": "Pravardės patikrinti nepavyko. Bandykite dar kartą."
+      },
+      "button": "Pravardė",
+      "open": "Keisti pravardę",
+      "dialogTitle": "Jūsų pravardė",
+      "dialogIntro": "Kiti mato pravardę vietoj jūsų vardo. Norint ją pakeisti, kambarys akimirkai jus prijungia iš naujo.",
+      "apply": "Išsaugoti ir prisijungti iš naujo",
+      "remove": "Pašalinti pravardę",
+      "reconnecting": "Jungiamasi iš naujo…",
+      "done": "Atlikta: dabar esate rodomi kaip „{nickname}“.",
+      "doneRemoved": "Atlikta: pravardė pašalinta."
     }
   },
   "qa": {
@@ -4711,7 +4736,9 @@
         "label": "Jūsų vardas",
         "real": "Salėje, pokalbyje ir klausimuose rodomas jūsų vardas.",
         "pseudonym": "Salėje, pokalbyje ir klausimuose rodomas jūsų slapyvardis. Organizatoriai mato jūsų registracijos duomenis.",
-        "pseudonymTranscript": "Jei sutinkate su transkripcija, joje lieka jūsų vardas."
+        "pseudonymTranscript": "Jei sutinkate su transkripcija, joje lieka jūsų vardas.",
+        "nickname": "Galite pasirinkti pravardę: kiti ją mato vietoj jūsų vardo. Organizatoriai ir moderatoriai žino, kas už jos slypi.",
+        "nicknameTranscript": "Jei sutiksite su stenograma, joje būsite rodomi pravarde, jei ją pasirinkote, kitaip – savo vardu."
       },
       "retention": {
         "label": "Saugojimas",

@@ -730,7 +730,32 @@
       "body": "Vous n'avez pas consenti à l'enregistrement : vous participez comme tout le monde, mais votre voix reste hors de l'enregistrement. Votre visage et votre nom n'apparaissent de toute façon jamais dans la vidéo."
     },
     "nickname": {
-      "reserved": "Modérateur,Modératrice,Intervenant,Intervenante,Orateur,Oratrice,Participant,Participante,Invité,Invitée,Organisateur,Organisatrice,Administrateur,Administratrice,Animateur,Animatrice"
+      "reserved": "Modérateur,Modératrice,Intervenant,Intervenante,Orateur,Oratrice,Participant,Participante,Invité,Invitée,Organisateur,Organisatrice,Administrateur,Administratrice,Animateur,Animatrice",
+      "label": "Surnom (facultatif)",
+      "help": "Un seul mot, de 2 à 24 caractères : lettres, chiffres et . _ -. Les autres le voient à la place de votre nom dans la vidéo, dans le chat, dans les questions et dans la transcription.",
+      "helpName": "Si vous le laissez vide, vous apparaissez sous votre nom.",
+      "helpAnonymous": "Si vous le laissez vide, vous apparaissez sous un pseudonyme automatique.",
+      "checking": "Vérification du surnom…",
+      "shownAs": "Les autres vous verront sous le nom « {nickname} ».",
+      "useSuggestion": "Utiliser « {suggestion} »",
+      "errors": {
+        "length": "Le surnom doit compter de 2 à 24 caractères.",
+        "format": "Un seul mot : il commence par une lettre et se termine par une lettre ou un chiffre ; entre les deux, des lettres, des chiffres et . _ -, jamais deux à la suite.",
+        "scripts": "Utilisez les lettres d'un seul alphabet.",
+        "reserved": "Il contient un mot réservé, comme le nom d'un rôle : choisissez-en un autre.",
+        "host": "Il ressemble au nom d'une personne qui anime l'événement : choisissez-en un autre.",
+        "taken": "Quelqu'un dans l'événement utilise déjà ce surnom.",
+        "rete": "Le surnom n'a pas pu être vérifié. Réessayez."
+      },
+      "button": "Surnom",
+      "open": "Changer votre surnom",
+      "dialogTitle": "Votre surnom",
+      "dialogIntro": "Les autres voient le surnom à la place de votre nom. Pour le changer, la salle vous reconnecte un instant.",
+      "apply": "Enregistrer et se reconnecter",
+      "remove": "Retirer le surnom",
+      "reconnecting": "Reconnexion en cours…",
+      "done": "C'est fait : vous apparaissez maintenant sous le nom « {nickname} ».",
+      "doneRemoved": "C'est fait : le surnom a été retiré."
     }
   },
   "qa": {
@@ -4711,7 +4736,9 @@
         "label": "Votre nom",
         "real": "Dans la salle, dans le chat et dans les questions, vous apparaissez sous votre nom.",
         "pseudonym": "Dans la salle, dans le chat et dans les questions, vous apparaissez sous un pseudonyme. Les organisateurs voient les données de votre inscription.",
-        "pseudonymTranscript": "Si vous consentez à la transcription, votre nom y reste."
+        "pseudonymTranscript": "Si vous consentez à la transcription, votre nom y reste.",
+        "nickname": "Vous pouvez choisir un surnom : les autres le voient à la place de votre nom. Les organisateurs et les modérateurs savent qui se trouve derrière.",
+        "nicknameTranscript": "Si vous consentez à la transcription, vous y apparaissez sous votre surnom si vous en avez choisi un, sinon sous votre nom."
       },
       "retention": {
         "label": "Conservation",

@@ -730,7 +730,32 @@
       "body": "Sie haben nicht in die Aufzeichnung eingewilligt: Sie nehmen wie alle teil, aber Ihre Stimme bleibt außerhalb der Aufzeichnung. Ihr Gesicht und Ihr Name erscheinen ohnehin nie im Video."
     },
     "nickname": {
-      "reserved": "Moderator,Moderatorin,Referent,Referentin,Sprecher,Sprecherin,Teilnehmer,Teilnehmerin,Teilnehmende,Gast,Veranstalter,Veranstalterin,Organisator,Organisatorin,Administrator,Administratorin"
+      "reserved": "Moderator,Moderatorin,Referent,Referentin,Sprecher,Sprecherin,Teilnehmer,Teilnehmerin,Teilnehmende,Gast,Veranstalter,Veranstalterin,Organisator,Organisatorin,Administrator,Administratorin",
+      "label": "Spitzname (optional)",
+      "help": "Ein Wort, 2 bis 24 Zeichen: Buchstaben, Ziffern und . _ -. Die anderen sehen ihn statt Ihres Namens im Video, im Chat, bei den Fragen und im Transkript.",
+      "helpName": "Wenn Sie das Feld leer lassen, erscheinen Sie mit Ihrem Namen.",
+      "helpAnonymous": "Wenn Sie das Feld leer lassen, erscheinen Sie mit einem automatischen Pseudonym.",
+      "checking": "Spitzname wird geprüft…",
+      "shownAs": "Die anderen sehen Sie als „{nickname}“.",
+      "useSuggestion": "„{suggestion}“ verwenden",
+      "errors": {
+        "length": "Der Spitzname muss 2 bis 24 Zeichen lang sein.",
+        "format": "Ein Wort: Es beginnt mit einem Buchstaben und endet mit einem Buchstaben oder einer Ziffer; dazwischen Buchstaben, Ziffern und . _ -, nie zwei hintereinander.",
+        "scripts": "Verwenden Sie Buchstaben eines einzigen Alphabets.",
+        "reserved": "Er enthält ein reserviertes Wort, etwa den Namen einer Rolle: Wählen Sie einen anderen.",
+        "host": "Er ähnelt dem Namen einer Person, die die Veranstaltung leitet: Wählen Sie einen anderen.",
+        "taken": "Jemand in der Veranstaltung verwendet diesen Spitznamen bereits.",
+        "rete": "Der Spitzname konnte nicht geprüft werden. Versuchen Sie es erneut."
+      },
+      "button": "Spitzname",
+      "open": "Spitznamen ändern",
+      "dialogTitle": "Ihr Spitzname",
+      "dialogIntro": "Die anderen sehen den Spitznamen statt Ihres Namens. Zum Ändern verbindet der Raum Sie kurz neu.",
+      "apply": "Speichern und neu verbinden",
+      "remove": "Spitznamen entfernen",
+      "reconnecting": "Neue Verbindung wird hergestellt…",
+      "done": "Erledigt: Sie erscheinen jetzt als „{nickname}“.",
+      "doneRemoved": "Erledigt: Der Spitzname wurde entfernt."
     }
   },
   "qa": {
@@ -4711,7 +4736,9 @@
         "label": "Ihr Name",
         "real": "Im Raum, im Chat und bei den Fragen erscheinen Sie unter Ihrem Namen.",
         "pseudonym": "Im Raum, im Chat und bei den Fragen erscheinen Sie unter einem Pseudonym. Die Veranstalter sehen Ihre Anmeldedaten.",
-        "pseudonymTranscript": "Wenn Sie in die Transkription einwilligen, bleibt dort Ihr Name stehen."
+        "pseudonymTranscript": "Wenn Sie in die Transkription einwilligen, bleibt dort Ihr Name stehen.",
+        "nickname": "Sie können einen Spitznamen wählen: Die anderen sehen ihn statt Ihres Namens. Veranstaltende und Moderierende wissen, wer dahintersteht.",
+        "nicknameTranscript": "Wenn Sie dem Transkript zustimmen, erscheinen Sie dort mit Ihrem Spitznamen, falls Sie einen gewählt haben, sonst mit Ihrem Namen."
       },
       "retention": {
         "label": "Aufbewahrung",

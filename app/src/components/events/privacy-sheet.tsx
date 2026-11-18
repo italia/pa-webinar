@@ -79,6 +79,8 @@ export function schedaInSala(
     ...(adesso.conduce
       ? {
           pseudonimi: false,
+          // Chi conduce compare con il suo nome.
+          nickname: false,
           registrazione: {
             ...scheda.registrazione,
             // Chi conduce non da' il consenso alla registrazione: dove c'e' un
@@ -190,10 +192,15 @@ export function PrivacySheet({
     );
   }
 
-  // Il nome nella trascrizione si dice dove quel consenso esiste.
-  const frasiNome = scheda.pseudonimi
-    ? [t('name.pseudonym'), ...(trascrizione.chiesta ? [t('name.pseudonymTranscript')] : [])]
-    : [t('name.real')];
+  // Il nome nella trascrizione si dice dove quel consenso esiste. Con il
+  // nickname li' compare quello, se la persona l'ha scelto.
+  const frasiNome = [
+    t(scheda.pseudonimi ? 'name.pseudonym' : 'name.real'),
+    ...(scheda.nickname ? [t('name.nickname')] : []),
+    ...(trascrizione.chiesta && (scheda.pseudonimi || scheda.nickname)
+      ? [t(scheda.nickname ? 'name.nicknameTranscript' : 'name.pseudonymTranscript')]
+      : []),
+  ];
 
   return (
     <section className="wr-summary" aria-labelledby={titolo}>

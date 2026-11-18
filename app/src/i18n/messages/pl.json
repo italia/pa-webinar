@@ -730,7 +730,32 @@
       "body": "Bez zgody na nagrywanie uczestniczysz jak wszyscy, ale twój głos pozostaje poza nagraniem. Twoja twarz oraz twoje imię i nazwisko i tak nigdy nie pojawiają się w nagraniu wideo."
     },
     "nickname": {
-      "reserved": "Moderator,Moderatorka,Prelegent,Prelegentka,Mówca,Uczestnik,Uczestniczka,Gość,Organizator,Organizatorka,Administrator,Administratorka,Prowadzący,Prowadząca"
+      "reserved": "Moderator,Moderatorka,Prelegent,Prelegentka,Mówca,Uczestnik,Uczestniczka,Gość,Organizator,Organizatorka,Administrator,Administratorka,Prowadzący,Prowadząca",
+      "label": "Nick (opcjonalnie)",
+      "help": "Jedno słowo, od 2 do 24 znaków: litery, cyfry i . _ -. Inni widzą go zamiast Twojego imienia i nazwiska w wideo, na czacie, w pytaniach i w transkrypcji.",
+      "helpName": "Jeśli zostawisz to pole puste, będziesz widoczny pod swoim imieniem i nazwiskiem.",
+      "helpAnonymous": "Jeśli zostawisz to pole puste, będziesz widoczny pod automatycznym pseudonimem.",
+      "checking": "Sprawdzanie nicka…",
+      "shownAs": "Inni będą Cię widzieć jako „{nickname}”.",
+      "useSuggestion": "Użyj „{suggestion}”",
+      "errors": {
+        "length": "Nick musi mieć od 2 do 24 znaków.",
+        "format": "Jedno słowo: zaczyna się literą i kończy literą lub cyfrą; pomiędzy litery, cyfry i . _ -, nigdy dwa obok siebie.",
+        "scripts": "Użyj liter tylko jednego alfabetu.",
+        "reserved": "Zawiera zastrzeżone słowo, na przykład nazwę roli: wybierz inny.",
+        "host": "Przypomina imię lub nazwisko osoby prowadzącej wydarzenie: wybierz inny.",
+        "taken": "Ktoś na tym wydarzeniu już używa tego nicka.",
+        "rete": "Nie udało się sprawdzić nicka. Spróbuj ponownie."
+      },
+      "button": "Nick",
+      "open": "Zmień swój nick",
+      "dialogTitle": "Twój nick",
+      "dialogIntro": "Inni widzą nick zamiast Twojego imienia i nazwiska. Aby go zmienić, sala na chwilę łączy Cię ponownie.",
+      "apply": "Zapisz i połącz ponownie",
+      "remove": "Usuń nick",
+      "reconnecting": "Ponowne łączenie…",
+      "done": "Gotowe: teraz jesteś widoczny jako „{nickname}”.",
+      "doneRemoved": "Gotowe: nick został usunięty."
     }
   },
   "qa": {
@@ -4711,7 +4736,9 @@
         "label": "Twoje imię i nazwisko",
         "real": "W sali, na czacie i w pytaniach występujesz pod swoim imieniem i nazwiskiem.",
         "pseudonym": "W sali, na czacie i w pytaniach występujesz pod pseudonimem. Organizatorzy widzą dane rejestracji.",
-        "pseudonymTranscript": "Jeśli wyrazisz zgodę na transkrypcję, pozostanie w niej Twoje imię i nazwisko."
+        "pseudonymTranscript": "Jeśli wyrazisz zgodę na transkrypcję, pozostanie w niej Twoje imię i nazwisko.",
+        "nickname": "Możesz wybrać nick: inni widzą go zamiast Twojego imienia i nazwiska. Organizatorzy i moderatorzy wiedzą, kto się za nim kryje.",
+        "nicknameTranscript": "Jeśli zgodzisz się na transkrypcję, będziesz w niej widoczny pod nickiem, jeśli go wybrałeś, a w przeciwnym razie pod imieniem i nazwiskiem."
       },
       "retention": {
         "label": "Przechowywanie",

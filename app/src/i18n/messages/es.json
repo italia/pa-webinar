@@ -730,7 +730,32 @@
       "body": "No has dado tu consentimiento a la grabación: participas como todos, pero tu voz queda fuera de la grabación. Tu cara y tu nombre nunca aparecen en el vídeo de todos modos."
     },
     "nickname": {
-      "reserved": "Moderador,Moderadora,Ponente,Orador,Oradora,Participante,Invitado,Invitada,Organizador,Organizadora,Administrador,Administradora,Anfitrión,Anfitriona"
+      "reserved": "Moderador,Moderadora,Ponente,Orador,Oradora,Participante,Invitado,Invitada,Organizador,Organizadora,Administrador,Administradora,Anfitrión,Anfitriona",
+      "label": "Apodo (opcional)",
+      "help": "Una sola palabra, de 2 a 24 caracteres: letras, cifras y . _ -. Los demás lo ven en lugar de tu nombre en el vídeo, en el chat, en las preguntas y en la transcripción.",
+      "helpName": "Si lo dejas vacío, apareces con tu nombre.",
+      "helpAnonymous": "Si lo dejas vacío, apareces con un seudónimo automático.",
+      "checking": "Comprobando el apodo…",
+      "shownAs": "Los demás te verán como «{nickname}».",
+      "useSuggestion": "Usar «{suggestion}»",
+      "errors": {
+        "length": "El apodo debe tener entre 2 y 24 caracteres.",
+        "format": "Una sola palabra: empieza por una letra y termina con una letra o una cifra; en medio letras, cifras y . _ -, nunca dos seguidos.",
+        "scripts": "Usa letras de un solo alfabeto.",
+        "reserved": "Contiene una palabra reservada, como el nombre de un rol: elige otro.",
+        "host": "Se parece al nombre de quien conduce el evento: elige otro.",
+        "taken": "Alguien en el evento ya usa este apodo.",
+        "rete": "No se ha podido comprobar el apodo. Inténtalo de nuevo."
+      },
+      "button": "Apodo",
+      "open": "Cambiar tu apodo",
+      "dialogTitle": "Tu apodo",
+      "dialogIntro": "Los demás ven el apodo en lugar de tu nombre. Para cambiarlo, la sala te vuelve a conectar un momento.",
+      "apply": "Guardar y volver a conectar",
+      "remove": "Quitar el apodo",
+      "reconnecting": "Volviendo a conectar…",
+      "done": "Hecho: ahora apareces como «{nickname}».",
+      "doneRemoved": "Hecho: se ha quitado el apodo."
     }
   },
   "qa": {
@@ -4711,7 +4736,9 @@
         "label": "Tu nombre",
         "real": "En la sala, en el chat y en las preguntas apareces con tu nombre.",
         "pseudonym": "En la sala, en el chat y en las preguntas apareces con un seudónimo. Quien organiza ve los datos de la inscripción.",
-        "pseudonymTranscript": "Si das tu consentimiento a la transcripción, allí queda tu nombre."
+        "pseudonymTranscript": "Si das tu consentimiento a la transcripción, allí queda tu nombre.",
+        "nickname": "Puedes elegir un apodo: los demás lo ven en lugar de tu nombre. Quienes organizan y moderan saben quién está detrás.",
+        "nicknameTranscript": "Si das tu consentimiento a la transcripción, allí apareces con tu apodo, si has elegido uno; si no, con tu nombre."
       },
       "retention": {
         "label": "Conservación",

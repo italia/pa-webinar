@@ -730,7 +730,32 @@
       "body": "Sa ei ole andnud nõusolekut salvestamiseks: osaled nagu kõik, kuid sinu hääl jääb salvestisest välja. Sinu nägu ja nimi ei ilmu videole niikuinii kunagi."
     },
     "nickname": {
-      "reserved": "Moderaator,Esineja,Kõneleja,Osaleja,Külaline,Korraldaja,Administraator,Võõrustaja"
+      "reserved": "Moderaator,Esineja,Kõneleja,Osaleja,Külaline,Korraldaja,Administraator,Võõrustaja",
+      "label": "Hüüdnimi (valikuline)",
+      "help": "Üks sõna, 2–24 märki: tähed, numbrid ja . _ -. Teised näevad seda sinu nime asemel videos, vestluses, küsimustes ja transkriptsioonis.",
+      "helpName": "Kui jätad selle tühjaks, oled nähtav oma nimega.",
+      "helpAnonymous": "Kui jätad selle tühjaks, oled nähtav automaatse pseudonüümiga.",
+      "checking": "Hüüdnime kontrollimine…",
+      "shownAs": "Teised näevad sind kui „{nickname}“.",
+      "useSuggestion": "Kasuta „{suggestion}“",
+      "errors": {
+        "length": "Hüüdnimi peab olema 2–24 märki pikk.",
+        "format": "Üks sõna: algab tähega ja lõpeb tähe või numbriga; vahel tähed, numbrid ja . _ -, mitte kunagi kaks järjest.",
+        "scripts": "Kasuta ühe tähestiku tähti.",
+        "reserved": "See sisaldab reserveeritud sõna, näiteks rolli nime: vali mõni teine.",
+        "host": "See sarnaneb ürituse juhi nimega: vali mõni teine.",
+        "taken": "Keegi üritusel juba kasutab seda hüüdnime.",
+        "rete": "Hüüdnime ei õnnestunud kontrollida. Proovi uuesti."
+      },
+      "button": "Hüüdnimi",
+      "open": "Muuda oma hüüdnime",
+      "dialogTitle": "Sinu hüüdnimi",
+      "dialogIntro": "Teised näevad hüüdnime sinu nime asemel. Selle muutmiseks ühendab ruum sind hetkeks uuesti.",
+      "apply": "Salvesta ja ühenda uuesti",
+      "remove": "Eemalda hüüdnimi",
+      "reconnecting": "Uuesti ühendamine…",
+      "done": "Valmis: nüüd oled nähtav kui „{nickname}“.",
+      "doneRemoved": "Valmis: hüüdnimi on eemaldatud."
     }
   },
   "qa": {
@@ -4711,7 +4736,9 @@
         "label": "Sinu nimi",
         "real": "Ruumis, vestluses ja küsimustes oled nähtav oma nimega.",
         "pseudonym": "Ruumis, vestluses ja küsimustes oled nähtav pseudonüümiga. Korraldajad näevad sinu registreerumisandmeid.",
-        "pseudonymTranscript": "Kui nõustud transkribeerimisega, jääb sinu nimi transkriptsiooni."
+        "pseudonymTranscript": "Kui nõustud transkribeerimisega, jääb sinu nimi transkriptsiooni.",
+        "nickname": "Saad valida hüüdnime: teised näevad seda sinu nime asemel. Korraldajad ja moderaatorid teavad, kes selle taga on.",
+        "nicknameTranscript": "Kui nõustud transkriptsiooniga, oled seal nähtav oma hüüdnimega, kui oled selle valinud, muidu oma nimega."
       },
       "retention": {
         "label": "Säilitamine",

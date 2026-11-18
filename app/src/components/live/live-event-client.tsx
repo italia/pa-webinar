@@ -125,6 +125,8 @@ import {
 } from '@/lib/jitsi/riconnessione';
 import { useRientro } from '@/hooks/use-rientro';
 import { usePresencePass } from '@/hooks/use-presence-pass';
+import { leggiNicknameVisita, useNickname, type ErroreNickname } from '@/hooks/use-nickname';
+import { NicknameDialog } from '@/components/live/nickname-field';
 import { splitTitleKicker } from '@/lib/utils/title-kicker';
 import { useSettings } from '@/lib/settings-context';
 import { OVERTIME_CAP_DEFAULT_MINUTES } from '@/lib/events/overtime-defaults';
@@ -140,6 +142,8 @@ interface EventInfo {
   waitingRoomEngine?: 'GARDEN' | 'GAME' | 'CLASSIC';
   /** Pubblico anonimo: chi partecipa compare con uno pseudonimo. */
   audienceAnonymous?: boolean;
+  /** Chi partecipa puo' usare un nickname (lib/live/nickname). */
+  nicknamesEnabled?: boolean;
   /** L'elenco di chi partecipa e' visibile al pubblico (lib/live/participant-list). */
   participantListVisible?: boolean;
   /** Resolved video/audio quality preset (per-event override merged with site default). */
@@ -270,6 +274,8 @@ interface LiveEventClientProps {
   /** Chi apre il proprio link d'iscrizione dal browser con cui si e' iscritto:
    *  in sala compare con il nome dell'iscrizione. */
   registrantOwnsLink?: boolean;
+  /** Il nickname salvato sull'iscrizione, per chi apre il proprio link. */
+  initialNickname?: string | null;
   displayName: string;
   locale: string;
   jitsiDomain: string;
@@ -386,6 +392,9 @@ interface JitsiCredentials {
    *  di questa. Il consenso resta legato al testo su cui e' stato dato (`consensoOra`):
    *  se quel testo non la copre, si dimentica e si richiede sul testo nuovo. */
   recordingDestination?: RecordingAudience | null;
+  /** Il nickname con cui si e' in sala (lib/live/nickname); null senza. Assente
+   *  per chi conduce. */
+  nickname?: string | null;
 }
 
 /**
@@ -413,6 +422,7 @@ export default function LiveEventClient({
   hasRecordingConsent = false,
   registrationJoined = false,
   registrantOwnsLink = false,
+  initialNickname = null,
   displayName: initialDisplayName,
   locale,
   jitsiDomain,
@@ -478,6 +488,23 @@ export default function LiveEventClient({
   const liveRootRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [chosenName, setChosenName] = useState(initialDisplayName);
+  // Il nickname (lib/live/nickname), dove l'evento lo consente a chi partecipa.
+  // Chi apre il link di un altro col pubblico anonimo resta con lo pseudonimo
+  // del posto, come dice la rotta del token.
+  const linkDiUnAltro = !!token && !isGuest && !isModerator && !isSpeaker && !registrantOwnsLink;
+  const nicknameOfferto =
+    !!event.nicknamesEnabled && !isModerator && !isSpeaker && !(linkDiUnAltro && event.audienceAnonymous);
+  // Quello della visita, che la pagina manda con ogni richiesta del token: chi
+  // apre il proprio link lo ha sull'iscrizione, e il server lo legge da li'.
+  const nicknameVisitaRef = useRef<string | null>(null);
+  const [erroreNickname, setErroreNickname] = useState<ErroreNickname | null>(null);
+  // Dopo un ricaricamento la scheda lo ricorda, anche per un ingresso che non
+  // passa dalla sala d'attesa: mai il nome scritto al posto di un nickname.
+  useEffect(() => {
+    if (nicknameOfferto && !registrantOwnsLink && nicknameVisitaRef.current === null) {
+      nicknameVisitaRef.current = leggiNicknameVisita(event.id);
+    }
+  }, [nicknameOfferto, registrantOwnsLink, event.id]);
   // True once THIS client is actually in the conference (Jitsi
   // `videoConferenceJoined` → handleJitsiReady). Used to lift the "warming up"
   // overlay as soon as we're in, instead of waiting on the coarse bridge-side
@@ -868,6 +895,7 @@ export default function LiveEventClient({
       // già data) in diretta. Il nome scritto è obbligatorio: lo chiede la
       // sala d'attesa prima di passare a fetching_jwt.
       body.guestName = chosenName.trim();
+      if (nicknameOfferto && nicknameVisitaRef.current) body.nickname = nicknameVisitaRef.current;
     } else if (isModerator || isSpeaker) {
       // Chi modera e chi interviene arrivano dal link personale e usano il
       // campo `moderatorToken`: la rotta del token distingue i ruoli e dà a
@@ -887,6 +915,11 @@ export default function LiveEventClient({
       // cookie scaduto nel frattempo) e' il nome con cui entra.
       if (chosenName.trim()) {
         body.displayNameOverride = chosenName.trim();
+      }
+      // Lo stesso per il nickname della visita: per chi apre il proprio link
+      // conta quello salvato sull'iscrizione, e non si manda.
+      if (nicknameOfferto && !registrantOwnsLink && nicknameVisitaRef.current) {
+        body.nickname = nicknameVisitaRef.current;
       }
     }
     // I consensi dati ora con un clic: il server ne conserva la prova insieme al
@@ -928,6 +961,18 @@ export default function LiveEventClient({
     if (!res) return 'rete';
 
     if (rientro && (res.status >= 500 || res.status === 429)) return 'rete';
+    // Il nickname della visita non passa (preso nel frattempo, o non ammesso):
+    // si torna a sceglierlo, in sala d'attesa o nella finestra della sala, con
+    // il motivo e l'alternativa del server.
+    const rifiutoNickname = (res.data ?? {}) as { code?: string; reason?: string; suggestion?: string };
+    if (rifiutoNickname.code === 'NICKNAME_INVALID' || rifiutoNickname.code === 'NICKNAME_TAKEN') {
+      setErroreNickname({
+        motivo: (rifiutoNickname.reason ?? 'rete') as ErroreNickname['motivo'],
+        ...(rifiutoNickname.suggestion ? { suggerimento: rifiutoNickname.suggestion } : {}),
+      });
+      if (!senzaUscire) setPhase('waiting');
+      return 'gestito';
+    }
     if (senzaUscire && !res.ok) return 'rete';
     if (!res.ok) {
       const errore = (res.data ?? {}) as { code?: string };
@@ -1044,6 +1089,8 @@ export default function LiveEventClient({
     isGuest,
     token,
     chosenName,
+    nicknameOfferto,
+    registrantOwnsLink,
     router,
     t,
     tApi,
@@ -1108,6 +1155,8 @@ export default function LiveEventClient({
     (name: string, prefs: WaitingRoomJoinPrefs) => {
       setChosenName(name);
       setJoinPrefs(prefs);
+      if (prefs.nickname !== undefined) nicknameVisitaRef.current = prefs.nickname;
+      setErroreNickname(null);
       if (prefs.recordingConsent) {
         setTestoAcconsentito(testoLetto(prefs.recordingConsentDestination, destinazioneInVigore));
       }
@@ -1187,6 +1236,36 @@ export default function LiveEventClient({
   // senza: la conferenza si ricollega e il registratore smette di registrare
   // la voce.
   const [consensiAperti, setConsensiAperti] = useState(false);
+  // Il nickname dalla sala: la finestra parte da quello in uso, e un rifiuto
+  // della rotta del token (preso nel frattempo) torna nel suo campo.
+  const [nicknameAperto, setNicknameAperto] = useState(false);
+  const statoNickname = useNickname({
+    eventSlug: event.slug,
+    eventId: event.id,
+    token: token || undefined,
+    iniziale: null,
+  });
+  const { reimposta: reimpostaNickname, setErrore: segnaErroreNickname } = statoNickname;
+  const nicknameInUso = credentials?.nickname ?? null;
+  useEffect(() => {
+    if (nicknameAperto) reimpostaNickname(nicknameInUso);
+  }, [nicknameAperto, nicknameInUso, reimpostaNickname]);
+  useEffect(() => {
+    if (nicknameAperto && erroreNickname) segnaErroreNickname(erroreNickname);
+  }, [nicknameAperto, erroreNickname, segnaErroreNickname]);
+  // Il nome in video viene dal token della conferenza: un token nuovo, e la sala
+  // si ricollega con quello (JitsiRoom rientra quando cambia). Chi si e' iscritto
+  // l'ha gia' salvato sull'iscrizione; per gli altri e' quello della visita.
+  const applicaNickname = useCallback(
+    async (nuovo: string | null) => {
+      nicknameVisitaRef.current = nuovo;
+      setErroreNickname(null);
+      const esito = await richiediCredenziali(true, true);
+      if (esito === 'rete') segnaErroreNickname({ motivo: 'rete' });
+      return esito === 'fatto';
+    },
+    [richiediCredenziali, segnaErroreNickname],
+  );
   const [ritiro, setRitiro] = useState<'no' | 'in-corso' | 'errore'>('no');
   const effettoRitiro: EffettoRitiroRegistrazione =
     voceInSala === 'assente'
@@ -2369,6 +2448,17 @@ export default function LiveEventClient({
           // Chi apre il proprio link d'iscrizione entra con il nome dato
           // all'iscrizione.
           nomeDellIscrizione={registrantOwnsLink && !isGuest && !isModerator && !isSpeaker}
+          nickname={
+            nicknameOfferto
+              ? {
+                  eventId: event.id,
+                  // Quello in uso in sala, se si torna qui da dentro; altrimenti
+                  // quello salvato sull'iscrizione (la visita lo ritrova da se').
+                  iniziale: credentials ? (credentials.nickname ?? null) : initialNickname,
+                  errore: erroreNickname,
+                }
+              : undefined
+          }
           onEnterLive={handleEnterFromWaiting}
           onStartEvent={isModerator ? handleStartEvent : undefined}
           onLeaveFeedback={askFeedback ? () => setShowFeedback(true) : undefined}
@@ -2627,6 +2717,7 @@ export default function LiveEventClient({
         soloContenuto={soloContenuto}
         onToggleSoloContenuto={() => setSoloContenuto((v) => !v)}
         onApriConsensi={haConsensiInSala ? () => setConsensiAperti(true) : undefined}
+        onApriNickname={nicknameOfferto && credentials ? () => setNicknameAperto(true) : undefined}
       />
 
       <CaptureNotice video={isRecording} voci={!!cattura?.registrazione} trascrizione={trascrizioneInCorso} />
@@ -2901,7 +2992,9 @@ export default function LiveEventClient({
                 ? 'nessuna'
                 : 'voce'
           }
-          guestKeyName={isGuest || !token ? chosenName.trim() : undefined}
+          // Con il nickname l'ospite scrive e chiede con quello: chat e domande lo
+          // riconoscono come suo (lib/live/nickname).
+          guestKeyName={isGuest || !token ? (credentials.nickname || chosenName).trim() : undefined}
           elencoNascosto={elencoNascosto}
           nascosta={soloContenuto}
           onNascondi={nascondiColonna}
@@ -2972,6 +3065,19 @@ export default function LiveEventClient({
           }
           errore={riconsenso === 'errore' || ritiro === 'errore'}
           testoCambiato={riconsenso === 'rileggi'}
+          container={modalContainer}
+        />
+      )}
+
+      {/* Il nickname: cambiarlo o toglierlo, con un breve rientro. */}
+      {nicknameOfferto && (
+        <NicknameDialog
+          aperta={nicknameAperto}
+          onChiudi={() => setNicknameAperto(false)}
+          stato={statoNickname}
+          inUso={credentials.nickname ?? null}
+          anonimo={!!event.audienceAnonymous}
+          onApplica={applicaNickname}
           container={modalContainer}
         />
       )}
@@ -4431,6 +4537,8 @@ interface LiveTopBarProps {
   onToggleSoloContenuto?: () => void;
   /** I consensi della persona per l'evento, se l'evento ne chiede. */
   onApriConsensi?: () => void;
+  /** Il nickname della persona, dove l'evento lo consente. */
+  onApriNickname?: () => void;
 }
 
 function LiveTopBar({
@@ -4454,6 +4562,7 @@ function LiveTopBar({
   soloContenuto = false,
   onToggleSoloContenuto,
   onApriConsensi,
+  onApriNickname,
 }: LiveTopBarProps) {
   const t = useTranslations('live');
   const tr = useTranslations('live.role');
@@ -4616,6 +4725,22 @@ function LiveTopBar({
           >
             <Icon icon="it-locked" size="xs" color="white" />
             <span className="d-none d-xl-inline">{t('consents.button')}</span>
+          </Button>
+        )}
+        {onApriNickname && (
+          // Il nome con cui gli altri vedono la persona, da cambiare in sala.
+          <Button
+            color="light"
+            outline
+            size="xs"
+            className="d-inline-flex align-items-center gap-1 live-nickname-btn"
+            onClick={onApriNickname}
+            aria-haspopup="dialog"
+            aria-label={t('nickname.open')}
+            title={t('nickname.open')}
+          >
+            <Icon icon="it-user" size="xs" color="white" />
+            <span className="d-none d-xl-inline">{t('nickname.button')}</span>
           </Button>
         )}
         <LiveShareButton

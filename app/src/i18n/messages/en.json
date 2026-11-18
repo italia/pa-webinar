@@ -730,7 +730,32 @@
       "body": "You have not consented to the recording: you take part like everyone else, but your voice stays out of the recording. Your face and your name never appear in the video anyway."
     },
     "nickname": {
-      "reserved": "Moderator,Speaker,Participant,Guest,Organizer,Organiser,Administrator,Host,Presenter"
+      "reserved": "Moderator,Speaker,Participant,Guest,Organizer,Organiser,Administrator,Host,Presenter",
+      "label": "Nickname (optional)",
+      "help": "One word, 2 to 24 characters: letters, digits and . _ -. Others see it instead of your name in the video, in the chat, in questions and in the transcript.",
+      "helpName": "If you leave it empty, you appear under your name.",
+      "helpAnonymous": "If you leave it empty, you appear under an automatic pseudonym.",
+      "checking": "Checking the nickname…",
+      "shownAs": "Others will see you as “{nickname}”.",
+      "useSuggestion": "Use “{suggestion}”",
+      "errors": {
+        "length": "The nickname must be 2 to 24 characters long.",
+        "format": "One word: it starts with a letter and ends with a letter or a digit; in between letters, digits and . _ -, never two in a row.",
+        "scripts": "Use the letters of a single alphabet.",
+        "reserved": "It contains a reserved word, such as the name of a role: choose another one.",
+        "host": "It resembles the name of someone hosting the event: choose another one.",
+        "taken": "Someone in the event already uses this nickname.",
+        "rete": "The nickname could not be checked. Try again."
+      },
+      "button": "Nickname",
+      "open": "Change your nickname",
+      "dialogTitle": "Your nickname",
+      "dialogIntro": "Others see the nickname instead of your name. To change it, the room reconnects you for a moment.",
+      "apply": "Save and reconnect",
+      "remove": "Remove the nickname",
+      "reconnecting": "Reconnecting…",
+      "done": "Done: you now appear as “{nickname}”.",
+      "doneRemoved": "Done: the nickname has been removed."
     }
   },
   "qa": {
@@ -4711,7 +4736,9 @@
         "label": "Your name",
         "real": "In the room, in the chat and in questions you appear under your name.",
         "pseudonym": "In the room, in the chat and in questions you appear under a pseudonym. The organizers see your registration data.",
-        "pseudonymTranscript": "If you consent to the transcript, your name stays there."
+        "pseudonymTranscript": "If you consent to the transcript, your name stays there.",
+        "nickname": "You can choose a nickname: others see it instead of your name. Organizers and moderators know who is behind it.",
+        "nicknameTranscript": "If you consent to the transcript, you appear there under your nickname if you chose one, otherwise under your name."
       },
       "retention": {
         "label": "Retention",
