@@ -622,6 +622,7 @@
       "tab": "Rialú",
       "recordingHeading": "Taifeadadh",
       "recordingOff": "Gan taifeadadh",
+      "recordingNotOfferedInstant": "I nglaonna láithreacha ní thairgtear taifeadadh ach nuair a fhanann daoine nach dtugann toiliú lasmuigh den fhíseán, agus ní féidir leis an suiteáil seo é sin a dhéanamh.",
       "stopConfirm": "Stop an taifeadadh anois?",
       "featuresHeading": "Gnéithe an tseomra",
       "featuresHelp": "Casann siad air agus as do chách, láithreach.",
@@ -712,6 +713,14 @@
         "withdrawEffect": "Má tharraingíonn tú siar é, cailleann d'abairtí atá tras-scríofa cheana ó na fotheidil a dtéacs agus d'ainm, agus as seo amach ní thaifeadtar do ghuth ar rian ar leith ná ní thras-scríobhtar é. Maidir le tras-scríbhinn den fhíseán atá déanta cheana, déan teagmháil leis na heagraithe.",
         "needsRecording": "Is féidir leat é a thabhairt tar éis toiliú leis an taifeadadh."
       }
+    },
+    "recordingQuestion": {
+      "title": "Tá an glao á thaifeadadh",
+      "question": "Ar mhaith leat a bheith sa taifeadadh?",
+      "body": "Má fhreagraíonn tú tá, athnascfar an glao ar feadh cúpla soicind agus as sin amach beidh d'ainm, do ghuth agus d'íomhá sa taifeadadh. Má fhreagraíonn tú níl, nó má dhúnann tú an fhuinneog seo, leanfaidh tú ort ag glacadh páirte mar a rinne tú roimhe agus fanfaidh tú lasmuigh den taifeadadh.",
+      "later": "Má fhreagraíonn tú níl, fiafróimid díot arís ag an gcéad taifeadadh eile. Is féidir leat d'intinn a athrú ag am ar bith leis an gcnaipe {button} ag an mbarr.",
+      "yes": "Tá, ba mhaith liom a bheith ann",
+      "no": "Níl, fág amach mé"
     },
     "voiceExcluded": {
       "title": "Tá tú rannpháirteach gan taifeadadh.",
@@ -5416,6 +5425,7 @@
     "switchToLive": "Athraigh go beo",
     "enterRoom": "Téigh isteach sa seomra",
     "recordingNotice": "Féadfar an t-imeacht seo a thaifeadadh.",
+    "recordingNoticeInstant": "Féadfar an glao a thaifeadadh. Téann tú isteach lasmuigh den taifeadadh: má thosaíonn duine é, fiafróimid díot ar mhaith leat a bheith ann.",
     "recordingAvailableAfter": "Beidh an taifeadadh ar fáil tar éis an imeachta.",
     "autoRefreshHint": "Nuashonróidh an leathanach go huathoibríoch nuair a thosóidh an t-imeacht.",
     "startEventButton": "Tosaigh an t-imeacht",

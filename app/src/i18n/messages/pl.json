@@ -622,6 +622,7 @@
       "tab": "Reżyserka",
       "recordingHeading": "Nagrywanie",
       "recordingOff": "Bez nagrywania",
+      "recordingNotOfferedInstant": "W szybkich połączeniach nagrywanie jest dostępne tylko tam, gdzie osoby bez zgody pozostają poza nagraniem wideo, a ta instalacja tego nie umożliwia.",
       "stopConfirm": "Zatrzymać nagrywanie teraz?",
       "featuresHeading": "Funkcje sali",
       "featuresHelp": "Włączają się i wyłączają dla wszystkich, od razu.",
@@ -712,6 +713,14 @@
         "withdrawEffect": "Jeśli ją wycofasz, twoje zdania już przetranskrybowane z napisów tracą tekst i imię, a od teraz twój głos nie jest nagrywany na osobnej ścieżce ani transkrybowany. W sprawie transkrypcji wideo, która już powstała, zwróć się do organizatorów.",
         "needsRecording": "Możesz jej udzielić po wyrażeniu zgody na nagrywanie."
       }
+    },
+    "recordingQuestion": {
+      "title": "Połączenie jest nagrywane",
+      "question": "Czy chcesz pojawić się w nagraniu?",
+      "body": "Jeśli odpowiesz tak, połączenie na kilka sekund połączy się ponownie i od tej chwili twoje imię i nazwisko, głos i obraz będą częścią nagrania. Jeśli odpowiesz nie lub zamkniesz to okno, nadal uczestniczysz jak dotąd i pozostajesz poza nagraniem.",
+      "later": "Jeśli odpowiesz nie, zapytamy ponownie przy następnym nagraniu. Możesz zmienić zdanie w dowolnym momencie przyciskiem {button} u góry.",
+      "yes": "Tak, chcę się pojawić",
+      "no": "Nie, beze mnie"
     },
     "voiceExcluded": {
       "title": "Uczestniczysz bez nagrywania.",
@@ -5416,6 +5425,7 @@
     "switchToLive": "Przejdź do transmisji na żywo",
     "enterRoom": "Wejdź do sali",
     "recordingNotice": "To wydarzenie może być nagrywane.",
+    "recordingNoticeInstant": "Połączenie może być nagrywane. Wchodzisz poza nagraniem: jeśli ktoś je rozpocznie, zapytamy, czy chcesz się w nim pojawić.",
     "recordingAvailableAfter": "Nagranie będzie dostępne po zakończeniu wydarzenia.",
     "autoRefreshHint": "Strona zostanie automatycznie odświeżona, gdy wydarzenie się rozpocznie.",
     "startEventButton": "Rozpocznij wydarzenie",

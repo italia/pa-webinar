@@ -622,6 +622,7 @@
       "tab": "Juhtpult",
       "recordingHeading": "Salvestamine",
       "recordingOff": "Ei salvesta",
+      "recordingNotOfferedInstant": "Kiirkõnedes pakutakse salvestamist ainult seal, kus nõusolekuta inimesed jäävad videost välja, ja see paigaldus seda ei võimalda.",
       "stopConfirm": "Kas lõpetada salvestamine kohe?",
       "featuresHeading": "Ruumi funktsioonid",
       "featuresHelp": "Need lülituvad sisse ja välja kõigile kohe.",
@@ -712,6 +713,14 @@
         "withdrawEffect": "Kui võtad selle tagasi, kaotavad su subtiitritest juba transkribeeritud laused teksti ja nime ning nüüdsest su häält ei salvestata eraldi rajale ega transkribeerita. Juba loodud video transkriptsiooni puhul pöördu korraldajate poole.",
         "needsRecording": "Saad selle anda pärast nõusolekut salvestamiseks."
       }
+    },
+    "recordingQuestion": {
+      "title": "Kõnet salvestatakse",
+      "question": "Kas soovid salvestisel olla?",
+      "body": "Kui vastad jah, ühendatakse kõne mõneks sekundiks uuesti ja sellest hetkest on sinu nimi, hääl ja pilt salvestisel. Kui vastad ei või sulged selle akna, osaled edasi nagu enne ja jääd salvestisest välja.",
+      "later": "Kui vastad ei, küsime uuesti järgmise salvestuse ajal. Saad meelt muuta igal hetkel ülemise nupuga {button}.",
+      "yes": "Jah, soovin olla",
+      "no": "Ei, jään välja"
     },
     "voiceExcluded": {
       "title": "Osalete ilma salvestuseta.",
@@ -5416,6 +5425,7 @@
     "switchToLive": "Lülitu otseülekandele",
     "enterRoom": "Sisene ruumi",
     "recordingNotice": "Seda üritust võidakse salvestada.",
+    "recordingNoticeInstant": "Kõnet võidakse salvestada. Sisened salvestisest väljaspool: kui keegi salvestuse käivitab, küsime, kas soovid sellel olla.",
     "recordingAvailableAfter": "Salvestis on saadaval pärast üritust.",
     "autoRefreshHint": "Leht uueneb automaatselt, kui üritus algab.",
     "startEventButton": "Käivita üritus",

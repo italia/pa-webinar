@@ -61,12 +61,64 @@ describe('regolaConsenso', () => {
     expect(regola).toEqual({ registra: true, richiesto: false, soloAscolto: false });
   });
 
-  it('una chiamata rapida non chiede consensi', () => {
-    expect(regolaConsenso({ ...evento, eventType: 'INSTANT' }, true, 'rimovibile')).toEqual({
-      registra: false,
-      richiesto: false,
+  it('una chiamata rapida registra chi acconsente, dove la voce si puo\' togliere', () => {
+    const rapida = { ...evento, eventType: 'INSTANT' };
+    expect(regolaConsenso(rapida, true, 'rimovibile')).toEqual({
+      registra: true,
+      richiesto: true,
       soloAscolto: false,
     });
+    // Anche quando il pubblico non parla: si registra solo chi dice si'.
+    expect(regolaConsenso({ ...rapida, participantsCanUnmute: false }, true, 'rimovibile')).toEqual({
+      registra: true,
+      richiesto: true,
+      soloAscolto: false,
+    });
+  });
+
+  it('una chiamata rapida non va mai in solo ascolto: dove la voce resta, non registra', () => {
+    const niente = { registra: false, richiesto: false, soloAscolto: false };
+    const rapida = { ...evento, eventType: 'INSTANT' };
+    expect(regolaConsenso(rapida, true, 'fissa')).toEqual(niente);
+    expect(regolaConsenso(rapida, true, 'assente')).toEqual(niente);
+    expect(regolaConsenso(rapida, false, 'rimovibile')).toEqual(niente);
+    expect(regolaConsenso({ ...rapida, recordingEnabled: false }, true, 'rimovibile')).toEqual(niente);
+  });
+});
+
+describe('mediaDelToken in una chiamata rapida', () => {
+  const rapida = {
+    ...evento,
+    eventType: 'INSTANT',
+    participantsCanStartVideo: true,
+    participantsCanShareScreen: true,
+  };
+  const aperto = { audio: false, video: false, desktop: false };
+
+  it('senza consenso tutti entrano fuori dalla registrazione, chi conduce compreso', () => {
+    const regola = regolaConsenso(rapida, true, 'rimovibile');
+    expect(mediaDelToken(rapida, regola, 'moderatore', false)).toEqual({
+      mediaLock: aperto,
+      voiceExcluded: true,
+    });
+    expect(mediaDelToken(rapida, regola, 'partecipante', false)).toEqual({
+      mediaLock: aperto,
+      voiceExcluded: true,
+    });
+    expect(mediaDelToken(rapida, regola, 'partecipante', true)).toEqual({ mediaLock: aperto });
+  });
+
+  it('dove la voce resta nel video nessuno e\' escluso ne\' bloccato', () => {
+    for (const voce of ['fissa', 'assente'] as const) {
+      const regola = regolaConsenso(rapida, true, voce);
+      for (const chi of ['moderatore', 'relatore', 'partecipante'] as const) {
+        const media = mediaDelToken(rapida, regola, chi, false);
+        expect(media.voiceExcluded).toBeUndefined();
+        expect(media.listenOnly).toBeUndefined();
+        expect(media.consentLock).toBeUndefined();
+        expect(media.mediaLock).toEqual(aperto);
+      }
+    }
   });
 });
 

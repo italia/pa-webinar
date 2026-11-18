@@ -622,6 +622,7 @@
       "tab": "Kontroll",
       "recordingHeading": "Inspelning",
       "recordingOff": "Spelar inte in",
+      "recordingNotOfferedInstant": "I snabbsamtal erbjuds inspelning bara där den som inte samtycker hålls utanför videon, och den här installationen kan inte det.",
       "stopConfirm": "Stoppa inspelningen nu?",
       "featuresHeading": "Rummets funktioner",
       "featuresHelp": "De slås på och av för alla, direkt.",
@@ -712,6 +713,14 @@
         "withdrawEffect": "Om du återkallar det förlorar dina meningar som redan transkriberats från undertexterna text och namn, och från och med nu spelas din röst varken in på ett eget spår eller transkriberas. För en transkription av videon som redan har tagits fram, vänd dig till arrangörerna.",
         "needsRecording": "Du kan ge det efter samtycke till inspelningen."
       }
+    },
+    "recordingQuestion": {
+      "title": "Samtalet spelas in",
+      "question": "Vill du synas i inspelningen?",
+      "body": "Om du svarar ja ansluts samtalet på nytt i några sekunder, och från och med då ingår ditt namn, din röst och din bild i inspelningen. Om du svarar nej, eller stänger det här fönstret, fortsätter du delta som förut och står utanför inspelningen.",
+      "later": "Om du svarar nej frågar vi igen vid nästa inspelning. Du kan ändra dig när som helst med knappen {button} högst upp.",
+      "yes": "Ja, ta med mig",
+      "no": "Nej, utan mig"
     },
     "voiceExcluded": {
       "title": "Du deltar utan inspelning.",
@@ -5416,6 +5425,7 @@
     "switchToLive": "Byt till live",
     "enterRoom": "Gå in i rummet",
     "recordingNotice": "Detta evenemang kan komma att spelas in.",
+    "recordingNoticeInstant": "Samtalet kan spelas in. Du går in utanför inspelningen: om någon startar den frågar vi om du vill synas.",
     "recordingAvailableAfter": "Inspelningen blir tillgänglig efter evenemanget.",
     "autoRefreshHint": "Sidan uppdateras automatiskt när evenemanget startar.",
     "startEventButton": "Starta evenemang",

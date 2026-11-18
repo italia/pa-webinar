@@ -240,8 +240,11 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         },
             domandePubblicabili: domandePubblicabili(event),
             libraryListed: event.libraryListed,
-            recordingEnabled: isInstant ? false : event.recordingEnabled,
-            autoStartRecording: isInstant ? false : event.autoStartRecording,
+            // Anche nelle chiamate rapide la sala dell'ospite sa se si registra:
+            // gli chiede se vuole comparire quando qualcuno avvia la registrazione
+            // (lib/live/consent-rule). Avviarla resta di chi modera.
+            recordingEnabled: event.recordingEnabled,
+            autoStartRecording: event.autoStartRecording,
             qaEnabled: event.qaEnabled,
             chatEnabled: event.chatEnabled,
             agendaEnabled: event.agendaEnabled,
@@ -259,7 +262,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             videoDisponibile,
             tempRecordingUrl: recuperoInDiretta,
             feedbackEnabled: event.feedbackEnabled,
-            recordingConsentText: isInstant ? null : event.recordingConsentText,
+            recordingConsentText: event.recordingConsentText,
             voceNelVideo: voce,
             privacy,
             schedaPrivacy,
@@ -272,9 +275,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             liveCaptionsEnabled: event.liveCaptionsEnabled,
             liveCaptionsLanguage: settings.defaultLocale,
             aiConsentDisclosure,
-            multitrackRecordingEnabled: isInstant
-              ? false
-              : event.multitrackRecordingEnabled && canRecord,
+            multitrackRecordingEnabled: event.multitrackRecordingEnabled && canRecord,
             captionsTranscript: captionsTranscriptActive(event, settings),
             trascrizioneVideo,
           }}
@@ -416,7 +417,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
     if (staff) {
       const dellAccount = { eventId: event.id, staffAccountId: staff.accountId, withdrawnAt: null };
       const [proveStaff, tracceStaff] = await Promise.all([
-        registraChiConduce(event, canRecord)
+        registraChiConduce(event, canRecord, voce)
           ? prisma.recordingConsent.findMany({ where: dellAccount, select: { destination: true } })
           : [],
         chiedeConsensoPerVoce(event, settings)

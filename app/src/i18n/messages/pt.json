@@ -622,6 +622,7 @@
       "tab": "Régie",
       "recordingHeading": "Gravação",
       "recordingOff": "Sem gravação",
+      "recordingNotOfferedInstant": "Nas chamadas rápidas, a gravação só é oferecida onde quem não consente fica fora do vídeo, e esta instalação não o permite.",
       "stopConfirm": "Parar a gravação agora?",
       "featuresHeading": "Funções da sala",
       "featuresHelp": "Ligam-se e desligam-se para todos, de imediato.",
@@ -712,6 +713,14 @@
         "withdrawEffect": "Se o retirar, as suas frases já transcritas a partir das legendas perdem o texto e o nome, e a partir de agora a sua voz não é gravada numa faixa à parte nem transcrita. Para uma transcrição do vídeo já produzida, dirija-se a quem organiza.",
         "needsRecording": "Pode dá-lo depois do consentimento à gravação."
       }
+    },
+    "recordingQuestion": {
+      "title": "A chamada está a ser gravada",
+      "question": "Quer aparecer na gravação?",
+      "body": "Se responder sim, a chamada volta a ligar-se durante alguns segundos e, a partir desse momento, o seu nome, a sua voz e a sua imagem fazem parte da gravação. Se responder não, ou fechar esta janela, continua a participar como antes e fica fora da gravação.",
+      "later": "Se responder não, voltamos a perguntar na próxima gravação. Pode mudar de ideias em qualquer momento com o botão {button} em cima.",
+      "yes": "Sim, quero aparecer",
+      "no": "Não, fico de fora"
     },
     "voiceExcluded": {
       "title": "Participa sem gravação.",
@@ -5416,6 +5425,7 @@
     "switchToLive": "Mudar para o direto",
     "enterRoom": "Entrar na sala",
     "recordingNotice": "Este evento pode ser gravado.",
+    "recordingNoticeInstant": "A chamada pode ser gravada. Entra fora da gravação: se alguém a iniciar, perguntamos-lhe se quer aparecer.",
     "recordingAvailableAfter": "A gravação estará disponível após o evento.",
     "autoRefreshHint": "A página será atualizada automaticamente quando o evento começar.",
     "startEventButton": "Iniciar evento",

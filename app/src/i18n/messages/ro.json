@@ -622,6 +622,7 @@
       "tab": "Regie",
       "recordingHeading": "Înregistrare",
       "recordingOff": "Nu se înregistrează",
+      "recordingNotOfferedInstant": "În apelurile rapide, înregistrarea este oferită doar acolo unde cine nu își dă consimțământul rămâne în afara videoclipului, iar această instalare nu permite acest lucru.",
       "stopConfirm": "Oprești înregistrarea acum?",
       "featuresHeading": "Funcțiile sălii",
       "featuresHelp": "Se pornesc și se opresc pentru toți, imediat.",
@@ -712,6 +713,14 @@
         "withdrawEffect": "Dacă îl retragi, frazele tale deja transcrise din subtitrări își pierd textul și numele, iar de acum vocea ta nu mai este înregistrată pe o pistă separată și nici transcrisă. Pentru o transcriere a videoclipului deja realizată, adresează-te organizatorilor.",
         "needsRecording": "Îl poți da după consimțământul la înregistrare."
       }
+    },
+    "recordingQuestion": {
+      "title": "Apelul este înregistrat",
+      "question": "Vrei să apari în înregistrare?",
+      "body": "Dacă răspunzi da, apelul se reconectează pentru câteva secunde și, din acel moment, numele, vocea și imaginea ta fac parte din înregistrare. Dacă răspunzi nu sau închizi această fereastră, continui să participi ca înainte și rămâi în afara înregistrării.",
+      "later": "Dacă răspunzi nu, te vom întreba din nou la următoarea înregistrare. Te poți răzgândi oricând din butonul {button} de sus.",
+      "yes": "Da, vreau să apar",
+      "no": "Nu, fără mine"
     },
     "voiceExcluded": {
       "title": "Participi fără înregistrare.",
@@ -5416,6 +5425,7 @@
     "switchToLive": "Treceți la direct",
     "enterRoom": "Intrați în sală",
     "recordingNotice": "Acest eveniment poate fi înregistrat.",
+    "recordingNoticeInstant": "Apelul poate fi înregistrat. Intri în afara înregistrării: dacă cineva o pornește, te vom întreba dacă vrei să apari.",
     "recordingAvailableAfter": "Înregistrarea va fi disponibilă după eveniment.",
     "autoRefreshHint": "Pagina se va actualiza automat când evenimentul va începe.",
     "startEventButton": "Porniți evenimentul",

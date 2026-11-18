@@ -622,6 +622,7 @@
       "tab": "Control",
       "recordingHeading": "Recording",
       "recordingOff": "Not recording",
+      "recordingNotOfferedInstant": "In instant calls, recording is offered only where people who do not consent stay out of the video, and this installation cannot do that.",
       "stopConfirm": "Stop the recording now?",
       "featuresHeading": "Room features",
       "featuresHelp": "They turn on and off for everyone, right away.",
@@ -712,6 +713,14 @@
         "withdrawEffect": "If you withdraw it, your sentences already transcribed from the captions lose their text and your name, and from now on your voice is neither recorded on a separate track nor transcribed. For a video transcript that already exists, contact the organizers.",
         "needsRecording": "You can give it after consenting to the recording."
       }
+    },
+    "recordingQuestion": {
+      "title": "This call is being recorded",
+      "question": "Do you want to appear in the recording?",
+      "body": "If you answer yes, the call reconnects for a few seconds and from then on your name, your voice and your image are part of the recording. If you answer no, or close this window, you keep taking part as before and stay out of the recording.",
+      "later": "If you answer no, you will be asked again at the next recording. You can change your mind at any time with the {button} button at the top.",
+      "yes": "Yes, include me",
+      "no": "No, leave me out"
     },
     "voiceExcluded": {
       "title": "You are taking part without being recorded.",
@@ -5416,6 +5425,7 @@
     "switchToLive": "Switch to live",
     "enterRoom": "Enter the room",
     "recordingNotice": "This event may be recorded.",
+    "recordingNoticeInstant": "This call may be recorded. You join outside the recording: if someone starts it, you will be asked whether you want to appear.",
     "recordingAvailableAfter": "The recording will be available after the event.",
     "autoRefreshHint": "The page will automatically refresh when the event starts.",
     "startEventButton": "Start event",

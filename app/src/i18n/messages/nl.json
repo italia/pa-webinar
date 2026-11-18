@@ -622,6 +622,7 @@
       "tab": "Regie",
       "recordingHeading": "Opname",
       "recordingOff": "Geen opname",
+      "recordingNotOfferedInstant": "In snelle gesprekken wordt opnemen alleen aangeboden waar wie geen toestemming geeft buiten de video blijft, en deze installatie kan dat niet.",
       "stopConfirm": "De opname nu stoppen?",
       "featuresHeading": "Functies van de ruimte",
       "featuresHelp": "Ze gaan voor iedereen meteen aan en uit.",
@@ -712,6 +713,14 @@
         "withdrawEffect": "Als je hem intrekt, verliezen je zinnen die al uit de ondertitels zijn getranscribeerd hun tekst en je naam, en vanaf nu wordt je stem niet meer op een apart spoor opgenomen of getranscribeerd. Voor een transcriptie van de video die al is gemaakt, neem je contact op met de organisatoren.",
         "needsRecording": "Je kunt hem geven na toestemming voor de opname."
       }
+    },
+    "recordingQuestion": {
+      "title": "Dit gesprek wordt opgenomen",
+      "question": "Wil je in de opname verschijnen?",
+      "body": "Als je ja antwoordt, wordt het gesprek een paar seconden opnieuw verbonden en vanaf dat moment maken je naam, je stem en je beeld deel uit van de opname. Als je nee antwoordt of dit venster sluit, neem je deel zoals voorheen en blijf je buiten de opname.",
+      "later": "Als je nee antwoordt, vragen we het opnieuw bij de volgende opname. Je kunt op elk moment van gedachten veranderen via de knop {button} bovenaan.",
+      "yes": "Ja, neem mij op",
+      "no": "Nee, zonder mij"
     },
     "voiceExcluded": {
       "title": "U neemt deel zonder opname.",
@@ -5416,6 +5425,7 @@
     "switchToLive": "Overschakelen naar live",
     "enterRoom": "Zaal betreden",
     "recordingNotice": "Dit evenement kan worden opgenomen.",
+    "recordingNoticeInstant": "Dit gesprek kan worden opgenomen. Je komt binnen buiten de opname: als iemand die start, vragen we of je wilt verschijnen.",
     "recordingAvailableAfter": "De opname is beschikbaar na het evenement.",
     "autoRefreshHint": "De pagina wordt automatisch vernieuwd wanneer het evenement begint.",
     "startEventButton": "Evenement starten",

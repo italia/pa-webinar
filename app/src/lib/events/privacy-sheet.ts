@@ -197,12 +197,12 @@ function chiNonAcconsente(
 }
 
 /**
- * La scheda di un evento. Null per le chiamate rapide: non chiedono consensi e
- * chi entra dal link non ne vede la registrazione, ma chi modera puo' avviarla,
- * quindi nessuna delle due risposte sarebbe vera per tutti.
+ * La scheda di un evento. Null per le chiamate rapide: non hanno destinazione ne'
+ * modulo d'iscrizione, chi entra e' fuori dalla registrazione e la domanda arriva
+ * in sala quando qualcuno la avvia. La sala d'attesa lo dice con una riga sua.
  *
- * Riceve l'evento com'e', con il suo `eventType`, non i valori che la pagina
- * maschera per chi guarda: lo stesso evento ha una scheda sola.
+ * Riceve l'evento com'e', con il suo `eventType`: lo stesso evento ha una scheda
+ * sola, per chi conduce e per chi guarda.
  */
 export function schedaPrivacy({
   evento,

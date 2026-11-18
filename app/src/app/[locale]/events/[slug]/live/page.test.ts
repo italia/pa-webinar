@@ -532,7 +532,8 @@ describe('sala — la trascrizione dal video', () => {
     conEvento({ ...conAi, eventType: 'INSTANT' });
     const ospite = await clientProps();
     expect(ospite.event.trascrizioneVideo).toBe(false);
-    expect(ospite.event.recordingEnabled).toBe(false);
+    // L'ospite sa che la chiamata registra: la domanda gli arriva in sala.
+    expect(ospite.event.recordingEnabled).toBe(true);
     iscritto();
     expect((await clientProps(TOKEN)).event.trascrizioneVideo).toBe(false);
   });

@@ -622,6 +622,7 @@
       "tab": "Styring",
       "recordingHeading": "Optagelse",
       "recordingOff": "Optager ikke",
+      "recordingNotOfferedInstant": "I hurtige opkald tilbydes optagelse kun, hvor den, der ikke giver samtykke, holdes uden for videoen, og denne installation kan ikke det.",
       "stopConfirm": "Stop optagelsen nu?",
       "featuresHeading": "Rummets funktioner",
       "featuresHelp": "De slås til og fra for alle, med det samme.",
@@ -712,6 +713,14 @@
         "withdrawEffect": "Hvis du trækker det tilbage, mister dine sætninger, der allerede er transskriberet fra underteksterne, tekst og navn, og fra nu af optages din stemme hverken på et separat spor eller transskriberes. For en transskription af videoen, der allerede er lavet, skal du henvende dig til arrangørerne.",
         "needsRecording": "Du kan give det efter samtykke til optagelsen."
       }
+    },
+    "recordingQuestion": {
+      "title": "Opkaldet bliver optaget",
+      "question": "Vil du være med i optagelsen?",
+      "body": "Hvis du svarer ja, forbindes opkaldet igen i nogle sekunder, og fra da af er dit navn, din stemme og dit billede med i optagelsen. Hvis du svarer nej eller lukker dette vindue, deltager du som før og er ikke med i optagelsen.",
+      "later": "Hvis du svarer nej, spørger vi igen ved næste optagelse. Du kan til enhver tid ombestemme dig med knappen {button} øverst.",
+      "yes": "Ja, tag mig med",
+      "no": "Nej, uden mig"
     },
     "voiceExcluded": {
       "title": "Du deltager uden optagelse.",
@@ -5416,6 +5425,7 @@
     "switchToLive": "Skift til live",
     "enterRoom": "Gå ind i rummet",
     "recordingNotice": "Denne begivenhed kan blive optaget.",
+    "recordingNoticeInstant": "Opkaldet kan blive optaget. Du går ind uden for optagelsen: hvis nogen starter den, spørger vi, om du vil være med.",
     "recordingAvailableAfter": "Optagelsen vil være tilgængelig efter begivenheden.",
     "autoRefreshHint": "Siden opdateres automatisk, når begivenheden starter.",
     "startEventButton": "Start begivenhed",

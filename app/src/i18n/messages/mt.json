@@ -622,6 +622,7 @@
       "tab": "Kontroll",
       "recordingHeading": "Reġistrazzjoni",
       "recordingOff": "Mhux qed jirreġistra",
+      "recordingNotOfferedInstant": "Fis-sejħiet rapidi r-reġistrazzjoni tiġi offruta biss fejn min ma jagħtix il-kunsens jibqa' barra mill-vidjo, u din l-installazzjoni ma tippermettix dan.",
       "stopConfirm": "Twaqqaf ir-reġistrazzjoni issa?",
       "featuresHeading": "Funzjonijiet tal-kamra",
       "featuresHelp": "Jinxtegħlu u jintfew għal kulħadd, minnufih.",
@@ -712,6 +713,14 @@
         "withdrawEffect": "Jekk tirtirah, is-sentenzi tiegħek diġà traskritti mis-sottotitoli jitilfu t-test u ismek, u minn issa 'l quddiem leħnek la jiġi rrekordjat f'binarju separat u lanqas traskritt. Għal traskrizzjoni tal-vidjo diġà prodotta, ikkuntattja lil min jorganizza.",
         "needsRecording": "Tista' tagħtih wara l-kunsens għar-reġistrazzjoni."
       }
+    },
+    "recordingQuestion": {
+      "title": "Is-sejħa qed tiġi rreġistrata",
+      "question": "Trid tidher fir-reġistrazzjoni?",
+      "body": "Jekk twieġeb iva, is-sejħa terġa' titqabbad għal ftit sekondi u minn dak il-mument l-isem, il-leħen u l-immaġni tiegħek ikunu parti mir-reġistrazzjoni. Jekk twieġeb le, jew tagħlaq din it-tieqa, tkompli tipparteċipa bħal qabel u tibqa' barra mir-reġistrazzjoni.",
+      "later": "Jekk twieġeb le, nerġgħu nistaqsuk fir-reġistrazzjoni li jmiss. Tista' tbiddel fehmtek fi kwalunkwe ħin mill-buttuna {button} ta' fuq.",
+      "yes": "Iva, irrid nidher",
+      "no": "Le, mingħajri"
     },
     "voiceExcluded": {
       "title": "Qed tipparteċipa mingħajr reġistrazzjoni.",
@@ -5416,6 +5425,7 @@
     "switchToLive": "Aqbad ħaj",
     "enterRoom": "Idħol fis-sala",
     "recordingNotice": "Dan l-avveniment jista' jiġi rrekordjat.",
+    "recordingNoticeInstant": "Is-sejħa tista' tiġi rreġistrata. Tidħol barra mir-reġistrazzjoni: jekk xi ħadd jibdiha, nistaqsuk jekk tridx tidher.",
     "recordingAvailableAfter": "Ir-reġistrazzjoni se tkun disponibbli wara l-avveniment.",
     "autoRefreshHint": "Il-paġna se taġġorna awtomatikament meta jibda l-avveniment.",
     "startEventButton": "Ibda l-avveniment",

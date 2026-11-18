@@ -622,6 +622,7 @@
       "tab": "Réžia",
       "recordingHeading": "Nahrávanie",
       "recordingOff": "Nenahráva sa",
+      "recordingNotOfferedInstant": "V rýchlych hovoroch sa nahrávanie ponúka len tam, kde ľudia bez súhlasu zostávajú mimo videa, a táto inštalácia to neumožňuje.",
       "stopConfirm": "Zastaviť nahrávanie teraz?",
       "featuresHeading": "Funkcie miestnosti",
       "featuresHelp": "Zapínajú sa a vypínajú pre všetkých, okamžite.",
@@ -712,6 +713,14 @@
         "withdrawEffect": "Ak ho odvoláte, vaše vety už prepísané z titulkov prídu o text aj meno a odteraz sa váš hlas nenahráva na samostatnú stopu ani neprepisuje. V prípade už vytvoreného prepisu videa sa obráťte na organizátorov.",
         "needsRecording": "Môžete ho udeliť po súhlase so záznamom."
       }
+    },
+    "recordingQuestion": {
+      "title": "Hovor sa nahráva",
+      "question": "Chcete sa objaviť v zázname?",
+      "body": "Ak odpoviete áno, hovor sa na niekoľko sekúnd znova pripojí a od tej chvíle budú vaše meno, hlas a obraz súčasťou záznamu. Ak odpoviete nie alebo toto okno zatvoríte, zúčastňujete sa ďalej ako doteraz a zostávate mimo záznamu.",
+      "later": "Ak odpoviete nie, opýtame sa znova pri ďalšom nahrávaní. Názor môžete kedykoľvek zmeniť tlačidlom {button} hore.",
+      "yes": "Áno, chcem sa objaviť",
+      "no": "Nie, bezo mňa"
     },
     "voiceExcluded": {
       "title": "Zúčastňujete sa bez nahrávania.",
@@ -5416,6 +5425,7 @@
     "switchToLive": "Prepnúť na živý prenos",
     "enterRoom": "Vstúpiť do miestnosti",
     "recordingNotice": "Toto podujatie sa môže nahrávať.",
+    "recordingNoticeInstant": "Hovor sa môže nahrávať. Vstupujete mimo záznamu: ak niekto nahrávanie spustí, opýtame sa vás, či sa v ňom chcete objaviť.",
     "recordingAvailableAfter": "Záznam bude k dispozícii po skončení udalosti.",
     "autoRefreshHint": "Stránka sa automaticky aktualizuje, keď udalosť začne.",
     "startEventButton": "Začať udalosť",

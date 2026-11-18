@@ -600,9 +600,9 @@ export default function Step5Review({
               {vociConsenso.length > 0
                 ? tf('consentsLine', { list: vociConsenso.join(' · ') })
                 : tf('consentsNone')}
-              {registraChiConduce({ recordingEnabled: form.recordingEnabled && !vuota, eventType: istantanea ? 'INSTANT' : null }, recordingAvailable) && (
+              {registraChiConduce({ recordingEnabled: form.recordingEnabled && !vuota, eventType: istantanea ? 'INSTANT' : null }, recordingAvailable, voceNelVideo) && (
                 <span className="d-block text-secondary small mt-1">
-                  {tf(conduceSempreRegistrato(form, voceNelVideo) ? 'consentsHostsAlways' : 'consentsHosts')}
+                  {tf(conduceSempreRegistrato({ ...form, eventType: istantanea ? 'INSTANT' : null }, voceNelVideo) ? 'consentsHostsAlways' : 'consentsHosts')}
                 </span>
               )}
               {(consensi.registrazione || consensi.tracce) && (

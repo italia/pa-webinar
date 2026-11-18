@@ -622,6 +622,7 @@
       "tab": "Rendezés",
       "recordingHeading": "Felvétel",
       "recordingOff": "Nincs felvétel",
+      "recordingNotOfferedInstant": "A gyorshívásokban a felvétel csak ott érhető el, ahol a hozzájárulást nem adók kimaradnak a videóból, és ez a telepítés erre nem képes.",
       "stopConfirm": "Leállítja most a felvételt?",
       "featuresHeading": "A terem funkciói",
       "featuresHelp": "Mindenkinek azonnal be- és kikapcsolnak.",
@@ -712,6 +713,14 @@
         "withdrawEffect": "Ha visszavonja, a feliratokból már átírt mondatai elveszítik a szövegüket és a nevét, és mostantól a hangját sem külön sávon nem rögzítjük, sem át nem írjuk. A videó már elkészült átirata ügyében forduljon a szervezőkhöz.",
         "needsRecording": "A felvételhez adott hozzájárulás után adhatja meg."
       }
+    },
+    "recordingQuestion": {
+      "title": "A hívásról felvétel készül",
+      "question": "Szeretne szerepelni a felvételen?",
+      "body": "Ha igennel válaszol, a hívás néhány másodpercre újracsatlakozik, és attól kezdve a neve, a hangja és a képe a felvétel része. Ha nemmel válaszol, vagy bezárja ezt az ablakot, ugyanúgy részt vesz, mint eddig, és kimarad a felvételből.",
+      "later": "Ha nemmel válaszol, a következő felvételnél újra megkérdezzük. Bármikor meggondolhatja magát a felső {button} gombbal.",
+      "yes": "Igen, szerepelni szeretnék",
+      "no": "Nem, nélkülem"
     },
     "voiceExcluded": {
       "title": "Rögzítés nélkül vesz részt.",
@@ -5416,6 +5425,7 @@
     "switchToLive": "Váltás élő közvetítésre",
     "enterRoom": "Belépés a szobába",
     "recordingNotice": "Erről az eseményről felvétel készülhet.",
+    "recordingNoticeInstant": "A hívásról felvétel készülhet. A felvételen kívül lép be: ha valaki elindítja, megkérdezzük, szeretne-e szerepelni rajta.",
     "recordingAvailableAfter": "A felvétel az esemény után lesz elérhető.",
     "autoRefreshHint": "Az oldal automatikusan frissül, amikor az esemény elkezdődik.",
     "startEventButton": "Esemény indítása",

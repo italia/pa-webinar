@@ -622,6 +622,7 @@
       "tab": "Režija",
       "recordingHeading": "Snimanje",
       "recordingOff": "Ne snima se",
+      "recordingNotOfferedInstant": "U brzim pozivima snimanje se nudi samo ondje gdje osobe bez privole ostaju izvan videozapisa, a ova instalacija to ne omogućuje.",
       "stopConfirm": "Zaustaviti snimanje sada?",
       "featuresHeading": "Funkcije sobe",
       "featuresHelp": "Uključuju se i isključuju za sve, odmah.",
@@ -712,6 +713,14 @@
         "withdrawEffect": "Ako je povučete, vaše rečenice već transkribirane iz titlova gube tekst i ime, a od sada se vaš glas ne snima u zaseban zapis niti transkribira. Za već izrađeni transkript videozapisa obratite se organizatorima.",
         "needsRecording": "Možete je dati nakon privole za snimanje."
       }
+    },
+    "recordingQuestion": {
+      "title": "Poziv se snima",
+      "question": "Želite li biti na snimci?",
+      "body": "Ako odgovorite da, poziv se na nekoliko sekundi ponovno povezuje i od tog trenutka vaše ime, glas i slika dio su snimke. Ako odgovorite ne ili zatvorite ovaj prozor, nastavljate sudjelovati kao i prije i ostajete izvan snimke.",
+      "later": "Ako odgovorite ne, pitat ćemo vas ponovno pri sljedećem snimanju. Predomisliti se možete u bilo kojem trenutku gumbom {button} na vrhu.",
+      "yes": "Da, želim biti na snimci",
+      "no": "Ne, bez mene"
     },
     "voiceExcluded": {
       "title": "Sudjelujete bez snimanja.",
@@ -5416,6 +5425,7 @@
     "switchToLive": "Prebaci na uživo",
     "enterRoom": "Uđite u dvoranu",
     "recordingNotice": "Ovaj se događaj može snimati.",
+    "recordingNoticeInstant": "Poziv se može snimati. Ulazite izvan snimke: ako netko pokrene snimanje, pitat ćemo vas želite li biti na snimci.",
     "recordingAvailableAfter": "Snimka će biti dostupna nakon događaja.",
     "autoRefreshHint": "Stranica će se automatski osvježiti kada događaj počne.",
     "startEventButton": "Pokreni događaj",

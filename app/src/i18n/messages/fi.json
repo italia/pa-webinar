@@ -622,6 +622,7 @@
       "tab": "Ohjaamo",
       "recordingHeading": "Tallennus",
       "recordingOff": "Ei tallenna",
+      "recordingNotOfferedInstant": "Pikapuheluissa tallennusta tarjotaan vain, jos suostumusta antamattomat voidaan pitää videon ulkopuolella, eikä tämä asennus pysty siihen.",
       "stopConfirm": "Lopetetaanko tallennus nyt?",
       "featuresHeading": "Huoneen toiminnot",
       "featuresHelp": "Ne kytkeytyvät päälle ja pois kaikille heti.",
@@ -712,6 +713,14 @@
         "withdrawEffect": "Jos peruutat sen, tekstityksestä jo litteroidut lauseesi menettävät tekstinsä ja nimesi, eikä ääntäsi tästä lähtien tallenneta omalle raidalleen eikä litteroida. Jo tuotetun videon litteroinnin osalta ota yhteyttä järjestäjiin.",
         "needsRecording": "Voit antaa sen suostuttuasi tallennukseen."
       }
+    },
+    "recordingQuestion": {
+      "title": "Puhelua tallennetaan",
+      "question": "Haluatko näkyä tallenteessa?",
+      "body": "Jos vastaat kyllä, puhelu yhdistyy uudelleen muutamaksi sekunniksi, ja siitä hetkestä alkaen nimesi, äänesi ja kuvasi ovat mukana tallenteessa. Jos vastaat ei tai suljet tämän ikkunan, osallistut kuten ennenkin ja jäät tallenteen ulkopuolelle.",
+      "later": "Jos vastaat ei, kysymme uudelleen seuraavan tallennuksen alkaessa. Voit muuttaa mielesi milloin tahansa ylhäällä olevasta painikkeesta {button}.",
+      "yes": "Kyllä, haluan näkyä",
+      "no": "Ei, jätä minut pois"
     },
     "voiceExcluded": {
       "title": "Osallistut ilman tallennusta.",
@@ -5416,6 +5425,7 @@
     "switchToLive": "Vaihda suoraan lähetykseen",
     "enterRoom": "Siirry huoneeseen",
     "recordingNotice": "Tämä tapahtuma voidaan tallentaa.",
+    "recordingNoticeInstant": "Puhelu voidaan tallentaa. Liityt tallenteen ulkopuolella: jos joku aloittaa tallennuksen, kysymme, haluatko näkyä siinä.",
     "recordingAvailableAfter": "Tallenne on saatavilla tapahtuman jälkeen.",
     "autoRefreshHint": "Sivu päivittyy automaattisesti tapahtuman alkaessa.",
     "startEventButton": "Käynnistä tapahtuma",

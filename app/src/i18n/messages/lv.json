@@ -622,6 +622,7 @@
       "tab": "Vadība",
       "recordingHeading": "Ierakstīšana",
       "recordingOff": "Netiek ierakstīts",
+      "recordingNotOfferedInstant": "Ātrajos zvanos ierakstīšana tiek piedāvāta tikai tur, kur tie, kas nepiekrīt, paliek ārpus video, un šī instalācija to nevar nodrošināt.",
       "stopConfirm": "Apturēt ierakstīšanu tagad?",
       "featuresHeading": "Telpas funkcijas",
       "featuresHelp": "Tās ieslēdzas un izslēdzas visiem uzreiz.",
@@ -712,6 +713,14 @@
         "withdrawEffect": "Ja to atsaucat, jūsu no subtitriem jau atšifrētie teikumi zaudē tekstu un vārdu, un turpmāk jūsu balss netiek ierakstīta atsevišķā celiņā un netiek atšifrēta. Par jau izveidotu video atšifrējumu vērsieties pie organizatoriem.",
         "needsRecording": "To var dot pēc piekrišanas ierakstam."
       }
+    },
+    "recordingQuestion": {
+      "title": "Zvans tiek ierakstīts",
+      "question": "Vai vēlaties būt ierakstā?",
+      "body": "Ja atbildēsiet “jā”, zvans uz dažām sekundēm tiks savienots no jauna, un no tā brīža jūsu vārds, balss un attēls būs ierakstā. Ja atbildēsiet “nē” vai aizvērsiet šo logu, jūs turpināsiet piedalīties kā līdz šim un paliksiet ārpus ieraksta.",
+      "later": "Ja atbildēsiet “nē”, jautāsim vēlreiz nākamajā ierakstā. Savas domas varat mainīt jebkurā brīdī ar pogu {button} augšā.",
+      "yes": "Jā, vēlos būt ierakstā",
+      "no": "Nē, bez manis"
     },
     "voiceExcluded": {
       "title": "Jūs piedalāties bez ierakstīšanas.",
@@ -5416,6 +5425,7 @@
     "switchToLive": "Pārslēgties uz tiešraidi",
     "enterRoom": "Ienākt telpā",
     "recordingNotice": "Šis pasākums var tikt ierakstīts.",
+    "recordingNoticeInstant": "Zvans var tikt ierakstīts. Jūs ienākat ārpus ieraksta: ja kāds sāks ierakstīšanu, jums jautāsim, vai vēlaties būt ierakstā.",
     "recordingAvailableAfter": "Ieraksts būs pieejams pēc pasākuma.",
     "autoRefreshHint": "Lapa automātiski atjaunināsies, kad pasākums sāksies.",
     "startEventButton": "Sākt pasākumu",

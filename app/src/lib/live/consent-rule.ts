@@ -38,13 +38,14 @@ export interface RegolaConsenso {
 /**
  * Chi conduce resta sempre nella registrazione, per dichiarazione di chi
  * organizza. Conta solo dove chi non acconsente puo' restarne fuori: altrove il
- * valore rimasto su un evento non cambia niente.
+ * valore rimasto su un evento non cambia niente. Mai in una chiamata rapida:
+ * li' chi conduce risponde alla domanda come tutti (`regolaConsenso`).
  */
 export function conduceSempreRegistrato(
-  evento: { hostsAlwaysRecorded?: boolean | null },
+  evento: { hostsAlwaysRecorded?: boolean | null; eventType?: string | null },
   voce: VoceNelVideo,
 ): boolean {
-  return !!evento.hostsAlwaysRecorded && voce === 'rimovibile';
+  return !!evento.hostsAlwaysRecorded && voce === 'rimovibile' && evento.eventType !== 'INSTANT';
 }
 
 export function regolaConsenso(
@@ -52,9 +53,15 @@ export function regolaConsenso(
   registrazioneDisponibile: boolean,
   voce: VoceNelVideo,
 ): RegolaConsenso {
-  // Una chiamata rapida non chiede consensi: la sala non mostra la sua
-  // registrazione a chi entra dal link (la pagina della sala la nasconde).
-  if (event.eventType === 'INSTANT') return { registra: false, richiesto: false, soloAscolto: false };
+  // Una chiamata rapida non chiede niente all'ingresso: tutti, chi conduce
+  // compreso, entrano fuori dalla registrazione, e la domanda arriva in sala a
+  // ogni avvio (components/live/recording-question). Per questo si registra solo
+  // dove chi non acconsente resta davvero fuori dal video: altrove la sala non
+  // offre la registrazione, e il solo ascolto non tocca mai una chiamata rapida.
+  if (event.eventType === 'INSTANT') {
+    const registra = event.recordingEnabled && registrazioneDisponibile && voce === 'rimovibile';
+    return { registra, richiesto: registra, soloAscolto: false };
+  }
   const recordingEnabled = event.recordingEnabled && registrazioneDisponibile;
   const richiesto = consensiRichiesti({ ...event, recordingEnabled }).registrazione;
   return {

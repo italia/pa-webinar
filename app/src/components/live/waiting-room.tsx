@@ -265,6 +265,10 @@ interface WaitingRoomProps {
   recordingListenOnly?: boolean;
   /** Chi conduce un evento che lo tiene sempre nella registrazione: lo sa da qui. */
   recordingHostAlways?: boolean;
+  /** Chiamata rapida che registra: si entra fuori dalla registrazione e la
+   *  domanda arriva in sala, quando qualcuno la avvia. Qui la si annuncia, e la
+   *  trascrizione, che senza quel consenso non varrebbe, non si chiede. */
+  recordingAskedInRoom?: boolean;
   /** Il testo sulla registrazione scelto per l'evento; null = quello predefinito. */
   recordingConsentText?: string | null;
   /** L'informativa privacy dell'evento, accanto alla scheda. */
@@ -337,6 +341,7 @@ export default function WaitingRoom({
   voce = 'rimovibile',
   recordingListenOnly = false,
   recordingHostAlways = false,
+  recordingAskedInRoom = false,
   recordingConsentText = null,
   privacy,
   schedaPrivacy = null,
@@ -530,6 +535,7 @@ export default function WaitingRoom({
     giaDato: multitrackConsentExempt,
     voce,
     soloAscolto: recordingListenOnly,
+    registrazioneInSala: recordingAskedInRoom,
   });
   // Il consenso alla registrazione dell'evento, se va chiesto qui. E' libero:
   // non ferma ne' il pulsante ne' la piazza.
@@ -1938,11 +1944,13 @@ export default function WaitingRoom({
         'registrazione',
         <span className="wr-fact__rec" />,
         t('summaryRecording'),
-        recordingListenOnly && !schedaPrivacy
-          ? tGdpr(voce === 'fissa' ? 'recordingNotice' : 'recordingNoticeVoice')
-          : recordingHostAlways
-            ? tGdpr(chiaveAvvisoConduce(recordingDestination))
-            : t('recordingNotice'),
+        recordingAskedInRoom
+          ? t('recordingNoticeInstant')
+          : recordingListenOnly && !schedaPrivacy
+            ? tGdpr(voce === 'fissa' ? 'recordingNotice' : 'recordingNoticeVoice')
+            : recordingHostAlways
+              ? tGdpr(chiaveAvvisoConduce(recordingDestination))
+              : t('recordingNotice'),
       ),
     );
   }

@@ -476,7 +476,7 @@ export const POST = withErrorHandling(async (request, context) => {
     // con le regole di chi non ha acconsentito. Non conta dove chi organizza
     // dichiara chi conduce sempre nella registrazione: nessuna prova, perche'
     // nessuno ha spuntato niente.
-    const registraVideo = registraChiConduce(event, registrabile);
+    const registraVideo = registraChiConduce(event, registrabile, voce);
     // Un link e' un posto, non una persona: quello dato da un altro con lo
     // stesso link non si eredita.
     const replicaConduce = await provaDellaReplica(

@@ -622,6 +622,7 @@
       "tab": "Regia",
       "recordingHeading": "Registrazione",
       "recordingOff": "Non in registrazione",
+      "recordingNotOfferedInstant": "Nelle chiamate rapide la registrazione si offre solo dove chi non acconsente resta fuori dal video, e questa installazione non lo consente.",
       "stopConfirm": "Fermare la registrazione adesso?",
       "featuresHeading": "Funzioni della sala",
       "featuresHelp": "Si accendono e si spengono per tutti, subito.",
@@ -712,6 +713,14 @@
         "withdrawEffect": "Se lo ritiri, le tue frasi già trascritte dai sottotitoli perdono testo e nome, e da ora la tua voce non viene registrata in una traccia a parte né trascritta. Per una trascrizione del video già prodotta rivolgiti a chi organizza.",
         "needsRecording": "Si può dare dopo il consenso alla registrazione."
       }
+    },
+    "recordingQuestion": {
+      "title": "La chiamata viene registrata",
+      "question": "Vuoi comparire nella registrazione?",
+      "body": "Se rispondi sì, la chiamata si ricollega per qualche secondo e da quel momento il tuo nome, la tua voce e la tua immagine entrano nella registrazione. Se rispondi no, o chiudi questa finestra, continui a partecipare come prima e resti fuori dalla registrazione.",
+      "later": "Se rispondi no, te lo richiediamo alla prossima registrazione. Puoi cambiare idea in qualunque momento dal pulsante {button} in alto.",
+      "yes": "Sì, voglio comparire",
+      "no": "No, resto fuori"
     },
     "voiceExcluded": {
       "title": "Partecipi senza registrazione.",
@@ -5416,6 +5425,7 @@
     "switchToLive": "Passa alla diretta",
     "enterRoom": "Entra nella sala",
     "recordingNotice": "Questo evento può essere registrato.",
+    "recordingNoticeInstant": "La chiamata può essere registrata. Entri fuori dalla registrazione: se qualcuno la avvia, ti chiediamo se vuoi comparire.",
     "recordingAvailableAfter": "La registrazione sarà disponibile dopo l'evento.",
     "autoRefreshHint": "La pagina si aggiornerà automaticamente quando l'evento inizierà.",
     "startEventButton": "Avvia evento",

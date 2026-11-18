@@ -622,6 +622,7 @@
       "tab": "Regiduría",
       "recordingHeading": "Grabación",
       "recordingOff": "Sin grabar",
+      "recordingNotOfferedInstant": "En las llamadas rápidas la grabación solo se ofrece donde quien no da su consentimiento queda fuera del vídeo, y esta instalación no lo permite.",
       "stopConfirm": "¿Detener la grabación ahora?",
       "featuresHeading": "Funciones de la sala",
       "featuresHelp": "Se activan y desactivan para todos, al instante.",
@@ -712,6 +713,14 @@
         "withdrawEffect": "Si lo retiras, tus frases ya transcritas a partir de los subtítulos pierden el texto y el nombre, y desde ahora tu voz no se graba en una pista aparte ni se transcribe. Para una transcripción del vídeo ya generada, dirígete a quien organiza.",
         "needsRecording": "Puedes darlo después del consentimiento a la grabación."
       }
+    },
+    "recordingQuestion": {
+      "title": "La llamada se está grabando",
+      "question": "¿Quieres aparecer en la grabación?",
+      "body": "Si respondes que sí, la llamada se vuelve a conectar durante unos segundos y, a partir de ese momento, tu nombre, tu voz y tu imagen forman parte de la grabación. Si respondes que no, o cierras esta ventana, sigues participando como antes y quedas fuera de la grabación.",
+      "later": "Si respondes que no, te lo volveremos a preguntar en la próxima grabación. Puedes cambiar de opinión en cualquier momento con el botón {button} de arriba.",
+      "yes": "Sí, quiero aparecer",
+      "no": "No, me quedo fuera"
     },
     "voiceExcluded": {
       "title": "Participas sin grabación.",
@@ -5416,6 +5425,7 @@
     "switchToLive": "Pasar al directo",
     "enterRoom": "Entrar en la sala",
     "recordingNotice": "Este evento puede grabarse.",
+    "recordingNoticeInstant": "La llamada puede grabarse. Entras fuera de la grabación: si alguien la inicia, te preguntaremos si quieres aparecer.",
     "recordingAvailableAfter": "La grabación estará disponible después del evento.",
     "autoRefreshHint": "La página se actualizará automáticamente cuando comience el evento.",
     "startEventButton": "Iniciar evento",

@@ -622,6 +622,7 @@
       "tab": "Valdymas",
       "recordingHeading": "Įrašymas",
       "recordingOff": "Neįrašoma",
+      "recordingNotOfferedInstant": "Greituose skambučiuose įrašymas siūlomas tik ten, kur nesutikę asmenys lieka už vaizdo įrašo ribų, o ši diegimo aplinka to neleidžia.",
       "stopConfirm": "Sustabdyti įrašymą dabar?",
       "featuresHeading": "Kambario funkcijos",
       "featuresHelp": "Jos įjungiamos ir išjungiamos visiems iš karto.",
@@ -712,6 +713,14 @@
         "withdrawEffect": "Jei jį atšauksite, jūsų jau iš subtitrų transkribuoti sakiniai neteks teksto ir vardo, o nuo šiol jūsų balsas nebus nei įrašomas atskirame takelyje, nei transkribuojamas. Dėl jau parengtos vaizdo įrašo transkripcijos kreipkitės į organizatorius.",
         "needsRecording": "Jį galite duoti sutikę su įrašymu."
       }
+    },
+    "recordingQuestion": {
+      "title": "Skambutis įrašomas",
+      "question": "Ar norite būti įraše?",
+      "body": "Jei atsakysite „taip“, skambutis kelioms sekundėms bus prijungtas iš naujo ir nuo tos akimirkos jūsų vardas, balsas ir vaizdas pateks į įrašą. Jei atsakysite „ne“ arba uždarysite šį langą, toliau dalyvausite kaip anksčiau ir liksite už įrašo ribų.",
+      "later": "Jei atsakysite „ne“, paklausime dar kartą per kitą įrašymą. Nuomonę galite pakeisti bet kada mygtuku {button} viršuje.",
+      "yes": "Taip, noriu būti įraše",
+      "no": "Ne, be manęs"
     },
     "voiceExcluded": {
       "title": "Dalyvaujate be įrašymo.",
@@ -5416,6 +5425,7 @@
     "switchToLive": "Perjungti į tiesioginę transliaciją",
     "enterRoom": "Įeiti į salę",
     "recordingNotice": "Šis renginys gali būti įrašomas.",
+    "recordingNoticeInstant": "Skambutis gali būti įrašomas. Prisijungiate už įrašo ribų: jei kas nors pradės įrašymą, paklausime, ar norite būti įraše.",
     "recordingAvailableAfter": "Įrašas bus prieinamas po renginio.",
     "autoRefreshHint": "Puslapis bus automatiškai atnaujintas, kai renginys prasidės.",
     "startEventButton": "Pradėti renginį",

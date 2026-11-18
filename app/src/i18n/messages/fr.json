@@ -622,6 +622,7 @@
       "tab": "Régie",
       "recordingHeading": "Enregistrement",
       "recordingOff": "Pas d'enregistrement",
+      "recordingNotOfferedInstant": "Dans les appels rapides, l'enregistrement n'est proposé que là où les personnes qui ne consentent pas restent hors de la vidéo, et cette installation ne le permet pas.",
       "stopConfirm": "Arrêter l'enregistrement maintenant ?",
       "featuresHeading": "Fonctions de la salle",
       "featuresHelp": "Elles s'activent et se désactivent pour tous, tout de suite.",
@@ -712,6 +713,14 @@
         "withdrawEffect": "Si vous le retirez, vos phrases déjà transcrites à partir des sous-titres perdent leur texte et votre nom, et désormais votre voix n'est plus enregistrée sur une piste séparée ni transcrite. Pour une transcription de la vidéo déjà produite, adressez-vous aux organisateurs.",
         "needsRecording": "Vous pouvez le donner après avoir consenti à l'enregistrement."
       }
+    },
+    "recordingQuestion": {
+      "title": "L'appel est enregistré",
+      "question": "Voulez-vous apparaître dans l'enregistrement ?",
+      "body": "Si vous répondez oui, l'appel se reconnecte pendant quelques secondes et, à partir de ce moment, votre nom, votre voix et votre image font partie de l'enregistrement. Si vous répondez non, ou fermez cette fenêtre, vous continuez à participer comme avant et restez hors de l'enregistrement.",
+      "later": "Si vous répondez non, la question vous sera reposée au prochain enregistrement. Vous pouvez changer d'avis à tout moment avec le bouton {button} en haut.",
+      "yes": "Oui, je veux apparaître",
+      "no": "Non, sans moi"
     },
     "voiceExcluded": {
       "title": "Vous participez sans enregistrement.",
@@ -5416,6 +5425,7 @@
     "switchToLive": "Passer au direct",
     "enterRoom": "Entrer dans la salle",
     "recordingNotice": "Cet événement peut être enregistré.",
+    "recordingNoticeInstant": "L'appel peut être enregistré. Vous entrez hors de l'enregistrement : si quelqu'un le lance, nous vous demanderons si vous voulez y apparaître.",
     "recordingAvailableAfter": "L'enregistrement sera disponible après l'événement.",
     "autoRefreshHint": "La page s'actualisera automatiquement lorsque l'événement commencera.",
     "startEventButton": "Démarrer l'événement",

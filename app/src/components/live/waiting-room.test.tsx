@@ -449,6 +449,30 @@ describe('sala d\'attesa — avviso di registrazione', () => {
   });
 });
 
+describe('sala d\'attesa — chiamata rapida che registra', () => {
+  it('annuncia che si entra fuori dalla registrazione e la domanda arriva in sala', () => {
+    render({
+      event: { ...eventoLive, recordingEnabled: true },
+      eventType: 'INSTANT',
+      recordingAskedInRoom: true,
+    });
+    expect(container.textContent).toContain(t.recordingNoticeInstant);
+    expect(container.textContent).not.toContain(t.recordingNotice);
+    expect($('#waiting-recording-consent')).toBeNull();
+  });
+
+  it('la trascrizione non si chiede: senza il consenso alla registrazione non varrebbe', () => {
+    render({
+      role: 'guest',
+      defaultName: 'Ospite',
+      event: { ...eventoLive, recordingEnabled: true, multitrackRecordingEnabled: true },
+      eventType: 'INSTANT',
+      recordingAskedInRoom: true,
+    });
+    expect($('#waiting-multitrack-consent')).toBeNull();
+  });
+});
+
 describe('sala d\'attesa — consenso alla registrazione', () => {
   const evento: Evento = { ...eventoLive, recordingEnabled: true };
 

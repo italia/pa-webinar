@@ -622,6 +622,7 @@
       "tab": "Regie",
       "recordingHeading": "Aufnahme",
       "recordingOff": "Keine Aufnahme",
+      "recordingNotOfferedInstant": "In Sofortanrufen wird die Aufzeichnung nur dort angeboten, wo Personen ohne Einwilligung aus dem Video herausgehalten werden, und diese Installation kann das nicht.",
       "stopConfirm": "Aufnahme jetzt beenden?",
       "featuresHeading": "Funktionen des Raums",
       "featuresHelp": "Sie werden für alle sofort ein- und ausgeschaltet.",
@@ -712,6 +713,14 @@
         "withdrawEffect": "Wenn Sie sie widerrufen, verlieren Ihre bereits aus den Untertiteln transkribierten Sätze Text und Namen, und ab jetzt wird Ihre Stimme weder auf einer eigenen Spur aufgezeichnet noch transkribiert. Wenden Sie sich für ein bereits erstelltes Transkript des Videos an die Veranstalter.",
         "needsRecording": "Sie können sie nach der Einwilligung in die Aufzeichnung erteilen."
       }
+    },
+    "recordingQuestion": {
+      "title": "Die Konferenz wird aufgezeichnet",
+      "question": "Möchten Sie in der Aufzeichnung erscheinen?",
+      "body": "Wenn Sie mit Ja antworten, wird die Konferenz für einige Sekunden neu verbunden, und ab dann sind Ihr Name, Ihre Stimme und Ihr Bild Teil der Aufzeichnung. Wenn Sie mit Nein antworten oder dieses Fenster schließen, nehmen Sie weiter wie bisher teil und bleiben außerhalb der Aufzeichnung.",
+      "later": "Wenn Sie mit Nein antworten, fragen wir bei der nächsten Aufzeichnung erneut. Sie können Ihre Meinung jederzeit über die Schaltfläche {button} oben ändern.",
+      "yes": "Ja, ich möchte erscheinen",
+      "no": "Nein, ohne mich"
     },
     "voiceExcluded": {
       "title": "Sie nehmen ohne Aufzeichnung teil.",
@@ -5416,6 +5425,7 @@
     "switchToLive": "Zur Live-Übertragung wechseln",
     "enterRoom": "Raum betreten",
     "recordingNotice": "Diese Veranstaltung kann aufgezeichnet werden.",
+    "recordingNoticeInstant": "Die Konferenz kann aufgezeichnet werden. Sie treten außerhalb der Aufzeichnung ein: Wenn jemand sie startet, fragen wir Sie, ob Sie darin erscheinen möchten.",
     "recordingAvailableAfter": "Die Aufzeichnung wird nach der Veranstaltung verfügbar sein.",
     "autoRefreshHint": "Die Seite wird automatisch aktualisiert, wenn die Veranstaltung beginnt.",
     "startEventButton": "Veranstaltung starten",

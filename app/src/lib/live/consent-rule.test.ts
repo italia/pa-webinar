@@ -4,7 +4,7 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
 
-import { testoConsensoEvento } from './consent-rule';
+import { conduceSempreRegistrato, testoConsensoEvento } from './consent-rule';
 
 describe('testoConsensoEvento', () => {
   it.each(['rimovibile', 'fissa'] as const)('con un video (%s) resta', (voce) => {
@@ -21,4 +21,19 @@ describe('testoConsensoEvento', () => {
       expect(testoConsensoEvento(testo, 'fissa')).toBeNull();
     }
   );
+});
+
+describe('conduceSempreRegistrato', () => {
+  it('vale dove chi non acconsente resta fuori dal video', () => {
+    expect(conduceSempreRegistrato({ hostsAlwaysRecorded: true }, 'rimovibile')).toBe(true);
+    expect(conduceSempreRegistrato({ hostsAlwaysRecorded: true, eventType: 'SCHEDULED' }, 'rimovibile')).toBe(true);
+    expect(conduceSempreRegistrato({ hostsAlwaysRecorded: true }, 'fissa')).toBe(false);
+    expect(conduceSempreRegistrato({ hostsAlwaysRecorded: false }, 'rimovibile')).toBe(false);
+  });
+
+  it('mai in una chiamata rapida: chi conduce risponde alla domanda come tutti', () => {
+    expect(
+      conduceSempreRegistrato({ hostsAlwaysRecorded: true, eventType: 'INSTANT' }, 'rimovibile')
+    ).toBe(false);
+  });
 });
