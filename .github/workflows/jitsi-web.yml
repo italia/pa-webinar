@@ -43,9 +43,9 @@ jobs:
       DOCKER_BUILD_SUMMARY: "false"
       DOCKER_BUILD_RECORD_UPLOAD: "false"
     name: Build & validate patched jitsi/web
-    # Self-hosted ARC runner in the cluster, like ci.yml / release.yml / dev.yml.
-    # GitHub-hosted runners are unavailable to this org (billing), so a
-    # `ubuntu-latest` job never even starts.
+    # Self-hosted ARC runner in the cluster, like the build jobs of dev.yml and
+    # release.yml. The workflow runs only on push to dev and on manual
+    # dispatch, never on pull_request.
     runs-on: arc-runner-pa-webinar
     permissions:
       contents: read

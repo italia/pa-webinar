@@ -37,7 +37,7 @@ flowchart LR
     ci["ci.yml<br/>the gate to main"]:::gate
     rel["release.yml<br/>the release"]:::job
     codeql["codeql.yml<br/>GitHub-hosted"]:::job
-    score["scorecard.yml<br/>self-hosted"]:::job
+    score["scorecard.yml<br/>GitHub-hosted"]:::job
     clean["buildcache-cleanup.yml<br/>GitHub-hosted"]:::job
   end
 
@@ -46,9 +46,9 @@ flowchart LR
     webimg["GHCR pa-webinar-jitsi-web<br/>one tag per patch revision"]:::data
     checks["Pass or fail status<br/>Playwright report"]:::ext
     relimg["GHCR app: X.Y.Z, X.Y,<br/>latest, sha-&lt;sha&gt;<br/>migration: X.Y.Z-migrate,<br/>vX.Y.Z-migrate"]:::data
-    ghrel["GitHub Release<br/>notes, SPDX SBOM,<br/>packaged chart"]:::data
+    ghrel["GitHub Release<br/>notes, SPDX SBOM,<br/>packaged chart,<br/>provenance bundle"]:::data
     sec["Security tab (CodeQL)<br/>when code scanning is enabled"]:::ext
-    nopub["Nothing published:<br/>Scorecard publication<br/>needs a GitHub-hosted runner"]:::warn
+    scorepub["Scorecard results<br/>scorecard.dev and Security tab"]:::ext
     pruned["Old untagged versions of<br/>pa-webinar-buildcache deleted"]:::data
   end
 
@@ -65,7 +65,7 @@ flowchart LR
   rel --> relimg
   rel --> ghrel
   codeql --> sec
-  score --> nopub
+  score --> scorepub
   clean --> pruned
 
   classDef ext fill:#EEF1F4,stroke:#5C6F82,color:#17324D,stroke-width:2px
@@ -82,10 +82,10 @@ flowchart LR
 |---|---|---|---|---|
 | [`ci.yml`](../../.github/workflows/ci.yml) | Pull requests into `main`, pushes to `main`, manual dispatch | GitHub-hosted for pull requests, self-hosted otherwise | Check results and a Playwright report | A red check on the pull request or on `main`. E2E is non-blocking |
 | [`dev.yml`](../../.github/workflows/dev.yml) | Pushes to `dev`, manual dispatch | Self-hosted | Development images in GHCR | The `:dev` images were not updated |
-| [`release.yml`](../../.github/workflows/release.yml) | Any pushed tag matching `v*` | Self-hosted | Release images, SBOM, chart, GitHub Release | The release is incomplete (see [If something goes wrong](#if-something-goes-wrong)) |
+| [`release.yml`](../../.github/workflows/release.yml) | Any pushed tag matching `v*` | Self-hosted, except the attestation job (GitHub-hosted) | Release images, SBOM, chart, GitHub Release | The release is incomplete (see [If something goes wrong](#if-something-goes-wrong)) |
 | [`jitsi-web.yml`](../../.github/workflows/jitsi-web.yml) | Pushes to `dev` that change `infra/jitsi-web-patched/` or the workflow itself, manual dispatch | Self-hosted | The patched Jitsi web image | The image was not published |
 | [`codeql.yml`](../../.github/workflows/codeql.yml) | Pushes and pull requests to `main` or `dev`, weekly | GitHub-hosted | Code-scanning results | Nothing: the job is non-blocking |
-| [`scorecard.yml`](../../.github/workflows/scorecard.yml) | Pushes to `main`, weekly | Self-hosted | Nothing, as configured: publication needs a GitHub-hosted runner (see [below](#codeqlyml-and-scorecardyml-code-analysis)) | Nothing: the Scorecard step is non-blocking |
+| [`scorecard.yml`](../../.github/workflows/scorecard.yml) | Pushes to `main`, weekly | GitHub-hosted | Scorecard results on scorecard.dev, and in the Security tab when code scanning is enabled (see [below](#codeqlyml-and-scorecardyml-code-analysis)) | Nothing: the Scorecard step is non-blocking |
 | [`buildcache-cleanup.yml`](../../.github/workflows/buildcache-cleanup.yml) | Weekly, manual dispatch | GitHub-hosted | Deletes old untagged versions of the layer-cache package (see [below](#buildcache-cleanupyml-pruning-the-layer-cache)) | Old cache versions stay until the next run |
 
 The only GitHub Actions artifact any workflow uploads is the Playwright report of the E2E job. SBOMs and the chart are attached to the GitHub Release instead.
@@ -182,7 +182,7 @@ Building, bumping and verifying the image step by step is in [infra/jitsi-web-pa
 ### `codeql.yml` and `scorecard.yml`: code analysis
 
 - **CodeQL** analyzes JavaScript and TypeScript with the `security-extended` queries on pushes and pull requests to `main` and `dev`, and weekly. It runs on GitHub-hosted runners and is non-blocking (`continue-on-error`). Results reach the repository's Security tab only when code scanning is enabled in the repository settings. Until then the job still ends green.
-- **OpenSSF Scorecard** runs on pushes to `main` and weekly, on the self-hosted runner. It is configured to publish (`publish_results: true`), but scorecard-action accepts publication only from GitHub-hosted runners. As configured, the publication is rejected, the Scorecard step fails without failing the run (`continue-on-error`), and the upload to the Security tab, which runs only when that step succeeds, is skipped. Results reach OpenSSF and the Security tab only once the job runs on `ubuntu-latest`. The optional `SCORECARD_TOKEN` secret replaces the default token when the organization's settings deny the default one the access it needs.
+- **OpenSSF Scorecard** runs on pushes to `main` and weekly, on a GitHub-hosted `ubuntu-latest` runner, because scorecard-action accepts published results only from GitHub-hosted runners. It publishes them (`publish_results: true`) to OpenSSF, where the scorecard.dev viewer shows them, and uploads them to the Security tab, where they appear when code scanning is enabled. The Scorecard step is non-blocking (`continue-on-error`): if it fails, the upload, which runs only when that step succeeds, is skipped. The optional `SCORECARD_TOKEN` secret replaces the default token when the organization's settings deny the default one the access it needs.
 
 ### `buildcache-cleanup.yml`: pruning the layer cache
 
@@ -196,7 +196,7 @@ Every build rewrites its cache tag, so the previous cache manifest stays in `pa-
 
 The workflows name the upstream repository's own infrastructure. A fork that wants its own builds changes these places:
 
-- **The self-hosted runner label.** Jobs on trusted events run on `arc-runner-pa-webinar`: the non-pull-request branch of every `runs-on` in `ci.yml`, and every job in `dev.yml`, `release.yml`, `jitsi-web.yml` and `scorecard.yml`. Without a runner with that label, those jobs stay queued. Replace the label with your own runner's, or with `ubuntu-latest`. In `ci.yml`, keep the conditional so that pull requests still run on GitHub-hosted runners (see [Runner and permission policy](#runner-and-permission-policy)). In `scorecard.yml`, use `ubuntu-latest`, not another self-hosted label: scorecard-action publishes results only from GitHub-hosted runners.
+- **The self-hosted runner label.** Jobs on trusted events run on `arc-runner-pa-webinar`: the non-pull-request branch of every `runs-on` in `ci.yml`, every job in `dev.yml` and `jitsi-web.yml`, and every job in `release.yml` except the attestation job. Without a runner with that label, those jobs stay queued. Replace the label with your own runner's, or with `ubuntu-latest`. In `ci.yml`, keep the conditional so that pull requests still run on GitHub-hosted runners (see [Runner and permission policy](#runner-and-permission-policy)). `scorecard.yml` and the attestation job of `release.yml` already run on `ubuntu-latest`: keep them there, because scorecard-action publishes results only from GitHub-hosted runners and the attestation job keeps its signing token off the build runner.
 - **The image names.** `IMAGE_NAME` and the other `*_IMAGE_NAME` values in the `env` blocks of `dev.yml`, `release.yml` and `jitsi-web.yml` point to `italia/…`. A workflow's token can push only to its own owner's packages, so set them to your namespace. Then point the chart at your images (see [Deploying with Helm](../DEPLOYMENT.md)).
 - **Optional secrets.** `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` lift the Docker Hub pull limit for the chart and E2E jobs. `SCORECARD_TOKEN` is used only when the default token cannot run Scorecard.
 - **Code scanning.** Enable it in the repository settings if you want CodeQL results.

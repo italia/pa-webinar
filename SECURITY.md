@@ -172,8 +172,8 @@ flowchart LR
   pr --> gate
   gate -- "outside contributor:<br/>after maintainer approval" --> gh
   gate -- "repository collaborator:<br/>runs" --> gh
-  ev -- "every workflow except<br/>codeql.yml and<br/>buildcache-cleanup.yml" --> sh
-  ev -. "codeql.yml,<br/>buildcache-cleanup.yml" .-> gh
+  ev -- "ci.yml, dev.yml,<br/>jitsi-web.yml,<br/>release.yml builds" --> sh
+  ev -. "codeql.yml, scorecard.yml,<br/>buildcache-cleanup.yml,<br/>release attestation" .-> gh
   sh -- "publishes" --> out
   pr -. "never" .-> sh
 
@@ -193,7 +193,7 @@ flowchart LR
 The self-hosted runner runs inside a Kubernetes cluster. Code running there could reach the cloud metadata endpoint, a Kubernetes ServiceAccount or the Docker socket, so pull-request code must never run there. The workflows enforce this in four ways:
 
 - **Conditional runner in `ci.yml`.** Every job in `.github/workflows/ci.yml` picks its runner with a conditional `runs-on`. `pull_request` events go to GitHub-hosted `ubuntu-latest` runners. Pushes to `main` and manual dispatches go to the self-hosted runner.
-- **Trusted triggers for publishing workflows.** `dev.yml`, `jitsi-web.yml`, `release.yml` and `scorecard.yml` build, publish or analyze on the self-hosted runner. They start only on trusted events: pushes to `dev` or `main`, `v*` tags, manual dispatch or a schedule. `codeql.yml` always runs on GitHub-hosted runners, and so does `buildcache-cleanup.yml`, which starts only on its weekly schedule or a manual dispatch.
+- **Trusted triggers for publishing workflows.** `dev.yml`, `jitsi-web.yml` and `release.yml` build and publish on the self-hosted runner. They start only on trusted events: pushes to `dev`, `v*` tags or manual dispatch. `codeql.yml` always runs on GitHub-hosted runners, and so do `scorecard.yml` (pushes to `main` and a weekly schedule), `buildcache-cleanup.yml` (its weekly schedule or a manual dispatch) and the attestation job of `release.yml`.
 - **No privileged pull-request trigger.** No workflow uses `pull_request_target`.
 - **Approval for outside contributors.** A maintainer must approve workflow runs on pull requests from outside contributors. This is a repository setting, so it does not appear in the workflow files. For pull requests from forks, GitHub also withholds repository secrets.
 
@@ -242,7 +242,7 @@ Moving to a new upstream Jitsi web build means changing the `BASE_TAG` and `BASE
 | Trivy, repository filesystem | `ci.yml`, `Security Scan` | Pull requests to `main`, pushes to `main`, manual dispatch | Yes, on CRITICAL or HIGH findings |
 | Trivy, application image built locally (never pushed) | `ci.yml`, `Docker Build & Scan` | Same as above | Yes, on CRITICAL or HIGH findings |
 | CodeQL, JavaScript and TypeScript, `security-extended` queries | `codeql.yml` | Pushes and pull requests to `main` and `dev`, weekly | No (`continue-on-error`). Results go to the Security tab when code scanning is enabled in the repository settings |
-| OpenSSF Scorecard | `scorecard.yml` | Pushes to `main`, weekly | No (`continue-on-error`). Nothing is published yet: the job runs on the self-hosted runner, and scorecard-action accepts publication only from GitHub-hosted runners ([details](docs/development/ci-and-release.md#codeqlyml-and-scorecardyml-code-analysis)) |
+| OpenSSF Scorecard | `scorecard.yml` | Pushes to `main`, weekly | No (`continue-on-error`). Runs on a GitHub-hosted runner, the only kind from which scorecard-action accepts published results; results go to scorecard.dev, and to the Security tab when code scanning is enabled ([details](docs/development/ci-and-release.md#codeqlyml-and-scorecardyml-code-analysis)) |
 | Forbidden-license check | `ci.yml`, `License Compliance` | Same as `ci.yml` | Yes |
 | GitHub secret scanning, with push protection | Repository setting, not a workflow. A fork must turn it on | Every push | Yes for the formats of known providers, unless the person pushing gives a reason to bypass it |
 
