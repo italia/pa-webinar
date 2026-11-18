@@ -1077,7 +1077,7 @@
         "recordingLockedLive": "Pri otvorenej miestnosti nahrávanie nemožno zmeniť: platí od prvého vstupu.",
         "hostsAlwaysRecorded": "Moderujúci sú vždy v zázname",
         "hostsAlwaysRecordedDesc": "Moderátori a rečníci sú vo videu s menom a obrazom, bez začiarkavacieho políčka: informácia o ochrane súkromia podujatia to musí uvádzať. Od účastníkov sa nahráva len hlas, a len s ich súhlasom.",
-        "hostsAlwaysRecordedDescHostsOnly": "Moderátori a rečníci sú vo videu s menom a obrazom, bez začiarkavacieho políčka: informácia o ochrane súkromia podujatia to musí uvádzať. Účastníci nie sú vo videu nikdy vidieť ani počuť.",
+        "hostsAlwaysRecordedDescHostsOnly": "Moderátori a rečníci sú vo videu s menom a obrazom, bez začiarkavacieho políčka: informácia o ochrane súkromia podujatia to musí uvádzať. Účastníkov nie je vo videu nikdy vidieť ani počuť.",
         "hostsAlwaysRecordedDescVisible": "Moderátori a rečníci sú vo videu s menom a obrazom, bez začiarkavacieho políčka: informácia o ochrane súkromia podujatia to musí uvádzať. Táto inštalácia nedokáže udržať účastníkov mimo videa: kto súhlasí, vystupuje s menom, hlasom a obrazom, a meno ktoréhokoľvek sledujúceho sa môže zobraziť, aj keď neprehovorí."
       },
       "step3": {
@@ -1471,7 +1471,7 @@
         "othersSame": "Ostatní sa nemenia: zámky mikrofónov, udeľovanie slova a vzhľad videa zostávajú podľa podujatia.",
         "audienceNotice": "Účastníci nemajú mikrofón, kameru ani obrazovku: dostanú len upozornenie. Ak dostanú slovo, môžu súhlasiť v miestnosti; ak nie, zostanú mimo záznamu.",
         "hostsAlways": "Moderátori a rečníci sú vždy v zázname: políčko nevidia.",
-        "hostsOnly": "Táto inštalácia nahráva do videa len moderátorov: účastníci nie sú vidieť ani počuť a súhlas so záznamom sa od nich nežiada.",
+        "hostsOnly": "Táto inštalácia nahráva do videa len moderátorov: účastníkov nie je vidieť ani počuť a súhlas so záznamom sa od nich nežiada.",
         "trace": "Ak vystúpi počas nahrávania, poznámka vedľa videa uvedie, že chýba príspevok, a prepis označí *** s časom.",
         "anytime": "Súhlas sa dáva a odvoláva v miestnosti kedykoľvek.",
         "transcription": "Prepis vlastných príspevkov je samostatný, dobrovoľný súhlas.",
@@ -4660,7 +4660,7 @@
       "recordingNotice": "Podujatie sa môže nahrávať. Zúčastňujete sa bez mikrofónu a kamery: záznam neobsahuje váš hlas ani obraz, pokiaľ vám moderátori neudelia slovo.",
       "recordingNoticeVoice": "Podujatie sa môže nahrávať. Zúčastňujete sa bez mikrofónu a kamery: vaša tvár a vaše meno sa vo videu nikdy nezobrazia a váš hlas len vtedy, keď v miestnosti udelíte súhlas.",
       "namesMayAppear": "Meno, pod ktorým sa zúčastňujete, sa môže vo videu zobraziť, aj keď neprehovoríte.",
-      "recordingHostsOnly": "Podujatie sa môže nahrávať. Vo videu sú vidieť a počuť len moderátorov: tvár, meno ani hlas účastníkov v ňom nikdy nie sú.",
+      "recordingHostsOnly": "Podujatie sa môže nahrávať. Vo videu je vidieť a počuť len moderátorov: tvár, meno ani hlas účastníkov v ňom nikdy nie sú.",
       "recordingHostAlwaysReserved": "Moderujete toto podujatie: ste vždy v zázname, s menom, hlasom, obrazom a zdieľanou obrazovkou. Video zostáva len pre organizátorov a registrovaných: nezverejňuje sa. Registrovaní ho môžu vidieť, kým sa uchovávajú údaje ich registrácie.",
       "recordingHostAlwaysPublic": "Moderujete toto podujatie: ste vždy v zázname, s menom, hlasom, obrazom a zdieľanou obrazovkou. Video možno zverejniť a môže ho vidieť ktokoľvek.",
       "recordingHostAlways": "Vediete toto podujatie: ste vždy v zázname s menom, hlasom, obrazom a zdieľanou obrazovkou."
@@ -4681,7 +4681,7 @@
         "refuseListenOnly": "Ak nesúhlasíte, zúčastníte sa iba ako poslucháč.",
         "hostsAlways": "Vo videu sú len moderátori, s menom, hlasom, obrazom a zdieľanou obrazovkou. Tvár a meno účastníkov sa nikdy nezobrazia.",
         "hostsAlwaysVisible": "Moderátori sú vždy v zázname, s menom, hlasom, obrazom a zdieľanou obrazovkou.",
-        "hostsOnly": "Vo videu sú vidieť a počuť len moderátorov, s menom, hlasom, obrazom a zdieľanou obrazovkou. Tvár, meno ani hlas účastníkov v ňom nikdy nie sú.",
+        "hostsOnly": "Vo videu je vidieť a počuť len moderátorov, s menom, hlasom, obrazom a zdieľanou obrazovkou. Tvár, meno ani hlas účastníkov v ňom nikdy nie sú.",
         "audienceNotice": "Zúčastňujete sa bez mikrofónu a kamery: záznam neobsahuje váš hlas ani obraz, pokiaľ vám moderátori neudelia slovo.",
         "audienceNoticeVoice": "Zúčastňujete sa bez mikrofónu a kamery: vaša tvár a vaše meno sa vo videu nikdy nezobrazia a váš hlas len vtedy, keď v miestnosti udelíte súhlas."
       },
@@ -5626,7 +5626,7 @@
     "enterRoom": "Vstúpiť do miestnosti",
     "recordingNotice": "Toto podujatie sa môže nahrávať.",
     "recordingNoticeInstant": "Hovor sa môže nahrávať. Vo videu sú len moderátori: vaša tvár a vaše meno nikdy. Ak niekto spustí nahrávanie, opýtame sa vás, či súhlasíte s nahrávaním svojho hlasu.",
-    "recordingNoticeInstantHostsOnly": "Hovor sa môže nahrávať. Vo videu sú vidieť a počuť len moderátorov: tvár, meno ani hlas účastníkov v ňom nikdy nie sú.",
+    "recordingNoticeInstantHostsOnly": "Hovor sa môže nahrávať. Vo videu je vidieť a počuť len moderátorov: tvár, meno ani hlas účastníkov v ňom nikdy nie sú.",
     "recordingAvailableAfter": "Záznam bude k dispozícii po skončení udalosti.",
     "autoRefreshHint": "Stránka sa automaticky aktualizuje, keď udalosť začne.",
     "startEventButton": "Začať udalosť",

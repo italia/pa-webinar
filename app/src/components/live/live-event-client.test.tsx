@@ -1697,4 +1697,18 @@ describe("sala — chi partecipa non entra mai nel video ('esclusi')", () => {
     expect(testo()).not.toContain(l.consents.recording.give);
     expect(testo()).not.toContain(l.consents.transcription.needsRecording);
   });
+
+  it("un consenso alla registrazione dato prima resta da ritirare, mai da ridare", async () => {
+    await monta({ event: esclusi, hasRecordingConsent: true });
+    risposte.push({
+      recordingDestination: 'REGISTRANTS',
+      voiceExcluded: true,
+      consentsInForce: { recording: true, transcription: false },
+    });
+    await entra();
+    await premi(document.querySelector<HTMLElement>('.live-consents-btn')!);
+    expect(testo()).toContain(l.consents.recording.title);
+    expect(testo()).toContain(l.consents.withdraw);
+    expect(testo()).not.toContain(l.consents.recording.give);
+  });
 });

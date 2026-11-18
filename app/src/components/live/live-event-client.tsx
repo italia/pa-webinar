@@ -1341,7 +1341,11 @@ export default function LiveEventClient({
     formato: { ...event, captionsTranscript: trascrizioneDaiSottotitoli },
     concluso: eventStatus === 'ENDED',
   });
-  const registrazioneData = haConsensoRegistrazione && !soloAscolto && !voceEsclusa;
+  // Dove chi partecipa non entra mai nel video il segno della voce segue la
+  // trascrizione: un consenso alla registrazione dato prima resta dato, e si
+  // ritira, anche con la voce fuori.
+  const registrazioneData =
+    haConsensoRegistrazione && !soloAscolto && (voceDallaTrascrizione || !voceEsclusa);
   // Chi e' fuori dalla registrazione puo' rientrarvi anche dove l'evento non
   // chiede il consenso, e senza non vale nemmeno quello alla trascrizione. Dove
   // chi partecipa non entra mai nel video il consenso non c'e' da dare: la voce
