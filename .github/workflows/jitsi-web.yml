@@ -43,9 +43,9 @@ jobs:
       DOCKER_BUILD_SUMMARY: "false"
       DOCKER_BUILD_RECORD_UPLOAD: "false"
     name: Build & validate patched jitsi/web
-    # Self-hosted ARC runner in the cluster, like the build jobs of dev.yml and
-    # release.yml. The workflow runs only on push to dev and on manual
-    # dispatch, never on pull_request.
+    # Runner self-hosted (ARC) nel cluster, come i job di build di dev.yml e
+    # release.yml: il workflow parte solo da un push su dev o da un avvio
+    # manuale, mai da una pull request.
     runs-on: arc-runner-pa-webinar
     permissions:
       contents: read

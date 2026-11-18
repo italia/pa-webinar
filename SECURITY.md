@@ -159,7 +159,7 @@ flowchart LR
     gate{"Approval<br/>needed?"}:::risk
   end
   subgraph hosted["GitHub-hosted runner"]
-    gh["Ephemeral VM<br/>ubuntu-latest<br/>no publishing rights"]:::data
+    gh["Ephemeral VM<br/>ubuntu-latest<br/>no publishing rights<br/>for pull requests"]:::data
   end
   subgraph trusted["Trusted events"]
     ev["Push to main or dev<br/>tag v*<br/>manual dispatch<br/>weekly schedule"]:::portal
@@ -176,6 +176,7 @@ flowchart LR
   ev -. "codeql.yml, scorecard.yml,<br/>buildcache-cleanup.yml,<br/>release attestation" .-> gh
   sh -- "publishes" --> out
   pr -. "never" .-> sh
+  gh -. "release attestation:<br/>provenance bundle" .-> out
 
   classDef ext fill:#EEF1F4,stroke:#5C6F82,color:#17324D
   classDef risk fill:#FDF1E0,stroke:#CC7A00,color:#17324D,stroke-width:2px
