@@ -150,7 +150,7 @@ flowchart LR
 
 | Domain | Key models | What it holds | Owner page |
 |---|---|---|---|
-| Events and content | `Event`, `EventTemplate`, `Tag` and `EventTagLink`, `EventMaterial`, `EventReminder`, `EventQuestionnaire` with `QuestionTemplate`, `QuestionnaireTemplateLink` and `QuestionItem`, `GdprTemplate`, `GlossaryTerm` (post-production glossary: instance terms without an event, event terms with one) | The event and everything an organizer prepares for it. `EventTemplate` only pre-fills the wizard: an event keeps no reference to its template, so editing a template never changes existing events. | [event-journey.md](event-journey.md); statuses in [event-lifecycle.md](event-lifecycle.md) |
+| Events and content | `Event`, `EventTemplate`, `Tag` and `EventTagLink`, `EventMaterial`, `EventReminder`, `EventQuestionnaire` with `QuestionTemplate`, `QuestionnaireTemplateLink` and `QuestionItem`, `GdprTemplate`, `GlossaryTerm` (post-production glossary: instance terms without an event, event terms with one) | The event and everything an organizer prepares for it. `EventTemplate` pre-fills the wizard: an event copies its values, so editing a template never changes existing events. The event keeps only a catalog reference to it (`Event.templateId`, `SetNull`) for the instance statistics. | [event-journey.md](event-journey.md); statuses in [event-lifecycle.md](event-lifecycle.md) |
 | Participation | `Registration`, `EventInvitation`, `Person`, `ProfilePhoto`, `ReminderSent`, `QuestionnaireResponse` and `QuestionnaireAnswer`, `EventFeedback`, `RecordingConsent`, `MultitrackConsent`, `RetainedConsentProof` | Who registered, who was invited, the opt-in address book, the photos people show in the room, what participants answered, and the proofs of the consents given in the room or kept after their source was deleted ([Deleting data](#deleting-data)). | [event-journey.md](event-journey.md); address book in [GDPR.md](../GDPR.md) and [ADR-011](../adr/011-person-rubrica.md) |
 | Live interaction | `ChatMessage` and `ChatMessageReaction`, `Question`, `QuestionUpvote` and `QuestionGuestUpvote`, `Poll` and `PollVote`, `WordCloudRound` and `WordCloudSubmission`, `EventAgendaItem` and `AgendaItemReaction`, `Reaction`, `LiveAction`, `EventPresentation` | The table-backed features beside the video during a live event, and the journal of the actions taken in the room. PostgreSQL holds their state, and Redis only fans it out. The timer and the reaction-bar counters have no table ([Live interaction](#live-interaction)). | [live-interaction.md](live-interaction.md), [ADR-005](../adr/005-live-interaction-in-portal.md) |
 | Access | `EventModerator`, `StaffAccount`, `StaffLoginToken` | Named moderator and speaker grants, staff accounts and their one-time sign-in links. The primary moderator link is a column on `Event`, and the instance API key is not stored in the database. `EventOrganizer` sits next to these models but is display metadata only: it lists co-organizing organizations on the event page and grants no access. | [identity-and-access.md](identity-and-access.md) |
@@ -167,6 +167,7 @@ erDiagram
   STAFF_ACCOUNT |o--o{ EVENT : "creates (SetNull)"
   STAFF_ACCOUNT ||--o{ STAFF_LOGIN_TOKEN : "one-time sign-in"
   GDPR_TEMPLATE |o--o{ EVENT : "privacy notice (SetNull)"
+  EVENT_TEMPLATE |o--o{ EVENT : "catalog (SetNull)"
   EVENT |o--o{ EVENT : "series parent (SetNull)"
   EVENT ||--o{ REGISTRATION : "registrations"
   EVENT ||--o{ EVENT_INVITATION : "invitations"
@@ -186,6 +187,14 @@ erDiagram
     string jitsiRoomName UK
     uuid createdById FK "creator account, nullable"
     uuid recurrenceSeriesId FK "set only through the API"
+    uuid templateId FK "catalog, nullable"
+    string templateName "template name when created"
+    EventFormatClass formatClass "catalog, nullable"
+  }
+  EVENT_TEMPLATE {
+    uuid id PK
+    string name
+    boolean isSystem
   }
   REGISTRATION {
     uuid id PK
@@ -267,6 +276,7 @@ How to read it:
 - **Where the recording goes is declared on the event (not drawn).** `Event.recordingDestination` is what a person consents to when ticking the recording box: `PUBLIC`, `REGISTRANTS`, or null on an event that never declared it. `Event.recordingAudience` stays the choice of who sees the published recording, and a reserved destination holds it at `REGISTRANTS`. The text each consent was given to is stored with it: `Registration.consentRecordingDestination` and `consentRecordingVersion`, `RecordingConsent.destination` and `textVersion`. Both room proofs, `RecordingConsent` and `MultitrackConsent`, link the moderator or speaker who gave them through `eventModeratorId` and `staffAccountId` (`ON DELETE SET NULL`) and keep that person's `emailHash`, which still finds the proof when the grant or the account is gone. `EventTemplate` carries the starting values, with the same column names as `Event`. The rules are in [Recording destination](recording.md#recording-destination).
 - **Organizer scoping runs through `createdById` and organizer grants.** An event created by a staff account records that account, and an organizer sees the events whose `createdById` is their own, plus those where a valid organizer grant (`EventModerator.organizer`) has the account's email fingerprint (`emailHash`). Events created with the instance API key have no creator and are managed by administrators only. The rules are in [identity-and-access.md](identity-and-access.md).
 - **Series.** `recurrenceRule` stores an RFC 5545 `RRULE`. The wizard shows it on the review step, and duplication uses it to propose the next date; nothing else reads it. `recurrenceSeriesId` can link an occurrence to a parent event, but only an API client sets it: no screen does, no job creates occurrences, and a copy never inherits it ([event-journey.md](event-journey.md#recurrence)).
+- **The event catalog.** `Event.formatClass` (the family of the format) and `Event.templateId` with `templateName` (the template the event was created from, and its name then) classify the event for the instance statistics and change none of its settings. Both are empty on an event created before the catalog or without a template or a format, and nothing fills them in afterwards. Deleting the template clears `templateId` and keeps `templateName`. The rules are in [event-journey.md](event-journey.md#the-event-catalog).
 - **Call sessions.** A `CallSession` records one span of real use of the room. It is the anchor of a `Recording` (one-to-one) and of the live speaker and raised-hand logs. Its lifecycle is in [event-lifecycle.md](event-lifecycle.md#call-sessions).
 - **Questionnaires (not drawn).** Reusable `QuestionTemplate`s and ad-hoc `QuestionItem`s make up an `EventQuestionnaire`. Answers are stored as `QuestionnaireResponse` rows with their `QuestionnaireAnswer`s. The `POST_EVENT` questionnaire is the end-of-event rating; `EventFeedback` holds the older star ratings, which the room does not write but the event's reports read. At event retention the GDPR cleanup deletes the `PRE_REGISTRATION` responses, and keeps the `POST_EVENT` responses and the `EventFeedback` rows without registration, browser id, name or email hash ([Deleting data](#deleting-data)). The flow is in [event-journey.md](event-journey.md).
 
@@ -404,6 +414,7 @@ The values below are copied from `schema.prisma`. The owner page explains what e
 |---|---|---|---|
 | `EventStatus` | `DRAFT`, `PUBLISHED`, `PROVISIONING`, `LIVE`, `IDLE`, `ENDED`, `ARCHIVED` | `Event.status`. The scaler or the lifecycle cron, the API and the cleanup job move it. | [event-lifecycle.md](event-lifecycle.md) |
 | `EventType` | `SCHEDULED`, `INSTANT`, `LEGACY` | A scheduled event, an instant call, or a historical entry with no room and no registrations (metadata and a `youtubeUrl` only). | [event-journey.md](event-journey.md) |
+| `EventFormatClass` (type `event_format_class`) | `MEETING`, `PARTICIPATORY`, `PUBLIC` | `Event.formatClass`, nullable: the family of the format, for the instance statistics. `NULL` is an event not cataloged. | [event-journey.md](event-journey.md#the-event-catalog) |
 | `EventAccessMode` | `OPEN`, `INVITATION` | `Event.accessMode`, nullable: who can take part. `NULL` follows the site settings. | [event-journey.md](event-journey.md#invitation-only-registration) |
 | `EventModeratorRole` | `MODERATOR`, `SPEAKER` | The role of a named grant. | [identity-and-access.md](identity-and-access.md) |
 | `StaffRole` | `ORGANIZER`, `ADMIN` | A staff account manages its own events, or the whole instance under a name. The instance API key is not an account. | [identity-and-access.md](identity-and-access.md), [ADR-014](../adr/014-organizer-role.md), [ADR-015](../adr/015-named-administrators.md) |
@@ -440,6 +451,7 @@ Each rule below names the mechanism that enforces it. Keep that mechanism in pla
   | `Event.createdById` | Deleting a staff account keeps its events, which then only administrators manage. |
   | `Event.gdprTemplateId` | Deleting a privacy notice template leaves its events without a template. How a notice is resolved then is in [GDPR.md](../GDPR.md). |
   | `Event.recurrenceSeriesId` | An event survives the parent event it is linked to. |
+  | `Event.templateId` | Deleting an event template keeps its events and the template name stored on them (`templateName`). |
   | `personId` on `Registration`, `EventInvitation` and `Speaker` | Deleting a person record keeps the registrations and speaker labels. |
   | `ChatMessage.replyToId` | A reply survives its parent. |
   | `registrationId` on `EventFeedback` and `QuestionnaireResponse` | Answers survive their registration. The GDPR cleanup deletes the pre-registration responses and removes the identities from the others. |
