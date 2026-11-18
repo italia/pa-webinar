@@ -1075,6 +1075,35 @@ registry.registerPath({
 
 registry.registerPath({
   method: 'post',
+  path: '/api/gdpr/recording-removal',
+  tags: ['GDPR'],
+  summary: 'Ask not to appear in the recordings of an event (Art. 17), with the token the export returns',
+  description:
+    'Creates one removal request for each recording with media of the registration\'s event, ' +
+    'unless the registration already has an open one. Nothing is removed at once: the controller ' +
+    'handles the request. The export reports, per registration, whether a request can be made ' +
+    '(`recordingRemoval.available`) and the status of those made.',
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: z.object({ token: z.string(), registrationId: z.guid() }).strict(),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Requests created',
+      content: { 'application/json': { schema: z.object({ requested: z.number().int().min(0) }) } },
+    },
+    401: { description: 'Invalid or expired token' },
+    404: { description: 'No such registration for this address, or its event has no recording' },
+  },
+});
+
+registry.registerPath({
+  method: 'post',
   path: '/api/webhooks/recording',
   tags: ['Webhooks'],
   summary: 'Jibri recording finalize webhook',

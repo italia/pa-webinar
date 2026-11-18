@@ -20,6 +20,14 @@ describe('classi dei lavori di post-produzione', () => {
     expect(MT_JOB_KINDS).toEqual(['TRANSLATE_TEXT']);
   });
 
+  it('la rimozione da un video gira sul worker senza GPU, senza vLLM, e la chiude la consegna', () => {
+    expect(GPU_WORKER_KINDS).not.toContain('REDACT');
+    expect(CPU_WORKER_KINDS).toContain('REDACT');
+    expect(LLM_JOB_KINDS).not.toContain('REDACT');
+    expect(MT_JOB_KINDS).not.toContain('REDACT');
+    expect(EVENT_JOB_KINDS).toContain('REDACT');
+  });
+
   it('vLLM solo per i lavori che gli chiedono testo', () => {
     expect([...LLM_JOB_KINDS].sort()).toEqual([
       'REPORT',

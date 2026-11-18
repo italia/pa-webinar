@@ -29,6 +29,7 @@ import { proveDiSalaDiChiConduce } from '@/lib/gdpr/consent-proofs';
 import { consensiDellIscrizione } from '@/lib/gdpr/consent-state';
 import { issueGdprToken, verifyGdprToken } from '@/lib/gdpr/request-token';
 import { proveConservateDellaPersona } from '@/lib/gdpr/retained-consent-proofs';
+import { iscrizioniConRegistrazione, richiesteDellaPersona } from '@/lib/recording/redaction/requests';
 import { rubricaProposta } from '@/lib/persons/address-book';
 import { issueRubricaOptOutToken } from '@/lib/persons/opt-out-token';
 import { scadenzaRubrica } from '@/lib/persons/retention';
@@ -265,6 +266,11 @@ export const GET = withErrorHandling(async (request) => {
         })
       : [];
 
+  // Le richieste di non comparire in una registrazione: dove l'evento ne ha
+  // una, la pagina offre di chiederlo, e mostra lo stato di quelle fatte.
+  const conRegistrazione = await iscrizioniConRegistrazione(registrations);
+  const richiesteRimozione = await richiesteDellaPersona(emailHash);
+
   const result = registrations.map((r) => {
     let decryptedEmail: string | null = null;
     try {
@@ -320,6 +326,14 @@ export const GET = withErrorHandling(async (request) => {
           destination: c.destination ?? null,
           textVersion: c.textVersion ?? null,
         })),
+        // L'evento ha una registrazione da cui si puo' chiedere di essere tolti,
+        // e le richieste gia' fatte per questa iscrizione, con il loro stato.
+        recordingRemoval: {
+          available: conRegistrazione.has(r.id),
+          requests: richiesteRimozione
+            .filter((q) => q.registrationId === r.id)
+            .map(({ registrationId: _id, ...q }) => q),
+        },
       },
       event: {
         title: r.event.title,

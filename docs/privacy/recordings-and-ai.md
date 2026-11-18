@@ -78,6 +78,10 @@ assessment belongs to the controller of each installation.
   it exists, its status and its processing jobs; the instance key never sees
   content. Staff reads are written to the GDPR log
   ([Who can see recording content](#who-can-see-recording-content)).
+- A person can ask not to appear in a recording, from **My data** or through
+  the controller. An administrator covers and mutes the intervals in which
+  the person appears or speaks, the person's tracks go, and post-production
+  runs again ([Removing a person from a recording](#removing-a-person-from-a-recording)).
 - Several gaps need operator attention: see [Known limitations](#known-limitations).
 
 ## What is captured and when
@@ -768,6 +772,10 @@ where the rule is enforced. See
   and the archive. An administrator who does not organize the event sees the
   status of the recording and of its jobs, not the outputs
   ([Who can see recording content](#who-can-see-recording-content)).
+- **During a removal request**, a named administrator account opens the
+  recording of the request from the removal editor, for as long as the request
+  is open, and each opening is logged
+  ([Removing a person from a recording](#removing-a-person-from-a-recording)).
 
 ### The event report
 
@@ -1003,8 +1011,9 @@ the removal can be repeated.
 
 Erasure works on text. The spoken words stay in the recording itself: in the
 composite video, which is public once published, and in the per-participant
-tracks while they exist. Removing them means editing or unpublishing the
-video.
+tracks while they exist. Removing them is a removal from the recording
+([Removing a person from a recording](#removing-a-person-from-a-recording)),
+or unpublishing the video.
 
 ```mermaid
 flowchart LR
@@ -1060,13 +1069,45 @@ not regenerated:
 - **Dubbed audio and video, and an archive already built:** keep the passage
   until they are purged.
 
+### Removing a person from a recording
+
+A person who appears in a recording can ask not to appear in it. A registrant
+asks from **My data**; anyone else asks the controller, and an administrator
+registers the request. The request, its statuses and its audit are described
+in [Privacy and data protection](../GDPR.md#removal-from-a-recording); the job
+in [AI post-production](../POSTPROD.md#removal-from-a-recording).
+
+The administrator opens the recording of the request in the removal editor,
+by exception: only with a named administrator account, only that recording,
+only while the request is open, and every opening is written to the admin
+audit log. The editor proposes where the person appears and speaks, from the
+record of who was in the room with the voice in the video, the caption
+sentences, the speaking timeline and the per-participant tracks, all
+anchored to the recording's time zero; the administrator corrects the
+intervals while watching the video and previews the result.
+
+| Data | What the removal does |
+|---|---|
+| Composite video | Each interval becomes a full-frame card, **Content removed on request**, with the audio muted; the duration does not change. The redacted file replaces the original as the recording's source and, when it was the same file, as the event's published video. The original file is deleted |
+| Per-participant tracks of the person | Deleted whole, files and rows, with the recording's `tracks.json` |
+| Caption sentences of the person | Deleted for the whole event; the person leaves the transcript built from captions |
+| Speaking timeline | Kept until the event's retention, without the person's name |
+| Transcript, subtitles, summaries, translations, dubbing, waveform, archive | Deleted, with the files of every earlier run; when the recording had an AI transcript and the pipeline is on, a new run produces them again from the redacted video or from the remaining tracks |
+| Speaker labels of an AI transcript | Deleted with it; the new run creates its own |
+| Copies outside the platform (a video on another site, downloads, a different published file) | Not reached: the editor reminds the administrator |
+
+A new run from the composite video does not ask again for the confirmation
+that every voice consented: the redacted video holds fewer voices than the
+one it was given for. A recording transcribed from per-participant tracks runs
+again from the remaining tracks only, never from the composite video.
+
 ### Data-subject requests
 
 The self-service privacy pages (`/en/privacy/my-data`,
 `/it/privacy/i-miei-dati`; see
 [Privacy and data protection](../GDPR.md#self-service-access-and-erasure)) do
-not reach recordings or AI outputs, with one exception, the transcript from
-captions:
+not reach recordings or AI outputs, with two exceptions, the transcript from
+captions and the request not to appear in a recording:
 
 - the export lists registrations and their consent flags, including
   `consentMultitrack`, the consent proofs kept for what is published, and the
@@ -1076,7 +1117,11 @@ captions:
   stored sentences, and removes the person from the transcript built from
   captions ([Transcript from live captions](#transcript-from-live-captions));
   it does not reach recordings, tracks or AI outputs. The proof of a consent to
-  a video or transcript that exists, published or not, stays, without a name.
+  a video or transcript that exists, published or not, stays, without a name;
+- the access page offers, for each registration to an event with a
+  recording, **I don't want to appear in this recording**: the request goes to
+  the controller and the page shows its status
+  ([Removing a person from a recording](#removing-a-person-from-a-recording)).
 
 Requests about recordings and transcripts therefore go to the controller, who
 handles them in the administration area:
@@ -1086,7 +1131,8 @@ handles them in the administration area:
 | Access | Read the transcript in the transcript editor and provide a copy |
 | Rectification | Correct a line, reassign a segment to another speaker, or rename a speaker label. A rename writes a `POSTPROD_SPEAKER_MAP` entry to the admin audit log that holds the new name until the GDPR cleanup empties its detail. A correction changes the database copies: outputs generated later (an added translation language, a new archive) start from the corrected text, and outputs already produced stay as they are |
 | Erasure of words | Use **Erase from the original too**, then handle the derived outputs listed above and, if needed, the video |
-| Erasure of a voice track | No control deletes a single track. **Delete session** removes the recording's rows but leaves its track and output files in storage, so delete those in storage as well. Otherwise tracks go at the next purge or orphan sweep, or have to be deleted in storage |
+| Erasure from the recording: image, voice and what derives from them | Handle the removal request in the removal editor, or register it there when it arrived by other means ([Removing a person from a recording](#removing-a-person-from-a-recording)) |
+| Erasure of a voice track | A removal request deletes all the tracks of the person. Otherwise no control deletes a single track: **Delete session** removes the recording's rows but leaves its track and output files in storage, so delete those in storage as well, or wait for the next purge or orphan sweep |
 
 Once a track has been purged, the audio no longer exists. The attribution
 inside the transcript remains, and a request about it is handled on the
@@ -1165,7 +1211,13 @@ Consent and transparency:
   out, and the room still says so. Retry it after every Jitsi upgrade, and
   restart Prosody after an upgrade that changes the modules.
 - **What is already in the composite video stays after a withdrawal.** Removing
-  a person's passages is a request to the controller.
+  a person's passages is a removal request, which an administrator handles in
+  the removal editor.
+- **A removal does not reach copies outside the platform,** nor a published
+  video that is a different file from the recording, nor the AI event report
+  and the recap. On an installation without the post-production worker a
+  removal from a video never runs, and with the post-production switch off it
+  waits.
 - **Keep per-participant tracks can change after people have consented.** A
   consent given to the text that promises deletion stays valid
   ([The consent text and retained tracks](#the-consent-text-and-retained-tracks)).
@@ -1230,14 +1282,16 @@ Data-subject rights:
 
 - **Self-service export and erasure exclude recordings, tracks and AI
   outputs.** Only the transcript from captions is reached, by erasure and by the
-  withdrawal of a consent.
+  withdrawal of a consent. A registrant can ask not to appear in a recording,
+  and an administrator handles the request.
 - **A correction reaches the stored files only when a job needs them.** The
   file stays as it was until a summary, translation, dubbing or archive job
   takes it. If that write fails, the job reads the previous file, and only
   the application log says so.
-- **Redaction does not reach derived outputs or the recording.** No control
-  regenerates translations or dubbing from a revised transcript, and the
-  spoken words stay in the video and the tracks.
+- **Erasing a passage does not reach derived outputs or the recording.** No
+  control regenerates translations or dubbing from a revised transcript, and
+  the spoken words stay in the video and the tracks. A removal from the
+  recording does reach them, by the intervals, and redoes the outputs.
 
 ## Related pages
 

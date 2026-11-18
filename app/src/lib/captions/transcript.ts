@@ -262,7 +262,7 @@ export const TRASCRIZIONE_AI_IN_CORSO = {
  * pipeline (lib/postprod/live-timeline): l'inizio del media, o l'avvio
  * riferito dalla sala, o la creazione meno la durata.
  */
-async function zeroDelVideo(tx: Prisma.TransactionClient, r: {
+export async function zeroDelVideo(tx: Prisma.TransactionClient, r: {
   id: string;
   eventId: string;
   blobKey: string;
