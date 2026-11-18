@@ -69,11 +69,13 @@ export const SEZIONI: readonly NavSection[] = [
     href: '/admin/registrations',
    
     labelKey: 'people',
-    radici: ['/admin/registrations', '/admin/rubrica', '/admin/gdpr-audit'],
+    radici: ['/admin/registrations', '/admin/rubrica', '/admin/gdpr-audit', '/admin/recording-removals'],
     voci: [
       { href: '/admin/registrations', labelKey: 'registrationsList', exact: true },
       { href: '/admin/rubrica', labelKey: 'rubrica' },
       { href: '/admin/gdpr-audit', labelKey: 'gdprAudit' },
+      // Le richieste di non comparire in una registrazione: vanno al titolare.
+      { href: '/admin/recording-removals', labelKey: 'recordingRemovals' },
     ],
   },
   {
@@ -147,6 +149,7 @@ const DETTAGLI: Partial<Record<PercorsoInterno, string>> = {
   '/admin/events/[id]/questionnaires': 'eventQuestionnaires',
   '/admin/rubrica/[id]': 'rubricaDetail',
   '/admin/postprod/[recordingId]': 'postprodDetail',
+  '/admin/recording-removals/[id]': 'recordingRemovalDetail',
 };
 
 export function vocePerRuolo(role: StaffRole) {

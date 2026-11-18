@@ -33,6 +33,9 @@ const ACTION_COLORS: Record<string, string> = {
   CONSENT_RECORDED: 'success',
   CONSENT_WITHDRAWN: 'warning',
   DATA_EXPORTED: 'primary',
+  RECORDING_REDACTION_REQUESTED: 'warning',
+  RECORDING_REDACTION_REJECTED: 'secondary',
+  RECORDING_REDACTED: 'danger',
 };
 
 export default function GdprAuditDashboard() {
@@ -93,6 +96,9 @@ export default function GdprAuditDashboard() {
                 <option value="CONSENT_RECORDED">{t('actions.CONSENT_RECORDED')}</option>
                 <option value="CONSENT_WITHDRAWN">{t('actions.CONSENT_WITHDRAWN')}</option>
                 <option value="DATA_EXPORTED">{t('actions.DATA_EXPORTED')}</option>
+                <option value="RECORDING_REDACTION_REQUESTED">{t('actions.RECORDING_REDACTION_REQUESTED')}</option>
+                <option value="RECORDING_REDACTION_REJECTED">{t('actions.RECORDING_REDACTION_REJECTED')}</option>
+                <option value="RECORDING_REDACTED">{t('actions.RECORDING_REDACTED')}</option>
               </select>
             </div>
           </div>
