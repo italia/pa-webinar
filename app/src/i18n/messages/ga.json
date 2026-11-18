@@ -4600,7 +4600,19 @@
       "addressBookPendingEffect": "Má dheimhníonn tú, fillfidh tú ar an leabhar seoltaí le hainm agus eagraíocht an chláraithe seo agus gheobhaidh tú cuirí arís. Má chuireann tú ar ceal, nó murarbh tusa a rinne é, fanfaidh tú lasmuigh den leabhar seoltaí agus ní bhfaighidh tú cuirí.",
       "addressBookPendingConfirm": "Deimhnigh m'fhilleadh",
       "addressBookPendingCancel": "Cuir an t-iarratas ar ceal",
-      "addressBookPendingGone": "Níl an t-iarratas seo ag feitheamh a thuilleadh. Athlódáil an leathanach chun an staid reatha a fheiceáil."
+      "addressBookPendingGone": "Níl an t-iarratas seo ag feitheamh a thuilleadh. Athlódáil an leathanach chun an staid reatha a fheiceáil.",
+      "removalTitle": "Taifeadadh an imeachta",
+      "removalIntro": "Taifeadadh an t-imeacht seo. Mura mian leat a bheith sa taifeadadh, is féidir leat iarraidh go mbainfí as é thú: clúdaítear le cárta na codanna ina bhfuil tú le feiceáil nó ag labhairt agus múchtar an fhuaim, agus déantar an tras-scríbhinn, na fotheidil agus an achoimre arís. Téann an t-iarratas chuig an rialaitheoir sonraí, a scrúdaíonn é.",
+      "removalButton": "Níl mé ag iarraidh a bheith sa taifeadadh seo",
+      "removalConfirmTitle": "An ndeimhníonn tú an t-iarratas?",
+      "removalConfirmBody": "Bainfidh an rialaitheoir as an taifeadadh na codanna ina bhfuil tú le feiceáil nó ag labhairt. Maidir le cóipeanna a foilsíodh ar shuímh eile, mar shampla ar YouTube, is é an té a d’fhoilsigh iad a chaithfidh iad a bhaint ar leithligh.",
+      "removalConfirm": "Seol an t-iarratas",
+      "removalCancel": "Cealaigh",
+      "removalSent": "Seoladh an t-iarratas. Scrúdóidh an rialaitheoir é.",
+      "removalError": "Níorbh fhéidir an t-iarratas a sheoladh. Bain triail eile as ar ball.",
+      "removalStatusOpen": "Iarratas an {date}: á phróiseáil.",
+      "removalStatusClosed": "Iarratas an {date}: curtha i gcrích an {closed}.",
+      "removalStatusRejected": "Iarratas an {date}: diúltaithe. Scríobh chuig an rialaitheoir chun an chúis a fháil amach."
     },
     "erasure": {
       "title": "Scriosadh bhur gcuid sonraí",

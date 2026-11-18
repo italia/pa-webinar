@@ -4600,7 +4600,19 @@
       "addressBookPendingEffect": "Hvis du bekræfter, kommer du tilbage i adressebogen med navnet og organisationen fra denne tilmelding og modtager invitationer igen. Hvis du annullerer, eller hvis det ikke var dig, forbliver du uden for adressebogen og modtager ingen invitationer.",
       "addressBookPendingConfirm": "Bekræft min tilbagevenden",
       "addressBookPendingCancel": "Annuller anmodningen",
-      "addressBookPendingGone": "Denne anmodning afventer ikke længere. Genindlæs siden for at se den aktuelle status."
+      "addressBookPendingGone": "Denne anmodning afventer ikke længere. Genindlæs siden for at se den aktuelle status.",
+      "removalTitle": "Optagelsen af arrangementet",
+      "removalIntro": "Dette arrangement er blevet optaget. Hvis du ikke vil optræde i optagelsen, kan du bede om at blive fjernet: de dele, hvor du ses eller taler, dækkes af et skilt og gøres lydløse, og transskription, undertekster og resumé laves på ny. Anmodningen går til den dataansvarlige, som behandler den.",
+      "removalButton": "Jeg vil ikke optræde i denne optagelse",
+      "removalConfirmTitle": "Bekræfter du anmodningen?",
+      "removalConfirmBody": "Den dataansvarlige fjerner de dele af optagelsen, hvor du ses eller taler. Kopier, der er offentliggjort på andre websteder, for eksempel på YouTube, skal fjernes separat af dem, der har offentliggjort dem.",
+      "removalConfirm": "Send anmodningen",
+      "removalCancel": "Annullér",
+      "removalSent": "Anmodningen er sendt. Den dataansvarlige vil behandle den.",
+      "removalError": "Anmodningen kunne ikke sendes. Prøv igen senere.",
+      "removalStatusOpen": "Anmodning af {date}: under behandling.",
+      "removalStatusClosed": "Anmodning af {date}: gennemført {closed}.",
+      "removalStatusRejected": "Anmodning af {date}: afvist. Skriv til den dataansvarlige for at få begrundelsen."
     },
     "erasure": {
       "title": "Sletning af dine data",

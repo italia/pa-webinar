@@ -4600,7 +4600,19 @@
       "addressBookPendingEffect": "Als u bevestigt, keert u terug in het adresboek met de naam en de organisatie van deze inschrijving en ontvangt u weer uitnodigingen. Als u annuleert, of als u het niet was, blijft u buiten het adresboek en ontvangt u geen uitnodigingen.",
       "addressBookPendingConfirm": "Terugkeer bevestigen",
       "addressBookPendingCancel": "Verzoek annuleren",
-      "addressBookPendingGone": "Dit verzoek staat niet meer open. Laad de pagina opnieuw om de actuele status te zien."
+      "addressBookPendingGone": "Dit verzoek staat niet meer open. Laad de pagina opnieuw om de actuele status te zien.",
+      "removalTitle": "De opname van het evenement",
+      "removalIntro": "Dit evenement is opgenomen. Wilt u niet in de opname voorkomen, dan kunt u vragen om eruit verwijderd te worden: de delen waarin u te zien bent of spreekt, worden afgedekt met een tekstkaart en gedempt, en de transcriptie, de ondertiteling en de samenvatting worden opnieuw gemaakt. Het verzoek gaat naar de verwerkingsverantwoordelijke, die het beoordeelt.",
+      "removalButton": "Ik wil niet in deze opname voorkomen",
+      "removalConfirmTitle": "Verzoek bevestigen?",
+      "removalConfirmBody": "De verwerkingsverantwoordelijke verwijdert uit de opname de delen waarin u te zien bent of spreekt. Kopieën die op andere sites zijn gepubliceerd, bijvoorbeeld op YouTube, moeten apart worden verwijderd door wie ze heeft gepubliceerd.",
+      "removalConfirm": "Verzoek versturen",
+      "removalCancel": "Annuleren",
+      "removalSent": "Verzoek verstuurd. De verwerkingsverantwoordelijke zal het beoordelen.",
+      "removalError": "Het verzoek kon niet worden verstuurd. Probeer het later opnieuw.",
+      "removalStatusOpen": "Verzoek van {date}: in behandeling.",
+      "removalStatusClosed": "Verzoek van {date}: afgehandeld op {closed}.",
+      "removalStatusRejected": "Verzoek van {date}: afgewezen. Schrijf naar de verwerkingsverantwoordelijke om de reden te vernemen."
     },
     "erasure": {
       "title": "Verwijdering van uw gegevens",

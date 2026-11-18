@@ -4600,7 +4600,19 @@
       "addressBookPendingEffect": "Si vous confirmez, vous revenez dans le carnet d'adresses avec le nom et l'organisme de cette inscription et vous recevez de nouveau les invitations. Si vous annulez, ou si ce n'était pas vous, vous restez hors du carnet d'adresses et ne recevez pas d'invitations.",
       "addressBookPendingConfirm": "Confirmer mon retour",
       "addressBookPendingCancel": "Annuler la demande",
-      "addressBookPendingGone": "Cette demande n'est plus en attente. Rechargez la page pour voir l'état à jour."
+      "addressBookPendingGone": "Cette demande n'est plus en attente. Rechargez la page pour voir l'état à jour.",
+      "removalTitle": "L'enregistrement de l'événement",
+      "removalIntro": "Cet événement a été enregistré. Si vous ne souhaitez pas apparaître dans l'enregistrement, vous pouvez demander à ne plus y figurer : les passages où vous apparaissez ou parlez sont recouverts par un carton et rendus muets, et la transcription, les sous-titres et la synthèse sont produits à nouveau. La demande est adressée au responsable du traitement, qui l'examine.",
+      "removalButton": "Je ne veux pas apparaître dans cet enregistrement",
+      "removalConfirmTitle": "Confirmer la demande ?",
+      "removalConfirmBody": "Le responsable du traitement retirera de l'enregistrement les passages où vous apparaissez ou parlez. Les copies publiées sur d'autres sites, par exemple sur YouTube, doivent être retirées séparément par ceux qui les ont publiées.",
+      "removalConfirm": "Envoyer la demande",
+      "removalCancel": "Annuler",
+      "removalSent": "Demande envoyée. Le responsable du traitement l'examinera.",
+      "removalError": "La demande n'a pas pu être envoyée. Réessayez plus tard.",
+      "removalStatusOpen": "Demande du {date} : en cours de traitement.",
+      "removalStatusClosed": "Demande du {date} : traitée le {closed}.",
+      "removalStatusRejected": "Demande du {date} : rejetée. Écrivez au responsable du traitement pour en connaître le motif."
     },
     "erasure": {
       "title": "Effacement de vos données",

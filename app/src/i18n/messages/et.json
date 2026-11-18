@@ -4600,7 +4600,19 @@
       "addressBookPendingEffect": "Kui kinnitate, naasete aadressraamatusse selle registreerumise nime ja organisatsiooniga ning saate taas kutseid. Kui tühistate või kui see polnud teie, jääte aadressraamatust välja ega saa kutseid.",
       "addressBookPendingConfirm": "Kinnita naasmine",
       "addressBookPendingCancel": "Tühista taotlus",
-      "addressBookPendingGone": "See taotlus ei oota enam kinnitust. Uuendatud oleku nägemiseks laadige leht uuesti."
+      "addressBookPendingGone": "See taotlus ei oota enam kinnitust. Uuendatud oleku nägemiseks laadige leht uuesti.",
+      "removalTitle": "Ürituse salvestis",
+      "removalIntro": "See üritus salvestati. Kui te ei soovi salvestisel esineda, võite taotleda enda eemaldamist: kohad, kus te olete nähtav või räägite, kaetakse sildiga ja vaigistatakse ning transkriptsioon, subtiitrid ja kokkuvõte tehakse uuesti. Taotlus läheb vastutavale töötlejale, kes selle läbi vaatab.",
+      "removalButton": "Ma ei soovi selles salvestises esineda",
+      "removalConfirmTitle": "Kas kinnitate taotluse?",
+      "removalConfirmBody": "Vastutav töötleja eemaldab salvestisest kohad, kus te olete nähtav või räägite. Teistel saitidel, näiteks YouTube'is, avaldatud koopiad peab eraldi eemaldama see, kes need avaldas.",
+      "removalConfirm": "Saada taotlus",
+      "removalCancel": "Tühista",
+      "removalSent": "Taotlus saadetud. Vastutav töötleja vaatab selle läbi.",
+      "removalError": "Taotlust ei õnnestunud saata. Proovige hiljem uuesti.",
+      "removalStatusOpen": "{date} esitatud taotlus: menetluses.",
+      "removalStatusClosed": "{date} esitatud taotlus: lõpetatud {closed}.",
+      "removalStatusRejected": "{date} esitatud taotlus: tagasi lükatud. Põhjuse teadasaamiseks kirjutage vastutavale töötlejale."
     },
     "erasure": {
       "title": "Teie andmete kustutamine",

@@ -4600,7 +4600,19 @@
       "addressBookPendingEffect": "Jekk tikkonferma, terġa' lura fid-direttorju bl-isem u l-organizzazzjoni ta' din ir-reġistrazzjoni u terġa' tirċievi stediniet. Jekk tikkanċella, jew jekk ma kontx int, tibqa' barra mid-direttorju u ma tirċievix stediniet.",
       "addressBookPendingConfirm": "Ikkonferma r-ritorn",
       "addressBookPendingCancel": "Ikkanċella t-talba",
-      "addressBookPendingGone": "Din it-talba m'għadhiex pendenti. Erġa' tella' l-paġna biex tara l-istat attwali."
+      "addressBookPendingGone": "Din it-talba m'għadhiex pendenti. Erġa' tella' l-paġna biex tara l-istat attwali.",
+      "removalTitle": "Ir-reġistrazzjoni tal-avveniment",
+      "removalIntro": "Dan l-avveniment ġie rreġistrat. Jekk ma tridx tidher fir-reġistrazzjoni, tista’ titlob li titneħħa minnha: il-partijiet fejn tidher jew titkellem jiġu koperti b’kartellun u msikktin, u t-traskrizzjoni, is-sottotitoli u s-sommarju jsiru mill-ġdid. It-talba tmur għand il-kontrollur tad-dejta, li jeżaminaha.",
+      "removalButton": "Ma rridx nidher f’din ir-reġistrazzjoni",
+      "removalConfirmTitle": "Tikkonferma t-talba?",
+      "removalConfirmBody": "Il-kontrollur se jneħħi mir-reġistrazzjoni l-partijiet fejn tidher jew titkellem. Il-kopji ppubblikati f’siti oħra, pereżempju fuq YouTube, għandu jneħħihom separatament min ippubblikahom.",
+      "removalConfirm": "Ibgħat it-talba",
+      "removalCancel": "Ikkanċella",
+      "removalSent": "It-talba ntbagħtet. Il-kontrollur se jeżaminaha.",
+      "removalError": "It-talba ma setgħetx tintbagħat. Erġa’ pprova aktar tard.",
+      "removalStatusOpen": "Talba tal-{date}: qed tiġi pproċessata.",
+      "removalStatusClosed": "Talba tal-{date}: imlestija fil-{closed}.",
+      "removalStatusRejected": "Talba tal-{date}: miċħuda. Ikteb lill-kontrollur biex issir taf ir-raġuni."
     },
     "erasure": {
       "title": "Tħassir tad-dejta tiegħek",

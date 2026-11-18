@@ -4600,7 +4600,19 @@
       "addressBookPendingEffect": "Jeśli potwierdzisz, wrócisz do książki adresowej z imieniem i nazwiskiem oraz organizacją z tej rejestracji i znów będziesz otrzymywać zaproszenia. Jeśli anulujesz lub jeśli to nie Ty, pozostaniesz poza książką adresową i nie będziesz otrzymywać zaproszeń.",
       "addressBookPendingConfirm": "Potwierdź powrót",
       "addressBookPendingCancel": "Anuluj prośbę",
-      "addressBookPendingGone": "Ta prośba nie oczekuje już na potwierdzenie. Odśwież stronę, aby zobaczyć aktualny stan."
+      "addressBookPendingGone": "Ta prośba nie oczekuje już na potwierdzenie. Odśwież stronę, aby zobaczyć aktualny stan.",
+      "removalTitle": "Nagranie wydarzenia",
+      "removalIntro": "To wydarzenie zostało nagrane. Jeśli nie chcesz pojawiać się w nagraniu, możesz poprosić o usunięcie z niego: fragmenty, w których się pojawiasz lub mówisz, zostaną zakryte planszą i wyciszone, a transkrypcja, napisy i podsumowanie zostaną wykonane ponownie. Wniosek trafia do administratora danych, który go rozpatruje.",
+      "removalButton": "Nie chcę pojawiać się w tym nagraniu",
+      "removalConfirmTitle": "Potwierdzasz wniosek?",
+      "removalConfirmBody": "Administrator danych usunie z nagrania fragmenty, w których się pojawiasz lub mówisz. Kopie opublikowane w innych serwisach, na przykład w YouTube, musi osobno usunąć ten, kto je opublikował.",
+      "removalConfirm": "Wyślij wniosek",
+      "removalCancel": "Anuluj",
+      "removalSent": "Wniosek wysłany. Administrator danych go rozpatrzy.",
+      "removalError": "Nie udało się wysłać wniosku. Spróbuj ponownie później.",
+      "removalStatusOpen": "Wniosek z {date}: w trakcie rozpatrywania.",
+      "removalStatusClosed": "Wniosek z {date}: zrealizowany {closed}.",
+      "removalStatusRejected": "Wniosek z {date}: odrzucony. Napisz do administratora danych, aby poznać powód."
     },
     "erasure": {
       "title": "Usunięcie Twoich danych",

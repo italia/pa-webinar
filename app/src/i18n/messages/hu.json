@@ -4600,7 +4600,19 @@
       "addressBookPendingEffect": "Ha megerősíti, az ebben a regisztrációban szereplő névvel és szervezettel visszakerül a címjegyzékbe, és ismét kap meghívókat. Ha visszavonja a kérést, vagy ha nem Ön volt, a címjegyzéken kívül marad, és nem kap meghívókat.",
       "addressBookPendingConfirm": "Visszatérés megerősítése",
       "addressBookPendingCancel": "Kérés visszavonása",
-      "addressBookPendingGone": "Ez a kérés már nem vár megerősítésre. Töltse be újra az oldalt a jelenlegi állapot megtekintéséhez."
+      "addressBookPendingGone": "Ez a kérés már nem vár megerősítésre. Töltse be újra az oldalt a jelenlegi állapot megtekintéséhez.",
+      "removalTitle": "Az esemény felvétele",
+      "removalIntro": "Ezt az eseményt rögzítették. Ha nem szeretne szerepelni a felvételen, kérheti, hogy eltávolítsák belőle: azokat a részeket, ahol Ön látható vagy beszél, egy tájékoztató tábla takarja el és elnémítják, az átiratot, a feliratokat és az összefoglalót pedig újra elkészítik. A kérelem az adatkezelőhöz kerül, aki megvizsgálja.",
+      "removalButton": "Nem szeretnék szerepelni ezen a felvételen",
+      "removalConfirmTitle": "Megerősíti a kérelmet?",
+      "removalConfirmBody": "Az adatkezelő eltávolítja a felvételből azokat a részeket, ahol Ön látható vagy beszél. A más oldalakon, például a YouTube-on közzétett másolatokat külön kell eltávolítania annak, aki közzétette őket.",
+      "removalConfirm": "Kérelem elküldése",
+      "removalCancel": "Mégse",
+      "removalSent": "A kérelmet elküldtük. Az adatkezelő megvizsgálja.",
+      "removalError": "A kérelmet nem sikerült elküldeni. Próbálja újra később.",
+      "removalStatusOpen": "Kérelem ({date}): folyamatban.",
+      "removalStatusClosed": "Kérelem ({date}): teljesítve ({closed}).",
+      "removalStatusRejected": "Kérelem ({date}): elutasítva. Az ok megismeréséhez írjon az adatkezelőnek."
     },
     "erasure": {
       "title": "Az Ön adatainak törlése",

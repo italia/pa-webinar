@@ -4600,7 +4600,19 @@
       "addressBookPendingEffect": "Jos vahvistat, palaat osoitekirjaan tämän ilmoittautumisen nimellä ja organisaatiolla ja saat taas kutsuja. Jos peruutat tai jos se et ollut sinä, pysyt osoitekirjan ulkopuolella etkä saa kutsuja.",
       "addressBookPendingConfirm": "Vahvista paluu",
       "addressBookPendingCancel": "Peruuta pyyntö",
-      "addressBookPendingGone": "Tämä pyyntö ei enää odota vahvistusta. Lataa sivu uudelleen nähdäksesi ajantasaisen tilan."
+      "addressBookPendingGone": "Tämä pyyntö ei enää odota vahvistusta. Lataa sivu uudelleen nähdäksesi ajantasaisen tilan.",
+      "removalTitle": "Tapahtuman tallenne",
+      "removalIntro": "Tämä tapahtuma on tallennettu. Jos et halua esiintyä tallenteessa, voit pyytää, että sinut poistetaan siitä: kohdat, joissa näyt tai puhut, peitetään kyltillä ja mykistetään, ja litterointi, tekstitykset ja yhteenveto tehdään uudelleen. Pyyntö menee rekisterinpitäjälle, joka käsittelee sen.",
+      "removalButton": "En halua esiintyä tässä tallenteessa",
+      "removalConfirmTitle": "Vahvistatko pyynnön?",
+      "removalConfirmBody": "Rekisterinpitäjä poistaa tallenteesta kohdat, joissa näyt tai puhut. Muille sivustoille, esimerkiksi YouTubeen, julkaistut kopiot poistaa erikseen se, joka ne on julkaissut.",
+      "removalConfirm": "Lähetä pyyntö",
+      "removalCancel": "Peruuta",
+      "removalSent": "Pyyntö lähetetty. Rekisterinpitäjä käsittelee sen.",
+      "removalError": "Pyyntöä ei voitu lähettää. Yritä myöhemmin uudelleen.",
+      "removalStatusOpen": "{date} tehty pyyntö: käsittelyssä.",
+      "removalStatusClosed": "{date} tehty pyyntö: valmistui {closed}.",
+      "removalStatusRejected": "{date} tehty pyyntö: hylätty. Kirjoita rekisterinpitäjälle saadaksesi tietää syyn."
     },
     "erasure": {
       "title": "Tietojesi poistaminen",

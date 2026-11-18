@@ -4600,7 +4600,19 @@
       "addressBookPendingEffect": "Ako potvrdite, vraćate se u imenik s imenom i organizacijom iz ove prijave i ponovno primate pozivnice. Ako odustanete ili ako to niste bili vi, ostajete izvan imenika i ne primate pozivnice.",
       "addressBookPendingConfirm": "Potvrdi povratak",
       "addressBookPendingCancel": "Poništi zahtjev",
-      "addressBookPendingGone": "Ovaj zahtjev više nije na čekanju. Ponovno učitajte stranicu da biste vidjeli trenutačno stanje."
+      "addressBookPendingGone": "Ovaj zahtjev više nije na čekanju. Ponovno učitajte stranicu da biste vidjeli trenutačno stanje.",
+      "removalTitle": "Snimka događaja",
+      "removalIntro": "Ovaj je događaj snimljen. Ako se ne želite pojavljivati u snimci, možete zatražiti da vas se iz nje ukloni: dijelovi u kojima se pojavljujete ili govorite prekrivaju se natpisom i utišavaju, a transkript, titlovi i sažetak izrađuju se ponovno. Zahtjev ide voditelju obrade, koji ga razmatra.",
+      "removalButton": "Ne želim se pojavljivati u ovoj snimci",
+      "removalConfirmTitle": "Potvrđujete li zahtjev?",
+      "removalConfirmBody": "Voditelj obrade uklonit će iz snimke dijelove u kojima se pojavljujete ili govorite. Kopije objavljene na drugim stranicama, primjerice na YouTubeu, mora zasebno ukloniti onaj tko ih je objavio.",
+      "removalConfirm": "Pošalji zahtjev",
+      "removalCancel": "Odustani",
+      "removalSent": "Zahtjev je poslan. Voditelj obrade će ga razmotriti.",
+      "removalError": "Zahtjev nije bilo moguće poslati. Pokušajte ponovno kasnije.",
+      "removalStatusOpen": "Zahtjev od {date}: u obradi.",
+      "removalStatusClosed": "Zahtjev od {date}: dovršen {closed}.",
+      "removalStatusRejected": "Zahtjev od {date}: odbijen. Pišite voditelju obrade da biste saznali razlog."
     },
     "erasure": {
       "title": "Brisanje vaših podataka",

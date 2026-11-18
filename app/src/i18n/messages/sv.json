@@ -4600,7 +4600,19 @@
       "addressBookPendingEffect": "Om du bekräftar kommer du tillbaka till adressboken med namnet och organisationen från den här anmälan och får inbjudningar igen. Om du avbryter, eller om det inte var du, stannar du utanför adressboken och får inga inbjudningar.",
       "addressBookPendingConfirm": "Bekräfta min återkomst",
       "addressBookPendingCancel": "Avbryt begäran",
-      "addressBookPendingGone": "Den här begäran väntar inte längre. Ladda om sidan för att se aktuell status."
+      "addressBookPendingGone": "Den här begäran väntar inte längre. Ladda om sidan för att se aktuell status.",
+      "removalTitle": "Inspelningen av evenemanget",
+      "removalIntro": "Det här evenemanget har spelats in. Om du inte vill synas i inspelningen kan du begära att bli borttagen: de delar där du syns eller talar täcks av en skylt och tystas, och transkription, undertexter och sammanfattning tas fram på nytt. Begäran går till den personuppgiftsansvarige, som granskar den.",
+      "removalButton": "Jag vill inte synas i den här inspelningen",
+      "removalConfirmTitle": "Bekräfta begäran?",
+      "removalConfirmBody": "Den personuppgiftsansvarige tar bort de delar av inspelningen där du syns eller talar. Kopior som publicerats på andra webbplatser, till exempel på YouTube, måste tas bort separat av den som publicerade dem.",
+      "removalConfirm": "Skicka begäran",
+      "removalCancel": "Avbryt",
+      "removalSent": "Begäran har skickats. Den personuppgiftsansvarige kommer att granska den.",
+      "removalError": "Begäran kunde inte skickas. Försök igen senare.",
+      "removalStatusOpen": "Begäran från {date}: under behandling.",
+      "removalStatusClosed": "Begäran från {date}: slutförd {closed}.",
+      "removalStatusRejected": "Begäran från {date}: avslagen. Skriv till den personuppgiftsansvarige för att få veta varför."
     },
     "erasure": {
       "title": "Radering av dina uppgifter",

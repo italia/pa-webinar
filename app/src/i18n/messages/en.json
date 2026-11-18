@@ -4600,7 +4600,19 @@
       "addressBookPendingEffect": "If you confirm, you return to the address book with the name and organisation of this registration and receive invitations again. If you cancel, or if it was not you, you stay out of the address book and receive no invitations.",
       "addressBookPendingConfirm": "Confirm my return",
       "addressBookPendingCancel": "Cancel the request",
-      "addressBookPendingGone": "This request is no longer waiting. Reload the page to see the current state."
+      "addressBookPendingGone": "This request is no longer waiting. Reload the page to see the current state.",
+      "removalTitle": "The event recording",
+      "removalIntro": "This event was recorded. If you do not want to appear in the recording, you can ask to be removed: the parts where you appear or speak are covered by a card and muted, and the transcript, subtitles and summary are produced again. The request goes to the data controller, who reviews it.",
+      "removalButton": "I don't want to appear in this recording",
+      "removalConfirmTitle": "Confirm the request?",
+      "removalConfirmBody": "The controller will remove the parts of the recording where you appear or speak. Copies published on other sites, for example on YouTube, have to be removed separately by whoever published them.",
+      "removalConfirm": "Send the request",
+      "removalCancel": "Cancel",
+      "removalSent": "Request sent. The controller will review it.",
+      "removalError": "The request could not be sent. Try again later.",
+      "removalStatusOpen": "Request of {date}: being processed.",
+      "removalStatusClosed": "Request of {date}: completed on {closed}.",
+      "removalStatusRejected": "Request of {date}: rejected. Write to the controller to learn why."
     },
     "erasure": {
       "title": "Erase your data",

@@ -4600,7 +4600,19 @@
       "addressBookPendingEffect": "Jei patvirtinsite, grįšite į adresų knygą su šios registracijos vardu ir organizacija ir vėl gausite kvietimus. Jei atšauksite arba jei tai buvote ne jūs, liksite už adresų knygos ribų ir kvietimų negausite.",
       "addressBookPendingConfirm": "Patvirtinti grįžimą",
       "addressBookPendingCancel": "Atšaukti prašymą",
-      "addressBookPendingGone": "Šis prašymas nebelaukia patvirtinimo. Įkelkite puslapį iš naujo, kad pamatytumėte dabartinę būseną."
+      "addressBookPendingGone": "Šis prašymas nebelaukia patvirtinimo. Įkelkite puslapį iš naujo, kad pamatytumėte dabartinę būseną.",
+      "removalTitle": "Renginio įrašas",
+      "removalIntro": "Šis renginys buvo įrašytas. Jei nenorite būti įraše, galite paprašyti, kad būtumėte iš jo pašalinti: vietos, kuriose pasirodote ar kalbate, uždengiamos užrašu ir nutildomos, o transkripcija, subtitrai ir santrauka parengiami iš naujo. Prašymas siunčiamas duomenų valdytojui, kuris jį išnagrinėja.",
+      "removalButton": "Nenoriu būti šiame įraše",
+      "removalConfirmTitle": "Patvirtinate prašymą?",
+      "removalConfirmBody": "Duomenų valdytojas pašalins iš įrašo vietas, kuriose pasirodote ar kalbate. Kitose svetainėse, pavyzdžiui, YouTube, paskelbtas kopijas atskirai turi pašalinti tas, kas jas paskelbė.",
+      "removalConfirm": "Siųsti prašymą",
+      "removalCancel": "Atšaukti",
+      "removalSent": "Prašymas išsiųstas. Duomenų valdytojas jį išnagrinės.",
+      "removalError": "Prašymo nepavyko išsiųsti. Bandykite vėliau.",
+      "removalStatusOpen": "{date} prašymas: nagrinėjamas.",
+      "removalStatusClosed": "{date} prašymas: įvykdytas {closed}.",
+      "removalStatusRejected": "{date} prašymas: atmestas. Norėdami sužinoti priežastį, parašykite duomenų valdytojui."
     },
     "erasure": {
       "title": "Jūsų duomenų ištrynimas",

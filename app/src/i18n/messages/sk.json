@@ -4600,7 +4600,19 @@
       "addressBookPendingEffect": "Ak potvrdíte, vrátite sa do adresára s menom a organizáciou z tejto registrácie a budete opäť dostávať pozvánky. Ak zrušíte alebo ak ste to neboli vy, zostanete mimo adresára a pozvánky dostávať nebudete.",
       "addressBookPendingConfirm": "Potvrdiť návrat",
       "addressBookPendingCancel": "Zrušiť žiadosť",
-      "addressBookPendingGone": "Táto žiadosť už nečaká na potvrdenie. Znova načítajte stránku, aby ste videli aktuálny stav."
+      "addressBookPendingGone": "Táto žiadosť už nečaká na potvrdenie. Znova načítajte stránku, aby ste videli aktuálny stav.",
+      "removalTitle": "Záznam podujatia",
+      "removalIntro": "Toto podujatie bolo zaznamenané. Ak sa v zázname nechcete objaviť, môžete požiadať o odstránenie: časti, v ktorých sa objavujete alebo hovoríte, sa prekryjú informačnou tabuľou a stlmia a prepis, titulky a zhrnutie sa vytvoria znova. Žiadosť ide prevádzkovateľovi osobných údajov, ktorý ju posúdi.",
+      "removalButton": "Nechcem sa objaviť v tomto zázname",
+      "removalConfirmTitle": "Potvrdzujete žiadosť?",
+      "removalConfirmBody": "Prevádzkovateľ odstráni zo záznamu časti, v ktorých sa objavujete alebo hovoríte. Kópie zverejnené na iných weboch, napríklad na YouTube, musí osobitne odstrániť ten, kto ich zverejnil.",
+      "removalConfirm": "Odoslať žiadosť",
+      "removalCancel": "Zrušiť",
+      "removalSent": "Žiadosť odoslaná. Prevádzkovateľ ju posúdi.",
+      "removalError": "Žiadosť sa nepodarilo odoslať. Skúste to neskôr.",
+      "removalStatusOpen": "Žiadosť zo dňa {date}: vybavuje sa.",
+      "removalStatusClosed": "Žiadosť zo dňa {date}: vybavená {closed}.",
+      "removalStatusRejected": "Žiadosť zo dňa {date}: zamietnutá. Napíšte prevádzkovateľovi, aby ste sa dozvedeli dôvod."
     },
     "erasure": {
       "title": "Vymazanie vašich údajov",

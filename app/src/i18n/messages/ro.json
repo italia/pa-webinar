@@ -4600,7 +4600,19 @@
       "addressBookPendingEffect": "Dacă confirmați, reveniți în agendă cu numele și instituția de la această înscriere și primiți din nou invitații. Dacă anulați sau dacă nu ați fost dumneavoastră, rămâneți în afara agendei și nu primiți invitații.",
       "addressBookPendingConfirm": "Confirmați revenirea",
       "addressBookPendingCancel": "Anulați cererea",
-      "addressBookPendingGone": "Această cerere nu mai este în așteptare. Reîncărcați pagina pentru a vedea starea actualizată."
+      "addressBookPendingGone": "Această cerere nu mai este în așteptare. Reîncărcați pagina pentru a vedea starea actualizată.",
+      "removalTitle": "Înregistrarea evenimentului",
+      "removalIntro": "Acest eveniment a fost înregistrat. Dacă nu doriți să apăreți în înregistrare, puteți cere să nu mai apăreți în ea: părțile în care apăreți sau vorbiți sunt acoperite cu un panou informativ și fără sunet, iar transcrierea, subtitrările și rezumatul sunt refăcute. Cererea ajunge la operatorul de date, care o examinează.",
+      "removalButton": "Nu vreau să apar în această înregistrare",
+      "removalConfirmTitle": "Confirmați cererea?",
+      "removalConfirmBody": "Operatorul de date va elimina din înregistrare părțile în care apăreți sau vorbiți. Copiile publicate pe alte site-uri, de exemplu pe YouTube, trebuie eliminate separat de cei care le-au publicat.",
+      "removalConfirm": "Trimite cererea",
+      "removalCancel": "Anulează",
+      "removalSent": "Cererea a fost trimisă. Operatorul de date o va examina.",
+      "removalError": "Cererea nu a putut fi trimisă. Reîncercați mai târziu.",
+      "removalStatusOpen": "Cererea din {date}: în curs de soluționare.",
+      "removalStatusClosed": "Cererea din {date}: finalizată pe {closed}.",
+      "removalStatusRejected": "Cererea din {date}: respinsă. Scrieți operatorului de date pentru a afla motivul."
     },
     "erasure": {
       "title": "Ștergerea datelor dumneavoastră",

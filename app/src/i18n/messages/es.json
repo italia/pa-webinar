@@ -4600,7 +4600,19 @@
       "addressBookPendingEffect": "Si confirmas, vuelves a la agenda con el nombre y el organismo de esta inscripción y recibes de nuevo las invitaciones. Si cancelas, o si no has sido tú, sigues fuera de la agenda y no recibes invitaciones.",
       "addressBookPendingConfirm": "Confirmar mi regreso",
       "addressBookPendingCancel": "Cancelar la solicitud",
-      "addressBookPendingGone": "Esta solicitud ya no está pendiente. Recarga la página para ver el estado actualizado."
+      "addressBookPendingGone": "Esta solicitud ya no está pendiente. Recarga la página para ver el estado actualizado.",
+      "removalTitle": "La grabación del evento",
+      "removalIntro": "Este evento se ha grabado. Si no quieres aparecer en la grabación, puedes pedir que te retiren de ella: las partes en las que apareces o hablas se cubren con un cartel y se silencian, y la transcripción, los subtítulos y el resumen se vuelven a generar. La solicitud llega al responsable del tratamiento, que la examina.",
+      "removalButton": "No quiero aparecer en esta grabación",
+      "removalConfirmTitle": "¿Confirmas la solicitud?",
+      "removalConfirmBody": "El responsable del tratamiento retirará de la grabación las partes en las que apareces o hablas. Las copias publicadas en otros sitios, por ejemplo en YouTube, debe retirarlas por separado quien las haya publicado.",
+      "removalConfirm": "Enviar la solicitud",
+      "removalCancel": "Cancelar",
+      "removalSent": "Solicitud enviada. El responsable del tratamiento la examinará.",
+      "removalError": "No se ha podido enviar la solicitud. Inténtalo de nuevo más tarde.",
+      "removalStatusOpen": "Solicitud del {date}: en trámite.",
+      "removalStatusClosed": "Solicitud del {date}: completada el {closed}.",
+      "removalStatusRejected": "Solicitud del {date}: rechazada. Escribe al responsable del tratamiento para conocer el motivo."
     },
     "erasure": {
       "title": "Supresión de sus datos",

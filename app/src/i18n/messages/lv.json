@@ -4600,7 +4600,19 @@
       "addressBookPendingEffect": "Ja apstiprināsiet, atgriezīsieties kontaktu grāmatā ar šīs reģistrācijas vārdu un organizāciju un atkal saņemsiet ielūgumus. Ja atcelsiet vai ja tas nebijāt jūs, paliksiet ārpus kontaktu grāmatas un ielūgumus nesaņemsiet.",
       "addressBookPendingConfirm": "Apstiprināt atgriešanos",
       "addressBookPendingCancel": "Atcelt pieprasījumu",
-      "addressBookPendingGone": "Šis pieprasījums vairs negaida apstiprinājumu. Pārlādējiet lapu, lai redzētu aktuālo stāvokli."
+      "addressBookPendingGone": "Šis pieprasījums vairs negaida apstiprinājumu. Pārlādējiet lapu, lai redzētu aktuālo stāvokli.",
+      "removalTitle": "Pasākuma ieraksts",
+      "removalIntro": "Šis pasākums tika ierakstīts. Ja nevēlaties parādīties ierakstā, varat lūgt, lai jūs no tā izņem: vietas, kurās parādāties vai runājat, tiek aizsegtas ar uzrakstu un apklusinātas, bet atšifrējums, subtitri un kopsavilkums tiek izveidoti no jauna. Pieprasījums tiek nosūtīts datu pārzinim, kurš to izskata.",
+      "removalButton": "Es nevēlos parādīties šajā ierakstā",
+      "removalConfirmTitle": "Vai apstiprināt pieprasījumu?",
+      "removalConfirmBody": "Datu pārzinis izņems no ieraksta vietas, kurās parādāties vai runājat. Citās vietnēs, piemēram, YouTube, publicētās kopijas atsevišķi jāizņem tam, kas tās publicējis.",
+      "removalConfirm": "Nosūtīt pieprasījumu",
+      "removalCancel": "Atcelt",
+      "removalSent": "Pieprasījums nosūtīts. Datu pārzinis to izskatīs.",
+      "removalError": "Pieprasījumu neizdevās nosūtīt. Mēģiniet vēlāk.",
+      "removalStatusOpen": "Pieprasījums no {date}: tiek izskatīts.",
+      "removalStatusClosed": "Pieprasījums no {date}: izpildīts {closed}.",
+      "removalStatusRejected": "Pieprasījums no {date}: noraidīts. Lai uzzinātu iemeslu, rakstiet datu pārzinim."
     },
     "erasure": {
       "title": "Jūsu datu dzēšana",

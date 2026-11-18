@@ -4600,7 +4600,19 @@
       "addressBookPendingEffect": "Se confermi torni in rubrica con il nome e l'ente di questa iscrizione e ricevi di nuovo gli inviti. Se annulli, o se non sei stato tu, resti fuori dalla rubrica e non ricevi inviti.",
       "addressBookPendingConfirm": "Conferma il rientro",
       "addressBookPendingCancel": "Annulla la richiesta",
-      "addressBookPendingGone": "Questa richiesta non è più in attesa. Ricarica la pagina per vedere lo stato aggiornato."
+      "addressBookPendingGone": "Questa richiesta non è più in attesa. Ricarica la pagina per vedere lo stato aggiornato.",
+      "removalTitle": "La registrazione dell'evento",
+      "removalIntro": "Questo evento è stato registrato. Se non vuoi comparire nella registrazione puoi chiedere di esserne tolto: le parti in cui compari o parli vengono coperte da un cartello e silenziate, e trascrizione, sottotitoli e sintesi vengono rifatti. La richiesta va al titolare del trattamento, che la esamina.",
+      "removalButton": "Non voglio comparire in questa registrazione",
+      "removalConfirmTitle": "Confermi la richiesta?",
+      "removalConfirmBody": "Il titolare toglierà dalla registrazione le parti in cui compari o parli. Le copie pubblicate su altri siti, per esempio su YouTube, le toglie a parte chi le ha pubblicate.",
+      "removalConfirm": "Invia la richiesta",
+      "removalCancel": "Annulla",
+      "removalSent": "Richiesta inviata. Il titolare la esaminerà.",
+      "removalError": "Non è stato possibile inviare la richiesta. Riprova più tardi.",
+      "removalStatusOpen": "Richiesta del {date}: in lavorazione.",
+      "removalStatusClosed": "Richiesta del {date}: completata il {closed}.",
+      "removalStatusRejected": "Richiesta del {date}: respinta. Scrivi al titolare per conoscerne il motivo."
     },
     "erasure": {
       "title": "Cancellazione dei tuoi dati",
