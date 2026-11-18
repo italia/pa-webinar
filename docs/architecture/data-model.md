@@ -94,6 +94,8 @@ The hash is stored as `emailHash` on `Registration`, `EventInvitation`, `Person`
 - the staff-account lookup when someone asks for a sign-in link;
 - the lookup behind data-subject access and erasure requests.
 
+`Registration.nicknameKey` is the same kind of HMAC, over the event id and the comparison form of the nickname (`improntaNickname` in `app/src/lib/live/nickname.ts`): it keeps one nickname per event without decrypting the others, and does not link the same nickname across events.
+
 `APP_SECRET` therefore also keys data: changing it changes every hash. Existing rows then stop matching new lookups. A known address can register twice for the same event, staff accounts cannot request a sign-in link, and data-subject requests no longer find their rows.
 
 ### Hashed secrets and stored tokens
@@ -108,7 +110,7 @@ Most personal data is encrypted, but these fields are stored in plaintext. Reten
 
 | Field | What it holds |
 |---|---|
-| `Question.authorName` | The name shown on a Q&A question. It is copied from the registration or the named grant, or typed by a guest. The GDPR cleanup empties it at event retention. |
+| `Question.authorName` | The name shown on a Q&A question. It is copied from the registration or the named grant, or typed by a guest; the nickname, or the pseudonym, where the person appears under one. The GDPR cleanup empties it at event retention. |
 | `QuestionnaireResponse.respondentName` | A snapshot of the respondent's name at submission, from the standalone questionnaire page. Post-event (`POST_EVENT`) responses store no name and no `respondentEmailHash`, and the answers sent with a registration store no name: the response is linked to the registration, whose name is encrypted. |
 | `CallSession.dominantSpeakerLog` | The live speaker timeline, including display names as the room showed them. |
 | `Event.moderatorName`, `EventMaterial.addedBy`, `Speaker.displayName` | The primary moderator's name, a copy of that name on materials added from the room with the primary moderator link (links and file uploads alike; additions by named co-moderators and from the administration area store an empty string, shown as a translated "Added by the organisers", and the GDPR cleanup empties it at event retention), and the name attached to a transcript speaker label. `Event.moderatorEmail` is encrypted. |

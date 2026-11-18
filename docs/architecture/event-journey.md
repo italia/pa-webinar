@@ -92,6 +92,7 @@ The answers on people and voice give one of three families (`classeFormato()`), 
 | Proposed recording answer | **Yes, reserved** | **Yes, public** | **Yes, public** |
 | Participant list for the audience (`participantListVisible`, from `elencoPredefinito()`) | Shown | Shown | Hidden |
 | Audience names (`audienceAnonymous`) | Real names | Real names | Pseudonyms |
+| Nicknames for participants (`nicknamesEnabled`, from `nicknamePredefinito()`: on where the list is hidden) | Off | Off | On |
 | Text of Q&A questions after the event (`postEventShowQA`) | Not published | Published without names | Published without names |
 | Address book on the registration form (`offerAddressBook`) | Not offered | Offered | Offered |
 
@@ -402,7 +403,7 @@ The registration form shows it above the link to the privacy notice. The waiting
 | **Captions** | That captions are on, and whether their text is kept |
 | **Artificial intelligence** | With the pipeline on: summary, translation and dubbing, what the organizers can still ask for after the event, the event report, and that these texts may contain inaccuracies. The text an administrator wrote for that language (`aiConsentDisclosure`) replaces the sentences on summary, translation and dubbing |
 | **Participant list** | Whether participants see who is in the room |
-| **Your name** | Real name or pseudonym in the room, in the chat and in questions. With a pseudonym, that the name stays in the transcript for someone who consents, where the event asks for that consent |
+| **Your name** | Real name or pseudonym in the room, in the chat and in questions. Where the event allows nicknames, that a nickname can replace it and that the organizers and moderators know who is behind it. With a pseudonym, that the name stays in the transcript for someone who consents, where the event asks for that consent; with nicknames, that the transcript uses the nickname, if the person chose one |
 | **Chat and questions** | That chat messages are never published, and whether the text of Q&A questions may be, never with the name |
 | **Retention** | When registration and room data are deleted, and what happens to the recording |
 | **Address book** | That the form offers it and for how many months the data stays. The form only, as the waiting room has no such box |
