@@ -448,7 +448,11 @@ for the line of code that defines the mark, `VOCE = 'pa-recorder-voice'`). `part
 variables into what the video can hold: `solo-voce` (hosts seen, consenting participants heard),
 `esclusi` (hosts only, no participant's voice), `visibili` (the session ignores the marks, so
 participants can appear with face and name, even silent in the thumbnails) and `assente` (no composite
-video).
+video). The consent rule (`regolaConsenso` in `app/src/lib/live/consent-rule.ts`), the conference token
+and the texts follow that answer: with `esclusi` nobody is asked the recording consent and
+`voiceExcluded` follows the transcription consent, because only the per-participant recorder and the
+captions transcript can still record a participant's voice
+([Who is in the video](../GDPR.md#who-is-in-the-video)).
 
 Whoever the token admits at entry (a participant who consented, a speaker with the microphones locked)
 receives the bridge's approval as soon as they join, and Jitsi shows it as **The moderator asks you to

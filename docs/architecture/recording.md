@@ -100,7 +100,11 @@ The two capture paths treat consent differently.
   `infra/jitsi/web/custom-config.js` for Docker Compose). A values file that sets
   `_custom_config_js` replaces that text and has to carry it over: without it
   `RECORDING_VOICE_EXCLUSION` is unset and a person without the consent listens
-  only. The same fallback holds with a Jitsi other than the chart's.
+  only. The same fallback holds with a Jitsi other than the chart's. There
+  participants can appear with face and name, so the box shows the text that
+  covers name, voice and image (version 1), and the form, the waiting room and
+  the listen-only notice add that the name a person takes part with can appear
+  even if they do not speak.
   Moderators and speakers are always in the video, with name and image, and
   read a notice instead of the box; participants never appear in it, and the
   box asks only for the recording of their voice
@@ -109,9 +113,16 @@ The two capture paths treat consent differently.
   Prosody hides everyone without it from Jibri's session, which plays only the
   voice of participants who consented
   ([Only hosts in the video](jitsi-integration.md#per-event-participant-policies)).
-  `Event.hostsAlwaysRecorded` stays in the database and is no longer read. A
-  consent counts only while the text the person read covers the event's
-  [destination](#recording-destination).
+  Where the conference text does not play those voices
+  (`RECORDING_PARTICIPANT_VOICE` unset, `partecipantiNelVideo` answers
+  `esclusi`), the video holds the hosts only: the recording box is not shown,
+  the form and the waiting room say that only the hosts are seen and heard, and
+  the token marks `voiceExcluded` whoever has no transcription consent, so the
+  per-participant recorder and the captions transcript keep their own rule
+  ([Who is in the video](../GDPR.md#who-is-in-the-video) has the table of the
+  four cases). `Event.hostsAlwaysRecorded` stays in the database and is no
+  longer read. A consent counts only while the text the person read covers the
+  event's [destination](#recording-destination).
 - **Per-participant audio.** `Event.multitrackRecordingEnabled` adds the
   optional consent to the transcription of one's own contributions
   (`consentMultitrack` at registration, a box in the waiting room for everyone
@@ -213,7 +224,7 @@ are in `app/src/lib/recording/destination.ts`.
   in force, and every answer carries `recordingDestination`, so that an open
   page shows the current text and asks again.
 - **Without a video.** Where the installation records no composite video
-  (`voceNelVideo` is `assente`), the box says so
+  (`partecipantiNelVideo` is `assente`), the box says so
   (`gdpr.consent.recordingNoVideo`) and the consent declares no destination.
   An event without per-person tracks records nothing there: no box, no notice
   and no recording command. The event can still hold a destination, for a file
