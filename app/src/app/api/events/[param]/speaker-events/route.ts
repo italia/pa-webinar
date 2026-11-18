@@ -121,13 +121,16 @@ export const POST = withErrorHandling(async (request, context) => {
   }));
   // Chi non e' nel video: chi non ha il consenso o, dove chi partecipa non entra
   // mai nel video, chiunque non conduca. La nota lo dice con il motivo giusto.
+  // Si legge solo se la nota non c'e' ancora.
   const partecipanti = partecipantiNelVideo();
-  const fuoriDalVideo =
-    partecipanti === 'esclusi'
-      ? new Set(await endpointFuoriDalVideo(event.id, partecipanti))
-      : senzaNome;
-  const parlaChiEscluso = nuovi.some((e) => fuoriDalVideo.has(e.participantId));
-  if (parlaChiEscluso && roomToken && !event.unrecordedSpeech) {
+  const parlaChiEscluso = async (): Promise<boolean> => {
+    const fuoriDalVideo =
+      partecipanti === 'esclusi'
+        ? new Set(await endpointFuoriDalVideo(event.id, partecipanti))
+        : senzaNome;
+    return nuovi.some((e) => fuoriDalVideo.has(e.participantId));
+  };
+  if (roomToken && !event.unrecordedSpeech && (await parlaChiEscluso())) {
     const presente = await postoDaTokenSala(roomToken, event.jitsiRoomName, { ancheChiModera: true });
     if (presente) {
       // Il comando di sala dice se il video sta girando. Senza comandi, in questa

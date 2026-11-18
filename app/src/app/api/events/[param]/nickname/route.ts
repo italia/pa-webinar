@@ -36,6 +36,7 @@ import {
   ValidationError,
 } from '@/lib/errors';
 import { readOwnedEventAccessToken } from '@/lib/event-session';
+import { isFinishedEventStatus } from '@/lib/gdpr/cleanup-selection';
 import { normalizzaNickname } from '@/lib/live/nickname-rule';
 import {
   rispostaNicknameRifiutato,
@@ -51,9 +52,6 @@ import { getSettings } from '@/lib/settings';
 export const dynamic = 'force-dynamic';
 
 const schema = z.object({ nickname: z.string().max(100).nullable() }).strict();
-
-/** Gli stati in cui la sala e' finita: un nickname nuovo non serve piu'. */
-const CONCLUSO = ['ENDED', 'ARCHIVED'];
 
 export const PUT = withErrorHandling(async (request, context) => {
   const { param: slug } = await context.params;
@@ -121,7 +119,8 @@ export const PUT = withErrorHandling(async (request, context) => {
       'NICKNAMES_DISABLED'
     );
   }
-  if (CONCLUSO.includes(event.status)) {
+  // A sala finita un nickname nuovo non serve piu'.
+  if (isFinishedEventStatus(event.status)) {
     throw new AppError('The event is over', 409, 'EVENT_ENDED');
   }
 

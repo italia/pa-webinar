@@ -26,6 +26,7 @@ import { decryptPII, tryDecryptPII } from '@/lib/crypto/pii';
 import { getClientIp, rateLimit } from '@/lib/rate-limit';
 import { voceDi } from '@/lib/live/consent-rule';
 import { partecipantiNelVideo } from '@/lib/recording/availability';
+import { isFinishedEventStatus } from '@/lib/gdpr/cleanup-selection';
 import { proveDiSalaDiChiConduce } from '@/lib/gdpr/consent-proofs';
 import { CAMPI_EVENTO_CONSENSI, offertaConsensi } from '@/lib/gdpr/consent-giving';
 import { consensiDellIscrizione } from '@/lib/gdpr/consent-state';
@@ -291,8 +292,7 @@ export const GET = withErrorHandling(async (request) => {
         // l'evento ne accetta di nuovi: la pagina lo fa scegliere o cambiare,
         // e toglierlo resta sempre possibile.
         nickname: tryDecryptPII(r.nickname),
-        nicknameEditable:
-          r.event.nicknamesEnabled && !['ENDED', 'ARCHIVED'].includes(r.event.status),
+        nicknameEditable: r.event.nicknamesEnabled && !isFinishedEventStatus(r.event.status),
         email: decryptedEmail,
         organization: r.organization,
         organizationRole: r.organizationRole,

@@ -28,6 +28,7 @@ import { z } from 'zod';
 import { parseJsonBody, withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { AppError, ValidationError } from '@/lib/errors';
+import { isFinishedEventStatus } from '@/lib/gdpr/cleanup-selection';
 import { improntaValori } from '@/lib/gdpr/confirmation-code';
 import {
   conCodice,
@@ -57,9 +58,6 @@ const schema = z
   })
   .strict()
   .refine((b) => (b.code === undefined) === (b.issuedAt === undefined));
-
-/** Gli stati in cui la sala e' finita: un nickname nuovo non serve piu'. */
-const CONCLUSO = ['ENDED', 'ARCHIVED'];
 
 /** Un rifiuto al salvataggio: il codice torna valido (`conCodice`). */
 class NicknameRifiutato extends Error {
@@ -93,7 +91,8 @@ export const POST = withErrorHandling(async (request) => {
   if (richiesto === attuale) return risposta({ nickname: attuale, updated: false });
 
   if (richiesto !== null) {
-    if (!stato.event.nicknamesEnabled || CONCLUSO.includes(stato.event.status)) {
+    // A sala finita un nickname nuovo non serve piu'.
+    if (!stato.event.nicknamesEnabled || isFinishedEventStatus(stato.event.status)) {
       throw new AppError(
         'This event does not accept new nicknames',
         409,
