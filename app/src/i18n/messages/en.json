@@ -4064,6 +4064,23 @@
       },
       "retainedNote": "{count, plural, one {# proof is kept} other {# proofs are kept}} for as long as the video or transcript exists.",
       "countsNote": "People are counted: a registration, a staff account or a named link count once; a guest who comes back in another visit counts again."
+    },
+    "catalog": {
+      "fieldTitle": "Catalog",
+      "fieldHelp": "The event type and the template it was created from are used only for the instance statistics and change no setting. Correct them if the event is cataloged wrongly, or not at all.",
+      "typeLabel": "Event type",
+      "templateLabel": "Template",
+      "noTemplate": "No template",
+      "deletedTemplate": "Created from the template “{name}”, since deleted.",
+      "deletedOption": "{name} (deleted)",
+      "types": {
+        "MEETING": "Meeting",
+        "PARTICIPATORY": "Participatory event",
+        "PUBLIC": "Public event",
+        "INSTANT": "Instant call",
+        "LEGACY": "Imported publication",
+        "UNCATALOGED": "Not cataloged"
+      }
     }
   },
   "email": {

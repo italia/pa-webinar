@@ -4064,6 +4064,23 @@
       },
       "retainedNote": "{count, plural, one {# dokazilo se hrani} two {# dokazili se hranita} few {# dokazila se hranijo} other {# dokazil se hrani}}, dokler video ali prepis obstaja.",
       "countsNote": "Štejejo se osebe: prijava, račun osebja ali poimenska povezava štejejo enkrat; gost, ki se vrne ob drugem obisku, šteje znova."
+    },
+    "catalog": {
+      "fieldTitle": "Katalog",
+      "fieldHelp": "Vrsta dogodka in predloga, iz katere je nastal, služita samo statistiki instance in ne spremenita nobene nastavitve. Popravite ju, če je dogodek napačno katalogiziran ali sploh ni.",
+      "typeLabel": "Vrsta dogodka",
+      "templateLabel": "Predloga",
+      "noTemplate": "Brez predloge",
+      "deletedTemplate": "Ustvarjeno iz predloge »{name}«, ki je bila medtem izbrisana.",
+      "deletedOption": "{name} (izbrisana)",
+      "types": {
+        "MEETING": "Sestanek",
+        "PARTICIPATORY": "Participativni dogodek",
+        "PUBLIC": "Javni dogodek",
+        "INSTANT": "Hitri klic",
+        "LEGACY": "Uvožena objava",
+        "UNCATALOGED": "Nekatalogizirano"
+      }
     }
   },
   "email": {

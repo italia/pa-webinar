@@ -4064,6 +4064,23 @@
       },
       "retainedNote": "{count, plural, one {# Einwilligungsnachweis wird} other {# Einwilligungsnachweise werden}} aufbewahrt, solange das Video oder das Transkript existiert.",
       "countsNote": "Gezählt werden Personen: eine Anmeldung, ein Mitarbeiterkonto oder ein persönlicher Link zählen einmal; ein Gast, der in einem anderen Besuch zurückkehrt, zählt erneut."
+    },
+    "catalog": {
+      "fieldTitle": "Katalog",
+      "fieldHelp": "Der Veranstaltungstyp und die Vorlage, aus der sie entstanden ist, dienen nur der Statistik der Instanz und ändern keine Einstellung. Korrigieren Sie sie, wenn die Veranstaltung falsch oder gar nicht katalogisiert ist.",
+      "typeLabel": "Veranstaltungstyp",
+      "templateLabel": "Vorlage",
+      "noTemplate": "Keine Vorlage",
+      "deletedTemplate": "Aus der Vorlage „{name}“ erstellt, die inzwischen gelöscht wurde.",
+      "deletedOption": "{name} (gelöscht)",
+      "types": {
+        "MEETING": "Besprechung",
+        "PARTICIPATORY": "Partizipative Veranstaltung",
+        "PUBLIC": "Öffentliche Veranstaltung",
+        "INSTANT": "Sofortanruf",
+        "LEGACY": "Importierte Veröffentlichung",
+        "UNCATALOGED": "Nicht katalogisiert"
+      }
     }
   },
   "email": {

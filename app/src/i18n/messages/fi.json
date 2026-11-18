@@ -4064,6 +4064,23 @@
       },
       "retainedNote": "{count, plural, one {# todiste säilytetään} other {# todistetta säilytetään}}, niin kauan kuin video tai litterointi on olemassa.",
       "countsNote": "Lasketaan henkilöitä: ilmoittautuminen, henkilökunnan tili tai nimetty linkki lasketaan kerran; toisella käynnillä palaava vieras lasketaan uudelleen."
+    },
+    "catalog": {
+      "fieldTitle": "Luettelo",
+      "fieldHelp": "Tapahtuman tyyppi ja malli, josta se luotiin, ovat vain instanssin tilastoja varten eivätkä muuta mitään asetusta. Korjaa ne, jos tapahtuma on luetteloitu väärin tai sitä ei ole luetteloitu.",
+      "typeLabel": "Tapahtuman tyyppi",
+      "templateLabel": "Malli",
+      "noTemplate": "Ei mallia",
+      "deletedTemplate": "Luotu mallista ”{name}”, joka on sittemmin poistettu.",
+      "deletedOption": "{name} (poistettu)",
+      "types": {
+        "MEETING": "Kokous",
+        "PARTICIPATORY": "Osallistava tapahtuma",
+        "PUBLIC": "Julkinen tapahtuma",
+        "INSTANT": "Pikapuhelu",
+        "LEGACY": "Tuotu julkaisu",
+        "UNCATALOGED": "Luetteloimaton"
+      }
     }
   },
   "email": {

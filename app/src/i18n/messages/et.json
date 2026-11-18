@@ -4064,6 +4064,23 @@
       },
       "retainedNote": "{count, plural, one {# tõend säilitatakse} other {# tõendit säilitatakse}} seni, kuni video või transkriptsioon on olemas.",
       "countsNote": "Loetakse inimesi: registreerimine, töötaja konto või nimeline link loetakse üks kord; teisel külastusel naasev külaline loetakse uuesti."
+    },
+    "catalog": {
+      "fieldTitle": "Kataloog",
+      "fieldHelp": "Ürituse tüüp ja mall, millest see loodi, on vajalikud ainult instantsi statistika jaoks ega muuda ühtegi seadet. Parandage need, kui üritus on valesti kataloogitud või kataloogimata.",
+      "typeLabel": "Ürituse tüüp",
+      "templateLabel": "Mall",
+      "noTemplate": "Mall puudub",
+      "deletedTemplate": "Loodud mallist „{name}“, mis on hiljem kustutatud.",
+      "deletedOption": "{name} (kustutatud)",
+      "types": {
+        "MEETING": "Koosolek",
+        "PARTICIPATORY": "Kaasav üritus",
+        "PUBLIC": "Avalik üritus",
+        "INSTANT": "Kiirkõne",
+        "LEGACY": "Imporditud väljaanne",
+        "UNCATALOGED": "Kataloogimata"
+      }
     }
   },
   "email": {

@@ -4064,6 +4064,23 @@
       },
       "retainedNote": "{count, plural, one {# bevis på samtycke sparas} other {# bevis på samtycke sparas}} så länge videon eller transkriptionen finns.",
       "countsNote": "Personer räknas: en anmälan, ett personalkonto eller en personlig länk räknas en gång; en gäst som kommer tillbaka vid ett annat besök räknas igen."
+    },
+    "catalog": {
+      "fieldTitle": "Katalog",
+      "fieldHelp": "Evenemangstypen och mallen som det skapades från används bara för instansens statistik och ändrar ingen inställning. Rätta dem om evenemanget är felkatalogiserat eller inte katalogiserat alls.",
+      "typeLabel": "Evenemangstyp",
+      "templateLabel": "Mall",
+      "noTemplate": "Ingen mall",
+      "deletedTemplate": "Skapat från mallen ”{name}”, som sedan har tagits bort.",
+      "deletedOption": "{name} (borttagen)",
+      "types": {
+        "MEETING": "Möte",
+        "PARTICIPATORY": "Deltagande evenemang",
+        "PUBLIC": "Offentligt evenemang",
+        "INSTANT": "Snabbsamtal",
+        "LEGACY": "Importerad publicering",
+        "UNCATALOGED": "Inte katalogiserat"
+      }
     }
   },
   "email": {

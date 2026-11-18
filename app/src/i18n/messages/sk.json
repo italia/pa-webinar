@@ -4064,6 +4064,23 @@
       },
       "retainedNote": "{count, plural, one {# doklad sa uchováva} few {# doklady sa uchovávajú} many {# dokladu sa uchováva} other {# dokladov sa uchováva}}, kým video alebo prepis existujú.",
       "countsNote": "Počítajú sa osoby: registrácia, účet tímu alebo menný odkaz sa počítajú raz; hosť, ktorý sa vráti pri inej návšteve, sa počíta znova."
+    },
+    "catalog": {
+      "fieldTitle": "Katalóg",
+      "fieldHelp": "Typ udalosti a šablóna, z ktorej vznikla, slúžia len na štatistiky inštancie a nemenia žiadne nastavenie. Opravte ich, ak je udalosť zaradená nesprávne alebo nie je zaradená vôbec.",
+      "typeLabel": "Typ udalosti",
+      "templateLabel": "Šablóna",
+      "noTemplate": "Bez šablóny",
+      "deletedTemplate": "Vytvorené zo šablóny „{name}“, ktorá bola medzitým odstránená.",
+      "deletedOption": "{name} (odstránená)",
+      "types": {
+        "MEETING": "Porada",
+        "PARTICIPATORY": "Participatívna udalosť",
+        "PUBLIC": "Verejná udalosť",
+        "INSTANT": "Rýchly hovor",
+        "LEGACY": "Importovaná publikácia",
+        "UNCATALOGED": "Nezaradené"
+      }
     }
   },
   "email": {

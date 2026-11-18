@@ -4064,6 +4064,23 @@
       },
       "retainedNote": "{count, plural, one {# bewijs wordt bewaard} other {# bewijzen worden bewaard}} zolang de video of de transcriptie bestaat.",
       "countsNote": "Er worden personen geteld: een inschrijving, een medewerkersaccount of een persoonlijke link tellen één keer; een gast die in een ander bezoek terugkomt, telt opnieuw."
+    },
+    "catalog": {
+      "fieldTitle": "Catalogus",
+      "fieldHelp": "Het type evenement en het sjabloon waaruit het is gemaakt, dienen alleen voor de statistieken van de instantie en wijzigen geen enkele instelling. Corrigeer ze als het evenement verkeerd of helemaal niet is gecatalogiseerd.",
+      "typeLabel": "Type evenement",
+      "templateLabel": "Sjabloon",
+      "noTemplate": "Geen sjabloon",
+      "deletedTemplate": "Gemaakt uit het sjabloon ‘{name}’, dat inmiddels is verwijderd.",
+      "deletedOption": "{name} (verwijderd)",
+      "types": {
+        "MEETING": "Vergadering",
+        "PARTICIPATORY": "Participatief evenement",
+        "PUBLIC": "Openbaar evenement",
+        "INSTANT": "Directe oproep",
+        "LEGACY": "Geïmporteerde publicatie",
+        "UNCATALOGED": "Niet gecatalogiseerd"
+      }
     }
   },
   "email": {

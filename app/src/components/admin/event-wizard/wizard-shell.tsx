@@ -26,7 +26,7 @@
 
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import type { RecordingAudience } from '@prisma/client';
+import type { EventFormatClass, RecordingAudience } from '@prisma/client';
 
 import { useRouter, percorso } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
@@ -108,6 +108,13 @@ import {
   useLingueEvento,
 } from './text-translation';
 import { BOZZA_NUOVO_KEY, TRASLOCO_KEY, TRASLOCO_VALIDO_MS } from './drafts';
+import CampoCatalogo from './campo-catalogo';
+import {
+  catalogoDaSalvare,
+  catalogoDellEvento,
+  catalogoDopoIlSalvataggio,
+  type CampiCatalogo,
+} from './catalogo';
 import {
   LibreriaDomandeProvider,
   RiepilogoQuestionari,
@@ -293,6 +300,12 @@ export interface WizardProps {
   /** La destinazione del modello e' una risposta data a mano, non una proposta:
    *  su un evento su invito resta. */
   destinazioneScelta?: boolean;
+  /** In creazione: il catalogo dell'evento, cioe' il modello o la famiglia del
+   *  formato scelti prima del wizard (lib/events/catalog). */
+  catalogo?: Pick<CampiCatalogo, 'templateId' | 'formatClass'>;
+  /** In modifica, per lo staff: i modelli fra cui correggere il catalogo.
+   *  Senza, il catalogo non si mostra. */
+  modelliCatalogo?: ReadonlyArray<{ id: string; name: string }>;
 }
 
 /**
@@ -369,6 +382,11 @@ export interface InitialEventShape {
     moderatorPhotoId: string | null;
     /** Una chiamata istantanea non ha iscrizione. */
     eventType?: string;
+    /** Il catalogo (lib/events/catalog): il modello, il suo nome di allora e
+     *  la famiglia del formato. */
+    templateId?: string | null;
+    templateName?: string | null;
+    formatClass?: EventFormatClass | null;
     accessMode: EventAccessModeValue | null;
     requireOrganization: boolean;
     requireOrganizationRole: boolean;
@@ -472,7 +490,8 @@ export type WizardForm = Step1Value &
   StepPeopleValue &
   StepProgrammeValue &
   Step4Value &
-  Step5ReviewFields;
+  Step5ReviewFields &
+  CampiCatalogo;
 
 export default function EventWizard(props: WizardProps) {
   const t = useTranslations('admin.wizard');
@@ -518,6 +537,12 @@ export default function EventWizard(props: WizardProps) {
   if (initialEvent && snapshotRef.current === null) {
     snapshotRef.current = structuredClone(initialEvent);
   }
+  // Il catalogo come lo ha il server dopo l'ultimo salvataggio riuscito: il
+  // prossimo manda solo cio' che cambia rispetto a questo, anche dopo un
+  // salvataggio rimasto sulla pagina per un fallimento parziale.
+  const catalogoSalvatoRef = useRef<CampiCatalogo | null>(
+    initialEvent ? catalogoDellEvento(initialEvent.event) : null
+  );
   // Le risposte dei questionari come le conosce l'ultimo salvataggio: un
   // rifiuto per risposte arrivate a wizard aperto rende subito il blocco di
   // sola lettura, invece di lasciarlo modificabile senza effetto.
@@ -682,6 +707,9 @@ export default function EventWizard(props: WizardProps) {
         requireOrganization: ev.requireOrganization,
         requireOrganizationRole: ev.requireOrganizationRole,
         requireOrganizationType: ev.requireOrganizationType,
+
+        // Catalogo
+        ...catalogoDellEvento(ev),
       } satisfies WizardForm;
     }
 
@@ -839,6 +867,11 @@ export default function EventWizard(props: WizardProps) {
       requireOrganization: false,
       requireOrganizationRole: false,
       requireOrganizationType: false,
+
+      // Il catalogo viene dalla scelta fatta prima del wizard.
+      templateId: props.catalogo?.templateId ?? null,
+      deletedTemplateName: null,
+      formatClass: props.catalogo?.formatClass ?? null,
     } satisfies WizardForm;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.template, mode, initialEvent]);
@@ -1924,6 +1957,14 @@ export default function EventWizard(props: WizardProps) {
         // Il testo mandato delle lingue toccate: dopo il salvataggio restano
         // toccate solo quelle cambiate di nuovo mentre la richiesta viaggiava.
         const testiMandati = { title: { ...form.title }, description: { ...form.description } };
+        // Il catalogo: in creazione la scelta di partenza, in modifica solo se
+        // cambiato, e mai con un link di conduzione.
+        const catalogoInviato = catalogoDaSalvare(
+          form,
+          mode === 'edit' ? catalogoSalvatoRef.current : null,
+          viaToken !== null,
+          props.modelliCatalogo
+        );
         const payload: Record<string, unknown> = {
           title: form.title,
           description: form.description,
@@ -2044,6 +2085,8 @@ export default function EventWizard(props: WizardProps) {
           requireOrganization: form.requireOrganization,
           requireOrganizationRole: form.requireOrganizationRole,
           requireOrganizationType: form.requireOrganizationType,
+
+          ...catalogoInviato,
         };
 
         // ── Edit mode: PUT the event, diff-based fan-out, then redirect
@@ -2065,6 +2108,12 @@ export default function EventWizard(props: WizardProps) {
           if (!putRes.ok) {
             const err = await putRes.json().catch(() => ({}));
             throw new Error(serverErrorMessage(err, putRes.status));
+          }
+          if (catalogoSalvatoRef.current) {
+            catalogoSalvatoRef.current = catalogoDopoIlSalvataggio(
+              catalogoSalvatoRef.current,
+              catalogoInviato
+            );
           }
           // Il testo salvato e' ora quello del modulo: le lingue mandate non
           // sono piu' «toccate» (il server ha il loro testo, e una traduzione
@@ -2362,6 +2411,7 @@ export default function EventWizard(props: WizardProps) {
       fermaAutosalvataggio,
       viaToken,
       props.defaultLocale,
+      props.modelliCatalogo,
       t,
       tc,
       tDetail,
@@ -2837,13 +2887,32 @@ export default function EventWizard(props: WizardProps) {
                 />
               ),
               technical: (
-                <SezioneTecnica
-                  form={form}
-                  onChange={updateForm}
-                  capacita={props.capacita}
-                  onCambiaQualita={() => apriSezione('room')}
-                  errorePartecipanti={!!fieldErrors.maxParticipants}
-                />
+                <>
+                  <SezioneTecnica
+                    form={form}
+                    onChange={updateForm}
+                    capacita={props.capacita}
+                    onCambiaQualita={() => apriSezione('room')}
+                    errorePartecipanti={!!fieldErrors.maxParticipants}
+                  />
+                  {/* Il catalogo si corregge in modifica, dallo staff: le
+                      chiamate rapide e gli archivi importati sono tipi a se'. */}
+                  {mode === 'edit' &&
+                    viaToken === null &&
+                    props.modelliCatalogo &&
+                    initialEvent &&
+                    (initialEvent.event.eventType ?? 'SCHEDULED') === 'SCHEDULED' && (
+                      <CampoCatalogo
+                        value={form}
+                        onChange={updateForm}
+                        modelli={props.modelliCatalogo}
+                        salvato={{
+                          templateId: initialEvent.event.templateId ?? null,
+                          templateName: initialEvent.event.templateName ?? null,
+                        }}
+                      />
+                    )}
+                </>
               ),
             }}
           />

@@ -4064,6 +4064,23 @@
       },
       "retainedNote": "{count, plural, one {# įrodymas saugomas} few {# įrodymai saugomi} many {# įrodymo saugoma} other {# įrodymų saugoma}}, kol vaizdo įrašas arba transkripcija egzistuoja.",
       "countsNote": "Skaičiuojami asmenys: registracija, darbuotojo paskyra ar vardinė nuoroda skaičiuojamos vieną kartą; svečias, grįžęs kito apsilankymo metu, skaičiuojamas iš naujo."
+    },
+    "catalog": {
+      "fieldTitle": "Katalogas",
+      "fieldHelp": "Renginio tipas ir šablonas, iš kurio jis sukurtas, naudojami tik egzemplioriaus statistikai ir nekeičia jokių nustatymų. Pataisykite juos, jei renginys katalogizuotas neteisingai arba visai nekatalogizuotas.",
+      "typeLabel": "Renginio tipas",
+      "templateLabel": "Šablonas",
+      "noTemplate": "Be šablono",
+      "deletedTemplate": "Sukurta iš šablono „{name}“, kuris vėliau ištrintas.",
+      "deletedOption": "{name} (ištrintas)",
+      "types": {
+        "MEETING": "Susitikimas",
+        "PARTICIPATORY": "Dalyvaujamasis renginys",
+        "PUBLIC": "Viešas renginys",
+        "INSTANT": "Greitasis skambutis",
+        "LEGACY": "Importuota publikacija",
+        "UNCATALOGED": "Nekatalogizuota"
+      }
     }
   },
   "email": {

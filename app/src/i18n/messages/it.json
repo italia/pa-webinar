@@ -4274,6 +4274,23 @@
       },
       "retainedNote": "{count, plural, one {# prova è conservata} other {# prove sono conservate}} finché il video o la trascrizione esistono.",
       "countsNote": "Si contano le persone: un'iscrizione, un account dello staff o un link nominale contano una volta; un ospite che torna in un'altra visita conta di nuovo."
+    },
+    "catalog": {
+      "fieldTitle": "Catalogo",
+      "fieldHelp": "Il tipo di evento e il modello da cui è nato servono solo alle statistiche dell'istanza e non cambiano nessuna impostazione. Correggili se l'evento è catalogato male, o non è catalogato.",
+      "typeLabel": "Tipo di evento",
+      "templateLabel": "Modello",
+      "noTemplate": "Nessun modello",
+      "deletedTemplate": "Nato dal modello «{name}», poi eliminato.",
+      "deletedOption": "{name} (eliminato)",
+      "types": {
+        "MEETING": "Riunione",
+        "PARTICIPATORY": "Evento partecipativo",
+        "PUBLIC": "Evento pubblico",
+        "INSTANT": "Chiamata rapida",
+        "LEGACY": "Pubblicazione importata",
+        "UNCATALOGED": "Non catalogato"
+      }
     }
   },
   "email": {

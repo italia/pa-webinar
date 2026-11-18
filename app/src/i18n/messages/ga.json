@@ -4064,6 +4064,23 @@
       },
       "retainedNote": "Coinnítear {count, plural, one {# chruthúnas} two {# chruthúnas} few {# chruthúnas} many {# gcruthúnas} other {# cruthúnas}} fad atá an físeán nó an tras-scríbhinn ann.",
       "countsNote": "Áirítear daoine: áirítear clárú, cuntas foirne nó nasc ainmnithe uair amháin; áirítear aoi a fhilleann ar chuairt eile arís."
+    },
+    "catalog": {
+      "fieldTitle": "Catalóg",
+      "fieldHelp": "Ní úsáidtear cineál an imeachta agus an teimpléad as ar cruthaíodh é ach do staitisticí an chórais, agus ní athraíonn siad socrú ar bith. Ceartaigh iad má tá an t-imeacht catalógaithe go mícheart, nó gan catalógú.",
+      "typeLabel": "Cineál imeachta",
+      "templateLabel": "Teimpléad",
+      "noTemplate": "Gan teimpléad",
+      "deletedTemplate": "Cruthaithe ón teimpléad “{name}”, a scriosadh ó shin.",
+      "deletedOption": "{name} (scriosta)",
+      "types": {
+        "MEETING": "Cruinniú",
+        "PARTICIPATORY": "Imeacht rannpháirteach",
+        "PUBLIC": "Imeacht poiblí",
+        "INSTANT": "Glao tapa",
+        "LEGACY": "Foilseachán iompórtáilte",
+        "UNCATALOGED": "Gan chatalógú"
+      }
     }
   },
   "email": {

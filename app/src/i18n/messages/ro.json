@@ -4064,6 +4064,23 @@
       },
       "retainedNote": "{count, plural, one {# dovadă este păstrată} few {# dovezi sunt păstrate} other {# de dovezi sunt păstrate}} cât timp videoclipul sau transcrierea există.",
       "countsNote": "Se numără persoane: o înscriere, un cont al personalului sau un link nominal contează o dată; un invitat care revine la altă vizită contează din nou."
+    },
+    "catalog": {
+      "fieldTitle": "Catalog",
+      "fieldHelp": "Tipul evenimentului și șablonul din care a fost creat servesc doar statisticilor instanței și nu modifică nicio setare. Corectați-le dacă evenimentul este catalogat greșit sau nu este catalogat.",
+      "typeLabel": "Tipul evenimentului",
+      "templateLabel": "Șablon",
+      "noTemplate": "Fără șablon",
+      "deletedTemplate": "Creat din șablonul „{name}”, între timp șters.",
+      "deletedOption": "{name} (șters)",
+      "types": {
+        "MEETING": "Ședință",
+        "PARTICIPATORY": "Eveniment participativ",
+        "PUBLIC": "Eveniment public",
+        "INSTANT": "Apel rapid",
+        "LEGACY": "Publicație importată",
+        "UNCATALOGED": "Necatalogat"
+      }
     }
   },
   "email": {

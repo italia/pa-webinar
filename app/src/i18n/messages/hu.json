@@ -4064,6 +4064,23 @@
       },
       "retainedNote": "{count, plural, one {# igazolást őrzünk meg} other {# igazolást őrzünk meg}}, amíg a videó vagy az átirat létezik.",
       "countsNote": "Személyeket számolunk: egy regisztráció, egy munkatársi fiók vagy egy névre szóló link egyszer számít; a másik látogatáskor visszatérő vendég újra számít."
+    },
+    "catalog": {
+      "fieldTitle": "Katalógus",
+      "fieldHelp": "Az esemény típusa és a sablon, amelyből létrejött, csak a példány statisztikáihoz kell, és egyetlen beállítást sem módosít. Javítsa ki őket, ha az esemény hibásan vagy egyáltalán nincs katalogizálva.",
+      "typeLabel": "Eseménytípus",
+      "templateLabel": "Sablon",
+      "noTemplate": "Nincs sablon",
+      "deletedTemplate": "A(z) „{name}” sablonból készült, amelyet azóta töröltek.",
+      "deletedOption": "{name} (törölve)",
+      "types": {
+        "MEETING": "Megbeszélés",
+        "PARTICIPATORY": "Részvételi esemény",
+        "PUBLIC": "Nyilvános esemény",
+        "INSTANT": "Azonnali hívás",
+        "LEGACY": "Importált közzététel",
+        "UNCATALOGED": "Nincs katalogizálva"
+      }
     }
   },
   "email": {

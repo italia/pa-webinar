@@ -4064,6 +4064,23 @@
       },
       "retainedNote": "{count, plural, one {# dowód jest przechowywany} few {# dowody są przechowywane} many {# dowodów jest przechowywanych} other {# dowodu jest przechowywane}}, dopóki wideo lub transkrypcja istnieją.",
       "countsNote": "Liczone są osoby: rejestracja, konto personelu lub link imienny liczą się raz; gość, który wraca podczas innej wizyty, liczy się ponownie."
+    },
+    "catalog": {
+      "fieldTitle": "Katalog",
+      "fieldHelp": "Typ wydarzenia i szablon, z którego powstało, służą wyłącznie do statystyk instancji i nie zmieniają żadnych ustawień. Popraw je, jeśli wydarzenie jest skatalogowane błędnie lub wcale.",
+      "typeLabel": "Typ wydarzenia",
+      "templateLabel": "Szablon",
+      "noTemplate": "Bez szablonu",
+      "deletedTemplate": "Utworzone z szablonu „{name}”, który został później usunięty.",
+      "deletedOption": "{name} (usunięty)",
+      "types": {
+        "MEETING": "Spotkanie",
+        "PARTICIPATORY": "Wydarzenie partycypacyjne",
+        "PUBLIC": "Wydarzenie publiczne",
+        "INSTANT": "Szybkie połączenie",
+        "LEGACY": "Zaimportowana publikacja",
+        "UNCATALOGED": "Nieskatalogowane"
+      }
     }
   },
   "email": {

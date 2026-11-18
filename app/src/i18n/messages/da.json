@@ -4064,6 +4064,23 @@
       },
       "retainedNote": "{count, plural, one {# dokumentation for samtykke opbevares} other {# dokumentationer for samtykke opbevares}}, så længe videoen eller transskriptionen findes.",
       "countsNote": "Der tælles personer: en tilmelding, en personalekonto eller et personligt link tæller én gang; en gæst, der kommer igen ved et andet besøg, tæller igen."
+    },
+    "catalog": {
+      "fieldTitle": "Katalog",
+      "fieldHelp": "Begivenhedstypen og skabelonen, den blev oprettet ud fra, bruges kun til instansens statistik og ændrer ingen indstillinger. Ret dem, hvis begivenheden er katalogiseret forkert eller slet ikke.",
+      "typeLabel": "Begivenhedstype",
+      "templateLabel": "Skabelon",
+      "noTemplate": "Ingen skabelon",
+      "deletedTemplate": "Oprettet ud fra skabelonen “{name}”, som siden er slettet.",
+      "deletedOption": "{name} (slettet)",
+      "types": {
+        "MEETING": "Møde",
+        "PARTICIPATORY": "Deltagende begivenhed",
+        "PUBLIC": "Offentlig begivenhed",
+        "INSTANT": "Hurtigopkald",
+        "LEGACY": "Importeret publikation",
+        "UNCATALOGED": "Ikke katalogiseret"
+      }
     }
   },
   "email": {

@@ -4064,6 +4064,23 @@
       },
       "retainedNote": "{count, plural, one {# prova tinżamm} two {# provi jinżammu} few {# provi jinżammu} many {#-il prova jinżammu} other {# prova jinżammu}} sakemm il-vidjo jew it-traskrizzjoni jeżistu.",
       "countsNote": "Jingħaddu n-nies: reġistrazzjoni, kont tal-persunal jew link nominali jgħoddu darba; mistieden li jerġa' lura f'żjara oħra jgħodd mill-ġdid."
+    },
+    "catalog": {
+      "fieldTitle": "Katalgu",
+      "fieldHelp": "It-tip tal-avveniment u l-mudell li minnu nħoloq jintużaw biss għall-istatistika tal-istanza u ma jibdlu l-ebda settings. Ikkoreġihom jekk l-avveniment huwa kkatalogat ħażin, jew mhuwiex ikkatalogat.",
+      "typeLabel": "Tip ta’ avveniment",
+      "templateLabel": "Mudell",
+      "noTemplate": "L-ebda mudell",
+      "deletedTemplate": "Maħluq mill-mudell “{name}”, li minn dak iż-żmien tħassar.",
+      "deletedOption": "{name} (imħassar)",
+      "types": {
+        "MEETING": "Laqgħa",
+        "PARTICIPATORY": "Avveniment parteċipattiv",
+        "PUBLIC": "Avveniment pubbliku",
+        "INSTANT": "Sejħa rapida",
+        "LEGACY": "Pubblikazzjoni importata",
+        "UNCATALOGED": "Mhux ikkatalogat"
+      }
     }
   },
   "email": {

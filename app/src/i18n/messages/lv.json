@@ -4064,6 +4064,23 @@
       },
       "retainedNote": "{count, plural, zero {# pierādījumi tiek glabāti} one {# pierādījums tiek glabāts} other {# pierādījumi tiek glabāti}}, kamēr video vai atšifrējums pastāv.",
       "countsNote": "Tiek skaitītas personas: reģistrācija, darbinieka konts vai personalizēta saite tiek skaitīta vienreiz; viesis, kurš atgriežas citā apmeklējumā, tiek skaitīts vēlreiz."
+    },
+    "catalog": {
+      "fieldTitle": "Katalogs",
+      "fieldHelp": "Pasākuma veids un veidne, no kuras tas izveidots, tiek izmantoti tikai instances statistikai un nemaina nevienu iestatījumu. Labojiet tos, ja pasākums katalogizēts nepareizi vai nav katalogizēts vispār.",
+      "typeLabel": "Pasākuma veids",
+      "templateLabel": "Veidne",
+      "noTemplate": "Bez veidnes",
+      "deletedTemplate": "Izveidots no veidnes “{name}”, kas pēc tam dzēsta.",
+      "deletedOption": "{name} (dzēsta)",
+      "types": {
+        "MEETING": "Sanāksme",
+        "PARTICIPATORY": "Līdzdalības pasākums",
+        "PUBLIC": "Publisks pasākums",
+        "INSTANT": "Ātrais zvans",
+        "LEGACY": "Importēta publikācija",
+        "UNCATALOGED": "Nav katalogizēts"
+      }
     }
   },
   "email": {

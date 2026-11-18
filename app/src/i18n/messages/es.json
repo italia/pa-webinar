@@ -4064,6 +4064,23 @@
       },
       "retainedNote": "{count, plural, one {# prueba se conserva} other {# pruebas se conservan}} mientras el vídeo o la transcripción existan.",
       "countsNote": "Se cuentan personas: una inscripción, una cuenta del personal o un enlace nominal cuentan una vez; un invitado que vuelve en otra visita cuenta de nuevo."
+    },
+    "catalog": {
+      "fieldTitle": "Catálogo",
+      "fieldHelp": "El tipo de evento y la plantilla a partir de la cual se creó solo sirven para las estadísticas de la instancia y no cambian ningún ajuste. Corrígelos si el evento está mal catalogado o no está catalogado.",
+      "typeLabel": "Tipo de evento",
+      "templateLabel": "Plantilla",
+      "noTemplate": "Sin plantilla",
+      "deletedTemplate": "Creado a partir de la plantilla «{name}», ya eliminada.",
+      "deletedOption": "{name} (eliminada)",
+      "types": {
+        "MEETING": "Reunión",
+        "PARTICIPATORY": "Evento participativo",
+        "PUBLIC": "Evento público",
+        "INSTANT": "Llamada rápida",
+        "LEGACY": "Publicación importada",
+        "UNCATALOGED": "Sin catalogar"
+      }
     }
   },
   "email": {
