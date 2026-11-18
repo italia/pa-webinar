@@ -175,7 +175,10 @@ describe('RegistrationEdit', () => {
             JSON.stringify({
               code: 'VALIDATION_ERROR',
               details: [
-                { path: ['organization'], message: 'gdpr.export.editOrganizationRequired' },
+                {
+                  path: ['organization'],
+                  message: 'gdpr.export.editOrganizationRequired',
+                },
               ],
             }),
             { status: 422 }
@@ -194,7 +197,9 @@ describe('RegistrationEdit', () => {
       'fetch',
       vi
         .fn()
-        .mockResolvedValueOnce(new Response(JSON.stringify({ issuedAt: 1 }), { status: 202 }))
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({ issuedAt: 1 }), { status: 202 })
+        )
         .mockResolvedValueOnce(
           new Response(JSON.stringify({ code: 'VALIDATION_ERROR' }), { status: 422 })
         )
@@ -202,7 +207,10 @@ describe('RegistrationEdit', () => {
     monta();
     await clic(m.editButton);
     await clic(m.codeSend);
-    scrivi(container.querySelector<HTMLInputElement>('input[autocomplete="one-time-code"]')!, '111111');
+    scrivi(
+      container.querySelector<HTMLInputElement>('input[autocomplete="one-time-code"]')!,
+      '111111'
+    );
     await clic(m.codeConfirmEdit);
     expect(container.querySelector('[role="alert"]')?.textContent).toBe(m.error);
     expect(pulsante(m.codeConfirmEdit)).toBeDefined();

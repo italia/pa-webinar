@@ -27,15 +27,23 @@ export interface EsitoRichiesta {
 }
 
 /** I testi degli errori dei campi che la rotta della correzione puo' dare. */
-const CHIAVI_ERRORE = ['editNameInvalid', 'editOrganizationTooLong', 'editOrganizationRequired'] as const;
+const CHIAVI_ERRORE = [
+  'editNameInvalid',
+  'editOrganizationTooLong',
+  'editOrganizationRequired',
+] as const;
 export type ChiaveErrore = (typeof CHIAVI_ERRORE)[number];
 
 function erroriDeiCampi(dettagli: unknown): Record<string, ChiaveErrore> {
   const campi: Record<string, ChiaveErrore> = {};
   for (const d of Array.isArray(dettagli) ? dettagli : []) {
     const { path, message } = (d ?? {}) as { path?: unknown[]; message?: unknown };
-    const chiave = typeof message === 'string' ? message.replace(/^gdpr\.export\./, '') : '';
-    if (typeof path?.[0] === 'string' && (CHIAVI_ERRORE as readonly string[]).includes(chiave)) {
+    const chiave =
+      typeof message === 'string' ? message.replace(/^gdpr\.export\./, '') : '';
+    if (
+      typeof path?.[0] === 'string' &&
+      (CHIAVI_ERRORE as readonly string[]).includes(chiave)
+    ) {
       campi[path[0]] = chiave as ChiaveErrore;
     }
   }

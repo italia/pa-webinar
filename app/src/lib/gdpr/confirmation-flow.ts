@@ -49,7 +49,11 @@ import { defaultLocale } from '@/i18n/config';
 const ORA_MS = 3_600_000;
 
 const nonDisponibile = () =>
-  new AppError('Confirmation codes are unavailable, try again later', 503, 'SERVICE_UNAVAILABLE');
+  new AppError(
+    'Confirmation codes are unavailable, try again later',
+    503,
+    'SERVICE_UNAVAILABLE'
+  );
 
 function limita(chiave: string, limit: number): void {
   const rl = rateLimit(chiave, { limit, windowMs: ORA_MS });
@@ -145,7 +149,8 @@ export async function conCodice<T>(
   if (esito === 'nonDisponibile') throw nonDisponibile();
   const sbagliato = () =>
     new AppError('Invalid or expired confirmation code', 403, 'INVALID_CODE');
-  if (esito !== 'ammesso' || !verificaCodice(richiesta, issuedAt, code)) throw sbagliato();
+  if (esito !== 'ammesso' || !verificaCodice(richiesta, issuedAt, code))
+    throw sbagliato();
   const preso = await prendiEmissione(richiesta, issuedAt);
   if (preso === 'nonDisponibile') throw nonDisponibile();
   if (!preso) throw sbagliato();

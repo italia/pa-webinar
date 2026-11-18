@@ -137,9 +137,7 @@ export default function RegistrationEdit({
           required
           disabled={bloccato}
           aria-invalid={!!erroriCampi.displayName}
-          aria-describedby={
-            erroriCampi.displayName ? `${id}-nome-errore` : undefined
-          }
+          aria-describedby={erroriCampi.displayName ? `${id}-nome-errore` : undefined}
           onChange={(e) => setNome(e.target.value)}
         />
         {erroriCampi.displayName && (
@@ -157,9 +155,7 @@ export default function RegistrationEdit({
           maxLength={200}
           disabled={bloccato}
           aria-invalid={!!erroriCampi.organization}
-          aria-describedby={
-            erroriCampi.organization ? `${id}-ente-errore` : undefined
-          }
+          aria-describedby={erroriCampi.organization ? `${id}-ente-errore` : undefined}
           onChange={(e) => setEnte(e.target.value)}
         />
         {erroriCampi.organization && (

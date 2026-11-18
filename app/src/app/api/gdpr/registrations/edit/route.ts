@@ -52,7 +52,10 @@ const schema = z
 /** Gli errori dei valori, con le chiavi dei testi della pagina dei propri dati. */
 const ERRORI = {
   nameInvalid: { path: ['displayName'], message: 'gdpr.export.editNameInvalid' },
-  organizationTooLong: { path: ['organization'], message: 'gdpr.export.editOrganizationTooLong' },
+  organizationTooLong: {
+    path: ['organization'],
+    message: 'gdpr.export.editOrganizationTooLong',
+  },
   organizationRequired: {
     path: ['organization'],
     message: 'gdpr.export.editOrganizationRequired',

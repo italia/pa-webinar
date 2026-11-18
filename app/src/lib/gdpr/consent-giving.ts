@@ -156,12 +156,16 @@ export function consensiInVigore(
       (c.consentRecording === true &&
         !c.consentRecordingWithdrawnAt &&
         consensoCopre(c.consentRecordingDestination, destinazione)) ||
-      c.recordingConsents.some((p) => !p.withdrawnAt && consensoCopre(p.destination, destinazione)),
+      c.recordingConsents.some(
+        (p) => !p.withdrawnAt && consensoCopre(p.destination, destinazione)
+      ),
     transcription:
       (c.consentMultitrack === true &&
         !c.consentMultitrackWithdrawnAt &&
         (c.consentMultitrackVersion ?? 1) >= versioneTrascrizione) ||
-      c.multitrackConsents.some((p) => !p.withdrawnAt && p.textVersion >= versioneTrascrizione),
+      c.multitrackConsents.some(
+        (p) => !p.withdrawnAt && p.textVersion >= versioneTrascrizione
+      ),
   };
 }
 
@@ -404,7 +408,11 @@ export async function daiConsenso(
   if (consenso === 'futureCommunications') {
     const iscrizione = await prisma.registration.findFirst({
       where: { id: registrationId, emailHash },
-      select: { id: true, consentFutureCommunications: true, consentFutureCommunicationsWithdrawnAt: true },
+      select: {
+        id: true,
+        consentFutureCommunications: true,
+        consentFutureCommunicationsWithdrawnAt: true,
+      },
     });
     if (!iscrizione) return 'nonTrovata';
     if (iscrizione.consentFutureCommunications) return 'gia';
@@ -441,10 +449,18 @@ export async function daiConsenso(
         if (!r.richiesti.registrazione) return 'nonOfferto';
         if (!testoInVigore(letto.destinazione, r.destinazione)) return 'testoCambiato';
         if (vigore.recording) return 'gia';
-        return daiRegistrazione(tx, iscrizione, r.destinazione, letto.destinazione, locale);
+        return daiRegistrazione(
+          tx,
+          iscrizione,
+          r.destinazione,
+          letto.destinazione,
+          locale
+        );
       }
       if (!r.richiesti.tracce) return 'nonOfferto';
-      const testo = chiaveConsensoTrascrizione(traccePerPersonaConservate(iscrizione.event, sito));
+      const testo = chiaveConsensoTrascrizione(
+        traccePerPersonaConservate(iscrizione.event, sito)
+      );
       if (letto.trascrizione !== testo) return 'testoCambiato';
       if (r.serveRegistrazione && !vigore.recording) return 'serveRegistrazione';
       if (vigore.transcription) return 'gia';
