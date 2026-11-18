@@ -2440,6 +2440,40 @@
         "avgParticipantsPerEvent": "Avg participants per event",
         "avgFeedbackRating": "Avg feedback rating",
         "totalFeedback": "Feedback responses"
+      },
+      "catalog": {
+        "title": "Event types and templates",
+        "intro": "How many events of each type and from each template, month by month. Counts and averages only, no personal data. Drafts are not counted.",
+        "periodLabel": "Period",
+        "months": "{count, plural, one {# month} other {# months}}",
+        "groupByLabel": "Group by",
+        "groupBy": {
+          "type": "Event type",
+          "template": "Template"
+        },
+        "rankingTypes": "Most recurring types",
+        "rankingTemplates": "Most used templates",
+        "columns": {
+          "type": "Type",
+          "template": "Template",
+          "events": "Events",
+          "held": "Held",
+          "avgParticipants": "Avg. participants",
+          "avgDuration": "Avg. duration",
+          "total": "Whole period"
+        },
+        "measuresNote": "Held: events whose room opened. Average participants: the peak of people present at the same time, guests included, averaged over the events held. Average duration: the measured room time, not the scheduled one.",
+        "byMonth": "Month by month",
+        "measureLabel": "Measure",
+        "measures": {
+          "events": "Events",
+          "avgParticipants": "Average participants",
+          "avgDurationMinutes": "Average duration"
+        },
+        "byMonthCaption": "{measure} by month",
+        "empty": "No events in this period.",
+        "deletedTemplate": "{name} (deleted)",
+        "uncatalogedNote": "Events not cataloged: {count}. They were created before the catalog, or without a template or a format; you can catalog them when editing the event, under technical details."
       }
     },
     "recurrence": {
@@ -2508,7 +2542,8 @@
       "postEventPublic": "Public post-event page",
       "offerAddressBook": "Offers the address book to people who register",
       "invalidFields": "Check these fields: {fields}.",
-      "descriptionOtherLanguages": "There are also versions in: {languages}, which cannot be edited here. If you change the Italian text they are removed."
+      "descriptionOtherLanguages": "There are also versions in: {languages}, which cannot be edited here. If you change the Italian text they are removed.",
+      "usedBy": "Events created from this template: {count}"
     },
     "instantCall": {
       "title": "Instant video call",

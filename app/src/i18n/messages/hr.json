@@ -2440,6 +2440,40 @@
         "avgParticipantsPerEvent": "Prosječno sudionika po događaju",
         "avgFeedbackRating": "Prosječna ocjena povratnih informacija",
         "totalFeedback": "Odgovori povratnih informacija"
+      },
+      "catalog": {
+        "title": "Vrste događaja i predlošci",
+        "intro": "Koliko je događaja svake vrste i iz svakog predloška, mjesec po mjesec. Samo brojevi i prosjeci, bez osobnih podataka. Nacrti se ne broje.",
+        "periodLabel": "Razdoblje",
+        "months": "{count, plural, one {# mjesec} few {# mjeseca} other {# mjeseci}}",
+        "groupByLabel": "Grupiraj po",
+        "groupBy": {
+          "type": "Vrsta događaja",
+          "template": "Predložak"
+        },
+        "rankingTypes": "Najčešće vrste",
+        "rankingTemplates": "Najkorišteniji predlošci",
+        "columns": {
+          "type": "Vrsta",
+          "template": "Predložak",
+          "events": "Događaji",
+          "held": "Održani",
+          "avgParticipants": "Prosj. sudionika",
+          "avgDuration": "Prosj. trajanje",
+          "total": "Cijelo razdoblje"
+        },
+        "measuresNote": "Održani: događaji čija je soba otvorena. Prosječan broj sudionika: najveći broj istodobno prisutnih osoba, uključujući goste, u prosjeku za održane događaje. Prosječno trajanje: izmjereno vrijeme u sobi, a ne planirano.",
+        "byMonth": "Mjesec po mjesec",
+        "measureLabel": "Mjera",
+        "measures": {
+          "events": "Događaji",
+          "avgParticipants": "Prosječan broj sudionika",
+          "avgDurationMinutes": "Prosječno trajanje"
+        },
+        "byMonthCaption": "{measure} po mjesecima",
+        "empty": "U ovom razdoblju nema događaja.",
+        "deletedTemplate": "{name} (izbrisan)",
+        "uncatalogedNote": "Nekatalogizirani događaji: {count}. Nastali su prije kataloga ili bez predloška i bez formata; možete ih katalogizirati pri uređivanju događaja, u tehničkim detaljima."
       }
     },
     "recurrence": {
@@ -2508,7 +2542,8 @@
       "postEventPublic": "Javna stranica nakon događaja",
       "offerAddressBook": "Nudi imenik osobama koje se prijavljuju",
       "invalidFields": "Provjerite ova polja: {fields}.",
-      "descriptionOtherLanguages": "Postoje i verzije na: {languages}, koje se ovdje ne uređuju. Ako promijenite talijanski tekst, uklanjaju se."
+      "descriptionOtherLanguages": "Postoje i verzije na: {languages}, koje se ovdje ne uređuju. Ako promijenite talijanski tekst, uklanjaju se.",
+      "usedBy": "Događaji nastali iz ovog predloška: {count}"
     },
     "instantCall": {
       "title": "Trenutačni videopoziv",

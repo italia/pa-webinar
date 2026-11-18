@@ -2440,6 +2440,40 @@
         "avgParticipantsPerEvent": "Participantes médios por evento",
         "avgFeedbackRating": "Avaliação média do feedback",
         "totalFeedback": "Respostas de feedback"
+      },
+      "catalog": {
+        "title": "Tipos de evento e modelos",
+        "intro": "Quantos eventos de cada tipo e de cada modelo, mês a mês. Apenas contagens e médias, sem dados pessoais. Os rascunhos não contam.",
+        "periodLabel": "Período",
+        "months": "{count, plural, one {# mês} other {# meses}}",
+        "groupByLabel": "Agrupar por",
+        "groupBy": {
+          "type": "Tipo de evento",
+          "template": "Modelo"
+        },
+        "rankingTypes": "Os tipos mais frequentes",
+        "rankingTemplates": "Os modelos mais usados",
+        "columns": {
+          "type": "Tipo",
+          "template": "Modelo",
+          "events": "Eventos",
+          "held": "Realizados",
+          "avgParticipants": "Participantes médios",
+          "avgDuration": "Duração média",
+          "total": "Todo o período"
+        },
+        "measuresNote": "Realizados: eventos cuja sala foi aberta. Participantes médios: o pico de pessoas presentes em simultâneo, convidados incluídos, em média nos eventos realizados. Duração média: o tempo de sala medido, não o programado.",
+        "byMonth": "Mês a mês",
+        "measureLabel": "Medida",
+        "measures": {
+          "events": "Eventos",
+          "avgParticipants": "Participantes médios",
+          "avgDurationMinutes": "Duração média"
+        },
+        "byMonthCaption": "{measure} por mês",
+        "empty": "Não há eventos neste período.",
+        "deletedTemplate": "{name} (eliminado)",
+        "uncatalogedNote": "Eventos não catalogados: {count}. Foram criados antes do catálogo, ou sem modelo e sem formato; pode catalogá-los ao editar o evento, nos detalhes técnicos."
       }
     },
     "recurrence": {
@@ -2508,7 +2542,8 @@
       "postEventPublic": "Página pública após o evento",
       "offerAddressBook": "Propõe a agenda a quem se inscreve",
       "invalidFields": "Verifique estes campos: {fields}.",
-      "descriptionOtherLanguages": "Existem também versões em: {languages}, que não se editam aqui. Se alterar o texto em italiano, são removidas."
+      "descriptionOtherLanguages": "Existem também versões em: {languages}, que não se editam aqui. Se alterar o texto em italiano, são removidas.",
+      "usedBy": "Eventos criados a partir deste modelo: {count}"
     },
     "instantCall": {
       "title": "Videochamada instantânea",

@@ -2650,6 +2650,40 @@
         "avgParticipantsPerEvent": "Partecipanti medi per evento",
         "avgFeedbackRating": "Valutazione media feedback",
         "totalFeedback": "Risposte feedback"
+      },
+      "catalog": {
+        "title": "Tipi di evento e modelli",
+        "intro": "Quanti eventi di ciascun tipo e da ciascun modello, mese per mese. Solo conteggi e medie, nessun dato personale. Le bozze non contano.",
+        "periodLabel": "Periodo",
+        "months": "{count, plural, one {# mese} other {# mesi}}",
+        "groupByLabel": "Raggruppa per",
+        "groupBy": {
+          "type": "Tipo di evento",
+          "template": "Modello"
+        },
+        "rankingTypes": "I tipi più ricorrenti",
+        "rankingTemplates": "I modelli più usati",
+        "columns": {
+          "type": "Tipo",
+          "template": "Modello",
+          "events": "Eventi",
+          "held": "Tenuti",
+          "avgParticipants": "Partecipanti medi",
+          "avgDuration": "Durata media",
+          "total": "Tutto il periodo"
+        },
+        "measuresNote": "Tenuti: gli eventi la cui sala si è aperta. Partecipanti medi: il picco di persone presenti insieme, ospiti compresi, in media sugli eventi tenuti. Durata media: il tempo di sala misurato, non quello programmato.",
+        "byMonth": "Mese per mese",
+        "measureLabel": "Misura",
+        "measures": {
+          "events": "Eventi",
+          "avgParticipants": "Partecipanti medi",
+          "avgDurationMinutes": "Durata media"
+        },
+        "byMonthCaption": "{measure} per mese",
+        "empty": "Nessun evento in questo periodo.",
+        "deletedTemplate": "{name} (eliminato)",
+        "uncatalogedNote": "Eventi non catalogati: {count}. Sono nati prima del catalogo, o senza modello e senza formato; si catalogano dalla modifica dell'evento, nei dettagli tecnici."
       }
     },
     "recurrence": {
@@ -2718,7 +2752,8 @@
       "postEventPublic": "Pagina dopo l'evento pubblica",
       "offerAddressBook": "Propone la rubrica a chi si iscrive",
       "invalidFields": "Controlla questi campi: {fields}.",
-      "descriptionOtherLanguages": "Ci sono anche le versioni in: {languages}, che qui non si modificano. Se cambi il testo italiano vengono tolte."
+      "descriptionOtherLanguages": "Ci sono anche le versioni in: {languages}, che qui non si modificano. Se cambi il testo italiano vengono tolte.",
+      "usedBy": "Eventi creati da questo modello: {count}"
     },
     "instantCall": {
       "title": "Videocall istantanea",

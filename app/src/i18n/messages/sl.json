@@ -2440,6 +2440,40 @@
         "avgParticipantsPerEvent": "Povprečno udeležencev na dogodek",
         "avgFeedbackRating": "Povprečna ocena povratnih informacij",
         "totalFeedback": "Odgovori povratnih informacij"
+      },
+      "catalog": {
+        "title": "Vrste dogodkov in predloge",
+        "intro": "Koliko dogodkov posamezne vrste in iz posamezne predloge, mesec za mesecem. Samo števila in povprečja, brez osebnih podatkov. Osnutki se ne štejejo.",
+        "periodLabel": "Obdobje",
+        "months": "{count, plural, one {# mesec} two {# meseca} few {# meseci} other {# mesecev}}",
+        "groupByLabel": "Združi po",
+        "groupBy": {
+          "type": "Vrsta dogodka",
+          "template": "Predloga"
+        },
+        "rankingTypes": "Najpogostejše vrste",
+        "rankingTemplates": "Najpogosteje uporabljene predloge",
+        "columns": {
+          "type": "Vrsta",
+          "template": "Predloga",
+          "events": "Dogodki",
+          "held": "Izvedeni",
+          "avgParticipants": "Povpr. udeležencev",
+          "avgDuration": "Povpr. trajanje",
+          "total": "Celotno obdobje"
+        },
+        "measuresNote": "Izvedeni: dogodki, katerih soba se je odprla. Povprečno število udeležencev: največje število hkrati prisotnih oseb, vključno z gosti, v povprečju za izvedene dogodke. Povprečno trajanje: izmerjeni čas v sobi, ne načrtovani.",
+        "byMonth": "Mesec za mesecem",
+        "measureLabel": "Merilo",
+        "measures": {
+          "events": "Dogodki",
+          "avgParticipants": "Povprečno število udeležencev",
+          "avgDurationMinutes": "Povprečno trajanje"
+        },
+        "byMonthCaption": "{measure} po mesecih",
+        "empty": "V tem obdobju ni dogodkov.",
+        "deletedTemplate": "{name} (izbrisana)",
+        "uncatalogedNote": "Nekatalogizirani dogodki: {count}. Nastali so pred katalogom ali brez predloge in brez formata; katalogizirate jih lahko pri urejanju dogodka, v tehničnih podrobnostih."
       }
     },
     "recurrence": {
@@ -2508,7 +2542,8 @@
       "postEventPublic": "Javna stran po dogodku",
       "offerAddressBook": "Osebam, ki se prijavijo, predlaga imenik",
       "invalidFields": "Preverite ta polja: {fields}.",
-      "descriptionOtherLanguages": "Obstajajo tudi različice v jezikih: {languages}, ki jih tukaj ni mogoče urejati. Če spremenite italijansko besedilo, se odstranijo."
+      "descriptionOtherLanguages": "Obstajajo tudi različice v jezikih: {languages}, ki jih tukaj ni mogoče urejati. Če spremenite italijansko besedilo, se odstranijo.",
+      "usedBy": "Dogodki, ustvarjeni iz te predloge: {count}"
     },
     "instantCall": {
       "title": "Takojšnji video klic",

@@ -2440,6 +2440,40 @@
         "avgParticipantsPerEvent": "Priemerný počet účastníkov na udalosť",
         "avgFeedbackRating": "Priemerné hodnotenie spätnej väzby",
         "totalFeedback": "Odpovedí spätnej väzby"
+      },
+      "catalog": {
+        "title": "Typy udalostí a šablóny",
+        "intro": "Koľko udalostí každého typu a z každej šablóny, mesiac po mesiaci. Len počty a priemery, žiadne osobné údaje. Koncepty sa nepočítajú.",
+        "periodLabel": "Obdobie",
+        "months": "{count, plural, one {# mesiac} few {# mesiace} many {# mesiaca} other {# mesiacov}}",
+        "groupByLabel": "Zoskupiť podľa",
+        "groupBy": {
+          "type": "Typ udalosti",
+          "template": "Šablóna"
+        },
+        "rankingTypes": "Najčastejšie typy",
+        "rankingTemplates": "Najpoužívanejšie šablóny",
+        "columns": {
+          "type": "Typ",
+          "template": "Šablóna",
+          "events": "Udalosti",
+          "held": "Uskutočnené",
+          "avgParticipants": "Priem. účastníci",
+          "avgDuration": "Priem. trvanie",
+          "total": "Celé obdobie"
+        },
+        "measuresNote": "Uskutočnené: udalosti, ktorých miestnosť sa otvorila. Priemerný počet účastníkov: najvyšší počet súčasne prítomných osôb vrátane hostí, v priemere za uskutočnené udalosti. Priemerné trvanie: nameraný čas v miestnosti, nie plánovaný.",
+        "byMonth": "Mesiac po mesiaci",
+        "measureLabel": "Ukazovateľ",
+        "measures": {
+          "events": "Udalosti",
+          "avgParticipants": "Priemerný počet účastníkov",
+          "avgDurationMinutes": "Priemerné trvanie"
+        },
+        "byMonthCaption": "{measure} po mesiacoch",
+        "empty": "V tomto období nie sú žiadne udalosti.",
+        "deletedTemplate": "{name} (odstránená)",
+        "uncatalogedNote": "Nezaradené udalosti: {count}. Vznikli pred zavedením katalógu alebo bez šablóny a bez formátu; zaradiť ich môžete pri úprave udalosti, v technických údajoch."
       }
     },
     "recurrence": {
@@ -2508,7 +2542,8 @@
       "postEventPublic": "Verejná stránka po udalosti",
       "offerAddressBook": "Ponúka adresár osobám, ktoré sa registrujú",
       "invalidFields": "Skontrolujte tieto polia: {fields}.",
-      "descriptionOtherLanguages": "Existujú aj verzie v jazykoch: {languages}, ktoré tu nemožno upraviť. Ak zmeníte taliansky text, odstránia sa."
+      "descriptionOtherLanguages": "Existujú aj verzie v jazykoch: {languages}, ktoré tu nemožno upraviť. Ak zmeníte taliansky text, odstránia sa.",
+      "usedBy": "Udalosti vytvorené z tejto šablóny: {count}"
     },
     "instantCall": {
       "title": "Okamžitý videohovor",

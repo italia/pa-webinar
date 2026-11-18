@@ -2440,6 +2440,40 @@
         "avgParticipantsPerEvent": "Genomsnitt deltagare per evenemang",
         "avgFeedbackRating": "Genomsnittligt feedbackbetyg",
         "totalFeedback": "Feedbacksvar"
+      },
+      "catalog": {
+        "title": "Evenemangstyper och mallar",
+        "intro": "Hur många evenemang av varje typ och från varje mall, månad för månad. Endast antal och medelvärden, inga personuppgifter. Utkast räknas inte.",
+        "periodLabel": "Period",
+        "months": "{count, plural, one {# månad} other {# månader}}",
+        "groupByLabel": "Gruppera efter",
+        "groupBy": {
+          "type": "Evenemangstyp",
+          "template": "Mall"
+        },
+        "rankingTypes": "Vanligaste typerna",
+        "rankingTemplates": "Mest använda mallarna",
+        "columns": {
+          "type": "Typ",
+          "template": "Mall",
+          "events": "Evenemang",
+          "held": "Genomförda",
+          "avgParticipants": "Snitt deltagare",
+          "avgDuration": "Snittlängd",
+          "total": "Hela perioden"
+        },
+        "measuresNote": "Genomförda: evenemang vars rum öppnades. Genomsnittligt antal deltagare: det högsta antalet samtidigt närvarande, gäster inräknade, i genomsnitt för de genomförda evenemangen. Genomsnittlig längd: den uppmätta tiden i rummet, inte den planerade.",
+        "byMonth": "Månad för månad",
+        "measureLabel": "Mått",
+        "measures": {
+          "events": "Evenemang",
+          "avgParticipants": "Genomsnittligt antal deltagare",
+          "avgDurationMinutes": "Genomsnittlig längd"
+        },
+        "byMonthCaption": "{measure} per månad",
+        "empty": "Inga evenemang under den här perioden.",
+        "deletedTemplate": "{name} (borttagen)",
+        "uncatalogedNote": "Evenemang som inte är katalogiserade: {count}. De skapades före katalogen, eller utan mall och utan format; du kan katalogisera dem när du redigerar evenemanget, under tekniska detaljer."
       }
     },
     "recurrence": {
@@ -2508,7 +2542,8 @@
       "postEventPublic": "Offentlig sida efter evenemanget",
       "offerAddressBook": "Erbjuder adressboken till dem som anmäler sig",
       "invalidFields": "Kontrollera de här fälten: {fields}.",
-      "descriptionOtherLanguages": "Det finns även versioner på: {languages}, som inte kan redigeras här. Om du ändrar den italienska texten tas de bort."
+      "descriptionOtherLanguages": "Det finns även versioner på: {languages}, som inte kan redigeras här. Om du ändrar den italienska texten tas de bort.",
+      "usedBy": "Evenemang skapade från den här mallen: {count}"
     },
     "instantCall": {
       "title": "Omedelbart videosamtal",

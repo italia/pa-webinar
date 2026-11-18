@@ -12,6 +12,9 @@ import {
   getTopEvents,
   getEventAnalytics,
 } from '@/lib/analytics';
+import { mesiDelCatalogo } from '@/lib/analytics/catalog-stats';
+import { statisticheCatalogo } from '@/lib/analytics/catalog-stats-query';
+import { getSettings } from '@/lib/settings';
 
 function parseDays(period: string | null): number | undefined {
   switch (period) {
@@ -37,12 +40,27 @@ export const GET = withErrorHandling(async (request) => {
   const url = new URL(request.url);
   const period = url.searchParams.get('period');
   const days = parseDays(period);
+  // Il catalogo ha il suo periodo, in mesi (?months=): i tipi e i modelli si
+  // confrontano mese per mese. `?section=` chiede una parte sola, perche' la
+  // pagina cambia i due periodi separatamente e non rilegge l'altra.
+  const mesi = mesiDelCatalogo(url.searchParams.get('months'));
+  const section = url.searchParams.get('section');
 
-  const [overview, timeline, topEvents, recentEvents] = await Promise.all([
+  if (section === 'catalog') {
+    const settings = await getSettings();
+    return Response.json({
+      catalog: await statisticheCatalogo(mesi, settings.defaultTimezone),
+    });
+  }
+
+  const [overview, timeline, topEvents, recentEvents, catalog] = await Promise.all([
     getOverview(days),
     getTimeline(days ?? 365),
     getTopEvents(10),
     getEventAnalytics(10),
+    section === 'overview'
+      ? undefined
+      : getSettings().then((s) => statisticheCatalogo(mesi, s.defaultTimezone)),
   ]);
 
   return Response.json({
@@ -50,5 +68,6 @@ export const GET = withErrorHandling(async (request) => {
     timeline,
     topEvents,
     recentEvents,
+    ...(catalog && { catalog }),
   });
 });

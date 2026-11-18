@@ -2440,6 +2440,40 @@
         "avgParticipantsPerEvent": "Osallistujia keskimäärin tapahtumaa kohti",
         "avgFeedbackRating": "Palautteen keskiarvo",
         "totalFeedback": "Palautevastaukset"
+      },
+      "catalog": {
+        "title": "Tapahtumatyypit ja mallit",
+        "intro": "Kuinka monta tapahtumaa kustakin tyypistä ja kustakin mallista kuukausittain. Vain määriä ja keskiarvoja, ei henkilötietoja. Luonnoksia ei lasketa.",
+        "periodLabel": "Ajanjakso",
+        "months": "{count, plural, one {# kuukausi} other {# kuukautta}}",
+        "groupByLabel": "Ryhmittele",
+        "groupBy": {
+          "type": "Tapahtuman tyyppi",
+          "template": "Malli"
+        },
+        "rankingTypes": "Yleisimmät tyypit",
+        "rankingTemplates": "Käytetyimmät mallit",
+        "columns": {
+          "type": "Tyyppi",
+          "template": "Malli",
+          "events": "Tapahtumat",
+          "held": "Pidetyt",
+          "avgParticipants": "Osallistujia keskim.",
+          "avgDuration": "Kesto keskim.",
+          "total": "Koko ajanjakso"
+        },
+        "measuresNote": "Pidetyt: tapahtumat, joiden tila avattiin. Osallistujia keskimäärin: samanaikaisesti paikalla olleiden enimmäismäärä vieraat mukaan lukien, keskimäärin pidetyissä tapahtumissa. Keskimääräinen kesto: mitattu aika tilassa, ei suunniteltu aika.",
+        "byMonth": "Kuukausittain",
+        "measureLabel": "Mittari",
+        "measures": {
+          "events": "Tapahtumat",
+          "avgParticipants": "Osallistujia keskimäärin",
+          "avgDurationMinutes": "Keskimääräinen kesto"
+        },
+        "byMonthCaption": "{measure} kuukausittain",
+        "empty": "Tällä ajanjaksolla ei ole tapahtumia.",
+        "deletedTemplate": "{name} (poistettu)",
+        "uncatalogedNote": "Luetteloimattomia tapahtumia: {count}. Ne on luotu ennen luetteloa tai ilman mallia ja muotoa; voit luetteloida ne tapahtuman muokkauksessa teknisten tietojen kohdassa."
       }
     },
     "recurrence": {
@@ -2508,7 +2542,8 @@
       "postEventPublic": "Julkinen tapahtuman jälkeinen sivu",
       "offerAddressBook": "Tarjoaa ilmoittautuville osoitekirjaan jäämistä",
       "invalidFields": "Tarkista nämä kentät: {fields}.",
-      "descriptionOtherLanguages": "Tekstistä on myös versiot kielillä: {languages}, joita ei voi muokata täällä. Jos muutat italiankielistä tekstiä, ne poistetaan."
+      "descriptionOtherLanguages": "Tekstistä on myös versiot kielillä: {languages}, joita ei voi muokata täällä. Jos muutat italiankielistä tekstiä, ne poistetaan.",
+      "usedBy": "Tästä mallista luotuja tapahtumia: {count}"
     },
     "instantCall": {
       "title": "Pikavideopuhelu",

@@ -2440,6 +2440,40 @@
         "avgParticipantsPerEvent": "Průměrný počet účastníků na událost",
         "avgFeedbackRating": "Průměrné hodnocení zpětné vazby",
         "totalFeedback": "Odpovědí zpětné vazby"
+      },
+      "catalog": {
+        "title": "Typy událostí a šablony",
+        "intro": "Kolik událostí každého typu a z každé šablony, měsíc po měsíci. Pouze počty a průměry, žádné osobní údaje. Koncepty se nepočítají.",
+        "periodLabel": "Období",
+        "months": "{count, plural, one {# měsíc} few {# měsíce} many {# měsíce} other {# měsíců}}",
+        "groupByLabel": "Seskupit podle",
+        "groupBy": {
+          "type": "Typ události",
+          "template": "Šablona"
+        },
+        "rankingTypes": "Nejčastější typy",
+        "rankingTemplates": "Nejpoužívanější šablony",
+        "columns": {
+          "type": "Typ",
+          "template": "Šablona",
+          "events": "Události",
+          "held": "Konané",
+          "avgParticipants": "Prům. účastníci",
+          "avgDuration": "Prům. délka",
+          "total": "Celé období"
+        },
+        "measuresNote": "Konané: události, jejichž místnost byla otevřena. Průměrný počet účastníků: nejvyšší počet současně přítomných osob včetně hostů, v průměru za konané události. Průměrná délka: naměřený čas v místnosti, nikoli plánovaný.",
+        "byMonth": "Měsíc po měsíci",
+        "measureLabel": "Ukazatel",
+        "measures": {
+          "events": "Události",
+          "avgParticipants": "Průměrný počet účastníků",
+          "avgDurationMinutes": "Průměrná délka"
+        },
+        "byMonthCaption": "{measure} po měsících",
+        "empty": "V tomto období nejsou žádné události.",
+        "deletedTemplate": "{name} (smazáno)",
+        "uncatalogedNote": "Nezařazené události: {count}. Vznikly před zavedením katalogu nebo bez šablony a bez formátu; zařadit je můžete při úpravě události, v technických údajích."
       }
     },
     "recurrence": {
@@ -2508,7 +2542,8 @@
       "postEventPublic": "Veřejná stránka po události",
       "offerAddressBook": "Nabízí adresář těm, kdo se registrují",
       "invalidFields": "Zkontrolujte tato pole: {fields}.",
-      "descriptionOtherLanguages": "Existují také verze v jazycích: {languages}, které zde nelze upravit. Pokud změníte italský text, odstraní se."
+      "descriptionOtherLanguages": "Existují také verze v jazycích: {languages}, které zde nelze upravit. Pokud změníte italský text, odstraní se.",
+      "usedBy": "Události vytvořené z této šablony: {count}"
     },
     "instantCall": {
       "title": "Okamžitý videohovor",

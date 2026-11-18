@@ -2440,6 +2440,40 @@
         "avgParticipantsPerEvent": "Vidutiniškai dalyvių vienam renginiui",
         "avgFeedbackRating": "Vidutinis atsiliepimų įvertinimas",
         "totalFeedback": "Atsiliepimų atsakymų"
+      },
+      "catalog": {
+        "title": "Renginių tipai ir šablonai",
+        "intro": "Kiek kiekvieno tipo ir iš kiekvieno šablono renginių kiekvieną mėnesį. Tik skaičiai ir vidurkiai, jokių asmens duomenų. Juodraščiai neskaičiuojami.",
+        "periodLabel": "Laikotarpis",
+        "months": "{count, plural, one {# mėnuo} few {# mėnesiai} many {# mėnesio} other {# mėnesių}}",
+        "groupByLabel": "Grupuoti pagal",
+        "groupBy": {
+          "type": "Renginio tipas",
+          "template": "Šablonas"
+        },
+        "rankingTypes": "Dažniausi tipai",
+        "rankingTemplates": "Dažniausiai naudojami šablonai",
+        "columns": {
+          "type": "Tipas",
+          "template": "Šablonas",
+          "events": "Renginiai",
+          "held": "Įvykę",
+          "avgParticipants": "Vid. dalyvių",
+          "avgDuration": "Vid. trukmė",
+          "total": "Visas laikotarpis"
+        },
+        "measuresNote": "Įvykę: renginiai, kurių kambarys buvo atidarytas. Vidutinis dalyvių skaičius: didžiausias vienu metu buvusių žmonių skaičius, įskaitant svečius, įvykusių renginių vidurkis. Vidutinė trukmė: išmatuotas laikas kambaryje, o ne suplanuotas.",
+        "byMonth": "Pagal mėnesius",
+        "measureLabel": "Rodiklis",
+        "measures": {
+          "events": "Renginiai",
+          "avgParticipants": "Vidutinis dalyvių skaičius",
+          "avgDurationMinutes": "Vidutinė trukmė"
+        },
+        "byMonthCaption": "{measure} pagal mėnesius",
+        "empty": "Šiuo laikotarpiu renginių nėra.",
+        "deletedTemplate": "{name} (ištrintas)",
+        "uncatalogedNote": "Nekatalogizuotų renginių: {count}. Jie sukurti prieš atsirandant katalogui arba be šablono ir be formato; juos galite katalogizuoti redaguodami renginį, techninėje informacijoje."
       }
     },
     "recurrence": {
@@ -2508,7 +2542,8 @@
       "postEventPublic": "Viešas puslapis po renginio",
       "offerAddressBook": "Siūlo adresų knygą besiregistruojantiems",
       "invalidFields": "Patikrinkite šiuos laukus: {fields}.",
-      "descriptionOtherLanguages": "Yra ir versijos kalbomis: {languages}, kurių čia redaguoti negalima. Jei pakeisite tekstą italų kalba, jos bus pašalintos."
+      "descriptionOtherLanguages": "Yra ir versijos kalbomis: {languages}, kurių čia redaguoti negalima. Jei pakeisite tekstą italų kalba, jos bus pašalintos.",
+      "usedBy": "Iš šio šablono sukurtų renginių: {count}"
     },
     "instantCall": {
       "title": "Momentinis vaizdo skambutis",

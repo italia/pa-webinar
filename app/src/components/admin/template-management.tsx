@@ -61,6 +61,8 @@ interface SerializedTemplate {
   sortOrder: number;
   createdAt: string;
   updatedAt: string;
+  /** Quanti eventi sono nati da questo modello (Event.templateId). */
+  eventCount?: number;
 }
 
 interface TemplateManagementProps {
@@ -282,8 +284,9 @@ export default function TemplateManagement({
           { ...saved, createdAt: saved.createdAt, updatedAt: saved.updatedAt },
         ]);
       } else {
+        // Gli eventi nati dal modello non cambiano salvandolo: il conteggio resta.
         setTemplates((prev) =>
-          prev.map((tpl) => (tpl.id === saved.id ? saved : tpl)),
+          prev.map((tpl) => (tpl.id === saved.id ? { ...saved, eventCount: tpl.eventCount } : tpl)),
         );
       }
       setEditing(null);
@@ -454,6 +457,8 @@ export default function TemplateManagement({
                   </div>
                   <div className="text-muted mb-3" style={{ fontSize: '0.8rem' }}>
                     {t('maxParticipantsLabel')}: {tpl.maxParticipants}
+                    <br />
+                    {t('usedBy', { count: tpl.eventCount ?? 0 })}
                   </div>
                   <div className="mt-auto d-flex gap-2">
                     <Button

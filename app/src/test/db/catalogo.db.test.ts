@@ -4,7 +4,7 @@
 /**
  * Il catalogo degli eventi su un database vero: cio' che la creazione scrive,
  * cio' che resta quando il modello cambia nome o si cancella (la chiave esterna
- * SetNull), la copia e la correzione dello staff.
+ * SetNull), la copia, la correzione dello staff e le statistiche che ne escono.
  */
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -16,10 +16,12 @@ import {
 } from '@/app/api/admin/templates/route';
 import { PUT as aggiornaEvento } from '@/app/api/events/[param]/route';
 import { POST as creaEvento } from '@/app/api/events/route';
+import { statisticheCatalogo } from '@/lib/analytics/catalog-stats-query';
 import { prisma } from '@/lib/db';
 
 import {
   creaEvento as evento,
+  creaSessione,
   entraCome,
   esci,
   richiesta,
@@ -252,5 +254,78 @@ describe('la correzione del catalogo', () => {
       formatClass: 'MEETING',
       templateName: 'Vecchio',
     });
+  });
+});
+
+describe('le statistiche del catalogo', () => {
+  it('contano gli eventi del mese per tipo e modello, con picco e durata delle sessioni', async () => {
+    const ora = new Date('2026-11-18T12:00:00Z');
+    const modello = await prisma.eventTemplate.create({ data: { name: 'Riunione' } });
+    const quando = new Date('2026-11-10T09:00:00Z');
+    const base = { startsAt: quando, endsAt: new Date(quando.getTime() + 3_600_000) };
+
+    const tenuta = await evento({
+      ...base,
+      status: 'ENDED',
+      formatClass: 'MEETING',
+      templateId: modello.id,
+      templateName: 'Riunione',
+      peakParticipants: 8,
+    });
+    await creaSessione(tenuta.id, {
+      startedAt: quando,
+      endedAt: new Date(quando.getTime() + 40 * 60_000),
+    });
+    await creaSessione(tenuta.id, {
+      startedAt: new Date(quando.getTime() + 50 * 60_000),
+      endedAt: new Date(quando.getTime() + 60 * 60_000),
+    });
+    await evento({
+      ...base,
+      status: 'PUBLISHED',
+      formatClass: 'MEETING',
+      templateId: modello.id,
+    });
+    // Una bozza non conta; un evento di un anno fa nemmeno.
+    await evento({ ...base, status: 'DRAFT', formatClass: 'MEETING' });
+    await evento({
+      startsAt: new Date('2025-10-01T09:00:00Z'),
+      endsAt: new Date('2025-10-01T10:00:00Z'),
+      status: 'ENDED',
+      formatClass: 'MEETING',
+    });
+    const rapida = await evento({
+      ...base,
+      eventType: 'INSTANT',
+      status: 'ENDED',
+      peakParticipants: 3,
+    });
+    await creaSessione(rapida.id, {
+      startedAt: quando,
+      endedAt: new Date(quando.getTime() + 600_000),
+    });
+
+    const s = await statisticheCatalogo(3, 'Europe/Rome', ora);
+
+    expect(s.months).toEqual(['2026-09', '2026-10', '2026-11']);
+    expect(s.byType.find((g) => g.type === 'MEETING')).toMatchObject({
+      events: 2,
+      held: 1,
+      avgParticipants: 8,
+      avgDurationMinutes: 50,
+    });
+    expect(s.byType.find((g) => g.type === 'INSTANT')).toMatchObject({
+      events: 1,
+      held: 1,
+      avgParticipants: 3,
+      avgDurationMinutes: 10,
+    });
+    expect(s.byTemplate.find((g) => g.templateId === modello.id)).toMatchObject({
+      name: 'Riunione',
+      events: 2,
+    });
+    expect(
+      s.byType.find((g) => g.type === 'MEETING')?.byMonth.map((c) => c.events)
+    ).toEqual([0, 0, 2]);
   });
 });

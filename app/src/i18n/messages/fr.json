@@ -2440,6 +2440,40 @@
         "avgParticipantsPerEvent": "Participants moyens par événement",
         "avgFeedbackRating": "Note moyenne des retours",
         "totalFeedback": "Réponses de retour"
+      },
+      "catalog": {
+        "title": "Types d'événement et modèles",
+        "intro": "Combien d'événements de chaque type et issus de chaque modèle, mois par mois. Uniquement des décomptes et des moyennes, aucune donnée personnelle. Les brouillons ne comptent pas.",
+        "periodLabel": "Période",
+        "months": "{count, plural, one {# mois} other {# mois}}",
+        "groupByLabel": "Regrouper par",
+        "groupBy": {
+          "type": "Type d'événement",
+          "template": "Modèle"
+        },
+        "rankingTypes": "Les types les plus fréquents",
+        "rankingTemplates": "Les modèles les plus utilisés",
+        "columns": {
+          "type": "Type",
+          "template": "Modèle",
+          "events": "Événements",
+          "held": "Tenus",
+          "avgParticipants": "Participants moy.",
+          "avgDuration": "Durée moy.",
+          "total": "Toute la période"
+        },
+        "measuresNote": "Tenus : événements dont la salle s'est ouverte. Participants moyens : le pic de personnes présentes en même temps, invités compris, en moyenne sur les événements tenus. Durée moyenne : le temps de salle mesuré, et non le temps prévu.",
+        "byMonth": "Mois par mois",
+        "measureLabel": "Mesure",
+        "measures": {
+          "events": "Événements",
+          "avgParticipants": "Participants moyens",
+          "avgDurationMinutes": "Durée moyenne"
+        },
+        "byMonthCaption": "{measure} par mois",
+        "empty": "Aucun événement sur cette période.",
+        "deletedTemplate": "{name} (supprimé)",
+        "uncatalogedNote": "Événements non catalogués : {count}. Ils ont été créés avant le catalogue, ou sans modèle ni format ; vous pouvez les cataloguer en modifiant l'événement, dans les détails techniques."
       }
     },
     "recurrence": {
@@ -2508,7 +2542,8 @@
       "postEventPublic": "Page publique après l'événement",
       "offerAddressBook": "Propose le carnet d'adresses aux personnes qui s'inscrivent",
       "invalidFields": "Vérifiez ces champs : {fields}.",
-      "descriptionOtherLanguages": "Il existe aussi des versions en : {languages}, qui ne se modifient pas ici. Si vous changez le texte italien, elles sont supprimées."
+      "descriptionOtherLanguages": "Il existe aussi des versions en : {languages}, qui ne se modifient pas ici. Si vous changez le texte italien, elles sont supprimées.",
+      "usedBy": "Événements créés à partir de ce modèle : {count}"
     },
     "instantCall": {
       "title": "Appel vidéo instantané",

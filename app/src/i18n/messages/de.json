@@ -2440,6 +2440,40 @@
         "avgParticipantsPerEvent": "Durchschnittliche Teilnehmende pro Veranstaltung",
         "avgFeedbackRating": "Durchschnittliche Feedback-Bewertung",
         "totalFeedback": "Feedback-Antworten"
+      },
+      "catalog": {
+        "title": "Veranstaltungstypen und Vorlagen",
+        "intro": "Wie viele Veranstaltungen jedes Typs und aus jeder Vorlage, Monat für Monat. Nur Anzahlen und Mittelwerte, keine personenbezogenen Daten. Entwürfe zählen nicht.",
+        "periodLabel": "Zeitraum",
+        "months": "{count, plural, one {# Monat} other {# Monate}}",
+        "groupByLabel": "Gruppieren nach",
+        "groupBy": {
+          "type": "Veranstaltungstyp",
+          "template": "Vorlage"
+        },
+        "rankingTypes": "Häufigste Typen",
+        "rankingTemplates": "Meistgenutzte Vorlagen",
+        "columns": {
+          "type": "Typ",
+          "template": "Vorlage",
+          "events": "Veranstaltungen",
+          "held": "Durchgeführt",
+          "avgParticipants": "Ø Teilnehmende",
+          "avgDuration": "Ø Dauer",
+          "total": "Gesamter Zeitraum"
+        },
+        "measuresNote": "Durchgeführt: Veranstaltungen, deren Raum geöffnet wurde. Durchschnittliche Teilnehmende: die höchste Zahl gleichzeitig Anwesender, Gäste eingeschlossen, gemittelt über die durchgeführten Veranstaltungen. Durchschnittliche Dauer: die gemessene Raumzeit, nicht die geplante.",
+        "byMonth": "Monat für Monat",
+        "measureLabel": "Messgröße",
+        "measures": {
+          "events": "Veranstaltungen",
+          "avgParticipants": "Durchschnittliche Teilnehmende",
+          "avgDurationMinutes": "Durchschnittliche Dauer"
+        },
+        "byMonthCaption": "{measure} pro Monat",
+        "empty": "Keine Veranstaltungen in diesem Zeitraum.",
+        "deletedTemplate": "{name} (gelöscht)",
+        "uncatalogedNote": "Nicht katalogisierte Veranstaltungen: {count}. Sie sind vor dem Katalog entstanden oder ohne Vorlage und ohne Format; Sie können sie beim Bearbeiten der Veranstaltung unter „Technische Details“ katalogisieren."
       }
     },
     "recurrence": {
@@ -2508,7 +2542,8 @@
       "postEventPublic": "Öffentliche Seite nach der Veranstaltung",
       "offerAddressBook": "Bietet bei der Anmeldung das Adressbuch an",
       "invalidFields": "Prüfen Sie diese Felder: {fields}.",
-      "descriptionOtherLanguages": "Es gibt auch Fassungen in: {languages}, die hier nicht bearbeitet werden können. Wenn Sie den italienischen Text ändern, werden sie entfernt."
+      "descriptionOtherLanguages": "Es gibt auch Fassungen in: {languages}, die hier nicht bearbeitet werden können. Wenn Sie den italienischen Text ändern, werden sie entfernt.",
+      "usedBy": "Aus dieser Vorlage erstellte Veranstaltungen: {count}"
     },
     "instantCall": {
       "title": "Sofort-Videoanruf",

@@ -2440,6 +2440,40 @@
         "avgParticipantsPerEvent": "Osalejaid ürituse kohta keskmiselt",
         "avgFeedbackRating": "Tagasiside keskmine hinne",
         "totalFeedback": "Tagasiside vastuseid"
+      },
+      "catalog": {
+        "title": "Ürituste tüübid ja mallid",
+        "intro": "Kui palju üritusi igast tüübist ja igast mallist kuude kaupa. Ainult arvud ja keskmised, isikuandmeid pole. Mustandeid ei arvestata.",
+        "periodLabel": "Periood",
+        "months": "{count, plural, one {# kuu} other {# kuud}}",
+        "groupByLabel": "Rühmita",
+        "groupBy": {
+          "type": "Ürituse tüüp",
+          "template": "Mall"
+        },
+        "rankingTypes": "Kõige sagedasemad tüübid",
+        "rankingTemplates": "Enim kasutatud mallid",
+        "columns": {
+          "type": "Tüüp",
+          "template": "Mall",
+          "events": "Üritused",
+          "held": "Toimunud",
+          "avgParticipants": "Keskm. osalejaid",
+          "avgDuration": "Keskm. kestus",
+          "total": "Kogu periood"
+        },
+        "measuresNote": "Toimunud: üritused, mille ruum avati. Keskmine osalejate arv: korraga kohal olnud inimeste tipparv koos külalistega, keskmiselt toimunud ürituste kohta. Keskmine kestus: mõõdetud ruumi aeg, mitte planeeritud aeg.",
+        "byMonth": "Kuude kaupa",
+        "measureLabel": "Näitaja",
+        "measures": {
+          "events": "Üritused",
+          "avgParticipants": "Keskmine osalejate arv",
+          "avgDurationMinutes": "Keskmine kestus"
+        },
+        "byMonthCaption": "{measure} kuude kaupa",
+        "empty": "Selles perioodis üritusi pole.",
+        "deletedTemplate": "{name} (kustutatud)",
+        "uncatalogedNote": "Kataloogimata üritusi: {count}. Need loodi enne kataloogi või ilma malli ja vormingu; saate need kataloogida ürituse muutmisel tehniliste üksikasjade all."
       }
     },
     "recurrence": {
@@ -2508,7 +2542,8 @@
       "postEventPublic": "Avalik ürituse järgne leht",
       "offerAddressBook": "Pakub registreerujatele aadressraamatut",
       "invalidFields": "Kontrollige neid välju: {fields}.",
-      "descriptionOtherLanguages": "On ka versioonid keeltes: {languages}, mida siin muuta ei saa. Kui muudate itaaliakeelset teksti, need eemaldatakse."
+      "descriptionOtherLanguages": "On ka versioonid keeltes: {languages}, mida siin muuta ei saa. Kui muudate itaaliakeelset teksti, need eemaldatakse.",
+      "usedBy": "Sellest mallist loodud üritusi: {count}"
     },
     "instantCall": {
       "title": "Kiire videokõne",

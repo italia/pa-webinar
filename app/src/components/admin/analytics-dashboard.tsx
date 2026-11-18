@@ -14,8 +14,14 @@ import {
   Table,
 } from 'design-react-kit';
 
+import CatalogStatsPanel from '@/components/admin/catalog-stats-panel';
 import { Icon } from '@/components/ui/icon';
 import { Link, percorso } from '@/i18n/navigation';
+import {
+  MESI_CATALOGO_PREDEFINITI,
+  type MesiCatalogo,
+  type StatisticheCatalogo,
+} from '@/lib/analytics/catalog-stats';
 
 type Period = '7d' | '30d' | '90d' | 'all';
 
@@ -64,11 +70,36 @@ export default function AnalyticsDashboard() {
   const [period, setPeriod] = useState<Period>('30d');
   const [data, setData] = useState<AnalyticsResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  // Tipi di evento e modelli (lib/analytics/catalog-stats), con il loro
+  // periodo in mesi: si leggono a parte, cosi' cambiare un periodo non rilegge
+  // l'altra meta' della pagina.
+  const [months, setMonths] = useState<MesiCatalogo>(MESI_CATALOGO_PREDEFINITI);
+  const [catalog, setCatalog] = useState<StatisticheCatalogo | null>(null);
+  const [catalogLoading, setCatalogLoading] = useState(true);
+
+  const fetchCatalog = useCallback(async (m: MesiCatalogo) => {
+    setCatalogLoading(true);
+    try {
+      const res = await fetch(`/api/admin/analytics?section=catalog&months=${m}`);
+      if (res.ok) {
+        const json = (await res.json()) as { catalog: StatisticheCatalogo };
+        setCatalog(json.catalog);
+      }
+    } catch {
+      // Come il resto della pagina: senza risposta restano i numeri di prima.
+    } finally {
+      setCatalogLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCatalog(months);
+  }, [months, fetchCatalog]);
 
   const fetchData = useCallback(async (p: Period) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/admin/analytics?period=${p}`);
+      const res = await fetch(`/api/admin/analytics?period=${p}&section=overview`);
       if (res.ok) {
         const json = await res.json();
         setData(json);
@@ -120,6 +151,16 @@ export default function AnalyticsDashboard() {
           <TimelineChart data={data.timeline} />
         </CardBody>
       </Card>
+
+      {/* Tipi di evento e modelli */}
+      {catalog && (
+        <CatalogStatsPanel
+          catalog={catalog}
+          months={months}
+          onMonthsChange={setMonths}
+          loading={catalogLoading}
+        />
+      )}
 
       {/* Top events table */}
       <Card className="border-0 shadow-sm mb-4">

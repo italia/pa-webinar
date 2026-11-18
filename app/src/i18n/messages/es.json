@@ -2440,6 +2440,40 @@
         "avgParticipantsPerEvent": "Participantes medios por evento",
         "avgFeedbackRating": "Valoración media",
         "totalFeedback": "Respuestas de valoración"
+      },
+      "catalog": {
+        "title": "Tipos de evento y plantillas",
+        "intro": "Cuántos eventos de cada tipo y de cada plantilla, mes a mes. Solo recuentos y medias, ningún dato personal. Los borradores no cuentan.",
+        "periodLabel": "Periodo",
+        "months": "{count, plural, one {# mes} other {# meses}}",
+        "groupByLabel": "Agrupar por",
+        "groupBy": {
+          "type": "Tipo de evento",
+          "template": "Plantilla"
+        },
+        "rankingTypes": "Los tipos más frecuentes",
+        "rankingTemplates": "Las plantillas más usadas",
+        "columns": {
+          "type": "Tipo",
+          "template": "Plantilla",
+          "events": "Eventos",
+          "held": "Celebrados",
+          "avgParticipants": "Participantes medios",
+          "avgDuration": "Duración media",
+          "total": "Todo el periodo"
+        },
+        "measuresNote": "Celebrados: eventos cuya sala se abrió. Participantes medios: el pico de personas presentes a la vez, invitados incluidos, de media en los eventos celebrados. Duración media: el tiempo de sala medido, no el programado.",
+        "byMonth": "Mes a mes",
+        "measureLabel": "Medida",
+        "measures": {
+          "events": "Eventos",
+          "avgParticipants": "Participantes medios",
+          "avgDurationMinutes": "Duración media"
+        },
+        "byMonthCaption": "{measure} por mes",
+        "empty": "No hay eventos en este periodo.",
+        "deletedTemplate": "{name} (eliminada)",
+        "uncatalogedNote": "Eventos sin catalogar: {count}. Se crearon antes del catálogo, o sin plantilla y sin formato; puedes catalogarlos al editar el evento, en los detalles técnicos."
       }
     },
     "recurrence": {
@@ -2508,7 +2542,8 @@
       "postEventPublic": "Página posterior al evento pública",
       "offerAddressBook": "Propone la agenda a quien se inscribe",
       "invalidFields": "Revise estos campos: {fields}.",
-      "descriptionOtherLanguages": "También hay versiones en: {languages}, que no se pueden editar aquí. Si cambia el texto en italiano, se eliminan."
+      "descriptionOtherLanguages": "También hay versiones en: {languages}, que no se pueden editar aquí. Si cambia el texto en italiano, se eliminan.",
+      "usedBy": "Eventos creados con esta plantilla: {count}"
     },
     "instantCall": {
       "title": "Videollamada instantánea",
