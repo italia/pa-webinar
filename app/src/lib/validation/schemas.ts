@@ -63,6 +63,9 @@ export const eventBaseSchema = z.object({
   requireOrganizationRole: z.boolean().default(false),
   requireOrganizationType: z.boolean().default(false),
   dataRetentionDays: z.number().int().min(1).max(MAX_RETENTION_DAYS).default(30),
+  // Quanto dura la registrazione: non segue la conservazione dei dati. Null =
+  // nessuna cancellazione automatica (lib/gdpr/cleanup-selection).
+  recordingDeleteAfterDays: z.number().int().min(1).max(365).nullable().optional(),
   privacyPolicyUrl: materialUrlSchema.optional(),
   // Un testo vuoto non e' un'informativa: vale "nessun testo dell'evento", e
   // all'iscrizione si mostra quella del template GDPR scelto.
@@ -224,7 +227,6 @@ export const updateEventSchema = parzialeSenzaDefault(eventBaseSchema).extend({
   recordingAudience: destinatariVideo.optional(),
   // In modifica null toglie il documento dell'informativa dell'evento.
   privacyPolicyUrl: materialUrlSchema.nullable().optional(),
-  recordingDeleteAfterDays: z.number().int().min(1).max(365).nullable().optional(),
   recordingUrl: materialUrlSchema.nullable().optional(),
   tempRecordingUrl: materialUrlSchema.nullable().optional(),
   recordingFileSize: z.number().int().nullable().optional(),

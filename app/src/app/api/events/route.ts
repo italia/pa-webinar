@@ -231,6 +231,7 @@ export const POST = withErrorHandling(async (request) => {
       templateName: catalogo.templateName,
       formatClass: catalogo.formatClass,
       dataRetentionDays: data.dataRetentionDays,
+      recordingDeleteAfterDays: data.recordingDeleteAfterDays ?? null,
       privacyPolicyUrl: data.privacyPolicyUrl,
       privacyPolicyText: data.privacyPolicyText,
       // Accettati dallo schema e inviati dai moduli, ma finora mai scritti:

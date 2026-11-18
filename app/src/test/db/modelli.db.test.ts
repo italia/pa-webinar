@@ -150,6 +150,36 @@ describe('dal modello all evento', () => {
     });
   });
 
+  it('la durata della registrazione passa dal modello all evento; senza, nessuna', async () => {
+    await entraCome('ADMIN');
+    const { id } = await salvaModello({
+      name: 'Archivio',
+      recordingEnabled: true,
+      recordingDeleteAfterDays: 365,
+    });
+    const { id: senza } = await salvaModello({ name: 'Storico', recordingEnabled: true });
+    const crea = async (idModello: string) => {
+      const riga = await prisma.eventTemplate.findUniqueOrThrow({ where: { id: idModello } });
+      const creazione = richiesta(
+        '/api/events',
+        'POST',
+        corpoEvento({
+          recordingEnabled: true,
+          // Come il wizard: il valore di partenza del modulo viene dal modello.
+          recordingDeleteAfterDays: presetDelModello(riga).recordingDeleteAfterDays ?? null,
+        })
+      );
+      creazione.headers.set('x-forwarded-for', `10.31.0.${(ultimoIndirizzo += 1)}`);
+      const risposta = await creaEvento(creazione as never, senzaParametri);
+      expect(risposta.status).toBe(201);
+      const { id: idEvento } = (await risposta.json()) as { id: string };
+      return prisma.event.findUniqueOrThrow({ where: { id: idEvento } });
+    };
+
+    expect((await crea(id)).recordingDeleteAfterDays).toBe(365);
+    expect((await crea(senza)).recordingDeleteAfterDays).toBeNull();
+  });
+
   it('un modello che non registra non accende chi conduce', async () => {
     await entraCome('ADMIN');
     const { id } = await salvaModello({

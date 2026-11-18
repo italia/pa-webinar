@@ -563,6 +563,9 @@ describe('modifica — salvataggio da un passo intermedio', () => {
       ([url, init]) => url === '/api/events/evt-2' && init?.method === 'PUT',
     );
     expect(put).toBeTruthy();
+    // La durata della registrazione non cambiata non si manda: la cambia anche
+    // il pannello della registrazione.
+    expect(JSON.parse(String(put![1].body))).not.toHaveProperty('recordingDeleteAfterDays');
     expect(push).toHaveBeenCalledTimes(1);
   });
 
@@ -1635,6 +1638,22 @@ describe('creazione — i default del modello', () => {
       multitrackRecordingEnabled: true,
       aiTargetLocales: 'en,fr,es,de',
     });
+  });
+
+  it('la durata della registrazione del modello parte nel salvataggio', async () => {
+    renderWizard({ template: { ...modello, recordingDeleteAfterDays: 90 } });
+    compila();
+    goToStep('review');
+    await press(button(w.saveDraft));
+    expect(payloadInviato().recordingDeleteAfterDays).toBe(90);
+  });
+
+  it('senza una durata nel modello la registrazione non ha scadenza', async () => {
+    renderWizard({ template: modello });
+    compila();
+    goToStep('review');
+    await press(button(w.saveDraft));
+    expect(payloadInviato().recordingDeleteAfterDays).toBeNull();
   });
 
   it('il sopratitolo si spiega sotto il titolo, e con «|» si vede e si sceglie', async () => {

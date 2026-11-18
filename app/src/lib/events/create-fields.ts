@@ -78,6 +78,7 @@ export const CREATED_EVENT_FIELDS = [
   // registrazione e pubblicazione
   'recordingEnabled',
   'recordingDestination',
+  'recordingDeleteAfterDays',
   'autoStartRecording',
   'multitrackRecordingEnabled',
   'retainParticipantTracks',

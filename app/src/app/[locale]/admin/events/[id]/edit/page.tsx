@@ -322,6 +322,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       expectedSpeakers: event.expectedSpeakers,
       status: event.status,
       dataRetentionDays: event.dataRetentionDays,
+      recordingDeleteAfterDays: event.recordingDeleteAfterDays,
       postEventPublic: event.postEventPublic,
       postEventShowQA: event.postEventShowQA,
       gdprTemplateId: event.gdprTemplateId,

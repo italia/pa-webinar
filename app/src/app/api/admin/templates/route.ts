@@ -64,6 +64,9 @@ const templateSchema = z.object({
   aiTargetLocales: z.string().max(200).nullish(),
   descriptionTemplate: z.record(z.string(), z.string()).nullish(),
   defaultRetentionDays: z.number().int().min(1).max(MAX_RETENTION_DAYS).nullish(),
+  // La durata della registrazione degli eventi creati dal modello
+  // (Event.recordingDeleteAfterDays). null = nessuna cancellazione automatica.
+  recordingDeleteAfterDays: z.number().int().min(1).max(365).nullish(),
   defaultExpectedSpeakers: z.number().int().min(1).max(30).nullish(),
   // Matrice ruolo × funzione (lib/utils/permission-matrix.ts). Facoltativa:
   // se c'è, precompila il passo «Permessi» del wizard; se manca, il wizard la

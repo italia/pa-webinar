@@ -22,6 +22,7 @@ import { Icon } from '@/components/ui/icon';
 import ToggleSwitch from '@/components/ui/toggle-switch';
 import { useConfirm } from '@/components/ui/confirm-dialog';
 import type { Destinazione } from '@/lib/recording/destination';
+import { NESSUNA_CANCELLAZIONE, RETENTION_OPTIONS } from '@/lib/recording/retention-options';
 import { MAX_RETENTION_DAYS } from '@/lib/validation/retention';
 
 interface SerializedTemplate {
@@ -56,6 +57,7 @@ interface SerializedTemplate {
   retainParticipantTracks: boolean;
   descriptionTemplate: Record<string, string> | null;
   defaultRetentionDays: number | null;
+  recordingDeleteAfterDays: number | null;
   defaultExpectedSpeakers: number | null;
   isSystem: boolean;
   sortOrder: number;
@@ -113,6 +115,7 @@ interface EditingTemplate {
   /** L'italiano com'era all'apertura. */
   descriptionTemplateItOriginal: string;
   defaultRetentionDays: number | null;
+  recordingDeleteAfterDays: number | null;
   defaultExpectedSpeakers: number | null;
 }
 
@@ -154,6 +157,8 @@ const DEFAULT_NEW: EditingTemplate = {
   descriptionTemplateOther: {},
   descriptionTemplateItOriginal: '',
   defaultRetentionDays: null,
+  // Come sugli eventi: nessuna cancellazione automatica della registrazione.
+  recordingDeleteAfterDays: null,
   defaultExpectedSpeakers: null,
 };
 
@@ -219,6 +224,7 @@ export default function TemplateManagement({
         tpl.defaultRetentionDays == null
           ? null
           : Math.min(tpl.defaultRetentionDays, MAX_RETENTION_DAYS),
+      recordingDeleteAfterDays: tpl.recordingDeleteAfterDays ?? null,
       defaultExpectedSpeakers: tpl.defaultExpectedSpeakers,
     });
     setEditing(tpl.id);
@@ -263,6 +269,7 @@ export default function TemplateManagement({
           maxParticipants: t('maxParticipantsLabel'),
           defaultDurationMinutes: t('durationLabel'),
           defaultRetentionDays: t('retentionLabel'),
+          recordingDeleteAfterDays: t('recordingRetentionLabel'),
           defaultExpectedSpeakers: t('expectedSpeakersLabel'),
           descriptionTemplate: t('descriptionTemplateLabel'),
         };
@@ -518,6 +525,7 @@ function TemplateForm({
   // Duplicarle sotto `admin.templates` vorrebbe dire due testi da tenere
   // allineati in 24 lingue per la stessa cosa.
   const ta = useTranslations('admin.form');
+  const tRec = useTranslations('recording');
   const tw = useTranslations('admin.wizard.step2');
   const tPost = useTranslations('postEvent');
 
@@ -595,6 +603,33 @@ function TemplateForm({
           max={MAX_RETENTION_DAYS}
         />
       </FormGroup>
+
+      {/* La durata della registrazione degli eventi del modello: le stesse
+          scelte del pannello della registrazione. */}
+      <div className="mb-3">
+        <label className="form-label" htmlFor="tpl-recording-retention">
+          {t('recordingRetentionLabel')}
+        </label>
+        <select
+          id="tpl-recording-retention"
+          className="form-select"
+          value={form.recordingDeleteAfterDays ?? NESSUNA_CANCELLAZIONE}
+          onChange={(e) => {
+            const giorni = Number(e.target.value);
+            setField('recordingDeleteAfterDays', giorni === NESSUNA_CANCELLAZIONE ? null : giorni);
+          }}
+          aria-describedby="tpl-recording-retention-help"
+        >
+          {RETENTION_OPTIONS.map(({ value, labelKey }) => (
+            <option key={value} value={value}>
+              {tRec(labelKey)}
+            </option>
+          ))}
+        </select>
+        <small id="tpl-recording-retention-help" className="form-text text-muted">
+          {t('recordingRetentionHint')}
+        </small>
+      </div>
 
       <FormGroup className="mb-3">
         <Input

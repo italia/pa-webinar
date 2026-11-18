@@ -20,6 +20,7 @@ import { useToast } from '@/components/ui/toast';
 import { useConfirm } from '@/components/ui/confirm-dialog';
 import { codiceErrore, messaggioErroreApi } from '@/lib/api-error-message';
 import { esitoPubblicazione, type Destinazione } from '@/lib/recording/destination';
+import { NESSUNA_CANCELLAZIONE, RETENTION_OPTIONS } from '@/lib/recording/retention-options';
 import RecordingUploadWidget from './recording-upload-widget';
 
 interface RecordingManagementProps {
@@ -50,18 +51,6 @@ interface RecordingManagementProps {
    *  regolare (pagina della post-produzione, scheda «Slide»). */
   slidesRecordingId?: string | null;
 }
-
-/** Quanto dura la registrazione dell'evento (`recordingDeleteAfterDays`): dalla
- *  pubblicazione finche' il video e' pubblicato, altrimenti dalla fine
- *  dell'evento (lib/gdpr/cleanup-selection). -1 = nessuna cancellazione. */
-export const RETENTION_OPTIONS = [
-  { value: 1, labelKey: 'retention.24h' },
-  { value: 7, labelKey: 'retention.7d' },
-  { value: 30, labelKey: 'retention.30d' },
-  { value: 90, labelKey: 'retention.90d' },
-  { value: 365, labelKey: 'retention.1y' },
-  { value: -1, labelKey: 'retention.forever' },
-] as const;
 
 function formatDuration(seconds: number): string {
   const h = Math.floor(seconds / 3600);
@@ -187,7 +176,7 @@ export default function RecordingManagement({
   const handleRetentionChange = useCallback(
     async (days: number) => {
       const prima = retentionDays;
-      const val = days === -1 ? null : days;
+      const val = days === NESSUNA_CANCELLAZIONE ? null : days;
       setRetentionDays(val);
       const errore = await updateField({ recordingDeleteAfterDays: val });
       if (errore) {
@@ -463,7 +452,9 @@ export default function RecordingManagement({
                     type="radio"
                     id={`retention-${value}`}
                     name="retention"
-                    checked={value === -1 ? retentionDays === null : retentionDays === value}
+                    checked={
+                      value === NESSUNA_CANCELLAZIONE ? retentionDays === null : retentionDays === value
+                    }
                     onChange={() => handleRetentionChange(value)}
                     disabled={saving}
                   />

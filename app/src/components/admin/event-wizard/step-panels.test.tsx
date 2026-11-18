@@ -256,6 +256,45 @@ describe('Dati e pagina dopo l evento — le domande', () => {
   });
 });
 
+describe('Dati e pagina dopo l evento — la durata della registrazione', () => {
+  const s5 = messages.admin.wizard.step5;
+  const durata = () =>
+    container.querySelector<HTMLSelectElement>('#rev-recording-retention');
+  const mostra = (form: WizardForm, onChange = vi.fn(), durataRegistrazione?: boolean) =>
+    mount(
+      <SezioneDati
+        form={form}
+        onChange={onChange}
+        gdprTemplates={[]}
+        durataRegistrazione={durataRegistrazione}
+      />,
+    );
+
+  it('si sceglie dove l evento registra, e senza scelta non ha scadenza', () => {
+    const onChange = vi.fn();
+    mostra(modulo({ recordingEnabled: true, recordingDeleteAfterDays: null }), onChange);
+    expect(durata()?.value).toBe('-1');
+    expect(container.textContent).toContain(s5.recordingRetentionHelp);
+    act(() => {
+      durata()!.value = '365';
+      durata()!.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    expect(onChange).toHaveBeenCalledWith({ recordingDeleteAfterDays: 365 });
+  });
+
+  it('vale anche per la sola trascrizione dai sottotitoli', () => {
+    mostra(modulo({ recordingEnabled: false, captionsTranscriptEnabled: true }));
+    expect(durata()).not.toBeNull();
+  });
+
+  it('senza niente da registrare, o con un link di conduzione, non si propone', () => {
+    mostra(modulo({ recordingEnabled: false, captionsTranscriptEnabled: false }));
+    expect(durata()).toBeNull();
+    mostra(modulo({ recordingEnabled: true }), vi.fn(), false);
+    expect(durata()).toBeNull();
+  });
+});
+
 describe('Riepilogo — cio che il formato ha scelto', () => {
   const f = messages.admin.wizard.flow;
   const tp = messages.admin.wizard.step2;

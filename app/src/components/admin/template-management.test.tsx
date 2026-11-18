@@ -138,6 +138,7 @@ describe('TemplateManagement — i valori del formato', () => {
     retainParticipantTracks: false,
     descriptionTemplate: null,
     defaultRetentionDays: null,
+    recordingDeleteAfterDays: 90 as number | null,
     defaultExpectedSpeakers: null,
     isSystem: true,
     sortOrder: 1,
@@ -155,6 +156,8 @@ describe('TemplateManagement — i valori del formato', () => {
     container.querySelector<HTMLInputElement>(`input[aria-label="${nome}"]`)!;
   const destinazione = () =>
     container.querySelector<HTMLSelectElement>('#tpl-recording-destination')!;
+  const durata = () =>
+    container.querySelector<HTMLSelectElement>('#tpl-recording-retention')!;
   const fetchMock = vi.fn();
 
   function apri() {
@@ -244,6 +247,21 @@ describe('TemplateManagement — i valori del formato', () => {
       hostsAlwaysRecorded: false,
       recordingDestination: 'REGISTRANTS',
     });
+  });
+
+  it('la durata della registrazione: nessuna in un modello nuovo, la sua in uno salvato', async () => {
+    render(true);
+    expect(durata().value).toBe('-1');
+    expect(durata().textContent).toContain(messages.recording.retention.forever);
+    act(() => root.unmount());
+    root = createRoot(container);
+    apri();
+    expect(durata().value).toBe('90');
+    act(() => {
+      durata().value = '-1';
+      durata().dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    expect((await salva()).recordingDeleteAfterDays).toBeNull();
   });
 
   it('la destinazione si puo lasciare a chi crea l evento', async () => {
