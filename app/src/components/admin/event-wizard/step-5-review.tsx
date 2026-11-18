@@ -21,7 +21,7 @@ import { Icon } from '@/components/ui/icon';
 import { useDurataTesto } from '@/hooks/use-durata-testo';
 import { durataProgramma } from '@/lib/agenda/programme';
 import { parseLocaleList } from '@/lib/ai/target-locales';
-import { conduceNelVideo, type VoceNelVideo } from '@/lib/live/consent-rule';
+import { conduceNelVideo, type PartecipantiNelVideo } from '@/lib/live/consent-rule';
 import { registraChiConduce } from '@/lib/live/entry-consents';
 import { elencoVisibileAlPubblico } from '@/lib/live/participant-list';
 import { domandePubbliche } from '@/lib/events/post-event-sections';
@@ -75,8 +75,8 @@ interface Props {
   mancanti?: CampoMancante[];
   /** L'installazione puo' registrare: senza, non si chiede il consenso. */
   recordingAvailable?: boolean;
-  /** La voce di chi non acconsente nel video (lib/recording/availability). */
-  voceNelVideo?: VoceNelVideo;
+  /** Come compaiono nel video i partecipanti (lib/recording/availability). */
+  partecipantiNelVideo?: PartecipantiNelVideo;
   /** Chiamata rapida: nessuna iscrizione, e chi conduce non e' interpellato. */
   istantanea?: boolean;
   aiPipelineEnabled?: boolean;
@@ -133,7 +133,7 @@ export default function Step5Review({
   mancanti = [],
   aiPipelineEnabled = true,
   recordingAvailable = true,
-  voceNelVideo = 'rimovibile',
+  partecipantiNelVideo = 'solo-voce',
   istantanea = false,
   liveCaptionsAvailable = false,
   addressBookEnabled = true,
@@ -217,10 +217,10 @@ export default function Step5Review({
   // partecipa, con la stessa regola (lib/registration/consents): chi crea
   // l'evento vede prima cosa si chiedera', e se la scelta e' quella voluta.
   // Accesa, ma non produrrebbe nulla: il riepilogo non la promette.
-  const vuota = registrazioneVuota(form, voceNelVideo, recordingAvailable);
+  const vuota = registrazioneVuota(form, partecipantiNelVideo, recordingAvailable);
   const registra = form.recordingEnabled && recordingAvailable && !vuota;
   const destinazioneDopo = destinazioneDopoIlSalvataggio(form, destinazioneSenzaScelta);
-  const conVideo = videoDaDestinare(voceNelVideo);
+  const conVideo = videoDaDestinare(partecipantiNelVideo);
   const trascrizioneVideo = trascrizioneDalVideo(
     {
       eventType: istantanea ? 'INSTANT' : null,
@@ -229,28 +229,38 @@ export default function Step5Review({
     },
     { aiPipelineEnabled },
     recordingAvailable,
-    voceNelVideo,
+    partecipantiNelVideo,
   );
-  const consensi = consensiRichiesti({
-    recordingEnabled: registra,
-    multitrackRecordingEnabled: registra && !!form.multitrackRecordingEnabled,
-    captionsTranscript:
-      liveCaptionsAvailable && form.liveCaptionsEnabled && !!form.captionsTranscriptEnabled,
-    trascrizioneVideo,
-    participantsCanUnmute: toggles.participantsCanUnmute,
-    participantsCanStartVideo: toggles.participantsCanStartVideo,
-    participantsCanShareScreen: toggles.participantsCanShareScreen,
-  });
+  const consensi = consensiRichiesti(
+    {
+      recordingEnabled: registra,
+      multitrackRecordingEnabled: registra && !!form.multitrackRecordingEnabled,
+      captionsTranscript:
+        liveCaptionsAvailable && form.liveCaptionsEnabled && !!form.captionsTranscriptEnabled,
+      trascrizioneVideo,
+      participantsCanUnmute: toggles.participantsCanUnmute,
+      participantsCanStartVideo: toggles.participantsCanStartVideo,
+      participantsCanShareScreen: toggles.participantsCanShareScreen,
+    },
+    partecipantiNelVideo
+  );
   const vociConsenso = [
     consensi.registrazione &&
       tf(
-        voceNelVideo === 'rimovibile'
+        partecipantiNelVideo === 'solo-voce'
           ? 'consentRecordingVoice'
-          : voceNelVideo === 'fissa'
+          : partecipantiNelVideo === 'visibili'
             ? 'consentRecordingFree'
             : 'consentRecordingOptional'
       ),
-    consensi.avvisoRegistrazione && tf('consentRecordingNotice'),
+    // Dove chi partecipa non entra mai nel video non c'e' niente da chiedere, e
+    // l'avviso dice perche'.
+    consensi.avvisoRegistrazione &&
+      tf(
+        partecipantiNelVideo === 'esclusi'
+          ? 'consentRecordingHostsOnly'
+          : 'consentRecordingNotice'
+      ),
     consensi.tracce && tf('consentTranscription'),
   ].filter((x): x is string => !!x);
   const traduce =
@@ -600,8 +610,8 @@ export default function Step5Review({
               {vociConsenso.length > 0
                 ? tf('consentsLine', { list: vociConsenso.join(' · ') })
                 : tf('consentsNone')}
-              {registraChiConduce({ recordingEnabled: form.recordingEnabled && !vuota, eventType: istantanea ? 'INSTANT' : null }, recordingAvailable, voceNelVideo) &&
-                conduceNelVideo(voceNelVideo) && (
+              {registraChiConduce({ recordingEnabled: form.recordingEnabled && !vuota, eventType: istantanea ? 'INSTANT' : null }, recordingAvailable, partecipantiNelVideo) &&
+                conduceNelVideo(partecipantiNelVideo) && (
                 <span className="d-block text-secondary small mt-1">{tf('consentsHostsAlways')}</span>
               )}
               {(consensi.registrazione || consensi.tracce) && (
@@ -663,7 +673,7 @@ export default function Step5Review({
             participantsCanUnmute={toggles.participantsCanUnmute}
             participantsCanStartVideo={toggles.participantsCanStartVideo}
             participantsCanShareScreen={toggles.participantsCanShareScreen}
-            voce={voceNelVideo}
+            partecipanti={partecipantiNelVideo}
           />
         )}
         {capacita && (

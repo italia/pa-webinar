@@ -261,14 +261,14 @@ describe('sala d\'attesa — gli altri campi che trattengono', () => {
   });
 
   it.each([
-    ['fissa', messages.gdpr.consent.multitrackOptional],
-    ['rimovibile', messages.gdpr.consent.multitrackOptionalShort],
+    ['visibili', messages.gdpr.consent.multitrackOptional],
+    ['solo-voce', messages.gdpr.consent.multitrackOptionalShort],
     ['assente', messages.gdpr.consent.multitrackOptionalShort],
-  ] as const)('con la voce %s la nota dice solo cio\' che vale per il video', (voce, nota) => {
+  ] as const)('con la voce %s la nota dice solo cio\' che vale per il video', (partecipanti, nota) => {
     render({
       role: 'participant',
       defaultName: 'Relatore 1',
-      voce,
+      partecipanti,
       event: { ...eventoLive, multitrackRecordingEnabled: true },
     });
     expect($('#waiting-multitrack-consent-nota')?.textContent).toBe(nota);
@@ -439,13 +439,23 @@ describe('sala d\'attesa — avviso di registrazione', () => {
     render({ event: { ...eventoLive, recordingEnabled: true }, recordingListenOnly: true });
     expect(container.textContent).toContain(messages.gdpr.consent.recordingNoticeVoice);
     expect($('#waiting-recording-consent')).toBeNull();
-    // Dove la voce non si puo' escludere, resta l'avviso di sempre.
+    // Dove la voce non si puo' escludere, resta l'avviso di sempre, e il nome
+    // puo' comparire.
     render({
       event: { ...eventoLive, recordingEnabled: true },
       recordingListenOnly: true,
-      voce: 'fissa',
+      partecipanti: 'visibili',
     });
     expect(container.textContent).toContain(messages.gdpr.consent.recordingNotice);
+    expect(container.textContent).toContain(messages.gdpr.consent.namesMayAppear);
+    // Dove chi partecipa non entra mai nel video lo dice.
+    render({
+      event: { ...eventoLive, recordingEnabled: true },
+      recordingListenOnly: true,
+      partecipanti: 'esclusi',
+    });
+    expect(container.textContent).toContain(messages.gdpr.consent.recordingHostsOnly);
+    expect(container.textContent).not.toContain(messages.gdpr.consent.namesMayAppear);
   });
 });
 
@@ -459,6 +469,21 @@ describe('sala d\'attesa — chiamata rapida che registra', () => {
     expect(container.textContent).toContain(t.recordingNoticeInstant);
     expect(container.textContent).not.toContain(t.recordingNotice);
     expect($('#waiting-recording-consent')).toBeNull();
+  });
+
+  it("dove chi partecipa non entra mai nel video annuncia solo chi conduce, e la trascrizione vale da sola", () => {
+    render({
+      role: 'guest',
+      defaultName: 'Ospite',
+      event: { ...eventoLive, recordingEnabled: true, multitrackRecordingEnabled: true },
+      eventType: 'INSTANT',
+      recordingAskedInRoom: true,
+      partecipanti: 'esclusi',
+    });
+    expect(container.textContent).toContain(t.recordingNoticeInstantHostsOnly);
+    expect(container.textContent).not.toContain(t.recordingNoticeInstant);
+    expect($('#waiting-recording-consent')).toBeNull();
+    expect($('#waiting-multitrack-consent')).not.toBeNull();
   });
 
   it('la trascrizione non si chiede: senza il consenso alla registrazione non varrebbe', () => {
@@ -498,8 +523,25 @@ describe('sala d\'attesa — consenso alla registrazione', () => {
   });
 
   it('dove la voce non si puo\' togliere dal video dice che si resta in ascolto', () => {
-    render({ event: evento, defaultName: 'Relatore 1', recordingConsentRequired: true, voce: 'fissa' });
+    render({ event: evento, defaultName: 'Relatore 1', recordingConsentRequired: true, partecipanti: 'visibili' });
     expect(container.textContent).toContain(messages.gdpr.consent.recordingOptionalListenOnly);
+  });
+
+  it("dove chi partecipa puo' comparire non promette che volto e nome restano fuori", () => {
+    render({
+      event: evento,
+      defaultName: 'Relatore 1',
+      recordingConsentRequired: true,
+      recordingDestination: 'REGISTRANTS',
+      partecipanti: 'visibili',
+    });
+    const g = messages.gdpr.consent;
+    expect(container.textContent).toContain(t.recordingConsentTitleVisible);
+    expect(container.textContent).toContain(t.recordingConsentIntroVisible);
+    expect(container.textContent).toContain(g.namesMayAppear);
+    expect($('label[for="waiting-recording-consent"]')?.textContent).toBe(g.recordingVisibleReserved);
+    expect(container.textContent).not.toContain(t.recordingConsentIntro);
+    expect(container.textContent).not.toContain(g.recordingReserved);
   });
 
   it('chi l\'ha gia\' dato entra con un clic, senza casella', () => {
@@ -853,7 +895,7 @@ describe('sala d\'attesa — il testo segue la destinazione', () => {
   });
 
   it('senza video lo dice sopra e nella casella, qualunque sia la destinazione', () => {
-    render({ ...ingresso, recordingDestination: 'PUBLIC', voce: 'assente' });
+    render({ ...ingresso, recordingDestination: 'PUBLIC', partecipanti: 'assente' });
     expect(etichetta()).toBe(g.recordingNoVideo);
     expect(container.textContent).toContain(t.recordingConsentIntroNoVideo);
     expect(container.textContent).not.toContain(t.recordingConsentIntro);
@@ -872,13 +914,13 @@ describe('sala d\'attesa — il testo segue la destinazione', () => {
   });
 
   it('senza video il testo scelto per l\'evento non si mostra: direbbe il contrario della casella', () => {
-    render({ ...ingresso, voce: 'assente', recordingConsentText: 'Testo dell\'ente.' });
+    render({ ...ingresso, partecipanti: 'assente', recordingConsentText: 'Testo dell\'ente.' });
     expect(container.textContent).not.toContain('Testo dell\'ente.');
     expect(container.textContent).toContain(t.recordingConsentIntroNoVideo);
   });
 
   it('con un video il testo scelto per l\'evento resta', () => {
-    render({ ...ingresso, voce: 'fissa', recordingConsentText: 'Testo dell\'ente.' });
+    render({ ...ingresso, partecipanti: 'visibili', recordingConsentText: 'Testo dell\'ente.' });
     expect(container.textContent).toContain('Testo dell\'ente.');
     expect(container.textContent).not.toContain(t.recordingConsentIntro);
   });
@@ -969,6 +1011,7 @@ describe('sala d\'attesa — la scheda privacy', () => {
       destinazione: 'PUBLIC',
       chiNonAcconsente: 'restaFuori',
       conduceSempre: false,
+      partecipanti: null,
     },
     trascrizione: { chiesta: false, sottotitoli: false, tracce: null, dalVideo: false },
     sottotitoli: { attivi: true, testoConservato: false },
@@ -986,6 +1029,7 @@ describe('sala d\'attesa — la scheda privacy', () => {
       destinazione: null,
       chiNonAcconsente: null,
       conduceSempre: false,
+      partecipanti: null,
     },
   };
   const eventoConAvvisi: Evento = {
@@ -1125,7 +1169,7 @@ describe('sala d\'attesa — la scheda privacy', () => {
     render({
       event: { ...eventoLive, recordingEnabled: true },
       schedaPrivacy: SENZA_REGISTRAZIONE,
-      voce: 'assente',
+      partecipanti: 'assente',
     });
     expect(container.textContent).toContain(sheet.recording.none);
     expect(container.textContent).not.toContain(t.recordingNotice);

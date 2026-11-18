@@ -234,6 +234,7 @@ beforeEach(() => {
   };
   vi.stubEnv('JITSI_WEB_INTERNAL_URL', '');
   vi.stubEnv('RECORDING_VOICE_EXCLUSION', 'true');
+  vi.stubEnv('RECORDING_PARTICIPANT_VOICE', 'true');
   vi.mocked(prisma.registration.count).mockResolvedValue(0);
   vi.mocked(prisma.recordingConsent.findFirst).mockResolvedValue(null);
   vi.mocked(prisma.recordingConsent.findMany).mockResolvedValue([]);
@@ -282,7 +283,7 @@ describe('sala — la scheda privacy', () => {
     vi.stubEnv('RECORDER_CONTROLLER_URL', 'http://recorder-controller');
     conEvento();
     const { event } = await clientProps();
-    expect(event.voceNelVideo).toBe('assente');
+    expect(event.partecipantiNelVideo).toBe('assente');
     expect(scheda({ event } as PropsClient)?.registrazione.destinazione).toBeNull();
   });
 

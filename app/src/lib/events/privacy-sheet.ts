@@ -12,7 +12,7 @@ import { tracceConfigurate } from '@/lib/live/capture-state';
 import {
   conduceNelVideo,
   regolaConsenso,
-  type VoceNelVideo,
+  type PartecipantiNelVideo,
 } from '@/lib/live/consent-rule';
 import { registraChiConduce } from '@/lib/live/entry-consents';
 import { elencoVisibileAlPubblico } from '@/lib/live/participant-list';
@@ -20,9 +20,9 @@ import { rubricaProposta } from '@/lib/persons/address-book';
 import { MESI_RUBRICA_PREDEFINITI } from '@/lib/persons/retention';
 import {
   eventoRegistrabile,
+  partecipantiNelVideo,
   recordingAvailable,
   tracceDisponibili,
-  voceNelVideo,
 } from '@/lib/recording/availability';
 import { destinazioneDelTesto } from '@/lib/recording/destination';
 import {
@@ -61,8 +61,15 @@ export type DestinazioneScheda = RecordingAudience | 'nonDichiarata';
  *  - `avviso`: il pubblico non ha microfono, videocamera e schermo e non c'e'
  *    niente da chiedere, finche' chi conduce non gli da' la parola;
  *  - `avvisoVoce`: come sopra, e chi riceve la parola acconsente in sala;
+ *  - `maiNelVideo`: chi partecipa non entra mai nel video, nemmeno con la voce
+ *    ('esclusi'): non c'e' niente a cui acconsentire.
  */
-export type ChiNonAcconsente = 'restaFuori' | 'soloAscolto' | 'avviso' | 'avvisoVoce';
+export type ChiNonAcconsente =
+  | 'restaFuori'
+  | 'soloAscolto'
+  | 'avviso'
+  | 'avvisoVoce'
+  | 'maiNelVideo';
 
 export interface SchedaPrivacy {
   registrazione: {
@@ -72,8 +79,12 @@ export interface SchedaPrivacy {
     /** Null se non si registra niente. */
     chiNonAcconsente: ChiNonAcconsente | null;
     /** C'e' un video, e chi conduce ci e' sempre, con nome e immagine; chi
-     *  partecipa mai, solo la sua voce con il consenso (lib/live/consent-rule). */
+     *  partecipa come dice `partecipanti` (lib/live/consent-rule). */
     conduceSempre: boolean;
+    /** Come compaiono nel video i partecipanti: decide il testo accanto a
+     *  `conduceSempre`, che non promette piu' di quanto l'installazione
+     *  garantisce. Null se non c'e' un video. */
+    partecipanti: Exclude<PartecipantiNelVideo, 'assente'> | null;
   };
   trascrizione: {
     /** L'evento chiede il consenso alla trascrizione (`trascrizioneRichiesta`). */
@@ -135,7 +146,7 @@ export interface SchedaPrivacy {
  */
 export interface AmbienteScheda {
   registrazioneDisponibile: boolean;
-  voce: VoceNelVideo;
+  partecipanti: PartecipantiNelVideo;
   sottotitoliDisponibili: boolean;
   trascrizioneSottotitoli: boolean;
   tracceDisponibili: boolean;
@@ -184,10 +195,11 @@ function chiNonAcconsente(
   evento: EventoScheda,
   ambiente: AmbienteScheda
 ): ChiNonAcconsente {
-  const regola = regolaConsenso(evento, ambiente.registrazioneDisponibile, ambiente.voce);
+  const regola = regolaConsenso(evento, ambiente.registrazioneDisponibile, ambiente.partecipanti);
   if (regola.soloAscolto) return 'soloAscolto';
   if (regola.richiesto) return 'restaFuori';
-  return ambiente.voce === 'fissa' ? 'avviso' : 'avvisoVoce';
+  if (ambiente.partecipanti === 'esclusi') return 'maiNelVideo';
+  return ambiente.partecipanti === 'visibili' ? 'avviso' : 'avvisoVoce';
 }
 
 /**
@@ -209,10 +221,10 @@ export function schedaPrivacy({
 }): SchedaPrivacy | null {
   if (evento.eventType === 'INSTANT') return null;
 
-  const { registrazioneDisponibile, voce } = ambiente;
+  const { registrazioneDisponibile, partecipanti } = ambiente;
   const registrabile = eventoRegistrabile(evento, ambiente);
   const siRegistra = registraChiConduce(evento, registrabile);
-  const video = siRegistra && voce !== 'assente';
+  const video = siRegistra && partecipanti !== 'assente';
   const tracce = tracceConfigurate(
     evento,
     registrazioneDisponibile && ambiente.tracceDisponibili
@@ -222,7 +234,7 @@ export function schedaPrivacy({
   if (video) modo = evento.autoStartRecording ? 'automatica' : 'manuale';
   else if (siRegistra) modo = 'soloTracce';
 
-  const trascriveVideo = trascrizioneDalVideo(evento, sito, registrazioneDisponibile, voce);
+  const trascriveVideo = trascrizioneDalVideo(evento, sito, registrazioneDisponibile, partecipanti);
   // `trascrizioneDalVideo` e' vera anche con le tracce per persona, che sono la
   // via che la pipeline prende quando ci sono.
   const dalVideo = !tracce && trascriveVideo;
@@ -233,10 +245,11 @@ export function schedaPrivacy({
     registrazione: {
       modo,
       destinazione: video
-        ? (destinazioneDelTesto(evento.recordingDestination, voce) ?? 'nonDichiarata')
+        ? (destinazioneDelTesto(evento.recordingDestination, partecipanti) ?? 'nonDichiarata')
         : null,
       chiNonAcconsente: siRegistra ? chiNonAcconsente(evento, ambiente) : null,
-      conduceSempre: siRegistra && conduceNelVideo(voce),
+      conduceSempre: siRegistra && conduceNelVideo(partecipanti),
+      partecipanti: video ? partecipanti : null,
     },
     trascrizione: {
       chiesta: trascrizioneRichiesta({
@@ -299,7 +312,7 @@ export function schedaPrivacyEvento(
     sito,
     ambiente: {
       registrazioneDisponibile: recordingAvailable(),
-      voce: voceNelVideo(),
+      partecipanti: partecipantiNelVideo(),
       sottotitoliDisponibili: liveCaptionsAvailable(sito),
       trascrizioneSottotitoli: captionsTranscriptActive(evento, sito),
       tracceDisponibili: tracceDisponibili(),

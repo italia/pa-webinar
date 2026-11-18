@@ -24,14 +24,16 @@
  * Il consenso alla registrazione e' libero (art. 7.4 GDPR): non e' mai una
  * condizione per iscriversi o per entrare. Chi non lo da' partecipa come tutti e
  * resta fuori dalla registrazione; dove la voce non si puo' togliere dal video,
- * il pubblico senza consenso resta in solo ascolto (lib/live/listen-only).
+ * il pubblico senza consenso resta in solo ascolto (lib/live/listen-only). Dove
+ * chi partecipa non e' mai nel video, nemmeno con la voce ('esclusi',
+ * lib/live/consent-rule), non c'e' niente a cui acconsentire: un'informativa.
  *
  * Vale per il modulo di iscrizione, per la rotta che la salva e per l'avviso
  * all'ingresso in sala: una sola regola, perché un consenso chiesto in un
  * punto e non in un altro rifiuterebbe iscrizioni valide o ne lascerebbe
  * passare di monche.
  */
-import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import type { PartecipantiNelVideo } from '@/lib/live/consent-rule';
 
 /**
  * La versione del testo del consenso alla trascrizione dei propri interventi
@@ -69,8 +71,9 @@ export interface FormatoEvento {
 export interface ConsensiRichiesti {
   /** Consenso alla registrazione audio e video: si chiede, facoltativo. */
   registrazione: boolean;
-  /** Si registra, ma i partecipanti non hanno né microfono, né videocamera,
-   *  né schermo: un'informativa, nessuna casella. */
+  /** Si registra, ma non c'e' niente da chiedere: i partecipanti non hanno né
+   *  microfono, né videocamera, né schermo, oppure nel video non entrano mai
+   *  ('esclusi'). Un'informativa, nessuna casella. */
   avvisoRegistrazione: boolean;
   /** Consenso alla trascrizione dei propri interventi: si chiede, facoltativo. */
   tracce: boolean;
@@ -91,13 +94,13 @@ export function trascrizioneDalVideo(
   },
   sito: { aiPipelineEnabled?: boolean | null },
   registrazioneDisponibile: boolean,
-  voce: VoceNelVideo
+  partecipanti: PartecipantiNelVideo
 ): boolean {
   return (
     evento.eventType !== 'INSTANT' &&
     !!evento.recordingEnabled &&
     registrazioneDisponibile &&
-    voce !== 'assente' &&
+    partecipanti !== 'assente' &&
     !!evento.aiTranscriptEnabled &&
     !!sito.aiPipelineEnabled
   );
@@ -145,15 +148,23 @@ export function trascrizioneRichiesta(evento: FormatoTrascrizione): boolean {
   );
 }
 
-export function consensiRichiesti(evento: FormatoEvento): ConsensiRichiesti {
+/**
+ * `partecipanti` e' la capacita' dell'installazione (lib/recording/availability):
+ * dove chi partecipa non entra mai nel video ('esclusi') il consenso alla
+ * registrazione non copre niente, e resta l'informativa.
+ */
+export function consensiRichiesti(
+  evento: FormatoEvento,
+  partecipanti: PartecipantiNelVideo
+): ConsensiRichiesti {
   const presenza =
     evento.participantsCanUnmute ||
     evento.participantsCanStartVideo ||
     evento.participantsCanShareScreen;
-  const registrazione = evento.recordingEnabled && presenza;
+  const daChiedere = presenza && partecipanti !== 'esclusi';
   return {
-    registrazione,
-    avvisoRegistrazione: evento.recordingEnabled && !presenza,
+    registrazione: evento.recordingEnabled && daChiedere,
+    avvisoRegistrazione: evento.recordingEnabled && !daChiedere,
     tracce: trascrizioneRichiesta(evento),
   };
 }

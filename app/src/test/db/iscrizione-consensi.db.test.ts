@@ -83,6 +83,10 @@ afterEach(() => {
 
 describe('destinazione del consenso alla registrazione', () => {
   it('con il consenso si salvano destinazione e versione del testo', async () => {
+    // Il testo per la sola voce: il chart dichiara che chi partecipa resta fuori
+    // dal video e che, con il consenso, la sua voce si sente.
+    vi.stubEnv('RECORDING_VOICE_EXCLUSION', 'true');
+    vi.stubEnv('RECORDING_PARTICIPANT_VOICE', 'true');
     const evento = await eventoAperto({ recordingDestination: 'REGISTRANTS' });
     const email = nuovaEmail();
 
@@ -100,6 +104,21 @@ describe('destinazione del consenso alla registrazione', () => {
     expect(await auditDi(evento.id)).toMatchObject({
       consentRecordingDestination: 'REGISTRANTS',
       consentRecordingVersion: 2,
+    });
+  });
+
+  it("dove chi partecipa puo' comparire si salva la versione del testo che lo dice", async () => {
+    const evento = await eventoAperto({ recordingDestination: 'REGISTRANTS' });
+    const email = nuovaEmail();
+
+    await iscriviti(evento.slug, email, {
+      consentRecording: true,
+      consentRecordingDestination: 'REGISTRANTS',
+    });
+
+    expect(await iscrizioneDi(email)).toMatchObject({
+      consentRecordingDestination: 'REGISTRANTS',
+      consentRecordingVersion: 1,
     });
   });
 

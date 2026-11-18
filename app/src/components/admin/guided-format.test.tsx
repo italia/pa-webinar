@@ -78,7 +78,7 @@ function scegli(testo: string) {
 }
 
 describe('formato guidato, dove il video della sala non c e', () => {
-  const assente = { voceNelVideo: 'assente' } as const;
+  const assente = { partecipantiNelVideo: 'assente' } as const;
   const risposte = () =>
     Array.from(container.querySelectorAll<HTMLInputElement>('input[type="radio"]'))
       .filter((i) => i.name.endsWith('-registra'))
@@ -119,7 +119,7 @@ describe('formato guidato, dove il video della sala non c e', () => {
   });
 
   it('con il video le tre risposte restano', () => {
-    render(vi.fn(), true, { voceNelVideo: 'fissa' });
+    render(vi.fn(), true, { partecipantiNelVideo: 'visibili' });
     expect(risposte()).toEqual(['riservata', 'pubblica', 'no']);
   });
 });

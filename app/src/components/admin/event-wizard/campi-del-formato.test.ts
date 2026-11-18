@@ -77,8 +77,8 @@ describe('campiDaModello', () => {
 describe('dove non c e un video da destinare', () => {
   it('lo dice la voce assente', () => {
     expect(videoDaDestinare('assente')).toBe(false);
-    expect(videoDaDestinare('fissa')).toBe(true);
-    expect(videoDaDestinare('rimovibile')).toBe(true);
+    expect(videoDaDestinare('visibili')).toBe(true);
+    expect(videoDaDestinare('solo-voce')).toBe(true);
     expect(videoDaDestinare(undefined)).toBe(true);
   });
 
@@ -145,7 +145,7 @@ describe('registrazioneVuota', () => {
   it('solo senza video della sala e senza tracce', () => {
     expect(registrazioneVuota({ recordingEnabled: true, ...niente }, 'assente', true)).toBe(true);
     expect(registrazioneVuota({ recordingEnabled: true, ...tracce }, 'assente', true)).toBe(false);
-    expect(registrazioneVuota({ recordingEnabled: true, ...niente }, 'fissa', true)).toBe(false);
+    expect(registrazioneVuota({ recordingEnabled: true, ...niente }, 'visibili', true)).toBe(false);
     expect(registrazioneVuota({ recordingEnabled: false, ...niente }, 'assente', true)).toBe(false);
   });
 

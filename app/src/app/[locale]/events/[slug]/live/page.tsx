@@ -13,7 +13,7 @@ import { anteprimaEventoPubblico } from '@/lib/events/meta-title';
 import { getPublicEnv } from '@/lib/env';
 import { captionsTranscriptActive, liveCaptionsAvailable } from '@/lib/captions/availability';
 import { getSettings } from '@/lib/settings';
-import { recordingAvailableFor, voceNelVideo } from '@/lib/recording/availability';
+import { partecipantiNelVideo, recordingAvailableFor } from '@/lib/recording/availability';
 import { accessoRegistrazione, vedeVideo } from '@/lib/recording/audience';
 import {
   consensoCopre,
@@ -157,13 +157,13 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
   const isInstant = event.eventType === 'INSTANT';
 
   const cookieStore = await cookies();
-  const voce = voceNelVideo();
+  const partecipanti = partecipantiNelVideo();
   // La destinazione del testo in vigore: la stessa regola della rotta del token,
   // o la sala non richiederebbe il consenso a chi il token esclude dal video.
-  const destinazione = destinazioneDelTesto(event.recordingDestination, voce);
+  const destinazione = destinazioneDelTesto(event.recordingDestination, partecipanti);
   // La pipeline AI trascrive il video: anche questo chiede il consenso. Mai
   // nelle chiamate rapide.
-  const trascrizioneVideo = trascrizioneDalVideo(event, settings, canRecord, voce);
+  const trascrizioneVideo = trascrizioneDalVideo(event, settings, canRecord, partecipanti);
 
   // Il video non arriva mai alla pagina come indirizzo: il client sa solo se chi
   // guarda puo' vederlo, e il link porta alla rotta che ripete il controllo
@@ -266,7 +266,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             tempRecordingUrl: recuperoInDiretta,
             feedbackEnabled: event.feedbackEnabled,
             recordingConsentText: event.recordingConsentText,
-            voceNelVideo: voce,
+            partecipantiNelVideo: partecipanti,
             privacy,
             schedaPrivacy,
             timezone: event.timezone,
@@ -490,7 +490,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         tempRecordingUrl: recuperoInDiretta,
         feedbackEnabled: event.feedbackEnabled,
         recordingConsentText: event.recordingConsentText,
-        voceNelVideo: voce,
+        partecipantiNelVideo: partecipanti,
         privacy,
         schedaPrivacy,
         timezone: event.timezone,

@@ -9,7 +9,7 @@ import { useTranslations } from 'next-intl';
 import ChiudiFascia from '@/components/live/chiudi-fascia';
 import TestoEnteFascia from '@/components/live/testo-ente-fascia';
 import { Icon } from '@/components/ui/icon';
-import { testoConsensoEvento, type VoceNelVideo } from '@/lib/live/consent-rule';
+import { testoConsensoEvento, type PartecipantiNelVideo } from '@/lib/live/consent-rule';
 import { chiaveConsenso, type Destinazione } from '@/lib/recording/destination';
 
 /**
@@ -24,7 +24,7 @@ import { chiaveConsenso, type Destinazione } from '@/lib/recording/destination';
 export default function ListenOnlyNotice({
   testoConsenso,
   destinazione,
-  voce,
+  partecipanti,
   onAcconsenti,
   inCorso,
   errore,
@@ -35,7 +35,8 @@ export default function ListenOnlyNotice({
   testoConsenso?: string | null;
   /** La destinazione in vigore: il testo a cui si acconsente. */
   destinazione: Destinazione;
-  voce: VoceNelVideo;
+  /** Come compaiono nel video i partecipanti (lib/recording/availability). */
+  partecipanti: PartecipantiNelVideo;
   onAcconsenti: () => void;
   inCorso: boolean;
   errore: boolean;
@@ -48,7 +49,7 @@ export default function ListenOnlyNotice({
   const tc = useTranslations('live.consents');
   const tGdpr = useTranslations('gdpr.consent');
   const idTesto = useId();
-  const testoEvento = testoConsensoEvento(testoConsenso, voce);
+  const testoEvento = testoConsensoEvento(testoConsenso, partecipanti);
   return (
     <div className="live-listen-only" role="region" aria-label={t('title')}>
       <Icon
@@ -60,8 +61,13 @@ export default function ListenOnlyNotice({
         <strong>{t('title')}</strong> {t('body')}
         {testoEvento && <TestoEnteFascia testo={testoEvento} />}
         <span id={idTesto} className="d-block small mt-1">
-          {tGdpr(chiaveConsenso(destinazione, voce))}
+          {tGdpr(chiaveConsenso(destinazione, partecipanti))}
         </span>
+        {/* Il solo ascolto c'e' dove chi partecipa puo' comparire nel video: il
+            nome di chi segue puo' finirci anche cosi'. */}
+        {partecipanti === 'visibili' && (
+          <span className="d-block small mt-1">{tGdpr('namesMayAppear')}</span>
+        )}
       </p>
       <button
         type="button"

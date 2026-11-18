@@ -35,13 +35,13 @@ import { mediaDelToken, regolaConsenso } from '@/lib/live/listen-only';
 import { elencoVisibileAlPubblico } from '@/lib/live/participant-list';
 import { pseudonimo } from '@/lib/live/pseudonym';
 import { guestSenderId } from '@/lib/chat/sender-key';
-import { recordingAvailableFor, voceNelVideo } from '@/lib/recording/availability';
+import { partecipantiNelVideo, recordingAvailableFor } from '@/lib/recording/availability';
 import {
   consensoCopre,
   consensoOra,
   destinazioneDelTesto,
   testoLetto,
-  VERSIONE_TESTO_REGISTRAZIONE,
+  versioneTestoRegistrazione,
   type Destinazione,
   type PeriodoConsenso,
 } from '@/lib/recording/destination';
@@ -205,6 +205,8 @@ async function registraConsensi(
   },
   /** La destinazione del testo in vigore (`destinazioneDelTesto`). */
   destinazione: Destinazione,
+  /** La versione del testo della casella (`versioneTestoRegistrazione`). */
+  versioneTesto: number,
   /** Le prove che il posto nuovo porta con se': mai a posto di un clic. */
   replica: ReplicaValida = NESSUNA_REPLICA,
 ): Promise<ConsensiSalvati> {
@@ -242,7 +244,7 @@ async function registraConsensi(
   const destinazioneLetta = testoLetto(data.recordingConsentDestination, destinazione);
   const testoDellaProva = {
     destination: destinazioneLetta,
-    textVersion: destinazioneLetta ? VERSIONE_TESTO_REGISTRAZIONE : null,
+    textVersion: destinazioneLetta ? versioneTesto : null,
   };
   const alMeglio = async (quale: string, scrivi: () => Promise<unknown>): Promise<boolean> => {
     try {
@@ -412,9 +414,9 @@ export const POST = withErrorHandling(async (request, context) => {
   // Il consenso alla registrazione di chi partecipa e i limiti dei mezzi nel
   // token (lib/live/listen-only): chi entra per primo accende il blocco nella
   // sala (mod_pa_media_lock), con gli stessi tipi per tutti.
-  const voce = voceNelVideo();
+  const partecipanti = partecipantiNelVideo();
   const registrabile = recordingAvailableFor(event);
-  const regola = regolaConsenso(event, registrabile, voce);
+  const regola = regolaConsenso(event, registrabile, partecipanti);
   // Le prove seguono la regola della rotta d'iscrizione: dove non si registra
   // niente non c'e' un consenso da dare, nemmeno da una pagina aperta da prima.
   const eventoConsensi = {
@@ -426,7 +428,8 @@ export const POST = withErrorHandling(async (request, context) => {
   // prima, e torna in ogni risposta, cosi' una pagina aperta da prima mostra il
   // testo giusto e non rimanda un consenso dato su quello vecchio. Dove non c'e'
   // un video vale null, mai la colonna dell'evento.
-  const destinazione = destinazioneDelTesto(event.recordingDestination, voce);
+  const destinazione = destinazioneDelTesto(event.recordingDestination, partecipanti);
+  const versioneTesto = versioneTestoRegistrazione(partecipanti);
   const consensoDato = consensoOra(parsed.data, destinazione);
   // Vale da quando si entra: chi aspetta da prima non ha una scelta vecchia.
   const participantListVisible = elencoVisibileAlPubblico(event);
@@ -434,6 +437,26 @@ export const POST = withErrorHandling(async (request, context) => {
   // entrare, decide cosa si puo' fare in sala.
   const mediaPartecipante = (consenso: boolean) =>
     mediaDelToken(event, regola, 'partecipante', consenso);
+  // Il consenso che decide il segno della voce di chi partecipa: quello alla
+  // registrazione, o dove chi partecipa non entra mai nel video ('esclusi') quello
+  // alla trascrizione, dato ora o ancora valido (lib/live/listen-only). Il secondo
+  // si legge solo li'.
+  const trascrizioneOra =
+    regola.voceDallaTrascrizione &&
+    parsed.data.multitrackConsent === true &&
+    chiedeConsensoPerVoce(eventoConsensi, await getSettings());
+  const consensoVoce = async (
+    registrazione: boolean,
+    trascrizioneValida: () => Promise<boolean>,
+  ): Promise<boolean> =>
+    regola.voceDallaTrascrizione ? trascrizioneOra || (await trascrizioneValida()) : registrazione;
+  // Li' il consenso alla registrazione di chi partecipa non si chiede: uno che
+  // arriva lo stesso, da una pagina aperta da prima o da una replica, non lascia
+  // una prova.
+  const senzaRegistrazione = <T extends { recordingConsent?: boolean }>(data: T): T =>
+    regola.voceDallaTrascrizione ? { ...data, recordingConsent: false } : data;
+  const replicaSenzaRegistrazione = (replica: ReplicaValida): ReplicaValida =>
+    regola.voceDallaTrascrizione ? { ...replica, registrazione: null } : replica;
 
   // ── Grant flow (primary moderator, co-moderator, or speaker) ──
   if (moderatorToken) {
@@ -505,6 +528,7 @@ export const POST = withErrorHandling(async (request, context) => {
         emailHash: grant.email ? hashEmail(grant.email) : undefined,
       },
       destinazione,
+      versioneTesto,
       replicaConduce,
     );
 
@@ -566,7 +590,9 @@ export const POST = withErrorHandling(async (request, context) => {
       // Il consenso dell'iscritto non passa a chi ha il suo link: vale quello
       // dato da chi ha aperto il link, ora o a un ingresso di questa visita.
       const replicaInoltro = await provaDellaReplica(event, parsed.data.consentReplay, destinazione);
-      const mediaInoltro = mediaPartecipante(consensoDato || !!replicaInoltro.registrazione);
+      const mediaInoltro = mediaPartecipante(
+        await consensoVoce(consensoDato || !!replicaInoltro.registrazione, async () => !!replicaInoltro.tracce),
+      );
       // Pubblico anonimo: lo pseudonimo del posto (lo stesso della chat).
       const nomeInoltro = event.audienceAnonymous
         ? await pseudonimo(event.id, `reg-${registration.id}`)
@@ -581,10 +607,11 @@ export const POST = withErrorHandling(async (request, context) => {
       });
       const consentsRecorded = await registraConsensi(
         eventoConsensi,
-        conVoce(parsed.data, mediaInoltro),
+        senzaRegistrazione(conVoce(parsed.data, mediaInoltro)),
         { jitsiUserId: postoOspite, displayName: typedName },
         destinazione,
-        replicaConVoce(replicaInoltro, mediaInoltro),
+        versioneTesto,
+        replicaSenzaRegistrazione(replicaConVoce(replicaInoltro, mediaInoltro)),
       );
       return Response.json(
         {
@@ -617,7 +644,10 @@ export const POST = withErrorHandling(async (request, context) => {
     // questo video: la sala lo richiede.
     const consensoIscritto =
       consensoDato || (await registrazioneDellIscrizione(event, registration, destinazione));
-    const mediaIscritto = mediaPartecipante(consensoIscritto);
+    const postoIscritto = participantJitsiId(registration.id);
+    const mediaIscritto = mediaPartecipante(
+      await consensoVoce(consensoIscritto, () => trascrizioneInVigore(event, postoIscritto)),
+    );
 
     // Record the join, set-once. Kept write-free on rejoin so the reconnect
     // path never depends on a DB write (a write failure here would 500 the
@@ -639,7 +669,6 @@ export const POST = withErrorHandling(async (request, context) => {
       // PII decryption failure — skip Gravatar, use SVG fallback
     }
 
-    const postoIscritto = participantJitsiId(registration.id);
     // La foto vale per l'indirizzo in tutti gli eventi: si mostra solo a chi
     // ha provato che l'indirizzo e' suo aprendo il link dell'email. Iscriversi
     // con l'indirizzo di un altro non ne fa indossare la foto.
@@ -667,9 +696,10 @@ export const POST = withErrorHandling(async (request, context) => {
     });
     const consentsRecorded = await registraConsensi(
       eventoConsensi,
-      conVoce(parsed.data, mediaIscritto),
+      senzaRegistrazione(conVoce(parsed.data, mediaIscritto)),
       { jitsiUserId: postoIscritto, displayName: name, registrationId: registration.id },
       destinazione,
+      versioneTesto,
     );
 
     return Response.json({
@@ -727,7 +757,9 @@ export const POST = withErrorHandling(async (request, context) => {
 
     const postoOspite = guestJitsiId();
     const replicaOspite = await provaDellaReplica(event, parsed.data.consentReplay, destinazione);
-    const mediaOspite = mediaPartecipante(consensoDato || !!replicaOspite.registrazione);
+    const mediaOspite = mediaPartecipante(
+      await consensoVoce(consensoDato || !!replicaOspite.registrazione, async () => !!replicaOspite.tracce),
+    );
     // Pubblico anonimo: lo pseudonimo del posto in chat (la chiave dell'ospite).
     const nomeOspite = event.audienceAnonymous
       ? await pseudonimo(event.id, guestSenderId(ip, guestName))
@@ -742,10 +774,11 @@ export const POST = withErrorHandling(async (request, context) => {
     });
     const consentsRecorded = await registraConsensi(
       eventoConsensi,
-      conVoce(parsed.data, mediaOspite),
+      senzaRegistrazione(conVoce(parsed.data, mediaOspite)),
       { jitsiUserId: postoOspite, displayName: guestName },
       destinazione,
-      replicaConVoce(replicaOspite, mediaOspite),
+      versioneTesto,
+      replicaSenzaRegistrazione(replicaConVoce(replicaOspite, mediaOspite)),
     );
 
     return Response.json({

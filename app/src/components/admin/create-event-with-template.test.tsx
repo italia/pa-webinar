@@ -234,7 +234,7 @@ describe('CreateEventWithTemplate', () => {
     });
 
     it('dove il video non c e una risposta pubblica nell indirizzo diventa riservata', async () => {
-      mostra({ formatoParam: 'medio.tutti.pubblica.tutti', voceNelVideo: 'assente' });
+      mostra({ formatoParam: 'medio.tutti.pubblica.tutti', partecipantiNelVideo: 'assente' });
       expect(container.textContent).toContain(g.summary.riservata);
       expect(container.textContent).not.toContain(g.summary.pubblica);
       const corpo = await corpoPubblicato();
@@ -301,14 +301,14 @@ describe('CreateEventWithTemplate', () => {
   });
 
   it('dove il video non c e le domande non propongono un video pubblico', () => {
-    mostra({ scegliParam: 'medio.tutti.pubblica.tutti', voceNelVideo: 'assente' });
+    mostra({ scegliParam: 'medio.tutti.pubblica.tutti', partecipantiNelVideo: 'assente' });
     expect(container.textContent).not.toContain(g.rec.public);
     expect(container.textContent).toContain(w.flow.recordingDestinationReserved);
     expect(container.textContent).toContain(w.flow.postEventQaHidden);
   });
 
   it('senza video e senza AI le domande non promettono una registrazione', () => {
-    mostra({ voceNelVideo: 'assente', aiPipelineEnabled: false });
+    mostra({ partecipantiNelVideo: 'assente', aiPipelineEnabled: false });
     expect(container.textContent).not.toContain(g.recQ);
     expect(container.textContent).not.toContain(w.flow.recordingManual);
     expect(container.textContent).toContain(g.introNoRecording);
@@ -329,7 +329,7 @@ describe('CreateEventWithTemplate', () => {
       participantsCanShareScreen: false,
       maxParticipants: 100,
     };
-    mostra({ templates: [scheda], voceNelVideo: 'assente', aiPipelineEnabled: false });
+    mostra({ templates: [scheda], partecipantiNelVideo: 'assente', aiPipelineEnabled: false });
     const modelli = container.querySelector('#formato-modelli')!;
     expect(modelli.textContent).toContain(messages.admin.templates.noRecording);
     expect(modelli.textContent).not.toContain(messages.admin.templates.recordingLabel);
@@ -338,7 +338,7 @@ describe('CreateEventWithTemplate', () => {
   it('senza video e senza AI un indirizzo salvato apre il wizard senza registrazione', () => {
     mostra({
       formatoParam: 'piccolo.tutti.riservata.tutti',
-      voceNelVideo: 'assente',
+      partecipantiNelVideo: 'assente',
       aiPipelineEnabled: false,
     });
     vaiAlRiepilogo();
@@ -347,7 +347,7 @@ describe('CreateEventWithTemplate', () => {
   });
 
   describe('senza video e senza AI, la trascrizione dai sottotitoli', () => {
-    const senzaVideo = { voceNelVideo: 'assente', aiPipelineEnabled: false } as const;
+    const senzaVideo = { partecipantiNelVideo: 'assente', aiPipelineEnabled: false } as const;
 
     it('resta dove i sottotitoli ci sono, e il riepilogo la dice', async () => {
       mostra({ ...senzaVideo, formatoParam: 'medio.tutti.no.tutti', liveCaptionsAvailable: true });
@@ -367,7 +367,7 @@ describe('CreateEventWithTemplate', () => {
 
     it('un no dato alla domanda resta un no', async () => {
       mostra({
-        voceNelVideo: 'assente',
+        partecipantiNelVideo: 'assente',
         aiPipelineEnabled: true,
         formatoParam: 'medio.tutti.no.tutti',
         liveCaptionsAvailable: true,

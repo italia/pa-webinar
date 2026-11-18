@@ -14,7 +14,7 @@ import { GET as leggi, PUT as aggiorna } from '@/app/api/events/[param]/route';
 import { POST as creaChiamata } from '@/app/api/events/instant/route';
 import { POST as crea } from '@/app/api/events/route';
 import { prisma } from '@/lib/db';
-import { voceNelVideo } from '@/lib/recording/availability';
+import { partecipantiNelVideo } from '@/lib/recording/availability';
 import {
   consensoCopre,
   consensoOra,
@@ -522,13 +522,13 @@ describe('dove il video della sala non c e', () => {
       recordingConsent: true,
       recordingConsentDestination: iscrizione.consentRecordingDestination,
     };
-    const inVigore = () => destinazioneDelTesto(evento.recordingDestination, voceNelVideo());
+    const inVigore = () => destinazioneDelTesto(evento.recordingDestination, partecipantiNelVideo());
 
-    expect(voceNelVideo()).toBe('assente');
+    expect(partecipantiNelVideo()).toBe('assente');
     expect(consensoOra(letto, inVigore())).toBe(true);
 
     vi.stubEnv('JIBRI_HEALTH_URL', 'http://jibri.interno');
-    expect(voceNelVideo()).toBe('fissa');
+    expect(partecipantiNelVideo()).toBe('visibili');
     expect(consensoOra(letto, inVigore())).toBe(false);
     expect(consensoCopre(iscrizione.consentRecordingDestination, inVigore())).toBe(false);
   });

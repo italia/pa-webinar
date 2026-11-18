@@ -166,7 +166,7 @@ describe('RegistrationFormClient — consensi', () => {
             recordingEnabled
             multitrackRecordingEnabled
             participantsCanUnmute
-            voce="rimovibile"
+            partecipanti="solo-voce"
           />
         </NextIntlClientProvider>,
       );
@@ -235,16 +235,20 @@ describe('RegistrationFormClient — il testo della casella segue la destinazion
   const consenso = messages.gdpr.consent;
 
   it.each([
-    ['REGISTRANTS', 'fissa', consenso.recordingReserved, 'REGISTRANTS'],
-    ['PUBLIC', 'rimovibile', consenso.recordingPublic, 'PUBLIC'],
-    [null, 'fissa', consenso.recording, null],
+    ['REGISTRANTS', 'solo-voce', consenso.recordingReserved, 'REGISTRANTS'],
+    ['PUBLIC', 'solo-voce', consenso.recordingPublic, 'PUBLIC'],
+    [null, 'solo-voce', consenso.recording, null],
+    // Dove chi partecipa puo' comparire, il testo non promette che volto e nome restano fuori.
+    ['REGISTRANTS', 'visibili', consenso.recordingVisibleReserved, 'REGISTRANTS'],
+    ['PUBLIC', 'visibili', consenso.recordingVisiblePublic, 'PUBLIC'],
+    [null, 'visibili', consenso.recordingVisible, null],
     ['REGISTRANTS', 'assente', consenso.recordingNoVideo, null],
     ['PUBLIC', 'assente', consenso.recordingNoVideo, null],
     [null, 'assente', consenso.recordingNoVideo, null],
   ] as const)(
     'destinazione %s, voce %s: mostra il testo e manda quello che dichiara',
     async (recordingDestination, voce, testo, inviata) => {
-      disegnaCon({ ...SPUNTA_REGISTRAZIONE, recordingDestination, voce });
+      disegnaCon({ ...SPUNTA_REGISTRAZIONE, recordingDestination, partecipanti: voce });
       expect(testoDi('label[for="consentRecording"]')).toContain(testo);
       spunta('consentRecording');
       await iscriviti();
@@ -258,7 +262,7 @@ describe('RegistrationFormClient — il testo della casella segue la destinazion
     disegnaCon({
       ...SPUNTA_REGISTRAZIONE,
       recordingConsentText: 'Testo scelto per evento',
-      voce: 'fissa',
+      partecipanti: 'visibili',
     });
     expect(container.textContent).toContain('Testo scelto per evento');
     expect(
@@ -268,13 +272,13 @@ describe('RegistrationFormClient — il testo della casella segue la destinazion
     disegnaCon({
       ...SPUNTA_REGISTRAZIONE,
       recordingConsentText: 'Testo scelto per evento',
-      voce: 'assente',
+      partecipanti: 'assente',
     });
     expect(container.textContent).not.toContain('Testo scelto per evento');
   });
 
   it('manda il testo mostrato anche senza la spunta', async () => {
-    disegnaCon({ ...SPUNTA_REGISTRAZIONE, recordingDestination: 'PUBLIC', voce: 'fissa' });
+    disegnaCon({ ...SPUNTA_REGISTRAZIONE, recordingDestination: 'PUBLIC', partecipanti: 'visibili' });
     await iscriviti();
     expect(iscrizioneInviata()).toMatchObject({
       consentRecording: false,
@@ -296,7 +300,7 @@ describe('RegistrationFormClient — il testo della casella segue la destinazion
         }),
         { status: 422 },
       );
-    disegnaCon({ ...SPUNTA_REGISTRAZIONE, recordingDestination: 'PUBLIC', voce: 'rimovibile' });
+    disegnaCon({ ...SPUNTA_REGISTRAZIONE, recordingDestination: 'PUBLIC', partecipanti: 'solo-voce' });
     spunta('consentRecording');
     await iscriviti();
 
@@ -319,7 +323,7 @@ describe('RegistrationFormClient — il testo della casella segue la destinazion
         JSON.stringify({ details: [{ path: ['consentRecording'], message: 'altro' }] }),
         { status: 422 },
       );
-    disegnaCon({ ...SPUNTA_REGISTRAZIONE, voce: 'assente' });
+    disegnaCon({ ...SPUNTA_REGISTRAZIONE, partecipanti: 'assente' });
     expect(container.querySelector('#consentRecording')?.getAttribute('aria-describedby')).toBeNull();
     spunta('consentRecording');
     await iscriviti();
@@ -344,7 +348,7 @@ describe('RegistrationFormClient — casella della trascrizione', () => {
   const consenso = messages.gdpr.consent;
 
   it('compare con la trascrizione dal video calcolata dal server', async () => {
-    disegnaCon({ recordingEnabled: true, trascrizioneVideo: true, voce: 'fissa' });
+    disegnaCon({ recordingEnabled: true, trascrizioneVideo: true, partecipanti: 'visibili' });
     expect(testoDi('label[for="consentMultitrack"]')).toContain(consenso.multitrack);
     spunta('consentMultitrack');
     await iscriviti();
@@ -364,18 +368,18 @@ describe('RegistrationFormClient — casella della trascrizione', () => {
   });
 
   it('con voce rimovibile e il solo avviso resta nascosta', () => {
-    disegnaCon({ recordingEnabled: true, trascrizioneVideo: true, voce: 'rimovibile' });
+    disegnaCon({ recordingEnabled: true, trascrizioneVideo: true, partecipanti: 'solo-voce' });
     expect(container.querySelector('#consentMultitrack')).toBeNull();
   });
 
   it('con voce fissa la nota dice che la voce resta nel video', () => {
-    disegnaCon({ recordingEnabled: true, trascrizioneVideo: true, voce: 'fissa' });
+    disegnaCon({ recordingEnabled: true, trascrizioneVideo: true, partecipanti: 'visibili' });
     expect(testoDi('#consentMultitrackNota')).toBe(consenso.multitrackOptional);
   });
 
   it.each([
-    ['rimovibile', { ...SPUNTA_REGISTRAZIONE, trascrizioneVideo: true, voce: 'rimovibile' }],
-    ['assente', { ...SPUNTA_REGISTRAZIONE, multitrackRecordingEnabled: true, voce: 'assente' }],
+    ['solo-voce', { ...SPUNTA_REGISTRAZIONE, trascrizioneVideo: true, partecipanti: 'solo-voce' }],
+    ['assente', { ...SPUNTA_REGISTRAZIONE, multitrackRecordingEnabled: true, partecipanti: 'assente' }],
   ] as const)('con voce %s la nota non parla del video', (_nome, props) => {
     disegnaCon(props);
     expect(testoDi('#consentMultitrackNota')).toBe(consenso.multitrackOptionalShort);
@@ -392,6 +396,7 @@ describe('RegistrationFormClient — la scheda privacy', () => {
       destinazione: 'REGISTRANTS',
       chiNonAcconsente: 'restaFuori',
       conduceSempre: false,
+      partecipanti: null,
     },
     trascrizione: { chiesta: false, sottotitoli: false, tracce: null, dalVideo: false },
     sottotitoli: { attivi: false, testoConservato: false },
@@ -494,7 +499,7 @@ describe('RegistrationFormClient — la scheda privacy', () => {
       conScheda({
         ...senzaPresenza,
         recordingEnabled: false,
-        voce: 'assente',
+        partecipanti: 'assente',
         schedaPrivacy: conModo('nessuna'),
       });
       expect(container.textContent).toContain(sheet.recording.none);
@@ -503,18 +508,63 @@ describe('RegistrationFormClient — la scheda privacy', () => {
     });
 
     it('con le sole tracce resta', () => {
-      conScheda({ ...senzaPresenza, voce: 'assente', schedaPrivacy: conModo('soloTracce') });
+      conScheda({ ...senzaPresenza, partecipanti: 'assente', schedaPrivacy: conModo('soloTracce') });
       expect(container.textContent).toContain(recordingNoticeVoice);
     });
 
     it('con un video resta', () => {
-      conScheda({ ...senzaPresenza, voce: 'fissa', schedaPrivacy: conModo('manuale') });
+      conScheda({ ...senzaPresenza, partecipanti: 'visibili', schedaPrivacy: conModo('manuale') });
       expect(container.textContent).toContain(recordingNotice);
     });
 
     it('senza scheda resta', () => {
-      conScheda({ ...senzaPresenza, voce: 'rimovibile', schedaPrivacy: null });
+      conScheda({ ...senzaPresenza, partecipanti: 'solo-voce', schedaPrivacy: null });
       expect(container.textContent).toContain(recordingNoticeVoice);
+    });
+
+    it("dove chi partecipa puo' comparire dice che il nome puo' finire nel video", () => {
+      conScheda({ ...senzaPresenza, partecipanti: 'visibili', schedaPrivacy: null });
+      expect(container.textContent).toContain(recordingNotice);
+      expect(container.textContent).toContain(messages.gdpr.consent.namesMayAppear);
+      expect(recordingNotice).not.toMatch(/volto/i);
+    });
+  });
+
+  describe("dove chi partecipa non entra mai nel video ('esclusi')", () => {
+    const { recordingHostsOnly } = messages.gdpr.consent;
+
+    it("niente casella: l'informativa dice che nel video c'e' solo chi conduce", () => {
+      conScheda({ ...SPUNTA_REGISTRAZIONE, partecipanti: 'esclusi', schedaPrivacy: null });
+      expect(container.querySelector('#consentRecording')).toBeNull();
+      expect(container.textContent).toContain(recordingHostsOnly);
+      expect(container.textContent).not.toContain(messages.gdpr.consent.namesMayAppear);
+    });
+
+    it("anche dove il pubblico non parla, e il testo dell'ente non ha una casella a cui stare", () => {
+      conScheda({
+        recordingEnabled: true,
+        participantsCanUnmute: false,
+        partecipanti: 'esclusi',
+        recordingConsentText: 'Testo scelto per evento',
+        schedaPrivacy: null,
+      });
+      expect(container.textContent).toContain(recordingHostsOnly);
+      expect(container.textContent).not.toContain('Testo scelto per evento');
+    });
+
+    it('la trascrizione si chiede da sola, senza aspettare la registrazione', async () => {
+      conScheda({
+        ...SPUNTA_REGISTRAZIONE,
+        multitrackRecordingEnabled: true,
+        partecipanti: 'esclusi',
+        schedaPrivacy: null,
+      });
+      const casella = container.querySelector<HTMLInputElement>('#consentMultitrack');
+      expect(casella?.disabled).toBe(false);
+      spunta('consentMultitrack');
+      await iscriviti();
+      expect(iscrizioneInviata()?.consentMultitrack).toBe(true);
+      expect(iscrizioneInviata()).not.toHaveProperty('consentRecording');
     });
   });
 

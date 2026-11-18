@@ -28,6 +28,7 @@ const RAPIDA = {
 beforeEach(async () => {
   await svuotaDatabase();
   vi.stubEnv('RECORDING_VOICE_EXCLUSION', 'true');
+  vi.stubEnv('RECORDING_PARTICIPANT_VOICE', 'true');
 });
 afterEach(() => vi.unstubAllEnvs());
 

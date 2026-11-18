@@ -8,7 +8,7 @@ import { useTranslations } from 'next-intl';
 
 import { useRouter, percorso } from '@/i18n/navigation';
 import GuidedFormat from '@/components/admin/guided-format';
-import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import type { PartecipantiNelVideo } from '@/lib/live/consent-rule';
 import { videoDaDestinare } from '@/lib/recording/destination';
 import TemplatePicker from '@/components/admin/template-picker';
 import { classeDaFormato } from '@/lib/events/catalog';
@@ -65,7 +65,7 @@ interface Props {
   /** I sottotitoli live ci sono nell'installazione (lib/captions/availability). */
   liveCaptionsAvailable?: boolean;
   recordingAvailable?: boolean;
-  voceNelVideo?: VoceNelVideo;
+  partecipantiNelVideo?: PartecipantiNelVideo;
   defaultTargetLocales?: string | null;
   /** La post-produzione AI e' accesa sull'installazione. */
   aiPipelineEnabled?: boolean;
@@ -104,7 +104,7 @@ export default function CreateEventWithTemplate({
   whiteboardInfraReady,
   liveCaptionsAvailable = false,
   recordingAvailable: installazioneRegistra = true,
-  voceNelVideo,
+  partecipantiNelVideo,
   defaultTargetLocales = null,
   aiPipelineEnabled = true,
   textTranslationAvailable = false,
@@ -120,7 +120,7 @@ export default function CreateEventWithTemplate({
   const router = useRouter();
   const recordingAvailable = registrazioneProponibile(
     installazioneRegistra,
-    voceNelVideo,
+    partecipantiNelVideo,
     aiPipelineEnabled,
   );
   const [showInstant, setShowInstant] = useState(initialInstant);
@@ -128,7 +128,7 @@ export default function CreateEventWithTemplate({
   // Le quattro risposte nell'indirizzo: aprono il wizard con i loro valori.
   const letto = selectedTemplate ? null : decodificaFormato(formatoParam);
   const formato: FormatoGuidato | null =
-    letto && formatoPossibile(letto, recordingAvailable, videoDaDestinare(voceNelVideo));
+    letto && formatoPossibile(letto, recordingAvailable, videoDaDestinare(partecipantiNelVideo));
 
   if (showInstant) {
     return (
@@ -177,7 +177,7 @@ export default function CreateEventWithTemplate({
       whiteboardInfraReady={whiteboardInfraReady}
       liveCaptionsAvailable={liveCaptionsAvailable}
       recordingAvailable={recordingAvailable}
-      voceNelVideo={voceNelVideo}
+      partecipantiNelVideo={partecipantiNelVideo}
       defaultTargetLocales={defaultTargetLocales}
       aiPipelineEnabled={aiPipelineEnabled}
       textTranslationAvailable={textTranslationAvailable}
@@ -228,7 +228,7 @@ export default function CreateEventWithTemplate({
         publicRegistrationEnabled,
         trascriveSenzaRegistrare(
           installazioneRegistra,
-          voceNelVideo,
+          partecipantiNelVideo,
           aiPipelineEnabled,
           liveCaptionsAvailable,
         ),
@@ -260,7 +260,7 @@ export default function CreateEventWithTemplate({
           aiPipelineEnabled={aiPipelineEnabled}
           liveCaptionsAvailable={liveCaptionsAvailable}
           recordingAvailable={recordingAvailable}
-          voceNelVideo={voceNelVideo}
+          partecipantiNelVideo={partecipantiNelVideo}
           addressBookAvailable={addressBookEnabled}
           onContinue={(f) => router.push(percorso(`/admin/events/new?formato=${codificaFormato(f)}`))}
           // Il modello si sceglie prima di rispondere, non dopo: un'azione

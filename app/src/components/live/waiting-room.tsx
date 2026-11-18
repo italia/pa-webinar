@@ -39,12 +39,13 @@ import LiveShareButton from '@/components/live/live-share-button';
 import { MarkdownRenderer } from '@/components/ui/markdown';
 import type { EntePubblico, PersonaPubblica } from '@/lib/events/public-people';
 import type { SchedaPrivacy } from '@/lib/events/privacy-sheet';
-import { testoConsensoEvento, type VoceNelVideo } from '@/lib/live/consent-rule';
+import { testoConsensoEvento, type PartecipantiNelVideo } from '@/lib/live/consent-rule';
 import { consensoTrascrizioneIngresso } from '@/lib/live/entry-consents';
 import type { Presenze } from '@/lib/live/presence';
 import { PonteChatPiazza } from '@/lib/lobby/chat-bridge';
 import {
   chiaveAvvisoConduce,
+  chiaveAvvisoRegistrazione,
   chiaveConsenso,
   type Destinazione,
 } from '@/lib/recording/destination';
@@ -258,16 +259,21 @@ interface WaitingRoomProps {
   /** La destinazione in vigore del video (`destinazioneDelTesto`,
    *  lib/recording/destination): la dichiara il testo della casella. */
   recordingDestination?: Destinazione;
-  /** La voce di chi non acconsente nel video (lib/recording/availability). */
-  voce?: VoceNelVideo;
-  /** Si registra, ma chi partecipa non ha ne' microfono, ne' videocamera, ne'
-   *  schermo: il riepilogo lo dice, e non c'e' nulla da acconsentire. */
+  /** Come compaiono nel video i partecipanti (lib/recording/availability):
+   *  decide la casella e i testi, che non promettono piu' di cosi'. */
+  partecipanti?: PartecipantiNelVideo;
+  /** Si registra, ma non c'e' nulla da acconsentire: chi partecipa non ha ne'
+   *  microfono, ne' videocamera, ne' schermo, oppure nel video non entra mai
+   *  ('esclusi'). Il riepilogo lo dice. */
   recordingListenOnly?: boolean;
   /** Chi conduce un evento che lo tiene sempre nella registrazione: lo sa da qui. */
   recordingHostAlways?: boolean;
-  /** Chiamata rapida che registra: si entra fuori dalla registrazione e la
-   *  domanda arriva in sala, quando qualcuno la avvia. Qui la si annuncia, e la
-   *  trascrizione, che senza quel consenso non varrebbe, non si chiede. */
+  /** Chiamata rapida che registra, per chi partecipa: si entra fuori dalla
+   *  registrazione e la domanda arriva in sala, quando qualcuno la avvia. Qui la
+   *  si annuncia, e la trascrizione, che senza quel consenso non varrebbe, non si
+   *  chiede. Dove chi partecipa non entra mai nel video ('esclusi') la domanda non
+   *  c'e': si annuncia che nel video c'e' solo chi conduce, e la trascrizione vale
+   *  da sola. */
   recordingAskedInRoom?: boolean;
   /** Il testo sulla registrazione scelto per l'evento; null = quello predefinito. */
   recordingConsentText?: string | null;
@@ -338,7 +344,7 @@ export default function WaitingRoom({
   multitrackConsentExempt = false,
   recordingConsentRequired = false,
   recordingDestination = null,
-  voce = 'rimovibile',
+  partecipanti = 'solo-voce',
   recordingListenOnly = false,
   recordingHostAlways = false,
   recordingAskedInRoom = false,
@@ -533,9 +539,9 @@ export default function WaitingRoom({
     formato: event,
     concluso: isEnded,
     giaDato: multitrackConsentExempt,
-    voce,
+    partecipanti,
     soloAscolto: recordingListenOnly,
-    registrazioneInSala: recordingAskedInRoom,
+    registrazioneInSala: recordingAskedInRoom && partecipanti !== 'esclusi',
   });
   // Il consenso alla registrazione dell'evento, se va chiesto qui. E' libero:
   // non ferma ne' il pulsante ne' la piazza.
@@ -544,8 +550,12 @@ export default function WaitingRoom({
   // interventi vale solo con il consenso alla registrazione (la rotta del token
   // la ignora senza), quindi la casella si apre dopo quella: senza, la voce non
   // viene registrata e non si tiene neanche il testo.
+  const voceSoloConConsenso = partecipanti === 'solo-voce';
   const trascrizioneSospesa =
-    (conduceDaIncarico || voce === 'rimovibile') && recordingRequired && !recordingConsent;
+    (conduceDaIncarico || voceSoloConConsenso) && recordingRequired && !recordingConsent;
+  // Dove chi partecipa puo' comparire nel video, la sala lo dice: anche senza
+  // intervenire il suo nome puo' finirci.
+  const nomiVisibili = partecipanti === 'visibili' && !conduce;
   // La piazza e' disponibile quando c'e' qualcosa da fare e nessun cancello
   // davanti: a evento finito non serve, in vista classica e' stata rifiutata,
   // e senza consenso multitraccia non si va da nessuna parte.
@@ -1243,11 +1253,13 @@ export default function WaitingRoom({
   // Senza la spunta `canEnter` è false e il pulsante «Entra» porta il fuoco
   // sulla casella. Non è un <Alert>: serve un input, e l'icona ::before
   // finirebbe sopra il testo.
-  const testoEvento = testoConsensoEvento(recordingConsentText, voce);
+  const testoEvento = testoConsensoEvento(recordingConsentText, partecipanti);
   const consensiBlock = recordingRequired || trascrizioneChiesta ? (
     <section className="wr-consensi" aria-labelledby="wr-consensi-title">
       <h2 className="wr-consensi__title" id="wr-consensi-title">
-        {recordingRequired ? t('recordingConsentTitle') : t('multitrackConsentTitle')}
+        {recordingRequired
+          ? t(partecipanti === 'visibili' ? 'recordingConsentTitleVisible' : 'recordingConsentTitle')
+          : t('multitrackConsentTitle')}
       </h2>
       {recordingRequired && (
         <>
@@ -1255,12 +1267,17 @@ export default function WaitingRoom({
           <p className="wr-consensi__intro">
             {testoEvento ||
               t(
-                voce === 'assente'
+                partecipanti === 'assente'
                   ? 'recordingConsentIntroNoVideo'
-                  : event.audienceAnonymous && !conduce
-                    ? 'recordingConsentIntroAnonymous'
-                    : 'recordingConsentIntro',
+                  : partecipanti === 'visibili'
+                    ? event.audienceAnonymous && !conduce
+                      ? 'recordingConsentIntroVisibleAnonymous'
+                      : 'recordingConsentIntroVisible'
+                    : event.audienceAnonymous && !conduce
+                      ? 'recordingConsentIntroAnonymous'
+                      : 'recordingConsentIntro',
               )}
+            {nomiVisibili && <> {tGdpr('namesMayAppear')}</>}
           </p>
           <div className="form-check mb-0">
             <input
@@ -1273,23 +1290,23 @@ export default function WaitingRoom({
                 setTestoSpuntato(recordingDestination);
                 // Chi conduce: senza registrazione la trascrizione non vale, e
                 // non deve ritrovarsi spuntata se la rimette.
-                if (!e.target.checked && (conduceDaIncarico || voce === 'rimovibile')) {
+                if (!e.target.checked && (conduceDaIncarico || voceSoloConConsenso)) {
                   setMultitrackConsent(false);
                 }
               }}
-              aria-describedby={!recordingConsent && voce !== 'assente' ? NOTA_REGISTRAZIONE : undefined}
+              aria-describedby={!recordingConsent && partecipanti !== 'assente' ? NOTA_REGISTRAZIONE : undefined}
             />
             <label className="form-check-label" htmlFor={CAMPO_REGISTRAZIONE}>
-              {tGdpr(chiaveConsenso(recordingDestination, voce))}
+              {tGdpr(chiaveConsenso(recordingDestination, partecipanti))}
             </label>
           </div>
-          {!recordingConsent && voce !== 'assente' && (
+          {!recordingConsent && partecipanti !== 'assente' && (
             // Libero davvero: si dice che cosa succede senza.
             <div id={NOTA_REGISTRAZIONE} className="wr-consensi__nota">
               {/* Chi conduce non vede la casella: e' sempre nel video. */}
-              {voce === 'rimovibile'
-                ? tGdpr('recordingOptionalVoice')
-                : tGdpr('recordingOptionalListenOnly')}
+              {partecipanti === 'visibili'
+                ? tGdpr('recordingOptionalListenOnly')
+                : tGdpr('recordingOptionalVoice')}
             </div>
           )}
         </>
@@ -1311,7 +1328,7 @@ export default function WaitingRoom({
               onChange={(e) => setMultitrackConsent(e.target.checked)}
               aria-describedby={
                 trascrizioneSospesa
-                  ? `${voce !== 'assente' ? `${NOTA_REGISTRAZIONE} ` : ''}${CAMPO_TRASCRIZIONE}-nota`
+                  ? `${partecipanti !== 'assente' ? `${NOTA_REGISTRAZIONE} ` : ''}${CAMPO_TRASCRIZIONE}-nota`
                   : `${CAMPO_TRASCRIZIONE}-nota`
               }
             />
@@ -1323,7 +1340,7 @@ export default function WaitingRoom({
               altrove chi nega la registrazione ne resta fuori, e il video puo'
               non esserci. */}
           <div id={`${CAMPO_TRASCRIZIONE}-nota`} className="wr-consensi__nota">
-            {tGdpr(voce === 'fissa' ? 'multitrackOptional' : 'multitrackOptionalShort')}
+            {tGdpr(partecipanti === 'visibili' ? 'multitrackOptional' : 'multitrackOptionalShort')}
           </div>
         </div>
       )}
@@ -1943,9 +1960,15 @@ export default function WaitingRoom({
         <span className="wr-fact__rec" />,
         t('summaryRecording'),
         recordingAskedInRoom
-          ? t('recordingNoticeInstant')
+          ? t(
+              partecipanti === 'esclusi'
+                ? 'recordingNoticeInstantHostsOnly'
+                : 'recordingNoticeInstant',
+            )
           : recordingListenOnly && !schedaPrivacy
-            ? tGdpr(voce === 'fissa' ? 'recordingNotice' : 'recordingNoticeVoice')
+            ? `${tGdpr(chiaveAvvisoRegistrazione(partecipanti))}${
+                nomiVisibili ? ` ${tGdpr('namesMayAppear')}` : ''
+              }`
             : recordingHostAlways
               ? tGdpr(chiaveAvvisoConduce(recordingDestination))
               : t('recordingNotice'),

@@ -70,15 +70,15 @@ async function disegna(
 const registrazione = (
   dato: boolean,
   ritiro: EffettoRitiroRegistrazione,
-  testo: Partial<Pick<Registrazione, 'destinazione' | 'voce' | 'testoEvento'>> = {}
-): Registrazione => ({ dato, ritiro, destinazione: null, voce: 'fissa', ...testo });
+  testo: Partial<Pick<Registrazione, 'destinazione' | 'partecipanti' | 'testoEvento'>> = {}
+): Registrazione => ({ dato, ritiro, destinazione: null, partecipanti: 'solo-voce', ...testo });
 
 /** Il consenso alla trascrizione, con il testo che promette la cancellazione. */
 const trascrizione = (
   dato: boolean,
   serveRegistrazione: boolean,
-  testo: Partial<Pick<Trascrizione, 'testo' | 'voce'>> = {}
-): Trascrizione => ({ dato, serveRegistrazione, testo: 'multitrack', voce: 'fissa', ...testo });
+  testo: Partial<Pick<Trascrizione, 'testo' | 'partecipanti'>> = {}
+): Trascrizione => ({ dato, serveRegistrazione, testo: 'multitrack', partecipanti: 'visibili', ...testo });
 
 const pulsante = (testo: RegExp) =>
   [...document.querySelectorAll('button')].find((b) =>
@@ -217,7 +217,7 @@ describe('ConsentsDialog', () => {
   });
 
   it("senza un video il ritiro dice cosa cambia, e non parla di un video che non c'e'", async () => {
-    await disegna({ registrazione: registrazione(true, 'assente', { voce: 'assente' }) });
+    await disegna({ registrazione: registrazione(true, 'assente', { partecipanti: 'assente' }) });
     expect(document.getElementById('live-consents-rec-effetto')?.textContent).toBe(
       messages.live.consents.recording.withdraw.assente
     );
@@ -268,9 +268,24 @@ describe('ConsentsDialog', () => {
     expect(document.body.textContent).toContain(g.recording);
 
     await disegna({
-      registrazione: registrazione(false, 'assente', { destinazione: 'PUBLIC', voce: 'assente' }),
+      registrazione: registrazione(false, 'assente', { destinazione: 'PUBLIC', partecipanti: 'assente' }),
     });
     expect(document.body.textContent).toContain(g.recordingNoVideo);
+  });
+
+  it("dove chi partecipa puo' comparire il testo non promette che volto e nome restano fuori", async () => {
+    const g = messages.gdpr.consent;
+    await disegna({
+      registrazione: registrazione(false, 'soloAscolto', {
+        destinazione: 'REGISTRANTS',
+        partecipanti: 'visibili',
+      }),
+    });
+    expect(document.getElementById('live-consents-rec-nota')!.textContent).toBe(
+      g.recordingVisibleReserved
+    );
+    expect(document.body.textContent).toContain(g.namesMayAppear);
+    expect(document.body.textContent).not.toContain(g.recordingReserved);
   });
 
   it("il testo scelto dall'ente vale per quel consenso, dove un video c'e'", async () => {
@@ -283,7 +298,7 @@ describe('ConsentsDialog', () => {
     await disegna({
       registrazione: registrazione(false, 'assente', {
         testoEvento: 'Testo scelto per evento',
-        voce: 'assente',
+        partecipanti: 'assente',
       }),
     });
     expect(document.body.textContent).not.toContain('Testo scelto per evento');
@@ -300,7 +315,7 @@ describe('ConsentsDialog', () => {
     ).toBe('live-consents-tr-effetto live-consents-tr-nota');
 
     await disegna({
-      trascrizione: trascrizione(false, false, { testo: 'multitrackRetained', voce: 'rimovibile' }),
+      trascrizione: trascrizione(false, false, { testo: 'multitrackRetained', partecipanti: 'solo-voce' }),
     });
     expect(document.getElementById('live-consents-tr-nota')!.textContent).toBe(
       `${g.multitrackRetained} ${g.multitrackOptionalShort}`

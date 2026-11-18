@@ -18,7 +18,7 @@ import { rubricaConPersone } from '@/lib/persons/rubrica-picker';
 import { capacitaIstanza } from '@/lib/capacity/istanza';
 import { getSettings } from '@/lib/settings';
 import { liveCaptionsAvailable } from '@/lib/captions/availability';
-import { recordingAvailable, voceNelVideo } from '@/lib/recording/availability';
+import { partecipantiNelVideo, recordingAvailable } from '@/lib/recording/availability';
 import { traduzioneDisponibile, ultimoLavoroTraduzione } from '@/lib/text-translation/enqueue';
 import { calcolaStatoTesti } from '@/lib/text-translation/auto';
 import { agendaGiaUsata } from '@/lib/agenda/status';
@@ -461,7 +461,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
         )}
         liveCaptionsAvailable={liveCaptionsAvailable(siteSettings)}
         recordingAvailable={recordingAvailable()}
-        voceNelVideo={voceNelVideo()}
+        partecipantiNelVideo={partecipantiNelVideo()}
         defaultTargetLocales={siteSettings.aiDefaultTargetLocales}
         aiPipelineEnabled={siteSettings.aiPipelineEnabled}
         // La traduzione al salvataggio la decide il server, per chiunque salvi.

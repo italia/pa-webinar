@@ -5,7 +5,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { elencoPredefinito } from '@/lib/live/participant-list';
-import { regolaConsenso, type VoceNelVideo } from '@/lib/live/consent-rule';
+import { regolaConsenso, type PartecipantiNelVideo } from '@/lib/live/consent-rule';
 import { MESI_RUBRICA_PREDEFINITI } from '@/lib/persons/retention';
 import { trascrizioneDalVideo } from '@/lib/registration/consents';
 import type { ImpostazioniPubbliche } from '@/lib/settings/public-projection';
@@ -70,7 +70,7 @@ const SITO: SitoScheda = {
 
 const AMBIENTE: AmbienteScheda = {
   registrazioneDisponibile: true,
-  voce: 'rimovibile',
+  partecipanti: 'solo-voce',
   sottotitoliDisponibili: true,
   trascrizioneSottotitoli: false,
   tracceDisponibili: true,
@@ -91,31 +91,44 @@ function scheda(
 }
 
 describe('schedaPrivacy, la voce di chi non acconsente', () => {
-  it('rimovibile: chi non acconsente partecipa e la sua voce resta fuori; chi conduce e\' nel video', () => {
-    expect(scheda({}, { voce: 'rimovibile' }).registrazione).toEqual({
+  it('solo voce: chi non acconsente partecipa e la sua voce resta fuori; chi conduce e\' nel video', () => {
+    expect(scheda({}, { partecipanti: 'solo-voce' }).registrazione).toEqual({
       modo: 'manuale',
       destinazione: 'PUBLIC',
       chiNonAcconsente: 'restaFuori',
       conduceSempre: true,
+      partecipanti: 'solo-voce',
     });
   });
 
-  it('fissa: chi non acconsente partecipa in solo ascolto; chi conduce e\' nel video', () => {
-    expect(scheda({}, { voce: 'fissa' }).registrazione).toEqual({
+  it('visibili: chi non acconsente partecipa in solo ascolto; chi conduce e\' nel video', () => {
+    expect(scheda({}, { partecipanti: 'visibili' }).registrazione).toEqual({
       modo: 'manuale',
       destinazione: 'PUBLIC',
       chiNonAcconsente: 'soloAscolto',
       conduceSempre: true,
+      partecipanti: 'visibili',
+    });
+  });
+
+  it("esclusi: nel video solo chi conduce, e a chi partecipa non c'e' niente da chiedere", () => {
+    expect(scheda({}, { partecipanti: 'esclusi' }).registrazione).toEqual({
+      modo: 'manuale',
+      destinazione: 'PUBLIC',
+      chiNonAcconsente: 'maiNelVideo',
+      conduceSempre: true,
+      partecipanti: 'esclusi',
     });
   });
 
   it('assente: senza tracce non si registra niente, e non si parla di video', () => {
-    const s = scheda({}, { voce: 'assente' });
+    const s = scheda({}, { partecipanti: 'assente' });
     expect(s.registrazione).toEqual({
       modo: 'nessuna',
       destinazione: null,
       chiNonAcconsente: null,
       conduceSempre: false,
+      partecipanti: null,
     });
     expect(s.conservazione.video).toBeNull();
   });
@@ -123,25 +136,27 @@ describe('schedaPrivacy, la voce di chi non acconsente', () => {
   it("assente: con le tracce non c'e' un video da pubblicare", () => {
     const s = scheda(
       { multitrackRecordingEnabled: true, recordingDestination: 'REGISTRANTS' },
-      { voce: 'assente' }
+      { partecipanti: 'assente' }
     );
     expect(s.registrazione).toEqual({
       modo: 'soloTracce',
       destinazione: null,
       chiNonAcconsente: 'restaFuori',
       conduceSempre: false,
+      partecipanti: null,
     });
     expect(s.conservazione.video).toBeNull();
     expect(s.trascrizione.tracce).toBe('cancellate');
   });
 
-  it.each<[VoceNelVideo, string]>([
-    ['rimovibile', 'avvisoVoce'],
-    ['fissa', 'avviso'],
+  it.each<[PartecipantiNelVideo, string]>([
+    ['solo-voce', 'avvisoVoce'],
+    ['visibili', 'avviso'],
+    ['esclusi', 'maiNelVideo'],
   ])(
-    'voce %s, pubblico senza microfono, videocamera e schermo: si avvisa e basta',
-    (voce, atteso) => {
-      expect(scheda(SENZA_PRESENZA, { voce }).registrazione.chiNonAcconsente).toBe(
+    'partecipanti %s, pubblico senza microfono, videocamera e schermo: si avvisa e basta',
+    (partecipanti, atteso) => {
+      expect(scheda(SENZA_PRESENZA, { partecipanti }).registrazione.chiNonAcconsente).toBe(
         atteso
       );
     }
@@ -150,27 +165,28 @@ describe('schedaPrivacy, la voce di chi non acconsente', () => {
   it('assente con le tracce, pubblico senza presenza: acconsente in sala', () => {
     const s = scheda(
       { ...SENZA_PRESENZA, multitrackRecordingEnabled: true },
-      { voce: 'assente' }
+      { partecipanti: 'assente' }
     );
     expect(s.registrazione.chiNonAcconsente).toBe('avvisoVoce');
   });
 
   it('dice lo stesso della regola del consenso, per ogni regime', () => {
-    for (const voce of ['assente', 'rimovibile', 'fissa'] as const) {
+    for (const partecipanti of ['assente', 'solo-voce', 'esclusi', 'visibili'] as const) {
       for (const presenza of [EVENTO, { ...EVENTO, ...SENZA_PRESENZA }]) {
         const regola = regolaConsenso(
           { ...presenza, multitrackRecordingEnabled: true },
           true,
-          voce
+          partecipanti
         );
         const { chiNonAcconsente } = scheda(
           { ...presenza, multitrackRecordingEnabled: true },
-          { voce }
+          { partecipanti }
         ).registrazione;
         expect(chiNonAcconsente === 'soloAscolto').toBe(regola.soloAscolto);
         expect(chiNonAcconsente === 'restaFuori').toBe(
           regola.richiesto && !regola.soloAscolto
         );
+        expect(chiNonAcconsente === 'maiNelVideo').toBe(regola.voceDallaTrascrizione);
       }
     }
   });
@@ -178,11 +194,11 @@ describe('schedaPrivacy, la voce di chi non acconsente', () => {
   it('chi conduce e\' nel video dove c\'e\' un video, qualunque valore resti sulla colonna', () => {
     for (const hostsAlwaysRecorded of [false, true]) {
       const evento = { hostsAlwaysRecorded };
-      expect(scheda(evento, { voce: 'rimovibile' }).registrazione.conduceSempre).toBe(true);
-      expect(scheda(evento, { voce: 'fissa' }).registrazione.conduceSempre).toBe(true);
-      expect(scheda(evento, { voce: 'assente' }).registrazione.conduceSempre).toBe(false);
+      expect(scheda(evento, { partecipanti: 'solo-voce' }).registrazione.conduceSempre).toBe(true);
+      expect(scheda(evento, { partecipanti: 'visibili' }).registrazione.conduceSempre).toBe(true);
+      expect(scheda(evento, { partecipanti: 'assente' }).registrazione.conduceSempre).toBe(false);
       expect(
-        scheda({ ...evento, recordingEnabled: false }, { voce: 'rimovibile' }).registrazione
+        scheda({ ...evento, recordingEnabled: false }, { partecipanti: 'solo-voce' }).registrazione
           .conduceSempre
       ).toBe(false);
     }
@@ -202,6 +218,7 @@ describe('schedaPrivacy, la registrazione', () => {
       destinazione: null,
       chiNonAcconsente: null,
       conduceSempre: false,
+      partecipanti: null,
     });
     expect(s.trascrizione.tracce).toBeNull();
     expect(s.conservazione.video).toBeNull();
@@ -217,6 +234,7 @@ describe('schedaPrivacy, la registrazione', () => {
       destinazione: null,
       chiNonAcconsente: null,
       conduceSempre: false,
+      partecipanti: null,
     });
     expect(s.trascrizione).toEqual({ chiesta: false, sottotitoli: false, tracce: null, dalVideo: false });
     expect(s.conservazione.video).toBeNull();
@@ -246,7 +264,7 @@ describe('schedaPrivacy, la trascrizione', () => {
     const evento = { ...EVENTO, ...TRACCE };
     // La regola del video da sola direbbe il contrario: per questo si guardano
     // prima le tracce.
-    expect(trascrizioneDalVideo(evento, SITO, true, 'rimovibile')).toBe(true);
+    expect(trascrizioneDalVideo(evento, SITO, true, 'solo-voce')).toBe(true);
     expect(scheda(TRACCE).trascrizione).toEqual({
       chiesta: true,
       sottotitoli: false,
@@ -322,7 +340,7 @@ describe('schedaPrivacy, se la trascrizione si chiede', () => {
 
   it('il flag delle tracce non basta dove non si registra niente', () => {
     expect(
-      scheda({ ...TRACCE, aiTranscriptEnabled: false }, { voce: 'assente' }).trascrizione.chiesta
+      scheda({ ...TRACCE, aiTranscriptEnabled: false }, { partecipanti: 'assente' }).trascrizione.chiesta
     ).toBe(false);
   });
 });
@@ -405,7 +423,7 @@ describe('schedaPrivacy, la pipeline AI', () => {
   it('senza video non si doppia niente: sintesi e traduzione restano sulle tracce', () => {
     const s = scheda(
       { multitrackRecordingEnabled: true, aiDubbingEnabled: true },
-      { voce: 'assente' }
+      { partecipanti: 'assente' }
     );
     expect(s.registrazione.modo).toBe('soloTracce');
     expect(s.ia).toEqual({
@@ -440,14 +458,14 @@ describe('schedaPrivacy, la pipeline AI', () => {
     it('con le sole tracce restano sintesi e traduzione', () => {
       const tracce = { multitrackRecordingEnabled: true };
       expect(
-        scheda({ ...tracce, aiSummaryEnabled: false }, { voce: 'assente' }).ia
+        scheda({ ...tracce, aiSummaryEnabled: false }, { partecipanti: 'assente' }).ia
           ?.elaborabileDopo
       ).toBe(true);
-      expect(scheda(tracce, { voce: 'assente' }).ia?.elaborabileDopo).toBe(false);
+      expect(scheda(tracce, { partecipanti: 'assente' }).ia?.elaborabileDopo).toBe(false);
     });
 
     it('niente da elaborare: non si dice', () => {
-      expect(scheda(SPENTI, { voce: 'assente' }).ia?.elaborabileDopo).toBe(false);
+      expect(scheda(SPENTI, { partecipanti: 'assente' }).ia?.elaborabileDopo).toBe(false);
       expect(scheda({ ...SPENTI, recordingEnabled: false }).ia?.elaborabileDopo).toBe(
         false
       );
@@ -497,7 +515,7 @@ describe('schedaPrivacy, chat e domande', () => {
 
   it('non dipende da cosa registra: senza video la regola resta quella della pagina', () => {
     expect(scheda({ recordingEnabled: false }).chat.esitoDomande).toBe('soloTesto');
-    expect(scheda({}, { voce: 'assente' }).chat.esitoDomande).toBe('soloTesto');
+    expect(scheda({}, { partecipanti: 'assente' }).chat.esitoDomande).toBe('soloTesto');
   });
 });
 
@@ -647,6 +665,7 @@ describe('schedaPrivacyEvento, sul server', () => {
       'JIBRI_HEALTH_URL',
       'RECORDER_CONTROLLER_URL',
       'RECORDING_VOICE_EXCLUSION',
+      'RECORDING_PARTICIPANT_VOICE',
       'RECORDING_STORAGE_TYPE',
       'CAPTIONS_STATUS_URL',
     ]) {
@@ -669,6 +688,7 @@ describe('schedaPrivacyEvento, sul server', () => {
       ...CHART,
       JIBRI_HEALTH_URL: 'http://jibri',
       RECORDING_VOICE_EXCLUSION: 'true',
+      RECORDING_PARTICIPANT_VOICE: 'true',
       CAPTIONS_STATUS_URL: 'http://sottotitoli:2700/status',
     });
     const s = schedaPrivacyEvento(
@@ -678,6 +698,13 @@ describe('schedaPrivacyEvento, sul server', () => {
     expect(s?.registrazione.chiNonAcconsente).toBe('restaFuori');
     expect(s?.trascrizione).toEqual({ chiesta: true, sottotitoli: true, tracce: null, dalVideo: true });
     expect(s?.sottotitoli).toEqual({ attivi: true, testoConservato: true });
+  });
+
+  it('Jibri che non riproduce la voce di chi partecipa: nel video solo chi conduce', () => {
+    installa({ ...CHART, JIBRI_HEALTH_URL: 'http://jibri', RECORDING_VOICE_EXCLUSION: 'true' });
+    const s = schedaPrivacyEvento(EVENTO, SITO);
+    expect(s?.registrazione.chiNonAcconsente).toBe('maiNelVideo');
+    expect(s?.registrazione.partecipanti).toBe('esclusi');
   });
 
   it('solo il registratore per partecipante: tracce senza video', () => {

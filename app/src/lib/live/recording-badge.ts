@@ -20,8 +20,10 @@ export type PresenzaNellaRegistrazione = 'video' | 'voce' | 'nessuna';
  *    registra;
  *  - `mani`: solo chi chiede la parola, dove il pubblico non parla e riceve
  *    soltanto un avviso: un segno su ogni riga riempirebbe l'elenco;
- *  - `nessuno`: dove non si registra, o chi non acconsente resta in solo
- *    ascolto (lo dice gia' il suo segno).
+ *  - `nessuno`: dove non si registra, dove chi non acconsente resta in solo
+ *    ascolto (lo dice gia' il suo segno), o dove chi partecipa non entra mai nel
+ *    video, nemmeno con la voce (`voceDallaTrascrizione`): non c'e' un consenso
+ *    alla registrazione da mostrare.
  * Chi modera vede le righe di tutti, chi partecipa solo la propria.
  */
 export type ElencoRegistrazione = 'tutti' | 'mani' | 'nessuno';
@@ -32,7 +34,7 @@ export function elencoRegistrazione(i: {
   /** La registrazione e' in corso (conta solo nelle chiamate rapide). */
   inCorso: boolean;
 }): ElencoRegistrazione {
-  if (!i.regola.registra || i.regola.soloAscolto) return 'nessuno';
+  if (!i.regola.registra || i.regola.soloAscolto || i.regola.voceDallaTrascrizione) return 'nessuno';
   if (i.istantanea) return i.inCorso ? 'tutti' : 'nessuno';
   return i.regola.richiesto ? 'tutti' : 'mani';
 }

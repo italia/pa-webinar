@@ -20,7 +20,7 @@ import type { RecordingAudience } from '@prisma/client';
 
 import type { WizardTemplatePreset } from '@/components/admin/event-wizard/wizard-shell';
 import { accessModeDaSalvare } from '@/lib/events/access-mode';
-import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import type { PartecipantiNelVideo } from '@/lib/live/consent-rule';
 import { VASTA_SCALA } from '@/lib/live/participant-list';
 import { videoDaDestinare } from '@/lib/recording/destination';
 
@@ -182,10 +182,10 @@ export function formatoPossibile(
  *  registrazione che non parte. */
 export function registrazioneProponibile(
   puoRegistrare: boolean,
-  voce: VoceNelVideo | undefined,
+  partecipanti: PartecipantiNelVideo | undefined,
   aiPipelineEnabled: boolean,
 ): boolean {
-  return puoRegistrare && (videoDaDestinare(voce) || aiPipelineEnabled);
+  return puoRegistrare && (videoDaDestinare(partecipanti) || aiPipelineEnabled);
 }
 
 /** Dove la domanda sulla registrazione non si fa perche' non produrrebbe nulla, la
@@ -193,14 +193,14 @@ export function registrazioneProponibile(
  *  dalla pipeline AI, e la risposta mancante non la spegne. */
 export function trascriveSenzaRegistrare(
   puoRegistrare: boolean,
-  voce: VoceNelVideo | undefined,
+  partecipanti: PartecipantiNelVideo | undefined,
   aiPipelineEnabled: boolean,
   sottotitoliDisponibili: boolean,
 ): boolean {
   return (
     puoRegistrare &&
     sottotitoliDisponibili &&
-    !registrazioneProponibile(puoRegistrare, voce, aiPipelineEnabled)
+    !registrazioneProponibile(puoRegistrare, partecipanti, aiPipelineEnabled)
   );
 }
 

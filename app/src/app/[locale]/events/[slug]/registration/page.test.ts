@@ -135,7 +135,7 @@ describe('pagina di iscrizione: la scheda privacy', () => {
   it('dice lo stesso di cio che chiede il modulo', async () => {
     senzaVideo();
     const props = await propsDelModulo();
-    expect(props.voce).toBe('assente');
+    expect(props.partecipanti).toBe('assente');
     expect((props.schedaPrivacy as SchedaPrivacy).registrazione.modo).toBe('nessuna');
   });
 
@@ -181,7 +181,7 @@ describe('pagina di iscrizione: consensi passati al modulo', () => {
 
   it("dove non c'e' un video passa la voce assente", async () => {
     senzaVideo();
-    expect((await propsDelModulo()).voce).toBe('assente');
+    expect((await propsDelModulo()).partecipanti).toBe('assente');
   });
 
   describe('dove la scheda dice che non si registra niente', () => {

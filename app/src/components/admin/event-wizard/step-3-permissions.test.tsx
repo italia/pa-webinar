@@ -8,7 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import en from '@/i18n/messages/en.json';
 import messages from '@/i18n/messages/it.json';
-import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import type { PartecipantiNelVideo } from '@/lib/live/consent-rule';
 
 import StepPermissions, { type StepPermissionsValue } from './step-3-permissions';
 
@@ -43,7 +43,7 @@ afterEach(() => {
 function render(
   recordingEnabled: boolean,
   recordingAvailable: boolean,
-  voceNelVideo?: VoceNelVideo,
+  partecipantiNelVideo?: PartecipantiNelVideo,
   istantanea = false,
 ) {
   const value = {
@@ -59,7 +59,7 @@ function render(
           onChange={vi.fn()}
           whiteboardInfraReady={false}
           recordingAvailable={recordingAvailable}
-          voceNelVideo={voceNelVideo}
+          partecipantiNelVideo={partecipantiNelVideo}
           istantanea={istantanea}
         />
       </NextIntlClientProvider>
@@ -75,9 +75,15 @@ describe('i consensi nelle impostazioni avanzate', () => {
   const diagramma = () => container.querySelector('.mappa-consensi');
 
   it('chi conduce e\' sempre nel video: un avviso fisso, mai un interruttore', () => {
-    for (const voce of ['rimovibile', 'fissa'] as const) {
+    const testi = messages.admin.wizard.step2;
+    for (const [voce, testo] of [
+      ['solo-voce', testi.hostsAlwaysRecordedDesc],
+      ['esclusi', testi.hostsAlwaysRecordedDescHostsOnly],
+      ['visibili', testi.hostsAlwaysRecordedDescVisible],
+    ] as const) {
       render(true, true, voce);
-      expect(avviso()).toBe(true);
+      // Di chi partecipa dice cio' che l'installazione garantisce davvero.
+      expect(container.textContent).toContain(testo);
       expect(interruttore()).toBeNull();
       expect(diagramma()).not.toBeNull();
     }
@@ -89,15 +95,15 @@ describe('i consensi nelle impostazioni avanzate', () => {
   });
 
   it('una chiamata rapida chiede in sala: avviso dove si registra, niente diagramma', () => {
-    render(true, true, 'rimovibile', true);
+    render(true, true, 'solo-voce', true);
     expect(avviso()).toBe(true);
     expect(diagramma()).toBeNull();
-    render(true, true, 'fissa', true);
+    render(true, true, 'visibili', true);
     expect(avviso()).toBe(false);
   });
 
   it('senza registrazione non propone niente', () => {
-    render(false, true, 'rimovibile');
+    render(false, true, 'solo-voce');
     expect(avviso()).toBe(false);
     expect(interruttore()).toBeNull();
     expect(diagramma()).toBeNull();
@@ -145,7 +151,7 @@ describe('la destinazione della registrazione', () => {
       editing?: boolean;
       soloAscoltoBloccato?: boolean;
       errore?: boolean;
-      voceNelVideo?: 'fissa' | 'rimovibile' | 'assente';
+      partecipantiNelVideo?: 'visibili' | 'solo-voce' | 'assente';
       puoDichiarareChiConduce?: boolean;
     } = {},
   ) {
@@ -161,7 +167,7 @@ describe('la destinazione della registrazione', () => {
             destinazione={destinazione}
             editing={extra.editing}
             soloAscoltoBloccato={extra.soloAscoltoBloccato}
-            voceNelVideo={extra.voceNelVideo}
+            partecipantiNelVideo={extra.partecipantiNelVideo}
             puoDichiarareChiConduce={extra.puoDichiarareChiConduce}
             fieldErrors={extra.errore ? { recordingDestination: 'required' } : {}}
           />
@@ -207,7 +213,7 @@ describe('la destinazione della registrazione', () => {
 
   it('non si propone dove un video non c e', () => {
     mostra({ recordingEnabled: true, recordingDestination: null }, libera, {
-      voceNelVideo: 'assente',
+      partecipantiNelVideo: 'assente',
     });
     expect(scelta('REGISTRANTS')).toBeNull();
     expect(container.textContent).not.toContain(s2.recordingDestination);
@@ -215,7 +221,7 @@ describe('la destinazione della registrazione', () => {
 
   it('dove un video non c e accendere la registrazione non parte da riservata', () => {
     mostra({ recordingEnabled: false, recordingDestination: null }, libera, {
-      voceNelVideo: 'assente',
+      partecipantiNelVideo: 'assente',
     });
     act(() => interruttore().click());
     expect(onChange.mock.calls[0]![0]).not.toHaveProperty('recordingDestination');
@@ -234,7 +240,7 @@ describe('la destinazione della registrazione', () => {
     expect(container.textContent).not.toContain(s2.recordingDestinationStaffOnly);
     mostra({ recordingEnabled: true, recordingDestination: null }, undefined, {
       ...conLink,
-      voceNelVideo: 'assente',
+      partecipantiNelVideo: 'assente',
     });
     expect(container.textContent).not.toContain(s2.recordingDestinationStaffOnly);
   });

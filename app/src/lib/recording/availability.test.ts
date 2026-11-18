@@ -124,6 +124,20 @@ describe('partecipantiNelVideo', () => {
       partecipantiNelVideo({ ...conJibri, RECORDING_VOICE_EXCLUSION: 'true', RECORDING_PARTICIPANT_VOICE: '1' }),
     ).toBe('esclusi');
   });
+
+  it('la voce di chi non acconsente ne e\' la proiezione: le due letture non si contraddicono', () => {
+    const casi = [
+      {},
+      { ...conJibri },
+      { ...conJibri, RECORDING_VOICE_EXCLUSION: 'true' },
+      { ...conJibri, RECORDING_VOICE_EXCLUSION: 'true', RECORDING_PARTICIPANT_VOICE: 'true' },
+      { JITSI_WEB_INTERNAL_URL: 'http://jitsi-web' },
+    ];
+    const attesa = { assente: 'assente', 'solo-voce': 'rimovibile', esclusi: 'rimovibile', visibili: 'fissa' };
+    for (const env of casi) {
+      expect(voceNelVideo(env)).toBe(attesa[partecipantiNelVideo(env)]);
+    }
+  });
 });
 
 describe('tracceDisponibili', () => {
@@ -157,7 +171,7 @@ describe('eventoRegistrabile', () => {
   const SENZA_TRACCE = { ...CON_TRACCE, multitrackRecordingEnabled: false };
   const ambiente = {
     registrazioneDisponibile: true,
-    voce: 'assente' as const,
+    partecipanti: 'assente' as const,
     tracceDisponibili: true,
   };
 
@@ -171,8 +185,8 @@ describe('eventoRegistrabile', () => {
     expect(eventoRegistrabile(CON_TRACCE, ambiente)).toBe(true);
   });
 
-  it.each(['rimovibile', 'fissa'] as const)('con un video (%s) non servono le tracce', (voce) => {
-    expect(eventoRegistrabile(SENZA_TRACCE, { ...ambiente, voce })).toBe(true);
+  it.each(['solo-voce', 'esclusi', 'visibili'] as const)('con un video (%s) non servono le tracce', (partecipanti) => {
+    expect(eventoRegistrabile(SENZA_TRACCE, { ...ambiente, partecipanti })).toBe(true);
   });
 
   it("senza nulla che registri non basta l'evento", () => {

@@ -42,7 +42,7 @@ function apri(patch: Partial<ComponentProps<typeof ConsentDiagram>> = {}) {
           participantsCanUnmute
           participantsCanStartVideo
           participantsCanShareScreen={false}
-          voce="rimovibile"
+          partecipanti="solo-voce"
           {...patch}
         />
       </NextIntlClientProvider>
@@ -77,11 +77,11 @@ describe('ConsentDiagram', () => {
 
   it('chi conduce e\' sempre nel video, dove c\'e\' un video: non e\' una scelta', () => {
     expect(apri()).toContain(testi.hostsAlways);
-    expect(apri({ voce: 'fissa' })).toContain(testi.hostsAlways);
+    expect(apri({ partecipanti: 'visibili' })).toContain(testi.hostsAlways);
   });
 
   it('dove la voce resta nel video, senza consenso solo ascolto, e lo dichiara', () => {
-    const testo = apri({ voce: 'fissa' });
+    const testo = apri({ partecipanti: 'visibili' });
     expect(testo).toContain(testi.fixedVoice);
     expect(testo).toContain(testi.roomListenOnly);
     expect(testo).not.toContain(testi.othersSame);
@@ -89,7 +89,7 @@ describe('ConsentDiagram', () => {
 
   it("dove la voce resta nel video e l'evento avvisa soltanto, nessuno sceglie", () => {
     const testo = apri({
-      voce: 'fissa',
+      partecipanti: 'visibili',
       participantsCanUnmute: false,
       participantsCanStartVideo: false,
     });
@@ -98,13 +98,13 @@ describe('ConsentDiagram', () => {
   });
 
   it('dove la voce resta nel video non promette che il nome resti fuori', () => {
-    const testo = apri({ voce: 'fissa' });
+    const testo = apri({ partecipanti: 'visibili' });
     expect(testo).toContain(testi.fixedNotRecorded);
     expect(testo).not.toContain(testi.notRecorded);
   });
 
   it('senza un video completo decide il consenso alla trascrizione', () => {
-    const testo = apri({ voce: 'assente', multitrackRecordingEnabled: true });
+    const testo = apri({ partecipanti: 'assente', multitrackRecordingEnabled: true });
     expect(testo).toContain(testi.questionTranscription);
     expect(testo).toContain(testi.recordedVoice);
     expect(testo).toContain(testi.notRecordedVoice);
@@ -123,7 +123,7 @@ describe('ConsentDiagram', () => {
             participantsCanUnmute
             participantsCanStartVideo
             participantsCanShareScreen={false}
-            voce="assente"
+            partecipanti="assente"
           />
         </NextIntlClientProvider>
       );

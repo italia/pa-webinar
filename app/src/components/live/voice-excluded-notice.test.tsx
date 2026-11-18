@@ -37,7 +37,7 @@ function disegna(props: Partial<ComponentProps<typeof VoiceExcludedNotice>> = {}
       <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
         <VoiceExcludedNotice
           destinazione={null}
-          voce="rimovibile"
+          partecipanti="solo-voce"
           onAcconsenti={onAcconsenti}
           inCorso={false}
           errore={false}
@@ -70,14 +70,14 @@ describe('VoiceExcludedNotice', () => {
     expect(container.textContent).toContain(g.recordingPublic);
     disegna({ destinazione: null });
     expect(container.textContent).toContain(g.recording);
-    disegna({ destinazione: 'PUBLIC', voce: 'assente' });
+    disegna({ destinazione: 'PUBLIC', partecipanti: 'assente' });
     expect(container.textContent).toContain(g.recordingNoVideo);
   });
 
   it("il testo dell'evento si mostra, tranne dove non c'e' un video", () => {
     disegna({ testoConsenso: "Testo dell'ente." });
     expect(container.textContent).toContain("Testo dell'ente.");
-    disegna({ testoConsenso: "Testo dell'ente.", voce: 'assente' });
+    disegna({ testoConsenso: "Testo dell'ente.", partecipanti: 'assente' });
     expect(container.textContent).not.toContain("Testo dell'ente.");
     expect(container.textContent).toContain(g.recordingNoVideo);
   });

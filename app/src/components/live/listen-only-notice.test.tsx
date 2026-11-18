@@ -40,7 +40,7 @@ function disegna(props: Partial<ComponentProps<typeof ListenOnlyNotice>> = {}) {
       <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
         <ListenOnlyNotice
           destinazione={null}
-          voce="fissa"
+          partecipanti="visibili"
           onAcconsenti={onAcconsenti}
           inCorso={false}
           errore={false}
@@ -67,20 +67,25 @@ describe('ListenOnlyNotice', () => {
   });
 
   it("sopra il pulsante c'e' il testo della destinazione in vigore", () => {
+    // Il solo ascolto c'e' dove chi partecipa puo' comparire: il testo lo dice.
     disegna({ destinazione: 'REGISTRANTS' });
-    expect(container.textContent).toContain(g.recordingReserved);
+    expect(container.textContent).toContain(g.recordingVisibleReserved);
     disegna({ destinazione: 'PUBLIC' });
-    expect(container.textContent).toContain(g.recordingPublic);
+    expect(container.textContent).toContain(g.recordingVisiblePublic);
     disegna({ destinazione: null });
-    expect(container.textContent).toContain(g.recording);
-    disegna({ destinazione: 'PUBLIC', voce: 'assente' });
+    expect(container.textContent).toContain(g.recordingVisible);
+    expect(container.textContent).toContain(g.namesMayAppear);
+    disegna({ destinazione: 'PUBLIC', partecipanti: 'solo-voce' });
+    expect(container.textContent).toContain(g.recordingPublic);
+    expect(container.textContent).not.toContain(g.namesMayAppear);
+    disegna({ destinazione: 'PUBLIC', partecipanti: 'assente' });
     expect(container.textContent).toContain(g.recordingNoVideo);
   });
 
   it("il testo scelto dall'ente sta sopra il pulsante, dove un video c'e'", () => {
     disegna({ testoConsenso: 'Testo scelto per evento', destinazione: 'PUBLIC' });
     expect(container.textContent).toContain('Testo scelto per evento');
-    disegna({ testoConsenso: 'Testo scelto per evento', voce: 'assente' });
+    disegna({ testoConsenso: 'Testo scelto per evento', partecipanti: 'assente' });
     expect(container.textContent).not.toContain('Testo scelto per evento');
   });
 
@@ -105,7 +110,7 @@ describe('ListenOnlyNotice', () => {
   it("il pulsante e' descritto da quel testo, e il clic acconsente", () => {
     const onAcconsenti = disegna({ destinazione: 'PUBLIC' });
     const id = pulsante().getAttribute('aria-describedby');
-    expect(document.getElementById(id ?? '')?.textContent).toBe(g.recordingPublic);
+    expect(document.getElementById(id ?? '')?.textContent).toBe(g.recordingVisiblePublic);
     act(() => pulsante().click());
     expect(onAcconsenti).toHaveBeenCalledTimes(1);
   });

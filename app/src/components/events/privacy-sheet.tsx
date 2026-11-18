@@ -5,7 +5,7 @@ import { useId } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { Icon } from '@/components/ui/icon';
-import type { SchedaPrivacy } from '@/lib/events/privacy-sheet';
+import type { ChiNonAcconsente, SchedaPrivacy } from '@/lib/events/privacy-sheet';
 
 /**
  * La scheda privacy di un evento, con gli stessi fatti nel modulo d'iscrizione e
@@ -36,6 +36,15 @@ const TESTO_CHI_NON_ACCONSENTE = {
   soloAscolto: 'recording.refuseListenOnly',
   avviso: 'recording.audienceNotice',
   avvisoVoce: 'recording.audienceNoticeVoice',
+  // Lo dice la frase su chi e' nel video (`TESTO_NEL_VIDEO`).
+  maiNelVideo: null,
+} as const satisfies Record<ChiNonAcconsente, string | null>;
+
+/** Chi e' nel video, come lo garantisce l'installazione (lib/live/consent-rule). */
+const TESTO_NEL_VIDEO = {
+  'solo-voce': 'recording.hostsAlways',
+  esclusi: 'recording.hostsOnly',
+  visibili: 'recording.hostsAlwaysVisible',
 } as const;
 
 
@@ -134,6 +143,7 @@ export function PrivacySheet({
   testoIa?: string | null;
 }) {
   const t = useTranslations('gdpr.sheet');
+  const tConsenso = useTranslations('gdpr.consent');
   const tSala = useTranslations('waiting');
   const titolo = useId();
 
@@ -143,10 +153,17 @@ export function PrivacySheet({
   if (registrazione.destinazione) {
     frasiRegistrazione.push(t(TESTO_DESTINAZIONE[registrazione.destinazione]));
   }
-  if (registrazione.chiNonAcconsente) {
-    frasiRegistrazione.push(t(TESTO_CHI_NON_ACCONSENTE[registrazione.chiNonAcconsente]));
+  const testoChiNonAcconsente =
+    registrazione.chiNonAcconsente && TESTO_CHI_NON_ACCONSENTE[registrazione.chiNonAcconsente];
+  if (testoChiNonAcconsente) frasiRegistrazione.push(t(testoChiNonAcconsente));
+  if (registrazione.conduceSempre) {
+    frasiRegistrazione.push(t(TESTO_NEL_VIDEO[registrazione.partecipanti ?? 'visibili']));
   }
-  if (registrazione.conduceSempre) frasiRegistrazione.push(t('recording.hostsAlways'));
+  // Dove chi partecipa puo' comparire, chi legge da partecipante sa che il suo
+  // nome puo' finire nel video anche senza intervenire.
+  if (registrazione.partecipanti === 'visibili' && registrazione.chiNonAcconsente) {
+    frasiRegistrazione.push(tConsenso('namesMayAppear'));
+  }
 
   const frasiTrascrizione: string[] = [];
   if (trascrizione.sottotitoli) frasiTrascrizione.push(t('transcript.captions'));

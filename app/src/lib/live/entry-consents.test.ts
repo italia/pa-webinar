@@ -18,7 +18,13 @@ const interattivo = {
   participantsCanShareScreen: false,
 };
 const soloAscolto = { ...interattivo, participantsCanUnmute: false };
-const base = { formato: interattivo, registrazioneDisponibile: true, conduce: false, giaDato: false };
+const base = {
+  formato: interattivo,
+  registrazioneDisponibile: true,
+  conduce: false,
+  giaDato: false,
+  partecipanti: 'solo-voce' as const,
+};
 
 describe('consensoRegistrazioneIngresso', () => {
   it('chi partecipa e non l\'ha dato lo da\' in sala d\'attesa', () => {
@@ -61,6 +67,23 @@ describe('consensoRegistrazioneIngresso', () => {
   });
 });
 
+describe("consensoRegistrazioneIngresso — chi partecipa non entra mai nel video ('esclusi')", () => {
+  it("non c'e' una casella: si informa e basta, anche dove si puo' parlare", () => {
+    const esclusi = { ...base, partecipanti: 'esclusi' as const };
+    expect(consensoRegistrazioneIngresso(esclusi)).toEqual({ richiesto: false, soloAscolto: true });
+    expect(consensoRegistrazioneIngresso({ ...esclusi, formato: soloAscolto })).toEqual({
+      richiesto: false,
+      soloAscolto: true,
+    });
+  });
+
+  it('altrove la casella resta', () => {
+    for (const partecipanti of ['visibili', 'assente'] as const) {
+      expect(consensoRegistrazioneIngresso({ ...base, partecipanti }).richiesto).toBe(true);
+    }
+  });
+});
+
 describe('consensoRegistrazioneIngresso — chiamata rapida', () => {
   it('nessuno lo da\' all\'ingresso: la domanda arriva in sala, a registrazione avviata', () => {
     const niente = { richiesto: false, soloAscolto: false };
@@ -74,7 +97,7 @@ describe('consensoRegistrazioneIngresso — chiamata rapida', () => {
 
 describe('registraChiConduce', () => {
   it('un evento a calendario registra chi conduce dove si puo\' registrare, qualunque sia la voce', () => {
-    for (const voce of [undefined, 'assente', 'rimovibile', 'fissa'] as const) {
+    for (const voce of [undefined, 'assente', 'solo-voce', 'esclusi', 'visibili'] as const) {
       expect(registraChiConduce({ recordingEnabled: true }, true, voce)).toBe(true);
       expect(registraChiConduce({ recordingEnabled: true, eventType: 'SCHEDULED' }, true, voce)).toBe(true);
       expect(registraChiConduce({ recordingEnabled: false }, true, voce)).toBe(false);
@@ -84,12 +107,14 @@ describe('registraChiConduce', () => {
 
   it('una chiamata rapida solo dove chi non acconsente resta fuori dal video', () => {
     const rapida = { recordingEnabled: true, eventType: 'INSTANT' };
-    expect(registraChiConduce(rapida, true, 'rimovibile')).toBe(true);
-    expect(registraChiConduce(rapida, true, 'fissa')).toBe(false);
+    expect(registraChiConduce(rapida, true, 'solo-voce')).toBe(true);
+    // Chi partecipa non entra mai nel video: la registrazione riprende chi conduce.
+    expect(registraChiConduce(rapida, true, 'esclusi')).toBe(true);
+    expect(registraChiConduce(rapida, true, 'visibili')).toBe(false);
     expect(registraChiConduce(rapida, true, 'assente')).toBe(false);
     expect(registraChiConduce(rapida, true)).toBe(false);
-    expect(registraChiConduce(rapida, false, 'rimovibile')).toBe(false);
-    expect(registraChiConduce({ ...rapida, recordingEnabled: false }, true, 'rimovibile')).toBe(false);
+    expect(registraChiConduce(rapida, false, 'solo-voce')).toBe(false);
+    expect(registraChiConduce({ ...rapida, recordingEnabled: false }, true, 'solo-voce')).toBe(false);
   });
 });
 
@@ -101,7 +126,7 @@ describe('consensoRegistrazioneIngresso — solo ascolto per chi non acconsente'
 
 describe('consensoTrascrizioneIngresso', () => {
   const siNo = [false, true];
-  const voci = ['assente', 'rimovibile', 'fissa'] as const;
+  const voci = ['assente', 'solo-voce', 'esclusi', 'visibili'] as const;
 
   it("con tracce e sottotitoli risponde come la condizione della sala d'attesa", () => {
     for (const multitrackRecordingEnabled of siNo) {
@@ -114,13 +139,13 @@ describe('consensoTrascrizioneIngresso', () => {
                   (multitrackRecordingEnabled || captionsTranscript) &&
                   !concluso &&
                   !giaDato &&
-                  !(voce === 'rimovibile' && soloAscolto);
+                  !(voce === 'solo-voce' && soloAscolto);
                 expect(
                   consensoTrascrizioneIngresso({
                     formato: { multitrackRecordingEnabled, captionsTranscript },
                     concluso,
                     giaDato,
-                    voce,
+                    partecipanti: voce,
                     soloAscolto,
                   }),
                 ).toBe(atteso);
@@ -153,10 +178,10 @@ describe('consensoTrascrizioneIngresso', () => {
     expect(consensoTrascrizioneIngresso({ formato, concluso: true })).toBe(false);
     expect(consensoTrascrizioneIngresso({ formato, concluso: false, giaDato: true })).toBe(false);
     expect(
-      consensoTrascrizioneIngresso({ formato, concluso: false, voce: 'rimovibile', soloAscolto: true }),
+      consensoTrascrizioneIngresso({ formato, concluso: false, partecipanti: 'solo-voce', soloAscolto: true }),
     ).toBe(false);
     expect(
-      consensoTrascrizioneIngresso({ formato, concluso: false, voce: 'fissa', soloAscolto: true }),
+      consensoTrascrizioneIngresso({ formato, concluso: false, partecipanti: 'visibili', soloAscolto: true }),
     ).toBe(true);
   });
 
@@ -167,10 +192,17 @@ describe('consensoTrascrizioneIngresso', () => {
       { trascrizioneVideo: true },
     ]) {
       expect(
-        consensoTrascrizioneIngresso({ formato, concluso: false, voce: 'rimovibile', registrazioneInSala: true })
+        consensoTrascrizioneIngresso({ formato, concluso: false, partecipanti: 'solo-voce', registrazioneInSala: true })
       ).toBe(false);
-      expect(consensoTrascrizioneIngresso({ formato, concluso: false, voce: 'rimovibile' })).toBe(true);
+      expect(consensoTrascrizioneIngresso({ formato, concluso: false, partecipanti: 'solo-voce' })).toBe(true);
     }
+  });
+
+  it("dove chi partecipa non entra mai nel video la trascrizione non aspetta la registrazione", () => {
+    const formato = { multitrackRecordingEnabled: true };
+    expect(
+      consensoTrascrizioneIngresso({ formato, concluso: false, partecipanti: 'esclusi', soloAscolto: true }),
+    ).toBe(true);
   });
 
   it("senza nessuna trascrizione non c'e' casella", () => {

@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
 
 import { tracceConfigurate } from '@/lib/live/capture-state';
-import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import type { PartecipantiNelVideo } from '@/lib/live/consent-rule';
 import {
   destinazioneDiPartenza,
   videoDaDestinare,
@@ -71,12 +71,12 @@ export function registrazioneVuota(
     WizardForm,
     'recordingEnabled' | 'aiTranscriptEnabled' | 'multitrackRecordingEnabled'
   >,
-  voce: VoceNelVideo | undefined,
+  partecipanti: PartecipantiNelVideo | undefined,
   recordingAvailable: boolean,
 ): boolean {
   return (
     form.recordingEnabled &&
-    !videoDaDestinare(voce) &&
+    !videoDaDestinare(partecipanti) &&
     !tracceConfigurate(form, recordingAvailable)
   );
 }
