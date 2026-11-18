@@ -547,12 +547,14 @@ export default function WaitingRoom({
   });
   const nicknameOfferto = !!nicknameSala;
   const erroreDallaSala = nicknameSala?.errore ?? null;
-  const { setErrore: segnaErroreNickname } = nick;
+  const { segnalaRifiuto: segnalaRifiutoNickname } = nick;
   useEffect(() => {
     if (!erroreDallaSala) return;
-    segnaErroreNickname(erroreDallaSala);
+    // Il nickname rifiutato torna nel campo da rivedere: «Entra» lo
+    // ricontrolla, invece di rimandarlo com'e'.
+    segnalaRifiutoNickname(erroreDallaSala);
     document.getElementById(CAMPO_NICKNAME)?.focus();
-  }, [erroreDallaSala, segnaErroreNickname]);
+  }, [erroreDallaSala, segnalaRifiutoNickname]);
   // Il nome che gli altri vedono: nella chat dell'attesa e nella piazza.
   const nomeMostrato = (nicknameOfferto && nick.confermato) || trimmedName;
   // La trascrizione dei propri interventi, con il proprio nome: la stessa regola

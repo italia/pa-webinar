@@ -39,6 +39,7 @@ import {
   prendiNicknameOspite,
   rispostaNicknameRifiutato,
 } from '@/lib/live/nickname';
+import { normalizzaNickname } from '@/lib/live/nickname-rule';
 import { guestSenderId } from '@/lib/chat/sender-key';
 import { recordingAvailableFor, voceNelVideo } from '@/lib/recording/availability';
 import {
@@ -392,6 +393,21 @@ async function registraConsensi(
   };
 }
 
+/**
+ * Un token della sala di questa visita porta gia' questo nickname: l'ospite
+ * lo riprende anche se nel frattempo ha cambiato rete (lib/live/nickname).
+ */
+async function nicknameGiaInSala(
+  roomName: string,
+  nickname: string,
+  prove: readonly string[] | undefined,
+): Promise<boolean> {
+  if (!prove?.length) return false;
+  const nick = normalizzaNickname(nickname);
+  const posti = await Promise.all(prove.map((t) => postoDaTokenSala(t, roomName)));
+  return posti.some((p) => p?.nome === nick);
+}
+
 export const POST = withErrorHandling(async (request, context) => {
   const { param: slug } = await context.params;
 
@@ -573,7 +589,12 @@ export const POST = withErrorHandling(async (request, context) => {
       // accostano.
       let nicknameInoltro: string | null = null;
       if (parsed.data.nickname && event.nicknamesEnabled && !event.audienceAnonymous) {
-        const esito = await prendiNicknameOspite(event.id, parsed.data.nickname, (n) => guestSenderId(ip, n));
+        const esito = await prendiNicknameOspite(
+          event.id,
+          parsed.data.nickname,
+          (n) => guestSenderId(ip, n),
+          await nicknameGiaInSala(event.jitsiRoomName, parsed.data.nickname, parsed.data.nicknameProof),
+        );
         if (!esito.ok) return rispostaNicknameRifiutato(esito);
         nicknameInoltro = esito.nickname;
       }
@@ -752,7 +773,12 @@ export const POST = withErrorHandling(async (request, context) => {
     // poi scrive e chiede.
     let nicknameOspite: string | null = null;
     if (parsed.data.nickname && event.nicknamesEnabled) {
-      const esito = await prendiNicknameOspite(event.id, parsed.data.nickname, (n) => guestSenderId(ip, n));
+      const esito = await prendiNicknameOspite(
+        event.id,
+        parsed.data.nickname,
+        (n) => guestSenderId(ip, n),
+        await nicknameGiaInSala(event.jitsiRoomName, parsed.data.nickname, parsed.data.nicknameProof),
+      );
       if (!esito.ok) return rispostaNicknameRifiutato(esito);
       nicknameOspite = esito.nickname;
     }

@@ -2124,6 +2124,21 @@ describe('POST jitsi/token — nickname di chi partecipa', () => {
     expect(decryptPII(prova.displayName)).toBe('Pippo');
   });
 
+  it("l'ospite che rientra da un'altra rete riprende il suo nickname con i token della visita", async () => {
+    conNickname();
+    const { body } = await minted(await post({ guestName: 'Mario Rossi', nickname: 'Pippo' }));
+    // Un altro indirizzo, senza prova: per la sala e' un'altra persona.
+    const senza = await post({ guestName: 'Mario Rossi', nickname: 'Pippo' });
+    expect(senza.status).toBe(409);
+    const con = await post({ guestName: 'Mario Rossi', nickname: 'Pippo', nicknameProof: [body.jwt] });
+    expect(con.status).toBe(200);
+    expect((await minted(con)).user.name).toBe('Pippo');
+    // Un token con un altro nome non prova niente.
+    const altro = await minted(await post({ guestName: 'Mario Rossi', nickname: 'Pluto' }));
+    const falso = await post({ guestName: 'Mario Rossi', nickname: 'Pippo', nicknameProof: [altro.body.jwt] });
+    expect(falso.status).toBe(409);
+  });
+
   it("col pubblico anonimo il nickname dell'ospite prende il posto dello pseudonimo", async () => {
     conNickname({ audienceAnonymous: true });
     const { user } = await minted(await post({ guestName: 'Mario Rossi', nickname: 'Pippo' }));

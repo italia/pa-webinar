@@ -745,6 +745,7 @@
         "reserved": "Sadrži rezerviranu riječ, poput naziva uloge: odaberite drugi.",
         "host": "Nalikuje imenu nekoga tko vodi događaj: odaberite drugi.",
         "taken": "Netko na događaju već koristi ovaj nadimak.",
+        "disabled": "Ovaj događaj ne prihvaća nove nadimke: svoj možete samo ukloniti.",
         "rete": "Nadimak nije moguće provjeriti. Pokušajte ponovno."
       },
       "button": "Nadimak",

@@ -745,6 +745,7 @@
         "reserved": "Contiene una palabra reservada, como el nombre de un rol: elige otro.",
         "host": "Se parece al nombre de quien conduce el evento: elige otro.",
         "taken": "Alguien en el evento ya usa este apodo.",
+        "disabled": "Este evento no acepta apodos nuevos: solo puedes quitar el tuyo.",
         "rete": "No se ha podido comprobar el apodo. Inténtalo de nuevo."
       },
       "button": "Apodo",

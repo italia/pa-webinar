@@ -745,6 +745,7 @@
         "reserved": "Conține un cuvânt rezervat, cum ar fi numele unui rol: alege alta.",
         "host": "Seamănă cu numele cuiva care conduce evenimentul: alege alta.",
         "taken": "Cineva din eveniment folosește deja această poreclă.",
+        "disabled": "Acest eveniment nu acceptă porecle noi: o poți doar elimina pe a ta.",
         "rete": "Porecla nu a putut fi verificată. Încearcă din nou."
       },
       "button": "Poreclă",

@@ -28,7 +28,11 @@ type PropsAttesa = {
   recordingDestination?: unknown;
   voce?: unknown;
   schedaPrivacy?: SchedaPrivacy | null;
-  nickname?: { eventId: string; iniziale: string | null; errore?: { motivo: string; suggerimento?: string } | null };
+  nickname?: {
+    eventId: string;
+    iniziale: string | null;
+    errore?: { motivo: string; suggerimento?: string; nickname?: string } | null;
+  };
   onEnterLive: (nome: string, prefs: WaitingRoomJoinPrefs) => void;
 };
 const attesa = vi.hoisted(() => ({ props: null as unknown }));
@@ -1676,12 +1680,45 @@ describe('sala — il nickname', () => {
     expect(ultimoToken()).not.toHaveProperty('nickname');
   });
 
-  it("l'ospite lo manda con il token, per la visita", async () => {
+  it("l'ospite lo manda con il token, per la visita, con i token della visita come prova", async () => {
     await monta({ event: conNickname, token: '', isGuest: true });
     expect(leggiAttesa().nickname).toMatchObject({ eventId: evento.id, iniziale: null });
     risposte.push({ nickname: 'Pippo' });
     await entra({ nickname: 'Pippo' });
-    expect(ultimoToken()).toMatchObject({ guestName: 'Relatore 1', nickname: 'Pippo' });
+    expect(ultimoToken()).toMatchObject({ guestName: 'Relatore 1', nickname: 'Pippo', nicknameProof: [] });
+    risposte.push({ nickname: 'Pippo' });
+    await caduta();
+    expect(ultimoToken()).toMatchObject({ nickname: 'Pippo', nicknameProof: ['jwt-1'] });
+  });
+
+  it('un cambio dalla sala che non passa lascia il nickname di prima, anche ai rientri', async () => {
+    const base = globalThis.fetch;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL, init?: RequestInit) =>
+        String(input).endsWith('/nickname')
+          ? rispondi({ nickname: (JSON.parse(String(init?.body)) as { nickname: string }).nickname, saved: false })
+          : base(input, init),
+      ),
+    );
+    await monta({ event: conNickname, token: '', isGuest: true });
+    risposte.push({ nickname: 'Pippo' });
+    await entra({ nickname: 'Pippo' });
+    await premi(document.querySelector<HTMLElement>(`button[aria-label="${l.nickname.open}"]`)!);
+    const campo = document.querySelector<HTMLInputElement>('.wr-nickname input')!;
+    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set;
+    await act(async () => {
+      setter?.call(campo, 'Pluto');
+      campo.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    risposte.push({ stato: 409, code: 'NICKNAME_TAKEN', reason: 'taken' });
+    await premi(pulsante(l.nickname.apply));
+    await vi.waitFor(() => expect(ultimoToken()).toMatchObject({ nickname: 'Pluto' }));
+    await vi.waitFor(() => expect(testo()).toContain(l.nickname.errors.taken));
+    risposte.push({ nickname: 'Pippo' });
+    await caduta();
+    expect(ultimoToken()).toMatchObject({ nickname: 'Pippo' });
+    expect(window.sessionStorage.getItem(`pa-nickname:${evento.id}`)).toBe('Pippo');
   });
 
   it("chi apre il proprio link non lo manda: il server lo legge dall'iscrizione", async () => {
@@ -1689,6 +1726,13 @@ describe('sala — il nickname', () => {
     expect(leggiAttesa().nickname).toMatchObject({ iniziale: 'Pippo' });
     await entra({ nickname: 'Pippo' });
     expect(ultimoToken()).not.toHaveProperty('nickname');
+  });
+
+  it("chi ha un nickname salvato lo ritrova anche a opzione spenta, per poterlo togliere", async () => {
+    await monta({ registrantOwnsLink: true, initialNickname: 'Pippo' });
+    expect(leggiAttesa().nickname).toMatchObject({ iniziale: 'Pippo' });
+    await monta({ registrantOwnsLink: true, initialNickname: null });
+    expect(leggiAttesa().nickname).toBeUndefined();
   });
 
   it('chi conduce non ne ha uno', async () => {
@@ -1706,7 +1750,12 @@ describe('sala — il nickname', () => {
     risposte.push({ stato: 409, code: 'NICKNAME_TAKEN', reason: 'taken', suggestion: 'Pippo2' });
     await entra({ nickname: 'Pippo' });
     await vi.waitFor(() => {
-      expect(leggiAttesa().nickname?.errore).toEqual({ motivo: 'taken', suggerimento: 'Pippo2' });
+      // Con il nickname rifiutato, che torna nel campo da rivedere.
+      expect(leggiAttesa().nickname?.errore).toEqual({
+        motivo: 'taken',
+        suggerimento: 'Pippo2',
+        nickname: 'Pippo',
+      });
     });
   });
 });

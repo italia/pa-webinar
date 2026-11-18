@@ -163,17 +163,27 @@ export async function nomiDiChiConduce(eventId: string): Promise<string[]> {
 
 // ── I nickname degli ospiti, per la visita ──
 
+// Una chiave per nickname, con la sua scadenza: un nickname lasciato (cambiato,
+// o di chi se n'e' andato) si libera dodici ore dopo l'ultimo ingresso di chi
+// l'aveva, qualunque cosa facciano gli altri.
 const OSPITI_TTL_SECONDS = 12 * 60 * 60;
 const REDIS_TIMEOUT_MS = 1500;
 const MEMORIA_TETTO = 5000;
-const chiaveOspiti = (eventId: string) => `live:nicknames:${eventId}`;
+const chiaveOspite = (eventId: string, impronta: string) =>
+  `live:nickname:${eventId}:${impronta}`;
 const memoria = new Map<string, Map<string, { chi: string; at: number }>>();
+let ultimaPulizia = 0;
 
 function memoriaEvento(eventId: string): Map<string, { chi: string; at: number }> {
-  const scadenza = Date.now() - OSPITI_TTL_SECONDS * 1000;
-  for (const [ev, m] of memoria) {
-    for (const [k, v] of m) if (v.at < scadenza) m.delete(k);
-    if (m.size === 0 && ev !== eventId) memoria.delete(ev);
+  // La pulizia di tutta la memoria al piu' una volta al minuto: la si legge a
+  // ogni messaggio in chat di un ospite.
+  if (Date.now() - ultimaPulizia > 60_000) {
+    ultimaPulizia = Date.now();
+    const scadenza = Date.now() - OSPITI_TTL_SECONDS * 1000;
+    for (const [ev, m] of memoria) {
+      for (const [k, v] of m) if (v.at < scadenza) m.delete(k);
+      if (m.size === 0 && ev !== eventId) memoria.delete(ev);
+    }
   }
   let m = memoria.get(eventId);
   if (!m) {
@@ -192,40 +202,54 @@ async function presiDaOspiti(
   const redis = getRedis();
   if (redis) {
     const valori = await withDeadline(
-      redis.hmget(chiaveOspiti(eventId), ...impronte),
+      redis.mget(...impronte.map((k) => chiaveOspite(eventId, k))),
       REDIS_TIMEOUT_MS,
       null
     );
     if (valori) return valori.map((v) => v ?? null);
   }
   const m = memoriaEvento(eventId);
-  return impronte.map((k) => m.get(k)?.chi ?? null);
+  const scadenza = Date.now() - OSPITI_TTL_SECONDS * 1000;
+  return impronte.map((k) => {
+    const v = m.get(k);
+    return v && v.at >= scadenza ? v.chi : null;
+  });
 }
 
-/** Prende l'impronta per l'ospite. Vero se ora e' sua (anche se lo era gia'). */
+/**
+ * Prende l'impronta per l'ospite. Vero se ora e' sua (anche se lo era gia', e
+ * allora la scadenza riparte). `ripresa`: l'ospite prova di averla avuta in
+ * questa visita, e la riprende anche se risulta di un'altra chiave (un'altra
+ * rete).
+ */
 async function prendiPerOspite(
   eventId: string,
   impronta: string,
-  chi: string
+  chi: string,
+  ripresa = false
 ): Promise<boolean> {
   const redis = getRedis();
   if (redis) {
+    const k = chiaveOspite(eventId, impronta);
     const esito = await withDeadline(
-      redis
-        .multi()
-        .hsetnx(chiaveOspiti(eventId), impronta, chi)
-        .hget(chiaveOspiti(eventId), impronta)
-        .expire(chiaveOspiti(eventId), OSPITI_TTL_SECONDS)
-        .exec(),
+      (ripresa
+        ? redis.multi().set(k, chi, 'EX', OSPITI_TTL_SECONDS).get(k)
+        : redis.multi().set(k, chi, 'EX', OSPITI_TTL_SECONDS, 'NX').get(k)
+      ).exec(),
       REDIS_TIMEOUT_MS,
       null
     );
-    if (esito) return esito[1]?.[1] === chi;
+    if (esito) {
+      if (esito[1]?.[1] !== chi) return false;
+      await withDeadline(redis.expire(k, OSPITI_TTL_SECONDS), REDIS_TIMEOUT_MS, 0);
+      return true;
+    }
     // Redis non risponde: si ripiega sulla memoria, come senza Redis.
   }
   const m = memoriaEvento(eventId);
   const prima = m.get(impronta);
-  if (prima && prima.chi !== chi) return false;
+  const viva = prima && prima.at >= Date.now() - OSPITI_TTL_SECONDS * 1000;
+  if (viva && prima.chi !== chi && !ripresa) return false;
   if (!prima && m.size >= MEMORIA_TETTO) return false;
   m.set(impronta, { chi, at: Date.now() });
   return true;
@@ -348,19 +372,40 @@ export async function salvaNicknameIscrizione(
 /**
  * Il nickname di un ospite per la visita: controllato e preso per la sua
  * chiave (`guestSenderId` dell'indirizzo e del nickname, la stessa con cui
- * scrive in chat), finche' l'evento e' di oggi. Lo stesso ospite che rientra
- * lo ritrova suo.
+ * scrive in chat), per dodici ore dall'ultimo ingresso. Lo stesso ospite che
+ * rientra lo ritrova suo senza ripetere le regole, che valgono quando lo si
+ * prende: un relatore aggiunto dopo non fa uscire chi e' gia' in sala.
+ * `provato`: un token della sala di questa visita porta gia' questo nickname, e
+ * l'ospite lo riprende anche da un'altra rete.
  */
 export async function prendiNicknameOspite(
   eventId: string,
   raw: string,
-  chiaveOspite: (nickname: string) => string
+  chiaveOspite: (nickname: string) => string,
+  provato = false
 ): Promise<EsitoNickname> {
   const nick = normalizzaNickname(raw);
   const chi = { ospite: chiaveOspite(nick) };
+  const forma = difettoDiForma(nick);
+  if (forma) return { ok: false, motivo: forma };
+  const impronta = improntaNickname(eventId, nick);
+  const [gia] = await presiDaOspiti(eventId, [impronta]);
+  if (gia === chi.ospite || (gia !== null && provato)) {
+    if (await prendiPerOspite(eventId, impronta, chi.ospite, true)) {
+      return { ok: true, nickname: nick };
+    }
+  }
+  // Gia' in sala con questo nickname, e nessuno l'ha preso nel frattempo: lo
+  // riprende senza ripetere le regole.
+  if (provato) {
+    const [libero] = await liberi(eventId, [nick], chi);
+    if (libero && (await prendiPerOspite(eventId, impronta, chi.ospite))) {
+      return { ok: true, nickname: nick };
+    }
+  }
   const esito = await verificaNickname(eventId, nick, chi);
   if (!esito.ok) return esito;
-  if (!(await prendiPerOspite(eventId, improntaNickname(eventId, nick), chi.ospite))) {
+  if (!(await prendiPerOspite(eventId, impronta, chi.ospite))) {
     return {
       ok: false,
       motivo: 'taken',

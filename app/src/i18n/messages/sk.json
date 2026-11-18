@@ -745,6 +745,7 @@
         "reserved": "Obsahuje vyhradené slovo, napríklad názov roly: zvoľte inú.",
         "host": "Pripomína meno niekoho, kto podujatie vedie: zvoľte inú.",
         "taken": "Túto prezývku už na podujatí niekto používa.",
+        "disabled": "Toto podujatie neprijíma nové prezývky: svoju môžete iba odstrániť.",
         "rete": "Prezývku sa nepodarilo skontrolovať. Skúste to znova."
       },
       "button": "Prezývka",

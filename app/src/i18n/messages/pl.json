@@ -745,6 +745,7 @@
         "reserved": "Zawiera zastrzeżone słowo, na przykład nazwę roli: wybierz inny.",
         "host": "Przypomina imię lub nazwisko osoby prowadzącej wydarzenie: wybierz inny.",
         "taken": "Ktoś na tym wydarzeniu już używa tego nicka.",
+        "disabled": "To wydarzenie nie przyjmuje nowych nicków: możesz tylko usunąć swój.",
         "rete": "Nie udało się sprawdzić nicka. Spróbuj ponownie."
       },
       "button": "Nick",

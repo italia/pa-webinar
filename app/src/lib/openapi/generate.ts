@@ -272,7 +272,8 @@ registry.registerPath({
   description:
     'A registrant, from the browser that registered (`Authorization: Bearer <accessToken>` and the event cookie), ' +
     'saves the nickname on the registration, or removes it with null. A guest or someone opening another ' +
-    "person's link only checks it: their nickname lasts for the visit and the token route takes it on entry. " +
+    "person's link only checks it, and a guest only where guests may enter: their nickname lasts for the visit " +
+    'and the token route takes it on entry (`nickname`, with `nicknameProof`, the room tokens of the visit). ' +
     'One word that starts with a letter, 2 to 24 characters, letters of a single script; no platform role ' +
     'words, nothing resembling the names of the hosts, unique in the event. Hosts keep their own name.',
   request: {

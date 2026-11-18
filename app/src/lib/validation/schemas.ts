@@ -436,6 +436,9 @@ export const jitsiTokenRequestSchema = z.object({
    *  (lib/live/nickname): il server lo controlla e lo prende. Quello di chi
    *  apre il proprio link sta sull'iscrizione, e qui non conta. */
   nickname: z.string().min(1).max(100).optional(),
+  /** I token della sala di questa visita: uno che porta gia' quel nickname
+   *  lo fa riprendere anche da un'altra rete, senza ripetere le regole. */
+  nicknameProof: z.array(z.string().min(1).max(4096)).max(50).optional(),
   /** Consenso alla registrazione dell'evento dato ora con un clic: in sala
    *  d'attesa o dalla sala. I consensi gia' dati si riportano in `consentReplay`. */
   recordingConsent: z.boolean().optional(),

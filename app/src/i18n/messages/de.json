@@ -745,6 +745,7 @@
         "reserved": "Er enthält ein reserviertes Wort, etwa den Namen einer Rolle: Wählen Sie einen anderen.",
         "host": "Er ähnelt dem Namen einer Person, die die Veranstaltung leitet: Wählen Sie einen anderen.",
         "taken": "Jemand in der Veranstaltung verwendet diesen Spitznamen bereits.",
+        "disabled": "Diese Veranstaltung nimmt keine neuen Spitznamen an: Sie können Ihren nur entfernen.",
         "rete": "Der Spitzname konnte nicht geprüft werden. Versuchen Sie es erneut."
       },
       "button": "Spitzname",

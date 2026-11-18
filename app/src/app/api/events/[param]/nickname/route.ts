@@ -42,7 +42,11 @@ import {
   salvaNicknameIscrizione,
   verificaNickname,
 } from '@/lib/live/nickname';
+import { guestWindowOpen } from '@/lib/events/guest-window';
+import { hasJoinGrant } from '@/lib/events/join-grant';
 import { getClientIp, rateLimit } from '@/lib/rate-limit';
+import { limiteDellaSala } from '@/lib/room-rate-limit';
+import { getSettings } from '@/lib/settings';
 
 export const dynamic = 'force-dynamic';
 
@@ -56,7 +60,12 @@ export const PUT = withErrorHandling(async (request, context) => {
   const ip = getClientIp(request);
   // Una persona lo prova qualche volta: un tetto per indirizzo basta, e ferma
   // chi volesse scoprire quali nickname sono presi.
-  const rl = rateLimit(`nickname:${ip}`, { limit: 30, windowMs: 60_000 });
+  // Scala come gli altri limiti della sala: un ufficio dietro un solo
+  // indirizzo entra tutto insieme.
+  const rl = rateLimit(`nickname:${ip}`, {
+    limit: limiteDellaSala(120),
+    windowMs: 60_000,
+  });
   if (!rl.allowed) throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
   const parsed = schema.safeParse(await parseJsonBody(request, 1024));
   if (!parsed.success) throw new ValidationError('Invalid body');
@@ -70,6 +79,9 @@ export const PUT = withErrorHandling(async (request, context) => {
       status: true,
       nicknamesEnabled: true,
       audienceAnonymous: true,
+      eventType: true,
+      accessMode: true,
+      joinPasswordHash: true,
       moderatorToken: true,
       moderatorName: true,
     },
@@ -129,6 +141,15 @@ export const PUT = withErrorHandling(async (request, context) => {
       403,
       'NICKNAMES_DISABLED'
     );
+  }
+  // Un ospite prova il nickname solo dove potrebbe entrare: altrimenti la
+  // risposta direbbe a chiunque quali nomi hanno chi conduce e chi partecipa.
+  if (
+    !dellEvento &&
+    (!guestWindowOpen(event, (await getSettings()).guestAccessEnabled) ||
+      (event.joinPasswordHash && !(await hasJoinGrant(event.id))))
+  ) {
+    throw new ForbiddenError('The room is not open to guests');
   }
   const esito = await verificaNickname(event.id, richiesto, {
     ospite: guestSenderId(ip, richiesto),

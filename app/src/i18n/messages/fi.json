@@ -745,6 +745,7 @@
         "reserved": "Siinä on varattu sana, kuten roolin nimi: valitse toinen.",
         "host": "Se muistuttaa tapahtuman vetäjän nimeä: valitse toinen.",
         "taken": "Joku tapahtumassa käyttää jo tätä nimimerkkiä.",
+        "disabled": "Tämä tapahtuma ei hyväksy uusia nimimerkkejä: voit vain poistaa omasi.",
         "rete": "Nimimerkkiä ei voitu tarkistaa. Yritä uudelleen."
       },
       "button": "Nimimerkki",

@@ -745,6 +745,7 @@
         "reserved": "Il contient un mot réservé, comme le nom d'un rôle : choisissez-en un autre.",
         "host": "Il ressemble au nom d'une personne qui anime l'événement : choisissez-en un autre.",
         "taken": "Quelqu'un dans l'événement utilise déjà ce surnom.",
+        "disabled": "Cet événement n'accepte pas de nouveaux surnoms : vous pouvez seulement retirer le vôtre.",
         "rete": "Le surnom n'a pas pu être vérifié. Réessayez."
       },
       "button": "Surnom",

@@ -745,6 +745,7 @@
         "reserved": "Foglalt szót tartalmaz, például egy szerepkör nevét: válassz másikat.",
         "host": "Hasonlít az esemény egyik vezetőjének nevére: válassz másikat.",
         "taken": "Valaki az eseményen már használja ezt a becenevet.",
+        "disabled": "Ez az esemény nem fogad el új beceneveket: a sajátodat csak eltávolíthatod.",
         "rete": "A becenevet nem sikerült ellenőrizni. Próbáld újra."
       },
       "button": "Becenév",

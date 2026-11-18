@@ -745,6 +745,7 @@
         "reserved": "Obsahuje vyhrazené slovo, například název role: zvolte jinou.",
         "host": "Připomíná jméno někoho, kdo akci vede: zvolte jinou.",
         "taken": "Tuto přezdívku už v akci někdo používá.",
+        "disabled": "Tato akce nepřijímá nové přezdívky: svou můžete jen odstranit.",
         "rete": "Přezdívku se nepodařilo zkontrolovat. Zkuste to znovu."
       },
       "button": "Přezdívka",

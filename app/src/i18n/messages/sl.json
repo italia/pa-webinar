@@ -745,6 +745,7 @@
         "reserved": "Vsebuje rezervirano besedo, na primer ime vloge: izberite drugega.",
         "host": "Spominja na ime nekoga, ki vodi dogodek: izberite drugega.",
         "taken": "Nekdo na dogodku že uporablja ta vzdevek.",
+        "disabled": "Ta dogodek ne sprejema novih vzdevkov: svojega lahko le odstranite.",
         "rete": "Vzdevka ni bilo mogoče preveriti. Poskusite znova."
       },
       "button": "Vzdevek",

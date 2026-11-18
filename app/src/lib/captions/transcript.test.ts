@@ -81,17 +81,20 @@ describe('componiTrascrizione', () => {
     expect(t.speakers.map((s) => s.displayName)).toEqual(['Relatore 1', 'Moderatrice', 'Relatore 2']);
   });
 
-  it("un iscritto che cambia nickname durante l'evento e' uno solo, con l'ultimo", () => {
+  it("un iscritto che cambia o toglie il nickname ha un'etichetta per nome: nessuna frase passa sotto l'altro", () => {
     const iscrizione = '0b1f6c1e-2a3b-4c5d-8e9f-0a1b2c3d4e5f';
     const t = componiTrascrizione(
       [
-        frase(`reg-${iscrizione}-aaaa1111`, 'Pippo', 'Prima.', 1, 2),
-        frase(`reg-${iscrizione}-bbbb2222`, 'Pluto', 'Dopo.', 3, 4),
+        frase(`reg-${iscrizione}-aaaa1111`, 'Luna', 'Prima.', 1, 2),
+        frase(`reg-${iscrizione}-bbbb2222`, 'Maria Rossi', 'Dopo.', 3, 4),
+        frase(`reg-${iscrizione}-cccc3333`, 'Luna', 'Ancora.', 5, 6),
       ],
       t0,
     );
-    expect(t.speakers).toHaveLength(1);
-    expect(t.speakers[0]!.displayName).toBe('Pluto');
+    expect(t.speakers.map((s) => s.displayName)).toEqual(['Luna', 'Maria Rossi']);
+    expect(t.segments.map((s) => s.speaker)).toEqual(['SPEAKER_00', 'SPEAKER_01', 'SPEAKER_00']);
+    // Il conto delle voci resta per persona.
+    expect(contaVoci(t.segments.map(() => ({ seatId: `reg-${iscrizione}-x`, speakerName: null })))).toBe(1);
   });
 
   it('di chi non ha acconsentito restano solo i tempi, senza testo ne\' nome', () => {

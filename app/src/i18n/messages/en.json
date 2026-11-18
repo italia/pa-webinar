@@ -745,6 +745,7 @@
         "reserved": "It contains a reserved word, such as the name of a role: choose another one.",
         "host": "It resembles the name of someone hosting the event: choose another one.",
         "taken": "Someone in the event already uses this nickname.",
+        "disabled": "This event does not accept new nicknames: you can only remove yours.",
         "rete": "The nickname could not be checked. Try again."
       },
       "button": "Nickname",

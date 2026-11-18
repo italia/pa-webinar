@@ -125,7 +125,12 @@ import {
 } from '@/lib/jitsi/riconnessione';
 import { useRientro } from '@/hooks/use-rientro';
 import { usePresencePass } from '@/hooks/use-presence-pass';
-import { leggiNicknameVisita, useNickname, type ErroreNickname } from '@/hooks/use-nickname';
+import {
+  leggiNicknameVisita,
+  salvaNicknameVisita,
+  useNickname,
+  type ErroreNickname,
+} from '@/hooks/use-nickname';
 import { NicknameDialog } from '@/components/live/nickname-field';
 import { splitTitleKicker } from '@/lib/utils/title-kicker';
 import { useSettings } from '@/lib/settings-context';
@@ -492,8 +497,13 @@ export default function LiveEventClient({
   // Chi apre il link di un altro col pubblico anonimo resta con lo pseudonimo
   // del posto, come dice la rotta del token.
   const linkDiUnAltro = !!token && !isGuest && !isModerator && !isSpeaker && !registrantOwnsLink;
+  // Chi ha un nickname salvato lo ritrova anche se l'opzione si e' spenta dopo,
+  // e lo puo' togliere.
   const nicknameOfferto =
-    !!event.nicknamesEnabled && !isModerator && !isSpeaker && !(linkDiUnAltro && event.audienceAnonymous);
+    (!!event.nicknamesEnabled || (registrantOwnsLink && !!initialNickname)) &&
+    !isModerator &&
+    !isSpeaker &&
+    !(linkDiUnAltro && event.audienceAnonymous);
   // Quello della visita, che la pagina manda con ogni richiesta del token: chi
   // apre il proprio link lo ha sull'iscrizione, e il server lo legge da li'.
   const nicknameVisitaRef = useRef<string | null>(null);
@@ -895,7 +905,11 @@ export default function LiveEventClient({
       // già data) in diretta. Il nome scritto è obbligatorio: lo chiede la
       // sala d'attesa prima di passare a fetching_jwt.
       body.guestName = chosenName.trim();
-      if (nicknameOfferto && nicknameVisitaRef.current) body.nickname = nicknameVisitaRef.current;
+      if (nicknameOfferto && nicknameVisitaRef.current) {
+        body.nickname = nicknameVisitaRef.current;
+        // I token di questa visita: chi cambia rete riprende il suo nickname.
+        body.nicknameProof = tokenSalaRef.current;
+      }
     } else if (isModerator || isSpeaker) {
       // Chi modera e chi interviene arrivano dal link personale e usano il
       // campo `moderatorToken`: la rotta del token distingue i ruoli e dà a
@@ -920,6 +934,7 @@ export default function LiveEventClient({
       // conta quello salvato sull'iscrizione, e non si manda.
       if (nicknameOfferto && !registrantOwnsLink && nicknameVisitaRef.current) {
         body.nickname = nicknameVisitaRef.current;
+        body.nicknameProof = tokenSalaRef.current;
       }
     }
     // I consensi dati ora con un clic: il server ne conserva la prova insieme al
@@ -969,8 +984,13 @@ export default function LiveEventClient({
       setErroreNickname({
         motivo: (rifiutoNickname.reason ?? 'rete') as ErroreNickname['motivo'],
         ...(rifiutoNickname.suggestion ? { suggerimento: rifiutoNickname.suggestion } : {}),
+        ...(nicknameVisitaRef.current ? { nickname: nicknameVisitaRef.current } : {}),
       });
-      if (!senzaUscire) setPhase('waiting');
+      if (!senzaUscire) {
+        // La scheda non lo ripropone come confermato a un ricaricamento.
+        salvaNicknameVisita(event.id, null);
+        setPhase('waiting');
+      }
       return 'gestito';
     }
     if (senzaUscire && !res.ok) return 'rete';
@@ -1258,13 +1278,19 @@ export default function LiveEventClient({
   // l'ha gia' salvato sull'iscrizione; per gli altri e' quello della visita.
   const applicaNickname = useCallback(
     async (nuovo: string | null) => {
+      const prima = nicknameVisitaRef.current;
       nicknameVisitaRef.current = nuovo;
       setErroreNickname(null);
       const esito = await richiediCredenziali(true, true);
+      if (esito === 'fatto') return true;
       if (esito === 'rete') segnaErroreNickname({ motivo: 'rete' });
-      return esito === 'fatto';
+      // Non e' passato: resta quello con cui si e' in sala, anche per i
+      // rientri automatici e per un ricaricamento della pagina.
+      nicknameVisitaRef.current = prima;
+      if (!registrantOwnsLink) salvaNicknameVisita(event.id, prima);
+      return false;
     },
-    [richiediCredenziali, segnaErroreNickname],
+    [richiediCredenziali, segnaErroreNickname, registrantOwnsLink, event.id],
   );
   const [ritiro, setRitiro] = useState<'no' | 'in-corso' | 'errore'>('no');
   const effettoRitiro: EffettoRitiroRegistrazione =

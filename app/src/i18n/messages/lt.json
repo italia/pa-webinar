@@ -745,6 +745,7 @@
         "reserved": "Joje yra rezervuotas žodis, pavyzdžiui, vaidmens pavadinimas: pasirinkite kitą.",
         "host": "Ji panaši į renginį vedančio asmens vardą: pasirinkite kitą.",
         "taken": "Kažkas renginyje jau naudoja šią pravardę.",
+        "disabled": "Šis renginys nepriima naujų pravardžių: savąją galite tik pašalinti.",
         "rete": "Pravardės patikrinti nepavyko. Bandykite dar kartą."
       },
       "button": "Pravardė",

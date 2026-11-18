@@ -745,6 +745,7 @@
         "reserved": "Fih kelma riżervata, bħall-isem ta' rwol: agħżel ieħor.",
         "host": "Jixbah l-isem ta' xi ħadd li qed imexxi l-avveniment: agħżel ieħor.",
         "taken": "Xi ħadd fl-avveniment diġà juża dan il-laqam.",
+        "disabled": "Dan l-avveniment ma jaċċettax laqmijiet ġodda: tista' biss tneħħi tiegħek.",
         "rete": "Ma kienx possibbli li jiġi vverifikat il-laqam. Erġa' pprova."
       },
       "button": "Laqam",

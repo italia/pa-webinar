@@ -745,6 +745,7 @@
         "reserved": "Er staat een gereserveerd woord in, zoals de naam van een rol: kies een andere.",
         "host": "Het lijkt op de naam van iemand die het evenement leidt: kies een andere.",
         "taken": "Iemand in het evenement gebruikt deze bijnaam al.",
+        "disabled": "Dit evenement accepteert geen nieuwe bijnamen: je kunt de jouwe alleen verwijderen.",
         "rete": "De bijnaam kon niet worden gecontroleerd. Probeer het opnieuw."
       },
       "button": "Bijnaam",

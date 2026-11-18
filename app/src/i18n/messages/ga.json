@@ -745,6 +745,7 @@
         "reserved": "Tá focal forchoimeádta ann, cosúil le hainm róil: roghnaigh ceann eile.",
         "host": "Tá sé cosúil le hainm duine atá i mbun na hócáide: roghnaigh ceann eile.",
         "taken": "Tá an leasainm seo in úsáid cheana ag duine éigin san ócáid.",
+        "disabled": "Ní ghlacann an ócáid seo le leasainmneacha nua: ní féidir leat ach do cheann féin a bhaint.",
         "rete": "Níorbh fhéidir an leasainm a sheiceáil. Bain triail eile as."
       },
       "button": "Leasainm",

@@ -192,12 +192,18 @@ export function componiTrascrizione(
     const start = Math.max(0, (f.startedAt.getTime() - t0.getTime()) / 1000);
     const end = Math.max(start, (f.endedAt.getTime() - t0.getTime()) / 1000);
     const nome = f.speakerName ? (tryDecryptPII(f.speakerName) ?? null) : null;
-    const persona = chiParla(f.seatId, nome, titolari);
+    // Un iscritto che cambia nickname (o lo toglie) durante l'evento ha
+    // un'etichetta per nome: le frasi dette con un nome non passano sotto
+    // l'altro, che rivelerebbe chi c'e' dietro il nickname.
+    const iscrizioneDiChiParla = iscrizioneDelPosto(f.seatId);
+    const persona = `${chiParla(f.seatId, nome, titolari)}${
+      iscrizioneDiChiParla && nome ? `|nome:${nome.trim().toLowerCase()}` : ''
+    }`;
     let etichetta = etichette.get(persona);
     if (!etichetta) {
       etichetta = `SPEAKER_${String(etichette.size).padStart(2, '0')}`;
       etichette.set(persona, etichetta);
-      const registrationId = iscrizioneDelPosto(f.seatId);
+      const registrationId = iscrizioneDiChiParla;
       parlanti.set(etichetta, {
         displayName: nome,
         totalSpeechSec: 0,
@@ -207,9 +213,6 @@ export function componiTrascrizione(
     }
     const p = parlanti.get(etichetta);
     if (p) {
-      // Un iscritto puo' cambiare nickname durante l'evento: vale l'ultimo.
-      // Gli altri posti sono una persona per nome, e il nome non cambia.
-      if (nome && iscrizioneDelPosto(f.seatId)) p.displayName = nome;
       p.totalSpeechSec += end - start;
       for (const impronta of titolari?.get(f.seatId)?.impronte ?? []) p.titolari.add(impronta);
     }

@@ -49,6 +49,8 @@ vi.mock('next-intl/server', () => ({
   },
 }));
 
+import { deleteCache } from '@/lib/cache';
+
 import {
   improntaNickname,
   nicknameDellIscrizione,
@@ -199,6 +201,57 @@ describe('salvaNicknameIscrizione', () => {
 
 describe('prendiNicknameOspite e nicknameDellOspite', () => {
   const chiave = (ip: string) => (nick: string) => `guest-${ip}-${nick}`;
+
+  it('chi rientra lo ritrova senza ripetere le regole: un relatore aggiunto dopo non lo fa uscire', async () => {
+    const ev = nuovoEvento();
+    expect(await prendiNicknameOspite(ev, 'Marta', chiave('1'))).toMatchObject({
+      ok: true,
+    });
+    const prima = db.evento.additionalMods;
+    db.evento.additionalMods = [...prima, { name: 'Marta Bianchi' }];
+    try {
+      deleteCache(`nickname-hosts:${ev}`);
+      // Per chi lo chiede adesso la regola vale...
+      expect(
+        await verificaNickname(ev, 'Marta', { ospite: 'guest-9-Marta' })
+      ).toMatchObject({
+        ok: false,
+        motivo: 'host',
+      });
+      // ...chi l'aveva gia' lo ritrova.
+      expect(await prendiNicknameOspite(ev, 'Marta', chiave('1'))).toEqual({
+        ok: true,
+        nickname: 'Marta',
+      });
+    } finally {
+      db.evento.additionalMods = prima;
+    }
+  });
+
+  it("da un'altra rete lo riprende solo chi prova di averlo avuto in sala", async () => {
+    const ev = nuovoEvento();
+    await prendiNicknameOspite(ev, 'Pippo', chiave('wifi'));
+    expect(await prendiNicknameOspite(ev, 'Pippo', chiave('4g'))).toMatchObject({
+      ok: false,
+      motivo: 'taken',
+    });
+    expect(await prendiNicknameOspite(ev, 'Pippo', chiave('4g'), true)).toEqual({
+      ok: true,
+      nickname: 'Pippo',
+    });
+    // Da li' in poi e' della chiave nuova.
+    expect(await nicknameDellOspite(ev, 'Pippo', 'guest-4g-Pippo')).toBe(true);
+    expect(await nicknameDellOspite(ev, 'Pippo', 'guest-wifi-Pippo')).toBe(false);
+  });
+
+  it('la prova non scavalca il nickname salvato da un iscritto', async () => {
+    const ev = nuovoEvento();
+    db.iscrizioni = [{ id: 'r1', nicknameKey: improntaNickname(ev, 'Pippo') }];
+    expect(await prendiNicknameOspite(ev, 'Pippo', chiave('1'), true)).toMatchObject({
+      ok: false,
+      motivo: 'taken',
+    });
+  });
 
   it("il primo lo prende; lo stesso ospite lo ritrova; un altro trova un'alternativa", async () => {
     const ev = nuovoEvento();

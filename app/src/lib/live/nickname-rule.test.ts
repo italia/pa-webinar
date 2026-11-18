@@ -60,6 +60,12 @@ describe('difettoDiForma', () => {
     }
   });
 
+  it('rifiuta le lettere che non si vedono', () => {
+    expect(difettoDiForma(normalizzaNickname('\u3164\u3164'))).toBe('format');
+    expect(difettoDiForma('\u115F\u1160')).toBe('format');
+    expect(difettoDiForma('Pi\u3164ppo')).toBe('format');
+  });
+
   it("rifiuta le scritture mescolate, la via piu' semplice per sembrare un altro", () => {
     // «а» cirillica in mezzo a lettere latine.
     expect(difettoDiForma('Pаolo')).toBe('scripts');
@@ -92,6 +98,13 @@ describe('imitaUnNome', () => {
     expect(imitaUnNome('Angelo', chiConduce)).toBe(true);
   });
 
+  it('un nome di una parola sola conta solo uguale', () => {
+    expect(imitaUnNome('Anna', ['Anna'])).toBe(true);
+    expect(imitaUnNome('Giovanna', ['Anna'])).toBe(false);
+    expect(imitaUnNome('Direttore', ['Direttore Generale'])).toBe(true);
+    expect(imitaUnNome('Direttorissimo', ['Direttore Generale'])).toBe(false);
+  });
+
   it('non tocca i nickname che solo somigliano', () => {
     expect(imitaUnNome('Mar', chiConduce)).toBe(false);
     expect(imitaUnNome('Rossi99', chiConduce)).toBe(false);
@@ -114,6 +127,8 @@ describe('usaUnaParolaRiservata', () => {
 
   it('quelle corte solo da sole', () => {
     expect(usaUnaParolaRiservata('Host', parole)).toBe(true);
+    expect(usaUnaParolaRiservata('Host1', parole)).toBe(true);
+    expect(usaUnaParolaRiservata('host_22', parole)).toBe(true);
     expect(usaUnaParolaRiservata('Hostess', parole)).toBe(false);
     expect(usaUnaParolaRiservata('Pippo', parole)).toBe(false);
   });

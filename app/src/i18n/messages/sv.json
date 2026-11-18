@@ -745,6 +745,7 @@
         "reserved": "Det innehåller ett reserverat ord, till exempel namnet på en roll: välj ett annat.",
         "host": "Det liknar namnet på någon som leder evenemanget: välj ett annat.",
         "taken": "Någon i evenemanget använder redan det här smeknamnet.",
+        "disabled": "Det här evenemanget tar inte emot nya smeknamn: du kan bara ta bort ditt.",
         "rete": "Smeknamnet kunde inte kontrolleras. Försök igen."
       },
       "button": "Smeknamn",

@@ -1274,6 +1274,21 @@ describe('sala d\'attesa — nickname', () => {
     expect(container.textContent).toContain(tn.errors.host);
   });
 
+  it('il nickname rifiutato non vale come confermato: «Entra» lo ricontrolla', async () => {
+    window.sessionStorage.setItem('pa-nickname:ev-1', 'Luna');
+    fetchMock.mockResolvedValueOnce(risposta(409, { code: 'NICKNAME_TAKEN', reason: 'taken', suggestion: 'Luna2' }));
+    render({
+      defaultName: 'Mario Rossi',
+      ...conNickname({ errore: { motivo: 'taken', nickname: 'Luna' } }),
+    });
+    await attendi();
+    expect($<HTMLInputElement>('#waiting-nickname')!.value).toBe('Luna');
+    premi(pulsante(t.joinNowBtn));
+    await attendi();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(onEnterLive).not.toHaveBeenCalled();
+  });
+
   it('chi si e\' iscritto lo salva con il suo token', async () => {
     fetchMock.mockImplementation(async (url: string) =>
       String(url).endsWith('/nickname')

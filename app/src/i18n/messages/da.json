@@ -745,6 +745,7 @@
         "reserved": "Det indeholder et reserveret ord, fx navnet på en rolle: vælg et andet.",
         "host": "Det ligner navnet på en af dem, der leder arrangementet: vælg et andet.",
         "taken": "Nogen i arrangementet bruger allerede dette kaldenavn.",
+        "disabled": "Dette arrangement tager ikke imod nye kaldenavne: du kan kun fjerne dit.",
         "rete": "Kaldenavnet kunne ikke kontrolleres. Prøv igen."
       },
       "button": "Kaldenavn",

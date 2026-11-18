@@ -745,6 +745,7 @@
         "reserved": "Contém uma palavra reservada, como o nome de uma função: escolha outra.",
         "host": "Parece-se com o nome de quem conduz o evento: escolha outra.",
         "taken": "Alguém no evento já usa esta alcunha.",
+        "disabled": "Este evento não aceita novas alcunhas: só pode remover a sua.",
         "rete": "Não foi possível verificar a alcunha. Tente novamente."
       },
       "button": "Alcunha",

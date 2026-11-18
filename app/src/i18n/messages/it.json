@@ -745,6 +745,7 @@
         "reserved": "Contiene una parola riservata, come il nome di un ruolo: scegline un altro.",
         "host": "Somiglia al nome di chi conduce l'evento: scegline un altro.",
         "taken": "Nell'evento c'è già qualcuno con questo nickname.",
+        "disabled": "Questo evento non accetta nuovi nickname: puoi solo togliere il tuo.",
         "rete": "Non è stato possibile controllare il nickname. Riprova."
       },
       "button": "Nickname",

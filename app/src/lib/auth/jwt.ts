@@ -282,6 +282,8 @@ export async function postoDaTokenSala(
   posto: string;
   iscrizioneId: string | null;
   listenOnly: boolean;
+  /** Il nome con cui il token e' entrato in sala. */
+  nome: string | null;
 } | null> {
   try {
     const { payload } = await jwtVerify(token, getJitsiJwtSecret(), {
@@ -291,7 +293,9 @@ export async function postoDaTokenSala(
     });
     if (payload.room !== roomName || (payload.moderator === true && !opzioni.ancheChiModera)) return null;
     const user = (
-      payload.context as { user?: { id?: unknown; listenOnly?: unknown } } | undefined
+      payload.context as
+        | { user?: { id?: unknown; listenOnly?: unknown; name?: unknown } }
+        | undefined
     )?.user;
     const id = user?.id;
     if (typeof id !== 'string' || id.length === 0) return null;
@@ -299,6 +303,7 @@ export async function postoDaTokenSala(
       posto: id,
       iscrizioneId: POSTO_ISCRITTO.exec(id)?.[1] ?? null,
       listenOnly: user?.listenOnly === true,
+      nome: typeof user?.name === 'string' ? user.name : null,
     };
   } catch {
     return null;

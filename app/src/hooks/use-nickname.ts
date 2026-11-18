@@ -12,7 +12,14 @@ import {
 } from '@/lib/live/nickname-rule';
 
 /** Perche' il nickname non e' passato: un motivo delle regole, o la rete. */
-export type ErroreNickname = { motivo: MotivoNickname | 'rete'; suggerimento?: string };
+/** Perche' il nickname non e' passato: un motivo delle regole, l'evento che non
+ *  ne accetta di nuovi (`disabled`) o la rete. `nickname`: quello rifiutato,
+ *  quando il rifiuto arriva dalla sala all'ingresso. */
+export type ErroreNickname = {
+  motivo: MotivoNickname | 'disabled' | 'rete';
+  suggerimento?: string;
+  nickname?: string;
+};
 
 /** Il nickname confermato della visita, per chi non lo salva sull'iscrizione. */
 const chiaveVisita = (eventId: string) => `pa-nickname:${eventId}`;
@@ -77,6 +84,16 @@ export function useNickname({
     setErrore(null);
   }, []);
 
+  /** Un nickname rifiutato dalla sala: torna nel campo da rivedere, con il
+   *  motivo, e non vale come confermato. */
+  const segnalaRifiuto = useCallback((e: ErroreNickname) => {
+    if (e.nickname !== undefined) {
+      setValore(e.nickname);
+      setConfermato(null);
+    }
+    setErrore(e);
+  }, []);
+
   /** Riparte da un nickname noto (quello in uso in sala). */
   const reimposta = useCallback((v: string | null) => {
     setValore(v ?? '');
@@ -108,6 +125,7 @@ export function useNickname({
         const dati = (await res.json().catch(() => null)) as {
           nickname?: string | null;
           saved?: boolean;
+          code?: string;
           reason?: MotivoNickname;
           suggestion?: string;
         } | null;
@@ -118,7 +136,7 @@ export function useNickname({
                   motivo: dati.reason,
                   ...(dati.suggestion ? { suggerimento: dati.suggestion } : {}),
                 }
-              : { motivo: 'rete' }
+              : { motivo: dati?.code === 'NICKNAMES_DISABLED' ? 'disabled' : 'rete' }
           );
           return false;
         }
@@ -144,6 +162,7 @@ export function useNickname({
     valore,
     scrivi,
     reimposta,
+    segnalaRifiuto,
     confermato,
     daConfermare,
     conferma,

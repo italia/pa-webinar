@@ -745,6 +745,7 @@
         "reserved": "Tas satur rezervētu vārdu, piemēram, lomas nosaukumu: izvēlieties citu.",
         "host": "Tas atgādina pasākuma vadītāja vārdu: izvēlieties citu.",
         "taken": "Kāds pasākumā jau izmanto šo segvārdu.",
+        "disabled": "Šis pasākums nepieņem jaunus segvārdus: savu varat tikai noņemt.",
         "rete": "Segvārdu neizdevās pārbaudīt. Mēģiniet vēlreiz."
       },
       "button": "Segvārds",

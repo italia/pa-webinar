@@ -40,6 +40,9 @@ export type MotivoNickname =
 
 const FORMA = /^\p{L}(?:[\p{L}\p{Nd}._-]*[\p{L}\p{Nd}])?$/u;
 const SEPARATORI_DI_FILA = /[._-]{2}/;
+/** Lettere che non si vedono, come i riempitivi hangul: un nickname vuoto a
+ *  vederlo. */
+const INVISIBILI = /\p{Default_Ignorable_Code_Point}/u;
 
 /** Il nickname come si salva e si mostra: forma canonica, senza spazi ai lati.
  *  NFKC porta le cifre e le lettere «larghe» o in apice alla loro forma piana. */
@@ -67,7 +70,8 @@ function scritturaMista(nick: string): boolean {
 export function difettoDiForma(nick: string): MotivoNickname | null {
   const lunghezza = [...nick].length;
   if (lunghezza < NICKNAME_MIN || lunghezza > NICKNAME_MAX) return 'length';
-  if (!FORMA.test(nick) || SEPARATORI_DI_FILA.test(nick)) return 'format';
+  if (!FORMA.test(nick) || SEPARATORI_DI_FILA.test(nick) || INVISIBILI.test(nick))
+    return 'format';
   if (scritturaMista(nick)) return 'scripts';
   return null;
 }
@@ -90,7 +94,8 @@ const NOME_MINIMO = 4;
  * Il nickname somiglia a una di queste persone? Vale se coincide con il nome
  * intero o con una sua parola di almeno tre lettere («Mario» per «Mario
  * Rossi»: in chat lo menzionerebbe chi cerca lui), o se contiene il nome
- * intero («MarioRossi99»).
+ * intero di almeno due parole («MarioRossi99»). Un nome di una parola sola
+ * conta solo uguale: «Giovanna» non imita «Anna».
  */
 export function imitaUnNome(nick: string, nomi: readonly string[]): boolean {
   const n = formaDiConfronto(nick);
@@ -98,11 +103,14 @@ export function imitaUnNome(nick: string, nomi: readonly string[]): boolean {
   for (const nome of nomi) {
     const intero = formaDiConfronto(nome);
     if (!intero) continue;
-    if (n === intero || (intero.length >= NOME_MINIMO && n.includes(intero))) return true;
-    for (const parola of nome.split(/[\s'’.,_-]+/u)) {
-      const p = formaDiConfronto(parola);
-      if (p.length >= PAROLA_MINIMA && n === p) return true;
-    }
+    const parole = nome
+      .split(/[\s'’.,_-]+/u)
+      .map(formaDiConfronto)
+      .filter(Boolean);
+    if (n === intero) return true;
+    if (parole.length >= 2 && intero.length >= NOME_MINIMO && n.includes(intero))
+      return true;
+    if (parole.some((p) => p.length >= PAROLA_MINIMA && n === p)) return true;
   }
   return false;
 }
@@ -110,14 +118,16 @@ export function imitaUnNome(nick: string, nomi: readonly string[]): boolean {
 /**
  * Il nickname contiene una parola riservata della piattaforma? Le parole di
  * almeno cinque lettere non si possono nemmeno contenere («IlModeratore»,
- * «Relatore2»); le piu' corte solo non si possono usare da sole.
+ * «Relatore2»); le piu' corte non si possono usare da sole ne' con un numero
+ * in fondo («Host», «Host1»), ma restano dentro altre parole («Hostess»).
  */
 export function usaUnaParolaRiservata(nick: string, parole: readonly string[]): boolean {
   const n = formaDiConfronto(nick);
   return parole.some((parola) => {
     const p = formaDiConfronto(parola);
     if (!p) return false;
-    return p.length >= 5 ? n.includes(p) : n === p;
+    if (p.length >= 5) return n.includes(p);
+    return n === p || (n.startsWith(p) && /^\p{Nd}+$/u.test(n.slice(p.length)));
   });
 }
 
