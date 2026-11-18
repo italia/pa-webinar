@@ -142,9 +142,9 @@ describe('PrivacySheet, la registrazione', () => {
 
   it('chi conduce sempre nella registrazione', () => {
     expect(conRegistrazione({})).not.toContain(t.recording.hostsAlways);
-    expect(conRegistrazione({ conduceSempre: true, partecipanti: 'solo-voce' })).toContain(
-      t.recording.hostsAlways
-    );
+    expect(
+      conRegistrazione({ conduceSempre: true, partecipanti: 'solo-voce' })
+    ).toContain(t.recording.hostsAlways);
   });
 
   it("la frase su chi e' nel video non promette piu' di quanto l'installazione garantisce", () => {
@@ -180,13 +180,22 @@ describe('PrivacySheet, trascrizione e sottotitoli', () => {
   });
 
   it.each([
-    [{ chiesta: true, sottotitoli: true, tracce: null, dalVideo: false }, t.transcript.captions],
-    [{ chiesta: true, sottotitoli: false, tracce: 'cancellate', dalVideo: false }, t.transcript.tracks],
+    [
+      { chiesta: true, sottotitoli: true, tracce: null, dalVideo: false },
+      t.transcript.captions,
+    ],
+    [
+      { chiesta: true, sottotitoli: false, tracce: 'cancellate', dalVideo: false },
+      t.transcript.tracks,
+    ],
     [
       { chiesta: true, sottotitoli: false, tracce: 'conservate', dalVideo: false },
       t.transcript.tracksRetained,
     ],
-    [{ chiesta: true, sottotitoli: false, tracce: null, dalVideo: true }, t.transcript.fromVideo],
+    [
+      { chiesta: true, sottotitoli: false, tracce: null, dalVideo: true },
+      t.transcript.fromVideo,
+    ],
   ] as const)('%o', (trascrizione, testo) => {
     const resa = disegna({ trascrizione });
     expect(resa).toContain(t.transcript.label);
@@ -195,7 +204,12 @@ describe('PrivacySheet, trascrizione e sottotitoli', () => {
 
   it('una traccia che si conserva non promette la cancellazione', () => {
     const resa = disegna({
-      trascrizione: { chiesta: true, sottotitoli: false, tracce: 'conservate', dalVideo: false },
+      trascrizione: {
+        chiesta: true,
+        sottotitoli: false,
+        tracce: 'conservate',
+        dalVideo: false,
+      },
     });
     expect(resa).not.toContain(t.transcript.tracks);
   });
@@ -266,7 +280,15 @@ describe('PrivacySheet, intelligenza artificiale', () => {
   it("vale anche se l'unica elaborazione e' la trascrizione", () => {
     expect(
       disegna(
-        { ia: IA, trascrizione: { chiesta: true, sottotitoli: false, tracce: null, dalVideo: true } },
+        {
+          ia: IA,
+          trascrizione: {
+            chiesta: true,
+            sottotitoli: false,
+            tracce: null,
+            dalVideo: true,
+          },
+        },
         SCRITTO
       )
     ).toContain(SCRITTO);
@@ -331,7 +353,9 @@ describe('PrivacySheet, il nome nella trascrizione', () => {
   });
 
   it('dove si chiede dice che il nome resta', () => {
-    expect(disegna({ pseudonimi: true, trascrizione: SI })).toContain(t.name.pseudonymTranscript);
+    expect(disegna({ pseudonimi: true, trascrizione: SI })).toContain(
+      t.name.pseudonymTranscript
+    );
   });
 
   it('con il proprio nome non serve dirlo', () => {
@@ -350,7 +374,7 @@ describe('PrivacySheet, il nome nella trascrizione', () => {
     expect(anonimo).not.toContain(t.name.pseudonymTranscript);
   });
 
-  it('in sala vale anche il consenso gia\' dato, o i sottotitoli accesi dal vivo', () => {
+  it("in sala vale anche il consenso gia' dato, o i sottotitoli accesi dal vivo", () => {
     const adesso = { sottotitoli: false, chat: true, domande: true };
     const base: SchedaPrivacy = { ...SCHEDA, pseudonimi: true };
     expect(schedaInSala(base, adesso).trascrizione.chiesta).toBe(false);
@@ -369,7 +393,12 @@ describe('PrivacySheet, il nome nella trascrizione', () => {
 describe('schedaInSala, la scheda con i flag di adesso', () => {
   const accesi: SchedaPrivacy = {
     ...SCHEDA,
-    trascrizione: { chiesta: true, sottotitoli: true, tracce: 'cancellate', dalVideo: false },
+    trascrizione: {
+      chiesta: true,
+      sottotitoli: true,
+      tracce: 'cancellate',
+      dalVideo: false,
+    },
     sottotitoli: { attivi: true, testoConservato: true },
     chat: { attiva: true, domandeAttive: true, esitoDomande: 'soloTesto' },
   };
@@ -457,7 +486,7 @@ describe('schedaInSala, la scheda con i flag di adesso', () => {
     });
 
     it.each(['soloAscolto', 'avviso', 'avvisoVoce', 'restaFuori'] as const)(
-      'dove c\'e\' un video non legge cosa succede a chi nega («%s»): e\' nel video',
+      "dove c'e' un video non legge cosa succede a chi nega («%s»): e' nel video",
       (chiNonAcconsente) => {
         const testo = disegna(
           conScheda({ chiNonAcconsente, conduceSempre: true, partecipanti: 'solo-voce' })
@@ -471,7 +500,9 @@ describe('schedaInSala, la scheda con i flag di adesso', () => {
     );
 
     it('senza un video non legge una scelta che non gli si offre: restano le tracce', () => {
-      const testo = disegna(conScheda({ chiNonAcconsente: 'avvisoVoce', conduceSempre: false }));
+      const testo = disegna(
+        conScheda({ chiNonAcconsente: 'avvisoVoce', conduceSempre: false })
+      );
       expect(testo).not.toContain(t.recording.refuseOut);
       expect(testo).not.toContain(t.recording.audienceNoticeVoice);
     });
@@ -490,7 +521,7 @@ describe('schedaInSala, la scheda con i flag di adesso', () => {
     });
   });
 
-  it('la rubrica non si promette: in sala non c\'e\' la casella', () => {
+  it("la rubrica non si promette: in sala non c'e' la casella", () => {
     const dopo = conSottotitoli({ ...accesi, rubrica: { mesi: 24 } }, true);
     expect(dopo.rubrica).toBeNull();
     expect(disegna(dopo)).not.toContain(t.addressBook.label);
@@ -537,7 +568,9 @@ describe('PrivacySheet, gli altri fatti', () => {
     const testo = disegna({
       conservazione: { giorniDati: 30, registrazione: { giorni: 90, video: true } },
     });
-    expect(testo).toContain('si cancellano 90 giorni dopo la fine dell’evento'.replace('’', "'"));
+    expect(testo).toContain(
+      'si cancellano 90 giorni dopo la fine dell’evento'.replace('’', "'")
+    );
     expect(testo).toContain('dopo la pubblicazione');
     expect(testo).not.toContain(t.retention.recordingKept);
   });

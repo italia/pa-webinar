@@ -104,7 +104,12 @@ async function personaInSala(eventId: string, versione: number) {
   });
   const endpoint = `ep-${randomUUID()}`;
   await prisma.roomOccupant.create({
-    data: { eventId, endpointId: endpoint, seatId: `reg-${iscrizione.id}-a`, joinedAt: new Date() },
+    data: {
+      eventId,
+      endpointId: endpoint,
+      seatId: `reg-${iscrizione.id}-a`,
+      joinedAt: new Date(),
+    },
   });
   return { iscrizione, endpoint };
 }
@@ -309,7 +314,10 @@ describe('il video nuovo senza tracce per persona', () => {
       const evento = await eventoConcluso({ multitrackRecordingEnabled: true });
       const rec = await creaRegistrazione(evento.id);
       await tracciaDiIscritto(evento.id, rec.id, 1);
-      await prisma.recording.update({ where: { id: rec.id }, data: { status: 'POSTPROD_QUEUED' } });
+      await prisma.recording.update({
+        where: { id: rec.id },
+        data: { status: 'POSTPROD_QUEUED' },
+      });
       const lavoro = await prisma.postprodJob.create({
         data: {
           recordingId: rec.id,
@@ -328,17 +336,24 @@ describe('il video nuovo senza tracce per persona', () => {
       );
 
       expect(await risposta.json()).toMatchObject({ runnable: 0, desiredGpu: 0 });
-      expect(await prisma.postprodJob.findUniqueOrThrow({ where: { id: lavoro.id } })).toMatchObject({
+      expect(
+        await prisma.postprodJob.findUniqueOrThrow({ where: { id: lavoro.id } })
+      ).toMatchObject({
         status: 'FAILED',
         lastError: MOTIVO_TRACCE_ASSENTI,
       });
-      expect(await prisma.recording.findUniqueOrThrow({ where: { id: rec.id } })).toMatchObject({
+      expect(
+        await prisma.recording.findUniqueOrThrow({ where: { id: rec.id } })
+      ).toMatchObject({
         status: 'POSTPROD_PARTIAL',
       });
     });
 
     it('una radice chiusa senza tracce non si riapre con Genera AI', async () => {
-      const evento = await eventoConcluso({ multitrackRecordingEnabled: true, aiSummaryEnabled: true });
+      const evento = await eventoConcluso({
+        multitrackRecordingEnabled: true,
+        aiSummaryEnabled: true,
+      });
       const rec = await creaRegistrazione(evento.id);
       const iscrizione = await tracciaDiIscritto(evento.id, rec.id, 2);
       await entraCome('ADMIN');
@@ -356,7 +371,9 @@ describe('il video nuovo senza tracce per persona', () => {
         { params: Promise.resolve({}) }
       );
       expect(await coda.json()).toMatchObject({ desiredGpu: 0 });
-      expect(await prisma.recording.findUniqueOrThrow({ where: { id: rec.id } })).toMatchObject({
+      expect(
+        await prisma.recording.findUniqueOrThrow({ where: { id: rec.id } })
+      ).toMatchObject({
         status: 'POSTPROD_PARTIAL',
       });
 
@@ -364,7 +381,9 @@ describe('il video nuovo senza tracce per persona', () => {
 
       expect(risposta.status).toBe(422);
       expect(await risposta.json()).toMatchObject({ code: 'NO_TRANSCRIBABLE_TRACKS' });
-      expect(await prisma.recording.findUniqueOrThrow({ where: { id: rec.id } })).toMatchObject({
+      expect(
+        await prisma.recording.findUniqueOrThrow({ where: { id: rec.id } })
+      ).toMatchObject({
         status: 'POSTPROD_PARTIAL',
       });
     });
@@ -409,10 +428,14 @@ describe('il video nuovo senza tracce per persona', () => {
       expect(risposta.status).toBe(200);
       expect(await risposta.json()).toMatchObject({ enqueued: 0, tracksPending: true });
       expect(await prisma.postprodJob.count()).toBe(0);
-      expect(await prisma.recording.findUniqueOrThrow({ where: { id: rec.id } })).toMatchObject({
+      expect(
+        await prisma.recording.findUniqueOrThrow({ where: { id: rec.id } })
+      ).toMatchObject({
         status: 'READY',
       });
-      expect(await prisma.event.findUniqueOrThrow({ where: { id: evento.id } })).toMatchObject({
+      expect(
+        await prisma.event.findUniqueOrThrow({ where: { id: evento.id } })
+      ).toMatchObject({
         aiTranscriptEnabled: true,
         aiSummaryEnabled: true,
       });
@@ -422,8 +445,13 @@ describe('il video nuovo senza tracce per persona', () => {
 
       expect(consegna.status).toBe(200);
       const lavori = await prisma.postprodJob.findMany({ select: { kind: true } });
-      expect(lavori.map((l) => l.kind).sort()).toEqual(['SUMMARIZE', 'TRANSCRIBE_MULTITRACK']);
-      expect(await prisma.recording.findUniqueOrThrow({ where: { id: rec.id } })).toMatchObject({
+      expect(lavori.map((l) => l.kind).sort()).toEqual([
+        'SUMMARIZE',
+        'TRANSCRIBE_MULTITRACK',
+      ]);
+      expect(
+        await prisma.recording.findUniqueOrThrow({ where: { id: rec.id } })
+      ).toMatchObject({
         status: 'POSTPROD_QUEUED',
       });
     });
@@ -435,7 +463,11 @@ describe('il video nuovo senza tracce per persona', () => {
       await organizza(evento.id);
 
       const risposta = await generaPerRegistrazione(
-        richiesta(`/api/admin/postprod/recordings/${rec.id}/generate-ai`, 'POST', {}) as never,
+        richiesta(
+          `/api/admin/postprod/recordings/${rec.id}/generate-ai`,
+          'POST',
+          {}
+        ) as never,
         { params: Promise.resolve({ id: rec.id }) }
       );
 
@@ -455,16 +487,21 @@ describe('il video nuovo senza tracce per persona', () => {
 
       expect(risposta.status).toBe(409);
       expect(await risposta.json()).toMatchObject({ code: 'TRACKS_PENDING' });
-      expect(await prisma.recording.findUniqueOrThrow({ where: { id: rec.id } })).toMatchObject({
+      expect(
+        await prisma.recording.findUniqueOrThrow({ where: { id: rec.id } })
+      ).toMatchObject({
         runCount: rec.runCount,
         status: 'READY',
       });
     });
 
-    it('tracce gia\' arrivate e tolte, a segnaposto rimasto: resta il 422', async () => {
+    it("tracce gia' arrivate e tolte, a segnaposto rimasto: resta il 422", async () => {
       const evento = await eventoConcluso({ aiTranscriptEnabled: false });
       const rec = await creaSegnaposto(evento.id);
-      await prisma.recording.update({ where: { id: rec.id }, data: { mediaStartedAt: new Date() } });
+      await prisma.recording.update({
+        where: { id: rec.id },
+        data: { mediaStartedAt: new Date() },
+      });
       await entraCome('ADMIN');
       await organizza(evento.id);
 
@@ -472,7 +509,9 @@ describe('il video nuovo senza tracce per persona', () => {
 
       expect(risposta.status).toBe(422);
       expect(await risposta.json()).toMatchObject({ code: 'NO_TRANSCRIBABLE_TRACKS' });
-      expect(await prisma.event.findUniqueOrThrow({ where: { id: evento.id } })).toMatchObject({
+      expect(
+        await prisma.event.findUniqueOrThrow({ where: { id: evento.id } })
+      ).toMatchObject({
         aiTranscriptEnabled: false,
       });
     });

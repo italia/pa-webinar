@@ -132,9 +132,15 @@ describe('campiDaEvento', () => {
 
 describe('videoPubblico', () => {
   it('conta solo su un evento che registra', () => {
-    expect(videoPubblico({ recordingEnabled: true, recordingDestination: 'PUBLIC' })).toBe(true);
-    expect(videoPubblico({ recordingEnabled: false, recordingDestination: 'PUBLIC' })).toBe(false);
-    expect(videoPubblico({ recordingEnabled: true, recordingDestination: 'REGISTRANTS' })).toBe(false);
+    expect(
+      videoPubblico({ recordingEnabled: true, recordingDestination: 'PUBLIC' })
+    ).toBe(true);
+    expect(
+      videoPubblico({ recordingEnabled: false, recordingDestination: 'PUBLIC' })
+    ).toBe(false);
+    expect(
+      videoPubblico({ recordingEnabled: true, recordingDestination: 'REGISTRANTS' })
+    ).toBe(false);
   });
 });
 
@@ -143,19 +149,32 @@ describe('registrazioneVuota', () => {
   const niente = { aiTranscriptEnabled: false, multitrackRecordingEnabled: false };
 
   it('solo senza video della sala e senza tracce', () => {
-    expect(registrazioneVuota({ recordingEnabled: true, ...niente }, 'assente', true)).toBe(true);
-    expect(registrazioneVuota({ recordingEnabled: true, ...tracce }, 'assente', true)).toBe(false);
-    expect(registrazioneVuota({ recordingEnabled: true, ...niente }, 'visibili', true)).toBe(false);
-    expect(registrazioneVuota({ recordingEnabled: false, ...niente }, 'assente', true)).toBe(false);
+    expect(
+      registrazioneVuota({ recordingEnabled: true, ...niente }, 'assente', true)
+    ).toBe(true);
+    expect(
+      registrazioneVuota({ recordingEnabled: true, ...tracce }, 'assente', true)
+    ).toBe(false);
+    expect(
+      registrazioneVuota({ recordingEnabled: true, ...niente }, 'visibili', true)
+    ).toBe(false);
+    expect(
+      registrazioneVuota({ recordingEnabled: false, ...niente }, 'assente', true)
+    ).toBe(false);
   });
 
   it('non conta un evento che non registra, e le tracce valgono solo se il registratore c e', () => {
-    expect(registrazioneVuota({ recordingEnabled: true, ...tracce }, 'assente', false)).toBe(true);
+    expect(
+      registrazioneVuota({ recordingEnabled: true, ...tracce }, 'assente', false)
+    ).toBe(true);
   });
 });
 
 describe('paginaCheSegue', () => {
-  const riservata = { recordingEnabled: true, recordingDestination: 'REGISTRANTS' as const };
+  const riservata = {
+    recordingEnabled: true,
+    recordingDestination: 'REGISTRANTS' as const,
+  };
   const pubblica = { recordingEnabled: true, recordingDestination: 'PUBLIC' as const };
   const senza = { recordingEnabled: false, recordingDestination: null };
   const spenta = { recordingEnabled: false, recordingDestination: 'PUBLIC' as const };
@@ -169,15 +188,15 @@ describe('paginaCheSegue', () => {
       paginaCheSegue(
         daRiservataAperta,
         { suInvito: false, form: riservata },
-        { suInvito: true, form: { ...riservata, postEventPublic: true } },
-      ),
+        { suInvito: true, form: { ...riservata, postEventPublic: true } }
+      )
     ).toBe(false);
     expect(
       paginaCheSegue(
         { ...senza, postEventPublic: true },
         { suInvito: false, form: senza },
-        { suInvito: true, form: { ...senza, postEventPublic: true } },
-      ),
+        { suInvito: true, form: { ...senza, postEventPublic: true } }
+      )
     ).toBe(false);
   });
 
@@ -186,8 +205,8 @@ describe('paginaCheSegue', () => {
       paginaCheSegue(
         daPubblicaAperta,
         { suInvito: false, form: pubblica },
-        { suInvito: true, form: { ...pubblica, postEventPublic: true } },
-      ),
+        { suInvito: true, form: { ...pubblica, postEventPublic: true } }
+      )
     ).toBe(true);
   });
 
@@ -196,15 +215,15 @@ describe('paginaCheSegue', () => {
       paginaCheSegue(
         daRiservataPrivata,
         { suInvito: false, form: riservata },
-        { suInvito: false, form: { ...pubblica, postEventPublic: false } },
-      ),
+        { suInvito: false, form: { ...pubblica, postEventPublic: false } }
+      )
     ).toBe(true);
     expect(
       paginaCheSegue(
         daRiservataPrivata,
         { suInvito: true, form: riservata },
-        { suInvito: true, form: { ...pubblica, postEventPublic: false } },
-      ),
+        { suInvito: true, form: { ...pubblica, postEventPublic: false } }
+      )
     ).toBe(true);
   });
 
@@ -213,8 +232,8 @@ describe('paginaCheSegue', () => {
       paginaCheSegue(
         daRiservataAperta,
         { suInvito: true, form: pubblica },
-        { suInvito: true, form: { ...riservata, postEventPublic: true } },
-      ),
+        { suInvito: true, form: { ...riservata, postEventPublic: true } }
+      )
     ).toBe(false);
   });
 
@@ -223,15 +242,15 @@ describe('paginaCheSegue', () => {
       paginaCheSegue(
         daRiservataPrivata,
         { suInvito: false, form: pubblica },
-        { suInvito: false, form: { ...riservata, postEventPublic: true } },
-      ),
+        { suInvito: false, form: { ...riservata, postEventPublic: true } }
+      )
     ).toBe(false);
     expect(
       paginaCheSegue(
         daPubblicaAperta,
         { suInvito: false, form: pubblica },
-        { suInvito: false, form: { ...riservata, postEventPublic: true } },
-      ),
+        { suInvito: false, form: { ...riservata, postEventPublic: true } }
+      )
     ).toBe(true);
   });
 
@@ -239,15 +258,15 @@ describe('paginaCheSegue', () => {
     const spegnendo = paginaCheSegue(
       daPubblicaPrivata,
       { suInvito: false, form: pubblica },
-      { suInvito: false, form: { ...spenta, postEventPublic: false } },
+      { suInvito: false, form: { ...spenta, postEventPublic: false } }
     );
     expect(spegnendo).toBe(false);
     expect(
       paginaCheSegue(
         daPubblicaPrivata,
         { suInvito: false, form: spenta },
-        { suInvito: false, form: { ...pubblica, postEventPublic: spegnendo } },
-      ),
+        { suInvito: false, form: { ...pubblica, postEventPublic: spegnendo } }
+      )
     ).toBe(false);
   });
 
@@ -256,22 +275,22 @@ describe('paginaCheSegue', () => {
       paginaCheSegue(
         daRiservataAperta,
         { suInvito: true, form: riservata },
-        { suInvito: false, form: { ...riservata, postEventPublic: false } },
-      ),
+        { suInvito: false, form: { ...riservata, postEventPublic: false } }
+      )
     ).toBe(false);
     expect(
       paginaCheSegue(
         daPubblicaPrivata,
         { suInvito: false, form: pubblica },
-        { suInvito: false, form: { ...pubblica, postEventPublic: false } },
-      ),
+        { suInvito: false, form: { ...pubblica, postEventPublic: false } }
+      )
     ).toBe(false);
     expect(
       paginaCheSegue(
         daRiservataAperta,
         { suInvito: true, form: riservata },
-        { suInvito: true, form: { ...riservata, postEventPublic: true } },
-      ),
+        { suInvito: true, form: { ...riservata, postEventPublic: true } }
+      )
     ).toBe(true);
   });
 });

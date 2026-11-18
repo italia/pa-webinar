@@ -60,7 +60,9 @@ describe('ListenOnlyNotice', () => {
   it('si chiude, e il pulsante dice dove restano i consensi', () => {
     const onChiudi = vi.fn();
     disegna({ onChiudi });
-    const chiudi = container.querySelector<HTMLButtonElement>('.live-listen-only__chiudi')!;
+    const chiudi = container.querySelector<HTMLButtonElement>(
+      '.live-listen-only__chiudi'
+    )!;
     expect(chiudi.getAttribute('aria-label')).toBe(messages.live.consents.closeNotice);
     act(() => chiudi.click());
     expect(onChiudi).toHaveBeenCalledTimes(1);
@@ -94,7 +96,9 @@ describe('ListenOnlyNotice', () => {
     const scatola = container.querySelector<HTMLElement>('.live-listen-only__testo-ente');
     expect(scatola?.textContent).toBe('Testo scelto per evento');
     expect(scatola?.tabIndex).toBe(0);
-    expect(scatola?.getAttribute('aria-label')).toBe(messages.live.consents.recording.title);
+    expect(scatola?.getAttribute('aria-label')).toBe(
+      messages.live.consents.recording.title
+    );
     expect(scatola?.contains(pulsante())).toBe(false);
     expect(scatola?.textContent).not.toContain(g.recording);
   });

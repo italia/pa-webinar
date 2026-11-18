@@ -57,7 +57,9 @@ describe('VoiceExcludedNotice', () => {
   it('si chiude, e il pulsante dice dove restano i consensi', () => {
     const onChiudi = vi.fn();
     disegna({ onChiudi });
-    const chiudi = container.querySelector<HTMLButtonElement>('.live-listen-only__chiudi')!;
+    const chiudi = container.querySelector<HTMLButtonElement>(
+      '.live-listen-only__chiudi'
+    )!;
     expect(chiudi.getAttribute('aria-label')).toBe(messages.live.consents.closeNotice);
     act(() => chiudi.click());
     expect(onChiudi).toHaveBeenCalledTimes(1);

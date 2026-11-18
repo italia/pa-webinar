@@ -32,7 +32,10 @@ export const POST = withErrorHandling(async (request, context) => {
   const { param: slug } = await context.params;
 
   const ip = getClientIp(request);
-  const rl = rateLimit(`consents-in-force:${ip}`, { limit: limiteDellaSala(300), windowMs: 60_000 });
+  const rl = rateLimit(`consents-in-force:${ip}`, {
+    limit: limiteDellaSala(300),
+    windowMs: 60_000,
+  });
   if (!rl.allowed) throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
 
   const parsed = consentsInForceSchema.safeParse(await parseJsonBody(request));
@@ -71,7 +74,12 @@ export const POST = withErrorHandling(async (request, context) => {
 
   const partecipanti = partecipantiNelVideo();
   const destinazione = destinazioneDelTesto(event.recordingDestination, partecipanti);
-  const consensi = await consensiInVigoreDeiPosti(event, posti, destinazione, partecipanti);
+  const consensi = await consensiInVigoreDeiPosti(
+    event,
+    posti,
+    destinazione,
+    partecipanti
+  );
   return Response.json(
     { ...consensi, recordingDestination: destinazione },
     { headers: { 'Cache-Control': 'no-store' } }

@@ -120,7 +120,8 @@ async function registrazioneInVigore(
       },
     });
     return (
-      !!iscrizione && registrazioneDellIscrizione(event, iscrizione, destinazione, partecipanti)
+      !!iscrizione &&
+      registrazioneDellIscrizione(event, iscrizione, destinazione, partecipanti)
     );
   }
   if (!event.recordingEnabled) return false;

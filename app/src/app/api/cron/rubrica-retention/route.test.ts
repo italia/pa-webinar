@@ -43,7 +43,11 @@ function corsa(
 ) {
   const impronte = new Map(ritirati.map((p) => [p.id, p.emailHash]));
   db.person.findMany.mockImplementation(
-    async ({ where }: { where: { AND?: [{ id: { in: string[] } }]; optedOutAt?: unknown } }) => {
+    async ({
+      where,
+    }: {
+      where: { AND?: [{ id: { in: string[] } }]; optedOutAt?: unknown };
+    }) => {
       if (where.AND) {
         return where.AND[0].id.in
           .filter((id) => !cambiate.includes(id))

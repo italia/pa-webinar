@@ -218,9 +218,10 @@ describe('togliNomeDalleProve', () => {
       .mockResolvedValue([]);
     const perEvento = await togliNomeDalleProve('impronta', ADESSO);
     // Gli eventi in fila in ordine, come chi cancella le iscrizioni.
-    expect(
-      tx.$executeRaw.mock.calls.map((c) => (c as unknown[]).slice(1)[0])
-    ).toEqual(['captions-transcript:e1', 'captions-transcript:e2']);
+    expect(tx.$executeRaw.mock.calls.map((c) => (c as unknown[]).slice(1)[0])).toEqual([
+      'captions-transcript:e1',
+      'captions-transcript:e2',
+    ]);
     expect([...perEvento]).toEqual([
       ['e1', 2],
       ['e2', 1],
@@ -241,10 +242,12 @@ describe('togliNomeDalleProve', () => {
     expect(tx.retainedConsentProof.updateMany).not.toHaveBeenCalled();
   });
 
-  it('puo\' aspettare tutta la pulizia degli stessi eventi', async () => {
+  it("puo' aspettare tutta la pulizia degli stessi eventi", async () => {
     tx.retainedConsentProof.findMany.mockResolvedValue([]);
     await togliNomeDalleProve('impronta', ADESSO);
-    expect(m.transazione.mock.calls[0]![1].timeout).toBeGreaterThan(TIMEOUT_PULIZIA_EVENTO_MS);
+    expect(m.transazione.mock.calls[0]![1].timeout).toBeGreaterThan(
+      TIMEOUT_PULIZIA_EVENTO_MS
+    );
   });
 });
 
@@ -295,13 +298,19 @@ describe('tipiDelleProveEsistenti', () => {
     ]);
     expect(await tipiDelleProveEsistenti(tx as never, 'e1')).toEqual([]);
     tx.recording.findMany.mockResolvedValue([
-      { blobKey: 'recordings/multitrack/e1/', mediaStartedAt: t('09:00'), tracks: [{ id: 't1' }] },
+      {
+        blobKey: 'recordings/multitrack/e1/',
+        mediaStartedAt: t('09:00'),
+        tracks: [{ id: 't1' }],
+      },
     ]);
     expect(await tipiDelleProveEsistenti(tx as never, 'e1')).toEqual([
       'recording',
       'transcription',
     ]);
-    expect(tx.recording.findMany.mock.calls[0]![0].where.status).toEqual({ not: 'ARCHIVED' });
+    expect(tx.recording.findMany.mock.calls[0]![0].where.status).toEqual({
+      not: 'ARCHIVED',
+    });
   });
 
   it('le tracce gia’ cancellate non valgono come video', async () => {
@@ -330,7 +339,7 @@ describe('ritiraProveDelleIscrizioni', () => {
     withdrawnAt: null,
   };
 
-  it('la registrazione porta con se\' la trascrizione', async () => {
+  it("la registrazione porta con se' la trascrizione", async () => {
     tx.retainedConsentProof.updateMany
       .mockResolvedValueOnce({ count: 2 })
       .mockResolvedValueOnce({ count: 1 });
@@ -462,10 +471,12 @@ describe('ritiraProvaConservata', () => {
     );
   });
 
-  it('puo\' aspettare tutta la pulizia dello stesso evento', async () => {
+  it("puo' aspettare tutta la pulizia dello stesso evento", async () => {
     tx.retainedConsentProof.findFirst.mockResolvedValue(null);
     await ritiraProvaConservata('impronta', 'p1', 'recording', ADESSO);
-    expect(m.transazione.mock.calls[0]![1].timeout).toBeGreaterThan(TIMEOUT_PULIZIA_EVENTO_MS);
+    expect(m.transazione.mock.calls[0]![1].timeout).toBeGreaterThan(
+      TIMEOUT_PULIZIA_EVENTO_MS
+    );
   });
 });
 

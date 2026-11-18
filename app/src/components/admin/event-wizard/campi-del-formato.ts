@@ -40,7 +40,8 @@ export function campiDaModello(
   conVideo = true
 ): CampiDelFormato {
   const destinazione =
-    tpl?.recordingDestination ?? destinazioneDiPartenza({ recordingEnabled: false }, registra);
+    tpl?.recordingDestination ??
+    destinazioneDiPartenza({ recordingEnabled: false }, registra);
   return {
     recordingDestination: conVideo ? destinazione : null,
     offerAddressBook: tpl?.offerAddressBook ?? true,
@@ -72,7 +73,7 @@ export function registrazioneVuota(
     'recordingEnabled' | 'aiTranscriptEnabled' | 'multitrackRecordingEnabled'
   >,
   partecipanti: PartecipantiNelVideo | undefined,
-  recordingAvailable: boolean,
+  recordingAvailable: boolean
 ): boolean {
   return (
     form.recordingEnabled &&
@@ -83,7 +84,7 @@ export function registrazioneVuota(
 
 /** Il video dell'evento e' pubblico: la destinazione conta solo se l'evento registra. */
 export function videoPubblico(
-  form: Pick<WizardForm, 'recordingEnabled' | 'recordingDestination'>,
+  form: Pick<WizardForm, 'recordingEnabled' | 'recordingDestination'>
 ): boolean {
   return form.recordingEnabled && form.recordingDestination === 'PUBLIC';
 }
@@ -100,26 +101,36 @@ export function videoPubblico(
  * pagina resta com'era: quel passaggio non allarga mai.
  */
 export function paginaCheSegue(
-  partenza: Pick<WizardForm, 'recordingEnabled' | 'recordingDestination' | 'postEventPublic'>,
-  prima: { suInvito: boolean; form: Pick<WizardForm, 'recordingEnabled' | 'recordingDestination'> },
+  partenza: Pick<
+    WizardForm,
+    'recordingEnabled' | 'recordingDestination' | 'postEventPublic'
+  >,
+  prima: {
+    suInvito: boolean;
+    form: Pick<WizardForm, 'recordingEnabled' | 'recordingDestination'>;
+  },
   dopo: {
     suInvito: boolean;
-    form: Pick<WizardForm, 'recordingEnabled' | 'recordingDestination' | 'postEventPublic'>;
-  },
+    form: Pick<
+      WizardForm,
+      'recordingEnabled' | 'recordingDestination' | 'postEventPublic'
+    >;
+  }
 ): boolean {
   const pubblicoDopo = videoPubblico(dopo.form);
   if (pubblicoDopo !== videoPubblico(prima.form)) {
     if (pubblicoDopo) return videoPubblico(partenza) ? partenza.postEventPublic : true;
     return !dopo.suInvito && partenza.postEventPublic;
   }
-  return dopo.suInvito && !prima.suInvito && !pubblicoDopo ? false : dopo.form.postEventPublic;
+  return dopo.suInvito && !prima.suInvito && !pubblicoDopo
+    ? false
+    : dopo.form.postEventPublic;
 }
 
 /** Cio' che il wizard dice su un evento su invito che registra: il testo sotto
  *  `admin.wizard.step2`. */
 export type NotaDestinazione =
-  | 'recordingDestinationPublicOnInvitation'
-  | 'recordingDestinationReservedOnInvitation';
+  'recordingDestinationPublicOnInvitation' | 'recordingDestinationReservedOnInvitation';
 
 /** Cio' che il wizard dice della pagina dopo l'evento: passata da sola a seguire
  *  l'accesso o il video, rimasta privata su un evento tornato aperto, o privata con

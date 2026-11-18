@@ -18,10 +18,19 @@ import { encryptPII, hashEmail } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { eventAccessCookieName, signEventAccess } from '@/lib/event-session';
 import { ritiraConsensi } from '@/lib/live/consent-withdrawal';
-import { VERSIONE_TESTO_REGISTRAZIONE, type PeriodoConsenso } from '@/lib/recording/destination';
+import {
+  VERSIONE_TESTO_REGISTRAZIONE,
+  type PeriodoConsenso,
+} from '@/lib/recording/destination';
 
 import { biscotti } from './biscotti';
-import { creaEvento, creaIscrizione, entraCome, richiesta, svuotaDatabase } from './fixtures';
+import {
+  creaEvento,
+  creaIscrizione,
+  entraCome,
+  richiesta,
+  svuotaDatabase,
+} from './fixtures';
 
 const CHE_REGISTRA = { recordingEnabled: true, participantsCanUnmute: true };
 
@@ -89,9 +98,11 @@ const registro = (eventId: string) =>
 const tracce = (eventId: string) =>
   prisma.multitrackConsent.findMany({ where: { eventId } });
 const posto = (jwt: string) =>
-  (JSON.parse(Buffer.from(jwt.split('.')[1]!, 'base64url').toString()) as {
-    context: { user: { id: string } };
-  }).context.user.id;
+  (
+    JSON.parse(Buffer.from(jwt.split('.')[1]!, 'base64url').toString()) as {
+      context: { user: { id: string } };
+    }
+  ).context.user.id;
 
 describe('la prova dell’iscrizione quando il testo in vigore cambia', () => {
   it('dopo un allargamento il testo vecchio non vale e la prova non cambia', async () => {
@@ -277,7 +288,10 @@ describe('la prova dell’iscrizione quando il testo in vigore cambia', () => {
 
     const [prova, ...altre] = await prove(evento.id);
     expect(altre).toEqual([]);
-    expect(prova).toMatchObject({ destination: 'PUBLIC', textVersion: VERSIONE_TESTO_REGISTRAZIONE });
+    expect(prova).toMatchObject({
+      destination: 'PUBLIC',
+      textVersion: VERSIONE_TESTO_REGISTRAZIONE,
+    });
   });
 });
 
@@ -359,7 +373,9 @@ describe('la replica di un consenso gia dato', () => {
       where: { eventId: evento.id, jitsiUserId: posto(rientro.jwt) },
     });
     expect(traccia.textVersion).toBe(2);
-    expect((await consensoTrascrizione(evento.id, posto(rientro.jwt), 2)).dato).toBe(true);
+    expect((await consensoTrascrizione(evento.id, posto(rientro.jwt), 2)).dato).toBe(
+      true
+    );
     expect(await registro(evento.id)).toBe(0);
   });
 
@@ -475,7 +491,7 @@ describe('le prove senza iscrizione', () => {
     expect(righe.map((r) => r.destination)).toEqual(['PUBLIC', 'PUBLIC']);
   });
 
-  it('chi conduce dal link nominale e\' nel video senza lasciare una prova della registrazione', async () => {
+  it("chi conduce dal link nominale e' nel video senza lasciare una prova della registrazione", async () => {
     const evento = await creaEvento({
       ...CHE_REGISTRA,
       recordingDestination: 'REGISTRANTS',
@@ -497,9 +513,11 @@ describe('le prove senza iscrizione', () => {
 
     expect(risposta.voiceExcluded).toBe(false);
     expect(
-      (JSON.parse(Buffer.from(risposta.jwt.split('.')[1]!, 'base64url').toString()) as {
-        context: { user: { paInVideo?: boolean } };
-      }).context.user.paInVideo
+      (
+        JSON.parse(Buffer.from(risposta.jwt.split('.')[1]!, 'base64url').toString()) as {
+          context: { user: { paInVideo?: boolean } };
+        }
+      ).context.user.paInVideo
     ).toBe(true);
     expect(await prove(evento.id)).toEqual([]);
   });
@@ -541,7 +559,10 @@ describe("dove chi partecipa non entra mai nel video ('esclusi')", () => {
   beforeEach(() => vi.stubEnv('RECORDING_PARTICIPANT_VOICE', ''));
 
   it("la trascrizione data all'iscrizione toglie il segno, senza consenso alla registrazione", async () => {
-    const evento = await creaEvento({ ...CHE_REGISTRA, multitrackRecordingEnabled: true });
+    const evento = await creaEvento({
+      ...CHE_REGISTRA,
+      multitrackRecordingEnabled: true,
+    });
     const iscrizione = await iscrittoDa(evento.id);
     await prisma.registration.update({
       where: { id: iscrizione.id },
@@ -554,8 +575,11 @@ describe("dove chi partecipa non entra mai nel video ('esclusi')", () => {
     expect(await prove(evento.id)).toEqual([]);
   });
 
-  it("senza la trascrizione resta fuori, e un consenso alla registrazione non lascia una prova", async () => {
-    const evento = await creaEvento({ ...CHE_REGISTRA, multitrackRecordingEnabled: true });
+  it('senza la trascrizione resta fuori, e un consenso alla registrazione non lascia una prova', async () => {
+    const evento = await creaEvento({
+      ...CHE_REGISTRA,
+      multitrackRecordingEnabled: true,
+    });
     const iscrizione = await iscrittoDa(evento.id);
 
     const risposta = await entra(evento.slug, {
@@ -570,7 +594,10 @@ describe("dove chi partecipa non entra mai nel video ('esclusi')", () => {
   });
 
   it('la trascrizione data entrando vale da sola, con la sua prova', async () => {
-    const evento = await creaEvento({ ...CHE_REGISTRA, multitrackRecordingEnabled: true });
+    const evento = await creaEvento({
+      ...CHE_REGISTRA,
+      multitrackRecordingEnabled: true,
+    });
     const iscrizione = await iscrittoDa(evento.id);
 
     const risposta = await entra(evento.slug, {
@@ -588,11 +615,19 @@ describe("dove chi partecipa puo' comparire nel video ('visibili')", () => {
   beforeEach(() => vi.stubEnv('RECORDING_VOICE_EXCLUSION', ''));
 
   it('un consenso dato sul testo per la sola voce non copre, e ridato si aggiorna al testo che lo dice', async () => {
-    const evento = await creaEvento({ ...CHE_REGISTRA, recordingDestination: 'REGISTRANTS' });
+    const evento = await creaEvento({
+      ...CHE_REGISTRA,
+      recordingDestination: 'REGISTRANTS',
+    });
     const iscrizione = await iscrittoDa(evento.id);
-    await provaEsistente(evento.id, iscrizione.id, { destination: 'REGISTRANTS', textVersion: 2 });
+    await provaEsistente(evento.id, iscrizione.id, {
+      destination: 'REGISTRANTS',
+      textVersion: 2,
+    });
 
-    const senza = (await entra(evento.slug, { accessToken: iscrizione.accessToken })) as RispostaToken & {
+    const senza = (await entra(evento.slug, {
+      accessToken: iscrizione.accessToken,
+    })) as RispostaToken & {
       listenOnly: boolean;
     };
     expect(senza.listenOnly).toBe(true);
@@ -611,13 +646,15 @@ describe("dove chi partecipa puo' comparire nel video ('visibili')", () => {
       { destination: 'REGISTRANTS', textVersion: 2 },
     ]);
 
-    const dopo = (await entra(evento.slug, { accessToken: iscrizione.accessToken })) as RispostaToken & {
+    const dopo = (await entra(evento.slug, {
+      accessToken: iscrizione.accessToken,
+    })) as RispostaToken & {
       listenOnly: boolean;
     };
     expect(dopo.listenOnly).toBe(false);
   });
 
-  it('senza destinazione la prova dice comunque su quale testo e\' stata data', async () => {
+  it("senza destinazione la prova dice comunque su quale testo e' stata data", async () => {
     const evento = await creaEvento({ ...CHE_REGISTRA, recordingDestination: null });
     const risposta = await entra(evento.slug, {
       guestName: 'Ospite',

@@ -47,7 +47,9 @@ export const DESTINAZIONE_DI_PARTENZA = 'REGISTRANTS' satisfies RecordingAudienc
  * se l'installazione aggiunge il video chi ha letto quel testo va richiesto in
  * sala, perche' il suo consenso non dichiara una destinazione (`consensoCopre`).
  */
-export function videoDaDestinare(partecipanti: PartecipantiNelVideo | undefined): boolean {
+export function videoDaDestinare(
+  partecipanti: PartecipantiNelVideo | undefined
+): boolean {
   return partecipanti !== 'assente';
 }
 
@@ -83,7 +85,8 @@ export function destinazioneDiPartenza(
   registra: boolean
 ): Destinazione {
   const comincia = registra && !evento.recordingEnabled;
-  const senzaDestinazione = evento.eventType === 'INSTANT' || evento.eventType === 'LEGACY';
+  const senzaDestinazione =
+    evento.eventType === 'INSTANT' || evento.eventType === 'LEGACY';
   return (
     evento.recordingDestination ??
     (comincia && !senzaDestinazione ? DESTINAZIONE_DI_PARTENZA : null)
@@ -101,7 +104,7 @@ export function pubblicoAllineato(
   prima: Destinazione,
   dopo: Destinazione,
   chiesto: RecordingAudience | undefined,
-  attuale: RecordingAudience,
+  attuale: RecordingAudience
 ): RecordingAudience {
   if (dopo === 'REGISTRANTS' && prima !== 'REGISTRANTS') return 'REGISTRANTS';
   if (chiesto) return chiesto;
@@ -119,7 +122,8 @@ export function registrazioneRiservata(evento: {
   recordingDestination: Destinazione;
 }): boolean {
   return (
-    evento.recordingDestination === 'REGISTRANTS' || evento.recordingAudience === 'REGISTRANTS'
+    evento.recordingDestination === 'REGISTRANTS' ||
+    evento.recordingAudience === 'REGISTRANTS'
   );
 }
 
@@ -181,7 +185,9 @@ export const VERSIONE_TESTO_SENZA_VIDEO = 3;
  */
 export function versioneDellaProva(partecipanti: PartecipantiNelVideo): number {
   if (partecipanti === 'assente') return VERSIONE_TESTO_SENZA_VIDEO;
-  return partecipanti === 'visibili' ? VERSIONE_TESTO_VISIBILI : VERSIONE_TESTO_REGISTRAZIONE;
+  return partecipanti === 'visibili'
+    ? VERSIONE_TESTO_VISIBILI
+    : VERSIONE_TESTO_REGISTRAZIONE;
 }
 
 /**
@@ -199,7 +205,11 @@ export function versioneCopre(
 ): boolean {
   if (partecipanti === 'assente') return true;
   if (versione === VERSIONE_TESTO_SENZA_VIDEO) return false;
-  return partecipanti !== 'visibili' || versione == null || versione === VERSIONE_TESTO_VISIBILI;
+  return (
+    partecipanti !== 'visibili' ||
+    versione == null ||
+    versione === VERSIONE_TESTO_VISIBILI
+  );
 }
 
 /**
@@ -214,7 +224,8 @@ export function provaCopre(
   partecipanti: PartecipantiNelVideo
 ): boolean {
   return (
-    consensoCopre(prova.destination, inVigore) && versioneCopre(prova.textVersion, partecipanti)
+    consensoCopre(prova.destination, inVigore) &&
+    versioneCopre(prova.textVersion, partecipanti)
   );
 }
 

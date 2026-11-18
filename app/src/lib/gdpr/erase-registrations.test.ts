@@ -93,7 +93,10 @@ describe('eraseRegistrations', () => {
   it('toglie le richieste di rimozione evase, non quelle ancora da evadere', async () => {
     await eraseRegistrations(ISCRIZIONI, 'prova');
     expect(tx.recordingRedactionRequest.deleteMany).toHaveBeenCalledWith({
-      where: { registrationId: { in: ['r1', 'r2'] }, status: { in: ['CLOSED', 'REJECTED'] } },
+      where: {
+        registrationId: { in: ['r1', 'r2'] },
+        status: { in: ['CLOSED', 'REJECTED'] },
+      },
     });
   });
 
@@ -109,9 +112,11 @@ describe('eraseRegistrations', () => {
     expect(m.transazione.mock.calls[0]![1].timeout).toBeGreaterThan(5_000);
   });
 
-  it('puo\' aspettare tutta la pulizia dello stesso evento', async () => {
+  it("puo' aspettare tutta la pulizia dello stesso evento", async () => {
     await eraseRegistrations(ISCRIZIONI, 'prova');
-    expect(m.transazione.mock.calls[0]![1].timeout).toBeGreaterThan(TIMEOUT_PULIZIA_EVENTO_MS);
+    expect(m.transazione.mock.calls[0]![1].timeout).toBeGreaterThan(
+      TIMEOUT_PULIZIA_EVENTO_MS
+    );
   });
 
   it('blocca gli eventi in ordine prima di ogni cancellazione', async () => {

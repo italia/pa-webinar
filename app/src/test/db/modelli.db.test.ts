@@ -159,14 +159,17 @@ describe('dal modello all evento', () => {
     });
     const { id: senza } = await salvaModello({ name: 'Storico', recordingEnabled: true });
     const crea = async (idModello: string) => {
-      const riga = await prisma.eventTemplate.findUniqueOrThrow({ where: { id: idModello } });
+      const riga = await prisma.eventTemplate.findUniqueOrThrow({
+        where: { id: idModello },
+      });
       const creazione = richiesta(
         '/api/events',
         'POST',
         corpoEvento({
           recordingEnabled: true,
           // Come il wizard: il valore di partenza del modulo viene dal modello.
-          recordingDeleteAfterDays: presetDelModello(riga).recordingDeleteAfterDays ?? null,
+          recordingDeleteAfterDays:
+            presetDelModello(riga).recordingDeleteAfterDays ?? null,
         })
       );
       creazione.headers.set('x-forwarded-for', `10.31.0.${(ultimoIndirizzo += 1)}`);
@@ -274,16 +277,26 @@ describe('dal formato all evento', () => {
     ['partecipativo', 'medio.tutti.pubblica.tutti', PARTECIPATIVO],
     ['pubblico per numero', 'grande.tutti.pubblica.tutti', PUBBLICO],
     ['pubblico con soli relatori', 'piccolo.relatori.pubblica.tutti', PUBBLICO],
-    ['su invito', 'medio.tutti.riservata.invitati', { ...INVITO, accessMode: 'INVITATION' }],
+    [
+      'su invito',
+      'medio.tutti.riservata.invitati',
+      { ...INVITO, accessMode: 'INVITATION' },
+    ],
     ['vecchio indirizzo, riunione', 'piccolo.tutti.si.tutti', RIUNIONE],
     ['vecchio indirizzo, partecipativo', 'medio.tutti.si.tutti', PARTECIPATIVO],
     ['vecchio indirizzo, pubblico', 'medio.relatori.si.tutti', PUBBLICO],
-    ['vecchio indirizzo, su invito', 'medio.tutti.si.invitati', { ...INVITO, accessMode: 'INVITATION' }],
+    [
+      'vecchio indirizzo, su invito',
+      'medio.tutti.si.invitati',
+      { ...INVITO, accessMode: 'INVITATION' },
+    ],
   ])('%s', async (_nome, indirizzo, atteso) => {
     await entraCome('ADMIN');
     const formato = decodificaFormato(indirizzo);
     expect(formato).not.toBeNull();
-    expect(await eventoDalPreset(presetDaFormato(formato!, 'Formato'))).toMatchObject(atteso);
+    expect(await eventoDalPreset(presetDaFormato(formato!, 'Formato'))).toMatchObject(
+      atteso
+    );
   });
 
   it('senza registrazione nessuna destinazione, e le domande restano', async () => {
@@ -304,21 +317,27 @@ describe('dal formato all evento', () => {
       await entraCome('ADMIN');
       const preset = presetDaFormato(
         formatoPossibile(decodificaFormato(indirizzo)!, true, false),
-        'Formato',
+        'Formato'
       );
       expect(preset.recordingDestination).toBe('REGISTRANTS');
       expect(
-        domandePubbliche({ ...preset, recordingAudience: preset.recordingDestination ?? 'PUBLIC' }),
+        domandePubbliche({
+          ...preset,
+          recordingAudience: preset.recordingDestination ?? 'PUBLIC',
+        })
       ).toBe(false);
       const riga = await eventoDalPreset(preset, false);
       expect(riga).toMatchObject(VIDEO_RISERVATO);
       expect(domandePubbliche(riga)).toBe(false);
-    },
+    }
   );
 
   it('un video pubblico passato agli inviti torna riservato', async () => {
     await entraCome('ADMIN');
-    const formato = formatoConAccesso(decodificaFormato('medio.tutti.pubblica.tutti')!, 'invitati');
+    const formato = formatoConAccesso(
+      decodificaFormato('medio.tutti.pubblica.tutti')!,
+      'invitati'
+    );
     expect(await eventoDalPreset(presetDaFormato(formato, 'Formato'))).toMatchObject({
       ...INVITO,
       accessMode: 'INVITATION',

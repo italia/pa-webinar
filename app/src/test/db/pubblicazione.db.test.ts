@@ -179,7 +179,11 @@ describe('la copia', () => {
     ['chiamata rapida', 'INSTANT'],
     ['importazione storica', 'LEGACY'],
   ] as const)('di una %s resta senza destinazione', async (_n, eventType) => {
-    const originale = await creaEvento({ eventType, recordingEnabled: true, status: 'ENDED' });
+    const originale = await creaEvento({
+      eventType,
+      recordingEnabled: true,
+      status: 'ENDED',
+    });
     const r = await duplica(
       richiesta(`/api/admin/events/${originale.id}/duplicate`, 'POST') as never,
       { params: Promise.resolve({ id: originale.id }) }
@@ -346,9 +350,9 @@ describe('un evento senza destinazione', () => {
       const dopo = await prisma.registration.findUniqueOrThrow({
         where: { id: iscrizione.id },
       });
-      expect(consensoCopre(dopo.consentRecordingDestination, RISERVATO.recordingDestination)).toBe(
-        false
-      );
+      expect(
+        consensoCopre(dopo.consentRecordingDestination, RISERVATO.recordingDestination)
+      ).toBe(false);
     });
 
     it('scegliere la destinazione resta allo staff', async () => {
@@ -411,9 +415,7 @@ describe('un evento senza destinazione', () => {
     });
 
     // A sala mai aperta si puo' ancora allargare, e lo fa lo staff.
-    expect(
-      (await modifica(evento, { recordingDestination: 'PUBLIC' })).status
-    ).toBe(200);
+    expect((await modifica(evento, { recordingDestination: 'PUBLIC' })).status).toBe(200);
     expect(await riga(evento.id)).toMatchObject({
       recordingDestination: 'PUBLIC',
       recordingAudience: 'PUBLIC',
@@ -463,7 +465,11 @@ describe('dove il video della sala non c e', () => {
   afterEach(() => vi.unstubAllEnvs());
 
   async function eventoNuovo() {
-    const r = await creazione({ ...CORPO, recordingEnabled: true, recordingDestination: null });
+    const r = await creazione({
+      ...CORPO,
+      recordingEnabled: true,
+      recordingDestination: null,
+    });
     expect(r.status).toBe(201);
     const { id } = (await r.json()) as { id: string };
     return prisma.event.findUniqueOrThrow({ where: { id } });
@@ -492,13 +498,17 @@ describe('dove il video della sala non c e', () => {
 
   it('un file caricato su un evento spento mai aperto e un video, e parte riservato', async () => {
     const evento = await creaEvento({ recordingEnabled: false, status: 'PUBLISHED' });
-    expect((await modificaPubblicazione(evento.id, { recordingUrl: FILE })).status).toBe(200);
+    expect((await modificaPubblicazione(evento.id, { recordingUrl: FILE })).status).toBe(
+      200
+    );
     expect(await riga(evento.id)).toMatchObject(RISERVATO);
   });
 
   it('un file caricato su un evento nuovo che registra resta riservato', async () => {
     const evento = await eventoNuovo();
-    expect((await modificaPubblicazione(evento.id, { recordingUrl: FILE })).status).toBe(200);
+    expect((await modificaPubblicazione(evento.id, { recordingUrl: FILE })).status).toBe(
+      200
+    );
     expect(await riga(evento.id)).toMatchObject({
       ...RISERVATO,
       recordingUrl: FILE,
@@ -522,7 +532,8 @@ describe('dove il video della sala non c e', () => {
       recordingConsent: true,
       recordingConsentDestination: iscrizione.consentRecordingDestination,
     };
-    const inVigore = () => destinazioneDelTesto(evento.recordingDestination, partecipantiNelVideo());
+    const inVigore = () =>
+      destinazioneDelTesto(evento.recordingDestination, partecipantiNelVideo());
 
     expect(partecipantiNelVideo()).toBe('assente');
     expect(consensoOra(letto, inVigore(), partecipantiNelVideo())).toBe(true);

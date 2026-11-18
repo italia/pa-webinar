@@ -133,7 +133,9 @@ vi.mock('@/components/presentation/use-presentation', async () => {
 });
 
 // I pannelli della sala non c'entrano con i consensi.
-const pannelloDomande = vi.hoisted(() => ({ props: null as { domandePubblicate: boolean } | null }));
+const pannelloDomande = vi.hoisted(() => ({
+  props: null as { domandePubblicate: boolean } | null,
+}));
 vi.mock('@/components/qa/qa-panel', () => ({
   default: (props: { domandePubblicate: boolean }) => {
     pannelloDomande.props = props;
@@ -374,30 +376,30 @@ describe("sala — quello che arriva alla sala d'attesa", () => {
       liveCaptionsEnabled: true,
     };
 
-    it('arriva alla sala d\'attesa, e sulle chiamate rapide non arriva', async () => {
+    it("arriva alla sala d'attesa, e sulle chiamate rapide non arriva", async () => {
       await monta({ event: { ...evento, schedaPrivacy: null } });
       expect(leggiAttesa().schedaPrivacy).toBeNull();
     });
 
-    it('i sottotitoli seguono i flag della sala, non il valore dell\'apertura', async () => {
+    it("i sottotitoli seguono i flag della sala, non il valore dell'apertura", async () => {
       flagsDellaSala.dati = { liveCaptionsEnabled: false };
       await monta({ event: conSottotitoli });
       expect(leggiAttesa().schedaPrivacy?.sottotitoli.attivi).toBe(false);
       expect(leggiAttesa().schedaPrivacy?.trascrizione.sottotitoli).toBe(false);
     });
 
-    it('prima che i flag arrivino vale il valore dell\'apertura', async () => {
+    it("prima che i flag arrivino vale il valore dell'apertura", async () => {
       await monta({ event: conSottotitoli });
       expect(leggiAttesa().schedaPrivacy?.sottotitoli.attivi).toBe(true);
       expect(leggiAttesa().schedaPrivacy?.trascrizione.sottotitoli).toBe(true);
     });
 
-    it('sottotitoli non disponibili nell\'istanza: spenti, qualunque cosa dica l\'evento', async () => {
+    it("sottotitoli non disponibili nell'istanza: spenti, qualunque cosa dica l'evento", async () => {
       await monta({ event: { ...conSottotitoli, liveCaptionsAvailable: false } });
       expect(leggiAttesa().schedaPrivacy?.sottotitoli.attivi).toBe(false);
     });
 
-    it('chat e Q&A seguono i flag della sala, non il valore dell\'apertura', async () => {
+    it("chat e Q&A seguono i flag della sala, non il valore dell'apertura", async () => {
       const chiusi: SchedaPrivacy = {
         ...SCHEDA,
         chat: { attiva: false, domandeAttive: false, esitoDomande: 'soloTesto' },
@@ -414,7 +416,7 @@ describe("sala — quello che arriva alla sala d'attesa", () => {
       });
     });
 
-    it('prima che i flag arrivino, chat e Q&A valgono come all\'apertura', async () => {
+    it("prima che i flag arrivino, chat e Q&A valgono come all'apertura", async () => {
       await monta({
         event: { ...evento, chatEnabled: true, qaEnabled: true, schedaPrivacy: SCHEDA },
       });
@@ -424,34 +426,37 @@ describe("sala — quello che arriva alla sala d'attesa", () => {
       });
     });
 
-    it.each([true, false])('una chiamata rapida apre il Q&A dal vivo: domande pubblicabili %s', async (valore) => {
-      flagsDellaSala.dati = { qaEnabled: true };
-      await monta({
-        event: {
-          ...evento,
-          eventType: 'INSTANT',
-          qaEnabled: false,
-          schedaPrivacy: null,
-          postEventShow: {
-            recap: false,
-            qa: false,
-            polls: false,
-            wordCloud: false,
-            materials: false,
-            feedback: false,
+    it.each([true, false])(
+      'una chiamata rapida apre il Q&A dal vivo: domande pubblicabili %s',
+      async (valore) => {
+        flagsDellaSala.dati = { qaEnabled: true };
+        await monta({
+          event: {
+            ...evento,
+            eventType: 'INSTANT',
+            qaEnabled: false,
+            schedaPrivacy: null,
+            postEventShow: {
+              recap: false,
+              qa: false,
+              polls: false,
+              wordCloud: false,
+              materials: false,
+              feedback: false,
+            },
+            domandePubblicabili: valore,
           },
-          domandePubblicabili: valore,
-        },
-      });
-      await entra();
-      const scheda = [...document.querySelectorAll('button')].find(
-        (b) => b.textContent?.trim() === l.sidebarTabQa,
-      );
-      await act(async () => scheda?.click());
-      expect(pannelloDomande.props?.domandePubblicate).toBe(valore);
-    });
+        });
+        await entra();
+        const scheda = [...document.querySelectorAll('button')].find(
+          (b) => b.textContent?.trim() === l.sidebarTabQa
+        );
+        await act(async () => scheda?.click());
+        expect(pannelloDomande.props?.domandePubblicate).toBe(valore);
+      }
+    );
 
-    it('la rubrica non arriva alla sala d\'attesa, che non ha quella casella', async () => {
+    it("la rubrica non arriva alla sala d'attesa, che non ha quella casella", async () => {
       await monta({
         event: { ...evento, schedaPrivacy: { ...SCHEDA, rubrica: { mesi: 24 } } },
       });
@@ -465,7 +470,12 @@ describe("sala — quello che arriva alla sala d'attesa", () => {
         recordingEnabled: false,
         schedaPrivacy: {
           ...SCHEDA,
-          trascrizione: { chiesta: false, sottotitoli: false, tracce: null, dalVideo: false },
+          trascrizione: {
+            chiesta: false,
+            sottotitoli: false,
+            tracce: null,
+            dalVideo: false,
+          },
           sottotitoli: { attivi: false, testoConservato: true },
         },
         liveCaptionsAvailable: true,
@@ -480,7 +490,7 @@ describe("sala — quello che arriva alla sala d'attesa", () => {
       };
       const scrittaFinestra = l.consents.transcription.give;
 
-      it('in sala d\'attesa compare quando chi modera li accende', async () => {
+      it("in sala d'attesa compare quando chi modera li accende", async () => {
         await monta({ event: spentiAllApertura });
         expect(leggiAttesa().event.captionsTranscript).toBe(false);
 
@@ -490,7 +500,7 @@ describe("sala — quello che arriva alla sala d'attesa", () => {
         expect(leggiAttesa().schedaPrivacy?.trascrizione.sottotitoli).toBe(true);
       });
 
-      it('in sala d\'attesa scompare quando chi modera li spegne', async () => {
+      it("in sala d'attesa scompare quando chi modera li spegne", async () => {
         await monta({ event: accesiAllApertura });
         expect(leggiAttesa().event.captionsTranscript).toBe(true);
 
@@ -512,7 +522,7 @@ describe("sala — quello che arriva alla sala d'attesa", () => {
         expect(testo()).toContain(scrittaFinestra);
       });
 
-      it('chi ha gia\' acconsentito puo\' ritirare anche a sottotitoli spenti', async () => {
+      it("chi ha gia' acconsentito puo' ritirare anche a sottotitoli spenti", async () => {
         flagsDellaSala.dati = { liveCaptionsEnabled: false };
         await monta({ event: accesiAllApertura, hasMultitrackConsent: true });
         await entra();
@@ -546,7 +556,11 @@ describe("sala — quello che arriva alla sala d'attesa", () => {
 
   it('senza video il testo non dichiara una destinazione', async () => {
     await monta({
-      event: { ...evento, recordingDestination: 'PUBLIC', partecipantiNelVideo: 'assente' },
+      event: {
+        ...evento,
+        recordingDestination: 'PUBLIC',
+        partecipantiNelVideo: 'assente',
+      },
     });
     expect(leggiAttesa().recordingDestination).toBeNull();
   });
@@ -592,7 +606,11 @@ describe('sala — il testo su cui si acconsente', () => {
 
   it('in solo ascolto il testo cambiato si spiega anche entrando', async () => {
     await monta({
-      event: { ...evento, recordingDestination: 'REGISTRANTS', partecipantiNelVideo: 'visibili' },
+      event: {
+        ...evento,
+        recordingDestination: 'REGISTRANTS',
+        partecipantiNelVideo: 'visibili',
+      },
     });
     risposte.push({ recordingDestination: 'PUBLIC', listenOnly: true });
     await entra({ recordingConsent: true, recordingConsentDestination: 'REGISTRANTS' });
@@ -693,7 +711,9 @@ describe('sala — il testo su cui si acconsente', () => {
       consentsInForce: { recording: false, transcription: false },
     });
     await caduta();
-    expect(ultimoToken()).toMatchObject({ consentReplay: { recording: true, multitrack: true } });
+    expect(ultimoToken()).toMatchObject({
+      consentReplay: { recording: true, multitrack: true },
+    });
     expect(ultimoToken()).not.toHaveProperty('recordingConsent');
     expect(testo()).toContain(l.consents.notGiven);
     expect(testo()).not.toContain(l.consents.given);
@@ -831,7 +851,7 @@ describe('sala — il testo su cui si acconsente', () => {
     expect(testo()).toContain(g.recordingPublic);
   });
 
-  it('chi conduce non ha un consenso alla registrazione da dare o da ritirare: e\' nel video', async () => {
+  it("chi conduce non ha un consenso alla registrazione da dare o da ritirare: e' nel video", async () => {
     await monta({
       event: {
         ...evento,
@@ -864,7 +884,9 @@ describe('sala — il testo su cui si acconsente', () => {
       hasMultitrackConsent: true,
     });
     await entra();
-    expect(ultimoToken()).toMatchObject({ consentReplay: { multitrack: true, roomTokens: [] } });
+    expect(ultimoToken()).toMatchObject({
+      consentReplay: { multitrack: true, roomTokens: [] },
+    });
     expect(ultimoToken()).not.toHaveProperty('multitrackConsent');
   });
 
@@ -883,7 +905,10 @@ describe('sala — il testo su cui si acconsente', () => {
       await new Promise((fatto) => setTimeout(fatto, 0));
     });
     await caduta();
-    expect(ultimoToken()?.consentReplay).toMatchObject({ recording: true, multitrack: false });
+    expect(ultimoToken()?.consentReplay).toMatchObject({
+      recording: true,
+      multitrack: false,
+    });
   });
 
   it("il consenso dell'iscrizione decade solo se il server esclude la persona", async () => {
@@ -1077,7 +1102,7 @@ describe('sala — la finestra dei consensi', () => {
     );
   });
 
-  it("senza un video il ritiro dice cosa cambia", async () => {
+  it('senza un video il ritiro dice cosa cambia', async () => {
     await monta({
       event: { ...soloAvviso, partecipantiNelVideo: 'assente' },
       hasRecordingConsent: true,
@@ -1105,16 +1130,24 @@ describe('sala — la finestra dei consensi', () => {
     risposte.push({ voiceExcluded: true });
     await entra();
     await premi(pulsante(l.consents.button));
-    expect(document.getElementById('live-consents-rec-nota')?.textContent).toContain(TESTO_ENTE);
+    expect(document.getElementById('live-consents-rec-nota')?.textContent).toContain(
+      TESTO_ENTE
+    );
   });
 
   it("in solo ascolto il testo dell'ente sta sopra il pulsante", async () => {
     await monta({
-      event: { ...evento, partecipantiNelVideo: 'visibili', recordingConsentText: TESTO_ENTE },
+      event: {
+        ...evento,
+        partecipantiNelVideo: 'visibili',
+        recordingConsentText: TESTO_ENTE,
+      },
     });
     risposte.push({ listenOnly: true });
     await entra();
-    expect(document.querySelector('.live-listen-only')?.textContent).toContain(TESTO_ENTE);
+    expect(document.querySelector('.live-listen-only')?.textContent).toContain(
+      TESTO_ENTE
+    );
   });
 
   it('il testo della casella della trascrizione arriva alla finestra', async () => {
@@ -1169,7 +1202,11 @@ describe('sala — i consensi riletti a sala aperta', () => {
 
   it('un ritiro altrove lo vede anche la registrazione, con il testo in vigore', async () => {
     await inSalaConIConsensi();
-    letture.push({ recording: false, transcription: false, recordingDestination: 'PUBLIC' });
+    letture.push({
+      recording: false,
+      transcription: false,
+      recordingDestination: 'PUBLIC',
+    });
     await premi(pulsante(l.consents.button));
     await tutti();
     expect(pulsante(l.consents.recording.give).disabled).toBe(false);
@@ -1185,7 +1222,10 @@ describe('sala — i consensi riletti a sala aperta', () => {
     await tutti();
     risposte.push({ consentsInForce: { recording: true, transcription: false } });
     await caduta();
-    expect(ultimoToken()?.consentReplay).toMatchObject({ recording: true, multitrack: false });
+    expect(ultimoToken()?.consentReplay).toMatchObject({
+      recording: true,
+      multitrack: false,
+    });
   });
 
   it('una risposta che non dice lo stato lascia tutto com era', async () => {
@@ -1266,10 +1306,16 @@ describe('sala — un ritiro e un token insieme', () => {
     consentsInForce: { recording: false, transcription: false },
   };
   const ritiri = () => chiamate.filter((c) => c.url.endsWith('/consents/withdraw'));
-  const pausa = (ms: number) => act(async () => { await new Promise((fatto) => setTimeout(fatto, ms)); });
+  const pausa = (ms: number) =>
+    act(async () => {
+      await new Promise((fatto) => setTimeout(fatto, ms));
+    });
 
   async function dentroConConsenso() {
-    await monta({ event: { ...evento, recordingDestination: 'REGISTRANTS' }, isGuest: true });
+    await monta({
+      event: { ...evento, recordingDestination: 'REGISTRANTS' },
+      isGuest: true,
+    });
     risposte.push(CON_CONSENSO);
     await entra({ recordingConsent: true, recordingConsentDestination: 'REGISTRANTS' });
     expect(conferenza.jwt).toBe('jwt-1');
@@ -1283,7 +1329,11 @@ describe('sala — un ritiro e un token insieme', () => {
     vi.mocked(fetch).mockImplementation(async (input, init) => {
       if (String(input).endsWith(fine) && attiva) {
         attiva = false;
-        chiamate.push({ url: String(input), method: 'POST', body: JSON.parse(String(init?.body)) });
+        chiamate.push({
+          url: String(input),
+          method: 'POST',
+          body: JSON.parse(String(init?.body)),
+        });
         return new Promise<Response>((fatto) => {
           sblocca = fatto;
         });
@@ -1312,10 +1362,19 @@ describe('sala — un ritiro e un token insieme', () => {
     expect(ritiri()).toHaveLength(0);
 
     await act(async () => {
-      sblocca({ jwt: 'jwt-B', roomName: 'stanza', displayName: 'Relatore 1', role: 'participant', ...CON_CONSENSO });
+      sblocca({
+        jwt: 'jwt-B',
+        roomName: 'stanza',
+        displayName: 'Relatore 1',
+        role: 'participant',
+        ...CON_CONSENSO,
+      });
     });
     await vi.waitFor(() => expect(ritiri()).toHaveLength(1));
-    expect(ritiri()[0]!.body).toEqual({ roomTokens: ['jwt-1', 'jwt-B'], recording: true });
+    expect(ritiri()[0]!.body).toEqual({
+      roomTokens: ['jwt-1', 'jwt-B'],
+      recording: true,
+    });
 
     await vi.waitFor(() => expect(richiesteToken()).toHaveLength(3));
     expect(ultimoToken()).not.toHaveProperty('consentReplay');
@@ -1360,9 +1419,14 @@ describe('sala — un ritiro e un token insieme', () => {
 
 describe('sala — la fascia di chi resta fuori dalla registrazione', () => {
   const fascia = () => document.querySelector('.live-listen-only');
-  const pulsanteConsensi = () => document.querySelector<HTMLElement>('.live-consents-btn');
-  const chiudi = () => premi(document.querySelector<HTMLElement>('.live-listen-only__chiudi')!);
-  const eventoRiservato: Props['event'] = { ...evento, recordingDestination: 'REGISTRANTS' };
+  const pulsanteConsensi = () =>
+    document.querySelector<HTMLElement>('.live-consents-btn');
+  const chiudi = () =>
+    premi(document.querySelector<HTMLElement>('.live-listen-only__chiudi')!);
+  const eventoRiservato: Props['event'] = {
+    ...evento,
+    recordingDestination: 'REGISTRANTS',
+  };
 
   async function dentro(risposta: Risposta, e: Props['event'] = eventoRiservato) {
     await monta({ event: e });
@@ -1373,18 +1437,25 @@ describe('sala — la fascia di chi resta fuori dalla registrazione', () => {
 
   it.each<[string, Risposta, Props['event']]>([
     ['chi non acconsente', { voiceExcluded: true }, eventoRiservato],
-    ['chi segue in solo ascolto', { listenOnly: true }, { ...eventoRiservato, partecipantiNelVideo: 'visibili' }],
-  ])('%s la chiude e tiene il pulsante dei consensi, che prende il fuoco', async (_chi, risposta, e) => {
-    await dentro(risposta, e);
-    await chiudi();
-    expect(fascia()).toBeNull();
-    expect(pulsanteConsensi()).not.toBeNull();
-    expect(document.activeElement).toBe(pulsanteConsensi());
+    [
+      'chi segue in solo ascolto',
+      { listenOnly: true },
+      { ...eventoRiservato, partecipantiNelVideo: 'visibili' },
+    ],
+  ])(
+    '%s la chiude e tiene il pulsante dei consensi, che prende il fuoco',
+    async (_chi, risposta, e) => {
+      await dentro(risposta, e);
+      await chiudi();
+      expect(fascia()).toBeNull();
+      expect(pulsanteConsensi()).not.toBeNull();
+      expect(document.activeElement).toBe(pulsanteConsensi());
 
-    await premi(pulsanteConsensi()!);
-    expect(testo()).toContain(l.consents.intro);
-    expect(testo()).toContain(l.consents.recording.give);
-  });
+      await premi(pulsanteConsensi()!);
+      expect(testo()).toContain(l.consents.intro);
+      expect(testo()).toContain(l.consents.recording.give);
+    }
+  );
 
   it('il token successivo non la riapre', async () => {
     await dentro({ voiceExcluded: true });
@@ -1451,7 +1522,10 @@ describe("sala — la scheda in sala d'attesa", () => {
     await monta({
       event: {
         ...evento,
-        schedaPrivacy: { ...scheda, registrazione: { ...scheda.registrazione, conduceSempre: true } },
+        schedaPrivacy: {
+          ...scheda,
+          registrazione: { ...scheda.registrazione, conduceSempre: true },
+        },
       },
       isModerator: true,
     });
@@ -1472,7 +1546,10 @@ describe("sala — la scheda in sala d'attesa", () => {
   it('il consenso alla trascrizione gia dato fa nominare il nome che resta', async () => {
     await monta({ event: { ...evento, schedaPrivacy: scheda } });
     expect(leggiAttesa().schedaPrivacy?.trascrizione.chiesta).toBe(false);
-    await monta({ event: { ...evento, schedaPrivacy: scheda }, hasMultitrackConsent: true });
+    await monta({
+      event: { ...evento, schedaPrivacy: scheda },
+      hasMultitrackConsent: true,
+    });
     expect(leggiAttesa().schedaPrivacy?.trascrizione.chiesta).toBe(true);
   });
 });
@@ -1632,7 +1709,7 @@ describe("sala — fine dell'evento", () => {
   });
 });
 
-describe('sala — la chiamata rapida chiede a chi partecipa, all\'avvio della registrazione', () => {
+describe("sala — la chiamata rapida chiede a chi partecipa, all'avvio della registrazione", () => {
   const rapida = { ...evento, eventType: 'INSTANT' as const };
   const q = messages.live.recordingQuestion;
   const registra = async (acceso: boolean) => {
@@ -1646,9 +1723,14 @@ describe('sala — la chiamata rapida chiede a chi partecipa, all\'avvio della r
     expect(testo()).not.toContain(q.question);
     await registra(true);
     expect(testo()).toContain(q.question);
-    risposte.push({ voiceExcluded: false, consentsInForce: { recording: true, transcription: false } });
+    risposte.push({
+      voiceExcluded: false,
+      consentsInForce: { recording: true, transcription: false },
+    });
     await premi(pulsante(q.yes));
-    await vi.waitFor(() => expect(ultimoToken()).toMatchObject({ recordingConsent: true }));
+    await vi.waitFor(() =>
+      expect(ultimoToken()).toMatchObject({ recordingConsent: true })
+    );
     await vi.waitFor(() => expect(testo()).not.toContain(q.question));
   });
 
@@ -1664,7 +1746,7 @@ describe('sala — la chiamata rapida chiede a chi partecipa, all\'avvio della r
     expect(testo()).toContain(q.question);
   });
 
-  it('chi modera e\' nel video: nessuna domanda', async () => {
+  it("chi modera e' nel video: nessuna domanda", async () => {
     await monta({ event: rapida, isModerator: true, token: 'token-moderatore' });
     risposte.push({ role: 'moderator', voiceExcluded: false });
     await entra();
@@ -1672,7 +1754,7 @@ describe('sala — la chiamata rapida chiede a chi partecipa, all\'avvio della r
     expect(testo()).not.toContain(q.question);
   });
 
-  it('in un evento a calendario la domanda non c\'e\'', async () => {
+  it("in un evento a calendario la domanda non c'e'", async () => {
     await monta();
     risposte.push({ voiceExcluded: true });
     await entra();
@@ -1691,7 +1773,7 @@ describe('sala — la chiamata rapida chiede a chi partecipa, all\'avvio della r
     expect(leggiAttesa().event.recordingEnabled).toBe(false);
   });
 
-  it("dove chi partecipa non entra mai nel video si registra senza domanda", async () => {
+  it('dove chi partecipa non entra mai nel video si registra senza domanda', async () => {
     await monta({
       event: { ...rapida, partecipantiNelVideo: 'esclusi' },
       isGuest: true,
@@ -1727,7 +1809,7 @@ describe("sala — chi partecipa non entra mai nel video ('esclusi')", () => {
     expect(testo()).not.toContain(l.consents.transcription.needsRecording);
   });
 
-  it("un consenso alla registrazione dato prima non compare: non copre niente, e il suo ritiro toglierebbe la trascrizione", async () => {
+  it('un consenso alla registrazione dato prima non compare: non copre niente, e il suo ritiro toglierebbe la trascrizione', async () => {
     await monta({ event: esclusi, hasRecordingConsent: true });
     risposte.push({
       recordingDestination: 'REGISTRANTS',
@@ -1757,7 +1839,11 @@ describe('sala — il nickname', () => {
     expect(leggiAttesa().nickname).toMatchObject({ eventId: evento.id, iniziale: null });
     risposte.push({ nickname: 'Pippo' });
     await entra({ nickname: 'Pippo' });
-    expect(ultimoToken()).toMatchObject({ guestName: 'Relatore 1', nickname: 'Pippo', nicknameProof: [] });
+    expect(ultimoToken()).toMatchObject({
+      guestName: 'Relatore 1',
+      nickname: 'Pippo',
+      nicknameProof: [],
+    });
     risposte.push({ nickname: 'Pippo' });
     await caduta();
     expect(ultimoToken()).toMatchObject({ nickname: 'Pippo', nicknameProof: ['jwt-1'] });
@@ -1769,16 +1855,24 @@ describe('sala — il nickname', () => {
       'fetch',
       vi.fn(async (input: RequestInfo | URL, init?: RequestInit) =>
         String(input).endsWith('/nickname')
-          ? rispondi({ nickname: (JSON.parse(String(init?.body)) as { nickname: string }).nickname, saved: false })
-          : base(input, init),
-      ),
+          ? rispondi({
+              nickname: (JSON.parse(String(init?.body)) as { nickname: string }).nickname,
+              saved: false,
+            })
+          : base(input, init)
+      )
     );
     await monta({ event: conNickname, token: '', isGuest: true });
     risposte.push({ nickname: 'Pippo' });
     await entra({ nickname: 'Pippo' });
-    await premi(document.querySelector<HTMLElement>(`button[aria-label="${l.nickname.open}"]`)!);
+    await premi(
+      document.querySelector<HTMLElement>(`button[aria-label="${l.nickname.open}"]`)!
+    );
     const campo = document.querySelector<HTMLInputElement>('.wr-nickname input')!;
-    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set;
+    const setter = Object.getOwnPropertyDescriptor(
+      HTMLInputElement.prototype,
+      'value'
+    )?.set;
     await act(async () => {
       setter?.call(campo, 'Pluto');
       campo.dispatchEvent(new Event('input', { bubbles: true }));
@@ -1794,13 +1888,17 @@ describe('sala — il nickname', () => {
   });
 
   it("chi apre il proprio link non lo manda: il server lo legge dall'iscrizione", async () => {
-    await monta({ event: conNickname, registrantOwnsLink: true, initialNickname: 'Pippo' });
+    await monta({
+      event: conNickname,
+      registrantOwnsLink: true,
+      initialNickname: 'Pippo',
+    });
     expect(leggiAttesa().nickname).toMatchObject({ iniziale: 'Pippo' });
     await entra({ nickname: 'Pippo' });
     expect(ultimoToken()).not.toHaveProperty('nickname');
   });
 
-  it("chi ha un nickname salvato lo ritrova anche a opzione spenta, per poterlo togliere", async () => {
+  it('chi ha un nickname salvato lo ritrova anche a opzione spenta, per poterlo togliere', async () => {
     await monta({ registrantOwnsLink: true, initialNickname: 'Pippo' });
     expect(leggiAttesa().nickname).toMatchObject({ iniziale: 'Pippo' });
     await monta({ registrantOwnsLink: true, initialNickname: null });
@@ -1812,14 +1910,19 @@ describe('sala — il nickname', () => {
     expect(leggiAttesa().nickname).toBeUndefined();
   });
 
-  it("chi apre il link di un altro col pubblico anonimo resta con lo pseudonimo", async () => {
+  it('chi apre il link di un altro col pubblico anonimo resta con lo pseudonimo', async () => {
     await monta({ event: { ...conNickname, audienceAnonymous: true } });
     expect(leggiAttesa().nickname).toBeUndefined();
   });
 
   it("un nickname rifiutato all'ingresso riporta in sala d'attesa, con il motivo e l'alternativa", async () => {
     await monta({ event: conNickname, token: '', isGuest: true });
-    risposte.push({ stato: 409, code: 'NICKNAME_TAKEN', reason: 'taken', suggestion: 'Pippo2' });
+    risposte.push({
+      stato: 409,
+      code: 'NICKNAME_TAKEN',
+      reason: 'taken',
+      suggestion: 'Pippo2',
+    });
     await entra({ nickname: 'Pippo' });
     await vi.waitFor(() => {
       // Con il nickname rifiutato, che torna nel campo da rivedere.

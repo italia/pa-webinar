@@ -34,7 +34,8 @@ export function elencoRegistrazione(i: {
   /** La registrazione e' in corso (conta solo nelle chiamate rapide). */
   inCorso: boolean;
 }): ElencoRegistrazione {
-  if (!i.regola.registra || i.regola.soloAscolto || i.regola.voceDallaTrascrizione) return 'nessuno';
+  if (!i.regola.registra || i.regola.soloAscolto || i.regola.voceDallaTrascrizione)
+    return 'nessuno';
   if (i.istantanea) return i.inCorso ? 'tutti' : 'nessuno';
   return i.regola.richiesto ? 'tutti' : 'mani';
 }

@@ -7,15 +7,20 @@ import { describe, expect, it } from 'vitest';
 import { conduceNelVideo, testoConsensoEvento, voceDi } from './consent-rule';
 
 describe('testoConsensoEvento', () => {
-  it.each(['solo-voce', 'visibili'] as const)('con la casella (%s) resta', (partecipanti) => {
-    expect(testoConsensoEvento("Testo dell'ente.", partecipanti)).toBe("Testo dell'ente.");
-  });
+  it.each(['solo-voce', 'visibili'] as const)(
+    'con la casella (%s) resta',
+    (partecipanti) => {
+      expect(testoConsensoEvento("Testo dell'ente.", partecipanti)).toBe(
+        "Testo dell'ente."
+      );
+    }
+  );
 
   it('senza un video non si mostra', () => {
     expect(testoConsensoEvento("Testo dell'ente.", 'assente')).toBeNull();
   });
 
-  it('dove chi partecipa non entra mai nel video non c\'e\' la casella che lo copre', () => {
+  it("dove chi partecipa non entra mai nel video non c'e' la casella che lo copre", () => {
     expect(testoConsensoEvento("Testo dell'ente.", 'esclusi')).toBeNull();
   });
 
@@ -28,7 +33,7 @@ describe('testoConsensoEvento', () => {
 });
 
 describe('conduceNelVideo', () => {
-  it('chi conduce e\' nel video dove c\'e\' un video, qualunque cosa dica l\'evento', () => {
+  it("chi conduce e' nel video dove c'e' un video, qualunque cosa dica l'evento", () => {
     for (const partecipanti of ['solo-voce', 'esclusi', 'visibili'] as const) {
       expect(conduceNelVideo(partecipanti)).toBe(true);
     }
@@ -40,7 +45,7 @@ describe('conduceNelVideo', () => {
 });
 
 describe('voceDi', () => {
-  it('la voce di chi non acconsente si ricava dalla capacita\' dell\'installazione', () => {
+  it("la voce di chi non acconsente si ricava dalla capacita' dell'installazione", () => {
     expect(voceDi('solo-voce')).toBe('rimovibile');
     expect(voceDi('esclusi')).toBe('rimovibile');
     expect(voceDi('visibili')).toBe('fissa');

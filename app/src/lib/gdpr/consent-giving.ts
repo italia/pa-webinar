@@ -54,7 +54,10 @@ import {
 } from '@/lib/live/consent-rule';
 import { rubricaProposta } from '@/lib/persons/address-book';
 import { ridaiComunicazioni } from '@/lib/persons/spunta-in-attesa';
-import { partecipantiNelVideo, recordingAvailableFor } from '@/lib/recording/availability';
+import {
+  partecipantiNelVideo,
+  recordingAvailableFor,
+} from '@/lib/recording/availability';
 import {
   destinazioneDelTesto,
   provaCopre,
@@ -221,7 +224,8 @@ function regole(evento: EventoConsensi, sito: SitoConsensi) {
     // trascrizione non avrebbe niente da trascrivere (`conVoce` nel token). Dove
     // chi partecipa non entra mai nel video la voce la decide la trascrizione da
     // sola, come nella rotta d'iscrizione.
-    serveRegistrazione: regola.registra && !regola.soloAscolto && !regola.voceDallaTrascrizione,
+    serveRegistrazione:
+      regola.registra && !regola.soloAscolto && !regola.voceDallaTrascrizione,
   };
 }
 
@@ -297,7 +301,9 @@ const CAMPI_ISCRIZIONE = {
   consentMultitrackWithdrawnAt: true,
   consentFutureCommunications: true,
   consentFutureCommunicationsWithdrawnAt: true,
-  recordingConsents: { select: { withdrawnAt: true, destination: true, textVersion: true } },
+  recordingConsents: {
+    select: { withdrawnAt: true, destination: true, textVersion: true },
+  },
   multitrackConsents: { select: { withdrawnAt: true, textVersion: true } },
   event: { select: CAMPI_EVENTO_CONSENSI },
 } as const satisfies Prisma.RegistrationSelect;
@@ -502,7 +508,14 @@ export async function daiConsenso(
           return 'testoCambiato';
         }
         if (vigore.recording) return 'gia';
-        return daiRegistrazione(tx, iscrizione, r.destinazione, letto, r.partecipanti, locale);
+        return daiRegistrazione(
+          tx,
+          iscrizione,
+          r.destinazione,
+          letto,
+          r.partecipanti,
+          locale
+        );
       }
       if (!r.richiesti.tracce) return 'nonOfferto';
       const testo = chiaveConsensoTrascrizione(

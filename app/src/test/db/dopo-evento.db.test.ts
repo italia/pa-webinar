@@ -146,7 +146,9 @@ describe('registrazione riservata con la pagina privata', () => {
     const uguale = biscotto.indexOf('=');
     biscotti.set(biscotto.slice(0, uguale), biscotto.slice(uguale + 1));
 
-    expect(eventoNel(await payload(evento.slug)).recordingUrl).toBe(`/api/events/${evento.slug}/recording`);
+    expect(eventoNel(await payload(evento.slug)).recordingUrl).toBe(
+      `/api/events/${evento.slug}/recording`
+    );
     const risposta = await video(
       richiesta(`/api/events/${evento.slug}/recording`) as never,
       ctx(evento.slug)

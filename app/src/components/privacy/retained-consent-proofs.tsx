@@ -95,7 +95,8 @@ export default function RetainedConsentProofs({
       const anchePerLaTrascrizione =
         prova.kind === 'recording' &&
         righe.some(
-          (r) => r.eventId === prova.eventId && r.kind === 'transcription' && !r.withdrawnAt
+          (r) =>
+            r.eventId === prova.eventId && r.kind === 'transcription' && !r.withdrawnAt
         );
       const consensi = anchePerLaTrascrizione
         ? `${tl('recording.title')}, ${tl('transcription.title')}`

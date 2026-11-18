@@ -123,7 +123,8 @@ const ROTTE_RIMOZIONE_CONTENUTO: Record<string, string> = {
 const ROTTE_RIMOZIONE_METADATI: Record<string, string> = {
   'api/admin/recording-removals/route.ts': 'elenco e inserimento delle richieste',
   'api/admin/recording-removals/[id]/route.ts': 'la richiesta e i suoi intervalli',
-  'api/admin/recording-removals/people/route.ts': 'chi era in sala, per scegliere la persona',
+  'api/admin/recording-removals/people/route.ts':
+    'chi era in sala, per scegliere la persona',
   'api/admin/recording-removals/recordings/route.ts': 'le registrazioni di un evento',
   'api/admin/recording-removals/[id]/reject/route.ts': 'respinge la richiesta',
   'api/admin/recording-removals/[id]/start/route.ts': 'prende in carico la richiesta',
@@ -183,7 +184,9 @@ describe('rotte del contenuto delle registrazioni', () => {
   });
 
   it('le rotte della rimozione aprono il contenuto solo in deroga, e sono tutte dichiarate', () => {
-    const rotte = [...file(path.join(APP, 'api/admin/recording-removals'), 'route.ts')].map(rel);
+    const rotte = [
+      ...file(path.join(APP, 'api/admin/recording-removals'), 'route.ts'),
+    ].map(rel);
     const mute = rotte.filter(
       (r) => !(r in ROTTE_RIMOZIONE_CONTENUTO) && !(r in ROTTE_RIMOZIONE_METADATI)
     );

@@ -139,7 +139,7 @@ describe('destinazione del consenso alla registrazione', () => {
     });
   });
 
-  it("un evento senza destinazione non la salva, ma salva la versione del testo", async () => {
+  it('un evento senza destinazione non la salva, ma salva la versione del testo', async () => {
     vi.stubEnv('RECORDING_VOICE_EXCLUSION', 'true');
     vi.stubEnv('RECORDING_PARTICIPANT_VOICE', 'true');
     const evento = await eventoAperto();

@@ -190,7 +190,9 @@ describe('I miei dati', () => {
       data: [iscrizione('r1', 'Primo'), iscrizione('r2', 'Secondo')],
     });
     const pulsanti = (nome: string) =>
-      [...container.querySelectorAll('button')].filter((b) => b.textContent?.trim() === nome);
+      [...container.querySelectorAll('button')].filter(
+        (b) => b.textContent?.trim() === nome
+      );
     expect(pulsanti(m.addressBookPendingConfirm)).toHaveLength(2);
 
     await act(async () => {
@@ -241,11 +243,18 @@ describe('I miei dati', () => {
       data: [iscrizione('r1', 'Primo'), iscrizione('r2', 'Secondo')],
     };
     const pulsanti = (nome: string) =>
-      [...container.querySelectorAll('button')].filter((b) => b.textContent?.trim() === nome);
+      [...container.querySelectorAll('button')].filter(
+        (b) => b.textContent?.trim() === nome
+      );
     const scriviCodice = (valore: string) =>
       act(() => {
-        const el = container.querySelector<HTMLInputElement>('input[autocomplete="one-time-code"]')!;
-        Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!.call(el, valore);
+        const el = container.querySelector<HTMLInputElement>(
+          'input[autocomplete="one-time-code"]'
+        )!;
+        Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!.call(
+          el,
+          valore
+        );
         el.dispatchEvent(new Event('input', { bubbles: true }));
       });
     const clic = async (el: HTMLElement | undefined) => {

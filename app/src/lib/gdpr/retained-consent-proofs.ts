@@ -64,7 +64,10 @@ type ClienteCopia = LettoreProve & Pick<Prisma.TransactionClient, 'retainedConse
  *  transazione: decide quali prove si copiano e quali restano (la pulizia dei
  *  dati, chi cancella, il giro sulle prove conservate). */
 export async function tipiDelleProveEsistenti(
-  db: Pick<Prisma.TransactionClient, 'event' | 'postprodArtifact' | 'recording' | 'callSession'>,
+  db: Pick<
+    Prisma.TransactionClient,
+    'event' | 'postprodArtifact' | 'recording' | 'callSession'
+  >,
   eventId: string
 ): Promise<TipoConsenso[]> {
   const evento = await db.event.findUnique({
@@ -95,7 +98,9 @@ export async function tipiDelleProveEsistenti(
     fileDiSessione: fileDiSessione > 0,
     tracceArrivate: registrazioni.some(
       (r) =>
-        isMultitrackPlaceholder(r.blobKey) && registrazioneConMedia(r) && r.tracks.length > 0
+        isMultitrackPlaceholder(r.blobKey) &&
+        registrazioneConMedia(r) &&
+        r.tracks.length > 0
     ),
     trascrizioneEsiste: trascrizioni > 0,
   });
@@ -234,7 +239,8 @@ export async function togliNomeDalleProve(
         select: { eventId: true },
       });
       await togliNome(tx, { emailHash }, adesso);
-      for (const eventId of idEventi) await togliDalleTrascrizioni(tx, eventId, emailHash);
+      for (const eventId of idEventi)
+        await togliDalleTrascrizioni(tx, eventId, emailHash);
       for (const { eventId } of conNome) {
         perEvento.set(eventId, (perEvento.get(eventId) ?? 0) + 1);
       }

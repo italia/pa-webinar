@@ -323,7 +323,11 @@ describe('RecordingManagement — durata della registrazione', () => {
   });
   describe('in un evento nato prima della regola', () => {
     it('non pubblicato, mostra la durata che vale e spegne le scelte piu’ lunghe', () => {
-      render({ legacyRecordingRetention: true, dataRetentionDays: 45, recordingDeleteAfterDays: 90 });
+      render({
+        legacyRecordingRetention: true,
+        dataRetentionDays: 45,
+        recordingDeleteAfterDays: 90,
+      });
       // La conservazione dei dati, che non e' fra le scelte, si aggiunge.
       expect(scelta(45).checked).toBe(true);
       expect(container.textContent).toContain('45 giorni');
@@ -331,12 +335,19 @@ describe('RecordingManagement — durata della registrazione', () => {
       expect(scelta(90).disabled).toBe(true);
       expect(scelta(-1).disabled).toBe(true);
       expect(container.textContent).toContain(
-        t.retentionLegacy.replace('{days, plural, one {# giorno} other {# giorni}}', '45 giorni')
+        t.retentionLegacy.replace(
+          '{days, plural, one {# giorno} other {# giorni}}',
+          '45 giorni'
+        )
       );
     });
 
     it('pubblicato, si sceglie come sempre', () => {
-      render({ legacyRecordingRetention: true, recordingPublished: true, recordingDeleteAfterDays: null });
+      render({
+        legacyRecordingRetention: true,
+        recordingPublished: true,
+        recordingDeleteAfterDays: null,
+      });
       expect(scelta(-1).checked).toBe(true);
       expect(scelta(365).disabled).toBe(false);
       expect(container.textContent).not.toContain(t.retentionLegacy.slice(0, 30));

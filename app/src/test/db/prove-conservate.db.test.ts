@@ -459,7 +459,9 @@ describe('pulizia dei dati', () => {
     await giroDiPulizia();
     const righe = await prove(evento.id);
     expect(righe).toHaveLength(5);
-    expect(righe.every((r) => r.nameRemovedAt === null && r.displayName !== null)).toBe(true);
+    expect(righe.every((r) => r.nameRemovedAt === null && r.displayName !== null)).toBe(
+      true
+    );
   });
 
   it('la sola trascrizione non pubblicata tiene la sua prova', async () => {
@@ -816,7 +818,10 @@ describe('la trascrizione pubblicata dopo la pulizia', () => {
     }
     expect(resto.voci).toEqual(['Luca Verdi']);
   };
-  const ritiraLaProva = async (emailHash: string, kind: 'recording' | 'transcription') => {
+  const ritiraLaProva = async (
+    emailHash: string,
+    kind: 'recording' | 'transcription'
+  ) => {
     const { retainedConsentProofs, consentsToken } = await chiediDati(emailHash);
     const prova = retainedConsentProofs.find((p) => p.kind === kind);
     const res = await ritira(
@@ -858,7 +863,9 @@ describe('la trascrizione pubblicata dopo la pulizia', () => {
 
     await chiediCancellazione(anna.emailHash);
 
-    expect(await prisma.postprodArtifact.count({ where: { recordingId: registrazione } })).toBe(0);
+    expect(
+      await prisma.postprodArtifact.count({ where: { recordingId: registrazione } })
+    ).toBe(0);
     expect(await prisma.speaker.count({ where: { recordingId: registrazione } })).toBe(0);
     expect(await prisma.recording.count({ where: { id: registrazione } })).toBe(1);
   });
@@ -1010,7 +1017,9 @@ describe('prove di chi conduce', () => {
       const evento = await creaEvento(RECENTE);
       const emailHash = await senzaAccount(evento);
 
-      expect(await chiediCancellazione(emailHash)).toMatchObject({ consentProofsKept: 2 });
+      expect(await chiediCancellazione(emailHash)).toMatchObject({
+        consentProofsKept: 2,
+      });
 
       expect(await prisma.recordingConsent.count()).toBe(0);
       expect(await prisma.multitrackConsent.count()).toBe(0);
@@ -1122,12 +1131,17 @@ describe('chi conduce nei sottotitoli e nelle trascrizioni', () => {
     const evento = await creaEvento(RECENTE);
     const { emailHash } = await conDueVoci(evento.id);
     const recordingId = await costruita(evento.id);
-    expect((await trascrizione(recordingId)).voci.sort()).toEqual(['Ospite', 'Relatrice']);
+    expect((await trascrizione(recordingId)).voci.sort()).toEqual([
+      'Ospite',
+      'Relatrice',
+    ]);
 
     await chiediCancellazione(emailHash);
 
     expect(await prisma.captionSegment.count({ where: { seatId: POSTO } })).toBe(0);
-    expect(await prisma.captionSegment.count({ where: { seatId: 'ospite-sala' } })).toBe(1);
+    expect(await prisma.captionSegment.count({ where: { seatId: 'ospite-sala' } })).toBe(
+      1
+    );
     await senzaRelatrice(recordingId);
   });
 
@@ -1171,7 +1185,9 @@ describe('chi conduce nei sottotitoli e nelle trascrizioni', () => {
 
     await chiediCancellazione(account.emailHash);
 
-    expect(await prisma.captionSegment.count({ where: { seatId: 'mod-sala-staff' } })).toBe(0);
+    expect(
+      await prisma.captionSegment.count({ where: { seatId: 'mod-sala-staff' } })
+    ).toBe(0);
     const { corpo, voci } = await trascrizione(recordingId);
     expect(corpo).not.toContain('Organizzatrice');
     expect(voci.sort()).toEqual(['Ospite', 'Relatrice']);
@@ -1196,11 +1212,16 @@ describe('chi conduce nei sottotitoli e nelle trascrizioni', () => {
     );
     await frase(evento.id, 'mod-sala-omonima', 'Relatrice', 3);
     const recordingId = await costruita(evento.id);
-    expect((await trascrizione(recordingId)).voci.filter((v) => v === 'Relatrice')).toHaveLength(2);
+    expect(
+      (await trascrizione(recordingId)).voci.filter((v) => v === 'Relatrice')
+    ).toHaveLength(2);
 
     await chiediCancellazione(emailHash);
 
-    expect((await trascrizione(recordingId)).voci.sort()).toEqual(['Ospite', 'Relatrice']);
+    expect((await trascrizione(recordingId)).voci.sort()).toEqual([
+      'Ospite',
+      'Relatrice',
+    ]);
   });
 
   it('il ritiro di una prova conservata toglie nome e frasi di chi ha la concessione', async () => {
@@ -1301,7 +1322,9 @@ describe('chi conduce nei sottotitoli e nelle trascrizioni', () => {
       roomConsentProofs: Array<{ kind: string; eventId: string }>;
     };
 
-    expect(roomConsentProofs).toMatchObject([{ kind: 'transcription', eventId: evento.id }]);
+    expect(roomConsentProofs).toMatchObject([
+      { kind: 'transcription', eventId: evento.id },
+    ]);
   });
 });
 
@@ -1323,7 +1346,9 @@ describe('un video che esiste e non e’ pubblicato', () => {
 
     const righe = await prove(evento.id);
     expect(righe).toHaveLength(5);
-    expect(righe.every((r) => r.displayName === null && r.withdrawnAt !== null)).toBe(true);
+    expect(righe.every((r) => r.displayName === null && r.withdrawnAt !== null)).toBe(
+      true
+    );
   });
 
   it('vale per la registrazione temporanea e per la sola trascrizione', async () => {
@@ -1342,7 +1367,9 @@ describe('un video che esiste e non e’ pubblicato', () => {
     await giroDiPulizia();
 
     expect(await prove(temporanea.id)).toHaveLength(5);
-    expect((await prove(conTrascrizione.id)).every((r) => r.kind === 'transcription')).toBe(true);
+    expect(
+      (await prove(conTrascrizione.id)).every((r) => r.kind === 'transcription')
+    ).toBe(true);
     expect(await prove(conTrascrizione.id)).toHaveLength(2);
   });
 
@@ -1383,7 +1410,9 @@ describe('un video che esiste e non e’ pubblicato', () => {
 
     const righe = await prove(evento.id);
     expect(righe).toHaveLength(5);
-    expect(righe.every((r) => r.displayName === null && r.withdrawnAt !== null)).toBe(true);
+    expect(righe.every((r) => r.displayName === null && r.withdrawnAt !== null)).toBe(
+      true
+    );
   });
 });
 
@@ -1410,7 +1439,11 @@ describe('prove non piu’ coperte su un evento ancora in conservazione', () => 
     expect(await prove(evento.id)).toHaveLength(0);
     expect(conti.retainedConsentProofsDeleted).toBe(5);
     const [riga] = await prisma.gdprAuditLog.findMany({
-      where: { eventId: evento.id, action: 'DATA_DELETED', details: { contains: 'retainedConsentProofs' } },
+      where: {
+        eventId: evento.id,
+        action: 'DATA_DELETED',
+        details: { contains: 'retainedConsentProofs' },
+      },
     });
     expect(riga?.recordCount).toBe(5);
   });
@@ -1552,13 +1585,17 @@ describe('un evento con piu’ sessioni registrate', () => {
     await cancellaVideo(evento);
     await giroDiPulizia();
 
-    expect(await prisma.callSession.findUniqueOrThrow({ where: { id: seconda.id } })).toMatchObject({
+    expect(
+      await prisma.callSession.findUniqueOrThrow({ where: { id: seconda.id } })
+    ).toMatchObject({
       recordingUrl: null,
       recordingFilename: null,
       recordingFileSize: null,
       recordingDuration: null,
     });
-    expect(await prisma.callSession.findUniqueOrThrow({ where: { id: prima.id } })).toMatchObject({
+    expect(
+      await prisma.callSession.findUniqueOrThrow({ where: { id: prima.id } })
+    ).toMatchObject({
       recordingUrl: PRIMO,
       recordingFilename: 'recordings/prima-sessione.mp4',
     });
@@ -1587,7 +1624,9 @@ describe('un evento con piu’ sessioni registrate', () => {
     await cancellaSessione(evento, doppia);
     await giroDiPulizia();
 
-    const rimasta = await prisma.callSession.findUniqueOrThrow({ where: { id: prima.id } });
+    const rimasta = await prisma.callSession.findUniqueOrThrow({
+      where: { id: prima.id },
+    });
     expect(rimasta.recordingUrl).toBeNull();
     expect(await prove(evento.id)).toHaveLength(0);
   });
@@ -1606,7 +1645,9 @@ describe('un evento con piu’ sessioni registrate', () => {
     );
 
     expect(res.status).toBe(200);
-    const sessione = await prisma.callSession.findUniqueOrThrow({ where: { id: seconda.id } });
+    const sessione = await prisma.callSession.findUniqueOrThrow({
+      where: { id: seconda.id },
+    });
     expect(sessione.recordingUrl).toBeNull();
   });
 
@@ -1644,7 +1685,9 @@ describe('un evento con piu’ sessioni registrate', () => {
     );
 
     expect(res.status).toBe(200);
-    const sessione = await prisma.callSession.findUniqueOrThrow({ where: { id: seconda.id } });
+    const sessione = await prisma.callSession.findUniqueOrThrow({
+      where: { id: seconda.id },
+    });
     expect(sessione.recordingUrl).toBe(SECONDO);
   });
 
@@ -1922,8 +1965,12 @@ describe('pulizia e ritiro insieme', () => {
 
     expect((await risposta).status).toBe(200);
     const sue = await prisma.retainedConsentProof.findMany({ where: { emailHash } });
-    expect(sue.filter((r) => r.kind === 'transcription').every((r) => r.withdrawnAt)).toBe(true);
-    expect(sue.filter((r) => r.kind === 'recording').every((r) => !r.withdrawnAt)).toBe(true);
+    expect(
+      sue.filter((r) => r.kind === 'transcription').every((r) => r.withdrawnAt)
+    ).toBe(true);
+    expect(sue.filter((r) => r.kind === 'recording').every((r) => !r.withdrawnAt)).toBe(
+      true
+    );
   });
 
   it('il ritiro aspetta il blocco oltre i 5 secondi predefiniti', async () => {

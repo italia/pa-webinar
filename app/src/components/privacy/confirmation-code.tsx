@@ -29,7 +29,11 @@ export interface EsitoRichiesta {
 }
 
 /** I codici con cui la rotta del nickname lo rifiuta, con motivo e alternativa. */
-const CODICI_RIFIUTO = ['NICKNAME_INVALID', 'NICKNAME_TAKEN', 'NICKNAMES_DISABLED'] as const;
+const CODICI_RIFIUTO = [
+  'NICKNAME_INVALID',
+  'NICKNAME_TAKEN',
+  'NICKNAMES_DISABLED',
+] as const;
 export interface RifiutoNickname {
   codice: (typeof CODICI_RIFIUTO)[number];
   motivo?: string;
@@ -92,7 +96,9 @@ export function useCodiceDiConferma(url: string) {
           rifiuto: {
             codice: codice as RifiutoNickname['codice'],
             ...(typeof json.reason === 'string' ? { motivo: json.reason } : {}),
-            ...(typeof json.suggestion === 'string' ? { suggerimento: json.suggestion } : {}),
+            ...(typeof json.suggestion === 'string'
+              ? { suggerimento: json.suggestion }
+              : {}),
           },
         };
       }

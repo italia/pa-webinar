@@ -134,7 +134,9 @@ describe('l’avvio della pipeline', () => {
   });
 
   it('tracce non ancora arrivate: lo dice, e la pagina resta dov’e’', async () => {
-    avvia.mockResolvedValue(new Response(JSON.stringify({ enqueued: 0, tracksPending: true })));
+    avvia.mockResolvedValue(
+      new Response(JSON.stringify({ enqueued: 0, tracksPending: true }))
+    );
     disegna();
     await act(async () => pulsante(tp.generateAi).click());
     expect(toast.success).toHaveBeenCalledWith(messages.apiErrors.tracksPending);

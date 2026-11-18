@@ -73,7 +73,9 @@ export async function applicaSpuntaInAttesa(
     const iscrizione = await leggiIscrizione(tx, registrationId);
     if (!iscrizione) return false;
     if (!rubricaProposta(iscrizione.event, sito)) {
-      await tx.gdprAuditLog.create({ data: rigaSpuntaTolta(iscrizione.eventId, origine) });
+      await tx.gdprAuditLog.create({
+        data: rigaSpuntaTolta(iscrizione.eventId, origine),
+      });
       return false;
     }
     await rientraInRubrica(tx, registrationId, iscrizione, sito, origine, {});
@@ -149,7 +151,10 @@ async function rientraInRubrica(
   });
   const altreConfermate = altre.filter((a) => rubricaProposta(a.event, sito));
   const tolte = altre.filter((a) => !rubricaProposta(a.event, sito));
-  const confermate = [{ id: registrationId, eventId: iscrizione.eventId }, ...altreConfermate];
+  const confermate = [
+    { id: registrationId, eventId: iscrizione.eventId },
+    ...altreConfermate,
+  ];
   // Prima la voce, poi gli inviti: lo stesso ordine del ritiro e della
   // conservazione, che non si aspettano a vicenda.
   const personId = await upsertPersonOnRegistration(tx, {

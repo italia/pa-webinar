@@ -126,8 +126,10 @@ beforeEach(() => {
 });
 
 describe('pagina di iscrizione: la scheda privacy', () => {
-  it("la calcola il server, con la riga delle impostazioni", async () => {
-    const { schedaPrivacy } = (await propsDelModulo()) as { schedaPrivacy: SchedaPrivacy };
+  it('la calcola il server, con la riga delle impostazioni', async () => {
+    const { schedaPrivacy } = (await propsDelModulo()) as {
+      schedaPrivacy: SchedaPrivacy;
+    };
     expect(schedaPrivacy.registrazione.modo).toBe('manuale');
     expect(schedaPrivacy.rubrica).not.toBeNull();
   });
@@ -206,7 +208,9 @@ describe('pagina di iscrizione: consensi passati al modulo', () => {
     it('con le sole tracce la casella resta', async () => {
       evento({ multitrackRecordingEnabled: true, aiTranscriptEnabled: true });
       const props = await propsDelModulo();
-      expect((props.schedaPrivacy as SchedaPrivacy).registrazione.modo).toBe('soloTracce');
+      expect((props.schedaPrivacy as SchedaPrivacy).registrazione.modo).toBe(
+        'soloTracce'
+      );
       expect(props.recordingEnabled).toBe(true);
       expect(props.multitrackRecordingEnabled).toBe(true);
     });

@@ -16,7 +16,10 @@ import path from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { DELETE as cancellaVoce } from '@/app/api/admin/rubrica/[id]/route';
-import { GET as elencoRubrica, POST as cercaRubrica } from '@/app/api/admin/rubrica/route';
+import {
+  GET as elencoRubrica,
+  POST as cercaRubrica,
+} from '@/app/api/admin/rubrica/route';
 import { GET as registroGdpr } from '@/app/api/admin/gdpr-audit/route';
 import { GET as conservazione } from '@/app/api/cron/rubrica-retention/route';
 import { POST as cancellazione } from '@/app/api/gdpr/erasure/route';
@@ -177,7 +180,10 @@ describe('ricerca', () => {
     await voceConNome('Altra Persona');
     for (const q of ['nicolò', 'NICOLO', email.slice(4, 16)]) {
       const { rows, total } = await cerca({ q, withEmail: true });
-      expect(rows.map((r) => r.id), q).toEqual([persona.id]);
+      expect(
+        rows.map((r) => r.id),
+        q
+      ).toEqual([persona.id]);
       expect(rows[0]?.email).toBe(email);
       expect(total).toBe(1);
     }
@@ -272,13 +278,18 @@ describe('registro del ritiro', () => {
     const { emailHash, persona } = await voce();
     const token = issueRubricaOptOutToken(persona.id);
     const risposta = await esceDalLink(
-      richiesta(`/api/rubrica/opt-out?token=${encodeURIComponent(token)}`, 'POST') as never,
+      richiesta(
+        `/api/rubrica/opt-out?token=${encodeURIComponent(token)}`,
+        'POST'
+      ) as never,
       senzaParametri
     );
     expect(risposta.status).toBe(200);
-    expect(await prisma.person.findUniqueOrThrow({ where: { emailHash } })).toMatchObject({
-      optedInToAddressBook: false,
-    });
+    expect(await prisma.person.findUniqueOrThrow({ where: { emailHash } })).toMatchObject(
+      {
+        optedInToAddressBook: false,
+      }
+    );
     const righe = await prisma.gdprAuditLog.findMany();
     expect(righe).toHaveLength(1);
     expect(righe[0]).toMatchObject({
@@ -653,7 +664,9 @@ describe('inviti fermati', () => {
 
     await ritiraComunicazioni(persona.emailHash);
 
-    const rimaste = await prisma.emailOutbox.findMany({ select: { subject: true, status: true } });
+    const rimaste = await prisma.emailOutbox.findMany({
+      select: { subject: true, status: true },
+    });
     expect(rimaste).toHaveLength(2);
     expect(rimaste).toEqual(
       expect.arrayContaining([
@@ -724,7 +737,9 @@ describe('la corsa e una spunta concorrente', () => {
     return vi.spyOn(prisma.person, 'findMany').mockImplementation(((args: never) => {
       letture += 1;
       const lettura = originale(args);
-      return letture === n ? lettura.then(async (r: unknown) => (await mentre(), r)) : lettura;
+      return letture === n
+        ? lettura.then(async (r: unknown) => (await mentre(), r))
+        : lettura;
     }) as never);
   }
 
@@ -758,7 +773,9 @@ describe('la corsa e una spunta concorrente', () => {
     expect(
       await prisma.person.findUniqueOrThrow({ where: { id: persona.persona.id } })
     ).toMatchObject({ optedInToAddressBook: true, email: persona.cifrata });
-    expect(await prisma.eventInvitation.count({ where: { declinedAt: { not: null } } })).toBe(0);
+    expect(
+      await prisma.eventInvitation.count({ where: { declinedAt: { not: null } } })
+    ).toBe(0);
   });
 
   it('una voce scaduta che rispunta dopo la lettura resta', async () => {
@@ -926,7 +943,12 @@ describe('riempimento delle voci esistenti', () => {
     await prisma.registration.update({
       where: {
         id: (
-          await iscrizioneDi((await creaEvento()).id, emailHash, 'p@example.org', ultimaSpunta)
+          await iscrizioneDi(
+            (await creaEvento()).id,
+            emailHash,
+            'p@example.org',
+            ultimaSpunta
+          )
         ).id,
       },
       data: { consentFutureCommunications: true },
@@ -1032,9 +1054,24 @@ describe('riempimento delle voci esistenti', () => {
         optedInToAddressBook: false,
       },
     });
-    await iscrizioneDi((await creaEvento()).id, ritirata.emailHash, 'ritirata@example.org', giorni(1));
-    await iscrizioneDi((await creaEvento()).id, emailHash, 'vecchio@example.org', giorni(9));
-    const ultima = await iscrizioneDi((await creaEvento()).id, emailHash, email, giorni(1));
+    await iscrizioneDi(
+      (await creaEvento()).id,
+      ritirata.emailHash,
+      'ritirata@example.org',
+      giorni(1)
+    );
+    await iscrizioneDi(
+      (await creaEvento()).id,
+      emailHash,
+      'vecchio@example.org',
+      giorni(9)
+    );
+    const ultima = await iscrizioneDi(
+      (await creaEvento()).id,
+      emailHash,
+      email,
+      giorni(1)
+    );
 
     const esito = await (await corsaConservazione()).json();
 

@@ -127,7 +127,9 @@ describe('un consenso dato di nuovo da «I miei dati»', () => {
     const prima = await prisma.registration.findUniqueOrThrow({
       where: { id: iscrizione.id },
     });
-    expect(await registrazioneDellIscrizione(evento, prima, null, 'solo-voce')).toBe(false);
+    expect(await registrazioneDellIscrizione(evento, prima, null, 'solo-voce')).toBe(
+      false
+    );
 
     const res = await dai(token, iscrizione.id, {
       consent: 'recording',
@@ -145,7 +147,9 @@ describe('un consenso dato di nuovo da «I miei dati»', () => {
       expect.objectContaining({ withdrawnAt: expect.any(String) }),
     ]);
     // Il prossimo ingresso lo trova: il token della sala legge la stessa regola.
-    expect(await registrazioneDellIscrizione(evento, prima, null, 'solo-voce')).toBe(true);
+    expect(await registrazioneDellIscrizione(evento, prima, null, 'solo-voce')).toBe(
+      true
+    );
     // La trascrizione ritirata con la registrazione resta ritirata.
     expect(
       await prisma.multitrackConsent.count({
@@ -328,14 +332,18 @@ describe('un consenso dato di nuovo da «I miei dati»', () => {
     const prima = await prisma.registration.findUniqueOrThrow({
       where: { id: iscrizione.id },
     });
-    expect(await registrazioneDellIscrizione(evento, prima, 'PUBLIC', 'solo-voce')).toBe(false);
+    expect(await registrazioneDellIscrizione(evento, prima, 'PUBLIC', 'solo-voce')).toBe(
+      false
+    );
     const res = await dai(token, iscrizione.id, {
       consent: 'recording',
       recordingDestination: 'PUBLIC',
     });
     expect(res.status).toBe(200);
     expect(await righeRegistro(evento.id, 'CONSENT_RECORDED')).toHaveLength(1);
-    expect(await registrazioneDellIscrizione(evento, prima, 'PUBLIC', 'solo-voce')).toBe(true);
+    expect(await registrazioneDellIscrizione(evento, prima, 'PUBLIC', 'solo-voce')).toBe(
+      true
+    );
   });
 
   it("a evento concluso, o dove l'evento non lo chiede, non si da'", async () => {
@@ -489,7 +497,9 @@ describe('un consenso dato di nuovo da «I miei dati»', () => {
       consent: 'recording',
     });
     ritiro.headers.set('x-forwarded-for', `10.9.${Math.floor(ip / 250)}.${ip % 250}`);
-    expect((await consensi(ritiro as never, { params: Promise.resolve({}) })).status).toBe(200);
+    expect(
+      (await consensi(ritiro as never, { params: Promise.resolve({}) })).status
+    ).toBe(200);
     const dopo = await prisma.registration.findUniqueOrThrow({
       where: { id: iscrizione.id },
     });
@@ -533,7 +543,10 @@ async function chiamaCorreggi(corpo: Record<string, unknown>) {
 
 async function chiamaNickname(corpo: Record<string, unknown>) {
   ip += 1;
-  const r = richiesta('/api/gdpr/registrations/nickname', 'POST', { locale: 'it', ...corpo });
+  const r = richiesta('/api/gdpr/registrations/nickname', 'POST', {
+    locale: 'it',
+    ...corpo,
+  });
   r.headers.set('x-forwarded-for', `10.11.${Math.floor(ip / 250)}.${ip % 250}`);
   return soprannome(r as never, { params: Promise.resolve({}) });
 }
@@ -552,7 +565,10 @@ describe('il nickname da «I miei dati»', () => {
     // Un nome di chi conduce non passa, e non parte nessun codice.
     const simile = await chiamaNickname({ ...corpo, nickname: 'Giulia' });
     expect(simile.status).toBe(422);
-    expect(await simile.json()).toMatchObject({ code: 'NICKNAME_INVALID', reason: 'host' });
+    expect(await simile.json()).toMatchObject({
+      code: 'NICKNAME_INVALID',
+      reason: 'host',
+    });
     expect(await prisma.emailOutbox.count()).toBe(0);
 
     const richiesto = await chiamaNickname(corpo);
@@ -561,12 +577,15 @@ describe('il nickname da «I miei dati»', () => {
     const { codice } = await codiceArrivato();
     // Il codice vale solo per quel nickname.
     expect(
-      (await chiamaNickname({ ...corpo, nickname: 'Volpe', code: codice, issuedAt })).status
+      (await chiamaNickname({ ...corpo, nickname: 'Volpe', code: codice, issuedAt }))
+        .status
     ).toBe(403);
     const fatto = await chiamaNickname({ ...corpo, code: codice, issuedAt });
     expect(fatto.status).toBe(200);
     expect(await fatto.json()).toEqual({ nickname: 'Lupo', updated: true });
-    const dopo = await prisma.registration.findUniqueOrThrow({ where: { id: iscrizione.id } });
+    const dopo = await prisma.registration.findUniqueOrThrow({
+      where: { id: iscrizione.id },
+    });
     expect(tryDecryptPII(dopo.nickname)).toBe('Lupo');
     expect(dopo.nicknameKey).toBe(improntaNickname(evento.id, 'Lupo'));
     const [riga] = await righeRegistro(evento.id, 'DATA_RECTIFIED');
@@ -582,7 +601,10 @@ describe('il nickname da «I miei dati»', () => {
     expect((await chiamaNickname(corpo)).status).toBe(200);
 
     // A opzione spenta se ne sceglie uno nuovo no, ma si toglie.
-    await prisma.event.update({ where: { id: evento.id }, data: { nicknamesEnabled: false } });
+    await prisma.event.update({
+      where: { id: evento.id },
+      data: { nicknamesEnabled: false },
+    });
     const spento = await chiamaNickname({ ...corpo, nickname: 'Volpe' });
     expect(spento.status).toBe(409);
     expect((await spento.json()).code).toBe('NICKNAMES_DISABLED');
@@ -613,7 +635,11 @@ describe('il nickname da «I miei dati»', () => {
     });
     expect(altro.iscrizione.id).toBeDefined();
     const { iscrizione, token } = await iscritto(evento.id);
-    const res = await chiamaNickname({ token, registrationId: iscrizione.id, nickname: 'lupo' });
+    const res = await chiamaNickname({
+      token,
+      registrationId: iscrizione.id,
+      nickname: 'lupo',
+    });
     expect(res.status).toBe(409);
     const corpo = (await res.json()) as { code: string; suggestion?: string };
     expect(corpo.code).toBe('NICKNAME_TAKEN');
@@ -627,7 +653,11 @@ describe('il nickname da «I miei dati»', () => {
       endsAt: new Date(Date.now() - 60_000),
     });
     const { iscrizione, token } = await iscritto(evento.id);
-    const res = await chiamaNickname({ token, registrationId: iscrizione.id, nickname: 'Lupo' });
+    const res = await chiamaNickname({
+      token,
+      registrationId: iscrizione.id,
+      nickname: 'Lupo',
+    });
     expect(res.status).toBe(409);
     expect((await res.json()).code).toBe('NICKNAMES_DISABLED');
   });

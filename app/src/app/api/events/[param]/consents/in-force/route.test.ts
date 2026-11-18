@@ -80,7 +80,12 @@ describe('POST consents/in-force', () => {
       transcription: false,
       recordingDestination: 'PUBLIC',
     });
-    expect(leggi).toHaveBeenCalledWith(EVENTO, ['guest-a', 'mod-e1-b'], 'PUBLIC', 'visibili');
+    expect(leggi).toHaveBeenCalledWith(
+      EVENTO,
+      ['guest-a', 'mod-e1-b'],
+      'PUBLIC',
+      'visibili'
+    );
     expect(res.headers.get('Cache-Control')).toBe('no-store');
   });
 

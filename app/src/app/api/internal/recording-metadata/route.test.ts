@@ -17,9 +17,12 @@ import { GET } from './route';
 
 const chiedi = async () =>
   (await (
-    await GET(new NextRequest('http://localhost/api/internal/recording-metadata?room=stanza'), {
-      params: Promise.resolve({}),
-    } as never)
+    await GET(
+      new NextRequest('http://localhost/api/internal/recording-metadata?room=stanza'),
+      {
+        params: Promise.resolve({}),
+      } as never
+    )
   ).json()) as Record<string, unknown>;
 
 /** I metadati che finiscono nel file del video: solo chi conduce, come nel video. */
@@ -53,7 +56,10 @@ describe('GET /api/internal/recording-metadata', () => {
     const corpo = await chiedi();
     expect(corpo).not.toHaveProperty('participants');
     expect(corpo).not.toHaveProperty('participantNames');
-    const select = db.event.findUnique.mock.calls[0]![0].select as Record<string, unknown>;
+    const select = db.event.findUnique.mock.calls[0]![0].select as Record<
+      string,
+      unknown
+    >;
     expect(select).not.toHaveProperty('registrations');
     expect(db.event.findUnique.mock.calls[0]![0].select.additionalMods.where).toEqual({
       revokedAt: null,

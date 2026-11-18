@@ -47,7 +47,6 @@ const TESTO_NEL_VIDEO = {
   visibili: 'recording.hostsAlwaysVisible',
 } as const;
 
-
 const TESTO_TRACCE = {
   cancellate: 'transcript.tracks',
   conservate: 'transcript.tracksRetained',
@@ -102,7 +101,8 @@ export function schedaInSala(
     sottotitoli: { ...scheda.sottotitoli, attivi: adesso.sottotitoli },
     trascrizione: {
       ...scheda.trascrizione,
-      chiesta: scheda.trascrizione.chiesta || testoSottotitoli || !!adesso.trascrizioneData,
+      chiesta:
+        scheda.trascrizione.chiesta || testoSottotitoli || !!adesso.trascrizioneData,
       sottotitoli: testoSottotitoli,
     },
     chat: { ...scheda.chat, attiva: adesso.chat, domandeAttive: adesso.domande },
@@ -156,7 +156,8 @@ export function PrivacySheet({
     frasiRegistrazione.push(t(TESTO_DESTINAZIONE[registrazione.destinazione]));
   }
   const testoChiNonAcconsente =
-    registrazione.chiNonAcconsente && TESTO_CHI_NON_ACCONSENTE[registrazione.chiNonAcconsente];
+    registrazione.chiNonAcconsente &&
+    TESTO_CHI_NON_ACCONSENTE[registrazione.chiNonAcconsente];
   if (testoChiNonAcconsente) frasiRegistrazione.push(t(testoChiNonAcconsente));
   if (registrazione.conduceSempre) {
     frasiRegistrazione.push(t(TESTO_NEL_VIDEO[registrazione.partecipanti ?? 'visibili']));
@@ -196,7 +197,8 @@ export function PrivacySheet({
 
   const frasiChat: string[] = [];
   if (scheda.chat.attiva) frasiChat.push(t('chat.messages'));
-  if (scheda.chat.domandeAttive) frasiChat.push(t(TESTO_DOMANDE[scheda.chat.esitoDomande]));
+  if (scheda.chat.domandeAttive)
+    frasiChat.push(t(TESTO_DOMANDE[scheda.chat.esitoDomande]));
 
   // La registrazione non segue i dati delle persone: resta finche' chi organizza
   // non la cancella, o per i giorni scelti.
@@ -207,7 +209,9 @@ export function PrivacySheet({
     frasiConservazione.push(
       giorni === null
         ? t(video ? 'retention.recordingKept' : 'retention.transcriptKept')
-        : t(video ? 'retention.recordingDays' : 'retention.transcriptDays', { days: giorni })
+        : t(video ? 'retention.recordingDays' : 'retention.transcriptDays', {
+            days: giorni,
+          })
     );
   }
 
@@ -255,11 +259,7 @@ export function PrivacySheet({
           etichetta={t('list.label')}
           frasi={[t(scheda.elencoVisibile ? 'list.visible' : 'list.hidden')]}
         />
-        <Fatto
-          icona="it-user"
-          etichetta={t('name.label')}
-          frasi={frasiNome}
-        />
+        <Fatto icona="it-user" etichetta={t('name.label')} frasi={frasiNome} />
         <Fatto icona="it-comment" etichetta={t('chat.label')} frasi={frasiChat} />
         <Fatto
           icona="it-clock"

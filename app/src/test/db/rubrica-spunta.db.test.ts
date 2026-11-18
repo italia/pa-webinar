@@ -711,7 +711,11 @@ describe('la conferma vale per l’indirizzo', () => {
     ]);
     expect(
       await prisma.gdprAuditLog.count({
-        where: { eventId: secondo.id, action: 'CONSENT_RECORDED', details: { contains: 'self-service' } },
+        where: {
+          eventId: secondo.id,
+          action: 'CONSENT_RECORDED',
+          details: { contains: 'self-service' },
+        },
       })
     ).toBe(0);
   });

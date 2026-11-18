@@ -143,12 +143,18 @@ describe('indirizzoFermato', () => {
   });
 
   it('una voce con un ritiro lo ferma', async () => {
-    db.person.findUnique.mockResolvedValue({ optedInToAddressBook: false, optedOutAt: new Date() });
+    db.person.findUnique.mockResolvedValue({
+      optedInToAddressBook: false,
+      optedOutAt: new Date(),
+    });
     expect(await fermato()).toBe(true);
   });
 
   it('un invito fermato lo ferma anche con una voce attiva', async () => {
-    db.person.findUnique.mockResolvedValue({ optedInToAddressBook: true, optedOutAt: null });
+    db.person.findUnique.mockResolvedValue({
+      optedInToAddressBook: true,
+      optedOutAt: null,
+    });
     db.eventInvitation.findFirst.mockResolvedValue({ id: 'altro' });
     expect(await fermato()).toBe(true);
   });
@@ -159,13 +165,19 @@ describe('indirizzoFermato', () => {
   });
 
   it('una voce attiva ha superato un ritiro vecchio rimasto sulle iscrizioni', async () => {
-    db.person.findUnique.mockResolvedValue({ optedInToAddressBook: true, optedOutAt: null });
+    db.person.findUnique.mockResolvedValue({
+      optedInToAddressBook: true,
+      optedOutAt: null,
+    });
     db.registration.findFirst.mockResolvedValue({ id: 'iscrizione' });
     expect(await fermato()).toBe(false);
   });
 
   it('una voce mai entrata in rubrica non supera il ritiro di un’iscrizione', async () => {
-    db.person.findUnique.mockResolvedValue({ optedInToAddressBook: false, optedOutAt: null });
+    db.person.findUnique.mockResolvedValue({
+      optedInToAddressBook: false,
+      optedOutAt: null,
+    });
     db.registration.findFirst.mockResolvedValue({ id: 'iscrizione' });
     expect(await fermato()).toBe(true);
   });

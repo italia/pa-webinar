@@ -98,7 +98,9 @@ function clicca(testo: string) {
 
 function scrivi(el: HTMLInputElement | HTMLTextAreaElement, valore: string) {
   const proto =
-    el instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
+    el instanceof HTMLTextAreaElement
+      ? HTMLTextAreaElement.prototype
+      : HTMLInputElement.prototype;
   act(() => {
     Object.getOwnPropertyDescriptor(proto, 'value')?.set?.call(el, valore);
     el.dispatchEvent(new Event('input', { bubbles: true }));
@@ -106,7 +108,9 @@ function scrivi(el: HTMLInputElement | HTMLTextAreaElement, valore: string) {
 }
 
 const passo = (etichetta: string) => {
-  const nav = container.querySelector<HTMLElement>(`nav[aria-label="${w.stepsAriaLabel}"]`)!;
+  const nav = container.querySelector<HTMLElement>(
+    `nav[aria-label="${w.stepsAriaLabel}"]`
+  )!;
   const b = Array.from(nav.querySelectorAll('button')).find((el) =>
     el.textContent?.includes(etichetta)
   );
@@ -118,10 +122,13 @@ const passo = (etichetta: string) => {
 async function corpoPubblicato(): Promise<Record<string, unknown>> {
   const fetchFinto = vi.fn(async (input: RequestInfo | URL, init: RequestInit = {}) =>
     String(input) === '/api/events' && init.method === 'POST'
-      ? new Response(JSON.stringify({ id: 'evt', slug: 'evt', moderatorToken: 'token' }), {
-          status: 201,
-          headers: { 'Content-Type': 'application/json' },
-        })
+      ? new Response(
+          JSON.stringify({ id: 'evt', slug: 'evt', moderatorToken: 'token' }),
+          {
+            status: 201,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        )
       : new Response(JSON.stringify({ items: [] }))
   );
   vi.stubGlobal('fetch', fetchFinto);
@@ -132,7 +139,10 @@ async function corpoPubblicato(): Promise<Record<string, unknown>> {
   );
   passo(w.flow.steps.invites);
   scrivi(container.querySelector<HTMLInputElement>('#wiz-primary-name')!, 'Moderatore 1');
-  scrivi(container.querySelector<HTMLInputElement>('#wiz-primary-email')!, 'moderatore@example.org');
+  scrivi(
+    container.querySelector<HTMLInputElement>('#wiz-primary-email')!,
+    'moderatore@example.org'
+  );
   passo(w.flow.steps.review);
   await act(async () => clicca(w.publish));
   for (let i = 0; i < 20; i++) {
@@ -215,7 +225,11 @@ describe('CreateEventWithTemplate', () => {
       postEventPublic: true,
     };
     // Dove l'elenco e' nascosto chi partecipa puo' usare un nickname.
-    const PUBBLICO = { ...PARTECIPATIVO, audienceAnonymous: true, nicknamesEnabled: true };
+    const PUBBLICO = {
+      ...PARTECIPATIVO,
+      audienceAnonymous: true,
+      nicknamesEnabled: true,
+    };
     const INVITO = {
       ...PARTECIPATIVO,
       recordingDestination: 'REGISTRANTS',
@@ -237,7 +251,10 @@ describe('CreateEventWithTemplate', () => {
     });
 
     it('dove il video non c e una risposta pubblica nell indirizzo diventa riservata', async () => {
-      mostra({ formatoParam: 'medio.tutti.pubblica.tutti', partecipantiNelVideo: 'assente' });
+      mostra({
+        formatoParam: 'medio.tutti.pubblica.tutti',
+        partecipantiNelVideo: 'assente',
+      });
       expect(container.textContent).toContain(g.summary.riservata);
       expect(container.textContent).not.toContain(g.summary.pubblica);
       const corpo = await corpoPubblicato();
@@ -249,7 +266,7 @@ describe('CreateEventWithTemplate', () => {
       mostra({ formatoParam: 'medio.tutti.pubblica.invitati' });
       passo(w.flow.steps.invites);
       expect(container.querySelector('.wizard-iscrizione')?.textContent).toContain(
-        w.step2.recordingDestinationPublicOnInvitation,
+        w.step2.recordingDestinationPublicOnInvitation
       );
       passo(w.flow.steps.base);
       expect(await corpoPubblicato()).toMatchObject({
@@ -280,7 +297,10 @@ describe('CreateEventWithTemplate', () => {
       passo(w.flow.steps.invites);
       const invito = Array.from(
         container.querySelectorAll<HTMLElement>('.wizard-iscrizione label')
-      ).find((l) => l.querySelector('.formato-scelta__titolo')?.textContent === g.access.invitation);
+      ).find(
+        (l) =>
+          l.querySelector('.formato-scelta__titolo')?.textContent === g.access.invitation
+      );
       act(() => invito?.click());
       clicca(w.flow.changeFormat);
       expect(push).toHaveBeenCalledWith(
@@ -304,7 +324,10 @@ describe('CreateEventWithTemplate', () => {
   });
 
   it('dove il video non c e le domande non propongono un video pubblico', () => {
-    mostra({ scegliParam: 'medio.tutti.pubblica.tutti', partecipantiNelVideo: 'assente' });
+    mostra({
+      scegliParam: 'medio.tutti.pubblica.tutti',
+      partecipantiNelVideo: 'assente',
+    });
     expect(container.textContent).not.toContain(g.rec.public);
     expect(container.textContent).toContain(w.flow.recordingDestinationReserved);
     expect(container.textContent).toContain(w.flow.postEventQaHidden);
@@ -332,7 +355,11 @@ describe('CreateEventWithTemplate', () => {
       participantsCanShareScreen: false,
       maxParticipants: 100,
     };
-    mostra({ templates: [scheda], partecipantiNelVideo: 'assente', aiPipelineEnabled: false });
+    mostra({
+      templates: [scheda],
+      partecipantiNelVideo: 'assente',
+      aiPipelineEnabled: false,
+    });
     const modelli = container.querySelector('#formato-modelli')!;
     expect(modelli.textContent).toContain(messages.admin.templates.noRecording);
     expect(modelli.textContent).not.toContain(messages.admin.templates.recordingLabel);
@@ -350,16 +377,25 @@ describe('CreateEventWithTemplate', () => {
   });
 
   describe('senza video e senza AI, la trascrizione dai sottotitoli', () => {
-    const senzaVideo = { partecipantiNelVideo: 'assente', aiPipelineEnabled: false } as const;
+    const senzaVideo = {
+      partecipantiNelVideo: 'assente',
+      aiPipelineEnabled: false,
+    } as const;
 
     it('resta dove i sottotitoli ci sono, e il riepilogo la dice', async () => {
-      mostra({ ...senzaVideo, formatoParam: 'medio.tutti.no.tutti', liveCaptionsAvailable: true });
+      mostra({
+        ...senzaVideo,
+        formatoParam: 'medio.tutti.no.tutti',
+        liveCaptionsAvailable: true,
+      });
       expect(await corpoPubblicato()).toMatchObject({
         recordingEnabled: false,
         liveCaptionsEnabled: true,
         captionsTranscriptEnabled: true,
       });
-      expect(container.textContent).toContain(messages.admin.form.captionsTranscriptEnabled);
+      expect(container.textContent).toContain(
+        messages.admin.form.captionsTranscriptEnabled
+      );
       expect(container.textContent).toContain(w.step5.summary.recordingOff);
     });
 

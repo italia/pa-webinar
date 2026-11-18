@@ -247,7 +247,8 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllEnvs());
 
 describe('sala — la scheda privacy', () => {
-  const scheda = (props: PropsClient) => props.event.schedaPrivacy as SchedaPrivacy | null;
+  const scheda = (props: PropsClient) =>
+    props.event.schedaPrivacy as SchedaPrivacy | null;
 
   it('arriva a chi entra senza token e a chi ha il token, uguale', async () => {
     conEvento();
@@ -258,14 +259,14 @@ describe('sala — la scheda privacy', () => {
     expect(conToken).toEqual(ospite);
   });
 
-  it('sulle chiamate rapide non c\'e\', in nessuno dei due rami', async () => {
+  it("sulle chiamate rapide non c'e', in nessuno dei due rami", async () => {
     conEvento({ eventType: 'INSTANT' });
     expect(scheda(await clientProps())).toBeNull();
     iscritto();
     expect(scheda(await clientProps(TOKEN))).toBeNull();
   });
 
-  it('si calcola sull\'evento com\'e\', non sui valori mascherati per chi guarda', async () => {
+  it("si calcola sull'evento com'e', non sui valori mascherati per chi guarda", async () => {
     conEvento({ recordingEnabled: true, autoStartRecording: true });
     expect(scheda(await clientProps())?.registrazione.modo).toBe('automatica');
   });
@@ -274,7 +275,9 @@ describe('sala — la scheda privacy', () => {
     conEvento({ recordingDestination: 'REGISTRANTS' });
     const { event } = await clientProps();
     expect(event.recordingDestination).toBe('REGISTRANTS');
-    expect(scheda({ event } as PropsClient)?.registrazione.destinazione).toBe('REGISTRANTS');
+    expect(scheda({ event } as PropsClient)?.registrazione.destinazione).toBe(
+      'REGISTRANTS'
+    );
     expect(scheda({ event } as PropsClient)?.chat.esitoDomande).toBe('nonPubblicate');
   });
 
@@ -310,7 +313,7 @@ describe('sala — la scheda privacy', () => {
     });
   });
 
-  it('la disclosure dell\'amministrazione resta nella lingua della pagina', async () => {
+  it("la disclosure dell'amministrazione resta nella lingua della pagina", async () => {
     stato.impostazioni.aiConsentDisclosure = { it: 'Testo scritto.', fr: 'Texte écrit.' };
     conEvento();
     expect((await clientProps()).event.aiConsentDisclosure).toBe('Testo scritto.');
@@ -329,10 +332,14 @@ describe('chiamata rapida conclusa: il link mostra la registrazione a chi c’er
     postEventPublic: false,
   };
   const pagina = () =>
-    LivePage({ params: Promise.resolve({ slug: SLUG }), searchParams: Promise.resolve({}) });
+    LivePage({
+      params: Promise.resolve({ slug: SLUG }),
+      searchParams: Promise.resolve({}),
+    });
   async function conPass() {
     vi.stubEnv('APP_SECRET', 'segreto-di-prova-della-sala-abbastanza-lungo');
-    const { issuePresencePass, presencePassCookieName } = await import('@/lib/recording/presence-pass');
+    const { issuePresencePass, presencePassCookieName } =
+      await import('@/lib/recording/presence-pass');
     stato.biscotti.set(
       presencePassCookieName(EVENT_ID),
       issuePresencePass(EVENT_ID, new Date(Date.now() + 86_400_000))!
@@ -366,10 +373,14 @@ describe('chiamata rapida conclusa: il link mostra la registrazione a chi c’er
     stato.biscotti.clear();
     conEvento(chiusa);
     vi.stubEnv('APP_SECRET', 'segreto-di-prova-della-sala-abbastanza-lungo');
-    const { issuePresencePass, presencePassCookieName } = await import('@/lib/recording/presence-pass');
+    const { issuePresencePass, presencePassCookieName } =
+      await import('@/lib/recording/presence-pass');
     stato.biscotti.set(
       presencePassCookieName(EVENT_ID),
-      issuePresencePass('99999999-9999-4999-8999-999999999999', new Date(Date.now() + 86_400_000))!
+      issuePresencePass(
+        '99999999-9999-4999-8999-999999999999',
+        new Date(Date.now() + 86_400_000)
+      )!
     );
     await expect(pagina()).rejects.toThrow('NOT_FOUND');
   });
@@ -821,7 +832,7 @@ describe('sala — il consenso alla registrazione gia dato', () => {
   describe('chi conduce', () => {
     const staff = { accountId: 'acc-1', nome: 'Persona dello staff' };
 
-    it('dal link primario con l account: alla registrazione non acconsente, e\' nel video', async () => {
+    it("dal link primario con l account: alla registrazione non acconsente, e' nel video", async () => {
       conEvento({ recordingDestination: 'REGISTRANTS' });
       conduce(true);
       vi.mocked(staffDietroIlPrimario).mockResolvedValue(staff as never);

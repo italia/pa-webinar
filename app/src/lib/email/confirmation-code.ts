@@ -46,10 +46,12 @@ export async function inviaCodiceDiConferma(input: CodiceDaInviare): Promise<voi
     input.azione === 'cancel'
       ? t('introCancel', { event: input.eventTitle })
       : input.azione === 'nickname'
-        ? t(input.togli ? 'introNicknameRemove' : 'introNickname', { event: input.eventTitle })
+        ? t(input.togli ? 'introNicknameRemove' : 'introNickname', {
+            event: input.eventTitle,
+          })
         : input.tutte
-        ? t('introEditAll')
-        : t('introEdit', { event: input.eventTitle });
+          ? t('introEditAll')
+          : t('introEdit', { event: input.eventTitle });
   const istruzioni = t('instructions', { minutes: input.minuti });
   const body = `
 <p style="margin:0 0 16px;">${escapeHtml(intro)}</p>
