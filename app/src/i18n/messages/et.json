@@ -4824,7 +4824,14 @@
       "codeSent": "Saatsime teile e-postiga 6-kohalise koodi. Sisestage see siia: see kehtib {minutes, plural, one {# minut} other {# minutit}}.",
       "codeLabel": "Kinnituskood",
       "codeConfirmEdit": "Kinnita parandus",
-      "codeInvalid": "Kood on vale või aegunud. Kontrollige viimast saadud e-kirja või tühistage ja küsige uus."
+      "codeInvalid": "Kood on vale või aegunud. Kontrollige viimast saadud e-kirja või tühistage ja küsige uus.",
+      "cancelTitle": "Selle registreerumise kustutamine",
+      "cancelIntro": "Saate kustutada ainult selle registreerumise, puudutamata teisi ja ülejäänud andmeid.",
+      "cancelButton": "Kustuta see registreerumine",
+      "cancelDeletes": "Kustutatakse registreerumine sellele üritusele ja see, mida selle kaudu tegite: küsimused, hääled, vestlussõnumid, tagasiside, küsimustike vastused, teie laused subtiitrite transkriptsioonis ja ootel e-kirjad. Teie isiklik link lakkab töötamast ja koht vabaneb.",
+      "cancelKeeps": "Alles jäävad teie teised registreerumised, ürituste aadressraamat, profiilifoto ja veel menetletav taotlus salvestisest eemaldamiseks. Kui sellest üritusest on video või transkriptsioon, jääb teie nõusoleku tõend ilma teie nimeta alles seni, kuni need on olemas. Kustutamist ei saa tagasi võtta; kuni üritus võtab registreerumisi vastu, võite uuesti registreeruda.",
+      "codeConfirmCancel": "Kustuta registreerumine",
+      "cancelDone": "Registreerumine on kustutatud."
     },
     "erasure": {
       "title": "Teie andmete kustutamine",

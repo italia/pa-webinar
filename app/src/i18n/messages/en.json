@@ -4824,7 +4824,14 @@
       "codeSent": "We have emailed you a 6-digit code. Enter it here: it is valid for {minutes, plural, one {# minute} other {# minutes}}.",
       "codeLabel": "Confirmation code",
       "codeConfirmEdit": "Confirm the correction",
-      "codeInvalid": "The code is wrong or has expired. Check the latest email you received, or cancel and ask for a new one."
+      "codeInvalid": "The code is wrong or has expired. Check the latest email you received, or cancel and ask for a new one.",
+      "cancelTitle": "Delete this registration",
+      "cancelIntro": "You can delete only this registration, without touching the others or the rest of your data.",
+      "cancelButton": "Delete this registration",
+      "cancelDeletes": "The registration for this event is deleted with what you did through it: questions, votes, chat messages, feedback, questionnaire answers, your sentences in the transcript from captions and queued emails. Your personal link stops working and the seat is freed.",
+      "cancelKeeps": "Your other registrations, the events address book, your profile photo and a request of removal from a recording still being handled stay. If this event has a video or a transcript, the proof of your consent stays without your name for as long as they exist. The deletion cannot be undone; while the event takes registrations you can register again.",
+      "codeConfirmCancel": "Delete the registration",
+      "cancelDone": "Registration deleted."
     },
     "erasure": {
       "title": "Erase your data",

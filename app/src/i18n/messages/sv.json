@@ -4824,7 +4824,14 @@
       "codeSent": "Vi har mejlat dig en sexsiffrig kod. Skriv den här: den gäller i {minutes, plural, one {# minut} other {# minuter}}.",
       "codeLabel": "Bekräftelsekod",
       "codeConfirmEdit": "Bekräfta rättelsen",
-      "codeInvalid": "Koden är fel eller har gått ut. Kontrollera det senaste e-postmeddelandet du fått, eller avbryt och be om en ny."
+      "codeInvalid": "Koden är fel eller har gått ut. Kontrollera det senaste e-postmeddelandet du fått, eller avbryt och be om en ny.",
+      "cancelTitle": "Radera den här anmälan",
+      "cancelIntro": "Du kan radera bara den här anmälan utan att röra de andra eller resten av dina uppgifter.",
+      "cancelButton": "Radera den här anmälan",
+      "cancelDeletes": "Anmälan till det här evenemanget raderas tillsammans med det du har gjort med den: frågor, röster, chattmeddelanden, feedback, enkätsvar, dina meningar i transkriptionen från undertexterna och e-postmeddelanden i kö. Din personliga länk slutar fungera och platsen blir ledig.",
+      "cancelKeeps": "Kvar finns dina andra anmälningar, evenemangsadressboken, din profilbild och en begäran om borttagning ur en inspelning som fortfarande handläggs. Om det finns en video eller en transkription av evenemanget finns beviset på ditt samtycke kvar utan ditt namn så länge de finns. Raderingen kan inte ångras; så länge evenemanget tar emot anmälningar kan du anmäla dig igen.",
+      "codeConfirmCancel": "Radera anmälan",
+      "cancelDone": "Anmälan har raderats."
     },
     "erasure": {
       "title": "Radering av dina uppgifter",

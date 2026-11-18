@@ -4824,7 +4824,14 @@
       "codeSent": "E-mailben elküldtünk Önnek egy 6 jegyű kódot. Írja be ide: {minutes, plural, one {# percig} other {# percig}} érvényes.",
       "codeLabel": "Megerősítő kód",
       "codeConfirmEdit": "Javítás megerősítése",
-      "codeInvalid": "A kód hibás vagy lejárt. Nézze meg a legutóbb kapott e-mailt, vagy szakítsa meg, és kérjen újat."
+      "codeInvalid": "A kód hibás vagy lejárt. Nézze meg a legutóbb kapott e-mailt, vagy szakítsa meg, és kérjen újat.",
+      "cancelTitle": "A regisztráció törlése",
+      "cancelIntro": "Csak ezt a regisztrációt törölheti, a többi regisztráció és a többi adata érintetlen marad.",
+      "cancelButton": "Regisztráció törlése",
+      "cancelDeletes": "Törlődik az erre az eseményre szóló regisztráció és mindaz, amit vele tett: kérdések, szavazatok, csevegőüzenetek, visszajelzések, kérdőívekre adott válaszok, az Ön mondatai a feliratokból készült átiratban és a sorban álló e-mailek. A személyes linkje nem működik tovább, a hely felszabadul.",
+      "cancelKeeps": "Megmaradnak a többi regisztrációja, az események címjegyzéke, a profilképe és egy még folyamatban lévő kérelem a felvételből való eltávolításra. Ha erről az eseményről van videó vagy átirat, a hozzájárulásának igazolása az Ön neve nélkül megmarad, amíg ezek léteznek. A törlés nem vonható vissza; amíg az esemény fogad regisztrációkat, újra regisztrálhat.",
+      "codeConfirmCancel": "Regisztráció törlése",
+      "cancelDone": "A regisztráció törölve."
     },
     "erasure": {
       "title": "Az Ön adatainak törlése",

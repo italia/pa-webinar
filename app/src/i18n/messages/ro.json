@@ -4824,7 +4824,14 @@
       "codeSent": "Ți-am trimis pe e-mail un cod de 6 cifre. Scrie-l aici: este valabil {minutes, plural, one {# minut} few {# minute} other {# de minute}}.",
       "codeLabel": "Cod de confirmare",
       "codeConfirmEdit": "Confirmă corectura",
-      "codeInvalid": "Codul nu este corect sau a expirat. Verifică ultimul e-mail primit sau anulează și cere unul nou."
+      "codeInvalid": "Codul nu este corect sau a expirat. Verifică ultimul e-mail primit sau anulează și cere unul nou.",
+      "cancelTitle": "Ștergerea acestei înscrieri",
+      "cancelIntro": "Poți șterge doar această înscriere, fără să atingi celelalte înscrieri și restul datelor tale.",
+      "cancelButton": "Șterge această înscriere",
+      "cancelDeletes": "Se șterg înscrierea la acest eveniment și ce ai făcut cu ea: întrebări, voturi, mesaje în chat, feedback, răspunsuri la chestionare, frazele tale din transcrierea subtitrărilor și e-mailurile în așteptare. Linkul tău personal nu mai funcționează, iar locul se eliberează.",
+      "cancelKeeps": "Rămân celelalte înscrieri, agenda de evenimente, fotografia de profil și o cerere de eliminare dintr-o înregistrare care este încă în lucru. Dacă pentru acest eveniment există un videoclip sau o transcriere, dovada consimțământului tău rămâne fără numele tău cât timp acestea există. Ștergerea nu se poate anula; cât timp evenimentul acceptă înscrieri, te poți înscrie din nou.",
+      "codeConfirmCancel": "Șterge înscrierea",
+      "cancelDone": "Înscrierea a fost ștearsă."
     },
     "erasure": {
       "title": "Ștergerea datelor dumneavoastră",

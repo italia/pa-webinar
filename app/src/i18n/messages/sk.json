@@ -4824,7 +4824,14 @@
       "codeSent": "Poslali sme vám e-mailom šesťmiestny kód. Zadajte ho sem: platí {minutes, plural, one {# minúta} few {# minúty} other {# minút}}.",
       "codeLabel": "Potvrdzovací kód",
       "codeConfirmEdit": "Potvrdiť opravu",
-      "codeInvalid": "Kód nie je správny alebo jeho platnosť vypršala. Skontrolujte posledný prijatý e-mail, alebo akciu zrušte a požiadajte o nový."
+      "codeInvalid": "Kód nie je správny alebo jeho platnosť vypršala. Skontrolujte posledný prijatý e-mail, alebo akciu zrušte a požiadajte o nový.",
+      "cancelTitle": "Vymazanie tejto registrácie",
+      "cancelIntro": "Môžete vymazať iba túto registráciu bez toho, aby ste sa dotkli ostatných a zvyšku svojich údajov.",
+      "cancelButton": "Vymazať túto registráciu",
+      "cancelDeletes": "Vymaže sa registrácia na toto podujatie a to, čo ste s ňou urobili: otázky, hlasy, správy v chate, spätná väzba, odpovede na dotazníky, vaše vety v prepise z titulkov a e-maily v poradí. Váš osobný odkaz prestane fungovať a miesto sa uvoľní.",
+      "cancelKeeps": "Zostávajú vaše ostatné registrácie, adresár podujatí, profilová fotografia a žiadosť o odstránenie zo záznamu, ktorá sa ešte vybavuje. Ak k tomuto podujatiu existuje video alebo prepis, doklad o vašom súhlase zostane bez vášho mena, kým existujú. Vymazanie nemožno vrátiť; kým podujatie prijíma registrácie, môžete sa znova zaregistrovať.",
+      "codeConfirmCancel": "Vymazať registráciu",
+      "cancelDone": "Registrácia bola vymazaná."
     },
     "erasure": {
       "title": "Vymazanie vašich údajov",

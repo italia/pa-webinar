@@ -4824,7 +4824,14 @@
       "codeSent": "Enviámos-lhe por e-mail um código de 6 dígitos. Escreva-o aqui: é válido durante {minutes, plural, one {# minuto} other {# minutos}}.",
       "codeLabel": "Código de confirmação",
       "codeConfirmEdit": "Confirmar a correção",
-      "codeInvalid": "O código não está correto ou expirou. Verifique o último e-mail recebido, ou cancele e peça um novo."
+      "codeInvalid": "O código não está correto ou expirou. Verifique o último e-mail recebido, ou cancele e peça um novo.",
+      "cancelTitle": "Eliminar esta inscrição",
+      "cancelIntro": "Pode eliminar apenas esta inscrição, sem mexer nas outras nem no resto dos seus dados.",
+      "cancelButton": "Eliminar esta inscrição",
+      "cancelDeletes": "São eliminados a inscrição neste evento e o que fez com ela: perguntas, votos, mensagens no chat, comentários, respostas a questionários, as suas frases na transcrição das legendas e e-mails em fila. A sua ligação pessoal deixa de funcionar e o lugar fica livre.",
+      "cancelKeeps": "Mantêm-se as suas outras inscrições, a agenda de eventos, a fotografia de perfil e um pedido de remoção de uma gravação ainda em tratamento. Se deste evento existir um vídeo ou uma transcrição, a prova do seu consentimento fica sem o seu nome enquanto existirem. A eliminação não pode ser anulada; enquanto o evento aceitar inscrições, pode inscrever-se de novo.",
+      "codeConfirmCancel": "Eliminar a inscrição",
+      "cancelDone": "Inscrição eliminada."
     },
     "erasure": {
       "title": "Eliminação dos seus dados",

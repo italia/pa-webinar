@@ -4824,7 +4824,14 @@
       "codeSent": "Vi har sendt dig en 6-cifret kode pr. e-mail. Indtast den her: den gælder i {minutes, plural, one {# minut} other {# minutter}}.",
       "codeLabel": "Bekræftelseskode",
       "codeConfirmEdit": "Bekræft rettelsen",
-      "codeInvalid": "Koden er forkert eller udløbet. Tjek den seneste e-mail, du har modtaget, eller annuller og bed om en ny."
+      "codeInvalid": "Koden er forkert eller udløbet. Tjek den seneste e-mail, du har modtaget, eller annuller og bed om en ny.",
+      "cancelTitle": "Slet denne tilmelding",
+      "cancelIntro": "Du kan slette kun denne tilmelding uden at røre de andre eller resten af dine data.",
+      "cancelButton": "Slet denne tilmelding",
+      "cancelDeletes": "Tilmeldingen til dette arrangement slettes sammen med det, du har gjort med den: spørgsmål, stemmer, chatbeskeder, feedback, svar på spørgeskemaer, dine sætninger i transskriptionen fra undertekster og e-mails i kø. Dit personlige link holder op med at virke, og pladsen bliver ledig.",
+      "cancelKeeps": "Dine andre tilmeldinger, arrangementsadressebogen, dit profilbillede og en anmodning om fjernelse fra en optagelse, der stadig behandles, forbliver. Hvis der findes en video eller en transskription af dette arrangement, forbliver dokumentationen for dit samtykke uden dit navn, så længe de findes. Sletningen kan ikke fortrydes; så længe arrangementet tager imod tilmeldinger, kan du tilmelde dig igen.",
+      "codeConfirmCancel": "Slet tilmeldingen",
+      "cancelDone": "Tilmeldingen er slettet."
     },
     "erasure": {
       "title": "Sletning af dine data",

@@ -4824,7 +4824,14 @@
       "codeSent": "El. paštu atsiuntėme jums 6 skaitmenų kodą. Įveskite jį čia: jis galioja {minutes, plural, one {# minutė} few {# minutės} other {# minučių}}.",
       "codeLabel": "Patvirtinimo kodas",
       "codeConfirmEdit": "Patvirtinti pataisymą",
-      "codeInvalid": "Kodas neteisingas arba nebegalioja. Patikrinkite paskutinį gautą el. laišką arba atšaukite ir paprašykite naujo."
+      "codeInvalid": "Kodas neteisingas arba nebegalioja. Patikrinkite paskutinį gautą el. laišką arba atšaukite ir paprašykite naujo.",
+      "cancelTitle": "Šios registracijos ištrynimas",
+      "cancelIntro": "Galite ištrinti tik šią registraciją, neliesdami kitų ir likusių savo duomenų.",
+      "cancelButton": "Ištrinti šią registraciją",
+      "cancelDeletes": "Ištrinama registracija į šį renginį ir tai, ką su ja darėte: klausimai, balsai, pokalbio žinutės, atsiliepimai, klausimynų atsakymai, jūsų sakiniai transkripcijoje iš subtitrų ir eilėje laukiantys el. laiškai. Jūsų asmeninė nuoroda nebeveiks, o vieta atsilaisvins.",
+      "cancelKeeps": "Lieka kitos jūsų registracijos, renginių adresų knyga, profilio nuotrauka ir dar nagrinėjamas prašymas pašalinti iš įrašo. Jei iš šio renginio yra vaizdo įrašas ar transkripcija, jūsų sutikimo įrodymas lieka be jūsų vardo, kol jie egzistuoja. Ištrynimo atšaukti negalima; kol renginys priima registracijas, galite užsiregistruoti iš naujo.",
+      "codeConfirmCancel": "Ištrinti registraciją",
+      "cancelDone": "Registracija ištrinta."
     },
     "erasure": {
       "title": "Jūsų duomenų ištrynimas",

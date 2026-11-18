@@ -4824,7 +4824,14 @@
       "codeSent": "Wysłaliśmy Ci e-mailem 6-cyfrowy kod. Wpisz go tutaj: jest ważny przez {minutes, plural, one {# minuta} few {# minuty} many {# minut} other {# minuty}}.",
       "codeLabel": "Kod potwierdzający",
       "codeConfirmEdit": "Potwierdź poprawkę",
-      "codeInvalid": "Kod jest nieprawidłowy lub wygasł. Sprawdź ostatni otrzymany e-mail albo anuluj i poproś o nowy."
+      "codeInvalid": "Kod jest nieprawidłowy lub wygasł. Sprawdź ostatni otrzymany e-mail albo anuluj i poproś o nowy.",
+      "cancelTitle": "Usunięcie tej rejestracji",
+      "cancelIntro": "Możesz usunąć tylko tę rejestrację, bez naruszania pozostałych i reszty swoich danych.",
+      "cancelButton": "Usuń tę rejestrację",
+      "cancelDeletes": "Usuwana jest rejestracja na to wydarzenie i to, co z nią zrobiłeś: pytania, głosy, wiadomości na czacie, opinie, odpowiedzi na ankiety, Twoje zdania w transkrypcji z napisów i e-maile w kolejce. Twój osobisty link przestaje działać, a miejsce się zwalnia.",
+      "cancelKeeps": "Pozostają Twoje inne rejestracje, książka adresowa wydarzeń, zdjęcie profilowe i wciąż rozpatrywana prośba o usunięcie z nagrania. Jeśli z tego wydarzenia istnieje nagranie wideo lub transkrypcja, dowód Twojej zgody pozostaje bez Twojego imienia i nazwiska, dopóki istnieją. Usunięcia nie można cofnąć; dopóki wydarzenie przyjmuje rejestracje, możesz zarejestrować się ponownie.",
+      "codeConfirmCancel": "Usuń rejestrację",
+      "cancelDone": "Rejestracja została usunięta."
     },
     "erasure": {
       "title": "Usunięcie Twoich danych",

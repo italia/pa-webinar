@@ -218,4 +218,84 @@ describe('I miei dati', () => {
     expect(container.textContent).toContain(m.addressBookTitle);
     expect(container.textContent).toContain('—');
   });
+
+  describe('correggere e cancellare un’iscrizione', () => {
+    const iscrizione = (id: string, titolo: string) => ({
+      event: { title: { it: titolo }, startsAt: '2026-12-01T08:00:00.000Z' },
+      registration: {
+        id,
+        displayName: 'Ana Bianchi',
+        email: 'anna@example.com',
+        organization: 'Comune',
+        registeredAt: '2026-11-01T08:00:00.000Z',
+        consentGiven: true,
+        consentTimestamp: '2026-11-01T08:00:00.000Z',
+        consents: { recording: null, transcription: null, futureCommunications: null },
+      },
+      questions: [],
+      pollVotes: [],
+    });
+    const DUE = {
+      ...VUOTO,
+      consentsToken: 'consensi',
+      data: [iscrizione('r1', 'Primo'), iscrizione('r2', 'Secondo')],
+    };
+    const pulsanti = (nome: string) =>
+      [...container.querySelectorAll('button')].filter((b) => b.textContent?.trim() === nome);
+    const scriviCodice = (valore: string) =>
+      act(() => {
+        const el = container.querySelector<HTMLInputElement>('input[autocomplete="one-time-code"]')!;
+        Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!.call(el, valore);
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+    const clic = async (el: HTMLElement | undefined) => {
+      await act(async () => {
+        el?.click();
+      });
+    };
+    /** La pagina e' gia' caricata: le chiamate successive rispondono in ordine. */
+    const risposte = (...elenco: Array<[number, Record<string, unknown>]>) => {
+      const coda = [...elenco];
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(async () => {
+          const [status, corpo] = coda.shift()!;
+          return new Response(JSON.stringify(corpo), { status });
+        })
+      );
+    };
+
+    it('la correzione di tutte le iscrizioni si vede su ogni scheda', async () => {
+      await monta(DUE);
+      risposte(
+        [202, { issuedAt: 1 }],
+        [200, { displayName: 'Anna Bianchi', organization: null }]
+      );
+      await clic(pulsanti(m.editButton)[0]);
+      const tutte = [...container.querySelectorAll('label')].find((l) =>
+        l.textContent?.startsWith('Tutte le mie iscrizioni (2)')
+      )!;
+      act(() => (document.getElementById(tutte.htmlFor) as HTMLInputElement).click());
+      await clic(pulsanti(m.codeSend)[0]);
+      scriviCodice('123456');
+      await clic(pulsanti(m.codeConfirmEdit)[0]);
+      const testo = container.textContent ?? '';
+      expect(testo.split('Anna Bianchi').length - 1).toBe(2);
+      expect(testo).not.toContain('Ana Bianchi');
+      expect(testo).toContain(m.editDone);
+    });
+
+    it('una scheda cancellata lo dice, senza piu’ dati ne’ pulsanti', async () => {
+      await monta(DUE);
+      risposte([202, { issuedAt: 1 }], [200, { deleted: 1, consentProofsKept: 1 }]);
+      await clic(pulsanti(m.cancelButton)[0]);
+      await clic(pulsanti(m.codeSend)[0]);
+      scriviCodice('123456');
+      await clic(pulsanti(m.codeConfirmCancel)[0]);
+      expect(container.textContent).toContain(m.cancelDone);
+      expect(container.textContent).toContain('È rimasta 1 prova di consenso');
+      expect(pulsanti(m.cancelButton)).toHaveLength(1);
+      expect(pulsanti(m.editButton)).toHaveLength(1);
+    });
+  });
 });

@@ -21,6 +21,7 @@ import {
 } from 'design-react-kit';
 
 import RecordingRemoval, { type RimozioneVista } from '@/components/privacy/recording-removal';
+import RegistrationCancel from '@/components/privacy/registration-cancel';
 import RegistrationEdit, { type DatiCorretti } from '@/components/privacy/registration-edit';
 import RegistrationConsents, {
   type ConsensiVista,
@@ -123,6 +124,7 @@ const GRANT_ROLE_KEY = {
 
 export default function MyDataPage() {
   const t = useTranslations('gdpr.export');
+  const tCancellazione = useTranslations('gdpr.erasure');
   const tConsensi = useTranslations('live.consents');
   const locale = useLocale();
   const searchParams = useSearchParams();
@@ -145,6 +147,9 @@ export default function MyDataPage() {
   const [voce, setVoce] = useState<VoceNelVideo>('rimovibile');
   const [comunicazioniRitirateIl, setComunicazioniRitirateIl] = useState<string | null>(null);
   const [rubricaConfermata, setRubricaConfermata] = useState(false);
+  // Le iscrizioni cancellate da qui, con le prove rimaste senza nome: la scheda
+  // resta per dirlo, senza piu' dati.
+  const [cancellate, setCancellate] = useState<Map<string, number>>(new Map());
   const format = useFormatter();
 
   // When the user lands here via the signed link emailed to them, the
@@ -512,7 +517,30 @@ export default function MyDataPage() {
                 {t('resultsDescription', { count: results.length })}
               </p>
 
-              {results.map((entry) => (
+              {results.map((entry) =>
+                cancellate.has(entry.registration.id) ? (
+                  <Card
+                    key={entry.registration.id}
+                    className="shadow-sm border-0 mb-3"
+                    style={{ borderRadius: 8, border: '1px solid #e8e8e8' }}
+                  >
+                    <CardBody className="p-4">
+                      <h3 className="h5 mb-3">
+                        {getLocalized(entry.event.title as LocalizedField, locale)}
+                      </h3>
+                      <Alert color="success" className="mb-0" role="status">
+                        <p className="mb-0">{t('cancelDone')}</p>
+                        {(cancellate.get(entry.registration.id) ?? 0) > 0 && (
+                          <p className="mb-0 mt-2">
+                            {tCancellazione('doneProofs', {
+                              count: cancellate.get(entry.registration.id) ?? 0,
+                            })}
+                          </p>
+                        )}
+                      </Alert>
+                    </CardBody>
+                  </Card>
+                ) : (
                 <Card
                   key={entry.registration.id}
                   className="shadow-sm border-0 mb-3"
@@ -618,9 +646,25 @@ export default function MyDataPage() {
                         </ul>
                       </>
                     )}
+
+                    {tokenConsensi && (
+                      <div className="mt-3">
+                        <RegistrationCancel
+                          token={tokenConsensi}
+                          registrationId={entry.registration.id}
+                          locale={locale}
+                          onCancellata={(prove) =>
+                            setCancellate((prima) =>
+                              new Map(prima).set(entry.registration.id, prove)
+                            )
+                          }
+                        />
+                      </div>
+                    )}
                   </CardBody>
                 </Card>
-              ))}
+                )
+              )}
             </div>
           )}
         </div>

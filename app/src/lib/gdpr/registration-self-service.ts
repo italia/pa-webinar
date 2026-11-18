@@ -3,9 +3,9 @@
 
 /**
  * Le modifiche a un'iscrizione dalla pagina dei propri dati: correggere nome ed
- * ente (art. 16 GDPR). Le rotte (api/gdpr/registrations) le eseguono solo con il
- * token della pagina e il codice mandato all'indirizzo
- * (lib/gdpr/confirmation-code).
+ * ente (art. 16 GDPR) e cancellare una sola iscrizione senza cancellare tutto
+ * (art. 17). Le rotte (api/gdpr/registrations) le eseguono solo con il token
+ * della pagina e il codice mandato all'indirizzo (lib/gdpr/confirmation-code).
  *
  * Correzione. Vale per un'iscrizione o per tutte quelle dell'indirizzo, e in
  * quel caso anche per la voce di rubrica, che e' della stessa persona. Cambia cio'
@@ -16,9 +16,18 @@
  * Un'email gia' in coda conserva il testo con cui e' stata scritta. Nel registro
  * GDPR di ogni evento toccato resta `DATA_RECTIFIED`, con i nomi dei campi
  * cambiati e mai i valori.
+ *
+ * Cancellazione. La stessa della cancellazione completa (lib/gdpr/erase-registrations),
+ * per quella sola iscrizione: con lei se ne vanno domande, voti, chat, feedback,
+ * frasi dei sottotitoli, email in coda e richieste di rimozione evase, e le prove
+ * dei consensi di un video o di una trascrizione che esistono restano senza nome.
+ * Il posto si libera. La voce di rubrica, gli inviti, la foto profilo e le altre
+ * iscrizioni sono dell'indirizzo, non dell'evento: restano, come quando lo staff
+ * cancella un'iscrizione. Nel registro GDPR resta `DATA_DELETED`.
  */
 import { encryptPII, tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
+import { eraseRegistrations, type ErasureCounts } from '@/lib/gdpr/erase-registrations';
 
 export type AmbitoCorrezione = 'registration' | 'address';
 
@@ -163,4 +172,38 @@ export async function correggiIscrizioni(
     }
     return { iscrizioni: righe.filter((r) => r.eventId !== null).length, voceDiRubrica };
   });
+}
+
+/**
+ * Cancella un'iscrizione dell'indirizzo. `null` se non c'e' (gia' cancellata, o
+ * di un altro indirizzo).
+ */
+export async function cancellaIscrizione(
+  emailHash: string,
+  registrationId: string
+): Promise<ErasureCounts | null> {
+  const iscrizione = await prisma.registration.findFirst({
+    where: { id: registrationId, emailHash },
+    select: { id: true, eventId: true },
+  });
+  if (!iscrizione) return null;
+  const counts = await eraseRegistrations([iscrizione], 'gdpr/registration-cancel');
+  // Una cancellazione arrivata insieme a questa, o la pulizia dell'evento, l'ha
+  // gia' tolta: niente da annotare due volte.
+  if (counts.registrations === 0) return null;
+  const { attachmentFilesNotDeleted, consentProofsKept } = counts;
+  await prisma.gdprAuditLog.create({
+    data: {
+      eventId: iscrizione.eventId,
+      action: 'DATA_DELETED',
+      recordCount: counts.registrations,
+      details: JSON.stringify({
+        source: 'gdpr-registration-cancel',
+        emailHashPrefix: emailHash.substring(0, 8),
+        ...(consentProofsKept > 0 && { consentProofsWithoutName: consentProofsKept }),
+        ...(attachmentFilesNotDeleted > 0 && { attachmentFilesNotDeleted }),
+      }),
+    },
+  });
+  return counts;
 }

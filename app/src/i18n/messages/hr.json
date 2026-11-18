@@ -4824,7 +4824,14 @@
       "codeSent": "E-poštom smo vam poslali šesteroznamenkasti kod. Upišite ga ovdje: vrijedi {minutes, plural, one {# minuta} few {# minute} other {# minuta}}.",
       "codeLabel": "Kod za potvrdu",
       "codeConfirmEdit": "Potvrdi ispravak",
-      "codeInvalid": "Kod nije točan ili je istekao. Provjerite posljednju primljenu e-poruku ili odustanite i zatražite novi."
+      "codeInvalid": "Kod nije točan ili je istekao. Provjerite posljednju primljenu e-poruku ili odustanite i zatražite novi.",
+      "cancelTitle": "Brisanje ove prijave",
+      "cancelIntro": "Možete izbrisati samo ovu prijavu, a da ne dirate ostale ni ostatak svojih podataka.",
+      "cancelButton": "Izbriši ovu prijavu",
+      "cancelDeletes": "Brišu se prijava na ovaj događaj i ono što ste s njom učinili: pitanja, glasovi, poruke u chatu, povratne informacije, odgovori na upitnike, vaše rečenice u transkripciji iz titlova i e-poruke na čekanju. Vaša osobna poveznica prestaje raditi, a mjesto se oslobađa.",
+      "cancelKeeps": "Ostaju vaše ostale prijave, imenik događaja, profilna fotografija i zahtjev za uklanjanje iz snimke koji se još obrađuje. Ako za ovaj događaj postoji videozapis ili transkripcija, dokaz vaše privole ostaje bez vašeg imena dok oni postoje. Brisanje se ne može poništiti; dok događaj prima prijave, možete se ponovno prijaviti.",
+      "codeConfirmCancel": "Izbriši prijavu",
+      "cancelDone": "Prijava je izbrisana."
     },
     "erasure": {
       "title": "Brisanje vaših podataka",

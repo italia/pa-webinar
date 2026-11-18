@@ -4,8 +4,8 @@
 /**
  * La pagina dei propri dati sul database vero: un consenso dato di nuovo dopo un
  * ritiro, con la stessa prova di quello dato in sala, e solo finche' l'evento lo
- * chiede; la correzione di nome ed ente, confermata con il codice mandato
- * all'indirizzo.
+ * chiede; la correzione di nome ed ente e la cancellazione di una sola
+ * iscrizione, confermate con il codice mandato all'indirizzo.
  */
 import { randomUUID } from 'node:crypto';
 
@@ -14,6 +14,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { POST as chiediToken } from '@/app/api/events/[param]/jitsi/token/route';
 import { POST as consensi } from '@/app/api/gdpr/consents/route';
+import { POST as annulla } from '@/app/api/gdpr/registrations/cancel/route';
 import { POST as correggi } from '@/app/api/gdpr/registrations/edit/route';
 import { decryptPII, encryptPII, hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
@@ -560,5 +561,105 @@ describe('la correzione di nome ed ente', () => {
         .status
     ).toBe(401);
     expect(await prisma.emailOutbox.count()).toBe(0);
+  });
+});
+
+async function chiamaAnnulla(corpo: Record<string, unknown>) {
+  ip += 1;
+  const r = richiesta('/api/gdpr/registrations/cancel', 'POST', { locale: 'it', ...corpo });
+  r.headers.set('x-forwarded-for', `10.11.${Math.floor(ip / 250)}.${ip % 250}`);
+  return annulla(r as never, { params: Promise.resolve({}) });
+}
+
+describe('la cancellazione di una sola iscrizione', () => {
+  it('con il codice cancella quell’iscrizione e cio’ che porta, e tiene la prova senza nome', async () => {
+    const evento = await creaEvento({ ...CON_TRACCE, recordingUrl: 'recordings/video.mp4' });
+    const altroEvento = await creaEvento();
+    const { iscrizione, token, emailHash } = await iscritto(evento.id, { consentRecording: true });
+    const email = decryptPII(iscrizione.email);
+    const altra = await prisma.registration.create({
+      data: {
+        eventId: altroEvento.id,
+        displayName: encryptPII('Persona Iscritta'),
+        email: encryptPII(email),
+        emailHash,
+        consentGiven: true,
+        consentTimestamp: new Date(),
+        accessToken: randomUUID(),
+      },
+    });
+    await prisma.person.create({
+      data: { emailHash, email: encryptPII(email), optedInToAddressBook: true, optedInAt: new Date() },
+    });
+    await prisma.chatMessage.create({
+      data: {
+        eventId: evento.id,
+        senderId: `reg-${iscrizione.id}`,
+        senderName: encryptPII('Persona Iscritta'),
+        text: encryptPII('ciao'),
+      },
+    });
+    const corpo = { token, registrationId: iscrizione.id };
+
+    const richiesto = await chiamaAnnulla(corpo);
+    expect(richiesto.status).toBe(202);
+    const { issuedAt } = (await richiesto.json()) as { issuedAt: number };
+    const { codice } = await codiceArrivato();
+    // Un codice per correggere non cancella.
+    expect(
+      (await chiamaAnnulla({ ...corpo, code: String((Number(codice) + 7) % 1e6).padStart(6, '0'), issuedAt }))
+        .status
+    ).toBe(403);
+    expect(await prisma.registration.count({ where: { id: iscrizione.id } })).toBe(1);
+
+    const fatto = await chiamaAnnulla({ ...corpo, code: codice, issuedAt });
+    expect(fatto.status).toBe(200);
+    expect(await fatto.json()).toEqual({ deleted: 1, consentProofsKept: 1 });
+    expect(await prisma.registration.count({ where: { id: iscrizione.id } })).toBe(0);
+    expect(await prisma.chatMessage.count({ where: { senderId: `reg-${iscrizione.id}` } })).toBe(0);
+    // Il codice della cancellazione era un'email di quell'iscrizione: se ne va con lei.
+    expect(await prisma.emailOutbox.count()).toBe(0);
+    const [prova] = await prisma.retainedConsentProof.findMany({ where: { eventId: evento.id } });
+    expect(prova).toMatchObject({ kind: 'recording', displayName: null, emailHash });
+    // Il resto dell'indirizzo resta.
+    expect(await prisma.registration.count({ where: { id: altra.id } })).toBe(1);
+    expect(await prisma.person.count({ where: { emailHash } })).toBe(1);
+
+    const [riga] = await righeRegistro(evento.id, 'DATA_DELETED');
+    expect(JSON.parse(riga!.details!)).toEqual({
+      source: 'gdpr-registration-cancel',
+      emailHashPrefix: emailHash.substring(0, 8),
+      consentProofsWithoutName: 1,
+    });
+    // Rifatto con lo stesso codice non trova piu' niente.
+    expect((await chiamaAnnulla({ ...corpo, code: codice, issuedAt })).status).toBe(404);
+  });
+
+  it('il codice di un’iscrizione non cancella un’altra dello stesso indirizzo', async () => {
+    const [a, b] = [await creaEvento(), await creaEvento()];
+    const prima = await iscritto(a.id);
+    const seconda = await prisma.registration.create({
+      data: {
+        eventId: b.id,
+        displayName: encryptPII('Persona Iscritta'),
+        email: prima.iscrizione.email,
+        emailHash: prima.emailHash,
+        consentGiven: true,
+        consentTimestamp: new Date(),
+        accessToken: randomUUID(),
+      },
+    });
+    const { issuedAt } = (await (
+      await chiamaAnnulla({ token: prima.token, registrationId: prima.iscrizione.id })
+    ).json()) as { issuedAt: number };
+    const { codice } = await codiceArrivato();
+    const res = await chiamaAnnulla({
+      token: prima.token,
+      registrationId: seconda.id,
+      code: codice,
+      issuedAt,
+    });
+    expect(res.status).toBe(403);
+    expect(await prisma.registration.count()).toBe(2);
   });
 });

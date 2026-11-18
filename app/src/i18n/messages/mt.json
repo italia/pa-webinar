@@ -4824,7 +4824,14 @@
       "codeSent": "Bgħatnielek kodiċi ta' 6 ċifri bl-email. Iktbu hawn: jibqa' validu għal {minutes, plural, one {# minuta} few {# minuti} other {# minuta}}.",
       "codeLabel": "Kodiċi ta' konferma",
       "codeConfirmEdit": "Ikkonferma l-korrezzjoni",
-      "codeInvalid": "Il-kodiċi mhuwiex korrett jew skada. Iċċekkja l-aħħar email li rċevejt, jew ikkanċella u itlob wieħed ġdid."
+      "codeInvalid": "Il-kodiċi mhuwiex korrett jew skada. Iċċekkja l-aħħar email li rċevejt, jew ikkanċella u itlob wieħed ġdid.",
+      "cancelTitle": "Tħassir ta' din ir-reġistrazzjoni",
+      "cancelIntro": "Tista' tħassar din ir-reġistrazzjoni biss, mingħajr ma tmiss lill-oħrajn u l-bqija tad-dejta tiegħek.",
+      "cancelButton": "Ħassar din ir-reġistrazzjoni",
+      "cancelDeletes": "Titħassar ir-reġistrazzjoni għal dan l-avveniment u dak li għamilt biha: mistoqsijiet, voti, messaġġi fiċ-chat, feedback, tweġibiet għall-kwestjonarji, is-sentenzi tiegħek fit-traskrizzjoni mis-sottotitoli u l-emails fil-kju. Il-link personali tiegħek ma jibqax jaħdem u l-post jinħeles.",
+      "cancelKeeps": "Jibqgħu r-reġistrazzjonijiet l-oħra tiegħek, id-direttorju tal-avvenimenti, ir-ritratt tal-profil u talba għat-tneħħija minn reġistrazzjoni li għadha qed tiġi pproċessata. Jekk għal dan l-avveniment hemm vidjo jew traskrizzjoni, il-prova tal-kunsens tiegħek tibqa' mingħajr ismek sakemm jeżistu. It-tħassir ma jistax jitreġġa' lura; sakemm l-avveniment jaċċetta reġistrazzjonijiet, tista' terġa' tirreġistra.",
+      "codeConfirmCancel": "Ħassar ir-reġistrazzjoni",
+      "cancelDone": "Ir-reġistrazzjoni tħassret."
     },
     "erasure": {
       "title": "Tħassir tad-dejta tiegħek",

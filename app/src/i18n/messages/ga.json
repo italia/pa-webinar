@@ -4824,7 +4824,14 @@
       "codeSent": "Sheolamar cód 6 dhigit chugat i ríomhphost. Cuir isteach anseo é: tá sé bailí ar feadh {minutes, plural, one {# nóiméad} other {# nóiméad}}.",
       "codeLabel": "Cód deimhnithe",
       "codeConfirmEdit": "Deimhnigh an ceartúchán",
-      "codeInvalid": "Tá an cód mícheart nó imithe in éag. Seiceáil an ríomhphost is déanaí a fuair tú, nó cealaigh agus iarr ceann nua."
+      "codeInvalid": "Tá an cód mícheart nó imithe in éag. Seiceáil an ríomhphost is déanaí a fuair tú, nó cealaigh agus iarr ceann nua.",
+      "cancelTitle": "An clárú seo a scriosadh",
+      "cancelIntro": "Is féidir leat an clárú seo amháin a scriosadh, gan baint leis na cinn eile ná le do chuid sonraí eile.",
+      "cancelButton": "Scrios an clárú seo",
+      "cancelDeletes": "Scriostar an clárú don imeacht seo agus a ndearna tú leis: ceisteanna, vótaí, teachtaireachtaí comhrá, aiseolas, freagraí ar cheistneoirí, d'abairtí sa tras-scríbhinn ó na fotheidil agus ríomhphoist sa scuaine. Stopann do nasc pearsanta ag obair agus scaoiltear an áit.",
+      "cancelKeeps": "Fanann do chláruithe eile, leabhar seoltaí na n-imeachtaí, do ghrianghraf próifíle agus iarraidh ar bhaint ó thaifeadadh atá fós á próiseáil. Má tá físeán nó tras-scríbhinn ag an imeacht seo, fanann cruthúnas do thoilithe gan d'ainm fad is atá siad ann. Ní féidir an scriosadh a chealú; fad is a ghlacann an t-imeacht le clárúcháin, is féidir leat clárú arís.",
+      "codeConfirmCancel": "Scrios an clárú",
+      "cancelDone": "Scriosadh an clárú."
     },
     "erasure": {
       "title": "Scriosadh bhur gcuid sonraí",

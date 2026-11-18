@@ -4824,7 +4824,14 @@
       "codeSent": "We hebben u een code van 6 cijfers gemaild. Vul die hier in: hij is {minutes, plural, one {# minuut} other {# minuten}} geldig.",
       "codeLabel": "Bevestigingscode",
       "codeConfirmEdit": "Correctie bevestigen",
-      "codeInvalid": "De code is onjuist of verlopen. Controleer de laatst ontvangen e-mail, of annuleer en vraag een nieuwe aan."
+      "codeInvalid": "De code is onjuist of verlopen. Controleer de laatst ontvangen e-mail, of annuleer en vraag een nieuwe aan.",
+      "cancelTitle": "Deze inschrijving verwijderen",
+      "cancelIntro": "U kunt alleen deze inschrijving verwijderen, zonder de andere en de rest van uw gegevens aan te raken.",
+      "cancelButton": "Deze inschrijving verwijderen",
+      "cancelDeletes": "De inschrijving voor dit evenement wordt verwijderd met wat u ermee hebt gedaan: vragen, stemmen, chatberichten, feedback, antwoorden op vragenlijsten, uw zinnen in het transcript uit de ondertiteling en e-mails in de wachtrij. Uw persoonlijke link werkt niet meer en de plaats komt vrij.",
+      "cancelKeeps": "Uw andere inschrijvingen, het evenementenadresboek, uw profielfoto en een verzoek om verwijdering uit een opname dat nog in behandeling is, blijven bestaan. Als er van dit evenement een video of transcript bestaat, blijft het bewijs van uw toestemming zonder uw naam bewaard zolang die bestaan. Het verwijderen kan niet ongedaan worden gemaakt; zolang het evenement inschrijvingen aanneemt, kunt u zich opnieuw inschrijven.",
+      "codeConfirmCancel": "Inschrijving verwijderen",
+      "cancelDone": "Inschrijving verwijderd."
     },
     "erasure": {
       "title": "Verwijdering van uw gegevens",

@@ -4824,7 +4824,14 @@
       "codeSent": "Ti abbiamo mandato per email un codice di 6 cifre. Scrivilo qui: vale {minutes, plural, one {# minuto} other {# minuti}}.",
       "codeLabel": "Codice di conferma",
       "codeConfirmEdit": "Conferma la correzione",
-      "codeInvalid": "Il codice non è corretto o è scaduto. Controlla l'ultima email ricevuta, oppure annulla e chiedine uno nuovo."
+      "codeInvalid": "Il codice non è corretto o è scaduto. Controlla l'ultima email ricevuta, oppure annulla e chiedine uno nuovo.",
+      "cancelTitle": "Cancellare questa iscrizione",
+      "cancelIntro": "Puoi cancellare solo questa iscrizione, senza toccare le altre e il resto dei tuoi dati.",
+      "cancelButton": "Cancella questa iscrizione",
+      "cancelDeletes": "Si cancellano l'iscrizione a questo evento e ciò che hai fatto con lei: domande, voti, messaggi in chat, feedback, risposte ai questionari, le tue frasi nella trascrizione dai sottotitoli ed email in coda. Il tuo link personale smette di funzionare e il posto si libera.",
+      "cancelKeeps": "Restano le altre iscrizioni, la rubrica degli eventi, la foto profilo e una richiesta di rimozione da una registrazione ancora in lavorazione. Se di questo evento esistono un video o una trascrizione, la prova del tuo consenso resta senza il tuo nome finché esistono. La cancellazione non si annulla; finché l'evento accetta iscrizioni puoi iscriverti di nuovo.",
+      "codeConfirmCancel": "Cancella l'iscrizione",
+      "cancelDone": "Iscrizione cancellata."
     },
     "erasure": {
       "title": "Cancellazione dei tuoi dati",

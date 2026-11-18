@@ -4824,7 +4824,14 @@
       "codeSent": "Po e-pošti smo vam poslali 6-mestno kodo. Vpišite jo tukaj: velja {minutes, plural, one {# minuta} two {# minuti} few {# minute} other {# minut}}.",
       "codeLabel": "Potrditvena koda",
       "codeConfirmEdit": "Potrdi popravek",
-      "codeInvalid": "Koda ni pravilna ali je potekla. Preverite zadnje prejeto e-sporočilo ali prekličite in zahtevajte novo."
+      "codeInvalid": "Koda ni pravilna ali je potekla. Preverite zadnje prejeto e-sporočilo ali prekličite in zahtevajte novo.",
+      "cancelTitle": "Izbris te prijave",
+      "cancelIntro": "Izbrišete lahko samo to prijavo, ne da bi se dotaknili drugih in preostalih podatkov.",
+      "cancelButton": "Izbriši to prijavo",
+      "cancelDeletes": "Izbrišejo se prijava na ta dogodek in tisto, kar ste z njo naredili: vprašanja, glasovi, sporočila v klepetu, povratne informacije, odgovori na vprašalnike, vaši stavki v prepisu iz podnapisov in e-sporočila v čakalni vrsti. Vaša osebna povezava preneha delovati in mesto se sprosti.",
+      "cancelKeeps": "Ostanejo vaše druge prijave, imenik dogodkov, profilna fotografija in zahteva za odstranitev iz posnetka, ki je še v obdelavi. Če za ta dogodek obstaja video ali prepis, dokazilo o vaši privolitvi ostane brez vašega imena, dokler obstajata. Izbrisa ni mogoče razveljaviti; dokler dogodek sprejema prijave, se lahko znova prijavite.",
+      "codeConfirmCancel": "Izbriši prijavo",
+      "cancelDone": "Prijava je izbrisana."
     },
     "erasure": {
       "title": "Izbris vaših podatkov",

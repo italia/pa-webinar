@@ -4824,7 +4824,14 @@
       "codeSent": "Lähetimme sinulle sähköpostilla 6-numeroisen koodin. Kirjoita se tähän: se on voimassa {minutes, plural, one {# minuutti} other {# minuuttia}}.",
       "codeLabel": "Vahvistuskoodi",
       "codeConfirmEdit": "Vahvista korjaus",
-      "codeInvalid": "Koodi on väärä tai vanhentunut. Tarkista viimeisin saamasi sähköposti tai peruuta ja pyydä uusi."
+      "codeInvalid": "Koodi on väärä tai vanhentunut. Tarkista viimeisin saamasi sähköposti tai peruuta ja pyydä uusi.",
+      "cancelTitle": "Tämän ilmoittautumisen poistaminen",
+      "cancelIntro": "Voit poistaa vain tämän ilmoittautumisen koskematta muihin tai muihin tietoihisi.",
+      "cancelButton": "Poista tämä ilmoittautuminen",
+      "cancelDeletes": "Ilmoittautuminen tähän tapahtumaan poistetaan sekä se, mitä teit sen kautta: kysymykset, äänet, chat-viestit, palaute, kyselyvastaukset, lauseesi tekstityksistä tehdyssä litteroinnissa ja jonossa olevat sähköpostit. Henkilökohtainen linkkisi lakkaa toimimasta ja paikka vapautuu.",
+      "cancelKeeps": "Muut ilmoittautumisesi, tapahtumien osoitekirja, profiilikuvasi ja vielä käsiteltävänä oleva pyyntö tallenteesta poistamisesta säilyvät. Jos tästä tapahtumasta on video tai litterointi, suostumuksesi todiste säilyy ilman nimeäsi niin kauan kuin ne ovat olemassa. Poistoa ei voi perua; niin kauan kuin tapahtumaan voi ilmoittautua, voit ilmoittautua uudelleen.",
+      "codeConfirmCancel": "Poista ilmoittautuminen",
+      "cancelDone": "Ilmoittautuminen poistettu."
     },
     "erasure": {
       "title": "Tietojesi poistaminen",

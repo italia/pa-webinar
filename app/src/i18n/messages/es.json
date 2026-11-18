@@ -4824,7 +4824,14 @@
       "codeSent": "Te hemos enviado por correo un código de 6 cifras. Escríbelo aquí: vale {minutes, plural, one {# minuto} other {# minutos}}.",
       "codeLabel": "Código de confirmación",
       "codeConfirmEdit": "Confirmar la corrección",
-      "codeInvalid": "El código no es correcto o ha caducado. Revisa el último correo que has recibido, o cancela y pide uno nuevo."
+      "codeInvalid": "El código no es correcto o ha caducado. Revisa el último correo que has recibido, o cancela y pide uno nuevo.",
+      "cancelTitle": "Suprimir esta inscripción",
+      "cancelIntro": "Puedes suprimir solo esta inscripción, sin tocar las demás ni el resto de tus datos.",
+      "cancelButton": "Suprimir esta inscripción",
+      "cancelDeletes": "Se suprimen la inscripción en este evento y lo que hiciste con ella: preguntas, votos, mensajes en el chat, comentarios, respuestas a cuestionarios, tus frases en la transcripción de los subtítulos y los correos en cola. Tu enlace personal deja de funcionar y la plaza queda libre.",
+      "cancelKeeps": "Se mantienen tus otras inscripciones, la agenda de eventos, tu foto de perfil y una solicitud de retirada de una grabación que aún se está tramitando. Si de este evento existen un vídeo o una transcripción, la prueba de tu consentimiento queda sin tu nombre mientras existan. La supresión no se puede deshacer; mientras el evento acepte inscripciones, puedes volver a inscribirte.",
+      "codeConfirmCancel": "Suprimir la inscripción",
+      "cancelDone": "Inscripción suprimida."
     },
     "erasure": {
       "title": "Supresión de sus datos",

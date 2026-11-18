@@ -4824,7 +4824,14 @@
       "codeSent": "Mēs jums pa e-pastu nosūtījām 6 ciparu kodu. Ievadiet to šeit: tas ir derīgs {minutes, plural, zero {# minūtes} one {# minūte} other {# minūtes}}.",
       "codeLabel": "Apstiprinājuma kods",
       "codeConfirmEdit": "Apstiprināt labojumu",
-      "codeInvalid": "Kods nav pareizs vai tam ir beidzies derīguma termiņš. Pārbaudiet pēdējo saņemto e-pastu vai atceliet un pieprasiet jaunu."
+      "codeInvalid": "Kods nav pareizs vai tam ir beidzies derīguma termiņš. Pārbaudiet pēdējo saņemto e-pastu vai atceliet un pieprasiet jaunu.",
+      "cancelTitle": "Šīs reģistrācijas dzēšana",
+      "cancelIntro": "Varat dzēst tikai šo reģistrāciju, neskarot citas un pārējos savus datus.",
+      "cancelButton": "Dzēst šo reģistrāciju",
+      "cancelDeletes": "Tiek dzēsta reģistrācija šim pasākumam un tas, ko ar to darījāt: jautājumi, balsojumi, tērzēšanas ziņas, atsauksmes, aptauju atbildes, jūsu teikumi transkripcijā no subtitriem un rindā esošie e-pasti. Jūsu personīgā saite vairs nedarbojas, un vieta atbrīvojas.",
+      "cancelKeeps": "Paliek citas jūsu reģistrācijas, pasākumu kontaktu grāmata, profila fotoattēls un vēl izskatīšanā esošs pieprasījums par izņemšanu no ieraksta. Ja šim pasākumam ir video vai transkripcija, jūsu piekrišanas pierādījums paliek bez jūsu vārda, kamēr tie pastāv. Dzēšanu nevar atsaukt; kamēr pasākums pieņem reģistrācijas, varat reģistrēties no jauna.",
+      "codeConfirmCancel": "Dzēst reģistrāciju",
+      "cancelDone": "Reģistrācija ir dzēsta."
     },
     "erasure": {
       "title": "Jūsu datu dzēšana",

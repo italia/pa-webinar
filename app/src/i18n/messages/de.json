@@ -4824,7 +4824,14 @@
       "codeSent": "Wir haben Ihnen einen 6-stelligen Code per E-Mail geschickt. Geben Sie ihn hier ein: Er gilt {minutes, plural, one {# Minute} other {# Minuten}}.",
       "codeLabel": "Bestätigungscode",
       "codeConfirmEdit": "Berichtigung bestätigen",
-      "codeInvalid": "Der Code ist falsch oder abgelaufen. Prüfen Sie die zuletzt erhaltene E-Mail oder brechen Sie ab und fordern Sie einen neuen an."
+      "codeInvalid": "Der Code ist falsch oder abgelaufen. Prüfen Sie die zuletzt erhaltene E-Mail oder brechen Sie ab und fordern Sie einen neuen an.",
+      "cancelTitle": "Diese Anmeldung löschen",
+      "cancelIntro": "Sie können nur diese Anmeldung löschen, ohne die anderen und Ihre übrigen Daten zu berühren.",
+      "cancelButton": "Diese Anmeldung löschen",
+      "cancelDeletes": "Gelöscht werden die Anmeldung zu dieser Veranstaltung und alles, was Sie damit getan haben: Fragen, Abstimmungen, Chatnachrichten, Feedback, Antworten auf Fragebögen, Ihre Sätze im Transkript aus den Untertiteln und E-Mails in der Warteschlange. Ihr persönlicher Link funktioniert nicht mehr, und der Platz wird frei.",
+      "cancelKeeps": "Bestehen bleiben Ihre anderen Anmeldungen, das Veranstaltungs-Adressbuch, Ihr Profilfoto und ein noch bearbeiteter Antrag auf Entfernung aus einer Aufzeichnung. Gibt es zu dieser Veranstaltung ein Video oder ein Transkript, bleibt der Nachweis Ihrer Einwilligung ohne Ihren Namen erhalten, solange sie existieren. Die Löschung kann nicht rückgängig gemacht werden; solange die Veranstaltung Anmeldungen annimmt, können Sie sich erneut anmelden.",
+      "codeConfirmCancel": "Anmeldung löschen",
+      "cancelDone": "Anmeldung gelöscht."
     },
     "erasure": {
       "title": "Löschung Ihrer Daten",
