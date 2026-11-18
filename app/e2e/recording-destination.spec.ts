@@ -8,6 +8,12 @@ import { test, expect, type APIRequestContext, type Page } from '@playwright/tes
 import messages from '../src/i18n/messages/it.json';
 
 import { accediComeAdmin } from './helpers/accesso-admin';
+import {
+  accediConLink,
+  creaAccountStaff,
+  eliminaAccountStaff,
+  type AccountStaff,
+} from './helpers/accesso-staff';
 
 /**
  * Il blocco di pubblicazione: la destinazione della registrazione e' cio' a cui
@@ -18,10 +24,16 @@ import { accediComeAdmin } from './helpers/accesso-admin';
  * La regola sta in lib/recording/destination: qui si prova attraverso le rotte
  * vere e il pannello che le chiama, compresa la pagina rimasta aperta mentre
  * la destinazione cambia.
+ *
+ * Le prove agiscono come chi organizza gli eventi: un account nominale che li
+ * crea. Allegare il file e pubblicarlo toccano il contenuto della
+ * registrazione, che e' di chi organizza (ADR-021): la sessione della chiave
+ * dell'istanza non lo fa, e una prova lo dice.
  */
 
 const ADMIN_KEY = process.env.ADMIN_API_KEY || 'dev_admin_key_2026';
 const CODICE = 'RECORDING_DESTINATION_NOT_COVERED';
+const SOLO_ORGANIZZATORI = 'RECORDING_CONTENT_ORGANIZER_ONLY';
 const YOUTUBE = 'https://www.youtube.com/watch?v=aqz-KE-bpKQ';
 const VIDEO = 'https://example.com/registrazione.mp4';
 
@@ -35,16 +47,20 @@ interface Evento {
 // Login e creazione hanno un limite: un accesso per file, e gli eventi che le
 // prove non cambiano si condividono.
 test.describe.configure({ mode: 'serial' });
-let sessione: Awaited<ReturnType<ReturnType<Page['context']>['cookies']>> | null = null;
+type Cookie = Awaited<ReturnType<ReturnType<Page['context']>['cookies']>>;
+/** La sessione di chi organizza gli eventi della prova. */
+let sessione: Cookie | null = null;
+/** La sessione della chiave dell'istanza, che ha creato l'account. */
+let sessioneChiave: Cookie | null = null;
+let organizzatore: AccountStaff | null = null;
 let riservato: Evento | null = null;
 let riservatoConcluso = false;
 let pubblicoInDiretta: Evento | null = null;
 const creati: Evento[] = [];
 
 test.afterAll(async ({ playwright }) => {
-  const api = await playwright.request.newContext({
-    baseURL: process.env.E2E_BASE_URL ?? 'http://localhost:3000',
-  });
+  const baseURL = process.env.E2E_BASE_URL ?? 'http://localhost:3000';
+  const api = await playwright.request.newContext({ baseURL });
   for (const { id, moderatorToken } of creati.splice(0)) {
     const headers = { Authorization: `Bearer ${moderatorToken}` };
     // Un evento in diretta non si elimina: prima si chiude.
@@ -52,8 +68,25 @@ test.afterAll(async ({ playwright }) => {
     await api.delete(`/api/events/${id}`, { headers });
   }
   await api.dispose();
+
+  // L'account dopo i suoi eventi: eliminarlo cambia i loro link da moderatore.
+  if (!organizzatore || !sessioneChiave) return;
+  const chiave = await playwright.request.newContext({
+    baseURL,
+    storageState: { cookies: sessioneChiave, origins: [] },
+  });
+  const eliminato = await eliminaAccountStaff(chiave, organizzatore);
+  await chiave.dispose();
+  organizzatore = null;
+  expect(eliminato.ok(), `eliminazione dell'account: ${eliminato.status()}`).toBeTruthy();
 });
 
+/**
+ * Entra come chi organizza gli eventi della prova. La chiave dell'istanza crea
+ * l'account, che entra dal link arrivato per email: amministratore, perche' la
+ * prova legge anche l'elenco delle pubblicazioni, che e' dell'amministrazione.
+ * La sessione della chiave resta da parte.
+ */
 async function accedi(page: Page) {
   if (sessione) {
     await page.context().addCookies(sessione);
@@ -61,7 +94,19 @@ async function accedi(page: Page) {
   }
   const login = await accediComeAdmin(page.request, ADMIN_KEY);
   expect(login.ok(), `login: ${login.status()}`).toBeTruthy();
+  sessioneChiave = await page.context().cookies();
+  organizzatore = await creaAccountStaff(page.request, 'ADMIN');
+  const accesso = await accediConLink(page.request, organizzatore);
+  expect(accesso.ok(), `accesso dal link: ${await accesso.text()}`).toBeTruthy();
   sessione = await page.context().cookies();
+}
+
+/** La stessa pagina con la sessione della chiave dell'istanza al posto di quella
+ *  di chi organizza. */
+async function passaAllaChiave(page: Page) {
+  expect(sessioneChiave, 'sessione della chiave assente').toBeTruthy();
+  await page.context().clearCookies();
+  await page.context().addCookies(sessioneChiave!);
 }
 
 function datiEvento(extra: Record<string, unknown>) {
@@ -121,7 +166,8 @@ async function vaiAllaDiretta(api: APIRequestContext, evento: Evento) {
 /**
  * Il file caricato: un evento riservato lo prende, solo per gli iscritti. Con lo
  * storage delle registrazioni configurato un evento riservato accetta solo un
- * suo file: queste prove girano senza, come lo stack locale.
+ * suo file: queste prove girano senza, come lo stack locale. Lo allega chi
+ * organizza l'evento: il file e' contenuto della registrazione.
  */
 async function allegaVideo(api: APIRequestContext, evento: Evento) {
   const res = await api.patch(`/api/admin/publications/${evento.id}`, {
@@ -166,6 +212,7 @@ async function statoPubblicazione(api: APIRequestContext, evento: Evento) {
       recordingAudience: Destinazione;
       recordingDestination: Destinazione | null;
       youtubeUrl: string | null;
+      hasPublishedRecording: boolean;
     }[];
   };
   const riga = rows.find((r) => r.id === evento.id);
@@ -213,6 +260,37 @@ test.describe('le rotte', () => {
     );
 
     expect((await statoPubblicazione(api, evento)).youtubeUrl).toBeNull();
+  });
+
+  test("la chiave dell'istanza non tocca il file, e la destinazione vale anche per lei", async ({
+    page,
+  }) => {
+    await accedi(page);
+    const evento = await eventoRiservato(page.request);
+    await passaAllaChiave(page);
+    const chiave = page.request;
+
+    // Il file e la sua pubblicazione sono di chi organizza l'evento: la chiave
+    // non ne allega un altro, non lo toglie e non lo ritira.
+    for (const data of [
+      { recordingUrl: 'https://example.com/altra-registrazione.mp4' },
+      { recordingUrl: null },
+      { recordingPublished: false },
+    ]) {
+      const res = await chiave.patch(`/api/admin/publications/${evento.id}`, { data });
+      expect(res.status(), await res.text()).toBe(403);
+      expect(((await res.json()) as { code: string }).code).toBe(SOLO_ORGANIZZATORI);
+    }
+    // Il link esterno resta di chi gestisce l'evento, nei limiti della destinazione.
+    await attendiRifiuto(
+      chiave.patch(`/api/admin/publications/${evento.id}`, {
+        data: { youtubeUrl: YOUTUBE },
+      })
+    );
+
+    const stato = await statoPubblicazione(chiave, evento);
+    expect(stato.hasPublishedRecording).toBe(true);
+    expect(stato.youtubeUrl).toBeNull();
   });
 
   test('nemmeno alla creazione, anche senza scegliere la destinazione', async ({
