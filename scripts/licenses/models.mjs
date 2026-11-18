@@ -75,23 +75,32 @@ const SU_HF = /^https:\/\/(?:huggingface\.co|hf\.co)\//;
  *
  * La `}` chiude l'indirizzo come le virgolette: e' il valore di ripiego di
  * una variabile di shell o di Compose (`${MODELLO:-https://…}`), o la fine di
- * una mappa YAML in linea, e non fa parte dell'URL. Se restasse attaccata,
- * l'indirizzo sembrerebbe composto a run time e non si controllerebbe. La `{`
+ * una mappa YAML in linea, e non fa parte dell'URL. Lo stesso per i
+ * separatori della shell `|`, `&` e `;` (`…/modello.gguf|sha256sum`). La `{`
  * invece resta dentro: un segnaposto (`…/main/{file}`, `${voce}`) rende
- * l'indirizzo composto, e come tale si salta.
+ * l'indirizzo composto, e come tale si salta (vedi indirizzoDaConfrontare).
  */
 const URL_HF =
-  /https:\/\/(?:huggingface\.co|hf\.co)\/(?!datasets\/)[\w.-]+\/[\w.-]+\/resolve\/[^/\s"'`)\]}<>]+\/[^\s"'`)\]}<>]+/g;
+  /https:\/\/(?:huggingface\.co|hf\.co)\/(?!datasets\/)[\w.-]+\/[\w.-]+\/resolve\/[^/\s"'`)\]}<>|&;]+\/[^\s"'`)\]}<>|&;]+/g;
 
 /**
- * L'indirizzo da confrontare con il registro: senza query o frammento
- * (`?download=true`) e senza la punteggiatura che lo chiude in una frase
- * (`…/modello.gguf.` in un commento), che non nominano un file diverso.
- * Null se resta solo un prefisso (`…/resolve/main/`).
+ * L'indirizzo da confrontare con il registro, o null se non nomina un file
+ * fisso. Prima si tolgono quello che non fa parte del file: un tag di
+ * template attaccato all'indirizzo (`…/modello.gguf{{ end }}` in un template
+ * Helm), la query o il frammento (`?download=true`) e la punteggiatura che
+ * chiude una frase (`…/modello.gguf.` in un commento). Poi, su quello che
+ * resta, un segnaposto (`$`, `{`) vuol dire indirizzo composto a run time, e
+ * una `/` finale un prefisso a cui il codice aggiunge il file: in entrambi i
+ * casi null. Un segnaposto nella sola query (`?token=${HF_TOKEN}`) non rende
+ * composto il file.
  */
-export function indirizzoDaConfrontare(indirizzo) {
-  const pulito = indirizzo.replace(/[?#].*$/, '').replace(/[.,;:!]+$/, '');
-  return pulito.endsWith('/') ? null : pulito;
+export function indirizzoDaConfrontare(trovato) {
+  const pulito = trovato
+    .split('{{')[0]
+    .replace(/[?#].*$/, '')
+    .replace(/[.,:!]+$/, '');
+  if (/[$`{]/.test(pulito) || pulito.endsWith('/')) return null;
+  return pulito;
 }
 
 /** Estensioni dei file di pesi che non devono entrare nel repository fuori dal registro. */
@@ -321,7 +330,7 @@ export function modelliNonRegistrati(voci, tracciati, leggi) {
     const testo = leggi(f);
     if (testo === null || testo.includes('\0')) continue;
     for (const [trovato] of testo.matchAll(URL_HF)) {
-      if (/[$`{]/.test(trovato)) continue; // indirizzo composto a run time
+      // null: indirizzo composto a run time, o un prefisso.
       const indirizzo = indirizzoDaConfrontare(trovato);
       if (indirizzo && !indirizzi.has(indirizzo)) {
         problemi.push(`${f}: ${indirizzo} is not in the registry`);

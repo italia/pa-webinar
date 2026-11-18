@@ -453,6 +453,32 @@ describe('modelliNonRegistrati', () => {
     ]);
   });
 
+  it("i separatori della shell e i tag di template non entrano nell'indirizzo", () => {
+    assert.deepEqual(
+      cerca({
+        'run.sh': `curl -sL ${URL_FISSO}|sha256sum\ncurl ${URL_FISSO}&&echo\ncurl ${URL_FISSO};echo`,
+        'values.yaml': `url: ${URL_FISSO}{{ end }}`,
+        'templates/a.yaml':
+          'url: https://huggingface.co/org/m/resolve/main/{{ .Values.file }}\n' +
+          'url: https://huggingface.co/org/m/resolve/main/{{.Values.file}}',
+        'b.py': 'f"https://huggingface.co/org/m/resolve/main/m-{quant}.gguf"',
+      }),
+      []
+    );
+    const altro = 'https://huggingface.co/org/altro/resolve/main/altro.gguf';
+    for (const [f, testo] of [
+      ['templates/b.yaml', `url: ${altro}{{ end }}`],
+      ['run.sh', `curl -L "${altro}?token=\${HF_TOKEN}"`],
+      ['Dockerfile', `RUN curl -sL ${altro}|sha256sum`],
+    ]) {
+      assert.deepEqual(
+        cerca({ [f]: testo }),
+        [`${f}: ${altro} is not in the registry`],
+        f
+      );
+    }
+  });
+
   it('un indirizzo hf.co fuori dal registro si segnala', () => {
     assert.ok(
       contiene(
