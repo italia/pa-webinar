@@ -56,9 +56,14 @@ rejected runtime injection for fixes because a silently broken injection goes un
   appears who should not. The Jitsi upgrade checklist has a recorded call that tests it.
 - The per-participant recorder records a hidden track only when it carries `pa-recorder-voice`, so it
   ships with the module.
-- Jibri's call checks count only hosts: with no host for `default-call-empty-timeout` (30 s) the
-  recording ends, and also when every host keeps microphone and camera off for `all-muted-timeout`
-  (10 min) while participants speak.
+- Jibri's call checks count only hosts. With Jibri's values a recording would end 30 seconds after the
+  last host left, and after 10 minutes in which every host kept microphone and camera off while
+  participants spoke. The chart relaxes them through Jibri's JVM options
+  (`global.jibri.callStatusChecks`): `default-call-empty-timeout` 5 minutes, the time to come back
+  after a dropped line; `all-muted-timeout` and `no-media-timeout` 30 days, never in practice.
+  Participants' voices are received media even though Jibri's session never shows them, so a call
+  where only participants speak is not cut. A broken media connection is still caught by Jibri's ICE
+  check, and a recording also ends when a moderator stops it or the conference ends.
 - Jibri's session receives every source of the conference, as the per-participant recorder already
   does, instead of a fixed set of rewritten ones.
 - With an external Jitsi, or a values file that replaced the chart's conference text, the guarantee

@@ -145,6 +145,33 @@ Do not put a storage block under `jitsi-meet.jibri.recording`. In the subchart
 that key is a boolean, `true` by default, that enables file recording.
 Recording storage is configured on the app ([Recording storage](#recording-storage)).
 
+### When Jibri stops by itself
+
+Jibri ends a recording on its own when its call checks fire, and those checks
+count only hosts, the only people in the video. The chart sets them in
+`global.jibri.callStatusChecks` and passes them to Jibri as JVM options
+(`-Djibri.call-status-checks.*` in `jitsi-meet.jibri.extraEnvs.JAVA_TOOL_OPTIONS`).
+Why each value is what it is:
+[Starting and stopping](../architecture/recording.md#starting-and-stopping).
+
+| Value | Default | Jibri key |
+|---|---|---|
+| `global.jibri.callStatusChecks.defaultCallEmptyTimeout` | `5m` | `default-call-empty-timeout`: how long the recording goes on with no host in the room |
+| `global.jibri.callStatusChecks.allMutedTimeout` | `30d` (never in practice) | `all-muted-timeout`: every host with microphone and camera off |
+| `global.jibri.callStatusChecks.noMediaTimeout` | `30d` (never in practice) | `no-media-timeout`: nothing arrives while some host has microphone or camera on |
+
+To change one, set it in your values file, for example
+`global.jibri.callStatusChecks.defaultCallEmptyTimeout: 10m`. Write durations
+without spaces (`300s`, `5m`, `2h`, `30d`): they travel among the JVM options,
+which are separated by spaces, and the chart refuses any other form. An empty
+value leaves Jibri's own default. A values file that sets its own
+`jitsi-meet.jibri.extraEnvs.JAVA_TOOL_OPTIONS` replaces the chart's string: start
+from the one in `values.yaml` and append your options, or the chart stops the
+render because the checks are missing. A change restarts Jibri, since its
+ConfigMap changes. Docker Compose runs no Jibri; one of your own needs the same
+three `-Djibri.call-status-checks.*` options in its `JAVA_TOOL_OPTIONS`, or the
+same keys in its `jibri.conf`.
+
 ### Mount the finalize script
 
 After each recording, Jibri runs the script at `/config/finalize.sh` (the

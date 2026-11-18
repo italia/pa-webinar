@@ -258,6 +258,8 @@ When a domain resolves to no provider, it is disabled, and the features that dep
 
 How the two capture paths work is described in [Recording](architecture/recording.md). Which values turn them on is in [Setting up recording](operations/recording-setup.md).
 
+When Jibri stops a recording by itself is not an application variable: the chart passes Jibri's call checks as JVM options from `global.jibri.callStatusChecks` (`defaultCallEmptyTimeout` `5m`, `allMutedTimeout` `30d`, `noMediaTimeout` `30d`), because they count only hosts ([When Jibri stops by itself](operations/recording-setup.md#when-jibri-stops-by-itself)).
+
 | Name | Required | Default | Secret | Helm key | Description |
 |---|---|---|---|---|---|
 | `RECORDING_WEBHOOK_SECRET` | Recommended with Jibri | unset | Yes | Secret | HMAC-SHA256 key for the body of `POST /api/webhooks/recording`. The body is signed in the `X-Webhook-Signature: sha256=<hex>` header. When set, a request needs both the signature and the `CRON_API_KEY` bearer. When unset, the bearer alone is accepted and the app logs a warning once. The Jibri finalize script must receive the same value (`app/src/app/api/webhooks/recording/route.ts`) |

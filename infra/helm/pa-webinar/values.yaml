@@ -1177,8 +1177,14 @@ jitsi-meet:
     # 127.0.0.1. Quella esterna avvia e ferma anche registrazioni e dirette
     # senza autenticazione: con networkPolicy.enabled il chart la apre al
     # solo portale (NetworkPolicy <fullname>-jibri).
+    # Le stesse opzioni portano i controlli con cui Jibri chiude da solo una
+    # registrazione, da global.jibri.callStatusChecks: il valore passa da
+    # `tpl` nel sottochart, che dei valori di questo chart vede solo
+    # `global`. Un file di valori che imposta JAVA_TOOL_OPTIONS sostituisce
+    # questo valore: riparti da qui e aggiungi le tue opzioni in fondo,
+    # separate da uno spazio. Il chart si ferma se mancano i controlli.
     extraEnvs:
-      JAVA_TOOL_OPTIONS: "-Djibri.api.http.external-api-host=0.0.0.0"
+      JAVA_TOOL_OPTIONS: '-Djibri.api.http.external-api-host=0.0.0.0{{ $c := dig "jibri" "callStatusChecks" dict (.Values.global | default dict) | default dict }}{{ with dig "defaultCallEmptyTimeout" "" $c }} -Djibri.call-status-checks.default-call-empty-timeout={{ . }}{{ end }}{{ with dig "allMutedTimeout" "" $c }} -Djibri.call-status-checks.all-muted-timeout={{ . }}{{ end }}{{ with dig "noMediaTimeout" "" $c }} -Djibri.call-status-checks.no-media-timeout={{ . }}{{ end }}'
       # Qualita' della registrazione al massimo per default: la sala si
       # cattura a 1920x1080 (l'immagine ne ricava anche lo schermo virtuale,
       # cosi' le slide condivise restano leggibili) con un fattore di qualita'
@@ -1453,6 +1459,37 @@ global:
   # Cambiarlo riavvia il bridge: va fatto a sale vuote.
   jvb:
     numLoudest: 5
+  # Quando Jibri chiude da solo una registrazione. Nel video c'e' solo chi
+  # conduce, e i controlli di Jibri contano solo chi vede la sua sessione,
+  # cioe' i conduttori: con i valori di Jibri la registrazione finirebbe 30
+  # secondi dopo l'uscita dell'ultimo conduttore, o dopo 10 minuti di
+  # conduttori a microfono e videocamera spenti mentre parlano i
+  # partecipanti.
+  #   defaultCallEmptyTimeout  quanto si registra ancora senza nessun
+  #                            conduttore in sala: 5 minuti, il tempo di
+  #                            rientrare dopo una linea caduta;
+  #   allMutedTimeout          conduttori tutti a microfono e videocamera
+  #                            spenti: 30 giorni, piu' di qualunque evento,
+  #                            cioe' mai;
+  #   noMediaTimeout           nessun dato in arrivo mentre qualche
+  #                            conduttore ha il microfono o la videocamera
+  #                            accesi: anche questo mai. La voce dei
+  #                            partecipanti conta come dato in arrivo, anche
+  #                            se la sessione non li mostra; senza voci e
+  #                            senza videocamere (una pausa in silenzio) il
+  #                            bridge, che inoltra solo le voci piu' forti, puo'
+  #                            non mandare niente. Una connessione guasta la
+  #                            chiude il controllo ICE di Jibri, dopo 30
+  #                            secondi.
+  # Durate senza spazi, nel formato di Jibri (300s, 5m, 2h, 30d): viaggiano
+  # fra le opzioni della JVM, separate da spazi. Vuoto = il valore di Jibri.
+  # Le legge il sottochart della conferenza
+  # (jitsi-meet.jibri.extraEnvs.JAVA_TOOL_OPTIONS); cambiarle riavvia Jibri.
+  jibri:
+    callStatusChecks:
+      defaultCallEmptyTimeout: 5m
+      allMutedTimeout: 30d
+      noMediaTimeout: 30d
 
 captions:
   gateway:

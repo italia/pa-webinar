@@ -1311,6 +1311,10 @@ script needs; a values file that still sets `jitsi-meet.jibri.custom.other._fina
 ([Mount the finalize script](operations/recording-setup.md#mount-the-finalize-script)). The
 per-participant audio recorder is a separate path (`recorder.enabled`). Which values turn on each path,
 the storage they need and how to verify them: [Setting up recording](operations/recording-setup.md).
+Jibri's call checks count only hosts, so the chart relaxes them (`global.jibri.callStatusChecks`): a
+recording ends after 5 minutes with no host in the room, never because hosts keep microphone and camera
+off or because nothing arrives during a silent pause
+([When Jibri stops by itself](operations/recording-setup.md#when-jibri-stops-by-itself)).
 
 ## Metrics
 

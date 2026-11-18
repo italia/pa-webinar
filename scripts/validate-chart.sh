@@ -1908,6 +1908,16 @@ fi
 if grep -q -- '- name: RECORDING_PARTICIPANT_VOICE$' <<<"$reso_senza_voce"; then
   errore "testo della conferenza senza la voce dei partecipanti: RECORDING_PARTICIPANT_VOICE ancora presente"
 fi
+# Jibri chiude da solo una registrazione solo dopo 5 minuti senza conduttori,
+# mai per microfoni e videocamere spenti o per un silenzio: i suoi controlli
+# contano solo chi conduce.
+reso_jibri=$(helm template videocall "$CHART" -n videocall "${comuni[@]}" \
+  -f "$CHART/examples/values-simple.yaml" --set jitsi-meet.jibri.enabled=true)
+for opzione in default-call-empty-timeout=5m all-muted-timeout=30d no-media-timeout=30d; do
+  if ! grep -q -- "-Djibri.call-status-checks.$opzione" <<<"$reso_jibri"; then
+    errore "opzioni della JVM di Jibri: manca -Djibri.call-status-checks.$opzione"
+  fi
+done
 # I moduli di Prosody si caricano all'avvio: senza il riavvio dopo un
 # aggiornamento, la regola del consenso resta quella vecchia.
 if ! grep -qF 'kubectl rollout restart -n "$ns" "$sts"' <<<"$reso_semplice"; then
@@ -2015,6 +2025,13 @@ deve_fallire "opzioni della JVM del bridge senza le voci più forti" "VIDEOBRIDG
 deve_fallire "opzioni della JVM del bridge con un altro numero di voci" "VIDEOBRIDGE_DEBUG_OPTIONS" \
   --set global.jvb.numLoudest=0 \
   --set-string 'jitsi-meet.jvb.extraEnvs.VIDEOBRIDGE_DEBUG_OPTIONS=-Dvideobridge.loudest.route-loudest-only=true'
+# Quando Jibri chiude da solo una registrazione: durate senza spazi, e le
+# opzioni della JVM di Jibri che le portano davvero.
+deve_fallire "durata dei controlli di Jibri con uno spazio" "global.jibri.callStatusChecks" \
+  --set-string 'global.jibri.callStatusChecks.allMutedTimeout=5 minutes'
+deve_fallire "opzioni della JVM di Jibri senza i controlli" "JAVA_TOOL_OPTIONS" \
+  --set jitsi-meet.jibri.enabled=true \
+  --set-string 'jitsi-meet.jibri.extraEnvs.JAVA_TOOL_OPTIONS=-Djibri.api.http.external-api-host=0.0.0.0'
 
 echo
 if [ "$fallimenti" -gt 0 ]; then
