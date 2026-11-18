@@ -780,7 +780,8 @@
     "accessDenied": {
       "title": "Ovaj odjeljak nije dostupan za vašu ulogu",
       "body": "Kao organizator upravljate vlastitim događajima: izradom, objavom, materijalima, upitnicima i postprodukcijom. Postavke platforme i podaci svih događaja ostaju administraciji.",
-      "back": "Idi na svoje događaje"
+      "back": "Idi na svoje događaje",
+      "organizerOnly": "Ovaj događaj mogu uređivati samo njegovi organizatori. Kao administrator vidite njegovo stanje i pojedinosti te ga možete arhivirati ili izbrisati. Snimke i njihov sadržaj pripadaju organizatorima i sudionicima."
     },
     "staffLogin": {
       "title": "Prijava u administraciju",
@@ -1655,7 +1656,8 @@
       "detailFilename": "Naziv datoteke",
       "transcriptManage": "Upravljaj transkriptom / AI-jem",
       "transcriptReady": "Transkribirano",
-      "transcriptProcessing": "U obradi"
+      "transcriptProcessing": "U obradi",
+      "organizerOnly": "Samo za organizatore"
     },
     "gdprAudit": {
       "subtitle": "Zapis radnji nad osobnim podacima: brisanja, privole, izvozi",
@@ -1670,7 +1672,8 @@
         "DATA_DELETED": "Podaci izbrisani",
         "CONSENT_RECORDED": "Privola zabilježena",
         "DATA_EXPORTED": "Podaci izvezeni",
-        "CONSENT_WITHDRAWN": "Privola povučena"
+        "CONSENT_WITHDRAWN": "Privola povučena",
+        "RECORDING_CONTENT_READ": "Sadržaj snimke koji je pročitalo osoblje"
       },
       "recordsAffected": "{count} obuhvaćenih zapisa",
       "colWhen": "Kada",
@@ -1696,7 +1699,8 @@
       "rotating": "Regeneriranje…",
       "regenerateTitle": "Regeneriraj moderatorski token (poništava staru poveznicu)",
       "confirmRegenerate": "Jeste li sigurni da želite regenerirati token? Stara poveznica više neće raditi.",
-      "noResults": "Nije pronađen nijedan događaj."
+      "noResults": "Nije pronađen nijedan događaj.",
+      "organizerOnlyLink": "Poveznica je vidljiva samo organizatorima događaja"
     },
     "registrations": {
       "subtitle": "Sve osobe prijavljene na događaje — pretraga, filtri i izvoz",
@@ -2128,7 +2132,8 @@
         "DATA_DELETED": "Podaci obrisani",
         "CONSENT_RECORDED": "Pristanak zabilježen",
         "DATA_EXPORTED": "Podaci izvezeni",
-        "CONSENT_WITHDRAWN": "Privola povučena"
+        "CONSENT_WITHDRAWN": "Privola povučena",
+        "RECORDING_CONTENT_READ": "Sadržaj snimke koji je pročitalo osoblje"
       }
     },
     "settings": {
@@ -3020,7 +3025,20 @@
         "publishNow": "Objavi sada"
       },
       "editFeatures": "Uredi funkcije",
-      "editPrivacy": "Uredi privatnost i podatke"
+      "editPrivacy": "Uredi privatnost i podatke",
+      "governance": {
+        "title": "Ovim događajem upravljate kao administrator",
+        "body": "Niste među njegovim organizatorima: vidite stanje, pojedinosti, prijave i privole te ga možete arhivirati ili izbrisati. Vođenje događaja, poveznica moderatora i sadržaj snimki (video, transkripti, sažeci) pripadaju organizatorima.",
+        "recording": "Sadržaj snimke dostupan je samo organizatorima događaja i njegovim sudionicima. Ovdje vidite postoji li i njezine pojedinosti.",
+        "recordingFile": "Snimka",
+        "present": "Postoji",
+        "absent": "Nema",
+        "recordingPublished": "Objavljena",
+        "yes": "Da",
+        "no": "Ne",
+        "recordingDuration": "Trajanje",
+        "recordingSize": "Veličina"
+      }
     },
     "rubrica": {
       "subtitle": "Osobe koje su dale privolu za uvrštavanje u imenik (čl. 6.1.a GDPR). Ime, e-pošta i organizacija ažuriraju se samo kada osoba ponovno označi okvir.",
@@ -3290,7 +3308,8 @@
         "metricsTitle": "Pokazatelji sažimanja (LLM)",
         "chars": "znakova",
         "model": "Model",
-        "notAvailable": "n/d"
+        "notAvailable": "n/d",
+        "contentHidden": "Dostupno samo organizatorima događaja."
       },
       "rel": {
         "title": "Pouzdanost AI-ja",
@@ -3447,7 +3466,8 @@
         "alignNone": "Nema promjene slajda za usklađivanje.",
         "previewTitle": "Pregled",
         "previewHelp": "Videozapis sa slajdovima kako će ih vidjeti publika, s ispravkom upisanim iznad."
-      }
+      },
+      "contentOrganizerOnly": "Sadržaj ove snimke (video, zapisi, transkript, sažetak, prijevodi) mogu vidjeti i uređivati samo organizatori ovog događaja. Ovdje vidite njezino stanje, obrade i pojedinosti datoteka."
     },
     "questionnairesPage": {
       "subtitle": "Ponovno upotrebljivi predlošci pitanja za upitnike prije prijave i nakon događaja."
@@ -3739,7 +3759,9 @@
       "publishDesc": "Pregledajte ga prije objave: tekst je napisao model umjetne inteligencije. Ponovno izrađeno izvješće treba ponovno objaviti.",
       "preview": "Pregled",
       "hidePreview": "Sakrij pregled",
-      "previewLanguage": "Jezik"
+      "previewLanguage": "Jezik",
+      "organizerOnly": "Izvješće mogu zatražiti, čitati i objaviti samo organizatori ovog događaja.",
+      "organizerOnlyExists": "Izvješće postoji. Čitati i objaviti ga mogu samo organizatori ovog događaja."
     },
     "endEvent": "Završi događaj",
     "endEventConfirmTitle": "Završiti događaj za sve?",
@@ -6012,6 +6034,7 @@
     "captionsTranscriptNotTranslatable": "Ovaj transkript potječe iz titlova uživo: automatski prijevod zahtijeva AI transkript snimke.",
     "sameLanguage": "Odabrani jezik izvorni je jezik snimke: odaberite drugi.",
     "recordingDestinationNotCovered": "Privole za ovaj događaj vrijede za snimku samo za prijavljene: ne možete je učiniti vidljivom svima ni povezati vanjski videozapis.",
-    "mtUnavailable": "Strojno prevođenje nije instalirano na ovoj instanci."
+    "mtUnavailable": "Strojno prevođenje nije instalirano na ovoj instanci.",
+    "recordingContentOrganizerOnly": "Sadržaj snimki ovog događaja mogu otvarati, mijenjati ili objavljivati samo njegovi organizatori."
   }
 }

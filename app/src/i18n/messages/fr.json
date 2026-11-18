@@ -780,7 +780,8 @@
     "accessDenied": {
       "title": "Cette section n’est pas disponible pour votre rôle",
       "body": "En tant qu’organisateur, vous gérez vos propres événements : création, publication, supports, questionnaires et post-production. Les réglages de la plateforme et les données de tous les événements restent à l’administration.",
-      "back": "Aller à vos événements"
+      "back": "Aller à vos événements",
+      "organizerOnly": "Seuls les organisateurs de cet événement peuvent le modifier. En tant qu’administrateur, vous voyez son état et ses détails, et vous pouvez l’archiver ou le supprimer. Ses enregistrements et leur contenu appartiennent aux organisateurs et aux participants."
     },
     "staffLogin": {
       "title": "Connexion à l’espace d’administration",
@@ -1655,7 +1656,8 @@
       "detailFilename": "Nom du fichier",
       "transcriptManage": "Gérer la transcription / IA",
       "transcriptReady": "Transcrit",
-      "transcriptProcessing": "En cours"
+      "transcriptProcessing": "En cours",
+      "organizerOnly": "Organisateurs uniquement"
     },
     "gdprAudit": {
       "subtitle": "Journal des actions de confidentialité sur les données personnelles : suppressions, consentements, exports",
@@ -1670,7 +1672,8 @@
         "DATA_DELETED": "Données supprimées",
         "CONSENT_RECORDED": "Consentement enregistré",
         "DATA_EXPORTED": "Données exportées",
-        "CONSENT_WITHDRAWN": "Consentement retiré"
+        "CONSENT_WITHDRAWN": "Consentement retiré",
+        "RECORDING_CONTENT_READ": "Contenu de l’enregistrement lu par le personnel"
       },
       "recordsAffected": "{count} enregistrements concernés",
       "colWhen": "Quand",
@@ -1696,7 +1699,8 @@
       "rotating": "Régénération…",
       "regenerateTitle": "Régénérer le jeton modérateur (invalide l'ancien lien)",
       "confirmRegenerate": "Confirmez-vous la régénération du jeton ? L'ancien lien ne fonctionnera plus.",
-      "noResults": "Aucun événement trouvé."
+      "noResults": "Aucun événement trouvé.",
+      "organizerOnlyLink": "Lien visible uniquement par les organisateurs de l’événement"
     },
     "registrations": {
       "subtitle": "Toutes les personnes inscrites aux événements — recherche, filtre et export",
@@ -2128,7 +2132,8 @@
         "DATA_DELETED": "Données supprimées",
         "CONSENT_RECORDED": "Consentement enregistré",
         "DATA_EXPORTED": "Données exportées",
-        "CONSENT_WITHDRAWN": "Consentement retiré"
+        "CONSENT_WITHDRAWN": "Consentement retiré",
+        "RECORDING_CONTENT_READ": "Contenu de l’enregistrement lu par le personnel"
       }
     },
     "settings": {
@@ -3020,7 +3025,20 @@
         "publishNow": "Publier maintenant"
       },
       "editFeatures": "Modifier les fonctions",
-      "editPrivacy": "Modifier la confidentialité et les données"
+      "editPrivacy": "Modifier la confidentialité et les données",
+      "governance": {
+        "title": "Vous gérez cet événement en tant qu’administrateur",
+        "body": "Vous ne faites pas partie de ses organisateurs : vous voyez l’état, les détails, les inscriptions et les consentements, et vous pouvez l’archiver ou le supprimer. La conduite de l’événement, le lien du modérateur et le contenu des enregistrements (vidéo, transcriptions, synthèses) reviennent aux organisateurs.",
+        "recording": "Le contenu de l’enregistrement n’est accessible qu’aux organisateurs de l’événement et à ses participants. Vous voyez ici s’il existe et ses détails.",
+        "recordingFile": "Enregistrement",
+        "present": "Présent",
+        "absent": "Aucun",
+        "recordingPublished": "Publié",
+        "yes": "Oui",
+        "no": "Non",
+        "recordingDuration": "Durée",
+        "recordingSize": "Taille"
+      }
     },
     "rubrica": {
       "subtitle": "Personnes ayant consenti à être inscrites au carnet d'adresses (art. 6.1.a RGPD). Le nom, l'e-mail et l'organisation ne sont mis à jour que lorsque la personne coche à nouveau la case.",
@@ -3290,7 +3308,8 @@
         "metricsTitle": "Métriques de synthèse (LLM)",
         "chars": "caractères",
         "model": "Modèle",
-        "notAvailable": "n/d"
+        "notAvailable": "n/d",
+        "contentHidden": "Accessible uniquement aux organisateurs de l’événement."
       },
       "rel": {
         "title": "Fiabilité de l'IA",
@@ -3447,7 +3466,8 @@
         "alignNone": "Aucun changement de diapositive à aligner.",
         "previewTitle": "Aperçu",
         "previewHelp": "La vidéo avec les diapositives telles que le public les verra, avec la correction saisie ci-dessus."
-      }
+      },
+      "contentOrganizerOnly": "Seuls les organisateurs de cet événement peuvent voir et modifier le contenu de cet enregistrement (vidéo, pistes, transcription, synthèse, traductions). Vous voyez ici son état, les traitements et les détails des fichiers."
     },
     "questionnairesPage": {
       "subtitle": "Modèles de questions réutilisables pour les questionnaires de pré-inscription et après l'événement."
@@ -3739,7 +3759,9 @@
       "publishDesc": "Relisez-le avant de le publier : le texte est rédigé par un modèle d'intelligence artificielle. Un compte rendu régénéré doit être publié à nouveau.",
       "preview": "Aperçu",
       "hidePreview": "Masquer l'aperçu",
-      "previewLanguage": "Langue"
+      "previewLanguage": "Langue",
+      "organizerOnly": "Seuls les organisateurs de cet événement peuvent demander, lire et publier le compte rendu.",
+      "organizerOnlyExists": "Le compte rendu existe. Seuls les organisateurs de cet événement peuvent le lire et le publier."
     },
     "endEvent": "Terminer l'événement",
     "endEventConfirmTitle": "Terminer l'événement pour tout le monde ?",
@@ -6012,6 +6034,7 @@
     "captionsTranscriptNotTranslatable": "Cette transcription provient des sous-titres en direct : la traduction automatique nécessite une transcription IA de l'enregistrement.",
     "sameLanguage": "La langue choisie est celle d'origine de l'enregistrement : choisissez-en une autre.",
     "recordingDestinationNotCovered": "Les consentements de cet événement valent pour un enregistrement réservé aux inscrits : vous ne pouvez pas le rendre visible par tous ni lier une vidéo externe.",
-    "mtUnavailable": "La traduction automatique n'est pas installée sur cette instance."
+    "mtUnavailable": "La traduction automatique n'est pas installée sur cette instance.",
+    "recordingContentOrganizerOnly": "Seuls les organisateurs de cet événement peuvent ouvrir, modifier ou publier le contenu de ses enregistrements."
   }
 }

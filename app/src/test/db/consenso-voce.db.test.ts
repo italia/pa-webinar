@@ -32,6 +32,7 @@ import {
   creaRegistrazione,
   creaSessione,
   entraCome,
+  organizza,
   richiesta,
   svuotaDatabase,
 } from './fixtures';
@@ -195,6 +196,7 @@ describe('il video nuovo senza tracce per persona', () => {
     const evento = await eventoConcluso({ aiTranscriptEnabled: false });
     const rec = await creaRegistrazione(evento.id);
     await entraCome('ADMIN');
+    await organizza(evento.id);
 
     const rifiuto = await genera(evento.id, { summary: true });
     expect(rifiuto.status).toBe(409);
@@ -222,6 +224,7 @@ describe('il video nuovo senza tracce per persona', () => {
     const evento = await eventoConcluso();
     const rec = await creaRegistrazione(evento.id);
     await entraCome('ADMIN');
+    await organizza(evento.id);
     const r = await rilancia(
       richiesta(`/api/admin/postprod/recordings/${rec.id}/rerun`, 'POST', {}) as never,
       { params: Promise.resolve({ id: rec.id }) }
@@ -235,6 +238,7 @@ describe('il video nuovo senza tracce per persona', () => {
     const evento = await eventoConcluso({ aiTranscriptEnabled: false });
     const rec = await creaRegistrazione(evento.id);
     await entraCome('ADMIN');
+    await organizza(evento.id);
     const r = await generaPerRegistrazione(
       richiesta(
         `/api/admin/postprod/recordings/${rec.id}/generate-ai`,
@@ -255,6 +259,7 @@ describe('il video nuovo senza tracce per persona', () => {
     const rec = await creaRegistrazione(evento.id);
     await tracciaDiIscritto(evento.id, rec.id, 2);
     await entraCome('ADMIN');
+    await organizza(evento.id);
     expect((await genera(evento.id)).status).toBe(200);
     const lavori = await prisma.postprodJob.findMany({ select: { kind: true } });
     expect(lavori.map((l) => l.kind)).toContain('TRANSCRIBE_MULTITRACK');
@@ -272,6 +277,7 @@ describe('il video nuovo senza tracce per persona', () => {
       const rec = await creaRegistrazione(evento.id);
       await tracciaDiIscritto(evento.id, rec.id, 1);
       await entraCome('ADMIN');
+      await organizza(evento.id);
 
       const risposta = await genera(evento.id);
 
@@ -287,6 +293,7 @@ describe('il video nuovo senza tracce per persona', () => {
       const rec = await creaRegistrazione(evento.id);
       await tracciaDiIscritto(evento.id, rec.id, 1);
       await entraCome('ADMIN');
+      await organizza(evento.id);
 
       const risposta = await rilancia(
         richiesta(`/api/admin/postprod/recordings/${rec.id}/rerun`, 'POST', {}) as never,
@@ -335,6 +342,7 @@ describe('il video nuovo senza tracce per persona', () => {
       const rec = await creaRegistrazione(evento.id);
       const iscrizione = await tracciaDiIscritto(evento.id, rec.id, 2);
       await entraCome('ADMIN');
+      await organizza(evento.id);
       expect((await genera(evento.id, { summary: true })).status).toBe(200);
 
       await prisma.registration.update({
@@ -394,6 +402,7 @@ describe('il video nuovo senza tracce per persona', () => {
       });
       const rec = await creaSegnaposto(evento.id);
       await entraCome('ADMIN');
+      await organizza(evento.id);
 
       const risposta = await genera(evento.id, { summary: true });
 
@@ -423,6 +432,7 @@ describe('il video nuovo senza tracce per persona', () => {
       const evento = await eventoConcluso({ aiTranscriptEnabled: false });
       const rec = await creaSegnaposto(evento.id);
       await entraCome('ADMIN');
+      await organizza(evento.id);
 
       const risposta = await generaPerRegistrazione(
         richiesta(`/api/admin/postprod/recordings/${rec.id}/generate-ai`, 'POST', {}) as never,
@@ -436,6 +446,7 @@ describe('il video nuovo senza tracce per persona', () => {
       const evento = await eventoConcluso();
       const rec = await creaSegnaposto(evento.id);
       await entraCome('ADMIN');
+      await organizza(evento.id);
 
       const risposta = await rilancia(
         richiesta(`/api/admin/postprod/recordings/${rec.id}/rerun`, 'POST', {}) as never,
@@ -455,6 +466,7 @@ describe('il video nuovo senza tracce per persona', () => {
       const rec = await creaSegnaposto(evento.id);
       await prisma.recording.update({ where: { id: rec.id }, data: { mediaStartedAt: new Date() } });
       await entraCome('ADMIN');
+      await organizza(evento.id);
 
       const risposta = await genera(evento.id);
 
@@ -504,6 +516,7 @@ describe('il video nato prima della regola', () => {
     });
     await expect(voceTrascrizione(evento.id)).resolves.toMatchObject({ caso: 'nessuna' });
     await entraCome('ADMIN');
+    await organizza(evento.id);
     expect((await genera(evento.id)).status).toBe(200);
     expect(await prisma.postprodJob.count()).toBeGreaterThan(0);
   });

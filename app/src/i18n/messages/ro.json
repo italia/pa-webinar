@@ -780,7 +780,8 @@
     "accessDenied": {
       "title": "Această secțiune nu este disponibilă pentru rolul tău",
       "body": "Ca organizator îți gestionezi propriile evenimente: crearea și publicarea lor, materialele, chestionarele și post-producția. Setările platformei și datele tuturor evenimentelor rămân la administrație.",
-      "back": "Mergi la evenimentele tale"
+      "back": "Mergi la evenimentele tale",
+      "organizerOnly": "Doar organizatorii acestui eveniment îl pot modifica. Ca administrator îi vezi starea și detaliile și îl poți arhiva sau șterge. Înregistrările și conținutul lor aparțin organizatorilor și participanților."
     },
     "staffLogin": {
       "title": "Autentificare în zona de administrare",
@@ -1655,7 +1656,8 @@
       "detailFilename": "Nume fișier",
       "transcriptManage": "Gestionează transcrierea / AI",
       "transcriptReady": "Transcris",
-      "transcriptProcessing": "În curs"
+      "transcriptProcessing": "În curs",
+      "organizerOnly": "Doar pentru organizatori"
     },
     "gdprAudit": {
       "subtitle": "Registrul acțiunilor de confidențialitate asupra datelor cu caracter personal: ștergeri, consimțăminte, exporturi",
@@ -1670,7 +1672,8 @@
         "DATA_DELETED": "Date șterse",
         "CONSENT_RECORDED": "Consimțământ înregistrat",
         "DATA_EXPORTED": "Date exportate",
-        "CONSENT_WITHDRAWN": "Consimțământ retras"
+        "CONSENT_WITHDRAWN": "Consimțământ retras",
+        "RECORDING_CONTENT_READ": "Conținutul înregistrării citit de personal"
       },
       "recordsAffected": "{count} înregistrări afectate",
       "colWhen": "Când",
@@ -1696,7 +1699,8 @@
       "rotating": "Se regenerează…",
       "regenerateTitle": "Regenerați tokenul de moderator (vechiul link devine nevalid)",
       "confirmRegenerate": "Sigur regenerați tokenul? Vechiul link nu va mai funcționa.",
-      "noResults": "Niciun eveniment găsit."
+      "noResults": "Niciun eveniment găsit.",
+      "organizerOnlyLink": "Link vizibil doar organizatorilor evenimentului"
     },
     "registrations": {
       "subtitle": "Toate persoanele înscrise la evenimente — căutați, filtrați și exportați",
@@ -2128,7 +2132,8 @@
         "DATA_DELETED": "Date șterse",
         "CONSENT_RECORDED": "Consimțământ înregistrat",
         "DATA_EXPORTED": "Date exportate",
-        "CONSENT_WITHDRAWN": "Consimțământ retras"
+        "CONSENT_WITHDRAWN": "Consimțământ retras",
+        "RECORDING_CONTENT_READ": "Conținutul înregistrării citit de personal"
       }
     },
     "settings": {
@@ -3020,7 +3025,20 @@
         "publishNow": "Publică acum"
       },
       "editFeatures": "Editează funcțiile",
-      "editPrivacy": "Editează confidențialitatea și datele"
+      "editPrivacy": "Editează confidențialitatea și datele",
+      "governance": {
+        "title": "Gestionezi acest eveniment ca administrator",
+        "body": "Nu faci parte dintre organizatorii lui: vezi starea, detaliile, înscrierile și consimțămintele și îl poți arhiva sau șterge. Conducerea evenimentului, linkul moderatorului și conținutul înregistrărilor (video, transcrieri, rezumate) revin organizatorilor.",
+        "recording": "Conținutul înregistrării este disponibil doar organizatorilor evenimentului și participanților. Aici vezi dacă există și detaliile ei.",
+        "recordingFile": "Înregistrare",
+        "present": "Există",
+        "absent": "Niciuna",
+        "recordingPublished": "Publicată",
+        "yes": "Da",
+        "no": "Nu",
+        "recordingDuration": "Durată",
+        "recordingSize": "Dimensiune"
+      }
     },
     "rubrica": {
       "subtitle": "Persoane care și-au dat consimțământul pentru includerea în agendă (art. 6.1.a RGPD). Numele, e-mailul și organizația se actualizează doar când persoana bifează din nou caseta.",
@@ -3290,7 +3308,8 @@
         "metricsTitle": "Metrici ale rezumatului (LLM)",
         "chars": "caractere",
         "model": "Model",
-        "notAvailable": "n/a"
+        "notAvailable": "n/a",
+        "contentHidden": "Disponibil doar organizatorilor evenimentului."
       },
       "rel": {
         "title": "Fiabilitatea AI",
@@ -3447,7 +3466,8 @@
         "alignNone": "Nicio schimbare de diapozitiv de aliniat.",
         "previewTitle": "Previzualizare",
         "previewHelp": "Videoclipul cu diapozitivele așa cum le va vedea publicul, cu corecția scrisă mai sus."
-      }
+      },
+      "contentOrganizerOnly": "Doar organizatorii acestui eveniment pot vedea și modifica conținutul acestei înregistrări (video, piste, transcriere, rezumat, traduceri). Aici vezi starea ei, prelucrările și detaliile fișierelor."
     },
     "questionnairesPage": {
       "subtitle": "Șabloane reutilizabile de întrebări pentru chestionarele de preînregistrare și post-eveniment."
@@ -3739,7 +3759,9 @@
       "publishDesc": "Revizuiește-l înainte de publicare: textul este scris de un model de inteligență artificială. Un raport generat din nou trebuie publicat din nou.",
       "preview": "Previzualizare",
       "hidePreview": "Ascunde previzualizarea",
-      "previewLanguage": "Limba"
+      "previewLanguage": "Limba",
+      "organizerOnly": "Doar organizatorii acestui eveniment pot cere, citi și publica raportul.",
+      "organizerOnlyExists": "Raportul există. Doar organizatorii acestui eveniment îl pot citi și publica."
     },
     "endEvent": "Încheie evenimentul",
     "endEventConfirmTitle": "Închei evenimentul pentru toți?",
@@ -6012,6 +6034,7 @@
     "captionsTranscriptNotTranslatable": "Această transcriere provine din subtitrările live: traducerea automată necesită o transcriere AI a înregistrării.",
     "sameLanguage": "Limba aleasă este cea originală a înregistrării: alege alta.",
     "recordingDestinationNotCovered": "Consimțămintele acestui eveniment sunt valabile pentru o înregistrare rezervată înscrișilor: nu o poți face vizibilă pentru toți și nici nu poți lega un videoclip extern.",
-    "mtUnavailable": "Traducerea automată nu este instalată pe această instanță."
+    "mtUnavailable": "Traducerea automată nu este instalată pe această instanță.",
+    "recordingContentOrganizerOnly": "Doar organizatorii acestui eveniment pot deschide, modifica sau publica conținutul înregistrărilor sale."
   }
 }

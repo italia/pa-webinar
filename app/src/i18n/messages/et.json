@@ -780,7 +780,8 @@
     "accessDenied": {
       "title": "See jaotis pole teie rolli jaoks saadaval",
       "body": "Korraldajana haldate oma üritusi: nende loomist ja avaldamist, materjale, küsimustikke ja järeltöötlust. Platvormi seaded ja kõigi ürituste andmed jäävad administraatorile.",
-      "back": "Mine oma üritustele"
+      "back": "Mine oma üritustele",
+      "organizerOnly": "Seda üritust saavad muuta ainult selle korraldajad. Administraatorina näete selle olekut ja üksikasju ning saate selle arhiveerida või kustutada. Salvestised ja nende sisu kuuluvad korraldajatele ja osalejatele."
     },
     "staffLogin": {
       "title": "Logi haldusalasse",
@@ -1655,7 +1656,8 @@
       "detailFilename": "Failinimi",
       "transcriptManage": "Halda transkriptsiooni / AI-d",
       "transcriptReady": "Transkribeeritud",
-      "transcriptProcessing": "Töötlemisel"
+      "transcriptProcessing": "Töötlemisel",
+      "organizerOnly": "Ainult korraldajatele"
     },
     "gdprAudit": {
       "subtitle": "Privaatsustegevuste logi isikuandmetel: kustutamised, nõusolekud, ekspordid",
@@ -1670,7 +1672,8 @@
         "DATA_DELETED": "Andmed kustutatud",
         "CONSENT_RECORDED": "Nõusolek registreeritud",
         "DATA_EXPORTED": "Andmed eksporditud",
-        "CONSENT_WITHDRAWN": "Nõusolek tagasi võetud"
+        "CONSENT_WITHDRAWN": "Nõusolek tagasi võetud",
+        "RECORDING_CONTENT_READ": "Töötajate loetud salvestise sisu"
       },
       "recordsAffected": "{count} kirjet mõjutatud",
       "colWhen": "Millal",
@@ -1696,7 +1699,8 @@
       "rotating": "Genereerin…",
       "regenerateTitle": "Taasgenereeri moderaatori märgend (vana link muutub kehtetuks)",
       "confirmRegenerate": "Kas olete kindel, et soovite märgendi taasgenereerida? Vana link enam ei tööta.",
-      "noResults": "Sündmusi ei leitud."
+      "noResults": "Sündmusi ei leitud.",
+      "organizerOnlyLink": "Link on nähtav ainult ürituse korraldajatele"
     },
     "registrations": {
       "subtitle": "Kõik sündmustele registreerunud isikud — otsi, filtreeri ja ekspordi",
@@ -2128,7 +2132,8 @@
         "DATA_DELETED": "Andmed kustutatud",
         "CONSENT_RECORDED": "Nõusolek registreeritud",
         "DATA_EXPORTED": "Andmed eksporditud",
-        "CONSENT_WITHDRAWN": "Nõusolek tagasi võetud"
+        "CONSENT_WITHDRAWN": "Nõusolek tagasi võetud",
+        "RECORDING_CONTENT_READ": "Töötajate loetud salvestise sisu"
       }
     },
     "settings": {
@@ -3020,7 +3025,20 @@
         "publishNow": "Avalda kohe"
       },
       "editFeatures": "Muuda funktsioone",
-      "editPrivacy": "Muuda privaatsust ja andmeid"
+      "editPrivacy": "Muuda privaatsust ja andmeid",
+      "governance": {
+        "title": "Haldate seda üritust administraatorina",
+        "body": "Te ei ole selle korraldaja: näete olekut, üksikasju, registreerimisi ja nõusolekuid ning saate selle arhiveerida või kustutada. Ürituse juhtimine, moderaatori link ja salvestiste sisu (video, transkriptsioonid, kokkuvõtted) kuuluvad korraldajatele.",
+        "recording": "Salvestise sisu on kättesaadav ainult ürituse korraldajatele ja osalejatele. Siin näete, kas see on olemas, ja selle üksikasju.",
+        "recordingFile": "Salvestis",
+        "present": "Olemas",
+        "absent": "Puudub",
+        "recordingPublished": "Avaldatud",
+        "yes": "Jah",
+        "no": "Ei",
+        "recordingDuration": "Kestus",
+        "recordingSize": "Suurus"
+      }
     },
     "rubrica": {
       "subtitle": "Inimesed, kes on andnud nõusoleku aadressraamatusse lisamiseks (IKÜM art. 6.1.a). Nimi, e-posti aadress ja organisatsioon uuenevad ainult siis, kui inimene märgib lahtri uuesti.",
@@ -3290,7 +3308,8 @@
         "metricsTitle": "Kokkuvõtte mõõdikud (LLM)",
         "chars": "tähemärki",
         "model": "Mudel",
-        "notAvailable": "puudub"
+        "notAvailable": "puudub",
+        "contentHidden": "Kättesaadav ainult ürituse korraldajatele."
       },
       "rel": {
         "title": "AI usaldusväärsus",
@@ -3447,7 +3466,8 @@
         "alignNone": "Joondatavat slaidivahetust pole.",
         "previewTitle": "Eelvaade",
         "previewHelp": "Video koos slaididega nii, nagu publik neid näeb, ülal kirjutatud parandusega."
-      }
+      },
+      "contentOrganizerOnly": "Selle salvestise sisu (video, rajad, transkriptsioon, kokkuvõte, tõlked) saavad vaadata ja muuta ainult selle ürituse korraldajad. Siin näete selle olekut, töötlustöid ja failide üksikasju."
     },
     "questionnairesPage": {
       "subtitle": "Korduvkasutatavad küsimuste mallid eelregistreerimise ja sündmusejärgsete küsimustike jaoks."
@@ -3739,7 +3759,9 @@
       "publishDesc": "Vaadake see enne avaldamist üle: teksti on kirjutanud tehisintellekti mudel. Uuesti koostatud ülevaade tuleb uuesti avaldada.",
       "preview": "Eelvaade",
       "hidePreview": "Peida eelvaade",
-      "previewLanguage": "Keel"
+      "previewLanguage": "Keel",
+      "organizerOnly": "Ülevaadet saavad tellida, lugeda ja avaldada ainult selle ürituse korraldajad.",
+      "organizerOnlyExists": "Ülevaade on olemas. Lugeda ja avaldada saavad seda ainult selle ürituse korraldajad."
     },
     "endEvent": "Lõpeta üritus",
     "endEventConfirmTitle": "Kas lõpetada üritus kõigile?",
@@ -6012,6 +6034,7 @@
     "captionsTranscriptNotTranslatable": "See transkriptsioon pärineb otsesubtiitritest: automaattõlge vajab salvestise tehisintellekti transkriptsiooni.",
     "sameLanguage": "Valitud keel on salvestuse algkeel: vali mõni muu.",
     "recordingDestinationNotCovered": "Selle ürituse nõusolekud kehtivad salvestisele, mis on ainult registreerunutele: sa ei saa seda kõigile nähtavaks teha ega välist videot linkida.",
-    "mtUnavailable": "Masintõlge ei ole selles eksemplaris paigaldatud."
+    "mtUnavailable": "Masintõlge ei ole selles eksemplaris paigaldatud.",
+    "recordingContentOrganizerOnly": "Selle ürituse salvestiste sisu saavad avada, muuta või avaldada ainult selle korraldajad."
   }
 }

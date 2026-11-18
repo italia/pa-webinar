@@ -147,14 +147,25 @@ export async function requireEventManager(
  */
 export function eventScope(session: StaffSession): Prisma.EventWhereInput {
   if (session.role === 'admin') return {};
+  return ambitoOrganizzatore(session.accountId, session.emailHash);
+}
+
+/**
+ * Gli eventi di cui un account dello staff e' organizzatore, qualunque sia il
+ * suo ruolo: quelli che ha creato e quelli in cui il suo indirizzo ha una
+ * concessione da organizzatore ancora valida. E' la regola di `eventScope`
+ * senza la scorciatoia dell'admin: la usa anche l'accesso al contenuto delle
+ * registrazioni (lib/recording/content-access), che all'admin non la concede.
+ */
+export function ambitoOrganizzatore(accountId: string, emailHash: string): Prisma.EventWhereInput {
   return {
     AND: [
       {
         OR: [
-          { createdById: session.accountId },
+          { createdById: accountId },
           {
             additionalMods: {
-              some: { organizer: true, revokedAt: null, emailHash: session.emailHash },
+              some: { organizer: true, revokedAt: null, emailHash },
             },
           },
         ],

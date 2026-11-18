@@ -23,7 +23,13 @@ vi.mock('next/headers', () => ({
     get: (name: string) => (cookieJar.has(name) ? { name, value: cookieJar.get(name)! } : undefined),
   }),
 }));
-vi.mock('@/lib/auth/staff-session', () => ({ isEventManager: mockManager }));
+// Lo staff che vede il contenuto: chi organizza l'evento (lib/recording/content-access).
+const tracciate = vi.hoisted(() => vi.fn());
+vi.mock('@/lib/recording/content-access', () => ({
+  contenutoStaffDellaRichiesta: async () =>
+    (await mockManager()) ? { session: { role: 'organizer', accountId: 'a' }, via: 'organizzatore' } : null,
+  tracciaLetturaContenuto: tracciate,
+}));
 vi.mock('@/lib/auth/app-secret', () => ({ tryGetAppSecret: () => 'segreto-di-prova-abbastanza-lungo-per-hmac' }));
 
 import { issueViewingToken, viewingCookieName } from '@/lib/recording/viewing';
@@ -50,10 +56,19 @@ describe('assertPostprodAccessible', () => {
     cookieJar.clear();
   });
 
-  it('lo staff che gestisce l\'evento vede tutto anche prima della pubblicazione', async () => {
+  it('lo staff che organizza l\'evento vede tutto anche prima della pubblicazione, e la lettura si traccia', async () => {
     mockEvent.mockResolvedValue({ ...base });
     mockManager.mockResolvedValue(true);
-    await expect(assertPostprodAccessible('s')).resolves.toMatchObject({ ambito: 'tutto' });
+    await expect(assertPostprodAccessible('s', 'sintesi')).resolves.toMatchObject({ ambito: 'tutto' });
+    expect(tracciate).toHaveBeenCalledWith(
+      expect.objectContaining({ eventId: 'ev-1', superficie: 'sintesi', via: 'organizzatore' })
+    );
+  });
+
+  it('chi non organizza (l\'admin dell\'istanza) non vede una registrazione non pubblicata', async () => {
+    mockEvent.mockResolvedValue({ ...base });
+    await expect(assertPostprodAccessible('s')).rejects.toMatchObject({ statusCode: 404 });
+    expect(tracciate).not.toHaveBeenCalled();
   });
 
   it('riservata agli iscritti: chiusa a chi non prova l\'iscrizione', async () => {

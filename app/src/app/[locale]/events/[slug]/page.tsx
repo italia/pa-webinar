@@ -30,6 +30,7 @@ import { isEventManager } from '@/lib/auth/staff-session';
 import {
   accessoRegistrazione,
   apertaAgliIscritti,
+  videoDellApp,
   visioneRegistrazione,
 } from '@/lib/recording/audience';
 import {
@@ -556,7 +557,8 @@ export default async function EventDetailPage({
     maxParticipants: event.maxParticipants,
     registrationCount: event._count.registrations,
     status: event.status,
-    recordingUrl: visione.video ? event.recordingUrl : null,
+    // La rotta dell'app, mai l'indirizzo dello storage (lib/recording/audience).
+    recordingUrl: visione.video && event.recordingUrl ? videoDellApp(event.slug) : null,
     transcriptPublished: visione.registrazione && event.transcriptPublished,
     unrecordedSpeech: visione.video && event.unrecordedSpeech,
     // Il video su YouTube e' fuori dalla piattaforma: il link segue il video.

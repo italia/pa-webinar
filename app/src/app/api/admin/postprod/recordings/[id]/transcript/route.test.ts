@@ -15,6 +15,8 @@ vi.mock('next/headers', () => ({
 vi.mock('@/lib/auth/staff-session', () => ({
   requireRecordingManager: vi.fn(async () => ({ role: 'admin' })),
 }));
+// L'accesso al contenuto segue la guardia qui sopra (test/contenuto-come-gestore).
+vi.mock('@/lib/recording/content-access', () => import('@/test/contenuto-come-gestore'));
 vi.mock('@/lib/audit/admin-audit', () => ({ logAdminAction: vi.fn() }));
 vi.mock('@/lib/crypto/pii', () => ({
   encryptPII: (s: string) => s,

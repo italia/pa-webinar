@@ -6,6 +6,7 @@ import { notFound, redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
 import { getStaffSession, puoGestire } from '@/lib/auth/staff-session';
+import { organizzaEvento } from '@/lib/recording/content-access';
 import AccessDenied from '@/components/admin/access-denied';
 import { localizedPath } from '@/lib/utils/localized-url';
 import { eventAdminPath } from '@/lib/events/admin-links';
@@ -155,12 +156,19 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
   // nell'indirizzo si toglie; chi ha solo il link del moderatore entra col token.
   const session = await getStaffSession(await cookies());
   const staffCanManage = session ? await puoGestire(session, id) : false;
-  if (token && staffCanManage) {
+  // Il token si toglie solo a chi organizza l'evento: l'admin che non lo
+  // organizza modifica con il link di conduzione, e senza resterebbe fuori.
+  const staffOrganizza = session ? await organizzaEvento(session, id) : false;
+  if (token && staffOrganizza) {
     redirect(localizedPath(eventAdminPath(id, { edit: true, step: initialStep, section: initialSection }), locale));
   }
   if (!token) {
     if (!session) notFound();
     if (!staffCanManage) return <AccessDenied />;
+    // La modifica si salva con il link di conduzione, che apre anche la
+    // pubblicazione e la cancellazione del video: e' di chi organizza
+    // l'evento, non dell'admin che non lo organizza (lib/recording/content-access).
+    if (!staffOrganizza) return <AccessDenied motivo="organizzatore" />;
   }
 
   const [event, siteSettings, tags, gdprTemplates, ultimaTraduzione] = await Promise.all([

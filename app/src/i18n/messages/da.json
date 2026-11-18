@@ -780,7 +780,8 @@
     "accessDenied": {
       "title": "Denne sektion er ikke tilgængelig for din rolle",
       "body": "Som arrangør administrerer du dine egne arrangementer: oprettelse, udgivelse, materialer, spørgeskemaer og efterbehandling. Platformens indstillinger og data for alle arrangementer forbliver hos administrationen.",
-      "back": "Gå til dine arrangementer"
+      "back": "Gå til dine arrangementer",
+      "organizerOnly": "Kun arrangørerne af dette arrangement kan redigere det. Som administrator ser du dets status og detaljer og kan arkivere eller slette det. Optagelserne og deres indhold tilhører arrangørerne og deltagerne."
     },
     "staffLogin": {
       "title": "Log ind i administrationen",
@@ -1655,7 +1656,8 @@
       "detailFilename": "Filnavn",
       "transcriptManage": "Administrér transskription / AI",
       "transcriptReady": "Transskriberet",
-      "transcriptProcessing": "Behandles"
+      "transcriptProcessing": "Behandles",
+      "organizerOnly": "Kun arrangører"
     },
     "gdprAudit": {
       "subtitle": "Logbog over privatlivshandlinger på personoplysninger: sletninger, samtykker, eksport",
@@ -1670,7 +1672,8 @@
         "DATA_DELETED": "Data slettet",
         "CONSENT_RECORDED": "Samtykke registreret",
         "DATA_EXPORTED": "Data eksporteret",
-        "CONSENT_WITHDRAWN": "Samtykke trukket tilbage"
+        "CONSENT_WITHDRAWN": "Samtykke trukket tilbage",
+        "RECORDING_CONTENT_READ": "Optagelsens indhold læst af personale"
       },
       "recordsAffected": "{count} berørte poster",
       "colWhen": "Hvornår",
@@ -1696,7 +1699,8 @@
       "rotating": "Regenererer…",
       "regenerateTitle": "Regenerér moderator-token (det gamle link bliver ugyldigt)",
       "confirmRegenerate": "Er du sikker på, at du vil regenerere tokenet? Det gamle link vil ikke længere virke.",
-      "noResults": "Ingen arrangementer fundet."
+      "noResults": "Ingen arrangementer fundet.",
+      "organizerOnlyLink": "Linket er kun synligt for arrangementets arrangører"
     },
     "registrations": {
       "subtitle": "Alle personer, der er tilmeldt arrangementer — søg, filtrér og eksportér",
@@ -2128,7 +2132,8 @@
         "DATA_DELETED": "Data slettet",
         "CONSENT_RECORDED": "Samtykke registreret",
         "DATA_EXPORTED": "Data eksporteret",
-        "CONSENT_WITHDRAWN": "Samtykke trukket tilbage"
+        "CONSENT_WITHDRAWN": "Samtykke trukket tilbage",
+        "RECORDING_CONTENT_READ": "Optagelsens indhold læst af personale"
       }
     },
     "settings": {
@@ -3020,7 +3025,20 @@
         "publishNow": "Offentliggør nu"
       },
       "editFeatures": "Redigér funktioner",
-      "editPrivacy": "Redigér privatliv og data"
+      "editPrivacy": "Redigér privatliv og data",
+      "governance": {
+        "title": "Du administrerer dette arrangement som administrator",
+        "body": "Du er ikke en af dets arrangører: du ser status, detaljer, tilmeldinger og samtykker og kan arkivere eller slette det. At lede arrangementet, moderatorlinket og indholdet af optagelserne (video, transskriptioner, resuméer) er arrangørernes opgave.",
+        "recording": "Indholdet af optagelsen er kun tilgængeligt for arrangementets arrangører og deltagere. Her ser du, om den findes, og dens detaljer.",
+        "recordingFile": "Optagelse",
+        "present": "Findes",
+        "absent": "Ingen",
+        "recordingPublished": "Udgivet",
+        "yes": "Ja",
+        "no": "Nej",
+        "recordingDuration": "Varighed",
+        "recordingSize": "Størrelse"
+      }
     },
     "rubrica": {
       "subtitle": "Personer, der har givet samtykke til at blive optaget i adressebogen (GDPR art. 6.1.a). Navn, e-mailadresse og organisation opdateres kun, når personen sætter kryds i feltet igen.",
@@ -3290,7 +3308,8 @@
         "metricsTitle": "Målinger for resuméet (LLM)",
         "chars": "tegn",
         "model": "Model",
-        "notAvailable": "n/a"
+        "notAvailable": "n/a",
+        "contentHidden": "Kun tilgængeligt for arrangementets arrangører."
       },
       "rel": {
         "title": "AI-pålidelighed",
@@ -3447,7 +3466,8 @@
         "alignNone": "Intet slideskift at justere.",
         "previewTitle": "Forhåndsvisning",
         "previewHelp": "Videoen med slides, som publikum vil se dem, med den korrektion, der er angivet ovenfor."
-      }
+      },
+      "contentOrganizerOnly": "Kun arrangørerne af dette arrangement kan se og redigere indholdet af denne optagelse (video, spor, transskription, resumé, oversættelser). Her ser du dens status, behandlingsjobbene og filernes detaljer."
     },
     "questionnairesPage": {
       "subtitle": "Genbrugelige skabeloner til spørgsmål til før-tilmelding og efter-arrangement-spørgeskemaer."
@@ -3739,7 +3759,9 @@
       "publishDesc": "Gennemlæs det før offentliggørelse: teksten er skrevet af en AI-model. Et nyoprettet referat skal offentliggøres igen.",
       "preview": "Forhåndsvisning",
       "hidePreview": "Skjul forhåndsvisning",
-      "previewLanguage": "Sprog"
+      "previewLanguage": "Sprog",
+      "organizerOnly": "Kun arrangørerne af dette arrangement kan bestille, læse og udgive referatet.",
+      "organizerOnlyExists": "Referatet findes. Kun arrangørerne af dette arrangement kan læse og udgive det."
     },
     "endEvent": "Afslut arrangement",
     "endEventConfirmTitle": "Afslut arrangementet for alle?",
@@ -6012,6 +6034,7 @@
     "captionsTranscriptNotTranslatable": "Denne transskription kommer fra liveundertekster: automatisk oversættelse kræver en AI-transskription af optagelsen.",
     "sameLanguage": "Det valgte sprog er optagelsens originalsprog: vælg et andet.",
     "recordingDestinationNotCovered": "Samtykkerne til dette arrangement gælder en optagelse kun for tilmeldte: du kan ikke gøre den synlig for alle eller tilknytte en ekstern video.",
-    "mtUnavailable": "Maskinoversættelse er ikke installeret på denne instans."
+    "mtUnavailable": "Maskinoversættelse er ikke installeret på denne instans.",
+    "recordingContentOrganizerOnly": "Kun arrangørerne af dette arrangement kan åbne, ændre eller udgive indholdet af dets optagelser."
   }
 }

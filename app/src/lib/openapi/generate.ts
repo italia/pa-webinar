@@ -758,13 +758,33 @@ registry.registerPath({
   description:
     'Redirects to a short-lived signed URL of the video for whoever may see the recording ' +
     '(lib/recording/audience.ts): published inside the post-event window, to anyone or to ' +
-    'registrants only (`recordingAudience`), or the staff who manage the event, also before ' +
-    'publication. A registrant is recognized by the event access cookie or the viewing cookie.',
+    'registrants only (`recordingAudience`); the staff who organize the event, also before ' +
+    'publication, with the read written to the GDPR log (lib/recording/content-access.ts). A ' +
+    'registrant is recognized by the event access cookie or the viewing cookie. Only a file of ' +
+    'this event is signed: a storage address of another event answers 404.',
   request: { params: z.object({ param: z.string() }) },
   responses: {
     302: { description: 'Redirect to recording' },
     403: { description: 'Not published, or reserved to registrants' },
     404: { description: 'No recording' },
+  },
+});
+
+registry.registerPath({
+  method: 'get',
+  path: '/api/events/{param}/sessions/{id}/recording',
+  tags: ['Recording'],
+  summary: 'The recorded file of a call session',
+  description:
+    'For the staff who organize the event (lib/recording/content-access.ts): redirects to a ' +
+    "short-lived signed URL of the session's file and writes the read to the GDPR log. An " +
+    'administrator who does not organize the event gets 403 `RECORDING_CONTENT_ORGANIZER_ONLY`.',
+  request: { params: z.object({ param: z.string(), id: z.string() }) },
+  responses: {
+    302: { description: 'Redirect to the file' },
+    401: { description: 'No staff session' },
+    403: { description: 'Not an organizer of the event' },
+    404: { description: 'No such session or no file' },
   },
 });
 

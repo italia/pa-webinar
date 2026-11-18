@@ -56,6 +56,8 @@ vi.mock('@/lib/auth/staff-seat', () => ({
   staffDietroIlPrimario: vi.fn(async () => null),
 }));
 vi.mock('@/lib/auth/staff-session', () => ({ isEventManager: vi.fn(async () => false) }));
+// Lo staff che gestisce l'evento, qui, lo organizza (test/contenuto-come-gestore).
+vi.mock('@/lib/recording/content-access', () => import('@/test/contenuto-come-gestore'));
 vi.mock('@/lib/events/meta-title', () => ({
   anteprimaEventoPubblico: vi.fn(async () => null),
 }));

@@ -780,7 +780,8 @@
     "accessDenied": {
       "title": "Ez a rész az Ön szerepköre számára nem érhető el",
       "body": "Szervezőként a saját eseményeit kezeli: létrehozás, közzététel, anyagok, kérdőívek és utómunka. A platform beállításai és az összes esemény adatai az adminisztrációnál maradnak.",
-      "back": "Ugrás a saját eseményeihez"
+      "back": "Ugrás a saját eseményeihez",
+      "organizerOnly": "Ezt az eseményt csak a szervezői szerkeszthetik. Adminisztrátorként látja az állapotát és a részleteit, és archiválhatja vagy törölheti. A felvételek és tartalmuk a szervezőké és a résztvevőké."
     },
     "staffLogin": {
       "title": "Belépés az adminisztrációs felületre",
@@ -1655,7 +1656,8 @@
       "detailFilename": "Fájlnév",
       "transcriptManage": "Átirat / AI kezelése",
       "transcriptReady": "Átirat kész",
-      "transcriptProcessing": "Feldolg. alatt"
+      "transcriptProcessing": "Feldolg. alatt",
+      "organizerOnly": "Csak szervezőknek"
     },
     "gdprAudit": {
       "subtitle": "A személyes adatokon végzett adatvédelmi műveletek naplója: törlések, hozzájárulások, exportok",
@@ -1670,7 +1672,8 @@
         "DATA_DELETED": "Adatok törölve",
         "CONSENT_RECORDED": "Hozzájárulás rögzítve",
         "DATA_EXPORTED": "Adatok exportálva",
-        "CONSENT_WITHDRAWN": "Hozzájárulás visszavonva"
+        "CONSENT_WITHDRAWN": "Hozzájárulás visszavonva",
+        "RECORDING_CONTENT_READ": "A felvétel tartalmát a személyzet olvasta"
       },
       "recordsAffected": "{count} érintett rekord",
       "colWhen": "Mikor",
@@ -1696,7 +1699,8 @@
       "rotating": "Újragenerálás…",
       "regenerateTitle": "Moderátori token újragenerálása (a régi hivatkozás érvénytelenné válik)",
       "confirmRegenerate": "Biztosan újragenerálja a tokent? A régi hivatkozás többé nem fog működni.",
-      "noResults": "Nem található esemény."
+      "noResults": "Nem található esemény.",
+      "organizerOnlyLink": "A hivatkozást csak az esemény szervezői látják"
     },
     "registrations": {
       "subtitle": "Az eseményekre regisztrált összes személy — keresés, szűrés és exportálás",
@@ -2128,7 +2132,8 @@
         "DATA_DELETED": "Adatok törölve",
         "CONSENT_RECORDED": "Hozzájárulás rögzítve",
         "DATA_EXPORTED": "Adatok exportálva",
-        "CONSENT_WITHDRAWN": "Hozzájárulás visszavonva"
+        "CONSENT_WITHDRAWN": "Hozzájárulás visszavonva",
+        "RECORDING_CONTENT_READ": "A felvétel tartalmát a személyzet olvasta"
       }
     },
     "settings": {
@@ -3020,7 +3025,20 @@
         "publishNow": "Közzététel most"
       },
       "editFeatures": "Funkciók szerkesztése",
-      "editPrivacy": "Adatvédelem és adatok szerkesztése"
+      "editPrivacy": "Adatvédelem és adatok szerkesztése",
+      "governance": {
+        "title": "Ezt az eseményt adminisztrátorként kezeli",
+        "body": "Ön nem tartozik a szervezői közé: látja az állapotot, a részleteket, a regisztrációkat és a hozzájárulásokat, és archiválhatja vagy törölheti az eseményt. Az esemény levezetése, a moderátori hivatkozás és a felvételek tartalma (videó, átiratok, összefoglalók) a szervezőké.",
+        "recording": "A felvétel tartalma csak az esemény szervezői és résztvevői számára érhető el. Itt látja, hogy létezik-e, és a részleteit.",
+        "recordingFile": "Felvétel",
+        "present": "Van",
+        "absent": "Nincs",
+        "recordingPublished": "Közzétéve",
+        "yes": "Igen",
+        "no": "Nem",
+        "recordingDuration": "Időtartam",
+        "recordingSize": "Méret"
+      }
     },
     "rubrica": {
       "subtitle": "A címjegyzékbe való felvételhez hozzájárulást adó személyek (GDPR 6. cikk (1) bekezdés a) pont). A név, az e-mail cím és a szervezet csak akkor frissül, ha a személy ismét bejelöli a jelölőnégyzetet.",
@@ -3290,7 +3308,8 @@
         "metricsTitle": "Az összefoglaló mutatói (LLM)",
         "chars": "karakter",
         "model": "Modell",
-        "notAvailable": "n. a."
+        "notAvailable": "n. a.",
+        "contentHidden": "Csak az esemény szervezői számára érhető el."
       },
       "rel": {
         "title": "Az AI megbízhatósága",
@@ -3447,7 +3466,8 @@
         "alignNone": "Nincs igazítandó diaváltás.",
         "previewTitle": "Előnézet",
         "previewHelp": "A videó a diákkal úgy, ahogy a közönség látni fogja, a fent megadott javítással."
-      }
+      },
+      "contentOrganizerOnly": "Ennek a felvételnek a tartalmát (videó, sávok, átirat, összefoglaló, fordítások) csak az esemény szervezői láthatják és szerkeszthetik. Itt látja az állapotát, a feldolgozási feladatokat és a fájlok részleteit."
     },
     "questionnairesPage": {
       "subtitle": "Újrafelhasználható kérdéssablonok regisztráció előtti és esemény utáni kérdőívekhez."
@@ -3739,7 +3759,9 @@
       "publishDesc": "Közzététel előtt nézze át: a szöveget mesterségesintelligencia-modell írta. Az újrakészített beszámolót újra közzé kell tenni.",
       "preview": "Előnézet",
       "hidePreview": "Előnézet elrejtése",
-      "previewLanguage": "Nyelv"
+      "previewLanguage": "Nyelv",
+      "organizerOnly": "A beszámolót csak az esemény szervezői kérhetik, olvashatják és tehetik közzé.",
+      "organizerOnlyExists": "A beszámoló elkészült. Csak az esemény szervezői olvashatják és tehetik közzé."
     },
     "endEvent": "Esemény befejezése",
     "endEventConfirmTitle": "Befejezi az eseményt mindenkinek?",
@@ -6012,6 +6034,7 @@
     "captionsTranscriptNotTranslatable": "Ez az átirat az élő feliratokból származik: az automatikus fordításhoz a felvétel MI-átirata szükséges.",
     "sameLanguage": "A választott nyelv a felvétel eredeti nyelve: válasszon másikat.",
     "recordingDestinationNotCovered": "Az esemény hozzájárulásai csak regisztráltaknak szóló felvételre érvényesek: nem teheti mindenki számára láthatóvá, és nem kapcsolhat hozzá külső videót.",
-    "mtUnavailable": "A gépi fordítás nincs telepítve ezen a példányon."
+    "mtUnavailable": "A gépi fordítás nincs telepítve ezen a példányon.",
+    "recordingContentOrganizerOnly": "Az esemény felvételeinek tartalmát csak az esemény szervezői nyithatják meg, módosíthatják vagy tehetik közzé."
   }
 }

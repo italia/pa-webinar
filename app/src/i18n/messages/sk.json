@@ -780,7 +780,8 @@
     "accessDenied": {
       "title": "Táto sekcia nie je pre vašu rolu dostupná",
       "body": "Ako organizátor spravujete svoje vlastné podujatia: ich vytváranie a zverejňovanie, materiály, dotazníky a postprodukciu. Nastavenia platformy a údaje všetkých podujatí zostávajú správe.",
-      "back": "Prejsť na vaše podujatia"
+      "back": "Prejsť na vaše podujatia",
+      "organizerOnly": "Toto podujatie môžu upravovať len jeho organizátori. Ako administrátor vidíte jeho stav a podrobnosti a môžete ho archivovať alebo vymazať. Záznamy a ich obsah patria organizátorom a účastníkom."
     },
     "staffLogin": {
       "title": "Prihlásenie do administrácie",
@@ -1655,7 +1656,8 @@
       "detailFilename": "Názov súboru",
       "transcriptManage": "Spravovať prepis / AI",
       "transcriptReady": "Prepísané",
-      "transcriptProcessing": "Spracúva sa"
+      "transcriptProcessing": "Spracúva sa",
+      "organizerOnly": "Len pre organizátorov"
     },
     "gdprAudit": {
       "subtitle": "Register akcií ochrany súkromia na osobných údajoch: vymazania, súhlasy, exporty",
@@ -1670,7 +1672,8 @@
         "DATA_DELETED": "Údaje vymazané",
         "CONSENT_RECORDED": "Súhlas zaznamenaný",
         "DATA_EXPORTED": "Údaje exportované",
-        "CONSENT_WITHDRAWN": "Súhlas odvolaný"
+        "CONSENT_WITHDRAWN": "Súhlas odvolaný",
+        "RECORDING_CONTENT_READ": "Obsah záznamu prečítaný personálom"
       },
       "recordsAffected": "{count} dotknutých záznamov",
       "colWhen": "Kedy",
@@ -1696,7 +1699,8 @@
       "rotating": "Regeneruje sa…",
       "regenerateTitle": "Regenerovať token moderátora (zruší starý odkaz)",
       "confirmRegenerate": "Naozaj chcete regenerovať token? Starý odkaz prestane fungovať.",
-      "noResults": "Žiadne podujatie nebolo nájdené."
+      "noResults": "Žiadne podujatie nebolo nájdené.",
+      "organizerOnlyLink": "Odkaz vidia len organizátori podujatia"
     },
     "registrations": {
       "subtitle": "Všetky osoby registrované na podujatia — vyhľadávanie, filtrovanie a export",
@@ -2128,7 +2132,8 @@
         "DATA_DELETED": "Údaje zmazané",
         "CONSENT_RECORDED": "Súhlas zaznamenaný",
         "DATA_EXPORTED": "Údaje exportované",
-        "CONSENT_WITHDRAWN": "Súhlas odvolaný"
+        "CONSENT_WITHDRAWN": "Súhlas odvolaný",
+        "RECORDING_CONTENT_READ": "Obsah záznamu prečítaný personálom"
       }
     },
     "settings": {
@@ -3020,7 +3025,20 @@
         "publishNow": "Zverejniť teraz"
       },
       "editFeatures": "Upraviť funkcie",
-      "editPrivacy": "Upraviť súkromie a údaje"
+      "editPrivacy": "Upraviť súkromie a údaje",
+      "governance": {
+        "title": "Toto podujatie spravujete ako administrátor",
+        "body": "Nepatríte medzi jeho organizátorov: vidíte stav, podrobnosti, registrácie a súhlasy a môžete ho archivovať alebo vymazať. Vedenie podujatia, odkaz moderátora a obsah záznamov (video, prepisy, zhrnutia) patria organizátorom.",
+        "recording": "Obsah záznamu je dostupný len organizátorom podujatia a jeho účastníkom. Tu vidíte, či existuje, a jeho podrobnosti.",
+        "recordingFile": "Záznam",
+        "present": "Existuje",
+        "absent": "Žiadny",
+        "recordingPublished": "Zverejnené",
+        "yes": "Áno",
+        "no": "Nie",
+        "recordingDuration": "Trvanie",
+        "recordingSize": "Veľkosť"
+      }
     },
     "rubrica": {
       "subtitle": "Osoby, ktoré dali súhlas so zaradením do adresára (čl. 6.1.a GDPR). Meno, e-mail a organizácia sa aktualizujú iba vtedy, keď osoba políčko znova začiarkne.",
@@ -3290,7 +3308,8 @@
         "metricsTitle": "Metriky zhrnutia (LLM)",
         "chars": "znakov",
         "model": "Model",
-        "notAvailable": "neuv."
+        "notAvailable": "neuv.",
+        "contentHidden": "Dostupné len organizátorom podujatia."
       },
       "rel": {
         "title": "Spoľahlivosť AI",
@@ -3447,7 +3466,8 @@
         "alignNone": "Žiadna zmena snímky na zarovnanie.",
         "previewTitle": "Náhľad",
         "previewHelp": "Video so snímkami tak, ako ich uvidia diváci, s korekciou zadanou vyššie."
-      }
+      },
+      "contentOrganizerOnly": "Obsah tohto záznamu (video, stopy, prepis, zhrnutie, preklady) môžu vidieť a upravovať len organizátori tohto podujatia. Tu vidíte jeho stav, úlohy spracovania a podrobnosti súborov."
     },
     "questionnairesPage": {
       "subtitle": "Opakovane použiteľné šablóny otázok pre predregistračné a po-podujatie dotazníky."
@@ -3739,7 +3759,9 @@
       "publishDesc": "Pred zverejnením ju skontrolujte: text napísal model umelej inteligencie. Znova vytvorenú správu treba znova zverejniť.",
       "preview": "Náhľad",
       "hidePreview": "Skryť náhľad",
-      "previewLanguage": "Jazyk"
+      "previewLanguage": "Jazyk",
+      "organizerOnly": "Správu môžu vyžiadať, čítať a zverejniť len organizátori tohto podujatia.",
+      "organizerOnlyExists": "Správa existuje. Čítať a zverejniť ju môžu len organizátori tohto podujatia."
     },
     "endEvent": "Ukončiť podujatie",
     "endEventConfirmTitle": "Ukončiť podujatie pre všetkých?",
@@ -6012,6 +6034,7 @@
     "captionsTranscriptNotTranslatable": "Tento prepis pochádza zo živých titulkov: automatický preklad vyžaduje AI prepis záznamu.",
     "sameLanguage": "Zvolený jazyk je pôvodný jazyk záznamu: vyberte iný.",
     "recordingDestinationNotCovered": "Súhlasy pre toto podujatie platia pre záznam len pre registrovaných: nemôžete ho sprístupniť všetkým ani pripojiť externé video.",
-    "mtUnavailable": "Strojový preklad nie je na tejto inštancii nainštalovaný."
+    "mtUnavailable": "Strojový preklad nie je na tejto inštancii nainštalovaný.",
+    "recordingContentOrganizerOnly": "Obsah záznamov tohto podujatia môžu otvárať, meniť alebo zverejňovať len jeho organizátori."
   }
 }

@@ -780,7 +780,8 @@
     "accessDenied": {
       "title": "Šis skyrius jūsų vaidmeniui nepasiekiamas",
       "body": "Kaip organizatorius tvarkote savo renginius: jų kūrimą ir skelbimą, medžiagą, klausimynus ir postprodukciją. Platformos nustatymai ir visų renginių duomenys lieka administracijai.",
-      "back": "Eiti į savo renginius"
+      "back": "Eiti į savo renginius",
+      "organizerOnly": "Tik šio renginio organizatoriai gali jį redaguoti. Kaip administratorius matote jo būseną ir išsamią informaciją ir galite jį archyvuoti arba ištrinti. Įrašai ir jų turinys priklauso organizatoriams ir dalyviams."
     },
     "staffLogin": {
       "title": "Prisijungimas prie administravimo srities",
@@ -1655,7 +1656,8 @@
       "detailFilename": "Failo pavadinimas",
       "transcriptManage": "Tvarkyti transkripciją / DI",
       "transcriptReady": "Transkribuota",
-      "transcriptProcessing": "Apdorojama"
+      "transcriptProcessing": "Apdorojama",
+      "organizerOnly": "Tik organizatoriams"
     },
     "gdprAudit": {
       "subtitle": "Privatumo veiksmų su asmens duomenimis registras: pašalinimai, sutikimai, eksportai",
@@ -1670,7 +1672,8 @@
         "DATA_DELETED": "Duomenys pašalinti",
         "CONSENT_RECORDED": "Sutikimas užregistruotas",
         "DATA_EXPORTED": "Duomenys eksportuoti",
-        "CONSENT_WITHDRAWN": "Sutikimas atšauktas"
+        "CONSENT_WITHDRAWN": "Sutikimas atšauktas",
+        "RECORDING_CONTENT_READ": "Įrašo turinį perskaitė darbuotojai"
       },
       "recordsAffected": "{count} susiję įrašai",
       "colWhen": "Kada",
@@ -1696,7 +1699,8 @@
       "rotating": "Generuojama iš naujo…",
       "regenerateTitle": "Iš naujo generuoti moderatoriaus žetoną (sena nuoroda nustos veikti)",
       "confirmRegenerate": "Ar tikrai norite iš naujo generuoti žetoną? Sena nuoroda nustos veikti.",
-      "noResults": "Renginių nerasta."
+      "noResults": "Renginių nerasta.",
+      "organizerOnlyLink": "Nuorodą mato tik renginio organizatoriai"
     },
     "registrations": {
       "subtitle": "Visi renginiuose užsiregistravę asmenys — paieška, filtravimas ir eksportas",
@@ -2128,7 +2132,8 @@
         "DATA_DELETED": "Duomenys ištrinti",
         "CONSENT_RECORDED": "Sutikimas užregistruotas",
         "DATA_EXPORTED": "Duomenys eksportuoti",
-        "CONSENT_WITHDRAWN": "Sutikimas atšauktas"
+        "CONSENT_WITHDRAWN": "Sutikimas atšauktas",
+        "RECORDING_CONTENT_READ": "Įrašo turinį perskaitė darbuotojai"
       }
     },
     "settings": {
@@ -3020,7 +3025,20 @@
         "publishNow": "Skelbti dabar"
       },
       "editFeatures": "Redaguoti funkcijas",
-      "editPrivacy": "Redaguoti privatumą ir duomenis"
+      "editPrivacy": "Redaguoti privatumą ir duomenis",
+      "governance": {
+        "title": "Šį renginį tvarkote kaip administratorius",
+        "body": "Nesate vienas iš jo organizatorių: matote būseną, išsamią informaciją, registracijas ir sutikimus ir galite jį archyvuoti arba ištrinti. Renginio vedimas, moderatoriaus nuoroda ir įrašų turinys (vaizdo įrašas, transkripcijos, santraukos) priklauso organizatoriams.",
+        "recording": "Įrašo turinys prieinamas tik renginio organizatoriams ir dalyviams. Čia matote, ar jis yra, ir išsamią informaciją.",
+        "recordingFile": "Įrašas",
+        "present": "Yra",
+        "absent": "Nėra",
+        "recordingPublished": "Paskelbtas",
+        "yes": "Taip",
+        "no": "Ne",
+        "recordingDuration": "Trukmė",
+        "recordingSize": "Dydis"
+      }
     },
     "rubrica": {
       "subtitle": "Asmenys, davę sutikimą būti įtraukti į adresų knygą (BDAR 6.1.a str.). Vardas, el. paštas ir organizacija atnaujinami tik tada, kai asmuo vėl pažymi langelį.",
@@ -3290,7 +3308,8 @@
         "metricsTitle": "Santraukos rodikliai (LLM)",
         "chars": "simboliai",
         "model": "Modelis",
-        "notAvailable": "n. d."
+        "notAvailable": "n. d.",
+        "contentHidden": "Prieinama tik renginio organizatoriams."
       },
       "rel": {
         "title": "DI patikimumas",
@@ -3447,7 +3466,8 @@
         "alignNone": "Nėra skaidrės keitimo, kurį reikėtų suderinti.",
         "previewTitle": "Peržiūra",
         "previewHelp": "Vaizdo įrašas su skaidrėmis taip, kaip jį matys žiūrovai, su aukščiau įrašyta pataisa."
-      }
+      },
+      "contentOrganizerOnly": "Tik šio renginio organizatoriai gali matyti ir redaguoti šio įrašo turinį (vaizdo įrašą, takelius, transkripciją, santrauką, vertimus). Čia matote jo būseną, apdorojimo užduotis ir failų informaciją."
     },
     "questionnairesPage": {
       "subtitle": "Daugkartinio naudojimo klausimų šablonai išankstinės registracijos ir po renginio pildomiems klausimynams."
@@ -3739,7 +3759,9 @@
       "publishDesc": "Prieš skelbdami ją peržiūrėkite: tekstą parašė dirbtinio intelekto modelis. Iš naujo sukurtą ataskaitą reikia paskelbti iš naujo.",
       "preview": "Peržiūra",
       "hidePreview": "Slėpti peržiūrą",
-      "previewLanguage": "Kalba"
+      "previewLanguage": "Kalba",
+      "organizerOnly": "Tik šio renginio organizatoriai gali užsakyti, skaityti ir skelbti ataskaitą.",
+      "organizerOnlyExists": "Ataskaita yra. Tik šio renginio organizatoriai gali ją skaityti ir skelbti."
     },
     "endEvent": "Baigti renginį",
     "endEventConfirmTitle": "Baigti renginį visiems?",
@@ -6012,6 +6034,7 @@
     "captionsTranscriptNotTranslatable": "Ši transkripcija gauta iš tiesioginių subtitrų: automatiniam vertimui reikia įrašo DI transkripcijos.",
     "sameLanguage": "Pasirinkta kalba yra originali įrašo kalba: pasirinkite kitą.",
     "recordingDestinationNotCovered": "Šio renginio sutikimai galioja įrašui tik užsiregistravusiems: negalite padaryti jo matomo visiems ar susieti išorinio vaizdo įrašo.",
-    "mtUnavailable": "Šioje diegtyje mašininis vertimas neįdiegtas."
+    "mtUnavailable": "Šioje diegtyje mašininis vertimas neįdiegtas.",
+    "recordingContentOrganizerOnly": "Tik šio renginio organizatoriai gali atidaryti, keisti ar skelbti jo įrašų turinį."
   }
 }

@@ -780,7 +780,8 @@
     "accessDenied": {
       "title": "Esta sección no está disponible para tu rol",
       "body": "Como organizador gestionas tus propios eventos: crearlos, publicarlos, los materiales, los cuestionarios y la posproducción. La configuración de la plataforma y los datos de todos los eventos quedan en manos de la administración.",
-      "back": "Ir a tus eventos"
+      "back": "Ir a tus eventos",
+      "organizerOnly": "Solo quienes organizan este evento pueden modificarlo. Como administrador ves su estado y sus detalles, y puedes archivarlo o eliminarlo. Las grabaciones y su contenido pertenecen a quienes lo organizan y a quienes participaron."
     },
     "staffLogin": {
       "title": "Acceder al área de administración",
@@ -1655,7 +1656,8 @@
       "detailFilename": "Nombre del archivo",
       "transcriptManage": "Gestionar la transcripción / IA",
       "transcriptReady": "Transcrito",
-      "transcriptProcessing": "En proc."
+      "transcriptProcessing": "En proc.",
+      "organizerOnly": "Solo para quienes organizan"
     },
     "gdprAudit": {
       "subtitle": "Registro de las acciones de privacidad sobre datos personales: eliminaciones, consentimientos, exportaciones",
@@ -1670,7 +1672,8 @@
         "DATA_DELETED": "Datos eliminados",
         "CONSENT_RECORDED": "Consentimiento registrado",
         "DATA_EXPORTED": "Datos exportados",
-        "CONSENT_WITHDRAWN": "Consentimiento retirado"
+        "CONSENT_WITHDRAWN": "Consentimiento retirado",
+        "RECORDING_CONTENT_READ": "Contenido de la grabación leído por el personal"
       },
       "recordsAffected": "{count} registros afectados",
       "colWhen": "Cuándo",
@@ -1696,7 +1699,8 @@
       "rotating": "Regenerando…",
       "regenerateTitle": "Regenerar el token de moderador (invalida el enlace antiguo)",
       "confirmRegenerate": "¿Está seguro de que desea regenerar el token? El enlace antiguo dejará de funcionar.",
-      "noResults": "No se ha encontrado ningún evento."
+      "noResults": "No se ha encontrado ningún evento.",
+      "organizerOnlyLink": "Enlace visible solo para quienes organizan el evento"
     },
     "registrations": {
       "subtitle": "Todas las personas inscritas a los eventos: busque, filtre y exporte",
@@ -2128,7 +2132,8 @@
         "DATA_DELETED": "Datos eliminados",
         "CONSENT_RECORDED": "Consentimiento registrado",
         "DATA_EXPORTED": "Datos exportados",
-        "CONSENT_WITHDRAWN": "Consentimiento retirado"
+        "CONSENT_WITHDRAWN": "Consentimiento retirado",
+        "RECORDING_CONTENT_READ": "Contenido de la grabación leído por el personal"
       }
     },
     "settings": {
@@ -3020,7 +3025,20 @@
         "publishNow": "Publicar ahora"
       },
       "editFeatures": "Editar funciones",
-      "editPrivacy": "Editar privacidad y datos"
+      "editPrivacy": "Editar privacidad y datos",
+      "governance": {
+        "title": "Gestionas este evento como administrador",
+        "body": "No estás entre quienes lo organizan: ves el estado, los detalles, las inscripciones y los consentimientos, y puedes archivarlo o eliminarlo. Conducir el evento, el enlace del moderador y el contenido de las grabaciones (vídeo, transcripciones, resúmenes) corresponden a quienes lo organizan.",
+        "recording": "El contenido de la grabación solo está disponible para quienes organizan el evento y para quienes participaron. Aquí ves si existe y sus detalles.",
+        "recordingFile": "Grabación",
+        "present": "Disponible",
+        "absent": "Ninguna",
+        "recordingPublished": "Publicada",
+        "yes": "Sí",
+        "no": "No",
+        "recordingDuration": "Duración",
+        "recordingSize": "Tamaño"
+      }
     },
     "rubrica": {
       "subtitle": "Personas que han dado consentimiento para ser incluidas en la agenda (art. 6.1.a RGPD). El nombre, el correo electrónico y la organización solo se actualizan cuando la persona vuelve a marcar la casilla.",
@@ -3290,7 +3308,8 @@
         "metricsTitle": "Métricas del resumen (LLM)",
         "chars": "caracteres",
         "model": "Modelo",
-        "notAvailable": "n/d"
+        "notAvailable": "n/d",
+        "contentHidden": "Disponible solo para quienes organizan el evento."
       },
       "rel": {
         "title": "Fiabilidad de la IA",
@@ -3447,7 +3466,8 @@
         "alignNone": "No hay ningún cambio de diapositiva que alinear.",
         "previewTitle": "Vista previa",
         "previewHelp": "El vídeo con las diapositivas tal como las verá el público, con la corrección indicada arriba."
-      }
+      },
+      "contentOrganizerOnly": "Solo quienes organizan este evento pueden ver y modificar el contenido de esta grabación (vídeo, pistas, transcripción, resumen, traducciones). Aquí ves su estado, los procesos y los detalles de los archivos."
     },
     "questionnairesPage": {
       "subtitle": "Plantillas reutilizables de preguntas para los cuestionarios de pre-registro y posevento."
@@ -3739,7 +3759,9 @@
       "publishDesc": "Revísalo antes de publicarlo: el texto lo escribe un modelo de inteligencia artificial. Un informe regenerado debe publicarse de nuevo.",
       "preview": "Vista previa",
       "hidePreview": "Ocultar la vista previa",
-      "previewLanguage": "Idioma"
+      "previewLanguage": "Idioma",
+      "organizerOnly": "Solo quienes organizan este evento pueden solicitar, leer y publicar el informe.",
+      "organizerOnlyExists": "El informe existe. Solo quienes organizan este evento pueden leerlo y publicarlo."
     },
     "endEvent": "Finalizar evento",
     "endEventConfirmTitle": "¿Finalizar el evento para todos?",
@@ -6012,6 +6034,7 @@
     "captionsTranscriptNotTranslatable": "Esta transcripción procede de los subtítulos en directo: la traducción automática necesita una transcripción con IA de la grabación.",
     "sameLanguage": "El idioma elegido es el original de la grabación: elige otro.",
     "recordingDestinationNotCovered": "Los consentimientos de este evento valen para una grabación reservada a los inscritos: no puedes hacerla visible para todos ni vincular un vídeo externo.",
-    "mtUnavailable": "La traducción automática no está instalada en esta instancia."
+    "mtUnavailable": "La traducción automática no está instalada en esta instancia.",
+    "recordingContentOrganizerOnly": "Solo quienes organizan este evento pueden abrir, modificar o publicar el contenido de sus grabaciones."
   }
 }

@@ -15,7 +15,8 @@
  *   PUT — aggiorna md e/o structured per una lingua: riscrive l'inlineBody
  *         cifrato + content_hash + size dell'artifact giusto. Audit log.
  *
- * Auth: sessione admin.
+ * Auth: solo chi organizza l'evento (lib/recording/content-access); la
+ * lettura si traccia nel registro GDPR dell'evento.
  */
 
 import { z } from 'zod';
@@ -23,7 +24,7 @@ import { cookies } from 'next/headers';
 
 import { conservaOriginali } from '@/lib/ai/original-body';
 import { parseJsonBody, withErrorHandling } from '@/lib/api-handler';
-import { requireRecordingManager } from '@/lib/auth/staff-session';
+import { requireRecordingContent, tracciaLetturaContenuto } from '@/lib/recording/content-access';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { AppError, NotFoundError } from '@/lib/errors';
@@ -60,8 +61,10 @@ async function loadRecording(id: string) {
 
 export const GET = withErrorHandling(async (_request, context) => {
   const { id } = await (context as { params: Promise<{ id: string }> }).params;
-  // Dell'evento della registrazione: l'admin o chi l'ha creato (ADR-014).
-  await requireRecordingManager(await cookies(), id);
+  // Il contenuto e' di chi organizza l'evento, non dell'admin che non lo
+  // organizza (lib/recording/content-access); la lettura si traccia.
+  const accesso = await requireRecordingContent(await cookies(), id, 'sintesi');
+  await tracciaLetturaContenuto({ ...accesso, recordingId: id, superficie: 'sintesi' });
 
   const recording = await loadRecording(id);
   if (!recording) throw new NotFoundError('Recording');
@@ -122,8 +125,9 @@ const bodySchema = z
 
 export const PUT = withErrorHandling(async (request, context) => {
   const { id } = await (context as { params: Promise<{ id: string }> }).params;
-  // Dell'evento della registrazione: l'admin o chi l'ha creato (ADR-014).
-  await requireRecordingManager(await cookies(), id);
+  // Il contenuto e' di chi organizza l'evento, non dell'admin che non lo
+  // organizza (lib/recording/content-access).
+  await requireRecordingContent(await cookies(), id, 'sintesi');
   const body = bodySchema.parse(await parseJsonBody(request));
 
   const recording = await loadRecording(id);

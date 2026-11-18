@@ -65,8 +65,8 @@ import {
   recuperoAperto,
   type Destinazione,
 } from '@/lib/recording/destination';
-import { videoPerTutti } from '@/lib/recording/audience';
-import { assertVideoNelloStorage } from '@/lib/storage/recordings';
+import { videoDellApp, videoPerTutti } from '@/lib/recording/audience';
+import { assertVideoDellEvento, assertVideoNelloStorage } from '@/lib/storage/recordings';
 import { annullaEmailInCoda } from '@/lib/email/outbox';
 
 export const dynamic = 'force-dynamic';
@@ -133,7 +133,9 @@ export const GET = withErrorHandling(async (request, context) => {
       participantsCanStartVideo: event.participantsCanStartVideo,
       participantsCanShareScreen: event.participantsCanShareScreen,
       status: event.status,
-      recordingUrl: event.recordingUrl,
+      // La rotta dell'app, che firma il file per chi lo puo' vedere, mai
+      // l'indirizzo dello storage (lib/recording/audience).
+      recordingUrl: event.recordingUrl ? videoDellApp(event.slug) : null,
       tempRecordingUrl: event.tempRecordingUrl,
       tempRecordingStartedAt: event.tempRecordingStartedAt?.toISOString() ?? null,
       recordingPublished: event.recordingPublished,
@@ -443,6 +445,11 @@ export const PUT = withErrorHandling(async (request, context) => {
     event.recordingAudience,
   );
   assertVideoNelloStorage(destinazioneDopo, event.recordingUrl, data.recordingUrl);
+  // Un file del nostro storage si aggancia solo se e' di questo evento: l'app
+  // firma l'indirizzo per chi vede il video (lib/storage/recordings).
+  if (data.recordingUrl && data.recordingUrl !== event.recordingUrl) {
+    await assertVideoDellEvento(eventId, data.recordingUrl);
+  }
   assertEsposizioneConsentita(event, {
     recordingDestination: destinazioneDopo,
     recordingAudience: pubblicoDopo,

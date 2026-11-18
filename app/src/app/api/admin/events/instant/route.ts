@@ -15,6 +15,8 @@ import type { Prisma, EventStatus } from '@prisma/client';
 
 import { withErrorHandling } from '@/lib/api-handler';
 import { eventScope, requireStaff } from '@/lib/auth/staff-session';
+import { videoDellApp } from '@/lib/recording/audience';
+import { eventiOrganizzati } from '@/lib/recording/content-access';
 import { prisma } from '@/lib/db';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
@@ -108,6 +110,9 @@ export const GET = withErrorHandling(async (request) => {
     }),
   ]);
 
+  // Il link di conduzione e il video solo a chi organizza la chiamata, non
+  // all'admin che non la organizza (lib/recording/content-access).
+  const organizzati = await eventiOrganizzati(session, rows.map((c) => c.id));
   const serialised = rows.map((c) => ({
     id: c.id,
     slug: c.slug,
@@ -117,9 +122,10 @@ export const GET = withErrorHandling(async (request) => {
     lastActiveAt: c.lastActiveAt?.toISOString() ?? null,
     endsAt: c.endsAt.toISOString(),
     moderatorName: c.moderatorName,
-    moderatorToken: c.moderatorToken,
+    moderatorToken: organizzati.has(c.id) ? c.moderatorToken : null,
     peakParticipants: c.peakParticipants,
-    recordingUrl: c.recordingUrl,
+    hasRecording: !!c.recordingUrl,
+    recordingUrl: c.recordingUrl && organizzati.has(c.id) ? videoDellApp(c.slug) : null,
     recordingDuration: c.recordingDuration,
     recordingFileSize: c.recordingFileSize?.toString() ?? null,
     callSessionsCount: c._count.callSessions,

@@ -4,10 +4,10 @@
 import type { EventStatus, RecordingAudience } from '@prisma/client';
 import type { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
 
-import { isEventManager } from '@/lib/auth/staff-session';
 import { prisma } from '@/lib/db';
 import { eventAccessCookieName, verifyEventAccess } from '@/lib/event-session';
 
+import { contenutoStaffDellaRichiesta } from './content-access';
 import { verifyViewingToken, viewingCookieName } from './viewing';
 
 /**
@@ -30,9 +30,11 @@ import { verifyViewingToken, viewingCookieName } from './viewing';
  *    dipende da `postEventPublic`: la pagina puo' restare privata, e chi si e'
  *    iscritto vede comunque il video. La finestra `postEventPublicUntil` vale
  *    lo stesso. Gli eventi senza destinazione seguono la regola qui sopra.
- *  - Lo staff che gestisce l'evento la vede sempre, anche prima della
+ *  - Lo staff che ORGANIZZA l'evento la vede sempre, anche prima della
  *    pubblicazione: e' l'anteprima della pagina pubblica. Le rotte la
  *    servono; la pagina la mostra solo su richiesta (`?anteprima=1`).
+ *    L'admin che non lo organizza no, e la chiave dell'istanza mai
+ *    (lib/recording/content-access): vale `'staff'` solo per chi la vede.
  */
 
 export type AccessoRegistrazione = 'pubblico' | 'iscritto' | 'staff' | null;
@@ -71,16 +73,36 @@ export function pubblicazioneAperta(
  * filtrano per pagina solo gli eventi conclusi, e un file pubblicato prima della
  * fine su una pagina privata qui resta chiuso. Una registrazione riservata passa
  * dalla pagina e dal player, che riconoscono l'iscritto.
+ *
+ * E' la rotta dell'app (`videoDellApp`), mai l'indirizzo dello storage: la rotta
+ * ripete il controllo e firma il file solo per chi lo puo' vedere.
  */
 export function videoPerTutti(
-  event: EventoPerAccesso & { recordingUrl: string | null },
+  event: EventoPerAccesso & { recordingUrl: string | null; slug: string },
   now: Date = new Date()
 ): string | null {
   const perTutti =
     event.recordingPublished &&
     event.recordingAudience === 'PUBLIC' &&
     pubblicazioneAperta(event, now);
-  return perTutti ? event.recordingUrl : null;
+  return perTutti && event.recordingUrl ? videoDellApp(event.slug) : null;
+}
+
+/**
+ * La rotta dell'app che serve il video di un evento (`/api/events/[slug]/recording`):
+ * l'unico indirizzo del video che arriva al browser. L'indirizzo dello storage
+ * resta sul server.
+ */
+export function videoDellApp(slug: string): string {
+  return `/api/events/${slug}/recording`;
+}
+
+/**
+ * La rotta dell'app che serve il file di una sessione della sala
+ * (`/api/events/[slug]/sessions/[id]/recording`), solo a chi organizza l'evento.
+ */
+export function fileDellaSessione(slug: string, sessionId: string): string {
+  return `/api/events/${slug}/sessions/${sessionId}/recording`;
 }
 
 /**
@@ -100,11 +122,30 @@ export async function accessoRegistrazione(
   cookieStore: ReadonlyRequestCookies,
   now: Date = new Date()
 ): Promise<AccessoRegistrazione> {
+  return (await accessoRegistrazioneConStaff(event, cookieStore, now)).accesso;
+}
+
+/**
+ * Come `accessoRegistrazione`, con lo staff che l'ha ottenuto quando vale
+ * `'staff'`: le rotte che servono il contenuto ne tracciano la lettura
+ * (lib/recording/content-access) senza rileggere sessione e organizzatore.
+ */
+export async function accessoRegistrazioneConStaff(
+  event: EventoPerAccesso,
+  cookieStore: ReadonlyRequestCookies,
+  now: Date = new Date()
+): Promise<{
+  accesso: AccessoRegistrazione;
+  staff: Awaited<ReturnType<typeof contenutoStaffDellaRichiesta>>;
+}> {
   const aperta = pubblicazioneAperta(event, now);
-  if (aperta && event.recordingAudience === 'PUBLIC') return 'pubblico';
-  if (await isEventManager(cookieStore, event.id)) return 'staff';
-  if (!aperta) return null;
-  return (await iscrittoDellaRichiesta(event.id, cookieStore)) ? 'iscritto' : null;
+  if (aperta && event.recordingAudience === 'PUBLIC') return { accesso: 'pubblico', staff: null };
+  const staff = await contenutoStaffDellaRichiesta(cookieStore, event.id);
+  if (staff) return { accesso: 'staff', staff };
+  if (aperta && (await iscrittoDellaRichiesta(event.id, cookieStore))) {
+    return { accesso: 'iscritto', staff: null };
+  }
+  return { accesso: null, staff: null };
 }
 
 export interface EventoPerVisione extends EventoPerAccesso {

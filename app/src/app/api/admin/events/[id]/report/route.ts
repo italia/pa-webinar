@@ -13,7 +13,11 @@
  *      feedback.
  * PUT  { published } lo mostra o lo toglie dalla pagina dell'evento.
  *
- * Di chi gestisce l'evento: l'admin, chi l'ha creato o un altro organizzatore.
+ * GET di chi gestisce l'evento: l'admin, chi l'ha creato o un altro
+ * organizzatore; il testo del resoconto solo a chi lo organizza (contenuto,
+ * lib/recording/content-access), con la lettura tracciata: all'admin che non
+ * lo organizza `report` e' null e `reportExists` dice se c'e'. POST e PUT, che
+ * producono o espongono il contenuto, solo a chi organizza l'evento.
  */
 import { cookies } from 'next/headers';
 import { z } from 'zod';
@@ -21,6 +25,11 @@ import { z } from 'zod';
 import { parseJsonBody, withErrorHandling } from '@/lib/api-handler';
 import { languageCodeSchema } from '@/lib/ai/schemas';
 import { requireEventManager } from '@/lib/auth/staff-session';
+import {
+  accessoContenutoStaff,
+  requireEventContent,
+  tracciaLetturaContenuto,
+} from '@/lib/recording/content-access';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { conservazioneFinita, registrazionePubblica } from '@/lib/captions/transcript';
 import { prisma } from '@/lib/db';
@@ -41,12 +50,17 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 async function idEvento(context: { params: Promise<Record<string, string>> }): Promise<string> {
   const { id } = await context.params;
   if (!id || !UUID_RE.test(id)) throw new AppError('Event ID must be a UUID', 400, 'BAD_REQUEST');
-  await requireEventManager(await cookies(), id);
   return id;
 }
 
 export const GET = withErrorHandling(async (_request, context) => {
   const id = await idEvento(context);
+  const session = await requireEventManager(await cookies(), id);
+  const via = await accessoContenutoStaff(session, {
+    eventId: id,
+    recordingId: null,
+    superficie: 'resoconto',
+  });
   const [evento, impostazioni] = await Promise.all([
     prisma.event.findUnique({
       where: { id },
@@ -92,9 +106,15 @@ export const GET = withErrorHandling(async (_request, context) => {
   const inCorso = lavoro && ['PENDING', 'CLAIMED', 'RUNNING'].includes(lavoro.status);
   const lingua = (inCorso && lavoro.sourceLanguage) || (await linguaResoconto(id, prisma, pubblica));
   const scadenza = new Date(evento.endsAt.getTime() + evento.dataRetentionDays * 86_400_000);
+  const resoconto = letturaResoconto(evento.postEventReport);
+  if (via && resoconto) {
+    await tracciaLetturaContenuto({ session, via, eventId: id, recordingId: null, superficie: 'resoconto' });
+  }
 
   return Response.json({
-    report: letturaResoconto(evento.postEventReport),
+    contenuto: via !== null,
+    report: via ? resoconto : null,
+    reportExists: resoconto !== null,
     published: evento.postEventReportPublished,
     job: lavoro,
     requirements: {
@@ -123,6 +143,7 @@ const richiestaSchema = z.object({ targetLanguages: z.array(languageCodeSchema).
 
 export const POST = withErrorHandling(async (request, context) => {
   const id = await idEvento(context);
+  await requireEventContent(await cookies(), id, 'elaborazione');
   const parsed = richiestaSchema.safeParse(await parseJsonBody(request).catch(() => ({})));
   if (!parsed.success) throw new ValidationError('Validation failed');
   const esito = await accodaResoconto(id, {
@@ -155,6 +176,7 @@ const pubblicazioneSchema = z.object({ published: z.boolean() });
 
 export const PUT = withErrorHandling(async (request, context) => {
   const id = await idEvento(context);
+  await requireEventContent(await cookies(), id, 'pubblicazione');
   const parsed = pubblicazioneSchema.safeParse(await parseJsonBody(request));
   if (!parsed.success) throw new ValidationError('Validation failed');
   const evento = await prisma.event.findUnique({ where: { id }, select: { postEventReport: true } });

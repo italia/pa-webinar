@@ -36,6 +36,8 @@ vi.mock('@/lib/auth/app-secret', () => ({
   tryGetAppSecret: () => 'segreto-di-prova-abbastanza-lungo-per-hmac',
 }));
 vi.mock('@/lib/auth/staff-session', () => ({ isEventManager: vi.fn(async () => false) }));
+// Lo staff che gestisce l'evento, qui, lo organizza (test/contenuto-come-gestore).
+vi.mock('@/lib/recording/content-access', () => import('@/test/contenuto-come-gestore'));
 vi.mock('next-intl/server', () => ({
   getLocale: async () => 'it',
 }));
@@ -764,6 +766,8 @@ describe('scheda dell’evento — l’annuncio della registrazione', () => {
 describe('scheda dell’evento — registrazione riservata con la pagina privata', () => {
   const REG_ID = 'reg-1';
   const VIDEO = 'https://storage.example.net/recordings/sala.mp4';
+  // Al browser arriva la rotta dell'app, mai l'indirizzo dello storage.
+  const VIDEO_APP = `/api/events/${SLUG}/recording`;
   const YOUTUBE = 'https://www.youtube.com/watch?v=abc';
   const riservata = (over: Record<string, unknown> = {}) =>
     eventRow({
@@ -789,7 +793,7 @@ describe('scheda dell’evento — registrazione riservata con la pagina privata
     mockedEvent.mockResolvedValue(riservata());
     iscritto();
     const props = await clientProps();
-    expect(eventoDi(props).recordingUrl).toBe(VIDEO);
+    expect(eventoDi(props).recordingUrl).toBe(VIDEO_APP);
     expect(props.recordingForRegistrants).toBe(false);
     expect(props.previewForStaff).toBe(false);
     expect(publicRecordingSlides).toHaveBeenCalled();
@@ -812,7 +816,7 @@ describe('scheda dell’evento — registrazione riservata con la pagina privata
     // Cio' che il browser fa dopo il rimando: torna con il cookie appena posato.
     const [nome, valore] = (risposta.headers.get('Set-Cookie') ?? '').split(';')[0]!.split('=');
     biscotti.set(nome!, valore!);
-    expect(eventoDi(await clientProps()).recordingUrl).toBe(VIDEO);
+    expect(eventoDi(await clientProps()).recordingUrl).toBe(VIDEO_APP);
   });
 
   it('con la sola trascrizione la pagina si apre: il link porta anche lì', async () => {
@@ -863,7 +867,7 @@ describe('scheda dell’evento — registrazione riservata con la pagina privata
     await expect(pagina()).rejects.toThrow('NOT_FOUND');
     const props = await clientProps({ anteprima: '1' });
     expect(props.previewForStaff).toBe(true);
-    expect(eventoDi(props).recordingUrl).toBe(VIDEO);
+    expect(eventoDi(props).recordingUrl).toBe(VIDEO_APP);
   });
 
   it('in anteprima dice se ciò che manca al pubblico è la pagina o la pubblicazione', async () => {
@@ -902,7 +906,7 @@ describe('scheda dell’evento — registrazione riservata con la pagina privata
     const [nome, valore] = (risposta.headers.get('Set-Cookie') ?? '').split(';')[0]!.split('=');
     biscotti.set(nome!, valore!);
     const props = await clientProps({ anteprima: dove.searchParams.get('anteprima') ?? '' });
-    expect(eventoDi(props).recordingUrl).toBe(VIDEO);
+    expect(eventoDi(props).recordingUrl).toBe(VIDEO_APP);
   });
 
   it('con la pagina visibile chi non è iscritto legge che è riservata, senza il video', async () => {

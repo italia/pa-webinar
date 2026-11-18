@@ -14,6 +14,12 @@
  *   hasRecording?    — 'yes' (default) | 'no' | 'any'
  *   format?          — 'json' (default) | 'csv'
  *   limit? / offset? — pagination (default 100, max 500)
+ *
+ * The rows are metadata for whoever manages the event (ADR-014). The link to
+ * play or download a file (`recordingUrl`) is an app route, never the storage
+ * URL, and only for the event organizers (lib/recording/content-access): the
+ * route checks again and writes the read to the event's GDPR audit log. For
+ * the other rows `recordingUrl` is null and `hasFile` says the file exists.
  */
 
 import { cookies } from 'next/headers';
@@ -23,14 +29,10 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { eventScope, requireStaff } from '@/lib/auth/staff-session';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
-import { generateRecordingSasUrl } from '@/lib/storage/recordings';
+import { getPublicEnv } from '@/lib/env';
+import { fileDellaSessione, videoDellApp } from '@/lib/recording/audience';
+import { eventiOrganizzati } from '@/lib/recording/content-access';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
-
-// SAS expiry for inline playback + download links. Long enough that a
-// 300 MB file finishes downloading on a slow connection without the
-// token expiring mid-transfer, short enough that a stale page load
-// doesn't leak long-lived credentials.
-const SAS_EXPIRY_MINUTES = 60;
 
 export const dynamic = 'force-dynamic';
 
@@ -51,7 +53,12 @@ interface RecordingRow {
   endedAt: string | null;
   durationSeconds: number | null;
   peakParticipants: number;
+  /** La rotta dell'app che serve il file, per chi organizza l'evento. */
   recordingUrl: string | null;
+  /** Il file c'e', anche quando chi guarda non lo puo' aprire. */
+  hasFile: boolean;
+  /** Chi guarda organizza l'evento: vede il contenuto. */
+  contenuto: boolean;
   recordingFilename: string | null;
   recordingFileSize: string | null; // BigInt → string
   jitsiRoomName: string | null;
@@ -184,20 +191,14 @@ export const GET = withErrorHandling(async (request) => {
       : Promise.resolve([]),
   ]);
 
-  // Sign each blob URL with a short-lived read-SAS so the admin can
-  // play/download directly from the browser. The storage account has
-  // public access disabled, so the bare URL would 403 with
-  // `PublicAccessNotPermitted`. Signing per-row (instead of a single
-  // endpoint that redirects) lets the browser's video element fetch
-  // ranges for scrubbing.
-  async function signOrNull(url: string | null): Promise<string | null> {
-    if (!url) return null;
-    try {
-      return await generateRecordingSasUrl(url, SAS_EXPIRY_MINUTES);
-    } catch {
-      return url;
-    }
-  }
+  // Il file si apre da una rotta dell'app, che ripete il controllo, traccia
+  // la lettura e rimanda a un indirizzo firmato (il video segue i redirect, e
+  // lo scorrimento chiede gli intervalli direttamente allo storage). Solo per
+  // gli eventi che chi guarda organizza.
+  const organizzati = await eventiOrganizzati(session, [
+    ...sessions.map((s) => s.eventId),
+    ...events.map((e) => e.id),
+  ]);
 
   const rawRows = [
     ...sessions.map((s) => ({
@@ -212,7 +213,12 @@ export const GET = withErrorHandling(async (request) => {
       endedAt: s.endedAt?.toISOString() ?? null,
       durationSeconds: s.duration,
       peakParticipants: s.peakParticipants,
-      recordingUrl: s.recordingUrl,
+      recordingUrl:
+        s.recordingUrl && organizzati.has(s.eventId)
+          ? fileDellaSessione(s.event.slug, s.id)
+          : null,
+      hasFile: !!s.recordingUrl,
+      contenuto: organizzati.has(s.eventId),
       recordingFilename: s.recordingFilename,
       recordingFileSize: s.recordingFileSize?.toString() ?? null,
       jitsiRoomName: s.jitsiRoomName,
@@ -233,7 +239,9 @@ export const GET = withErrorHandling(async (request) => {
       endedAt: e.endsAt.toISOString(),
       durationSeconds: e.recordingDuration,
       peakParticipants: e.peakParticipants,
-      recordingUrl: e.recordingUrl,
+      recordingUrl: e.recordingUrl && organizzati.has(e.id) ? videoDellApp(e.slug) : null,
+      hasFile: !!e.recordingUrl,
+      contenuto: organizzati.has(e.id),
       recordingFilename: null,
       recordingFileSize: e.recordingFileSize?.toString() ?? null,
       jitsiRoomName: e.jitsiRoomName,
@@ -244,17 +252,12 @@ export const GET = withErrorHandling(async (request) => {
     })),
   ];
 
-  const rows: RecordingRow[] = await Promise.all(
-    rawRows.map(async (r) => ({
-      ...r,
-      recordingUrl: await signOrNull(r.recordingUrl),
-    })),
-  );
+  const rows: RecordingRow[] = rawRows;
 
   rows.sort((a, b) => b.startedAt.localeCompare(a.startedAt));
 
   // Aggregate stats on the filtered set
-  const withRecording = rows.filter((r) => r.recordingUrl !== null);
+  const withRecording = rows.filter((r) => r.hasFile);
   const totalBytes = withRecording.reduce(
     (a, r) => a + (r.recordingFileSize ? BigInt(r.recordingFileSize) : 0n),
     0n,
@@ -275,6 +278,7 @@ export const GET = withErrorHandling(async (request) => {
       'recording_url',
     ];
     const lines = [header.join(',')];
+    const appUrl = getPublicEnv('NEXT_PUBLIC_APP_URL').replace(/\/+$/, '');
     for (const r of rows) {
       lines.push([
         r.source,
@@ -286,7 +290,8 @@ export const GET = withErrorHandling(async (request) => {
         r.peakParticipants,
         csvEscape(r.recordingFilename),
         r.recordingFileSize ?? '',
-        csvEscape(r.recordingUrl),
+        // Il link dell'app, che chiede la sessione di chi organizza l'evento.
+        csvEscape(r.recordingUrl ? `${appUrl}${r.recordingUrl}` : null),
       ].join(','));
     }
     return new Response(lines.join('\n'), {

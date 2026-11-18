@@ -27,7 +27,9 @@ import {
   assertEsposizioneConsentita,
   destinazioneDiPartenza,
 } from '@/lib/recording/destination';
-import { assertVideoNelloStorage } from '@/lib/storage/recordings';
+import { videoDellApp } from '@/lib/recording/audience';
+import { requireEventContent } from '@/lib/recording/content-access';
+import { assertVideoDellEvento, assertVideoNelloStorage } from '@/lib/storage/recordings';
 
 export const dynamic = 'force-dynamic';
 
@@ -83,6 +85,7 @@ export const PATCH = withErrorHandling(async (request, context) => {
     select: {
       status: true,
       eventType: true,
+      postEventPublic: true,
       recordingEnabled: true,
       recordingDestination: true,
       recordingAudience: true,
@@ -94,6 +97,21 @@ export const PATCH = withErrorHandling(async (request, context) => {
     },
   });
   if (!prima) throw new NotFoundError('Event');
+
+  // Cambiare il file, pubblicarlo o aprire la pagina dopo l'evento espone il
+  // contenuto: lo decide chi organizza l'evento, non l'admin che non lo
+  // organizza (lib/recording/content-access). Elenco, copertina e YouTube
+  // restano di chi gestisce l'evento.
+  const espone =
+    parsed.data.recordingUrl !== undefined ||
+    (parsed.data.recordingPublished !== undefined &&
+      parsed.data.recordingPublished !== prima.recordingPublished) ||
+    (parsed.data.postEventPublic !== undefined &&
+      parsed.data.postEventPublic !== prima.postEventPublic);
+  if (espone) await requireEventContent(await cookies(), id, 'pubblicazione');
+  // Solo un file di questo evento: un indirizzo del nostro storage che e' di
+  // un altro evento non si aggancia (l'app lo firmerebbe per questo).
+  await assertVideoDellEvento(id, parsed.data.recordingUrl);
 
   // Il caricamento accende la registrazione: un evento che comincia a registrare
   // con questo file parte riservato, come quando la si accende dalla modifica
@@ -188,7 +206,8 @@ export const PATCH = withErrorHandling(async (request, context) => {
     postEventPublic: updated.postEventPublic,
     coverImageUrl: updated.coverImageUrl,
     youtubeUrl: updated.youtubeUrl,
-    recordingUrl: updated.recordingUrl,
+    // La rotta dell'app, non l'indirizzo dello storage (lib/recording/audience).
+    recordingUrl: updated.recordingUrl ? videoDellApp(updated.slug) : null,
     recordingPublished: updated.recordingPublished,
   });
 });

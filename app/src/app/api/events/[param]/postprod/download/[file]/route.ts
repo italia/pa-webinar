@@ -137,7 +137,10 @@ export const GET = withErrorHandling(async (request, context) => {
 
   // Access policy: same as the sibling transcript / subtitle endpoints
   // (kill-switch + recordingPublished + postEventPublic + window).
-  const { eventId, ambito, soloSottotitoli } = await assertPostprodAccessible(slug);
+  const { eventId, ambito, soloSottotitoli } = await assertPostprodAccessible(
+    slug,
+    fmt === 'summary.md' ? 'sintesi' : 'trascrizione',
+  );
   // La sintesi accompagna il video pubblicato, con la pipeline AI accesa.
   if (fmt === 'summary.md' && ambito !== 'tutto') throw new NotFoundError('Summary');
 

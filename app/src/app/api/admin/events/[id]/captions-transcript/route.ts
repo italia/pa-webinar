@@ -18,6 +18,7 @@ import { cookies } from 'next/headers';
 
 import { withErrorHandling } from '@/lib/api-handler';
 import { requireEventManager } from '@/lib/auth/staff-session';
+import { requireEventContent } from '@/lib/recording/content-access';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import {
   CAPTIONS_TRANSCRIPT_MODEL,
@@ -89,7 +90,10 @@ export const GET = withErrorHandling(async (_request, context) => {
 export const POST = withErrorHandling(async (request, context) => {
   const { id } = await context.params;
   if (!UUID_RE.test(id)) throw new AppError('Event ID must be a UUID', 400, 'BAD_REQUEST');
-  await requireEventManager(await cookies(), id);
+  // Scrive la trascrizione dalle frasi dette in sala: contenuto, solo per chi
+  // organizza l'evento (lib/recording/content-access). La GET, che conta e
+  // basta, resta di chi lo gestisce.
+  await requireEventContent(await cookies(), id, 'elaborazione');
 
   const event = await prisma.event.findUnique({ where: { id }, select: { id: true } });
   if (!event) throw new NotFoundError('Event');
