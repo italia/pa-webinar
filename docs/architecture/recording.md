@@ -243,7 +243,8 @@ chart sets `JAVA_TOOL_OPTIONS=-Djibri.api.http.external-api-host=0.0.0.0` on
 the Jibri container (`jitsi-meet.jibri.extraEnvs`): without it the portal's
 probe is refused, Jibri stays "starting" and the room reports the recording
 unavailable once the wait runs out. A values file that sets its own
-`jitsi-meet.jibri.extraEnvs.JAVA_TOOL_OPTIONS` must keep that option. The same
+`jitsi-meet.jibri.extraEnvs.JAVA_TOOL_OPTIONS` must keep that option and the
+call checks described below. The same
 API starts and stops recordings without authentication; with
 `networkPolicy.enabled` the chart admits only the app pods to it (see
 [Network policies](../INFRASTRUCTURE.md#network-policies)).
@@ -268,6 +269,32 @@ Starting sends the IFrame API command `startRecording` with `mode: 'file'`,
 retried a few times with a growing delay while Jibri joins. Stopping sends
 `stopRecording('file')` and disables the button for a short cooldown. Each
 start/stop pair produces its own MP4 and its own webhook.
+
+Jibri also stops a recording by itself, through its call checks. They count
+only the people its session sees, and since only hosts are in the video
+([Only hosts in the video](jitsi-integration.md#per-event-participant-policies))
+that means only hosts. With Jibri's own values a recording would end 30 seconds
+after the last host left, or after 10 minutes in which every host kept the
+microphone and the camera off, even while participants speak. The chart passes
+other values in Jibri's JVM options, from `global.jibri.callStatusChecks`:
+
+| Jibri check | Jibri's value | Chart's value | When it ends the recording |
+|---|---|---|---|
+| `default-call-empty-timeout` (`defaultCallEmptyTimeout`) | 30 s | `5m` | No host has been in the room for 5 minutes: time to come back after a dropped line |
+| `all-muted-timeout` (`allMutedTimeout`) | 10 min | `30d` | Never in practice: every host with microphone and camera off is a normal phase of an event, such as questions from the audience |
+| `no-media-timeout` (`noMediaTimeout`) | 3 min | `30d` | Never in practice. It counts only while some host has the microphone or the camera on and nothing at all arrives |
+
+The voice of a participant counts as incoming media for Jibri even though its
+session never shows that person: a call where only participants speak, with
+every host silent, is never cut. With every host muted Jibri skips the
+no-media check, and otherwise the participant's voice is received data. What
+`no-media-timeout` would catch is a silent pause with no camera on and some
+host's microphone open, when the bridge, which forwards only the loudest
+voices, may send nothing; the chart does not end a recording for that. A
+broken media connection is still caught by Jibri's ICE check
+(`ice-connection-timeout`, 30 seconds), and the recording also ends when a
+moderator stops it or the conference ends. How to change the values:
+[Setting up recording](../operations/recording-setup.md#when-jibri-stops-by-itself).
 
 Jibri capacity comes from the JVB scaler: it asks for one Jibri replica while
 any `LIVE` or `PROVISIONING` event has recording enabled, and zero otherwise

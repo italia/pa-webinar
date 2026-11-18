@@ -13,6 +13,7 @@
 {{- include "pa-webinar.validateCaptions" . }}
 {{- include "pa-webinar.validateMt" . }}
 {{- include "pa-webinar.validateJvbLoudest" . }}
+{{- include "pa-webinar.validateJibriCallChecks" . }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:

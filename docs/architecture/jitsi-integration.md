@@ -422,10 +422,13 @@ recording never ends up with nobody in it; a portal that wants a moderator out o
 
 What follows from it:
 
-- Jibri's own call checks count only the people its session sees. With no host in the room for
-  `jibri.call-status-checks.default-call-empty-timeout` (30 seconds by default) the recording ends, and
-  it ends too when every host has kept microphone and camera off for `all-muted-timeout` (10 minutes by
-  default), even while participants speak.
+- Jibri's own call checks count only the people its session sees, the hosts. With Jibri's values a
+  recording would end 30 seconds after the last host left, or after 10 minutes of hosts with
+  microphone and camera off while participants speak. The chart relaxes them
+  (`global.jibri.callStatusChecks`): the recording ends after 5 minutes with no host in the room, and
+  never because hosts keep microphone and camera off or because nothing arrives during a silent pause.
+  Participants' voices count as incoming media, so a call where only participants speak is not cut
+  ([Starting and stopping](recording.md#starting-and-stopping)).
 - Jibri's session runs without SSRC rewriting, which Jitsi turns on by default for every other client
   (`flags.ssrcRewritingEnabled`, set to `false` by the same script). With it, the session builds screen
   tiles from the presence of every member, hidden ones included, and a participant's screen share put an
