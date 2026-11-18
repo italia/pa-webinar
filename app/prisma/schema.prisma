@@ -149,6 +149,19 @@ model Event {
   // Event type
   eventType EventType @default(SCHEDULED) @map("event_type")
 
+  // Il catalogo dell'evento, per le statistiche dell'istanza
+  // (lib/events/catalog): il modello da cui e' nato e la famiglia del formato.
+  // Le chiamate rapide sono un tipo a se' (eventType INSTANT) e non hanno ne'
+  // l'uno ne' l'altra. Vuoti negli eventi nati prima del catalogo o creati
+  // senza modello e senza formato: «non catalogati», mai indovinati.
+  // `templateName` e' il nome del modello quando l'evento l'ha preso: le
+  // statistiche restano leggibili se il modello cambia nome o si cancella
+  // (SetNull). Chi organizza li corregge nella modifica dell'evento.
+  templateId   String?           @map("template_id") @db.Uuid
+  template     EventTemplate?    @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  templateName String?           @map("template_name")
+  formatClass  EventFormatClass? @map("format_class")
+
   // Status
   status EventStatus @default(DRAFT)
 
@@ -436,6 +449,8 @@ model Event {
   @@index([createdById], map: "events_created_by_id_idx")
   // «Chi usa ancora questa foto»: la pulizia delle foto delle persone.
   @@index([moderatorPhotoId])
+  // «Quanti eventi usano questo modello», e la cancellazione del modello.
+  @@index([templateId], map: "events_template_id_idx")
   @@map("events")
 }
 
@@ -842,6 +857,17 @@ enum EventType {
   // no Jitsi room, no registrations, no live flow — just metadata and
   // a `youtubeUrl` that the library / detail page can embed.
   LEGACY
+}
+
+// La famiglia del formato di un evento (lib/events/guided-format,
+// classeFormato): una riunione fra pochi, un evento partecipativo, un evento
+// pubblico in cui parla chi conduce o su vasta scala.
+enum EventFormatClass {
+  MEETING
+  PARTICIPATORY
+  PUBLIC
+
+  @@map("event_format_class")
 }
 
 enum OrganizationType {
@@ -1420,6 +1446,10 @@ model EventTemplate {
   sortOrder Int      @default(0) @map("sort_order")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Gli eventi nati da questo modello (Event.templateId): cancellare il
+  // modello non li tocca, perdono solo il riferimento.
+  events Event[]
 
   @@map("event_templates")
 }

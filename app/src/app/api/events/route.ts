@@ -9,6 +9,7 @@ import { cookies } from 'next/headers';
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { RateLimitError, ValidationError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
+import { catalogoDiCreazione, MODELLO_PER_CATALOGO } from '@/lib/events/catalog';
 import { tagIdsFromSlugs } from '@/lib/events/event-tags';
 import { usablePersonPhotoId } from '@/lib/events/person-photo-store';
 import { elencoPredefinito } from '@/lib/live/participant-list';
@@ -87,6 +88,22 @@ export const POST = withErrorHandling(async (request) => {
       ]);
     }
   }
+
+  // Il modello da cui l'evento nasce, per il catalogo: come per l'informativa,
+  // un id che non esiste e' un errore sul campo, non un 500. Se ne fotografa il
+  // nome (lib/events/catalog).
+  const modello = data.templateId
+    ? await prisma.eventTemplate.findUnique({
+        where: { id: data.templateId },
+        select: MODELLO_PER_CATALOGO,
+      })
+    : null;
+  if (data.templateId && !modello) {
+    throw new ValidationError('Validation failed', [
+      { path: ['templateId'], message: 'Unknown event template' },
+    ]);
+  }
+  const catalogo = catalogoDiCreazione(modello, data.formatClass);
 
   // If the wizard supplied a permission matrix, keep the boolean toggles
   // in sync so legacy code paths stay correct. Matrix wins when both are
@@ -210,6 +227,9 @@ export const POST = withErrorHandling(async (request) => {
       postEventShowFeedback: data.postEventShowFeedback,
       recurrenceRule: data.recurrenceRule ?? null,
       recurrenceSeriesId: data.recurrenceSeriesId ?? null,
+      templateId: catalogo.templateId,
+      templateName: catalogo.templateName,
+      formatClass: catalogo.formatClass,
       dataRetentionDays: data.dataRetentionDays,
       privacyPolicyUrl: data.privacyPolicyUrl,
       privacyPolicyText: data.privacyPolicyText,

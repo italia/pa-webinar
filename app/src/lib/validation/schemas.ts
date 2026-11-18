@@ -4,6 +4,7 @@
 import { z } from 'zod';
 
 import { CODICE_LINGUA } from '@/lib/ai/target-locales';
+import { CLASSI_FORMATO } from '@/lib/events/catalog';
 import { REMINDER_PRESETS } from '@/lib/events/reminder-presets';
 
 import {
@@ -199,6 +200,13 @@ export const eventBaseSchema = z.object({
   // postprod forza k=N nel clustering della diarization invece di
   // auto-detect via silhouette. Null = lascia decidere al modello.
   expectedSpeakers: z.number().int().min(1).max(30).nullable().optional(),
+
+  // Il catalogo dell'evento, per le statistiche dell'istanza
+  // (lib/events/catalog): il modello da cui nasce e la famiglia del formato.
+  // Niente default: un aggiornamento parziale non li tocca, e senza l'uno e
+  // l'altro l'evento resta non catalogato. Null toglie il valore.
+  templateId: z.guid().nullable().optional(),
+  formatClass: z.enum(CLASSI_FORMATO).nullable().optional(),
 });
 
 export const createEventSchema = eventBaseSchema.refine(

@@ -49,6 +49,7 @@ export const NOT_DUPLICATED_EVENT_RELATIONS: Record<string, string> = {
   recurrenceSeries: 'idem con recurrenceSeriesId: l’appartenenza a una serie si assegna, non si eredita',
   seriesChildren: 'lato inverso: le occorrenze figlie restano dell’originale',
   moderatorPhoto: 'il legame viaggia con la colonna moderatorPhotoId: la copia usa la stessa foto',
+  template: 'il legame viaggia con la colonna templateId: la copia viene dallo stesso modello',
 
   // Persone e loro azioni: copiarle significherebbe iscrivere o invitare
   // qualcuno a un evento a cui non ha mai detto di sì.

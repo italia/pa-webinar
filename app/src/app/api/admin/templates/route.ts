@@ -199,8 +199,9 @@ export const DELETE = withErrorHandling(async (request: NextRequest) => {
   }
   // System (seeded) templates are deletable too: an admin curating the
   // template list for their PA must be able to remove the generic demos.
-  // Deleting a template is non-destructive to existing events (events copy
-  // the template's values at creation; they don't reference it afterwards).
+  // Deleting a template is non-destructive to existing events: they copy the
+  // template's values at creation, and their catalogue reference
+  // (Event.templateId) goes to NULL while the template name they took stays.
   // Note: on local dev the seed re-creates the system templates; test/prod
   // run `migrate deploy` only, so the deletion persists there.
   await prisma.eventTemplate.delete({ where: { id } });
