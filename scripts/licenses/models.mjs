@@ -83,6 +83,17 @@ const SU_HF = /^https:\/\/(?:huggingface\.co|hf\.co)\//;
 const URL_HF =
   /https:\/\/(?:huggingface\.co|hf\.co)\/(?!datasets\/)[\w.-]+\/[\w.-]+\/resolve\/[^/\s"'`)\]}<>]+\/[^\s"'`)\]}<>]+/g;
 
+/**
+ * L'indirizzo da confrontare con il registro: senza query o frammento
+ * (`?download=true`) e senza la punteggiatura che lo chiude in una frase
+ * (`…/modello.gguf.` in un commento), che non nominano un file diverso.
+ * Null se resta solo un prefisso (`…/resolve/main/`).
+ */
+export function indirizzoDaConfrontare(indirizzo) {
+  const pulito = indirizzo.replace(/[?#].*$/, '').replace(/[.,;:!]+$/, '');
+  return pulito.endsWith('/') ? null : pulito;
+}
+
 /** Estensioni dei file di pesi che non devono entrare nel repository fuori dal registro. */
 export const ESTENSIONI_PESI =
   /\.(gguf|onnx|tflite|safetensors|pt|pth|ckpt|bin|pkl|pickle|joblib|npz|npy|h5)$/i;
@@ -288,7 +299,12 @@ export function problemiDellaVoce(voce, ambiente) {
  */
 export function modelliNonRegistrati(voci, tracciati, leggi) {
   const problemi = [];
-  const indirizzi = new Set(voci.map((v) => v.url).filter(Boolean));
+  const indirizzi = new Set(
+    voci
+      .map((v) => v.url)
+      .filter((u) => typeof u === 'string')
+      .map(indirizzoDaConfrontare)
+  );
   const percorsi = new Set(voci.map((v) => v.path).filter(Boolean));
   const nomi = new Set(
     voci.flatMap((v) => [v.name, ...(Array.isArray(v.ids) ? v.ids : [])])
@@ -304,9 +320,10 @@ export function modelliNonRegistrati(voci, tracciati, leggi) {
     if (!daScansionare(f)) continue;
     const testo = leggi(f);
     if (testo === null || testo.includes('\0')) continue;
-    for (const [indirizzo] of testo.matchAll(URL_HF)) {
-      if (/[$`{]/.test(indirizzo)) continue; // indirizzo composto a run time
-      if (!indirizzi.has(indirizzo)) {
+    for (const [trovato] of testo.matchAll(URL_HF)) {
+      if (/[$`{]/.test(trovato)) continue; // indirizzo composto a run time
+      const indirizzo = indirizzoDaConfrontare(trovato);
+      if (indirizzo && !indirizzi.has(indirizzo)) {
         problemi.push(`${f}: ${indirizzo} is not in the registry`);
       }
     }

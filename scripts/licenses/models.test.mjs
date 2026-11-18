@@ -435,6 +435,24 @@ describe('modelliNonRegistrati', () => {
     );
   });
 
+  it("la punteggiatura che segue l'indirizzo, una query o un frammento non lo cambiano", () => {
+    assert.deepEqual(
+      cerca({
+        'values.yaml': `# pesi da ${URL_FISSO}.\nurl: "${URL_FISSO}?download=true"`,
+        'run.sh': `# ${URL_FISSO}, ${URL_FISSO}; ${URL_FISSO}:\ncurl -L ${URL_FISSO}#sha`,
+        'common.py': '"https://huggingface.co/org/m/resolve/main/?x=1"',
+      }),
+      []
+    );
+    const altro = `https://huggingface.co/org/altro/resolve/${REV}/altro.gguf`;
+    assert.deepEqual(cerca({ 'run.sh': `# vedi ${altro}.` }), [
+      `run.sh: ${altro} is not in the registry`,
+    ]);
+    assert.deepEqual(cerca({ 'run.sh': `curl "${altro}?download=true"` }), [
+      `run.sh: ${altro} is not in the registry`,
+    ]);
+  });
+
   it('un indirizzo hf.co fuori dal registro si segnala', () => {
     assert.ok(
       contiene(
