@@ -4644,7 +4644,7 @@
       "recording": "Consiento que se grabe mi voz cuando intervengo en este evento. Mi cara y mi nombre nunca aparecen en el vídeo.",
       "recordingReserved": "Consiento que se grabe mi voz cuando intervengo en este evento. Mi cara y mi nombre nunca aparecen en el vídeo. El vídeo queda reservado a quienes organizan y a quienes se han inscrito: no se publica. Quienes se han inscrito pueden verlo mientras se conserven los datos de su inscripción.",
       "recordingPublic": "Consiento que se grabe mi voz cuando intervengo en este evento. Consiento también la publicación del vídeo: cualquier persona puede ver el vídeo en la página del evento y en la biblioteca de vídeos. Mi cara y mi nombre nunca aparecen en el vídeo.",
-      "recordingVisible": "Consiento la grabación de audio/vídeo de este evento",
+      "recordingVisible": "Consiento la grabación de audio/vídeo de este evento.",
       "recordingVisibleReserved": "Consiento la grabación de audio/vídeo de este evento. El vídeo queda reservado a quienes organizan y a quienes se han inscrito: no se publica. Quienes se han inscrito pueden verlo mientras se conserven los datos de su inscripción.",
       "recordingVisiblePublic": "Consiento la grabación de audio/vídeo de este evento y su publicación: cualquier persona puede ver el vídeo en la página del evento y en la biblioteca de vídeos.",
       "recordingNoVideo": "Consiento la grabación de este evento. El vídeo de la sala no se graba: solo quedan las pistas de audio de quienes dan su consentimiento a la transcripción, si el evento las prevé.",

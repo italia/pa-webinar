@@ -583,3 +583,49 @@ describe("dove chi partecipa non entra mai nel video ('esclusi')", () => {
     expect(await tracce(evento.id)).toHaveLength(1);
   });
 });
+
+describe("dove chi partecipa puo' comparire nel video ('visibili')", () => {
+  beforeEach(() => vi.stubEnv('RECORDING_VOICE_EXCLUSION', ''));
+
+  it('un consenso dato sul testo per la sola voce non copre, e ridato si aggiorna al testo che lo dice', async () => {
+    const evento = await creaEvento({ ...CHE_REGISTRA, recordingDestination: 'REGISTRANTS' });
+    const iscrizione = await iscrittoDa(evento.id);
+    await provaEsistente(evento.id, iscrizione.id, { destination: 'REGISTRANTS', textVersion: 2 });
+
+    const senza = (await entra(evento.slug, { accessToken: iscrizione.accessToken })) as RispostaToken & {
+      listenOnly: boolean;
+    };
+    expect(senza.listenOnly).toBe(true);
+    expect(senza.consentsInForce.recording).toBe(false);
+
+    const ridato = (await entra(evento.slug, {
+      accessToken: iscrizione.accessToken,
+      recordingConsent: true,
+      recordingConsentDestination: 'REGISTRANTS',
+    })) as RispostaToken & { listenOnly: boolean };
+    expect(ridato.listenOnly).toBe(false);
+    const [prova, ...altre] = await prove(evento.id);
+    expect(altre).toEqual([]);
+    expect(prova!.textVersion).toBe(1);
+    expect(prova!.earlierPeriods as unknown as PeriodoConsenso[]).toMatchObject([
+      { destination: 'REGISTRANTS', textVersion: 2 },
+    ]);
+
+    const dopo = (await entra(evento.slug, { accessToken: iscrizione.accessToken })) as RispostaToken & {
+      listenOnly: boolean;
+    };
+    expect(dopo.listenOnly).toBe(false);
+  });
+
+  it('senza destinazione la prova dice comunque su quale testo e\' stata data', async () => {
+    const evento = await creaEvento({ ...CHE_REGISTRA, recordingDestination: null });
+    const risposta = await entra(evento.slug, {
+      guestName: 'Ospite',
+      recordingConsent: true,
+      recordingConsentDestination: null,
+    });
+    expect(risposta.consentsRecorded.recording).toBe(true);
+    const [prova] = await prove(evento.id);
+    expect(prova).toMatchObject({ destination: null, textVersion: 1 });
+  });
+});

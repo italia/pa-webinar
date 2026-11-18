@@ -133,7 +133,7 @@ export default function Step5Review({
   mancanti = [],
   aiPipelineEnabled = true,
   recordingAvailable = true,
-  partecipantiNelVideo = 'solo-voce',
+  partecipantiNelVideo = 'visibili',
   istantanea = false,
   liveCaptionsAvailable = false,
   addressBookEnabled = true,

@@ -140,6 +140,8 @@ describe('destinazione del consenso alla registrazione', () => {
   });
 
   it("un evento senza destinazione non salva ne' destinazione ne' versione", async () => {
+    vi.stubEnv('RECORDING_VOICE_EXCLUSION', 'true');
+    vi.stubEnv('RECORDING_PARTICIPANT_VOICE', 'true');
     const evento = await eventoAperto();
     const email = nuovaEmail();
 
@@ -152,6 +154,21 @@ describe('destinazione del consenso alla registrazione', () => {
       consentRecording: true,
       consentRecordingDestination: null,
       consentRecordingVersion: null,
+    });
+  });
+
+  it("dove chi partecipa puo' comparire la versione si salva anche senza destinazione", async () => {
+    const evento = await eventoAperto();
+    const email = nuovaEmail();
+
+    await iscriviti(evento.slug, email, {
+      consentRecording: true,
+      consentRecordingDestination: null,
+    });
+
+    expect(await iscrizioneDi(email)).toMatchObject({
+      consentRecordingDestination: null,
+      consentRecordingVersion: 1,
     });
   });
 

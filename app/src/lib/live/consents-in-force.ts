@@ -7,7 +7,8 @@ import {
 } from '@/lib/ai/voice-consent';
 import { consensoTrascrizione, iscrizioneDelPosto } from '@/lib/captions/room';
 import { prisma } from '@/lib/db';
-import { consensoCopre, type Destinazione } from '@/lib/recording/destination';
+import type { PartecipantiNelVideo } from '@/lib/live/consent-rule';
+import { provaCopre, type Destinazione } from '@/lib/recording/destination';
 import { getSettings } from '@/lib/settings';
 
 /**
@@ -40,7 +41,8 @@ export async function trascrizioneInVigore(
 /**
  * Il consenso alla registrazione di un'iscrizione: dato nel modulo, o in sala con
  * la prova legata all'iscrizione. Uno ritirato non vale, e nemmeno uno dato su un
- * testo che non copre quello in vigore.
+ * testo che non copre quello in vigore (`provaCopre`: la destinazione e, dove chi
+ * partecipa puo' comparire nel video, la versione del testo).
  */
 export async function registrazioneDellIscrizione(
   event: { id: string; recordingEnabled: boolean },
@@ -49,22 +51,31 @@ export async function registrazioneDellIscrizione(
     consentRecording: boolean | null;
     consentRecordingWithdrawnAt: Date | null;
     consentRecordingDestination: Destinazione;
+    consentRecordingVersion: number | null;
   },
-  destinazione: Destinazione
+  destinazione: Destinazione,
+  partecipanti: PartecipantiNelVideo
 ): Promise<boolean> {
   if (
     iscrizione.consentRecording === true &&
     !iscrizione.consentRecordingWithdrawnAt &&
-    consensoCopre(iscrizione.consentRecordingDestination, destinazione)
+    provaCopre(
+      {
+        destination: iscrizione.consentRecordingDestination,
+        textVersion: iscrizione.consentRecordingVersion,
+      },
+      destinazione,
+      partecipanti
+    )
   ) {
     return true;
   }
   if (!event.recordingEnabled) return false;
   const prova = await prisma.recordingConsent.findFirst({
     where: { eventId: event.id, registrationId: iscrizione.id, withdrawnAt: null },
-    select: { destination: true },
+    select: { destination: true, textVersion: true },
   });
-  return prova !== null && consensoCopre(prova.destination, destinazione);
+  return prova !== null && provaCopre(prova, destinazione, partecipanti);
 }
 
 /**
@@ -77,12 +88,13 @@ export async function registrazioneDellIscrizione(
 export async function consensiInVigoreDeiPosti(
   event: EventoConsensiInVigore,
   posti: readonly string[],
-  destinazione: Destinazione
+  destinazione: Destinazione,
+  partecipanti: PartecipantiNelVideo
 ): Promise<ConsensiInVigore> {
   const posto = posti.at(-1);
   if (!posto) return { recording: false, transcription: false };
   const [recording, transcription] = await Promise.all([
-    registrazioneInVigore(event, posto, posti, destinazione),
+    registrazioneInVigore(event, posto, posti, destinazione, partecipanti),
     trascrizioneInVigore(event, posto),
   ]);
   return { recording, transcription };
@@ -92,7 +104,8 @@ async function registrazioneInVigore(
   event: EventoConsensiInVigore,
   posto: string,
   posti: readonly string[],
-  destinazione: Destinazione
+  destinazione: Destinazione,
+  partecipanti: PartecipantiNelVideo
 ): Promise<boolean> {
   const iscrizioneId = iscrizioneDelPosto(posto);
   if (iscrizioneId) {
@@ -103,14 +116,17 @@ async function registrazioneInVigore(
         consentRecording: true,
         consentRecordingWithdrawnAt: true,
         consentRecordingDestination: true,
+        consentRecordingVersion: true,
       },
     });
-    return !!iscrizione && registrazioneDellIscrizione(event, iscrizione, destinazione);
+    return (
+      !!iscrizione && registrazioneDellIscrizione(event, iscrizione, destinazione, partecipanti)
+    );
   }
   if (!event.recordingEnabled) return false;
   const prove = await prisma.recordingConsent.findMany({
     where: { eventId: event.id, jitsiUserId: { in: [...posti] }, withdrawnAt: null },
-    select: { destination: true },
+    select: { destination: true, textVersion: true },
   });
-  return prove.some((p) => consensoCopre(p.destination, destinazione));
+  return prove.some((p) => provaCopre(p, destinazione, partecipanti));
 }

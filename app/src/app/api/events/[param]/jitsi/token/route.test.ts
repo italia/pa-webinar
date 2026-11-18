@@ -1202,12 +1202,32 @@ describe('POST jitsi/token — consenso alla registrazione verificato dal server
 
   it("l'iscritto che l'ha dato all'iscrizione entra senza ridarlo", async () => {
     vi.mocked(prisma.event.findUnique).mockResolvedValue(eventRow(interattivo) as never);
-    vi.mocked(prisma.registration.findUnique).mockResolvedValue(registrationRow({ consentRecording: true }) as never);
+    vi.mocked(prisma.registration.findUnique).mockResolvedValue(
+      registrationRow({ consentRecording: true, consentRecordingVersion: 1 }) as never,
+    );
     cookieJar.set(eventAccessCookieName(EVENT_ID), await signEventAccess(EVENT_ID, ACCESS_TOKEN, 3600));
     const res = await post({ accessToken: ACCESS_TOKEN });
     expect(res.status).toBe(200);
     expect(((await minted(res)).body as { listenOnly?: boolean }).listenOnly).toBe(false);
   });
+
+  it.each([2, null])(
+    "dove chi partecipa puo' comparire, un consenso sul testo %s non copre: si entra in solo ascolto",
+    async (versione) => {
+      vi.mocked(prisma.event.findUnique).mockResolvedValue(eventRow(interattivo) as never);
+      vi.mocked(prisma.registration.findUnique).mockResolvedValue(
+        registrationRow({ consentRecording: true, consentRecordingVersion: versione }) as never,
+      );
+      vi.mocked(prisma.recordingConsent.findFirst).mockResolvedValue({
+        destination: null,
+        textVersion: versione,
+      } as never);
+      cookieJar.set(eventAccessCookieName(EVENT_ID), await signEventAccess(EVENT_ID, ACCESS_TOKEN, 3600));
+      const { body, user } = await minted(await post({ accessToken: ACCESS_TOKEN }));
+      expect((body as { listenOnly?: boolean }).listenOnly).toBe(true);
+      expect(user.listenOnly).toBe(true);
+    },
+  );
 
   it('dove la voce non si puo\' togliere, chi non acconsente entra con i mezzi chiusi per lui', async () => {
     vi.mocked(prisma.event.findUnique).mockResolvedValue(

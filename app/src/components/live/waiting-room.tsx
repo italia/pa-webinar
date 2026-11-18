@@ -344,7 +344,7 @@ export default function WaitingRoom({
   multitrackConsentExempt = false,
   recordingConsentRequired = false,
   recordingDestination = null,
-  partecipanti = 'solo-voce',
+  partecipanti = 'visibili',
   recordingListenOnly = false,
   recordingHostAlways = false,
   recordingAskedInRoom = false,

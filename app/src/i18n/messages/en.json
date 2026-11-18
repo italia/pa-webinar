@@ -4644,7 +4644,7 @@
       "recording": "I consent to my voice being recorded when I speak at this event. My face and my name never appear in the video.",
       "recordingReserved": "I consent to my voice being recorded when I speak at this event. My face and my name never appear in the video. The video stays reserved for the organizers and registrants: it is not published. Registrants can watch it for as long as their registration data is kept.",
       "recordingPublic": "I consent to my voice being recorded when I speak at this event. I also consent to the publication of the video: anyone can watch the video on the event page and in the video library. My face and my name never appear in the video.",
-      "recordingVisible": "I consent to the audio/video recording of this event",
+      "recordingVisible": "I consent to the audio/video recording of this event.",
       "recordingVisibleReserved": "I consent to the audio/video recording of this event. The video stays reserved for the organizers and registrants: it is not published. Registrants can watch it for as long as their registration data is kept.",
       "recordingVisiblePublic": "I consent to the audio/video recording of this event and to its publication: anyone can watch the video on the event page and in the video library.",
       "recordingNoVideo": "I consent to the recording of this event. The room video is not recorded: only the audio tracks of people who consent to transcription are kept, if the event uses them.",

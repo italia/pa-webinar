@@ -69,8 +69,9 @@ export const POST = withErrorHandling(async (request, context) => {
     throw new AppError('No valid room token for this event', 401, 'ROOM_TOKEN_INVALID');
   }
 
-  const destinazione = destinazioneDelTesto(event.recordingDestination, partecipantiNelVideo());
-  const consensi = await consensiInVigoreDeiPosti(event, posti, destinazione);
+  const partecipanti = partecipantiNelVideo();
+  const destinazione = destinazioneDelTesto(event.recordingDestination, partecipanti);
+  const consensi = await consensiInVigoreDeiPosti(event, posti, destinazione, partecipanti);
   return Response.json(
     { ...consensi, recordingDestination: destinazione },
     { headers: { 'Cache-Control': 'no-store' } }

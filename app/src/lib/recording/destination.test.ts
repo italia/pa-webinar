@@ -21,7 +21,8 @@ import {
   testoInVigore,
   testoLetto,
   VERSIONE_TESTO_REGISTRAZIONE,
-  versioneTestoRegistrazione,
+  provaCopre,
+  versioneDellaProva,
   type Destinazione,
   type EsposizioneVideo,
   destinazioneDiPartenza,
@@ -217,10 +218,30 @@ describe('testo del consenso', () => {
       const testo = messages.gdpr.consent[chiaveConsenso(destinazione, 'visibili')];
       expect(testo).not.toMatch(/volto|nome non/i);
     }
-    // Chiede di piu': si salva con la versione del testo che lo diceva.
-    expect(versioneTestoRegistrazione('visibili')).toBe(1);
+    // Chiede di piu': si salva con la versione del testo che lo diceva, anche
+    // senza destinazione.
+    expect(versioneDellaProva('REGISTRANTS', 'visibili')).toBe(1);
+    expect(versioneDellaProva(null, 'visibili')).toBe(1);
+    for (const voce of ['solo-voce', 'esclusi'] as const) {
+      expect(versioneDellaProva('PUBLIC', voce)).toBe(VERSIONE_TESTO_REGISTRAZIONE);
+      expect(versioneDellaProva(null, voce)).toBeNull();
+    }
+    expect(versioneDellaProva(null, 'assente')).toBeNull();
+  });
+
+  it("dove chi partecipa puo' comparire copre solo il testo che lo diceva", () => {
+    // Il testo per la sola voce prometteva che volto e nome restavano fuori.
+    expect(provaCopre({ destination: 'PUBLIC', textVersion: 2 }, 'PUBLIC', 'visibili')).toBe(false);
+    expect(provaCopre({ destination: null, textVersion: null }, null, 'visibili')).toBe(false);
+    expect(provaCopre({ destination: 'PUBLIC', textVersion: 1 }, 'REGISTRANTS', 'visibili')).toBe(true);
+    expect(provaCopre({ destination: null, textVersion: 1 }, null, 'visibili')).toBe(true);
+    // La destinazione conta comunque.
+    expect(provaCopre({ destination: 'REGISTRANTS', textVersion: 1 }, 'PUBLIC', 'visibili')).toBe(false);
+    // Altrove il testo 1 copre il 2, che chiede meno, e decide la destinazione.
     for (const voce of ['solo-voce', 'esclusi', 'assente'] as const) {
-      expect(versioneTestoRegistrazione(voce)).toBe(VERSIONE_TESTO_REGISTRAZIONE);
+      expect(provaCopre({ destination: 'PUBLIC', textVersion: 2 }, 'PUBLIC', voce)).toBe(true);
+      expect(provaCopre({ destination: 'PUBLIC', textVersion: 1 }, 'PUBLIC', voce)).toBe(true);
+      expect(provaCopre({ destination: null, textVersion: null }, null, voce)).toBe(true);
     }
   });
 

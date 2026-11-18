@@ -31,17 +31,18 @@ import { limiteTokenOspiti } from '@/lib/room-rate-limit';
 import { readOwnedEventAccess } from '@/lib/event-session';
 import { guestAccessAllowed } from '@/lib/events/guest-window';
 import { registrazioneDellIscrizione, trascrizioneInVigore } from '@/lib/live/consents-in-force';
+import type { PartecipantiNelVideo } from '@/lib/live/consent-rule';
 import { mediaDelToken, regolaConsenso } from '@/lib/live/listen-only';
 import { elencoVisibileAlPubblico } from '@/lib/live/participant-list';
 import { pseudonimo } from '@/lib/live/pseudonym';
 import { guestSenderId } from '@/lib/chat/sender-key';
 import { partecipantiNelVideo, recordingAvailableFor } from '@/lib/recording/availability';
 import {
-  consensoCopre,
   consensoOra,
   destinazioneDelTesto,
+  provaCopre,
   testoLetto,
-  versioneTestoRegistrazione,
+  versioneDellaProva,
   type Destinazione,
   type PeriodoConsenso,
 } from '@/lib/recording/destination';
@@ -108,6 +109,7 @@ async function provaDellaReplica(
   event: { id: string; jitsiRoomName: string },
   replica: JitsiTokenRequest['consentReplay'],
   destinazione: Destinazione,
+  partecipanti: PartecipantiNelVideo,
   staffAccountId?: string,
 ): Promise<ReplicaValida> {
   if (!replica?.recording && !replica?.multitrack) return NESSUNA_REPLICA;
@@ -138,7 +140,7 @@ async function provaDellaReplica(
       : null,
   ]);
   return {
-    registrazione: registrazione.find((p) => consensoCopre(p.destination, destinazione)) ?? null,
+    registrazione: registrazione.find((p) => provaCopre(p, destinazione, partecipanti)) ?? null,
     tracce,
   };
 }
@@ -173,9 +175,15 @@ async function consensiInVigore(
   event: EventoConsensoVoce & { id: string },
   posto: string,
   registrazione: boolean,
+  /** La trascrizione gia' letta per questo posto in questa richiesta, se nessuna
+   *  prova e' stata scritta dopo: non si rilegge. */
+  trascrizioneLetta?: boolean,
 ): Promise<{ recording: boolean; transcription: boolean } | undefined> {
   try {
-    return { recording: registrazione, transcription: await trascrizioneInVigore(event, posto) };
+    return {
+      recording: registrazione,
+      transcription: trascrizioneLetta ?? (await trascrizioneInVigore(event, posto)),
+    };
   } catch (err) {
     console.error('[jitsi/token] consents in force not read', {
       eventId: event.id,
@@ -205,8 +213,9 @@ async function registraConsensi(
   },
   /** La destinazione del testo in vigore (`destinazioneDelTesto`). */
   destinazione: Destinazione,
-  /** La versione del testo della casella (`versioneTestoRegistrazione`). */
-  versioneTesto: number,
+  /** Come compaiono nel video i partecipanti: decide quale testo copre e quale
+   *  versione si salva (`provaCopre`, `versioneDellaProva`). */
+  partecipanti: PartecipantiNelVideo,
   /** Le prove che il posto nuovo porta con se': mai a posto di un clic. */
   replica: ReplicaValida = NESSUNA_REPLICA,
 ): Promise<ConsensiSalvati> {
@@ -244,7 +253,7 @@ async function registraConsensi(
   const destinazioneLetta = testoLetto(data.recordingConsentDestination, destinazione);
   const testoDellaProva = {
     destination: destinazioneLetta,
-    textVersion: destinazioneLetta ? versioneTesto : null,
+    textVersion: versioneDellaProva(destinazioneLetta, partecipanti),
   };
   const alMeglio = async (quale: string, scrivi: () => Promise<unknown>): Promise<boolean> => {
     try {
@@ -297,7 +306,7 @@ async function registraConsensi(
         if (
           registrationId &&
           esistente &&
-          (esistente.withdrawnAt || !consensoCopre(esistente.destination, destinazione))
+          (esistente.withdrawnAt || !provaCopre(esistente, destinazione, partecipanti))
         ) {
           const ridata = await prisma.recordingConsent.updateMany({
             where: {
@@ -429,7 +438,6 @@ export const POST = withErrorHandling(async (request, context) => {
   // testo giusto e non rimanda un consenso dato su quello vecchio. Dove non c'e'
   // un video vale null, mai la colonna dell'evento.
   const destinazione = destinazioneDelTesto(event.recordingDestination, partecipanti);
-  const versioneTesto = versioneTestoRegistrazione(partecipanti);
   const consensoDato = consensoOra(parsed.data, destinazione);
   // Vale da quando si entra: chi aspetta da prima non ha una scelta vecchia.
   const participantListVisible = elencoVisibileAlPubblico(event);
@@ -450,6 +458,19 @@ export const POST = withErrorHandling(async (request, context) => {
     trascrizioneValida: () => Promise<boolean>,
   ): Promise<boolean> =>
     regola.voceDallaTrascrizione ? trascrizioneOra || (await trascrizioneValida()) : registrazione;
+  // La trascrizione dell'iscritto, letta per il segno della voce. Null: la
+  // lettura non e' riuscita. Non toglie il JWT, e la voce resta fuori.
+  const trascrizioneDelPosto = async (posto: string): Promise<boolean | null> => {
+    try {
+      return await trascrizioneInVigore(event, posto);
+    } catch (err) {
+      console.error('[jitsi/token] transcription consent not read', {
+        eventId: event.id,
+        err: err instanceof Error ? err.message : String(err),
+      });
+      return null;
+    }
+  };
   // Li' il consenso alla registrazione di chi partecipa non si chiede: uno che
   // arriva lo stesso, da una pagina aperta da prima o da una replica, non lascia
   // una prova.
@@ -501,6 +522,7 @@ export const POST = withErrorHandling(async (request, context) => {
       event,
       parsed.data.consentReplay && { ...parsed.data.consentReplay, recording: false },
       destinazione,
+      partecipanti,
       staff?.accountId,
     );
     const mediaConduce = mediaDelToken(event, regola, isSpeaker ? 'relatore' : 'moderatore', true);
@@ -528,7 +550,7 @@ export const POST = withErrorHandling(async (request, context) => {
         emailHash: grant.email ? hashEmail(grant.email) : undefined,
       },
       destinazione,
-      versioneTesto,
+      partecipanti,
       replicaConduce,
     );
 
@@ -589,7 +611,12 @@ export const POST = withErrorHandling(async (request, context) => {
       const postoOspite = guestJitsiId();
       // Il consenso dell'iscritto non passa a chi ha il suo link: vale quello
       // dato da chi ha aperto il link, ora o a un ingresso di questa visita.
-      const replicaInoltro = await provaDellaReplica(event, parsed.data.consentReplay, destinazione);
+      const replicaInoltro = await provaDellaReplica(
+        event,
+        parsed.data.consentReplay,
+        destinazione,
+        partecipanti,
+      );
       const mediaInoltro = mediaPartecipante(
         await consensoVoce(consensoDato || !!replicaInoltro.registrazione, async () => !!replicaInoltro.tracce),
       );
@@ -610,7 +637,7 @@ export const POST = withErrorHandling(async (request, context) => {
         senzaRegistrazione(conVoce(parsed.data, mediaInoltro)),
         { jitsiUserId: postoOspite, displayName: typedName },
         destinazione,
-        versioneTesto,
+        partecipanti,
         replicaSenzaRegistrazione(replicaConVoce(replicaInoltro, mediaInoltro)),
       );
       return Response.json(
@@ -643,10 +670,16 @@ export const POST = withErrorHandling(async (request, context) => {
     // e uno dato su un testo che non copre il testo in vigore non vale per
     // questo video: la sala lo richiede.
     const consensoIscritto =
-      consensoDato || (await registrazioneDellIscrizione(event, registration, destinazione));
+      consensoDato ||
+      (await registrazioneDellIscrizione(event, registration, destinazione, partecipanti));
     const postoIscritto = participantJitsiId(registration.id);
+    // Letta una volta sola, e riportata alla sala senza rileggerla.
+    let trascrizioneIscritto: boolean | undefined;
     const mediaIscritto = mediaPartecipante(
-      await consensoVoce(consensoIscritto, () => trascrizioneInVigore(event, postoIscritto)),
+      await consensoVoce(consensoIscritto, async () => {
+        trascrizioneIscritto = (await trascrizioneDelPosto(postoIscritto)) ?? undefined;
+        return trascrizioneIscritto === true;
+      }),
     );
 
     // Record the join, set-once. Kept write-free on rejoin so the reconnect
@@ -699,7 +732,7 @@ export const POST = withErrorHandling(async (request, context) => {
       senzaRegistrazione(conVoce(parsed.data, mediaIscritto)),
       { jitsiUserId: postoIscritto, displayName: name, registrationId: registration.id },
       destinazione,
-      versioneTesto,
+      partecipanti,
     );
 
     return Response.json({
@@ -712,6 +745,7 @@ export const POST = withErrorHandling(async (request, context) => {
         event,
         postoIscritto,
         consentsRecorded.recording || (!consensoDato && consensoIscritto),
+        trascrizioneIscritto,
       ),
       participantListVisible,
       listenOnly: !!mediaIscritto.listenOnly,
@@ -756,7 +790,12 @@ export const POST = withErrorHandling(async (request, context) => {
     }
 
     const postoOspite = guestJitsiId();
-    const replicaOspite = await provaDellaReplica(event, parsed.data.consentReplay, destinazione);
+    const replicaOspite = await provaDellaReplica(
+      event,
+      parsed.data.consentReplay,
+      destinazione,
+      partecipanti,
+    );
     const mediaOspite = mediaPartecipante(
       await consensoVoce(consensoDato || !!replicaOspite.registrazione, async () => !!replicaOspite.tracce),
     );
@@ -777,7 +816,7 @@ export const POST = withErrorHandling(async (request, context) => {
       senzaRegistrazione(conVoce(parsed.data, mediaOspite)),
       { jitsiUserId: postoOspite, displayName: guestName },
       destinazione,
-      versioneTesto,
+      partecipanti,
       replicaSenzaRegistrazione(replicaConVoce(replicaOspite, mediaOspite)),
     );
 

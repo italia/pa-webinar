@@ -4644,7 +4644,7 @@
       "recording": "Hozzájárulok, hogy a hangomat rögzítsék, amikor felszólalok az eseményen. Az arcom és a nevem soha nem jelenik meg a videón.",
       "recordingReserved": "Hozzájárulok, hogy a hangomat rögzítsék, amikor felszólalok az eseményen. Az arcom és a nevem soha nem jelenik meg a videón. A videó csak a szervezők és a regisztráltak számára érhető el: nem kerül közzétételre. A regisztráltak addig nézhetik meg, amíg a regisztrációs adataikat megőrizzük.",
       "recordingPublic": "Hozzájárulok, hogy a hangomat rögzítsék, amikor felszólalok az eseményen. Hozzájárulok a videó közzétételéhez is: a videót bárki megnézheti az esemény oldalán és a videótárban. Az arcom és a nevem soha nem jelenik meg a videón.",
-      "recordingVisible": "Hozzájárulok az esemény audió/videó felvételéhez",
+      "recordingVisible": "Hozzájárulok az esemény audió/videó felvételéhez.",
       "recordingVisibleReserved": "Hozzájárulok az esemény videófelvételének elkészítéséhez (hang és kép). A videó csak a szervezők és a regisztráltak számára érhető el: nem kerül közzétételre. A regisztráltak addig nézhetik meg, amíg a regisztrációs adataikat megőrizzük.",
       "recordingVisiblePublic": "Hozzájárulok az esemény videófelvételének elkészítéséhez (hang és kép) és közzétételéhez: a videót bárki megnézheti az esemény oldalán és a videótárban.",
       "recordingNoVideo": "Hozzájárulok az esemény felvételéhez. A terem videójáról nem készül felvétel: csak azok hangsávjai maradnak meg, akik hozzájárulnak az átíráshoz, ha az esemény ilyeneket használ.",

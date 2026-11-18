@@ -50,7 +50,7 @@ import {
   destinazioneDelTesto,
   testoInVigore,
   testoLetto,
-  versioneTestoRegistrazione,
+  versioneDellaProva,
 } from '@/lib/recording/destination';
 import {
   buildEventAccessSetCookie,
@@ -153,13 +153,14 @@ export const POST = withErrorHandling(async (request, context) => {
       { path: ['consentRecording'], message: 'registration.errors.recordingDestinationChanged' },
     ]);
   }
-  // Un testo che non dichiara la destinazione non ha neanche una versione
-  // (VERSIONE_TESTO_REGISTRAZIONE).
+  // Un testo che non dichiara la destinazione non ha neanche una versione, salvo
+  // dove chi partecipa puo' comparire nel video (`versioneDellaProva`).
   const destinazioneLetta = registrazioneData
     ? testoLetto(consentRecordingDestination, destinazioneInVigore)
     : null;
-  const versioneLetta =
-    destinazioneLetta !== null ? versioneTestoRegistrazione(partecipanti) : null;
+  const versioneLetta = registrazioneData
+    ? versioneDellaProva(destinazioneLetta, partecipanti)
+    : null;
 
   // La rubrica non proposta non ha casella: un valore che arriva lo stesso, da
   // una pagina aperta prima del cambio o da chi chiama la rotta, non conta.

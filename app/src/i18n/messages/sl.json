@@ -4644,7 +4644,7 @@
       "recording": "Privolim v snemanje svojega glasu, ko med dogodkom spregovorim. Moj obraz in moje ime se v videu nikoli ne pojavita.",
       "recordingReserved": "Privolim v snemanje svojega glasu, ko med dogodkom spregovorim. Moj obraz in moje ime se v videu nikoli ne pojavita. Video ostane na voljo samo organizatorjem in prijavljenim osebam in se ne objavi. Prijavljena oseba si ga lahko ogleda, dokler se hranijo podatki o njeni prijavi.",
       "recordingPublic": "Privolim v snemanje svojega glasu, ko med dogodkom spregovorim. Privolim tudi v objavo videa: video si lahko kdor koli ogleda na strani dogodka in v videoknjižnici. Moj obraz in moje ime se v videu nikoli ne pojavita.",
-      "recordingVisible": "Soglašam z avdio/video snemanjem dogodka",
+      "recordingVisible": "Soglašam z avdio/video snemanjem dogodka.",
       "recordingVisibleReserved": "Privolim v snemanje dogodka (zvok in video). Video ostane na voljo samo organizatorjem in prijavljenim osebam in se ne objavi. Prijavljena oseba si ga lahko ogleda, dokler se hranijo podatki o njeni prijavi.",
       "recordingVisiblePublic": "Privolim v snemanje dogodka (zvok in video) in v objavo posnetka: video si lahko kdor koli ogleda na strani dogodka in v videoknjižnici.",
       "recordingNoVideo": "Privolim v snemanje dogodka. Video dvorane se ne snema: ostanejo samo zvočne sledi oseb, ki privolijo v prepis, če jih dogodek predvideva.",

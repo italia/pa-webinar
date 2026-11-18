@@ -200,7 +200,7 @@ export default function StepPermissions({
   whiteboardInfraReady,
   liveCaptionsAvailable = false,
   recordingAvailable = true,
-  partecipantiNelVideo = 'solo-voce',
+  partecipantiNelVideo = 'visibili',
   istantanea = false,
   puoDichiarareChiConduce = true,
   destinazioneDopo = null,

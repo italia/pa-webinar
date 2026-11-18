@@ -67,7 +67,8 @@ rejected runtime injection for fixes because a silently broken injection goes un
 - With an external Jitsi, or a values file that replaced the chart's conference text, the guarantee
   does not hold (`visibili`): participants can appear with face and name, even silent in the
   thumbnails. The portal keeps listen-only for scheduled events there and does not offer recording in
-  instant calls. The recording box there shows the text that covers name, voice and image.
+  instant calls. The recording box there shows the text that covers name, voice and image, and only
+  a consent given on that text counts.
 - Where the conference text hides participants but does not play their voices (`esclusi`), the video
   holds the hosts only, nobody is asked the recording consent, and instant calls still offer
   recording. The voice mark of a participant there follows the transcription consent, which the

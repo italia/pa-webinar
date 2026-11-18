@@ -776,8 +776,25 @@ describe('sala — il consenso alla registrazione gia dato', () => {
     expect((await clientProps(TOKEN)).hasRecordingConsent).toBe(true);
     expect(prisma.recordingConsent.findFirst).toHaveBeenCalledWith({
       where: { eventId: EVENT_ID, registrationId: REGISTRATION_ID, withdrawnAt: null },
-      select: { destination: true },
+      select: { destination: true, textVersion: true },
     });
+  });
+
+  it("dove chi partecipa puo' comparire vale solo il consenso dato sul testo che lo diceva", async () => {
+    vi.stubEnv('RECORDING_VOICE_EXCLUSION', '');
+    conEvento({ recordingDestination: 'REGISTRANTS' });
+    iscritto({
+      consentRecording: true,
+      consentRecordingDestination: 'REGISTRANTS',
+      consentRecordingVersion: 2,
+    });
+    expect((await clientProps(TOKEN)).hasRecordingConsent).toBe(false);
+    iscritto({
+      consentRecording: true,
+      consentRecordingDestination: 'REGISTRANTS',
+      consentRecordingVersion: 1,
+    });
+    expect((await clientProps(TOKEN)).hasRecordingConsent).toBe(true);
   });
 
   it('la prova data in sala non vale se non copre', async () => {

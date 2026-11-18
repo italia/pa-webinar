@@ -128,7 +128,7 @@ export default function RegistrationFormClient({
   profiling,
   registrationAccess = 'open',
   invito = null,
-  partecipanti = 'solo-voce',
+  partecipanti = 'visibili',
 }: RegistrationFormClientProps) {
   const t = useTranslations('registration');
   const tg = useTranslations('gdpr');

@@ -16,8 +16,8 @@ import { getSettings } from '@/lib/settings';
 import { partecipantiNelVideo, recordingAvailableFor } from '@/lib/recording/availability';
 import { accessoRegistrazione, vedeVideo } from '@/lib/recording/audience';
 import {
-  consensoCopre,
   destinazioneDelTesto,
+  provaCopre,
   recuperoAperto,
 } from '@/lib/recording/destination';
 import { informativaEvento } from '@/lib/events/privacy-notice';
@@ -339,6 +339,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         eventId: true,
         consentRecording: true,
         consentRecordingDestination: true,
+        consentRecordingVersion: true,
         consentMultitrack: true,
         consentMultitrackVersion: true,
         consentRecordingWithdrawnAt: true,
@@ -391,14 +392,24 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
     const registrazioneAllIscrizione =
       registration.consentRecording === true &&
       !registration.consentRecordingWithdrawnAt &&
-      consensoCopre(registration.consentRecordingDestination, destinazione);
+      provaCopre(
+        {
+          destination: registration.consentRecordingDestination,
+          textVersion: registration.consentRecordingVersion,
+        },
+        destinazione,
+        partecipanti
+      );
     const [proveTracce, provaRegistrazione] = ownsToken
       ? await Promise.all([
           !datoAllIscrizione && chiedeConsensoPerVoce(event, settings)
             ? prisma.multitrackConsent.count({ where: { ...prove, textVersion: { gte: versioneMinima } } })
             : 0,
           !registrazioneAllIscrizione && event.recordingEnabled
-            ? prisma.recordingConsent.findFirst({ where: prove, select: { destination: true } })
+            ? prisma.recordingConsent.findFirst({
+                where: prove,
+                select: { destination: true, textVersion: true },
+              })
             : null,
         ])
       : ([0, null] as const);
@@ -406,7 +417,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
     hasRecordingConsent =
       ownsToken &&
       (registrazioneAllIscrizione ||
-        (!!provaRegistrazione && consensoCopre(provaRegistrazione.destination, destinazione)));
+        (!!provaRegistrazione && provaCopre(provaRegistrazione, destinazione, partecipanti)));
     // Solo per chi ha il proprio link: un link inoltrato non risponde a nome
     // di chi l'ha ricevuto.
     iscrizioneEntrata = ownsToken && registration.joinedAt !== null;

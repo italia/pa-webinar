@@ -4644,7 +4644,7 @@
       "recording": "Suostun siihen, että ääneni tallennetaan, kun puhun tapahtumassa. Kasvoni ja nimeni eivät koskaan näy videolla.",
       "recordingReserved": "Suostun siihen, että ääneni tallennetaan, kun puhun tapahtumassa. Kasvoni ja nimeni eivät koskaan näy videolla. Video pysyy vain järjestäjien ja ilmoittautuneiden nähtävissä: sitä ei julkaista. Ilmoittautuneet voivat katsoa sitä niin kauan kuin heidän ilmoittautumistietojaan säilytetään.",
       "recordingPublic": "Suostun siihen, että ääneni tallennetaan, kun puhun tapahtumassa. Suostun myös videon julkaisemiseen: kuka tahansa voi katsoa videon tapahtuman sivulla ja videokirjastossa. Kasvoni ja nimeni eivät koskaan näy videolla.",
-      "recordingVisible": "Suostun tämän tapahtuman ääni-/videotallennukseen",
+      "recordingVisible": "Suostun tämän tapahtuman ääni-/videotallennukseen.",
       "recordingVisibleReserved": "Suostun tapahtuman videotallennukseen (ääni ja kuva). Video pysyy vain järjestäjien ja ilmoittautuneiden nähtävissä: sitä ei julkaista. Ilmoittautuneet voivat katsoa sitä niin kauan kuin heidän ilmoittautumistietojaan säilytetään.",
       "recordingVisiblePublic": "Suostun tapahtuman videotallennukseen (ääni ja kuva) ja sen julkaisemiseen: kuka tahansa voi katsoa videon tapahtuman sivulla ja videokirjastossa.",
       "recordingNoVideo": "Suostun tapahtuman tallennukseen. Huoneen videota ei tallenneta: jäljelle jäävät vain litterointiin suostuvien ääniraidat, jos tapahtumassa niitä käytetään.",

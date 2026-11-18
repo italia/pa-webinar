@@ -71,12 +71,15 @@ let onEnterLive: ReturnType<typeof vi.fn<Props['onEnterLive']>>;
 function albero(props: Partial<Props> = {}) {
   return (
     <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
+      {/* L'installazione del chart, salvo dove la prova dice altro: senza, la sala
+          non promette niente ('visibili'). */}
       <WaitingRoom
         event={eventoLive}
         role="guest"
         jvbReady
         defaultName=""
         onEnterLive={onEnterLive}
+        partecipanti="solo-voce"
         {...props}
       />
     </NextIntlClientProvider>
@@ -525,6 +528,25 @@ describe('sala d\'attesa — consenso alla registrazione', () => {
   it('dove la voce non si puo\' togliere dal video dice che si resta in ascolto', () => {
     render({ event: evento, defaultName: 'Relatore 1', recordingConsentRequired: true, partecipanti: 'visibili' });
     expect(container.textContent).toContain(messages.gdpr.consent.recordingOptionalListenOnly);
+  });
+
+  it("senza sapere cosa garantisce l'installazione non promette niente", () => {
+    act(() => {
+      root.render(
+        <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
+          <WaitingRoom
+            event={evento}
+            role="guest"
+            jvbReady
+            defaultName="Relatore 1"
+            onEnterLive={onEnterLive}
+            recordingConsentRequired
+          />
+        </NextIntlClientProvider>,
+      );
+    });
+    expect(container.textContent).toContain(t.recordingConsentIntroVisible);
+    expect(container.textContent).not.toContain(t.recordingConsentIntro);
   });
 
   it("dove chi partecipa puo' comparire non promette che volto e nome restano fuori", () => {

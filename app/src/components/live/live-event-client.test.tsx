@@ -1698,7 +1698,7 @@ describe("sala — chi partecipa non entra mai nel video ('esclusi')", () => {
     expect(testo()).not.toContain(l.consents.transcription.needsRecording);
   });
 
-  it("un consenso alla registrazione dato prima resta da ritirare, mai da ridare", async () => {
+  it("un consenso alla registrazione dato prima non compare: non copre niente, e il suo ritiro toglierebbe la trascrizione", async () => {
     await monta({ event: esclusi, hasRecordingConsent: true });
     risposte.push({
       recordingDestination: 'REGISTRANTS',
@@ -1707,8 +1707,8 @@ describe("sala — chi partecipa non entra mai nel video ('esclusi')", () => {
     });
     await entra();
     await premi(document.querySelector<HTMLElement>('.live-consents-btn')!);
-    expect(testo()).toContain(l.consents.recording.title);
-    expect(testo()).toContain(l.consents.withdraw);
+    expect(testo()).toContain(l.consents.transcription.title);
+    expect(testo()).not.toContain(l.consents.recording.title);
     expect(testo()).not.toContain(l.consents.recording.give);
   });
 });
