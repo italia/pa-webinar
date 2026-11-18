@@ -95,11 +95,11 @@ describe('destinazione del consenso alla registrazione', () => {
     expect(await iscrizioneDi(email)).toMatchObject({
       consentRecording: true,
       consentRecordingDestination: 'REGISTRANTS',
-      consentRecordingVersion: 1,
+      consentRecordingVersion: 2,
     });
     expect(await auditDi(evento.id)).toMatchObject({
       consentRecordingDestination: 'REGISTRANTS',
-      consentRecordingVersion: 1,
+      consentRecordingVersion: 2,
     });
   });
 

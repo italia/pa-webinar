@@ -37,6 +37,9 @@ interface ControlRoomPanelProps {
   /** Dove montare la conferma (a schermo intero il body è fuori vista). */
   modalContainer?: HTMLElement;
   recordingEnabled: boolean;
+  /** Chiamata rapida dove chi non acconsente non puo' restare fuori dal video:
+   *  la registrazione non si offre, e il comando spento dice perche'. */
+  registrazioneNonOfferta?: boolean;
   isRecording: boolean;
   faseRegistratore: FaseRegistratore | null;
   registrazione: ControlloRegistrazione;
@@ -54,6 +57,7 @@ export default function ControlRoomPanel({
   onEnded,
   modalContainer,
   recordingEnabled,
+  registrazioneNonOfferta = false,
   isRecording,
   faseRegistratore,
   registrazione,
@@ -199,6 +203,30 @@ export default function ControlRoomPanel({
           {/* L'avviso lo annuncia la striscia del tempo, visibile da ogni
               scheda; qui resta scritto, senza un secondo annuncio. */}
           {registrazione.avviso && <p className="control-room__warning">{registrazione.avviso}</p>}
+        </section>
+      )}
+
+      {registrazioneNonOfferta && !recordingEnabled && (
+        <section className="control-room__section" aria-labelledby="control-room-rec">
+          <h3 id="control-room-rec" className="control-room__heading">
+            {t('recordingHeading')}
+          </h3>
+          <div className="d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <span className="control-room__rec-state">{t('recordingOff')}</span>
+            <Button
+              color="danger"
+              size="sm"
+              className="text-nowrap"
+              disabled
+              aria-describedby="control-room-rec-not-offered"
+            >
+              <span className="control-room__rec-dot control-room__rec-dot--light me-1" aria-hidden="true" />
+              {tm('startRecording')}
+            </Button>
+          </div>
+          <p id="control-room-rec-not-offered" className="control-room__help">
+            {t('recordingNotOfferedInstant')}
+          </p>
         </section>
       )}
 

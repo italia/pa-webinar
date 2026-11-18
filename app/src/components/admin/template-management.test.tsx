@@ -149,7 +149,6 @@ describe('TemplateManagement — i valori del formato', () => {
     postEventShowQA: messages.postEvent.showQA,
     offerAddressBook: t.offerAddressBook,
     audienceAnonymous: w.audienceAnonymous,
-    hostsAlwaysRecorded: w.hostsAlwaysRecorded,
   };
   const interruttore = (nome: string) =>
     container.querySelector<HTMLInputElement>(`input[aria-label="${nome}"]`)!;
@@ -202,7 +201,8 @@ describe('TemplateManagement — i valori del formato', () => {
     expect(interruttore(interruttori.postEventShowQA)).toBeChecked();
     expect(interruttore(interruttori.offerAddressBook)).toBeChecked();
     expect(interruttore(interruttori.audienceAnonymous)).not.toBeChecked();
-    expect(interruttore(interruttori.hostsAlwaysRecorded)).not.toBeChecked();
+    // Chi conduce e' sempre nel video: non e' una scelta del modello.
+    expect(interruttore(w.hostsAlwaysRecorded)).toBeNull();
     expect(destinazione().value).toBe('');
     expect(destinazione().textContent).toContain(t.recordingDestinationNone);
   });
@@ -212,7 +212,7 @@ describe('TemplateManagement — i valori del formato', () => {
     expect(interruttore(interruttori.postEventShowQA)).not.toBeChecked();
     expect(interruttore(interruttori.offerAddressBook)).not.toBeChecked();
     expect(interruttore(interruttori.audienceAnonymous)).toBeChecked();
-    expect(interruttore(interruttori.hostsAlwaysRecorded)).toBeChecked();
+    expect(interruttore(w.hostsAlwaysRecorded)).toBeNull();
     expect(destinazione().value).toBe('PUBLIC');
   });
 
@@ -241,7 +241,6 @@ describe('TemplateManagement — i valori del formato', () => {
       postEventShowQA: true,
       offerAddressBook: true,
       audienceAnonymous: false,
-      hostsAlwaysRecorded: false,
       recordingDestination: 'REGISTRANTS',
     });
   });

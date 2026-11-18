@@ -106,9 +106,15 @@ The two capture paths treat consent differently.
   `_custom_config_js` replaces that text and has to carry it over: without it
   `RECORDING_VOICE_EXCLUSION` is unset and a person without the consent listens
   only. The same fallback holds with a Jitsi other than the chart's.
-  `Event.hostsAlwaysRecorded` keeps moderators and speakers in the recording,
-  with a notice instead of the box. A consent counts only while the text the
-  person read covers the event's [destination](#recording-destination).
+  Moderators and speakers are always in the video, with name and image, and
+  read a notice instead of the box; participants never appear in it, and the
+  box asks only for the recording of their voice
+  ([Who is in the video](../GDPR.md#who-is-in-the-video)). The conference token
+  of a host carries `context.user.paInVideo = true`, and no other token does: it
+  is the mark that tells the recorder whose image and name to show.
+  `Event.hostsAlwaysRecorded` stays in the database and is no longer read. A
+  consent counts only while the text the person read covers the event's
+  [destination](#recording-destination).
 - **Per-participant audio.** `Event.multitrackRecordingEnabled` adds the
   optional consent to the transcription of one's own contributions
   (`consentMultitrack` at registration, a box in the waiting room for everyone
@@ -1055,9 +1061,11 @@ title. The event page puts the pages back beside the published video
 - **A lost viewing link on a private page.** A registrant asks for the personal
   link again from the event page. With the page private, a reserved recording
   has no such form.
-- **Instant calls.** Guests joining an instant call are not asked for the
-  recording consent, although the moderator can record, and an instant call has
-  no destination.
+- **Instant calls have no destination.** Their participants are asked about
+  their voice in the room, when a recording starts
+  ([In instant calls](../GDPR.md#in-instant-calls)); the consents say nothing
+  about where the video goes, and publishing it shows the warning of events
+  without a destination.
 - **Per-track consent needs Prosody's occupants module.** The portal learns
   which seat stands behind an endpoint only from `mod_pa_occupants`. Without
   it, as with an external Jitsi that does not load it, the recorder records no

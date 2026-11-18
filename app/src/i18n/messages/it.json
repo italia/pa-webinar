@@ -560,7 +560,9 @@
       "locksByConsent": "Microfoni e videocamere seguono il consenso alla registrazione: chi l'ha dato usa ciò che l'evento concede, chi no resta in solo ascolto. I blocchi della sala restano accesi.",
       "listenOnlyBadge": "solo ascolto",
       "listenOnlyNoFloor": "Non ha dato il consenso alla registrazione: non può intervenire finché non acconsente dalla sua sala.",
-      "voiceExcludedBadge": "senza registrazione",
+      "inVideoBadge": "nel video",
+      "voiceRecordedBadge": "voce registrata",
+      "voiceExcludedBadge": "voce non registrata",
       "voiceExcludedFloor": "Non ha dato il consenso alla registrazione: può intervenire, ma resta fuori dalla registrazione."
     },
     "moderator": {
@@ -622,6 +624,7 @@
       "tab": "Regia",
       "recordingHeading": "Registrazione",
       "recordingOff": "Non in registrazione",
+      "recordingNotOfferedInstant": "Nelle chiamate rapide la registrazione si offre solo dove chi non acconsente resta fuori dal video, e questa installazione non lo consente.",
       "stopConfirm": "Fermare la registrazione adesso?",
       "featuresHeading": "Funzioni della sala",
       "featuresHelp": "Si accendono e si spengono per tutti, subito.",
@@ -690,7 +693,7 @@
         "without": {
           "soloAscolto": "Senza questo consenso segui in solo ascolto: microfono, videocamera e schermo restano chiusi.",
           "conduce": "Senza questo consenso conduci lo stesso.",
-          "voce": "Senza questo consenso partecipi come tutti, ma resti fuori dalla registrazione: né il nome, né la voce, né l'immagine.",
+          "voce": "Senza questo consenso partecipi come tutti, ma la tua voce resta fuori dalla registrazione. Il tuo volto e il tuo nome non compaiono comunque mai nel video.",
           "comeTutti": "Senza questo consenso partecipi come tutti."
         },
         "withoutTranscriptHost": "La tua voce non resta nelle tracce per persona né nella trascrizione.",
@@ -713,10 +716,18 @@
         "needsRecording": "Si può dare dopo il consenso alla registrazione."
       }
     },
+    "recordingQuestion": {
+      "title": "La chiamata viene registrata",
+      "question": "Vuoi che la tua voce venga registrata?",
+      "body": "Nel video compare solo chi conduce: il tuo volto e il tuo nome mai. Se rispondi sì, la chiamata si ricollega per qualche secondo e da quel momento, quando parli, la tua voce viene registrata. Se rispondi no, o chiudi questa finestra, continui a partecipare come prima e la tua voce non viene registrata.",
+      "later": "Se rispondi no, te lo richiediamo alla prossima registrazione. Puoi cambiare idea in qualunque momento dal pulsante {button} in alto.",
+      "yes": "Sì, registra la mia voce",
+      "no": "No, non registrarla"
+    },
     "voiceExcluded": {
       "title": "Partecipi senza registrazione.",
       "consent": "Acconsento alla registrazione",
-      "body": "Non hai dato il consenso alla registrazione: partecipi come tutti, ma il tuo nome, la tua voce e la tua immagine non entrano nella registrazione."
+      "body": "Non hai dato il consenso alla registrazione: partecipi come tutti, ma la tua voce resta fuori dalla registrazione. Il tuo volto e il tuo nome non compaiono comunque mai nel video."
     }
   },
   "qa": {
@@ -1275,7 +1286,7 @@
         "participantListCameraNote": "Con l'elenco nascosto, chi accende la videocamera non vede il proprio riquadro. Per un incontro in cui tutti si vedono, mostra l'elenco.",
         "recordingLockedLive": "Con la sala aperta la registrazione non si cambia: vale dal primo ingresso.",
         "hostsAlwaysRecorded": "Chi conduce è sempre nella registrazione",
-        "hostsAlwaysRecordedDesc": "Spenta, moderatori e relatori scelgono come tutti. Accendila solo se hanno già accettato di essere ripresi: non vedono la casella, e l'informativa dell'evento deve dirlo."
+        "hostsAlwaysRecordedDesc": "Moderatori e relatori compaiono nel video con nome e immagine, senza una casella da spuntare: l'informativa dell'evento deve dirlo. Di chi partecipa si registra solo la voce, e solo con il suo consenso."
       },
       "step3": {
         "heading": "Persone e inviti",
@@ -1577,7 +1588,6 @@
         "consentRecordingNotice": "per la registrazione solo un avviso (chi partecipa non parla né si mostra)",
         "consentTranscription": "trascrizione dei propri interventi, facoltativa",
         "consentsNone": "Nessun consenso da chiedere: all'iscrizione basta la presa visione dell'informativa.",
-        "consentsHosts": "A chi conduce e interviene la registrazione si chiede in sala, facoltativa.",
         "consentsWithdraw": "Chi partecipa può ritirarli in sala, dal pulsante «Consensi».",
         "participantListShown": "Elenco dei partecipanti: visibile a tutti.",
         "participantListHidden": "Elenco dei partecipanti: solo per chi conduce e chi interviene.",
@@ -1660,22 +1670,20 @@
         "recording": "Nella registrazione",
         "roomSame": "Partecipa con le regole dell'evento.",
         "roomListenOnly": "Solo ascolto e chat.",
-        "recordedFull": "Nome, voce, immagine e schermo condiviso.",
+        "recordedFull": "Solo la sua voce, quando parla: volto e nome non compaiono mai.",
         "notRecorded": "Non compare: niente nome, voce, immagine o schermo condiviso.",
         "recordedVoice": "La sua voce, in una traccia a parte.",
         "notRecordedVoice": "La sua voce non viene registrata.",
         "othersSame": "Gli altri non cambiano: blocchi dei microfoni, parola e aspetto del video restano quelli dell'evento.",
         "audienceNotice": "Chi partecipa non ha microfono, videocamera né schermo: riceve solo un avviso. Se gli viene data la parola può acconsentire in sala; se non lo fa, resta fuori dalla registrazione.",
-        "hostsChoose": "Moderatori e relatori scelgono come tutti: chi non acconsente conduce normalmente, ma resta fuori dalla registrazione.",
         "hostsAlways": "Moderatori e relatori sono sempre nella registrazione: non vedono la casella.",
-        "hostsFixed": "Moderatori e relatori conducono comunque, e il video li riprende.",
         "trace": "Se interviene durante la registrazione, una nota accanto al video dice che manca un intervento, e la trascrizione segna *** con l'orario.",
         "anytime": "Il consenso si dà e si ritira in sala, in qualunque momento.",
         "transcription": "La trascrizione dei propri interventi è un consenso a parte, facoltativo.",
         "fixedVoice": "Questa installazione non può togliere una voce dal video: chi non acconsente resta in solo ascolto, e i blocchi della sala seguono il consenso.",
         "fixedNotice": "Questa installazione non può togliere una voce dal video: chi riceve la parola entra nella registrazione, e l'avviso lo dice.",
         "questionTranscription": "Ha acconsentito alla trascrizione?",
-        "fixedNotRecorded": "Niente voce né immagine; il nome può comparire nel video."
+        "fixedNotRecorded": "Né voce, né immagine, né nome."
       }
     },
     "nav": {
@@ -4628,9 +4636,9 @@
   },
   "gdpr": {
     "consent": {
-      "recording": "Acconsento alla videoregistrazione dell'evento (audio e video)",
-      "recordingReserved": "Acconsento alla videoregistrazione dell'evento (audio e video). Il video resta riservato a chi organizza e a chi si è iscritto: non viene pubblicato. Chi si è iscritto può vederlo finché i dati della sua iscrizione sono conservati.",
-      "recordingPublic": "Acconsento alla videoregistrazione dell'evento (audio e video) e alla sua pubblicazione: il video può essere visto da chiunque sulla pagina dell'evento e nella libreria video.",
+      "recording": "Acconsento alla registrazione della mia voce quando intervengo nell'evento. Il mio volto e il mio nome non compaiono mai nel video.",
+      "recordingReserved": "Acconsento alla registrazione della mia voce quando intervengo nell'evento. Il mio volto e il mio nome non compaiono mai nel video. Il video resta riservato a chi organizza e a chi si è iscritto: non viene pubblicato. Chi si è iscritto può vederlo finché i dati della sua iscrizione sono conservati.",
+      "recordingPublic": "Acconsento alla registrazione della mia voce quando intervengo nell'evento. Acconsento anche alla pubblicazione del video: il video può essere visto da chiunque sulla pagina dell'evento e nella libreria video. Il mio volto e il mio nome non compaiono mai nel video.",
       "recordingNoVideo": "Acconsento alla registrazione dell'evento. Il video della sala non viene registrato: restano solo le tracce audio di chi acconsente alla trascrizione, se l'evento le prevede.",
       "multitrack": "Acconsento alla trascrizione dei miei interventi, con il mio nome, per il resoconto dell'evento. Se l'evento registra una traccia audio per ogni persona, la mia voce viene registrata a questo solo scopo e la traccia si cancella dopo la trascrizione; non viene usata per identificare o riprodurre la mia voce.",
       "multitrackRetained": "Acconsento alla trascrizione dei miei interventi, con il mio nome, per il resoconto dell'evento. Se l'evento registra una traccia audio per ogni persona, la mia voce viene registrata a questo solo scopo e la traccia si conserva con i dati dell'evento; non viene usata per identificare o riprodurre la mia voce.",
@@ -4640,10 +4648,9 @@
       "stayInTouchHelp": "Consenso facoltativo (art. 6.1.a GDPR). Puoi revocarlo in qualsiasi momento dal link «Rimuovi i miei dati dalla rubrica» nell'email di conferma, nei promemoria e negli inviti, oppure dalla pagina «I miei dati». Nome, indirizzo email e organizzazione sono quelli di questa iscrizione.",
       "stayInTouchRetention": "Conserviamo questi dati per {months} mesi da questo consenso: il periodo riparte solo se spunti di nuovo la casella.",
       "recordingOptionalListenOnly": "Se non acconsenti partecipi lo stesso, in solo ascolto: segui e scrivi in chat, ma microfono, videocamera e condivisione dello schermo restano chiusi. Puoi acconsentire più tardi, dalla sala.",
-      "recordingOptionalHost": "Se non acconsenti entri lo stesso e conduci come sempre, ma la tua voce non resta nelle tracce per persona né nella trascrizione. Il video della sala, se registrato, ti riprende comunque.",
       "recordingOptionalVoice": "Se non acconsenti partecipi lo stesso e puoi intervenire, ma resti fuori dalla registrazione: né il nome, né la voce, né l'immagine. Puoi acconsentire più tardi dalla sala.",
-      "recordingNotice": "L'evento può essere registrato. Partecipi senza microfono né videocamera: la registrazione non contiene la tua voce né la tua immagine, a meno che chi conduce non ti dia la parola.",
-      "recordingNoticeVoice": "L'evento può essere registrato. Partecipi senza microfono né videocamera: la registrazione non contiene il tuo nome, la tua voce né la tua immagine, a meno che tu non acconsenta in sala.",
+      "recordingNotice": "L'evento può essere registrato. Partecipi senza microfono né videocamera: il tuo volto e il tuo nome non compaiono mai nel video, e la tua voce solo se chi conduce ti dà la parola.",
+      "recordingNoticeVoice": "L'evento può essere registrato. Partecipi senza microfono né videocamera: il tuo volto e il tuo nome non compaiono mai nel video, e la tua voce solo se acconsenti in sala.",
       "recordingHostAlwaysReserved": "Conduci questo evento: sei sempre nella registrazione, con nome, voce, immagine e schermo condiviso. Il video resta riservato a chi organizza e a chi si è iscritto: non viene pubblicato. Chi si è iscritto può vederlo finché i dati della sua iscrizione sono conservati.",
       "recordingHostAlwaysPublic": "Conduci questo evento: sei sempre nella registrazione, con nome, voce, immagine e schermo condiviso. Il video può essere pubblicato e visto da chiunque.",
       "recordingHostAlways": "Conduci questo evento: sei sempre nella registrazione, con nome, voce, immagine e schermo condiviso."
@@ -4662,9 +4669,9 @@
         "destinationUnset": "Chi organizza decide dopo l'evento se pubblicarla.",
         "refuseOut": "Se non acconsenti partecipi lo stesso e resti fuori dalla registrazione.",
         "refuseListenOnly": "Se non acconsenti partecipi in solo ascolto.",
-        "hostsAlways": "Chi conduce è sempre nella registrazione, con nome, voce, immagine e schermo condiviso.",
-        "audienceNotice": "Partecipi senza microfono né videocamera: la registrazione non contiene la tua voce né la tua immagine, a meno che chi conduce non ti dia la parola.",
-        "audienceNoticeVoice": "Partecipi senza microfono né videocamera: la registrazione non contiene il tuo nome, la tua voce né la tua immagine, a meno che tu non acconsenta in sala."
+        "hostsAlways": "Nel video compare solo chi conduce, con nome, voce, immagine e schermo condiviso. Volto e nome di chi partecipa non compaiono mai.",
+        "audienceNotice": "Partecipi senza microfono né videocamera: il tuo volto e il tuo nome non compaiono mai nel video, e la tua voce solo se chi conduce ti dà la parola.",
+        "audienceNoticeVoice": "Partecipi senza microfono né videocamera: il tuo volto e il tuo nome non compaiono mai nel video, e la tua voce solo se acconsenti in sala."
       },
       "transcript": {
         "label": "Trascrizione",
@@ -5606,6 +5613,7 @@
     "switchToLive": "Passa alla diretta",
     "enterRoom": "Entra nella sala",
     "recordingNotice": "Questo evento può essere registrato.",
+    "recordingNoticeInstant": "La chiamata può essere registrata. Nel video compare solo chi conduce: il tuo volto e il tuo nome mai. Se qualcuno avvia la registrazione, ti chiediamo se acconsenti alla registrazione della tua voce.",
     "recordingAvailableAfter": "La registrazione sarà disponibile dopo l'evento.",
     "autoRefreshHint": "La pagina si aggiornerà automaticamente quando l'evento inizierà.",
     "startEventButton": "Avvia evento",
@@ -5658,9 +5666,9 @@
     "aiNoticeTitle": "Elaborazione AI dopo l'evento",
     "aiNotice": "Al termine, la registrazione può essere elaborata da strumenti di intelligenza artificiale per generare trascrizione, sintesi ed eventuali traduzioni e doppiaggi. La trascrizione riguarda solo chi ha dato il consenso. Gli artefatti possono contenere imprecisioni; il video resta la fonte autoritativa.",
     "multitrackConsentTitle": "Trascrizione dei tuoi interventi",
-    "recordingConsentTitle": "Registrazione dell'evento",
-    "recordingConsentIntro": "L'evento può essere registrato (audio e video). Con il consenso, la registrazione contiene il tuo nome, la tua voce, la tua immagine e quello che condividi sullo schermo.",
-    "recordingConsentIntroAnonymous": "L'evento può essere registrato (audio e video). Con il consenso, la registrazione contiene il tuo pseudonimo, la tua voce, la tua immagine e quello che condividi sullo schermo.",
+    "recordingConsentTitle": "Registrazione della tua voce",
+    "recordingConsentIntro": "L'evento può essere registrato. Nel video compare solo chi conduce: il tuo volto e il tuo nome mai. Con il consenso, quando intervieni si registra la tua voce.",
+    "recordingConsentIntroAnonymous": "L'evento può essere registrato. Nel video compare solo chi conduce: il tuo volto e il tuo pseudonimo mai. Con il consenso, quando intervieni si registra la tua voce.",
     "recordingConsentIntroNoVideo": "In questo evento non si registra il video della sala.",
     "enterGardenTitle": "Entra nella piazza",
     "enterGardenHint": "Un altro posto dove aspettare: cammina, incontra chi è in attesa ed entra nella diretta dal cancello quando la sala apre.",

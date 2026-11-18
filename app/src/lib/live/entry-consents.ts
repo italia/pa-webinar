@@ -10,51 +10,49 @@ import {
 } from '@/lib/registration/consents';
 
 /**
- * Il consenso alla registrazione dell'evento per chi entra dalla sala
+ * Il consenso alla registrazione della propria voce per chi entra dalla sala
  * d'attesa: se chiederlo, o se basta informare.
  *
  * Se chi partecipa ha microfono, videocamera o schermo, la sala lo chiede a
  * chi non l'ha gia' dato (all'iscrizione, o in sala in questa visita della
- * pagina); di solo ascolto informa e basta (lib/registration/consents).
- * Chi conduce o interviene lo vede in ogni evento che registra, salvo che
- * l'evento lo tenga sempre nella registrazione (conduceSempreRegistrato). E'
- * sempre facoltativo: chi non lo da' entra lo stesso (lib/live/listen-only). Senza
- * nulla che possa registrare (lib/recording/availability), e nelle chiamate
- * rapide, non si chiede e non si informa.
+ * pagina); di solo ascolto informa e basta (lib/registration/consents). E'
+ * sempre facoltativo: chi non lo da' entra lo stesso (lib/live/listen-only). Chi
+ * conduce o interviene non lo vede: e' sempre nel video, e la sala glielo dice
+ * (lib/live/consent-rule). Senza nulla che possa registrare
+ * (lib/recording/availability) non si chiede e non si informa. Nelle chiamate
+ * rapide non si chiede all'ingresso: chi partecipa entra con la voce fuori dalla
+ * registrazione, e la sala lo chiede quando qualcuno la avvia
+ * (components/live/recording-question).
  */
 /**
- * L'evento registra chi conduce o interviene: la stessa regola per la sala
- * d'attesa, la pagina della sala e la rotta del token. Nelle chiamate rapide
- * la sala non mostra la registrazione, e senza nulla che possa registrare non
- * c'e' niente a cui acconsentire.
+ * L'evento registra, e chi conduce o interviene e' nella registrazione: la
+ * stessa regola per la sala d'attesa, la pagina della sala e la rotta del token.
+ * Una chiamata rapida registra solo dove la voce di chi non acconsente resta
+ * fuori (`voce` 'rimovibile', lib/live/consent-rule): altrove la sala non offre
+ * la registrazione.
  */
 export function registraChiConduce(
   evento: { recordingEnabled: boolean; eventType?: string | null },
   registrazioneDisponibile: boolean,
+  voce?: VoceNelVideo,
 ): boolean {
-  return evento.recordingEnabled && registrazioneDisponibile && evento.eventType !== 'INSTANT';
+  if (!evento.recordingEnabled || !registrazioneDisponibile) return false;
+  return evento.eventType !== 'INSTANT' || voce === 'rimovibile';
 }
 
 export function consensoRegistrazioneIngresso(i: {
   formato: FormatoEvento;
   /** L'installazione puo' registrare. */
   registrazioneDisponibile: boolean;
-  /** Moderatore o relatore. */
+  /** Moderatore o relatore: non lo da', e' nel video (lib/live/consent-rule). */
   conduce: boolean;
   /** Dato all'iscrizione nel browser che si e' iscritto, o in sala. */
   giaDato: boolean;
-  /** Chiamata rapida (eventType INSTANT): la sala non ne mostra la registrazione. */
+  /** Chiamata rapida (eventType INSTANT): la domanda arriva in sala, quando
+   *  qualcuno avvia la registrazione. */
   istantanea?: boolean;
-  /** Chi conduce e' sempre nella registrazione (lib/live/consent-rule). */
-  conduceSempreRegistrato?: boolean;
 }): { richiesto: boolean; soloAscolto: boolean } {
-  if (i.conduce) {
-    const registra = registraChiConduce(
-      { recordingEnabled: i.formato.recordingEnabled, eventType: i.istantanea ? 'INSTANT' : null },
-      i.registrazioneDisponibile,
-    );
-    return { richiesto: registra && !i.giaDato && !i.conduceSempreRegistrato, soloAscolto: false };
-  }
+  if (i.istantanea || i.conduce) return { richiesto: false, soloAscolto: false };
   const formato = consensiRichiesti({
     ...i.formato,
     recordingEnabled: i.formato.recordingEnabled && i.registrazioneDisponibile,
@@ -84,10 +82,13 @@ export function consensoTrascrizioneIngresso(i: {
   voce?: VoceNelVideo;
   /** Il `soloAscolto` di `consensoRegistrazioneIngresso`: si avvisa e basta. */
   soloAscolto?: boolean;
+  /** Il consenso alla registrazione si chiede solo in sala, quando qualcuno la
+   *  avvia: la chiamata rapida che registra. */
+  registrazioneInSala?: boolean;
 }): boolean {
-  // Dove si avvisa soltanto la voce non si registra senza il consenso, che si
-  // da' in sala: la trascrizione, qui, non varrebbe.
-  const nonVarrebbe = i.voce === 'rimovibile' && !!i.soloAscolto;
+  // Dove si avvisa soltanto, e nelle chiamate rapide, la voce non si registra
+  // senza il consenso, che si da' in sala: la trascrizione, qui, non varrebbe.
+  const nonVarrebbe = (i.voce === 'rimovibile' && !!i.soloAscolto) || !!i.registrazioneInSala;
   return trascrizioneRichiesta(i.formato) && !i.concluso && !i.giaDato && !nonVarrebbe;
 }
 

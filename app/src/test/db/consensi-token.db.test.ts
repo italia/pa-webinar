@@ -18,7 +18,7 @@ import { encryptPII, hashEmail } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { eventAccessCookieName, signEventAccess } from '@/lib/event-session';
 import { ritiraConsensi } from '@/lib/live/consent-withdrawal';
-import type { PeriodoConsenso } from '@/lib/recording/destination';
+import { VERSIONE_TESTO_REGISTRAZIONE, type PeriodoConsenso } from '@/lib/recording/destination';
 
 import { biscotti } from './biscotti';
 import { creaEvento, creaIscrizione, entraCome, richiesta, svuotaDatabase } from './fixtures';
@@ -136,7 +136,7 @@ describe('la prova dell’iscrizione quando il testo in vigore cambia', () => {
     expect(altre).toEqual([]);
     expect(prova!.id).toBe(vecchia.id);
     expect(prova!.destination).toBe('PUBLIC');
-    expect(prova!.textVersion).toBe(1);
+    expect(prova!.textVersion).toBe(VERSIONE_TESTO_REGISTRAZIONE);
     expect(prova!.consentedAt.getTime()).toBeGreaterThan(vecchia.consentedAt.getTime());
     const periodi: PeriodoConsenso[] = [
       {
@@ -276,7 +276,7 @@ describe('la prova dell’iscrizione quando il testo in vigore cambia', () => {
 
     const [prova, ...altre] = await prove(evento.id);
     expect(altre).toEqual([]);
-    expect(prova).toMatchObject({ destination: 'PUBLIC', textVersion: 1 });
+    expect(prova).toMatchObject({ destination: 'PUBLIC', textVersion: VERSIONE_TESTO_REGISTRAZIONE });
   });
 });
 
@@ -474,7 +474,7 @@ describe('le prove senza iscrizione', () => {
     expect(righe.map((r) => r.destination)).toEqual(['PUBLIC', 'PUBLIC']);
   });
 
-  it('chi conduce dal link nominale lascia la prova sulla concessione', async () => {
+  it('chi conduce dal link nominale e\' nel video senza lasciare una prova della registrazione', async () => {
     const evento = await creaEvento({
       ...CHE_REGISTRA,
       recordingDestination: 'REGISTRANTS',
@@ -495,16 +495,15 @@ describe('le prove senza iscrizione', () => {
     });
 
     expect(risposta.voiceExcluded).toBe(false);
-    const [prova] = await prove(evento.id);
-    expect(prova).toMatchObject({
-      eventModeratorId: concessione.id,
-      registrationId: null,
-      destination: 'REGISTRANTS',
-      textVersion: 1,
-    });
+    expect(
+      (JSON.parse(Buffer.from(risposta.jwt.split('.')[1]!, 'base64url').toString()) as {
+        context: { user: { paInVideo?: boolean } };
+      }).context.user.paInVideo
+    ).toBe(true);
+    expect(await prove(evento.id)).toEqual([]);
   });
 
-  it('le due prove di una concessione portano il legame e l’impronta dell’indirizzo', async () => {
+  it('la prova della trascrizione di una concessione porta il legame e l’impronta dell’indirizzo', async () => {
     const evento = await creaEvento({
       ...CHE_REGISTRA,
       multitrackRecordingEnabled: true,
@@ -530,7 +529,7 @@ describe('le prove senza iscrizione', () => {
     });
 
     const legami = { eventModeratorId: concessione.id, emailHash: hashEmail(indirizzo) };
-    expect(await prove(evento.id)).toMatchObject([legami]);
+    expect(await prove(evento.id)).toEqual([]);
     expect(
       await prisma.multitrackConsent.findMany({ where: { eventId: evento.id } })
     ).toMatchObject([legami]);

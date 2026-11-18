@@ -42,7 +42,6 @@ function apri(patch: Partial<ComponentProps<typeof ConsentDiagram>> = {}) {
           participantsCanUnmute
           participantsCanStartVideo
           participantsCanShareScreen={false}
-          hostsAlwaysRecorded={false}
           voce="rimovibile"
           {...patch}
         />
@@ -76,16 +75,15 @@ describe('ConsentDiagram', () => {
     expect(testo).not.toContain(testi.roomListenOnly);
   });
 
-  it("dice l'opzione di chi conduce", () => {
-    expect(apri()).toContain(testi.hostsChoose);
-    expect(apri({ hostsAlwaysRecorded: true })).toContain(testi.hostsAlways);
+  it('chi conduce e\' sempre nel video, dove c\'e\' un video: non e\' una scelta', () => {
+    expect(apri()).toContain(testi.hostsAlways);
+    expect(apri({ voce: 'fissa' })).toContain(testi.hostsAlways);
   });
 
   it('dove la voce resta nel video, senza consenso solo ascolto, e lo dichiara', () => {
     const testo = apri({ voce: 'fissa' });
     expect(testo).toContain(testi.fixedVoice);
     expect(testo).toContain(testi.roomListenOnly);
-    expect(testo).toContain(testi.hostsFixed);
     expect(testo).not.toContain(testi.othersSame);
   });
 
@@ -111,7 +109,8 @@ describe('ConsentDiagram', () => {
     expect(testo).toContain(testi.recordedVoice);
     expect(testo).toContain(testi.notRecordedVoice);
     expect(testo).not.toContain(testi.trace);
-    expect(testo).not.toContain(testi.hostsChoose);
+    // Senza video chi conduce segue il consenso alla trascrizione come tutti.
+    expect(testo).not.toContain(testi.hostsAlways);
   });
 
   it("senza video e senza tracce non c'e' niente da mostrare", () => {
@@ -124,22 +123,12 @@ describe('ConsentDiagram', () => {
             participantsCanUnmute
             participantsCanStartVideo
             participantsCanShareScreen={false}
-            hostsAlwaysRecorded={false}
             voce="assente"
           />
         </NextIntlClientProvider>
       );
     });
     expect(container.querySelector('.mappa-consensi')).toBeNull();
-  });
-
-  it("l'opzione di chi conduce conta solo dove si puo' restare fuori", () => {
-    expect(apri({ voce: 'fissa', hostsAlwaysRecorded: true })).toContain(
-      testi.hostsFixed
-    );
-    expect(apri({ voce: 'fissa', hostsAlwaysRecorded: true })).not.toContain(
-      testi.hostsAlways
-    );
   });
 
   it("chi non puo' parlare riceve solo un avviso", () => {

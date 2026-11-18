@@ -11,6 +11,10 @@ import { avatarColor, avatarInitials } from '@/lib/chat/avatar';
 import type { JitsiMeetExternalAPI, JitsiParticipant } from '@/types/jitsi';
 import { useJitsiStats, qualityLabel, qualityColor } from '@/hooks/use-jitsi-stats';
 import { humanParticipantCount, isHumanParticipant } from '@/lib/jitsi/participants';
+import type {
+  ElencoRegistrazione,
+  PresenzaNellaRegistrazione,
+} from '@/lib/live/recording-badge';
 
 import {
   canKick,
@@ -30,6 +34,13 @@ interface SeatView {
   name: string | null;
   email: string | null;
 }
+
+/** Il segno di ogni presenza nella registrazione, nell'elenco. */
+const ETICHETTA_PRESENZA = {
+  video: 'inVideoBadge',
+  voce: 'voiceRecordedBadge',
+  nessuna: 'voiceExcludedBadge',
+} as const satisfies Record<PresenzaNellaRegistrazione, string>;
 
 /** Due nomi uguali a meno di maiuscole e spazi. */
 function stessoNome(a: string, b: string): boolean {
@@ -65,8 +76,12 @@ interface ParticipantPanelProps {
   /** Evento con il solo ascolto per chi non acconsente: microfoni e
    *  videocamere seguono il consenso, i blocchi della sala non si tolgono. */
   bloccoDaConsenso?: boolean;
-  /** Il consenso si chiede al pubblico: il segno dice chi non l'ha dato. */
-  consensoChiesto?: boolean;
+  /** Per chi l'elenco dice come e' nella registrazione (lib/live/recording-badge):
+   *  chi modera lo vede sulle righe di tutti, gli altri solo sulla propria. */
+  statoRegistrazione?: ElencoRegistrazione;
+  /** La propria presenza nella registrazione, per chi non modera: la sala la
+   *  conosce dal suo token. */
+  statoProprio?: PresenzaNellaRegistrazione | null;
   /** Quante mani sono alzate: la scheda lo mostra a chi modera. */
   onHandsChange?: (count: number) => void;
 }
@@ -89,7 +104,8 @@ export default function ParticipantPanel({
   eventSlug,
   token,
   bloccoDaConsenso = false,
-  consensoChiesto = false,
+  statoRegistrazione = 'nessuno',
+  statoProprio = null,
   onHandsChange,
 }: ParticipantPanelProps) {
   const t = useTranslations('live.participants');
@@ -301,6 +317,7 @@ export default function ParticipantPanel({
     seats: Record<string, SeatView>;
     listenOnly?: string[];
     voiceExcluded?: string[];
+    recording?: Record<string, PresenzaNellaRegistrazione>;
   }>(
     seatsUrl ? [seatsUrl, token, participants.length] : null,
     async ([url, bearer]: [string, string]) => {
@@ -480,6 +497,18 @@ export default function ParticipantPanel({
       seat?.kind === 'registration' && !!seat.name && !stessoNome(seat.name, shownName);
     const soloAscolto = isModerator && inSoloAscolto.has(p.participantId);
     const voceEsclusa = isModerator && conVoceEsclusa.has(p.participantId);
+    // Come e' nella registrazione: chi modera lo sa per tutti dal server, gli
+    // altri solo per se'. Dove il pubblico non parla, solo per chi chiede la
+    // parola (e per la propria riga).
+    const presenza: PresenzaNellaRegistrazione | null = isModerator
+      ? (seatsData?.recording?.[p.participantId] ?? null)
+      : isSelf
+        ? statoProprio
+        : null;
+    const mostraPresenza =
+      !soloAscolto &&
+      (statoRegistrazione === 'tutti' ||
+        (statoRegistrazione === 'mani' && (!!manoAlzata || isSelf)));
     return (
       <li
         key={p.participantId}
@@ -503,10 +532,8 @@ export default function ParticipantPanel({
               {shownName}
               {isSelf && <span className="people-row__self">{t('you')}</span>}
               {soloAscolto && <span className="people-row__tag">{t('listenOnlyBadge')}</span>}
-              {/* Dove l'evento avvisa soltanto vale per tutto il pubblico: il
-                  segno compare solo per chi chiede la parola. */}
-              {voceEsclusa && (consensoChiesto || manoAlzata) && (
-                <span className="people-row__tag">{t('voiceExcludedBadge')}</span>
+              {mostraPresenza && presenza && (
+                <span className="people-row__tag">{t(ETICHETTA_PRESENZA[presenza])}</span>
               )}
             </span>
             {seat && (

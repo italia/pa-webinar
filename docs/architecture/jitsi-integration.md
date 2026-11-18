@@ -394,8 +394,11 @@ recorder skips the track. The mark never goes into the JWT under that name: the 
 upgrade. The mark takes effect only with the new `mod_pa_media_lock` loaded: after an upgrade that
 changes the Prosody modules, restart Prosody before the next event. The room tells the person, with **I
 consent to the recording**: consenting asks for a new token, and the conference rejoins with it.
-Withdrawing from **Your consents** in the top bar does the opposite. `Event.hostsAlwaysRecorded` leaves
-moderators and speakers unmarked, with a notice instead of the box.
+Withdrawing from **Your consents** in the top bar does the opposite. Moderators and speakers are never
+marked: they are in the video, with name and image, and read a notice instead of the box. Their token
+carries `context.user.paInVideo = true`, and nobody else's does, the recorder's included: Prosody writes it
+into the presence, where the client cannot change it, and the recorder shows image and name only of whoever
+carries it. Of everyone else the recording holds at most the voice, with the consent.
 
 **Only hosts in the video.** The composite video shows the people who host the event and nobody else.
 The token of a host carries `context.user.paInVideo`. `mod_pa_media_lock` writes `hidden-from-recorder`
@@ -453,7 +456,9 @@ receives the bridge's approval as soon as they join, and Jitsi shows it as **The
 speak**, though nobody asked: during the first seconds of each entry the room closes that notification
 (`hideNotification`, uid `asked-to-unmute`), while the floor given later by a moderator (**Give the
 floor**, `askToUnmute`) still shows it. The moderator's **Participants** tab marks these people, from
-`GET /api/events/{param}/seats`. `voiceExcluded` comes from Prosody (`mod_pa_occupants` sends the token's
+`GET /api/events/{param}/seats`, whose `recording` field says for each endpoint in the room whether it is
+`video` (a host: the seat of a moderator or speaker link, `mod-`), `voce` (a participant whose voice is
+recorded) or `nessuna` (a participant without the consent, or listening only). `voiceExcluded` comes from Prosody (`mod_pa_occupants` sends the token's
 value, stored in `RoomOccupant`). `listenOnly` comes from the person's browser, which declares its bridge
 endpoint with its room token (`POST /api/events/{param}/listen-only`), and only a token that carries the
 value the bridge enforces marks it. A dominant-speaker event from a `voiceExcluded` endpoint keeps no
@@ -463,7 +468,7 @@ that endpoint are kept as times only.
 Only where the voice cannot be left out, every token of such an event locks all three media, whoever
 consented carries `mediaAdmit` with the media the event concedes, and every token carries `consentLock`:
 in that room the module refuses to switch the moderation off (the **Participants** tab shows a note instead of **Microphones locked** and **Video
-locked**), and a person made moderator stays bound by their token. `recordingEnabled` and `hostsAlwaysRecorded` do not change
+locked**), and a person made moderator stays bound by their token. `recordingEnabled` does not change
 while the room may be open (`LIVE`, `PROVISIONING`, `IDLE`, or `PUBLISHED` with a call session opened in
 the last 12 hours, since moderators and speakers enter early; `app/src/lib/live/room-open.ts`): the lock
 is decided at the first entry, and people already in the room did not consent to a recording switched on

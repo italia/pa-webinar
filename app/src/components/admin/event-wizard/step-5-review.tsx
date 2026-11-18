@@ -21,7 +21,7 @@ import { Icon } from '@/components/ui/icon';
 import { useDurataTesto } from '@/hooks/use-durata-testo';
 import { durataProgramma } from '@/lib/agenda/programme';
 import { parseLocaleList } from '@/lib/ai/target-locales';
-import { conduceSempreRegistrato, type VoceNelVideo } from '@/lib/live/consent-rule';
+import { conduceNelVideo, type VoceNelVideo } from '@/lib/live/consent-rule';
 import { registraChiConduce } from '@/lib/live/entry-consents';
 import { elencoVisibileAlPubblico } from '@/lib/live/participant-list';
 import { domandePubbliche } from '@/lib/events/post-event-sections';
@@ -600,10 +600,9 @@ export default function Step5Review({
               {vociConsenso.length > 0
                 ? tf('consentsLine', { list: vociConsenso.join(' · ') })
                 : tf('consentsNone')}
-              {registraChiConduce({ recordingEnabled: form.recordingEnabled && !vuota, eventType: istantanea ? 'INSTANT' : null }, recordingAvailable) && (
-                <span className="d-block text-secondary small mt-1">
-                  {tf(conduceSempreRegistrato(form, voceNelVideo) ? 'consentsHostsAlways' : 'consentsHosts')}
-                </span>
+              {registraChiConduce({ recordingEnabled: form.recordingEnabled && !vuota, eventType: istantanea ? 'INSTANT' : null }, recordingAvailable, voceNelVideo) &&
+                conduceNelVideo(voceNelVideo) && (
+                <span className="d-block text-secondary small mt-1">{tf('consentsHostsAlways')}</span>
               )}
               {(consensi.registrazione || consensi.tracce) && (
                 <span className="d-block text-secondary small">{tf('consentsWithdraw')}</span>
@@ -664,7 +663,6 @@ export default function Step5Review({
             participantsCanUnmute={toggles.participantsCanUnmute}
             participantsCanStartVideo={toggles.participantsCanStartVideo}
             participantsCanShareScreen={toggles.participantsCanShareScreen}
-            hostsAlwaysRecorded={form.hostsAlwaysRecorded}
             voce={voceNelVideo}
           />
         )}

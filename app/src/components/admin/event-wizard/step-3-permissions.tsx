@@ -18,7 +18,8 @@ import { useTranslations } from 'next-intl';
 import { parseLocaleList } from '@/components/admin/language-checklist';
 import ToggleSwitch from '@/components/ui/toggle-switch';
 import { Icon } from '@/components/ui/icon';
-import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import { conduceNelVideo, type VoceNelVideo } from '@/lib/live/consent-rule';
+import { registraChiConduce } from '@/lib/live/entry-consents';
 import {
   DESTINAZIONE_DI_PARTENZA,
   puoCambiareDestinazione,
@@ -47,8 +48,8 @@ export interface StepPermissionsValue {
   /** Dove va il video: e' cio' a cui acconsente chi spunta la casella. Null su
    *  un evento che non l'ha dichiarata. */
   recordingDestination: Destinazione;
-  /** Moderatori e relatori sempre nella registrazione, per dichiarazione di
-   *  chi organizza: non vedono la casella. */
+  /** Colonna storica, non piu' una scelta: chi conduce e' sempre nel video
+   *  (lib/live/consent-rule). Il valore viaggia com'e'. */
   hostsAlwaysRecorded: boolean;
   /** Pubblico anonimo: chi partecipa compare con uno pseudonimo. */
   audienceAnonymous: boolean;
@@ -98,10 +99,11 @@ interface Props {
   recordingAvailable?: boolean;
   /** Cosa succede alla voce di chi non acconsente, in questa installazione. */
   voceNelVideo?: VoceNelVideo;
-  /** Una chiamata rapida non chiede consensi: niente diagramma, niente opzione. */
+  /** Una chiamata rapida chiede il consenso in sala, all'avvio della
+   *  registrazione: niente diagramma. */
   istantanea?: boolean;
-  /** Tenere chi conduce nella registrazione lo dichiara lo staff dell'evento, non
-   *  un link di conduzione. */
+  /** Le scelte dello staff dell'evento (la destinazione): un link di conduzione
+   *  non le fa. */
   puoDichiarareChiConduce?: boolean;
   /** La scelta della destinazione. Assente dove non si propone: una chiamata
    *  rapida, un link di conduzione (la decide lo staff dell'evento). */
@@ -656,30 +658,22 @@ export default function StepPermissions({
             </p>
           )}
 
-        {value.recordingEnabled &&
-          recordingAvailable &&
-          !istantanea &&
-          puoDichiarareChiConduce &&
-          voceNelVideo === 'rimovibile' && (
-          <div
-            className="py-2 d-flex justify-content-between align-items-start"
-            style={{ borderTop: '1px solid #e8e8e8' }}
-          >
-            <div className="me-3">
-              <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
-                {t('hostsAlwaysRecorded')}
-              </div>
-              <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
-                {t('hostsAlwaysRecordedDesc')}
-              </div>
+        {/* Chi conduce e' nel video, sempre: non e' una scelta dell'evento
+            (lib/live/consent-rule). La riga lo dice a chi organizza, perche'
+            l'informativa dell'evento lo dica a chi conduce. */}
+        {registraChiConduce(
+          { recordingEnabled: value.recordingEnabled, eventType: istantanea ? 'INSTANT' : null },
+          recordingAvailable,
+          voceNelVideo,
+        ) &&
+          conduceNelVideo(voceNelVideo) && (
+          <div className="py-2" style={{ borderTop: '1px solid #e8e8e8' }}>
+            <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
+              {t('hostsAlwaysRecorded')}
             </div>
-            <ToggleSwitch
-              label=""
-              ariaLabel={t('hostsAlwaysRecorded')}
-              checked={value.hostsAlwaysRecorded}
-              disabled={soloAscoltoBloccato}
-              onChange={() => onChange({ hostsAlwaysRecorded: !value.hostsAlwaysRecorded })}
-            />
+            <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
+              {t('hostsAlwaysRecordedDesc')}
+            </div>
           </div>
         )}
 
@@ -696,7 +690,6 @@ export default function StepPermissions({
               voceNelVideo,
             )}
             {...togglesFromMatrix(value.permissionMatrix)}
-            hostsAlwaysRecorded={value.hostsAlwaysRecorded}
             voce={voceNelVideo}
           />
         )}

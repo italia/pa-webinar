@@ -30,11 +30,9 @@ import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { limiteTokenOspiti } from '@/lib/room-rate-limit';
 import { readOwnedEventAccess } from '@/lib/event-session';
 import { guestAccessAllowed } from '@/lib/events/guest-window';
-import { conduceSempreRegistrato } from '@/lib/live/consent-rule';
 import { registrazioneDellIscrizione, trascrizioneInVigore } from '@/lib/live/consents-in-force';
 import { mediaDelToken, regolaConsenso } from '@/lib/live/listen-only';
 import { elencoVisibileAlPubblico } from '@/lib/live/participant-list';
-import { registraChiConduce } from '@/lib/live/entry-consents';
 import { pseudonimo } from '@/lib/live/pseudonym';
 import { guestSenderId } from '@/lib/chat/sender-key';
 import { recordingAvailableFor, voceNelVideo } from '@/lib/recording/availability';
@@ -470,24 +468,19 @@ export const POST = withErrorHandling(async (request, context) => {
     // Un identificativo per ingresso (con suffisso casuale): lo stesso nel
     // consenso e nel JWT.
     const postoModeratore = moderatorJitsiId(event.id);
-    // Il consenso alla registrazione di chi conduce o interviene: facoltativo,
-    // con la prova legata alla sua concessione o al suo account. Vale con un clic
-    // o con una replica che trova ancora la sua prova. Senza, entra lo stesso,
-    // con le regole di chi non ha acconsentito. Non conta dove chi organizza
-    // dichiara chi conduce sempre nella registrazione: nessuna prova, perche'
-    // nessuno ha spuntato niente.
-    const registraVideo = registraChiConduce(event, registrabile);
-    // Un link e' un posto, non una persona: quello dato da un altro con lo
-    // stesso link non si eredita.
+    // Chi conduce o interviene e' sempre nel video, con nome e immagine, e il
+    // suo token lo dice (`paInVideo`, lib/live/listen-only): non da' il consenso
+    // alla registrazione, e un consenso che una pagina manda lo stesso non lascia
+    // una prova. Resta suo il consenso alla trascrizione dei propri interventi,
+    // con la prova legata alla concessione o all'account. Un link e' un posto,
+    // non una persona: quello dato da un altro con lo stesso link non si eredita.
     const replicaConduce = await provaDellaReplica(
       event,
-      parsed.data.consentReplay,
+      parsed.data.consentReplay && { ...parsed.data.consentReplay, recording: false },
       destinazione,
       staff?.accountId,
     );
-    const consensoConduce =
-      conduceSempreRegistrato(event, voce) || consensoDato || !!replicaConduce.registrazione;
-    const mediaConduce = mediaDelToken(event, regola, isSpeaker ? 'relatore' : 'moderatore', consensoConduce);
+    const mediaConduce = mediaDelToken(event, regola, isSpeaker ? 'relatore' : 'moderatore', true);
     const jwt = await generateJitsiJwt({
       roomName: event.jitsiRoomName,
       displayName: name,
@@ -503,11 +496,7 @@ export const POST = withErrorHandling(async (request, context) => {
     });
     const consentsRecorded = await registraConsensi(
       eventoConsensi,
-      {
-        ...parsed.data,
-        multitrackConsent:
-          registraVideo && !consensoConduce ? false : parsed.data.multitrackConsent,
-      },
+      { ...parsed.data, recordingConsent: false },
       {
         jitsiUserId: postoModeratore,
         displayName: name,
@@ -516,7 +505,7 @@ export const POST = withErrorHandling(async (request, context) => {
         emailHash: grant.email ? hashEmail(grant.email) : undefined,
       },
       destinazione,
-      registraVideo && !consensoConduce ? { ...replicaConduce, tracce: null } : replicaConduce,
+      replicaConduce,
     );
 
     return Response.json({
@@ -525,11 +514,7 @@ export const POST = withErrorHandling(async (request, context) => {
       displayName: name,
       role: isSpeaker ? 'speaker' : 'moderator',
       consentsRecorded,
-      consentsInForce: await consensiInVigore(
-        event,
-        postoModeratore,
-        consentsRecorded.recording || !!replicaConduce.registrazione,
-      ),
+      consentsInForce: await consensiInVigore(event, postoModeratore, false),
       voiceExcluded: !!mediaConduce.voiceExcluded,
       participantListVisible,
       recordingDestination: destinazione,
