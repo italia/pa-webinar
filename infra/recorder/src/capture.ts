@@ -578,10 +578,14 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
       seenParticipant = true;
       if (idleTimer) clearTimeout(idleTimer);
       const pid: string = track.getParticipantId?.() ?? 'unknown';
-      // Il consenso alla registrazione manca (lo dice la presenza, che viene
-      // dal token: mod_pa_media_lock): la sua voce non si registra, qualunque
-      // altra cosa abbia acconsentito.
-      if (conference?.getParticipantById?.(pid)?.isHiddenFromRecorder?.() === true) {
+      // Il consenso alla registrazione manca: la sua voce non si registra,
+      // qualunque altra cosa abbia acconsentito. Lo dice la presenza, che viene
+      // dal token (mod_pa_media_lock): hidden-from-recorder senza
+      // pa-recorder-voice. Chi ha anche pa-recorder-voice e' un partecipante con
+      // il consenso, fuori dal video ma non dall'audio: si registra.
+      const persona = conference?.getParticipantById?.(pid);
+      const soloVoce = persona?.getIdentity?.()?.user?.['pa-recorder-voice'] === 'true';
+      if (persona?.isHiddenFromRecorder?.() === true && !soloVoce) {
         log(`TRACK_SKIPPED pid=${pid}: nessun consenso alla registrazione`);
         return;
       }

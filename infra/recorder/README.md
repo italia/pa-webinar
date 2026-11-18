@@ -106,6 +106,11 @@ sequenceDiagram
    uses the hidden-domain login when that is configured, and the JWT otherwise.
 4. **Capture.** Every remote audio track gets its own `MediaRecorder`. Chunks
    stream to Node, which appends them to one file per track in `OUTPUT_DIR`.
+   A track is skipped when its owner's presence carries `hidden-from-recorder`
+   without `pa-recorder-voice`, which Prosody writes for a person without the
+   recording consent; a participant who consented carries both marks, stays out
+   of the composite video and is recorded here. The portal then decides on the
+   transcription consent ([Consent gates](../../docs/architecture/recording.md#consent-gates)).
 5. **Manifest.** When the session ends, `manifest.ts` turns the per-track
    timing into `tracks.json`.
 6. **Upload.** `upload.ts` uploads each file through a single-object URL that
