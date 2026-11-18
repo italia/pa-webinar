@@ -407,9 +407,18 @@ export function controllaRegistro(registro, ambiente) {
       lacune: [],
     };
 
+  // Una voce che non e' un oggetto (un `null` o un testo lasciati da un
+  // merge) si segnala come le altre, invece di far cadere il controllo.
+  const valide = [];
+  voci.forEach((voce, i) => {
+    if (voce !== null && typeof voce === 'object' && !Array.isArray(voce))
+      valide.push(voce);
+    else problemi.push({ chi: `models[${i}]`, motivo: 'an entry must be an object' });
+  });
+
   const visti = new Set();
   const idVisti = new Map();
-  for (const voce of voci) {
+  for (const voce of valide) {
     const chi = `${voce.name ?? '?'}${voce.file ? ` (${voce.file})` : ''}`;
     if (visti.has(chi)) problemi.push({ chi, motivo: 'registered twice' });
     visti.add(chi);
@@ -421,11 +430,11 @@ export function controllaRegistro(registro, ambiente) {
     for (const motivo of problemiDellaVoce(voce, ambiente))
       problemi.push({ chi, motivo });
   }
-  for (const motivo of modelliNonRegistrati(voci, ambiente.tracciati, ambiente.leggi)) {
+  for (const motivo of modelliNonRegistrati(valide, ambiente.tracciati, ambiente.leggi)) {
     problemi.push({ chi: 'repository', motivo });
   }
-  const lacune = voci.flatMap((v) =>
+  const lacune = valide.flatMap((v) =>
     Array.isArray(v.gaps) ? v.gaps.map((l) => ({ chi: v.name, ...l })) : []
   );
-  return { problemi, voci, lacune };
+  return { problemi, voci: valide, lacune };
 }

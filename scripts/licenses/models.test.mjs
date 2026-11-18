@@ -521,6 +521,19 @@ describe('controllaRegistro', () => {
     assert.ok(p.some((x) => x.motivo.includes('id x is also on')));
   });
 
+  it("una voce che non e' un oggetto si segnala senza far cadere il controllo", () => {
+    const { problemi: p, voci } = controllaRegistro(
+      { models: [null, 'org/modello', [1], scaricato()] },
+      AMBIENTE_BASE
+    );
+    assert.deepEqual(p, [
+      { chi: 'models[0]', motivo: 'an entry must be an object' },
+      { chi: 'models[1]', motivo: 'an entry must be an object' },
+      { chi: 'models[2]', motivo: 'an entry must be an object' },
+    ]);
+    assert.equal(voci.length, 1);
+  });
+
   it('un registro senza elenco si segnala', () => {
     assert.equal(controllaRegistro({}, AMBIENTE_BASE).problemi.length, 1);
   });
