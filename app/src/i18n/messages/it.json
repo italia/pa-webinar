@@ -990,7 +990,8 @@
     "accessDenied": {
       "title": "Questa sezione non è disponibile per il tuo ruolo",
       "body": "Da organizzatore gestisci i tuoi eventi: crearli, pubblicarli, i materiali, i questionari e la post-produzione. La configurazione della piattaforma e i dati di tutti gli eventi restano all'amministrazione.",
-      "back": "Vai ai tuoi eventi"
+      "back": "Vai ai tuoi eventi",
+      "organizerOnly": "Solo chi organizza questo evento può modificarlo. Da amministratore ne vedi lo stato e i dettagli, e puoi archiviarlo o eliminarlo. Le registrazioni e il loro contenuto sono di chi organizza e di chi ha partecipato."
     },
     "staffLogin": {
       "title": "Accedi all’area di amministrazione",
@@ -1865,7 +1866,8 @@
       "detailFilename": "Nome file",
       "transcriptManage": "Gestisci trascrizione / AI",
       "transcriptReady": "Trascritto",
-      "transcriptProcessing": "In elab."
+      "transcriptProcessing": "In elab.",
+      "organizerOnly": "Solo per chi organizza"
     },
     "gdprAudit": {
       "subtitle": "Registro delle azioni di privacy su dati personali: cancellazioni, consensi, export",
@@ -1880,7 +1882,8 @@
         "DATA_DELETED": "Dati cancellati",
         "CONSENT_RECORDED": "Consenso registrato",
         "DATA_EXPORTED": "Dati esportati",
-        "CONSENT_WITHDRAWN": "Consenso ritirato"
+        "CONSENT_WITHDRAWN": "Consenso ritirato",
+        "RECORDING_CONTENT_READ": "Contenuto della registrazione letto dallo staff"
       },
       "recordsAffected": "{count} record coinvolti",
       "colWhen": "Quando",
@@ -1906,7 +1909,8 @@
       "rotating": "Rigenero…",
       "regenerateTitle": "Rigenera il token moderatore (invalida il vecchio link)",
       "confirmRegenerate": "Sei sicuro di voler rigenerare il token? Il vecchio link non funzionerà più.",
-      "noResults": "Nessun evento trovato."
+      "noResults": "Nessun evento trovato.",
+      "organizerOnlyLink": "Link visibile solo a chi organizza l’evento"
     },
     "registrations": {
       "subtitle": "Tutte le persone iscritte agli eventi — ricerca, filtra ed esporta",
@@ -2338,7 +2342,8 @@
         "DATA_DELETED": "Dati eliminati",
         "CONSENT_RECORDED": "Consenso registrato",
         "DATA_EXPORTED": "Dati esportati",
-        "CONSENT_WITHDRAWN": "Consenso ritirato"
+        "CONSENT_WITHDRAWN": "Consenso ritirato",
+        "RECORDING_CONTENT_READ": "Contenuto della registrazione letto dallo staff"
       }
     },
     "settings": {
@@ -3230,7 +3235,20 @@
         "publishNow": "Pubblica ora"
       },
       "editFeatures": "Modifica le funzioni",
-      "editPrivacy": "Modifica privacy e dati"
+      "editPrivacy": "Modifica privacy e dati",
+      "governance": {
+        "title": "Gestisci questo evento da amministratore",
+        "body": "Non sei fra chi lo organizza: ne vedi stato, dettagli, iscrizioni e consensi, e puoi archiviarlo o eliminarlo. Condurre l’evento, il link del moderatore e il contenuto delle registrazioni (video, trascrizioni, sintesi) spettano a chi lo organizza.",
+        "recording": "Il contenuto della registrazione è disponibile solo a chi organizza l’evento e a chi vi ha partecipato. Qui vedi se esiste e i suoi dettagli.",
+        "recordingFile": "Registrazione",
+        "present": "Presente",
+        "absent": "Nessuna",
+        "recordingPublished": "Pubblicata",
+        "yes": "Sì",
+        "no": "No",
+        "recordingDuration": "Durata",
+        "recordingSize": "Dimensione"
+      }
     },
     "rubrica": {
       "subtitle": "Persone che hanno dato consenso all'inserimento in rubrica (art. 6.1.a GDPR). Nome, email e organizzazione si aggiornano solo quando la persona spunta di nuovo la casella.",
@@ -3505,7 +3523,8 @@
         "metricsTitle": "Metriche sintesi (LLM)",
         "chars": "caratteri",
         "model": "Modello",
-        "notAvailable": "n/d"
+        "notAvailable": "n/d",
+        "contentHidden": "Disponibile solo a chi organizza l’evento."
       },
       "rel": {
         "title": "Affidabilità AI",
@@ -3657,7 +3676,8 @@
         "alignNone": "Nessun cambio di slide da allineare.",
         "previewTitle": "Anteprima",
         "previewHelp": "Il video con le slide come le vedrà il pubblico, con la correzione scritta qui sopra."
-      }
+      },
+      "contentOrganizerOnly": "Solo chi organizza questo evento può vedere e modificare il contenuto di questa registrazione (video, tracce, trascrizione, sintesi, traduzioni). Qui vedi il suo stato, le lavorazioni e i dettagli dei file."
     },
     "questionnairesPage": {
       "subtitle": "Template riutilizzabili di domande per i questionari di pre-registrazione e post-evento."
@@ -3949,7 +3969,9 @@
       "publishDesc": "Rileggilo prima di pubblicarlo: il testo è scritto da un modello di intelligenza artificiale. Un resoconto rigenerato va pubblicato di nuovo.",
       "preview": "Anteprima",
       "hidePreview": "Nascondi l'anteprima",
-      "previewLanguage": "Lingua"
+      "previewLanguage": "Lingua",
+      "organizerOnly": "Solo chi organizza questo evento può chiedere, leggere e pubblicare il resoconto.",
+      "organizerOnlyExists": "Il resoconto c’è. Solo chi organizza questo evento può leggerlo e pubblicarlo."
     },
     "endEvent": "Termina evento",
     "endEventConfirmTitle": "Terminare l'evento per tutti?",
@@ -6012,6 +6034,7 @@
     "captionsTranscriptNotTranslatable": "Questa trascrizione viene dai sottotitoli live: la traduzione automatica parte solo da una trascrizione AI della registrazione.",
     "sameLanguage": "La lingua scelta è quella originale della registrazione: scegline un'altra.",
     "recordingDestinationNotCovered": "I consensi di questo evento valgono per una registrazione riservata: non puoi renderla visibile a tutti né collegare un video esterno.",
-    "mtUnavailable": "La traduzione automatica non è installata su questa istanza."
+    "mtUnavailable": "La traduzione automatica non è installata su questa istanza.",
+    "recordingContentOrganizerOnly": "Solo chi organizza questo evento può aprire, modificare o pubblicare il contenuto delle sue registrazioni."
   }
 }

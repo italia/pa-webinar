@@ -780,7 +780,8 @@
     "accessDenied": {
       "title": "Dieser Bereich ist für Ihre Rolle nicht verfügbar",
       "body": "Als Veranstaltende verwalten Sie Ihre eigenen Veranstaltungen: anlegen, veröffentlichen, Materialien, Fragebögen und Nachbearbeitung. Die Plattformeinstellungen und die Daten aller Veranstaltungen bleiben bei der Administration.",
-      "back": "Zu Ihren Veranstaltungen"
+      "back": "Zu Ihren Veranstaltungen",
+      "organizerOnly": "Nur die Veranstaltenden können diese Veranstaltung bearbeiten. Als Administrator sehen Sie Status und Details und können sie archivieren oder löschen. Die Aufzeichnungen und ihr Inhalt gehören den Veranstaltenden und den Teilnehmenden."
     },
     "staffLogin": {
       "title": "Anmeldung im Verwaltungsbereich",
@@ -1655,7 +1656,8 @@
       "detailFilename": "Dateiname",
       "transcriptManage": "Transkript / KI verwalten",
       "transcriptReady": "Transkribiert",
-      "transcriptProcessing": "In Verarb."
+      "transcriptProcessing": "In Verarb.",
+      "organizerOnly": "Nur Veranstaltende"
     },
     "gdprAudit": {
       "subtitle": "Protokoll der Datenschutzmaßnahmen für personenbezogene Daten: Löschungen, Einwilligungen, Exporte",
@@ -1670,7 +1672,8 @@
         "DATA_DELETED": "Daten gelöscht",
         "CONSENT_RECORDED": "Einwilligung erfasst",
         "DATA_EXPORTED": "Daten exportiert",
-        "CONSENT_WITHDRAWN": "Einwilligung widerrufen"
+        "CONSENT_WITHDRAWN": "Einwilligung widerrufen",
+        "RECORDING_CONTENT_READ": "Aufzeichnungsinhalt vom Personal gelesen"
       },
       "recordsAffected": "{count} betroffene Datensätze",
       "colWhen": "Wann",
@@ -1696,7 +1699,8 @@
       "rotating": "Wird neu generiert…",
       "regenerateTitle": "Moderator-Token neu generieren (alter Link wird ungültig)",
       "confirmRegenerate": "Sind Sie sicher, dass Sie den Token neu generieren möchten? Der alte Link funktioniert dann nicht mehr.",
-      "noResults": "Keine Events gefunden."
+      "noResults": "Keine Events gefunden.",
+      "organizerOnlyLink": "Link nur für die Veranstaltenden sichtbar"
     },
     "registrations": {
       "subtitle": "Alle zu Events angemeldeten Personen — suchen, filtern und exportieren",
@@ -2128,7 +2132,8 @@
         "DATA_DELETED": "Daten gelöscht",
         "CONSENT_RECORDED": "Einwilligung erfasst",
         "DATA_EXPORTED": "Daten exportiert",
-        "CONSENT_WITHDRAWN": "Einwilligung widerrufen"
+        "CONSENT_WITHDRAWN": "Einwilligung widerrufen",
+        "RECORDING_CONTENT_READ": "Aufzeichnungsinhalt vom Personal gelesen"
       }
     },
     "settings": {
@@ -3020,7 +3025,20 @@
         "publishNow": "Jetzt veröffentlichen"
       },
       "editFeatures": "Funktionen bearbeiten",
-      "editPrivacy": "Datenschutz und Daten bearbeiten"
+      "editPrivacy": "Datenschutz und Daten bearbeiten",
+      "governance": {
+        "title": "Sie verwalten diese Veranstaltung als Administrator",
+        "body": "Sie gehören nicht zu den Veranstaltenden: Sie sehen Status, Details, Anmeldungen und Einwilligungen und können die Veranstaltung archivieren oder löschen. Die Durchführung, der Moderationslink und der Inhalt der Aufzeichnungen (Video, Transkripte, Zusammenfassungen) sind Sache der Veranstaltenden.",
+        "recording": "Der Inhalt der Aufzeichnung steht nur den Veranstaltenden und den Teilnehmenden zur Verfügung. Hier sehen Sie, ob es sie gibt, und ihre Details.",
+        "recordingFile": "Aufzeichnung",
+        "present": "Vorhanden",
+        "absent": "Keine",
+        "recordingPublished": "Veröffentlicht",
+        "yes": "Ja",
+        "no": "Nein",
+        "recordingDuration": "Dauer",
+        "recordingSize": "Größe"
+      }
     },
     "rubrica": {
       "subtitle": "Personen, die der Aufnahme in das Adressbuch zugestimmt haben (Art. 6.1.a DSGVO). Name, E-Mail-Adresse und Organisation werden nur aktualisiert, wenn die Person das Kästchen erneut ankreuzt.",
@@ -3290,7 +3308,8 @@
         "metricsTitle": "Kennzahlen der Zusammenfassung (LLM)",
         "chars": "Zeichen",
         "model": "Modell",
-        "notAvailable": "k. A."
+        "notAvailable": "k. A.",
+        "contentHidden": "Nur für die Veranstaltenden verfügbar."
       },
       "rel": {
         "title": "Verlässlichkeit der KI",
@@ -3447,7 +3466,8 @@
         "alignNone": "Kein Folienwechsel zum Ausrichten.",
         "previewTitle": "Vorschau",
         "previewHelp": "Das Video mit den Folien, wie das Publikum sie sehen wird, mit der oben eingegebenen Korrektur."
-      }
+      },
+      "contentOrganizerOnly": "Nur die Veranstaltenden können den Inhalt dieser Aufzeichnung sehen und bearbeiten (Video, Spuren, Transkript, Zusammenfassung, Übersetzungen). Hier sehen Sie den Status, die Verarbeitungsaufträge und die Dateidetails."
     },
     "questionnairesPage": {
       "subtitle": "Wiederverwendbare Fragenvorlagen für Voranmeldungs- und Nach-Event-Fragebögen."
@@ -3739,7 +3759,9 @@
       "publishDesc": "Prüfen Sie ihn vor der Veröffentlichung: Der Text stammt von einem KI-Modell. Ein neu erstellter Bericht muss erneut veröffentlicht werden.",
       "preview": "Vorschau",
       "hidePreview": "Vorschau ausblenden",
-      "previewLanguage": "Sprache"
+      "previewLanguage": "Sprache",
+      "organizerOnly": "Nur die Veranstaltenden können den Bericht anfordern, lesen und veröffentlichen.",
+      "organizerOnlyExists": "Der Bericht liegt vor. Nur die Veranstaltenden können ihn lesen und veröffentlichen."
     },
     "endEvent": "Veranstaltung beenden",
     "endEventConfirmTitle": "Veranstaltung für alle beenden?",
@@ -6012,6 +6034,7 @@
     "captionsTranscriptNotTranslatable": "Dieses Transkript stammt aus den Live-Untertiteln: Die automatische Übersetzung benötigt ein KI-Transkript der Aufzeichnung.",
     "sameLanguage": "Die gewählte Sprache ist die Originalsprache der Aufzeichnung: Wählen Sie eine andere.",
     "recordingDestinationNotCovered": "Die Einwilligungen dieser Veranstaltung gelten für eine Aufzeichnung nur für Angemeldete: Sie können sie nicht für alle sichtbar machen und auch kein externes Video verknüpfen.",
-    "mtUnavailable": "Die automatische Übersetzung ist auf dieser Instanz nicht installiert."
+    "mtUnavailable": "Die automatische Übersetzung ist auf dieser Instanz nicht installiert.",
+    "recordingContentOrganizerOnly": "Nur die Veranstaltenden dieser Veranstaltung können den Inhalt ihrer Aufzeichnungen öffnen, ändern oder veröffentlichen."
   }
 }

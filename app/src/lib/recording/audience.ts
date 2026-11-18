@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: EUPL-1.2
 // SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
 
-import type { EventStatus, RecordingAudience } from '@prisma/client';
+import type { EventStatus, EventType, RecordingAudience } from '@prisma/client';
 import type { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
 
-import { isEventManager } from '@/lib/auth/staff-session';
 import { prisma } from '@/lib/db';
 import { eventAccessCookieName, verifyEventAccess } from '@/lib/event-session';
 
+import { contenutoStaffDellaRichiesta } from './content-access';
+import { haPassDiPresenza } from './presence-pass';
 import { verifyViewingToken, viewingCookieName } from './viewing';
 
 /**
@@ -30,12 +31,17 @@ import { verifyViewingToken, viewingCookieName } from './viewing';
  *    dipende da `postEventPublic`: la pagina puo' restare privata, e chi si e'
  *    iscritto vede comunque il video. La finestra `postEventPublicUntil` vale
  *    lo stesso. Gli eventi senza destinazione seguono la regola qui sopra.
- *  - Lo staff che gestisce l'evento la vede sempre, anche prima della
+ *  - Lo staff che ORGANIZZA l'evento la vede sempre, anche prima della
  *    pubblicazione: e' l'anteprima della pagina pubblica. Le rotte la
  *    servono; la pagina la mostra solo su richiesta (`?anteprima=1`).
+ *    L'admin che non lo organizza no, e la chiave dell'istanza mai
+ *    (lib/recording/content-access): vale `'staff'` solo per chi la vede.
+ *  - Chiamata rapida: chi era in sala mentre si registrava ha nel browser il
+ *    pass di presenza (lib/recording/presence-pass) e la vede dal link della
+ *    chiamata, senza pubblicazione, finche' la chiamata e' conservata.
  */
 
-export type AccessoRegistrazione = 'pubblico' | 'iscritto' | 'staff' | null;
+export type AccessoRegistrazione = 'pubblico' | 'iscritto' | 'presente' | 'staff' | null;
 
 export interface EventoPerAccesso {
   id: string;
@@ -71,16 +77,36 @@ export function pubblicazioneAperta(
  * filtrano per pagina solo gli eventi conclusi, e un file pubblicato prima della
  * fine su una pagina privata qui resta chiuso. Una registrazione riservata passa
  * dalla pagina e dal player, che riconoscono l'iscritto.
+ *
+ * E' la rotta dell'app (`videoDellApp`), mai l'indirizzo dello storage: la rotta
+ * ripete il controllo e firma il file solo per chi lo puo' vedere.
  */
 export function videoPerTutti(
-  event: EventoPerAccesso & { recordingUrl: string | null },
+  event: EventoPerAccesso & { recordingUrl: string | null; slug: string },
   now: Date = new Date()
 ): string | null {
   const perTutti =
     event.recordingPublished &&
     event.recordingAudience === 'PUBLIC' &&
     pubblicazioneAperta(event, now);
-  return perTutti ? event.recordingUrl : null;
+  return perTutti && event.recordingUrl ? videoDellApp(event.slug) : null;
+}
+
+/**
+ * La rotta dell'app che serve il video di un evento (`/api/events/[slug]/recording`):
+ * l'unico indirizzo del video che arriva al browser. L'indirizzo dello storage
+ * resta sul server.
+ */
+export function videoDellApp(slug: string): string {
+  return `/api/events/${slug}/recording`;
+}
+
+/**
+ * La rotta dell'app che serve il file di una sessione della sala
+ * (`/api/events/[slug]/sessions/[id]/recording`), solo a chi organizza l'evento.
+ */
+export function fileDellaSessione(slug: string, sessionId: string): string {
+  return `/api/events/${slug}/sessions/${sessionId}/recording`;
 }
 
 /**
@@ -100,15 +126,39 @@ export async function accessoRegistrazione(
   cookieStore: ReadonlyRequestCookies,
   now: Date = new Date()
 ): Promise<AccessoRegistrazione> {
+  return (await accessoRegistrazioneConStaff(event, cookieStore, now)).accesso;
+}
+
+/**
+ * Come `accessoRegistrazione`, con lo staff che l'ha ottenuto quando vale
+ * `'staff'`: le rotte che servono il contenuto ne tracciano la lettura
+ * (lib/recording/content-access) senza rileggere sessione e organizzatore.
+ */
+export async function accessoRegistrazioneConStaff(
+  event: EventoPerAccesso,
+  cookieStore: ReadonlyRequestCookies,
+  now: Date = new Date()
+): Promise<{
+  accesso: AccessoRegistrazione;
+  staff: Awaited<ReturnType<typeof contenutoStaffDellaRichiesta>>;
+}> {
   const aperta = pubblicazioneAperta(event, now);
-  if (aperta && event.recordingAudience === 'PUBLIC') return 'pubblico';
-  if (await isEventManager(cookieStore, event.id)) return 'staff';
-  if (!aperta) return null;
-  return (await iscrittoDellaRichiesta(event.id, cookieStore)) ? 'iscritto' : null;
+  if (aperta && event.recordingAudience === 'PUBLIC') return { accesso: 'pubblico', staff: null };
+  const staff = await contenutoStaffDellaRichiesta(cookieStore, event.id);
+  if (staff) return { accesso: 'staff', staff };
+  if (aperta && (await iscrittoDellaRichiesta(event.id, cookieStore))) {
+    return { accesso: 'iscritto', staff: null };
+  }
+  // Il pass esiste solo per le chiamate rapide (la rotta che lo posa lo
+  // verifica): la visione lo conta solo li'.
+  return { accesso: haPassDiPresenza(cookieStore, event.id, now) ? 'presente' : null, staff: null };
 }
 
 export interface EventoPerVisione extends EventoPerAccesso {
   status: EventStatus;
+  /** Una chiamata rapida non si pubblica: chi la organizza e chi c'era la
+   *  vedono senza pubblicazione. Assente: un evento a calendario. */
+  eventType?: EventType;
 }
 
 /** L'anteprima dello staff: la chiede solo la pagina dell'evento. */
@@ -158,16 +208,24 @@ export function visioneRegistrazione(
 ): VisioneRegistrazione {
   if (event.status !== 'ENDED') return NESSUNA_VISIONE;
   const aperta = pubblicazioneAperta(event, now);
+  // La chiamata rapida non ha pubblicazione ne' pagina: la vedono chi c'era e
+  // chi la organizza, dal link della chiamata.
+  const dellaChiamata =
+    event.eventType === 'INSTANT' && (accesso === 'presente' || accesso === 'staff');
   const anteprimaStaff =
-    accesso === 'staff' && anteprima.chiesta && (!aperta || !anteprima.paginaVisibile);
+    !dellaChiamata &&
+    accesso === 'staff' &&
+    anteprima.chiesta &&
+    (!aperta || !anteprima.paginaVisibile);
   const registrazione =
+    dellaChiamata ||
     accesso === 'pubblico' ||
     accesso === 'iscritto' ||
     (accesso === 'staff' && (aperta || anteprimaStaff));
   return {
     anteprimaStaff,
     registrazione,
-    video: registrazione && (event.recordingPublished || anteprimaStaff),
+    video: registrazione && (event.recordingPublished || anteprimaStaff || dellaChiamata),
     soloIscritti: aperta && event.recordingAudience === 'REGISTRANTS' && !registrazione,
   };
 }

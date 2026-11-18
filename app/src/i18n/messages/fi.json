@@ -780,7 +780,8 @@
     "accessDenied": {
       "title": "Tämä osio ei ole käytettävissä roolillesi",
       "body": "Järjestäjänä hallinnoit omia tapahtumiasi: niiden luomista ja julkaisua, materiaaleja, kyselyitä ja jälkituotantoa. Alustan asetukset ja kaikkien tapahtumien tiedot pysyvät ylläpidolla.",
-      "back": "Siirry omiin tapahtumiisi"
+      "back": "Siirry omiin tapahtumiisi",
+      "organizerOnly": "Vain tämän tapahtuman järjestäjät voivat muokata sitä. Ylläpitäjänä näet sen tilan ja tiedot ja voit arkistoida tai poistaa sen. Tallenteet ja niiden sisältö kuuluvat järjestäjille ja osallistujille."
     },
     "staffLogin": {
       "title": "Kirjaudu ylläpitoon",
@@ -1655,7 +1656,8 @@
       "detailFilename": "Tiedostonimi",
       "transcriptManage": "Hallinnoi litterointia / tekoälyä",
       "transcriptReady": "Litteroitu",
-      "transcriptProcessing": "Käsitellään"
+      "transcriptProcessing": "Käsitellään",
+      "organizerOnly": "Vain järjestäjille"
     },
     "gdprAudit": {
       "subtitle": "Lokirekisteri henkilötietoihin kohdistuvista yksityisyystoimista: poistot, suostumukset, viennit",
@@ -1670,7 +1672,8 @@
         "DATA_DELETED": "Tiedot poistettu",
         "CONSENT_RECORDED": "Suostumus kirjattu",
         "DATA_EXPORTED": "Tiedot viety",
-        "CONSENT_WITHDRAWN": "Suostumus peruutettu"
+        "CONSENT_WITHDRAWN": "Suostumus peruutettu",
+        "RECORDING_CONTENT_READ": "Henkilökunta luki tallenteen sisällön"
       },
       "recordsAffected": "{count} tietuetta vaikuttunut",
       "colWhen": "Milloin",
@@ -1696,7 +1699,8 @@
       "rotating": "Luodaan uudelleen…",
       "regenerateTitle": "Luo moderaattoritunnus uudelleen (vanha linkki ei enää toimi)",
       "confirmRegenerate": "Luodaanko tunnus uudelleen? Vanha linkki lakkaa toimimasta.",
-      "noResults": "Tapahtumia ei löytynyt."
+      "noResults": "Tapahtumia ei löytynyt.",
+      "organizerOnlyLink": "Linkki näkyy vain tapahtuman järjestäjille"
     },
     "registrations": {
       "subtitle": "Kaikki tapahtumiin ilmoittautuneet henkilöt — hae, suodata ja vie",
@@ -2128,7 +2132,8 @@
         "DATA_DELETED": "Tiedot poistettu",
         "CONSENT_RECORDED": "Suostumus kirjattu",
         "DATA_EXPORTED": "Tiedot viety",
-        "CONSENT_WITHDRAWN": "Suostumus peruutettu"
+        "CONSENT_WITHDRAWN": "Suostumus peruutettu",
+        "RECORDING_CONTENT_READ": "Henkilökunta luki tallenteen sisällön"
       }
     },
     "settings": {
@@ -3020,7 +3025,20 @@
         "publishNow": "Julkaise nyt"
       },
       "editFeatures": "Muokkaa toimintoja",
-      "editPrivacy": "Muokkaa tietosuojaa ja tietoja"
+      "editPrivacy": "Muokkaa tietosuojaa ja tietoja",
+      "governance": {
+        "title": "Hallinnoit tätä tapahtumaa ylläpitäjänä",
+        "body": "Et ole sen järjestäjä: näet tilan, tiedot, ilmoittautumiset ja suostumukset ja voit arkistoida tai poistaa sen. Tapahtuman vetäminen, moderaattorin linkki ja tallenteiden sisältö (video, litteroinnit, yhteenvedot) kuuluvat järjestäjille.",
+        "recording": "Tallenteen sisältö on vain tapahtuman järjestäjien ja osallistujien käytettävissä. Tässä näet, onko se olemassa, ja sen tiedot.",
+        "recordingFile": "Tallenne",
+        "present": "On",
+        "absent": "Ei ole",
+        "recordingPublished": "Julkaistu",
+        "yes": "Kyllä",
+        "no": "Ei",
+        "recordingDuration": "Kesto",
+        "recordingSize": "Koko"
+      }
     },
     "rubrica": {
       "subtitle": "Henkilöt, jotka ovat antaneet suostumuksen osoitekirjaan lisäämiseen (GDPR art. 6.1.a). Nimi, sähköposti ja organisaatio päivittyvät vain, kun henkilö valitsee ruudun uudelleen.",
@@ -3290,7 +3308,8 @@
         "metricsTitle": "Yhteenvedon mittarit (LLM)",
         "chars": "merkkiä",
         "model": "Malli",
-        "notAvailable": "ei tietoa"
+        "notAvailable": "ei tietoa",
+        "contentHidden": "Vain tapahtuman järjestäjien käytettävissä."
       },
       "rel": {
         "title": "Tekoälyn luotettavuus",
@@ -3447,7 +3466,8 @@
         "alignNone": "Ei kohdistettavia dian vaihtoja.",
         "previewTitle": "Esikatselu",
         "previewHelp": "Video ja diat siten kuin yleisö ne näkee, yllä kirjoitetulla korjauksella."
-      }
+      },
+      "contentOrganizerOnly": "Vain tämän tapahtuman järjestäjät voivat nähdä ja muokata tämän tallenteen sisältöä (video, raidat, litterointi, yhteenveto, käännökset). Tässä näet sen tilan, käsittelytyöt ja tiedostojen tiedot."
     },
     "questionnairesPage": {
       "subtitle": "Uudelleenkäytettävät kysymysmallit ennakkoilmoittautumis- ja tapahtuman jälkeisiä kyselyitä varten."
@@ -3739,7 +3759,9 @@
       "publishDesc": "Tarkista se ennen julkaisua: tekstin on kirjoittanut tekoälymalli. Uudelleen luotu raportti on julkaistava uudelleen.",
       "preview": "Esikatselu",
       "hidePreview": "Piilota esikatselu",
-      "previewLanguage": "Kieli"
+      "previewLanguage": "Kieli",
+      "organizerOnly": "Vain tämän tapahtuman järjestäjät voivat pyytää, lukea ja julkaista raportin.",
+      "organizerOnlyExists": "Raportti on olemassa. Vain tämän tapahtuman järjestäjät voivat lukea ja julkaista sen."
     },
     "endEvent": "Päätä tapahtuma",
     "endEventConfirmTitle": "Päätetäänkö tapahtuma kaikilta?",
@@ -6012,6 +6034,7 @@
     "captionsTranscriptNotTranslatable": "Tämä litterointi on peräisin livetekstityksestä: automaattinen käännös edellyttää tallenteen tekoälylitterointia.",
     "sameLanguage": "Valittu kieli on tallenteen alkuperäinen kieli: valitse toinen.",
     "recordingDestinationNotCovered": "Tämän tapahtuman suostumukset koskevat tallennetta, joka on vain ilmoittautuneille: et voi tehdä siitä kaikille näkyvää etkä liittää ulkoista videota.",
-    "mtUnavailable": "Konekäännöstä ei ole asennettu tähän instanssiin."
+    "mtUnavailable": "Konekäännöstä ei ole asennettu tähän instanssiin.",
+    "recordingContentOrganizerOnly": "Vain tämän tapahtuman järjestäjät voivat avata, muuttaa tai julkaista sen tallenteiden sisällön."
   }
 }

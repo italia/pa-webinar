@@ -780,7 +780,8 @@
     "accessDenied": {
       "title": "Ta razdelek za vašo vlogo ni na voljo",
       "body": "Kot organizator upravljate svoje dogodke: ustvarjanje, objavo, gradiva, vprašalnike in postprodukcijo. Nastavitve platforme in podatki vseh dogodkov ostanejo administraciji.",
-      "back": "Pojdi na svoje dogodke"
+      "back": "Pojdi na svoje dogodke",
+      "organizerOnly": "Ta dogodek lahko urejajo samo njegovi organizatorji. Kot skrbnik vidite njegovo stanje in podrobnosti ter ga lahko arhivirate ali izbrišete. Posnetki in njihova vsebina pripadajo organizatorjem in udeležencem."
     },
     "staffLogin": {
       "title": "Prijava v administracijo",
@@ -1655,7 +1656,8 @@
       "detailFilename": "Ime datoteke",
       "transcriptManage": "Upravljaj prepis / AI",
       "transcriptReady": "Prepisano",
-      "transcriptProcessing": "V obdelavi"
+      "transcriptProcessing": "V obdelavi",
+      "organizerOnly": "Samo za organizatorje"
     },
     "gdprAudit": {
       "subtitle": "Dnevnik dejanj zasebnosti nad osebnimi podatki: izbrisi, soglasja, izvozi",
@@ -1670,7 +1672,8 @@
         "DATA_DELETED": "Izbrisani podatki",
         "CONSENT_RECORDED": "Zabeleženo soglasje",
         "DATA_EXPORTED": "Izvoženi podatki",
-        "CONSENT_WITHDRAWN": "Privolitev preklicana"
+        "CONSENT_WITHDRAWN": "Privolitev preklicana",
+        "RECORDING_CONTENT_READ": "Vsebino posnetka je prebralo osebje"
       },
       "recordsAffected": "{count} prizadetih zapisov",
       "colWhen": "Kdaj",
@@ -1696,7 +1699,8 @@
       "rotating": "Obnavljam …",
       "regenerateTitle": "Obnovi žeton moderatorja (stara povezava preneha delovati)",
       "confirmRegenerate": "Ali ste prepričani, da želite obnoviti žeton? Stara povezava ne bo več delovala.",
-      "noResults": "Ni najdenih dogodkov."
+      "noResults": "Ni najdenih dogodkov.",
+      "organizerOnlyLink": "Povezava je vidna samo organizatorjem dogodka"
     },
     "registrations": {
       "subtitle": "Vse osebe, prijavljene na dogodke — iskanje, filtriranje in izvoz",
@@ -2128,7 +2132,8 @@
         "DATA_DELETED": "Podatki izbrisani",
         "CONSENT_RECORDED": "Soglasje zabeleženo",
         "DATA_EXPORTED": "Podatki izvoženi",
-        "CONSENT_WITHDRAWN": "Privolitev preklicana"
+        "CONSENT_WITHDRAWN": "Privolitev preklicana",
+        "RECORDING_CONTENT_READ": "Vsebino posnetka je prebralo osebje"
       }
     },
     "settings": {
@@ -3020,7 +3025,20 @@
         "publishNow": "Objavi zdaj"
       },
       "editFeatures": "Uredi funkcije",
-      "editPrivacy": "Uredi zasebnost in podatke"
+      "editPrivacy": "Uredi zasebnost in podatke",
+      "governance": {
+        "title": "Ta dogodek upravljate kot skrbnik",
+        "body": "Niste med njegovimi organizatorji: vidite stanje, podrobnosti, prijave in privolitve ter ga lahko arhivirate ali izbrišete. Vodenje dogodka, povezava moderatorja in vsebina posnetkov (video, prepisi, povzetki) so stvar organizatorjev.",
+        "recording": "Vsebina posnetka je na voljo samo organizatorjem dogodka in udeležencem. Tukaj vidite, ali obstaja, in njegove podrobnosti.",
+        "recordingFile": "Posnetek",
+        "present": "Obstaja",
+        "absent": "Ni ga",
+        "recordingPublished": "Objavljen",
+        "yes": "Da",
+        "no": "Ne",
+        "recordingDuration": "Trajanje",
+        "recordingSize": "Velikost"
+      }
     },
     "rubrica": {
       "subtitle": "Osebe, ki so privolile v vključitev v imenik (čl. 6.1.a GDPR). Ime, e-poštni naslov in organizacija se posodobijo samo, ko oseba znova označi polje.",
@@ -3290,7 +3308,8 @@
         "metricsTitle": "Meritve povzetka (LLM)",
         "chars": "znakov",
         "model": "Model",
-        "notAvailable": "ni podatka"
+        "notAvailable": "ni podatka",
+        "contentHidden": "Na voljo samo organizatorjem dogodka."
       },
       "rel": {
         "title": "Zanesljivost AI",
@@ -3447,7 +3466,8 @@
         "alignNone": "Ni menjave prosojnice za uskladitev.",
         "previewTitle": "Predogled",
         "previewHelp": "Videoposnetek s prosojnicami, kot jih bo videlo občinstvo, s popravkom, vpisanim zgoraj."
-      }
+      },
+      "contentOrganizerOnly": "Vsebino tega posnetka (video, sledi, prepis, povzetek, prevodi) lahko vidijo in urejajo samo organizatorji tega dogodka. Tukaj vidite njegovo stanje, obdelave in podrobnosti datotek."
     },
     "questionnairesPage": {
       "subtitle": "Predloge vprašanj za večkratno uporabo za vprašalnike pred prijavo in po dogodku."
@@ -3739,7 +3759,9 @@
       "publishDesc": "Pred objavo ga preberite: besedilo je napisal model umetne inteligence. Ponovno ustvarjeno poročilo je treba znova objaviti.",
       "preview": "Predogled",
       "hidePreview": "Skrij predogled",
-      "previewLanguage": "Jezik"
+      "previewLanguage": "Jezik",
+      "organizerOnly": "Poročilo lahko zahtevajo, berejo in objavijo samo organizatorji tega dogodka.",
+      "organizerOnlyExists": "Poročilo obstaja. Brati in objaviti ga lahko samo organizatorji tega dogodka."
     },
     "endEvent": "Končaj dogodek",
     "endEventConfirmTitle": "Končam dogodek za vse?",
@@ -6012,6 +6034,7 @@
     "captionsTranscriptNotTranslatable": "Ta prepis izvira iz podnapisov v živo: samodejni prevod potrebuje prepis posnetka z UI.",
     "sameLanguage": "Izbrani jezik je izvirni jezik posnetka: izberite drugega.",
     "recordingDestinationNotCovered": "Privolitve za ta dogodek veljajo za posnetek samo za prijavljene: ne morete ga narediti vidnega vsem niti povezati zunanjega videa.",
-    "mtUnavailable": "Strojno prevajanje na tej instanci ni nameščeno."
+    "mtUnavailable": "Strojno prevajanje na tej instanci ni nameščeno.",
+    "recordingContentOrganizerOnly": "Vsebino posnetkov tega dogodka lahko odprejo, spremenijo ali objavijo samo njegovi organizatorji."
   }
 }

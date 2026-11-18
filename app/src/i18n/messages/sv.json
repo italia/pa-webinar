@@ -780,7 +780,8 @@
     "accessDenied": {
       "title": "Den här delen är inte tillgänglig för din roll",
       "body": "Som arrangör hanterar du dina egna evenemang: skapa och publicera dem, material, enkäter och efterbearbetning. Plattformens inställningar och data för alla evenemang ligger kvar hos administrationen.",
-      "back": "Till dina evenemang"
+      "back": "Till dina evenemang",
+      "organizerOnly": "Endast arrangörerna av det här evenemanget kan redigera det. Som administratör ser du dess status och detaljer och kan arkivera eller radera det. Inspelningarna och deras innehåll tillhör arrangörerna och deltagarna."
     },
     "staffLogin": {
       "title": "Logga in i administrationen",
@@ -1655,7 +1656,8 @@
       "detailFilename": "Filnamn",
       "transcriptManage": "Hantera transkription / AI",
       "transcriptReady": "Transkriberad",
-      "transcriptProcessing": "Bearbetas"
+      "transcriptProcessing": "Bearbetas",
+      "organizerOnly": "Endast arrangörer"
     },
     "gdprAudit": {
       "subtitle": "Logg över integritetsåtgärder på personuppgifter: raderingar, samtycken, exporter",
@@ -1670,7 +1672,8 @@
         "DATA_DELETED": "Data raderad",
         "CONSENT_RECORDED": "Samtycke registrerat",
         "DATA_EXPORTED": "Data exporterad",
-        "CONSENT_WITHDRAWN": "Samtycke återkallat"
+        "CONSENT_WITHDRAWN": "Samtycke återkallat",
+        "RECORDING_CONTENT_READ": "Inspelningens innehåll läst av personal"
       },
       "recordsAffected": "{count} poster berörda",
       "colWhen": "När",
@@ -1696,7 +1699,8 @@
       "rotating": "Regenererar…",
       "regenerateTitle": "Regenerera moderatortoken (ogiltigförklarar gamla länken)",
       "confirmRegenerate": "Är du säker på att du vill regenerera token? Den gamla länken slutar fungera.",
-      "noResults": "Inga evenemang funna."
+      "noResults": "Inga evenemang funna.",
+      "organizerOnlyLink": "Länken syns endast för evenemangets arrangörer"
     },
     "registrations": {
       "subtitle": "Alla personer anmälda till evenemang — sök, filtrera och exportera",
@@ -2128,7 +2132,8 @@
         "DATA_DELETED": "Data raderad",
         "CONSENT_RECORDED": "Samtycke registrerat",
         "DATA_EXPORTED": "Data exporterad",
-        "CONSENT_WITHDRAWN": "Samtycke återkallat"
+        "CONSENT_WITHDRAWN": "Samtycke återkallat",
+        "RECORDING_CONTENT_READ": "Inspelningens innehåll läst av personal"
       }
     },
     "settings": {
@@ -3020,7 +3025,20 @@
         "publishNow": "Publicera nu"
       },
       "editFeatures": "Redigera funktioner",
-      "editPrivacy": "Redigera integritet och data"
+      "editPrivacy": "Redigera integritet och data",
+      "governance": {
+        "title": "Du hanterar det här evenemanget som administratör",
+        "body": "Du är inte en av dess arrangörer: du ser status, detaljer, anmälningar och samtycken och kan arkivera eller radera det. Att leda evenemanget, moderatorlänken och innehållet i inspelningarna (video, transkriptioner, sammanfattningar) är arrangörernas sak.",
+        "recording": "Innehållet i inspelningen är endast tillgängligt för evenemangets arrangörer och deltagare. Här ser du om den finns och dess detaljer.",
+        "recordingFile": "Inspelning",
+        "present": "Finns",
+        "absent": "Ingen",
+        "recordingPublished": "Publicerad",
+        "yes": "Ja",
+        "no": "Nej",
+        "recordingDuration": "Längd",
+        "recordingSize": "Storlek"
+      }
     },
     "rubrica": {
       "subtitle": "Personer som har samtyckt till att läggas till i adressboken (GDPR art. 6.1.a). Namn, e-postadress och organisation uppdateras bara när personen kryssar i rutan igen.",
@@ -3290,7 +3308,8 @@
         "metricsTitle": "Mått för sammanfattningen (LLM)",
         "chars": "tecken",
         "model": "Modell",
-        "notAvailable": "ej tillg."
+        "notAvailable": "ej tillg.",
+        "contentHidden": "Endast tillgängligt för evenemangets arrangörer."
       },
       "rel": {
         "title": "AI-tillförlitlighet",
@@ -3447,7 +3466,8 @@
         "alignNone": "Inget bildbyte att synkronisera.",
         "previewTitle": "Förhandsgranskning",
         "previewHelp": "Videon med bilderna så som publiken kommer att se dem, med justeringen som angetts ovan."
-      }
+      },
+      "contentOrganizerOnly": "Endast arrangörerna av det här evenemanget kan se och redigera innehållet i den här inspelningen (video, spår, transkription, sammanfattning, översättningar). Här ser du dess status, bearbetningsjobben och filernas detaljer."
     },
     "questionnairesPage": {
       "subtitle": "Återanvändbara frågemallar för förregistrerings- och eftermöteenkäter."
@@ -3739,7 +3759,9 @@
       "publishDesc": "Granska den före publicering: texten är skriven av en AI-modell. En nyskapad rapport måste publiceras igen.",
       "preview": "Förhandsvisning",
       "hidePreview": "Dölj förhandsvisning",
-      "previewLanguage": "Språk"
+      "previewLanguage": "Språk",
+      "organizerOnly": "Endast arrangörerna av det här evenemanget kan begära, läsa och publicera rapporten.",
+      "organizerOnlyExists": "Rapporten finns. Endast arrangörerna av det här evenemanget kan läsa och publicera den."
     },
     "endEvent": "Avsluta evenemang",
     "endEventConfirmTitle": "Avsluta evenemanget för alla?",
@@ -6012,6 +6034,7 @@
     "captionsTranscriptNotTranslatable": "Den här transkriptionen kommer från livetextningen: automatisk översättning kräver en AI-transkription av inspelningen.",
     "sameLanguage": "Det valda språket är inspelningens originalspråk: välj ett annat.",
     "recordingDestinationNotCovered": "Samtyckena för det här evenemanget gäller en inspelning endast för anmälda: du kan inte göra den synlig för alla eller länka en extern video.",
-    "mtUnavailable": "Maskinöversättning är inte installerad på den här instansen."
+    "mtUnavailable": "Maskinöversättning är inte installerad på den här instansen.",
+    "recordingContentOrganizerOnly": "Endast arrangörerna av det här evenemanget kan öppna, ändra eller publicera innehållet i dess inspelningar."
   }
 }

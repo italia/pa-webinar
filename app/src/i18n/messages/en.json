@@ -780,7 +780,8 @@
     "accessDenied": {
       "title": "This section is not available for your role",
       "body": "As an organizer you manage your own events: creating and publishing them, materials, questionnaires and post-production. Platform settings and data across all events stay with the administration.",
-      "back": "Go to your events"
+      "back": "Go to your events",
+      "organizerOnly": "Only the organizers of this event can edit it. As an administrator you can see its status and details, and archive or delete it. Its recordings and their content belong to the organizers and the participants."
     },
     "staffLogin": {
       "title": "Sign in to the administration area",
@@ -1655,7 +1656,8 @@
       "detailFilename": "File name",
       "transcriptManage": "Manage transcript / AI",
       "transcriptReady": "Transcribed",
-      "transcriptProcessing": "Processing"
+      "transcriptProcessing": "Processing",
+      "organizerOnly": "Organizers only"
     },
     "gdprAudit": {
       "subtitle": "Log of privacy actions on personal data: deletions, consent, exports",
@@ -1670,7 +1672,8 @@
         "DATA_DELETED": "Data deleted",
         "CONSENT_RECORDED": "Consent recorded",
         "DATA_EXPORTED": "Data exported",
-        "CONSENT_WITHDRAWN": "Consent withdrawn"
+        "CONSENT_WITHDRAWN": "Consent withdrawn",
+        "RECORDING_CONTENT_READ": "Recording content read by staff"
       },
       "recordsAffected": "{count} records affected",
       "colWhen": "When",
@@ -1696,7 +1699,8 @@
       "rotating": "Rotating…",
       "regenerateTitle": "Regenerate moderator token (old link stops working)",
       "confirmRegenerate": "Regenerate the token? The old link will stop working.",
-      "noResults": "No events found."
+      "noResults": "No events found.",
+      "organizerOnlyLink": "Link visible to the event organizers only"
     },
     "registrations": {
       "subtitle": "All people signed up to events — search, filter and export",
@@ -2128,7 +2132,8 @@
         "DATA_DELETED": "Data deleted",
         "CONSENT_RECORDED": "Consent recorded",
         "DATA_EXPORTED": "Data exported",
-        "CONSENT_WITHDRAWN": "Consent withdrawn"
+        "CONSENT_WITHDRAWN": "Consent withdrawn",
+        "RECORDING_CONTENT_READ": "Recording content read by staff"
       }
     },
     "settings": {
@@ -3020,7 +3025,20 @@
         "publishNow": "Publish now"
       },
       "editFeatures": "Edit features",
-      "editPrivacy": "Edit privacy and data"
+      "editPrivacy": "Edit privacy and data",
+      "governance": {
+        "title": "You manage this event as an administrator",
+        "body": "You are not one of its organizers: you can see status, details, registrations and consents, and archive or delete it. Running the event, the moderator link and the content of its recordings (video, transcripts, summaries) are for the organizers.",
+        "recording": "The content of the recording is available only to the organizers of the event and to its participants. Here you can see whether it exists and its details.",
+        "recordingFile": "Recording",
+        "present": "Present",
+        "absent": "None",
+        "recordingPublished": "Published",
+        "yes": "Yes",
+        "no": "No",
+        "recordingDuration": "Duration",
+        "recordingSize": "Size"
+      }
     },
     "rubrica": {
       "subtitle": "People who have consented to be added to the address book (GDPR art. 6.1.a). Name, email and organization are updated only when the person ticks the box again.",
@@ -3290,7 +3308,8 @@
         "metricsTitle": "Summary metrics (LLM)",
         "chars": "characters",
         "model": "Model",
-        "notAvailable": "n/a"
+        "notAvailable": "n/a",
+        "contentHidden": "Available to the event organizers only."
       },
       "rel": {
         "title": "AI reliability",
@@ -3447,7 +3466,8 @@
         "alignNone": "No slide change to align.",
         "previewTitle": "Preview",
         "previewHelp": "The video with the slides as the public will see them, with the correction written above."
-      }
+      },
+      "contentOrganizerOnly": "Only the organizers of this event can see and edit the content of this recording (video, tracks, transcript, summary, translations). Here you can see its status, the processing jobs and the file details."
     },
     "questionnairesPage": {
       "subtitle": "Reusable question templates for pre-registration and post-event questionnaires."
@@ -3739,7 +3759,9 @@
       "publishDesc": "Review it before publishing: the text is written by an artificial intelligence model. A regenerated report must be published again.",
       "preview": "Preview",
       "hidePreview": "Hide preview",
-      "previewLanguage": "Language"
+      "previewLanguage": "Language",
+      "organizerOnly": "Only the organizers of this event can request, read and publish the report.",
+      "organizerOnlyExists": "The report exists. Only the organizers of this event can read and publish it."
     },
     "endEvent": "End event",
     "endEventConfirmTitle": "End the event for everyone?",
@@ -6012,6 +6034,7 @@
     "captionsTranscriptNotTranslatable": "This transcript comes from the live captions: automatic translation needs an AI transcript of the recording.",
     "sameLanguage": "The chosen language is the recording's original one: pick another.",
     "recordingDestinationNotCovered": "The consents for this event cover a reserved recording: you cannot make it visible to everyone or link an external video.",
-    "mtUnavailable": "Machine translation is not installed on this instance."
+    "mtUnavailable": "Machine translation is not installed on this instance.",
+    "recordingContentOrganizerOnly": "Only the organizers of this event can open, change or publish the content of its recordings."
   }
 }

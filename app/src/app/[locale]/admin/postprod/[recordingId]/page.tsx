@@ -6,6 +6,7 @@ import { getLocale } from 'next-intl/server';
 
 import { staffOLogin } from '@/lib/auth/staff-page';
 import { puoGestire } from '@/lib/auth/staff-session';
+import { accessoContenutoStaff } from '@/lib/recording/content-access';
 import AccessDenied from '@/components/admin/access-denied';
 import { prisma } from '@/lib/db';
 import { confermaVociNecessaria } from '@/lib/ai/voice-consent';
@@ -64,6 +65,15 @@ export default async function RecordingManagePage({ params, searchParams }: Page
   if (!(await puoGestire(session, recording.eventId))) {
     return <AccessDenied />;
   }
+  // Chi gestisce l'evento senza organizzarlo (l'admin dell'istanza) vede che
+  // la registrazione c'e' e come procede, non il contenuto
+  // (lib/recording/content-access).
+  const contenuto =
+    (await accessoContenutoStaff(session, {
+      eventId: recording.eventId,
+      recordingId: recording.id,
+      superficie: 'video',
+    })) !== null;
 
   const eventTitle = getLocalized(recording.event?.title as LocalizedField, locale) || '—';
   // Il video completo soggetto al consenso voce per voce si trascrive solo con
@@ -108,6 +118,7 @@ export default async function RecordingManagePage({ params, searchParams }: Page
       restaDaiSottotitoli={restaDaiSottotitoli}
       eventId={recording.eventId}
       initialTab={initialTab}
+      contenuto={contenuto}
     />
   );
 }

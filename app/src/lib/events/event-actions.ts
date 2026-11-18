@@ -43,3 +43,32 @@ export async function duplicaComeProssima(
   // deve saperlo.
   return { id: creato.id, dataProssima: creato.scheduleProjected === true };
 }
+
+/**
+ * L'eliminazione: con il link di conduzione, o, per lo staff che non lo ha,
+ * con la sessione (la stessa rotta della selezione nell'elenco).
+ */
+export async function eliminaEvento(
+  eventId: string,
+  moderatorToken: string,
+): Promise<{ ok: true } | { ok: false; codice?: string }> {
+  if (!moderatorToken) {
+    const res = await fetch('/api/admin/events/bulk-delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids: [eventId] }),
+    });
+    const esito = res.ok
+      ? ((await res.json().catch(() => ({}))) as { deleted?: number; skippedLive?: number })
+      : null;
+    if (esito && (esito.deleted ?? 0) > 0) return { ok: true };
+    return { ok: false, codice: (esito?.skippedLive ?? 0) > 0 ? 'EVENT_LIVE' : undefined };
+  }
+  const res = await fetch(`/api/events/${eventId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${moderatorToken}` },
+  });
+  if (res.ok) return { ok: true };
+  const body = (await res.json().catch(() => ({}))) as { code?: string };
+  return { ok: false, codice: body.code };
+}

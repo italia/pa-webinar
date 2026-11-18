@@ -77,6 +77,37 @@ describe('finalizePostEventEmails', () => {
     expect(db.registration.findMany).not.toHaveBeenCalled();
   });
 
+  it('il link al video nell’email del moderatore: la rotta dell’app, solo per un video aperto a tutti', async () => {
+    const pubblico = {
+      ...EVENT,
+      recordingPublished: true,
+      recordingUrl: 'https://storage.example.net/recordings/sala.mp4',
+      transcriptPublished: false,
+      recordingAudience: 'PUBLIC',
+      recordingDestination: null,
+      postEventPublic: true,
+      postEventPublicUntil: null,
+    };
+    const testoModeratore = () =>
+      JSON.stringify(enqueue.mock.calls.find((c) => (c[0] as { to: string }).to === 'dec:mod@x.it')![0]);
+
+    db.event.findMany.mockResolvedValue([pubblico]);
+    await finalizePostEventEmails(OPTS);
+    expect(testoModeratore()).toContain('https://x.gov.it/api/events/e/recording');
+    expect(testoModeratore()).not.toContain('storage.example.net');
+
+    // Riservato agli iscritti: chi riceve l'email puo' non poterlo aprire.
+    vi.clearAllMocks();
+    db.event.updateMany.mockResolvedValue({ count: 1 });
+    db.registration.findMany.mockResolvedValue([]);
+    db.event.findMany.mockResolvedValue([
+      { ...pubblico, recordingAudience: 'REGISTRANTS', recordingDestination: 'REGISTRANTS' },
+    ]);
+    await finalizePostEventEmails(OPTS);
+    expect(testoModeratore()).not.toContain('/recording');
+    expect(testoModeratore()).not.toContain('storage.example.net');
+  });
+
   it('salta l’email moderatore se manca l’indirizzo', async () => {
     db.event.findMany.mockResolvedValue([{ ...EVENT, moderatorEmail: null }]);
     const res = await finalizePostEventEmails(OPTS);

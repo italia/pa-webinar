@@ -26,8 +26,12 @@ interface InstantCallRow {
   lastActiveAt: string | null;
   endsAt: string;
   moderatorName: string | null;
-  moderatorToken: string;
+  /** Null sulle chiamate che chi guarda non organizza
+   *  (lib/recording/content-access). */
+  moderatorToken: string | null;
   peakParticipants: number;
+  /** La chiamata ha un video, anche quando chi guarda non lo puo' aprire. */
+  hasRecording: boolean;
   recordingUrl: string | null;
   recordingDuration: number | null;
   recordingFileSize: string | null;
@@ -407,7 +411,7 @@ export default function InstantCallsList({
       ) : (
         <ul className="chiamate-elenco">
           {rows.map((call) => {
-            const hasRecording = !!call.recordingUrl;
+            const hasRecording = call.hasRecording;
             const isSelected = selected.has(call.id);
             const liveUrl = `${origin}${localizedPath(`/events/${call.slug}/live`, locale)}`;
             // Una chiamata archiviata non si riapre: i suoi link non servono piu'.
@@ -478,11 +482,13 @@ export default function InstantCallsList({
                     qualcuno. */}
                 {conLink && (
                   <div className="chiamata__link">
+                    {call.moderatorToken && (
                     <CopyButton
                       text={`${liveUrl}?token=${call.moderatorToken}`}
                       label={t('linkModerator')}
                       accessibleName={t('copyModeratorLink', { title: call.title })}
                     />
+                    )}
                     <CopyButton
                       text={liveUrl}
                       label={t('linkGuests')}

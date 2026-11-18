@@ -780,7 +780,8 @@
     "accessDenied": {
       "title": "Ta sekcja nie jest dostępna dla Twojej roli",
       "body": "Jako organizator zarządzasz własnymi wydarzeniami: tworzeniem, publikacją, materiałami, ankietami i postprodukcją. Ustawienia platformy i dane wszystkich wydarzeń pozostają w gestii administracji.",
-      "back": "Przejdź do swoich wydarzeń"
+      "back": "Przejdź do swoich wydarzeń",
+      "organizerOnly": "Tylko organizatorzy tego wydarzenia mogą je edytować. Jako administrator widzisz jego stan i szczegóły oraz możesz je zarchiwizować lub usunąć. Nagrania i ich zawartość należą do organizatorów i uczestników."
     },
     "staffLogin": {
       "title": "Logowanie do panelu administracyjnego",
@@ -1655,7 +1656,8 @@
       "detailFilename": "Nazwa pliku",
       "transcriptManage": "Zarządzaj transkrypcją / AI",
       "transcriptReady": "Przetranskrybowane",
-      "transcriptProcessing": "W trakcie"
+      "transcriptProcessing": "W trakcie",
+      "organizerOnly": "Tylko organizatorzy"
     },
     "gdprAudit": {
       "subtitle": "Rejestr działań związanych z prywatnością danych osobowych: usunięcia, zgody, eksporty",
@@ -1670,7 +1672,8 @@
         "DATA_DELETED": "Dane usunięte",
         "CONSENT_RECORDED": "Zgoda zarejestrowana",
         "DATA_EXPORTED": "Dane wyeksportowane",
-        "CONSENT_WITHDRAWN": "Zgoda wycofana"
+        "CONSENT_WITHDRAWN": "Zgoda wycofana",
+        "RECORDING_CONTENT_READ": "Zawartość nagrania odczytana przez personel"
       },
       "recordsAffected": "{count} powiązanych rekordów",
       "colWhen": "Kiedy",
@@ -1696,7 +1699,8 @@
       "rotating": "Generowanie…",
       "regenerateTitle": "Wygeneruj ponownie token moderatora (stary link przestanie działać)",
       "confirmRegenerate": "Czy na pewno wygenerować ponownie token? Stary link przestanie działać.",
-      "noResults": "Nie znaleziono wydarzeń."
+      "noResults": "Nie znaleziono wydarzeń.",
+      "organizerOnlyLink": "Link widoczny tylko dla organizatorów wydarzenia"
     },
     "registrations": {
       "subtitle": "Wszystkie osoby zarejestrowane na wydarzenia — wyszukaj, filtruj i eksportuj",
@@ -2128,7 +2132,8 @@
         "DATA_DELETED": "Dane usunięte",
         "CONSENT_RECORDED": "Zgoda zarejestrowana",
         "DATA_EXPORTED": "Dane wyeksportowane",
-        "CONSENT_WITHDRAWN": "Zgoda wycofana"
+        "CONSENT_WITHDRAWN": "Zgoda wycofana",
+        "RECORDING_CONTENT_READ": "Zawartość nagrania odczytana przez personel"
       }
     },
     "settings": {
@@ -3020,7 +3025,20 @@
         "publishNow": "Opublikuj teraz"
       },
       "editFeatures": "Edytuj funkcje",
-      "editPrivacy": "Edytuj prywatność i dane"
+      "editPrivacy": "Edytuj prywatność i dane",
+      "governance": {
+        "title": "Zarządzasz tym wydarzeniem jako administrator",
+        "body": "Nie jesteś jednym z jego organizatorów: widzisz stan, szczegóły, rejestracje i zgody oraz możesz je zarchiwizować lub usunąć. Prowadzenie wydarzenia, link moderatora i zawartość nagrań (wideo, transkrypcje, podsumowania) należą do organizatorów.",
+        "recording": "Zawartość nagrania jest dostępna tylko dla organizatorów wydarzenia i jego uczestników. Tutaj widzisz, czy istnieje, oraz jego szczegóły.",
+        "recordingFile": "Nagranie",
+        "present": "Jest",
+        "absent": "Brak",
+        "recordingPublished": "Opublikowane",
+        "yes": "Tak",
+        "no": "Nie",
+        "recordingDuration": "Czas trwania",
+        "recordingSize": "Rozmiar"
+      }
     },
     "rubrica": {
       "subtitle": "Osoby, które wyraziły zgodę na wpisanie do książki adresowej (art. 6.1.a RODO). Imię i nazwisko, adres e-mail i organizacja aktualizują się tylko wtedy, gdy dana osoba ponownie zaznaczy pole.",
@@ -3290,7 +3308,8 @@
         "metricsTitle": "Metryki podsumowania (LLM)",
         "chars": "znaki",
         "model": "Model",
-        "notAvailable": "nd."
+        "notAvailable": "nd.",
+        "contentHidden": "Dostępne tylko dla organizatorów wydarzenia."
       },
       "rel": {
         "title": "Wiarygodność AI",
@@ -3447,7 +3466,8 @@
         "alignNone": "Brak zmiany slajdu do wyrównania.",
         "previewTitle": "Podgląd",
         "previewHelp": "Wideo ze slajdami tak, jak zobaczą je widzowie, z korektą wpisaną powyżej."
-      }
+      },
+      "contentOrganizerOnly": "Tylko organizatorzy tego wydarzenia mogą oglądać i edytować zawartość tego nagrania (wideo, ścieżki, transkrypcja, podsumowanie, tłumaczenia). Tutaj widzisz jego stan, zadania przetwarzania i szczegóły plików."
     },
     "questionnairesPage": {
       "subtitle": "Szablony pytań wielokrotnego użytku do kwestionariuszy przedrejestracyjnych i po wydarzeniu."
@@ -3739,7 +3759,9 @@
       "publishDesc": "Przejrzyj je przed publikacją: tekst napisał model sztucznej inteligencji. Ponownie wygenerowane sprawozdanie trzeba opublikować jeszcze raz.",
       "preview": "Podgląd",
       "hidePreview": "Ukryj podgląd",
-      "previewLanguage": "Język"
+      "previewLanguage": "Język",
+      "organizerOnly": "Tylko organizatorzy tego wydarzenia mogą zamówić, czytać i publikować sprawozdanie.",
+      "organizerOnlyExists": "Sprawozdanie istnieje. Tylko organizatorzy tego wydarzenia mogą je czytać i publikować."
     },
     "endEvent": "Zakończ wydarzenie",
     "endEventConfirmTitle": "Zakończyć wydarzenie dla wszystkich?",
@@ -6012,6 +6034,7 @@
     "captionsTranscriptNotTranslatable": "Ta transkrypcja pochodzi z napisów na żywo: automatyczne tłumaczenie wymaga transkrypcji AI nagrania.",
     "sameLanguage": "Wybrany język jest oryginalnym językiem nagrania: wybierz inny.",
     "recordingDestinationNotCovered": "Zgody dla tego wydarzenia dotyczą nagrania tylko dla zarejestrowanych: nie możesz udostępnić go wszystkim ani dodać linku do zewnętrznego wideo.",
-    "mtUnavailable": "Tłumaczenie maszynowe nie jest zainstalowane w tej instancji."
+    "mtUnavailable": "Tłumaczenie maszynowe nie jest zainstalowane w tej instancji.",
+    "recordingContentOrganizerOnly": "Tylko organizatorzy tego wydarzenia mogą otwierać, zmieniać lub publikować zawartość jego nagrań."
   }
 }

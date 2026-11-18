@@ -77,6 +77,9 @@ interface SpeakerRow {
 interface RecordingRow {
   id: string;
   eventId: string;
+  /** Chi guarda organizza l'evento e ne vede il contenuto
+   *  (lib/recording/content-access). */
+  contenuto?: boolean;
   eventSlug: string;
   eventTitle: string;
   blobKey: string;
@@ -510,11 +513,17 @@ function RecordingDetails({
           <h6 className="text-uppercase text-secondary small">
             {t('detailSpeakers')}
           </h6>
-          <SpeakersEditor speakers={row.speakers} onSave={onSpeakerSave} />
+          {row.contenuto === false ? (
+            <p className="text-secondary small mb-0">{t('contentOrganizerOnly')}</p>
+          ) : (
+            <SpeakersEditor speakers={row.speakers} onSave={onSpeakerSave} />
+          )}
         </div>
       </div>
 
-      {hasTranscript && (
+      {/* L'editor della trascrizione e' contenuto: solo per chi organizza
+          l'evento (lib/recording/content-access). */}
+      {hasTranscript && row.contenuto !== false && (
         <div className="mt-3 pt-3 border-top">
           <button
             type="button"

@@ -46,6 +46,7 @@ interface EventSummary {
   registrationCount: number;
   maxParticipants: number;
   peakParticipants: number;
+  /** Vuoto per l'admin che non organizza l'evento (lib/recording/content-access). */
   moderatorToken: string;
   coverImageUrl: string | null;
   imageUrl: string | null;
@@ -555,6 +556,9 @@ export default function AdminDashboardClient({
                   {/* Un pulsante, non un link: l'indirizzo della sala porta il
                       token del moderatore, che non deve comparire passandoci
                       sopra (in una condivisione dello schermo). */}
+                  {/* Senza link di conduzione (l'admin che non organizza
+                      l'evento) si gestisce soltanto. */}
+                  {event.moderatorToken && (
                   <button
                     type="button"
                     className="btn btn-primary btn-sm"
@@ -562,6 +566,7 @@ export default function AdminDashboardClient({
                   >
                     {tList('menu.enterRoom')}
                   </button>
+                  )}
                   <Link href={percorso(eventAdminPath(event.id, { viaToken: token }))} className="btn btn-outline-primary btn-sm">
                     {t('manage')}
                   </Link>

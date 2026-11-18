@@ -42,6 +42,10 @@ interface RecordingManagementProps {
     moderatorToken: string;
   };
   jibriAvailable?: boolean;
+  /** Chi guarda puo' aprire il file dalla rotta dell'app: chi organizza
+   *  l'evento, o chiunque se e' pubblicato per tutti. Con il solo link di
+   *  conduzione la rotta lo rifiuterebbe: niente riproduci e scarica. */
+  riproducibile?: boolean;
   /** La registrazione del video, quando ha slide presentate in sala da
    *  regolare (pagina della post-produzione, scheda «Slide»). */
   slidesRecordingId?: string | null;
@@ -72,6 +76,7 @@ function formatFileSize(bytes: number): string {
 export default function RecordingManagement({
   event,
   jibriAvailable = true,
+  riproducibile = true,
   slidesRecordingId = null,
 }: RecordingManagementProps) {
   const t = useTranslations('recording');
@@ -404,7 +409,7 @@ export default function RecordingManagement({
 
             {/* Action buttons */}
             <div className="d-flex align-items-center gap-3 flex-wrap">
-              {event.recordingUrl && (
+              {event.recordingUrl && riproducibile && (
                 <>
                   <a
                     href={event.recordingUrl}

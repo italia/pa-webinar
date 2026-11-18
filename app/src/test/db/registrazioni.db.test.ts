@@ -13,6 +13,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const { cancellaBlob } = vi.hoisted(() => ({ cancellaBlob: vi.fn() }));
 vi.mock('@/lib/storage/recordings', () => ({
   assertVideoNelloStorage: vi.fn(),
+  assertVideoDellEvento: vi.fn(async () => undefined),
+  fileDelloStorage: vi.fn(() => false),
   deleteRecordingBlob: cancellaBlob,
   generateRecordingSasUrl: vi.fn(),
 }));
@@ -37,6 +39,7 @@ import {
   creaRegistrazione,
   creaSessione,
   entraCome,
+  organizza,
   esci,
   richiesta,
   svuotaDatabase,
@@ -303,6 +306,7 @@ describe('pubblicazione', () => {
   it('togliere il video toglie anche la pubblicazione, qualunque cosa chieda il corpo', async () => {
     await entraCome('ADMIN');
     const evento = await creaEvento(CON_VIDEO);
+    await organizza(evento.id);
 
     const risposta = await aggiorna(evento.id, {
       recordingUrl: null,
@@ -327,6 +331,7 @@ describe('pubblicazione', () => {
   it('peso e durata nel corpo non sopravvivono alla rimozione del video', async () => {
     await entraCome('ADMIN');
     const evento = await creaEvento({ ...CON_VIDEO, recordingEnabled: false });
+    await organizza(evento.id);
 
     await aggiorna(evento.id, {
       recordingUrl: null,
@@ -346,6 +351,7 @@ describe('pubblicazione', () => {
   it('un video caricato si pubblica, con le dimensioni oltre i 32 bit', async () => {
     await entraCome('ADMIN');
     const evento = await creaEvento({ status: 'ENDED' });
+    await organizza(evento.id);
 
     const risposta = await aggiorna(evento.id, {
       recordingUrl: VIDEO,
@@ -535,6 +541,9 @@ describe('relatori della post-produzione', () => {
   it('collegare una persona riporta il suo nome leggibile', async () => {
     await entraCome('ADMIN');
     const riga = await relatore();
+    await organizza(
+      (await prisma.recording.findUniqueOrThrow({ where: { id: riga.recordingId } })).eventId
+    );
     const contatto = await persona(encryptPII('Nome in rubrica'));
 
     const risposta = await mappa(riga.id, { displayName: null, personId: contatto.id });

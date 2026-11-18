@@ -81,7 +81,7 @@ describe('elenco degli eventi — il video', () => {
     expect(
       elenchi(pagina).flatMap((l) => l.props.events.map((e) => [e.id, e.recordingUrl]))
     ).toEqual([
-      ['a', 'recordings/a.mp4'],
+      ['a', '/api/events/evento-a/recording'],
       ['b', null],
     ]);
   });

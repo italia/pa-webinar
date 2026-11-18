@@ -780,7 +780,8 @@
     "accessDenied": {
       "title": "Din it-taqsima mhijiex disponibbli għar-rwol tiegħek",
       "body": "Bħala organizzatur timmaniġġja l-avvenimenti tiegħek: toħloqhom u tippubblikahom, il-materjali, il-kwestjonarji u l-postproduzzjoni. Is-settings tal-pjattaforma u d-data tal-avvenimenti kollha jibqgħu għand l-amministrazzjoni.",
-      "back": "Mur għall-avvenimenti tiegħek"
+      "back": "Mur għall-avvenimenti tiegħek",
+      "organizerOnly": "L-organizzaturi ta’ dan l-avveniment biss jistgħu jeditjawh. Bħala amministratur tara l-istatus u d-dettalji tiegħu, u tista’ tarkivjah jew tħassru. Ir-reġistrazzjonijiet u l-kontenut tagħhom huma tal-organizzaturi u tal-parteċipanti."
     },
     "staffLogin": {
       "title": "Idħol fiż-żona tal-amministrazzjoni",
@@ -1655,7 +1656,8 @@
       "detailFilename": "Nomu file",
       "transcriptManage": "Immaniġġja t-traskrizzjoni / AI",
       "transcriptReady": "Traskritt",
-      "transcriptProcessing": "Fl-ipproċessar"
+      "transcriptProcessing": "Fl-ipproċessar",
+      "organizerOnly": "Għall-organizzaturi biss"
     },
     "gdprAudit": {
       "subtitle": "Reġistru tal-azioni ta' privatezza fuq data personali: cancellazioni, consensi, export",
@@ -1670,7 +1672,8 @@
         "DATA_DELETED": "Data imħassrin",
         "CONSENT_RECORDED": "Kunsens reġistrat",
         "DATA_EXPORTED": "Data esportati",
-        "CONSENT_WITHDRAWN": "Kunsens irtirat"
+        "CONSENT_WITHDRAWN": "Kunsens irtirat",
+        "RECORDING_CONTENT_READ": "Kontenut tar-reġistrazzjoni moqri mill-persunal"
       },
       "recordsAffected": "{count} record coinvolti",
       "colWhen": "Quando",
@@ -1696,7 +1699,8 @@
       "rotating": "Rigenero…",
       "regenerateTitle": "Rigenera il-token moderatur (invalida il-antik link)",
       "confirmRegenerate": "Sei sicuro ta' voler rigeneraru il token? Il antik link mhux funzionerà più.",
-      "noResults": "Ebda avveniment misjub."
+      "noResults": "Ebda avveniment misjub.",
+      "organizerOnlyLink": "Il-link jidher biss lill-organizzaturi tal-avveniment"
     },
     "registrations": {
       "subtitle": "Kollha il-personu imiktubin lill-avvenimenti — tfittxija, iffiltra ed esporta",
@@ -2128,7 +2132,8 @@
         "DATA_DELETED": "Dejta mħassra",
         "CONSENT_RECORDED": "Kunsens irreġistrat",
         "DATA_EXPORTED": "Dejta esportata",
-        "CONSENT_WITHDRAWN": "Kunsens irtirat"
+        "CONSENT_WITHDRAWN": "Kunsens irtirat",
+        "RECORDING_CONTENT_READ": "Kontenut tar-reġistrazzjoni moqri mill-persunal"
       }
     },
     "settings": {
@@ -3020,7 +3025,20 @@
         "publishNow": "Ippubblika issa"
       },
       "editFeatures": "Editja l-funzjonijiet",
-      "editPrivacy": "Editja l-privatezza u d-data"
+      "editPrivacy": "Editja l-privatezza u d-data",
+      "governance": {
+        "title": "Qed timmaniġġja dan l-avveniment bħala amministratur",
+        "body": "M’intix wieħed mill-organizzaturi tiegħu: tara l-istatus, id-dettalji, ir-reġistrazzjonijiet tal-parteċipanti u l-kunsensi, u tista’ tarkivjah jew tħassru. It-tmexxija tal-avveniment, il-link tal-moderatur u l-kontenut tar-reġistrazzjonijiet (vidjo, traskrizzjonijiet, sommarji) huma għall-organizzaturi.",
+        "recording": "Il-kontenut tar-reġistrazzjoni huwa disponibbli biss għall-organizzaturi tal-avveniment u għall-parteċipanti. Hawn tara jekk teżistix u d-dettalji tagħha.",
+        "recordingFile": "Reġistrazzjoni",
+        "present": "Teżisti",
+        "absent": "Xejn",
+        "recordingPublished": "Ippubblikata",
+        "yes": "Iva",
+        "no": "Le",
+        "recordingDuration": "Tul",
+        "recordingSize": "Daqs"
+      }
     },
     "rubrica": {
       "subtitle": "Persuni li taw il-kunsens biex jiddaħħlu fid-direttorju (art. 6.1.a GDPR). L-isem, l-email u l-organizzazzjoni jiġu aġġornati biss meta l-persuna terġa' timmarka l-kaxxa.",
@@ -3290,7 +3308,8 @@
         "metricsTitle": "Metriċi tas-sommarju (LLM)",
         "chars": "karattri",
         "model": "Mudell",
-        "notAvailable": "m/d"
+        "notAvailable": "m/d",
+        "contentHidden": "Disponibbli biss għall-organizzaturi tal-avveniment."
       },
       "rel": {
         "title": "Affidabbiltà tal-AI",
@@ -3447,7 +3466,8 @@
         "alignNone": "L-ebda bidla ta’ slajd biex tiġi allinjata.",
         "previewTitle": "Anteprima",
         "previewHelp": "Il-vidjo bis-slajds kif se jarahom il-pubbliku, bil-korrezzjoni miktuba hawn fuq."
-      }
+      },
+      "contentOrganizerOnly": "L-organizzaturi ta’ dan l-avveniment biss jistgħu jaraw u jeditjaw il-kontenut ta’ din ir-reġistrazzjoni (vidjo, binarji, traskrizzjoni, sommarju, traduzzjonijiet). Hawn tara l-istatus tagħha, ix-xogħlijiet tal-ipproċessar u d-dettalji tal-fajls."
     },
     "questionnairesPage": {
       "subtitle": "Template użati mill-ġdid ta' mistoqsijiet għal i dawnonari ta' preġistrazzjoni u post-avveniment."
@@ -3739,7 +3759,9 @@
       "publishDesc": "Irrevedih qabel tippubblikah: it-test inkiteb minn mudell tal-intelliġenza artifiċjali. Rapport iġġenerat mill-ġdid għandu jerġa' jiġi ppubblikat.",
       "preview": "Previżjoni",
       "hidePreview": "Aħbi l-previżjoni",
-      "previewLanguage": "Lingwa"
+      "previewLanguage": "Lingwa",
+      "organizerOnly": "L-organizzaturi ta’ dan l-avveniment biss jistgħu jitolbu, jaqraw u jippubblikaw ir-rapport.",
+      "organizerOnlyExists": "Ir-rapport jeżisti. L-organizzaturi ta’ dan l-avveniment biss jistgħu jaqrawh u jippubblikawh."
     },
     "endEvent": "Temm l-avveniment",
     "endEventConfirmTitle": "Ittemm l-avveniment għal kulħadd?",
@@ -6012,6 +6034,7 @@
     "captionsTranscriptNotTranslatable": "Din it-traskrizzjoni ġejja mis-sottotitoli diretti: it-traduzzjoni awtomatika teħtieġ traskrizzjoni AI tar-reġistrazzjoni.",
     "sameLanguage": "Il-lingwa magħżula hija l-lingwa oriġinali tar-reġistrazzjoni: agħżel oħra.",
     "recordingDestinationNotCovered": "Il-kunsensi ta' dan l-avveniment jgħoddu għal rekording riservat għar-reġistrati: ma tistax tagħmlu viżibbli għal kulħadd u lanqas torbot vidjo estern.",
-    "mtUnavailable": "It-traduzzjoni awtomatika mhijiex installata f'din l-istanza."
+    "mtUnavailable": "It-traduzzjoni awtomatika mhijiex installata f'din l-istanza.",
+    "recordingContentOrganizerOnly": "L-organizzaturi ta’ dan l-avveniment biss jistgħu jiftħu, ibiddlu jew jippubblikaw il-kontenut tar-reġistrazzjonijiet tiegħu."
   }
 }

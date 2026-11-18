@@ -12,7 +12,7 @@ import { copiaNegliAppunti } from '@/lib/utils/clipboard';
 import { Link, percorso, useRouter } from '@/i18n/navigation';
 import { eventAdminPath } from '@/lib/events/admin-links';
 import { moderatorRoomOpen } from '@/lib/events/participant-entry';
-import { duplicaComeProssima, impostaStatoEvento } from '@/lib/events/event-actions';
+import { duplicaComeProssima, eliminaEvento, impostaStatoEvento } from '@/lib/events/event-actions';
 import { localizedPath } from '@/lib/utils/localized-url';
 
 /**
@@ -106,7 +106,9 @@ export default function EventCardMenu({
     setOpen(true);
   };
 
-  const autorizzato = { Authorization: `Bearer ${event.moderatorToken}` };
+  // Senza link di conduzione (l'admin che non organizza l'evento) restano le
+  // azioni della sessione: duplicare, copiare il link pubblico, eliminare.
+  const conduce = event.moderatorToken !== '';
   const pubblico = event.status === 'PUBLISHED' || event.status === 'LIVE';
   const pubblicabile = event.status === 'DRAFT' || event.status === 'PUBLISHED';
   const istantanea = event.eventType === 'INSTANT';
@@ -170,11 +172,8 @@ export default function EventCardMenu({
         danger: true,
       });
       if (!ok) return;
-      const res = await fetch(`/api/events/${event.id}`, {
-        method: 'DELETE',
-        headers: autorizzato,
-      });
-      if (!res.ok) throw new Error(String(res.status));
+      const esito = await eliminaEvento(event.id, event.moderatorToken);
+      if (!esito.ok) throw new Error(esito.codice ?? 'delete');
       toast.success(t('deleted'));
       router.refresh();
     });
@@ -215,7 +214,7 @@ export default function EventCardMenu({
               stessa regola della pagina di gestione (moderatorRoomOpen). Un
               pulsante, non un link: l'indirizzo porta il token del
               moderatore, che passandoci sopra si vedrebbe. */}
-          {['LIVE', 'PROVISIONING', 'IDLE'].includes(event.status) && moderatorRoomOpen(event) && (
+          {conduce && ['LIVE', 'PROVISIONING', 'IDLE'].includes(event.status) && moderatorRoomOpen(event) && (
             <li>
               <button
                 type="button"
@@ -228,7 +227,7 @@ export default function EventCardMenu({
           )}
           {/* Niente «Gestisci»: la scheda porta gia' alla gestione, dal
               titolo e dal link in basso. */}
-          {!istantanea && (
+          {!istantanea && conduce && (
             <li>
               <Link
                 className={voce}
@@ -247,7 +246,7 @@ export default function EventCardMenu({
               </button>
             </li>
           )}
-          {pubblicabile && !istantanea && (
+          {pubblicabile && !istantanea && conduce && (
             <li>
               <button type="button" className={voce} onClick={cambiaPubblicazione}>
                 {event.status === 'PUBLISHED' ? t('unpublish') : t('publish')}

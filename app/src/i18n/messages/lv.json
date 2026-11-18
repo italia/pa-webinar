@@ -780,7 +780,8 @@
     "accessDenied": {
       "title": "Šī sadaļa jūsu lomai nav pieejama",
       "body": "Kā organizators jūs pārvaldāt savus pasākumus: to izveidi un publicēšanu, materiālus, aptaujas un pēcapstrādi. Platformas iestatījumi un visu pasākumu dati paliek administrācijas ziņā.",
-      "back": "Uz jūsu pasākumiem"
+      "back": "Uz jūsu pasākumiem",
+      "organizerOnly": "Tikai šī pasākuma organizatori var to rediģēt. Kā administrators jūs redzat tā statusu un informāciju un varat to arhivēt vai dzēst. Ieraksti un to saturs pieder organizatoriem un dalībniekiem."
     },
     "staffLogin": {
       "title": "Pieteikšanās administrēšanas sadaļā",
@@ -1655,7 +1656,8 @@
       "detailFilename": "Faila nosaukums",
       "transcriptManage": "Pārvaldīt transkripciju / MI",
       "transcriptReady": "Transkribēts",
-      "transcriptProcessing": "Apstrādē"
+      "transcriptProcessing": "Apstrādē",
+      "organizerOnly": "Tikai organizatoriem"
     },
     "gdprAudit": {
       "subtitle": "Privātuma darbību reģistrs ar personas datiem: dzēšanas, piekrišanas, eksporti",
@@ -1670,7 +1672,8 @@
         "DATA_DELETED": "Dati dzēsti",
         "CONSENT_RECORDED": "Piekrišana reģistrēta",
         "DATA_EXPORTED": "Dati eksportēti",
-        "CONSENT_WITHDRAWN": "Piekrišana atsaukta"
+        "CONSENT_WITHDRAWN": "Piekrišana atsaukta",
+        "RECORDING_CONTENT_READ": "Ieraksta saturs, ko lasījuši darbinieki"
       },
       "recordsAffected": "{count} ietekmēti ieraksti",
       "colWhen": "Kad",
@@ -1696,7 +1699,8 @@
       "rotating": "Atjauno…",
       "regenerateTitle": "Atjaunot moderatora marķieri (vecā saite vairs nedarbosies)",
       "confirmRegenerate": "Vai esat pārliecināts, ka vēlaties atjaunot marķieri? Vecā saite vairs nedarbosies.",
-      "noResults": "Pasākumi netika atrasti."
+      "noResults": "Pasākumi netika atrasti.",
+      "organizerOnlyLink": "Saite redzama tikai pasākuma organizatoriem"
     },
     "registrations": {
       "subtitle": "Visas pasākumiem reģistrētās personas — meklēšana, filtrēšana un eksports",
@@ -2128,7 +2132,8 @@
         "DATA_DELETED": "Dati dzēsti",
         "CONSENT_RECORDED": "Piekrišana reģistrēta",
         "DATA_EXPORTED": "Dati eksportēti",
-        "CONSENT_WITHDRAWN": "Piekrišana atsaukta"
+        "CONSENT_WITHDRAWN": "Piekrišana atsaukta",
+        "RECORDING_CONTENT_READ": "Ieraksta saturs, ko lasījuši darbinieki"
       }
     },
     "settings": {
@@ -3020,7 +3025,20 @@
         "publishNow": "Publicēt tūlīt"
       },
       "editFeatures": "Rediģēt funkcijas",
-      "editPrivacy": "Rediģēt privātumu un datus"
+      "editPrivacy": "Rediģēt privātumu un datus",
+      "governance": {
+        "title": "Jūs pārvaldāt šo pasākumu kā administrators",
+        "body": "Jūs neesat viens no tā organizatoriem: jūs redzat statusu, informāciju, reģistrācijas un piekrišanas un varat to arhivēt vai dzēst. Pasākuma vadīšana, moderatora saite un ierakstu saturs (video, transkripcijas, kopsavilkumi) ir organizatoru ziņā.",
+        "recording": "Ieraksta saturs ir pieejams tikai pasākuma organizatoriem un dalībniekiem. Šeit redzat, vai tas ir, un tā informāciju.",
+        "recordingFile": "Ieraksts",
+        "present": "Ir",
+        "absent": "Nav",
+        "recordingPublished": "Publicēts",
+        "yes": "Jā",
+        "no": "Nē",
+        "recordingDuration": "Ilgums",
+        "recordingSize": "Izmērs"
+      }
     },
     "rubrica": {
       "subtitle": "Personas, kas devušas piekrišanu iekļaušanai kontaktu grāmatā (VDAR 6.1.a pants). Vārds, e-pasts un organizācija tiek atjaunināti tikai tad, kad persona atkārtoti atzīmē izvēles rūtiņu.",
@@ -3290,7 +3308,8 @@
         "metricsTitle": "Kopsavilkuma rādītāji (LLM)",
         "chars": "rakstzīmes",
         "model": "Modelis",
-        "notAvailable": "n/p"
+        "notAvailable": "n/p",
+        "contentHidden": "Pieejams tikai pasākuma organizatoriem."
       },
       "rel": {
         "title": "MI uzticamība",
@@ -3447,7 +3466,8 @@
         "alignNone": "Nav slaidu maiņas, ko salāgot.",
         "previewTitle": "Priekšskatījums",
         "previewHelp": "Video ar slaidiem tā, kā tos redzēs skatītāji, ar augstāk ierakstīto korekciju."
-      }
+      },
+      "contentOrganizerOnly": "Tikai šī pasākuma organizatori var skatīt un rediģēt šī ieraksta saturu (video, celiņus, transkripciju, kopsavilkumu, tulkojumus). Šeit redzat tā statusu, apstrādes darbus un failu informāciju."
     },
     "questionnairesPage": {
       "subtitle": "Atkārtoti izmantojamas jautājumu veidnes pirmsreģistrācijas un pēcpasākuma anketām."
@@ -3739,7 +3759,9 @@
       "publishDesc": "Pirms publicēšanas pārskatiet to: tekstu uzrakstījis mākslīgā intelekta modelis. Atkārtoti izveidots pārskats jāpublicē vēlreiz.",
       "preview": "Priekšskatījums",
       "hidePreview": "Paslēpt priekšskatījumu",
-      "previewLanguage": "Valoda"
+      "previewLanguage": "Valoda",
+      "organizerOnly": "Tikai šī pasākuma organizatori var pieprasīt, lasīt un publicēt pārskatu.",
+      "organizerOnlyExists": "Pārskats ir sagatavots. Tikai šī pasākuma organizatori var to lasīt un publicēt."
     },
     "endEvent": "Beigt pasākumu",
     "endEventConfirmTitle": "Beigt pasākumu visiem?",
@@ -6012,6 +6034,7 @@
     "captionsTranscriptNotTranslatable": "Šis atšifrējums iegūts no tiešraides subtitriem: automātiskajai tulkošanai nepieciešams ieraksta MI atšifrējums.",
     "sameLanguage": "Izvēlētā valoda ir ieraksta oriģinālvaloda: izvēlieties citu.",
     "recordingDestinationNotCovered": "Šī pasākuma piekrišanas attiecas uz ierakstu tikai reģistrētajiem: jūs nevarat to padarīt redzamu visiem, ne pievienot ārēju video.",
-    "mtUnavailable": "Šajā instancē mašīntulkošana nav instalēta."
+    "mtUnavailable": "Šajā instancē mašīntulkošana nav instalēta.",
+    "recordingContentOrganizerOnly": "Tikai šī pasākuma organizatori var atvērt, mainīt vai publicēt tā ierakstu saturu."
   }
 }

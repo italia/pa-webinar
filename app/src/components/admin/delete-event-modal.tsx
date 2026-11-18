@@ -13,11 +13,16 @@ import {
   ModalFooter,
 } from 'design-react-kit';
 
+import { eliminaEvento } from '@/lib/events/event-actions';
+
 interface DeleteEventModalProps {
   eventId: string;
+  /** Vuoto per l'admin che non organizza l'evento: non ha il link di
+   *  conduzione, ed elimina con la propria sessione (la rotta in blocco). */
   moderatorToken: string;
   onDeleted: () => void;
 }
+
 
 export default function DeleteEventModal({
   eventId,
@@ -34,17 +39,13 @@ export default function DeleteEventModal({
     setDeleting(true);
     setError(null);
     try {
-      const res = await fetch(`/api/events/${eventId}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${moderatorToken}` },
-      });
-      if (res.ok) {
+      const esito = await eliminaEvento(eventId, moderatorToken);
+      if (esito.ok) {
         setIsOpen(false);
         onDeleted();
         return;
       }
-      const body = (await res.json().catch(() => ({}))) as { code?: string };
-      setError(body.code === 'EVENT_LIVE' ? t('deleteLiveBlocked') : tc('errorGeneric'));
+      setError(esito.codice === 'EVENT_LIVE' ? t('deleteLiveBlocked') : tc('errorGeneric'));
     } catch {
       setError(tc('errorGeneric'));
     } finally {

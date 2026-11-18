@@ -57,6 +57,7 @@ import {
   creaEvento,
   creaIscrizione,
   entraCome,
+  organizza,
   esci,
   richiesta,
   svuotaDatabase,
@@ -145,7 +146,7 @@ describe('registrazione riservata con la pagina privata', () => {
     const uguale = biscotto.indexOf('=');
     biscotti.set(biscotto.slice(0, uguale), biscotto.slice(uguale + 1));
 
-    expect(eventoNel(await payload(evento.slug)).recordingUrl).toBe(VIDEO);
+    expect(eventoNel(await payload(evento.slug)).recordingUrl).toBe(`/api/events/${evento.slug}/recording`);
     const risposta = await video(
       richiesta(`/api/events/${evento.slug}/recording`) as never,
       ctx(evento.slug)
@@ -165,6 +166,7 @@ describe('registrazione riservata con la pagina privata', () => {
     await expect(payload(evento.slug)).rejects.toThrow('NOT_FOUND');
 
     await entraCome('ADMIN');
+    await organizza(evento.id);
     await expect(payload(evento.slug)).rejects.toThrow('NOT_FOUND');
     const anteprima = await payload(evento.slug, { anteprima: '1' });
     expect(anteprima.previewForStaff).toBe(true);

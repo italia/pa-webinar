@@ -68,7 +68,7 @@ describe('GET /api/events, elenco pubblico', () => {
       evento('c', true, 'REGISTRANTS'),
     ]);
     expect(await elenco()).toEqual([
-      ['a', 'recordings/a.mp4'],
+      ['a', '/api/events/evento-a/recording'],
       ['b', null],
       ['c', null],
     ]);
@@ -86,7 +86,7 @@ describe('GET /api/events, elenco pubblico', () => {
         }),
       ]);
       expect(await elenco()).toEqual([
-        ['a', 'recordings/a.mp4'],
+        ['a', '/api/events/evento-a/recording'],
         ['b', null],
       ]);
     }

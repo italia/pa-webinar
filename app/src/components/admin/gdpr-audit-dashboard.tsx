@@ -33,6 +33,7 @@ const ACTION_COLORS: Record<string, string> = {
   CONSENT_RECORDED: 'success',
   CONSENT_WITHDRAWN: 'warning',
   DATA_EXPORTED: 'primary',
+  RECORDING_CONTENT_READ: 'info',
 };
 
 export default function GdprAuditDashboard() {
@@ -93,6 +94,7 @@ export default function GdprAuditDashboard() {
                 <option value="CONSENT_RECORDED">{t('actions.CONSENT_RECORDED')}</option>
                 <option value="CONSENT_WITHDRAWN">{t('actions.CONSENT_WITHDRAWN')}</option>
                 <option value="DATA_EXPORTED">{t('actions.DATA_EXPORTED')}</option>
+                <option value="RECORDING_CONTENT_READ">{t('actions.RECORDING_CONTENT_READ')}</option>
               </select>
             </div>
           </div>
@@ -106,7 +108,7 @@ export default function GdprAuditDashboard() {
               <Card className="border-0 shadow-sm h-100">
                 <CardBody className="p-3">
                   <Badge color={ACTION_COLORS[s.action] ?? 'secondary'} className="mb-2" style={{ fontSize: '0.72rem' }}>
-                    {t(`actions.${s.action}` as 'actions.DATA_DELETED' | 'actions.CONSENT_RECORDED' | 'actions.CONSENT_WITHDRAWN' | 'actions.DATA_EXPORTED')}
+                    {t(`actions.${s.action}` as 'actions.DATA_DELETED' | 'actions.CONSENT_RECORDED' | 'actions.CONSENT_WITHDRAWN' | 'actions.DATA_EXPORTED' | 'actions.RECORDING_CONTENT_READ')}
                   </Badge>
                   <div className="fw-bold" style={{ fontSize: '1.4rem', color: 'var(--app-text)' }}>
                     {s.count}
@@ -152,7 +154,7 @@ export default function GdprAuditDashboard() {
                       </td>
                       <td>
                         <Badge color={ACTION_COLORS[r.action] ?? 'secondary'} style={{ fontSize: '0.7rem' }}>
-                          {t(`actions.${r.action}` as 'actions.DATA_DELETED' | 'actions.CONSENT_RECORDED' | 'actions.CONSENT_WITHDRAWN' | 'actions.DATA_EXPORTED')}
+                          {t(`actions.${r.action}` as 'actions.DATA_DELETED' | 'actions.CONSENT_RECORDED' | 'actions.CONSENT_WITHDRAWN' | 'actions.DATA_EXPORTED' | 'actions.RECORDING_CONTENT_READ')}
                         </Badge>
                       </td>
                       <td>

@@ -780,7 +780,8 @@
     "accessDenied": {
       "title": "Níl an chuid seo ar fáil do do ról",
       "body": "Mar eagraí bainistíonn tú d’imeachtaí féin: iad a chruthú agus a fhoilsiú, ábhair, ceistneoirí agus iarléiriúchán. Fanann socruithe an ardáin agus sonraí na n-imeachtaí go léir ag an riarachán.",
-      "back": "Téigh chuig d’imeachtaí"
+      "back": "Téigh chuig d’imeachtaí",
+      "organizerOnly": "Ní féidir ach le heagraithe an imeachta seo é a chur in eagar. Mar riarthóir feiceann tú a stádas agus a shonraí, agus is féidir leat é a chartlannú nó a scriosadh. Is leis na heagraithe agus leis na rannpháirtithe na taifeadtaí agus a n-ábhar."
     },
     "staffLogin": {
       "title": "Sínigh isteach sa limistéar riaracháin",
@@ -1655,7 +1656,8 @@
       "detailFilename": "Ainm comhaid",
       "transcriptManage": "Bainistigh an tras-scríbhinn / AI",
       "transcriptReady": "Tras-scríofa",
-      "transcriptProcessing": "Á phróiseáil"
+      "transcriptProcessing": "Á phróiseáil",
+      "organizerOnly": "Eagraithe amháin"
     },
     "gdprAudit": {
       "subtitle": "Logleabhar gníomhartha príobháideachais ar shonraí pearsanta: scriosadh, toiliú, easpórtálacha",
@@ -1670,7 +1672,8 @@
         "DATA_DELETED": "Sonraí scriosta",
         "CONSENT_RECORDED": "Toiliú taifeadta",
         "DATA_EXPORTED": "Sonraí easpórtáilte",
-        "CONSENT_WITHDRAWN": "Toiliú tarraingthe siar"
+        "CONSENT_WITHDRAWN": "Toiliú tarraingthe siar",
+        "RECORDING_CONTENT_READ": "Ábhar an taifeadta léite ag an bhfoireann"
       },
       "recordsAffected": "{count} taifead i gceist",
       "colWhen": "Cathain",
@@ -1696,7 +1699,8 @@
       "rotating": "Á athghineadh…",
       "regenerateTitle": "Athghin comhartha an mhodhnóra (cuirtear an seannasc ó fheidhm)",
       "confirmRegenerate": "An bhfuil tú cinnte gur mhaith leat an comhartha a athghineadh? Ní oibreoidh an seannasc a thuilleadh.",
-      "noResults": "Níor aimsíodh aon imeacht."
+      "noResults": "Níor aimsíodh aon imeacht.",
+      "organizerOnlyLink": "Nasc le feiceáil ag eagraithe an imeachta amháin"
     },
     "registrations": {
       "subtitle": "Gach duine atá cláraithe le himeachtaí — cuardaigh, scag agus easpórtáil",
@@ -2128,7 +2132,8 @@
         "DATA_DELETED": "Sonraí scriosta",
         "CONSENT_RECORDED": "Toiliú taifeadta",
         "DATA_EXPORTED": "Sonraí easpórtáilte",
-        "CONSENT_WITHDRAWN": "Toiliú tarraingthe siar"
+        "CONSENT_WITHDRAWN": "Toiliú tarraingthe siar",
+        "RECORDING_CONTENT_READ": "Ábhar an taifeadta léite ag an bhfoireann"
       }
     },
     "settings": {
@@ -3020,7 +3025,20 @@
         "publishNow": "Foilsigh anois"
       },
       "editFeatures": "Cuir na feidhmeanna in eagar",
-      "editPrivacy": "Cuir príobháideachas agus sonraí in eagar"
+      "editPrivacy": "Cuir príobháideachas agus sonraí in eagar",
+      "governance": {
+        "title": "Tá tú ag bainistiú an imeachta seo mar riarthóir",
+        "body": "Ní duine dá eagraithe thú: feiceann tú an stádas, na sonraí, na cláruithe agus na toilithe, agus is féidir leat é a chartlannú nó a scriosadh. Is faoi na heagraithe atá reáchtáil an imeachta, nasc an mhodhnóra agus ábhar na dtaifeadtaí (físeán, tras-scríbhinní, achoimrí).",
+        "recording": "Níl ábhar an taifeadta ar fáil ach d’eagraithe an imeachta agus dá rannpháirtithe. Feiceann tú anseo an bhfuil sé ann agus a shonraí.",
+        "recordingFile": "Taifeadadh",
+        "present": "Ann",
+        "absent": "Níl",
+        "recordingPublished": "Foilsithe",
+        "yes": "Tá",
+        "no": "Níl",
+        "recordingDuration": "Fad",
+        "recordingSize": "Méid"
+      }
     },
     "rubrica": {
       "subtitle": "Daoine a thug toiliú a gcur leis an leabhar seoltaí (airteagal 6.1.a GDPR). Ní nuashonraítear an t-ainm, an ríomhphost ná an eagraíocht ach amháin nuair a thiceálann an duine an bosca arís.",
@@ -3290,7 +3308,8 @@
         "metricsTitle": "Méadrachtaí na hachoimre (LLM)",
         "chars": "carachtair",
         "model": "Samhail",
-        "notAvailable": "n/b"
+        "notAvailable": "n/b",
+        "contentHidden": "Ar fáil d’eagraithe an imeachta amháin."
       },
       "rel": {
         "title": "Iontaofacht AI",
@@ -3447,7 +3466,8 @@
         "alignNone": "Níl aon athrú sleamhnáin le hailíniú.",
         "previewTitle": "Réamhamharc",
         "previewHelp": "An físeán leis na sleamhnáin mar a fheicfidh an pobal iad, leis an gceartú atá scríofa thuas."
-      }
+      },
+      "contentOrganizerOnly": "Ní féidir ach le heagraithe an imeachta seo ábhar an taifeadta seo a fheiceáil agus a chur in eagar (físeán, rianta, tras-scríbhinn, achoimre, aistriúcháin). Feiceann tú anseo a stádas, na jabanna próiseála agus sonraí na gcomhad."
     },
     "questionnairesPage": {
       "subtitle": "Teimpléid in-athúsáidte ceisteanna do cheistneoirí réamhchlárúcháin agus iar-imeachta."
@@ -3739,7 +3759,9 @@
       "publishDesc": "Athbhreithnigh í sula bhfoilsíonn tú í: is samhail intleachta saorga a scríobh an téacs. Ní mór tuarascáil a cruthaíodh arís a fhoilsiú arís.",
       "preview": "Réamhamharc",
       "hidePreview": "Folaigh an réamhamharc",
-      "previewLanguage": "Teanga"
+      "previewLanguage": "Teanga",
+      "organizerOnly": "Ní féidir ach le heagraithe an imeachta seo an tuarascáil a iarraidh, a léamh agus a fhoilsiú.",
+      "organizerOnlyExists": "Tá an tuarascáil ann. Ní féidir ach le heagraithe an imeachta seo í a léamh agus a fhoilsiú."
     },
     "endEvent": "Cuir deireadh leis an ócáid",
     "endEventConfirmTitle": "Deireadh a chur leis an ócáid do chách?",
@@ -6012,6 +6034,7 @@
     "captionsTranscriptNotTranslatable": "Tagann an tras-scríbhinn seo ó na fotheidil bheo: teastaíonn tras-scríbhinn AI den taifeadadh don aistriúchán uathoibríoch.",
     "sameLanguage": "Is í an teanga a roghnaigh tú bunteanga an taifeadta: roghnaigh ceann eile.",
     "recordingDestinationNotCovered": "Baineann toilithe an imeachta seo le taifeadadh do dhaoine cláraithe amháin: ní féidir leat é a chur le feiceáil ag cách ná físeán seachtrach a nascadh.",
-    "mtUnavailable": "Níl meaistriúchán suiteáilte ar an ásc seo."
+    "mtUnavailable": "Níl meaistriúchán suiteáilte ar an ásc seo.",
+    "recordingContentOrganizerOnly": "Ní féidir ach le heagraithe an imeachta seo ábhar a thaifeadtaí a oscailt, a athrú nó a fhoilsiú."
   }
 }

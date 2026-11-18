@@ -11,12 +11,18 @@ import { Link } from '@/i18n/navigation';
  * sarebbe un giro senza uscita — ma una spiegazione e la strada per tornare
  * agli eventi che gestisce.
  */
-export default async function AccessDenied() {
+export default async function AccessDenied({
+  motivo,
+}: {
+  /** `organizzatore`: la pagina e' di chi organizza l'evento, e chi guarda
+   *  lo gestisce soltanto (l'admin dell'istanza). */
+  motivo?: 'organizzatore';
+} = {}) {
   const t = await getTranslations('admin.accessDenied');
   return (
     <div className="container py-5" style={{ maxWidth: 720 }}>
       <h1 className="h2 mb-3">{t('title')}</h1>
-      <p className="mb-4">{t('body')}</p>
+      <p className="mb-4">{motivo === 'organizzatore' ? t('organizerOnly') : t('body')}</p>
       <Link href="/admin/events" className="btn btn-primary">
         {t('back')}
       </Link>

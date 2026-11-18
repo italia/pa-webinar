@@ -24,7 +24,10 @@ interface ModeratorRow {
   endsAt: string;
   moderatorName: string | null;
   moderatorEmail: string | null;
-  moderatorToken: string;
+  /** Null sugli eventi che chi guarda non organizza: il link apre la
+   *  pubblicazione e la cancellazione del video (lib/recording/content-access).
+   *  Rigenerarlo resta possibile, per chiudere un link finito in giro. */
+  moderatorToken: string | null;
 }
 
 interface ApiResponse {
@@ -74,12 +77,13 @@ export default function ModeratorsDashboard({
   useEffect(() => { fetchRows(); }, [fetchRows]);
 
   // Link da copiare: fuori dal router, i segmenti si traducono dalla mappa.
-  function buildLink(row: ModeratorRow): string {
+  function buildLink(row: ModeratorRow & { moderatorToken: string }): string {
     return localizedUrl(appUrl, `/events/${row.slug}/live?token=${row.moderatorToken}`, locale);
   }
 
   async function copyLink(row: ModeratorRow) {
-    if (!(await copiaNegliAppunti(buildLink(row)))) {
+    if (!row.moderatorToken) return;
+    if (!(await copiaNegliAppunti(buildLink({ ...row, moderatorToken: row.moderatorToken })))) {
       toast.error(tLinks('copyFailedShort'));
       return;
     }
@@ -174,6 +178,7 @@ export default function ModeratorsDashboard({
                         </Badge>
                       </td>
                       <td>
+                        {r.moderatorToken ? (
                         <button
                           type="button"
                           className="btn btn-sm btn-outline-primary me-1"
@@ -183,6 +188,11 @@ export default function ModeratorsDashboard({
                           <Icon icon="it-copy" size="xs" className="me-1" />
                           {copied === r.id ? t('copied') : t('copy')}
                         </button>
+                        ) : (
+                          <span className="d-block text-muted mb-1" style={{ fontSize: '0.75rem' }}>
+                            {t('organizerOnlyLink')}
+                          </span>
+                        )}
                         <button
                           type="button"
                           className="btn btn-sm btn-outline-warning"

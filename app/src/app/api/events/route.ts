@@ -16,7 +16,7 @@ import {
   assertEsposizioneConsentita,
   destinazioneDiPartenza,
 } from '@/lib/recording/destination';
-import { videoPerTutti } from '@/lib/recording/audience';
+import { videoDellApp, videoPerTutti } from '@/lib/recording/audience';
 import { createEventSchema } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { generateUniqueSlug } from '@/lib/utils/slug';
@@ -406,7 +406,8 @@ export const GET = withErrorHandling(async (request) => {
         recordingEnabled: event.recordingEnabled,
         status: event.status,
         eventType: event.eventType,
-        recordingUrl: event.recordingUrl,
+        // La rotta dell'app, mai l'indirizzo dello storage (lib/recording/audience).
+        recordingUrl: event.recordingUrl ? videoDellApp(event.slug) : null,
         moderatorToken: event.moderatorToken,
       };
     });

@@ -780,7 +780,8 @@
     "accessDenied": {
       "title": "Esta secção não está disponível para a sua função",
       "body": "Como organizador, gere os seus próprios eventos: criá-los, publicá-los, os materiais, os questionários e a pós-produção. As definições da plataforma e os dados de todos os eventos ficam com a administração.",
-      "back": "Ir para os seus eventos"
+      "back": "Ir para os seus eventos",
+      "organizerOnly": "Só os organizadores deste evento o podem editar. Como administrador, vê o seu estado e os seus detalhes e pode arquivá-lo ou eliminá-lo. As gravações e o seu conteúdo pertencem aos organizadores e aos participantes."
     },
     "staffLogin": {
       "title": "Aceder à área de administração",
@@ -1655,7 +1656,8 @@
       "detailFilename": "Nome do ficheiro",
       "transcriptManage": "Gerir a transcrição / IA",
       "transcriptReady": "Transcrita",
-      "transcriptProcessing": "Em proc."
+      "transcriptProcessing": "Em proc.",
+      "organizerOnly": "Só organizadores"
     },
     "gdprAudit": {
       "subtitle": "Registo das ações de privacidade sobre dados pessoais: eliminações, consentimentos, exportações",
@@ -1670,7 +1672,8 @@
         "DATA_DELETED": "Dados eliminados",
         "CONSENT_RECORDED": "Consentimento registado",
         "DATA_EXPORTED": "Dados exportados",
-        "CONSENT_WITHDRAWN": "Consentimento retirado"
+        "CONSENT_WITHDRAWN": "Consentimento retirado",
+        "RECORDING_CONTENT_READ": "Conteúdo da gravação lido pela equipa"
       },
       "recordsAffected": "{count} registos afetados",
       "colWhen": "Quando",
@@ -1696,7 +1699,8 @@
       "rotating": "A regenerar…",
       "regenerateTitle": "Regenerar o token de moderador (invalida a ligação antiga)",
       "confirmRegenerate": "Tem a certeza de que pretende regenerar o token? A ligação antiga deixará de funcionar.",
-      "noResults": "Nenhum evento encontrado."
+      "noResults": "Nenhum evento encontrado.",
+      "organizerOnlyLink": "Ligação visível apenas para os organizadores do evento"
     },
     "registrations": {
       "subtitle": "Todas as pessoas inscritas em eventos — pesquisar, filtrar e exportar",
@@ -2128,7 +2132,8 @@
         "DATA_DELETED": "Dados eliminados",
         "CONSENT_RECORDED": "Consentimento registado",
         "DATA_EXPORTED": "Dados exportados",
-        "CONSENT_WITHDRAWN": "Consentimento retirado"
+        "CONSENT_WITHDRAWN": "Consentimento retirado",
+        "RECORDING_CONTENT_READ": "Conteúdo da gravação lido pela equipa"
       }
     },
     "settings": {
@@ -3020,7 +3025,20 @@
         "publishNow": "Publicar agora"
       },
       "editFeatures": "Editar funções",
-      "editPrivacy": "Editar privacidade e dados"
+      "editPrivacy": "Editar privacidade e dados",
+      "governance": {
+        "title": "Gere este evento como administrador",
+        "body": "Não faz parte dos seus organizadores: vê o estado, os detalhes, as inscrições e os consentimentos e pode arquivá-lo ou eliminá-lo. A condução do evento, a ligação do moderador e o conteúdo das gravações (vídeo, transcrições, resumos) cabem aos organizadores.",
+        "recording": "O conteúdo da gravação só está disponível para os organizadores do evento e para os seus participantes. Aqui vê se existe e os seus detalhes.",
+        "recordingFile": "Gravação",
+        "present": "Disponível",
+        "absent": "Nenhuma",
+        "recordingPublished": "Publicada",
+        "yes": "Sim",
+        "no": "Não",
+        "recordingDuration": "Duração",
+        "recordingSize": "Tamanho"
+      }
     },
     "rubrica": {
       "subtitle": "Pessoas que deram consentimento para constarem na agenda (art. 6.1.a RGPD). O nome, o e-mail e a organização só são atualizados quando a pessoa volta a assinalar a caixa.",
@@ -3290,7 +3308,8 @@
         "metricsTitle": "Métricas do resumo (LLM)",
         "chars": "caracteres",
         "model": "Modelo",
-        "notAvailable": "n/d"
+        "notAvailable": "n/d",
+        "contentHidden": "Disponível apenas para os organizadores do evento."
       },
       "rel": {
         "title": "Fiabilidade da IA",
@@ -3447,7 +3466,8 @@
         "alignNone": "Nenhuma mudança de diapositivo para alinhar.",
         "previewTitle": "Pré-visualização",
         "previewHelp": "O vídeo com os diapositivos tal como o público os verá, com a correção indicada acima."
-      }
+      },
+      "contentOrganizerOnly": "Só os organizadores deste evento podem ver e editar o conteúdo desta gravação (vídeo, faixas, transcrição, resumo, traduções). Aqui vê o seu estado, os processamentos e os detalhes dos ficheiros."
     },
     "questionnairesPage": {
       "subtitle": "Modelos reutilizáveis de perguntas para os questionários de pré-inscrição e pós-evento."
@@ -3739,7 +3759,9 @@
       "publishDesc": "Reveja-o antes de o publicar: o texto é escrito por um modelo de inteligência artificial. Um relatório gerado de novo tem de ser publicado novamente.",
       "preview": "Pré-visualização",
       "hidePreview": "Ocultar a pré-visualização",
-      "previewLanguage": "Idioma"
+      "previewLanguage": "Idioma",
+      "organizerOnly": "Só os organizadores deste evento podem pedir, ler e publicar o relatório.",
+      "organizerOnlyExists": "O relatório existe. Só os organizadores deste evento o podem ler e publicar."
     },
     "endEvent": "Terminar evento",
     "endEventConfirmTitle": "Terminar o evento para todos?",
@@ -6012,6 +6034,7 @@
     "captionsTranscriptNotTranslatable": "Esta transcrição provém das legendas em direto: a tradução automática requer uma transcrição por IA da gravação.",
     "sameLanguage": "O idioma escolhido é o original da gravação: escolha outro.",
     "recordingDestinationNotCovered": "Os consentimentos deste evento valem para uma gravação reservada aos inscritos: não pode torná-la visível a todos nem associar um vídeo externo.",
-    "mtUnavailable": "A tradução automática não está instalada nesta instância."
+    "mtUnavailable": "A tradução automática não está instalada nesta instância.",
+    "recordingContentOrganizerOnly": "Só os organizadores deste evento podem abrir, alterar ou publicar o conteúdo das suas gravações."
   }
 }

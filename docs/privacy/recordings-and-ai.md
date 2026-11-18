@@ -72,6 +72,12 @@ assessment belongs to the controller of each installation.
   unless the video is published, in which case they live as long as the
   published video. A transcript published on its own stays while it is
   published, and the event's other outputs still go at its retention.
+- The content of a recording (video, voices, transcripts, summaries, report,
+  translations, subtitles, dubbing) is for the organizers of the event and its
+  participants. An administrator who does not organize the event sees only that
+  it exists, its status and its processing jobs; the instance key never sees
+  content. Staff reads are written to the GDPR log
+  ([Who can see recording content](#who-can-see-recording-content)).
 - Several gaps need operator attention: see [Known limitations](#known-limitations).
 
 ## What is captured and when
@@ -109,7 +115,7 @@ recording box. The rules are in `app/src/lib/recording/destination.ts`.
 
 | Destination | Who can see the video | Box |
 |---|---|---|
-| Reserved (`REGISTRANTS`) | The staff who manage the event, and registrants for as long as their registration exists. It is not public and not in the video library | `gdpr.consent.recordingReserved` |
+| Reserved (`REGISTRANTS`) | The organizers of the event, and registrants for as long as their registration exists. It is not public and not in the video library | `gdpr.consent.recordingReserved` |
 | Public (`PUBLIC`) | Anyone, once staff publish it | `gdpr.consent.recordingPublic` |
 | Not declared (null) | What staff decide after the event, with a warning when they publish. Only events that recorded before the choice existed, events that received a file after their room opened, instant calls, and imported archives, which publish with no warning | `gdpr.consent.recording` |
 
@@ -292,6 +298,47 @@ in the waiting room and in the room, **Consents** dialog included
 ([Custom recording consent text](privacy-notice-checklist.md#custom-recording-consent-text),
 [Recording: consent gates](../architecture/recording.md#consent-gates)).
 
+## Who can see recording content
+
+The content of a recording is what it shows or says and what is derived from
+it: the composite video, the per-participant tracks and the archive, the
+waveform, the transcripts (AI and from captions), the summaries, the event
+report, the translations, the subtitles and the dubbed audio. The rule is in
+`app/src/lib/recording/content-access.ts` for staff and in
+`app/src/lib/recording/audience.ts` for everyone else
+([ADR-021](../adr/021-recording-content-access.md)).
+
+| Who | Content |
+|---|---|
+| The organizers of the event (the staff account that created it, and every staff account with a valid organizer grant on it, administrators included) | Everything, before and after publication: reading it, correcting it, producing more of it and publishing it |
+| An administrator who does not organize the event | None. They see that the recording exists, its status, duration, size and files, the processing jobs and their errors, the quality figures of the transcript and the languages produced, and can cancel queued jobs |
+| The instance API key | None |
+| Registrants | A recording reserved for registrants, while their registration exists |
+| Whoever was in an instant call while it was recorded | The recording of that call, from the call's link, until the call is deleted |
+| Anyone | A recording published for everyone |
+
+- **Instant calls.** When the recording starts, the room of each person present
+  asks the portal for a presence pass, proving its seat with the room tokens of
+  that visit. The portal checks that the recording is running and that a token
+  of the call came from the portal, then sets an `HttpOnly` cookie
+  (`rec_pass_<eventId>`) that expires when the call's retention ends.
+  Consent does not matter: someone who stayed out of the video was still in
+  the call. Nothing is emailed and there is no link to forward.
+- **Every staff read is logged.** A staff member who reads content as staff
+  writes a `RECORDING_CONTENT_READ` row in the event's GDPR log, with the
+  surface, the recording, the role and the account ID, and no name or address
+  ([Audit trails](../GDPR.md#audit-trails)).
+- **No storage addresses in browsers.** Pages, APIs and emails carry the
+  portal's route for a video, which checks access again and redirects to a
+  signed address valid for 120 minutes. The portal signs only files of the
+  event being asked for.
+- **Post-production is the organizers' work.** Correcting transcripts, naming
+  speakers, editing summaries, translating, archiving and publishing need an
+  organizer of the event.
+- **The block is in the application.** Whoever holds the storage or database
+  credentials, `PII_ENCRYPTION_KEY` or the cluster can read the files and
+  decrypt the texts. The worker and the recorder keep their own access.
+
 ## Voice data
 
 ### No voiceprints
@@ -409,9 +456,10 @@ on. It serves two features of the administration area:
   video, one audio track per participant labeled with the name, and the
   subtitles into one MKV file.
 
-Only staff who manage the event can use them: administrators, and the
-organizer who created it. The audio and archive links are signed URLs that
-expire after 120 minutes
+Only the organizers of the event can use them: the staff account that created
+it and those with an organizer grant on it, administrators included only when
+they organize it. Each use is written to the event's GDPR log. The audio and
+archive links are signed URLs that expire after 120 minutes
 (`app/src/app/api/admin/postprod/recordings/[id]/tracks/route.ts`). Nothing
 from this feature appears on public pages.
 
@@ -445,7 +493,7 @@ event's privacy notice and in its own communication to participants.
 | Track audio | Object storage, `recordings/multitrack/<eventId>/<recordingId>/audio/` | The recorder bot writes each file through its own signed upload URL. The worker reads the files through signed URLs valid for its job lease. Staff play retained tracks | Never public. At-rest encryption is the storage provider's |
 | `tracks.json` | Same prefix | Anyone allowed to list the bucket | Display names in plain text. Nothing reads it after the upload; the purge jobs delete it with the recording's last track |
 | Track rows (`RecordingTrack`) | PostgreSQL | The portal | Display name encrypted |
-| Downloadable archive | Object storage, `postprod/…/archive.mkv` | Staff who manage the event, through a signed URL | Never public |
+| Downloadable archive | Object storage, `postprod/…/archive.mkv` | The organizers of the event, through a signed URL | Never public |
 | Mixed audio | Inside the composite MP4 | Anyone who reaches the waiting room, guests included, through the temporary catch-up copy (24 hours), which a reserved recording does not offer; the public, once the video is published for everyone; registrants, for a reserved video | See [Privacy and data protection](../GDPR.md) |
 
 The worker receives each participant's name in clear text through the internal
@@ -714,9 +762,12 @@ where the rule is enforced. See
   the speaking timeline while the log exists, or else a numbered label
   (**Participant N**, in the page language). In the downloads
   and subtitles, an unnamed cluster keeps its raw label (`SPEAKER_00`).
-- **Staff who manage the event** (administrators and the organizer who created
-  it) see everything in the administration area. That includes raw
-  diarization labels, retained tracks and the archive.
+- **The organizers of the event** (the staff account that created it and those
+  with an organizer grant on it, whatever their role) see everything in the
+  administration area. That includes raw diarization labels, retained tracks
+  and the archive. An administrator who does not organize the event sees the
+  status of the recording and of its jobs, not the outputs
+  ([Who can see recording content](#who-can-see-recording-content)).
 
 ### The event report
 
@@ -1099,6 +1150,12 @@ Key handling and the secrets map are in
 [Configuration reference](../CONFIGURATION.md).
 
 ## Known limitations
+
+Access:
+
+- **Recording content is protected by the application, not by encryption.**
+  Storage, database and cluster credentials read it whatever the portal
+  allows; signed addresses already handed out stay valid until they expire.
 
 Consent and transparency:
 

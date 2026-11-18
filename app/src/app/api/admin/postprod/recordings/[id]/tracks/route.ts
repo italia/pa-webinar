@@ -4,15 +4,15 @@
 /**
  * GET /api/admin/postprod/recordings/[id]/tracks
  *
- * Admin/moderatore only. Dati per il player multi-audio di riascolto
+ * Solo chi organizza l'evento. Dati per il player multi-audio di riascolto
  * per-relatore (ADR-013): il mix video + una traccia audio isolata per
  * partecipante (etichettata col nome + offset di ingresso) + lo stato
  * dell'archivio scaricabile.
  *
  * L'audio isolato per-partecipante è PII sensibile (voce isolata,
- * quasi-biometrica) → questo endpoint è gated SOLO sulla sessione admin
- * e NON è mai esposto pubblicamente. Le URL audio sono signed e
- * short-lived.
+ * quasi-biometrica) → questo endpoint e' aperto SOLO a chi organizza
+ * l'evento (lib/recording/content-access), con la lettura tracciata, e NON
+ * e' mai esposto pubblicamente. Le URL audio sono signed e short-lived.
  *
  * Nota offset: usiamo `RecordingTrack.startOffsetMs` (offset wall-clock
  * del manifest). L'allineamento fine via cross-correlazione è applicato
@@ -23,7 +23,7 @@
 import { cookies } from 'next/headers';
 
 import { withErrorHandling } from '@/lib/api-handler';
-import { requireRecordingManager } from '@/lib/auth/staff-session';
+import { requireRecordingContent, tracciaLetturaContenuto } from '@/lib/recording/content-access';
 import { prisma } from '@/lib/db';
 import { NotFoundError } from '@/lib/errors';
 import {
@@ -39,8 +39,10 @@ const AUDIO_SAS_EXPIRY_MINUTES = 120;
 
 export const GET = withErrorHandling(async (_request, context) => {
   const { id } = await (context as { params: Promise<{ id: string }> }).params;
-  // Dell'evento della registrazione: l'admin o chi l'ha creato (ADR-014).
-  await requireRecordingManager(await cookies(), id);
+  // Il contenuto e' di chi organizza l'evento, non dell'admin che non lo
+  // organizza (lib/recording/content-access); la lettura si traccia.
+  const accesso = await requireRecordingContent(await cookies(), id, 'tracce');
+  await tracciaLetturaContenuto({ ...accesso, recordingId: id, superficie: 'tracce' });
 
   const recording = await prisma.recording.findUnique({
     where: { id },

@@ -12,14 +12,15 @@
  * un singolo job ARCHIVE (idempotente) che dipende dal job che ha
  * prodotto il transcript. Vedi enqueueArchiveJob.
  *
- * L'audio isolato per-partecipante è PII sensibile → l'archivio è
- * scaricabile solo da admin/moderatore (mai esposto pubblicamente).
+ * L'audio isolato per-partecipante è PII sensibile → l'archivio lo genera
+ * e lo scarica solo chi organizza l'evento (lib/recording/content-access),
+ * mai esposto pubblicamente.
  */
 
 import { cookies } from 'next/headers';
 
 import { withErrorHandling } from '@/lib/api-handler';
-import { requireRecordingManager } from '@/lib/auth/staff-session';
+import { requireRecordingContent } from '@/lib/recording/content-access';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { enqueueArchiveJob } from '@/lib/ai/enqueue';
 import { prisma } from '@/lib/db';
@@ -30,8 +31,9 @@ export const dynamic = 'force-dynamic';
 
 export const POST = withErrorHandling(async (request, context) => {
   const { id } = await (context as { params: Promise<{ id: string }> }).params;
-  // Dell'evento della registrazione: l'admin o chi l'ha creato (ADR-014).
-  await requireRecordingManager(await cookies(), id);
+  // Il contenuto e' di chi organizza l'evento, non dell'admin che non lo
+  // organizza (lib/recording/content-access).
+  await requireRecordingContent(await cookies(), id, 'elaborazione');
 
   const site = await prisma.siteSetting.findUnique({
     where: { id: 'singleton' },

@@ -13,6 +13,8 @@ const m = vi.hoisted(() => ({
 }));
 vi.mock('next/headers', () => ({ cookies: vi.fn(async () => ({ get: () => undefined })) }));
 vi.mock('@/lib/auth/staff-session', () => ({ requireRecordingManager: vi.fn(async () => ({ role: 'admin' })) }));
+// L'accesso al contenuto segue la guardia qui sopra (test/contenuto-come-gestore).
+vi.mock('@/lib/recording/content-access', () => import('@/test/contenuto-come-gestore'));
 vi.mock('@/lib/audit/admin-audit', () => ({ logAdminAction: vi.fn() }));
 vi.mock('@/lib/ai/enqueue', () => ({ enqueuePostprodForRecording: m.accoda }));
 vi.mock('@/lib/captions/transcript', () => ({

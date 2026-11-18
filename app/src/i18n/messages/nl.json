@@ -780,7 +780,8 @@
     "accessDenied": {
       "title": "Dit onderdeel is niet beschikbaar voor uw rol",
       "body": "Als organisator beheert u uw eigen evenementen: aanmaken, publiceren, materialen, vragenlijsten en nabewerking. De platforminstellingen en de gegevens van alle evenementen blijven bij de beheerders.",
-      "back": "Naar uw evenementen"
+      "back": "Naar uw evenementen",
+      "organizerOnly": "Alleen de organisatoren van dit evenement kunnen het bewerken. Als beheerder ziet u de status en de details en kunt u het archiveren of verwijderen. De opnamen en hun inhoud zijn van de organisatoren en de deelnemers."
     },
     "staffLogin": {
       "title": "Inloggen in het beheergedeelte",
@@ -1655,7 +1656,8 @@
       "detailFilename": "Bestandsnaam",
       "transcriptManage": "Transcriptie / AI beheren",
       "transcriptReady": "Getranscribeerd",
-      "transcriptProcessing": "In verwerking"
+      "transcriptProcessing": "In verwerking",
+      "organizerOnly": "Alleen organisatoren"
     },
     "gdprAudit": {
       "subtitle": "Logboek van privacy-acties op persoonsgegevens: verwijderingen, toestemmingen, exports",
@@ -1670,7 +1672,8 @@
         "DATA_DELETED": "Gegevens verwijderd",
         "CONSENT_RECORDED": "Toestemming geregistreerd",
         "DATA_EXPORTED": "Gegevens geëxporteerd",
-        "CONSENT_WITHDRAWN": "Toestemming ingetrokken"
+        "CONSENT_WITHDRAWN": "Toestemming ingetrokken",
+        "RECORDING_CONTENT_READ": "Inhoud van de opname gelezen door medewerkers"
       },
       "recordsAffected": "{count} betrokken records",
       "colWhen": "Wanneer",
@@ -1696,7 +1699,8 @@
       "rotating": "Genereren…",
       "regenerateTitle": "Moderatortoken opnieuw genereren (oude link wordt ongeldig)",
       "confirmRegenerate": "Weet u zeker dat u het token opnieuw wilt genereren? De oude link werkt dan niet meer.",
-      "noResults": "Geen evenementen gevonden."
+      "noResults": "Geen evenementen gevonden.",
+      "organizerOnlyLink": "Link alleen zichtbaar voor de organisatoren van het evenement"
     },
     "registrations": {
       "subtitle": "Alle personen die zich voor evenementen hebben aangemeld — zoeken, filteren en exporteren",
@@ -2128,7 +2132,8 @@
         "DATA_DELETED": "Gegevens verwijderd",
         "CONSENT_RECORDED": "Toestemming geregistreerd",
         "DATA_EXPORTED": "Gegevens geëxporteerd",
-        "CONSENT_WITHDRAWN": "Toestemming ingetrokken"
+        "CONSENT_WITHDRAWN": "Toestemming ingetrokken",
+        "RECORDING_CONTENT_READ": "Inhoud van de opname gelezen door medewerkers"
       }
     },
     "settings": {
@@ -3020,7 +3025,20 @@
         "publishNow": "Nu publiceren"
       },
       "editFeatures": "Functies bewerken",
-      "editPrivacy": "Privacy en gegevens bewerken"
+      "editPrivacy": "Privacy en gegevens bewerken",
+      "governance": {
+        "title": "U beheert dit evenement als beheerder",
+        "body": "U bent geen organisator ervan: u ziet de status, de details, de inschrijvingen en de toestemmingen en kunt het archiveren of verwijderen. Het leiden van het evenement, de moderatorlink en de inhoud van de opnamen (video, transcripties, samenvattingen) zijn voor de organisatoren.",
+        "recording": "De inhoud van de opname is alleen beschikbaar voor de organisatoren van het evenement en de deelnemers. Hier ziet u of ze bestaat en wat de details zijn.",
+        "recordingFile": "Opname",
+        "present": "Aanwezig",
+        "absent": "Geen",
+        "recordingPublished": "Gepubliceerd",
+        "yes": "Ja",
+        "no": "Nee",
+        "recordingDuration": "Duur",
+        "recordingSize": "Grootte"
+      }
     },
     "rubrica": {
       "subtitle": "Personen die toestemming hebben gegeven voor opname in het adresboek (art. 6.1.a AVG). Naam, e-mailadres en organisatie worden alleen bijgewerkt wanneer de persoon het vakje opnieuw aanvinkt.",
@@ -3290,7 +3308,8 @@
         "metricsTitle": "Metrieken van de samenvatting (LLM)",
         "chars": "tekens",
         "model": "Model",
-        "notAvailable": "n.v.t."
+        "notAvailable": "n.v.t.",
+        "contentHidden": "Alleen beschikbaar voor de organisatoren van het evenement."
       },
       "rel": {
         "title": "Betrouwbaarheid van de AI",
@@ -3447,7 +3466,8 @@
         "alignNone": "Geen diawissel om uit te lijnen.",
         "previewTitle": "Voorbeeld",
         "previewHelp": "De video met de dia's zoals het publiek ze zal zien, met de hierboven ingevoerde correctie."
-      }
+      },
+      "contentOrganizerOnly": "Alleen de organisatoren van dit evenement kunnen de inhoud van deze opname bekijken en bewerken (video, sporen, transcriptie, samenvatting, vertalingen). Hier ziet u de status, de verwerkingstaken en de details van de bestanden."
     },
     "questionnairesPage": {
       "subtitle": "Herbruikbare vraagsjablonen voor aanmeldings- en post-event vragenlijsten."
@@ -3739,7 +3759,9 @@
       "publishDesc": "Lees het na voordat u het publiceert: de tekst is geschreven door een AI-model. Een opnieuw gemaakt verslag moet opnieuw worden gepubliceerd.",
       "preview": "Voorbeeld",
       "hidePreview": "Voorbeeld verbergen",
-      "previewLanguage": "Taal"
+      "previewLanguage": "Taal",
+      "organizerOnly": "Alleen de organisatoren van dit evenement kunnen het verslag aanvragen, lezen en publiceren.",
+      "organizerOnlyExists": "Het verslag bestaat. Alleen de organisatoren van dit evenement kunnen het lezen en publiceren."
     },
     "endEvent": "Evenement beëindigen",
     "endEventConfirmTitle": "Het evenement voor iedereen beëindigen?",
@@ -6012,6 +6034,7 @@
     "captionsTranscriptNotTranslatable": "Deze transcriptie komt uit de live-ondertiteling: automatische vertaling vereist een AI-transcriptie van de opname.",
     "sameLanguage": "De gekozen taal is de oorspronkelijke taal van de opname: kies een andere.",
     "recordingDestinationNotCovered": "De toestemmingen voor dit evenement gelden voor een opname alleen voor ingeschrevenen: je kunt haar niet voor iedereen zichtbaar maken en geen externe video koppelen.",
-    "mtUnavailable": "Automatische vertaling is niet geïnstalleerd op deze instantie."
+    "mtUnavailable": "Automatische vertaling is niet geïnstalleerd op deze instantie.",
+    "recordingContentOrganizerOnly": "Alleen de organisatoren van dit evenement kunnen de inhoud van de opnamen openen, wijzigen of publiceren."
   }
 }
