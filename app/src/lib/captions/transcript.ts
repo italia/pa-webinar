@@ -137,7 +137,11 @@ function chiParla(
   return `${persona ? `${persona}|` : ''}nome:${nome.trim().toLowerCase()}`;
 }
 
-/** Quante persone hanno parlato, con lo stesso criterio della trascrizione. */
+/**
+ * Quante persone hanno parlato, con lo stesso criterio della trascrizione per
+ * riconoscerle. Un iscritto che cambia nickname durante l'evento e' una persona
+ * sola, anche se la trascrizione gli da' un'etichetta per nome.
+ */
 export function contaVoci(
   frasi: ReadonlyArray<{ seatId: string | null; speakerName: string | null }>,
   titolari?: ReadonlyMap<string, TitolareDelPosto>,
@@ -192,12 +196,18 @@ export function componiTrascrizione(
     const start = Math.max(0, (f.startedAt.getTime() - t0.getTime()) / 1000);
     const end = Math.max(start, (f.endedAt.getTime() - t0.getTime()) / 1000);
     const nome = f.speakerName ? (tryDecryptPII(f.speakerName) ?? null) : null;
-    const persona = chiParla(f.seatId, nome, titolari);
+    // Un iscritto che cambia nickname (o lo toglie) durante l'evento ha
+    // un'etichetta per nome: le frasi dette con un nome non passano sotto
+    // l'altro, che rivelerebbe chi c'e' dietro il nickname.
+    const iscrizioneDiChiParla = iscrizioneDelPosto(f.seatId);
+    const persona = `${chiParla(f.seatId, nome, titolari)}${
+      iscrizioneDiChiParla && nome ? `|nome:${nome.trim().toLowerCase()}` : ''
+    }`;
     let etichetta = etichette.get(persona);
     if (!etichetta) {
       etichetta = `SPEAKER_${String(etichette.size).padStart(2, '0')}`;
       etichette.set(persona, etichetta);
-      const registrationId = iscrizioneDelPosto(f.seatId);
+      const registrationId = iscrizioneDiChiParla;
       parlanti.set(etichetta, {
         displayName: nome,
         totalSpeechSec: 0,

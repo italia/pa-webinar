@@ -728,6 +728,35 @@
       "title": "Du deltager uden optagelse.",
       "consent": "Jeg giver samtykke til optagelsen",
       "body": "Du har ikke givet samtykke til optagelsen: du deltager som alle andre, men din stemme er ikke med i optagelsen. Dit ansigt og dit navn vises under alle omstændigheder aldrig i videoen."
+    },
+    "nickname": {
+      "reserved": "Moderator,Taler,Oplægsholder,Deltager,Gæst,Arrangør,Administrator,Vært",
+      "label": "Kaldenavn (valgfrit)",
+      "help": "Ét ord på 2 til 24 tegn: bogstaver, tal og . _ -. De andre ser det i stedet for dit navn i videoen, i chatten, i spørgsmålene og i transskriptionen.",
+      "helpName": "Hvis du lader feltet stå tomt, vises du med dit navn.",
+      "helpAnonymous": "Hvis du lader feltet stå tomt, vises du med et automatisk pseudonym.",
+      "checking": "Kaldenavnet kontrolleres…",
+      "shownAs": "De andre vil se dig som »{nickname}«.",
+      "useSuggestion": "Brug »{suggestion}«",
+      "errors": {
+        "length": "Kaldenavnet skal være på 2 til 24 tegn.",
+        "format": "Ét ord: det begynder med et bogstav og slutter med et bogstav eller et tal; derimellem bogstaver, tal og . _ -, aldrig to i træk.",
+        "scripts": "Brug bogstaver fra ét alfabet.",
+        "reserved": "Det indeholder et reserveret ord, fx navnet på en rolle: vælg et andet.",
+        "host": "Det ligner navnet på en af dem, der leder arrangementet: vælg et andet.",
+        "taken": "Nogen i arrangementet bruger allerede dette kaldenavn.",
+        "disabled": "Dette arrangement tager ikke imod nye kaldenavne: du kan kun fjerne dit.",
+        "rete": "Kaldenavnet kunne ikke kontrolleres. Prøv igen."
+      },
+      "button": "Kaldenavn",
+      "open": "Skift dit kaldenavn",
+      "dialogTitle": "Dit kaldenavn",
+      "dialogIntro": "De andre ser kaldenavnet i stedet for dit navn. For at skifte det forbinder rummet dig igen et øjeblik.",
+      "apply": "Gem og forbind igen",
+      "remove": "Fjern kaldenavnet",
+      "reconnecting": "Forbinder igen…",
+      "done": "Færdig: du vises nu som »{nickname}«.",
+      "doneRemoved": "Færdig: kaldenavnet er fjernet."
     }
   },
   "qa": {
@@ -1073,6 +1102,9 @@
         "participantListVisibleDesc": "Fra: listen, gitteret og navnene på pladsen forbeholdes værter og talere; publikum ser kun den, der taler. Til: alle kan se, hvem der er i rummet.",
         "participantListAnonymous": "Med anonymt publikum forbliver listen skjult.",
         "participantListLocked": "Kan ikke ændres, mens rummet er åbent: dem, der allerede er inde, ville ikke se ændringen.",
+        "nicknamesEnabled": "Kaldenavne for deltagere",
+        "nicknamesEnabledDesc": "Deltagere kan vælge et kaldenavn: de andre ser det i stedet for navnet i videoen, i chatten, i spørgsmålene og i transskriptionen. Arrangører og moderatorer kan se, hvem der står bag. Værterne beholder deres eget navn. Fra start er det slået til, hvor deltagerlisten er skjult.",
+        "nicknamesLocked": "Det kan ikke ændres, mens rummet er åbent: de, der allerede er inde, valgte efter den tidligere regel.",
         "participantListCameraNote": "Med skjult liste kan den, der tænder kameraet, ikke se sit eget billede. Vis listen til et møde, hvor alle ser hinanden.",
         "recordingLockedLive": "Optagelse kan ikke ændres, mens rummet er åbent: den gælder fra første indgang.",
         "hostsAlwaysRecorded": "Ordstyrere og talere er altid med i optagelsen",
@@ -1387,6 +1419,7 @@
         "participantListShown": "Deltagerliste: synlig for alle.",
         "participantListHidden": "Deltagerliste: kun værter og talere.",
         "audiencePseudonyms": "Publikums navne: pseudonymer.",
+        "audienceNicknames": "Deltagere kan bruge et kaldenavn.",
         "audienceRealNames": "Publikums navne: de rigtige navne.",
         "postEventQaHidden": "Spørgsmål efter arrangementet: offentliggøres ikke.",
         "postEventQaTextOnly": "Spørgsmål efter arrangementet: kun teksten, uden navn.",
@@ -1750,6 +1783,8 @@
       "colCreatedAt": "Tilmeldingsdato",
       "colEvent": "Arrangement",
       "colName": "Navn",
+      "colNickname": "Kaldenavn",
+      "nicknameShown": "De andre ser personen som »{nickname}«",
       "colEmail": "E-mail",
       "colOrg": "Organisation",
       "colJoined": "Deltaget",
@@ -3761,6 +3796,7 @@
       },
       "previewInvitation": "Kun inviterede tilmelder sig; uden tilmelding kommer man ikke ind.",
       "previewPseudonyms": "Publikum vises under et pseudonym",
+      "previewNicknames": "Deltagere kan bruge et kaldenavn",
       "previewRealNames": "Publikum vises med deres eget navn",
       "templateReplaces": "En skabelon bruger sine egne indstillinger i stedet for svarene nedenfor. Titel, datoer og personer skriver du i de næste trin.",
       "instantBack": "Opret i stedet et planlagt arrangement"
@@ -4733,7 +4769,9 @@
         "label": "Dit navn",
         "real": "I rummet, i chatten og i spørgsmålene vises du med dit navn.",
         "pseudonym": "I rummet, i chatten og i spørgsmålene vises du under et pseudonym. Arrangørerne kan se dine tilmeldingsdata.",
-        "pseudonymTranscript": "Hvis du giver samtykke til transskriptionen, står dit navn der fortsat."
+        "pseudonymTranscript": "Hvis du giver samtykke til transskriptionen, står dit navn der fortsat.",
+        "nickname": "Du kan vælge et kaldenavn: de andre ser det i stedet for dit navn. Arrangører og moderatorer ved, hvem der står bag.",
+        "nicknameTranscript": "Hvis du giver samtykke til transskriptionen, vises du dér med dit kaldenavn, hvis du har valgt et, ellers med dit navn."
       },
       "retention": {
         "label": "Opbevaring",
@@ -4773,6 +4811,7 @@
       "resultsDescription": "{count, plural, one {Data fundet for # begivenhed.} other {Data fundet for # begivenheder.}}",
       "registrationData": "Tilmeldingsdata",
       "fieldName": "Navn",
+      "fieldNickname": "Kaldenavn",
       "fieldEmail": "E-mail",
       "fieldOrganization": "Organisation",
       "fieldRegisteredAt": "Tilmeldingsdato",

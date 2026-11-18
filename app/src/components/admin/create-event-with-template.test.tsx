@@ -198,6 +198,7 @@ describe('CreateEventWithTemplate', () => {
       recordingEnabled: true,
       recordingDestination: 'REGISTRANTS',
       audienceAnonymous: false,
+      nicknamesEnabled: false,
       postEventShowQA: false,
       offerAddressBook: false,
       hostsAlwaysRecorded: false,
@@ -207,12 +208,14 @@ describe('CreateEventWithTemplate', () => {
       recordingEnabled: true,
       recordingDestination: 'PUBLIC',
       audienceAnonymous: false,
+      nicknamesEnabled: false,
       postEventShowQA: true,
       offerAddressBook: true,
       hostsAlwaysRecorded: false,
       postEventPublic: true,
     };
-    const PUBBLICO = { ...PARTECIPATIVO, audienceAnonymous: true };
+    // Dove l'elenco e' nascosto chi partecipa puo' usare un nickname.
+    const PUBBLICO = { ...PARTECIPATIVO, audienceAnonymous: true, nicknamesEnabled: true };
     const INVITO = {
       ...PARTECIPATIVO,
       recordingDestination: 'REGISTRANTS',

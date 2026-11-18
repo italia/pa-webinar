@@ -30,6 +30,7 @@ import {
 } from '@/lib/events/guided-format';
 import { domandePubbliche } from '@/lib/events/post-event-sections';
 import { conduceNelVideo, type PartecipantiNelVideo } from '@/lib/live/consent-rule';
+import { elencoPredefinito, nicknamePredefinito } from '@/lib/live/participant-list';
 import { rubricaProposta } from '@/lib/persons/address-book';
 import { videoDaDestinare } from '@/lib/recording/destination';
 
@@ -393,7 +394,14 @@ export default function GuidedFormat({
               <span className="anteprima-righe__icona">
                 <Icon icon="it-user" size="sm" />
               </span>
-              <span>{preset.audienceAnonymous ? t('previewPseudonyms') : t('previewRealNames')}</span>
+              <span>
+                {preset.audienceAnonymous ? t('previewPseudonyms') : t('previewRealNames')}
+                {/* Il nickname segue l'elenco, come nel wizard. */}
+                {nicknamePredefinito({
+                  audienceAnonymous: preset.audienceAnonymous,
+                  participantListVisible: elencoPredefinito(preset),
+                }) && <span className="d-block text-secondary">{t('previewNicknames')}</span>}
+              </span>
             </li>
             <li>
               <span className="anteprima-righe__icona">

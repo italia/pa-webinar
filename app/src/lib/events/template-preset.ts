@@ -61,6 +61,7 @@ export function presetDelModello(tpl: EventTemplate): WizardTemplatePreset {
     recordingDestination: tpl.recordingDestination,
     offerAddressBook: tpl.offerAddressBook,
     audienceAnonymous: tpl.audienceAnonymous,
+    nicknamesEnabled: tpl.nicknamesEnabled,
     hostsAlwaysRecorded: tpl.hostsAlwaysRecorded,
     postEventShowQA: tpl.postEventShowQA,
   };

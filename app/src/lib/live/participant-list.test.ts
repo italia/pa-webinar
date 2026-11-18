@@ -3,7 +3,12 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { VASTA_SCALA, elencoPredefinito, elencoVisibileAlPubblico } from './participant-list';
+import {
+  VASTA_SCALA,
+  elencoPredefinito,
+  elencoVisibileAlPubblico,
+  nicknamePredefinito,
+} from './participant-list';
 
 describe('elencoVisibileAlPubblico', () => {
   it("di default e' nascosto", () => {
@@ -48,5 +53,17 @@ describe('elencoPredefinito', () => {
   it('resta nascosto dove il pubblico ascolta soltanto', () => {
     expect(elencoPredefinito({})).toBe(false);
     expect(elencoPredefinito({ participantsCanUnmute: false, participantsCanStartVideo: false })).toBe(false);
+  });
+});
+
+describe('nicknamePredefinito', () => {
+  it("acceso dove l'elenco e' nascosto e col pubblico anonimo", () => {
+    expect(nicknamePredefinito({ participantListVisible: false })).toBe(true);
+    expect(nicknamePredefinito({ participantListVisible: true, audienceAnonymous: true })).toBe(true);
+  });
+
+  it("spento dove ci si vede per nome, e nelle chiamate rapide", () => {
+    expect(nicknamePredefinito({ participantListVisible: true })).toBe(false);
+    expect(nicknamePredefinito({ eventType: 'INSTANT' })).toBe(false);
   });
 });

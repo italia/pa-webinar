@@ -728,6 +728,35 @@
       "title": "Vous participez sans enregistrement.",
       "consent": "Je consens à l'enregistrement",
       "body": "Vous n'avez pas consenti à l'enregistrement : vous participez comme tout le monde, mais votre voix reste hors de l'enregistrement. Votre visage et votre nom n'apparaissent de toute façon jamais dans la vidéo."
+    },
+    "nickname": {
+      "reserved": "Modérateur,Modératrice,Intervenant,Intervenante,Orateur,Oratrice,Participant,Participante,Invité,Invitée,Organisateur,Organisatrice,Administrateur,Administratrice,Animateur,Animatrice",
+      "label": "Surnom (facultatif)",
+      "help": "Un seul mot, de 2 à 24 caractères : lettres, chiffres et . _ -. Les autres le voient à la place de votre nom dans la vidéo, dans le chat, dans les questions et dans la transcription.",
+      "helpName": "Si vous le laissez vide, vous apparaissez sous votre nom.",
+      "helpAnonymous": "Si vous le laissez vide, vous apparaissez sous un pseudonyme automatique.",
+      "checking": "Vérification du surnom…",
+      "shownAs": "Les autres vous verront sous le nom « {nickname} ».",
+      "useSuggestion": "Utiliser « {suggestion} »",
+      "errors": {
+        "length": "Le surnom doit compter de 2 à 24 caractères.",
+        "format": "Un seul mot : il commence par une lettre et se termine par une lettre ou un chiffre ; entre les deux, des lettres, des chiffres et . _ -, jamais deux à la suite.",
+        "scripts": "Utilisez les lettres d'un seul alphabet.",
+        "reserved": "Il contient un mot réservé, comme le nom d'un rôle : choisissez-en un autre.",
+        "host": "Il ressemble au nom d'une personne qui anime l'événement : choisissez-en un autre.",
+        "taken": "Quelqu'un dans l'événement utilise déjà ce surnom.",
+        "disabled": "Cet événement n'accepte pas de nouveaux surnoms : vous pouvez seulement retirer le vôtre.",
+        "rete": "Le surnom n'a pas pu être vérifié. Réessayez."
+      },
+      "button": "Surnom",
+      "open": "Changer votre surnom",
+      "dialogTitle": "Votre surnom",
+      "dialogIntro": "Les autres voient le surnom à la place de votre nom. Pour le changer, la salle vous reconnecte un instant.",
+      "apply": "Enregistrer et se reconnecter",
+      "remove": "Retirer le surnom",
+      "reconnecting": "Reconnexion en cours…",
+      "done": "C'est fait : vous apparaissez maintenant sous le nom « {nickname} ».",
+      "doneRemoved": "C'est fait : le surnom a été retiré."
     }
   },
   "qa": {
@@ -1073,6 +1102,9 @@
         "participantListVisibleDesc": "Désactivé : la liste, la grille et les noms sur la place restent réservés aux personnes qui animent et interviennent ; le public ne voit que la personne qui parle. Activé : tout le monde voit qui est dans la salle.",
         "participantListAnonymous": "Avec un public anonyme, la liste reste masquée.",
         "participantListLocked": "Non modifiable quand la salle est ouverte : les personnes déjà présentes ne verraient pas le changement.",
+        "nicknamesEnabled": "Surnoms pour les participants",
+        "nicknamesEnabledDesc": "Les participants peuvent choisir un surnom : les autres le voient à la place de leur nom dans la vidéo, dans le chat, dans les questions et dans la transcription. Les organisateurs et les modérateurs voient qui se trouve derrière. Les animateurs gardent leur propre nom. Activé par défaut lorsque la liste des participants est masquée.",
+        "nicknamesLocked": "Impossible de le modifier pendant que la salle est ouverte : les personnes déjà présentes ont choisi selon la règle précédente.",
         "participantListCameraNote": "Avec la liste masquée, les personnes qui activent leur caméra ne voient pas leur propre image. Pour une réunion où tout le monde se voit, affichez la liste.",
         "recordingLockedLive": "L'enregistrement ne se modifie pas quand la salle est ouverte : il vaut dès la première entrée.",
         "hostsAlwaysRecorded": "Les animateurs sont toujours dans l'enregistrement",
@@ -1387,6 +1419,7 @@
         "participantListShown": "Liste des participants : visible par tous.",
         "participantListHidden": "Liste des participants : réservée aux personnes qui animent et interviennent.",
         "audiencePseudonyms": "Noms du public : pseudonymes.",
+        "audienceNicknames": "Les participants peuvent utiliser un surnom.",
         "audienceRealNames": "Noms du public : noms réels.",
         "postEventQaHidden": "Questions après l'événement : non publiées.",
         "postEventQaTextOnly": "Questions après l'événement : texte seul, sans nom.",
@@ -1750,6 +1783,8 @@
       "colCreatedAt": "Date d'inscription",
       "colEvent": "Événement",
       "colName": "Nom",
+      "colNickname": "Surnom",
+      "nicknameShown": "Les autres le voient sous le nom « {nickname} »",
       "colEmail": "E-mail",
       "colOrg": "Organisation",
       "colJoined": "A participé",
@@ -3761,6 +3796,7 @@
       },
       "previewInvitation": "Seules les personnes invitées s'inscrivent ; sans inscription, on n'entre pas.",
       "previewPseudonyms": "Le public apparaît sous un pseudonyme",
+      "previewNicknames": "Les participants peuvent utiliser un surnom",
       "previewRealNames": "Le public apparaît sous son propre nom",
       "templateReplaces": "Un modèle apporte ses propres réglages à la place des réponses ci-dessous. Vous saisissez le titre, les dates et les personnes aux étapes suivantes.",
       "instantBack": "Créer plutôt un événement programmé"
@@ -4733,7 +4769,9 @@
         "label": "Votre nom",
         "real": "Dans la salle, dans le chat et dans les questions, vous apparaissez sous votre nom.",
         "pseudonym": "Dans la salle, dans le chat et dans les questions, vous apparaissez sous un pseudonyme. Les organisateurs voient les données de votre inscription.",
-        "pseudonymTranscript": "Si vous consentez à la transcription, votre nom y reste."
+        "pseudonymTranscript": "Si vous consentez à la transcription, votre nom y reste.",
+        "nickname": "Vous pouvez choisir un surnom : les autres le voient à la place de votre nom. Les organisateurs et les modérateurs savent qui se trouve derrière.",
+        "nicknameTranscript": "Si vous consentez à la transcription, vous y apparaissez sous votre surnom si vous en avez choisi un, sinon sous votre nom."
       },
       "retention": {
         "label": "Conservation",
@@ -4773,6 +4811,7 @@
       "resultsDescription": "{count, plural, one {Données trouvées relatives à # événement.} many {Données trouvées relatives à # d'événements.} other {Données trouvées relatives à # événements.}}",
       "registrationData": "Données d'inscription",
       "fieldName": "Nom",
+      "fieldNickname": "Surnom",
       "fieldEmail": "E-mail",
       "fieldOrganization": "Organisme",
       "fieldRegisteredAt": "Date d'inscription",

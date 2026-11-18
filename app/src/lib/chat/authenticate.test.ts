@@ -26,6 +26,10 @@ vi.mock('@/lib/chat/sender-key', () => ({
   guestSenderId: (ip: string, nome: string) => `guest-${ip}-${nome}`,
 }));
 vi.mock('@/lib/rate-limit', () => ({ getClientIp: () => '203.0.113.9' }));
+const nick = vi.hoisted(() => ({ presi: new Set<string>() }));
+vi.mock('@/lib/live/nickname', () => ({
+  nicknameDellOspite: vi.fn(async (_e: string, nome: string, chiave: string) => nick.presi.has(`${nome}|${chiave}`)),
+}));
 
 import {
   assertChatOpen,
@@ -78,6 +82,30 @@ describe('authenticateChatSender — ospite', () => {
     const primo = await scrive(null, 'Bruno');
     const secondo = await scrive(null, 'Bruno');
     expect(secondo.senderName).toBe(primo.senderName);
+  });
+
+  it("col pubblico anonimo il nickname preso entrando prende il posto dello pseudonimo", async () => {
+    db.event.findUnique.mockResolvedValue(evento({ audienceAnonymous: true, nicknamesEnabled: true }));
+    nick.presi.add('Pippo|guest-203.0.113.9-Pippo');
+    try {
+      await expect(scrive(null, 'Pippo')).resolves.toMatchObject({ senderName: 'Pippo' });
+      // Un nome che l'ospite non ha preso come nickname resta dietro lo pseudonimo.
+      const altro = await scrive(null, 'Pluto');
+      expect(altro.senderName).toBe(`Pseudo ${altro.senderId}`);
+    } finally {
+      nick.presi.clear();
+    }
+  });
+
+  it("senza l'opzione il pubblico anonimo resta con lo pseudonimo, anche per un nickname preso", async () => {
+    db.event.findUnique.mockResolvedValue(evento({ audienceAnonymous: true, nicknamesEnabled: false }));
+    nick.presi.add('Pippo|guest-203.0.113.9-Pippo');
+    try {
+      const esito = await scrive(null, 'Pippo');
+      expect(esito.senderName).toBe(`Pseudo ${esito.senderId}`);
+    } finally {
+      nick.presi.clear();
+    }
   });
 
   it('il nome resta obbligatorio, anche se poi non si mostra', async () => {

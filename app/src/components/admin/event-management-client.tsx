@@ -141,7 +141,7 @@ function Svg({ name, size = 16 }: { name: IconName; size?: number }) {
 
 // ── Types ──
 interface Registration {
-  id: string; displayName: string; organization: string | null;
+  id: string; displayName: string; nickname?: string | null; organization: string | null;
   organizationRole: string | null; organizationType: string | null;
   joinedAt: string | null; createdAt: string;
 }
@@ -517,6 +517,7 @@ export default function EventManagementClient({
   const exportCsv = useCallback(() => {
     const headers = [
       tReg('colName'),
+      tReg('colNickname'),
       tReg('colOrg'),
       tReg('colRole'),
       tReg('colOrgType'),
@@ -525,6 +526,7 @@ export default function EventManagementClient({
     ];
     const rows = event.registrations.map((r) => [
       r.displayName,
+      r.nickname ?? '',
       r.organization ?? '',
       r.organizationRole ?? '',
       r.organizationType ? orgTypeLabel(r.organizationType) : '',
@@ -1425,7 +1427,15 @@ function PeopleTab({ event, baseUrl, locale, onExportCsv, canEditRegistrations, 
                   return (
                     <tr key={reg.id}>
                       <td style={{ color: C_MUTED }}>{i + 1}</td>
-                      <td className="fw-semibold">{reg.displayName}</td>
+                      <td className="fw-semibold">
+                        {reg.displayName}
+                        {/* Il nickname con cui la persona compare agli altri. */}
+                        {reg.nickname && (
+                          <div className="fw-normal" style={{ color: C_MUTED, fontSize: '0.8rem' }}>
+                            {t('registrations.nicknameShown', { nickname: reg.nickname })}
+                          </div>
+                        )}
+                      </td>
                       {event.requireOrganization && (
                         <td style={{ color: C_MUTED }}>{reg.organization ?? '—'}</td>
                       )}

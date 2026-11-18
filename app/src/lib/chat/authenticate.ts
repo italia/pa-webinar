@@ -16,6 +16,7 @@ import { resolveTokenSender } from '@/lib/chat/sender';
 import { guestChatWindowOpen } from '@/lib/chat/read-access';
 import { guestSenderId } from '@/lib/chat/sender-key';
 import { getClientIp } from '@/lib/rate-limit';
+import { nicknameDellOspite } from '@/lib/live/nickname';
 import { pseudonimo } from '@/lib/live/pseudonym';
 import { getSettings } from '@/lib/settings';
 
@@ -61,6 +62,7 @@ export async function authenticateChatSender(
       moderatorName: true,
       chatEnabled: true,
       audienceAnonymous: true,
+      nicknamesEnabled: true,
     },
   });
   if (!event) throw new AppError('Event not found', 404, 'NOT_FOUND');
@@ -108,11 +110,16 @@ export async function authenticateChatSender(
   // bubble colour, AI summary "this attendee said 3 things").
   const ip = getClientIp(req);
   const senderId = guestSenderId(ip, name);
+  // Pubblico anonimo: lo pseudonimo del posto, lo stesso del video. Un ospite
+  // con il nickname scrive con quello: la sala manda il nickname come nome, e
+  // vale se l'ospite l'ha preso entrando (lib/live/nickname), dalla stessa
+  // rete. Altrimenti, come prima, lo pseudonimo.
+  const conNickname =
+    event.audienceAnonymous && event.nicknamesEnabled && (await nicknameDellOspite(event.id, name, senderId));
   return {
     eventId: event.id,
     senderId,
-    // Pubblico anonimo: lo pseudonimo del posto, lo stesso del video.
-    senderName: event.audienceAnonymous ? await pseudonimo(event.id, senderId) : name,
+    senderName: event.audienceAnonymous && !conNickname ? await pseudonimo(event.id, senderId) : name,
     isModerator: false,
     // Keyed hash of ip:name (lib/chat/sender-key): two people behind one NAT
     // with the same name share it. It is a display hint, never a credential.

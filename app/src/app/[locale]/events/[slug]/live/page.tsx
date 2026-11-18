@@ -220,6 +220,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             // Pubblico anonimo: niente piazza, dove ci si riconosce dal nome.
             waitingRoomEngine: event.audienceAnonymous ? 'CLASSIC' : (event.waitingRoomEngine ?? settings.waitingRoomEngine),
             audienceAnonymous: event.audienceAnonymous,
+            nicknamesEnabled: event.nicknamesEnabled,
             participantListVisible: elencoVisibileAlPubblico(event),
             recordingDestination: event.recordingDestination,
             recordingAudience: event.recordingAudience,
@@ -327,12 +328,16 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
   // Il browser che si e' iscritto apre il proprio link: entra con il nome
   // dell'iscrizione (la rotta del token applica la stessa regola).
   let linkDellIscritto = false;
+  // Il nickname salvato sull'iscrizione (lib/live/nickname): solo a chi apre il
+  // proprio link, come il nome.
+  let nicknameDellIscritto: string | null = null;
   if (!isModerator && !isSpeaker) {
     const registration = await prisma.registration.findUnique({
       where: { accessToken: token },
       select: {
         id: true,
         displayName: true,
+        nickname: true,
         eventId: true,
         consentRecording: true,
         consentRecordingDestination: true,
@@ -368,6 +373,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         cookieStore.get(eventAccessCookieName(event.id))?.value,
       )) === token;
     linkDellIscritto = ownsToken;
+    nicknameDellIscritto = ownsToken ? tryDecryptPII(registration.nickname) : null;
     participantInfo = {
       displayName: ownsToken
         ? (tryDecryptPII(registration.displayName) ?? registration.displayName)
@@ -441,6 +447,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         // Pubblico anonimo: niente piazza, dove ci si riconosce dal nome.
         waitingRoomEngine: event.audienceAnonymous ? 'CLASSIC' : (event.waitingRoomEngine ?? settings.waitingRoomEngine),
         audienceAnonymous: event.audienceAnonymous,
+        nicknamesEnabled: event.nicknamesEnabled,
         participantListVisible: elencoVisibileAlPubblico(event),
         recordingDestination: event.recordingDestination,
         recordingAudience: event.recordingAudience,
@@ -506,6 +513,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       hasRecordingConsent={hasRecordingConsent}
       registrationJoined={iscrizioneEntrata}
       registrantOwnsLink={linkDellIscritto}
+      initialNickname={nicknameDellIscritto}
       displayName={
         grant && !grant.isPrimaryShared
           ? // Named co-moderator or speaker via EventModerator row —

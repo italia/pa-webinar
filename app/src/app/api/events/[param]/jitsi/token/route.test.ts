@@ -15,7 +15,7 @@ import { describe, it, expect, vi, afterEach, beforeAll, beforeEach } from 'vite
 import { SignJWT, jwtVerify } from 'jose';
 import type { NextRequest } from 'next/server';
 
-import { encryptPII, hashEmail } from '@/lib/crypto/pii';
+import { decryptPII, encryptPII, hashEmail } from '@/lib/crypto/pii';
 import { eventAccessCookieName, signEventAccess } from '@/lib/event-session';
 import { readGravatarRef } from '@/lib/gravatar-ref';
 import { invalidateSettingsCache } from '@/lib/settings';
@@ -23,6 +23,7 @@ import { prisma } from '@/lib/db';
 import type * as Pseudonimo from '@/lib/live/pseudonym';
 import { codicePseudonimo } from '@/lib/live/pseudonym';
 import { guestSenderId } from '@/lib/chat/sender-key';
+import { resetNicknameCachesForTests } from '@/lib/live/nickname';
 
 import { POST } from './route';
 
@@ -43,13 +44,28 @@ vi.mock('@/lib/live/pseudonym', async (orig) => {
   const vero = await orig<typeof Pseudonimo>();
   return { ...vero, pseudonimo: async (e: string, p: string) => `Partecipante-${vero.codicePseudonimo(e, p)}` };
 });
+// Le parole riservate dei nickname dai cataloghi veri, come le darebbe next-intl.
+vi.mock('next-intl/server', () => ({
+  getTranslations: async ({ locale }: { locale: string }) => {
+    const m = (await import(`@/i18n/messages/${locale}.json`)).default as {
+      live: { pseudonym: string; nickname: { reserved: string } };
+    };
+    return (k: string, v?: { code: string }) =>
+      k === 'nickname.reserved' ? m.live.nickname.reserved : m.live.pseudonym.replace('{code}', v?.code ?? '');
+  },
+}));
 const staffSeat = vi.hoisted(() => ({ valore: null as { accountId: string; nome: string } | null }));
 vi.mock('@/lib/auth/staff-seat', () => ({ staffDietroIlPrimario: vi.fn(async () => staffSeat.valore) }));
 
 vi.mock('@/lib/db', () => ({
   prisma: {
     event: { findUnique: vi.fn() },
-    registration: { findUnique: vi.fn(), findFirst: vi.fn(async () => null), update: vi.fn() },
+    registration: {
+      findUnique: vi.fn(),
+      findFirst: vi.fn(async () => null),
+      findMany: vi.fn(async () => []),
+      update: vi.fn(),
+    },
     eventModerator: { findUnique: vi.fn() },
     staffAccount: { findUnique: vi.fn() },
     siteSetting: { findUnique: vi.fn() },
@@ -115,6 +131,7 @@ type EventOverrides = Partial<{
   recordingDestination: 'PUBLIC' | 'REGISTRANTS' | null;
   aiTranscriptEnabled: boolean;
   captionsTranscriptEnabled: boolean;
+  nicknamesEnabled: boolean;
 }>;
 
 function eventRow(overrides: EventOverrides = {}) {
@@ -138,6 +155,11 @@ function eventRow(overrides: EventOverrides = {}) {
     recordingDestination: null,
     aiTranscriptEnabled: false,
     captionsTranscriptEnabled: false,
+    nicknamesEnabled: false,
+    // Chi conduce, per il controllo dei nickname (lib/live/nickname).
+    speakersInfo: {},
+    createdBy: null,
+    additionalMods: [{ name: encryptPII('Anna Bianchi') }],
     ...overrides,
   };
 }
@@ -235,6 +257,7 @@ async function minted(res: Response) {
     consentsInForce?: { recording: boolean; transcription: boolean };
     recordingDestination?: string | null;
     voiceExcluded?: boolean;
+    nickname?: string | null;
   };
   // Firma verificata davvero: un JWT che Prosody rifiuterebbe non fa entrare
   // nessuno, per quanto corretto sia il resto del payload.
@@ -2249,5 +2272,168 @@ describe('POST jitsi/token — chiamata rapida', () => {
     const { body, user } = await minted(await post({ guestName: 'Ospite' }));
     expect(body.voiceExcluded).toBe(false);
     expect(user.voiceExcluded).toBeUndefined();
+  });
+});
+
+describe('POST jitsi/token — nickname di chi partecipa', () => {
+  beforeEach(() => {
+    applySettings({ guestAccessEnabled: true, gravatarEnabled: true });
+    // I nickname presi dagli ospiti restano nella memoria del processo.
+    resetNicknameCachesForTests();
+    vi.mocked(prisma.registration.findMany).mockImplementation((async () => []) as never);
+  });
+  const conNickname = (campi: EventOverrides = {}) =>
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(eventRow({ nicknamesEnabled: true, ...campi }) as never);
+  const iscrittoProprietario = async (campi: Record<string, unknown> = {}) => {
+    vi.mocked(prisma.registration.findUnique).mockResolvedValue(registrationRow(campi) as never);
+    cookieJar.set(eventAccessCookieName(EVENT_ID), await signEventAccess(EVENT_ID, ACCESS_TOKEN, 3600));
+  };
+
+  it("l'ospite entra con il nickname, e la prova del consenso lo porta", async () => {
+    conNickname({ recordingEnabled: true, participantsCanUnmute: true });
+    const res = await post({ guestName: 'Mario Rossi', nickname: ' Pippo ', recordingConsent: true });
+    expect(res.status).toBe(200);
+    const { body, user } = await minted(res);
+    expect(user.name).toBe('Pippo');
+    expect(body.displayName).toBe('Pippo');
+    expect(body.nickname).toBe('Pippo');
+    expect(JSON.stringify(user)).not.toContain('Mario');
+    const prova = (vi.mocked(prisma.recordingConsent.createMany).mock.calls[0]![0] as {
+      data: { displayName: string }[];
+    }).data[0]!;
+    expect(decryptPII(prova.displayName)).toBe('Pippo');
+  });
+
+  it("l'ospite che rientra da un'altra rete riprende il suo nickname con i token della visita", async () => {
+    conNickname();
+    const { body } = await minted(await post({ guestName: 'Mario Rossi', nickname: 'Pippo' }));
+    // Un altro indirizzo, senza prova: per la sala e' un'altra persona.
+    const senza = await post({ guestName: 'Mario Rossi', nickname: 'Pippo' });
+    expect(senza.status).toBe(409);
+    const con = await post({ guestName: 'Mario Rossi', nickname: 'Pippo', nicknameProof: [body.jwt] });
+    expect(con.status).toBe(200);
+    const ripreso = await minted(con);
+    expect(ripreso.user.name).toBe('Pippo');
+    // Da qui la prova e' il token nuovo: quello di prima non tiene piu' il nickname.
+    const vecchio = await post({ guestName: 'Mario Rossi', nickname: 'Pippo', nicknameProof: [body.jwt] });
+    expect(vecchio.status).toBe(409);
+    const nuovo = await post({ guestName: 'Mario Rossi', nickname: 'Pippo', nicknameProof: [ripreso.body.jwt] });
+    expect(nuovo.status).toBe(200);
+  });
+
+  it('un token con lo stesso nome non prova niente: conta il posto, non il nome', async () => {
+    conNickname();
+    await post({ guestName: 'Mario Rossi', nickname: 'Pippo' });
+    // Un altro ospite entra scrivendo «Pippo» come nome, e prova a usarne il token.
+    const furbo = await minted(await post({ guestName: 'Pippo' }));
+    expect(furbo.user.name).toBe('Pippo');
+    const furto = await post({ guestName: 'Pippo', nickname: 'Pippo', nicknameProof: [furbo.body.jwt] });
+    expect(furto.status).toBe(409);
+    // Ne' fa passare un nickname riservato o di chi conduce.
+    const moderatore = await minted(await post({ guestName: 'Moderatore' }));
+    const riservato = await post({
+      guestName: 'Moderatore',
+      nickname: 'Moderatore',
+      nicknameProof: [moderatore.body.jwt],
+    });
+    expect(riservato.status).toBe(422);
+  });
+
+  it("col pubblico anonimo il nickname dell'ospite prende il posto dello pseudonimo", async () => {
+    conNickname({ audienceAnonymous: true });
+    const { user } = await minted(await post({ guestName: 'Mario Rossi', nickname: 'Pippo' }));
+    expect(user.name).toBe('Pippo');
+  });
+
+  it("senza l'opzione il nickname non conta: resta il nome scritto, come prima", async () => {
+    const { body, user } = await minted(await post({ guestName: 'Mario Rossi', nickname: 'Pippo' }));
+    expect(user.name).toBe('Mario Rossi');
+    expect(body.nickname).toBeNull();
+  });
+
+  it.each([
+    ['reserved', 'Moderatore2'],
+    ['host', 'AnnaBianchi'],
+    ['format', 'Pippo Rossi'],
+  ])('un nickname che non va (%s) non fa entrare, e la sala sa perche\'', async (motivo, nickname) => {
+    conNickname();
+    const res = await post({ guestName: 'Mario Rossi', nickname });
+    expect(res.status).toBe(422);
+    expect(await res.json()).toMatchObject({ code: 'NICKNAME_INVALID', reason: motivo });
+  });
+
+  it("un nickname gia' di un iscritto: 409 con un'alternativa", async () => {
+    conNickname();
+    vi.mocked(prisma.registration.findMany).mockImplementation((async (arg: {
+      where: { nicknameKey: { in: string[] } };
+    }) => arg.where.nicknameKey.in.slice(0, 1).map((k) => ({ id: 'altra', nicknameKey: k }))) as never);
+    const res = await post({ guestName: 'Mario Rossi', nickname: 'Pippo' });
+    expect(res.status).toBe(409);
+    expect(await res.json()).toMatchObject({ code: 'NICKNAME_TAKEN', reason: 'taken' });
+  });
+
+  it("l'iscritto entra con il nickname salvato, senza indirizzo ne' foto", async () => {
+    conNickname();
+    await iscrittoProprietario({ nickname: encryptPII('Pippo') });
+    const { body, user } = await minted(await post({ accessToken: ACCESS_TOKEN, nickname: 'Altro' }));
+    // Conta quello salvato: per l'iscritto il nickname passa dalla sua rotta.
+    expect(user.name).toBe('Pippo');
+    expect(body.nickname).toBe('Pippo');
+    expect(JSON.stringify(user)).not.toContain('Mario');
+    expect(JSON.stringify(user)).not.toContain(REGISTRANT_MD5);
+    expect(user.avatar).not.toContain('/api/avatar');
+    // La prova resta legata alla persona, con il suo nome.
+  });
+
+  it("un nickname salvato vale anche col pubblico anonimo, e anche se l'opzione si e' spenta dopo", async () => {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(eventRow({ audienceAnonymous: true }) as never);
+    await iscrittoProprietario({ nickname: encryptPII('Pippo') });
+    const { user } = await minted(await post({ accessToken: ACCESS_TOKEN }));
+    expect(user.name).toBe('Pippo');
+  });
+
+  it("l'iscritto senza nickname resta com'era: il suo nome", async () => {
+    conNickname();
+    await iscrittoProprietario();
+    const { body, user } = await minted(await post({ accessToken: ACCESS_TOKEN }));
+    expect(user.name).toBe('Mario Rossi');
+    expect(body.nickname).toBeNull();
+  });
+
+  it('chi apre il link di un altro ha il nickname per la visita, mai quello salvato', async () => {
+    conNickname();
+    vi.mocked(prisma.registration.findUnique).mockResolvedValue(
+      registrationRow({ nickname: encryptPII('Pippo') }) as never,
+    );
+    const { user } = await minted(
+      await post({ accessToken: ACCESS_TOKEN, displayNameOverride: 'Luigi Bianchi', nickname: 'Pluto' }),
+    );
+    expect(user.name).toBe('Pluto');
+    const senza = await minted(await post({ accessToken: ACCESS_TOKEN, displayNameOverride: 'Luigi Bianchi' }));
+    expect(senza.user.name).toBe('Luigi Bianchi');
+  });
+
+  it("chi apre il link di un altro col pubblico anonimo resta con lo pseudonimo del posto", async () => {
+    conNickname({ audienceAnonymous: true });
+    vi.mocked(prisma.registration.findUnique).mockResolvedValue(registrationRow() as never);
+    const { user } = await minted(
+      await post({ accessToken: ACCESS_TOKEN, displayNameOverride: 'Luigi Bianchi', nickname: 'Pluto' }),
+    );
+    expect(user.name).toBe(`Partecipante-${codicePseudonimo(EVENT_ID, `reg-${REGISTRATION_ID}`)}`);
+  });
+
+  it('chi conduce resta con il suo nome anche se la pagina manda un nickname', async () => {
+    conNickname();
+    vi.mocked(prisma.eventModerator.findUnique).mockResolvedValue({
+      id: 'grant-1',
+      eventId: EVENT_ID,
+      revokedAt: null,
+      role: 'SPEAKER',
+      name: encryptPII('Luca Neri'),
+      email: null,
+    } as never);
+    const { body, user } = await minted(await post({ moderatorToken: GRANT_TOKEN, nickname: 'Pippo' }));
+    expect(user.name).toBe('Luca Neri');
+    expect(body).not.toHaveProperty('nickname');
   });
 });

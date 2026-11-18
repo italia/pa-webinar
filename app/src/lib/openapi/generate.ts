@@ -257,8 +257,34 @@ registry.registerPath({
   summary: 'Get Jitsi JWT for room join',
   request: { params: z.object({ param: z.string() }), body: { content: { 'application/json': { schema: jitsiTokenRequestSchema } } } },
   responses: {
-    200: { description: 'JWT token, room name, display name, role' },
+    200: { description: 'JWT token, room name, display name, role; for participants the nickname in use (null without one)' },
+    409: { description: 'CONFLICT: the event does not admit this entry now; or NICKNAME_TAKEN: the visit nickname is already in use, with a free `suggestion`' },
+    422: { description: 'NICKNAME_INVALID: the visit nickname of a guest is not allowed, with the `reason`' },
     403: { description: 'Guest request refused: GUEST_ACCESS_DISABLED (guest access turned off, scheduled events only) or JOIN_PASSWORD_REQUIRED (password-protected event without the join grant cookie)' },
+  },
+});
+
+registry.registerPath({
+  method: 'put',
+  path: '/api/events/{param}/nickname',
+  tags: ['Jitsi'],
+  summary: 'Choose, check or remove a participant nickname',
+  description:
+    'A registrant, from the browser that registered (`Authorization: Bearer <accessToken>` and the event cookie), ' +
+    'saves the nickname on the registration, or removes it with null. A guest or someone opening another ' +
+    "person's link only checks it, and a guest only where guests may enter: their nickname lasts for the visit " +
+    'and the token route takes it on entry (`nickname`, with `nicknameProof`, the room tokens of the visit). ' +
+    'One word that starts with a letter, 2 to 24 characters, letters of a single script; no platform role ' +
+    'words, nothing resembling the names of the hosts, unique in the event. Hosts keep their own name.',
+  request: {
+    params: z.object({ param: z.string() }),
+    body: { content: { 'application/json': { schema: z.object({ nickname: z.string().max(100).nullable() }) } } },
+  },
+  responses: {
+    200: { description: '`nickname` (canonical form, or null) and `saved`: whether it is stored on the registration' },
+    403: { description: 'NICKNAMES_DISABLED (the event does not allow them), HOSTS_USE_THEIR_NAME, or a token not of this event' },
+    409: { description: 'NICKNAME_TAKEN, with a free `suggestion` when there is one; EVENT_ENDED' },
+    422: { description: 'NICKNAME_INVALID, with the `reason`: length, format, scripts, reserved or host' },
   },
 });
 

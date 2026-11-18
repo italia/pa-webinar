@@ -728,6 +728,35 @@
       "title": "Qed tipparteċipa mingħajr reġistrazzjoni.",
       "consent": "Nagħti l-kunsens għar-reġistrazzjoni",
       "body": "Ma tajtx il-kunsens għar-reġistrazzjoni: qed tipparteċipa bħal kulħadd, iżda leħnek jibqa' barra mir-reġistrazzjoni. Wiċċek u ismek xorta qatt ma jidhru fil-vidjo."
+    },
+    "nickname": {
+      "reserved": "Moderatur,Moderatriċi,Kelliem,Kelliema,Parteċipant,Mistieden,Mistiedna,Organizzatur,Organizzatriċi,Amministratur,Amministratriċi",
+      "label": "Laqam (mhux obbligatorju)",
+      "help": "Kelma waħda, minn 2 sa 24 karattru: ittri, ċifri u . _ -. L-oħrajn jarawh minflok ismek fil-vidjo, fiċ-chat, fil-mistoqsijiet u fit-traskrizzjoni.",
+      "helpName": "Jekk tħallih vojt, tidher b'ismek.",
+      "helpAnonymous": "Jekk tħallih vojt, tidher b'psewdonimu awtomatiku.",
+      "checking": "Il-laqam qed jiġi vverifikat…",
+      "shownAs": "L-oħrajn se jarawk bħala “{nickname}”.",
+      "useSuggestion": "Uża “{suggestion}”",
+      "errors": {
+        "length": "Il-laqam irid ikun minn 2 sa 24 karattru.",
+        "format": "Kelma waħda: tibda b'ittra u tispiċċa b'ittra jew ċifra; bejniethom ittri, ċifri u . _ -, qatt tnejn wara xulxin.",
+        "scripts": "Uża l-ittri ta' alfabett wieħed biss.",
+        "reserved": "Fih kelma riżervata, bħall-isem ta' rwol: agħżel ieħor.",
+        "host": "Jixbah l-isem ta' xi ħadd li qed imexxi l-avveniment: agħżel ieħor.",
+        "taken": "Xi ħadd fl-avveniment diġà juża dan il-laqam.",
+        "disabled": "Dan l-avveniment ma jaċċettax laqmijiet ġodda: tista' biss tneħħi tiegħek.",
+        "rete": "Ma kienx possibbli li jiġi vverifikat il-laqam. Erġa' pprova."
+      },
+      "button": "Laqam",
+      "open": "Ibdel il-laqam tiegħek",
+      "dialogTitle": "Il-laqam tiegħek",
+      "dialogIntro": "L-oħrajn jaraw il-laqam minflok ismek. Biex tibdlu, il-kamra terġa' tqabbdek għal mument.",
+      "apply": "Issejvja u erġa' qabbad",
+      "remove": "Neħħi l-laqam",
+      "reconnecting": "Qed terġa' tiġi mqabbad…",
+      "done": "Lest: issa tidher bħala “{nickname}”.",
+      "doneRemoved": "Lest: il-laqam tneħħa."
     }
   },
   "qa": {
@@ -1073,6 +1102,9 @@
         "participantListVisibleDesc": "Mitfi: il-lista, il-grilja u l-ismijiet fil-pjazza jibqgħu għal min imexxi u min jitkellem; l-udjenza tara biss min qed jitkellem. Mixgħul: kulħadd jara min hemm fis-sala.",
         "participantListAnonymous": "B'udjenza anonima l-lista tibqa' moħbija.",
         "participantListLocked": "Ma jinbidilx bis-sala miftuħa: min diġà ġewwa ma jarax il-bidla.",
+        "nicknamesEnabled": "Laqmijiet għall-parteċipanti",
+        "nicknamesEnabledDesc": "Il-parteċipanti jistgħu jagħżlu laqam: l-oħrajn jarawh minflok isimhom fil-vidjo, fiċ-chat, fil-mistoqsijiet u fit-traskrizzjoni. L-organizzaturi u l-moderaturi jaraw min hemm warajh. Min imexxi jibqa' b'ismu. Fil-bidu huwa mixgħul fejn il-lista tal-parteċipanti hija moħbija.",
+        "nicknamesLocked": "Ma jinbidilx waqt li l-kamra hija miftuħa: min diġà ġewwa għażel bir-regola ta' qabel.",
         "participantListCameraNote": "Bil-lista moħbija, min ixgħel il-kamera ma jarax il-kwadru tiegħu. Għal laqgħa fejn kulħadd jara lil xulxin, uri l-lista.",
         "recordingLockedLive": "Bis-sala miftuħa r-reġistrazzjoni ma tinbidilx: tgħodd mill-ewwel dħul.",
         "hostsAlwaysRecorded": "Min imexxi dejjem jidher fir-reġistrazzjoni",
@@ -1387,6 +1419,7 @@
         "participantListShown": "Lista tal-parteċipanti: viżibbli għal kulħadd.",
         "participantListHidden": "Lista tal-parteċipanti: biss għal min imexxi u min jitkellem.",
         "audiencePseudonyms": "Ismijiet tal-udjenza: psewdonimi.",
+        "audienceNicknames": "Il-parteċipanti jistgħu jużaw laqam.",
         "audienceRealNames": "Ismijiet tal-udjenza: dawk reali.",
         "postEventQaHidden": "Mistoqsijiet wara l-avveniment: mhux ippubblikati.",
         "postEventQaTextOnly": "Mistoqsijiet wara l-avveniment: it-test biss, mingħajr isem.",
@@ -1750,6 +1783,8 @@
       "colCreatedAt": "Data reġistrazzjoni",
       "colEvent": "Avveniment",
       "colName": "Isem",
+      "colNickname": "Laqam",
+      "nicknameShown": "L-oħrajn jarawh bħala “{nickname}”",
       "colEmail": "Email",
       "colOrg": "Organizzazzjoni",
       "colJoined": "Ipparteċipato",
@@ -3761,6 +3796,7 @@
       },
       "previewInvitation": "Jirreġistraw biss il-mistiedna; mingħajr reġistrazzjoni ħadd ma jidħol.",
       "previewPseudonyms": "L-udjenza tidher b'psewdonimu",
+      "previewNicknames": "Il-parteċipanti jistgħu jużaw laqam",
       "previewRealNames": "L-udjenza tidher bl-ismijiet tagħha",
       "templateReplaces": "Mudell iġib l-issettjar tiegħu minflok it-tweġibiet hawn taħt. It-titlu, id-dati u n-nies tiktibhom fil-passi li ġejjin.",
       "instantBack": "Oħloq minflok avveniment skedat"
@@ -4733,7 +4769,9 @@
         "label": "Ismek",
         "real": "Fis-sala, fiċ-chat u fil-mistoqsijiet tidher b'ismek.",
         "pseudonym": "Fis-sala, fiċ-chat u fil-mistoqsijiet tidher b'psewdonimu. Min jorganizza jara d-dejta tar-reġistrazzjoni.",
-        "pseudonymTranscript": "Jekk tagħti l-kunsens għat-traskrizzjoni, hemmhekk jibqa' ismek."
+        "pseudonymTranscript": "Jekk tagħti l-kunsens għat-traskrizzjoni, hemmhekk jibqa' ismek.",
+        "nickname": "Tista' tagħżel laqam: l-oħrajn jarawh minflok ismek. L-organizzaturi u l-moderaturi jafu min hemm warajh.",
+        "nicknameTranscript": "Jekk tagħti l-kunsens għat-traskrizzjoni, hemmhekk tidher bil-laqam tiegħek jekk għażilt wieħed, inkella b'ismek."
       },
       "retention": {
         "label": "Żamma",
@@ -4773,6 +4811,7 @@
       "resultsDescription": "{count, plural, one {Dejta misjuba relatata ma' # avveniment.} two {Dejta misjuba relatata ma' # avvenimenti.} few {Dejta misjuba relatata ma' # avvenimenti.} many {Dejta misjuba relatata ma' #-il avveniment.} other {Dejta misjuba relatata ma' # avveniment.}}",
       "registrationData": "Dejta tar-reġistrazzjoni",
       "fieldName": "Isem",
+      "fieldNickname": "Laqam",
       "fieldEmail": "Email",
       "fieldOrganization": "Entità",
       "fieldRegisteredAt": "Data tar-reġistrazzjoni",

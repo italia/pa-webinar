@@ -728,6 +728,35 @@
       "title": "U neemt deel zonder opname.",
       "consent": "Ik geef toestemming voor de opname",
       "body": "Je hebt geen toestemming gegeven voor de opname: je neemt deel zoals iedereen, maar je stem blijft buiten de opname. Je gezicht en je naam komen sowieso nooit in de video."
+    },
+    "nickname": {
+      "reserved": "Moderator,Spreker,Deelnemer,Gast,Organisator,Beheerder,Gastheer,Gastvrouw,Presentator",
+      "label": "Bijnaam (optioneel)",
+      "help": "Eén woord, 2 tot 24 tekens: letters, cijfers en . _ -. Anderen zien die in plaats van je naam in de video, in de chat, bij de vragen en in de transcriptie.",
+      "helpName": "Laat je het leeg, dan verschijn je met je naam.",
+      "helpAnonymous": "Laat je het leeg, dan verschijn je met een automatisch pseudoniem.",
+      "checking": "Bijnaam wordt gecontroleerd…",
+      "shownAs": "Anderen zien je als ‘{nickname}’.",
+      "useSuggestion": "‘{suggestion}’ gebruiken",
+      "errors": {
+        "length": "De bijnaam moet 2 tot 24 tekens lang zijn.",
+        "format": "Eén woord: het begint met een letter en eindigt op een letter of cijfer; daartussen letters, cijfers en . _ -, nooit twee achter elkaar.",
+        "scripts": "Gebruik letters uit één alfabet.",
+        "reserved": "Er staat een gereserveerd woord in, zoals de naam van een rol: kies een andere.",
+        "host": "Het lijkt op de naam van iemand die het evenement leidt: kies een andere.",
+        "taken": "Iemand in het evenement gebruikt deze bijnaam al.",
+        "disabled": "Dit evenement accepteert geen nieuwe bijnamen: je kunt de jouwe alleen verwijderen.",
+        "rete": "De bijnaam kon niet worden gecontroleerd. Probeer het opnieuw."
+      },
+      "button": "Bijnaam",
+      "open": "Je bijnaam wijzigen",
+      "dialogTitle": "Je bijnaam",
+      "dialogIntro": "Anderen zien de bijnaam in plaats van je naam. Om hem te wijzigen verbindt de zaal je even opnieuw.",
+      "apply": "Opslaan en opnieuw verbinden",
+      "remove": "Bijnaam verwijderen",
+      "reconnecting": "Opnieuw verbinden…",
+      "done": "Klaar: je verschijnt nu als ‘{nickname}’.",
+      "doneRemoved": "Klaar: de bijnaam is verwijderd."
     }
   },
   "qa": {
@@ -1073,6 +1102,9 @@
         "participantListVisibleDesc": "Uit: de lijst, het raster en de namen op het plein blijven bij moderatoren en sprekers; het publiek ziet alleen wie spreekt. Aan: iedereen ziet wie er in de zaal is.",
         "participantListAnonymous": "Bij een anoniem publiek blijft de lijst verborgen.",
         "participantListLocked": "Niet te wijzigen terwijl de zaal open is: wie al binnen is, zou de wijziging niet zien.",
+        "nicknamesEnabled": "Bijnamen voor deelnemers",
+        "nicknamesEnabledDesc": "Deelnemers kunnen een bijnaam kiezen: anderen zien die in plaats van hun naam in de video, in de chat, bij de vragen en in de transcriptie. Organisatoren en moderators zien wie erachter zit. Wie presenteert, houdt de eigen naam. Standaard aan waar de deelnemerslijst verborgen is.",
+        "nicknamesLocked": "Kan niet worden gewijzigd zolang de zaal open is: wie al binnen is, koos volgens de vorige regel.",
         "participantListCameraNote": "Met een verborgen lijst ziet wie de camera aanzet het eigen beeld niet. Toon de lijst voor een bijeenkomst waarin iedereen elkaar ziet.",
         "recordingLockedLive": "Opname is niet te wijzigen terwijl de zaal open is: die geldt vanaf de eerste binnenkomst.",
         "hostsAlwaysRecorded": "Wie de leiding heeft staat altijd in de opname",
@@ -1387,6 +1419,7 @@
         "participantListShown": "Deelnemerslijst: zichtbaar voor iedereen.",
         "participantListHidden": "Deelnemerslijst: alleen voor moderatoren en sprekers.",
         "audiencePseudonyms": "Namen van het publiek: pseudoniemen.",
+        "audienceNicknames": "Deelnemers kunnen een bijnaam gebruiken.",
         "audienceRealNames": "Namen van het publiek: echte namen.",
         "postEventQaHidden": "Vragen na het evenement: niet gepubliceerd.",
         "postEventQaTextOnly": "Vragen na het evenement: alleen de tekst, zonder naam.",
@@ -1750,6 +1783,8 @@
       "colCreatedAt": "Aanmelddatum",
       "colEvent": "Evenement",
       "colName": "Naam",
+      "colNickname": "Bijnaam",
+      "nicknameShown": "Anderen zien deze persoon als ‘{nickname}’",
       "colEmail": "E-mail",
       "colOrg": "Organisatie",
       "colJoined": "Deelgenomen",
@@ -3761,6 +3796,7 @@
       },
       "previewInvitation": "Alleen genodigden schrijven zich in; zonder inschrijving kom je er niet in.",
       "previewPseudonyms": "Het publiek verschijnt onder een pseudoniem",
+      "previewNicknames": "Deelnemers kunnen een bijnaam gebruiken",
       "previewRealNames": "Het publiek verschijnt onder de eigen naam",
       "templateReplaces": "Een sjabloon brengt zijn eigen instellingen mee in plaats van de antwoorden hieronder. Titel, data en personen vul je in de volgende stappen in.",
       "instantBack": "Maak in plaats daarvan een gepland evenement"
@@ -4733,7 +4769,9 @@
         "label": "Je naam",
         "real": "In de zaal, in de chat en bij vragen verschijn je onder je eigen naam.",
         "pseudonym": "In de zaal, in de chat en bij vragen verschijn je onder een pseudoniem. De organisatoren zien je inschrijvingsgegevens.",
-        "pseudonymTranscript": "Als je toestemming geeft voor de transcriptie, blijft je naam daarin staan."
+        "pseudonymTranscript": "Als je toestemming geeft voor de transcriptie, blijft je naam daarin staan.",
+        "nickname": "Je kunt een bijnaam kiezen: anderen zien die in plaats van je naam. Organisatoren en moderators weten wie erachter zit.",
+        "nicknameTranscript": "Als je toestemming geeft voor de transcriptie, verschijn je daar met je bijnaam als je er een hebt gekozen, anders met je naam."
       },
       "retention": {
         "label": "Bewaring",
@@ -4773,6 +4811,7 @@
       "resultsDescription": "{count, plural, one {Gegevens gevonden met betrekking tot # evenement.} other {Gegevens gevonden met betrekking tot # evenementen.}}",
       "registrationData": "Inschrijvingsgegevens",
       "fieldName": "Naam",
+      "fieldNickname": "Bijnaam",
       "fieldEmail": "E-mail",
       "fieldOrganization": "Organisatie",
       "fieldRegisteredAt": "Datum inschrijving",

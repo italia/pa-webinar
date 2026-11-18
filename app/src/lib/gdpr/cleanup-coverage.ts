@@ -22,7 +22,7 @@
 
 /** Tabelle che la transazione svuota (o ripulisce) alla scadenza. */
 export const PURGED_BY_CLEANUP: Record<string, string> = {
-  Registration: 'iscritti: email cifrata, nome, hash, token di accesso; le prove dei consensi dati all’iscrizione si copiano prima, se il video o la trascrizione esistono (RetainedConsentProof)',
+  Registration: 'iscritti: email cifrata, nome, nickname e sua impronta, hash, token di accesso; le prove dei consensi dati all’iscrizione si copiano prima, se il video o la trascrizione esistono (RetainedConsentProof)',
   Question: 'anonimizzate, non cancellate: restano testo, risposta e voti contati; si tolgono nome dell’autore e iscrizione (prima di cancellare le iscrizioni, che le porterebbero via in cascata)',
   ChatMessage: 'nomi dei mittenti e testi, allegati compresi',
   Reaction: 'reazioni di quell’occorrenza',

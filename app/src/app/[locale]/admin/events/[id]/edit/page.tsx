@@ -309,6 +309,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       autoStartRecording: event.autoStartRecording,
       audienceAnonymous: event.audienceAnonymous,
       participantListVisible: event.participantListVisible,
+      nicknamesEnabled: event.nicknamesEnabled,
       hostsAlwaysRecorded: event.hostsAlwaysRecorded,
       recordingDestination: event.recordingDestination,
       recordingAudience: event.recordingAudience,

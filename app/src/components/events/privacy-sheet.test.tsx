@@ -28,6 +28,7 @@ const SCHEDA: SchedaPrivacy = {
   chat: { attiva: false, domandeAttive: false, esitoDomande: 'nonPubblicate' },
   elencoVisibile: true,
   pseudonimi: false,
+  nickname: false,
   conservazione: { giorniDati: 30, registrazione: { giorni: null, video: true } },
   rubrica: null,
 };
@@ -335,6 +336,18 @@ describe('PrivacySheet, il nome nella trascrizione', () => {
 
   it('con il proprio nome non serve dirlo', () => {
     expect(disegna({ trascrizione: SI })).not.toContain(t.name.pseudonymTranscript);
+  });
+
+  it('con il nickname si dice, e la trascrizione lo usa al posto del nome', () => {
+    const testo = disegna({ nickname: true, trascrizione: SI });
+    expect(testo).toContain(t.name.real);
+    expect(testo).toContain(t.name.nickname);
+    expect(testo).toContain(t.name.nicknameTranscript);
+    expect(testo).not.toContain(t.name.pseudonymTranscript);
+    const anonimo = disegna({ pseudonimi: true, nickname: true, trascrizione: SI });
+    expect(anonimo).toContain(t.name.pseudonym);
+    expect(anonimo).toContain(t.name.nicknameTranscript);
+    expect(anonimo).not.toContain(t.name.pseudonymTranscript);
   });
 
   it('in sala vale anche il consenso gia\' dato, o i sottotitoli accesi dal vivo', () => {

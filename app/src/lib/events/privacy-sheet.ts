@@ -129,6 +129,8 @@ export interface SchedaPrivacy {
   };
   elencoVisibile: boolean;
   pseudonimi: boolean;
+  /** Chi partecipa puo' scegliere un nickname (lib/live/nickname). */
+  nickname: boolean;
   conservazione: {
     giorniDati: number;
     /** La registrazione non segue `giorniDati`: resta finche' chi organizza non
@@ -179,6 +181,7 @@ export type EventoScheda = Pick<
   | 'postEventShowQA'
   | 'participantListVisible'
   | 'audienceAnonymous'
+  | 'nicknamesEnabled'
   | 'dataRetentionDays'
   | 'recordingDeleteAfterDays'
   | 'offerAddressBook'
@@ -290,6 +293,7 @@ export function schedaPrivacy({
     },
     elencoVisibile: elencoVisibileAlPubblico(evento),
     pseudonimi: evento.audienceAnonymous,
+    nickname: evento.nicknamesEnabled,
     conservazione: {
       giorniDati: evento.dataRetentionDays,
       // Cio' che resta oltre i dati: il video, le tracce trascritte, la

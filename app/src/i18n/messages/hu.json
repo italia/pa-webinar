@@ -728,6 +728,35 @@
       "title": "Rögzítés nélkül vesz részt.",
       "consent": "Hozzájárulok a rögzítéshez",
       "body": "Nem járult hozzá a felvételhez: ugyanúgy részt vesz, mint mindenki, de a hangja kimarad a felvételből. Az arca és a neve egyébként sem jelenik meg soha a videón."
+    },
+    "nickname": {
+      "reserved": "Moderátor,Előadó,Felszólaló,Résztvevő,Vendég,Szervező,Adminisztrátor,Házigazda",
+      "label": "Becenév (nem kötelező)",
+      "help": "Egy szó, 2–24 karakter: betűk, számjegyek és . _ -. A többiek ezt látják a neved helyett a videóban, a csevegésben, a kérdéseknél és az átiratban.",
+      "helpName": "Ha üresen hagyod, a saját neveddel jelensz meg.",
+      "helpAnonymous": "Ha üresen hagyod, automatikus álnévvel jelensz meg.",
+      "checking": "A becenév ellenőrzése…",
+      "shownAs": "A többiek így látnak majd: „{nickname}”.",
+      "useSuggestion": "„{suggestion}” használata",
+      "errors": {
+        "length": "A becenévnek 2–24 karakterből kell állnia.",
+        "format": "Egy szó: betűvel kezdődik, és betűvel vagy számjeggyel végződik; közte betűk, számjegyek és . _ -, soha nem kettő egymás után.",
+        "scripts": "Egyetlen ábécé betűit használd.",
+        "reserved": "Foglalt szót tartalmaz, például egy szerepkör nevét: válassz másikat.",
+        "host": "Hasonlít az esemény egyik vezetőjének nevére: válassz másikat.",
+        "taken": "Valaki az eseményen már használja ezt a becenevet.",
+        "disabled": "Ez az esemény nem fogad el új beceneveket: a sajátodat csak eltávolíthatod.",
+        "rete": "A becenevet nem sikerült ellenőrizni. Próbáld újra."
+      },
+      "button": "Becenév",
+      "open": "Becenév módosítása",
+      "dialogTitle": "A beceneved",
+      "dialogIntro": "A többiek a becenevet látják a neved helyett. A módosításhoz a terem egy pillanatra újracsatlakoztat.",
+      "apply": "Mentés és újracsatlakozás",
+      "remove": "Becenév törlése",
+      "reconnecting": "Újracsatlakozás…",
+      "done": "Kész: most így jelensz meg: „{nickname}”.",
+      "doneRemoved": "Kész: a becenevet eltávolítottuk."
     }
   },
   "qa": {
@@ -1073,6 +1102,9 @@
         "participantListVisibleDesc": "Ki: a lista, a rács és a téren látható nevek a házigazdáknál és az előadóknál maradnak; a közönség csak azt látja, aki beszél. Be: mindenki látja, ki van a teremben.",
         "participantListAnonymous": "Névtelen közönségnél a lista rejtve marad.",
         "participantListLocked": "Nyitott teremnél nem módosítható: akik már bent vannak, nem látnák a változást.",
+        "nicknamesEnabled": "Becenév a résztvevőknek",
+        "nicknamesEnabledDesc": "A résztvevők becenevet választhatnak: a többiek ezt látják a nevük helyett a videóban, a csevegésben, a kérdéseknél és az átiratban. A szervezők és a moderátorok látják, ki áll mögötte. Akik vezetik az eseményt, a saját nevükkel szerepelnek. Alapértelmezés szerint be van kapcsolva, ahol a résztvevők listája rejtett.",
+        "nicknamesLocked": "Nyitott teremnél nem módosítható: aki már bent van, az előző szabály szerint választott.",
         "participantListCameraNote": "Rejtett listánál aki bekapcsolja a kameráját, nem látja a saját képét. Olyan találkozónál, ahol mindenki látja egymást, jelenítse meg a listát.",
         "recordingLockedLive": "Nyitott teremnél a rögzítés nem módosítható: az első belépéstől érvényes.",
         "hostsAlwaysRecorded": "Az esemény vezetői mindig szerepelnek a felvételen",
@@ -1387,6 +1419,7 @@
         "participantListShown": "Résztvevők listája: mindenki számára látható.",
         "participantListHidden": "Résztvevők listája: csak a házigazdáknak és az előadóknak.",
         "audiencePseudonyms": "A közönség nevei: álnevek.",
+        "audienceNicknames": "A résztvevők becenevet használhatnak.",
         "audienceRealNames": "A közönség nevei: a valódi nevek.",
         "postEventQaHidden": "Kérdések az esemény után: nincsenek közzétéve.",
         "postEventQaTextOnly": "Kérdések az esemény után: csak a szöveg, név nélkül.",
@@ -1750,6 +1783,8 @@
       "colCreatedAt": "Regisztráció dátuma",
       "colEvent": "Esemény",
       "colName": "Név",
+      "colNickname": "Becenév",
+      "nicknameShown": "Mások így látják: „{nickname}”",
       "colEmail": "E-mail",
       "colOrg": "Szervezet",
       "colJoined": "Részt vett",
@@ -3761,6 +3796,7 @@
       },
       "previewInvitation": "Csak a meghívottak regisztrálnak; regisztráció nélkül nem lehet belépni.",
       "previewPseudonyms": "A közönség álnéven jelenik meg",
+      "previewNicknames": "A résztvevők becenevet használhatnak",
       "previewRealNames": "A közönség a saját nevén jelenik meg",
       "templateReplaces": "A sablon a saját beállításait hozza az alábbi válaszok helyett. A címet, a dátumokat és a személyeket a következő lépésekben adja meg.",
       "instantBack": "Inkább ütemezett esemény létrehozása"
@@ -4733,7 +4769,9 @@
         "label": "Az Ön neve",
         "real": "A teremben, a csevegésben és a kérdéseknél a saját nevén jelenik meg.",
         "pseudonym": "A teremben, a csevegésben és a kérdéseknél álnéven jelenik meg. A szervezők látják a regisztrációs adatait.",
-        "pseudonymTranscript": "Ha hozzájárul az átirathoz, ott a neve megmarad."
+        "pseudonymTranscript": "Ha hozzájárul az átirathoz, ott a neve megmarad.",
+        "nickname": "Választhatsz becenevet: a többiek ezt látják a neved helyett. A szervezők és a moderátorok tudják, ki áll mögötte.",
+        "nicknameTranscript": "Ha hozzájárulsz az átirathoz, ott a beceneveddel jelensz meg, ha választottál, különben a neveddel."
       },
       "retention": {
         "label": "Megőrzés",
@@ -4773,6 +4811,7 @@
       "resultsDescription": "{count, plural, one {# eseményhez kapcsolódó adatok találhatók.} other {# eseményhez kapcsolódó adatok találhatók.}}",
       "registrationData": "Regisztrációs adatok",
       "fieldName": "Név",
+      "fieldNickname": "Becenév",
       "fieldEmail": "E-mail",
       "fieldOrganization": "Szervezet",
       "fieldRegisteredAt": "Regisztráció dátuma",

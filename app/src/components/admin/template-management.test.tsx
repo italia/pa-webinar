@@ -121,6 +121,7 @@ describe('TemplateManagement — i valori del formato', () => {
     postEventShowQA: false,
     offerAddressBook: false,
     audienceAnonymous: true,
+    nicknamesEnabled: true,
     hostsAlwaysRecorded: true,
     recordingDestination: 'PUBLIC' as const,
     waitingRoomEngine: null,

@@ -728,6 +728,35 @@
       "title": "Partecipi senza registrazione.",
       "consent": "Acconsento alla registrazione",
       "body": "Non hai dato il consenso alla registrazione: partecipi come tutti, ma la tua voce resta fuori dalla registrazione. Il tuo volto e il tuo nome non compaiono comunque mai nel video."
+    },
+    "nickname": {
+      "reserved": "Moderatore,Moderatrice,Relatore,Relatrice,Partecipante,Ospite,Organizzatore,Organizzatrice,Amministratore,Amministratrice,Conduttore,Conduttrice",
+      "label": "Nickname (facoltativo)",
+      "help": "Una parola sola, da 2 a 24 caratteri: lettere, cifre e . _ -. Gli altri lo vedono al posto del tuo nome in video, in chat, nelle domande e nella trascrizione.",
+      "helpName": "Se lo lasci vuoto, compari con il tuo nome.",
+      "helpAnonymous": "Se lo lasci vuoto, compari con uno pseudonimo automatico.",
+      "checking": "Controllo del nickname…",
+      "shownAs": "Gli altri ti vedranno come «{nickname}».",
+      "useSuggestion": "Usa «{suggestion}»",
+      "errors": {
+        "length": "Il nickname va da 2 a 24 caratteri.",
+        "format": "Una parola sola: comincia con una lettera e finisce con una lettera o una cifra; in mezzo lettere, cifre e . _ -, mai due di fila.",
+        "scripts": "Usa le lettere di un solo alfabeto.",
+        "reserved": "Contiene una parola riservata, come il nome di un ruolo: scegline un altro.",
+        "host": "Somiglia al nome di chi conduce l'evento: scegline un altro.",
+        "taken": "Nell'evento c'è già qualcuno con questo nickname.",
+        "disabled": "Questo evento non accetta nuovi nickname: puoi solo togliere il tuo.",
+        "rete": "Non è stato possibile controllare il nickname. Riprova."
+      },
+      "button": "Nickname",
+      "open": "Cambia il tuo nickname",
+      "dialogTitle": "Il tuo nickname",
+      "dialogIntro": "Gli altri vedono il nickname al posto del tuo nome. Per cambiarlo la sala ti ricollega per un attimo.",
+      "apply": "Salva e ricollegati",
+      "remove": "Togli il nickname",
+      "reconnecting": "Ricollegamento in corso…",
+      "done": "Fatto: ora compari come «{nickname}».",
+      "doneRemoved": "Fatto: il nickname è stato tolto."
     }
   },
   "qa": {
@@ -1283,6 +1312,9 @@
         "participantListVisibleDesc": "Spento: l'elenco, la griglia e i nomi nella piazza restano a chi conduce e a chi interviene; il pubblico vede solo chi sta parlando. Acceso: tutti vedono chi è in sala.",
         "participantListAnonymous": "Con il pubblico anonimo l'elenco resta nascosto.",
         "participantListLocked": "Con la sala aperta non si cambia: chi è già dentro non vedrebbe la modifica.",
+        "nicknamesEnabled": "Nickname per chi partecipa",
+        "nicknamesEnabledDesc": "Chi partecipa può scegliere un nickname: gli altri lo vedono al posto del nome in video, in chat, nelle domande e nella trascrizione. Chi organizza e chi modera vedono chi c'è dietro. Chi conduce resta con il proprio nome. Di partenza è acceso dove l'elenco dei partecipanti è nascosto.",
+        "nicknamesLocked": "Con la sala aperta non si cambia: chi è già dentro ha scelto con la regola di prima.",
         "participantListCameraNote": "Con l'elenco nascosto, chi accende la videocamera non vede il proprio riquadro. Per un incontro in cui tutti si vedono, mostra l'elenco.",
         "recordingLockedLive": "Con la sala aperta la registrazione non si cambia: vale dal primo ingresso.",
         "hostsAlwaysRecorded": "Chi conduce è sempre nella registrazione",
@@ -1597,6 +1629,7 @@
         "participantListShown": "Elenco dei partecipanti: visibile a tutti.",
         "participantListHidden": "Elenco dei partecipanti: solo per chi conduce e chi interviene.",
         "audiencePseudonyms": "Nomi del pubblico: pseudonimi.",
+        "audienceNicknames": "Chi partecipa può usare un nickname.",
         "audienceRealNames": "Nomi del pubblico: quelli reali.",
         "postEventQaHidden": "Domande dopo l'evento: non pubblicate.",
         "postEventQaTextOnly": "Domande dopo l'evento: solo il testo, senza nome.",
@@ -1960,6 +1993,8 @@
       "colCreatedAt": "Data iscrizione",
       "colEvent": "Evento",
       "colName": "Nome",
+      "colNickname": "Nickname",
+      "nicknameShown": "Agli altri compare come «{nickname}»",
       "colEmail": "Email",
       "colOrg": "Organizzazione",
       "colJoined": "Partecipato",
@@ -3971,6 +4006,7 @@
       },
       "previewInvitation": "Si iscrive solo chi è invitato; senza iscrizione non si entra.",
       "previewPseudonyms": "Il pubblico compare con uno pseudonimo",
+      "previewNicknames": "Chi partecipa può usare un nickname",
       "previewRealNames": "Il pubblico compare con il proprio nome",
       "templateReplaces": "Un modello porta le sue impostazioni al posto delle risposte qui sotto. Titolo, date e persone li scrivi nei passi seguenti.",
       "instantBack": "Crea invece un evento programmato"
@@ -4733,7 +4769,9 @@
         "label": "Il tuo nome",
         "real": "In sala, in chat e nelle domande compari con il tuo nome.",
         "pseudonym": "In sala, in chat e nelle domande compari con uno pseudonimo. Chi organizza vede i dati dell'iscrizione.",
-        "pseudonymTranscript": "Se acconsenti alla trascrizione, lì resta il tuo nome."
+        "pseudonymTranscript": "Se acconsenti alla trascrizione, lì resta il tuo nome.",
+        "nickname": "Puoi scegliere un nickname: gli altri lo vedono al posto del tuo nome. Chi organizza e chi modera sanno chi c'è dietro.",
+        "nicknameTranscript": "Se acconsenti alla trascrizione, lì compari con il nickname, se ne hai scelto uno, altrimenti con il tuo nome."
       },
       "retention": {
         "label": "Conservazione",
@@ -4773,6 +4811,7 @@
       "resultsDescription": "{count, plural, one {Trovati dati relativi a # evento.} other {Trovati dati relativi a # eventi.}}",
       "registrationData": "Dati di registrazione",
       "fieldName": "Nome",
+      "fieldNickname": "Nickname",
       "fieldEmail": "Email",
       "fieldOrganization": "Ente",
       "fieldRegisteredAt": "Data registrazione",

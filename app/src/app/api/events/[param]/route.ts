@@ -157,6 +157,7 @@ export const GET = withErrorHandling(async (request, context) => {
       recordingConsentText: event.recordingConsentText,
       audienceAnonymous: event.audienceAnonymous,
       participantListVisible: event.participantListVisible,
+      nicknamesEnabled: event.nicknamesEnabled,
       hostsAlwaysRecorded: event.hostsAlwaysRecorded,
       recordingDestination: event.recordingDestination,
       offerAddressBook: event.offerAddressBook,
@@ -441,6 +442,8 @@ export const PUT = withErrorHandling(async (request, context) => {
   // pseudonimi ai nomi (stesso posto, stesso colore in chat).
   // L'elenco dei partecipanti vale da quando la sala si monta: a sala aperta
   // cambierebbe solo per chi entra dopo.
+  // Anche i nickname: spegnerli a sala aperta toglierebbe la scelta a chi
+  // entra dopo, e accenderli la darebbe a meta' della sala.
   // Anche chi conduce sempre nella registrazione: a sala aperta chi ha gia' detto
   // no ci entrerebbe al primo rientro, e chi ha letto l'avviso ne uscirebbe.
   // Anche la destinazione, che la sala mostra nel testo della casella: il suo
@@ -450,6 +453,7 @@ export const PUT = withErrorHandling(async (request, context) => {
     'recordingEnabled',
     'audienceAnonymous',
     'participantListVisible',
+    'nicknamesEnabled',
     'hostsAlwaysRecorded',
   ] as const;
   const cambiaRegime = CAMPI_DELLA_SALA.some(
@@ -756,6 +760,7 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.recordingConsentText !== undefined && { recordingConsentText: data.recordingConsentText }),
       ...(data.audienceAnonymous !== undefined && { audienceAnonymous: data.audienceAnonymous }),
       ...(data.participantListVisible !== undefined && { participantListVisible: data.participantListVisible }),
+      ...(data.nicknamesEnabled !== undefined && { nicknamesEnabled: data.nicknamesEnabled }),
       ...(data.hostsAlwaysRecorded !== undefined && { hostsAlwaysRecorded: data.hostsAlwaysRecorded }),
       ...(data.offerAddressBook !== undefined && { offerAddressBook: data.offerAddressBook }),
       ...catalogo,

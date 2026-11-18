@@ -144,7 +144,7 @@ else. Where something depends on the organizers, it says "may".
 | **Captions** | The text of `waiting.captionsNotice` or `waiting.captionsNoticeTranscript` | `liveCaptionsEnabled`, `captionsTranscriptEnabled` |
 | **Artificial intelligence** | Summary, translation and dubbing the event asks for, what staff can still request after the event, the event report, and that outputs may be inaccurate. No row with the AI pipeline off | `aiPipelineEnabled`, the event's AI flags, **AI notice in the waiting room** |
 | **Chat and questions** | Chat messages are never published. The text of Q&A questions may be published, never the name, or the questions are not published | `chatEnabled`, `qaEnabled`, `postEventShowQA`, `recordingDestination`, `recordingAudience` |
-| **Participant list** and **Your name** | Whether the audience sees who is present, and whether people appear under their name or a pseudonym | `participantListVisible`, `audienceAnonymous` |
+| **Participant list** and **Your name** | Whether the audience sees who is present, whether people appear under their name or a pseudonym, and whether they can choose a nickname, which the organizers can match to the registration | `participantListVisible`, `audienceAnonymous`, `nicknamesEnabled` |
 | **Retention** | The days of the event's data, and how long the recording and what is made from it stay: until the organizers delete them, or that many days after the event's end, or after publication if the video is made available. Without a video, the same for the transcript | `dataRetentionDays`, `recordingDeleteAfterDays` |
 | **Address book** | The optional offer, with its months. Registration form only | `addressBookEnabled`, `offerAddressBook` |
 

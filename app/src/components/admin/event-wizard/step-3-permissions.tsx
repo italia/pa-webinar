@@ -55,6 +55,8 @@ export interface StepPermissionsValue {
   audienceAnonymous: boolean;
   /** L'elenco di chi partecipa, per il pubblico: spento di default. */
   participantListVisible: boolean;
+  /** Chi partecipa puo' usare un nickname (lib/live/nickname). */
+  nicknamesEnabled: boolean;
   /** Agenda/note live (checklist opt-in). */
   agendaEnabled: boolean;
   /** Nuvola di parole live (opt-in). */
@@ -303,6 +305,32 @@ export default function StepPermissions({
       {soloAscoltoBloccato && (
         <p className="text-secondary" style={{ fontSize: '0.85rem' }}>
           {t('participantListLocked')}
+        </p>
+      )}
+
+      {/* Il nickname per chi partecipa: acceso di partenza dove l'elenco e'
+          nascosto, si accende anche per un incontro riservato. Chi conduce
+          resta con il suo nome. */}
+      <div className="py-2 mb-3 d-flex justify-content-between align-items-start" style={{ borderBottom: '1px solid #e8e8e8' }}>
+        <div className="me-3">
+          <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
+            {t('nicknamesEnabled')}
+          </div>
+          <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
+            {t('nicknamesEnabledDesc')}
+          </div>
+        </div>
+        <ToggleSwitch
+          label=""
+          ariaLabel={t('nicknamesEnabled')}
+          checked={value.nicknamesEnabled}
+          disabled={soloAscoltoBloccato}
+          onChange={() => onChange({ nicknamesEnabled: !value.nicknamesEnabled })}
+        />
+      </div>
+      {soloAscoltoBloccato && (
+        <p className="text-secondary" style={{ fontSize: '0.85rem' }}>
+          {t('nicknamesLocked')}
         </p>
       )}
 

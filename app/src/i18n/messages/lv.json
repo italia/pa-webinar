@@ -728,6 +728,35 @@
       "title": "Jūs piedalāties bez ierakstīšanas.",
       "consent": "Piekrītu ierakstīšanai",
       "body": "Jūs neesat devis piekrišanu ierakstīšanai: jūs piedalāties kā visi, bet jūsu balss paliek ārpus ieraksta. Jūsu seja un vārds video tik un tā nekad neparādās."
+    },
+    "nickname": {
+      "reserved": "Moderators,Moderatore,Runātājs,Runātāja,Lektors,Lektore,Dalībnieks,Dalībniece,Viesis,Viešņa,Organizators,Organizatore,Administrators,Administratore",
+      "label": "Segvārds (nav obligāts)",
+      "help": "Viens vārds, 2–24 rakstzīmes: burti, cipari un . _ -. Citi to redz jūsu vārda vietā video, tērzēšanā, jautājumos un atšifrējumā.",
+      "helpName": "Ja atstāsiet tukšu, būsiet redzams ar savu vārdu.",
+      "helpAnonymous": "Ja atstāsiet tukšu, būsiet redzams ar automātisku pseidonīmu.",
+      "checking": "Pārbauda segvārdu…",
+      "shownAs": "Citi jūs redzēs kā “{nickname}”.",
+      "useSuggestion": "Izmantot “{suggestion}”",
+      "errors": {
+        "length": "Segvārdam jābūt 2–24 rakstzīmes garam.",
+        "format": "Viens vārds: sākas ar burtu un beidzas ar burtu vai ciparu; starp tiem burti, cipari un . _ -, nekad divi pēc kārtas.",
+        "scripts": "Izmantojiet tikai vienas alfabēta burtus.",
+        "reserved": "Tas satur rezervētu vārdu, piemēram, lomas nosaukumu: izvēlieties citu.",
+        "host": "Tas atgādina pasākuma vadītāja vārdu: izvēlieties citu.",
+        "taken": "Kāds pasākumā jau izmanto šo segvārdu.",
+        "disabled": "Šis pasākums nepieņem jaunus segvārdus: savu varat tikai noņemt.",
+        "rete": "Segvārdu neizdevās pārbaudīt. Mēģiniet vēlreiz."
+      },
+      "button": "Segvārds",
+      "open": "Mainīt segvārdu",
+      "dialogTitle": "Jūsu segvārds",
+      "dialogIntro": "Citi redz segvārdu jūsu vārda vietā. Lai to mainītu, telpa jūs uz brīdi pievieno no jauna.",
+      "apply": "Saglabāt un pievienoties no jauna",
+      "remove": "Noņemt segvārdu",
+      "reconnecting": "Pievienojas no jauna…",
+      "done": "Gatavs: tagad esat redzams kā “{nickname}”.",
+      "doneRemoved": "Gatavs: segvārds ir noņemts."
     }
   },
   "qa": {
@@ -1073,6 +1102,9 @@
         "participantListVisibleDesc": "Izslēgts: saraksts, režģis un vārdi laukumā paliek vadītājiem un runātājiem; auditorija redz tikai runātāju. Ieslēgts: visi redz, kas ir telpā.",
         "participantListAnonymous": "Ar anonīmu auditoriju saraksts paliek paslēpts.",
         "participantListLocked": "Kamēr telpa ir atvērta, to mainīt nevar: tie, kas jau ir iekšā, izmaiņas neredzētu.",
+        "nicknamesEnabled": "Segvārdi dalībniekiem",
+        "nicknamesEnabledDesc": "Dalībnieki var izvēlēties segvārdu: citi to redz vārda vietā video, tērzēšanā, jautājumos un atšifrējumā. Organizatori un moderatori redz, kas aiz tā slēpjas. Vadītāji paliek ar savu vārdu. Sākotnēji ieslēgts, ja dalībnieku saraksts ir paslēpts.",
+        "nicknamesLocked": "Kamēr telpa ir atvērta, to nevar mainīt: tie, kas jau ir iekšā, izvēlējās pēc iepriekšējā noteikuma.",
         "participantListCameraNote": "Kad saraksts ir paslēpts, kameru ieslēdzis cilvēks neredz savu attēlu. Tikšanās reizēm, kur visi redz cits citu, parādiet sarakstu.",
         "recordingLockedLive": "Kamēr telpa ir atvērta, ierakstīšanu mainīt nevar: tā ir spēkā no pirmās ienākšanas.",
         "hostsAlwaysRecorded": "Vadītāji vienmēr ir ierakstā",
@@ -1387,6 +1419,7 @@
         "participantListShown": "Dalībnieku saraksts: redzams visiem.",
         "participantListHidden": "Dalībnieku saraksts: tikai vadītājiem un runātājiem.",
         "audiencePseudonyms": "Auditorijas vārdi: pseidonīmi.",
+        "audienceNicknames": "Dalībnieki var izmantot segvārdu.",
         "audienceRealNames": "Auditorijas vārdi: īstie vārdi.",
         "postEventQaHidden": "Jautājumi pēc pasākuma: netiek publicēti.",
         "postEventQaTextOnly": "Jautājumi pēc pasākuma: tikai teksts, bez vārda.",
@@ -1750,6 +1783,8 @@
       "colCreatedAt": "Reģistrēts",
       "colEvent": "Pasākums",
       "colName": "Vārds",
+      "colNickname": "Segvārds",
+      "nicknameShown": "Citi redz kā “{nickname}”",
       "colEmail": "E-pasts",
       "colOrg": "Organizācija",
       "colJoined": "Piedalījies",
@@ -3761,6 +3796,7 @@
       },
       "previewInvitation": "Reģistrējas tikai uzaicinātie; bez reģistrācijas neviens netiek iekšā.",
       "previewPseudonyms": "Auditorija ir redzama ar pseidonīmu",
+      "previewNicknames": "Dalībnieki var izmantot segvārdu",
       "previewRealNames": "Auditorija ir redzama ar saviem vārdiem",
       "templateReplaces": "Veidne atnes savus iestatījumus zemāk esošo atbilžu vietā. Nosaukumu, datumus un personas ierakstāt nākamajos soļos.",
       "instantBack": "Tā vietā izveidot plānotu pasākumu"
@@ -4733,7 +4769,9 @@
         "label": "Jūsu vārds",
         "real": "Telpā, tērzēšanā un jautājumos jūs parādāties ar savu vārdu.",
         "pseudonym": "Telpā, tērzēšanā un jautājumos jūs parādāties ar pseidonīmu. Organizatori redz reģistrācijas datus.",
-        "pseudonymTranscript": "Ja piekrītat atšifrēšanai, tur paliek jūsu vārds."
+        "pseudonymTranscript": "Ja piekrītat atšifrēšanai, tur paliek jūsu vārds.",
+        "nickname": "Varat izvēlēties segvārdu: citi to redz jūsu vārda vietā. Organizatori un moderatori zina, kas aiz tā slēpjas.",
+        "nicknameTranscript": "Ja piekrītat atšifrējumam, tajā esat redzams ar segvārdu, ja to izvēlējāties, citādi ar savu vārdu."
       },
       "retention": {
         "label": "Glabāšana",
@@ -4773,6 +4811,7 @@
       "resultsDescription": "{count, plural, zero {Atrasti dati, kas saistīti ar # pasākumiem.} one {Atrasti dati, kas saistīti ar # pasākumu.} other {Atrasti dati, kas saistīti ar # pasākumiem.}}",
       "registrationData": "Reģistrācijas dati",
       "fieldName": "Vārds",
+      "fieldNickname": "Segvārds",
       "fieldEmail": "E-pasts",
       "fieldOrganization": "Organizācija",
       "fieldRegisteredAt": "Reģistrācijas datums",

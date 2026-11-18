@@ -728,6 +728,35 @@
       "title": "Tá tú rannpháirteach gan taifeadadh.",
       "consent": "Toilím leis an taifeadadh",
       "body": "Níor thoiligh tú leis an taifeadadh: glacann tú páirt cosúil le cách, ach fanann do ghuth lasmuigh den taifeadadh. Ní thaispeántar d'aghaidh ná d'ainm san fhíseán riamh ar aon nós."
+    },
+    "nickname": {
+      "reserved": "Modhnóir,Cainteoir,Rannpháirtí,Aoi,Eagraí,Riarthóir,Óstach",
+      "label": "Leasainm (roghnach)",
+      "help": "Focal amháin, 2 go 24 carachtar: litreacha, digití agus . _ -. Feiceann daoine eile é in ionad d'ainm san fhíseán, sa chomhrá, sna ceisteanna agus sa tras-scríbhinn.",
+      "helpName": "Má fhágann tú folamh é, feictear thú faoi d'ainm féin.",
+      "helpAnonymous": "Má fhágann tú folamh é, feictear thú faoi ainm cleite uathoibríoch.",
+      "checking": "An leasainm á sheiceáil…",
+      "shownAs": "Feicfidh daoine eile thú mar “{nickname}”.",
+      "useSuggestion": "Úsáid “{suggestion}”",
+      "errors": {
+        "length": "Caithfidh an leasainm a bheith idir 2 agus 24 carachtar.",
+        "format": "Focal amháin: tosaíonn sé le litir agus críochnaíonn sé le litir nó digit; eatarthu litreacha, digití agus . _ -, riamh dhá cheann i ndiaidh a chéile.",
+        "scripts": "Úsáid litreacha ó aibítir amháin.",
+        "reserved": "Tá focal forchoimeádta ann, cosúil le hainm róil: roghnaigh ceann eile.",
+        "host": "Tá sé cosúil le hainm duine atá i mbun na hócáide: roghnaigh ceann eile.",
+        "taken": "Tá an leasainm seo in úsáid cheana ag duine éigin san ócáid.",
+        "disabled": "Ní ghlacann an ócáid seo le leasainmneacha nua: ní féidir leat ach do cheann féin a bhaint.",
+        "rete": "Níorbh fhéidir an leasainm a sheiceáil. Bain triail eile as."
+      },
+      "button": "Leasainm",
+      "open": "Athraigh do leasainm",
+      "dialogTitle": "Do leasainm",
+      "dialogIntro": "Feiceann daoine eile an leasainm in ionad d'ainm. Chun é a athrú, ceanglaíonn an seomra thú arís ar feadh nóiméid.",
+      "apply": "Sábháil agus ceangail arís",
+      "remove": "Bain an leasainm",
+      "reconnecting": "Ag ceangal arís…",
+      "done": "Déanta: feictear thú anois mar “{nickname}”.",
+      "doneRemoved": "Déanta: baineadh an leasainm."
     }
   },
   "qa": {
@@ -1073,6 +1102,9 @@
         "participantListVisibleDesc": "As: fanann an liosta, an ghreille agus na hainmneacha sa chearnóg ag na hóstaigh agus na cainteoirí; ní fheiceann an lucht féachana ach an té atá ag caint. Ar: feiceann gach duine cé atá sa seomra.",
         "participantListAnonymous": "Le lucht féachana anaithnid fanann an liosta i bhfolach.",
         "participantListLocked": "Ní féidir é a athrú agus an seomra oscailte: ní fheicfeadh na daoine atá istigh an t-athrú.",
+        "nicknamesEnabled": "Leasainmneacha do rannpháirtithe",
+        "nicknamesEnabledDesc": "Is féidir le rannpháirtithe leasainm a roghnú: feiceann daoine eile é in ionad a n-ainm san fhíseán, sa chomhrá, sna ceisteanna agus sa tras-scríbhinn. Feiceann eagraithe agus modhnóirí cé atá taobh thiar de. Coinníonn na hóstaigh a n-ainm féin. Bíonn sé ar siúl ar dtús nuair atá liosta na rannpháirtithe i bhfolach.",
+        "nicknamesLocked": "Ní féidir é a athrú agus an seomra ar oscailt: roghnaigh na daoine atá istigh cheana faoin riail roimhe.",
         "participantListCameraNote": "Agus an liosta i bhfolach, ní fheiceann an té a chuireann a cheamara air a thíl féin. Le haghaidh cruinnithe ina bhfeiceann gach duine a chéile, taispeáin an liosta.",
         "recordingLockedLive": "Ní féidir an taifeadadh a athrú agus an seomra oscailte: tá sé i bhfeidhm ón gcéad iontráil.",
         "hostsAlwaysRecorded": "Bíonn na óstaigh sa taifeadadh i gcónaí",
@@ -1387,6 +1419,7 @@
         "participantListShown": "Liosta na rannpháirtithe: infheicthe do chách.",
         "participantListHidden": "Liosta na rannpháirtithe: do na hóstaigh agus na cainteoirí amháin.",
         "audiencePseudonyms": "Ainmneacha an lucht féachana: ainmneacha cleite.",
+        "audienceNicknames": "Is féidir le rannpháirtithe leasainm a úsáid.",
         "audienceRealNames": "Ainmneacha an lucht féachana: na fíorainmneacha.",
         "postEventQaHidden": "Ceisteanna tar éis an imeachta: gan foilsiú.",
         "postEventQaTextOnly": "Ceisteanna tar éis an imeachta: an téacs amháin, gan ainm.",
@@ -1750,6 +1783,8 @@
       "colCreatedAt": "Cláraithe",
       "colEvent": "Imeacht",
       "colName": "Ainm",
+      "colNickname": "Leasainm",
+      "nicknameShown": "Feiceann daoine eile é mar “{nickname}”",
       "colEmail": "Ríomhphost",
       "colOrg": "Eagraíocht",
       "colJoined": "Páirteach",
@@ -3761,6 +3796,7 @@
       },
       "previewInvitation": "Ní chláraíonn ach daoine a fuair cuireadh; gan clárú ní théann aon duine isteach.",
       "previewPseudonyms": "Taispeántar an lucht féachana faoi ainm cleite",
+      "previewNicknames": "Is féidir le rannpháirtithe leasainm a úsáid",
       "previewRealNames": "Taispeántar an lucht féachana faoina n-ainm féin",
       "templateReplaces": "Tugann teimpléad a shocruithe féin in ionad na bhfreagraí thíos. Scríobhann tú an teideal, na dátaí agus na daoine sna céimeanna eile.",
       "instantBack": "Cruthaigh ócáid sceidealta ina ionad"
@@ -4733,7 +4769,9 @@
         "label": "D'ainm",
         "real": "Sa seomra, sa chomhrá agus sna ceisteanna taispeántar thú faoi d'ainm féin.",
         "pseudonym": "Sa seomra, sa chomhrá agus sna ceisteanna taispeántar thú faoi ainm cleite. Feiceann na heagraithe do shonraí cláraithe.",
-        "pseudonymTranscript": "Má thoilíonn tú leis an tras-scríobh, fanann d'ainm sa tras-scríbhinn."
+        "pseudonymTranscript": "Má thoilíonn tú leis an tras-scríobh, fanann d'ainm sa tras-scríbhinn.",
+        "nickname": "Is féidir leat leasainm a roghnú: feiceann daoine eile é in ionad d'ainm. Tá a fhios ag eagraithe agus ag modhnóirí cé atá taobh thiar de.",
+        "nicknameTranscript": "Má thugann tú toiliú don tras-scríbhinn, feictear thú ansin faoi do leasainm má roghnaigh tú ceann, nó faoi d'ainm mura ndearna."
       },
       "retention": {
         "label": "Coinneáil",
@@ -4773,6 +4811,7 @@
       "resultsDescription": "{count, plural, one {Aimsíodh sonraí a bhaineann le # imeacht.} two {Aimsíodh sonraí a bhaineann le # imeacht.} few {Aimsíodh sonraí a bhaineann le # imeacht.} many {Aimsíodh sonraí a bhaineann le # n-imeacht.} other {Aimsíodh sonraí a bhaineann le # imeacht.}}",
       "registrationData": "Sonraí cláraithe",
       "fieldName": "Ainm",
+      "fieldNickname": "Leasainm",
       "fieldEmail": "Ríomhphost",
       "fieldOrganization": "Eagraíocht",
       "fieldRegisteredAt": "Dáta cláraithe",

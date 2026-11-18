@@ -131,6 +131,9 @@ export const eventBaseSchema = z.object({
   // L'elenco di chi partecipa, per il pubblico: senza una scelta, lo decide il
   // formato dell'evento (lib/live/participant-list).
   participantListVisible: z.boolean().optional(),
+  // Chi partecipa puo' usare un nickname (lib/live/nickname): senza una
+  // scelta, acceso dove l'elenco e' nascosto (nicknamePredefinito).
+  nicknamesEnabled: z.boolean().optional(),
   // Moderatori e relatori sempre nella registrazione, per dichiarazione di chi
   // organizza. Niente default: un aggiornamento parziale non lo azzera.
   hostsAlwaysRecorded: z.boolean().optional(),
@@ -439,6 +442,13 @@ export const jitsiTokenRequestSchema = z.object({
   moderatorToken: z.guid().optional(),
   guestName: z.string().min(2).max(100).optional(),
   displayNameOverride: z.string().min(2).max(100).optional(),
+  /** Il nickname per la visita di un ospite, o di chi apre il link di un altro
+   *  (lib/live/nickname): il server lo controlla e lo prende. Quello di chi
+   *  apre il proprio link sta sull'iscrizione, e qui non conta. */
+  nickname: z.string().min(1).max(100).optional(),
+  /** I token della sala di questa visita: se uno e' del posto che tiene gia' quel
+   *  nickname, l'ospite lo riprende anche da un'altra rete. */
+  nicknameProof: z.array(z.string().min(1).max(4096)).max(50).optional(),
   /** Consenso alla registrazione dell'evento dato ora con un clic: in sala
    *  d'attesa o dalla sala. I consensi gia' dati si riportano in `consentReplay`. */
   recordingConsent: z.boolean().optional(),

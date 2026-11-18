@@ -728,6 +728,35 @@
       "title": "Osalete ilma salvestuseta.",
       "consent": "Annan nõusoleku salvestamiseks",
       "body": "Sa ei ole andnud nõusolekut salvestamiseks: osaled nagu kõik, kuid sinu hääl jääb salvestisest välja. Sinu nägu ja nimi ei ilmu videole niikuinii kunagi."
+    },
+    "nickname": {
+      "reserved": "Moderaator,Esineja,Kõneleja,Osaleja,Külaline,Korraldaja,Administraator,Võõrustaja",
+      "label": "Hüüdnimi (valikuline)",
+      "help": "Üks sõna, 2–24 märki: tähed, numbrid ja . _ -. Teised näevad seda sinu nime asemel videos, vestluses, küsimustes ja transkriptsioonis.",
+      "helpName": "Kui jätad selle tühjaks, oled nähtav oma nimega.",
+      "helpAnonymous": "Kui jätad selle tühjaks, oled nähtav automaatse pseudonüümiga.",
+      "checking": "Hüüdnime kontrollimine…",
+      "shownAs": "Teised näevad sind kui „{nickname}“.",
+      "useSuggestion": "Kasuta „{suggestion}“",
+      "errors": {
+        "length": "Hüüdnimi peab olema 2–24 märki pikk.",
+        "format": "Üks sõna: algab tähega ja lõpeb tähe või numbriga; vahel tähed, numbrid ja . _ -, mitte kunagi kaks järjest.",
+        "scripts": "Kasuta ühe tähestiku tähti.",
+        "reserved": "See sisaldab reserveeritud sõna, näiteks rolli nime: vali mõni teine.",
+        "host": "See sarnaneb ürituse juhi nimega: vali mõni teine.",
+        "taken": "Keegi üritusel juba kasutab seda hüüdnime.",
+        "disabled": "See üritus ei võta uusi hüüdnimesid vastu: saad oma hüüdnime ainult eemaldada.",
+        "rete": "Hüüdnime ei õnnestunud kontrollida. Proovi uuesti."
+      },
+      "button": "Hüüdnimi",
+      "open": "Muuda oma hüüdnime",
+      "dialogTitle": "Sinu hüüdnimi",
+      "dialogIntro": "Teised näevad hüüdnime sinu nime asemel. Selle muutmiseks ühendab ruum sind hetkeks uuesti.",
+      "apply": "Salvesta ja ühenda uuesti",
+      "remove": "Eemalda hüüdnimi",
+      "reconnecting": "Uuesti ühendamine…",
+      "done": "Valmis: nüüd oled nähtav kui „{nickname}“.",
+      "doneRemoved": "Valmis: hüüdnimi on eemaldatud."
     }
   },
   "qa": {
@@ -1073,6 +1102,9 @@
         "participantListVisibleDesc": "Väljas: loend, ruudustik ja nimed väljakul jäävad juhtidele ja esinejatele; publik näeb ainult kõnelejat. Sees: kõik näevad, kes on ruumis.",
         "participantListAnonymous": "Anonüümse publiku korral jääb loend peidetuks.",
         "participantListLocked": "Avatud ruumiga seda muuta ei saa: juba sees olijad muudatust ei näeks.",
+        "nicknamesEnabled": "Hüüdnimed osalejatele",
+        "nicknamesEnabledDesc": "Osalejad saavad valida hüüdnime: teised näevad seda nime asemel videos, vestluses, küsimustes ja transkriptsioonis. Korraldajad ja moderaatorid näevad, kes selle taga on. Juhid jäävad oma nimega. Vaikimisi on see sees, kui osalejate nimekiri on peidetud.",
+        "nicknamesLocked": "Avatud ruumi korral seda muuta ei saa: kes on juba sees, valis eelmise reegli järgi.",
         "participantListCameraNote": "Peidetud loendi korral ei näe kaamera sisselülitaja oma pilti. Kohtumiseks, kus kõik üksteist näevad, näita loendit.",
         "recordingLockedLive": "Avatud ruumiga salvestamist muuta ei saa: see kehtib esimesest sisenemisest.",
         "hostsAlwaysRecorded": "Juhtijad on alati salvestuses",
@@ -1387,6 +1419,7 @@
         "participantListShown": "Osalejate loend: nähtav kõigile.",
         "participantListHidden": "Osalejate loend: ainult juhtidele ja esinejatele.",
         "audiencePseudonyms": "Publiku nimed: pseudonüümid.",
+        "audienceNicknames": "Osalejad saavad kasutada hüüdnime.",
         "audienceRealNames": "Publiku nimed: pärisnimed.",
         "postEventQaHidden": "Küsimused pärast üritust: ei avaldata.",
         "postEventQaTextOnly": "Küsimused pärast üritust: ainult tekst, ilma nimedeta.",
@@ -1750,6 +1783,8 @@
       "colCreatedAt": "Registreerimise kuupäev",
       "colEvent": "Sündmus",
       "colName": "Nimi",
+      "colNickname": "Hüüdnimi",
+      "nicknameShown": "Teised näevad teda kui „{nickname}“",
       "colEmail": "E-post",
       "colOrg": "Organisatsioon",
       "colJoined": "Osales",
@@ -3761,6 +3796,7 @@
       },
       "previewInvitation": "Registreeruvad ainult kutsutud; ilma registreerumiseta ei pääse sisse.",
       "previewPseudonyms": "Publik on nähtav pseudonüümiga",
+      "previewNicknames": "Osalejad saavad kasutada hüüdnime",
       "previewRealNames": "Publik on nähtav oma nimega",
       "templateReplaces": "Mall toob alltoodud vastuste asemel oma seaded. Pealkirja, kuupäevad ja inimesed kirjutad järgmistes sammudes.",
       "instantBack": "Loo selle asemel plaanitud sündmus"
@@ -4733,7 +4769,9 @@
         "label": "Sinu nimi",
         "real": "Ruumis, vestluses ja küsimustes oled nähtav oma nimega.",
         "pseudonym": "Ruumis, vestluses ja küsimustes oled nähtav pseudonüümiga. Korraldajad näevad sinu registreerumisandmeid.",
-        "pseudonymTranscript": "Kui nõustud transkribeerimisega, jääb sinu nimi transkriptsiooni."
+        "pseudonymTranscript": "Kui nõustud transkribeerimisega, jääb sinu nimi transkriptsiooni.",
+        "nickname": "Saad valida hüüdnime: teised näevad seda sinu nime asemel. Korraldajad ja moderaatorid teavad, kes selle taga on.",
+        "nicknameTranscript": "Kui nõustud transkriptsiooniga, oled seal nähtav oma hüüdnimega, kui oled selle valinud, muidu oma nimega."
       },
       "retention": {
         "label": "Säilitamine",
@@ -4773,6 +4811,7 @@
       "resultsDescription": "{count, plural, one {Leiti andmeid # ürituse kohta.} other {Leiti andmeid # ürituse kohta.}}",
       "registrationData": "Registreerimisandmed",
       "fieldName": "Nimi",
+      "fieldNickname": "Hüüdnimi",
       "fieldEmail": "E-post",
       "fieldOrganization": "Organisatsioon",
       "fieldRegisteredAt": "Registreerimise kuupäev",

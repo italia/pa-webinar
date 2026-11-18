@@ -40,6 +40,7 @@ interface SerializedTemplate {
   postEventShowQA: boolean;
   offerAddressBook: boolean;
   audienceAnonymous: boolean;
+  nicknamesEnabled: boolean;
   hostsAlwaysRecorded: boolean;
   recordingDestination: Destinazione;
   waitingRoomEngine: 'GARDEN' | 'GAME' | 'CLASSIC' | null;
@@ -91,6 +92,7 @@ interface EditingTemplate {
   postEventShowQA: boolean;
   offerAddressBook: boolean;
   audienceAnonymous: boolean;
+  nicknamesEnabled: boolean;
   hostsAlwaysRecorded: boolean;
   /** Null: la sceglie chi crea l'evento. */
   recordingDestination: Destinazione;
@@ -138,6 +140,7 @@ const DEFAULT_NEW: EditingTemplate = {
   postEventShowQA: true,
   offerAddressBook: true,
   audienceAnonymous: false,
+  nicknamesEnabled: false,
   hostsAlwaysRecorded: false,
   recordingDestination: null,
   waitingRoomEngine: null,
@@ -198,6 +201,7 @@ export default function TemplateManagement({
       postEventShowQA: tpl.postEventShowQA,
       offerAddressBook: tpl.offerAddressBook,
       audienceAnonymous: tpl.audienceAnonymous,
+      nicknamesEnabled: tpl.nicknamesEnabled,
       hostsAlwaysRecorded: tpl.hostsAlwaysRecorded,
       recordingDestination: tpl.recordingDestination,
       waitingRoomEngine: tpl.waitingRoomEngine,
@@ -689,6 +693,9 @@ function TemplateForm({
             ['postEventShowQA', tPost('showQA')],
             ['offerAddressBook', t('offerAddressBook')],
             ['audienceAnonymous', tw('audienceAnonymous')],
+            // Acceso qui, il nickname si propone anche dove l'elenco si vede;
+            // dove e' nascosto lo e' comunque, di partenza.
+            ['nicknamesEnabled', tw('nicknamesEnabled')],
             // Chi conduce e' sempre nel video (lib/live/consent-rule): non e'
             // piu' una scelta, e il modello non la propone.
           ] as const

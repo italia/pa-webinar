@@ -98,6 +98,7 @@ export default async function EventManagePage({
         select: {
           id: true,
           displayName: true,
+          nickname: true,
           organization: true,
           organizationRole: true,
           organizationType: true,
@@ -251,6 +252,8 @@ export default async function EventManagePage({
     registrations: event.registrations.map((r) => ({
       id: r.id,
       displayName: tryDecryptPII(r.displayName) ?? r.displayName,
+      // Chi organizza vede chi c'e' dietro un nickname (lib/live/nickname).
+      nickname: tryDecryptPII(r.nickname),
       organization: r.organization,
       organizationRole: r.organizationRole,
       organizationType: r.organizationType,

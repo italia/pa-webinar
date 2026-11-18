@@ -728,6 +728,35 @@
       "title": "Participi fără înregistrare.",
       "consent": "Îmi dau consimțământul pentru înregistrare",
       "body": "Nu ți-ai dat consimțământul pentru înregistrare: participi ca toți ceilalți, dar vocea ta rămâne în afara înregistrării. Fața și numele tău nu apar oricum niciodată în videoclip."
+    },
+    "nickname": {
+      "reserved": "Moderator,Moderatoare,Vorbitor,Vorbitoare,Participant,Participantă,Invitat,Invitată,Organizator,Organizatoare,Administrator,Administratoare,Gazdă",
+      "label": "Poreclă (opțional)",
+      "help": "Un singur cuvânt, între 2 și 24 de caractere: litere, cifre și . _ -. Ceilalți o văd în locul numelui tău în video, în chat, la întrebări și în transcriere.",
+      "helpName": "Dacă o lași necompletată, apari cu numele tău.",
+      "helpAnonymous": "Dacă o lași necompletată, apari cu un pseudonim automat.",
+      "checking": "Se verifică porecla…",
+      "shownAs": "Ceilalți te vor vedea ca „{nickname}”.",
+      "useSuggestion": "Folosește „{suggestion}”",
+      "errors": {
+        "length": "Porecla trebuie să aibă între 2 și 24 de caractere.",
+        "format": "Un singur cuvânt: începe cu o literă și se termină cu o literă sau o cifră; între ele litere, cifre și . _ -, niciodată două la rând.",
+        "scripts": "Folosește literele unui singur alfabet.",
+        "reserved": "Conține un cuvânt rezervat, cum ar fi numele unui rol: alege alta.",
+        "host": "Seamănă cu numele cuiva care conduce evenimentul: alege alta.",
+        "taken": "Cineva din eveniment folosește deja această poreclă.",
+        "disabled": "Acest eveniment nu acceptă porecle noi: o poți doar elimina pe a ta.",
+        "rete": "Porecla nu a putut fi verificată. Încearcă din nou."
+      },
+      "button": "Poreclă",
+      "open": "Schimbă-ți porecla",
+      "dialogTitle": "Porecla ta",
+      "dialogIntro": "Ceilalți văd porecla în locul numelui tău. Pentru a o schimba, sala te reconectează pentru o clipă.",
+      "apply": "Salvează și reconectează-te",
+      "remove": "Elimină porecla",
+      "reconnecting": "Reconectare…",
+      "done": "Gata: acum apari ca „{nickname}”.",
+      "doneRemoved": "Gata: porecla a fost eliminată."
     }
   },
   "qa": {
@@ -1073,6 +1102,9 @@
         "participantListVisibleDesc": "Dezactivat: lista, grila și numele din piață rămân la moderatori și vorbitori; publicul vede doar cine vorbește. Activat: toată lumea vede cine este în sală.",
         "participantListAnonymous": "Cu public anonim, lista rămâne ascunsă.",
         "participantListLocked": "Nu se poate schimba cu sala deschisă: cei deja înăuntru nu ar vedea modificarea.",
+        "nicknamesEnabled": "Porecle pentru participanți",
+        "nicknamesEnabledDesc": "Participanții pot alege o poreclă: ceilalți o văd în locul numelui în video, în chat, la întrebări și în transcriere. Organizatorii și moderatorii văd cine se află în spatele ei. Cei care conduc rămân cu numele propriu. Implicit este activat acolo unde lista participanților este ascunsă.",
+        "nicknamesLocked": "Nu se poate schimba cât timp sala este deschisă: cine este deja înăuntru a ales după regula anterioară.",
         "participantListCameraNote": "Cu lista ascunsă, cine pornește camera nu își vede propria imagine. Pentru o întâlnire în care toți se văd, afișează lista.",
         "recordingLockedLive": "Cu sala deschisă înregistrarea nu se schimbă: e valabilă de la prima intrare.",
         "hostsAlwaysRecorded": "Cine conduce este mereu în înregistrare",
@@ -1387,6 +1419,7 @@
         "participantListShown": "Lista participanților: vizibilă pentru toți.",
         "participantListHidden": "Lista participanților: doar pentru moderatori și vorbitori.",
         "audiencePseudonyms": "Numele publicului: pseudonime.",
+        "audienceNicknames": "Participanții pot folosi o poreclă.",
         "audienceRealNames": "Numele publicului: cele reale.",
         "postEventQaHidden": "Întrebări după eveniment: nepublicate.",
         "postEventQaTextOnly": "Întrebări după eveniment: doar textul, fără nume.",
@@ -1750,6 +1783,8 @@
       "colCreatedAt": "Data înscrierii",
       "colEvent": "Eveniment",
       "colName": "Nume",
+      "colNickname": "Poreclă",
+      "nicknameShown": "Ceilalți îl văd ca „{nickname}”",
       "colEmail": "E-mail",
       "colOrg": "Organizație",
       "colJoined": "Au participat",
@@ -3761,6 +3796,7 @@
       },
       "previewInvitation": "Se înscriu doar cei invitați; fără înscriere nu se intră.",
       "previewPseudonyms": "Publicul apare cu un pseudonim",
+      "previewNicknames": "Participanții pot folosi o poreclă",
       "previewRealNames": "Publicul apare cu numele propriu",
       "templateReplaces": "Un șablon aduce propriile setări în locul răspunsurilor de mai jos. Titlul, datele și persoanele le scrii în pașii următori.",
       "instantBack": "Creează în schimb un eveniment programat"
@@ -4733,7 +4769,9 @@
         "label": "Numele tău",
         "real": "În sală, în chat și la întrebări apari cu numele tău.",
         "pseudonym": "În sală, în chat și la întrebări apari cu un pseudonim. Organizatorii văd datele înscrierii.",
-        "pseudonymTranscript": "Dacă îți dai consimțământul la transcriere, acolo rămâne numele tău."
+        "pseudonymTranscript": "Dacă îți dai consimțământul la transcriere, acolo rămâne numele tău.",
+        "nickname": "Poți alege o poreclă: ceilalți o văd în locul numelui tău. Organizatorii și moderatorii știu cine se află în spatele ei.",
+        "nicknameTranscript": "Dacă îți dai acordul pentru transcriere, acolo apari cu porecla, dacă ai ales una, altfel cu numele tău."
       },
       "retention": {
         "label": "Păstrare",
@@ -4773,6 +4811,7 @@
       "resultsDescription": "{count, plural, one {S-au găsit date referitoare la # eveniment.} few {S-au găsit date referitoare la # evenimente.} other {S-au găsit date referitoare la # de evenimente.}}",
       "registrationData": "Date de înregistrare",
       "fieldName": "Nume",
+      "fieldNickname": "Poreclă",
       "fieldEmail": "E-mail",
       "fieldOrganization": "Instituție",
       "fieldRegisteredAt": "Data înregistrării",

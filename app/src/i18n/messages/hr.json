@@ -728,6 +728,35 @@
       "title": "Sudjelujete bez snimanja.",
       "consent": "Dajem privolu za snimanje",
       "body": "Niste dali pristanak za snimanje: sudjelujete kao i svi, ali vaš glas ostaje izvan snimke. Vaše lice i vaše ime ionako se nikada ne pojavljuju u videozapisu."
+    },
+    "nickname": {
+      "reserved": "Moderator,Moderatorica,Govornik,Govornica,Predavač,Predavačica,Sudionik,Sudionica,Gost,Gošća,Organizator,Organizatorica,Administrator,Administratorica,Domaćin",
+      "label": "Nadimak (neobavezno)",
+      "help": "Jedna riječ, od 2 do 24 znaka: slova, brojke i . _ -. Drugi ga vide umjesto vašeg imena u videu, u chatu, u pitanjima i u transkriptu.",
+      "helpName": "Ako ga ostavite praznim, prikazujete se svojim imenom.",
+      "helpAnonymous": "Ako ga ostavite praznim, prikazujete se automatskim pseudonimom.",
+      "checking": "Provjera nadimka…",
+      "shownAs": "Drugi će vas vidjeti kao „{nickname}”.",
+      "useSuggestion": "Upotrijebi „{suggestion}”",
+      "errors": {
+        "length": "Nadimak mora imati od 2 do 24 znaka.",
+        "format": "Jedna riječ: počinje slovom i završava slovom ili brojkom; između slova, brojke i . _ -, nikad dva zaredom.",
+        "scripts": "Upotrijebite slova samo jednog pisma.",
+        "reserved": "Sadrži rezerviranu riječ, poput naziva uloge: odaberite drugi.",
+        "host": "Nalikuje imenu nekoga tko vodi događaj: odaberite drugi.",
+        "taken": "Netko na događaju već koristi ovaj nadimak.",
+        "disabled": "Ovaj događaj ne prihvaća nove nadimke: svoj možete samo ukloniti.",
+        "rete": "Nadimak nije moguće provjeriti. Pokušajte ponovno."
+      },
+      "button": "Nadimak",
+      "open": "Promijenite nadimak",
+      "dialogTitle": "Vaš nadimak",
+      "dialogIntro": "Drugi vide nadimak umjesto vašeg imena. Za promjenu vas soba na trenutak ponovno povezuje.",
+      "apply": "Spremi i ponovno se poveži",
+      "remove": "Ukloni nadimak",
+      "reconnecting": "Ponovno povezivanje…",
+      "done": "Gotovo: sada se prikazujete kao „{nickname}”.",
+      "doneRemoved": "Gotovo: nadimak je uklonjen."
     }
   },
   "qa": {
@@ -1073,6 +1102,9 @@
         "participantListVisibleDesc": "Isključeno: popis, mreža i imena na trgu ostaju voditeljima i govornicima; publika vidi samo onoga tko govori. Uključeno: svi vide tko je u dvorani.",
         "participantListAnonymous": "Uz anonimnu publiku popis ostaje skriven.",
         "participantListLocked": "Dok je dvorana otvorena ne može se mijenjati: oni koji su već unutra ne bi vidjeli promjenu.",
+        "nicknamesEnabled": "Nadimci za sudionike",
+        "nicknamesEnabledDesc": "Sudionici mogu odabrati nadimak: drugi ga vide umjesto imena u videu, u chatu, u pitanjima i u transkriptu. Organizatori i moderatori vide tko se iza njega krije. Voditelji ostaju sa svojim imenom. Prema zadanim postavkama uključeno je ondje gdje je popis sudionika skriven.",
+        "nicknamesLocked": "Ne može se mijenjati dok je soba otvorena: tko je već unutra, birao je prema prethodnom pravilu.",
         "participantListCameraNote": "Kad je popis skriven, onaj tko uključi kameru ne vidi vlastiti prozor. Za sastanak na kojem se svi vide, prikažite popis.",
         "recordingLockedLive": "Dok je dvorana otvorena snimanje se ne može mijenjati: vrijedi od prvog ulaska.",
         "hostsAlwaysRecorded": "Voditelji su uvijek u snimci",
@@ -1387,6 +1419,7 @@
         "participantListShown": "Popis sudionika: vidljiv svima.",
         "participantListHidden": "Popis sudionika: samo za voditelje i govornike.",
         "audiencePseudonyms": "Imena publike: pseudonimi.",
+        "audienceNicknames": "Sudionici mogu koristiti nadimak.",
         "audienceRealNames": "Imena publike: stvarna imena.",
         "postEventQaHidden": "Pitanja nakon događaja: ne objavljuju se.",
         "postEventQaTextOnly": "Pitanja nakon događaja: samo tekst, bez imena.",
@@ -1750,6 +1783,8 @@
       "colCreatedAt": "Datum prijave",
       "colEvent": "Događaj",
       "colName": "Ime",
+      "colNickname": "Nadimak",
+      "nicknameShown": "Drugima se prikazuje kao „{nickname}”",
       "colEmail": "E-pošta",
       "colOrg": "Organizacija",
       "colJoined": "Sudjelovao",
@@ -3761,6 +3796,7 @@
       },
       "previewInvitation": "Prijavljuju se samo pozvani; bez prijave se ne ulazi.",
       "previewPseudonyms": "Publika se prikazuje pod pseudonimom",
+      "previewNicknames": "Sudionici mogu koristiti nadimak",
       "previewRealNames": "Publika se prikazuje pod vlastitim imenom",
       "templateReplaces": "Predložak donosi svoje postavke umjesto odgovora ispod. Naslov, datume i osobe upisujete u sljedećim koracima.",
       "instantBack": "Umjesto toga stvori zakazani događaj"
@@ -4733,7 +4769,9 @@
         "label": "Vaše ime",
         "real": "U dvorani, chatu i pitanjima prikazujete se pod svojim imenom.",
         "pseudonym": "U dvorani, chatu i pitanjima prikazujete se pod pseudonimom. Organizatori vide podatke o vašoj prijavi.",
-        "pseudonymTranscript": "Ako date privolu za transkripciju, u transkriptu ostaje vaše ime."
+        "pseudonymTranscript": "Ako date privolu za transkripciju, u transkriptu ostaje vaše ime.",
+        "nickname": "Možete odabrati nadimak: drugi ga vide umjesto vašeg imena. Organizatori i moderatori znaju tko se iza njega krije.",
+        "nicknameTranscript": "Ako pristanete na transkript, u njemu se prikazujete nadimkom ako ste ga odabrali, a inače svojim imenom."
       },
       "retention": {
         "label": "Čuvanje",
@@ -4773,6 +4811,7 @@
       "resultsDescription": "{count, plural, one {Pronađeni podaci vezani uz # događaj.} few {Pronađeni podaci vezani uz # događaja.} other {Pronađeni podaci vezani uz # događaja.}}",
       "registrationData": "Podaci o prijavi",
       "fieldName": "Ime",
+      "fieldNickname": "Nadimak",
       "fieldEmail": "E-pošta",
       "fieldOrganization": "Ustanova",
       "fieldRegisteredAt": "Datum prijave",

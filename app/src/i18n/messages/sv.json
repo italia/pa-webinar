@@ -728,6 +728,35 @@
       "title": "Du deltar utan inspelning.",
       "consent": "Jag samtycker till inspelningen",
       "body": "Du har inte samtyckt till inspelningen: du deltar som alla andra, men din röst står utanför inspelningen. Ditt ansikte och ditt namn syns ändå aldrig i videon."
+    },
+    "nickname": {
+      "reserved": "Moderator,Talare,Föreläsare,Deltagare,Gäst,Arrangör,Organisatör,Administratör,Värd",
+      "label": "Smeknamn (valfritt)",
+      "help": "Ett ord, 2 till 24 tecken: bokstäver, siffror och . _ -. De andra ser det i stället för ditt namn i videon, i chatten, bland frågorna och i transkriptionen.",
+      "helpName": "Om du lämnar det tomt visas du med ditt namn.",
+      "helpAnonymous": "Om du lämnar det tomt visas du med en automatisk pseudonym.",
+      "checking": "Smeknamnet kontrolleras…",
+      "shownAs": "De andra kommer att se dig som ”{nickname}”.",
+      "useSuggestion": "Använd ”{suggestion}”",
+      "errors": {
+        "length": "Smeknamnet måste vara 2 till 24 tecken långt.",
+        "format": "Ett ord: det börjar med en bokstav och slutar med en bokstav eller siffra; däremellan bokstäver, siffror och . _ -, aldrig två i rad.",
+        "scripts": "Använd bokstäver från ett enda alfabet.",
+        "reserved": "Det innehåller ett reserverat ord, till exempel namnet på en roll: välj ett annat.",
+        "host": "Det liknar namnet på någon som leder evenemanget: välj ett annat.",
+        "taken": "Någon i evenemanget använder redan det här smeknamnet.",
+        "disabled": "Det här evenemanget tar inte emot nya smeknamn: du kan bara ta bort ditt.",
+        "rete": "Smeknamnet kunde inte kontrolleras. Försök igen."
+      },
+      "button": "Smeknamn",
+      "open": "Ändra ditt smeknamn",
+      "dialogTitle": "Ditt smeknamn",
+      "dialogIntro": "De andra ser smeknamnet i stället för ditt namn. För att ändra det ansluter rummet dig på nytt en kort stund.",
+      "apply": "Spara och anslut igen",
+      "remove": "Ta bort smeknamnet",
+      "reconnecting": "Ansluter igen…",
+      "done": "Klart: du visas nu som ”{nickname}”.",
+      "doneRemoved": "Klart: smeknamnet har tagits bort."
     }
   },
   "qa": {
@@ -1073,6 +1102,9 @@
         "participantListVisibleDesc": "Av: listan, rutnätet och namnen på torget stannar hos värdar och talare; publiken ser bara den som talar. På: alla ser vilka som är i rummet.",
         "participantListAnonymous": "Med anonym publik förblir listan dold.",
         "participantListLocked": "Kan inte ändras när rummet är öppet: de som redan är inne skulle inte se ändringen.",
+        "nicknamesEnabled": "Smeknamn för deltagare",
+        "nicknamesEnabledDesc": "Deltagarna kan välja ett smeknamn: de andra ser det i stället för namnet i videon, i chatten, bland frågorna och i transkriptionen. Arrangörer och moderatorer ser vem som står bakom. Den som leder behåller sitt eget namn. Från början påslaget där deltagarlistan är dold.",
+        "nicknamesLocked": "Det går inte att ändra medan rummet är öppet: de som redan är inne valde enligt den tidigare regeln.",
         "participantListCameraNote": "Med dold lista ser den som slår på kameran inte sin egen ruta. Visa listan vid ett möte där alla ser varandra.",
         "recordingLockedLive": "Inspelning kan inte ändras när rummet är öppet: den gäller från första inträdet.",
         "hostsAlwaysRecorded": "De som leder finns alltid med i inspelningen",
@@ -1387,6 +1419,7 @@
         "participantListShown": "Deltagarlista: synlig för alla.",
         "participantListHidden": "Deltagarlista: endast för värdar och talare.",
         "audiencePseudonyms": "Publikens namn: pseudonymer.",
+        "audienceNicknames": "Deltagarna kan använda ett smeknamn.",
         "audienceRealNames": "Publikens namn: de riktiga namnen.",
         "postEventQaHidden": "Frågor efter evenemanget: publiceras inte.",
         "postEventQaTextOnly": "Frågor efter evenemanget: endast texten, utan namn.",
@@ -1750,6 +1783,8 @@
       "colCreatedAt": "Anmäld",
       "colEvent": "Evenemang",
       "colName": "Namn",
+      "colNickname": "Smeknamn",
+      "nicknameShown": "De andra ser personen som ”{nickname}”",
       "colEmail": "E-post",
       "colOrg": "Organisation",
       "colJoined": "Deltagit",
@@ -3761,6 +3796,7 @@
       },
       "previewInvitation": "Bara inbjudna anmäler sig; utan anmälan kommer ingen in.",
       "previewPseudonyms": "Publiken visas under en pseudonym",
+      "previewNicknames": "Deltagarna kan använda ett smeknamn",
       "previewRealNames": "Publiken visas med sina egna namn",
       "templateReplaces": "En mall tar med sina egna inställningar i stället för svaren nedan. Titel, datum och personer fyller du i de följande stegen.",
       "instantBack": "Skapa ett schemalagt evenemang i stället"
@@ -4733,7 +4769,9 @@
         "label": "Ditt namn",
         "real": "I rummet, i chatten och i frågorna visas du med ditt namn.",
         "pseudonym": "I rummet, i chatten och i frågorna visas du under en pseudonym. Arrangörerna ser uppgifterna från din anmälan.",
-        "pseudonymTranscript": "Om du samtycker till transkriptionen står ditt namn kvar där."
+        "pseudonymTranscript": "Om du samtycker till transkriptionen står ditt namn kvar där.",
+        "nickname": "Du kan välja ett smeknamn: de andra ser det i stället för ditt namn. Arrangörer och moderatorer vet vem som står bakom.",
+        "nicknameTranscript": "Om du samtycker till transkriptionen visas du där med ditt smeknamn om du har valt ett, annars med ditt namn."
       },
       "retention": {
         "label": "Lagring",
@@ -4773,6 +4811,7 @@
       "resultsDescription": "{count, plural, one {Uppgifter hittades för # evenemang.} other {Uppgifter hittades för # evenemang.}}",
       "registrationData": "Anmälningsuppgifter",
       "fieldName": "Namn",
+      "fieldNickname": "Smeknamn",
       "fieldEmail": "E-post",
       "fieldOrganization": "Organisation",
       "fieldRegisteredAt": "Anmälningsdatum",
