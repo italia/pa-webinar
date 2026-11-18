@@ -21,6 +21,7 @@ import {
 } from 'design-react-kit';
 
 import RecordingRemoval, { type RimozioneVista } from '@/components/privacy/recording-removal';
+import RegistrationEdit, { type DatiCorretti } from '@/components/privacy/registration-edit';
 import RegistrationConsents, {
   type ConsensiVista,
   type OffertaVista,
@@ -195,6 +196,26 @@ export default function MyDataPage() {
       cancelled = true;
     };
   }, [token, t]);
+
+  // Una correzione si vede subito: sull'iscrizione, o su tutte quelle
+  // dell'indirizzo e sulla voce di rubrica.
+  const corretta = useCallback((registrationId: string, dati: DatiCorretti) => {
+    const nuovi = { displayName: dati.displayName, organization: dati.organization };
+    setResults((prima) =>
+      prima
+        ? prima.map((e) =>
+            dati.scope === 'address' || e.registration.id === registrationId
+              ? { ...e, registration: { ...e.registration, ...nuovi } }
+              : e
+          )
+        : prima
+    );
+    if (dati.scope === 'address') {
+      setRubrica((prima) =>
+        prima?.optedIn ? { ...prima, name: dati.displayName, organization: dati.organization } : prima
+      );
+    }
+  }, []);
 
   const handleSubmit = useCallback(
     async (e: FormEvent) => {
@@ -491,9 +512,9 @@ export default function MyDataPage() {
                 {t('resultsDescription', { count: results.length })}
               </p>
 
-              {results.map((entry, idx) => (
+              {results.map((entry) => (
                 <Card
-                  key={idx}
+                  key={entry.registration.id}
                   className="shadow-sm border-0 mb-3"
                   style={{ borderRadius: 8, border: '1px solid #e8e8e8' }}
                 >
@@ -526,6 +547,18 @@ export default function MyDataPage() {
                         {new Date(entry.registration.consentTimestamp).toLocaleString()}
                       </dd>
                     </dl>
+
+                    {tokenConsensi && (
+                      <RegistrationEdit
+                        token={tokenConsensi}
+                        registrationId={entry.registration.id}
+                        displayName={entry.registration.displayName}
+                        organization={entry.registration.organization}
+                        quanteIscrizioni={results.length}
+                        locale={locale}
+                        onCorretta={(dati) => corretta(entry.registration.id, dati)}
+                      />
+                    )}
 
                     {tokenConsensi && (
                       <RegistrationConsents

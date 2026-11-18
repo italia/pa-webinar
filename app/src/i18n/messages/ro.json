@@ -1674,6 +1674,7 @@
         "DATA_DELETED": "Date șterse",
         "CONSENT_RECORDED": "Consimțământ înregistrat",
         "DATA_EXPORTED": "Date exportate",
+        "DATA_RECTIFIED": "Date corectate",
         "CONSENT_WITHDRAWN": "Consimțământ retras",
         "RECORDING_CONTENT_READ": "Conținutul înregistrării citit de personal",
         "RECORDING_REDACTION_REQUESTED": "Eliminare dintr-o înregistrare solicitată",
@@ -2137,6 +2138,7 @@
         "DATA_DELETED": "Date șterse",
         "CONSENT_RECORDED": "Consimțământ înregistrat",
         "DATA_EXPORTED": "Date exportate",
+        "DATA_RECTIFIED": "Date corectate",
         "CONSENT_WITHDRAWN": "Consimțământ retras",
         "RECORDING_CONTENT_READ": "Conținutul înregistrării citit de personal"
       }
@@ -4262,7 +4264,17 @@
     "addressBookNote": "Sunteți în agenda de evenimente, pentru a fi invitat la evenimente similare: vă puteți retrage consimțământul în orice moment.",
     "addressBookPendingNote": "La această înscriere a fost bifată caseta agendei de evenimente, dar această adresă nu mai primea invitații. Dacă cererea vă aparține, o puteți confirma din pagina cu datele dumneavoastră, folosind linkul de mai jos. Dacă nu vă aparține, ignorați acest mesaj: rămâneți în afara agendei și nu primiți invitații.",
     "addressBookOptOutLink": "Elimină-mi datele din agendă",
-    "myDataLink": "Datele tale: vizualizare, corectare, retragerea unui consimțământ sau anularea înscrierii"
+    "myDataLink": "Datele tale: vizualizare, corectare, retragerea unui consimțământ sau anularea înscrierii",
+    "confirmationCode": {
+      "subject": "{site}: cod de confirmare",
+      "heading": "Codul tău de confirmare",
+      "introEdit": "Ai cerut corectarea numelui și a instituției din înscrierea ta la „{event}”.",
+      "introEditAll": "Ai cerut corectarea numelui și a instituției în toate înscrierile tale.",
+      "introCancel": "Ai cerut ștergerea înscrierii tale la „{event}”.",
+      "codeLabel": "Codul este:",
+      "instructions": "Scrie-l în pagina Datele mele de pe care ai făcut cererea. Este valabil {minutes, plural, one {# minut} few {# minute} other {# de minute}}.",
+      "ignore": "Dacă nu tu ai făcut cererea, ignoră acest e-mail: fără cod nu se schimbă nimic. Nu da codul nimănui."
+    }
   },
   "home": {
     "hero": {
@@ -4798,7 +4810,21 @@
       "removalError": "Cererea nu a putut fi trimisă. Reîncercați mai târziu.",
       "removalStatusOpen": "Cererea din {date}: în curs de soluționare.",
       "removalStatusClosed": "Cererea din {date}: finalizată pe {closed}.",
-      "removalStatusRejected": "Cererea din {date}: respinsă. Scrieți operatorului de date pentru a afla motivul."
+      "removalStatusRejected": "Cererea din {date}: respinsă. Scrieți operatorului de date pentru a afla motivul.",
+      "editButton": "Corectează numele și instituția",
+      "editScopeLegend": "Căror înscrieri li se aplică",
+      "editScopeOne": "Doar această înscriere",
+      "editScopeAll": "Toate înscrierile mele ({count}) și agenda de evenimente",
+      "editEffect": "Corectura se aplică următoarelor e-mailuri și de la următoarea ta intrare în sală. Nu schimbă ce a fost deja înregistrat, transcris sau scris în chat, nici dovezile consimțămintelor.",
+      "editNameInvalid": "Numele trebuie să aibă între 2 și 100 de caractere.",
+      "editOrganizationRequired": "Un eveniment la care ești înscris cere instituția: câmpul nu poate rămâne gol.",
+      "editDone": "Datele au fost corectate.",
+      "codeWhy": "Din motive de securitate, corecturile și ștergerile se confirmă cu un cod pe care îl trimitem la adresa de e-mail a înscrierii.",
+      "codeSend": "Trimite-mi codul de confirmare",
+      "codeSent": "Ți-am trimis pe e-mail un cod de 6 cifre. Scrie-l aici: este valabil {minutes, plural, one {# minut} few {# minute} other {# de minute}}.",
+      "codeLabel": "Cod de confirmare",
+      "codeConfirmEdit": "Confirmă corectura",
+      "codeInvalid": "Codul nu este corect sau a expirat. Verifică ultimul e-mail primit sau anulează și cere unul nou."
     },
     "erasure": {
       "title": "Ștergerea datelor dumneavoastră",

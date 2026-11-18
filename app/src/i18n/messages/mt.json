@@ -1674,6 +1674,7 @@
         "DATA_DELETED": "Data imħassrin",
         "CONSENT_RECORDED": "Kunsens reġistrat",
         "DATA_EXPORTED": "Data esportati",
+        "DATA_RECTIFIED": "Dejta kkoreġuta",
         "CONSENT_WITHDRAWN": "Kunsens irtirat",
         "RECORDING_CONTENT_READ": "Kontenut tar-reġistrazzjoni moqri mill-persunal",
         "RECORDING_REDACTION_REQUESTED": "Intalbet tneħħija minn reġistrazzjoni",
@@ -2137,6 +2138,7 @@
         "DATA_DELETED": "Dejta mħassra",
         "CONSENT_RECORDED": "Kunsens irreġistrat",
         "DATA_EXPORTED": "Dejta esportata",
+        "DATA_RECTIFIED": "Dejta kkoreġuta",
         "CONSENT_WITHDRAWN": "Kunsens irtirat",
         "RECORDING_CONTENT_READ": "Kontenut tar-reġistrazzjoni moqri mill-persunal"
       }
@@ -4262,7 +4264,17 @@
     "addressBookNote": "Int fid-direttorju tal-avvenimenti, biex tiġi mistieden għal avvenimenti simili: tista' tirtira l-kunsens fi kwalunkwe ħin.",
     "addressBookPendingNote": "F'din ir-reġistrazzjoni ġiet immarkata l-kaxxa tad-direttorju tal-avvenimenti, iżda dan l-indirizz kien waqaf jirċievi stediniet. Jekk it-talba hija tiegħek, tista' tikkonfermaha mill-paġna tad-dejta tiegħek, bil-link hawn taħt. Jekk mhix tiegħek, injora dan il-messaġġ: tibqa' barra mid-direttorju u ma tirċievix stediniet.",
     "addressBookOptOutLink": "Neħħi d-dejta tiegħi mid-direttorju",
-    "myDataLink": "Id-data tiegħek: araha, ikkoreġiha, irtira kunsens jew ikkanċella r-reġistrazzjoni"
+    "myDataLink": "Id-data tiegħek: araha, ikkoreġiha, irtira kunsens jew ikkanċella r-reġistrazzjoni",
+    "confirmationCode": {
+      "subject": "{site}: kodiċi ta' konferma",
+      "heading": "Il-kodiċi ta' konferma tiegħek",
+      "introEdit": "Tlabt li jiġu kkoreġuti l-isem u l-entità tar-reġistrazzjoni tiegħek għal “{event}”.",
+      "introEditAll": "Tlabt li jiġu kkoreġuti l-isem u l-entità tar-reġistrazzjonijiet kollha tiegħek.",
+      "introCancel": "Tlabt li titħassar ir-reġistrazzjoni tiegħek għal “{event}”.",
+      "codeLabel": "Il-kodiċi huwa:",
+      "instructions": "Iktbu fil-paġna Id-dejta tiegħi minn fejn għamilt it-talba. Jibqa' validu għal {minutes, plural, one {# minuta} few {# minuti} other {# minuta}}.",
+      "ignore": "Jekk ma għamiltx int it-talba, injora din l-email: mingħajr il-kodiċi ma jinbidel xejn. Tagħti l-kodiċi lil ħadd."
+    }
   },
   "home": {
     "hero": {
@@ -4798,7 +4810,21 @@
       "removalError": "It-talba ma setgħetx tintbagħat. Erġa’ pprova aktar tard.",
       "removalStatusOpen": "Talba tal-{date}: qed tiġi pproċessata.",
       "removalStatusClosed": "Talba tal-{date}: imlestija fil-{closed}.",
-      "removalStatusRejected": "Talba tal-{date}: miċħuda. Ikteb lill-kontrollur biex issir taf ir-raġuni."
+      "removalStatusRejected": "Talba tal-{date}: miċħuda. Ikteb lill-kontrollur biex issir taf ir-raġuni.",
+      "editButton": "Ikkoreġi l-isem u l-entità",
+      "editScopeLegend": "Għal liema reġistrazzjonijiet tapplika",
+      "editScopeOne": "Din ir-reġistrazzjoni biss",
+      "editScopeAll": "Ir-reġistrazzjonijiet kollha tiegħi ({count}) u d-direttorju tal-avvenimenti",
+      "editEffect": "Il-korrezzjoni tgħodd għall-emails li jmiss u mid-dħul li jmiss tiegħek fis-sala. Ma tbiddilx dak li diġà ġie rreġistrat, traskritt jew miktub fiċ-chat, u lanqas il-provi tal-kunsensi.",
+      "editNameInvalid": "L-isem irid ikollu bejn 2 u 100 karattru.",
+      "editOrganizationRequired": "Avveniment li inti rreġistrat għalih jitlob l-entità: ma tistax titħalla vojta.",
+      "editDone": "Id-dejta ġiet ikkoreġuta.",
+      "codeWhy": "Għas-sigurtà, il-korrezzjonijiet u t-tħassir jiġu kkonfermati b'kodiċi li nibagħtu fl-indirizz tal-email tar-reġistrazzjoni.",
+      "codeSend": "Ibagħtli l-kodiċi ta' konferma",
+      "codeSent": "Bgħatnielek kodiċi ta' 6 ċifri bl-email. Iktbu hawn: jibqa' validu għal {minutes, plural, one {# minuta} few {# minuti} other {# minuta}}.",
+      "codeLabel": "Kodiċi ta' konferma",
+      "codeConfirmEdit": "Ikkonferma l-korrezzjoni",
+      "codeInvalid": "Il-kodiċi mhuwiex korrett jew skada. Iċċekkja l-aħħar email li rċevejt, jew ikkanċella u itlob wieħed ġdid."
     },
     "erasure": {
       "title": "Tħassir tad-dejta tiegħek",

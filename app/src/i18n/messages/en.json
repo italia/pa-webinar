@@ -1674,6 +1674,7 @@
         "DATA_DELETED": "Data deleted",
         "CONSENT_RECORDED": "Consent recorded",
         "DATA_EXPORTED": "Data exported",
+        "DATA_RECTIFIED": "Data corrected",
         "CONSENT_WITHDRAWN": "Consent withdrawn",
         "RECORDING_CONTENT_READ": "Recording content read by staff",
         "RECORDING_REDACTION_REQUESTED": "Removal from a recording requested",
@@ -2137,6 +2138,7 @@
         "DATA_DELETED": "Data deleted",
         "CONSENT_RECORDED": "Consent recorded",
         "DATA_EXPORTED": "Data exported",
+        "DATA_RECTIFIED": "Data corrected",
         "CONSENT_WITHDRAWN": "Consent withdrawn",
         "RECORDING_CONTENT_READ": "Recording content read by staff"
       }
@@ -4262,7 +4264,17 @@
     "addressBookNote": "You are in the events address book, to be invited to similar events: you can withdraw your consent at any time.",
     "addressBookPendingNote": "The events address book box was ticked on this registration, but this address had stopped receiving invitations. If the request is yours, you can confirm it from the page with your data, using the link below. If it is not, ignore this message: you stay out of the address book and receive no invitations.",
     "addressBookOptOutLink": "Remove me from the address book",
-    "myDataLink": "Your data: see it, correct it, withdraw a consent or cancel your registration"
+    "myDataLink": "Your data: see it, correct it, withdraw a consent or cancel your registration",
+    "confirmationCode": {
+      "subject": "{site}: confirmation code",
+      "heading": "Your confirmation code",
+      "introEdit": "You asked to correct the name and organisation of your registration for “{event}”.",
+      "introEditAll": "You asked to correct the name and organisation of all your registrations.",
+      "introCancel": "You asked to delete your registration for “{event}”.",
+      "codeLabel": "The code is:",
+      "instructions": "Enter it on the My data page you made the request from. It is valid for {minutes, plural, one {# minute} other {# minutes}}.",
+      "ignore": "If you did not make the request, ignore this email: nothing changes without the code. Do not share the code with anyone."
+    }
   },
   "home": {
     "hero": {
@@ -4798,7 +4810,21 @@
       "removalError": "The request could not be sent. Try again later.",
       "removalStatusOpen": "Request of {date}: being processed.",
       "removalStatusClosed": "Request of {date}: completed on {closed}.",
-      "removalStatusRejected": "Request of {date}: rejected. Write to the controller to learn why."
+      "removalStatusRejected": "Request of {date}: rejected. Write to the controller to learn why.",
+      "editButton": "Correct name and organisation",
+      "editScopeLegend": "Which registrations it applies to",
+      "editScopeOne": "Only this registration",
+      "editScopeAll": "All my registrations ({count}) and the events address book",
+      "editEffect": "The correction applies to the next emails and from your next entry into the room. It does not change what has already been recorded, transcribed or written in the chat, nor the consent proofs.",
+      "editNameInvalid": "The name must have between 2 and 100 characters.",
+      "editOrganizationRequired": "An event you are registered for asks for the organisation: it cannot be left empty.",
+      "editDone": "Data corrected.",
+      "codeWhy": "For security, corrections and deletions are confirmed with a code we send to the email address of the registration.",
+      "codeSend": "Send me the confirmation code",
+      "codeSent": "We have emailed you a 6-digit code. Enter it here: it is valid for {minutes, plural, one {# minute} other {# minutes}}.",
+      "codeLabel": "Confirmation code",
+      "codeConfirmEdit": "Confirm the correction",
+      "codeInvalid": "The code is wrong or has expired. Check the latest email you received, or cancel and ask for a new one."
     },
     "erasure": {
       "title": "Erase your data",

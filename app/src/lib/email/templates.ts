@@ -324,7 +324,8 @@ function eventBanner(url: string | null | undefined, alt: string): string {
 `;
 }
 
-function layout(
+/** L'impaginazione comune delle email: `heading` e `body` sono gia' HTML sicuro. */
+export function layout(
   heading: string,
   body: string,
   footerText: string,

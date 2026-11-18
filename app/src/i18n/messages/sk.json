@@ -1674,6 +1674,7 @@
         "DATA_DELETED": "Údaje vymazané",
         "CONSENT_RECORDED": "Súhlas zaznamenaný",
         "DATA_EXPORTED": "Údaje exportované",
+        "DATA_RECTIFIED": "Opravené údaje",
         "CONSENT_WITHDRAWN": "Súhlas odvolaný",
         "RECORDING_CONTENT_READ": "Obsah záznamu prečítaný personálom",
         "RECORDING_REDACTION_REQUESTED": "Požiadané o odstránenie zo záznamu",
@@ -2137,6 +2138,7 @@
         "DATA_DELETED": "Údaje zmazané",
         "CONSENT_RECORDED": "Súhlas zaznamenaný",
         "DATA_EXPORTED": "Údaje exportované",
+        "DATA_RECTIFIED": "Opravené údaje",
         "CONSENT_WITHDRAWN": "Súhlas odvolaný",
         "RECORDING_CONTENT_READ": "Obsah záznamu prečítaný personálom"
       }
@@ -4262,7 +4264,17 @@
     "addressBookNote": "Ste v adresári podujatí, aby ste boli pozývaní na podobné podujatia: súhlas môžete kedykoľvek odvolať.",
     "addressBookPendingNote": "Pri tejto registrácii bolo začiarknuté políčko adresára podujatí, ale táto adresa prestala dostávať pozvánky. Ak je žiadosť vaša, môžete ju potvrdiť na stránke so svojimi údajmi pomocou odkazu nižšie. Ak nie je vaša, túto správu ignorujte: zostanete mimo adresára a pozvánky dostávať nebudete.",
     "addressBookOptOutLink": "Odstrániť moje údaje z adresára",
-    "myDataLink": "Vaše údaje: zobraziť, opraviť, odvolať súhlas alebo zrušiť registráciu"
+    "myDataLink": "Vaše údaje: zobraziť, opraviť, odvolať súhlas alebo zrušiť registráciu",
+    "confirmationCode": {
+      "subject": "{site}: potvrdzovací kód",
+      "heading": "Váš potvrdzovací kód",
+      "introEdit": "Požiadali ste o opravu mena a organizácie vo svojej registrácii na „{event}“.",
+      "introEditAll": "Požiadali ste o opravu mena a organizácie vo všetkých svojich registráciách.",
+      "introCancel": "Požiadali ste o vymazanie svojej registrácie na „{event}“.",
+      "codeLabel": "Kód je:",
+      "instructions": "Zadajte ho na stránke Moje údaje, z ktorej ste žiadosť odoslali. Platí {minutes, plural, one {# minúta} few {# minúty} other {# minút}}.",
+      "ignore": "Ak ste žiadosť neodoslali vy, tento e-mail ignorujte: bez kódu sa nič nezmení. Kód nikomu neprezrádzajte."
+    }
   },
   "home": {
     "hero": {
@@ -4798,7 +4810,21 @@
       "removalError": "Žiadosť sa nepodarilo odoslať. Skúste to neskôr.",
       "removalStatusOpen": "Žiadosť zo dňa {date}: vybavuje sa.",
       "removalStatusClosed": "Žiadosť zo dňa {date}: vybavená {closed}.",
-      "removalStatusRejected": "Žiadosť zo dňa {date}: zamietnutá. Napíšte prevádzkovateľovi, aby ste sa dozvedeli dôvod."
+      "removalStatusRejected": "Žiadosť zo dňa {date}: zamietnutá. Napíšte prevádzkovateľovi, aby ste sa dozvedeli dôvod.",
+      "editButton": "Opraviť meno a organizáciu",
+      "editScopeLegend": "Na ktoré registrácie sa vzťahuje",
+      "editScopeOne": "Iba táto registrácia",
+      "editScopeAll": "Všetky moje registrácie ({count}) a adresár podujatí",
+      "editEffect": "Oprava platí pre ďalšie e-maily a od vášho ďalšieho vstupu do miestnosti. Nemení to, čo už bolo zaznamenané, prepísané alebo napísané v chate, ani doklady o súhlase.",
+      "editNameInvalid": "Meno musí mať 2 až 100 znakov.",
+      "editOrganizationRequired": "Podujatie, na ktoré ste registrovaní, vyžaduje organizáciu: pole nemôže zostať prázdne.",
+      "editDone": "Údaje boli opravené.",
+      "codeWhy": "Z bezpečnostných dôvodov sa opravy a vymazania potvrdzujú kódom, ktorý pošleme na e-mailovú adresu registrácie.",
+      "codeSend": "Pošlite mi potvrdzovací kód",
+      "codeSent": "Poslali sme vám e-mailom šesťmiestny kód. Zadajte ho sem: platí {minutes, plural, one {# minúta} few {# minúty} other {# minút}}.",
+      "codeLabel": "Potvrdzovací kód",
+      "codeConfirmEdit": "Potvrdiť opravu",
+      "codeInvalid": "Kód nie je správny alebo jeho platnosť vypršala. Skontrolujte posledný prijatý e-mail, alebo akciu zrušte a požiadajte o nový."
     },
     "erasure": {
       "title": "Vymazanie vašich údajov",

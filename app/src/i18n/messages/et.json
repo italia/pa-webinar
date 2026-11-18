@@ -1674,6 +1674,7 @@
         "DATA_DELETED": "Andmed kustutatud",
         "CONSENT_RECORDED": "Nõusolek registreeritud",
         "DATA_EXPORTED": "Andmed eksporditud",
+        "DATA_RECTIFIED": "Andmed parandatud",
         "CONSENT_WITHDRAWN": "Nõusolek tagasi võetud",
         "RECORDING_CONTENT_READ": "Töötajate loetud salvestise sisu",
         "RECORDING_REDACTION_REQUESTED": "Taotletud eemaldamist salvestisest",
@@ -2137,6 +2138,7 @@
         "DATA_DELETED": "Andmed kustutatud",
         "CONSENT_RECORDED": "Nõusolek registreeritud",
         "DATA_EXPORTED": "Andmed eksporditud",
+        "DATA_RECTIFIED": "Andmed parandatud",
         "CONSENT_WITHDRAWN": "Nõusolek tagasi võetud",
         "RECORDING_CONTENT_READ": "Töötajate loetud salvestise sisu"
       }
@@ -4262,7 +4264,17 @@
     "addressBookNote": "Oled ürituste aadressraamatus, et sind kutsutaks sarnastele üritustele: saad nõusoleku igal ajal tagasi võtta.",
     "addressBookPendingNote": "Selle registreerumise juures märgiti ürituste aadressraamatu lahter, kuid see aadress oli lakanud kutseid saamast. Kui taotlus on sinu, saad selle kinnitada oma andmete lehel allpool oleva lingi kaudu. Kui see pole sinu, jäta see sõnum tähelepanuta: jääd aadressraamatust välja ega saa kutseid.",
     "addressBookOptOutLink": "Eemalda minu andmed aadressraamatust",
-    "myDataLink": "Teie andmed: vaadake, parandage, võtke nõusolek tagasi või tühistage registreerimine"
+    "myDataLink": "Teie andmed: vaadake, parandage, võtke nõusolek tagasi või tühistage registreerimine",
+    "confirmationCode": {
+      "subject": "{site}: kinnituskood",
+      "heading": "Teie kinnituskood",
+      "introEdit": "Palusite parandada oma registreerumise nime ja organisatsiooni üritusele „{event}“.",
+      "introEditAll": "Palusite parandada nime ja organisatsiooni kõigis oma registreerumistes.",
+      "introCancel": "Palusite kustutada oma registreerumise üritusele „{event}“.",
+      "codeLabel": "Kood on:",
+      "instructions": "Sisestage see lehel „Minu andmed“, kust taotluse esitasite. See kehtib {minutes, plural, one {# minut} other {# minutit}}.",
+      "ignore": "Kui te taotlust ei esitanud, eirake seda e-kirja: ilma koodita ei muutu midagi. Ärge jagage koodi kellegagi."
+    }
   },
   "home": {
     "hero": {
@@ -4798,7 +4810,21 @@
       "removalError": "Taotlust ei õnnestunud saata. Proovige hiljem uuesti.",
       "removalStatusOpen": "{date} esitatud taotlus: menetluses.",
       "removalStatusClosed": "{date} esitatud taotlus: lõpetatud {closed}.",
-      "removalStatusRejected": "{date} esitatud taotlus: tagasi lükatud. Põhjuse teadasaamiseks kirjutage vastutavale töötlejale."
+      "removalStatusRejected": "{date} esitatud taotlus: tagasi lükatud. Põhjuse teadasaamiseks kirjutage vastutavale töötlejale.",
+      "editButton": "Paranda nimi ja organisatsioon",
+      "editScopeLegend": "Milliste registreerumiste kohta see kehtib",
+      "editScopeOne": "Ainult see registreerumine",
+      "editScopeAll": "Kõik minu registreerumised ({count}) ja ürituste aadressraamat",
+      "editEffect": "Parandus kehtib järgmiste e-kirjade puhul ja järgmisest ruumi sisenemisest. See ei muuda juba salvestatut, transkribeeritut ega vestlusesse kirjutatut ega nõusolekute tõendeid.",
+      "editNameInvalid": "Nimes peab olema 2 kuni 100 märki.",
+      "editOrganizationRequired": "Üritus, kuhu olete registreerunud, nõuab organisatsiooni: välja ei saa tühjaks jätta.",
+      "editDone": "Andmed on parandatud.",
+      "codeWhy": "Turvalisuse huvides kinnitatakse parandused ja kustutamised koodiga, mille saadame registreerumise e-posti aadressile.",
+      "codeSend": "Saada mulle kinnituskood",
+      "codeSent": "Saatsime teile e-postiga 6-kohalise koodi. Sisestage see siia: see kehtib {minutes, plural, one {# minut} other {# minutit}}.",
+      "codeLabel": "Kinnituskood",
+      "codeConfirmEdit": "Kinnita parandus",
+      "codeInvalid": "Kood on vale või aegunud. Kontrollige viimast saadud e-kirja või tühistage ja küsige uus."
     },
     "erasure": {
       "title": "Teie andmete kustutamine",

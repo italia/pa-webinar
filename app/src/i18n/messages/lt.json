@@ -1674,6 +1674,7 @@
         "DATA_DELETED": "Duomenys pašalinti",
         "CONSENT_RECORDED": "Sutikimas užregistruotas",
         "DATA_EXPORTED": "Duomenys eksportuoti",
+        "DATA_RECTIFIED": "Duomenys pataisyti",
         "CONSENT_WITHDRAWN": "Sutikimas atšauktas",
         "RECORDING_CONTENT_READ": "Įrašo turinį perskaitė darbuotojai",
         "RECORDING_REDACTION_REQUESTED": "Paprašyta pašalinti iš įrašo",
@@ -2137,6 +2138,7 @@
         "DATA_DELETED": "Duomenys ištrinti",
         "CONSENT_RECORDED": "Sutikimas užregistruotas",
         "DATA_EXPORTED": "Duomenys eksportuoti",
+        "DATA_RECTIFIED": "Duomenys pataisyti",
         "CONSENT_WITHDRAWN": "Sutikimas atšauktas",
         "RECORDING_CONTENT_READ": "Įrašo turinį perskaitė darbuotojai"
       }
@@ -4262,7 +4264,17 @@
     "addressBookNote": "Esate renginių adresų knygoje, kad būtumėte kviečiami į panašius renginius: sutikimą galite atšaukti bet kada.",
     "addressBookPendingNote": "Šioje registracijoje buvo pažymėtas renginių adresų knygos langelis, tačiau šis adresas nebegaudavo kvietimų. Jei prašymas jūsų, galite jį patvirtinti savo duomenų puslapyje, pasinaudoję toliau pateikta nuoroda. Jei ne jūsų, nekreipkite dėmesio į šį pranešimą: liksite už adresų knygos ribų ir kvietimų negausite.",
     "addressBookOptOutLink": "Pašalinti mano duomenis iš adresų knygos",
-    "myDataLink": "Jūsų duomenys: peržiūrėti, ištaisyti, atšaukti sutikimą arba atšaukti registraciją"
+    "myDataLink": "Jūsų duomenys: peržiūrėti, ištaisyti, atšaukti sutikimą arba atšaukti registraciją",
+    "confirmationCode": {
+      "subject": "{site}: patvirtinimo kodas",
+      "heading": "Jūsų patvirtinimo kodas",
+      "introEdit": "Paprašėte pataisyti vardą ir organizaciją savo registracijoje į „{event}“.",
+      "introEditAll": "Paprašėte pataisyti vardą ir organizaciją visose savo registracijose.",
+      "introCancel": "Paprašėte ištrinti savo registraciją į „{event}“.",
+      "codeLabel": "Kodas:",
+      "instructions": "Įveskite jį puslapyje „Mano duomenys“, iš kurio pateikėte prašymą. Jis galioja {minutes, plural, one {# minutė} few {# minutės} other {# minučių}}.",
+      "ignore": "Jei prašymo neteikėte, nekreipkite dėmesio į šį laišką: be kodo niekas nepasikeis. Niekam neatskleiskite kodo."
+    }
   },
   "home": {
     "hero": {
@@ -4798,7 +4810,21 @@
       "removalError": "Prašymo nepavyko išsiųsti. Bandykite vėliau.",
       "removalStatusOpen": "{date} prašymas: nagrinėjamas.",
       "removalStatusClosed": "{date} prašymas: įvykdytas {closed}.",
-      "removalStatusRejected": "{date} prašymas: atmestas. Norėdami sužinoti priežastį, parašykite duomenų valdytojui."
+      "removalStatusRejected": "{date} prašymas: atmestas. Norėdami sužinoti priežastį, parašykite duomenų valdytojui.",
+      "editButton": "Taisyti vardą ir organizaciją",
+      "editScopeLegend": "Kurioms registracijoms taikoma",
+      "editScopeOne": "Tik ši registracija",
+      "editScopeAll": "Visos mano registracijos ({count}) ir renginių adresų knyga",
+      "editEffect": "Pataisymas galioja kitiems el. laiškams ir nuo kito jūsų įėjimo į salę. Jis nekeičia to, kas jau įrašyta, transkribuota ar parašyta pokalbyje, ir sutikimų įrodymų.",
+      "editNameInvalid": "Vardas turi būti nuo 2 iki 100 simbolių.",
+      "editOrganizationRequired": "Renginys, į kurį esate užsiregistravę, prašo organizacijos: lauko negalima palikti tuščio.",
+      "editDone": "Duomenys pataisyti.",
+      "codeWhy": "Saugumo sumetimais pataisymai ir ištrynimai patvirtinami kodu, kurį siunčiame registracijos el. pašto adresu.",
+      "codeSend": "Atsiųskite man patvirtinimo kodą",
+      "codeSent": "El. paštu atsiuntėme jums 6 skaitmenų kodą. Įveskite jį čia: jis galioja {minutes, plural, one {# minutė} few {# minutės} other {# minučių}}.",
+      "codeLabel": "Patvirtinimo kodas",
+      "codeConfirmEdit": "Patvirtinti pataisymą",
+      "codeInvalid": "Kodas neteisingas arba nebegalioja. Patikrinkite paskutinį gautą el. laišką arba atšaukite ir paprašykite naujo."
     },
     "erasure": {
       "title": "Jūsų duomenų ištrynimas",

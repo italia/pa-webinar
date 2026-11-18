@@ -1674,6 +1674,7 @@
         "DATA_DELETED": "Data raderad",
         "CONSENT_RECORDED": "Samtycke registrerat",
         "DATA_EXPORTED": "Data exporterad",
+        "DATA_RECTIFIED": "Uppgifter rättade",
         "CONSENT_WITHDRAWN": "Samtycke återkallat",
         "RECORDING_CONTENT_READ": "Inspelningens innehåll läst av personal",
         "RECORDING_REDACTION_REQUESTED": "Borttagning ur en inspelning begärd",
@@ -2137,6 +2138,7 @@
         "DATA_DELETED": "Data raderad",
         "CONSENT_RECORDED": "Samtycke registrerat",
         "DATA_EXPORTED": "Data exporterad",
+        "DATA_RECTIFIED": "Uppgifter rättade",
         "CONSENT_WITHDRAWN": "Samtycke återkallat",
         "RECORDING_CONTENT_READ": "Inspelningens innehåll läst av personal"
       }
@@ -4262,7 +4264,17 @@
     "addressBookNote": "Du finns i evenemangsadressboken för att bjudas in till liknande evenemang: du kan när som helst återkalla ditt samtycke.",
     "addressBookPendingNote": "Rutan för evenemangsadressboken kryssades i på den här anmälan, men den här adressen hade slutat ta emot inbjudningar. Om begäran är din kan du bekräfta den på sidan med dina uppgifter, via länken nedan. Om den inte är din kan du bortse från det här meddelandet: du stannar utanför adressboken och får inga inbjudningar.",
     "addressBookOptOutLink": "Ta bort mina uppgifter från adressboken",
-    "myDataLink": "Dina uppgifter: se dem, rätta dem, återkalla ett samtycke eller avbryt anmälan"
+    "myDataLink": "Dina uppgifter: se dem, rätta dem, återkalla ett samtycke eller avbryt anmälan",
+    "confirmationCode": {
+      "subject": "{site}: bekräftelsekod",
+      "heading": "Din bekräftelsekod",
+      "introEdit": "Du har bett om att rätta namn och organisation i din anmälan till ”{event}”.",
+      "introEditAll": "Du har bett om att rätta namn och organisation i alla dina anmälningar.",
+      "introCancel": "Du har bett om att radera din anmälan till ”{event}”.",
+      "codeLabel": "Koden är:",
+      "instructions": "Skriv den på sidan Mina uppgifter där du gjorde begäran. Den gäller i {minutes, plural, one {# minut} other {# minuter}}.",
+      "ignore": "Om det inte var du som gjorde begäran kan du strunta i det här meddelandet: utan koden ändras ingenting. Dela inte koden med någon."
+    }
   },
   "home": {
     "hero": {
@@ -4798,7 +4810,21 @@
       "removalError": "Begäran kunde inte skickas. Försök igen senare.",
       "removalStatusOpen": "Begäran från {date}: under behandling.",
       "removalStatusClosed": "Begäran från {date}: slutförd {closed}.",
-      "removalStatusRejected": "Begäran från {date}: avslagen. Skriv till den personuppgiftsansvarige för att få veta varför."
+      "removalStatusRejected": "Begäran från {date}: avslagen. Skriv till den personuppgiftsansvarige för att få veta varför.",
+      "editButton": "Rätta namn och organisation",
+      "editScopeLegend": "Vilka anmälningar det gäller",
+      "editScopeOne": "Endast den här anmälan",
+      "editScopeAll": "Alla mina anmälningar ({count}) och evenemangsadressboken",
+      "editEffect": "Rättelsen gäller för nästa e-postmeddelanden och från ditt nästa inträde i rummet. Den ändrar inte det som redan har spelats in, transkriberats eller skrivits i chatten, och inte heller bevisen på samtycke.",
+      "editNameInvalid": "Namnet måste ha mellan 2 och 100 tecken.",
+      "editOrganizationRequired": "Ett evenemang som du är anmäld till kräver organisationen: fältet får inte lämnas tomt.",
+      "editDone": "Uppgifterna har rättats.",
+      "codeWhy": "Av säkerhetsskäl bekräftas rättelser och raderingar med en kod som vi skickar till anmälans e-postadress.",
+      "codeSend": "Skicka bekräftelsekoden till mig",
+      "codeSent": "Vi har mejlat dig en sexsiffrig kod. Skriv den här: den gäller i {minutes, plural, one {# minut} other {# minuter}}.",
+      "codeLabel": "Bekräftelsekod",
+      "codeConfirmEdit": "Bekräfta rättelsen",
+      "codeInvalid": "Koden är fel eller har gått ut. Kontrollera det senaste e-postmeddelandet du fått, eller avbryt och be om en ny."
     },
     "erasure": {
       "title": "Radering av dina uppgifter",

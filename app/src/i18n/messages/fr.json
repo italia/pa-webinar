@@ -1674,6 +1674,7 @@
         "DATA_DELETED": "Données supprimées",
         "CONSENT_RECORDED": "Consentement enregistré",
         "DATA_EXPORTED": "Données exportées",
+        "DATA_RECTIFIED": "Données corrigées",
         "CONSENT_WITHDRAWN": "Consentement retiré",
         "RECORDING_CONTENT_READ": "Contenu de l’enregistrement lu par le personnel",
         "RECORDING_REDACTION_REQUESTED": "Retrait d'un enregistrement demandé",
@@ -2137,6 +2138,7 @@
         "DATA_DELETED": "Données supprimées",
         "CONSENT_RECORDED": "Consentement enregistré",
         "DATA_EXPORTED": "Données exportées",
+        "DATA_RECTIFIED": "Données corrigées",
         "CONSENT_WITHDRAWN": "Consentement retiré",
         "RECORDING_CONTENT_READ": "Contenu de l’enregistrement lu par le personnel"
       }
@@ -4262,7 +4264,17 @@
     "addressBookNote": "Vous êtes dans le carnet d’adresses des événements, pour être invité à des événements similaires : vous pouvez retirer votre consentement à tout moment.",
     "addressBookPendingNote": "La case du carnet d’adresses des événements a été cochée sur cette inscription, mais cette adresse ne recevait plus d’invitations. Si la demande vient de vous, vous pouvez la confirmer depuis la page de vos données, avec le lien ci-dessous. Sinon, ignorez ce message : vous restez hors du carnet d’adresses et ne recevez pas d’invitations.",
     "addressBookOptOutLink": "Supprimer mes données du carnet d’adresses",
-    "myDataLink": "Vos données : les consulter, les corriger, retirer un consentement ou annuler l’inscription"
+    "myDataLink": "Vos données : les consulter, les corriger, retirer un consentement ou annuler l’inscription",
+    "confirmationCode": {
+      "subject": "{site} : code de confirmation",
+      "heading": "Votre code de confirmation",
+      "introEdit": "Vous avez demandé à corriger le nom et l'organisme de votre inscription à « {event} ».",
+      "introEditAll": "Vous avez demandé à corriger le nom et l'organisme de toutes vos inscriptions.",
+      "introCancel": "Vous avez demandé à supprimer votre inscription à « {event} ».",
+      "codeLabel": "Le code est :",
+      "instructions": "Saisissez-le sur la page Mes données depuis laquelle vous avez fait la demande. Il est valable {minutes, plural, one {# minute} other {# minutes}}.",
+      "ignore": "Si vous n'êtes pas à l'origine de la demande, ignorez cet e-mail : sans le code, rien ne change. Ne communiquez le code à personne."
+    }
   },
   "home": {
     "hero": {
@@ -4798,7 +4810,21 @@
       "removalError": "La demande n'a pas pu être envoyée. Réessayez plus tard.",
       "removalStatusOpen": "Demande du {date} : en cours de traitement.",
       "removalStatusClosed": "Demande du {date} : traitée le {closed}.",
-      "removalStatusRejected": "Demande du {date} : rejetée. Écrivez au responsable du traitement pour en connaître le motif."
+      "removalStatusRejected": "Demande du {date} : rejetée. Écrivez au responsable du traitement pour en connaître le motif.",
+      "editButton": "Corriger le nom et l'organisme",
+      "editScopeLegend": "À quelles inscriptions elle s'applique",
+      "editScopeOne": "Uniquement cette inscription",
+      "editScopeAll": "Toutes mes inscriptions ({count}) et le carnet d'adresses des événements",
+      "editEffect": "La correction vaut pour les prochains e-mails et à partir de votre prochaine entrée dans la salle. Elle ne change pas ce qui a déjà été enregistré, transcrit ou écrit dans le chat, ni les preuves de consentement.",
+      "editNameInvalid": "Le nom doit comporter entre 2 et 100 caractères.",
+      "editOrganizationRequired": "Un événement auquel vous êtes inscrit demande l'organisme : le champ ne peut pas rester vide.",
+      "editDone": "Données corrigées.",
+      "codeWhy": "Par sécurité, les corrections et les suppressions se confirment avec un code que nous envoyons à l'adresse e-mail de l'inscription.",
+      "codeSend": "M'envoyer le code de confirmation",
+      "codeSent": "Nous vous avons envoyé par e-mail un code à 6 chiffres. Saisissez-le ici : il est valable {minutes, plural, one {# minute} other {# minutes}}.",
+      "codeLabel": "Code de confirmation",
+      "codeConfirmEdit": "Confirmer la correction",
+      "codeInvalid": "Le code est incorrect ou a expiré. Vérifiez le dernier e-mail reçu, ou annulez et demandez-en un nouveau."
     },
     "erasure": {
       "title": "Effacement de vos données",

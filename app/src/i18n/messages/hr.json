@@ -1674,6 +1674,7 @@
         "DATA_DELETED": "Podaci izbrisani",
         "CONSENT_RECORDED": "Privola zabilježena",
         "DATA_EXPORTED": "Podaci izvezeni",
+        "DATA_RECTIFIED": "Podaci ispravljeni",
         "CONSENT_WITHDRAWN": "Privola povučena",
         "RECORDING_CONTENT_READ": "Sadržaj snimke koji je pročitalo osoblje",
         "RECORDING_REDACTION_REQUESTED": "Zatraženo uklanjanje iz snimke",
@@ -2137,6 +2138,7 @@
         "DATA_DELETED": "Podaci obrisani",
         "CONSENT_RECORDED": "Pristanak zabilježen",
         "DATA_EXPORTED": "Podaci izvezeni",
+        "DATA_RECTIFIED": "Podaci ispravljeni",
         "CONSENT_WITHDRAWN": "Privola povučena",
         "RECORDING_CONTENT_READ": "Sadržaj snimke koji je pročitalo osoblje"
       }
@@ -4262,7 +4264,17 @@
     "addressBookNote": "Nalazite se u imeniku događaja kako biste bili pozivani na slične događaje: privolu možete povući u bilo kojem trenutku.",
     "addressBookPendingNote": "Na ovoj prijavi označeno je polje imenika događaja, ali ova je adresa prestala primati pozivnice. Ako je zahtjev vaš, možete ga potvrditi na stranici sa svojim podacima, putem poveznice u nastavku. Ako nije vaš, zanemarite ovu poruku: ostajete izvan imenika i ne primate pozivnice.",
     "addressBookOptOutLink": "Ukloni moje podatke iz imenika",
-    "myDataLink": "Vaši podaci: pregled, ispravak, povlačenje privole ili otkazivanje prijave"
+    "myDataLink": "Vaši podaci: pregled, ispravak, povlačenje privole ili otkazivanje prijave",
+    "confirmationCode": {
+      "subject": "{site}: kod za potvrdu",
+      "heading": "Vaš kod za potvrdu",
+      "introEdit": "Zatražili ste ispravak imena i ustanove u svojoj prijavi za „{event}”.",
+      "introEditAll": "Zatražili ste ispravak imena i ustanove u svim svojim prijavama.",
+      "introCancel": "Zatražili ste brisanje svoje prijave za „{event}”.",
+      "codeLabel": "Kod je:",
+      "instructions": "Upišite ga na stranici Moji podaci s koje ste poslali zahtjev. Vrijedi {minutes, plural, one {# minuta} few {# minute} other {# minuta}}.",
+      "ignore": "Ako niste vi poslali zahtjev, zanemarite ovu e-poruku: bez koda se ništa ne mijenja. Ne dijelite kod ni s kim."
+    }
   },
   "home": {
     "hero": {
@@ -4798,7 +4810,21 @@
       "removalError": "Zahtjev nije bilo moguće poslati. Pokušajte ponovno kasnije.",
       "removalStatusOpen": "Zahtjev od {date}: u obradi.",
       "removalStatusClosed": "Zahtjev od {date}: dovršen {closed}.",
-      "removalStatusRejected": "Zahtjev od {date}: odbijen. Pišite voditelju obrade da biste saznali razlog."
+      "removalStatusRejected": "Zahtjev od {date}: odbijen. Pišite voditelju obrade da biste saznali razlog.",
+      "editButton": "Ispravi ime i ustanovu",
+      "editScopeLegend": "Na koje se prijave odnosi",
+      "editScopeOne": "Samo ova prijava",
+      "editScopeAll": "Sve moje prijave ({count}) i imenik događaja",
+      "editEffect": "Ispravak vrijedi za sljedeće e-poruke i od vašeg sljedećeg ulaska u dvoranu. Ne mijenja ono što je već snimljeno, transkribirano ili napisano u chatu, niti dokaze o privolama.",
+      "editNameInvalid": "Ime mora imati od 2 do 100 znakova.",
+      "editOrganizationRequired": "Događaj na koji ste prijavljeni traži ustanovu: polje ne može ostati prazno.",
+      "editDone": "Podaci su ispravljeni.",
+      "codeWhy": "Radi sigurnosti, ispravci i brisanja potvrđuju se kodom koji šaljemo na adresu e-pošte prijave.",
+      "codeSend": "Pošaljite mi kod za potvrdu",
+      "codeSent": "E-poštom smo vam poslali šesteroznamenkasti kod. Upišite ga ovdje: vrijedi {minutes, plural, one {# minuta} few {# minute} other {# minuta}}.",
+      "codeLabel": "Kod za potvrdu",
+      "codeConfirmEdit": "Potvrdi ispravak",
+      "codeInvalid": "Kod nije točan ili je istekao. Provjerite posljednju primljenu e-poruku ili odustanite i zatražite novi."
     },
     "erasure": {
       "title": "Brisanje vaših podataka",

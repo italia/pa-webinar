@@ -4,7 +4,8 @@
 /**
  * La pagina dei propri dati sul database vero: un consenso dato di nuovo dopo un
  * ritiro, con la stessa prova di quello dato in sala, e solo finche' l'evento lo
- * chiede.
+ * chiede; la correzione di nome ed ente, confermata con il codice mandato
+ * all'indirizzo.
  */
 import { randomUUID } from 'node:crypto';
 
@@ -13,7 +14,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { POST as chiediToken } from '@/app/api/events/[param]/jitsi/token/route';
 import { POST as consensi } from '@/app/api/gdpr/consents/route';
-import { encryptPII, hashEmail } from '@/lib/crypto/pii';
+import { POST as correggi } from '@/app/api/gdpr/registrations/edit/route';
+import { decryptPII, encryptPII, hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { eventAccessCookieName, signEventAccess } from '@/lib/event-session';
 import { leggiRigheProve, postoDaIMieiDati } from '@/lib/gdpr/consent-proofs';
@@ -23,6 +25,20 @@ import { registrazioneDellIscrizione } from '@/lib/live/consents-in-force';
 
 import { biscotti } from './biscotti';
 import { creaEvento, richiesta, svuotaDatabase } from './fixtures';
+
+// Fuori da Next `getTranslations` lancia: l'email del codice usa i testi veri.
+vi.mock('next-intl/server', async () => {
+  const { createTranslator } = await import('next-intl');
+  const messaggi = (await import('@/i18n/messages/it.json')).default;
+  return {
+    getTranslations: async ({ namespace }: { namespace: string }) =>
+      createTranslator({
+        locale: 'it',
+        messages: messaggi,
+        namespace: namespace as never,
+      }),
+  };
+});
 
 const CON_TRACCE = {
   recordingEnabled: true,
@@ -360,5 +376,189 @@ describe('un consenso dato di nuovo da «I miei dati»', () => {
     });
     expect(res.status).toBe(404);
     expect(await prisma.recordingConsent.count()).toBe(0);
+  });
+});
+
+/** Il codice dell'ultima email accodata: la persona lo legge nella sua casella. */
+async function codiceArrivato(): Promise<{ codice: string; destinatario: string }> {
+  const riga = await prisma.emailOutbox.findFirstOrThrow({
+    orderBy: { createdAt: 'desc' },
+  });
+  const testo = decryptPII(riga.text!);
+  const codice = /\b(\d{6})\b/.exec(testo)?.[1];
+  expect(codice, 'nessun codice nel testo').toBeDefined();
+  expect(riga.subject).not.toContain(codice!);
+  return { codice: codice!, destinatario: decryptPII(riga.toAddress) };
+}
+
+async function chiamaCorreggi(corpo: Record<string, unknown>) {
+  ip += 1;
+  const r = richiesta('/api/gdpr/registrations/edit', 'POST', { locale: 'it', ...corpo });
+  r.headers.set('x-forwarded-for', `10.10.${Math.floor(ip / 250)}.${ip % 250}`);
+  return correggi(r as never, { params: Promise.resolve({}) });
+}
+
+describe('la correzione di nome ed ente', () => {
+  it('chiede il codice, lo manda all’indirizzo e corregge solo con quello', async () => {
+    const evento = await creaEvento();
+    const { iscrizione, token, emailHash } = await iscritto(evento.id, {
+      organization: 'Vecchio',
+    });
+    const corpo = {
+      token,
+      registrationId: iscrizione.id,
+      scope: 'registration',
+      displayName: '  Anna Bianchi ',
+      organization: 'Comune di Prova',
+    };
+
+    const richiesto = await chiamaCorreggi(corpo);
+    expect(richiesto.status).toBe(202);
+    const { issuedAt } = (await richiesto.json()) as { issuedAt: number };
+    const { codice, destinatario } = await codiceArrivato();
+    expect(hashEmail(destinatario)).toBe(emailHash);
+    // Niente cambia prima della conferma.
+    expect(
+      tryDecryptPII(
+        (await prisma.registration.findUniqueOrThrow({ where: { id: iscrizione.id } }))
+          .displayName
+      )
+    ).toBe('Persona Iscritta');
+
+    const sbagliato = String((Number(codice) + 1) % 1_000_000).padStart(6, '0');
+    expect((await chiamaCorreggi({ ...corpo, code: sbagliato, issuedAt })).status).toBe(
+      403
+    );
+    // Lo stesso codice non vale per altri valori.
+    expect(
+      (
+        await chiamaCorreggi({
+          ...corpo,
+          displayName: 'Altro Nome',
+          code: codice,
+          issuedAt,
+        })
+      ).status
+    ).toBe(403);
+
+    const fatto = await chiamaCorreggi({ ...corpo, code: codice, issuedAt });
+    expect(fatto.status).toBe(200);
+    expect(await fatto.json()).toMatchObject({ updated: 1, displayName: 'Anna Bianchi' });
+    const dopo = await prisma.registration.findUniqueOrThrow({
+      where: { id: iscrizione.id },
+    });
+    expect(tryDecryptPII(dopo.displayName)).toBe('Anna Bianchi');
+    expect(dopo.organization).toBe('Comune di Prova');
+
+    const [riga] = await righeRegistro(evento.id, 'DATA_RECTIFIED');
+    expect(JSON.parse(riga!.details!)).toEqual({
+      source: 'self-service',
+      scope: 'registration',
+      fields: ['displayName', 'organization'],
+      emailHashPrefix: emailHash.substring(0, 8),
+    });
+    expect(riga!.details).not.toContain('Anna');
+    expect(riga!.details).not.toContain('Comune');
+  });
+
+  it('per tutte le iscrizioni corregge anche la voce di rubrica, non le altre persone', async () => {
+    const [a, b] = [await creaEvento(), await creaEvento()];
+    const prima = await iscritto(a.id, { organization: 'Vecchio' });
+    const email = decryptPII(prima.iscrizione.email);
+    const seconda = await prisma.registration.create({
+      data: {
+        eventId: b.id,
+        displayName: encryptPII('Persona Iscritta'),
+        email: encryptPII(email),
+        emailHash: prima.emailHash,
+        consentGiven: true,
+        consentTimestamp: new Date(),
+        accessToken: randomUUID(),
+      },
+    });
+    await prisma.person.create({
+      data: {
+        emailHash: prima.emailHash,
+        email: encryptPII(email),
+        displayName: encryptPII('Persona Iscritta'),
+        organization: 'Vecchio',
+        optedInToAddressBook: true,
+        optedInAt: new Date(),
+      },
+    });
+    const altra = await iscritto(a.id);
+    const corpo = {
+      token: prima.token,
+      registrationId: prima.iscrizione.id,
+      scope: 'address',
+      displayName: 'Anna Bianchi',
+      organization: null,
+    };
+    const { issuedAt } = (await (await chiamaCorreggi(corpo)).json()) as {
+      issuedAt: number;
+    };
+    const { codice } = await codiceArrivato();
+    expect((await chiamaCorreggi({ ...corpo, code: codice, issuedAt })).status).toBe(200);
+
+    for (const id of [prima.iscrizione.id, seconda.id]) {
+      const r = await prisma.registration.findUniqueOrThrow({ where: { id } });
+      expect([tryDecryptPII(r.displayName), r.organization]).toEqual([
+        'Anna Bianchi',
+        null,
+      ]);
+    }
+    const voce = await prisma.person.findUniqueOrThrow({
+      where: { emailHash: prima.emailHash },
+    });
+    expect([tryDecryptPII(voce.displayName!), voce.organization]).toEqual([
+      'Anna Bianchi',
+      null,
+    ]);
+    const estranea = await prisma.registration.findUniqueOrThrow({
+      where: { id: altra.iscrizione.id },
+    });
+    expect(tryDecryptPII(estranea.displayName)).toBe('Persona Iscritta');
+    const righe = await prisma.gdprAuditLog.findMany({
+      where: { action: 'DATA_RECTIFIED' },
+    });
+    expect(righe.map((r) => r.eventId).sort()).toEqual([a.id, b.id, null].sort());
+  });
+
+  it('segue le regole del modulo: nome, e l’ente dove un evento lo chiede', async () => {
+    const evento = await creaEvento({ requireOrganization: true });
+    const { iscrizione, token } = await iscritto(evento.id, { organization: 'Ente' });
+    const corpo = { token, registrationId: iscrizione.id, scope: 'registration' };
+    const senzaEnte = await chiamaCorreggi({
+      ...corpo,
+      displayName: 'Anna',
+      organization: '  ',
+    });
+    expect(senzaEnte.status).toBe(422);
+    expect((await senzaEnte.json()).details).toEqual([
+      expect.objectContaining({ path: ['organization'] }),
+    ]);
+    expect(
+      (await chiamaCorreggi({ ...corpo, displayName: ' A ', organization: 'Ente' }))
+        .status
+    ).toBe(422);
+    expect(await prisma.emailOutbox.count()).toBe(0);
+  });
+
+  it('senza il token della pagina, o per un’iscrizione di un altro indirizzo, niente codice', async () => {
+    const evento = await creaEvento();
+    const a = await iscritto(evento.id);
+    const b = await iscritto(evento.id);
+    const corpo = {
+      registrationId: a.iscrizione.id,
+      scope: 'registration',
+      displayName: 'Anna',
+      organization: null,
+    };
+    expect((await chiamaCorreggi({ ...corpo, token: b.token })).status).toBe(404);
+    expect(
+      (await chiamaCorreggi({ ...corpo, token: issueGdprToken('export', a.emailHash) }))
+        .status
+    ).toBe(401);
+    expect(await prisma.emailOutbox.count()).toBe(0);
   });
 });

@@ -1674,6 +1674,7 @@
         "DATA_DELETED": "Dati dzēsti",
         "CONSENT_RECORDED": "Piekrišana reģistrēta",
         "DATA_EXPORTED": "Dati eksportēti",
+        "DATA_RECTIFIED": "Dati laboti",
         "CONSENT_WITHDRAWN": "Piekrišana atsaukta",
         "RECORDING_CONTENT_READ": "Ieraksta saturs, ko lasījuši darbinieki",
         "RECORDING_REDACTION_REQUESTED": "Pieprasīta izņemšana no ieraksta",
@@ -2137,6 +2138,7 @@
         "DATA_DELETED": "Dati dzēsti",
         "CONSENT_RECORDED": "Piekrišana reģistrēta",
         "DATA_EXPORTED": "Dati eksportēti",
+        "DATA_RECTIFIED": "Dati laboti",
         "CONSENT_WITHDRAWN": "Piekrišana atsaukta",
         "RECORDING_CONTENT_READ": "Ieraksta saturs, ko lasījuši darbinieki"
       }
@@ -4262,7 +4264,17 @@
     "addressBookNote": "Jūs esat pasākumu kontaktu grāmatā, lai jūs aicinātu uz līdzīgiem pasākumiem: piekrišanu varat atsaukt jebkurā laikā.",
     "addressBookPendingNote": "Šajā reģistrācijā tika atzīmēta pasākumu kontaktu grāmatas izvēles rūtiņa, taču šī adrese vairs nesaņēma ielūgumus. Ja pieprasījums ir jūsu, varat to apstiprināt savu datu lapā, izmantojot zemāk esošo saiti. Ja tas nav jūsu, neņemiet vērā šo ziņojumu: paliekat ārpus kontaktu grāmatas un ielūgumus nesaņemat.",
     "addressBookOptOutLink": "Izņemt manus datus no kontaktu grāmatas",
-    "myDataLink": "Jūsu dati: skatīt, labot, atsaukt piekrišanu vai atcelt reģistrāciju"
+    "myDataLink": "Jūsu dati: skatīt, labot, atsaukt piekrišanu vai atcelt reģistrāciju",
+    "confirmationCode": {
+      "subject": "{site}: apstiprinājuma kods",
+      "heading": "Jūsu apstiprinājuma kods",
+      "introEdit": "Jūs lūdzāt labot vārdu un organizāciju savā reģistrācijā pasākumam “{event}”.",
+      "introEditAll": "Jūs lūdzāt labot vārdu un organizāciju visās savās reģistrācijās.",
+      "introCancel": "Jūs lūdzāt dzēst savu reģistrāciju pasākumam “{event}”.",
+      "codeLabel": "Kods ir:",
+      "instructions": "Ievadiet to lapā “Mani dati”, no kuras iesniedzāt pieprasījumu. Tas ir derīgs {minutes, plural, zero {# minūtes} one {# minūte} other {# minūtes}}.",
+      "ignore": "Ja pieprasījumu neiesniedzāt jūs, ignorējiet šo e-pastu: bez koda nekas nemainās. Nevienam neatklājiet kodu."
+    }
   },
   "home": {
     "hero": {
@@ -4798,7 +4810,21 @@
       "removalError": "Pieprasījumu neizdevās nosūtīt. Mēģiniet vēlāk.",
       "removalStatusOpen": "Pieprasījums no {date}: tiek izskatīts.",
       "removalStatusClosed": "Pieprasījums no {date}: izpildīts {closed}.",
-      "removalStatusRejected": "Pieprasījums no {date}: noraidīts. Lai uzzinātu iemeslu, rakstiet datu pārzinim."
+      "removalStatusRejected": "Pieprasījums no {date}: noraidīts. Lai uzzinātu iemeslu, rakstiet datu pārzinim.",
+      "editButton": "Labot vārdu un organizāciju",
+      "editScopeLegend": "Uz kurām reģistrācijām tas attiecas",
+      "editScopeOne": "Tikai šī reģistrācija",
+      "editScopeAll": "Visas manas reģistrācijas ({count}) un pasākumu kontaktu grāmata",
+      "editEffect": "Labojums attiecas uz nākamajiem e-pastiem un ir spēkā no jūsu nākamās ienākšanas telpā. Tas nemaina to, kas jau ierakstīts, transkribēts vai uzrakstīts tērzēšanā, un piekrišanas pierādījumus.",
+      "editNameInvalid": "Vārdam jābūt no 2 līdz 100 rakstzīmēm.",
+      "editOrganizationRequired": "Pasākums, kuram esat reģistrējies, prasa organizāciju: lauku nevar atstāt tukšu.",
+      "editDone": "Dati ir laboti.",
+      "codeWhy": "Drošības nolūkos labojumus un dzēšanu apstiprina ar kodu, ko nosūtām uz reģistrācijas e-pasta adresi.",
+      "codeSend": "Nosūtīt man apstiprinājuma kodu",
+      "codeSent": "Mēs jums pa e-pastu nosūtījām 6 ciparu kodu. Ievadiet to šeit: tas ir derīgs {minutes, plural, zero {# minūtes} one {# minūte} other {# minūtes}}.",
+      "codeLabel": "Apstiprinājuma kods",
+      "codeConfirmEdit": "Apstiprināt labojumu",
+      "codeInvalid": "Kods nav pareizs vai tam ir beidzies derīguma termiņš. Pārbaudiet pēdējo saņemto e-pastu vai atceliet un pieprasiet jaunu."
     },
     "erasure": {
       "title": "Jūsu datu dzēšana",

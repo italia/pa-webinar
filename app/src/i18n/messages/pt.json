@@ -1674,6 +1674,7 @@
         "DATA_DELETED": "Dados eliminados",
         "CONSENT_RECORDED": "Consentimento registado",
         "DATA_EXPORTED": "Dados exportados",
+        "DATA_RECTIFIED": "Dados corrigidos",
         "CONSENT_WITHDRAWN": "Consentimento retirado",
         "RECORDING_CONTENT_READ": "Conteúdo da gravação lido pela equipa",
         "RECORDING_REDACTION_REQUESTED": "Remoção de uma gravação pedida",
@@ -2137,6 +2138,7 @@
         "DATA_DELETED": "Dados eliminados",
         "CONSENT_RECORDED": "Consentimento registado",
         "DATA_EXPORTED": "Dados exportados",
+        "DATA_RECTIFIED": "Dados corrigidos",
         "CONSENT_WITHDRAWN": "Consentimento retirado",
         "RECORDING_CONTENT_READ": "Conteúdo da gravação lido pela equipa"
       }
@@ -4262,7 +4264,17 @@
     "addressBookNote": "Está na agenda de eventos, para ser convidado para eventos semelhantes: pode retirar o consentimento a qualquer momento.",
     "addressBookPendingNote": "Nesta inscrição foi assinalada a caixa da agenda de eventos, mas este endereço tinha deixado de receber convites. Se o pedido for seu, pode confirmá-lo na página dos seus dados, com a ligação abaixo. Se não for, ignore esta mensagem: fica fora da agenda e não recebe convites.",
     "addressBookOptOutLink": "Remover os meus dados da agenda",
-    "myDataLink": "Os seus dados: consultá-los, corrigi-los, retirar um consentimento ou cancelar a inscrição"
+    "myDataLink": "Os seus dados: consultá-los, corrigi-los, retirar um consentimento ou cancelar a inscrição",
+    "confirmationCode": {
+      "subject": "{site}: código de confirmação",
+      "heading": "O seu código de confirmação",
+      "introEdit": "Pediu para corrigir o nome e o organismo da sua inscrição em «{event}».",
+      "introEditAll": "Pediu para corrigir o nome e o organismo de todas as suas inscrições.",
+      "introCancel": "Pediu para eliminar a sua inscrição em «{event}».",
+      "codeLabel": "O código é:",
+      "instructions": "Escreva-o na página Os meus dados a partir da qual fez o pedido. É válido durante {minutes, plural, one {# minuto} other {# minutos}}.",
+      "ignore": "Se não foi você a fazer o pedido, ignore este e-mail: sem o código nada muda. Não partilhe o código com ninguém."
+    }
   },
   "home": {
     "hero": {
@@ -4798,7 +4810,21 @@
       "removalError": "Não foi possível enviar o pedido. Tente novamente mais tarde.",
       "removalStatusOpen": "Pedido de {date}: em tratamento.",
       "removalStatusClosed": "Pedido de {date}: concluído em {closed}.",
-      "removalStatusRejected": "Pedido de {date}: recusado. Escreva ao responsável pelo tratamento para saber o motivo."
+      "removalStatusRejected": "Pedido de {date}: recusado. Escreva ao responsável pelo tratamento para saber o motivo.",
+      "editButton": "Corrigir nome e organismo",
+      "editScopeLegend": "A que inscrições se aplica",
+      "editScopeOne": "Apenas esta inscrição",
+      "editScopeAll": "Todas as minhas inscrições ({count}) e a agenda de eventos",
+      "editEffect": "A correção vale para os próximos e-mails e a partir da sua próxima entrada na sala. Não altera o que já foi gravado, transcrito ou escrito no chat, nem as provas dos consentimentos.",
+      "editNameInvalid": "O nome deve ter entre 2 e 100 caracteres.",
+      "editOrganizationRequired": "Um evento em que está inscrito pede o organismo: não pode ficar vazio.",
+      "editDone": "Dados corrigidos.",
+      "codeWhy": "Por segurança, as correções e as eliminações são confirmadas com um código que enviamos para o endereço de e-mail da inscrição.",
+      "codeSend": "Enviar-me o código de confirmação",
+      "codeSent": "Enviámos-lhe por e-mail um código de 6 dígitos. Escreva-o aqui: é válido durante {minutes, plural, one {# minuto} other {# minutos}}.",
+      "codeLabel": "Código de confirmação",
+      "codeConfirmEdit": "Confirmar a correção",
+      "codeInvalid": "O código não está correto ou expirou. Verifique o último e-mail recebido, ou cancele e peça um novo."
     },
     "erasure": {
       "title": "Eliminação dos seus dados",

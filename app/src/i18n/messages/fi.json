@@ -1674,6 +1674,7 @@
         "DATA_DELETED": "Tiedot poistettu",
         "CONSENT_RECORDED": "Suostumus kirjattu",
         "DATA_EXPORTED": "Tiedot viety",
+        "DATA_RECTIFIED": "Tiedot korjattu",
         "CONSENT_WITHDRAWN": "Suostumus peruutettu",
         "RECORDING_CONTENT_READ": "Henkilökunta luki tallenteen sisällön",
         "RECORDING_REDACTION_REQUESTED": "Poistoa tallenteesta pyydetty",
@@ -2137,6 +2138,7 @@
         "DATA_DELETED": "Tiedot poistettu",
         "CONSENT_RECORDED": "Suostumus kirjattu",
         "DATA_EXPORTED": "Tiedot viety",
+        "DATA_RECTIFIED": "Tiedot korjattu",
         "CONSENT_WITHDRAWN": "Suostumus peruutettu",
         "RECORDING_CONTENT_READ": "Henkilökunta luki tallenteen sisällön"
       }
@@ -4262,7 +4264,17 @@
     "addressBookNote": "Olet tapahtumien osoitekirjassa, jotta sinut voidaan kutsua vastaaviin tapahtumiin: voit peruuttaa suostumuksesi milloin tahansa.",
     "addressBookPendingNote": "Tässä ilmoittautumisessa valittiin tapahtumien osoitekirjan valintaruutu, mutta tämä osoite oli lakannut saamasta kutsuja. Jos pyyntö on sinun, voit vahvistaa sen tietojesi sivulla alla olevan linkin kautta. Jos se ei ole sinun, jätä tämä viesti huomiotta: pysyt osoitekirjan ulkopuolella etkä saa kutsuja.",
     "addressBookOptOutLink": "Poista tietoni osoitekirjasta",
-    "myDataLink": "Tietosi: tarkastele, korjaa, peruuta suostumus tai peru ilmoittautuminen"
+    "myDataLink": "Tietosi: tarkastele, korjaa, peruuta suostumus tai peru ilmoittautuminen",
+    "confirmationCode": {
+      "subject": "{site}: vahvistuskoodi",
+      "heading": "Vahvistuskoodisi",
+      "introEdit": "Pyysit korjaamaan nimen ja organisaation ilmoittautumisessasi tapahtumaan ”{event}”.",
+      "introEditAll": "Pyysit korjaamaan nimen ja organisaation kaikissa ilmoittautumisissasi.",
+      "introCancel": "Pyysit poistamaan ilmoittautumisesi tapahtumaan ”{event}”.",
+      "codeLabel": "Koodi on:",
+      "instructions": "Kirjoita se Omat tietoni -sivulle, jolta teit pyynnön. Se on voimassa {minutes, plural, one {# minuutti} other {# minuuttia}}.",
+      "ignore": "Jos et tehnyt pyyntöä, voit jättää tämän viestin huomiotta: ilman koodia mikään ei muutu. Älä anna koodia kenellekään."
+    }
   },
   "home": {
     "hero": {
@@ -4798,7 +4810,21 @@
       "removalError": "Pyyntöä ei voitu lähettää. Yritä myöhemmin uudelleen.",
       "removalStatusOpen": "{date} tehty pyyntö: käsittelyssä.",
       "removalStatusClosed": "{date} tehty pyyntö: valmistui {closed}.",
-      "removalStatusRejected": "{date} tehty pyyntö: hylätty. Kirjoita rekisterinpitäjälle saadaksesi tietää syyn."
+      "removalStatusRejected": "{date} tehty pyyntö: hylätty. Kirjoita rekisterinpitäjälle saadaksesi tietää syyn.",
+      "editButton": "Korjaa nimi ja organisaatio",
+      "editScopeLegend": "Mihin ilmoittautumisiin se koskee",
+      "editScopeOne": "Vain tämä ilmoittautuminen",
+      "editScopeAll": "Kaikki ilmoittautumiseni ({count}) ja tapahtumien osoitekirja",
+      "editEffect": "Korjaus koskee seuraavia sähköposteja ja on voimassa seuraavasta huoneeseen tulosta alkaen. Se ei muuta jo tallennettua, litteroitua tai chattiin kirjoitettua eikä suostumusten todisteita.",
+      "editNameInvalid": "Nimessä on oltava 2–100 merkkiä.",
+      "editOrganizationRequired": "Tapahtuma, johon olet ilmoittautunut, vaatii organisaation: kenttää ei voi jättää tyhjäksi.",
+      "editDone": "Tiedot korjattu.",
+      "codeWhy": "Turvallisuussyistä korjaukset ja poistot vahvistetaan koodilla, jonka lähetämme ilmoittautumisen sähköpostiosoitteeseen.",
+      "codeSend": "Lähetä minulle vahvistuskoodi",
+      "codeSent": "Lähetimme sinulle sähköpostilla 6-numeroisen koodin. Kirjoita se tähän: se on voimassa {minutes, plural, one {# minuutti} other {# minuuttia}}.",
+      "codeLabel": "Vahvistuskoodi",
+      "codeConfirmEdit": "Vahvista korjaus",
+      "codeInvalid": "Koodi on väärä tai vanhentunut. Tarkista viimeisin saamasi sähköposti tai peruuta ja pyydä uusi."
     },
     "erasure": {
       "title": "Tietojesi poistaminen",

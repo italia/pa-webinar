@@ -1674,6 +1674,7 @@
         "DATA_DELETED": "Daten gelöscht",
         "CONSENT_RECORDED": "Einwilligung erfasst",
         "DATA_EXPORTED": "Daten exportiert",
+        "DATA_RECTIFIED": "Daten berichtigt",
         "CONSENT_WITHDRAWN": "Einwilligung widerrufen",
         "RECORDING_CONTENT_READ": "Aufzeichnungsinhalt vom Personal gelesen",
         "RECORDING_REDACTION_REQUESTED": "Entfernung aus einer Aufzeichnung beantragt",
@@ -2137,6 +2138,7 @@
         "DATA_DELETED": "Daten gelöscht",
         "CONSENT_RECORDED": "Einwilligung erfasst",
         "DATA_EXPORTED": "Daten exportiert",
+        "DATA_RECTIFIED": "Daten berichtigt",
         "CONSENT_WITHDRAWN": "Einwilligung widerrufen",
         "RECORDING_CONTENT_READ": "Aufzeichnungsinhalt vom Personal gelesen"
       }
@@ -4262,7 +4264,17 @@
     "addressBookNote": "Sie stehen im Veranstaltungs-Adressbuch, um zu ähnlichen Veranstaltungen eingeladen zu werden: Sie können Ihre Einwilligung jederzeit widerrufen.",
     "addressBookPendingNote": "Bei dieser Anmeldung wurde das Kästchen für das Veranstaltungs-Adressbuch angekreuzt, aber diese Adresse hatte keine Einladungen mehr erhalten. Wenn die Anfrage von Ihnen stammt, können Sie sie auf der Seite mit Ihren Daten über den Link unten bestätigen. Andernfalls ignorieren Sie diese Nachricht: Sie bleiben außerhalb des Adressbuchs und erhalten keine Einladungen.",
     "addressBookOptOutLink": "Meine Daten aus dem Adressbuch entfernen",
-    "myDataLink": "Ihre Daten: einsehen, berichtigen, eine Einwilligung widerrufen oder die Anmeldung löschen"
+    "myDataLink": "Ihre Daten: einsehen, berichtigen, eine Einwilligung widerrufen oder die Anmeldung löschen",
+    "confirmationCode": {
+      "subject": "{site}: Bestätigungscode",
+      "heading": "Ihr Bestätigungscode",
+      "introEdit": "Sie haben beantragt, Name und Organisation Ihrer Anmeldung für „{event}“ zu berichtigen.",
+      "introEditAll": "Sie haben beantragt, Name und Organisation in allen Ihren Anmeldungen zu berichtigen.",
+      "introCancel": "Sie haben beantragt, Ihre Anmeldung für „{event}“ zu löschen.",
+      "codeLabel": "Der Code lautet:",
+      "instructions": "Geben Sie ihn auf der Seite „Meine Daten“ ein, von der aus Sie die Anfrage gestellt haben. Er gilt {minutes, plural, one {# Minute} other {# Minuten}}.",
+      "ignore": "Wenn Sie die Anfrage nicht gestellt haben, ignorieren Sie diese E-Mail: Ohne den Code ändert sich nichts. Geben Sie den Code an niemanden weiter."
+    }
   },
   "home": {
     "hero": {
@@ -4798,7 +4810,21 @@
       "removalError": "Der Antrag konnte nicht gesendet werden. Bitte versuchen Sie es später erneut.",
       "removalStatusOpen": "Antrag vom {date}: in Bearbeitung.",
       "removalStatusClosed": "Antrag vom {date}: erledigt am {closed}.",
-      "removalStatusRejected": "Antrag vom {date}: abgelehnt. Schreiben Sie an den Verantwortlichen, um den Grund zu erfahren."
+      "removalStatusRejected": "Antrag vom {date}: abgelehnt. Schreiben Sie an den Verantwortlichen, um den Grund zu erfahren.",
+      "editButton": "Name und Organisation berichtigen",
+      "editScopeLegend": "Für welche Anmeldungen sie gilt",
+      "editScopeOne": "Nur diese Anmeldung",
+      "editScopeAll": "Alle meine Anmeldungen ({count}) und das Veranstaltungs-Adressbuch",
+      "editEffect": "Die Berichtigung gilt für die nächsten E-Mails und ab Ihrem nächsten Eintritt in den Raum. Sie ändert nichts an bereits Aufgezeichnetem, Transkribiertem oder im Chat Geschriebenem und auch nicht an den Einwilligungsnachweisen.",
+      "editNameInvalid": "Der Name muss zwischen 2 und 100 Zeichen lang sein.",
+      "editOrganizationRequired": "Eine Veranstaltung, für die Sie angemeldet sind, verlangt die Organisation: Das Feld darf nicht leer bleiben.",
+      "editDone": "Daten berichtigt.",
+      "codeWhy": "Aus Sicherheitsgründen werden Berichtigungen und Löschungen mit einem Code bestätigt, den wir an die E-Mail-Adresse der Anmeldung senden.",
+      "codeSend": "Bestätigungscode senden",
+      "codeSent": "Wir haben Ihnen einen 6-stelligen Code per E-Mail geschickt. Geben Sie ihn hier ein: Er gilt {minutes, plural, one {# Minute} other {# Minuten}}.",
+      "codeLabel": "Bestätigungscode",
+      "codeConfirmEdit": "Berichtigung bestätigen",
+      "codeInvalid": "Der Code ist falsch oder abgelaufen. Prüfen Sie die zuletzt erhaltene E-Mail oder brechen Sie ab und fordern Sie einen neuen an."
     },
     "erasure": {
       "title": "Löschung Ihrer Daten",

@@ -1674,6 +1674,7 @@
         "DATA_DELETED": "Datos eliminados",
         "CONSENT_RECORDED": "Consentimiento registrado",
         "DATA_EXPORTED": "Datos exportados",
+        "DATA_RECTIFIED": "Datos corregidos",
         "CONSENT_WITHDRAWN": "Consentimiento retirado",
         "RECORDING_CONTENT_READ": "Contenido de la grabación leído por el personal",
         "RECORDING_REDACTION_REQUESTED": "Retirada de una grabación solicitada",
@@ -2137,6 +2138,7 @@
         "DATA_DELETED": "Datos eliminados",
         "CONSENT_RECORDED": "Consentimiento registrado",
         "DATA_EXPORTED": "Datos exportados",
+        "DATA_RECTIFIED": "Datos corregidos",
         "CONSENT_WITHDRAWN": "Consentimiento retirado",
         "RECORDING_CONTENT_READ": "Contenido de la grabación leído por el personal"
       }
@@ -4262,7 +4264,17 @@
     "addressBookNote": "Está en la Agenda de eventos, para recibir invitaciones a eventos similares: puede revocar su consentimiento en cualquier momento.",
     "addressBookPendingNote": "En esta inscripción se marcó la casilla de la Agenda de eventos, pero esta dirección había dejado de recibir invitaciones. Si la solicitud es suya, puede confirmarla desde la página de sus datos, con el enlace de abajo. Si no lo es, ignore este mensaje: sigue fuera de la agenda y no recibe invitaciones.",
     "addressBookOptOutLink": "Eliminar mis datos de la agenda",
-    "myDataLink": "Tus datos: verlos, corregirlos, retirar un consentimiento o cancelar la inscripción"
+    "myDataLink": "Tus datos: verlos, corregirlos, retirar un consentimiento o cancelar la inscripción",
+    "confirmationCode": {
+      "subject": "{site}: código de confirmación",
+      "heading": "Tu código de confirmación",
+      "introEdit": "Has pedido corregir el nombre y el organismo de tu inscripción en «{event}».",
+      "introEditAll": "Has pedido corregir el nombre y el organismo de todas tus inscripciones.",
+      "introCancel": "Has pedido suprimir tu inscripción en «{event}».",
+      "codeLabel": "El código es:",
+      "instructions": "Escríbelo en la página Mis datos desde la que hiciste la solicitud. Vale {minutes, plural, one {# minuto} other {# minutos}}.",
+      "ignore": "Si no has hecho tú la solicitud, ignora este correo: sin el código no cambia nada. No compartas el código con nadie."
+    }
   },
   "home": {
     "hero": {
@@ -4798,7 +4810,21 @@
       "removalError": "No se ha podido enviar la solicitud. Inténtalo de nuevo más tarde.",
       "removalStatusOpen": "Solicitud del {date}: en trámite.",
       "removalStatusClosed": "Solicitud del {date}: completada el {closed}.",
-      "removalStatusRejected": "Solicitud del {date}: rechazada. Escribe al responsable del tratamiento para conocer el motivo."
+      "removalStatusRejected": "Solicitud del {date}: rechazada. Escribe al responsable del tratamiento para conocer el motivo.",
+      "editButton": "Corregir nombre y organismo",
+      "editScopeLegend": "A qué inscripciones se aplica",
+      "editScopeOne": "Solo esta inscripción",
+      "editScopeAll": "Todas mis inscripciones ({count}) y la agenda de eventos",
+      "editEffect": "La corrección vale para los próximos correos y desde tu próxima entrada en la sala. No cambia lo que ya se ha grabado, transcrito o escrito en el chat, ni las pruebas de los consentimientos.",
+      "editNameInvalid": "El nombre debe tener entre 2 y 100 caracteres.",
+      "editOrganizationRequired": "Un evento en el que estás inscrito pide el organismo: no se puede dejar vacío.",
+      "editDone": "Datos corregidos.",
+      "codeWhy": "Por seguridad, las correcciones y las supresiones se confirman con un código que enviamos a la dirección de correo de la inscripción.",
+      "codeSend": "Envíame el código de confirmación",
+      "codeSent": "Te hemos enviado por correo un código de 6 cifras. Escríbelo aquí: vale {minutes, plural, one {# minuto} other {# minutos}}.",
+      "codeLabel": "Código de confirmación",
+      "codeConfirmEdit": "Confirmar la corrección",
+      "codeInvalid": "El código no es correcto o ha caducado. Revisa el último correo que has recibido, o cancela y pide uno nuevo."
     },
     "erasure": {
       "title": "Supresión de sus datos",

@@ -1674,6 +1674,7 @@
         "DATA_DELETED": "Data slettet",
         "CONSENT_RECORDED": "Samtykke registreret",
         "DATA_EXPORTED": "Data eksporteret",
+        "DATA_RECTIFIED": "Oplysninger rettet",
         "CONSENT_WITHDRAWN": "Samtykke trukket tilbage",
         "RECORDING_CONTENT_READ": "Optagelsens indhold læst af personale",
         "RECORDING_REDACTION_REQUESTED": "Fjernelse fra en optagelse anmodet",
@@ -2137,6 +2138,7 @@
         "DATA_DELETED": "Data slettet",
         "CONSENT_RECORDED": "Samtykke registreret",
         "DATA_EXPORTED": "Data eksporteret",
+        "DATA_RECTIFIED": "Oplysninger rettet",
         "CONSENT_WITHDRAWN": "Samtykke trukket tilbage",
         "RECORDING_CONTENT_READ": "Optagelsens indhold læst af personale"
       }
@@ -4262,7 +4264,17 @@
     "addressBookNote": "Du er i arrangementsadressebogen for at blive inviteret til lignende arrangementer: du kan til enhver tid trække dit samtykke tilbage.",
     "addressBookPendingNote": "Afkrydsningsfeltet til arrangementsadressebogen blev markeret på denne tilmelding, men denne adresse var holdt op med at modtage invitationer. Hvis anmodningen er din, kan du bekræfte den på siden med dine data via linket nedenfor. Hvis den ikke er din, kan du se bort fra denne besked: du forbliver uden for adressebogen og modtager ingen invitationer.",
     "addressBookOptOutLink": "Fjern mine data fra adressebogen",
-    "myDataLink": "Dine data: se dem, ret dem, træk et samtykke tilbage eller annullér tilmeldingen"
+    "myDataLink": "Dine data: se dem, ret dem, træk et samtykke tilbage eller annullér tilmeldingen",
+    "confirmationCode": {
+      "subject": "{site}: bekræftelseskode",
+      "heading": "Din bekræftelseskode",
+      "introEdit": "Du har bedt om at rette navn og organisation i din tilmelding til “{event}”.",
+      "introEditAll": "Du har bedt om at rette navn og organisation i alle dine tilmeldinger.",
+      "introCancel": "Du har bedt om at slette din tilmelding til “{event}”.",
+      "codeLabel": "Koden er:",
+      "instructions": "Indtast den på siden Mine data, som du sendte anmodningen fra. Den gælder i {minutes, plural, one {# minut} other {# minutter}}.",
+      "ignore": "Hvis det ikke var dig, der sendte anmodningen, så ignorer denne e-mail: uden koden ændres intet. Del ikke koden med nogen."
+    }
   },
   "home": {
     "hero": {
@@ -4798,7 +4810,21 @@
       "removalError": "Anmodningen kunne ikke sendes. Prøv igen senere.",
       "removalStatusOpen": "Anmodning af {date}: under behandling.",
       "removalStatusClosed": "Anmodning af {date}: gennemført {closed}.",
-      "removalStatusRejected": "Anmodning af {date}: afvist. Skriv til den dataansvarlige for at få begrundelsen."
+      "removalStatusRejected": "Anmodning af {date}: afvist. Skriv til den dataansvarlige for at få begrundelsen.",
+      "editButton": "Ret navn og organisation",
+      "editScopeLegend": "Hvilke tilmeldinger det gælder for",
+      "editScopeOne": "Kun denne tilmelding",
+      "editScopeAll": "Alle mine tilmeldinger ({count}) og arrangementsadressebogen",
+      "editEffect": "Rettelsen gælder for de næste e-mails og fra din næste indgang i rummet. Den ændrer ikke det, der allerede er optaget, transskriberet eller skrevet i chatten, og heller ikke dokumentationen for samtykker.",
+      "editNameInvalid": "Navnet skal have mellem 2 og 100 tegn.",
+      "editOrganizationRequired": "Et arrangement, du er tilmeldt, kræver organisationen: feltet må ikke være tomt.",
+      "editDone": "Oplysningerne er rettet.",
+      "codeWhy": "Af sikkerhedshensyn bekræftes rettelser og sletninger med en kode, som vi sender til tilmeldingens e-mailadresse.",
+      "codeSend": "Send mig bekræftelseskoden",
+      "codeSent": "Vi har sendt dig en 6-cifret kode pr. e-mail. Indtast den her: den gælder i {minutes, plural, one {# minut} other {# minutter}}.",
+      "codeLabel": "Bekræftelseskode",
+      "codeConfirmEdit": "Bekræft rettelsen",
+      "codeInvalid": "Koden er forkert eller udløbet. Tjek den seneste e-mail, du har modtaget, eller annuller og bed om en ny."
     },
     "erasure": {
       "title": "Sletning af dine data",
