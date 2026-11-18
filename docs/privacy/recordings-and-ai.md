@@ -888,12 +888,14 @@ only. Their speaker records and job payloads stay with them.
 
 With a period (`Event.recordingDeleteAfterDays`), the recording goes when it
 ends: counted from publication while the video is published, and from the
-event's end otherwise. The cleanup's phase 2 deletes the video files of the
-event and of every session, unpublishes the video and the transcript, deletes
-the transcript from captions and the speaker records, fails the open
-post-production jobs, writes `RECORDING_DELETED` and sets
-`Recording.retentionUntil` to that moment; the next `postprod-retention` run
-purges the rest. The consent proofs of the recording leave at the next cleanup
+event's end otherwise, never before the period was last chosen, the video
+unpublished or a new file attached. The cleanup's phase 2 unpublishes the video
+and the transcript, deletes the transcript from captions and the speaker
+records, fails the queued post-production jobs, writes `RECORDING_DELETED`,
+sets `Recording.retentionUntil` to that moment and then deletes the video files
+of the event and of every session; the next `postprod-retention` run purges
+the rest. While a worker holds a job of the recording, the cleanup waits for
+the next run. The consent proofs of the recording leave at the next cleanup
 run that finds nothing left to cover them. A recording listed in the video
 library is treated like any other.
 

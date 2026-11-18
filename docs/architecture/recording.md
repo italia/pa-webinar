@@ -836,8 +836,9 @@ stateDiagram-v2
   list (`lib/recording/retention-options.ts`), in the wizard, on the recording
   panel and on the event template; empty by default, which keeps the recording
   until someone deletes it. It counts from publication while the video is
-  published and from the event's end otherwise, removing the video does not
-  reset it, and at its end the cleanup deletes the files of every session and
+  published and from the event's end otherwise, never before the period was
+  chosen, the video unpublished or a new file attached
+  (`Event.recordingRetentionFrom`); removing the video does not reset it, and at its end the cleanup deletes the files of every session and
   hands the outputs to `postprod-retention`
   ([Recording retention](../GDPR.md#recording-retention)). For as long as the
   recording exists, the proofs of its consents outlive the registrations
