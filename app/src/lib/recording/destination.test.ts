@@ -218,23 +218,23 @@ describe('testo del consenso', () => {
       const testo = messages.gdpr.consent[chiaveConsenso(destinazione, 'visibili')];
       expect(testo).not.toMatch(/volto|nome non/i);
     }
-    // Chiede di piu': si salva con la versione del testo che lo diceva, anche
-    // senza destinazione.
-    expect(versioneDellaProva('REGISTRANTS', 'visibili')).toBe(1);
-    expect(versioneDellaProva(null, 'visibili')).toBe(1);
+    // La prova dice su quale testo e' stata data, con o senza destinazione.
+    expect(versioneDellaProva('visibili')).toBe(1);
     for (const voce of ['solo-voce', 'esclusi'] as const) {
-      expect(versioneDellaProva('PUBLIC', voce)).toBe(VERSIONE_TESTO_REGISTRAZIONE);
-      expect(versioneDellaProva(null, voce)).toBeNull();
+      expect(versioneDellaProva(voce)).toBe(VERSIONE_TESTO_REGISTRAZIONE);
     }
-    expect(versioneDellaProva(null, 'assente')).toBeNull();
+    // Il testo senza video non ha versione.
+    expect(versioneDellaProva('assente')).toBeNull();
   });
 
   it("dove chi partecipa puo' comparire copre solo il testo che lo diceva", () => {
     // Il testo per la sola voce prometteva che volto e nome restavano fuori.
     expect(provaCopre({ destination: 'PUBLIC', textVersion: 2 }, 'PUBLIC', 'visibili')).toBe(false);
-    expect(provaCopre({ destination: null, textVersion: null }, null, 'visibili')).toBe(false);
+    expect(provaCopre({ destination: null, textVersion: 2 }, null, 'visibili')).toBe(false);
     expect(provaCopre({ destination: 'PUBLIC', textVersion: 1 }, 'REGISTRANTS', 'visibili')).toBe(true);
     expect(provaCopre({ destination: null, textVersion: 1 }, null, 'visibili')).toBe(true);
+    // Senza versione: data quando ogni testo diceva audio e video.
+    expect(provaCopre({ destination: null, textVersion: null }, null, 'visibili')).toBe(true);
     // La destinazione conta comunque.
     expect(provaCopre({ destination: 'REGISTRANTS', textVersion: 1 }, 'PUBLIC', 'visibili')).toBe(false);
     // Altrove il testo 1 copre il 2, che chiede meno, e decide la destinazione.

@@ -15,11 +15,8 @@ import { captionsTranscriptActive, liveCaptionsAvailable } from '@/lib/captions/
 import { getSettings } from '@/lib/settings';
 import { partecipantiNelVideo, recordingAvailableFor } from '@/lib/recording/availability';
 import { accessoRegistrazione, vedeVideo } from '@/lib/recording/audience';
-import {
-  destinazioneDelTesto,
-  provaCopre,
-  recuperoAperto,
-} from '@/lib/recording/destination';
+import { destinazioneDelTesto, recuperoAperto } from '@/lib/recording/destination';
+import { registrazioneDellIscrizione } from '@/lib/live/consents-in-force';
 import { informativaEvento } from '@/lib/events/privacy-notice';
 import { schedaPrivacyEvento, testoIaDelSito } from '@/lib/events/privacy-sheet';
 import LiveEventClient from '@/components/live/live-event-client';
@@ -389,35 +386,18 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       registration.consentMultitrack === true &&
       !registration.consentMultitrackWithdrawnAt &&
       (registration.consentMultitrackVersion ?? 1) >= versioneMinima;
-    const registrazioneAllIscrizione =
-      registration.consentRecording === true &&
-      !registration.consentRecordingWithdrawnAt &&
-      provaCopre(
-        {
-          destination: registration.consentRecordingDestination,
-          textVersion: registration.consentRecordingVersion,
-        },
-        destinazione,
-        partecipanti
-      );
-    const [proveTracce, provaRegistrazione] = ownsToken
+    // La stessa regola del token (lib/live/consents-in-force): l'iscrizione, poi
+    // la prova data in sala.
+    const [proveTracce, registrazioneValida] = ownsToken
       ? await Promise.all([
           !datoAllIscrizione && chiedeConsensoPerVoce(event, settings)
             ? prisma.multitrackConsent.count({ where: { ...prove, textVersion: { gte: versioneMinima } } })
             : 0,
-          !registrazioneAllIscrizione && event.recordingEnabled
-            ? prisma.recordingConsent.findFirst({
-                where: prove,
-                select: { destination: true, textVersion: true },
-              })
-            : null,
+          registrazioneDellIscrizione(event, registration, destinazione, partecipanti),
         ])
-      : ([0, null] as const);
+      : ([0, false] as const);
     hasMultitrackConsent = ownsToken && (datoAllIscrizione || proveTracce > 0);
-    hasRecordingConsent =
-      ownsToken &&
-      (registrazioneAllIscrizione ||
-        (!!provaRegistrazione && provaCopre(provaRegistrazione, destinazione, partecipanti)));
+    hasRecordingConsent = ownsToken && registrazioneValida;
     // Solo per chi ha il proprio link: un link inoltrato non risponde a nome
     // di chi l'ha ricevuto.
     iscrizioneEntrata = ownsToken && registration.joinedAt !== null;

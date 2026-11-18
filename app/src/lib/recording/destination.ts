@@ -139,7 +139,7 @@ export function recuperoAperto(evento: {
 /**
  * La versione del testo del consenso alla registrazione. Si salva con il
  * consenso, accanto alla destinazione letta (Registration.consentRecordingVersion,
- * RecordingConsent.textVersion), solo se il testo la dichiara:
+ * RecordingConsent.textVersion), come dice `versioneDellaProva`:
  *   1. il testo che dice dove va il video (gdpr.consent.recordingReserved,
  *      gdpr.consent.recordingPublic), con nome, voce e immagine di chi acconsente;
  *   2. lo stesso testo per la sola voce: nel video compare solo chi conduce, e di
@@ -149,11 +149,12 @@ export function recuperoAperto(evento: {
  * ('visibili') la casella mostra di nuovo il testo 1, con le sue parole, la
  * prova salva 1 (`versioneDellaProva`), e un consenso dato sul testo 2 non copre
  * piu' (`provaCopre`): prometteva che volto e nome restavano fuori.
- * Due testi non lo dicono, e destinazione e versione restano null, come sui
- * consensi dati prima: gdpr.consent.recording, su un evento senza destinazione,
- * e gdpr.consent.recordingNoVideo, dove non c'e' un video da pubblicare. Il
- * testo 1 senza destinazione (gdpr.consent.recordingVisible) salva la versione
- * comunque (`versioneDellaProva`): li' copre solo quel testo (`provaCopre`). Per
+ * Due testi non dicono la destinazione, che resta null come sui consensi dati
+ * prima: gdpr.consent.recording (o recordingVisible), su un evento senza
+ * destinazione, e gdpr.consent.recordingNoVideo, dove non c'e' un video da
+ * pubblicare. La versione si salva comunque, tranne per il testo senza video
+ * (`versioneDellaProva`): una prova senza versione e' stata data prima che i
+ * testi la dichiarassero, quando ogni testo diceva audio e video. Per
  * questo i consensi si confrontano con `destinazioneDelTesto`, non con la colonna
  * dell'evento: dove non c'e' un video un consenso senza destinazione copre. Se
  * poi l'installazione registra il video, su un evento con destinazione non copre
@@ -163,26 +164,23 @@ export function recuperoAperto(evento: {
 export const VERSIONE_TESTO_REGISTRAZIONE = 2;
 
 /**
- * La versione da salvare con la prova di un consenso dato ora, sul testo che
- * dichiara `destinazioneLetta`: il testo 1, nome, voce e immagine, dove chi
- * partecipa puo' comparire nel video ('visibili'), altrove quello per la sola
- * voce. Si salva con una destinazione, come dice `VERSIONE_TESTO_REGISTRAZIONE`;
- * il testo 1 anche senza, perche' li' copre solo lui (`provaCopre`) e la prova
- * deve dire su quale testo e' stata data.
+ * La versione da salvare con la prova di un consenso dato ora, con o senza
+ * destinazione: il testo 1, nome, voce e immagine, dove chi partecipa puo'
+ * comparire nel video ('visibili'), altrove il testo per la sola voce. Il testo
+ * senza video (gdpr.consent.recordingNoVideo) non ha versione: null.
  */
-export function versioneDellaProva(
-  destinazioneLetta: Destinazione,
-  partecipanti: PartecipantiNelVideo
-): number | null {
-  if (partecipanti === 'visibili') return 1;
-  return destinazioneLetta ? VERSIONE_TESTO_REGISTRAZIONE : null;
+export function versioneDellaProva(partecipanti: PartecipantiNelVideo): number | null {
+  if (partecipanti === 'assente') return null;
+  return partecipanti === 'visibili' ? 1 : VERSIONE_TESTO_REGISTRAZIONE;
 }
 
 /**
  * Una prova di consenso gia' data copre il testo in vigore: la destinazione
  * (`consensoCopre`) e, dove chi partecipa puo' comparire nel video ('visibili'),
- * il testo che diceva nome, voce e immagine (versione 1). Li' un consenso dato sul
- * testo per la sola voce, o senza versione, non copre: chi l'ha dato entra in
+ * il testo che diceva nome, voce e immagine. Li' copre la versione 1, e una prova
+ * senza versione, data prima che il testo per la sola voce esistesse, quando ogni
+ * testo diceva audio e video. Un consenso dato sul testo per la sola voce non
+ * copre: prometteva che volto e nome restavano fuori, e chi l'ha dato entra in
  * solo ascolto e lo si richiede in sala, sul testo che dice cosa riprende il video.
  */
 export function provaCopre(
@@ -191,7 +189,7 @@ export function provaCopre(
   partecipanti: PartecipantiNelVideo
 ): boolean {
   if (!consensoCopre(prova.destination, inVigore)) return false;
-  return partecipanti !== 'visibili' || prova.textVersion === 1;
+  return partecipanti !== 'visibili' || prova.textVersion == null || prova.textVersion === 1;
 }
 
 /**

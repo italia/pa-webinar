@@ -579,7 +579,7 @@ describe('POST registrations — la destinazione del video nel consenso', () => 
     });
   });
 
-  it('su un evento senza destinazione il testo non ne dichiara una: niente versione', async () => {
+  it('su un evento senza destinazione il testo non ne dichiara una, ma la versione si', async () => {
     conRegistrazione(null);
     const res = await iscriviti('anna@example.com', {
       consentRecording: true,
@@ -589,7 +589,7 @@ describe('POST registrations — la destinazione del video nel consenso', () => 
     expect(iscrizioneScritta()).toMatchObject({
       consentRecording: true,
       consentRecordingDestination: null,
-      consentRecordingVersion: null,
+      consentRecordingVersion: 2,
     });
   });
 

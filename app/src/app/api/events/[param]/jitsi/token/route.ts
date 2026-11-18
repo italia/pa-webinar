@@ -176,9 +176,11 @@ async function consensiInVigore(
   posto: string,
   registrazione: boolean,
   /** La trascrizione gia' letta per questo posto in questa richiesta, se nessuna
-   *  prova e' stata scritta dopo: non si rilegge. */
-  trascrizioneLetta?: boolean,
+   *  prova e' stata scritta dopo: non si rilegge. Null: la lettura non e'
+   *  riuscita, e la sala tiene l'ultimo stato noto. */
+  trascrizioneLetta?: boolean | null,
 ): Promise<{ recording: boolean; transcription: boolean } | undefined> {
+  if (trascrizioneLetta === null) return undefined;
   try {
     return {
       recording: registrazione,
@@ -253,7 +255,7 @@ async function registraConsensi(
   const destinazioneLetta = testoLetto(data.recordingConsentDestination, destinazione);
   const testoDellaProva = {
     destination: destinazioneLetta,
-    textVersion: versioneDellaProva(destinazioneLetta, partecipanti),
+    textVersion: versioneDellaProva(partecipanti),
   };
   const alMeglio = async (quale: string, scrivi: () => Promise<unknown>): Promise<boolean> => {
     try {
@@ -314,7 +316,11 @@ async function registraConsensi(
               registrationId,
               ...(esistente.withdrawnAt
                 ? { withdrawnAt: { not: null } }
-                : { withdrawnAt: null, destination: esistente.destination }),
+                : {
+                    withdrawnAt: null,
+                    destination: esistente.destination,
+                    textVersion: esistente.textVersion,
+                  }),
             },
             data: {
               withdrawnAt: null,
@@ -453,11 +459,8 @@ export const POST = withErrorHandling(async (request, context) => {
     regola.voceDallaTrascrizione &&
     parsed.data.multitrackConsent === true &&
     chiedeConsensoPerVoce(eventoConsensi, await getSettings());
-  const consensoVoce = async (
-    registrazione: boolean,
-    trascrizioneValida: () => Promise<boolean>,
-  ): Promise<boolean> =>
-    regola.voceDallaTrascrizione ? trascrizioneOra || (await trascrizioneValida()) : registrazione;
+  const consensoVoce = (registrazione: boolean, trascrizioneValida: boolean): boolean =>
+    regola.voceDallaTrascrizione ? trascrizioneOra || trascrizioneValida : registrazione;
   // La trascrizione dell'iscritto, letta per il segno della voce. Null: la
   // lettura non e' riuscita. Non toglie il JWT, e la voce resta fuori.
   const trascrizioneDelPosto = async (posto: string): Promise<boolean | null> => {
@@ -618,7 +621,7 @@ export const POST = withErrorHandling(async (request, context) => {
         partecipanti,
       );
       const mediaInoltro = mediaPartecipante(
-        await consensoVoce(consensoDato || !!replicaInoltro.registrazione, async () => !!replicaInoltro.tracce),
+        consensoVoce(consensoDato || !!replicaInoltro.registrazione, !!replicaInoltro.tracce),
       );
       // Pubblico anonimo: lo pseudonimo del posto (lo stesso della chat).
       const nomeInoltro = event.audienceAnonymous
@@ -673,13 +676,15 @@ export const POST = withErrorHandling(async (request, context) => {
       consensoDato ||
       (await registrazioneDellIscrizione(event, registration, destinazione, partecipanti));
     const postoIscritto = participantJitsiId(registration.id);
-    // Letta una volta sola, e riportata alla sala senza rileggerla.
-    let trascrizioneIscritto: boolean | undefined;
+    // Dove decide il segno della voce si legge una volta sola, e la stessa
+    // lettura torna alla sala: in questa richiesta l'iscritto non da' la
+    // trascrizione, quindi nessuna prova nuova la cambia.
+    const trascrizioneIscritto =
+      regola.voceDallaTrascrizione && !trascrizioneOra
+        ? await trascrizioneDelPosto(postoIscritto)
+        : undefined;
     const mediaIscritto = mediaPartecipante(
-      await consensoVoce(consensoIscritto, async () => {
-        trascrizioneIscritto = (await trascrizioneDelPosto(postoIscritto)) ?? undefined;
-        return trascrizioneIscritto === true;
-      }),
+      consensoVoce(consensoIscritto, trascrizioneIscritto === true),
     );
 
     // Record the join, set-once. Kept write-free on rejoin so the reconnect
@@ -797,7 +802,7 @@ export const POST = withErrorHandling(async (request, context) => {
       partecipanti,
     );
     const mediaOspite = mediaPartecipante(
-      await consensoVoce(consensoDato || !!replicaOspite.registrazione, async () => !!replicaOspite.tracce),
+      consensoVoce(consensoDato || !!replicaOspite.registrazione, !!replicaOspite.tracce),
     );
     // Pubblico anonimo: lo pseudonimo del posto in chat (la chiave dell'ospite).
     const nomeOspite = event.audienceAnonymous
