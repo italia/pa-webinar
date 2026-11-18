@@ -335,7 +335,13 @@ describe('ritiraProveDelleIscrizioni', () => {
       .mockResolvedValueOnce({ count: 2 })
       .mockResolvedValueOnce({ count: 1 });
     expect(
-      await ritiraProveDelleIscrizioni(cliente, 'e1', ['r1'], { registrazione: true }, ADESSO)
+      await ritiraProveDelleIscrizioni(
+        cliente,
+        'e1',
+        ['r1'],
+        { registrazione: true, trascrizione: true },
+        ADESSO
+      )
     ).toEqual({ recording: 2, transcription: 1 });
     expect(tx.retainedConsentProof.updateMany.mock.calls.map((c) => c[0])).toEqual([
       { where: { ...dove, kind: 'recording' }, data: { withdrawnAt: ADESSO } },
@@ -346,9 +352,31 @@ describe('ritiraProveDelleIscrizioni', () => {
   it('la trascrizione non tocca la registrazione', async () => {
     tx.retainedConsentProof.updateMany.mockResolvedValue({ count: 1 });
     expect(
-      await ritiraProveDelleIscrizioni(cliente, 'e1', ['r1'], { registrazione: false }, ADESSO)
+      await ritiraProveDelleIscrizioni(
+        cliente,
+        'e1',
+        ['r1'],
+        { registrazione: false, trascrizione: true },
+        ADESSO
+      )
     ).toEqual({ recording: 0, transcription: 1 });
     expect(tx.retainedConsentProof.updateMany).toHaveBeenCalledTimes(1);
+  });
+
+  it('dove chi partecipa non entra nel video la registrazione si ritira da sola', async () => {
+    tx.retainedConsentProof.updateMany.mockResolvedValue({ count: 1 });
+    expect(
+      await ritiraProveDelleIscrizioni(
+        cliente,
+        'e1',
+        ['r1'],
+        { registrazione: true, trascrizione: false },
+        ADESSO
+      )
+    ).toEqual({ recording: 1, transcription: 0 });
+    expect(tx.retainedConsentProof.updateMany.mock.calls.map((c) => c[0])).toEqual([
+      { where: { ...dove, kind: 'recording' }, data: { withdrawnAt: ADESSO } },
+    ]);
   });
 });
 

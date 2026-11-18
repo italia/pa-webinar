@@ -29,7 +29,10 @@
  * Durante l'evento succede lo stesso, come per il consenso ridato in sala.
  * Dove la voce di chi non acconsente resta fuori dalla
  * registrazione, la trascrizione chiede prima il consenso alla registrazione, come
- * in sala. Le comunicazioni future non riguardano l'evento: tornano finche'
+ * in sala; dove chi partecipa non entra mai nel video ('esclusi') il consenso alla
+ * registrazione non si offre, e la trascrizione vale da sola. Il consenso alla
+ * registrazione vale per il testo letto, destinazione e versione (`provaCopre`),
+ * come nel modulo d'iscrizione. Le comunicazioni future non riguardano l'evento: tornano finche'
  * l'evento e l'installazione propongono la rubrica (`rubricaProposta`), come la
  * conferma di una spunta in attesa (lib/persons/spunta-in-attesa).
  */
@@ -53,11 +56,13 @@ import { rubricaProposta } from '@/lib/persons/address-book';
 import { ridaiComunicazioni } from '@/lib/persons/spunta-in-attesa';
 import { partecipantiNelVideo, recordingAvailableFor } from '@/lib/recording/availability';
 import {
-  consensoCopre,
   destinazioneDelTesto,
+  provaCopre,
   testoInVigore,
   testoLetto,
-  VERSIONE_TESTO_REGISTRAZIONE,
+  versioneCopre,
+  versioneDellaProva,
+  versioneLetta,
   type Destinazione,
 } from '@/lib/recording/destination';
 import {
@@ -112,6 +117,8 @@ export interface OffertaConsensi {
     voice: VoceNelVideo;
     /** Come compaiono nel video i partecipanti: sceglie il testo della casella. */
     participants: PartecipantiNelVideo;
+    /** La versione del testo della casella: la pagina la rimanda con il consenso. */
+    textVersion: number;
     /** Il testo scelto per l'evento, che precede quello della casella. */
     eventText: string | null;
     /** Un consenso dato vale per il testo in vigore. Uno dato su un testo che non
@@ -135,12 +142,17 @@ export interface ConsensiDellIscrizione {
   consentRecording: boolean | null;
   consentRecordingWithdrawnAt: Date | null;
   consentRecordingDestination: Destinazione;
+  consentRecordingVersion: number | null;
   consentMultitrack: boolean | null;
   consentMultitrackVersion: number | null;
   consentMultitrackWithdrawnAt: Date | null;
-  /** Le prove di sala dell'iscrizione: il ritiro e, per la registrazione, la
-   *  destinazione, per la trascrizione la versione del testo. */
-  recordingConsents: readonly { withdrawnAt: Date | null; destination: Destinazione }[];
+  /** Le prove di sala dell'iscrizione: il ritiro e la versione del testo, per la
+   *  registrazione anche la destinazione. */
+  recordingConsents: readonly {
+    withdrawnAt: Date | null;
+    destination: Destinazione;
+    textVersion: number | null;
+  }[];
   multitrackConsents: readonly { withdrawnAt: Date | null; textVersion: number }[];
 }
 
@@ -148,20 +160,29 @@ export interface ConsensiDellIscrizione {
  * I consensi dell'iscrizione che valgono per il testo in vigore, con le regole del
  * token della sala (lib/live/consents-in-force) e della trascrizione
  * (lib/captions/room): dati all'iscrizione o in sala, non ritirati, su un testo che
- * copre la destinazione del video e con la versione richiesta.
+ * copre la destinazione del video e cio' che il video riprende (`provaCopre`), e
+ * con la versione richiesta.
  */
 export function consensiInVigore(
   c: ConsensiDellIscrizione,
   destinazione: Destinazione,
-  versioneTrascrizione: number
+  versioneTrascrizione: number,
+  partecipanti: PartecipantiNelVideo
 ): { recording: boolean; transcription: boolean } {
   return {
     recording:
       (c.consentRecording === true &&
         !c.consentRecordingWithdrawnAt &&
-        consensoCopre(c.consentRecordingDestination, destinazione)) ||
+        provaCopre(
+          {
+            destination: c.consentRecordingDestination,
+            textVersion: c.consentRecordingVersion,
+          },
+          destinazione,
+          partecipanti
+        )) ||
       c.recordingConsents.some(
-        (p) => !p.withdrawnAt && consensoCopre(p.destination, destinazione)
+        (p) => !p.withdrawnAt && provaCopre(p, destinazione, partecipanti)
       ),
     transcription:
       (c.consentMultitrack === true &&
@@ -213,7 +234,8 @@ export function offertaConsensi(
   const vigore = consensiInVigore(
     iscrizione,
     r.destinazione,
-    versioneConsensoTrascrizione(evento, sito)
+    versioneConsensoTrascrizione(evento, sito),
+    r.partecipanti
   );
   return {
     recording:
@@ -222,6 +244,7 @@ export function offertaConsensi(
             destination: r.destinazione,
             voice: r.voce,
             participants: r.partecipanti,
+            textVersion: versioneDellaProva(r.partecipanti),
             eventText: testoConsensoEvento(evento.recordingConsentText, r.partecipanti),
             inForce: vigore.recording,
           }
@@ -252,10 +275,12 @@ export type EsitoConsensoDato =
   /** Il testo letto non e' quello in vigore: la pagina va ricaricata. */
   | 'testoCambiato';
 
-/** Il testo che la pagina ha mostrato: per la registrazione la destinazione, per la
- *  trascrizione la casella (con la traccia che si cancella o che si conserva). */
+/** Il testo che la pagina ha mostrato: per la registrazione la destinazione e la
+ *  versione, per la trascrizione la casella (con la traccia che si cancella o che
+ *  si conserva). */
 export interface TestoLetto {
   destinazione?: Destinazione;
+  versione?: number;
   trascrizione?: ReturnType<typeof chiaveConsensoTrascrizione>;
 }
 
@@ -266,12 +291,13 @@ const CAMPI_ISCRIZIONE = {
   consentRecording: true,
   consentRecordingWithdrawnAt: true,
   consentRecordingDestination: true,
+  consentRecordingVersion: true,
   consentMultitrack: true,
   consentMultitrackVersion: true,
   consentMultitrackWithdrawnAt: true,
   consentFutureCommunications: true,
   consentFutureCommunicationsWithdrawnAt: true,
-  recordingConsents: { select: { withdrawnAt: true, destination: true } },
+  recordingConsents: { select: { withdrawnAt: true, destination: true, textVersion: true } },
   multitrackConsents: { select: { withdrawnAt: true, textVersion: true } },
   event: { select: CAMPI_EVENTO_CONSENSI },
 } as const satisfies Prisma.RegistrationSelect;
@@ -299,13 +325,15 @@ async function daiRegistrazione(
   tx: Prisma.TransactionClient,
   iscrizione: IscrizioneConsensi,
   destinazione: Destinazione,
-  letta: Destinazione | undefined,
+  letto: TestoLetto,
+  partecipanti: PartecipantiNelVideo,
   locale: string | null
 ): Promise<EsitoConsensoDato> {
-  const destinazioneLetta = testoLetto(letta, destinazione);
+  // Il testo letto, destinazione e versione, come nel modulo d'iscrizione: la
+  // versione si salva con o senza destinazione (`versioneLetta`).
   const testo = {
-    destination: destinazioneLetta,
-    textVersion: destinazioneLetta ? VERSIONE_TESTO_REGISTRAZIONE : null,
+    destination: testoLetto(letto.destinazione, destinazione),
+    textVersion: versioneLetta(letto.versione, partecipanti),
   };
   // La prova dell'iscrizione e' una sola (vincolo unico): torna valida con l'ora
   // nuova, e il periodo di prima resta nella prova, come per il consenso ridato
@@ -331,7 +359,11 @@ async function daiRegistrazione(
         registrationId: iscrizione.id,
         ...(esistente.withdrawnAt
           ? { withdrawnAt: { not: null } }
-          : { withdrawnAt: null, destination: esistente.destination }),
+          : {
+              withdrawnAt: null,
+              destination: esistente.destination,
+              textVersion: esistente.textVersion,
+            }),
       },
       data: {
         withdrawnAt: null,
@@ -454,19 +486,21 @@ export async function daiConsenso(
       const vigore = consensiInVigore(
         iscrizione,
         r.destinazione,
-        versioneConsensoTrascrizione(iscrizione.event, sito)
+        versioneConsensoTrascrizione(iscrizione.event, sito),
+        r.partecipanti
       );
       if (consenso === 'recording') {
         if (!r.richiesti.registrazione) return 'nonOfferto';
-        if (!testoInVigore(letto.destinazione, r.destinazione)) return 'testoCambiato';
+        // La destinazione, e il testo: dove chi partecipa puo' comparire nel video
+        // vale solo quello che lo dice (`versioneCopre`), come nel modulo.
+        if (
+          !testoInVigore(letto.destinazione, r.destinazione) ||
+          !versioneCopre(letto.versione, r.partecipanti)
+        ) {
+          return 'testoCambiato';
+        }
         if (vigore.recording) return 'gia';
-        return daiRegistrazione(
-          tx,
-          iscrizione,
-          r.destinazione,
-          letto.destinazione,
-          locale
-        );
+        return daiRegistrazione(tx, iscrizione, r.destinazione, letto, r.partecipanti, locale);
       }
       if (!r.richiesti.tracce) return 'nonOfferto';
       const testo = chiaveConsensoTrascrizione(

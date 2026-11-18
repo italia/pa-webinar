@@ -32,7 +32,7 @@ import RetainedConsentProofs, {
 } from '@/components/privacy/retained-consent-proofs';
 import { Icon } from '@/components/ui/icon';
 import { Link, percorso } from '@/i18n/navigation';
-import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import type { PartecipantiNelVideo } from '@/lib/live/consent-rule';
 import { localizedPath } from '@/lib/utils/localized-url';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
@@ -146,7 +146,7 @@ export default function MyDataPage() {
   const [prove, setProve] = useState<ProvaConservataVista[]>([]);
   // Il token per ritirare un consenso: lo consegna la lettura dei dati.
   const [tokenConsensi, setTokenConsensi] = useState<string | null>(null);
-  const [voce, setVoce] = useState<VoceNelVideo>('rimovibile');
+  const [partecipanti, setPartecipanti] = useState<PartecipantiNelVideo>('solo-voce');
   const [comunicazioniRitirateIl, setComunicazioniRitirateIl] = useState<string | null>(null);
   const [rubricaConfermata, setRubricaConfermata] = useState(false);
   // Le iscrizioni cancellate da qui, con le prove rimaste senza nome: la scheda
@@ -192,7 +192,7 @@ export default function MyDataPage() {
         setRubrica(json.addressBook ?? null);
         setProve(Array.isArray(json.retainedConsentProofs) ? json.retainedConsentProofs : []);
         setTokenConsensi(typeof json.consentsToken === 'string' ? json.consentsToken : null);
-        if (json.voiceInVideo) setVoce(json.voiceInVideo);
+        if (json.participantsInVideo) setPartecipanti(json.participantsInVideo);
       } catch {
         if (!cancelled) setError(t('error'));
       } finally {
@@ -608,7 +608,7 @@ export default function MyDataPage() {
                         token={tokenConsensi}
                         registrationId={entry.registration.id}
                         consensi={entry.registration.consents}
-                        voce={voce}
+                        partecipanti={partecipanti}
                         comunicazioniRitirateIl={comunicazioniRitirateIl}
                         onComunicazioniRitirate={setComunicazioniRitirateIl}
                         rubricaConfermata={rubricaConfermata}

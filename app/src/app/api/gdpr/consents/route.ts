@@ -22,9 +22,13 @@
  *  - `registrationId` con `consent` e `give`, il consenso dato di nuovo
  *    (lib/gdpr/consent-giving), con la stessa prova di quello dato in sala. Per
  *    la registrazione la pagina rimanda la destinazione del testo che ha mostrato
- *    (`recordingDestination`, null se non ne dichiara una), come il modulo
- *    d'iscrizione, e per la trascrizione la casella (`transcriptionText`). Vale
- *    dal prossimo ingresso in sala.
+ *    (`recordingDestination`, null se non ne dichiara una) e la sua versione
+ *    (`recordingVersion`), come il modulo d'iscrizione, e per la trascrizione la
+ *    casella (`transcriptionText`). Vale dal prossimo ingresso in sala.
+ *
+ * Il ritiro della registrazione ritira anche la trascrizione, salvo dove chi
+ * partecipa non entra mai nel video (lib/live/consent-rule
+ * `ritiroPortaTrascrizione`): li' la voce la decide la sola trascrizione.
  */
 import { z } from 'zod';
 
@@ -35,9 +39,11 @@ import { AppError, NotFoundError, RateLimitError, ValidationError } from '@/lib/
 import { verifyGdprToken } from '@/lib/gdpr/request-token';
 import { daiConsenso, type EsitoConsensoDato } from '@/lib/gdpr/consent-giving';
 import { ritiraProvaConservata } from '@/lib/gdpr/retained-consent-proofs';
+import { ritiroPortaTrascrizione } from '@/lib/live/consent-rule';
 import { ritiraComunicazioni, ritiraConsensi } from '@/lib/live/consent-withdrawal';
 import { applicaSpuntaInAttesa } from '@/lib/persons/spunta-in-attesa';
 import { getClientIp, rateLimit } from '@/lib/rate-limit';
+import { partecipantiNelVideo } from '@/lib/recording/availability';
 
 export const dynamic = 'force-dynamic';
 
@@ -72,14 +78,19 @@ const schema = z.union([
       consent: z.enum(['recording', 'transcription', 'futureCommunications']),
       give: z.literal(true),
       recordingDestination: destinatariVideo.nullable().optional(),
+      recordingVersion: z.number().int().positive().max(1000).optional(),
       transcriptionText: z.enum(['multitrack', 'multitrackRetained']).optional(),
       locale: z.string().max(10).optional(),
     })
     .strict()
-    // Il consenso alla registrazione vale per il testo letto: la pagina lo dice.
-    // Senza la casella della trascrizione la risposta e' «testo cambiato», che fa
-    // ricaricare la pagina.
-    .refine((c) => c.consent !== 'recording' || c.recordingDestination !== undefined),
+    // Il consenso alla registrazione vale per il testo letto: la pagina lo dice,
+    // destinazione e versione. Senza la casella della trascrizione la risposta e'
+    // «testo cambiato», che fa ricaricare la pagina.
+    .refine(
+      (c) =>
+        c.consent !== 'recording' ||
+        (c.recordingDestination !== undefined && c.recordingVersion !== undefined)
+    ),
 ]);
 
 /** Perche' un consenso non si e' potuto dare: la pagina lo spiega. */
@@ -111,6 +122,7 @@ export const POST = withErrorHandling(async (request) => {
     const esito = await daiConsenso(verificato.emailHash, corpo.registrationId, corpo.consent, {
       letto: {
         destinazione: corpo.recordingDestination ?? null,
+        versione: corpo.recordingVersion,
         trascrizione: corpo.transcriptionText,
       },
       locale: linguaPagina(corpo.locale),
@@ -121,11 +133,16 @@ export const POST = withErrorHandling(async (request) => {
     return risposta({ given: corpo.consent });
   }
 
+  // Si legge com'e' oggi l'installazione, come per il consenso dato.
+  const conTrascrizione = ritiroPortaTrascrizione(partecipantiNelVideo());
+
   if ('proofId' in corpo) {
     const trovata = await ritiraProvaConservata(
       verificato.emailHash,
       corpo.proofId,
-      corpo.consent
+      corpo.consent,
+      new Date(),
+      { trascrizione: conTrascrizione }
     );
     if (!trovata) throw new NotFoundError('Consent proof');
     return risposta({ withdrawn: corpo.consent });
@@ -150,7 +167,7 @@ export const POST = withErrorHandling(async (request) => {
     await ritiraConsensi(
       iscrizione.eventId,
       [],
-      { registrazione: consent === 'recording' },
+      { registrazione: consent === 'recording', trascrizione: conTrascrizione },
       new Date(),
       {
         iscrizioni: [iscrizione.id],

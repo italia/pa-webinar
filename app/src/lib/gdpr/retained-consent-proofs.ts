@@ -254,7 +254,7 @@ export async function ritiraProveDelleIscrizioni(
   tx: Pick<Prisma.TransactionClient, 'retainedConsentProof'>,
   eventId: string,
   registrationIds: readonly string[],
-  cosa: { registrazione: boolean },
+  cosa: { registrazione: boolean; trascrizione: boolean },
   adesso: Date
 ): Promise<Record<TipoConsenso, number>> {
   const holderHash = {
@@ -269,7 +269,7 @@ export async function ritiraProveDelleIscrizioni(
     ).count;
   return {
     recording: cosa.registrazione ? await ritira('recording') : 0,
-    transcription: await ritira('transcription'),
+    transcription: cosa.trascrizione ? await ritira('transcription') : 0,
   };
 }
 
@@ -278,7 +278,9 @@ export async function ritiraProveDelleIscrizioni(
  * prova deve essere di questo indirizzo e di questo tipo. Come per il ritiro
  * dalla sala (lib/live/consent-withdrawal), ritirare la registrazione ritira
  * anche la trascrizione dello stesso evento, che senza registrazione non ha
- * luogo. Vale per tutti i periodi del consenso. Il video non cambia; la persona
+ * luogo, salvo `trascrizione: false` (dove chi partecipa non entra mai nel
+ * video, lib/live/consent-rule `ritiroPortaTrascrizione`). Vale per tutti i
+ * periodi del consenso. Il video non cambia; la persona
  * esce dalla trascrizione dai sottotitoli, come con il ritiro dalla sala, con il
  * limite dei corpi senza impronte per chi conduce.
  *
@@ -289,8 +291,12 @@ export async function ritiraProvaConservata(
   emailHash: string,
   proofId: string,
   consent: TipoConsenso,
-  adesso: Date = new Date()
+  adesso: Date = new Date(),
+  { trascrizione = true }: { trascrizione?: boolean } = {}
 ): Promise<boolean> {
+  // Il ritiro della trascrizione la ritira sempre; quello della registrazione,
+  // salvo `trascrizione: false`.
+  const conTrascrizione = consent === 'transcription' || trascrizione;
   return prisma.$transaction(
     async (tx) => {
       const prova = await tx.retainedConsentProof.findFirst({
@@ -308,8 +314,8 @@ export async function ritiraProvaConservata(
           })
         ).count;
       const recording = consent === 'recording' ? await ritira('recording') : 0;
-      const transcription = await ritira('transcription');
-      await togliDalleTrascrizioni(tx, eventId, emailHash);
+      const transcription = conTrascrizione ? await ritira('transcription') : 0;
+      if (conTrascrizione) await togliDalleTrascrizioni(tx, eventId, emailHash);
       if (recording + transcription > 0) {
         await tx.gdprAuditLog.create({
           data: {

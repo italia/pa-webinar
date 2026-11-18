@@ -7,7 +7,12 @@ import { useState } from 'react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { Button } from 'design-react-kit';
 
-import type { PartecipantiNelVideo, VoceNelVideo } from '@/lib/live/consent-rule';
+import {
+  ritiroPortaTrascrizione,
+  voceDi,
+  type PartecipantiNelVideo,
+  type VoceNelVideo,
+} from '@/lib/live/consent-rule';
 import { MESI_RUBRICA_PREDEFINITI } from '@/lib/persons/retention';
 import { chiaveConsenso, type Destinazione } from '@/lib/recording/destination';
 
@@ -33,6 +38,8 @@ export interface OffertaVista {
     destination: Destinazione;
     voice: VoceNelVideo;
     participants: PartecipantiNelVideo;
+    /** La versione del testo della casella: torna con il consenso. */
+    textVersion: number;
     eventText: string | null;
     /** Il consenso dato vale per il testo in vigore: uno su un testo che non lo
      *  copre resta dato, ma va dato di nuovo. Assente nelle risposte di prima. */
@@ -61,7 +68,7 @@ export default function RegistrationConsents({
   token,
   registrationId,
   consensi,
-  voce = 'rimovibile',
+  partecipanti = 'solo-voce',
   comunicazioniRitirateIl = null,
   onComunicazioniRitirate,
   rubricaConfermata = false,
@@ -69,7 +76,9 @@ export default function RegistrationConsents({
   offerta = null,
   locale,
 }: {
-  voce?: VoceNelVideo;
+  /** Come compaiono nel video i partecipanti (lib/recording/availability): dice
+   *  cosa cambia ritirando la registrazione. */
+  partecipanti?: PartecipantiNelVideo;
   /** Cosa si puo' dare di nuovo, e con quale testo. */
   offerta?: OffertaVista | null;
   /** La lingua della pagina: va con la prova del consenso dato. */
@@ -168,6 +177,10 @@ export default function RegistrationConsents({
     if (vigoreLocale[chiave] !== undefined) return vigoreLocale[chiave]!;
     return offerta?.[chiave]?.inForce ?? !!stati[chiave]?.dato;
   };
+  // Dove chi partecipa non entra mai nel video, ritirare la registrazione lascia
+  // la trascrizione com'e' (la voce la decide lei sola).
+  const ritiroConTrascrizione = ritiroPortaTrascrizione(partecipanti);
+  const voce = voceDi(partecipanti);
   // La trascrizione senza la registrazione non avrebbe la voce: va data dopo.
   const serveRegistrazione =
     !!offerta?.transcription?.needsRecording && !inVigore('recording');
@@ -178,11 +191,15 @@ export default function RegistrationConsents({
         chiave: 'recording',
         titolo: tl('recording.title'),
         // Il ritiro porta con se' la trascrizione (`ritira`): la conferma lo dice.
+        // Dove chi partecipa non entra mai nel video non cambia niente del video,
+        // e la trascrizione resta.
         effetto: [
-          ...(voce === 'assente'
+          ...(voce === 'assente' || partecipanti === 'esclusi'
             ? []
             : [tl(voce === 'rimovibile' ? 'recording.withdraw.voce' : 'recording.withdraw.soloAscolto')]),
-          ...(stati.transcription?.dato ? [tl('recording.withdrawTranscript')] : []),
+          ...(ritiroConTrascrizione && stati.transcription?.dato
+            ? [tl('recording.withdrawTranscript')]
+            : []),
         ].join(' '),
         nota: tl('recording.alreadyRecorded'),
       },
@@ -243,8 +260,9 @@ export default function RegistrationConsents({
       setStati((prima) => ({
         ...prima,
         [chiave]: { dato: false, ritiratoIl: adesso },
-        // Senza registrazione non c'e' trascrizione: si ritira insieme.
-        ...(chiave === 'recording' && prima.transcription?.dato
+        // Senza registrazione non c'e' trascrizione: si ritira insieme, salvo
+        // dove chi partecipa non entra mai nel video.
+        ...(chiave === 'recording' && ritiroConTrascrizione && prima.transcription?.dato
           ? { transcription: { dato: false, ritiratoIl: adesso } }
           : {}),
         // Il ritiro delle comunicazioni toglie anche la spunta in attesa.
@@ -255,7 +273,7 @@ export default function RegistrationConsents({
         setVigoreLocale((prima) => ({
           ...prima,
           [chiave]: false,
-          ...(chiave === 'recording' ? { transcription: false } : {}),
+          ...(chiave === 'recording' && ritiroConTrascrizione ? { transcription: false } : {}),
         }));
       }
       setConferma(null);
@@ -268,7 +286,10 @@ export default function RegistrationConsents({
         give: true,
         locale,
         ...(chiave === 'recording'
-          ? { recordingDestination: offerta?.recording?.destination ?? null }
+          ? {
+              recordingDestination: offerta?.recording?.destination ?? null,
+              recordingVersion: offerta?.recording?.textVersion,
+            }
           : {}),
         ...(chiave === 'transcription' ? { transcriptionText: offerta?.transcription?.text } : {}),
       },

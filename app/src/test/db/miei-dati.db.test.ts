@@ -87,6 +87,8 @@ async function dai(
     registrationId,
     give: true,
     locale: 'it',
+    // La versione del testo che la pagina mostra dove si sente solo la voce.
+    ...(corpo.consent === 'recording' ? { recordingVersion: 2 } : {}),
     ...corpo,
   });
   r.headers.set('x-forwarded-for', `10.9.${Math.floor(ip / 250)}.${ip % 250}`);
@@ -260,7 +262,60 @@ describe('un consenso dato di nuovo da «I miei dati»', () => {
       where: { registrationId: iscrizione.id },
     });
     expect(prova.destination).toBe('PUBLIC');
+    expect(prova.textVersion).toBe(2);
+  });
+
+  it('vale per il testo letto anche nella versione, che si salva con la prova', async () => {
+    // Dove chi partecipa puo' comparire nel video vale solo il testo che lo dice.
+    vi.stubEnv('RECORDING_VOICE_EXCLUSION', '');
+    const evento = await creaEvento(CON_TRACCE);
+    const { iscrizione, token } = await iscritto(evento.id, { consentRecording: false });
+    const vecchio = await dai(token, iscrizione.id, {
+      consent: 'recording',
+      recordingDestination: null,
+      recordingVersion: 2,
+    });
+    expect(vecchio.status).toBe(409);
+    expect((await vecchio.json()).code).toBe('CONSENT_TEXT_CHANGED');
+    // Una pagina che non dice la versione non da' niente.
+    expect(
+      (
+        await dai(token, iscrizione.id, {
+          consent: 'recording',
+          recordingDestination: null,
+          recordingVersion: undefined,
+        })
+      ).status
+    ).toBe(422);
+    const giusto = await dai(token, iscrizione.id, {
+      consent: 'recording',
+      recordingDestination: null,
+      recordingVersion: 1,
+    });
+    expect(giusto.status).toBe(200);
+    const prova = await prisma.recordingConsent.findFirstOrThrow({
+      where: { registrationId: iscrizione.id },
+    });
     expect(prova.textVersion).toBe(1);
+    const [riga] = await righeRegistro(evento.id, 'CONSENT_RECORDED');
+    expect(JSON.parse(riga!.details!)).toMatchObject({ textVersion: 1 });
+  });
+
+  it('un consenso dato sul testo per la sola voce non vale dove chi partecipa compare', async () => {
+    const evento = await creaEvento(CON_TRACCE);
+    const { iscrizione, token } = await iscritto(evento.id, {
+      consentRecording: true,
+      consentRecordingVersion: 2,
+    });
+    vi.stubEnv('RECORDING_VOICE_EXCLUSION', '');
+    // Lo stato dice che c'e', l'offerta che non vale: si da' di nuovo.
+    const res = await dai(token, iscrizione.id, {
+      consent: 'recording',
+      recordingDestination: null,
+      recordingVersion: 1,
+    });
+    expect(res.status).toBe(200);
+    expect(await righeRegistro(evento.id, 'CONSENT_RECORDED')).toHaveLength(1);
   });
 
   it('un consenso che non copre piu’ il testo in vigore si da di nuovo, come chiede la sala', async () => {
@@ -409,6 +464,39 @@ describe('un consenso dato di nuovo da «I miei dati»', () => {
       (await dai(a.token, a.iscrizione.id, { consent: 'futureCommunications' })).status
     ).toBe(409);
     expect(await prisma.person.count()).toBe(0);
+  });
+
+  it('dove chi partecipa non entra nel video la registrazione non si da, e il suo ritiro lascia la trascrizione', async () => {
+    vi.stubEnv('RECORDING_PARTICIPANT_VOICE', '');
+    const evento = await creaEvento(CON_TRACCE);
+    const { iscrizione, token } = await iscritto(evento.id, {
+      consentRecording: true,
+      consentRecordingVersion: 2,
+      consentMultitrack: true,
+      consentMultitrackVersion: 2,
+    });
+    const res = await dai(token, iscrizione.id, {
+      consent: 'recording',
+      recordingDestination: null,
+    });
+    expect(res.status).toBe(409);
+    expect((await res.json()).code).toBe('CONSENT_NOT_OFFERED');
+
+    ip += 1;
+    const ritiro = richiesta('/api/gdpr/consents', 'POST', {
+      token,
+      registrationId: iscrizione.id,
+      consent: 'recording',
+    });
+    ritiro.headers.set('x-forwarded-for', `10.9.${Math.floor(ip / 250)}.${ip % 250}`);
+    expect((await consensi(ritiro as never, { params: Promise.resolve({}) })).status).toBe(200);
+    const dopo = await prisma.registration.findUniqueOrThrow({
+      where: { id: iscrizione.id },
+    });
+    expect(dopo.consentRecordingWithdrawnAt).not.toBeNull();
+    expect(dopo.consentMultitrackWithdrawnAt).toBeNull();
+    const [riga] = await righeRegistro(evento.id, 'CONSENT_WITHDRAWN');
+    expect(JSON.parse(riga!.details!)).toMatchObject({ recording: 1, transcription: 0 });
   });
 
   it("si tocca solo un'iscrizione dell'indirizzo del token", async () => {

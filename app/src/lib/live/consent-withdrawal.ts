@@ -30,8 +30,10 @@ import { getSettings } from '@/lib/settings';
  * Cosa cambia:
  *   - la registrazione dell'evento (`registrazione`): la prova resta, con
  *     l'ora del ritiro, e il consenso non vale piu'; con esso si ritira anche
- *     quello alla trascrizione, che senza registrazione non ha luogo;
- *   - la trascrizione dei propri interventi (sempre): le frasi dei sottotitoli
+ *     quello alla trascrizione, che senza registrazione non ha luogo, salvo
+ *     dove chi partecipa non entra mai nel video (`trascrizione: false`, da
+ *     lib/live/consent-rule `ritiroPortaTrascrizione`);
+ *   - la trascrizione dei propri interventi (salvo `trascrizione: false`): le frasi dei sottotitoli
  *     gia' salvate perdono testo, nome e posto (ne restano i tempi, come per
  *     chi non ha acconsentito), e le tracce audio per persona non passano piu'
  *     alla trascrizione (lib/captions/room endpointRitirati).
@@ -63,16 +65,27 @@ export interface OpzioniRitiro {
   origine?: 'room' | 'self-service';
 }
 
+/**
+ * Cosa si ritira: la registrazione, se `registrazione`, e la trascrizione dei
+ * propri interventi, salvo `trascrizione: false` (solo con `registrazione`).
+ */
+export interface DaRitirare {
+  registrazione: boolean;
+  trascrizione?: boolean;
+}
+
 export async function ritiraConsensi(
   eventId: string,
   posti: readonly string[],
-  cosa: { registrazione: boolean },
+  cosa: DaRitirare,
   adesso: Date = new Date(),
   { iscrizioni: dalleIscrizioni = [], origine = 'room' }: OpzioniRitiro = {}
 ): Promise<EsitoRitiro> {
   if (posti.length === 0 && dalleIscrizioni.length === 0) {
     return { registrazione: false, trascrizione: false };
   }
+  // Senza la registrazione da ritirare resta solo la trascrizione: c'e' sempre.
+  const conTrascrizione = !cosa.registrazione || cosa.trascrizione !== false;
   return prisma.$transaction(
     async (tx) => {
       // In fila con le costruzioni della trascrizione e con le cancellazioni, per
@@ -150,22 +163,24 @@ export async function ritiraConsensi(
         proveRegistrazione = prove.count + dateAllIscrizione.count;
       }
 
-      const proveTracce = await tx.multitrackConsent.updateMany({
-        where: {
-          eventId,
-          withdrawnAt: null,
-          OR: [
-            { jitsiUserId: { in: tuttiIPosti } },
-            ...(listaIscrizioni.length > 0
-              ? [{ registrationId: { in: listaIscrizioni } }]
-              : []),
-            ...(account.length > 0 ? [{ staffAccountId: { in: account } }] : []),
-          ],
-        },
-        data: { withdrawnAt: adesso },
-      });
+      const proveTracce = conTrascrizione
+        ? await tx.multitrackConsent.updateMany({
+            where: {
+              eventId,
+              withdrawnAt: null,
+              OR: [
+                { jitsiUserId: { in: tuttiIPosti } },
+                ...(listaIscrizioni.length > 0
+                  ? [{ registrationId: { in: listaIscrizioni } }]
+                  : []),
+                ...(account.length > 0 ? [{ staffAccountId: { in: account } }] : []),
+              ],
+            },
+            data: { withdrawnAt: adesso },
+          })
+        : { count: 0 };
       const tracceAllIscrizione =
-        listaIscrizioni.length > 0
+        conTrascrizione && listaIscrizioni.length > 0
           ? await tx.registration.updateMany({
               where: {
                 eventId,
@@ -178,7 +193,7 @@ export async function ritiraConsensi(
           : { count: 0 };
       // Dopo l'evento la trascrizione puo' essere gia' costruita: la persona se ne
       // va anche da li'.
-      if (listaIscrizioni.length > 0 || account.length > 0) {
+      if (conTrascrizione && (listaIscrizioni.length > 0 || account.length > 0)) {
         await togliPersoneDalleTrascrizioni(
           tx,
           [eventId],
@@ -188,21 +203,29 @@ export async function ritiraConsensi(
       }
       // Le frasi dei sottotitoli gia' salvate: restano i tempi, come per chi
       // non ha acconsentito (lib/captions/transcript).
-      const frasi = await tx.captionSegment.updateMany({
-        where: {
-          eventId,
-          OR: [
-            { seatId: { in: tuttiIPosti } },
-            ...listaIscrizioni.map((r) => ({ seatId: { startsWith: `reg-${r}-` } })),
-          ],
-        },
-        data: { seatId: null, speakerName: null, text: null },
-      });
+      const frasi = conTrascrizione
+        ? await tx.captionSegment.updateMany({
+            where: {
+              eventId,
+              OR: [
+                { seatId: { in: tuttiIPosti } },
+                ...listaIscrizioni.map((r) => ({ seatId: { startsWith: `reg-${r}-` } })),
+              ],
+            },
+            data: { seatId: null, speakerName: null, text: null },
+          })
+        : { count: 0 };
       // Le iscrizioni possono essere gia' cancellate da una pulizia che ha preso il
       // turno prima: restano le prove che ha copiato.
       const conservate =
         listaIscrizioni.length > 0
-          ? await ritiraProveDelleIscrizioni(tx, eventId, listaIscrizioni, cosa, adesso)
+          ? await ritiraProveDelleIscrizioni(
+              tx,
+              eventId,
+              listaIscrizioni,
+              { registrazione: cosa.registrazione, trascrizione: conTrascrizione },
+              adesso
+            )
           : { recording: 0, transcription: 0 };
       proveRegistrazione += conservate.recording;
       const proveTrascrizione =

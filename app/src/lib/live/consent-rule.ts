@@ -86,6 +86,19 @@ export function conduceNelVideo(partecipanti: PartecipantiNelVideo): boolean {
   return partecipanti !== 'assente';
 }
 
+/**
+ * Se ritirare il consenso alla registrazione ritira anche quello alla
+ * trascrizione dei propri interventi. Di solito si': la voce entra nelle tracce
+ * per persona e nella trascrizione solo con il consenso alla registrazione, e
+ * senza non c'e' niente da trascrivere. Dove chi partecipa non entra mai nel
+ * video ('esclusi') il consenso alla registrazione non copre niente e la voce la
+ * decide la sola trascrizione (`voceDallaTrascrizione`): ritirare il primo, dato
+ * prima che l'installazione cambiasse, lascia il secondo com'e'.
+ */
+export function ritiroPortaTrascrizione(partecipanti: PartecipantiNelVideo): boolean {
+  return partecipanti !== 'esclusi';
+}
+
 export function regolaConsenso(
   event: EventoConsenso,
   registrazioneDisponibile: boolean,

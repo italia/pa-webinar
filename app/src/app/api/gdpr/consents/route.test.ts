@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
 
 import type { NextRequest } from 'next/server';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   findFirst: vi.fn(),
@@ -60,6 +60,7 @@ beforeEach(() => {
   mocks.applicaSpuntaInAttesa.mockResolvedValue(true);
   mocks.daiConsenso.mockResolvedValue('dato');
 });
+afterEach(() => vi.unstubAllEnvs());
 
 describe('POST /api/gdpr/consents', () => {
   it('senza link firmato non si tocca niente', async () => {
@@ -94,9 +95,30 @@ describe('POST /api/gdpr/consents', () => {
     expect(mocks.ritiraConsensi).toHaveBeenCalledWith(
       'evento-1',
       [],
-      { registrazione: true },
+      { registrazione: true, trascrizione: true },
       expect.any(Date),
       { iscrizioni: [ISCRIZIONE], origine: 'self-service' }
+    );
+  });
+
+  it('dove chi partecipa non entra nel video la registrazione si ritira da sola', async () => {
+    vi.stubEnv('RECORDING_VOICE_EXCLUSION', 'true');
+    vi.stubEnv('RECORDING_PARTICIPANT_VOICE', '');
+    await richiesta({ registrationId: ISCRIZIONE, consent: 'recording' });
+    expect(mocks.ritiraConsensi).toHaveBeenCalledWith(
+      'evento-1',
+      [],
+      { registrazione: true, trascrizione: false },
+      expect.any(Date),
+      { iscrizioni: [ISCRIZIONE], origine: 'self-service' }
+    );
+    await richiesta({ proofId: PROVA, consent: 'recording' });
+    expect(mocks.ritiraProvaConservata).toHaveBeenCalledWith(
+      'impronta',
+      PROVA,
+      'recording',
+      expect.any(Date),
+      { trascrizione: false }
     );
   });
 
@@ -105,7 +127,7 @@ describe('POST /api/gdpr/consents', () => {
     expect(mocks.ritiraConsensi).toHaveBeenCalledWith(
       'evento-1',
       [],
-      { registrazione: false },
+      { registrazione: false, trascrizione: true },
       expect.any(Date),
       { iscrizioni: [ISCRIZIONE], origine: 'self-service' }
     );
@@ -167,7 +189,13 @@ describe('POST /api/gdpr/consents', () => {
     const res = await richiesta({ proofId: PROVA, consent: 'recording' });
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ withdrawn: 'recording' });
-    expect(mocks.ritiraProvaConservata).toHaveBeenCalledWith('impronta', PROVA, 'recording');
+    expect(mocks.ritiraProvaConservata).toHaveBeenCalledWith(
+      'impronta',
+      PROVA,
+      'recording',
+      expect.any(Date),
+      { trascrizione: true }
+    );
     expect(mocks.findFirst).not.toHaveBeenCalled();
     expect(mocks.ritiraConsensi).not.toHaveBeenCalled();
   });
@@ -208,13 +236,14 @@ describe('POST /api/gdpr/consents', () => {
         consent: 'recording',
         give: true,
         recordingDestination: 'PUBLIC',
+        recordingVersion: 2,
         locale: 'de',
       });
       expect(res.status).toBe(200);
       expect(await res.json()).toEqual({ given: 'recording' });
       expect(mocks.verifyGdprToken).toHaveBeenCalledWith('token-valido', 'consents');
       expect(mocks.daiConsenso).toHaveBeenCalledWith('impronta', ISCRIZIONE, 'recording', {
-        letto: { destinazione: 'PUBLIC', trascrizione: undefined },
+        letto: { destinazione: 'PUBLIC', versione: 2, trascrizione: undefined },
         locale: 'de',
       });
       expect(mocks.ritiraConsensi).not.toHaveBeenCalled();
@@ -224,10 +253,21 @@ describe('POST /api/gdpr/consents', () => {
       expect(
         (await richiesta({ registrationId: ISCRIZIONE, consent: 'recording', give: true })).status
       ).toBe(422);
+      // La destinazione senza la versione del testo non basta.
+      expect(
+        (
+          await richiesta({
+            registrationId: ISCRIZIONE,
+            consent: 'recording',
+            give: true,
+            recordingDestination: null,
+          })
+        ).status
+      ).toBe(422);
       // Senza la casella letta decide la libreria: «testo cambiato», si ricarica.
       await richiesta({ registrationId: ISCRIZIONE, consent: 'transcription', give: true });
       expect(mocks.daiConsenso).toHaveBeenLastCalledWith('impronta', ISCRIZIONE, 'transcription', {
-        letto: { destinazione: null, trascrizione: undefined },
+        letto: { destinazione: null, versione: undefined, trascrizione: undefined },
         locale: null,
       });
       await richiesta({
@@ -238,7 +278,7 @@ describe('POST /api/gdpr/consents', () => {
         locale: 'xx',
       });
       expect(mocks.daiConsenso).toHaveBeenCalledWith('impronta', ISCRIZIONE, 'transcription', {
-        letto: { destinazione: null, trascrizione: 'multitrackRetained' },
+        letto: { destinazione: null, versione: undefined, trascrizione: 'multitrackRetained' },
         locale: null,
       });
     });

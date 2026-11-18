@@ -394,6 +394,7 @@ describe('testo letto', () => {
         destination: 'PUBLIC',
         voice: 'rimovibile',
         participants: 'solo-voce',
+        textVersion: 2,
         eventText: 'Testo dell’ente',
         // Il consenso all'iscrizione non dichiara la destinazione: non copre un
         // video pubblico, e va dato di nuovo.

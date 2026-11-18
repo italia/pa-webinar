@@ -8,7 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import messages from '@/i18n/messages/it.json';
 
-import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import type { PartecipantiNelVideo } from '@/lib/live/consent-rule';
 
 import RegistrationConsents, { type ConsensiVista, type OffertaVista } from './registration-consents';
 
@@ -21,7 +21,7 @@ const monta = (
   altri: {
     comunicazioniRitirateIl?: string;
     onComunicazioniRitirate?: (q: string) => void;
-    voce?: VoceNelVideo;
+    partecipanti?: PartecipantiNelVideo;
     rubricaConfermata?: boolean;
     onRubricaConfermata?: () => void;
     offerta?: OffertaVista | null;
@@ -108,22 +108,39 @@ describe('RegistrationConsents', () => {
     expect(container.textContent?.match(/Ritirato il/g)).toHaveLength(2);
   });
 
+  it('dove chi partecipa non entra nel video la trascrizione resta', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('{}', { status: 200 }))
+    );
+    monta({ recording: dato, transcription: dato }, { partecipanti: 'esclusi' });
+
+    await clic('Ritira il consenso');
+    const conferma = container.querySelector('[role="group"]')?.textContent ?? '';
+    expect(conferma).not.toContain(messages.live.consents.recording.withdrawTranscript);
+    expect(conferma).not.toContain(messages.live.consents.recording.withdraw.voce);
+    await clic('Ritira');
+
+    expect(container.textContent?.match(/Ritirato il/g)).toHaveLength(1);
+    expect(container.textContent).toContain(messages.live.consents.given);
+  });
+
   describe('la conferma del ritiro della registrazione', () => {
     const { withdraw, withdrawTranscript } = messages.live.consents.recording;
     const ritiroAvviato = async (
       consensi: Partial<ConsensiVista>,
-      voce: VoceNelVideo
+      partecipanti: PartecipantiNelVideo
     ) => {
-      monta(consensi, { voce });
+      monta(consensi, { partecipanti });
       await clic('Ritira il consenso');
       return container.querySelector('[role="group"]')?.textContent;
     };
 
     it.each([
-      ['rimovibile', withdraw.voce],
-      ['fissa', withdraw.soloAscolto],
-    ] as const)('voce %s: annuncia anche la trascrizione data', async (voce, testo) => {
-      const conferma = await ritiroAvviato({ recording: dato, transcription: dato }, voce);
+      ['solo-voce', withdraw.voce],
+      ['visibili', withdraw.soloAscolto],
+    ] as const)('video %s: annuncia anche la trascrizione data', async (partecipanti, testo) => {
+      const conferma = await ritiroAvviato({ recording: dato, transcription: dato }, partecipanti);
       expect(conferma).toContain(`${testo} ${withdrawTranscript}`);
     });
 
@@ -133,7 +150,7 @@ describe('RegistrationConsents', () => {
     });
 
     it('senza una trascrizione data non la nomina', async () => {
-      const conferma = await ritiroAvviato({ recording: dato, transcription: null }, 'rimovibile');
+      const conferma = await ritiroAvviato({ recording: dato, transcription: null }, 'solo-voce');
       expect(conferma).toContain(withdraw.voce);
       expect(conferma).not.toContain(withdrawTranscript);
     });
@@ -141,7 +158,7 @@ describe('RegistrationConsents', () => {
     it('una trascrizione gia ritirata non la nomina', async () => {
       const conferma = await ritiroAvviato(
         { recording: dato, transcription: { dato: false, ritiratoIl: '2026-11-05T10:00:00.000Z' } },
-        'rimovibile'
+        'solo-voce'
       );
       expect(conferma).not.toContain(withdrawTranscript);
     });
@@ -365,6 +382,7 @@ describe('RegistrationConsents', () => {
         destination: 'REGISTRANTS',
         voice: 'rimovibile',
         participants: 'solo-voce',
+        textVersion: 2,
         eventText: 'Testo dell’ente.',
         inForce: false,
       },
@@ -397,6 +415,7 @@ describe('RegistrationConsents', () => {
             give: true,
             locale: 'it',
             recordingDestination: 'REGISTRANTS',
+            recordingVersion: 2,
           }),
         })
       );

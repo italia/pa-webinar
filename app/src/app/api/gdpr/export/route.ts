@@ -24,7 +24,8 @@ import { AppError, RateLimitError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { decryptPII, tryDecryptPII } from '@/lib/crypto/pii';
 import { getClientIp, rateLimit } from '@/lib/rate-limit';
-import { voceNelVideo } from '@/lib/recording/availability';
+import { voceDi } from '@/lib/live/consent-rule';
+import { partecipantiNelVideo } from '@/lib/recording/availability';
 import { proveDiSalaDiChiConduce } from '@/lib/gdpr/consent-proofs';
 import { CAMPI_EVENTO_CONSENSI, offertaConsensi } from '@/lib/gdpr/consent-giving';
 import { consensiDellIscrizione } from '@/lib/gdpr/consent-state';
@@ -60,6 +61,7 @@ export const GET = withErrorHandling(async (request) => {
   }
 
   const { emailHash } = verified;
+  const partecipanti = partecipantiNelVideo();
 
   const sito = await getSettings();
   const registrations = await prisma.registration.findMany({
@@ -374,6 +376,10 @@ export const GET = withErrorHandling(async (request) => {
     // Serve a ritirare un consenso dalla pagina: il link dell'email resta di
     // sola lettura, e questo non finisce negli indirizzi.
     consentsToken: issueGdprToken('consents', emailHash),
-    voiceInVideo: voceNelVideo(),
+    // Come compaiono nel video i partecipanti (lib/recording/availability): la
+    // pagina ne ricava cosa cambia ritirando un consenso. `voiceInVideo` e' la
+    // stessa cosa vista dalla sola voce, per chi lo leggeva gia'.
+    participantsInVideo: partecipanti,
+    voiceInVideo: voceDi(partecipanti),
   });
 });
