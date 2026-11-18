@@ -892,7 +892,8 @@ stateDiagram-v2
   chosen, the video unpublished or removed, or a new file attached
   (`Event.recordingRetentionFrom`); removing the video does not reset it. On
   an event created before this rule (`Event.legacyRecordingRetention`) a video
-  that is not published goes at the latest with the participants' data, and
+  that is not published goes at the latest with the participants' data,
+  counted from the event's end or from a later unpublication or new file, and
   the period can only be shortened (`lib/recording/legacy-retention.ts`). At
   its end the cleanup deletes the files of every session and
   hands the outputs to `postprod-retention`

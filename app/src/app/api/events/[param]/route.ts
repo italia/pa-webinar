@@ -515,9 +515,14 @@ export const PUT = withErrorHandling(async (request, context) => {
   // aggancia un file nuovo. Nessuna di queste
   // scelte, su un evento finito da tempo, cancella la registrazione al giro
   // dopo della pulizia.
+  // Negli eventi nati prima della regola scegliere la durata non sposta il punto
+  // di partenza: la promessa conta dalla fine dell'evento, e una durata scelta
+  // adesso la allungherebbe (lib/recording/legacy-retention). Una pubblicazione
+  // tolta o un file nuovo si', come per ogni evento.
   const durataDaAdesso =
     (data.recordingDeleteAfterDays !== undefined &&
-      data.recordingDeleteAfterDays !== event.recordingDeleteAfterDays) ||
+      data.recordingDeleteAfterDays !== event.recordingDeleteAfterDays &&
+      !event.legacyRecordingRetention) ||
     ((data.recordingPublished === false || data.recordingUrl === null) && event.recordingPublished) ||
     (!!data.recordingUrl && data.recordingUrl !== event.recordingUrl);
   const destinazioneDopo: Destinazione =

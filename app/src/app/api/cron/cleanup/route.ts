@@ -21,6 +21,7 @@ import {
   isRecordingRetentionExpired,
   tempRecordingExpiryCutoff,
 } from '@/lib/gdpr/cleanup-selection';
+import { durataEffettiva, limiteDurataPrecedente } from '@/lib/recording/legacy-retention';
 import { getSettings } from '@/lib/settings';
 import {
   AUDIT_ACTIONS_WITH_NAMES,
@@ -295,8 +296,11 @@ export const GET = withErrorHandling(async (request) => {
               recordCount: 1,
               details: JSON.stringify({
                 reason: 'retention_expired',
-                retentionDays: evt.recordingDeleteAfterDays,
+                // La durata che valeva: negli eventi nati prima della regola la
+                // promessa fatta a chi si era iscritto (lib/recording/legacy-retention).
+                retentionDays: durataEffettiva(evt),
                 countedFrom: evt.recordingPublished ? 'publication' : 'event_end',
+                ...(limiteDurataPrecedente(evt) !== null && { legacyPromise: true }),
                 files: indirizzi.length + soloNomi.length,
                 recordings: registrazioni.length,
               }),

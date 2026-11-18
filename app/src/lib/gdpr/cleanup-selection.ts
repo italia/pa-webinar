@@ -161,9 +161,12 @@ export interface RecordingRetentionRow extends CleanupCandidateRow {
  *
  * Negli eventi nati prima di questa regola (`legacyRecordingRetention`) la
  * registrazione non pubblicata scade al piu' tardi alla conservazione dei dati,
- * contata dallo stesso inizio e senza `recordingRetentionFrom`: a chi si e'
- * iscritto si era detto che il video non pubblicato se ne va con i suoi dati
- * (lib/recording/legacy-retention). Una durata piu' corta vale.
+ * contata dallo stesso inizio: a chi si e' iscritto si era detto che il video
+ * non pubblicato se ne va con i suoi dati (lib/recording/legacy-retention). La
+ * migrazione che li segna toglie `recordingRetentionFrom`, quindi conta dalla
+ * fine dell'evento; poi, come per ogni evento, mai da prima di una pubblicazione
+ * tolta o di un file agganciato da chi organizza: quella scelta non cancella il
+ * video al giro dopo. Una durata piu' corta vale.
  *
  * Un video pubblicato senza la data di pubblicazione (scritto direttamente nel
  * database) non scade: non sappiamo da quando contare, e qui l'errore costa un
@@ -180,7 +183,8 @@ export function recordingExpiresAt(evt: RecordingRetentionRow): Date | null {
   const limite = limiteDurataPrecedente(evt);
   const inizio = limite === null ? null : inizioConservazione(evt);
   if (limite === null || !inizio) return scelta;
-  const promessa = new Date(inizio.getTime() + limite * DAY_MS);
+  const da = Math.max(inizio.getTime(), evt.recordingRetentionFrom?.getTime() ?? 0);
+  const promessa = new Date(da + limite * DAY_MS);
   return scelta && scelta.getTime() < promessa.getTime() ? scelta : promessa;
 }
 

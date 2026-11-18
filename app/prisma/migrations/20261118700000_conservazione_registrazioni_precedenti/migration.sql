@@ -6,12 +6,17 @@
 -- solo accorciare. Le bozze non hanno raccolto consensi e seguono la regola
 -- nuova.
 --
--- Solo una colonna nuova e il segno sugli eventi che c'erano: la durata scelta
+-- Una colonna nuova e il segno sugli eventi che c'erano: la durata scelta
 -- (recording_delete_after_days) resta com'e', cosi' un video pubblicato, ora o
--- dopo, conta come prima dalla pubblicazione. La versione precedente, che
--- durante l'aggiornamento gira sullo stesso schema, non legge la colonna e
--- cancellava gia' il video non pubblicato con i dati.
+-- dopo, conta come prima dalla pubblicazione. Su questi eventi la promessa conta
+-- dalla fine, come la conservazione dei dati: si toglie il punto di partenza che
+-- la migrazione precedente aveva messo ad adesso (recording_retention_from), che
+-- la sposterebbe in avanti. Le scelte successive di chi organizza (pubblicazione
+-- tolta, file nuovo) lo rimettono, come per ogni evento. La versione precedente,
+-- che durante l'aggiornamento gira sullo stesso schema, non legge queste colonne
+-- e cancellava gia' il video non pubblicato con i dati.
 
 ALTER TABLE "events" ADD COLUMN "legacy_recording_retention" BOOLEAN NOT NULL DEFAULT false;
 
-UPDATE "events" SET "legacy_recording_retention" = true WHERE "status" <> 'DRAFT';
+UPDATE "events" SET "legacy_recording_retention" = true, "recording_retention_from" = NULL
+WHERE "status" <> 'DRAFT';

@@ -171,17 +171,24 @@ describe('isRecordingRetentionExpired', () => {
       expect(isRecordingRetentionExpired(vecchio, NOW)).toBe(true);
     });
 
-    it('una durata piu’ lunga, o una scelta recente, non la allunga', () => {
+    it('una durata piu’ lunga non la allunga', () => {
       expect(recordingExpiresAt({ ...vecchio, recordingDeleteAfterDays: 365 })).toEqual(
         daysFromNow(-10)
       );
+    });
+
+    it('una pubblicazione tolta o un file nuovo la fanno contare da allora', () => {
+      // Come per ogni evento: quella scelta non cancella il video al giro dopo.
+      expect(
+        recordingExpiresAt({ ...vecchio, recordingRetentionFrom: daysFromNow(-1) })
+      ).toEqual(daysFromNow(29));
       expect(
         recordingExpiresAt({
           ...vecchio,
           recordingDeleteAfterDays: 7,
           recordingRetentionFrom: daysFromNow(-1),
         })
-      ).toEqual(daysFromNow(-10));
+      ).toEqual(daysFromNow(6));
     });
 
     it('una durata piu’ corta vale', () => {

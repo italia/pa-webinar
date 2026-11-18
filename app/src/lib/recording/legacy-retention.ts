@@ -8,9 +8,12 @@
  * dati: finche' il video non e' pubblicato, la registrazione scade al piu' tardi
  * alla conservazione dei dati (`dataRetentionDays` dalla stessa fine da cui conta
  * quella, lib/gdpr/cleanup-selection), qualunque durata ci sia sull'evento. Chi
- * organizza puo' accorciarla, non toglierla ne' allungarla. Un video pubblicato
- * segue la sua durata dalla pubblicazione, come prima; se si toglie la
- * pubblicazione, torna la promessa.
+ * organizza puo' accorciarla, non toglierla ne' allungarla, e sceglierla non
+ * sposta il punto di partenza. Un video pubblicato segue la sua durata dalla
+ * pubblicazione, come prima; se si toglie la pubblicazione, o si aggancia un
+ * file nuovo, torna la promessa, contata da quel momento come la durata di ogni
+ * evento (`recordingRetentionFrom`): quella scelta non cancella il video al giro
+ * dopo.
  *
  * Il modulo e' puro: lo usano la pulizia, la rotta dell'evento, il pannello della
  * registrazione e la scheda privacy.
