@@ -44,7 +44,7 @@ import { getSettings } from '@/lib/settings';
 import { encryptPIIOrNull, tryDecryptPII } from '@/lib/crypto/pii';
 import { calculateEstimates } from '@/lib/estimates';
 import { hashJoinPassword } from '@/lib/auth/password';
-import { isEventManager, requireEventManager } from '@/lib/auth/staff-session';
+import { getStaffSession, isEventManager, requireEventManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { coerceMatrix, togglesFromMatrix } from '@/lib/utils/permission-matrix';
 import { riconciliaTraduzioni } from '@/lib/text-translation/auto';
@@ -66,6 +66,7 @@ import {
   type Destinazione,
 } from '@/lib/recording/destination';
 import { videoDellApp, videoPerTutti } from '@/lib/recording/audience';
+import { organizzaEvento } from '@/lib/recording/content-access';
 import { assertVideoDellEvento, assertVideoNelloStorage } from '@/lib/storage/recordings';
 import { annullaEmailInCoda } from '@/lib/email/outbox';
 
@@ -314,6 +315,21 @@ export const PUT = withErrorHandling(async (request, context) => {
     await soloStaffDellEvento(eventId, 'Only the event staff can attach a recording');
   }
 
+  // Quanto dura la registrazione lo decide chi organizza l'evento, come la sua
+  // cancellazione: il link principale di conduzione, o una sessione dello staff
+  // che organizza l'evento. Un co-moderatore, o l'admin che non lo organizza,
+  // no (lib/recording/content-access). Il wizard la manda solo se cambiata.
+  if (
+    data.recordingDeleteAfterDays !== undefined &&
+    data.recordingDeleteAfterDays !== event.recordingDeleteAfterDays &&
+    !isPrimaryModerator
+  ) {
+    const staff = await getStaffSession(await cookies());
+    if (!staff || !(await organizzaEvento(staff, eventId))) {
+      throw new ForbiddenError('Only the event organizers can change how long the recording is kept');
+    }
+  }
+
   // Le etichette le manda il wizard a ogni salvataggio, l'elenco intero: si
   // scrivono solo se sono cambiate, e le cambia lo staff che gestisce
   // l'evento, come chi partecipa (un link di conduzione no). Una modifica
@@ -464,6 +480,17 @@ export const PUT = withErrorHandling(async (request, context) => {
     !!data.recordingUrl &&
     data.recordingUrl !== event.recordingUrl &&
     !(await salaGiaAperta(event));
+  // Da quando, al piu' presto, conta la durata della registrazione non
+  // pubblicata (Event.recordingRetentionFrom): da adesso se la si sceglie, se
+  // si toglie la pubblicazione (anche togliendo il video pubblicato) o se si
+  // aggancia un file nuovo. Nessuna di queste
+  // scelte, su un evento finito da tempo, cancella la registrazione al giro
+  // dopo della pulizia.
+  const durataDaAdesso =
+    (data.recordingDeleteAfterDays !== undefined &&
+      data.recordingDeleteAfterDays !== event.recordingDeleteAfterDays) ||
+    ((data.recordingPublished === false || data.recordingUrl === null) && event.recordingPublished) ||
+    (!!data.recordingUrl && data.recordingUrl !== event.recordingUrl);
   const destinazioneDopo: Destinazione =
     data.recordingDestination ??
     destinazioneDiPartenza(event, data.recordingEnabled === true || fileNuovo);
@@ -740,6 +767,7 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.transcriptPublished !== undefined && { transcriptPublished: data.transcriptPublished }),
       ...(pubblicoDopo !== event.recordingAudience && { recordingAudience: pubblicoDopo }),
       ...(data.recordingDeleteAfterDays !== undefined && { recordingDeleteAfterDays: data.recordingDeleteAfterDays }),
+      ...(durataDaAdesso && { recordingRetentionFrom: new Date() }),
       ...(data.recordingUrl !== undefined && { recordingUrl: data.recordingUrl }),
       ...(data.tempRecordingUrl !== undefined && { tempRecordingUrl: data.tempRecordingUrl }),
       ...(data.recordingFileSize !== undefined && { recordingFileSize: data.recordingFileSize }),

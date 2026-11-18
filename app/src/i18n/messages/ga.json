@@ -1272,6 +1272,8 @@
         "gdprHeading": "Príobháideachas agus coinneáil sonraí",
         "retentionDays": "Laethanta coinneála",
         "retentionHelp": "Tar éis na tairsí seo, scriostar sonraí pearsanta go huathoibríoch.",
+        "recordingRetention": "Coinneáil an taifeadta",
+        "recordingRetentionHelp": "Ní scriostar an taifeadadh ná a ndéantar as in éineacht le sonraí na ndaoine. Le tréimhse, scriostar iad an méid sin laethanta tar éis dheireadh an imeachta nó, má tá an físeán foilsithe, tar éis an fhoilsithe. Is féidir í a athrú níos déanaí freisin, i bpainéal an taifeadta.",
         "gdprTemplate": "Teimpléad fógra príobháideachais",
         "gdprTemplateNone": "— Úsáid téacs saincheaptha —",
         "gdprTemplateUnknown": "Níl an teimpléad fógra príobháideachais a roghnaíodh ann a thuilleadh: roghnaigh ceann eile nó fill ar an téacs saincheaptha",
@@ -2189,7 +2191,7 @@
         "jobMaxAttempts": "Iarrachtaí roimh theip",
         "jobMaxAttemptsHelp": "Cé mhéad uair a bhaineann an phíblíne triail eile as jab sula marcálann sí mar theipthe é. Fásann an cúlú idir iarrachtaí go heispéantúil (ó 30 soicind suas go 2 uair an chloig). Is é 5 an gnáthluach.",
         "artifactRetentionDays": "Coinneáil na ndéantán (laethanta)",
-        "artifactRetentionDaysHelp": "Ag 0 níl aon teorainn don suíomh ar fad: leanann na déantáin AI tréimhse choinneála a dtaifeadta nó an imeachta. Le luach níos mó ná nialas, scriosann jab laethúil gach déantán a cruthaíodh níos mó ná an líon sin laethanta ó shin, foilsithe nó nach ea: is féidir leis an gcoinneáil a ghiorrú, ach ní a fhadú choíche. Níl ainmneacha na gcainteoirí ná pálasta na jabanna san áireamh: leanann siad tréimhse choinneála an taifeadta nó an imeachta. Sonraí in docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "Ag 0 níl aon teorainn don suíomh ar fad: leanann na déantáin AI tréimhse choinneála a dtaifeadta. Le luach níos mó ná nialas, scriosann jab laethúil gach déantán a cruthaíodh níos mó ná an líon sin laethanta ó shin, foilsithe nó nach ea: is féidir leis an gcoinneáil a ghiorrú, ach ní a fhadú choíche. Níl ainmneacha na gcainteoirí ná pálasta na jabanna san áireamh: leanann siad tréimhse choinneála an taifeadta. Sonraí in docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "Fógra AI sa seomra feithimh",
         "consentDisclosureHelp": "Téacs a thaispeántar do rannpháirtithe sa seomra feithimh nuair a bhaineann an t-imeacht úsáid as iarléiriú AI (tras-scríobh, achoimre, aistriúchán, dubáil). Inoiriúnaithe de réir teanga. Fág folamh chun an téacs réamhshocraithe a úsáid.",
         "consentDisclosurePlaceholder": "M.sh. Déanfar an t-imeacht seo a thras-scríobh agus a achoimriú go huathoibríoch le huirlisí AI tar éis an tarchuir bheo…"
@@ -2548,6 +2550,8 @@
       "durationLabel": "Fad réamhshocraithe (nóiméid)",
       "durationHint": "Réamhlíonann sé deireadh an imeachta (tús + fad). Is féidir leis an úsáideoir é a athrú. Folamh = 2 uair an chloig.",
       "retentionLabel": "Coinneáil sonraí réamhshocraithe (laethanta)",
+      "recordingRetentionLabel": "Coinneáil réamhshocraithe an taifeadta",
+      "recordingRetentionHint": "Do na himeachtaí a chruthaítear ón teimpléad seo; athraítear í sa draoi agus i bpainéal an taifeadta. Ní leanann an taifeadadh coinneáil na sonraí.",
       "expectedSpeakersLabel": "Líon na gcainteoirí a bhfuiltear ag súil leo (réamhshocrú)",
       "descriptionTemplateLabel": "Cur síos réamhshocraithe",
       "descriptionTemplateHint": "Téacs a réamhlíontar i gcur síos an imeachta (inathraithe).",
@@ -3085,7 +3089,10 @@
         "yes": "Tá",
         "no": "Níl",
         "recordingDuration": "Fad",
-        "recordingSize": "Méid"
+        "recordingSize": "Méid",
+        "recordingRetention": "Scriosadh uathoibríoch an taifeadta",
+        "recordingRetentionNone": "Níl",
+        "recordingRetentionDays": "{days, plural, one {# lá} two {# lá} few {# lá} many {# lá} other {# lá}} tar éis dheireadh an imeachta nó, má fhoilsítear é, tar éis an fhoilsithe"
       }
     },
     "rubrica": {
@@ -4706,9 +4713,10 @@
       "retention": {
         "label": "Coinneáil",
         "data": "Scriostar sonraí an chláraithe agus an tseomra {days, plural, one {# lá} two {# lá} few {# lá} many {# lá} other {# lá}} tar éis dheireadh an imeachta. Fanann ceisteanna agus pobalbhreitheanna gan ainmneacha.",
-        "videoUnpublished": "Mura gcuirtear ar fáil é, scriostar an taifeadadh in éineacht leo.",
-        "videoPublishedDays": "Má chuirtear ar fáil é, scriostar é {days, plural, one {# lá} two {# lá} few {# lá} many {# lá} other {# lá}} ina dhiaidh sin.",
-        "videoPublishedOpen": "Má chuirtear ar fáil é, fanann sé go dtí go mbaineann na heagraithe é."
+        "recordingKept": "Ní scriostar an taifeadadh ná a ndéantar as (tras-scríbhinn, achoimre, aistriúcháin) in éineacht leis na sonraí seo: cibé acu a chuirtear ar fáil iad nó nach gcuirtear, fanann siad go dtí go scriosann na heagraithe iad.",
+        "recordingDays": "Scriostar an taifeadadh agus a ndéantar as {days, plural, one {# lá} two {# lá} few {# lá} many {# lá} other {# lá}} tar éis dheireadh an imeachta nó, má chuirtear an taifeadadh ar fáil, tar éis é a fhoilsiú.",
+        "transcriptKept": "Ní scriostar an tras-scríbhinn in éineacht leis na sonraí seo: fanann sí go dtí go scriosann na heagraithe í.",
+        "transcriptDays": "Scriostar an tras-scríbhinn {days, plural, one {# lá} two {# lá} few {# lá} many {# lá} other {# lá}} tar éis dheireadh an imeachta."
       },
       "addressBook": {
         "label": "Leabhar seoltaí",
@@ -5916,11 +5924,12 @@
       "7d": "7 lá",
       "30d": "30 lá",
       "90d": "90 lá",
+      "1y": "1 bhliain",
       "forever": "Gan scriosadh uathoibríoch"
     },
-    "retentionNote": "Ní leanann físeán foilsithe coinneáil sonraí an imeachta: gan tréimhse, fanann sé poiblí go dtí go scriosann duine é.",
+    "retentionNote": "Ní leanann an taifeadadh coinneáil sonraí an imeachta: gan tréimhse fanann sé, foilsithe nó nach ea, go dtí go scriosann duine é. Áirítear an tréimhse ón bhfoilsiú nó, mura bhfuil an físeán foilsithe, ó dheireadh an imeachta; nuair a théann sí in éag, scriostar an físeán agus a ndéantar as (tras-scríbhinní, achoimrí, aistriúcháin).",
     "delete": "Scrios taifeadadh",
-    "deleteConfirm": "An bhfuil sibh cinnte? Scriosfar an físeán go buan.",
+    "deleteConfirm": "An bhfuil sibh cinnte? Scriosfar an físeán go buan. Ní scriostar na tras-scríbhinní, na hachoimrí ná na haistriúcháin leis: leanann siad tréimhse an taifeadta a roghnaítear anseo.",
     "notConfigured": "Níl Jibri cumraithe. Níl taifeadadh físe ar fáil.",
     "disabledHint": "Níl an taifeadadh físe cumasaithe don imeacht seo. Chun é a chumasú, oscail an rannóg Socruithe thuas agus athraigh an t-athroghnóir \"Taifeadadh\".",
     "play": "Seinn",
@@ -5961,7 +5970,7 @@
     "visibilityAlways": "Infheicthe i gcónaí",
     "visibilityUntil": "Infheicthe go dtí:",
     "dataRetentionNote": "Scriosfar sonraí pearsanta na rannpháirtithe de réir choinneáil an imeachta ({days} lá). Fanfaidh ábhar an imeachta ar fáil fad is atá an leathanach infheicthe.",
-    "availableUntil": "Beidh an t-imeacht seo agus a ábhar ar fáil go dtí {date}.",
+    "participantDataUntil": "Scriosfar sonraí pearsanta na rannpháirtithe ar {date}.",
     "tabs": {
       "qa": "Ceisteanna agus Freagraí",
       "materials": "Ábhair",

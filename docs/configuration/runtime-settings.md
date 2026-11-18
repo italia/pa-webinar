@@ -334,7 +334,7 @@ Defaults are those of `app/prisma/schema.prisma`.
 | `aiTtsEngine` | **Dubbing engine** | `piper` | `piper` only | The engine for synthetic dubbing voices |
 | `aiMaxConcurrentJobs` | **Parallel jobs** | `2` | 1 to 20 | The most worker jobs the orchestrator keeps running at once |
 | `aiJobMaxAttempts` | **Attempts before failure** | `5` | 1 to 20 | After this many attempts, a job is marked failed for good |
-| `aiArtifactRetentionDays` | **Artifact retention (days)** | `0` | 0 to 3650 | `0` sets no site-wide limit: artifacts follow the event-bound and per-recording regimes. `N` > 0 adds a rule: the post-production retention job deletes every artifact older than `N` days, those of published recordings included. It can shorten retention, never extend it |
+| `aiArtifactRetentionDays` | **Artifact retention (days)** | `0` | 0 to 3650 | `0` sets no site-wide limit: artifacts stay with their recording until it is deleted or its period ends. `N` > 0 adds a rule: the post-production retention job deletes every artifact older than `N` days, those of published recordings included. It can shorten retention, never extend it |
 | `aiConsentDisclosure` | **AI notice in the waiting room** | empty | text per language | The notice shown in the waiting room of an event with AI options. A language with no text gets the built-in notice |
 
 The engine values select what the worker runs; the endpoints, models and credentials behind them are

@@ -202,6 +202,13 @@ model Event {
   recordingFileSize        BigInt?   @map("recording_file_size")
   recordingDuration        Int?      @map("recording_duration")
   recordingDeleteAfterDays Int?      @map("recording_delete_after_days")
+  // Da quando, al piu' presto, conta la durata della registrazione non
+  // pubblicata (lib/gdpr/cleanup-selection): l'ultima volta che si e' scelta
+  // la durata, si e' tolta la pubblicazione (anche togliendo il video
+  // pubblicato) o si e' agganciato un file nuovo.
+  // Cosi' nessuna di queste scelte cancella la registrazione al giro dopo.
+  // Null: conta dalla fine dell'evento.
+  recordingRetentionFrom   DateTime? @map("recording_retention_from")
 
   // Optional YouTube URL for legacy / mirrored recordings. When set, the
   // public video library prefers the embed over the self-hosted blob —
@@ -1422,6 +1429,10 @@ model EventTemplate {
   descriptionTemplate     Json? @map("description_template") @db.JsonB
   defaultRetentionDays    Int?  @map("default_retention_days")
   defaultExpectedSpeakers Int?  @map("default_expected_speakers")
+  // La durata della registrazione degli eventi creati da questo modello
+  // (Event.recordingDeleteAfterDays), stesso nome: la registrazione non segue
+  // la conservazione dei dati. Null = nessuna cancellazione automatica.
+  recordingDeleteAfterDays Int? @map("recording_delete_after_days")
 
   // Mirrors Event.permissionMatrix: when set, the role×feature matrix
   // is applied on new-event creation instead of the boolean toggles.

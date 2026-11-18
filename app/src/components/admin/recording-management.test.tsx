@@ -50,7 +50,7 @@ const evento = {
   recordingAudience: 'PUBLIC' as 'PUBLIC' | 'REGISTRANTS',
   recordingFileSize: null,
   recordingDuration: null,
-  recordingDeleteAfterDays: null,
+  recordingDeleteAfterDays: null as number | null,
   moderatorToken: 'TOKEN',
 };
 
@@ -275,5 +275,48 @@ describe('RecordingManagement — un rifiuto del server', () => {
     await premi(interruttore());
     expect(interruttore().checked).toBe(false);
     expect(toast.error).toHaveBeenCalledWith(t.saveFailed);
+  });
+});
+
+describe('RecordingManagement — durata della registrazione', () => {
+  const scelta = (giorni: number) =>
+    container.querySelector<HTMLInputElement>(`#retention-${giorni}`)!;
+
+  it('si sceglie anche prima che il video ci sia, e anche dopo averlo tolto', () => {
+    render({ recordingUrl: null, status: 'PUBLISHED' });
+    expect(container.textContent).toContain(t.retentionLabel);
+    expect(scelta(-1).checked).toBe(true);
+    // In diretta no: il pannello mostra la registrazione in corso.
+    render({ recordingUrl: null, status: 'LIVE' });
+    expect(container.textContent).not.toContain(t.retentionLabel);
+  });
+
+  it('offre anche un anno, e dice che non segue i dati dell’evento', () => {
+    render({ recordingDeleteAfterDays: 365 });
+    expect(scelta(365).checked).toBe(true);
+    expect(container.textContent).toContain(t.retention['1y']);
+    expect(container.textContent).toContain(t.retentionNote);
+  });
+
+  it('salva la scelta con il link di conduzione', async () => {
+    fetchMock.mockResolvedValue(new Response('{}', { status: 200 }));
+    render();
+    await premi(scelta(30));
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/events/evento-1',
+      expect.objectContaining({
+        method: 'PUT',
+        body: JSON.stringify({ recordingDeleteAfterDays: 30 }),
+      })
+    );
+    expect(scelta(30).checked).toBe(true);
+  });
+
+  it('rifiutata, torna com’era e lo dice', async () => {
+    fetchMock.mockResolvedValue(rifiuto(403));
+    render({ recordingDeleteAfterDays: 90 });
+    await premi(scelta(-1));
+    expect(scelta(90).checked).toBe(true);
+    expect(toast.error).toHaveBeenCalled();
   });
 });

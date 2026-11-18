@@ -181,6 +181,9 @@ export interface WizardTemplatePreset {
   aiTargetLocales?: string | null;
   descriptionTemplate?: Record<string, string> | null;
   defaultRetentionDays?: number | null;
+  /** La durata della registrazione (Event.recordingDeleteAfterDays); null =
+   *  nessuna cancellazione automatica. */
+  recordingDeleteAfterDays?: number | null;
   defaultExpectedSpeakers?: number | null;
   /** La pagina dopo l'evento e' pubblica (false per una riunione di lavoro). */
   postEventPublic?: boolean;
@@ -369,6 +372,7 @@ export interface InitialEventShape {
     aiTargetLocales?: string | null;
     expectedSpeakers?: number | null;
     dataRetentionDays: number;
+    recordingDeleteAfterDays?: number | null;
     postEventPublic: boolean;
     postEventShowQA?: boolean;
     gdprTemplateId: string | null;
@@ -449,6 +453,9 @@ export interface InitialEventShape {
 
 export interface Step5ReviewFields {
   dataRetentionDays: number;
+  /** Event.recordingDeleteAfterDays: quanto dura la registrazione, che non segue
+   *  la conservazione dei dati. Null = nessuna cancellazione automatica. */
+  recordingDeleteAfterDays: number | null;
   /** Event.postEventPublic: la pagina dell'evento concluso resta visibile. */
   postEventPublic: boolean;
   /** Event.postEventShowQA: le domande restano sulla pagina dell'evento concluso. */
@@ -693,6 +700,7 @@ export default function EventWizard(props: WizardProps) {
 
         // Step 5
         dataRetentionDays: ev.dataRetentionDays,
+        recordingDeleteAfterDays: ev.recordingDeleteAfterDays ?? null,
         postEventPublic: ev.postEventPublic,
         gdprTemplateId: ev.gdprTemplateId,
         privacyPolicyText: ev.privacyPolicyText ?? '',
@@ -846,6 +854,8 @@ export default function EventWizard(props: WizardProps) {
         tpl?.defaultRetentionDays ?? props.defaultRetentionDays,
         MAX_RETENTION_DAYS
       ),
+      // La durata della registrazione che il modello propone; senza, nessuna.
+      recordingDeleteAfterDays: tpl?.recordingDeleteAfterDays ?? null,
       // Il valore del modello vale su invito solo con il video pubblico per scelta.
       postEventPublic:
         (tpl?.postEventPublic ?? true) &&
@@ -2048,6 +2058,17 @@ export default function EventWizard(props: WizardProps) {
             mode === 'edit' && form.dataRetentionDays === initialRetention
               ? undefined
               : form.dataRetentionDays,
+          // La durata della registrazione la sceglie chi organizza: mai con un
+          // link di conduzione, e in modifica solo se cambiata qui (la cambia
+          // anche il pannello della registrazione). Una bozza di prima non ce
+          // l'ha: nessuna durata.
+          recordingDeleteAfterDays:
+            viaToken !== null ||
+            (mode === 'edit' &&
+              (form.recordingDeleteAfterDays ?? null) ===
+                (initialEvent?.event.recordingDeleteAfterDays ?? null))
+              ? undefined
+              : (form.recordingDeleteAfterDays ?? null),
           gdprTemplateId: form.gdprTemplateId,
           // In modifica solo se cambiato qui: la pagina dell'evento ha il suo
           // interruttore, e un salvataggio del wizard non deve rimettere un
@@ -2882,6 +2903,7 @@ export default function EventWizard(props: WizardProps) {
                   retentionMax={retentionMax}
                   onUploadBusy={segnalaCaricamento}
                   domandeDopoEvento={viaToken === null}
+                  durataRegistrazione={viaToken === null}
                   destinazioneSenzaScelta={destinazioneSenzaScelta}
                   pubblicoDopo={pubblicoDopo}
                 />

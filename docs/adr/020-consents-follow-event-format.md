@@ -1,6 +1,6 @@
 # ADR-020: Consents follow the event format, which sets starting values and never rights
 
-**Status:** Accepted
+**Status:** Accepted; the retention of consent proofs follows the recording retention described in [GDPR.md](../GDPR.md#recording-retention)
 
 **Extends:** [ADR-011](011-person-rubrica.md)
 
@@ -44,7 +44,7 @@ These hold for every format and no setting removes them:
 - A person who refuses stays out of the recording, and the room does not change for anyone else. How that happens depends on the installation's recorder, not on the format. Where the recorder can leave the person out, the person takes part as usual. Where it cannot, the audience without a consent listens only ([ADR-013](013-multitrack-speaker-attribution.md)).
 - People are told that the event can be recorded and transcribed. Where the audience has no microphone, camera or screen there is nothing of theirs to record, and the event informs them instead of asking.
 - A consent can be withdrawn, from the room or from the person's own data page.
-- The proof of a consent stays for as long as the video or transcript it covers exists, and past the event's data retention for as long as that content is published.
+- The proof of a consent stays for as long as the video or transcript it covers exists, published or not.
 
 The installation decides what applies to all its events: the privacy notice, the legal texts, whether the address book exists, and the templates.
 
@@ -137,19 +137,11 @@ An event with no destination is not blocked: its consents do not say where the v
 
 `RetainedConsentProof` holds one row per consent period, copied in the same transaction that deletes the sources. It has no foreign key to registrations or room consents, so the code that reads live consents cannot mistake a historical proof for a consent in force. Its only key is to the event.
 
-Two rules say how long a proof lasts, because the question changes when the event's data retention ends.
-
-Until then a video can exist without being published, and the voice of whoever asks for erasure is in it. `tipiDiProvaDiCioCheEsiste()` looks at what exists, for whoever deletes registrations, grants or staff accounts and for the proofs those deletions leave:
+One rule says how long a proof lasts. A recording does not follow the event's data retention ([Recording retention](../GDPR.md#recording-retention)), and the voice of whoever consented is in it whether or not it is published. `tipiDiProvaDiCioCheEsiste()` looks at what exists, at the cleanup and for whoever deletes registrations, grants or staff accounts:
 
 - The event's video, the file of any session, an external video, a catch-up file or per-participant tracks whose audio is still there keep both the recording and the transcription proofs.
 - A transcript alone keeps its own proof.
-- Otherwise nothing stays, and the cleanup deletes such proofs at the first pass in which neither exists.
-
-At the end of retention the unpublished file goes, and `tipiDiProvaDaConservare()` looks at what is published:
-
-- A video published on the platform, or linked as an external video, keeps both proofs.
-- A published transcript alone keeps its own proof.
-- Otherwise nothing stays, and proofs kept earlier go at the next cleanup pass.
+- Otherwise nothing stays, and the cleanup deletes such proofs at the first pass in which neither exists, for example after the recording's period ends.
 
 The cleanup copies a proof with its encrypted name. After an erasure requested by the person the proof stays without the name, with its type, dates, text version and keyed email hash, which are what make it a proof. A consent still valid at that moment counts as withdrawn at the time of the request. The video does not change. A person can see these proofs on their own data page and withdraw from there, and staff see them in the event's consent export.
 

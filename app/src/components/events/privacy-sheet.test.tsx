@@ -27,7 +27,7 @@ const SCHEDA: SchedaPrivacy = {
   chat: { attiva: false, domandeAttive: false, esitoDomande: 'nonPubblicate' },
   elencoVisibile: true,
   pseudonimi: false,
-  conservazione: { giorniDati: 30, video: { giorniDopoPubblicazione: null } },
+  conservazione: { giorniDati: 30, registrazione: { giorni: null, video: true } },
   rubrica: null,
 };
 
@@ -105,14 +105,14 @@ describe('PrivacySheet, la registrazione', () => {
         chiNonAcconsente: 'restaFuori',
         conduceSempre: false,
       },
-      conservazione: { giorniDati: 30, video: null },
+      conservazione: { giorniDati: 30, registrazione: null },
     });
     expect(testo).toContain(t.recording.tracksOnly);
     expect(testo).not.toContain(t.recording.destinationPublic);
     expect(testo).not.toContain(t.recording.destinationReserved);
     expect(testo).not.toContain(t.recording.destinationUnset);
-    expect(testo).not.toContain(t.retention.videoUnpublished);
-    expect(testo).not.toContain(t.retention.videoPublishedOpen);
+    expect(testo).not.toContain(t.retention.recordingKept);
+    expect(testo).not.toContain(t.retention.transcriptKept);
   });
 
   it('con voce fissa non dice che chi non acconsente resta fuori dal video', () => {
@@ -129,7 +129,7 @@ describe('PrivacySheet, la registrazione', () => {
         chiNonAcconsente: null,
         conduceSempre: false,
       },
-      conservazione: { giorniDati: 30, video: null },
+      conservazione: { giorniDati: 30, registrazione: null },
     });
     expect(testo).toContain(t.recording.none);
     expect(testo).not.toContain(t.recording.refuseOut);
@@ -475,27 +475,39 @@ describe('PrivacySheet, gli altri fatti', () => {
   });
 
   it('i giorni, al plurale e al singolare', () => {
-    expect(disegna({ conservazione: { giorniDati: 30, video: null } })).toContain(
+    expect(disegna({ conservazione: { giorniDati: 30, registrazione: null } })).toContain(
       '30 giorni dopo'
     );
-    expect(disegna({ conservazione: { giorniDati: 1, video: null } })).toContain(
+    expect(disegna({ conservazione: { giorniDati: 1, registrazione: null } })).toContain(
       '1 giorno dopo'
     );
   });
 
-  it('senza una scadenza del video non compare un numero di giorni', () => {
+  it('senza una scadenza la registrazione resta, e non compare un numero di giorni', () => {
     const testo = disegna();
-    expect(testo).toContain(t.retention.videoUnpublished);
-    expect(testo).toContain(t.retention.videoPublishedOpen);
-    expect(testo).not.toContain('si cancella 30');
+    expect(testo).toContain(t.retention.recordingKept);
+    expect(testo).not.toContain('dopo la pubblicazione');
   });
 
-  it('con una scadenza del video la dice', () => {
+  it('con una scadenza la dice, dalla fine o dalla pubblicazione', () => {
     const testo = disegna({
-      conservazione: { giorniDati: 30, video: { giorniDopoPubblicazione: 90 } },
+      conservazione: { giorniDati: 30, registrazione: { giorni: 90, video: true } },
     });
-    expect(testo).toContain('si cancella 90 giorni dopo.');
-    expect(testo).not.toContain(t.retention.videoPublishedOpen);
+    expect(testo).toContain('si cancellano 90 giorni dopo la fine dell’evento'.replace('’', "'"));
+    expect(testo).toContain('dopo la pubblicazione');
+    expect(testo).not.toContain(t.retention.recordingKept);
+  });
+
+  it('senza video parla della trascrizione', () => {
+    const resta = disegna({
+      conservazione: { giorniDati: 30, registrazione: { giorni: null, video: false } },
+    });
+    expect(resta).toContain(t.retention.transcriptKept);
+    expect(resta).not.toContain(t.retention.recordingKept);
+    const scade = disegna({
+      conservazione: { giorniDati: 30, registrazione: { giorni: 7, video: false } },
+    });
+    expect(scade).toContain('La trascrizione si cancella 7 giorni dopo');
   });
 
   it('la rubrica compare solo dove si propone, con i suoi mesi', () => {

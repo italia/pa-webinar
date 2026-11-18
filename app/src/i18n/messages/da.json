@@ -1272,6 +1272,8 @@
         "gdprHeading": "Privatliv og opbevaring af data",
         "retentionDays": "Opbevaringsdage",
         "retentionHelp": "Efter denne grænse slettes personoplysninger automatisk.",
+        "recordingRetention": "Optagelsens opbevaringsperiode",
+        "recordingRetentionHelp": "Optagelsen og det, der laves ud fra den, slettes ikke sammen med personernes data. Med en periode slettes de så mange dage efter arrangementets afslutning eller, hvis videoen er offentliggjort, efter offentliggørelsen. Den kan også ændres senere i optagelsespanelet.",
         "gdprTemplate": "Privatlivsskabelon",
         "gdprTemplateNone": "— Brug brugerdefineret tekst —",
         "gdprTemplateUnknown": "Den valgte skabelon til privatlivsoplysninger findes ikke længere: vælg en anden, eller gå tilbage til tilpasset tekst",
@@ -2189,7 +2191,7 @@
         "jobMaxAttempts": "Forsøg før fejl",
         "jobMaxAttemptsHelp": "Hvor mange gange pipelinen forsøger et job igen, før det markeres som mislykket. Ventetiden mellem forsøgene vokser eksponentielt (fra 30 sekunder op til 2 timer). Den typiske værdi er 5.",
         "artifactRetentionDays": "Opbevaring af artefakter (dage)",
-        "artifactRetentionDaysHelp": "Ved 0 er der ingen grænse for hele webstedet: AI-artefakterne følger opbevaringsperioden for deres optagelse eller arrangement. En værdi over nul får et dagligt job til at slette alle artefakter, der er oprettet for mere end det antal dage siden, offentliggjort eller ej: den kan forkorte opbevaringen, aldrig forlænge den. Talernes navne og jobbenes payload er ikke omfattet: de følger optagelsens eller arrangementets opbevaringsperiode. Detaljer i docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "Ved 0 er der ingen grænse for hele webstedet: AI-artefakterne følger opbevaringsperioden for deres optagelse. En værdi over nul får et dagligt job til at slette alle artefakter, der er oprettet for mere end det antal dage siden, offentliggjort eller ej: den kan forkorte opbevaringen, aldrig forlænge den. Talernes navne og jobbenes payload er ikke omfattet: de følger optagelsens opbevaringsperiode. Detaljer i docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "AI-oplysning i venteværelset",
         "consentDisclosureHelp": "Tekst, der vises for deltagerne i venteværelset, når arrangementet bruger AI-efterbehandling (transskription, resumé, oversættelse, eftersynkronisering). Kan tilpasses pr. sprog. Lad feltet stå tomt for at bruge systemets standardtekst.",
         "consentDisclosurePlaceholder": "F.eks. Dette arrangement bliver automatisk transskriberet og resumeret med AI-værktøjer efter den direkte udsendelse…"
@@ -2548,6 +2550,8 @@
       "durationLabel": "Standardvarighed (minutter)",
       "durationHint": "Forudfylder arrangementets sluttidspunkt (start + varighed). Brugeren kan ændre det. Tomt = 2 timer.",
       "retentionLabel": "Standardopbevaring af data (dage)",
+      "recordingRetentionLabel": "Standardperiode for optagelsen",
+      "recordingRetentionHint": "For arrangementer oprettet ud fra denne skabelon; den ændres i guiden og i optagelsespanelet. Optagelsen følger ikke opbevaringen af data.",
       "expectedSpeakersLabel": "Forventet antal talere (standard)",
       "descriptionTemplateLabel": "Standardbeskrivelse",
       "descriptionTemplateHint": "Tekst, der forudfyldes i arrangementets beskrivelse (kan redigeres).",
@@ -3085,7 +3089,10 @@
         "yes": "Ja",
         "no": "Nej",
         "recordingDuration": "Varighed",
-        "recordingSize": "Størrelse"
+        "recordingSize": "Størrelse",
+        "recordingRetention": "Automatisk sletning af optagelsen",
+        "recordingRetentionNone": "Ingen",
+        "recordingRetentionDays": "{days, plural, one {# dag} other {# dage}} efter arrangementets afslutning eller, hvis den er offentliggjort, efter offentliggørelsen"
       }
     },
     "rubrica": {
@@ -4706,9 +4713,10 @@
       "retention": {
         "label": "Opbevaring",
         "data": "Tilmeldings- og rumdata slettes {days, plural, one {# dag} other {# dage}} efter arrangementets afslutning. Spørgsmål og afstemninger bevares uden navne.",
-        "videoUnpublished": "Hvis den ikke stilles til rådighed, slettes optagelsen sammen med dem.",
-        "videoPublishedDays": "Hvis den stilles til rådighed, slettes den {days, plural, one {# dag} other {# dage}} senere.",
-        "videoPublishedOpen": "Hvis den stilles til rådighed, forbliver den, indtil arrangørerne fjerner den."
+        "recordingKept": "Optagelsen og det, der laves ud fra den (transskription, resumé, oversættelser), slettes ikke sammen med disse data: uanset om de stilles til rådighed eller ej, bevares de, indtil arrangørerne sletter dem.",
+        "recordingDays": "Optagelsen og det, der laves ud fra den, slettes {days, plural, one {# dag} other {# dage}} efter arrangementets afslutning eller, hvis optagelsen stilles til rådighed, efter offentliggørelsen.",
+        "transcriptKept": "Transskriptionen slettes ikke sammen med disse data: den bevares, indtil arrangørerne sletter den.",
+        "transcriptDays": "Transskriptionen slettes {days, plural, one {# dag} other {# dage}} efter arrangementets afslutning."
       },
       "addressBook": {
         "label": "Adressebog",
@@ -5916,11 +5924,12 @@
       "7d": "7 dage",
       "30d": "30 dage",
       "90d": "90 dage",
+      "1y": "1 år",
       "forever": "Ingen automatisk sletning"
     },
-    "retentionNote": "En offentliggjort video følger ikke opbevaringen af begivenhedens data: uden en periode forbliver den offentlig, indtil nogen sletter den.",
+    "retentionNote": "Optagelsen følger ikke opbevaringen af begivenhedens data: uden en periode forbliver den, offentliggjort eller ej, indtil nogen sletter den. Perioden regnes fra offentliggørelsen eller, hvis videoen ikke er offentliggjort, fra begivenhedens afslutning; når den udløber, slettes videoen og det, der er lavet ud fra den (transskriptioner, resuméer, oversættelser).",
     "delete": "Slet optagelse",
-    "deleteConfirm": "Er du sikker? Videoen slettes permanent.",
+    "deleteConfirm": "Er du sikker? Videoen slettes permanent. Transskriptioner, resuméer og oversættelser slettes ikke sammen med den: de følger den periode for optagelsen, der er valgt her.",
     "notConfigured": "Jibri er ikke konfigureret. Videooptagelse er ikke tilgængelig.",
     "disabledHint": "Videooptagelse er ikke aktiveret for dette arrangement. For at aktivere den åbnes afsnittet Indstillinger ovenfor, og kontakten \"Optagelse\" slås til.",
     "play": "Afspil",
@@ -5961,7 +5970,7 @@
     "visibilityAlways": "Altid synlig",
     "visibilityUntil": "Synlig indtil:",
     "dataRetentionNote": "Deltagernes personoplysninger slettes i henhold til begivenhedens opbevaringspolitik ({days} dage). Begivenhedsindholdet forbliver tilgængeligt, så længe siden er synlig.",
-    "availableUntil": "Denne begivenhed og dens indhold vil være tilgængelige indtil {date}.",
+    "participantDataUntil": "Deltagernes personoplysninger slettes den {date}.",
     "tabs": {
       "qa": "Spørgsmål og svar",
       "materials": "Materialer",

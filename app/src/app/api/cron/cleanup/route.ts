@@ -6,8 +6,8 @@ import { Prisma } from '@prisma/client';
 import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { assertCronApiKey } from '@/lib/auth/cron';
-import { CAMPI_VIDEO_VUOTI, sessioniSenzaFile } from '@/lib/events/recording-fields';
-import { deleteRecordingBlob } from '@/lib/storage/recordings';
+import { CAMPI_FILE_SESSIONE_VUOTI, CAMPI_VIDEO_VUOTI } from '@/lib/events/recording-fields';
+import { deleteRecordingBlob, deleteRecordingBlobByName } from '@/lib/storage/recordings';
 import { deleteBlob, isAzureConfigured } from '@/lib/azure/blob-storage';
 import { closeStaleSessions, type OvertimeLimits } from '@/lib/events/call-sessions';
 import { OVERTIME_CAP_DEFAULT_MINUTES, OVERTIME_EMPTY_DEFAULT_MINUTES } from '@/lib/events/overtime-defaults';
@@ -19,7 +19,6 @@ import {
   isEventEligibleForCleanup,
   isFinishedEventStatus,
   isRecordingRetentionExpired,
-  shouldPurgeRecordingBlob,
   tempRecordingExpiryCutoff,
 } from '@/lib/gdpr/cleanup-selection';
 import { getSettings } from '@/lib/settings';
@@ -31,12 +30,12 @@ import {
 } from '@/lib/gdpr/log-retention';
 import { completaImprontaConcessioni } from '@/lib/events/grant-email-hash';
 import { deleteUnreferencedPersonPhotos } from '@/lib/events/person-photo-store';
-import { bloccaTrascrizioneEvento, CAPTIONS_TRANSCRIPT_MODEL } from '@/lib/captions/transcript';
 import {
-  conservaProve,
-  tipiDelleProve,
-  tipiDelleProveEsistenti,
-} from '@/lib/gdpr/retained-consent-proofs';
+  bloccaTrascrizioneEvento,
+  CAPTIONS_TRANSCRIPT_MODEL,
+  registrazioneSoloSottotitoli,
+} from '@/lib/captions/transcript';
+import { conservaProve, tipiDelleProveEsistenti } from '@/lib/gdpr/retained-consent-proofs';
 
 /** Giorni senza iscrizioni dopo cui una foto profilo si cancella. */
 const PROFILE_PHOTO_GRACE_DAYS = 30;
@@ -55,8 +54,10 @@ export const dynamic = 'force-dynamic';
  * invitations, named grants and their photos, the lead organizer's photo,
  * consents, reactions — and strips every identity from the content that
  * stays with the event (questions, poll votes, words, ratings, end-of-event
- * answers, materials). Le prove dei consensi di un video o di una trascrizione
- * pubblicati si copiano prima e restano finche' esistono
+ * answers, materials). La registrazione (video, trascrizioni, output della
+ * post-produzione) resta: non segue la conservazione dei dati e se ne va solo
+ * alla sua scadenza, se chi organizza ne ha scelta una (fase 2). Le prove dei
+ * consensi delle voci che contiene si copiano prima e restano finche' esiste
  * (lib/gdpr/retained-consent-proofs). Ripassa ogni giorno sugli eventi
  * oltre la conservazione: tutto e' idempotente, e cosi' toglie anche cio' che
  * si fosse scritto dopo il primo giro o che un giro fallito avesse lasciato.
@@ -129,56 +130,189 @@ export const GET = withErrorHandling(async (request) => {
     }
   }
 
-  // ── Phase 2: Clean up published recordings past their retention ──
+  // ── Phase 2: la registrazione oltre la sua scadenza ──
+  // La registrazione e' un documento storico: non segue la conservazione dei
+  // dati dei partecipanti (fase 3) e scade solo se chi organizza ha scelto una
+  // durata (recordingDeleteAfterDays), contata dalla pubblicazione finche' il
+  // video e' pubblicato, altrimenti dalla fine dell'evento
+  // (lib/gdpr/cleanup-selection). Alla scadenza se ne va tutta: i file video
+  // dell'evento e delle sue sessioni, la trascrizione dai sottotitoli, i nomi
+  // dei parlanti, e gli output della post-produzione, che toglie
+  // `postprod-retention` dalla data `Recording.retentionUntil` scritta qui (file
+  // nello storage della post-produzione, tracce, testi dei lavori). Le prove dei
+  // consensi se ne vanno al primo giro che non trova piu' niente da coprire
+  // (fasi 3 e 4). Il link esterno resta: la piattaforma non lo cancella.
+  // Si cercano solo gli eventi in cui resta qualcosa da cancellare: dopo il
+  // giro l'evento esce dalla selezione da solo, e la durata resta sull'evento
+  // per cio' che verra' dopo.
   const recordingRetentionEvents = await prisma.event.findMany({
     where: {
-      recordingUrl: { not: null },
-      recordingPublished: true,
       recordingDeleteAfterDays: { not: null },
-      recordingPublishedAt: { not: null },
+      OR: [
+        { recordingUrl: { not: null } },
+        { tempRecordingUrl: { not: null } },
+        {
+          callSessions: {
+            some: { OR: [{ recordingUrl: { not: null } }, { recordingFilename: { not: null } }] },
+          },
+        },
+        {
+          recordings: {
+            some: {
+              status: { not: 'ARCHIVED' },
+              OR: [{ retentionUntil: null }, { retentionUntil: { gt: now } }],
+            },
+          },
+        },
+      ],
     },
     select: {
       id: true,
       slug: true,
+      status: true,
+      endsAt: true,
+      lastActiveAt: true,
+      dataRetentionDays: true,
       recordingUrl: true,
-      recordingDeleteAfterDays: true,
+      tempRecordingUrl: true,
+      recordingPublished: true,
       recordingPublishedAt: true,
+      recordingDeleteAfterDays: true,
+      recordingRetentionFrom: true,
+      callSessions: {
+        where: { OR: [{ recordingUrl: { not: null } }, { recordingFilename: { not: null } }] },
+        select: { recordingUrl: true, recordingFilename: true },
+      },
     },
   });
+  const expiredRecordings = recordingRetentionEvents.filter((evt) =>
+    isRecordingRetentionExpired(evt, now)
+  );
+  let recordingsExpired = 0;
+  let recordingsDeferred = 0;
 
-  for (const evt of recordingRetentionEvents) {
-    if (!isRecordingRetentionExpired(evt, now)) continue;
-
+  for (const evt of expiredRecordings) {
+    // I file da togliere: per indirizzo quelli dell'evento e delle sessioni,
+    // per nome quelli di una sessione che ha solo il nome nello storage.
+    const indirizzi = [
+      ...new Set(
+        [evt.recordingUrl, evt.tempRecordingUrl, ...evt.callSessions.map((c) => c.recordingUrl)].filter(
+          (u): u is string => !!u
+        )
+      ),
+    ];
+    const soloNomi = [
+      ...new Set(
+        evt.callSessions
+          .filter((c) => !c.recordingUrl && c.recordingFilename)
+          .map((c) => c.recordingFilename as string)
+      ),
+    ];
     try {
-      // Delete the expired blob (best-effort, outside the transaction).
-      if (evt.recordingUrl) {
-        await deleteRecordingBlob(evt.recordingUrl).catch(() => false);
-      }
-      await prisma.$transaction([
-        prisma.event.update({
-          where: { id: evt.id },
-          data: CAMPI_VIDEO_VUOTI,
-        }),
-        ...(evt.recordingUrl
-          ? [prisma.callSession.updateMany(sessioniSenzaFile(evt.id, evt.recordingUrl))]
-          : []),
-        prisma.gdprAuditLog.create({
-          data: {
-            eventId: evt.id,
-            action: 'RECORDING_DELETED',
-            recordCount: 1,
-            details: JSON.stringify({
-              reason: 'retention_expired',
-              retentionDays: evt.recordingDeleteAfterDays,
-            }),
-          },
-        }),
-      ]);
-      console.log(
-        `[cron/cleanup] Published recording cleared for event ${evt.id} (${evt.slug})`
+      const esito = await prisma.$transaction(
+        async (tx) => {
+          // In fila con chi scrive la trascrizione dell'evento e con chi copia
+          // le prove (pulizia, cancellazioni).
+          await bloccaTrascrizioneEvento(tx, evt.id);
+          const registrazioni = await tx.recording.findMany({
+            where: { eventId: evt.id, status: { not: 'ARCHIVED' } },
+            select: { id: true, blobKey: true },
+          });
+          const ids = registrazioni.map((r) => r.id);
+          // Un lavoro che non partira' piu' si ferma; uno che un worker sta gia'
+          // facendo no: scriverebbe i suoi risultati su una registrazione
+          // gia' tolta. Si riprova al giro dopo, quando ha finito o quando il
+          // recupero dei lavori l'ha rimesso in coda.
+          if (ids.length > 0) {
+            await tx.postprodJob.updateMany({
+              where: { recordingId: { in: ids }, status: 'PENDING' },
+              data: { status: 'FAILED', completedAt: now, lastError: 'recording expired' },
+            });
+            const inCorso = await tx.postprodJob.count({
+              where: { recordingId: { in: ids }, status: { in: ['CLAIMED', 'RUNNING'] } },
+            });
+            if (inCorso > 0) return 'rinviata' as const;
+          }
+          await tx.event.update({
+            where: { id: evt.id },
+            data: {
+              ...CAMPI_VIDEO_VUOTI,
+              tempRecordingUrl: null,
+              tempRecordingStartedAt: null,
+              transcriptPublished: false,
+            },
+          });
+          await tx.callSession.updateMany({
+            where: {
+              eventId: evt.id,
+              OR: [{ recordingUrl: { not: null } }, { recordingFilename: { not: null } }],
+            },
+            data: CAMPI_FILE_SESSIONE_VUOTI,
+          });
+          // La registrazione «solo sottotitoli» non ha altro: va via tutta
+          // (lavoro, artefatti, testi originali e parlanti a cascata).
+          const soloSottotitoli = registrazioni
+            .filter((r) => registrazioneSoloSottotitoli(r))
+            .map((r) => r.id);
+          const conFile = registrazioni
+            .filter((r) => !registrazioneSoloSottotitoli(r))
+            .map((r) => r.id);
+          if (soloSottotitoli.length > 0) {
+            await tx.recording.deleteMany({ where: { id: { in: soloSottotitoli } } });
+          }
+          if (conFile.length > 0) {
+            // Quello che sta solo nel database se ne va adesso, anche dove la
+            // post-produzione non gira: la trascrizione dai sottotitoli e i
+            // nomi dei parlanti.
+            await tx.postprodArtifact.deleteMany({
+              where: { recordingId: { in: conFile }, modelId: CAPTIONS_TRANSCRIPT_MODEL },
+            });
+            await tx.speaker.deleteMany({ where: { recordingId: { in: conFile } } });
+            // Il resto lo toglie postprod-retention da questa data; una data
+            // piu' vicina resta.
+            await tx.recording.updateMany({
+              where: {
+                id: { in: conFile },
+                OR: [{ retentionUntil: null }, { retentionUntil: { gt: now } }],
+              },
+              data: { retentionUntil: now },
+            });
+          }
+          await tx.gdprAuditLog.create({
+            data: {
+              eventId: evt.id,
+              action: 'RECORDING_DELETED',
+              recordCount: 1,
+              details: JSON.stringify({
+                reason: 'retention_expired',
+                retentionDays: evt.recordingDeleteAfterDays,
+                countedFrom: evt.recordingPublished ? 'publication' : 'event_end',
+                files: indirizzi.length + soloNomi.length,
+                recordings: registrazioni.length,
+              }),
+            },
+          });
+          return 'cancellata' as const;
+        },
+        { timeout: TIMEOUT_PULIZIA_EVENTO_MS }
       );
+      if (esito === 'rinviata') {
+        recordingsDeferred++;
+        continue;
+      }
+      // I file dopo, fuori dalla transazione e senza fermarla: un file che lo
+      // storage non cancella resta senza riferimenti, e la riconciliazione lo
+      // toglie come orfano.
+      for (const url of indirizzi) {
+        await deleteRecordingBlob(url).catch(() => false);
+      }
+      for (const nome of soloNomi) {
+        await deleteRecordingBlobByName(nome).catch(() => false);
+      }
+      recordingsExpired++;
+      console.log(`[cron/cleanup] Recording expired for event ${evt.id} (${evt.slug})`);
     } catch (err) {
-      console.error(`[cron/cleanup] Failed to clear recording for event ${evt.id}:`, err);
+      console.error(`[cron/cleanup] Failed to delete the expired recording of event ${evt.id}:`, err);
       failures.push(`recording:${evt.id}`);
     }
   }
@@ -200,10 +334,7 @@ export const GET = withErrorHandling(async (request) => {
       lastActiveAt: true,
       dataRetentionDays: true,
       status: true,
-      recordingUrl: true,
       tempRecordingUrl: true,
-      recordingPublished: true,
-      transcriptPublished: true,
       moderatorPhotoId: true,
       _count: { select: { registrations: true, questions: true, polls: true } },
     },
@@ -332,13 +463,24 @@ export const GET = withErrorHandling(async (request) => {
           where: { eventId: evt.id },
         });
 
-        // Le prove dei consensi di cio' che e' pubblicato restano, in una tabella
-        // a parte: si copiano adesso, perche' prove in sala, iscrizioni e
-        // concessioni qui sotto portano via nome e indirizzo. Quelle conservate
+        // La registrazione temporanea (il recupero per chi arriva tardi) non e'
+        // la registrazione che resta: si toglie qui, il file dopo la
+        // transazione, e non tiene in vita le prove qui sotto.
+        if (evt.tempRecordingUrl) {
+          await tx.event.update({
+            where: { id: evt.id },
+            data: { tempRecordingUrl: null, tempRecordingStartedAt: null },
+          });
+        }
+
+        // Le prove dei consensi delle voci che stanno nella registrazione
+        // restano finche' la registrazione esiste, pubblicata o no, in una
+        // tabella a parte: si copiano adesso, perche' prove in sala, iscrizioni
+        // e concessioni qui sotto portano via nome e indirizzo. Quelle conservate
         // da un giro precedente e non piu' coperte se ne vanno: il video o la
-        // trascrizione non sono piu' pubblicati. Le regole si leggono qui, sullo
-        // stato attuale dell'evento, non su quello di inizio giro.
-        const tipiProve = await tipiDelleProve(tx, evt.id);
+        // trascrizione non ci sono piu'. Le regole si leggono qui, sullo stato
+        // attuale dell'evento, non su quello di inizio giro.
+        const tipiProve = await tipiDelleProveEsistenti(tx, evt.id);
         const consentProofsRetained = await conservaProve(tx, {
           eventId: evt.id,
           tipi: tipiProve,
@@ -384,35 +526,8 @@ export const GET = withErrorHandling(async (request) => {
           },
         });
 
-        // La trascrizione costruita da quelle frasi porta nomi e parole: se
-        // ne va qui, salvo che sia pubblicata (con il video o da sola). La
-        // pulizia della post-produzione la toglierebbe solo dove quella gira.
-        // La registrazione «solo sottotitoli» non ha altro contenuto: va via
-        // tutta (lavoro, artefatti, testi originali e parlanti a cascata);
-        // da una registrazione con il video si tolgono la trascrizione e i
-        // suoi parlanti.
-        let captionsTranscriptsDeleted = 0;
-        if (!evt.recordingPublished && !evt.transcriptPublished) {
-          const conSottotitoli = await tx.recording.findMany({
-            where: {
-              eventId: evt.id,
-              artifacts: { some: { modelId: CAPTIONS_TRANSCRIPT_MODEL } },
-            },
-            select: { id: true, blobKey: true },
-          });
-          const soloSottotitoli = conSottotitoli.filter((r) => r.blobKey === '').map((r) => r.id);
-          const conVideo = conSottotitoli.filter((r) => r.blobKey !== '').map((r) => r.id);
-          if (soloSottotitoli.length > 0) {
-            await tx.recording.deleteMany({ where: { id: { in: soloSottotitoli } } });
-          }
-          if (conVideo.length > 0) {
-            await tx.postprodArtifact.deleteMany({
-              where: { recordingId: { in: conVideo }, modelId: CAPTIONS_TRANSCRIPT_MODEL },
-            });
-            await tx.speaker.deleteMany({ where: { recordingId: { in: conVideo } } });
-          }
-          captionsTranscriptsDeleted = conSottotitoli.length;
-        }
+        // La trascrizione costruita da quelle frasi resta: e' parte della
+        // registrazione, che ha la sua scadenza (fase 2). Le frasi no.
 
         const registrationsDeleted = await tx.registration.deleteMany({
           where: { eventId: evt.id },
@@ -542,7 +657,6 @@ export const GET = withErrorHandling(async (request) => {
           roomOccupants: roomOccupantsDeleted.count,
           captionSegments: captionSegmentsDeleted.count,
           redactionRequests: redactionRequestsDeleted.count,
-          captionsTranscripts: captionsTranscriptsDeleted,
           chatMessages: chatMessagesDeleted.count,
           reactions: reactionsDeleted.count,
           agendaReactions: agendaReactionsDeleted.count,
@@ -573,14 +687,10 @@ export const GET = withErrorHandling(async (request) => {
 
       // Blob deletion (network I/O) AFTER the transaction commits — best-effort.
       // tempRecordingUrl is raw pre-publish Jibri output → always safe to purge.
+      // Il video dell'evento e delle sue sessioni resta: e' la registrazione, che
+      // ha la sua scadenza (fase 2).
       if (evt.tempRecordingUrl) {
         const ok = await deleteRecordingBlob(evt.tempRecordingUrl).catch(() => false);
-        if (ok) totalRecordingBlobsDeleted++;
-      }
-      // recordingUrl: EXEMPT the PUBLISHED video only — see
-      // shouldPurgeRecordingBlob (lib/gdpr/cleanup-selection.ts) for why.
-      if (evt.recordingUrl && shouldPurgeRecordingBlob(evt)) {
-        const ok = await deleteRecordingBlob(evt.recordingUrl).catch(() => false);
         if (ok) totalRecordingBlobsDeleted++;
       }
       if (isAzureConfigured()) {
@@ -614,8 +724,8 @@ export const GET = withErrorHandling(async (request) => {
   // ── Prove conservate non piu' coperte, sugli eventi ancora in conservazione ──
   // Una prova nasce anche da una cancellazione chiesta prima della scadenza, e
   // deve andarsene quando il video e la trascrizione se ne vanno, senza aspettare
-  // la fine della conservazione dell'evento. Fino ad allora non conta se sono
-  // pubblicati: finche' esistono la prova serve.
+  // la fine della conservazione dell'evento. Non conta se sono pubblicati:
+  // finche' esistono la prova serve, la stessa regola della fase 3.
   const provePerEvento = await prisma.retainedConsentProof.findMany({
     where: { eventId: { notIn: toClean.map((evt) => evt.id) } },
     select: { eventId: true },
@@ -812,9 +922,8 @@ export const GET = withErrorHandling(async (request) => {
       emailOutboxScrubbed: outboxScrubbed,
       auditLogRowsScrubbed: auditScrubbed,
       tempRecordingsCleaned: tempRecordingEvents.length,
-      publishedRecordingsCleaned: recordingRetentionEvents.filter((evt) =>
-        isRecordingRetentionExpired(evt, now)
-      ).length,
+      recordingsExpired,
+      recordingsDeferred,
       eventsProcessed,
       unfinishedEventsArchived: unfinishedArchived,
       registrationsDeleted: totalRegistrationsDeleted,

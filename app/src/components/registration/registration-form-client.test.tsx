@@ -399,7 +399,7 @@ describe('RegistrationFormClient — la scheda privacy', () => {
     chat: { attiva: true, domandeAttive: true, esitoDomande: 'nonPubblicate' },
     elencoVisibile: true,
     pseudonimi: false,
-    conservazione: { giorniDati: 30, video: { giorniDopoPubblicazione: null } },
+    conservazione: { giorniDati: 30, registrazione: { giorni: null, video: true } },
     rubrica: null,
   };
 

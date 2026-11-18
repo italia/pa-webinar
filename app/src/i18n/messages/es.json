@@ -1272,6 +1272,8 @@
         "gdprHeading": "Privacidad y conservación de datos",
         "retentionDays": "Días de conservación",
         "retentionHelp": "Pasado este umbral, los datos personales se eliminan automáticamente.",
+        "recordingRetention": "Duración de la grabación",
+        "recordingRetentionHelp": "La grabación y lo que se obtiene de ella no se eliminan con los datos de las personas. Con un plazo, se eliminan esos días después del final del evento o, si el vídeo está publicado, después de la publicación. También se puede cambiar después, en el panel de la grabación.",
         "gdprTemplate": "Plantilla de aviso de privacidad",
         "gdprTemplateNone": "— Usar texto personalizado —",
         "gdprTemplateUnknown": "La plantilla de aviso de privacidad seleccionada ya no existe: elige otra o vuelve al texto personalizado",
@@ -2189,7 +2191,7 @@
         "jobMaxAttempts": "Intentos antes del fallo",
         "jobMaxAttemptsHelp": "Cuántas veces reintenta el pipeline un trabajo antes de marcarlo como fallido. El backoff entre un intento y el siguiente crece exponencialmente (de 30 segundos hasta 2 horas). El valor típico es 5.",
         "artifactRetentionDays": "Conservación de los artefactos (días)",
-        "artifactRetentionDaysHelp": "Con 0 no hay límite para todo el sitio: los artefactos de IA siguen la conservación de su grabación o del evento. Un valor mayor que cero hace que una tarea diaria elimine todo artefacto creado hace más de ese número de días, publicado o no: puede acortar la conservación, nunca alargarla. Los nombres de los hablantes y las cargas útiles de los trabajos no están incluidos: siguen la conservación de la grabación o del evento. Detalles en docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "Con 0 no hay límite para todo el sitio: los artefactos de IA siguen la conservación de su grabación. Un valor mayor que cero hace que una tarea diaria elimine todo artefacto creado hace más de ese número de días, publicado o no: puede acortar la conservación, nunca alargarla. Los nombres de los hablantes y las cargas útiles de los trabajos no están incluidos: siguen la conservación de la grabación. Detalles en docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "Aviso sobre la IA en la sala de espera",
         "consentDisclosureHelp": "Texto que se muestra a los participantes en la sala de espera cuando el evento usa la posproducción con IA (transcripción, resumen, traducción, doblaje). Se puede personalizar por idioma. Déjalo vacío para usar el texto predeterminado del sistema.",
         "consentDisclosurePlaceholder": "P. ej. Este evento se transcribirá y resumirá automáticamente con herramientas de IA después del directo…"
@@ -2548,6 +2550,8 @@
       "durationLabel": "Duración predeterminada (minutos)",
       "durationHint": "Prerrellena el final del evento (inicio + duración). El usuario puede modificarlo. Vacío = 2 horas.",
       "retentionLabel": "Conservación de datos predeterminada (días)",
+      "recordingRetentionLabel": "Duración predeterminada de la grabación",
+      "recordingRetentionHint": "Para los eventos creados con esta plantilla; se cambia en el asistente y en el panel de la grabación. La grabación no sigue la conservación de los datos.",
       "expectedSpeakersLabel": "Número de hablantes previstos (predeterminado)",
       "descriptionTemplateLabel": "Descripción predeterminada",
       "descriptionTemplateHint": "Texto prerrellenado en la descripción del evento (modificable).",
@@ -3085,7 +3089,10 @@
         "yes": "Sí",
         "no": "No",
         "recordingDuration": "Duración",
-        "recordingSize": "Tamaño"
+        "recordingSize": "Tamaño",
+        "recordingRetention": "Eliminación automática de la grabación",
+        "recordingRetentionNone": "Ninguna",
+        "recordingRetentionDays": "{days, plural, one {# día} other {# días}} después del final del evento o, si se publica, después de la publicación"
       }
     },
     "rubrica": {
@@ -4706,9 +4713,10 @@
       "retention": {
         "label": "Conservación",
         "data": "Los datos de la inscripción y de la sala se eliminan {days, plural, one {# día} other {# días}} después del final del evento. Las preguntas y las encuestas permanecen sin nombres.",
-        "videoUnpublished": "Si no se pone a disposición, la grabación se elimina con ellos.",
-        "videoPublishedDays": "Si se pone a disposición, se elimina {days, plural, one {# día} other {# días}} después.",
-        "videoPublishedOpen": "Si se pone a disposición, permanece hasta que quien organiza la retire."
+        "recordingKept": "La grabación y lo que se obtiene de ella (transcripción, resumen, traducciones) no se eliminan con estos datos: se pongan o no a disposición, permanecen hasta que quien organiza los elimine.",
+        "recordingDays": "La grabación y lo que se obtiene de ella se eliminan {days, plural, one {# día} other {# días}} después del final del evento o, si la grabación se pone a disposición, después de su publicación.",
+        "transcriptKept": "La transcripción no se elimina con estos datos: permanece hasta que quien organiza la elimine.",
+        "transcriptDays": "La transcripción se elimina {days, plural, one {# día} other {# días}} después del final del evento."
       },
       "addressBook": {
         "label": "Agenda",
@@ -5916,11 +5924,12 @@
       "7d": "7 días",
       "30d": "30 días",
       "90d": "90 días",
+      "1y": "1 año",
       "forever": "Sin eliminación automática"
     },
-    "retentionNote": "Un vídeo publicado no sigue la conservación de los datos del evento: sin un plazo, sigue siendo público hasta que alguien lo elimine.",
+    "retentionNote": "La grabación no sigue la conservación de los datos del evento: sin un plazo permanece, publicada o no, hasta que alguien la elimine. El plazo cuenta desde la publicación o, si el vídeo no está publicado, desde el final del evento; al vencer, se eliminan el vídeo y lo que se obtiene de él (transcripciones, resúmenes, traducciones).",
     "delete": "Eliminar grabación",
-    "deleteConfirm": "¿Está seguro? El vídeo se eliminará de forma permanente.",
+    "deleteConfirm": "¿Está seguro? El vídeo se eliminará de forma permanente. Las transcripciones, los resúmenes y las traducciones no se eliminan con él: siguen el plazo de la grabación elegido aquí.",
     "notConfigured": "Jibri no está configurado. La grabación de vídeo no está disponible.",
     "disabledHint": "La grabación de vídeo no está habilitada para este evento. Para activarla, abra la sección Configuración más arriba y active el interruptor \"Grabación\".",
     "play": "Reproducir",
@@ -5961,7 +5970,7 @@
     "visibilityAlways": "Siempre visible",
     "visibilityUntil": "Visible hasta:",
     "dataRetentionNote": "Los datos personales de los participantes se eliminarán según la retención del evento ({days} días). El contenido del evento seguirá disponible mientras la página sea visible.",
-    "availableUntil": "Este evento y su contenido estarán disponibles hasta el {date}.",
+    "participantDataUntil": "Los datos personales de quienes participaron se eliminan el {date}.",
     "tabs": {
       "qa": "Preguntas y Respuestas",
       "materials": "Materiales",

@@ -1272,6 +1272,8 @@
         "gdprHeading": "Privatnost i čuvanje podataka",
         "retentionDays": "Dani čuvanja",
         "retentionHelp": "Nakon ovog praga osobni se podaci automatski brišu.",
+        "recordingRetention": "Rok čuvanja snimke",
+        "recordingRetentionHelp": "Snimka i ono što iz nje nastaje ne brišu se s podacima osoba. S rokom se brišu toliko dana nakon završetka događaja ili, ako je video objavljen, nakon objave. Može se promijeniti i kasnije, na ploči snimke.",
         "gdprTemplate": "Predložak obavijesti",
         "gdprTemplateNone": "— Koristi prilagođeni tekst —",
         "gdprTemplateUnknown": "Odabrani predložak obavijesti o privatnosti više ne postoji: odaberite drugi ili se vratite na prilagođeni tekst",
@@ -2189,7 +2191,7 @@
         "jobMaxAttempts": "Pokušaji prije neuspjeha",
         "jobMaxAttemptsHelp": "Koliko puta pipeline ponavlja posao prije nego što ga označi neuspjelim. Odgoda između pokušaja raste eksponencijalno (od 30 sekundi do 2 sata). Uobičajena vrijednost je 5.",
         "artifactRetentionDays": "Čuvanje artefakata (dani)",
-        "artifactRetentionDaysHelp": "Uz 0 nema ograničenja za cijelu stranicu: AI artefakti slijede rok čuvanja svoje snimke ili događaja. Vrijednost veća od nule znači da dnevni posao briše svaki artefakt stvoren prije više od toliko dana, objavljen ili ne: rok čuvanja može skratiti, ali ga nikad ne produljuje. Imena govornika i podaci poslova nisu obuhvaćeni: slijede rok čuvanja snimke ili događaja. Pojedinosti u docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "Uz 0 nema ograničenja za cijelu stranicu: AI artefakti slijede rok čuvanja svoje snimke. Vrijednost veća od nule znači da dnevni posao briše svaki artefakt stvoren prije više od toliko dana, objavljen ili ne: rok čuvanja može skratiti, ali ga nikad ne produljuje. Imena govornika i podaci poslova nisu obuhvaćeni: slijede rok čuvanja snimke. Pojedinosti u docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "AI obavijest u čekaonici",
         "consentDisclosureHelp": "Tekst prikazan sudionicima u čekaonici kada događaj koristi AI postprodukciju (transkripcija, sažetak, prijevod, sinkronizacija). Može se prilagoditi po jeziku. Ostavi prazno za zadani tekst sustava.",
         "consentDisclosurePlaceholder": "Npr. Ovaj će događaj nakon prijenosa uživo biti automatski transkribiran i sažet AI alatima…"
@@ -2548,6 +2550,8 @@
       "durationLabel": "Zadano trajanje (minute)",
       "durationHint": "Unaprijed popunjava završetak događaja (početak + trajanje). Korisnik ga može promijeniti. Prazno = 2 sata.",
       "retentionLabel": "Zadano čuvanje podataka (dani)",
+      "recordingRetentionLabel": "Zadani rok čuvanja snimke",
+      "recordingRetentionHint": "Za događaje stvorene iz ovog predloška; mijenja se u čarobnjaku i na ploči snimke. Snimka ne prati čuvanje podataka.",
       "expectedSpeakersLabel": "Očekivani broj govornika (zadano)",
       "descriptionTemplateLabel": "Zadani opis",
       "descriptionTemplateHint": "Tekst unaprijed upisan u opis događaja (izmjenjiv).",
@@ -3085,7 +3089,10 @@
         "yes": "Da",
         "no": "Ne",
         "recordingDuration": "Trajanje",
-        "recordingSize": "Veličina"
+        "recordingSize": "Veličina",
+        "recordingRetention": "Automatsko brisanje snimke",
+        "recordingRetentionNone": "Nema",
+        "recordingRetentionDays": "{days, plural, one {# dan} few {# dana} other {# dana}} nakon završetka događaja ili, ako je objavljena, nakon objave"
       }
     },
     "rubrica": {
@@ -4706,9 +4713,10 @@
       "retention": {
         "label": "Čuvanje",
         "data": "Podaci o prijavi i dvorani brišu se {days, plural, one {# dan} few {# dana} other {# dana}} nakon završetka događaja. Pitanja i ankete ostaju bez imena.",
-        "videoUnpublished": "Ako ne bude stavljena na raspolaganje, snimka se briše zajedno s njima.",
-        "videoPublishedDays": "Ako bude stavljena na raspolaganje, briše se {days, plural, one {# dan} few {# dana} other {# dana}} kasnije.",
-        "videoPublishedOpen": "Ako bude stavljena na raspolaganje, ostaje dok je organizatori ne uklone."
+        "recordingKept": "Snimka i ono što iz nje nastaje (transkript, sažetak, prijevodi) ne brišu se zajedno s tim podacima: bez obzira na to jesu li stavljeni na raspolaganje, ostaju dok ih organizatori ne izbrišu.",
+        "recordingDays": "Snimka i ono što iz nje nastaje brišu se {days, plural, one {# dan} few {# dana} other {# dana}} nakon završetka događaja ili, ako se snimka stavi na raspolaganje, nakon njezine objave.",
+        "transcriptKept": "Transkript se ne briše zajedno s tim podacima: ostaje dok ga organizatori ne izbrišu.",
+        "transcriptDays": "Transkript se briše {days, plural, one {# dan} few {# dana} other {# dana}} nakon završetka događaja."
       },
       "addressBook": {
         "label": "Imenik",
@@ -5916,11 +5924,12 @@
       "7d": "7 dana",
       "30d": "30 dana",
       "90d": "90 dana",
+      "1y": "1 godina",
       "forever": "Bez automatskog brisanja"
     },
-    "retentionNote": "Objavljeni videozapis ne prati čuvanje podataka događaja: bez roka ostaje javan dok ga netko ne izbriše.",
+    "retentionNote": "Snimka ne prati čuvanje podataka događaja: bez roka ostaje, objavljena ili ne, dok je netko ne izbriše. Rok se računa od objave ili, ako video nije objavljen, od završetka događaja; kad istekne, brišu se video i ono što iz njega nastaje (transkripti, sažeci, prijevodi).",
     "delete": "Obriši snimku",
-    "deleteConfirm": "Jeste li sigurni? Video će biti trajno obrisan.",
+    "deleteConfirm": "Jeste li sigurni? Video će biti trajno obrisan. Transkripti, sažeci i prijevodi ne brišu se s njim: prate rok snimke odabran ovdje.",
     "notConfigured": "Jibri nije konfiguriran u infrastrukturi. Video snimanje nije dostupno.",
     "disabledHint": "Snimanje videa nije omogućeno za ovaj događaj. Za aktiviranje otvorite gornji odjeljak Postavke i uključite preklopnik \"Snimanje\".",
     "play": "Reproduciraj",
@@ -5961,7 +5970,7 @@
     "visibilityAlways": "Uvijek vidljivo",
     "visibilityUntil": "Vidljivo do:",
     "dataRetentionNote": "Osobni podaci sudionika bit će obrisani u skladu s retencijom događaja ({days} dana). Sadržaj događaja ostat će dostupan dok je stranica vidljiva.",
-    "availableUntil": "Ovaj događaj i pripadajući sadržaj bit će dostupni do {date}.",
+    "participantDataUntil": "Osobni podaci sudionika brišu se {date}.",
     "tabs": {
       "qa": "Pitanja i odgovori",
       "materials": "Materijali",

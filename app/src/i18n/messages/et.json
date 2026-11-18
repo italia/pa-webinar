@@ -1272,6 +1272,8 @@
         "gdprHeading": "Privaatsus ja andmete säilitamine",
         "retentionDays": "Säilitamise päevad",
         "retentionHelp": "Pärast seda läve isikuandmed kustutatakse automaatselt.",
+        "recordingRetention": "Salvestise säilitamine",
+        "recordingRetentionHelp": "Salvestist ja sellest tehtut ei kustutata koos inimeste andmetega. Tähtaja korral kustutatakse need nii mitu päeva pärast ürituse lõppu või, kui video on avaldatud, pärast avaldamist. Seda saab muuta ka hiljem salvestise paneelil.",
         "gdprTemplate": "Teabe mall",
         "gdprTemplateNone": "— Kasuta kohandatud teksti —",
         "gdprTemplateUnknown": "Valitud privaatsusteabe malli ei ole enam olemas: vali mõni muu või naase kohandatud teksti juurde",
@@ -2189,7 +2191,7 @@
         "jobMaxAttempts": "Katseid enne ebaõnnestumist",
         "jobMaxAttemptsHelp": "Mitu korda töövoog tööd uuesti proovib, enne kui märgib selle ebaõnnestunuks. Katsete vaheline ooteaeg kasvab eksponentsiaalselt (30 sekundist kuni 2 tunnini). Tüüpiline väärtus on 5.",
         "artifactRetentionDays": "Artefaktide säilitamine (päevades)",
-        "artifactRetentionDaysHelp": "Väärtusega 0 ei kehti kogu saidi piirangut: AI artefaktid järgivad oma salvestise või sündmuse säilitustähtaega. Nullist suurem väärtus paneb igapäevase töö kustutama iga artefakti, mis loodi rohkem kui nii mitu päeva tagasi, olgu avaldatud või mitte: see võib säilitusaega lühendada, kuid mitte kunagi pikendada. Kõnelejate nimesid ja tööde andmeid see ei puuduta: need järgivad salvestise või sündmuse säilitustähtaega. Üksikasjad: docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "Väärtusega 0 ei kehti kogu saidi piirangut: AI artefaktid järgivad oma salvestise säilitustähtaega. Nullist suurem väärtus paneb igapäevase töö kustutama iga artefakti, mis loodi rohkem kui nii mitu päeva tagasi, olgu avaldatud või mitte: see võib säilitusaega lühendada, kuid mitte kunagi pikendada. Kõnelejate nimesid ja tööde andmeid see ei puuduta: need järgivad salvestise säilitustähtaega. Üksikasjad: docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "AI teavitus ooteruumis",
         "consentDisclosureHelp": "Tekst, mida näidatakse osalejatele ooteruumis, kui sündmus kasutab AI järeltöötlust (transkribeerimine, kokkuvõte, tõlge, dubleerimine). Kohandatav keelte kaupa. Jäta tühjaks, et kasutada süsteemi vaiketeksti.",
         "consentDisclosurePlaceholder": "Nt Sellest sündmusest tehakse pärast otseülekannet AI tööriistadega automaatselt transkriptsioon ja kokkuvõte…"
@@ -2548,6 +2550,8 @@
       "durationLabel": "Vaikimisi kestus (minutites)",
       "durationHint": "Täidab sündmuse lõpu ette (algus + kestus). Kasutaja saab seda muuta. Tühi = 2 tundi.",
       "retentionLabel": "Vaikimisi andmete säilitamine (päevades)",
+      "recordingRetentionLabel": "Salvestise vaikimisi säilitamine",
+      "recordingRetentionHint": "Selle malli põhjal loodud ürituste jaoks; seda saab muuta viisardis ja salvestise paneelil. Salvestis ei järgi andmete säilitamisaega.",
       "expectedSpeakersLabel": "Eeldatav kõnelejate arv (vaikimisi)",
       "descriptionTemplateLabel": "Vaikimisi kirjeldus",
       "descriptionTemplateHint": "Tekst, mis täidetakse sündmuse kirjeldusse ette (muudetav).",
@@ -3085,7 +3089,10 @@
         "yes": "Jah",
         "no": "Ei",
         "recordingDuration": "Kestus",
-        "recordingSize": "Suurus"
+        "recordingSize": "Suurus",
+        "recordingRetention": "Salvestise automaatne kustutamine",
+        "recordingRetentionNone": "Puudub",
+        "recordingRetentionDays": "{days, plural, one {# päev} other {# päeva}} pärast ürituse lõppu või, kui see on avaldatud, pärast avaldamist"
       }
     },
     "rubrica": {
@@ -4706,9 +4713,10 @@
       "retention": {
         "label": "Säilitamine",
         "data": "Registreerumis- ja ruumiandmed kustutatakse {days, plural, one {# päev} other {# päeva}} pärast ürituse lõppu. Küsimused ja küsitlused jäävad alles ilma nimedeta.",
-        "videoUnpublished": "Kui seda kättesaadavaks ei tehta, kustutatakse salvestis koos nende andmetega.",
-        "videoPublishedDays": "Kui see tehakse kättesaadavaks, kustutatakse see {days, plural, one {# päev} other {# päeva}} hiljem.",
-        "videoPublishedOpen": "Kui see tehakse kättesaadavaks, jääb see alles, kuni korraldajad selle eemaldavad."
+        "recordingKept": "Salvestist ja sellest tehtut (transkriptsioon, kokkuvõte, tõlked) nende andmetega koos ei kustutata: olenemata sellest, kas need tehakse kättesaadavaks, jäävad need alles, kuni korraldajad need kustutavad.",
+        "recordingDays": "Salvestis ja sellest tehtu kustutatakse {days, plural, one {# päev} other {# päeva}} pärast ürituse lõppu või, kui salvestis tehakse kättesaadavaks, pärast selle avaldamist.",
+        "transcriptKept": "Transkriptsiooni nende andmetega koos ei kustutata: see jääb alles, kuni korraldajad selle kustutavad.",
+        "transcriptDays": "Transkriptsioon kustutatakse {days, plural, one {# päev} other {# päeva}} pärast ürituse lõppu."
       },
       "addressBook": {
         "label": "Aadressraamat",
@@ -5916,11 +5924,12 @@
       "7d": "7 päeva",
       "30d": "30 päeva",
       "90d": "90 päeva",
+      "1y": "1 aasta",
       "forever": "Automaatset kustutamist pole"
     },
-    "retentionNote": "Avaldatud video ei järgi ürituse andmete säilitamisaega: ilma tähtajata jääb see avalikuks, kuni keegi selle kustutab.",
+    "retentionNote": "Salvestis ei järgi ürituse andmete säilitamisaega: ilma tähtajata jääb see alles, avaldatud või mitte, kuni keegi selle kustutab. Tähtaeg loetakse avaldamisest või, kui video pole avaldatud, ürituse lõpust; kui see möödub, kustutatakse video ja sellest tehtu (transkriptsioonid, kokkuvõtted, tõlked).",
     "delete": "Kustuta salvestis",
-    "deleteConfirm": "Kas olete kindel? Video kustutatakse jäädavalt.",
+    "deleteConfirm": "Kas olete kindel? Video kustutatakse jäädavalt. Transkriptsioone, kokkuvõtteid ja tõlkeid koos sellega ei kustutata: need järgivad siin valitud salvestise tähtaega.",
     "notConfigured": "Jibri pole infrastruktuuris seadistatud. Videosalvestamine pole saadaval.",
     "disabledHint": "Selle sündmuse jaoks pole videosalvestus lubatud. Selle aktiveerimiseks avage ülal asuv jaotis Seaded ja lülitage sisse \"Salvestus\".",
     "play": "Esita",
@@ -5961,7 +5970,7 @@
     "visibilityAlways": "Alati nähtav",
     "visibilityUntil": "Nähtav kuni:",
     "dataRetentionNote": "Osalejate isikuandmed kustutatakse vastavalt ürituse säilitamispoliitikale ({days} päeva). Ürituse sisu jääb kättesaadavaks, kuni leht on nähtav.",
-    "availableUntil": "See üritus ja selle sisu on saadaval kuni {date}.",
+    "participantDataUntil": "Osalejate isikuandmed kustutatakse {date}.",
     "tabs": {
       "qa": "Küsimused ja vastused",
       "materials": "Materjalid",

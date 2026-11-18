@@ -1648,6 +1648,11 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
             )}
           </>
         )}
+        {/* Quanto dura la registrazione: un metadato, che sceglie chi organizza. */}
+        <KV label={td('governance.recordingRetention')}
+            value={event.recordingDeleteAfterDays
+              ? td('governance.recordingRetentionDays', { days: event.recordingDeleteAfterDays })
+              : td('governance.recordingRetentionNone')} />
         </dl>
       </div>
   ) : (

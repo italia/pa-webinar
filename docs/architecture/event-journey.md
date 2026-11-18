@@ -404,7 +404,7 @@ The registration form shows it above the link to the privacy notice. The waiting
 | **Participant list** | Whether participants see who is in the room |
 | **Your name** | Real name or pseudonym in the room, in the chat and in questions. With a pseudonym, that the name stays in the transcript for someone who consents, where the event asks for that consent |
 | **Chat and questions** | That chat messages are never published, and whether the text of Q&A questions may be, never with the name |
-| **Retention** | When registration and room data are deleted, and what happens to the recording |
+| **Retention** | When registration and room data are deleted, and how long the recording and what is made from it stay, which does not depend on that date: until the organizers delete them, or the period they chose |
 | **Address book** | That the form offers it and for how many months the data stays. The form only, as the waiting room has no such box |
 
 A line with nothing to say does not appear. In the waiting room captions, chat and Q&A follow the current value, because moderators turn them on and off live (`schedaInSala()`). The computed sheet speaks to participants, so in the waiting room someone who leads or speaks reads two lines written for them: **Your name** gives no pseudonym, and **Recording** says what happens to them without the consent.

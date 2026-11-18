@@ -474,7 +474,7 @@ A job whose dependency failed is never runnable and stays `PENDING`.
 | `POSTPROD_DONE` | A job registers its last artifact, no job of the recording is left `PENDING`, `CLAIMED` or `RUNNING`, and no job of the recording failed. |
 | `POSTPROD_PARTIAL` | A job fails for good, or the last job completes while any job of the recording is `FAILED`. Other artifacts may exist. |
 | `POSTPROD_FAILED` | An administrator canceled the pipeline, or the silence guard rejected the tracks. |
-| `ARCHIVED` | The retention job purged the recording's artifacts. |
+| `ARCHIVED` | The retention job purged the recording's artifacts, at the end of the recording's period (`retentionUntil`). |
 
 `POSTPROD_RUNNING` exists in the enum but no code sets it: a recording stays
 `POSTPROD_QUEUED` while its jobs run. A recording without media, created to
@@ -1497,7 +1497,7 @@ this table gives only their effect on the pipeline.
 | `aiDefaultTargetLocales` | **Default event languages** (in **Settings › Languages**) | The languages every new event starts with, and those of events without their own (`en,fr,es,de` on a new installation). Those not active on the site only serve subtitles and summary |
 | `aiMaxConcurrentJobs` | **Parallel jobs** | Upper bound on concurrent workers, reached only when that many jobs are runnable at once ([The orchestrator](#the-orchestrator)) |
 | `aiJobMaxAttempts` | **Attempts before failure** | Attempt cap per job ([Retries and backoff](#retries-and-backoff)) |
-| `aiArtifactRetentionDays` | **Artifact retention (days)** | `0` sets no site-wide cap: outputs follow the event's retention, or the published video's lifetime; with only the transcript published, the transcript stays while published and the other outputs follow the event's retention. A positive value makes the daily retention job delete every artifact older than that many days, published recordings included ([Recordings, voice data and AI outputs](privacy/recordings-and-ai.md)) |
+| `aiArtifactRetentionDays` | **Artifact retention (days)** | `0` sets no site-wide cap: outputs stay with their recording, published or not, until it is deleted or its period (`recordingDeleteAfterDays`) ends. A positive value makes the daily retention job delete every artifact older than that many days, published recordings included ([Recordings, voice data and AI outputs](privacy/recordings-and-ai.md#retention-regimes)) |
 | `aiConsentDisclosure` | **AI notice in the waiting room** | Per-language text. On the privacy sheet of an event, in the form and the waiting room, it replaces the sentences on summary, translation and dubbing; on an instant call, which has no sheet, it replaces the waiting room's AI notice. Empty uses the built-in text |
 
 ### Per-event settings
@@ -1681,7 +1681,8 @@ while the request is open; every opening is written to the admin audit log
 
 The editor proposes the intervals from what the room recorded, stored with
 the request when it arrives, because the room data goes at the event's
-retention (`app/src/lib/recording/redaction/people.ts`):
+retention while the recording stays: a request registered after that date
+starts without proposals (`app/src/lib/recording/redaction/people.ts`):
 
 | Source | Where it comes from | Precision |
 |---|---|---|

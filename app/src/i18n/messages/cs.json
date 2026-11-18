@@ -1272,6 +1272,8 @@
         "gdprHeading": "Soukromí a uchovávání dat",
         "retentionDays": "Dnů uchování",
         "retentionHelp": "Po překročení tohoto prahu se osobní údaje automaticky mažou.",
+        "recordingRetention": "Doba uchování záznamu",
+        "recordingRetentionHelp": "Záznam a to, co z něj vznikne, se nemažou s údaji lidí. S nastavenou dobou se smažou tolik dní po skončení akce, nebo, pokud je video zveřejněno, po zveřejnění. Dá se změnit i později, v panelu záznamu.",
         "gdprTemplate": "Šablona informací o ochraně",
         "gdprTemplateNone": "— Použít vlastní text —",
         "gdprTemplateUnknown": "Vybraná šablona informací o ochraně osobních údajů již neexistuje: vyberte jinou nebo se vraťte k vlastnímu textu",
@@ -2189,7 +2191,7 @@
         "jobMaxAttempts": "Počet pokusů před selháním",
         "jobMaxAttemptsHelp": "Kolikrát pipeline zopakuje úlohu, než ji označí za neúspěšnou. Prodleva mezi pokusy roste exponenciálně (od 30 sekund až po 2 hodiny). Obvyklá hodnota je 5.",
         "artifactRetentionDays": "Uchování artefaktů (dny)",
-        "artifactRetentionDaysHelp": "Při hodnotě 0 neplatí žádný limit pro celý web: AI artefakty se řídí dobou uchování své nahrávky nebo události. Kladná hodnota nechá denní úlohu smazat každý artefakt vytvořený před více než zadaným počtem dní, zveřejněný i nezveřejněný: dobu uchování tak může zkrátit, nikdy prodloužit. Jmen mluvčích a payloadů úloh se to netýká: řídí se dobou uchování nahrávky nebo události. Podrobnosti v docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "Při hodnotě 0 neplatí žádný limit pro celý web: AI artefakty se řídí dobou uchování své nahrávky. Kladná hodnota nechá denní úlohu smazat každý artefakt vytvořený před více než zadaným počtem dní, zveřejněný i nezveřejněný: dobu uchování tak může zkrátit, nikdy prodloužit. Jmen mluvčích a payloadů úloh se to netýká: řídí se dobou uchování nahrávky. Podrobnosti v docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "Informace o AI v čekárně",
         "consentDisclosureHelp": "Text zobrazený účastníkům v čekárně, když událost používá AI postprodukci (přepis, shrnutí, překlad, dabing). Lze upravit pro každý jazyk. Ponechte prázdné, chcete-li použít výchozí systémový text.",
         "consentDisclosurePlaceholder": "Např. Tato událost bude po skončení živého přenosu automaticky přepsána a shrnuta pomocí nástrojů AI…"
@@ -2548,6 +2550,8 @@
       "durationLabel": "Výchozí délka (minuty)",
       "durationHint": "Předvyplní konec události (začátek + délka). Uživatel jej může změnit. Prázdné = 2 hodiny.",
       "retentionLabel": "Výchozí uchování dat (dny)",
+      "recordingRetentionLabel": "Výchozí doba uchování záznamu",
+      "recordingRetentionHint": "Pro události vytvořené z této šablony; mění se v průvodci a v panelu záznamu. Záznam se neřídí dobou uchování údajů.",
       "expectedSpeakersLabel": "Očekávaný počet mluvčích (výchozí)",
       "descriptionTemplateLabel": "Výchozí popis",
       "descriptionTemplateHint": "Text předvyplněný do popisu události (lze upravit).",
@@ -3085,7 +3089,10 @@
         "yes": "Ano",
         "no": "Ne",
         "recordingDuration": "Délka",
-        "recordingSize": "Velikost"
+        "recordingSize": "Velikost",
+        "recordingRetention": "Automatické smazání záznamu",
+        "recordingRetentionNone": "Žádné",
+        "recordingRetentionDays": "{days, plural, one {# den} few {# dny} many {# dne} other {# dní}} po skončení akce, nebo, pokud je zveřejněn, po zveřejnění"
       }
     },
     "rubrica": {
@@ -4706,9 +4713,10 @@
       "retention": {
         "label": "Uchovávání",
         "data": "Údaje o registraci a z místnosti se smažou {days, plural, one {# den} few {# dny} many {# dne} other {# dní}} po skončení akce. Otázky a ankety zůstávají bez jmen.",
-        "videoUnpublished": "Pokud záznam nebude zpřístupněn, smaže se spolu s těmito údaji.",
-        "videoPublishedDays": "Pokud bude záznam zpřístupněn, smaže se {days, plural, one {# den} few {# dny} many {# dne} other {# dní}} později.",
-        "videoPublishedOpen": "Pokud bude záznam zpřístupněn, zůstane, dokud ho pořadatelé neodstraní."
+        "recordingKept": "Záznam a to, co z něj vznikne (přepis, shrnutí, překlady), se s těmito údaji nemažou: ať budou zpřístupněny, nebo ne, zůstávají, dokud je pořadatelé nesmažou.",
+        "recordingDays": "Záznam a to, co z něj vznikne, se smažou {days, plural, one {# den} few {# dny} many {# dne} other {# dní}} po skončení akce, nebo, pokud bude záznam zpřístupněn, po jeho zveřejnění.",
+        "transcriptKept": "Přepis se s těmito údaji nemaže: zůstává, dokud ho pořadatelé nesmažou.",
+        "transcriptDays": "Přepis se smaže {days, plural, one {# den} few {# dny} many {# dne} other {# dní}} po skončení akce."
       },
       "addressBook": {
         "label": "Adresář",
@@ -5916,11 +5924,12 @@
       "7d": "7 dní",
       "30d": "30 dní",
       "90d": "90 dní",
+      "1y": "1 rok",
       "forever": "Bez automatického smazání"
     },
-    "retentionNote": "Zveřejněné video se neřídí dobou uchování údajů události: bez stanovené doby zůstane veřejné, dokud ho někdo nesmaže.",
+    "retentionNote": "Záznam se neřídí dobou uchování údajů události: bez stanovené doby zůstane, zveřejněný i nezveřejněný, dokud ho někdo nesmaže. Doba se počítá od zveřejnění, nebo, pokud video zveřejněno není, od skončení události; po jejím uplynutí se smaže video i to, co z něj vzniklo (přepisy, shrnutí, překlady).",
     "delete": "Smazat záznam",
-    "deleteConfirm": "Jste si jisti? Video bude trvale smazáno.",
+    "deleteConfirm": "Jste si jisti? Video bude trvale smazáno. Přepisy, shrnutí a překlady se s ním nesmažou: řídí se dobou záznamu zvolenou zde.",
     "notConfigured": "Jibri není nakonfigurován. Videozáznam není k dispozici.",
     "disabledHint": "Záznam videa není pro tuto událost povolen. Pro aktivaci otevřete sekci Nastavení výše a zapněte přepínač „Záznam“.",
     "play": "Přehrát",
@@ -5961,7 +5970,7 @@
     "visibilityAlways": "Vždy viditelné",
     "visibilityUntil": "Viditelné do:",
     "dataRetentionNote": "Osobní údaje účastníků budou smazány podle retence události ({days} dní). Obsah události zůstane dostupný po dobu viditelnosti stránky.",
-    "availableUntil": "Tato událost a její obsah budou dostupné do {date}.",
+    "participantDataUntil": "Osobní údaje účastníků se smažou {date}.",
     "tabs": {
       "qa": "Otázky a odpovědi",
       "materials": "Materiály",

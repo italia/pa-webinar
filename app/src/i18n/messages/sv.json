@@ -1272,6 +1272,8 @@
         "gdprHeading": "Integritet och datalagring",
         "retentionDays": "Lagringsdagar",
         "retentionHelp": "Efter denna gräns raderas personuppgifter automatiskt.",
+        "recordingRetention": "Lagring av inspelningen",
+        "recordingRetentionHelp": "Inspelningen och det som görs av den raderas inte med personernas uppgifter. Med en period raderas de så många dagar efter evenemangets slut eller, om videon är publicerad, efter publiceringen. Den kan också ändras senare i inspelningspanelen.",
         "gdprTemplate": "Integritetsmall",
         "gdprTemplateNone": "— Använd anpassad text —",
         "gdprTemplateUnknown": "Den valda mallen för integritetsmeddelandet finns inte längre: välj en annan eller gå tillbaka till anpassad text",
@@ -2189,7 +2191,7 @@
         "jobMaxAttempts": "Försök före misslyckande",
         "jobMaxAttemptsHelp": "Hur många gånger pipelinen gör om ett jobb innan det markeras som misslyckat. Väntetiden mellan försöken växer exponentiellt (från 30 sekunder upp till 2 timmar). Typiskt värde är 5.",
         "artifactRetentionDays": "Lagring av artefakter (dagar)",
-        "artifactRetentionDaysHelp": "Vid 0 finns ingen gräns för hela webbplatsen: AI-artefakterna följer lagringstiden för sin inspelning eller sitt evenemang. Ett värde större än noll får ett dagligt jobb att radera varje artefakt som skapades för mer än så många dagar sedan, publicerad eller inte: det kan förkorta lagringen men aldrig förlänga den. Talarnas namn och jobbens payload omfattas inte: de följer inspelningens eller evenemangets lagringstid. Detaljer i docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "Vid 0 finns ingen gräns för hela webbplatsen: AI-artefakterna följer lagringstiden för sin inspelning. Ett värde större än noll får ett dagligt jobb att radera varje artefakt som skapades för mer än så många dagar sedan, publicerad eller inte: det kan förkorta lagringen men aldrig förlänga den. Talarnas namn och jobbens payload omfattas inte: de följer inspelningens lagringstid. Detaljer i docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "AI-information i väntrummet",
         "consentDisclosureHelp": "Text som visas för deltagarna i väntrummet när evenemanget använder AI-efterproduktion (transkription, sammanfattning, översättning, dubbning). Kan anpassas per språk. Lämna tomt för att använda systemets standardtext.",
         "consentDisclosurePlaceholder": "T.ex. Det här evenemanget kommer att transkriberas och sammanfattas automatiskt med AI-verktyg efter direktsändningen…"
@@ -2548,6 +2550,8 @@
       "durationLabel": "Standardlängd (minuter)",
       "durationHint": "Förifyller evenemangets sluttid (start + längd). Användaren kan ändra den. Tomt = 2 timmar.",
       "retentionLabel": "Standardlagring av data (dagar)",
+      "recordingRetentionLabel": "Standardlagring av inspelningen",
+      "recordingRetentionHint": "För evenemang som skapas från den här mallen; den ändras i guiden och i inspelningspanelen. Inspelningen följer inte lagringstiden för uppgifterna.",
       "expectedSpeakersLabel": "Förväntat antal talare (standard)",
       "descriptionTemplateLabel": "Standardbeskrivning",
       "descriptionTemplateHint": "Text som förifylls i evenemangets beskrivning (går att ändra).",
@@ -3085,7 +3089,10 @@
         "yes": "Ja",
         "no": "Nej",
         "recordingDuration": "Längd",
-        "recordingSize": "Storlek"
+        "recordingSize": "Storlek",
+        "recordingRetention": "Automatisk radering av inspelningen",
+        "recordingRetentionNone": "Ingen",
+        "recordingRetentionDays": "{days, plural, one {# dag} other {# dagar}} efter att evenemanget har avslutats eller, om den publiceras, efter publiceringen"
       }
     },
     "rubrica": {
@@ -4706,9 +4713,10 @@
       "retention": {
         "label": "Lagring",
         "data": "Uppgifterna om anmälan och rummet raderas {days, plural, one {# dag} other {# dagar}} efter att evenemanget har avslutats. Frågor och omröstningar finns kvar utan namn.",
-        "videoUnpublished": "Om den inte görs tillgänglig raderas inspelningen tillsammans med dem.",
-        "videoPublishedDays": "Om den görs tillgänglig raderas den {days, plural, one {# dag} other {# dagar}} senare.",
-        "videoPublishedOpen": "Om den görs tillgänglig finns den kvar tills arrangörerna tar bort den."
+        "recordingKept": "Inspelningen och det som görs av den (transkription, sammanfattning, översättningar) raderas inte tillsammans med dessa uppgifter: oavsett om de görs tillgängliga eller inte finns de kvar tills arrangörerna raderar dem.",
+        "recordingDays": "Inspelningen och det som görs av den raderas {days, plural, one {# dag} other {# dagar}} efter att evenemanget har avslutats eller, om inspelningen görs tillgänglig, efter att den har publicerats.",
+        "transcriptKept": "Transkriptionen raderas inte tillsammans med dessa uppgifter: den finns kvar tills arrangörerna raderar den.",
+        "transcriptDays": "Transkriptionen raderas {days, plural, one {# dag} other {# dagar}} efter att evenemanget har avslutats."
       },
       "addressBook": {
         "label": "Adressbok",
@@ -5916,11 +5924,12 @@
       "7d": "7 dagar",
       "30d": "30 dagar",
       "90d": "90 dagar",
+      "1y": "1 år",
       "forever": "Ingen automatisk radering"
     },
-    "retentionNote": "En publicerad video följer inte lagringstiden för evenemangets data: utan en period förblir den offentlig tills någon raderar den.",
+    "retentionNote": "Inspelningen följer inte lagringstiden för evenemangets data: utan en period finns den kvar, publicerad eller inte, tills någon raderar den. Perioden räknas från publiceringen eller, om videon inte är publicerad, från evenemangets slut; när den löper ut raderas videon och det som gjorts av den (transkriptioner, sammanfattningar, översättningar).",
     "delete": "Radera inspelning",
-    "deleteConfirm": "Är du säker? Videon raderas permanent.",
+    "deleteConfirm": "Är du säker? Videon raderas permanent. Transkriptioner, sammanfattningar och översättningar raderas inte med den: de följer den period för inspelningen som väljs här.",
     "notConfigured": "Jibri är inte konfigurerat. Videoinspelning är inte tillgänglig.",
     "disabledHint": "Videoinspelning är inte aktiverad för detta evenemang. För att aktivera, öppna avsnittet Inställningar ovan och slå på \"Inspelning\".",
     "play": "Spela upp",
@@ -5961,7 +5970,7 @@
     "visibilityAlways": "Alltid synlig",
     "visibilityUntil": "Synlig till:",
     "dataRetentionNote": "Deltagarnas personuppgifter raderas enligt evenemangets lagringspolicy ({days} dagar). Evenemangets innehåll förblir tillgängligt så länge sidan är synlig.",
-    "availableUntil": "Detta evenemang och dess innehåll kommer att vara tillgängligt till {date}.",
+    "participantDataUntil": "Deltagarnas personuppgifter raderas den {date}.",
     "tabs": {
       "qa": "Frågor och svar",
       "materials": "Material",

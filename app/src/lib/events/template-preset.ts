@@ -55,6 +55,7 @@ export function presetDelModello(tpl: EventTemplate): WizardTemplatePreset {
     descriptionTemplate:
       (tpl.descriptionTemplate as Record<string, string> | null) ?? null,
     defaultRetentionDays: tpl.defaultRetentionDays,
+    recordingDeleteAfterDays: tpl.recordingDeleteAfterDays,
     defaultExpectedSpeakers: tpl.defaultExpectedSpeakers,
     postEventPublic: tpl.postEventPublic,
     recordingDestination: tpl.recordingDestination,

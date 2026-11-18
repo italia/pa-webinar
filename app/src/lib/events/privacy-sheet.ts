@@ -120,9 +120,12 @@ export interface SchedaPrivacy {
   pseudonimi: boolean;
   conservazione: {
     giorniDati: number;
-    /** Null se non c'e' un video. `giorniDopoPubblicazione` e' null dove il
-     *  video non ha una scadenza propria (lib/gdpr/cleanup-selection). */
-    video: { giorniDopoPubblicazione: number | null } | null;
+    /** La registrazione non segue `giorniDati`: resta finche' chi organizza non
+     *  la cancella, o per `giorni` (dalla fine dell'evento, o dalla pubblicazione
+     *  del video) se ne ha scelti (lib/gdpr/cleanup-selection). Null se l'evento
+     *  non registra ne' il video ne' una trascrizione; `video` dice se c'e' un
+     *  video o solo una trascrizione. */
+    registrazione: { giorni: number | null; video: boolean } | null;
   };
   /** Null dove la rubrica non si propone. */
   rubrica: { mesi: number } | null;
@@ -276,10 +279,13 @@ export function schedaPrivacy({
     pseudonimi: evento.audienceAnonymous,
     conservazione: {
       giorniDati: evento.dataRetentionDays,
-      // Uno zero non e' una scadenza: lib/gdpr/cleanup-selection lo ignora.
-      video: video
-        ? { giorniDopoPubblicazione: evento.recordingDeleteAfterDays || null }
-        : null,
+      // Cio' che resta oltre i dati: il video, le tracce trascritte, la
+      // trascrizione dai sottotitoli. Uno zero non e' una scadenza:
+      // lib/gdpr/cleanup-selection lo ignora.
+      registrazione:
+        video || modo === 'soloTracce' || ambiente.trascrizioneSottotitoli
+          ? { giorni: evento.recordingDeleteAfterDays || null, video }
+          : null,
     },
     rubrica: rubricaProposta(evento, sito) ? { mesi: MESI_RUBRICA_PREDEFINITI } : null,
   };

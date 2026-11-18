@@ -1272,6 +1272,8 @@
         "gdprHeading": "Datenschutz und Datenaufbewahrung",
         "retentionDays": "Aufbewahrungstage",
         "retentionHelp": "Nach Ablauf werden personenbezogene Daten automatisch gelöscht.",
+        "recordingRetention": "Aufbewahrung der Aufzeichnung",
+        "recordingRetentionHelp": "Die Aufzeichnung und was daraus entsteht, werden nicht mit den Daten der Personen gelöscht. Mit einer Frist werden sie so viele Tage nach dem Ende der Veranstaltung gelöscht oder, wenn das Video veröffentlicht ist, nach der Veröffentlichung. Sie lässt sich auch später im Bereich der Aufzeichnung ändern.",
         "gdprTemplate": "Datenschutz-Vorlage",
         "gdprTemplateNone": "— Eigenen Text verwenden —",
         "gdprTemplateUnknown": "Die gewählte Vorlage für die Datenschutzhinweise existiert nicht mehr: Wählen Sie eine andere oder kehren Sie zum individuellen Text zurück",
@@ -2189,7 +2191,7 @@
         "jobMaxAttempts": "Versuche vor dem Fehlschlag",
         "jobMaxAttemptsHelp": "Wie oft die Pipeline einen Job wiederholt, bevor sie ihn als fehlgeschlagen markiert. Der Backoff zwischen den Versuchen wächst exponentiell (von 30 Sekunden bis zu 2 Stunden). Der typische Wert ist 5.",
         "artifactRetentionDays": "Aufbewahrung der Artefakte (Tage)",
-        "artifactRetentionDaysHelp": "Bei 0 gilt keine seitenweite Grenze: Die KI-Artefakte folgen der Aufbewahrungsfrist ihrer Aufzeichnung oder der Veranstaltung. Ein Wert größer als null lässt einen täglichen Job jedes Artefakt löschen, das vor mehr als dieser Anzahl von Tagen erstellt wurde, ob veröffentlicht oder nicht: Er kann die Aufbewahrung verkürzen, aber nie verlängern. Namen der Sprecher und Payloads der Jobs sind nicht erfasst: Sie folgen der Aufbewahrungsfrist der Aufzeichnung oder der Veranstaltung. Details in docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "Bei 0 gilt keine seitenweite Grenze: Die KI-Artefakte folgen der Aufbewahrungsfrist ihrer Aufzeichnung. Ein Wert größer als null lässt einen täglichen Job jedes Artefakt löschen, das vor mehr als dieser Anzahl von Tagen erstellt wurde, ob veröffentlicht oder nicht: Er kann die Aufbewahrung verkürzen, aber nie verlängern. Namen der Sprecher und Payloads der Jobs sind nicht erfasst: Sie folgen der Aufbewahrungsfrist der Aufzeichnung. Details in docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "KI-Hinweis im Warteraum",
         "consentDisclosureHelp": "Text, der den Teilnehmern im Warteraum angezeigt wird, wenn die Veranstaltung die KI-Nachbearbeitung nutzt (Transkription, Zusammenfassung, Übersetzung, Synchronisation). Pro Sprache anpassbar. Leer lassen, um den vom System vorgegebenen Standardtext zu verwenden.",
         "consentDisclosurePlaceholder": "Z. B. Diese Veranstaltung wird nach der Live-Übertragung automatisch mit KI-Werkzeugen transkribiert und zusammengefasst …"
@@ -2548,6 +2550,8 @@
       "durationLabel": "Standarddauer (Minuten)",
       "durationHint": "Füllt das Ende der Veranstaltung vor (Beginn + Dauer). Es kann geändert werden. Leer = 2 Stunden.",
       "retentionLabel": "Standardmäßige Datenaufbewahrung (Tage)",
+      "recordingRetentionLabel": "Standardaufbewahrung der Aufzeichnung",
+      "recordingRetentionHint": "Für die aus dieser Vorlage erstellten Veranstaltungen; sie lässt sich im Assistenten und im Bereich der Aufzeichnung ändern. Die Aufzeichnung folgt nicht der Aufbewahrung der Daten.",
       "expectedSpeakersLabel": "Erwartete Anzahl der Sprecher (Standard)",
       "descriptionTemplateLabel": "Standardbeschreibung",
       "descriptionTemplateHint": "Text, der in die Beschreibung der Veranstaltung vorab eingetragen wird (änderbar).",
@@ -3085,7 +3089,10 @@
         "yes": "Ja",
         "no": "Nein",
         "recordingDuration": "Dauer",
-        "recordingSize": "Größe"
+        "recordingSize": "Größe",
+        "recordingRetention": "Automatische Löschung der Aufzeichnung",
+        "recordingRetentionNone": "Keine",
+        "recordingRetentionDays": "{days, plural, one {# Tag} other {# Tage}} nach dem Ende der Veranstaltung oder, wenn veröffentlicht, nach der Veröffentlichung"
       }
     },
     "rubrica": {
@@ -4706,9 +4713,10 @@
       "retention": {
         "label": "Aufbewahrung",
         "data": "Die Daten der Anmeldung und des Raums werden {days, plural, one {# Tag} other {# Tage}} nach dem Ende der Veranstaltung gelöscht. Fragen und Umfragen bleiben ohne Namen erhalten.",
-        "videoUnpublished": "Wird sie nicht bereitgestellt, wird die Aufzeichnung zusammen mit ihnen gelöscht.",
-        "videoPublishedDays": "Wird die Aufzeichnung bereitgestellt, wird sie {days, plural, one {# Tag} other {# Tage}} danach gelöscht.",
-        "videoPublishedOpen": "Wird die Aufzeichnung bereitgestellt, bleibt sie erhalten, bis die Veranstalter sie entfernen."
+        "recordingKept": "Die Aufzeichnung und was daraus entsteht (Transkript, Zusammenfassung, Übersetzungen) werden nicht mit diesen Daten gelöscht: Ob bereitgestellt oder nicht, sie bleiben erhalten, bis die Veranstalter sie löschen.",
+        "recordingDays": "Die Aufzeichnung und was daraus entsteht, werden {days, plural, one {# Tag} other {# Tage}} nach dem Ende der Veranstaltung gelöscht oder, wenn die Aufzeichnung bereitgestellt wird, nach ihrer Veröffentlichung.",
+        "transcriptKept": "Das Transkript wird nicht mit diesen Daten gelöscht: Es bleibt erhalten, bis die Veranstalter es löschen.",
+        "transcriptDays": "Das Transkript wird {days, plural, one {# Tag} other {# Tage}} nach dem Ende der Veranstaltung gelöscht."
       },
       "addressBook": {
         "label": "Adressbuch",
@@ -5916,11 +5924,12 @@
       "7d": "7 Tage",
       "30d": "30 Tage",
       "90d": "90 Tage",
+      "1y": "1 Jahr",
       "forever": "Keine automatische Löschung"
     },
-    "retentionNote": "Ein veröffentlichtes Video folgt nicht der Aufbewahrung der Veranstaltungsdaten: Ohne Frist bleibt es öffentlich, bis es jemand löscht.",
+    "retentionNote": "Die Aufzeichnung folgt nicht der Aufbewahrung der Veranstaltungsdaten: Ohne Frist bleibt sie, ob veröffentlicht oder nicht, bis jemand sie löscht. Die Frist läuft ab der Veröffentlichung oder, wenn das Video nicht veröffentlicht ist, ab dem Ende der Veranstaltung; danach werden das Video und alles daraus Entstandene (Transkripte, Zusammenfassungen, Übersetzungen) gelöscht.",
     "delete": "Aufzeichnung löschen",
-    "deleteConfirm": "Sind Sie sicher? Das Video wird endgültig gelöscht.",
+    "deleteConfirm": "Sind Sie sicher? Das Video wird endgültig gelöscht. Transkripte, Zusammenfassungen und Übersetzungen werden nicht mit ihm gelöscht: Sie folgen der hier gewählten Frist der Aufzeichnung.",
     "notConfigured": "Jibri ist nicht konfiguriert. Die Videoaufzeichnung ist nicht verfügbar.",
     "disabledHint": "Für dieses Event ist die Videoaufzeichnung nicht aktiviert. Um sie zu aktivieren, öffnen Sie den Bereich \"Einstellungen\" oben und schalten den Schalter \"Aufzeichnung\" ein.",
     "play": "Abspielen",
@@ -5961,7 +5970,7 @@
     "visibilityAlways": "Immer sichtbar",
     "visibilityUntil": "Sichtbar bis:",
     "dataRetentionNote": "Personenbezogene Daten der Teilnehmenden werden gemäß der Aufbewahrungsfrist der Veranstaltung ({days} Tage) gelöscht. Der Veranstaltungsinhalt bleibt verfügbar, solange die Seite sichtbar ist.",
-    "availableUntil": "Diese Veranstaltung und ihre Inhalte sind bis zum {date} verfügbar.",
+    "participantDataUntil": "Die personenbezogenen Daten der Teilnehmenden werden am {date} gelöscht.",
     "tabs": {
       "qa": "Fragen und Antworten",
       "materials": "Materialien",

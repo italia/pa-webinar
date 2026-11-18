@@ -1272,6 +1272,8 @@
         "gdprHeading": "Privatezza u żamma tad-data",
         "retentionDays": "Jiem ta' żamma",
         "retentionHelp": "Wara dan il-livell, id-data personali titħassar awtomatikament.",
+        "recordingRetention": "Żamma tar-rekording",
+        "recordingRetentionHelp": "Ir-rekording u dak li jsir minnu ma jitħassrux mad-dejta tan-nies. B'perjodu, jitħassru dawk il-jiem wara t-tmiem tal-avveniment jew, jekk il-vidjo huwa ppubblikat, wara l-pubblikazzjoni. Jista' jinbidel ukoll wara, fil-pannell tar-rekording.",
         "gdprTemplate": "Template tal-avviż",
         "gdprTemplateNone": "— Uża test personalizzat —",
         "gdprTemplateUnknown": "It-template tal-avviż ta' privatezza magħżul ma għadux jeżisti: agħżel ieħor jew erġa' lura għat-test personalizzat",
@@ -2189,7 +2191,7 @@
         "jobMaxAttempts": "Tentattivi qabel il-falliment",
         "jobMaxAttemptsHelp": "Kemm-il darba l-pipeline terġa' tipprova xogħol qabel timmarkah bħala falliment. Il-backoff bejn tentattiv u ieħor jikber b'mod esponenzjali (minn 30 sekonda sa sagħtejn). Il-valur tipiku huwa 5.",
         "artifactRetentionDays": "Żamma tal-artefatti (jiem)",
-        "artifactRetentionDaysHelp": "B'0 ma hemm l-ebda limitu għas-sit kollu: l-artefatti tal-AI isegwu ż-żamma tar-reġistrazzjoni tagħhom jew tal-avveniment. Valur ikbar minn żero jġiegħel xogħol ta' kuljum iħassar kull artefatt maħluq aktar minn dak in-numru ta' jiem ilu, ippubblikat jew le: jista' jqassar iż-żamma, iżda qatt ma jtawwalha. L-ismijiet tal-kelliema u l-payload tax-xogħlijiet mhumiex inklużi: isegwu ż-żamma tar-reġistrazzjoni jew tal-avveniment. Dettalji f'docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "B'0 ma hemm l-ebda limitu għas-sit kollu: l-artefatti tal-AI isegwu ż-żamma tar-reġistrazzjoni tagħhom. Valur ikbar minn żero jġiegħel xogħol ta' kuljum iħassar kull artefatt maħluq aktar minn dak in-numru ta' jiem ilu, ippubblikat jew le: jista' jqassar iż-żamma, iżda qatt ma jtawwalha. L-ismijiet tal-kelliema u l-payload tax-xogħlijiet mhumiex inklużi: isegwu ż-żamma tar-reġistrazzjoni. Dettalji f'docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "Avviż dwar l-AI fil-kamra tal-istennija",
         "consentDisclosureHelp": "Test muri lill-parteċipanti fil-kamra tal-istennija meta l-avveniment juża l-post-produzzjoni bl-AI (traskrizzjoni, sommarju, traduzzjoni, doppjaġġ). Jista' jiġi personalizzat għal kull lingwa. Ħalli vojt biex tuża t-test prestabbilit tas-sistema.",
         "consentDisclosurePlaceholder": "Eż. Dan l-avveniment se jiġi traskritt u sommarizzat awtomatikament b'għodod tal-AI wara d-dirett…"
@@ -2548,6 +2550,8 @@
       "durationLabel": "Durata prestabbilita (minuti)",
       "durationHint": "Timla minn qabel it-tmiem tal-avveniment (bidu + durata). L-utent jista' jbiddilha. Vojt = sagħtejn.",
       "retentionLabel": "Żamma tad-data prestabbilita (jiem)",
+      "recordingRetentionLabel": "Żamma awtomatika tar-rekording",
+      "recordingRetentionHint": "Għall-avvenimenti maħluqa minn dan il-mudell; tinbidel fil-wizard u fil-pannell tar-rekording. Ir-rekording ma jsegwix iż-żamma tad-dejta.",
       "expectedSpeakersLabel": "Numru mistenni ta' kelliema (prestabbilit)",
       "descriptionTemplateLabel": "Deskrizzjoni prestabbilita",
       "descriptionTemplateHint": "Test mimli minn qabel fid-deskrizzjoni tal-avveniment (jista' jiġi mmodifikat).",
@@ -3085,7 +3089,10 @@
         "yes": "Iva",
         "no": "Le",
         "recordingDuration": "Tul",
-        "recordingSize": "Daqs"
+        "recordingSize": "Daqs",
+        "recordingRetention": "Tħassir awtomatiku tar-rekording",
+        "recordingRetentionNone": "Xejn",
+        "recordingRetentionDays": "{days, plural, one {# ġurnata} two {# ġranet} few {# ġranet} many {#-il ġurnata} other {# ġurnata}} wara t-tmiem tal-avveniment jew, jekk ippubblikat, wara l-pubblikazzjoni"
       }
     },
     "rubrica": {
@@ -4706,9 +4713,10 @@
       "retention": {
         "label": "Żamma",
         "data": "Id-dejta tar-reġistrazzjoni u tas-sala titħassar {days, plural, one {# ġurnata} two {# ġranet} few {# ġranet} many {#-il ġurnata} other {# ġurnata}} wara t-tmiem tal-avveniment. Il-mistoqsijiet u l-istħarriġ jibqgħu mingħajr ismijiet.",
-        "videoUnpublished": "Jekk ma jitqiegħedx għad-dispożizzjoni, ir-rekording jitħassar magħha.",
-        "videoPublishedDays": "Jekk jitqiegħed għad-dispożizzjoni, jitħassar {days, plural, one {# ġurnata} two {# ġranet} few {# ġranet} many {#-il ġurnata} other {# ġurnata}} wara.",
-        "videoPublishedOpen": "Jekk jitqiegħed għad-dispożizzjoni, jibqa' sakemm min jorganizza jneħħih."
+        "recordingKept": "Ir-rekording u dak li jsir minnu (traskrizzjoni, sommarju, traduzzjonijiet) ma jitħassrux ma' din id-dejta: kemm jekk jitqiegħdu għad-dispożizzjoni kif ukoll jekk le, jibqgħu sakemm l-organizzaturi jħassruhom.",
+        "recordingDays": "Ir-rekording u dak li jsir minnu jitħassru {days, plural, one {# ġurnata} two {# ġranet} few {# ġranet} many {#-il ġurnata} other {# ġurnata}} wara t-tmiem tal-avveniment jew, jekk ir-rekording jitqiegħed għad-dispożizzjoni, wara l-pubblikazzjoni tiegħu.",
+        "transcriptKept": "It-traskrizzjoni ma titħassarx ma' din id-dejta: tibqa' sakemm l-organizzaturi jħassruha.",
+        "transcriptDays": "It-traskrizzjoni titħassar {days, plural, one {# ġurnata} two {# ġranet} few {# ġranet} many {#-il ġurnata} other {# ġurnata}} wara t-tmiem tal-avveniment."
       },
       "addressBook": {
         "label": "Direttorju",
@@ -5916,11 +5924,12 @@
       "7d": "7 ijiem",
       "30d": "30 ġurnata",
       "90d": "90 ġurnata",
+      "1y": "1 sena",
       "forever": "L-ebda tħassir awtomatiku"
     },
-    "retentionNote": "Vidjo ppubblikat ma jsegwix iż-żamma tad-data tal-avveniment: mingħajr perjodu, jibqa' pubbliku sakemm xi ħadd iħassru.",
+    "retentionNote": "Ir-rekording ma jsegwix iż-żamma tad-data tal-avveniment: mingħajr perjodu jibqa', ippubblikat jew le, sakemm xi ħadd iħassru. Il-perjodu jgħodd mill-pubblikazzjoni jew, jekk il-vidjo mhuwiex ippubblikat, mit-tmiem tal-avveniment; meta jiskadi, jitħassru l-vidjo u dak li jsir minnu (traskrizzjonijiet, sommarji, traduzzjonijiet).",
     "delete": "Ħassar ir-reġistrazzjoni",
-    "deleteConfirm": "Żgur? Il-vidjo se jiġi mħassar definittivament.",
+    "deleteConfirm": "Żgur? Il-vidjo se jiġi mħassar definittivament. It-traskrizzjonijiet, is-sommarji u t-traduzzjonijiet ma jitħassrux miegħu: isegwu l-perjodu tar-rekording magħżul hawn.",
     "notConfigured": "Jibri mhux ikkonfigurat. Ir-reġistrazzjoni bil-vidjo mhijiex disponibbli.",
     "disabledHint": "La rekording tal-vidjo mhux abilitata għal dan avveniment. Għal attivarla, iftaħ il-sezionu Impostazioni aktar in alto u accendi il-togglu \"Reġistrazzjoni\".",
     "play": "Iddoqq",
@@ -5961,7 +5970,7 @@
     "visibilityAlways": "Dejjem viżibbli",
     "visibilityUntil": "Viżibbli sa:",
     "dataRetentionNote": "Id-dejta personali tal-parteċipanti se tiġi mħassra skont iż-żamma tal-avveniment ({days} ġurnata). Il-kontenut tal-avveniment jibqa' disponibbli sakemm il-paġna tkun viżibbli.",
-    "availableUntil": "Dan l-avveniment u l-kontenut tiegħu se jkunu disponibbli sa {date}.",
+    "participantDataUntil": "Id-dejta personali tal-parteċipanti titħassar fi {date}.",
     "tabs": {
       "qa": "Mistoqsijiet u Tweġibiet",
       "materials": "Materjali",

@@ -1272,6 +1272,8 @@
         "gdprHeading": "Prywatność i przechowywanie danych",
         "retentionDays": "Dni przechowywania",
         "retentionHelp": "Po przekroczeniu tego progu dane osobowe są automatycznie usuwane.",
+        "recordingRetention": "Okres przechowywania nagrania",
+        "recordingRetentionHelp": "Nagranie i to, co z niego powstaje, nie są usuwane razem z danymi osób. Po ustawieniu okresu są usuwane tyle dni po zakończeniu wydarzenia lub, jeśli wideo zostało opublikowane, po publikacji. Można to zmienić także później, w panelu nagrania.",
         "gdprTemplate": "Szablon informacji",
         "gdprTemplateNone": "— Użyj tekstu niestandardowego —",
         "gdprTemplateUnknown": "Wybrany szablon klauzuli informacyjnej już nie istnieje: wybierz inny lub wróć do własnego tekstu",
@@ -2189,7 +2191,7 @@
         "jobMaxAttempts": "Próby przed uznaniem za nieudane",
         "jobMaxAttemptsHelp": "Ile razy potok ponawia zadanie, zanim oznaczy je jako nieudane. Odstęp między kolejnymi próbami rośnie wykładniczo (od 30 sekund do 2 godzin). Typowa wartość to 5.",
         "artifactRetentionDays": "Przechowywanie artefaktów (dni)",
-        "artifactRetentionDaysHelp": "Przy wartości 0 nie ma limitu dla całej witryny: artefakty AI podlegają okresowi przechowywania swojego nagrania lub wydarzenia. Wartość większa od zera sprawia, że codzienne zadanie usuwa każdy artefakt utworzony ponad tyle dni temu, opublikowany czy nie: może to skrócić przechowywanie, ale nigdy go nie wydłuża. Nie dotyczy to nazwisk mówców ani danych zadań: podlegają one okresowi przechowywania nagrania lub wydarzenia. Szczegóły w docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "Przy wartości 0 nie ma limitu dla całej witryny: artefakty AI podlegają okresowi przechowywania swojego nagrania. Wartość większa od zera sprawia, że codzienne zadanie usuwa każdy artefakt utworzony ponad tyle dni temu, opublikowany czy nie: może to skrócić przechowywanie, ale nigdy go nie wydłuża. Nie dotyczy to nazwisk mówców ani danych zadań: podlegają one okresowi przechowywania nagrania. Szczegóły w docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "Informacja o AI w poczekalni",
         "consentDisclosureHelp": "Tekst wyświetlany uczestnikom w poczekalni, gdy wydarzenie korzysta z postprodukcji AI (transkrypcja, podsumowanie, tłumaczenie, dubbing). Można go dostosować dla każdego języka. Pozostaw puste, aby użyć domyślnego tekstu systemowego.",
         "consentDisclosurePlaceholder": "Np. To wydarzenie zostanie po transmisji na żywo automatycznie przetranskrybowane i podsumowane narzędziami AI…"
@@ -2548,6 +2550,8 @@
       "durationLabel": "Domyślny czas trwania (minuty)",
       "durationHint": "Wstępnie wypełnia koniec wydarzenia (początek + czas trwania). Użytkownik może to zmienić. Puste = 2 godziny.",
       "retentionLabel": "Domyślne przechowywanie danych (dni)",
+      "recordingRetentionLabel": "Domyślny okres przechowywania nagrania",
+      "recordingRetentionHint": "Dla wydarzeń utworzonych z tego szablonu; zmienia się go w kreatorze i w panelu nagrania. Nagranie nie podlega okresowi przechowywania danych.",
       "expectedSpeakersLabel": "Oczekiwana liczba mówców (domyślnie)",
       "descriptionTemplateLabel": "Domyślny opis",
       "descriptionTemplateHint": "Tekst wstępnie wypełniający opis wydarzenia (można go edytować).",
@@ -3085,7 +3089,10 @@
         "yes": "Tak",
         "no": "Nie",
         "recordingDuration": "Czas trwania",
-        "recordingSize": "Rozmiar"
+        "recordingSize": "Rozmiar",
+        "recordingRetention": "Automatyczne usunięcie nagrania",
+        "recordingRetentionNone": "Brak",
+        "recordingRetentionDays": "{days, plural, one {# dzień} few {# dni} many {# dni} other {# dnia}} po zakończeniu wydarzenia lub, jeśli zostało opublikowane, po publikacji"
       }
     },
     "rubrica": {
@@ -4706,9 +4713,10 @@
       "retention": {
         "label": "Przechowywanie",
         "data": "Dane rejestracji i sali są usuwane {days, plural, one {# dzień} few {# dni} many {# dni} other {# dnia}} po zakończeniu wydarzenia. Pytania i ankiety pozostają bez imion i nazwisk.",
-        "videoUnpublished": "Jeśli nie zostanie udostępnione, nagranie zostanie usunięte razem z nimi.",
-        "videoPublishedDays": "Jeśli zostanie udostępnione, zostanie usunięte {days, plural, one {# dzień} few {# dni} many {# dni} other {# dnia}} później.",
-        "videoPublishedOpen": "Jeśli zostanie udostępnione, pozostanie, dopóki organizatorzy go nie usuną."
+        "recordingKept": "Nagranie i to, co z niego powstaje (transkrypcja, podsumowanie, tłumaczenia), nie są usuwane razem z tymi danymi: niezależnie od tego, czy zostaną udostępnione, pozostają, dopóki organizatorzy ich nie usuną.",
+        "recordingDays": "Nagranie i to, co z niego powstaje, są usuwane {days, plural, one {# dzień} few {# dni} many {# dni} other {# dnia}} po zakończeniu wydarzenia lub, jeśli nagranie zostanie udostępnione, po jego publikacji.",
+        "transcriptKept": "Transkrypcja nie jest usuwana razem z tymi danymi: pozostaje, dopóki organizatorzy jej nie usuną.",
+        "transcriptDays": "Transkrypcja jest usuwana {days, plural, one {# dzień} few {# dni} many {# dni} other {# dnia}} po zakończeniu wydarzenia."
       },
       "addressBook": {
         "label": "Książka adresowa",
@@ -5916,11 +5924,12 @@
       "7d": "7 dni",
       "30d": "30 dni",
       "90d": "90 dni",
+      "1y": "1 rok",
       "forever": "Bez automatycznego usuwania"
     },
-    "retentionNote": "Opublikowane wideo nie podlega okresowi przechowywania danych wydarzenia: bez ustalonego okresu pozostaje publiczne, dopóki ktoś go nie usunie.",
+    "retentionNote": "Nagranie nie podlega okresowi przechowywania danych wydarzenia: bez ustalonego okresu pozostaje, opublikowane czy nie, dopóki ktoś go nie usunie. Okres liczy się od publikacji lub, jeśli wideo nie jest opublikowane, od zakończenia wydarzenia; po jego upływie usuwane są wideo i to, co z niego powstało (transkrypcje, podsumowania, tłumaczenia).",
     "delete": "Usuń nagranie",
-    "deleteConfirm": "Czy na pewno? Wideo zostanie trwale usunięte.",
+    "deleteConfirm": "Czy na pewno? Wideo zostanie trwale usunięte. Transkrypcje, podsumowania i tłumaczenia nie są usuwane razem z nim: podlegają wybranemu tutaj okresowi przechowywania nagrania.",
     "notConfigured": "Jibri nie jest skonfigurowany w infrastrukturze. Nagrywanie wideo nie jest dostępne.",
     "disabledHint": "Nagrywanie wideo nie jest włączone dla tego wydarzenia. Aby je włączyć, otwórz sekcję Ustawienia powyżej i włącz przełącznik \"Nagrywanie\".",
     "play": "Odtwórz",
@@ -5961,7 +5970,7 @@
     "visibilityAlways": "Zawsze widoczna",
     "visibilityUntil": "Widoczna do:",
     "dataRetentionNote": "Dane osobowe uczestników zostaną usunięte zgodnie z zasadami przechowywania wydarzenia ({days} dni). Treść wydarzenia pozostanie dostępna, dopóki strona jest widoczna.",
-    "availableUntil": "To wydarzenie i jego treści będą dostępne do {date}.",
+    "participantDataUntil": "Dane osobowe uczestników zostaną usunięte {date}.",
     "tabs": {
       "qa": "Pytania i odpowiedzi",
       "materials": "Materiały",

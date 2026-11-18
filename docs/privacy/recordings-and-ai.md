@@ -68,10 +68,13 @@ assessment belongs to the controller of each installation.
   by speaking time. Nothing is inferred about the speaker from their name.
 - Every model runs inside the installation; no recording or transcript is sent
   to an external AI service.
-- AI outputs, and the transcript from captions, follow the event's retention
-  unless the video is published, in which case they live as long as the
-  published video. A transcript published on its own stays while it is
-  published, and the event's other outputs still go at its retention.
+- The recording (the composite video, the AI outputs and the transcript from
+  captions) is a record of the event and does not follow the event's data
+  retention: published or not, it stays until someone deletes it, or until the
+  period its organizers chose ends (`recordingDeleteAfterDays`, counted from
+  publication while the video is published, otherwise from the event's end).
+  The participants' data around it, per-participant tracks included, still
+  goes at the event's retention.
 - The content of a recording (video, voices, transcripts, summaries, report,
   translations, subtitles, dubbing) is for the organizers of the event and its
   participants. An administrator who does not organize the event sees only that
@@ -107,8 +110,8 @@ pipeline ([Transcript from live captions](#transcript-from-live-captions)).
 Jibri records the conference as seen by a participant: the video layout and
 one mixed audio track, without the voice and image of people who have no valid
 recording consent ([Consent model](../GDPR.md#consent-model)). Its retention (the temporary catch-up copy,
-publication, `recordingDeleteAfterDays`) is described in
-[Privacy and data protection](../GDPR.md). When post-production transcribes a
+and the recording's own period, `recordingDeleteAfterDays`) is described in
+[Recording retention](../GDPR.md#recording-retention). When post-production transcribes a
 composite video, it separates the voices with diarization. See
 [No voiceprints](#no-voiceprints).
 
@@ -318,14 +321,14 @@ report, the translations, the subtitles and the dubbed audio. The rule is in
 | An administrator who does not organize the event | None. They see that the recording exists, its status, duration, size and files, the processing jobs and their errors, the quality figures of the transcript and the languages produced, and can cancel queued jobs |
 | The instance API key | None |
 | Registrants | A recording reserved for registrants, while their registration exists |
-| Whoever was in an instant call while it was recorded | The recording of that call, from the call's link, until the call is deleted |
+| Whoever was in an instant call while it was recorded | The recording of that call, from the call's link, until the call's data retention ends; the recording stays for the organizers |
 | Anyone | A recording published for everyone |
 
 - **Instant calls.** When the recording starts, the room of each person present
   asks the portal for a presence pass, proving its seat with the room tokens of
   that visit. The portal checks that the recording is running and that a token
   of the call came from the portal, then sets an `HttpOnly` cookie
-  (`rec_pass_<eventId>`) that expires when the call's retention ends.
+  (`rec_pass_<eventId>`) that expires when the call's data retention ends.
   Consent does not matter: someone who stayed out of the video was still in
   the call. Nothing is emailed and there is no link to forward.
 - **Every staff read is logged.** A staff member who reads content as staff
@@ -445,8 +448,8 @@ when the event's data retention expires.
 The purge job never selects a track whose transcription never finishes. That
 happens when the AI switch is off, when every track is silent (the recording is
 then marked `POSTPROD_FAILED`) or when the job fails for good. Those tracks
-wait for the event-bound retention pass described in
-[Retention regimes](#retention-regimes).
+wait for the event's data retention, when `multitrack-purge` or
+`postprod-retention` deletes them ([Retention regimes](#retention-regimes)).
 
 ### Keeping tracks
 
@@ -468,10 +471,11 @@ archive links are signed URLs that expire after 120 minutes
 from this feature appears on public pages.
 
 The purge job keeps retained tracks until the recording's own
-`Recording.retentionUntil`, but no screen or API sets that date. In practice,
-retained tracks are deleted by `postprod-retention` when the event's data
-retention expires (`endsAt` plus `dataRetentionDays`), whether or not the
-video is published. The wizard warns
+`Recording.retentionUntil`, which the cleanup sets only when the recording's
+period ends. In practice, retained tracks are deleted by `postprod-retention`
+when the event's data retention expires (`endsAt` plus `dataRetentionDays`),
+whether or not the video is published, or earlier when the recording's period
+ends first. The wizard warns
 whoever sets the option that it "extends retention of sensitive personal data
 (isolated voice) until the event's retention deadline".
 
@@ -603,12 +607,13 @@ this section covers what matters for privacy.
   includes only the people who consented, and shows speaker names.
 - **Retention.** The occupant rows and the sentences are deleted by the GDPR
   cleanup at the event's retention, on every installation, Docker Compose
-  included. The same run deletes the transcript unless the event's video or
-  transcript is published: a recording that holds only the transcript goes
+  included. The transcript built from them is part of the recording and stays,
+  published or not, until someone deletes it or the recording's period ends:
+  then the cleanup deletes it, a recording that holds only the transcript
   whole, with its job, artifact, machine version and speaker labels, and from
-  a recording with video only the transcript from captions and its speaker
-  labels go. A published transcript stays while it, or the video, stays
-  published ([Retention regimes](#retention-regimes)).
+  a recording with video the transcript and the speaker labels
+  ([Retention regimes](#retention-regimes)). After the event's retention it is
+  not rebuilt, because its sentences are gone.
 - **Rights.** The self-service export includes the person's stored sentences,
   and erasure deletes them, with the room records, for the conference seats of
   the registration. Erasure also removes the person's sentences, name and
@@ -806,8 +811,8 @@ switch on ([AI post-production](../POSTPROD.md#the-event-report)).
   Staff review it in a preview and publish it on the event page; the page
   says that the text is written by an AI model from the event's material and
   reviewed by staff, and that the figures come from the platform.
-- **Retention.** The report is not an output of a recording, so the
-  post-production purges do not touch it. Like the event recap, it stays with
+- **Retention.** The report is not an output of a recording, so neither the
+  recording's period nor the post-production purges touch it. Like the event recap, it stays with
   the event after the event's retention, and goes only when the event is
   deleted. Self-service erasure does not reach it: staff withdraw it from the
   page or regenerate it when a request concerns it.
@@ -817,60 +822,55 @@ switch on ([AI post-production](../POSTPROD.md#the-event-report)).
 Three kinds of data follow different clocks:
 
 - **Raw track audio:** deleted after transcription, or at the event's
-  retention when kept or never transcribed.
-- **AI outputs:** artifacts, their machine versions, speaker records and job
-  payloads.
-- **The composite video:** owned by [Privacy and data protection](../GDPR.md).
+  retention when kept or never transcribed, published or not.
+- **The recording:** the composite video of every session, the AI outputs
+  (artifacts, their machine versions, speaker records, job payloads) and the
+  transcript from captions. It is a record of the event and does not follow
+  the event's data retention: published or not, it stays until someone deletes
+  it or until the period its organizers chose ends. The rule, the choices and
+  who sets them are in [Recording retention](../GDPR.md#recording-retention).
+- **The participants' data around it** (registrations, consents given in the
+  room, caption sentences, the record of who was in the room, the speaking
+  timeline) follows the event's retention.
 
-Two jobs enforce the first two. `multitrack-purge` is described above.
-`postprod-retention` (`app/src/app/api/cron/postprod-retention/route.ts`) runs
-daily by default (`postprod.retention.schedule` in
+Three jobs enforce them. `multitrack-purge` is described above. The GDPR
+cleanup (`app/src/app/api/cron/cleanup/route.ts`) deletes, at the end of the
+recording's period, the video files and what lives only in the database (the
+transcript from captions, the speaker records), fails the open jobs and sets
+`Recording.retentionUntil`. `postprod-retention`
+(`app/src/app/api/cron/postprod-retention/route.ts`) then deletes the stored
+outputs; it runs daily by default (`postprod.retention.schedule` in
 `infra/helm/pa-webinar/values.yaml`).
 
 ```mermaid
 flowchart TD
-    start(["AI outputs and tracks<br/>of one recording"])
-    until{"Recording.retentionUntil<br/>set?"}
-    pub{"Event video<br/>published?"}
-    tp{"Transcript published<br/>on its own?"}
-    ovA{"aiArtifactRetentionDays<br/>greater than 0?"}
-    ovB{"aiArtifactRetentionDays<br/>greater than 0?"}
+    start(["Outputs and tracks<br/>of one recording"])
+    period{"Organizers chose<br/>a period?"}
+    ov{"aiArtifactRetentionDays<br/>greater than 0?"}
 
-    rU["Outputs, speaker records<br/>and retained tracks purged<br/>at retentionUntil<br/>(the site-wide limit can<br/>delete outputs earlier)"]
-    rPubN["Outputs kept while<br/>the video stays published"]
-    rTr["Transcript kept while<br/>it stays published;<br/>every other output deleted<br/>at endsAt + dataRetentionDays"]
-    rPubY["Outputs deleted N days<br/>after each was created"]
-    rEvt["Outputs, speaker records<br/>and tracks purged at<br/>endsAt + dataRetentionDays"]
-    rEvtN["Outputs deleted at the earlier of<br/>N days after creation and<br/>endsAt + dataRetentionDays;<br/>speaker records and tracks<br/>at endsAt + dataRetentionDays"]
-    tracks["Raw tracks still purged<br/>at endsAt + dataRetentionDays"]
+    kept["Outputs, speaker records<br/>and transcripts kept,<br/>published or not,<br/>until someone deletes them"]
+    exp["At the end of the period<br/>(from publication while published,<br/>else from the event's end):<br/>cleanup deletes videos, transcript<br/>from captions, speaker records,<br/>sets retentionUntil;<br/>postprod-retention purges outputs"]
+    site["Outputs also deleted<br/>N days after each was created"]
+    tracks["Raw tracks purged after<br/>transcription, or at<br/>endsAt + dataRetentionDays<br/>when kept or never transcribed"]
 
-    start --> until
-    until -->|"yes (no screen sets it)"| rU
-    until -->|"no"| pub
-    pub -->|"yes"| ovA
-    pub -->|"no"| tp
-    tp -->|"yes"| rTr
-    tp -->|"no"| ovB
-    ovA -->|"no"| rPubN
-    ovA -->|"yes"| rPubY
-    ovB -->|"no"| rEvt
-    ovB -->|"yes"| rEvtN
-    rPubN --> tracks
-    rPubY --> tracks
-    rTr --> tracks
+    start --> period
+    period -->|"no (default)"| kept
+    period -->|"yes"| exp
+    kept --> ov
+    exp --> ov
+    ov -->|"yes"| site
+    start --> tracks
 
     classDef entry fill:#E6F0FA,stroke:#0066CC,stroke-width:2px,color:#17324D
     classDef decision fill:#EEF1F4,stroke:#5C6F82,color:#17324D
-    classDef rare fill:#FFF3E0,stroke:#CC7A00,stroke-dasharray:6 3,color:#17324D
     classDef kept fill:#E0F5F5,stroke:#00A3A3,color:#17324D
     classDef purged fill:#E3F2EC,stroke:#008055,color:#17324D
     classDef voice fill:#FBE9EC,stroke:#D1344C,color:#17324D
 
     class start entry
-    class until,pub,tp,ovA,ovB decision
-    class rU rare
-    class rPubN,rTr kept
-    class rPubY,rEvt,rEvtN purged
+    class period,ov decision
+    class kept kept
+    class exp,site purged
     class tracks voice
 ```
 
@@ -879,66 +879,52 @@ the diagram shows when the remaining ones go. The site-wide limit
 (`aiArtifactRetentionDays`), when set, deletes old outputs on every branch,
 a published transcript included.
 
-### Event-bound purge
+### The recording's period
 
-This is the default. When `Recording.retentionUntil` is empty, the event is
-`ENDED` or `ARCHIVED`, and neither its video nor its transcript is published,
-the recording's outputs are purged once `endsAt` plus `dataRetentionDays` has
-passed. The default of `dataRetentionDays` is in `app/prisma/schema.prisma`.
-The cleanup job deletes no AI output except the transcript from captions, so
-this pass is what enforces the event's retention on them. An event that was
-never ended reaches this pass once the cleanup job has archived it, after its
-retention.
+With no period (**No automatic deletion**, the default) the outputs stay with
+the recording, published or not, after the event's retention and after the
+video is deleted by hand: **Delete recording** removes the event's video file
+only. Their speaker records and job payloads stay with them.
 
-When only the transcript is published (`transcriptPublished`, with the video
-unpublished), the same deadline deletes every output of the event's
-recordings except the transcript itself (`TRANSCRIPT_JSON`): summaries,
-translations, subtitle files, dubbing and the waveform go, files included.
-The transcript, with its speaker labels, stays while it is published.
-
-### Published recordings
-
-A published video keeps its outputs: its subtitles, transcript and dubbing are
-its accessibility layer, and they live as long as `recordingPublished` stays
-true. Raw tracks are still purged at `endsAt` plus `dataRetentionDays`,
-because isolated voice is never a public asset, and so are those of an event
-whose transcript alone is published.
-
-When a published video reaches its own retention (`recordingDeleteAfterDays`,
-counted from publication), the cleanup job deletes it and unpublishes it. The
-next `postprod-retention` run then purges the outputs, provided the event's
-retention has passed; with the transcript still published on its own, it
-keeps the transcript only. A video published without its own retention keeps
-its outputs as long as it stays published. A recording listed in the video library
-but not published gets no exemption.
+With a period (`Event.recordingDeleteAfterDays`), the recording goes when it
+ends: counted from publication while the video is published, and from the
+event's end otherwise, never before the period was last chosen, the video
+unpublished or removed, or a new file attached. The cleanup's phase 2 unpublishes the video
+and the transcript, deletes the transcript from captions and the speaker
+records, fails the queued post-production jobs, writes `RECORDING_DELETED`,
+sets `Recording.retentionUntil` to that moment and then deletes the video files
+of the event and of every session; the next `postprod-retention` run purges
+the rest. While a worker holds a job of the recording, the cleanup waits for
+the next run. The consent proofs of the recording leave at the next cleanup
+run that finds nothing left to cover them. A recording listed in the video
+library is treated like any other.
 
 ### Site-wide limit: `aiArtifactRetentionDays`
 
 **Artifact retention (days)** in the post-production site settings defaults to
 `0`, which means no limit (`app/prisma/schema.prisma`). With a value N greater
 than zero, the job deletes every artifact created more than N days ago,
-published or not, whatever the recording's regime. It deletes the artifact's
+published or not, whatever the recording's period. It deletes the artifact's
 file, its row and, through the foreign key, its machine version.
 
 This pass deletes artifacts only. Speaker records and job payloads wait for
-the event-bound or per-recording purge, so on a published video they stay as
-long as the video. Tracks follow their own rules, described above. The value
-can therefore shorten retention but never extend it, and the field's help
-text says so.
+the recording-level purge, so they stay as long as the recording. Tracks
+follow their own rules, described above. The value can therefore shorten
+retention but never extend it, and the field's help text says so.
 
 ### Per-recording date: `Recording.retentionUntil`
 
-Both jobs honor this date, and the administration area displays it. No screen
-or API sets it, so today it can only be written directly in the database. When
-set, it replaces the event-bound and published regimes for its recording. The
-recording is purged on that date whatever the event's retention or the video's
-publication, so the date can also be later than the event's retention. For
-retained tracks, the purge job waits for this date. The site-wide limit still
-applies to the recording's artifacts.
+Both jobs honor this date, and the administration area displays it. The
+cleanup writes it when the recording's period ends; it can also be written
+directly in the database, to purge one recording's outputs on a given date,
+and the cleanup keeps an earlier date it finds. On that date the recording's
+outputs are purged whatever the event's retention or the video's publication.
+For retained tracks, the purge job waits for this date. The site-wide limit
+still applies to the recording's artifacts.
 
 ### What a purge deletes and what it leaves
 
-A recording-level purge (event-bound or `retentionUntil`) deletes:
+A recording-level purge (`retentionUntil`) deletes:
 
 - the output files and their rows, with their machine versions;
 - the `Speaker` records: names, and links to address-book persons;
@@ -947,7 +933,7 @@ A recording-level purge (event-bound or `retentionUntil`) deletes:
   messages.
 
 It then marks the recording `ARCHIVED`. Only these recording-level purges
-delete speaker names and job payloads; the site-wide limit does not.
+delete job payloads; the site-wide limit does not.
 
 A purge leaves:
 
@@ -961,10 +947,12 @@ A purge leaves:
 - `tracks.json`;
 - the composite video, which the cleanup job handles.
 
-Neither job writes to the GDPR audit log: the counts appear only in the job's
-own log. Both jobs work in bounded batches, so a large backlog drains over
-several runs. They postpone a recording while a job still reads its tracks,
-and they do nothing when recording storage is not configured.
+`postprod-retention` writes nothing to the GDPR audit log: the counts appear
+only in its own response and log; the end of the recording's period is
+recorded by the cleanup (`RECORDING_DELETED`). Both jobs work in bounded
+batches, so a large backlog drains over several runs. They postpone a
+recording while a job still reads its tracks, and they do nothing when
+recording storage is not configured.
 
 ## Editing and erasure
 
@@ -1110,7 +1098,7 @@ not reach recordings or AI outputs, with two exceptions, the transcript from
 captions and the request not to appear in a recording:
 
 - the export lists registrations and their consent flags, including
-  `consentMultitrack`, the consent proofs kept for what is published, and the
+  `consentMultitrack`, the consent proofs kept for an existing recording, and the
   person's sentences stored for a transcript from captions, but no built
   transcripts, speaker records or tracks;
 - the erasure deletes registrations and what depends on them, including those
@@ -1263,8 +1251,15 @@ Consent and transparency:
 
 Retention and deletion:
 
-- **`Recording.retentionUntil` cannot be set from the application.** Retained
-  tracks and the per-recording regime depend on it.
+- **A recording without a period stays.** With **No automatic deletion**, the
+  default, the video and its outputs stay after the participants' data is
+  gone, until someone deletes them; deleting the video by hand leaves the
+  outputs. Choose a period in the recording panel, the wizard or the template
+  where the notice promises one.
+- **The outputs of an expired recording need `postprod-retention`.** The
+  cleanup deletes the video files and what lives only in the database, and
+  marks the rest; with `postprod.retention.enabled` off, the stored outputs and
+  the remaining tracks stay.
 - **The site-wide limit deletes artifacts only.** It leaves speaker records
   and job payloads in place.
 - **Speaker names in the admin audit log.** The `POSTPROD_SPEAKER_MAP`
@@ -1281,7 +1276,8 @@ Retention and deletion:
   stay, and `postprod/` files are never swept.
 - **Deleting an event deletes its consent proofs,** also when a video stays
   online on an external site.
-- **AI and track purges do not appear in the GDPR audit log.**
+- **AI and track purges do not appear in the GDPR audit log.** Only the end of
+  the recording's period does (`RECORDING_DELETED`).
 
 Data-subject rights:
 

@@ -809,8 +809,8 @@ stateDiagram-v2
   [*] --> Published: admin upload (auto-published)
   Temporary --> Published: publish toggle
   Published --> Temporary: unpublish toggle
-  Temporary --> Deleted: manual delete or event data retention
-  Published --> Deleted: manual delete or recordingDeleteAfterDays
+  Temporary --> Deleted: manual delete or recordingDeleteAfterDays from the event's end
+  Published --> Deleted: manual delete or recordingDeleteAfterDays from publication
   Deleted --> [*]
 
   classDef temp fill:#FFF4E5,stroke:#CC7A00,color:#17324D
@@ -825,9 +825,9 @@ stateDiagram-v2
   (`Event.recordingUrl`) and leaves `recordingPublished` as it is, so an MP4 on
   an unpublished event starts here, while one on an already published event
   replaces the public video at once. A temporary recording appears in the
-  administration area; the public playback route refuses it. It is deleted
-  together with the event's participant data when the event's data retention
-  expires.
+  administration area; the public playback route refuses it. It does not go
+  with the event's participant data: it stays until it is deleted by hand, or
+  until `recordingDeleteAfterDays` have passed since the event's end.
 - **Published by upload.** An administrator, or the organizer who owns the
   event, can upload a video to an event; an administrator can also create a
   publication. Attaching a video this way publishes it unless the caller opts
@@ -836,11 +836,19 @@ stateDiagram-v2
   An event that starts recording with that file, not a historical one, starts
   reserved ([Recording destination](#recording-destination)).
 - **Published.** The event's recording panel toggles `recordingPublished` (the
-  portal stamps `recordingPublishedAt`) and can set `recordingDeleteAfterDays`
-  from a fixed list of options. A published video is exempt from the event's
-  data retention: it lives until it is deleted by hand or until
-  `recordingDeleteAfterDays` have passed since publication. While it is
-  published, the proofs of its consents outlive the registrations
+  portal stamps `recordingPublishedAt`). A published video lives until it is
+  deleted by hand or until `recordingDeleteAfterDays` have passed since
+  publication.
+- **Period.** `recordingDeleteAfterDays` is the event's choice, from a fixed
+  list (`lib/recording/retention-options.ts`), in the wizard, on the recording
+  panel and on the event template; empty by default, which keeps the recording
+  until someone deletes it. It counts from publication while the video is
+  published and from the event's end otherwise, never before the period was
+  chosen, the video unpublished or removed, or a new file attached
+  (`Event.recordingRetentionFrom`); removing the video does not reset it, and at its end the cleanup deletes the files of every session and
+  hands the outputs to `postprod-retention`
+  ([Recording retention](../GDPR.md#recording-retention)). For as long as the
+  recording exists, the proofs of its consents outlive the registrations
   ([Deleting data](data-model.md#deleting-data)).
 - **Audience.** `Event.recordingAudience` says who sees a published recording
   and what comes from it (the video, the transcript, the summary, the
@@ -911,9 +919,9 @@ described in [Recordings, voice data and AI outputs](../privacy/recordings-and-a
 
 | Job | What it does to recordings |
 |---|---|
-| `cleanup` | Deletes catch-up URLs past their fixed window (only when `tempRecordingStartedAt` is set) and published videos past `recordingDeleteAfterDays`. When an event's data retention expires, it deletes the objects of the unpublished video and of the catch-up URL, deletes the track rows whose audio was already purged, clears the participant lists of its call sessions, and, unless the video or the transcript is published, deletes the transcript from captions (with the whole recording when it holds nothing else). |
-| `multitrack-purge` | Deletes per-participant track audio once transcription is done, for events that do not keep their tracks, and tracks that no transcription consumed when the event's data retention expires. Its branch for kept tracks applies only when `Recording.retentionUntil` is set, which the platform does not do. With the last track of a recording it deletes the recording's `tracks.json`, as `postprod-retention` does. In the chart it exists when `postprod.enabled` or `recorder.enabled` is true. |
-| `postprod-retention` | Purges post-production artifacts and remaining tracks, including kept tracks, once the event's data retention has passed; for an event whose video is published it purges only the tracks, and for one whose transcript alone is published it keeps only the transcript. See [AI post-production](../POSTPROD.md). |
+| `cleanup` | Deletes catch-up URLs past their fixed window (only when `tempRecordingStartedAt` is set). At the end of the recording's period (`recordingDeleteAfterDays`) it deletes the video objects of the event and of every session and the catch-up URL, clears the fields that point to them and the publication, deletes the transcript from captions and the speaker records, fails open jobs and sets `Recording.retentionUntil`. When an event's data retention expires, it deletes the object of the catch-up URL, deletes the track rows whose audio was already purged and clears the participant lists of its call sessions; the video and the transcripts stay. |
+| `multitrack-purge` | Deletes per-participant track audio once transcription is done, for events that do not keep their tracks, and tracks that no transcription consumed when the event's data retention expires. Its branch for kept tracks applies only when `Recording.retentionUntil` is set, which the cleanup does at the end of the recording's period. With the last track of a recording it deletes the recording's `tracks.json`, as `postprod-retention` does. In the chart it exists when `postprod.enabled` or `recorder.enabled` is true. |
+| `postprod-retention` | Purges the remaining per-participant tracks, including kept ones, once the event's data retention has passed, published or not; purges post-production artifacts, speaker records and job payloads only from `Recording.retentionUntil`, which the cleanup sets at the end of the recording's period. See [AI post-production](../POSTPROD.md). |
 | `recordings-reconcile` | Lists every object under `recordings/` in the recordings storage domain, by key without the `recordings/` prefix, and compares it with names derived from `Event.recordingUrl` and `CallSession.recordingUrl` (the URL path after its first segment) and with `CallSession.recordingFilename`, and, while the event's data retention lasts (or a later retention date of the recording, or a pipeline task that reads them), with the keys of the per-participant tracks whose audio is still present and the `tracks.json` of their recordings. An object with no match becomes an orphan, shown in the **Orphans** tab of **Video recordings** in the administration area. Orphans are deleted after `SiteSetting.orphanRecordingGraceDays` unless an administrator marks them **Keep**; **Delete now** deletes them at the next run. It never re-links an orphan to an event. See [Known limitations](#known-limitations) for what the match misses. |
 
 Schedules, Helm keys and what breaks when a job does not run are in

@@ -4,21 +4,24 @@
 /**
  * GET /api/cron/postprod-retention
  *
- * Daily cleanup of postprod artifacts whose retention has expired.
- * Two retention regimes coexist:
+ * Daily cleanup of post-production outputs and per-participant tracks.
  *
- *   1. **Event-bound** (default): `Recording.retentionUntil` is null
- *      → the artifact follows the parent event's retention. Since
- *      `/api/cron/cleanup` removes the event's personal data but never
- *      deletes the event row, we purge here once the event is past
- *      `endsAt + dataRetentionDays` — otherwise transcripts/summaries
- *      (which can carry names) would survive forever.
+ *   1. **La scadenza della registrazione** (`Recording.retentionUntil`): la
+ *      scrive la pulizia GDPR (`/api/cron/cleanup`, fase 2) quando la
+ *      registrazione dell'evento scade (`Event.recordingDeleteAfterDays`).
+ *      Passata quella data se ne va tutto cio' che la post-produzione ha
+ *      prodotto: file e righe degli artefatti, parlanti, tracce, testi dei
+ *      lavori, nomi nello snapshot. Senza quella data gli output restano: la
+ *      registrazione e' un documento storico e non segue la conservazione dei
+ *      dati dei partecipanti.
  *
- *   2. **Override** (`Recording.retentionUntil != null` OR
- *      `SiteSetting.aiArtifactRetentionDays > 0`): artifacts past
- *      their override expiry are purged independently of the event
- *      retention. Useful for "verbale come atto pubblico" cases
- *      that should outlive the chat/Q&A.
+ *   2. **Le tracce per persona** (voce isolata, quasi biometrica) non sono la
+ *      registrazione che resta: alla conservazione dei dati dell'evento
+ *      (`endsAt + dataRetentionDays`) se ne vanno, file e righe, pubblicata o
+ *      no la registrazione.
+ *
+ *   3. **Il limite del sito** (`SiteSetting.aiArtifactRetentionDays > 0`):
+ *      cancella gli artefatti creati da piu' di N giorni, pubblicati o no.
  *
  * Protected by CRON_API_KEY.
  */
@@ -29,6 +32,7 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { withoutSpeakerNames } from '@/lib/ai/pipeline-snapshot';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { prisma } from '@/lib/db';
+import { isEventDataRetentionExpired } from '@/lib/gdpr/cleanup-selection';
 import { cancellaManifesto } from '@/lib/recorder/manifest';
 import {
   deletePostprodBlob,
@@ -42,14 +46,13 @@ export const dynamic = 'force-dynamic';
  * Purge a recording's per-participant audio tracks: blobKey points at
  * isolated-voice audio (quasi-biometric) and displayName is encrypted PII.
  * For RETAINED (retainParticipantTracks=true) recordings, cron/multitrack-purge
- * never fires — it waits on a retentionUntil that no app code ever sets — so
- * the raw audio would otherwise outlive retention. Deletes any surviving track
- * blobs, then the rows (RecordingTrack has no FK dependents). Idempotent.
+ * waits on a retentionUntil that only the recording's expiry writes, so the raw
+ * audio would otherwise outlive the event's retention. Deletes any surviving
+ * track blobs, then the rows (RecordingTrack has no FK dependents). Idempotent.
  *
- * This is deliberately independent of the published/library artifact exemption:
- * subtitles/transcripts are a public video's accessibility layer worth keeping,
- * but the raw per-participant audio is never a public asset and must always be
- * minimized at retention.
+ * Indipendente dagli artefatti: trascrizioni, sottotitoli e sintesi restano con
+ * la registrazione, la voce isolata di una persona no, e se ne va alla
+ * conservazione dei dati dell'evento.
  */
 async function purgeRecordingTracks(
   recordingId: string,
@@ -88,8 +91,8 @@ async function purgeRecordingTracks(
 /**
  * Purge every postprod artifact of a recording: delete the blobs, delete the
  * artifact rows, delete Speaker rows (full PII), purge the raw tracks, scrub
- * PostprodJob payloads, then archive the recording. Shared by the override and
- * the (non-published) event-bound regimes so the two never drift.
+ * PostprodJob payloads, then archive the recording. Lo usa la scadenza della
+ * registrazione (`retentionUntil`).
  */
 async function purgeRecordingArtifacts(
   recordingId: string,
@@ -178,7 +181,7 @@ export const GET = withErrorHandling(async (request) => {
 
   const now = new Date();
 
-  // Per-recording override expiry takes precedence.
+  // La scadenza della registrazione: via tutti i suoi output.
   const expired = await prisma.recording.findMany({
     where: {
       retentionUntil: { not: null, lt: now },
@@ -204,144 +207,38 @@ export const GET = withErrorHandling(async (request) => {
     artifactsDeleted += r.artifactsDeleted;
   }
 
-  // Event-bound default (retentionUntil == null): follow the parent event's
-  // retention. `/api/cron/cleanup` never deletes the event row,
-  // so WITHOUT this branch these artifacts — transcripts/summaries that can
-  // carry names — would live forever. Purge once the event is past
-  // endsAt + dataRetentionDays. Prisma can't do that date arithmetic in a
-  // `where`, so filter in JS (same pattern as cron/cleanup Phase 3).
-  let eventBoundRecordings = 0;
-  const eventBoundCandidates = await prisma.recording.findMany({
+  // Le tracce per persona alla conservazione dei dati dell'evento, per ogni
+  // registrazione senza una scadenza propria: gli artefatti restano (la
+  // registrazione non segue i dati dei partecipanti), la voce isolata no. Per
+  // multitrack-purge le tracce non conservate se ne vanno gia' dopo la
+  // trascrizione; qui quelle tenute (retainParticipantTracks) e quelle mai
+  // trascritte. Prima gli eventi scaduti, poi le loro registrazioni: filtrare
+  // dopo un `take` sulle registrazioni lascerebbe fuori quelle scadute ogni
+  // volta che le prime appartengono a eventi ancora in conservazione.
+  // `tracks: { some: {} }` esaurisce il giro: tolte le righe, la registrazione
+  // non e' piu' scelta.
+  let tracksPurged = 0;
+  const eventiConTracce = await prisma.event.findMany({
     where: {
-      retentionUntil: null,
-      status: { not: 'ARCHIVED' },
-      // EXEMPT the PUBLISHED video: a published recording is a kept public
-      // record, and its AI artifacts (subtitles, multilingual dubbing,
-      // transcript) are its accessibility layer — they must live as long as the
-      // video, not be purged at the event's default 30-day retention (their
-      // lifetime is governed by recordingDeleteAfterDays / an explicit
-      // Recording.retentionUntil override). `recordingPublished` is the single
-      // "kept public video" signal (same as cleanup Phase 3); a
-      // library-listed-but-unpublished recording is invisible, so it correctly
-      // falls through here and gets fully purged. Pass 3 below still minimizes
-      // the raw tracks of the exempted (published) recordings.
-      // Lo stesso vale per la trascrizione pubblicata senza il video
-      // (transcriptPublished): resta finche' resta pubblicata.
-      event: {
-        status: { in: ['ENDED', 'ARCHIVED'] },
-        recordingPublished: false,
-        transcriptPublished: false,
-      },
+      status: { in: ['ENDED', 'ARCHIVED'] },
+      endsAt: { lt: now },
+      recordings: { some: { retentionUntil: null, tracks: { some: {} } } },
     },
-    select: {
-      id: true,
-      eventId: true,
-      event: { select: { endsAt: true, dataRetentionDays: true } },
-    },
-    take: 50,
+    select: { id: true, endsAt: true, dataRetentionDays: true },
   });
-  for (const rec of eventBoundCandidates) {
-    if (!rec.event) continue;
-    const expiry = rec.event.endsAt.getTime() + rec.event.dataRetentionDays * 86_400_000;
-    if (expiry >= now.getTime()) continue;
-    if (await hasActivePostprodJob(rec.id)) {
-      deferredActiveJob += 1;
-      continue;
-    }
-    const r = await purgeRecordingArtifacts(rec.id, rec.eventId);
-    blobsDeleted += r.blobsDeleted;
-    blobsFailed += r.blobsFailed;
-    artifactsDeleted += r.artifactsDeleted;
-    eventBoundRecordings += 1;
-  }
-
-  // Pubblicata la sola trascrizione (transcriptPublished, video no): resta il
-  // testo che si legge nella pagina dell'evento, il resto se ne va alla
-  // scadenza come per un video non pubblicato. Solo le registrazioni che hanno
-  // ancora altro: il giro si esaurisce da solo.
-  let transcriptOnlyRecordings = 0;
-  const transcriptOnlyCandidates = await prisma.recording.findMany({
-    where: {
-      retentionUntil: null,
-      artifacts: { some: { type: { not: 'TRANSCRIPT_JSON' } } },
-      event: {
-        status: { in: ['ENDED', 'ARCHIVED'] },
-        recordingPublished: false,
-        transcriptPublished: true,
-      },
-    },
-    select: {
-      id: true,
-      eventId: true,
-      event: { select: { endsAt: true, dataRetentionDays: true } },
-    },
-    take: 50,
-  });
-  for (const rec of transcriptOnlyCandidates) {
-    if (!rec.event) continue;
-    const expiry = rec.event.endsAt.getTime() + rec.event.dataRetentionDays * 86_400_000;
-    if (expiry >= now.getTime()) continue;
-    if (await hasActivePostprodJob(rec.id)) {
-      deferredActiveJob += 1;
-      continue;
-    }
-    const altri = await prisma.postprodArtifact.findMany({
-      where: { recordingId: rec.id, type: { not: 'TRANSCRIPT_JSON' } },
-      select: { id: true, blobKey: true },
-    });
-    for (const a of altri) {
-      if (!a.blobKey) continue;
-      try {
-        await deletePostprodBlob(a.blobKey);
-        blobsDeleted += 1;
-      } catch (err) {
-        blobsFailed += 1;
-        console.warn('[postprod-retention] blob delete failed', {
-          key: a.blobKey,
-          err: err instanceof Error ? err.message : String(err),
+  const eventiScaduti = eventiConTracce
+    .filter((e) => isEventDataRetentionExpired(e, now))
+    .map((e) => e.id);
+  const conTracce =
+    eventiScaduti.length === 0
+      ? []
+      : await prisma.recording.findMany({
+          where: { eventId: { in: eventiScaduti }, retentionUntil: null, tracks: { some: {} } },
+          select: { id: true, eventId: true },
+          take: 50,
         });
-      }
-    }
-    // I testi originali conservati se ne vanno a cascata con i loro artefatti.
-    const del = await prisma.postprodArtifact.deleteMany({
-      where: { id: { in: altri.map((a) => a.id) } },
-    });
-    artifactsDeleted += del.count;
-    transcriptOnlyRecordings += 1;
-  }
-
-  // Published recordings are exempt from the artifact purge above (their
-  // subtitles/transcript are the video's accessibility layer). But their RAW
-  // per-participant track audio is never a public asset and still must be
-  // minimized at retention — otherwise a published event with
-  // retainParticipantTracks=true keeps quasi-biometric audio forever (the
-  // artifact exemption would otherwise skip the whole recording). Purge ONLY the
-  // tracks here, leaving artifacts + status intact. Keyed on recordingPublished
-  // (same signal as the exemption); library-listed-but-unpublished recordings
-  // are handled by pass 2. `tracks: { some: {} }` makes this self-terminating:
-  // once the rows are deleted the recording stops matching.
-  let publishedTracksPurged = 0;
-  const publishedWithTracks = await prisma.recording.findMany({
-    where: {
-      retentionUntil: null,
-      tracks: { some: {} },
-      event: {
-        status: { in: ['ENDED', 'ARCHIVED'] },
-        OR: [{ recordingPublished: true }, { transcriptPublished: true }],
-      },
-    },
-    select: {
-      id: true,
-      eventId: true,
-      event: { select: { endsAt: true, dataRetentionDays: true } },
-    },
-    take: 50,
-  });
-  for (const rec of publishedWithTracks) {
-    if (!rec.event) continue;
-    const expiry = rec.event.endsAt.getTime() + rec.event.dataRetentionDays * 86_400_000;
-    if (expiry >= now.getTime()) continue;
-    // Same active-job guard as the artifact passes: an in-flight ARCHIVE /
+  for (const rec of conTracce) {
+    // Same active-job guard as the purge above: an in-flight ARCHIVE /
     // multitrack re-run still reads these tracks — defer a tick.
     if (await hasActivePostprodJob(rec.id)) {
       deferredActiveJob += 1;
@@ -350,7 +247,7 @@ export const GET = withErrorHandling(async (request) => {
     const tp = await purgeRecordingTracks(rec.id, rec.eventId);
     blobsDeleted += tp.blobsDeleted;
     blobsFailed += tp.blobsFailed;
-    publishedTracksPurged += 1;
+    tracksPurged += 1;
   }
 
   // Also walk the global aiArtifactRetentionDays override (a single
@@ -390,9 +287,7 @@ export const GET = withErrorHandling(async (request) => {
   return Response.json({
     ok: true,
     expiredRecordings: expired.length,
-    eventBoundRecordings,
-    transcriptOnlyRecordings,
-    publishedTracksPurged,
+    tracksPurged,
     deferredActiveJob,
     blobsDeleted,
     blobsFailed,

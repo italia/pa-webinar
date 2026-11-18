@@ -12,8 +12,11 @@ import { tryGetAppSecret } from '@/lib/auth/app-secret';
  * il browser di chi era in sala mentre si registrava riceve dalla rotta
  * `/api/events/[slug]/recording/presence`. Dopo la chiamata, con il pass, il
  * link della chiamata mostra la registrazione (lib/recording/audience), finche'
- * la chiamata e' conservata. Vale per chi c'era, che abbia acconsentito o no a
- * comparire nel video; niente email, niente link da inoltrare.
+ * i dati della chiamata sono conservati. La registrazione resta anche dopo (non
+ * segue quella conservazione), e da allora la vede solo chi organizza: il pass
+ * e' un dato di chi c'era, e scade con gli altri. Vale per chi c'era, che abbia
+ * acconsentito o no a comparire nel video; niente email, niente link da
+ * inoltrare.
  *
  * Il valore e' `<scadenza>.<firma>`: la scadenza in secondi epoch e una firma
  * HMAC-SHA256 (troncata a 128 bit) di scopo, evento e scadenza. L'evento sta
@@ -47,7 +50,7 @@ export function presencePassCookieName(eventId: string): string {
 }
 
 /**
- * Fin quando la chiamata e' conservata: la pulizia dei dati la cancella dopo
+ * Fin quando i dati della chiamata sono conservati: la pulizia li cancella dopo
  * `dataRetentionDays` dal piu' tardo fra la fine prevista e l'ultima attivita'
  * (lib/gdpr/cleanup-selection), e chi la registra adesso e' l'ultima attivita'.
  */

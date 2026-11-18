@@ -1272,6 +1272,8 @@
         "gdprHeading": "Yksityisyys ja tietojen säilytys",
         "retentionDays": "Säilytysaika (päivinä)",
         "retentionHelp": "Tämän rajan ylittyessä henkilötiedot poistetaan automaattisesti.",
+        "recordingRetention": "Tallenteen säilytys",
+        "recordingRetentionHelp": "Tallennetta ja siitä tehtyä aineistoa ei poisteta ihmisten tietojen mukana. Määräajan kanssa ne poistetaan niin monta päivää tapahtuman päättymisen jälkeen tai, jos video on julkaistu, julkaisemisen jälkeen. Sitä voi muuttaa myöhemmin myös tallenteen paneelissa.",
         "gdprTemplate": "Tietosuojaseloste-malli",
         "gdprTemplateNone": "— Käytä mukautettua tekstiä —",
         "gdprTemplateUnknown": "Valittua tietosuojaseloste-mallia ei enää ole: valitse toinen tai palaa mukautettuun tekstiin",
@@ -2189,7 +2191,7 @@
         "jobMaxAttempts": "Yrityksiä ennen epäonnistumista",
         "jobMaxAttemptsHelp": "Kuinka monta kertaa putki yrittää työtä uudelleen ennen kuin merkitsee sen epäonnistuneeksi. Odotusaika yritysten välillä kasvaa eksponentiaalisesti (30 sekunnista jopa 2 tuntiin). Tyypillinen arvo on 5.",
         "artifactRetentionDays": "Tuotosten säilytys (päivää)",
-        "artifactRetentionDaysHelp": "Arvolla 0 koko sivustoa koskevaa rajaa ei ole: tekoälyn tuotokset noudattavat tallenteensa tai tapahtuman säilytysaikaa. Nollaa suurempi arvo saa päivittäisen työn poistamaan jokaisen tuotoksen, joka on luotu yli annetun päivien määrän sitten, julkaistun tai julkaisemattoman: se voi lyhentää säilytysaikaa mutta ei koskaan pidentää sitä. Puhujien nimet ja töiden hyötykuormat eivät kuulu tähän: ne noudattavat tallenteen tai tapahtuman säilytysaikaa. Lisätietoja: docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "Arvolla 0 koko sivustoa koskevaa rajaa ei ole: tekoälyn tuotokset noudattavat tallenteensa säilytysaikaa. Nollaa suurempi arvo saa päivittäisen työn poistamaan jokaisen tuotoksen, joka on luotu yli annetun päivien määrän sitten, julkaistun tai julkaisemattoman: se voi lyhentää säilytysaikaa mutta ei koskaan pidentää sitä. Puhujien nimet ja töiden hyötykuormat eivät kuulu tähän: ne noudattavat tallenteen säilytysaikaa. Lisätietoja: docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "Tekoälyilmoitus odotushuoneessa",
         "consentDisclosureHelp": "Teksti, joka näytetään osallistujille odotushuoneessa, kun tapahtumassa käytetään tekoälyjälkituotantoa (litterointi, yhteenveto, käännös, dubbaus). Mukautettavissa kielikohtaisesti. Jätä tyhjäksi, jos haluat käyttää järjestelmän oletustekstiä.",
         "consentDisclosurePlaceholder": "Esim. Tämä tapahtuma litteroidaan ja tiivistetään automaattisesti tekoälytyökaluilla suoran lähetyksen jälkeen…"
@@ -2548,6 +2550,8 @@
       "durationLabel": "Oletuskesto (minuuttia)",
       "durationHint": "Esitäyttää tapahtuman päättymisajan (alku + kesto). Käyttäjä voi muuttaa sitä. Tyhjä = 2 tuntia.",
       "retentionLabel": "Tietojen oletussäilytysaika (päivää)",
+      "recordingRetentionLabel": "Tallenteen oletussäilytys",
+      "recordingRetentionHint": "Tästä mallista luoduille tapahtumille; sitä voi muuttaa ohjatussa toiminnossa ja tallenteen paneelissa. Tallenne ei noudata tietojen säilytysaikaa.",
       "expectedSpeakersLabel": "Odotettu puhujien määrä (oletus)",
       "descriptionTemplateLabel": "Oletuskuvaus",
       "descriptionTemplateHint": "Tapahtuman kuvaukseen esitäytettävä teksti (muokattavissa).",
@@ -3085,7 +3089,10 @@
         "yes": "Kyllä",
         "no": "Ei",
         "recordingDuration": "Kesto",
-        "recordingSize": "Koko"
+        "recordingSize": "Koko",
+        "recordingRetention": "Tallenteen automaattinen poisto",
+        "recordingRetentionNone": "Ei ole",
+        "recordingRetentionDays": "{days, plural, one {# päivä} other {# päivää}} tapahtuman päättymisen jälkeen tai, jos se on julkaistu, julkaisemisen jälkeen"
       }
     },
     "rubrica": {
@@ -4706,9 +4713,10 @@
       "retention": {
         "label": "Säilytys",
         "data": "Ilmoittautumis- ja huonetiedot poistetaan {days, plural, one {# päivä} other {# päivää}} tapahtuman päättymisen jälkeen. Kysymykset ja kyselyt säilyvät ilman nimiä.",
-        "videoUnpublished": "Jos tallennetta ei aseteta saataville, se poistetaan näiden tietojen mukana.",
-        "videoPublishedDays": "Jos tallenne asetetaan saataville, se poistetaan {days, plural, one {# päivä} other {# päivää}} sen jälkeen.",
-        "videoPublishedOpen": "Jos tallenne asetetaan saataville, se säilyy, kunnes järjestäjät poistavat sen."
+        "recordingKept": "Tallennetta ja siitä tehtyä aineistoa (litterointi, tiivistelmä, käännökset) ei poisteta näiden tietojen mukana: ne säilyvät, asetettiinpa ne saataville tai ei, kunnes järjestäjät poistavat ne.",
+        "recordingDays": "Tallenne ja siitä tehty aineisto poistetaan {days, plural, one {# päivä} other {# päivää}} tapahtuman päättymisen jälkeen tai, jos tallenne asetetaan saataville, sen julkaisemisen jälkeen.",
+        "transcriptKept": "Litterointia ei poisteta näiden tietojen mukana: se säilyy, kunnes järjestäjät poistavat sen.",
+        "transcriptDays": "Litterointi poistetaan {days, plural, one {# päivä} other {# päivää}} tapahtuman päättymisen jälkeen."
       },
       "addressBook": {
         "label": "Osoitekirja",
@@ -5916,11 +5924,12 @@
       "7d": "7 päivää",
       "30d": "30 päivää",
       "90d": "90 päivää",
+      "1y": "1 vuosi",
       "forever": "Ei automaattista poistoa"
     },
-    "retentionNote": "Julkaistu video ei noudata tapahtuman tietojen säilytysaikaa: ilman määräaikaa se pysyy julkisena, kunnes joku poistaa sen.",
+    "retentionNote": "Tallenne ei noudata tapahtuman tietojen säilytysaikaa: ilman määräaikaa se säilyy, julkaistuna tai ei, kunnes joku poistaa sen. Määräaika lasketaan julkaisusta tai, jos videota ei ole julkaistu, tapahtuman päättymisestä; kun se umpeutuu, video ja siitä tehty aineisto (litteroinnit, tiivistelmät, käännökset) poistetaan.",
     "delete": "Poista tallenne",
-    "deleteConfirm": "Oletko varma? Video poistetaan pysyvästi.",
+    "deleteConfirm": "Oletko varma? Video poistetaan pysyvästi. Litterointeja, tiivistelmiä ja käännöksiä ei poisteta sen mukana: ne noudattavat tässä valittua tallenteen määräaikaa.",
     "notConfigured": "Jibri ei ole määritetty. Videotallennus ei ole käytettävissä.",
     "disabledHint": "Videotallennus ei ole käytössä tässä tapahtumassa. Ota se käyttöön avaamalla yllä oleva Asetukset-osio ja kytkemällä \"Tallennus\"-valitsin päälle.",
     "play": "Toista",
@@ -5961,7 +5970,7 @@
     "visibilityAlways": "Aina näkyvissä",
     "visibilityUntil": "Näkyvissä asti:",
     "dataRetentionNote": "Osallistujien henkilötiedot poistetaan tapahtuman säilytyskäytännön mukaisesti ({days} päivää). Tapahtuman sisältö pysyy saatavilla niin kauan kuin sivu on näkyvissä.",
-    "availableUntil": "Tämä tapahtuma ja sen sisältö ovat saatavilla {date} asti.",
+    "participantDataUntil": "Osallistujien henkilötiedot poistetaan {date}.",
     "tabs": {
       "qa": "Kysymykset ja vastaukset",
       "materials": "Materiaalit",

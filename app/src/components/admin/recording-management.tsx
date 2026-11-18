@@ -20,6 +20,8 @@ import { useToast } from '@/components/ui/toast';
 import { useConfirm } from '@/components/ui/confirm-dialog';
 import { codiceErrore, messaggioErroreApi } from '@/lib/api-error-message';
 import { esitoPubblicazione, type Destinazione } from '@/lib/recording/destination';
+import { NESSUNA_CANCELLAZIONE, RETENTION_OPTIONS } from '@/lib/recording/retention-options';
+
 import RecordingUploadWidget from './recording-upload-widget';
 
 interface RecordingManagementProps {
@@ -50,14 +52,6 @@ interface RecordingManagementProps {
    *  regolare (pagina della post-produzione, scheda «Slide»). */
   slidesRecordingId?: string | null;
 }
-
-const RETENTION_OPTIONS = [
-  { value: 1, labelKey: 'retention.24h' },
-  { value: 7, labelKey: 'retention.7d' },
-  { value: 30, labelKey: 'retention.30d' },
-  { value: 90, labelKey: 'retention.90d' },
-  { value: -1, labelKey: 'retention.forever' },
-] as const;
 
 function formatDuration(seconds: number): string {
   const h = Math.floor(seconds / 3600);
@@ -178,13 +172,20 @@ export default function RecordingManagement({
     [audience, updateField, toast, router],
   );
 
+  // La durata decide quando la registrazione si cancella: se il server non la
+  // salva, la scelta torna com'era e lo si dice.
   const handleRetentionChange = useCallback(
     async (days: number) => {
-      const val = days === -1 ? null : days;
+      const prima = retentionDays;
+      const val = days === NESSUNA_CANCELLAZIONE ? null : days;
       setRetentionDays(val);
-      await updateField({ recordingDeleteAfterDays: val });
+      const errore = await updateField({ recordingDeleteAfterDays: val });
+      if (errore) {
+        setRetentionDays(prima);
+        toast.error(errore);
+      }
     },
-    [updateField],
+    [retentionDays, updateField, toast],
   );
 
   const handleDelete = useCallback(async () => {
@@ -373,40 +374,6 @@ export default function RecordingManagement({
               </fieldset>
             </div>
 
-            {/* Retention options */}
-            {/* Le scelte del design system (form-check): il pallino nativo
-                da 13 px era troppo piccolo da colpire. */}
-            {/* Il bordo sul contenitore: su quello del fieldset la legenda si
-                siederebbe sopra la linea, tagliandola. */}
-            <div className="border rounded p-3 mb-3">
-              <fieldset className="border-0 p-0 m-0">
-                <legend
-                  className="fw-semibold mb-2 fs-6 float-none w-auto p-0"
-                  style={{ color: 'var(--app-text)' }}
-                >
-                  {t('retentionLabel')}
-                </legend>
-                {RETENTION_OPTIONS.map(({ value, labelKey }) => (
-                  <div key={value} className="form-check my-1">
-                    <input
-                      type="radio"
-                      id={`retention-${value}`}
-                      name="retention"
-                      checked={value === -1 ? retentionDays === null : retentionDays === value}
-                      onChange={() => handleRetentionChange(value)}
-                      disabled={saving}
-                    />
-                    <label htmlFor={`retention-${value}`} style={{ fontSize: '0.88rem' }}>
-                      {t(labelKey)}
-                    </label>
-                  </div>
-                ))}
-                <div className="text-muted mt-2" style={{ fontSize: '0.8rem' }}>
-                  {t('retentionNote')}
-                </div>
-              </fieldset>
-            </div>
-
             {/* Action buttons */}
             <div className="d-flex align-items-center gap-3 flex-wrap">
               {event.recordingUrl && riproducibile && (
@@ -463,6 +430,45 @@ export default function RecordingManagement({
               </Button>
             </div>
           </>
+        )}
+
+        {/* La durata della registrazione: una scelta dell'evento, non del
+            file. Vale anche prima che il video ci sia, e dopo che lo si e'
+            tolto, per cio' che resta (trascrizioni, sintesi, traduzioni). Le
+            scelte del design system (form-check): il pallino nativo da 13 px
+            era troppo piccolo da colpire. Il bordo sul contenitore: su quello
+            del fieldset la legenda si siederebbe sopra la linea, tagliandola. */}
+        {!isLive && (
+          <div className="border rounded p-3 mb-3">
+            <fieldset className="border-0 p-0 m-0">
+              <legend
+                className="fw-semibold mb-2 fs-6 float-none w-auto p-0"
+                style={{ color: 'var(--app-text)' }}
+              >
+                {t('retentionLabel')}
+              </legend>
+              {RETENTION_OPTIONS.map(({ value, labelKey }) => (
+                <div key={value} className="form-check my-1">
+                  <input
+                    type="radio"
+                    id={`retention-${value}`}
+                    name="retention"
+                    checked={
+                      value === NESSUNA_CANCELLAZIONE ? retentionDays === null : retentionDays === value
+                    }
+                    onChange={() => handleRetentionChange(value)}
+                    disabled={saving}
+                  />
+                  <label htmlFor={`retention-${value}`} style={{ fontSize: '0.88rem' }}>
+                    {t(labelKey)}
+                  </label>
+                </div>
+              ))}
+              <div className="text-muted mt-2" style={{ fontSize: '0.8rem' }}>
+                {t('retentionNote')}
+              </div>
+            </fieldset>
+          </div>
         )}
 
         {/* Replace the existing recording with a different MP4 —

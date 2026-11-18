@@ -177,6 +177,16 @@ export const PATCH = withErrorHandling(async (request, context) => {
           recordingPublished: publishWith,
           ...(publishWith && { recordingPublishedAt: new Date() }),
         }),
+        // La durata della registrazione non pubblicata conta, al piu' presto, da
+        // un file nuovo o da una pubblicazione tolta (Event.recordingRetentionFrom):
+        // nessuna delle due la fa scadere al giro dopo della pulizia.
+        ...(((setsRecording &&
+          parsed.data.recordingUrl !== null &&
+          parsed.data.recordingUrl !== prima.recordingUrl) ||
+          ((publishWith === false || parsed.data.recordingUrl === null) &&
+            prima.recordingPublished)) && {
+          recordingRetentionFrom: new Date(),
+        }),
         ...(parsed.data.recordingFileSize !== undefined && {
           recordingFileSize:
             parsed.data.recordingFileSize === null

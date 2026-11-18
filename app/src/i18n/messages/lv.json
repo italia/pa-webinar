@@ -1272,6 +1272,8 @@
         "gdprHeading": "Privātums un datu glabāšana",
         "retentionDays": "Glabāšanas dienas",
         "retentionHelp": "Pēc šī sliekšņa personas dati tiek automātiski dzēsti.",
+        "recordingRetention": "Ieraksta glabāšana",
+        "recordingRetentionHelp": "Ieraksts un tas, kas no tā sagatavots, netiek dzēsti kopā ar cilvēku datiem. Ar noteiktu termiņu tie tiek dzēsti tik dienu pēc pasākuma beigām vai, ja video ir publicēts, pēc publicēšanas. To var mainīt arī vēlāk, ieraksta panelī.",
         "gdprTemplate": "Paziņojuma veidne",
         "gdprTemplateNone": "— Izmantot pielāgotu tekstu —",
         "gdprTemplateUnknown": "Izvēlētā privātuma paziņojuma veidne vairs nepastāv: izvēlieties citu vai atgriezieties pie pielāgotā teksta",
@@ -2189,7 +2191,7 @@
         "jobMaxAttempts": "Mēģinājumi pirms atteices",
         "jobMaxAttemptsHelp": "Cik reižu konveijers atkārto darbu, pirms atzīmē to kā neizdevušos. Gaidīšanas laiks starp mēģinājumiem pieaug eksponenciāli (no 30 sekundēm līdz 2 stundām). Tipiskā vērtība ir 5.",
         "artifactRetentionDays": "Artefaktu glabāšana (dienas)",
-        "artifactRetentionDaysHelp": "Ar vērtību 0 visai vietnei nav ierobežojuma: MI artefaktiem ir sava ieraksta vai pasākuma glabāšanas termiņš. Vērtība, kas lielāka par nulli, liek ikdienas uzdevumam dzēst katru artefaktu, kas izveidots pirms vairāk nekā šī dienu skaita, publicētu vai nē: tā var saīsināt glabāšanu, bet nekad to nepagarina. Runātāju vārdi un darbu dati uz to neattiecas: tiem ir ieraksta vai pasākuma glabāšanas termiņš. Sīkāk: docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "Ar vērtību 0 visai vietnei nav ierobežojuma: MI artefaktiem ir sava ieraksta glabāšanas termiņš. Vērtība, kas lielāka par nulli, liek ikdienas uzdevumam dzēst katru artefaktu, kas izveidots pirms vairāk nekā šī dienu skaita, publicētu vai nē: tā var saīsināt glabāšanu, bet nekad to nepagarina. Runātāju vārdi un darbu dati uz to neattiecas: tiem ir ieraksta glabāšanas termiņš. Sīkāk: docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "MI paziņojums uzgaidāmajā telpā",
         "consentDisclosureHelp": "Teksts, ko dalībnieki redz uzgaidāmajā telpā, ja pasākumā tiek izmantota MI pēcapstrāde (transkripcija, kopsavilkums, tulkošana, dublēšana). Pielāgojams katrai valodai. Atstājiet tukšu, lai izmantotu sistēmas noklusējuma tekstu.",
         "consentDisclosurePlaceholder": "Piem., šis pasākums pēc tiešraides tiks automātiski transkribēts un apkopots ar MI rīkiem…"
@@ -2548,6 +2550,8 @@
       "durationLabel": "Noklusējuma ilgums (minūtes)",
       "durationHint": "Iepriekš aizpilda pasākuma beigu laiku (sākums + ilgums). Lietotājs to var mainīt. Tukšs = 2 stundas.",
       "retentionLabel": "Noklusējuma datu glabāšana (dienas)",
+      "recordingRetentionLabel": "Ieraksta noklusējuma glabāšana",
+      "recordingRetentionHint": "Pasākumiem, kas izveidoti no šīs veidnes; to maina vednī un ieraksta panelī. Ieraksts neievēro datu glabāšanas termiņu.",
       "expectedSpeakersLabel": "Paredzamais runātāju skaits (noklusējums)",
       "descriptionTemplateLabel": "Noklusējuma apraksts",
       "descriptionTemplateHint": "Teksts, kas iepriekš aizpildīts pasākuma aprakstā (rediģējams).",
@@ -3085,7 +3089,10 @@
         "yes": "Jā",
         "no": "Nē",
         "recordingDuration": "Ilgums",
-        "recordingSize": "Izmērs"
+        "recordingSize": "Izmērs",
+        "recordingRetention": "Ieraksta automātiska dzēšana",
+        "recordingRetentionNone": "Nav",
+        "recordingRetentionDays": "{days, plural, zero {# dienas} one {# dienu} other {# dienas}} pēc pasākuma beigām vai, ja publicēts, pēc publicēšanas"
       }
     },
     "rubrica": {
@@ -4706,9 +4713,10 @@
       "retention": {
         "label": "Glabāšana",
         "data": "Reģistrācijas un telpas dati tiek dzēsti {days, plural, zero {# dienas} one {# dienu} other {# dienas}} pēc pasākuma beigām. Jautājumi un aptaujas paliek bez vārdiem.",
-        "videoUnpublished": "Ja ieraksts netiek padarīts pieejams, tas tiek dzēsts kopā ar šiem datiem.",
-        "videoPublishedDays": "Ja ieraksts tiek padarīts pieejams, tas tiek dzēsts {days, plural, zero {# dienas} one {# dienu} other {# dienas}} vēlāk.",
-        "videoPublishedOpen": "Ja ieraksts tiek padarīts pieejams, tas paliek, līdz organizatori to noņem."
+        "recordingKept": "Ieraksts un tas, kas no tā tiek sagatavots (atšifrējums, kopsavilkums, tulkojumi), netiek dzēsti kopā ar šiem datiem: neatkarīgi no tā, vai tie tiek padarīti pieejami, tie paliek, līdz organizatori tos dzēš.",
+        "recordingDays": "Ieraksts un tas, kas no tā tiek sagatavots, tiek dzēsti {days, plural, zero {# dienas} one {# dienu} other {# dienas}} pēc pasākuma beigām vai, ja ieraksts tiek padarīts pieejams, pēc tā publicēšanas.",
+        "transcriptKept": "Atšifrējums netiek dzēsts kopā ar šiem datiem: tas paliek, līdz organizatori to dzēš.",
+        "transcriptDays": "Atšifrējums tiek dzēsts {days, plural, zero {# dienas} one {# dienu} other {# dienas}} pēc pasākuma beigām."
       },
       "addressBook": {
         "label": "Kontaktu grāmata",
@@ -5916,11 +5924,12 @@
       "7d": "7 dienas",
       "30d": "30 dienas",
       "90d": "90 dienas",
+      "1y": "1 gads",
       "forever": "Bez automātiskas dzēšanas"
     },
-    "retentionNote": "Publicēts video neievēro pasākuma datu glabāšanas termiņu: bez noteikta termiņa tas paliek publisks, līdz kāds to izdzēš.",
+    "retentionNote": "Ieraksts neievēro pasākuma datu glabāšanas termiņu: bez noteikta termiņa tas paliek, publicēts vai nē, līdz kāds to izdzēš. Termiņu skaita no publicēšanas vai, ja video nav publicēts, no pasākuma beigām; kad tas beidzas, tiek dzēsts video un tas, kas no tā sagatavots (atšifrējumi, kopsavilkumi, tulkojumi).",
     "delete": "Dzēst ierakstu",
-    "deleteConfirm": "Vai esat pārliecināts? Video tiks neatgriezeniski dzēsts.",
+    "deleteConfirm": "Vai esat pārliecināts? Video tiks neatgriezeniski dzēsts. Atšifrējumi, kopsavilkumi un tulkojumi kopā ar to netiek dzēsti: tiem ir šeit izvēlētais ieraksta termiņš.",
     "notConfigured": "Jibri nav konfigurēts infrastruktūrā. Video ierakstīšana nav pieejama.",
     "disabledHint": "Šim pasākumam video ierakstīšana nav iespējota. Lai to iespējotu, atveriet sadaļu Iestatījumi augstāk un ieslēdziet slēdzi \"Ierakstīšana\".",
     "play": "Atskaņot",
@@ -5961,7 +5970,7 @@
     "visibilityAlways": "Vienmēr redzams",
     "visibilityUntil": "Redzams līdz:",
     "dataRetentionNote": "Dalībnieku personas dati tiks dzēsti saskaņā ar pasākuma saglabāšanas politiku ({days} dienas). Pasākuma saturs būs pieejams, kamēr lapa ir redzama.",
-    "availableUntil": "Šis pasākums un tā saturs būs pieejams līdz {date}.",
+    "participantDataUntil": "Dalībnieku personas dati tiek dzēsti {date}.",
     "tabs": {
       "qa": "Jautājumi un atbildes",
       "materials": "Materiāli",

@@ -351,7 +351,7 @@ describe("sala — quello che arriva alla sala d'attesa", () => {
       chat: { attiva: true, domandeAttive: true, esitoDomande: 'soloTesto' },
       elencoVisibile: true,
       pseudonimi: false,
-      conservazione: { giorniDati: 30, video: null },
+      conservazione: { giorniDati: 30, registrazione: null },
       rubrica: null,
     };
     const conSottotitoli = {

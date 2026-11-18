@@ -1272,6 +1272,8 @@
         "gdprHeading": "Privacy en bewaring van gegevens",
         "retentionDays": "Bewaardagen",
         "retentionHelp": "Na deze drempel worden persoonsgegevens automatisch verwijderd.",
+        "recordingRetention": "Bewaartermijn van de opname",
+        "recordingRetentionHelp": "De opname en wat ervan wordt gemaakt, worden niet met de gegevens van personen verwijderd. Met een termijn worden ze zoveel dagen na het einde van het evenement verwijderd of, als de video gepubliceerd is, na de publicatie. De termijn kan later ook worden gewijzigd in het paneel van de opname.",
         "gdprTemplate": "Privacy-sjabloon",
         "gdprTemplateNone": "— Aangepaste tekst gebruiken —",
         "gdprTemplateUnknown": "Het gekozen sjabloon voor de privacyverklaring bestaat niet meer: kies een ander sjabloon of ga terug naar de aangepaste tekst",
@@ -2189,7 +2191,7 @@
         "jobMaxAttempts": "Pogingen vóór mislukking",
         "jobMaxAttemptsHelp": "Hoe vaak de pijplijn een taak opnieuw probeert voordat deze als mislukt wordt gemarkeerd. De backoff tussen de pogingen groeit exponentieel (van 30 seconden tot 2 uur). De gebruikelijke waarde is 5.",
         "artifactRetentionDays": "Bewaring van de artefacten (dagen)",
-        "artifactRetentionDaysHelp": "Bij 0 geldt geen limiet voor de hele site: de AI-artefacten volgen de bewaartermijn van hun opname of van het evenement. Een waarde groter dan nul laat een dagelijkse taak elk artefact verwijderen dat meer dan dat aantal dagen geleden is aangemaakt, gepubliceerd of niet: zo kan de bewaring korter worden, maar nooit langer. Namen van sprekers en payloads van de jobs vallen hier niet onder: die volgen de bewaartermijn van de opname of van het evenement. Details in docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "Bij 0 geldt geen limiet voor de hele site: de AI-artefacten volgen de bewaartermijn van hun opname. Een waarde groter dan nul laat een dagelijkse taak elk artefact verwijderen dat meer dan dat aantal dagen geleden is aangemaakt, gepubliceerd of niet: zo kan de bewaring korter worden, maar nooit langer. Namen van sprekers en payloads van de jobs vallen hier niet onder: die volgen de bewaartermijn van de opname. Details in docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "AI-mededeling in de wachtruimte",
         "consentDisclosureHelp": "Tekst die aan de deelnemers in de wachtruimte wordt getoond wanneer het evenement AI-postproductie gebruikt (transcriptie, samenvatting, vertaling, nasynchronisatie). Per taal aan te passen. Laat leeg om de standaardtekst van het systeem te gebruiken.",
         "consentDisclosurePlaceholder": "Bijv. Dit evenement wordt na de live-uitzending automatisch getranscribeerd en samengevat met AI-hulpmiddelen…"
@@ -2548,6 +2550,8 @@
       "durationLabel": "Standaardduur (minuten)",
       "durationHint": "Vult het einde van het evenement vooraf in (begin + duur). De gebruiker kan dit wijzigen. Leeg = 2 uur.",
       "retentionLabel": "Standaard bewaring van gegevens (dagen)",
+      "recordingRetentionLabel": "Standaardbewaartermijn van de opname",
+      "recordingRetentionHint": "Voor de evenementen die met dit sjabloon worden gemaakt; te wijzigen in de wizard en in het paneel van de opname. De opname volgt de bewaartermijn van de gegevens niet.",
       "expectedSpeakersLabel": "Verwacht aantal sprekers (standaard)",
       "descriptionTemplateLabel": "Standaardbeschrijving",
       "descriptionTemplateHint": "Tekst die vooraf in de beschrijving van het evenement wordt ingevuld (aanpasbaar).",
@@ -3085,7 +3089,10 @@
         "yes": "Ja",
         "no": "Nee",
         "recordingDuration": "Duur",
-        "recordingSize": "Grootte"
+        "recordingSize": "Grootte",
+        "recordingRetention": "Automatische verwijdering van de opname",
+        "recordingRetentionNone": "Geen",
+        "recordingRetentionDays": "{days, plural, one {# dag} other {# dagen}} na het einde van het evenement of, als ze is gepubliceerd, na de publicatie"
       }
     },
     "rubrica": {
@@ -4706,9 +4713,10 @@
       "retention": {
         "label": "Bewaring",
         "data": "De gegevens van de inschrijving en van de zaal worden {days, plural, one {# dag} other {# dagen}} na het einde van het evenement verwijderd. Vragen en peilingen blijven bewaard zonder namen.",
-        "videoUnpublished": "Als de opname niet beschikbaar wordt gesteld, wordt ze samen met die gegevens verwijderd.",
-        "videoPublishedDays": "Als de opname beschikbaar wordt gesteld, wordt ze {days, plural, one {# dag} other {# dagen}} later verwijderd.",
-        "videoPublishedOpen": "Als de opname beschikbaar wordt gesteld, blijft ze staan tot de organisatoren haar verwijderen."
+        "recordingKept": "De opname en wat ervan wordt gemaakt (transcriptie, samenvatting, vertalingen) worden niet met deze gegevens verwijderd: of ze nu beschikbaar worden gesteld of niet, ze blijven bewaard tot de organisatoren ze verwijderen.",
+        "recordingDays": "De opname en wat ervan wordt gemaakt, worden {days, plural, one {# dag} other {# dagen}} na het einde van het evenement verwijderd of, als de opname beschikbaar wordt gesteld, na de publicatie ervan.",
+        "transcriptKept": "De transcriptie wordt niet met deze gegevens verwijderd: ze blijft bewaard tot de organisatoren haar verwijderen.",
+        "transcriptDays": "De transcriptie wordt {days, plural, one {# dag} other {# dagen}} na het einde van het evenement verwijderd."
       },
       "addressBook": {
         "label": "Adresboek",
@@ -5916,11 +5924,12 @@
       "7d": "7 dagen",
       "30d": "30 dagen",
       "90d": "90 dagen",
+      "1y": "1 jaar",
       "forever": "Geen automatische verwijdering"
     },
-    "retentionNote": "Een gepubliceerde video volgt de bewaartermijn van de evenementgegevens niet: zonder termijn blijft hij openbaar tot iemand hem verwijdert.",
+    "retentionNote": "De opname volgt de bewaartermijn van de evenementgegevens niet: zonder termijn blijft ze, gepubliceerd of niet, bewaard tot iemand haar verwijdert. De termijn loopt vanaf de publicatie of, als de video niet gepubliceerd is, vanaf het einde van het evenement; daarna worden de video en wat ervan is gemaakt (transcripties, samenvattingen, vertalingen) verwijderd.",
     "delete": "Opname verwijderen",
-    "deleteConfirm": "Weet u het zeker? De video wordt definitief verwijderd.",
+    "deleteConfirm": "Weet u het zeker? De video wordt definitief verwijderd. Transcripties, samenvattingen en vertalingen worden niet samen met de video verwijderd: ze volgen de hier gekozen termijn van de opname.",
     "notConfigured": "Jibri is niet geconfigureerd in de infrastructuur. Video-opname is niet beschikbaar.",
     "disabledHint": "Video-opname is niet ingeschakeld voor dit evenement. Open het gedeelte Instellingen hierboven en zet de schakelaar \"Opname\" aan.",
     "play": "Afspelen",
@@ -5961,7 +5970,7 @@
     "visibilityAlways": "Altijd zichtbaar",
     "visibilityUntil": "Zichtbaar tot:",
     "dataRetentionNote": "Persoonsgegevens van deelnemers worden verwijderd volgens de bewaartermijn van het evenement ({days} dagen). De inhoud van het evenement blijft beschikbaar zolang de pagina zichtbaar is.",
-    "availableUntil": "Dit evenement en de bijbehorende inhoud zijn beschikbaar tot {date}.",
+    "participantDataUntil": "De persoonsgegevens van de deelnemers worden op {date} verwijderd.",
     "tabs": {
       "qa": "Vragen en Antwoorden",
       "materials": "Materialen",

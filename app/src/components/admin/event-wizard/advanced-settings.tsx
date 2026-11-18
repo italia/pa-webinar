@@ -17,6 +17,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import CapacityPanel, { type RiepilogoCapacita } from '@/components/admin/capacity-panel';
+import RecordingRetentionSelect from '@/components/admin/recording-retention-select';
 import FileOrUrlInput from '@/components/ui/file-or-url-input';
 import ToggleSwitch from '@/components/ui/toggle-switch';
 import { registrazioneRiservata, type Destinazione } from '@/lib/recording/destination';
@@ -113,6 +114,7 @@ export function SezioneDati({
   retentionMax = MAX_RETENTION_DAYS,
   onUploadBusy,
   domandeDopoEvento = true,
+  durataRegistrazione = true,
   destinazioneSenzaScelta = null,
   pubblicoDopo = 'PUBLIC',
 }: {
@@ -127,6 +129,9 @@ export function SezioneDati({
   /** Si sceglie qui se le domande restano sulla pagina: non con un link di
    *  conduzione, che le cambia dalla pagina dell'evento. */
   domandeDopoEvento?: boolean;
+  /** Si sceglie qui quanto dura la registrazione: non con un link di
+   *  conduzione, che la cambia dal pannello della registrazione. */
+  durataRegistrazione?: boolean;
   /** La destinazione che l'evento tiene se il modulo non ne sceglie una
    *  (`destinazioneDiPartenza`). */
   destinazioneSenzaScelta?: Destinazione;
@@ -135,6 +140,9 @@ export function SezioneDati({
 }) {
   const t = useTranslations('admin.wizard.step5');
   const tPost = useTranslations('postEvent');
+  // La durata si sceglie dove l'evento registra qualcosa: il video, o la
+  // trascrizione dai sottotitoli.
+  const registraQualcosa = form.recordingEnabled || form.captionsTranscriptEnabled;
   // La regola della pagina si legge sull'evento che il salvataggio scrive: una
   // scelta rimasta nel modulo a registrazione spenta non toglie le domande.
   const riservata = registrazioneRiservata({
@@ -226,6 +234,22 @@ export function SezioneDati({
           {t('retentionHelp')}
         </small>
       </div>
+      {durataRegistrazione && registraQualcosa && (
+        <div className="col-md-6">
+          <label className="form-label" htmlFor="rev-recording-retention">
+            {t('recordingRetention')}
+          </label>
+          <RecordingRetentionSelect
+            id="rev-recording-retention"
+            value={form.recordingDeleteAfterDays ?? null}
+            onChange={(giorni) => onChange({ recordingDeleteAfterDays: giorni })}
+            describedBy="rev-recording-retention-help"
+          />
+          <small id="rev-recording-retention-help" className="form-text text-muted">
+            {t('recordingRetentionHelp')}
+          </small>
+        </div>
+      )}
       {/* La pagina dell'evento concluso: il modello la decide (una riunione
           di lavoro non e' pubblica), qui si cambia. */}
       <div className="col-12">

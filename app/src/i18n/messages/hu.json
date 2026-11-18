@@ -1272,6 +1272,8 @@
         "gdprHeading": "Adatvédelem és adatmegőrzés",
         "retentionDays": "Megőrzési napok",
         "retentionHelp": "E küszöb után a személyes adatok automatikusan törlődnek.",
+        "recordingRetention": "A felvétel megőrzése",
+        "recordingRetentionHelp": "A felvétel és ami belőle készül nem törlődik a személyek adataival együtt. Időtartammal ennyi nappal az esemény vége után törlődik, vagy ha a videót közzétették, a közzététel után. Később is módosítható, a felvétel paneljén.",
         "gdprTemplate": "Adatvédelmi sablon",
         "gdprTemplateNone": "— Egyedi szöveg használata —",
         "gdprTemplateUnknown": "A kiválasztott adatvédelmi sablon már nem létezik: válasszon másikat, vagy térjen vissza az egyéni szöveghez",
@@ -2189,7 +2191,7 @@
         "jobMaxAttempts": "Próbálkozások a sikertelenné nyilvánítás előtt",
         "jobMaxAttemptsHelp": "Hányszor próbálja újra a pipeline a feladatot, mielőtt sikertelennek jelöli. A próbálkozások közötti várakozás exponenciálisan nő (30 másodperctől 2 óráig). A szokásos érték 5.",
         "artifactRetentionDays": "Artefaktumok megőrzése (nap)",
-        "artifactRetentionDaysHelp": "0 értéknél nincs az egész webhelyre vonatkozó korlát: az AI-artefaktumok a felvételük vagy az esemény megőrzési idejét követik. A nullánál nagyobb érték esetén egy napi feladat töröl minden olyan artefaktumot, amely ennél több napja jött létre, akár közzétették, akár nem: ez lerövidítheti a megőrzést, de soha nem hosszabbítja meg. A beszélők neveire és a feladatok adattartalmára ez nem vonatkozik: ezek a felvétel vagy az esemény megőrzési idejét követik. Részletek: docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "0 értéknél nincs az egész webhelyre vonatkozó korlát: az AI-artefaktumok a felvételük megőrzési idejét követik. A nullánál nagyobb érték esetén egy napi feladat töröl minden olyan artefaktumot, amely ennél több napja jött létre, akár közzétették, akár nem: ez lerövidítheti a megőrzést, de soha nem hosszabbítja meg. A beszélők neveire és a feladatok adattartalmára ez nem vonatkozik: ezek a felvétel megőrzési idejét követik. Részletek: docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "AI-tájékoztató a váróteremben",
         "consentDisclosureHelp": "A résztvevőknek a váróteremben megjelenő szöveg, ha az esemény AI-utómunkát használ (átiratkészítés, összefoglaló, fordítás, szinkron). Nyelvenként testre szabható. Hagyja üresen a beépített alapértelmezett szöveg használatához.",
         "consentDisclosurePlaceholder": "Pl. Ezt az eseményt az élő közvetítés után automatikusan átírjuk és összefoglaljuk AI-eszközökkel…"
@@ -2548,6 +2550,8 @@
       "durationLabel": "Alapértelmezett időtartam (perc)",
       "durationHint": "Előre kitölti az esemény végét (kezdés + időtartam). A felhasználó módosíthatja. Üres = 2 óra.",
       "retentionLabel": "Alapértelmezett adatmegőrzés (nap)",
+      "recordingRetentionLabel": "A felvétel alapértelmezett megőrzése",
+      "recordingRetentionHint": "Az ebből a sablonból létrehozott eseményekhez; a varázslóban és a felvétel paneljén módosítható. A felvételre nem vonatkozik az adatok megőrzési ideje.",
       "expectedSpeakersLabel": "Várható beszélők száma (alapértelmezés)",
       "descriptionTemplateLabel": "Alapértelmezett leírás",
       "descriptionTemplateHint": "Az esemény leírásába előre beillesztett szöveg (szerkeszthető).",
@@ -3085,7 +3089,10 @@
         "yes": "Igen",
         "no": "Nem",
         "recordingDuration": "Időtartam",
-        "recordingSize": "Méret"
+        "recordingSize": "Méret",
+        "recordingRetention": "A felvétel automatikus törlése",
+        "recordingRetentionNone": "Nincs",
+        "recordingRetentionDays": "az esemény vége után {days, plural, one {# nappal} other {# nappal}}, vagy ha közzétették, a közzététel után"
       }
     },
     "rubrica": {
@@ -4706,9 +4713,10 @@
       "retention": {
         "label": "Megőrzés",
         "data": "A regisztrációs és a termi adatok az esemény vége után {days, plural, one {# nappal} other {# nappal}} törlődnek. A kérdések és a szavazások név nélkül megmaradnak.",
-        "videoUnpublished": "Ha nem teszik elérhetővé, a felvétel ezekkel együtt törlődik.",
-        "videoPublishedDays": "Ha elérhetővé teszik, {days, plural, one {# nappal} other {# nappal}} később törlődik.",
-        "videoPublishedOpen": "Ha elérhetővé teszik, addig marad meg, amíg a szervezők el nem távolítják."
+        "recordingKept": "A felvétel és ami belőle készül (átirat, összefoglaló, fordítások) nem törlődik ezekkel az adatokkal együtt: akár elérhetővé teszik, akár nem, megmarad, amíg a szervezők nem törlik.",
+        "recordingDays": "A felvétel és ami belőle készül az esemény vége után {days, plural, one {# nappal} other {# nappal}} törlődik, vagy ha a felvételt elérhetővé teszik, a közzététele után ugyanennyivel.",
+        "transcriptKept": "Az átirat nem törlődik ezekkel az adatokkal együtt: megmarad, amíg a szervezők nem törlik.",
+        "transcriptDays": "Az átirat az esemény vége után {days, plural, one {# nappal} other {# nappal}} törlődik."
       },
       "addressBook": {
         "label": "Címjegyzék",
@@ -5916,11 +5924,12 @@
       "7d": "7 nap",
       "30d": "30 nap",
       "90d": "90 nap",
+      "1y": "1 év",
       "forever": "Nincs automatikus törlés"
     },
-    "retentionNote": "A közzétett videóra nem vonatkozik az esemény adatainak megőrzési ideje: időtartam nélkül nyilvános marad, amíg valaki nem törli.",
+    "retentionNote": "A felvételre nem vonatkozik az esemény adatainak megőrzési ideje: időtartam nélkül megmarad, akár közzétették, akár nem, amíg valaki nem törli. Az időtartam a közzétételtől, vagy ha a videót nem tették közzé, az esemény végétől számít; lejártakor törlődik a videó és ami belőle készült (átiratok, összefoglalók, fordítások).",
     "delete": "Felvétel törlése",
-    "deleteConfirm": "Biztos benne? A videó véglegesen törlésre kerül.",
+    "deleteConfirm": "Biztos benne? A videó véglegesen törlésre kerül. Az átiratok, összefoglalók és fordítások nem törlődnek vele együtt: a felvételhez itt választott időtartamot követik.",
     "notConfigured": "Jibri nincs konfigurálva. A videofelvétel nem elérhető.",
     "disabledHint": "A videófelvétel nincs engedélyezve ehhez az eseményhez. Az engedélyezéshez nyissa meg fent a Beállítások szakaszt, és kapcsolja be a „Felvétel” kapcsolót.",
     "play": "Lejátszás",
@@ -5961,7 +5970,7 @@
     "visibilityAlways": "Mindig látható",
     "visibilityUntil": "Látható eddig:",
     "dataRetentionNote": "A résztvevők személyes adatai az esemény megőrzési szabálya szerint kerülnek törlésre ({days} nap). Az esemény tartalma az oldal láthatóságáig elérhető marad.",
-    "availableUntil": "Ez az esemény és tartalmai {date}-ig lesznek elérhetők.",
+    "participantDataUntil": "A résztvevők személyes adatainak törlési dátuma: {date}.",
     "tabs": {
       "qa": "Kérdések és válaszok",
       "materials": "Anyagok",
