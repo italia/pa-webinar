@@ -41,7 +41,16 @@
 --                              microfono e videocamera), e la sessione del
 --                              registratore non lo vede: non riproduce la sua
 --                              voce né la sua immagine, e non mostra il suo nome.
---                              Stesso segno per chi è in solo ascolto.
+--                              Stesso segno per chi è in solo ascolto;
+--   context.user.paInVideo   = true per chi conduce (organizzatori, moderatori,
+--                              relatori): nel video della registrazione compare
+--                              con immagine e nome. Chi non lo porta non compare
+--                              mai: il modulo gli scrive hidden-from-recorder
+--                              nella presenza e, se non ha voiceExcluded né
+--                              listenOnly, anche pa-recorder-voice: la sessione
+--                              del registratore riproduce solo la sua voce.
+--                              Senza la chiave nel token conduce chi è owner o
+--                              ha mediaExempt.
 -- I moderatori (owner) sono ammessi anche loro: Jicofo controlla solo
 -- l'elenco, non il ruolo.
 --
@@ -518,23 +527,63 @@ process_host_module(av_host, function(host_module)
     host_module:hook('message/host', on_av_command, 10);
 end);
 
--- La presenza di chi non ha un consenso valido lo dice alla sessione del
--- registratore: con hiddenFromRecorderFeatureEnabled (il testo della conferenza,
--- jitsi-meet.web.custom.configs) Jitsi non la mette nella sala che registra, e
--- il video resta com'è per tutti gli altri. Chi è in solo ascolto ha lo stesso
--- segno: dove il testo c'è, nome e riquadro restano fuori anche per lui.
+-- Nel video della registrazione compare solo chi conduce. La presenza di ogni
+-- altra persona lo dice alla sessione del registratore: con
+-- hiddenFromRecorderFeatureEnabled (il testo della conferenza,
+-- jitsi-meet.web.custom.configs) Jitsi non la mette nella sala che registra:
+-- niente riquadro, nome, immagine o schermo, e il palco non va mai su di lei.
+-- Per tutti gli altri in sala non cambia niente.
 --
--- Vale il token: il client non se lo può togliere né dare. Il modulo gira dopo
--- mod_presence_identity (priorità 0), che ricostruisce l'identità e cancellerebbe
--- il segno; a chi è segnato toglie ogni identità, a tutti gli altri il segno
--- scritto dal client.
+-- Dei partecipanti con il consenso la sessione del registratore riproduce la
+-- sola voce: lo dice un secondo segno, pa-recorder-voice, letto dal testo della
+-- conferenza. Chi non ha un consenso valido (voiceExcluded) o è in solo ascolto
+-- non lo ha: fuori anche la voce. Chi entra senza token non conduce e non ha
+-- dato consensi: fuori del tutto.
+--
+-- Vale il token: il client non si può togliere né dare i segni. Il modulo gira
+-- dopo mod_presence_identity (priorità 0), che ricostruisce l'identità e
+-- cancellerebbe i segni; a chi è segnato toglie ogni identità, a chi conduce i
+-- segni scritti dal client. Nome e avatar viaggiano fuori dall'identità (nick e
+-- avatar-url), e la sala li vede come prima; la sessione del registratore non
+-- riceve dal token niente di chi non conduce.
 local HIDDEN_TAG = 'hidden-from-recorder';
+local VOICE_TAG = 'pa-recorder-voice';
 
-local function without_mark(identity)
+-- Cosa vede di una sessione la sessione del registratore:
+--   'video'  chi conduce: immagine, nome e voce;
+--   'voce'   un partecipante con il consenso: solo la voce;
+--   'niente' senza consenso, in solo ascolto o senza token.
+-- Il no al consenso prevale anche su chi conduce. Un token che non porta
+-- paInVideo (emesso prima di questa regola, o da un portale che non la
+-- conosce) fa condurre chi modera (owner) e chi parla come relatore
+-- (mediaExempt), come prima: la registrazione non resta senza chi conduce. Un
+-- portale che vuole fuori dal video anche uno di loro scrive paInVideo = false.
+local function in_video_claim(value)
+    if value == true or value == 'true' then
+        return true;
+    end
+    if value == false or value == 'false' then
+        return false;
+    end
+    return nil;
+end
+
+local function recorder_view(user)
+    if type(user) ~= 'table' or user.voiceExcluded == true or user.listenOnly == true then
+        return 'niente';
+    end
+    local in_video = in_video_claim(user.paInVideo);
+    if in_video == nil then
+        in_video = user.affiliation == 'owner' or user.mediaExempt == true;
+    end
+    return in_video and 'video' or 'voce';
+end
+
+local function without_marks(identity)
     identity:maptags(function(user_tag)
         if user_tag.name == 'user' then
             user_tag:maptags(function(tag)
-                if tag.name == HIDDEN_TAG then
+                if tag.name == HIDDEN_TAG or tag.name == VOICE_TAG then
                     return nil;
                 end
                 return tag;
@@ -549,8 +598,8 @@ local function mark_no_recording(event)
     if not stanza or not session then
         return;
     end
-    local user = session.jitsi_meet_context_user;
-    local marked = type(user) == 'table' and (user.voiceExcluded == true or user.listenOnly == true);
+    local view = recorder_view(session.jitsi_meet_context_user);
+    local marked = view ~= 'video';
     stanza:maptags(function(tag)
         if tag.name ~= 'identity' then
             return tag;
@@ -558,11 +607,15 @@ local function mark_no_recording(event)
         if marked then
             return nil;
         end
-        without_mark(tag);
+        without_marks(tag);
         return tag;
     end);
     if marked then
-        stanza:add_child(st.stanza('identity'):add_child(st.stanza('user'):add_child(st.stanza(HIDDEN_TAG):text('true'))));
+        local user = st.stanza('user'):add_child(st.stanza(HIDDEN_TAG):text('true'));
+        if view == 'voce' then
+            user:add_child(st.stanza(VOICE_TAG):text('true'));
+        end
+        stanza:add_child(st.stanza('identity'):add_child(user));
     end
 end
 

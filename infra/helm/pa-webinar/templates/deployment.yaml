@@ -119,12 +119,25 @@ spec:
             {{- end }}
             {{- /*
               Il testo della conferenza del chart fa si' che il registratore non
-              veda chi non ha acconsentito. Un file di valori che lo sostituisce
-              lo perde: senza, il portale tiene quelle persone in solo ascolto.
+              veda chi non ha acconsentito ne' chi non conduce. Un file di valori
+              che lo sostituisce lo perde: senza, il portale tiene in solo ascolto
+              chi non ha acconsentito e sa che i partecipanti possono comparire.
             */}}
-            {{- if contains "hiddenFromRecorderFeatureEnabled" (toString (dig "web" "custom" "configs" "_custom_config_js" "" (index .Values "jitsi-meet" | default dict))) }}
+            {{- $testoConferenza := toString (dig "web" "custom" "configs" "_custom_config_js" "" (index .Values "jitsi-meet" | default dict)) }}
+            {{- if contains "hiddenFromRecorderFeatureEnabled" $testoConferenza }}
             - name: RECORDING_VOICE_EXCLUSION
               value: "true"
+            {{- /*
+              Lo stesso testo riproduce nel video la voce dei partecipanti con
+              il consenso, che non compaiono mai: senza, nel video resta solo
+              chi conduce, senza la voce di chi interviene dal pubblico. Si
+              cerca la riga di codice che definisce il segno, non il nome in
+              un commento.
+            */}}
+            {{- if contains "VOCE = 'pa-recorder-voice'" $testoConferenza }}
+            - name: RECORDING_PARTICIPANT_VOICE
+              value: "true"
+            {{- end }}
             {{- end }}
             {{- end }}
             {{- with include "pa-webinar.extraCaCerts" . }}
