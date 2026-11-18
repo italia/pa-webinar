@@ -74,6 +74,7 @@ import CollapsibleSection from './collapsible-section';
 import EventLinksSection from './event-links-section';
 import CopyButton from './copy-button';
 import StatusBadge from './status-badge';
+import { durataEffettiva } from '@/lib/recording/legacy-retention';
 
 // ── Palette ──
 const C_PRIMARY = 'var(--app-primary)';
@@ -182,6 +183,8 @@ interface EventData {
   recordingAudience: 'PUBLIC' | 'REGISTRANTS';
   recordingDestination: 'PUBLIC' | 'REGISTRANTS' | null;
   recordingFileSize: number | null; recordingDuration: number | null; recordingDeleteAfterDays: number | null;
+  /** Evento nato prima che la registrazione si separasse dai dati (lib/recording/legacy-retention). */
+  legacyRecordingRetention?: boolean;
   youtubeUrl: string | null; libraryListed: boolean; hasRecordingRow: boolean;
   /** La registrazione del video dell'evento, quando in sala si è presentato un
    *  PDF: le sue slide sincronizzate si regolano dalla post-produzione. */
@@ -1578,6 +1581,8 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
   const locale = useLocale();
   const format = useFormatter();
   const isEnded = status === 'ENDED' || status === 'ARCHIVED';
+  // La durata che vale davvero, con il limite degli eventi nati prima della regola.
+  const durataGoverno = durataEffettiva(event);
 
   // Colore della pastiglia dell'azione nel registro GDPR.
   const actionColor = (action: string) => {
@@ -1660,8 +1665,8 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
         )}
         {/* Quanto dura la registrazione: un metadato, che sceglie chi organizza. */}
         <KV label={td('governance.recordingRetention')}
-            value={event.recordingDeleteAfterDays
-              ? td('governance.recordingRetentionDays', { days: event.recordingDeleteAfterDays })
+            value={durataGoverno
+              ? td('governance.recordingRetentionDays', { days: durataGoverno })
               : td('governance.recordingRetentionNone')} />
         </dl>
       </div>
@@ -1683,6 +1688,8 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
             recordingFileSize: event.recordingFileSize,
             recordingDuration: event.recordingDuration,
             recordingDeleteAfterDays: event.recordingDeleteAfterDays,
+            legacyRecordingRetention: event.legacyRecordingRetention,
+            dataRetentionDays: event.dataRetentionDays,
             moderatorToken: event.moderatorToken,
           }}
           riproducibile={event.recordingPlayable ?? true}

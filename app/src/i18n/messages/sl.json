@@ -6030,9 +6030,11 @@
       "30d": "30 dni",
       "90d": "90 dni",
       "1y": "1 leto",
+      "days": "{count, plural, one {# dan} two {# dneva} few {# dni} other {# dni}}",
       "forever": "Brez samodejnega brisanja"
     },
     "retentionNote": "Posnetek ne sledi hrambi podatkov dogodka: brez določenega roka ostane, objavljen ali ne, dokler ga kdo ne izbriše. Rok se šteje od objave ali, če video ni objavljen, od konca dogodka; ko poteče, se izbrišeta video in to, kar iz njega nastane (prepisi, povzetki, prevodi).",
+    "retentionLegacy": "Prijavljenim na ta dogodek je bilo rečeno, da se neobjavljen posnetek izbriše skupaj z njihovimi podatki, {days, plural, one {# dan} two {# dneva} few {# dni} other {# dni}} po koncu dogodka. Dokler video ni objavljen, lahko to obdobje skrajšate, ne morete pa ga odstraniti ali podaljšati.",
     "delete": "Izbriši posnetek",
     "deleteConfirm": "Ali ste prepričani? Video bo trajno izbrisan. Prepisi, povzetki in prevodi se z njim ne izbrišejo: sledijo roku posnetka, izbranemu tukaj.",
     "notConfigured": "Jibri ni konfiguriran v infrastrukturi. Video snemanje ni na voljo.",
@@ -6325,7 +6327,8 @@
     "sameLanguage": "Izbrani jezik je izvirni jezik posnetka: izberite drugega.",
     "recordingDestinationNotCovered": "Privolitve za ta dogodek veljajo za posnetek samo za prijavljene: ne morete ga narediti vidnega vsem niti povezati zunanjega videa.",
     "mtUnavailable": "Strojno prevajanje na tej instanci ni nameščeno.",
-    "recordingContentOrganizerOnly": "Vsebino posnetkov tega dogodka lahko odprejo, spremenijo ali objavijo samo njegovi organizatorji."
+    "recordingContentOrganizerOnly": "Vsebino posnetkov tega dogodka lahko odprejo, spremenijo ali objavijo samo njegovi organizatorji.",
+    "recordingRetentionLegacy": "Prijavljenim na ta dogodek je bilo rečeno, da se neobjavljen posnetek izbriše skupaj z njihovimi podatki: dokler video ni objavljen, se njegovo obdobje lahko skrajša, ne pa odstrani ali podaljša."
   },
   "recordingRemoval": {
     "cardTitle": "Vsebina odstranjena na zahtevo",

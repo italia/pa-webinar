@@ -6030,9 +6030,11 @@
       "30d": "30 dni",
       "90d": "90 dni",
       "1y": "1 rok",
+      "days": "{count, plural, one {# dzień} few {# dni} many {# dni} other {# dnia}}",
       "forever": "Bez automatycznego usuwania"
     },
     "retentionNote": "Nagranie nie podlega okresowi przechowywania danych wydarzenia: bez ustalonego okresu pozostaje, opublikowane czy nie, dopóki ktoś go nie usunie. Okres liczy się od publikacji lub, jeśli wideo nie jest opublikowane, od zakończenia wydarzenia; po jego upływie usuwane są wideo i to, co z niego powstało (transkrypcje, podsumowania, tłumaczenia).",
+    "retentionLegacy": "Zarejestrowanym na to wydarzenie powiedziano, że nieopublikowane nagranie jest usuwane razem z ich danymi, {days, plural, one {# dzień} few {# dni} many {# dni} other {# dnia}} po zakończeniu wydarzenia. Dopóki wideo nie jest opublikowane, możesz skrócić ten okres, ale nie możesz go usunąć ani wydłużyć.",
     "delete": "Usuń nagranie",
     "deleteConfirm": "Czy na pewno? Wideo zostanie trwale usunięte. Transkrypcje, podsumowania i tłumaczenia nie są usuwane razem z nim: podlegają wybranemu tutaj okresowi przechowywania nagrania.",
     "notConfigured": "Jibri nie jest skonfigurowany w infrastrukturze. Nagrywanie wideo nie jest dostępne.",
@@ -6325,7 +6327,8 @@
     "sameLanguage": "Wybrany język jest oryginalnym językiem nagrania: wybierz inny.",
     "recordingDestinationNotCovered": "Zgody dla tego wydarzenia dotyczą nagrania tylko dla zarejestrowanych: nie możesz udostępnić go wszystkim ani dodać linku do zewnętrznego wideo.",
     "mtUnavailable": "Tłumaczenie maszynowe nie jest zainstalowane w tej instancji.",
-    "recordingContentOrganizerOnly": "Tylko organizatorzy tego wydarzenia mogą otwierać, zmieniać lub publikować zawartość jego nagrań."
+    "recordingContentOrganizerOnly": "Tylko organizatorzy tego wydarzenia mogą otwierać, zmieniać lub publikować zawartość jego nagrań.",
+    "recordingRetentionLegacy": "Zarejestrowanym na to wydarzenie powiedziano, że nieopublikowane nagranie jest usuwane razem z ich danymi: dopóki wideo nie jest opublikowane, jego okres można skrócić, ale nie usunąć ani wydłużyć."
   },
   "recordingRemoval": {
     "cardTitle": "Treść usunięta na wniosek",

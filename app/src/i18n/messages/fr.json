@@ -6030,9 +6030,11 @@
       "30d": "30 jours",
       "90d": "90 jours",
       "1y": "1 an",
+      "days": "{count, plural, one {# jour} many {# jours} other {# jours}}",
       "forever": "Aucune suppression automatique"
     },
     "retentionNote": "L'enregistrement ne suit pas la conservation des données de l'événement : sans durée, il reste, publié ou non, jusqu'à ce qu'on le supprime. La durée court à partir de la publication ou, si la vidéo n'est pas publiée, de la fin de l'événement ; à son échéance, la vidéo et ce qui en est tiré (transcriptions, synthèses, traductions) sont supprimés.",
+    "retentionLegacy": "Les inscrits à cet événement ont été informés qu'un enregistrement non publié est supprimé avec leurs données, {days, plural, one {# jour} many {# jours} other {# jours}} après la fin de l'événement. Tant que la vidéo n'est pas publiée, vous pouvez raccourcir cette durée, mais pas la supprimer ni l'allonger.",
     "delete": "Supprimer l'enregistrement",
     "deleteConfirm": "Êtes-vous sûr ? La vidéo sera définitivement supprimée. Les transcriptions, synthèses et traductions ne sont pas supprimées avec elle : elles suivent la durée de l'enregistrement choisie ici.",
     "notConfigured": "Jibri n'est pas configuré. L'enregistrement vidéo n'est pas disponible.",
@@ -6325,7 +6327,8 @@
     "sameLanguage": "La langue choisie est celle d'origine de l'enregistrement : choisissez-en une autre.",
     "recordingDestinationNotCovered": "Les consentements de cet événement valent pour un enregistrement réservé aux inscrits : vous ne pouvez pas le rendre visible par tous ni lier une vidéo externe.",
     "mtUnavailable": "La traduction automatique n'est pas installée sur cette instance.",
-    "recordingContentOrganizerOnly": "Seuls les organisateurs de cet événement peuvent ouvrir, modifier ou publier le contenu de ses enregistrements."
+    "recordingContentOrganizerOnly": "Seuls les organisateurs de cet événement peuvent ouvrir, modifier ou publier le contenu de ses enregistrements.",
+    "recordingRetentionLegacy": "Les inscrits à cet événement ont été informés qu'un enregistrement non publié est supprimé avec leurs données : tant que la vidéo n'est pas publiée, sa durée peut être raccourcie, mais pas supprimée ni allongée."
   },
   "recordingRemoval": {
     "cardTitle": "Contenu retiré sur demande",

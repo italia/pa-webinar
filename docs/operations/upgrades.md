@@ -79,6 +79,14 @@ one you run and the one you target. Releases follow semantic versioning; while t
 0, a minor release can change chart values and behavior. The GitHub Release also carries the SBOMs
 and the packaged chart.
 
+Some behavior changes are tied to the events that exist at the moment of the upgrade. For example,
+the release that separated the recording from the participants' data marks, in its migration, every
+event that is not a draft, so that a recording of those events that is not published still goes with
+the participants' data as their registrants were told; events created afterwards follow the new rule
+([Recording retention](../GDPR.md#recording-retention)). Such a migration runs once, at the upgrade
+that introduces it: events restored later from an older backup and migrated again are marked in the
+same way.
+
 Some behavior changes need no migration and no new value, yet change what the public sees on events
 that are already published: for example, which event materials a public page lists before the start.
 The release notes flag them. After such an upgrade, check the upcoming events with their organizers.

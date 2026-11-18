@@ -6030,9 +6030,11 @@
       "30d": "30 dagar",
       "90d": "90 dagar",
       "1y": "1 år",
+      "days": "{count, plural, one {# dag} other {# dagar}}",
       "forever": "Ingen automatisk radering"
     },
     "retentionNote": "Inspelningen följer inte lagringstiden för evenemangets data: utan en period finns den kvar, publicerad eller inte, tills någon raderar den. Perioden räknas från publiceringen eller, om videon inte är publicerad, från evenemangets slut; när den löper ut raderas videon och det som gjorts av den (transkriptioner, sammanfattningar, översättningar).",
+    "retentionLegacy": "De anmälda till det här evenemanget har fått veta att en inspelning som inte publiceras raderas tillsammans med deras uppgifter, {days, plural, one {# dag} other {# dagar}} efter att evenemanget har avslutats. Så länge videon inte är publicerad kan du förkorta perioden, men inte ta bort eller förlänga den.",
     "delete": "Radera inspelning",
     "deleteConfirm": "Är du säker? Videon raderas permanent. Transkriptioner, sammanfattningar och översättningar raderas inte med den: de följer den period för inspelningen som väljs här.",
     "notConfigured": "Jibri är inte konfigurerat. Videoinspelning är inte tillgänglig.",
@@ -6325,7 +6327,8 @@
     "sameLanguage": "Det valda språket är inspelningens originalspråk: välj ett annat.",
     "recordingDestinationNotCovered": "Samtyckena för det här evenemanget gäller en inspelning endast för anmälda: du kan inte göra den synlig för alla eller länka en extern video.",
     "mtUnavailable": "Maskinöversättning är inte installerad på den här instansen.",
-    "recordingContentOrganizerOnly": "Endast arrangörerna av det här evenemanget kan öppna, ändra eller publicera innehållet i dess inspelningar."
+    "recordingContentOrganizerOnly": "Endast arrangörerna av det här evenemanget kan öppna, ändra eller publicera innehållet i dess inspelningar.",
+    "recordingRetentionLegacy": "De anmälda till det här evenemanget har fått veta att en inspelning som inte publiceras raderas tillsammans med deras uppgifter: så länge videon inte är publicerad kan perioden förkortas, men inte tas bort eller förlängas."
   },
   "recordingRemoval": {
     "cardTitle": "Innehåll borttaget på begäran",

@@ -15,6 +15,7 @@
  * eleggibile alla cancellazione e da quando".
  */
 import type { TipoConsenso } from '@/lib/gdpr/consent-proofs';
+import { limiteDurataPrecedente } from '@/lib/recording/legacy-retention';
 
 const DAY_MS = 86_400_000;
 
@@ -137,6 +138,9 @@ export interface RecordingRetentionRow extends CleanupCandidateRow {
    *  pubblicata: l'ultima scelta della durata, l'ultima pubblicazione tolta,
    *  l'ultimo file agganciato. Null = dalla fine dell'evento. */
   recordingRetentionFrom: Date | null;
+  /** Evento nato prima della separazione dai dati (lib/recording/legacy-retention):
+   *  non pubblicata, scade al piu' tardi con i dati dei partecipanti. */
+  legacyRecordingRetention?: boolean | null;
 }
 
 /**
@@ -155,6 +159,12 @@ export interface RecordingRetentionRow extends CleanupCandidateRow {
  *    giro dopo, e un file caricato dopo la scadenza non se ne va prima che
  *    qualcuno lo veda.
  *
+ * Negli eventi nati prima di questa regola (`legacyRecordingRetention`) la
+ * registrazione non pubblicata scade al piu' tardi alla conservazione dei dati,
+ * contata dallo stesso inizio e senza `recordingRetentionFrom`: a chi si e'
+ * iscritto si era detto che il video non pubblicato se ne va con i suoi dati
+ * (lib/recording/legacy-retention). Una durata piu' corta vale.
+ *
  * Un video pubblicato senza la data di pubblicazione (scritto direttamente nel
  * database) non scade: non sappiamo da quando contare, e qui l'errore costa un
  * video che la pagina evento sta ancora linkando. Una bozza non scade mai.
@@ -166,6 +176,16 @@ export interface RecordingRetentionRow extends CleanupCandidateRow {
  * ogni registrazione.
  */
 export function recordingExpiresAt(evt: RecordingRetentionRow): Date | null {
+  const scelta = scadenzaScelta(evt);
+  const limite = limiteDurataPrecedente(evt);
+  const inizio = limite === null ? null : inizioConservazione(evt);
+  if (limite === null || !inizio) return scelta;
+  const promessa = new Date(inizio.getTime() + limite * DAY_MS);
+  return scelta && scelta.getTime() < promessa.getTime() ? scelta : promessa;
+}
+
+/** La scadenza della durata scelta da chi organizza (`recordingExpiresAt`). */
+function scadenzaScelta(evt: RecordingRetentionRow): Date | null {
   if (!evt.recordingDeleteAfterDays) return null;
   const durata = evt.recordingDeleteAfterDays * DAY_MS;
   if (evt.recordingPublished) {

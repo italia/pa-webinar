@@ -73,6 +73,9 @@ assessment belongs to the controller of each installation.
   retention: published or not, it stays until someone deletes it, or until the
   period its organizers chose ends (`recordingDeleteAfterDays`, counted from
   publication while the video is published, otherwise from the event's end).
+  On an event created before this rule, a video that is not published still
+  goes with the participants' data, as its registrants were told
+  ([Recording retention](../GDPR.md#recording-retention)).
   The participants' data around it, per-participant tracks included, still
   goes at the event's retention.
 - The content of a recording (video, voices, transcripts, summaries, report,

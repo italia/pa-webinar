@@ -6030,9 +6030,11 @@
       "30d": "30 päivää",
       "90d": "90 päivää",
       "1y": "1 vuosi",
+      "days": "{count, plural, one {# päivä} other {# päivää}}",
       "forever": "Ei automaattista poistoa"
     },
     "retentionNote": "Tallenne ei noudata tapahtuman tietojen säilytysaikaa: ilman määräaikaa se säilyy, julkaistuna tai ei, kunnes joku poistaa sen. Määräaika lasketaan julkaisusta tai, jos videota ei ole julkaistu, tapahtuman päättymisestä; kun se umpeutuu, video ja siitä tehty aineisto (litteroinnit, tiivistelmät, käännökset) poistetaan.",
+    "retentionLegacy": "Tähän tapahtumaan ilmoittautuneille kerrottiin, että julkaisematon tallenne poistetaan heidän tietojensa mukana {days, plural, one {# päivä} other {# päivää}} tapahtuman päättymisen jälkeen. Niin kauan kuin videota ei ole julkaistu, voit lyhentää aikaa, mutta et poistaa tai pidentää sitä.",
     "delete": "Poista tallenne",
     "deleteConfirm": "Oletko varma? Video poistetaan pysyvästi. Litterointeja, tiivistelmiä ja käännöksiä ei poisteta sen mukana: ne noudattavat tässä valittua tallenteen määräaikaa.",
     "notConfigured": "Jibri ei ole määritetty. Videotallennus ei ole käytettävissä.",
@@ -6325,7 +6327,8 @@
     "sameLanguage": "Valittu kieli on tallenteen alkuperäinen kieli: valitse toinen.",
     "recordingDestinationNotCovered": "Tämän tapahtuman suostumukset koskevat tallennetta, joka on vain ilmoittautuneille: et voi tehdä siitä kaikille näkyvää etkä liittää ulkoista videota.",
     "mtUnavailable": "Konekäännöstä ei ole asennettu tähän instanssiin.",
-    "recordingContentOrganizerOnly": "Vain tämän tapahtuman järjestäjät voivat avata, muuttaa tai julkaista sen tallenteiden sisällön."
+    "recordingContentOrganizerOnly": "Vain tämän tapahtuman järjestäjät voivat avata, muuttaa tai julkaista sen tallenteiden sisällön.",
+    "recordingRetentionLegacy": "Tähän tapahtumaan ilmoittautuneille kerrottiin, että julkaisematon tallenne poistetaan heidän tietojensa mukana: niin kauan kuin videota ei ole julkaistu, säilytysaikaa voi lyhentää, mutta ei poistaa tai pidentää."
   },
   "recordingRemoval": {
     "cardTitle": "Sisältö poistettu pyynnöstä",

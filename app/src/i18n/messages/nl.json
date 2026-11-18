@@ -6030,9 +6030,11 @@
       "30d": "30 dagen",
       "90d": "90 dagen",
       "1y": "1 jaar",
+      "days": "{count, plural, one {# dag} other {# dagen}}",
       "forever": "Geen automatische verwijdering"
     },
     "retentionNote": "De opname volgt de bewaartermijn van de evenementgegevens niet: zonder termijn blijft ze, gepubliceerd of niet, bewaard tot iemand haar verwijdert. De termijn loopt vanaf de publicatie of, als de video niet gepubliceerd is, vanaf het einde van het evenement; daarna worden de video en wat ervan is gemaakt (transcripties, samenvattingen, vertalingen) verwijderd.",
+    "retentionLegacy": "Aan de ingeschrevenen voor dit evenement is gezegd dat een niet-gepubliceerde opname samen met hun gegevens wordt verwijderd, {days, plural, one {# dag} other {# dagen}} na het einde van het evenement. Zolang de video niet is gepubliceerd, kun je deze termijn inkorten, maar niet weghalen of verlengen.",
     "delete": "Opname verwijderen",
     "deleteConfirm": "Weet u het zeker? De video wordt definitief verwijderd. Transcripties, samenvattingen en vertalingen worden niet samen met de video verwijderd: ze volgen de hier gekozen termijn van de opname.",
     "notConfigured": "Jibri is niet geconfigureerd in de infrastructuur. Video-opname is niet beschikbaar.",
@@ -6325,7 +6327,8 @@
     "sameLanguage": "De gekozen taal is de oorspronkelijke taal van de opname: kies een andere.",
     "recordingDestinationNotCovered": "De toestemmingen voor dit evenement gelden voor een opname alleen voor ingeschrevenen: je kunt haar niet voor iedereen zichtbaar maken en geen externe video koppelen.",
     "mtUnavailable": "Automatische vertaling is niet geïnstalleerd op deze instantie.",
-    "recordingContentOrganizerOnly": "Alleen de organisatoren van dit evenement kunnen de inhoud van de opnamen openen, wijzigen of publiceren."
+    "recordingContentOrganizerOnly": "Alleen de organisatoren van dit evenement kunnen de inhoud van de opnamen openen, wijzigen of publiceren.",
+    "recordingRetentionLegacy": "Aan de ingeschrevenen voor dit evenement is gezegd dat een niet-gepubliceerde opname samen met hun gegevens wordt verwijderd: zolang de video niet is gepubliceerd, kan de termijn worden ingekort, maar niet weggehaald of verlengd."
   },
   "recordingRemoval": {
     "cardTitle": "Inhoud op verzoek verwijderd",

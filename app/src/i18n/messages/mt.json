@@ -6030,9 +6030,11 @@
       "30d": "30 ġurnata",
       "90d": "90 ġurnata",
       "1y": "1 sena",
+      "days": "{count, plural, one {# ġurnata} two {# ġranet} few {# ġranet} many {# ġurnata} other {# ġurnata}}",
       "forever": "L-ebda tħassir awtomatiku"
     },
     "retentionNote": "Ir-rekording ma jsegwix iż-żamma tad-data tal-avveniment: mingħajr perjodu jibqa', ippubblikat jew le, sakemm xi ħadd iħassru. Il-perjodu jgħodd mill-pubblikazzjoni jew, jekk il-vidjo mhuwiex ippubblikat, mit-tmiem tal-avveniment; meta jiskadi, jitħassru l-vidjo u dak li jsir minnu (traskrizzjonijiet, sommarji, traduzzjonijiet).",
+    "retentionLegacy": "Lil min irreġistra għal dan l-avveniment intqallu li rekording mhux ippubblikat jitħassar flimkien mad-dejta tagħhom, {days, plural, one {# ġurnata} two {# ġranet} few {# ġranet} many {#-il ġurnata} other {# ġurnata}} wara t-tmiem tal-avveniment. Sakemm il-vidjo ma jkunx ippubblikat, tista' tqassar dan il-perjodu, iżda mhux tneħħih jew ittawwlu.",
     "delete": "Ħassar ir-reġistrazzjoni",
     "deleteConfirm": "Żgur? Il-vidjo se jiġi mħassar definittivament. It-traskrizzjonijiet, is-sommarji u t-traduzzjonijiet ma jitħassrux miegħu: isegwu l-perjodu tar-rekording magħżul hawn.",
     "notConfigured": "Jibri mhux ikkonfigurat. Ir-reġistrazzjoni bil-vidjo mhijiex disponibbli.",
@@ -6325,7 +6327,8 @@
     "sameLanguage": "Il-lingwa magħżula hija l-lingwa oriġinali tar-reġistrazzjoni: agħżel oħra.",
     "recordingDestinationNotCovered": "Il-kunsensi ta' dan l-avveniment jgħoddu għal rekording riservat għar-reġistrati: ma tistax tagħmlu viżibbli għal kulħadd u lanqas torbot vidjo estern.",
     "mtUnavailable": "It-traduzzjoni awtomatika mhijiex installata f'din l-istanza.",
-    "recordingContentOrganizerOnly": "L-organizzaturi ta’ dan l-avveniment biss jistgħu jiftħu, ibiddlu jew jippubblikaw il-kontenut tar-reġistrazzjonijiet tiegħu."
+    "recordingContentOrganizerOnly": "L-organizzaturi ta’ dan l-avveniment biss jistgħu jiftħu, ibiddlu jew jippubblikaw il-kontenut tar-reġistrazzjonijiet tiegħu.",
+    "recordingRetentionLegacy": "Lil min irreġistra għal dan l-avveniment intqallu li rekording mhux ippubblikat jitħassar flimkien mad-dejta tagħhom: sakemm il-vidjo ma jkunx ippubblikat, il-perjodu tiegħu jista' jitqassar, iżda mhux jitneħħa jew jittawwal."
   },
   "recordingRemoval": {
     "cardTitle": "Kontenut imneħħi fuq talba",

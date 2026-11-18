@@ -890,7 +890,11 @@ stateDiagram-v2
   until someone deletes it. It counts from publication while the video is
   published and from the event's end otherwise, never before the period was
   chosen, the video unpublished or removed, or a new file attached
-  (`Event.recordingRetentionFrom`); removing the video does not reset it, and at its end the cleanup deletes the files of every session and
+  (`Event.recordingRetentionFrom`); removing the video does not reset it. On
+  an event created before this rule (`Event.legacyRecordingRetention`) a video
+  that is not published goes at the latest with the participants' data, and
+  the period can only be shortened (`lib/recording/legacy-retention.ts`). At
+  its end the cleanup deletes the files of every session and
   hands the outputs to `postprod-retention`
   ([Recording retention](../GDPR.md#recording-retention)). For as long as the
   recording exists, the proofs of its consents outlive the registrations

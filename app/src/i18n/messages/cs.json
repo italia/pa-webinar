@@ -6030,9 +6030,11 @@
       "30d": "30 dní",
       "90d": "90 dní",
       "1y": "1 rok",
+      "days": "{count, plural, one {# den} few {# dny} many {# dne} other {# dní}}",
       "forever": "Bez automatického smazání"
     },
     "retentionNote": "Záznam se neřídí dobou uchování údajů události: bez stanovené doby zůstane, zveřejněný i nezveřejněný, dokud ho někdo nesmaže. Doba se počítá od zveřejnění, nebo, pokud video zveřejněno není, od skončení události; po jejím uplynutí se smaže video i to, co z něj vzniklo (přepisy, shrnutí, překlady).",
+    "retentionLegacy": "Registrovaným na tuto akci bylo řečeno, že nezveřejněný záznam se smaže spolu s jejich údaji, {days, plural, one {# den} few {# dny} many {# dne} other {# dní}} po skončení akce. Dokud video není zveřejněno, můžete tuto dobu zkrátit, ale ne zrušit ani prodloužit.",
     "delete": "Smazat záznam",
     "deleteConfirm": "Jste si jisti? Video bude trvale smazáno. Přepisy, shrnutí a překlady se s ním nesmažou: řídí se dobou záznamu zvolenou zde.",
     "notConfigured": "Jibri není nakonfigurován. Videozáznam není k dispozici.",
@@ -6325,7 +6327,8 @@
     "sameLanguage": "Zvolený jazyk je původní jazyk záznamu: vyberte jiný.",
     "recordingDestinationNotCovered": "Souhlasy k této akci platí pro záznam jen pro registrované: nemůžete ho zpřístupnit všem ani připojit externí video.",
     "mtUnavailable": "Strojový překlad není na této instanci nainstalován.",
-    "recordingContentOrganizerOnly": "Obsah záznamů této akce mohou otevírat, měnit nebo zveřejňovat jen její organizátoři."
+    "recordingContentOrganizerOnly": "Obsah záznamů této akce mohou otevírat, měnit nebo zveřejňovat jen její organizátoři.",
+    "recordingRetentionLegacy": "Registrovaným na tuto akci bylo řečeno, že nezveřejněný záznam se smaže spolu s jejich údaji: dokud video není zveřejněno, jeho dobu uchování lze zkrátit, ale ne zrušit ani prodloužit."
   },
   "recordingRemoval": {
     "cardTitle": "Obsah odstraněn na žádost",

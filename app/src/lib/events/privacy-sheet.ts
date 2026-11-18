@@ -25,6 +25,7 @@ import {
   tracceDisponibili,
 } from '@/lib/recording/availability';
 import { destinazioneDelTesto } from '@/lib/recording/destination';
+import { durataEffettiva } from '@/lib/recording/legacy-retention';
 import {
   traccePerPersonaConservate,
   trascrizioneDalVideo,
@@ -185,7 +186,10 @@ export type EventoScheda = Pick<
   | 'dataRetentionDays'
   | 'recordingDeleteAfterDays'
   | 'offerAddressBook'
->;
+> &
+  // Gli eventi nati prima della regola (lib/recording/legacy-retention): la
+  // registrazione non pubblicata se ne va al piu' tardi con i dati.
+  Partial<Pick<Event, 'legacyRecordingRetention' | 'recordingPublished'>>;
 
 /**
  * Campi obbligatori di proposito: `addressBookEnabled` non e' tra le impostazioni
@@ -301,7 +305,13 @@ export function schedaPrivacy({
       // lib/gdpr/cleanup-selection lo ignora.
       registrazione:
         video || modo === 'soloTracce' || ambiente.trascrizioneSottotitoli
-          ? { giorni: evento.recordingDeleteAfterDays || null, video }
+          ? {
+              giorni: durataEffettiva({
+                ...evento,
+                recordingPublished: evento.recordingPublished ?? false,
+              }),
+              video,
+            }
           : null,
     },
     rubrica: rubricaProposta(evento, sito) ? { mesi: MESI_RUBRICA_PREDEFINITI } : null,

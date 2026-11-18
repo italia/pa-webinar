@@ -6030,9 +6030,11 @@
       "30d": "30 päeva",
       "90d": "90 päeva",
       "1y": "1 aasta",
+      "days": "{count, plural, one {# päev} other {# päeva}}",
       "forever": "Automaatset kustutamist pole"
     },
     "retentionNote": "Salvestis ei järgi ürituse andmete säilitamisaega: ilma tähtajata jääb see alles, avaldatud või mitte, kuni keegi selle kustutab. Tähtaeg loetakse avaldamisest või, kui video pole avaldatud, ürituse lõpust; kui see möödub, kustutatakse video ja sellest tehtu (transkriptsioonid, kokkuvõtted, tõlked).",
+    "retentionLegacy": "Selle ürituse registreerunutele öeldi, et avaldamata salvestis kustutatakse koos nende andmetega {days, plural, one {# päev} other {# päeva}} pärast ürituse lõppu. Kuni video pole avaldatud, saad seda aega lühendada, kuid mitte eemaldada ega pikendada.",
     "delete": "Kustuta salvestis",
     "deleteConfirm": "Kas olete kindel? Video kustutatakse jäädavalt. Transkriptsioone, kokkuvõtteid ja tõlkeid koos sellega ei kustutata: need järgivad siin valitud salvestise tähtaega.",
     "notConfigured": "Jibri pole infrastruktuuris seadistatud. Videosalvestamine pole saadaval.",
@@ -6325,7 +6327,8 @@
     "sameLanguage": "Valitud keel on salvestuse algkeel: vali mõni muu.",
     "recordingDestinationNotCovered": "Selle ürituse nõusolekud kehtivad salvestisele, mis on ainult registreerunutele: sa ei saa seda kõigile nähtavaks teha ega välist videot linkida.",
     "mtUnavailable": "Masintõlge ei ole selles eksemplaris paigaldatud.",
-    "recordingContentOrganizerOnly": "Selle ürituse salvestiste sisu saavad avada, muuta või avaldada ainult selle korraldajad."
+    "recordingContentOrganizerOnly": "Selle ürituse salvestiste sisu saavad avada, muuta või avaldada ainult selle korraldajad.",
+    "recordingRetentionLegacy": "Selle ürituse registreerunutele öeldi, et avaldamata salvestis kustutatakse koos nende andmetega: kuni video pole avaldatud, saab selle aega lühendada, kuid mitte eemaldada ega pikendada."
   },
   "recordingRemoval": {
     "cardTitle": "Sisu eemaldatud taotluse alusel",

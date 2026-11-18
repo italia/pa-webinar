@@ -38,7 +38,8 @@ export type ApiErrorKey =
   | 'sameLanguage'
   | 'mtUnavailable'
   | 'recordingDestinationNotCovered'
-  | 'recordingContentOrganizerOnly';
+  | 'recordingContentOrganizerOnly'
+  | 'recordingRetentionLegacy';
 
 /** I codici d'errore che le rotte usano per le condizioni sopra. */
 export const API_ERROR_CODES = {
@@ -58,6 +59,7 @@ export const API_ERROR_CODES = {
   MT_UNAVAILABLE: 'mtUnavailable',
   RECORDING_DESTINATION_NOT_COVERED: 'recordingDestinationNotCovered',
   RECORDING_CONTENT_ORGANIZER_ONLY: 'recordingContentOrganizerOnly',
+  RECORDING_RETENTION_LEGACY: 'recordingRetentionLegacy',
 } as const satisfies Record<string, ApiErrorKey>;
 
 const PER_STATO: Partial<Record<number, ApiErrorKey>> = {

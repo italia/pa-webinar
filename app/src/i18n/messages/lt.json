@@ -6030,9 +6030,11 @@
       "30d": "30 dienų",
       "90d": "90 dienų",
       "1y": "1 metai",
+      "days": "{count, plural, one {# diena} few {# dienos} many {# dienos} other {# dienų}}",
       "forever": "Be automatinio ištrynimo"
     },
     "retentionNote": "Įrašui netaikomas renginio duomenų saugojimo laikotarpis: nenustačius laikotarpio jis lieka, paskelbtas ar ne, kol kas nors jį ištrins. Laikotarpis skaičiuojamas nuo paskelbimo arba, jei vaizdo įrašas nepaskelbtas, nuo renginio pabaigos; jam pasibaigus ištrinamas vaizdo įrašas ir tai, kas iš jo parengta (transkripcijos, santraukos, vertimai).",
+    "retentionLegacy": "Užsiregistravusiems į šį renginį buvo pasakyta, kad nepaskelbtas įrašas ištrinamas kartu su jų duomenimis, praėjus {days, plural, one {# dienai} few {# dienoms} many {# dienos} other {# dienų}} nuo renginio pabaigos. Kol vaizdo įrašas nepaskelbtas, šį laikotarpį galite sutrumpinti, bet ne panaikinti ar pratęsti.",
     "delete": "Ištrinti įrašą",
     "deleteConfirm": "Ar esate tikri? Vaizdo įrašas bus ištrintas negrįžtamai. Transkripcijos, santraukos ir vertimai kartu su juo neištrinami: jiems taikomas čia pasirinktas įrašo laikotarpis.",
     "notConfigured": "Jibri nesukonfigūruotas infrastruktūroje. Vaizdo įrašymas neprieinamas.",
@@ -6325,7 +6327,8 @@
     "sameLanguage": "Pasirinkta kalba yra originali įrašo kalba: pasirinkite kitą.",
     "recordingDestinationNotCovered": "Šio renginio sutikimai galioja įrašui tik užsiregistravusiems: negalite padaryti jo matomo visiems ar susieti išorinio vaizdo įrašo.",
     "mtUnavailable": "Šioje diegtyje mašininis vertimas neįdiegtas.",
-    "recordingContentOrganizerOnly": "Tik šio renginio organizatoriai gali atidaryti, keisti ar skelbti jo įrašų turinį."
+    "recordingContentOrganizerOnly": "Tik šio renginio organizatoriai gali atidaryti, keisti ar skelbti jo įrašų turinį.",
+    "recordingRetentionLegacy": "Užsiregistravusiems į šį renginį buvo pasakyta, kad nepaskelbtas įrašas ištrinamas kartu su jų duomenimis: kol vaizdo įrašas nepaskelbtas, jo laikotarpį galima sutrumpinti, bet ne panaikinti ar pratęsti."
   },
   "recordingRemoval": {
     "cardTitle": "Turinys pašalintas pagal prašymą",

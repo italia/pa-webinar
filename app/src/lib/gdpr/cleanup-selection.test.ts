@@ -162,6 +162,47 @@ describe('isRecordingRetentionExpired', () => {
     ).toBeNull();
   });
 
+  describe('negli eventi nati prima della regola', () => {
+    const vecchio = { ...evento, legacyRecordingRetention: true };
+
+    it('non pubblicata scade con i dati, anche senza una durata', () => {
+      // Concluso 40 giorni fa, dati per 30: la promessa era la fine dei dati.
+      expect(recordingExpiresAt(vecchio)).toEqual(daysFromNow(-10));
+      expect(isRecordingRetentionExpired(vecchio, NOW)).toBe(true);
+    });
+
+    it('una durata piu’ lunga, o una scelta recente, non la allunga', () => {
+      expect(recordingExpiresAt({ ...vecchio, recordingDeleteAfterDays: 365 })).toEqual(
+        daysFromNow(-10)
+      );
+      expect(
+        recordingExpiresAt({
+          ...vecchio,
+          recordingDeleteAfterDays: 7,
+          recordingRetentionFrom: daysFromNow(-1),
+        })
+      ).toEqual(daysFromNow(-10));
+    });
+
+    it('una durata piu’ corta vale', () => {
+      const corto = { ...vecchio, endsAt: daysFromNow(-5), recordingDeleteAfterDays: 1 };
+      expect(recordingExpiresAt(corto)).toEqual(daysFromNow(-4));
+    });
+
+    it('pubblicata segue la sua durata dalla pubblicazione, come prima', () => {
+      expect(recordingExpiresAt({ ...pubblicato(3, 30), legacyRecordingRetention: true })).toEqual(
+        daysFromNow(27)
+      );
+      expect(
+        recordingExpiresAt({ ...pubblicato(400, null), legacyRecordingRetention: true })
+      ).toBeNull();
+    });
+
+    it('di una bozza non scade mai', () => {
+      expect(recordingExpiresAt({ ...vecchio, status: 'DRAFT' })).toBeNull();
+    });
+  });
+
   it('tratta 0 giorni come "nessuna scadenza", non come "cancella subito"', () => {
     // L'API valida min(1) (lib/validation/schemas.ts), quindi uno 0 arriva solo
     // da un default o da una scrittura diretta. Leggerlo come "scaduto

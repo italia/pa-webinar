@@ -6030,9 +6030,11 @@
       "30d": "30 dage",
       "90d": "90 dage",
       "1y": "1 år",
+      "days": "{count, plural, one {# dag} other {# dage}}",
       "forever": "Ingen automatisk sletning"
     },
     "retentionNote": "Optagelsen følger ikke opbevaringen af begivenhedens data: uden en periode forbliver den, offentliggjort eller ej, indtil nogen sletter den. Perioden regnes fra offentliggørelsen eller, hvis videoen ikke er offentliggjort, fra begivenhedens afslutning; når den udløber, slettes videoen og det, der er lavet ud fra den (transskriptioner, resuméer, oversættelser).",
+    "retentionLegacy": "De tilmeldte til dette arrangement har fået at vide, at en optagelse, der ikke er offentliggjort, slettes sammen med deres data {days, plural, one {# dag} other {# dage}} efter arrangementets afslutning. Så længe videoen ikke er offentliggjort, kan du forkorte perioden, men ikke fjerne eller forlænge den.",
     "delete": "Slet optagelse",
     "deleteConfirm": "Er du sikker? Videoen slettes permanent. Transskriptioner, resuméer og oversættelser slettes ikke sammen med den: de følger den periode for optagelsen, der er valgt her.",
     "notConfigured": "Jibri er ikke konfigureret. Videooptagelse er ikke tilgængelig.",
@@ -6325,7 +6327,8 @@
     "sameLanguage": "Det valgte sprog er optagelsens originalsprog: vælg et andet.",
     "recordingDestinationNotCovered": "Samtykkerne til dette arrangement gælder en optagelse kun for tilmeldte: du kan ikke gøre den synlig for alle eller tilknytte en ekstern video.",
     "mtUnavailable": "Maskinoversættelse er ikke installeret på denne instans.",
-    "recordingContentOrganizerOnly": "Kun arrangørerne af dette arrangement kan åbne, ændre eller udgive indholdet af dets optagelser."
+    "recordingContentOrganizerOnly": "Kun arrangørerne af dette arrangement kan åbne, ændre eller udgive indholdet af dets optagelser.",
+    "recordingRetentionLegacy": "De tilmeldte til dette arrangement har fået at vide, at en optagelse, der ikke er offentliggjort, slettes sammen med deres data: så længe videoen ikke er offentliggjort, kan perioden forkortes, men ikke fjernes eller forlænges."
   },
   "recordingRemoval": {
     "cardTitle": "Indhold fjernet efter anmodning",

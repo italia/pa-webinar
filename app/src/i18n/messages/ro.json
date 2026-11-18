@@ -6030,9 +6030,11 @@
       "30d": "30 zile",
       "90d": "90 zile",
       "1y": "1 an",
+      "days": "{count, plural, one {# zi} few {# zile} other {# de zile}}",
       "forever": "Fără ștergere automată"
     },
     "retentionNote": "Înregistrarea nu urmează perioada de păstrare a datelor evenimentului: fără o durată rămâne, publicată sau nu, până când cineva o șterge. Durata se socotește de la publicare sau, dacă videoclipul nu este publicat, de la încheierea evenimentului; la expirare se șterg videoclipul și ce rezultă din el (transcrieri, rezumate, traduceri).",
+    "retentionLegacy": "Celor înscriși la acest eveniment li s-a spus că o înregistrare nepublicată se șterge împreună cu datele lor, la {days, plural, one {# zi} few {# zile} other {# de zile}} după încheierea evenimentului. Cât timp videoclipul nu este publicat, poți scurta această perioadă, dar nu o poți elimina sau prelungi.",
     "delete": "Ștergeți înregistrarea",
     "deleteConfirm": "Sigur doriți? Videoclipul va fi șters definitiv. Transcrierile, rezumatele și traducerile nu se șterg odată cu el: urmează durata înregistrării aleasă aici.",
     "notConfigured": "Jibri nu este configurat în infrastructură. Înregistrarea video nu este disponibilă.",
@@ -6325,7 +6327,8 @@
     "sameLanguage": "Limba aleasă este cea originală a înregistrării: alege alta.",
     "recordingDestinationNotCovered": "Consimțămintele acestui eveniment sunt valabile pentru o înregistrare rezervată înscrișilor: nu o poți face vizibilă pentru toți și nici nu poți lega un videoclip extern.",
     "mtUnavailable": "Traducerea automată nu este instalată pe această instanță.",
-    "recordingContentOrganizerOnly": "Doar organizatorii acestui eveniment pot deschide, modifica sau publica conținutul înregistrărilor sale."
+    "recordingContentOrganizerOnly": "Doar organizatorii acestui eveniment pot deschide, modifica sau publica conținutul înregistrărilor sale.",
+    "recordingRetentionLegacy": "Celor înscriși la acest eveniment li s-a spus că o înregistrare nepublicată se șterge împreună cu datele lor: cât timp videoclipul nu este publicat, perioada ei poate fi scurtată, dar nu eliminată sau prelungită."
   },
   "recordingRemoval": {
     "cardTitle": "Conținut eliminat la cerere",

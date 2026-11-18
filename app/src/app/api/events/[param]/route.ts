@@ -67,6 +67,7 @@ import {
 } from '@/lib/recording/destination';
 import { videoDellApp, videoPerTutti } from '@/lib/recording/audience';
 import { organizzaEvento } from '@/lib/recording/content-access';
+import { durataAmmessa } from '@/lib/recording/legacy-retention';
 import { assertVideoDellEvento, assertVideoNelloStorage } from '@/lib/storage/recordings';
 import { annullaEmailInCoda } from '@/lib/email/outbox';
 
@@ -144,6 +145,7 @@ export const GET = withErrorHandling(async (request, context) => {
       recordingFileSize: event.recordingFileSize ? Number(event.recordingFileSize) : null,
       recordingDuration: event.recordingDuration,
       recordingDeleteAfterDays: event.recordingDeleteAfterDays,
+      legacyRecordingRetention: event.legacyRecordingRetention,
       postEventPublic: event.postEventPublic,
       postEventPublicUntil: event.postEventPublicUntil?.toISOString() ?? null,
       postEventShowQA: event.postEventShowQA,
@@ -329,6 +331,29 @@ export const PUT = withErrorHandling(async (request, context) => {
     if (!staff || !(await organizzaEvento(staff, eventId))) {
       throw new ForbiddenError('Only the event organizers can change how long the recording is kept');
     }
+  }
+  // Negli eventi nati prima che la registrazione si separasse dai dati si era
+  // detto che il video non pubblicato se ne va con i dati: finche' non e'
+  // pubblicato la durata si accorcia, non si toglie ne' si allunga
+  // (lib/recording/legacy-retention). La pulizia tiene comunque la promessa.
+  if (
+    data.recordingDeleteAfterDays !== undefined &&
+    data.recordingDeleteAfterDays !== event.recordingDeleteAfterDays &&
+    !durataAmmessa(
+      {
+        legacyRecordingRetention: event.legacyRecordingRetention,
+        recordingPublished:
+          data.recordingUrl === null ? false : (data.recordingPublished ?? event.recordingPublished),
+        dataRetentionDays: data.dataRetentionDays ?? event.dataRetentionDays,
+      },
+      data.recordingDeleteAfterDays
+    )
+  ) {
+    throw new AppError(
+      'An unpublished recording of this event goes with the participants\' data: its period can only be shortened',
+      422,
+      'RECORDING_RETENTION_LEGACY'
+    );
   }
 
   // Le etichette le manda il wizard a ogni salvataggio, l'elenco intero: si

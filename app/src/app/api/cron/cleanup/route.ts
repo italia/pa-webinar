@@ -144,10 +144,19 @@ export const GET = withErrorHandling(async (request) => {
   // (fasi 3 e 4). Il link esterno resta: la piattaforma non lo cancella.
   // Si cercano solo gli eventi in cui resta qualcosa da cancellare: dopo il
   // giro l'evento esce dalla selezione da solo, e la durata resta sull'evento
-  // per cio' che verra' dopo.
+  // per cio' che verra' dopo. Gli eventi nati prima di questa regola scadono
+  // anche senza una durata, finche' il video non e' pubblicato: si era detto
+  // che se ne va con i dati (lib/recording/legacy-retention).
   const recordingRetentionEvents = await prisma.event.findMany({
     where: {
-      recordingDeleteAfterDays: { not: null },
+      AND: [
+        {
+          OR: [
+            { recordingDeleteAfterDays: { not: null } },
+            { legacyRecordingRetention: true, recordingPublished: false },
+          ],
+        },
+      ],
       OR: [
         { recordingUrl: { not: null } },
         { tempRecordingUrl: { not: null } },
@@ -179,6 +188,7 @@ export const GET = withErrorHandling(async (request) => {
       recordingPublishedAt: true,
       recordingDeleteAfterDays: true,
       recordingRetentionFrom: true,
+      legacyRecordingRetention: true,
       callSessions: {
         where: { OR: [{ recordingUrl: { not: null } }, { recordingFilename: { not: null } }] },
         select: { recordingUrl: true, recordingFilename: true },

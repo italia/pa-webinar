@@ -194,6 +194,7 @@ export default async function EventManagePage({
     recordingFileSize: event.recordingFileSize ? Number(event.recordingFileSize) : null,
     recordingDuration: event.recordingDuration,
     recordingDeleteAfterDays: event.recordingDeleteAfterDays,
+    legacyRecordingRetention: event.legacyRecordingRetention,
     youtubeUrl: event.youtubeUrl,
     libraryListed: event.libraryListed,
     // A Recording ROW exists (live capture happened) → the AI pipeline can run.

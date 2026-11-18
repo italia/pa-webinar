@@ -6030,9 +6030,11 @@
       "30d": "30 lá",
       "90d": "90 lá",
       "1y": "1 bhliain",
+      "days": "{count, plural, one {# lá} two {# lá} few {# lá} many {# lá} other {# lá}}",
       "forever": "Gan scriosadh uathoibríoch"
     },
     "retentionNote": "Ní leanann an taifeadadh coinneáil sonraí an imeachta: gan tréimhse fanann sé, foilsithe nó nach ea, go dtí go scriosann duine é. Áirítear an tréimhse ón bhfoilsiú nó, mura bhfuil an físeán foilsithe, ó dheireadh an imeachta; nuair a théann sí in éag, scriostar an físeán agus a ndéantar as (tras-scríbhinní, achoimrí, aistriúcháin).",
+    "retentionLegacy": "Dúradh leis na daoine a chláraigh don imeacht seo go scriostar taifeadadh nach bhfoilsítear in éineacht lena sonraí, {days, plural, one {# lá} two {# lá} few {# lá} many {# lá} other {# lá}} tar éis dheireadh an imeachta. Fad nach bhfuil an físeán foilsithe, is féidir leat an tréimhse seo a ghiorrú, ach ní féidir í a bhaint ná a fhadú.",
     "delete": "Scrios taifeadadh",
     "deleteConfirm": "An bhfuil sibh cinnte? Scriosfar an físeán go buan. Ní scriostar na tras-scríbhinní, na hachoimrí ná na haistriúcháin leis: leanann siad tréimhse an taifeadta a roghnaítear anseo.",
     "notConfigured": "Níl Jibri cumraithe. Níl taifeadadh físe ar fáil.",
@@ -6325,7 +6327,8 @@
     "sameLanguage": "Is í an teanga a roghnaigh tú bunteanga an taifeadta: roghnaigh ceann eile.",
     "recordingDestinationNotCovered": "Baineann toilithe an imeachta seo le taifeadadh do dhaoine cláraithe amháin: ní féidir leat é a chur le feiceáil ag cách ná físeán seachtrach a nascadh.",
     "mtUnavailable": "Níl meaistriúchán suiteáilte ar an ásc seo.",
-    "recordingContentOrganizerOnly": "Ní féidir ach le heagraithe an imeachta seo ábhar a thaifeadtaí a oscailt, a athrú nó a fhoilsiú."
+    "recordingContentOrganizerOnly": "Ní féidir ach le heagraithe an imeachta seo ábhar a thaifeadtaí a oscailt, a athrú nó a fhoilsiú.",
+    "recordingRetentionLegacy": "Dúradh leis na daoine a chláraigh don imeacht seo go scriostar taifeadadh nach bhfoilsítear in éineacht lena sonraí: fad nach bhfuil an físeán foilsithe, is féidir a thréimhse a ghiorrú, ach ní féidir í a bhaint ná a fhadú."
   },
   "recordingRemoval": {
     "cardTitle": "Ábhar bainte ar iarratas",

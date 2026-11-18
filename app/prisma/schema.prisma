@@ -209,6 +209,13 @@ model Event {
   // Cosi' nessuna di queste scelte cancella la registrazione al giro dopo.
   // Null: conta dalla fine dell'evento.
   recordingRetentionFrom   DateTime? @map("recording_retention_from")
+  // Evento nato prima che la registrazione si separasse dai dati dei
+  // partecipanti: a chi si e' iscritto si e' detto che un video non pubblicato
+  // si cancella con i loro dati. Finche' il video non e' pubblicato la
+  // registrazione scade al piu' tardi con la conservazione dei dati
+  // (lib/recording/legacy-retention), e la durata si puo' solo accorciare. La
+  // migrazione lo accende su ogni evento non in bozza che c'era; non si copia.
+  legacyRecordingRetention Boolean   @default(false) @map("legacy_recording_retention")
 
   // Optional YouTube URL for legacy / mirrored recordings. When set, the
   // public video library prefers the embed over the self-hosted blob —

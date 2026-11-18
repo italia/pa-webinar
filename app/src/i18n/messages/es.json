@@ -6030,9 +6030,11 @@
       "30d": "30 días",
       "90d": "90 días",
       "1y": "1 año",
+      "days": "{count, plural, one {# día} other {# días}}",
       "forever": "Sin eliminación automática"
     },
     "retentionNote": "La grabación no sigue la conservación de los datos del evento: sin un plazo permanece, publicada o no, hasta que alguien la elimine. El plazo cuenta desde la publicación o, si el vídeo no está publicado, desde el final del evento; al vencer, se eliminan el vídeo y lo que se obtiene de él (transcripciones, resúmenes, traducciones).",
+    "retentionLegacy": "A los inscritos en este evento se les dijo que una grabación no publicada se elimina con sus datos, {days, plural, one {# día} other {# días}} después del final del evento. Mientras el vídeo no esté publicado puedes acortar este plazo, pero no quitarlo ni alargarlo.",
     "delete": "Eliminar grabación",
     "deleteConfirm": "¿Está seguro? El vídeo se eliminará de forma permanente. Las transcripciones, los resúmenes y las traducciones no se eliminan con él: siguen el plazo de la grabación elegido aquí.",
     "notConfigured": "Jibri no está configurado. La grabación de vídeo no está disponible.",
@@ -6325,7 +6327,8 @@
     "sameLanguage": "El idioma elegido es el original de la grabación: elige otro.",
     "recordingDestinationNotCovered": "Los consentimientos de este evento valen para una grabación reservada a los inscritos: no puedes hacerla visible para todos ni vincular un vídeo externo.",
     "mtUnavailable": "La traducción automática no está instalada en esta instancia.",
-    "recordingContentOrganizerOnly": "Solo quienes organizan este evento pueden abrir, modificar o publicar el contenido de sus grabaciones."
+    "recordingContentOrganizerOnly": "Solo quienes organizan este evento pueden abrir, modificar o publicar el contenido de sus grabaciones.",
+    "recordingRetentionLegacy": "A los inscritos en este evento se les dijo que una grabación no publicada se elimina con sus datos: mientras el vídeo no esté publicado, su plazo se puede acortar, pero no quitar ni alargar."
   },
   "recordingRemoval": {
     "cardTitle": "Contenido retirado a petición",

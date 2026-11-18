@@ -6030,9 +6030,11 @@
       "30d": "30 giorni",
       "90d": "90 giorni",
       "1y": "1 anno",
+      "days": "{count, plural, one {# giorno} other {# giorni}}",
       "forever": "Nessuna cancellazione automatica"
     },
     "retentionNote": "La registrazione non segue la conservazione dei dati dell'evento: senza una durata resta, pubblicata o no, finché non la si elimina. La durata conta dalla pubblicazione o, se il video non è pubblicato, dalla fine dell'evento; alla scadenza si cancellano il video e ciò che se ne ricava (trascrizioni, sintesi, traduzioni).",
+    "retentionLegacy": "A chi si è iscritto a questo evento è stato detto che una registrazione non pubblicata si cancella con i suoi dati, {days, plural, one {# giorno} other {# giorni}} dopo la fine dell'evento. Finché il video non è pubblicato puoi accorciare questo periodo, non toglierlo né allungarlo.",
     "delete": "Elimina registrazione",
     "deleteConfirm": "Sei sicuro? Il video verrà eliminato definitivamente. Trascrizioni, sintesi e traduzioni non si cancellano con il video: seguono la durata della registrazione scelta qui.",
     "notConfigured": "Jibri non è configurato nell'infrastruttura. La registrazione video non è disponibile.",
@@ -6325,7 +6327,8 @@
     "sameLanguage": "La lingua scelta è quella originale della registrazione: scegline un'altra.",
     "recordingDestinationNotCovered": "I consensi di questo evento valgono per una registrazione riservata: non puoi renderla visibile a tutti né collegare un video esterno.",
     "mtUnavailable": "La traduzione automatica non è installata su questa istanza.",
-    "recordingContentOrganizerOnly": "Solo chi organizza questo evento può aprire, modificare o pubblicare il contenuto delle sue registrazioni."
+    "recordingContentOrganizerOnly": "Solo chi organizza questo evento può aprire, modificare o pubblicare il contenuto delle sue registrazioni.",
+    "recordingRetentionLegacy": "A chi si è iscritto a questo evento è stato detto che una registrazione non pubblicata si cancella con i suoi dati: finché il video non è pubblicato, la sua durata si può accorciare, non togliere né allungare."
   },
   "recordingRemoval": {
     "cardTitle": "Contenuto rimosso su richiesta",

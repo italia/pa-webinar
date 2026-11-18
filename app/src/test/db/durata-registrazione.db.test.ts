@@ -8,6 +8,8 @@
  * sono finti, il resto no.
  */
 import { randomUUID } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 
 import type { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -598,5 +600,105 @@ describe('il video pubblicato, come prima', () => {
       recordingPublished: true,
     });
     expect((await proveDi(evento.id)).length).toBeGreaterThan(0);
+  });
+});
+
+describe('gli eventi nati prima della regola', () => {
+  // A chi si e' iscritto si era detto che il video non pubblicato se ne va con i
+  // suoi dati: la promessa resta (lib/recording/legacy-retention).
+  async function modifica(eventId: string, token: string, corpo: Record<string, unknown>) {
+    return aggiornaEvento(richiesta(`/api/events/${eventId}`, 'PUT', corpo, token) as never, {
+      params: Promise.resolve({ param: eventId }),
+    });
+  }
+
+  it('il video non pubblicato se ne va con i dati, quello di un evento nuovo resta', async () => {
+    const vecchio = await eventoRegistrato({ legacyRecordingRetention: true });
+    const NUOVO = 'https://storage.example.com/recordings/nuovo.mp4';
+    const nuovo = await creaEvento({ ...CONCLUSO, recordingUrl: NUOVO });
+
+    const esito = await giroDiPulizia();
+
+    expect(esito.recordingsExpired).toBe(1);
+    expect(m.cancellaVideo).toHaveBeenCalledWith(VIDEO);
+    expect(m.cancellaVideo).not.toHaveBeenCalledWith(NUOVO);
+    expect(
+      (await prisma.event.findUniqueOrThrow({ where: { id: vecchio.evento.id } })).recordingUrl
+    ).toBeNull();
+    expect(
+      (await prisma.event.findUniqueOrThrow({ where: { id: nuovo.id } })).recordingUrl
+    ).toBe(NUOVO);
+  });
+
+  it('pubblicato resta come prima, e senza durata non scade', async () => {
+    const { evento } = await eventoRegistrato({
+      legacyRecordingRetention: true,
+      recordingPublished: true,
+      recordingPublishedAt: giorniFa(400),
+    });
+    expect((await giroDiPulizia()).recordingsExpired).toBe(0);
+    expect(m.cancellaVideo).not.toHaveBeenCalled();
+    expect(
+      (await prisma.event.findUniqueOrThrow({ where: { id: evento.id } })).recordingPublished
+    ).toBe(true);
+  });
+
+  it('la durata si accorcia, non si toglie ne’ si allunga finche’ il video non e’ pubblicato', async () => {
+    const evento = await creaEvento({
+      status: 'ENDED',
+      startsAt: giorniFa(3),
+      endsAt: giorniFa(2),
+      dataRetentionDays: 30,
+      recordingUrl: VIDEO,
+      legacyRecordingRetention: true,
+    });
+
+    expect(
+      (await modifica(evento.id, evento.moderatorToken, { recordingDeleteAfterDays: 7 })).status
+    ).toBe(200);
+    for (const giorni of [null, 90]) {
+      const rifiutata = await modifica(evento.id, evento.moderatorToken, {
+        recordingDeleteAfterDays: giorni,
+      });
+      expect(rifiutata.status).toBe(422);
+      expect((await rifiutata.json()).code).toBe('RECORDING_RETENTION_LEGACY');
+    }
+    expect(
+      (await prisma.event.findUniqueOrThrow({ where: { id: evento.id } })).recordingDeleteAfterDays
+    ).toBe(7);
+
+    // Pubblicato, la durata conta dalla pubblicazione come prima: si sceglie liberamente.
+    expect(
+      (
+        await modifica(evento.id, evento.moderatorToken, {
+          recordingPublished: true,
+          recordingDeleteAfterDays: null,
+        })
+      ).status
+    ).toBe(200);
+  });
+
+  it('la migrazione segna gli eventi che c’erano, non le bozze', async () => {
+    const [bozza, concluso] = [
+      await creaEvento({ status: 'DRAFT' }),
+      await creaEvento({ ...CONCLUSO }),
+    ];
+    const sql = readFileSync(
+      path.join(
+        __dirname,
+        '../../../prisma/migrations/20261118700000_conservazione_registrazioni_precedenti/migration.sql'
+      ),
+      'utf8'
+    );
+    const aggiornamento = sql.slice(sql.indexOf('UPDATE'));
+    await prisma.$executeRawUnsafe(aggiornamento);
+
+    expect(
+      (await prisma.event.findUniqueOrThrow({ where: { id: bozza.id } })).legacyRecordingRetention
+    ).toBe(false);
+    expect(
+      (await prisma.event.findUniqueOrThrow({ where: { id: concluso.id } }))
+        .legacyRecordingRetention
+    ).toBe(true);
   });
 });

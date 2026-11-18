@@ -190,7 +190,9 @@ function stubEventQueries(rows: {
   db.event.findMany.mockImplementation(async (args: { where?: Record<string, unknown> }) => {
     const where = args?.where ?? {};
     if ('tempRecordingUrl' in where) return rows.tempRecordings ?? [];
-    if ('recordingDeleteAfterDays' in where) return rows.expiringRecordings ?? [];
+    if (JSON.stringify(where).includes('recordingDeleteAfterDays')) {
+      return rows.expiringRecordings ?? [];
+    }
     return rows.ended ?? [];
   });
 }
@@ -386,11 +388,19 @@ describe('GET /api/cron/cleanup', () => {
 
     const phase2 = db.event.findMany.mock.calls
       .map((c) => c[0] as { where: Record<string, unknown> })
-      .find((a) => 'recordingDeleteAfterDays' in a.where);
+      .find((a) => JSON.stringify(a.where).includes('recordingDeleteAfterDays'));
     // Senza durata la registrazione non scade: nessuna condizione sulla
-    // pubblicazione, e niente che la leghi alla conservazione dei dati.
+    // pubblicazione, e niente che la leghi alla conservazione dei dati. Salvo
+    // gli eventi nati prima, finche' il video non e' pubblicato.
     expect(phase2?.where).toEqual({
-      recordingDeleteAfterDays: { not: null },
+      AND: [
+        {
+          OR: [
+            { recordingDeleteAfterDays: { not: null } },
+            { legacyRecordingRetention: true, recordingPublished: false },
+          ],
+        },
+      ],
       OR: [
         { recordingUrl: { not: null } },
         { tempRecordingUrl: { not: null } },
@@ -1188,7 +1198,9 @@ describe('GET /api/cron/cleanup', () => {
     );
     const phase3 = db.event.findMany.mock.calls
       .map((c) => c[0] as { where: Record<string, unknown>; select: Record<string, unknown> })
-      .find((a) => 'OR' in a.where && !('recordingDeleteAfterDays' in a.where));
+      .find(
+        (a) => 'OR' in a.where && !JSON.stringify(a.where).includes('recordingDeleteAfterDays')
+      );
     expect(phase3?.select).not.toHaveProperty('recordingUrl');
   });
 

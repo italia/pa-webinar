@@ -6030,9 +6030,11 @@
       "30d": "30 dienas",
       "90d": "90 dienas",
       "1y": "1 gads",
+      "days": "{count, plural, zero {# dienu} one {# diena} other {# dienas}}",
       "forever": "Bez automātiskas dzēšanas"
     },
     "retentionNote": "Ieraksts neievēro pasākuma datu glabāšanas termiņu: bez noteikta termiņa tas paliek, publicēts vai nē, līdz kāds to izdzēš. Termiņu skaita no publicēšanas vai, ja video nav publicēts, no pasākuma beigām; kad tas beidzas, tiek dzēsts video un tas, kas no tā sagatavots (atšifrējumi, kopsavilkumi, tulkojumi).",
+    "retentionLegacy": "Šī pasākuma reģistrētajiem tika teikts, ka nepublicēts ieraksts tiek dzēsts kopā ar viņu datiem {days, plural, zero {# dienas} one {# dienu} other {# dienas}} pēc pasākuma beigām. Kamēr video nav publicēts, jūs varat šo laiku saīsināt, bet ne noņemt vai pagarināt.",
     "delete": "Dzēst ierakstu",
     "deleteConfirm": "Vai esat pārliecināts? Video tiks neatgriezeniski dzēsts. Atšifrējumi, kopsavilkumi un tulkojumi kopā ar to netiek dzēsti: tiem ir šeit izvēlētais ieraksta termiņš.",
     "notConfigured": "Jibri nav konfigurēts infrastruktūrā. Video ierakstīšana nav pieejama.",
@@ -6325,7 +6327,8 @@
     "sameLanguage": "Izvēlētā valoda ir ieraksta oriģinālvaloda: izvēlieties citu.",
     "recordingDestinationNotCovered": "Šī pasākuma piekrišanas attiecas uz ierakstu tikai reģistrētajiem: jūs nevarat to padarīt redzamu visiem, ne pievienot ārēju video.",
     "mtUnavailable": "Šajā instancē mašīntulkošana nav instalēta.",
-    "recordingContentOrganizerOnly": "Tikai šī pasākuma organizatori var atvērt, mainīt vai publicēt tā ierakstu saturu."
+    "recordingContentOrganizerOnly": "Tikai šī pasākuma organizatori var atvērt, mainīt vai publicēt tā ierakstu saturu.",
+    "recordingRetentionLegacy": "Šī pasākuma reģistrētajiem tika teikts, ka nepublicēts ieraksts tiek dzēsts kopā ar viņu datiem: kamēr video nav publicēts, tā laiku var saīsināt, bet ne noņemt vai pagarināt."
   },
   "recordingRemoval": {
     "cardTitle": "Saturs izņemts pēc pieprasījuma",

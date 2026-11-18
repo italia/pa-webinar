@@ -6030,9 +6030,11 @@
       "30d": "30 dana",
       "90d": "90 dana",
       "1y": "1 godina",
+      "days": "{count, plural, one {# dan} few {# dana} other {# dana}}",
       "forever": "Bez automatskog brisanja"
     },
     "retentionNote": "Snimka ne prati čuvanje podataka događaja: bez roka ostaje, objavljena ili ne, dok je netko ne izbriše. Rok se računa od objave ili, ako video nije objavljen, od završetka događaja; kad istekne, brišu se video i ono što iz njega nastaje (transkripti, sažeci, prijevodi).",
+    "retentionLegacy": "Prijavljenima na ovaj događaj rečeno je da se neobjavljena snimka briše zajedno s njihovim podacima, {days, plural, one {# dan} few {# dana} other {# dana}} nakon završetka događaja. Dok videozapis nije objavljen, možete skratiti to razdoblje, ali ga ne možete ukloniti ni produljiti.",
     "delete": "Obriši snimku",
     "deleteConfirm": "Jeste li sigurni? Video će biti trajno obrisan. Transkripti, sažeci i prijevodi ne brišu se s njim: prate rok snimke odabran ovdje.",
     "notConfigured": "Jibri nije konfiguriran u infrastrukturi. Video snimanje nije dostupno.",
@@ -6325,7 +6327,8 @@
     "sameLanguage": "Odabrani jezik izvorni je jezik snimke: odaberite drugi.",
     "recordingDestinationNotCovered": "Privole za ovaj događaj vrijede za snimku samo za prijavljene: ne možete je učiniti vidljivom svima ni povezati vanjski videozapis.",
     "mtUnavailable": "Strojno prevođenje nije instalirano na ovoj instanci.",
-    "recordingContentOrganizerOnly": "Sadržaj snimki ovog događaja mogu otvarati, mijenjati ili objavljivati samo njegovi organizatori."
+    "recordingContentOrganizerOnly": "Sadržaj snimki ovog događaja mogu otvarati, mijenjati ili objavljivati samo njegovi organizatori.",
+    "recordingRetentionLegacy": "Prijavljenima na ovaj događaj rečeno je da se neobjavljena snimka briše zajedno s njihovim podacima: dok videozapis nije objavljen, njezino se razdoblje može skratiti, ali ne i ukloniti ni produljiti."
   },
   "recordingRemoval": {
     "cardTitle": "Sadržaj uklonjen na zahtjev",

@@ -6030,9 +6030,11 @@
       "30d": "30 Tage",
       "90d": "90 Tage",
       "1y": "1 Jahr",
+      "days": "{count, plural, one {# Tag} other {# Tage}}",
       "forever": "Keine automatische Löschung"
     },
     "retentionNote": "Die Aufzeichnung folgt nicht der Aufbewahrung der Veranstaltungsdaten: Ohne Frist bleibt sie, ob veröffentlicht oder nicht, bis jemand sie löscht. Die Frist läuft ab der Veröffentlichung oder, wenn das Video nicht veröffentlicht ist, ab dem Ende der Veranstaltung; danach werden das Video und alles daraus Entstandene (Transkripte, Zusammenfassungen, Übersetzungen) gelöscht.",
+    "retentionLegacy": "Den Angemeldeten dieser Veranstaltung wurde gesagt, dass eine nicht veröffentlichte Aufzeichnung mit ihren Daten gelöscht wird, {days, plural, one {# Tag} other {# Tage}} nach dem Ende der Veranstaltung. Solange das Video nicht veröffentlicht ist, können Sie diese Frist verkürzen, aber weder aufheben noch verlängern.",
     "delete": "Aufzeichnung löschen",
     "deleteConfirm": "Sind Sie sicher? Das Video wird endgültig gelöscht. Transkripte, Zusammenfassungen und Übersetzungen werden nicht mit ihm gelöscht: Sie folgen der hier gewählten Frist der Aufzeichnung.",
     "notConfigured": "Jibri ist nicht konfiguriert. Die Videoaufzeichnung ist nicht verfügbar.",
@@ -6325,7 +6327,8 @@
     "sameLanguage": "Die gewählte Sprache ist die Originalsprache der Aufzeichnung: Wählen Sie eine andere.",
     "recordingDestinationNotCovered": "Die Einwilligungen dieser Veranstaltung gelten für eine Aufzeichnung nur für Angemeldete: Sie können sie nicht für alle sichtbar machen und auch kein externes Video verknüpfen.",
     "mtUnavailable": "Die automatische Übersetzung ist auf dieser Instanz nicht installiert.",
-    "recordingContentOrganizerOnly": "Nur die Veranstaltenden dieser Veranstaltung können den Inhalt ihrer Aufzeichnungen öffnen, ändern oder veröffentlichen."
+    "recordingContentOrganizerOnly": "Nur die Veranstaltenden dieser Veranstaltung können den Inhalt ihrer Aufzeichnungen öffnen, ändern oder veröffentlichen.",
+    "recordingRetentionLegacy": "Den Angemeldeten dieser Veranstaltung wurde gesagt, dass eine nicht veröffentlichte Aufzeichnung mit ihren Daten gelöscht wird: Solange das Video nicht veröffentlicht ist, kann ihre Frist verkürzt, aber weder aufgehoben noch verlängert werden."
   },
   "recordingRemoval": {
     "cardTitle": "Inhalt auf Antrag entfernt",

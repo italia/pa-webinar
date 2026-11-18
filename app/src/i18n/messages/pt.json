@@ -6030,9 +6030,11 @@
       "30d": "30 dias",
       "90d": "90 dias",
       "1y": "1 ano",
+      "days": "{count, plural, one {# dia} many {# dias} other {# dias}}",
       "forever": "Sem eliminação automática"
     },
     "retentionNote": "A gravação não segue a conservação dos dados do evento: sem um prazo, fica, publicada ou não, até alguém a eliminar. O prazo conta a partir da publicação ou, se o vídeo não estiver publicado, do fim do evento; quando termina, são eliminados o vídeo e o que dele resulta (transcrições, resumos, traduções).",
+    "retentionLegacy": "Aos inscritos neste evento foi dito que uma gravação não publicada é eliminada com os seus dados, {days, plural, one {# dia} many {# dias} other {# dias}} depois do fim do evento. Enquanto o vídeo não estiver publicado, pode encurtar este prazo, mas não retirá-lo nem alargá-lo.",
     "delete": "Eliminar gravação",
     "deleteConfirm": "Tem a certeza? O vídeo será eliminado definitivamente. As transcrições, os resumos e as traduções não são eliminados com ele: seguem o prazo da gravação escolhido aqui.",
     "notConfigured": "Jibri não está configurado na infraestrutura. A gravação de vídeo não está disponível.",
@@ -6325,7 +6327,8 @@
     "sameLanguage": "O idioma escolhido é o original da gravação: escolha outro.",
     "recordingDestinationNotCovered": "Os consentimentos deste evento valem para uma gravação reservada aos inscritos: não pode torná-la visível a todos nem associar um vídeo externo.",
     "mtUnavailable": "A tradução automática não está instalada nesta instância.",
-    "recordingContentOrganizerOnly": "Só os organizadores deste evento podem abrir, alterar ou publicar o conteúdo das suas gravações."
+    "recordingContentOrganizerOnly": "Só os organizadores deste evento podem abrir, alterar ou publicar o conteúdo das suas gravações.",
+    "recordingRetentionLegacy": "Aos inscritos neste evento foi dito que uma gravação não publicada é eliminada com os seus dados: enquanto o vídeo não estiver publicado, o seu prazo pode ser encurtado, mas não retirado nem alargado."
   },
   "recordingRemoval": {
     "cardTitle": "Conteúdo removido a pedido",

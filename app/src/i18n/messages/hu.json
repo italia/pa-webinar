@@ -6030,9 +6030,11 @@
       "30d": "30 nap",
       "90d": "90 nap",
       "1y": "1 év",
+      "days": "{count, plural, one {# nap} other {# nap}}",
       "forever": "Nincs automatikus törlés"
     },
     "retentionNote": "A felvételre nem vonatkozik az esemény adatainak megőrzési ideje: időtartam nélkül megmarad, akár közzétették, akár nem, amíg valaki nem törli. Az időtartam a közzétételtől, vagy ha a videót nem tették közzé, az esemény végétől számít; lejártakor törlődik a videó és ami belőle készült (átiratok, összefoglalók, fordítások).",
+    "retentionLegacy": "Az eseményre regisztráltaknak azt mondták, hogy a nem közzétett felvétel az adataikkal együtt törlődik, az esemény vége után {days, plural, one {# nappal} other {# nappal}}. Amíg a videó nincs közzétéve, ezt az időtartamot lerövidítheti, de nem szüntetheti meg és nem hosszabbíthatja meg.",
     "delete": "Felvétel törlése",
     "deleteConfirm": "Biztos benne? A videó véglegesen törlésre kerül. Az átiratok, összefoglalók és fordítások nem törlődnek vele együtt: a felvételhez itt választott időtartamot követik.",
     "notConfigured": "Jibri nincs konfigurálva. A videofelvétel nem elérhető.",
@@ -6325,7 +6327,8 @@
     "sameLanguage": "A választott nyelv a felvétel eredeti nyelve: válasszon másikat.",
     "recordingDestinationNotCovered": "Az esemény hozzájárulásai csak regisztráltaknak szóló felvételre érvényesek: nem teheti mindenki számára láthatóvá, és nem kapcsolhat hozzá külső videót.",
     "mtUnavailable": "A gépi fordítás nincs telepítve ezen a példányon.",
-    "recordingContentOrganizerOnly": "Az esemény felvételeinek tartalmát csak az esemény szervezői nyithatják meg, módosíthatják vagy tehetik közzé."
+    "recordingContentOrganizerOnly": "Az esemény felvételeinek tartalmát csak az esemény szervezői nyithatják meg, módosíthatják vagy tehetik közzé.",
+    "recordingRetentionLegacy": "Az eseményre regisztráltaknak azt mondták, hogy a nem közzétett felvétel az adataikkal együtt törlődik: amíg a videó nincs közzétéve, az időtartama lerövidíthető, de nem szüntethető meg és nem hosszabbítható meg."
   },
   "recordingRemoval": {
     "cardTitle": "Kérelemre eltávolított tartalom",

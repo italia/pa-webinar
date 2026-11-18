@@ -21,6 +21,7 @@ import { useConfirm } from '@/components/ui/confirm-dialog';
 import { codiceErrore, messaggioErroreApi } from '@/lib/api-error-message';
 import { esitoPubblicazione, type Destinazione } from '@/lib/recording/destination';
 import { NESSUNA_CANCELLAZIONE, RETENTION_OPTIONS } from '@/lib/recording/retention-options';
+import { durataEffettiva, limiteDurataPrecedente } from '@/lib/recording/legacy-retention';
 
 import RecordingUploadWidget from './recording-upload-widget';
 
@@ -41,6 +42,11 @@ interface RecordingManagementProps {
     recordingFileSize: number | null;
     recordingDuration: number | null;
     recordingDeleteAfterDays: number | null;
+    /** Evento nato prima che la registrazione si separasse dai dati
+     *  (lib/recording/legacy-retention): con `dataRetentionDays`, il limite della
+     *  durata finche' il video non e' pubblicato. */
+    legacyRecordingRetention?: boolean;
+    dataRetentionDays?: number;
     moderatorToken: string;
   };
   jibriAvailable?: boolean;
@@ -88,6 +94,28 @@ export default function RecordingManagement({
   const intervalRef = useRef<ReturnType<typeof setInterval>>(undefined);
 
   const hasRecording = !!(event.recordingUrl || event.tempRecordingUrl);
+  // Negli eventi nati prima della regola, finche' il video non e' pubblicato, la
+  // durata non va oltre la conservazione dei dati: le scelte piu' lunghe e
+  // «nessuna cancellazione» si spengono, e il pannello mostra quella che vale.
+  const vecchiaRegola = {
+    legacyRecordingRetention: event.legacyRecordingRetention,
+    recordingPublished: published,
+    dataRetentionDays: event.dataRetentionDays ?? 30,
+  };
+  const limiteDurata = limiteDurataPrecedente(vecchiaRegola);
+  const durataMostrata = durataEffettiva({
+    ...vecchiaRegola,
+    recordingDeleteAfterDays: retentionDays,
+  });
+  const sceltePossibili = [
+    ...RETENTION_OPTIONS.map((o) => ({ value: o.value as number, label: t(o.labelKey) })),
+    // La conservazione dei dati come scelta, se non e' gia' fra le altre.
+    ...(limiteDurata !== null && !RETENTION_OPTIONS.some((o) => o.value === limiteDurata)
+      ? [{ value: limiteDurata, label: t('retention.days', { count: limiteDurata }) }]
+      : []),
+  ].sort((a, b) =>
+    a.value === NESSUNA_CANCELLAZIONE ? 1 : b.value === NESSUNA_CANCELLAZIONE ? -1 : a.value - b.value
+  );
   const isLive = event.status === 'LIVE';
   const esito = esitoPubblicazione(event);
 
@@ -447,23 +475,33 @@ export default function RecordingManagement({
               >
                 {t('retentionLabel')}
               </legend>
-              {RETENTION_OPTIONS.map(({ value, labelKey }) => (
+              {sceltePossibili.map(({ value, label }) => (
                 <div key={value} className="form-check my-1">
                   <input
                     type="radio"
                     id={`retention-${value}`}
                     name="retention"
                     checked={
-                      value === NESSUNA_CANCELLAZIONE ? retentionDays === null : retentionDays === value
+                      value === NESSUNA_CANCELLAZIONE ? durataMostrata === null : durataMostrata === value
                     }
                     onChange={() => handleRetentionChange(value)}
-                    disabled={saving}
+                    disabled={
+                      saving ||
+                      (limiteDurata !== null &&
+                        (value === NESSUNA_CANCELLAZIONE || value > limiteDurata))
+                    }
+                    aria-describedby={limiteDurata !== null ? 'retention-legacy' : undefined}
                   />
                   <label htmlFor={`retention-${value}`} style={{ fontSize: '0.88rem' }}>
-                    {t(labelKey)}
+                    {label}
                   </label>
                 </div>
               ))}
+              {limiteDurata !== null && (
+                <div id="retention-legacy" className="mt-2" style={{ fontSize: '0.8rem' }}>
+                  {t('retentionLegacy', { days: limiteDurata })}
+                </div>
+              )}
               <div className="text-muted mt-2" style={{ fontSize: '0.8rem' }}>
                 {t('retentionNote')}
               </div>

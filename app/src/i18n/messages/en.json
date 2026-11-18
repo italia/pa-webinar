@@ -6030,9 +6030,11 @@
       "30d": "30 days",
       "90d": "90 days",
       "1y": "1 year",
+      "days": "{count, plural, one {# day} other {# days}}",
       "forever": "No automatic deletion"
     },
     "retentionNote": "The recording does not follow the event's data retention: without a period it stays, published or not, until someone deletes it. The period counts from publication or, if the video is not published, from the end of the event; when it expires, the video and what is made from it (transcripts, summaries, translations) are deleted.",
+    "retentionLegacy": "People registered for this event were told that a recording that is not published is deleted with their data, {days, plural, one {# day} other {# days}} after the event ends. While the video is not published you can shorten this period, not remove or extend it.",
     "delete": "Delete recording",
     "deleteConfirm": "Are you sure? The video will be permanently deleted. Transcripts, summaries and translations are not deleted with it: they follow the recording period chosen here.",
     "notConfigured": "Jibri is not configured. Video recording is not available.",
@@ -6325,7 +6327,8 @@
     "sameLanguage": "The chosen language is the recording's original one: pick another.",
     "recordingDestinationNotCovered": "The consents for this event cover a reserved recording: you cannot make it visible to everyone or link an external video.",
     "mtUnavailable": "Machine translation is not installed on this instance.",
-    "recordingContentOrganizerOnly": "Only the organizers of this event can open, change or publish the content of its recordings."
+    "recordingContentOrganizerOnly": "Only the organizers of this event can open, change or publish the content of its recordings.",
+    "recordingRetentionLegacy": "People registered for this event were told that an unpublished recording is deleted with their data: while the video is not published, its period can be shortened, not removed or extended."
   },
   "recordingRemoval": {
     "cardTitle": "Content removed on request",
