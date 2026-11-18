@@ -6013,5 +6013,9 @@
     "sameLanguage": "Valitud keel on salvestuse algkeel: vali mõni muu.",
     "recordingDestinationNotCovered": "Selle ürituse nõusolekud kehtivad salvestisele, mis on ainult registreerunutele: sa ei saa seda kõigile nähtavaks teha ega välist videot linkida.",
     "mtUnavailable": "Masintõlge ei ole selles eksemplaris paigaldatud."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Sisu eemaldatud taotluse alusel",
+    "cardBody": "See salvestise osa eemaldati selles esinenud isiku taotluse alusel."
   }
 }

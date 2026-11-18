@@ -6013,5 +6013,9 @@
     "sameLanguage": "Det valgte sprog er optagelsens originalsprog: vælg et andet.",
     "recordingDestinationNotCovered": "Samtykkerne til dette arrangement gælder en optagelse kun for tilmeldte: du kan ikke gøre den synlig for alle eller tilknytte en ekstern video.",
     "mtUnavailable": "Maskinoversættelse er ikke installeret på denne instans."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Indhold fjernet efter anmodning",
+    "cardBody": "Denne del af optagelsen er fjernet efter anmodning fra en person, der optrådte i den."
   }
 }

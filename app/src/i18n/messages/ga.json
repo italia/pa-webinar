@@ -6013,5 +6013,9 @@
     "sameLanguage": "Is í an teanga a roghnaigh tú bunteanga an taifeadta: roghnaigh ceann eile.",
     "recordingDestinationNotCovered": "Baineann toilithe an imeachta seo le taifeadadh do dhaoine cláraithe amháin: ní féidir leat é a chur le feiceáil ag cách ná físeán seachtrach a nascadh.",
     "mtUnavailable": "Níl meaistriúchán suiteáilte ar an ásc seo."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Ábhar bainte ar iarratas",
+    "cardBody": "Baineadh an chuid seo den taifeadadh ar iarratas ó dhuine a bhí le feiceáil ann."
   }
 }

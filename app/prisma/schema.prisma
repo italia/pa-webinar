@@ -2243,6 +2243,12 @@ enum PostprodJobKind {
   // server dopo il salvataggio dell'evento; il risultato va nelle lingue vuote
   // o tradotte in automatico, e resta su Event.textTranslations.
   TRANSLATE_TEXT
+  // La rimozione di una persona da un video su sua richiesta
+  // (lib/recording/redaction): il worker senza GPU copre gli intervalli
+  // scelti con un cartello e ne toglie l'audio, a durata invariata. E' un
+  // lavoro dell'evento come il resoconto (la registrazione sta nel payload):
+  // lo chiude solo la consegna, e non tocca lo stato della pipeline.
+  REDACT
 }
 
 enum PostprodJobStatus {

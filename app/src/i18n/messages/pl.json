@@ -6013,5 +6013,9 @@
     "sameLanguage": "Wybrany język jest oryginalnym językiem nagrania: wybierz inny.",
     "recordingDestinationNotCovered": "Zgody dla tego wydarzenia dotyczą nagrania tylko dla zarejestrowanych: nie możesz udostępnić go wszystkim ani dodać linku do zewnętrznego wideo.",
     "mtUnavailable": "Tłumaczenie maszynowe nie jest zainstalowane w tej instancji."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Treść usunięta na wniosek",
+    "cardBody": "Ta część nagrania została usunięta na wniosek osoby, która się w nim pojawiała."
   }
 }

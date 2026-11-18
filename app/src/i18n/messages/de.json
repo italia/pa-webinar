@@ -6013,5 +6013,9 @@
     "sameLanguage": "Die gewählte Sprache ist die Originalsprache der Aufzeichnung: Wählen Sie eine andere.",
     "recordingDestinationNotCovered": "Die Einwilligungen dieser Veranstaltung gelten für eine Aufzeichnung nur für Angemeldete: Sie können sie nicht für alle sichtbar machen und auch kein externes Video verknüpfen.",
     "mtUnavailable": "Die automatische Übersetzung ist auf dieser Instanz nicht installiert."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Inhalt auf Antrag entfernt",
+    "cardBody": "Dieser Teil der Aufzeichnung wurde auf Antrag einer Person entfernt, die darin vorkam."
   }
 }

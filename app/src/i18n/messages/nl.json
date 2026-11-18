@@ -6013,5 +6013,9 @@
     "sameLanguage": "De gekozen taal is de oorspronkelijke taal van de opname: kies een andere.",
     "recordingDestinationNotCovered": "De toestemmingen voor dit evenement gelden voor een opname alleen voor ingeschrevenen: je kunt haar niet voor iedereen zichtbaar maken en geen externe video koppelen.",
     "mtUnavailable": "Automatische vertaling is niet geïnstalleerd op deze instantie."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Inhoud op verzoek verwijderd",
+    "cardBody": "Dit deel van de opname is verwijderd op verzoek van een persoon die erin voorkwam."
   }
 }

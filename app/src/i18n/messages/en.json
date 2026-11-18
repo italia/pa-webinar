@@ -6013,5 +6013,9 @@
     "sameLanguage": "The chosen language is the recording's original one: pick another.",
     "recordingDestinationNotCovered": "The consents for this event cover a reserved recording: you cannot make it visible to everyone or link an external video.",
     "mtUnavailable": "Machine translation is not installed on this instance."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Content removed on request",
+    "cardBody": "This part of the recording was removed at the request of a person who appeared in it."
   }
 }

@@ -6013,5 +6013,9 @@
     "sameLanguage": "Odabrani jezik izvorni je jezik snimke: odaberite drugi.",
     "recordingDestinationNotCovered": "Privole za ovaj događaj vrijede za snimku samo za prijavljene: ne možete je učiniti vidljivom svima ni povezati vanjski videozapis.",
     "mtUnavailable": "Strojno prevođenje nije instalirano na ovoj instanci."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Sadržaj uklonjen na zahtjev",
+    "cardBody": "Ovaj dio snimke uklonjen je na zahtjev osobe koja se u njoj pojavljivala."
   }
 }

@@ -6013,5 +6013,9 @@
     "sameLanguage": "Valittu kieli on tallenteen alkuperäinen kieli: valitse toinen.",
     "recordingDestinationNotCovered": "Tämän tapahtuman suostumukset koskevat tallennetta, joka on vain ilmoittautuneille: et voi tehdä siitä kaikille näkyvää etkä liittää ulkoista videota.",
     "mtUnavailable": "Konekäännöstä ei ole asennettu tähän instanssiin."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Sisältö poistettu pyynnöstä",
+    "cardBody": "Tämä tallenteen osa on poistettu siinä esiintyneen henkilön pyynnöstä."
   }
 }

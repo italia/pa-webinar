@@ -31,6 +31,7 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { prisma } from '@/lib/db';
 import { MT_JOB_KINDS } from '@/lib/ai/job-classes';
+import { riapriRichiesteSenzaLavoro } from '@/lib/recording/redaction/requests';
 import { refreshPostprodGauges } from '@/lib/ai/metrics';
 import { resolveMtProvider } from '@/lib/ai/providers';
 import { postprodJobsCompletedTotal } from '@/lib/metrics';
@@ -103,6 +104,12 @@ export const GET = withErrorHandling(async (request) => {
       data: { status: 'POSTPROD_PARTIAL' },
     });
   }
+
+  // Le richieste di rimozione il cui lavoro e' appena fallito per sempre (o
+  // non c'e' piu') tornano allo staff, che le puo' inviare di nuovo.
+  await riapriRichiesteSenzaLavoro().catch((err) => {
+    console.warn('[postprod-reclaim] reopening removal requests failed', err);
+  });
 
   // Step 3 — la traduzione dei testi senza motore. Solo i lavori in coda,
   // anche quelli appena ripresi dal passo 1: uno preso ha un worker vivo, che

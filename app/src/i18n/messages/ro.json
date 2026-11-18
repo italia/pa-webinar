@@ -6013,5 +6013,9 @@
     "sameLanguage": "Limba aleasă este cea originală a înregistrării: alege alta.",
     "recordingDestinationNotCovered": "Consimțămintele acestui eveniment sunt valabile pentru o înregistrare rezervată înscrișilor: nu o poți face vizibilă pentru toți și nici nu poți lega un videoclip extern.",
     "mtUnavailable": "Traducerea automată nu este instalată pe această instanță."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Conținut eliminat la cerere",
+    "cardBody": "Această parte a înregistrării a fost eliminată la cererea unei persoane care apărea în ea."
   }
 }

@@ -6013,5 +6013,9 @@
     "sameLanguage": "Det valda språket är inspelningens originalspråk: välj ett annat.",
     "recordingDestinationNotCovered": "Samtyckena för det här evenemanget gäller en inspelning endast för anmälda: du kan inte göra den synlig för alla eller länka en extern video.",
     "mtUnavailable": "Maskinöversättning är inte installerad på den här instansen."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Innehåll borttaget på begäran",
+    "cardBody": "Den här delen av inspelningen har tagits bort på begäran av en person som förekom i den."
   }
 }

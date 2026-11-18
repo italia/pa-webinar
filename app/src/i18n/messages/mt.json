@@ -6013,5 +6013,9 @@
     "sameLanguage": "Il-lingwa magħżula hija l-lingwa oriġinali tar-reġistrazzjoni: agħżel oħra.",
     "recordingDestinationNotCovered": "Il-kunsensi ta' dan l-avveniment jgħoddu għal rekording riservat għar-reġistrati: ma tistax tagħmlu viżibbli għal kulħadd u lanqas torbot vidjo estern.",
     "mtUnavailable": "It-traduzzjoni awtomatika mhijiex installata f'din l-istanza."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Kontenut imneħħi fuq talba",
+    "cardBody": "Din il-parti tar-reġistrazzjoni tneħħiet fuq talba ta’ persuna li kienet tidher fiha."
   }
 }

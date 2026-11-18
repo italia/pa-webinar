@@ -6013,5 +6013,9 @@
     "sameLanguage": "Zvolený jazyk je pôvodný jazyk záznamu: vyberte iný.",
     "recordingDestinationNotCovered": "Súhlasy pre toto podujatie platia pre záznam len pre registrovaných: nemôžete ho sprístupniť všetkým ani pripojiť externé video.",
     "mtUnavailable": "Strojový preklad nie je na tejto inštancii nainštalovaný."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Obsah odstránený na žiadosť",
+    "cardBody": "Táto časť záznamu bola odstránená na žiadosť osoby, ktorá sa v ňom objavila."
   }
 }

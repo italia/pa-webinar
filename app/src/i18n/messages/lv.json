@@ -6013,5 +6013,9 @@
     "sameLanguage": "Izvēlētā valoda ir ieraksta oriģinālvaloda: izvēlieties citu.",
     "recordingDestinationNotCovered": "Šī pasākuma piekrišanas attiecas uz ierakstu tikai reģistrētajiem: jūs nevarat to padarīt redzamu visiem, ne pievienot ārēju video.",
     "mtUnavailable": "Šajā instancē mašīntulkošana nav instalēta."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Saturs izņemts pēc pieprasījuma",
+    "cardBody": "Šī ieraksta daļa ir izņemta pēc tādas personas pieprasījuma, kura tajā parādījās."
   }
 }

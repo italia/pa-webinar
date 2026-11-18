@@ -6013,5 +6013,9 @@
     "sameLanguage": "La lingua scelta è quella originale della registrazione: scegline un'altra.",
     "recordingDestinationNotCovered": "I consensi di questo evento valgono per una registrazione riservata: non puoi renderla visibile a tutti né collegare un video esterno.",
     "mtUnavailable": "La traduzione automatica non è installata su questa istanza."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Contenuto rimosso su richiesta",
+    "cardBody": "Questa parte della registrazione è stata tolta su richiesta di una persona che vi compariva."
   }
 }

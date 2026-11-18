@@ -6013,5 +6013,9 @@
     "sameLanguage": "Izbrani jezik je izvirni jezik posnetka: izberite drugega.",
     "recordingDestinationNotCovered": "Privolitve za ta dogodek veljajo za posnetek samo za prijavljene: ne morete ga narediti vidnega vsem niti povezati zunanjega videa.",
     "mtUnavailable": "Strojno prevajanje na tej instanci ni nameščeno."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Vsebina odstranjena na zahtevo",
+    "cardBody": "Ta del posnetka je bil odstranjen na zahtevo osebe, ki se je v njem pojavila."
   }
 }

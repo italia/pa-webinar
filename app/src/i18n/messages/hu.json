@@ -6013,5 +6013,9 @@
     "sameLanguage": "A választott nyelv a felvétel eredeti nyelve: válasszon másikat.",
     "recordingDestinationNotCovered": "Az esemény hozzájárulásai csak regisztráltaknak szóló felvételre érvényesek: nem teheti mindenki számára láthatóvá, és nem kapcsolhat hozzá külső videót.",
     "mtUnavailable": "A gépi fordítás nincs telepítve ezen a példányon."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Kérelemre eltávolított tartalom",
+    "cardBody": "A felvétel ezen részét egy benne szereplő személy kérelmére eltávolították."
   }
 }

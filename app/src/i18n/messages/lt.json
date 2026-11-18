@@ -6013,5 +6013,9 @@
     "sameLanguage": "Pasirinkta kalba yra originali įrašo kalba: pasirinkite kitą.",
     "recordingDestinationNotCovered": "Šio renginio sutikimai galioja įrašui tik užsiregistravusiems: negalite padaryti jo matomo visiems ar susieti išorinio vaizdo įrašo.",
     "mtUnavailable": "Šioje diegtyje mašininis vertimas neįdiegtas."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Turinys pašalintas pagal prašymą",
+    "cardBody": "Ši įrašo dalis pašalinta pagal joje pasirodžiusio asmens prašymą."
   }
 }

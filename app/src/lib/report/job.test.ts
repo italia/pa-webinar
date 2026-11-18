@@ -88,11 +88,11 @@ describe('avanzamentoLavoroEvento', () => {
 });
 
 describe("i lavori dell'evento", () => {
-  it('le regole valgono per il resoconto e per la traduzione dei testi, non per i lavori delle registrazioni', async () => {
+  it('le regole valgono per il resoconto, la traduzione dei testi e la rimozione da un video, non per i lavori delle registrazioni', async () => {
     await avanzamentoLavoroEvento(lavoro(), { status: 'RUNNING', attempt: 2 }, regole);
     const { testo, valori } = sql(0);
     expect(testo).toContain('kind::text = ANY(');
-    expect(valori).toContainEqual(['REPORT', 'TRANSLATE_TEXT']);
+    expect(valori).toContainEqual(['REPORT', 'TRANSLATE_TEXT', 'REDACT']);
   });
 
   it('la consegna della traduzione dei testi chiude solo quel tipo, dal claim corrente', async () => {
