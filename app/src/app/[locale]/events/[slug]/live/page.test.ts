@@ -592,7 +592,8 @@ describe('sala — la trascrizione dal video', () => {
     conEvento({ ...conAi, eventType: 'INSTANT' });
     const ospite = await clientProps();
     expect(ospite.event.trascrizioneVideo).toBe(false);
-    expect(ospite.event.recordingEnabled).toBe(false);
+    // L'ospite sa che la chiamata registra: la domanda gli arriva in sala.
+    expect(ospite.event.recordingEnabled).toBe(true);
     iscritto();
     expect((await clientProps(TOKEN)).event.trascrizioneVideo).toBe(false);
   });
@@ -802,19 +803,15 @@ describe('sala — il consenso alla registrazione gia dato', () => {
   describe('chi conduce', () => {
     const staff = { accountId: 'acc-1', nome: 'Persona dello staff' };
 
-    it('dal link primario con l account: vale una prova che copre', async () => {
+    it('dal link primario con l account: alla registrazione non acconsente, e\' nel video', async () => {
       conEvento({ recordingDestination: 'REGISTRANTS' });
       conduce(true);
       vi.mocked(staffDietroIlPrimario).mockResolvedValue(staff as never);
       vi.mocked(prisma.recordingConsent.findMany).mockResolvedValue([
-        { destination: null },
         { destination: 'PUBLIC' },
       ] as never);
-      expect((await clientProps(TOKEN)).hasRecordingConsent).toBe(true);
-      expect(prisma.recordingConsent.findMany).toHaveBeenCalledWith({
-        where: { eventId: EVENT_ID, staffAccountId: 'acc-1', withdrawnAt: null },
-        select: { destination: true },
-      });
+      expect((await clientProps(TOKEN)).hasRecordingConsent).toBe(false);
+      expect(prisma.recordingConsent.findMany).not.toHaveBeenCalled();
     });
 
     const conTracce = { multitrackRecordingEnabled: true };

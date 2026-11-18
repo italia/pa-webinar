@@ -95,7 +95,7 @@ The answers on people and voice give one of three families (`classeFormato()`), 
 | Text of Q&A questions after the event (`postEventShowQA`) | Not published | Published without names | Published without names |
 | Address book on the registration form (`offerAddressBook`) | Not offered | Offered | Offered |
 
-In every family the hosts choose about the recording like everyone else: `hostsAlwaysRecorded` starts off, and one constant in `guided-format.ts` changes that for the events of the public family.
+In every family the hosts are in the video of a recorded event, with name and image, and the participants are not: only their voice is recorded, with their consent ([Who is in the video](../GDPR.md#who-is-in-the-video)). `guided-format.ts` still writes `hostsAlwaysRecorded`, which nothing reads any more.
 
 The recording answer gives the destination (`REGISTRANTS` for **Yes, reserved**, `PUBLIC` for **Yes, public**, none for **No**) and turns on the transcript from captions with the recording. The page after the event (`postEventPublic`) starts visible, except for a meeting or an invitation-only event; **Yes, public** always keeps it visible, because a public video would otherwise have no page. While staff have not touched its switch, the page follows the move to invitation-only and the move to a public video (`paginaCheSegue()`). When the video stops being public it goes back to where it started, and closes on an invitation-only event; going back to open does not reopen it, and the wizard says so. With a reserved destination registrants see the video on a private page too ([Who sees the recording](#who-sees-the-recording)), and the questions stay off the page whatever `postEventShowQA` says (`domandePubbliche()`), so the preview and the summary say that they are not published.
 
@@ -236,7 +236,7 @@ An event template (`EventTemplate`, UI **Event templates** at `/admin/events/tem
 - the live features: Q&A, chat, agenda, word cloud, whiteboard and automatic captions (on in a new template, as in a new event), and the participants' microphone, camera and screen-sharing permissions, or a full permission matrix;
 - recording, per-participant recording and the retention of participant tracks (a template's automatic start is ignored: recording starts only with **REC**);
 - where the recording goes: **Reserved**, **Public** or **Chosen when creating the event**, in which case an event that records starts reserved;
-- whether the audience appears under a pseudonym, whether the hosts are always in the recording, whether the registration form offers the address book, whether the page after the event is public and whether it shows the text of the Q&A questions;
+- whether the audience appears under a pseudonym, whether the registration form offers the address book, whether the page after the event is public and whether it shows the text of the Q&A questions;
 - the AI post-production options and their target languages (empty means the site default);
 - the waiting-room engine (empty means the site default);
 - the expected participants and the default duration, from which the wizard computes the end time;
@@ -685,7 +685,7 @@ Both call `POST /api/events/instant`, which requires a staff session and allows 
 - start time now and a nominal end four hours later. The end is cosmetic: it does not close the room;
 - `gracePeriodMinutes` set to `-1`, so the room closes on inactivity instead of at its nominal end ([event-lifecycle.md](event-lifecycle.md#instant-calls));
 - chat and whiteboard on, Q&A off, and microphone, camera and screen sharing open to everyone;
-- recording on (`recordingEnabled: true`), so the creator and the other moderators can record. The guest view of an instant call forces the recording flags off, so guests are not asked for the recording consent before joining ([known limitations](#known-limitations)). The call has no recording destination and no [privacy sheet](#the-privacy-sheet);
+- recording on (`recordingEnabled: true`), so the creator and the other moderators can record where the installation can leave a voice out of the video; elsewhere the **Control** panel shows the start button disabled, with the reason. Participants, guests included, enter with their voice outside the recording, and when a recording starts the room asks each of them whether their voice may be recorded; the moderators are in the video ([In instant calls](../GDPR.md#in-instant-calls)). The call has no recording destination and no [privacy sheet](#the-privacy-sheet);
 - a retention of 7 days and the post-event page off;
 - the platform's generic post-event feedback questionnaire, so the end of the call asks for a rating. If it cannot be attached, the call is created without it;
 - the name as the title, and the fixed Italian description `Videocall istantanea`. The API requires the `it` key, so the card stores the name there whatever language it was typed in; the list's quick form stores it under both `it` and `en`.
@@ -701,7 +701,6 @@ These describe the current code. Planned work is tracked in [ROADMAP.md](../ROAD
 - **Content must exist in Italian.** The events API refuses a title or description without an Italian version, whatever the site's default language. The wizard checks the default language; on a site whose default is another language, the Italian requirement appears in the alert only after submit ([ROADMAP.md](../ROADMAP.md#known-limitations-of-shipped-features)).
 - **Unchecked publication.** On **Publish event**, the wizard does not check the result of the publishing request: if it fails, the event stays a `DRAFT` without any message.
 - **Organization names.** Step 3 asks for a contact name and an organization for each co-organizing organization, but only the contact name, the logo and the website are stored.
-- **Recording consent in instant calls.** Instant calls have recording on, but their guest view skips the recording consent that the waiting room asks of participants of a recorded scheduled event, so people who join through the share link are not asked before a moderator records.
 - **A lost link on a private page.** The form that sends the link to a reserved recording again is on the event page. A private page opens only for someone who can already see the recording, so a registrant who lost the link has nowhere to ask for it.
 - **Feedback can be counted twice.** A registrant or a speaker who answered the post-event questionnaire in the room can answer again on the public post-event page, which submits with the browser's guest id.
 - **No series.** A recurrence rule only proposes the next date on duplication; occurrences are not created automatically and have no shared configuration ([ROADMAP.md](../ROADMAP.md#recurring-events-and-series)).

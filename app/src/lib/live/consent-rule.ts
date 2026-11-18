@@ -7,6 +7,13 @@ import { consensiRichiesti } from '@/lib/registration/consents';
  * La regola del consenso alla registrazione per chi entra nella conferenza,
  * la stessa per il server (il token di Jitsi, lib/live/listen-only) e per la
  * sala (sala d'attesa, pannello dei partecipanti).
+ *
+ * Chi compare nel video: solo chi conduce (moderatori, relatori, chi organizza
+ * dal link primario; nelle chiamate rapide chi la modera), sempre, con nome e
+ * immagine (`conduceNelVideo`). Chi partecipa non compare mai: ne' riquadro, ne'
+ * immagine, ne' nome. Dei suoi interventi si registra solo la voce, e solo con
+ * il consenso; senza, nemmeno quella. Il consenso alla registrazione e' quindi
+ * solo di chi partecipa.
  */
 export interface EventoConsenso {
   eventType?: string;
@@ -25,10 +32,10 @@ export interface EventoConsenso {
 export type VoceNelVideo = 'assente' | 'rimovibile' | 'fissa';
 
 export interface RegolaConsenso {
-  /** Conta chi ha un consenso valido: chi non ce l'ha resta fuori dalla
-   *  registrazione, e il resto della sala non cambia. */
+  /** Conta chi ha un consenso valido: la voce di chi partecipa senza resta
+   *  fuori dalla registrazione, e il resto della sala non cambia. */
   registra: boolean;
-  /** Il consenso alla registrazione si chiede a chi partecipa. */
+  /** Il consenso alla registrazione della voce si chiede a chi partecipa. */
   richiesto: boolean;
   /** Senza consenso, solo ascolto: la voce non si potrebbe togliere dal video.
    *  Solo qui i blocchi della sala seguono il consenso. */
@@ -36,15 +43,15 @@ export interface RegolaConsenso {
 }
 
 /**
- * Chi conduce resta sempre nella registrazione, per dichiarazione di chi
- * organizza. Conta solo dove chi non acconsente puo' restarne fuori: altrove il
- * valore rimasto su un evento non cambia niente.
+ * Chi conduce e' nel video, con nome e immagine, dove c'e' un video della sala:
+ * e' la regola, non una scelta dell'evento, e non chiede un consenso (la base
+ * giuridica la dichiara il titolare). La colonna `Event.hostsAlwaysRecorded`
+ * resta nel database e non si legge piu'. Senza un video completo (`assente`)
+ * restano le tracce per persona, che seguono il consenso alla trascrizione,
+ * anche per chi conduce.
  */
-export function conduceSempreRegistrato(
-  evento: { hostsAlwaysRecorded?: boolean | null },
-  voce: VoceNelVideo,
-): boolean {
-  return !!evento.hostsAlwaysRecorded && voce === 'rimovibile';
+export function conduceNelVideo(voce: VoceNelVideo): boolean {
+  return voce !== 'assente';
 }
 
 export function regolaConsenso(
@@ -52,9 +59,15 @@ export function regolaConsenso(
   registrazioneDisponibile: boolean,
   voce: VoceNelVideo,
 ): RegolaConsenso {
-  // Una chiamata rapida non chiede consensi: la sala non mostra la sua
-  // registrazione a chi entra dal link (la pagina della sala la nasconde).
-  if (event.eventType === 'INSTANT') return { registra: false, richiesto: false, soloAscolto: false };
+  // Una chiamata rapida non chiede niente all'ingresso: chi partecipa entra con
+  // la voce fuori dalla registrazione, e la domanda arriva in sala a ogni avvio
+  // (components/live/recording-question). Per questo si registra solo dove la
+  // voce di chi non acconsente resta davvero fuori: altrove la sala non offre la
+  // registrazione, e il solo ascolto non tocca mai una chiamata rapida.
+  if (event.eventType === 'INSTANT') {
+    const registra = event.recordingEnabled && registrazioneDisponibile && voce === 'rimovibile';
+    return { registra, richiesto: registra, soloAscolto: false };
+  }
   const recordingEnabled = event.recordingEnabled && registrazioneDisponibile;
   const richiesto = consensiRichiesti({ ...event, recordingEnabled }).registrazione;
   return {

@@ -545,7 +545,9 @@
       "locksByConsent": "Mikrofony a kamery se řídí souhlasem se záznamem: kdo ho dal, používá, co akce povoluje, ostatní jen poslouchají. Zámky místnosti zůstávají zapnuté.",
       "listenOnlyBadge": "jen poslech",
       "listenOnlyNoFloor": "Nedal souhlas se záznamem: nemůže vystoupit, dokud ho neudělí ve své místnosti.",
-      "voiceExcludedBadge": "bez nahrávání",
+      "inVideoBadge": "ve videu",
+      "voiceRecordedBadge": "hlas se nahrává",
+      "voiceExcludedBadge": "hlas se nenahrává",
       "voiceExcludedFloor": "Bez souhlasu se záznamem: může vystoupit, ale zůstává mimo záznam."
     },
     "moderator": {
@@ -622,6 +624,7 @@
       "tab": "Režie",
       "recordingHeading": "Nahrávání",
       "recordingOff": "Nenahrává se",
+      "recordingNotOfferedInstant": "V rychlých hovorech se nahrávání nabízí jen tam, kde lidé bez souhlasu zůstávají mimo video, a tato instalace to neumožňuje.",
       "stopConfirm": "Zastavit nahrávání teď?",
       "featuresHeading": "Funkce místnosti",
       "featuresHelp": "Zapínají se a vypínají pro všechny, okamžitě.",
@@ -690,7 +693,7 @@
         "without": {
           "soloAscolto": "Bez tohoto souhlasu jste pouze posluchač: mikrofon, kamera a obrazovka zůstávají zavřené.",
           "conduce": "Bez tohoto souhlasu moderujete dál.",
-          "voce": "Bez tohoto souhlasu se účastníte jako všichni, ale zůstáváte mimo záznam: bez jména, hlasu i obrazu.",
+          "voce": "Bez tohoto souhlasu se účastníte jako všichni, ale váš hlas zůstává mimo záznam. Váš obličej a vaše jméno se ve videu stejně nikdy neobjeví.",
           "comeTutti": "Bez tohoto souhlasu se účastníte jako všichni."
         },
         "withoutTranscriptHost": "Váš hlas nezůstane ve stopách jednotlivých osob ani v přepisu.",
@@ -713,10 +716,18 @@
         "needsRecording": "Můžete ho udělit po souhlasu se záznamem."
       }
     },
+    "recordingQuestion": {
+      "title": "Hovor se nahrává",
+      "question": "Chcete, aby se váš hlas nahrával?",
+      "body": "Ve videu jsou jen moderátoři: váš obličej a vaše jméno nikdy. Pokud odpovíte ano, hovor se na několik sekund znovu připojí a od té chvíle se váš hlas nahrává, když mluvíte. Pokud odpovíte ne nebo toto okno zavřete, účastníte se dál jako dosud a váš hlas se nenahrává.",
+      "later": "Pokud odpovíte ne, zeptáme se znovu při dalším nahrávání. Názor můžete kdykoli změnit tlačítkem {button} nahoře.",
+      "yes": "Ano, nahrávat můj hlas",
+      "no": "Ne, nenahrávat"
+    },
     "voiceExcluded": {
       "title": "Účastníte se bez nahrávání.",
       "consent": "Souhlasím s nahráváním",
-      "body": "Nesouhlasili jste se záznamem: účastníte se jako všichni, ale vaše jméno, hlas a obraz do záznamu nevstoupí."
+      "body": "Nedali jste souhlas s nahráváním: účastníte se jako všichni, ale váš hlas zůstává mimo záznam. Váš obličej a vaše jméno se ve videu stejně nikdy neobjeví."
     }
   },
   "qa": {
@@ -1065,7 +1076,7 @@
         "participantListCameraNote": "Při skrytém seznamu nevidí ten, kdo zapne kameru, své vlastní okno. Pro schůzku, kde se všichni vidí, seznam zobrazte.",
         "recordingLockedLive": "Při otevřené místnosti nelze nahrávání změnit: platí od prvního vstupu.",
         "hostsAlwaysRecorded": "Moderátoři a řečníci jsou vždy v záznamu",
-        "hostsAlwaysRecordedDesc": "Vypnuto: moderátoři a řečníci rozhodují jako všichni. Zapněte jen pokud už se natáčením souhlasili: políčko nevidí a informace o akci to musí uvádět."
+        "hostsAlwaysRecordedDesc": "Moderátoři a řečníci jsou ve videu se jménem a obrazem, bez zaškrtávacího políčka: informace o ochraně soukromí akce to musí uvádět. Od účastníků se nahrává jen hlas, a jen s jejich souhlasem."
       },
       "step3": {
         "heading": "Osoby a pozvánky",
@@ -1367,7 +1378,6 @@
         "consentRecordingNotice": "k záznamu jen upozornění (účastníci nemluví ani se neukazují)",
         "consentTranscription": "přepis vlastních příspěvků, dobrovolný",
         "consentsNone": "Žádný souhlas není třeba žádat: při registraci stačí seznámení se se zásadami ochrany osobních údajů.",
-        "consentsHosts": "Moderátoři a řečníci jsou o souhlas se záznamem požádáni v místnosti, dobrovolně.",
         "consentsWithdraw": "Účastníci je mohou v místnosti odvolat tlačítkem „Souhlasy“.",
         "participantListShown": "Seznam účastníků: viditelný pro všechny.",
         "participantListHidden": "Seznam účastníků: jen pro moderátory a řečníky.",
@@ -1450,22 +1460,20 @@
         "recording": "V záznamu",
         "roomSame": "Účastní se podle pravidel akce.",
         "roomListenOnly": "Jen poslech a chat.",
-        "recordedFull": "Jméno, hlas, obraz a sdílená obrazovka.",
+        "recordedFull": "Jen hlas, když osoba mluví: obličej a jméno se nikdy neobjeví.",
         "notRecorded": "Nevystupuje: žádné jméno, hlas, obraz ani sdílená obrazovka.",
         "recordedVoice": "Jeho hlas, na samostatné stopě.",
         "notRecordedVoice": "Jeho hlas se nenahrává.",
         "othersSame": "Ostatní se nemění: zámky mikrofonů, slovo a vzhled videa zůstávají podle akce.",
         "audienceNotice": "Publikum nemá mikrofon, kameru ani obrazovku: dostane jen upozornění. Pokud dostane slovo, může souhlasit v místnosti; pokud ne, zůstane mimo záznam.",
-        "hostsChoose": "Moderátoři a řečníci rozhodují jako všichni: kdo nesouhlasí, vede akci normálně, ale zůstává mimo záznam.",
         "hostsAlways": "Moderátoři a řečníci jsou vždy v záznamu: políčko nevidí.",
-        "hostsFixed": "Moderátoři a řečníci vedou akci v každém případě a video je zaznamenává.",
         "trace": "Pokud promluví během záznamu, poznámka u videa uvede, že chybí příspěvek, a přepis zaznamená *** s časem.",
         "anytime": "Souhlas se uděluje a odvolává v místnosti, kdykoli.",
         "transcription": "Přepis vlastních příspěvků je samostatný, dobrovolný souhlas.",
         "fixedVoice": "Tato instalace nemůže odstranit hlas z videa: kdo nesouhlasí, zůstane jen posluchačem a zámky místnosti sledují souhlas.",
         "fixedNotice": "Tato instalace nemůže odstranit hlas z videa: kdo dostane slovo, vstupuje do záznamu a upozornění to říká.",
         "questionTranscription": "Je dán souhlas s transkripcí?",
-        "fixedNotRecorded": "Bez hlasu a obrazu; jméno se ve videu může objevit."
+        "fixedNotRecorded": "Žádný hlas, obraz ani jméno."
       }
     },
     "nav": {
@@ -4628,9 +4636,9 @@
   },
   "gdpr": {
     "consent": {
-      "recording": "Souhlasím s audio/video záznamem této události",
-      "recordingReserved": "Souhlasím s audio/video záznamem této akce. Video zůstává vyhrazeno pořadatelům a registrovaným: nezveřejňuje se. Registrovaní ho mohou sledovat, dokud jsou uchovávány údaje o jejich registraci.",
-      "recordingPublic": "Souhlasím s audio/video záznamem této akce a s jeho zveřejněním: video může kdokoli sledovat na stránce akce a ve videotéce.",
+      "recording": "Souhlasím s nahráváním svého hlasu, když během akce promluvím. Můj obličej a moje jméno se ve videu nikdy neobjeví.",
+      "recordingReserved": "Souhlasím s nahráváním svého hlasu, když během akce promluvím. Můj obličej a moje jméno se ve videu nikdy neobjeví. Video zůstává vyhrazeno pořadatelům a registrovaným: nezveřejňuje se. Registrovaní ho mohou sledovat, dokud jsou uchovávány údaje o jejich registraci.",
+      "recordingPublic": "Souhlasím s nahráváním svého hlasu, když během akce promluvím. Souhlasím také se zveřejněním videa: video může kdokoli sledovat na stránce akce a ve videotéce. Můj obličej a moje jméno se ve videu nikdy neobjeví.",
       "recordingNoVideo": "Souhlasím se záznamem této akce. Video místnosti se nenahrává: zůstávají jen zvukové stopy těch, kdo souhlasí s přepisem, pokud s nimi akce počítá.",
       "multitrack": "Souhlasím s přepisem svých příspěvků se svým jménem pro zprávu z akce. Pokud akce nahrává samostatnou zvukovou stopu každé osoby, můj hlas se nahrává pouze za tímto účelem a stopa se po přepisu smaže; nepoužívá se k identifikaci ani k napodobení mého hlasu.",
       "multitrackRetained": "Souhlasím s přepisem svých příspěvků se svým jménem pro zprávu z akce. Pokud akce nahrává samostatnou zvukovou stopu každé osoby, můj hlas se nahrává pouze za tímto účelem a stopa se uchovává spolu s údaji akce; nepoužívá se k identifikaci ani k napodobení mého hlasu.",
@@ -4640,10 +4648,9 @@
       "stayInTouchHelp": "Nepovinný souhlas (čl. 6.1.a GDPR). Můžete ho kdykoli odvolat odkazem „Odebrat mé údaje z adresáře“ v potvrzovacím e-mailu, v připomenutích a v pozvánkách nebo na stránce „Moje údaje“. Jméno, e-mailová adresa a organizace jsou ty z této registrace.",
       "stayInTouchRetention": "Tyto údaje uchováváme {months} měsíců od tohoto souhlasu: lhůta začne běžet znovu, pouze pokud políčko znovu zaškrtnete.",
       "recordingOptionalListenOnly": "Pokud nesouhlasíte, účastníte se i tak, pouze jako posluchač: sledujete a píšete do chatu, ale mikrofon, kamera a sdílení obrazovky zůstávají vypnuté. Souhlas můžete dát později v místnosti.",
-      "recordingOptionalHost": "Pokud nesouhlasíte, vstoupíte i tak a vedete jako obvykle, ale váš hlas nezůstane ve stopách jednotlivých osob ani v přepisu. Video místnosti, pokud se nahrává, vás přesto zachytí.",
       "recordingOptionalVoice": "Pokud nesouhlasíte, účastníte se i tak a můžete mluvit, ale zůstáváte mimo záznam: bez jména, hlasu i obrazu. Souhlas můžete dát později v místnosti.",
-      "recordingNotice": "Akce může být nahrávána. Účastníte se bez mikrofonu a kamery: záznam neobsahuje váš hlas ani obraz, pokud vám moderátoři neudělí slovo.",
-      "recordingNoticeVoice": "Akce může být nahrávána. Účastníte se bez mikrofonu a kamery: záznam neobsahuje vaše jméno, hlas ani obraz, pokud v místnosti neudělíte souhlas.",
+      "recordingNotice": "Akce může být nahrávána. Účastníte se bez mikrofonu a kamery: váš obličej a vaše jméno se ve videu nikdy neobjeví a váš hlas jen tehdy, když vám moderátor udělí slovo.",
+      "recordingNoticeVoice": "Akce může být nahrávána. Účastníte se bez mikrofonu a kamery: váš obličej a vaše jméno se ve videu nikdy neobjeví a váš hlas jen tehdy, když v místnosti udělíte souhlas.",
       "recordingHostAlwaysReserved": "Vedete tuto akci: jste vždy v záznamu, se jménem, hlasem, obrazem a sdílenou obrazovkou. Video zůstává vyhrazeno pořadatelům a registrovaným: nezveřejňuje se. Registrovaní ho mohou sledovat, dokud jsou uchovávány údaje o jejich registraci.",
       "recordingHostAlwaysPublic": "Vedete tuto akci: jste vždy v záznamu, se jménem, hlasem, obrazem a sdílenou obrazovkou. Video může být zveřejněno a může ho sledovat kdokoli.",
       "recordingHostAlways": "Vedete tuto akci: jste vždy v záznamu, se jménem, hlasem, obrazem a sdílenou obrazovkou."
@@ -4662,9 +4669,9 @@
         "destinationUnset": "Pořadatelé po akci rozhodnou, zda záznam zveřejní.",
         "refuseOut": "Pokud nesouhlasíte, účastníte se i tak a zůstáváte mimo záznam.",
         "refuseListenOnly": "Pokud nesouhlasíte, účastníte se pouze jako posluchač.",
-        "hostsAlways": "Moderátoři jsou vždy v záznamu, se jménem, hlasem, obrazem a sdílenou obrazovkou.",
-        "audienceNotice": "Účastníte se bez mikrofonu a kamery: záznam neobsahuje váš hlas ani obraz, pokud vám moderátoři neudělí slovo.",
-        "audienceNoticeVoice": "Účastníte se bez mikrofonu a kamery: záznam neobsahuje vaše jméno, hlas ani obraz, pokud v místnosti neudělíte souhlas."
+        "hostsAlways": "Ve videu jsou jen moderátoři, se jménem, hlasem, obrazem a sdílenou obrazovkou. Obličej a jméno účastníků se nikdy neobjeví.",
+        "audienceNotice": "Účastníte se bez mikrofonu a kamery: váš obličej a vaše jméno se ve videu nikdy neobjeví a váš hlas jen tehdy, když vám moderátor udělí slovo.",
+        "audienceNoticeVoice": "Účastníte se bez mikrofonu a kamery: váš obličej a vaše jméno se ve videu nikdy neobjeví a váš hlas jen tehdy, když v místnosti udělíte souhlas."
       },
       "transcript": {
         "label": "Přepis",
@@ -5606,6 +5613,7 @@
     "switchToLive": "Přepnout na živý přenos",
     "enterRoom": "Vstoupit do místnosti",
     "recordingNotice": "Tato událost může být nahrávána.",
+    "recordingNoticeInstant": "Hovor může být nahráván. Ve videu jsou jen moderátoři: váš obličej a vaše jméno nikdy. Pokud někdo spustí nahrávání, zeptáme se vás, zda souhlasíte s nahráváním svého hlasu.",
     "recordingAvailableAfter": "Záznam bude k dispozici po skončení události.",
     "autoRefreshHint": "Stránka se automaticky aktualizuje, jakmile událost začne.",
     "startEventButton": "Zahájit událost",
@@ -5658,9 +5666,9 @@
     "aiNoticeTitle": "Zpracování umělou inteligencí po události",
     "aiNotice": "Po skončení může být záznam zpracován nástroji umělé inteligence, aby vznikl přepis, shrnutí a případné překlady a dabing. Přepis se týká pouze těch, kdo dali souhlas. Výstupy mohou obsahovat nepřesnosti; závazným zdrojem zůstává video.",
     "multitrackConsentTitle": "Přepis vašich příspěvků",
-    "recordingConsentTitle": "Záznam akce",
-    "recordingConsentIntro": "Akce může být nahrávána (zvuk i video). S vaším souhlasem záznam obsahuje vaše jméno, hlas, obraz a to, co sdílíte na obrazovce.",
-    "recordingConsentIntroAnonymous": "Akce může být nahrávána (zvuk i video). S vaším souhlasem záznam obsahuje váš pseudonym, hlas, obraz a to, co sdílíte na obrazovce.",
+    "recordingConsentTitle": "Nahrávání vašeho hlasu",
+    "recordingConsentIntro": "Akce může být nahrávána. Ve videu jsou jen moderátoři: váš obličej a vaše jméno nikdy. S vaším souhlasem se váš hlas nahrává, když mluvíte.",
+    "recordingConsentIntroAnonymous": "Akce může být nahrávána. Ve videu jsou jen moderátoři: váš obličej a váš pseudonym nikdy. S vaším souhlasem se váš hlas nahrává, když mluvíte.",
     "recordingConsentIntroNoVideo": "Na této akci se video místnosti nenahrává.",
     "enterGardenTitle": "Vstupte na náměstí",
     "enterGardenHint": "Jiné místo pro čekání: projděte se, potkejte ostatní čekající a vstupte do přenosu branou, až se místnost otevře.",

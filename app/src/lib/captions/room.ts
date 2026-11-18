@@ -65,6 +65,20 @@ export async function endpointSenzaRegistrazione(eventId: string): Promise<strin
   return righe.map((r) => r.endpointId);
 }
 
+/**
+ * Chi e' in sala adesso, con il posto e il segno della voce: l'elenco dei
+ * partecipanti ne ricava chi e' nel video, chi solo con la voce, chi no
+ * (lib/live/recording-badge).
+ */
+export async function occupantiInSala(
+  eventId: string
+): Promise<Array<{ endpointId: string; seatId: string; voiceExcluded: boolean }>> {
+  return prisma.roomOccupant.findMany({
+    where: { eventId, leftAt: null },
+    select: { endpointId: true, seatId: true, voiceExcluded: true },
+  });
+}
+
 /** Se dietro l'endpoint c'e' chi non ha il consenso alla registrazione. */
 export async function voceEsclusa(eventId: string, endpointId: string): Promise<boolean> {
   const riga = await prisma.roomOccupant.findUnique({

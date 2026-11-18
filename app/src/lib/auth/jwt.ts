@@ -111,6 +111,13 @@ interface JitsiTokenPayload {
   voiceExcluded?: boolean;
   /** Evento con il solo ascolto: la sala non toglie i blocchi. */
   consentLock?: boolean;
+  /**
+   * Chi conduce (moderatori e relatori): nel video della registrazione, con nome
+   * e immagine. Nessun altro token lo porta: di chi partecipa il registratore
+   * riproduce al massimo la voce. Lo legge Prosody, che lo scrive nella presenza
+   * dove il client non lo puo' cambiare.
+   */
+  paInVideo?: boolean;
 }
 
 /** Microfono, videocamera, condivisione dello schermo: true = bloccato. */
@@ -222,6 +229,7 @@ export async function generateJitsiJwt(
         ...(payload.listenOnly ? { listenOnly: true } : {}),
         ...(payload.voiceExcluded ? { voiceExcluded: true } : {}),
         ...(payload.consentLock ? { consentLock: true } : {}),
+        ...(payload.paInVideo ? { paInVideo: true } : {}),
       },
       features,
     },

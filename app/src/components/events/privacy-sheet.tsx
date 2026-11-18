@@ -5,7 +5,7 @@ import { useId } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { Icon } from '@/components/ui/icon';
-import type { ChiNonAcconsente, SchedaPrivacy } from '@/lib/events/privacy-sheet';
+import type { SchedaPrivacy } from '@/lib/events/privacy-sheet';
 
 /**
  * La scheda privacy di un evento, con gli stessi fatti nel modulo d'iscrizione e
@@ -38,20 +38,6 @@ const TESTO_CHI_NON_ACCONSENTE = {
   avvisoVoce: 'recording.audienceNoticeVoice',
 } as const;
 
-/** Cio' che chi non acconsente legge in sala d'attesa, se conduce (`schedaInSala`). */
-function chiConduceNonAcconsente(scheda: SchedaPrivacy): ChiNonAcconsente | null {
-  if (scheda.registrazione.conduceSempre) return null;
-  switch (scheda.registrazione.chiNonAcconsente) {
-    case null:
-      return null;
-    // Dove la voce non si toglie dal video, chi conduce resta ripreso.
-    case 'soloAscolto':
-    case 'avviso':
-      return 'conduceRipreso';
-    default:
-      return 'restaFuori';
-  }
-}
 
 const TESTO_TRACCE = {
   cancellate: 'transcript.tracks',
@@ -95,7 +81,10 @@ export function schedaInSala(
           pseudonimi: false,
           registrazione: {
             ...scheda.registrazione,
-            chiNonAcconsente: chiConduceNonAcconsente(scheda),
+            // Chi conduce non da' il consenso alla registrazione: dove c'e' un
+            // video ci e' sempre, e senza video restano le tracce per persona,
+            // che seguono il consenso alla trascrizione (riga della trascrizione).
+            chiNonAcconsente: null,
           },
         }
       : {}),
@@ -145,7 +134,6 @@ export function PrivacySheet({
   testoIa?: string | null;
 }) {
   const t = useTranslations('gdpr.sheet');
-  const tConsenso = useTranslations('gdpr.consent');
   const tSala = useTranslations('waiting');
   const titolo = useId();
 
@@ -155,9 +143,7 @@ export function PrivacySheet({
   if (registrazione.destinazione) {
     frasiRegistrazione.push(t(TESTO_DESTINAZIONE[registrazione.destinazione]));
   }
-  if (registrazione.chiNonAcconsente === 'conduceRipreso') {
-    frasiRegistrazione.push(tConsenso('recordingOptionalHost'));
-  } else if (registrazione.chiNonAcconsente) {
+  if (registrazione.chiNonAcconsente) {
     frasiRegistrazione.push(t(TESTO_CHI_NON_ACCONSENTE[registrazione.chiNonAcconsente]));
   }
   if (registrazione.conduceSempre) frasiRegistrazione.push(t('recording.hostsAlways'));

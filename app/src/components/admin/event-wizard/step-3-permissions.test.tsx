@@ -68,31 +68,38 @@ function render(
 }
 
 describe('i consensi nelle impostazioni avanzate', () => {
-  const opzione = () =>
+  const avviso = () =>
+    (container.textContent ?? '').includes(messages.admin.wizard.step2.hostsAlwaysRecordedDesc);
+  const interruttore = () =>
     container.querySelector(`[aria-label="${messages.admin.wizard.step2.hostsAlwaysRecorded}"]`);
   const diagramma = () => container.querySelector('.mappa-consensi');
 
-  it('con la registrazione accesa propone l opzione per chi conduce e il diagramma', () => {
-    render(true, true, 'rimovibile');
-    expect(opzione()).not.toBeNull();
-    expect(diagramma()).not.toBeNull();
+  it('chi conduce e\' sempre nel video: un avviso fisso, mai un interruttore', () => {
+    for (const voce of ['rimovibile', 'fissa'] as const) {
+      render(true, true, voce);
+      expect(avviso()).toBe(true);
+      expect(interruttore()).toBeNull();
+      expect(diagramma()).not.toBeNull();
+    }
   });
 
-  it('l opzione vale solo dove una voce si puo togliere dal video', () => {
-    render(true, true, 'fissa');
-    expect(opzione()).toBeNull();
-    expect(diagramma()).not.toBeNull();
+  it('senza un video della sala chi conduce segue le tracce: niente avviso', () => {
+    render(true, true, 'assente');
+    expect(avviso()).toBe(false);
   });
 
-  it('una chiamata rapida non chiede consensi', () => {
+  it('una chiamata rapida chiede in sala: avviso dove si registra, niente diagramma', () => {
     render(true, true, 'rimovibile', true);
-    expect(opzione()).toBeNull();
+    expect(avviso()).toBe(true);
     expect(diagramma()).toBeNull();
+    render(true, true, 'fissa', true);
+    expect(avviso()).toBe(false);
   });
 
   it('senza registrazione non propone niente', () => {
     render(false, true, 'rimovibile');
-    expect(opzione()).toBeNull();
+    expect(avviso()).toBe(false);
+    expect(interruttore()).toBeNull();
     expect(diagramma()).toBeNull();
   });
 });

@@ -545,7 +545,9 @@
       "locksByConsent": "Mikrofoni in kamere sledijo privolitvi v snemanje: kdor jo je dal, uporablja, kar dogodek dovoljuje, ostali le poslušajo. Zaklepi sobe ostanejo vklopljeni.",
       "listenOnlyBadge": "samo posluša",
       "listenOnlyNoFloor": "Ni dal privolitve v snemanje: ne more govoriti, dokler je ne da v svoji dvorani.",
-      "voiceExcludedBadge": "brez snemanja",
+      "inVideoBadge": "v videu",
+      "voiceRecordedBadge": "glas se snema",
+      "voiceExcludedBadge": "glas se ne snema",
       "voiceExcludedFloor": "Ni privolil v snemanje: lahko nastopa, a ostane zunaj posnetka."
     },
     "moderator": {
@@ -622,6 +624,7 @@
       "tab": "Režija",
       "recordingHeading": "Snemanje",
       "recordingOff": "Ne snema",
+      "recordingNotOfferedInstant": "V hitrih klicih se snemanje ponuja le tam, kjer osebe brez privolitve ostanejo zunaj videa, ta namestitev pa tega ne omogoča.",
       "stopConfirm": "Ustavim snemanje zdaj?",
       "featuresHeading": "Funkcije sobe",
       "featuresHelp": "Vklopijo in izklopijo se za vse, takoj.",
@@ -690,7 +693,7 @@
         "without": {
           "soloAscolto": "Brez te privolitve samo poslušate: mikrofon, kamera in zaslon ostanejo zaprti.",
           "conduce": "Brez te privolitve vseeno vodite.",
-          "voce": "Brez te privolitve sodelujete kot vsi, a ostanete zunaj posnetka: ne ime, ne glas, ne slika.",
+          "voce": "Brez te privolitve sodelujete kot vsi, vaš glas pa ostane zunaj posnetka. Vaš obraz in vaše ime se v videu tako ali tako nikoli ne pojavita.",
           "comeTutti": "Brez te privolitve sodelujete kot vsi."
         },
         "withoutTranscriptHost": "Vaš glas ne ostane v sledeh po osebah niti v prepisu.",
@@ -713,10 +716,18 @@
         "needsRecording": "Date jo lahko po privolitvi v snemanje."
       }
     },
+    "recordingQuestion": {
+      "title": "Klic se snema",
+      "question": "Ali želite, da se vaš glas snema?",
+      "body": "V videu so samo voditelji: vaš obraz in vaše ime nikoli. Če odgovorite da, se klic za nekaj sekund znova poveže in od tedaj se vaš glas snema, ko govorite. Če odgovorite ne ali zaprete to okno, sodelujete naprej kot prej in vaš glas se ne snema.",
+      "later": "Če odgovorite ne, vas bomo ob naslednjem snemanju vprašali znova. Premislite si lahko kadar koli z gumbom {button} na vrhu.",
+      "yes": "Da, snemaj moj glas",
+      "no": "Ne, ne snemaj"
+    },
     "voiceExcluded": {
       "title": "Sodelujete brez snemanja.",
       "consent": "Privolim v snemanje",
-      "body": "Niste privolili v snemanje: sodelujete kot vsi, vaše ime, glas in slika pa ne pridejo v posnetek."
+      "body": "Niste privolili v snemanje: sodelujete kot vsi, vaš glas pa ostane zunaj posnetka. Vaš obraz in vaše ime se v videu tako ali tako nikoli ne pojavita."
     }
   },
   "qa": {
@@ -1065,7 +1076,7 @@
         "participantListCameraNote": "Ko je seznam skrit, tisti, ki vklopi kamero, ne vidi svojega okna. Za srečanje, na katerem se vsi vidijo, pokažite seznam.",
         "recordingLockedLive": "Ko je dvorana odprta, snemanja ni mogoče spremeniti: velja od prvega vstopa.",
         "hostsAlwaysRecorded": "Voditelji so vedno v posnetku",
-        "hostsAlwaysRecordedDesc": "Ko je izklopljeno, moderatorji in govorniki izbirajo kot vsi. Vklopite le, če so že privolili v snemanje: polja ne vidijo, obvestilo o dogodku pa mora to navesti."
+        "hostsAlwaysRecordedDesc": "Moderatorji in govorci so v videu z imenom in sliko, brez potrditvenega polja: obvestilo o zasebnosti dogodka mora to navesti. Od udeležencev se snema samo glas in samo z njihovo privolitvijo."
       },
       "step3": {
         "heading": "Osebe in vabila",
@@ -1367,7 +1378,6 @@
         "consentRecordingNotice": "za snemanje samo obvestilo (udeleženci ne govorijo in se ne kažejo)",
         "consentTranscription": "prepis lastnih govorov, neobvezen",
         "consentsNone": "Privolitve ni treba zahtevati: ob prijavi zadošča seznanitev s politiko zasebnosti.",
-        "consentsHosts": "Moderatorje in govornike za snemanje vprašamo v dvorani, neobvezno.",
         "consentsWithdraw": "Udeleženci jih lahko v dvorani prekličejo z gumbom »Privolitve«.",
         "participantListShown": "Seznam udeležencev: viden vsem.",
         "participantListHidden": "Seznam udeležencev: samo za voditelje in govorce.",
@@ -1450,22 +1460,20 @@
         "recording": "V posnetku",
         "roomSame": "Sodeluje po pravilih dogodka.",
         "roomListenOnly": "Samo posluša in piše v klepet.",
-        "recordedFull": "Ime, glas, slika in deljeni zaslon.",
+        "recordedFull": "Samo glas, ko oseba govori: obraz in ime se nikoli ne pojavita.",
         "notRecorded": "Ni v posnetku: ne ime, ne glas, ne slika, ne deljeni zaslon.",
         "recordedVoice": "Njegov glas, na ločeni sledi.",
         "notRecordedVoice": "Njegov glas se ne snema.",
         "othersSame": "Drugi se ne spremenijo: zaklepi mikrofonov, dodeljevanje besede in videz videa ostanejo po pravilih dogodka.",
         "audienceNotice": "Udeleženci nimajo mikrofona, kamere ali zaslona: prejmejo le obvestilo. Če dobijo besedo, lahko privolijo v sobi; če ne, ostanejo zunaj posnetka.",
-        "hostsChoose": "Moderatorji in govorniki izbirajo kot vsi: kdor ne privoli, vodi običajno, a ostane zunaj posnetka.",
         "hostsAlways": "Moderatorji in govorniki so vedno v posnetku: polja ne vidijo.",
-        "hostsFixed": "Moderatorji in govorniki vodijo v vsakem primeru, video pa jih posname.",
         "trace": "Če nastopi med snemanjem, opomba ob videu pove, da manjka prispevek, prepis pa označi *** s časom.",
         "anytime": "Privolitev se da in prekliče v sobi, kadar koli.",
         "transcription": "Prepis lastnih prispevkov je ločena, neobvezna privolitev.",
         "fixedVoice": "Ta namestitev ne more odstraniti glasu iz videa: kdor ne privoli, ostane le poslušalec, zaklepi sobe pa sledijo privolitvi.",
         "fixedNotice": "Ta namestitev ne more odstraniti glasu iz videa: kdor dobi besedo, vstopi v posnetek, obvestilo pa to pove.",
         "questionTranscription": "Je dano soglasje za prepis?",
-        "fixedNotRecorded": "Brez glasu in slike; ime se lahko pojavi v videoposnetku."
+        "fixedNotRecorded": "Ne glas, ne slika, ne ime."
       }
     },
     "nav": {
@@ -4628,9 +4636,9 @@
   },
   "gdpr": {
     "consent": {
-      "recording": "Soglašam z avdio/video snemanjem dogodka",
-      "recordingReserved": "Privolim v snemanje dogodka (zvok in video). Video ostane na voljo samo organizatorjem in prijavljenim osebam in se ne objavi. Prijavljena oseba si ga lahko ogleda, dokler se hranijo podatki o njeni prijavi.",
-      "recordingPublic": "Privolim v snemanje dogodka (zvok in video) in v objavo posnetka: video si lahko kdor koli ogleda na strani dogodka in v videoknjižnici.",
+      "recording": "Privolim v snemanje svojega glasu, ko med dogodkom spregovorim. Moj obraz in moje ime se v videu nikoli ne pojavita.",
+      "recordingReserved": "Privolim v snemanje svojega glasu, ko med dogodkom spregovorim. Moj obraz in moje ime se v videu nikoli ne pojavita. Video ostane na voljo samo organizatorjem in prijavljenim osebam in se ne objavi. Prijavljena oseba si ga lahko ogleda, dokler se hranijo podatki o njeni prijavi.",
+      "recordingPublic": "Privolim v snemanje svojega glasu, ko med dogodkom spregovorim. Privolim tudi v objavo videa: video si lahko kdor koli ogleda na strani dogodka in v videoknjižnici. Moj obraz in moje ime se v videu nikoli ne pojavita.",
       "recordingNoVideo": "Privolim v snemanje dogodka. Video dvorane se ne snema: ostanejo samo zvočne sledi oseb, ki privolijo v prepis, če jih dogodek predvideva.",
       "multitrack": "Privolim, da se moji prispevki prepišejo z mojim imenom za poročilo o dogodku. Če dogodek snema ločen zvočni posnetek za vsako osebo, se moj glas snema samo za ta namen, posnetek pa se po prepisu izbriše; ne uporablja se za prepoznavanje ali posnemanje mojega glasu.",
       "multitrackRetained": "Privolim, da se moji prispevki prepišejo z mojim imenom za poročilo o dogodku. Če dogodek snema ločen zvočni posnetek za vsako osebo, se moj glas snema samo za ta namen, posnetek pa se hrani s podatki dogodka; ne uporablja se za prepoznavanje ali posnemanje mojega glasu.",
@@ -4640,10 +4648,9 @@
       "stayInTouchHelp": "Neobvezna privolitev (člen 6.1.a GDPR). Kadar koli jo lahko prekličete s povezavo »Odstrani moje podatke iz imenika« v potrditvenem e-sporočilu, v opomnikih in povabilih ali na strani »Moji podatki«. Ime, e-poštni naslov in organizacija so tisti iz te prijave.",
       "stayInTouchRetention": "Te podatke hranimo {months} mesecev od te privolitve: obdobje se začne znova samo, če znova označite polje.",
       "recordingOptionalListenOnly": "Če ne privolite, vseeno sodelujete, samo kot poslušalec: spremljate in pišete v klepet, mikrofon, kamera in deljenje zaslona pa ostanejo izklopljeni. Privolite lahko pozneje, iz sobe.",
-      "recordingOptionalHost": "Če ne privolite, vseeno vstopite in vodite kot običajno, vendar se vaš glas ne ohrani v posnetkih po osebah niti v prepisu. Video sobe, če se snema, vas vseeno zajame.",
       "recordingOptionalVoice": "Če ne privolite, vseeno sodelujete in lahko nastopate, a ostanete zunaj posnetka: ne ime, ne glas, ne slika. Privolite lahko pozneje, iz sobe.",
-      "recordingNotice": "Dogodek se lahko snema. Sodelujete brez mikrofona in kamere: posnetek ne vsebuje vašega glasu ali slike, razen če vam voditelji dajo besedo.",
-      "recordingNoticeVoice": "Dogodek se lahko snema. Sodelujete brez mikrofona in kamere: posnetek ne vsebuje vašega imena, glasu ali slike, razen če privolite v dvorani.",
+      "recordingNotice": "Dogodek se lahko snema. Sodelujete brez mikrofona in kamere: vaš obraz in vaše ime se v videu nikoli ne pojavita, vaš glas pa le, če vam voditelj da besedo.",
+      "recordingNoticeVoice": "Dogodek se lahko snema. Sodelujete brez mikrofona in kamere: vaš obraz in vaše ime se v videu nikoli ne pojavita, vaš glas pa le, če privolite v sobi.",
       "recordingHostAlwaysReserved": "Vodite ta dogodek: ste vedno v posnetku, z imenom, glasom, sliko in deljenim zaslonom. Video ostane na voljo samo organizatorjem in prijavljenim osebam in se ne objavi. Prijavljena oseba si ga lahko ogleda, dokler se hranijo podatki o njeni prijavi.",
       "recordingHostAlwaysPublic": "Vodite ta dogodek: ste vedno v posnetku, z imenom, glasom, sliko in deljenim zaslonom. Video je lahko objavljen in si ga lahko ogleda kdor koli.",
       "recordingHostAlways": "Vodite ta dogodek: ste vedno v posnetku, z imenom, glasom, sliko in deljenim zaslonom."
@@ -4662,9 +4669,9 @@
         "destinationUnset": "Organizatorji po dogodku odločijo, ali ga bodo objavili.",
         "refuseOut": "Če ne privolite, vseeno sodelujete in ostanete zunaj posnetka.",
         "refuseListenOnly": "Če ne privolite, sodelujete samo kot poslušalec.",
-        "hostsAlways": "Voditelji so vedno v posnetku, z imenom, glasom, sliko in deljenim zaslonom.",
-        "audienceNotice": "Sodelujete brez mikrofona in kamere: posnetek ne vsebuje vašega glasu ali slike, razen če vam voditelji dajo besedo.",
-        "audienceNoticeVoice": "Sodelujete brez mikrofona in kamere: posnetek ne vsebuje vašega imena, glasu ali slike, razen če privolite v dvorani."
+        "hostsAlways": "V videu so samo voditelji, z imenom, glasom, sliko in deljenim zaslonom. Obraz in ime udeležencev se nikoli ne pojavita.",
+        "audienceNotice": "Sodelujete brez mikrofona in kamere: vaš obraz in vaše ime se v videu nikoli ne pojavita, vaš glas pa le, če vam voditelj da besedo.",
+        "audienceNoticeVoice": "Sodelujete brez mikrofona in kamere: vaš obraz in vaše ime se v videu nikoli ne pojavita, vaš glas pa le, če privolite v sobi."
       },
       "transcript": {
         "label": "Prepis",
@@ -5606,6 +5613,7 @@
     "switchToLive": "Preklopi na živo",
     "enterRoom": "Vstopite v dvorano",
     "recordingNotice": "Ta dogodek se lahko snema.",
+    "recordingNoticeInstant": "Klic se lahko snema. V videu so samo voditelji: vaš obraz in vaše ime nikoli. Če kdo začne snemanje, vas bomo vprašali, ali privolite v snemanje svojega glasu.",
     "recordingAvailableAfter": "Posnetek bo na voljo po dogodku.",
     "autoRefreshHint": "Stran se bo samodejno osvežila, ko se bo dogodek začel.",
     "startEventButton": "Zaženi dogodek",
@@ -5658,9 +5666,9 @@
     "aiNoticeTitle": "Obdelava z UI po dogodku",
     "aiNotice": "Ob koncu lahko posnetek obdelajo orodja umetne inteligence za izdelavo prepisa, povzetka ter morebitnih prevodov in sinhronizacij. Prepis zajema samo osebe, ki so dale privolitev. Rezultati lahko vsebujejo netočnosti; merodajen ostaja videoposnetek.",
     "multitrackConsentTitle": "Prepis vaših prispevkov",
-    "recordingConsentTitle": "Snemanje dogodka",
-    "recordingConsentIntro": "Dogodek se lahko snema (zvok in video). Ob privolitvi posnetek vsebuje vaše ime, glas, sliko in to, kar delite na zaslonu.",
-    "recordingConsentIntroAnonymous": "Dogodek se lahko snema (zvok in video). Ob privolitvi posnetek vsebuje vaš psevdonim, glas, sliko in to, kar delite na zaslonu.",
+    "recordingConsentTitle": "Snemanje vašega glasu",
+    "recordingConsentIntro": "Dogodek se lahko snema. V videu so samo voditelji: vaš obraz in vaše ime nikoli. Z vašo privolitvijo se vaš glas snema, ko govorite.",
+    "recordingConsentIntroAnonymous": "Dogodek se lahko snema. V videu so samo voditelji: vaš obraz in vaš psevdonim nikoli. Z vašo privolitvijo se vaš glas snema, ko govorite.",
     "recordingConsentIntroNoVideo": "Na tem dogodku se video dvorane ne snema.",
     "enterGardenTitle": "Vstopi na trg",
     "enterGardenHint": "Drug kraj za čakanje: sprehodite se, spoznajte druge, ki čakajo, in vstopite v prenos skozi vrata, ko se soba odpre.",

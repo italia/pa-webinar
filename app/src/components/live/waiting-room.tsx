@@ -221,9 +221,9 @@ interface WaitingRoomProps {
   /** Chi conduce o interviene: la scelta di fotocamera e microfono si ricorda
    *  a parte da quella di chi assiste. Per tutti partono spenti. */
   conduce?: boolean;
-  /** Moderatore o relatore (non chi e' in una chiamata rapida): il consenso
-   *  alla registrazione gli si chiede libero, e la trascrizione dei propri
-   *  interventi vale solo insieme a quello. */
+  /** Moderatore o relatore. Il consenso alla registrazione non gli si chiede
+   *  (e' nel video, lib/live/consent-rule): se una sala lo chiedesse lo stesso,
+   *  la trascrizione dei propri interventi aspetterebbe quello. */
   conduceDaIncarico?: boolean;
   jvbReady?: boolean | null;
   defaultName: string;
@@ -265,6 +265,10 @@ interface WaitingRoomProps {
   recordingListenOnly?: boolean;
   /** Chi conduce un evento che lo tiene sempre nella registrazione: lo sa da qui. */
   recordingHostAlways?: boolean;
+  /** Chiamata rapida che registra: si entra fuori dalla registrazione e la
+   *  domanda arriva in sala, quando qualcuno la avvia. Qui la si annuncia, e la
+   *  trascrizione, che senza quel consenso non varrebbe, non si chiede. */
+  recordingAskedInRoom?: boolean;
   /** Il testo sulla registrazione scelto per l'evento; null = quello predefinito. */
   recordingConsentText?: string | null;
   /** L'informativa privacy dell'evento, accanto alla scheda. */
@@ -337,6 +341,7 @@ export default function WaitingRoom({
   voce = 'rimovibile',
   recordingListenOnly = false,
   recordingHostAlways = false,
+  recordingAskedInRoom = false,
   recordingConsentText = null,
   privacy,
   schedaPrivacy = null,
@@ -530,15 +535,15 @@ export default function WaitingRoom({
     giaDato: multitrackConsentExempt,
     voce,
     soloAscolto: recordingListenOnly,
+    registrazioneInSala: recordingAskedInRoom,
   });
   // Il consenso alla registrazione dell'evento, se va chiesto qui. E' libero:
   // non ferma ne' il pulsante ne' la piazza.
   const recordingRequired = recordingConsentRequired && !isEnded;
-  // Chi conduce o interviene, in un evento che registra: la trascrizione dei
-  // propri interventi vale solo con il consenso alla registrazione (la rotta
-  // del token la ignora senza), quindi la casella si apre dopo quella.
-  // Senza consenso alla registrazione non si tiene neanche il testo: la voce non
-  // viene registrata. Chi conduce, dove la voce resta nel video, sceglie lo stesso.
+  // Dove la voce di chi non acconsente resta fuori, la trascrizione dei propri
+  // interventi vale solo con il consenso alla registrazione (la rotta del token
+  // la ignora senza), quindi la casella si apre dopo quella: senza, la voce non
+  // viene registrata e non si tiene neanche il testo.
   const trascrizioneSospesa =
     (conduceDaIncarico || voce === 'rimovibile') && recordingRequired && !recordingConsent;
   // La piazza e' disponibile quando c'e' qualcosa da fare e nessun cancello
@@ -1281,11 +1286,10 @@ export default function WaitingRoom({
           {!recordingConsent && voce !== 'assente' && (
             // Libero davvero: si dice che cosa succede senza.
             <div id={NOTA_REGISTRAZIONE} className="wr-consensi__nota">
+              {/* Chi conduce non vede la casella: e' sempre nel video. */}
               {voce === 'rimovibile'
                 ? tGdpr('recordingOptionalVoice')
-                : conduceDaIncarico
-                  ? tGdpr('recordingOptionalHost')
-                  : tGdpr('recordingOptionalListenOnly')}
+                : tGdpr('recordingOptionalListenOnly')}
             </div>
           )}
         </>
@@ -1938,11 +1942,13 @@ export default function WaitingRoom({
         'registrazione',
         <span className="wr-fact__rec" />,
         t('summaryRecording'),
-        recordingListenOnly && !schedaPrivacy
-          ? tGdpr(voce === 'fissa' ? 'recordingNotice' : 'recordingNoticeVoice')
-          : recordingHostAlways
-            ? tGdpr(chiaveAvvisoConduce(recordingDestination))
-            : t('recordingNotice'),
+        recordingAskedInRoom
+          ? t('recordingNoticeInstant')
+          : recordingListenOnly && !schedaPrivacy
+            ? tGdpr(voce === 'fissa' ? 'recordingNotice' : 'recordingNoticeVoice')
+            : recordingHostAlways
+              ? tGdpr(chiaveAvvisoConduce(recordingDestination))
+              : t('recordingNotice'),
       ),
     );
   }

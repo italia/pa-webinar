@@ -32,7 +32,11 @@ type PropsAttesa = {
 };
 const attesa = vi.hoisted(() => ({ props: null as unknown }));
 const leggiAttesa = () => attesa.props as PropsAttesa;
-const conferenza = vi.hoisted(() => ({ perdiConnessione: () => {}, jwt: '' }));
+const conferenza = vi.hoisted(() => ({
+  perdiConnessione: () => {},
+  jwt: '',
+  registrazione: (_acceso: boolean) => {},
+}));
 
 vi.mock('@/components/live/waiting-room', () => ({
   default: (props: unknown) => {
@@ -47,15 +51,18 @@ vi.mock('@/components/jitsi/jitsi-room', async () => {
     default: function ConferenzaFinta({
       onReady,
       onConnectionLost,
+      onRecordingStatusChanged,
       jwt,
     }: {
       onReady: () => void;
       onConnectionLost: () => void;
+      onRecordingStatusChanged?: (acceso: boolean) => void;
       jwt: string;
     }) {
       const entra = useRef(onReady);
       useEffect(() => entra.current(), []);
       conferenza.perdiConnessione = onConnectionLost;
+      conferenza.registrazione = onRecordingStatusChanged ?? (() => {});
       conferenza.jwt = jwt;
       return null;
     },
@@ -810,7 +817,7 @@ describe('sala — il testo su cui si acconsente', () => {
     expect(testo()).toContain(g.recordingPublic);
   });
 
-  it("chi conduce porta il consenso trovato dalla pagina con il testo dell'apertura", async () => {
+  it('chi conduce non ha un consenso alla registrazione da dare o da ritirare: e\' nel video', async () => {
     await monta({
       event: {
         ...evento,
@@ -818,17 +825,15 @@ describe('sala — il testo su cui si acconsente', () => {
         recordingDestination: 'REGISTRANTS',
       },
       isModerator: true,
-      hasRecordingConsent: true,
     });
     risposte.push({ recordingDestination: 'PUBLIC' });
     await entra();
-    expect(ultimoToken()).toMatchObject({ consentReplay: { recording: true, roomTokens: [] } });
     expect(ultimoToken()).not.toHaveProperty('recordingConsent');
-    // Non copre piu': al prossimo ingresso non riparte, e si richiede.
+    expect(ultimoToken()?.consentReplay).toBeUndefined();
     await premi(pulsante(l.consents.button));
-    expect(testo()).toContain(l.consents.notGiven);
-    expect(testo()).toContain(g.recordingPublic);
-    expect(testo()).toContain(l.consents.textChanged);
+    expect(testo()).not.toContain(l.consents.recording.title);
+    expect(testo()).not.toContain(g.recordingPublic);
+    expect(testo()).toContain(l.consents.transcription.title);
   });
 
   it('chi conduce porta la trascrizione trovata dalla pagina, come la registrazione', async () => {
@@ -1421,10 +1426,16 @@ describe("sala — la scheda in sala d'attesa", () => {
   } as unknown as SchedaPrivacy;
 
   it('dice a chi conduce cio che vale per lui', async () => {
-    await monta({ event: { ...evento, schedaPrivacy: scheda }, isModerator: true });
+    await monta({
+      event: {
+        ...evento,
+        schedaPrivacy: { ...scheda, registrazione: { ...scheda.registrazione, conduceSempre: true } },
+      },
+      isModerator: true,
+    });
     expect(leggiAttesa().schedaPrivacy).toMatchObject({
       pseudonimi: false,
-      registrazione: { chiNonAcconsente: 'conduceRipreso' },
+      registrazione: { chiNonAcconsente: null, conduceSempre: true },
     });
   });
 
@@ -1596,5 +1607,54 @@ describe("sala — fine dell'evento", () => {
     );
     const put = await termina();
     expect(put.body).toMatchObject({ aiTranscriptEnabled: true, aiSummaryEnabled: true });
+  });
+});
+
+describe('sala — la chiamata rapida chiede a chi partecipa, all\'avvio della registrazione', () => {
+  const rapida = { ...evento, eventType: 'INSTANT' as const };
+  const q = messages.live.recordingQuestion;
+  const registra = async (acceso: boolean) => {
+    await act(async () => conferenza.registrazione(acceso));
+  };
+
+  it("chi partecipa riceve la domanda, e il si' chiede un token con il consenso", async () => {
+    await monta({ event: rapida, isGuest: true, token: '' });
+    risposte.push({ voiceExcluded: true });
+    await entra();
+    expect(testo()).not.toContain(q.question);
+    await registra(true);
+    expect(testo()).toContain(q.question);
+    risposte.push({ voiceExcluded: false, consentsInForce: { recording: true, transcription: false } });
+    await premi(pulsante(q.yes));
+    await vi.waitFor(() => expect(ultimoToken()).toMatchObject({ recordingConsent: true }));
+    await vi.waitFor(() => expect(testo()).not.toContain(q.question));
+  });
+
+  it('un no vale per quella registrazione, e alla successiva si richiede', async () => {
+    await monta({ event: rapida, isGuest: true, token: '' });
+    risposte.push({ voiceExcluded: true });
+    await entra();
+    await registra(true);
+    await premi(pulsante(q.no));
+    await vi.waitFor(() => expect(testo()).not.toContain(q.question));
+    await registra(false);
+    await registra(true);
+    expect(testo()).toContain(q.question);
+  });
+
+  it('chi modera e\' nel video: nessuna domanda', async () => {
+    await monta({ event: rapida, isModerator: true, token: 'token-moderatore' });
+    risposte.push({ role: 'moderator', voiceExcluded: false });
+    await entra();
+    await registra(true);
+    expect(testo()).not.toContain(q.question);
+  });
+
+  it('in un evento a calendario la domanda non c\'e\'', async () => {
+    await monta();
+    risposte.push({ voiceExcluded: true });
+    await entra();
+    await registra(true);
+    expect(testo()).not.toContain(q.question);
   });
 });

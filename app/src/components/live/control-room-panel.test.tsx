@@ -21,7 +21,10 @@ const funzioni: FunzioneSala[] = [
   { key: 'qaEnabled', label: 'Domande', on: false },
 ];
 
-function disegna(lista: FunzioneSala[] = funzioni) {
+function disegna(
+  lista: FunzioneSala[] = funzioni,
+  registrazione: { recordingEnabled?: boolean; registrazioneNonOfferta?: boolean } = {},
+) {
   act(() => {
     root.render(
       <NextIntlClientProvider locale="it" messages={messages}>
@@ -29,7 +32,8 @@ function disegna(lista: FunzioneSala[] = funzioni) {
           api={null}
           eventId="e1"
           token="t"
-          recordingEnabled={false}
+          recordingEnabled={registrazione.recordingEnabled ?? false}
+          registrazioneNonOfferta={registrazione.registrazioneNonOfferta}
           isRecording={false}
           faseRegistratore={null}
           registrazione={{ azionabile: false, bloccato: false, inPausa: false, avvia: vi.fn(), ferma: vi.fn(), avviso: '' }}
@@ -105,3 +109,20 @@ describe('Regia — funzioni della sala', () => {
   });
 });
 
+
+describe('Regia — registrazione non offerta in una chiamata rapida', () => {
+  it('il comando c\'e\', spento, e dice perche\'', () => {
+    disegna(funzioni, { registrazioneNonOfferta: true });
+    const avvia = pulsante(messages.live.moderator.startRecording)!;
+    expect(avvia).toBeDefined();
+    expect((avvia as HTMLButtonElement).disabled).toBe(true);
+    const motivo = container.querySelector(`#${avvia.getAttribute('aria-describedby')}`);
+    expect(motivo?.textContent).toBe(messages.live.controlRoom.recordingNotOfferedInstant);
+  });
+
+  it('altrove la sezione della registrazione non cambia', () => {
+    disegna();
+    expect(pulsante(messages.live.moderator.startRecording)).toBeUndefined();
+    expect(container.textContent).not.toContain(messages.live.controlRoom.recordingNotOfferedInstant);
+  });
+});
