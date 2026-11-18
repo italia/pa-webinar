@@ -560,7 +560,9 @@ Your notice should state at least:
 
 Access and erasure work without staff involvement, through a link emailed to
 the address that registered; `app/src/lib/gdpr/request-token.ts` sets how long
-the link is valid, and requests are rate-limited. Both flows need a working
+the link is valid, and requests are rate-limited. From the access page a
+registrant also corrects or deletes one registration, after typing a code that
+the platform emails to the registration's address. Both flows need a working
 SMTP relay and the `email-outbox` job. They reach only data found through a
 registration's email address, so your notice should not promise more:
 [Data-subject rights](../GDPR.md#data-subject-rights) lists exactly what each
@@ -570,9 +572,11 @@ flow covers.
 |---|---|---|
 | Access (Art. 15) | `/<locale>/privacy/my-data` (`/it/privacy/i-miei-dati`, `/en/privacy/my-data`) | Everything outside [What the export contains](../GDPR.md#what-the-export-contains), such as chat, questionnaire answers, recordings and AI outputs |
 | Withdrawal of a consent (Art. 7(3)) | The same page, for the recording, the transcription and future communications, also from the copies of the proofs kept after a registration is gone. In the room, under **Consents** | What is already in the composite video stays: removing it is a request to you. A withdrawal from a kept copy also takes a registrant out of the transcript from captions, as one from the room does; an AI transcript already built does not change |
-| Erasure (Art. 17) | `/<locale>/privacy/my-data/erasure` (`/it/privacy/i-miei-dati/cancellazione`, `/en/privacy/my-data/erasure`) | Everything outside [What erasure deletes](../GDPR.md#what-erasure-deletes). Feedback and questionnaire answers given through a registration are deleted; those given as a guest, or on the public event page, are not found; the event's retention later deletes the chat and removes names and browser ids from the content that stays. The proof of a consent stays without a name while its video or transcript exists, published or not: say so |
+| Giving a consent again | The same page: the recording and the transcription while the event takes registrations, future communications while the event and the installation offer the address book. In the room, under **Consents** | A consent given again counts from the next entry into the room, never for what is already recorded: say so if your notice describes the consents |
+| Erasure (Art. 17) | `/<locale>/privacy/my-data/erasure` (`/it/privacy/i-miei-dati/cancellazione`, `/en/privacy/my-data/erasure`); one registration alone with **Delete this registration** on the access page | Everything outside [What erasure deletes](../GDPR.md#what-erasure-deletes). Feedback and questionnaire answers given through a registration are deleted; those given as a guest, or on the public event page, are not found; the event's retention later deletes the chat and removes names and browser ids from the content that stays. The proof of a consent stays without a name while its video or transcript exists, published or not: say so |
 | Objection (Art. 21), address book | The link in emails, or the **My data** page | Requests by other means: deletion of the entry by an administrator |
-| Rectification, portability, restriction | By request | No self-service flow |
+| Rectification (Art. 16) | Name and organization of a registration, or of all of them with the address-book entry, with **Correct name and organization** on the access page | The email address, the role and the type of organization: an administrator corrects them on request ([What needs an administrator](../GDPR.md#what-needs-an-administrator)) |
+| Portability, restriction | By request | No self-service flow |
 | Guests | By request | Nothing ties a guest's data to an email address, so self-service cannot find it |
 
 Transcript corrections and the removal of a person's contribution from a

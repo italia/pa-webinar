@@ -232,6 +232,7 @@ limitation (Art. 5(1)(b) and Art. 5(1)(e)). Only stable profile fields carry ove
 | Withdrawal | `ritiraComunicazioni()` in `app/src/lib/live/consent-withdrawal.ts`, shared by the opt-out page and `POST /api/gdpr/consents` |
 | Stopped invitations | `fermaInviti()`, `riapriInviti()` and `indirizzoFermato()` in `app/src/lib/persons/inviti-fermati.ts` |
 | A tick waiting for confirmation | `Registration.addressBookPending`, and `applicaSpuntaInAttesa()` in `app/src/lib/persons/spunta-in-attesa.ts`, called by `GET /api/events/{slug}/registrations/enter` and by `POST /api/gdpr/consents` with `confirmAddressBook` |
+| Future communications given again from the person's data page | `ridaiComunicazioni()` in the same file, called through `daiConsenso()` in `app/src/lib/gdpr/consent-giving.ts` by `POST /api/gdpr/consents` with `give: true`: the same return to the address book as a confirmed tick, with the data of that registration |
 | Opt-out token and link | `app/src/lib/persons/opt-out-token.ts` and `app/src/lib/persons/opt-out-link.ts` |
 | Opt-out page and API | `app/src/app/[locale]/rubrica/opt-out/page.tsx` and `app/src/app/api/rubrica/opt-out/route.ts` |
 | Retention job | `app/src/app/api/cron/rubrica-retention/route.ts`, with `riempiEmailRubrica()` in `app/src/lib/persons/riempimento-email.ts`. Chart template `infra/helm/pa-webinar/templates/cronjob-rubrica-retention.yaml`, with the keys `cronjobs.rubricaRetention.enabled` and `cronjobs.rubricaRetention.schedule` in `infra/helm/pa-webinar/values.yaml` |
