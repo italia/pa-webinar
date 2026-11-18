@@ -2181,7 +2181,7 @@
         "jobMaxAttempts": "Próbálkozások a sikertelenné nyilvánítás előtt",
         "jobMaxAttemptsHelp": "Hányszor próbálja újra a pipeline a feladatot, mielőtt sikertelennek jelöli. A próbálkozások közötti várakozás exponenciálisan nő (30 másodperctől 2 óráig). A szokásos érték 5.",
         "artifactRetentionDays": "Artefaktumok megőrzése (nap)",
-        "artifactRetentionDaysHelp": "0 értéknél nincs az egész webhelyre vonatkozó korlát: az AI-artefaktumok a felvételük vagy az esemény megőrzési idejét követik. A nullánál nagyobb érték esetén egy napi feladat töröl minden olyan artefaktumot, amely ennél több napja jött létre, akár közzétették, akár nem: ez lerövidítheti a megőrzést, de soha nem hosszabbítja meg. A beszélők neveire és a feladatok adattartalmára ez nem vonatkozik: ezek a felvétel vagy az esemény megőrzési idejét követik. Részletek: docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "0 értéknél nincs az egész webhelyre vonatkozó korlát: az AI-artefaktumok a felvételük megőrzési idejét követik. A nullánál nagyobb érték esetén egy napi feladat töröl minden olyan artefaktumot, amely ennél több napja jött létre, akár közzétették, akár nem: ez lerövidítheti a megőrzést, de soha nem hosszabbítja meg. A beszélők neveire és a feladatok adattartalmára ez nem vonatkozik: ezek a felvétel megőrzési idejét követik. Részletek: docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "AI-tájékoztató a váróteremben",
         "consentDisclosureHelp": "A résztvevőknek a váróteremben megjelenő szöveg, ha az esemény AI-utómunkát használ (átiratkészítés, összefoglaló, fordítás, szinkron). Nyelvenként testre szabható. Hagyja üresen a beépített alapértelmezett szöveg használatához.",
         "consentDisclosurePlaceholder": "Pl. Ezt az eseményt az élő közvetítés után automatikusan átírjuk és összefoglaljuk AI-eszközökkel…"
@@ -4699,9 +4699,10 @@
       "retention": {
         "label": "Megőrzés",
         "data": "A regisztrációs és a termi adatok az esemény vége után {days, plural, one {# nappal} other {# nappal}} törlődnek. A kérdések és a szavazások név nélkül megmaradnak.",
-        "videoUnpublished": "Ha nem teszik elérhetővé, a felvétel ezekkel együtt törlődik.",
-        "videoPublishedDays": "Ha elérhetővé teszik, {days, plural, one {# nappal} other {# nappal}} később törlődik.",
-        "videoPublishedOpen": "Ha elérhetővé teszik, addig marad meg, amíg a szervezők el nem távolítják."
+        "recordingKept": "A felvétel és ami belőle készül (átirat, összefoglaló, fordítások) nem törlődik ezekkel az adatokkal együtt: akár elérhetővé teszik, akár nem, megmarad, amíg a szervezők nem törlik.",
+        "recordingDays": "A felvétel és ami belőle készül az esemény vége után {days, plural, one {# nappal} other {# nappal}} törlődik, vagy ha a felvételt elérhetővé teszik, a közzététele után ugyanennyivel.",
+        "transcriptKept": "Az átirat nem törlődik ezekkel az adatokkal együtt: megmarad, amíg a szervezők nem törlik.",
+        "transcriptDays": "Az átirat az esemény vége után {days, plural, one {# nappal} other {# nappal}} törlődik."
       },
       "addressBook": {
         "label": "Címjegyzék",
@@ -5953,7 +5954,7 @@
     "visibilityAlways": "Mindig látható",
     "visibilityUntil": "Látható eddig:",
     "dataRetentionNote": "A résztvevők személyes adatai az esemény megőrzési szabálya szerint kerülnek törlésre ({days} nap). Az esemény tartalma az oldal láthatóságáig elérhető marad.",
-    "availableUntil": "Ez az esemény és tartalmai {date}-ig lesznek elérhetők.",
+    "participantDataUntil": "A résztvevők személyes adatainak törlési dátuma: {date}.",
     "tabs": {
       "qa": "Kérdések és válaszok",
       "materials": "Anyagok",

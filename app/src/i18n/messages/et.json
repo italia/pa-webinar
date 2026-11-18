@@ -2181,7 +2181,7 @@
         "jobMaxAttempts": "Katseid enne ebaõnnestumist",
         "jobMaxAttemptsHelp": "Mitu korda töövoog tööd uuesti proovib, enne kui märgib selle ebaõnnestunuks. Katsete vaheline ooteaeg kasvab eksponentsiaalselt (30 sekundist kuni 2 tunnini). Tüüpiline väärtus on 5.",
         "artifactRetentionDays": "Artefaktide säilitamine (päevades)",
-        "artifactRetentionDaysHelp": "Väärtusega 0 ei kehti kogu saidi piirangut: AI artefaktid järgivad oma salvestise või sündmuse säilitustähtaega. Nullist suurem väärtus paneb igapäevase töö kustutama iga artefakti, mis loodi rohkem kui nii mitu päeva tagasi, olgu avaldatud või mitte: see võib säilitusaega lühendada, kuid mitte kunagi pikendada. Kõnelejate nimesid ja tööde andmeid see ei puuduta: need järgivad salvestise või sündmuse säilitustähtaega. Üksikasjad: docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "Väärtusega 0 ei kehti kogu saidi piirangut: AI artefaktid järgivad oma salvestise säilitustähtaega. Nullist suurem väärtus paneb igapäevase töö kustutama iga artefakti, mis loodi rohkem kui nii mitu päeva tagasi, olgu avaldatud või mitte: see võib säilitusaega lühendada, kuid mitte kunagi pikendada. Kõnelejate nimesid ja tööde andmeid see ei puuduta: need järgivad salvestise säilitustähtaega. Üksikasjad: docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "AI teavitus ooteruumis",
         "consentDisclosureHelp": "Tekst, mida näidatakse osalejatele ooteruumis, kui sündmus kasutab AI järeltöötlust (transkribeerimine, kokkuvõte, tõlge, dubleerimine). Kohandatav keelte kaupa. Jäta tühjaks, et kasutada süsteemi vaiketeksti.",
         "consentDisclosurePlaceholder": "Nt Sellest sündmusest tehakse pärast otseülekannet AI tööriistadega automaatselt transkriptsioon ja kokkuvõte…"
@@ -4699,9 +4699,10 @@
       "retention": {
         "label": "Säilitamine",
         "data": "Registreerumis- ja ruumiandmed kustutatakse {days, plural, one {# päev} other {# päeva}} pärast ürituse lõppu. Küsimused ja küsitlused jäävad alles ilma nimedeta.",
-        "videoUnpublished": "Kui seda kättesaadavaks ei tehta, kustutatakse salvestis koos nende andmetega.",
-        "videoPublishedDays": "Kui see tehakse kättesaadavaks, kustutatakse see {days, plural, one {# päev} other {# päeva}} hiljem.",
-        "videoPublishedOpen": "Kui see tehakse kättesaadavaks, jääb see alles, kuni korraldajad selle eemaldavad."
+        "recordingKept": "Salvestist ja sellest tehtut (transkriptsioon, kokkuvõte, tõlked) nende andmetega koos ei kustutata: olenemata sellest, kas need tehakse kättesaadavaks, jäävad need alles, kuni korraldajad need kustutavad.",
+        "recordingDays": "Salvestis ja sellest tehtu kustutatakse {days, plural, one {# päev} other {# päeva}} pärast ürituse lõppu või, kui salvestis tehakse kättesaadavaks, pärast selle avaldamist.",
+        "transcriptKept": "Transkriptsiooni nende andmetega koos ei kustutata: see jääb alles, kuni korraldajad selle kustutavad.",
+        "transcriptDays": "Transkriptsioon kustutatakse {days, plural, one {# päev} other {# päeva}} pärast ürituse lõppu."
       },
       "addressBook": {
         "label": "Aadressraamat",
@@ -5953,7 +5954,7 @@
     "visibilityAlways": "Alati nähtav",
     "visibilityUntil": "Nähtav kuni:",
     "dataRetentionNote": "Osalejate isikuandmed kustutatakse vastavalt ürituse säilitamispoliitikale ({days} päeva). Ürituse sisu jääb kättesaadavaks, kuni leht on nähtav.",
-    "availableUntil": "See üritus ja selle sisu on saadaval kuni {date}.",
+    "participantDataUntil": "Osalejate isikuandmed kustutatakse {date}.",
     "tabs": {
       "qa": "Küsimused ja vastused",
       "materials": "Materjalid",

@@ -2181,7 +2181,7 @@
         "jobMaxAttempts": "Attempts before failure",
         "jobMaxAttemptsHelp": "How many times the pipeline retries a job before marking it as failed. Backoff between attempts grows exponentially (from 30 seconds up to 2 hours). The typical value is 5.",
         "artifactRetentionDays": "Artifact retention (days)",
-        "artifactRetentionDaysHelp": "At 0 there is no site-wide limit: AI artifacts follow the retention of their recording or event. A value greater than zero makes a daily job delete every artifact created more than that many days ago, published or not, so it can shorten retention but never extend it. Speaker names and job payloads are not covered: they follow the recording or event retention. Details in docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "At 0 there is no site-wide limit: AI artifacts follow the retention of their recording. A value greater than zero makes a daily job delete every artifact created more than that many days ago, published or not, so it can shorten retention but never extend it. Speaker names and job payloads are not covered: they follow the recording's retention. Details in docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "AI notice in the waiting room",
         "consentDisclosureHelp": "Text shown to participants in the waiting room when the event uses AI post-production (transcription, summary, translation, dubbing). Customisable per language. Leave empty to use the built-in default text.",
         "consentDisclosurePlaceholder": "E.g. This event will be automatically transcribed and summarised with AI tools after the live session…"
@@ -4699,9 +4699,10 @@
       "retention": {
         "label": "Retention",
         "data": "Registration and room data are deleted {days, plural, one {# day} other {# days}} after the event ends. Questions and polls stay without names.",
-        "videoUnpublished": "If it is not made available, the recording is deleted with them.",
-        "videoPublishedDays": "If it is made available, it is deleted {days, plural, one {# day} other {# days}} later.",
-        "videoPublishedOpen": "If it is made available, it stays until the organizers remove it."
+        "recordingKept": "The recording and what is made from it (transcript, summary, translations) are not deleted with this data: whether or not they are made available, they stay until the organizers delete them.",
+        "recordingDays": "The recording and what is made from it are deleted {days, plural, one {# day} other {# days}} after the event ends or, if the recording is made available, after it is published.",
+        "transcriptKept": "The transcript is not deleted with this data: it stays until the organizers delete it.",
+        "transcriptDays": "The transcript is deleted {days, plural, one {# day} other {# days}} after the event ends."
       },
       "addressBook": {
         "label": "Address book",
@@ -5953,7 +5954,7 @@
     "visibilityAlways": "Always visible",
     "visibilityUntil": "Visible until:",
     "dataRetentionNote": "Participants' personal data will be deleted according to event retention ({days} days). Event content will remain available while the page is visible.",
-    "availableUntil": "This event and its content will be available until {date}.",
+    "participantDataUntil": "The personal data of the participants is deleted on {date}.",
     "tabs": {
       "qa": "Questions & Answers",
       "materials": "Materials",

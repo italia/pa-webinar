@@ -2181,7 +2181,7 @@
         "jobMaxAttempts": "Próby przed uznaniem za nieudane",
         "jobMaxAttemptsHelp": "Ile razy potok ponawia zadanie, zanim oznaczy je jako nieudane. Odstęp między kolejnymi próbami rośnie wykładniczo (od 30 sekund do 2 godzin). Typowa wartość to 5.",
         "artifactRetentionDays": "Przechowywanie artefaktów (dni)",
-        "artifactRetentionDaysHelp": "Przy wartości 0 nie ma limitu dla całej witryny: artefakty AI podlegają okresowi przechowywania swojego nagrania lub wydarzenia. Wartość większa od zera sprawia, że codzienne zadanie usuwa każdy artefakt utworzony ponad tyle dni temu, opublikowany czy nie: może to skrócić przechowywanie, ale nigdy go nie wydłuża. Nie dotyczy to nazwisk mówców ani danych zadań: podlegają one okresowi przechowywania nagrania lub wydarzenia. Szczegóły w docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "Przy wartości 0 nie ma limitu dla całej witryny: artefakty AI podlegają okresowi przechowywania swojego nagrania. Wartość większa od zera sprawia, że codzienne zadanie usuwa każdy artefakt utworzony ponad tyle dni temu, opublikowany czy nie: może to skrócić przechowywanie, ale nigdy go nie wydłuża. Nie dotyczy to nazwisk mówców ani danych zadań: podlegają one okresowi przechowywania nagrania. Szczegóły w docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "Informacja o AI w poczekalni",
         "consentDisclosureHelp": "Tekst wyświetlany uczestnikom w poczekalni, gdy wydarzenie korzysta z postprodukcji AI (transkrypcja, podsumowanie, tłumaczenie, dubbing). Można go dostosować dla każdego języka. Pozostaw puste, aby użyć domyślnego tekstu systemowego.",
         "consentDisclosurePlaceholder": "Np. To wydarzenie zostanie po transmisji na żywo automatycznie przetranskrybowane i podsumowane narzędziami AI…"
@@ -4699,9 +4699,10 @@
       "retention": {
         "label": "Przechowywanie",
         "data": "Dane rejestracji i sali są usuwane {days, plural, one {# dzień} few {# dni} many {# dni} other {# dnia}} po zakończeniu wydarzenia. Pytania i ankiety pozostają bez imion i nazwisk.",
-        "videoUnpublished": "Jeśli nie zostanie udostępnione, nagranie zostanie usunięte razem z nimi.",
-        "videoPublishedDays": "Jeśli zostanie udostępnione, zostanie usunięte {days, plural, one {# dzień} few {# dni} many {# dni} other {# dnia}} później.",
-        "videoPublishedOpen": "Jeśli zostanie udostępnione, pozostanie, dopóki organizatorzy go nie usuną."
+        "recordingKept": "Nagranie i to, co z niego powstaje (transkrypcja, podsumowanie, tłumaczenia), nie są usuwane razem z tymi danymi: niezależnie od tego, czy zostaną udostępnione, pozostają, dopóki organizatorzy ich nie usuną.",
+        "recordingDays": "Nagranie i to, co z niego powstaje, są usuwane {days, plural, one {# dzień} few {# dni} many {# dni} other {# dnia}} po zakończeniu wydarzenia lub, jeśli nagranie zostanie udostępnione, po jego publikacji.",
+        "transcriptKept": "Transkrypcja nie jest usuwana razem z tymi danymi: pozostaje, dopóki organizatorzy jej nie usuną.",
+        "transcriptDays": "Transkrypcja jest usuwana {days, plural, one {# dzień} few {# dni} many {# dni} other {# dnia}} po zakończeniu wydarzenia."
       },
       "addressBook": {
         "label": "Książka adresowa",
@@ -5953,7 +5954,7 @@
     "visibilityAlways": "Zawsze widoczna",
     "visibilityUntil": "Widoczna do:",
     "dataRetentionNote": "Dane osobowe uczestników zostaną usunięte zgodnie z zasadami przechowywania wydarzenia ({days} dni). Treść wydarzenia pozostanie dostępna, dopóki strona jest widoczna.",
-    "availableUntil": "To wydarzenie i jego treści będą dostępne do {date}.",
+    "participantDataUntil": "Dane osobowe uczestników zostaną usunięte {date}.",
     "tabs": {
       "qa": "Pytania i odpowiedzi",
       "materials": "Materiały",

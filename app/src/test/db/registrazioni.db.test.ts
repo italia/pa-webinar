@@ -113,7 +113,7 @@ describe('cancellazione di una sessione', () => {
     expect(JSON.parse(traccia!.details!)).toMatchObject({ wasEventRecording: false });
   });
 
-  it('toglie anche la scadenza del video, che non passa al prossimo', async () => {
+  it('la durata della registrazione resta: e’ dell’evento, non del file', async () => {
     const evento = await creaEvento({ ...CON_VIDEO, recordingDeleteAfterDays: 30 });
     const sessione = await creaSessione(evento.id, { recordingUrl: VIDEO });
 
@@ -122,7 +122,8 @@ describe('cancellazione di una sessione', () => {
     expect(
       await prisma.event.findUniqueOrThrow({ where: { id: evento.id } })
     ).toMatchObject({
-      recordingDeleteAfterDays: null,
+      recordingUrl: null,
+      recordingDeleteAfterDays: 30,
     });
   });
 
@@ -235,7 +236,7 @@ describe('cancellazione di una sessione', () => {
 });
 
 describe('cancellazione del video dell’evento', () => {
-  it('svuota anche il file temporaneo e la sua scadenza', async () => {
+  it('svuota anche il file temporaneo, e tiene la durata della registrazione', async () => {
     const evento = await creaEvento({
       ...CON_VIDEO,
       tempRecordingUrl: `${VIDEO}.temp`,
@@ -263,7 +264,7 @@ describe('cancellazione del video dell’evento', () => {
       recordingFileSize: null,
       tempRecordingUrl: null,
       tempRecordingStartedAt: null,
-      recordingDeleteAfterDays: null,
+      recordingDeleteAfterDays: 30,
     });
   });
 });
@@ -291,7 +292,7 @@ describe('modifica dell’evento col link di conduzione', () => {
       recordingPublishedAt: null,
       recordingFileSize: null,
       recordingDuration: null,
-      recordingDeleteAfterDays: null,
+      recordingDeleteAfterDays: 30,
     });
   });
 });

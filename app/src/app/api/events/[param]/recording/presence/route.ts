@@ -15,8 +15,11 @@
  * Il server verifica che sia una chiamata rapida, che la sala sia aperta, che
  * la registrazione sia in corso (l'ultima azione della sala e' l'avvio della
  * registrazione, lib/live/actions) e che il token sia di questa stanza. Poi
- * posa il cookie HttpOnly firmato, che scade con la conservazione della
- * chiamata. Il link della chiamata fa entrare chiunque lo abbia, e il pass non
+ * posa il cookie HttpOnly firmato, che scade con la conservazione dei dati
+ * della chiamata: la registrazione resta (non segue quella conservazione), ma
+ * da allora la vede solo chi organizza, come per gli iscritti di un evento
+ * quando la loro iscrizione si cancella. Il link della chiamata fa entrare
+ * chiunque lo abbia, e il pass non
  * da' di piu': chi lo chiede con un token della chiamata c'era, o poteva
  * esserci.
  *

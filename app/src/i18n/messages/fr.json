@@ -2181,7 +2181,7 @@
         "jobMaxAttempts": "Tentatives avant échec",
         "jobMaxAttemptsHelp": "Nombre de fois où la chaîne de traitement relance une tâche avant de la marquer comme échouée. Le délai entre tentatives croît de façon exponentielle (de 30 secondes jusqu'à 2 heures). La valeur typique est 5.",
         "artifactRetentionDays": "Conservation des artefacts (jours)",
-        "artifactRetentionDaysHelp": "À 0, il n'y a pas de limite pour tout le site : les artefacts IA suivent la conservation de leur enregistrement ou de l'événement. Une valeur supérieure à zéro fait supprimer par une tâche quotidienne tout artefact créé il y a plus de ce nombre de jours, publié ou non : elle peut raccourcir la conservation, jamais l'allonger. Les noms des intervenants et les charges utiles des tâches ne sont pas concernés : ils suivent la conservation de l'enregistrement ou de l'événement. Détails dans docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "À 0, il n'y a pas de limite pour tout le site : les artefacts IA suivent la conservation de leur enregistrement. Une valeur supérieure à zéro fait supprimer par une tâche quotidienne tout artefact créé il y a plus de ce nombre de jours, publié ou non : elle peut raccourcir la conservation, jamais l'allonger. Les noms des intervenants et les charges utiles des tâches ne sont pas concernés : ils suivent la conservation de l'enregistrement. Détails dans docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "Avis IA dans la salle d'attente",
         "consentDisclosureHelp": "Texte affiché aux participants dans la salle d'attente lorsque l'événement utilise la post-production IA (transcription, synthèse, traduction, doublage). Personnalisable par langue. Laissez vide pour utiliser le texte par défaut du système.",
         "consentDisclosurePlaceholder": "Ex. Cet événement sera transcrit et résumé automatiquement à l'aide d'outils d'IA après le direct…"
@@ -4699,9 +4699,10 @@
       "retention": {
         "label": "Conservation",
         "data": "Les données de l'inscription et de la salle sont supprimées {days, plural, one {# jour} many {# jours} other {# jours}} après la fin de l'événement. Les questions et les sondages restent sans noms.",
-        "videoUnpublished": "S'il n'est pas mis à disposition, l'enregistrement est supprimé avec ces données.",
-        "videoPublishedDays": "Si l'enregistrement est mis à disposition, il est supprimé {days, plural, one {# jour} many {# jours} other {# jours}} plus tard.",
-        "videoPublishedOpen": "Si l'enregistrement est mis à disposition, il reste jusqu'à ce que les organisateurs le retirent."
+        "recordingKept": "L'enregistrement et ce qui en est tiré (transcription, synthèse, traductions) ne sont pas supprimés avec ces données : qu'ils soient mis à disposition ou non, ils restent jusqu'à ce que les organisateurs les suppriment.",
+        "recordingDays": "L'enregistrement et ce qui en est tiré sont supprimés {days, plural, one {# jour} many {# jours} other {# jours}} après la fin de l'événement ou, si l'enregistrement est mis à disposition, après sa publication.",
+        "transcriptKept": "La transcription n'est pas supprimée avec ces données : elle reste jusqu'à ce que les organisateurs la suppriment.",
+        "transcriptDays": "La transcription est supprimée {days, plural, one {# jour} many {# jours} other {# jours}} après la fin de l'événement."
       },
       "addressBook": {
         "label": "Carnet d'adresses",
@@ -5953,7 +5954,7 @@
     "visibilityAlways": "Toujours visible",
     "visibilityUntil": "Visible jusqu'au :",
     "dataRetentionNote": "Les données personnelles des participants seront supprimées selon la rétention de l'événement ({days} jours). Le contenu de l'événement restera disponible tant que la page est visible.",
-    "availableUntil": "Cet événement et son contenu seront disponibles jusqu'au {date}.",
+    "participantDataUntil": "Les données personnelles des participants sont supprimées le {date}.",
     "tabs": {
       "qa": "Questions et Réponses",
       "materials": "Documents",

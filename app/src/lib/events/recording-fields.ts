@@ -4,7 +4,12 @@
 /**
  * I campi dell'evento che descrivono il video pubblicato, azzerati insieme: chi
  * toglie il video lascia una pagina senza date, peso o durata di un file che non
- * c'e' piu', e il prossimo video non eredita la scadenza di questo.
+ * c'e' piu'.
+ *
+ * La durata della registrazione (`recordingDeleteAfterDays`) resta: e' una
+ * scelta dell'evento, presa nel wizard o dal modello, non del singolo file. Vale
+ * per cio' che della registrazione resta (trascrizioni, sintesi, traduzioni) e
+ * per il video che verra' dopo (lib/gdpr/cleanup-selection).
  */
 export const CAMPI_VIDEO_VUOTI = {
   recordingUrl: null,
@@ -12,7 +17,6 @@ export const CAMPI_VIDEO_VUOTI = {
   recordingPublishedAt: null,
   recordingFileSize: null,
   recordingDuration: null,
-  recordingDeleteAfterDays: null,
 } as const;
 
 /**

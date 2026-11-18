@@ -2181,7 +2181,7 @@
         "jobMaxAttempts": "Forsøg før fejl",
         "jobMaxAttemptsHelp": "Hvor mange gange pipelinen forsøger et job igen, før det markeres som mislykket. Ventetiden mellem forsøgene vokser eksponentielt (fra 30 sekunder op til 2 timer). Den typiske værdi er 5.",
         "artifactRetentionDays": "Opbevaring af artefakter (dage)",
-        "artifactRetentionDaysHelp": "Ved 0 er der ingen grænse for hele webstedet: AI-artefakterne følger opbevaringsperioden for deres optagelse eller arrangement. En værdi over nul får et dagligt job til at slette alle artefakter, der er oprettet for mere end det antal dage siden, offentliggjort eller ej: den kan forkorte opbevaringen, aldrig forlænge den. Talernes navne og jobbenes payload er ikke omfattet: de følger optagelsens eller arrangementets opbevaringsperiode. Detaljer i docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "Ved 0 er der ingen grænse for hele webstedet: AI-artefakterne følger opbevaringsperioden for deres optagelse. En værdi over nul får et dagligt job til at slette alle artefakter, der er oprettet for mere end det antal dage siden, offentliggjort eller ej: den kan forkorte opbevaringen, aldrig forlænge den. Talernes navne og jobbenes payload er ikke omfattet: de følger optagelsens opbevaringsperiode. Detaljer i docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "AI-oplysning i venteværelset",
         "consentDisclosureHelp": "Tekst, der vises for deltagerne i venteværelset, når arrangementet bruger AI-efterbehandling (transskription, resumé, oversættelse, eftersynkronisering). Kan tilpasses pr. sprog. Lad feltet stå tomt for at bruge systemets standardtekst.",
         "consentDisclosurePlaceholder": "F.eks. Dette arrangement bliver automatisk transskriberet og resumeret med AI-værktøjer efter den direkte udsendelse…"
@@ -4699,9 +4699,10 @@
       "retention": {
         "label": "Opbevaring",
         "data": "Tilmeldings- og rumdata slettes {days, plural, one {# dag} other {# dage}} efter arrangementets afslutning. Spørgsmål og afstemninger bevares uden navne.",
-        "videoUnpublished": "Hvis den ikke stilles til rådighed, slettes optagelsen sammen med dem.",
-        "videoPublishedDays": "Hvis den stilles til rådighed, slettes den {days, plural, one {# dag} other {# dage}} senere.",
-        "videoPublishedOpen": "Hvis den stilles til rådighed, forbliver den, indtil arrangørerne fjerner den."
+        "recordingKept": "Optagelsen og det, der laves ud fra den (transskription, resumé, oversættelser), slettes ikke sammen med disse data: uanset om de stilles til rådighed eller ej, bevares de, indtil arrangørerne sletter dem.",
+        "recordingDays": "Optagelsen og det, der laves ud fra den, slettes {days, plural, one {# dag} other {# dage}} efter arrangementets afslutning eller, hvis optagelsen stilles til rådighed, efter offentliggørelsen.",
+        "transcriptKept": "Transskriptionen slettes ikke sammen med disse data: den bevares, indtil arrangørerne sletter den.",
+        "transcriptDays": "Transskriptionen slettes {days, plural, one {# dag} other {# dage}} efter arrangementets afslutning."
       },
       "addressBook": {
         "label": "Adressebog",
@@ -5953,7 +5954,7 @@
     "visibilityAlways": "Altid synlig",
     "visibilityUntil": "Synlig indtil:",
     "dataRetentionNote": "Deltagernes personoplysninger slettes i henhold til begivenhedens opbevaringspolitik ({days} dage). Begivenhedsindholdet forbliver tilgængeligt, så længe siden er synlig.",
-    "availableUntil": "Denne begivenhed og dens indhold vil være tilgængelige indtil {date}.",
+    "participantDataUntil": "Deltagernes personoplysninger slettes den {date}.",
     "tabs": {
       "qa": "Spørgsmål og svar",
       "materials": "Materialer",

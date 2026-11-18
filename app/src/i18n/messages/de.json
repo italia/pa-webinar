@@ -2181,7 +2181,7 @@
         "jobMaxAttempts": "Versuche vor dem Fehlschlag",
         "jobMaxAttemptsHelp": "Wie oft die Pipeline einen Job wiederholt, bevor sie ihn als fehlgeschlagen markiert. Der Backoff zwischen den Versuchen wächst exponentiell (von 30 Sekunden bis zu 2 Stunden). Der typische Wert ist 5.",
         "artifactRetentionDays": "Aufbewahrung der Artefakte (Tage)",
-        "artifactRetentionDaysHelp": "Bei 0 gilt keine seitenweite Grenze: Die KI-Artefakte folgen der Aufbewahrungsfrist ihrer Aufzeichnung oder der Veranstaltung. Ein Wert größer als null lässt einen täglichen Job jedes Artefakt löschen, das vor mehr als dieser Anzahl von Tagen erstellt wurde, ob veröffentlicht oder nicht: Er kann die Aufbewahrung verkürzen, aber nie verlängern. Namen der Sprecher und Payloads der Jobs sind nicht erfasst: Sie folgen der Aufbewahrungsfrist der Aufzeichnung oder der Veranstaltung. Details in docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "Bei 0 gilt keine seitenweite Grenze: Die KI-Artefakte folgen der Aufbewahrungsfrist ihrer Aufzeichnung. Ein Wert größer als null lässt einen täglichen Job jedes Artefakt löschen, das vor mehr als dieser Anzahl von Tagen erstellt wurde, ob veröffentlicht oder nicht: Er kann die Aufbewahrung verkürzen, aber nie verlängern. Namen der Sprecher und Payloads der Jobs sind nicht erfasst: Sie folgen der Aufbewahrungsfrist der Aufzeichnung. Details in docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "KI-Hinweis im Warteraum",
         "consentDisclosureHelp": "Text, der den Teilnehmern im Warteraum angezeigt wird, wenn die Veranstaltung die KI-Nachbearbeitung nutzt (Transkription, Zusammenfassung, Übersetzung, Synchronisation). Pro Sprache anpassbar. Leer lassen, um den vom System vorgegebenen Standardtext zu verwenden.",
         "consentDisclosurePlaceholder": "Z. B. Diese Veranstaltung wird nach der Live-Übertragung automatisch mit KI-Werkzeugen transkribiert und zusammengefasst …"
@@ -4699,9 +4699,10 @@
       "retention": {
         "label": "Aufbewahrung",
         "data": "Die Daten der Anmeldung und des Raums werden {days, plural, one {# Tag} other {# Tage}} nach dem Ende der Veranstaltung gelöscht. Fragen und Umfragen bleiben ohne Namen erhalten.",
-        "videoUnpublished": "Wird sie nicht bereitgestellt, wird die Aufzeichnung zusammen mit ihnen gelöscht.",
-        "videoPublishedDays": "Wird die Aufzeichnung bereitgestellt, wird sie {days, plural, one {# Tag} other {# Tage}} danach gelöscht.",
-        "videoPublishedOpen": "Wird die Aufzeichnung bereitgestellt, bleibt sie erhalten, bis die Veranstalter sie entfernen."
+        "recordingKept": "Die Aufzeichnung und was daraus entsteht (Transkript, Zusammenfassung, Übersetzungen) werden nicht mit diesen Daten gelöscht: Ob bereitgestellt oder nicht, sie bleiben erhalten, bis die Veranstalter sie löschen.",
+        "recordingDays": "Die Aufzeichnung und was daraus entsteht, werden {days, plural, one {# Tag} other {# Tage}} nach dem Ende der Veranstaltung gelöscht oder, wenn die Aufzeichnung bereitgestellt wird, nach ihrer Veröffentlichung.",
+        "transcriptKept": "Das Transkript wird nicht mit diesen Daten gelöscht: Es bleibt erhalten, bis die Veranstalter es löschen.",
+        "transcriptDays": "Das Transkript wird {days, plural, one {# Tag} other {# Tage}} nach dem Ende der Veranstaltung gelöscht."
       },
       "addressBook": {
         "label": "Adressbuch",
@@ -5953,7 +5954,7 @@
     "visibilityAlways": "Immer sichtbar",
     "visibilityUntil": "Sichtbar bis:",
     "dataRetentionNote": "Personenbezogene Daten der Teilnehmenden werden gemäß der Aufbewahrungsfrist der Veranstaltung ({days} Tage) gelöscht. Der Veranstaltungsinhalt bleibt verfügbar, solange die Seite sichtbar ist.",
-    "availableUntil": "Diese Veranstaltung und ihre Inhalte sind bis zum {date} verfügbar.",
+    "participantDataUntil": "Die personenbezogenen Daten der Teilnehmenden werden am {date} gelöscht.",
     "tabs": {
       "qa": "Fragen und Antworten",
       "materials": "Materialien",

@@ -42,7 +42,6 @@ import {
   proveConservateDellaPersona,
   ritiraProvaConservata,
   ritiraProveDelleIscrizioni,
-  tipiDelleProve,
   tipiDelleProveEsistenti,
   togliNomeDalleProve,
   togliNomeDelleIscrizioni,
@@ -84,40 +83,6 @@ beforeEach(() => {
   tx.recordingConsent.findMany.mockResolvedValue([]);
   tx.multitrackConsent.findMany.mockResolvedValue([]);
   tx.retainedConsentProof.updateMany.mockResolvedValue({ count: 1 });
-});
-
-describe('tipiDelleProve', () => {
-  const evento = {
-    youtubeUrl: null,
-    recordingUrl: null,
-    recordingPublished: false,
-    transcriptPublished: false,
-  };
-
-  it('un evento che non esiste non conserva niente', async () => {
-    tx.event.findUnique.mockResolvedValue(null);
-    expect(await tipiDelleProve(tx as never, 'e1')).toEqual([]);
-  });
-
-  it('il flag della trascrizione vale solo se l’artefatto c’e’', async () => {
-    tx.event.findUnique.mockResolvedValue({ ...evento, transcriptPublished: true });
-    tx.postprodArtifact.count.mockResolvedValue(0);
-    expect(await tipiDelleProve(tx as never, 'e1')).toEqual([]);
-    tx.postprodArtifact.count.mockResolvedValue(1);
-    expect(await tipiDelleProve(tx as never, 'e1')).toEqual(['transcription']);
-    expect(tx.postprodArtifact.count).toHaveBeenCalledWith({
-      where: { type: 'TRANSCRIPT_JSON', recording: { eventId: 'e1' } },
-    });
-  });
-
-  it('senza flag non cerca l’artefatto', async () => {
-    tx.event.findUnique.mockResolvedValue({ ...evento, youtubeUrl: 'https://esterno' });
-    expect(await tipiDelleProve(tx as never, 'e1')).toEqual([
-      'recording',
-      'transcription',
-    ]);
-    expect(tx.postprodArtifact.count).not.toHaveBeenCalled();
-  });
 });
 
 describe('conservaProve', () => {

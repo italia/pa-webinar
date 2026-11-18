@@ -8,11 +8,11 @@ import {
   TEMP_RECORDING_TTL_MS,
   UNFINISHED_EVENT_STATUSES,
   isEventDataRetentionExpired,
+  inizioConservazione,
   isEventEligibleForCleanup,
   isRecordingRetentionExpired,
-  shouldPurgeRecordingBlob,
+  recordingExpiresAt,
   tempRecordingExpiryCutoff,
-  tipiDiProvaDaConservare,
   TIMEOUT_DOPO_PULIZIA_MS,
   TIMEOUT_PULIZIA_EVENTO_MS,
   tipiDiProvaDiCioCheEsiste,
@@ -53,68 +53,124 @@ describe('tempRecordingExpiryCutoff', () => {
 });
 
 describe('isRecordingRetentionExpired', () => {
+  /** Un evento concluso da 40 giorni, con i dati gia' scaduti a 30. */
+  const evento = {
+    status: 'ENDED',
+    endsAt: daysFromNow(-40),
+    lastActiveAt: null,
+    dataRetentionDays: 30,
+    recordingPublished: false,
+    recordingPublishedAt: null,
+    recordingDeleteAfterDays: null,
+  };
+  const pubblicato = (giorniFa: number, durata: number | null) => ({
+    ...evento,
+    recordingPublished: true,
+    recordingPublishedAt: daysFromNow(-giorniFa),
+    recordingDeleteAfterDays: durata,
+  });
+
   it('scade il video pubblicato oltre i giorni configurati', () => {
-    expect(
-      isRecordingRetentionExpired(
-        { recordingPublishedAt: daysFromNow(-31), recordingDeleteAfterDays: 30 },
-        NOW
-      )
-    ).toBe(true);
+    expect(isRecordingRetentionExpired(pubblicato(31, 30), NOW)).toBe(true);
   });
 
   it('NON scade il giorno esatto della scadenza', () => {
     // "Conservato 30 giorni" vuol dire che il trentesimo giorno il video c'è
     // ancora. Un confronto >= lo farebbe sparire un giorno prima del promesso.
-    expect(
-      isRecordingRetentionExpired(
-        { recordingPublishedAt: daysFromNow(-30), recordingDeleteAfterDays: 30 },
-        NOW
-      )
-    ).toBe(false);
+    expect(isRecordingRetentionExpired(pubblicato(30, 30), NOW)).toBe(false);
   });
 
   it('NON scade un video ancora dentro la finestra', () => {
-    expect(
-      isRecordingRetentionExpired(
-        { recordingPublishedAt: daysFromNow(-3), recordingDeleteAfterDays: 30 },
-        NOW
-      )
-    ).toBe(false);
+    expect(isRecordingRetentionExpired(pubblicato(3, 30), NOW)).toBe(false);
   });
 
-  it('senza data di pubblicazione non cancella nulla', () => {
+  it('il video pubblicato conta dalla pubblicazione, non dalla fine dell’evento', () => {
+    // Evento finito 40 giorni fa, video pubblicato 3 giorni fa con 30 giorni:
+    // dalla fine sarebbe gia' scaduto, dalla pubblicazione no.
+    expect(recordingExpiresAt(pubblicato(3, 30))).toEqual(daysFromNow(27));
+  });
+
+  it('pubblicato senza data di pubblicazione: nessuna scadenza', () => {
     // Non sapendo da quando contare, l'unica alternativa alla non-scadenza
     // sarebbe cancellare un video che la pagina evento sta ancora linkando.
     expect(
       isRecordingRetentionExpired(
-        { recordingPublishedAt: null, recordingDeleteAfterDays: 30 },
+        { ...evento, recordingPublished: true, recordingDeleteAfterDays: 1 },
         NOW
       )
     ).toBe(false);
   });
 
-  it('senza giorni configurati lascia il video alla retention dell’evento', () => {
-    // `recordingDeleteAfterDays` null = nessuna scadenza PROPRIA: il video
-    // vive quanto l'evento e lo cancella la fase 3, non questa.
+  it('senza giorni configurati non scade mai, pubblicata o no', () => {
+    // La registrazione e' un documento storico: la conservazione dei dati
+    // dell'evento (scaduta da 10 giorni) non la tocca.
+    expect(isRecordingRetentionExpired(evento, NOW)).toBe(false);
+    expect(isRecordingRetentionExpired(pubblicato(400, null), NOW)).toBe(false);
+    expect(recordingExpiresAt(evento)).toBeNull();
+  });
+
+  it('non pubblicata, conta dalla fine dell’evento', () => {
+    expect(recordingExpiresAt({ ...evento, recordingDeleteAfterDays: 30 })).toEqual(
+      daysFromNow(-10)
+    );
+    expect(isRecordingRetentionExpired({ ...evento, recordingDeleteAfterDays: 30 }, NOW)).toBe(
+      true
+    );
+    expect(isRecordingRetentionExpired({ ...evento, recordingDeleteAfterDays: 90 }, NOW)).toBe(
+      false
+    );
+  });
+
+  it('non pubblicata, il confine e’ stretto', () => {
     expect(
-      isRecordingRetentionExpired(
-        { recordingPublishedAt: daysFromNow(-400), recordingDeleteAfterDays: null },
-        NOW
-      )
+      isRecordingRetentionExpired({ ...evento, recordingDeleteAfterDays: 40 }, NOW)
     ).toBe(false);
+  });
+
+  it('di un evento mai concluso conta dall’ultima attivita’, se piu’ tarda', () => {
+    const aperto = {
+      ...evento,
+      status: 'LIVE',
+      lastActiveAt: daysFromNow(-5),
+      recordingDeleteAfterDays: 30,
+    };
+    expect(recordingExpiresAt(aperto)).toEqual(daysFromNow(25));
+    expect(isRecordingRetentionExpired(aperto, NOW)).toBe(false);
+  });
+
+  it('di una bozza non scade mai', () => {
+    expect(
+      recordingExpiresAt({ ...evento, status: 'DRAFT', recordingDeleteAfterDays: 1 })
+    ).toBeNull();
   });
 
   it('tratta 0 giorni come "nessuna scadenza", non come "cancella subito"', () => {
     // L'API valida min(1) (lib/validation/schemas.ts), quindi uno 0 arriva solo
     // da un default o da una scrittura diretta. Leggerlo come "scaduto
-    // all'istante della pubblicazione" farebbe sparire al primo giro di cron
-    // OGNI video appena pubblicato.
-    expect(
-      isRecordingRetentionExpired(
-        { recordingPublishedAt: daysFromNow(-1), recordingDeleteAfterDays: 0 },
-        NOW
-      )
-    ).toBe(false);
+    // all'istante" farebbe sparire al primo giro di cron OGNI registrazione.
+    expect(isRecordingRetentionExpired(pubblicato(1, 0), NOW)).toBe(false);
+    expect(isRecordingRetentionExpired({ ...evento, recordingDeleteAfterDays: 0 }, NOW)).toBe(
+      false
+    );
+  });
+});
+
+describe('inizioConservazione', () => {
+  const base = { endsAt: daysFromNow(-40), dataRetentionDays: 30, lastActiveAt: daysFromNow(-2) };
+
+  it('per un evento concluso e’ la fine prevista, anche con attivita’ dopo', () => {
+    expect(inizioConservazione({ ...base, status: 'ENDED' })).toEqual(daysFromNow(-40));
+  });
+
+  it('per uno mai concluso e’ il piu’ tardo fra fine e ultima attivita’', () => {
+    expect(inizioConservazione({ ...base, status: 'LIVE' })).toEqual(daysFromNow(-2));
+    expect(inizioConservazione({ ...base, status: 'LIVE', lastActiveAt: null })).toEqual(
+      daysFromNow(-40)
+    );
+  });
+
+  it('per una bozza non c’e’', () => {
+    expect(inizioConservazione({ ...base, status: 'DRAFT' })).toBeNull();
   });
 });
 
@@ -247,87 +303,6 @@ describe('isEventEligibleForCleanup', () => {
   it('una bozza non si ripulisce mai', () => {
     expect(isEventEligibleForCleanup({ ...base, status: 'DRAFT' }, NOW)).toBe(false);
     expect(UNFINISHED_EVENT_STATUSES as readonly string[]).not.toContain('DRAFT');
-  });
-});
-
-describe('shouldPurgeRecordingBlob', () => {
-  it('risparmia il video PUBBLICATO', () => {
-    // È l'unico "documento reso pubblico": la sua durata di vita è governata
-    // dalla fase 2 (recordingDeleteAfterDays). Cancellarlo qui lascerebbe il
-    // player della pagina evento su un 404 prima della scadenza promessa.
-    expect(
-      shouldPurgeRecordingBlob({
-        recordingUrl: 'https://blob/rec.mp4',
-        recordingPublished: true,
-      })
-    ).toBe(false);
-  });
-
-  it('cancella il video NON pubblicato', () => {
-    // Nessuno lo vede da nessuna parte e la fase 2 non lo guarda: se non lo
-    // cancellasse questa fase, il blob resterebbe nello storage per sempre.
-    expect(
-      shouldPurgeRecordingBlob({
-        recordingUrl: 'https://blob/rec.mp4',
-        recordingPublished: false,
-      })
-    ).toBe(true);
-  });
-
-  it('non prova a cancellare quando non c’è nessun URL', () => {
-    expect(
-      shouldPurgeRecordingBlob({ recordingUrl: null, recordingPublished: false })
-    ).toBe(false);
-  });
-});
-
-describe('tipiDiProvaDaConservare', () => {
-  const niente = {
-    youtubeUrl: null,
-    recordingUrl: null,
-    recordingPublished: false,
-    trascrizionePubblicata: false,
-  };
-  const entrambe = ['recording', 'transcription'];
-
-  it('niente di pubblicato: nessuna prova', () => {
-    expect(tipiDiProvaDaConservare(niente)).toEqual([]);
-  });
-
-  it('il video pubblicato tiene entrambe', () => {
-    expect(
-      tipiDiProvaDaConservare({ ...niente, recordingUrl: 'u', recordingPublished: true })
-    ).toEqual(entrambe);
-  });
-
-  it('il link esterno conta come video, anche senza file', () => {
-    expect(tipiDiProvaDaConservare({ ...niente, youtubeUrl: 'y' })).toEqual(entrambe);
-  });
-
-  it('il file non pubblicato non conta', () => {
-    expect(tipiDiProvaDaConservare({ ...niente, recordingUrl: 'u' })).toEqual([]);
-  });
-
-  it('il flag di pubblicazione senza file non conta', () => {
-    expect(tipiDiProvaDaConservare({ ...niente, recordingPublished: true })).toEqual([]);
-  });
-
-  it('la sola trascrizione pubblicata tiene la sua prova', () => {
-    expect(tipiDiProvaDaConservare({ ...niente, trascrizionePubblicata: true })).toEqual([
-      'transcription',
-    ]);
-  });
-
-  it('video e trascrizione insieme non raddoppiano', () => {
-    expect(
-      tipiDiProvaDaConservare({ ...niente, youtubeUrl: 'y', trascrizionePubblicata: true })
-    ).toEqual(entrambe);
-  });
-
-  it('non cambia il destino del file: il link esterno non lo tiene in vita', () => {
-    const evt = { ...niente, youtubeUrl: 'y', recordingUrl: 'u' };
-    expect(tipiDiProvaDaConservare(evt)).toEqual(entrambe);
-    expect(shouldPurgeRecordingBlob(evt)).toBe(true);
   });
 });
 

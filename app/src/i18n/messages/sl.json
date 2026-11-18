@@ -2181,7 +2181,7 @@
         "jobMaxAttempts": "Poskusi pred neuspehom",
         "jobMaxAttemptsHelp": "Kolikokrat cevovod ponovi opravilo, preden ga označi kot neuspešno. Zamik med poskusi narašča eksponentno (od 30 sekund do 2 ur). Običajna vrednost je 5.",
         "artifactRetentionDays": "Hramba artefaktov (dnevi)",
-        "artifactRetentionDaysHelp": "Pri vrednosti 0 ni omejitve za celotno spletno mesto: artefakti AI sledijo roku hrambe svojega posnetka ali dogodka. Vrednost, večja od nič, poskrbi, da dnevno opravilo izbriše vsak artefakt, ustvarjen pred več kot toliko dnevi, objavljen ali ne: rok hrambe lahko skrajša, nikoli pa ga ne podaljša. Imena govorcev in vsebina opravil niso zajeti: sledijo roku hrambe posnetka ali dogodka. Podrobnosti v docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "Pri vrednosti 0 ni omejitve za celotno spletno mesto: artefakti AI sledijo roku hrambe svojega posnetka. Vrednost, večja od nič, poskrbi, da dnevno opravilo izbriše vsak artefakt, ustvarjen pred več kot toliko dnevi, objavljen ali ne: rok hrambe lahko skrajša, nikoli pa ga ne podaljša. Imena govorcev in vsebina opravil niso zajeti: sledijo roku hrambe posnetka. Podrobnosti v docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "Obvestilo o AI v čakalnici",
         "consentDisclosureHelp": "Besedilo, prikazano udeležencem v čakalnici, kadar dogodek uporablja postprodukcijo z AI (prepis, povzetek, prevod, sinhronizacija). Prilagodljivo po jezikih. Pustite prazno, da se uporabi privzeto sistemsko besedilo.",
         "consentDisclosurePlaceholder": "Npr. Ta dogodek bo po prenosu v živo samodejno prepisan in povzet z orodji umetne inteligence …"
@@ -4699,9 +4699,10 @@
       "retention": {
         "label": "Hramba",
         "data": "Podatki o prijavi in iz dvorane se izbrišejo {days, plural, one {# dan} two {# dneva} few {# dni} other {# dni}} po koncu dogodka. Vprašanja in ankete ostanejo brez imen.",
-        "videoUnpublished": "Če posnetek ni dan na voljo, se izbriše skupaj z njimi.",
-        "videoPublishedDays": "Če je posnetek dan na voljo, se izbriše {days, plural, one {# dan} two {# dneva} few {# dni} other {# dni}} pozneje.",
-        "videoPublishedOpen": "Če je posnetek dan na voljo, ostane, dokler ga organizatorji ne odstranijo."
+        "recordingKept": "Posnetek in to, kar iz njega nastane (prepis, povzetek, prevodi), se ne izbrišejo skupaj s temi podatki: ne glede na to, ali so dani na voljo, ostanejo, dokler jih organizatorji ne izbrišejo.",
+        "recordingDays": "Posnetek in to, kar iz njega nastane, se izbrišejo {days, plural, one {# dan} two {# dneva} few {# dni} other {# dni}} po koncu dogodka ali, če je posnetek dan na voljo, po njegovi objavi.",
+        "transcriptKept": "Prepis se ne izbriše skupaj s temi podatki: ostane, dokler ga organizatorji ne izbrišejo.",
+        "transcriptDays": "Prepis se izbriše {days, plural, one {# dan} two {# dneva} few {# dni} other {# dni}} po koncu dogodka."
       },
       "addressBook": {
         "label": "Imenik",
@@ -5953,7 +5954,7 @@
     "visibilityAlways": "Vedno vidno",
     "visibilityUntil": "Vidno do:",
     "dataRetentionNote": "Osebni podatki udeležencev bodo izbrisani v skladu s hrambo dogodka ({days} dni). Vsebina dogodka bo ostala na voljo, dokler je stran vidna.",
-    "availableUntil": "Ta dogodek in njegova vsebina bodo na voljo do {date}.",
+    "participantDataUntil": "Osebni podatki udeležencev se izbrišejo {date}.",
     "tabs": {
       "qa": "Vprašanja in odgovori",
       "materials": "Gradiva",

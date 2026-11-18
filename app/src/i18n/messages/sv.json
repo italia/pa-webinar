@@ -2181,7 +2181,7 @@
         "jobMaxAttempts": "Försök före misslyckande",
         "jobMaxAttemptsHelp": "Hur många gånger pipelinen gör om ett jobb innan det markeras som misslyckat. Väntetiden mellan försöken växer exponentiellt (från 30 sekunder upp till 2 timmar). Typiskt värde är 5.",
         "artifactRetentionDays": "Lagring av artefakter (dagar)",
-        "artifactRetentionDaysHelp": "Vid 0 finns ingen gräns för hela webbplatsen: AI-artefakterna följer lagringstiden för sin inspelning eller sitt evenemang. Ett värde större än noll får ett dagligt jobb att radera varje artefakt som skapades för mer än så många dagar sedan, publicerad eller inte: det kan förkorta lagringen men aldrig förlänga den. Talarnas namn och jobbens payload omfattas inte: de följer inspelningens eller evenemangets lagringstid. Detaljer i docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "Vid 0 finns ingen gräns för hela webbplatsen: AI-artefakterna följer lagringstiden för sin inspelning. Ett värde större än noll får ett dagligt jobb att radera varje artefakt som skapades för mer än så många dagar sedan, publicerad eller inte: det kan förkorta lagringen men aldrig förlänga den. Talarnas namn och jobbens payload omfattas inte: de följer inspelningens lagringstid. Detaljer i docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "AI-information i väntrummet",
         "consentDisclosureHelp": "Text som visas för deltagarna i väntrummet när evenemanget använder AI-efterproduktion (transkription, sammanfattning, översättning, dubbning). Kan anpassas per språk. Lämna tomt för att använda systemets standardtext.",
         "consentDisclosurePlaceholder": "T.ex. Det här evenemanget kommer att transkriberas och sammanfattas automatiskt med AI-verktyg efter direktsändningen…"
@@ -4699,9 +4699,10 @@
       "retention": {
         "label": "Lagring",
         "data": "Uppgifterna om anmälan och rummet raderas {days, plural, one {# dag} other {# dagar}} efter att evenemanget har avslutats. Frågor och omröstningar finns kvar utan namn.",
-        "videoUnpublished": "Om den inte görs tillgänglig raderas inspelningen tillsammans med dem.",
-        "videoPublishedDays": "Om den görs tillgänglig raderas den {days, plural, one {# dag} other {# dagar}} senare.",
-        "videoPublishedOpen": "Om den görs tillgänglig finns den kvar tills arrangörerna tar bort den."
+        "recordingKept": "Inspelningen och det som görs av den (transkription, sammanfattning, översättningar) raderas inte tillsammans med dessa uppgifter: oavsett om de görs tillgängliga eller inte finns de kvar tills arrangörerna raderar dem.",
+        "recordingDays": "Inspelningen och det som görs av den raderas {days, plural, one {# dag} other {# dagar}} efter att evenemanget har avslutats eller, om inspelningen görs tillgänglig, efter att den har publicerats.",
+        "transcriptKept": "Transkriptionen raderas inte tillsammans med dessa uppgifter: den finns kvar tills arrangörerna raderar den.",
+        "transcriptDays": "Transkriptionen raderas {days, plural, one {# dag} other {# dagar}} efter att evenemanget har avslutats."
       },
       "addressBook": {
         "label": "Adressbok",
@@ -5953,7 +5954,7 @@
     "visibilityAlways": "Alltid synlig",
     "visibilityUntil": "Synlig till:",
     "dataRetentionNote": "Deltagarnas personuppgifter raderas enligt evenemangets lagringspolicy ({days} dagar). Evenemangets innehåll förblir tillgängligt så länge sidan är synlig.",
-    "availableUntil": "Detta evenemang och dess innehåll kommer att vara tillgängligt till {date}.",
+    "participantDataUntil": "Deltagarnas personuppgifter raderas den {date}.",
     "tabs": {
       "qa": "Frågor och svar",
       "materials": "Material",

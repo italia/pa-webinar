@@ -2181,7 +2181,7 @@
         "jobMaxAttempts": "Pogingen vóór mislukking",
         "jobMaxAttemptsHelp": "Hoe vaak de pijplijn een taak opnieuw probeert voordat deze als mislukt wordt gemarkeerd. De backoff tussen de pogingen groeit exponentieel (van 30 seconden tot 2 uur). De gebruikelijke waarde is 5.",
         "artifactRetentionDays": "Bewaring van de artefacten (dagen)",
-        "artifactRetentionDaysHelp": "Bij 0 geldt geen limiet voor de hele site: de AI-artefacten volgen de bewaartermijn van hun opname of van het evenement. Een waarde groter dan nul laat een dagelijkse taak elk artefact verwijderen dat meer dan dat aantal dagen geleden is aangemaakt, gepubliceerd of niet: zo kan de bewaring korter worden, maar nooit langer. Namen van sprekers en payloads van de jobs vallen hier niet onder: die volgen de bewaartermijn van de opname of van het evenement. Details in docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "Bij 0 geldt geen limiet voor de hele site: de AI-artefacten volgen de bewaartermijn van hun opname. Een waarde groter dan nul laat een dagelijkse taak elk artefact verwijderen dat meer dan dat aantal dagen geleden is aangemaakt, gepubliceerd of niet: zo kan de bewaring korter worden, maar nooit langer. Namen van sprekers en payloads van de jobs vallen hier niet onder: die volgen de bewaartermijn van de opname. Details in docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "AI-mededeling in de wachtruimte",
         "consentDisclosureHelp": "Tekst die aan de deelnemers in de wachtruimte wordt getoond wanneer het evenement AI-postproductie gebruikt (transcriptie, samenvatting, vertaling, nasynchronisatie). Per taal aan te passen. Laat leeg om de standaardtekst van het systeem te gebruiken.",
         "consentDisclosurePlaceholder": "Bijv. Dit evenement wordt na de live-uitzending automatisch getranscribeerd en samengevat met AI-hulpmiddelen…"
@@ -4699,9 +4699,10 @@
       "retention": {
         "label": "Bewaring",
         "data": "De gegevens van de inschrijving en van de zaal worden {days, plural, one {# dag} other {# dagen}} na het einde van het evenement verwijderd. Vragen en peilingen blijven bewaard zonder namen.",
-        "videoUnpublished": "Als de opname niet beschikbaar wordt gesteld, wordt ze samen met die gegevens verwijderd.",
-        "videoPublishedDays": "Als de opname beschikbaar wordt gesteld, wordt ze {days, plural, one {# dag} other {# dagen}} later verwijderd.",
-        "videoPublishedOpen": "Als de opname beschikbaar wordt gesteld, blijft ze staan tot de organisatoren haar verwijderen."
+        "recordingKept": "De opname en wat ervan wordt gemaakt (transcriptie, samenvatting, vertalingen) worden niet met deze gegevens verwijderd: of ze nu beschikbaar worden gesteld of niet, ze blijven bewaard tot de organisatoren ze verwijderen.",
+        "recordingDays": "De opname en wat ervan wordt gemaakt, worden {days, plural, one {# dag} other {# dagen}} na het einde van het evenement verwijderd of, als de opname beschikbaar wordt gesteld, na de publicatie ervan.",
+        "transcriptKept": "De transcriptie wordt niet met deze gegevens verwijderd: ze blijft bewaard tot de organisatoren haar verwijderen.",
+        "transcriptDays": "De transcriptie wordt {days, plural, one {# dag} other {# dagen}} na het einde van het evenement verwijderd."
       },
       "addressBook": {
         "label": "Adresboek",
@@ -5953,7 +5954,7 @@
     "visibilityAlways": "Altijd zichtbaar",
     "visibilityUntil": "Zichtbaar tot:",
     "dataRetentionNote": "Persoonsgegevens van deelnemers worden verwijderd volgens de bewaartermijn van het evenement ({days} dagen). De inhoud van het evenement blijft beschikbaar zolang de pagina zichtbaar is.",
-    "availableUntil": "Dit evenement en de bijbehorende inhoud zijn beschikbaar tot {date}.",
+    "participantDataUntil": "De persoonsgegevens van de deelnemers worden op {date} verwijderd.",
     "tabs": {
       "qa": "Vragen en Antwoorden",
       "materials": "Materialen",

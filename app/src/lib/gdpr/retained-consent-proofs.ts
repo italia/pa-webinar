@@ -13,7 +13,6 @@ import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import {
   TIMEOUT_DOPO_PULIZIA_MS,
-  tipiDiProvaDaConservare,
   tipiDiProvaDiCioCheEsiste,
 } from '@/lib/gdpr/cleanup-selection';
 import {
@@ -51,8 +50,9 @@ import { isMultitrackPlaceholder } from '@/lib/recorder/lifecycle';
  * dello staff, se il corpo porta le impronte dei titolari: uno senza impronte
  * tiene le loro frasi (togliPersoneDalleTrascrizioni).
  *
- * Se ne vanno al primo giro della pulizia dopo che video e trascrizione non
- * esistono piu', e alla fine della conservazione dei dati se non sono pubblicati
+ * Restano finche' esiste la registrazione che contiene quelle voci, pubblicata o
+ * no, anche dopo la conservazione dei dati dei partecipanti, e se ne vanno al
+ * primo giro della pulizia dopo che video e trascrizione non esistono piu'
  * (lib/gdpr/cleanup-selection), oppure con l'evento: cancellare un evento cancella
  * le sue prove anche se un video esterno resta online.
  */
@@ -60,39 +60,9 @@ import { isMultitrackPlaceholder } from '@/lib/recorder/lifecycle';
 /** Le stesse tabelle della lettura, piu' quella in cui si copia. */
 type ClienteCopia = LettoreProve & Pick<Prisma.TransactionClient, 'retainedConsentProof'>;
 
-/** Lo stato di pubblicazione dell'evento, letto dentro la transazione: alla fine
- *  della conservazione dei dati. */
-export async function tipiDelleProve(
-  db: Pick<Prisma.TransactionClient, 'event' | 'postprodArtifact'>,
-  eventId: string
-): Promise<TipoConsenso[]> {
-  const evento = await db.event.findUnique({
-    where: { id: eventId },
-    select: {
-      youtubeUrl: true,
-      recordingUrl: true,
-      recordingPublished: true,
-      transcriptPublished: true,
-    },
-  });
-  if (!evento) return [];
-  // Il flag non si azzera quando si cancella la sessione: da solo terrebbe la
-  // prova per sempre.
-  const trascrizionePubblicata =
-    !!evento.transcriptPublished &&
-    (await db.postprodArtifact.count({
-      where: { type: 'TRANSCRIPT_JSON', recording: { eventId } },
-    })) > 0;
-  return tipiDiProvaDaConservare({
-    youtubeUrl: evento.youtubeUrl ?? null,
-    recordingUrl: evento.recordingUrl ?? null,
-    recordingPublished: !!evento.recordingPublished,
-    trascrizionePubblicata,
-  });
-}
-
-/** Cosa esiste dell'evento, anche non pubblicato, letto dentro la transazione:
- *  per chi cancella e per le prove prima della fine della conservazione. */
+/** Cosa esiste della registrazione dell'evento, pubblicato o no, letto dentro la
+ *  transazione: decide quali prove si copiano e quali restano (la pulizia dei
+ *  dati, chi cancella, il giro sulle prove conservate). */
 export async function tipiDelleProveEsistenti(
   db: Pick<Prisma.TransactionClient, 'event' | 'postprodArtifact' | 'recording' | 'callSession'>,
   eventId: string

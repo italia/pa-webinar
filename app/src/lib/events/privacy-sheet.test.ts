@@ -117,7 +117,7 @@ describe('schedaPrivacy, la voce di chi non acconsente', () => {
       chiNonAcconsente: null,
       conduceSempre: false,
     });
-    expect(s.conservazione.video).toBeNull();
+    expect(s.conservazione.registrazione).toBeNull();
   });
 
   it("assente: con le tracce non c'e' un video da pubblicare", () => {
@@ -131,7 +131,8 @@ describe('schedaPrivacy, la voce di chi non acconsente', () => {
       chiNonAcconsente: 'restaFuori',
       conduceSempre: false,
     });
-    expect(s.conservazione.video).toBeNull();
+    // Niente video, ma la trascrizione resta con la sua durata.
+    expect(s.conservazione.registrazione).toEqual({ giorni: null, video: false });
     expect(s.trascrizione.tracce).toBe('cancellate');
   });
 
@@ -202,7 +203,7 @@ describe('schedaPrivacy, la registrazione', () => {
       conduceSempre: false,
     });
     expect(s.trascrizione.tracce).toBeNull();
-    expect(s.conservazione.video).toBeNull();
+    expect(s.conservazione.registrazione).toBeNull();
   });
 
   it("l'installazione non puo' registrare: niente video, tracce o elaborazioni", () => {
@@ -217,7 +218,7 @@ describe('schedaPrivacy, la registrazione', () => {
       conduceSempre: false,
     });
     expect(s.trascrizione).toEqual({ chiesta: false, sottotitoli: false, tracce: null, dalVideo: false });
-    expect(s.conservazione.video).toBeNull();
+    expect(s.conservazione.registrazione).toBeNull();
     expect(s.ia).toEqual({
       sintesi: false,
       traduzione: false,
@@ -508,20 +509,29 @@ describe('schedaPrivacy, gli altri fatti', () => {
     expect(s.pseudonimi).toBe(true);
   });
 
-  it('la conservazione del video non inventa un numero di giorni', () => {
+  it('la conservazione della registrazione non inventa un numero di giorni', () => {
     expect(scheda().conservazione).toEqual({
       giorniDati: 30,
-      video: { giorniDopoPubblicazione: null },
+      registrazione: { giorni: null, video: true },
     });
     expect(
       scheda({ recordingDeleteAfterDays: 90, dataRetentionDays: 7 }).conservazione
     ).toEqual({
       giorniDati: 7,
-      video: { giorniDopoPubblicazione: 90 },
+      registrazione: { giorni: 90, video: true },
     });
-    expect(scheda({ recordingDeleteAfterDays: 0 }).conservazione.video).toEqual({
-      giorniDopoPubblicazione: null,
+    expect(scheda({ recordingDeleteAfterDays: 0 }).conservazione.registrazione).toEqual({
+      giorni: null,
+      video: true,
     });
+  });
+
+  it('senza video, la trascrizione dai sottotitoli ha la stessa durata', () => {
+    const s = scheda(
+      { recordingEnabled: false, recordingDeleteAfterDays: 30 },
+      { trascrizioneSottotitoli: true }
+    );
+    expect(s.conservazione.registrazione).toEqual({ giorni: 30, video: false });
   });
 
   it("la rubrica serve accesa sia nell'installazione sia sull'evento", () => {

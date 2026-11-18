@@ -2181,7 +2181,7 @@
         "jobMaxAttempts": "Pokusy pred zlyhaním",
         "jobMaxAttemptsHelp": "Koľkokrát pipeline zopakuje úlohu, kým ju označí za zlyhanú. Odstup medzi pokusmi rastie exponenciálne (od 30 sekúnd až po 2 hodiny). Typická hodnota je 5.",
         "artifactRetentionDays": "Uchovávanie artefaktov (dni)",
-        "artifactRetentionDaysHelp": "Pri hodnote 0 neplatí žiadny limit pre celý web: AI artefakty sa riadia dobou uchovávania svojej nahrávky alebo podujatia. Kladná hodnota nechá dennú úlohu vymazať každý artefakt vytvorený pred viac ako zadaným počtom dní, zverejnený aj nezverejnený: dobu uchovávania tak môže skrátiť, nikdy predĺžiť. Mien hovoriacich a payloadov úloh sa to netýka: riadia sa dobou uchovávania nahrávky alebo podujatia. Podrobnosti v docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "Pri hodnote 0 neplatí žiadny limit pre celý web: AI artefakty sa riadia dobou uchovávania svojej nahrávky. Kladná hodnota nechá dennú úlohu vymazať každý artefakt vytvorený pred viac ako zadaným počtom dní, zverejnený aj nezverejnený: dobu uchovávania tak môže skrátiť, nikdy predĺžiť. Mien hovoriacich a payloadov úloh sa to netýka: riadia sa dobou uchovávania nahrávky. Podrobnosti v docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "Informácia o AI v čakárni",
         "consentDisclosureHelp": "Text zobrazený účastníkom v čakárni, keď podujatie využíva AI postprodukciu (prepis, zhrnutie, preklad, dabing). Dá sa prispôsobiť pre každý jazyk. Ak pole necháte prázdne, použije sa predvolený systémový text.",
         "consentDisclosurePlaceholder": "Napr. Toto podujatie bude po skončení živého vysielania automaticky prepísané a zhrnuté nástrojmi AI…"
@@ -4699,9 +4699,10 @@
       "retention": {
         "label": "Uchovávanie",
         "data": "Údaje z registrácie a z miestnosti sa vymažú {days, plural, one {# deň} few {# dni} many {# dňa} other {# dní}} po skončení podujatia. Otázky a ankety zostávajú bez mien.",
-        "videoUnpublished": "Ak sa nesprístupní, záznam sa vymaže spolu s nimi.",
-        "videoPublishedDays": "Ak sa sprístupní, vymaže sa {days, plural, one {# deň} few {# dni} many {# dňa} other {# dní}} neskôr.",
-        "videoPublishedOpen": "Ak sa sprístupní, zostane, kým ho organizátori neodstránia."
+        "recordingKept": "Záznam a to, čo z neho vznikne (prepis, zhrnutie, preklady), sa s týmito údajmi nevymažú: či už budú sprístupnené, alebo nie, zostanú, kým ich organizátori nevymažú.",
+        "recordingDays": "Záznam a to, čo z neho vznikne, sa vymažú {days, plural, one {# deň} few {# dni} many {# dňa} other {# dní}} po skončení podujatia alebo, ak sa záznam sprístupní, po jeho zverejnení.",
+        "transcriptKept": "Prepis sa s týmito údajmi nevymaže: zostane, kým ho organizátori nevymažú.",
+        "transcriptDays": "Prepis sa vymaže {days, plural, one {# deň} few {# dni} many {# dňa} other {# dní}} po skončení podujatia."
       },
       "addressBook": {
         "label": "Adresár",
@@ -5953,7 +5954,7 @@
     "visibilityAlways": "Vždy viditeľné",
     "visibilityUntil": "Viditeľné do:",
     "dataRetentionNote": "Osobné údaje účastníkov budú zmazané podľa retencie udalosti ({days} dní). Obsah udalosti zostane dostupný po dobu viditeľnosti stránky.",
-    "availableUntil": "Táto udalosť a jej obsah budú dostupné do {date}.",
+    "participantDataUntil": "Osobné údaje účastníkov sa vymažú {date}.",
     "tabs": {
       "qa": "Otázky a odpovede",
       "materials": "Materiály",

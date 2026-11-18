@@ -193,14 +193,16 @@ export function PrivacySheet({
   if (scheda.chat.attiva) frasiChat.push(t('chat.messages'));
   if (scheda.chat.domandeAttive) frasiChat.push(t(TESTO_DOMANDE[scheda.chat.esitoDomande]));
 
+  // La registrazione non segue i dati delle persone: resta finche' chi organizza
+  // non la cancella, o per i giorni scelti.
   const frasiConservazione = [t('retention.data', { days: conservazione.giorniDati })];
-  if (conservazione.video) {
-    const giorni = conservazione.video.giorniDopoPubblicazione;
-    frasiConservazione.push(t('retention.videoUnpublished'));
+  const registrazioneTenuta = conservazione.registrazione;
+  if (registrazioneTenuta) {
+    const { giorni, video } = registrazioneTenuta;
     frasiConservazione.push(
       giorni === null
-        ? t('retention.videoPublishedOpen')
-        : t('retention.videoPublishedDays', { days: giorni })
+        ? t(video ? 'retention.recordingKept' : 'retention.transcriptKept')
+        : t(video ? 'retention.recordingDays' : 'retention.transcriptDays', { days: giorni })
     );
   }
 

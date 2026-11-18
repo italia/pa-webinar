@@ -1056,6 +1056,8 @@ function PostEventSidebar({
   const tp = useTranslations('postEvent');
   const format = useFormatter();
 
+  // Il giorno in cui si cancellano i dati delle persone: la pagina, i contenuti
+  // e la registrazione non se ne vanno con loro (docs/GDPR.md).
   const retentionExpiry = event.dataRetentionDays
     ? new Date(new Date(event.endsAt).getTime() + event.dataRetentionDays * 86_400_000)
     : null;
@@ -1149,7 +1151,7 @@ function PostEventSidebar({
             color: 'var(--app-text)',
           }}
         >
-          {tp('availableUntil', {
+          {tp('participantDataUntil', {
             date: format.dateTime(retentionExpiry, {
               day: 'numeric',
               month: 'long',

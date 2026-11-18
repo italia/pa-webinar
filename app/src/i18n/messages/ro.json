@@ -2181,7 +2181,7 @@
         "jobMaxAttempts": "Încercări înainte de eșec",
         "jobMaxAttemptsHelp": "De câte ori reîncearcă pipeline-ul un job înainte de a-l marca drept eșuat. Intervalul dintre încercări crește exponențial (de la 30 de secunde până la 2 ore). Valoarea tipică este 5.",
         "artifactRetentionDays": "Păstrarea artefactelor (zile)",
-        "artifactRetentionDaysHelp": "La 0 nu există o limită pentru întregul site: artefactele AI urmează termenul de păstrare al înregistrării lor sau al evenimentului. O valoare mai mare decât zero face ca un job zilnic să șteargă orice artefact creat cu mai mult de acest număr de zile în urmă, publicat sau nu: poate scurta păstrarea, dar nu o prelungește niciodată. Numele vorbitorilor și payload-urile joburilor nu sunt incluse: urmează termenul de păstrare al înregistrării sau al evenimentului. Detalii în docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "La 0 nu există o limită pentru întregul site: artefactele AI urmează termenul de păstrare al înregistrării lor. O valoare mai mare decât zero face ca un job zilnic să șteargă orice artefact creat cu mai mult de acest număr de zile în urmă, publicat sau nu: poate scurta păstrarea, dar nu o prelungește niciodată. Numele vorbitorilor și payload-urile joburilor nu sunt incluse: urmează termenul de păstrare al înregistrării. Detalii în docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "Notă informativă AI în sala de așteptare",
         "consentDisclosureHelp": "Text afișat participanților în sala de așteptare când evenimentul folosește post-producția AI (transcriere, rezumat, traducere, dublaj). Personalizabil pentru fiecare limbă. Lăsați gol pentru a folosi textul implicit al sistemului.",
         "consentDisclosurePlaceholder": "Ex. Acest eveniment va fi transcris și rezumat automat cu instrumente AI după transmisiunea în direct…"
@@ -4699,9 +4699,10 @@
       "retention": {
         "label": "Păstrare",
         "data": "Datele înscrierii și ale sălii se șterg la {days, plural, one {# zi} few {# zile} other {# de zile}} după încheierea evenimentului. Întrebările și sondajele rămân fără nume.",
-        "videoUnpublished": "Dacă nu este pusă la dispoziție, înregistrarea se șterge odată cu acestea.",
-        "videoPublishedDays": "Dacă este pusă la dispoziție, se șterge după {days, plural, one {# zi} few {# zile} other {# de zile}}.",
-        "videoPublishedOpen": "Dacă este pusă la dispoziție, rămâne până când organizatorii o elimină."
+        "recordingKept": "Înregistrarea și ce rezultă din ea (transcriere, rezumat, traduceri) nu se șterg odată cu aceste date: fie că sunt puse la dispoziție, fie că nu, rămân până când organizatorii le șterg.",
+        "recordingDays": "Înregistrarea și ce rezultă din ea se șterg la {days, plural, one {# zi} few {# zile} other {# de zile}} după încheierea evenimentului sau, dacă înregistrarea este pusă la dispoziție, după publicarea ei.",
+        "transcriptKept": "Transcrierea nu se șterge odată cu aceste date: rămâne până când organizatorii o șterg.",
+        "transcriptDays": "Transcrierea se șterge la {days, plural, one {# zi} few {# zile} other {# de zile}} după încheierea evenimentului."
       },
       "addressBook": {
         "label": "Agendă",
@@ -5953,7 +5954,7 @@
     "visibilityAlways": "Întotdeauna vizibil",
     "visibilityUntil": "Vizibil până la:",
     "dataRetentionNote": "Datele personale ale participanților vor fi șterse conform retenției evenimentului ({days} zile). Conținutul evenimentului va rămâne disponibil cât timp pagina este vizibilă.",
-    "availableUntil": "Acest eveniment și conținutul asociat vor fi disponibile până la {date}.",
+    "participantDataUntil": "Datele personale ale participanților se șterg la {date}.",
     "tabs": {
       "qa": "Întrebări și Răspunsuri",
       "materials": "Materiale",

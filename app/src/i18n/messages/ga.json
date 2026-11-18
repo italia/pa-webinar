@@ -2181,7 +2181,7 @@
         "jobMaxAttempts": "Iarrachtaí roimh theip",
         "jobMaxAttemptsHelp": "Cé mhéad uair a bhaineann an phíblíne triail eile as jab sula marcálann sí mar theipthe é. Fásann an cúlú idir iarrachtaí go heispéantúil (ó 30 soicind suas go 2 uair an chloig). Is é 5 an gnáthluach.",
         "artifactRetentionDays": "Coinneáil na ndéantán (laethanta)",
-        "artifactRetentionDaysHelp": "Ag 0 níl aon teorainn don suíomh ar fad: leanann na déantáin AI tréimhse choinneála a dtaifeadta nó an imeachta. Le luach níos mó ná nialas, scriosann jab laethúil gach déantán a cruthaíodh níos mó ná an líon sin laethanta ó shin, foilsithe nó nach ea: is féidir leis an gcoinneáil a ghiorrú, ach ní a fhadú choíche. Níl ainmneacha na gcainteoirí ná pálasta na jabanna san áireamh: leanann siad tréimhse choinneála an taifeadta nó an imeachta. Sonraí in docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "Ag 0 níl aon teorainn don suíomh ar fad: leanann na déantáin AI tréimhse choinneála a dtaifeadta. Le luach níos mó ná nialas, scriosann jab laethúil gach déantán a cruthaíodh níos mó ná an líon sin laethanta ó shin, foilsithe nó nach ea: is féidir leis an gcoinneáil a ghiorrú, ach ní a fhadú choíche. Níl ainmneacha na gcainteoirí ná pálasta na jabanna san áireamh: leanann siad tréimhse choinneála an taifeadta. Sonraí in docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "Fógra AI sa seomra feithimh",
         "consentDisclosureHelp": "Téacs a thaispeántar do rannpháirtithe sa seomra feithimh nuair a bhaineann an t-imeacht úsáid as iarléiriú AI (tras-scríobh, achoimre, aistriúchán, dubáil). Inoiriúnaithe de réir teanga. Fág folamh chun an téacs réamhshocraithe a úsáid.",
         "consentDisclosurePlaceholder": "M.sh. Déanfar an t-imeacht seo a thras-scríobh agus a achoimriú go huathoibríoch le huirlisí AI tar éis an tarchuir bheo…"
@@ -4699,9 +4699,10 @@
       "retention": {
         "label": "Coinneáil",
         "data": "Scriostar sonraí an chláraithe agus an tseomra {days, plural, one {# lá} two {# lá} few {# lá} many {# lá} other {# lá}} tar éis dheireadh an imeachta. Fanann ceisteanna agus pobalbhreitheanna gan ainmneacha.",
-        "videoUnpublished": "Mura gcuirtear ar fáil é, scriostar an taifeadadh in éineacht leo.",
-        "videoPublishedDays": "Má chuirtear ar fáil é, scriostar é {days, plural, one {# lá} two {# lá} few {# lá} many {# lá} other {# lá}} ina dhiaidh sin.",
-        "videoPublishedOpen": "Má chuirtear ar fáil é, fanann sé go dtí go mbaineann na heagraithe é."
+        "recordingKept": "Ní scriostar an taifeadadh ná a ndéantar as (tras-scríbhinn, achoimre, aistriúcháin) in éineacht leis na sonraí seo: cibé acu a chuirtear ar fáil iad nó nach gcuirtear, fanann siad go dtí go scriosann na heagraithe iad.",
+        "recordingDays": "Scriostar an taifeadadh agus a ndéantar as {days, plural, one {# lá} two {# lá} few {# lá} many {# lá} other {# lá}} tar éis dheireadh an imeachta nó, má chuirtear an taifeadadh ar fáil, tar éis é a fhoilsiú.",
+        "transcriptKept": "Ní scriostar an tras-scríbhinn in éineacht leis na sonraí seo: fanann sí go dtí go scriosann na heagraithe í.",
+        "transcriptDays": "Scriostar an tras-scríbhinn {days, plural, one {# lá} two {# lá} few {# lá} many {# lá} other {# lá}} tar éis dheireadh an imeachta."
       },
       "addressBook": {
         "label": "Leabhar seoltaí",
@@ -5953,7 +5954,7 @@
     "visibilityAlways": "Infheicthe i gcónaí",
     "visibilityUntil": "Infheicthe go dtí:",
     "dataRetentionNote": "Scriosfar sonraí pearsanta na rannpháirtithe de réir choinneáil an imeachta ({days} lá). Fanfaidh ábhar an imeachta ar fáil fad is atá an leathanach infheicthe.",
-    "availableUntil": "Beidh an t-imeacht seo agus a ábhar ar fáil go dtí {date}.",
+    "participantDataUntil": "Scriosfar sonraí pearsanta na rannpháirtithe ar {date}.",
     "tabs": {
       "qa": "Ceisteanna agus Freagraí",
       "materials": "Ábhair",

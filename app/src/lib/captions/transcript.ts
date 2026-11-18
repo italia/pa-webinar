@@ -352,8 +352,9 @@ async function trascrizioneIntoccabile(
  * mettono in fila su un lock per evento.
  */
 export async function costruisciTrascrizioneDaiSottotitoli(eventId: string): Promise<EsitoTrascrizione> {
-  // Dopo la conservazione la pulizia toglie la trascrizione: ricostruirla
-  // dalle frasi rimaste fino al giro successivo la riporterebbe in vita.
+  // Dopo la conservazione le frasi sono dati delle persone che la pulizia
+  // toglie: la trascrizione gia' costruita resta con la registrazione, ma non
+  // si ricostruisce da frasi che non dovrebbero esserci piu'.
   const evento = await prisma.event.findUnique({
     where: { id: eventId },
     select: { endsAt: true, dataRetentionDays: true },

@@ -2181,7 +2181,7 @@
         "jobMaxAttempts": "Bandymai iki nesėkmės",
         "jobMaxAttemptsHelp": "Kiek kartų grandinė kartoja užduotį, prieš pažymėdama ją kaip nepavykusią. Pertrauka tarp bandymų auga eksponentiškai (nuo 30 sekundžių iki 2 valandų). Įprasta reikšmė – 5.",
         "artifactRetentionDays": "Artefaktų saugojimas (dienomis)",
-        "artifactRetentionDaysHelp": "Esant 0, visai svetainei taikomos ribos nėra: DI artefaktams taikomas jų įrašo arba renginio saugojimo terminas. Už nulį didesnė reikšmė lemia, kad kasdienė užduotis ištrina kiekvieną artefaktą, sukurtą anksčiau nei prieš tiek dienų, paskelbtą ar ne: ji gali sutrumpinti saugojimą, bet niekada jo nepailgina. Kalbėtojų vardams ir užduočių duomenims tai netaikoma: jiems taikomas įrašo arba renginio saugojimo terminas. Išsamiau: docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "Esant 0, visai svetainei taikomos ribos nėra: DI artefaktams taikomas jų įrašo saugojimo terminas. Už nulį didesnė reikšmė lemia, kad kasdienė užduotis ištrina kiekvieną artefaktą, sukurtą anksčiau nei prieš tiek dienų, paskelbtą ar ne: ji gali sutrumpinti saugojimą, bet niekada jo nepailgina. Kalbėtojų vardams ir užduočių duomenims tai netaikoma: jiems taikomas įrašo saugojimo terminas. Išsamiau: docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "DI pranešimas laukiamajame",
         "consentDisclosureHelp": "Tekstas, rodomas dalyviams laukiamajame, kai renginyje naudojama DI postprodukcija (transkripcija, santrauka, vertimas, įgarsinimas). Pritaikomas kiekvienai kalbai. Palikite tuščią, kad būtų naudojamas numatytasis sistemos tekstas.",
         "consentDisclosurePlaceholder": "Pvz. Šis renginys po tiesioginės transliacijos bus automatiškai transkribuotas ir apibendrintas DI įrankiais…"
@@ -4699,9 +4699,10 @@
       "retention": {
         "label": "Saugojimas",
         "data": "Registracijos ir salės duomenys ištrinami praėjus {days, plural, one {# dienai} few {# dienoms} many {# dienos} other {# dienų}} nuo renginio pabaigos. Klausimai ir apklausos lieka be vardų.",
-        "videoUnpublished": "Jei įrašas nepadaromas prieinamas, jis ištrinamas kartu su šiais duomenimis.",
-        "videoPublishedDays": "Jei įrašas padaromas prieinamas, jis ištrinamas po {days, plural, one {# dienos} few {# dienų} many {# dienos} other {# dienų}}.",
-        "videoPublishedOpen": "Jei įrašas padaromas prieinamas, jis lieka, kol organizatoriai jo nepašalins."
+        "recordingKept": "Įrašas ir tai, kas iš jo parengiama (transkripcija, santrauka, vertimai), kartu su šiais duomenimis neištrinami: nesvarbu, ar jie padaromi prieinami, ar ne, jie lieka, kol organizatoriai jų neištrina.",
+        "recordingDays": "Įrašas ir tai, kas iš jo parengiama, ištrinami praėjus {days, plural, one {# dienai} few {# dienoms} many {# dienos} other {# dienų}} nuo renginio pabaigos arba, jei įrašas padaromas prieinamas, nuo jo paskelbimo.",
+        "transcriptKept": "Transkripcija kartu su šiais duomenimis neištrinama: ji lieka, kol organizatoriai jos neištrina.",
+        "transcriptDays": "Transkripcija ištrinama praėjus {days, plural, one {# dienai} few {# dienoms} many {# dienos} other {# dienų}} nuo renginio pabaigos."
       },
       "addressBook": {
         "label": "Adresų knyga",
@@ -5953,7 +5954,7 @@
     "visibilityAlways": "Visada matomas",
     "visibilityUntil": "Matomas iki:",
     "dataRetentionNote": "Dalyvių asmens duomenys bus ištrinti pagal renginio saugojimo politiką ({days} dienų). Renginio turinys bus prieinamas, kol puslapis matomas.",
-    "availableUntil": "Šis renginys ir jo turinys bus prieinami iki {date}.",
+    "participantDataUntil": "Dalyvių asmens duomenys ištrinami {date}.",
     "tabs": {
       "qa": "Klausimai ir atsakymai",
       "materials": "Medžiaga",

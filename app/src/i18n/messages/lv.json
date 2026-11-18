@@ -2181,7 +2181,7 @@
         "jobMaxAttempts": "Mēģinājumi pirms atteices",
         "jobMaxAttemptsHelp": "Cik reižu konveijers atkārto darbu, pirms atzīmē to kā neizdevušos. Gaidīšanas laiks starp mēģinājumiem pieaug eksponenciāli (no 30 sekundēm līdz 2 stundām). Tipiskā vērtība ir 5.",
         "artifactRetentionDays": "Artefaktu glabāšana (dienas)",
-        "artifactRetentionDaysHelp": "Ar vērtību 0 visai vietnei nav ierobežojuma: MI artefaktiem ir sava ieraksta vai pasākuma glabāšanas termiņš. Vērtība, kas lielāka par nulli, liek ikdienas uzdevumam dzēst katru artefaktu, kas izveidots pirms vairāk nekā šī dienu skaita, publicētu vai nē: tā var saīsināt glabāšanu, bet nekad to nepagarina. Runātāju vārdi un darbu dati uz to neattiecas: tiem ir ieraksta vai pasākuma glabāšanas termiņš. Sīkāk: docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "Ar vērtību 0 visai vietnei nav ierobežojuma: MI artefaktiem ir sava ieraksta glabāšanas termiņš. Vērtība, kas lielāka par nulli, liek ikdienas uzdevumam dzēst katru artefaktu, kas izveidots pirms vairāk nekā šī dienu skaita, publicētu vai nē: tā var saīsināt glabāšanu, bet nekad to nepagarina. Runātāju vārdi un darbu dati uz to neattiecas: tiem ir ieraksta glabāšanas termiņš. Sīkāk: docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "MI paziņojums uzgaidāmajā telpā",
         "consentDisclosureHelp": "Teksts, ko dalībnieki redz uzgaidāmajā telpā, ja pasākumā tiek izmantota MI pēcapstrāde (transkripcija, kopsavilkums, tulkošana, dublēšana). Pielāgojams katrai valodai. Atstājiet tukšu, lai izmantotu sistēmas noklusējuma tekstu.",
         "consentDisclosurePlaceholder": "Piem., šis pasākums pēc tiešraides tiks automātiski transkribēts un apkopots ar MI rīkiem…"
@@ -4699,9 +4699,10 @@
       "retention": {
         "label": "Glabāšana",
         "data": "Reģistrācijas un telpas dati tiek dzēsti {days, plural, zero {# dienas} one {# dienu} other {# dienas}} pēc pasākuma beigām. Jautājumi un aptaujas paliek bez vārdiem.",
-        "videoUnpublished": "Ja ieraksts netiek padarīts pieejams, tas tiek dzēsts kopā ar šiem datiem.",
-        "videoPublishedDays": "Ja ieraksts tiek padarīts pieejams, tas tiek dzēsts {days, plural, zero {# dienas} one {# dienu} other {# dienas}} vēlāk.",
-        "videoPublishedOpen": "Ja ieraksts tiek padarīts pieejams, tas paliek, līdz organizatori to noņem."
+        "recordingKept": "Ieraksts un tas, kas no tā tiek sagatavots (atšifrējums, kopsavilkums, tulkojumi), netiek dzēsti kopā ar šiem datiem: neatkarīgi no tā, vai tie tiek padarīti pieejami, tie paliek, līdz organizatori tos dzēš.",
+        "recordingDays": "Ieraksts un tas, kas no tā tiek sagatavots, tiek dzēsti {days, plural, zero {# dienas} one {# dienu} other {# dienas}} pēc pasākuma beigām vai, ja ieraksts tiek padarīts pieejams, pēc tā publicēšanas.",
+        "transcriptKept": "Atšifrējums netiek dzēsts kopā ar šiem datiem: tas paliek, līdz organizatori to dzēš.",
+        "transcriptDays": "Atšifrējums tiek dzēsts {days, plural, zero {# dienas} one {# dienu} other {# dienas}} pēc pasākuma beigām."
       },
       "addressBook": {
         "label": "Kontaktu grāmata",
@@ -5953,7 +5954,7 @@
     "visibilityAlways": "Vienmēr redzams",
     "visibilityUntil": "Redzams līdz:",
     "dataRetentionNote": "Dalībnieku personas dati tiks dzēsti saskaņā ar pasākuma saglabāšanas politiku ({days} dienas). Pasākuma saturs būs pieejams, kamēr lapa ir redzama.",
-    "availableUntil": "Šis pasākums un tā saturs būs pieejams līdz {date}.",
+    "participantDataUntil": "Dalībnieku personas dati tiek dzēsti {date}.",
     "tabs": {
       "qa": "Jautājumi un atbildes",
       "materials": "Materiāli",

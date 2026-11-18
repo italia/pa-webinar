@@ -55,8 +55,9 @@ vi.mock('@/lib/db', () => ({
     roomOccupant: { deleteMany: vi.fn() },
     captionSegment: { deleteMany: vi.fn() },
     recordingRedactionRequest: { deleteMany: vi.fn() },
-    recording: { findMany: vi.fn(), deleteMany: vi.fn() },
+    recording: { findMany: vi.fn(), deleteMany: vi.fn(), updateMany: vi.fn() },
     postprodArtifact: { deleteMany: vi.fn(), count: vi.fn() },
+    postprodJob: { updateMany: vi.fn() },
     speaker: { deleteMany: vi.fn() },
     reaction: { deleteMany: vi.fn() },
     agendaItemReaction: { deleteMany: vi.fn() },
@@ -66,7 +67,7 @@ vi.mock('@/lib/db', () => ({
     eventModerator: { deleteMany: vi.fn(), findMany: vi.fn() },
     eventPersonPhoto: { deleteMany: vi.fn() },
     recordingTrack: { deleteMany: vi.fn() },
-    callSession: { updateMany: vi.fn(), findMany: vi.fn(), update: vi.fn() },
+    callSession: { updateMany: vi.fn(), findMany: vi.fn(), update: vi.fn(), count: vi.fn() },
     $transaction: vi.fn(),
   },
 }));
@@ -134,8 +135,9 @@ const db = prisma as unknown as {
   roomOccupant: { deleteMany: Mock };
   captionSegment: { deleteMany: Mock };
   recordingRedactionRequest: { deleteMany: Mock };
-  recording: { findMany: Mock; deleteMany: Mock };
+  recording: { findMany: Mock; deleteMany: Mock; updateMany: Mock };
   postprodArtifact: { deleteMany: Mock; count: Mock };
+  postprodJob: { updateMany: Mock };
   speaker: { deleteMany: Mock };
   reaction: { deleteMany: Mock };
   agendaItemReaction: { deleteMany: Mock };
@@ -145,7 +147,7 @@ const db = prisma as unknown as {
   eventModerator: { deleteMany: Mock; findMany: Mock };
   eventPersonPhoto: { deleteMany: Mock };
   recordingTrack: { deleteMany: Mock };
-  callSession: { updateMany: Mock; findMany: Mock; update: Mock };
+  callSession: { updateMany: Mock; findMany: Mock; update: Mock; count: Mock };
   $transaction: Mock;
 };
 const deleteRecordingBlobMock = deleteRecordingBlob as unknown as Mock;
@@ -166,10 +168,7 @@ function endedEvent(over: Partial<Record<string, unknown>> = {}) {
     lastActiveAt: null,
     dataRetentionDays: 30,
     status: 'ENDED',
-    recordingUrl: null,
     tempRecordingUrl: null,
-    recordingPublished: false,
-    transcriptPublished: false,
     _count: { registrations: 0, questions: 0, polls: 0 },
     ...over,
   };
@@ -181,13 +180,13 @@ function endedEvent(over: Partial<Record<string, unknown>> = {}) {
  */
 function stubEventQueries(rows: {
   tempRecordings?: unknown[];
-  publishedRecordings?: unknown[];
+  expiringRecordings?: unknown[];
   ended?: unknown[];
 }) {
   db.event.findMany.mockImplementation(async (args: { where?: Record<string, unknown> }) => {
     const where = args?.where ?? {};
     if ('tempRecordingUrl' in where) return rows.tempRecordings ?? [];
-    if ('recordingDeleteAfterDays' in where) return rows.publishedRecordings ?? [];
+    if ('recordingDeleteAfterDays' in where) return rows.expiringRecordings ?? [];
     return rows.ended ?? [];
   });
 }
@@ -262,6 +261,7 @@ describe('GET /api/cron/cleanup', () => {
         if (typeof mock !== 'function') continue;
         if (name === 'findMany') mock.mockResolvedValue([]);
         else if (name === 'findFirst') mock.mockResolvedValue(null);
+        else if (name === 'count') mock.mockResolvedValue(0);
         else if (name === 'deleteMany' || name === 'updateMany')
           mock.mockResolvedValue({ count: 0 });
         else mock.mockResolvedValue({});
@@ -355,25 +355,68 @@ describe('GET /api/cron/cleanup', () => {
     );
   });
 
-  // ── Fase 2: registrazioni pubblicate oltre la loro retention ──
+  // ── Fase 2: la registrazione oltre la sua scadenza ──
 
-  it('fase 2: cancella solo il video pubblicato oltre la retention', async () => {
-    stubEventQueries({
-      publishedRecordings: [
+  /** Evento della fase 2: la `select` dell'handler, con default innocui. */
+  function expiringEvent(over: Partial<Record<string, unknown>> = {}) {
+    return {
+      id: 'evt-scaduto',
+      slug: 'scaduto',
+      status: 'ENDED',
+      endsAt: daysAgo(60),
+      lastActiveAt: null,
+      dataRetentionDays: 30,
+      recordingUrl: 'https://blob/scaduto.mp4',
+      tempRecordingUrl: null,
+      recordingPublished: false,
+      recordingPublishedAt: null,
+      recordingDeleteAfterDays: 30,
+      callSessions: [],
+      ...over,
+    };
+  }
+
+  it('fase 2: cerca solo gli eventi con una durata e qualcosa da cancellare', async () => {
+    await runCleanup();
+
+    const phase2 = db.event.findMany.mock.calls
+      .map((c) => c[0] as { where: Record<string, unknown> })
+      .find((a) => 'recordingDeleteAfterDays' in a.where);
+    // Senza durata la registrazione non scade: nessuna condizione sulla
+    // pubblicazione, e niente che la leghi alla conservazione dei dati.
+    expect(phase2?.where).toEqual({
+      recordingDeleteAfterDays: { not: null },
+      OR: [
+        { recordingUrl: { not: null } },
+        { tempRecordingUrl: { not: null } },
         {
-          id: 'evt-scaduto',
-          slug: 'scaduto',
-          recordingUrl: 'https://blob/scaduto.mp4',
-          recordingDeleteAfterDays: 30,
-          recordingPublishedAt: daysAgo(31),
+          callSessions: {
+            some: { OR: [{ recordingUrl: { not: null } }, { recordingFilename: { not: null } }] },
+          },
         },
         {
+          recordings: {
+            some: {
+              status: { not: 'ARCHIVED' },
+              OR: [{ retentionUntil: null }, { retentionUntil: { gt: NOW } }],
+            },
+          },
+        },
+      ],
+    });
+  });
+
+  it('fase 2: cancella il video pubblicato oltre la sua durata, contata dalla pubblicazione', async () => {
+    stubEventQueries({
+      expiringRecordings: [
+        expiringEvent({ recordingPublished: true, recordingPublishedAt: daysAgo(31) }),
+        expiringEvent({
           id: 'evt-fresco',
           slug: 'fresco',
           recordingUrl: 'https://blob/fresco.mp4',
-          recordingDeleteAfterDays: 30,
+          recordingPublished: true,
           recordingPublishedAt: daysAgo(2),
-        },
+        }),
       ],
     });
 
@@ -383,19 +426,150 @@ describe('GET /api/cron/cleanup', () => {
     expect(deleteRecordingBlobMock).toHaveBeenCalledTimes(1);
     expect(deleteRecordingBlobMock).toHaveBeenCalledWith('https://blob/scaduto.mp4');
     expect(db.event.update).toHaveBeenCalledTimes(1);
-    expect(db.event.update.mock.calls[0]?.[0]).toMatchObject({
+    expect(db.event.update.mock.calls[0]?.[0]).toEqual({
       where: { id: 'evt-scaduto' },
       // Tolto il file, vanno tolti anche i metadati che la pagina evento usa
-      // per mostrare il player: altrimenti resterebbe un link a un 404.
+      // per mostrare il player: altrimenti resterebbe un link a un 404. La
+      // durata resta: e' dell'evento, e vale per la registrazione che verra'.
       data: {
         recordingUrl: null,
         recordingPublished: false,
         recordingPublishedAt: null,
-        recordingDeleteAfterDays: null,
+        recordingFileSize: null,
+        recordingDuration: null,
+        tempRecordingUrl: null,
+        tempRecordingStartedAt: null,
+        transcriptPublished: false,
       },
     });
-    expect(body.publishedRecordingsCleaned).toBe(1);
+    expect(body.recordingsExpired).toBe(1);
     expect(everyDbCall()).not.toContain('evt-fresco');
+  });
+
+  it('fase 2: la registrazione non pubblicata conta dalla fine dell’evento', async () => {
+    stubEventQueries({
+      expiringRecordings: [
+        expiringEvent(),
+        expiringEvent({ id: 'evt-lunga', slug: 'lunga', recordingDeleteAfterDays: 90 }),
+      ],
+    });
+
+    const body = await (await runCleanup()).json();
+
+    expect(deleteRecordingBlobMock).toHaveBeenCalledWith('https://blob/scaduto.mp4');
+    expect(body.recordingsExpired).toBe(1);
+    expect(everyDbCall()).not.toContain('evt-lunga');
+  });
+
+  it('fase 2: toglie i file di tutte le sessioni e la registrazione temporanea', async () => {
+    stubEventQueries({
+      expiringRecordings: [
+        expiringEvent({
+          tempRecordingUrl: 'https://blob/temp.mp4',
+          callSessions: [
+            { recordingUrl: 'https://blob/scaduto.mp4' },
+            { recordingUrl: 'https://blob/prima.mp4' },
+          ],
+        }),
+      ],
+    });
+
+    await runCleanup();
+
+    expect(deleteRecordingBlobMock.mock.calls.map((c) => c[0]).sort()).toEqual([
+      'https://blob/prima.mp4',
+      'https://blob/scaduto.mp4',
+      'https://blob/temp.mp4',
+    ]);
+    expect(db.callSession.updateMany).toHaveBeenCalledWith({
+      where: {
+        eventId: 'evt-scaduto',
+        OR: [{ recordingUrl: { not: null } }, { recordingFilename: { not: null } }],
+      },
+      data: {
+        recordingUrl: null,
+        recordingFileSize: null,
+        recordingDuration: null,
+        recordingFilename: null,
+      },
+    });
+  });
+
+  it('fase 2: la trascrizione dai sottotitoli va subito, gli output li passa a postprod-retention', async () => {
+    stubEventQueries({ expiringRecordings: [expiringEvent()] });
+    db.recording.findMany.mockImplementation(async (args: { where: Record<string, unknown> }) =>
+      args.where.status
+        ? [
+            { id: 'rec-solo-sottotitoli', blobKey: '' },
+            { id: 'rec-video', blobKey: 'recordings/evt-scaduto/a.mp4' },
+          ]
+        : []
+    );
+
+    await runCleanup();
+
+    // La registrazione senza file se ne va tutta, a cascata.
+    expect(db.recording.deleteMany).toHaveBeenCalledWith({
+      where: { id: { in: ['rec-solo-sottotitoli'] } },
+    });
+    // Da quella con il video: subito cio' che sta solo nel database…
+    expect(db.postprodArtifact.deleteMany).toHaveBeenCalledWith({
+      where: { recordingId: { in: ['rec-video'] }, modelId: 'live-captions' },
+    });
+    expect(db.speaker.deleteMany).toHaveBeenCalledWith({
+      where: { recordingId: { in: ['rec-video'] } },
+    });
+    // …i lavori aperti si fermano…
+    expect(db.postprodJob.updateMany).toHaveBeenCalledWith({
+      where: { recordingId: { in: ['rec-video'] }, status: { in: ['PENDING', 'CLAIMED', 'RUNNING'] } },
+      data: { status: 'FAILED', completedAt: NOW, lastError: 'recording expired' },
+    });
+    // …e il resto lo toglie postprod-retention da adesso.
+    expect(db.recording.updateMany).toHaveBeenCalledWith({
+      where: {
+        id: { in: ['rec-video'] },
+        OR: [{ retentionUntil: null }, { retentionUntil: { gt: NOW } }],
+      },
+      data: { retentionUntil: NOW },
+    });
+  });
+
+  it('fase 2: scrive la cancellazione nel registro GDPR, senza dati personali', async () => {
+    stubEventQueries({ expiringRecordings: [expiringEvent()] });
+
+    await runCleanup();
+
+    const riga = db.gdprAuditLog.create.mock.calls.find(
+      (c) => (c[0] as { data: { action: string } }).data.action === 'RECORDING_DELETED'
+    )?.[0] as { data: { eventId: string; details: string } };
+    expect(riga.data.eventId).toBe('evt-scaduto');
+    expect(JSON.parse(riga.data.details)).toEqual({
+      reason: 'retention_expired',
+      retentionDays: 30,
+      countedFrom: 'event_end',
+      files: 1,
+      recordings: 0,
+    });
+  });
+
+  it('fase 2: un evento che fallisce non ferma gli altri e il giro risponde 500', async () => {
+    stubEventQueries({
+      expiringRecordings: [
+        expiringEvent({ id: 'evt-rotto', slug: 'rotto' }),
+        expiringEvent(),
+      ],
+    });
+    db.event.update.mockImplementation(async (args: { where: { id: string } }) => {
+      if (args.where.id === 'evt-rotto') throw new Error('database');
+      return {};
+    });
+
+    const res = await runCleanup();
+    const body = await res.json();
+
+    expect(res.status).toBe(500);
+    expect(body.failures).toContain('recording:evt-rotto');
+    expect(body.recordingsExpired).toBe(1);
   });
 
   // ── Fase 3: retention completa dei dati dell'evento ──
@@ -517,45 +691,20 @@ describe('GET /api/cron/cleanup', () => {
     expect(db.callSession.findMany).not.toHaveBeenCalled();
   });
 
-  it('fase 3: toglie la trascrizione dai sottotitoli non pubblicata', async () => {
+  it('fase 3: la trascrizione dai sottotitoli resta, le sue frasi no', async () => {
     stubEventQueries({ ended: [endedEvent({ id: 'evt-vecchio' })] });
-    db.recording.findMany.mockResolvedValue([
-      { id: 'rec-solo-sottotitoli', blobKey: '' },
-      { id: 'rec-video', blobKey: 'recordings/evt-vecchio/a.mp4' },
-    ]);
 
     await runCleanup();
 
-    expect(db.recording.findMany).toHaveBeenCalledWith({
-      where: { eventId: 'evt-vecchio', artifacts: { some: { modelId: 'live-captions' } } },
-      select: { id: true, blobKey: true },
-    });
-    // La registrazione senza file se ne va tutta, a cascata.
-    expect(db.recording.deleteMany).toHaveBeenCalledWith({
-      where: { id: { in: ['rec-solo-sottotitoli'] } },
-    });
-    // Da quella con il video si tolgono solo la trascrizione e i parlanti.
-    expect(db.postprodArtifact.deleteMany).toHaveBeenCalledWith({
-      where: { recordingId: { in: ['rec-video'] }, modelId: 'live-captions' },
-    });
-    expect(db.speaker.deleteMany).toHaveBeenCalledWith({
-      where: { recordingId: { in: ['rec-video'] } },
-    });
-  });
-
-  it('fase 3: la trascrizione pubblicata, con il video o da sola, resta', async () => {
-    stubEventQueries({
-      ended: [
-        endedEvent({ id: 'evt-trascrizione', transcriptPublished: true }),
-        endedEvent({ id: 'evt-video', slug: 'video', recordingPublished: true }),
-      ],
-    });
-
-    await runCleanup();
-
-    expect(db.recording.findMany).not.toHaveBeenCalled();
+    // La trascrizione e' parte della registrazione: niente la tocca qui, ne'
+    // le registrazioni, ne' gli artefatti, ne' i nomi dei parlanti.
     expect(db.recording.deleteMany).not.toHaveBeenCalled();
+    expect(db.recording.updateMany).not.toHaveBeenCalled();
     expect(db.postprodArtifact.deleteMany).not.toHaveBeenCalled();
+    expect(db.speaker.deleteMany).not.toHaveBeenCalled();
+    // Le frasi salvate e chi era in sala sono dati delle persone: via.
+    expect(db.captionSegment.deleteMany).toHaveBeenCalledWith({ where: { eventId: 'evt-vecchio' } });
+    expect(db.roomOccupant.deleteMany).toHaveBeenCalledWith({ where: { eventId: 'evt-vecchio' } });
   });
 
   it('fase 3: cancella i dati delle persone dell’evento scaduto', async () => {
@@ -951,37 +1100,28 @@ describe('GET /api/cron/cleanup', () => {
     expect(body.eventsProcessed).toBe(1);
   });
 
-  it('fase 3: purga il video non pubblicato e la registrazione temporanea, risparmia quello pubblicato', async () => {
+  it('fase 3: purga la registrazione temporanea e lascia il video, pubblicato o no', async () => {
     stubEventQueries({
       ended: [
-        endedEvent({
-          id: 'evt-pubblicato',
-          recordingUrl: 'https://blob/pubblicato.mp4',
-          recordingPublished: true,
-          tempRecordingUrl: 'https://blob/grezzo.mp4',
-        }),
-        endedEvent({
-          id: 'evt-non-pubblicato',
-          slug: 'non-pubblicato',
-          recordingUrl: 'https://blob/interno.mp4',
-          recordingPublished: false,
-        }),
+        endedEvent({ id: 'evt-pubblicato', tempRecordingUrl: 'https://blob/grezzo.mp4' }),
+        endedEvent({ id: 'evt-non-pubblicato', slug: 'non-pubblicato' }),
       ],
     });
 
     const res = await runCleanup();
     const body = await res.json();
 
-    const urls = deleteRecordingBlobMock.mock.calls.map((c) => c[0]);
-    // Il video pubblicato è l'unico esente: lo governa la fase 2
-    // (recordingDeleteAfterDays), e cancellarlo qui manderebbe in 404 il
-    // player ancora linkato dalla pagina evento.
-    expect(urls).not.toContain('https://blob/pubblicato.mp4');
-    // Il grezzo pre-pubblicazione e il video mai pubblicato invece sì:
-    // nessuna delle due fasi precedenti li guarda.
-    expect(urls).toContain('https://blob/grezzo.mp4');
-    expect(urls).toContain('https://blob/interno.mp4');
-    expect(body.recordingBlobsDeleted).toBe(2);
+    // Il grezzo per il recupero si', il video no: e' la registrazione, che non
+    // segue la conservazione dei dati e ha la sua scadenza (fase 2). La fase 3
+    // non legge nemmeno il suo indirizzo.
+    expect(deleteRecordingBlobMock.mock.calls.map((c) => c[0])).toEqual([
+      'https://blob/grezzo.mp4',
+    ]);
+    expect(body.recordingBlobsDeleted).toBe(1);
+    const phase3 = db.event.findMany.mock.calls
+      .map((c) => c[0] as { where: Record<string, unknown>; select: Record<string, unknown> })
+      .find((a) => 'OR' in a.where && !('recordingDeleteAfterDays' in a.where));
+    expect(phase3?.select).not.toHaveProperty('recordingUrl');
   });
 
   it('fase 3: cancella solo le tracce audio già purgate, non quelle ancora presenti', async () => {
@@ -1141,7 +1281,7 @@ describe('GET /api/cron/cleanup', () => {
       emailOutboxScrubbed: 0,
       auditLogRowsScrubbed: 0,
       tempRecordingsCleaned: 0,
-      publishedRecordingsCleaned: 0,
+      recordingsExpired: 0,
       eventsProcessed: 0,
       unfinishedEventsArchived: 0,
       registrationsDeleted: 0,
@@ -1199,12 +1339,13 @@ describe('GET /api/cron/cleanup', () => {
 
 
 describe('GET /api/cron/cleanup — prove dei consensi', () => {
+  /** Cio' che `tipiDelleProveEsistenti` legge dell'evento. */
   const PUBBLICATO = {
     youtubeUrl: null,
     recordingUrl: 'https://storage.example/video.mp4',
-    recordingPublished: true,
-    transcriptPublished: false,
+    tempRecordingUrl: null,
   };
+  const SENZA_VIDEO = { youtubeUrl: null, recordingUrl: null, tempRecordingUrl: null };
   const iscritta = {
     id: 'reg-1',
     displayName: 'nome-cifrato',
@@ -1229,10 +1370,10 @@ describe('GET /api/cron/cleanup — prove dei consensi', () => {
         if (typeof mock !== 'function') continue;
         if (name === 'findMany') mock.mockResolvedValue([]);
         else if (name === 'deleteMany' || name === 'updateMany') mock.mockResolvedValue({ count: 0 });
+        else if (name === 'count') mock.mockResolvedValue(0);
         else mock.mockResolvedValue({});
       }
     }
-    db.postprodArtifact.count.mockResolvedValue(0);
     db.$executeRaw.mockResolvedValue(0);
     db.$transaction.mockImplementation(async (arg: unknown) =>
       typeof arg === 'function' ? await (arg as (tx: unknown) => Promise<unknown>)(prisma) : arg,
@@ -1295,13 +1436,23 @@ describe('GET /api/cron/cleanup — prove dei consensi', () => {
     expect(body.consentProofsRetained).toBe(2);
   });
 
-  it('la sola trascrizione pubblicata conserva la sola trascrizione', async () => {
-    db.event.findUnique.mockResolvedValue({
-      youtubeUrl: null,
-      recordingUrl: null,
-      recordingPublished: false,
-      transcriptPublished: true,
-    });
+  it('il video non pubblicato conserva tutto: la registrazione resta', async () => {
+    // La registrazione non segue la conservazione dei dati: le prove delle
+    // voci che contiene restano con lei, pubblicata o no.
+    db.event.findUnique.mockResolvedValue(PUBBLICATO);
+    conIscritta();
+
+    await runCleanup();
+
+    const { data } = db.retainedConsentProof.createMany.mock.calls[0]![0] as {
+      data: Array<Record<string, unknown>>;
+    };
+    expect(data.map((r) => r.kind)).toEqual(['recording', 'transcription']);
+    expect(data[0]).toMatchObject({ displayName: 'nome-cifrato', nameRemovedAt: null });
+  });
+
+  it('la sola trascrizione, pubblicata o no, conserva la sola trascrizione', async () => {
+    db.event.findUnique.mockResolvedValue(SENZA_VIDEO);
     db.postprodArtifact.count.mockResolvedValue(1);
     conIscritta();
 
@@ -1316,27 +1467,8 @@ describe('GET /api/cron/cleanup — prove dei consensi', () => {
     });
   });
 
-  it('il flag della trascrizione senza artefatto non tiene le prove', async () => {
-    db.event.findUnique.mockResolvedValue({
-      youtubeUrl: null,
-      recordingUrl: null,
-      recordingPublished: false,
-      transcriptPublished: true,
-    });
-    conIscritta();
-
-    await runCleanup();
-
-    expect(db.retainedConsentProof.createMany).not.toHaveBeenCalled();
-  });
-
-  it('niente di pubblicato: nessuna copia, e via quelle conservate prima', async () => {
-    db.event.findUnique.mockResolvedValue({
-      youtubeUrl: null,
-      recordingUrl: 'https://storage.example/video.mp4',
-      recordingPublished: false,
-      transcriptPublished: false,
-    });
+  it('niente video e niente trascrizione: nessuna copia, e via quelle conservate prima', async () => {
+    db.event.findUnique.mockResolvedValue(SENZA_VIDEO);
     conIscritta();
     db.retainedConsentProof.deleteMany.mockResolvedValue({ count: 3 });
 

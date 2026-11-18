@@ -444,7 +444,7 @@ describe('pulizia dei dati', () => {
     ).toBe(5);
   });
 
-  it('niente di pubblicato: nessuna prova resta', async () => {
+  it('niente registrato: nessuna prova resta', async () => {
     const evento = await creaEvento(CONCLUSO);
     await iscritta(evento.id);
     await giroDiPulizia();
@@ -452,11 +452,25 @@ describe('pulizia dei dati', () => {
     expect(await prisma.retainedConsentProof.count()).toBe(0);
   });
 
-  it('un file non pubblicato non tiene le prove', async () => {
+  it('un file non pubblicato tiene le prove, con il nome: la registrazione resta', async () => {
     const evento = await creaEvento({ ...CONCLUSO, recordingUrl: VIDEO });
     await iscritta(evento.id);
     await giroDiPulizia();
-    expect(await prisma.retainedConsentProof.count()).toBe(0);
+    const righe = await prove(evento.id);
+    expect(righe).toHaveLength(5);
+    expect(righe.every((r) => r.nameRemovedAt === null && r.displayName !== null)).toBe(true);
+  });
+
+  it('la sola trascrizione non pubblicata tiene la sua prova', async () => {
+    const evento = await creaEvento(CONCLUSO);
+    await iscritta(evento.id);
+    await creaTrascrizione(evento.id);
+
+    await giroDiPulizia();
+
+    const righe = await prove(evento.id);
+    expect(righe.length).toBeGreaterThan(0);
+    expect(righe.every((r) => r.kind === 'transcription')).toBe(true);
   });
 
   it('la sola trascrizione pubblicata tiene la sua prova, se l’artefatto c’e’', async () => {
@@ -1355,7 +1369,7 @@ describe('un video che esiste e non e’ pubblicato', () => {
     expect(await prove(evento.id)).toHaveLength(0);
   });
 
-  it('alla fine della conservazione, se non e’ stato pubblicato, la prova se ne va', async () => {
+  it('alla fine della conservazione dei dati la prova resta, senza nome, con il video', async () => {
     const evento = await creaEvento({ ...IN_CONSERVAZIONE, recordingUrl: VIDEO });
     const { emailHash } = await iscritta(evento.id);
     await chiediCancellazione(emailHash);
@@ -1366,7 +1380,9 @@ describe('un video che esiste e non e’ pubblicato', () => {
 
     await giroDiPulizia();
 
-    expect(await prove(evento.id)).toHaveLength(0);
+    const righe = await prove(evento.id);
+    expect(righe).toHaveLength(5);
+    expect(righe.every((r) => r.displayName === null && r.withdrawnAt !== null)).toBe(true);
   });
 });
 
@@ -1631,7 +1647,7 @@ describe('un evento con piu’ sessioni registrate', () => {
     expect(sessione.recordingUrl).toBe(SECONDO);
   });
 
-  it('il video pubblicato scaduto toglie il suo file: resta quello dell’altra sessione', async () => {
+  it('la registrazione scaduta toglie i file di tutte le sessioni, e con loro le prove', async () => {
     const { evento, prima, seconda } = await dueSessioni({
       recordingPublished: true,
       recordingPublishedAt: giorniFa(5),
@@ -1639,16 +1655,20 @@ describe('un evento con piu’ sessioni registrate', () => {
     });
     const { emailHash } = await iscritta(evento.id);
     await chiediCancellazione(emailHash);
+    expect(await prove(evento.id)).toHaveLength(5);
 
     await giroDiPulizia();
 
-    const [scaduta, altra] = await Promise.all([
-      prisma.callSession.findUniqueOrThrow({ where: { id: seconda.id } }),
-      prisma.callSession.findUniqueOrThrow({ where: { id: prima.id } }),
+    const sessioni = await prisma.callSession.findMany({
+      where: { id: { in: [prima.id, seconda.id] } },
+      select: { recordingUrl: true, recordingFilename: true },
+    });
+    expect(sessioni).toEqual([
+      { recordingUrl: null, recordingFilename: null },
+      { recordingUrl: null, recordingFilename: null },
     ]);
-    expect(scaduta.recordingUrl).toBeNull();
-    expect(altra.recordingUrl).toBe(PRIMO);
-    expect(await prove(evento.id)).toHaveLength(5);
+    // Nello stesso giro: niente piu' video, niente piu' prove.
+    expect(await prove(evento.id)).toHaveLength(0);
   });
 });
 

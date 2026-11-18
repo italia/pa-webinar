@@ -2391,7 +2391,7 @@
         "jobMaxAttempts": "Tentativi prima del fallimento",
         "jobMaxAttemptsHelp": "Quante volte la pipeline ritenta un lavoro prima di marcarlo come fallito. Il backoff fra un tentativo e l'altro cresce esponenzialmente (da 30 secondi fino a 2 ore). Il valore tipico è 5.",
         "artifactRetentionDays": "Conservazione degli artefatti (giorni)",
-        "artifactRetentionDaysHelp": "A 0 non c'è un limite per tutto il sito: gli artefatti AI seguono la conservazione della loro registrazione o dell'evento. Un valore maggiore di zero fa cancellare da un job quotidiano ogni artefatto creato da più di quel numero di giorni, pubblicato o no: può accorciare la conservazione, mai allungarla. Nomi dei parlanti e payload dei job ne sono esclusi e seguono la conservazione della registrazione o dell'evento. Dettagli in docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "A 0 non c'è un limite per tutto il sito: gli artefatti AI seguono la conservazione della loro registrazione. Un valore maggiore di zero fa cancellare da un job quotidiano ogni artefatto creato da più di quel numero di giorni, pubblicato o no: può accorciare la conservazione, mai allungarla. Nomi dei parlanti e payload dei job ne sono esclusi e seguono la conservazione della registrazione. Dettagli in docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "Informativa AI in sala d'attesa",
         "consentDisclosureHelp": "Testo mostrato ai partecipanti nella sala d'attesa quando l'evento usa la post-produzione AI (trascrizione, sintesi, traduzione, doppiaggio). Personalizzabile per lingua. Lascia vuoto per usare il testo predefinito di sistema.",
         "consentDisclosurePlaceholder": "Es. Questo evento sarà trascritto e sintetizzato automaticamente con strumenti di IA dopo la diretta…"
@@ -4699,9 +4699,10 @@
       "retention": {
         "label": "Conservazione",
         "data": "I dati dell'iscrizione e della sala si cancellano {days, plural, one {# giorno} other {# giorni}} dopo la fine dell'evento. Domande e sondaggi restano senza nomi.",
-        "videoUnpublished": "Se non viene messa a disposizione, la registrazione si cancella con loro.",
-        "videoPublishedDays": "Se viene messa a disposizione, si cancella {days, plural, one {# giorno} other {# giorni}} dopo.",
-        "videoPublishedOpen": "Se viene messa a disposizione, resta finché chi organizza non la toglie."
+        "recordingKept": "La registrazione e ciò che se ne ricava (trascrizione, sintesi, traduzioni) non si cancellano con questi dati: restano, messi a disposizione o no, finché chi organizza non li elimina.",
+        "recordingDays": "La registrazione e ciò che se ne ricava si cancellano {days, plural, one {# giorno} other {# giorni}} dopo la fine dell'evento o, se la registrazione viene messa a disposizione, dopo la pubblicazione.",
+        "transcriptKept": "La trascrizione non si cancella con questi dati: resta finché chi organizza non la elimina.",
+        "transcriptDays": "La trascrizione si cancella {days, plural, one {# giorno} other {# giorni}} dopo la fine dell'evento."
       },
       "addressBook": {
         "label": "Rubrica",
@@ -5953,7 +5954,7 @@
     "visibilityAlways": "Sempre visibile",
     "visibilityUntil": "Visibile fino a:",
     "dataRetentionNote": "I dati personali dei partecipanti saranno eliminati secondo la retention dell'evento ({days} giorni). Il contenuto dell'evento rimarrà disponibile finché la pagina è visibile.",
-    "availableUntil": "Questo evento e i relativi contenuti saranno disponibili fino al {date}.",
+    "participantDataUntil": "I dati personali di chi ha partecipato si cancellano il {date}.",
     "tabs": {
       "qa": "Domande e Risposte",
       "materials": "Materiali",
