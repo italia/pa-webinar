@@ -396,12 +396,11 @@ changes the Prosody modules, restart Prosody before the next event. The room tel
 consent to the recording**: consenting asks for a new token, and the conference rejoins with it.
 Withdrawing from **Your consents** in the top bar does the opposite. Moderators and speakers are never
 marked: they are in the video, with name and image, and read a notice instead of the box. Their token
-carries `context.user.paInVideo = true`, and nobody else's does, the recorder's included: Prosody writes it
-into the presence, where the client cannot change it, and the recorder shows image and name only of whoever
-carries it. Of everyone else the recording holds at most the voice, with the consent.
+carries `context.user.paInVideo = true`, and nobody else's does, the recorder's included. Of everyone else
+the recording holds at most the voice, with the consent.
 
 **Only hosts in the video.** The composite video shows the people who host the event and nobody else.
-The token of a host carries `context.user.paInVideo`. `mod_pa_media_lock` writes `hidden-from-recorder`
+`mod_pa_media_lock` writes `hidden-from-recorder`
 into the presence of every other session, a session without a token included, so Jibri's session never
 adds a participant to its state: no tile, no name, no image and no shared screen, and the stage never
 moves to a participant who speaks, because a dominant speaker the session does not know leaves the
