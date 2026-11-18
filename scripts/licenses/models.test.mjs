@@ -408,6 +408,33 @@ describe('modelliNonRegistrati', () => {
     );
   });
 
+  it('un indirizzo scritto come ripiego di una variabile si controlla', () => {
+    const ramo = 'https://huggingface.co/org/altro/resolve/main/altro.gguf';
+    for (const [f, testo] of [
+      ['docker-compose.yml', `      - MODEL_URL=\${MODEL_URL:-${ramo}}`],
+      ['Dockerfile', `RUN curl -fsSL "\${MODEL_URL:-${ramo}}" -o /m.gguf`],
+      ['run.sh', `url=\${URL:=${ramo}}`],
+      ['values.yaml', `model: {url: ${ramo}}`],
+    ]) {
+      assert.deepEqual(
+        cerca({ [f]: testo }),
+        [`${f}: ${ramo} is not in the registry`],
+        f
+      );
+    }
+    // L'indirizzo del registro come ripiego passa; un segnaposto lo rende composto.
+    assert.deepEqual(
+      cerca({
+        'docker-compose.yml': `- MODEL_URL=\${MODEL_URL:-${URL_FISSO}}`,
+        'run.sh':
+          'curl "${BASE:-https://huggingface.co/org/voci/resolve/main/${voce}.onnx}"',
+        'common.py': 'f"https://huggingface.co/org/m/resolve/{REV}/{FILE}"',
+        'b.py': 'f"https://huggingface.co/org/m/resolve/main/{FILE}"',
+      }),
+      []
+    );
+  });
+
   it('un indirizzo hf.co fuori dal registro si segnala', () => {
     assert.ok(
       contiene(

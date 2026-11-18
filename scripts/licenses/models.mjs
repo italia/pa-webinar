@@ -72,9 +72,16 @@ const SU_HF = /^https:\/\/(?:huggingface\.co|hf\.co)\//;
  * Indirizzi completi di file su Hugging Face (modelli, non dataset): dopo
  * `resolve/` una revisione e almeno un segmento di percorso. Un prefisso a
  * cui il codice aggiunge il file (`…/resolve/main"`) non conta.
+ *
+ * La `}` chiude l'indirizzo come le virgolette: e' il valore di ripiego di
+ * una variabile di shell o di Compose (`${MODELLO:-https://…}`), o la fine di
+ * una mappa YAML in linea, e non fa parte dell'URL. Se restasse attaccata,
+ * l'indirizzo sembrerebbe composto a run time e non si controllerebbe. La `{`
+ * invece resta dentro: un segnaposto (`…/main/{file}`, `${voce}`) rende
+ * l'indirizzo composto, e come tale si salta.
  */
 const URL_HF =
-  /https:\/\/(?:huggingface\.co|hf\.co)\/(?!datasets\/)[\w.-]+\/[\w.-]+\/resolve\/[^/\s"'`)\]<>]+\/[^\s"'`)\]<>]+/g;
+  /https:\/\/(?:huggingface\.co|hf\.co)\/(?!datasets\/)[\w.-]+\/[\w.-]+\/resolve\/[^/\s"'`)\]}<>]+\/[^\s"'`)\]}<>]+/g;
 
 /** Estensioni dei file di pesi che non devono entrare nel repository fuori dal registro. */
 export const ESTENSIONI_PESI =
@@ -298,7 +305,7 @@ export function modelliNonRegistrati(voci, tracciati, leggi) {
     const testo = leggi(f);
     if (testo === null || testo.includes('\0')) continue;
     for (const [indirizzo] of testo.matchAll(URL_HF)) {
-      if (/[$`{}]/.test(indirizzo)) continue; // indirizzo composto a run time
+      if (/[$`{]/.test(indirizzo)) continue; // indirizzo composto a run time
       if (!indirizzi.has(indirizzo)) {
         problemi.push(`${f}: ${indirizzo} is not in the registry`);
       }
