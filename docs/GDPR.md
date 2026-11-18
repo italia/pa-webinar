@@ -394,11 +394,11 @@ It stays until someone deletes it, or until the period its organizers chose ends
 The period counts:
 
 - from publication (`recordingPublishedAt`), while the video is published: publishing again restarts it, and a published video without a publication date does not expire;
-- otherwise from the event's end, the same start as the data retention: `endsAt`, or for an event that was never ended the later of `endsAt` and its last activity. A draft never expires. The count never starts before the last time the period was chosen, the video was unpublished or a new video file was attached to the event (`Event.recordingRetentionFrom`): none of these, on an event that ended long ago, deletes the recording at the next run.
+- otherwise from the event's end, the same start as the data retention: `endsAt`, or for an event that was never ended the later of `endsAt` and its last activity. A draft never expires. The count never starts before the last time the period was chosen, the video was unpublished or removed, or a new video file was attached to the event (`Event.recordingRetentionFrom`): none of these, on an event that ended long ago, deletes the recording, or what is left of it, at the next run.
 
 At the end of the period the daily cleanup deletes the whole recording (phase 2 of [The daily GDPR cleanup](#the-daily-gdpr-cleanup)), and the next `postprod-retention` run its stored outputs; the consent proofs leave at the first cleanup run that finds nothing left to cover them. An external video link (`youtubeUrl`) is not touched, because the platform cannot delete a video on another site. The AI event report stays with the event.
 
-Deleting the video by hand (**Delete recording**, which needs the primary moderator link) deletes the event's video file and the temporary recording only; the confirmation says that transcripts, summaries and translations stay, and the period, which is the event's, stays and applies to them and to a later video.
+Deleting the video by hand (**Delete recording**, which needs the primary moderator link) deletes the event's video file and the temporary recording only; the confirmation says that transcripts, summaries and translations stay, and the period, which is the event's, stays and applies to them and to a later video, counted at the earliest from the deletion of a published video.
 
 A recording reserved for registrants stays when the registrations go, and only its organizers can watch it from then on ([limitation](#known-limitations)); the same holds for the people of an instant call, whose presence pass expires with the call's data retention. The privacy sheet of an event says how long the recording stays, and the concluded event page gives the date on which the participants' personal data is deleted.
 

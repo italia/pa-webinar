@@ -32,6 +32,7 @@ vi.mock('@/lib/storage/postprod', () => ({
 
 import { GET as pulizia } from '@/app/api/cron/cleanup/route';
 import { GET as puliziaPostProduzione } from '@/app/api/cron/postprod-retention/route';
+import { DELETE as togliVideo } from '@/app/api/events/[param]/recording/route';
 import { PUT as aggiornaEvento } from '@/app/api/events/[param]/route';
 import { CAPTIONS_TRANSCRIPT_MODEL } from '@/lib/captions/transcript';
 import { encryptPII, hashEmail } from '@/lib/crypto/pii';
@@ -425,7 +426,11 @@ describe('la scadenza scelta da chi organizza', () => {
 });
 
 describe('le scelte che non fanno scadere la registrazione al giro dopo', () => {
-  async function modifica(eventId: string, token: string, corpo: Record<string, unknown>) {
+  async function modifica(
+    eventId: string,
+    token: string,
+    corpo: Record<string, unknown>
+  ) {
     const risposta = await aggiornaEvento(
       richiesta(`/api/events/${eventId}`, 'PUT', corpo, token) as never,
       { params: Promise.resolve({ param: eventId }) }
@@ -479,8 +484,41 @@ describe('le scelte che non fanno scadere la registrazione al giro dopo', () => 
     ).toBe(VIDEO);
   });
 
+  it('togliere a mano il video pubblicato lascia agli output la loro durata', async () => {
+    const { evento, registrazione } = await eventoRegistrato({
+      recordingPublished: true,
+      recordingPublishedAt: giorniFa(10),
+      recordingDeleteAfterDays: 30,
+    });
+
+    const risposta = await togliVideo(
+      richiesta(
+        `/api/events/${evento.id}/recording`,
+        'DELETE',
+        undefined,
+        evento.moderatorToken
+      ) as never,
+      { params: Promise.resolve({ param: evento.id }) }
+    );
+    expect(risposta.status).toBe(200);
+    const esito = await giroDiPulizia();
+
+    // Il video se n'e' andato a mano; trascrizioni e sintesi restano, e la
+    // durata conta da adesso, non dalla fine dell'evento.
+    expect(esito.recordingsExpired).toBe(0);
+    expect(
+      await prisma.postprodArtifact.count({ where: { recordingId: registrazione.id } })
+    ).toBe(2);
+    expect(
+      (await prisma.event.findUniqueOrThrow({ where: { id: evento.id } }))
+        .recordingRetentionFrom
+    ).not.toBeNull();
+  });
+
   it('un lavoro in mano a un worker rinvia la scadenza', async () => {
-    const { evento, registrazione } = await eventoRegistrato({ recordingDeleteAfterDays: 30 });
+    const { evento, registrazione } = await eventoRegistrato({
+      recordingDeleteAfterDays: 30,
+    });
     await creaLavoro(registrazione.id, 'RUNNING');
 
     const esito = await giroDiPulizia();

@@ -183,7 +183,8 @@ export const PATCH = withErrorHandling(async (request, context) => {
         ...(((setsRecording &&
           parsed.data.recordingUrl !== null &&
           parsed.data.recordingUrl !== prima.recordingUrl) ||
-          (publishWith === false && prima.recordingPublished)) && {
+          ((publishWith === false || parsed.data.recordingUrl === null) &&
+            prima.recordingPublished)) && {
           recordingRetentionFrom: new Date(),
         }),
         ...(parsed.data.recordingFileSize !== undefined && {

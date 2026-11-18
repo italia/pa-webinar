@@ -482,13 +482,14 @@ export const PUT = withErrorHandling(async (request, context) => {
     !(await salaGiaAperta(event));
   // Da quando, al piu' presto, conta la durata della registrazione non
   // pubblicata (Event.recordingRetentionFrom): da adesso se la si sceglie, se
-  // si toglie la pubblicazione o se si aggancia un file nuovo. Nessuna di queste
+  // si toglie la pubblicazione (anche togliendo il video pubblicato) o se si
+  // aggancia un file nuovo. Nessuna di queste
   // scelte, su un evento finito da tempo, cancella la registrazione al giro
   // dopo della pulizia.
   const durataDaAdesso =
     (data.recordingDeleteAfterDays !== undefined &&
       data.recordingDeleteAfterDays !== event.recordingDeleteAfterDays) ||
-    (data.recordingPublished === false && event.recordingPublished) ||
+    ((data.recordingPublished === false || data.recordingUrl === null) && event.recordingPublished) ||
     (!!data.recordingUrl && data.recordingUrl !== event.recordingUrl);
   const destinazioneDopo: Destinazione =
     data.recordingDestination ??

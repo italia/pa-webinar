@@ -107,6 +107,7 @@ export const DELETE = withErrorHandling(async (request, context) => {
       moderatorToken: true,
       recordingUrl: true,
       tempRecordingUrl: true,
+      recordingPublished: true,
     },
   });
 
@@ -135,6 +136,10 @@ export const DELETE = withErrorHandling(async (request, context) => {
         ...CAMPI_VIDEO_VUOTI,
         tempRecordingUrl: null,
         tempRecordingStartedAt: null,
+        // Cio' che resta (trascrizioni, sintesi) ha la durata della
+        // registrazione: tolto il video pubblicato, conta al piu' presto da
+        // adesso, non dalla fine dell'evento (lib/gdpr/cleanup-selection).
+        ...(event.recordingPublished && { recordingRetentionFrom: new Date() }),
       },
     }),
     ...(event.recordingUrl

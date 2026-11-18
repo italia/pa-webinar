@@ -149,10 +149,11 @@ export interface RecordingRetentionRow extends CleanupCandidateRow {
  *    pubblicazione riapre il conto);
  *  - altrimenti dalla fine dell'evento, la stessa da cui conta la conservazione
  *    dei dati (`inizioConservazione`), ma mai da prima di
- *    `recordingRetentionFrom`: scegliere la durata, togliere la pubblicazione o
- *    agganciare un file nuovo a eventi finiti da tempo non cancella la
- *    registrazione al giro dopo, e un file caricato dopo la scadenza non se ne
- *    va prima che qualcuno lo veda.
+ *    `recordingRetentionFrom`: scegliere la durata, togliere la pubblicazione
+ *    (anche togliendo il video pubblicato) o agganciare un file nuovo a eventi
+ *    finiti da tempo non cancella la registrazione, o cio' che ne resta, al
+ *    giro dopo, e un file caricato dopo la scadenza non se ne va prima che
+ *    qualcuno lo veda.
  *
  * Un video pubblicato senza la data di pubblicazione (scritto direttamente nel
  * database) non scade: non sappiamo da quando contare, e qui l'errore costa un

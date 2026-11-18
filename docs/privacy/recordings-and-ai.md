@@ -889,7 +889,7 @@ only. Their speaker records and job payloads stay with them.
 With a period (`Event.recordingDeleteAfterDays`), the recording goes when it
 ends: counted from publication while the video is published, and from the
 event's end otherwise, never before the period was last chosen, the video
-unpublished or a new file attached. The cleanup's phase 2 unpublishes the video
+unpublished or removed, or a new file attached. The cleanup's phase 2 unpublishes the video
 and the transcript, deletes the transcript from captions and the speaker
 records, fails the queued post-production jobs, writes `RECORDING_DELETED`,
 sets `Recording.retentionUntil` to that moment and then deletes the video files

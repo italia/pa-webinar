@@ -204,7 +204,8 @@ model Event {
   recordingDeleteAfterDays Int?      @map("recording_delete_after_days")
   // Da quando, al piu' presto, conta la durata della registrazione non
   // pubblicata (lib/gdpr/cleanup-selection): l'ultima volta che si e' scelta
-  // la durata, si e' tolta la pubblicazione o si e' agganciato un file nuovo.
+  // la durata, si e' tolta la pubblicazione (anche togliendo il video
+  // pubblicato) o si e' agganciato un file nuovo.
   // Cosi' nessuna di queste scelte cancella la registrazione al giro dopo.
   // Null: conta dalla fine dell'evento.
   recordingRetentionFrom   DateTime? @map("recording_retention_from")

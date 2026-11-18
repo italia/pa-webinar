@@ -75,7 +75,7 @@ export const DELETE = withErrorHandling(async (request, context) => {
       ...(isUuid ? { OR: [{ id: param }, { slug: param }] } : { slug: param }),
       moderatorToken: token,
     },
-    select: { id: true, recordingUrl: true },
+    select: { id: true, recordingUrl: true, recordingPublished: true },
   });
   if (!event) throw new NotFoundError('Event');
 
@@ -103,7 +103,12 @@ export const DELETE = withErrorHandling(async (request, context) => {
       ? [
           prisma.event.update({
             where: { id: event.id },
-            data: CAMPI_VIDEO_VUOTI,
+            data: {
+              ...CAMPI_VIDEO_VUOTI,
+              // Tolto il video pubblicato, la durata di cio' che resta conta al
+              // piu' presto da adesso (lib/gdpr/cleanup-selection).
+              ...(event.recordingPublished && { recordingRetentionFrom: new Date() }),
+            },
           }),
         ]
       : []),
