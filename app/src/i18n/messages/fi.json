@@ -662,7 +662,6 @@
     },
     "notOpenNow": "Huone ei ole juuri nyt auki.",
     "nameRequired": "Nimi, jolla liityt, puuttuu: palaa takaisin ja kirjoita se.",
-    "closeSidebar": "Sulje sivupaneeli",
     "contentOnly": "Vain sisältö, ilman chattia ja paneeleja",
     "showPanels": "Näytä chat ja paneelit",
     "confirmFullscreen": "Vaihda koko näytölle",

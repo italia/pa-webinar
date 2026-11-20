@@ -662,7 +662,6 @@
     },
     "notOpenNow": "The room is not open right now.",
     "nameRequired": "The name to join with is missing: go back and type it.",
-    "closeSidebar": "Close the side panel",
     "contentOnly": "Content only, without chat and panels",
     "showPanels": "Show chat and panels",
     "confirmFullscreen": "Switch to fullscreen",

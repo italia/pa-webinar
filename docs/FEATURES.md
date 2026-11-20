@@ -264,7 +264,7 @@ Configured in: [Runtime settings](configuration/runtime-settings.md) · [From cr
 
 ### Panels in the drawer
 
-On desktop the drawer is a column on the right, which can be widened by dragging its edge or collapsed to a strip of icons (with a short animation, or none when the system asks for reduced motion). Its **×** closes it altogether, leaving only the content (slides, speakers); the **Content only** button in the top bar does the same and brings it back. On smaller screens it is a sheet that rises from the bottom. It holds these panels:
+On desktop the drawer is a column on the right, which can be widened by dragging its edge or collapsed to a strip of icons (with a short animation, or none when the system asks for reduced motion). The arrow at its top collapses it and opens it again; the **Content only** button in the top bar hides it altogether, leaving only the content (slides, speakers), and brings it back. On smaller screens it is a sheet that rises from the bottom. It holds these panels:
 
 | Panel | What it does | Default |
 |---|---|---|

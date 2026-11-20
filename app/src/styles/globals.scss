@@ -918,39 +918,6 @@ button.live-time-strip__rec {
 .live-sidebar.live-sidebar--nascosta {
   display: none !important;
 }
-// La «×» sta nella striscia blu in cima alla colonna, a destra della freccia
-// che la comprime.
-.live-sidebar-close {
-  display: none;
-
-  @media (min-width: 992px) {
-    position: absolute;
-    top: 0;
-    right: 0;
-    z-index: 3;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    min-height: 28px;
-    border: 0;
-    background: transparent;
-    color: #fff;
-    cursor: pointer;
-
-    .icon {
-      fill: currentColor;
-    }
-    &:hover {
-      background: #003d7a;
-    }
-    &:focus-visible {
-      outline: 2px solid #fff;
-      outline-offset: -3px;
-    }
-  }
-}
-
 .live-captions__speaker {
   display: inline-block;
   margin-right: 0.5rem;

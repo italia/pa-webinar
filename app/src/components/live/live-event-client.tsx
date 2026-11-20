@@ -2236,14 +2236,6 @@ export default function LiveEventClient({
   // barra in alto. Vale per la pagina aperta, non si ricorda.
   const [soloContenuto, setSoloContenuto] = useState(false);
   const mostraColonna = useCallback(() => setSoloContenuto(false), []);
-  // Chiusa dalla sua «×», che sparisce con lei: il fuoco va al pulsante che la
-  // riapre, nella barra in alto, non torna all'inizio della pagina.
-  const nascondiColonna = useCallback(() => {
-    setSoloContenuto(true);
-    requestAnimationFrame(() =>
-      document.querySelector<HTMLButtonElement>('[data-solo-contenuto]')?.focus(),
-    );
-  }, []);
   // Dove i sottotitoli si spostano quando chi guarda li vuole in alto.
   const [sottotitoliAlto, setSottotitoliAlto] = useState<HTMLDivElement | null>(null);
 
@@ -3059,7 +3051,6 @@ export default function LiveEventClient({
           guestKeyName={isGuest || !token ? (credentials.nickname || chosenName).trim() : undefined}
           elencoNascosto={elencoNascosto}
           nascosta={soloContenuto}
-          onNascondi={nascondiColonna}
           onMostra={mostraColonna}
           eventSlug={event.slug}
           eventId={event.id}
@@ -3308,8 +3299,6 @@ interface LiveSidebarProps {
   elencoNascosto?: boolean;
   /** Solo il contenuto: la colonna e' chiusa del tutto (desktop). */
   nascosta?: boolean;
-  /** La «×» della colonna: chiude tutto, si riapre dalla barra in alto. */
-  onNascondi?: () => void;
   /** Riapre la colonna chiusa: ogni richiesta di una scheda la riporta. */
   onMostra?: () => void;
   eventSlug: string;
@@ -3376,7 +3365,6 @@ function LiveSidebar({
   guestKeyName,
   elencoNascosto = false,
   nascosta = false,
-  onNascondi,
   onMostra,
   eventSlug,
   roomCount,
@@ -4275,19 +4263,6 @@ function LiveSidebar({
                   comprime, verso sinistra riapre. */}
               <polyline points="9 18 15 12 9 6" />
             </svg>
-          </button>
-        )}
-        {isDesktop && !compressa && onNascondi && (
-          // La «×»: chiude la colonna del tutto (resta solo il contenuto).
-          // Comprimerla a una striscia di icone resta la freccia accanto.
-          <button
-            type="button"
-            className="live-sidebar-close"
-            onClick={onNascondi}
-            aria-label={t('closeSidebar')}
-            title={t('closeSidebar')}
-          >
-            <Icon icon="it-close" size="sm" />
           </button>
         )}
         {isDesktop && !compressa && (
