@@ -54,7 +54,7 @@ spec:
           emptyDir: {}
       initContainers:
         - name: wait-for-grid
-          image: curlimages/curl:8.11.1
+          image: curlimages/curl:8.23.0
           command: ["/bin/sh", "-c"]
           args:
             - |
