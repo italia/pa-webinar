@@ -247,12 +247,10 @@ convention. When it is on, an event title that contains `|` shows the part befor
 label above the main title, in listings, on the event page, in the waiting room and in the live room.
 It is off by default, so existing titles never change appearance. An event can override the site
 default in either direction (`Event.parseTitleKicker`; empty inherits the site setting). In the event
-wizard, under the title, a help line explains the convention; as soon as the title contains `|` with
-text on both sides, a box offers **Show “…” as a kicker above the title**, with a preview of how the
-title will look. The box follows the site setting, with one exception: when the site setting is off,
-the event has no choice of its own and no title in any language has a kicker yet, typing the first `|`
-checks it for the event; deleting that `|` again returns the event to the site setting. A choice made
-by hand in the box stays as it is.
+wizard, **Kicker** and **Title** are two fields, saved as one title, `Kicker | Title`, and the event's
+choice follows them: on when a language has a kicker, off when a title contains a `|` typed as text
+(the page then shows it whole), otherwise the site setting. Pasting a composed title into the empty
+title field fills both fields.
 
 ## Header, footer and legal pages
 

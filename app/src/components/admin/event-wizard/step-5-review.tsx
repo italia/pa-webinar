@@ -694,7 +694,7 @@ export default function Step5Review({
           onClick={() => onCustomize()}
         >
           <Icon icon="it-settings" size="sm" color="primary" />
-          {tf('customize')}
+          {tf('steps.advanced')}
         </button>
       )}
     </div>

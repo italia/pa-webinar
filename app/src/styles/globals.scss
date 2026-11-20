@@ -11584,8 +11584,22 @@ html.live-resizing .live-sidebar-resizer::after {
 
 .wizard-mancanti__titolo .icon { fill: #8a5300; }
 
-// ── Il modello in uso, sopra i passi del wizard
+// ── In testa al wizard, sopra i passi: il modello in uso e, a parte, le
+// impostazioni aggiuntive (a destra anche quando il modello non c'e').
+.wizard-testata {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.wizard-testata__aggiuntive {
+  margin-left: auto;
+}
+
 .wizard-modello {
+  flex: 1 1 22rem;
   padding: 0.6rem 0.9rem;
   border-radius: 8px;
   background: #eef4fb;
@@ -12587,41 +12601,6 @@ html:has(.wizard-azioni) {
   }
 }
 
-// Il sopratitolo accanto al titolo: come apparira' sulla pagina dell'evento.
-.wizard-sopratitolo {
-  border-left: 3px solid var(--app-primary);
-  border-radius: 0 6px 6px 0;
-  background: #F2F7FC;
-  padding: 0.75rem 1rem;
-}
-
-.wizard-sopratitolo__etichetta {
-  margin: 0 0 0.25rem;
-  font-size: 0.75rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--app-muted);
-}
-
-.wizard-sopratitolo__titolo {
-  margin: 0;
-  font-size: 1.35rem;
-  font-weight: 700;
-  line-height: 1.25;
-  color: var(--app-text);
-}
-
-.wizard-campo__hint {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin-top: 0.4rem;
-  font-size: 0.85rem;
-  color: #004d99;
-
-  svg { flex-shrink: 0; }
-}
-
 // Che cosa manca per pubblicare, in cima al riepilogo.
 .wizard-mancanti {
   padding: 0.75rem 1rem;
@@ -12655,18 +12634,12 @@ html:has(.wizard-azioni) {
   color: var(--app-text);
 }
 
-// La barra dei passi: «Da completare» sotto il nome, e le impostazioni
-// avanzate a parte.
+// La barra dei passi: «Da completare» sotto il nome (anche accanto alle
+// impostazioni aggiuntive, in testa al wizard).
 .wizard-passi__da-fare {
   font-size: 0.75rem;
   font-weight: 600;
   color: #8a5300;
-}
-
-.wizard-passi__avanzate {
-  display: flex;
-  align-items: center;
-  align-self: center;
 }
 
 // La regione del passo riceve il fuoco a ogni cambio di passo, perche' chi
@@ -14783,55 +14756,6 @@ a.campo-file__nome {
 
 .wizard-programma__mostra {
   font-size: 0.8rem;
-}
-
-// Il rimando dal passo «Persone».
-.wizard-programma__rimando {
-  display: flex;
-  gap: 0.5rem;
-  align-items: flex-start;
-  margin: 0 0 1rem;
-  color: #3d4955;
-  font-size: 0.875rem;
-
-  .icon {
-    flex-shrink: 0;
-    fill: #0066cc;
-  }
-}
-
-// La scheda del programma nel passo «Evento», sotto la descrizione.
-.wizard-programma-scheda {
-  padding: 0.75rem 1rem;
-  border: 1px solid #d9dadb;
-  border-radius: 8px;
-  background: #fff;
-}
-
-.wizard-programma-scheda__riga {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem 1rem;
-}
-
-.wizard-programma-scheda__icona {
-  flex-shrink: 0;
-  fill: #0066cc;
-}
-
-.wizard-programma-scheda__testo {
-  flex: 1 1 16rem;
-  min-width: 0;
-  color: #3d4955;
-  font-size: 0.9rem;
-}
-
-.wizard-programma-scheda__titolo {
-  margin: 0 0 0.15rem;
-  color: var(--app-text);
-  font-size: 1rem;
-  font-weight: 700;
 }
 
 // Nell'anteprima con il programma in primo piano: la descrizione accorciata

@@ -94,7 +94,6 @@ describe('formato guidato, dove il video della sala non c e', () => {
     render(vi.fn(), true, assente);
     expect(registraScelta()).toBe('riservata');
     expect(anteprima()).toContain(f.recordingDestinationReserved);
-    expect(anteprima()).toContain(f.postEventQaHidden);
     expect(anteprima()).not.toContain(f.recordingDestinationPublic);
   });
 
@@ -104,7 +103,6 @@ describe('formato guidato, dove il video della sala non c e', () => {
       initial: { persone: 'medio', voce: 'tutti', registra: 'pubblica', accesso: 'tutti' },
     });
     expect(registraScelta()).toBe('riservata');
-    expect(anteprima()).toContain(f.postEventQaHidden);
     continua();
     expect(onContinue).toHaveBeenCalledWith(expect.objectContaining({ registra: 'riservata' }));
   });
@@ -113,7 +111,6 @@ describe('formato guidato, dove il video della sala non c e', () => {
     const onContinue = render(vi.fn(), true, assente);
     scegli(g.rec.no);
     expect(registraScelta()).toBe('no');
-    expect(anteprima()).toContain(f.postEventQaTextOnly);
     continua();
     expect(onContinue).toHaveBeenCalledWith(expect.objectContaining({ registra: 'no' }));
   });
@@ -276,56 +273,32 @@ describe('la griglia a tre colonne', () => {
   });
 });
 
-describe('l anteprima dice cosa viene dal formato', () => {
-  it('una riunione: riservata, nomi reali, domande e rubrica fuori', () => {
+describe('l anteprima dice solo cio che si sceglie qui', () => {
+  it('una riunione: persone, chi parla, registrazione riservata, iscrizione', () => {
     render();
     scegli(g.people.piccolo);
     expect(anteprima()).toContain(f.recordingDestinationReserved);
     expect(anteprima()).toContain(f.consentsHostsAlways);
-    expect(anteprima()).toContain(g.previewRealNames);
-    expect(anteprima()).toContain(f.postEventQaHidden);
-    expect(anteprima()).toContain(f.addressBookNotOffered);
+    expect(anteprima()).toContain(f.voiceAll);
+    expect(anteprima()).toContain(f.accessOpen);
   });
 
-  it('un evento partecipativo: pubblica, nomi reali, testo delle domande, rubrica', () => {
-    render();
-    expect(anteprima()).toContain(f.recordingDestinationPublic);
-    expect(anteprima()).toContain(g.previewRealNames);
-    expect(anteprima()).toContain(f.postEventQaTextOnly);
-    expect(anteprima()).toContain(f.addressBookOffered);
-  });
-
-  it('un webinar: pseudonimi', () => {
+  it('niente di cio che non si sceglie qui: funzioni, nomi, domande, rubrica', () => {
     render();
     scegli(g.voice.speakers);
     scegli(g.people.grande);
-    expect(anteprima()).toContain(f.recordingDestinationPublic);
-    expect(anteprima()).toContain(g.previewPseudonyms);
-    expect(anteprima()).not.toContain(g.previewRealNames);
-    expect(anteprima()).toContain(f.postEventQaTextOnly);
-    expect(anteprima()).toContain(f.addressBookOffered);
-  });
-
-  it('con il video riservato le domande non restano, anche dove la famiglia le terrebbe', () => {
-    render();
-    scegli(g.rec.reserved);
-    expect(anteprima()).toContain(f.postEventQaHidden);
-    expect(anteprima()).not.toContain(f.postEventQaTextOnly);
-  });
-
-  it('senza registrazione su invito la pagina resta privata: le domande non si pubblicano', () => {
-    render(vi.fn(), true, {
-      initial: { persone: 'medio', voce: 'tutti', registra: 'no', accesso: 'invitati' },
-    });
-    expect(anteprima()).toContain(f.postEventQaHidden);
-    expect(anteprima()).not.toContain(f.postEventQaTextOnly);
-  });
-
-  it('senza registrazione su un evento aperto la pagina resta, e con lei le domande', () => {
-    render(vi.fn(), true, {
-      initial: { persone: 'medio', voce: 'tutti', registra: 'no', accesso: 'tutti' },
-    });
-    expect(anteprima()).toContain(f.postEventQaTextOnly);
+    const testo = anteprima();
+    expect(testo).toContain(f.voiceSpeakers);
+    expect(testo).toContain(f.recordingDestinationPublic);
+    for (const assente of [
+      f.postEventQaTextOnly,
+      f.postEventQaHidden,
+      f.addressBookNotOffered,
+      messages.admin.wizard.step2.feature.chat.label,
+    ]) {
+      expect(testo).not.toContain(assente);
+    }
+    expect(anteprima()).toContain(f.liveToggleNote);
   });
 
   it('senza registrazione niente destinazione, ne chi conduce', () => {
@@ -348,9 +321,4 @@ describe('l anteprima dice cosa viene dal formato', () => {
     expect(anteprima()).toContain(g.rec.yesDesc);
   });
 
-  it('con la rubrica spenta nell installazione non la promette', () => {
-    render(vi.fn(), true, { addressBookAvailable: false });
-    expect(anteprima()).toContain(f.addressBookNotOffered);
-    expect(anteprima()).not.toContain(f.addressBookOffered);
-  });
 });

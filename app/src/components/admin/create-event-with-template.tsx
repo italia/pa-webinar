@@ -258,10 +258,8 @@ export default function CreateEventWithTemplate({
           initial={decodificaFormato(scegliParam)}
           accessoPredefinito={publicRegistrationEnabled ? 'tutti' : 'invitati'}
           aiPipelineEnabled={aiPipelineEnabled}
-          liveCaptionsAvailable={liveCaptionsAvailable}
           recordingAvailable={recordingAvailable}
           partecipantiNelVideo={partecipantiNelVideo}
-          addressBookAvailable={addressBookEnabled}
           onContinue={(f) => router.push(percorso(`/admin/events/new?formato=${codificaFormato(f)}`))}
           // Il modello si sceglie prima di rispondere, non dopo: un'azione
           // accanto al titolo. La videochiamata istantanea non sta qui: ha il

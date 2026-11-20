@@ -44,10 +44,11 @@ export interface OrarioVoce {
  * poi non si mostra piu' nessun orario: sarebbe un'ora inventata.
  */
 export function orariProgramma(
-  startsAt: Date,
+  startsAt: Date | null,
   voci: ReadonlyArray<{ plannedMinutes: number | null }>
 ): OrarioVoce[] {
-  let cursore: number | null = startsAt.getTime();
+  // Senza inizio (un evento ancora senza data) nessun argomento ha un orario.
+  let cursore: number | null = startsAt ? startsAt.getTime() : null;
   return voci.map((v) => {
     const start: number | null = cursore;
     const end: number | null =

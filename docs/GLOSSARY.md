@@ -242,7 +242,7 @@ editable, and an event keeps no link to the template it came from.
 questions on its format: six steps (**Event**, **When**, **People**,
 **Programme**, optional and not for instant calls, **Permissions** and
 **Summary**) and the
-**Advanced settings** with what the format or template has already chosen.
+**Additional settings** with what the format or template has already chosen.
 [From creation to recap](architecture/event-journey.md)
 
 **Fixed-cadence series** and **moving-date series**: the two ways recurring
@@ -299,7 +299,7 @@ control) for `GUEST` (the audience), `SPEAKER` and `MODERATOR`. Only the
 `GUEST` column is chosen and applied: moderators can always do everything,
 and speakers always have microphone, camera and screen; the other columns
 are normalized to that on every write.
-[From creation to recap](architecture/event-journey.md#the-wizard-steps-and-the-advanced-settings)
+[From creation to recap](architecture/event-journey.md#the-wizard-steps-and-the-additional-settings)
 
 **Questionnaire** (`EventQuestionnaire`, UI **Questionnaires**): questions
 attached to an event, either inside the registration form (`PRE_REGISTRATION`)
@@ -375,7 +375,7 @@ bring the square back. `GARDEN` is a legacy value treated as `GAME`.
 **Waiting-room music** (`waitingRoomAudioUrl`, UI **Waiting-room audio
 (optional)**): audio a visitor can switch on in the waiting room while the
 event is `PUBLISHED`. It is offered only when the event has its own audio
-(upload or URL in the wizard's advanced settings, **Waiting room and video**), and nothing plays until the
+(upload or URL in the wizard's additional settings, **Waiting room and video**), and nothing plays until the
 visitor presses **Enable music**.
 [The waiting room and the square](architecture/waiting-room.md#waiting-room-music)
 
@@ -1043,7 +1043,7 @@ these docs and the code use *organizer*.
 | Persone | **People** | event wizard, step 3 |
 | Programma | **Programme** | event wizard, step 4 (optional, not for instant calls) |
 | Riepilogo | **Summary** | event wizard, step 5 |
-| Impostazioni avanzate | **Advanced settings** | event wizard, the settings chosen by the format or template |
+| Impostazioni aggiuntive | **Additional settings** | event wizard, the settings chosen by the format or template |
 | Ricorrenza | **Recurrence** | recurrence rule (`recurrenceRule`) |
 | Duplica | **Duplicate** | duplicate as the next occurrence |
 | Iscrizioni | **Sign-ups** | registrations (`Registration`) |

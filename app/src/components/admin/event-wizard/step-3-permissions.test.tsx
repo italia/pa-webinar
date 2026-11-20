@@ -388,3 +388,58 @@ describe('la nota sulla camera, con l elenco nascosto', () => {
     expect(mostra(true)).not.toContain(nota);
   });
 });
+
+describe('come compare chi partecipa: una scelta a tre', () => {
+  const s2 = messages.admin.wizard.step2;
+  function mostra(
+    valori: { audienceAnonymous: boolean; participantListVisible: boolean },
+    soloAscoltoBloccato = false,
+  ) {
+    const onChange = vi.fn();
+    act(() => {
+      root.render(
+        <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
+          <StepPermissions
+            parte="partecipazione"
+            value={{ ...valori, permissionMatrix: {} } as unknown as StepPermissionsValue}
+            onChange={onChange}
+            whiteboardInfraReady={false}
+            soloAscoltoBloccato={soloAscoltoBloccato}
+          />
+        </NextIntlClientProvider>,
+      );
+    });
+    const opzione = (k: 'tutti' | 'conduce' | 'anonimo') =>
+      container.querySelector<HTMLInputElement>(`#wiz-pubblico-${k}`)!;
+    return { onChange, opzione };
+  }
+
+  it('una sola opzione scelta, quella dei valori del modulo', () => {
+    const { opzione } = mostra({ audienceAnonymous: false, participantListVisible: false });
+    expect(container.querySelector('legend')?.textContent).toBe(s2.audienceHeading);
+    expect(opzione('tutti').checked).toBe(false);
+    expect(opzione('conduce').checked).toBe(true);
+    expect(opzione('anonimo').checked).toBe(false);
+  });
+
+  it('con gli pseudonimi e scelto l anonimo, qualunque sia l elenco', () => {
+    const { opzione } = mostra({ audienceAnonymous: true, participantListVisible: true });
+    expect(opzione('anonimo').checked).toBe(true);
+    expect(opzione('tutti').checked).toBe(false);
+  });
+
+  it('ogni scelta manda i valori che la fanno', () => {
+    const { onChange, opzione } = mostra({ audienceAnonymous: true, participantListVisible: false });
+    act(() => opzione('tutti').click());
+    expect(onChange).toHaveBeenLastCalledWith({ audienceAnonymous: false, participantListVisible: true });
+    act(() => opzione('conduce').click());
+    expect(onChange).toHaveBeenLastCalledWith({ audienceAnonymous: false, participantListVisible: false });
+  });
+
+  it('a sala aperta non si cambia, e lo dice', () => {
+    const { opzione } = mostra({ audienceAnonymous: false, participantListVisible: true }, true);
+    expect(opzione('tutti').disabled).toBe(true);
+    expect(opzione('anonimo').disabled).toBe(true);
+    expect(container.textContent).toContain(s2.audienceLocked);
+  });
+});

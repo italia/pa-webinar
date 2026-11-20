@@ -362,12 +362,12 @@ included, so a copy keeps inheriting.
 
 | Event column | Falls back to | Values | Where it is set | Pre-filled by a template |
 |---|---|---|---|---|
-| `expectedSenderRatioPct` | `defaultSenderRatioPct` | `null` or 0 to 100 | Wizard, advanced settings, **Technical details**: **How many webcams will be on?** | No |
+| `expectedSenderRatioPct` | `defaultSenderRatioPct` | `null` or 0 to 100 | Wizard, additional settings, **Technical details**: **How many webcams will be on?** | No |
 | `accessMode` | `publicRegistrationEnabled`. Guest entry follows `guestAccessEnabled` either way, except that `INVITATION` admits no guests | `null`, `OPEN` or `INVITATION` | New-event question **Who can take part?**; wizard, **People**: **Who registers**, where an event left on `null` keeps following the site until a choice is made | No; the new-event questions set it |
 | `gracePeriodMinutes` | `eventGracePeriodMinutes` | `null` or -1 to 240 | Events API only; the wizard has no field. Instant calls are created with `-1` | No |
-| `parseTitleKicker` | `parseTitleKicker` | `null`, `true` or `false` | Wizard, **Event**, under the title: **Show “…” as a kicker above the title**, offered when the title contains `\|` | No |
-| `waitingRoomEngine` | `waitingRoomEngine` | `null`, `GAME` or `CLASSIC` (legacy `GARDEN` behaves as `GAME`) | Wizard, advanced settings, **Waiting room and video**: **Waiting room (this event)**, where **Site default** means `null` | Yes |
-| `videoQuality` | `videoQuality` | `null` or a preset | Wizard, advanced settings, **Waiting room and video**: **Video/audio quality (this event)** | No |
+| `parseTitleKicker` | `parseTitleKicker` | `null`, `true` or `false` | Wizard, **Event**: follows the **Kicker** field (on when a language has a kicker, off when a title contains a typed `\|`, otherwise empty) | No |
+| `waitingRoomEngine` | `waitingRoomEngine` | `null`, `GAME` or `CLASSIC` (legacy `GARDEN` behaves as `GAME`) | Wizard, additional settings, **Waiting room and video**: **Waiting room (this event)**, where **Site default** means `null` | Yes |
+| `videoQuality` | `videoQuality` | `null` or a preset | Wizard, additional settings, **Waiting room and video**: **Video/audio quality (this event)** | No |
 | `aiTargetLocales` | `aiDefaultTargetLocales` | `null` or comma-separated codes | Wizard, **Event** step (**Change languages**); the wizard always writes it | Yes |
 
 Some event settings have no site-wide counterpart and exist only on the event. They default to off or
@@ -391,7 +391,7 @@ empty in `app/prisma/schema.prisma`:
   set after the event. The transcript takes effect only while captions are on for the event and in this
   site's `liveCaptionsEnabled`. A template cannot set it; the new-event questions turn it on for events
   that can be recorded ([Live captions](../architecture/live-captions.md#transcript-from-captions));
-- the waiting-room music, `waitingRoomAudioUrl` (**Waiting-room audio (optional)** in the wizard's advanced settings, **Waiting room and video**),
+- the waiting-room music, `waitingRoomAudioUrl` (**Waiting-room audio (optional)** in the wizard's additional settings, **Waiting room and video**),
   offered only while the event is `PUBLISHED` (see
   [waiting-room music](../architecture/waiting-room.md#waiting-room-music)). There is no site-wide
   default track, and a template cannot set one.

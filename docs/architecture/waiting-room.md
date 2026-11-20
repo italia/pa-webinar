@@ -142,7 +142,7 @@ The preview shows the chosen background behind the person. `app/src/hooks/use-ba
 
 `app/src/components/live/audio-player.tsx` is a toggle, **Enable music** / **Disable music**. Nothing plays until the visitor presses it, because browsers block autoplay and the page never tries. Once started, the track loops and fades in to 30 percent volume. Pressing the toggle again fades it out.
 
-The toggle appears only while the event is `PUBLISHED` and only if the event has its own audio: **Waiting-room audio (optional)** in the event wizard's advanced settings (**Waiting room and video**), as an upload or a URL (`Event.waitingRoomAudioUrl`). The bundled `app/public/audio/waiting-room-default.mp3` is the player's fallback, but the waiting room never renders the player without an event audio. So an event without its own audio has no music toggle.
+The toggle appears only while the event is `PUBLISHED` and only if the event has its own audio: **Waiting-room audio (optional)** in the event wizard's additional settings (**Waiting room and video**), as an upload or a URL (`Event.waitingRoomAudioUrl`). The bundled `app/public/audio/waiting-room-default.mp3` is the player's fallback, but the waiting room never renders the player without an event audio. So an event without its own audio has no music toggle.
 
 ### Consent and transparency notices
 

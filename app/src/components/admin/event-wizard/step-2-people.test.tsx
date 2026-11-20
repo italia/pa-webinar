@@ -253,3 +253,24 @@ describe('SezioneIscrizione — la rubrica', () => {
     expect(casella()).not.toBeChecked();
   });
 });
+
+describe('StepPeople — le card in vista', () => {
+  const gruppo = (titolo: string) =>
+    Array.from(container.querySelectorAll<HTMLDetailsElement>('details.wizard-group')).find(
+      (d) => d.querySelector('.wizard-group__title')?.textContent?.startsWith(titolo),
+    )!;
+
+  it('gli enti organizzatori sono aperti anche senza enti', () => {
+    expect(gruppo(t.organizersHeading).open).toBe(true);
+  });
+
+  it('i ruoli si leggono dentro la card «Moderatori e relatori», aperta', () => {
+    const persone = gruppo(t.peopleHeading);
+    expect(persone.open).toBe(true);
+    const ruoli = persone.querySelector('.wizard-roles');
+    expect(ruoli).not.toBeNull();
+    expect(ruoli!.textContent).toContain(messages.admin.wizard.step2.roleInfo.speaker.name);
+    // Una volta sola nel passo.
+    expect(container.querySelectorAll('.wizard-roles')).toHaveLength(1);
+  });
+});

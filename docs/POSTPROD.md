@@ -1263,7 +1263,7 @@ points to this section.
     2. the site switch **Post-event pipeline active** (`aiPipelineEnabled`)
        in the site settings;
     3. per event, **Automatic transcription** and the other options in the
-       wizard's advanced settings, section **Recording and AI**.
+       wizard's additional settings, section **Recording and AI**.
 11. **Check it.** Run a short test event with transcription on, or start one
     worker by hand with
     `kubectl create job -n pa-webinar --from=cronjob/pa-webinar-postprod-worker pa-webinar-postprod-worker-manual`
@@ -1502,7 +1502,7 @@ this table gives only their effect on the pipeline.
 
 ### Per-event settings
 
-In the event wizard's advanced settings, section **Recording and AI**, under
+In the event wizard's additional settings, section **Recording and AI**, under
 **Automatic post-production**. A format or an event template pre-fills them:
 recording an event turns on transcription, summary, translation (when the
 event has languages besides the main one) and per-participant recording.
@@ -2072,7 +2072,7 @@ main text. The **Event** step
 shows them in a row, **Event languages: Italiano (main) · English ·
 Français**, with **Change languages**. Removing a language that has text asks
 for confirmation, because its title and description are deleted when the event
-is saved. The review step and the advanced settings show the list read-only,
+is saved. The review step and the additional settings show the list read-only,
 with a link to the **Event** step.
 
 **The state of each language.** `Event.textLocaleState` records, for each

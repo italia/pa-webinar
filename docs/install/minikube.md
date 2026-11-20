@@ -692,7 +692,7 @@ Compose stack.
   event's format; an installation that can record adds a fourth (**Start from a template**, next to the heading, offers the
   saved templates). The wizard then has six steps, **Event**, **When**,
   **People**, **Programme** (optional), **Permissions** and **Summary**, with
-  **Advanced settings** apart. Publishing needs the lead
+  **Additional settings** apart. Publishing needs the lead
   moderator's name and email, entered in **People**, used for the moderator
   link and the confirmation email; like every email of this setup, it lands
   in Mailpit. After **Publish event**, or **Save as draft**, the wizard lands

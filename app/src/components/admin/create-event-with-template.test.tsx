@@ -302,6 +302,8 @@ describe('CreateEventWithTemplate', () => {
           l.querySelector('.formato-scelta__titolo')?.textContent === g.access.invitation
       );
       act(() => invito?.click());
+      // Il formato si cambia tornando indietro dal primo passo.
+      passo(w.flow.steps.base);
       clicca(w.flow.changeFormat);
       expect(push).toHaveBeenCalledWith(
         '/admin/events/new?scegli=medio.tutti.riservata.invitati'
@@ -330,7 +332,6 @@ describe('CreateEventWithTemplate', () => {
     });
     expect(container.textContent).not.toContain(g.rec.public);
     expect(container.textContent).toContain(w.flow.recordingDestinationReserved);
-    expect(container.textContent).toContain(w.flow.postEventQaHidden);
   });
 
   it('senza video e senza AI le domande non promettono una registrazione', () => {
@@ -423,17 +424,6 @@ describe('CreateEventWithTemplate', () => {
       });
       expect(await corpoPubblicato()).toMatchObject({ captionsTranscriptEnabled: false });
     });
-  });
-
-  it('le domande non promettono una rubrica spenta sull installazione', () => {
-    mostra({ scegliParam: 'medio.tutti.pubblica.tutti', addressBookEnabled: false });
-    expect(container.textContent).toContain(w.flow.addressBookNotOffered);
-    expect(container.textContent).not.toContain(w.flow.addressBookOffered);
-  });
-
-  it('con la rubrica accesa le domande la promettono', () => {
-    mostra({ scegliParam: 'medio.tutti.pubblica.tutti', addressBookEnabled: true });
-    expect(container.textContent).toContain(w.flow.addressBookOffered);
   });
 
   it('il formato aperto nomina la risposta sulla registrazione, anche da un vecchio indirizzo', () => {
