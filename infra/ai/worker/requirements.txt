@@ -12,7 +12,7 @@
 # wheel CUDA 13 (vedi Dockerfile.worker).
 --extra-index-url https://download.pytorch.org/whl/cu126
 torch==2.14.1+cu126
-torchvision==0.29.1+cu126
+torchvision==0.29.2
 # torchaudio 2.11 e' l'ultima release (il progetto e' in manutenzione) e non
 # dichiara una versione di torch. Il worker non usa API di torchaudio;
 # WhisperX usa solo `torchaudio.pipelines` (modelli di allineamento), che la
