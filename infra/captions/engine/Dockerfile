@@ -10,7 +10,7 @@
 # motore: il banco di prova (infra/captions/bench) va rifatto.
 #
 # Debian e non Alpine: il binario è compilato per glibc.
-FROM mirror.gcr.io/library/debian:bookworm-slim AS fetch
+FROM mirror.gcr.io/library/debian:bookworm-slim@sha256:734a72b3d6142a71993b4bc580ca01d8ca687f77a2c422d96a961d3376b179bc AS fetch
 
 ARG ENGINE_VERSION=0.2.0
 ARG ENGINE_SHA256=f396057150f1b774935c7414fd32ebc04195a795a34120d78d8c9ecefa1b7507
@@ -27,7 +27,7 @@ RUN curl -fsSL -o engine.tgz \
     && tar -xzf engine.tgz -C engine --strip-components=1 \
     && engine/bin/nemo-speech --version
 
-FROM mirror.gcr.io/library/debian:bookworm-slim
+FROM mirror.gcr.io/library/debian:bookworm-slim@sha256:734a72b3d6142a71993b4bc580ca01d8ca687f77a2c422d96a961d3376b179bc
 
 # curl serve solo a fetch-model.sh, che gira come initContainer con la stessa immagine.
 # /models appartiene all'utente del motore: un volume con nome montato lì

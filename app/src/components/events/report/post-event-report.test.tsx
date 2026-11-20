@@ -7,12 +7,23 @@ import { createRoot, type Root } from 'react-dom/client';
 import { NextIntlClientProvider } from 'next-intl';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import inglese from '@/i18n/messages/en.json';
 import messages from '@/i18n/messages/it.json';
 import type { ReportMetrics, ReportView } from '@/lib/report/types';
 
 import PostEventReport from './post-event-report';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+
+describe('resoconto — l’avviso sotto il testo', () => {
+  it.each([
+    ['it', messages.postEvent.report.aiNotice, 'domande'],
+    ['en', inglese.postEvent.report.aiNotice, 'questions'],
+  ])('%s: non dice che il testo nasce dalla chat, e le domande solo se pubblicate', (_l, testo, domande) => {
+    expect(testo.toLowerCase()).not.toContain('chat');
+    expect(testo).toMatch(new RegExp(`(pubblicate|published), ${domande}`));
+  });
+});
 
 const metrics: ReportMetrics = {
   version: 1,

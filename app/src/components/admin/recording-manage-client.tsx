@@ -34,6 +34,10 @@ import { recordingStatusLabel, statusBadgeClass } from './recording-status';
 
 type TabKey = RecordingTab;
 
+/** Le schede che mostrano metadati, non contenuto: le vede anche chi gestisce
+ *  l'evento senza organizzarlo. */
+const SCHEDE_METADATI: ReadonlySet<TabKey> = new Set<TabKey>(['overview', 'reliability']);
+
 function fmtDuration(sec: number | null): string {
   if (sec == null) return '–';
   const m = Math.floor(sec / 60);
@@ -52,9 +56,15 @@ export default function RecordingManageClient({
   soloSottotitoli = false,
   confermaVoci = false,
   avvisoConfermaVoci = false,
+  restaDaiSottotitoli = false,
   eventId,
   initialTab = 'overview',
+  contenuto = true,
 }: {
+  /** Chi guarda vede il contenuto (organizza l'evento). Falso per l'admin che
+   *  non lo organizza: restano la panoramica dei metadati e l'affidabilita'
+   *  (lib/recording/content-access). */
+  contenuto?: boolean;
   /** La scheda aperta all'arrivo. */
   initialTab?: TabKey;
   /** La registrazione non ha un file: la trascrizione viene dai sottotitoli live. */
@@ -63,6 +73,8 @@ export default function RecordingManageClient({
   confermaVoci?: boolean;
   /** La pipeline sarebbe partita da sola, e non e' partita solo per quella conferma. */
   avvisoConfermaVoci?: boolean;
+  /** Senza quella conferma resta la trascrizione dai sottotitoli. */
+  restaDaiSottotitoli?: boolean;
   eventId?: string;
   recordingId: string;
   eventTitle: string;
@@ -183,8 +195,11 @@ export default function RecordingManageClient({
         const data = (await r.json().catch(() => null)) as {
           enqueued?: number;
           skippedExisting?: number;
+          tracksPending?: boolean;
         } | null;
-        if (data?.enqueued === 0) {
+        if (data?.tracksPending) {
+          toast.success(tApi('tracksPending'));
+        } else if (data?.enqueued === 0) {
           if ((data.skippedExisting ?? 0) > 0) {
             toast.success(t('manageRerunAlreadyQueued'));
             window.location.reload();
@@ -217,7 +232,13 @@ export default function RecordingManageClient({
     archive: t('manageTabArchive'),
     reliability: t('manageTabReliability'),
   };
-  const tabs = RECORDING_TABS.map((key) => ({ key, label: etichette[key] }));
+  // Senza contenuto, le schede dei metadati: le altre leggono o cambiano il
+  // contenuto, e le rotte le rifiuterebbero.
+  const tabs = RECORDING_TABS.filter((key) => contenuto || SCHEDE_METADATI.has(key)).map((key) => ({
+    key,
+    label: etichette[key],
+  }));
+  const schedaAperta: TabKey = tabs.some((tb) => tb.key === tab) ? tab : 'overview';
 
   return (
     <div className="container py-4">
@@ -235,7 +256,8 @@ export default function RecordingManageClient({
             <span>· {format.dateTime(new Date(createdAt), { dateStyle: 'short', timeStyle: 'medium' })}</span>
           </div>
         </div>
-        <div className="d-flex align-items-center gap-2">
+        {/* Le azioni vanno a capo: su un telefono non stanno su una riga. */}
+        <div className="d-flex flex-wrap align-items-center gap-2">
           {/* Il lavoro sul video fa parte della chiusura dell'evento: da qui
               si torna alla sua scheda «Dopo l'evento». */}
           {eventId && (
@@ -255,7 +277,7 @@ export default function RecordingManageClient({
               {t('manageOpenPublic')}
             </Link>
           )}
-          {soloSottotitoli ? (
+          {!contenuto ? null : soloSottotitoli ? (
             <button
               type="button"
               className="btn btn-sm btn-outline-primary"
@@ -265,7 +287,7 @@ export default function RecordingManageClient({
               {aggiornando ? '…' : t('captionsRebuild')}
             </button>
           ) : null}
-          {!soloSottotitoli && status === 'READY' && (
+          {contenuto && !soloSottotitoli && status === 'READY' && (
             <button
               type="button"
               className="btn btn-sm btn-primary"
@@ -275,7 +297,7 @@ export default function RecordingManageClient({
               {generating ? '…' : t('generateAi')}
             </button>
           )}
-          {!soloSottotitoli && (
+          {contenuto && !soloSottotitoli && (
             <button
               type="button"
               className="btn btn-sm btn-outline-primary"
@@ -288,11 +310,20 @@ export default function RecordingManageClient({
         </div>
       </div>
 
-      {/* La trascrizione del video completo non parte da sola in un evento con
-          il consenso voce per voce: lo si dice accanto al pulsante che la avvia. */}
-      {avvisoConfermaVoci && status === 'READY' && (
+      {/* La trascrizione del video completo soggetta al consenso voce per voce
+          non parte da sola: lo si dice accanto al pulsante che la avvia, con
+          cio' che resta se non parte. */}
+      {!contenuto && (
+        <div className="alert alert-info mb-3" role="note">
+          {t('contentOrganizerOnly')}
+        </div>
+      )}
+
+      {contenuto && avvisoConfermaVoci && status === 'READY' && (
         <div className="alert alert-info mb-3" role="status">
-          {tVoci('waiting', { button: t('generateAi') })}
+          {tVoci(restaDaiSottotitoli ? 'waiting' : 'waitingNoCaptions', {
+            button: t('generateAi'),
+          })}
         </div>
       )}
 
@@ -305,8 +336,8 @@ export default function RecordingManageClient({
             <button
               type="button"
               role="tab"
-              aria-selected={tab === tb.key}
-              className={`nav-link ${tab === tb.key ? 'active fw-semibold' : ''}`}
+              aria-selected={schedaAperta === tb.key}
+              className={`nav-link ${schedaAperta === tb.key ? 'active fw-semibold' : ''}`}
               onClick={() => setTab(tb.key)}
             >
               {tb.label}
@@ -318,15 +349,15 @@ export default function RecordingManageClient({
       <div
         role="tabpanel"
         className="bg-white border rounded-bottom rounded-end p-4 shadow-sm"
-        style={{ borderTopLeftRadius: tab === tabs[0]?.key ? 0 : 8 }}
+        style={{ borderTopLeftRadius: schedaAperta === tabs[0]?.key ? 0 : 8 }}
       >
-        {tab === 'overview' && <RecordingOverview recordingId={recordingId} />}
-        {tab === 'transcript' && <TranscriptEditor recordingId={recordingId} status={status} />}
-        {tab === 'summary' && <SummaryEditor recordingId={recordingId} status={status} />}
-        {tab === 'translations' && <TranslationManager recordingId={recordingId} />}
-        {tab === 'slides' && <RecordingSlidesPanel recordingId={recordingId} />}
-        {tab === 'archive' && <ArchivePanel recordingId={recordingId} />}
-        {tab === 'reliability' && <AiReliabilityPanel recordingId={recordingId} />}
+        {schedaAperta === 'overview' && <RecordingOverview recordingId={recordingId} />}
+        {schedaAperta === 'transcript' && <TranscriptEditor recordingId={recordingId} status={status} />}
+        {schedaAperta === 'summary' && <SummaryEditor recordingId={recordingId} status={status} />}
+        {schedaAperta === 'translations' && <TranslationManager recordingId={recordingId} />}
+        {schedaAperta === 'slides' && <RecordingSlidesPanel recordingId={recordingId} />}
+        {schedaAperta === 'archive' && <ArchivePanel recordingId={recordingId} />}
+        {schedaAperta === 'reliability' && <AiReliabilityPanel recordingId={recordingId} />}
       </div>
     </div>
   );

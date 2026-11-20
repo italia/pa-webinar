@@ -23,7 +23,7 @@
 import { cookies } from 'next/headers';
 
 import { withErrorHandling } from '@/lib/api-handler';
-import { requireEventManager } from '@/lib/auth/staff-session';
+import { requireEventContent } from '@/lib/recording/content-access';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { enqueuePostprodForRecording } from '@/lib/ai/enqueue';
 import { leggiCorpoAvvio } from '@/lib/ai/voice-consent';
@@ -35,8 +35,9 @@ export const dynamic = 'force-dynamic';
 
 export const POST = withErrorHandling(async (request, context) => {
   const { id } = await (context as { params: Promise<{ id: string }> }).params;
-  // Di chi gestisce l'evento: l'admin, chi l'ha creato o un altro organizzatore (eventScope, ADR-014).
-  await requireEventManager(await cookies(), id);
+  // Avvia lavori che producono contenuto: solo chi organizza l'evento
+  // (lib/recording/content-access).
+  await requireEventContent(await cookies(), id, 'elaborazione');
 
   // Master kill-switch first, so we never flip flags then leave nothing enqueued.
   const site = await prisma.siteSetting.findUnique({

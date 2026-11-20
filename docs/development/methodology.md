@@ -21,7 +21,7 @@ Three other pages cover what this one does not:
 | Project rules encoded as tests | [Guard tests](#guard-tests), such as the 24-language parity test |
 | Schema and migrations in sync | The Migration Integrity job |
 | A chart that renders on every profile, and that a Kubernetes API server accepts for the example profiles | [`scripts/validate-chart.sh`](../../scripts/validate-chart.sh), and `kubectl apply --dry-run=server` on a throwaway kind cluster |
-| Dependency license policy | `npm run license:check` in the License Compliance job and in the Git hooks |
+| License policy for dependencies and model weights | `npm run license:check`, on the lockfiles and on the [model registry](../../THIRD-PARTY-LICENSES.md#the-model-registry), in the License Compliance job and in the Git hooks |
 | SPDX header on every source file | `scripts/licenses/headers.test.mjs` in Lint & Typecheck, and the `pre-commit` hook for new files |
 | Vulnerability and secret scanning | Trivy on the repository and on the image (blocking); CodeQL (non-blocking); GitHub secret scanning with push protection |
 | Architecture decisions | Architecture Decision Records in [`docs/adr/`](../adr/README.md) |
@@ -182,9 +182,10 @@ These three commands cover the `app` workspace only. If you touched one of the a
 |---|---|
 | `lobby/` | `npm run lobby:typecheck`. The lobby has no unit tests, so the type check is its only gate. |
 | `infra/recorder/`, `infra/recorder-controller/` or `infra/captions/gateway/` | In that folder: `npm ci`, then `npx tsc --noEmit -p tsconfig.json && npm test`. These packages sit outside the npm workspaces. |
-| `infra/ai/worker/` | In that folder: `pip install -r requirements-test.txt`, then `python -m pytest -q`. The tests cover pure logic and need no GPU. |
+| `infra/ai/worker/` | In that folder, with Python 3.11: `pip install -r requirements-test.txt`, then `python -m pytest -q`. The tests cover pure logic and need no GPU. |
 | `infra/helm/` | `./scripts/validate-chart.sh`. No other local check looks at the chart. |
 | Dependencies | `npm run license:check`, then `npm run license:report` and commit `license-report.json` together with `package-lock.json` |
+| Model weights, or a file that downloads them (`values.yaml`, Compose, a Dockerfile) | `npm run license:check`, which checks the [model registry](../../THIRD-PARTY-LICENSES.md#the-model-registry) |
 | `app/prisma/schema.prisma` | `npm run db:migrate:dev --workspace=app`, then commit the generated SQL with the schema. See [Database changes](#database-changes). |
 | Interface strings | The key must exist in all 24 catalogs in `app/src/i18n/messages/`. Add it to `it.json` and `en.json`, then run `node scripts/sync-i18n.mjs` to create it in the other catalogs. |
 
@@ -198,7 +199,7 @@ The repository ships three Git hooks in [`scripts/git-hooks/`](../../scripts/git
 
 | Hook | When | What it runs |
 |---|---|---|
-| `pre-commit` | `git commit` | On the staged files: secrets in the added lines (common key and token formats), merge-conflict markers, files over 5 MB, the SPDX header of new source files. Then, for what is staged: ESLint on the staged code of `app/`, the app type check, the unit tests related to the staged files (`vitest related`), the 24-language parity test when a catalog changed, a staged migration when `schema.prisma` changed, the lobby and service type checks, the license check and report when a lockfile changed, the chart validation when `infra/helm/` changed, and Prettier on new code files only. |
+| `pre-commit` | `git commit` | On the staged files: secrets in the added lines (common key and token formats), merge-conflict markers, files over 5 MB, the SPDX header of new source files. Then, for what is staged: ESLint on the staged code of `app/`, the app type check, the unit tests related to the staged files (`vitest related`), the 24-language parity test when a catalog changed, a staged migration when `schema.prisma` changed, the lobby and service type checks, the license check on every change that is not documentation only (it also searches the repository for models outside the registry), the license report when the root lockfile changed, the chart validation when `infra/helm/` changed, and Prettier on new code files only. |
 | `commit-msg` | after you write the message | The [commit format](#commits): `type(scope): subject`, 72 characters at most, no emoji, no trailing period, a blank line before the body, no attribution trailers. Merge, revert and fixup messages pass as Git writes them. |
 | `pre-push` | `git push` | The [CI-parity](#ci-parity-before-every-push) commands. Always: lint, type check, the script tests and the coverage run. For the areas the pushed commits touch: tests of the services, the lobby type check, the chart validation, the worker tests, the license check and the migration check. Then the Trivy filesystem scan on a clean checkout of each pushed commit. |
 
@@ -225,9 +226,9 @@ Run every command from the repository root unless the table says otherwise.
 | Unit Tests (recorder, controller) | In `infra/recorder/`, `infra/recorder-controller/` and `infra/captions/gateway/`: `npm ci`, then `npx tsc --noEmit -p tsconfig.json && npm test` | Nothing changed in those folders |
 | Typecheck (lobby) | `npm run lobby:typecheck`, which runs the same `tsc --noEmit` as `npx tsc --noEmit -p lobby/tsconfig.json` | Nothing changed in `lobby/` |
 | Helm Chart | `./scripts/validate-chart.sh`. The second step, `kubectl apply --dry-run=server`, needs a cluster (see below). | Nothing changed in `infra/helm/` |
-| Unit Tests (worker AI) | In `infra/ai/worker/`: `pip install -r requirements-test.txt`, then `python -m pytest -q` | Nothing changed in `infra/ai/worker/` |
+| Unit Tests (worker AI) | In `infra/ai/worker/`, with Python 3.11: `pip install -r requirements-test.txt`, then `python -m pytest -q` | Nothing changed in `infra/ai/worker/` |
 | Security Scan | `trivy fs --severity CRITICAL,HIGH --exit-code 1 .` | Never: it also looks for secrets in every file |
-| License Compliance | `npm run license:check`, then `npm run license:report && git diff --exit-code license-report.json` | No dependency changed |
+| License Compliance | `npm run license:check`, then `npm run license:report && git diff --exit-code license-report.json` | Documentation-only changes. The report step when no dependency changed |
 | Migration Integrity | `prisma migrate deploy` and `prisma migrate diff` against a throwaway database (see below) | Nothing changed in `app/prisma/` |
 | Docker Build & Scan | `docker build -t pa-webinar:local .`, then `trivy image --severity CRITICAL,HIGH --exit-code 1 pa-webinar:local` | Documentation-only changes |
 | E2E Smoke Tests (non-blocking) | Start the local stack, then run `npx playwright test --project=chromium` from `app/` (see below) | You did not touch the flows of the live room |

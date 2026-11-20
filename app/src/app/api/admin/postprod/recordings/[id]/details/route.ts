@@ -11,7 +11,11 @@
  * dei file nel blob, metriche dell'output LLM (sintesi per lingua) e lo
  * snapshot di trasparenza dei modelli. URL media firmati e short-lived.
  *
- * Gated SOLO sulla sessione admin: include dati PII (nomi, voce isolata).
+ * Di chi gestisce l'evento (ADR-014): sono i metadati della registrazione.
+ * Cio' che e' contenuto (il doppiaggio da ascoltare, i nomi legati alle voci:
+ * delle tracce per persona e dei parlanti) arriva solo a chi organizza
+ * l'evento (lib/recording/content-access), con la lettura tracciata:
+ * all'admin che non lo organizza `contenuto: false`, senza quei campi.
  */
 
 import { cookies } from 'next/headers';
@@ -26,6 +30,8 @@ import {
   listPostprodBlobs,
 } from '@/lib/storage/postprod';
 import { tryDecryptPII } from '@/lib/crypto/pii';
+import { withoutSpeakerNames } from '@/lib/ai/pipeline-snapshot';
+import { accessoContenutoStaff, tracciaLetturaContenuto } from '@/lib/recording/content-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -66,7 +72,7 @@ function summaryMetrics(raw: string | null): {
 export const GET = withErrorHandling(async (_request, context) => {
   const { id } = await (context as { params: Promise<{ id: string }> }).params;
   // Dell'evento della registrazione: l'admin o chi l'ha creato (ADR-014).
-  await requireRecordingManager(await cookies(), id);
+  const session = await requireRecordingManager(await cookies(), id);
 
   const rec = await prisma.recording.findUnique({
     where: { id },
@@ -114,6 +120,17 @@ export const GET = withErrorHandling(async (_request, context) => {
     },
   });
   if (!rec) throw new NotFoundError('Recording');
+  // Il doppiaggio e i nomi legati alle voci (tracce e parlanti) sono
+  // contenuto: solo per chi lo vede, con la lettura tracciata.
+  const via = await accessoContenutoStaff(session, {
+    eventId: rec.eventId,
+    recordingId: rec.id,
+    superficie: 'relatori',
+  });
+  const contenuto = via !== null;
+  if (via) {
+    await tracciaLetturaContenuto({ session, via, eventId: rec.eventId, recordingId: rec.id, superficie: 'relatori' });
+  }
 
   // Dimensioni reali dei blob (il pipeline locale lascia sizeBytes=null nel
   // DB ma il file ESISTE): elenchiamo lo storage e costruiamo una mappa
@@ -148,7 +165,7 @@ export const GET = withErrorHandling(async (_request, context) => {
   // URL media firmati per il player/ download (dub, sottotitoli, archivio).
   const dubbedAudio = await Promise.all(
     rec.artifacts
-      .filter((a) => a.type === 'DUBBED_AUDIO' && a.language)
+      .filter((a) => contenuto && a.type === 'DUBBED_AUDIO' && a.language)
       .map(async (a) => ({
         language: a.language as string,
         url: await presignArtifactDownload({ blobKey: a.blobKey, expiresInMinutes: MEDIA_EXPIRY_MIN }),
@@ -158,6 +175,7 @@ export const GET = withErrorHandling(async (_request, context) => {
   );
 
   return Response.json({
+    contenuto,
     recording: {
       id: rec.id,
       status: rec.status,
@@ -177,7 +195,7 @@ export const GET = withErrorHandling(async (_request, context) => {
       purged: rec.tracks.filter((t) => t.audioPurgedAt != null).length,
       items: rec.tracks.map((t) => ({
         participantId: t.participantId,
-        displayName: t.displayName ? tryDecryptPII(t.displayName) : null,
+        displayName: contenuto && t.displayName ? tryDecryptPII(t.displayName) : null,
         startOffsetMs: t.startOffsetMs,
         durationMs: t.durationMs,
         sizeBytes: t.sizeBytes != null ? Number(t.sizeBytes) : null,
@@ -211,9 +229,10 @@ export const GET = withErrorHandling(async (_request, context) => {
     speakers: rec.speakers.map((s) => ({
       id: s.id,
       diarLabel: s.diarLabel,
-      displayName: s.displayName, // Speaker.displayName è in chiaro
+      // Speaker.displayName è in chiaro; il nome dato a una voce e' contenuto.
+      displayName: contenuto ? s.displayName : null,
       totalSpeechSec: s.totalSpeechSec,
     })),
-    pipelineSnapshot: rec.pipelineSnapshot ?? null,
+    pipelineSnapshot: (contenuto ? rec.pipelineSnapshot : withoutSpeakerNames(rec.pipelineSnapshot)) ?? null,
   });
 });

@@ -159,7 +159,7 @@ flowchart LR
     gate{"Approval<br/>needed?"}:::risk
   end
   subgraph hosted["GitHub-hosted runner"]
-    gh["Ephemeral VM<br/>ubuntu-latest<br/>no publishing rights"]:::data
+    gh["Ephemeral VM<br/>ubuntu-latest<br/>no publishing rights<br/>for pull requests"]:::data
   end
   subgraph trusted["Trusted events"]
     ev["Push to main or dev<br/>tag v*<br/>manual dispatch<br/>weekly schedule"]:::portal
@@ -172,10 +172,11 @@ flowchart LR
   pr --> gate
   gate -- "outside contributor:<br/>after maintainer approval" --> gh
   gate -- "repository collaborator:<br/>runs" --> gh
-  ev -- "every workflow except<br/>codeql.yml and<br/>buildcache-cleanup.yml" --> sh
-  ev -. "codeql.yml,<br/>buildcache-cleanup.yml" .-> gh
+  ev -- "ci.yml, dev.yml,<br/>jitsi-web.yml,<br/>release.yml builds" --> sh
+  ev -. "codeql.yml, scorecard.yml,<br/>buildcache-cleanup.yml,<br/>release attestation" .-> gh
   sh -- "publishes" --> out
   pr -. "never" .-> sh
+  gh -. "release attestation:<br/>provenance bundle" .-> out
 
   classDef ext fill:#EEF1F4,stroke:#5C6F82,color:#17324D
   classDef risk fill:#FDF1E0,stroke:#CC7A00,color:#17324D,stroke-width:2px
@@ -193,7 +194,7 @@ flowchart LR
 The self-hosted runner runs inside a Kubernetes cluster. Code running there could reach the cloud metadata endpoint, a Kubernetes ServiceAccount or the Docker socket, so pull-request code must never run there. The workflows enforce this in four ways:
 
 - **Conditional runner in `ci.yml`.** Every job in `.github/workflows/ci.yml` picks its runner with a conditional `runs-on`. `pull_request` events go to GitHub-hosted `ubuntu-latest` runners. Pushes to `main` and manual dispatches go to the self-hosted runner.
-- **Trusted triggers for publishing workflows.** `dev.yml`, `jitsi-web.yml`, `release.yml` and `scorecard.yml` build, publish or analyze on the self-hosted runner. They start only on trusted events: pushes to `dev` or `main`, `v*` tags, manual dispatch or a schedule. `codeql.yml` always runs on GitHub-hosted runners, and so does `buildcache-cleanup.yml`, which starts only on its weekly schedule or a manual dispatch.
+- **Trusted triggers for publishing workflows.** `dev.yml`, `jitsi-web.yml` and `release.yml` build and publish on the self-hosted runner. They start only on trusted events: pushes to `dev`, `v*` tags or manual dispatch. `codeql.yml` always runs on GitHub-hosted runners, and so do `scorecard.yml` (pushes to `main` and a weekly schedule), `buildcache-cleanup.yml` (its weekly schedule or a manual dispatch) and the attestation job of `release.yml`.
 - **No privileged pull-request trigger.** No workflow uses `pull_request_target`.
 - **Approval for outside contributors.** A maintainer must approve workflow runs on pull requests from outside contributors. This is a repository setting, so it does not appear in the workflow files. For pull requests from forks, GitHub also withholds repository secrets.
 
@@ -202,6 +203,7 @@ As a result, code from a pull request reaches the self-hosted runner only after 
 ### Pinned actions and least-privilege tokens
 
 - **Pinned actions.** Every `uses:` in `.github/workflows/` references a full commit SHA, with the tag in a trailing comment (`actions/checkout@<sha> # v4`). No workflow uses a floating reference such as `@v4` or `@main`. Dependabot updates the SHA and the comment together.
+- **Pinned installs.** Builds and CI install packages from lockfiles that fix every version and its hash: `npm ci` everywhere (never an `npm install` fallback), and pip with `--require-hashes` for the CPU post-production worker, the worker's test suite, WhisperX and the PyYAML of the chart validation. Two installs are pinned by version only: the CUDA stack of the GPU worker (`infra/ai/worker/requirements.txt`), on top of the NGC base image, for the reason in [infra/ai/worker/README.md](infra/ai/worker/README.md#dependency-constraints); and the CycloneDX generator that `release.yml` runs with `npx` for the best-effort npm SBOM, in a job that holds no signing token.
 - **Least-privilege tokens.** `ci.yml`, `codeql.yml`, `scorecard.yml`, `dev.yml`, `release.yml`, `buildcache-cleanup.yml` and `jitsi-web.yml` set a read-only workflow default. Only the jobs that need more than read access get it:
 
   | Workflow | Workflow-level permissions | Elevated jobs |
@@ -211,7 +213,7 @@ As a result, code from a pull request reaches the self-hosted runner only after 
   | `scorecard.yml` | `read-all` | The analysis job gets `security-events: write`, plus `id-token: write` to publish results |
   | `dev.yml` | `contents: read` | The jobs that push images get `packages: write` |
   | `jitsi-web.yml` | `contents: read` | The job that pushes the image gets `packages: write` |
-  | `release.yml` | `contents: read` | The application image job gets `packages: write` and `contents: write`. The auxiliary images job gets `packages: write`. The chart job gets `contents: write` to attach files to the GitHub Release |
+  | `release.yml` | `contents: read` | The application image job gets `packages: write` and `contents: write`. The auxiliary images job gets `packages: write`. The chart job gets `contents: write` to attach files to the GitHub Release. The attestation job, on a GitHub-hosted runner with no checkout and no third-party code, gets `id-token: write` and `attestations: write` to sign the provenance of the release files, and `contents: write` to attach it |
   | `buildcache-cleanup.yml` | `contents: read` | The prune job gets `packages: write` to delete old untagged versions of the layer-cache package |
 
 - **Jobs without a `permissions` block.** Such a job receives the workflow default, or, when the workflow declares none, the repository's default token permissions, a repository setting that the workflow files do not show. The change-detection jobs in `dev.yml` take the workflow's read-only default.
@@ -221,8 +223,8 @@ As a result, code from a pull request reaches the self-hosted runner only after 
 `.github/dependabot.yml` checks for updates every week. It is the authoritative list of what is covered:
 
 - **npm:** the root project with its workspaces (the app and the lobby share one lockfile), the recorder, the recorder controller and the live captions gateway.
-- **pip:** the AI post-production worker.
-- **Docker:** Dependabot updates a base image only when a `FROM` line names it literally: the recorder, recorder-controller, captions gateway, captions engine and CPU post-production worker bases, and the build-only `node` stage of the patched jitsi/web image. The app, GPU worker and patched-image Dockerfiles take their runtime base from a build argument (`NODE_BASE`, `BASE_IMAGE`, `BASE_TAG`), which Dependabot does not update, so those bases are manual bumps.
+- **pip:** the AI post-production worker, and the PyYAML that the chart validation needs in CI.
+- **Docker:** every base image is pinned by the digest of its multi-architecture index (`tag@sha256:…`), so every build starts from the same base whatever the tag points to later. Build steps that upgrade system packages (`apk upgrade` in the app image, for example) can still add newer packages on top. Dependabot updates the bases that a `FROM` line names literally, digest included, with one pull request per image that updates every directory using it: the app (its `node-base` stage), the recorder, recorder-controller, captions gateway, captions engine and CPU post-production worker, and the load-test tool. The GPU worker takes its base from a build argument (`BASE_IMAGE`), which Dependabot does not update. The patched jitsi/web image is left out on purpose: its base (`BASE_TAG` with `BASE_DIGEST`) and its build-only `node` stage move by hand with the Jitsi release, and its workflow never republishes a tag with different content. Those bases are manual bumps.
 - **GitHub Actions:** every action used by the workflows.
 - **Not covered:** the Helm subchart versions in `infra/helm/pa-webinar/Chart.lock`, and the image references in the chart's values.
 
@@ -232,7 +234,7 @@ For npm, minor and patch updates are grouped into one pull request per directory
 
 The `update-types` exclusions (`version-update:semver-major`, plus `version-update:semver-minor` where minors are held back) apply to routine version updates only. When Dependabot security updates are enabled for the repository, a vulnerable dependency still gets its pull request.
 
-Moving to a new upstream Jitsi web build means changing `BASE_TAG`, `BASE_IMAGE` and `IMAGE_TAG` in `.github/workflows/jitsi-web.yml`, so it is always a deliberate change. The procedure is in [infra/jitsi-web-patched/README.md](infra/jitsi-web-patched/README.md).
+Moving to a new upstream Jitsi web build means changing the `BASE_TAG` and `BASE_DIGEST` defaults in `infra/jitsi-web-patched/Dockerfile` and `IMAGE_TAG` in `.github/workflows/jitsi-web.yml`, so it is always a deliberate change. The procedure is in [infra/jitsi-web-patched/README.md](infra/jitsi-web-patched/README.md).
 
 ### Scanners
 
@@ -241,7 +243,7 @@ Moving to a new upstream Jitsi web build means changing `BASE_TAG`, `BASE_IMAGE`
 | Trivy, repository filesystem | `ci.yml`, `Security Scan` | Pull requests to `main`, pushes to `main`, manual dispatch | Yes, on CRITICAL or HIGH findings |
 | Trivy, application image built locally (never pushed) | `ci.yml`, `Docker Build & Scan` | Same as above | Yes, on CRITICAL or HIGH findings |
 | CodeQL, JavaScript and TypeScript, `security-extended` queries | `codeql.yml` | Pushes and pull requests to `main` and `dev`, weekly | No (`continue-on-error`). Results go to the Security tab when code scanning is enabled in the repository settings |
-| OpenSSF Scorecard | `scorecard.yml` | Pushes to `main`, weekly | No (`continue-on-error`). Nothing is published yet: the job runs on the self-hosted runner, and scorecard-action accepts publication only from GitHub-hosted runners ([details](docs/development/ci-and-release.md#codeqlyml-and-scorecardyml-code-analysis)) |
+| OpenSSF Scorecard | `scorecard.yml` | Pushes to `main`, weekly | No (`continue-on-error`). Runs on a GitHub-hosted runner, the only kind from which scorecard-action accepts published results; results go to scorecard.dev, and to the Security tab when code scanning is enabled ([details](docs/development/ci-and-release.md#codeqlyml-and-scorecardyml-code-analysis)) |
 | Forbidden-license check | `ci.yml`, `License Compliance` | Same as `ci.yml` | Yes |
 | GitHub secret scanning, with push protection | Repository setting, not a workflow. A fork must turn it on | Every push | Yes for the formats of known providers, unless the person pushing gives a reason to bypass it |
 
@@ -261,11 +263,12 @@ What the scanners do not cover:
 - **`sbom.spdx.json`:** an SPDX JSON SBOM of the published application image, generated with Syft (`anchore/sbom-action`).
 - **`npm-sbom.json`:** a CycloneDX SBOM of the npm dependencies of the `app` workspace, generated with `@cyclonedx/cyclonedx-npm`. This file is best effort: its step is allowed to fail, so a release can lack it.
 - **The packaged Helm chart.**
+- **Signed provenance:** `pa-webinar-X.Y.Z.intoto.jsonl`, a Sigstore bundle with one SLSA build provenance attestation covering the files above, by the digests computed when they were built, made by `actions/attest-build-provenance` and signed keylessly with the identity of the release workflow at that tag. It is made in a separate job, so a Sigstore outage leaves the release complete without it. The same attestations are stored on GitHub, so a downloaded file can be checked with `gh attestation verify <file> --repo italia/pa-webinar`, or against the attached bundle with `--bundle`, without the GitHub attestations API (the Sigstore trusted root is still fetched unless `--custom-trusted-root` is given).
 
 These artifacts have limits:
 
 - Only the application image has SBOMs. The migration image, the auxiliary images and the patched jitsi/web image have none.
-- No workflow signs images. The release application image carries the OCI labels set by `docker/metadata-action`, which include `org.opencontainers.image.revision`, the commit the image was built from. The release auxiliary images set the same revision label, and the version, in the workflow. The release migration image is built without these labels.
+- No workflow signs images: the provenance covers the files attached to the release, not the container images. The release application image carries the OCI labels set by `docker/metadata-action`, which include `org.opencontainers.image.revision`, the commit the image was built from. The release auxiliary images set the same revision label, and the version, in the workflow. The release migration image is built without these labels.
 
 Installations show an **SBOM** button on `/changelog` for releases flagged `sbom`; see [docs/development/ci-and-release.md](docs/development/ci-and-release.md#sboms).
 

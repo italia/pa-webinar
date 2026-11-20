@@ -28,6 +28,7 @@ their owner pages:
 |---|---|---|
 | Output | One MP4 per recording session, mixed audio and video | One Opus track per participant session, plus a `tracks.json` manifest |
 | Purpose | Playback, publication, video library, AI transcript from the mix | Exact speaker attribution in the AI transcript; optionally a downloadable archive |
+| Who is in it | The hosts, with image, name and voice; participants who consented to the recording, voice only | The voice of each person whose recording and transcription consents allow it |
 | Who starts it | A moderator (**Start recording**), or automatically when a moderator's room loads with `Event.autoStartRecording` on | The recorder controller, when an eligible event is `LIVE` |
 | Event flags | `recordingEnabled` (+ optional `autoStartRecording`) | `recordingEnabled` + `aiTranscriptEnabled` + `multitrackRecordingEnabled` |
 | Default | Off: `jitsi-meet.jibri.enabled: false`, every event flag `false` | Off: `recorder.enabled: false`, every event flag `false` |
@@ -86,23 +87,42 @@ options that were weighed.
 The two capture paths treat consent differently.
 
 - **Composite video.** `Event.recordingEnabled` adds an optional recording
-  consent to registration and, when the installation can record (Jibri is
-  expected, or `RECORDER_CONTROLLER_URL` is set:
-  `app/src/lib/recording/availability.ts`), a notice in the waiting room and,
+  consent to registration and, when something can record the event (Jibri is
+  expected, or `RECORDER_CONTROLLER_URL` is set and the event keeps per-person
+  tracks: `recordingAvailableFor` in `app/src/lib/recording/availability.ts`),
+  a notice in the waiting room and,
   for whoever has not consented, a box there. Nobody is kept out, and whoever
   speaks without the consent is not recorded: `mod_pa_media_lock` marks their
   presence from the token, and Jitsi's `hidden-from-recorder` feature keeps that
   person out of Jibri's session: no name, voice, image or shared screen reaches
-  the video ([Jitsi integration](jitsi-integration.md)). Everyone else appears as
-  in any recording, with the speaker, the thumbnails and the names. The session
-  needs `hiddenFromRecorderFeatureEnabled`
+  the video ([Jitsi integration](jitsi-integration.md)). The session needs `hiddenFromRecorderFeatureEnabled`
   (`jitsi-meet.web.custom.configs._custom_config_js` in the chart,
   `infra/jitsi/web/custom-config.js` for Docker Compose). A values file that sets
   `_custom_config_js` replaces that text and has to carry it over: without it
   `RECORDING_VOICE_EXCLUSION` is unset and a person without the consent listens
-  only. The same fallback holds with a Jitsi other than the chart's.
-  `Event.hostsAlwaysRecorded` keeps moderators and speakers in the recording,
-  with a notice instead of the box.
+  only. The same fallback holds with a Jitsi other than the chart's. There
+  participants can appear with face and name, so the box shows the text that
+  covers name, voice and image (version 1), and the form, the waiting room and
+  the listen-only notice add that the name a person takes part with can appear
+  even if they do not speak.
+  Moderators and speakers are always in the video, with name and image, and
+  read a notice instead of the box; participants never appear in it, and the
+  box asks only for the recording of their voice
+  ([Who is in the video](../GDPR.md#who-is-in-the-video)). The conference token
+  of a host carries `context.user.paInVideo = true`, and no other token does:
+  Prosody hides everyone without it from Jibri's session, which plays only the
+  voice of participants who consented
+  ([Only hosts in the video](jitsi-integration.md#per-event-participant-policies)).
+  Where the conference text does not play those voices
+  (`RECORDING_PARTICIPANT_VOICE` unset, `partecipantiNelVideo` answers
+  `esclusi`), the video holds the hosts only: the recording box is not shown,
+  the form and the waiting room say that only the hosts are seen and heard, and
+  the token marks `voiceExcluded` whoever has no transcription consent, so the
+  per-participant recorder and the captions transcript keep their own rule
+  ([Who is in the video](../GDPR.md#who-is-in-the-video) has the table of the
+  four cases). `Event.hostsAlwaysRecorded` stays in the database and is no
+  longer read. A consent counts only while the text the person read covers the
+  event's [destination](#recording-destination).
 - **Per-participant audio.** `Event.multitrackRecordingEnabled` adds the
   optional consent to the transcription of one's own contributions
   (`consentMultitrack` at registration, a box in the waiting room for everyone
@@ -113,16 +133,118 @@ The two capture paths treat consent differently.
   track's bridge endpoint to the token seat that Prosody reported
   (`mod_pa_occupants`, [Jitsi integration](jitsi-integration.md#who-is-in-the-room))
   and the seat to the consent. A track without consent is not recorded. The
-  recorder accepts a consent given with any version of its text, all of which
-  cover the audio track (`MultitrackConsent.textVersion`,
+  portal asks for the version of the consent text that the event needs
+  (`versioneConsensoTrascrizione` in `app/src/lib/ai/voice-consent.ts`). Where
+  the event transcribes speech, from these tracks with the AI pipeline, from
+  live captions or from the full video, only a consent to the text that
+  includes the transcription counts, and whoever leaves the box empty when it
+  is offered again is not recorded. Elsewhere a consent given with any version
+  of the text covers the audio track (`MultitrackConsent.textVersion`,
   `Registration.consentMultitrackVersion`).
 
-The same consent decides what the transcript from live captions keeps
-([Live captions](live-captions.md#transcript-from-captions)). The consent
+The same consent is asked on an event that keeps a transcript from live
+captions, where it decides what the transcript keeps
+([Live captions](live-captions.md#transcript-from-captions)), and on an event
+whose full video the AI pipeline transcribes, where it decides whose name
+appears ([AI post-production](../POSTPROD.md#how-work-enters-the-queue)). Its
+box has a variant that does not promise to delete the tracks, shown when
+**Keep per-participant tracks** is on and when the AI pipeline is off, because
+then no transcription deletes them (`traccePerPersonaConservate` and
+`chiaveConsensoTrascrizione` in `app/src/lib/registration/consents.ts`). The
+consent
 model and exact texts are in [GDPR](../GDPR.md#consent-model), the waiting
 room's boxes in
 [The waiting room](waiting-room.md#consent-and-transparency-notices), and the
 gaps under [Known limitations](#known-limitations).
+
+### Recording destination
+
+`Event.recordingDestination` declares, before the room opens, where the video
+goes: it is what a person consents to by ticking the recording box. The rules
+are in `app/src/lib/recording/destination.ts`.
+
+| Value | Meaning |
+|---|---|
+| `PUBLIC` | The video can be published for anyone. |
+| `REGISTRANTS` | The video stays reserved to registrants and staff. `Event.recordingAudience` stays `REGISTRANTS`, and no external video can be added. |
+| Null | The event never declared one: nothing is blocked, and the recording panel warns whoever publishes it, except on a historical event. |
+
+- **Starting value.** The event format or template proposes a value, and the
+  wizard asks for one when a staff member turns recording on. Whoever does not
+  choose gets the narrowest: an event that starts recording, by being created
+  or copied, by an edit or by a file uploaded before its room has ever opened,
+  starts `REGISTRANTS`, with the audience aligned, even with an explicit `null`
+  on `POST /api/events`. A copy inherits a declared destination. An
+  event that does not record declares nothing, because the destination also
+  decides on the questions after the event. Null stays on instant calls and on
+  historical events, copies included, on events that were already recording
+  without one, and on any event that receives a file after its room has opened:
+  a destination set then could never widen, so the event publishes with the
+  warning instead. A moderator link cannot choose: its save goes through, and
+  the destination starts reserved.
+- **Changing it.** `recordingDestination` changes only with a staff session
+  that manages the event (`403` otherwise), and a declared destination can
+  never be removed. Until the room has opened for the first time
+  (`salaGiaAperta` in `app/src/lib/live/room-open.ts`), every other change is
+  allowed. From then on it can only narrow to `REGISTRANTS`: widening answers
+  `409 RECORDING_DESTINATION_NOT_COVERED`. While the room may be open, a
+  narrowing is not applied either: the field is dropped and listed in
+  `ignoredCreationOnlyFields`, like the other settings that change what the
+  room shows.
+- **Publishing guard.** On a reserved event, `POST /api/events`,
+  `PUT /api/events/{id}` and `PATCH /api/admin/publications/{id}` answer `409`
+  to a change that exposes more: showing or publishing the recording for
+  everyone, or a new external video or catch-up URL. `PUT` and `PATCH` also
+  answer `409` to a new recording address outside the recordings storage, which
+  no access rule protects (`assertVideoNelloStorage` in
+  `app/src/lib/storage/recordings.ts`); without recordings storage configured
+  the address is accepted as it is. Narrowing is never refused, a video that was
+  already published or linked stays as it is, and a new file in the recordings
+  storage is not refused. Attaching a new `recordingUrl` with `PUT` takes a
+  staff session that manages the event (`403` otherwise): a moderator link can
+  only send back the address already there. The guard looks at the event, not
+  at the single proofs: whoever
+  has no consent that covers the destination is asked again in the room, and
+  stays out of the video otherwise, so a consent refused touches only the
+  person who refused it.
+- **Which consent covers which destination** (`consensoCopre`). On an event
+  without a destination every consent counts. Otherwise a consent to `PUBLIC`
+  covers both destinations, a consent to `REGISTRANTS` covers only
+  `REGISTRANTS`, and a consent whose text named no destination covers neither.
+  Narrowing therefore asks nobody again, and widening asks those affected.
+- **The text is stored with the consent.** The box text follows the destination
+  (`gdpr.consent.recordingPublic`, `recordingReserved`, or `recording` on an
+  event without one), and the form and the waiting room send the destination
+  and the version of the text they showed. It is saved with that version, with
+  or without a destination, on the registration
+  (`consentRecordingDestination`, `consentRecordingVersion`) and on the room
+  proof (`RecordingConsent.destination`, `textVersion`): 1 for the text that
+  covers name, voice and image, 2 for the voice-only text, 3 for the text
+  without a video (`versioneDellaProva`). A consent replaced
+  on a new text keeps the earlier period in `earlierPeriods`. A registration
+  form left open across a change answers `422` if the box is ticked. The token
+  route does not save a consent on a text that does not cover the destination
+  in force, or, where participants can appear in the video, on a version other
+  than 1 (`versioneCopre`), and every answer carries `recordingDestination`, so
+  that an open page shows the current destination and asks again; a room opened
+  before the installation changed what the video holds needs a reload to show
+  the current text.
+- **Without a video.** Where the installation records no composite video
+  (`partecipantiNelVideo` is `assente`), the box says so
+  (`gdpr.consent.recordingNoVideo`) and the consent declares no destination; its
+  version (3) is its own, because it covers no video.
+  An event without per-person tracks records nothing there: no box, no notice
+  and no recording command. The event can still hold a destination, for a file
+  uploaded later. If the installation
+  adds the video afterwards, those consents no longer cover, and the person is
+  asked again in the room.
+- **What else follows.** With a recording reserved by its destination, or by
+  the audience `REGISTRANTS` on an event whose destination is `PUBLIC` or null
+  (`registrazioneRiservata`), the questions are not published after the event
+  (`domandePubbliche`) and the catch-up URL is not offered (`recuperoAperto`).
+  With the audience `REGISTRANTS` on an event with a declared
+  destination, the external video link and the AI report reach only those who
+  see the recording.
 
 ## Composite video with Jibri
 
@@ -139,7 +261,8 @@ chart sets `JAVA_TOOL_OPTIONS=-Djibri.api.http.external-api-host=0.0.0.0` on
 the Jibri container (`jitsi-meet.jibri.extraEnvs`): without it the portal's
 probe is refused, Jibri stays "starting" and the room reports the recording
 unavailable once the wait runs out. A values file that sets its own
-`jitsi-meet.jibri.extraEnvs.JAVA_TOOL_OPTIONS` must keep that option. The same
+`jitsi-meet.jibri.extraEnvs.JAVA_TOOL_OPTIONS` must keep that option and the
+call checks described below. The same
 API starts and stops recordings without authentication; with
 `networkPolicy.enabled` the chart admits only the app pods to it (see
 [Network policies](../INFRASTRUCTURE.md#network-policies)).
@@ -164,6 +287,32 @@ Starting sends the IFrame API command `startRecording` with `mode: 'file'`,
 retried a few times with a growing delay while Jibri joins. Stopping sends
 `stopRecording('file')` and disables the button for a short cooldown. Each
 start/stop pair produces its own MP4 and its own webhook.
+
+Jibri also stops a recording by itself, through its call checks. They count
+only the people its session sees, and since only hosts are in the video
+([Only hosts in the video](jitsi-integration.md#per-event-participant-policies))
+that means only hosts. With Jibri's own values a recording would end 30 seconds
+after the last host left, or after 10 minutes in which every host kept the
+microphone and the camera off, even while participants speak. The chart passes
+other values in Jibri's JVM options, from `global.jibri.callStatusChecks`:
+
+| Jibri check | Jibri's value | Chart's value | When it ends the recording |
+|---|---|---|---|
+| `default-call-empty-timeout` (`defaultCallEmptyTimeout`) | 30 s | `5m` | No host has been in the room for 5 minutes: time to come back after a dropped line |
+| `all-muted-timeout` (`allMutedTimeout`) | 10 min | `30d` | Never in practice: every host with microphone and camera off is a normal phase of an event, such as questions from the audience |
+| `no-media-timeout` (`noMediaTimeout`) | 3 min | `30d` | Never in practice. It counts only while some host has the microphone or the camera on and nothing at all arrives |
+
+The voice of a participant counts as incoming media for Jibri even though its
+session never shows that person: a call where only participants speak, with
+every host silent, is never cut. With every host muted Jibri skips the
+no-media check, and otherwise the participant's voice is received data. What
+`no-media-timeout` would catch is a silent pause with no camera on and some
+host's microphone open, when the bridge, which forwards only the loudest
+voices, may send nothing; the chart does not end a recording for that. A
+broken media connection is still caught by Jibri's ICE check
+(`ice-connection-timeout`, 30 seconds), and the recording also ends when a
+moderator stops it or the conference ends. How to change the values:
+[Setting up recording](../operations/recording-setup.md#when-jibri-stops-by-itself).
 
 Jibri capacity comes from the JVB scaler: it asks for one Jibri replica while
 any `LIVE` or `PROVISIONING` event has recording enabled, and zero otherwise
@@ -480,7 +629,9 @@ milliseconds of the first recorded frame. The portal:
    marks the recording `POSTPROD_FAILED` instead of enqueueing. The tracks
    stay stored; the failure is visible in the administration area and can be
    re-run. The guard fails open: a track without size or duration disables it;
-4. otherwise enqueues post-production with a `TRANSCRIBE_MULTITRACK` root job.
+4. otherwise enqueues post-production with a `TRANSCRIBE_MULTITRACK` root job,
+   unless no track can be transcribed: then it enqueues nothing and logs a
+   warning ([How work enters the queue](../POSTPROD.md#how-work-enters-the-queue)).
    The enqueue is idempotent per recording and pipeline run
    (`Recording.runCount`).
 
@@ -650,6 +801,8 @@ erDiagram
     boolean autoStartRecording
     boolean multitrackRecordingEnabled
     boolean retainParticipantTracks
+    RecordingAudience recordingDestination "declared, nullable"
+    RecordingAudience recordingAudience "who sees it published"
     string recordingUrl "latest composite MP4"
     boolean recordingPublished
   }
@@ -666,6 +819,7 @@ erDiagram
     datetime retentionUntil
     boolean slidesEnabled "synced slides shown"
     int slidesOffsetSec "slide alignment"
+    boolean transcriptConsentRule "full video needs a confirmation"
   }
   RECORDING_TRACK {
     uuid id PK
@@ -700,8 +854,8 @@ stateDiagram-v2
   [*] --> Published: admin upload (auto-published)
   Temporary --> Published: publish toggle
   Published --> Temporary: unpublish toggle
-  Temporary --> Deleted: manual delete or event data retention
-  Published --> Deleted: manual delete or recordingDeleteAfterDays
+  Temporary --> Deleted: manual delete or recordingDeleteAfterDays from the event's end
+  Published --> Deleted: manual delete or recordingDeleteAfterDays from publication
   Deleted --> [*]
 
   classDef temp fill:#FFF4E5,stroke:#CC7A00,color:#17324D
@@ -716,19 +870,36 @@ stateDiagram-v2
   (`Event.recordingUrl`) and leaves `recordingPublished` as it is, so an MP4 on
   an unpublished event starts here, while one on an already published event
   replaces the public video at once. A temporary recording appears in the
-  administration area; the public playback route refuses it. It is deleted
-  together with the event's participant data when the event's data retention
-  expires.
+  administration area; the public playback route refuses it. It does not go
+  with the event's participant data: it stays until it is deleted by hand, or
+  until `recordingDeleteAfterDays` have passed since the event's end.
 - **Published by upload.** An administrator, or the organizer who owns the
   event, can upload a video to an event; an administrator can also create a
   publication. Attaching a video this way publishes it unless the caller opts
   out (see
   [The recording and the video library](event-journey.md#the-recording-and-the-video-library)).
+  An event that starts recording with that file, not a historical one, starts
+  reserved ([Recording destination](#recording-destination)).
 - **Published.** The event's recording panel toggles `recordingPublished` (the
-  portal stamps `recordingPublishedAt`) and can set `recordingDeleteAfterDays`
-  from a fixed list of options. A published video is exempt from the event's
-  data retention: it lives until it is deleted by hand or until
-  `recordingDeleteAfterDays` have passed since publication.
+  portal stamps `recordingPublishedAt`). A published video lives until it is
+  deleted by hand or until `recordingDeleteAfterDays` have passed since
+  publication.
+- **Period.** `recordingDeleteAfterDays` is the event's choice, from a fixed
+  list (`lib/recording/retention-options.ts`), in the wizard, on the recording
+  panel and on the event template; empty by default, which keeps the recording
+  until someone deletes it. It counts from publication while the video is
+  published and from the event's end otherwise, never before the period was
+  chosen, the video unpublished or removed, or a new file attached
+  (`Event.recordingRetentionFrom`); removing the video does not reset it. On
+  an event created before this rule (`Event.legacyRecordingRetention`) a video
+  that is not published goes at the latest with the participants' data,
+  counted from the event's end or from a later unpublication or new file, and
+  the period can only be shortened (`lib/recording/legacy-retention.ts`). At
+  its end the cleanup deletes the files of every session and
+  hands the outputs to `postprod-retention`
+  ([Recording retention](../GDPR.md#recording-retention)). For as long as the
+  recording exists, the proofs of its consents outlive the registrations
+  ([Deleting data](data-model.md#deleting-data)).
 - **Audience.** `Event.recordingAudience` says who sees a published recording
   and what comes from it (the video, the transcript, the summary, the
   translations, the dubbing, the slides beside the video): `PUBLIC`, anyone
@@ -741,21 +912,35 @@ stateDiagram-v2
   cookie (`recording_access_<eventId>`): the "recording available" email sends
   each registrant a personal link, `/api/events/<slug>/recording/access?t=…`,
   that sets it. The link is signed for viewing only and does not open the
-  room; it stops working when the registration is deleted. The responses that
+  room; it stops working when the registration is deleted. On an event with a
+  declared destination, `REGISTRANTS` does not depend on `postEventPublic`: the
+  page can stay private and a registrant still opens it, with its other
+  sections, and `postEventPublicUntil` still applies. A registrant loses access
+  when the registration is deleted, also by the data retention cleanup, and
+  only the staff keep it. Someone who registered and also manages the event
+  arrives from the personal link with `?anteprima=1`. The responses that
   shared caches keep (`/api/events`, `/api/events/<slug>`, the video library)
-  carry a recording only when its audience is `PUBLIC`, and the video library
-  lists only those. The staff who manage the event see the recording before
+  carry a recording only when it is published with the audience `PUBLIC` and
+  inside the post-event window, whatever the event's status (`videoPerTutti`),
+  and the video library lists only those. The home page and the event list
+  apply the same rule. The staff who manage the event see the recording before
   it is published: the recording panel links to the event page with
   `?anteprima=1`, which shows the page as it will be published, with a notice,
   and is not indexed.
 - **Deleted.** `DELETE /api/events/<slug>/recording` (moderator link) removes
-  the stored objects, clears the event's recording fields and writes a
-  `RECORDING_DELETED` entry to the GDPR audit log. The cleanup job deletes the
-  video when either retention window ends.
+  the stored objects, clears the event's recording fields and the call sessions
+  that point to the same file, and writes a `RECORDING_DELETED` entry to the
+  GDPR audit log. Taking the video off with `recordingUrl: null` on
+  `PUT /api/events/{id}` or `PATCH /api/admin/publications/{id}` clears the same
+  fields and leaves the object in storage: nothing references it any more, so
+  `recordings-reconcile` lists it as an orphan and deletes it after the grace
+  period. The cleanup job deletes the video when either retention window ends.
 
 A separate field, `Event.tempRecordingUrl`, holds an optional catch-up URL that
-the waiting room plays while the event is `LIVE`. No component of the platform
-fills it automatically: it is set through the event update API. The cleanup
+the waiting room plays while the event is `LIVE`, unless the recording is
+reserved, by its destination or by its audience. No component of the platform
+fills it automatically: it is set through the event update API, which refuses a
+new URL on an event with a reserved destination. The cleanup
 job's fixed-window deletion applies only when `Event.tempRecordingStartedAt`
 is set, and the update API does not set it. A URL set through the API is
 therefore removed by `DELETE /api/events/<slug>/recording`, or its object is
@@ -784,9 +969,9 @@ described in [Recordings, voice data and AI outputs](../privacy/recordings-and-a
 
 | Job | What it does to recordings |
 |---|---|
-| `cleanup` | Deletes catch-up URLs past their fixed window (only when `tempRecordingStartedAt` is set) and published videos past `recordingDeleteAfterDays`. When an event's data retention expires, it deletes the objects of the unpublished video and of the catch-up URL, deletes the track rows whose audio was already purged, clears the participant lists of its call sessions, and, unless the video or the transcript is published, deletes the transcript from captions (with the whole recording when it holds nothing else). |
-| `multitrack-purge` | Deletes per-participant track audio once transcription is done, for events that do not keep their tracks, and tracks that no transcription consumed when the event's data retention expires. Its branch for kept tracks applies only when `Recording.retentionUntil` is set, which the platform does not do. With the last track of a recording it deletes the recording's `tracks.json`, as `postprod-retention` does. In the chart it exists when `postprod.enabled` or `recorder.enabled` is true. |
-| `postprod-retention` | Purges post-production artifacts and remaining tracks, including kept tracks, once the event's data retention has passed; for an event whose video is published it purges only the tracks, and for one whose transcript alone is published it keeps only the transcript. See [AI post-production](../POSTPROD.md). |
+| `cleanup` | Deletes catch-up URLs past their fixed window (only when `tempRecordingStartedAt` is set). At the end of the recording's period (`recordingDeleteAfterDays`) it deletes the video objects of the event and of every session and the catch-up URL, clears the fields that point to them and the publication, deletes the transcript from captions and the speaker records, fails open jobs and sets `Recording.retentionUntil`. When an event's data retention expires, it deletes the object of the catch-up URL, deletes the track rows whose audio was already purged and clears the participant lists of its call sessions; the video and the transcripts stay. |
+| `multitrack-purge` | Deletes per-participant track audio once transcription is done, for events that do not keep their tracks, and tracks that no transcription consumed when the event's data retention expires. Its branch for kept tracks applies only when `Recording.retentionUntil` is set, which the cleanup does at the end of the recording's period. With the last track of a recording it deletes the recording's `tracks.json`, as `postprod-retention` does. In the chart it exists when `postprod.enabled` or `recorder.enabled` is true. |
+| `postprod-retention` | Purges the remaining per-participant tracks, including kept ones, once the event's data retention has passed, published or not; purges post-production artifacts, speaker records and job payloads only from `Recording.retentionUntil`, which the cleanup sets at the end of the recording's period. See [AI post-production](../POSTPROD.md). |
 | `recordings-reconcile` | Lists every object under `recordings/` in the recordings storage domain, by key without the `recordings/` prefix, and compares it with names derived from `Event.recordingUrl` and `CallSession.recordingUrl` (the URL path after its first segment) and with `CallSession.recordingFilename`, and, while the event's data retention lasts (or a later retention date of the recording, or a pipeline task that reads them), with the keys of the per-participant tracks whose audio is still present and the `tracks.json` of their recordings. An object with no match becomes an orphan, shown in the **Orphans** tab of **Video recordings** in the administration area. Orphans are deleted after `SiteSetting.orphanRecordingGraceDays` unless an administrator marks them **Keep**; **Delete now** deletes them at the next run. It never re-links an orphan to an event. See [Known limitations](#known-limitations) for what the match misses. |
 
 Schedules, Helm keys and what breaks when a job does not run are in
@@ -796,7 +981,7 @@ Schedules, Helm keys and what breaks when a job does not run are in
 
 | Case | Root job | Enqueued by |
 |---|---|---|
-| Jibri only | `TRANSCRIBE` on the MP4 | The webhook, when `aiTranscriptEnabled` |
+| Jibri only | `TRANSCRIBE` on the MP4 | Staff, confirming that every voice consented ([How work enters the queue](../POSTPROD.md#how-work-enters-the-queue)). The webhook does it, when `aiTranscriptEnabled`, only for a `Recording` without `transcriptConsentRule` on an event that asked no per-voice consent |
 | Multitrack only | `TRANSCRIBE_MULTITRACK` on the tracks | The manifest ingest |
 | Both | `TRANSCRIBE_MULTITRACK`; the MP4 is attached to the same `Recording`, where the archive job finds it | The manifest ingest (the webhook enqueues nothing) |
 
@@ -805,7 +990,7 @@ while the site-wide AI pipeline switch is off, or for a recording whose
 transcript from live captions was corrected by hand, which an AI transcript
 would replace ([Live captions](live-captions.md#transcript-from-captions)). On demand, an `ARCHIVE` job can
 mux the composite video, the retained per-participant tracks (labeled with
-names) and the subtitles into one MKV, available to administrators and the
+names, where the consent covers them) and the subtitles into one MKV, available to administrators and the
 event's organizer from the administration area, never through a moderator
 link or publicly. From here on, the pipeline is described in
 [AI post-production](../POSTPROD.md).
@@ -885,7 +1070,8 @@ title. The event page puts the pages back beside the published video
 - **Serving the PDF.** The page receives the cues and, per material, a
   `fileUrl` on `GET /api/events/<slug>/recording/slides?m=<materialId>`. That
   route answers only while the concluded page is public
-  (`isEventPageVisible`) and the video published, checks first that the
+  (`isEventPageVisible`), or a reserved recording is open to registrants
+  (`apertaAgliIscritti`), and the video published, checks first that the
   material can be shown and was presented in the room, then recomputes the
   slides and serves only a material among them, streaming it from files storage through
   a short-lived signed URL that never leaves the server
@@ -920,11 +1106,21 @@ title. The event page puts the pages back beside the published video
   after every Jitsi upgrade, and restart Prosody when the module changes. A
   dedicated track for each person would keep them out by construction
   ([Roadmap](../ROADMAP.md)).
-- **Consent text.** The per-participant consent text states that the track is
-  deleted after transcription, and does not change when **Keep
-  per-participant tracks** is on.
-- **Instant calls.** Guests joining an instant call are not asked for the
-  recording consent, although the moderator can record.
+- **Custom consent text.** `Event.recordingConsentText` appears on the
+  registration form, in the waiting room, in the room's consents dialog and in
+  the notices above the conference. Nothing checks it against the destination,
+  so it can contradict the box and the privacy sheet. It is not shown where
+  there is no composite video, and no proof records it. A
+  translation override of `gdpr.consent.recording` does not reach the texts of
+  a declared destination, which are keys of their own.
+- **A lost viewing link on a private page.** A registrant asks for the personal
+  link again from the event page. With the page private, a reserved recording
+  has no such form.
+- **Instant calls have no destination.** Their participants are asked about
+  their voice in the room, when a recording starts
+  ([In instant calls](../GDPR.md#in-instant-calls)); the consents say nothing
+  about where the video goes, and publishing it shows the warning of events
+  without a destination.
 - **Per-track consent needs Prosody's occupants module.** The portal learns
   which seat stands behind an endpoint only from `mod_pa_occupants`. Without
   it, as with an external Jitsi that does not load it, the recorder records no

@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: EUPL-1.2
 // SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
 
+import { cookies } from 'next/headers';
+
 import { withErrorHandling } from '@/lib/api-handler';
 import { AppError, ForbiddenError, NotFoundError, RateLimitError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
@@ -8,6 +10,8 @@ import { extractModeratorToken } from '@/lib/auth/moderator';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { limiteDellaSala } from '@/lib/room-rate-limit';
 import { tryDecryptJSON } from '@/lib/crypto/pii';
+import { fileDellaSessione } from '@/lib/recording/audience';
+import { contenutoStaffDellaRichiesta } from '@/lib/recording/content-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,7 +28,7 @@ export const GET = withErrorHandling(async (request, context) => {
       ...(isUuid ? { OR: [{ id: param }, { slug: param }] } : { slug: param }),
       moderatorToken: token,
     },
-    select: { id: true },
+    select: { id: true, slug: true },
   });
 
   if (!event) throw new NotFoundError('Event');
@@ -33,6 +37,8 @@ export const GET = withErrorHandling(async (request, context) => {
     where: { eventId: event.id },
     orderBy: { startedAt: 'desc' },
   });
+  // Il link di conduzione non basta per aprire i file: serve chi organizza.
+  const organizza = (await contenutoStaffDellaRichiesta(await cookies(), event.id)) !== null;
 
   return Response.json({
     sessions: sessions.map((s) => ({
@@ -43,7 +49,10 @@ export const GET = withErrorHandling(async (request, context) => {
       duration: s.duration,
       peakParticipants: s.peakParticipants,
       participants: tryDecryptJSON(s.participants, []),
-      recordingUrl: s.recordingUrl,
+      // La rotta dell'app, e solo a chi organizza l'evento (la rotta lo
+      // richiede); mai l'indirizzo dello storage (lib/recording/content-access).
+      recordingUrl: s.recordingUrl && organizza ? fileDellaSessione(event.slug, s.id) : null,
+      hasRecording: !!s.recordingUrl,
       recordingFileSize: s.recordingFileSize ? Number(s.recordingFileSize) : null,
       recordingDuration: s.recordingDuration,
       recordingFilename: s.recordingFilename,

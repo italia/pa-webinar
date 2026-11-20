@@ -13,7 +13,7 @@ import {
 import { prisma } from '@/lib/db';
 import { VERSIONE_TESTO_TRASCRIZIONE } from '@/lib/registration/consents';
 import { getSettings } from '@/lib/settings';
-import { captionsTranscriptActive } from '@/lib/captions/availability';
+import { chiedeConsensoPerVoce, type EventoConsensoVoce } from '@/lib/ai/voice-consent';
 import { jitsiTokenRequestSchema } from '@/lib/validation/schemas';
 import { EventModeratorRole, verifyGrantToken } from '@/lib/auth/moderator';
 import { staffDietroIlPrimario } from '@/lib/auth/staff-seat';
@@ -21,31 +21,53 @@ import {
   generateJitsiJwt,
   moderatorJitsiId,
   participantJitsiId,
+  postoDaTokenSala,
   guestJitsiId,
 } from '@/lib/auth/jwt';
-import { decryptPII, encryptPII, tryDecryptPII } from '@/lib/crypto/pii';
+import { decryptPII, encryptPII, hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
 import { findPhotoByEmailHash, profilePhotoUrl } from '@/lib/profile-photo';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { limiteTokenOspiti } from '@/lib/room-rate-limit';
 import { readOwnedEventAccess } from '@/lib/event-session';
 import { guestAccessAllowed } from '@/lib/events/guest-window';
-import { conduceSempreRegistrato } from '@/lib/live/consent-rule';
+import { periodoSostituito } from '@/lib/gdpr/consent-proofs';
+import { registrazioneDellIscrizione, trascrizioneInVigore } from '@/lib/live/consents-in-force';
+import type { PartecipantiNelVideo } from '@/lib/live/consent-rule';
 import { mediaDelToken, regolaConsenso } from '@/lib/live/listen-only';
 import { elencoVisibileAlPubblico } from '@/lib/live/participant-list';
-import { registraChiConduce } from '@/lib/live/entry-consents';
-import { pseudonimo } from '@/lib/live/pseudonym';
+import {
+  nicknameDellIscrizione,
+  nomeDiChiPartecipa,
+  prendiNicknameOspite,
+  rispostaNicknameRifiutato,
+} from '@/lib/live/nickname';
 import { guestSenderId } from '@/lib/chat/sender-key';
-import { recordingAvailable, voceNelVideo } from '@/lib/recording/availability';
+import { partecipantiNelVideo, recordingAvailableFor } from '@/lib/recording/availability';
+import {
+  consensoOra,
+  destinazioneDelTesto,
+  provaCopre,
+  testoLetto,
+  versioneLetta,
+  type Destinazione,
+} from '@/lib/recording/destination';
 import { hasJoinGrant } from '@/lib/events/join-grant';
+import type { JitsiTokenRequest } from '@/lib/validation/schemas';
 
 export const dynamic = 'force-dynamic';
 
 /**
- * Registra i consensi dati in sala d'attesa (prova del consenso, art. 7.1
+ * Registra i consensi dati ora con un clic (prova del consenso, art. 7.1
  * GDPR): alla registrazione dell'evento, da chi non l'aveva dato
- * all'iscrizione, e alla traccia audio per partecipante. Il posto e' lo stesso
- * identificativo che entra nel JWT della conferenza: una prova per posto,
+ * all'iscrizione, e alla trascrizione dei propri interventi. Il posto e' lo
+ * stesso identificativo che entra nel JWT della conferenza: una prova per posto,
  * scritta a JWT emesso, cosi' un posto che non entra non ne lascia.
+ *
+ * Solo un clic da' un consenso, o lo ridà dopo un ritiro. Una replica, il
+ * consenso che la pagina riporta da sola a un nuovo ingresso, non fa rivivere
+ * una prova ritirata e non ne scrive una al suo posto: se la prova non c'e' piu',
+ * il consenso non vale (`provaDellaReplica`). Se c'e', il posto nuovo porta la
+ * stessa prova, con la data e il testo di quando e' stata data.
  *
  * Al meglio: un errore di scrittura si registra nel log e non toglie il JWT a
  * chi sta entrando o rientrando; la risposta dice quali prove sono state
@@ -53,6 +75,10 @@ export const dynamic = 'force-dynamic';
  * ha gia' la sua prova non ne aggiunge un'altra a ogni rientro (per la
  * registrazione lo garantisce il vincolo unico, anche con due richieste
  * insieme).
+ *
+ * La prova della registrazione dice a quale testo si e' acconsentito: la
+ * destinazione letta (`testoLetto`), anche se quella in vigore e' piu' stretta.
+ * Un consenso che il testo in vigore non copre non si salva (`consensoOra`).
  */
 /** Quali prove di consenso la richiesta ha lasciato (o trovato gia' salvate). */
 interface ConsensiSalvati {
@@ -61,8 +87,73 @@ interface ConsensiSalvati {
 }
 
 /**
+ * Le prove ancora valide su cui poggia una replica. Null: non ne resta nessuna,
+ * o la pagina non ha riportato quel consenso.
+ */
+interface ReplicaValida {
+  registrazione: {
+    consentedAt: Date;
+    locale: string | null;
+    destination: Destinazione;
+    textVersion: number | null;
+  } | null;
+  tracce: { consentedAt: Date; locale: string | null; textVersion: number } | null;
+}
+
+const NESSUNA_REPLICA: ReplicaValida = { registrazione: null, tracce: null };
+
+/**
+ * I consensi che la pagina riporta da sola a un nuovo ingresso. Un ospite e chi
+ * entra da una concessione hanno un posto nuovo a ogni ingresso: la replica vale
+ * se resta una prova non ritirata sui posti provati dai token della sala di
+ * questa visita, o sull'account di chi conduce dal link primario. Quella della
+ * registrazione deve coprire il testo in vigore. L'iscritto che apre il proprio
+ * link non passa da qui: la sua prova sta sull'iscrizione.
+ */
+async function provaDellaReplica(
+  event: { id: string; jitsiRoomName: string },
+  replica: JitsiTokenRequest['consentReplay'],
+  destinazione: Destinazione,
+  partecipanti: PartecipantiNelVideo,
+  staffAccountId?: string,
+): Promise<ReplicaValida> {
+  if (!replica?.recording && !replica?.multitrack) return NESSUNA_REPLICA;
+  const prove = await Promise.all(
+    (replica.roomTokens ?? []).map((t) =>
+      postoDaTokenSala(t, event.jitsiRoomName, { ancheChiModera: true }),
+    ),
+  );
+  const posti = [...new Set(prove.filter((p) => p !== null).map((p) => p.posto))];
+  const dove = [
+    ...(posti.length > 0 ? [{ jitsiUserId: { in: posti } }] : []),
+    ...(staffAccountId ? [{ staffAccountId }] : []),
+  ];
+  const [registrazione, tracce] = await Promise.all([
+    replica.recording && dove.length > 0
+      ? prisma.recordingConsent.findMany({
+          where: { eventId: event.id, withdrawnAt: null, OR: dove },
+          orderBy: { consentedAt: 'desc' },
+          select: { consentedAt: true, locale: true, destination: true, textVersion: true },
+        })
+      : [],
+    replica.multitrack && dove.length > 0
+      ? prisma.multitrackConsent.findFirst({
+          where: { eventId: event.id, withdrawnAt: null, OR: dove },
+          orderBy: { textVersion: 'desc' },
+          select: { consentedAt: true, locale: true, textVersion: true },
+        })
+      : null,
+  ]);
+  return {
+    registrazione: registrazione.find((p) => provaCopre(p, destinazione, partecipanti)) ?? null,
+    tracce,
+  };
+}
+
+/**
  * Senza consenso alla registrazione la trascrizione non vale: la voce non viene
- * registrata e il testo non si tiene (lib/captions/room). Non se ne salva la prova.
+ * registrata e il testo non si tiene (lib/captions/room). Non se ne salva la
+ * prova, e il posto nuovo non la porta.
  */
 function conVoce<T extends { multitrackConsent?: boolean }>(
   data: T,
@@ -71,15 +162,56 @@ function conVoce<T extends { multitrackConsent?: boolean }>(
   return media.voiceExcluded ? { ...data, multitrackConsent: false } : data;
 }
 
+function replicaConVoce(
+  replica: ReplicaValida,
+  media: { voiceExcluded?: boolean },
+): ReplicaValida {
+  return media.voiceExcluded ? { ...replica, tracce: null } : replica;
+}
+
+/**
+ * I consensi che valgono per il posto dopo questa richiesta: la sala li mette al
+ * posto di cio' che ha letto all'apertura, perche' nel frattempo la persona puo'
+ * averli ritirati altrove o l'evento puo' aver cambiato il testo richiesto. Al
+ * meglio come le prove: un errore di lettura non toglie il JWT, e la sala tiene
+ * l'ultimo stato noto.
+ */
+async function consensiInVigore(
+  event: EventoConsensoVoce & { id: string },
+  posto: string,
+  registrazione: boolean,
+  /** La trascrizione gia' letta per questo posto in questa richiesta, se nessuna
+   *  prova e' stata scritta dopo: non si rilegge. Null: la lettura non e'
+   *  riuscita, e il token l'ha trattata come assente; la sala riceve lo stesso,
+   *  e la puo' ridare. */
+  trascrizioneLetta?: boolean | null,
+): Promise<{ recording: boolean; transcription: boolean } | undefined> {
+  if (trascrizioneLetta !== undefined) {
+    return { recording: registrazione, transcription: trascrizioneLetta === true };
+  }
+  try {
+    return {
+      recording: registrazione,
+      transcription: await trascrizioneInVigore(event, posto),
+    };
+  } catch (err) {
+    console.error('[jitsi/token] consents in force not read', {
+      eventId: event.id,
+      err: err instanceof Error ? err.message : String(err),
+    });
+    return undefined;
+  }
+}
+
 async function registraConsensi(
-  event: {
-    id: string;
-    recordingEnabled: boolean;
-    multitrackRecordingEnabled: boolean;
-    liveCaptionsEnabled: boolean;
-    captionsTranscriptEnabled: boolean;
+  event: EventoConsensoVoce & { id: string; recordingEnabled: boolean },
+  data: {
+    recordingConsent?: boolean;
+    recordingConsentDestination?: Destinazione;
+    recordingConsentVersion?: number;
+    multitrackConsent?: boolean;
+    locale?: string;
   },
-  data: { recordingConsent?: boolean; multitrackConsent?: boolean; locale?: string },
   posto: {
     jitsiUserId: string;
     displayName: string;
@@ -87,24 +219,53 @@ async function registraConsensi(
     /** Chi conduce o interviene: a chi si lega la prova della registrazione. */
     eventModeratorId?: string;
     staffAccountId?: string;
+    /** L'impronta dell'indirizzo di una concessione nominale. */
+    emailHash?: string;
   },
+  /** La destinazione del testo in vigore (`destinazioneDelTesto`). */
+  destinazione: Destinazione,
+  /** Come compaiono nel video i partecipanti: decide quale testo copre e quale
+   *  versione si salva (`provaCopre`, `versioneDellaProva`). */
+  partecipanti: PartecipantiNelVideo,
+  /** Le prove che il posto nuovo porta con se': mai a posto di un clic. */
+  replica: ReplicaValida = NESSUNA_REPLICA,
 ): Promise<ConsensiSalvati> {
-  const registrazione = event.recordingEnabled && data.recordingConsent === true;
-  // La trascrizione dei propri interventi: la traccia audio per persona o la
-  // trascrizione dai sottotitoli. La prova serve al registratore e alla
-  // trascrizione per sapere, voce per voce, chi l'ha data (lib/captions/room).
-  const trascrizione =
-    event.multitrackRecordingEnabled || captionsTranscriptActive(event, await getSettings());
+  const registrazione = event.recordingEnabled && consensoOra(data, destinazione, partecipanti);
+  // La trascrizione dei propri interventi, dalla traccia audio per persona, dai
+  // sottotitoli o dal video. La prova serve al registratore e alla trascrizione
+  // per sapere, voce per voce, chi l'ha data (lib/captions/room).
+  const trascrizione = chiedeConsensoPerVoce(event, await getSettings());
   const tracce = trascrizione && data.multitrackConsent === true;
-  if (!registrazione && !tracce) return { recording: false, multitrack: false };
+  const registrazionePortata = event.recordingEnabled && !registrazione ? replica.registrazione : null;
+  const traccePortate = tracce ? null : replica.tracce;
+  if (!registrazione && !tracce && !registrazionePortata && !traccePortate) {
+    return { recording: false, multitrack: false };
+  }
   const { registrationId } = posto;
+  // L'impronta di chi conduce sta sulla prova: resta anche quando la concessione
+  // o l'account se ne vanno, e la cancellazione chiesta dalla persona la trova.
+  const account = posto.staffAccountId
+    ? await prisma.staffAccount.findUnique({
+        where: { id: posto.staffAccountId },
+        select: { emailHash: true },
+      })
+    : null;
+  const emailHash = posto.emailHash ?? account?.emailHash ?? null;
   const prova = () => ({
     eventId: event.id,
     jitsiUserId: posto.jitsiUserId,
     displayName: encryptPII(posto.displayName),
     registrationId: registrationId ?? null,
+    eventModeratorId: posto.eventModeratorId ?? null,
+    staffAccountId: posto.staffAccountId ?? null,
+    emailHash,
     locale: data.locale ?? null,
   });
+  const destinazioneLetta = testoLetto(data.recordingConsentDestination, destinazione);
+  const testoDellaProva = {
+    destination: destinazioneLetta,
+    textVersion: versioneLetta(data.recordingConsentVersion, partecipanti),
+  };
   const alMeglio = async (quale: string, scrivi: () => Promise<unknown>): Promise<boolean> => {
     try {
       await scrivi();
@@ -118,33 +279,69 @@ async function registraConsensi(
     }
   };
   // Due prove indipendenti: si scrivono insieme, sul percorso d'ingresso.
-  const [recording, multitrack] = await Promise.all([
+  const [recordingPortata, recording, multitrack, multitrackPortata] = await Promise.all([
+    registrazionePortata &&
+      alMeglio('recording', () =>
+        prisma.recordingConsent.createMany({
+          data: [
+            {
+              ...prova(),
+              ...registrazionePortata,
+              eventModeratorId: posto.eventModeratorId ?? null,
+              staffAccountId: posto.staffAccountId ?? null,
+            },
+          ],
+          skipDuplicates: true,
+        }),
+      ),
     registrazione &&
       alMeglio('recording', async () => {
-        // Ridato dopo un ritiro dalla sala (lib/live/consent-withdrawal): la
-        // prova dell'iscrizione e' una sola (vincolo unico), e torna valida
-        // con l'ora nuova; il consenso di prima e il ritiro restano nel
-        // registro GDPR dell'evento, senza dati personali.
-        const ritirata = registrationId
+        // La prova dell'iscrizione e' una sola (vincolo unico). Torna valida con
+        // l'ora nuova se il consenso e' ridato dopo un ritiro dalla sala
+        // (lib/live/consent-withdrawal), o dato sul testo di una destinazione che
+        // la prova non copre. Il consenso di prima resta nel registro GDPR
+        // dell'evento, senza dati personali. Il `where` non trova piu' la riga
+        // se un'altra richiesta l'ha gia' aggiornata.
+        const esistente = registrationId
           ? await prisma.recordingConsent.findFirst({
-              where: { eventId: event.id, registrationId, withdrawnAt: { not: null } },
-              select: { consentedAt: true, withdrawnAt: true, earlierPeriods: true },
+              where: { eventId: event.id, registrationId },
+              select: {
+                jitsiUserId: true,
+                consentedAt: true,
+                withdrawnAt: true,
+                earlierPeriods: true,
+                destination: true,
+                textVersion: true,
+              },
             })
           : null;
-        if (registrationId && ritirata) {
+        if (
+          registrationId &&
+          esistente &&
+          (esistente.withdrawnAt || !provaCopre(esistente, destinazione, partecipanti))
+        ) {
           const ridata = await prisma.recordingConsent.updateMany({
-            where: { eventId: event.id, registrationId, withdrawnAt: { not: null } },
+            where: {
+              eventId: event.id,
+              registrationId,
+              ...(esistente.withdrawnAt
+                ? { withdrawnAt: { not: null } }
+                : {
+                    withdrawnAt: null,
+                    destination: esistente.destination,
+                    textVersion: esistente.textVersion,
+                  }),
+            },
             data: {
               withdrawnAt: null,
               consentedAt: new Date(),
               // Il periodo di prima resta nella prova (lib/gdpr/consent-proofs).
+              // Con `withdrawnAt` nullo e' stato sostituito, non ritirato.
               earlierPeriods: [
-                ...(Array.isArray(ritirata.earlierPeriods) ? ritirata.earlierPeriods : []),
-                {
-                  consentedAt: ritirata.consentedAt.toISOString(),
-                  withdrawnAt: ritirata.withdrawnAt?.toISOString() ?? null,
-                },
+                ...(Array.isArray(esistente.earlierPeriods) ? esistente.earlierPeriods : []),
+                periodoSostituito(esistente),
               ],
+              ...testoDellaProva,
               jitsiUserId: posto.jitsiUserId,
               displayName: encryptPII(posto.displayName),
               locale: data.locale ?? null,
@@ -160,8 +357,10 @@ async function registraConsensi(
                   source: 'room',
                   kind: 'recording',
                   givenAgain: true,
-                  previousConsentedAt: ritirata.consentedAt.toISOString(),
-                  withdrawnAt: ritirata.withdrawnAt?.toISOString() ?? null,
+                  previousConsentedAt: esistente.consentedAt.toISOString(),
+                  withdrawnAt: esistente.withdrawnAt?.toISOString() ?? null,
+                  previousDestination: esistente.destination ?? null,
+                  destination: destinazioneLetta,
                 }),
               },
             });
@@ -171,8 +370,7 @@ async function registraConsensi(
           data: [
             {
               ...prova(),
-              eventModeratorId: posto.eventModeratorId ?? null,
-              staffAccountId: posto.staffAccountId ?? null,
+              ...testoDellaProva,
             },
           ],
           skipDuplicates: true,
@@ -200,8 +398,28 @@ async function registraConsensi(
           });
         }
       }),
+    traccePortate &&
+      alMeglio('multitrack', () =>
+        prisma.multitrackConsent.create({ data: { ...prova(), ...traccePortate } }),
+      ),
   ]);
-  return { recording, multitrack };
+  return {
+    recording: !!recording || !!recordingPortata,
+    multitrack: !!multitrack || !!multitrackPortata,
+  };
+}
+
+/**
+ * I posti provati dai token della sala di questa visita: l'ospite che li porta
+ * riprende il nickname tenuto dall'ultimo di quei posti, anche da un'altra rete
+ * (lib/live/nickname). Si verificano solo se servono.
+ */
+function postiDellaVisita(roomName: string, prove: readonly string[] | undefined) {
+  return async (): Promise<ReadonlySet<string>> => {
+    if (!prove?.length) return new Set();
+    const posti = await Promise.all(prove.map((t) => postoDaTokenSala(t, roomName)));
+    return new Set(posti.filter((p) => p !== null).map((p) => p.posto));
+  };
 }
 
 export const POST = withErrorHandling(async (request, context) => {
@@ -229,13 +447,58 @@ export const POST = withErrorHandling(async (request, context) => {
   // Il consenso alla registrazione di chi partecipa e i limiti dei mezzi nel
   // token (lib/live/listen-only): chi entra per primo accende il blocco nella
   // sala (mod_pa_media_lock), con gli stessi tipi per tutti.
-  const regola = regolaConsenso(event, recordingAvailable(), voceNelVideo());
+  const partecipanti = partecipantiNelVideo();
+  const registrabile = recordingAvailableFor(event);
+  const regola = regolaConsenso(event, registrabile, partecipanti);
+  // Le prove seguono la regola della rotta d'iscrizione: dove non si registra
+  // niente non c'e' un consenso da dare, nemmeno da una pagina aperta da prima.
+  const eventoConsensi = {
+    ...event,
+    recordingEnabled: event.recordingEnabled && registrabile,
+    multitrackRecordingEnabled: event.multitrackRecordingEnabled && registrabile,
+  };
+  // La destinazione del testo in vigore: si confronta con i consensi, dati ora o
+  // prima, e torna in ogni risposta, cosi' una pagina aperta da prima mostra il
+  // testo giusto e non rimanda un consenso dato su quello vecchio. Dove non c'e'
+  // un video vale null, mai la colonna dell'evento.
+  const destinazione = destinazioneDelTesto(event.recordingDestination, partecipanti);
+  const consensoDato = consensoOra(parsed.data, destinazione, partecipanti);
   // Vale da quando si entra: chi aspetta da prima non ha una scelta vecchia.
   const participantListVisible = elencoVisibileAlPubblico(event);
   // Il token di chi partecipa: il consenso non e' mai una condizione per
   // entrare, decide cosa si puo' fare in sala.
   const mediaPartecipante = (consenso: boolean) =>
     mediaDelToken(event, regola, 'partecipante', consenso);
+  // Il consenso che decide il segno della voce di chi partecipa: quello alla
+  // registrazione, o dove chi partecipa non entra mai nel video ('esclusi') quello
+  // alla trascrizione, dato ora o ancora valido (lib/live/listen-only). Il secondo
+  // si legge solo li'.
+  const trascrizioneOra =
+    regola.voceDallaTrascrizione &&
+    parsed.data.multitrackConsent === true &&
+    chiedeConsensoPerVoce(eventoConsensi, await getSettings());
+  const consensoVoce = (registrazione: boolean, trascrizioneValida: boolean): boolean =>
+    regola.voceDallaTrascrizione ? trascrizioneOra || trascrizioneValida : registrazione;
+  // La trascrizione dell'iscritto, letta per il segno della voce. Null: la
+  // lettura non e' riuscita. Non toglie il JWT, e la voce resta fuori.
+  const trascrizioneDelPosto = async (posto: string): Promise<boolean | null> => {
+    try {
+      return await trascrizioneInVigore(event, posto);
+    } catch (err) {
+      console.error('[jitsi/token] transcription consent not read', {
+        eventId: event.id,
+        err: err instanceof Error ? err.message : String(err),
+      });
+      return null;
+    }
+  };
+  // Li' il consenso alla registrazione di chi partecipa non si chiede: uno che
+  // arriva lo stesso, da una pagina aperta da prima o da una replica, non lascia
+  // una prova.
+  const senzaRegistrazione = <T extends { recordingConsent?: boolean }>(data: T): T =>
+    regola.voceDallaTrascrizione ? { ...data, recordingConsent: false } : data;
+  const replicaSenzaRegistrazione = (replica: ReplicaValida): ReplicaValida =>
+    regola.voceDallaTrascrizione ? { ...replica, registrazione: null } : replica;
 
   // ── Grant flow (primary moderator, co-moderator, or speaker) ──
   if (moderatorToken) {
@@ -270,18 +533,20 @@ export const POST = withErrorHandling(async (request, context) => {
     // Un identificativo per ingresso (con suffisso casuale): lo stesso nel
     // consenso e nel JWT.
     const postoModeratore = moderatorJitsiId(event.id);
-    // Il consenso alla registrazione di chi conduce o interviene: facoltativo,
-    // con la prova legata alla sua concessione o al suo account. Viaggia con
-    // ogni ingresso (la sala lo rimanda, come per gli ospiti). Senza, entra
-    // lo stesso, con le regole di chi non ha acconsentito. Non conta dove chi
-    // organizza dichiara chi conduce sempre nella registrazione: nessuna prova,
-    // perche' nessuno ha spuntato niente.
-    const registraVideo = registraChiConduce(event, recordingAvailable());
-    // Un link e' un posto, non una persona: quello dato da un altro con lo
-    // stesso link non si eredita.
-    const consensoConduce =
-      conduceSempreRegistrato(event, voceNelVideo()) || parsed.data.recordingConsent === true;
-    const mediaConduce = mediaDelToken(event, regola, isSpeaker ? 'relatore' : 'moderatore', consensoConduce);
+    // Chi conduce o interviene e' sempre nel video, con nome e immagine, e il
+    // suo token lo dice (`paInVideo`, lib/live/listen-only): non da' il consenso
+    // alla registrazione, e un consenso che una pagina manda lo stesso non lascia
+    // una prova. Resta suo il consenso alla trascrizione dei propri interventi,
+    // con la prova legata alla concessione o all'account. Un link e' un posto,
+    // non una persona: quello dato da un altro con lo stesso link non si eredita.
+    const replicaConduce = await provaDellaReplica(
+      event,
+      parsed.data.consentReplay && { ...parsed.data.consentReplay, recording: false },
+      destinazione,
+      partecipanti,
+      staff?.accountId,
+    );
+    const mediaConduce = mediaDelToken(event, regola, isSpeaker ? 'relatore' : 'moderatore', true);
     const jwt = await generateJitsiJwt({
       roomName: event.jitsiRoomName,
       displayName: name,
@@ -296,18 +561,18 @@ export const POST = withErrorHandling(async (request, context) => {
       useGravatar: (await getSettings()).gravatarEnabled,
     });
     const consentsRecorded = await registraConsensi(
-      event,
-      {
-        ...parsed.data,
-        multitrackConsent:
-          registraVideo && !consensoConduce ? false : parsed.data.multitrackConsent,
-      },
+      eventoConsensi,
+      { ...parsed.data, recordingConsent: false },
       {
         jitsiUserId: postoModeratore,
         displayName: name,
         eventModeratorId: grant.grantId ?? undefined,
         staffAccountId: staff?.accountId,
+        emailHash: grant.email ? hashEmail(grant.email) : undefined,
       },
+      destinazione,
+      partecipanti,
+      replicaConduce,
     );
 
     return Response.json({
@@ -316,8 +581,10 @@ export const POST = withErrorHandling(async (request, context) => {
       displayName: name,
       role: isSpeaker ? 'speaker' : 'moderator',
       consentsRecorded,
+      consentsInForce: await consensiInVigore(event, postoModeratore, false),
       voiceExcluded: !!mediaConduce.voiceExcluded,
       participantListVisible,
+      recordingDestination: destinazione,
     }, { headers: { 'Cache-Control': 'no-store' } });
   }
 
@@ -362,14 +629,36 @@ export const POST = withErrorHandling(async (request, context) => {
       if (!rl.allowed) {
         throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
       }
+      // Il nickname di chi apre il link di un altro vale per la visita, come
+      // quello di un ospite. Col pubblico anonimo resta lo pseudonimo del
+      // posto: la chat lo nomina dall'iscrizione, e i due nomi non si
+      // accostano.
       const postoOspite = guestJitsiId();
+      let nicknameInoltro: string | null = null;
+      if (parsed.data.nickname && event.nicknamesEnabled && !event.audienceAnonymous) {
+        const esito = await prendiNicknameOspite(
+          event.id,
+          parsed.data.nickname,
+          (n) => guestSenderId(ip, n),
+          postoOspite,
+          postiDellaVisita(event.jitsiRoomName, parsed.data.nicknameProof),
+        );
+        if (!esito.ok) return rispostaNicknameRifiutato(esito);
+        nicknameInoltro = esito.nickname;
+      }
       // Il consenso dell'iscritto non passa a chi ha il suo link: vale quello
-      // dato ora in sala d'attesa.
-      const mediaInoltro = mediaPartecipante(parsed.data.recordingConsent === true);
+      // dato da chi ha aperto il link, ora o a un ingresso di questa visita.
+      const replicaInoltro = await provaDellaReplica(
+        event,
+        parsed.data.consentReplay,
+        destinazione,
+        partecipanti,
+      );
+      const mediaInoltro = mediaPartecipante(
+        consensoVoce(consensoDato || !!replicaInoltro.registrazione, !!replicaInoltro.tracce),
+      );
       // Pubblico anonimo: lo pseudonimo del posto (lo stesso della chat).
-      const nomeInoltro = event.audienceAnonymous
-        ? await pseudonimo(event.id, `reg-${registration.id}`)
-        : typedName;
+      const nomeInoltro = await nomeDiChiPartecipa(event, `reg-${registration.id}`, nicknameInoltro, typedName);
       const guestJwt = await generateJitsiJwt({
         roomName: event.jitsiRoomName,
         displayName: nomeInoltro,
@@ -378,38 +667,60 @@ export const POST = withErrorHandling(async (request, context) => {
         ...mediaInoltro,
         expiresInSeconds: 2 * 60 * 60,
       });
-      const consentsRecorded = await registraConsensi(event, conVoce(parsed.data, mediaInoltro), {
-        jitsiUserId: postoOspite,
-        displayName: typedName,
-      });
+      // La prova porta il nome con cui si e' in sala: la trascrizione dai
+      // sottotitoli nomina il posto da qui (lib/captions/room).
+      const consentsRecorded = await registraConsensi(
+        eventoConsensi,
+        senzaRegistrazione(conVoce(parsed.data, mediaInoltro)),
+        { jitsiUserId: postoOspite, displayName: nicknameInoltro ?? typedName },
+        destinazione,
+        partecipanti,
+        replicaSenzaRegistrazione(replicaConVoce(replicaInoltro, mediaInoltro)),
+      );
       return Response.json(
         {
           jwt: guestJwt,
           roomName: event.jitsiRoomName,
           displayName: nomeInoltro,
+          nickname: nicknameInoltro,
           role: 'participant',
           consentsRecorded,
+          consentsInForce: await consensiInVigore(
+            event,
+            postoOspite,
+            consentsRecorded.recording || !!replicaInoltro.registrazione,
+          ),
           participantListVisible,
           listenOnly: !!mediaInoltro.listenOnly,
           voiceExcluded: !!mediaInoltro.voiceExcluded,
+          recordingDestination: destinazione,
         },
         { headers: { 'Cache-Control': 'no-store' } },
       );
     }
 
-    // Il consenso dell'iscritto: dato all'iscrizione, in sala d'attesa ora o
-    // in una visita precedente (la prova resta legata all'iscrizione). La
-    // lettura serve solo a chi non l'ha dato ne' ora ne' all'iscrizione.
-    // Un consenso ritirato dalla sala non vale piu' (lib/live/consent-withdrawal).
+    // Il consenso dell'iscritto: dato all'iscrizione, con un clic ora o in una
+    // visita precedente (la prova resta legata all'iscrizione). Le repliche della
+    // pagina non contano: decide cio' che il server trova. La lettura serve solo
+    // a chi non l'ha dato ne' ora ne' all'iscrizione, e si fa anche dove il
+    // consenso non cambia il token: la sala deve sapere che c'e', per poterlo
+    // ritirare. Un consenso ritirato non vale piu' (lib/live/consent-withdrawal),
+    // e uno dato su un testo che non copre il testo in vigore non vale per
+    // questo video: la sala lo richiede.
     const consensoIscritto =
-      parsed.data.recordingConsent === true ||
-      (registration.consentRecording === true && !registration.consentRecordingWithdrawnAt) ||
-      (regola.registra &&
-        (await prisma.recordingConsent.findFirst({
-          where: { eventId: event.id, registrationId: registration.id, withdrawnAt: null },
-          select: { id: true },
-        })) !== null);
-    const mediaIscritto = mediaPartecipante(consensoIscritto);
+      consensoDato ||
+      (await registrazioneDellIscrizione(event, registration, destinazione, partecipanti));
+    const postoIscritto = participantJitsiId(registration.id);
+    // Dove decide il segno della voce si legge una volta sola, e la stessa
+    // lettura torna alla sala: in questa richiesta l'iscritto non da' la
+    // trascrizione, quindi nessuna prova nuova la cambia.
+    const trascrizioneIscritto =
+      regola.voceDallaTrascrizione && !trascrizioneOra
+        ? await trascrizioneDelPosto(postoIscritto)
+        : undefined;
+    const mediaIscritto = mediaPartecipante(
+      consensoVoce(consensoIscritto, trascrizioneIscritto === true),
+    );
 
     // Record the join, set-once. Kept write-free on rejoin so the reconnect
     // path never depends on a DB write (a write failure here would 500 the
@@ -431,19 +742,23 @@ export const POST = withErrorHandling(async (request, context) => {
       // PII decryption failure — skip Gravatar, use SVG fallback
     }
 
-    const postoIscritto = participantJitsiId(registration.id);
     // La foto vale per l'indirizzo in tutti gli eventi: si mostra solo a chi
     // ha provato che l'indirizzo e' suo aprendo il link dell'email. Iscriversi
     // con l'indirizzo di un altro non ne fa indossare la foto.
     const fotoIscritto = accesso?.emailVerified
       ? await findPhotoByEmailHash(registration.emailHash)
       : null;
+    // Il nickname salvato sull'iscrizione (lib/live/nickname) vale finche' la
+    // persona non lo toglie, anche se l'opzione si spegne dopo: spegnerla non
+    // rimette il nome al posto di un nickname gia' scelto.
     // Pubblico anonimo: in sala lo pseudonimo del posto, senza indirizzo ne'
-    // foto (niente che porti alla persona). Chi e' in solo ascolto ha
-    // rifiutato la registrazione: in sala con le iniziali, senza la sua foto.
-    // Chi resta fuori dalla registrazione tiene la sua: non entra nel video.
-    const anonimo = event.audienceAnonymous;
-    const nomeInSala = anonimo ? await pseudonimo(event.id, `reg-${registration.id}`) : name;
+    // foto (niente che porti alla persona). Lo stesso con il nickname. Chi e'
+    // in solo ascolto ha rifiutato la registrazione: in sala con le iniziali,
+    // senza la sua foto. Chi resta fuori dalla registrazione tiene la sua: non
+    // entra nel video.
+    const nickname = nicknameDellIscrizione(registration);
+    const anonimo = event.audienceAnonymous || !!nickname;
+    const nomeInSala = await nomeDiChiPartecipa(event, `reg-${registration.id}`, nickname, name);
     const conVolto = !anonimo && !mediaIscritto.listenOnly;
     const jwt = await generateJitsiJwt({
       roomName: event.jitsiRoomName,
@@ -457,21 +772,31 @@ export const POST = withErrorHandling(async (request, context) => {
       // token resta puro (vedi JitsiTokenPayload.useGravatar).
       useGravatar: conVolto && (await getSettings()).gravatarEnabled,
     });
-    const consentsRecorded = await registraConsensi(event, conVoce(parsed.data, mediaIscritto), {
-      jitsiUserId: postoIscritto,
-      displayName: name,
-      registrationId: registration.id,
-    });
+    const consentsRecorded = await registraConsensi(
+      eventoConsensi,
+      senzaRegistrazione(conVoce(parsed.data, mediaIscritto)),
+      { jitsiUserId: postoIscritto, displayName: name, registrationId: registration.id },
+      destinazione,
+      partecipanti,
+    );
 
     return Response.json({
       jwt,
       roomName: event.jitsiRoomName,
       displayName: nomeInSala,
+      nickname,
       role: 'participant',
       consentsRecorded,
+      consentsInForce: await consensiInVigore(
+        event,
+        postoIscritto,
+        consentsRecorded.recording || (!consensoDato && consensoIscritto),
+        trascrizioneIscritto,
+      ),
       participantListVisible,
       listenOnly: !!mediaIscritto.listenOnly,
       voiceExcluded: !!mediaIscritto.voiceExcluded,
+      recordingDestination: destinazione,
     }, { headers: { 'Cache-Control': 'no-store' } });
   }
 
@@ -510,12 +835,38 @@ export const POST = withErrorHandling(async (request, context) => {
       throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
     }
 
+    // Il nickname dell'ospite vale per la visita: controllato e preso per la
+    // sua chiave in chat (lib/live/nickname), che e' quella con cui la sala
+    // poi scrive e chiede.
     const postoOspite = guestJitsiId();
-    const mediaOspite = mediaPartecipante(parsed.data.recordingConsent === true);
+    let nicknameOspite: string | null = null;
+    if (parsed.data.nickname && event.nicknamesEnabled) {
+      const esito = await prendiNicknameOspite(
+        event.id,
+        parsed.data.nickname,
+        (n) => guestSenderId(ip, n),
+        postoOspite,
+        postiDellaVisita(event.jitsiRoomName, parsed.data.nicknameProof),
+      );
+      if (!esito.ok) return rispostaNicknameRifiutato(esito);
+      nicknameOspite = esito.nickname;
+    }
+    const replicaOspite = await provaDellaReplica(
+      event,
+      parsed.data.consentReplay,
+      destinazione,
+      partecipanti,
+    );
+    const mediaOspite = mediaPartecipante(
+      consensoVoce(consensoDato || !!replicaOspite.registrazione, !!replicaOspite.tracce),
+    );
     // Pubblico anonimo: lo pseudonimo del posto in chat (la chiave dell'ospite).
-    const nomeOspite = event.audienceAnonymous
-      ? await pseudonimo(event.id, guestSenderId(ip, guestName))
-      : guestName;
+    const nomeOspite = await nomeDiChiPartecipa(
+      event,
+      guestSenderId(ip, guestName),
+      nicknameOspite,
+      guestName,
+    );
     const jwt = await generateJitsiJwt({
       roomName: event.jitsiRoomName,
       displayName: nomeOspite,
@@ -524,20 +875,32 @@ export const POST = withErrorHandling(async (request, context) => {
       ...mediaOspite,
       expiresInSeconds: 2 * 60 * 60,
     });
-    const consentsRecorded = await registraConsensi(event, conVoce(parsed.data, mediaOspite), {
-      jitsiUserId: postoOspite,
-      displayName: guestName,
-    });
+    // Il nome con cui l'ospite e' in sala: la trascrizione lo prende da qui.
+    const consentsRecorded = await registraConsensi(
+      eventoConsensi,
+      senzaRegistrazione(conVoce(parsed.data, mediaOspite)),
+      { jitsiUserId: postoOspite, displayName: nicknameOspite ?? guestName },
+      destinazione,
+      partecipanti,
+      replicaSenzaRegistrazione(replicaConVoce(replicaOspite, mediaOspite)),
+    );
 
     return Response.json({
       jwt,
       roomName: event.jitsiRoomName,
       displayName: nomeOspite,
+      nickname: nicknameOspite,
       role: 'guest',
       consentsRecorded,
+      consentsInForce: await consensiInVigore(
+        event,
+        postoOspite,
+        consentsRecorded.recording || !!replicaOspite.registrazione,
+      ),
       participantListVisible,
       listenOnly: !!mediaOspite.listenOnly,
       voiceExcluded: !!mediaOspite.voiceExcluded,
+      recordingDestination: destinazione,
     }, { headers: { 'Cache-Control': 'no-store' } });
   }
 

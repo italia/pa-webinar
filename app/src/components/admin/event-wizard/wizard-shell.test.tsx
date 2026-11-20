@@ -8,6 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import messages from '@/i18n/messages/it.json';
 import { ISTANZA_PREDEFINITA } from '@/lib/capacity/model';
+import { matrixFromToggles } from '@/lib/utils/permission-matrix';
 
 import EventWizard, { type InitialEventShape, type WizardProps } from './wizard-shell';
 
@@ -271,6 +272,7 @@ describe('modifica — revoca di un co-moderatore', () => {
     slug: 'evento',
     moderatorToken: 'token-primario',
     event: {
+      recordingAudience: 'PUBLIC',
       title: { it: 'Evento di prova' },
       description: { it: 'Una descrizione valida per il wizard.' },
       startsAt: '2030-01-10T09:00:00.000Z',
@@ -369,6 +371,160 @@ describe('modifica — revoca di un co-moderatore', () => {
   });
 });
 
+/**
+ * Il catalogo dell'evento (lib/events/catalog): in creazione viene dalla scelta
+ * fatta prima del wizard e non si mostra; in modifica lo corregge lo staff dai
+ * dettagli tecnici, e il salvataggio manda solo cio' che cambia.
+ */
+describe('catalogo dell evento', () => {
+  const tc = messages.admin.catalog;
+
+  function corpoInviato(metodo: 'POST' | 'PUT'): Record<string, unknown> {
+    const chiamata = (fetchMock.mock.calls as Array<[string, RequestInit]>).find(
+      ([url, init]) => url.startsWith('/api/events') && init?.method === metodo,
+    );
+    return JSON.parse(String(chiamata?.[1].body)) as Record<string, unknown>;
+  }
+
+  function scegli(id: string, valore: string) {
+    const campo = byId<HTMLSelectElement>(id);
+    act(() => {
+      campo.value = valore;
+      campo.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+  }
+
+  const evento = (campi: Record<string, unknown> = {}): InitialEventShape =>
+    ({
+      id: 'evt-cat',
+      slug: 'evento-catalogo',
+      moderatorToken: 'token-primario',
+      event: {
+        title: { it: 'Evento di prova' },
+        description: { it: 'Una descrizione valida per il wizard.' },
+        startsAt: '2030-01-10T09:00:00.000Z',
+        endsAt: '2030-01-10T10:00:00.000Z',
+        timezone: 'Europe/Rome',
+        maxParticipants: 50,
+        dataRetentionDays: 30,
+        postEventPublic: true,
+        status: 'PUBLISHED',
+        accessMode: null,
+        requireOrganization: false,
+        requireOrganizationRole: false,
+        requireOrganizationType: false,
+        eventType: 'SCHEDULED',
+        templateId: null,
+        templateName: 'Modello cancellato',
+        formatClass: null,
+        ...campi,
+      } as unknown as InitialEventShape['event'],
+      organizers: [],
+      eventModerators: [],
+      invitations: [],
+      materials: [],
+      preEventQuestionnaire: null,
+      postEventQuestionnaire: null,
+    }) as InitialEventShape;
+
+  const MODELLI = [{ id: 'tpl-1', name: 'Riunione di lavoro' }];
+
+  it('in creazione manda la scelta di partenza, senza mostrarla', async () => {
+    fetchMock.mockImplementation(async (input: RequestInfo | URL, init: RequestInit = {}) =>
+      String(input) === '/api/events' && init.method === 'POST'
+        ? json(201, { id: 'evt-nuovo', slug: 'evento-nuovo', moderatorToken: 'token' })
+        : json(200, {}),
+    );
+    renderWizard({ catalogo: { templateId: null, formatClass: 'MEETING' }, modelliCatalogo: MODELLI });
+    goToStep(w.flow.steps.advanced);
+    apriSezione('technical');
+    expect(container.querySelector('#ev-catalog-type')).toBeNull();
+
+    goToStep('base');
+    type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
+    type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
+    organizzatore();
+    goToStep('review');
+    await press(button(w.saveDraft));
+    const corpo = corpoInviato('POST');
+    expect(corpo.formatClass).toBe('MEETING');
+    expect('templateId' in corpo).toBe(false);
+  });
+
+  it('in modifica lo staff lo corregge, e si manda solo cio che cambia', async () => {
+    fetchMock.mockImplementation(async () => json(200, {}));
+    renderWizard({ mode: 'edit', initialEvent: evento(), modelliCatalogo: MODELLI });
+    goToStep(w.flow.steps.advanced);
+    apriSezione('technical');
+    // Il modello da cui l'evento e' nato, poi cancellato, si nomina.
+    expect(container.textContent).toContain(
+      tc.deletedTemplate.replace('{name}', 'Modello cancellato'),
+    );
+    expect(byId<HTMLSelectElement>('ev-catalog-type').value).toBe('');
+
+    scegli('ev-catalog-type', 'MEETING');
+    await press(button(w.updateEvent));
+    const corpo = corpoInviato('PUT');
+    expect(corpo.formatClass).toBe('MEETING');
+    expect('templateId' in corpo).toBe(false);
+  });
+
+  it('«nessun modello» toglie il modello cancellato, che finche resta si nomina', async () => {
+    fetchMock.mockImplementation(async () => json(200, {}));
+    renderWizard({ mode: 'edit', initialEvent: evento(), modelliCatalogo: MODELLI });
+    goToStep(w.flow.steps.advanced);
+    apriSezione('technical');
+    const modello = byId<HTMLSelectElement>('ev-catalog-template');
+    expect(modello.selectedOptions[0]?.textContent).toBe(
+      tc.deletedOption.replace('{name}', 'Modello cancellato')
+    );
+
+    scegli('ev-catalog-template', '');
+    expect(container.textContent).not.toContain(
+      tc.deletedTemplate.replace('{name}', 'Modello cancellato')
+    );
+    await press(button(w.updateEvent));
+    expect(corpoInviato('PUT').templateId).toBeNull();
+  });
+
+  it('un salvataggio che non lo tocca non lo manda', async () => {
+    fetchMock.mockImplementation(async () => json(200, {}));
+    renderWizard({
+      mode: 'edit',
+      initialEvent: evento({ templateId: 'tpl-1', templateName: 'Riunione', formatClass: 'MEETING' }),
+      modelliCatalogo: MODELLI,
+    });
+    await press(button(w.updateEvent));
+    const corpo = corpoInviato('PUT');
+    expect('templateId' in corpo).toBe(false);
+    expect('formatClass' in corpo).toBe(false);
+  });
+
+  it('non si mostra con il link di conduzione, ne in una chiamata rapida', () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: evento(),
+      modelliCatalogo: MODELLI,
+      viaToken: 'token-primario',
+    });
+    goToStep(w.flow.steps.advanced);
+    apriSezione('technical');
+    expect(container.querySelector('#ev-catalog-type')).toBeNull();
+
+    act(() => root.unmount());
+    root = createRoot(container);
+    localStorage.clear();
+    renderWizard({
+      mode: 'edit',
+      initialEvent: evento({ eventType: 'INSTANT' }),
+      modelliCatalogo: MODELLI,
+    });
+    goToStep(w.flow.steps.advanced);
+    apriSezione('technical');
+    expect(container.querySelector('#ev-catalog-type')).toBeNull();
+  });
+});
+
 describe('modifica — salvataggio da un passo intermedio', () => {
   it('si parte dal passo chiesto e si salva da lì, senza arrivare al riepilogo', async () => {
     fetchMock.mockImplementation(async () => json(200, {}));
@@ -407,6 +563,9 @@ describe('modifica — salvataggio da un passo intermedio', () => {
       ([url, init]) => url === '/api/events/evt-2' && init?.method === 'PUT',
     );
     expect(put).toBeTruthy();
+    // La durata della registrazione non cambiata non si manda: la cambia anche
+    // il pannello della registrazione.
+    expect(JSON.parse(String(put![1].body))).not.toHaveProperty('recordingDeleteAfterDays');
     expect(push).toHaveBeenCalledTimes(1);
   });
 
@@ -693,6 +852,20 @@ describe('creazione — pubblicazione non riuscita', () => {
     expect(push).toHaveBeenCalledTimes(1);
   });
 
+  it('un rifiuto con un codice si legge nella lingua di chi usa il wizard', async () => {
+    rispondi(async () =>
+      json(409, {
+        error: 'The consents of this event cover a reserved recording',
+        code: 'RECORDING_DESTINATION_NOT_COVERED',
+      }),
+    );
+    await compilaEPubblica();
+
+    expect(toastError).toHaveBeenCalledWith(
+      w.publishFailedDetail.replace('{reason}', messages.apiErrors.recordingDestinationNotCovered),
+    );
+  });
+
   it('la rete cade: avviso senza dettaglio', async () => {
     rispondi(async () => {
       throw new TypeError('Failed to fetch');
@@ -975,6 +1148,7 @@ describe('lingue dell evento e traduzione automatica', () => {
     slug: 'evento-lingue',
     moderatorToken: 'token-l',
     event: {
+      recordingAudience: 'PUBLIC',
       title: { it: 'Evento di prova', en: 'Test event', de: 'Testveranstaltung' },
       description: {
         it: 'Una descrizione valida per il wizard.',
@@ -1466,6 +1640,22 @@ describe('creazione — i default del modello', () => {
     });
   });
 
+  it('la durata della registrazione del modello parte nel salvataggio', async () => {
+    renderWizard({ template: { ...modello, recordingDeleteAfterDays: 90 } });
+    compila();
+    goToStep('review');
+    await press(button(w.saveDraft));
+    expect(payloadInviato().recordingDeleteAfterDays).toBe(90);
+  });
+
+  it('senza una durata nel modello la registrazione non ha scadenza', async () => {
+    renderWizard({ template: modello });
+    compila();
+    goToStep('review');
+    await press(button(w.saveDraft));
+    expect(payloadInviato().recordingDeleteAfterDays).toBeNull();
+  });
+
   it('il sopratitolo si spiega sotto il titolo, e con «|» si vede e si sceglie', async () => {
     renderWizard({ template: modello });
     const s1 = messages.admin.wizard.step1;
@@ -1521,7 +1711,15 @@ describe('creazione — i default del modello', () => {
   it('chi si iscrive: segue il sito finche non si sceglie, e solo su invito lo dice ovunque', async () => {
     const g = messages.admin.guided;
     const s3 = messages.admin.wizard.step3;
-    renderWizard({ template: { ...modello, accessMode: null }, publicRegistrationEnabled: true });
+    renderWizard({
+      template: { ...modello, accessMode: null, recordingDestination: 'PUBLIC' },
+      publicRegistrationEnabled: true,
+      formatoLabel: 'dalle domande',
+      etichettaFormato: ({ registra, invitati }) => `${registra} ${invitati}`,
+      onChangeTemplate: vi.fn(),
+    });
+    const fascia = () => container.querySelector('.wizard-modello')?.textContent;
+    expect(fascia()).toContain('pubblica false');
     compila();
     goToStep('invites');
     const sezione = container.querySelector('.wizard-iscrizione')!;
@@ -1533,6 +1731,8 @@ describe('creazione — i default del modello', () => {
     expect(scelta(g.access.open).querySelector('input')!.checked).toBe(true);
 
     click(scelta(g.access.invitation));
+    // La fascia in cima non resta alle risposte di partenza.
+    expect(fascia()).toContain('riservata true');
     expect(sezione.textContent).not.toContain(s3.accessSiteDefault);
     expect(sezione.textContent).toContain(s3.accessNoInvitees);
     // Solo su invito l'elenco degli invitati sta dentro la scelta, aperto:
@@ -1670,6 +1870,56 @@ describe('creazione — i default del modello', () => {
     root = createRoot(container);
     renderWizard({ template: modello });
     expect(byId<HTMLInputElement>('ev-title').value).toBe('');
+  });
+});
+
+describe('i rifiuti del server, nella lingua di chi usa il wizard', () => {
+  const INGLESE = 'The consents of this event cover a reserved recording';
+  const compila = () => {
+    type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
+    type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
+    organizzatore();
+    goToStep('review');
+  };
+
+  it('il rifiuto della destinazione al salvataggio', async () => {
+    fetchMock.mockImplementation(async (input: RequestInfo | URL, init: RequestInit = {}) => {
+      if (init.method === 'PUT') {
+        return json(409, { error: INGLESE, code: 'RECORDING_DESTINATION_NOT_COVERED' });
+      }
+      return json(200, { items: [] });
+    });
+    renderWizard({ mode: 'edit', initialEvent: structuredClone(ATTIVA) });
+    await press(button(w.updateEvent));
+    expect(alertText()).toBe(messages.apiErrors.recordingDestinationNotCovered);
+  });
+
+  it('lo stesso alla creazione', async () => {
+    fetchMock.mockImplementation(async (input: RequestInfo | URL, init: RequestInit = {}) => {
+      if (String(input) === '/api/events' && init.method === 'POST') {
+        return json(409, { error: INGLESE, code: 'RECORDING_DESTINATION_NOT_COVERED' });
+      }
+      return json(200, { items: [] });
+    });
+    renderWizard();
+    compila();
+    await press(button(w.publish));
+    expect(alertText()).toBe(messages.apiErrors.recordingDestinationNotCovered);
+  });
+
+  it('un rifiuto senza codice segue lo stato, o resta quello del server', async () => {
+    fetchMock.mockImplementation(async (_input: RequestInfo | URL, init: RequestInit = {}) =>
+      init.method === 'PUT' ? json(403, { error: 'Only the event staff' }) : json(200, { items: [] }),
+    );
+    renderWizard({ mode: 'edit', initialEvent: structuredClone(ATTIVA) });
+    await press(button(w.updateEvent));
+    expect(alertText()).toBe(messages.apiErrors.forbidden);
+
+    fetchMock.mockImplementation(async (_input: RequestInfo | URL, init: RequestInit = {}) =>
+      init.method === 'PUT' ? json(409, { error: 'Conflict detail' }) : json(200, { items: [] }),
+    );
+    await press(button(w.updateEvent));
+    expect(alertText()).toBe('Conflict detail');
   });
 });
 
@@ -2363,6 +2613,7 @@ const ATTIVA: InitialEventShape = {
   slug: 'evento-programma',
   moderatorToken: 'token-primario',
   event: {
+    recordingAudience: 'PUBLIC',
     title: { it: 'Evento con programma' },
     description: { it: 'Una descrizione valida per il wizard.' },
     startsAt: '2030-01-10T09:00:00.000Z',
@@ -2621,6 +2872,1557 @@ describe('file in viaggio verso il server', () => {
     expect(container.querySelector('[data-testid="rev-privacy-doc"]')).toBeNull();
   });
 });
+
+/**
+ * I valori che il formato o il modello scelgono per l'evento: arrivano al modulo
+ * e al salvataggio, si cambiano nel wizard, e la destinazione non blocca e non
+ * si perde.
+ */
+describe('i valori del formato', () => {
+  const s2 = w.step2;
+  const CREATO = { id: 'evt-tpl', slug: 'evento-modello', moderatorToken: 'token' };
+  const modello: NonNullable<WizardProps['template']> = {
+    id: 'tpl-formato',
+    name: 'Formato',
+    qaEnabled: true,
+    chatEnabled: true,
+    recordingEnabled: true,
+    autoStartRecording: false,
+    participantsCanUnmute: false,
+    participantsCanStartVideo: false,
+    participantsCanShareScreen: false,
+    maxParticipants: 300,
+    recordingDestination: 'PUBLIC',
+    offerAddressBook: false,
+    audienceAnonymous: true,
+    hostsAlwaysRecorded: true,
+    postEventShowQA: false,
+  };
+  /** Un evento salvato: registra, e si puo' modificare da un passo intermedio. */
+  const salvato = (
+    evento: Partial<InitialEventShape['event']> = {},
+    resto: Partial<InitialEventShape> = {},
+  ): InitialEventShape => ({
+    ...structuredClone(ATTIVA),
+    ...resto,
+    event: { ...structuredClone(ATTIVA).event, recordingEnabled: true, ...evento },
+  });
+  /** Un evento con le domande accese: il riepilogo dice dove finiscono. */
+  const conDomande = {
+    postEventShowQA: true,
+    permissionMatrix: matrixFromToggles({
+      qaEnabled: true,
+      chatEnabled: true,
+      participantsCanUnmute: false,
+      participantsCanStartVideo: false,
+      participantsCanShareScreen: false,
+    }),
+  };
+  const interruttore = (nome: string) =>
+    container.querySelector<HTMLInputElement>(`input[aria-label="${nome}"]`);
+  const destinazione = (valore: 'PUBLIC' | 'REGISTRANTS') =>
+    container.querySelector<HTMLInputElement>(`#wiz-destinazione-${valore}`);
+
+  beforeEach(() => {
+    fetchMock.mockImplementation(async (input: RequestInfo | URL, init: RequestInit = {}) => {
+      if (String(input) === '/api/events' && init.method === 'POST') return json(201, CREATO);
+      return json(200, { items: [] });
+    });
+  });
+
+  function corpo(metodo: 'POST' | 'PUT'): Record<string, unknown> {
+    const chiamata = (fetchMock.mock.calls as Array<[string, RequestInit]>).find(
+      ([url, init]) =>
+        init?.method === metodo && (url === '/api/events' || url === '/api/events/evt-prog'),
+    );
+    if (!chiamata) throw new Error(`nessun ${metodo} dell'evento`);
+    return JSON.parse(String(chiamata[1].body)) as Record<string, unknown>;
+  }
+
+  function compila() {
+    type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
+    type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
+    organizzatore();
+  }
+
+  it('i valori del modello arrivano al POST', async () => {
+    renderWizard({ template: modello });
+    compila();
+    goToStep('review');
+    await press(button(w.publish));
+    expect(corpo('POST')).toMatchObject({
+      recordingDestination: 'PUBLIC',
+      offerAddressBook: false,
+      audienceAnonymous: true,
+      hostsAlwaysRecorded: true,
+      postEventShowQA: false,
+    });
+  });
+
+  describe('un evento su invito e la destinazione', () => {
+    const s2 = w.step2;
+    const scegliAccesso = (testo: string) => {
+      goToStep('invites');
+      const voce = Array.from(
+        container.querySelectorAll<HTMLLabelElement>('.wizard-iscrizione label'),
+      ).find((l) => l.querySelector('.formato-scelta__titolo')?.textContent === testo);
+      click(voce!);
+    };
+    const sezione = () => container.querySelector('.wizard-iscrizione')?.textContent ?? '';
+
+    it('diventando su invito un video pubblico non scelto torna riservato, e lo dice', async () => {
+      renderWizard({ template: modello });
+      compila();
+      scegliAccesso(messages.admin.guided.access.invitation);
+      expect(sezione()).toContain(s2.recordingDestinationReservedOnInvitation);
+      goToStep('review');
+      expect(container.textContent).toContain(w.flow.recordingDestinationReserved);
+      await press(button(w.publish));
+      expect(corpo('POST')).toMatchObject({
+        accessMode: 'INVITATION',
+        recordingDestination: 'REGISTRANTS',
+      });
+    });
+
+    it('tornando aperto non si allarga da solo', () => {
+      renderWizard({ template: modello });
+      scegliAccesso(messages.admin.guided.access.invitation);
+      scegliAccesso(messages.admin.guided.access.open);
+      expect(sezione()).not.toContain(s2.recordingDestinationReservedOnInvitation);
+      goToStep('recording');
+      expect(destinazione('REGISTRANTS')?.checked).toBe(true);
+    });
+
+    it('la destinazione scelta a mano resta, e il wizard lo dice', async () => {
+      renderWizard({ template: modello });
+      compila();
+      goToStep('recording');
+      click(destinazione('REGISTRANTS')!);
+      click(destinazione('PUBLIC')!);
+      scegliAccesso(messages.admin.guided.access.invitation);
+      expect(sezione()).toContain(s2.recordingDestinationPublicOnInvitation);
+      goToStep('recording');
+      expect(container.textContent).toContain(s2.recordingDestinationPublicOnInvitation);
+      goToStep('review');
+      expect(container.textContent).toContain(s2.recordingDestinationPublicOnInvitation);
+      await press(button(w.publish));
+      expect(corpo('POST')).toMatchObject({
+        accessMode: 'INVITATION',
+        recordingDestination: 'PUBLIC',
+      });
+    });
+
+    it('dopo una scelta a mano la nota della proposta non torna', () => {
+      renderWizard({ template: modello });
+      scegliAccesso(messages.admin.guided.access.invitation);
+      goToStep('recording');
+      click(destinazione('PUBLIC')!);
+      click(destinazione('REGISTRANTS')!);
+      goToStep('invites');
+      expect(sezione()).not.toContain(s2.recordingDestinationReservedOnInvitation);
+      expect(sezione()).not.toContain(s2.recordingDestinationPublicOnInvitation);
+    });
+
+    it('su un sito con iscrizione chiusa il modello parte riservato', () => {
+      renderWizard({ template: modello, publicRegistrationEnabled: false });
+      goToStep('recording');
+      expect(destinazione('REGISTRANTS')?.checked).toBe(true);
+      expect(destinazione('PUBLIC')?.disabled).toBe(false);
+      expect(container.textContent).toContain(s2.recordingDestinationReservedOnInvitation);
+      goToStep('invites');
+      expect(sezione()).toContain(s2.recordingDestinationReservedOnInvitation);
+      goToStep('review');
+      expect(container.textContent).toContain(s2.recordingDestinationReservedOnInvitation);
+    });
+
+    it('un modello su invito che propone il video pubblico parte riservato, e lo dice', () => {
+      renderWizard({ template: { ...modello, accessMode: 'INVITATION' } });
+      goToStep('invites');
+      expect(sezione()).toContain(s2.recordingDestinationReservedOnInvitation);
+      goToStep('recording');
+      expect(destinazione('REGISTRANTS')?.checked).toBe(true);
+    });
+
+    it('un modello che propone il video riservato non ha nulla da dire', () => {
+      renderWizard({
+        template: { ...modello, recordingDestination: 'REGISTRANTS' },
+        publicRegistrationEnabled: false,
+      });
+      goToStep('invites');
+      expect(sezione()).not.toContain(s2.recordingDestinationReservedOnInvitation);
+      expect(sezione()).not.toContain(s2.recordingDestinationPublicOnInvitation);
+    });
+
+    it('una risposta data a mano nelle domande resta anche su invito', () => {
+      renderWizard({
+        template: { ...modello, accessMode: 'INVITATION' },
+        destinazioneScelta: true,
+      });
+      goToStep('recording');
+      expect(destinazione('PUBLIC')?.checked).toBe(true);
+      expect(container.textContent).toContain(s2.recordingDestinationPublicOnInvitation);
+    });
+
+    it('su un evento salvato la destinazione dichiarata non cambia da sola', async () => {
+      renderWizard({
+        mode: 'edit',
+        initialEvent: salvato({ recordingDestination: 'PUBLIC', accessMode: 'OPEN' }),
+        publicRegistrationEnabled: true,
+      });
+      scegliAccesso(messages.admin.guided.access.invitation);
+      expect(sezione()).toContain(s2.recordingDestinationPublicOnInvitation);
+      await press(button(w.updateEvent));
+      expect(corpo('PUT')).toMatchObject({ accessMode: 'INVITATION' });
+      expect(corpo('PUT')).not.toHaveProperty('recordingDestination');
+    });
+
+    describe('la pagina dopo l evento segue l accesso e il video', () => {
+      const pagina = messages.postEvent.pageVisible;
+      const toccaPagina = () => {
+        goToStep(w.flow.steps.advanced);
+        apriSezione('data');
+        const voce = Array.from(container.querySelectorAll('label')).find(
+          (l) => l.textContent === pagina,
+        );
+        click(voce!);
+      };
+
+      it('un formato pubblico passato a invito chiude la pagina, e lo dice', async () => {
+        renderWizard({ template: { ...modello, postEventPublic: true } });
+        compila();
+        scegliAccesso(messages.admin.guided.access.invitation);
+        expect(sezione()).toContain(s2.postEventPagePrivateOnInvitation);
+        goToStep('review');
+        expect(container.textContent).toContain(s2.postEventPagePrivateOnInvitation);
+        await press(button(w.publish));
+        expect(corpo('POST')).toMatchObject({
+          accessMode: 'INVITATION',
+          recordingDestination: 'REGISTRANTS',
+          postEventPublic: false,
+        });
+      });
+
+      it('lo stesso partendo da riservata, dove la destinazione non cambia', async () => {
+        renderWizard({
+          template: { ...modello, recordingDestination: 'REGISTRANTS', postEventPublic: true },
+        });
+        compila();
+        scegliAccesso(messages.admin.guided.access.invitation);
+        expect(sezione()).toContain(s2.postEventPagePrivateOnInvitation);
+        goToStep('review');
+        await press(button(w.publish));
+        expect(corpo('POST')).toMatchObject({ accessMode: 'INVITATION', postEventPublic: false });
+      });
+
+      it('lo stesso senza registrazione', async () => {
+        renderWizard({
+          template: {
+            ...modello,
+            recordingEnabled: false,
+            recordingDestination: null,
+            postEventPublic: true,
+          },
+        });
+        compila();
+        scegliAccesso(messages.admin.guided.access.invitation);
+        goToStep('review');
+        await press(button(w.publish));
+        expect(corpo('POST')).toMatchObject({ postEventPublic: false });
+      });
+
+      it('tornando aperto non si riapre da sola, e il wizard non parla piu di invito', async () => {
+        renderWizard({ template: { ...modello, postEventPublic: true } });
+        compila();
+        scegliAccesso(messages.admin.guided.access.invitation);
+        scegliAccesso(messages.admin.guided.access.open);
+        expect(sezione()).not.toContain(s2.postEventPagePrivateOnInvitation);
+        expect(sezione()).toContain(s2.postEventPageStaysPrivate);
+        goToStep('review');
+        expect(container.textContent).not.toContain(s2.postEventPagePrivateOnInvitation);
+        expect(container.textContent).toContain(s2.postEventPageStaysPrivate);
+        await press(button(w.publish));
+        expect(corpo('POST')).toMatchObject({ postEventPublic: false });
+      });
+
+      it('un modello pubblico su sito chiuso portato ad accesso aperto dice lo stesso', () => {
+        renderWizard({
+          template: { ...modello, postEventPublic: true },
+          publicRegistrationEnabled: false,
+        });
+        compila();
+        scegliAccesso(messages.admin.guided.access.open);
+        expect(sezione()).not.toContain(s2.postEventPagePrivateOnInvitation);
+        expect(sezione()).toContain(s2.postEventPageStaysPrivate);
+      });
+
+      it('una pagina che non si e mossa non ha note', () => {
+        renderWizard({
+          template: { ...modello, recordingDestination: 'REGISTRANTS', postEventPublic: false },
+        });
+        goToStep('invites');
+        expect(sezione()).not.toContain(s2.postEventPageStaysPrivate);
+        expect(sezione()).not.toContain(s2.postEventPagePrivateOnInvitation);
+      });
+
+      it('con il video pubblico per scelta la pagina resta', async () => {
+        renderWizard({ template: { ...modello, postEventPublic: true } });
+        compila();
+        goToStep('recording');
+        click(destinazione('REGISTRANTS')!);
+        click(destinazione('PUBLIC')!);
+        scegliAccesso(messages.admin.guided.access.invitation);
+        expect(sezione()).not.toContain(s2.postEventPagePrivateOnInvitation);
+        goToStep('review');
+        await press(button(w.publish));
+        expect(corpo('POST')).toMatchObject({
+          accessMode: 'INVITATION',
+          recordingDestination: 'PUBLIC',
+          postEventPublic: true,
+        });
+      });
+
+      it('l interruttore toccato vince sul passaggio a invito', async () => {
+        renderWizard({ template: { ...modello, postEventPublic: true } });
+        compila();
+        toccaPagina();
+        toccaPagina();
+        scegliAccesso(messages.admin.guided.access.invitation);
+        expect(sezione()).not.toContain(s2.postEventPagePrivateOnInvitation);
+        goToStep('review');
+        await press(button(w.publish));
+        expect(corpo('POST')).toMatchObject({ accessMode: 'INVITATION', postEventPublic: true });
+      });
+
+      it('un modello pubblico su sito chiuso non tiene la pagina aperta', async () => {
+        renderWizard({
+          template: { ...modello, postEventPublic: true },
+          publicRegistrationEnabled: false,
+        });
+        compila();
+        goToStep('invites');
+        expect(sezione()).toContain(s2.postEventPagePrivateOnInvitation);
+        goToStep('review');
+        await press(button(w.publish));
+        expect(corpo('POST')).toMatchObject({
+          recordingDestination: 'REGISTRANTS',
+          postEventPublic: false,
+        });
+      });
+
+      it('su sito chiuso il valore del modello vale se il video resta pubblico per scelta', async () => {
+        renderWizard({
+          template: { ...modello, postEventPublic: true },
+          publicRegistrationEnabled: false,
+          destinazioneScelta: true,
+        });
+        compila();
+        goToStep('review');
+        await press(button(w.publish));
+        expect(corpo('POST')).toMatchObject({
+          recordingDestination: 'PUBLIC',
+          postEventPublic: true,
+        });
+      });
+
+      it('un video che diventa pubblico apre la pagina, e lo dice', async () => {
+        renderWizard({
+          template: { ...modello, recordingDestination: 'REGISTRANTS', postEventPublic: false },
+        });
+        compila();
+        goToStep('recording');
+        click(destinazione('PUBLIC')!);
+        expect(container.textContent).toContain(s2.postEventPagePublicWithVideo);
+        goToStep('review');
+        await press(button(w.publish));
+        expect(corpo('POST')).toMatchObject({
+          recordingDestination: 'PUBLIC',
+          postEventPublic: true,
+        });
+      });
+
+      it('un video reso pubblico e tornato riservato lascia la pagina com era', async () => {
+        renderWizard({
+          template: { ...modello, recordingDestination: 'REGISTRANTS', postEventPublic: false },
+        });
+        compila();
+        goToStep('recording');
+        click(destinazione('PUBLIC')!);
+        expect(container.textContent).toContain(s2.postEventPagePublicWithVideo);
+        click(destinazione('REGISTRANTS')!);
+        expect(container.textContent).not.toContain(s2.postEventPagePublicWithVideo);
+        goToStep('review');
+        expect(container.textContent).not.toContain(s2.postEventPagePublicWithVideo);
+        await press(button(w.publish));
+        expect(corpo('POST')).toMatchObject({
+          recordingDestination: 'REGISTRANTS',
+          postEventPublic: false,
+        });
+      });
+
+      it('spegnere e riaccendere la registrazione non apre una pagina privata', async () => {
+        renderWizard({ template: { ...modello, postEventPublic: false } });
+        compila();
+        goToStep('recording');
+        click(interruttore(messages.admin.form.recordingEnabled)!);
+        click(interruttore(messages.admin.form.recordingEnabled)!);
+        expect(container.textContent).toContain(s2.postEventPagePrivateVideoHidden);
+        goToStep('review');
+        await press(button(w.publish));
+        expect(corpo('POST')).toMatchObject({
+          recordingEnabled: true,
+          recordingDestination: 'PUBLIC',
+          postEventPublic: false,
+        });
+      });
+
+      it('la pagina tenuta privata a mano resta tale, e il wizard avvisa', async () => {
+        renderWizard({
+          template: { ...modello, recordingDestination: 'REGISTRANTS', postEventPublic: true },
+        });
+        compila();
+        toccaPagina();
+        goToStep('recording');
+        click(destinazione('PUBLIC')!);
+        expect(container.textContent).toContain(s2.postEventPagePrivateVideoHidden);
+        goToStep('review');
+        expect(container.textContent).toContain(s2.postEventPagePrivateVideoHidden);
+        await press(button(w.publish));
+        expect(corpo('POST')).toMatchObject({
+          recordingDestination: 'PUBLIC',
+          postEventPublic: false,
+        });
+      });
+
+      it('a pagina privata la nota non promette il video a chiunque', () => {
+        renderWizard({ template: { ...modello, postEventPublic: true } });
+        goToStep('recording');
+        click(destinazione('REGISTRANTS')!);
+        click(destinazione('PUBLIC')!);
+        toccaPagina();
+        scegliAccesso(messages.admin.guided.access.invitation);
+        expect(sezione()).toContain(s2.postEventPagePrivateVideoHidden);
+        expect(sezione()).not.toContain(s2.recordingDestinationPublicOnInvitation);
+      });
+
+      it('su un evento salvato segue lo stesso passaggio, e il PUT lo porta', async () => {
+        renderWizard({
+          mode: 'edit',
+          initialEvent: salvato({
+            recordingDestination: 'REGISTRANTS',
+            accessMode: 'OPEN',
+            postEventPublic: true,
+          }),
+          publicRegistrationEnabled: true,
+        });
+        scegliAccesso(messages.admin.guided.access.invitation);
+        await press(button(w.updateEvent));
+        expect(corpo('PUT')).toMatchObject({ accessMode: 'INVITATION', postEventPublic: false });
+      });
+
+      it('una destinazione pubblica salvata conta come scelta: la pagina resta', async () => {
+        renderWizard({
+          mode: 'edit',
+          initialEvent: salvato({
+            recordingDestination: 'PUBLIC',
+            accessMode: 'OPEN',
+            postEventPublic: true,
+          }),
+          publicRegistrationEnabled: true,
+        });
+        scegliAccesso(messages.admin.guided.access.invitation);
+        await press(button(w.updateEvent));
+        expect(corpo('PUT')).not.toHaveProperty('postEventPublic');
+      });
+
+      it('una proposta ripresa da una bozza segue ancora il passaggio', async () => {
+        localStorage.setItem(
+          `pa-wizard-draft:new:${modello.id}`,
+          JSON.stringify({ destinazioneScelta: false, paginaScelta: false, postEventPublic: true }),
+        );
+        renderWizard({ template: { ...modello, postEventPublic: true } });
+        click(button(w.draftRestore));
+        compila();
+        scegliAccesso(messages.admin.guided.access.invitation);
+        goToStep('review');
+        await press(button(w.publish));
+        expect(corpo('POST')).toMatchObject({ postEventPublic: false });
+      });
+
+      it('un interruttore toccato nella bozza resta toccato', async () => {
+        localStorage.setItem(
+          `pa-wizard-draft:new:${modello.id}`,
+          JSON.stringify({ destinazioneScelta: false, paginaScelta: true, postEventPublic: true }),
+        );
+        renderWizard({ template: { ...modello, postEventPublic: true } });
+        click(button(w.draftRestore));
+        compila();
+        scegliAccesso(messages.admin.guided.access.invitation);
+        goToStep('review');
+        await press(button(w.publish));
+        expect(corpo('POST')).toMatchObject({ postEventPublic: true });
+      });
+
+      it('una bozza di prima conta l interruttore come toccato solo se si allontana dal modello', async () => {
+        localStorage.setItem(
+          `pa-wizard-draft:new:${modello.id}`,
+          JSON.stringify({ postEventPublic: false }),
+        );
+        renderWizard({ template: { ...modello, postEventPublic: true } });
+        click(button(w.draftRestore));
+        compila();
+        goToStep('recording');
+        click(destinazione('REGISTRANTS')!);
+        click(destinazione('PUBLIC')!);
+        expect(container.textContent).toContain(s2.postEventPagePrivateVideoHidden);
+      });
+
+      it('con un link di conduzione la pagina non si muove', async () => {
+        renderWizard({
+          mode: 'edit',
+          viaToken: 'tok',
+          initialEvent: salvato({
+            recordingEnabled: false,
+            recordingDestination: 'PUBLIC',
+            postEventPublic: false,
+          }),
+        });
+        goToStep('recording');
+        click(interruttore(messages.admin.form.recordingEnabled)!);
+        await press(button(w.updateEvent));
+        expect(corpo('PUT')).not.toHaveProperty('postEventPublic');
+      });
+    });
+
+    describe('una proposta non diventa una scelta', () => {
+      const bozza = (dati: Record<string, unknown>) =>
+        localStorage.setItem(`pa-wizard-draft:new:${modello.id}`, JSON.stringify(dati));
+
+      it('la bozza ricorda che la destinazione era solo proposta', async () => {
+        bozza({ recordingDestination: 'PUBLIC', destinazioneScelta: false });
+        renderWizard({ template: modello });
+        click(button(w.draftRestore));
+        compila();
+        scegliAccesso(messages.admin.guided.access.invitation);
+        expect(sezione()).toContain(s2.recordingDestinationReservedOnInvitation);
+        goToStep('review');
+        await press(button(w.publish));
+        expect(corpo('POST')).toMatchObject({ recordingDestination: 'REGISTRANTS' });
+      });
+
+      it('la bozza ricorda anche una destinazione scelta', async () => {
+        bozza({ recordingDestination: 'PUBLIC', destinazioneScelta: true });
+        renderWizard({ template: modello });
+        click(button(w.draftRestore));
+        compila();
+        scegliAccesso(messages.admin.guided.access.invitation);
+        goToStep('review');
+        await press(button(w.publish));
+        expect(corpo('POST')).toMatchObject({ recordingDestination: 'PUBLIC' });
+      });
+
+      it('il modulo salva nella bozza se la destinazione e stata toccata', () => {
+        vi.useFakeTimers();
+        try {
+          renderWizard({ template: modello });
+          goToStep('recording');
+          click(destinazione('REGISTRANTS')!);
+          act(() => {
+            vi.advanceTimersByTime(900);
+          });
+          const salvata = JSON.parse(
+            localStorage.getItem(`pa-wizard-draft:new:${modello.id}`) ?? '{}',
+          ) as Record<string, unknown>;
+          expect(salvata).toMatchObject({ destinazioneScelta: true, paginaScelta: false });
+        } finally {
+          vi.useRealTimers();
+        }
+      });
+
+      it('una bozza di prima con la destinazione del modello conta come proposta', async () => {
+        bozza({ recordingDestination: 'PUBLIC' });
+        renderWizard({ template: modello });
+        click(button(w.draftRestore));
+        compila();
+        scegliAccesso(messages.admin.guided.access.invitation);
+        goToStep('review');
+        await press(button(w.publish));
+        expect(corpo('POST')).toMatchObject({ recordingDestination: 'REGISTRANTS' });
+      });
+
+      it('una bozza di prima con un altra destinazione conta come scelta', () => {
+        bozza({ recordingDestination: 'REGISTRANTS' });
+        renderWizard({ template: modello });
+        click(button(w.draftRestore));
+        scegliAccesso(messages.admin.guided.access.invitation);
+        expect(sezione()).not.toContain(s2.recordingDestinationReservedOnInvitation);
+      });
+
+      it('su sito chiuso la nota sulla proposta resta dopo la ripresa', () => {
+        bozza({ recordingDestination: 'REGISTRANTS', destinazioneScelta: false });
+        renderWizard({ template: modello, publicRegistrationEnabled: false });
+        click(button(w.draftRestore));
+        goToStep('invites');
+        expect(sezione()).toContain(s2.recordingDestinationReservedOnInvitation);
+      });
+
+      it('«Ricomincia» torna a un modulo mai toccato', async () => {
+        localStorage.setItem(
+          'pa-wizard-draft:trasloco',
+          JSON.stringify({ at: Date.now(), dati: { title: { it: 'Portato' } } }),
+        );
+        renderWizard({ template: { ...modello, postEventPublic: true } });
+        goToStep('recording');
+        click(destinazione('REGISTRANTS')!);
+        click(destinazione('PUBLIC')!);
+        click(button(w.flow.startOver));
+        goToStep('base');
+        compila();
+        scegliAccesso(messages.admin.guided.access.invitation);
+        expect(sezione()).toContain(s2.recordingDestinationReservedOnInvitation);
+        goToStep('review');
+        await press(button(w.publish));
+        expect(corpo('POST')).toMatchObject({
+          recordingDestination: 'REGISTRANTS',
+          postEventPublic: false,
+        });
+      });
+
+      it('«Ricomincia» rimette l elenco dei partecipanti a seguire il modulo', async () => {
+        localStorage.setItem(
+          'pa-wizard-draft:trasloco',
+          JSON.stringify({ at: Date.now(), dati: { participantListVisible: false } }),
+        );
+        renderWizard({
+          template: { ...modello, participantsCanUnmute: true, maxParticipants: 100 },
+        });
+        click(button(w.flow.startOver));
+        compila();
+        goToStep(w.flow.steps.advanced);
+        apriSezione('technical');
+        type(byId<HTMLInputElement>('ev-max'), '500');
+        goToStep('review');
+        await press(button(w.publish));
+        expect(corpo('POST')).toMatchObject({ maxParticipants: 500, participantListVisible: false });
+      });
+
+      it('«Ricomincia» non toglie una risposta data nelle domande', () => {
+        localStorage.setItem(
+          'pa-wizard-draft:trasloco',
+          JSON.stringify({ at: Date.now(), dati: { title: { it: 'Portato' } } }),
+        );
+        renderWizard({ template: modello, destinazioneScelta: true });
+        click(button(w.flow.startOver));
+        scegliAccesso(messages.admin.guided.access.invitation);
+        goToStep('recording');
+        expect(destinazione('PUBLIC')?.checked).toBe(true);
+      });
+    });
+  });
+
+  describe('dove la registrazione non produrrebbe nulla', () => {
+    const s2 = w.step2;
+    const senzaVideo = { partecipantiNelVideo: 'assente', aiPipelineEnabled: false } as const;
+
+    it('senza video e senza AI il modello non accende la registrazione', async () => {
+      renderWizard({ template: modello, ...senzaVideo });
+      compila();
+      goToStep('review');
+      expect(container.textContent).toContain(w.step5.summary.recordingOff);
+      expect(container.textContent).not.toContain(w.flow.recordingManual);
+      await press(button(w.publish));
+      expect(corpo('POST')).toMatchObject({ recordingEnabled: false });
+    });
+
+    it('senza video ma con l AI le tracce restano e la registrazione si propone', () => {
+      renderWizard({
+        template: { ...modello, aiTranscriptEnabled: true, multitrackRecordingEnabled: true },
+        partecipantiNelVideo: 'assente',
+      });
+      goToStep('review');
+      expect(container.textContent).toContain(w.flow.recordingManual);
+      expect(container.textContent).not.toContain(s2.recordingNothingToCapture);
+    });
+
+    it('spegnendo le tracce il wizard smette di prometterla', () => {
+      renderWizard({
+        template: { ...modello, aiTranscriptEnabled: false, multitrackRecordingEnabled: false },
+        partecipantiNelVideo: 'assente',
+      });
+      goToStep('recording');
+      expect(container.textContent).toContain(s2.recordingNothingToCapture);
+      expect(container.textContent).not.toContain(s2.recordingManualNote);
+      goToStep('review');
+      expect(container.textContent).toContain(w.step5.summary.recordingOff);
+      expect(container.textContent).not.toContain(w.flow.recordingManual);
+    });
+
+    it('con la trascrizione accesa e le tracce spente non promette il dopo', () => {
+      renderWizard({
+        template: {
+          ...modello,
+          aiTranscriptEnabled: true,
+          aiTranslationEnabled: true,
+          multitrackRecordingEnabled: false,
+          aiTargetLocales: 'en',
+        },
+        partecipantiNelVideo: 'assente',
+      });
+      goToStep('review');
+      expect(container.textContent).toContain(s2.recordingNothingToCapture);
+      expect(container.textContent).not.toContain(w.flow.aiAfter.split('{list}')[0]);
+      expect(container.textContent).not.toContain(w.flow.translationLine.split('{list}')[0]);
+    });
+
+    it('con le tracce accese il dopo resta', () => {
+      renderWizard({
+        template: {
+          ...modello,
+          aiTranscriptEnabled: true,
+          aiTranslationEnabled: true,
+          multitrackRecordingEnabled: true,
+          aiTargetLocales: 'en',
+        },
+        partecipantiNelVideo: 'assente',
+      });
+      goToStep('review');
+      expect(container.textContent).toContain(w.flow.aiAfter.split('{list}')[0]);
+      expect(container.textContent).toContain(w.flow.translationLine.split('{list}')[0]);
+    });
+
+    it('con il video non cambia nulla, anche senza AI', () => {
+      renderWizard({ template: modello, aiPipelineEnabled: false });
+      goToStep('review');
+      expect(container.textContent).toContain(w.flow.recordingManual);
+    });
+
+    it('un evento salvato che registra resta com e', () => {
+      renderWizard({
+        mode: 'edit',
+        initialEvent: salvato({
+          recordingEnabled: true,
+          aiTranscriptEnabled: true,
+          multitrackRecordingEnabled: true,
+        }),
+        ...senzaVideo,
+      });
+      goToStep('recording');
+      expect(interruttore(messages.admin.form.recordingEnabled)?.checked).toBe(true);
+      expect(container.textContent).not.toContain(s2.recordingNothingToCapture);
+    });
+
+    it('su un evento salvato che non registra non si propone', () => {
+      renderWizard({
+        mode: 'edit',
+        initialEvent: salvato({ recordingEnabled: false, recordingDestination: null }),
+        ...senzaVideo,
+      });
+      goToStep('recording');
+      expect(interruttore(messages.admin.form.recordingEnabled)).toBeNull();
+      expect(container.textContent).toContain(messages.admin.recording.notConfigured);
+    });
+  });
+
+  it('si vedono nel riepilogo', () => {
+    renderWizard({ template: modello });
+    goToStep('review');
+    const testo = container.textContent ?? '';
+    expect(testo).toContain(w.flow.recordingDestinationPublic);
+    expect(testo).toContain(w.flow.audiencePseudonyms);
+    expect(testo).toContain(w.flow.postEventQaHidden);
+    expect(testo).toContain(w.flow.addressBookNotOffered);
+    expect(testo).not.toContain(w.flow.askAddressBook);
+  });
+
+  it('un modello muto che registra parte riservato, e con i valori delle colonne', async () => {
+    renderWizard({
+      template: {
+        ...modello,
+        recordingDestination: null,
+        offerAddressBook: undefined,
+        audienceAnonymous: undefined,
+        hostsAlwaysRecorded: undefined,
+        postEventShowQA: undefined,
+      },
+    });
+    compila();
+    goToStep('review');
+    await press(button(w.publish));
+    expect(corpo('POST')).toMatchObject({
+      recordingDestination: 'REGISTRANTS',
+      offerAddressBook: true,
+      audienceAnonymous: false,
+      hostsAlwaysRecorded: false,
+      postEventShowQA: true,
+    });
+  });
+
+  it('un modello che non registra non accende chi conduce, e non inventa una destinazione', async () => {
+    renderWizard({
+      template: { ...modello, recordingEnabled: false, recordingDestination: null },
+    });
+    compila();
+    goToStep('review');
+    await press(button(w.publish));
+    const inviato = corpo('POST');
+    expect(inviato).not.toHaveProperty('recordingDestination');
+    expect(inviato).toMatchObject({ recordingEnabled: false, hostsAlwaysRecorded: false });
+  });
+
+  it('accendendo la registrazione in creazione la destinazione parte riservata', async () => {
+    renderWizard({
+      template: { ...modello, recordingEnabled: false, recordingDestination: null },
+    });
+    compila();
+    goToStep('recording');
+    click(interruttore(messages.admin.form.recordingEnabled)!);
+    expect(destinazione('REGISTRANTS')).toBeChecked();
+    click(destinazione('PUBLIC')!);
+    goToStep('review');
+    await press(button(w.publish));
+    expect(corpo('POST')).toMatchObject({ recordingEnabled: true, recordingDestination: 'PUBLIC' });
+  });
+
+  it('«Cambia formato» non porta con se i valori del formato: li ricalcola il formato nuovo', () => {
+    renderWizard({ template: modello, onChangeTemplate: vi.fn() });
+    type(byId<HTMLInputElement>('ev-title'), 'Evento portato');
+    goToStep('recording');
+    click(destinazione('REGISTRANTS')!);
+    goToStep('base');
+    click(button(w.flow.changeTemplate));
+    const portati = JSON.parse(localStorage.getItem('pa-wizard-draft:trasloco')!) as {
+      dati: Record<string, unknown>;
+    };
+    expect(Object.keys(portati.dati)).toEqual(['title']);
+  });
+
+  it('una bozza di prima di questi campi non li cambia', () => {
+    localStorage.setItem(
+      `pa-wizard-draft:new:${modello.id}`,
+      JSON.stringify({ title: { it: 'Di prima' }, recordingEnabled: true }),
+    );
+    renderWizard({ template: modello });
+    click(button(w.draftRestore));
+    goToStep('recording');
+    expect(destinazione('PUBLIC')).toBeChecked();
+  });
+
+  it('un evento mai aperto e senza iscrizioni non si salva senza destinazione, copie comprese', async () => {
+    renderWizard({
+      mode: 'edit',
+      copia: true,
+      initialEvent: salvato({ recordingDestination: null }, { destinazioneDaChiedere: true }),
+      initialStep: 'base',
+    });
+    await press(button(w.saveCopy));
+    expect(chiamateAlServer()).toHaveLength(0);
+    expect(alertText()).toBe(w.validationFailed);
+    // Porta alla sezione, e il fuoco alla scelta.
+    expect(byId<HTMLDetailsElement>('wiz-avanzate-recording').open).toBe(true);
+    expect(container.textContent).toContain(s2.recordingDestinationRequired);
+    expect(document.activeElement).toBe(destinazione('REGISTRANTS'));
+    expect(container.textContent).not.toContain(s2.recordingDestinationNotSet);
+
+    click(destinazione('PUBLIC')!);
+    expect(container.textContent).not.toContain(s2.recordingDestinationRequired);
+    await press(button(w.saveCopy));
+    expect(corpo('PUT').recordingDestination).toBe('PUBLIC');
+  });
+
+  it('lo stesso evento senza registrazione si salva senza', async () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato(
+        { recordingDestination: null, recordingEnabled: false },
+        { destinazioneDaChiedere: true },
+      ),
+      initialStep: 'base',
+    });
+    await press(button(w.updateEvent));
+    expect(corpo('PUT')).not.toHaveProperty('recordingDestination');
+  });
+
+  it('riaccendendo la registrazione su un evento salvato la scelta resta da fare', async () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato(
+        { recordingDestination: null, recordingEnabled: false },
+        { destinazioneDaChiedere: true },
+      ),
+      initialStep: 'advanced',
+      initialSection: 'recording',
+    });
+    click(interruttore(messages.admin.form.recordingEnabled)!);
+    expect(destinazione('REGISTRANTS')).not.toBeChecked();
+    await press(button(w.updateEvent));
+    expect(chiamateAlServer()).toHaveLength(0);
+    expect(container.textContent).toContain(s2.recordingDestinationRequired);
+  });
+
+  it('accendere la registrazione con gente iscritta chiede la destinazione', async () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato({ recordingDestination: null, recordingEnabled: false }),
+      initialStep: 'advanced',
+      initialSection: 'recording',
+    });
+    click(interruttore(messages.admin.form.recordingEnabled)!);
+    expect(container.textContent).not.toContain(s2.recordingDestinationNotSet);
+    await press(button(w.updateEvent));
+    expect(chiamateAlServer()).toHaveLength(0);
+    expect(container.textContent).toContain(s2.recordingDestinationRequired);
+
+    click(destinazione('PUBLIC')!);
+    await press(button(w.updateEvent));
+    expect(corpo('PUT')).toMatchObject({ recordingEnabled: true, recordingDestination: 'PUBLIC' });
+  });
+
+  it('accenderla su un evento gia aperto la chiede, e si puo solo restringere', async () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato(
+        { recordingDestination: null, recordingEnabled: false },
+        { salaGiaAperta: true },
+      ),
+      initialStep: 'advanced',
+      initialSection: 'recording',
+    });
+    click(interruttore(messages.admin.form.recordingEnabled)!);
+    expect(destinazione('PUBLIC')).toBeDisabled();
+    await press(button(w.updateEvent));
+    expect(chiamateAlServer()).toHaveLength(0);
+
+    click(destinazione('REGISTRANTS')!);
+    await press(button(w.updateEvent));
+    expect(corpo('PUT').recordingDestination).toBe('REGISTRANTS');
+  });
+
+  it('con un link di conduzione accenderla non blocca, e dice che parte riservata', async () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato({ ...conDomande, recordingDestination: null, recordingEnabled: false }),
+      initialStep: 'advanced',
+      initialSection: 'recording',
+      viaToken: 'token-primario',
+    });
+    click(interruttore(messages.admin.form.recordingEnabled)!);
+    expect(destinazione('REGISTRANTS')).toBeNull();
+    expect(container.textContent).toContain(s2.recordingDestinationStartsReserved);
+    expect(container.textContent).not.toContain(s2.recordingDestinationStaffOnly);
+    goToStep('review');
+    const testo = container.textContent ?? '';
+    expect(testo).toContain(w.flow.recordingDestinationReserved);
+    expect(testo).toContain(w.flow.postEventQaHidden);
+    expect(testo).not.toContain(s2.recordingDestinationStaffOnly);
+    expect(testo).not.toContain(s2.recordingDestinationNotSet);
+    await press(button(w.updateEvent));
+    const inviato = corpo('PUT');
+    expect(inviato.recordingEnabled).toBe(true);
+    expect(inviato).not.toHaveProperty('recordingDestination');
+  });
+
+  it('un video reso riservato dal pubblico toglie le domande dal riepilogo', () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato({
+        ...conDomande,
+        recordingDestination: 'PUBLIC',
+        recordingAudience: 'REGISTRANTS',
+      }),
+      initialStep: 'review',
+    });
+    expect(container.textContent).toContain(w.flow.postEventQaHidden);
+  });
+
+  it('con un link di conduzione un evento vecchio che registra resta senza, e lo dice', async () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato({ ...conDomande, recordingDestination: null }),
+      initialStep: 'advanced',
+      initialSection: 'recording',
+      viaToken: 'token-primario',
+    });
+    expect(container.textContent).toContain(s2.recordingDestinationStaffOnly);
+    expect(container.textContent).not.toContain(s2.recordingDestinationStartsReserved);
+    goToStep('review');
+    expect(container.textContent).toContain(s2.recordingDestinationStaffOnly);
+    expect(container.textContent).toContain(w.flow.postEventQaTextOnly);
+  });
+
+  it('con un link di conduzione a sala gia aperta dice che resta riservata', async () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato(
+        { ...conDomande, recordingDestination: null, recordingEnabled: false },
+        { salaGiaAperta: true },
+      ),
+      initialStep: 'advanced',
+      initialSection: 'recording',
+      viaToken: 'token-primario',
+    });
+    click(interruttore(messages.admin.form.recordingEnabled)!);
+    expect(container.textContent).toContain(s2.recordingDestinationStaysReserved);
+    expect(container.textContent).not.toContain(s2.recordingDestinationStartsReserved);
+    expect(destinazione('REGISTRANTS')).toBeNull();
+    goToStep('review');
+    expect(container.textContent).toContain(w.flow.recordingDestinationReserved);
+    await press(button(w.updateEvent));
+    expect(corpo('PUT').recordingEnabled).toBe(true);
+    expect(corpo('PUT')).not.toHaveProperty('recordingDestination');
+  });
+
+  it('con un link di conduzione, dove il video non c e, annuncia cio che il server scrive', () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato({
+        ...conDomande,
+        recordingDestination: null,
+        recordingEnabled: false,
+        aiTranscriptEnabled: true,
+        multitrackRecordingEnabled: true,
+      }),
+      initialStep: 'advanced',
+      initialSection: 'recording',
+      viaToken: 'token-primario',
+      partecipantiNelVideo: 'assente',
+    });
+    click(interruttore(messages.admin.form.recordingEnabled)!);
+    expect(container.textContent).not.toContain(s2.recordingDestinationStartsReserved);
+    expect(container.textContent).not.toContain(s2.recordingDestinationStaffOnly);
+    goToStep('review');
+    expect(container.textContent).toContain(w.flow.recordingDestinationReserved);
+    expect(container.textContent).toContain(w.flow.postEventQaHidden);
+  });
+
+  it('una registrazione accesa e rispenta non dichiara una destinazione', async () => {
+    renderWizard({ template: { ...modello, recordingEnabled: false, recordingDestination: null } });
+    compila();
+    goToStep('recording');
+    click(interruttore(messages.admin.form.recordingEnabled)!);
+    expect(destinazione('REGISTRANTS')).toBeChecked();
+    click(interruttore(messages.admin.form.recordingEnabled)!);
+    goToStep('review');
+    await press(button(w.publish));
+    const inviato = corpo('POST');
+    expect(inviato.recordingEnabled).toBe(false);
+    expect(inviato).not.toHaveProperty('recordingDestination');
+  });
+
+  it('un modello riservato che non registra non toglie le domande', async () => {
+    renderWizard({
+      template: {
+        ...modello,
+        recordingEnabled: false,
+        recordingDestination: 'REGISTRANTS',
+        postEventShowQA: true,
+      },
+    });
+    compila();
+    goToStep('recording');
+    const domande = Array.from(container.querySelectorAll('label'))
+      .find((l) => l.textContent === messages.postEvent.showQA)
+      ?.querySelector('input');
+    expect(domande).toBeEnabled();
+    expect(domande).toBeChecked();
+    expect(container.textContent).not.toContain(messages.postEvent.qaReservedNote);
+    goToStep('review');
+    expect(container.textContent).toContain(w.flow.postEventQaTextOnly);
+    await press(button(w.publish));
+    expect(corpo('POST')).not.toHaveProperty('recordingDestination');
+  });
+
+  it('riaccendendola la destinazione del modello e ancora li', async () => {
+    renderWizard({
+      template: { ...modello, recordingEnabled: false, recordingDestination: 'REGISTRANTS' },
+    });
+    compila();
+    goToStep('recording');
+    click(interruttore(messages.admin.form.recordingEnabled)!);
+    expect(destinazione('REGISTRANTS')).toBeChecked();
+    goToStep('review');
+    await press(button(w.publish));
+    expect(corpo('POST').recordingDestination).toBe('REGISTRANTS');
+  });
+
+  it('in modifica una scelta rimasta a registrazione spenta non parte', async () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato({ recordingDestination: null, recordingEnabled: false }),
+      initialStep: 'advanced',
+      initialSection: 'recording',
+    });
+    click(interruttore(messages.admin.form.recordingEnabled)!);
+    click(destinazione('REGISTRANTS')!);
+    click(interruttore(messages.admin.form.recordingEnabled)!);
+    await press(button(w.updateEvent));
+    expect(corpo('PUT')).not.toHaveProperty('recordingDestination');
+  });
+
+  it('un evento gia riservato a registrazione spenta non pubblica le domande, e lo dice', () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato({
+        recordingDestination: 'REGISTRANTS',
+        recordingEnabled: false,
+        postEventShowQA: true,
+        permissionMatrix: matrixFromToggles({
+          qaEnabled: true,
+          chatEnabled: true,
+          participantsCanUnmute: false,
+          participantsCanStartVideo: false,
+          participantsCanShareScreen: false,
+        }),
+      }),
+      initialStep: 'advanced',
+      initialSection: 'recording',
+    });
+    expect(container.textContent).toContain(messages.postEvent.qaReservedNote);
+    goToStep('review');
+    expect(container.textContent).toContain(w.flow.postEventQaHidden);
+  });
+
+  it('dove il video non c e non chiede, e annuncia la riservata che il server scrive', async () => {
+    renderWizard({
+      template: {
+        ...modello,
+        recordingDestination: null,
+        postEventShowQA: true,
+        aiTranscriptEnabled: true,
+        multitrackRecordingEnabled: true,
+      },
+      partecipantiNelVideo: 'assente',
+    });
+    compila();
+    goToStep('recording');
+    expect(destinazione('REGISTRANTS')).toBeNull();
+    expect(container.textContent).not.toContain(s2.recordingDestination);
+    goToStep('review');
+    expect(container.textContent).toContain(w.flow.recordingDestinationReserved);
+    expect(container.textContent).toContain(w.flow.postEventQaHidden);
+    await press(button(w.publish));
+    const inviato = corpo('POST');
+    expect(inviato.recordingEnabled).toBe(true);
+    expect(inviato).not.toHaveProperty('recordingDestination');
+  });
+
+  it('dove il video non c e un modello pubblico non parte, e il riepilogo non lo promette', async () => {
+    renderWizard({
+      template: {
+        ...modello,
+        recordingDestination: 'PUBLIC',
+        postEventShowQA: true,
+        aiTranscriptEnabled: true,
+        multitrackRecordingEnabled: true,
+      },
+      partecipantiNelVideo: 'assente',
+    });
+    compila();
+    goToStep('review');
+    expect(container.textContent).toContain(w.flow.recordingDestinationReserved);
+    expect(container.textContent).not.toContain(w.flow.recordingDestinationPublic);
+    expect(container.textContent).toContain(w.flow.postEventQaHidden);
+    await press(button(w.publish));
+    expect(corpo('POST')).not.toHaveProperty('recordingDestination');
+  });
+
+  it('riaprendo un evento che registra a vuoto il wizard non promette niente', () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato({
+        recordingEnabled: true,
+        multitrackRecordingEnabled: false,
+        aiTranscriptEnabled: false,
+        recordingDestination: 'REGISTRANTS',
+      }),
+      partecipantiNelVideo: 'assente',
+      aiPipelineEnabled: false,
+    });
+    goToStep('review');
+    expect(container.textContent).toContain(w.step5.summary.recordingOff);
+    expect(container.textContent).not.toContain(w.flow.recordingDestinationReserved);
+    expect(container.textContent).not.toContain(w.flow.consentsHostsAlways);
+    goToStep('permissions');
+    expect(container.textContent).not.toContain(w.step2.feature.recording_control.label);
+  });
+
+  it('senza un registratore il riepilogo non promette il consenso alla trascrizione', () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato({
+        recordingEnabled: true,
+        aiTranscriptEnabled: true,
+        multitrackRecordingEnabled: true,
+      }),
+      partecipantiNelVideo: 'assente',
+      recordingAvailable: false,
+    });
+    goToStep('review');
+    expect(container.textContent).toContain(w.step5.summary.recordingOff);
+    expect(container.textContent).not.toContain(w.flow.consentsWithdraw);
+  });
+
+  it('una registrazione a vuoto non parla di un video pubblico sulla pagina privata', () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato({
+        recordingEnabled: true,
+        multitrackRecordingEnabled: false,
+        aiTranscriptEnabled: false,
+        recordingDestination: 'PUBLIC',
+        postEventPublic: false,
+      }),
+      partecipantiNelVideo: 'assente',
+      aiPipelineEnabled: false,
+    });
+    goToStep('review');
+    expect(container.textContent).not.toContain(w.step2.postEventPagePrivateVideoHidden);
+  });
+
+  it('la fascia del formato non annuncia una registrazione a vuoto', () => {
+    renderWizard({
+      template: { ...modello, aiTranscriptEnabled: false, multitrackRecordingEnabled: false },
+      partecipantiNelVideo: 'assente',
+      formatoLabel: 'dalle domande',
+      etichettaFormato: ({ registra }) => `registra ${registra}`,
+      onChangeTemplate: vi.fn(),
+    });
+    expect(container.querySelector('.wizard-modello')?.textContent).toContain('registra no');
+  });
+
+  it('dove un video non c e una copia senza destinazione si salva', async () => {
+    renderWizard({
+      mode: 'edit',
+      copia: true,
+      initialEvent: salvato({ recordingDestination: null }, { destinazioneDaChiedere: true }),
+      initialStep: 'base',
+      partecipantiNelVideo: 'assente',
+    });
+    await press(button(w.saveCopy));
+    expect(corpo('PUT')).not.toHaveProperty('recordingDestination');
+    expect(toastError).not.toHaveBeenCalled();
+  });
+
+  it('a sala aperta una bozza che accende la registrazione non resta bloccata', async () => {
+    localStorage.setItem(
+      'pa-wizard-draft:evt-prog',
+      JSON.stringify({ title: { it: 'Dalla bozza' }, recordingEnabled: true }),
+    );
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato(
+        { recordingDestination: null, recordingEnabled: false },
+        { salaGiaAperta: true },
+      ),
+      initialStep: 'base',
+      salaAperta: true,
+    });
+    click(button(w.draftRestore));
+    await press(button(w.updateEvent));
+    expect(corpo('PUT')).not.toHaveProperty('recordingDestination');
+    expect(toastError).not.toHaveBeenCalled();
+  });
+
+  it('a sala aperta una bozza che accende la registrazione non annuncia una destinazione', () => {
+    localStorage.setItem(
+      'pa-wizard-draft:evt-prog',
+      JSON.stringify({ title: { it: 'Dalla bozza' }, recordingEnabled: true }),
+    );
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato(
+        { recordingDestination: null, recordingEnabled: false },
+        { salaGiaAperta: true },
+      ),
+      initialStep: 'base',
+      salaAperta: true,
+    });
+    click(button(w.draftRestore));
+    goToStep('review');
+    expect(container.textContent).not.toContain(w.flow.recordingDestinationReserved);
+  });
+
+  it('un evento vecchio, con iscrizioni o gia aperto, si salva senza destinazione e lo dice', async () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato({ recordingDestination: null }, { salaGiaAperta: true }),
+      initialStep: 'advanced',
+      initialSection: 'recording',
+    });
+    expect(container.textContent).toContain(s2.recordingDestinationNotSet);
+    await press(button(w.updateEvent));
+    expect(corpo('PUT')).not.toHaveProperty('recordingDestination');
+    expect(toastError).not.toHaveBeenCalled();
+  });
+
+  it('nel riepilogo un evento vecchio dice che la destinazione non e indicata', () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato({ recordingDestination: null }),
+      initialStep: 'review',
+    });
+    expect(container.textContent).toContain(s2.recordingDestinationNotSet);
+  });
+
+  it('nel riepilogo, se va scelta, e fra cio che manca e porta alla scelta', () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato({ recordingDestination: null }, { destinazioneDaChiedere: true }),
+      initialStep: 'review',
+    });
+    const mancanti = container.querySelector<HTMLElement>('.wizard-mancanti')!;
+    expect(mancanti.textContent).toContain(s2.recordingDestination);
+    expect(container.textContent).not.toContain(s2.recordingDestinationNotSet);
+    click(button(s2.recordingDestination, mancanti));
+    expect(byId<HTMLDetailsElement>('wiz-avanzate-recording').open).toBe(true);
+    expect(document.activeElement).toBe(destinazione('REGISTRANTS'));
+  });
+
+  it('spegnere la registrazione non manda mai null su un evento con destinazione', async () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato({ recordingDestination: 'REGISTRANTS' }, { destinazioneDaChiedere: true }),
+      initialStep: 'advanced',
+      initialSection: 'recording',
+    });
+    click(interruttore(messages.admin.form.recordingEnabled)!);
+    await press(button(w.updateEvent));
+    const inviato = corpo('PUT');
+    expect(inviato.recordingEnabled).toBe(false);
+    expect(inviato).not.toHaveProperty('recordingDestination');
+  });
+
+  it('una bozza che non aveva la destinazione non la toglie', async () => {
+    localStorage.setItem(
+      'pa-wizard-draft:evt-prog',
+      JSON.stringify({ title: { it: 'Dalla bozza' }, recordingDestination: null }),
+    );
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato({ recordingDestination: 'REGISTRANTS' }),
+      initialStep: 'base',
+    });
+    click(button(w.draftRestore));
+    await press(button(w.updateEvent));
+    expect(corpo('PUT')).not.toHaveProperty('recordingDestination');
+  });
+
+  it('una bozza non allarga la destinazione dopo l apertura della sala', async () => {
+    localStorage.setItem(
+      'pa-wizard-draft:evt-prog',
+      JSON.stringify({ recordingDestination: 'PUBLIC' }),
+    );
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato({ recordingDestination: 'REGISTRANTS' }, { salaGiaAperta: true }),
+      initialStep: 'base',
+    });
+    click(button(w.draftRestore));
+    await press(button(w.updateEvent));
+    expect(corpo('PUT')).not.toHaveProperty('recordingDestination');
+  });
+
+  it('dopo l apertura della sala si puo solo restringere', async () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato({ recordingDestination: 'PUBLIC' }, { salaGiaAperta: true }),
+      initialStep: 'advanced',
+      initialSection: 'recording',
+    });
+    expect(container.textContent).toContain(s2.recordingDestinationLocked);
+    click(destinazione('REGISTRANTS')!);
+    // Era pubblica: si puo' tornare a com'era.
+    expect(destinazione('PUBLIC')).toBeEnabled();
+    await press(button(w.updateEvent));
+    expect(corpo('PUT').recordingDestination).toBe('REGISTRANTS');
+  });
+
+  it('riservata, dopo l apertura non si allarga', () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato({ recordingDestination: 'REGISTRANTS' }, { salaGiaAperta: true }),
+      initialStep: 'advanced',
+      initialSection: 'recording',
+    });
+    expect(destinazione('PUBLIC')).toBeDisabled();
+  });
+
+  it('a sala aperta la scelta si legge soltanto', () => {
+    renderWizard({
+      mode: 'edit',
+      salaAperta: true,
+      initialEvent: salvato({ recordingDestination: 'PUBLIC' }, { salaGiaAperta: true }),
+      initialStep: 'advanced',
+      initialSection: 'recording',
+    });
+    expect(destinazione('REGISTRANTS')).toBeDisabled();
+    expect(destinazione('PUBLIC')).toBeDisabled();
+  });
+
+  it('con un link di conduzione i campi restano fuori dal salvataggio e la scelta non si propone', async () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato(
+        { recordingDestination: null, offerAddressBook: false, postEventShowQA: false },
+        { destinazioneDaChiedere: true },
+      ),
+      initialStep: 'advanced',
+      initialSection: 'recording',
+      viaToken: 'token-primario',
+    });
+    expect(byId<HTMLDetailsElement>('wiz-avanzate-recording')).toBeInTheDocument();
+    expect(destinazione('REGISTRANTS')).toBeNull();
+    expect(interruttore(s2.hostsAlwaysRecorded)).toBeNull();
+    await press(button(w.updateEvent));
+    const inviato = corpo('PUT');
+    expect(inviato).not.toHaveProperty('recordingDestination');
+    expect(inviato).not.toHaveProperty('offerAddressBook');
+    expect(inviato).not.toHaveProperty('hostsAlwaysRecorded');
+    expect(inviato).not.toHaveProperty('postEventShowQA');
+  });
+
+  it('dal riepilogo si arriva alla scelta, ma non con un link di conduzione', () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato({ recordingDestination: 'PUBLIC' }),
+      initialStep: 'review',
+    });
+    const riga = () =>
+      Array.from(container.querySelectorAll('span.d-block')).find((s) =>
+        s.textContent?.includes(w.flow.recordingDestinationPublic),
+      );
+    click(riga()!.querySelector('button')!);
+    expect(byId<HTMLDetailsElement>('wiz-avanzate-recording').open).toBe(true);
+    expect(destinazione('PUBLIC')).toBeChecked();
+
+    act(() => root.unmount());
+    root = createRoot(container);
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato({ recordingDestination: 'PUBLIC' }),
+      initialStep: 'review',
+      viaToken: 'token-primario',
+    });
+    expect(riga()).toBeDefined();
+    expect(riga()!.querySelector('button')).toBeNull();
+  });
+
+  it('con un link di conduzione una bozza non cambia i campi dello staff', async () => {
+    localStorage.setItem(
+      'pa-wizard-draft:evt-prog',
+      JSON.stringify({
+        recordingDestination: 'PUBLIC',
+        offerAddressBook: false,
+        postEventShowQA: false,
+        hostsAlwaysRecorded: true,
+      }),
+    );
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato({ recordingDestination: 'REGISTRANTS', offerAddressBook: true }),
+      initialStep: 'base',
+      viaToken: 'token-primario',
+    });
+    click(button(w.draftRestore));
+    await press(button(w.updateEvent));
+    const inviato = corpo('PUT');
+    expect(inviato).not.toHaveProperty('recordingDestination');
+    expect(inviato).not.toHaveProperty('offerAddressBook');
+    expect(inviato).not.toHaveProperty('postEventShowQA');
+    expect(inviato).not.toHaveProperty('hostsAlwaysRecorded');
+  });
+
+  it('una chiamata rapida non chiede la destinazione', async () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato(
+        { recordingDestination: null, eventType: 'INSTANT' },
+        { destinazioneDaChiedere: true },
+      ),
+      initialStep: 'advanced',
+      initialSection: 'recording',
+    });
+    expect(destinazione('REGISTRANTS')).toBeNull();
+    await press(button(w.updateEvent));
+    expect(corpo('PUT')).not.toHaveProperty('recordingDestination');
+  });
+
+  it('dove non si puo registrare la destinazione non si chiede', async () => {
+    renderWizard({
+      mode: 'edit',
+      recordingAvailable: false,
+      initialEvent: salvato({ recordingDestination: null }, { destinazioneDaChiedere: true }),
+      initialStep: 'advanced',
+      initialSection: 'recording',
+    });
+    expect(destinazione('REGISTRANTS')).toBeNull();
+    await press(button(w.updateEvent));
+    expect(corpo('PUT')).not.toHaveProperty('recordingDestination');
+  });
+
+  it('in modifica le domande partono solo se cambiate', async () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato({ recordingDestination: 'PUBLIC', postEventShowQA: true }),
+      initialStep: 'advanced',
+      initialSection: 'data',
+    });
+    await press(button(w.updateEvent));
+    expect(corpo('PUT')).not.toHaveProperty('postEventShowQA');
+
+    fetchMock.mockClear();
+    click(interruttore(messages.postEvent.showQA) ?? byLabel(messages.postEvent.showQA));
+    await press(button(w.updateEvent));
+    expect(corpo('PUT').postEventShowQA).toBe(false);
+  });
+
+  it('un evento vecchio senza la colonna nel modulo non cambia le domande', async () => {
+    renderWizard({ mode: 'edit', initialEvent: salvato(), initialStep: 'base' });
+    await press(button(w.updateEvent));
+    const inviato = corpo('PUT');
+    expect(inviato).not.toHaveProperty('postEventShowQA');
+    expect(inviato).not.toHaveProperty('offerAddressBook');
+  });
+
+  it('la rubrica si propone dal passo «Persone», e spenta sull installazione non si vede', async () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: salvato({ recordingDestination: 'PUBLIC', offerAddressBook: true }),
+      initialStep: 'invites',
+    });
+    const casella = () =>
+      Array.from(container.querySelectorAll('label')).find(
+        (l) => l.textContent === w.step3.askAddressBook,
+      );
+    click(casella()!);
+    goToStep('review');
+    expect(container.textContent).toContain(w.flow.addressBookNotOffered);
+    await press(button(w.updateEvent));
+    expect(corpo('PUT').offerAddressBook).toBe(false);
+
+    act(() => root.unmount());
+    root = createRoot(container);
+    localStorage.clear();
+    renderWizard({
+      mode: 'edit',
+      addressBookEnabled: false,
+      initialEvent: salvato({ recordingDestination: 'PUBLIC', offerAddressBook: false }),
+      initialStep: 'invites',
+    });
+    expect(casella()).toBeUndefined();
+    goToStep('review');
+    expect(container.textContent).not.toContain(w.flow.addressBookNotOffered);
+  });
+
+  /** Un interruttore con l'etichetta visibile, senza `aria-label`. */
+  function byLabel(testo: string): HTMLInputElement {
+    const etichetta = Array.from(container.querySelectorAll('label')).find(
+      (l) => l.textContent === testo,
+    );
+    const campo = etichetta?.querySelector('input');
+    if (!campo) throw new Error(`nessun interruttore «${testo}»`);
+    return campo;
+  }
+});
+
 
 describe('moduli da confermare — cio che e scritto e non aggiunto', () => {
   const sulPassoPersone = () => container.querySelector('#person-name') !== null;

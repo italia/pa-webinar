@@ -1873,24 +1873,54 @@ done
 # un messaggio che nomina il valore da correggere. Una guardia che non scatta
 # più non la nota nessun altro controllo.
 echo "guardie"
+# Le rese si leggono intere prima di cercarvi: con pipefail, un grep -q che
+# chiude la pipe mentre helm scrive ancora fa fallire helm (SIGPIPE), e la
+# guardia scatterebbe a caso.
+#
 # Chi non ha acconsentito resta fuori dal video finche' il testo della
 # conferenza del chart lo fa: un testo sostituito lo perde, e il portale deve
-# saperlo (senza la variabile quelle persone restano in solo ascolto).
-if ! helm template videocall "$CHART" -n videocall "${comuni[@]}" \
-    -f "$CHART/examples/values-simple.yaml" | grep -q RECORDING_VOICE_EXCLUSION; then
+# saperlo (senza la variabile quelle persone restano in solo ascolto). Lo
+# stesso testo tiene fuori dal video chi non conduce e ne riproduce la sola
+# voce: un testo con la sola riga della funzione nascosta perde la voce.
+reso_semplice=$(helm template videocall "$CHART" -n videocall "${comuni[@]}" \
+  -f "$CHART/examples/values-simple.yaml")
+reso_testo_altro=$(helm template videocall "$CHART" -n videocall "${comuni[@]}" \
+  -f "$CHART/examples/values-simple.yaml" \
+  --set-string 'jitsi-meet.web.custom.configs._custom_config_js=// altro')
+reso_senza_voce=$(helm template videocall "$CHART" -n videocall "${comuni[@]}" \
+  -f "$CHART/examples/values-simple.yaml" \
+  --set-string 'jitsi-meet.web.custom.configs._custom_config_js=config.hiddenFromRecorderFeatureEnabled = true;')
+if ! grep -q -- '- name: RECORDING_VOICE_EXCLUSION$' <<<"$reso_semplice"; then
   errore "testo della conferenza del chart: RECORDING_VOICE_EXCLUSION assente"
 fi
-if helm template videocall "$CHART" -n videocall "${comuni[@]}" \
-    -f "$CHART/examples/values-simple.yaml" \
-    --set-string 'jitsi-meet.web.custom.configs._custom_config_js=// altro' \
-    | grep -q RECORDING_VOICE_EXCLUSION; then
+if grep -q -- '- name: RECORDING_VOICE_EXCLUSION$' <<<"$reso_testo_altro"; then
   errore "testo della conferenza sostituito: RECORDING_VOICE_EXCLUSION ancora presente"
 fi
+if ! grep -q -- '- name: RECORDING_PARTICIPANT_VOICE$' <<<"$reso_semplice"; then
+  errore "testo della conferenza del chart: RECORDING_PARTICIPANT_VOICE assente"
+fi
+if grep -q -- '- name: RECORDING_PARTICIPANT_VOICE$' <<<"$reso_testo_altro"; then
+  errore "testo della conferenza sostituito: RECORDING_PARTICIPANT_VOICE ancora presente"
+fi
+if ! grep -q -- '- name: RECORDING_VOICE_EXCLUSION$' <<<"$reso_senza_voce"; then
+  errore "testo con la sola funzione nascosta: RECORDING_VOICE_EXCLUSION assente"
+fi
+if grep -q -- '- name: RECORDING_PARTICIPANT_VOICE$' <<<"$reso_senza_voce"; then
+  errore "testo della conferenza senza la voce dei partecipanti: RECORDING_PARTICIPANT_VOICE ancora presente"
+fi
+# Jibri chiude da solo una registrazione solo dopo 5 minuti senza conduttori,
+# mai per microfoni e videocamere spenti o per un silenzio: i suoi controlli
+# contano solo chi conduce.
+reso_jibri=$(helm template videocall "$CHART" -n videocall "${comuni[@]}" \
+  -f "$CHART/examples/values-simple.yaml" --set jitsi-meet.jibri.enabled=true)
+for opzione in default-call-empty-timeout=5m all-muted-timeout=30d no-media-timeout=30d; do
+  if ! grep -q -- "-Djibri.call-status-checks.$opzione" <<<"$reso_jibri"; then
+    errore "opzioni della JVM di Jibri: manca -Djibri.call-status-checks.$opzione"
+  fi
+done
 # I moduli di Prosody si caricano all'avvio: senza il riavvio dopo un
 # aggiornamento, la regola del consenso resta quella vecchia.
-if ! helm template videocall "$CHART" -n videocall "${comuni[@]}" \
-    -f "$CHART/examples/values-simple.yaml" \
-    | grep -q 'kubectl rollout restart -n "$ns" "$sts"'; then
+if ! grep -qF 'kubectl rollout restart -n "$ns" "$sts"' <<<"$reso_semplice"; then
   errore "hook di aggiornamento: Prosody non riparte quando cambiano i moduli"
 fi
 # Lo stesso testo per il chart e per Docker Compose.
@@ -1995,6 +2025,13 @@ deve_fallire "opzioni della JVM del bridge senza le voci più forti" "VIDEOBRIDG
 deve_fallire "opzioni della JVM del bridge con un altro numero di voci" "VIDEOBRIDGE_DEBUG_OPTIONS" \
   --set global.jvb.numLoudest=0 \
   --set-string 'jitsi-meet.jvb.extraEnvs.VIDEOBRIDGE_DEBUG_OPTIONS=-Dvideobridge.loudest.route-loudest-only=true'
+# Quando Jibri chiude da solo una registrazione: durate senza spazi, e le
+# opzioni della JVM di Jibri che le portano davvero.
+deve_fallire "durata dei controlli di Jibri con uno spazio" "global.jibri.callStatusChecks" \
+  --set-string 'global.jibri.callStatusChecks.allMutedTimeout=5 minutes'
+deve_fallire "opzioni della JVM di Jibri senza i controlli" "JAVA_TOOL_OPTIONS" \
+  --set jitsi-meet.jibri.enabled=true \
+  --set-string 'jitsi-meet.jibri.extraEnvs.JAVA_TOOL_OPTIONS=-Djibri.api.http.external-api-host=0.0.0.0'
 
 echo
 if [ "$fallimenti" -gt 0 ]; then

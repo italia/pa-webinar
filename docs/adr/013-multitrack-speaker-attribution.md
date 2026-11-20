@@ -78,7 +78,8 @@ The decision sets these boundaries:
 - **A consent of its own**, separate from the recording consent, optional, and checked for each track
   before it is recorded.
 - **Tracks are intermediate input.** They are never public, and they are deleted after transcription
-  unless the event keeps them.
+  unless the event keeps them. Where nothing transcribes them, they last until the event's data
+  retention ends.
 - **Audio only.** The bot publishes nothing and records no video.
 
 ### How a transcript gets its speaker names
@@ -382,8 +383,9 @@ The consent is the transcription of one's own contributions, with one's name. It
 blocks entry; the same consent also decides what the transcript from live captions keeps
 ([ADR-018](018-live-captions.md)).
 
-- **At registration.** When `multitrackRecordingEnabled` is on, or the event keeps a transcript from
-  live captions, the form shows an optional box. The answer is stored on `Registration.consentMultitrack`
+- **At registration.** When `multitrackRecordingEnabled` is on and the event can record its tracks
+  (`eventoRegistrabile`), or the event keeps a transcript from live captions, the form shows an
+  optional box. The answer is stored on `Registration.consentMultitrack`
   (`false` when the box is left unticked), which is null for events that do not ask.
 - **In the waiting room.** The box, under **Transcript of what you say**, is shown to everyone who has
   not given the consent, moderators and speakers included, and entry does not wait for it. A registrant
@@ -397,10 +399,11 @@ blocks entry; the same consent also decides what the transcript from live captio
   seat: the registration's, or the waiting-room proof. Without consent, or when the portal does not
   answer or does not know the endpoint, the track is skipped. Because Prosody can report a join a moment
   after the track arrives, a refusal is asked again after a few seconds before the track is skipped, and
-  an endpoint still unknown then is logged with a warning that names `mod_pa_occupants`. The recorder
-  accepts a consent given with any version of the text (`Registration.consentMultitrackVersion`,
-  `MultitrackConsent.textVersion`), since every version covers the audio track; the transcript from
-  live captions counts only the current one.
+  an endpoint still unknown then is logged with a warning that names `mod_pa_occupants`. Where the
+  event transcribes speech, from the tracks with the AI pipeline, from live captions or from the full
+  video, only a consent to the current text counts (`versioneConsensoTrascrizione` in
+  `app/src/lib/ai/voice-consent.ts`). Elsewhere a consent given with any version of the text covers the
+  audio track (`Registration.consentMultitrackVersion`, `MultitrackConsent.textVersion`).
 - **The in-room indicator.** Jitsi's recording indicator follows Jibri only, so a capture made only by the
   recorder does not raise it.
 
@@ -430,8 +433,9 @@ until the recording's retention expires, when `multitrack-purge` or `postprod-re
 orphan sweep (`recordings-reconcile`) also treats these objects as orphans and deletes them after
 `SiteSetting.orphanRecordingGraceDays` unless they are marked **Keep** (see
 [Known limitations](#known-limitations)). Turning per-participant recording off in the event wizard also
-turns this option off. The consent text that participants see still says that the track is deleted after
-transcription.
+turns this option off. Where the tracks stay, by this option or because the AI pipeline is off and no
+transcription deletes them, the consent box shows a text that does not promise their deletion
+(`traccePerPersonaConservate` in `app/src/lib/registration/consents.ts`).
 
 ```mermaid
 stateDiagram-v2

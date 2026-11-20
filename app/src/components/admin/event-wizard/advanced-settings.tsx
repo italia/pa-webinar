@@ -12,12 +12,15 @@
  * dell'evento): il wizard porta su di lei il fuoco e la vista.
  */
 
+import type { RecordingAudience } from '@prisma/client';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import CapacityPanel, { type RiepilogoCapacita } from '@/components/admin/capacity-panel';
+import RecordingRetentionSelect from '@/components/admin/recording-retention-select';
 import FileOrUrlInput from '@/components/ui/file-or-url-input';
 import ToggleSwitch from '@/components/ui/toggle-switch';
+import { registrazioneRiservata, type Destinazione } from '@/lib/recording/destination';
 import { togglesFromMatrix } from '@/lib/utils/permission-matrix';
 import { MAX_RETENTION_DAYS } from '@/lib/validation/retention';
 import {
@@ -32,6 +35,7 @@ import {
 } from '@/lib/capacity/model';
 
 import CampoPartecipanti from './campo-partecipanti';
+import { destinazioneDopoIlSalvataggio } from './campi-del-formato';
 import type { WizardForm } from './wizard-shell';
 
 export default function AdvancedSettings({
@@ -101,7 +105,7 @@ export default function AdvancedSettings({
 }
 
 /** L'informativa privacy (la vede chi si iscrive), quanto restano i dati
- *  delle persone, e se la pagina resta pubblica dopo l'evento. */
+ *  delle persone, e cosa resta pubblico dopo l'evento. */
 export function SezioneDati({
   form,
   onChange,
@@ -109,6 +113,10 @@ export function SezioneDati({
   fieldErrors = {},
   retentionMax = MAX_RETENTION_DAYS,
   onUploadBusy,
+  domandeDopoEvento = true,
+  durataRegistrazione = true,
+  destinazioneSenzaScelta = null,
+  pubblicoDopo = 'PUBLIC',
 }: {
   form: WizardForm;
   onChange: (patch: Partial<WizardForm>) => void;
@@ -118,9 +126,29 @@ export function SezioneDati({
   /** Il documento della privacy in viaggio verso il server: il wizard
    *  aspetta che arrivi prima di salvare o cambiare passo. */
   onUploadBusy?: (inCaricamento: boolean) => void;
+  /** Si sceglie qui se le domande restano sulla pagina: non con un link di
+   *  conduzione, che le cambia dalla pagina dell'evento. */
+  domandeDopoEvento?: boolean;
+  /** Si sceglie qui quanto dura la registrazione: non con un link di
+   *  conduzione, che la cambia dal pannello della registrazione. */
+  durataRegistrazione?: boolean;
+  /** La destinazione che l'evento tiene se il modulo non ne sceglie una
+   *  (`destinazioneDiPartenza`). */
+  destinazioneSenzaScelta?: Destinazione;
+  /** Il pubblico del video dopo il salvataggio (`pubblicoAllineato`). */
+  pubblicoDopo?: RecordingAudience;
 }) {
   const t = useTranslations('admin.wizard.step5');
   const tPost = useTranslations('postEvent');
+  // La durata si sceglie dove l'evento registra qualcosa: il video, o la
+  // trascrizione dai sottotitoli.
+  const registraQualcosa = form.recordingEnabled || form.captionsTranscriptEnabled;
+  // La regola della pagina si legge sull'evento che il salvataggio scrive: una
+  // scelta rimasta nel modulo a registrazione spenta non toglie le domande.
+  const riservata = registrazioneRiservata({
+    recordingDestination: destinazioneDopoIlSalvataggio(form, destinazioneSenzaScelta),
+    recordingAudience: pubblicoDopo,
+  });
   return (
     <div className="row g-3">
       <div className="col-md-6">
@@ -206,6 +234,22 @@ export function SezioneDati({
           {t('retentionHelp')}
         </small>
       </div>
+      {durataRegistrazione && registraQualcosa && (
+        <div className="col-md-6">
+          <label className="form-label" htmlFor="rev-recording-retention">
+            {t('recordingRetention')}
+          </label>
+          <RecordingRetentionSelect
+            id="rev-recording-retention"
+            value={form.recordingDeleteAfterDays ?? null}
+            onChange={(giorni) => onChange({ recordingDeleteAfterDays: giorni })}
+            describedBy="rev-recording-retention-help"
+          />
+          <small id="rev-recording-retention-help" className="form-text text-muted">
+            {t('recordingRetentionHelp')}
+          </small>
+        </div>
+      )}
       {/* La pagina dell'evento concluso: il modello la decide (una riunione
           di lavoro non e' pubblica), qui si cambia. */}
       <div className="col-12">
@@ -216,6 +260,22 @@ export function SezioneDati({
         />
         <small className="form-text text-muted d-block">{tPost('pageVisibleHelp')}</small>
       </div>
+      {/* Le domande sulla pagina dell'evento concluso: partono dal formato, e
+          con la registrazione riservata non si pubblicano comunque
+          (domandePubbliche). */}
+      {domandeDopoEvento && (
+        <div className="col-12">
+          <ToggleSwitch
+            label={tPost('showQA')}
+            checked={form.postEventShowQA && !riservata}
+            disabled={riservata}
+            onChange={() => onChange({ postEventShowQA: !form.postEventShowQA })}
+          />
+          {riservata && (
+            <small className="form-text text-muted d-block">{tPost('qaReservedNote')}</small>
+          )}
+        </div>
+      )}
     </div>
   );
 }

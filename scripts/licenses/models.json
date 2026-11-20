@@ -1,0 +1,278 @@
+{
+  "models": [
+    {
+      "name": "nvidia/nemotron-3.5-asr-streaming-0.6b",
+      "file": "nemotron-3.5-asr-streaming-0.6b.q8_0.gguf",
+      "use": "Live captions: streaming speech recognition",
+      "delivery": "download",
+      "url": "https://huggingface.co/nvidia/nemotron-3.5-asr-streaming-0.6b/resolve/ea30d66debe3740a08b573244286791d423d6b3e/nemotron-3.5-asr-streaming-0.6b.q8_0.gguf",
+      "sha256": "3fc991d3badad7277c11030a7519832cddaf2057aafed6d4b25147e953a070b1",
+      "usedIn": [
+        "infra/helm/pa-webinar/values.yaml",
+        "docker-compose.yml",
+        "infra/captions/bench/common.py"
+      ],
+      "license": "LicenseRef-OpenMDW-1.1",
+      "licenseReview": "OpenMDW-1.1 per the model card, which states the model is ready for commercial use.",
+      "format": "gguf"
+    },
+    {
+      "name": "mradermacher/EuroLLM-9B-Instruct-2512-GGUF",
+      "file": "EuroLLM-9B-Instruct-2512.Q4_K_M.gguf",
+      "use": "Machine translation of event titles and descriptions, on CPU",
+      "delivery": "download",
+      "url": "https://huggingface.co/mradermacher/EuroLLM-9B-Instruct-2512-GGUF/resolve/5138603fccb9dc1f35c25cfd1a4981a78617e9ff/EuroLLM-9B-Instruct-2512.Q4_K_M.gguf",
+      "sha256": "fe9b50d4ba67eb0131f1ceeaab2e56ea8fb6b2bbc37391d3219c791c3b140a28",
+      "usedIn": ["infra/helm/pa-webinar/values.yaml"],
+      "ids": ["utter-project/EuroLLM-9B-Instruct-2512"],
+      "license": "Apache-2.0",
+      "format": "gguf"
+    },
+    {
+      "name": "Systran/faster-whisper-large-v3",
+      "use": "Post-production speech recognition",
+      "delivery": "operator",
+      "ids": ["large-v3"],
+      "license": "MIT",
+      "format": "ctranslate2"
+    },
+    {
+      "name": "mistralai/Mistral-Small-3.2-24B-Instruct-2506",
+      "use": "Post-production summaries and translations, served by vLLM",
+      "delivery": "operator",
+      "ids": ["mistralai/Mistral-Small-3.2-24B-Instruct-2506"],
+      "license": "Apache-2.0",
+      "format": "safetensors"
+    },
+    {
+      "name": "pyannote/segmentation-3.0",
+      "use": "Diarization of single-track recordings, loaded by the pyannote/speaker-diarization-3.1 pipeline",
+      "delivery": "operator",
+      "ids": ["pyannote/speaker-diarization-3.1"],
+      "license": "MIT",
+      "format": "pytorch-pickle",
+      "gaps": [
+        { "kind": "format", "note": "Published only as a PyTorch pickle (pytorch_model.bin)." }
+      ]
+    },
+    {
+      "name": "pyannote/wespeaker-voxceleb-resnet34-LM",
+      "use": "Speaker embeddings, loaded by the pyannote/speaker-diarization-3.1 pipeline",
+      "delivery": "operator",
+      "license": "CC-BY-4.0",
+      "format": "pytorch-pickle",
+      "gaps": [
+        { "kind": "format", "note": "Published only as a PyTorch pickle (pytorch_model.bin)." }
+      ]
+    },
+    {
+      "name": "pyannote/speaker-diarization-community-1",
+      "file": "plda",
+      "use": "PLDA files that pyannote.audio 4 loads with the diarization pipeline",
+      "delivery": "operator",
+      "license": "CC-BY-4.0",
+      "format": "numpy"
+    },
+    {
+      "name": "WAV2VEC2_ASR_BASE_960H",
+      "use": "Word alignment for English (torchaudio, WhisperX default)",
+      "delivery": "operator",
+      "license": "MIT",
+      "format": "pytorch-pickle",
+      "gaps": [
+        { "kind": "format", "note": "torchaudio publishes its pipeline weights as PyTorch pickles." }
+      ]
+    },
+    {
+      "name": "VOXPOPULI_ASR_BASE_10K_IT",
+      "use": "Word alignment for Italian (torchaudio, WhisperX default)",
+      "delivery": "operator",
+      "license": "CC-BY-NC-4.0",
+      "format": "pytorch-pickle",
+      "gaps": [
+        { "kind": "license", "note": "Non-commercial terms on a default model. Open point in THIRD-PARTY-LICENSES.md." },
+        { "kind": "format", "note": "torchaudio publishes its pipeline weights as PyTorch pickles." }
+      ]
+    },
+    {
+      "name": "VOXPOPULI_ASR_BASE_10K_FR",
+      "use": "Word alignment for French (torchaudio, WhisperX default)",
+      "delivery": "operator",
+      "license": "CC-BY-NC-4.0",
+      "format": "pytorch-pickle",
+      "gaps": [
+        { "kind": "license", "note": "Non-commercial terms on a default model. Open point in THIRD-PARTY-LICENSES.md." },
+        { "kind": "format", "note": "torchaudio publishes its pipeline weights as PyTorch pickles." }
+      ]
+    },
+    {
+      "name": "VOXPOPULI_ASR_BASE_10K_DE",
+      "use": "Word alignment for German (torchaudio, WhisperX default)",
+      "delivery": "operator",
+      "license": "CC-BY-NC-4.0",
+      "format": "pytorch-pickle",
+      "gaps": [
+        { "kind": "license", "note": "Non-commercial terms on a default model. Open point in THIRD-PARTY-LICENSES.md." },
+        { "kind": "format", "note": "torchaudio publishes its pipeline weights as PyTorch pickles." }
+      ]
+    },
+    {
+      "name": "VOXPOPULI_ASR_BASE_10K_ES",
+      "use": "Word alignment for Spanish (torchaudio, WhisperX default)",
+      "delivery": "operator",
+      "license": "CC-BY-NC-4.0",
+      "format": "pytorch-pickle",
+      "gaps": [
+        { "kind": "license", "note": "Non-commercial terms on a default model. Open point in THIRD-PARTY-LICENSES.md." },
+        { "kind": "format", "note": "torchaudio publishes its pipeline weights as PyTorch pickles." }
+      ]
+    },
+    {
+      "name": "facebook/audioseal",
+      "use": "Inaudible watermark on dubbed audio, fetched with torch.hub unless seeded",
+      "delivery": "operator",
+      "ids": ["audioseal_wm_16bits"],
+      "license": "MIT",
+      "format": "pytorch-pickle",
+      "gaps": [
+        { "kind": "format", "note": "Published only as PyTorch pickles (.pth)." }
+      ]
+    },
+    {
+      "name": "en_US-lessac-medium",
+      "file": "en_US-lessac-medium.onnx",
+      "use": "Speech synthesis for English dubbing",
+      "delivery": "image",
+      "url": "https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx",
+      "usedIn": ["infra/ai/Dockerfile.worker"],
+      "license": "NOASSERTION",
+      "format": "onnx",
+      "gaps": [
+        { "kind": "license", "note": "The model card names Blizzard 2013 Lessac data under a research license agreement. To verify for use outside research." },
+        { "kind": "pinning", "note": "Downloaded at image build from the main branch, with a size check and no checksum." }
+      ]
+    },
+    {
+      "name": "en_US-amy-medium",
+      "file": "en_US-amy-medium.onnx",
+      "use": "Speech synthesis for English dubbing",
+      "delivery": "image",
+      "url": "https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/amy/medium/en_US-amy-medium.onnx",
+      "usedIn": ["infra/ai/Dockerfile.worker"],
+      "license": "NOASSERTION",
+      "format": "onnx",
+      "gaps": [
+        { "kind": "license", "note": "The model card says \"See URL\" (Mycroft); fine-tuned from en_US-lessac-medium. To verify." },
+        { "kind": "pinning", "note": "Downloaded at image build from the main branch, with a size check and no checksum." }
+      ]
+    },
+    {
+      "name": "fr_FR-tom-medium",
+      "file": "fr_FR-tom-medium.onnx",
+      "use": "Speech synthesis for French dubbing",
+      "delivery": "image",
+      "url": "https://huggingface.co/rhasspy/piper-voices/resolve/main/fr/fr_FR/tom/medium/fr_FR-tom-medium.onnx",
+      "usedIn": ["infra/ai/Dockerfile.worker"],
+      "license": "AGPL-3.0",
+      "format": "onnx",
+      "gaps": [
+        { "kind": "license", "note": "AGPLv3 per the model card: a copyleft license on a model file inside a distributed image. To verify." },
+        { "kind": "pinning", "note": "Downloaded at image build from the main branch, with a size check and no checksum." }
+      ]
+    },
+    {
+      "name": "fr_FR-siwis-medium",
+      "file": "fr_FR-siwis-medium.onnx",
+      "use": "Speech synthesis for French dubbing",
+      "delivery": "image",
+      "url": "https://huggingface.co/rhasspy/piper-voices/resolve/main/fr/fr_FR/siwis/medium/fr_FR-siwis-medium.onnx",
+      "usedIn": ["infra/ai/Dockerfile.worker"],
+      "license": "CC-BY-4.0",
+      "format": "onnx",
+      "gaps": [
+        { "kind": "license", "note": "Fine-tuned from en_US-lessac-medium, whose data is under a research license." },
+        { "kind": "pinning", "note": "Downloaded at image build from the main branch, with a size check and no checksum." }
+      ]
+    },
+    {
+      "name": "de_DE-thorsten-medium",
+      "file": "de_DE-thorsten-medium.onnx",
+      "use": "Speech synthesis for German dubbing",
+      "delivery": "image",
+      "url": "https://huggingface.co/rhasspy/piper-voices/resolve/main/de/de_DE/thorsten/medium/de_DE-thorsten-medium.onnx",
+      "usedIn": ["infra/ai/Dockerfile.worker"],
+      "license": "CC0-1.0",
+      "format": "onnx",
+      "gaps": [
+        { "kind": "license", "note": "Fine-tuned from en_US-lessac-medium, whose data is under a research license." },
+        { "kind": "pinning", "note": "Downloaded at image build from the main branch, with a size check and no checksum." }
+      ]
+    },
+    {
+      "name": "de_DE-kerstin-low",
+      "file": "de_DE-kerstin-low.onnx",
+      "use": "Speech synthesis for German dubbing",
+      "delivery": "image",
+      "url": "https://huggingface.co/rhasspy/piper-voices/resolve/main/de/de_DE/kerstin/low/de_DE-kerstin-low.onnx",
+      "usedIn": ["infra/ai/Dockerfile.worker"],
+      "license": "CC0-1.0",
+      "format": "onnx",
+      "gaps": [
+        { "kind": "license", "note": "Fine-tuned from en_US-ryan-low, whose dataset is CC BY-NC-SA 4.0. To verify." },
+        { "kind": "pinning", "note": "Downloaded at image build from the main branch, with a size check and no checksum." }
+      ]
+    },
+    {
+      "name": "es_ES-davefx-medium",
+      "file": "es_ES-davefx-medium.onnx",
+      "use": "Speech synthesis for Spanish dubbing",
+      "delivery": "image",
+      "url": "https://huggingface.co/rhasspy/piper-voices/resolve/main/es/es_ES/davefx/medium/es_ES-davefx-medium.onnx",
+      "usedIn": ["infra/ai/Dockerfile.worker"],
+      "license": "CC0-1.0",
+      "format": "onnx",
+      "gaps": [
+        { "kind": "license", "note": "Fine-tuned from en_US-lessac-medium, whose data is under a research license." },
+        { "kind": "pinning", "note": "Downloaded at image build from the main branch, with a size check and no checksum." }
+      ]
+    },
+    {
+      "name": "es_AR-daniela-high",
+      "file": "es_AR-daniela-high.onnx",
+      "use": "Speech synthesis for Spanish dubbing",
+      "delivery": "image",
+      "url": "https://huggingface.co/rhasspy/piper-voices/resolve/main/es/es_AR/daniela/high/es_AR-daniela-high.onnx",
+      "usedIn": ["infra/ai/Dockerfile.worker"],
+      "license": "CC-BY-SA-4.0",
+      "format": "onnx",
+      "gaps": [
+        { "kind": "license", "note": "Trained on CC BY-SA 4.0 data (OpenSLR 61): attribution and share-alike. To verify." },
+        { "kind": "pinning", "note": "Downloaded at image build from the main branch, with a size check and no checksum." }
+      ]
+    },
+    {
+      "name": "it_IT-paola-medium",
+      "file": "it_IT-paola-medium.onnx",
+      "use": "Speech synthesis for Italian dubbing",
+      "delivery": "image",
+      "url": "https://huggingface.co/rhasspy/piper-voices/resolve/main/it/it_IT/paola/medium/it_IT-paola-medium.onnx",
+      "usedIn": ["infra/ai/Dockerfile.worker"],
+      "license": "CC0-1.0",
+      "format": "onnx",
+      "gaps": [
+        { "kind": "license", "note": "Fine-tuned from en_US-lessac-medium, whose data is under a research license." },
+        { "kind": "pinning", "note": "Downloaded at image build from the main branch, with a size check and no checksum." }
+      ]
+    },
+    {
+      "name": "selfie_segmenter_landscape",
+      "file": "selfie_segmenter_landscape.tflite",
+      "use": "Background preview in the waiting room, run in the browser",
+      "delivery": "repository",
+      "path": "app/public/models/selfie-segmentation/selfie_segmenter_landscape.tflite",
+      "sha256": "490e9ea734313e0de10fa0cd9e3c6133e36ea4db2b7a49bde9ef019f72796b8e",
+      "license": "Apache-2.0",
+      "format": "tflite"
+    }
+  ]
+}

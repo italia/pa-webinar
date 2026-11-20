@@ -7,17 +7,27 @@ const db = vi.hoisted(() => ({
   registration: { findMany: vi.fn() },
   recordingConsent: { findMany: vi.fn() },
   multitrackConsent: { findMany: vi.fn() },
+  retainedConsentProof: { findMany: vi.fn() },
 }));
 vi.mock('@/lib/db', () => ({ prisma: db }));
 vi.mock('@/lib/crypto/pii', () => ({ tryDecryptPII: (v: string) => `chiaro:${v}` }));
 
-import { proveConsensoEvento, riepilogoProve } from './consent-proofs';
+import {
+  improntaTitolare,
+  leggiRigheProve,
+  origineDelPosto,
+  periodiSostituiti,
+  postoDaIMieiDati,
+  proveConsensoEvento,
+  riepilogoProve,
+} from './consent-proofs';
 
 const REG = '11111111-2222-4333-8444-555555555555';
 const t = (s: string) => new Date(`2026-11-01T${s}:00Z`);
 
 beforeEach(() => {
   vi.clearAllMocks();
+  db.retainedConsentProof.findMany.mockResolvedValue([]);
   db.registration.findMany.mockResolvedValue([
     {
       id: REG,
@@ -130,5 +140,471 @@ describe('proveConsensoEvento', () => {
       [t('11:00').toISOString(), null],
     ]);
     expect(riepilogoProve(righe).recording).toEqual({ given: 1, withdrawn: 0 });
+  });
+
+  describe('un periodo sostituito da uno successivo', () => {
+    /** La prova di un'iscritta, con il periodo di prima chiuso da una sostituzione. */
+    const sostituita = (altri: Record<string, unknown> = {}) => {
+      db.registration.findMany.mockResolvedValue([]);
+      db.multitrackConsent.findMany.mockResolvedValue([]);
+      db.recordingConsent.findMany.mockResolvedValue([
+        {
+          displayName: 'iscritta',
+          jitsiUserId: `reg-${REG}-bb`,
+          registrationId: REG,
+          eventModeratorId: null,
+          staffAccountId: null,
+          consentedAt: t('11:00'),
+          withdrawnAt: null,
+          destination: 'PUBLIC',
+          textVersion: 1,
+          earlierPeriods: [
+            {
+              consentedAt: t('10:00').toISOString(),
+              withdrawnAt: null,
+              destination: 'REGISTRANTS',
+              textVersion: 1,
+            },
+          ],
+          ...altri,
+        },
+      ]);
+    };
+
+    it('resta come prova del suo testo, e il consenso vale una volta', async () => {
+      sostituita();
+      const righe = await proveConsensoEvento('e1');
+      expect(righe.map((r) => [r.destination, r.withdrawnAt, r.superata])).toEqual([
+        ['REGISTRANTS', null, true],
+        ['PUBLIC', null, false],
+      ]);
+      expect(riepilogoProve(righe).recording).toEqual({ given: 1, withdrawn: 0 });
+    });
+
+    it('chi ritira dopo la sostituzione ha ritirato', async () => {
+      sostituita({ withdrawnAt: t('11:30') });
+      expect(riepilogoProve(await proveConsensoEvento('e1')).recording).toEqual({
+        given: 0,
+        withdrawn: 1,
+      });
+    });
+
+    it('sostituito, ritirato e ridato: il consenso vale', async () => {
+      sostituita({
+        consentedAt: t('12:00'),
+        earlierPeriods: [
+          { consentedAt: t('10:00').toISOString(), withdrawnAt: null },
+          {
+            consentedAt: t('11:00').toISOString(),
+            withdrawnAt: t('11:30').toISOString(),
+          },
+        ],
+      });
+      const righe = await proveConsensoEvento('e1');
+      expect(righe.map((r) => r.superata)).toEqual([true, false, false]);
+      expect(riepilogoProve(righe).recording).toEqual({ given: 1, withdrawn: 0 });
+    });
+
+    it('un periodo ritirato resta un ritiro', async () => {
+      sostituita({
+        earlierPeriods: [
+          {
+            consentedAt: t('10:00').toISOString(),
+            withdrawnAt: t('10:30').toISOString(),
+          },
+        ],
+      });
+      expect((await proveConsensoEvento('e1')).map((r) => r.superata)).toEqual([
+        false,
+        false,
+      ]);
+    });
+
+    it('dopo la copia si riconosce uguale: nessun nuovo consenso valido', async () => {
+      db.registration.findMany.mockResolvedValue([]);
+      db.multitrackConsent.findMany.mockResolvedValue([]);
+      db.recordingConsent.findMany.mockResolvedValue([]);
+      const conservata = {
+        kind: 'recording',
+        source: 'room',
+        role: 'registrant',
+        holderHash: 'impronta',
+        displayName: null,
+        nameRemovedAt: null,
+        textVersion: 1,
+        destination: 'PUBLIC',
+      };
+      db.retainedConsentProof.findMany.mockResolvedValue([
+        { ...conservata, givenAt: t('10:00'), withdrawnAt: null },
+        { ...conservata, givenAt: t('11:00'), withdrawnAt: t('11:30') },
+      ]);
+      const righe = await proveConsensoEvento('e1');
+      expect(righe.map((r) => r.superata)).toEqual([true, false]);
+      expect(riepilogoProve(righe).recording).toEqual({ given: 0, withdrawn: 1 });
+    });
+  });
+
+  it('riporta destinazione e versione del testo, anche dei periodi precedenti', async () => {
+    db.registration.findMany.mockResolvedValue([
+      {
+        id: REG,
+        displayName: 'iscritta',
+        consentTimestamp: t('09:00'),
+        consentRecording: true,
+        consentRecordingDestination: 'REGISTRANTS',
+        consentRecordingVersion: 1,
+        consentRecordingWithdrawnAt: null,
+        consentMultitrack: false,
+      },
+    ]);
+    db.multitrackConsent.findMany.mockResolvedValue([]);
+    db.recordingConsent.findMany.mockResolvedValue([
+      {
+        displayName: 'ospite',
+        jitsiUserId: 'guest-1',
+        registrationId: null,
+        eventModeratorId: null,
+        staffAccountId: null,
+        consentedAt: t('11:00'),
+        withdrawnAt: null,
+        destination: 'PUBLIC',
+        textVersion: 1,
+        earlierPeriods: [
+          // Un periodo scritto prima che il testo dichiarasse la destinazione.
+          { consentedAt: t('10:00').toISOString(), withdrawnAt: t('10:10').toISOString() },
+          {
+            consentedAt: t('10:20').toISOString(),
+            withdrawnAt: t('10:30').toISOString(),
+            destination: 'REGISTRANTS',
+            textVersion: 1,
+          },
+          'non e’ un periodo',
+        ],
+      },
+    ]);
+    const righe = await proveConsensoEvento('e1');
+    expect(righe.map((r) => [r.destination, r.textVersion])).toEqual([
+      ['REGISTRANTS', 1],
+      [null, null],
+      ['REGISTRANTS', 1],
+      ['PUBLIC', 1],
+    ]);
+  });
+
+  it('legge anche le prove conservate: nome, nome tolto e stessa impronta', async () => {
+    const adesso = t('12:00');
+    const impronta = improntaTitolare('e1', `reg:${REG}`);
+    db.retainedConsentProof.findMany.mockResolvedValue([
+      {
+        kind: 'recording',
+        source: 'registration',
+        role: 'registrant',
+        holderHash: impronta,
+        displayName: 'cifrato',
+        nameRemovedAt: null,
+        textVersion: 1,
+        destination: 'PUBLIC',
+        givenAt: t('08:00'),
+        withdrawnAt: null,
+      },
+      {
+        kind: 'recording',
+        source: 'room',
+        role: 'guest',
+        holderHash: 'altra',
+        displayName: null,
+        nameRemovedAt: adesso,
+        textVersion: null,
+        destination: null,
+        givenAt: t('08:30'),
+        withdrawnAt: adesso,
+      },
+    ]);
+    const righe = await proveConsensoEvento('e1');
+    expect(db.retainedConsentProof.findMany.mock.calls[0]![0].where).toEqual({ eventId: 'e1' });
+    expect(righe[0]).toMatchObject({
+      name: 'chiaro:cifrato',
+      nomeRimosso: false,
+      conservata: true,
+      givenAt: t('08:00').toISOString(),
+    });
+    expect(righe[1]).toMatchObject({ name: null, nomeRimosso: true, conservata: true });
+    // La stessa persona con la sorgente viva e con la prova conservata conta una
+    // volta: quella della riga ritirata resta valida grazie alla conservata.
+    expect(riepilogoProve(righe).recording).toEqual({ given: 3, withdrawn: 1 });
+  });
+
+  it('il titolare non esce in chiaro', async () => {
+    const righe = await proveConsensoEvento('e1');
+    expect(righe.every((r) => /^[0-9a-f]{64}$/.test(r.holder))).toBe(true);
+  });
+
+  it('senza nomi non legge il nome delle prove conservate', async () => {
+    await proveConsensoEvento('e1', { nomi: false });
+    expect(db.retainedConsentProof.findMany.mock.calls[0]![0].select.displayName).toBe(false);
+  });
+});
+
+describe('periodiSostituiti', () => {
+  const periodo = (givenAt: string, withdrawnAt: string | null, altri = {}) => ({
+    kind: 'recording',
+    source: 'room',
+    role: 'registrant',
+    holderHash: 'impronta',
+    givenAt: t(givenAt),
+    withdrawnAt: withdrawnAt ? t(withdrawnAt) : null,
+    ...altri,
+  });
+
+  it('un periodo aperto seguito da un altro e’ sostituito; l’ultimo no', () => {
+    const [primo, secondo] = [periodo('10:00', null), periodo('11:00', null)];
+    expect([...periodiSostituiti([secondo, primo])]).toEqual([primo]);
+  });
+
+  it('un periodo ritirato prima del successivo non e’ sostituito', () => {
+    expect(
+      periodiSostituiti([periodo('10:00', '10:30'), periodo('11:00', null)]).size
+    ).toBe(0);
+  });
+
+  it('un ritiro scritto dopo la copia lo lascia sostituito', () => {
+    const primo = periodo('10:00', '12:00');
+    expect([...periodiSostituiti([primo, periodo('11:00', '12:00')])]).toEqual([primo]);
+  });
+
+  it('la prova dell’iscrizione non e’ un periodo di quella di sala', () => {
+    expect(
+      periodiSostituiti([
+        periodo('09:00', null, { source: 'registration' }),
+        periodo('10:00', null),
+      ]).size
+    ).toBe(0);
+  });
+
+  it('le prove di sala di chi conduce sono una per posto, e non si sostituiscono', () => {
+    expect(
+      periodiSostituiti([
+        periodo('10:00', null, { role: 'host' }),
+        periodo('11:00', '11:30', { role: 'host' }),
+      ]).size
+    ).toBe(0);
+  });
+
+  it('non mescola titolari diversi', () => {
+    expect(
+      periodiSostituiti([
+        periodo('10:00', null),
+        periodo('11:00', null, { holderHash: 'altra' }),
+      ]).size
+    ).toBe(0);
+  });
+
+  it('un periodo dato dai propri dati e’ un periodo della stessa prova di sala', () => {
+    const primo = periodo('10:00', null, { source: 'self-service' });
+    expect([...periodiSostituiti([primo, periodo('11:00', null)])]).toEqual([primo]);
+  });
+});
+
+describe('origineDelPosto', () => {
+  it('il posto di «I miei dati» e’ quello dell’iscrizione, non un ingresso', () => {
+    expect(postoDaIMieiDati(REG)).toBe(`reg-${REG}-mydata`);
+    expect(origineDelPosto(postoDaIMieiDati(REG))).toBe('self-service');
+  });
+
+  it('ogni altro posto e’ un ingresso in sala', () => {
+    expect(origineDelPosto(`reg-${REG}-abcd1234`)).toBe('room');
+    expect(origineDelPosto('guest-1-mydata')).toBe('room');
+    expect(origineDelPosto('mod-e-1')).toBe('room');
+  });
+});
+
+describe('leggiRigheProve', () => {
+  it('senza filtri legge tutto l’evento, con il cifrato e gli indirizzi', async () => {
+    db.registration.findMany.mockResolvedValue([
+      {
+        id: REG,
+        displayName: 'iscritta',
+        emailHash: 'impronta-iscritta',
+        locale: 'it',
+        consentTimestamp: t('09:00'),
+        consentRecording: true,
+        consentRecordingWithdrawnAt: null,
+        consentMultitrack: false,
+      },
+    ]);
+    db.recordingConsent.findMany.mockResolvedValue([
+      {
+        displayName: 'relatrice',
+        jitsiUserId: 'mod-e-1',
+        registrationId: null,
+        eventModeratorId: 'g1',
+        staffAccountId: null,
+        locale: 'en',
+        consentedAt: t('09:30'),
+        withdrawnAt: null,
+        eventModerator: { emailHash: 'impronta-relatrice' },
+      },
+      {
+        displayName: 'staff',
+        jitsiUserId: 'mod-e-2',
+        registrationId: null,
+        eventModeratorId: null,
+        staffAccountId: 's1',
+        locale: null,
+        consentedAt: t('09:40'),
+        withdrawnAt: null,
+        staffAccount: { emailHash: 'impronta-staff' },
+      },
+    ]);
+    db.multitrackConsent.findMany.mockResolvedValue([
+      {
+        displayName: 'iscritta',
+        jitsiUserId: `reg-${REG}-aa`,
+        registrationId: REG,
+        locale: 'it',
+        consentedAt: t('10:05'),
+        withdrawnAt: null,
+        textVersion: 2,
+        registration: { emailHash: 'impronta-iscritta' },
+      },
+    ]);
+    const righe = await leggiRigheProve(
+      db as unknown as Parameters<typeof leggiRigheProve>[0],
+      'e1'
+    );
+    expect(db.registration.findMany.mock.calls[0]![0].where.id).toBeUndefined();
+    expect(righe.map((r) => [r.displayName, r.emailHash, r.holder])).toEqual([
+      ['iscritta', 'impronta-iscritta', `reg:${REG}`],
+      ['relatrice', 'impronta-relatrice', 'concessione:g1'],
+      ['staff', 'impronta-staff', 'staff:s1'],
+      ['iscritta', 'impronta-iscritta', `reg:${REG}`],
+    ]);
+  });
+
+  it('un ospite non ha un indirizzo', async () => {
+    const righe = await leggiRigheProve(
+      db as unknown as Parameters<typeof leggiRigheProve>[0],
+      'e1'
+    );
+    expect(righe.find((r) => r.holder === 'posto:guest-1')?.emailHash).toBeNull();
+  });
+
+  it('filtra per iscrizione', async () => {
+    await leggiRigheProve(db as unknown as Parameters<typeof leggiRigheProve>[0], 'e1', {
+      registrationIds: ['r1'],
+    });
+    expect(db.registration.findMany.mock.calls[0]![0].where.id).toEqual({ in: ['r1'] });
+    expect(db.recordingConsent.findMany.mock.calls[0]![0].where.OR).toEqual([
+      { registrationId: { in: ['r1'] } },
+      { eventModeratorId: { in: [] } },
+      { staffAccountId: { in: [] } },
+    ]);
+    expect(db.multitrackConsent.findMany.mock.calls[0]![0].where.OR).toEqual([
+      { registrationId: { in: ['r1'] } },
+      { eventModeratorId: { in: [] } },
+      { staffAccountId: { in: [] } },
+    ]);
+  });
+
+  it('filtra per concessione: restano fuori le prove delle iscrizioni', async () => {
+    await leggiRigheProve(db as unknown as Parameters<typeof leggiRigheProve>[0], 'e1', {
+      grantIds: ['g1'],
+    });
+    expect(db.registration.findMany.mock.calls[0]![0].where.id).toEqual({ in: [] });
+    expect(db.recordingConsent.findMany.mock.calls[0]![0].where.OR).toEqual([
+      { registrationId: { in: [] } },
+      { eventModeratorId: { in: ['g1'] } },
+      { staffAccountId: { in: [] } },
+    ]);
+    expect(db.multitrackConsent.findMany.mock.calls[0]![0].where.OR).toEqual([
+      { registrationId: { in: [] } },
+      { eventModeratorId: { in: ['g1'] } },
+      { staffAccountId: { in: [] } },
+    ]);
+  });
+
+  it('filtra per account dello staff: restano fuori le prove delle iscrizioni', async () => {
+    await leggiRigheProve(db as unknown as Parameters<typeof leggiRigheProve>[0], 'e1', {
+      staffAccountIds: ['s1'],
+    });
+    expect(db.registration.findMany.mock.calls[0]![0].where.id).toEqual({ in: [] });
+    expect(db.recordingConsent.findMany.mock.calls[0]![0].where.OR).toEqual([
+      { registrationId: { in: [] } },
+      { eventModeratorId: { in: [] } },
+      { staffAccountId: { in: ['s1'] } },
+    ]);
+  });
+
+  it('filtra per impronta: trova le prove di chi non ha piu\' concessione o account', async () => {
+    await leggiRigheProve(db as unknown as Parameters<typeof leggiRigheProve>[0], 'e1', {
+      emailHash: 'impronta',
+    });
+    expect(db.registration.findMany.mock.calls[0]![0].where.id).toEqual({ in: [] });
+    for (const tabella of [db.recordingConsent, db.multitrackConsent]) {
+      expect(tabella.findMany.mock.calls[0]![0].where.OR).toContainEqual({
+        emailHash: 'impronta',
+      });
+    }
+  });
+
+  it('la prova della trascrizione di chi conduce si lega come quella della registrazione', async () => {
+    db.registration.findMany.mockResolvedValue([]);
+    db.recordingConsent.findMany.mockResolvedValue([]);
+    db.multitrackConsent.findMany.mockResolvedValue([
+      {
+        displayName: 'cifrato',
+        jitsiUserId: 'mod-e1-aa',
+        registrationId: null,
+        eventModeratorId: 'g1',
+        staffAccountId: null,
+        emailHash: null,
+        locale: 'it',
+        consentedAt: new Date('2026-10-01T09:00:00Z'),
+        withdrawnAt: null,
+        textVersion: 2,
+        registration: null,
+        eventModerator: { emailHash: 'della-concessione' },
+        staffAccount: null,
+      },
+    ]);
+    const [riga] = await leggiRigheProve(
+      db as unknown as Parameters<typeof leggiRigheProve>[0],
+      'e1'
+    );
+    expect(riga).toMatchObject({
+      kind: 'transcription',
+      role: 'host',
+      emailHash: 'della-concessione',
+      holder: 'concessione:g1',
+    });
+  });
+
+  it('l\'impronta scritta con il consenso resta se concessione e account se ne vanno', async () => {
+    db.registration.findMany.mockResolvedValue([]);
+    db.multitrackConsent.findMany.mockResolvedValue([]);
+    db.recordingConsent.findMany.mockResolvedValue([
+      {
+        displayName: 'cifrato',
+        jitsiUserId: 'mod-e1-aa',
+        registrationId: null,
+        eventModeratorId: null,
+        staffAccountId: null,
+        emailHash: 'scritta-sulla-prova',
+        locale: 'it',
+        consentedAt: new Date('2026-10-01T09:00:00Z'),
+        withdrawnAt: null,
+        earlierPeriods: null,
+        destination: 'PUBLIC',
+        textVersion: 1,
+        registration: null,
+        eventModerator: null,
+        staffAccount: null,
+      },
+    ]);
+    const [riga] = await leggiRigheProve(
+      db as unknown as Parameters<typeof leggiRigheProve>[0],
+      'e1'
+    );
+    expect(riga).toMatchObject({ role: 'host', emailHash: 'scritta-sulla-prova' });
   });
 });

@@ -17,6 +17,16 @@ export const CHIAVI_RINOMINATE: Readonly<Record<string, string>> = {
   'live.recordingConsent': 'waiting.recordingConsentIntro',
 };
 
+/**
+ * Varianti di un testo personalizzabile: finche' non ne hanno una loro, valgono
+ * con la personalizzazione del testo di partenza. Un testo legale scritto
+ * dall'amministrazione non lascia il posto a quello predefinito solo perche'
+ * l'evento ne usa una variante.
+ */
+export const VARIANTI_DI_TESTO: Readonly<Record<string, string>> = {
+  'waiting.recordingConsentIntroAnonymous': 'waiting.recordingConsentIntro',
+};
+
 export function conChiaviRinominate<T>(
   overrides: Readonly<Record<string, T>>,
 ): Record<string, T | string> {
@@ -25,6 +35,12 @@ export function conChiaviRinominate<T>(
     const valore = overrides[vecchia];
     if (typeof valore === 'string' && valore.trim() && overrides[nuova] === undefined) {
       out[nuova] = valore;
+    }
+  }
+  for (const [variante, testo] of Object.entries(VARIANTI_DI_TESTO)) {
+    const valore = out[testo];
+    if (typeof valore === 'string' && valore.trim() && out[variante] === undefined) {
+      out[variante] = valore;
     }
   }
   return out;

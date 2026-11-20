@@ -13,13 +13,16 @@ const db = vi.hoisted(() => ({
   event: { findUnique: vi.fn() },
   eventInvitation: {
     findMany: vi.fn(),
-    update: vi.fn(),
     updateMany: vi.fn(),
     findUnique: vi.fn(),
   },
   registration: { findMany: vi.fn() },
+  person: { findMany: vi.fn() },
 }));
-const coda = vi.hoisted(() => ({ enqueueEmailOnce: vi.fn(async () => true) }));
+const coda = vi.hoisted(() => ({
+  enqueueEmailOnce: vi.fn(async () => true),
+  chiaveEmailInvito: (id: string) => `event-invitation:${id}:`,
+}));
 vi.mock('next/headers', () => ({ cookies: async () => ({}) }));
 vi.mock('@/lib/auth/staff-session', () => ({
   requireEventManager: vi.fn(async () => ({ role: 'organizer' })),
@@ -37,6 +40,9 @@ vi.mock('@/lib/email/outbox', () => coda);
 vi.mock('@/lib/crypto/pii', () => ({
   tryDecryptPII: (v: string | null) => v,
   hashEmail: (v: string) => `h:${v}`,
+}));
+vi.mock('next-intl/server', () => ({
+  getTranslations: async () => (chiave: string) => chiave,
 }));
 
 import { POST } from './route';
@@ -65,14 +71,15 @@ beforeEach(() => {
   for (const f of [
     db.event.findUnique,
     db.eventInvitation.findMany,
-    db.eventInvitation.update,
     db.eventInvitation.updateMany,
     db.eventInvitation.findUnique,
     db.registration.findMany,
+    db.person.findMany,
   ])
     f.mockReset();
   coda.enqueueEmailOnce.mockClear();
   db.registration.findMany.mockResolvedValue([]);
+  db.person.findMany.mockResolvedValue([]);
   db.eventInvitation.findUnique.mockResolvedValue({ token: 'tok' });
 });
 
@@ -98,6 +105,31 @@ describe('POST /api/admin/events/[id]/invitations/send', () => {
     )[0]![0];
     expect(mail.subject).toBe('Invitation: Event');
     expect(mail.text).toContain('Registration is reserved for invited people');
+    expect(mail.text).not.toContain('addressBook');
+  });
+
+  it("l'esito conta fra i saltati chi ha ritirato il consenso alla rubrica", async () => {
+    db.event.findUnique.mockResolvedValue(evento('PUBLISHED'));
+    db.eventInvitation.findMany.mockResolvedValue([
+      {
+        id: 'i1',
+        name: null,
+        email: 'ada@example.org',
+        emailHash: 'h:ada@example.org',
+        token: 'tok',
+      },
+    ]);
+    db.person.findMany.mockResolvedValue([
+      {
+        id: 'p1',
+        emailHash: 'h:ada@example.org',
+        optedInToAddressBook: false,
+        optedOutAt: new Date('2026-11-01T10:00:00Z'),
+      },
+    ]);
+    const res = await POST(richiesta({}) as never, ctx as never);
+    expect(await res.json()).toEqual({ sent: 0, skipped: 1, remaining: 0 });
+    expect(coda.enqueueEmailOnce).not.toHaveBeenCalled();
   });
 
   it('una bozza risponde 409 EVENT_NOT_SENDABLE, senza email', async () => {

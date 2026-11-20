@@ -13,12 +13,20 @@ const { prisma, sessione } = vi.hoisted(() => ({
   prisma: {
     staffAccount: { findUnique: vi.fn() },
     adminAuditLog: { create: vi.fn() },
-    event: { count: vi.fn(), update: vi.fn() },
+    event: { count: vi.fn(), findUnique: vi.fn(), update: vi.fn(), findMany: vi.fn() },
+    callSession: { findFirst: vi.fn(), updateMany: vi.fn(), findMany: vi.fn() },
+    recording: { findMany: vi.fn() },
+    $transaction: vi.fn(),
   },
   sessione: { cookie: undefined as string | undefined },
 }));
 
 vi.mock('@/lib/db', () => ({ prisma }));
+const storage = vi.hoisted(() => ({ getRecordingsStorage: vi.fn((): unknown => null) }));
+vi.mock('@/lib/storage/index', () => ({
+  getRecordingsStorage: storage.getRecordingsStorage,
+  recordingsProviderLabel: () => 'not-configured',
+}));
 vi.mock('next/headers', () => ({
   cookies: async () => ({
     get: (nome: string) =>
@@ -55,6 +63,24 @@ async function entra(role: 'ADMIN' | 'ORGANIZER') {
   sessione.cookie = await signStaffSession({ id: ACCOUNT, role });
 }
 
+/** Cio' che la rotta rilegge per la guardia: un evento senza destinazione. */
+const evento = (over: Record<string, unknown> = {}) => ({
+  status: 'PUBLISHED',
+  eventType: 'SCHEDULED',
+  recordingEnabled: true,
+  recordingDestination: null,
+  recordingAudience: 'PUBLIC',
+  recordingUrl: null,
+  recordingPublished: false,
+  transcriptPublished: false,
+  youtubeUrl: null,
+  tempRecordingUrl: null,
+  ...over,
+});
+const riservato = (over: Record<string, unknown> = {}) =>
+  evento({ recordingDestination: 'REGISTRANTS', recordingAudience: 'REGISTRANTS', ...over });
+const YOUTUBE = 'https://www.youtube.com/watch?v=abc';
+
 const dati = () => prisma.event.update.mock.calls[0]![0].data as Record<string, unknown>;
 
 beforeAll(() => {
@@ -64,7 +90,18 @@ beforeAll(() => {
 beforeEach(async () => {
   vi.clearAllMocks();
   await entra('ADMIN');
-  prisma.event.count.mockResolvedValue(0);
+  // L'admin di questi casi organizza l'evento: pubblicarne il video e' una sua
+  // scelta (lib/recording/content-access).
+  prisma.event.count.mockResolvedValue(1);
+  prisma.event.findUnique.mockResolvedValue(evento());
+  prisma.event.findMany.mockResolvedValue([]);
+  prisma.callSession.findMany.mockResolvedValue([]);
+  prisma.recording.findMany.mockResolvedValue([]);
+  prisma.$transaction.mockImplementation(async (fn: (tx: typeof prisma) => unknown) =>
+    fn(prisma)
+  );
+  prisma.callSession.findFirst.mockResolvedValue(null);
+  storage.getRecordingsStorage.mockReturnValue(null);
   prisma.event.update.mockImplementation(async ({ data }: { data: object }) => ({
     id: EVENTO,
     moderatorToken: 'token-segreto-di-conduzione',
@@ -86,12 +123,29 @@ describe('chi puo’ pubblicare', () => {
 
   it('l’evento di un altro organizzatore e’ 403', async () => {
     await entra('ORGANIZER');
+    prisma.event.count.mockResolvedValue(0);
     expect((await aggiorna({ libraryListed: true })).status).toBe(403);
     expect(prisma.event.count.mock.calls[0]![0].where).toMatchObject({
       id: EVENTO,
       AND: [{ OR: expect.arrayContaining([{ createdById: ACCOUNT }]) }],
     });
     expect(prisma.event.update).not.toHaveBeenCalled();
+  });
+
+  it('l’admin che non organizza l’evento ne cura l’elenco, ma non ne espone il contenuto', async () => {
+    prisma.event.count.mockResolvedValue(0);
+    expect((await aggiorna({ libraryListed: true, coverImageUrl: null })).status).toBe(200);
+    for (const corpo of [
+      { recordingPublished: true },
+      { postEventPublic: true },
+      { recordingUrl: VIDEO },
+      { recordingUrl: null },
+    ]) {
+      const r = await aggiorna(corpo);
+      expect(r.status).toBe(403);
+      expect(((await r.json()) as { code?: string }).code).toBe('RECORDING_CONTENT_ORGANIZER_ONLY');
+    }
+    expect(prisma.event.update).toHaveBeenCalledTimes(1);
   });
 
   it('chi organizza pubblica il proprio evento', async () => {
@@ -170,11 +224,14 @@ describe('cosa si scrive', () => {
 
   it('chi rinuncia a pubblicare carica il video e basta', async () => {
     await aggiorna({ recordingUrl: VIDEO, recordingPublished: false });
-    expect(dati()).toEqual({
+    const { recordingRetentionFrom, ...resto } = dati();
+    expect(resto).toEqual({
       recordingUrl: VIDEO,
       recordingEnabled: true,
       recordingPublished: false,
     });
+    // Un file nuovo: la durata della registrazione non pubblicata conta da qui.
+    expect(recordingRetentionFrom).toBeInstanceOf(Date);
   });
 
   it('togliere il video toglie la pubblicazione', async () => {
@@ -201,6 +258,162 @@ describe('cosa si scrive', () => {
     prisma.event.update.mockClear();
     await aggiorna({ recordingFileSize: null, recordingDuration: null });
     expect(dati()).toEqual({ recordingFileSize: null, recordingDuration: null });
+  });
+});
+
+describe('la destinazione della registrazione', () => {
+  it('un video esterno su un evento riservato e’ 409, e non si scrive niente', async () => {
+    prisma.event.findUnique.mockResolvedValue(riservato());
+    const r = await aggiorna({ youtubeUrl: YOUTUBE });
+    expect(r.status).toBe(409);
+    expect(await r.json()).toMatchObject({ code: 'RECORDING_DESTINATION_NOT_COVERED' });
+    expect(prisma.event.update).not.toHaveBeenCalled();
+  });
+
+  it('un file caricato non si rifiuta mai: si pubblica per gli iscritti', async () => {
+    prisma.event.findUnique.mockResolvedValue(riservato());
+    const r = await aggiorna({ recordingUrl: VIDEO, recordingFileSize: 1024 });
+    expect(r.status).toBe(200);
+    expect(dati()).toMatchObject({ recordingUrl: VIDEO, recordingPublished: true });
+  });
+
+  it('un indirizzo fuori dallo storage su un evento riservato e’ 409', async () => {
+    storage.getRecordingsStorage.mockReturnValue({ keyFromUrl: () => null });
+    prisma.event.findUnique.mockResolvedValue(riservato());
+    const r = await aggiorna({ recordingUrl: 'https://altro.example.com/video.mp4' });
+    expect(r.status).toBe(409);
+    expect(prisma.event.update).not.toHaveBeenCalled();
+  });
+
+  it('un file dello storage su un evento riservato passa', async () => {
+    storage.getRecordingsStorage.mockReturnValue({ keyFromUrl: () => 'recordings/sala.mp4' });
+    prisma.event.findUnique.mockResolvedValue(riservato());
+    expect((await aggiorna({ recordingUrl: VIDEO })).status).toBe(200);
+  });
+
+  it('il file di un altro evento non si aggancia: 422, e non si scrive niente', async () => {
+    storage.getRecordingsStorage.mockReturnValue({ keyFromUrl: () => 'recordings/sala.mp4' });
+    prisma.event.findMany.mockResolvedValue([{ recordingUrl: VIDEO }]);
+    const r = await aggiorna({ recordingUrl: VIDEO });
+    expect(r.status).toBe(422);
+    expect(((await r.json()) as { code?: string }).code).toBe('RECORDING_URL_NOT_OWNED');
+    expect(prisma.event.update).not.toHaveBeenCalled();
+  });
+
+  it('nemmeno quello che porta nel nome un altro evento', async () => {
+    const altro = '99999999-9999-4999-8999-999999999999';
+    storage.getRecordingsStorage.mockReturnValue({ keyFromUrl: () => `postprod/${altro}/r/mix.mp4` });
+    expect((await aggiorna({ recordingUrl: VIDEO })).status).toBe(422);
+    storage.getRecordingsStorage.mockReturnValue({ keyFromUrl: () => `recordings/multitrack/${EVENTO}/r/a.ogg` });
+    expect((await aggiorna({ recordingUrl: VIDEO })).status).toBe(200);
+  });
+
+  it.each([
+    ['la libreria', { libraryListed: true }],
+    ['la pagina dopo l’evento', { postEventPublic: true }],
+    ['la pubblicazione per gli iscritti', { recordingPublished: true }],
+    ['togliere il video esterno', { youtubeUrl: null }],
+    ['togliere il video', { recordingUrl: null }],
+  ])('un evento riservato accetta %s', async (_n, corpo) => {
+    prisma.event.findUnique.mockResolvedValue(riservato());
+    expect((await aggiorna(corpo)).status).toBe(200);
+  });
+
+  it('un evento riservato tiene il suo video esterno', async () => {
+    prisma.event.findUnique.mockResolvedValue(riservato({ youtubeUrl: YOUTUBE }));
+    expect((await aggiorna({ youtubeUrl: YOUTUBE })).status).toBe(200);
+  });
+
+  describe('un evento che comincia a registrare con il file caricato', () => {
+    const spento = (over: Record<string, unknown> = {}) =>
+      evento({ recordingEnabled: false, ...over });
+
+    it('parte riservato, e il file non si rifiuta', async () => {
+      prisma.event.findUnique.mockResolvedValue(spento());
+      expect((await aggiorna({ recordingUrl: VIDEO })).status).toBe(200);
+      expect(dati()).toMatchObject({
+        recordingUrl: VIDEO,
+        recordingEnabled: true,
+        recordingPublished: true,
+        recordingDestination: 'REGISTRANTS',
+        recordingAudience: 'REGISTRANTS',
+      });
+    });
+
+    it('anche se chi carica rinuncia a pubblicare', async () => {
+      prisma.event.findUnique.mockResolvedValue(spento());
+      await aggiorna({ recordingUrl: VIDEO, recordingPublished: false });
+      expect(dati()).toMatchObject({
+        recordingPublished: false,
+        recordingDestination: 'REGISTRANTS',
+        recordingAudience: 'REGISTRANTS',
+      });
+    });
+
+    it.each([
+      ['concluso', () => spento({ status: 'ENDED' })],
+      ['archiviato', () => spento({ status: 'ARCHIVED' })],
+    ])('su un evento %s resta senza destinazione e pubblica', async (_n, stato) => {
+      prisma.event.findUnique.mockResolvedValue(stato());
+      expect((await aggiorna({ recordingUrl: VIDEO })).status).toBe(200);
+      expect(dati()).toMatchObject({
+        recordingUrl: VIDEO,
+        recordingEnabled: true,
+        recordingPublished: true,
+      });
+      expect(dati()).not.toHaveProperty('recordingDestination');
+      expect(dati()).not.toHaveProperty('recordingAudience');
+    });
+
+    it('anche su un evento pubblicato la cui sala si e’ gia’ aperta', async () => {
+      prisma.event.findUnique.mockResolvedValue(spento());
+      prisma.callSession.findFirst.mockResolvedValue({ id: 'sessione' });
+      await aggiorna({ recordingUrl: VIDEO });
+      expect(dati()).not.toHaveProperty('recordingDestination');
+    });
+
+    it('un video esterno nella stessa richiesta e’ 409', async () => {
+      prisma.event.findUnique.mockResolvedValue(spento());
+      const r = await aggiorna({ recordingUrl: VIDEO, youtubeUrl: YOUTUBE });
+      expect(r.status).toBe(409);
+      expect(prisma.event.update).not.toHaveBeenCalled();
+    });
+
+    it.each([
+      ['una chiamata rapida', spento({ eventType: 'INSTANT' })],
+      ['un evento storico', spento({ eventType: 'LEGACY' })],
+      ['un evento che registrava gia’', evento()],
+      ['una destinazione dichiarata', spento({ recordingDestination: 'PUBLIC' })],
+    ])('%s resta com’era', async (_n, stato) => {
+      prisma.event.findUnique.mockResolvedValue(stato);
+      await aggiorna({ recordingUrl: VIDEO });
+      expect(dati().recordingDestination).toBeUndefined();
+      expect(dati().recordingAudience).toBeUndefined();
+    });
+
+    it('togliere il video o le altre modifiche non toccano la destinazione', async () => {
+      prisma.event.findUnique.mockResolvedValue(spento());
+      await aggiorna({ recordingUrl: null });
+      expect(dati().recordingDestination).toBeUndefined();
+
+      prisma.event.update.mockClear();
+      await aggiorna({ libraryListed: true });
+      expect(dati()).toEqual({ libraryListed: true });
+    });
+  });
+
+  it.each([
+    ['senza destinazione', evento()],
+    ['con destinazione pubblica', evento({ recordingDestination: 'PUBLIC' })],
+  ])('un evento %s non si blocca', async (_n, stato) => {
+    prisma.event.findUnique.mockResolvedValue(stato);
+    expect((await aggiorna({ youtubeUrl: YOUTUBE, recordingPublished: true })).status).toBe(200);
+  });
+
+  it('un evento che non esiste e’ 404', async () => {
+    prisma.event.findUnique.mockResolvedValue(null);
+    expect((await aggiorna({ libraryListed: true })).status).toBe(404);
+    expect(prisma.event.update).not.toHaveBeenCalled();
   });
 });
 

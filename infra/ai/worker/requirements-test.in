@@ -1,0 +1,21 @@
+# Dipendenze MINIME per la suite pytest (logica pura).
+#
+# I moduli sotto test importano torch/whisperx/pyannote solo DENTRO le funzioni,
+# non a livello di modulo: i test non li toccano. Restano solo le due leggere
+# che compaiono in cima — numpy (align, xcorr, merge tracce), httpx (il client
+# del LLM) e pydantic (la forma del claim, in client.py, che i test del worker
+# e del resoconto importano). Cosi' il job CI non deve tirare ~2 GB di CUDA
+# per verificare che l'allineamento dei sottotitoli non regredisca.
+# Sotto la 2.5, che chiede Python 3.12: la CI gira la suite con Python 3.11.
+# Il file compilato (requirements-test.txt) si genera con Python 3.13, come
+# requirements-cpu.txt: Dependabot usa una sola versione di Python per
+# cartella, quella che legge nell'intestazione di un file pip-compile.
+numpy>=2.1,<2.5
+# I parametri Punkt che l'immagine genera (punkt_params.py), caricati come li
+# carica l'allineamento di WhisperX. Stessa versione di requirements.txt: NLTK
+# scrive i parametri solo sotto i percorsi di nltk.data.path (punkt_params ci
+# aggiunge la cartella), e la prova deve girare con la versione dell'immagine.
+nltk==3.10.4
+httpx==0.28.1
+pydantic==2.14.2
+pytest

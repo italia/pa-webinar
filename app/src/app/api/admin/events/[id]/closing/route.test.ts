@@ -56,11 +56,13 @@ const DATI: DatiChiusura = {
   recordingEnabled: true,
   recordingUrl: 'https://x/v.mp4',
   recordingPublished: false,
+  recordingAudience: 'PUBLIC',
   youtubeUrl: null,
   transcriptPublished: false,
   captionsTranscriptEnabled: false,
   trascrizione: null,
   trascrizioneInLavorazione: false,
+  trascrizioneDaConfermare: null,
   pipelineAi: false,
   resocontoGenerato: false,
   resocontoPubblicato: false,
@@ -133,6 +135,52 @@ describe('GET /api/admin/events/[id]/closing', () => {
     const res = await GET(...chiama(EVENT_ID, TOKEN));
     const corpo = (await res.json()) as { voci: { voce: string; caso: string }[] };
     expect(corpo.voci.find((v) => v.voce === 'resoconto')?.caso).toBe('soloStaff');
+  });
+
+  describe('il video che aspetta la conferma sulle voci', () => {
+    const fermo: DatiChiusura = {
+      ...DATI,
+      pipelineAi: true,
+      trascrizioneDaConfermare: 'rec-9',
+    };
+    const trascrizione = async (res: Response) =>
+      ((await res.json()) as { voci: Record<string, unknown>[] }).voci.find(
+        (v) => v.voce === 'trascrizione'
+      );
+
+    it('lo staff riceve la voce da fare, con la registrazione da aprire', async () => {
+      mockedDati.mockResolvedValue(fermo);
+      await expect(trascrizione(await GET(...chiama()))).resolves.toEqual({
+        voce: 'trascrizione',
+        stato: 'da-fare',
+        caso: 'daConfermare',
+        recordingId: 'rec-9',
+      });
+    });
+
+    it('con il solo link del moderatore: la conferma la da’ lo staff, nessun id', async () => {
+      mockedDati.mockResolvedValue(fermo);
+      await expect(trascrizione(await GET(...chiama(EVENT_ID, TOKEN)))).resolves.toEqual({
+        voce: 'trascrizione',
+        stato: 'non-serve',
+        caso: 'soloStaff',
+      });
+    });
+  });
+
+  it('un video riservato non si dice nella libreria, a nessuno dei due', async () => {
+    mockedDati.mockResolvedValue({
+      ...DATI,
+      recordingPublished: true,
+      recordingAudience: 'REGISTRANTS',
+      libraryListed: true,
+    });
+    for (const richiesta of [chiama(), chiama(EVENT_ID, TOKEN)]) {
+      const corpo = (await (await GET(...richiesta)).json()) as {
+        voci: { voce: string; caso: string }[];
+      };
+      expect(corpo.voci.find((v) => v.voce === 'pagina')?.caso).toBe('libreriaRiservata');
+    }
   });
 
   it('staff che non gestisce l’evento e token sbagliato: decide la sessione, 403', async () => {

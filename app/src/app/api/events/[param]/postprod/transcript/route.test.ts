@@ -97,6 +97,7 @@ function registrazione(extra: Record<string, unknown> = {}) {
     id: `rec-${contatore}`,
     sourceLanguage: 'it',
     pipelineSnapshot: { asr: 'whisperx' },
+    transcriptConsentRule: false,
     artifacts: [artefatto('TRANSCRIPT_JSON', null, JSON.stringify(TRASCRIZIONE))],
     speakers: [
       { diarLabel: 'SPEAKER_00', displayName: null, totalSpeechSec: 5 },
@@ -231,6 +232,92 @@ describe('nomi di chi parla', () => {
     expect(c.segments[0]!.speakerName).not.toBe('Anna Bianchi');
     expect(c.segments[1]!.speakerName).toBe('Luca Verdi');
     expect(h.endpointConConsenso).toHaveBeenCalledWith('ev-1', ['ep-1', 'ep-2'], 'v1');
+  });
+
+  describe('il segno della registrazione mostrata', () => {
+    // Come la regola vera: il segno basta a dire che il consenso e' stato
+    // chiesto, e vale il testo che comprende il nome.
+    function regolaSulSegno() {
+      h.regimeConsensoVoce.mockImplementation(
+        async (_db: unknown, _id: string, _e: unknown, _s: unknown, segno: boolean) => ({
+          chiesto: segno,
+          versione: segno ? 2 : 1,
+        })
+      );
+    }
+
+    it('video nuovo, consenso negato: il nome non si mostra', async () => {
+      regolaSulSegno();
+      h.endpointConConsenso.mockResolvedValue(new Set());
+      registrazione({
+        transcriptConsentRule: true,
+        callSession: { dominantSpeakerLog: LOG },
+      });
+      const c = await corpo();
+      expect(c.segments.map((s) => s.speakerName)).toEqual([
+        'Partecipante 2',
+        'Partecipante 1',
+      ]);
+      expect(h.endpointConConsenso).toHaveBeenCalledWith('ev-1', ['ep-1', 'ep-2'], 2);
+    });
+
+    it('video nuovo: il nome solo di chi ha dato il consenso', async () => {
+      regolaSulSegno();
+      h.endpointConConsenso.mockResolvedValue(new Set(['ep-2']));
+      registrazione({
+        transcriptConsentRule: true,
+        callSession: { dominantSpeakerLog: LOG },
+      });
+      const c = await corpo();
+      expect(c.segments[0]!.speakerName).not.toBe('Anna Bianchi');
+      expect(c.segments[1]!.speakerName).toBe('Luca Verdi');
+    });
+
+    it('registrazione nata prima della regola: i nomi restano com’erano', async () => {
+      regolaSulSegno();
+      registrazione({ callSession: { dominantSpeakerLog: LOG } });
+      const c = await corpo();
+      expect(c.segments.map((s) => s.speakerName)).toEqual([
+        'Anna Bianchi',
+        'Luca Verdi',
+      ]);
+      expect(h.endpointConConsenso).not.toHaveBeenCalled();
+    });
+
+    it('il segno passa dalla riga di ogni registrazione, non dall’evento', async () => {
+      regolaSulSegno();
+      h.endpointConConsenso.mockResolvedValue(new Set());
+      registrazione({ callSession: { dominantSpeakerLog: LOG } });
+      await corpo();
+      registrazione({
+        transcriptConsentRule: true,
+        callSession: { dominantSpeakerLog: LOG },
+      });
+      await corpo();
+      expect(h.regimeConsensoVoce.mock.calls.map((c) => c[4])).toEqual([false, true]);
+      expect(h.event).toHaveBeenCalledWith(
+        expect.objectContaining({
+          select: expect.not.objectContaining({ transcriptConsentRule: true }),
+        })
+      );
+    });
+
+    it('il nome dato dallo staff non dipende dal segno', async () => {
+      regolaSulSegno();
+      registrazione({
+        transcriptConsentRule: true,
+        speakers: [
+          { diarLabel: 'SPEAKER_00', displayName: 'Anna Bianchi', totalSpeechSec: 5 },
+          { diarLabel: 'SPEAKER_01', displayName: 'Luca Verdi', totalSpeechSec: 50 },
+        ],
+        callSession: { dominantSpeakerLog: LOG },
+      });
+      const c = await corpo();
+      expect(c.segments.map((s) => s.speakerName)).toEqual([
+        'Anna Bianchi',
+        'Luca Verdi',
+      ]);
+    });
   });
 
   it('senza voci da nominare il registro non si legge', async () => {

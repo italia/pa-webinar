@@ -28,7 +28,7 @@
     "license:check": "node scripts/licenses/check.mjs",
     "license:headers": "node scripts/licenses/headers.mjs",
     "changelog:md": "node scripts/generate-changelog-md.mjs",
-    "test:scripts": "node --test scripts/licenses/policy.test.mjs scripts/licenses/headers.test.mjs scripts/git-hooks/rules.test.mjs",
+    "test:scripts": "node --test scripts/licenses/policy.test.mjs scripts/licenses/models.test.mjs scripts/licenses/headers.test.mjs scripts/git-hooks/rules.test.mjs",
     "hooks:install": "node scripts/git-hooks/install.mjs --force",
     "prepare": "node scripts/git-hooks/install.mjs"
   },

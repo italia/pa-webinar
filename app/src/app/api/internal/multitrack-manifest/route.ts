@@ -29,7 +29,7 @@ import { assertCronApiKey } from '@/lib/auth/cron';
 import { prisma } from '@/lib/db';
 import { NotFoundError, ValidationError } from '@/lib/errors';
 import { encryptPIIOrNull } from '@/lib/crypto/pii';
-import { enqueuePostprodForRecording } from '@/lib/ai/enqueue';
+import { enqueuePostprodForRecording, type EnqueueResult } from '@/lib/ai/enqueue';
 import { allTracksSilent, SILENCE_FLOOR_BYTES_PER_SEC } from '@/lib/ai/track-silence';
 import { multitrackRecordingPrefix } from '@/lib/recorder/lifecycle';
 import { unisciZero } from '@/lib/recorder/track-zero';
@@ -111,6 +111,7 @@ export const POST = withErrorHandling(async (request) => {
     recording.event.status !== 'ARCHIVED';
 
   let skipSilent = false;
+  const vuoto: EnqueueResult = { enqueued: 0, skippedExisting: 0, jobIds: [] };
   const result = await prisma.$transaction(async (tx) => {
     // Due manifest della stessa registrazione non si mescolano a meta'.
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`multitrack-manifest:${recordingId}`}))`;
@@ -173,7 +174,7 @@ export const POST = withErrorHandling(async (request) => {
       });
     }
 
-    if (parziale) return { enqueued: 0, skippedExisting: 0, jobIds: [] };
+    if (parziale) return vuoto;
     // Il silenzio si giudica su tutte le tracce della registrazione, anche
     // quelle di un'esecuzione precedente: una seconda esecuzione breve e
     // silenziosa non deve buttare l'audio della prima.
@@ -196,12 +197,18 @@ export const POST = withErrorHandling(async (request) => {
         where: { id: recordingId },
         data: { status: 'POSTPROD_FAILED' },
       });
-      return { enqueued: 0, skippedExisting: 0, jobIds: [] };
+      return vuoto;
     }
 
     // Accoda la pipeline multi-traccia (idempotente via idempotency_key).
-    return enqueuePostprodForRecording(tx, { recordingId, multitrack: true });
+    return enqueuePostprodForRecording(tx, { recordingId, multitrack: true, seMancanoTracce: 'salta' });
   });
+
+  if (result.noTranscribableTracks) {
+    console.warn(
+      `[multitrack-manifest] recording=${recordingId}: transcription not started, no track can be transcribed`,
+    );
+  }
 
   if (skipSilent) {
     console.error(

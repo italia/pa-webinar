@@ -9,16 +9,22 @@
  */
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { prisma, sessione } = vi.hoisted(() => ({
-  prisma: {
+const { prisma, sessione } = vi.hoisted(() => {
+  const prisma = {
     staffAccount: { findUnique: vi.fn() },
     adminAuditLog: { create: vi.fn() },
     person: { findUnique: vi.fn(), delete: vi.fn() },
-  },
-  sessione: { cookie: undefined as string | undefined },
-}));
+    eventInvitation: { findMany: vi.fn(), deleteMany: vi.fn(), updateMany: vi.fn() },
+    emailOutbox: { deleteMany: vi.fn() },
+    $transaction: (fn: (tx: unknown) => unknown) => fn(prisma),
+  };
+  return { prisma, sessione: { cookie: undefined as string | undefined } };
+});
 
 vi.mock('@/lib/db', () => ({ prisma }));
+vi.mock('@/lib/settings', () => ({
+  getSettings: async () => ({ publicRegistrationEnabled: true }),
+}));
 vi.mock('next/headers', () => ({
   cookies: async () => ({
     get: (nome: string) =>
@@ -98,6 +104,7 @@ beforeEach(async () => {
   await entra('ADMIN');
   prisma.person.findUnique.mockResolvedValue(persona());
   prisma.person.delete.mockResolvedValue({ id: PERSONA });
+  prisma.eventInvitation.findMany.mockResolvedValue([]);
 });
 
 describe('chi puo’ entrare', () => {
@@ -177,6 +184,24 @@ describe('DELETE', () => {
     expect(r.status).toBe(200);
     expect(r.headers.get('Cache-Control')).toBe('no-store');
     expect(prisma.person.delete.mock.calls[0]![0]).toEqual({ where: { id: PERSONA } });
+  });
+
+  it('ferma gli inviti della voce e dell’indirizzo, prima di cancellarla', async () => {
+    const ordine: string[] = [];
+    prisma.eventInvitation.updateMany.mockImplementation(async () => {
+      ordine.push('inviti');
+      return { count: 1 };
+    });
+    prisma.person.delete.mockImplementation(async () => {
+      ordine.push('voce');
+      return { id: PERSONA };
+    });
+    await cancella();
+    expect(prisma.eventInvitation.updateMany.mock.calls[0]![0].where).toEqual({
+      AND: [{ OR: [{ personId: PERSONA }, { emailHash: IMPRONTA }] }],
+      declinedAt: null,
+    });
+    expect(ordine).toEqual(['inviti', 'voce']);
   });
 
   it('la traccia dice chi e’ stato cancellato solo con l’identificativo', async () => {

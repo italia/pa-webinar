@@ -15,7 +15,7 @@ PA Webinar is an open-source platform that public administrations (PAs) use to r
 | ![System status page with the infrastructure map](docs/screenshots/status.png) | ![Changelog with release notes](docs/screenshots/changelog.png) | ![Service inventory](docs/screenshots/service-inventory.png) |
 | **System status** (Stato del sistema): live infrastructure map | **What's new & changelog** (Novità e changelog) | **Provider service inventory** (Inventario servizi del provider): CycloneDX 1.6 |
 
-The screenshots show the English interface with the demo data of the seed script (`app/prisma/seed.ts`), with the demo recording marked as published for the video library. They are taken on a local Docker Compose stack, and the service inventory shows the example document in `docs/examples/`, placeholders included. The live room is not pictured, because it would show real people.
+The screenshots show the English interface with the demo data of the seed script (`app/prisma/seed.ts`), with the demo recording marked as published for the video library and the site description written in English. They are taken on a local Docker Compose stack, and the service inventory shows the example document in `docs/examples/`, placeholders included. The live room is not pictured, because it would show real people.
 
 ## The idea
 
@@ -407,7 +407,7 @@ No commercial software is required. Every installation runs a Redis server, whic
 - Lint, typecheck and unit tests run before every commit. Before every push, the same commands run as in each CI job that the change touches, because no blocking check runs on `dev`. Git hooks, installed by `npm install`, run them on what changed, check the commit message format and look for secrets in the added lines ([Git hooks](docs/development/methodology.md#git-hooks)).
 - Every non-trivial change gets a code review before it is committed or merged, and every finding is resolved or explicitly accepted.
 - Project rules are encoded as tests: a coverage ratchet (thresholds in `app/vitest.config.ts` are never lowered to let a change pass), the 24-language parity test, the localized-URL test and a CI check that the database schema and its migrations agree.
-- Trivy scans the repository and a local build of the app image, CodeQL analyzes the code, and an OpenSSF Scorecard workflow exists whose results are not yet published. Production dependency licenses are checked against the policy from the lockfiles, a license report is kept up to date, every GitHub Action is pinned to a full commit SHA, and pull requests never run on the in-cluster runner.
+- Trivy scans the repository and a local build of the app image, CodeQL analyzes the code, an OpenSSF Scorecard workflow publishes its results to scorecard.dev, and the files attached to each release carry a signed provenance attestation. Production dependency licenses are checked against the policy from the lockfiles, a license report is kept up to date, every GitHub Action is pinned to a full commit SHA, and pull requests never run on the in-cluster runner.
 - Each release publishes the images, an SPDX SBOM of the application image (and, when it can be generated, a CycloneDX SBOM of the npm dependencies), the packaged chart and a GitHub Release. The release notes shown in the app and in the changelog are written by hand in all 24 languages; the GitHub Release body is generated from the commit log. CI builds and never deploys.
 
 ```mermaid

@@ -11,14 +11,16 @@
  * refer to.
  *
  * Unlike the public `/api/events/[param]/recording` endpoint this does
- * NOT require `recordingPublished` — the operator edits transcripts
- * before publishing. Access is gated purely on the admin session.
+ * NOT require `recordingPublished` — the organizer edits transcripts
+ * before publishing. Access: the event organizers only, never an admin who
+ * does not organize the event (lib/recording/content-access); every read
+ * is written to the event's GDPR audit log.
  */
 
 import { cookies } from 'next/headers';
 
 import { withErrorHandling } from '@/lib/api-handler';
-import { requireRecordingManager } from '@/lib/auth/staff-session';
+import { requireRecordingContent, tracciaLetturaContenuto } from '@/lib/recording/content-access';
 import { registrazioneConVideo } from '@/lib/captions/transcript';
 import { prisma } from '@/lib/db';
 import { NotFoundError } from '@/lib/errors';
@@ -33,8 +35,10 @@ const PLAYBACK_SAS_EXPIRY_MINUTES = 120;
 
 export const GET = withErrorHandling(async (_request, context) => {
   const { id } = await (context as { params: Promise<{ id: string }> }).params;
-  // Dell'evento della registrazione: l'admin o chi l'ha creato (ADR-014).
-  await requireRecordingManager(await cookies(), id);
+  // Il contenuto e' di chi organizza l'evento, non dell'admin che non lo
+  // organizza (lib/recording/content-access); la lettura si traccia.
+  const accesso = await requireRecordingContent(await cookies(), id, 'video');
+  await tracciaLetturaContenuto({ ...accesso, recordingId: id, superficie: 'video' });
 
   const recording = await prisma.recording.findUnique({
     where: { id },

@@ -16,7 +16,8 @@ import { captionsTranscriptActive } from '@/lib/captions/availability';
  * sbagliare per difetto vuol dire catturare senza dirlo.
  *
  * La trascrizione dal video completo, dopo l'evento, non e' una cattura in
- * sala: la annuncia la sala d'attesa (`waiting.aiNotice`).
+ * sala: la annuncia la scheda privacy (`transcript.fromVideo`,
+ * lib/events/privacy-sheet).
  */
 export interface StatoCattura {
   /** Si registra l'audio di ciascuno, per chi ha acconsentito. */
@@ -26,6 +27,28 @@ export interface StatoCattura {
 }
 
 const STATI_CON_SALA = ['PUBLISHED', 'IDLE', 'PROVISIONING', 'LIVE'];
+
+/**
+ * L'evento e' impostato per registrare una traccia audio per persona, le stesse
+ * condizioni di GET /api/internal/recorder-desired senza guardare se e' in
+ * diretta: la risposta vale anche prima della sala. `registratorePresente`
+ * dice se l'installazione ha qualcosa che possa farlo.
+ */
+export function tracceConfigurate(
+  evento: {
+    recordingEnabled: boolean;
+    aiTranscriptEnabled: boolean;
+    multitrackRecordingEnabled: boolean;
+  },
+  registratorePresente: boolean
+): boolean {
+  return (
+    registratorePresente &&
+    evento.recordingEnabled &&
+    evento.aiTranscriptEnabled &&
+    evento.multitrackRecordingEnabled
+  );
+}
 
 export function statoCattura(
   evento: {
@@ -39,12 +62,7 @@ export function statoCattura(
   sito: { liveCaptionsEnabled?: boolean | null },
   registrazioneDisponibile = true
 ): StatoCattura {
-  const tracce =
-    registrazioneDisponibile &&
-    evento.status === 'LIVE' &&
-    evento.recordingEnabled &&
-    evento.aiTranscriptEnabled &&
-    evento.multitrackRecordingEnabled;
+  const tracce = evento.status === 'LIVE' && tracceConfigurate(evento, registrazioneDisponibile);
   const sottotitoli =
     STATI_CON_SALA.includes(evento.status) && captionsTranscriptActive(evento, sito);
   return { registrazione: tracce, trascrizione: tracce || sottotitoli };

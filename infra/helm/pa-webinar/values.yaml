@@ -1177,8 +1177,14 @@ jitsi-meet:
     # 127.0.0.1. Quella esterna avvia e ferma anche registrazioni e dirette
     # senza autenticazione: con networkPolicy.enabled il chart la apre al
     # solo portale (NetworkPolicy <fullname>-jibri).
+    # Le stesse opzioni portano i controlli con cui Jibri chiude da solo una
+    # registrazione, da global.jibri.callStatusChecks: il valore passa da
+    # `tpl` nel sottochart, che dei valori di questo chart vede solo
+    # `global`. Un file di valori che imposta JAVA_TOOL_OPTIONS sostituisce
+    # questo valore: riparti da qui e aggiungi le tue opzioni in fondo,
+    # separate da uno spazio. Il chart si ferma se mancano i controlli.
     extraEnvs:
-      JAVA_TOOL_OPTIONS: "-Djibri.api.http.external-api-host=0.0.0.0"
+      JAVA_TOOL_OPTIONS: '-Djibri.api.http.external-api-host=0.0.0.0{{ $c := dig "jibri" "callStatusChecks" dict (.Values.global | default dict) | default dict }}{{ with dig "defaultCallEmptyTimeout" "" $c }} -Djibri.call-status-checks.default-call-empty-timeout={{ . }}{{ end }}{{ with dig "allMutedTimeout" "" $c }} -Djibri.call-status-checks.all-muted-timeout={{ . }}{{ end }}{{ with dig "noMediaTimeout" "" $c }} -Djibri.call-status-checks.no-media-timeout={{ . }}{{ end }}'
       # Qualita' della registrazione al massimo per default: la sala si
       # cattura a 1920x1080 (l'immagine ne ricava anche lo schermo virtuale,
       # cosi' le slide condivise restano leggibili) con un fattore di qualita'
@@ -1237,14 +1243,104 @@ jitsi-meet:
       tag: stable-11031
 
   web:
-    # La sessione del registratore (Jibri) non vede chi non ha un consenso valido:
-    # mod_pa_media_lock lo dice nella presenza, e per tutti gli altri il video
-    # resta com'e'. Un file di valori che imposta _custom_config_js sostituisce
-    # questo testo: va riportato, altrimenti quelle persone restano in solo ascolto.
+    # La sessione del registratore (Jibri) vede solo chi conduce: chi non
+    # conduce e chi non ha un consenso valido lo dice la presenza
+    # (mod_pa_media_lock), e per tutti gli altri in sala non cambia niente. Il
+    # testo riproduce nel video la sola voce dei partecipanti con il consenso.
+    # Un file di valori che imposta _custom_config_js sostituisce questo testo e
+    # va riportato per intero: senza, chi non ha acconsentito resta in solo
+    # ascolto e i partecipanti possono comparire nel video (il portale lo sa da
+    # RECORDING_VOICE_EXCLUSION e RECORDING_PARTICIPANT_VOICE). Lo stesso testo e'
+    # in infra/jitsi/web/custom-config.js per Docker Compose.
     custom:
       configs:
         _custom_config_js: |
           config.hiddenFromRecorderFeatureEnabled = true;
+          // Nel video solo chi conduce. mod_pa_media_lock segna hidden-from-recorder chi
+          // non conduce, e la sessione del registratore (Jibri) non lo mette nella sala:
+          // niente riquadro, nome o immagine. Di chi porta anche il segno della voce (un
+          // partecipante con il consenso) qui si riproduce la sola voce. Gira solo nella
+          // pagina che Jibri apre (config.iAmRecorder) e non modifica niente di Jitsi:
+          // legge la conferenza da APP.conference._room, come fa Jibri stesso, e ne
+          // ascolta gli eventi pubblici. Se smette di funzionare manca quella voce, non
+          // compare nessuno in piu'. Il chart imposta RECORDING_PARTICIPANT_VOICE solo se
+          // trova qui la riga che definisce VOCE.
+          (function () {
+            if (typeof window === 'undefined' || !window.location
+              || !/[#&]config\.iAmRecorder=true(&|$)/.test(window.location.hash)) {
+              return;
+            }
+            // Lo schermo di un partecipante: con lo SSRC rewriting la sessione crea i
+            // riquadri delle condivisioni dalla presenza di tutti, nascosti compresi, e
+            // il palco passerebbe a un riquadro vuoto. Senza, li crea dalle tracce, che
+            // Jitsi non le da' per chi e' nascosto.
+            config.flags = Object.assign({}, config.flags, { ssrcRewritingEnabled: false });
+            var VOCE = 'pa-recorder-voice';
+            function soloVoce(persona) {
+              var identita = persona.getIdentity();
+              return Boolean(persona.isHiddenFromRecorder()
+                && identita && identita.user && identita.user[VOCE] === 'true');
+            }
+            function riproduci(conference) {
+              var eventi = window.JitsiMeetJS.events.conference;
+              var elementi = new Map();
+              function togli(track) {
+                var el = elementi.get(track);
+                if (el) {
+                  elementi.delete(track);
+                  track.detach(el);
+                  el.remove();
+                }
+              }
+              // Decide sul proprietario attuale: se una traccia passa da una persona
+              // all'altra (SSRC rewriting), Jitsi la toglie e la riaggiunge.
+              function valuta(track) {
+                if (!track || track.isLocal() || track.getType() !== 'audio' || elementi.has(track)) {
+                  return;
+                }
+                var persona = conference.getParticipantById(track.getParticipantId());
+                if (!persona || !soloVoce(persona)) {
+                  return;
+                }
+                var el = document.createElement('audio');
+                el.autoplay = true;
+                el.setAttribute('data-pa-recorder-voice', '');
+                document.body.appendChild(el);
+                elementi.set(track, el);
+                track.attach(el);
+                var avvio = el.play();
+                if (avvio && avvio.catch) {
+                  avvio.catch(function (e) {
+                    console.error('[pa-webinar] voce di un partecipante non riprodotta', e);
+                  });
+                }
+              }
+              conference.on(eventi.TRACK_ADDED, valuta);
+              conference.on(eventi.TRACK_REMOVED, togli);
+              // La segnalazione delle fonti puo' precedere la presenza: lib-jitsi-meet
+              // assegna quelle tracce alla persona quando entra, prima di USER_JOINED.
+              conference.on(eventi.USER_JOINED, function (id, persona) {
+                if (persona) {
+                  persona.getTracks().forEach(valuta);
+                }
+              });
+              conference.on(eventi.CONFERENCE_LEFT, function () {
+                Array.from(elementi.keys()).forEach(togli);
+              });
+              conference.getParticipants().forEach(function (persona) {
+                persona.getTracks().forEach(valuta);
+              });
+            }
+            var agganciata = null;
+            setInterval(function () {
+              var app = window.APP;
+              var conference = app && app.conference && app.conference._room;
+              if (conference && conference !== agganciata && window.config.iAmRecorder === true) {
+                agganciata = conference;
+                riproduci(conference);
+              }
+            }, 500);
+          }());
     # Immagine web con la patch che forza a 48 kHz il contesto audio della
     # soppressione rumore avanzata. Senza la patch quel filtro, su alcuni
     # browser, ammutolisce il microfono senza alcun errore visibile — e il
@@ -1363,6 +1459,37 @@ global:
   # Cambiarlo riavvia il bridge: va fatto a sale vuote.
   jvb:
     numLoudest: 5
+  # Quando Jibri chiude da solo una registrazione. Nel video c'e' solo chi
+  # conduce, e i controlli di Jibri contano solo chi vede la sua sessione,
+  # cioe' i conduttori: con i valori di Jibri la registrazione finirebbe 30
+  # secondi dopo l'uscita dell'ultimo conduttore, o dopo 10 minuti di
+  # conduttori a microfono e videocamera spenti mentre parlano i
+  # partecipanti.
+  #   defaultCallEmptyTimeout  quanto si registra ancora senza nessun
+  #                            conduttore in sala: 5 minuti, il tempo di
+  #                            rientrare dopo una linea caduta;
+  #   allMutedTimeout          conduttori tutti a microfono e videocamera
+  #                            spenti: 30 giorni, piu' di qualunque evento,
+  #                            cioe' mai;
+  #   noMediaTimeout           nessun dato in arrivo mentre qualche
+  #                            conduttore ha il microfono o la videocamera
+  #                            accesi: anche questo mai. La voce dei
+  #                            partecipanti conta come dato in arrivo, anche
+  #                            se la sessione non li mostra; senza voci e
+  #                            senza videocamere (una pausa in silenzio) il
+  #                            bridge, che inoltra solo le voci piu' forti, puo'
+  #                            non mandare niente. Una connessione guasta la
+  #                            chiude il controllo ICE di Jibri, dopo 30
+  #                            secondi.
+  # Durate senza spazi, nel formato di Jibri (300s, 5m, 2h, 30d): viaggiano
+  # fra le opzioni della JVM, separate da spazi. Vuoto = il valore di Jibri.
+  # Le legge il sottochart della conferenza
+  # (jitsi-meet.jibri.extraEnvs.JAVA_TOOL_OPTIONS); cambiarle riavvia Jibri.
+  jibri:
+    callStatusChecks:
+      defaultCallEmptyTimeout: 5m
+      allMutedTimeout: 30d
+      noMediaTimeout: 30d
 
 captions:
   gateway:

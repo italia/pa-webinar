@@ -1,6 +1,17 @@
 // SPDX-License-Identifier: EUPL-1.2
 // SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
 
+/**
+ * GET /api/internal/recording-metadata?room=<stanza>
+ *
+ * I metadati che lo script di fine registrazione scrive nel file del video:
+ * titolo, chi organizza, data, descrizione e chi conduce. Nel video compare solo
+ * chi conduce (ADR-022): moderatori e relatori, con il nome di chi modera dal
+ * link primario e delle concessioni nominali ancora valide. Chi partecipa non
+ * compare, e non compare nemmeno qui, ne' con il nome ne' con il nickname: il
+ * file del video circola oltre la piattaforma e la sua conservazione. Solo con
+ * la chiave delle macchine (`CRON_API_KEY`).
+ */
 import { NextResponse } from 'next/server';
 
 import { withErrorHandling } from '@/lib/api-handler';
@@ -31,14 +42,10 @@ export const GET = withErrorHandling(async (request) => {
       moderatorName: true,
       startsAt: true,
       endsAt: true,
-      registrations: {
-        where: { joinedAt: { not: null } },
-        select: {
-          displayName: true,
-          joinedAt: true,
-          leftAt: true,
-        },
-        orderBy: { joinedAt: 'asc' },
+      additionalMods: {
+        where: { revokedAt: null },
+        select: { name: true, role: true },
+        orderBy: { createdAt: 'asc' },
       },
     },
   });
@@ -48,11 +55,20 @@ export const GET = withErrorHandling(async (request) => {
   const title = getLocalized(event.title as LocalizedField, 'it');
   const description = getLocalized(event.description as LocalizedField, 'it');
 
-  const participants = event.registrations.map((r) => ({
-    name: tryDecryptPII(r.displayName) ?? r.displayName,
-    joinedAt: r.joinedAt?.toISOString() ?? null,
-    leftAt: r.leftAt?.toISOString() ?? null,
-  }));
+  // Chi conduce, una volta per nome: chi modera dal link primario e le
+  // concessioni nominali.
+  const hosts: Array<{ name: string; role: 'moderator' | 'speaker' }> = [];
+  const aggiungi = (nome: string | null | undefined, role: 'moderator' | 'speaker') => {
+    const name = nome?.trim();
+    if (name && !hosts.some((h) => h.name === name)) hosts.push({ name, role });
+  };
+  aggiungi(
+    event.moderatorName ? (tryDecryptPII(event.moderatorName) ?? event.moderatorName) : null,
+    'moderator'
+  );
+  for (const m of event.additionalMods) {
+    aggiungi(tryDecryptPII(m.name) ?? m.name, m.role === 'SPEAKER' ? 'speaker' : 'moderator');
+  }
 
   return NextResponse.json({
     title,
@@ -61,7 +77,6 @@ export const GET = withErrorHandling(async (request) => {
     date: event.startsAt.toISOString().split('T')[0],
     startsAt: event.startsAt.toISOString(),
     endsAt: event.endsAt.toISOString(),
-    participants,
-    participantNames: participants.map((p) => p.name),
+    hosts,
   });
 });

@@ -24,6 +24,7 @@ const { prisma, tx, accoda, sessione } = vi.hoisted(() => {
       staffAccount: { findUnique: vi.fn() },
       adminAuditLog: { create: vi.fn() },
       event: { count: vi.fn() },
+      gdprAuditLog: { findFirst: vi.fn(), create: vi.fn() },
       siteSetting: { findUnique: vi.fn() },
       $transaction: vi.fn(async (fn: (t: typeof tx) => unknown) => fn(tx)),
     },
@@ -82,7 +83,9 @@ beforeAll(() => {
 beforeEach(async () => {
   vi.clearAllMocks();
   await entra('ADMIN');
-  prisma.event.count.mockResolvedValue(0);
+  // L'admin di questi casi organizza l'evento: il contenuto e' suo
+  // (lib/recording/content-access).
+  prisma.event.count.mockResolvedValue(1);
   prisma.siteSetting.findUnique.mockResolvedValue({ aiPipelineEnabled: true });
   tx.recording.findFirst.mockResolvedValue({
     id: REGISTRAZIONE,
@@ -111,7 +114,21 @@ describe('chi puo’ avviare', () => {
 
   it('l’evento di un altro organizzatore e’ 403', async () => {
     await entra('ORGANIZER');
+    prisma.event.count.mockResolvedValue(0);
     expect((await avvia()).status).toBe(403);
+    expect(prisma.event.count.mock.calls[0]![0].where).toMatchObject({
+      id: EVENTO,
+      AND: [{ OR: expect.arrayContaining([{ createdById: ACCOUNT }]) }],
+    });
+    expect(prisma.$transaction).not.toHaveBeenCalled();
+    nienteAvviato();
+  });
+
+  it('l’admin che non organizza l’evento: 403 RECORDING_CONTENT_ORGANIZER_ONLY', async () => {
+    prisma.event.count.mockResolvedValue(0);
+    const r = await avvia();
+    expect(r.status).toBe(403);
+    expect(((await r.json()) as { code?: string }).code).toBe('RECORDING_CONTENT_ORGANIZER_ONLY');
     expect(prisma.event.count.mock.calls[0]![0].where).toMatchObject({
       id: EVENTO,
       AND: [{ OR: expect.arrayContaining([{ createdById: ACCOUNT }]) }],

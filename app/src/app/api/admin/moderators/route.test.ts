@@ -5,7 +5,9 @@
 /**
  * L'elenco dei link di conduzione di tutti gli eventi: e' fatto di credenziali
  * durevoli, quindi lo vede solo l'amministrazione dell'istanza, mai
- * l'organizzatore, e non resta in cache. Chi ne cambia uno lascia traccia, senza
+ * l'organizzatore, e non resta in cache. Il link stesso arriva solo per gli
+ * eventi che chi guarda organizza: apre la pubblicazione e la cancellazione del
+ * video (lib/recording/content-access). Chi ne cambia uno lascia traccia, senza
  * che il link nuovo finisca nel registro.
  */
 import type { NextRequest } from 'next/server';
@@ -15,7 +17,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const { prisma, biscotti } = vi.hoisted(() => ({
   prisma: {
     staffAccount: { findUnique: vi.fn() },
-    event: { findMany: vi.fn(), findUnique: vi.fn(), update: vi.fn() },
+    event: { findMany: vi.fn(), findUnique: vi.fn(), update: vi.fn(), count: vi.fn() },
     adminAuditLog: { create: vi.fn() },
   },
   biscotti: new Map<string, { value: string }>(),
@@ -103,6 +105,7 @@ beforeEach(async () => {
     moderatorToken: TOKEN_VECCHIO,
   });
   prisma.event.update.mockResolvedValue({ id: EVENTO });
+  prisma.event.count.mockResolvedValue(0);
   prisma.adminAuditLog.create.mockResolvedValue({ id: 'a1' });
 });
 
@@ -194,7 +197,10 @@ describe('l’elenco', () => {
     ]);
   });
 
-  it('una riga ha l’email in chiaro, il titolo e il link, e non resta in cache', async () => {
+  it('una riga ha l’email in chiaro, il titolo e il link di chi organizza, e non resta in cache', async () => {
+    biscotti.set('admin_session', { value: await entraConIlConto('ADMIN') });
+    // La seconda lettura: gli eventi che l'account organizza.
+    prisma.event.findMany.mockResolvedValueOnce([riga()]).mockResolvedValueOnce([{ id: EVENTO }]);
     const r = await elenca();
     expect(r.headers.get('cache-control')).toBe('no-store');
     await expect(r.json()).resolves.toEqual({
@@ -213,6 +219,15 @@ describe('l’elenco', () => {
         },
       ],
     });
+  });
+
+  it('sugli eventi che non organizza il link non arriva, nemmeno con la chiave dell’istanza', async () => {
+    const conLaChiave = (await (await elenca()).json()) as { rows: Array<{ moderatorToken: unknown }> };
+    expect(conLaChiave.rows[0]!.moderatorToken).toBeNull();
+    biscotti.set('admin_session', { value: await entraConIlConto('ADMIN') });
+    prisma.event.findMany.mockResolvedValueOnce([riga()]).mockResolvedValueOnce([]);
+    const conIlConto = (await (await elenca()).json()) as { rows: Array<{ moderatorToken: unknown }> };
+    expect(conIlConto.rows[0]!.moderatorToken).toBeNull();
   });
 });
 
@@ -238,7 +253,9 @@ describe('il cambio del link', () => {
     expect(prisma.adminAuditLog.create).not.toHaveBeenCalled();
   });
 
-  it('il link nuovo e’ un UUID diverso, e si legge una volta sola', async () => {
+  it('il link nuovo e’ un UUID diverso, e si legge una volta sola, da chi organizza l’evento', async () => {
+    biscotti.set('admin_session', { value: await entraConIlConto('ADMIN') });
+    prisma.event.count.mockResolvedValue(1);
     const r = await rigenera({ eventId: EVENTO, action: 'regenerate' });
     expect(r.status).toBe(200);
     expect(r.headers.get('cache-control')).toBe('no-store');
@@ -252,7 +269,19 @@ describe('il cambio del link', () => {
     });
   });
 
+  it('chi non organizza l’evento lo cambia, ma il link nuovo non gli arriva', async () => {
+    const r = await rigenera({ eventId: EVENTO, action: 'regenerate' });
+    expect(r.status).toBe(200);
+    const corpo = (await r.json()) as { moderatorToken: unknown };
+    expect(corpo.moderatorToken).toBeNull();
+    const { data } = prisma.event.update.mock.calls[0]![0] as { data: { moderatorToken: string } };
+    expect(data.moderatorToken).toMatch(/^[0-9a-f-]{36}$/);
+    expect(data.moderatorToken).not.toBe(TOKEN_VECCHIO);
+  });
+
   it('due cambi danno due link diversi', async () => {
+    biscotti.set('admin_session', { value: await entraConIlConto('ADMIN') });
+    prisma.event.count.mockResolvedValue(1);
     const leggi = async () =>
       (
         (await (await rigenera({ eventId: EVENTO, action: 'regenerate' })).json()) as {
@@ -264,6 +293,7 @@ describe('il cambio del link', () => {
 
   it('il registro dice chi ha agito e su cosa, senza il link', async () => {
     biscotti.set('admin_session', { value: await entraConIlConto('ADMIN') });
+    prisma.event.count.mockResolvedValue(1);
     const r = await rigenera({ eventId: EVENTO, action: 'regenerate' });
     const { moderatorToken } = (await r.json()) as { moderatorToken: string };
     const { data } = prisma.adminAuditLog.create.mock.calls[0]![0] as {

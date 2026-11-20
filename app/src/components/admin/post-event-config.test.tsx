@@ -24,6 +24,8 @@ const evento = {
   postEventPublic: false,
   postEventPublicUntil: null,
   libraryListed: false,
+  recordingDestination: null as 'PUBLIC' | 'REGISTRANTS' | null,
+  recordingAudience: 'PUBLIC' as 'PUBLIC' | 'REGISTRANTS',
   hasPlayableRecording: false,
   postEventShowQA: false,
   postEventShowMaterials: false,
@@ -43,11 +45,11 @@ let root: Root;
 const fetchMock = vi.fn();
 const onPublicPageChange = vi.fn();
 
-function render() {
+function render(over: Partial<typeof evento> = {}) {
   act(() => {
     root.render(
       <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
-        <PostEventConfig event={evento} onPublicPageChange={onPublicPageChange} />
+        <PostEventConfig event={{ ...evento, ...over }} onPublicPageChange={onPublicPageChange} />
       </NextIntlClientProvider>,
     );
   });
@@ -90,6 +92,62 @@ afterEach(() => {
   act(() => root.unmount());
   container.remove();
   vi.unstubAllGlobals();
+});
+
+describe('PostEventConfig — registrazione riservata', () => {
+  const m = messages.postEvent;
+  const leva = (etichetta: string) => {
+    const el = container.querySelector<HTMLInputElement>(`input[aria-label="${etichetta}"]`);
+    if (!el) throw new Error(`interruttore non trovato: ${etichetta}`);
+    return el;
+  };
+
+  it('le domande: interruttore spento e bloccato, con il motivo', () => {
+    render({ recordingDestination: 'REGISTRANTS', postEventShowQA: true });
+    expect(leva(m.showQA).checked).toBe(false);
+    expect(leva(m.showQA).disabled).toBe(true);
+    expect(container.textContent).toContain(m.qaReservedNote);
+  });
+
+  it('le domande: lo stesso se il video e’ reso riservato dal pubblico', () => {
+    render({
+      recordingDestination: 'PUBLIC',
+      recordingAudience: 'REGISTRANTS',
+      postEventShowQA: true,
+    });
+    expect(leva(m.showQA).checked).toBe(false);
+    expect(leva(m.showQA).disabled).toBe(true);
+    expect(container.textContent).toContain(m.qaReservedNote);
+  });
+
+  it('la libreria: non ci entra, con il motivo al posto dell’aiuto', () => {
+    render({ recordingDestination: 'REGISTRANTS' });
+    expect(leva(m.libraryListed).disabled).toBe(true);
+    expect(container.textContent).toContain(m.libraryListedReserved);
+    expect(container.textContent).not.toContain(m.libraryListedHelp);
+  });
+
+  it('una riga gia’ in libreria si puo’ togliere', async () => {
+    fetchMock.mockResolvedValue(new Response('{}', { status: 200 }));
+    render({ recordingDestination: 'REGISTRANTS', libraryListed: true });
+    expect(leva(m.libraryListed).disabled).toBe(false);
+    await premi(leva(m.libraryListed));
+    expect(JSON.parse(fetchMock.mock.calls[0]![1].body as string)).toEqual({
+      libraryListed: false,
+    });
+  });
+
+  it.each([
+    ['senza destinazione', null],
+    ['con destinazione pubblica', 'PUBLIC'],
+  ] as const)('%s tutto come prima', (_n, recordingDestination) => {
+    render({ recordingDestination, postEventShowQA: true });
+    expect(leva(m.showQA).checked).toBe(true);
+    expect(leva(m.showQA).disabled).toBe(false);
+    expect(leva(m.libraryListed).disabled).toBe(false);
+    expect(container.textContent).not.toContain(m.qaReservedNote);
+    expect(container.textContent).not.toContain(m.libraryListedReserved);
+  });
 });
 
 describe('PostEventConfig — salvataggio di un interruttore', () => {

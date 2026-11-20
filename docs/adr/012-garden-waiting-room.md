@@ -177,7 +177,8 @@ view and saves that choice too. **Back to the park** reverses the choice.
 
 An installation sets the waiting-room engine site-wide, and each event can override it. The `CLASSIC` engine sets the
 default, but it is not a switch-off: in the classic view the page still offers **Back to the park**, so an
-installation can make the classic view the default but cannot remove the square from an event.
+installation can make the classic view the default but cannot remove the square from an event. Only an anonymous
+audience removes it: the page offers no way back and ignores `?engine=`, and the presence route writes nothing.
 
 ### Presence by HTTP ping and a short-lived Redis hash
 

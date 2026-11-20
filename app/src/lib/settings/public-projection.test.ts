@@ -2,12 +2,13 @@
 // SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
 
 import { describe, it, expect } from 'vitest';
-import { Prisma } from '@prisma/client';
+import { Prisma, type SiteSetting } from '@prisma/client';
 
 import {
   NON_PUBLIC_SETTING_FIELDS,
   PUBLIC_SETTING_FIELDS,
   publicSettings,
+  type ImpostazioniPubbliche,
 } from './public-projection';
 
 /**
@@ -62,5 +63,23 @@ describe('public settings projection', () => {
     // The sender NAME is in every message we send: public by nature.
     expect(out.emailFromName).toBe('Comune di X');
     expect(out.siteName).toBe('PA Webinar');
+  });
+
+  it('toglie ogni campo non pubblico, compreso quello della rubrica', () => {
+    const riga = { siteName: 'PA Webinar', addressBookEnabled: false };
+    expect(publicSettings(riga)).toEqual({ siteName: 'PA Webinar' });
+
+    const nonPubblici = Object.fromEntries(
+      Object.keys(NON_PUBLIC_SETTING_FIELDS).map((campo) => [campo, 'valore']),
+    );
+    expect(publicSettings(nonPubblici)).toEqual({});
+  });
+
+  it('la riga intera non si assegna al tipo che ricevono i Client Component', () => {
+    const intera = { siteName: 'PA Webinar' } as SiteSetting;
+    // @ts-expect-error la riga intera porta anche i campi non pubblici
+    const passataSenzaFiltro: ImpostazioniPubbliche = intera;
+    const filtrata: ImpostazioniPubbliche = publicSettings(intera);
+    expect(passataSenzaFiltro.siteName).toBe(filtrata.siteName);
   });
 });

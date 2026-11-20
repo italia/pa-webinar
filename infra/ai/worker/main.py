@@ -26,6 +26,7 @@ transcript, poi al label). Vedi run_summarize/run_translate.
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import json
 import logging
@@ -42,6 +43,7 @@ from . import client as cli
 from . import glossary as glmod
 from . import llm as llmmod
 from . import multitrack as mtmod
+from . import redact as redmod
 from . import report as repmod
 from . import transcribe as tr
 from . import tts as ttsmod
@@ -859,6 +861,58 @@ def run_report(app: cli.AppClient, job: cli.ClaimResponse) -> None:
         raise LavoroChiuso(f"report job not delivered by this attempt: {esito}")
 
 
+def run_redact(app: cli.AppClient, job: cli.ClaimResponse) -> None:
+    """Toglie una persona dal video: gli intervalli scelti dallo staff
+    diventano il cartello «contenuto rimosso su richiesta» con l'audio muto, a
+    durata invariata. Il video ripulito si carica nella chiave del lavoro e si
+    consegna al portale, che lo mette al posto dell'originale. Solo CPU."""
+    dati = job.redaction or {}
+    intervalli = dati.get("intervals") or job.payload.get("intervals") or []
+    if not intervalli:
+        raise RuntimeError("REDACT without intervals")
+    target = job.uploadTargets.get("redactedVideo")
+    if target is None or not job.sourceDownloadUrl:
+        raise RuntimeError("REDACT without source video or upload target")
+
+    def passo(percent: float, message: str) -> None:
+        # Come per il resoconto: se il lavoro e' chiuso o l'ha ripreso un altro
+        # worker, non serve ricodificare oltre.
+        risposta = app.progress(job.jobId, "RUNNING", percent=percent, message=message, attempt=job.attempts) or {}
+        if risposta.get("superseded") or risposta.get("status") in ("DONE", "FAILED"):
+            raise LavoroChiuso(f"redaction job {risposta.get('status')}, taken over: {bool(risposta.get('superseded'))}")
+
+    with tempfile.TemporaryDirectory(prefix="postprod-redact-") as workdir:
+        passo(10.0, "downloading source video")
+        sorgente = os.path.join(workdir, "source.mp4")
+        cli.download_to_file(job.sourceDownloadUrl, sorgente)
+        cartello: Optional[str] = None
+        if dati.get("card"):
+            cartello = os.path.join(workdir, "card.png")
+            with open(cartello, "wb") as f:
+                f.write(base64.b64decode(dati["card"]))
+        passo(20.0, "redacting")
+        uscita = os.path.join(workdir, "redacted.mp4")
+        info = redmod.rimuovi_intervalli(
+            sorgente,
+            uscita,
+            intervalli,
+            cartello=cartello,
+            avanzamento=lambda fatto: passo(20.0 + 65.0 * fatto, "redacting"),
+        )
+        passo(88.0, "uploading redacted video")
+        dimensione = os.path.getsize(uscita)
+        cli.upload_from_file(target.url, uscita, content_type=target.contentType)
+    esito = app.deliver_redaction(
+        job_id=job.jobId,
+        blob_key=target.blobKey,
+        size_bytes=dimensione,
+        attempt=job.attempts,
+        duration_sec=getattr(info, "duration", None),
+    )
+    if esito.get("superseded") or esito.get("alreadyDelivered") or esito.get("closed"):
+        raise LavoroChiuso(f"redaction job not delivered by this attempt: {esito}")
+
+
 def _tempo_rimasto_s(margine: float = 300.0) -> float:
     """Quanto resta alla scadenza del Job (WORKER_DEADLINE_S), meno un margine
     per l'avvio del pod (la scadenza parte dalla creazione del Job) e per la
@@ -949,6 +1003,8 @@ def run_one() -> int:
                 run_report(app, job)
             elif job.kind == "TRANSLATE_TEXT":
                 run_translate_text(app, job)
+            elif job.kind == "REDACT":
+                run_redact(app, job)
             elif job.kind == "SUBTITLE":
                 # SUBTITLE is satisfied by TRANSCRIBE today (it emits
                 # the source-lang VTT). If we ever decouple them this

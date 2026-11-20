@@ -1,13 +1,17 @@
 // SPDX-License-Identifier: EUPL-1.2
 // SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
 
+import { cookies } from 'next/headers';
+
 import { withErrorHandling } from '@/lib/api-handler';
 import { ForbiddenError, NotFoundError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { extractModeratorToken } from '@/lib/auth/moderator';
-import { CAMPI_VIDEO_VUOTI } from '@/lib/events/recording-fields';
+import { CAMPI_VIDEO_VUOTI, sessioniSenzaFile } from '@/lib/events/recording-fields';
 import { deleteRecordingBlob } from '@/lib/storage/recordings';
 import { tryDecryptJSON } from '@/lib/crypto/pii';
+import { fileDellaSessione } from '@/lib/recording/audience';
+import { contenutoStaffDellaRichiesta } from '@/lib/recording/content-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,7 +28,7 @@ export const GET = withErrorHandling(async (request, context) => {
       ...(isUuid ? { OR: [{ id: param }, { slug: param }] } : { slug: param }),
       moderatorToken: token,
     },
-    select: { id: true },
+    select: { id: true, slug: true },
   });
   if (!event) throw new NotFoundError('Event');
 
@@ -43,7 +47,13 @@ export const GET = withErrorHandling(async (request, context) => {
     duration: session.duration,
     peakParticipants: session.peakParticipants,
     participants: tryDecryptJSON(session.participants, []),
-    recordingUrl: session.recordingUrl,
+    // La rotta dell'app, e solo a chi organizza l'evento (la rotta lo
+    // richiede); mai l'indirizzo dello storage (lib/recording/content-access).
+    recordingUrl:
+      session.recordingUrl && (await contenutoStaffDellaRichiesta(await cookies(), event.id))
+        ? fileDellaSessione(event.slug, session.id)
+        : null,
+    hasRecording: !!session.recordingUrl,
     recordingFileSize: session.recordingFileSize
       ? Number(session.recordingFileSize)
       : null,
@@ -65,7 +75,7 @@ export const DELETE = withErrorHandling(async (request, context) => {
       ...(isUuid ? { OR: [{ id: param }, { slug: param }] } : { slug: param }),
       moderatorToken: token,
     },
-    select: { id: true, recordingUrl: true },
+    select: { id: true, recordingUrl: true, recordingPublished: true },
   });
   if (!event) throw new NotFoundError('Event');
 
@@ -84,11 +94,21 @@ export const DELETE = withErrorHandling(async (request, context) => {
     !!session.recordingUrl && session.recordingUrl === event.recordingUrl;
   await prisma.$transaction([
     prisma.callSession.delete({ where: { id: session.id } }),
+    // Un webhook ripetuto lascia due sessioni sullo stesso file: quella che resta
+    // non deve continuare a offrirlo.
+    ...(session.recordingUrl
+      ? [prisma.callSession.updateMany(sessioniSenzaFile(event.id, session.recordingUrl))]
+      : []),
     ...(eraPubblicato
       ? [
           prisma.event.update({
             where: { id: event.id },
-            data: CAMPI_VIDEO_VUOTI,
+            data: {
+              ...CAMPI_VIDEO_VUOTI,
+              // Tolto il video pubblicato, la durata di cio' che resta conta al
+              // piu' presto da adesso (lib/gdpr/cleanup-selection).
+              ...(event.recordingPublished && { recordingRetentionFrom: new Date() }),
+            },
           }),
         ]
       : []),

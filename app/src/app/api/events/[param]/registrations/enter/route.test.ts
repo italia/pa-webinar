@@ -22,6 +22,9 @@ vi.mock('@/lib/db', () => ({
   },
 }));
 
+const spunta = vi.hoisted(() => ({ applicaSpuntaInAttesa: vi.fn(async () => true) }));
+vi.mock('@/lib/persons/spunta-in-attesa', () => spunta);
+
 const impostazioni = vi.hoisted(() => ({ publicRegistrationEnabled: false }));
 vi.mock('@/lib/settings', () => ({ getSettings: vi.fn(async () => impostazioni) }));
 
@@ -78,9 +81,72 @@ beforeEach(() => {
     endsAt: new Date(Date.now() + 3_600_000),
   } as never);
   vi.mocked(prisma.registration.findUnique).mockResolvedValue({
+    id: 'iscrizione-1',
     eventId: EVENT_ID,
     locale: 'it',
   } as never);
+});
+
+describe('la spunta della rubrica in attesa', () => {
+  it('la conferma il link `proof` aperto dal browser che ha compilato il modulo', async () => {
+    barattolo.cookie = await signEventAccess(EVENT_ID, TOKEN, 3600);
+    await apri({ token: TOKEN, proof: signRegistrationProof(EVENT_ID, TOKEN) });
+    expect(spunta.applicaSpuntaInAttesa).toHaveBeenCalledWith(
+      'iscrizione-1',
+      'registration-link'
+    );
+  });
+
+  it('il link `sig` non conferma niente: il suo cookie lo consegna il link stesso', async () => {
+    const link = { token: TOKEN, sig: signRegistrationEntry(EVENT_ID, TOKEN) };
+    const prima = await apri(link);
+    barattolo.cookie = cookieAccesso(prima);
+    expect(barattolo.cookie).toBeDefined();
+
+    await apri(link);
+
+    expect(spunta.applicaSpuntaInAttesa).not.toHaveBeenCalled();
+  });
+
+  it('un cookie nato da un link non conferma nemmeno con `proof`', async () => {
+    barattolo.cookie = await signEventAccess(EVENT_ID, TOKEN, 3600, { emailVerified: true });
+    await apri({ token: TOKEN, proof: signRegistrationProof(EVENT_ID, TOKEN) });
+    expect(spunta.applicaSpuntaInAttesa).not.toHaveBeenCalled();
+  });
+
+  it('un filtro antivirus che apre il link senza cookie non conferma niente', async () => {
+    await apri({ token: TOKEN, proof: signRegistrationProof(EVENT_ID, TOKEN) });
+    const conFirmaIngresso = await apri({
+      token: TOKEN,
+      sig: signRegistrationEntry(EVENT_ID, TOKEN),
+    });
+    expect(spunta.applicaSpuntaInAttesa).not.toHaveBeenCalled();
+    // L'ingresso non cambia: il cookie d'identita' parte come sempre.
+    expect(cookieAccesso(conFirmaIngresso)).toBeDefined();
+  });
+
+  it('il cookie senza una firma valida non conferma niente', async () => {
+    barattolo.cookie = await signEventAccess(EVENT_ID, TOKEN, 3600);
+    await apri({ token: TOKEN });
+    await apri({ token: TOKEN, proof: 'firma-sbagliata' });
+    expect(spunta.applicaSpuntaInAttesa).not.toHaveBeenCalled();
+  });
+
+  it('il cookie di un’altra iscrizione non conferma niente', async () => {
+    barattolo.cookie = await signEventAccess(EVENT_ID, 'altro-token', 3600);
+    await apri({ token: TOKEN, proof: signRegistrationProof(EVENT_ID, TOKEN) });
+    expect(spunta.applicaSpuntaInAttesa).not.toHaveBeenCalled();
+  });
+
+  it('un errore sulla rubrica non blocca l’ingresso', async () => {
+    const errore = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    spunta.applicaSpuntaInAttesa.mockRejectedValueOnce(new Error('database'));
+    barattolo.cookie = await signEventAccess(EVENT_ID, TOKEN, 3600);
+    const res = await apri({ token: TOKEN, proof: signRegistrationProof(EVENT_ID, TOKEN) });
+    expect(res.status).toBe(303);
+    expect(errore).toHaveBeenCalledTimes(1);
+    errore.mockRestore();
+  });
 });
 
 describe('GET registrations/enter', () => {

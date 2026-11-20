@@ -142,10 +142,7 @@
       "votes": "{count, plural, =0 {inga röster} one {1 röst} other {# röster}}",
       "topWords": "Mest delade ord",
       "feedback": "Genomsnittligt betyg",
-      "feedbackCount": "{count, plural, one {1 svar} other {# svar}}",
-      "chatQuestions": "Frågor från chatten",
-      "reactionsCount": "{count, plural, one {1 reaktion} other {# reaktioner}}",
-      "answered": "besvarad"
+      "feedbackCount": "{count, plural, one {1 svar} other {# svar}}"
     },
     "detail": {
       "title": "Evenemangsdetaljer",
@@ -191,7 +188,7 @@
       },
       "chatNotSaved": "Chattmeddelanden publiceras inte efter evenemanget: de raderas tillsammans med evenemangets övriga uppgifter.",
       "qaPostEvent": "Q&A från evenemanget",
-      "peakParticipants": "Toppantal: {count} deltagare",
+      "peakParticipants": "{count, plural, one {Toppantal: # deltagare} other {Toppantal: # deltagare}}",
       "calendar": {
         "addToCalendar": "Lägg till i kalender",
         "google": "Google Kalender",
@@ -202,11 +199,13 @@
       "registrationEnded": "Evenemanget är avslutat: anmälan är stängd.",
       "joinAsGuest": "Delta som gäst",
       "registeredUseEmailLink": "Redan anmäld? Använd den personliga länken i ditt e-postmeddelande.",
-      "willBeRecorded": "Evenemanget spelas in.",
+      "willBeRecorded": "Evenemanget kan komma att spelas in.",
       "machineTranslation": "Automatisk översättning",
       "machineTranslationNote": "Titel och beskrivning har översatts av en automatisk modell och ingen har granskat dem än.",
       "previewTitle": "Förhandsgranskning för teamet",
       "previewBody": "Inspelningen är inte publicerad ännu: bara de som hanterar evenemanget ser den här versionen av sidan.",
+      "previewBodyPageHidden": "Den här sidan är inte synlig för allmänheten: den som öppnar adressen hittar den inte. Bara de som hanterar evenemanget ser sidan.",
+      "previewBodyPageRegistrants": "Den här sidan är inte synlig för allmänheten: den som öppnar adressen hittar den inte. Bara de som är anmälda till evenemanget och de som hanterar det ser sidan.",
       "recordingForRegistrantsTitle": "Inspelning endast för anmälda",
       "recordingForRegistrantsBody": "Om du anmälde dig till evenemanget, öppna den personliga länken i e-postmeddelandet ”inspelning tillgänglig”, eller be att få den skickad igen.",
       "recordingLinkEmailLabel": "E-postadress du anmälde dig med",
@@ -243,8 +242,8 @@
     "namePlaceholder": "Ditt namn visas i evenemangsrummet",
     "email": "E-post",
     "emailPlaceholder": "Du får en länk för att delta i evenemanget",
-    "gdprConsent": "Jag samtycker till behandlingen av mina personuppgifter (namn, e-post) i enlighet med EU-förordning 2016/679 (GDPR) för deltagande i detta evenemang.",
-    "consentsLegend": "Samtycken",
+    "gdprConsent": "Jag har läst integritetspolicyn om behandlingen av personuppgifter (namn, e-post) för deltagande i detta evenemang.",
+    "consentsLegend": "Integritetspolicy och samtycken",
     "requiredMark": "obligatoriskt",
     "optionalMark": "valfritt",
     "gdprLink": "Läs den fullständiga integritetspolicyn",
@@ -292,12 +291,13 @@
       "emailRequired": "Ange din e-postadress",
       "emailInvalid": "Ange en giltig e-postadress",
       "organizationRequired": "Ange din organisation",
-      "consentRequired": "Samtycke till databehandling krävs",
+      "consentRequired": "Bekräfta att du har läst integritetspolicyn för att anmäla dig",
       "recordingConsentRequired": "Samtycke till inspelning krävs för detta evenemang",
       "eventFull": "Evenemanget har nått maximalt antal deltagare",
       "generic": "Fel vid anmälan. Försök igen.",
       "questionnaireRequired": "Svara på frågorna i enkäten för att anmäla dig.",
       "questionnaireIncomplete": "Svara på alla obligatoriska frågor i enkäten.",
+      "recordingDestinationChanged": "Texten om inspelningen ändrades medan du fyllde i formuläret: ladda om sidan och läs den igen.",
       "questionnaireChanged": "Enkäten ändrades medan du fyllde i formuläret: ladda om sidan och svara igen."
     }
   },
@@ -363,7 +363,7 @@
       "publicHelpNone": "Sidan för det avslutade evenemanget förblir synlig, med titel och beskrivning.",
       "sections": {
         "recap": "sammanfattningen",
-        "qa": "frågorna från frågestunden",
+        "qa": "texten till frågorna från frågestunden",
         "polls": "de publicerade omröstningarna",
         "wordCloud": "ordmolnet",
         "materials": "materialet",
@@ -424,6 +424,7 @@
       "noMessages": "Inga meddelanden ännu",
       "empty": "Inga meddelanden ännu. Skriv det första!",
       "inputLabel": "Chattmeddelande",
+      "personalDataNotice": "Skriv inte andras personuppgifter, och inte heller dina egna om du inte vill att de ska bli kända: de som är i rummet kan läsa och ladda ned chatten.",
       "moderatorBadge": "Moderator",
       "attach": "Bifoga en fil",
       "emojiPicker": "Infoga emoji",
@@ -544,7 +545,9 @@
       "locksByConsent": "Mikrofoner och kameror följer samtycket till inspelningen: de som gett det använder det evenemanget tillåter, övriga lyssnar bara. Rummets lås förblir på.",
       "listenOnlyBadge": "lyssnar bara",
       "listenOnlyNoFloor": "Har inte samtyckt till inspelningen: kan inte tala förrän samtycke ges i det egna rummet.",
-      "voiceExcludedBadge": "utan inspelning",
+      "inVideoBadge": "i videon",
+      "voiceRecordedBadge": "röst spelas in",
+      "voiceExcludedBadge": "röst spelas inte in",
       "voiceExcludedFloor": "Har inte samtyckt till inspelningen: kan yttra sig men står utanför inspelningen."
     },
     "moderator": {
@@ -621,6 +624,7 @@
       "tab": "Kontroll",
       "recordingHeading": "Inspelning",
       "recordingOff": "Spelar inte in",
+      "recordingNotOfferedInstant": "I snabbsamtal erbjuds inspelning bara där den som inte samtycker hålls utanför videon, och den här installationen kan inte det.",
       "stopConfirm": "Stoppa inspelningen nu?",
       "featuresHeading": "Rummets funktioner",
       "featuresHelp": "De slås på och av för alla, direkt.",
@@ -681,33 +685,78 @@
       "confirm": "Återkalla",
       "working": "Uppdaterar…",
       "error": "Samtycket kunde inte uppdateras: försök igen.",
+      "textChanged": "Samtyckestexten har ändrats efter att du öppnade sidan: läs den nya texten och bekräfta om du håller med.",
+      "closeNotice": "Stäng det här meddelandet: dina samtycken finns kvar under knappen högst upp",
       "recording": {
         "title": "Inspelning av evenemanget",
         "give": "Jag samtycker till inspelningen",
         "without": {
           "soloAscolto": "Utan detta samtycke lyssnar du bara: mikrofon, kamera och skärm förblir stängda.",
-          "conduce": "Utan detta samtycke leder du ändå, men din röst sparas inte i spåren per person eller i transkriptionen.",
-          "voce": "Utan detta samtycke deltar du som alla andra, men står utanför inspelningen: varken namn, röst eller bild."
+          "conduce": "Utan detta samtycke leder du ändå.",
+          "voce": "Utan detta samtycke deltar du som alla andra, men din röst står utanför inspelningen. Ditt ansikte och ditt namn syns ändå aldrig i videon.",
+          "comeTutti": "Utan detta samtycke deltar du som alla andra."
         },
+        "withoutTranscriptHost": "Din röst sparas inte i spåren per person eller i transkriptionen.",
         "alreadyRecorded": "Det som redan har spelats in finns kvar i evenemangets video: skriv till arrangörerna för att få det borttaget.",
         "withdraw": {
-          "soloAscolto": "Om du återkallar det stannar du i rummet och lyssnar bara: mikrofon, kamera och skärm stängs. Ditt samtycke till transkription av dina inlägg återkallas också.",
-          "conduce": "Om du återkallar det fortsätter du leda, men från och med nu sparas din röst inte i spåren per person eller i transkriptionen. Rummets video visar dig ändå om den spelas in.",
-          "voce": "Om du återkallar det är du kvar i rummet som förut, och från nu står du utanför inspelningen. Du återkallar också samtycket till utskrift av dina inlägg."
-        }
+          "soloAscolto": "Om du återkallar det stannar du i rummet och lyssnar bara: mikrofon, kamera och skärm stängs.",
+          "conduce": "Om du återkallar det fortsätter du leda. Rummets video visar dig ändå om den spelas in.",
+          "voce": "Om du återkallar det är du kvar i rummet som förut, och från och med nu står du utanför inspelningen.",
+          "avvertenza": "Om du återkallar det är du kvar i rummet som förut. Om du får ordet och evenemanget spelas in finns din röst ändå kvar i videon.",
+          "assente": "Om du återkallar det är du kvar i rummet som förut. Från och med nu spelas din röst inte in på ett eget spår."
+        },
+        "withdrawTranscript": "Du återkallar också samtycket till transkription av dina inlägg.",
+        "withdrawTranscriptHost": "Från och med nu sparas din röst inte i spåren per person eller i transkriptionen."
       },
       "transcription": {
         "title": "Transkription av dina inlägg",
         "give": "Jag samtycker till transkriptionen",
         "giveEffect": "Dina inlägg kommer med i evenemangets transkription med ditt namn. Utan samtycke deltar du ändå.",
-        "withdrawEffect": "Om du återkallar det förlorar dina redan transkriberade meningar text och namn, och från och med nu spelas din röst varken in på ett eget spår eller transkriberas.",
+        "withdrawEffect": "Om du återkallar det förlorar dina meningar som redan transkriberats från undertexterna text och namn, och från och med nu spelas din röst varken in på ett eget spår eller transkriberas. För en transkription av videon som redan har tagits fram, vänd dig till arrangörerna.",
         "needsRecording": "Du kan ge det efter samtycke till inspelningen."
       }
+    },
+    "recordingQuestion": {
+      "title": "Samtalet spelas in",
+      "question": "Vill du att din röst spelas in?",
+      "body": "I videon syns bara moderatorerna: ditt ansikte och ditt namn aldrig. Om du svarar ja ansluts samtalet på nytt i några sekunder, och från och med då spelas din röst in när du talar. Om du svarar nej, eller stänger det här fönstret, fortsätter du delta som förut och din röst spelas inte in.",
+      "later": "Om du svarar nej frågar vi igen vid nästa inspelning. Du kan ändra dig när som helst med knappen {button} högst upp.",
+      "yes": "Ja, spela in min röst",
+      "no": "Nej, spela inte in"
     },
     "voiceExcluded": {
       "title": "Du deltar utan inspelning.",
       "consent": "Jag samtycker till inspelningen",
-      "body": "Du har inte samtyckt till inspelningen: du deltar som alla andra, men ditt namn, din röst och din bild kommer inte med i inspelningen."
+      "body": "Du har inte samtyckt till inspelningen: du deltar som alla andra, men din röst står utanför inspelningen. Ditt ansikte och ditt namn syns ändå aldrig i videon."
+    },
+    "nickname": {
+      "reserved": "Moderator,Talare,Föreläsare,Deltagare,Gäst,Arrangör,Organisatör,Administratör,Värd",
+      "label": "Smeknamn (valfritt)",
+      "help": "Ett ord, 2 till 24 tecken: bokstäver, siffror och . _ -. De andra ser det i stället för ditt namn i videon, i chatten, bland frågorna och i transkriptionen.",
+      "helpName": "Om du lämnar det tomt visas du med ditt namn.",
+      "helpAnonymous": "Om du lämnar det tomt visas du med en automatisk pseudonym.",
+      "checking": "Smeknamnet kontrolleras…",
+      "shownAs": "De andra kommer att se dig som ”{nickname}”.",
+      "useSuggestion": "Använd ”{suggestion}”",
+      "errors": {
+        "length": "Smeknamnet måste vara 2 till 24 tecken långt.",
+        "format": "Ett ord: det börjar med en bokstav och slutar med en bokstav eller siffra; däremellan bokstäver, siffror och . _ -, aldrig två i rad.",
+        "scripts": "Använd bokstäver från ett enda alfabet.",
+        "reserved": "Det innehåller ett reserverat ord, till exempel namnet på en roll: välj ett annat.",
+        "host": "Det liknar namnet på någon som leder evenemanget: välj ett annat.",
+        "taken": "Någon i evenemanget använder redan det här smeknamnet.",
+        "disabled": "Det här evenemanget tar inte emot nya smeknamn: du kan bara ta bort ditt.",
+        "rete": "Smeknamnet kunde inte kontrolleras. Försök igen."
+      },
+      "button": "Smeknamn",
+      "open": "Ändra ditt smeknamn",
+      "dialogTitle": "Ditt smeknamn",
+      "dialogIntro": "De andra ser smeknamnet i stället för ditt namn. För att ändra det ansluter rummet dig på nytt en kort stund.",
+      "apply": "Spara och anslut igen",
+      "remove": "Ta bort smeknamnet",
+      "reconnecting": "Ansluter igen…",
+      "done": "Klart: du visas nu som ”{nickname}”.",
+      "doneRemoved": "Klart: smeknamnet har tagits bort."
     }
   },
   "qa": {
@@ -721,9 +770,9 @@
     "upvote": "Rösta upp",
     "upvoted": "Röstad",
     "noQuestions": "Inga frågor ännu. Var den första!",
-    "qaPersistenceNote": "Frågor sparas och kommer att vara tillgängliga efter evenemanget.",
-    "qaPostEvent": "Q&A från evenemanget",
-    "noAnsweredQuestions": "Inga besvarade frågor för detta evenemang.",
+    "qaPersistenceNote": "Frågornas text kan visas på evenemangets sida, utan namnet på den som ställde dem.",
+    "personalDataNotice": "Skriv inte andras personuppgifter, och inte heller dina egna om du inte vill att de ska bli offentliga: frågans text kan visas på evenemangets sida, utan ditt namn.",
+    "personalDataNoticeNotPublished": "Skriv inte andras personuppgifter, och inte heller dina egna om du inte vill att de ska bli kända: de som är i rummet kan läsa frågans text.",
     "filterAll": "Alla",
     "showPanel": "Visa Q&A",
     "hidePanel": "Dölj Q&A",
@@ -742,6 +791,8 @@
       "editAnswer": "Redigera svar",
       "answerFieldLabel": "Svar på frågan från {name}",
       "answerPlaceholder": "Skriv svaret (max 2000 tecken)",
+      "answerNotice": "Svaret kan visas på evenemangets sida: skriv inga personuppgifter.",
+      "answerNoticeNotPublished": "De som är i rummet kan läsa svaret: skriv inga personuppgifter.",
       "sendAnswer": "Publicera svar",
       "cancel": "Avbryt",
       "removeAnswer": "Ta bort svaret"
@@ -769,7 +820,8 @@
     "accessDenied": {
       "title": "Den här delen är inte tillgänglig för din roll",
       "body": "Som arrangör hanterar du dina egna evenemang: skapa och publicera dem, material, enkäter och efterbearbetning. Plattformens inställningar och data för alla evenemang ligger kvar hos administrationen.",
-      "back": "Till dina evenemang"
+      "back": "Till dina evenemang",
+      "organizerOnly": "Endast arrangörerna av det här evenemanget kan redigera det. Som administratör ser du dess status och detaljer och kan arkivera eller radera det. Inspelningarna och deras innehåll tillhör arrangörerna och deltagarna."
     },
     "staffLogin": {
       "title": "Logga in i administrationen",
@@ -1025,6 +1077,24 @@
           }
         },
         "recordingManualNote": "Inspelningen startar aldrig av sig själv: en moderator startar den med REC-knappen.",
+        "recordingDestination": "Vart inspelningen ska",
+        "recordingDestinationReserved": "Endast för anmälda",
+        "recordingDestinationReservedDesc": "Arrangörerna och de anmälda kan se den, de anmälda så länge uppgifterna om deras anmälan sparas. Den publiceras inte. När rummet har öppnats kan den inte längre göras offentlig.",
+        "recordingDestinationPublic": "Offentlig",
+        "recordingDestinationPublicDesc": "Den kan publiceras på evenemangets sida och i videobiblioteket. Deltagarna samtycker även till detta.",
+        "recordingDestinationNotSet": "Inte angiven: evenemanget skapades innan det här valet fanns.",
+        "recordingDestinationStaffOnly": "Evenemangets personal väljer vart inspelningen ska: för tillfället är det inte angivet.",
+        "recordingDestinationStartsReserved": "Inspelningen är från början endast för anmälda: evenemangets personal kan göra den offentlig tills rummet öppnas.",
+        "recordingDestinationStaysReserved": "Inspelningen förblir endast för anmälda: rummet har redan öppnats.",
+        "recordingDestinationLocked": "När rummet har öppnats kan inspelningen bara ändras till ”Endast för anmälda”: samtyckena gäller den text som personerna har läst.",
+        "recordingDestinationPublicOnInvitation": "Evenemanget är endast för inbjudna, men inspelningen förblir offentlig: vem som helst kommer att kunna se videon, inte bara de inbjudna.",
+        "recordingDestinationReservedOnInvitation": "Evenemanget är endast för inbjudna: inspelningen har ändrats till ”Endast för anmälda”. Du kan ändra det under ”Inspelning och AI”.",
+        "postEventPagePrivateOnInvitation": "Evenemanget är endast för inbjudna: sidan efter evenemanget har ändrats till privat. Du kan ändra det under ”Integritet, data och sidan efter evenemanget”.",
+        "postEventPagePublicWithVideo": "Inspelningen är offentlig: sidan efter evenemanget har ändrats till offentlig, annars skulle ingen kunna se videon. Du kan ändra det under ”Integritet, data och sidan efter evenemanget”.",
+        "postEventPageStaysPrivate": "Evenemanget är öppet för alla som anmäler sig, men sidan efter evenemanget har förblivit privat: den öppnas inte igen av sig själv. Du kan ändra det under ”Integritet, data och sidan efter evenemanget”.",
+        "postEventPagePrivateVideoHidden": "Inspelningen är offentlig men sidan efter evenemanget är privat: ingen kommer att se videon, inte ens de anmälda, så länge sidan förblir privat.",
+        "recordingNothingToCapture": "Den här installationen har ingen video av rummet: utan transkriptionen och spåren per deltagare spelas ingenting in.",
+        "recordingDestinationRequired": "Välj vart inspelningen ska.",
         "audienceAnonymous": "Anonym publik",
         "audienceAnonymousDesc": "Deltagare visas för andra under en pseudonym (”Deltagare” och en kod) i video, chatt och frågor; deltagarlistan stannar hos värdarna och det finns inget torg. Bra för stora evenemang; på gemenskapsevenemang vill man lära känna varandra.",
         "audienceAnonymousLocked": "Kan inte ändras medan rummet kan vara öppet: det skulle koppla pseudonymer till namn.",
@@ -1032,10 +1102,15 @@
         "participantListVisibleDesc": "Av: listan, rutnätet och namnen på torget stannar hos värdar och talare; publiken ser bara den som talar. På: alla ser vilka som är i rummet.",
         "participantListAnonymous": "Med anonym publik förblir listan dold.",
         "participantListLocked": "Kan inte ändras när rummet är öppet: de som redan är inne skulle inte se ändringen.",
+        "nicknamesEnabled": "Smeknamn för deltagare",
+        "nicknamesEnabledDesc": "Deltagarna kan välja ett smeknamn: de andra ser det i stället för namnet i videon, i chatten, bland frågorna och i transkriptionen. Arrangörer och moderatorer ser vem som står bakom. Den som leder behåller sitt eget namn. Från början påslaget där deltagarlistan är dold.",
+        "nicknamesLocked": "Det går inte att ändra medan rummet är öppet: de som redan är inne valde enligt den tidigare regeln.",
         "participantListCameraNote": "Med dold lista ser den som slår på kameran inte sin egen ruta. Visa listan vid ett möte där alla ser varandra.",
         "recordingLockedLive": "Inspelning kan inte ändras när rummet är öppet: den gäller från första inträdet.",
         "hostsAlwaysRecorded": "De som leder finns alltid med i inspelningen",
-        "hostsAlwaysRecordedDesc": "Avstängt väljer moderatorer och talare som alla andra. Slå på det bara om de redan har gått med på att filmas: de ser inte rutan, och evenemangets information måste ange det."
+        "hostsAlwaysRecordedDesc": "Moderatorer och talare syns i videon med namn och bild, utan någon ruta att kryssa i: evenemangets integritetsmeddelande måste säga det. Av deltagarna spelas bara rösten in, och bara med deras samtycke.",
+        "hostsAlwaysRecordedDescHostsOnly": "Moderatorer och talare syns i videon med namn och bild, utan någon ruta att kryssa i: evenemangets integritetsmeddelande måste säga det. Deltagarna syns och hörs aldrig i videon.",
+        "hostsAlwaysRecordedDescVisible": "Moderatorer och talare syns i videon med namn och bild, utan någon ruta att kryssa i: evenemangets integritetsmeddelande måste säga det. Den här installationen kan inte hålla deltagarna utanför videon: den som samtycker deltar med namn, röst och bild, och namnet på den som följer med kan synas även utan att personen talar."
       },
       "step3": {
         "heading": "Personer och inbjudningar",
@@ -1053,7 +1128,7 @@
         "remove": "Ta bort",
         "invalidEmail": "Ogiltig e-postadress.",
         "duplicateEmail": "Adressen finns redan.",
-        "rubricaPick": "Sök i adressboken efter organisation…",
+        "rubricaPick": "Sök i adressboken efter namn, e-postadress eller organisation…",
         "rubricaOrAdd": "eller lägg till manuellt",
         "removeItem": "Ta bort {name}",
         "invitationsStaffOnly": "Inbjudningarna hanteras av evenemangets personal.",
@@ -1135,6 +1210,7 @@
         "askOrganization": "Organisation (krävs för anmälan)",
         "askRole": "Roll (valfritt)",
         "askType": "Typ av organisation (valfritt)",
+        "askAddressBook": "Erbjud att stanna kvar i adressboken (frivilligt för dem som anmäler sig)",
         "questionnairesHeading": "Enkäter",
         "questionsBefore": "Före evenemanget, vid anmälan: {count, plural, =0 {inga extra frågor} one {# extra fråga} other {# extra frågor}}",
         "questionsAfter": "Efter evenemanget: {count, plural, =0 {ingen nöjdhetsenkät} one {nöjdhetsenkät, # fråga} other {nöjdhetsenkät, # frågor}}",
@@ -1230,6 +1306,8 @@
         "gdprHeading": "Integritet och datalagring",
         "retentionDays": "Lagringsdagar",
         "retentionHelp": "Efter denna gräns raderas personuppgifter automatiskt.",
+        "recordingRetention": "Lagring av inspelningen",
+        "recordingRetentionHelp": "Inspelningen och det som görs av den raderas inte med personernas uppgifter. Med en period raderas de så många dagar efter evenemangets slut eller, om videon är publicerad, efter publiceringen. Den kan också ändras senare i inspelningspanelen.",
         "gdprTemplate": "Integritetsmall",
         "gdprTemplateNone": "— Använd anpassad text —",
         "gdprTemplateUnknown": "Den valda mallen för integritetsmeddelandet finns inte längre: välj en annan eller gå tillbaka till anpassad text",
@@ -1281,7 +1359,10 @@
         "participantsCan": "Deltagare: {list}",
         "none": "inga",
         "recordingManual": "Tillgänglig: startar först när en moderator trycker på REC.",
+        "recordingDestinationReserved": "Destination: förbehållen arrangörerna och de anmälda.",
+        "recordingDestinationPublic": "Destination: offentlig.",
         "aiAfter": "Efter inspelningen: {list}.",
+        "aiConfirmVideo": "Utan spår per person startar transkriptionen av videon först efter bekräftelse av att alla röster har samtyckt.",
         "scheduleHeading": "När det äger rum",
         "scheduleIntro": "När evenemanget äger rum: datum, tid och tidszon.",
         "advancedIntro": "Värden som mallen redan har valt: ändra bara det som behövs.",
@@ -1325,17 +1406,25 @@
         "askOrganization": "organisation",
         "askRole": "roll",
         "askType": "typ av organisation",
+        "askAddressBook": "om personen vill stanna kvar i adressboken",
         "permissionsHeading": "Vem som får göra vad i rummet",
         "permissionsIntro": "Vad deltagarna kan göra och vilka funktioner i rummet som är på. Allt kan också ändras under evenemanget.",
         "consentsLine": "Samtycken vid anmälan och i rummet: {list}",
         "consentRecordingFree": "inspelning, frivillig (utan: bara lyssna)",
         "consentRecordingNotice": "för inspelningen bara ett meddelande (deltagarna varken talar eller syns)",
+        "consentRecordingHostsOnly": "för inspelningen bara ett meddelande (i videon syns bara moderatorerna)",
         "consentTranscription": "transkription av egna inlägg, frivillig",
-        "consentsNone": "Inget samtycke utöver det vid anmälan.",
-        "consentsHosts": "Moderatorer och talare tillfrågas om inspelningen i rummet, frivilligt.",
+        "consentsNone": "Inget samtycke behöver begäras: vid anmälan räcker kännedom om integritetspolicyn.",
         "consentsWithdraw": "Deltagarna kan återkalla dem i rummet med knappen ”Samtycken”.",
         "participantListShown": "Deltagarlista: synlig för alla.",
         "participantListHidden": "Deltagarlista: endast för värdar och talare.",
+        "audiencePseudonyms": "Publikens namn: pseudonymer.",
+        "audienceNicknames": "Deltagarna kan använda ett smeknamn.",
+        "audienceRealNames": "Publikens namn: de riktiga namnen.",
+        "postEventQaHidden": "Frågor efter evenemanget: publiceras inte.",
+        "postEventQaTextOnly": "Frågor efter evenemanget: endast texten, utan namn.",
+        "addressBookOffered": "Adressbok: erbjuds dem som anmäler sig.",
+        "addressBookNotOffered": "Adressbok: erbjuds inte.",
         "consentRecordingOptional": "inspelning, frivillig",
         "consentRecordingVoice": "inspelning, valfri (utan samtycke står personen utanför inspelningen)",
         "consentsHostsAlways": "De som leder och talar finns alltid med i inspelningen: de ser inte rutan."
@@ -1409,15 +1498,15 @@
         "recording": "I inspelningen",
         "roomSame": "Deltar enligt evenemangets regler.",
         "roomListenOnly": "Lyssnar och chattar bara.",
-        "recordedFull": "Namn, röst, bild och delad skärm.",
+        "recordedFull": "Bara rösten, när personen talar: ansikte och namn syns aldrig.",
+        "recordedVisible": "Namn, röst, bild och delad skärm.",
         "notRecorded": "Syns inte: varken namn, röst, bild eller delad skärm.",
         "recordedVoice": "Rösten, på ett separat spår.",
         "notRecordedVoice": "Rösten spelas inte in.",
         "othersSame": "Övriga ändras inte: mikrofonlås, ordet och videons utseende förblir som i evenemanget.",
         "audienceNotice": "Deltagare har ingen mikrofon, kamera eller skärm: de får bara en avisering. Får de ordet kan de samtycka i rummet; gör de inte det står de utanför inspelningen.",
-        "hostsChoose": "Moderatorer och talare väljer som alla andra: den som inte samtycker leder som vanligt men står utanför inspelningen.",
         "hostsAlways": "Moderatorer och talare finns alltid med i inspelningen: de ser inte rutan.",
-        "hostsFixed": "Moderatorer och talare leder i alla fall, och videon filmar dem.",
+        "hostsOnly": "Den här installationen spelar bara in moderatorerna i videon: deltagarna varken syns eller hörs, och de tillfrågas inte om samtycke till inspelningen.",
         "trace": "Om personen talar under inspelningen anger en notering bredvid videon att ett inlägg saknas, och utskriften markerar *** med klockslaget.",
         "anytime": "Samtycke ges och återkallas i rummet, när som helst.",
         "transcription": "Utskrift av de egna inläggen är ett separat, frivilligt samtycke.",
@@ -1472,7 +1561,9 @@
       "breadcrumbAriaLabel": "Brödsmulor",
       "skipToPage": "Gå till sidans innehåll",
       "openMenu": "Öppna menyn",
-      "closeMenu": "Stäng menyn"
+      "closeMenu": "Stäng menyn",
+      "recordingRemovals": "Begäranden om borttagning",
+      "recordingRemovalDetail": "Begäran om borttagning"
     },
     "publications": {
       "subtitle": "Enhetlig redaktionell hubb för alla publicerade videor: schemalagda evenemang, snabbsamtal, uppladdade arkiv och sessioner som väntar på att marknadsföras.",
@@ -1543,6 +1634,8 @@
           "saveFailed": "Det gick inte att spara metadata."
         }
       },
+      "reservedBadge": "Endast för anmälda",
+      "reservedHelp": "Inspelningen är förbehållen de anmälda: den kan inte visas i videobiblioteket.",
       "updateFailed": "Uppdateringen misslyckades."
     },
     "recordingsLibrary": {
@@ -1614,7 +1707,8 @@
       "detailFilename": "Filnamn",
       "transcriptManage": "Hantera transkription / AI",
       "transcriptReady": "Transkriberad",
-      "transcriptProcessing": "Bearbetas"
+      "transcriptProcessing": "Bearbetas",
+      "organizerOnly": "Endast arrangörer"
     },
     "gdprAudit": {
       "subtitle": "Logg över integritetsåtgärder på personuppgifter: raderingar, samtycken, exporter",
@@ -1629,7 +1723,12 @@
         "DATA_DELETED": "Data raderad",
         "CONSENT_RECORDED": "Samtycke registrerat",
         "DATA_EXPORTED": "Data exporterad",
-        "CONSENT_WITHDRAWN": "Samtycke återkallat"
+        "DATA_RECTIFIED": "Uppgifter rättade",
+        "CONSENT_WITHDRAWN": "Samtycke återkallat",
+        "RECORDING_CONTENT_READ": "Inspelningens innehåll läst av personal",
+        "RECORDING_REDACTION_REQUESTED": "Borttagning ur en inspelning begärd",
+        "RECORDING_REDACTION_REJECTED": "Begäran om borttagning avslagen",
+        "RECORDING_REDACTED": "Person borttagen ur en inspelning"
       },
       "recordsAffected": "{count} poster berörda",
       "colWhen": "När",
@@ -1655,7 +1754,8 @@
       "rotating": "Regenererar…",
       "regenerateTitle": "Regenerera moderatortoken (ogiltigförklarar gamla länken)",
       "confirmRegenerate": "Är du säker på att du vill regenerera token? Den gamla länken slutar fungera.",
-      "noResults": "Inga evenemang funna."
+      "noResults": "Inga evenemang funna.",
+      "organizerOnlyLink": "Länken syns endast för evenemangets arrangörer"
     },
     "registrations": {
       "subtitle": "Alla personer anmälda till evenemang — sök, filtrera och exportera",
@@ -1684,6 +1784,8 @@
       "colCreatedAt": "Anmäld",
       "colEvent": "Evenemang",
       "colName": "Namn",
+      "colNickname": "Smeknamn",
+      "nicknameShown": "De andra ser personen som ”{nickname}”",
       "colEmail": "E-post",
       "colOrg": "Organisation",
       "colJoined": "Deltagit",
@@ -1917,7 +2019,7 @@
       "aiSectionHeading": "Automatisk efterproduktion",
       "aiSectionDesc": "När evenemanget är slut kan inspelningen bearbetas av en AI-pipeline i klustret som tar fram transkription, sammanfattning och – om det efterfrågas – översättningar och dubbning. Allt sker på den här installationens infrastruktur, inga uppgifter lämnas till tredje part.",
       "aiTranscriptEnabled": "Automatisk transkribering",
-      "aiTranscriptEnabledDesc": "Taligenkänning med identifiering av talare. Krävs för att kunna aktivera sammanfattning, översättningar och dubbning.",
+      "aiTranscriptEnabledDesc": "Taligenkänning med identifiering av talare. Krävs för att kunna aktivera sammanfattning, översättningar och dubbning. Deltagarna väljer själva om deras inlägg ska transkriberas.",
       "aiSummaryEnabled": "Sammanfattning och kapitel",
       "aiSummaryEnabledDesc": "Sammanfattning av mötet, fattade beslut, att göra-punkter och indelning i kapitel med tidsangivelser.",
       "aiTranslationEnabled": "Översättning till andra språk",
@@ -2023,7 +2125,7 @@
     },
     "recordingUpload": {
       "title": "Ladda upp befintlig inspelning",
-      "subtitle": "Om du redan har en videofil från evenemanget (till exempel inspelad med en annan plattform) laddar du upp den här: den visas som officiell inspelning på den offentliga sidan.",
+      "subtitle": "Om du redan har en videofil från evenemanget (till exempel inspelad med en annan plattform) laddar du upp den här: den blir evenemangets officiella inspelning.",
       "fileLabel": "Videofil",
       "upload": "Ladda upp och koppla",
       "signing": "Förbereder…",
@@ -2087,7 +2189,9 @@
         "DATA_DELETED": "Data raderad",
         "CONSENT_RECORDED": "Samtycke registrerat",
         "DATA_EXPORTED": "Data exporterad",
-        "CONSENT_WITHDRAWN": "Samtycke återkallat"
+        "DATA_RECTIFIED": "Uppgifter rättade",
+        "CONSENT_WITHDRAWN": "Samtycke återkallat",
+        "RECORDING_CONTENT_READ": "Inspelningens innehåll läst av personal"
       }
     },
     "settings": {
@@ -2130,7 +2234,7 @@
         "jobMaxAttempts": "Försök före misslyckande",
         "jobMaxAttemptsHelp": "Hur många gånger pipelinen gör om ett jobb innan det markeras som misslyckat. Väntetiden mellan försöken växer exponentiellt (från 30 sekunder upp till 2 timmar). Typiskt värde är 5.",
         "artifactRetentionDays": "Lagring av artefakter (dagar)",
-        "artifactRetentionDaysHelp": "Vid 0 finns ingen gräns för hela webbplatsen: AI-artefakterna följer lagringstiden för sin inspelning eller sitt evenemang. Ett värde större än noll får ett dagligt jobb att radera varje artefakt som skapades för mer än så många dagar sedan, publicerad eller inte: det kan förkorta lagringen men aldrig förlänga den. Talarnas namn och jobbens payload omfattas inte: de följer inspelningens eller evenemangets lagringstid. Detaljer i docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "Vid 0 finns ingen gräns för hela webbplatsen: AI-artefakterna följer lagringstiden för sin inspelning. Ett värde större än noll får ett dagligt jobb att radera varje artefakt som skapades för mer än så många dagar sedan, publicerad eller inte: det kan förkorta lagringen men aldrig förlänga den. Talarnas namn och jobbens payload omfattas inte: de följer inspelningens lagringstid. Detaljer i docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "AI-information i väntrummet",
         "consentDisclosureHelp": "Text som visas för deltagarna i väntrummet när evenemanget använder AI-efterproduktion (transkription, sammanfattning, översättning, dubbning). Kan anpassas per språk. Lämna tomt för att använda systemets standardtext.",
         "consentDisclosurePlaceholder": "T.ex. Det här evenemanget kommer att transkriberas och sammanfattas automatiskt med AI-verktyg efter direktsändningen…"
@@ -2307,6 +2411,8 @@
         "guestAccessEnabledHelp": "Personer som inte har anmält sig kan delta i pågående evenemang med bara sitt namn. När det är avstängt kan man bara delta i schemalagda evenemang med anmälan eller med en moderator- eller talarlänk; omedelbara videosamtal förblir öppna för alla som har länken. Ett evenemang endast för inbjudna släpper aldrig in gäster.",
         "publicRegistrationEnabled": "Offentlig registrering aktiverad",
         "publicRegistrationEnabledHelp": "Vem som helst kan anmäla sig till evenemang. När det är avstängt kan bara personer på evenemangets inbjudningslista anmäla sig, och den personliga länken för att delta skickas bara via e-post; redan anmälda och moderator- och talarlänkar fungerar fortfarande. Det är valet som föreslås för nya evenemang: varje evenemang kan välja annorlunda i steget ”Personer”.",
+        "addressBookEnabled": "Evenemangsadressbok",
+        "addressBookEnabledHelp": "Erbjuder dem som anmäler sig att stanna kvar i adressboken för att bjudas in till liknande evenemang. När funktionen är avstängd försvinner kryssrutan från formulären och väljaren från guiden; befintliga poster finns kvar tills de återkallas eller löper ut.",
         "calendarPublic": "Offentlig kalender",
         "calendarPublicHelp": "Publicera evenemangskalendern. Besökare kan se schemalagda evenemang.",
         "parseTitleKicker": "Titlar med redaktionell övertitel",
@@ -2397,6 +2503,40 @@
         "avgParticipantsPerEvent": "Genomsnitt deltagare per evenemang",
         "avgFeedbackRating": "Genomsnittligt feedbackbetyg",
         "totalFeedback": "Feedbacksvar"
+      },
+      "catalog": {
+        "title": "Evenemangstyper och mallar",
+        "intro": "Hur många evenemang av varje typ och från varje mall, månad för månad. Endast antal och medelvärden, inga personuppgifter. Utkast räknas inte.",
+        "periodLabel": "Period",
+        "months": "{count, plural, one {# månad} other {# månader}}",
+        "groupByLabel": "Gruppera efter",
+        "groupBy": {
+          "type": "Evenemangstyp",
+          "template": "Mall"
+        },
+        "rankingTypes": "Vanligaste typerna",
+        "rankingTemplates": "Mest använda mallarna",
+        "columns": {
+          "type": "Typ",
+          "template": "Mall",
+          "events": "Evenemang",
+          "held": "Genomförda",
+          "avgParticipants": "Snitt deltagare",
+          "avgDuration": "Snittlängd",
+          "total": "Hela perioden"
+        },
+        "measuresNote": "Genomförda: evenemang vars rum öppnades. Genomsnittligt antal deltagare: det högsta antalet samtidigt närvarande, gäster inräknade, i genomsnitt för de genomförda evenemangen. Genomsnittlig längd: den uppmätta tiden i rummet, inte den planerade.",
+        "byMonth": "Månad för månad",
+        "measureLabel": "Mått",
+        "measures": {
+          "events": "Evenemang",
+          "avgParticipants": "Genomsnittligt antal deltagare",
+          "avgDurationMinutes": "Genomsnittlig längd"
+        },
+        "byMonthCaption": "{measure} per månad",
+        "empty": "Inga evenemang under den här perioden.",
+        "deletedTemplate": "{name} (borttagen)",
+        "uncatalogedNote": "Evenemang som inte är katalogiserade: {count}. De skapades före katalogen, eller utan mall och utan format; du kan katalogisera dem när du redigerar evenemanget, under tekniska detaljer."
       }
     },
     "recurrence": {
@@ -2439,6 +2579,8 @@
       "featuresLabel": "Funktioner",
       "whiteboardLabel": "Whiteboard",
       "recordingLabel": "Inspelning",
+      "recordingDestination": "Inspelningens destination",
+      "recordingDestinationNone": "Väljs när evenemanget skapas",
       "waitingRoomEngineLabel": "Väntrum (mallens standard)",
       "waitingRoomEngineSiteDefault": "Webbplatsens standard",
       "waitingRoomEngineGarden": "Trädgård (standard)",
@@ -2451,17 +2593,22 @@
       "durationLabel": "Standardlängd (minuter)",
       "durationHint": "Förifyller evenemangets sluttid (start + längd). Användaren kan ändra den. Tomt = 2 timmar.",
       "retentionLabel": "Standardlagring av data (dagar)",
+      "recordingRetentionLabel": "Standardlagring av inspelningen",
+      "recordingRetentionHint": "För evenemang som skapas från den här mallen; den ändras i guiden och i inspelningspanelen. Inspelningen följer inte lagringstiden för uppgifterna.",
       "expectedSpeakersLabel": "Förväntat antal talare (standard)",
       "descriptionTemplateLabel": "Standardbeskrivning",
       "descriptionTemplateHint": "Text som förifylls i evenemangets beskrivning (går att ändra).",
       "aiTranscript": "Automatisk transkribering (standard)",
       "aiSummary": "Automatisk sammanfattning (standard)",
       "aiTranslation": "Automatisk översättning (standard)",
+      "noRecording": "Den här installationen spelar inte in: mallarna startar utan inspelning.",
       "pickerSubtitle": "Välj en mall för att förkonfigurera evenemangsinställningarna, eller hoppa över för att konfigurera allt manuellt.",
       "skipTemplate": "Konfigurera manuellt",
       "postEventPublic": "Offentlig sida efter evenemanget",
+      "offerAddressBook": "Erbjuder adressboken till dem som anmäler sig",
       "invalidFields": "Kontrollera de här fälten: {fields}.",
-      "descriptionOtherLanguages": "Det finns även versioner på: {languages}, som inte kan redigeras här. Om du ändrar den italienska texten tas de bort."
+      "descriptionOtherLanguages": "Det finns även versioner på: {languages}, som inte kan redigeras här. Om du ändrar den italienska texten tas de bort.",
+      "usedBy": "Evenemang skapade från den här mallen: {count}"
     },
     "instantCall": {
       "title": "Omedelbart videosamtal",
@@ -2724,7 +2871,7 @@
       "title": "Samtalssessioner",
       "empty": "Inga sessioner registrerade. Live-sessioner listas automatiskt här så snart moderatorn går in i rummet.",
       "loading": "Laddar sessioner...",
-      "participants": "deltagare",
+      "participantsCount": "{count, plural, one {# deltagare} other {# deltagare}}",
       "participantList": "Deltagare",
       "name": "Namn",
       "joined": "Anslöt",
@@ -2974,11 +3121,28 @@
         "publishNow": "Publicera nu"
       },
       "editFeatures": "Redigera funktioner",
-      "editPrivacy": "Redigera integritet och data"
+      "editPrivacy": "Redigera integritet och data",
+      "governance": {
+        "title": "Du hanterar det här evenemanget som administratör",
+        "body": "Du är inte en av dess arrangörer: du ser status, detaljer, anmälningar och samtycken och kan arkivera eller radera det. Att leda evenemanget, moderatorlänken och innehållet i inspelningarna (video, transkriptioner, sammanfattningar) är arrangörernas sak.",
+        "recording": "Innehållet i inspelningen är endast tillgängligt för evenemangets arrangörer och deltagare. Här ser du om den finns och dess detaljer.",
+        "recordingFile": "Inspelning",
+        "present": "Finns",
+        "absent": "Ingen",
+        "recordingPublished": "Publicerad",
+        "yes": "Ja",
+        "no": "Nej",
+        "recordingDuration": "Längd",
+        "recordingSize": "Storlek",
+        "recordingRetention": "Automatisk radering av inspelningen",
+        "recordingRetentionNone": "Ingen",
+        "recordingRetentionDays": "{days, plural, one {# dag} other {# dagar}} efter att evenemanget har avslutats eller, om den publiceras, efter publiceringen"
+      }
     },
     "rubrica": {
-      "subtitle": "Personer som har samtyckt till att läggas till i adressboken (GDPR art. 6.1.a). Profilinformation uppdateras automatiskt vid varje ny anmälan.",
-      "searchLabel": "Sök på namn eller organisation",
+      "subtitle": "Personer som har samtyckt till att läggas till i adressboken (GDPR art. 6.1.a). Namn, e-postadress och organisation uppdateras bara när personen kryssar i rutan igen.",
+      "searchLabel": "Sök på namn, e-postadress eller organisation",
+      "searchPartial": "Sökningen gällde bara de {limit} senast uppdaterade posterna: en person med en äldre post kanske inte visas.",
       "orgTypeLabel": "Typ av organisation",
       "allTypes": "Alla",
       "includeOptedOut": "Ta med personer som har återkallat sitt samtycke",
@@ -3243,7 +3407,8 @@
         "metricsTitle": "Mått för sammanfattningen (LLM)",
         "chars": "tecken",
         "model": "Modell",
-        "notAvailable": "ej tillg."
+        "notAvailable": "ej tillg.",
+        "contentHidden": "Endast tillgängligt för evenemangets arrangörer."
       },
       "rel": {
         "title": "AI-tillförlitlighet",
@@ -3400,7 +3565,8 @@
         "alignNone": "Inget bildbyte att synkronisera.",
         "previewTitle": "Förhandsgranskning",
         "previewHelp": "Videon med bilderna så som publiken kommer att se dem, med justeringen som angetts ovan."
-      }
+      },
+      "contentOrganizerOnly": "Endast arrangörerna av det här evenemanget kan se och redigera innehållet i den här inspelningen (video, spår, transkription, sammanfattning, översättningar). Här ser du dess status, bearbetningsjobben och filernas detaljer."
     },
     "questionnairesPage": {
       "subtitle": "Återanvändbara frågemallar för förregistrerings- och eftermöteenkäter."
@@ -3597,10 +3763,13 @@
         "speakers": "Talare och moderatorer",
         "speakersDesc": "Publiken skriver i chatten och ställer frågor"
       },
-      "recQ": "Vill du kunna spela in?",
+      "recQ": "Vill du kunna spela in, och för vem?",
       "rec": {
-        "yes": "Ja, när du trycker på REC",
         "yesDesc": "Efter evenemanget: transkription, sammanfattning och översättning",
+        "reserved": "Ja, endast för anmälda",
+        "reservedDesc": "Arrangörerna och de anmälda kan se den",
+        "public": "Ja, offentlig",
+        "publicDesc": "Den kan publiceras på evenemangets sida",
         "no": "Nej",
         "noDesc": "Ingen inspelning, inget samtycke att be om"
       },
@@ -3614,7 +3783,8 @@
         "grande": "Fler än 100 personer",
         "tutti": "alla i video",
         "relatori": "talarna talar",
-        "si": "med inspelning",
+        "riservata": "med inspelning endast för anmälda",
+        "pubblica": "med offentlig inspelning",
         "no": "utan inspelning",
         "openAccess": "öppet för alla",
         "inviteOnly": "endast inbjudna"
@@ -3627,6 +3797,9 @@
         "invitationDesc": "Sidan förblir synlig, men bara de som står på listan kan anmäla sig; inbjudan med anmälningslänken skickar du via e-post från evenemangssidan"
       },
       "previewInvitation": "Bara inbjudna anmäler sig; utan anmälan kommer ingen in.",
+      "previewPseudonyms": "Publiken visas under en pseudonym",
+      "previewNicknames": "Deltagarna kan använda ett smeknamn",
+      "previewRealNames": "Publiken visas med sina egna namn",
       "templateReplaces": "En mall tar med sina egna inställningar i stället för svaren nedan. Titel, datum och personer fyller du i de följande stegen.",
       "instantBack": "Skapa ett schemalagt evenemang i stället"
     },
@@ -3686,7 +3859,9 @@
       "publishDesc": "Granska den före publicering: texten är skriven av en AI-modell. En nyskapad rapport måste publiceras igen.",
       "preview": "Förhandsvisning",
       "hidePreview": "Dölj förhandsvisning",
-      "previewLanguage": "Språk"
+      "previewLanguage": "Språk",
+      "organizerOnly": "Endast arrangörerna av det här evenemanget kan begära, läsa och publicera rapporten.",
+      "organizerOnlyExists": "Rapporten finns. Endast arrangörerna av det här evenemanget kan läsa och publicera den."
     },
     "endEvent": "Avsluta evenemang",
     "endEventConfirmTitle": "Avsluta evenemanget för alla?",
@@ -3722,11 +3897,12 @@
       "organizersEmpty": "Ingen organisation angiven: den offentliga sidan visar inte vem som arrangerar.",
       "sendAll": "Skicka inbjudan till dem som inte har fått den ({count})",
       "sending": "Skickar…",
-      "sendDone": "Inbjudningar på väg: {sent}. Hoppade över (redan anmälda eller utan adress): {skipped}.",
+      "sendDone": "Inbjudningar på väg: {sent}. Hoppade över (redan anmälda, utan adress eller utan samtycke till kommunikation): {skipped}.",
       "sendError": "Det gick inte att skicka: försök igen.",
       "sendNotPublished": "Inbjudningar skickas medan evenemanget tar emot anmälningar: efter publiceringen och före slutet.",
       "invitedOn": "Inbjuden {date}",
       "notInvited": "Inbjudan inte skickad",
+      "stopped": "Tar inte emot inbjudningar",
       "send": "Skicka inbjudan",
       "resend": "Skicka igen",
       "actions": "Åtgärder",
@@ -3764,6 +3940,7 @@
         "pubblicata": "Publicerad.",
         "prontaAi": "Klar från efterbearbetningen: granska den; den publiceras tillsammans med videon.",
         "prontaSottotitoli": "Klar från textningen: kontrollera namnen och publicera den.",
+        "daConfermare": "Ska startas: videon transkriberas bara efter bekräftelse av att alla röster har samtyckt.",
         "inLavorazione": "Bearbetas.",
         "nessuna": "Saknas: varken textning eller efterbearbetning.",
         "soloStaff": "Evenemangets arrangör granskar och publicerar den i administrationen.",
@@ -3773,7 +3950,7 @@
         "title": "Rapport",
         "pubblicato": "Publicerad.",
         "daPubblicare": "Genererad: läs igenom och publicera den.",
-        "daGenerare": "Ska genereras utifrån transkriptionen, chatten och omdömena.",
+        "daGenerare": "Ska genereras utifrån transkriptionen, omröstningarna, omdömena och, om de är publicerade, frågorna.",
         "inLavorazione": "Bearbetas.",
         "senzaPipeline": "AI-efterbearbetning är inte aktiverad i den här installationen.",
         "soloStaff": "Evenemangets arrangör genererar och publicerar den i administrationen.",
@@ -3803,6 +3980,7 @@
         "title": "Publik sida",
         "visibile": "Synlig för alla.",
         "nellaLibreria": "Synlig för alla och i videobiblioteket.",
+        "libreriaRiservata": "Sidan är synlig, men videon är förbehållen de anmälda: den visas inte i videobiblioteket.",
         "privata": "Tillbakadragen: allmänheten ser den inte.",
         "scaduta": "Inte längre synlig: utgångsdatumet har passerat.",
         "archiviato": "Evenemanget är arkiverat: sidan är inte publik.",
@@ -3950,9 +4128,10 @@
     },
     "voiceConsent": {
       "title": "Transkribera hela inspelningen?",
-      "message": "Det här evenemanget bad var och en om samtycke till att det de säger transkriberas. Hela inspelningen innehåller alla röster, även deras som inte samtyckte: transkribera den bara om alla som talar i den har samtyckt. Din bekräftelse sparas i aktivitetsloggen.",
+      "message": "Hela videon innehåller alla röster, även deras som inte har samtyckt till att deras inlägg transkriberas: transkribera den bara om alla som talar i videon har samtyckt. Din bekräftelse sparas i aktivitetsloggen.",
       "confirm": "Ja, alla har samtyckt",
       "cancel": "Avbryt",
+      "waitingNoCaptions": "Transkriptionen av hela videon startade inte av sig själv: var och en väljer om deras inlägg ska transkriberas. Starta den med {button} bara om alla som talar i videon har samtyckt; annars förblir evenemanget utan transkription.",
       "waiting": "Transkriberingen av hela inspelningen startade inte av sig själv: det här evenemanget bad var och en om samtycke till att det de säger transkriberas. Starta den med {button} bara om alla som talar i inspelningen har samtyckt; annars finns transkriptionen från undertexterna kvar."
     },
     "editCopyTitle": "Kopia av evenemanget",
@@ -3981,22 +4160,149 @@
         "givenAt": "Givet",
         "withdrawnAt": "Återkallat",
         "textVersion": "Textversion",
+        "destination": "Destination",
+        "superseded": "Ersatt",
+        "supersededValue": "Av ett senare samtycke",
+        "destinations": {
+          "PUBLIC": "Offentlig",
+          "REGISTRANTS": "Endast för anmälda",
+          "none": "Inte angiven"
+        },
         "kinds": {
           "recording": "Inspelning",
           "transcription": "Transkription av inlägg"
         },
         "sources": {
           "registration": "anmälan",
-          "room": "rum"
+          "room": "rum",
+          "self-service": "Mina uppgifter"
         },
         "roles": {
           "registrant": "anmäld",
           "guest": "gäst",
           "host": "leder eller talar"
         },
+        "erasedName": "(namn borttaget på begäran)",
         "unreadableName": "(namnet kan inte läsas)"
       },
+      "retainedNote": "{count, plural, one {# bevis på samtycke sparas} other {# bevis på samtycke sparas}} så länge videon eller transkriptionen finns.",
       "countsNote": "Personer räknas: en anmälan, ett personalkonto eller en personlig länk räknas en gång; en gäst som kommer tillbaka vid ett annat besök räknas igen."
+    },
+    "recordingRemovals": {
+      "subtitle": "Personer som har begärt att inte synas i en inspelning. Så länge en begäran är öppen kan du öppna inspelningen från redigeraren för borttagning, och varje åtkomst registreras i åtgärdsloggen.",
+      "filterOpen": "Öppna",
+      "filterAll": "Alla",
+      "filterLabel": "Vilka begäranden",
+      "empty": "Inga begäranden.",
+      "loadError": "Begärandena kunde inte läsas in.",
+      "colReceived": "Mottagen",
+      "colPerson": "Person",
+      "colEvent": "Evenemang",
+      "colSource": "Ursprung",
+      "colStatus": "Status",
+      "open": "Öppna",
+      "unnamed": "Person utan namn",
+      "sources": {
+        "self-service": "Mina uppgifter",
+        "admin": "Personal"
+      },
+      "statuses": {
+        "OPEN": "Öppen",
+        "IN_PROGRESS": "Pågår",
+        "PROCESSING": "Bearbetas",
+        "CLOSED": "Stängd",
+        "REJECTED": "Avslagen"
+      },
+      "kinds": {
+        "registrant": "Anmäld",
+        "host": "Leder",
+        "guest": "Gäst"
+      },
+      "newOpen": "Registrera en begäran",
+      "newTitle": "En begäran som kommit in på annat sätt",
+      "newIntro": "För en begäran som nått den personuppgiftsansvarige via e-post, brev eller personligen. Välj inspelningen och, om du känner igen personen, vem det är bland dem som var i rummet.",
+      "recordingSearch": "Sök evenemanget",
+      "recordingLabel": "Inspelning",
+      "recordingChoose": "Välj en inspelning",
+      "recordingOption": "{title} · {date}",
+      "recordingNone": "Ingen inspelning med video eller med spår per deltagare.",
+      "peopleLabel": "Vilka som var i rummet",
+      "peopleNone": "Rummet har inte sparat vilka som var där: ange namnet, så markerar du intervallen för hand.",
+      "personNotInVideo": "utanför bild",
+      "personTimes": "från {from} till {to}",
+      "personStill": "från {from} till slutet",
+      "nameLabel": "Personens namn",
+      "noteLabel": "Hur begäran kom in (valfritt)",
+      "create": "Registrera begäran",
+      "createError": "Begäran kunde inte registreras.",
+      "cancel": "Avbryt",
+      "back": "Alla begäranden",
+      "fieldPerson": "Person",
+      "fieldEvent": "Evenemang",
+      "fieldReceived": "Mottagen",
+      "fieldSource": "Ursprung",
+      "fieldStatus": "Status",
+      "fieldNote": "Anteckning",
+      "externalCopy": "Det här evenemanget har en video på en extern webbplats (till exempel YouTube): borttagningen når inte dit. Ta bort eller ersätt den även där.",
+      "publishedElsewhere": "Evenemangets publicerade video är en annan fil än den här inspelningen: borttagningen ändrar den inte. Ersätt den eller ta bort den från evenemangssidan.",
+      "pipelineOff": "Efterbearbetningen är avstängd: borttagningsjobbet väntar i kön tills du slår på den, och transkriptionen görs inte om.",
+      "noVideo": "Den här inspelningen har ingen video, bara spår per deltagare: personens spår raderas och transkriptionen görs om utifrån de spår som finns kvar.",
+      "noRecording": "Inspelningen finns inte längre: det finns inget kvar att ta bort.",
+      "keyOnly": "Instansnyckeln öppnar inte en inspelning: logga in med ditt administratörskonto.",
+      "startIntro": "För att ta bort personen måste du öppna inspelningen. Åtkomsten gäller bara för den här begäran och registreras i åtgärdsloggen med ditt konto.",
+      "start": "Öppna redigeraren för borttagning",
+      "processing": "Borttagning pågår: den rensade videon ersätter originalet. Jobbets status: {status}.",
+      "closed": "Begäran stängd {date}.",
+      "closedIntervals": "{count, plural, =0 {Inget intervall täckt.} one {# intervall täckt.} other {# intervall täckta.}}",
+      "rejected": "Begäran avslagen {date}.",
+      "lastError": "Den senaste bearbetningen misslyckades: {error}. Kontrollera intervallen och skicka igen.",
+      "rejectTitle": "Avslå begäran",
+      "rejectLabel": "Skäl",
+      "reject": "Avslå",
+      "rejectConfirm": "Avslå begäran? Personen kommer att se att den har avslagits.",
+      "actionError": "Åtgärden misslyckades (HTTP {code}).",
+      "editorTitle": "Intervall att täcka",
+      "editorHint": "Förslagen bygger på vilka som var i rummet, vilka som talade och spåren per deltagare: taltiderna är ungefärliga. Titta på videon och rätta. I varje intervall blir videon skylten ”innehåll borttaget på begäran” och ljudet tystas; längden ändras inte.",
+      "sourcePresence": "I rummet",
+      "sourceSpeech": "Talar",
+      "sourceTrack": "Spår",
+      "selectedLegend": "Att täcka",
+      "useProposals": "Börja om från förslagen",
+      "addInterval": "Lägg till ett intervall här",
+      "fieldStart": "Början",
+      "fieldEnd": "Slut",
+      "setStart": "Början här",
+      "setEnd": "Slut här",
+      "seek": "Gå",
+      "remove": "Ta bort",
+      "intervalLabel": "Intervall {n}",
+      "noIntervalsVideo": "Inget intervall att täcka. Om personen inte syns i videon, avslå begäran och ange skälet.",
+      "total": "{count, plural, one {# intervall} other {# intervall}} · {seconds} s att täcka",
+      "timeHint": "Tider i timmar:minuter:sekunder, som i spelaren.",
+      "invalidTime": "Ogiltig tid",
+      "preview": "Förhandsgranska borttagningen",
+      "timelineLabel": "Inspelningens tidslinje",
+      "mediaError": "Videon läses inte in. Ladda om sidan.",
+      "submit": "Ta bort personen ur inspelningen",
+      "submitConfirm": "Originalvideon och personens spår raderas och efterbearbetningen görs om. Det går inte att ångra. Fortsätta?",
+      "submitDone": "Begäran stängd: personen har tagits bort."
+    },
+    "catalog": {
+      "fieldTitle": "Katalog",
+      "fieldHelp": "Evenemangstypen och mallen som det skapades från används bara för instansens statistik och ändrar ingen inställning. Rätta dem om evenemanget är felkatalogiserat eller inte katalogiserat alls.",
+      "typeLabel": "Evenemangstyp",
+      "templateLabel": "Mall",
+      "noTemplate": "Ingen mall",
+      "deletedTemplate": "Skapat från mallen ”{name}”, som sedan har tagits bort.",
+      "deletedOption": "{name} (borttagen)",
+      "types": {
+        "MEETING": "Möte",
+        "PARTICIPATORY": "Deltagande evenemang",
+        "PUBLIC": "Offentligt evenemang",
+        "INSTANT": "Snabbsamtal",
+        "LEGACY": "Importerad publicering",
+        "UNCATALOGED": "Inte katalogiserat"
+      }
     }
   },
   "email": {
@@ -4013,7 +4319,22 @@
     "dateLabel": "Datum",
     "timeLabel": "Tid",
     "durationLabel": "Längd",
-    "myDataLink": "Dina uppgifter: se dem, rätta dem, återkalla ett samtycke eller avbryt anmälan"
+    "addressBookNote": "Du finns i evenemangsadressboken för att bjudas in till liknande evenemang: du kan när som helst återkalla ditt samtycke.",
+    "addressBookPendingNote": "Rutan för evenemangsadressboken kryssades i på den här anmälan, men den här adressen hade slutat ta emot inbjudningar. Om begäran är din kan du bekräfta den på sidan med dina uppgifter, via länken nedan. Om den inte är din kan du bortse från det här meddelandet: du stannar utanför adressboken och får inga inbjudningar.",
+    "addressBookOptOutLink": "Ta bort mina uppgifter från adressboken",
+    "myDataLink": "Dina uppgifter: se dem, rätta dem, återkalla ett samtycke eller avbryt anmälan",
+    "confirmationCode": {
+      "subject": "{site}: bekräftelsekod",
+      "heading": "Din bekräftelsekod",
+      "introEdit": "Du har bett om att rätta namn och organisation i din anmälan till ”{event}”.",
+      "introEditAll": "Du har bett om att rätta namn och organisation i alla dina anmälningar.",
+      "introNickname": "Du har bett om att ändra smeknamnet i din anmälan till ”{event}”.",
+      "introNicknameRemove": "Du har bett om att ta bort smeknamnet från din anmälan till ”{event}”.",
+      "introCancel": "Du har bett om att radera din anmälan till ”{event}”.",
+      "codeLabel": "Koden är:",
+      "instructions": "Skriv den på sidan Mina uppgifter där du gjorde begäran. Den gäller i {minutes, plural, one {# minut} other {# minuter}}.",
+      "ignore": "Om det inte var du som gjorde begäran kan du strunta i det här meddelandet: utan koden ändras ingenting. Dela inte koden med någon."
+    }
   },
   "home": {
     "hero": {
@@ -4380,17 +4701,100 @@
   },
   "gdpr": {
     "consent": {
-      "recording": "Jag samtycker till ljud-/videoinspelning av detta evenemang",
+      "recording": "Jag samtycker till att min röst spelas in när jag talar under evenemanget. Mitt ansikte och mitt namn syns aldrig i videon.",
+      "recordingReserved": "Jag samtycker till att min röst spelas in när jag talar under evenemanget. Mitt ansikte och mitt namn syns aldrig i videon. Videon förblir förbehållen arrangörerna och de anmälda: den publiceras inte. De anmälda kan se den så länge uppgifterna om deras anmälan sparas.",
+      "recordingPublic": "Jag samtycker till att min röst spelas in när jag talar under evenemanget. Jag samtycker också till att videon publiceras: videon kan ses av vem som helst på evenemangets sida och i videobiblioteket. Mitt ansikte och mitt namn syns aldrig i videon.",
+      "recordingVisible": "Jag samtycker till ljud-/videoinspelning av detta evenemang.",
+      "recordingVisibleReserved": "Jag samtycker till ljud-/videoinspelning av detta evenemang. Videon förblir förbehållen arrangörerna och de anmälda: den publiceras inte. De anmälda kan se den så länge uppgifterna om deras anmälan sparas.",
+      "recordingVisiblePublic": "Jag samtycker till ljud-/videoinspelning av detta evenemang och till att den publiceras: videon kan ses av vem som helst på evenemangets sida och i videobiblioteket.",
+      "recordingNoVideo": "Jag samtycker till inspelningen av evenemanget. Rummets video spelas inte in: endast ljudspåren från dem som samtycker till transkription blir kvar, om evenemanget använder sådana.",
       "multitrack": "Jag samtycker till att mina inlägg transkriberas med mitt namn för evenemangets sammanfattning. Om evenemanget spelar in ett separat ljudspår för varje person spelas min röst in enbart i detta syfte och spåret raderas efter transkriberingen; det används inte för att identifiera eller återskapa min röst.",
+      "multitrackRetained": "Jag samtycker till att mina inlägg transkriberas med mitt namn för evenemangets rapport. Om evenemanget spelar in ett separat ljudspår för varje person spelas min röst in enbart i detta syfte och spåret sparas tillsammans med evenemangets uppgifter; det används inte för att identifiera eller återskapa min röst.",
       "multitrackOptional": "Det är frivilligt: om du inte samtycker deltar du ändå, men det du säger kommer inte med i transkriptionen och din röst spelas inte in på ett eget spår. Om evenemanget spelas in finns din röst ändå kvar i videon.",
+      "multitrackOptionalShort": "Det är frivilligt: om du inte samtycker deltar du ändå, men det du säger kommer inte med i transkriptionen och din röst spelas inte in på ett eget spår.",
       "stayInTouch": "Jag vill få information om kommande evenemang och läggas till i adressboken för att bjudas in till liknande evenemang",
-      "stayInTouchHelp": "Frivilligt samtycke (art. 6.1.a GDPR). Du kan när som helst återkalla det via länken ”Ta bort mig från adressboken” i de e-postmeddelanden du får. Namn och organisation är de från den här anmälan.",
+      "stayInTouchHelp": "Frivilligt samtycke (art. 6.1.a GDPR). Du kan när som helst återkalla det via länken ”Ta bort mina uppgifter från adressboken” i bekräftelsemejlet, påminnelserna och inbjudningarna, eller från sidan ”Mina uppgifter”. Namn, e-postadress och organisation är de från den här anmälan.",
+      "stayInTouchRetention": "Vi sparar dessa uppgifter i {months} månader från det här samtycket: perioden börjar om bara om du kryssar i rutan igen.",
       "recordingOptionalListenOnly": "Om du inte samtycker deltar du ändå, bara som lyssnare: du följer och skriver i chatten, men mikrofon, kamera och skärmdelning förblir avstängda. Du kan samtycka senare, från rummet.",
-      "recordingOptionalHost": "Om du inte samtycker kommer du ändå in och leder som vanligt, men din röst sparas inte i spåren per person eller i transkriptionen. Videon av rummet, om den spelas in, visar dig ändå.",
       "recordingOptionalVoice": "Om du inte samtycker deltar du ändå och kan yttra dig, men står utanför inspelningen: varken namn, röst eller bild. Du kan samtycka senare, från rummet.",
-      "recordingNotice": "Evenemanget spelas in (ljud och bild). Du deltar utan mikrofon och kamera: inspelningen innehåller inte din röst eller bild, om inte värden ger dig ordet.",
-      "recordingNoticeVoice": "Evenemanget spelas in (ljud och video). Du deltar utan mikrofon och kamera: inspelningen innehåller varken ditt namn, din röst eller din bild, om du inte samtycker i rummet.",
+      "recordingNotice": "Evenemanget kan komma att spelas in. Du deltar utan mikrofon och kamera: inspelningen innehåller inte din röst eller bild, om inte moderatorerna ger dig ordet.",
+      "recordingNoticeVoice": "Evenemanget kan komma att spelas in. Du deltar utan mikrofon och kamera: ditt ansikte och ditt namn syns aldrig i videon, och din röst bara om du samtycker i rummet.",
+      "namesMayAppear": "Namnet du deltar med kan synas i videon även om du inte talar.",
+      "recordingHostsOnly": "Evenemanget kan komma att spelas in. I videon syns och hörs bara moderatorerna: deltagarnas ansikten, namn och röster finns aldrig med.",
+      "recordingHostAlwaysReserved": "Du leder det här evenemanget: du är alltid med i inspelningen, med namn, röst, bild och delad skärm. Videon förblir förbehållen arrangörerna och de anmälda: den publiceras inte. De anmälda kan se den så länge uppgifterna om deras anmälan sparas.",
+      "recordingHostAlwaysPublic": "Du leder det här evenemanget: du är alltid med i inspelningen, med namn, röst, bild och delad skärm. Videon kan publiceras och ses av vem som helst.",
       "recordingHostAlways": "Du leder det här evenemanget: du är alltid med i inspelningen, med namn, röst, bild och delad skärm."
+    },
+    "sheet": {
+      "title": "Det här evenemanget och dina uppgifter",
+      "intro": "Det beror på hur arrangörerna har ställt in evenemanget. Resten står i integritetspolicyn.",
+      "recording": {
+        "label": "Inspelning",
+        "none": "Ingen inspelning planeras för det här evenemanget.",
+        "manual": "Moderatorerna kan starta inspelningen, ljud och video. När den är igång visas det i rummet.",
+        "auto": "Evenemanget spelas in, ljud och video, från det att det börjar. Det visas i rummet.",
+        "tracksOnly": "Rummets video spelas inte in: endast ett ljudspår för varje person som samtycker.",
+        "destinationReserved": "Inspelningen förblir förbehållen arrangörerna och de anmälda och publiceras inte. De anmälda kan se den så länge uppgifterna om deras anmälan sparas.",
+        "destinationPublic": "Inspelningen kan publiceras efter evenemanget.",
+        "destinationUnset": "Arrangörerna bestämmer efter evenemanget om den ska publiceras.",
+        "refuseOut": "Om du inte samtycker deltar du ändå och står utanför inspelningen.",
+        "refuseListenOnly": "Om du inte samtycker deltar du endast som lyssnare.",
+        "hostsAlways": "I videon syns bara moderatorerna, med namn, röst, bild och delad skärm. Deltagarnas ansikten och namn syns aldrig.",
+        "hostsAlwaysVisible": "Moderatorerna är alltid med i inspelningen, med namn, röst, bild och delad skärm.",
+        "hostsOnly": "I videon syns och hörs bara moderatorerna, med namn, röst, bild och delad skärm. Deltagarnas ansikten, namn och röster finns aldrig med.",
+        "audienceNotice": "Du deltar utan mikrofon och kamera: inspelningen innehåller inte din röst eller bild, om inte moderatorerna ger dig ordet.",
+        "audienceNoticeVoice": "Du deltar utan mikrofon och kamera: ditt ansikte och ditt namn syns aldrig i videon, och din röst bara om du samtycker i rummet."
+      },
+      "transcript": {
+        "label": "Transkription",
+        "captions": "Undertexternas text sparas, med namnet, bara för dem som samtycker och blir evenemangets transkription.",
+        "tracks": "För dem som samtycker spelas ett ljudspår in, som raderas efter transkriptionen.",
+        "tracksRetained": "För dem som samtycker spelas ett ljudspår in, som sparas tillsammans med evenemangets uppgifter.",
+        "fromVideo": "Efter evenemanget kan arrangörerna låta transkribera videon endast om alla som talar har samtyckt."
+      },
+      "captions": {
+        "label": "Undertexter"
+      },
+      "ai": {
+        "label": "Artificiell intelligens",
+        "summary": "Efter evenemanget kan ett verktyg för artificiell intelligens skriva en sammanfattning av inspelningen.",
+        "translation": "Transkriptionen och sammanfattningen kan översättas automatiskt.",
+        "dubbing": "Videon kan dubbas med en syntetisk röst.",
+        "onRequest": "Efter evenemanget kan arrangörerna även begära automatisk bearbetning av inspelningen som inte anges här: transkription, sammanfattning eller översättning.",
+        "report": "Efter evenemanget kan personalen låta artificiell intelligens skriva en rapport, även utifrån omröstningarna och, om de är publicerade, frågorna. Chattens text används inte.",
+        "accuracy": "Texter som tas fram med artificiell intelligens kan innehålla felaktigheter."
+      },
+      "list": {
+        "label": "Deltagarlista",
+        "visible": "Deltagarna ser listan över närvarande i rummet.",
+        "hidden": "I rummet ser publiken inte listan över närvarande. Det gör moderatorerna och talarna."
+      },
+      "name": {
+        "label": "Ditt namn",
+        "real": "I rummet, i chatten och i frågorna visas du med ditt namn.",
+        "pseudonym": "I rummet, i chatten och i frågorna visas du under en pseudonym. Arrangörerna ser uppgifterna från din anmälan.",
+        "pseudonymTranscript": "Om du samtycker till transkriptionen står ditt namn kvar där.",
+        "nickname": "Du kan välja ett smeknamn: de andra ser det i stället för ditt namn. Arrangörer och moderatorer vet vem som står bakom.",
+        "nicknameTranscript": "Om du samtycker till transkriptionen visas du där med ditt smeknamn om du har valt ett, annars med ditt namn."
+      },
+      "retention": {
+        "label": "Lagring",
+        "data": "Uppgifterna om anmälan och rummet raderas {days, plural, one {# dag} other {# dagar}} efter att evenemanget har avslutats. Frågor och omröstningar finns kvar utan namn.",
+        "recordingKept": "Inspelningen och det som görs av den (transkription, sammanfattning, översättningar) raderas inte tillsammans med dessa uppgifter: oavsett om de görs tillgängliga eller inte finns de kvar tills arrangörerna raderar dem.",
+        "recordingDays": "Inspelningen och det som görs av den raderas {days, plural, one {# dag} other {# dagar}} efter att evenemanget har avslutats eller, om inspelningen görs tillgänglig, efter att den har publicerats.",
+        "transcriptKept": "Transkriptionen raderas inte tillsammans med dessa uppgifter: den finns kvar tills arrangörerna raderar den.",
+        "transcriptDays": "Transkriptionen raderas {days, plural, one {# dag} other {# dagar}} efter att evenemanget har avslutats."
+      },
+      "addressBook": {
+        "label": "Adressbok",
+        "offered": "När du anmäler dig kan du välja att stanna kvar i evenemangsadressboken för att bjudas in till liknande evenemang. Det är frivilligt: uppgifterna sparas i {months} månader från ditt samtycke, om du inte återkallar det."
+      },
+      "chat": {
+        "label": "Chatt och frågor",
+        "messages": "Chattmeddelanden publiceras aldrig, inte ens frågor som ställs i chatten.",
+        "questionsText": "Efter evenemanget kan texten till Q&A-frågorna publiceras, aldrig namnet på den som har ställt dem.",
+        "questionsNone": "Q&A-frågorna publiceras inte."
+      }
     },
     "export": {
       "title": "Mina uppgifter",
@@ -4401,20 +4805,21 @@
       "submit": "Begär mina uppgifter",
       "loading": "Söker...",
       "requestSubmittedTitle": "Kontrollera din inkorg",
-      "requestSubmittedBody": "Om e-postadressen motsvarar en anmälan har vi skickat en länk för att ladda ned dina uppgifter. Länken är giltig i 1 timme.",
+      "requestSubmittedBody": "Om e-postadressen motsvarar en anmälan har vi skickat en länk för att visa dina uppgifter. Länken är giltig i 1 timme.",
       "linkInvalid": "Länken är ogiltig eller har gått ut. Begär en ny länk.",
       "requestNew": "Begär en ny länk",
       "noData": "Inga uppgifter hittades för denna e-postadress.",
       "error": "Ett fel uppstod. Försök igen senare.",
       "rateLimited": "För många förfrågningar. Försök igen om en timme.",
       "results": "Dina uppgifter",
-      "resultsDescription": "Uppgifter hittades för {count} evenemang.",
+      "resultsDescription": "{count, plural, one {Uppgifter hittades för # evenemang.} other {Uppgifter hittades för # evenemang.}}",
       "registrationData": "Anmälningsuppgifter",
       "fieldName": "Namn",
+      "fieldNickname": "Smeknamn",
       "fieldEmail": "E-post",
       "fieldOrganization": "Organisation",
       "fieldRegisteredAt": "Anmälningsdatum",
-      "fieldConsent": "Samtycke",
+      "fieldConsent": "Kännedom om integritetspolicyn",
       "questionsTitle": "Q&A-frågor",
       "pollVotesTitle": "Omröstningsröster",
       "optionLabel": "Alternativ",
@@ -4436,7 +4841,74 @@
       "consentFuture": "Framtida meddelanden",
       "consentWithdrawnOn": "Återkallat {date}",
       "consentNoteInRoom": "Om du är i rummet just nu gäller återkallelsen från nästa inträde: använd Samtycken i rummet för att den ska gälla direkt.",
-      "consentFutureEffect": "Om du återkallar det får du inte längre meddelanden om kommande evenemang och du lämnar adressboken, för alla dina anmälningar."
+      "consentGiveNoteInRoom": "Ett samtycke som ges här gäller från ditt nästa inträde i rummet, inte för det som redan har spelats in. Samtycke till inspelning och transkribering kan ges tills evenemanget är slut.",
+      "proofsTitle": "Sparade bevis på samtycken",
+      "proofsIntro": "Uppgifterna för dessa evenemang har raderats. Dessa bevis finns kvar så länge videon eller transkriptionen finns. Du kan återkalla ditt samtycke: det som redan finns i videon blir kvar, och för att få det borttaget måste du skriva till den personuppgiftsansvarige.",
+      "proofGivenOn": "Givet den {date}",
+      "proofSuperseded": "Ersatt av ett senare samtycke",
+      "proofWithdrawEffect": {
+        "recording": "Du återkallar också ditt samtycke till transkription: dina meningar och ditt namn tas bort från transkriptionen baserad på undertexterna. Det som redan finns i videon blir kvar, liksom en transkription som gjorts från videon eller ljudspåren: för att få dem borttagna, skriv till den personuppgiftsansvarige. Återkallelsen kan inte ångras från den här sidan.",
+        "transcription": "Dina meningar och ditt namn tas bort från transkriptionen baserad på undertexterna. En transkription som gjorts från videon eller ljudspåren blir kvar: för att få den borttagen, skriv till den personuppgiftsansvarige. Återkallelsen kan inte ångras från den här sidan."
+      },
+      "proofWithdrawHost": "Äldre transkriptioner baserade på undertexterna känner inte igen moderatorerna: där står dina meningar och ditt namn kvar, och för att få dem borttagna måste du skriva till den personuppgiftsansvarige.",
+      "roomProofsTitle": "Samtycken givna som moderator för ett evenemang",
+      "roomProofsIntro": "De samtycken till inspelning och transkription som du gav när du gick in i rummet med en roll i evenemanget. I fönstret Samtycken i rummet återkallar du dem från det pågående inträdet och, med ditt personalkonto, även dem från tidigare inträden; för de övriga, och när evenemanget är slut, återstår radering av dina uppgifter.",
+      "addressBookTitle": "Evenemangsadressbok",
+      "addressBookIntro": "Du har valt att stanna kvar i adressboken för att bjudas in till liknande evenemang. Vi sparar dessa uppgifter fram till {date}, om du inte återkallar samtycket eller ger ett nytt.",
+      "addressBookOptOut": "Ta bort mina uppgifter från adressboken",
+      "consentFutureEffect": "Om du återkallar det får du inte längre meddelanden om kommande evenemang och du lämnar adressboken, för alla dina anmälningar.",
+      "consentFutureGive": "Jag samtycker till framtida meddelanden",
+      "consentFutureGiveEffect": "Du kommer tillbaka till evenemangsadressboken med namnet och organisationen från den här anmälan och får inbjudningar igen; lagringstiden börjar om i dag.",
+      "consentGiveDone": "Samtycke givet: det gäller från ditt nästa inträde i rummet.",
+      "consentFutureGiveDone": "Samtycke givet: du finns i evenemangsadressboken igen.",
+      "consentGiveTextChanged": "Samtyckestexten ändrades efter att du öppnade sidan: ladda om den för att läsa den nya.",
+      "consentGiveClosed": "Det här samtycket kan inte längre ges härifrån: evenemanget är slut eller ber inte längre om det. Ladda om sidan för att se aktuell status.",
+      "consentGiveNewText": "Texten till det här samtycket ändrades efter att du gav det: för den aktuella texten måste det ges igen.",
+      "addressBookPendingTitle": "Återkomst till adressboken väntar på bekräftelse",
+      "addressBookPendingBody": "Rutan för adressboken kryssades i på den här anmälan, men den här adressen hade slutat ta emot inbjudningar. Inget ändras förrän du bekräftar.",
+      "addressBookPendingEffect": "Om du bekräftar kommer du tillbaka till adressboken med namnet och organisationen från den här anmälan och får inbjudningar igen. Om du avbryter, eller om det inte var du, stannar du utanför adressboken och får inga inbjudningar.",
+      "addressBookPendingConfirm": "Bekräfta min återkomst",
+      "addressBookPendingCancel": "Avbryt begäran",
+      "addressBookPendingGone": "Den här begäran väntar inte längre. Ladda om sidan för att se aktuell status.",
+      "removalTitle": "Inspelningen av evenemanget",
+      "removalIntro": "Det här evenemanget har spelats in. Om du inte vill synas i inspelningen kan du begära att bli borttagen: de delar där du syns eller talar täcks av en skylt och tystas, och transkription, undertexter och sammanfattning tas fram på nytt. Begäran går till den personuppgiftsansvarige, som granskar den.",
+      "removalButton": "Jag vill inte synas i den här inspelningen",
+      "removalConfirmTitle": "Bekräfta begäran?",
+      "removalConfirmBody": "Den personuppgiftsansvarige tar bort de delar av inspelningen där du syns eller talar. Kopior som publicerats på andra webbplatser, till exempel på YouTube, måste tas bort separat av den som publicerade dem.",
+      "removalConfirm": "Skicka begäran",
+      "removalCancel": "Avbryt",
+      "removalSent": "Begäran har skickats. Den personuppgiftsansvarige kommer att granska den.",
+      "removalError": "Begäran kunde inte skickas. Försök igen senare.",
+      "removalStatusOpen": "Begäran från {date}: under behandling.",
+      "removalStatusClosed": "Begäran från {date}: slutförd {closed}.",
+      "removalStatusRejected": "Begäran från {date}: avslagen. Skriv till den personuppgiftsansvarige för att få veta varför.",
+      "editButton": "Rätta namn och organisation",
+      "editScopeLegend": "Vilka anmälningar det gäller",
+      "editScopeOne": "Endast den här anmälan",
+      "editScopeAll": "Alla mina anmälningar ({count}) och evenemangsadressboken",
+      "editEffect": "Rättelsen gäller för nästa e-postmeddelanden och från ditt nästa inträde i rummet. Den ändrar inte det som redan har spelats in, transkriberats eller skrivits i chatten, och inte heller bevisen på samtycke.",
+      "editNameInvalid": "Namnet måste ha mellan 2 och 100 tecken.",
+      "editOrganizationRequired": "Ett evenemang som du är anmäld till kräver organisationen: fältet får inte lämnas tomt.",
+      "editOrganizationTooLong": "Organisationen får ha högst 200 tecken.",
+      "editDone": "Uppgifterna har rättats.",
+      "nicknameChoose": "Välj ett smeknamn",
+      "nicknameChange": "Byt smeknamn",
+      "nicknameEffect": "Andra ser smeknamnet i stället för ditt namn: i chatten och i frågorna direkt, i videon från nästa gång du går in i rummet. Det som redan har spelats in, transkriberats eller skrivits ändras inte.",
+      "nicknameDone": "Smeknamnet har sparats.",
+      "codeWhy": "Av säkerhetsskäl bekräftas rättelser och raderingar med en kod som vi skickar till anmälans e-postadress.",
+      "codeSend": "Skicka bekräftelsekoden till mig",
+      "codeSent": "Vi har mejlat dig en sexsiffrig kod. Skriv den här: den gäller i {minutes, plural, one {# minut} other {# minuter}}.",
+      "codeLabel": "Bekräftelsekod",
+      "codeConfirmEdit": "Bekräfta rättelsen",
+      "codeConfirmNickname": "Bekräfta smeknamnet",
+      "codeInvalid": "Koden är fel eller har gått ut. Kontrollera det senaste e-postmeddelandet du fått, eller avbryt och be om en ny.",
+      "cancelTitle": "Radera den här anmälan",
+      "cancelIntro": "Du kan radera bara den här anmälan utan att röra de andra eller resten av dina uppgifter.",
+      "cancelButton": "Radera den här anmälan",
+      "cancelDeletes": "Anmälan till det här evenemanget raderas tillsammans med det du har gjort med den: frågor, röster, chattmeddelanden, feedback, enkätsvar, dina meningar i transkriptionen från undertexterna och e-postmeddelanden i kö. Din personliga länk slutar fungera och platsen blir ledig.",
+      "cancelKeeps": "Kvar finns dina andra anmälningar, evenemangsadressboken, din profilbild och en begäran om borttagning ur en inspelning som fortfarande handläggs. Om det finns en video eller en transkription av evenemanget finns beviset på ditt samtycke kvar utan ditt namn så länge de finns. Raderingen kan inte ångras; så länge evenemanget tar emot anmälningar kan du anmäla dig igen.",
+      "codeConfirmCancel": "Radera anmälan",
+      "cancelDone": "Anmälan har raderats."
     },
     "erasure": {
       "title": "Radering av dina uppgifter",
@@ -4448,13 +4920,15 @@
       "requestSubmittedTitle": "Kontrollera din inkorg",
       "requestSubmittedBody": "Om e-postadressen motsvarar en anmälan har vi skickat en länk för att bekräfta raderingen. Länken är giltig i 1 timme.",
       "linkInvalid": "Länken är ogiltig eller har gått ut. Begär en ny länk.",
-      "confirmWarning": "Du håller på att permanent radera alla personuppgifter som är kopplade till din e-postadress.",
+      "confirmWarning": "Du håller på att permanent radera de personuppgifter som är kopplade till din e-postadress, utom det som anges nedan.",
       "confirmBody": "Anmälningar, frågor, röster i omröstningar, återkoppling, påminnelser och din post i evenemangsadressboken raderas. Åtgärden kan inte ångras.",
+      "confirmProofs": "Om det finns en video eller transkription av ett evenemang, även om den ännu inte är publicerad, finns typen av samtycke, datumet och texten som du svarade på kvar, utan ditt namn, så länge den videon eller transkriptionen finns. De behövs för att visa samtycket. Videon ändras inte: för att begära att dina inlägg tas bort, skriv till den personuppgiftsansvarige. Äldre transkriptioner baserade på undertexterna känner inte igen personer som leder eller talar med en roll i evenemanget: där står dina meningar och ditt namn kvar, och för att få dem borttagna måste du skriva till den personuppgiftsansvarige.",
       "confirmButton": "Bekräfta radering",
       "cancel": "Avbryt",
       "processing": "Raderar...",
       "doneTitle": "Raderingen är klar",
-      "doneBody": "Raderade anmälningar: {count}, tillsammans med tillhörande uppgifter.",
+      "doneBody": "{count, plural, =0 {Inga anmälningar att radera.} one {# anmälan och tillhörande uppgifter har raderats.} other {# anmälningar och tillhörande uppgifter har raderats.}}",
+      "doneProofs": "{count, plural, one {# bevis på samtycke finns kvar, utan ditt namn, så länge videon eller transkriptionen finns.} other {# bevis på samtycke finns kvar, utan ditt namn, så länge videon eller transkriptionen finns.}}",
       "error": "Ett fel uppstod. Försök igen senare.",
       "rateLimited": "För många förfrågningar. Försök igen om en timme.",
       "back": "Tillbaka till mina uppgifter",
@@ -5232,7 +5706,8 @@
     "overlapTitle": "Samtidigt tal: i det här intervallet talar mer än en person samtidigt.",
     "anonymousSpeaker": "Deltagare {n}",
     "untranscribed": "Inte transkriberat: talaren gav inte sitt samtycke",
-    "unrecordedSpeech": "Vissa inlägg finns inte i inspelningen: de som talade samtyckte inte."
+    "unrecordedSpeech": "Vissa inlägg finns inte i inspelningen: de som talade samtyckte inte.",
+    "unrecordedSpeechHostsOnly": "Vissa inlägg finns inte i inspelningen: i videon syns och hörs bara moderatorerna."
   },
   "waiting": {
     "startsIn": "Evenemanget börjar om",
@@ -5249,7 +5724,9 @@
     "watchNow": "Se",
     "switchToLive": "Byt till live",
     "enterRoom": "Gå in i rummet",
-    "recordingNotice": "Detta evenemang spelas in.",
+    "recordingNotice": "Detta evenemang kan komma att spelas in.",
+    "recordingNoticeInstant": "Samtalet kan spelas in. I videon syns bara moderatorerna: ditt ansikte och ditt namn aldrig. Om någon startar inspelningen frågar vi om du samtycker till att din röst spelas in.",
+    "recordingNoticeInstantHostsOnly": "Samtalet kan spelas in. I videon syns och hörs bara moderatorerna: deltagarnas ansikten, namn och röster finns aldrig med.",
     "recordingAvailableAfter": "Inspelningen blir tillgänglig efter evenemanget.",
     "autoRefreshHint": "Sidan uppdateras automatiskt när evenemanget startar.",
     "startEventButton": "Starta evenemang",
@@ -5300,10 +5777,15 @@
     "classicView": "Klassisk vy",
     "backToGarden": "Visa torget",
     "aiNoticeTitle": "AI-bearbetning efter evenemanget",
-    "aiNotice": "När det är slut bearbetas inspelningen av AI-verktyg för att skapa transkription, sammanfattning och eventuella översättningar och dubbning. Resultaten kan innehålla felaktigheter; videon är fortfarande den auktoritativa källan.",
+    "aiNotice": "När det är slut kan inspelningen bearbetas av AI-verktyg för att skapa transkription, sammanfattning och eventuella översättningar och dubbning. Transkriptionen gäller bara dem som har gett sitt samtycke. Resultaten kan innehålla felaktigheter; videon är fortfarande den auktoritativa källan.",
     "multitrackConsentTitle": "Transkription av dina inlägg",
-    "recordingConsentTitle": "Inspelning av evenemanget",
-    "recordingConsentIntro": "Evenemanget spelas in (ljud och video). Med ditt samtycke innehåller inspelningen ditt namn, din röst, din bild och det du delar på skärmen.",
+    "recordingConsentTitle": "Inspelning av din röst",
+    "recordingConsentTitleVisible": "Inspelning av evenemanget",
+    "recordingConsentIntro": "Evenemanget kan spelas in. I videon syns bara moderatorerna: ditt ansikte och ditt namn aldrig. Med ditt samtycke spelas din röst in när du talar.",
+    "recordingConsentIntroAnonymous": "Evenemanget kan spelas in. I videon syns bara moderatorerna: ditt ansikte och din pseudonym aldrig. Med ditt samtycke spelas din röst in när du talar.",
+    "recordingConsentIntroVisible": "Evenemanget kan komma att spelas in (ljud och video). Med ditt samtycke innehåller inspelningen ditt namn, din röst, din bild och det du delar på skärmen.",
+    "recordingConsentIntroVisibleAnonymous": "Evenemanget kan komma att spelas in (ljud och video). Med ditt samtycke innehåller inspelningen din pseudonym, din röst, din bild och det du delar på skärmen.",
+    "recordingConsentIntroNoVideo": "På det här evenemanget spelas rummets video inte in.",
     "enterGardenTitle": "Gå in på torget",
     "enterGardenHint": "En annan plats att vänta på: gå runt, träffa de andra som väntar och gå in i livesändningen genom grinden när rummet öppnar.",
     "backToWaitingRoom": "Tillbaka till väntrummet",
@@ -5550,11 +6032,14 @@
       "7d": "7 dagar",
       "30d": "30 dagar",
       "90d": "90 dagar",
+      "1y": "1 år",
+      "days": "{count, plural, one {# dag} other {# dagar}}",
       "forever": "Ingen automatisk radering"
     },
-    "retentionNote": "En publicerad video följer inte lagringstiden för evenemangets data: utan en period förblir den offentlig tills någon raderar den.",
+    "retentionNote": "Inspelningen följer inte lagringstiden för evenemangets data: utan en period finns den kvar, publicerad eller inte, tills någon raderar den. Perioden räknas från publiceringen eller, om videon inte är publicerad, från evenemangets slut; när den löper ut raderas videon och det som gjorts av den (transkriptioner, sammanfattningar, översättningar).",
+    "retentionLegacy": "De anmälda till det här evenemanget har fått veta att en inspelning som inte publiceras raderas tillsammans med deras uppgifter, {days, plural, one {# dag} other {# dagar}} efter att evenemanget har avslutats. Så länge videon inte är publicerad kan du förkorta perioden, men inte ta bort eller förlänga den.",
     "delete": "Radera inspelning",
-    "deleteConfirm": "Är du säker? Videon raderas permanent.",
+    "deleteConfirm": "Är du säker? Videon raderas permanent. Transkriptioner, sammanfattningar och översättningar raderas inte med den: de följer den period för inspelningen som väljs här.",
     "notConfigured": "Jibri är inte konfigurerat. Videoinspelning är inte tillgänglig.",
     "disabledHint": "Videoinspelning är inte aktiverad för detta evenemang. För att aktivera, öppna avsnittet Inställningar ovan och slå på \"Inspelning\".",
     "play": "Spela upp",
@@ -5570,6 +6055,8 @@
     "audiencePublicDesc": "Alla som öppnar evenemangets sida. Den kan visas i videoteket.",
     "audienceRegistrants": "Endast anmälda",
     "audienceRegistrantsDesc": "De som anmält sig till evenemanget, även om de aldrig kom in i rummet, via den personliga länken i e-postmeddelandet. Den visas inte i videoteket.",
+    "audienceReservedNote": "De som har samtyckt har gjort det för en inspelning endast för anmälda: videon kan bara ses av de anmälda och arrangörerna.",
+    "destinationMissing": "Det här evenemanget anger inte vart inspelningen ska: de insamlade samtyckena säger inte om videon skulle publiceras. Kontrollera innan du publicerar den.",
     "saveFailed": "Ändringen sparades inte. Försök igen."
   },
   "postEvent": {
@@ -5579,7 +6066,9 @@
     "libraryListed": "Publicera i videobiblioteket",
     "libraryListedHelp": "Visa det här evenemanget i det publika biblioteket (/video-library). Kräver en publicerad inspelning eller en YouTube-video, och att evenemangssidan är synlig.",
     "libraryListedNoRecording": "Ingen publicerad inspelning: evenemanget visas inte i biblioteket förrän du publicerar inspelningen eller lägger till en YouTube-video.",
-    "showQA": "Visa Q&A-frågor",
+    "libraryListedReserved": "Inspelning endast för anmälda: evenemanget visas inte i videobiblioteket.",
+    "showQA": "Visa texten till Q&A-frågorna, utan namn",
+    "qaReservedNote": "Med en inspelning endast för anmälda publiceras inte frågorna.",
     "showMaterials": "Visa delat material",
     "showPolls": "Visa omröstningsresultat",
     "showFeedback": "Visa feedback",
@@ -5591,7 +6080,7 @@
     "visibilityAlways": "Alltid synlig",
     "visibilityUntil": "Synlig till:",
     "dataRetentionNote": "Deltagarnas personuppgifter raderas enligt evenemangets lagringspolicy ({days} dagar). Evenemangets innehåll förblir tillgängligt så länge sidan är synlig.",
-    "availableUntil": "Detta evenemang och dess innehåll kommer att vara tillgängligt till {date}.",
+    "participantDataUntil": "Deltagarnas personuppgifter raderas den {date}.",
     "tabs": {
       "qa": "Frågor och svar",
       "materials": "Material",
@@ -5672,7 +6161,7 @@
       "strengths": "Styrkor",
       "improvements": "Att förbättra",
       "quotes": "Ur kommentarerna",
-      "aiNotice": "Texten är skriven av en AI-modell utifrån transkriptionen, chatten, frågorna, omröstningarna och bedömningarna, och teamet har granskat den före publicering. Siffrorna och diagrammen beräknar plattformen. Den kan innehålla felaktigheter."
+      "aiNotice": "Texten är skriven av en AI-modell utifrån transkriptionen, omröstningarna, omdömena och, om de är publicerade, frågorna, och teamet har granskat den före publicering. Siffrorna och diagrammen beräknar plattformen. Texten kan innehålla felaktigheter."
     },
     "languages": {
       "title": "Titta på",
@@ -5733,7 +6222,7 @@
       "confirm": "Bekräfta borttagningen",
       "submitting": "Tar bort…",
       "successTitle": "Borttagning klar",
-      "successBody": "Dina uppgifter finns inte längre i evenemangsadressboken.",
+      "successBody": "Från och med nu får du inga fler inbjudningar. Din e-postadress har redan tagits bort; namn och organisation raderas från adressboken senast nästa dag.",
       "errors": {
         "generic": "Ett fel uppstod. Försök igen senare."
       }
@@ -5831,12 +6320,21 @@
     "recordingWithoutMedia": "Den här inspelningen har ingen video: dess transkription kommer från livetextningen.",
     "recordingWithoutVideo": "Från den här inspelningen finns deltagarnas ljudspår men inte videon: den spelades inte in, eller så har den inte kommit än. Det nedladdningsbara arkivet kräver också videon.",
     "noParticipantTracks": "Det finns inga separata ljudspår för deltagarna: de spelades inte in eller har redan raderats. Slå på inspelning per deltagare före evenemanget för att få dem.",
+    "noTranscribableTracks": "Inget spår från den här inspelningen kan transkriberas: de har raderats, eller så har personerna som förekommer i dem inte samtyckt till en transkription med sitt namn.",
+    "tracksPending": "Spåren från den här inspelningen har inte kommit än: transkriptionen startar av sig själv när de kommer.",
     "summaryMissing": "Det finns ännu ingen sammanfattning att redigera på det här språket: generera den först.",
     "storageUnavailable": "Filuppladdning är inte tillgänglig i den här installationen.",
     "aiDisabledForEvent": "AI är avstängd för det här evenemanget: använd ”Generera AI” för att slå på den och starta bearbetningen.",
     "sourceTranscriptMissing": "Den här inspelningen är inte transkriberad än: transkribera den innan du lägger till en översättning.",
     "captionsTranscriptNotTranslatable": "Den här transkriptionen kommer från livetextningen: automatisk översättning kräver en AI-transkription av inspelningen.",
     "sameLanguage": "Det valda språket är inspelningens originalspråk: välj ett annat.",
-    "mtUnavailable": "Maskinöversättning är inte installerad på den här instansen."
+    "recordingDestinationNotCovered": "Samtyckena för det här evenemanget gäller en inspelning endast för anmälda: du kan inte göra den synlig för alla eller länka en extern video.",
+    "mtUnavailable": "Maskinöversättning är inte installerad på den här instansen.",
+    "recordingContentOrganizerOnly": "Endast arrangörerna av det här evenemanget kan öppna, ändra eller publicera innehållet i dess inspelningar.",
+    "recordingRetentionLegacy": "De anmälda till det här evenemanget har fått veta att en inspelning som inte publiceras raderas tillsammans med deras uppgifter: så länge videon inte är publicerad kan perioden förkortas, men inte tas bort eller förlängas."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Innehåll borttaget på begäran",
+    "cardBody": "Den här delen av inspelningen har tagits bort på begäran av en person som förekom i den."
   }
 }

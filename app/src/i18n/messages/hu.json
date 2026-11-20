@@ -142,10 +142,7 @@
       "votes": "{count, plural, =0 {nincs szavazat} one {1 szavazat} other {# szavazat}}",
       "topWords": "Leggyakrabban megosztott szavak",
       "feedback": "Átlagos értékelés",
-      "feedbackCount": "{count, plural, one {1 válasz} other {# válasz}}",
-      "chatQuestions": "Kérdések a chatből",
-      "reactionsCount": "{count, plural, one {1 reakció} other {# reakció}}",
-      "answered": "megválaszolva"
+      "feedbackCount": "{count, plural, one {1 válasz} other {# válasz}}"
     },
     "detail": {
       "title": "Esemény részletei",
@@ -191,7 +188,7 @@
       },
       "chatNotSaved": "A csevegés üzeneteit az esemény után nem tesszük közzé: az esemény többi adatával együtt törlődnek.",
       "qaPostEvent": "Kérdések és válaszok az eseményről",
-      "peakParticipants": "Csúcs: {count} résztvevő",
+      "peakParticipants": "{count, plural, one {Csúcs: # résztvevő} other {Csúcs: # résztvevő}}",
       "calendar": {
         "addToCalendar": "Hozzáadás a naptárhoz",
         "google": "Google Calendar",
@@ -202,11 +199,13 @@
       "registrationEnded": "Az esemény véget ért: a regisztráció lezárult.",
       "joinAsGuest": "Csatlakozás vendégként",
       "registeredUseEmailLink": "Már jelentkezett? Lépjen be az e-mailben kapott személyes linkkel.",
-      "willBeRecorded": "Az eseményt rögzítik.",
+      "willBeRecorded": "Az eseményről felvétel készülhet.",
       "machineTranslation": "Automatikus fordítás",
       "machineTranslationNote": "A címet és a leírást egy automatikus modell fordította, és még senki sem ellenőrizte.",
       "previewTitle": "Előnézet a csapatnak",
       "previewBody": "A felvétel még nincs közzétéve: az oldal ezen változatát csak az esemény kezelői látják.",
+      "previewBodyPageHidden": "Ez az oldal nem látható a nyilvánosság számára: aki megnyitja a címet, nem találja meg. Csak az esemény kezelői látják.",
+      "previewBodyPageRegistrants": "Ez az oldal nem látható a nyilvánosság számára: aki megnyitja a címet, nem találja meg. Csak az eseményre regisztráltak és az esemény kezelői látják.",
       "recordingForRegistrantsTitle": "A felvétel csak a regisztráltaknak szól",
       "recordingForRegistrantsBody": "Ha regisztráltál az eseményre, nyisd meg a „felvétel elérhető” e-mailben kapott személyes linket, vagy kérd újra.",
       "recordingLinkEmailLabel": "A regisztrációhoz használt e-mail-cím",
@@ -243,8 +242,8 @@
     "namePlaceholder": "Az Ön neve megjelenik az esemény szobájában",
     "email": "E-mail",
     "emailPlaceholder": "Erre a címre kapja meg a hozzáférési linket",
-    "gdprConsent": "Hozzájárulok személyes adataim (név, e-mail) kezeléséhez az EU 2016/679 rendelet (GDPR) alapján az eseményen való részvétel céljából.",
-    "consentsLegend": "Hozzájárulások",
+    "gdprConsent": "Elolvastam az adatvédelmi tájékoztatót a személyes adatok (név, e-mail) kezeléséről az eseményen való részvétel céljából.",
+    "consentsLegend": "Adatvédelmi tájékoztató és hozzájárulások",
     "requiredMark": "kötelező",
     "optionalMark": "nem kötelező",
     "gdprLink": "Olvassa el a teljes adatvédelmi tájékoztatót",
@@ -292,12 +291,13 @@
       "emailRequired": "Adja meg az e-mail címét",
       "emailInvalid": "Adjon meg érvényes e-mail címet",
       "organizationRequired": "Adja meg a szervezetét",
-      "consentRequired": "Az adatkezeléshez való hozzájárulás kötelező",
+      "consentRequired": "A regisztrációhoz erősítse meg, hogy elolvasta az adatvédelmi tájékoztatót",
       "recordingConsentRequired": "A felvételhez való hozzájárulás ehhez az eseményhez kötelező",
       "eventFull": "Az esemény elérte a maximális résztvevőszámot",
       "generic": "Hiba a regisztráció során. Próbálja újra.",
       "questionnaireRequired": "A regisztrációhoz válaszoljon a kérdőív kérdéseire.",
       "questionnaireIncomplete": "Válaszoljon a kérdőív összes kötelező kérdésére.",
+      "recordingDestinationChanged": "A felvételre vonatkozó szöveg megváltozott, miközben az űrlapot töltötte ki: töltse újra az oldalt, és olvassa el újra.",
       "questionnaireChanged": "A kérdőív megváltozott, amíg az űrlapot kitöltötte: töltse újra az oldalt, és válaszoljon újra."
     }
   },
@@ -363,7 +363,7 @@
       "publicHelpNone": "A lezárult esemény oldala látható marad, címmel és leírással.",
       "sections": {
         "recap": "az összefoglaló",
-        "qa": "a kérdések és válaszok",
+        "qa": "a Q&A kérdések szövege",
         "polls": "a közzétett szavazások",
         "wordCloud": "a szófelhő",
         "materials": "az anyagok",
@@ -424,6 +424,7 @@
       "noMessages": "Nincsenek üzenetek",
       "empty": "Még nincs üzenet. Legyen Ön az első!",
       "inputLabel": "Chat üzenet",
+      "personalDataNotice": "Ne írja le mások személyes adatait, sem a sajátjait, ha nem szeretné, hogy ismertté váljanak: akik a teremben vannak, elolvashatják és letölthetik a csevegést.",
       "moderatorBadge": "Moderátor",
       "attach": "Fájl csatolása",
       "emojiPicker": "Emoji beszúrása",
@@ -544,7 +545,9 @@
       "locksByConsent": "A mikrofonok és kamerák a felvételhez adott hozzájárulást követik: aki megadta, használja, amit az esemény enged, a többiek csak hallgatnak. A terem zárolásai bekapcsolva maradnak.",
       "listenOnlyBadge": "csak hallgat",
       "listenOnlyNoFloor": "Nem járult hozzá a felvételhez: amíg a saját termében hozzá nem járul, nem szólalhat fel.",
-      "voiceExcludedBadge": "rögzítés nélkül",
+      "inVideoBadge": "a videón",
+      "voiceRecordedBadge": "hang rögzítve",
+      "voiceExcludedBadge": "hang nincs rögzítve",
       "voiceExcludedFloor": "Nem járult hozzá a felvételhez: felszólalhat, de kimarad a felvételből."
     },
     "moderator": {
@@ -621,6 +624,7 @@
       "tab": "Rendezés",
       "recordingHeading": "Felvétel",
       "recordingOff": "Nincs felvétel",
+      "recordingNotOfferedInstant": "A gyorshívásokban a felvétel csak ott érhető el, ahol a hozzájárulást nem adók kimaradnak a videóból, és ez a telepítés erre nem képes.",
       "stopConfirm": "Leállítja most a felvételt?",
       "featuresHeading": "A terem funkciói",
       "featuresHelp": "Mindenkinek azonnal be- és kikapcsolnak.",
@@ -681,33 +685,78 @@
       "confirm": "Visszavonás",
       "working": "Frissítés folyamatban…",
       "error": "A hozzájárulást nem sikerült frissíteni: próbálja újra.",
+      "textChanged": "A hozzájárulás szövege megváltozott az oldal megnyitása óta: olvassa el az újat, és ha egyetért, erősítse meg.",
+      "closeNotice": "Értesítés bezárása: hozzájárulásai továbbra is a felső gombbal érhetők el",
       "recording": {
         "title": "Az esemény felvétele",
         "give": "Hozzájárulok a felvételhez",
         "without": {
           "soloAscolto": "E hozzájárulás nélkül csak hallgatóként vesz részt: a mikrofon, a kamera és a képernyő zárva marad.",
-          "conduce": "E hozzájárulás nélkül is vezetheti az eseményt, de a hangja nem marad meg a személyenkénti sávokban és az átiratban.",
-          "voce": "E hozzájárulás nélkül ugyanúgy részt vesz, de kimarad a felvételből: sem a neve, sem a hangja, sem a képe nem szerepel."
+          "conduce": "E hozzájárulás nélkül is vezetheti az eseményt.",
+          "voce": "E hozzájárulás nélkül ugyanúgy részt vesz, mint mindenki, de a hangja kimarad a felvételből. Az arca és a neve egyébként sem jelenik meg soha a videón.",
+          "comeTutti": "E hozzájárulás nélkül ugyanúgy részt vesz, mint mindenki más."
         },
+        "withoutTranscriptHost": "A hangja nem marad meg a személyenkénti sávokban és az átiratban.",
         "alreadyRecorded": "Ami már felvételre került, az az esemény videójában marad: az eltávolításért írjon a szervezőknek.",
         "withdraw": {
-          "soloAscolto": "Ha visszavonja, a teremben marad, de csak hallgatóként: a mikrofon, a kamera és a képernyő bezárul. A hozzászólásai átiratához adott hozzájárulását is visszavonja.",
-          "conduce": "Ha visszavonja, tovább vezeti az eseményt, de mostantól a hangja nem marad meg a személyenkénti sávokban és az átiratban. A terem videója, ha készül felvétel, így is mutatja Önt.",
-          "voce": "Ha visszavonja, ugyanúgy a teremben marad, de mostantól kimarad a felvételből. A hozzászólásai átiratához adott hozzájárulást is visszavonja."
-        }
+          "soloAscolto": "Ha visszavonja, a teremben marad, de csak hallgatóként: a mikrofon, a kamera és a képernyő bezárul.",
+          "conduce": "Ha visszavonja, tovább vezeti az eseményt. A terem videója, ha készül felvétel, így is mutatja Önt.",
+          "voce": "Ha visszavonja, ugyanúgy a teremben marad, és mostantól kimarad a felvételből.",
+          "avvertenza": "Ha visszavonja, ugyanúgy a teremben marad. Ha szót kap, és az eseményt rögzítik, a hangja a videóban így is benne marad.",
+          "assente": "Ha visszavonja, ugyanúgy a teremben marad. Mostantól a hangját nem rögzítjük külön sávon."
+        },
+        "withdrawTranscript": "A hozzászólásai átiratához adott hozzájárulását is visszavonja.",
+        "withdrawTranscriptHost": "Mostantól a hangja nem marad meg a személyenkénti sávokban és az átiratban."
       },
       "transcription": {
         "title": "A hozzászólásai átirata",
         "give": "Hozzájárulok az átirathoz",
         "giveEffect": "A hozzászólásai a nevével együtt bekerülnek az esemény átiratába. Hozzájárulás nélkül is részt vehet.",
-        "withdrawEffect": "Ha visszavonja, a már átírt mondatai elveszítik a szövegüket és a nevét, és mostantól a hangját sem külön sávon nem rögzítjük, sem át nem írjuk.",
+        "withdrawEffect": "Ha visszavonja, a feliratokból már átírt mondatai elveszítik a szövegüket és a nevét, és mostantól a hangját sem külön sávon nem rögzítjük, sem át nem írjuk. A videó már elkészült átirata ügyében forduljon a szervezőkhöz.",
         "needsRecording": "A felvételhez adott hozzájárulás után adhatja meg."
       }
+    },
+    "recordingQuestion": {
+      "title": "A hívásról felvétel készül",
+      "question": "Szeretné, hogy rögzítsük a hangját?",
+      "body": "A videón csak a moderátorok jelennek meg: az Ön arca és neve soha. Ha igennel válaszol, a hívás néhány másodpercre újracsatlakozik, és attól kezdve a hangját rögzítjük, amikor beszél. Ha nemmel válaszol, vagy bezárja ezt az ablakot, ugyanúgy részt vesz, mint eddig, és a hangját nem rögzítjük.",
+      "later": "Ha nemmel válaszol, a következő felvételnél újra megkérdezzük. Bármikor meggondolhatja magát a felső {button} gombbal.",
+      "yes": "Igen, rögzítsék a hangomat",
+      "no": "Nem, ne rögzítsék"
     },
     "voiceExcluded": {
       "title": "Rögzítés nélkül vesz részt.",
       "consent": "Hozzájárulok a rögzítéshez",
-      "body": "Nem járult hozzá a felvételhez: ugyanúgy részt vesz, de a neve, a hangja és a képe nem kerül a felvételbe."
+      "body": "Nem járult hozzá a felvételhez: ugyanúgy részt vesz, mint mindenki, de a hangja kimarad a felvételből. Az arca és a neve egyébként sem jelenik meg soha a videón."
+    },
+    "nickname": {
+      "reserved": "Moderátor,Előadó,Felszólaló,Résztvevő,Vendég,Szervező,Adminisztrátor,Házigazda",
+      "label": "Becenév (nem kötelező)",
+      "help": "Egy szó, 2–24 karakter: betűk, számjegyek és . _ -. A többiek ezt látják a neved helyett a videóban, a csevegésben, a kérdéseknél és az átiratban.",
+      "helpName": "Ha üresen hagyod, a saját neveddel jelensz meg.",
+      "helpAnonymous": "Ha üresen hagyod, automatikus álnévvel jelensz meg.",
+      "checking": "A becenév ellenőrzése…",
+      "shownAs": "A többiek így látnak majd: „{nickname}”.",
+      "useSuggestion": "„{suggestion}” használata",
+      "errors": {
+        "length": "A becenévnek 2–24 karakterből kell állnia.",
+        "format": "Egy szó: betűvel kezdődik, és betűvel vagy számjeggyel végződik; közte betűk, számjegyek és . _ -, soha nem kettő egymás után.",
+        "scripts": "Egyetlen ábécé betűit használd.",
+        "reserved": "Foglalt szót tartalmaz, például egy szerepkör nevét: válassz másikat.",
+        "host": "Hasonlít az esemény egyik vezetőjének nevére: válassz másikat.",
+        "taken": "Valaki az eseményen már használja ezt a becenevet.",
+        "disabled": "Ez az esemény nem fogad el új beceneveket: a sajátodat csak eltávolíthatod.",
+        "rete": "A becenevet nem sikerült ellenőrizni. Próbáld újra."
+      },
+      "button": "Becenév",
+      "open": "Becenév módosítása",
+      "dialogTitle": "A beceneved",
+      "dialogIntro": "A többiek a becenevet látják a neved helyett. A módosításhoz a terem egy pillanatra újracsatlakoztat.",
+      "apply": "Mentés és újracsatlakozás",
+      "remove": "Becenév törlése",
+      "reconnecting": "Újracsatlakozás…",
+      "done": "Kész: most így jelensz meg: „{nickname}”.",
+      "doneRemoved": "Kész: a becenevet eltávolítottuk."
     }
   },
   "qa": {
@@ -721,9 +770,9 @@
     "upvote": "Szavazás",
     "upvoted": "Megszavazva",
     "noQuestions": "Még nincsenek kérdések. Legyen Ön az első!",
-    "qaPersistenceNote": "A kérdések mentésre kerülnek, és az esemény után is elérhetők lesznek.",
-    "qaPostEvent": "Kérdések és válaszok az eseményről",
-    "noAnsweredQuestions": "Ehhez az eseményhez nincsenek megválaszolt kérdések.",
+    "qaPersistenceNote": "A kérdések szövege megjelenhet az esemény oldalán, a kérdezők neve nélkül.",
+    "personalDataNotice": "Ne írja le mások személyes adatait, sem a sajátjait, ha nem szeretné nyilvánossá tenni őket: a kérdés szövege megjelenhet az esemény oldalán, a neve nélkül.",
+    "personalDataNoticeNotPublished": "Ne írja le mások személyes adatait, sem a sajátjait, ha nem szeretné, hogy mások megismerjék őket: a teremben lévők elolvashatják a kérdés szövegét.",
     "filterAll": "Összes",
     "showPanel": "Q&A megjelenítése",
     "hidePanel": "Q&A elrejtése",
@@ -742,6 +791,8 @@
       "editAnswer": "Válasz szerkesztése",
       "answerFieldLabel": "Válasz {name} kérdésére",
       "answerPlaceholder": "Írja meg a választ (legfeljebb 2000 karakter)",
+      "answerNotice": "A válasz megjelenhet az esemény oldalán: ne írjon bele személyes adatokat.",
+      "answerNoticeNotPublished": "A teremben lévők elolvashatják a választ: ne írjon bele személyes adatokat.",
       "sendAnswer": "Válasz közzététele",
       "cancel": "Mégse",
       "removeAnswer": "Válasz eltávolítása"
@@ -769,7 +820,8 @@
     "accessDenied": {
       "title": "Ez a rész az Ön szerepköre számára nem érhető el",
       "body": "Szervezőként a saját eseményeit kezeli: létrehozás, közzététel, anyagok, kérdőívek és utómunka. A platform beállításai és az összes esemény adatai az adminisztrációnál maradnak.",
-      "back": "Ugrás a saját eseményeihez"
+      "back": "Ugrás a saját eseményeihez",
+      "organizerOnly": "Ezt az eseményt csak a szervezői szerkeszthetik. Adminisztrátorként látja az állapotát és a részleteit, és archiválhatja vagy törölheti. A felvételek és tartalmuk a szervezőké és a résztvevőké."
     },
     "staffLogin": {
       "title": "Belépés az adminisztrációs felületre",
@@ -1025,6 +1077,24 @@
           }
         },
         "recordingManualNote": "A felvétel soha nem indul el magától: egy moderátor indítja a REC gombbal.",
+        "recordingDestination": "Hová kerül a felvétel",
+        "recordingDestinationReserved": "Csak regisztráltaknak",
+        "recordingDestinationReservedDesc": "A szervezők és a regisztráltak láthatják, ez utóbbiak addig, amíg a regisztrációs adataikat megőrizzük. Nem kerül közzétételre. A terem megnyitása után már nem tehető nyilvánossá.",
+        "recordingDestinationPublic": "Nyilvános",
+        "recordingDestinationPublicDesc": "Közzétehető az esemény oldalán és a videótárban. A résztvevők ehhez is hozzájárulnak.",
+        "recordingDestinationNotSet": "Nincs megadva: az esemény e választási lehetőség bevezetése előtt jött létre.",
+        "recordingDestinationStaffOnly": "Azt, hogy hová kerül a felvétel, az esemény munkatársai választják ki: egyelőre nincs megadva.",
+        "recordingDestinationStartsReserved": "A felvétel kezdetben csak regisztráltaknak szól: az esemény munkatársai a terem megnyitásáig nyilvánossá tehetik.",
+        "recordingDestinationStaysReserved": "A felvétel továbbra is csak regisztráltaknak szól: a terem már megnyílt.",
+        "recordingDestinationLocked": "A terem megnyitása után a felvétel már csak a „Csak regisztráltaknak” beállításra módosítható: a hozzájárulások arra a szövegre érvényesek, amelyet az emberek elolvastak.",
+        "recordingDestinationPublicOnInvitation": "Az esemény csak meghívással látogatható, de a felvétel nyilvános marad: a videót bárki megnézheti, nem csak a meghívottak.",
+        "recordingDestinationReservedOnInvitation": "Az esemény csak meghívással látogatható: a felvétel „Csak regisztráltaknak” beállításra váltott. Ezt a „Felvétel és MI” részben módosíthatja.",
+        "postEventPagePrivateOnInvitation": "Az esemény csak meghívással látogatható: az esemény utáni oldal privátra váltott. Ezt az „Adatvédelem, adatok és oldal az esemény után” részben módosíthatja.",
+        "postEventPagePublicWithVideo": "A felvétel nyilvános: az esemény utáni oldal nyilvánosra váltott, különben senki sem látná a videót. Ezt az „Adatvédelem, adatok és oldal az esemény után” részben módosíthatja.",
+        "postEventPageStaysPrivate": "Az esemény nyitott a regisztrálók számára, de az esemény utáni oldal privát maradt: nem nyílik meg újra magától. Ezt az „Adatvédelem, adatok és oldal az esemény után” részben módosíthatja.",
+        "postEventPagePrivateVideoHidden": "A felvétel nyilvános, de az esemény utáni oldal privát: a videót senki sem fogja látni, még a regisztráltak sem, amíg az oldal privát marad.",
+        "recordingNothingToCapture": "Ezen a telepítésen nincs videó a teremről: az átirat és a résztvevőnkénti sávok nélkül semmit sem rögzítünk.",
+        "recordingDestinationRequired": "Válassza ki, hová kerül a felvétel.",
         "audienceAnonymous": "Névtelen közönség",
         "audienceAnonymousDesc": "A résztvevők másoknak álnéven jelennek meg („Résztvevő” és egy kód) a videóban, a csevegésben és a kérdésekben; a résztvevők listája a moderátoroknál marad, és nincs tér. Nagy eseményekhez hasznos; közösségi eseményeken az emberek meg akarják ismerni egymást.",
         "audienceAnonymousLocked": "Amíg a terem nyitva lehet, nem módosítható: összekapcsolná az álneveket a nevekkel.",
@@ -1032,10 +1102,15 @@
         "participantListVisibleDesc": "Ki: a lista, a rács és a téren látható nevek a házigazdáknál és az előadóknál maradnak; a közönség csak azt látja, aki beszél. Be: mindenki látja, ki van a teremben.",
         "participantListAnonymous": "Névtelen közönségnél a lista rejtve marad.",
         "participantListLocked": "Nyitott teremnél nem módosítható: akik már bent vannak, nem látnák a változást.",
+        "nicknamesEnabled": "Becenév a résztvevőknek",
+        "nicknamesEnabledDesc": "A résztvevők becenevet választhatnak: a többiek ezt látják a nevük helyett a videóban, a csevegésben, a kérdéseknél és az átiratban. A szervezők és a moderátorok látják, ki áll mögötte. Akik vezetik az eseményt, a saját nevükkel szerepelnek. Alapértelmezés szerint be van kapcsolva, ahol a résztvevők listája rejtett.",
+        "nicknamesLocked": "Nyitott teremnél nem módosítható: aki már bent van, az előző szabály szerint választott.",
         "participantListCameraNote": "Rejtett listánál aki bekapcsolja a kameráját, nem látja a saját képét. Olyan találkozónál, ahol mindenki látja egymást, jelenítse meg a listát.",
         "recordingLockedLive": "Nyitott teremnél a rögzítés nem módosítható: az első belépéstől érvényes.",
         "hostsAlwaysRecorded": "Az esemény vezetői mindig szerepelnek a felvételen",
-        "hostsAlwaysRecordedDesc": "Kikapcsolva a moderátorok és az előadók is úgy döntenek, mint mindenki más. Csak akkor kapcsolja be, ha már beleegyeztek a felvételbe: nem látják a jelölőnégyzetet, és az esemény adatkezelési tájékoztatójának ezt jeleznie kell."
+        "hostsAlwaysRecordedDesc": "A moderátorok és az előadók névvel és képpel jelennek meg a videón, jelölőnégyzet nélkül: az esemény adatvédelmi tájékoztatójának ezt ki kell mondania. A résztvevőknek csak a hangját rögzítjük, és csak a hozzájárulásukkal.",
+        "hostsAlwaysRecordedDescHostsOnly": "A moderátorok és az előadók névvel és képpel jelennek meg a videón, jelölőnégyzet nélkül: az esemény adatvédelmi tájékoztatójának ezt ki kell mondania. A résztvevők soha nem látszanak és nem hallatszanak a videón.",
+        "hostsAlwaysRecordedDescVisible": "A moderátorok és az előadók névvel és képpel jelennek meg a videón, jelölőnégyzet nélkül: az esemény adatvédelmi tájékoztatójának ezt ki kell mondania. Ez a telepítés nem tudja kívül tartani a résztvevőket a videón: aki hozzájárul, névvel, hanggal és képpel szólal fel, és bárki neve megjelenhet, aki követi az eseményt, akkor is, ha nem szólal fel."
       },
       "step3": {
         "heading": "Személyek és meghívók",
@@ -1053,7 +1128,7 @@
         "remove": "Eltávolítás",
         "invalidEmail": "Érvénytelen e-mail cím.",
         "duplicateEmail": "Az e-mail cím már szerepel.",
-        "rubricaPick": "Keresés a címjegyzékben szervezet szerint…",
+        "rubricaPick": "Keresés a címjegyzékben név, e-mail cím vagy szervezet szerint…",
         "rubricaOrAdd": "vagy adja hozzá kézzel",
         "removeItem": "{name} eltávolítása",
         "invitationsStaffOnly": "A meghívókat az esemény munkatársai kezelik.",
@@ -1135,6 +1210,7 @@
         "askOrganization": "Szervezet (a regisztrációhoz kötelező)",
         "askRole": "Beosztás (nem kötelező)",
         "askType": "Szervezet típusa (nem kötelező)",
+        "askAddressBook": "Ajánlja fel a címjegyzékben maradást (a regisztrálóknak nem kötelező)",
         "questionnairesHeading": "Kérdőívek",
         "questionsBefore": "Az esemény előtt, a jelentkezéskor: {count, plural, =0 {nincs további kérdés} one {# további kérdés} other {# további kérdés}}",
         "questionsAfter": "Az esemény után: {count, plural, =0 {nincs elégedettségi kérdőív} one {elégedettségi kérdőív, # kérdés} other {elégedettségi kérdőív, # kérdés}}",
@@ -1230,6 +1306,8 @@
         "gdprHeading": "Adatvédelem és adatmegőrzés",
         "retentionDays": "Megőrzési napok",
         "retentionHelp": "E küszöb után a személyes adatok automatikusan törlődnek.",
+        "recordingRetention": "A felvétel megőrzése",
+        "recordingRetentionHelp": "A felvétel és ami belőle készül nem törlődik a személyek adataival együtt. Időtartammal ennyi nappal az esemény vége után törlődik, vagy ha a videót közzétették, a közzététel után. Később is módosítható, a felvétel paneljén.",
         "gdprTemplate": "Adatvédelmi sablon",
         "gdprTemplateNone": "— Egyedi szöveg használata —",
         "gdprTemplateUnknown": "A kiválasztott adatvédelmi sablon már nem létezik: válasszon másikat, vagy térjen vissza az egyéni szöveghez",
@@ -1281,7 +1359,10 @@
         "participantsCan": "Résztvevők: {list}",
         "none": "nincs",
         "recordingManual": "Elérhető: csak akkor indul, ha egy moderátor megnyomja a REC gombot.",
+        "recordingDestinationReserved": "Rendeltetés: csak a szervezőknek és a regisztráltaknak.",
+        "recordingDestinationPublic": "Rendeltetés: nyilvános.",
         "aiAfter": "A felvétel után: {list}.",
+        "aiConfirmVideo": "Személyenkénti sávok nélkül a videó átírása csak annak megerősítése után indul el, hogy minden beszélő hozzájárult.",
         "scheduleHeading": "Mikor kerül sor rá",
         "scheduleIntro": "Mikor kerül sor az eseményre: dátum, időpont és időzóna.",
         "advancedIntro": "A sablon által már kiválasztott értékek: csak azt módosítsa, amit kell.",
@@ -1325,17 +1406,25 @@
         "askOrganization": "szervezet",
         "askRole": "beosztás",
         "askType": "szervezet típusa",
+        "askAddressBook": "kíván-e a címjegyzékben maradni",
         "permissionsHeading": "Ki mit tehet a teremben",
         "permissionsIntro": "Mit tehetnek a résztvevők, és mely termi funkciók vannak bekapcsolva. Minden az esemény közben is módosítható.",
         "consentsLine": "Hozzájárulások a regisztrációkor és a teremben: {list}",
         "consentRecordingFree": "felvétel, önkéntes (nélküle csak hallgatás)",
         "consentRecordingNotice": "a felvételhez csak tájékoztatás (a résztvevők nem beszélnek és nem látszanak)",
+        "consentRecordingHostsOnly": "a felvételhez csak tájékoztatás (a videón csak a moderátorok jelennek meg)",
         "consentTranscription": "a saját hozzászólások átirata, önkéntes",
-        "consentsNone": "A regisztrációs hozzájáruláson kívül nincs más.",
-        "consentsHosts": "A moderátoroktól és előadóktól a teremben kérjük a felvételhez való hozzájárulást, önkéntesen.",
+        "consentsNone": "Nincs kérendő hozzájárulás: a regisztrációkor elegendő az adatvédelmi tájékoztató tudomásulvétele.",
         "consentsWithdraw": "A résztvevők a teremben a „Hozzájárulások” gombbal vonhatják vissza őket.",
         "participantListShown": "Résztvevők listája: mindenki számára látható.",
         "participantListHidden": "Résztvevők listája: csak a házigazdáknak és az előadóknak.",
+        "audiencePseudonyms": "A közönség nevei: álnevek.",
+        "audienceNicknames": "A résztvevők becenevet használhatnak.",
+        "audienceRealNames": "A közönség nevei: a valódi nevek.",
+        "postEventQaHidden": "Kérdések az esemény után: nincsenek közzétéve.",
+        "postEventQaTextOnly": "Kérdések az esemény után: csak a szöveg, név nélkül.",
+        "addressBookOffered": "Címjegyzék: felajánlva a regisztrálóknak.",
+        "addressBookNotOffered": "Címjegyzék: nincs felajánlva.",
         "consentRecordingOptional": "rögzítés, önkéntes",
         "consentRecordingVoice": "felvétel, szabad (nélküle a személy kimarad a felvételből)",
         "consentsHostsAlways": "Az esemény vezetői és felszólalói mindig szerepelnek a felvételen: nem látják a jelölőnégyzetet."
@@ -1409,15 +1498,15 @@
         "recording": "A felvételen",
         "roomSame": "Az esemény szabályai szerint vesz részt.",
         "roomListenOnly": "Csak hallgat és csetel.",
-        "recordedFull": "Név, hang, kép és megosztott képernyő.",
+        "recordedFull": "Csak a hangja, amikor beszél: arc és név soha nem jelenik meg.",
+        "recordedVisible": "Név, hang, kép és megosztott képernyő.",
         "notRecorded": "Nem szerepel: sem név, sem hang, sem kép, sem megosztott képernyő.",
         "recordedVoice": "A hangja, külön sávon.",
         "notRecordedVoice": "A hangja nem kerül rögzítésre.",
         "othersSame": "A többiek nem változnak: a mikrofonzárak, a szó megadása és a videó megjelenése az esemény szerint marad.",
         "audienceNotice": "A résztvevőknek nincs mikrofonjuk, kamerájuk és képernyőmegosztásuk: csak értesítést kapnak. Ha szót kapnak, a teremben hozzájárulhatnak; ha nem teszik, kimaradnak a felvételből.",
-        "hostsChoose": "A moderátorok és az előadók úgy döntenek, mint mindenki más: aki nem járul hozzá, ugyanúgy vezet, de kimarad a felvételből.",
         "hostsAlways": "A moderátorok és az előadók mindig szerepelnek a felvételen: nem látják a jelölőnégyzetet.",
-        "hostsFixed": "A moderátorok és az előadók mindenképp vezetnek, és a videó rögzíti őket.",
+        "hostsOnly": "Ez a telepítés csak a moderátorokat rögzíti a videón: a résztvevők nem látszanak és nem hallatszanak, és a felvételhez való hozzájárulásukat nem kérjük.",
         "trace": "Ha felszólal a felvétel alatt, a videó melletti megjegyzés jelzi, hogy egy hozzászólás hiányzik, az átirat pedig *** jelet tesz az időponttal.",
         "anytime": "A hozzájárulást a teremben bármikor meg lehet adni és vissza lehet vonni.",
         "transcription": "A saját hozzászólások átirata külön, választható hozzájárulás.",
@@ -1472,7 +1561,9 @@
       "breadcrumbAriaLabel": "Morzsamenü",
       "skipToPage": "Ugrás az oldal tartalmára",
       "openMenu": "Menü megnyitása",
-      "closeMenu": "Menü bezárása"
+      "closeMenu": "Menü bezárása",
+      "recordingRemovals": "Eltávolítási kérelmek",
+      "recordingRemovalDetail": "Eltávolítási kérelem"
     },
     "publications": {
       "subtitle": "Egységes szerkesztőségi központ minden közzétett videóhoz: ütemezett események, azonnali hívások, feltöltött archív felvételek és előléptetésre váró munkamenetek.",
@@ -1543,6 +1634,8 @@
           "saveFailed": "A metaadatok mentése sikertelen volt."
         }
       },
+      "reservedBadge": "Csak regisztráltaknak",
+      "reservedHelp": "A felvétel csak a regisztráltak számára érhető el: nem jelenhet meg a videótárban.",
       "updateFailed": "A frissítés nem sikerült."
     },
     "recordingsLibrary": {
@@ -1614,7 +1707,8 @@
       "detailFilename": "Fájlnév",
       "transcriptManage": "Átirat / AI kezelése",
       "transcriptReady": "Átirat kész",
-      "transcriptProcessing": "Feldolg. alatt"
+      "transcriptProcessing": "Feldolg. alatt",
+      "organizerOnly": "Csak szervezőknek"
     },
     "gdprAudit": {
       "subtitle": "A személyes adatokon végzett adatvédelmi műveletek naplója: törlések, hozzájárulások, exportok",
@@ -1629,7 +1723,12 @@
         "DATA_DELETED": "Adatok törölve",
         "CONSENT_RECORDED": "Hozzájárulás rögzítve",
         "DATA_EXPORTED": "Adatok exportálva",
-        "CONSENT_WITHDRAWN": "Hozzájárulás visszavonva"
+        "DATA_RECTIFIED": "Adatok javítva",
+        "CONSENT_WITHDRAWN": "Hozzájárulás visszavonva",
+        "RECORDING_CONTENT_READ": "A felvétel tartalmát a személyzet olvasta",
+        "RECORDING_REDACTION_REQUESTED": "Felvételből való eltávolítás kérelmezve",
+        "RECORDING_REDACTION_REJECTED": "Eltávolítási kérelem elutasítva",
+        "RECORDING_REDACTED": "Személy eltávolítva egy felvételből"
       },
       "recordsAffected": "{count} érintett rekord",
       "colWhen": "Mikor",
@@ -1655,7 +1754,8 @@
       "rotating": "Újragenerálás…",
       "regenerateTitle": "Moderátori token újragenerálása (a régi hivatkozás érvénytelenné válik)",
       "confirmRegenerate": "Biztosan újragenerálja a tokent? A régi hivatkozás többé nem fog működni.",
-      "noResults": "Nem található esemény."
+      "noResults": "Nem található esemény.",
+      "organizerOnlyLink": "A hivatkozást csak az esemény szervezői látják"
     },
     "registrations": {
       "subtitle": "Az eseményekre regisztrált összes személy — keresés, szűrés és exportálás",
@@ -1684,6 +1784,8 @@
       "colCreatedAt": "Regisztráció dátuma",
       "colEvent": "Esemény",
       "colName": "Név",
+      "colNickname": "Becenév",
+      "nicknameShown": "Mások így látják: „{nickname}”",
       "colEmail": "E-mail",
       "colOrg": "Szervezet",
       "colJoined": "Részt vett",
@@ -1917,7 +2019,7 @@
       "aiSectionHeading": "Automatikus utómunka",
       "aiSectionDesc": "Az esemény befejezése után a felvételt egy fürtön belüli mesterségesintelligencia-pipeline dolgozhatja fel, amely átiratot és összefoglalót, igény esetén pedig fordításokat és szinkront készít. Minden ennek a telepítésnek az infrastruktúráján történik, semmilyen adat nem kerül harmadik félhez.",
       "aiTranscriptEnabled": "Automatikus átiratkészítés",
-      "aiTranscriptEnabledDesc": "Beszédfelismerés a beszélők azonosításával. Az összefoglaló, a fordítások és a szinkron bekapcsolásához szükséges.",
+      "aiTranscriptEnabledDesc": "Beszédfelismerés a beszélők azonosításával. Az összefoglaló, a fordítások és a szinkron bekapcsolásához szükséges. A résztvevők maguk döntik el, hogy a hozzászólásaikról készüljön-e átirat.",
       "aiSummaryEnabled": "Összefoglaló és fejezetek",
       "aiSummaryEnabledDesc": "A megbeszélés összefoglalója, a meghozott döntések, a teendők, valamint fejezetekre bontás időbélyegekkel.",
       "aiTranslationEnabled": "Fordítás más nyelvekre",
@@ -2023,7 +2125,7 @@
     },
     "recordingUpload": {
       "title": "Meglévő felvétel feltöltése",
-      "subtitle": "Ha már van videofájlja az eseményről (például más platformon rögzítve), töltse fel ide: hivatalos felvételként jelenik meg a nyilvános oldalon.",
+      "subtitle": "Ha már van videofájlja az eseményről (például más platformon rögzítve), töltse fel ide: ez lesz az esemény hivatalos felvétele.",
       "fileLabel": "Videofájl",
       "upload": "Feltöltés és hozzárendelés",
       "signing": "Előkészítés…",
@@ -2087,7 +2189,9 @@
         "DATA_DELETED": "Adatok törölve",
         "CONSENT_RECORDED": "Hozzájárulás rögzítve",
         "DATA_EXPORTED": "Adatok exportálva",
-        "CONSENT_WITHDRAWN": "Hozzájárulás visszavonva"
+        "DATA_RECTIFIED": "Adatok javítva",
+        "CONSENT_WITHDRAWN": "Hozzájárulás visszavonva",
+        "RECORDING_CONTENT_READ": "A felvétel tartalmát a személyzet olvasta"
       }
     },
     "settings": {
@@ -2130,7 +2234,7 @@
         "jobMaxAttempts": "Próbálkozások a sikertelenné nyilvánítás előtt",
         "jobMaxAttemptsHelp": "Hányszor próbálja újra a pipeline a feladatot, mielőtt sikertelennek jelöli. A próbálkozások közötti várakozás exponenciálisan nő (30 másodperctől 2 óráig). A szokásos érték 5.",
         "artifactRetentionDays": "Artefaktumok megőrzése (nap)",
-        "artifactRetentionDaysHelp": "0 értéknél nincs az egész webhelyre vonatkozó korlát: az AI-artefaktumok a felvételük vagy az esemény megőrzési idejét követik. A nullánál nagyobb érték esetén egy napi feladat töröl minden olyan artefaktumot, amely ennél több napja jött létre, akár közzétették, akár nem: ez lerövidítheti a megőrzést, de soha nem hosszabbítja meg. A beszélők neveire és a feladatok adattartalmára ez nem vonatkozik: ezek a felvétel vagy az esemény megőrzési idejét követik. Részletek: docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "0 értéknél nincs az egész webhelyre vonatkozó korlát: az AI-artefaktumok a felvételük megőrzési idejét követik. A nullánál nagyobb érték esetén egy napi feladat töröl minden olyan artefaktumot, amely ennél több napja jött létre, akár közzétették, akár nem: ez lerövidítheti a megőrzést, de soha nem hosszabbítja meg. A beszélők neveire és a feladatok adattartalmára ez nem vonatkozik: ezek a felvétel megőrzési idejét követik. Részletek: docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "AI-tájékoztató a váróteremben",
         "consentDisclosureHelp": "A résztvevőknek a váróteremben megjelenő szöveg, ha az esemény AI-utómunkát használ (átiratkészítés, összefoglaló, fordítás, szinkron). Nyelvenként testre szabható. Hagyja üresen a beépített alapértelmezett szöveg használatához.",
         "consentDisclosurePlaceholder": "Pl. Ezt az eseményt az élő közvetítés után automatikusan átírjuk és összefoglaljuk AI-eszközökkel…"
@@ -2307,6 +2411,8 @@
         "guestAccessEnabledHelp": "A nem regisztrált személyek csak a nevük megadásával csatlakozhatnak a folyamatban lévő eseményekhez. Kikapcsolva a tervezett eseményekre csak regisztrációval vagy moderátori, illetve előadói hivatkozással lehet belépni; az azonnali videohívások mindenki számára nyitva maradnak, akinek megvan a hivatkozás. A csak meghívottaknak szóló esemény soha nem enged be vendégeket.",
         "publicRegistrationEnabled": "Nyilvános regisztráció aktív",
         "publicRegistrationEnabledHelp": "Bárki regisztrálhat az eseményekre. Kikapcsolva csak az esemény meghívotti listáján szereplők regisztrálhatnak, és a személyes belépési linket csak e-mailben küldjük el; a már regisztráltak, valamint a moderátori és előadói hivatkozások továbbra is működnek. Ez az új eseményeknek javasolt beállítás: minden esemény a „Személyek” lépésben dönthet másként.",
+        "addressBookEnabled": "Az események címjegyzéke",
+        "addressBookEnabledHelp": "Felajánlja a regisztrálóknak, hogy a címjegyzékben maradjanak, és hasonló eseményekre meghívást kapjanak. Kikapcsolva a jelölőnégyzet eltűnik az űrlapokról, a választó pedig a varázslóból; a meglévő bejegyzések a visszavonásig vagy a lejáratig megmaradnak.",
         "calendarPublic": "Nyilvános naptár",
         "calendarPublicHelp": "Az eseménynaptár közzététele. A látogatók megtekinthetik a tervezett eseményeket.",
         "parseTitleKicker": "Címek szerkesztői felcímmel",
@@ -2397,6 +2503,40 @@
         "avgParticipantsPerEvent": "Átlagos résztvevőszám eseményenként",
         "avgFeedbackRating": "Átlagos visszajelzési értékelés",
         "totalFeedback": "Visszajelzési válaszok"
+      },
+      "catalog": {
+        "title": "Eseménytípusok és sablonok",
+        "intro": "Hány esemény van az egyes típusokból és sablonokból, hónapról hónapra. Csak darabszámok és átlagok, személyes adatok nélkül. A piszkozatok nem számítanak.",
+        "periodLabel": "Időszak",
+        "months": "{count, plural, one {# hónap} other {# hónap}}",
+        "groupByLabel": "Csoportosítás",
+        "groupBy": {
+          "type": "Eseménytípus",
+          "template": "Sablon"
+        },
+        "rankingTypes": "A leggyakoribb típusok",
+        "rankingTemplates": "A leggyakrabban használt sablonok",
+        "columns": {
+          "type": "Típus",
+          "template": "Sablon",
+          "events": "Események",
+          "held": "Megtartva",
+          "avgParticipants": "Átl. résztvevő",
+          "avgDuration": "Átl. időtartam",
+          "total": "A teljes időszak"
+        },
+        "measuresNote": "Megtartva: azok az események, amelyek terme megnyílt. Átlagos résztvevőszám: az egyszerre jelen lévők legmagasabb száma a vendégekkel együtt, a megtartott események átlagában. Átlagos időtartam: a mért teremidő, nem a tervezett.",
+        "byMonth": "Hónapról hónapra",
+        "measureLabel": "Mutató",
+        "measures": {
+          "events": "Események",
+          "avgParticipants": "Átlagos résztvevőszám",
+          "avgDurationMinutes": "Átlagos időtartam"
+        },
+        "byMonthCaption": "{measure} havonta",
+        "empty": "Ebben az időszakban nincs esemény.",
+        "deletedTemplate": "{name} (törölve)",
+        "uncatalogedNote": "Nem katalogizált események: {count}. A katalógus előtt, vagy sablon és formátum nélkül jöttek létre; az esemény szerkesztésekor, a technikai részleteknél katalogizálhatók."
       }
     },
     "recurrence": {
@@ -2439,6 +2579,8 @@
       "featuresLabel": "Funkciók",
       "whiteboardLabel": "Tábla",
       "recordingLabel": "Felvétel",
+      "recordingDestination": "A felvétel rendeltetése",
+      "recordingDestinationNone": "Az esemény létrehozásakor kell kiválasztani",
       "waitingRoomEngineLabel": "Váróterem (a sablon alapértelmezése)",
       "waitingRoomEngineSiteDefault": "A webhely alapértelmezése",
       "waitingRoomEngineGarden": "Kert (normál)",
@@ -2451,17 +2593,22 @@
       "durationLabel": "Alapértelmezett időtartam (perc)",
       "durationHint": "Előre kitölti az esemény végét (kezdés + időtartam). A felhasználó módosíthatja. Üres = 2 óra.",
       "retentionLabel": "Alapértelmezett adatmegőrzés (nap)",
+      "recordingRetentionLabel": "A felvétel alapértelmezett megőrzése",
+      "recordingRetentionHint": "Az ebből a sablonból létrehozott eseményekhez; a varázslóban és a felvétel paneljén módosítható. A felvételre nem vonatkozik az adatok megőrzési ideje.",
       "expectedSpeakersLabel": "Várható beszélők száma (alapértelmezés)",
       "descriptionTemplateLabel": "Alapértelmezett leírás",
       "descriptionTemplateHint": "Az esemény leírásába előre beillesztett szöveg (szerkeszthető).",
       "aiTranscript": "Automatikus átiratkészítés (alapértelmezés)",
       "aiSummary": "Automatikus összefoglaló (alapértelmezés)",
       "aiTranslation": "Automatikus fordítás (alapértelmezés)",
+      "noRecording": "Ebben a telepítésben nem készül felvétel: a sablonok felvétel nélkül indulnak.",
       "pickerSubtitle": "Válasszon sablont az eseménybeállítások előkonfigurálásához, vagy hagyja ki a kézi konfiguráláshoz.",
       "skipTemplate": "Kézi konfigurálás",
       "postEventPublic": "Nyilvános esemény utáni oldal",
+      "offerAddressBook": "Felajánlja a címjegyzéket a regisztrálóknak",
       "invalidFields": "Ellenőrizze ezeket a mezőket: {fields}.",
-      "descriptionOtherLanguages": "Más nyelvű változatok is vannak: {languages}, amelyek itt nem szerkeszthetők. Ha módosítja az olasz szöveget, törlődnek."
+      "descriptionOtherLanguages": "Más nyelvű változatok is vannak: {languages}, amelyek itt nem szerkeszthetők. Ha módosítja az olasz szöveget, törlődnek.",
+      "usedBy": "Ebből a sablonból létrehozott események: {count}"
     },
     "instantCall": {
       "title": "Azonnali videohívás",
@@ -2724,7 +2871,7 @@
       "title": "Hívás munkamenetei",
       "empty": "Még nincs rögzített munkamenet. Az élő munkamenetek automatikusan megjelennek itt, amint a moderátor belép a terembe.",
       "loading": "Munkamenetek betöltése...",
-      "participants": "résztvevő",
+      "participantsCount": "{count, plural, one {# résztvevő} other {# résztvevő}}",
       "participantList": "Résztvevők",
       "name": "Név",
       "joined": "Belépés",
@@ -2974,11 +3121,28 @@
         "publishNow": "Közzététel most"
       },
       "editFeatures": "Funkciók szerkesztése",
-      "editPrivacy": "Adatvédelem és adatok szerkesztése"
+      "editPrivacy": "Adatvédelem és adatok szerkesztése",
+      "governance": {
+        "title": "Ezt az eseményt adminisztrátorként kezeli",
+        "body": "Ön nem tartozik a szervezői közé: látja az állapotot, a részleteket, a regisztrációkat és a hozzájárulásokat, és archiválhatja vagy törölheti az eseményt. Az esemény levezetése, a moderátori hivatkozás és a felvételek tartalma (videó, átiratok, összefoglalók) a szervezőké.",
+        "recording": "A felvétel tartalma csak az esemény szervezői és résztvevői számára érhető el. Itt látja, hogy létezik-e, és a részleteit.",
+        "recordingFile": "Felvétel",
+        "present": "Van",
+        "absent": "Nincs",
+        "recordingPublished": "Közzétéve",
+        "yes": "Igen",
+        "no": "Nem",
+        "recordingDuration": "Időtartam",
+        "recordingSize": "Méret",
+        "recordingRetention": "A felvétel automatikus törlése",
+        "recordingRetentionNone": "Nincs",
+        "recordingRetentionDays": "az esemény vége után {days, plural, one {# nappal} other {# nappal}}, vagy ha közzétették, a közzététel után"
+      }
     },
     "rubrica": {
-      "subtitle": "A címjegyzékbe való felvételhez hozzájárulást adó személyek (GDPR 6. cikk (1) bekezdés a) pont). A profilinformációk minden újraregisztrációkor automatikusan frissülnek.",
-      "searchLabel": "Keresés név vagy szervezet szerint",
+      "subtitle": "A címjegyzékbe való felvételhez hozzájárulást adó személyek (GDPR 6. cikk (1) bekezdés a) pont). A név, az e-mail cím és a szervezet csak akkor frissül, ha a személy ismét bejelöli a jelölőnégyzetet.",
+      "searchLabel": "Keresés név, e-mail cím vagy szervezet szerint",
+      "searchPartial": "A keresés csak a legutóbb frissített {limit} bejegyzést vizsgálta: egy régebben frissített személy esetleg nem jelenik meg.",
       "orgTypeLabel": "Szervezet típusa",
       "allTypes": "Mind",
       "includeOptedOut": "A hozzájárulásukat visszavonók is",
@@ -3243,7 +3407,8 @@
         "metricsTitle": "Az összefoglaló mutatói (LLM)",
         "chars": "karakter",
         "model": "Modell",
-        "notAvailable": "n. a."
+        "notAvailable": "n. a.",
+        "contentHidden": "Csak az esemény szervezői számára érhető el."
       },
       "rel": {
         "title": "Az AI megbízhatósága",
@@ -3400,7 +3565,8 @@
         "alignNone": "Nincs igazítandó diaváltás.",
         "previewTitle": "Előnézet",
         "previewHelp": "A videó a diákkal úgy, ahogy a közönség látni fogja, a fent megadott javítással."
-      }
+      },
+      "contentOrganizerOnly": "Ennek a felvételnek a tartalmát (videó, sávok, átirat, összefoglaló, fordítások) csak az esemény szervezői láthatják és szerkeszthetik. Itt látja az állapotát, a feldolgozási feladatokat és a fájlok részleteit."
     },
     "questionnairesPage": {
       "subtitle": "Újrafelhasználható kérdéssablonok regisztráció előtti és esemény utáni kérdőívekhez."
@@ -3597,10 +3763,13 @@
         "speakers": "Előadók és moderátorok",
         "speakersDesc": "A közönség a csevegőben ír és kérdez"
       },
-      "recQ": "Szeretne felvételt készíteni?",
+      "recQ": "Szeretné, hogy legyen lehetőség felvételre, és kinek a számára?",
       "rec": {
-        "yes": "Igen, amikor megnyomja a REC gombot",
         "yesDesc": "Az esemény után: átirat, összefoglaló és fordítás",
+        "reserved": "Igen, csak regisztráltaknak",
+        "reservedDesc": "A szervezők és a regisztráltak láthatják",
+        "public": "Igen, nyilvános",
+        "publicDesc": "Közzétehető az esemény oldalán",
         "no": "Nem",
         "noDesc": "Nincs felvétel, nincs kérendő hozzájárulás"
       },
@@ -3614,7 +3783,8 @@
         "grande": "Több mint 100 fő",
         "tutti": "mindenki videón",
         "relatori": "az előadók beszélnek",
-        "si": "felvétellel",
+        "riservata": "csak regisztráltaknak szóló felvétellel",
+        "pubblica": "nyilvános felvétellel",
         "no": "felvétel nélkül",
         "openAccess": "mindenki számára nyitott",
         "inviteOnly": "csak meghívással"
@@ -3627,6 +3797,9 @@
         "invitationDesc": "Az oldal látható marad, de csak a listán szereplők regisztrálhatnak; a regisztrációs linket tartalmazó meghívót az esemény oldaláról küldi e-mailben"
       },
       "previewInvitation": "Csak a meghívottak regisztrálnak; regisztráció nélkül nem lehet belépni.",
+      "previewPseudonyms": "A közönség álnéven jelenik meg",
+      "previewNicknames": "A résztvevők becenevet használhatnak",
+      "previewRealNames": "A közönség a saját nevén jelenik meg",
       "templateReplaces": "A sablon a saját beállításait hozza az alábbi válaszok helyett. A címet, a dátumokat és a személyeket a következő lépésekben adja meg.",
       "instantBack": "Inkább ütemezett esemény létrehozása"
     },
@@ -3686,7 +3859,9 @@
       "publishDesc": "Közzététel előtt nézze át: a szöveget mesterségesintelligencia-modell írta. Az újrakészített beszámolót újra közzé kell tenni.",
       "preview": "Előnézet",
       "hidePreview": "Előnézet elrejtése",
-      "previewLanguage": "Nyelv"
+      "previewLanguage": "Nyelv",
+      "organizerOnly": "A beszámolót csak az esemény szervezői kérhetik, olvashatják és tehetik közzé.",
+      "organizerOnlyExists": "A beszámoló elkészült. Csak az esemény szervezői olvashatják és tehetik közzé."
     },
     "endEvent": "Esemény befejezése",
     "endEventConfirmTitle": "Befejezi az eseményt mindenkinek?",
@@ -3722,11 +3897,12 @@
       "organizersEmpty": "Nincs megadva intézmény: a nyilvános oldal nem mutatja, ki szervezi.",
       "sendAll": "Meghívó küldése azoknak, akik még nem kapták meg ({count})",
       "sending": "Küldés…",
-      "sendDone": "Elküldött meghívók: {sent}. Kihagyva (már regisztrált vagy cím nélkül): {skipped}.",
+      "sendDone": "Elküldés alatt lévő meghívók: {sent}. Kihagyva (már regisztrált, nincs cím vagy nincs hozzájárulás az értesítésekhez): {skipped}.",
       "sendError": "A küldés nem sikerült: próbálja újra.",
       "sendNotPublished": "A meghívók addig mennek ki, amíg az esemény fogad regisztrációt: közzététel után és a vége előtt.",
       "invitedOn": "Meghívva: {date}",
       "notInvited": "A meghívó nincs elküldve",
+      "stopped": "Nem kap meghívókat",
       "send": "Meghívó küldése",
       "resend": "Újraküldés",
       "actions": "Műveletek",
@@ -3764,6 +3940,7 @@
         "pubblicata": "Közzétéve.",
         "prontaAi": "Elkészült az utómunkából: tekintse át; a videóval együtt kerül közzétételre.",
         "prontaSottotitoli": "Elkészült a feliratokból: ellenőrizze a neveket, és tegye közzé.",
+        "daConfermare": "Elindításra vár: a videó csak annak megerősítésével írható át, hogy minden beszélő hozzájárult.",
         "inLavorazione": "Feldolgozás alatt.",
         "nessuna": "Nincs: sem felirat, sem utómunka nem készült.",
         "soloStaff": "Az esemény szervezője tekinti át és teszi közzé az adminisztrációs felületen.",
@@ -3773,7 +3950,7 @@
         "title": "Beszámoló",
         "pubblicato": "Közzétéve.",
         "daPubblicare": "Elkészült: olvassa át, és tegye közzé.",
-        "daGenerare": "Még el kell készíteni az átiratból, a csevegésből és az értékelésekből.",
+        "daGenerare": "Még el kell készíteni az átiratból, a szavazásokból, az értékelésekből és, ha közzé vannak téve, a kérdésekből.",
         "inLavorazione": "Feldolgozás alatt.",
         "senzaPipeline": "Az AI-utómunka ebben a telepítésben nincs bekapcsolva.",
         "soloStaff": "Az esemény szervezője készíti el és teszi közzé az adminisztrációs felületen.",
@@ -3803,6 +3980,7 @@
         "title": "Nyilvános oldal",
         "visibile": "Mindenki számára látható.",
         "nellaLibreria": "Mindenki számára látható, és a videótárban is szerepel.",
+        "libreriaRiservata": "Az oldal látható, de a videó csak a regisztráltak számára érhető el: a videótárban nem jelenik meg.",
         "privata": "Visszavonva: a nyilvánosság nem látja.",
         "scaduta": "Már nem látható: a lejárati dátum elmúlt.",
         "archiviato": "Az esemény archiválva: az oldal nem nyilvános.",
@@ -3950,9 +4128,10 @@
     },
     "voiceConsent": {
       "title": "Átírja a teljes felvételt?",
-      "message": "Ez az esemény mindenkitől hozzájárulást kért a hozzászólásai átírásához. A teljes felvétel minden hangot tartalmaz, azokét is, akik nem járultak hozzá: csak akkor írja át, ha mindenki hozzájárult, aki beszél benne. A megerősítése a tevékenységnaplóban marad.",
+      "message": "A teljes felvétel minden hangot tartalmaz, azokét is, akik nem járultak hozzá a hozzászólásaik átírásához: csak akkor írja át, ha mindenki hozzájárult, aki beszél benne. A megerősítése a tevékenységnaplóban marad.",
       "confirm": "Igen, mindenki hozzájárult",
       "cancel": "Mégse",
+      "waitingNoCaptions": "A teljes felvétel átírása nem indult el magától: mindenki maga dönti el, hogy a hozzászólásairól készüljön-e átirat. Csak akkor indítsa el az {button} gombbal, ha mindenki hozzájárult, aki a felvételen beszél; különben az esemény átirat nélkül marad.",
       "waiting": "A teljes felvétel átírása nem indult el magától: ez az esemény mindenkitől hozzájárulást kért a hozzászólásai átírásához. Csak akkor indítsa el az {button} gombbal, ha mindenki hozzájárult, aki a felvételen beszél; különben a feliratokból készült átirat marad."
     },
     "editCopyTitle": "Az esemény másolata",
@@ -3981,22 +4160,149 @@
         "givenAt": "Megadva",
         "withdrawnAt": "Visszavonva",
         "textVersion": "Szövegváltozat",
+        "destination": "Rendeltetés",
+        "superseded": "Felváltva",
+        "supersededValue": "Egy későbbi hozzájárulással",
+        "destinations": {
+          "PUBLIC": "Nyilvános",
+          "REGISTRANTS": "Csak regisztráltaknak",
+          "none": "Nincs megadva"
+        },
         "kinds": {
           "recording": "Felvétel",
           "transcription": "A hozzászólások átirata"
         },
         "sources": {
           "registration": "regisztráció",
-          "room": "terem"
+          "room": "terem",
+          "self-service": "Az én adataim"
         },
         "roles": {
           "registrant": "regisztrált",
           "guest": "vendég",
           "host": "vezet vagy előad"
         },
+        "erasedName": "(a név kérésre eltávolítva)",
         "unreadableName": "(a név nem olvasható)"
       },
+      "retainedNote": "{count, plural, one {# igazolást őrzünk meg} other {# igazolást őrzünk meg}}, amíg a videó vagy az átirat létezik.",
       "countsNote": "Személyeket számolunk: egy regisztráció, egy munkatársi fiók vagy egy névre szóló link egyszer számít; a másik látogatáskor visszatérő vendég újra számít."
+    },
+    "recordingRemovals": {
+      "subtitle": "Azok a személyek, akik kérték, hogy ne szerepeljenek egy felvételen. Amíg egy kérelem nyitott, megnyithatja az adott felvételt az eltávolítási szerkesztőből, és minden hozzáférés megmarad a műveleti naplóban.",
+      "filterOpen": "Nyitottak",
+      "filterAll": "Mind",
+      "filterLabel": "Mely kérelmek",
+      "empty": "Nincs kérelem.",
+      "loadError": "A kérelmeket nem sikerült betölteni.",
+      "colReceived": "Beérkezett",
+      "colPerson": "Személy",
+      "colEvent": "Esemény",
+      "colSource": "Forrás",
+      "colStatus": "Állapot",
+      "open": "Megnyitás",
+      "unnamed": "Névtelen személy",
+      "sources": {
+        "self-service": "Az én adataim",
+        "admin": "Munkatársak"
+      },
+      "statuses": {
+        "OPEN": "Nyitott",
+        "IN_PROGRESS": "Folyamatban",
+        "PROCESSING": "Feldolgozás alatt",
+        "CLOSED": "Lezárva",
+        "REJECTED": "Elutasítva"
+      },
+      "kinds": {
+        "registrant": "Jelentkezett",
+        "host": "Vezet",
+        "guest": "Vendég"
+      },
+      "newOpen": "Kérelem rögzítése",
+      "newTitle": "Más úton érkezett kérelem",
+      "newIntro": "Olyan kérelemhez, amely e-mailben, postán vagy személyesen jutott el az adatkezelőhöz. Válassza ki a felvételt és, ha felismeri, a személyt a teremben jelen lévők közül.",
+      "recordingSearch": "Esemény keresése",
+      "recordingLabel": "Felvétel",
+      "recordingChoose": "Válasszon felvételt",
+      "recordingOption": "{title} · {date}",
+      "recordingNone": "Nincs videót vagy résztvevőnkénti sávokat tartalmazó felvétel.",
+      "peopleLabel": "Kik voltak a teremben",
+      "peopleNone": "A terem nem rögzítette, kik voltak jelen: adja meg a nevet, az intervallumokat pedig kézzel jelöli majd ki.",
+      "personNotInVideo": "nem látható a videón",
+      "personTimes": "{from} és {to} között",
+      "personStill": "{from} időponttól a végéig",
+      "nameLabel": "A személy neve",
+      "noteLabel": "Hogyan érkezett a kérelem (nem kötelező)",
+      "create": "Kérelem rögzítése",
+      "createError": "A kérelmet nem sikerült rögzíteni.",
+      "cancel": "Mégse",
+      "back": "Összes kérelem",
+      "fieldPerson": "Személy",
+      "fieldEvent": "Esemény",
+      "fieldReceived": "Beérkezett",
+      "fieldSource": "Forrás",
+      "fieldStatus": "Állapot",
+      "fieldNote": "Megjegyzés",
+      "externalCopy": "Ennek az eseménynek van videója egy külső oldalon (például a YouTube-on): az eltávolítás arra nem terjed ki. Ott is távolítsa el vagy cserélje le.",
+      "publishedElsewhere": "Az esemény közzétett videója más fájl, mint ez a felvétel: az eltávolítás nem változtatja meg. Cserélje le, vagy vegye le az esemény oldaláról.",
+      "pipelineOff": "Az utómunka ki van kapcsolva: az eltávolítási feladat a sorban vár, amíg be nem kapcsolja, és az átirat nem készül el újra.",
+      "noVideo": "Ennek a felvételnek nincs videója, csak résztvevőnkénti sávjai: a személy sávjai törlődnek, és az átirat a megmaradtakból készül el újra.",
+      "noRecording": "A felvétel már nem létezik: nincs mit eltávolítani.",
+      "keyOnly": "A példány kulcsával nem nyitható meg felvétel: jelentkezzen be adminisztrátori fiókjával.",
+      "startIntro": "A személy eltávolításához meg kell nyitnia a felvételt. A hozzáférés csak erre a kérelemre érvényes, és a fiókjával együtt megmarad a műveleti naplóban.",
+      "start": "Eltávolítási szerkesztő megnyitása",
+      "processing": "Eltávolítás folyamatban: a megtisztított videó az eredeti helyére kerül. A feladat állapota: {status}.",
+      "closed": "Kérelem lezárva: {date}.",
+      "closedIntervals": "{count, plural, =0 {Nincs letakart intervallum.} one {# intervallum letakarva.} other {# intervallum letakarva.}}",
+      "rejected": "Kérelem elutasítva: {date}.",
+      "lastError": "Az utolsó feldolgozás nem sikerült: {error}. Ellenőrizze az intervallumokat, és küldje el újra.",
+      "rejectTitle": "Kérelem elutasítása",
+      "rejectLabel": "Indok",
+      "reject": "Elutasítás",
+      "rejectConfirm": "Elutasítja a kérelmet? A személy látni fogja, hogy elutasították.",
+      "actionError": "A művelet nem sikerült (HTTP {code}).",
+      "editorTitle": "Letakarandó intervallumok",
+      "editorHint": "A javaslatok abból származnak, kik voltak a teremben és kik beszéltek, valamint a résztvevőnkénti sávokból: a beszédidők közelítőek. Nézze meg a videót, és javítsa ki őket. Minden intervallumban a videó helyén a „kérelemre eltávolított tartalom” tábla jelenik meg, a hang pedig elnémul; az időtartam nem változik.",
+      "sourcePresence": "A teremben",
+      "sourceSpeech": "Beszél",
+      "sourceTrack": "Sáv",
+      "selectedLegend": "Letakarandó",
+      "useProposals": "Újrakezdés a javaslatokból",
+      "addInterval": "Intervallum hozzáadása ide",
+      "fieldStart": "Kezdet",
+      "fieldEnd": "Vége",
+      "setStart": "Kezdet itt",
+      "setEnd": "Vége itt",
+      "seek": "Ugrás",
+      "remove": "Eltávolítás",
+      "intervalLabel": "{n}. intervallum",
+      "noIntervalsVideo": "Nincs letakarandó intervallum. Ha a személy nem látható a videón, utasítsa el a kérelmet az indok megadásával.",
+      "total": "{count, plural, one {# intervallum} other {# intervallum}} · {seconds} mp letakarandó",
+      "timeHint": "Az idők óra:perc:másodperc formátumban, mint a lejátszóban.",
+      "invalidTime": "Érvénytelen idő",
+      "preview": "Az eltávolítás előnézete",
+      "timelineLabel": "A felvétel idővonala",
+      "mediaError": "A videó nem töltődik be. Töltse be újra az oldalt.",
+      "submit": "Személy eltávolítása a felvételből",
+      "submitConfirm": "Az eredeti videó és a személy sávjai törlődnek, az utómunka pedig újra lefut. Ez nem vonható vissza. Folytatja?",
+      "submitDone": "Kérelem lezárva: a személyt eltávolították."
+    },
+    "catalog": {
+      "fieldTitle": "Katalógus",
+      "fieldHelp": "Az esemény típusa és a sablon, amelyből létrejött, csak a példány statisztikáihoz kell, és egyetlen beállítást sem módosít. Javítsa ki őket, ha az esemény hibásan vagy egyáltalán nincs katalogizálva.",
+      "typeLabel": "Eseménytípus",
+      "templateLabel": "Sablon",
+      "noTemplate": "Nincs sablon",
+      "deletedTemplate": "A(z) „{name}” sablonból készült, amelyet azóta töröltek.",
+      "deletedOption": "{name} (törölve)",
+      "types": {
+        "MEETING": "Megbeszélés",
+        "PARTICIPATORY": "Részvételi esemény",
+        "PUBLIC": "Nyilvános esemény",
+        "INSTANT": "Azonnali hívás",
+        "LEGACY": "Importált közzététel",
+        "UNCATALOGED": "Nincs katalogizálva"
+      }
     }
   },
   "email": {
@@ -4013,7 +4319,22 @@
     "dateLabel": "Dátum",
     "timeLabel": "Időpont",
     "durationLabel": "Időtartam",
-    "myDataLink": "Az adatai: megtekintés, javítás, hozzájárulás visszavonása vagy a regisztráció törlése"
+    "addressBookNote": "Ön szerepel az események címjegyzékében, hogy hasonló eseményekre meghívást kapjon: hozzájárulását bármikor visszavonhatja.",
+    "addressBookPendingNote": "Ennél a regisztrációnál bejelölték az események címjegyzékének jelölőnégyzetét, de erre a címre már nem érkeztek meghívók. Ha a kérés az Öné, a saját adatait tartalmazó oldalon erősítheti meg, az alábbi hivatkozással. Ha nem az Öné, hagyja figyelmen kívül ezt az üzenetet: a címjegyzéken kívül marad, és nem kap meghívókat.",
+    "addressBookOptOutLink": "Adataim eltávolítása a címjegyzékből",
+    "myDataLink": "Az adatai: megtekintés, javítás, hozzájárulás visszavonása vagy a regisztráció törlése",
+    "confirmationCode": {
+      "subject": "{site}: megerősítő kód",
+      "heading": "Az Ön megerősítő kódja",
+      "introEdit": "Kérte a(z) „{event}” eseményre szóló regisztrációjában szereplő név és szervezet javítását.",
+      "introEditAll": "Kérte a név és a szervezet javítását az összes regisztrációjában.",
+      "introNickname": "Kérte a(z) „{event}” eseményre szóló regisztrációjában szereplő becenév módosítását.",
+      "introNicknameRemove": "Kérte a(z) „{event}” eseményre szóló regisztrációjában szereplő becenév törlését.",
+      "introCancel": "Kérte a(z) „{event}” eseményre szóló regisztrációja törlését.",
+      "codeLabel": "A kód:",
+      "instructions": "Írja be az Az én adataim oldalon, ahonnan a kérést küldte. {minutes, plural, one {# percig} other {# percig}} érvényes.",
+      "ignore": "Ha nem Ön küldte a kérést, hagyja figyelmen kívül ezt az e-mailt: a kód nélkül semmi sem változik. A kódot ne adja meg senkinek."
+    }
   },
   "home": {
     "hero": {
@@ -4380,17 +4701,100 @@
   },
   "gdpr": {
     "consent": {
-      "recording": "Hozzájárulok az esemény audió/videó felvételéhez",
+      "recording": "Hozzájárulok, hogy a hangomat rögzítsék, amikor felszólalok az eseményen. Az arcom és a nevem soha nem jelenik meg a videón.",
+      "recordingReserved": "Hozzájárulok, hogy a hangomat rögzítsék, amikor felszólalok az eseményen. Az arcom és a nevem soha nem jelenik meg a videón. A videó csak a szervezők és a regisztráltak számára érhető el: nem kerül közzétételre. A regisztráltak addig nézhetik meg, amíg a regisztrációs adataikat megőrizzük.",
+      "recordingPublic": "Hozzájárulok, hogy a hangomat rögzítsék, amikor felszólalok az eseményen. Hozzájárulok a videó közzétételéhez is: a videót bárki megnézheti az esemény oldalán és a videótárban. Az arcom és a nevem soha nem jelenik meg a videón.",
+      "recordingVisible": "Hozzájárulok az esemény audió/videó felvételéhez.",
+      "recordingVisibleReserved": "Hozzájárulok az esemény videófelvételének elkészítéséhez (hang és kép). A videó csak a szervezők és a regisztráltak számára érhető el: nem kerül közzétételre. A regisztráltak addig nézhetik meg, amíg a regisztrációs adataikat megőrizzük.",
+      "recordingVisiblePublic": "Hozzájárulok az esemény videófelvételének elkészítéséhez (hang és kép) és közzétételéhez: a videót bárki megnézheti az esemény oldalán és a videótárban.",
+      "recordingNoVideo": "Hozzájárulok az esemény felvételéhez. A terem videójáról nem készül felvétel: csak azok hangsávjai maradnak meg, akik hozzájárulnak az átíráshoz, ha az esemény ilyeneket használ.",
       "multitrack": "Hozzájárulok, hogy a felszólalásaimat a nevemmel átírják az esemény beszámolójához. Ha az esemény minden résztvevőről külön hangsávot rögzít, a hangomat csak erre a célra rögzítik, és a sáv az átírás után törlődik; nem használják a hangom azonosítására vagy utánzására.",
+      "multitrackRetained": "Hozzájárulok, hogy a felszólalásaimat a nevemmel átírják az esemény beszámolójához. Ha az esemény minden résztvevőről külön hangsávot rögzít, a hangomat csak erre a célra rögzítik, és a sávot az esemény adataival együtt őrzik meg; nem használják a hangom azonosítására vagy utánzására.",
       "multitrackOptional": "Nem kötelező: ha nem járul hozzá, ugyanúgy részt vesz, de a hozzászólásai nem kerülnek az átiratba, és a hangját nem rögzítjük külön sávon. Ha az eseményt rögzítik, a hangja a videóban így is benne marad.",
+      "multitrackOptionalShort": "Nem kötelező: ha nem járul hozzá, ugyanúgy részt vesz, de a hozzászólásai nem kerülnek az átiratba, és a hangját nem rögzítjük külön sávon.",
       "stayInTouch": "Szeretnék tájékoztatást kapni a következő eseményekről, és bekerülni a címjegyzékbe, hogy hasonló eseményekre meghívjanak",
-      "stayInTouchHelp": "Nem kötelező hozzájárulás (GDPR 6.1.a cikk). Bármikor visszavonhatod a kapott e-mailekben található „Törlés a címjegyzékből” hivatkozással. A név és a szervezet ebből a regisztrációból származik.",
+      "stayInTouchHelp": "Nem kötelező hozzájárulás (GDPR 6.1.a cikk). Bármikor visszavonhatja a visszaigazoló e-mailben, az emlékeztetőkben és a meghívókban található „Adataim eltávolítása a címjegyzékből” hivatkozással, vagy az „Az én adataim” oldalon. A név, az e-mail cím és a szervezet ebből a regisztrációból származik.",
+      "stayInTouchRetention": "Ezeket az adatokat a jelen hozzájárulástól számított {months} hónapig őrizzük meg: az időszak csak akkor indul újra, ha ismét bejelöli a jelölőnégyzetet.",
       "recordingOptionalListenOnly": "Ha nem járul hozzá, akkor is részt vesz, csak hallgatóként: követi az eseményt és ír a csevegésbe, de a mikrofon, a kamera és a képernyőmegosztás kikapcsolva marad. Később a teremből is hozzájárulhat.",
-      "recordingOptionalHost": "Hozzájárulás nélkül is belép és a szokásos módon vezet, de a hangja nem marad meg a személyenkénti sávokban és az átiratban. A terem videója, ha rögzítik, így is tartalmazza Önt.",
       "recordingOptionalVoice": "Ha nem járul hozzá, ugyanúgy részt vesz és felszólalhat, de kimarad a felvételből: sem a neve, sem a hangja, sem a képe nem szerepel. Később a teremből is hozzájárulhat.",
-      "recordingNotice": "Az eseményről felvétel készül (hang és kép). Mikrofon és kamera nélkül veszel részt: a felvétel nem tartalmazza a hangodat és a képedet, kivéve, ha a házigazda szót ad neked.",
-      "recordingNoticeVoice": "Az eseményt rögzítjük (hang és videó). Mikrofon és kamera nélkül vesz részt: a felvétel nem tartalmazza a nevét, a hangját és a képét, hacsak nem járul hozzá a teremben.",
+      "recordingNotice": "Az eseményről felvétel készülhet. Mikrofon és kamera nélkül vesz részt: a felvétel nem tartalmazza a hangját és a képét, kivéve, ha a moderátorok szót adnak Önnek.",
+      "recordingNoticeVoice": "Az eseményről felvétel készülhet. Mikrofon és kamera nélkül vesz részt: az arca és a neve soha nem jelenik meg a videón, a hangja pedig csak akkor, ha a teremben hozzájárul.",
+      "namesMayAppear": "A név, amellyel részt vesz, akkor is megjelenhet a videón, ha nem szólal fel.",
+      "recordingHostsOnly": "Az eseményről felvétel készülhet. A videón csak a moderátorok látszanak és hallatszanak: a résztvevők arca, neve és hangja soha nem kerül bele.",
+      "recordingHostAlwaysReserved": "Ön vezeti ezt az eseményt: mindig szerepel a felvételen, névvel, hanggal, képpel és megosztott képernyővel. A videó csak a szervezők és a regisztráltak számára érhető el: nem kerül közzétételre. A regisztráltak addig nézhetik meg, amíg a regisztrációs adataikat megőrizzük.",
+      "recordingHostAlwaysPublic": "Ön vezeti ezt az eseményt: mindig szerepel a felvételen, névvel, hanggal, képpel és megosztott képernyővel. A videó közzétehető, és bárki megnézheti.",
       "recordingHostAlways": "Ön vezeti ezt az eseményt: mindig szerepel a felvételen, névvel, hanggal, képpel és megosztott képernyővel."
+    },
+    "sheet": {
+      "title": "Ez az esemény és az Ön adatai",
+      "intro": "Ez attól függ, hogyan állították be az eseményt a szervezők. Minden más az adatvédelmi tájékoztatóban található.",
+      "recording": {
+        "label": "Felvétel",
+        "none": "Ehhez az eseményhez nincs tervezett felvétel.",
+        "manual": "A moderátorok elindíthatják a felvételt, hanggal és képpel. Amikor a felvétel aktív, a terem ezt jelzi.",
+        "auto": "Az eseményt a kezdetétől rögzítjük, hanggal és képpel. A terem ezt jelzi.",
+        "tracksOnly": "A terem videójáról nem készül felvétel: csak egy-egy hangsáv minden hozzájáruló személyről.",
+        "destinationReserved": "A felvétel csak a szervezők és a regisztráltak számára érhető el, és nem kerül közzétételre. A regisztráltak addig nézhetik meg, amíg a regisztrációs adataikat megőrizzük.",
+        "destinationPublic": "A felvétel az esemény után közzétehető.",
+        "destinationUnset": "Az esemény után a szervezők döntik el, hogy közzéteszik-e.",
+        "refuseOut": "Ha nem járul hozzá, ugyanúgy részt vesz, és kimarad a felvételből.",
+        "refuseListenOnly": "Ha nem járul hozzá, csak hallgatóként vesz részt.",
+        "hostsAlways": "A videón csak a moderátorok jelennek meg, névvel, hanggal, képpel és megosztott képernyővel. A résztvevők arca és neve soha nem jelenik meg.",
+        "hostsAlwaysVisible": "A moderátorok mindig szerepelnek a felvételen, névvel, hanggal, képpel és megosztott képernyővel.",
+        "hostsOnly": "A videón csak a moderátorok látszanak és hallatszanak, névvel, hanggal, képpel és megosztott képernyővel. A résztvevők arca, neve és hangja soha nem kerül bele.",
+        "audienceNotice": "Mikrofon és kamera nélkül vesz részt: a felvétel nem tartalmazza a hangját és a képét, kivéve, ha a moderátorok szót adnak Önnek.",
+        "audienceNoticeVoice": "Mikrofon és kamera nélkül vesz részt: az arca és a neve soha nem jelenik meg a videón, a hangja pedig csak akkor, ha a teremben hozzájárul."
+      },
+      "transcript": {
+        "label": "Átirat",
+        "captions": "A feliratok szövege a névvel együtt csak a hozzájárulók esetében marad meg, és ez lesz az esemény átirata.",
+        "tracks": "A hozzájárulókról hangsáv készül, amely az átírás után törlődik.",
+        "tracksRetained": "A hozzájárulókról hangsáv készül, amelyet az esemény adataival együtt őrzünk meg.",
+        "fromVideo": "Az esemény után a szervezők csak akkor írathatják át a videót, ha minden beszélő hozzájárult."
+      },
+      "captions": {
+        "label": "Feliratok"
+      },
+      "ai": {
+        "label": "Mesterséges intelligencia",
+        "summary": "Az esemény után egy mesterséges intelligencián alapuló eszköz összefoglalót írhat a felvételről.",
+        "translation": "Az átirat és az összefoglaló automatikusan lefordítható.",
+        "dubbing": "A videó szintetikus hangú szinkront kaphat.",
+        "onRequest": "Az esemény után a szervezők az itt fel nem sorolt automatikus feldolgozásokat is kérhetnek a felvételről: átiratot, összefoglalót vagy fordítást.",
+        "report": "Az esemény után a munkatársak mesterséges intelligenciával beszámolót készíttethetnek, amely a szavazásokra és, ha közzé vannak téve, a kérdésekre is támaszkodhat. A csevegés szövegét nem használjuk fel.",
+        "accuracy": "A mesterséges intelligenciával készült szövegek pontatlanságokat tartalmazhatnak."
+      },
+      "list": {
+        "label": "Résztvevők listája",
+        "visible": "A résztvevők a teremben látják a jelenlévők listáját.",
+        "hidden": "A teremben a közönség nem látja a jelenlévők listáját. A moderátorok és a felszólalók igen."
+      },
+      "name": {
+        "label": "Az Ön neve",
+        "real": "A teremben, a csevegésben és a kérdéseknél a saját nevén jelenik meg.",
+        "pseudonym": "A teremben, a csevegésben és a kérdéseknél álnéven jelenik meg. A szervezők látják a regisztrációs adatait.",
+        "pseudonymTranscript": "Ha hozzájárul az átirathoz, ott a neve megmarad.",
+        "nickname": "Választhatsz becenevet: a többiek ezt látják a neved helyett. A szervezők és a moderátorok tudják, ki áll mögötte.",
+        "nicknameTranscript": "Ha hozzájárulsz az átirathoz, ott a beceneveddel jelensz meg, ha választottál, különben a neveddel."
+      },
+      "retention": {
+        "label": "Megőrzés",
+        "data": "A regisztrációs és a termi adatok az esemény vége után {days, plural, one {# nappal} other {# nappal}} törlődnek. A kérdések és a szavazások név nélkül megmaradnak.",
+        "recordingKept": "A felvétel és ami belőle készül (átirat, összefoglaló, fordítások) nem törlődik ezekkel az adatokkal együtt: akár elérhetővé teszik, akár nem, megmarad, amíg a szervezők nem törlik.",
+        "recordingDays": "A felvétel és ami belőle készül az esemény vége után {days, plural, one {# nappal} other {# nappal}} törlődik, vagy ha a felvételt elérhetővé teszik, a közzététele után ugyanennyivel.",
+        "transcriptKept": "Az átirat nem törlődik ezekkel az adatokkal együtt: megmarad, amíg a szervezők nem törlik.",
+        "transcriptDays": "Az átirat az esemény vége után {days, plural, one {# nappal} other {# nappal}} törlődik."
+      },
+      "addressBook": {
+        "label": "Címjegyzék",
+        "offered": "Regisztrációkor választhatja, hogy az események címjegyzékében marad, hogy hasonló eseményekre meghívást kapjon. Nem kötelező: az adatok a hozzájárulástól számított {months} hónapig megmaradnak, kivéve visszavonás esetén."
+      },
+      "chat": {
+        "label": "Csevegés és kérdések",
+        "messages": "A csevegés üzenetei soha nem kerülnek közzétételre, még a csevegésben feltett kérdések sem.",
+        "questionsText": "Az esemény után közzétehető a Q&A kérdések szövege, de soha nem azoknak a neve, akik feltették őket.",
+        "questionsNone": "A Q&A kérdései nem kerülnek közzétételre."
+      }
     },
     "export": {
       "title": "Az én adataim",
@@ -4401,20 +4805,21 @@
       "submit": "Adataim igénylése",
       "loading": "Keresés...",
       "requestSubmittedTitle": "Nézze meg a postafiókját",
-      "requestSubmittedBody": "Ha az e-mail cím egy regisztrációhoz tartozik, elküldtük Önnek az adatai letöltésére szolgáló linket. A link 1 óráig érvényes.",
+      "requestSubmittedBody": "Ha az e-mail cím egy regisztrációhoz tartozik, elküldtük Önnek az adatai megtekintésére szolgáló linket. A link 1 óráig érvényes.",
       "linkInvalid": "A link érvénytelen vagy lejárt. Kérjen új linket.",
       "requestNew": "Új link kérése",
       "noData": "Ehhez az e-mail címhez nem találhatók adatok.",
       "error": "Hiba történt. Kérjük, próbálja újra később.",
       "rateLimited": "Túl sok kérés. Próbálja újra egy óra múlva.",
       "results": "Az Ön adatai",
-      "resultsDescription": "{count} eseményhez kapcsolódó adatok találhatók.",
+      "resultsDescription": "{count, plural, one {# eseményhez kapcsolódó adatok találhatók.} other {# eseményhez kapcsolódó adatok találhatók.}}",
       "registrationData": "Regisztrációs adatok",
       "fieldName": "Név",
+      "fieldNickname": "Becenév",
       "fieldEmail": "E-mail",
       "fieldOrganization": "Szervezet",
       "fieldRegisteredAt": "Regisztráció dátuma",
-      "fieldConsent": "Hozzájárulás",
+      "fieldConsent": "Az adatvédelmi tájékoztató tudomásulvétele",
       "questionsTitle": "Q&A kérdések",
       "pollVotesTitle": "Szavazási szavazatok",
       "optionLabel": "Lehetőség",
@@ -4436,7 +4841,74 @@
       "consentFuture": "Jövőbeli értesítések",
       "consentWithdrawnOn": "Visszavonva: {date}",
       "consentNoteInRoom": "Ha most a teremben van, a visszavonás a következő belépéstől érvényes: az azonnali érvényhez használja a teremben a Hozzájárulások gombot.",
-      "consentFutureEffect": "Ha visszavonja, többé nem kap értesítést a következő eseményekről, és kikerül a címjegyzékből, minden regisztrációja esetében."
+      "consentGiveNoteInRoom": "Az itt adott hozzájárulás a következő teremben való belépésétől érvényes, a már rögzítettekre nem. A felvételhez és az átiratkészítéshez az esemény végéig lehet hozzájárulni.",
+      "proofsTitle": "Megőrzött hozzájárulási igazolások",
+      "proofsIntro": "Ezen események adatai törölve lettek. Ezek az igazolások addig maradnak meg, amíg a videó vagy az átirat létezik. A hozzájárulását visszavonhatja: ami már a videóban van, az ott marad, és az eltávolításához írnia kell az adatkezelőnek.",
+      "proofGivenOn": "Megadva: {date}",
+      "proofSuperseded": "Egy későbbi hozzájárulás váltotta fel",
+      "proofWithdrawEffect": {
+        "recording": "Az átirathoz adott hozzájárulását is visszavonja: a mondatai és a neve kikerülnek a feliratokból készült átiratból. Ami már a videóban van, az megmarad, ahogy a videóból vagy a hangsávokból készült átirat is: az eltávolításukhoz írjon az adatkezelőnek. A visszavonást erről az oldalról nem lehet semmissé tenni.",
+        "transcription": "A mondatai és a neve kikerülnek a feliratokból készült átiratból. A videóból vagy a hangsávokból készült átirat megmarad: az eltávolításához írjon az adatkezelőnek. A visszavonást erről az oldalról nem lehet semmissé tenni."
+      },
+      "proofWithdrawHost": "A feliratokból készült régebbi átiratok nem ismerik fel a moderátorokat: ott a mondatai és a neve megmaradnak, és az eltávolításukhoz írnia kell az adatkezelőnek.",
+      "roomProofsTitle": "Egy esemény vezetésekor adott hozzájárulások",
+      "roomProofsIntro": "A felvételhez és az átirathoz adott hozzájárulások, amelyeket akkor adott meg, amikor az eseményben betöltött szerepkörrel lépett be a terembe. A terem „Hozzájárulások” ablakában az aktuális belépés hozzájárulásai vonhatók vissza, munkatársi fiókjával pedig a korábbi belépéseké is; a többi esetében, illetve az esemény befejezése után marad az adatai törlése.",
+      "addressBookTitle": "Az események címjegyzéke",
+      "addressBookIntro": "Ön úgy döntött, hogy a címjegyzékben marad, hogy hasonló eseményekre meghívást kapjon. Visszavonás vagy új hozzájárulás hiányában ezeket az adatokat a következő napig őrizzük meg: {date}.",
+      "addressBookOptOut": "Adataim eltávolítása a címjegyzékből",
+      "consentFutureEffect": "Ha visszavonja, többé nem kap értesítést a következő eseményekről, és kikerül a címjegyzékből, minden regisztrációja esetében.",
+      "consentFutureGive": "Hozzájárulok a jövőbeli értesítésekhez",
+      "consentFutureGiveEffect": "Az ebben a regisztrációban szereplő névvel és szervezettel visszakerül az események címjegyzékébe, és ismét kap meghívókat; a megőrzési idő ma újraindul.",
+      "consentGiveDone": "Hozzájárulás megadva: a következő teremben való belépésétől érvényes.",
+      "consentFutureGiveDone": "Hozzájárulás megadva: ismét szerepel az események címjegyzékében.",
+      "consentGiveTextChanged": "A hozzájárulás szövege megváltozott, miután megnyitotta az oldalt: töltse be újra, hogy elolvassa az újat.",
+      "consentGiveClosed": "Ezt a hozzájárulást innen már nem lehet megadni: az esemény véget ért, vagy már nem kéri. Töltse be újra az oldalt az aktuális állapotért.",
+      "consentGiveNewText": "A hozzájárulás szövege megváltozott, miután megadta: a jelenlegi szöveghez újra meg kell adni.",
+      "addressBookPendingTitle": "A címjegyzékbe való visszatérés megerősítésre vár",
+      "addressBookPendingBody": "Ennél a regisztrációnál bejelölték a címjegyzék jelölőnégyzetét, de erre a címre már nem érkeztek meghívók. Amíg nem erősíti meg, semmi sem változik.",
+      "addressBookPendingEffect": "Ha megerősíti, az ebben a regisztrációban szereplő névvel és szervezettel visszakerül a címjegyzékbe, és ismét kap meghívókat. Ha visszavonja a kérést, vagy ha nem Ön volt, a címjegyzéken kívül marad, és nem kap meghívókat.",
+      "addressBookPendingConfirm": "Visszatérés megerősítése",
+      "addressBookPendingCancel": "Kérés visszavonása",
+      "addressBookPendingGone": "Ez a kérés már nem vár megerősítésre. Töltse be újra az oldalt a jelenlegi állapot megtekintéséhez.",
+      "removalTitle": "Az esemény felvétele",
+      "removalIntro": "Ezt az eseményt rögzítették. Ha nem szeretne szerepelni a felvételen, kérheti, hogy eltávolítsák belőle: azokat a részeket, ahol Ön látható vagy beszél, egy tájékoztató tábla takarja el és elnémítják, az átiratot, a feliratokat és az összefoglalót pedig újra elkészítik. A kérelem az adatkezelőhöz kerül, aki megvizsgálja.",
+      "removalButton": "Nem szeretnék szerepelni ezen a felvételen",
+      "removalConfirmTitle": "Megerősíti a kérelmet?",
+      "removalConfirmBody": "Az adatkezelő eltávolítja a felvételből azokat a részeket, ahol Ön látható vagy beszél. A más oldalakon, például a YouTube-on közzétett másolatokat külön kell eltávolítania annak, aki közzétette őket.",
+      "removalConfirm": "Kérelem elküldése",
+      "removalCancel": "Mégse",
+      "removalSent": "A kérelmet elküldtük. Az adatkezelő megvizsgálja.",
+      "removalError": "A kérelmet nem sikerült elküldeni. Próbálja újra később.",
+      "removalStatusOpen": "Kérelem ({date}): folyamatban.",
+      "removalStatusClosed": "Kérelem ({date}): teljesítve ({closed}).",
+      "removalStatusRejected": "Kérelem ({date}): elutasítva. Az ok megismeréséhez írjon az adatkezelőnek.",
+      "editButton": "Név és szervezet javítása",
+      "editScopeLegend": "Mely regisztrációkra vonatkozik",
+      "editScopeOne": "Csak ez a regisztráció",
+      "editScopeAll": "Az összes regisztrációm ({count}) és az események címjegyzéke",
+      "editEffect": "A javítás a következő e-mailekre és a következő teremben való belépésétől érvényes. Nem változtat a már rögzített, átírt vagy a csevegésben leírt tartalmon, sem a hozzájárulási igazolásokon.",
+      "editNameInvalid": "A névnek 2 és 100 karakter közötti hosszúságúnak kell lennie.",
+      "editOrganizationRequired": "Az egyik esemény, amelyre regisztrált, kéri a szervezetet: nem hagyható üresen.",
+      "editOrganizationTooLong": "A szervezet legfeljebb 200 karakter lehet.",
+      "editDone": "Az adatok javítva.",
+      "nicknameChoose": "Becenév választása",
+      "nicknameChange": "Becenév módosítása",
+      "nicknameEffect": "Mások a neve helyett a becenevet látják: a csevegésben és a kérdéseknél azonnal, a videóban a következő belépésétől a terembe. Ami már rögzítve, átírva vagy leírva van, nem változik.",
+      "nicknameDone": "A becenév mentve.",
+      "codeWhy": "Biztonsági okból a javításokat és törléseket egy kóddal kell megerősíteni, amelyet a regisztráció e-mail-címére küldünk.",
+      "codeSend": "Kérem a megerősítő kódot",
+      "codeSent": "E-mailben elküldtünk Önnek egy 6 jegyű kódot. Írja be ide: {minutes, plural, one {# percig} other {# percig}} érvényes.",
+      "codeLabel": "Megerősítő kód",
+      "codeConfirmEdit": "Javítás megerősítése",
+      "codeConfirmNickname": "Becenév megerősítése",
+      "codeInvalid": "A kód hibás vagy lejárt. Nézze meg a legutóbb kapott e-mailt, vagy szakítsa meg, és kérjen újat.",
+      "cancelTitle": "A regisztráció törlése",
+      "cancelIntro": "Csak ezt a regisztrációt törölheti, a többi regisztráció és a többi adata érintetlen marad.",
+      "cancelButton": "Regisztráció törlése",
+      "cancelDeletes": "Törlődik az erre az eseményre szóló regisztráció és mindaz, amit vele tett: kérdések, szavazatok, csevegőüzenetek, visszajelzések, kérdőívekre adott válaszok, az Ön mondatai a feliratokból készült átiratban és a sorban álló e-mailek. A személyes linkje nem működik tovább, a hely felszabadul.",
+      "cancelKeeps": "Megmaradnak a többi regisztrációja, az események címjegyzéke, a profilképe és egy még folyamatban lévő kérelem a felvételből való eltávolításra. Ha erről az eseményről van videó vagy átirat, a hozzájárulásának igazolása az Ön neve nélkül megmarad, amíg ezek léteznek. A törlés nem vonható vissza; amíg az esemény fogad regisztrációkat, újra regisztrálhat.",
+      "codeConfirmCancel": "Regisztráció törlése",
+      "cancelDone": "A regisztráció törölve."
     },
     "erasure": {
       "title": "Az Ön adatainak törlése",
@@ -4448,13 +4920,15 @@
       "requestSubmittedTitle": "Nézze meg a postafiókját",
       "requestSubmittedBody": "Ha az e-mail cím egy regisztrációhoz tartozik, elküldtük Önnek a törlés megerősítésére szolgáló linket. A link 1 óráig érvényes.",
       "linkInvalid": "A link érvénytelen vagy lejárt. Kérjen új linket.",
-      "confirmWarning": "Az e-mail címéhez társított összes személyes adat végleges törlésére készül.",
+      "confirmWarning": "Az e-mail címéhez társított személyes adatok végleges törlésére készül, kivéve az alább felsoroltakat.",
       "confirmBody": "Törlésre kerülnek a regisztrációk, a kérdések, a szavazatok, a visszajelzések, az emlékeztetők és az Ön bejegyzése az események címjegyzékében. A művelet visszavonhatatlan.",
+      "confirmProofs": "Ha egy eseménynek van videója vagy átirata, akkor is, ha még nincs közzétéve, a hozzájárulás típusa, a dátum és a szöveg, amelyre válaszolt, a neve nélkül megmarad, amíg az a videó vagy az az átirat létezik. Ezek a hozzájárulás igazolására szolgálnak. A videó nem változik: ha kérni szeretné a hozzászólásai eltávolítását, írjon az adatkezelőnek. A feliratokból készült régebbi átiratok nem ismerik fel azokat, akik az eseményben betöltött szerepkörrel vezetnek vagy szólalnak fel: ott a mondatai és a neve megmaradnak, és az eltávolításukhoz írnia kell az adatkezelőnek.",
       "confirmButton": "Törlés megerősítése",
       "cancel": "Mégse",
       "processing": "Törlés folyamatban...",
       "doneTitle": "A törlés befejeződött",
-      "doneBody": "{count} regisztráció és a kapcsolódó adatok törölve lettek.",
+      "doneBody": "{count, plural, =0 {Nincs törlendő regisztráció.} one {# regisztrációt töröltünk a kapcsolódó adatokkal együtt.} other {# regisztrációt töröltünk a kapcsolódó adatokkal együtt.}}",
+      "doneProofs": "{count, plural, one {# hozzájárulási igazolás maradt meg, az Ön neve nélkül, amíg a videó vagy az átirat létezik.} other {# hozzájárulási igazolás maradt meg, az Ön neve nélkül, amíg a videó vagy az átirat létezik.}}",
       "error": "Hiba történt. Kérjük, próbálja újra később.",
       "rateLimited": "Túl sok kérés. Próbálja újra egy óra múlva.",
       "back": "Vissza az adataimhoz",
@@ -5232,7 +5706,8 @@
     "overlapTitle": "Egyidejű beszéd: ebben az intervallumban egyszerre több személy beszél.",
     "anonymousSpeaker": "{n}. résztvevő",
     "untranscribed": "Nincs átírva: a beszélő nem járult hozzá",
-    "unrecordedSpeech": "Egyes felszólalások nincsenek a felvételen: a felszólalók nem adtak hozzájárulást."
+    "unrecordedSpeech": "Egyes felszólalások nincsenek a felvételen: a felszólalók nem adtak hozzájárulást.",
+    "unrecordedSpeechHostsOnly": "Egyes felszólalások nincsenek a felvételen: a videón csak a moderátorok látszanak és hallatszanak."
   },
   "waiting": {
     "startsIn": "Az esemény kezdéséig hátralévő idő",
@@ -5249,7 +5724,9 @@
     "watchNow": "Megtekintés",
     "switchToLive": "Váltás élő közvetítésre",
     "enterRoom": "Belépés a szobába",
-    "recordingNotice": "Ez az esemény rögzítésre kerül.",
+    "recordingNotice": "Erről az eseményről felvétel készülhet.",
+    "recordingNoticeInstant": "A hívásról felvétel készülhet. A videón csak a moderátorok jelennek meg: az Ön arca és neve soha. Ha valaki elindítja a felvételt, megkérdezzük, hozzájárul-e a hangja rögzítéséhez.",
+    "recordingNoticeInstantHostsOnly": "A hívásról felvétel készülhet. A videón csak a moderátorok látszanak és hallatszanak: a résztvevők arca, neve és hangja soha nem kerül bele.",
     "recordingAvailableAfter": "A felvétel az esemény után lesz elérhető.",
     "autoRefreshHint": "Az oldal automatikusan frissül, amikor az esemény elkezdődik.",
     "startEventButton": "Esemény indítása",
@@ -5300,10 +5777,15 @@
     "classicView": "Klasszikus nézet",
     "backToGarden": "A tér megjelenítése",
     "aiNoticeTitle": "MI-feldolgozás az esemény után",
-    "aiNotice": "A végén a felvételt mesterséges intelligencia eszközök dolgozzák fel átirat, összefoglaló, valamint esetleges fordítások és szinkron készítéséhez. Az eredmények pontatlanságokat tartalmazhatnak; a mérvadó forrás továbbra is a videó.",
+    "aiNotice": "A végén a felvételt mesterséges intelligencia eszközök dolgozhatják fel átirat, összefoglaló, valamint esetleges fordítások és szinkron készítéséhez. Az átirat csak a hozzájárulókra vonatkozik. Az eredmények pontatlanságokat tartalmazhatnak; a mérvadó forrás továbbra is a videó.",
     "multitrackConsentTitle": "Felszólalásai átirata",
-    "recordingConsentTitle": "Az esemény felvétele",
-    "recordingConsentIntro": "Az eseményt rögzítjük (hang és videó). Hozzájárulás esetén a felvétel tartalmazza a nevét, a hangját, a képét és a megosztott képernyőjét.",
+    "recordingConsentTitle": "Az Ön hangjának rögzítése",
+    "recordingConsentTitleVisible": "Az esemény felvétele",
+    "recordingConsentIntro": "Az eseményről felvétel készülhet. A videón csak a moderátorok jelennek meg: az Ön arca és neve soha. Hozzájárulásával a hangját rögzítjük, amikor beszél.",
+    "recordingConsentIntroAnonymous": "Az eseményről felvétel készülhet. A videón csak a moderátorok jelennek meg: az Ön arca és álneve soha. Hozzájárulásával a hangját rögzítjük, amikor beszél.",
+    "recordingConsentIntroVisible": "Az eseményről felvétel készülhet (hang és videó). Hozzájárulás esetén a felvétel tartalmazza a nevét, a hangját, a képét és azt, amit a képernyőn megoszt.",
+    "recordingConsentIntroVisibleAnonymous": "Az eseményről felvétel készülhet (hang és videó). Hozzájárulás esetén a felvétel tartalmazza az álnevét, a hangját, a képét és azt, amit a képernyőn megoszt.",
+    "recordingConsentIntroNoVideo": "Ezen az eseményen a terem videójáról nem készül felvétel.",
     "enterGardenTitle": "Lépj be a térre",
     "enterGardenHint": "Egy másik hely a várakozáshoz: sétáljon, találkozzon a többi várakozóval, és lépjen be az élő eseménybe a kapun, amikor a terem megnyílik.",
     "backToWaitingRoom": "Vissza a váróterembe",
@@ -5550,11 +6032,14 @@
       "7d": "7 nap",
       "30d": "30 nap",
       "90d": "90 nap",
+      "1y": "1 év",
+      "days": "{count, plural, one {# nap} other {# nap}}",
       "forever": "Nincs automatikus törlés"
     },
-    "retentionNote": "A közzétett videóra nem vonatkozik az esemény adatainak megőrzési ideje: időtartam nélkül nyilvános marad, amíg valaki nem törli.",
+    "retentionNote": "A felvételre nem vonatkozik az esemény adatainak megőrzési ideje: időtartam nélkül megmarad, akár közzétették, akár nem, amíg valaki nem törli. Az időtartam a közzétételtől, vagy ha a videót nem tették közzé, az esemény végétől számít; lejártakor törlődik a videó és ami belőle készült (átiratok, összefoglalók, fordítások).",
+    "retentionLegacy": "Az eseményre regisztráltaknak azt mondták, hogy a nem közzétett felvétel az adataikkal együtt törlődik, az esemény vége után {days, plural, one {# nappal} other {# nappal}}. Amíg a videó nincs közzétéve, ezt az időtartamot lerövidítheti, de nem szüntetheti meg és nem hosszabbíthatja meg.",
     "delete": "Felvétel törlése",
-    "deleteConfirm": "Biztos benne? A videó véglegesen törlésre kerül.",
+    "deleteConfirm": "Biztos benne? A videó véglegesen törlésre kerül. Az átiratok, összefoglalók és fordítások nem törlődnek vele együtt: a felvételhez itt választott időtartamot követik.",
     "notConfigured": "Jibri nincs konfigurálva. A videofelvétel nem elérhető.",
     "disabledHint": "A videófelvétel nincs engedélyezve ehhez az eseményhez. Az engedélyezéshez nyissa meg fent a Beállítások szakaszt, és kapcsolja be a „Felvétel” kapcsolót.",
     "play": "Lejátszás",
@@ -5570,6 +6055,8 @@
     "audiencePublicDesc": "Bárki, aki megnyitja az esemény oldalát. Megjelenhet a videótárban.",
     "audienceRegistrants": "Csak a regisztráltak",
     "audienceRegistrantsDesc": "Akik regisztráltak az eseményre, akkor is, ha nem léptek be a terembe, az e-mailes értesítés személyes linkjén keresztül. Nem jelenik meg a videótárban.",
+    "audienceReservedNote": "A hozzájárulók csak regisztráltaknak szóló felvételhez járultak hozzá: a videót csak a regisztráltak és a szervezők láthatják.",
+    "destinationMissing": "Ez az esemény nem adja meg, hová kerül a felvétel: az összegyűjtött hozzájárulásokból nem derül ki, hogy a videó közzétételre került volna-e. Közzététel előtt ellenőrizze.",
     "saveFailed": "A módosítás nem mentődött el. Próbáld újra."
   },
   "postEvent": {
@@ -5579,7 +6066,9 @@
     "libraryListed": "Közzététel a videókönyvtárban",
     "libraryListedHelp": "Megjeleníti ezt az eseményt a nyilvános könyvtárban (/video-library). Közzétett felvételt vagy YouTube-videót igényel, és azt, hogy az esemény oldala látható legyen.",
     "libraryListedNoRecording": "Nincs közzétett felvétel: az esemény addig nem jelenik meg a könyvtárban, amíg közzé nem teszi a felvételt, vagy hozzá nem ad egy YouTube-videót.",
-    "showQA": "Q&A kérdések megjelenítése",
+    "libraryListedReserved": "Csak regisztráltaknak szóló felvétel: az esemény nem jelenik meg a videótárban.",
+    "showQA": "A Q&A kérdések szövegének megjelenítése, nevek nélkül",
+    "qaReservedNote": "Csak regisztráltaknak szóló felvétel esetén a kérdések nem kerülnek közzétételre.",
     "showMaterials": "Megosztott anyagok megjelenítése",
     "showPolls": "Szavazási eredmények megjelenítése",
     "showFeedback": "Visszajelzések megjelenítése",
@@ -5591,7 +6080,7 @@
     "visibilityAlways": "Mindig látható",
     "visibilityUntil": "Látható eddig:",
     "dataRetentionNote": "A résztvevők személyes adatai az esemény megőrzési szabálya szerint kerülnek törlésre ({days} nap). Az esemény tartalma az oldal láthatóságáig elérhető marad.",
-    "availableUntil": "Ez az esemény és tartalmai {date}-ig lesznek elérhetők.",
+    "participantDataUntil": "A résztvevők személyes adatainak törlési dátuma: {date}.",
     "tabs": {
       "qa": "Kérdések és válaszok",
       "materials": "Anyagok",
@@ -5672,7 +6161,7 @@
       "strengths": "Erősségek",
       "improvements": "Fejlesztendő",
       "quotes": "A hozzászólásokból",
-      "aiNotice": "A szöveget mesterségesintelligencia-modell írta az átirat, a csevegés, a kérdések, a szavazások és az értékelések alapján, és a csapat közzététel előtt átnézte. A számokat és a grafikonokat a platform számítja ki. Pontatlanságokat tartalmazhat."
+      "aiNotice": "A szöveget mesterségesintelligencia-modell írta az átirat, a szavazások, az értékelések és, ha közzé vannak téve, a kérdések alapján, és a csapat közzététel előtt átnézte. A számokat és a grafikonokat a platform számítja ki. Pontatlanságokat tartalmazhat."
     },
     "languages": {
       "title": "Megtekintés nyelve",
@@ -5733,7 +6222,7 @@
       "confirm": "Eltávolítás megerősítése",
       "submitting": "Eltávolítás folyamatban…",
       "successTitle": "Eltávolítás befejezve",
-      "successBody": "Az adatai már nem szerepelnek az események címjegyzékében.",
+      "successBody": "Mostantól nem kap több meghívót. Az e-mail címét már eltávolítottuk; a nevét és a szervezetét legkésőbb a következő napon töröljük a címjegyzékből.",
       "errors": {
         "generic": "Hiba történt. Kérjük, próbálja újra később."
       }
@@ -5831,12 +6320,21 @@
     "recordingWithoutMedia": "Ennek a felvételnek nincs videója: az átirata az élő feliratokból származik.",
     "recordingWithoutVideo": "Erről a felvételről megvannak a résztvevők hangsávjai, de a videó nincs: nem rögzítették, vagy még nem érkezett meg. A letölthető archívumhoz a videó is kell.",
     "noParticipantTracks": "Nincsenek külön hangsávok a résztvevőkről: nem rögzítették őket, vagy már törölték. Ha szükség van rájuk, az esemény előtt kapcsolja be a résztvevőnkénti felvételt.",
+    "noTranscribableTracks": "Ennek a felvételnek egyetlen sávja sem írható át: törölték őket, vagy akik szerepelnek rajtuk, nem járultak hozzá a névvel ellátott átirathoz.",
+    "tracksPending": "Ennek a felvételnek a sávjai még nem érkeztek meg: az átírás magától elindul, amint megérkeznek.",
     "summaryMissing": "Ezen a nyelven még nincs szerkeszthető összefoglaló: előbb hozza létre.",
     "storageUnavailable": "Ebben a telepítésben a fájlfeltöltés nem érhető el.",
     "aiDisabledForEvent": "Az MI ki van kapcsolva ennél az eseménynél: az „AI-tartalom létrehozása” gombbal bekapcsolhatja és elindíthatja a feldolgozást.",
     "sourceTranscriptMissing": "Ez a felvétel még nincs átírva: előbb írja át, aztán adjon hozzá fordítást.",
     "captionsTranscriptNotTranslatable": "Ez az átirat az élő feliratokból származik: az automatikus fordításhoz a felvétel MI-átirata szükséges.",
     "sameLanguage": "A választott nyelv a felvétel eredeti nyelve: válasszon másikat.",
-    "mtUnavailable": "A gépi fordítás nincs telepítve ezen a példányon."
+    "recordingDestinationNotCovered": "Az esemény hozzájárulásai csak regisztráltaknak szóló felvételre érvényesek: nem teheti mindenki számára láthatóvá, és nem kapcsolhat hozzá külső videót.",
+    "mtUnavailable": "A gépi fordítás nincs telepítve ezen a példányon.",
+    "recordingContentOrganizerOnly": "Az esemény felvételeinek tartalmát csak az esemény szervezői nyithatják meg, módosíthatják vagy tehetik közzé.",
+    "recordingRetentionLegacy": "Az eseményre regisztráltaknak azt mondták, hogy a nem közzétett felvétel az adataikkal együtt törlődik: amíg a videó nincs közzétéve, az időtartama lerövidíthető, de nem szüntethető meg és nem hosszabbítható meg."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Kérelemre eltávolított tartalom",
+    "cardBody": "A felvétel ezen részét egy benne szereplő személy kérelmére eltávolították."
   }
 }

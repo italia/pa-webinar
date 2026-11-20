@@ -6,6 +6,7 @@ import { notFound, redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
 import { getStaffSession, puoGestire } from '@/lib/auth/staff-session';
+import { organizzaEvento } from '@/lib/recording/content-access';
 import AccessDenied from '@/components/admin/access-denied';
 import { localizedPath } from '@/lib/utils/localized-url';
 import { eventAdminPath } from '@/lib/events/admin-links';
@@ -17,13 +18,14 @@ import { rubricaConPersone } from '@/lib/persons/rubrica-picker';
 import { capacitaIstanza } from '@/lib/capacity/istanza';
 import { getSettings } from '@/lib/settings';
 import { liveCaptionsAvailable } from '@/lib/captions/availability';
-import { recordingAvailable, voceNelVideo } from '@/lib/recording/availability';
+import { partecipantiNelVideo, recordingAvailable } from '@/lib/recording/availability';
 import { traduzioneDisponibile, ultimoLavoroTraduzione } from '@/lib/text-translation/enqueue';
 import { calcolaStatoTesti } from '@/lib/text-translation/auto';
 import { agendaGiaUsata } from '@/lib/agenda/status';
 import { Link, percorso } from '@/i18n/navigation';
 import { WIZARD_ADVANCED_SECTIONS, wizardStepFromParam, type WizardAdvancedSection } from '@/lib/events/wizard-steps';
 import { salaForseAperta } from '@/lib/live/room-open';
+import { domandaDestinazione } from '@/lib/events/destination-question';
 import EventWizard, {
   type InitialEventShape,
 } from '@/components/admin/event-wizard/wizard-shell';
@@ -154,15 +156,22 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
   // nell'indirizzo si toglie; chi ha solo il link del moderatore entra col token.
   const session = await getStaffSession(await cookies());
   const staffCanManage = session ? await puoGestire(session, id) : false;
-  if (token && staffCanManage) {
+  // Il token si toglie solo a chi organizza l'evento: l'admin che non lo
+  // organizza modifica con il link di conduzione, e senza resterebbe fuori.
+  const staffOrganizza = session ? await organizzaEvento(session, id) : false;
+  if (token && staffOrganizza) {
     redirect(localizedPath(eventAdminPath(id, { edit: true, step: initialStep, section: initialSection }), locale));
   }
   if (!token) {
     if (!session) notFound();
     if (!staffCanManage) return <AccessDenied />;
+    // La modifica si salva con il link di conduzione, che apre anche la
+    // pubblicazione e la cancellazione del video: e' di chi organizza
+    // l'evento, non dell'admin che non lo organizza (lib/recording/content-access).
+    if (!staffOrganizza) return <AccessDenied motivo="organizzatore" />;
   }
 
-  const [event, siteSettings, tags, gdprTemplates, ultimaTraduzione] = await Promise.all([
+  const [event, siteSettings, tags, gdprTemplates, ultimaTraduzione, modelliCatalogo] = await Promise.all([
     prisma.event.findUnique({
       where: { id },
       include: {
@@ -203,6 +212,13 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       select: { id: true, name: true, isDefault: true },
     }),
     ultimoLavoroTraduzione(id),
+    // I modelli fra cui correggere il catalogo dell'evento: solo per lo staff.
+    staffCanManage
+      ? prisma.eventTemplate.findMany({
+          orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+          select: { id: true, name: true },
+        })
+      : undefined,
   ]);
 
   if (!event || (token && event.moderatorToken !== token)) {
@@ -254,10 +270,14 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
 
   const matrix: PermissionMatrix | null = coerceMatrix(event.permissionMatrix);
 
+  const destinazione = await domandaDestinazione(event);
+
   const initialEvent: InitialEventShape = {
     id: event.id,
     slug: event.slug,
     moderatorToken: event.moderatorToken,
+    salaGiaAperta: destinazione.salaGiaAperta,
+    destinazioneDaChiedere: destinazione.daChiedere,
     event: {
       title: (event.title ?? {}) as Record<string, string>,
       description: (event.description ?? {}) as Record<string, string>,
@@ -289,7 +309,10 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       autoStartRecording: event.autoStartRecording,
       audienceAnonymous: event.audienceAnonymous,
       participantListVisible: event.participantListVisible,
+      nicknamesEnabled: event.nicknamesEnabled,
       hostsAlwaysRecorded: event.hostsAlwaysRecorded,
+      recordingDestination: event.recordingDestination,
+      recordingAudience: event.recordingAudience,
       aiTranscriptEnabled: event.aiTranscriptEnabled,
       aiSummaryEnabled: event.aiSummaryEnabled,
       aiTranslationEnabled: event.aiTranslationEnabled,
@@ -300,7 +323,9 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       expectedSpeakers: event.expectedSpeakers,
       status: event.status,
       dataRetentionDays: event.dataRetentionDays,
+      recordingDeleteAfterDays: event.recordingDeleteAfterDays,
       postEventPublic: event.postEventPublic,
+      postEventShowQA: event.postEventShowQA,
       gdprTemplateId: event.gdprTemplateId,
       privacyPolicyText: event.privacyPolicyText,
       privacyPolicyUrl: event.privacyPolicyUrl,
@@ -311,10 +336,14 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       moderatorPublicListed: event.moderatorPublicListed,
       moderatorPhotoId: event.moderatorPhotoId,
       eventType: event.eventType,
+      templateId: event.templateId,
+      templateName: event.templateName,
+      formatClass: event.formatClass,
       accessMode: event.accessMode,
       requireOrganization: event.requireOrganization,
       requireOrganizationRole: event.requireOrganizationRole,
       requireOrganizationType: event.requireOrganizationType,
+      offerAddressBook: event.offerAddressBook,
     },
     organizers: event.organizers.map((o) => ({
       id: o.id,
@@ -398,11 +427,17 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
         copia={copiaInBozza}
         initialStep={initialStep}
         initialSection={initialSection}
-        canUseRubrica={session?.role === 'admin' && (await rubricaConPersone())}
+        canUseRubrica={
+          session?.role === 'admin' &&
+          siteSettings.addressBookEnabled !== false &&
+          (await rubricaConPersone())
+        }
         canManageTags={session?.role === 'admin'}
         publicRegistrationEnabled={siteSettings.publicRegistrationEnabled}
+        addressBookEnabled={siteSettings.addressBookEnabled}
         viaToken={staffCanManage ? null : (token ?? null)}
         initialEvent={initialEvent}
+        modelliCatalogo={modelliCatalogo}
         siteTimezone={event.timezone}
         salaAperta={await salaForseAperta(event)}
         enabledLocales={
@@ -428,7 +463,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
         )}
         liveCaptionsAvailable={liveCaptionsAvailable(siteSettings)}
         recordingAvailable={recordingAvailable()}
-        voceNelVideo={voceNelVideo()}
+        partecipantiNelVideo={partecipantiNelVideo()}
         defaultTargetLocales={siteSettings.aiDefaultTargetLocales}
         aiPipelineEnabled={siteSettings.aiPipelineEnabled}
         // La traduzione al salvataggio la decide il server, per chiunque salvi.

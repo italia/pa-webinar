@@ -39,6 +39,11 @@ export function validateStep(
   /** Il massimo accettato per la conservazione: in modifica, se l'evento ha
    *  gia' un valore piu' alto (una pubblicazione in libreria), quello. */
   retentionMax: number = MAX_RETENTION_DAYS,
+  /** La destinazione della registrazione si deve scegliere: un evento nuovo, uno
+   *  mai aperto e senza iscrizioni (lib/events/destination-question), o uno su
+   *  cui questo salvataggio accende la registrazione. Un evento che registrava
+   *  gia', nato prima di questa scelta, si salva anche senza. */
+  chiedeDestinazione = false,
 ): Record<string, string> {
   const errs: Record<string, string> = {};
   if (step === 'base') {
@@ -96,18 +101,25 @@ export function validateStep(
     ) {
       errs['maxParticipants'] = 'outOfRange';
     }
+    // Con la registrazione spenta non c'e' niente da dichiarare a chi partecipa.
+    if (chiedeDestinazione && form.recordingEnabled && !form.recordingDestination) {
+      errs['recordingDestination'] = 'required';
+    }
   }
   return errs;
 }
 
 /**
  * Le sezioni delle impostazioni avanzate che mostrano questi errori: quella
- * dei dati (conservazione, informativa) e quella tecnica (partecipanti
- * attesi). Con errori in entrambe si aprono entrambe; senza un campo noto,
- * quella dei dati.
+ * della registrazione (destinazione), quella dei dati (conservazione,
+ * informativa) e quella tecnica (partecipanti attesi). Con errori in piu'
+ * sezioni si aprono tutte; senza un campo noto, quella dei dati.
  */
-export function sezioniDegliErrori(chiavi: readonly string[]): Array<'data' | 'technical'> {
-  const out: Array<'data' | 'technical'> = [];
+export function sezioniDegliErrori(
+  chiavi: readonly string[],
+): Array<'recording' | 'data' | 'technical'> {
+  const out: Array<'recording' | 'data' | 'technical'> = [];
+  if (chiavi.includes('recordingDestination')) out.push('recording');
   if (chiavi.some((k) => k === 'dataRetentionDays' || k === 'gdprTemplateId')) out.push('data');
   if (chiavi.includes('maxParticipants')) out.push('technical');
   return out.length > 0 ? out : ['data'];
@@ -148,6 +160,7 @@ const INLINE_FIELDS: ReadonlyMap<string, StepKey> = new Map<string, StepKey>([
   ['aiTargetLocales', 'base'],
   ['gdprTemplateId', 'advanced'],
   ['dataRetentionDays', 'advanced'],
+  ['recordingDestination', 'advanced'],
   ['moderatorName', 'invites'],
   ['moderatorEmail', 'invites'],
   ['moderatorOrganization', 'invites'],
@@ -236,10 +249,14 @@ export function campiMancanti(
   /** Si pubblica da qui (creazione): contano anche i dati che servono solo
    *  per pubblicare. In modifica si aggiorna e basta. */
   conPubblicazione = true,
+  /** Vedi `validateStep`. */
+  chiedeDestinazione = false,
 ): CampoMancante[] {
   const out: CampoMancante[] = [];
   for (const step of STEP_KEYS) {
-    for (const key of Object.keys(validateStep(step, form, defaultLocale, retentionMax))) {
+    for (const key of Object.keys(
+      validateStep(step, form, defaultLocale, retentionMax, chiedeDestinazione)
+    )) {
       out.push({ key, step, perPubblicare: false });
     }
   }

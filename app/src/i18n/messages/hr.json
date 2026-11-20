@@ -142,10 +142,7 @@
       "votes": "{count, plural, =0 {nema glasova} one {# glas} few {# glasa} other {# glasova}}",
       "topWords": "Najčešće dijeljene riječi",
       "feedback": "Prosječna ocjena",
-      "feedbackCount": "{count, plural, one {# odgovor} few {# odgovora} other {# odgovora}}",
-      "chatQuestions": "Pitanja iz chata",
-      "reactionsCount": "{count, plural, one {# reakcija} few {# reakcije} other {# reakcija}}",
-      "answered": "odgovoreno"
+      "feedbackCount": "{count, plural, one {# odgovor} few {# odgovora} other {# odgovora}}"
     },
     "detail": {
       "title": "Pojedinosti o događaju",
@@ -191,7 +188,7 @@
       },
       "chatNotSaved": "Poruke chata ne objavljuju se nakon događaja: brišu se zajedno s ostalim podacima događaja.",
       "qaPostEvent": "Pitanja i odgovori s događaja",
-      "peakParticipants": "Vrh: {count} sudionika",
+      "peakParticipants": "{count, plural, one {Vrh: # sudionik} few {Vrh: # sudionika} other {Vrh: # sudionika}}",
       "calendar": {
         "addToCalendar": "Dodaj u kalendar",
         "google": "Google Calendar",
@@ -202,11 +199,13 @@
       "registrationEnded": "Događaj je završen: prijave su zatvorene.",
       "joinAsGuest": "Pridruži se kao gost",
       "registeredUseEmailLink": "Već ste prijavljeni? Uđite osobnom poveznicom iz e-pošte.",
-      "willBeRecorded": "Događaj će se snimati.",
+      "willBeRecorded": "Događaj se može snimati.",
       "machineTranslation": "Automatski prijevod",
       "machineTranslationNote": "Naslov i opis preveo je automatski model i još ih nitko nije pregledao.",
       "previewTitle": "Pregled za tim",
       "previewBody": "Snimka još nije objavljena: ovu verziju stranice vide samo oni koji upravljaju događajem.",
+      "previewBodyPageHidden": "Ova stranica nije vidljiva javnosti: tko otvori adresu, neće je pronaći. Vide je samo oni koji upravljaju događajem.",
+      "previewBodyPageRegistrants": "Ova stranica nije vidljiva javnosti: tko otvori adresu, neće je pronaći. Vide je samo prijavljeni na događaj i oni koji njime upravljaju.",
       "recordingForRegistrantsTitle": "Snimka samo za prijavljene",
       "recordingForRegistrantsBody": "Ako ste se prijavili na događaj, otvorite osobnu poveznicu iz e-pošte „snimka je dostupna” ili zatražite da vam je ponovno pošaljemo.",
       "recordingLinkEmailLabel": "E-pošta kojom ste se prijavili",
@@ -243,8 +242,8 @@
     "namePlaceholder": "Ime će biti prikazano u dvorani događaja",
     "email": "E-pošta",
     "emailPlaceholder": "Primit ćete poveznicu za pristup događaju",
-    "gdprConsent": "Pristajem na obradu svojih osobnih podataka (ime, email) u skladu s Uredbom EU 2016/679 (GDPR) za sudjelovanje u ovom događaju.",
-    "consentsLegend": "Privole",
+    "gdprConsent": "Pročitao/la sam politiku privatnosti o obradi osobnih podataka (ime, email) za sudjelovanje u ovom događaju.",
+    "consentsLegend": "Politika privatnosti i privole",
     "requiredMark": "obavezno",
     "optionalMark": "neobavezno",
     "gdprLink": "Pročitajte cjelovitu politiku privatnosti",
@@ -292,12 +291,13 @@
       "emailRequired": "Unesite svoju email adresu",
       "emailInvalid": "Unesite valjanu email adresu",
       "organizationRequired": "Unesite svoju ustanovu",
-      "consentRequired": "Pristanak na obradu podataka je obvezan",
+      "consentRequired": "Za prijavu potvrdite da ste pročitali politiku privatnosti",
       "recordingConsentRequired": "Pristanak na snimanje je obvezan za ovaj događaj",
       "eventFull": "Događaj je dosegnuo maksimalan broj sudionika",
       "generic": "Pogreška pri prijavi. Molimo pokušajte ponovno.",
       "questionnaireRequired": "Za prijavu odgovorite na pitanja iz upitnika.",
       "questionnaireIncomplete": "Odgovorite na sva obavezna pitanja iz upitnika.",
+      "recordingDestinationChanged": "Tekst o snimanju promijenio se dok ste ispunjavali obrazac: ponovno učitajte stranicu i pročitajte ga još jednom.",
       "questionnaireChanged": "Upitnik se promijenio dok ste ispunjavali obrazac: ponovno učitajte stranicu i ponovno odgovorite."
     }
   },
@@ -363,7 +363,7 @@
       "publicHelpNone": "Stranica završenog događaja ostaje vidljiva, s naslovom i opisom.",
       "sections": {
         "recap": "sažetak",
-        "qa": "pitanja iz Q&A",
+        "qa": "tekst pitanja iz Q&A",
         "polls": "objavljene ankete",
         "wordCloud": "oblak riječi",
         "materials": "materijale",
@@ -424,6 +424,7 @@
       "noMessages": "Nema poruka",
       "empty": "Još nema poruka. Budite prvi!",
       "inputLabel": "Poruka razgovora",
+      "personalDataNotice": "Ne pišite tuđe osobne podatke ni svoje koje ne želite otkriti: osobe u dvorani mogu čitati i preuzeti chat.",
       "moderatorBadge": "Moderator",
       "attach": "Priloži datoteku",
       "emojiPicker": "Umetni emoji",
@@ -544,7 +545,9 @@
       "locksByConsent": "Mikrofoni i kamere slijede pristanak na snimanje: tko ga je dao koristi ono što događaj dopušta, ostali samo slušaju. Zaključavanja sobe ostaju uključena.",
       "listenOnlyBadge": "samo sluša",
       "listenOnlyNoFloor": "Nije dao privolu za snimanje: ne može govoriti dok je ne da u svojoj dvorani.",
-      "voiceExcludedBadge": "bez snimanja",
+      "inVideoBadge": "u videozapisu",
+      "voiceRecordedBadge": "glas se snima",
+      "voiceExcludedBadge": "glas se ne snima",
       "voiceExcludedFloor": "Bez privole za snimanje: može sudjelovati, ali ostaje izvan snimke."
     },
     "moderator": {
@@ -621,6 +624,7 @@
       "tab": "Režija",
       "recordingHeading": "Snimanje",
       "recordingOff": "Ne snima se",
+      "recordingNotOfferedInstant": "U brzim pozivima snimanje se nudi samo ondje gdje osobe bez privole ostaju izvan videozapisa, a ova instalacija to ne omogućuje.",
       "stopConfirm": "Zaustaviti snimanje sada?",
       "featuresHeading": "Funkcije sobe",
       "featuresHelp": "Uključuju se i isključuju za sve, odmah.",
@@ -681,33 +685,78 @@
       "confirm": "Povuci",
       "working": "Ažuriranje…",
       "error": "Privolu nije bilo moguće ažurirati: pokušajte ponovno.",
+      "textChanged": "Tekst privole promijenio se nakon što ste otvorili stranicu: pročitajte novi tekst i potvrdite ako se slažete.",
+      "closeNotice": "Zatvorite ovu obavijest: svoje privole i dalje nalazite pod gumbom na vrhu",
       "recording": {
         "title": "Snimanje događaja",
         "give": "Pristajem na snimanje",
         "without": {
           "soloAscolto": "Bez ove privole samo slušate: mikrofon, kamera i zaslon ostaju zatvoreni.",
-          "conduce": "Bez ove privole i dalje vodite, ali vaš glas ne ostaje u zasebnim zapisima osoba ni u transkripciji.",
-          "voce": "Bez ovog pristanka sudjelujete kao i svi, ali ostajete izvan snimke: bez imena, glasa i slike."
+          "conduce": "Bez ove privole i dalje vodite.",
+          "voce": "Bez ovog pristanka sudjelujete kao i svi, ali vaš glas ostaje izvan snimke. Vaše lice i vaše ime ionako se nikada ne pojavljuju u videozapisu.",
+          "comeTutti": "Bez ove privole sudjelujete kao i svi."
         },
+        "withoutTranscriptHost": "Vaš glas ne ostaje u zasebnim zapisima osoba ni u transkriptu.",
         "alreadyRecorded": "Ono što je već snimljeno ostaje u videozapisu događaja: za uklanjanje pišite organizatorima.",
         "withdraw": {
-          "soloAscolto": "Ako je povučete, ostajete u dvorani i samo slušate: mikrofon, kamera i zaslon se zatvaraju. Povlačite i privolu za transkripciju svojih izlaganja.",
-          "conduce": "Ako je povučete, nastavljate voditi, ali od sada vaš glas ne ostaje u zasebnim zapisima osoba ni u transkripciji. Videozapis dvorane, ako se snima, i dalje vas prikazuje.",
-          "voce": "Ako ga povučete, ostajete u sobi kao prije, a od sada ste izvan snimke. Povlačite i pristanak na transkripciju svojih izlaganja."
-        }
+          "soloAscolto": "Ako je povučete, ostajete u dvorani i samo slušate: mikrofon, kamera i zaslon se zatvaraju.",
+          "conduce": "Ako je povučete, nastavljate voditi. Videozapis dvorane, ako se snima, i dalje vas prikazuje.",
+          "voce": "Ako je povučete, ostajete u dvorani kao prije, a od sada ste izvan snimke.",
+          "avvertenza": "Ako je povučete, ostajete u dvorani kao prije. Ako dobijete riječ i događaj se snima, vaš glas ipak ostaje u videozapisu.",
+          "assente": "Ako je povučete, ostajete u dvorani kao prije. Od sada se vaš glas ne snima na zasebnu stazu."
+        },
+        "withdrawTranscript": "Povlačite i privolu za transkripciju svojih izlaganja.",
+        "withdrawTranscriptHost": "Od sada vaš glas ne ostaje u zasebnim zapisima osoba ni u transkriptu."
       },
       "transcription": {
         "title": "Transkripcija vaših izlaganja",
         "give": "Pristajem na transkripciju",
         "giveEffect": "Vaša izlaganja ulaze u transkripciju događaja s vašim imenom. Bez privole svejedno sudjelujete.",
-        "withdrawEffect": "Ako je povučete, vaše već transkribirane rečenice gube tekst i ime, a od sada se vaš glas ne snima u zaseban zapis niti transkribira.",
+        "withdrawEffect": "Ako je povučete, vaše rečenice već transkribirane iz titlova gube tekst i ime, a od sada se vaš glas ne snima u zaseban zapis niti transkribira. Za već izrađeni transkript videozapisa obratite se organizatorima.",
         "needsRecording": "Možete je dati nakon privole za snimanje."
       }
+    },
+    "recordingQuestion": {
+      "title": "Poziv se snima",
+      "question": "Želite li da se vaš glas snima?",
+      "body": "U videozapisu su samo voditelji: vaše lice i vaše ime nikada. Ako odgovorite da, poziv se na nekoliko sekundi ponovno povezuje i od tog trenutka vaš se glas snima kada govorite. Ako odgovorite ne ili zatvorite ovaj prozor, nastavljate sudjelovati kao i prije i vaš se glas ne snima.",
+      "later": "Ako odgovorite ne, pitat ćemo vas ponovno pri sljedećem snimanju. Predomisliti se možete u bilo kojem trenutku gumbom {button} na vrhu.",
+      "yes": "Da, snimaj moj glas",
+      "no": "Ne, nemoj snimati"
     },
     "voiceExcluded": {
       "title": "Sudjelujete bez snimanja.",
       "consent": "Dajem privolu za snimanje",
-      "body": "Niste pristali na snimanje: sudjelujete kao i svi, ali vaše ime, glas i slika ne ulaze u snimku."
+      "body": "Niste dali pristanak za snimanje: sudjelujete kao i svi, ali vaš glas ostaje izvan snimke. Vaše lice i vaše ime ionako se nikada ne pojavljuju u videozapisu."
+    },
+    "nickname": {
+      "reserved": "Moderator,Moderatorica,Govornik,Govornica,Predavač,Predavačica,Sudionik,Sudionica,Gost,Gošća,Organizator,Organizatorica,Administrator,Administratorica,Domaćin",
+      "label": "Nadimak (neobavezno)",
+      "help": "Jedna riječ, od 2 do 24 znaka: slova, brojke i . _ -. Drugi ga vide umjesto vašeg imena u videu, u chatu, u pitanjima i u transkriptu.",
+      "helpName": "Ako ga ostavite praznim, prikazujete se svojim imenom.",
+      "helpAnonymous": "Ako ga ostavite praznim, prikazujete se automatskim pseudonimom.",
+      "checking": "Provjera nadimka…",
+      "shownAs": "Drugi će vas vidjeti kao „{nickname}”.",
+      "useSuggestion": "Upotrijebi „{suggestion}”",
+      "errors": {
+        "length": "Nadimak mora imati od 2 do 24 znaka.",
+        "format": "Jedna riječ: počinje slovom i završava slovom ili brojkom; između slova, brojke i . _ -, nikad dva zaredom.",
+        "scripts": "Upotrijebite slova samo jednog pisma.",
+        "reserved": "Sadrži rezerviranu riječ, poput naziva uloge: odaberite drugi.",
+        "host": "Nalikuje imenu nekoga tko vodi događaj: odaberite drugi.",
+        "taken": "Netko na događaju već koristi ovaj nadimak.",
+        "disabled": "Ovaj događaj ne prihvaća nove nadimke: svoj možete samo ukloniti.",
+        "rete": "Nadimak nije moguće provjeriti. Pokušajte ponovno."
+      },
+      "button": "Nadimak",
+      "open": "Promijenite nadimak",
+      "dialogTitle": "Vaš nadimak",
+      "dialogIntro": "Drugi vide nadimak umjesto vašeg imena. Za promjenu vas soba na trenutak ponovno povezuje.",
+      "apply": "Spremi i ponovno se poveži",
+      "remove": "Ukloni nadimak",
+      "reconnecting": "Ponovno povezivanje…",
+      "done": "Gotovo: sada se prikazujete kao „{nickname}”.",
+      "doneRemoved": "Gotovo: nadimak je uklonjen."
     }
   },
   "qa": {
@@ -721,9 +770,9 @@
     "upvote": "Glasuj",
     "upvoted": "Glasovano",
     "noQuestions": "Još nema pitanja. Budite prvi!",
-    "qaPersistenceNote": "Pitanja su spremljena i bit će dostupna nakon događaja.",
-    "qaPostEvent": "Pitanja i odgovori s događaja",
-    "noAnsweredQuestions": "Nema odgovorenih pitanja za ovaj događaj.",
+    "qaPersistenceNote": "Tekst pitanja može se pojaviti na stranici događaja, bez imena osobe koja ih je postavila.",
+    "personalDataNotice": "Ne pišite tuđe osobne podatke ni svoje koje ne želite učiniti javnima: tekst pitanja može se pojaviti na stranici događaja, bez vašeg imena.",
+    "personalDataNoticeNotPublished": "Ne pišite tuđe osobne podatke ni svoje koje ne želite učiniti poznatima: osobe u dvorani mogu pročitati tekst pitanja.",
     "filterAll": "Sva",
     "showPanel": "Prikaži Q&A",
     "hidePanel": "Sakrij Q&A",
@@ -742,6 +791,8 @@
       "editAnswer": "Uredi odgovor",
       "answerFieldLabel": "Odgovor na pitanje od {name}",
       "answerPlaceholder": "Napišite odgovor (najviše 2000 znakova)",
+      "answerNotice": "Odgovor se može pojaviti na stranici događaja: ne pišite osobne podatke.",
+      "answerNoticeNotPublished": "Osobe u dvorani mogu pročitati odgovor: ne pišite osobne podatke.",
       "sendAnswer": "Objavi odgovor",
       "cancel": "Odustani",
       "removeAnswer": "Ukloni odgovor"
@@ -769,7 +820,8 @@
     "accessDenied": {
       "title": "Ovaj odjeljak nije dostupan za vašu ulogu",
       "body": "Kao organizator upravljate vlastitim događajima: izradom, objavom, materijalima, upitnicima i postprodukcijom. Postavke platforme i podaci svih događaja ostaju administraciji.",
-      "back": "Idi na svoje događaje"
+      "back": "Idi na svoje događaje",
+      "organizerOnly": "Ovaj događaj mogu uređivati samo njegovi organizatori. Kao administrator vidite njegovo stanje i pojedinosti te ga možete arhivirati ili izbrisati. Snimke i njihov sadržaj pripadaju organizatorima i sudionicima."
     },
     "staffLogin": {
       "title": "Prijava u administraciju",
@@ -1025,6 +1077,24 @@
           }
         },
         "recordingManualNote": "Snimanje nikad ne počinje samo: moderator ga pokreće gumbom REC.",
+        "recordingDestination": "Kamo ide snimka",
+        "recordingDestinationReserved": "Samo za prijavljene",
+        "recordingDestinationReservedDesc": "Vide je organizatori i prijavljeni; prijavljeni dok se čuvaju podaci o njihovoj prijavi. Ne objavljuje se. Nakon otvaranja dvorane više se ne može učiniti javnom.",
+        "recordingDestinationPublic": "Javna",
+        "recordingDestinationPublicDesc": "Može se objaviti na stranici događaja i u videoteci. Sudionici daju privolu i za to.",
+        "recordingDestinationNotSet": "Nije navedeno: događaj je izrađen prije uvođenja ovog izbora.",
+        "recordingDestinationStaffOnly": "Kamo ide snimka bira osoblje događaja: zasad nije navedeno.",
+        "recordingDestinationStartsReserved": "Snimka je na početku samo za prijavljene: osoblje događaja može je učiniti javnom dok se dvorana ne otvori.",
+        "recordingDestinationStaysReserved": "Snimka ostaje samo za prijavljene: dvorana je već otvorena.",
+        "recordingDestinationLocked": "Nakon otvaranja dvorane moguće je jedino prijeći na opciju „Samo za prijavljene”: privole vrijede za tekst koji su ljudi pročitali.",
+        "recordingDestinationPublicOnInvitation": "Događaj je samo uz pozivnicu, ali snimka ostaje javna: videozapis će moći pogledati bilo tko, a ne samo pozvani.",
+        "recordingDestinationReservedOnInvitation": "Događaj je samo uz pozivnicu: snimka je prebačena na „Samo za prijavljene”. To možete promijeniti u odjeljku „Snimanje i UI”.",
+        "postEventPagePrivateOnInvitation": "Događaj je samo uz pozivnicu: stranica nakon događaja prebačena je na privatnu. Možete je promijeniti u odjeljku „Privatnost, podaci i stranica nakon događaja”.",
+        "postEventPagePublicWithVideo": "Snimka je javna: stranica nakon događaja prebačena je na javnu, inače videozapis nitko ne bi vidio. Možete je promijeniti u odjeljku „Privatnost, podaci i stranica nakon događaja”.",
+        "postEventPageStaysPrivate": "Događaj je otvoren svima koji se prijave, ali stranica nakon događaja ostala je privatna: ne otvara se ponovno sama od sebe. Možete je promijeniti u odjeljku „Privatnost, podaci i stranica nakon događaja”.",
+        "postEventPagePrivateVideoHidden": "Snimka je javna, ali stranica nakon događaja je privatna: videozapis neće vidjeti nitko, čak ni prijavljeni, dok stranica ostaje privatna.",
+        "recordingNothingToCapture": "U ovoj instalaciji nema videozapisa dvorane: bez transkripcije i zasebnih zapisa sudionika ništa se ne snima.",
+        "recordingDestinationRequired": "Odaberite kamo ide snimka.",
         "audienceAnonymous": "Anonimna publika",
         "audienceAnonymousDesc": "Sudionici se drugima prikazuju pod pseudonimom („Sudionik” i kod) u videu, chatu i pitanjima; popis sudionika ostaje voditeljima i nema trga. Korisno za velike događaje; na događajima zajednice ljudi se žele upoznati.",
         "audienceAnonymousLocked": "Ne može se mijenjati dok soba može biti otvorena: povezalo bi pseudonime s imenima.",
@@ -1032,10 +1102,15 @@
         "participantListVisibleDesc": "Isključeno: popis, mreža i imena na trgu ostaju voditeljima i govornicima; publika vidi samo onoga tko govori. Uključeno: svi vide tko je u dvorani.",
         "participantListAnonymous": "Uz anonimnu publiku popis ostaje skriven.",
         "participantListLocked": "Dok je dvorana otvorena ne može se mijenjati: oni koji su već unutra ne bi vidjeli promjenu.",
+        "nicknamesEnabled": "Nadimci za sudionike",
+        "nicknamesEnabledDesc": "Sudionici mogu odabrati nadimak: drugi ga vide umjesto imena u videu, u chatu, u pitanjima i u transkriptu. Organizatori i moderatori vide tko se iza njega krije. Voditelji ostaju sa svojim imenom. Prema zadanim postavkama uključeno je ondje gdje je popis sudionika skriven.",
+        "nicknamesLocked": "Ne može se mijenjati dok je soba otvorena: tko je već unutra, birao je prema prethodnom pravilu.",
         "participantListCameraNote": "Kad je popis skriven, onaj tko uključi kameru ne vidi vlastiti prozor. Za sastanak na kojem se svi vide, prikažite popis.",
         "recordingLockedLive": "Dok je dvorana otvorena snimanje se ne može mijenjati: vrijedi od prvog ulaska.",
         "hostsAlwaysRecorded": "Voditelji su uvijek u snimci",
-        "hostsAlwaysRecordedDesc": "Isključeno, moderatori i govornici biraju kao i svi. Uključite samo ako su već pristali na snimanje: ne vide okvir, a obavijest o događaju to mora reći."
+        "hostsAlwaysRecordedDesc": "Moderatori i govornici pojavljuju se u videozapisu s imenom i slikom, bez potvrdnog okvira: obavijest o privatnosti događaja to mora navesti. Od sudionika snima se samo glas, i to samo uz njihov pristanak.",
+        "hostsAlwaysRecordedDescHostsOnly": "Moderatori i govornici pojavljuju se u videozapisu s imenom i slikom, bez potvrdnog okvira: obavijest o privatnosti događaja to mora navesti. Sudionici se u videozapisu nikada ne vide i ne čuju.",
+        "hostsAlwaysRecordedDescVisible": "Moderatori i govornici pojavljuju se u videozapisu s imenom i slikom, bez potvrdnog okvira: obavijest o privatnosti događaja to mora navesti. Ova instalacija ne može zadržati sudionike izvan videozapisa: tko pristane, govori s imenom, glasom i slikom, a ime svakoga tko prati može se pojaviti i ako ne govori."
       },
       "step3": {
         "heading": "Osobe i pozivnice",
@@ -1053,7 +1128,7 @@
         "remove": "Ukloni",
         "invalidEmail": "Adresa e-pošte nije valjana.",
         "duplicateEmail": "Adresa je već dodana.",
-        "rubricaPick": "Pretraži imenik po organizaciji…",
+        "rubricaPick": "Pretraži imenik po imenu, e-pošti ili organizaciji…",
         "rubricaOrAdd": "ili dodajte ručno",
         "removeItem": "Ukloni {name}",
         "invitationsStaffOnly": "Pozivnicama upravlja osoblje događaja.",
@@ -1135,6 +1210,7 @@
         "askOrganization": "Organizacija (obavezno za prijavu)",
         "askRole": "Uloga (neobavezno)",
         "askType": "Vrsta organizacije (neobavezno)",
+        "askAddressBook": "Ponudite ostanak u imeniku (neobavezno za osobe koje se prijavljuju)",
         "questionnairesHeading": "Upitnici",
         "questionsBefore": "Prije događanja, pri prijavi: {count, plural, =0 {nema dodatnih pitanja} one {# dodatno pitanje} few {# dodatna pitanja} other {# dodatnih pitanja}}",
         "questionsAfter": "Nakon događanja: {count, plural, =0 {nema upitnika o zadovoljstvu} one {upitnik o zadovoljstvu, # pitanje} few {upitnik o zadovoljstvu, # pitanja} other {upitnik o zadovoljstvu, # pitanja}}",
@@ -1230,6 +1306,8 @@
         "gdprHeading": "Privatnost i čuvanje podataka",
         "retentionDays": "Dani čuvanja",
         "retentionHelp": "Nakon ovog praga osobni se podaci automatski brišu.",
+        "recordingRetention": "Rok čuvanja snimke",
+        "recordingRetentionHelp": "Snimka i ono što iz nje nastaje ne brišu se s podacima osoba. S rokom se brišu toliko dana nakon završetka događaja ili, ako je video objavljen, nakon objave. Može se promijeniti i kasnije, na ploči snimke.",
         "gdprTemplate": "Predložak obavijesti",
         "gdprTemplateNone": "— Koristi prilagođeni tekst —",
         "gdprTemplateUnknown": "Odabrani predložak obavijesti o privatnosti više ne postoji: odaberite drugi ili se vratite na prilagođeni tekst",
@@ -1281,7 +1359,10 @@
         "participantsCan": "Sudionici: {list}",
         "none": "nijedna",
         "recordingManual": "Dostupno: počinje tek kad moderator pritisne REC.",
+        "recordingDestinationReserved": "Odredište: samo za organizatore i prijavljene.",
+        "recordingDestinationPublic": "Odredište: javna.",
         "aiAfter": "Nakon snimanja: {list}.",
+        "aiConfirmVideo": "Bez zapisa po osobi transkripcija videozapisa pokreće se tek nakon potvrde da su svi koji govore dali privolu.",
         "scheduleHeading": "Kada se održava",
         "scheduleIntro": "Kada se događaj održava: datum, vrijeme i vremenska zona.",
         "advancedIntro": "Vrijednosti koje je predložak već odabrao: promijenite samo ono što treba.",
@@ -1325,17 +1406,25 @@
         "askOrganization": "organizacija",
         "askRole": "uloga",
         "askType": "vrsta organizacije",
+        "askAddressBook": "želi li ostati u imeniku",
         "permissionsHeading": "Tko što može u sobi",
         "permissionsIntro": "Što sudionici mogu i koje su funkcije sobe uključene. Sve se može mijenjati i tijekom događaja.",
         "consentsLine": "Privole pri prijavi i u dvorani: {list}",
         "consentRecordingFree": "snimanje, dobrovoljno (bez nje samo slušanje)",
         "consentRecordingNotice": "za snimanje samo obavijest (sudionici ne govore i ne prikazuju se)",
+        "consentRecordingHostsOnly": "za snimanje samo obavijest (u videozapisu su samo voditelji)",
         "consentTranscription": "transkripcija vlastitih izlaganja, neobvezna",
-        "consentsNone": "Nema privola osim one pri prijavi.",
-        "consentsHosts": "Moderatore i govornike za snimanje pitamo u dvorani, neobvezno.",
+        "consentsNone": "Nema privola koje treba tražiti: pri prijavi dovoljno je upoznavanje s politikom privatnosti.",
         "consentsWithdraw": "Sudionici ih mogu povući u dvorani gumbom „Privole”.",
         "participantListShown": "Popis sudionika: vidljiv svima.",
         "participantListHidden": "Popis sudionika: samo za voditelje i govornike.",
+        "audiencePseudonyms": "Imena publike: pseudonimi.",
+        "audienceNicknames": "Sudionici mogu koristiti nadimak.",
+        "audienceRealNames": "Imena publike: stvarna imena.",
+        "postEventQaHidden": "Pitanja nakon događaja: ne objavljuju se.",
+        "postEventQaTextOnly": "Pitanja nakon događaja: samo tekst, bez imena.",
+        "addressBookOffered": "Imenik: ponuđen osobama koje se prijavljuju.",
+        "addressBookNotOffered": "Imenik: nije ponuđen.",
         "consentRecordingOptional": "snimanje, dobrovoljno",
         "consentRecordingVoice": "snimanje, neobvezno (bez pristanka osoba ostaje izvan snimke)",
         "consentsHostsAlways": "Voditelji i govornici su uvijek u snimci: ne vide okvir."
@@ -1409,15 +1498,15 @@
         "recording": "U snimci",
         "roomSame": "Sudjeluje prema pravilima događaja.",
         "roomListenOnly": "Samo slušanje i chat.",
-        "recordedFull": "Ime, glas, slika i dijeljeni zaslon.",
+        "recordedFull": "Samo glas, kada osoba govori: lice i ime nikada se ne pojavljuju.",
+        "recordedVisible": "Ime, glas, slika i dijeljeni zaslon.",
         "notRecorded": "Ne pojavljuje se: bez imena, glasa, slike i dijeljenog zaslona.",
         "recordedVoice": "Njezin glas, na zasebnom zapisu.",
         "notRecordedVoice": "Njezin glas se ne snima.",
         "othersSame": "Ostali se ne mijenjaju: zaključavanja mikrofona, riječ i izgled videa ostaju kao u događaju.",
         "audienceNotice": "Publika nema mikrofon, kameru ni zaslon: dobiva samo obavijest. Ako dobije riječ, može pristati u sobi; ako ne pristane, ostaje izvan snimke.",
-        "hostsChoose": "Moderatori i govornici biraju kao i svi: tko ne pristane, vodi normalno, ali ostaje izvan snimke.",
         "hostsAlways": "Moderatori i govornici su uvijek u snimci: ne vide okvir.",
-        "hostsFixed": "Moderatori i govornici svejedno vode, a video ih snima.",
+        "hostsOnly": "Ova instalacija u videozapis snima samo voditelje: sudionici se ne vide i ne čuju, i od njih se ne traži pristanak na snimanje.",
         "trace": "Ako se javi tijekom snimanja, bilješka uz video kaže da nedostaje izlaganje, a transkript bilježi *** s vremenom.",
         "anytime": "Pristanak se daje i povlači u sobi, u bilo kojem trenutku.",
         "transcription": "Transkripcija vlastitih izlaganja zaseban je, neobvezan pristanak.",
@@ -1472,7 +1561,9 @@
       "breadcrumbAriaLabel": "Navigacijski put",
       "skipToPage": "Idi na sadržaj stranice",
       "openMenu": "Otvori izbornik",
-      "closeMenu": "Zatvori izbornik"
+      "closeMenu": "Zatvori izbornik",
+      "recordingRemovals": "Zahtjevi za uklanjanje",
+      "recordingRemovalDetail": "Zahtjev za uklanjanje"
     },
     "publications": {
       "subtitle": "Jedinstveno uredničko središte za sve objavljene videozapise: planirani događaji, brzi pozivi, prenesene povijesne arhive i sesije koje čekaju promociju.",
@@ -1543,6 +1634,8 @@
           "saveFailed": "Spremanje metapodataka nije uspjelo."
         }
       },
+      "reservedBadge": "Samo za prijavljene",
+      "reservedHelp": "Snimka je dostupna samo prijavljenima: ne može se pojaviti u videoteci.",
       "updateFailed": "Ažuriranje nije uspjelo."
     },
     "recordingsLibrary": {
@@ -1614,7 +1707,8 @@
       "detailFilename": "Naziv datoteke",
       "transcriptManage": "Upravljaj transkriptom / AI-jem",
       "transcriptReady": "Transkribirano",
-      "transcriptProcessing": "U obradi"
+      "transcriptProcessing": "U obradi",
+      "organizerOnly": "Samo za organizatore"
     },
     "gdprAudit": {
       "subtitle": "Zapis radnji nad osobnim podacima: brisanja, privole, izvozi",
@@ -1629,7 +1723,12 @@
         "DATA_DELETED": "Podaci izbrisani",
         "CONSENT_RECORDED": "Privola zabilježena",
         "DATA_EXPORTED": "Podaci izvezeni",
-        "CONSENT_WITHDRAWN": "Privola povučena"
+        "DATA_RECTIFIED": "Podaci ispravljeni",
+        "CONSENT_WITHDRAWN": "Privola povučena",
+        "RECORDING_CONTENT_READ": "Sadržaj snimke koji je pročitalo osoblje",
+        "RECORDING_REDACTION_REQUESTED": "Zatraženo uklanjanje iz snimke",
+        "RECORDING_REDACTION_REJECTED": "Zahtjev za uklanjanje odbijen",
+        "RECORDING_REDACTED": "Osoba uklonjena iz snimke"
       },
       "recordsAffected": "{count} obuhvaćenih zapisa",
       "colWhen": "Kada",
@@ -1655,7 +1754,8 @@
       "rotating": "Regeneriranje…",
       "regenerateTitle": "Regeneriraj moderatorski token (poništava staru poveznicu)",
       "confirmRegenerate": "Jeste li sigurni da želite regenerirati token? Stara poveznica više neće raditi.",
-      "noResults": "Nije pronađen nijedan događaj."
+      "noResults": "Nije pronađen nijedan događaj.",
+      "organizerOnlyLink": "Poveznica je vidljiva samo organizatorima događaja"
     },
     "registrations": {
       "subtitle": "Sve osobe prijavljene na događaje — pretraga, filtri i izvoz",
@@ -1684,6 +1784,8 @@
       "colCreatedAt": "Datum prijave",
       "colEvent": "Događaj",
       "colName": "Ime",
+      "colNickname": "Nadimak",
+      "nicknameShown": "Drugima se prikazuje kao „{nickname}”",
       "colEmail": "E-pošta",
       "colOrg": "Organizacija",
       "colJoined": "Sudjelovao",
@@ -1917,7 +2019,7 @@
       "aiSectionHeading": "Automatska postprodukcija",
       "aiSectionDesc": "Nakon završetka događaja snimku može obraditi pipeline umjetne inteligencije u klasteru kako bi izradio transkript, sažetak te, na zahtjev, prijevode i sinkronizaciju. Sve se odvija na infrastrukturi ove instalacije, nijedan podatak ne odlazi trećim stranama.",
       "aiTranscriptEnabled": "Automatska transkripcija",
-      "aiTranscriptEnabledDesc": "Prepoznavanje govora s identifikacijom govornika. Potrebna je za uključivanje sažetka, prijevoda i sinkronizacije.",
+      "aiTranscriptEnabledDesc": "Prepoznavanje govora s identifikacijom govornika. Potrebna je za uključivanje sažetka, prijevoda i sinkronizacije. Sudionici sami biraju hoće li se njihova izlaganja transkribirati.",
       "aiSummaryEnabled": "Sažetak i poglavlja",
       "aiSummaryEnabledDesc": "Sažetak sastanka, donesene odluke, zadaci i podjela na poglavlja s vremenskim oznakama.",
       "aiTranslationEnabled": "Prijevod na druge jezike",
@@ -2023,7 +2125,7 @@
     },
     "recordingUpload": {
       "title": "Učitaj postojeću snimku",
-      "subtitle": "Ako već imate videodatoteku događaja (na primjer snimljenu na drugoj platformi), učitajte je ovdje: prikazat će se kao službena snimka na javnoj stranici.",
+      "subtitle": "Ako već imate videodatoteku događaja (na primjer snimljenu na drugoj platformi), učitajte je ovdje: bit će to službena snimka događaja.",
       "fileLabel": "Videodatoteka",
       "upload": "Učitaj i poveži",
       "signing": "Priprema…",
@@ -2087,7 +2189,9 @@
         "DATA_DELETED": "Podaci obrisani",
         "CONSENT_RECORDED": "Pristanak zabilježen",
         "DATA_EXPORTED": "Podaci izvezeni",
-        "CONSENT_WITHDRAWN": "Privola povučena"
+        "DATA_RECTIFIED": "Podaci ispravljeni",
+        "CONSENT_WITHDRAWN": "Privola povučena",
+        "RECORDING_CONTENT_READ": "Sadržaj snimke koji je pročitalo osoblje"
       }
     },
     "settings": {
@@ -2130,7 +2234,7 @@
         "jobMaxAttempts": "Pokušaji prije neuspjeha",
         "jobMaxAttemptsHelp": "Koliko puta pipeline ponavlja posao prije nego što ga označi neuspjelim. Odgoda između pokušaja raste eksponencijalno (od 30 sekundi do 2 sata). Uobičajena vrijednost je 5.",
         "artifactRetentionDays": "Čuvanje artefakata (dani)",
-        "artifactRetentionDaysHelp": "Uz 0 nema ograničenja za cijelu stranicu: AI artefakti slijede rok čuvanja svoje snimke ili događaja. Vrijednost veća od nule znači da dnevni posao briše svaki artefakt stvoren prije više od toliko dana, objavljen ili ne: rok čuvanja može skratiti, ali ga nikad ne produljuje. Imena govornika i podaci poslova nisu obuhvaćeni: slijede rok čuvanja snimke ili događaja. Pojedinosti u docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "Uz 0 nema ograničenja za cijelu stranicu: AI artefakti slijede rok čuvanja svoje snimke. Vrijednost veća od nule znači da dnevni posao briše svaki artefakt stvoren prije više od toliko dana, objavljen ili ne: rok čuvanja može skratiti, ali ga nikad ne produljuje. Imena govornika i podaci poslova nisu obuhvaćeni: slijede rok čuvanja snimke. Pojedinosti u docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "AI obavijest u čekaonici",
         "consentDisclosureHelp": "Tekst prikazan sudionicima u čekaonici kada događaj koristi AI postprodukciju (transkripcija, sažetak, prijevod, sinkronizacija). Može se prilagoditi po jeziku. Ostavi prazno za zadani tekst sustava.",
         "consentDisclosurePlaceholder": "Npr. Ovaj će događaj nakon prijenosa uživo biti automatski transkribiran i sažet AI alatima…"
@@ -2307,6 +2411,8 @@
         "guestAccessEnabledHelp": "Osobe koje se nisu prijavile mogu ući na događaje u tijeku samo sa svojim imenom. Kad je isključeno, na planirane događaje ulazi se samo s prijavom ili s poveznicom za moderatora ili govornika; trenutačni videopozivi ostaju otvoreni svima koji imaju poveznicu. Događaj samo uz pozivnicu nikad ne prima goste.",
         "publicRegistrationEnabled": "Javna registracija aktivna",
         "publicRegistrationEnabledHelp": "Svatko se može prijaviti na događaje. Kad je isključeno, mogu se prijaviti samo osobe s popisa pozvanih na događaj, a osobna poveznica za ulazak šalje se samo e-poštom; već prijavljeni te poveznice moderatora i govornika i dalje rade. To je izbor koji se predlaže novim događajima: svaki događaj može u koraku „Osobe” odlučiti drukčije.",
+        "addressBookEnabled": "Imenik događaja",
+        "addressBookEnabledHelp": "Osobama koje se prijavljuju nudi mogućnost da ostanu u imeniku kako bi bile pozivane na slične događaje. Kad je isključeno, potvrdni okvir nestaje iz obrazaca, a birač iz čarobnjaka; postojeći unosi ostaju do povlačenja privole ili isteka.",
         "calendarPublic": "Javni kalendar",
         "calendarPublicHelp": "Objavi kalendar događaja. Posjetitelji mogu vidjeti zakazane događaje.",
         "parseTitleKicker": "Naslovi s uredničkim nadnaslovom",
@@ -2397,6 +2503,40 @@
         "avgParticipantsPerEvent": "Prosječno sudionika po događaju",
         "avgFeedbackRating": "Prosječna ocjena povratnih informacija",
         "totalFeedback": "Odgovori povratnih informacija"
+      },
+      "catalog": {
+        "title": "Vrste događaja i predlošci",
+        "intro": "Koliko je događaja svake vrste i iz svakog predloška, mjesec po mjesec. Samo brojevi i prosjeci, bez osobnih podataka. Nacrti se ne broje.",
+        "periodLabel": "Razdoblje",
+        "months": "{count, plural, one {# mjesec} few {# mjeseca} other {# mjeseci}}",
+        "groupByLabel": "Grupiraj po",
+        "groupBy": {
+          "type": "Vrsta događaja",
+          "template": "Predložak"
+        },
+        "rankingTypes": "Najčešće vrste",
+        "rankingTemplates": "Najkorišteniji predlošci",
+        "columns": {
+          "type": "Vrsta",
+          "template": "Predložak",
+          "events": "Događaji",
+          "held": "Održani",
+          "avgParticipants": "Prosj. sudionika",
+          "avgDuration": "Prosj. trajanje",
+          "total": "Cijelo razdoblje"
+        },
+        "measuresNote": "Održani: događaji čija je soba otvorena. Prosječan broj sudionika: najveći broj istodobno prisutnih osoba, uključujući goste, u prosjeku za održane događaje. Prosječno trajanje: izmjereno vrijeme u sobi, a ne planirano.",
+        "byMonth": "Mjesec po mjesec",
+        "measureLabel": "Mjera",
+        "measures": {
+          "events": "Događaji",
+          "avgParticipants": "Prosječan broj sudionika",
+          "avgDurationMinutes": "Prosječno trajanje"
+        },
+        "byMonthCaption": "{measure} po mjesecima",
+        "empty": "U ovom razdoblju nema događaja.",
+        "deletedTemplate": "{name} (izbrisan)",
+        "uncatalogedNote": "Nekatalogizirani događaji: {count}. Nastali su prije kataloga ili bez predloška i bez formata; možete ih katalogizirati pri uređivanju događaja, u tehničkim detaljima."
       }
     },
     "recurrence": {
@@ -2439,6 +2579,8 @@
       "featuresLabel": "Funkcionalnosti",
       "whiteboardLabel": "Ploča",
       "recordingLabel": "Snimanje",
+      "recordingDestination": "Odredište snimke",
+      "recordingDestinationNone": "Odabire se pri izradi događaja",
       "waitingRoomEngineLabel": "Čekaonica (zadano za predložak)",
       "waitingRoomEngineSiteDefault": "Zadano za stranicu",
       "waitingRoomEngineGarden": "Vrt (standardna)",
@@ -2451,17 +2593,22 @@
       "durationLabel": "Zadano trajanje (minute)",
       "durationHint": "Unaprijed popunjava završetak događaja (početak + trajanje). Korisnik ga može promijeniti. Prazno = 2 sata.",
       "retentionLabel": "Zadano čuvanje podataka (dani)",
+      "recordingRetentionLabel": "Zadani rok čuvanja snimke",
+      "recordingRetentionHint": "Za događaje stvorene iz ovog predloška; mijenja se u čarobnjaku i na ploči snimke. Snimka ne prati čuvanje podataka.",
       "expectedSpeakersLabel": "Očekivani broj govornika (zadano)",
       "descriptionTemplateLabel": "Zadani opis",
       "descriptionTemplateHint": "Tekst unaprijed upisan u opis događaja (izmjenjiv).",
       "aiTranscript": "Automatska transkripcija (zadano)",
       "aiSummary": "Automatski sažetak (zadano)",
       "aiTranslation": "Automatski prijevod (zadano)",
+      "noRecording": "Na ovoj se instalaciji ne snima: predlošci počinju bez snimke.",
       "pickerSubtitle": "Odaberite predložak za predkonfiguraciju postavki događaja ili preskočite za ručnu konfiguraciju.",
       "skipTemplate": "Konfiguriraj ručno",
       "postEventPublic": "Javna stranica nakon događaja",
+      "offerAddressBook": "Nudi imenik osobama koje se prijavljuju",
       "invalidFields": "Provjerite ova polja: {fields}.",
-      "descriptionOtherLanguages": "Postoje i verzije na: {languages}, koje se ovdje ne uređuju. Ako promijenite talijanski tekst, uklanjaju se."
+      "descriptionOtherLanguages": "Postoje i verzije na: {languages}, koje se ovdje ne uređuju. Ako promijenite talijanski tekst, uklanjaju se.",
+      "usedBy": "Događaji nastali iz ovog predloška: {count}"
     },
     "instantCall": {
       "title": "Trenutačni videopoziv",
@@ -2724,7 +2871,7 @@
       "title": "Sesije poziva",
       "empty": "Nije zabilježena nijedna sesija. Sesije uživo automatski se navode čim moderator uđe u sobu.",
       "loading": "Učitavanje sesija...",
-      "participants": "sudionika",
+      "participantsCount": "{count, plural, one {# sudionik} few {# sudionika} other {# sudionika}}",
       "participantList": "Sudionici",
       "name": "Ime",
       "joined": "Ulazak",
@@ -2974,11 +3121,28 @@
         "publishNow": "Objavi sada"
       },
       "editFeatures": "Uredi funkcije",
-      "editPrivacy": "Uredi privatnost i podatke"
+      "editPrivacy": "Uredi privatnost i podatke",
+      "governance": {
+        "title": "Ovim događajem upravljate kao administrator",
+        "body": "Niste među njegovim organizatorima: vidite stanje, pojedinosti, prijave i privole te ga možete arhivirati ili izbrisati. Vođenje događaja, poveznica moderatora i sadržaj snimki (video, transkripti, sažeci) pripadaju organizatorima.",
+        "recording": "Sadržaj snimke dostupan je samo organizatorima događaja i njegovim sudionicima. Ovdje vidite postoji li i njezine pojedinosti.",
+        "recordingFile": "Snimka",
+        "present": "Postoji",
+        "absent": "Nema",
+        "recordingPublished": "Objavljena",
+        "yes": "Da",
+        "no": "Ne",
+        "recordingDuration": "Trajanje",
+        "recordingSize": "Veličina",
+        "recordingRetention": "Automatsko brisanje snimke",
+        "recordingRetentionNone": "Nema",
+        "recordingRetentionDays": "{days, plural, one {# dan} few {# dana} other {# dana}} nakon završetka događaja ili, ako je objavljena, nakon objave"
+      }
     },
     "rubrica": {
-      "subtitle": "Osobe koje su dale privolu za uvrštavanje u imenik (čl. 6.1.a GDPR). Podaci profila automatski se ažuriraju pri svakoj ponovnoj prijavi.",
-      "searchLabel": "Pretraži po imenu ili organizaciji",
+      "subtitle": "Osobe koje su dale privolu za uvrštavanje u imenik (čl. 6.1.a GDPR). Ime, e-pošta i organizacija ažuriraju se samo kada osoba ponovno označi okvir.",
+      "searchLabel": "Pretraži po imenu, e-pošti ili organizaciji",
+      "searchPartial": "Pretraživanje je obuhvatilo samo {limit} unosa koji su posljednji ažurirani: osoba s ranijim ažuriranjem možda se neće prikazati.",
       "orgTypeLabel": "Vrsta organizacije",
       "allTypes": "Sve",
       "includeOptedOut": "Uključi osobe koje su povukle privolu",
@@ -3243,7 +3407,8 @@
         "metricsTitle": "Pokazatelji sažimanja (LLM)",
         "chars": "znakova",
         "model": "Model",
-        "notAvailable": "n/d"
+        "notAvailable": "n/d",
+        "contentHidden": "Dostupno samo organizatorima događaja."
       },
       "rel": {
         "title": "Pouzdanost AI-ja",
@@ -3400,7 +3565,8 @@
         "alignNone": "Nema promjene slajda za usklađivanje.",
         "previewTitle": "Pregled",
         "previewHelp": "Videozapis sa slajdovima kako će ih vidjeti publika, s ispravkom upisanim iznad."
-      }
+      },
+      "contentOrganizerOnly": "Sadržaj ove snimke (video, zapisi, transkript, sažetak, prijevodi) mogu vidjeti i uređivati samo organizatori ovog događaja. Ovdje vidite njezino stanje, obrade i pojedinosti datoteka."
     },
     "questionnairesPage": {
       "subtitle": "Ponovno upotrebljivi predlošci pitanja za upitnike prije prijave i nakon događaja."
@@ -3597,10 +3763,13 @@
         "speakers": "Govornici i moderatori",
         "speakersDesc": "Publika piše u chatu i postavlja pitanja"
       },
-      "recQ": "Želite li moći snimati?",
+      "recQ": "Želite li moći snimati i za koga?",
       "rec": {
-        "yes": "Da, kada pritisnete REC",
         "yesDesc": "Nakon događaja: transkript, sažetak i prijevod",
+        "reserved": "Da, samo za prijavljene",
+        "reservedDesc": "Vide je organizatori i prijavljeni",
+        "public": "Da, javna",
+        "publicDesc": "Može se objaviti na stranici događaja",
         "no": "Ne",
         "noDesc": "Bez snimanja, bez privole"
       },
@@ -3614,7 +3783,8 @@
         "grande": "Više od 100 osoba",
         "tutti": "svi na videu",
         "relatori": "govore govornici",
-        "si": "sa snimanjem",
+        "riservata": "sa snimkom samo za prijavljene",
+        "pubblica": "s javnom snimkom",
         "no": "bez snimanja",
         "openAccess": "otvoreno za sve",
         "inviteOnly": "samo uz pozivnicu"
@@ -3627,6 +3797,9 @@
         "invitationDesc": "Stranica ostaje vidljiva, ali se prijaviti mogu samo osobe s popisa; pozivnicu s poveznicom za prijavu šaljete e-poštom sa stranice događaja"
       },
       "previewInvitation": "Prijavljuju se samo pozvani; bez prijave se ne ulazi.",
+      "previewPseudonyms": "Publika se prikazuje pod pseudonimom",
+      "previewNicknames": "Sudionici mogu koristiti nadimak",
+      "previewRealNames": "Publika se prikazuje pod vlastitim imenom",
       "templateReplaces": "Predložak donosi svoje postavke umjesto odgovora ispod. Naslov, datume i osobe upisujete u sljedećim koracima.",
       "instantBack": "Umjesto toga stvori zakazani događaj"
     },
@@ -3686,7 +3859,9 @@
       "publishDesc": "Pregledajte ga prije objave: tekst je napisao model umjetne inteligencije. Ponovno izrađeno izvješće treba ponovno objaviti.",
       "preview": "Pregled",
       "hidePreview": "Sakrij pregled",
-      "previewLanguage": "Jezik"
+      "previewLanguage": "Jezik",
+      "organizerOnly": "Izvješće mogu zatražiti, čitati i objaviti samo organizatori ovog događaja.",
+      "organizerOnlyExists": "Izvješće postoji. Čitati i objaviti ga mogu samo organizatori ovog događaja."
     },
     "endEvent": "Završi događaj",
     "endEventConfirmTitle": "Završiti događaj za sve?",
@@ -3722,11 +3897,12 @@
       "organizersEmpty": "Nije navedena nijedna ustanova: javna stranica ne prikazuje tko organizira.",
       "sendAll": "Pošalji pozivnicu onima koji je još nisu primili ({count})",
       "sending": "Slanje…",
-      "sendDone": "Pozivnice u slanju: {sent}. Preskočeno (već prijavljeni ili bez adrese): {skipped}.",
+      "sendDone": "Pozivnice u slanju: {sent}. Preskočeno (već prijavljeni, bez adrese ili bez privole za primanje obavijesti): {skipped}.",
       "sendError": "Slanje nije uspjelo: pokušajte ponovno.",
       "sendNotPublished": "Pozivnice se šalju dok događaj prima prijave: nakon objave i prije završetka.",
       "invitedOn": "Pozvan {date}",
       "notInvited": "Pozivnica nije poslana",
+      "stopped": "Ne prima pozivnice",
       "send": "Pošalji pozivnicu",
       "resend": "Pošalji ponovno",
       "actions": "Radnje",
@@ -3764,6 +3940,7 @@
         "pubblicata": "Objavljen.",
         "prontaAi": "Spreman iz postprodukcije: pregledajte ga; objavljuje se zajedno s videozapisom.",
         "prontaSottotitoli": "Spreman iz titlova: provjerite imena i objavite ga.",
+        "daConfermare": "Treba pokrenuti: videozapis se transkribira samo uz potvrdu da su svi koji govore dali privolu.",
         "inLavorazione": "U obradi.",
         "nessuna": "Nema ga: nema ni titlova ni postprodukcije.",
         "soloStaff": "Pregledava ga i objavljuje organizator događaja u administraciji.",
@@ -3773,7 +3950,7 @@
         "title": "Izvješće",
         "pubblicato": "Objavljeno.",
         "daPubblicare": "Generirano: pročitajte ga i objavite.",
-        "daGenerare": "Treba ga generirati iz transkripta, chata i ocjena.",
+        "daGenerare": "Treba ga generirati iz transkripta, anketa, ocjena i, ako su objavljena, pitanja.",
         "inLavorazione": "U obradi.",
         "senzaPipeline": "AI postprodukcija nije aktivna na ovoj instalaciji.",
         "soloStaff": "Generira ga i objavljuje organizator događaja u administraciji.",
@@ -3803,6 +3980,7 @@
         "title": "Javna stranica",
         "visibile": "Vidljiva svima.",
         "nellaLibreria": "Vidljiva svima i u videoteci.",
+        "libreriaRiservata": "Stranica je vidljiva, ali videozapis je dostupan samo prijavljenima: ne pojavljuje se u videoteci.",
         "privata": "Povučena: javnost je ne vidi.",
         "scaduta": "Više nije vidljiva: datum isteka je prošao.",
         "archiviato": "Događaj arhiviran: stranica nije javna.",
@@ -3950,9 +4128,10 @@
     },
     "voiceConsent": {
       "title": "Transkribirati cijelu snimku?",
-      "message": "Ovaj je događaj tražio od svakoga privolu za transkripciju njegovih izlaganja. Cijela snimka sadrži sve glasove, i one koji nisu dali privolu: transkribirajte je samo ako su svi koji u njoj govore dali privolu. Vaša potvrda ostaje u zapisniku aktivnosti.",
+      "message": "Cijela snimka sadrži sve glasove, i onih koji nisu dali privolu za transkripciju svojih izlaganja: transkribirajte je samo ako su svi koji u njoj govore dali privolu. Vaša potvrda ostaje u zapisniku aktivnosti.",
       "confirm": "Da, svi su dali privolu",
       "cancel": "Odustani",
+      "waitingNoCaptions": "Transkripcija cijele snimke nije pokrenuta sama: svatko bira hoće li se njegova izlaganja transkribirati. Pokrenite je gumbom {button} samo ako su svi koji govore u snimci dali privolu; inače događaj ostaje bez transkripta.",
       "waiting": "Transkripcija cijele snimke nije pokrenuta sama: ovaj je događaj od svakoga tražio privolu za transkripciju njegovih izlaganja. Pokrenite je gumbom {button} samo ako su svi koji govore u snimci dali privolu; inače ostaje transkript iz titlova."
     },
     "editCopyTitle": "Kopija događaja",
@@ -3981,22 +4160,149 @@
         "givenAt": "Dano",
         "withdrawnAt": "Povučeno",
         "textVersion": "Verzija teksta",
+        "destination": "Odredište",
+        "superseded": "Zamijenjeno",
+        "supersededValue": "Kasnijom privolom",
+        "destinations": {
+          "PUBLIC": "Javna",
+          "REGISTRANTS": "Samo za prijavljene",
+          "none": "Nije navedeno"
+        },
         "kinds": {
           "recording": "Snimanje",
           "transcription": "Transkripcija izlaganja"
         },
         "sources": {
           "registration": "prijava",
-          "room": "dvorana"
+          "room": "dvorana",
+          "self-service": "Moji podaci"
         },
         "roles": {
           "registrant": "prijavljen",
           "guest": "gost",
           "host": "vodi ili govori"
         },
+        "erasedName": "(ime uklonjeno na zahtjev)",
         "unreadableName": "(ime nije čitljivo)"
       },
+      "retainedNote": "{count, plural, one {# dokaz se čuva} few {# dokaza se čuvaju} other {# dokaza se čuva}} dok videozapis ili transkript postoje.",
       "countsNote": "Broje se osobe: prijava, račun osoblja ili imenska poveznica broje se jednom; gost koji se vrati u drugom posjetu broji se ponovno."
+    },
+    "recordingRemovals": {
+      "subtitle": "Osobe koje su zatražile da se ne pojavljuju u snimci. Dok je zahtjev otvoren, možeš otvoriti tu snimku iz uređivača uklanjanja, a svaki pristup ostaje u zapisniku operacija.",
+      "filterOpen": "Otvoreni",
+      "filterAll": "Svi",
+      "filterLabel": "Koji zahtjevi",
+      "empty": "Nema zahtjeva.",
+      "loadError": "Zahtjeve nije bilo moguće učitati.",
+      "colReceived": "Primljen",
+      "colPerson": "Osoba",
+      "colEvent": "Događaj",
+      "colSource": "Izvor",
+      "colStatus": "Status",
+      "open": "Otvori",
+      "unnamed": "Osoba bez imena",
+      "sources": {
+        "self-service": "Moji podaci",
+        "admin": "Osoblje"
+      },
+      "statuses": {
+        "OPEN": "Otvoren",
+        "IN_PROGRESS": "U tijeku",
+        "PROCESSING": "Obrađuje se",
+        "CLOSED": "Zatvoren",
+        "REJECTED": "Odbijen"
+      },
+      "kinds": {
+        "registrant": "Prijavljen",
+        "host": "Vodi",
+        "guest": "Gost"
+      },
+      "newOpen": "Evidentiraj zahtjev",
+      "newTitle": "Zahtjev primljen drugim putem",
+      "newIntro": "Za zahtjev koji je stigao voditelju obrade e-poštom, poštom ili osobno. Odaberi snimku i, ako je prepoznaješ, osobu među onima koji su bili u dvorani.",
+      "recordingSearch": "Traži događaj",
+      "recordingLabel": "Snimka",
+      "recordingChoose": "Odaberi snimku",
+      "recordingOption": "{title} · {date}",
+      "recordingNone": "Nema snimke s videozapisom ili s trakama po sudioniku.",
+      "peopleLabel": "Tko je bio u dvorani",
+      "peopleNone": "Dvorana nije zabilježila tko je bio prisutan: upiši ime, a intervale ćeš označiti ručno.",
+      "personNotInVideo": "izvan kadra",
+      "personTimes": "od {from} do {to}",
+      "personStill": "od {from} do kraja",
+      "nameLabel": "Ime osobe",
+      "noteLabel": "Kako je zahtjev stigao (neobavezno)",
+      "create": "Evidentiraj zahtjev",
+      "createError": "Zahtjev nije bilo moguće evidentirati.",
+      "cancel": "Odustani",
+      "back": "Svi zahtjevi",
+      "fieldPerson": "Osoba",
+      "fieldEvent": "Događaj",
+      "fieldReceived": "Primljen",
+      "fieldSource": "Izvor",
+      "fieldStatus": "Status",
+      "fieldNote": "Napomena",
+      "externalCopy": "Ovaj događaj ima videozapis na vanjskoj stranici (primjerice YouTube): uklanjanje ga ne doseže. Ukloni ga ili zamijeni i ondje.",
+      "publishedElsewhere": "Objavljeni videozapis događaja datoteka je različita od ove snimke: uklanjanje ga ne mijenja. Zamijeni ga ili ga povuci sa stranice događaja.",
+      "pipelineOff": "Postprodukcija je isključena: posao uklanjanja čeka u redu dok je ne uključiš, a transkript se ne izrađuje ponovno.",
+      "noVideo": "Ova snimka nema videozapis, samo trake po sudioniku: trake osobe brišu se, a transkript se ponovno izrađuje iz preostalih.",
+      "noRecording": "Snimka više ne postoji: nema više ničega za ukloniti.",
+      "keyOnly": "Ključem instance ne otvara se snimka: prijavi se svojim administratorskim računom.",
+      "startIntro": "Da bi uklonio osobu, moraš otvoriti snimku. Pristup vrijedi samo za ovaj zahtjev i ostaje u zapisniku operacija s tvojim računom.",
+      "start": "Otvori uređivač uklanjanja",
+      "processing": "Uklanjanje u tijeku: očišćeni videozapis zamijenit će izvornik. Status posla: {status}.",
+      "closed": "Zahtjev zatvoren {date}.",
+      "closedIntervals": "{count, plural, =0 {Nijedan interval nije prekriven.} one {# interval prekriven.} few {# intervala prekrivena.} other {# intervala prekriveno.}}",
+      "rejected": "Zahtjev odbijen {date}.",
+      "lastError": "Posljednja obrada nije uspjela: {error}. Provjeri intervale i pošalji ponovno.",
+      "rejectTitle": "Odbij zahtjev",
+      "rejectLabel": "Razlog",
+      "reject": "Odbij",
+      "rejectConfirm": "Odbiti zahtjev? Osoba će vidjeti da je odbijen.",
+      "actionError": "Radnja nije uspjela (HTTP {code}).",
+      "editorTitle": "Intervali za prekrivanje",
+      "editorHint": "Prijedlozi dolaze od toga tko je bio u dvorani, tko je govorio i od traka po sudioniku: vremena govora su približna. Pogledaj videozapis i ispravi. U svakom intervalu videozapis postaje natpis „sadržaj uklonjen na zahtjev” i zvuk se utišava; trajanje se ne mijenja.",
+      "sourcePresence": "U dvorani",
+      "sourceSpeech": "Govori",
+      "sourceTrack": "Traka",
+      "selectedLegend": "Za prekrivanje",
+      "useProposals": "Kreni ponovno od prijedloga",
+      "addInterval": "Dodaj interval ovdje",
+      "fieldStart": "Početak",
+      "fieldEnd": "Kraj",
+      "setStart": "Početak ovdje",
+      "setEnd": "Kraj ovdje",
+      "seek": "Idi",
+      "remove": "Ukloni",
+      "intervalLabel": "Interval {n}",
+      "noIntervalsVideo": "Nema intervala za prekrivanje. Ako se osoba ne pojavljuje u videozapisu, odbij zahtjev i navedi razlog.",
+      "total": "{count, plural, one {# interval} few {# intervala} other {# intervala}} · {seconds} s za prekrivanje",
+      "timeHint": "Vremena u obliku sati:minute:sekunde, kao u playeru.",
+      "invalidTime": "Nevažeće vrijeme",
+      "preview": "Pregled uklanjanja",
+      "timelineLabel": "Vremenska crta snimke",
+      "mediaError": "Videozapis se ne učitava. Ponovno učitaj stranicu.",
+      "submit": "Ukloni osobu iz snimke",
+      "submitConfirm": "Izvorni videozapis i trake osobe bit će izbrisani, a postprodukcija ponovno izvedena. To se ne može poništiti. Nastaviti?",
+      "submitDone": "Zahtjev zatvoren: osoba je uklonjena."
+    },
+    "catalog": {
+      "fieldTitle": "Katalog",
+      "fieldHelp": "Vrsta događaja i predložak iz kojeg je nastao služe samo za statistiku instance i ne mijenjaju nijednu postavku. Ispravite ih ako je događaj pogrešno katalogiziran ili uopće nije.",
+      "typeLabel": "Vrsta događaja",
+      "templateLabel": "Predložak",
+      "noTemplate": "Bez predloška",
+      "deletedTemplate": "Nastao iz predloška „{name}”, koji je u međuvremenu izbrisan.",
+      "deletedOption": "{name} (izbrisan)",
+      "types": {
+        "MEETING": "Sastanak",
+        "PARTICIPATORY": "Participativni događaj",
+        "PUBLIC": "Javni događaj",
+        "INSTANT": "Brzi poziv",
+        "LEGACY": "Uvezena objava",
+        "UNCATALOGED": "Nekatalogizirano"
+      }
     }
   },
   "email": {
@@ -4013,7 +4319,22 @@
     "dateLabel": "Datum",
     "timeLabel": "Vrijeme",
     "durationLabel": "Trajanje",
-    "myDataLink": "Vaši podaci: pregled, ispravak, povlačenje privole ili otkazivanje prijave"
+    "addressBookNote": "Nalazite se u imeniku događaja kako biste bili pozivani na slične događaje: privolu možete povući u bilo kojem trenutku.",
+    "addressBookPendingNote": "Na ovoj prijavi označeno je polje imenika događaja, ali ova je adresa prestala primati pozivnice. Ako je zahtjev vaš, možete ga potvrditi na stranici sa svojim podacima, putem poveznice u nastavku. Ako nije vaš, zanemarite ovu poruku: ostajete izvan imenika i ne primate pozivnice.",
+    "addressBookOptOutLink": "Ukloni moje podatke iz imenika",
+    "myDataLink": "Vaši podaci: pregled, ispravak, povlačenje privole ili otkazivanje prijave",
+    "confirmationCode": {
+      "subject": "{site}: kod za potvrdu",
+      "heading": "Vaš kod za potvrdu",
+      "introEdit": "Zatražili ste ispravak imena i ustanove u svojoj prijavi za „{event}”.",
+      "introEditAll": "Zatražili ste ispravak imena i ustanove u svim svojim prijavama.",
+      "introNickname": "Zatražili ste promjenu nadimka u svojoj prijavi za „{event}”.",
+      "introNicknameRemove": "Zatražili ste uklanjanje nadimka iz svoje prijave za „{event}”.",
+      "introCancel": "Zatražili ste brisanje svoje prijave za „{event}”.",
+      "codeLabel": "Kod je:",
+      "instructions": "Upišite ga na stranici Moji podaci s koje ste poslali zahtjev. Vrijedi {minutes, plural, one {# minuta} few {# minute} other {# minuta}}.",
+      "ignore": "Ako niste vi poslali zahtjev, zanemarite ovu e-poruku: bez koda se ništa ne mijenja. Ne dijelite kod ni s kim."
+    }
   },
   "home": {
     "hero": {
@@ -4380,17 +4701,100 @@
   },
   "gdpr": {
     "consent": {
-      "recording": "Pristajem na audio/video snimanje događaja",
+      "recording": "Pristajem na snimanje svojeg glasa kada govorim tijekom događaja. Moje lice i moje ime nikada se ne pojavljuju u videozapisu.",
+      "recordingReserved": "Pristajem na snimanje svojeg glasa kada govorim tijekom događaja. Moje lice i moje ime nikada se ne pojavljuju u videozapisu. Videozapis ostaje dostupan samo organizatorima i prijavljenima: ne objavljuje se. Prijavljeni ga mogu gledati dok se čuvaju podaci o njihovoj prijavi.",
+      "recordingPublic": "Pristajem na snimanje svojeg glasa kada govorim tijekom događaja. Pristajem i na objavu videozapisa: videozapis može pogledati bilo tko na stranici događaja i u videoteci. Moje lice i moje ime nikada se ne pojavljuju u videozapisu.",
+      "recordingVisible": "Pristajem na audio/video snimanje događaja.",
+      "recordingVisibleReserved": "Pristajem na audio/video snimanje događaja. Videozapis ostaje dostupan samo organizatorima i prijavljenima: ne objavljuje se. Prijavljeni ga mogu gledati dok se čuvaju podaci o njihovoj prijavi.",
+      "recordingVisiblePublic": "Pristajem na audio/video snimanje događaja i na objavu snimke: videozapis može pogledati bilo tko na stranici događaja i u videoteci.",
+      "recordingNoVideo": "Pristajem na snimanje događaja. Videozapis dvorane ne snima se: ostaju samo audiozapisi osoba koje daju privolu za transkripciju, ako ih događaj predviđa.",
       "multitrack": "Pristajem da se moja izlaganja transkribiraju s mojim imenom za izvješće o događanju. Ako događanje snima zaseban audiozapis za svaku osobu, moj se glas snima samo u tu svrhu, a zapis se briše nakon transkripcije; ne koristi se za prepoznavanje ili oponašanje mog glasa.",
+      "multitrackRetained": "Pristajem da se moja izlaganja transkribiraju s mojim imenom za izvješće o događaju. Ako događaj snima zaseban audiozapis za svaku osobu, moj se glas snima samo u tu svrhu, a zapis se čuva s podacima o događaju; ne koristi se za identifikaciju ili reproduciranje mog glasa.",
       "multitrackOptional": "Nije obvezno: ako ne date privolu, svejedno sudjelujete, ali vaša izlaganja ne ulaze u transkript i vaš se glas ne snima na zasebnu stazu. Ako se događaj snima, vaš glas ipak ostaje u videozapisu.",
+      "multitrackOptionalShort": "Nije obvezno: ako ne date privolu, svejedno sudjelujete, ali vaša izlaganja ne ulaze u transkript i vaš se glas ne snima na zasebnu stazu.",
       "stayInTouch": "Želim primati informacije o budućim događajima i biti dodan u imenik kako bih bio pozvan na slične događaje",
-      "stayInTouchHelp": "Neobavezna privola (čl. 6.1.a GDPR-a). Možeš je povući u bilo kojem trenutku putem poveznice „Ukloni me iz imenika” u e-porukama koje primiš. Ime i organizacija su oni iz ove prijave.",
+      "stayInTouchHelp": "Neobavezna privola (čl. 6.1.a GDPR-a). Možete je povući u bilo kojem trenutku putem poveznice „Ukloni moje podatke iz imenika” u potvrdnoj e-poruci, podsjetnicima i pozivnicama ili na stranici „Moji podaci”. Ime, adresa e-pošte i organizacija oni su iz ove prijave.",
+      "stayInTouchRetention": "Ove podatke čuvamo {months} mj. od ove privole: razdoblje počinje iznova samo ako ponovno označite okvir.",
       "recordingOptionalListenOnly": "Ako ne pristanete, svejedno sudjelujete, samo kao slušatelj: pratite i pišete u chatu, ali mikrofon, kamera i dijeljenje zaslona ostaju isključeni. Pristanak možete dati kasnije, iz sobe.",
-      "recordingOptionalHost": "Ako ne pristanete, svejedno ulazite i vodite kao i obično, ali vaš se glas ne čuva u zasebnim zapisima sudionika ni u transkripciji. Videozapis sobe, ako se snima, svejedno vas obuhvaća.",
       "recordingOptionalVoice": "Ako ne pristanete, svejedno sudjelujete i možete govoriti, ali ostajete izvan snimke: bez imena, glasa i slike. Pristanak možete dati kasnije, iz sobe.",
-      "recordingNotice": "Događaj se snima (zvuk i video). Sudjeluješ bez mikrofona i kamere: snimka ne sadrži tvoj glas ni tvoju sliku, osim ako ti voditelj ne da riječ.",
-      "recordingNoticeVoice": "Događaj se snima (audio i video). Sudjelujete bez mikrofona i kamere: snimka ne sadrži vaše ime, glas ni sliku, osim ako ne pristanete u sobi.",
+      "recordingNotice": "Događaj se može snimati. Sudjelujete bez mikrofona i kamere: snimka ne sadrži vaš glas ni vašu sliku, osim ako vam voditelji ne daju riječ.",
+      "recordingNoticeVoice": "Događaj se može snimati. Sudjelujete bez mikrofona i kamere: vaše lice i vaše ime nikada se ne pojavljuju u videozapisu, a vaš glas samo ako pristanete u sobi.",
+      "namesMayAppear": "Ime s kojim sudjelujete može se pojaviti u videozapisu čak i ako ne govorite.",
+      "recordingHostsOnly": "Događaj se može snimati. U videozapisu se vide i čuju samo voditelji: lica, imena i glasovi sudionika u njemu se nikada ne nalaze.",
+      "recordingHostAlwaysReserved": "Vodite ovaj događaj: uvijek ste u snimci, s imenom, glasom, slikom i dijeljenim zaslonom. Videozapis ostaje dostupan samo organizatorima i prijavljenima: ne objavljuje se. Prijavljeni ga mogu gledati dok se čuvaju podaci o njihovoj prijavi.",
+      "recordingHostAlwaysPublic": "Vodite ovaj događaj: uvijek ste u snimci, s imenom, glasom, slikom i dijeljenim zaslonom. Videozapis se može objaviti i može ga pogledati bilo tko.",
       "recordingHostAlways": "Vodite ovaj događaj: uvijek ste u snimci, s imenom, glasom, slikom i dijeljenim zaslonom."
+    },
+    "sheet": {
+      "title": "Ovaj događaj i vaši podaci",
+      "intro": "Ovisi o tome kako su organizatori postavili događaj. Sve ostalo nalazi se u politici privatnosti.",
+      "recording": {
+        "label": "Snimanje",
+        "none": "Za ovaj događaj nije predviđeno snimanje.",
+        "manual": "Voditelji mogu pokrenuti audio i video snimanje. Kad je uključeno, to je naznačeno u dvorani.",
+        "auto": "Događaj se snima, zvuk i slika, od samog početka. To je naznačeno u dvorani.",
+        "tracksOnly": "Videozapis dvorane ne snima se: samo jedan audiozapis za svaku osobu koja da privolu.",
+        "destinationReserved": "Snimka ostaje dostupna samo organizatorima i prijavljenima i ne objavljuje se. Prijavljeni je mogu gledati dok se čuvaju podaci o njihovoj prijavi.",
+        "destinationPublic": "Snimka se može objaviti nakon događaja.",
+        "destinationUnset": "Organizatori nakon događaja odlučuju hoće li je objaviti.",
+        "refuseOut": "Ako ne date privolu, svejedno sudjelujete i ostajete izvan snimke.",
+        "refuseListenOnly": "Ako ne date privolu, sudjelujete, ali samo slušate.",
+        "hostsAlways": "U videozapisu su samo voditelji, s imenom, glasom, slikom i dijeljenim zaslonom. Lica i imena sudionika nikada se ne pojavljuju.",
+        "hostsAlwaysVisible": "Voditelji su uvijek u snimci, s imenom, glasom, slikom i dijeljenim zaslonom.",
+        "hostsOnly": "U videozapisu se vide i čuju samo voditelji, s imenom, glasom, slikom i dijeljenim zaslonom. Lica, imena i glasovi sudionika u njemu se nikada ne nalaze.",
+        "audienceNotice": "Sudjelujete bez mikrofona i kamere: snimka ne sadrži vaš glas ni vašu sliku, osim ako vam voditelji ne daju riječ.",
+        "audienceNoticeVoice": "Sudjelujete bez mikrofona i kamere: vaše lice i vaše ime nikada se ne pojavljuju u videozapisu, a vaš glas samo ako pristanete u sobi."
+      },
+      "transcript": {
+        "label": "Transkripcija",
+        "captions": "Tekst titlova čuva se, s imenom, samo za osobe koje daju privolu i postaje transkript događaja.",
+        "tracks": "Za osobe koje daju privolu snima se audiozapis, koji se briše nakon transkripcije.",
+        "tracksRetained": "Za osobe koje daju privolu snima se audiozapis, koji se čuva s podacima o događaju.",
+        "fromVideo": "Nakon događaja organizatori mogu dati transkribirati videozapis samo ako su svi koji govore dali privolu."
+      },
+      "captions": {
+        "label": "Titlovi"
+      },
+      "ai": {
+        "label": "Umjetna inteligencija",
+        "summary": "Nakon događaja alat umjetne inteligencije može napisati sažetak snimke.",
+        "translation": "Transkript i sažetak mogu se automatski prevesti.",
+        "dubbing": "Videozapis može imati sinkronizaciju sintetičkim glasom.",
+        "onRequest": "Nakon događaja organizatori mogu zatražiti i automatske obrade snimke koje ovdje nisu navedene: transkripciju, sažetak ili prijevod.",
+        "report": "Nakon događaja osoblje može dati izraditi izvješće pomoću umjetne inteligencije, koristeći se i anketama te, ako su objavljena, pitanjima. Tekst chata ne koristi se.",
+        "accuracy": "Tekstovi izrađeni pomoću umjetne inteligencije mogu sadržavati netočnosti."
+      },
+      "list": {
+        "label": "Popis sudionika",
+        "visible": "Sudionici u dvorani vide popis prisutnih.",
+        "hidden": "U dvorani publika ne vidi popis prisutnih. Voditelji i govornici ga vide."
+      },
+      "name": {
+        "label": "Vaše ime",
+        "real": "U dvorani, chatu i pitanjima prikazujete se pod svojim imenom.",
+        "pseudonym": "U dvorani, chatu i pitanjima prikazujete se pod pseudonimom. Organizatori vide podatke o vašoj prijavi.",
+        "pseudonymTranscript": "Ako date privolu za transkripciju, u transkriptu ostaje vaše ime.",
+        "nickname": "Možete odabrati nadimak: drugi ga vide umjesto vašeg imena. Organizatori i moderatori znaju tko se iza njega krije.",
+        "nicknameTranscript": "Ako pristanete na transkript, u njemu se prikazujete nadimkom ako ste ga odabrali, a inače svojim imenom."
+      },
+      "retention": {
+        "label": "Čuvanje",
+        "data": "Podaci o prijavi i dvorani brišu se {days, plural, one {# dan} few {# dana} other {# dana}} nakon završetka događaja. Pitanja i ankete ostaju bez imena.",
+        "recordingKept": "Snimka i ono što iz nje nastaje (transkript, sažetak, prijevodi) ne brišu se zajedno s tim podacima: bez obzira na to jesu li stavljeni na raspolaganje, ostaju dok ih organizatori ne izbrišu.",
+        "recordingDays": "Snimka i ono što iz nje nastaje brišu se {days, plural, one {# dan} few {# dana} other {# dana}} nakon završetka događaja ili, ako se snimka stavi na raspolaganje, nakon njezine objave.",
+        "transcriptKept": "Transkript se ne briše zajedno s tim podacima: ostaje dok ga organizatori ne izbrišu.",
+        "transcriptDays": "Transkript se briše {days, plural, one {# dan} few {# dana} other {# dana}} nakon završetka događaja."
+      },
+      "addressBook": {
+        "label": "Imenik",
+        "offered": "Pri prijavi možete odabrati da ostanete u imeniku događaja kako biste bili pozivani na slične događaje. Neobavezno je: podaci ostaju {months} mj. od privole, osim ako je povučete."
+      },
+      "chat": {
+        "label": "Chat i pitanja",
+        "messages": "Poruke u chatu nikad se ne objavljuju, čak ni pitanja postavljena u chatu.",
+        "questionsText": "Nakon događaja može se objaviti tekst pitanja iz Q&A, ali nikad ime osobe koja ih je postavila.",
+        "questionsNone": "Pitanja iz Q&A ne objavljuju se."
+      }
     },
     "export": {
       "title": "Moji podaci",
@@ -4401,20 +4805,21 @@
       "submit": "Zatraži moje podatke",
       "loading": "Pretraživanje...",
       "requestSubmittedTitle": "Provjerite svoj pretinac e-pošte",
-      "requestSubmittedBody": "Ako email adresa odgovara prijavi, poslali smo vam poveznicu za preuzimanje vaših podataka. Poveznica vrijedi 1 sat.",
+      "requestSubmittedBody": "Ako email adresa odgovara prijavi, poslali smo vam poveznicu za pregled vaših podataka. Poveznica vrijedi 1 sat.",
       "linkInvalid": "Poveznica nije valjana ili je istekla. Zatražite novu poveznicu.",
       "requestNew": "Zatraži novu poveznicu",
       "noData": "Nema pronađenih podataka za ovu email adresu.",
       "error": "Došlo je do pogreške. Molimo pokušajte ponovno kasnije.",
       "rateLimited": "Previše zahtjeva. Molimo pokušajte ponovno za sat vremena.",
       "results": "Vaši podaci",
-      "resultsDescription": "Pronađeni podaci vezani uz {count} događaja.",
+      "resultsDescription": "{count, plural, one {Pronađeni podaci vezani uz # događaj.} few {Pronađeni podaci vezani uz # događaja.} other {Pronađeni podaci vezani uz # događaja.}}",
       "registrationData": "Podaci o prijavi",
       "fieldName": "Ime",
+      "fieldNickname": "Nadimak",
       "fieldEmail": "E-pošta",
       "fieldOrganization": "Ustanova",
       "fieldRegisteredAt": "Datum prijave",
-      "fieldConsent": "Pristanak",
+      "fieldConsent": "Upoznavanje s politikom privatnosti",
       "questionsTitle": "Q&A pitanja",
       "pollVotesTitle": "Glasovi u anketama",
       "optionLabel": "Opcija",
@@ -4436,7 +4841,74 @@
       "consentFuture": "Buduće obavijesti",
       "consentWithdrawnOn": "Povučeno {date}",
       "consentNoteInRoom": "Ako ste trenutačno u dvorani, povlačenje vrijedi od sljedećeg ulaska: da vrijedi odmah, upotrijebite Privole u dvorani.",
-      "consentFutureEffect": "Ako je povučete, više nećete primati obavijesti o sljedećim događajima i izlazite iz adresara, za sve svoje prijave."
+      "consentGiveNoteInRoom": "Privola dana ovdje vrijedi od vašeg sljedećeg ulaska u dvoranu, a ne za ono što je već snimljeno. Privolu za snimanje i transkripciju možete dati dok događaj ne završi.",
+      "proofsTitle": "Sačuvani dokazi o privolama",
+      "proofsIntro": "Podaci o ovim događajima su izbrisani. Ovi dokazi ostaju dok videozapis ili transkript postoje. Možete povući privolu: ono što je već u videozapisu ostaje, a za uklanjanje morate pisati voditelju obrade.",
+      "proofGivenOn": "Dano {date}",
+      "proofSuperseded": "Zamijenjeno kasnijom privolom",
+      "proofWithdrawEffect": {
+        "recording": "Povlačite i privolu za transkripciju: vaše rečenice i vaše ime uklanjaju se iz transkripta iz titlova. Ono što je već u videozapisu ostaje, kao i transkript izrađen iz videozapisa ili audiozapisa: za njihovo uklanjanje pišite voditelju obrade. S ove stranice povlačenje se ne može poništiti.",
+        "transcription": "Vaše rečenice i vaše ime uklanjaju se iz transkripta iz titlova. Transkript izrađen iz videozapisa ili audiozapisa ostaje: za njegovo uklanjanje pišite voditelju obrade. S ove stranice povlačenje se ne može poništiti."
+      },
+      "proofWithdrawHost": "Stariji transkripti iz titlova ne prepoznaju voditelje: u njima vaše rečenice i vaše ime ostaju, a za njihovo uklanjanje morate pisati voditelju obrade.",
+      "roomProofsTitle": "Privole dane tijekom vođenja događaja",
+      "roomProofsIntro": "Privole za snimanje i transkripciju koje ste dali pri ulasku u dvoranu s ulogom u događaju. U prozoru „Privole” u dvorani povlače se privole trenutačnog ulaska, a s vašim računom osoblja i privole prethodnih ulazaka; za ostale, i nakon završetka događaja, preostaje brisanje vaših podataka.",
+      "addressBookTitle": "Imenik događaja",
+      "addressBookIntro": "Odabrali ste ostati u imeniku kako biste bili pozivani na slične događaje. Ove podatke čuvamo do {date}, osim ako povučete privolu ili date novu.",
+      "addressBookOptOut": "Ukloni moje podatke iz imenika",
+      "consentFutureEffect": "Ako je povučete, više nećete primati obavijesti o sljedećim događajima i izlazite iz adresara, za sve svoje prijave.",
+      "consentFutureGive": "Pristajem na buduće obavijesti",
+      "consentFutureGiveEffect": "Vraćate se u imenik događaja s imenom i organizacijom iz ove prijave i ponovno primate pozivnice; razdoblje čuvanja počinje iznova od danas.",
+      "consentGiveDone": "Privola je dana: vrijedi od vašeg sljedećeg ulaska u dvoranu.",
+      "consentFutureGiveDone": "Privola je dana: ponovno ste u imeniku događaja.",
+      "consentGiveTextChanged": "Tekst privole promijenio se nakon što ste otvorili stranicu: ponovno je učitajte da biste pročitali novi.",
+      "consentGiveClosed": "Ovu privolu više nije moguće dati ovdje: događaj je završio ili je više ne traži. Ponovno učitajte stranicu da biste vidjeli trenutačno stanje.",
+      "consentGiveNewText": "Tekst ove privole promijenio se nakon što ste je dali: za trenutačni tekst treba je dati ponovno.",
+      "addressBookPendingTitle": "Povratak u imenik treba potvrditi",
+      "addressBookPendingBody": "Na ovoj prijavi označeno je polje imenika, ali ova je adresa prestala primati pozivnice. Dok ne potvrdite, ništa se ne mijenja.",
+      "addressBookPendingEffect": "Ako potvrdite, vraćate se u imenik s imenom i organizacijom iz ove prijave i ponovno primate pozivnice. Ako odustanete ili ako to niste bili vi, ostajete izvan imenika i ne primate pozivnice.",
+      "addressBookPendingConfirm": "Potvrdi povratak",
+      "addressBookPendingCancel": "Poništi zahtjev",
+      "addressBookPendingGone": "Ovaj zahtjev više nije na čekanju. Ponovno učitajte stranicu da biste vidjeli trenutačno stanje.",
+      "removalTitle": "Snimka događaja",
+      "removalIntro": "Ovaj je događaj snimljen. Ako se ne želite pojavljivati u snimci, možete zatražiti da vas se iz nje ukloni: dijelovi u kojima se pojavljujete ili govorite prekrivaju se natpisom i utišavaju, a transkript, titlovi i sažetak izrađuju se ponovno. Zahtjev ide voditelju obrade, koji ga razmatra.",
+      "removalButton": "Ne želim se pojavljivati u ovoj snimci",
+      "removalConfirmTitle": "Potvrđujete li zahtjev?",
+      "removalConfirmBody": "Voditelj obrade uklonit će iz snimke dijelove u kojima se pojavljujete ili govorite. Kopije objavljene na drugim stranicama, primjerice na YouTubeu, mora zasebno ukloniti onaj tko ih je objavio.",
+      "removalConfirm": "Pošalji zahtjev",
+      "removalCancel": "Odustani",
+      "removalSent": "Zahtjev je poslan. Voditelj obrade će ga razmotriti.",
+      "removalError": "Zahtjev nije bilo moguće poslati. Pokušajte ponovno kasnije.",
+      "removalStatusOpen": "Zahtjev od {date}: u obradi.",
+      "removalStatusClosed": "Zahtjev od {date}: dovršen {closed}.",
+      "removalStatusRejected": "Zahtjev od {date}: odbijen. Pišite voditelju obrade da biste saznali razlog.",
+      "editButton": "Ispravi ime i ustanovu",
+      "editScopeLegend": "Na koje se prijave odnosi",
+      "editScopeOne": "Samo ova prijava",
+      "editScopeAll": "Sve moje prijave ({count}) i imenik događaja",
+      "editEffect": "Ispravak vrijedi za sljedeće e-poruke i od vašeg sljedećeg ulaska u dvoranu. Ne mijenja ono što je već snimljeno, transkribirano ili napisano u chatu, niti dokaze o privolama.",
+      "editNameInvalid": "Ime mora imati od 2 do 100 znakova.",
+      "editOrganizationRequired": "Događaj na koji ste prijavljeni traži ustanovu: polje ne može ostati prazno.",
+      "editOrganizationTooLong": "Ustanova može imati najviše 200 znakova.",
+      "editDone": "Podaci su ispravljeni.",
+      "nicknameChoose": "Odaberi nadimak",
+      "nicknameChange": "Promijeni nadimak",
+      "nicknameEffect": "Drugi vide nadimak umjesto vašeg imena: u chatu i u pitanjima odmah, u videu od vašeg sljedećeg ulaska u sobu. Ono što je već snimljeno, transkribirano ili napisano ne mijenja se.",
+      "nicknameDone": "Nadimak je spremljen.",
+      "codeWhy": "Radi sigurnosti, ispravci i brisanja potvrđuju se kodom koji šaljemo na adresu e-pošte prijave.",
+      "codeSend": "Pošaljite mi kod za potvrdu",
+      "codeSent": "E-poštom smo vam poslali šesteroznamenkasti kod. Upišite ga ovdje: vrijedi {minutes, plural, one {# minuta} few {# minute} other {# minuta}}.",
+      "codeLabel": "Kod za potvrdu",
+      "codeConfirmEdit": "Potvrdi ispravak",
+      "codeConfirmNickname": "Potvrdi nadimak",
+      "codeInvalid": "Kod nije točan ili je istekao. Provjerite posljednju primljenu e-poruku ili odustanite i zatražite novi.",
+      "cancelTitle": "Brisanje ove prijave",
+      "cancelIntro": "Možete izbrisati samo ovu prijavu, a da ne dirate ostale ni ostatak svojih podataka.",
+      "cancelButton": "Izbriši ovu prijavu",
+      "cancelDeletes": "Brišu se prijava na ovaj događaj i ono što ste s njom učinili: pitanja, glasovi, poruke u chatu, povratne informacije, odgovori na upitnike, vaše rečenice u transkripciji iz titlova i e-poruke na čekanju. Vaša osobna poveznica prestaje raditi, a mjesto se oslobađa.",
+      "cancelKeeps": "Ostaju vaše ostale prijave, imenik događaja, profilna fotografija i zahtjev za uklanjanje iz snimke koji se još obrađuje. Ako za ovaj događaj postoji videozapis ili transkripcija, dokaz vaše privole ostaje bez vašeg imena dok oni postoje. Brisanje se ne može poništiti; dok događaj prima prijave, možete se ponovno prijaviti.",
+      "codeConfirmCancel": "Izbriši prijavu",
+      "cancelDone": "Prijava je izbrisana."
     },
     "erasure": {
       "title": "Brisanje vaših podataka",
@@ -4448,13 +4920,15 @@
       "requestSubmittedTitle": "Provjerite svoj pretinac e-pošte",
       "requestSubmittedBody": "Ako email adresa odgovara prijavi, poslali smo vam poveznicu za potvrdu brisanja. Poveznica vrijedi 1 sat.",
       "linkInvalid": "Poveznica nije valjana ili je istekla. Zatražite novu poveznicu.",
-      "confirmWarning": "Upravo ćete trajno izbrisati sve osobne podatke povezane s vašom email adresom.",
+      "confirmWarning": "Upravo ćete trajno izbrisati osobne podatke povezane s vašom email adresom, osim onoga što je navedeno u nastavku.",
       "confirmBody": "Bit će izbrisane prijave, pitanja, glasovi u anketama, povratne informacije, podsjetnici i vaš unos u imeniku događaja. Radnja je nepovratna.",
+      "confirmProofs": "Ako događaj ima videozapis ili transkript, čak i ako još nisu objavljeni, ostaju vrsta privole, datum i tekst na koji ste odgovorili, bez vašeg imena, dok taj videozapis ili transkript postoje. Služe kao dokaz privole. Videozapis se ne mijenja: ako želite zatražiti uklanjanje svojih izlaganja, pišite voditelju obrade. Stariji transkripti iz titlova ne prepoznaju osobe koje vode događaj ili u njemu govore s određenom ulogom: u njima vaše rečenice i vaše ime ostaju, a za njihovo uklanjanje morate pisati voditelju obrade.",
       "confirmButton": "Potvrdi brisanje",
       "cancel": "Odustani",
       "processing": "Brisanje u tijeku...",
       "doneTitle": "Brisanje dovršeno",
-      "doneBody": "Broj izbrisanih prijava: {count}. Izbrisani su i povezani podaci.",
+      "doneBody": "{count, plural, =0 {Nema prijava za brisanje.} one {Izbrisana je # prijava, zajedno s povezanim podacima.} few {Izbrisane su # prijave, zajedno s povezanim podacima.} other {Izbrisano je # prijava, zajedno s povezanim podacima.}}",
+      "doneProofs": "{count, plural, one {Ostao je # dokaz o privoli, bez vašeg imena, dok videozapis ili transkript postoje.} few {Ostala su # dokaza o privoli, bez vašeg imena, dok videozapis ili transkript postoje.} other {Ostalo je # dokaza o privoli, bez vašeg imena, dok videozapis ili transkript postoje.}}",
       "error": "Došlo je do pogreške. Molimo pokušajte ponovno kasnije.",
       "rateLimited": "Previše zahtjeva. Molimo pokušajte ponovno za sat vremena.",
       "back": "Natrag na moje podatke",
@@ -5232,7 +5706,8 @@
     "overlapTitle": "Istodobni govor: u ovom intervalu istovremeno govori više osoba.",
     "anonymousSpeaker": "Sudionik {n}",
     "untranscribed": "Nije transkribirano: govornik nije dao privolu",
-    "unrecordedSpeech": "Neka izlaganja nisu u snimci: govornici nisu dali privolu."
+    "unrecordedSpeech": "Neka izlaganja nisu u snimci: govornici nisu dali privolu.",
+    "unrecordedSpeechHostsOnly": "Neka izlaganja nisu u snimci: u videozapisu se vide i čuju samo voditelji."
   },
   "waiting": {
     "startsIn": "Događaj počinje za",
@@ -5249,7 +5724,9 @@
     "watchNow": "Gledaj",
     "switchToLive": "Prebaci na uživo",
     "enterRoom": "Uđite u dvoranu",
-    "recordingNotice": "Ovaj događaj se snima.",
+    "recordingNotice": "Ovaj se događaj može snimati.",
+    "recordingNoticeInstant": "Poziv se može snimati. U videozapisu su samo voditelji: vaše lice i vaše ime nikada. Ako netko pokrene snimanje, pitat ćemo vas pristajete li na snimanje svojeg glasa.",
+    "recordingNoticeInstantHostsOnly": "Poziv se može snimati. U videozapisu se vide i čuju samo voditelji: lica, imena i glasovi sudionika u njemu se nikada ne nalaze.",
     "recordingAvailableAfter": "Snimka će biti dostupna nakon događaja.",
     "autoRefreshHint": "Stranica će se automatski osvježiti kada događaj počne.",
     "startEventButton": "Pokreni događaj",
@@ -5300,10 +5777,15 @@
     "classicView": "Klasični prikaz",
     "backToGarden": "Prikaži trg",
     "aiNoticeTitle": "Obrada umjetnom inteligencijom nakon događaja",
-    "aiNotice": "Na kraju će snimka biti obrađena alatima umjetne inteligencije radi izrade transkripta, sažetka te mogućih prijevoda i sinkronizacija. Rezultati mogu sadržavati netočnosti; mjerodavan ostaje videozapis.",
+    "aiNotice": "Na kraju snimka može biti obrađena alatima umjetne inteligencije radi izrade transkripta, sažetka te mogućih prijevoda i sinkronizacija. Transkript obuhvaća samo osobe koje su dale privolu. Rezultati mogu sadržavati netočnosti; mjerodavan ostaje videozapis.",
     "multitrackConsentTitle": "Transkript vaših izlaganja",
-    "recordingConsentTitle": "Snimanje događaja",
-    "recordingConsentIntro": "Događaj se snima (audio i video). S vašim pristankom snimka sadrži vaše ime, glas, sliku i ono što dijelite na zaslonu.",
+    "recordingConsentTitle": "Snimanje vašeg glasa",
+    "recordingConsentTitleVisible": "Snimanje događaja",
+    "recordingConsentIntro": "Događaj se može snimati. U videozapisu su samo voditelji: vaše lice i vaše ime nikada. Uz vaš pristanak vaš se glas snima kada govorite.",
+    "recordingConsentIntroAnonymous": "Događaj se može snimati. U videozapisu su samo voditelji: vaše lice i vaš pseudonim nikada. Uz vaš pristanak vaš se glas snima kada govorite.",
+    "recordingConsentIntroVisible": "Događaj se može snimati (audio i video). Uz vašu privolu snimka sadrži vaše ime, glas, sliku i ono što dijelite na zaslonu.",
+    "recordingConsentIntroVisibleAnonymous": "Događaj se može snimati (audio i video). Uz vašu privolu snimka sadrži vaš pseudonim, glas, sliku i ono što dijelite na zaslonu.",
+    "recordingConsentIntroNoVideo": "Na ovom se događaju videozapis dvorane ne snima.",
     "enterGardenTitle": "Uđi na trg",
     "enterGardenHint": "Drugo mjesto za čekanje: prošetaj, upoznaj ostale koji čekaju i uđi u prijenos kroz vrata kad se soba otvori.",
     "backToWaitingRoom": "Natrag u čekaonicu",
@@ -5550,11 +6032,14 @@
       "7d": "7 dana",
       "30d": "30 dana",
       "90d": "90 dana",
+      "1y": "1 godina",
+      "days": "{count, plural, one {# dan} few {# dana} other {# dana}}",
       "forever": "Bez automatskog brisanja"
     },
-    "retentionNote": "Objavljeni videozapis ne prati čuvanje podataka događaja: bez roka ostaje javan dok ga netko ne izbriše.",
+    "retentionNote": "Snimka ne prati čuvanje podataka događaja: bez roka ostaje, objavljena ili ne, dok je netko ne izbriše. Rok se računa od objave ili, ako video nije objavljen, od završetka događaja; kad istekne, brišu se video i ono što iz njega nastaje (transkripti, sažeci, prijevodi).",
+    "retentionLegacy": "Prijavljenima na ovaj događaj rečeno je da se neobjavljena snimka briše zajedno s njihovim podacima, {days, plural, one {# dan} few {# dana} other {# dana}} nakon završetka događaja. Dok videozapis nije objavljen, možete skratiti to razdoblje, ali ga ne možete ukloniti ni produljiti.",
     "delete": "Obriši snimku",
-    "deleteConfirm": "Jeste li sigurni? Video će biti trajno obrisan.",
+    "deleteConfirm": "Jeste li sigurni? Video će biti trajno obrisan. Transkripti, sažeci i prijevodi ne brišu se s njim: prate rok snimke odabran ovdje.",
     "notConfigured": "Jibri nije konfiguriran u infrastrukturi. Video snimanje nije dostupno.",
     "disabledHint": "Snimanje videa nije omogućeno za ovaj događaj. Za aktiviranje otvorite gornji odjeljak Postavke i uključite preklopnik \"Snimanje\".",
     "play": "Reproduciraj",
@@ -5570,6 +6055,8 @@
     "audiencePublicDesc": "Svatko tko otvori stranicu događaja. Može se pojaviti u videoteci.",
     "audienceRegistrants": "Samo prijavljeni",
     "audienceRegistrantsDesc": "Oni koji su se prijavili na događaj, čak i ako nisu ušli u sobu, putem osobne poveznice iz obavijesti e-poštom. Ne pojavljuje se u videoteci.",
+    "audienceReservedNote": "Osobe koje su dale privolu dale su je za snimku samo za prijavljene: videozapis mogu vidjeti samo prijavljeni i organizatori.",
+    "destinationMissing": "Ovaj događaj ne navodi kamo ide snimka: prikupljene privole ne govore bi li videozapis bio objavljen. Provjerite prije objave.",
     "saveFailed": "Promjena nije spremljena. Pokušajte ponovno."
   },
   "postEvent": {
@@ -5579,7 +6066,9 @@
     "libraryListed": "Objavi u videoteci",
     "libraryListedHelp": "Prikazuje ovaj događaj u javnoj videoteci (/video-library). Zahtijeva objavljenu snimku ili YouTube videozapis te vidljivu stranicu događaja.",
     "libraryListedNoRecording": "Nema objavljene snimke: događaj se neće pojaviti u videoteci dok ne objaviš snimku ili dodaš YouTube videozapis.",
-    "showQA": "Prikaži Q&A pitanja",
+    "libraryListedReserved": "Snimka samo za prijavljene: događaj se ne pojavljuje u videoteci.",
+    "showQA": "Prikaži tekst Q&A pitanja, bez imena",
+    "qaReservedNote": "Uz snimku samo za prijavljene pitanja se ne objavljuju.",
     "showMaterials": "Prikaži podijeljene materijale",
     "showPolls": "Prikaži rezultate anketa",
     "showFeedback": "Prikaži povratne informacije",
@@ -5591,7 +6080,7 @@
     "visibilityAlways": "Uvijek vidljivo",
     "visibilityUntil": "Vidljivo do:",
     "dataRetentionNote": "Osobni podaci sudionika bit će obrisani u skladu s retencijom događaja ({days} dana). Sadržaj događaja ostat će dostupan dok je stranica vidljiva.",
-    "availableUntil": "Ovaj događaj i pripadajući sadržaj bit će dostupni do {date}.",
+    "participantDataUntil": "Osobni podaci sudionika brišu se {date}.",
     "tabs": {
       "qa": "Pitanja i odgovori",
       "materials": "Materijali",
@@ -5672,7 +6161,7 @@
       "strengths": "Prednosti",
       "improvements": "Za poboljšanje",
       "quotes": "Iz komentara",
-      "aiNotice": "Tekst je napisao model umjetne inteligencije na temelju transkripta, chata, pitanja, anketa i ocjena, a tim ga je pregledao prije objave. Brojke i grafikone izračunava platforma. Može sadržavati netočnosti."
+      "aiNotice": "Tekst je napisao model umjetne inteligencije na temelju transkripta, anketa, ocjena i, ako su objavljena, pitanja, a tim ga je pregledao prije objave. Brojke i grafikone izračunava platforma. Može sadržavati netočnosti."
     },
     "languages": {
       "title": "Gledaj na jeziku",
@@ -5733,7 +6222,7 @@
       "confirm": "Potvrdi uklanjanje",
       "submitting": "Uklanjanje u tijeku…",
       "successTitle": "Uklanjanje dovršeno",
-      "successBody": "Vaši podaci više nisu u imeniku događaja.",
+      "successBody": "Od ovog trenutka više nećete primati pozivnice. Vaša adresa e-pošte već je uklonjena; ime i organizacija brišu se iz imenika najkasnije sljedećeg dana.",
       "errors": {
         "generic": "Došlo je do pogreške. Pokušajte ponovno kasnije."
       }
@@ -5831,12 +6320,21 @@
     "recordingWithoutMedia": "Ova snimka nema videozapis: njezin transkript dolazi iz titlova uživo.",
     "recordingWithoutVideo": "Iz ove snimke postoje audiozapisi sudionika, ali ne i video: nije snimljen ili još nije stigao. Za arhivu za preuzimanje potreban je i video.",
     "noParticipantTracks": "Nema zasebnih audiozapisa sudionika: nisu snimljeni ili su već izbrisani. Ako ih želite, prije događaja uključite snimanje po sudioniku.",
+    "noTranscribableTracks": "Nijedan audiozapis ove snimke ne može se transkribirati: izbrisani su ili osobe koje se u njima pojavljuju nisu dale privolu za transkripciju sa svojim imenom.",
+    "tracksPending": "Audiozapisi ove snimke još nisu stigli: transkripcija će se pokrenuti sama kada stignu.",
     "summaryMissing": "Za ovaj jezik još nema sažetka za uređivanje: najprije ga generirajte.",
     "storageUnavailable": "Učitavanje datoteka nije dostupno u ovoj instalaciji.",
     "aiDisabledForEvent": "Umjetna inteligencija isključena je za ovaj događaj: upotrijebite „Generiraj AI” da je uključite i pokrenete obradu.",
     "sourceTranscriptMissing": "Ova snimka još nije transkribirana: transkribirajte je prije dodavanja prijevoda.",
     "captionsTranscriptNotTranslatable": "Ovaj transkript potječe iz titlova uživo: automatski prijevod zahtijeva AI transkript snimke.",
     "sameLanguage": "Odabrani jezik izvorni je jezik snimke: odaberite drugi.",
-    "mtUnavailable": "Strojno prevođenje nije instalirano na ovoj instanci."
+    "recordingDestinationNotCovered": "Privole za ovaj događaj vrijede za snimku samo za prijavljene: ne možete je učiniti vidljivom svima ni povezati vanjski videozapis.",
+    "mtUnavailable": "Strojno prevođenje nije instalirano na ovoj instanci.",
+    "recordingContentOrganizerOnly": "Sadržaj snimki ovog događaja mogu otvarati, mijenjati ili objavljivati samo njegovi organizatori.",
+    "recordingRetentionLegacy": "Prijavljenima na ovaj događaj rečeno je da se neobjavljena snimka briše zajedno s njihovim podacima: dok videozapis nije objavljen, njezino se razdoblje može skratiti, ali ne i ukloniti ni produljiti."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Sadržaj uklonjen na zahtjev",
+    "cardBody": "Ovaj dio snimke uklonjen je na zahtjev osobe koja se u njoj pojavljivala."
   }
 }

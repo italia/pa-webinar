@@ -51,7 +51,6 @@ interface AnsweredQuestion {
   id: string;
   text: string;
   answerText: string | null;
-  authorName: string;
   upvotes: number;
   status: string;
 }
@@ -75,10 +74,14 @@ interface EventData {
   transcriptPublished?: boolean;
   /** Qualcuno ha parlato senza consenso: nel video il suo intervento non c'e'. */
   unrecordedSpeech?: boolean;
+  /** Nel video c'e' solo chi conduce (lib/recording/availability 'esclusi'): la
+   *  nota dice questo, non che manca un consenso. */
+  unrecordedSpeechHostsOnly?: boolean;
   youtubeUrl?: string | null;
   qaEnabled: boolean;
   chatEnabled: boolean;
-  recordingEnabled?: boolean;
+  /** La scheda privacy dice che si registra qualcosa. */
+  siRegistra?: boolean;
   participantsCanUnmute?: boolean;
   participantsCanStartVideo?: boolean;
   participantsCanShareScreen?: boolean;
@@ -173,9 +176,13 @@ interface EventDetailClientProps {
   /** Le slide presentate in sala da mostrare accanto al video pubblicato
    *  (lib/presentation/recording-slides-data); null se non ce ne sono. */
   recordingSlides?: RecordingSlidesView | null;
-  /** Lo staff guarda la pagina come sara' pubblicata (`?anteprima=1`), con la
-   *  registrazione non ancora pubblica (lib/recording/audience). */
+  /** Lo staff guarda in anteprima (`?anteprima=1`) cio' che il pubblico non vede
+   *  ancora (lib/recording/audience). */
   previewForStaff?: boolean;
+  /** Il video e' gia' pubblicato: cio' che il pubblico non vede e' la pagina. */
+  previewPageHidden?: boolean;
+  /** La pagina nascosta si apre agli iscritti (`apertaAgliIscritti`). */
+  previewPageForRegistrants?: boolean;
   /** La registrazione e' pubblicata per i soli iscritti e questa richiesta non
    *  prova un'iscrizione: la pagina lo dice invece di tacere. */
   recordingForRegistrants?: boolean;
@@ -198,6 +205,8 @@ export default function EventDetailClient({
   tags = [],
   invalidToken = false,
   previewForStaff = false,
+  previewPageHidden = false,
+  previewPageForRegistrants = false,
   recordingForRegistrants = false,
   replayMoments = null,
   programmeVideoTimes = null,
@@ -487,7 +496,9 @@ export default function EventDetailClient({
         poster={event.imageUrl}
       />
       {event.unrecordedSpeech && (
-        <p className="small text-secondary mt-2 mb-0">{tp('unrecordedSpeech')}</p>
+        <p className="small text-secondary mt-2 mb-0">
+          {tp(event.unrecordedSpeechHostsOnly ? 'unrecordedSpeechHostsOnly' : 'unrecordedSpeech')}
+        </p>
       )}
 
       {/* Mini-transcript inline sotto al video: 3 righe
@@ -551,7 +562,15 @@ export default function EventDetailClient({
       {previewForStaff && (
         <div className="alert alert-warning mb-4" role="status">
           <strong>{t('detail.previewTitle')}</strong>
-          <div className="mt-1">{t('detail.previewBody')}</div>
+          <div className="mt-1">
+            {t(
+              !previewPageHidden
+                ? 'detail.previewBody'
+                : previewPageForRegistrants
+                  ? 'detail.previewBodyPageRegistrants'
+                  : 'detail.previewBodyPageHidden',
+            )}
+          </div>
         </div>
       )}
 
@@ -980,7 +999,7 @@ export default function EventDetailClient({
                     )
                   )}
 
-                  {event.recordingEnabled && (
+                  {event.siRegistra && (
                     <p className="text-muted mt-3 mb-0 d-flex align-items-start gap-1" style={{ fontSize: '0.82rem', lineHeight: 1.45 }}>
                       <Icon icon="it-video" size="xs" className="flex-shrink-0" style={{ marginTop: 1 }} />
                       <span>{t('detail.willBeRecorded')}</span>
@@ -1042,6 +1061,8 @@ function PostEventSidebar({
   const tp = useTranslations('postEvent');
   const format = useFormatter();
 
+  // Il giorno in cui si cancellano i dati delle persone: la pagina, i contenuti
+  // e la registrazione non se ne vanno con loro (docs/GDPR.md).
   const retentionExpiry = event.dataRetentionDays
     ? new Date(new Date(event.endsAt).getTime() + event.dataRetentionDays * 86_400_000)
     : null;
@@ -1135,7 +1156,7 @@ function PostEventSidebar({
             color: 'var(--app-text)',
           }}
         >
-          {tp('availableUntil', {
+          {tp('participantDataUntil', {
             date: format.dateTime(retentionExpiry, {
               day: 'numeric',
               month: 'long',

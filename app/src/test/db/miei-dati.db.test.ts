@@ -1,0 +1,951 @@
+// SPDX-License-Identifier: EUPL-1.2
+// SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
+
+/**
+ * La pagina dei propri dati sul database vero: un consenso dato di nuovo dopo un
+ * ritiro, con la stessa prova di quello dato in sala, e solo finche' l'evento lo
+ * chiede; la correzione di nome ed ente e la cancellazione di una sola
+ * iscrizione, confermate con il codice mandato all'indirizzo.
+ */
+import { randomUUID } from 'node:crypto';
+
+import type { Prisma } from '@prisma/client';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { POST as chiediToken } from '@/app/api/events/[param]/jitsi/token/route';
+import { POST as consensi } from '@/app/api/gdpr/consents/route';
+import { POST as annulla } from '@/app/api/gdpr/registrations/cancel/route';
+import { POST as correggi } from '@/app/api/gdpr/registrations/edit/route';
+import { POST as soprannome } from '@/app/api/gdpr/registrations/nickname/route';
+import { decryptPII, encryptPII, hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
+import { prisma } from '@/lib/db';
+import { eventAccessCookieName, signEventAccess } from '@/lib/event-session';
+import { leggiRigheProve, postoDaIMieiDati } from '@/lib/gdpr/consent-proofs';
+import { issueGdprToken } from '@/lib/gdpr/request-token';
+import { ritiraComunicazioni, ritiraConsensi } from '@/lib/live/consent-withdrawal';
+import { registrazioneDellIscrizione } from '@/lib/live/consents-in-force';
+import { improntaNickname, resetNicknameCachesForTests } from '@/lib/live/nickname';
+
+import { biscotti } from './biscotti';
+import { creaEvento, richiesta, svuotaDatabase } from './fixtures';
+
+// Fuori da Next `getTranslations` lancia: l'email del codice usa i testi veri.
+vi.mock('next-intl/server', async () => {
+  const { createTranslator } = await import('next-intl');
+  const messaggi = (await import('@/i18n/messages/it.json')).default;
+  return {
+    getTranslations: async ({ namespace }: { namespace: string }) =>
+      createTranslator({
+        locale: 'it',
+        messages: messaggi,
+        namespace: namespace as never,
+      }),
+  };
+});
+
+const CON_TRACCE = {
+  recordingEnabled: true,
+  participantsCanUnmute: true,
+  multitrackRecordingEnabled: true,
+} satisfies Partial<Prisma.EventUncheckedCreateInput>;
+
+beforeEach(async () => {
+  await svuotaDatabase();
+  vi.stubEnv('RECORDING_VOICE_EXCLUSION', 'true');
+  vi.stubEnv('RECORDING_PARTICIPANT_VOICE', 'true');
+});
+afterEach(() => vi.unstubAllEnvs());
+
+async function iscritto(
+  eventId: string,
+  campi: Partial<Prisma.RegistrationUncheckedCreateInput> = {}
+) {
+  const email = `${randomUUID()}@example.org`;
+  const emailHash = hashEmail(email);
+  const iscrizione = await prisma.registration.create({
+    data: {
+      eventId,
+      displayName: encryptPII('Persona Iscritta'),
+      email: encryptPII(email),
+      emailHash,
+      consentGiven: true,
+      consentTimestamp: new Date(),
+      accessToken: randomUUID(),
+      ...campi,
+    },
+  });
+  return { iscrizione, emailHash, token: issueGdprToken('consents', emailHash) };
+}
+
+let ip = 0;
+async function dai(
+  token: string,
+  registrationId: string,
+  corpo: Record<string, unknown>
+) {
+  ip += 1;
+  const r = richiesta('/api/gdpr/consents', 'POST', {
+    token,
+    registrationId,
+    give: true,
+    locale: 'it',
+    // La versione del testo che la pagina mostra dove si sente solo la voce.
+    ...(corpo.consent === 'recording' ? { recordingVersion: 2 } : {}),
+    ...corpo,
+  });
+  r.headers.set('x-forwarded-for', `10.9.${Math.floor(ip / 250)}.${ip % 250}`);
+  return consensi(r as never, { params: Promise.resolve({}) });
+}
+
+const righeRegistro = (eventId: string, action: string) =>
+  prisma.gdprAuditLog.findMany({
+    where: { eventId, action },
+    orderBy: { createdAt: 'asc' },
+  });
+
+describe('un consenso dato di nuovo da «I miei dati»', () => {
+  it('la registrazione torna valida con la prova di sala, e il periodo di prima resta', async () => {
+    const evento = await creaEvento(CON_TRACCE);
+    const { iscrizione, token } = await iscritto(evento.id, {
+      consentRecording: true,
+      consentMultitrack: true,
+      consentMultitrackVersion: 2,
+    });
+    await prisma.recordingConsent.create({
+      data: {
+        eventId: evento.id,
+        jitsiUserId: `reg-${iscrizione.id}-abcd1234`,
+        displayName: encryptPII('Nome in sala'),
+        registrationId: iscrizione.id,
+        consentedAt: new Date(Date.now() - 600_000),
+      },
+    });
+    await ritiraConsensi(evento.id, [], { registrazione: true }, new Date(), {
+      iscrizioni: [iscrizione.id],
+      origine: 'self-service',
+    });
+    const prima = await prisma.registration.findUniqueOrThrow({
+      where: { id: iscrizione.id },
+    });
+    expect(await registrazioneDellIscrizione(evento, prima, null, 'solo-voce')).toBe(
+      false
+    );
+
+    const res = await dai(token, iscrizione.id, {
+      consent: 'recording',
+      recordingDestination: null,
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ given: 'recording' });
+
+    const prova = await prisma.recordingConsent.findFirstOrThrow({
+      where: { registrationId: iscrizione.id },
+    });
+    expect(prova.withdrawnAt).toBeNull();
+    expect(prova.locale).toBe('it');
+    expect(prova.earlierPeriods).toEqual([
+      expect.objectContaining({ withdrawnAt: expect.any(String) }),
+    ]);
+    // Il prossimo ingresso lo trova: il token della sala legge la stessa regola.
+    expect(await registrazioneDellIscrizione(evento, prima, null, 'solo-voce')).toBe(
+      true
+    );
+    // La trascrizione ritirata con la registrazione resta ritirata.
+    expect(
+      await prisma.multitrackConsent.count({
+        where: { registrationId: iscrizione.id, withdrawnAt: null },
+      })
+    ).toBe(0);
+
+    const [riga] = await righeRegistro(evento.id, 'CONSENT_RECORDED');
+    expect(JSON.parse(riga!.details!)).toMatchObject({
+      source: 'self-service',
+      kind: 'recording',
+      givenAgain: true,
+    });
+    expect(riga!.details).not.toContain('Persona');
+
+    // L'elenco delle prove dice da dove viene ogni periodo.
+    const righe = await leggiRigheProve(prisma, evento.id, {
+      registrationIds: [iscrizione.id],
+    });
+    expect(
+      righe
+        .filter((r) => r.kind === 'recording')
+        .map((r) => [r.source, r.withdrawnAt === null])
+    ).toEqual([
+      ['registration', false],
+      ['room', false],
+      ['self-service', true],
+    ]);
+
+    // Un secondo clic non scrive niente.
+    expect(
+      (
+        await dai(token, iscrizione.id, {
+          consent: 'recording',
+          recordingDestination: null,
+        })
+      ).status
+    ).toBe(200);
+    expect(await righeRegistro(evento.id, 'CONSENT_RECORDED')).toHaveLength(1);
+  });
+
+  it("senza prova di sala ne nasce una sul posto dell'iscrizione, non su un ingresso", async () => {
+    const evento = await creaEvento(CON_TRACCE);
+    const { iscrizione, token } = await iscritto(evento.id, {
+      consentRecording: true,
+      consentRecordingWithdrawnAt: new Date(),
+    });
+    expect(
+      (
+        await dai(token, iscrizione.id, {
+          consent: 'recording',
+          recordingDestination: null,
+        })
+      ).status
+    ).toBe(200);
+    const prova = await prisma.recordingConsent.findFirstOrThrow({
+      where: { registrationId: iscrizione.id },
+    });
+    expect(prova.jitsiUserId).toBe(postoDaIMieiDati(iscrizione.id));
+    expect(prova.displayName).toBe(iscrizione.displayName);
+  });
+
+  it('un periodo dato da qui resta di «I miei dati» anche quando lo sostituisce la sala', async () => {
+    const evento = await creaEvento(CON_TRACCE);
+    const { iscrizione, token } = await iscritto(evento.id, { consentRecording: false });
+    await dai(token, iscrizione.id, { consent: 'recording', recordingDestination: null });
+    await ritiraConsensi(evento.id, [], { registrazione: true }, new Date(), {
+      iscrizioni: [iscrizione.id],
+      origine: 'self-service',
+    });
+    // Di nuovo, ma dalla sala: il clic nella finestra dei consensi.
+    biscotti.set(
+      eventAccessCookieName(evento.id),
+      await signEventAccess(evento.id, iscrizione.accessToken, 3600)
+    );
+    const ingresso = await chiediToken(
+      richiesta(`/api/events/${evento.slug}/jitsi/token`, 'POST', {
+        accessToken: iscrizione.accessToken,
+        recordingConsent: true,
+        recordingConsentDestination: null,
+      }) as never,
+      { params: Promise.resolve({ param: evento.slug }) }
+    );
+    expect(ingresso.status).toBe(200);
+    const prova = await prisma.recordingConsent.findFirstOrThrow({
+      where: { registrationId: iscrizione.id },
+    });
+    expect(prova.jitsiUserId).not.toBe(postoDaIMieiDati(iscrizione.id));
+    expect(prova.earlierPeriods).toEqual([
+      expect.objectContaining({
+        source: 'self-service',
+        withdrawnAt: expect.any(String),
+      }),
+    ]);
+    const righe = await leggiRigheProve(prisma, evento.id, {
+      registrationIds: [iscrizione.id],
+    });
+    expect(righe.map((r) => r.source)).toEqual(['self-service', 'room']);
+  });
+
+  it('vale per il testo letto: una destinazione cambiata a pagina aperta non vale', async () => {
+    const evento = await creaEvento({ ...CON_TRACCE, recordingDestination: 'PUBLIC' });
+    const { iscrizione, token } = await iscritto(evento.id, { consentRecording: false });
+    const vecchio = await dai(token, iscrizione.id, {
+      consent: 'recording',
+      recordingDestination: 'REGISTRANTS',
+    });
+    expect(vecchio.status).toBe(409);
+    expect((await vecchio.json()).code).toBe('CONSENT_TEXT_CHANGED');
+    const giusto = await dai(token, iscrizione.id, {
+      consent: 'recording',
+      recordingDestination: 'PUBLIC',
+    });
+    expect(giusto.status).toBe(200);
+    const prova = await prisma.recordingConsent.findFirstOrThrow({
+      where: { registrationId: iscrizione.id },
+    });
+    expect(prova.destination).toBe('PUBLIC');
+    expect(prova.textVersion).toBe(2);
+  });
+
+  it('vale per il testo letto anche nella versione, che si salva con la prova', async () => {
+    // Dove chi partecipa puo' comparire nel video vale solo il testo che lo dice.
+    vi.stubEnv('RECORDING_VOICE_EXCLUSION', '');
+    const evento = await creaEvento(CON_TRACCE);
+    const { iscrizione, token } = await iscritto(evento.id, { consentRecording: false });
+    const vecchio = await dai(token, iscrizione.id, {
+      consent: 'recording',
+      recordingDestination: null,
+      recordingVersion: 2,
+    });
+    expect(vecchio.status).toBe(409);
+    expect((await vecchio.json()).code).toBe('CONSENT_TEXT_CHANGED');
+    // Una pagina che non dice la versione e' di prima: rilegge.
+    const senzaVersione = await dai(token, iscrizione.id, {
+      consent: 'recording',
+      recordingDestination: null,
+      recordingVersion: undefined,
+    });
+    expect(senzaVersione.status).toBe(409);
+    expect((await senzaVersione.json()).code).toBe('CONSENT_TEXT_CHANGED');
+    const giusto = await dai(token, iscrizione.id, {
+      consent: 'recording',
+      recordingDestination: null,
+      recordingVersion: 1,
+    });
+    expect(giusto.status).toBe(200);
+    const prova = await prisma.recordingConsent.findFirstOrThrow({
+      where: { registrationId: iscrizione.id },
+    });
+    expect(prova.textVersion).toBe(1);
+    const [riga] = await righeRegistro(evento.id, 'CONSENT_RECORDED');
+    expect(JSON.parse(riga!.details!)).toMatchObject({ textVersion: 1 });
+  });
+
+  it('un consenso dato sul testo per la sola voce non vale dove chi partecipa compare', async () => {
+    const evento = await creaEvento(CON_TRACCE);
+    const { iscrizione, token } = await iscritto(evento.id, {
+      consentRecording: true,
+      consentRecordingVersion: 2,
+    });
+    vi.stubEnv('RECORDING_VOICE_EXCLUSION', '');
+    // Lo stato dice che c'e', l'offerta che non vale: si da' di nuovo.
+    const res = await dai(token, iscrizione.id, {
+      consent: 'recording',
+      recordingDestination: null,
+      recordingVersion: 1,
+    });
+    expect(res.status).toBe(200);
+    expect(await righeRegistro(evento.id, 'CONSENT_RECORDED')).toHaveLength(1);
+  });
+
+  it('un consenso che non copre piu’ il testo in vigore si da di nuovo, come chiede la sala', async () => {
+    const evento = await creaEvento({ ...CON_TRACCE, recordingDestination: 'PUBLIC' });
+    const { iscrizione, token } = await iscritto(evento.id, {
+      consentRecording: true,
+      consentRecordingDestination: 'REGISTRANTS',
+      consentRecordingVersion: 1,
+    });
+    const prima = await prisma.registration.findUniqueOrThrow({
+      where: { id: iscrizione.id },
+    });
+    expect(await registrazioneDellIscrizione(evento, prima, 'PUBLIC', 'solo-voce')).toBe(
+      false
+    );
+    const res = await dai(token, iscrizione.id, {
+      consent: 'recording',
+      recordingDestination: 'PUBLIC',
+    });
+    expect(res.status).toBe(200);
+    expect(await righeRegistro(evento.id, 'CONSENT_RECORDED')).toHaveLength(1);
+    expect(await registrazioneDellIscrizione(evento, prima, 'PUBLIC', 'solo-voce')).toBe(
+      true
+    );
+  });
+
+  it("a evento concluso, o dove l'evento non lo chiede, non si da'", async () => {
+    const concluso = await creaEvento({
+      ...CON_TRACCE,
+      status: 'ENDED',
+      endsAt: new Date(Date.now() - 60_000),
+    });
+    const a = await iscritto(concluso.id, { consentRecording: false });
+    const res = await dai(a.token, a.iscrizione.id, {
+      consent: 'recording',
+      recordingDestination: null,
+    });
+    expect(res.status).toBe(409);
+    expect((await res.json()).code).toBe('CONSENT_NOT_OFFERED');
+
+    const senzaRegistrazione = await creaEvento({ participantsCanUnmute: true });
+    const b = await iscritto(senzaRegistrazione.id);
+    expect(
+      (
+        await dai(b.token, b.iscrizione.id, {
+          consent: 'transcription',
+          transcriptionText: 'multitrackRetained',
+        })
+      ).status
+    ).toBe(409);
+    expect(await prisma.recordingConsent.count()).toBe(0);
+    expect(await prisma.multitrackConsent.count()).toBe(0);
+  });
+
+  it('la trascrizione chiede prima la registrazione, poi una prova nuova accanto a quella ritirata', async () => {
+    const evento = await creaEvento(CON_TRACCE);
+    const { iscrizione, token } = await iscritto(evento.id, {
+      consentRecording: true,
+      consentMultitrack: true,
+      consentMultitrackVersion: 2,
+    });
+    await ritiraConsensi(evento.id, [], { registrazione: true }, new Date(), {
+      iscrizioni: [iscrizione.id],
+      origine: 'self-service',
+    });
+    const senza = await dai(token, iscrizione.id, {
+      consent: 'transcription',
+      transcriptionText: 'multitrackRetained',
+    });
+    expect(senza.status).toBe(409);
+    expect((await senza.json()).code).toBe('RECORDING_CONSENT_REQUIRED');
+
+    await dai(token, iscrizione.id, { consent: 'recording', recordingDestination: null });
+    // La casella letta conta anche per la trascrizione: qui le tracce restano con
+    // i dati dell'evento (pipeline AI spenta), e il testo che lo dice e' un altro.
+    const vecchio = await dai(token, iscrizione.id, {
+      consent: 'transcription',
+      transcriptionText: 'multitrack',
+    });
+    expect((await vecchio.json()).code).toBe('CONSENT_TEXT_CHANGED');
+    // Una pagina che non dice quale casella ha mostrato rilegge.
+    const senzaTesto = await dai(token, iscrizione.id, { consent: 'transcription' });
+    expect((await senzaTesto.json()).code).toBe('CONSENT_TEXT_CHANGED');
+    expect(
+      (
+        await dai(token, iscrizione.id, {
+          consent: 'transcription',
+          transcriptionText: 'multitrackRetained',
+        })
+      ).status
+    ).toBe(200);
+    const prove = await prisma.multitrackConsent.findMany({
+      where: { registrationId: iscrizione.id },
+    });
+    expect(prove).toHaveLength(1);
+    expect(prove[0]).toMatchObject({ withdrawnAt: null, textVersion: 2 });
+    expect(prove[0]!.jitsiUserId).toBe(postoDaIMieiDati(iscrizione.id));
+    // Il ritiro dell'iscrizione resta: e' la storia del consenso.
+    const dopo = await prisma.registration.findUniqueOrThrow({
+      where: { id: iscrizione.id },
+    });
+    expect(dopo.consentMultitrackWithdrawnAt).not.toBeNull();
+    const righe = await righeRegistro(evento.id, 'CONSENT_RECORDED');
+    expect(righe.map((r) => JSON.parse(r.details!).kind)).toEqual([
+      'recording',
+      'transcription',
+    ]);
+  });
+
+  it("le comunicazioni future riportano in rubrica con i dati dell'iscrizione", async () => {
+    const evento = await creaEvento({
+      status: 'ENDED',
+      endsAt: new Date(Date.now() - 60_000),
+    });
+    const { iscrizione, emailHash, token } = await iscritto(evento.id, {
+      consentFutureCommunications: true,
+      organization: 'Ente di prova',
+    });
+    await ritiraComunicazioni(emailHash);
+    // Le comunicazioni non riguardano l'evento: si ridanno anche a evento concluso.
+    const res = await dai(token, iscrizione.id, { consent: 'futureCommunications' });
+    expect(res.status).toBe(200);
+    const voce = await prisma.person.findUniqueOrThrow({ where: { emailHash } });
+    expect(voce).toMatchObject({
+      optedInToAddressBook: true,
+      optedOutAt: null,
+      organization: 'Ente di prova',
+    });
+    expect(voce.email).not.toBeNull();
+    const dopo = await prisma.registration.findUniqueOrThrow({
+      where: { id: iscrizione.id },
+    });
+    expect(dopo).toMatchObject({ consentFutureCommunications: true, personId: voce.id });
+    const [riga] = await righeRegistro(evento.id, 'CONSENT_RECORDED');
+    expect(JSON.parse(riga!.details!)).toMatchObject({
+      source: 'self-service',
+      consentFutureCommunications: true,
+      givenAgain: true,
+    });
+  });
+
+  it('le comunicazioni mai ritirate, o dove la rubrica non si propone, non si danno da qui', async () => {
+    const evento = await creaEvento({ offerAddressBook: false });
+    const a = await iscritto(evento.id);
+    expect(
+      (await dai(a.token, a.iscrizione.id, { consent: 'futureCommunications' })).status
+    ).toBe(409);
+    await ritiraComunicazioni(a.emailHash);
+    expect(
+      (await dai(a.token, a.iscrizione.id, { consent: 'futureCommunications' })).status
+    ).toBe(409);
+    expect(await prisma.person.count()).toBe(0);
+  });
+
+  it('dove chi partecipa non entra nel video la registrazione non si da, e il suo ritiro lascia la trascrizione', async () => {
+    vi.stubEnv('RECORDING_PARTICIPANT_VOICE', '');
+    const evento = await creaEvento(CON_TRACCE);
+    const { iscrizione, token } = await iscritto(evento.id, {
+      consentRecording: true,
+      consentRecordingVersion: 2,
+      consentMultitrack: true,
+      consentMultitrackVersion: 2,
+    });
+    const res = await dai(token, iscrizione.id, {
+      consent: 'recording',
+      recordingDestination: null,
+    });
+    expect(res.status).toBe(409);
+    expect((await res.json()).code).toBe('CONSENT_NOT_OFFERED');
+
+    ip += 1;
+    const ritiro = richiesta('/api/gdpr/consents', 'POST', {
+      token,
+      registrationId: iscrizione.id,
+      consent: 'recording',
+    });
+    ritiro.headers.set('x-forwarded-for', `10.9.${Math.floor(ip / 250)}.${ip % 250}`);
+    expect(
+      (await consensi(ritiro as never, { params: Promise.resolve({}) })).status
+    ).toBe(200);
+    const dopo = await prisma.registration.findUniqueOrThrow({
+      where: { id: iscrizione.id },
+    });
+    expect(dopo.consentRecordingWithdrawnAt).not.toBeNull();
+    expect(dopo.consentMultitrackWithdrawnAt).toBeNull();
+    const [riga] = await righeRegistro(evento.id, 'CONSENT_WITHDRAWN');
+    expect(JSON.parse(riga!.details!)).toMatchObject({ recording: 1, transcription: 0 });
+  });
+
+  it("si tocca solo un'iscrizione dell'indirizzo del token", async () => {
+    const evento = await creaEvento(CON_TRACCE);
+    const a = await iscritto(evento.id, { consentRecording: false });
+    const b = await iscritto(evento.id);
+    const res = await dai(b.token, a.iscrizione.id, {
+      consent: 'recording',
+      recordingDestination: null,
+    });
+    expect(res.status).toBe(404);
+    expect(await prisma.recordingConsent.count()).toBe(0);
+  });
+});
+
+/** Il codice dell'ultima email accodata: la persona lo legge nella sua casella. */
+async function codiceArrivato(): Promise<{ codice: string; destinatario: string }> {
+  const riga = await prisma.emailOutbox.findFirstOrThrow({
+    orderBy: { createdAt: 'desc' },
+  });
+  const testo = decryptPII(riga.text!);
+  const codice = /\b(\d{6})\b/.exec(testo)?.[1];
+  expect(codice, 'nessun codice nel testo').toBeDefined();
+  expect(riga.subject).not.toContain(codice!);
+  return { codice: codice!, destinatario: decryptPII(riga.toAddress) };
+}
+
+async function chiamaCorreggi(corpo: Record<string, unknown>) {
+  ip += 1;
+  const r = richiesta('/api/gdpr/registrations/edit', 'POST', { locale: 'it', ...corpo });
+  r.headers.set('x-forwarded-for', `10.10.${Math.floor(ip / 250)}.${ip % 250}`);
+  return correggi(r as never, { params: Promise.resolve({}) });
+}
+
+async function chiamaNickname(corpo: Record<string, unknown>) {
+  ip += 1;
+  const r = richiesta('/api/gdpr/registrations/nickname', 'POST', {
+    locale: 'it',
+    ...corpo,
+  });
+  r.headers.set('x-forwarded-for', `10.11.${Math.floor(ip / 250)}.${ip % 250}`);
+  return soprannome(r as never, { params: Promise.resolve({}) });
+}
+
+describe('il nickname da «I miei dati»', () => {
+  beforeEach(() => resetNicknameCachesForTests());
+
+  it('si sceglie con il codice, con le regole della sala, e si toglie sempre', async () => {
+    const evento = await creaEvento({
+      nicknamesEnabled: true,
+      moderatorName: encryptPII('Giulia Verdi'),
+    });
+    const { iscrizione, token, emailHash } = await iscritto(evento.id);
+    const corpo = { token, registrationId: iscrizione.id, nickname: ' Lupo ' };
+
+    // Un nome di chi conduce non passa, e non parte nessun codice.
+    const simile = await chiamaNickname({ ...corpo, nickname: 'Giulia' });
+    expect(simile.status).toBe(422);
+    expect(await simile.json()).toMatchObject({
+      code: 'NICKNAME_INVALID',
+      reason: 'host',
+    });
+    expect(await prisma.emailOutbox.count()).toBe(0);
+
+    const richiesto = await chiamaNickname(corpo);
+    expect(richiesto.status).toBe(202);
+    const { issuedAt } = (await richiesto.json()) as { issuedAt: number };
+    const { codice } = await codiceArrivato();
+    // Il codice vale solo per quel nickname.
+    expect(
+      (await chiamaNickname({ ...corpo, nickname: 'Volpe', code: codice, issuedAt }))
+        .status
+    ).toBe(403);
+    const fatto = await chiamaNickname({ ...corpo, code: codice, issuedAt });
+    expect(fatto.status).toBe(200);
+    expect(await fatto.json()).toEqual({ nickname: 'Lupo', updated: true });
+    const dopo = await prisma.registration.findUniqueOrThrow({
+      where: { id: iscrizione.id },
+    });
+    expect(tryDecryptPII(dopo.nickname)).toBe('Lupo');
+    expect(dopo.nicknameKey).toBe(improntaNickname(evento.id, 'Lupo'));
+    const [riga] = await righeRegistro(evento.id, 'DATA_RECTIFIED');
+    expect(JSON.parse(riga!.details!)).toEqual({
+      source: 'self-service',
+      scope: 'registration',
+      fields: ['nickname'],
+      emailHashPrefix: emailHash.substring(0, 8),
+    });
+    expect(riga!.details).not.toContain('Lupo');
+
+    // Lo stesso nickname: niente da fare, nessun codice.
+    expect((await chiamaNickname(corpo)).status).toBe(200);
+
+    // A opzione spenta se ne sceglie uno nuovo no, ma si toglie.
+    await prisma.event.update({
+      where: { id: evento.id },
+      data: { nicknamesEnabled: false },
+    });
+    const spento = await chiamaNickname({ ...corpo, nickname: 'Volpe' });
+    expect(spento.status).toBe(409);
+    expect((await spento.json()).code).toBe('NICKNAMES_DISABLED');
+    const togli = await chiamaNickname({ ...corpo, nickname: null });
+    expect(togli.status).toBe(202);
+    const t2 = (await togli.json()) as { issuedAt: number };
+    const c2 = await codiceArrivato();
+    const tolto = await chiamaNickname({
+      ...corpo,
+      nickname: null,
+      code: c2.codice,
+      issuedAt: t2.issuedAt,
+    });
+    expect(tolto.status).toBe(200);
+    expect(
+      await prisma.registration.findUniqueOrThrow({
+        where: { id: iscrizione.id },
+        select: { nickname: true, nicknameKey: true },
+      })
+    ).toEqual({ nickname: null, nicknameKey: null });
+  });
+
+  it("unico nell'evento: chi lo trova preso riceve un'alternativa", async () => {
+    const evento = await creaEvento({ nicknamesEnabled: true });
+    const altro = await iscritto(evento.id, {
+      nickname: encryptPII('Lupo'),
+      nicknameKey: improntaNickname(evento.id, 'Lupo'),
+    });
+    expect(altro.iscrizione.id).toBeDefined();
+    const { iscrizione, token } = await iscritto(evento.id);
+    const res = await chiamaNickname({
+      token,
+      registrationId: iscrizione.id,
+      nickname: 'lupo',
+    });
+    expect(res.status).toBe(409);
+    const corpo = (await res.json()) as { code: string; suggestion?: string };
+    expect(corpo.code).toBe('NICKNAME_TAKEN');
+    expect(corpo.suggestion).toBeTruthy();
+  });
+
+  it('a evento concluso non se ne sceglie uno nuovo', async () => {
+    const evento = await creaEvento({
+      nicknamesEnabled: true,
+      status: 'ENDED',
+      endsAt: new Date(Date.now() - 60_000),
+    });
+    const { iscrizione, token } = await iscritto(evento.id);
+    const res = await chiamaNickname({
+      token,
+      registrationId: iscrizione.id,
+      nickname: 'Lupo',
+    });
+    expect(res.status).toBe(409);
+    expect((await res.json()).code).toBe('NICKNAMES_DISABLED');
+  });
+});
+
+describe('la correzione di nome ed ente', () => {
+  it('chiede il codice, lo manda all’indirizzo e corregge solo con quello', async () => {
+    const evento = await creaEvento();
+    const { iscrizione, token, emailHash } = await iscritto(evento.id, {
+      organization: 'Vecchio',
+    });
+    const corpo = {
+      token,
+      registrationId: iscrizione.id,
+      scope: 'registration',
+      displayName: '  Anna Bianchi ',
+      organization: 'Comune di Prova',
+    };
+
+    const richiesto = await chiamaCorreggi(corpo);
+    expect(richiesto.status).toBe(202);
+    const { issuedAt } = (await richiesto.json()) as { issuedAt: number };
+    const { codice, destinatario } = await codiceArrivato();
+    expect(hashEmail(destinatario)).toBe(emailHash);
+    // Niente cambia prima della conferma.
+    expect(
+      tryDecryptPII(
+        (await prisma.registration.findUniqueOrThrow({ where: { id: iscrizione.id } }))
+          .displayName
+      )
+    ).toBe('Persona Iscritta');
+
+    const sbagliato = String((Number(codice) + 1) % 1_000_000).padStart(6, '0');
+    expect((await chiamaCorreggi({ ...corpo, code: sbagliato, issuedAt })).status).toBe(
+      403
+    );
+    // Lo stesso codice non vale per altri valori.
+    expect(
+      (
+        await chiamaCorreggi({
+          ...corpo,
+          displayName: 'Altro Nome',
+          code: codice,
+          issuedAt,
+        })
+      ).status
+    ).toBe(403);
+
+    const fatto = await chiamaCorreggi({ ...corpo, code: codice, issuedAt });
+    expect(fatto.status).toBe(200);
+    expect(await fatto.json()).toMatchObject({ updated: 1, displayName: 'Anna Bianchi' });
+    const dopo = await prisma.registration.findUniqueOrThrow({
+      where: { id: iscrizione.id },
+    });
+    expect(tryDecryptPII(dopo.displayName)).toBe('Anna Bianchi');
+    expect(dopo.organization).toBe('Comune di Prova');
+
+    const [riga] = await righeRegistro(evento.id, 'DATA_RECTIFIED');
+    expect(JSON.parse(riga!.details!)).toEqual({
+      source: 'self-service',
+      scope: 'registration',
+      fields: ['displayName', 'organization'],
+      emailHashPrefix: emailHash.substring(0, 8),
+    });
+    expect(riga!.details).not.toContain('Anna');
+    expect(riga!.details).not.toContain('Comune');
+  });
+
+  it('per tutte le iscrizioni corregge anche la voce di rubrica, non le altre persone', async () => {
+    const [a, b] = [await creaEvento(), await creaEvento()];
+    const prima = await iscritto(a.id, { organization: 'Vecchio' });
+    const email = decryptPII(prima.iscrizione.email);
+    const seconda = await prisma.registration.create({
+      data: {
+        eventId: b.id,
+        displayName: encryptPII('Persona Iscritta'),
+        email: encryptPII(email),
+        emailHash: prima.emailHash,
+        consentGiven: true,
+        consentTimestamp: new Date(),
+        accessToken: randomUUID(),
+      },
+    });
+    await prisma.person.create({
+      data: {
+        emailHash: prima.emailHash,
+        email: encryptPII(email),
+        displayName: encryptPII('Persona Iscritta'),
+        organization: 'Vecchio',
+        optedInToAddressBook: true,
+        optedInAt: new Date(),
+      },
+    });
+    const altra = await iscritto(a.id);
+    const corpo = {
+      token: prima.token,
+      registrationId: prima.iscrizione.id,
+      scope: 'address',
+      displayName: 'Anna Bianchi',
+      organization: null,
+    };
+    const { issuedAt } = (await (await chiamaCorreggi(corpo)).json()) as {
+      issuedAt: number;
+    };
+    const { codice } = await codiceArrivato();
+    expect((await chiamaCorreggi({ ...corpo, code: codice, issuedAt })).status).toBe(200);
+
+    for (const id of [prima.iscrizione.id, seconda.id]) {
+      const r = await prisma.registration.findUniqueOrThrow({ where: { id } });
+      expect([tryDecryptPII(r.displayName), r.organization]).toEqual([
+        'Anna Bianchi',
+        null,
+      ]);
+    }
+    const voce = await prisma.person.findUniqueOrThrow({
+      where: { emailHash: prima.emailHash },
+    });
+    expect([tryDecryptPII(voce.displayName!), voce.organization]).toEqual([
+      'Anna Bianchi',
+      null,
+    ]);
+    const estranea = await prisma.registration.findUniqueOrThrow({
+      where: { id: altra.iscrizione.id },
+    });
+    expect(tryDecryptPII(estranea.displayName)).toBe('Persona Iscritta');
+    const righe = await prisma.gdprAuditLog.findMany({
+      where: { action: 'DATA_RECTIFIED' },
+    });
+    expect(righe.map((r) => r.eventId).sort()).toEqual([a.id, b.id, null].sort());
+  });
+
+  it('segue le regole del modulo: nome, e l’ente dove un evento lo chiede', async () => {
+    const evento = await creaEvento({ requireOrganization: true });
+    const { iscrizione, token } = await iscritto(evento.id, { organization: 'Ente' });
+    const corpo = { token, registrationId: iscrizione.id, scope: 'registration' };
+    const senzaEnte = await chiamaCorreggi({
+      ...corpo,
+      displayName: 'Anna',
+      organization: '  ',
+    });
+    expect(senzaEnte.status).toBe(422);
+    expect((await senzaEnte.json()).details).toEqual([
+      expect.objectContaining({ path: ['organization'] }),
+    ]);
+    expect(
+      (await chiamaCorreggi({ ...corpo, displayName: ' A ', organization: 'Ente' }))
+        .status
+    ).toBe(422);
+    expect(await prisma.emailOutbox.count()).toBe(0);
+  });
+
+  it('senza il token della pagina, o per un’iscrizione di un altro indirizzo, niente codice', async () => {
+    const evento = await creaEvento();
+    const a = await iscritto(evento.id);
+    const b = await iscritto(evento.id);
+    const corpo = {
+      registrationId: a.iscrizione.id,
+      scope: 'registration',
+      displayName: 'Anna',
+      organization: null,
+    };
+    expect((await chiamaCorreggi({ ...corpo, token: b.token })).status).toBe(404);
+    expect(
+      (await chiamaCorreggi({ ...corpo, token: issueGdprToken('export', a.emailHash) }))
+        .status
+    ).toBe(401);
+    expect(await prisma.emailOutbox.count()).toBe(0);
+  });
+});
+
+async function chiamaAnnulla(corpo: Record<string, unknown>) {
+  ip += 1;
+  const r = richiesta('/api/gdpr/registrations/cancel', 'POST', {
+    locale: 'it',
+    ...corpo,
+  });
+  r.headers.set('x-forwarded-for', `10.11.${Math.floor(ip / 250)}.${ip % 250}`);
+  return annulla(r as never, { params: Promise.resolve({}) });
+}
+
+describe('la cancellazione di una sola iscrizione', () => {
+  it('con il codice cancella quell’iscrizione e cio’ che porta, e tiene la prova senza nome', async () => {
+    const evento = await creaEvento({
+      ...CON_TRACCE,
+      recordingUrl: 'recordings/video.mp4',
+    });
+    const altroEvento = await creaEvento();
+    const { iscrizione, token, emailHash } = await iscritto(evento.id, {
+      consentRecording: true,
+    });
+    const email = decryptPII(iscrizione.email);
+    const altra = await prisma.registration.create({
+      data: {
+        eventId: altroEvento.id,
+        displayName: encryptPII('Persona Iscritta'),
+        email: encryptPII(email),
+        emailHash,
+        consentGiven: true,
+        consentTimestamp: new Date(),
+        accessToken: randomUUID(),
+      },
+    });
+    await prisma.person.create({
+      data: {
+        emailHash,
+        email: encryptPII(email),
+        optedInToAddressBook: true,
+        optedInAt: new Date(),
+      },
+    });
+    await prisma.chatMessage.create({
+      data: {
+        eventId: evento.id,
+        senderId: `reg-${iscrizione.id}`,
+        senderName: encryptPII('Persona Iscritta'),
+        text: encryptPII('ciao'),
+      },
+    });
+    const corpo = { token, registrationId: iscrizione.id };
+
+    const richiesto = await chiamaAnnulla(corpo);
+    expect(richiesto.status).toBe(202);
+    const { issuedAt } = (await richiesto.json()) as { issuedAt: number };
+    const { codice } = await codiceArrivato();
+    // Un codice per correggere non cancella.
+    expect(
+      (
+        await chiamaAnnulla({
+          ...corpo,
+          code: String((Number(codice) + 7) % 1e6).padStart(6, '0'),
+          issuedAt,
+        })
+      ).status
+    ).toBe(403);
+    expect(await prisma.registration.count({ where: { id: iscrizione.id } })).toBe(1);
+
+    const fatto = await chiamaAnnulla({ ...corpo, code: codice, issuedAt });
+    expect(fatto.status).toBe(200);
+    expect(await fatto.json()).toEqual({ deleted: 1, consentProofsKept: 1 });
+    expect(await prisma.registration.count({ where: { id: iscrizione.id } })).toBe(0);
+    expect(
+      await prisma.chatMessage.count({ where: { senderId: `reg-${iscrizione.id}` } })
+    ).toBe(0);
+    // Il codice della cancellazione era un'email di quell'iscrizione: se ne va con lei.
+    expect(await prisma.emailOutbox.count()).toBe(0);
+    const [prova] = await prisma.retainedConsentProof.findMany({
+      where: { eventId: evento.id },
+    });
+    expect(prova).toMatchObject({ kind: 'recording', displayName: null, emailHash });
+    // Il resto dell'indirizzo resta.
+    expect(await prisma.registration.count({ where: { id: altra.id } })).toBe(1);
+    expect(await prisma.person.count({ where: { emailHash } })).toBe(1);
+
+    const [riga] = await righeRegistro(evento.id, 'DATA_DELETED');
+    expect(JSON.parse(riga!.details!)).toEqual({
+      source: 'gdpr-registration-cancel',
+      emailHashPrefix: emailHash.substring(0, 8),
+      consentProofsWithoutName: 1,
+    });
+    // Rifatto, l'iscrizione non c'e' piu'.
+    expect((await chiamaAnnulla({ ...corpo, code: codice, issuedAt })).status).toBe(404);
+  });
+
+  it('il codice di un’iscrizione non cancella un’altra dello stesso indirizzo', async () => {
+    const [a, b] = [await creaEvento(), await creaEvento()];
+    const prima = await iscritto(a.id);
+    const seconda = await prisma.registration.create({
+      data: {
+        eventId: b.id,
+        displayName: encryptPII('Persona Iscritta'),
+        email: prima.iscrizione.email,
+        emailHash: prima.emailHash,
+        consentGiven: true,
+        consentTimestamp: new Date(),
+        accessToken: randomUUID(),
+      },
+    });
+    const { issuedAt } = (await (
+      await chiamaAnnulla({ token: prima.token, registrationId: prima.iscrizione.id })
+    ).json()) as { issuedAt: number };
+    const { codice } = await codiceArrivato();
+    const res = await chiamaAnnulla({
+      token: prima.token,
+      registrationId: seconda.id,
+      code: codice,
+      issuedAt,
+    });
+    expect(res.status).toBe(403);
+    expect(await prisma.registration.count()).toBe(2);
+  });
+});

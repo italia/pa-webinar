@@ -14,6 +14,8 @@
  * L'handler DEVE usare queste funzioni: sono la definizione unica di "cosa è
  * eleggibile alla cancellazione e da quando".
  */
+import type { TipoConsenso } from '@/lib/gdpr/consent-proofs';
+import { limiteDurataPrecedente } from '@/lib/recording/legacy-retention';
 
 const DAY_MS = 86_400_000;
 
@@ -69,39 +71,6 @@ export function tempRecordingExpiryCutoff(now: Date): Date {
   return new Date(now.getTime() - TEMP_RECORDING_TTL_MS);
 }
 
-export interface RecordingRetentionRow {
-  /** Quando il moderatore ha pubblicato il video. */
-  recordingPublishedAt: Date | null;
-  /** Retention scelta per QUESTO video, in giorni. */
-  recordingDeleteAfterDays: number | null;
-}
-
-/**
- * La registrazione PUBBLICATA ha superato la sua retention (fase 2)?
- *
- * Serve che entrambi i campi ci siano: senza `recordingPublishedAt` non
- * sappiamo da quando contare, e senza `recordingDeleteAfterDays` il video non
- * ha una scadenza propria — segue quella dell'evento (fase 3). In nessuno dei
- * due casi si cancella "per sicurezza": qui l'errore costa un video che la
- * pagina evento sta ancora linkando.
- *
- * Nota su `0`: è trattato come "nessuna scadenza propria", non come "cancella
- * subito". `recordingDeleteAfterDays` è validato `min(1)` (`lib/validation/
- * schemas.ts`), quindi uno 0 non arriva dall'API ma da un default o da una
- * scrittura diretta — e leggerlo come "scaduta all'istante della
- * pubblicazione" farebbe sparire al primo giro di cron ogni video appena
- * pubblicato.
- */
-export function isRecordingRetentionExpired(
-  evt: RecordingRetentionRow,
-  now: Date
-): boolean {
-  if (!evt.recordingPublishedAt || !evt.recordingDeleteAfterDays) return false;
-  const expiresAt =
-    evt.recordingPublishedAt.getTime() + evt.recordingDeleteAfterDays * DAY_MS;
-  return expiresAt < now.getTime();
-}
-
 export interface EventRetentionRow {
   /** Fine dell'evento: la retention decorre da qui, non dalla creazione. */
   endsAt: Date;
@@ -134,41 +103,169 @@ export function isFinishedEventStatus(status: string): boolean {
 }
 
 /**
- * I dati di questo evento vanno cancellati in questo giro (fase 3)?
- *
- * Per un evento concluso decide `isEventDataRetentionExpired`. Per uno mai
- * concluso (UNFINISHED_EVENT_STATUSES) la finestra decorre dal più tardo fra
- * `endsAt` e l'ultima attività: una sala a tempo indefinito ancora usata dopo
- * la fine programmata non si svuota mentre qualcuno ci sta. Una bozza, mai.
+ * Da quando contano le scadenze dell'evento: quella dei dati dei partecipanti e
+ * quella della registrazione non pubblicata. Per un evento concluso la fine
+ * prevista (`endsAt`); per uno mai concluso (UNFINISHED_EVENT_STATUSES) il piu'
+ * tardo fra la fine prevista e l'ultima attivita', cosi' una sala a tempo
+ * indefinito ancora usata dopo la fine programmata non si svuota mentre
+ * qualcuno ci sta. Una bozza non ha scadenze: null.
  */
-export function isEventEligibleForCleanup(evt: CleanupCandidateRow, now: Date): boolean {
-  if (isFinishedEventStatus(evt.status)) return isEventDataRetentionExpired(evt, now);
-  if (!(UNFINISHED_EVENT_STATUSES as readonly string[]).includes(evt.status)) return false;
-  const lastSign = Math.max(evt.endsAt.getTime(), evt.lastActiveAt?.getTime() ?? 0);
-  return isEventDataRetentionExpired(
-    { endsAt: new Date(lastSign), dataRetentionDays: evt.dataRetentionDays },
-    now,
-  );
-}
-
-export interface RecordingBlobRow {
-  recordingUrl: string | null;
-  recordingPublished: boolean;
+export function inizioConservazione(evt: CleanupCandidateRow): Date | null {
+  if (isFinishedEventStatus(evt.status)) return evt.endsAt;
+  if (!(UNFINISHED_EVENT_STATUSES as readonly string[]).includes(evt.status)) return null;
+  return new Date(Math.max(evt.endsAt.getTime(), evt.lastActiveAt?.getTime() ?? 0));
 }
 
 /**
- * In fase 3, il blob di `recordingUrl` va cancellato insieme al resto?
- *
- * Sì, TRANNE quando il video è pubblicato. `recordingPublished` è l'unico
- * segnale di "documento reso pubblico": la pagina evento e l'indice della
- * videoteca mostrano `recordingUrl` solo se pubblicato, e la sua durata di
- * vita è governata da `recordingDeleteAfterDays` (fase 2). Cancellarlo qui
- * lascerebbe un player linkato su un 404.
- *
- * Da NON estendere a `libraryListed`: una registrazione elencata ma non
- * pubblicata non è visibile da nessuna parte e la fase 2 non la guarda —
- * esentarla qui significherebbe non cancellarne mai il blob.
+ * I dati di questo evento vanno cancellati in questo giro (fase 3)? La finestra
+ * decorre da `inizioConservazione`; una bozza, mai.
  */
-export function shouldPurgeRecordingBlob(evt: RecordingBlobRow): boolean {
-  return Boolean(evt.recordingUrl) && !evt.recordingPublished;
+export function isEventEligibleForCleanup(evt: CleanupCandidateRow, now: Date): boolean {
+  const inizio = inizioConservazione(evt);
+  return (
+    inizio !== null &&
+    isEventDataRetentionExpired({ endsAt: inizio, dataRetentionDays: evt.dataRetentionDays }, now)
+  );
+}
+
+export interface RecordingRetentionRow extends CleanupCandidateRow {
+  recordingPublished: boolean;
+  /** Quando chi organizza ha pubblicato il video. */
+  recordingPublishedAt: Date | null;
+  /** La scadenza della registrazione dell'evento, in giorni; null = nessuna. */
+  recordingDeleteAfterDays: number | null;
+  /** Da quando, al piu' presto, conta la scadenza della registrazione non
+   *  pubblicata: l'ultima scelta della durata, l'ultima pubblicazione tolta,
+   *  l'ultimo file agganciato. Null = dalla fine dell'evento. */
+  recordingRetentionFrom: Date | null;
+  /** Evento nato prima della separazione dai dati (lib/recording/legacy-retention):
+   *  non pubblicata, scade al piu' tardi con i dati dei partecipanti. */
+  legacyRecordingRetention?: boolean | null;
+}
+
+/**
+ * Quando scade la registrazione dell'evento (fase 2), o null se non scade.
+ *
+ * La registrazione e' un documento storico: non segue la conservazione dei dati
+ * dei partecipanti, e senza `recordingDeleteAfterDays` resta finche' qualcuno
+ * non la cancella. Con una durata, i giorni contano:
+ *  - dalla pubblicazione, finche' il video e' pubblicato (come prima: la
+ *    pubblicazione riapre il conto);
+ *  - altrimenti dalla fine dell'evento, la stessa da cui conta la conservazione
+ *    dei dati (`inizioConservazione`), ma mai da prima di
+ *    `recordingRetentionFrom`: scegliere la durata, togliere la pubblicazione
+ *    (anche togliendo il video pubblicato) o agganciare un file nuovo a eventi
+ *    finiti da tempo non cancella la registrazione, o cio' che ne resta, al
+ *    giro dopo, e un file caricato dopo la scadenza non se ne va prima che
+ *    qualcuno lo veda.
+ *
+ * Negli eventi nati prima di questa regola (`legacyRecordingRetention`) la
+ * registrazione non pubblicata scade al piu' tardi alla conservazione dei dati,
+ * contata dallo stesso inizio: a chi si e' iscritto si era detto che il video
+ * non pubblicato se ne va con i suoi dati (lib/recording/legacy-retention). La
+ * migrazione che li segna toglie `recordingRetentionFrom`, quindi conta dalla
+ * fine dell'evento; poi, come per ogni evento, mai da prima di una pubblicazione
+ * tolta o di un file agganciato da chi organizza: quella scelta non cancella il
+ * video al giro dopo. Una durata piu' corta vale.
+ *
+ * Un video pubblicato senza la data di pubblicazione (scritto direttamente nel
+ * database) non scade: non sappiamo da quando contare, e qui l'errore costa un
+ * video che la pagina evento sta ancora linkando. Una bozza non scade mai.
+ *
+ * Nota su `0`: e' trattato come "nessuna scadenza", non come "cancella subito".
+ * `recordingDeleteAfterDays` e' validato `min(1)` (`lib/validation/schemas.ts`),
+ * quindi uno 0 non arriva dall'API ma da un default o da una scrittura diretta,
+ * e leggerlo come "scaduta all'istante" farebbe sparire al primo giro di cron
+ * ogni registrazione.
+ */
+export function recordingExpiresAt(evt: RecordingRetentionRow): Date | null {
+  const scelta = scadenzaScelta(evt);
+  const limite = limiteDurataPrecedente(evt);
+  const inizio = limite === null ? null : inizioConservazione(evt);
+  if (limite === null || !inizio) return scelta;
+  const da = Math.max(inizio.getTime(), evt.recordingRetentionFrom?.getTime() ?? 0);
+  const promessa = new Date(da + limite * DAY_MS);
+  return scelta && scelta.getTime() < promessa.getTime() ? scelta : promessa;
+}
+
+/** La scadenza della durata scelta da chi organizza (`recordingExpiresAt`). */
+function scadenzaScelta(evt: RecordingRetentionRow): Date | null {
+  if (!evt.recordingDeleteAfterDays) return null;
+  const durata = evt.recordingDeleteAfterDays * DAY_MS;
+  if (evt.recordingPublished) {
+    return evt.recordingPublishedAt
+      ? new Date(evt.recordingPublishedAt.getTime() + durata)
+      : null;
+  }
+  const inizio = inizioConservazione(evt);
+  if (!inizio) return null;
+  const da = Math.max(inizio.getTime(), evt.recordingRetentionFrom?.getTime() ?? 0);
+  return new Date(da + durata);
+}
+
+/**
+ * La registrazione dell'evento ha superato la sua scadenza (fase 2)? Il
+ * confronto e' stretto, come per i dati: l'ultimo giorno c'e' ancora.
+ */
+export function isRecordingRetentionExpired(evt: RecordingRetentionRow, now: Date): boolean {
+  const scadenza = recordingExpiresAt(evt);
+  return scadenza !== null && scadenza.getTime() < now.getTime();
+}
+
+/** La transazione di un evento nella pulizia: fa decine di istruzioni, e quelle
+ *  sulle prove crescono con le persone. Il limite predefinito di Prisma (5
+ *  secondi) farebbe fallire ogni giorno un evento grande, che non si
+ *  ripulirebbe mai. */
+export const TIMEOUT_PULIZIA_EVENTO_MS = 60_000;
+
+/** Le transazioni in fila con la pulizia dello stesso evento (ritiri e
+ *  cancellazioni): l'attesa conta nel limite, quindi devono poterla aspettare
+ *  tutta e fare ancora il proprio lavoro. */
+export const TIMEOUT_DOPO_PULIZIA_MS = TIMEOUT_PULIZIA_EVENTO_MS + 30_000;
+
+export interface StatoEsistenzaProve {
+  youtubeUrl: string | null;
+  recordingUrl: string | null;
+  tempRecordingUrl: string | null;
+  /** Il file di una sessione ancora al suo posto, anche se non e' quello
+   *  dell'evento: l'evento indica solo l'ultima sessione registrata. */
+  fileDiSessione: boolean;
+  /** Le tracce per persona ancora presenti di una registrazione che sull'evento
+   *  non ha un indirizzo. Le altre registrazioni non contano: i campi qui sopra
+   *  dicono gia' se il loro video c'e', e la riga resta anche dopo che il video e'
+   *  stato tolto. */
+  tracceArrivate: boolean;
+  /** C'e' un artefatto di trascrizione, pubblicato o no. */
+  trascrizioneEsiste: boolean;
+}
+
+/**
+ * Quali prove di consenso restano: quelle delle voci che stanno in cio' che
+ * esiste della registrazione, pubblicato o no. La registrazione non segue la
+ * conservazione dei dati dei partecipanti, e le sue prove restano con lei: alla
+ * pulizia dei dati, a una cancellazione chiesta da una persona (iscrizioni,
+ * concessioni, account), e finche' il video o la trascrizione ci sono. Quando se
+ * ne vanno (scadenza della registrazione, cancellazione dello staff) le prove si
+ * cancellano al primo giro della pulizia.
+ *
+ *  - Un video (dell'evento, temporaneo, di una sessione, o un link esterno) o
+ *    tracce per persona ancora presenti: restano entrambe, perche' la
+ *    trascrizione viene da li'.
+ *  - La sola trascrizione: resta la sua prova.
+ *  - Niente: nessuna, e quelle gia' conservate si cancellano.
+ *
+ * Il link esterno vale finche' qualcuno non lo toglie: la piattaforma non sa
+ * quando il video sparisce da un altro sito.
+ */
+export function tipiDiProvaDiCioCheEsiste(evt: StatoEsistenzaProve): TipoConsenso[] {
+  if (
+    evt.youtubeUrl ||
+    evt.recordingUrl ||
+    evt.tempRecordingUrl ||
+    evt.fileDiSessione ||
+    evt.tracceArrivate
+  ) {
+    return ['recording', 'transcription'];
+  }
+  return evt.trascrizioneEsiste ? ['transcription'] : [];
 }

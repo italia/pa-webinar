@@ -37,7 +37,7 @@ flowchart LR
     ci["ci.yml<br/>the gate to main"]:::gate
     rel["release.yml<br/>the release"]:::job
     codeql["codeql.yml<br/>GitHub-hosted"]:::job
-    score["scorecard.yml<br/>self-hosted"]:::job
+    score["scorecard.yml<br/>GitHub-hosted"]:::job
     clean["buildcache-cleanup.yml<br/>GitHub-hosted"]:::job
   end
 
@@ -46,9 +46,9 @@ flowchart LR
     webimg["GHCR pa-webinar-jitsi-web<br/>one tag per patch revision"]:::data
     checks["Pass or fail status<br/>Playwright report"]:::ext
     relimg["GHCR app: X.Y.Z, X.Y,<br/>latest, sha-&lt;sha&gt;<br/>migration: X.Y.Z-migrate,<br/>vX.Y.Z-migrate"]:::data
-    ghrel["GitHub Release<br/>notes, SPDX SBOM,<br/>packaged chart"]:::data
+    ghrel["GitHub Release<br/>notes, SPDX SBOM,<br/>packaged chart,<br/>provenance bundle"]:::data
     sec["Security tab (CodeQL)<br/>when code scanning is enabled"]:::ext
-    nopub["Nothing published:<br/>Scorecard publication<br/>needs a GitHub-hosted runner"]:::warn
+    scorepub["Scorecard results<br/>scorecard.dev and Security tab"]:::ext
     pruned["Old untagged versions of<br/>pa-webinar-buildcache deleted"]:::data
   end
 
@@ -65,7 +65,7 @@ flowchart LR
   rel --> relimg
   rel --> ghrel
   codeql --> sec
-  score --> nopub
+  score --> scorepub
   clean --> pruned
 
   classDef ext fill:#EEF1F4,stroke:#5C6F82,color:#17324D,stroke-width:2px
@@ -82,10 +82,10 @@ flowchart LR
 |---|---|---|---|---|
 | [`ci.yml`](../../.github/workflows/ci.yml) | Pull requests into `main`, pushes to `main`, manual dispatch | GitHub-hosted for pull requests, self-hosted otherwise | Check results and a Playwright report | A red check on the pull request or on `main`. E2E is non-blocking |
 | [`dev.yml`](../../.github/workflows/dev.yml) | Pushes to `dev`, manual dispatch | Self-hosted | Development images in GHCR | The `:dev` images were not updated |
-| [`release.yml`](../../.github/workflows/release.yml) | Any pushed tag matching `v*` | Self-hosted | Release images, SBOM, chart, GitHub Release | The release is incomplete (see [If something goes wrong](#if-something-goes-wrong)) |
+| [`release.yml`](../../.github/workflows/release.yml) | Any pushed tag matching `v*` | Self-hosted, except the attestation job (GitHub-hosted) | Release images, SBOM, chart, GitHub Release | The release is incomplete (see [If something goes wrong](#if-something-goes-wrong)) |
 | [`jitsi-web.yml`](../../.github/workflows/jitsi-web.yml) | Pushes to `dev` that change `infra/jitsi-web-patched/` or the workflow itself, manual dispatch | Self-hosted | The patched Jitsi web image | The image was not published |
 | [`codeql.yml`](../../.github/workflows/codeql.yml) | Pushes and pull requests to `main` or `dev`, weekly | GitHub-hosted | Code-scanning results | Nothing: the job is non-blocking |
-| [`scorecard.yml`](../../.github/workflows/scorecard.yml) | Pushes to `main`, weekly | Self-hosted | Nothing, as configured: publication needs a GitHub-hosted runner (see [below](#codeqlyml-and-scorecardyml-code-analysis)) | Nothing: the Scorecard step is non-blocking |
+| [`scorecard.yml`](../../.github/workflows/scorecard.yml) | Pushes to `main`, weekly | GitHub-hosted | Scorecard results on scorecard.dev, and in the Security tab when code scanning is enabled (see [below](#codeqlyml-and-scorecardyml-code-analysis)) | Nothing: the Scorecard step is non-blocking |
 | [`buildcache-cleanup.yml`](../../.github/workflows/buildcache-cleanup.yml) | Weekly, manual dispatch | GitHub-hosted | Deletes old untagged versions of the layer-cache package (see [below](#buildcache-cleanupyml-pruning-the-layer-cache)) | Old cache versions stay until the next run |
 
 The only GitHub Actions artifact any workflow uploads is the Playwright report of the E2E job. SBOMs and the chart are attached to the GitHub Release instead.
@@ -100,14 +100,14 @@ The only GitHub Actions artifact any workflow uploads is the Playwright report o
 
 | Job, as named in the checks list | What it runs | Waits for | Blocking |
 |---|---|---|---|
-| Lint & Typecheck | `npm run lint --workspace=app`, `npx tsc --noEmit --project app/tsconfig.json` and `npm run test:scripts` (the Git-hook rules and the license policy) | | Yes |
+| Lint & Typecheck | `npm run lint --workspace=app`, `npx tsc --noEmit --project app/tsconfig.json` and `npm run test:scripts` (the Git-hook rules, the license policy and the model registry) | | Yes |
 | Unit Tests | `npm run test:coverage --workspace=app`, which fails when coverage falls below the thresholds in `app/vitest.config.ts`, which work as a ratchet. Then `npm run test:db --workspace=app` against a PostgreSQL service container | | Yes |
 | Unit Tests (recorder, controller) | For `infra/recorder`, `infra/recorder-controller` and `infra/captions/gateway`, which sit outside the npm workspaces: `npm ci`, `npx tsc --noEmit -p tsconfig.json`, `npm test` | | Yes |
 | Typecheck (lobby) | `npx tsc --noEmit -p lobby/tsconfig.json` | | Yes |
 | Helm Chart | Builds the subcharts at the versions pinned in `Chart.lock`, runs `./scripts/validate-chart.sh`, then renders the `simple`, `standard` and `full` example values and applies each result with `kubectl apply --dry-run=server` to a throwaway kind cluster | | Yes |
-| Unit Tests (worker AI) | In `infra/ai/worker`: `pip install -r requirements-test.txt`, then `pytest -q`. No GPU is involved: tests that need models skip themselves | | Yes |
+| Unit Tests (worker AI) | In `infra/ai/worker`, with Python 3.11: `pip install -r requirements-test.txt`, then `pytest -q`. No GPU is involved: tests that need models skip themselves | | Yes |
 | Security Scan | Trivy filesystem scan of the repository for CRITICAL and HIGH findings. `.trivyignore` at the root records the accepted ones | | Yes |
-| License Compliance | `npm run license:check` reads the lockfiles and fails on forbidden or missing licenses among production dependencies ([policy](../../THIRD-PARTY-LICENSES.md#what-ci-runs)). The job then regenerates `license-report.json` and fails if the committed file differs | | Yes |
+| License Compliance | `npm run license:check` reads the lockfiles and fails on forbidden or missing licenses among production dependencies ([policy](../../THIRD-PARTY-LICENSES.md#what-ci-runs)), and checks the [model registry](../../THIRD-PARTY-LICENSES.md#the-model-registry). The job then regenerates `license-report.json` and fails if the committed file differs | | Yes |
 | Migration Integrity | `prisma migrate deploy` on an empty database, then `prisma migrate diff --from-migrations app/prisma/migrations --to-schema-datamodel app/prisma/schema.prisma --shadow-database-url <the same throwaway database> --exit-code` | | Yes |
 | E2E Smoke Tests | Starts the Docker Compose stack, loads the demo data with the `db-seed` service and runs Playwright on Chromium. It uploads the `playwright-report` artifact | Lint & Typecheck, Unit Tests | No (`continue-on-error`) |
 | Docker Build & Scan | Builds the app image from the checkout with `push: false`, then scans that local image with Trivy for CRITICAL and HIGH findings | Lint & Typecheck, Unit Tests | Yes |
@@ -149,7 +149,7 @@ The local command for each job, and when a job may be skipped, are in [CI parity
 
 `release.yml` runs on every pushed tag that matches `v*`. It does not run lint, tests or scans: it trusts that the tagged commit already passed `ci.yml`. That is why a release is tagged on `main` after the pull request from `dev` has merged (see [Cutting a release](#cutting-a-release)).
 
-The workflow has three jobs:
+The workflow has four jobs:
 
 1. **Build & Push Docker Image.**
    - Builds and pushes the app image. The tags come from `docker/metadata-action`: `X.Y.Z`, `X.Y`, `sha-<sha>` and `latest`. The OCI labels include `org.opencontainers.image.revision`, the full commit SHA.
@@ -159,7 +159,8 @@ The workflow has three jobs:
    - Writes the release notes from `git log` (see [Release notes and the changelog](#release-notes-and-the-changelog)).
    - Creates the GitHub Release with those notes and attaches the SBOM files.
 2. **Package Helm Chart**, after the first job. It builds the subcharts from `Chart.lock` with the same Helm version the `ci.yml` chart job validates with, packages `infra/helm/pa-webinar` with `--version X.Y.Z --app-version X.Y.Z`, and attaches `pa-webinar-X.Y.Z.tgz` to the same GitHub Release. The packaged chart therefore carries the release version whatever `Chart.yaml` says, and it includes its subcharts.
-3. **Build & Push \<component\>**, a matrix job for the auxiliary images: the recorder, the recorder controller, the two post-production workers and the two live-captions components, each as `ghcr.io/italia/pa-webinar-<component>:X.Y.Z` (see [Auxiliary components](#auxiliary-components)).
+3. **Attest Release Files**, after the first two jobs, on a GitHub-hosted runner without a checkout. It attests, with `actions/attest-build-provenance`, the SHA-256 digests that the first two jobs computed for the files they attached, not copies downloaded later from the release: a SLSA provenance attestation signed keylessly with the workflow's identity and stored on GitHub. It attaches the bundle as `pa-webinar-X.Y.Z.intoto.jsonl`. It is the only job with `id-token: write`, so the signing token never sits next to the npm install scripts and tools of the build jobs. If it fails, the release is complete except for the provenance.
+4. **Build & Push \<component\>**, a matrix job for the auxiliary images: the recorder, the recorder controller, the two post-production workers and the two live-captions components, each as `ghcr.io/italia/pa-webinar-<component>:X.Y.Z` (see [Auxiliary components](#auxiliary-components)).
 
 The app image is built for `linux/amd64` only, and the migration image for the runner's own platform.
 
@@ -172,8 +173,8 @@ The layer cache is in the same package as for `dev.yml`. Each build reads its `<
 `jitsi-web.yml` builds `ghcr.io/italia/pa-webinar-jitsi-web`: the upstream `jitsi/web` image with the fixes that have no configuration point. Why the patch exists is in [ADR-017](../adr/017-patched-jitsi-web-image.md). How it works is in [How PA Webinar extends Jitsi Meet](../architecture/jitsi-integration.md#the-patched-web-image).
 
 - **When it runs.** On pushes to `dev` that change `infra/jitsi-web-patched/` or the workflow file, and on manual dispatch. It does not run for releases.
-- **Validate, then push the same image.** The job builds the image into the local Docker daemon without pushing it. It then extracts the patched files and the original ones, and checks each patch by occurrence count in the JavaScript bundle and in `all.css`. When the runner's Node.js can parse the original bundle, it also checks that the patched bundle still parses (`node --check`); otherwise it logs a warning and relies on the count checks. Only then does it push the exact image it validated, without rebuilding. The image is built with `provenance: false` so that it can be loaded locally.
-- **Tags.** The workflow's `env` block sets the upstream build in `BASE_TAG` and the published tag in `IMAGE_TAG`, of the form `stable-<jitsi-build>-rnnoise`. Bump `IMAGE_TAG` in the same change as any patch change: the workflow pushes whatever `IMAGE_TAG` says, so an unchanged value overwrites the previous image and makes a rollback impossible.
+- **Validate, then push the same image.** The job builds the image into the local Docker daemon without pushing it. It then extracts the patched files and the original ones, and checks each patch by occurrence count in the JavaScript bundle and in `all.css`. When the runner's Node.js can parse the original bundle, it also checks that the patched bundle still parses (`node --check`); otherwise it logs a warning and relies on the count checks. Only then does it push the exact image it validated, without rebuilding. If `IMAGE_TAG` is already published, it pushes nothing: when the base layers, the image configuration and every file equal the published image the rebuild adds nothing, and any difference fails the job, which asks for a new tag. The image is built with `provenance: false` so that it can be loaded locally.
+- **Tags.** The upstream build is the `BASE_TAG` and `BASE_DIGEST` defaults in the Dockerfile (the job stops if the tag no longer points to that digest); the workflow's `env` block sets the published tag in `IMAGE_TAG`, of the form `stable-<jitsi-build>-rnnoise`. Bump `IMAGE_TAG` in the same change as any patch change: the workflow never overwrites a published tag with different content, so an unchanged value makes the job fail.
 - **The chart default is separate.** `jitsi-meet.web.image.tag` in `infra/helm/pa-webinar/values.yaml` is maintained on its own and can lag behind `IMAGE_TAG`. Compare the two before relying on the chart default.
 
 Building, bumping and verifying the image step by step is in [infra/jitsi-web-patched/README.md](../../infra/jitsi-web-patched/README.md).
@@ -181,7 +182,7 @@ Building, bumping and verifying the image step by step is in [infra/jitsi-web-pa
 ### `codeql.yml` and `scorecard.yml`: code analysis
 
 - **CodeQL** analyzes JavaScript and TypeScript with the `security-extended` queries on pushes and pull requests to `main` and `dev`, and weekly. It runs on GitHub-hosted runners and is non-blocking (`continue-on-error`). Results reach the repository's Security tab only when code scanning is enabled in the repository settings. Until then the job still ends green.
-- **OpenSSF Scorecard** runs on pushes to `main` and weekly, on the self-hosted runner. It is configured to publish (`publish_results: true`), but scorecard-action accepts publication only from GitHub-hosted runners. As configured, the publication is rejected, the Scorecard step fails without failing the run (`continue-on-error`), and the upload to the Security tab, which runs only when that step succeeds, is skipped. Results reach OpenSSF and the Security tab only once the job runs on `ubuntu-latest`. The optional `SCORECARD_TOKEN` secret replaces the default token when the organization's settings deny the default one the access it needs.
+- **OpenSSF Scorecard** runs on pushes to `main` and weekly, on a GitHub-hosted `ubuntu-latest` runner, because scorecard-action accepts published results only from GitHub-hosted runners. It publishes them (`publish_results: true`) to OpenSSF, where the scorecard.dev viewer shows them, and uploads them to the Security tab, where they appear when code scanning is enabled. The Scorecard step is non-blocking (`continue-on-error`): if it fails, the upload, which runs only when that step succeeds, is skipped. The optional `SCORECARD_TOKEN` secret replaces the default token when the organization's settings deny the default one the access it needs.
 
 ### `buildcache-cleanup.yml`: pruning the layer cache
 
@@ -195,7 +196,7 @@ Every build rewrites its cache tag, so the previous cache manifest stays in `pa-
 
 The workflows name the upstream repository's own infrastructure. A fork that wants its own builds changes these places:
 
-- **The self-hosted runner label.** Jobs on trusted events run on `arc-runner-pa-webinar`: the non-pull-request branch of every `runs-on` in `ci.yml`, and every job in `dev.yml`, `release.yml`, `jitsi-web.yml` and `scorecard.yml`. Without a runner with that label, those jobs stay queued. Replace the label with your own runner's, or with `ubuntu-latest`. In `ci.yml`, keep the conditional so that pull requests still run on GitHub-hosted runners (see [Runner and permission policy](#runner-and-permission-policy)). In `scorecard.yml`, use `ubuntu-latest`, not another self-hosted label: scorecard-action publishes results only from GitHub-hosted runners.
+- **The self-hosted runner label.** Jobs on trusted events run on `arc-runner-pa-webinar`: the non-pull-request branch of every `runs-on` in `ci.yml`, every job in `dev.yml` and `jitsi-web.yml`, and every job in `release.yml` except the attestation job. Without a runner with that label, those jobs stay queued. Replace the label with your own runner's, or with `ubuntu-latest`. In `ci.yml`, keep the conditional so that pull requests still run on GitHub-hosted runners (see [Runner and permission policy](#runner-and-permission-policy)). `scorecard.yml` and the attestation job of `release.yml` already run on `ubuntu-latest`: keep them there, because scorecard-action publishes results only from GitHub-hosted runners and the attestation job keeps its signing token off the build runner.
 - **The image names.** `IMAGE_NAME` and the other `*_IMAGE_NAME` values in the `env` blocks of `dev.yml`, `release.yml` and `jitsi-web.yml` point to `italia/…`. A workflow's token can push only to its own owner's packages, so set them to your namespace. Then point the chart at your images (see [Deploying with Helm](../DEPLOYMENT.md)).
 - **Optional secrets.** `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` lift the Docker Hub pull limit for the chart and E2E jobs. `SCORECARD_TOKEN` is used only when the default token cannot run Scorecard.
 - **Code scanning.** Enable it in the repository settings if you want CodeQL results.
@@ -280,7 +281,13 @@ Each GitHub Release can carry two SBOMs:
 - **`sbom.spdx.json`**: an SPDX JSON SBOM of the published app image `ghcr.io/italia/pa-webinar:X.Y.Z`, generated by Syft through `anchore/sbom-action`. It is attached to the release, not uploaded as an Actions artifact.
 - **`npm-sbom.json`**: a CycloneDX SBOM of the npm dependencies of the `app` workspace, from `@cyclonedx/cyclonedx-npm`. This step is best effort (`continue-on-error`, and the command ends in `|| true`). The job does not set up Node.js, so on a runner without `npm` the step fails and the release has no `npm-sbom.json`. Check the release assets rather than assuming the file is there.
 
-Which images have no SBOM, and the signing status, are in [SECURITY.md](../../SECURITY.md#release-artifacts-and-sboms).
+Which images have no SBOM, and the signing status, are in [SECURITY.md](../../SECURITY.md#release-artifacts-and-sboms). To check a downloaded release file against its signed provenance:
+
+```sh
+gh attestation verify sbom.spdx.json --repo italia/pa-webinar
+gh attestation verify pa-webinar-X.Y.Z.tgz --repo italia/pa-webinar \
+  --bundle pa-webinar-X.Y.Z.intoto.jsonl
+```
 
 **The SBOM viewer.** On the `/changelog` page of an installation, a release whose entry in `app/src/content/changelog/releases.json` has `"sbom": true` shows an **SBOM** button inside its collapsed **Technical detail** disclosure, which is rendered only when the `githubUrl` site setting points at a GitHub repository. The button opens a searchable list of the image's components (name, version, ecosystem) and a **Download full SBOM (SPDX)** link. The server fetches `sbom.spdx.json` from the GitHub Release of the repository named in the `githubUrl` site setting, trims it and caches the summary (`app/src/app/api/changelog/[version]/sbom/route.ts`). The route accepts only an `https://github.com/<owner>/<repo>` URL and only versions listed in `releases.json` with the flag set. The viewer reads the SPDX image SBOM only.
 

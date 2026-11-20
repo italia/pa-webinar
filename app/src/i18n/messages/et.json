@@ -142,10 +142,7 @@
       "votes": "{count, plural, =0 {hääli pole} one {1 hääl} other {# häält}}",
       "topWords": "Enim jagatud sõnad",
       "feedback": "Keskmine hinnang",
-      "feedbackCount": "{count, plural, one {1 vastus} other {# vastust}}",
-      "chatQuestions": "Küsimused vestlusest",
-      "reactionsCount": "{count, plural, one {1 reaktsioon} other {# reaktsiooni}}",
-      "answered": "vastatud"
+      "feedbackCount": "{count, plural, one {1 vastus} other {# vastust}}"
     },
     "detail": {
       "title": "Ürituse üksikasjad",
@@ -191,7 +188,7 @@
       },
       "chatNotSaved": "Vestluse sõnumeid pärast üritust ei avaldata: need kustutatakse koos ürituse ülejäänud andmetega.",
       "qaPostEvent": "Ürituse küsimused ja vastused",
-      "peakParticipants": "Tipp: {count} osalejat",
+      "peakParticipants": "{count, plural, one {Tipp: # osaleja} other {Tipp: # osalejat}}",
       "calendar": {
         "addToCalendar": "Lisa kalendrisse",
         "google": "Google Calendar",
@@ -202,11 +199,13 @@
       "registrationEnded": "Üritus on lõppenud: registreerumine on suletud.",
       "joinAsGuest": "Liitu külalisena",
       "registeredUseEmailLink": "Juba registreerunud? Kasuta e-kirjas saadud isiklikku linki.",
-      "willBeRecorded": "Üritus salvestatakse.",
+      "willBeRecorded": "Üritust võidakse salvestada.",
       "machineTranslation": "Automaatne tõlge",
       "machineTranslationNote": "Pealkirja ja kirjelduse tõlkis automaatne mudel ja keegi ei ole neid veel üle vaadanud.",
       "previewTitle": "Eelvaade meeskonnale",
       "previewBody": "Salvestust pole veel avaldatud: seda lehe versiooni näevad ainult ürituse haldajad.",
+      "previewBodyPageHidden": "See leht ei ole avalikkusele nähtav: aadressi avades seda ei leia. Seda näevad ainult ürituse haldajad.",
+      "previewBodyPageRegistrants": "See leht ei ole avalikkusele nähtav: aadressi avades seda ei leia. Seda näevad ainult üritusele registreerunud ja ürituse haldajad.",
       "recordingForRegistrantsTitle": "Salvestus ainult registreerunutele",
       "recordingForRegistrantsBody": "Kui registreerusid üritusele, ava e-kirja „salvestus on saadaval“ isiklik link või palu see uuesti saata.",
       "recordingLinkEmailLabel": "E-post, millega registreerusid",
@@ -243,8 +242,8 @@
     "namePlaceholder": "Teie nime kuvatakse ürituse ruumis",
     "email": "E-post",
     "emailPlaceholder": "Saate üritusele ligipääsu lingi",
-    "gdprConsent": "Nõustun oma isikuandmete (nimi, e-post) töötlemisega vastavalt ELi määrusele 2016/679 (GDPR) selles üritusel osalemiseks.",
-    "consentsLegend": "Nõusolekud",
+    "gdprConsent": "Olen lugenud privaatsuspoliitikat, mis käsitleb isikuandmete (nimi, e-post) töötlemist sellel üritusel osalemiseks.",
+    "consentsLegend": "Privaatsuspoliitika ja nõusolekud",
     "requiredMark": "kohustuslik",
     "optionalMark": "valikuline",
     "gdprLink": "Lugege täielikku privaatsuspoliitikat",
@@ -292,12 +291,13 @@
       "emailRequired": "Palun sisestage oma e-posti aadress",
       "emailInvalid": "Palun sisestage kehtiv e-posti aadress",
       "organizationRequired": "Palun sisestage oma organisatsioon",
-      "consentRequired": "Nõusolek andmetöötluseks on kohustuslik",
+      "consentRequired": "Registreerumiseks kinnitage, et olete privaatsuspoliitikat lugenud",
       "recordingConsentRequired": "Selle ürituse jaoks on salvestamise nõusolek kohustuslik",
       "eventFull": "Üritus on saavutanud osalejate maksimaalse arvu",
       "generic": "Registreerumisel ilmnes viga. Palun proovige uuesti.",
       "questionnaireRequired": "Registreerumiseks vastake küsimustiku küsimustele.",
       "questionnaireIncomplete": "Vastake kõigile küsimustiku kohustuslikele küsimustele.",
+      "recordingDestinationChanged": "Salvestamist käsitlev tekst muutus vormi täitmise ajal: laadige leht uuesti ja lugege tekst uuesti läbi.",
       "questionnaireChanged": "Küsimustikku muudeti vormi täitmise ajal: laadige leht uuesti ja vastake uuesti."
     }
   },
@@ -363,7 +363,7 @@
       "publicHelpNone": "Lõppenud ürituse leht jääb nähtavaks koos pealkirja ja kirjeldusega.",
       "sections": {
         "recap": "kokkuvõtet",
-        "qa": "küsimusi ja vastuseid",
+        "qa": "Q&A küsimuste teksti",
         "polls": "avaldatud küsitlusi",
         "wordCloud": "sõnapilve",
         "materials": "materjale",
@@ -424,6 +424,7 @@
       "noMessages": "Sõnumeid pole",
       "empty": "Sõnumeid veel pole. Kirjutage esimesena!",
       "inputLabel": "Vestlussõnum",
+      "personalDataNotice": "Ärge kirjutage teiste inimeste isikuandmeid ega enda omi, mida te ei soovi teatavaks teha: ruumis olijad saavad vestlust lugeda ja alla laadida.",
       "moderatorBadge": "Moderaator",
       "attach": "Lisa fail",
       "emojiPicker": "Lisa emoji",
@@ -544,7 +545,9 @@
       "locksByConsent": "Mikrofonid ja kaamerad järgivad salvestamise nõusolekut: kes selle andis, kasutab sündmuse lubatut, teised ainult kuulavad. Ruumi lukud jäävad sisse.",
       "listenOnlyBadge": "ainult kuulab",
       "listenOnlyNoFloor": "Ei ole salvestamiseks nõusolekut andnud: ei saa sõna võtta enne, kui annab selle oma ruumis.",
-      "voiceExcludedBadge": "salvestuseta",
+      "inVideoBadge": "videol",
+      "voiceRecordedBadge": "hääl salvestatakse",
+      "voiceExcludedBadge": "häält ei salvestata",
       "voiceExcludedFloor": "Pole salvestamisega nõustunud: võib sõna võtta, kuid jääb salvestusest välja."
     },
     "moderator": {
@@ -621,6 +624,7 @@
       "tab": "Juhtpult",
       "recordingHeading": "Salvestamine",
       "recordingOff": "Ei salvesta",
+      "recordingNotOfferedInstant": "Kiirkõnedes pakutakse salvestamist ainult seal, kus nõusolekuta inimesed jäävad videost välja, ja see paigaldus seda ei võimalda.",
       "stopConfirm": "Kas lõpetada salvestamine kohe?",
       "featuresHeading": "Ruumi funktsioonid",
       "featuresHelp": "Need lülituvad sisse ja välja kõigile kohe.",
@@ -681,33 +685,78 @@
       "confirm": "Võta tagasi",
       "working": "Uuendamine…",
       "error": "Nõusolekut ei õnnestunud uuendada: proovi uuesti.",
+      "textChanged": "Nõusoleku tekst muutus pärast seda, kui selle lehe avasid: loe uus tekst läbi ja kinnita, kui oled nõus.",
+      "closeNotice": "Sulge see teade: sinu nõusolekud jäävad kättesaadavaks ülemise nupu alt",
       "recording": {
         "title": "Ürituse salvestamine",
         "give": "Annan nõusoleku salvestamiseks",
         "without": {
           "soloAscolto": "Ilma selle nõusolekuta oled ainult kuulaja: mikrofon, kaamera ja ekraan jäävad suletuks.",
-          "conduce": "Ilma selle nõusolekuta juhid ikka, kuid su hääl ei jää isikupõhistele radadele ega transkriptsiooni.",
-          "voce": "Ilma selle nõusolekuta osaled nagu kõik, kuid jääd salvestusest välja: ei nime, häält ega pilti."
+          "conduce": "Ilma selle nõusolekuta juhid ikka.",
+          "voce": "Ilma selle nõusolekuta osaled nagu kõik, kuid sinu hääl jääb salvestisest välja. Sinu nägu ja nimi ei ilmu videole niikuinii kunagi.",
+          "comeTutti": "Ilma selle nõusolekuta osaled nagu kõik."
         },
+        "withoutTranscriptHost": "Sinu häält ei säilitata isikupõhistel radadel ega transkriptsioonis.",
         "alreadyRecorded": "Juba salvestatu jääb ürituse videosse: eemaldamiseks kirjuta korraldajatele.",
         "withdraw": {
-          "soloAscolto": "Kui võtad selle tagasi, jääd ruumi ainult kuulajana: mikrofon, kaamera ja ekraan suletakse. Võtad tagasi ka nõusoleku oma sõnavõttude transkribeerimiseks.",
-          "conduce": "Kui võtad selle tagasi, juhid edasi, kuid nüüdsest su hääl ei jää isikupõhistele radadele ega transkriptsiooni. Ruumi video näitab sind siiski, kui seda salvestatakse.",
-          "voce": "Kui selle tagasi võtad, jääd ruumi nagu enne ja oled nüüdsest salvestusest väljas. Võtad tagasi ka nõusoleku oma sõnavõttude transkribeerimiseks."
-        }
+          "soloAscolto": "Kui võtad selle tagasi, jääd ruumi ainult kuulajana: mikrofon, kaamera ja ekraan suletakse.",
+          "conduce": "Kui võtad selle tagasi, juhid edasi. Ruumi video näitab sind siiski, kui seda salvestatakse.",
+          "voce": "Kui selle tagasi võtad, jääd ruumi nagu enne ja oled nüüdsest salvestisest väljas.",
+          "avvertenza": "Kui selle tagasi võtad, jääd ruumi nagu enne. Kui sulle antakse sõna ja üritus salvestatakse, jääb sinu hääl siiski videosse.",
+          "assente": "Kui selle tagasi võtad, jääd ruumi nagu enne. Nüüdsest ei salvestata sinu häält eraldi rajale."
+        },
+        "withdrawTranscript": "Võtad tagasi ka nõusoleku oma sõnavõttude transkribeerimiseks.",
+        "withdrawTranscriptHost": "Nüüdsest ei säilitata sinu häält isikupõhistel radadel ega transkriptsioonis."
       },
       "transcription": {
         "title": "Sinu sõnavõttude transkribeerimine",
         "give": "Annan nõusoleku transkribeerimiseks",
         "giveEffect": "Sinu sõnavõtud lähevad ürituse transkriptsiooni sinu nimega. Ilma nõusolekuta osaled ikka.",
-        "withdrawEffect": "Kui võtad selle tagasi, kaotavad su juba transkribeeritud laused teksti ja nime ning nüüdsest su häält ei salvestata eraldi rajale ega transkribeerita.",
+        "withdrawEffect": "Kui võtad selle tagasi, kaotavad su subtiitritest juba transkribeeritud laused teksti ja nime ning nüüdsest su häält ei salvestata eraldi rajale ega transkribeerita. Juba loodud video transkriptsiooni puhul pöördu korraldajate poole.",
         "needsRecording": "Saad selle anda pärast nõusolekut salvestamiseks."
       }
+    },
+    "recordingQuestion": {
+      "title": "Kõnet salvestatakse",
+      "question": "Kas soovid, et sinu häält salvestataks?",
+      "body": "Videol on ainult juhid: sinu nägu ja nimi mitte kunagi. Kui vastad jah, ühendatakse kõne mõneks sekundiks uuesti ja sellest hetkest salvestatakse sinu hääl, kui räägid. Kui vastad ei või sulged selle akna, osaled edasi nagu enne ja sinu häält ei salvestata.",
+      "later": "Kui vastad ei, küsime uuesti järgmise salvestuse ajal. Saad meelt muuta igal hetkel ülemise nupuga {button}.",
+      "yes": "Jah, salvesta mu hääl",
+      "no": "Ei, ära salvesta"
     },
     "voiceExcluded": {
       "title": "Osalete ilma salvestuseta.",
       "consent": "Annan nõusoleku salvestamiseks",
-      "body": "Sa pole salvestamisega nõustunud: osaled nagu kõik, kuid sinu nimi, hääl ja pilt ei satu salvestusse."
+      "body": "Sa ei ole andnud nõusolekut salvestamiseks: osaled nagu kõik, kuid sinu hääl jääb salvestisest välja. Sinu nägu ja nimi ei ilmu videole niikuinii kunagi."
+    },
+    "nickname": {
+      "reserved": "Moderaator,Esineja,Kõneleja,Osaleja,Külaline,Korraldaja,Administraator,Võõrustaja",
+      "label": "Hüüdnimi (valikuline)",
+      "help": "Üks sõna, 2–24 märki: tähed, numbrid ja . _ -. Teised näevad seda sinu nime asemel videos, vestluses, küsimustes ja transkriptsioonis.",
+      "helpName": "Kui jätad selle tühjaks, oled nähtav oma nimega.",
+      "helpAnonymous": "Kui jätad selle tühjaks, oled nähtav automaatse pseudonüümiga.",
+      "checking": "Hüüdnime kontrollimine…",
+      "shownAs": "Teised näevad sind kui „{nickname}“.",
+      "useSuggestion": "Kasuta „{suggestion}“",
+      "errors": {
+        "length": "Hüüdnimi peab olema 2–24 märki pikk.",
+        "format": "Üks sõna: algab tähega ja lõpeb tähe või numbriga; vahel tähed, numbrid ja . _ -, mitte kunagi kaks järjest.",
+        "scripts": "Kasuta ühe tähestiku tähti.",
+        "reserved": "See sisaldab reserveeritud sõna, näiteks rolli nime: vali mõni teine.",
+        "host": "See sarnaneb ürituse juhi nimega: vali mõni teine.",
+        "taken": "Keegi üritusel juba kasutab seda hüüdnime.",
+        "disabled": "See üritus ei võta uusi hüüdnimesid vastu: saad oma hüüdnime ainult eemaldada.",
+        "rete": "Hüüdnime ei õnnestunud kontrollida. Proovi uuesti."
+      },
+      "button": "Hüüdnimi",
+      "open": "Muuda oma hüüdnime",
+      "dialogTitle": "Sinu hüüdnimi",
+      "dialogIntro": "Teised näevad hüüdnime sinu nime asemel. Selle muutmiseks ühendab ruum sind hetkeks uuesti.",
+      "apply": "Salvesta ja ühenda uuesti",
+      "remove": "Eemalda hüüdnimi",
+      "reconnecting": "Uuesti ühendamine…",
+      "done": "Valmis: nüüd oled nähtav kui „{nickname}“.",
+      "doneRemoved": "Valmis: hüüdnimi on eemaldatud."
     }
   },
   "qa": {
@@ -721,9 +770,9 @@
     "upvote": "Hääleta",
     "upvoted": "Hääletatud",
     "noQuestions": "Küsimusi veel pole. Olge esimene!",
-    "qaPersistenceNote": "Küsimused salvestatakse ja on saadaval pärast üritust.",
-    "qaPostEvent": "Ürituse küsimused ja vastused",
-    "noAnsweredQuestions": "Selle ürituse kohta vastatud küsimusi pole.",
+    "qaPersistenceNote": "Küsimuste tekst võib ilmuda ürituse lehel ilma küsija nimeta.",
+    "personalDataNotice": "Ärge kirjutage teiste inimeste isikuandmeid ega enda omi, mida te ei soovi avalikustada: küsimuse tekst võib ilmuda ürituse lehel ilma teie nimeta.",
+    "personalDataNoticeNotPublished": "Ärge kirjutage teiste inimeste isikuandmeid ega enda omi, mida te ei soovi teistele teada anda: ruumis olijad saavad küsimuse teksti lugeda.",
     "filterAll": "Kõik",
     "showPanel": "Näita Q&A",
     "hidePanel": "Peida Q&A",
@@ -742,6 +791,8 @@
       "editAnswer": "Muuda vastust",
       "answerFieldLabel": "Vastus küsimusele, küsija {name}",
       "answerPlaceholder": "Kirjutage vastus (kuni 2000 tähemärki)",
+      "answerNotice": "Vastus võib ilmuda ürituse lehel: ära kirjuta isikuandmeid.",
+      "answerNoticeNotPublished": "Ruumis olijad saavad vastust lugeda: ära kirjuta isikuandmeid.",
       "sendAnswer": "Avalda vastus",
       "cancel": "Tühista",
       "removeAnswer": "Eemalda vastus"
@@ -769,7 +820,8 @@
     "accessDenied": {
       "title": "See jaotis pole teie rolli jaoks saadaval",
       "body": "Korraldajana haldate oma üritusi: nende loomist ja avaldamist, materjale, küsimustikke ja järeltöötlust. Platvormi seaded ja kõigi ürituste andmed jäävad administraatorile.",
-      "back": "Mine oma üritustele"
+      "back": "Mine oma üritustele",
+      "organizerOnly": "Seda üritust saavad muuta ainult selle korraldajad. Administraatorina näete selle olekut ja üksikasju ning saate selle arhiveerida või kustutada. Salvestised ja nende sisu kuuluvad korraldajatele ja osalejatele."
     },
     "staffLogin": {
       "title": "Logi haldusalasse",
@@ -1025,6 +1077,24 @@
           }
         },
         "recordingManualNote": "Salvestus ei alga kunagi iseenesest: juht käivitab selle REC-nupuga.",
+        "recordingDestination": "Kuhu salvestis läheb",
+        "recordingDestinationReserved": "Ainult registreerunutele",
+        "recordingDestinationReservedDesc": "Seda näevad korraldajad ja registreerunud, viimased seni, kuni nende registreerumisandmeid säilitatakse. Seda ei avaldata. Pärast ruumi avamist ei saa seda enam avalikuks muuta.",
+        "recordingDestinationPublic": "Avalik",
+        "recordingDestinationPublicDesc": "Saab avaldada ürituse lehel ja videoteegis. Osalejad annavad nõusoleku ka selleks.",
+        "recordingDestinationNotSet": "Määramata: üritus loodi enne selle valiku lisamist.",
+        "recordingDestinationStaffOnly": "Kuhu salvestis läheb, valib ürituse meeskond: praegu pole see määratud.",
+        "recordingDestinationStartsReserved": "Salvestis on alguses ainult registreerunutele: ürituse meeskond saab selle avalikuks muuta kuni ruumi avamiseni.",
+        "recordingDestinationStaysReserved": "Salvestis jääb ainult registreerunutele: ruum on juba avatud.",
+        "recordingDestinationLocked": "Pärast ruumi avamist saab valida ainult „Ainult registreerunutele“: nõusolekud kehtivad teksti kohta, mida inimesed lugesid.",
+        "recordingDestinationPublicOnInvitation": "Üritus on ainult kutsega, kuid salvestis jääb avalikuks: videot saab vaadata igaüks, mitte ainult kutsutud.",
+        "recordingDestinationReservedOnInvitation": "Üritus on ainult kutsega: salvestis on muudetud valikule „Ainult registreerunutele“. Saad seda muuta jaotises „Salvestus ja tehisintellekt“.",
+        "postEventPagePrivateOnInvitation": "Üritus on ainult kutsega: ürituse järgne leht on muudetud privaatseks. Saad seda muuta jaotises „Privaatsus, andmed ja leht pärast üritust“.",
+        "postEventPagePublicWithVideo": "Salvestis on avalik: ürituse järgne leht on muudetud avalikuks, muidu ei näeks videot keegi. Saad seda muuta jaotises „Privaatsus, andmed ja leht pärast üritust“.",
+        "postEventPageStaysPrivate": "Üritus on avatud registreerujatele, kuid ürituse järgne leht jäi privaatseks: see ei avane ise uuesti. Saad seda muuta jaotises „Privaatsus, andmed ja leht pärast üritust“.",
+        "postEventPagePrivateVideoHidden": "Salvestis on avalik, kuid ürituse järgne leht on privaatne: videot ei näe keegi, isegi mitte registreerunud, seni kuni leht jääb privaatseks.",
+        "recordingNothingToCapture": "Selles paigalduses ei ole ruumi videot: ilma transkriptsiooni ja osalejapõhiste radadeta ei salvestata midagi.",
+        "recordingDestinationRequired": "Vali, kuhu salvestis läheb.",
         "audienceAnonymous": "Anonüümne publik",
         "audienceAnonymousDesc": "Osalejad on teistele nähtavad pseudonüümiga („Osaleja“ ja kood) videos, vestluses ja küsimustes; osalejate nimekiri jääb juhatajatele ja väljakut pole. Kasulik suurtel sündmustel; kogukonna sündmustel tahetakse üksteist tundma õppida.",
         "audienceAnonymousLocked": "Kuni ruum võib olla avatud, seda muuta ei saa: see seoks pseudonüümid nimedega.",
@@ -1032,10 +1102,15 @@
         "participantListVisibleDesc": "Väljas: loend, ruudustik ja nimed väljakul jäävad juhtidele ja esinejatele; publik näeb ainult kõnelejat. Sees: kõik näevad, kes on ruumis.",
         "participantListAnonymous": "Anonüümse publiku korral jääb loend peidetuks.",
         "participantListLocked": "Avatud ruumiga seda muuta ei saa: juba sees olijad muudatust ei näeks.",
+        "nicknamesEnabled": "Hüüdnimed osalejatele",
+        "nicknamesEnabledDesc": "Osalejad saavad valida hüüdnime: teised näevad seda nime asemel videos, vestluses, küsimustes ja transkriptsioonis. Korraldajad ja moderaatorid näevad, kes selle taga on. Juhid jäävad oma nimega. Vaikimisi on see sees, kui osalejate nimekiri on peidetud.",
+        "nicknamesLocked": "Avatud ruumi korral seda muuta ei saa: kes on juba sees, valis eelmise reegli järgi.",
         "participantListCameraNote": "Peidetud loendi korral ei näe kaamera sisselülitaja oma pilti. Kohtumiseks, kus kõik üksteist näevad, näita loendit.",
         "recordingLockedLive": "Avatud ruumiga salvestamist muuta ei saa: see kehtib esimesest sisenemisest.",
         "hostsAlwaysRecorded": "Juhtijad on alati salvestuses",
-        "hostsAlwaysRecordedDesc": "Väljas valivad moderaatorid ja esinejad nagu kõik. Lülita sisse ainult siis, kui nad on juba nõustunud filmimisega: nad ei näe lahtrit ja ürituse teavitus peab seda ütlema."
+        "hostsAlwaysRecordedDesc": "Moderaatorid ja esinejad on videol nime ja pildiga, ilma märkeruuduta: ürituse privaatsusteade peab seda ütlema. Osalejatest salvestatakse ainult hääl ja ainult nende nõusolekul.",
+        "hostsAlwaysRecordedDescHostsOnly": "Moderaatorid ja esinejad on videol nime ja pildiga, ilma märkeruuduta: ürituse privaatsusteade peab seda ütlema. Osalejaid pole videol kunagi näha ega kuulda.",
+        "hostsAlwaysRecordedDescVisible": "Moderaatorid ja esinejad on videol nime ja pildiga, ilma märkeruuduta: ürituse privaatsusteade peab seda ütlema. See paigaldus ei suuda osalejaid videost eemal hoida: nõusoleku andnu võtab sõna nime, hääle ja pildiga ning iga jälgija nimi võib ilmuda ka ilma sõna võtmata."
       },
       "step3": {
         "heading": "Inimesed ja kutsed",
@@ -1053,7 +1128,7 @@
         "remove": "Eemalda",
         "invalidEmail": "E-posti aadress pole kehtiv.",
         "duplicateEmail": "Aadress on juba lisatud.",
-        "rubricaPick": "Otsi aadressiraamatust organisatsiooni järgi…",
+        "rubricaPick": "Otsi aadressraamatust nime, e-posti või organisatsiooni järgi…",
         "rubricaOrAdd": "või lisa käsitsi",
         "removeItem": "Eemalda {name}",
         "invitationsStaffOnly": "Kutseid haldab ürituse meeskond.",
@@ -1135,6 +1210,7 @@
         "askOrganization": "Organisatsioon (registreerumiseks kohustuslik)",
         "askRole": "Roll (valikuline)",
         "askType": "Organisatsiooni liik (valikuline)",
+        "askAddressBook": "Paku aadressraamatusse jäämist (registreerujatele vabatahtlik)",
         "questionnairesHeading": "Küsimustikud",
         "questionsBefore": "Enne üritust, registreerimisel: {count, plural, =0 {lisaküsimusi pole} one {# lisaküsimus} other {# lisaküsimust}}",
         "questionsAfter": "Pärast üritust: {count, plural, =0 {rahuloluküsitlust pole} one {rahuloluküsitlus, # küsimus} other {rahuloluküsitlus, # küsimust}}",
@@ -1230,6 +1306,8 @@
         "gdprHeading": "Privaatsus ja andmete säilitamine",
         "retentionDays": "Säilitamise päevad",
         "retentionHelp": "Pärast seda läve isikuandmed kustutatakse automaatselt.",
+        "recordingRetention": "Salvestise säilitamine",
+        "recordingRetentionHelp": "Salvestist ja sellest tehtut ei kustutata koos inimeste andmetega. Tähtaja korral kustutatakse need nii mitu päeva pärast ürituse lõppu või, kui video on avaldatud, pärast avaldamist. Seda saab muuta ka hiljem salvestise paneelil.",
         "gdprTemplate": "Teabe mall",
         "gdprTemplateNone": "— Kasuta kohandatud teksti —",
         "gdprTemplateUnknown": "Valitud privaatsusteabe malli ei ole enam olemas: vali mõni muu või naase kohandatud teksti juurde",
@@ -1281,7 +1359,10 @@
         "participantsCan": "Osalejad: {list}",
         "none": "puuduvad",
         "recordingManual": "Saadaval: algab alles siis, kui juht vajutab REC.",
+        "recordingDestinationReserved": "Sihtkoht: ainult korraldajatele ja registreerunutele.",
+        "recordingDestinationPublic": "Sihtkoht: avalik.",
         "aiAfter": "Pärast salvestust: {list}.",
+        "aiConfirmVideo": "Ilma isikupõhiste radadeta algab video transkribeerimine alles pärast kinnitust, et kõik rääkijad on nõustunud.",
         "scheduleHeading": "Millal see toimub",
         "scheduleIntro": "Millal sündmus toimub: kuupäev, kellaaeg ja ajavöönd.",
         "advancedIntro": "Malli juba valitud väärtused: muuda ainult vajalikku.",
@@ -1325,17 +1406,25 @@
         "askOrganization": "organisatsioon",
         "askRole": "roll",
         "askType": "organisatsiooni liik",
+        "askAddressBook": "kas soovib jääda aadressraamatusse",
         "permissionsHeading": "Kes mida ruumis teha saab",
         "permissionsIntro": "Mida osalejad teha saavad ja millised ruumi funktsioonid on sees. Kõike saab muuta ka sündmuse ajal.",
         "consentsLine": "Nõusolekud registreerimisel ja ruumis: {list}",
         "consentRecordingFree": "salvestamine, vabatahtlik (ilma selleta ainult kuulamine)",
         "consentRecordingNotice": "salvestamise kohta ainult teade (osalejad ei räägi ega paista)",
+        "consentRecordingHostsOnly": "salvestamise kohta ainult teade (videol on ainult juhid)",
         "consentTranscription": "oma sõnavõttude transkribeerimine, vabatahtlik",
-        "consentsNone": "Peale registreerimise nõusoleku muid ei ole.",
-        "consentsHosts": "Moderaatoritelt ja esinejatelt küsitakse salvestamise kohta ruumis, vabatahtlikult.",
+        "consentsNone": "Nõusolekut pole vaja küsida: registreerumisel piisab privaatsuspoliitikaga tutvumisest.",
         "consentsWithdraw": "Osalejad saavad need ruumis tagasi võtta nupuga „Nõusolekud”.",
         "participantListShown": "Osalejate loend: nähtav kõigile.",
         "participantListHidden": "Osalejate loend: ainult juhtidele ja esinejatele.",
+        "audiencePseudonyms": "Publiku nimed: pseudonüümid.",
+        "audienceNicknames": "Osalejad saavad kasutada hüüdnime.",
+        "audienceRealNames": "Publiku nimed: pärisnimed.",
+        "postEventQaHidden": "Küsimused pärast üritust: ei avaldata.",
+        "postEventQaTextOnly": "Küsimused pärast üritust: ainult tekst, ilma nimedeta.",
+        "addressBookOffered": "Aadressraamat: pakutakse registreerujatele.",
+        "addressBookNotOffered": "Aadressraamat: ei pakuta.",
         "consentRecordingOptional": "salvestamine, vabatahtlik",
         "consentRecordingVoice": "salvestus, vabatahtlik (ilma nõusolekuta jääb isik salvestusest välja)",
         "consentsHostsAlways": "Juhtijad ja esinejad on alati salvestuses: nad ei näe lahtrit."
@@ -1409,15 +1498,15 @@
         "recording": "Salvestuses",
         "roomSame": "Osaleb ürituse reeglite järgi.",
         "roomListenOnly": "Ainult kuulamine ja vestlus.",
-        "recordedFull": "Nimi, hääl, pilt ja jagatud ekraan.",
+        "recordedFull": "Ainult hääl, kui inimene räägib: nägu ja nimi ei ilmu kunagi.",
+        "recordedVisible": "Nimi, hääl, pilt ja jagatud ekraan.",
         "notRecorded": "Ei esine: ei nime, häält, pilti ega jagatud ekraani.",
         "recordedVoice": "Tema hääl eraldi helirajal.",
         "notRecordedVoice": "Tema häält ei salvestata.",
         "othersSame": "Teised ei muutu: mikrofonilukud, sõna andmine ja video kuvamine jäävad ürituse omaks.",
         "audienceNotice": "Osalejatel pole mikrofoni, kaamerat ega ekraani: nad saavad ainult teavituse. Kui neile antakse sõna, võivad nad ruumis nõustuda; kui ei, jäävad nad salvestusest välja.",
-        "hostsChoose": "Moderaatorid ja esinejad valivad nagu kõik: nõustumata juhivad nad tavapäraselt, kuid jäävad salvestusest välja.",
         "hostsAlways": "Moderaatorid ja esinejad on alati salvestuses: nad ei näe lahtrit.",
-        "hostsFixed": "Moderaatorid ja esinejad juhivad igal juhul ning video võtab nad üles.",
+        "hostsOnly": "See paigaldus salvestab videole ainult juhid: osalejaid pole näha ega kuulda ning neilt ei küsita salvestamise nõusolekut.",
         "trace": "Kui ta salvestuse ajal sõna võtab, märgib video kõrval olev märkus puuduvat sõnavõttu ning transkriptsioonis on *** koos kellaajaga.",
         "anytime": "Nõusolekut antakse ja võetakse tagasi ruumis, igal ajal.",
         "transcription": "Oma sõnavõttude transkribeerimine on eraldi vabatahtlik nõusolek.",
@@ -1472,7 +1561,9 @@
       "breadcrumbAriaLabel": "Asukoharada",
       "skipToPage": "Mine lehe sisu juurde",
       "openMenu": "Ava menüü",
-      "closeMenu": "Sulge menüü"
+      "closeMenu": "Sulge menüü",
+      "recordingRemovals": "Eemaldamise taotlused",
+      "recordingRemovalDetail": "Eemaldamise taotlus"
     },
     "publications": {
       "subtitle": "Ühtne toimetuskeskus kõigi avaldatud videote jaoks: planeeritud sündmused, kiirkõned, üleslaaditud arhiivisalvestused ja avaldamist ootavad sessioonid.",
@@ -1543,6 +1634,8 @@
           "saveFailed": "Metaandmete salvestamine ebaõnnestus."
         }
       },
+      "reservedBadge": "Ainult registreerunutele",
+      "reservedHelp": "Salvestis on ainult registreerunutele: see ei saa videoteegis ilmuda.",
       "updateFailed": "Uuendamine ebaõnnestus."
     },
     "recordingsLibrary": {
@@ -1614,7 +1707,8 @@
       "detailFilename": "Failinimi",
       "transcriptManage": "Halda transkriptsiooni / AI-d",
       "transcriptReady": "Transkribeeritud",
-      "transcriptProcessing": "Töötlemisel"
+      "transcriptProcessing": "Töötlemisel",
+      "organizerOnly": "Ainult korraldajatele"
     },
     "gdprAudit": {
       "subtitle": "Privaatsustegevuste logi isikuandmetel: kustutamised, nõusolekud, ekspordid",
@@ -1629,7 +1723,12 @@
         "DATA_DELETED": "Andmed kustutatud",
         "CONSENT_RECORDED": "Nõusolek registreeritud",
         "DATA_EXPORTED": "Andmed eksporditud",
-        "CONSENT_WITHDRAWN": "Nõusolek tagasi võetud"
+        "DATA_RECTIFIED": "Andmed parandatud",
+        "CONSENT_WITHDRAWN": "Nõusolek tagasi võetud",
+        "RECORDING_CONTENT_READ": "Töötajate loetud salvestise sisu",
+        "RECORDING_REDACTION_REQUESTED": "Taotletud eemaldamist salvestisest",
+        "RECORDING_REDACTION_REJECTED": "Eemaldamise taotlus tagasi lükatud",
+        "RECORDING_REDACTED": "Isik salvestisest eemaldatud"
       },
       "recordsAffected": "{count} kirjet mõjutatud",
       "colWhen": "Millal",
@@ -1655,7 +1754,8 @@
       "rotating": "Genereerin…",
       "regenerateTitle": "Taasgenereeri moderaatori märgend (vana link muutub kehtetuks)",
       "confirmRegenerate": "Kas olete kindel, et soovite märgendi taasgenereerida? Vana link enam ei tööta.",
-      "noResults": "Sündmusi ei leitud."
+      "noResults": "Sündmusi ei leitud.",
+      "organizerOnlyLink": "Link on nähtav ainult ürituse korraldajatele"
     },
     "registrations": {
       "subtitle": "Kõik sündmustele registreerunud isikud — otsi, filtreeri ja ekspordi",
@@ -1684,6 +1784,8 @@
       "colCreatedAt": "Registreerimise kuupäev",
       "colEvent": "Sündmus",
       "colName": "Nimi",
+      "colNickname": "Hüüdnimi",
+      "nicknameShown": "Teised näevad teda kui „{nickname}“",
       "colEmail": "E-post",
       "colOrg": "Organisatsioon",
       "colJoined": "Osales",
@@ -1917,7 +2019,7 @@
       "aiSectionHeading": "Automaatne järeltöötlus",
       "aiSectionDesc": "Pärast sündmuse lõppu saab salvestist töödelda klastrisisese tehisintellekti töövooga, et luua transkriptsioon, kokkuvõte ning soovi korral tõlked ja dubleering. Kõik toimub selle paigalduse taristus, andmeid ei edastata kolmandatele isikutele.",
       "aiTranscriptEnabled": "Automaatne transkribeerimine",
-      "aiTranscriptEnabledDesc": "Kõnetuvastus koos kõnelejate tuvastamisega. Vajalik kokkuvõtte, tõlgete ja dubleerimise sisselülitamiseks.",
+      "aiTranscriptEnabledDesc": "Kõnetuvastus koos kõnelejate tuvastamisega. Vajalik kokkuvõtte, tõlgete ja dubleerimise sisselülitamiseks. Iga osaleja valib, kas tema sõnavõtte transkribeeritakse.",
       "aiSummaryEnabled": "Kokkuvõte ja peatükid",
       "aiSummaryEnabledDesc": "Koosoleku kokkuvõte, tehtud otsused, tegevusülesanded ja jaotus ajatemplitega peatükkideks.",
       "aiTranslationEnabled": "Tõlge teistesse keeltesse",
@@ -2023,7 +2125,7 @@
     },
     "recordingUpload": {
       "title": "Lae üles olemasolev salvestus",
-      "subtitle": "Kui sul on juba ürituse videofail (näiteks salvestatud teisel platvormil), laadi see siia: seda näidatakse avalikul lehel ametliku salvestusena.",
+      "subtitle": "Kui sul on juba ürituse videofail (näiteks salvestatud teisel platvormil), laadi see siia: sellest saab ürituse ametlik salvestis.",
       "fileLabel": "Videofail",
       "upload": "Lae üles ja seo",
       "signing": "Ettevalmistus…",
@@ -2087,7 +2189,9 @@
         "DATA_DELETED": "Andmed kustutatud",
         "CONSENT_RECORDED": "Nõusolek registreeritud",
         "DATA_EXPORTED": "Andmed eksporditud",
-        "CONSENT_WITHDRAWN": "Nõusolek tagasi võetud"
+        "DATA_RECTIFIED": "Andmed parandatud",
+        "CONSENT_WITHDRAWN": "Nõusolek tagasi võetud",
+        "RECORDING_CONTENT_READ": "Töötajate loetud salvestise sisu"
       }
     },
     "settings": {
@@ -2130,7 +2234,7 @@
         "jobMaxAttempts": "Katseid enne ebaõnnestumist",
         "jobMaxAttemptsHelp": "Mitu korda töövoog tööd uuesti proovib, enne kui märgib selle ebaõnnestunuks. Katsete vaheline ooteaeg kasvab eksponentsiaalselt (30 sekundist kuni 2 tunnini). Tüüpiline väärtus on 5.",
         "artifactRetentionDays": "Artefaktide säilitamine (päevades)",
-        "artifactRetentionDaysHelp": "Väärtusega 0 ei kehti kogu saidi piirangut: AI artefaktid järgivad oma salvestise või sündmuse säilitustähtaega. Nullist suurem väärtus paneb igapäevase töö kustutama iga artefakti, mis loodi rohkem kui nii mitu päeva tagasi, olgu avaldatud või mitte: see võib säilitusaega lühendada, kuid mitte kunagi pikendada. Kõnelejate nimesid ja tööde andmeid see ei puuduta: need järgivad salvestise või sündmuse säilitustähtaega. Üksikasjad: docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "Väärtusega 0 ei kehti kogu saidi piirangut: AI artefaktid järgivad oma salvestise säilitustähtaega. Nullist suurem väärtus paneb igapäevase töö kustutama iga artefakti, mis loodi rohkem kui nii mitu päeva tagasi, olgu avaldatud või mitte: see võib säilitusaega lühendada, kuid mitte kunagi pikendada. Kõnelejate nimesid ja tööde andmeid see ei puuduta: need järgivad salvestise säilitustähtaega. Üksikasjad: docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "AI teavitus ooteruumis",
         "consentDisclosureHelp": "Tekst, mida näidatakse osalejatele ooteruumis, kui sündmus kasutab AI järeltöötlust (transkribeerimine, kokkuvõte, tõlge, dubleerimine). Kohandatav keelte kaupa. Jäta tühjaks, et kasutada süsteemi vaiketeksti.",
         "consentDisclosurePlaceholder": "Nt Sellest sündmusest tehakse pärast otseülekannet AI tööriistadega automaatselt transkriptsioon ja kokkuvõte…"
@@ -2307,6 +2411,8 @@
         "guestAccessEnabledHelp": "Registreerimata inimesed saavad toimuvatele üritustele siseneda ainult oma nimega. Kui see on välja lülitatud, saab kavandatud üritustele siseneda ainult registreerudes või moderaatori või esineja lingiga; kiired videokõned jäävad avatuks kõigile, kellel on link. Ainult kutsega üritusele külalisi kunagi ei lubata.",
         "publicRegistrationEnabled": "Avalik registreerumine lubatud",
         "publicRegistrationEnabledHelp": "Üritustele saab registreeruda igaüks. Kui see on välja lülitatud, saavad registreeruda ainult ürituse kutsutute nimekirjas olevad isikud ja isiklik sisenemislink saadetakse ainult e-postiga; juba registreerunud ning moderaatorite ja esinejate lingid toimivad edasi. See on uutele üritustele pakutav valik: iga üritus võib sammus „Inimesed“ teisiti otsustada.",
+        "addressBookEnabled": "Ürituste aadressraamat",
+        "addressBookEnabledHelp": "Pakub registreerujatele võimalust jääda aadressraamatusse, et neid kutsutaks sarnastele üritustele. Väljalülitatuna kaob lahter vormidelt ja valija viisardist; olemasolevad kirjed jäävad alles kuni tagasivõtmise või aegumiseni.",
         "calendarPublic": "Avalik kalender",
         "calendarPublicHelp": "Avalda ürituste kalender. Külastajad saavad näha planeeritud üritusi.",
         "parseTitleKicker": "Toimetuslike ülapealkirjadega pealkirjad",
@@ -2397,6 +2503,40 @@
         "avgParticipantsPerEvent": "Osalejaid ürituse kohta keskmiselt",
         "avgFeedbackRating": "Tagasiside keskmine hinne",
         "totalFeedback": "Tagasiside vastuseid"
+      },
+      "catalog": {
+        "title": "Ürituste tüübid ja mallid",
+        "intro": "Kui palju üritusi igast tüübist ja igast mallist kuude kaupa. Ainult arvud ja keskmised, isikuandmeid pole. Mustandeid ei arvestata.",
+        "periodLabel": "Periood",
+        "months": "{count, plural, one {# kuu} other {# kuud}}",
+        "groupByLabel": "Rühmita",
+        "groupBy": {
+          "type": "Ürituse tüüp",
+          "template": "Mall"
+        },
+        "rankingTypes": "Kõige sagedasemad tüübid",
+        "rankingTemplates": "Enim kasutatud mallid",
+        "columns": {
+          "type": "Tüüp",
+          "template": "Mall",
+          "events": "Üritused",
+          "held": "Toimunud",
+          "avgParticipants": "Keskm. osalejaid",
+          "avgDuration": "Keskm. kestus",
+          "total": "Kogu periood"
+        },
+        "measuresNote": "Toimunud: üritused, mille ruum avati. Keskmine osalejate arv: korraga kohal olnud inimeste tipparv koos külalistega, keskmiselt toimunud ürituste kohta. Keskmine kestus: mõõdetud ruumi aeg, mitte planeeritud aeg.",
+        "byMonth": "Kuude kaupa",
+        "measureLabel": "Näitaja",
+        "measures": {
+          "events": "Üritused",
+          "avgParticipants": "Keskmine osalejate arv",
+          "avgDurationMinutes": "Keskmine kestus"
+        },
+        "byMonthCaption": "{measure} kuude kaupa",
+        "empty": "Selles perioodis üritusi pole.",
+        "deletedTemplate": "{name} (kustutatud)",
+        "uncatalogedNote": "Kataloogimata üritusi: {count}. Need loodi enne kataloogi või ilma malli ja vormingu; saate need kataloogida ürituse muutmisel tehniliste üksikasjade all."
       }
     },
     "recurrence": {
@@ -2439,6 +2579,8 @@
       "featuresLabel": "Funktsioonid",
       "whiteboardLabel": "Tahvel",
       "recordingLabel": "Salvestamine",
+      "recordingDestination": "Salvestise sihtkoht",
+      "recordingDestinationNone": "Valitakse ürituse loomisel",
       "waitingRoomEngineLabel": "Ooteruum (malli vaikeväärtus)",
       "waitingRoomEngineSiteDefault": "Saidi vaikeväärtus",
       "waitingRoomEngineGarden": "Aed (tavaline)",
@@ -2451,17 +2593,22 @@
       "durationLabel": "Vaikimisi kestus (minutites)",
       "durationHint": "Täidab sündmuse lõpu ette (algus + kestus). Kasutaja saab seda muuta. Tühi = 2 tundi.",
       "retentionLabel": "Vaikimisi andmete säilitamine (päevades)",
+      "recordingRetentionLabel": "Salvestise vaikimisi säilitamine",
+      "recordingRetentionHint": "Selle malli põhjal loodud ürituste jaoks; seda saab muuta viisardis ja salvestise paneelil. Salvestis ei järgi andmete säilitamisaega.",
       "expectedSpeakersLabel": "Eeldatav kõnelejate arv (vaikimisi)",
       "descriptionTemplateLabel": "Vaikimisi kirjeldus",
       "descriptionTemplateHint": "Tekst, mis täidetakse sündmuse kirjeldusse ette (muudetav).",
       "aiTranscript": "Automaatne transkribeerimine (vaikimisi)",
       "aiSummary": "Automaatne kokkuvõte (vaikimisi)",
       "aiTranslation": "Automaatne tõlge (vaikimisi)",
+      "noRecording": "Selles paigalduses ei salvestata: mallid algavad ilma salvestiseta.",
       "pickerSubtitle": "Valige mall ürituse seadete eelseadistamiseks või jätke vahele, et kõik käsitsi seadistada.",
       "skipTemplate": "Seadista käsitsi",
       "postEventPublic": "Avalik ürituse järgne leht",
+      "offerAddressBook": "Pakub registreerujatele aadressraamatut",
       "invalidFields": "Kontrollige neid välju: {fields}.",
-      "descriptionOtherLanguages": "On ka versioonid keeltes: {languages}, mida siin muuta ei saa. Kui muudate itaaliakeelset teksti, need eemaldatakse."
+      "descriptionOtherLanguages": "On ka versioonid keeltes: {languages}, mida siin muuta ei saa. Kui muudate itaaliakeelset teksti, need eemaldatakse.",
+      "usedBy": "Sellest mallist loodud üritusi: {count}"
     },
     "instantCall": {
       "title": "Kiire videokõne",
@@ -2724,7 +2871,7 @@
       "title": "Kõnesessioonid",
       "empty": "Sessioone pole veel salvestatud. Otsesessioonid loetletakse siin automaatselt niipea, kui moderaator ruumi siseneb.",
       "loading": "Sessioonide laadimine...",
-      "participants": "osalejad",
+      "participantsCount": "{count, plural, one {# osaleja} other {# osalejat}}",
       "participantList": "Osalejad",
       "name": "Nimi",
       "joined": "Sisenes",
@@ -2974,11 +3121,28 @@
         "publishNow": "Avalda kohe"
       },
       "editFeatures": "Muuda funktsioone",
-      "editPrivacy": "Muuda privaatsust ja andmeid"
+      "editPrivacy": "Muuda privaatsust ja andmeid",
+      "governance": {
+        "title": "Haldate seda üritust administraatorina",
+        "body": "Te ei ole selle korraldaja: näete olekut, üksikasju, registreerimisi ja nõusolekuid ning saate selle arhiveerida või kustutada. Ürituse juhtimine, moderaatori link ja salvestiste sisu (video, transkriptsioonid, kokkuvõtted) kuuluvad korraldajatele.",
+        "recording": "Salvestise sisu on kättesaadav ainult ürituse korraldajatele ja osalejatele. Siin näete, kas see on olemas, ja selle üksikasju.",
+        "recordingFile": "Salvestis",
+        "present": "Olemas",
+        "absent": "Puudub",
+        "recordingPublished": "Avaldatud",
+        "yes": "Jah",
+        "no": "Ei",
+        "recordingDuration": "Kestus",
+        "recordingSize": "Suurus",
+        "recordingRetention": "Salvestise automaatne kustutamine",
+        "recordingRetentionNone": "Puudub",
+        "recordingRetentionDays": "{days, plural, one {# päev} other {# päeva}} pärast ürituse lõppu või, kui see on avaldatud, pärast avaldamist"
+      }
     },
     "rubrica": {
-      "subtitle": "Inimesed, kes on andnud nõusoleku aadressraamatusse lisamiseks (IKÜM art. 6.1.a). Profiiliteave uuendatakse automaatselt iga uuesti registreerimise käigus.",
-      "searchLabel": "Otsi nime või organisatsiooni järgi",
+      "subtitle": "Inimesed, kes on andnud nõusoleku aadressraamatusse lisamiseks (IKÜM art. 6.1.a). Nimi, e-posti aadress ja organisatsioon uuenevad ainult siis, kui inimene märgib lahtri uuesti.",
+      "searchLabel": "Otsi nime, e-posti või organisatsiooni järgi",
+      "searchPartial": "Otsing hõlmas ainult {limit} viimati uuendatud kirjet: varem uuendatud inimene ei pruugi tulemustes ilmuda.",
       "orgTypeLabel": "Organisatsiooni liik",
       "allTypes": "Kõik",
       "includeOptedOut": "Kaasa ka nõusoleku tagasi võtnud inimesed",
@@ -3243,7 +3407,8 @@
         "metricsTitle": "Kokkuvõtte mõõdikud (LLM)",
         "chars": "tähemärki",
         "model": "Mudel",
-        "notAvailable": "puudub"
+        "notAvailable": "puudub",
+        "contentHidden": "Kättesaadav ainult ürituse korraldajatele."
       },
       "rel": {
         "title": "AI usaldusväärsus",
@@ -3400,7 +3565,8 @@
         "alignNone": "Joondatavat slaidivahetust pole.",
         "previewTitle": "Eelvaade",
         "previewHelp": "Video koos slaididega nii, nagu publik neid näeb, ülal kirjutatud parandusega."
-      }
+      },
+      "contentOrganizerOnly": "Selle salvestise sisu (video, rajad, transkriptsioon, kokkuvõte, tõlked) saavad vaadata ja muuta ainult selle ürituse korraldajad. Siin näete selle olekut, töötlustöid ja failide üksikasju."
     },
     "questionnairesPage": {
       "subtitle": "Korduvkasutatavad küsimuste mallid eelregistreerimise ja sündmusejärgsete küsimustike jaoks."
@@ -3597,10 +3763,13 @@
         "speakers": "Esinejad ja juhid",
         "speakersDesc": "Publik kirjutab vestlusesse ja esitab küsimusi"
       },
-      "recQ": "Kas soovid salvestada?",
+      "recQ": "Kas soovid võimalust salvestada ja kellele?",
       "rec": {
-        "yes": "Jah, kui vajutad REC",
         "yesDesc": "Pärast üritust: transkriptsioon, kokkuvõte ja tõlge",
+        "reserved": "Jah, ainult registreerunutele",
+        "reservedDesc": "Seda näevad korraldajad ja registreerunud",
+        "public": "Jah, avalik",
+        "publicDesc": "Saab avaldada ürituse lehel",
         "no": "Ei",
         "noDesc": "Salvestust pole, nõusolekut pole vaja küsida"
       },
@@ -3614,7 +3783,8 @@
         "grande": "Üle 100 inimese",
         "tutti": "kõik videos",
         "relatori": "räägivad esinejad",
-        "si": "salvestusega",
+        "riservata": "salvestisega ainult registreerunutele",
+        "pubblica": "avaliku salvestisega",
         "no": "salvestuseta",
         "openAccess": "avatud kõigile",
         "inviteOnly": "ainult kutsega"
@@ -3627,6 +3797,9 @@
         "invitationDesc": "Leht jääb nähtavaks, kuid registreeruda saavad ainult nimekirjas olijad; kutse registreerimislingiga saadad e-postiga sündmuse lehelt"
       },
       "previewInvitation": "Registreeruvad ainult kutsutud; ilma registreerumiseta ei pääse sisse.",
+      "previewPseudonyms": "Publik on nähtav pseudonüümiga",
+      "previewNicknames": "Osalejad saavad kasutada hüüdnime",
+      "previewRealNames": "Publik on nähtav oma nimega",
       "templateReplaces": "Mall toob alltoodud vastuste asemel oma seaded. Pealkirja, kuupäevad ja inimesed kirjutad järgmistes sammudes.",
       "instantBack": "Loo selle asemel plaanitud sündmus"
     },
@@ -3686,7 +3859,9 @@
       "publishDesc": "Vaadake see enne avaldamist üle: teksti on kirjutanud tehisintellekti mudel. Uuesti koostatud ülevaade tuleb uuesti avaldada.",
       "preview": "Eelvaade",
       "hidePreview": "Peida eelvaade",
-      "previewLanguage": "Keel"
+      "previewLanguage": "Keel",
+      "organizerOnly": "Ülevaadet saavad tellida, lugeda ja avaldada ainult selle ürituse korraldajad.",
+      "organizerOnlyExists": "Ülevaade on olemas. Lugeda ja avaldada saavad seda ainult selle ürituse korraldajad."
     },
     "endEvent": "Lõpeta üritus",
     "endEventConfirmTitle": "Kas lõpetada üritus kõigile?",
@@ -3722,11 +3897,12 @@
       "organizersEmpty": "Asutust pole märgitud: avalik leht ei näita, kes korraldab.",
       "sendAll": "Saada kutse neile, kes pole seda saanud ({count})",
       "sending": "Saatmine…",
-      "sendDone": "Teel olevad kutsed: {sent}. Vahele jäetud (juba registreerunud või aadressita): {skipped}.",
+      "sendDone": "Teel olevad kutsed: {sent}. Vahele jäetud (juba registreerunud, aadressita või teadete saamise nõusolekuta): {skipped}.",
       "sendError": "Saatmine ebaõnnestus: proovi uuesti.",
       "sendNotPublished": "Kutsed saadetakse, kuni sündmus võtab registreerumisi vastu: pärast avaldamist ja enne lõppu.",
       "invitedOn": "Kutsutud {date}",
       "notInvited": "Kutse saatmata",
+      "stopped": "Ei saa kutseid",
       "send": "Saada kutse",
       "resend": "Saada uuesti",
       "actions": "Toimingud",
@@ -3764,6 +3940,7 @@
         "pubblicata": "Avaldatud.",
         "prontaAi": "Järeltöötlusest valmis: vaadake see üle; see avaldatakse koos videoga.",
         "prontaSottotitoli": "Subtiitritest valmis: kontrollige nimesid ja avaldage see.",
+        "daConfermare": "Tuleb käivitada: video transkribeeritakse ainult kinnitusel, et kõik rääkijad on nõustunud.",
         "inLavorazione": "Töötlemisel.",
         "nessuna": "Puudub: pole ei subtiitreid ega järeltöötlust.",
         "soloStaff": "Ürituse korraldaja vaatab selle üle ja avaldab haldusalas.",
@@ -3773,7 +3950,7 @@
         "title": "Ülevaade",
         "pubblicato": "Avaldatud.",
         "daPubblicare": "Loodud: lugege see läbi ja avaldage.",
-        "daGenerare": "Tuleb luua transkriptsiooni, vestluse ja hinnangute põhjal.",
+        "daGenerare": "Tuleb luua transkriptsiooni, küsitluste, hinnangute ja, kui need on avaldatud, küsimuste põhjal.",
         "inLavorazione": "Töötlemisel.",
         "senzaPipeline": "AI järeltöötlus pole selles paigalduses aktiivne.",
         "soloStaff": "Ürituse korraldaja loob selle ja avaldab haldusalas.",
@@ -3803,6 +3980,7 @@
         "title": "Avalik leht",
         "visibile": "Nähtav kõigile.",
         "nellaLibreria": "Nähtav kõigile ja videoteegis.",
+        "libreriaRiservata": "Leht on nähtav, kuid video on ainult registreerunutele: videoteegis see ei ilmu.",
         "privata": "Tagasi võetud: avalikkus seda ei näe.",
         "scaduta": "Pole enam nähtav: aegumiskuupäev on möödas.",
         "archiviato": "Üritus arhiveeritud: leht pole avalik.",
@@ -3950,9 +4128,10 @@
     },
     "voiceConsent": {
       "title": "Kas transkribeerida kogu salvestis?",
-      "message": "See sündmus küsis igaühelt nõusolekut tema sõnavõttude transkribeerimiseks. Kogu salvestis sisaldab kõiki hääli, ka nende omi, kes nõusolekut ei andnud: transkribeeri see ainult siis, kui kõik selles rääkijad on nõustunud. Sinu kinnitus jääb tegevuslogisse.",
+      "message": "Kogu salvestis sisaldab kõiki hääli, ka nende omi, kes ei andnud nõusolekut oma sõnavõttude transkribeerimiseks: transkribeeri see ainult siis, kui kõik selles rääkijad on nõustunud. Sinu kinnitus jääb tegevuslogisse.",
       "confirm": "Jah, kõik on nõustunud",
       "cancel": "Tühista",
+      "waitingNoCaptions": "Kogu salvestise transkribeerimine ei alanud iseenesest: igaüks valib, kas tema sõnavõtte transkribeeritakse. Käivita see nupuga {button} ainult siis, kui kõik salvestises rääkijad on nõustunud; muidu jääb sündmus transkriptsioonita.",
       "waiting": "Kogu salvestise transkribeerimine ei alanud iseenesest: see sündmus küsis igaühelt nõusolekut tema sõnavõttude transkribeerimiseks. Käivita see nupuga {button} ainult siis, kui kõik salvestises rääkijad on nõustunud; muidu jääb alles subtiitritest tehtud transkriptsioon."
     },
     "editCopyTitle": "Sündmuse koopia",
@@ -3981,22 +4160,149 @@
         "givenAt": "Antud",
         "withdrawnAt": "Tagasi võetud",
         "textVersion": "Teksti versioon",
+        "destination": "Sihtkoht",
+        "superseded": "Asendatud",
+        "supersededValue": "Hilisema nõusolekuga",
+        "destinations": {
+          "PUBLIC": "Avalik",
+          "REGISTRANTS": "Ainult registreerunutele",
+          "none": "Määramata"
+        },
         "kinds": {
           "recording": "Salvestamine",
           "transcription": "Sõnavõttude transkribeerimine"
         },
         "sources": {
           "registration": "registreerimine",
-          "room": "ruum"
+          "room": "ruum",
+          "self-service": "Minu andmed"
         },
         "roles": {
           "registrant": "registreerunud",
           "guest": "külaline",
           "host": "juhib või esineb"
         },
+        "erasedName": "(nimi eemaldatud taotluse alusel)",
         "unreadableName": "(nimi pole loetav)"
       },
+      "retainedNote": "{count, plural, one {# tõend säilitatakse} other {# tõendit säilitatakse}} seni, kuni video või transkriptsioon on olemas.",
       "countsNote": "Loetakse inimesi: registreerimine, töötaja konto või nimeline link loetakse üks kord; teisel külastusel naasev külaline loetakse uuesti."
+    },
+    "recordingRemovals": {
+      "subtitle": "Isikud, kes on palunud, et neid salvestisel ei oleks. Kuni taotlus on avatud, saad selle salvestise avada eemaldamise redaktoris ja iga juurdepääs jääb toimingute logisse.",
+      "filterOpen": "Avatud",
+      "filterAll": "Kõik",
+      "filterLabel": "Millised taotlused",
+      "empty": "Taotlusi pole.",
+      "loadError": "Taotlusi ei õnnestunud laadida.",
+      "colReceived": "Saabunud",
+      "colPerson": "Isik",
+      "colEvent": "Üritus",
+      "colSource": "Päritolu",
+      "colStatus": "Olek",
+      "open": "Ava",
+      "unnamed": "Nimeta isik",
+      "sources": {
+        "self-service": "Minu andmed",
+        "admin": "Meeskond"
+      },
+      "statuses": {
+        "OPEN": "Avatud",
+        "IN_PROGRESS": "Töös",
+        "PROCESSING": "Töötlemisel",
+        "CLOSED": "Suletud",
+        "REJECTED": "Tagasi lükatud"
+      },
+      "kinds": {
+        "registrant": "Registreerunud",
+        "host": "Juhib",
+        "guest": "Külaline"
+      },
+      "newOpen": "Registreeri taotlus",
+      "newTitle": "Muul viisil saabunud taotlus",
+      "newIntro": "Taotluse jaoks, mis jõudis vastutava töötlejani e-posti, posti teel või isiklikult. Vali salvestis ja, kui tunned isiku ära, tema ruumis olnute hulgast.",
+      "recordingSearch": "Otsi üritust",
+      "recordingLabel": "Salvestis",
+      "recordingChoose": "Vali salvestis",
+      "recordingOption": "{title} · {date}",
+      "recordingNone": "Pole ühtegi salvestist, millel oleks video või osalejapõhised helirajad.",
+      "peopleLabel": "Kes olid ruumis",
+      "peopleNone": "Ruum ei jätnud jälge sellest, kes kohal olid: sisesta nimi ja märgi intervallid käsitsi.",
+      "personNotInVideo": "kaadrist väljas",
+      "personTimes": "{from} kuni {to}",
+      "personStill": "{from} kuni lõpuni",
+      "nameLabel": "Isiku nimi",
+      "noteLabel": "Kuidas taotlus saabus (valikuline)",
+      "create": "Registreeri taotlus",
+      "createError": "Taotlust ei õnnestunud registreerida.",
+      "cancel": "Tühista",
+      "back": "Kõik taotlused",
+      "fieldPerson": "Isik",
+      "fieldEvent": "Üritus",
+      "fieldReceived": "Saabunud",
+      "fieldSource": "Päritolu",
+      "fieldStatus": "Olek",
+      "fieldNote": "Märkus",
+      "externalCopy": "Sellel üritusel on video välisel saidil (näiteks YouTube'is): eemaldamine seda ei mõjuta. Eemalda või asenda see ka seal.",
+      "publishedElsewhere": "Ürituse avaldatud video on sellest salvestisest erinev fail: eemaldamine seda ei muuda. Asenda see või eemalda see ürituse lehelt.",
+      "pipelineOff": "Järeltöötlus on välja lülitatud: eemaldamise töö jääb järjekorda, kuni selle sisse lülitad, ja transkriptsiooni uuesti ei tehta.",
+      "noVideo": "Sellel salvestisel pole videot, ainult osalejapõhised helirajad: isiku helirajad kustutatakse ja transkriptsioon tehakse uuesti allesjäänutest.",
+      "noRecording": "Salvestist enam ei ole: midagi pole enam eemaldada.",
+      "keyOnly": "Instantsi võtmega salvestist ei ava: logi sisse oma administraatori kontoga.",
+      "startIntro": "Isiku eemaldamiseks pead salvestise avama. Juurdepääs kehtib ainult selle taotluse jaoks ja jääb koos sinu kontoga toimingute logisse.",
+      "start": "Ava eemaldamise redaktor",
+      "processing": "Eemaldamine käib: puhastatud video asendab originaali. Töö olek: {status}.",
+      "closed": "Taotlus suletud {date}.",
+      "closedIntervals": "{count, plural, =0 {Ühtegi intervalli ei kaetud.} one {# intervall kaetud.} other {# intervalli kaetud.}}",
+      "rejected": "Taotlus tagasi lükatud {date}.",
+      "lastError": "Viimane töötlemine ebaõnnestus: {error}. Kontrolli intervalle ja saada uuesti.",
+      "rejectTitle": "Lükka taotlus tagasi",
+      "rejectLabel": "Põhjus",
+      "reject": "Lükka tagasi",
+      "rejectConfirm": "Kas lükata taotlus tagasi? Isik näeb, et see lükati tagasi.",
+      "actionError": "Toiming ebaõnnestus (HTTP {code}).",
+      "editorTitle": "Kaetavad intervallid",
+      "editorHint": "Ettepanekud põhinevad sellel, kes olid ruumis ja kes rääkisid, ning osalejapõhistel helirajadel: rääkimise ajad on ligikaudsed. Vaata videot ja paranda. Igas intervallis näitab video silti „sisu eemaldatud taotluse alusel“ ja heli vaigistatakse; kestus ei muutu.",
+      "sourcePresence": "Ruumis",
+      "sourceSpeech": "Räägib",
+      "sourceTrack": "Helirada",
+      "selectedLegend": "Katta",
+      "useProposals": "Alusta uuesti ettepanekutest",
+      "addInterval": "Lisa siia intervall",
+      "fieldStart": "Algus",
+      "fieldEnd": "Lõpp",
+      "setStart": "Algus siin",
+      "setEnd": "Lõpp siin",
+      "seek": "Mine",
+      "remove": "Eemalda",
+      "intervalLabel": "Intervall {n}",
+      "noIntervalsVideo": "Kaetavaid intervalle pole. Kui isik videos ei esine, lükka taotlus tagasi ja märgi põhjus.",
+      "total": "{count, plural, one {# intervall} other {# intervalli}} · {seconds} s katta",
+      "timeHint": "Ajad kujul tunnid:minutid:sekundid nagu mängijas.",
+      "invalidTime": "Vigane aeg",
+      "preview": "Eemaldamise eelvaade",
+      "timelineLabel": "Salvestise ajatelg",
+      "mediaError": "Video ei laadi. Laadi leht uuesti.",
+      "submit": "Eemalda isik salvestisest",
+      "submitConfirm": "Algne video ja isiku helirajad kustutatakse ning järeltöötlus tehakse uuesti. Seda ei saa tagasi võtta. Kas jätkata?",
+      "submitDone": "Taotlus suletud: isik on eemaldatud."
+    },
+    "catalog": {
+      "fieldTitle": "Kataloog",
+      "fieldHelp": "Ürituse tüüp ja mall, millest see loodi, on vajalikud ainult instantsi statistika jaoks ega muuda ühtegi seadet. Parandage need, kui üritus on valesti kataloogitud või kataloogimata.",
+      "typeLabel": "Ürituse tüüp",
+      "templateLabel": "Mall",
+      "noTemplate": "Mall puudub",
+      "deletedTemplate": "Loodud mallist „{name}“, mis on hiljem kustutatud.",
+      "deletedOption": "{name} (kustutatud)",
+      "types": {
+        "MEETING": "Koosolek",
+        "PARTICIPATORY": "Kaasav üritus",
+        "PUBLIC": "Avalik üritus",
+        "INSTANT": "Kiirkõne",
+        "LEGACY": "Imporditud väljaanne",
+        "UNCATALOGED": "Kataloogimata"
+      }
     }
   },
   "email": {
@@ -4013,7 +4319,22 @@
     "dateLabel": "Kuupäev",
     "timeLabel": "Kellaaeg",
     "durationLabel": "Kestus",
-    "myDataLink": "Teie andmed: vaadake, parandage, võtke nõusolek tagasi või tühistage registreerimine"
+    "addressBookNote": "Oled ürituste aadressraamatus, et sind kutsutaks sarnastele üritustele: saad nõusoleku igal ajal tagasi võtta.",
+    "addressBookPendingNote": "Selle registreerumise juures märgiti ürituste aadressraamatu lahter, kuid see aadress oli lakanud kutseid saamast. Kui taotlus on sinu, saad selle kinnitada oma andmete lehel allpool oleva lingi kaudu. Kui see pole sinu, jäta see sõnum tähelepanuta: jääd aadressraamatust välja ega saa kutseid.",
+    "addressBookOptOutLink": "Eemalda minu andmed aadressraamatust",
+    "myDataLink": "Teie andmed: vaadake, parandage, võtke nõusolek tagasi või tühistage registreerimine",
+    "confirmationCode": {
+      "subject": "{site}: kinnituskood",
+      "heading": "Teie kinnituskood",
+      "introEdit": "Palusite parandada oma registreerumise nime ja organisatsiooni üritusele „{event}“.",
+      "introEditAll": "Palusite parandada nime ja organisatsiooni kõigis oma registreerumistes.",
+      "introNickname": "Palusite muuta oma registreerumise hüüdnime üritusele „{event}“.",
+      "introNicknameRemove": "Palusite eemaldada oma registreerumise hüüdnime üritusele „{event}“.",
+      "introCancel": "Palusite kustutada oma registreerumise üritusele „{event}“.",
+      "codeLabel": "Kood on:",
+      "instructions": "Sisestage see lehel „Minu andmed“, kust taotluse esitasite. See kehtib {minutes, plural, one {# minut} other {# minutit}}.",
+      "ignore": "Kui te taotlust ei esitanud, eirake seda e-kirja: ilma koodita ei muutu midagi. Ärge jagage koodi kellegagi."
+    }
   },
   "home": {
     "hero": {
@@ -4380,17 +4701,100 @@
   },
   "gdpr": {
     "consent": {
-      "recording": "Nõustun selle ürituse heli-/videosalvestamisega",
+      "recording": "Nõustun, et minu häält salvestatakse, kui ma üritusel sõna võtan. Minu nägu ja nimi ei ilmu kunagi videole.",
+      "recordingReserved": "Nõustun, et minu häält salvestatakse, kui ma üritusel sõna võtan. Minu nägu ja nimi ei ilmu kunagi videole. Video jääb ainult korraldajatele ja registreerunutele: seda ei avaldata. Registreerunud saavad seda vaadata seni, kuni nende registreerumisandmeid säilitatakse.",
+      "recordingPublic": "Nõustun, et minu häält salvestatakse, kui ma üritusel sõna võtan. Nõustun ka video avaldamisega: videot saab vaadata igaüks ürituse lehel ja videoteegis. Minu nägu ja nimi ei ilmu kunagi videole.",
+      "recordingVisible": "Nõustun selle ürituse heli-/videosalvestamisega.",
+      "recordingVisibleReserved": "Nõustun ürituse videosalvestamisega (heli ja video). Video jääb ainult korraldajatele ja registreerunutele: seda ei avaldata. Registreerunud saavad seda vaadata seni, kuni nende registreerumisandmeid säilitatakse.",
+      "recordingVisiblePublic": "Nõustun ürituse videosalvestamisega (heli ja video) ja selle avaldamisega: videot saab vaadata igaüks ürituse lehel ja videoteegis.",
+      "recordingNoVideo": "Nõustun ürituse salvestamisega. Ruumi videot ei salvestata: alles jäävad ainult nende helirajad, kes nõustuvad transkribeerimisega, kui üritusel on need ette nähtud.",
       "multitrack": "Nõustun, et minu sõnavõtud transkribeeritakse koos minu nimega ürituse kokkuvõtte jaoks. Kui üritus salvestab iga inimese jaoks eraldi helirea, salvestatakse minu häält ainult sel eesmärgil ja helirida kustutatakse pärast transkribeerimist; seda ei kasutata minu hääle tuvastamiseks ega taasesitamiseks.",
+      "multitrackRetained": "Nõustun, et minu sõnavõtud transkribeeritakse koos minu nimega ürituse ülevaate jaoks. Kui üritus salvestab iga inimese jaoks eraldi heliraja, salvestatakse minu häält ainult sel eesmärgil ja heliraja säilitatakse koos ürituse andmetega; seda ei kasutata minu hääle tuvastamiseks ega taasesitamiseks.",
       "multitrackOptional": "See on vabatahtlik: kui sa nõusolekut ei anna, osaled ikkagi, kuid sinu sõnavõtud ei lähe transkriptsiooni ja sinu häält ei salvestata eraldi rajale. Kui sündmus salvestatakse, jääb sinu hääl siiski videosse.",
+      "multitrackOptionalShort": "See on vabatahtlik: kui sa nõusolekut ei anna, osaled ikkagi, kuid sinu sõnavõtud ei lähe transkriptsiooni ja sinu häält ei salvestata eraldi rajale.",
       "stayInTouch": "Soovin saada teavet eelseisvate ürituste kohta ja olla lisatud aadressiraamatusse, et mind kutsutaks sarnastele üritustele",
-      "stayInTouchHelp": "Vabatahtlik nõusolek (IKÜM art 6.1.a). Saate selle igal ajal tagasi võtta e-kirjades oleva lingiga „Eemalda mind aadressiraamatust“. Nimi ja organisatsioon on selle registreerimise omad.",
+      "stayInTouchHelp": "Vabatahtlik nõusolek (IKÜM art 6.1.a). Saad selle igal ajal tagasi võtta lingiga „Eemalda minu andmed aadressraamatust“ kinnitusmeilis, meeldetuletustes ja kutsetes või lehel „Minu andmed“. Nimi, e-posti aadress ja organisatsioon on selle registreerumise omad.",
+      "stayInTouchRetention": "Säilitame neid andmeid {months} kuud selle nõusoleku andmisest: periood algab uuesti ainult siis, kui märgid lahtri uuesti.",
       "recordingOptionalListenOnly": "Kui sa ei nõustu, osaled ikkagi, ainult kuulajana: jälgid ja kirjutad vestlusesse, kuid mikrofon, kaamera ja ekraani jagamine jäävad välja. Saad nõustuda hiljem ruumis.",
-      "recordingOptionalHost": "Kui sa nõusolekut ei anna, saad ikkagi siseneda ja juhtida nagu tavaliselt, kuid sinu häält ei säilitata isiklikel radadel ega transkriptsioonis. Ruumi video, kui see salvestatakse, näitab sind siiski.",
       "recordingOptionalVoice": "Kui sa ei nõustu, osaled ikkagi ja võid sõna võtta, kuid jääd salvestusest välja: ei nime, häält ega pilti. Saad nõustuda hiljem ruumis.",
-      "recordingNotice": "Üritus salvestatakse (heli ja video). Osalete ilma mikrofoni ja kaamerata: salvestis ei sisalda teie häält ega pilti, välja arvatud juhul, kui moderaator annab teile sõna.",
-      "recordingNoticeVoice": "Üritust salvestatakse (heli ja video). Osaled ilma mikrofoni ja kaamerata: salvestus ei sisalda sinu nime, häält ega pilti, kui sa ruumis ei nõustu.",
+      "recordingNotice": "Üritust võidakse salvestada. Osaled ilma mikrofoni ja kaamerata: salvestis ei sisalda sinu häält ega pilti, välja arvatud juhul, kui juhid annavad sulle sõna.",
+      "recordingNoticeVoice": "Üritust võidakse salvestada. Osaled ilma mikrofoni ja kaamerata: sinu nägu ja nimi ei ilmu kunagi videole ning sinu hääl ainult siis, kui annad ruumis nõusoleku.",
+      "namesMayAppear": "Nimi, millega osaled, võib videole ilmuda ka siis, kui sa sõna ei võta.",
+      "recordingHostsOnly": "Üritust võidakse salvestada. Videol on näha ja kuulda ainult juhte: osalejate nägu, nime ega häält seal kunagi ei ole.",
+      "recordingHostAlwaysReserved": "Sa juhid seda üritust: oled alati salvestises nime, hääle, pildi ja jagatud ekraaniga. Video jääb ainult korraldajatele ja registreerunutele: seda ei avaldata. Registreerunud saavad seda vaadata seni, kuni nende registreerumisandmeid säilitatakse.",
+      "recordingHostAlwaysPublic": "Sa juhid seda üritust: oled alati salvestises nime, hääle, pildi ja jagatud ekraaniga. Video võidakse avaldada ja seda võib vaadata igaüks.",
       "recordingHostAlways": "Sa juhid seda üritust: oled alati salvestuses nime, hääle, pildi ja jagatud ekraaniga."
+    },
+    "sheet": {
+      "title": "See üritus ja sinu andmed",
+      "intro": "See sõltub sellest, kuidas korraldajad on ürituse seadistanud. Kõik muu on privaatsuspoliitikas.",
+      "recording": {
+        "label": "Salvestamine",
+        "none": "Selle ürituse salvestamist ei ole ette nähtud.",
+        "manual": "Juhid saavad käivitada salvestamise (heli ja video). Kui see on käimas, antakse ruumis sellest märku.",
+        "auto": "Üritust salvestatakse (heli ja video) selle algusest peale. Ruumis antakse sellest märku.",
+        "tracksOnly": "Ruumi videot ei salvestata: ainult üks heliraja iga nõustuva inimese kohta.",
+        "destinationReserved": "Salvestis jääb ainult korraldajatele ja registreerunutele ning seda ei avaldata. Registreerunud saavad seda vaadata seni, kuni nende registreerumisandmeid säilitatakse.",
+        "destinationPublic": "Salvestis võidakse pärast üritust avaldada.",
+        "destinationUnset": "Korraldajad otsustavad pärast üritust, kas see avaldada.",
+        "refuseOut": "Kui sa ei nõustu, osaled ikkagi ja jääd salvestisest välja.",
+        "refuseListenOnly": "Kui sa ei nõustu, osaled ainult kuulajana.",
+        "hostsAlways": "Videol on ainult juhid, nime, hääle, pildi ja jagatud ekraaniga. Osalejate nägu ja nimi ei ilmu kunagi videole.",
+        "hostsAlwaysVisible": "Juhid on alati salvestises nime, hääle, pildi ja jagatud ekraaniga.",
+        "hostsOnly": "Videol on näha ja kuulda ainult juhte, nime, hääle, pildi ja jagatud ekraaniga. Osalejate nägu, nime ega häält seal kunagi ei ole.",
+        "audienceNotice": "Osaled ilma mikrofoni ja kaamerata: salvestis ei sisalda sinu häält ega pilti, välja arvatud juhul, kui juhid annavad sulle sõna.",
+        "audienceNoticeVoice": "Osaled ilma mikrofoni ja kaamerata: sinu nägu ja nimi ei ilmu kunagi videole ning sinu hääl ainult siis, kui annad ruumis nõusoleku."
+      },
+      "transcript": {
+        "label": "Transkriptsioon",
+        "captions": "Subtiitrite tekst säilitatakse koos nimega ainult nende puhul, kes nõustuvad, ja sellest saab ürituse transkriptsioon.",
+        "tracks": "Nende jaoks, kes nõustuvad, salvestatakse heliraja, mis kustutatakse pärast transkribeerimist.",
+        "tracksRetained": "Nende jaoks, kes nõustuvad, salvestatakse heliraja, mida säilitatakse koos ürituse andmetega.",
+        "fromVideo": "Pärast üritust saavad korraldajad lasta video transkribeerida ainult siis, kui kõik rääkijad on nõustunud."
+      },
+      "captions": {
+        "label": "Subtiitrid"
+      },
+      "ai": {
+        "label": "Tehisintellekt",
+        "summary": "Pärast üritust võib tehisintellekti tööriist kirjutada salvestise kokkuvõtte.",
+        "translation": "Transkriptsiooni ja kokkuvõtet võidakse automaatselt tõlkida.",
+        "dubbing": "Videol võib olla sünteetilise häälega dubleering.",
+        "onRequest": "Pärast üritust võivad korraldajad taotleda ka salvestise automaatset töötlemist, mida siin ei ole märgitud: transkribeerimist, kokkuvõtet või tõlget.",
+        "report": "Pärast üritust võib meeskond lasta tehisintellektil kirjutada ülevaate, kasutades ka küsitlusi ja, kui need on avaldatud, küsimusi. Vestluse teksti ei kasutata.",
+        "accuracy": "Tehisintellektiga loodud tekstid võivad sisaldada ebatäpsusi."
+      },
+      "list": {
+        "label": "Osalejate loend",
+        "visible": "Osalejad näevad ruumis kohalolijate loendit.",
+        "hidden": "Ruumis ei näe publik kohalolijate loendit. Juhid ja esinejad näevad."
+      },
+      "name": {
+        "label": "Sinu nimi",
+        "real": "Ruumis, vestluses ja küsimustes oled nähtav oma nimega.",
+        "pseudonym": "Ruumis, vestluses ja küsimustes oled nähtav pseudonüümiga. Korraldajad näevad sinu registreerumisandmeid.",
+        "pseudonymTranscript": "Kui nõustud transkribeerimisega, jääb sinu nimi transkriptsiooni.",
+        "nickname": "Saad valida hüüdnime: teised näevad seda sinu nime asemel. Korraldajad ja moderaatorid teavad, kes selle taga on.",
+        "nicknameTranscript": "Kui nõustud transkriptsiooniga, oled seal nähtav oma hüüdnimega, kui oled selle valinud, muidu oma nimega."
+      },
+      "retention": {
+        "label": "Säilitamine",
+        "data": "Registreerumis- ja ruumiandmed kustutatakse {days, plural, one {# päev} other {# päeva}} pärast ürituse lõppu. Küsimused ja küsitlused jäävad alles ilma nimedeta.",
+        "recordingKept": "Salvestist ja sellest tehtut (transkriptsioon, kokkuvõte, tõlked) nende andmetega koos ei kustutata: olenemata sellest, kas need tehakse kättesaadavaks, jäävad need alles, kuni korraldajad need kustutavad.",
+        "recordingDays": "Salvestis ja sellest tehtu kustutatakse {days, plural, one {# päev} other {# päeva}} pärast ürituse lõppu või, kui salvestis tehakse kättesaadavaks, pärast selle avaldamist.",
+        "transcriptKept": "Transkriptsiooni nende andmetega koos ei kustutata: see jääb alles, kuni korraldajad selle kustutavad.",
+        "transcriptDays": "Transkriptsioon kustutatakse {days, plural, one {# päev} other {# päeva}} pärast ürituse lõppu."
+      },
+      "addressBook": {
+        "label": "Aadressraamat",
+        "offered": "Registreerudes saad valida, kas jääd ürituste aadressraamatusse, et sind kutsutaks sarnastele üritustele. See on vabatahtlik: andmed jäävad alles {months} kuud nõusoleku andmisest, välja arvatud juhul, kui selle tagasi võtad."
+      },
+      "chat": {
+        "label": "Vestlus ja küsimused",
+        "messages": "Vestlussõnumeid ei avaldata kunagi, isegi mitte vestluses esitatud küsimusi.",
+        "questionsText": "Pärast üritust võidakse avaldada Q&A küsimuste tekst, kuid mitte kunagi küsija nime.",
+        "questionsNone": "Q&A küsimusi ei avaldata."
+      }
     },
     "export": {
       "title": "Minu andmed",
@@ -4401,20 +4805,21 @@
       "submit": "Taotle oma andmeid",
       "loading": "Otsimine...",
       "requestSubmittedTitle": "Kontrollige oma postkasti",
-      "requestSubmittedBody": "Kui see e-posti aadress vastab registreeringule, saatsime teile lingi oma andmete allalaadimiseks. Link kehtib 1 tund.",
+      "requestSubmittedBody": "Kui see e-posti aadress vastab registreerumisele, saatsime teile lingi oma andmete vaatamiseks. Link kehtib 1 tund.",
       "linkInvalid": "See link on kehtetu või aegunud. Palun taotlege uus link.",
       "requestNew": "Taotle uut linki",
       "noData": "Selle e-posti aadressi kohta andmeid ei leitud.",
       "error": "Ilmnes viga. Palun proovige hiljem uuesti.",
       "rateLimited": "Liiga palju päringuid. Palun proovige uuesti tunni pärast.",
       "results": "Teie andmed",
-      "resultsDescription": "Leiti andmeid {count} ürituse kohta.",
+      "resultsDescription": "{count, plural, one {Leiti andmeid # ürituse kohta.} other {Leiti andmeid # ürituse kohta.}}",
       "registrationData": "Registreerimisandmed",
       "fieldName": "Nimi",
+      "fieldNickname": "Hüüdnimi",
       "fieldEmail": "E-post",
       "fieldOrganization": "Organisatsioon",
       "fieldRegisteredAt": "Registreerimise kuupäev",
-      "fieldConsent": "Nõusolek",
+      "fieldConsent": "Privaatsuspoliitikaga tutvumine",
       "questionsTitle": "Q&A küsimused",
       "pollVotesTitle": "Küsitluste hääled",
       "optionLabel": "Variant",
@@ -4436,7 +4841,74 @@
       "consentFuture": "Tulevased teated",
       "consentWithdrawnOn": "Tagasi võetud {date}",
       "consentNoteInRoom": "Kui olete praegu ruumis, kehtib tagasivõtmine järgmisest sisenemisest: et see kehtiks kohe, kasutage ruumis nuppu Nõusolekud.",
-      "consentFutureEffect": "Kui selle tagasi võtate, ei saa te enam teateid järgmiste ürituste kohta ja lahkute aadressiraamatust kõigi oma registreerimiste puhul."
+      "consentGiveNoteInRoom": "Siin antud nõusolek kehtib järgmisest ruumi sisenemisest, mitte juba salvestatu kohta. Salvestamise ja transkriptsiooni nõusoleku saab anda kuni ürituse lõpuni.",
+      "proofsTitle": "Säilitatud nõusolekute tõendid",
+      "proofsIntro": "Nende ürituste andmed on kustutatud. Need tõendid jäävad alles seni, kuni video või transkriptsioon on olemas. Võite nõusoleku tagasi võtta: see, mis on juba videos, jääb alles, ja selle eemaldamiseks peate kirjutama vastutavale töötlejale.",
+      "proofGivenOn": "Antud {date}",
+      "proofSuperseded": "Asendatud hilisema nõusolekuga",
+      "proofWithdrawEffect": {
+        "recording": "Võtate tagasi ka nõusoleku transkribeerimiseks: teie laused ja nimi eemaldatakse subtiitritest tehtud transkriptsioonist. See, mis on juba videos, jääb alles, nagu ka videost või helirajadest tehtud transkriptsioon: nende eemaldamiseks kirjutage vastutavale töötlejale. Sellel lehel ei saa tagasivõtmist tühistada.",
+        "transcription": "Teie laused ja nimi eemaldatakse subtiitritest tehtud transkriptsioonist. Videost või helirajadest tehtud transkriptsioon jääb alles: selle eemaldamiseks kirjutage vastutavale töötlejale. Sellel lehel ei saa tagasivõtmist tühistada."
+      },
+      "proofWithdrawHost": "Vanemad subtiitritest tehtud transkriptsioonid ei tunne juhte ära: neis jäävad teie laused ja nimi alles ning nende eemaldamiseks peate kirjutama vastutavale töötlejale.",
+      "roomProofsTitle": "Ürituse juhina antud nõusolekud",
+      "roomProofsIntro": "Nõusolekud salvestamiseks ja transkribeerimiseks, mille andsite ruumi sisenedes, kui teil oli ürituses roll. Ruumi aknas „Nõusolekud“ saab tagasi võtta praeguse sisenemise nõusolekud ja oma töötajakontoga ka varasemate sisenemiste omad; ülejäänute puhul ja pärast ürituse lõppu jääb üle teie andmete kustutamine.",
+      "addressBookTitle": "Ürituste aadressraamat",
+      "addressBookIntro": "Valisite jääda aadressraamatusse, et teid kutsutaks sarnastele üritustele. Säilitame neid andmeid kuni {date}, välja arvatud juhul, kui võtate nõusoleku tagasi või annate uue.",
+      "addressBookOptOut": "Eemalda minu andmed aadressraamatust",
+      "consentFutureEffect": "Kui selle tagasi võtate, ei saa te enam teateid järgmiste ürituste kohta ja lahkute aadressiraamatust kõigi oma registreerimiste puhul.",
+      "consentFutureGive": "Annan nõusoleku tulevaste teadete saamiseks",
+      "consentFutureGiveEffect": "Naasete ürituste aadressraamatusse selle registreerumise nime ja organisatsiooniga ning saate taas kutseid; säilitusaeg algab uuesti tänasest.",
+      "consentGiveDone": "Nõusolek antud: see kehtib järgmisest ruumi sisenemisest.",
+      "consentFutureGiveDone": "Nõusolek antud: olete taas ürituste aadressraamatus.",
+      "consentGiveTextChanged": "Nõusoleku tekst muutus pärast lehe avamist: laadige leht uuesti, et uut teksti lugeda.",
+      "consentGiveClosed": "Seda nõusolekut ei saa siit enam anda: üritus on lõppenud või ei küsi seda enam. Laadige leht uuesti, et näha praegust olekut.",
+      "consentGiveNewText": "Selle nõusoleku tekst muutus pärast selle andmist: praeguse teksti jaoks tuleb see uuesti anda.",
+      "addressBookPendingTitle": "Aadressraamatusse naasmine vajab kinnitust",
+      "addressBookPendingBody": "Selle registreerumise juures märgiti aadressraamatu lahter, kuid see aadress oli lakanud kutseid saamast. Enne kinnitamist ei muutu midagi.",
+      "addressBookPendingEffect": "Kui kinnitate, naasete aadressraamatusse selle registreerumise nime ja organisatsiooniga ning saate taas kutseid. Kui tühistate või kui see polnud teie, jääte aadressraamatust välja ega saa kutseid.",
+      "addressBookPendingConfirm": "Kinnita naasmine",
+      "addressBookPendingCancel": "Tühista taotlus",
+      "addressBookPendingGone": "See taotlus ei oota enam kinnitust. Uuendatud oleku nägemiseks laadige leht uuesti.",
+      "removalTitle": "Ürituse salvestis",
+      "removalIntro": "See üritus salvestati. Kui te ei soovi salvestisel esineda, võite taotleda enda eemaldamist: kohad, kus te olete nähtav või räägite, kaetakse sildiga ja vaigistatakse ning transkriptsioon, subtiitrid ja kokkuvõte tehakse uuesti. Taotlus läheb vastutavale töötlejale, kes selle läbi vaatab.",
+      "removalButton": "Ma ei soovi selles salvestises esineda",
+      "removalConfirmTitle": "Kas kinnitate taotluse?",
+      "removalConfirmBody": "Vastutav töötleja eemaldab salvestisest kohad, kus te olete nähtav või räägite. Teistel saitidel, näiteks YouTube'is, avaldatud koopiad peab eraldi eemaldama see, kes need avaldas.",
+      "removalConfirm": "Saada taotlus",
+      "removalCancel": "Tühista",
+      "removalSent": "Taotlus saadetud. Vastutav töötleja vaatab selle läbi.",
+      "removalError": "Taotlust ei õnnestunud saata. Proovige hiljem uuesti.",
+      "removalStatusOpen": "{date} esitatud taotlus: menetluses.",
+      "removalStatusClosed": "{date} esitatud taotlus: lõpetatud {closed}.",
+      "removalStatusRejected": "{date} esitatud taotlus: tagasi lükatud. Põhjuse teadasaamiseks kirjutage vastutavale töötlejale.",
+      "editButton": "Paranda nimi ja organisatsioon",
+      "editScopeLegend": "Milliste registreerumiste kohta see kehtib",
+      "editScopeOne": "Ainult see registreerumine",
+      "editScopeAll": "Kõik minu registreerumised ({count}) ja ürituste aadressraamat",
+      "editEffect": "Parandus kehtib järgmiste e-kirjade puhul ja järgmisest ruumi sisenemisest. See ei muuda juba salvestatut, transkribeeritut ega vestlusesse kirjutatut ega nõusolekute tõendeid.",
+      "editNameInvalid": "Nimes peab olema 2 kuni 100 märki.",
+      "editOrganizationRequired": "Üritus, kuhu olete registreerunud, nõuab organisatsiooni: välja ei saa tühjaks jätta.",
+      "editOrganizationTooLong": "Organisatsioonis võib olla kuni 200 märki.",
+      "editDone": "Andmed on parandatud.",
+      "nicknameChoose": "Vali hüüdnimi",
+      "nicknameChange": "Muuda hüüdnime",
+      "nicknameEffect": "Teised näevad teie nime asemel hüüdnime: vestluses ja küsimustes kohe, videos alates teie järgmisest ruumi sisenemisest. See, mis on juba salvestatud, transkribeeritud või kirjutatud, ei muutu.",
+      "nicknameDone": "Hüüdnimi on salvestatud.",
+      "codeWhy": "Turvalisuse huvides kinnitatakse parandused ja kustutamised koodiga, mille saadame registreerumise e-posti aadressile.",
+      "codeSend": "Saada mulle kinnituskood",
+      "codeSent": "Saatsime teile e-postiga 6-kohalise koodi. Sisestage see siia: see kehtib {minutes, plural, one {# minut} other {# minutit}}.",
+      "codeLabel": "Kinnituskood",
+      "codeConfirmEdit": "Kinnita parandus",
+      "codeConfirmNickname": "Kinnita hüüdnimi",
+      "codeInvalid": "Kood on vale või aegunud. Kontrollige viimast saadud e-kirja või tühistage ja küsige uus.",
+      "cancelTitle": "Selle registreerumise kustutamine",
+      "cancelIntro": "Saate kustutada ainult selle registreerumise, puudutamata teisi ja ülejäänud andmeid.",
+      "cancelButton": "Kustuta see registreerumine",
+      "cancelDeletes": "Kustutatakse registreerumine sellele üritusele ja see, mida selle kaudu tegite: küsimused, hääled, vestlussõnumid, tagasiside, küsimustike vastused, teie laused subtiitrite transkriptsioonis ja ootel e-kirjad. Teie isiklik link lakkab töötamast ja koht vabaneb.",
+      "cancelKeeps": "Alles jäävad teie teised registreerumised, ürituste aadressraamat, profiilifoto ja veel menetletav taotlus salvestisest eemaldamiseks. Kui sellest üritusest on video või transkriptsioon, jääb teie nõusoleku tõend ilma teie nimeta alles seni, kuni need on olemas. Kustutamist ei saa tagasi võtta; kuni üritus võtab registreerumisi vastu, võite uuesti registreeruda.",
+      "codeConfirmCancel": "Kustuta registreerumine",
+      "cancelDone": "Registreerumine on kustutatud."
     },
     "erasure": {
       "title": "Teie andmete kustutamine",
@@ -4448,13 +4920,15 @@
       "requestSubmittedTitle": "Kontrollige oma postkasti",
       "requestSubmittedBody": "Kui see e-posti aadress vastab registreeringule, saatsime teile lingi kustutamise kinnitamiseks. Link kehtib 1 tund.",
       "linkInvalid": "See link on kehtetu või aegunud. Palun taotlege uus link.",
-      "confirmWarning": "Olete jäädavalt kustutamas kõiki teie e-posti aadressiga seotud isikuandmeid.",
-      "confirmBody": "Kustutatakse registreeringud, küsimused, küsitluste hääled, tagasiside, meeldetuletused ja teie kirje ürituste aadressraamatus. Toiming on pöördumatu.",
+      "confirmWarning": "Olete jäädavalt kustutamas teie e-posti aadressiga seotud isikuandmeid, välja arvatud allpool märgitu.",
+      "confirmBody": "Kustutatakse registreerumised, küsimused, küsitluste hääled, tagasiside, meeldetuletused ja teie kirje ürituste aadressraamatus. Toiming on pöördumatu.",
+      "confirmProofs": "Kui ürituse kohta on olemas video või transkriptsioon, isegi kui seda pole veel avaldatud, jäävad nõusoleku liik, kuupäev ja tekst, millele vastasite, alles ilma teie nimeta seni, kuni see video või transkriptsioon on olemas. Need on vajalikud nõusoleku tõendamiseks. Video ei muutu: oma sõnavõttude eemaldamise taotlemiseks kirjutage vastutavale töötlejale. Vanemad subtiitritest tehtud transkriptsioonid ei tunne ära neid, kes juhivad või võtavad sõna ürituses mingis rollis: neis jäävad teie laused ja nimi alles ning nende eemaldamiseks peate kirjutama vastutavale töötlejale.",
       "confirmButton": "Kinnita kustutamine",
       "cancel": "Tühista",
       "processing": "Kustutamine...",
       "doneTitle": "Kustutamine lõpetatud",
-      "doneBody": "Kustutatud registreeringute arv: {count}. Ka nendega seotud andmed on kustutatud.",
+      "doneBody": "{count, plural, =0 {Kustutatavaid registreerumisi pole.} one {Kustutatud on # registreerumine koos sellega seotud andmetega.} other {Kustutatud on # registreerumist koos nendega seotud andmetega.}}",
+      "doneProofs": "{count, plural, one {Alles jäi # nõusoleku tõend ilma teie nimeta seni, kuni video või transkriptsioon on olemas.} other {Alles jäi # nõusoleku tõendit ilma teie nimeta seni, kuni video või transkriptsioon on olemas.}}",
       "error": "Tekkis viga. Palun proovige hiljem uuesti.",
       "rateLimited": "Liiga palju päringuid. Palun proovige tunni aja pärast uuesti.",
       "back": "Tagasi minu andmete juurde",
@@ -5232,7 +5706,8 @@
     "overlapTitle": "Samaaegne kõne: selles vahemikus räägib korraga rohkem kui üks inimene.",
     "anonymousSpeaker": "Osaleja {n}",
     "untranscribed": "Ei transkribeeritud: kõneleja ei andnud nõusolekut",
-    "unrecordedSpeech": "Mõned sõnavõtud pole salvestuses: kõnelejad ei andnud nõusolekut."
+    "unrecordedSpeech": "Mõned sõnavõtud pole salvestuses: kõnelejad ei andnud nõusolekut.",
+    "unrecordedSpeechHostsOnly": "Mõned sõnavõtud pole salvestuses: videol on näha ja kuulda ainult juhte."
   },
   "waiting": {
     "startsIn": "Üritus algab",
@@ -5249,7 +5724,9 @@
     "watchNow": "Vaata",
     "switchToLive": "Lülitu otseülekandele",
     "enterRoom": "Sisene ruumi",
-    "recordingNotice": "Seda üritust salvestatakse.",
+    "recordingNotice": "Seda üritust võidakse salvestada.",
+    "recordingNoticeInstant": "Kõnet võidakse salvestada. Videol on ainult juhid: sinu nägu ja nimi mitte kunagi. Kui keegi salvestuse käivitab, küsime, kas nõustud oma hääle salvestamisega.",
+    "recordingNoticeInstantHostsOnly": "Kõnet võidakse salvestada. Videol on näha ja kuulda ainult juhte: osalejate nägu, nime ega häält seal kunagi ei ole.",
     "recordingAvailableAfter": "Salvestis on saadaval pärast üritust.",
     "autoRefreshHint": "Leht uueneb automaatselt, kui üritus algab.",
     "startEventButton": "Käivita üritus",
@@ -5300,10 +5777,15 @@
     "classicView": "Klassikaline vaade",
     "backToGarden": "Näita väljakut",
     "aiNoticeTitle": "Tehisintellekti töötlus pärast sündmust",
-    "aiNotice": "Lõpus töödeldakse salvestist tehisintellekti tööriistadega, et luua transkriptsioon, kokkuvõte ning võimalikud tõlked ja dubleeringud. Tulemused võivad sisaldada ebatäpsusi; video jääb autoriteetseks allikaks.",
+    "aiNotice": "Lõpus võidakse salvestist töödelda tehisintellekti tööriistadega, et luua transkriptsioon, kokkuvõte ning võimalikud tõlked ja dubleeringud. Transkriptsioon hõlmab ainult neid, kes andsid nõusoleku. Tulemused võivad sisaldada ebatäpsusi; video jääb autoriteetseks allikaks.",
     "multitrackConsentTitle": "Teie sõnavõttude transkriptsioon",
-    "recordingConsentTitle": "Ürituse salvestamine",
-    "recordingConsentIntro": "Üritust salvestatakse (heli ja video). Sinu nõusolekul sisaldab salvestus sinu nime, häält, pilti ja seda, mida ekraanil jagad.",
+    "recordingConsentTitle": "Sinu hääle salvestamine",
+    "recordingConsentTitleVisible": "Ürituse salvestamine",
+    "recordingConsentIntro": "Üritust võidakse salvestada. Videol on ainult juhid: sinu nägu ja nimi mitte kunagi. Sinu nõusolekul salvestatakse sinu hääl, kui räägid.",
+    "recordingConsentIntroAnonymous": "Üritust võidakse salvestada. Videol on ainult juhid: sinu nägu ja pseudonüüm mitte kunagi. Sinu nõusolekul salvestatakse sinu hääl, kui räägid.",
+    "recordingConsentIntroVisible": "Üritust võidakse salvestada (heli ja video). Sinu nõusolekul sisaldab salvestis sinu nime, häält, pilti ja seda, mida ekraanil jagad.",
+    "recordingConsentIntroVisibleAnonymous": "Üritust võidakse salvestada (heli ja video). Sinu nõusolekul sisaldab salvestis sinu pseudonüümi, häält, pilti ja seda, mida ekraanil jagad.",
+    "recordingConsentIntroNoVideo": "Sellel üritusel ruumi videot ei salvestata.",
     "enterGardenTitle": "Astu väljakule",
     "enterGardenHint": "Teine koht ootamiseks: jaluta ringi, kohtu teiste ootajatega ja sisene otseülekandesse värava kaudu, kui ruum avaneb.",
     "backToWaitingRoom": "Tagasi ooteruumi",
@@ -5550,11 +6032,14 @@
       "7d": "7 päeva",
       "30d": "30 päeva",
       "90d": "90 päeva",
+      "1y": "1 aasta",
+      "days": "{count, plural, one {# päev} other {# päeva}}",
       "forever": "Automaatset kustutamist pole"
     },
-    "retentionNote": "Avaldatud video ei järgi ürituse andmete säilitamisaega: ilma tähtajata jääb see avalikuks, kuni keegi selle kustutab.",
+    "retentionNote": "Salvestis ei järgi ürituse andmete säilitamisaega: ilma tähtajata jääb see alles, avaldatud või mitte, kuni keegi selle kustutab. Tähtaeg loetakse avaldamisest või, kui video pole avaldatud, ürituse lõpust; kui see möödub, kustutatakse video ja sellest tehtu (transkriptsioonid, kokkuvõtted, tõlked).",
+    "retentionLegacy": "Selle ürituse registreerunutele öeldi, et avaldamata salvestis kustutatakse koos nende andmetega {days, plural, one {# päev} other {# päeva}} pärast ürituse lõppu. Kuni video pole avaldatud, saad seda aega lühendada, kuid mitte eemaldada ega pikendada.",
     "delete": "Kustuta salvestis",
-    "deleteConfirm": "Kas olete kindel? Video kustutatakse jäädavalt.",
+    "deleteConfirm": "Kas olete kindel? Video kustutatakse jäädavalt. Transkriptsioone, kokkuvõtteid ja tõlkeid koos sellega ei kustutata: need järgivad siin valitud salvestise tähtaega.",
     "notConfigured": "Jibri pole infrastruktuuris seadistatud. Videosalvestamine pole saadaval.",
     "disabledHint": "Selle sündmuse jaoks pole videosalvestus lubatud. Selle aktiveerimiseks avage ülal asuv jaotis Seaded ja lülitage sisse \"Salvestus\".",
     "play": "Esita",
@@ -5570,6 +6055,8 @@
     "audiencePublicDesc": "Igaüks, kes avab ürituse lehe. Võib ilmuda videoteeki.",
     "audienceRegistrants": "Ainult registreerunud",
     "audienceRegistrantsDesc": "Üritusele registreerunud, ka siis, kui nad ruumi ei sisenenud, e-posti teate isikliku lingi kaudu. Ei ilmu videoteeki.",
+    "audienceReservedNote": "Nõusolek anti salvestisele, mis on ainult registreerunutele: videot saavad vaadata ainult registreerunud ja korraldajad.",
+    "destinationMissing": "See üritus ei ütle, kuhu salvestis läheb: kogutud nõusolekud ei näita, kas videot kavatseti avaldada. Kontrollige enne selle avaldamist.",
     "saveFailed": "Muudatust ei salvestatud. Proovi uuesti."
   },
   "postEvent": {
@@ -5579,7 +6066,9 @@
     "libraryListed": "Avalda videokogus",
     "libraryListedHelp": "Näita seda sündmust avalikus kogus (/video-library). Eeldab avaldatud salvestist või YouTube’i videot ja seda, et sündmuse leht oleks nähtav.",
     "libraryListedNoRecording": "Avaldatud salvestist pole: sündmus ei ilmu kogusse enne, kui avaldad salvestise või lisad YouTube’i video.",
-    "showQA": "Näita Q&A küsimusi",
+    "libraryListedReserved": "Salvestis ainult registreerunutele: üritus ei ilmu videoteegis.",
+    "showQA": "Näita Q&A küsimuste teksti ilma nimedeta",
+    "qaReservedNote": "Kui salvestis on ainult registreerunutele, küsimusi ei avaldata.",
     "showMaterials": "Näita jagatud materjale",
     "showPolls": "Näita küsitluste tulemusi",
     "showFeedback": "Näita tagasisidet",
@@ -5591,7 +6080,7 @@
     "visibilityAlways": "Alati nähtav",
     "visibilityUntil": "Nähtav kuni:",
     "dataRetentionNote": "Osalejate isikuandmed kustutatakse vastavalt ürituse säilitamispoliitikale ({days} päeva). Ürituse sisu jääb kättesaadavaks, kuni leht on nähtav.",
-    "availableUntil": "See üritus ja selle sisu on saadaval kuni {date}.",
+    "participantDataUntil": "Osalejate isikuandmed kustutatakse {date}.",
     "tabs": {
       "qa": "Küsimused ja vastused",
       "materials": "Materjalid",
@@ -5672,7 +6161,7 @@
       "strengths": "Tugevused",
       "improvements": "Parandada",
       "quotes": "Kommentaaridest",
-      "aiNotice": "Teksti on kirjutanud tehisintellekti mudel transkriptsiooni, vestluse, küsimuste, küsitluste ja hinnangute põhjal ning meeskond vaatas selle enne avaldamist üle. Numbrid ja graafikud arvutab platvorm. See võib sisaldada ebatäpsusi."
+      "aiNotice": "Teksti on kirjutanud tehisintellekti mudel transkriptsiooni, küsitluste, hinnangute ja, kui need on avaldatud, küsimuste põhjal ning meeskond vaatas selle enne avaldamist üle. Numbrid ja graafikud arvutab platvorm. See võib sisaldada ebatäpsusi."
     },
     "languages": {
       "title": "Vaata keeles",
@@ -5733,7 +6222,7 @@
       "confirm": "Kinnita eemaldamine",
       "submitting": "Eemaldamine käib…",
       "successTitle": "Eemaldamine valmis",
-      "successBody": "Teie andmed ei ole enam ürituste aadressraamatus.",
+      "successBody": "Alates praegusest hetkest ei saa te enam kutseid. Teie e-posti aadress on juba eemaldatud; teie nimi ja organisatsioon kustutatakse aadressraamatust hiljemalt järgmisel päeval.",
       "errors": {
         "generic": "Tekkis viga. Palun proovige hiljem uuesti."
       }
@@ -5831,12 +6320,21 @@
     "recordingWithoutMedia": "Sellel salvestusel pole videot: selle transkriptsioon pärineb otseülekande subtiitritest.",
     "recordingWithoutVideo": "Sellest salvestisest on osalejate helirajad, aga mitte videot: seda ei salvestatud või see pole veel saabunud. Allalaaditav arhiiv vajab ka videot.",
     "noParticipantTracks": "Osalejate eraldi helirajad puuduvad: neid ei salvestatud või need on juba kustutatud. Nende saamiseks lülita enne üritust sisse osalejapõhine salvestamine.",
+    "noTranscribableTracks": "Selle salvestise ühtegi rada ei saa transkribeerida: need on kustutatud või neil esinevad inimesed ei ole andnud nõusolekut transkribeerimiseks oma nimega.",
+    "tracksPending": "Selle salvestise rajad pole veel kohale jõudnud: transkribeerimine algab iseenesest, kui need saabuvad.",
     "summaryMissing": "Selles keeles pole veel muudetavat kokkuvõtet: loo see kõigepealt.",
     "storageUnavailable": "Failide üleslaadimine pole selles paigalduses saadaval.",
     "aiDisabledForEvent": "Tehisintellekt on selle ürituse jaoks välja lülitatud: kasuta nuppu „Loo AI“, et see sisse lülitada ja töötlus käivitada.",
     "sourceTranscriptMissing": "Seda salvestust pole veel transkribeeritud: transkribeeri see enne tõlke lisamist.",
     "captionsTranscriptNotTranslatable": "See transkriptsioon pärineb otsesubtiitritest: automaattõlge vajab salvestise tehisintellekti transkriptsiooni.",
     "sameLanguage": "Valitud keel on salvestuse algkeel: vali mõni muu.",
-    "mtUnavailable": "Masintõlge ei ole selles eksemplaris paigaldatud."
+    "recordingDestinationNotCovered": "Selle ürituse nõusolekud kehtivad salvestisele, mis on ainult registreerunutele: sa ei saa seda kõigile nähtavaks teha ega välist videot linkida.",
+    "mtUnavailable": "Masintõlge ei ole selles eksemplaris paigaldatud.",
+    "recordingContentOrganizerOnly": "Selle ürituse salvestiste sisu saavad avada, muuta või avaldada ainult selle korraldajad.",
+    "recordingRetentionLegacy": "Selle ürituse registreerunutele öeldi, et avaldamata salvestis kustutatakse koos nende andmetega: kuni video pole avaldatud, saab selle aega lühendada, kuid mitte eemaldada ega pikendada."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Sisu eemaldatud taotluse alusel",
+    "cardBody": "See salvestise osa eemaldati selles esinenud isiku taotluse alusel."
   }
 }

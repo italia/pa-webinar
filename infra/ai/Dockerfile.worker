@@ -24,7 +24,7 @@
 #     /models (pre-populated by an init container or a persistent
 #     volume), NOT downloaded at runtime from huggingface.co.
 
-ARG BASE_IMAGE=nvcr.io/nvidia/pytorch:24.10-py3
+ARG BASE_IMAGE=nvcr.io/nvidia/pytorch:24.10-py3@sha256:36555b43d382425a4281ecfbcb41de2f95fb542ca8e531c5486be10df8026f9d
 FROM ${BASE_IMAGE}
 
 # System tools — ffmpeg for audio extraction from mp4, ca-certificates
@@ -57,7 +57,7 @@ COPY worker/requirements.txt worker/requirements-whisperx.txt worker/build_check
 RUN pip uninstall -y apex flash-attn flash_attn transformer-engine transformer_engine \
         torch-tensorrt torch_tensorrt nvfuser pytorch-triton pyarrow numba spacy thinc blis \
     && pip install --no-cache-dir -r requirements.txt \
-    && pip install --no-cache-dir --no-deps -r requirements-whisperx.txt \
+    && pip install --no-cache-dir --no-deps --require-hashes -r requirements-whisperx.txt \
     && python build_check.py
 
 # Pre-bake Piper TTS voices into the image (rhasspy/piper-voices, MIT,

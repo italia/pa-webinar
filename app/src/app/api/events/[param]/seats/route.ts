@@ -9,7 +9,10 @@
  *        204 sempre: un endpoint gia' di un altro posto diventa conteso, e la
  *        risposta non lo dice.
  *   GET  → solo per chi modera: { seats: { [endpointId]: { kind, name, email } } }
- *        con nome ed email dell'iscrizione o della concessione.
+ *        con nome ed email dell'iscrizione o della concessione; `listenOnly` e
+ *        `voiceExcluded`, gli endpoint in solo ascolto e quelli senza consenso;
+ *        `recording`, per ogni endpoint in sala, come e' nella registrazione
+ *        ('video' | 'voce' | 'nessuna', lib/live/recording-badge).
  */
 
 import { createHash } from 'crypto';
@@ -27,7 +30,10 @@ import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { ForbiddenError, NotFoundError, RateLimitError, UnauthorizedError, ValidationError } from '@/lib/errors';
 import { readOwnedEventAccessToken } from '@/lib/event-session';
-import { endpointSenzaRegistrazione } from '@/lib/captions/room';
+import { PREFISSO_POSTO_MODERATORE } from '@/lib/auth/jwt';
+import { endpointSenzaRegistrazione, occupantiInSala } from '@/lib/captions/room';
+import type { PresenzaNellaRegistrazione } from '@/lib/live/recording-badge';
+import { isRecorderSeat } from '@/lib/recorder/seat';
 import { claimSeat, leggiSoloAscolto, readSeats, type Seat } from '@/lib/live/seats';
 import { rateLimit } from '@/lib/rate-limit';
 
@@ -153,12 +159,26 @@ export const GET = withErrorHandling(async (request, context) => {
   // Chi e' in solo ascolto (dichiarato dal suo browser con il token che lo
   // dice): chi modera non gli da' una parola che il bridge non apre.
   // Chi non ha un consenso valido partecipa come tutti, e non viene registrato.
-  const [listenOnly, voiceExcluded] = await Promise.all([
+  const [listenOnly, voiceExcluded, occupanti] = await Promise.all([
     leggiSoloAscolto(event.id),
     endpointSenzaRegistrazione(event.id),
+    occupantiInSala(event.id),
   ]);
+  // Come e' nella registrazione chi e' in sala: chi conduce (il posto dei link
+  // di conduzione) nel video, chi partecipa con la voce se il token non lo
+  // esclude. Il registratore non e' una persona.
+  const inSoloAscolto = new Set(listenOnly);
+  const recording: Record<string, PresenzaNellaRegistrazione> = {};
+  for (const o of occupanti) {
+    if (isRecorderSeat(o.seatId)) continue;
+    recording[o.endpointId] = o.seatId.startsWith(PREFISSO_POSTO_MODERATORE)
+      ? 'video'
+      : o.voiceExcluded || inSoloAscolto.has(o.endpointId)
+        ? 'nessuna'
+        : 'voce';
+  }
   return Response.json(
-    { seats: out, listenOnly, voiceExcluded },
+    { seats: out, listenOnly, voiceExcluded, recording },
     { headers: { 'Cache-Control': 'no-store' } },
   );
 });

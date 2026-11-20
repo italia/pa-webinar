@@ -15,7 +15,7 @@
 import { cookies } from 'next/headers';
 
 import { withErrorHandling } from '@/lib/api-handler';
-import { requireRecordingManager } from '@/lib/auth/staff-session';
+import { requireRecordingContent } from '@/lib/recording/content-access';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { enqueuePostprodForRecording } from '@/lib/ai/enqueue';
 import { leggiCorpoAvvio } from '@/lib/ai/voice-consent';
@@ -27,8 +27,9 @@ export const dynamic = 'force-dynamic';
 
 export const POST = withErrorHandling(async (request, context) => {
   const { id } = (await (context as { params: Promise<{ id: string }> }).params);
-  // Dell'evento della registrazione: l'admin o chi l'ha creato (ADR-014).
-  await requireRecordingManager(await cookies(), id);
+  // Il contenuto e' di chi organizza l'evento, non dell'admin che non lo
+  // organizza (lib/recording/content-access).
+  await requireRecordingContent(await cookies(), id, 'elaborazione');
 
   // Check the master kill-switch upfront so we don't bump runCount /
   // flip the recording into POSTPROD_QUEUED and then leave it stuck
@@ -95,7 +96,17 @@ export const POST = withErrorHandling(async (request, context) => {
         status: 'POSTPROD_QUEUED',
       },
     });
-    return enqueuePostprodForRecording(tx, { recordingId: recording.id, allVoicesConsented });
+    const esito = await enqueuePostprodForRecording(tx, { recordingId: recording.id, allVoicesConsented });
+    // Niente da rilanciare: l'errore riporta indietro contatore e stato, e il
+    // manifest accodera' la pipeline all'arrivo delle tracce.
+    if (esito.tracksPending) {
+      throw new AppError(
+        'The tracks of this recording have not arrived yet: the transcription starts when they do.',
+        409,
+        'TRACKS_PENDING',
+      );
+    }
+    return esito;
   });
 
   await logAdminAction({

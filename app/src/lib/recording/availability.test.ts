@@ -4,7 +4,14 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
 
-import { recordingAvailable, voceNelVideo } from './availability';
+import {
+  eventoRegistrabile,
+  partecipantiNelVideo,
+  recordingAvailable,
+  recordingAvailableFor,
+  tracceDisponibili,
+  voceNelVideo,
+} from './availability';
 
 // Jitsi installato dal chart: l'unico caso in cui l'assenza di un registratore
 // e' certa.
@@ -68,5 +75,130 @@ describe('voceNelVideo', () => {
 
   it('con un Jitsi esterno non si sa chi registra: vale la risposta prudente', () => {
     expect(voceNelVideo({})).toBe('fissa');
+  });
+});
+
+describe('partecipantiNelVideo', () => {
+  const conJibri = { JITSI_WEB_INTERNAL_URL: 'http://jitsi-web', JIBRI_HEALTH_URL: 'http://jibri' };
+
+  it('il testo del chart riproduce la voce dei partecipanti: solo voce', () => {
+    expect(
+      partecipantiNelVideo({
+        ...conJibri,
+        RECORDING_VOICE_EXCLUSION: 'true',
+        RECORDING_PARTICIPANT_VOICE: 'true',
+      }),
+    ).toBe('solo-voce');
+  });
+
+  it('il testo onora i segni ma non riproduce la voce: fuori anche la voce', () => {
+    expect(partecipantiNelVideo({ ...conJibri, RECORDING_VOICE_EXCLUSION: 'true' })).toBe('esclusi');
+  });
+
+  it('la voce dichiarata senza la funzione nascosta non basta: i segni non valgono', () => {
+    expect(partecipantiNelVideo({ ...conJibri, RECORDING_PARTICIPANT_VOICE: 'true' })).toBe('visibili');
+  });
+
+  it('con un Jitsi esterno non si sa cosa mostra il registratore: possono comparire', () => {
+    expect(partecipantiNelVideo({})).toBe('visibili');
+  });
+
+  it('fuori dal chart valgono le variabili dichiarate a mano (Docker Compose con un Jibri suo)', () => {
+    expect(
+      partecipantiNelVideo({ RECORDING_VOICE_EXCLUSION: 'true', RECORDING_PARTICIPANT_VOICE: 'true' }),
+    ).toBe('solo-voce');
+  });
+
+  it('senza Jibri non c\'e\' un video completo', () => {
+    expect(
+      partecipantiNelVideo({
+        JITSI_WEB_INTERNAL_URL: 'http://jitsi-web',
+        RECORDER_CONTROLLER_URL: 'http://registratore',
+        RECORDING_PARTICIPANT_VOICE: 'true',
+      }),
+    ).toBe('assente');
+  });
+
+  it('un valore diverso da «true» non dichiara niente', () => {
+    expect(
+      partecipantiNelVideo({ ...conJibri, RECORDING_VOICE_EXCLUSION: 'true', RECORDING_PARTICIPANT_VOICE: '1' }),
+    ).toBe('esclusi');
+  });
+
+  it('la voce di chi non acconsente ne e\' la proiezione: le due letture non si contraddicono', () => {
+    const casi = [
+      {},
+      { ...conJibri },
+      { ...conJibri, RECORDING_VOICE_EXCLUSION: 'true' },
+      { ...conJibri, RECORDING_VOICE_EXCLUSION: 'true', RECORDING_PARTICIPANT_VOICE: 'true' },
+      { JITSI_WEB_INTERNAL_URL: 'http://jitsi-web' },
+    ];
+    const attesa = { assente: 'assente', 'solo-voce': 'rimovibile', esclusi: 'rimovibile', visibili: 'fissa' };
+    for (const env of casi) {
+      expect(voceNelVideo(env)).toBe(attesa[partecipantiNelVideo(env)]);
+    }
+  });
+});
+
+describe('tracceDisponibili', () => {
+  it('Jitsi esterno o non dichiarato: si presume che il registratore ci sia', () => {
+    expect(tracceDisponibili({})).toBe(true);
+  });
+
+  it('chart con il registratore per partecipante collegato', () => {
+    expect(tracceDisponibili({ ...CHART, RECORDER_CONTROLLER_URL: 'http://recorder-controller:8080' })).toBe(
+      true,
+    );
+  });
+
+  it('il solo Jibri registra il video ma non le tracce', () => {
+    const soloJibri = { ...CHART, JIBRI_HEALTH_URL: 'http://pa-webinar-jitsi-meet-jibri:2222' };
+    expect(recordingAvailable(soloJibri)).toBe(true);
+    expect(tracceDisponibili(soloJibri)).toBe(false);
+  });
+
+  it('un indirizzo vuoto del registratore non conta', () => {
+    expect(tracceDisponibili({ ...CHART, RECORDER_CONTROLLER_URL: '  ' })).toBe(false);
+  });
+});
+
+describe('eventoRegistrabile', () => {
+  const CON_TRACCE = {
+    recordingEnabled: true,
+    aiTranscriptEnabled: true,
+    multitrackRecordingEnabled: true,
+  };
+  const SENZA_TRACCE = { ...CON_TRACCE, multitrackRecordingEnabled: false };
+  const ambiente = {
+    registrazioneDisponibile: true,
+    partecipanti: 'assente' as const,
+    tracceDisponibili: true,
+  };
+
+  it('senza video e senza tracce non si registra niente', () => {
+    expect(eventoRegistrabile(SENZA_TRACCE, ambiente)).toBe(false);
+    expect(eventoRegistrabile({ ...CON_TRACCE, aiTranscriptEnabled: false }, ambiente)).toBe(false);
+    expect(eventoRegistrabile(CON_TRACCE, { ...ambiente, tracceDisponibili: false })).toBe(false);
+  });
+
+  it('senza video le tracce bastano', () => {
+    expect(eventoRegistrabile(CON_TRACCE, ambiente)).toBe(true);
+  });
+
+  it.each(['solo-voce', 'esclusi', 'visibili'] as const)('con un video (%s) non servono le tracce', (partecipanti) => {
+    expect(eventoRegistrabile(SENZA_TRACCE, { ...ambiente, partecipanti })).toBe(true);
+  });
+
+  it("senza nulla che registri non basta l'evento", () => {
+    expect(
+      eventoRegistrabile(CON_TRACCE, { ...ambiente, registrazioneDisponibile: false }),
+    ).toBe(false);
+  });
+
+  it("recordingAvailableFor legge l'ambiente", () => {
+    const soloRegistratore = { ...CHART, RECORDER_CONTROLLER_URL: 'http://recorder' };
+    expect(recordingAvailableFor(SENZA_TRACCE, soloRegistratore)).toBe(false);
+    expect(recordingAvailableFor(CON_TRACCE, soloRegistratore)).toBe(true);
+    expect(recordingAvailableFor(SENZA_TRACCE, {})).toBe(true);
   });
 });

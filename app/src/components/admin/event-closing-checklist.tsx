@@ -138,14 +138,17 @@ export default function EventClosingChecklist({
         if (v.caso === 'prontaSottotitoli' && conTrascrizioneDaiSottotitoli) {
           return pulsante(t('azioni.rivedi'), () => vaiA(ANCORE_CHIUSURA.trascrizione));
         }
-        // L'editor della trascrizione vive con la registrazione: ci entra lo
-        // staff, e il ritorno riporta qui.
+        // La pagina della registrazione ha l'editor della trascrizione e la
+        // conferma per avviarla: ci entra lo staff, e il ritorno riporta qui.
         return staff && v.recordingId ? (
           <Link
             href={percorso(`/admin/postprod/${v.recordingId}`)}
             className="btn btn-outline-primary btn-sm"
+            aria-label={
+              v.caso === 'daConfermare' ? `${t('azioni.apri')}: ${nomeVoce}` : undefined
+            }
           >
-            {t('azioni.rivedi')}
+            {v.caso === 'daConfermare' ? t('azioni.apri') : t('azioni.rivedi')}
           </Link>
         ) : (
           pulsante(t('azioni.apri'), () => vaiA(ANCORE_CHIUSURA.ai))

@@ -28,6 +28,20 @@ const templateSchema = z.object({
   wordCloudEnabled: z.boolean().optional(),
   // La pagina dopo l'evento e' pubblica? (Event.postEventPublic)
   postEventPublic: z.boolean().optional(),
+  // Le domande restano su quella pagina (Event.postEventShowQA).
+  postEventShowQA: z.boolean().optional(),
+  // Dove va il video degli eventi creati dal modello. null = lo sceglie chi crea
+  // l'evento (Event.recordingDestination).
+  recordingDestination: z.enum(['PUBLIC', 'REGISTRANTS']).nullish(),
+  // Il modulo d'iscrizione propone la rubrica (Event.offerAddressBook).
+  offerAddressBook: z.boolean().optional(),
+  // Chi partecipa compare con uno pseudonimo (Event.audienceAnonymous).
+  audienceAnonymous: z.boolean().optional(),
+  // Chi partecipa puo' usare un nickname anche dove l'elenco si vede
+  // (Event.nicknamesEnabled; dove e' nascosto lo e' comunque, di partenza).
+  nicknamesEnabled: z.boolean().optional(),
+  // Chi conduce e' sempre nella registrazione (Event.hostsAlwaysRecorded).
+  hostsAlwaysRecorded: z.boolean().optional(),
   whiteboardEnabled: z.boolean().optional(),
   // I sottotitoli live degli eventi creati dal modello (Event.liveCaptionsEnabled).
   liveCaptionsEnabled: z.boolean().optional(),
@@ -53,6 +67,9 @@ const templateSchema = z.object({
   aiTargetLocales: z.string().max(200).nullish(),
   descriptionTemplate: z.record(z.string(), z.string()).nullish(),
   defaultRetentionDays: z.number().int().min(1).max(MAX_RETENTION_DAYS).nullish(),
+  // La durata della registrazione degli eventi creati dal modello
+  // (Event.recordingDeleteAfterDays). null = nessuna cancellazione automatica.
+  recordingDeleteAfterDays: z.number().int().min(1).max(365).nullish(),
   defaultExpectedSpeakers: z.number().int().min(1).max(30).nullish(),
   // Matrice ruolo × funzione (lib/utils/permission-matrix.ts). Facoltativa:
   // se c'è, precompila il passo «Permessi» del wizard; se manca, il wizard la
@@ -188,8 +205,9 @@ export const DELETE = withErrorHandling(async (request: NextRequest) => {
   }
   // System (seeded) templates are deletable too: an admin curating the
   // template list for their PA must be able to remove the generic demos.
-  // Deleting a template is non-destructive to existing events (events copy
-  // the template's values at creation; they don't reference it afterwards).
+  // Deleting a template is non-destructive to existing events: they copy the
+  // template's values at creation, and their catalogue reference
+  // (Event.templateId) goes to NULL while the template name they took stays.
   // Note: on local dev the seed re-creates the system templates; test/prod
   // run `migrate deploy` only, so the deletion persists there.
   await prisma.eventTemplate.delete({ where: { id } });

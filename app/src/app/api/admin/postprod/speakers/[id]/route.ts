@@ -18,7 +18,7 @@ import { z } from 'zod';
 import { cookies } from 'next/headers';
 
 import { parseJsonBody, withErrorHandling } from '@/lib/api-handler';
-import { requireSpeakerManager } from '@/lib/auth/staff-session';
+import { requireSpeakerContent } from '@/lib/recording/content-access';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { ForbiddenError, NotFoundError } from '@/lib/errors';
@@ -36,8 +36,9 @@ const bodySchema = z.object({
 
 export const PUT = withErrorHandling(async (request, context) => {
   const { id } = (await (context as { params: Promise<{ id: string }> }).params);
-  // Dell'evento della registrazione: l'admin o chi l'ha creato (ADR-014).
-  const session = await requireSpeakerManager(await cookies(), id);
+  // Il nome dato a una voce e' contenuto della registrazione: solo chi organizza
+  // l'evento (lib/recording/content-access), non l'admin che non lo organizza.
+  const { session } = await requireSpeakerContent(await cookies(), id, 'relatori');
   const parsed = bodySchema.parse(await parseJsonBody(request));
   // Collegare un relatore a una persona significa leggere la rubrica, che e'
   // dell'amministrazione: l'organizzatore rinomina, non collega (ADR-014).

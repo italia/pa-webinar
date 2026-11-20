@@ -79,6 +79,14 @@ one you run and the one you target. Releases follow semantic versioning; while t
 0, a minor release can change chart values and behavior. The GitHub Release also carries the SBOMs
 and the packaged chart.
 
+Some behavior changes are tied to the events that exist at the moment of the upgrade. For example,
+the release that separated the recording from the participants' data marks, in its migration, every
+event that is not a draft, so that a recording of those events that is not published still goes with
+the participants' data as their registrants were told; events created afterwards follow the new rule
+([Recording retention](../GDPR.md#recording-retention)). Such a migration runs once, at the upgrade
+that introduces it: events restored later from an older backup and migrated again are marked in the
+same way.
+
 Some behavior changes need no migration and no new value, yet change what the public sees on events
 that are already published: for example, which event materials a public page lists before the start.
 The release notes flag them. After such an upgrade, check the upcoming events with their organizers.
@@ -582,8 +590,12 @@ The room-role wiring is such a change: Prosody's module volume and `XMPP_MUC_MOD
 ([Server-side role enforcement](../architecture/jitsi-integration.md#server-side-role-enforcement)).
 The upgrade that first brings them to an installation restarts Prosody and Jicofo, and calls in
 progress drop: run it outside events. Adding a module to `XMPP_MUC_MODULES`, as the upgrade that
-brings `pa_media_lock` does, is the same kind of change. A later change to a module file alone does
-not restart Prosody; restart its StatefulSet when no call is running. A values file that sets its own
+brings `pa_media_lock` does, is the same kind of change. A change to a module file alone does not
+change Prosody's checksums: the chart's post-upgrade hook (`configReloadHook`) compares a fingerprint
+of the module files with the one it stored on the StatefulSet and restarts Prosody when they differ,
+which drops the calls in progress. Who appears in the recording depends on those modules, so run such
+an upgrade outside events; with `configReloadHook.enabled: false`, restart Prosody's StatefulSet
+yourself before the next event. A values file that sets its own
 `XMPP_MUC_MODULES` keeps its list: add `pa_media_lock` to it, or participant limits stay enforced only
 by the room's toolbar.
 

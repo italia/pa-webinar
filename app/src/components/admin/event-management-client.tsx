@@ -75,6 +75,7 @@ import CollapsibleSection from './collapsible-section';
 import EventLinksSection from './event-links-section';
 import CopyButton from './copy-button';
 import StatusBadge from './status-badge';
+import { durataEffettiva } from '@/lib/recording/legacy-retention';
 
 // ── Palette ──
 const C_PRIMARY = 'var(--app-primary)';
@@ -142,7 +143,7 @@ function Svg({ name, size = 16 }: { name: IconName; size?: number }) {
 
 // ── Types ──
 interface Registration {
-  id: string; displayName: string; organization: string | null;
+  id: string; displayName: string; nickname?: string | null; organization: string | null;
   organizationRole: string | null; organizationType: string | null;
   joinedAt: string | null; createdAt: string;
 }
@@ -177,9 +178,14 @@ interface EventData {
   parseTitleKicker: boolean | null;
   expectedSenderRatioPct: number | null;
   recordingUrl: string | null; tempRecordingUrl: string | null; tempRecordingStartedAt: string | null;
+  /** Chi guarda apre il video dalla rotta dell'app (lib/recording/audience). */
+  recordingPlayable?: boolean;
   recordingPublished: boolean; recordingPublishedAt: string | null;
   recordingAudience: 'PUBLIC' | 'REGISTRANTS';
+  recordingDestination: 'PUBLIC' | 'REGISTRANTS' | null;
   recordingFileSize: number | null; recordingDuration: number | null; recordingDeleteAfterDays: number | null;
+  /** Evento nato prima che la registrazione si separasse dai dati (lib/recording/legacy-retention). */
+  legacyRecordingRetention?: boolean;
   youtubeUrl: string | null; libraryListed: boolean; hasRecordingRow: boolean;
   /** La registrazione del video dell'evento, quando in sala si è presentato un
    *  PDF: le sue slide sincronizzate si regolano dalla post-produzione. */
@@ -227,6 +233,11 @@ interface EventManagementClientProps {
   /** La traduzione automatica di titolo e descrizione c'e' nell'installazione:
    *  la panoramica ne mostra lo stato (solo allo staff). */
   textTranslationAvailable?: boolean;
+  /** Chi guarda e' l'admin dell'istanza e non organizza l'evento: lo governa
+   *  (stato, metadati, consensi, archivio) ma non lo conduce. Niente link di
+   *  conduzione, e niente contenuto delle registrazioni
+   *  (lib/recording/content-access). */
+  governo?: boolean;
 }
 
 // Le schede sono cinque e stanno in una riga sola anche su un telefono: oltre,
@@ -257,7 +268,7 @@ function tagChipStyle(color: string | null): CSSProperties {
 // ── Main component ──
 export default function EventManagementClient({
   event, baseUrl, locale, kickerEnabled, guestEntryOpen = true, renderedAt, viaToken = null,
-  textTranslationAvailable = false,
+  textTranslationAvailable = false, governo = false,
 }: EventManagementClientProps) {
   const t = useTranslations('admin');
   const td = useTranslations('admin.eventDetail');
@@ -355,11 +366,9 @@ export default function EventManagementClient({
   // riconosce direttamente, senza passare da una redirezione.
   const publicUrl = localizedUrl(baseUrl, `/events/${event.slug}`, locale);
   const guestLiveUrl = localizedUrl(baseUrl, `/events/${event.slug}/live`, locale);
-  const moderatorUrl = localizedUrl(
-    baseUrl,
-    `/admin/events/${event.id}?token=${event.moderatorToken}`,
-    locale,
-  );
+  const moderatorUrl = governo
+    ? null
+    : localizedUrl(baseUrl, `/admin/events/${event.id}?token=${event.moderatorToken}`, locale);
   const liveModeratorUrl = `/events/${event.slug}/live?token=${event.moderatorToken}`;
   const editUrl = eventAdminPath(event.id, { edit: true, viaToken });
   // La modifica aperta sul passo che riguarda cio' che si sta guardando.
@@ -379,7 +388,9 @@ export default function EventManagementClient({
   const promemoriaModificabili = !isInstant && (status === 'DRAFT' || status === 'PUBLISHED');
   const eventoOra = { ...event, status, ...paginaPostEvento };
   const ingressoPartecipante = participantEntry(eventoOra, guestEntryOpen, istante);
-  const entraModeratore = moderatorRoomOpen(eventoOra, istante);
+  // Si entra da moderatore con il link di conduzione: chi governa soltanto non
+  // lo ha.
+  const entraModeratore = !governo && moderatorRoomOpen(eventoOra, istante);
   const publicPageVisible = isEventPageVisible(eventoOra, istante);
   // Il link in cima: la pagina pubblica o, per una chiamata rapida, l'invito
   // alla sala finche' funziona (lo stesso dell'elenco delle chiamate). Una
@@ -517,6 +528,7 @@ export default function EventManagementClient({
   const exportCsv = useCallback(() => {
     const headers = [
       tReg('colName'),
+      tReg('colNickname'),
       tReg('colOrg'),
       tReg('colRole'),
       tReg('colOrgType'),
@@ -525,6 +537,7 @@ export default function EventManagementClient({
     ];
     const rows = event.registrations.map((r) => [
       r.displayName,
+      r.nickname ?? '',
       r.organization ?? '',
       r.organizationRole ?? '',
       r.organizationType ? orgTypeLabel(r.organizationType) : '',
@@ -544,7 +557,7 @@ export default function EventManagementClient({
   // Live peak-count poll when LIVE.
   const [liveCount, setLiveCount] = useState<number | null>(null);
   useEffect(() => {
-    if (status !== 'LIVE') { setLiveCount(null); return; }
+    if (status !== 'LIVE' || governo) { setLiveCount(null); return; }
     let cancelled = false;
     const poll = async () => {
       try {
@@ -560,7 +573,7 @@ export default function EventManagementClient({
     poll();
     const i = setInterval(poll, 15_000);
     return () => { cancelled = true; clearInterval(i); };
-  }, [status, event.slug, event.moderatorToken]);
+  }, [status, event.slug, event.moderatorToken, governo]);
 
   const coverBg = event.coverImageUrl ?? event.imageUrl ?? null;
   const firstLetter = (title || '?').trim().charAt(0).toUpperCase();
@@ -715,6 +728,13 @@ export default function EventManagementClient({
         </div>
       </div>
 
+      {governo && (
+        <div className="alert alert-info mb-3" role="note">
+          <strong className="d-block mb-1">{td('governance.title')}</strong>
+          {td('governance.body')}
+        </div>
+      )}
+
       {feedback && (
         <div className="mb-3 p-3 rounded d-flex align-items-center gap-2"
              style={{ background: '#e6f4ea', color: '#0c5a2a', border: '1px solid #c2e3cc' }}>
@@ -775,12 +795,13 @@ export default function EventManagementClient({
             {activeTab === 'persone' && (
               <PeopleTab event={event} baseUrl={baseUrl} locale={locale} onExportCsv={exportCsv}
                          canEditRegistrations={!viaToken} isDraft={status === 'DRAFT'}
+                         governo={governo}
                          linksMailable={!['DRAFT', 'ENDED', 'ARCHIVED'].includes(status)}
                          editPeopleHref={editUrlAt('invites')} />
             )}
             {activeTab === 'contenuti' && <ContentTab event={event} staffTools={!viaToken} />}
             {activeTab === 'dopo' && (
-              <PostEventTab event={event} status={status} viaToken={viaToken}
+              <PostEventTab event={event} status={status} viaToken={viaToken} governo={governo}
                             onMateriali={() => scegliScheda('contenuti')}
                             paginaPostEvento={paginaPostEvento}
                             onPaginaPostEvento={(patch) =>
@@ -802,14 +823,14 @@ export default function EventManagementClient({
                 {/* Un'azione principale per stato: in bozza pubblicare, in
                     diretta terminare, a evento concluso archiviare. Le altre
                     restano, in secondo piano. */}
-                {status === 'DRAFT' && (
+                {status === 'DRAFT' && !governo && (
                   <button type="button"
                           className="btn btn-primary d-flex align-items-center justify-content-center gap-2"
                           onClick={togglePublish} disabled={updating}>
                     {t('publish')}
                   </button>
                 )}
-                {status === 'LIVE' && (
+                {status === 'LIVE' && !governo && (
                   <button type="button"
                           className="btn btn-outline-danger d-flex align-items-center justify-content-center gap-2"
                           onClick={endEvent} disabled={updating}>
@@ -823,7 +844,7 @@ export default function EventManagementClient({
                     {t('archive')}
                   </button>
                 )}
-                {status === 'ARCHIVED' && (
+                {status === 'ARCHIVED' && !governo && (
                   <button type="button"
                           className="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2"
                           onClick={unarchiveEvent} disabled={updating}>
@@ -832,11 +853,13 @@ export default function EventManagementClient({
                 )}
                 {/* Pubblicato, l'azione principale e' modificare: le altre
                     (ritirare, duplicare) restano in secondo piano. */}
+                {!governo && (
                 <Link href={percorso(editUrl)}
                       className={`btn ${status === 'PUBLISHED' ? 'btn-primary' : 'btn-outline-primary'} d-flex align-items-center justify-content-center gap-2`}>
                   <Svg name="pencil" size={14} /> {td('editEvent')}
                 </Link>
-                {status === 'PUBLISHED' && (
+                )}
+                {status === 'PUBLISHED' && !governo && (
                   <button type="button" className="btn btn-outline-warning"
                           onClick={togglePublish} disabled={updating}>
                     {t('unpublish')}
@@ -910,7 +933,7 @@ export default function EventManagementClient({
                 <div style={EYEBROW}>{tr('title')}</div>
                 {/* Si scelgono prima dell'evento: in diretta o dopo non
                     partirebbero; una chiamata rapida non ne manda. */}
-                {promemoriaModificabili && (
+                {promemoriaModificabili && !governo && (
                   <button type="button" className="btn btn-link btn-sm p-0"
                           aria-expanded={modificaPromemoria} aria-controls="modifica-promemoria"
                           onClick={() => setModificaPromemoria((v) => !v)}>
@@ -1114,7 +1137,9 @@ function OverviewTab({
 }: {
   event: EventData; description: string;
   editUrlAt: (step: WizardStep, section?: WizardAdvancedSection) => string;
-  publicUrl: string | null; guestLiveUrl: string | null; moderatorUrl: string;
+  publicUrl: string | null; guestLiveUrl: string | null;
+  /** Null per chi governa soltanto l'evento: non ha il link di conduzione. */
+  moderatorUrl: string | null;
   instant: boolean;
   /** Lo stato della traduzione automatica di titolo e descrizione. */
   textTranslation: boolean;
@@ -1204,7 +1229,7 @@ function OverviewTab({
             ...(guestLiveUrl
               ? [{ chiave: instant ? ('callInvite' as const) : ('guestJoin' as const), url: guestLiveUrl }]
               : []),
-            { chiave: 'moderatorLink', url: moderatorUrl, riservato: true },
+            ...(moderatorUrl ? [{ chiave: 'moderatorLink' as const, url: moderatorUrl, riservato: true }] : []),
           ]}
         />
       </div>
@@ -1274,8 +1299,10 @@ function OverviewTab({
   );
 }
 
-function PeopleTab({ event, baseUrl, locale, onExportCsv, canEditRegistrations, isDraft, linksMailable, editPeopleHref }: {
+function PeopleTab({ event, baseUrl, locale, onExportCsv, canEditRegistrations, isDraft, linksMailable, editPeopleHref, governo = false }: {
   event: EventData; baseUrl: string; locale: string; onExportCsv: () => void;
+  /** Chi governa soltanto: i link delle persone in sala sono di chi conduce. */
+  governo?: boolean;
   /** In bozza i link di co-moderatori e relatori partono alla pubblicazione. */
   isDraft: boolean;
   /** Il portale manda i link per email (non in bozza, non a evento finito). */
@@ -1340,6 +1367,7 @@ function PeopleTab({ event, baseUrl, locale, onExportCsv, canEditRegistrations, 
         )}
       </section>
 
+      {!governo && (
       <div className="mb-4">
         <H>{t('coModerators.title')}</H>
         <EventModeratorsPanel eventId={event.id} eventSlug={event.slug}
@@ -1349,6 +1377,7 @@ function PeopleTab({ event, baseUrl, locale, onExportCsv, canEditRegistrations, 
                               canResend={linksMailable}
                               onChange={() => router.refresh()} />
       </div>
+      )}
 
       {/* Gli invitati: la rotta e' dello staff, non del link del moderatore. */}
       {canEditRegistrations && (
@@ -1417,7 +1446,15 @@ function PeopleTab({ event, baseUrl, locale, onExportCsv, canEditRegistrations, 
                   return (
                     <tr key={reg.id}>
                       <td style={{ color: C_MUTED }}>{i + 1}</td>
-                      <td className="fw-semibold">{reg.displayName}</td>
+                      <td className="fw-semibold">
+                        {reg.displayName}
+                        {/* Il nickname con cui la persona compare agli altri. */}
+                        {reg.nickname && (
+                          <div className="fw-normal" style={{ color: C_MUTED, fontSize: '0.8rem' }}>
+                            {t('registrations.nicknameShown', { nickname: reg.nickname })}
+                          </div>
+                        )}
+                      </td>
                       {event.requireOrganization && (
                         <td style={{ color: C_MUTED }}>{reg.organization ?? '—'}</td>
                       )}
@@ -1539,8 +1576,11 @@ function ContentTab({ event, staffTools }: { event: EventData; staffTools: boole
   );
 }
 
-function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, viaToken, onMateriali }: {
+function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, viaToken, onMateriali, governo = false }: {
   event: EventData; status: string; viaToken: string | null;
+  /** Chi governa soltanto: della registrazione vede i metadati, non il
+   *  contenuto ne' le scelte che lo espongono (lib/recording/content-access). */
+  governo?: boolean;
   onMateriali: () => void;
   paginaPostEvento: PostEventVisibility;
   onPaginaPostEvento: (patch: Partial<PostEventVisibility>) => void;
@@ -1557,6 +1597,8 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
   const locale = useLocale();
   const format = useFormatter();
   const isEnded = status === 'ENDED' || status === 'ARCHIVED';
+  // La durata che vale davvero, con il limite degli eventi nati prima della regola.
+  const durataGoverno = durataEffettiva(event);
 
   // Colore della pastiglia dell'azione nel registro GDPR.
   const actionColor = (action: string) => {
@@ -1582,7 +1624,11 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
     try {
       const res = await avviaPipeline(`/api/admin/events/${event.id}/generate-ai`, { summary: true });
       if (!res) return;
-      const data = (await res.json().catch(() => ({}))) as { enqueued?: number; code?: string };
+      const data = (await res.json().catch(() => ({}))) as {
+        enqueued?: number;
+        tracksPending?: boolean;
+        code?: string;
+      };
       if (!res.ok) {
         setAiGenMsg({
           ok: false,
@@ -1595,10 +1641,8 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
           ),
         });
       } else {
-        setAiGenMsg({
-          ok: true,
-          text: (data.enqueued ?? 0) > 0 ? td('aiGenerateQueued') : td('aiGenerateAlready'),
-        });
+        const accodati = (data.enqueued ?? 0) > 0 ? td('aiGenerateQueued') : td('aiGenerateAlready');
+        setAiGenMsg({ ok: true, text: data.tracksPending ? tApi('tracksPending') : accodati });
       }
     } catch {
       setAiGenMsg({ ok: false, text: td('aiGenerateError') });
@@ -1610,13 +1654,47 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
   // Il file video: riprodurlo, scaricarlo, pubblicarlo, cancellarlo. A
   // evento concluso e' la prima cosa da fare, e sta in cima.
   const registrazioneInCima = status === 'ENDED' || status === 'ARCHIVED';
-  const bloccoRegistrazione = (
+  // Chi governa soltanto vede che la registrazione c'e' e com'e', non il file:
+  // riprodurla, pubblicarla o cancellarla e' di chi organizza l'evento.
+  const bloccoRegistrazione = governo ? (
+      <div className="mb-4" id={ANCORE_CHIUSURA.registrazione} tabIndex={-1}>
+        <H>{td('recordingSection')}</H>
+        <div className="alert alert-info mb-3" role="note" style={{ fontSize: '0.88rem' }}>
+          {td('governance.recording')}
+        </div>
+        <dl className="mb-0">
+        <KV label={td('governance.recordingFile')}
+            value={event.recordingUrl ? td('governance.present') : td('governance.absent')} />
+        {event.recordingUrl && (
+          <>
+            <KV label={td('governance.recordingPublished')}
+                value={event.recordingPublished ? td('governance.yes') : td('governance.no')} />
+            {event.recordingDuration != null && (
+              <KV label={td('governance.recordingDuration')}
+                  value={format.number(Math.round(event.recordingDuration / 60), { style: 'unit', unit: 'minute' })} />
+            )}
+            {event.recordingFileSize != null && (
+              <KV label={td('governance.recordingSize')}
+                  value={format.number(event.recordingFileSize / 1024 / 1024, { maximumFractionDigits: 0, style: 'unit', unit: 'megabyte' })} />
+            )}
+          </>
+        )}
+        {/* Quanto dura la registrazione: un metadato, che sceglie chi organizza. */}
+        <KV label={td('governance.recordingRetention')}
+            value={durataGoverno
+              ? td('governance.recordingRetentionDays', { days: durataGoverno })
+              : td('governance.recordingRetentionNone')} />
+        </dl>
+      </div>
+  ) : (
       <div className="mb-4" id={ANCORE_CHIUSURA.registrazione} tabIndex={-1}>
         <H>{td('recordingSection')}</H>
         <RecordingManagement
           event={{
             id: event.id, slug: event.slug, status,
+            eventType: event.eventType,
             recordingEnabled: event.recordingEnabled,
+            recordingDestination: event.recordingDestination,
             recordingUrl: event.recordingUrl,
             tempRecordingUrl: event.tempRecordingUrl,
             tempRecordingStartedAt: event.tempRecordingStartedAt,
@@ -1626,8 +1704,11 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
             recordingFileSize: event.recordingFileSize,
             recordingDuration: event.recordingDuration,
             recordingDeleteAfterDays: event.recordingDeleteAfterDays,
+            legacyRecordingRetention: event.legacyRecordingRetention,
+            dataRetentionDays: event.dataRetentionDays,
             moderatorToken: event.moderatorToken,
           }}
+          riproducibile={event.recordingPlayable ?? true}
           slidesRecordingId={event.slidesRecordingId ?? null}
         />
       </div>
@@ -1649,6 +1730,7 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
       {/* Cosa succede dopo l'evento: prima le regole — pagina pubblica,
           libreria, feedback — e poi cio' che ne e' uscito. Decisione e
           risultato si leggono nello stesso posto. */}
+      {!governo && (
       <div id={ANCORE_CHIUSURA.pagina} tabIndex={-1}>
         <H>{td('postEventTitle')}</H>
         {/* I valori correnti, non quelli del caricamento: la scheda si
@@ -1660,6 +1742,8 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
             postEventPublic: paginaPostEvento.postEventPublic,
             postEventPublicUntil: paginaPostEvento.postEventPublicUntil,
             libraryListed: event.libraryListed,
+            recordingDestination: event.recordingDestination,
+            recordingAudience: event.recordingAudience,
             hasPlayableRecording:
               (event.recordingPublished && !!event.recordingUrl) || !!event.youtubeUrl,
             postEventShowQA: event.postEventShowQA,
@@ -1676,10 +1760,11 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
           }}
         />
       </div>
+      )}
 
       {/* Cosa e' successo in sala, da rivedere a evento finito: subito dopo
           le regole su cosa la pagina pubblica mostra. */}
-      {isEnded && (
+      {isEnded && !governo && (
         <div className="mb-4" id={ANCORE_CHIUSURA.sala} tabIndex={-1}>
           <H>{trr('title')}</H>
           <EventRoomReview
@@ -1728,7 +1813,7 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
         {isEnded ? (
           <div className="d-flex flex-column gap-2">
             <div className="d-flex flex-wrap gap-2">
-              {hasRecording && (
+              {hasRecording && !governo && (
                 <button
                   type="button"
                   className="btn btn-primary d-inline-flex align-items-center gap-2"
@@ -1770,7 +1855,7 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
 
       {/* La trascrizione dai sottotitoli live, se l'evento la tiene: si legge
           e si pubblica anche senza video e senza pipeline AI. */}
-      {event.captionsTranscriptEnabled && (
+      {event.captionsTranscriptEnabled && !governo && (
         <div className="mb-4" id={ANCORE_CHIUSURA.trascrizione} tabIndex={-1}>
           <H>{tct('title')}</H>
           <CaptionsTranscriptPanel
@@ -1796,11 +1881,13 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
           e' collegato, quando, per quanto. Stanno qui perche' si leggono dopo,
           insieme al video e alla trascrizione. */}
       <div className="mt-4">
+        {!governo && (
         <div className="mb-4">
           <H>{td('callSessions')}</H>
           <CallSessionsPanel eventId={event.id} eventSlug={event.slug}
                              moderatorToken={event.moderatorToken} />
         </div>
+        )}
 
         {/* Le prove dei consensi, con i nomi: solo per lo staff. */}
         {!viaToken && (

@@ -74,3 +74,53 @@ describe('PostEventTabs — sondaggi', () => {
     expect(prima.getAttribute('aria-valuetext')).toMatch(/^3 voti, 25\s?%$/);
   });
 });
+
+describe('PostEventTabs — domande', () => {
+  const domanda = (over: Record<string, unknown> = {}) => ({
+    id: 'q1',
+    text: 'Testo della domanda?',
+    answerText: null,
+    upvotes: 4,
+    status: 'HIGHLIGHTED',
+    ...over,
+  });
+
+  function disegnaDomande(questions: ReturnType<typeof domanda>[]) {
+    act(() => {
+      root.render(
+        <NextIntlClientProvider locale="it" messages={messaggiIt}>
+          <PostEventTabs
+            questions={questions}
+            materials={[]}
+            polls={[]}
+            feedback={null}
+            showQA
+            showMaterials={false}
+            showPolls={false}
+            showFeedback={false}
+          />
+        </NextIntlClientProvider>
+      );
+    });
+  }
+
+  it('mostra il testo e i voti, senza nomi', () => {
+    // Una riga con il nome, come se il server lo mandasse: non deve arrivare a schermo.
+    disegnaDomande([domanda({ authorName: 'Anna Rossi' })]);
+    expect(container.textContent).toContain('Testo della domanda?');
+    expect(container.textContent).toContain('4');
+    expect(container.textContent).not.toContain('Anna Rossi');
+  });
+
+  it('senza il segno di risposta non lascia un blocco vuoto', () => {
+    disegnaDomande([domanda()]);
+    expect(container.querySelector('.text-muted')).toBeNull();
+  });
+
+  it('il segno di risposta non resta rientrato sul nulla', () => {
+    disegnaDomande([domanda({ status: 'ANSWERED' })]);
+    const blocco = container.querySelector('.text-muted');
+    expect(blocco?.textContent).toBe(messaggiIt.qa.status.ANSWERED);
+    expect(blocco?.querySelector('.ms-2')).toBeNull();
+  });
+});

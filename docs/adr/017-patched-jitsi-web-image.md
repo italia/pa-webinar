@@ -143,13 +143,14 @@ describes [the workflow](../../infra/jitsi-web-patched/README.md#the-workflow) s
 
 ### Bumping Jitsi is a tag change plus a real call
 
-- The upstream build appears in three values that move together:
-  - the `BASE_TAG` default in `infra/jitsi-web-patched/Dockerfile`, which local builds use;
-  - `BASE_TAG` in `.github/workflows/jitsi-web.yml`, which the workflow passes as a build argument
-    and which overrides the Dockerfile default;
-  - `BASE_IMAGE` in the same workflow, which the checks compare against.
+- The upstream build is written in one place: the `BASE_TAG` and `BASE_DIGEST` defaults in
+  `infra/jitsi-web-patched/Dockerfile`, which local builds and the workflow both use. The base is
+  pulled by digest, so the tag alone does not select it: overriding `BASE_TAG` without `BASE_DIGEST`
+  builds on the old base. The workflow stops if the tag no longer points to that digest upstream, and
+  derives from them the `BASE_IMAGE` its checks compare against.
 
-  A new `IMAGE_TAG` goes with them.
+  A new `IMAGE_TAG` in `.github/workflows/jitsi-web.yml` goes with them. The workflow never republishes
+  an existing tag with different content.
 - When every assertion passes, the bump needs no code change. When one fails, the maintainer finds
   out whether upstream changed the shape or fixed the defect. A fixed defect loses its patch, and a
   changed shape gets a new pattern. An assertion is never loosened to make the build pass.
@@ -168,12 +169,13 @@ describes [the workflow](../../infra/jitsi-web-patched/README.md#the-workflow) s
 
 - The repository is separate from the app image. Tags name the upstream build they were made from, in
   the form `stable-<jitsi-build>-rnnoise`. A revision suffix such as `-r2` is added when the patches
-  change on the same upstream build. Because the workflow pushes whatever `IMAGE_TAG` says, every
-  patch change must come with a new, never-pushed value in the same commit. Reusing a value
-  overwrites the previous image and leaves no rollback target.
+  change on the same upstream build. Every patch change must come with a new, never-pushed value in
+  the same commit: the workflow never rewrites a published tag with different content, so a reused
+  value fails the job before anything is pushed. A rebuild identical to the published image is not
+  pushed at all. A rewritten tag would leave no rollback target.
 - The app's release tags do not version this image, and the release workflow does not build it. An
   installation moves to a new conference image only when its `jitsi-meet.web.image` value changes,
-  or when a tag it uses is overwritten, which the tag rule above forbids. The chart default in
+  or when a tag it uses is overwritten, which the workflow refuses to do. The chart default in
   `infra/helm/pa-webinar/values.yaml` and the workflow's `IMAGE_TAG` are maintained separately and
   can differ. Aligning them is a rollout of the conference image, decided on its own and carried out
   through [upgrades and rollback](../operations/upgrades.md).

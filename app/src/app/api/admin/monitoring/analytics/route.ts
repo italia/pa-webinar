@@ -20,6 +20,7 @@ import { prisma } from '@/lib/db';
 import { UnauthorizedError } from '@/lib/errors';
 import { activeStatusWhere } from '@/lib/status/event-activity';
 import { getLocalized, resolveLocale, type LocalizedField } from '@/lib/utils/locale';
+import { fileDellaSessione } from '@/lib/recording/audience';
 
 export const dynamic = 'force-dynamic';
 
@@ -293,7 +294,11 @@ export const GET = withErrorHandling(async (request) => {
       endedAt: cs.endedAt?.toISOString() ?? null,
       durationSeconds: cs.duration,
       peakParticipants: cs.peakParticipants,
-      recordingUrl: cs.recordingUrl,
+      // Che il file ci sia, con la rotta che lo serve a chi organizza l'evento:
+      // mai l'indirizzo dello storage (lib/recording/content-access).
+      recordingUrl: cs.recordingUrl
+        ? fileDellaSessione(cs.event.slug, cs.id)
+        : null,
       recordingFileSize: cs.recordingFileSize?.toString() ?? null,
       telemetry: cs.telemetry as Record<string, unknown>,
     })),

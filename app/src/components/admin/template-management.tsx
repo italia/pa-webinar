@@ -21,6 +21,8 @@ import {
 import { Icon } from '@/components/ui/icon';
 import ToggleSwitch from '@/components/ui/toggle-switch';
 import { useConfirm } from '@/components/ui/confirm-dialog';
+import RecordingRetentionSelect from '@/components/admin/recording-retention-select';
+import type { Destinazione } from '@/lib/recording/destination';
 import { MAX_RETENTION_DAYS } from '@/lib/validation/retention';
 
 interface SerializedTemplate {
@@ -35,6 +37,12 @@ interface SerializedTemplate {
   whiteboardEnabled: boolean;
   liveCaptionsEnabled: boolean;
   postEventPublic: boolean;
+  postEventShowQA: boolean;
+  offerAddressBook: boolean;
+  audienceAnonymous: boolean;
+  nicknamesEnabled: boolean;
+  hostsAlwaysRecorded: boolean;
+  recordingDestination: Destinazione;
   waitingRoomEngine: 'GARDEN' | 'GAME' | 'CLASSIC' | null;
   recordingEnabled: boolean;
   participantsCanUnmute: boolean;
@@ -50,11 +58,14 @@ interface SerializedTemplate {
   retainParticipantTracks: boolean;
   descriptionTemplate: Record<string, string> | null;
   defaultRetentionDays: number | null;
+  recordingDeleteAfterDays: number | null;
   defaultExpectedSpeakers: number | null;
   isSystem: boolean;
   sortOrder: number;
   createdAt: string;
   updatedAt: string;
+  /** Quanti eventi sono nati da questo modello (Event.templateId). */
+  eventCount?: number;
 }
 
 interface TemplateManagementProps {
@@ -78,6 +89,13 @@ interface EditingTemplate {
   whiteboardEnabled: boolean;
   liveCaptionsEnabled: boolean;
   postEventPublic: boolean;
+  postEventShowQA: boolean;
+  offerAddressBook: boolean;
+  audienceAnonymous: boolean;
+  nicknamesEnabled: boolean;
+  hostsAlwaysRecorded: boolean;
+  /** Null: la sceglie chi crea l'evento. */
+  recordingDestination: Destinazione;
   waitingRoomEngine: 'GARDEN' | 'GAME' | 'CLASSIC' | null;
   recordingEnabled: boolean;
   participantsCanUnmute: boolean;
@@ -99,6 +117,7 @@ interface EditingTemplate {
   /** L'italiano com'era all'apertura. */
   descriptionTemplateItOriginal: string;
   defaultRetentionDays: number | null;
+  recordingDeleteAfterDays: number | null;
   defaultExpectedSpeakers: number | null;
 }
 
@@ -117,6 +136,13 @@ const DEFAULT_NEW: EditingTemplate = {
   // Come sugli eventi: i sottotitoli sono accesi finche' non li si spegne.
   liveCaptionsEnabled: true,
   postEventPublic: true,
+  // Come sugli eventi: valgono le colonne, finche' il modello non sceglie.
+  postEventShowQA: true,
+  offerAddressBook: true,
+  audienceAnonymous: false,
+  nicknamesEnabled: false,
+  hostsAlwaysRecorded: false,
+  recordingDestination: null,
   waitingRoomEngine: null,
   recordingEnabled: false,
   participantsCanUnmute: false,
@@ -134,6 +160,8 @@ const DEFAULT_NEW: EditingTemplate = {
   descriptionTemplateOther: {},
   descriptionTemplateItOriginal: '',
   defaultRetentionDays: null,
+  // Come sugli eventi: nessuna cancellazione automatica della registrazione.
+  recordingDeleteAfterDays: null,
   defaultExpectedSpeakers: null,
 };
 
@@ -170,6 +198,12 @@ export default function TemplateManagement({
       whiteboardEnabled: tpl.whiteboardEnabled,
       liveCaptionsEnabled: tpl.liveCaptionsEnabled,
       postEventPublic: tpl.postEventPublic,
+      postEventShowQA: tpl.postEventShowQA,
+      offerAddressBook: tpl.offerAddressBook,
+      audienceAnonymous: tpl.audienceAnonymous,
+      nicknamesEnabled: tpl.nicknamesEnabled,
+      hostsAlwaysRecorded: tpl.hostsAlwaysRecorded,
+      recordingDestination: tpl.recordingDestination,
       waitingRoomEngine: tpl.waitingRoomEngine,
       recordingEnabled: tpl.recordingEnabled,
       participantsCanUnmute: tpl.participantsCanUnmute,
@@ -194,6 +228,7 @@ export default function TemplateManagement({
         tpl.defaultRetentionDays == null
           ? null
           : Math.min(tpl.defaultRetentionDays, MAX_RETENTION_DAYS),
+      recordingDeleteAfterDays: tpl.recordingDeleteAfterDays ?? null,
       defaultExpectedSpeakers: tpl.defaultExpectedSpeakers,
     });
     setEditing(tpl.id);
@@ -238,6 +273,7 @@ export default function TemplateManagement({
           maxParticipants: t('maxParticipantsLabel'),
           defaultDurationMinutes: t('durationLabel'),
           defaultRetentionDays: t('retentionLabel'),
+          recordingDeleteAfterDays: t('recordingRetentionLabel'),
           defaultExpectedSpeakers: t('expectedSpeakersLabel'),
           descriptionTemplate: t('descriptionTemplateLabel'),
         };
@@ -259,8 +295,9 @@ export default function TemplateManagement({
           { ...saved, createdAt: saved.createdAt, updatedAt: saved.updatedAt },
         ]);
       } else {
+        // Gli eventi nati dal modello non cambiano salvandolo: il conteggio resta.
         setTemplates((prev) =>
-          prev.map((tpl) => (tpl.id === saved.id ? saved : tpl)),
+          prev.map((tpl) => (tpl.id === saved.id ? { ...saved, eventCount: tpl.eventCount } : tpl)),
         );
       }
       setEditing(null);
@@ -431,6 +468,8 @@ export default function TemplateManagement({
                   </div>
                   <div className="text-muted mb-3" style={{ fontSize: '0.8rem' }}>
                     {t('maxParticipantsLabel')}: {tpl.maxParticipants}
+                    <br />
+                    {t('usedBy', { count: tpl.eventCount ?? 0 })}
                   </div>
                   <div className="mt-auto d-flex gap-2">
                     <Button
@@ -490,6 +529,8 @@ function TemplateForm({
   // Duplicarle sotto `admin.templates` vorrebbe dire due testi da tenere
   // allineati in 24 lingue per la stessa cosa.
   const ta = useTranslations('admin.form');
+  const tw = useTranslations('admin.wizard.step2');
+  const tPost = useTranslations('postEvent');
 
   return (
     <div>
@@ -566,6 +607,23 @@ function TemplateForm({
         />
       </FormGroup>
 
+      {/* La durata della registrazione degli eventi del modello: le stesse
+          scelte del pannello della registrazione. */}
+      <div className="mb-3">
+        <label className="form-label" htmlFor="tpl-recording-retention">
+          {t('recordingRetentionLabel')}
+        </label>
+        <RecordingRetentionSelect
+          id="tpl-recording-retention"
+          value={form.recordingDeleteAfterDays}
+          onChange={(giorni) => setField('recordingDeleteAfterDays', giorni)}
+          describedBy="tpl-recording-retention-help"
+        />
+        <small id="tpl-recording-retention-help" className="form-text text-muted">
+          {t('recordingRetentionHint')}
+        </small>
+      </div>
+
       <FormGroup className="mb-3">
         <Input
           id="tpl-speakers"
@@ -632,6 +690,14 @@ function TemplateForm({
             ['multitrackRecordingEnabled', ta('multitrackRecordingEnabled')],
             ['retainParticipantTracks', ta('retainParticipantTracks')],
             ['postEventPublic', t('postEventPublic')],
+            ['postEventShowQA', tPost('showQA')],
+            ['offerAddressBook', t('offerAddressBook')],
+            ['audienceAnonymous', tw('audienceAnonymous')],
+            // Acceso qui, il nickname si propone anche dove l'elenco si vede;
+            // dove e' nascosto lo e' comunque, di partenza.
+            ['nicknamesEnabled', tw('nicknamesEnabled')],
+            // Chi conduce e' sempre nel video (lib/live/consent-rule): non e'
+            // piu' una scelta, e il modello non la propone.
           ] as const
         )
           // Senza il servizio dei sottotitoli non c'e' niente da scegliere.
@@ -668,6 +734,30 @@ function TemplateForm({
             </div>
           );
         })}
+      </div>
+
+      {/* Dove va il video degli eventi creati dal modello (null = si sceglie
+          creando l'evento). */}
+      <div className="mb-3">
+        <label className="form-label mb-1" htmlFor="tpl-recording-destination">
+          {t('recordingDestination')}
+        </label>
+        <select
+          id="tpl-recording-destination"
+          className="form-select form-select-sm"
+          style={{ maxWidth: 340 }}
+          value={form.recordingDestination ?? ''}
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+            setField(
+              'recordingDestination',
+              e.target.value === '' ? null : (e.target.value as NonNullable<Destinazione>),
+            )
+          }
+        >
+          <option value="">{t('recordingDestinationNone')}</option>
+          <option value="REGISTRANTS">{tw('recordingDestinationReserved')}</option>
+          <option value="PUBLIC">{tw('recordingDestinationPublic')}</option>
+        </select>
       </div>
 
       {/* Motore sala d'attesa pre-popolato nel wizard (null = default sito). */}

@@ -8,7 +8,7 @@
  * solo cio' che lo schema prevede.
  */
 import type { NextRequest } from 'next/server';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { prisma } = vi.hoisted(() => ({
   prisma: {
@@ -19,7 +19,10 @@ const { prisma } = vi.hoisted(() => ({
 }));
 
 vi.mock('@/lib/db', () => ({ prisma }));
-const room = vi.hoisted(() => ({ endpointSenzaRegistrazione: vi.fn() }));
+const room = vi.hoisted(() => ({
+  endpointSenzaRegistrazione: vi.fn(),
+  endpointFuoriDalVideo: vi.fn(),
+}));
 vi.mock('@/lib/captions/room', () => room);
 const jwt = vi.hoisted(() => ({ postoDaTokenSala: vi.fn() }));
 vi.mock('@/lib/auth/jwt', () => jwt);
@@ -60,6 +63,7 @@ beforeEach(() => {
   prisma.callSession.findFirst.mockResolvedValue({ id: 's1', startedAt: INIZIO, dominantSpeakerLog: [] });
   prisma.callSession.update.mockResolvedValue({ id: 's1' });
   room.endpointSenzaRegistrazione.mockResolvedValue([]);
+  room.endpointFuoriDalVideo.mockResolvedValue([]);
   prisma.liveAction.findFirst.mockResolvedValue(null);
   jwt.postoDaTokenSala.mockResolvedValue({ posto: 'reg-1', iscrizioneId: 'r1', listenOnly: false });
 });
@@ -153,6 +157,31 @@ describe('il registro', () => {
     expect(prisma.event.updateMany).toHaveBeenCalledWith({
       where: { id: EVENTO, unrecordedSpeech: false },
       data: { unrecordedSpeech: true },
+    });
+  });
+
+  describe("dove chi partecipa non entra mai nel video ('esclusi')", () => {
+    beforeEach(() => {
+      vi.stubEnv('RECORDING_VOICE_EXCLUSION', 'true');
+      vi.stubEnv('RECORDING_PARTICIPANT_VOICE', '');
+    });
+    afterEach(() => vi.unstubAllEnvs());
+
+    it('la nota vale anche per chi ha acconsentito, e il suo nome resta nel registro', async () => {
+      room.endpointFuoriDalVideo.mockResolvedValue(['con-consenso']);
+      prisma.liveAction.findFirst.mockResolvedValue({ kind: 'recording.started', at: new Date() });
+      await manda({
+        roomToken: 'token-di-sala',
+        events: [{ atMs: 1, participantId: 'con-consenso', displayName: 'Anna Bianchi' }],
+      });
+      expect(room.endpointFuoriDalVideo).toHaveBeenCalledWith(EVENTO, 'esclusi');
+      expect(registroScritto()).toEqual([
+        { atMs: 1, participantId: 'con-consenso', displayName: 'Anna Bianchi' },
+      ]);
+      expect(prisma.event.updateMany).toHaveBeenCalledWith({
+        where: { id: EVENTO, unrecordedSpeech: false },
+        data: { unrecordedSpeech: true },
+      });
     });
   });
 

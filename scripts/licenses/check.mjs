@@ -14,6 +14,9 @@
  * di solo sviluppo (`dev`) non entrano nelle immagini e sono escluse; quelle
  * `devOptional` si controllano lo stesso, per prudenza.
  *
+ * Controlla anche il registro dei pesi dei modelli (models.json, vedi
+ * models.mjs): licenza, formato, fissaggio e modelli fuori dal registro.
+ *
  * Uso: node scripts/licenses/check.mjs
  * Esce con 1 se trova una violazione.
  */
@@ -21,6 +24,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { ambienteDelRepository, controllaRegistro } from './models.mjs';
 import { valuta } from './policy.mjs';
 
 const qui = dirname(fileURLToPath(import.meta.url));
@@ -114,16 +118,49 @@ function principale() {
       );
     }
   }
-  if (errori > 0) {
+  const dipendenze = errori;
+  if (dipendenze > 0) {
     console.error(
-      `\n${errori} problem(s). Replace the dependency, or verify its real license and record it ` +
+      `\n${dipendenze} problem(s). Replace the dependency, or verify its real license and record it ` +
         'in scripts/licenses/exceptions.json (see THIRD-PARTY-LICENSES.md).'
     );
-    process.exit(1);
+  } else {
+    console.log(
+      `Licenses: ${totale} production packages in ${LOCKFILE.length} lockfiles, none forbidden or unknown.`
+    );
   }
+  errori += controllaModelli();
+  if (errori > 0) process.exit(1);
+}
+
+/** Il registro dei modelli: stampa i problemi e ne restituisce il numero. */
+function controllaModelli() {
+  let ambiente;
+  try {
+    ambiente = ambienteDelRepository(radice);
+  } catch (e) {
+    console.error(
+      `✗ models.json: git ls-files failed (${e.message}); the check needs a Git checkout`
+    );
+    return 1;
+  }
+  const registro = JSON.parse(readFileSync(resolve(qui, 'models.json'), 'utf8'));
+  const { problemi, voci, lacune } = controllaRegistro(registro, ambiente);
+  for (const { chi, motivo } of problemi)
+    console.error(`✗ models.json: ${chi}: ${motivo}`);
+  if (problemi.length > 0) {
+    console.error(
+      `\n${problemi.length} problem(s) in the model registry. The rules are in ` +
+        '"The model registry" in THIRD-PARTY-LICENSES.md.'
+    );
+    return problemi.length;
+  }
+  const perTipo = (tipo) => lacune.filter((l) => l.kind === tipo).length;
   console.log(
-    `Licenses: ${totale} production packages in ${LOCKFILE.length} lockfiles, none forbidden or unknown.`
+    `Model weights: ${voci.length} registered; declared gaps: ${perTipo('license')} license, ` +
+      `${perTipo('format')} format, ${perTipo('pinning')} pinning.`
   );
+  return 0;
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

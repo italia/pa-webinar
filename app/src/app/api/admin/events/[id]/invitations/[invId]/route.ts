@@ -16,7 +16,9 @@ import { requireEventManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { encryptPII, encryptPIIOrNull, hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
+import { annullaEmailInCoda, cancellaEmailInviti } from '@/lib/email/outbox';
 import { AppError, ForbiddenError, ValidationError } from '@/lib/errors';
+import { indirizzoFermato } from '@/lib/persons/inviti-fermati';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,7 +47,7 @@ export const PATCH = withErrorHandling(async (request, context) => {
   const { id, invId } = await context.params;
   // Di chi gestisce l'evento: l'admin, chi l'ha creato o un altro organizzatore (eventScope, ADR-014).
   const session = await requireEventManager(await cookies(), id);
-  await requireBelongs(id, invId);
+  const riga = await requireBelongs(id, invId);
 
   const body = await parseJsonBody(request);
   const parsed = patchSchema.safeParse(body);
@@ -60,23 +62,40 @@ export const PATCH = withErrorHandling(async (request, context) => {
   // dell'amministrazione (ADR-014).
   if (session.role !== 'admin' && parsed.data.personId) throw new ForbiddenError();
   const data: Record<string, unknown> = { ...parsed.data };
+  let indirizzoCambiato = false;
   if (typeof data.email === 'string') {
     const emailNorm = (data.email as string).trim().toLowerCase();
     data.email = encryptPII(emailNorm);
     data.emailHash = hashEmail(emailNorm);
     // Un indirizzo nuovo non ha ricevuto l'invito, e il link dell'invito
-    // vecchio non deve aprire il modulo con i dati della persona nuova.
-    data.token = null;
-    data.sentAt = null;
+    // vecchio non deve aprire il modulo con i dati della persona nuova. Lo
+    // stop segue l'indirizzo: quello nuovo riparte solo se non ha smesso di
+    // ricevere inviti. Passando da un altro indirizzo e tornando indietro lo
+    // stop resta solo se il vecchio indirizzo lo ricorda altrove: se la riga era
+    // la sua unica traccia si perde (`indirizzoFermato`). Lo stesso indirizzo
+    // riscritto resta com'era.
+    const stessoIndirizzo = riga.emailHash
+      ? riga.emailHash === data.emailHash
+      : tryDecryptPII(riga.email)?.trim().toLowerCase() === emailNorm;
+    if (!stessoIndirizzo) {
+      indirizzoCambiato = true;
+      data.token = null;
+      data.sentAt = null;
+      data.declinedAt = (await indirizzoFermato(prisma, data.emailHash as string))
+        ? (riga.declinedAt ?? new Date())
+        : null;
+    }
   }
   if ('name' in data) {
     data.name = encryptPIIOrNull(data.name as string | null);
   }
 
   try {
-    const updated = await prisma.eventInvitation.update({
-      where: { id: invId },
-      data,
+    // Le email dell'indirizzo vecchio se ne vanno con lui: quelle in coda non
+    // partono, e la chiave del primo invio torna libera per l'indirizzo nuovo.
+    const updated = await prisma.$transaction(async (tx) => {
+      if (indirizzoCambiato) await cancellaEmailInviti(tx, [invId]);
+      return tx.eventInvitation.update({ where: { id: invId }, data });
     });
 
     await logAdminAction({
@@ -107,7 +126,10 @@ export const DELETE = withErrorHandling(async (request, context) => {
   await requireEventManager(await cookies(), id);
   await requireBelongs(id, invId);
 
-  await prisma.eventInvitation.delete({ where: { id: invId } });
+  await prisma.$transaction(async (tx) => {
+    await annullaEmailInCoda(tx, { invitationIds: [invId] });
+    await tx.eventInvitation.delete({ where: { id: invId } });
+  });
 
   await logAdminAction({
     request,

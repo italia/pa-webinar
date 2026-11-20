@@ -1,8 +1,13 @@
-# WhisperX, installato con `pip install --no-deps` (vedi Dockerfile.worker).
+# WhisperX, installato con `pip install --no-deps --require-hashes` (vedi
+# Dockerfile.worker): un solo pacchetto, fissato per versione e per impronta.
+# Le impronte sono quelle dei file pubblicati su PyPI per la versione
+# (https://pypi.org/pypi/whisperx/<versione>/json): si aggiornano con lei.
 #
 # Ogni release 3.8.x fissa torch a 2.8, che non ha le correzioni di sicurezza
 # di torch: con le sue dipendenze, pip scenderebbe di versione. Le dipendenze
 # che servono davvero stanno in requirements.txt, a versioni compatibili con
 # il torch fissato li'. A ogni aggiornamento di WhisperX vanno riconfrontate
 # con il suo pyproject.toml.
-whisperx==3.8.6
+whisperx==3.8.6 \
+    --hash=sha256:cb6d4fcd3fb6c42305cb8b222a33a0b78f6b657e9db3b714345fe43dc0a69c1f \
+    --hash=sha256:d647aecaa6c2f413bb924d722d925878ef300c99093ca49cd6cb7840bdbffe0e

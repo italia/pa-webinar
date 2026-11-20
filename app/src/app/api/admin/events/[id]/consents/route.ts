@@ -4,8 +4,9 @@
 /**
  * GET /api/admin/events/[id]/consents
  *
- * Le prove dei consensi dell'evento (lib/gdpr/consent-proofs): in JSON il
- * solo riepilogo, senza nomi, per il pannello; con `?format=csv&locale=it`
+ * Le prove dei consensi dell'evento (lib/gdpr/consent-proofs), comprese quelle
+ * conservate dopo la pulizia dei dati: in JSON il solo riepilogo, senza nomi,
+ * per il pannello, con quante sono le conservate (`retained`); con `?format=csv&locale=it`
  * l'elenco completo, con i nomi, per dimostrare i consensi (art. 7.1 GDPR).
  * Solo per lo staff che gestisce l'evento: il link del moderatore si puo'
  * inoltrare, e l'elenco porta i nomi delle persone. Ogni esportazione lascia
@@ -34,7 +35,11 @@ export const GET = withErrorHandling(async (request, context) => {
     // Il riepilogo non ha bisogno dei nomi: non si decifrano.
     const righe = await proveConsensoEvento(id, { nomi: false });
     return Response.json(
-      { summary: riepilogoProve(righe), total: righe.length },
+      {
+        summary: riepilogoProve(righe),
+        total: righe.length,
+        retained: righe.filter((r) => r.conservata).length,
+      },
       { headers: { 'Cache-Control': 'no-store' } }
     );
   }
@@ -53,16 +58,22 @@ export const GET = withErrorHandling(async (request, context) => {
       t('givenAt'),
       t('withdrawnAt'),
       t('textVersion'),
+      t('destination'),
+      t('superseded'),
     ],
     ...righe.map((r) => [
       t(`kinds.${r.kind}`),
       t(`sources.${r.source}`),
       t(`roles.${r.role}`),
-      // Un nome che non si decifra si dice, non si lascia vuoto.
-      r.name ?? t('unreadableName'),
+      // Un nome che non c'e' si dice, non si lascia vuoto: tolto su richiesta
+      // della persona, o che non si decifra.
+      r.name ?? (r.nomeRimosso ? t('erasedName') : t('unreadableName')),
       r.givenAt,
       r.withdrawnAt ?? '',
       r.textVersion === null ? '' : String(r.textVersion),
+      r.kind === 'recording' ? t(`destinations.${r.destination ?? 'none'}`) : '',
+      // Un periodo sostituito non e' un ritiro, e non si scambia per uno.
+      r.superata ? t('supersededValue') : '',
     ]),
   ]);
   await prisma.gdprAuditLog.create({

@@ -9,6 +9,8 @@ vi.mock('@/lib/crypto/pii', () => ({
   encryptPII: (v: string) => `cif:${v}`,
 }));
 
+import { improntaTitolare, type TitolareDelPosto } from '@/lib/gdpr/consent-proofs';
+
 import {
   componiTrascrizione,
   conservazioneFinita,
@@ -17,6 +19,7 @@ import {
   registrazioneSoloSottotitoli,
   senzaLePersone,
   togliPersoneDalleTrascrizioni,
+  togliPostiDaiSottotitoli,
   vaCostruita,
 } from './transcript';
 
@@ -76,6 +79,22 @@ describe('componiTrascrizione', () => {
       'SPEAKER_02',
     ]);
     expect(t.speakers.map((s) => s.displayName)).toEqual(['Relatore 1', 'Moderatrice', 'Relatore 2']);
+  });
+
+  it("un iscritto che cambia o toglie il nickname ha un'etichetta per nome: nessuna frase passa sotto l'altro", () => {
+    const iscrizione = '0b1f6c1e-2a3b-4c5d-8e9f-0a1b2c3d4e5f';
+    const t = componiTrascrizione(
+      [
+        frase(`reg-${iscrizione}-aaaa1111`, 'Luna', 'Prima.', 1, 2),
+        frase(`reg-${iscrizione}-bbbb2222`, 'Maria Rossi', 'Dopo.', 3, 4),
+        frase(`reg-${iscrizione}-cccc3333`, 'Luna', 'Ancora.', 5, 6),
+      ],
+      t0,
+    );
+    expect(t.speakers.map((s) => s.displayName)).toEqual(['Luna', 'Maria Rossi']);
+    expect(t.segments.map((s) => s.speaker)).toEqual(['SPEAKER_00', 'SPEAKER_01', 'SPEAKER_00']);
+    // Il conto delle voci resta per persona.
+    expect(contaVoci(t.segments.map(() => ({ seatId: `reg-${iscrizione}-x`, speakerName: null })))).toBe(1);
   });
 
   it('di chi non ha acconsentito restano solo i tempi, senza testo ne\' nome', () => {
@@ -179,6 +198,116 @@ describe('senzaLePersone', () => {
       expect.objectContaining({ diarLabel: 'SPEAKER_00', registrationId: '0b1f6c1e-2a3b-4c5d-8e9f-0a1b2c3d4e5f' }),
       expect.not.objectContaining({ registrationId: expect.anything() }),
     ]);
+  });
+});
+
+describe('i titolari nella trascrizione', () => {
+  const concessione = (n: number, posto: string) => ({
+    persona: `concessione:${n}`,
+    impronte: [`impronta-${n}`, `impronta-${posto}`],
+  });
+  const titolari = new Map<string, TitolareDelPosto>([
+    ['mod-1', concessione(1, 'mod-1')],
+    ['mod-2', concessione(1, 'mod-2')],
+    ['mod-3', concessione(2, 'mod-3')],
+    ['ospite-1', { persona: null, impronte: ['impronta-ospite-1'] }],
+  ]);
+
+  it('il parlante porta le impronte di tutti i suoi posti, solo nel corpo', () => {
+    const t = componiTrascrizione(
+      [frase('mod-1', 'Ada', 'Uno.', 1, 2), frase('mod-2', 'Ada', 'Due.', 3, 4)],
+      t0,
+      null,
+      titolari,
+    );
+    expect(t.speakers).toHaveLength(1);
+    expect(t.speakers[0]!.titolari?.sort()).toEqual(['impronta-1', 'impronta-mod-1', 'impronta-mod-2']);
+  });
+
+  it('lo stesso nome con due concessioni e\' due persone, e una si toglie senza l\'altra', () => {
+    const t = componiTrascrizione(
+      [frase('mod-1', 'Moderatore', 'Mia.', 1, 2), frase('mod-3', 'Moderatore', 'Sua.', 3, 4)],
+      t0,
+      null,
+      titolari,
+    );
+    expect(t.speakers).toHaveLength(2);
+    const via = senzaLePersone(JSON.stringify(t), new Set(), new Set(['impronta-1']));
+    expect(via?.corpo).not.toContain('Mia.');
+    expect(via?.corpo).toContain('Sua.');
+    expect(via?.vuoto).toBe(false);
+  });
+
+  it('due nomi con la stessa concessione restano due voci: un link si puo\' passare', () => {
+    const t = componiTrascrizione(
+      [frase('mod-1', 'Ada', 'Uno.', 1, 2), frase('mod-2', 'Bruno', 'Due.', 3, 4)],
+      t0,
+      null,
+      titolari,
+    );
+    expect(t.speakers.map((s) => s.displayName)).toEqual(['Ada', 'Bruno']);
+  });
+
+  it('contaVoci segue lo stesso criterio', () => {
+    const frasi = [
+      { seatId: 'mod-1', speakerName: 'cif:Moderatore' },
+      { seatId: 'mod-3', speakerName: 'cif:Moderatore' },
+    ];
+    expect(contaVoci(frasi)).toBe(1);
+    expect(contaVoci(frasi, titolari)).toBe(2);
+  });
+
+  it('un corpo senza impronte non riconosce nessuno', () => {
+    const t = componiTrascrizione([frase('mod-1', 'Ada', 'Uno.', 1, 2)], t0);
+    expect(senzaLePersone(JSON.stringify(t), new Set(), new Set(['impronta-1']))).toBeNull();
+  });
+});
+
+describe('togliPostiDaiSottotitoli', () => {
+  const prova = (eventId: string, jitsiUserId: string) => ({
+    eventId,
+    jitsiUserId,
+    registrationId: null,
+    eventModeratorId: 'grant-1',
+    staffAccountId: null,
+  });
+
+  it('toglie le frasi di ogni evento, e la voce con l\'impronta di quell\'evento', async () => {
+    const corpo = JSON.stringify({
+      segments: [{ start: 0, end: 1, speaker: 'SPEAKER_00', text: 'Mia' }],
+      speakers: [
+        { diarLabel: 'SPEAKER_00', titolari: [improntaTitolare('ev-2', 'concessione:grant-1')] },
+      ],
+    });
+    const tx = {
+      captionSegment: { deleteMany: vi.fn() },
+      postprodArtifact: {
+        findMany: vi.fn(async ({ where }: { where: { recording: { eventId: { in: string[] } } } }) =>
+          where.recording.eventId.in.includes('ev-2')
+            ? [{ id: 'a1', recordingId: 'rec-1', inlineBody: `cif:${corpo}`, recording: { blobKey: 'video.mp4' }, original: null }]
+            : [],
+        ),
+        update: vi.fn(),
+        delete: vi.fn(),
+      },
+      postprodOriginalBody: { update: vi.fn() },
+      speaker: { deleteMany: vi.fn() },
+      recording: { delete: vi.fn() },
+    };
+
+    await togliPostiDaiSottotitoli(tx as never, [
+      prova('ev-1', 'mod-a'),
+      prova('ev-1', 'mod-a'),
+      prova('ev-2', 'mod-b'),
+    ]);
+
+    expect(tx.captionSegment.deleteMany).toHaveBeenCalledWith({
+      where: { eventId: 'ev-1', seatId: { in: ['mod-a'] } },
+    });
+    expect(tx.captionSegment.deleteMany).toHaveBeenCalledWith({
+      where: { eventId: 'ev-2', seatId: { in: ['mod-b'] } },
+    });
+    expect(tx.postprodArtifact.delete).toHaveBeenCalledWith({ where: { id: 'a1' } });
   });
 });
 

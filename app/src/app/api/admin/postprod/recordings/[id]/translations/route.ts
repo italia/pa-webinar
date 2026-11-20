@@ -17,7 +17,9 @@
  *          Idempotent: re-adding a queued/translated language is a
  *          no-op that returns 200.
  *
- * Auth: admin session cookie (same as the rest of /api/admin/postprod).
+ * Auth: GET (which languages exist) for whoever manages the event, admin
+ * included; POST (produces content) for the event organizers only
+ * (lib/recording/content-access).
  */
 
 import { z } from 'zod';
@@ -25,6 +27,7 @@ import { cookies } from 'next/headers';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { requireRecordingManager } from '@/lib/auth/staff-session';
+import { requireRecordingContent } from '@/lib/recording/content-access';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { enqueueTranslateLanguage } from '@/lib/ai/enqueue';
 import { prisma } from '@/lib/db';
@@ -108,8 +111,9 @@ const bodySchema = z.object({
 
 export const POST = withErrorHandling(async (request, context) => {
   const { id } = await (context as { params: Promise<{ id: string }> }).params;
-  // Dell'evento della registrazione: l'admin o chi l'ha creato (ADR-014).
-  await requireRecordingManager(await cookies(), id);
+  // Il contenuto e' di chi organizza l'evento, non dell'admin che non lo
+  // organizza (lib/recording/content-access).
+  await requireRecordingContent(await cookies(), id, 'elaborazione');
   const { targetLanguage } = bodySchema.parse(await parseJsonBody(request));
 
   // Master kill-switch upfront, so we don't enqueue an orphan job while

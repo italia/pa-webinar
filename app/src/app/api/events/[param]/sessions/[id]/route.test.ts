@@ -13,7 +13,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const { prisma, deleteRecordingBlob } = vi.hoisted(() => ({
   prisma: {
     event: { findFirst: vi.fn(), update: vi.fn() },
-    callSession: { findFirst: vi.fn(), delete: vi.fn() },
+    callSession: { findFirst: vi.fn(), delete: vi.fn(), updateMany: vi.fn() },
     gdprAuditLog: { create: vi.fn() },
     $transaction: vi.fn(async (operazioni: unknown[]) => Promise.all(operazioni)),
   },
@@ -21,6 +21,13 @@ const { prisma, deleteRecordingBlob } = vi.hoisted(() => ({
 }));
 
 vi.mock('@/lib/db', () => ({ prisma }));
+// I file si aprono dalla rotta dell'app, e solo chi organizza l'evento la riceve.
+const organizza = vi.hoisted(() => ({ valore: false }));
+vi.mock('next/headers', () => ({ cookies: async () => ({ get: () => undefined }) }));
+vi.mock('@/lib/recording/content-access', () => ({
+  contenutoStaffDellaRichiesta: async () =>
+    organizza.valore ? { session: { role: 'organizer', accountId: 'a' }, via: 'organizzatore' } : null,
+}));
 vi.mock('@/lib/storage/recordings', () => ({ deleteRecordingBlob }));
 
 import { encryptJSON } from '@/lib/crypto/pii';

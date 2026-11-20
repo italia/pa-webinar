@@ -65,6 +65,11 @@ flowchart LR
 | Prosody modules | `infra/jitsi/prosody-plugins/` (`mod_token_affiliation_custom`, `mod_pa_media_lock`, `mod_pa_captions`, `mod_pa_occupants`) | [Prosody extensions](#prosody-extensions) |
 | Patched web bundle | `infra/jitsi-web-patched/` | [The patched web image](#the-patched-web-image) |
 
+The conference text served to every client (`jitsi-meet.web.custom.configs._custom_config_js`) also
+carries a short script that runs only in Jibri's session. It reads the conference object that Jibri's own
+checks read and listens to its public events, without changing Jitsi's code. It sits between the Prosody
+modules and the patched bundle: it plays the voice of participants who are never shown in the recording ([Only hosts in the video](#per-event-participant-policies)).
+
 ### What is never done
 
 - **No fork of the Jitsi source.** Server-side behavior changes only through the configuration that the
@@ -389,8 +394,51 @@ recorder skips the track. The mark never goes into the JWT under that name: the 
 upgrade. The mark takes effect only with the new `mod_pa_media_lock` loaded: after an upgrade that
 changes the Prosody modules, restart Prosody before the next event. The room tells the person, with **I
 consent to the recording**: consenting asks for a new token, and the conference rejoins with it.
-Withdrawing from **Your consents** in the top bar does the opposite. `Event.hostsAlwaysRecorded` leaves
-moderators and speakers unmarked, with a notice instead of the box.
+Withdrawing from **Your consents** in the top bar does the opposite. Moderators and speakers are never
+marked: they are in the video, with name and image, and read a notice instead of the box. Their token
+carries `context.user.paInVideo = true`, and nobody else's does, the recorder's included. Of everyone else
+the recording holds at most the voice, with the consent.
+
+**Only hosts in the video.** The composite video shows the people who host the event and nobody else.
+`mod_pa_media_lock` writes `hidden-from-recorder`
+into the presence of every other session, a session without a token included, so Jibri's session never
+adds a participant to its state: no tile, no name, no image and no shared screen, and the stage never
+moves to a participant who speaks, because a dominant speaker the session does not know leaves the
+stage on a host. For a participant whose token carries neither `voiceExcluded` nor `listenOnly`, the
+same identity also carries `pa-recorder-voice`, and the conference text plays that participant's voice.
+Its script runs only in the page Jibri opens (`config.iAmRecorder` in the address and in the resolved
+configuration) and changes nothing in Jitsi. It reads the conference from `APP.conference._room`, as
+Jibri's own call checks do, listens to its public track events and attaches each remote audio track
+whose current owner carries both marks to an audio element of its own. It removes the element when the
+track goes away or passes to another owner, and decides a track that arrives before its owner's
+presence when that person joins. The guarantee about faces and names rests on Jitsi's own feature and
+on a mark that the client cannot change. The script only adds voices: if an upgrade breaks it, the
+video loses the participants' voices and never gains a face or a name. The per-participant recorder
+records a hidden track only when it carries `pa-recorder-voice`. A token with `voiceExcluded` or
+`listenOnly` never gets the voice mark, a host's included. A token without `paInVideo`, issued by a
+portal older than this rule, counts as a host's when it is a moderator's (`affiliation: owner`), so a
+recording never ends up with nobody in it; a portal that wants a moderator out of the video writes
+`paInVideo: false`.
+
+What follows from it:
+
+- Jibri's own call checks count only the people its session sees, the hosts. With Jibri's values a
+  recording would end 30 seconds after the last host left, or after 10 minutes of hosts with
+  microphone and camera off while participants speak. The chart relaxes them
+  (`global.jibri.callStatusChecks`): the recording ends after 5 minutes with no host in the room, and
+  never because hosts keep microphone and camera off or because nothing arrives during a silent pause.
+  Participants' voices count as incoming media, so a call where only participants speak is not cut
+  ([Starting and stopping](recording.md#starting-and-stopping)).
+- Jibri's session runs without SSRC rewriting, which Jitsi turns on by default for every other client
+  (`flags.ssrcRewritingEnabled`, set to `false` by the same script). With it, the session builds screen
+  tiles from the presence of every member, hidden ones included, and a participant's screen share put an
+  empty tile on the stage under Jitsi's default name. Without it, screen tiles come from the tracks the
+  session keeps, which never include a hidden participant's, so neither the screen nor the stage reaches
+  a participant. The cost is that the session receives every source of the conference, as the
+  per-participant recorder already does, instead of a fixed set of rewritten ones.
+- Captions appear in the video only when the conference text turns on
+  `transcription.autoCaptionOnTranscribe`, and they carry the speaker's name from the transcriber. The
+  chart does not set it, and a values file that replaces the conference text must not either.
 
 The chart sets `RECORDING_VOICE_EXCLUSION` only when the conference text carries that logic. Without it
 (an external Jitsi, a values file that replaced the text) a Jibri recording would keep the voice, so the
@@ -398,23 +446,37 @@ audience without consent carries `listenOnly` instead and is never admitted, not
 gives them the floor (`mod_pa_media_lock` drops that approval), and moderators and speakers host as
 usual, recorded by the composite video. `listenOnly` carries the same mark: where the session has the
 feature on, their name and tile stay out too; with an external Jitsi the name can appear in the video.
+The chart sets `RECORDING_PARTICIPANT_VOICE` when the conference text also carries the script (it looks
+for the line of code that defines the mark, `VOCE = 'pa-recorder-voice'`). `partecipantiNelVideo` in `app/src/lib/recording/availability.ts` turns the two
+variables into what the video can hold: `solo-voce` (hosts seen, consenting participants heard),
+`esclusi` (hosts only, no participant's voice), `visibili` (the session ignores the marks, so
+participants can appear with face and name, even silent in the thumbnails) and `assente` (no composite
+video). The consent rule (`regolaConsenso` in `app/src/lib/live/consent-rule.ts`), the conference token
+and the texts follow that answer: with `esclusi` nobody is asked the recording consent and
+`voiceExcluded` follows the transcription consent, because only the per-participant recorder and the
+captions transcript can still record a participant's voice
+([Who is in the video](../GDPR.md#who-is-in-the-video)).
 
 Whoever the token admits at entry (a participant who consented, a speaker with the microphones locked)
 receives the bridge's approval as soon as they join, and Jitsi shows it as **The moderator asks you to
 speak**, though nobody asked: during the first seconds of each entry the room closes that notification
 (`hideNotification`, uid `asked-to-unmute`), while the floor given later by a moderator (**Give the
 floor**, `askToUnmute`) still shows it. The moderator's **Participants** tab marks these people, from
-`GET /api/events/{param}/seats`. `voiceExcluded` comes from Prosody (`mod_pa_occupants` sends the token's
+`GET /api/events/{param}/seats`, whose `recording` field says for each endpoint in the room whether it is
+`video` (a host: the seat of a moderator or speaker link, `mod-`), `voce` (a participant whose voice is
+recorded) or `nessuna` (a participant without the consent, or listening only). `voiceExcluded` comes from Prosody (`mod_pa_occupants` sends the token's
 value, stored in `RoomOccupant`). `listenOnly` comes from the person's browser, which declares its bridge
 endpoint with its room token (`POST /api/events/{param}/listen-only`), and only a token that carries the
 value the bridge enforces marks it. A dominant-speaker event from a `voiceExcluded` endpoint keeps no
 name. While a recording runs, a batch sent with a valid room token (`roomToken`) also sets
 `Event.unrecordedSpeech`, which puts the note next to the published video; the caption segments of
-that endpoint are kept as times only.
+that endpoint are kept as times only. Where participants never enter the video (`esclusi`), a batch
+from any endpoint that is not a host's (`mod-` seat) sets it too, and the note says that only the hosts
+are seen and heard.
 Only where the voice cannot be left out, every token of such an event locks all three media, whoever
 consented carries `mediaAdmit` with the media the event concedes, and every token carries `consentLock`:
 in that room the module refuses to switch the moderation off (the **Participants** tab shows a note instead of **Microphones locked** and **Video
-locked**), and a person made moderator stays bound by their token. `recordingEnabled` and `hostsAlwaysRecorded` do not change
+locked**), and a person made moderator stays bound by their token. `recordingEnabled` does not change
 while the room may be open (`LIVE`, `PROVISIONING`, `IDLE`, or `PUBLISHED` with a call session opened in
 the last 12 hours, since moderators and speakers enter early; `app/src/lib/live/room-open.ts`): the lock
 is decided at the first entry, and people already in the room did not consent to a recording switched on
@@ -1002,8 +1064,8 @@ order, and roll out through [upgrades and rollback](../operations/upgrades.md).
    the profiles that use the stock web image (`examples/values-k3s.yaml`, `values-minikube.yaml`,
    `values-eks.yaml`). Run `helm dependency update infra/helm/pa-webinar` if the dependency changed,
    commit the vendored chart and `Chart.lock`, and run `./scripts/validate-chart.sh`.
-2. **Rebuild the patched web image on the same Jitsi release.** Update `BASE_TAG` in
-   `infra/jitsi-web-patched/Dockerfile`, and `BASE_TAG`, `BASE_IMAGE` and a new `IMAGE_TAG` in
+2. **Rebuild the patched web image on the same Jitsi release.** Update `BASE_TAG` and `BASE_DIGEST` in
+   `infra/jitsi-web-patched/Dockerfile`, and set a new `IMAGE_TAG` in
    `.github/workflows/jitsi-web.yml`. Every exactly-one-match assertion and every workflow check must
    pass. If one fails, find out whether upstream changed shape or fixed the bug; do not loosen the
    assertion.
@@ -1033,6 +1095,15 @@ order, and roll out through [upgrades and rollback](../operations/upgrades.md).
    raised hands, the leave prompt and recording if it is enabled. With live captions on, start and stop
    a recording and check that captions keep coming: Jitsi's recording commands write into the room
    metadata that transcription is off ([Live captions](live-captions.md)).
+   With recording on, record a call with a host, a participant who consented and one who did not, each
+   with the camera on, and have both participants speak while the host is silent; then have a
+   participant share their screen while a second host joins. The video must show only the hosts, with
+   their names, and keep a host on the stage; the consenting participant must be heard and the other
+   not. Jibri's browser log must hold no `[pa-webinar]` error. Jitsi's
+   `hidden-from-recorder` handling (`USER_JOINED` and `TRACK_ADDED` in `conference.js`), the identity
+   parsing in lib-jitsi-meet, `APP.conference._room` and the track events the script listens to are
+   what this step tests
+   ([Only hosts in the video](#per-event-participant-policies)).
 7. **Run a load-test smoke test** with the toolkit in
    [scripts/load-test/README.md](../../scripts/load-test/README.md), and compare with the reference
    measurements in [LOAD-TESTING](../LOAD-TESTING.md).

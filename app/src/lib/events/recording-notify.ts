@@ -11,6 +11,11 @@
  * concluso, avviso acceso, registrazione pubblicata (o video esterno), pagina
  * pubblica visibile, avviso non ancora partito.
  *
+ * Una registrazione riservata su un evento con destinazione
+ * (lib/recording/audience) la trovano gli iscritti, anche con la pagina privata:
+ * conta che il video sia aperto a loro. Il video esterno, li', segue quello della
+ * piattaforma: da solo non fa partire l'avviso, perche' la pagina non lo mostra.
+ *
  * Gira con il cron dei promemoria. Come l'email dopo l'evento
  * (lib/events/post-event-finalize), l'evento si «prenota» con un updateMany
  * condizionato PRIMA di accodare le email: due giri sovrapposti non mandano
@@ -25,6 +30,7 @@ import { lingueIscrizione } from '@/lib/email/lingua';
 import { recordingPublishedEmail } from '@/lib/email/templates';
 import { isEventPageVisible } from '@/lib/events/visibility';
 import { rubricaOptOutUrl } from '@/lib/persons/opt-out-link';
+import { apertaAgliIscritti } from '@/lib/recording/audience';
 import { issueViewingToken, viewingLinkUrl } from '@/lib/recording/viewing';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { localizedUrl } from '@/lib/utils/localized-url';
@@ -58,6 +64,7 @@ export async function notifyPublishedRecordings(opts: {
       postEventPublic: true,
       postEventPublicUntil: true,
       recordingAudience: true,
+      recordingDestination: true,
       recordingPublished: true,
       transcriptPublished: true,
     },
@@ -68,9 +75,14 @@ export async function notifyPublishedRecordings(opts: {
   let emailsFailed = 0;
 
   for (const event of candidati) {
-    // Il link porta alla pagina dell'evento: se non si vede, l'avviso aspetta
-    // che chi organizza la renda pubblica.
-    if (!isEventPageVisible(event, now.getTime())) continue;
+    // Il link porta alla pagina dell'evento: se chi lo riceve non ci trova la
+    // registrazione, l'avviso aspetta che chi organizza la renda visibile.
+    const riservata =
+      event.recordingAudience === 'REGISTRANTS' && event.recordingDestination != null;
+    const siTrova = riservata
+      ? event.recordingPublished && apertaAgliIscritti(event, now)
+      : isEventPageVisible(event, now.getTime());
+    if (!siTrova) continue;
 
     const prenotato = await prisma.event.updateMany({
       where: { id: event.id, recordingNotifiedAt: null },

@@ -63,6 +63,7 @@ export const CREATED_EVENT_FIELDS = [
   'requireOrganization',
   'requireOrganizationRole',
   'requireOrganizationType',
+  'offerAddressBook',
 
   // dati personali e informativa
   'dataRetentionDays',
@@ -72,10 +73,13 @@ export const CREATED_EVENT_FIELDS = [
   'recordingConsentText',
   'audienceAnonymous',
   'participantListVisible',
+  'nicknamesEnabled',
   'hostsAlwaysRecorded',
 
   // registrazione e pubblicazione
   'recordingEnabled',
+  'recordingDestination',
+  'recordingDeleteAfterDays',
   'autoStartRecording',
   'multitrackRecordingEnabled',
   'retainParticipantTracks',
@@ -117,6 +121,10 @@ export const CREATED_EVENT_FIELDS = [
   // serie
   'recurrenceRule',
   'recurrenceSeriesId',
+
+  // catalogo (lib/events/catalog): il modello si verifica e se ne fotografa il nome
+  'templateId',
+  'formatClass',
 ] as const;
 
 /**

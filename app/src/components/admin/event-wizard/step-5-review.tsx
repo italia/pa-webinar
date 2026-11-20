@@ -12,6 +12,7 @@
  * avanzate. I pulsanti per salvare li ha il wizard.
  */
 
+import type { RecordingAudience } from '@prisma/client';
 import { useTranslations } from 'next-intl';
 
 import { RigaCapacita, type RiepilogoCapacita } from '@/components/admin/capacity-panel';
@@ -20,14 +21,23 @@ import { Icon } from '@/components/ui/icon';
 import { useDurataTesto } from '@/hooks/use-durata-testo';
 import { durataProgramma } from '@/lib/agenda/programme';
 import { parseLocaleList } from '@/lib/ai/target-locales';
-import { conduceSempreRegistrato, type VoceNelVideo } from '@/lib/live/consent-rule';
+import { conduceNelVideo, type PartecipantiNelVideo } from '@/lib/live/consent-rule';
 import { registraChiConduce } from '@/lib/live/entry-consents';
 import { elencoVisibileAlPubblico } from '@/lib/live/participant-list';
-import { consensiRichiesti } from '@/lib/registration/consents';
+import { domandePubbliche } from '@/lib/events/post-event-sections';
+import { rubricaProposta } from '@/lib/persons/address-book';
+import { videoDaDestinare, type Destinazione } from '@/lib/recording/destination';
+import { consensiRichiesti, trascrizioneDalVideo } from '@/lib/registration/consents';
 import { togglesFromMatrix } from '@/lib/utils/permission-matrix';
 import { splitTitleKicker } from '@/lib/utils/title-kicker';
 import { describeRRule } from '@/lib/utils/recurrence';
 
+import {
+  destinazioneDopoIlSalvataggio,
+  registrazioneVuota,
+  type NotaDestinazione,
+  type NotaPagina,
+} from './campi-del-formato';
 import ConsentDiagram from './consent-diagram';
 import { vociCompilate } from './programme-plan';
 import { nomeLingua } from './text-translation';
@@ -63,16 +73,28 @@ interface Props {
   onVaiAlCampo?: (campo: CampoMancante) => void;
   /** Cio' che manca ancora, nell'ordine del wizard. */
   mancanti?: CampoMancante[];
-  /** La post-produzione AI e' accesa sull'installazione. */
   /** L'installazione puo' registrare: senza, non si chiede il consenso. */
   recordingAvailable?: boolean;
-  /** La voce di chi non acconsente nel video (lib/recording/availability). */
-  voceNelVideo?: VoceNelVideo;
+  /** Come compaiono nel video i partecipanti (lib/recording/availability). */
+  partecipantiNelVideo?: PartecipantiNelVideo;
   /** Chiamata rapida: nessuna iscrizione, e chi conduce non e' interpellato. */
   istantanea?: boolean;
   aiPipelineEnabled?: boolean;
   /** I sottotitoli live ci sono nell'installazione. */
   liveCaptionsAvailable?: boolean;
+  /** La rubrica e' accesa sull'installazione. */
+  addressBookEnabled?: boolean;
+  /** La destinazione va scelta per salvare: se manca lo dice l'elenco di cio'
+   *  che manca, non «non indicata». */
+  chiedeDestinazione?: boolean;
+  /** Porta alla scelta della destinazione. Assente con un link di conduzione:
+   *  la scelta non c'e', la fa lo staff. */
+  onCambiaDestinazione?: () => void;
+  /** La destinazione che l'evento tiene se il modulo non ne sceglie una
+   *  (`destinazioneDiPartenza`). */
+  destinazioneSenzaScelta?: Destinazione;
+  /** Il pubblico del video dopo il salvataggio (`pubblicoAllineato`). */
+  pubblicoDopo?: RecordingAudience;
   /** La capacita' in una riga: il carico del ponte e quanto riceve chi guarda;
    *  da «attenzione» in su e' un avviso. Porta ai dettagli tecnici. */
   capacita?: RiepilogoCapacita;
@@ -81,6 +103,10 @@ interface Props {
   /** Si iscrive chiunque (scelta dell'evento, o del sito). Assente per una
    *  chiamata istantanea, che non ha iscrizione. */
   iscrizioneAperta?: boolean;
+  /** Cosa diventa la registrazione con un evento su invito. */
+  notaDestinazione?: NotaDestinazione | null;
+  /** Cosa diventa la pagina dopo l'evento. */
+  notaPagina?: NotaPagina | null;
   /** Porta al passo «Persone», dove si sceglie chi si iscrive. */
   onVaiPersone?: () => void;
   /** Porta al passo «Programma». Assente per una chiamata istantanea, che
@@ -107,12 +133,19 @@ export default function Step5Review({
   mancanti = [],
   aiPipelineEnabled = true,
   recordingAvailable = true,
-  voceNelVideo = 'rimovibile',
+  partecipantiNelVideo = 'visibili',
   istantanea = false,
   liveCaptionsAvailable = false,
+  addressBookEnabled = true,
+  chiedeDestinazione = false,
+  onCambiaDestinazione,
+  destinazioneSenzaScelta = null,
+  pubblicoDopo = 'PUBLIC',
   capacita,
   sopratitolo = false,
   iscrizioneAperta,
+  notaDestinazione,
+  notaPagina,
   onVaiPersone,
   onVaiProgramma,
   programmaInCreazione = false,
@@ -139,6 +172,7 @@ export default function Step5Review({
     ...(form.requireOrganization ? [tf('askOrganization')] : []),
     ...(form.requireOrganizationRole ? [tf('askRole')] : []),
     ...(form.requireOrganizationType ? [tf('askType')] : []),
+    ...(rubricaProposta(form, { addressBookEnabled }) ? [tf('askAddressBook')] : []),
   ];
   const titolo = splitTitleKicker(
     form.title[defaultLocale] || form.title.it || form.title.en || '',
@@ -182,30 +216,55 @@ export default function Step5Review({
   // I consensi che modulo d'iscrizione e sala d'attesa chiederanno a chi
   // partecipa, con la stessa regola (lib/registration/consents): chi crea
   // l'evento vede prima cosa si chiedera', e se la scelta e' quella voluta.
-  const registra = form.recordingEnabled && recordingAvailable;
-  const consensi = consensiRichiesti({
-    recordingEnabled: registra,
-    multitrackRecordingEnabled: form.recordingEnabled && !!form.multitrackRecordingEnabled,
-    captionsTranscript:
-      liveCaptionsAvailable && form.liveCaptionsEnabled && !!form.captionsTranscriptEnabled,
-    participantsCanUnmute: toggles.participantsCanUnmute,
-    participantsCanStartVideo: toggles.participantsCanStartVideo,
-    participantsCanShareScreen: toggles.participantsCanShareScreen,
-  });
+  // Accesa, ma non produrrebbe nulla: il riepilogo non la promette.
+  const vuota = registrazioneVuota(form, partecipantiNelVideo, recordingAvailable);
+  const registra = form.recordingEnabled && recordingAvailable && !vuota;
+  const destinazioneDopo = destinazioneDopoIlSalvataggio(form, destinazioneSenzaScelta);
+  const conVideo = videoDaDestinare(partecipantiNelVideo);
+  const trascrizioneVideo = trascrizioneDalVideo(
+    {
+      eventType: istantanea ? 'INSTANT' : null,
+      recordingEnabled: form.recordingEnabled,
+      aiTranscriptEnabled: form.aiTranscriptEnabled,
+    },
+    { aiPipelineEnabled },
+    recordingAvailable,
+    partecipantiNelVideo,
+  );
+  const consensi = consensiRichiesti(
+    {
+      recordingEnabled: registra,
+      multitrackRecordingEnabled: registra && !!form.multitrackRecordingEnabled,
+      captionsTranscript:
+        liveCaptionsAvailable && form.liveCaptionsEnabled && !!form.captionsTranscriptEnabled,
+      trascrizioneVideo,
+      participantsCanUnmute: toggles.participantsCanUnmute,
+      participantsCanStartVideo: toggles.participantsCanStartVideo,
+      participantsCanShareScreen: toggles.participantsCanShareScreen,
+    },
+    partecipantiNelVideo
+  );
   const vociConsenso = [
     consensi.registrazione &&
       tf(
-        voceNelVideo === 'rimovibile'
+        partecipantiNelVideo === 'solo-voce'
           ? 'consentRecordingVoice'
-          : voceNelVideo === 'fissa'
+          : partecipantiNelVideo === 'visibili'
             ? 'consentRecordingFree'
             : 'consentRecordingOptional'
       ),
-    consensi.avvisoRegistrazione && tf('consentRecordingNotice'),
+    // Dove chi partecipa non entra mai nel video non c'e' niente da chiedere, e
+    // l'avviso dice perche'.
+    consensi.avvisoRegistrazione &&
+      tf(
+        partecipantiNelVideo === 'esclusi'
+          ? 'consentRecordingHostsOnly'
+          : 'consentRecordingNotice'
+      ),
     consensi.tracce && tf('consentTranscription'),
   ].filter((x): x is string => !!x);
   const traduce =
-    form.recordingEnabled && form.aiTranscriptEnabled && form.aiTranslationEnabled;
+    !vuota && form.recordingEnabled && form.aiTranscriptEnabled && form.aiTranslationEnabled;
   const funzioniAi = [
     tForm('aiTranscriptEnabled'),
     form.aiSummaryEnabled && tForm('aiSummaryEnabled'),
@@ -245,6 +304,8 @@ export default function Step5Review({
         return tTrad('eventLanguages');
       case 'dataRetentionDays':
         return t('retentionDays');
+      case 'recordingDestination':
+        return tp('recordingDestination');
       case 'gdprTemplateId':
         return t('gdprTemplate');
       case 'agenda':
@@ -414,6 +475,9 @@ export default function Step5Review({
                 <span className="d-block text-secondary">
                   {tf('askLine', { list: chiesti.join(', ') })}
                 </span>
+                {addressBookEnabled && !form.offerAddressBook && (
+                  <span className="d-block text-secondary">{tf('addressBookNotOffered')}</span>
+                )}
                 {questionari}
               </span>
             </li>
@@ -448,15 +512,61 @@ export default function Step5Review({
               <IconaRec />
             </span>
             <span>
-              {!form.recordingEnabled
+              {!form.recordingEnabled || vuota
                 ? t('summary.recordingOff')
                 : form.autoStartRecording
                   ? t('summary.recordingAuto')
                   : tf('recordingManual')}
-              {form.recordingEnabled && form.aiTranscriptEnabled && (
+              {/* Dove va il video. Se manca e va scelto, lo dice l'elenco in cima.
+                  Dove il video della sala non c'e' si dice solo quella che l'evento
+                  avra', e non si cambia: la scelta non si propone. */}
+              {vuota && (
+                <span className="d-block text-secondary small mt-1">
+                  {tp('recordingNothingToCapture')}
+                </span>
+              )}
+              {registra &&
+                !istantanea &&
+                (conVideo || destinazioneDopo !== null) &&
+                (form.recordingDestination || !chiedeDestinazione) && (
+                <span className="d-block">
+                  {destinazioneDopo === null
+                    ? tp(onCambiaDestinazione ? 'recordingDestinationNotSet' : 'recordingDestinationStaffOnly')
+                    : tf(
+                        destinazioneDopo === 'PUBLIC'
+                          ? 'recordingDestinationPublic'
+                          : 'recordingDestinationReserved',
+                      )}
+                  {onCambiaDestinazione && conVideo && (
+                    <>
+                      {' '}
+                      <button
+                        type="button"
+                        className="btn btn-link p-0 align-baseline anteprima-link"
+                        onClick={onCambiaDestinazione}
+                      >
+                        {tf('change')}
+                      </button>
+                    </>
+                  )}
+                  {notaDestinazione && (
+                    <span className="d-block text-secondary small mt-1">
+                      {tp(notaDestinazione)}
+                    </span>
+                  )}
+                </span>
+              )}
+              {notaPagina && (
+                <span className="d-block text-secondary small mt-1">{tp(notaPagina)}</span>
+              )}
+              {!vuota && form.recordingEnabled && form.aiTranscriptEnabled && (
                 <span className="d-block">
                   {tf('aiAfter', { list: funzioniAi.join(', ') })}
                 </span>
+              )}
+              {/* Il video completo contiene tutte le voci: non si trascrive da solo. */}
+              {trascrizioneVideo && !form.multitrackRecordingEnabled && (
+                <span className="d-block text-secondary small">{tf('aiConfirmVideo')}</span>
               )}
               {form.recordingEnabled &&
                 !form.aiTranscriptEnabled &&
@@ -500,10 +610,9 @@ export default function Step5Review({
               {vociConsenso.length > 0
                 ? tf('consentsLine', { list: vociConsenso.join(' · ') })
                 : tf('consentsNone')}
-              {registraChiConduce({ recordingEnabled: form.recordingEnabled, eventType: istantanea ? 'INSTANT' : null }, recordingAvailable) && (
-                <span className="d-block text-secondary small mt-1">
-                  {tf(conduceSempreRegistrato(form, voceNelVideo) ? 'consentsHostsAlways' : 'consentsHosts')}
-                </span>
+              {registraChiConduce({ recordingEnabled: form.recordingEnabled && !vuota, eventType: istantanea ? 'INSTANT' : null }, recordingAvailable, partecipantiNelVideo) &&
+                conduceNelVideo(partecipantiNelVideo) && (
+                <span className="d-block text-secondary small mt-1">{tf('consentsHostsAlways')}</span>
               )}
               {(consensi.registrazione || consensi.tracce) && (
                 <span className="d-block text-secondary small">{tf('consentsWithdraw')}</span>
@@ -522,8 +631,37 @@ export default function Step5Review({
               })
                 ? tf('participantListShown')
                 : tf('participantListHidden')}
-              {!form.participantListVisible && toggles.participantsCanStartVideo && (
+              {/* Con gli pseudonimi l'elenco non si puo' mostrare: la nota non
+                  avrebbe un'azione da proporre. */}
+              {!form.participantListVisible &&
+                !form.audienceAnonymous &&
+                toggles.participantsCanStartVideo && (
                 <span className="d-block text-secondary small mt-1">{tp('participantListCameraNote')}</span>
+              )}
+              {!istantanea && (
+                <span className="d-block">
+                  {tf(form.audienceAnonymous ? 'audiencePseudonyms' : 'audienceRealNames')}
+                </span>
+              )}
+              {form.nicknamesEnabled && (
+                <span className="d-block">{tf('audienceNicknames')}</span>
+              )}
+              {!istantanea && toggles.qaEnabled && (
+                <span className="d-block">
+                  {/* Con la pagina privata nessuno le legge, come nell'anteprima
+                      delle domande guidate. */}
+                  {tf(
+                    form.postEventPublic &&
+                      domandePubbliche({
+                        postEventShowQA: form.postEventShowQA,
+                        qaEnabled: toggles.qaEnabled,
+                        recordingDestination: destinazioneDopo,
+                        recordingAudience: pubblicoDopo,
+                      })
+                      ? 'postEventQaTextOnly'
+                      : 'postEventQaHidden',
+                  )}
+                </span>
               )}
             </span>
           </li>
@@ -534,11 +672,11 @@ export default function Step5Review({
             captionsTranscript={
               liveCaptionsAvailable && form.liveCaptionsEnabled && !!form.captionsTranscriptEnabled
             }
+            trascrizioneVideo={trascrizioneVideo}
             participantsCanUnmute={toggles.participantsCanUnmute}
             participantsCanStartVideo={toggles.participantsCanStartVideo}
             participantsCanShareScreen={toggles.participantsCanShareScreen}
-            hostsAlwaysRecorded={form.hostsAlwaysRecorded}
-            voce={voceNelVideo}
+            partecipanti={partecipantiNelVideo}
           />
         )}
         {capacita && (

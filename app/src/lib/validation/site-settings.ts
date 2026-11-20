@@ -131,4 +131,6 @@ export const updateSettingsSchema = z.object({
   aiJobMaxAttempts: z.number().int().min(1).max(20).optional(),
   aiArtifactRetentionDays: z.number().int().min(0).max(3650).optional(),
   aiConsentDisclosure: z.record(z.string(), z.string().max(2000)).optional(),
+  // Spenta, nessun evento propone la rubrica.
+  addressBookEnabled: z.boolean().optional(),
 }).strict();

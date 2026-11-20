@@ -142,10 +142,7 @@
       "votes": "{count, plural, =0 {aucun vote} one {1 vote} other {# votes}}",
       "topWords": "Mots les plus partagés",
       "feedback": "Note moyenne",
-      "feedbackCount": "{count, plural, one {# réponse} other {# réponses}}",
-      "chatQuestions": "Questions posées dans le chat",
-      "reactionsCount": "{count, plural, one {1 réaction} other {# réactions}}",
-      "answered": "répondue"
+      "feedbackCount": "{count, plural, one {# réponse} other {# réponses}}"
     },
     "detail": {
       "title": "Détails de l'événement",
@@ -191,7 +188,7 @@
       },
       "chatNotSaved": "Les messages du chat ne sont pas publiés après l'événement : ils sont supprimés avec les autres données de l'événement.",
       "qaPostEvent": "Q&A de l'événement",
-      "peakParticipants": "Pic : {count} participants",
+      "peakParticipants": "{count, plural, one {Pic : # participant} many {Pic : # de participants} other {Pic : # participants}}",
       "calendar": {
         "addToCalendar": "Ajouter au calendrier",
         "google": "Google Calendar",
@@ -202,11 +199,13 @@
       "registrationEnded": "L'événement est terminé : les inscriptions sont closes.",
       "joinAsGuest": "Participer en tant qu'invité",
       "registeredUseEmailLink": "Déjà inscrit ? Entrez avec le lien personnel reçu par e-mail.",
-      "willBeRecorded": "L'événement sera enregistré.",
+      "willBeRecorded": "L'événement peut être enregistré.",
       "machineTranslation": "Traduction automatique",
       "machineTranslationNote": "Le titre et la description ont été traduits par un modèle automatique et personne ne les a encore relus.",
       "previewTitle": "Aperçu réservé à l'équipe",
       "previewBody": "L'enregistrement n'est pas encore publié : seules les personnes qui gèrent l'événement voient cette version de la page.",
+      "previewBodyPageHidden": "Cette page n'est pas visible par le public : quiconque ouvre l'adresse ne la trouve pas. Seules les personnes qui gèrent l'événement la voient.",
+      "previewBodyPageRegistrants": "Cette page n'est pas visible par le public : quiconque ouvre l'adresse ne la trouve pas. Seules les personnes inscrites à l'événement et celles qui le gèrent la voient.",
       "recordingForRegistrantsTitle": "Enregistrement réservé aux inscrits",
       "recordingForRegistrantsBody": "Si vous vous êtes inscrit à l'événement, ouvrez le lien personnel de l'e-mail « enregistrement disponible », ou demandez à le recevoir à nouveau.",
       "recordingLinkEmailLabel": "E-mail utilisé pour l'inscription",
@@ -243,8 +242,8 @@
     "namePlaceholder": "Votre nom sera affiché dans la salle de l'événement",
     "email": "E-mail",
     "emailPlaceholder": "Vous recevrez le lien d'accès à l'événement",
-    "gdprConsent": "Je consens au traitement de mes données personnelles (nom, e-mail) conformément au Règlement UE 2016/679 (GDPR) pour la participation à cet événement.",
-    "consentsLegend": "Consentements",
+    "gdprConsent": "J'ai lu la politique de confidentialité relative au traitement des données personnelles (nom, e-mail) pour la participation à cet événement.",
+    "consentsLegend": "Politique de confidentialité et consentements",
     "requiredMark": "obligatoire",
     "optionalMark": "facultatif",
     "gdprLink": "Lire la politique de confidentialité complète",
@@ -292,12 +291,13 @@
       "emailRequired": "Veuillez saisir votre e-mail",
       "emailInvalid": "Veuillez saisir un e-mail valide",
       "organizationRequired": "Veuillez saisir votre organisme",
-      "consentRequired": "Le consentement au traitement des données est obligatoire",
+      "consentRequired": "Pour vous inscrire, confirmez avoir lu la politique de confidentialité",
       "recordingConsentRequired": "Le consentement à l'enregistrement est obligatoire pour cet événement",
       "eventFull": "L'événement a atteint le nombre maximum de participants",
       "generic": "Erreur lors de l'inscription. Veuillez réessayer.",
       "questionnaireRequired": "Pour vous inscrire, répondez aux questions du questionnaire.",
       "questionnaireIncomplete": "Répondez à toutes les questions obligatoires du questionnaire.",
+      "recordingDestinationChanged": "Le texte sur l'enregistrement a changé pendant que vous remplissiez le formulaire : rechargez la page et relisez-le.",
       "questionnaireChanged": "Le questionnaire a changé pendant que vous remplissiez le formulaire : rechargez la page et répondez à nouveau."
     }
   },
@@ -363,7 +363,7 @@
       "publicHelpNone": "La page de l'événement terminé reste visible, avec son titre et sa description.",
       "sections": {
         "recap": "le récapitulatif",
-        "qa": "les questions du Q&R",
+        "qa": "le texte des questions du Q&R",
         "polls": "les sondages publiés",
         "wordCloud": "le nuage de mots",
         "materials": "les documents",
@@ -424,6 +424,7 @@
       "noMessages": "Aucun message",
       "empty": "Aucun message pour l'instant. Soyez le premier à écrire !",
       "inputLabel": "Message du chat",
+      "personalDataNotice": "N'écrivez pas les données personnelles d'autres personnes, ni les vôtres si vous ne souhaitez pas les faire connaître : les personnes présentes dans la salle peuvent lire et télécharger le chat.",
       "moderatorBadge": "Modérateur",
       "attach": "Joindre un fichier",
       "emojiPicker": "Insérer un emoji",
@@ -544,7 +545,9 @@
       "locksByConsent": "Micros et caméras suivent le consentement à l'enregistrement : qui l'a donné utilise ce que l'événement autorise, les autres restent en écoute seule. Les verrous de la salle restent actifs.",
       "listenOnlyBadge": "écoute seule",
       "listenOnlyNoFloor": "N'a pas consenti à l'enregistrement : ne peut pas intervenir avant d'y consentir depuis sa salle.",
-      "voiceExcludedBadge": "sans enregistrement",
+      "inVideoBadge": "dans la vidéo",
+      "voiceRecordedBadge": "voix enregistrée",
+      "voiceExcludedBadge": "voix non enregistrée",
       "voiceExcludedFloor": "Cette personne n'a pas consenti à l'enregistrement : elle peut intervenir, mais reste hors de l'enregistrement."
     },
     "moderator": {
@@ -621,6 +624,7 @@
       "tab": "Régie",
       "recordingHeading": "Enregistrement",
       "recordingOff": "Pas d'enregistrement",
+      "recordingNotOfferedInstant": "Dans les appels rapides, l'enregistrement n'est proposé que là où les personnes qui ne consentent pas restent hors de la vidéo, et cette installation ne le permet pas.",
       "stopConfirm": "Arrêter l'enregistrement maintenant ?",
       "featuresHeading": "Fonctions de la salle",
       "featuresHelp": "Elles s'activent et se désactivent pour tous, tout de suite.",
@@ -681,33 +685,78 @@
       "confirm": "Retirer",
       "working": "Mise à jour…",
       "error": "Impossible de mettre à jour le consentement : réessayez.",
+      "textChanged": "Le texte du consentement a changé après que vous avez ouvert la page : lisez le nouveau texte et confirmez si vous êtes d'accord.",
+      "closeNotice": "Fermer cet avis : vos consentements restent accessibles depuis le bouton en haut",
       "recording": {
         "title": "Enregistrement de l'événement",
         "give": "Je consens à l'enregistrement",
         "without": {
           "soloAscolto": "Sans ce consentement, vous suivez en écoute seule : micro, caméra et écran restent fermés.",
-          "conduce": "Sans ce consentement, vous animez quand même, mais votre voix ne reste ni dans les pistes individuelles ni dans la transcription.",
-          "voce": "Sans ce consentement, vous participez comme tout le monde, mais vous restez hors de l'enregistrement : ni nom, ni voix, ni image."
+          "conduce": "Sans ce consentement, vous animez quand même.",
+          "voce": "Sans ce consentement, vous participez comme tout le monde, mais votre voix reste hors de l'enregistrement. Votre visage et votre nom n'apparaissent de toute façon jamais dans la vidéo.",
+          "comeTutti": "Sans ce consentement, vous participez comme tout le monde."
         },
+        "withoutTranscriptHost": "Votre voix ne reste ni dans les pistes par personne ni dans la transcription.",
         "alreadyRecorded": "Ce qui a déjà été enregistré reste dans la vidéo de l'événement : pour le faire retirer, écrivez aux organisateurs.",
         "withdraw": {
-          "soloAscolto": "Si vous le retirez, vous restez dans la salle en écoute seule : micro, caméra et écran se ferment. Votre consentement à la transcription de vos interventions est aussi retiré.",
-          "conduce": "Si vous le retirez, vous continuez à animer, mais désormais votre voix ne reste ni dans les pistes individuelles ni dans la transcription. La vidéo de la salle, si elle est enregistrée, vous montre quand même.",
-          "voce": "Si vous le retirez, vous restez dans la salle comme avant, et vous êtes hors de l'enregistrement à partir de maintenant. Vous retirez aussi le consentement à la transcription de vos interventions."
-        }
+          "soloAscolto": "Si vous le retirez, vous restez dans la salle en écoute seule : micro, caméra et écran se ferment.",
+          "conduce": "Si vous le retirez, vous continuez à animer. La vidéo de la salle, si elle est enregistrée, vous montre quand même.",
+          "voce": "Si vous le retirez, vous restez dans la salle comme avant, et vous êtes hors de l'enregistrement à partir de maintenant.",
+          "avvertenza": "Si vous le retirez, vous restez dans la salle comme avant. Si la parole vous est donnée et que l'événement est enregistré, votre voix reste néanmoins dans la vidéo.",
+          "assente": "Si vous le retirez, vous restez dans la salle comme avant. À partir de maintenant, votre voix n'est pas enregistrée sur une piste séparée."
+        },
+        "withdrawTranscript": "Vous retirez aussi le consentement à la transcription de vos interventions.",
+        "withdrawTranscriptHost": "À partir de maintenant, votre voix ne reste ni dans les pistes par personne ni dans la transcription."
       },
       "transcription": {
         "title": "Transcription de vos interventions",
         "give": "Je consens à la transcription",
         "giveEffect": "Vos interventions entrent dans la transcription de l'événement avec votre nom. Sans ce consentement, vous participez quand même.",
-        "withdrawEffect": "Si vous le retirez, vos phrases déjà transcrites perdent leur texte et votre nom, et désormais votre voix n'est plus enregistrée sur une piste séparée ni transcrite.",
+        "withdrawEffect": "Si vous le retirez, vos phrases déjà transcrites à partir des sous-titres perdent leur texte et votre nom, et désormais votre voix n'est plus enregistrée sur une piste séparée ni transcrite. Pour une transcription de la vidéo déjà produite, adressez-vous aux organisateurs.",
         "needsRecording": "Vous pouvez le donner après avoir consenti à l'enregistrement."
       }
+    },
+    "recordingQuestion": {
+      "title": "L'appel est enregistré",
+      "question": "Voulez-vous que votre voix soit enregistrée ?",
+      "body": "Seuls les animateurs apparaissent dans la vidéo : votre visage et votre nom, jamais. Si vous répondez oui, l'appel se reconnecte pendant quelques secondes et, à partir de ce moment, votre voix est enregistrée lorsque vous parlez. Si vous répondez non, ou fermez cette fenêtre, vous continuez à participer comme avant et votre voix n'est pas enregistrée.",
+      "later": "Si vous répondez non, la question vous sera reposée au prochain enregistrement. Vous pouvez changer d'avis à tout moment avec le bouton {button} en haut.",
+      "yes": "Oui, enregistrez ma voix",
+      "no": "Non, ne l'enregistrez pas"
     },
     "voiceExcluded": {
       "title": "Vous participez sans enregistrement.",
       "consent": "Je consens à l'enregistrement",
-      "body": "Vous n'avez pas consenti à l'enregistrement : vous participez comme tout le monde, mais votre nom, votre voix et votre image n'entrent pas dans l'enregistrement."
+      "body": "Vous n'avez pas consenti à l'enregistrement : vous participez comme tout le monde, mais votre voix reste hors de l'enregistrement. Votre visage et votre nom n'apparaissent de toute façon jamais dans la vidéo."
+    },
+    "nickname": {
+      "reserved": "Modérateur,Modératrice,Intervenant,Intervenante,Orateur,Oratrice,Participant,Participante,Invité,Invitée,Organisateur,Organisatrice,Administrateur,Administratrice,Animateur,Animatrice",
+      "label": "Surnom (facultatif)",
+      "help": "Un seul mot, de 2 à 24 caractères : lettres, chiffres et . _ -. Les autres le voient à la place de votre nom dans la vidéo, dans le chat, dans les questions et dans la transcription.",
+      "helpName": "Si vous le laissez vide, vous apparaissez sous votre nom.",
+      "helpAnonymous": "Si vous le laissez vide, vous apparaissez sous un pseudonyme automatique.",
+      "checking": "Vérification du surnom…",
+      "shownAs": "Les autres vous verront sous le nom « {nickname} ».",
+      "useSuggestion": "Utiliser « {suggestion} »",
+      "errors": {
+        "length": "Le surnom doit compter de 2 à 24 caractères.",
+        "format": "Un seul mot : il commence par une lettre et se termine par une lettre ou un chiffre ; entre les deux, des lettres, des chiffres et . _ -, jamais deux à la suite.",
+        "scripts": "Utilisez les lettres d'un seul alphabet.",
+        "reserved": "Il contient un mot réservé, comme le nom d'un rôle : choisissez-en un autre.",
+        "host": "Il ressemble au nom d'une personne qui anime l'événement : choisissez-en un autre.",
+        "taken": "Quelqu'un dans l'événement utilise déjà ce surnom.",
+        "disabled": "Cet événement n'accepte pas de nouveaux surnoms : vous pouvez seulement retirer le vôtre.",
+        "rete": "Le surnom n'a pas pu être vérifié. Réessayez."
+      },
+      "button": "Surnom",
+      "open": "Changer votre surnom",
+      "dialogTitle": "Votre surnom",
+      "dialogIntro": "Les autres voient le surnom à la place de votre nom. Pour le changer, la salle vous reconnecte un instant.",
+      "apply": "Enregistrer et se reconnecter",
+      "remove": "Retirer le surnom",
+      "reconnecting": "Reconnexion en cours…",
+      "done": "C'est fait : vous apparaissez maintenant sous le nom « {nickname} ».",
+      "doneRemoved": "C'est fait : le surnom a été retiré."
     }
   },
   "qa": {
@@ -721,9 +770,9 @@
     "upvote": "Voter",
     "upvoted": "Voté",
     "noQuestions": "Aucune question pour le moment. Soyez le premier !",
-    "qaPersistenceNote": "Les questions sont sauvegardées et seront disponibles après l'événement.",
-    "qaPostEvent": "Q&A de l'événement",
-    "noAnsweredQuestions": "Aucune question avec réponse pour cet événement.",
+    "qaPersistenceNote": "Le texte des questions peut apparaître sur la page de l'événement, sans le nom de la personne qui les a posées.",
+    "personalDataNotice": "N'écrivez pas les données personnelles d'autres personnes, ni les vôtres si vous ne souhaitez pas les rendre publiques : le texte de la question peut apparaître sur la page de l'événement, sans votre nom.",
+    "personalDataNoticeNotPublished": "N'écrivez pas les données personnelles d'autres personnes, ni les vôtres si vous ne souhaitez pas les faire connaître : les personnes présentes dans la salle peuvent lire le texte de la question.",
     "filterAll": "Toutes",
     "showPanel": "Afficher Q&A",
     "hidePanel": "Masquer Q&A",
@@ -742,6 +791,8 @@
       "editAnswer": "Modifier la réponse",
       "answerFieldLabel": "Réponse à la question de {name}",
       "answerPlaceholder": "Rédigez la réponse (2000 caractères max.)",
+      "answerNotice": "La réponse peut apparaître sur la page de l'événement : n'écrivez pas de données personnelles.",
+      "answerNoticeNotPublished": "Les personnes présentes dans la salle peuvent lire la réponse : n'écrivez pas de données personnelles.",
       "sendAnswer": "Publier la réponse",
       "cancel": "Annuler",
       "removeAnswer": "Retirer la réponse"
@@ -769,7 +820,8 @@
     "accessDenied": {
       "title": "Cette section n’est pas disponible pour votre rôle",
       "body": "En tant qu’organisateur, vous gérez vos propres événements : création, publication, supports, questionnaires et post-production. Les réglages de la plateforme et les données de tous les événements restent à l’administration.",
-      "back": "Aller à vos événements"
+      "back": "Aller à vos événements",
+      "organizerOnly": "Seuls les organisateurs de cet événement peuvent le modifier. En tant qu’administrateur, vous voyez son état et ses détails, et vous pouvez l’archiver ou le supprimer. Ses enregistrements et leur contenu appartiennent aux organisateurs et aux participants."
     },
     "staffLogin": {
       "title": "Connexion à l’espace d’administration",
@@ -1025,6 +1077,24 @@
           }
         },
         "recordingManualNote": "L'enregistrement ne démarre jamais tout seul : un animateur le lance avec le bouton REC.",
+        "recordingDestination": "Où va l'enregistrement",
+        "recordingDestinationReserved": "Réservé",
+        "recordingDestinationReservedDesc": "Les organisateurs et les inscrits peuvent le voir, ces derniers tant que les données de leur inscription sont conservées. Il n'est pas publié. Après l'ouverture de la salle, il ne peut plus être rendu public.",
+        "recordingDestinationPublic": "Public",
+        "recordingDestinationPublicDesc": "Il peut être publié sur la page de l'événement et dans la vidéothèque. Les participants y consentent également.",
+        "recordingDestinationNotSet": "Non indiqué : l'événement a été créé avant ce choix.",
+        "recordingDestinationStaffOnly": "L'équipe de l'événement choisit où va l'enregistrement : pour l'instant, ce n'est pas indiqué.",
+        "recordingDestinationStartsReserved": "L'enregistrement est d'abord réservé : l'équipe de l'événement peut le rendre public tant que la salle n'est pas ouverte.",
+        "recordingDestinationStaysReserved": "L'enregistrement reste réservé : la salle a déjà été ouverte.",
+        "recordingDestinationLocked": "Après l'ouverture de la salle, on peut seulement passer à « Réservé » : les consentements valent pour le texte que les personnes ont lu.",
+        "recordingDestinationPublicOnInvitation": "L'événement est sur invitation, mais l'enregistrement reste public : tout le monde pourra voir la vidéo, pas seulement les invités.",
+        "recordingDestinationReservedOnInvitation": "L'événement est sur invitation : l'enregistrement est passé à « Réservé ». Vous pouvez le modifier dans « Enregistrement et IA ».",
+        "postEventPagePrivateOnInvitation": "L'événement est sur invitation : la page après l'événement est devenue privée. Vous pouvez la modifier dans « Confidentialité, données et page après l'événement ».",
+        "postEventPagePublicWithVideo": "L'enregistrement est public : la page après l'événement est devenue publique, sinon personne ne verrait la vidéo. Vous pouvez la modifier dans « Confidentialité, données et page après l'événement ».",
+        "postEventPageStaysPrivate": "L'événement est ouvert à toute personne qui s'inscrit, mais la page après l'événement est restée privée : elle ne se rouvre pas toute seule. Vous pouvez la modifier dans « Confidentialité, données et page après l'événement ».",
+        "postEventPagePrivateVideoHidden": "L'enregistrement est public mais la page après l'événement est privée : personne ne verra la vidéo, pas même les inscrits, tant que la page reste privée.",
+        "recordingNothingToCapture": "Cette installation n'a pas la vidéo de la salle : sans la transcription et les pistes par participant, rien n'est enregistré.",
+        "recordingDestinationRequired": "Choisissez où va l'enregistrement.",
         "audienceAnonymous": "Public anonyme",
         "audienceAnonymousDesc": "Les participants apparaissent aux autres sous un pseudonyme (« Participant » et un code) en vidéo, dans le chat et les questions ; la liste des participants reste aux animateurs et il n'y a pas de place. Utile pour les grands événements ; aux événements de communauté, on veut se connaître.",
         "audienceAnonymousLocked": "Non modifiable tant que la salle peut être ouverte : cela relierait les pseudonymes aux noms.",
@@ -1032,10 +1102,15 @@
         "participantListVisibleDesc": "Désactivé : la liste, la grille et les noms sur la place restent réservés aux personnes qui animent et interviennent ; le public ne voit que la personne qui parle. Activé : tout le monde voit qui est dans la salle.",
         "participantListAnonymous": "Avec un public anonyme, la liste reste masquée.",
         "participantListLocked": "Non modifiable quand la salle est ouverte : les personnes déjà présentes ne verraient pas le changement.",
+        "nicknamesEnabled": "Surnoms pour les participants",
+        "nicknamesEnabledDesc": "Les participants peuvent choisir un surnom : les autres le voient à la place de leur nom dans la vidéo, dans le chat, dans les questions et dans la transcription. Les organisateurs et les modérateurs voient qui se trouve derrière. Les animateurs gardent leur propre nom. Activé par défaut lorsque la liste des participants est masquée.",
+        "nicknamesLocked": "Impossible de le modifier pendant que la salle est ouverte : les personnes déjà présentes ont choisi selon la règle précédente.",
         "participantListCameraNote": "Avec la liste masquée, les personnes qui activent leur caméra ne voient pas leur propre image. Pour une réunion où tout le monde se voit, affichez la liste.",
         "recordingLockedLive": "L'enregistrement ne se modifie pas quand la salle est ouverte : il vaut dès la première entrée.",
         "hostsAlwaysRecorded": "Les animateurs sont toujours dans l'enregistrement",
-        "hostsAlwaysRecordedDesc": "Désactivée, modérateurs et intervenants choisissent comme tout le monde. Activez-la seulement s'ils ont déjà accepté d'être filmés : ils ne voient pas la case, et l'information de l'événement doit le dire."
+        "hostsAlwaysRecordedDesc": "Les modérateurs et les intervenants apparaissent dans la vidéo avec leur nom et leur image, sans case à cocher : l'avis de confidentialité de l'événement doit le dire. Des participants, seule la voix est enregistrée, et seulement avec leur consentement.",
+        "hostsAlwaysRecordedDescHostsOnly": "Les modérateurs et les intervenants apparaissent dans la vidéo avec leur nom et leur image, sans case à cocher : l'avis de confidentialité de l'événement doit le dire. Les participants ne sont jamais vus ni entendus dans la vidéo.",
+        "hostsAlwaysRecordedDescVisible": "Les modérateurs et les intervenants apparaissent dans la vidéo avec leur nom et leur image, sans case à cocher : l'avis de confidentialité de l'événement doit le dire. Cette installation ne peut pas tenir les participants hors de la vidéo : qui consent intervient avec son nom, sa voix et son image, et le nom de toute personne qui suit peut apparaître même sans intervenir."
       },
       "step3": {
         "heading": "Personnes et invitations",
@@ -1053,7 +1128,7 @@
         "remove": "Supprimer",
         "invalidEmail": "Adresse e-mail non valide.",
         "duplicateEmail": "Adresse déjà ajoutée.",
-        "rubricaPick": "Rechercher dans le carnet par organisation…",
+        "rubricaPick": "Rechercher dans le carnet d'adresses par nom, e-mail ou organisation…",
         "rubricaOrAdd": "ou ajouter manuellement",
         "removeItem": "Supprimer {name}",
         "invitationsStaffOnly": "Les invitations sont gérées par l'équipe de l'événement.",
@@ -1135,6 +1210,7 @@
         "askOrganization": "Organisme (obligatoire pour s'inscrire)",
         "askRole": "Fonction (facultatif)",
         "askType": "Type d'organisme (facultatif)",
+        "askAddressBook": "Proposer de rester dans le carnet d'adresses (facultatif pour les personnes qui s'inscrivent)",
         "questionnairesHeading": "Questionnaires",
         "questionsBefore": "Avant l'événement, à l'inscription : {count, plural, =0 {aucune question supplémentaire} one {# question supplémentaire} other {# questions supplémentaires}}",
         "questionsAfter": "Après l'événement : {count, plural, =0 {aucun questionnaire de satisfaction} one {questionnaire de satisfaction, # question} other {questionnaire de satisfaction, # questions}}",
@@ -1230,6 +1306,8 @@
         "gdprHeading": "Confidentialité et conservation des données",
         "retentionDays": "Jours de conservation",
         "retentionHelp": "Au-delà de ce seuil, les données personnelles sont automatiquement supprimées.",
+        "recordingRetention": "Durée de l'enregistrement",
+        "recordingRetentionHelp": "L'enregistrement et ce qui en est tiré ne sont pas supprimés avec les données des personnes. Avec une durée, ils sont supprimés ce nombre de jours après la fin de l'événement ou, si la vidéo est publiée, après la publication. Elle se modifie aussi plus tard, dans le panneau de l'enregistrement.",
         "gdprTemplate": "Modèle d'information",
         "gdprTemplateNone": "— Utiliser un texte personnalisé —",
         "gdprTemplateUnknown": "Le modèle de politique de confidentialité sélectionné n'existe plus : choisissez-en un autre ou revenez au texte personnalisé",
@@ -1281,7 +1359,10 @@
         "participantsCan": "Participants : {list}",
         "none": "aucune",
         "recordingManual": "Disponible : il démarre seulement quand un animateur appuie sur REC.",
+        "recordingDestinationReserved": "Destination : enregistrement réservé aux organisateurs et aux inscrits.",
+        "recordingDestinationPublic": "Destination : enregistrement public.",
         "aiAfter": "Après l'enregistrement : {list}.",
+        "aiConfirmVideo": "Sans pistes par personne, la transcription de la vidéo ne démarre qu'après la confirmation que toutes les voix ont consenti.",
         "scheduleHeading": "Quand il a lieu",
         "scheduleIntro": "Quand l'événement a lieu : date, heure et fuseau horaire.",
         "advancedIntro": "Valeurs déjà choisies par le modèle : modifiez seulement ce qui est nécessaire.",
@@ -1325,17 +1406,25 @@
         "askOrganization": "organisme",
         "askRole": "fonction",
         "askType": "type d'organisme",
+        "askAddressBook": "si la personne souhaite rester dans le carnet d'adresses",
         "permissionsHeading": "Qui peut faire quoi dans la salle",
         "permissionsIntro": "Ce que les participants peuvent faire et quelles fonctions de la salle sont actives. Tout se modifie aussi pendant l'événement.",
         "consentsLine": "Consentements à l'inscription et dans la salle : {list}",
         "consentRecordingFree": "enregistrement, libre (sans, écoute seule)",
         "consentRecordingNotice": "pour l'enregistrement, seulement un avis (les participants ne parlent ni ne se montrent)",
+        "consentRecordingHostsOnly": "pour l'enregistrement, seulement un avis (seuls les animateurs apparaissent dans la vidéo)",
         "consentTranscription": "transcription de ses interventions, facultative",
-        "consentsNone": "Aucun consentement en dehors de celui de l'inscription.",
-        "consentsHosts": "Aux animateurs et intervenants, l'enregistrement est demandé dans la salle, facultatif.",
+        "consentsNone": "Aucun consentement à demander : à l'inscription, la prise de connaissance de la politique de confidentialité suffit.",
         "consentsWithdraw": "Les participants peuvent les retirer dans la salle, avec le bouton « Consentements ».",
         "participantListShown": "Liste des participants : visible par tous.",
         "participantListHidden": "Liste des participants : réservée aux personnes qui animent et interviennent.",
+        "audiencePseudonyms": "Noms du public : pseudonymes.",
+        "audienceNicknames": "Les participants peuvent utiliser un surnom.",
+        "audienceRealNames": "Noms du public : noms réels.",
+        "postEventQaHidden": "Questions après l'événement : non publiées.",
+        "postEventQaTextOnly": "Questions après l'événement : texte seul, sans nom.",
+        "addressBookOffered": "Carnet d'adresses : proposé aux personnes qui s'inscrivent.",
+        "addressBookNotOffered": "Carnet d'adresses : non proposé.",
         "consentRecordingOptional": "enregistrement, facultatif",
         "consentRecordingVoice": "enregistrement, facultatif (sans, la personne reste hors de l'enregistrement)",
         "consentsHostsAlways": "Les animateurs et intervenants sont toujours dans l'enregistrement : ils ne voient pas la case."
@@ -1409,15 +1498,15 @@
         "recording": "Dans l'enregistrement",
         "roomSame": "Participe selon les règles de l'événement.",
         "roomListenOnly": "Écoute et chat uniquement.",
-        "recordedFull": "Nom, voix, image et écran partagé.",
+        "recordedFull": "Seulement sa voix, quand la personne parle : visage et nom n'apparaissent jamais.",
+        "recordedVisible": "Nom, voix, image et écran partagé.",
         "notRecorded": "N'apparaît pas : ni nom, ni voix, ni image, ni écran partagé.",
         "recordedVoice": "Sa voix, sur une piste séparée.",
         "notRecordedVoice": "Sa voix n'est pas enregistrée.",
         "othersSame": "Les autres ne changent pas : verrous des micros, parole et aspect de la vidéo restent ceux de l'événement.",
         "audienceNotice": "Le public n'a ni micro, ni caméra, ni écran : il reçoit seulement un avis. Si la parole lui est donnée, il peut consentir dans la salle ; sinon, il reste hors de l'enregistrement.",
-        "hostsChoose": "Modérateurs et intervenants choisissent comme tout le monde : sans consentement, ils animent normalement mais restent hors de l'enregistrement.",
         "hostsAlways": "Modérateurs et intervenants sont toujours dans l'enregistrement : ils ne voient pas la case.",
-        "hostsFixed": "Modérateurs et intervenants animent quoi qu'il arrive, et la vidéo les filme.",
+        "hostsOnly": "Cette installation n'enregistre dans la vidéo que les animateurs : les participants ne sont ni vus ni entendus, et leur consentement à l'enregistrement ne leur est pas demandé.",
         "trace": "Si elle intervient pendant l'enregistrement, une note près de la vidéo signale une intervention manquante, et la transcription indique *** avec l'heure.",
         "anytime": "Le consentement se donne et se retire dans la salle, à tout moment.",
         "transcription": "La transcription de ses propres interventions est un consentement distinct, facultatif.",
@@ -1472,7 +1561,9 @@
       "breadcrumbAriaLabel": "Fil d'Ariane",
       "skipToPage": "Aller au contenu de la page",
       "openMenu": "Ouvrir le menu",
-      "closeMenu": "Fermer le menu"
+      "closeMenu": "Fermer le menu",
+      "recordingRemovals": "Demandes de retrait",
+      "recordingRemovalDetail": "Demande de retrait"
     },
     "publications": {
       "subtitle": "Hub éditorial unique pour toutes les vidéos publiées : événements planifiés, appels instantanés, archives historiques téléversées et sessions en attente de promotion.",
@@ -1543,6 +1634,8 @@
           "saveFailed": "Échec de l'enregistrement des métadonnées."
         }
       },
+      "reservedBadge": "Réservé",
+      "reservedHelp": "L'enregistrement est réservé aux inscrits : il ne peut pas apparaître dans la vidéothèque.",
       "updateFailed": "Échec de la mise à jour."
     },
     "recordingsLibrary": {
@@ -1614,7 +1707,8 @@
       "detailFilename": "Nom du fichier",
       "transcriptManage": "Gérer la transcription / IA",
       "transcriptReady": "Transcrit",
-      "transcriptProcessing": "En cours"
+      "transcriptProcessing": "En cours",
+      "organizerOnly": "Organisateurs uniquement"
     },
     "gdprAudit": {
       "subtitle": "Journal des actions de confidentialité sur les données personnelles : suppressions, consentements, exports",
@@ -1629,7 +1723,12 @@
         "DATA_DELETED": "Données supprimées",
         "CONSENT_RECORDED": "Consentement enregistré",
         "DATA_EXPORTED": "Données exportées",
-        "CONSENT_WITHDRAWN": "Consentement retiré"
+        "DATA_RECTIFIED": "Données corrigées",
+        "CONSENT_WITHDRAWN": "Consentement retiré",
+        "RECORDING_CONTENT_READ": "Contenu de l’enregistrement lu par le personnel",
+        "RECORDING_REDACTION_REQUESTED": "Retrait d'un enregistrement demandé",
+        "RECORDING_REDACTION_REJECTED": "Demande de retrait rejetée",
+        "RECORDING_REDACTED": "Personne retirée d'un enregistrement"
       },
       "recordsAffected": "{count} enregistrements concernés",
       "colWhen": "Quand",
@@ -1655,7 +1754,8 @@
       "rotating": "Régénération…",
       "regenerateTitle": "Régénérer le jeton modérateur (invalide l'ancien lien)",
       "confirmRegenerate": "Confirmez-vous la régénération du jeton ? L'ancien lien ne fonctionnera plus.",
-      "noResults": "Aucun événement trouvé."
+      "noResults": "Aucun événement trouvé.",
+      "organizerOnlyLink": "Lien visible uniquement par les organisateurs de l’événement"
     },
     "registrations": {
       "subtitle": "Toutes les personnes inscrites aux événements — recherche, filtre et export",
@@ -1684,6 +1784,8 @@
       "colCreatedAt": "Date d'inscription",
       "colEvent": "Événement",
       "colName": "Nom",
+      "colNickname": "Surnom",
+      "nicknameShown": "Les autres le voient sous le nom « {nickname} »",
       "colEmail": "E-mail",
       "colOrg": "Organisation",
       "colJoined": "A participé",
@@ -1917,7 +2019,7 @@
       "aiSectionHeading": "Post-production automatique",
       "aiSectionDesc": "Une fois l'événement terminé, l'enregistrement peut être traité par un pipeline d'intelligence artificielle hébergé dans le cluster afin de produire une transcription, une synthèse et, si demandé, des traductions et un doublage. Tout se déroule sur l'infrastructure de cette installation : aucune donnée n'est transmise à des tiers.",
       "aiTranscriptEnabled": "Transcription automatique",
-      "aiTranscriptEnabledDesc": "Reconnaissance de la parole avec identification des intervenants. Nécessaire pour activer la synthèse, les traductions et le doublage.",
+      "aiTranscriptEnabledDesc": "Reconnaissance de la parole avec identification des intervenants. Nécessaire pour activer la synthèse, les traductions et le doublage. Chaque participant choisit si ses interventions sont transcrites.",
       "aiSummaryEnabled": "Synthèse et chapitres",
       "aiSummaryEnabledDesc": "Résumé de la réunion, décisions prises, actions à mener et découpage en chapitres horodatés.",
       "aiTranslationEnabled": "Traduction dans d'autres langues",
@@ -2023,7 +2125,7 @@
     },
     "recordingUpload": {
       "title": "Téléverser un enregistrement existant",
-      "subtitle": "Si vous avez déjà un fichier vidéo de l'événement (par exemple enregistré avec une autre plateforme), téléversez-le ici : il sera affiché comme enregistrement officiel sur la page publique.",
+      "subtitle": "Si vous avez déjà un fichier vidéo de l'événement (par exemple enregistré avec une autre plateforme), téléversez-le ici : il sera l'enregistrement officiel de l'événement.",
       "fileLabel": "Fichier vidéo",
       "upload": "Téléverser et associer",
       "signing": "Préparation…",
@@ -2087,7 +2189,9 @@
         "DATA_DELETED": "Données supprimées",
         "CONSENT_RECORDED": "Consentement enregistré",
         "DATA_EXPORTED": "Données exportées",
-        "CONSENT_WITHDRAWN": "Consentement retiré"
+        "DATA_RECTIFIED": "Données corrigées",
+        "CONSENT_WITHDRAWN": "Consentement retiré",
+        "RECORDING_CONTENT_READ": "Contenu de l’enregistrement lu par le personnel"
       }
     },
     "settings": {
@@ -2130,7 +2234,7 @@
         "jobMaxAttempts": "Tentatives avant échec",
         "jobMaxAttemptsHelp": "Nombre de fois où la chaîne de traitement relance une tâche avant de la marquer comme échouée. Le délai entre tentatives croît de façon exponentielle (de 30 secondes jusqu'à 2 heures). La valeur typique est 5.",
         "artifactRetentionDays": "Conservation des artefacts (jours)",
-        "artifactRetentionDaysHelp": "À 0, il n'y a pas de limite pour tout le site : les artefacts IA suivent la conservation de leur enregistrement ou de l'événement. Une valeur supérieure à zéro fait supprimer par une tâche quotidienne tout artefact créé il y a plus de ce nombre de jours, publié ou non : elle peut raccourcir la conservation, jamais l'allonger. Les noms des intervenants et les charges utiles des tâches ne sont pas concernés : ils suivent la conservation de l'enregistrement ou de l'événement. Détails dans docs/privacy/recordings-and-ai.md.",
+        "artifactRetentionDaysHelp": "À 0, il n'y a pas de limite pour tout le site : les artefacts IA suivent la conservation de leur enregistrement. Une valeur supérieure à zéro fait supprimer par une tâche quotidienne tout artefact créé il y a plus de ce nombre de jours, publié ou non : elle peut raccourcir la conservation, jamais l'allonger. Les noms des intervenants et les charges utiles des tâches ne sont pas concernés : ils suivent la conservation de l'enregistrement. Détails dans docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "Avis IA dans la salle d'attente",
         "consentDisclosureHelp": "Texte affiché aux participants dans la salle d'attente lorsque l'événement utilise la post-production IA (transcription, synthèse, traduction, doublage). Personnalisable par langue. Laissez vide pour utiliser le texte par défaut du système.",
         "consentDisclosurePlaceholder": "Ex. Cet événement sera transcrit et résumé automatiquement à l'aide d'outils d'IA après le direct…"
@@ -2307,6 +2411,8 @@
         "guestAccessEnabledHelp": "Les personnes non inscrites peuvent rejoindre les événements en cours en indiquant seulement leur nom. Si elle est désactivée, on n'entre dans les événements programmés qu'avec une inscription ou un lien de modérateur ou d'intervenant ; les appels vidéo instantanés restent ouverts à toute personne disposant du lien. Un événement sur invitation n'admet jamais d'invités sans inscription.",
         "publicRegistrationEnabled": "Inscription publique active",
         "publicRegistrationEnabledHelp": "Tout le monde peut s'inscrire aux événements. Si elle est désactivée, seules les personnes figurant sur la liste des invités de l'événement peuvent s'inscrire, et le lien personnel pour entrer n'est envoyé que par e-mail ; les personnes déjà inscrites et les liens de modérateurs et d'intervenants continuent de fonctionner. C'est le choix proposé aux nouveaux événements : chacun peut en décider autrement à l'étape « Personnes ».",
+        "addressBookEnabled": "Carnet d'adresses des événements",
+        "addressBookEnabledHelp": "Propose aux personnes qui s'inscrivent de rester dans le carnet d'adresses pour être invitées à des événements similaires. Lorsqu'il est désactivé, la case disparaît des formulaires et le sélecteur de l'assistant ; les entrées déjà présentes restent jusqu'au retrait du consentement ou à l'expiration.",
         "calendarPublic": "Calendrier public",
         "calendarPublicHelp": "Publier le calendrier des événements. Les visiteurs peuvent voir les événements programmés.",
         "parseTitleKicker": "Sur-titres éditoriaux",
@@ -2397,6 +2503,40 @@
         "avgParticipantsPerEvent": "Participants moyens par événement",
         "avgFeedbackRating": "Note moyenne des retours",
         "totalFeedback": "Réponses de retour"
+      },
+      "catalog": {
+        "title": "Types d'événement et modèles",
+        "intro": "Combien d'événements de chaque type et issus de chaque modèle, mois par mois. Uniquement des décomptes et des moyennes, aucune donnée personnelle. Les brouillons ne comptent pas.",
+        "periodLabel": "Période",
+        "months": "{count, plural, one {# mois} other {# mois}}",
+        "groupByLabel": "Regrouper par",
+        "groupBy": {
+          "type": "Type d'événement",
+          "template": "Modèle"
+        },
+        "rankingTypes": "Les types les plus fréquents",
+        "rankingTemplates": "Les modèles les plus utilisés",
+        "columns": {
+          "type": "Type",
+          "template": "Modèle",
+          "events": "Événements",
+          "held": "Tenus",
+          "avgParticipants": "Participants moy.",
+          "avgDuration": "Durée moy.",
+          "total": "Toute la période"
+        },
+        "measuresNote": "Tenus : événements dont la salle s'est ouverte. Participants moyens : le pic de personnes présentes en même temps, invités compris, en moyenne sur les événements tenus. Durée moyenne : le temps de salle mesuré, et non le temps prévu.",
+        "byMonth": "Mois par mois",
+        "measureLabel": "Mesure",
+        "measures": {
+          "events": "Événements",
+          "avgParticipants": "Participants moyens",
+          "avgDurationMinutes": "Durée moyenne"
+        },
+        "byMonthCaption": "{measure} par mois",
+        "empty": "Aucun événement sur cette période.",
+        "deletedTemplate": "{name} (supprimé)",
+        "uncatalogedNote": "Événements non catalogués : {count}. Ils ont été créés avant le catalogue, ou sans modèle ni format ; vous pouvez les cataloguer en modifiant l'événement, dans les détails techniques."
       }
     },
     "recurrence": {
@@ -2439,6 +2579,8 @@
       "featuresLabel": "Fonctionnalités",
       "whiteboardLabel": "Tableau blanc",
       "recordingLabel": "Enregistrement",
+      "recordingDestination": "Destination de l'enregistrement",
+      "recordingDestinationNone": "Choisie à la création de l'événement",
       "waitingRoomEngineLabel": "Salle d'attente (valeur par défaut du modèle)",
       "waitingRoomEngineSiteDefault": "Valeur par défaut du site",
       "waitingRoomEngineGarden": "Jardin (standard)",
@@ -2451,17 +2593,22 @@
       "durationLabel": "Durée par défaut (minutes)",
       "durationHint": "Pré-remplit la fin de l'événement (début + durée). L'utilisateur peut la modifier. Vide = 2 heures.",
       "retentionLabel": "Conservation des données par défaut (jours)",
+      "recordingRetentionLabel": "Durée par défaut de l'enregistrement",
+      "recordingRetentionHint": "Pour les événements créés à partir de ce modèle ; elle se modifie dans l'assistant et dans le panneau de l'enregistrement. L'enregistrement ne suit pas la conservation des données.",
       "expectedSpeakersLabel": "Nombre d'intervenants attendu (par défaut)",
       "descriptionTemplateLabel": "Description par défaut",
       "descriptionTemplateHint": "Texte pré-rempli dans la description de l'événement (modifiable).",
       "aiTranscript": "Transcription automatique (par défaut)",
       "aiSummary": "Synthèse automatique (par défaut)",
       "aiTranslation": "Traduction automatique (par défaut)",
+      "noRecording": "Cette installation n'enregistre pas : les modèles démarrent sans enregistrement.",
       "pickerSubtitle": "Sélectionnez un modèle pour préconfigurer les paramètres de l'événement, ou passez cette étape pour tout configurer manuellement.",
       "skipTemplate": "Configurer manuellement",
       "postEventPublic": "Page publique après l'événement",
+      "offerAddressBook": "Propose le carnet d'adresses aux personnes qui s'inscrivent",
       "invalidFields": "Vérifiez ces champs : {fields}.",
-      "descriptionOtherLanguages": "Il existe aussi des versions en : {languages}, qui ne se modifient pas ici. Si vous changez le texte italien, elles sont supprimées."
+      "descriptionOtherLanguages": "Il existe aussi des versions en : {languages}, qui ne se modifient pas ici. Si vous changez le texte italien, elles sont supprimées.",
+      "usedBy": "Événements créés à partir de ce modèle : {count}"
     },
     "instantCall": {
       "title": "Appel vidéo instantané",
@@ -2724,7 +2871,7 @@
       "title": "Sessions d'appel",
       "empty": "Aucune session enregistrée. Les sessions live sont listées ici automatiquement dès que le modérateur entre dans la salle.",
       "loading": "Chargement des sessions...",
-      "participants": "participants",
+      "participantsCount": "{count, plural, one {# participant} many {# de participants} other {# participants}}",
       "participantList": "Participants",
       "name": "Nom",
       "joined": "Entrée",
@@ -2974,11 +3121,28 @@
         "publishNow": "Publier maintenant"
       },
       "editFeatures": "Modifier les fonctions",
-      "editPrivacy": "Modifier la confidentialité et les données"
+      "editPrivacy": "Modifier la confidentialité et les données",
+      "governance": {
+        "title": "Vous gérez cet événement en tant qu’administrateur",
+        "body": "Vous ne faites pas partie de ses organisateurs : vous voyez l’état, les détails, les inscriptions et les consentements, et vous pouvez l’archiver ou le supprimer. La conduite de l’événement, le lien du modérateur et le contenu des enregistrements (vidéo, transcriptions, synthèses) reviennent aux organisateurs.",
+        "recording": "Le contenu de l’enregistrement n’est accessible qu’aux organisateurs de l’événement et à ses participants. Vous voyez ici s’il existe et ses détails.",
+        "recordingFile": "Enregistrement",
+        "present": "Présent",
+        "absent": "Aucun",
+        "recordingPublished": "Publié",
+        "yes": "Oui",
+        "no": "Non",
+        "recordingDuration": "Durée",
+        "recordingSize": "Taille",
+        "recordingRetention": "Suppression automatique de l'enregistrement",
+        "recordingRetentionNone": "Aucune",
+        "recordingRetentionDays": "{days, plural, one {# jour} many {# jours} other {# jours}} après la fin de l'événement ou, s'il est publié, après la publication"
+      }
     },
     "rubrica": {
-      "subtitle": "Personnes ayant consenti à être inscrites au carnet d'adresses (art. 6.1.a RGPD). Les informations de profil sont mises à jour automatiquement à chaque ré-inscription.",
-      "searchLabel": "Rechercher par nom ou organisation",
+      "subtitle": "Personnes ayant consenti à être inscrites au carnet d'adresses (art. 6.1.a RGPD). Le nom, l'e-mail et l'organisation ne sont mis à jour que lorsque la personne coche à nouveau la case.",
+      "searchLabel": "Rechercher par nom, e-mail ou organisation",
+      "searchPartial": "La recherche n'a porté que sur les {limit} entrées mises à jour le plus récemment : une personne mise à jour il y a plus longtemps peut ne pas apparaître.",
       "orgTypeLabel": "Type d'organisation",
       "allTypes": "Tous",
       "includeOptedOut": "Inclure les personnes ayant retiré leur consentement",
@@ -3243,7 +3407,8 @@
         "metricsTitle": "Métriques de synthèse (LLM)",
         "chars": "caractères",
         "model": "Modèle",
-        "notAvailable": "n/d"
+        "notAvailable": "n/d",
+        "contentHidden": "Accessible uniquement aux organisateurs de l’événement."
       },
       "rel": {
         "title": "Fiabilité de l'IA",
@@ -3400,7 +3565,8 @@
         "alignNone": "Aucun changement de diapositive à aligner.",
         "previewTitle": "Aperçu",
         "previewHelp": "La vidéo avec les diapositives telles que le public les verra, avec la correction saisie ci-dessus."
-      }
+      },
+      "contentOrganizerOnly": "Seuls les organisateurs de cet événement peuvent voir et modifier le contenu de cet enregistrement (vidéo, pistes, transcription, synthèse, traductions). Vous voyez ici son état, les traitements et les détails des fichiers."
     },
     "questionnairesPage": {
       "subtitle": "Modèles de questions réutilisables pour les questionnaires de pré-inscription et après l'événement."
@@ -3597,10 +3763,13 @@
         "speakers": "Intervenants et animateurs",
         "speakersDesc": "Le public écrit dans le chat et pose des questions"
       },
-      "recQ": "Voulez-vous pouvoir enregistrer ?",
+      "recQ": "Voulez-vous pouvoir enregistrer, et pour qui ?",
       "rec": {
-        "yes": "Oui, quand vous appuyez sur REC",
         "yesDesc": "Après l'événement : transcription, synthèse et traduction",
+        "reserved": "Oui, réservé",
+        "reservedDesc": "Les organisateurs et les inscrits peuvent le voir",
+        "public": "Oui, public",
+        "publicDesc": "Il peut être publié sur la page de l'événement",
         "no": "Non",
         "noDesc": "Aucun enregistrement, aucun consentement à demander"
       },
@@ -3614,7 +3783,8 @@
         "grande": "Plus de 100 personnes",
         "tutti": "tout le monde en vidéo",
         "relatori": "les intervenants parlent",
-        "si": "avec enregistrement",
+        "riservata": "avec enregistrement réservé aux inscrits",
+        "pubblica": "avec enregistrement public",
         "no": "sans enregistrement",
         "openAccess": "ouvert à tous",
         "inviteOnly": "sur invitation"
@@ -3627,6 +3797,9 @@
         "invitationDesc": "La page reste visible, mais seules les personnes de la liste s'inscrivent ; l'invitation avec le lien d'inscription s'envoie par e-mail depuis la page de l'événement"
       },
       "previewInvitation": "Seules les personnes invitées s'inscrivent ; sans inscription, on n'entre pas.",
+      "previewPseudonyms": "Le public apparaît sous un pseudonyme",
+      "previewNicknames": "Les participants peuvent utiliser un surnom",
+      "previewRealNames": "Le public apparaît sous son propre nom",
       "templateReplaces": "Un modèle apporte ses propres réglages à la place des réponses ci-dessous. Vous saisissez le titre, les dates et les personnes aux étapes suivantes.",
       "instantBack": "Créer plutôt un événement programmé"
     },
@@ -3686,7 +3859,9 @@
       "publishDesc": "Relisez-le avant de le publier : le texte est rédigé par un modèle d'intelligence artificielle. Un compte rendu régénéré doit être publié à nouveau.",
       "preview": "Aperçu",
       "hidePreview": "Masquer l'aperçu",
-      "previewLanguage": "Langue"
+      "previewLanguage": "Langue",
+      "organizerOnly": "Seuls les organisateurs de cet événement peuvent demander, lire et publier le compte rendu.",
+      "organizerOnlyExists": "Le compte rendu existe. Seuls les organisateurs de cet événement peuvent le lire et le publier."
     },
     "endEvent": "Terminer l'événement",
     "endEventConfirmTitle": "Terminer l'événement pour tout le monde ?",
@@ -3722,11 +3897,12 @@
       "organizersEmpty": "Aucun organisme indiqué : la page publique ne montre pas qui organise.",
       "sendAll": "Envoyer l'invitation à ceux qui ne l'ont pas reçue ({count})",
       "sending": "Envoi…",
-      "sendDone": "Invitations en cours d'envoi : {sent}. Ignorées (déjà inscrits ou sans adresse) : {skipped}.",
+      "sendDone": "Invitations en cours d'envoi : {sent}. Ignorées (déjà inscrits, sans adresse ou sans consentement aux communications) : {skipped}.",
       "sendError": "L'envoi a échoué : réessayez.",
       "sendNotPublished": "Les invitations partent tant que l'événement accepte des inscriptions : après la publication et avant la fin.",
       "invitedOn": "Invité le {date}",
       "notInvited": "Invitation non envoyée",
+      "stopped": "Ne reçoit pas d'invitations",
       "send": "Envoyer l'invitation",
       "resend": "Renvoyer",
       "actions": "Actions",
@@ -3764,6 +3940,7 @@
         "pubblicata": "Publiée.",
         "prontaAi": "Prête depuis la post-production : relisez-la ; elle est publiée avec la vidéo.",
         "prontaSottotitoli": "Prête à partir des sous-titres : vérifiez les noms et publiez-la.",
+        "daConfermare": "À lancer : la vidéo n'est transcrite qu'avec la confirmation que toutes les voix ont consenti.",
         "inLavorazione": "En cours de traitement.",
         "nessuna": "Aucune : ni sous-titres ni post-production.",
         "soloStaff": "La personne qui organise l’événement la relit et la publie depuis l’espace d’administration.",
@@ -3773,7 +3950,7 @@
         "title": "Compte rendu",
         "pubblicato": "Publié.",
         "daPubblicare": "Généré : relisez-le et publiez-le.",
-        "daGenerare": "À générer, à partir de la transcription, du chat et des évaluations.",
+        "daGenerare": "À générer, à partir de la transcription, des sondages, des évaluations et, si elles sont publiées, des questions.",
         "inLavorazione": "En cours de traitement.",
         "senzaPipeline": "La post-production IA n’est pas activée sur cette installation.",
         "soloStaff": "La personne qui organise l’événement le génère et le publie depuis l’espace d’administration.",
@@ -3803,6 +3980,7 @@
         "title": "Page publique",
         "visibile": "Visible par tous.",
         "nellaLibreria": "Visible par tous et dans la vidéothèque.",
+        "libreriaRiservata": "La page est visible, mais la vidéo est réservée aux inscrits : elle n'apparaît pas dans la vidéothèque.",
         "privata": "Retirée : le public ne la voit pas.",
         "scaduta": "N’est plus visible : la date d’expiration est passée.",
         "archiviato": "Événement archivé : la page n’est pas publique.",
@@ -3950,9 +4128,10 @@
     },
     "voiceConsent": {
       "title": "Transcrire l'enregistrement complet ?",
-      "message": "Cet événement a demandé à chaque personne son consentement à la transcription de ses interventions. L'enregistrement complet contient toutes les voix, y compris celles des personnes qui ne l'ont pas donné : ne le transcrivez que si toutes les personnes qui y parlent ont consenti. Votre confirmation est conservée dans le journal d'activité.",
+      "message": "L'enregistrement complet contient toutes les voix, y compris celles des personnes qui n'ont pas consenti à la transcription de leurs interventions : ne le transcrivez que si toutes les personnes qui y parlent ont consenti. Votre confirmation est conservée dans le journal d'activité.",
       "confirm": "Oui, tout le monde a consenti",
       "cancel": "Annuler",
+      "waitingNoCaptions": "La transcription de l'enregistrement complet n'a pas démarré seule : chaque personne choisit si ses interventions sont transcrites. Lancez-la avec {button} seulement si toutes les personnes qui parlent dans l'enregistrement ont consenti ; sinon, l'événement reste sans transcription.",
       "waiting": "La transcription de l{button}a pas démarré seule : cet événement a demandé à chaque personne son consentement à la transcription de ses interventions. Lancez-la avec « Générer avec l'IA » seulement si toutes les personnes qui parlent dans l'enregistrement ont consenti ; sinon, la transcription issue des sous-titres reste."
     },
     "editCopyTitle": "Copie de l'événement",
@@ -3981,22 +4160,149 @@
         "givenAt": "Donné le",
         "withdrawnAt": "Retiré le",
         "textVersion": "Version du texte",
+        "destination": "Destination",
+        "superseded": "Remplacé",
+        "supersededValue": "Par un consentement ultérieur",
+        "destinations": {
+          "PUBLIC": "Public",
+          "REGISTRANTS": "Réservé",
+          "none": "Non indiqué"
+        },
         "kinds": {
           "recording": "Enregistrement",
           "transcription": "Transcription des interventions"
         },
         "sources": {
           "registration": "inscription",
-          "room": "salle"
+          "room": "salle",
+          "self-service": "Mes données"
         },
         "roles": {
           "registrant": "inscrit",
           "guest": "invité",
           "host": "anime ou intervient"
         },
+        "erasedName": "(nom retiré sur demande)",
         "unreadableName": "(nom illisible)"
       },
+      "retainedNote": "{count, plural, one {# preuve est conservée} many {# preuves sont conservées} other {# preuves sont conservées}} tant que la vidéo ou la transcription existe.",
       "countsNote": "On compte les personnes : une inscription, un compte du personnel ou un lien nominatif comptent une fois ; un invité qui revient lors d'une autre visite compte à nouveau."
+    },
+    "recordingRemovals": {
+      "subtitle": "Personnes qui ont demandé à ne pas apparaître dans un enregistrement. Tant qu'une demande est ouverte, vous pouvez ouvrir cet enregistrement depuis l'éditeur de retrait, et chaque accès reste inscrit dans le journal des opérations.",
+      "filterOpen": "Ouvertes",
+      "filterAll": "Toutes",
+      "filterLabel": "Quelles demandes",
+      "empty": "Aucune demande.",
+      "loadError": "Impossible de charger les demandes.",
+      "colReceived": "Reçue",
+      "colPerson": "Personne",
+      "colEvent": "Événement",
+      "colSource": "Origine",
+      "colStatus": "Statut",
+      "open": "Ouvrir",
+      "unnamed": "Personne sans nom",
+      "sources": {
+        "self-service": "Mes données",
+        "admin": "Équipe"
+      },
+      "statuses": {
+        "OPEN": "Ouverte",
+        "IN_PROGRESS": "Prise en charge",
+        "PROCESSING": "En traitement",
+        "CLOSED": "Clôturée",
+        "REJECTED": "Rejetée"
+      },
+      "kinds": {
+        "registrant": "Inscrit",
+        "host": "Anime",
+        "guest": "Invité"
+      },
+      "newOpen": "Consigner une demande",
+      "newTitle": "Une demande reçue par d'autres voies",
+      "newIntro": "Pour une demande parvenue au responsable du traitement par e-mail, par courrier ou en personne. Choisissez l'enregistrement et, si vous la reconnaissez, la personne parmi celles qui étaient dans la salle.",
+      "recordingSearch": "Rechercher l'événement",
+      "recordingLabel": "Enregistrement",
+      "recordingChoose": "Choisir un enregistrement",
+      "recordingOption": "{title} · {date}",
+      "recordingNone": "Aucun enregistrement avec une vidéo ou des pistes par participant.",
+      "peopleLabel": "Qui était dans la salle",
+      "peopleNone": "La salle n'a pas gardé trace des personnes présentes : indiquez le nom, et vous marquerez les intervalles à la main.",
+      "personNotInVideo": "hors champ",
+      "personTimes": "de {from} à {to}",
+      "personStill": "de {from} jusqu'à la fin",
+      "nameLabel": "Nom de la personne",
+      "noteLabel": "Comment la demande est arrivée (facultatif)",
+      "create": "Consigner la demande",
+      "createError": "Impossible de consigner la demande.",
+      "cancel": "Annuler",
+      "back": "Toutes les demandes",
+      "fieldPerson": "Personne",
+      "fieldEvent": "Événement",
+      "fieldReceived": "Reçue",
+      "fieldSource": "Origine",
+      "fieldStatus": "Statut",
+      "fieldNote": "Note",
+      "externalCopy": "Cet événement a une vidéo sur un site externe (par exemple YouTube) : le retrait ne l'atteint pas. Retirez-la ou remplacez-la là aussi.",
+      "publishedElsewhere": "La vidéo publiée de l'événement est un fichier différent de cet enregistrement : le retrait ne la modifie pas. Remplacez-la ou retirez-la de la page de l'événement.",
+      "pipelineOff": "La post-production est désactivée : la tâche de retrait reste en file d'attente jusqu'à ce que vous l'activiez, et la transcription n'est pas refaite.",
+      "noVideo": "Cet enregistrement n'a pas de vidéo, seulement des pistes par participant : les pistes de la personne sont supprimées et la transcription est refaite à partir de celles qui restent.",
+      "noRecording": "L'enregistrement n'existe plus : il ne reste rien à retirer.",
+      "keyOnly": "La clé de l'instance n'ouvre pas un enregistrement : connectez-vous avec votre compte d'administrateur.",
+      "startIntro": "Pour retirer la personne, vous devez ouvrir l'enregistrement. L'accès ne vaut que pour cette demande et reste inscrit dans le journal des opérations avec votre compte.",
+      "start": "Ouvrir l'éditeur de retrait",
+      "processing": "Retrait en cours : la vidéo nettoyée remplacera l'originale. État de la tâche : {status}.",
+      "closed": "Demande clôturée le {date}.",
+      "closedIntervals": "{count, plural, =0 {Aucun intervalle couvert.} one {# intervalle couvert.} many {# d'intervalles couverts.} other {# intervalles couverts.}}",
+      "rejected": "Demande rejetée le {date}.",
+      "lastError": "Le dernier traitement a échoué : {error}. Vérifiez les intervalles et envoyez de nouveau.",
+      "rejectTitle": "Rejeter la demande",
+      "rejectLabel": "Motif",
+      "reject": "Rejeter",
+      "rejectConfirm": "Rejeter la demande ? La personne verra qu'elle a été rejetée.",
+      "actionError": "L'opération a échoué (HTTP {code}).",
+      "editorTitle": "Intervalles à couvrir",
+      "editorHint": "Les propositions viennent de la présence dans la salle, des prises de parole et des pistes par participant : les temps de parole sont approximatifs. Regardez la vidéo et corrigez. Dans chaque intervalle, la vidéo devient le carton « contenu retiré sur demande » et le son est coupé ; la durée ne change pas.",
+      "sourcePresence": "Dans la salle",
+      "sourceSpeech": "Parle",
+      "sourceTrack": "Piste",
+      "selectedLegend": "À couvrir",
+      "useProposals": "Repartir des propositions",
+      "addInterval": "Ajouter un intervalle ici",
+      "fieldStart": "Début",
+      "fieldEnd": "Fin",
+      "setStart": "Début ici",
+      "setEnd": "Fin ici",
+      "seek": "Aller",
+      "remove": "Retirer",
+      "intervalLabel": "Intervalle {n}",
+      "noIntervalsVideo": "Aucun intervalle à couvrir. Si la personne n'apparaît pas dans la vidéo, rejetez la demande en indiquant le motif.",
+      "total": "{count, plural, one {# intervalle} many {# d'intervalles} other {# intervalles}} · {seconds} s à couvrir",
+      "timeHint": "Temps en heures:minutes:secondes, comme dans le lecteur.",
+      "invalidTime": "Temps non valide",
+      "preview": "Aperçu du retrait",
+      "timelineLabel": "Ligne de temps de l'enregistrement",
+      "mediaError": "La vidéo ne se charge pas. Rechargez la page.",
+      "submit": "Retirer la personne de l'enregistrement",
+      "submitConfirm": "La vidéo originale et les pistes de la personne seront supprimées et la post-production refaite. Ce n'est pas réversible. Continuer ?",
+      "submitDone": "Demande clôturée : la personne a été retirée."
+    },
+    "catalog": {
+      "fieldTitle": "Catalogue",
+      "fieldHelp": "Le type d'événement et le modèle dont il est issu servent uniquement aux statistiques de l'instance et ne modifient aucun réglage. Corrigez-les si l'événement est mal catalogué ou ne l'est pas.",
+      "typeLabel": "Type d'événement",
+      "templateLabel": "Modèle",
+      "noTemplate": "Aucun modèle",
+      "deletedTemplate": "Créé à partir du modèle « {name} », supprimé depuis.",
+      "deletedOption": "{name} (supprimé)",
+      "types": {
+        "MEETING": "Réunion",
+        "PARTICIPATORY": "Événement participatif",
+        "PUBLIC": "Événement public",
+        "INSTANT": "Appel instantané",
+        "LEGACY": "Publication importée",
+        "UNCATALOGED": "Non catalogué"
+      }
     }
   },
   "email": {
@@ -4013,7 +4319,22 @@
     "dateLabel": "Date",
     "timeLabel": "Heure",
     "durationLabel": "Durée",
-    "myDataLink": "Vos données : les consulter, les corriger, retirer un consentement ou annuler l’inscription"
+    "addressBookNote": "Vous êtes dans le carnet d’adresses des événements, pour être invité à des événements similaires : vous pouvez retirer votre consentement à tout moment.",
+    "addressBookPendingNote": "La case du carnet d’adresses des événements a été cochée sur cette inscription, mais cette adresse ne recevait plus d’invitations. Si la demande vient de vous, vous pouvez la confirmer depuis la page de vos données, avec le lien ci-dessous. Sinon, ignorez ce message : vous restez hors du carnet d’adresses et ne recevez pas d’invitations.",
+    "addressBookOptOutLink": "Supprimer mes données du carnet d’adresses",
+    "myDataLink": "Vos données : les consulter, les corriger, retirer un consentement ou annuler l’inscription",
+    "confirmationCode": {
+      "subject": "{site} : code de confirmation",
+      "heading": "Votre code de confirmation",
+      "introEdit": "Vous avez demandé à corriger le nom et l'organisme de votre inscription à « {event} ».",
+      "introEditAll": "Vous avez demandé à corriger le nom et l'organisme de toutes vos inscriptions.",
+      "introNickname": "Vous avez demandé à modifier le surnom de votre inscription à « {event} ».",
+      "introNicknameRemove": "Vous avez demandé à retirer le surnom de votre inscription à « {event} ».",
+      "introCancel": "Vous avez demandé à supprimer votre inscription à « {event} ».",
+      "codeLabel": "Le code est :",
+      "instructions": "Saisissez-le sur la page Mes données depuis laquelle vous avez fait la demande. Il est valable {minutes, plural, one {# minute} other {# minutes}}.",
+      "ignore": "Si vous n'êtes pas à l'origine de la demande, ignorez cet e-mail : sans le code, rien ne change. Ne communiquez le code à personne."
+    }
   },
   "home": {
     "hero": {
@@ -4380,17 +4701,100 @@
   },
   "gdpr": {
     "consent": {
-      "recording": "Je consens à l'enregistrement audio/vidéo de cet événement",
+      "recording": "Je consens à l'enregistrement de ma voix lorsque j'interviens pendant l'événement. Mon visage et mon nom n'apparaissent jamais dans la vidéo.",
+      "recordingReserved": "Je consens à l'enregistrement de ma voix lorsque j'interviens pendant l'événement. Mon visage et mon nom n'apparaissent jamais dans la vidéo. La vidéo reste réservée aux organisateurs et aux inscrits : elle n'est pas publiée. Les inscrits peuvent la voir tant que les données de leur inscription sont conservées.",
+      "recordingPublic": "Je consens à l'enregistrement de ma voix lorsque j'interviens pendant l'événement. Je consens aussi à la publication de la vidéo : la vidéo peut être vue par toute personne sur la page de l'événement et dans la vidéothèque. Mon visage et mon nom n'apparaissent jamais dans la vidéo.",
+      "recordingVisible": "Je consens à l'enregistrement audio/vidéo de cet événement.",
+      "recordingVisibleReserved": "Je consens à l'enregistrement vidéo de l'événement (audio et vidéo). La vidéo reste réservée aux organisateurs et aux inscrits : elle n'est pas publiée. Les inscrits peuvent la voir tant que les données de leur inscription sont conservées.",
+      "recordingVisiblePublic": "Je consens à l'enregistrement vidéo de l'événement (audio et vidéo) et à sa publication : la vidéo peut être vue par toute personne sur la page de l'événement et dans la vidéothèque.",
+      "recordingNoVideo": "Je consens à l'enregistrement de l'événement. La vidéo de la salle n'est pas enregistrée : seules restent les pistes audio des personnes qui consentent à la transcription, si l'événement les prévoit.",
       "multitrack": "J'accepte que mes interventions soient transcrites, avec mon nom, pour le compte rendu de l'événement. Si l'événement enregistre une piste audio distincte pour chaque personne, ma voix est enregistrée à cette seule fin et la piste est supprimée après la transcription ; elle n'est pas utilisée pour identifier ou reproduire ma voix.",
+      "multitrackRetained": "J'accepte que mes interventions soient transcrites, avec mon nom, pour le compte rendu de l'événement. Si l'événement enregistre une piste audio distincte pour chaque personne, ma voix est enregistrée à cette seule fin et la piste est conservée avec les données de l'événement ; elle n'est pas utilisée pour identifier ou reproduire ma voix.",
       "multitrackOptional": "C'est facultatif : si vous ne consentez pas, vous participez quand même, mais vos interventions n'entrent pas dans la transcription et votre voix n'est pas enregistrée sur une piste séparée. Si l'événement est enregistré, votre voix reste néanmoins dans la vidéo.",
+      "multitrackOptionalShort": "C'est facultatif : si vous ne consentez pas, vous participez quand même, mais vos interventions n'entrent pas dans la transcription et votre voix n'est pas enregistrée sur une piste séparée.",
       "stayInTouch": "Je souhaite recevoir des informations sur les prochains événements et être ajouté au carnet d'adresses, pour être invité à des événements similaires",
-      "stayInTouchHelp": "Consentement facultatif (art. 6.1.a RGPD). Vous pouvez le retirer à tout moment avec le lien « Me retirer du carnet d'adresses » dans les e-mails que vous recevrez. Le nom et l'organisation sont ceux de cette inscription.",
+      "stayInTouchHelp": "Consentement facultatif (art. 6.1.a RGPD). Vous pouvez le retirer à tout moment avec le lien « Supprimer mes données du carnet d’adresses » dans l'e-mail de confirmation, dans les rappels et dans les invitations, ou depuis la page « Mes données ». Le nom, l'adresse e-mail et l'organisation sont ceux de cette inscription.",
+      "stayInTouchRetention": "Nous conservons ces données pendant {months} mois à compter de ce consentement : la période ne repart que si vous cochez à nouveau la case.",
       "recordingOptionalListenOnly": "Sans consentement, vous participez quand même, en écoute seule : vous suivez et écrivez dans le chat, mais le micro, la caméra et le partage d'écran restent coupés. Vous pouvez consentir plus tard, depuis la salle.",
-      "recordingOptionalHost": "Sans consentement, vous entrez quand même et animez comme d’habitude, mais votre voix n’est conservée ni dans les pistes par personne ni dans la transcription. La vidéo de la salle, si elle est enregistrée, vous montre tout de même.",
       "recordingOptionalVoice": "Sans consentement, vous participez quand même et pouvez intervenir, mais vous restez hors de l'enregistrement : ni nom, ni voix, ni image. Vous pouvez consentir plus tard, depuis la salle.",
-      "recordingNotice": "L'événement est enregistré (audio et vidéo). Vous participez sans micro ni caméra : l'enregistrement ne contient ni votre voix ni votre image, sauf si l'animateur vous donne la parole.",
-      "recordingNoticeVoice": "L'événement est enregistré (audio et vidéo). Vous participez sans micro ni caméra : l'enregistrement ne contient ni votre nom, ni votre voix, ni votre image, sauf si vous consentez dans la salle.",
+      "recordingNotice": "L'événement peut être enregistré. Vous participez sans micro ni caméra : l'enregistrement ne contient ni votre voix ni votre image, sauf si les animateurs vous donnent la parole.",
+      "recordingNoticeVoice": "L'événement peut être enregistré. Vous participez sans micro ni caméra : votre visage et votre nom n'apparaissent jamais dans la vidéo, et votre voix seulement si vous y consentez dans la salle.",
+      "namesMayAppear": "Le nom sous lequel vous participez peut apparaître dans la vidéo même si vous n'intervenez pas.",
+      "recordingHostsOnly": "L'événement peut être enregistré. Seuls les animateurs sont vus et entendus dans la vidéo : le visage, le nom et la voix des participants n'y figurent jamais.",
+      "recordingHostAlwaysReserved": "Vous animez cet événement : vous êtes toujours dans l'enregistrement, avec nom, voix, image et écran partagé. La vidéo reste réservée aux organisateurs et aux inscrits : elle n'est pas publiée. Les inscrits peuvent la voir tant que les données de leur inscription sont conservées.",
+      "recordingHostAlwaysPublic": "Vous animez cet événement : vous êtes toujours dans l'enregistrement, avec nom, voix, image et écran partagé. La vidéo peut être publiée et vue par toute personne.",
       "recordingHostAlways": "Vous animez cet événement : vous êtes toujours dans l'enregistrement, avec nom, voix, image et écran partagé."
+    },
+    "sheet": {
+      "title": "Cet événement et vos données",
+      "intro": "Cela dépend de la façon dont les organisateurs ont configuré l'événement. Le reste figure dans la politique de confidentialité.",
+      "recording": {
+        "label": "Enregistrement",
+        "none": "Aucun enregistrement n'est prévu pour cet événement.",
+        "manual": "Les animateurs peuvent lancer l'enregistrement, audio et vidéo. Lorsqu'il est actif, la salle le signale.",
+        "auto": "L'événement est enregistré, audio et vidéo, dès son début. La salle le signale.",
+        "tracksOnly": "La vidéo de la salle n'est pas enregistrée : seulement une piste audio pour chaque personne qui consent.",
+        "destinationReserved": "L'enregistrement reste réservé aux organisateurs et aux inscrits et n'est pas publié. Les inscrits peuvent le voir tant que les données de leur inscription sont conservées.",
+        "destinationPublic": "L'enregistrement peut être publié après l'événement.",
+        "destinationUnset": "Les organisateurs décident après l'événement de le publier ou non.",
+        "refuseOut": "Si vous ne consentez pas, vous participez quand même et vous restez hors de l'enregistrement.",
+        "refuseListenOnly": "Si vous ne consentez pas, vous participez en écoute seule.",
+        "hostsAlways": "Seuls les animateurs apparaissent dans la vidéo, avec nom, voix, image et écran partagé. Le visage et le nom des participants n'apparaissent jamais.",
+        "hostsAlwaysVisible": "Les animateurs sont toujours dans l'enregistrement, avec nom, voix, image et écran partagé.",
+        "hostsOnly": "Seuls les animateurs sont vus et entendus dans la vidéo, avec nom, voix, image et écran partagé. Le visage, le nom et la voix des participants n'y figurent jamais.",
+        "audienceNotice": "Vous participez sans micro ni caméra : l'enregistrement ne contient ni votre voix ni votre image, sauf si les animateurs vous donnent la parole.",
+        "audienceNoticeVoice": "Vous participez sans micro ni caméra : votre visage et votre nom n'apparaissent jamais dans la vidéo, et votre voix seulement si vous y consentez dans la salle."
+      },
+      "transcript": {
+        "label": "Transcription",
+        "captions": "Le texte des sous-titres est conservé, avec le nom, uniquement pour les personnes qui consentent, et devient la transcription de l'événement.",
+        "tracks": "Pour les personnes qui consentent, une piste audio est enregistrée, puis supprimée après la transcription.",
+        "tracksRetained": "Pour les personnes qui consentent, une piste audio est enregistrée et conservée avec les données de l'événement.",
+        "fromVideo": "Après l'événement, les organisateurs ne peuvent faire transcrire la vidéo que si toutes les personnes qui parlent ont consenti."
+      },
+      "captions": {
+        "label": "Sous-titres"
+      },
+      "ai": {
+        "label": "Intelligence artificielle",
+        "summary": "Après l'événement, un outil d'intelligence artificielle peut rédiger la synthèse de l'enregistrement.",
+        "translation": "La transcription et la synthèse peuvent être traduites automatiquement.",
+        "dubbing": "La vidéo peut être doublée avec une voix synthétique.",
+        "onRequest": "Après l'événement, les organisateurs peuvent aussi demander des traitements automatiques de l'enregistrement non indiqués ici : transcription, synthèse ou traduction.",
+        "report": "Après l'événement, l'équipe peut faire rédiger un compte rendu avec l'intelligence artificielle, à partir également des sondages et, si elles sont publiées, des questions. Le texte du chat n'est pas utilisé.",
+        "accuracy": "Les textes produits avec l'intelligence artificielle peuvent comporter des imprécisions."
+      },
+      "list": {
+        "label": "Liste des participants",
+        "visible": "Les participants voient dans la salle la liste des présents.",
+        "hidden": "Dans la salle, le public ne voit pas la liste des présents. Les animateurs et les intervenants la voient."
+      },
+      "name": {
+        "label": "Votre nom",
+        "real": "Dans la salle, dans le chat et dans les questions, vous apparaissez sous votre nom.",
+        "pseudonym": "Dans la salle, dans le chat et dans les questions, vous apparaissez sous un pseudonyme. Les organisateurs voient les données de votre inscription.",
+        "pseudonymTranscript": "Si vous consentez à la transcription, votre nom y reste.",
+        "nickname": "Vous pouvez choisir un surnom : les autres le voient à la place de votre nom. Les organisateurs et les modérateurs savent qui se trouve derrière.",
+        "nicknameTranscript": "Si vous consentez à la transcription, vous y apparaissez sous votre surnom si vous en avez choisi un, sinon sous votre nom."
+      },
+      "retention": {
+        "label": "Conservation",
+        "data": "Les données de l'inscription et de la salle sont supprimées {days, plural, one {# jour} many {# jours} other {# jours}} après la fin de l'événement. Les questions et les sondages restent sans noms.",
+        "recordingKept": "L'enregistrement et ce qui en est tiré (transcription, synthèse, traductions) ne sont pas supprimés avec ces données : qu'ils soient mis à disposition ou non, ils restent jusqu'à ce que les organisateurs les suppriment.",
+        "recordingDays": "L'enregistrement et ce qui en est tiré sont supprimés {days, plural, one {# jour} many {# jours} other {# jours}} après la fin de l'événement ou, si l'enregistrement est mis à disposition, après sa publication.",
+        "transcriptKept": "La transcription n'est pas supprimée avec ces données : elle reste jusqu'à ce que les organisateurs la suppriment.",
+        "transcriptDays": "La transcription est supprimée {days, plural, one {# jour} many {# jours} other {# jours}} après la fin de l'événement."
+      },
+      "addressBook": {
+        "label": "Carnet d'adresses",
+        "offered": "En vous inscrivant, vous pouvez choisir de rester dans le carnet d'adresses des événements, pour être invité à des événements similaires. C'est facultatif : les données restent {months} mois à compter du consentement, sauf retrait."
+      },
+      "chat": {
+        "label": "Chat et questions",
+        "messages": "Les messages du chat ne sont jamais publiés, pas même les questions posées dans le chat.",
+        "questionsText": "Après l'événement, le texte des questions du Q&R peut être publié, jamais le nom de la personne qui les a posées.",
+        "questionsNone": "Les questions du Q&R ne sont pas publiées."
+      }
     },
     "export": {
       "title": "Mes données",
@@ -4401,20 +4805,21 @@
       "submit": "Demander mes données",
       "loading": "Recherche en cours...",
       "requestSubmittedTitle": "Consultez votre boîte de réception",
-      "requestSubmittedBody": "Si cette adresse e-mail correspond à une inscription, nous vous avons envoyé un lien pour télécharger vos données. Le lien est valable 1 heure.",
+      "requestSubmittedBody": "Si cette adresse e-mail correspond à une inscription, nous vous avons envoyé un lien pour consulter vos données. Le lien est valable 1 heure.",
       "linkInvalid": "Ce lien n'est pas valide ou a expiré. Veuillez demander un nouveau lien.",
       "requestNew": "Demander un nouveau lien",
       "noData": "Aucune donnée trouvée pour cette adresse e-mail.",
       "error": "Une erreur s'est produite. Veuillez réessayer plus tard.",
       "rateLimited": "Trop de demandes. Veuillez réessayer dans une heure.",
       "results": "Vos données",
-      "resultsDescription": "Données trouvées relatives à {count} événements.",
+      "resultsDescription": "{count, plural, one {Données trouvées relatives à # événement.} many {Données trouvées relatives à # d'événements.} other {Données trouvées relatives à # événements.}}",
       "registrationData": "Données d'inscription",
       "fieldName": "Nom",
+      "fieldNickname": "Surnom",
       "fieldEmail": "E-mail",
       "fieldOrganization": "Organisme",
       "fieldRegisteredAt": "Date d'inscription",
-      "fieldConsent": "Consentement",
+      "fieldConsent": "Prise de connaissance de la politique de confidentialité",
       "questionsTitle": "Questions Q&A",
       "pollVotesTitle": "Votes de sondages",
       "optionLabel": "Option",
@@ -4436,7 +4841,74 @@
       "consentFuture": "Communications futures",
       "consentWithdrawnOn": "Retiré le {date}",
       "consentNoteInRoom": "Si vous êtes dans la salle en ce moment, le retrait vaut à partir de votre prochaine entrée : pour l'appliquer aussitôt, utilisez Consentements dans la salle.",
-      "consentFutureEffect": "Si vous le retirez, vous ne recevez plus de communications sur les prochains événements et vous quittez le carnet d'adresses, pour toutes vos inscriptions."
+      "consentGiveNoteInRoom": "Un consentement donné ici vaut à partir de votre prochaine entrée dans la salle, pas pour ce qui a déjà été enregistré. L'enregistrement et la transcription peuvent être acceptés jusqu'à la fin de l'événement.",
+      "proofsTitle": "Preuves des consentements conservées",
+      "proofsIntro": "Les données de ces événements ont été supprimées. Ces preuves restent tant que la vidéo ou la transcription existe. Vous pouvez retirer votre consentement : ce qui figure déjà dans la vidéo reste, et pour le faire retirer vous devez écrire au responsable du traitement.",
+      "proofGivenOn": "Donné le {date}",
+      "proofSuperseded": "Remplacé par un consentement ultérieur",
+      "proofWithdrawEffect": {
+        "recording": "Vous retirez aussi votre consentement à la transcription : vos phrases et votre nom sortent de la transcription issue des sous-titres. Ce qui figure déjà dans la vidéo reste, de même qu'une transcription réalisée à partir de la vidéo ou des pistes audio : pour les faire retirer, écrivez au responsable du traitement. Depuis cette page, le retrait ne peut pas être annulé.",
+        "transcription": "Vos phrases et votre nom sortent de la transcription issue des sous-titres. Une transcription réalisée à partir de la vidéo ou des pistes audio reste : pour la faire retirer, écrivez au responsable du traitement. Depuis cette page, le retrait ne peut pas être annulé."
+      },
+      "proofWithdrawHost": "Les transcriptions les plus anciennes issues des sous-titres ne reconnaissent pas les animateurs : vos phrases et votre nom y restent, et pour les faire retirer vous devez écrire au responsable du traitement.",
+      "roomProofsTitle": "Consentements donnés en animant un événement",
+      "roomProofsIntro": "Les consentements à l'enregistrement et à la transcription que vous avez donnés en entrant dans la salle avec un rôle dans l'événement. La fenêtre « Consentements » de la salle permet de retirer ceux de l'entrée en cours et, avec votre compte du personnel, ceux des entrées précédentes aussi ; pour les autres, et une fois l'événement terminé, il reste l'effacement de vos données.",
+      "addressBookTitle": "Carnet d'adresses des événements",
+      "addressBookIntro": "Vous avez choisi de rester dans le carnet d'adresses pour être invité à des événements similaires. Nous conservons ces données jusqu'au {date}, sauf retrait ou nouveau consentement.",
+      "addressBookOptOut": "Supprimer mes données du carnet d’adresses",
+      "consentFutureEffect": "Si vous le retirez, vous ne recevez plus de communications sur les prochains événements et vous quittez le carnet d'adresses, pour toutes vos inscriptions.",
+      "consentFutureGive": "Je consens aux communications futures",
+      "consentFutureGiveEffect": "Vous revenez dans le carnet d'adresses des événements avec le nom et l'organisme de cette inscription et vous recevez de nouveau les invitations ; la durée de conservation repart d'aujourd'hui.",
+      "consentGiveDone": "Consentement donné : il vaut à partir de votre prochaine entrée dans la salle.",
+      "consentFutureGiveDone": "Consentement donné : vous êtes de nouveau dans le carnet d'adresses des événements.",
+      "consentGiveTextChanged": "Le texte du consentement a changé après l'ouverture de la page : rechargez-la pour lire le nouveau.",
+      "consentGiveClosed": "Ce consentement ne peut plus être donné ici : l'événement est terminé ou ne le demande plus. Rechargez la page pour voir l'état actuel.",
+      "consentGiveNewText": "Le texte de ce consentement a changé après que vous l'avez donné : pour le texte actuel, il doit être donné de nouveau.",
+      "addressBookPendingTitle": "Retour dans le carnet d'adresses à confirmer",
+      "addressBookPendingBody": "La case du carnet d'adresses a été cochée sur cette inscription, mais cette adresse ne recevait plus d'invitations. Rien ne change tant que vous n'avez pas confirmé.",
+      "addressBookPendingEffect": "Si vous confirmez, vous revenez dans le carnet d'adresses avec le nom et l'organisme de cette inscription et vous recevez de nouveau les invitations. Si vous annulez, ou si ce n'était pas vous, vous restez hors du carnet d'adresses et ne recevez pas d'invitations.",
+      "addressBookPendingConfirm": "Confirmer mon retour",
+      "addressBookPendingCancel": "Annuler la demande",
+      "addressBookPendingGone": "Cette demande n'est plus en attente. Rechargez la page pour voir l'état à jour.",
+      "removalTitle": "L'enregistrement de l'événement",
+      "removalIntro": "Cet événement a été enregistré. Si vous ne souhaitez pas apparaître dans l'enregistrement, vous pouvez demander à ne plus y figurer : les passages où vous apparaissez ou parlez sont recouverts par un carton et rendus muets, et la transcription, les sous-titres et la synthèse sont produits à nouveau. La demande est adressée au responsable du traitement, qui l'examine.",
+      "removalButton": "Je ne veux pas apparaître dans cet enregistrement",
+      "removalConfirmTitle": "Confirmer la demande ?",
+      "removalConfirmBody": "Le responsable du traitement retirera de l'enregistrement les passages où vous apparaissez ou parlez. Les copies publiées sur d'autres sites, par exemple sur YouTube, doivent être retirées séparément par ceux qui les ont publiées.",
+      "removalConfirm": "Envoyer la demande",
+      "removalCancel": "Annuler",
+      "removalSent": "Demande envoyée. Le responsable du traitement l'examinera.",
+      "removalError": "La demande n'a pas pu être envoyée. Réessayez plus tard.",
+      "removalStatusOpen": "Demande du {date} : en cours de traitement.",
+      "removalStatusClosed": "Demande du {date} : traitée le {closed}.",
+      "removalStatusRejected": "Demande du {date} : rejetée. Écrivez au responsable du traitement pour en connaître le motif.",
+      "editButton": "Corriger le nom et l'organisme",
+      "editScopeLegend": "À quelles inscriptions elle s'applique",
+      "editScopeOne": "Uniquement cette inscription",
+      "editScopeAll": "Toutes mes inscriptions ({count}) et le carnet d'adresses des événements",
+      "editEffect": "La correction vaut pour les prochains e-mails et à partir de votre prochaine entrée dans la salle. Elle ne change pas ce qui a déjà été enregistré, transcrit ou écrit dans le chat, ni les preuves de consentement.",
+      "editNameInvalid": "Le nom doit comporter entre 2 et 100 caractères.",
+      "editOrganizationRequired": "Un événement auquel vous êtes inscrit demande l'organisme : le champ ne peut pas rester vide.",
+      "editOrganizationTooLong": "L'organisme peut comporter au plus 200 caractères.",
+      "editDone": "Données corrigées.",
+      "nicknameChoose": "Choisir un surnom",
+      "nicknameChange": "Modifier le surnom",
+      "nicknameEffect": "Les autres voient le surnom à la place de votre nom : dans le chat et les questions tout de suite, dans la vidéo à partir de votre prochaine entrée dans la salle. Ce qui a déjà été enregistré, transcrit ou écrit ne change pas.",
+      "nicknameDone": "Surnom enregistré.",
+      "codeWhy": "Par sécurité, les corrections et les suppressions se confirment avec un code que nous envoyons à l'adresse e-mail de l'inscription.",
+      "codeSend": "M'envoyer le code de confirmation",
+      "codeSent": "Nous vous avons envoyé par e-mail un code à 6 chiffres. Saisissez-le ici : il est valable {minutes, plural, one {# minute} other {# minutes}}.",
+      "codeLabel": "Code de confirmation",
+      "codeConfirmEdit": "Confirmer la correction",
+      "codeConfirmNickname": "Confirmer le surnom",
+      "codeInvalid": "Le code est incorrect ou a expiré. Vérifiez le dernier e-mail reçu, ou annulez et demandez-en un nouveau.",
+      "cancelTitle": "Supprimer cette inscription",
+      "cancelIntro": "Vous pouvez supprimer uniquement cette inscription, sans toucher aux autres ni au reste de vos données.",
+      "cancelButton": "Supprimer cette inscription",
+      "cancelDeletes": "Sont supprimés l'inscription à cet événement et ce que vous avez fait avec elle : questions, votes, messages dans le chat, avis, réponses aux questionnaires, vos phrases dans la transcription des sous-titres et e-mails en attente. Votre lien personnel cesse de fonctionner et la place se libère.",
+      "cancelKeeps": "Restent vos autres inscriptions, le carnet d'adresses des événements, votre photo de profil et une demande de retrait d'un enregistrement encore en cours de traitement. Si cet événement a une vidéo ou une transcription, la preuve de votre consentement reste sans votre nom tant qu'elles existent. La suppression est irréversible ; tant que l'événement accepte des inscriptions, vous pouvez vous réinscrire.",
+      "codeConfirmCancel": "Supprimer l'inscription",
+      "cancelDone": "Inscription supprimée."
     },
     "erasure": {
       "title": "Effacement de vos données",
@@ -4448,13 +4920,15 @@
       "requestSubmittedTitle": "Consultez votre boîte de réception",
       "requestSubmittedBody": "Si cette adresse e-mail correspond à une inscription, nous vous avons envoyé un lien pour confirmer l'effacement. Le lien est valable 1 heure.",
       "linkInvalid": "Ce lien n'est pas valide ou a expiré. Veuillez demander un nouveau lien.",
-      "confirmWarning": "Vous êtes sur le point d'effacer définitivement toutes les données personnelles associées à votre adresse e-mail.",
+      "confirmWarning": "Vous êtes sur le point d'effacer définitivement les données personnelles associées à votre adresse e-mail, à l'exception de ce qui est indiqué ci-dessous.",
       "confirmBody": "Les inscriptions, les questions, les votes aux sondages, les avis, les rappels et votre fiche dans le carnet d'adresses des événements seront supprimés. Cette opération est irréversible.",
+      "confirmProofs": "S'il existe une vidéo ou une transcription d'un événement, même pas encore publiée, le type de consentement, la date et le texte auquel vous avez répondu restent, sans votre nom, tant que cette vidéo ou cette transcription existe. Ils servent à prouver le consentement. La vidéo ne change pas : pour demander le retrait de vos interventions, écrivez au responsable du traitement. Les transcriptions les plus anciennes issues des sous-titres ne reconnaissent pas les animateurs ni les personnes qui interviennent avec un rôle dans l'événement : vos phrases et votre nom y restent, et pour les faire retirer vous devez écrire au responsable du traitement.",
       "confirmButton": "Confirmer l'effacement",
       "cancel": "Annuler",
       "processing": "Effacement en cours...",
       "doneTitle": "Effacement terminé",
-      "doneBody": "{count} inscriptions et les données associées ont été supprimées.",
+      "doneBody": "{count, plural, =0 {Aucune inscription à supprimer.} one {# inscription a été supprimée, avec les données associées.} many {# d'inscriptions ont été supprimées, avec les données associées.} other {# inscriptions ont été supprimées, avec les données associées.}}",
+      "doneProofs": "{count, plural, one {# preuve de consentement est conservée, sans votre nom, tant que la vidéo ou la transcription existe.} many {# preuves de consentement sont conservées, sans votre nom, tant que la vidéo ou la transcription existe.} other {# preuves de consentement sont conservées, sans votre nom, tant que la vidéo ou la transcription existe.}}",
       "error": "Une erreur s'est produite. Veuillez réessayer plus tard.",
       "rateLimited": "Trop de demandes. Veuillez réessayer dans une heure.",
       "back": "Retour à mes données",
@@ -5232,7 +5706,8 @@
     "overlapTitle": "Parole simultanée : plusieurs personnes parlent en même temps sur cet intervalle.",
     "anonymousSpeaker": "Participant·e {n}",
     "untranscribed": "Intervention non transcrite : la personne qui parlait n'a pas donné son consentement",
-    "unrecordedSpeech": "Certaines interventions ne figurent pas dans l'enregistrement : les personnes qui ont parlé n'ont pas consenti."
+    "unrecordedSpeech": "Certaines interventions ne figurent pas dans l'enregistrement : les personnes qui ont parlé n'ont pas consenti.",
+    "unrecordedSpeechHostsOnly": "Certaines interventions ne figurent pas dans l'enregistrement : seuls les animateurs sont vus et entendus dans la vidéo."
   },
   "waiting": {
     "startsIn": "L'événement commence dans",
@@ -5249,7 +5724,9 @@
     "watchNow": "Regarder",
     "switchToLive": "Passer au direct",
     "enterRoom": "Entrer dans la salle",
-    "recordingNotice": "Cet événement est enregistré.",
+    "recordingNotice": "Cet événement peut être enregistré.",
+    "recordingNoticeInstant": "L'appel peut être enregistré. Seuls les animateurs apparaissent dans la vidéo : votre visage et votre nom, jamais. Si quelqu'un lance l'enregistrement, nous vous demanderons si vous consentez à l'enregistrement de votre voix.",
+    "recordingNoticeInstantHostsOnly": "L'appel peut être enregistré. Seuls les animateurs sont vus et entendus dans la vidéo : le visage, le nom et la voix des participants n'y figurent jamais.",
     "recordingAvailableAfter": "L'enregistrement sera disponible après l'événement.",
     "autoRefreshHint": "La page s'actualisera automatiquement lorsque l'événement commencera.",
     "startEventButton": "Démarrer l'événement",
@@ -5300,10 +5777,15 @@
     "classicView": "Vue classique",
     "backToGarden": "Afficher la place",
     "aiNoticeTitle": "Traitement par IA après l'événement",
-    "aiNotice": "À la fin, l'enregistrement sera traité par des outils d'intelligence artificielle pour produire une transcription, une synthèse et d'éventuelles traductions et doublages. Ces contenus peuvent comporter des imprécisions ; la vidéo reste la source faisant foi.",
+    "aiNotice": "À la fin, l'enregistrement peut être traité par des outils d'intelligence artificielle pour produire une transcription, une synthèse et d'éventuelles traductions et doublages. La transcription concerne uniquement les personnes qui ont donné leur consentement. Ces contenus peuvent comporter des imprécisions ; la vidéo reste la source faisant foi.",
     "multitrackConsentTitle": "Transcription de vos interventions",
-    "recordingConsentTitle": "Enregistrement de l'événement",
-    "recordingConsentIntro": "L'événement est enregistré (audio et vidéo). Avec votre consentement, l'enregistrement contient votre nom, votre voix, votre image et ce que vous partagez à l'écran.",
+    "recordingConsentTitle": "Enregistrement de votre voix",
+    "recordingConsentTitleVisible": "Enregistrement de l'événement",
+    "recordingConsentIntro": "L'événement peut être enregistré. Seuls les animateurs apparaissent dans la vidéo : votre visage et votre nom, jamais. Avec votre consentement, votre voix est enregistrée lorsque vous parlez.",
+    "recordingConsentIntroAnonymous": "L'événement peut être enregistré. Seuls les animateurs apparaissent dans la vidéo : votre visage et votre pseudonyme, jamais. Avec votre consentement, votre voix est enregistrée lorsque vous parlez.",
+    "recordingConsentIntroVisible": "L'événement peut être enregistré (audio et vidéo). Avec votre consentement, l'enregistrement contient votre nom, votre voix, votre image et ce que vous partagez à l'écran.",
+    "recordingConsentIntroVisibleAnonymous": "L'événement peut être enregistré (audio et vidéo). Avec votre consentement, l'enregistrement contient votre pseudonyme, votre voix, votre image et ce que vous partagez à l'écran.",
+    "recordingConsentIntroNoVideo": "Lors de cet événement, la vidéo de la salle n'est pas enregistrée.",
     "enterGardenTitle": "Entrer sur la place",
     "enterGardenHint": "Un autre endroit pour attendre : promenez-vous, rencontrez celles et ceux qui attendent, et entrez dans le direct par le portail quand la salle ouvre.",
     "backToWaitingRoom": "Retour à la salle d'attente",
@@ -5550,11 +6032,14 @@
       "7d": "7 jours",
       "30d": "30 jours",
       "90d": "90 jours",
+      "1y": "1 an",
+      "days": "{count, plural, one {# jour} many {# jours} other {# jours}}",
       "forever": "Aucune suppression automatique"
     },
-    "retentionNote": "Une vidéo publiée ne suit pas la conservation des données de l'événement : sans durée, elle reste publique jusqu'à ce qu'on la supprime.",
+    "retentionNote": "L'enregistrement ne suit pas la conservation des données de l'événement : sans durée, il reste, publié ou non, jusqu'à ce qu'on le supprime. La durée court à partir de la publication ou, si la vidéo n'est pas publiée, de la fin de l'événement ; à son échéance, la vidéo et ce qui en est tiré (transcriptions, synthèses, traductions) sont supprimés.",
+    "retentionLegacy": "Les inscrits à cet événement ont été informés qu'un enregistrement non publié est supprimé avec leurs données, {days, plural, one {# jour} many {# jours} other {# jours}} après la fin de l'événement. Tant que la vidéo n'est pas publiée, vous pouvez raccourcir cette durée, mais pas la supprimer ni l'allonger.",
     "delete": "Supprimer l'enregistrement",
-    "deleteConfirm": "Êtes-vous sûr ? La vidéo sera définitivement supprimée.",
+    "deleteConfirm": "Êtes-vous sûr ? La vidéo sera définitivement supprimée. Les transcriptions, synthèses et traductions ne sont pas supprimées avec elle : elles suivent la durée de l'enregistrement choisie ici.",
     "notConfigured": "Jibri n'est pas configuré. L'enregistrement vidéo n'est pas disponible.",
     "disabledHint": "L'enregistrement vidéo n'est pas activé pour cet événement. Pour l'activer, ouvrez la section Paramètres ci-dessus et activez le toggle « Enregistrement ».",
     "play": "Lire",
@@ -5570,6 +6055,8 @@
     "audiencePublicDesc": "Toute personne qui ouvre la page de l'événement. Il peut apparaître dans la vidéothèque.",
     "audienceRegistrants": "Inscrits uniquement",
     "audienceRegistrantsDesc": "Les personnes inscrites à l'événement, même sans être entrées dans la salle, via le lien personnel de l'avis par e-mail. Il n'apparaît pas dans la vidéothèque.",
+    "audienceReservedNote": "Les personnes qui ont consenti l'ont fait pour un enregistrement réservé aux inscrits : seuls les inscrits et les organisateurs peuvent voir la vidéo.",
+    "destinationMissing": "Cet événement n'indique pas où va l'enregistrement : les consentements recueillis ne disent pas si la vidéo serait publiée. Vérifiez avant de la publier.",
     "saveFailed": "Modification non enregistrée. Réessayez."
   },
   "postEvent": {
@@ -5579,7 +6066,9 @@
     "libraryListed": "Publier dans la vidéothèque",
     "libraryListedHelp": "Affiche cet événement dans la vidéothèque publique (/video-library). Nécessite un enregistrement publié ou une vidéo YouTube, ainsi qu'une page d'événement visible.",
     "libraryListedNoRecording": "Aucun enregistrement publié : l'événement n'apparaîtra pas dans la vidéothèque tant que vous n'aurez pas publié l'enregistrement ou ajouté une vidéo YouTube.",
-    "showQA": "Afficher les questions Q&A",
+    "libraryListedReserved": "Enregistrement réservé aux inscrits : l'événement n'apparaît pas dans la vidéothèque.",
+    "showQA": "Afficher le texte des questions Q&A, sans les noms",
+    "qaReservedNote": "Avec un enregistrement réservé aux inscrits, les questions ne sont pas publiées.",
     "showMaterials": "Afficher les documents partagés",
     "showPolls": "Afficher les résultats des sondages",
     "showFeedback": "Afficher les retours",
@@ -5591,7 +6080,7 @@
     "visibilityAlways": "Toujours visible",
     "visibilityUntil": "Visible jusqu'au :",
     "dataRetentionNote": "Les données personnelles des participants seront supprimées selon la rétention de l'événement ({days} jours). Le contenu de l'événement restera disponible tant que la page est visible.",
-    "availableUntil": "Cet événement et son contenu seront disponibles jusqu'au {date}.",
+    "participantDataUntil": "Les données personnelles des participants sont supprimées le {date}.",
     "tabs": {
       "qa": "Questions et Réponses",
       "materials": "Documents",
@@ -5672,7 +6161,7 @@
       "strengths": "Points forts",
       "improvements": "À améliorer",
       "quotes": "Extraits des commentaires",
-      "aiNotice": "Le texte est rédigé par un modèle d'intelligence artificielle à partir de la transcription, du chat, des questions, des sondages et des évaluations, et l'équipe l'a relu avant de le publier. Les chiffres et les graphiques sont calculés par la plateforme. Il peut contenir des imprécisions."
+      "aiNotice": "Le texte est rédigé par un modèle d'intelligence artificielle à partir de la transcription, des sondages, des évaluations et, si elles sont publiées, des questions, et l'équipe l'a relu avant de le publier. Les chiffres et les graphiques sont calculés par la plateforme. Il peut contenir des imprécisions."
     },
     "languages": {
       "title": "Regarder en",
@@ -5733,7 +6222,7 @@
       "confirm": "Confirmer la suppression",
       "submitting": "Suppression en cours…",
       "successTitle": "Suppression effectuée",
-      "successBody": "Vos données ne sont plus présentes dans le carnet d'adresses des événements.",
+      "successBody": "À partir de maintenant, vous ne recevrez plus d'invitations. Votre adresse e-mail a déjà été retirée ; le nom et l'organisme sont supprimés du carnet d'adresses au plus tard le lendemain.",
       "errors": {
         "generic": "Une erreur s'est produite. Veuillez réessayer plus tard."
       }
@@ -5831,12 +6320,21 @@
     "recordingWithoutMedia": "Cet enregistrement n'a pas de vidéo : sa transcription vient des sous-titres du direct.",
     "recordingWithoutVideo": "Cet enregistrement a les pistes audio des participants mais pas la vidéo : elle n'a pas été enregistrée, ou elle n'est pas encore arrivée. L'archive téléchargeable nécessite aussi la vidéo.",
     "noParticipantTracks": "Il n'y a pas de pistes audio séparées des participants : elles n'ont pas été enregistrées ou ont déjà été supprimées. Pour les avoir, activez l'enregistrement par participant avant l'événement.",
+    "noTranscribableTracks": "Aucune piste de cet enregistrement ne peut être transcrite : elles ont été supprimées, ou les personnes qui y figurent n'ont pas consenti à une transcription avec leur nom.",
+    "tracksPending": "Les pistes de cet enregistrement ne sont pas encore arrivées : la transcription démarrera toute seule à leur arrivée.",
     "summaryMissing": "Il n'y a pas encore de synthèse à modifier dans cette langue : générez-la d'abord.",
     "storageUnavailable": "Le téléversement de fichiers n'est pas disponible sur cette installation.",
     "aiDisabledForEvent": "L'IA est désactivée pour cet événement : utilisez « Générer l'IA » pour l'activer et lancer le pipeline.",
     "sourceTranscriptMissing": "Cet enregistrement n'est pas encore transcrit : transcrivez-le avant d'ajouter une traduction.",
     "captionsTranscriptNotTranslatable": "Cette transcription provient des sous-titres en direct : la traduction automatique nécessite une transcription IA de l'enregistrement.",
     "sameLanguage": "La langue choisie est celle d'origine de l'enregistrement : choisissez-en une autre.",
-    "mtUnavailable": "La traduction automatique n'est pas installée sur cette instance."
+    "recordingDestinationNotCovered": "Les consentements de cet événement valent pour un enregistrement réservé aux inscrits : vous ne pouvez pas le rendre visible par tous ni lier une vidéo externe.",
+    "mtUnavailable": "La traduction automatique n'est pas installée sur cette instance.",
+    "recordingContentOrganizerOnly": "Seuls les organisateurs de cet événement peuvent ouvrir, modifier ou publier le contenu de ses enregistrements.",
+    "recordingRetentionLegacy": "Les inscrits à cet événement ont été informés qu'un enregistrement non publié est supprimé avec leurs données : tant que la vidéo n'est pas publiée, sa durée peut être raccourcie, mais pas supprimée ni allongée."
+  },
+  "recordingRemoval": {
+    "cardTitle": "Contenu retiré sur demande",
+    "cardBody": "Cette partie de l'enregistrement a été retirée à la demande d'une personne qui y apparaissait."
   }
 }

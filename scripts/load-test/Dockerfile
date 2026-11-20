@@ -12,7 +12,7 @@
 #   podman build -t pa-webinar-load-test scripts/load-test/
 #
 # Run: vedi scripts/load-test/run-local.sh
-FROM docker.io/library/maven:3.9-eclipse-temurin-17
+FROM docker.io/library/maven:3.9-eclipse-temurin-17@sha256:1a352420f7aba21f5ad08df31bab55f74c013fb491f1ae8ab1dd7ff9ed698584
 
 ENV DEBIAN_FRONTEND=noninteractive
 

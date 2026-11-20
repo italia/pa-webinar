@@ -145,6 +145,33 @@ Do not put a storage block under `jitsi-meet.jibri.recording`. In the subchart
 that key is a boolean, `true` by default, that enables file recording.
 Recording storage is configured on the app ([Recording storage](#recording-storage)).
 
+### When Jibri stops by itself
+
+Jibri ends a recording on its own when its call checks fire, and those checks
+count only hosts, the only people in the video. The chart sets them in
+`global.jibri.callStatusChecks` and passes them to Jibri as JVM options
+(`-Djibri.call-status-checks.*` in `jitsi-meet.jibri.extraEnvs.JAVA_TOOL_OPTIONS`).
+Why each value is what it is:
+[Starting and stopping](../architecture/recording.md#starting-and-stopping).
+
+| Value | Default | Jibri key |
+|---|---|---|
+| `global.jibri.callStatusChecks.defaultCallEmptyTimeout` | `5m` | `default-call-empty-timeout`: how long the recording goes on with no host in the room |
+| `global.jibri.callStatusChecks.allMutedTimeout` | `30d` (never in practice) | `all-muted-timeout`: every host with microphone and camera off |
+| `global.jibri.callStatusChecks.noMediaTimeout` | `30d` (never in practice) | `no-media-timeout`: nothing arrives while some host has microphone or camera on |
+
+To change one, set it in your values file, for example
+`global.jibri.callStatusChecks.defaultCallEmptyTimeout: 10m`. Write durations
+without spaces (`300s`, `5m`, `2h`, `30d`): they travel among the JVM options,
+which are separated by spaces, and the chart refuses any other form. An empty
+value leaves Jibri's own default. A values file that sets its own
+`jitsi-meet.jibri.extraEnvs.JAVA_TOOL_OPTIONS` replaces the chart's string: start
+from the one in `values.yaml` and append your options, or the chart stops the
+render because the checks are missing. A change restarts Jibri, since its
+ConfigMap changes. Docker Compose runs no Jibri; one of your own needs the same
+three `-Djibri.call-status-checks.*` options in its `JAVA_TOOL_OPTIONS`, or the
+same keys in its `jibri.conf`.
+
 ### Mount the finalize script
 
 After each recording, Jibri runs the script at `/config/finalize.sh` (the
@@ -324,7 +351,9 @@ template are not rendered, and the app's notification fails harmlessly with a
 logged warning (`[jvb] dispatch recorder best-effort fallito`) each time the
 scaler or the lifecycle cron opens a room. Setting `RECORDER_CONTROLLER_URL`
 also makes the live room treat the installation as able to record, so events
-with recording on show the recording notice and ask for consent.
+with recording on show the recording notice and ask for consent. Without Jibri
+that holds only for events that keep per-person tracks: the others record
+nothing and ask nothing.
 
 A bot starts only when all of these hold:
 
@@ -590,9 +619,9 @@ first recorded event; the durations and what each deletion removes are in
 
 | Setting | Where | What it decides |
 |---|---|---|
-| **Data retention (days after event)** (`Event.dataRetentionDays`; default 30 in `schema.prisma`) | Event wizard | When the daily cleanup deletes the event's personal data, including an unpublished video |
-| `Event.recordingDeleteAfterDays` | Recording panel of the event's administration page | How long a published video stays after publication |
-| **Keep per-participant tracks** (`Event.retainParticipantTracks`; off by default) | Event wizard or event template | Off: tracks are deleted soon after transcription. On: they are kept until the recording's retention ends |
+| **Data retention (days after event)** (`Event.dataRetentionDays`; default 30 in `schema.prisma`) | Event wizard | When the daily cleanup deletes the event's personal data, per-participant tracks included. The recording stays |
+| **Recording retention** (`Event.recordingDeleteAfterDays`; empty by default, no automatic deletion) | Event wizard, recording panel of the event's administration page, event template | How long the recording and its outputs stay: from publication while the video is published, otherwise from the event's end ([Recording retention](../GDPR.md#recording-retention)) |
+| **Keep per-participant tracks** (`Event.retainParticipantTracks`; off by default) | Event wizard or event template | Off: tracks are deleted soon after transcription, and with the pipeline off, or a transcription that never completes, they stay until the event's data retention ends. On: they are kept until the recording's retention ends |
 | **Post-event pipeline active** (`SiteSetting.aiPipelineEnabled`; off by default) | Site settings | Whether anything is transcribed, and therefore whether tracks are ever purged after transcription |
 | `SiteSetting.orphanRecordingGraceDays` (default 30 in `schema.prisma`) | `PUT /api/admin/settings`, or `scripts/restore.sh --reset-orphan-grace <days>` on a chart installation; the settings form has no field for it | Days before `recordings-reconcile` deletes an unlinked object; `0` turns automatic deletion off, as a restore does |
 

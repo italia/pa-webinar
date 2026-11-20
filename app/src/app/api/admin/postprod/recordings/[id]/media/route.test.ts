@@ -11,6 +11,8 @@ vi.mock('next/headers', () => ({
 vi.mock('@/lib/auth/staff-session', () => ({
   requireRecordingManager: vi.fn(async () => ({ role: 'admin' })),
 }));
+// L'accesso al contenuto segue la guardia qui sopra (test/contenuto-come-gestore).
+vi.mock('@/lib/recording/content-access', () => import('@/test/contenuto-come-gestore'));
 vi.mock('@/lib/storage/postprod', () => ({
   isPostprodStorageConfigured: () => true,
   presignArtifactDownload: vi.fn(

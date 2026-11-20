@@ -84,6 +84,9 @@ interface Details {
   dubbedAudio: Array<{ language: string; url: string; sizeBytes: number | null; watermark: string | null }>;
   speakers: Array<{ id: string; diarLabel: string; displayName: string | null; totalSpeechSec: number }>;
   pipelineSnapshot?: PipelineSnapshot | null;
+  /** Chi guarda vede il contenuto (organizza l'evento): il doppiaggio da
+   *  ascoltare e i nomi delle voci (lib/recording/content-access). */
+  contenuto?: boolean;
 }
 
 const fetcher = (url: string): Promise<Details> =>
@@ -225,7 +228,9 @@ export default function RecordingOverview({ recordingId }: { recordingId: string
 
       {/* ── Player dub ────────────────────────────────────── */}
       <h6 className="fw-semibold mb-2">{t('dubTitle')}</h6>
-      {dubbedAudio.length === 0 ? (
+      {data.contenuto === false ? (
+        <p className="text-secondary small mb-4">{t('contentHidden')}</p>
+      ) : dubbedAudio.length === 0 ? (
         <p className="text-secondary small">{t('dubNone')}</p>
       ) : (
         <div className="d-flex flex-column gap-2 mb-4">
@@ -299,7 +304,11 @@ export default function RecordingOverview({ recordingId }: { recordingId: string
 
       {/* ── Parlanti (roster rinominabile) ─────────────────── */}
       <h6 className="fw-semibold mb-2">{t('speakersTitle')}</h6>
-      <SpeakerRosterEditor speakers={speakers} onSaved={() => void mutate()} />
+      {data.contenuto === false ? (
+        <p className="text-secondary small mb-4">{t('contentHidden')}</p>
+      ) : (
+        <SpeakerRosterEditor speakers={speakers} onSaved={() => void mutate()} />
+      )}
 
       {/* ── File nello storage ────────────────────────────── */}
       <h6 className="fw-semibold mb-2">{t('filesTitle')}</h6>

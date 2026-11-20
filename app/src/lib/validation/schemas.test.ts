@@ -827,3 +827,94 @@ describe('createQuestionTemplateSchema — quando si propone', () => {
     expect(r.success && r.data.sortOrder).toBeUndefined();
   });
 });
+
+// ── Destinazione del video e rubrica ────────────────────────
+
+describe('destinazione del video e rubrica proposta', () => {
+  it('un evento senza una scelta non ha questi campi', () => {
+    const esito = createEventSchema.safeParse(validEvent());
+    expect(esito.success).toBe(true);
+    if (!esito.success) return;
+    expect(esito.data).not.toHaveProperty('recordingDestination');
+    expect(esito.data).not.toHaveProperty('offerAddressBook');
+  });
+
+  it('una modifica parziale non tocca campi che non ha mandato', () => {
+    const esito = updateEventSchema.safeParse({ title: { it: 'Titolo valido' } });
+    expect(esito.success).toBe(true);
+    if (!esito.success) return;
+    expect(esito.data).not.toHaveProperty('recordingDestination');
+    expect(esito.data).not.toHaveProperty('offerAddressBook');
+  });
+
+  it.each(['PUBLIC', 'REGISTRANTS', null])('accetta la destinazione %s', (destinazione) => {
+    const esito = createEventSchema.safeParse({
+      ...validEvent(),
+      recordingDestination: destinazione,
+    });
+    expect(esito.success).toBe(true);
+  });
+
+  it('rifiuta una destinazione che non esiste', () => {
+    const esito = createEventSchema.safeParse({
+      ...validEvent(),
+      recordingDestination: 'STAFF',
+    });
+    expect(esito.success).toBe(false);
+  });
+
+  it('la destinazione accompagna il consenso, e il consenso resta valido senza', () => {
+    const iscrizione = {
+      displayName: 'Maria Rossi',
+      email: 'maria@esempio.gov.it',
+      consentGiven: true,
+      consentRecording: true,
+    };
+    expect(createRegistrationSchema.safeParse(iscrizione).success).toBe(true);
+    expect(
+      createRegistrationSchema.safeParse({
+        ...iscrizione,
+        consentRecordingDestination: 'REGISTRANTS',
+      }).success,
+    ).toBe(true);
+    expect(
+      createRegistrationSchema.safeParse({ ...iscrizione, consentRecordingDestination: 'ALTRO' })
+        .success,
+    ).toBe(false);
+
+    const ingresso = { guestName: 'Maria Rossi', recordingConsent: true };
+    expect(jitsiTokenRequestSchema.safeParse(ingresso).success).toBe(true);
+    expect(
+      jitsiTokenRequestSchema.safeParse({ ...ingresso, recordingConsentDestination: 'PUBLIC' })
+        .success,
+    ).toBe(true);
+    expect(
+      jitsiTokenRequestSchema.safeParse({ ...ingresso, recordingConsentDestination: 'ALTRO' })
+        .success,
+    ).toBe(false);
+  });
+
+  it('un testo senza destinazione si dichiara con null, che non e\' come il campo assente', () => {
+    const iscrizione = createRegistrationSchema.safeParse({
+      displayName: 'Maria Rossi',
+      email: 'maria@esempio.gov.it',
+      consentGiven: true,
+      consentRecording: true,
+      consentRecordingDestination: null,
+    });
+    expect(iscrizione.success && iscrizione.data.consentRecordingDestination).toBeNull();
+
+    const ingresso = jitsiTokenRequestSchema.safeParse({
+      guestName: 'Maria Rossi',
+      recordingConsent: true,
+      recordingConsentDestination: null,
+    });
+    expect(ingresso.success && ingresso.data.recordingConsentDestination).toBeNull();
+
+    const senzaCampo = jitsiTokenRequestSchema.safeParse({
+      guestName: 'Maria Rossi',
+      recordingConsent: true,
+    });
+    expect(senzaCampo.success && 'recordingConsentDestination' in senzaCampo.data).toBe(false);
+  });
+});

@@ -406,7 +406,7 @@ Saving an `ENDED` event with an `endsAt` in the future revives it, without recre
 
 - revival applies only to `ENDED` events, and only when the request does not set `status` explicitly;
 - the new status is `LIVE` if the effective `startsAt` (the new one if sent, otherwise the stored one) has passed, `PUBLISHED` otherwise;
-- the wizard always sends both dates and never a status, so editing and saving an ended event with a later end time is enough.
+- the wizard always sends both dates and never a status, so saving an ended event is enough when its end is in the future: a later end time, or the same dates on an event closed before its end.
 
 With the scaler, a revived `LIVE` event that was never provisioned (no pre-scale and no wake) and never joined has no activity signal and is not demoted before someone joins. One that already ran keeps its old `lastActiveAt`, and one that was pre-scaled or woken before it ended keeps its old `provisioningStartedAt`: either can go `IDLE` on the next tick and is then woken by the first visitor (see [Inactivity grace](#inactivity-grace-live-to-idle)).
 

@@ -18,7 +18,15 @@ import { useTranslations } from 'next-intl';
 import { parseLocaleList } from '@/components/admin/language-checklist';
 import ToggleSwitch from '@/components/ui/toggle-switch';
 import { Icon } from '@/components/ui/icon';
-import type { VoceNelVideo } from '@/lib/live/consent-rule';
+import { conduceNelVideo, type PartecipantiNelVideo } from '@/lib/live/consent-rule';
+import { registraChiConduce } from '@/lib/live/entry-consents';
+import {
+  DESTINAZIONE_DI_PARTENZA,
+  puoCambiareDestinazione,
+  videoDaDestinare,
+  type Destinazione,
+} from '@/lib/recording/destination';
+import { trascrizioneDalVideo } from '@/lib/registration/consents';
 import {
   EVENT_ROLES,
   EVENT_FEATURES,
@@ -29,6 +37,7 @@ import {
   togglesFromMatrix,
 } from '@/lib/utils/permission-matrix';
 
+import { registrazioneVuota, type NotaDestinazione, type NotaPagina } from './campi-del-formato';
 import ConsentDiagram from './consent-diagram';
 import { nomeLingua } from './text-translation';
 
@@ -36,13 +45,18 @@ export interface StepPermissionsValue {
   permissionMatrix: PermissionMatrix;
   recordingEnabled: boolean;
   autoStartRecording: boolean;
-  /** Moderatori e relatori sempre nella registrazione, per dichiarazione di
-   *  chi organizza: non vedono la casella. */
+  /** Dove va il video: e' cio' a cui acconsente chi spunta la casella. Null su
+   *  un evento che non l'ha dichiarata. */
+  recordingDestination: Destinazione;
+  /** Colonna storica, non piu' una scelta: chi conduce e' sempre nel video
+   *  (lib/live/consent-rule). Il valore viaggia com'e'. */
   hostsAlwaysRecorded: boolean;
   /** Pubblico anonimo: chi partecipa compare con uno pseudonimo. */
   audienceAnonymous: boolean;
   /** L'elenco di chi partecipa, per il pubblico: spento di default. */
   participantListVisible: boolean;
+  /** Chi partecipa puo' usare un nickname (lib/live/nickname). */
+  nicknamesEnabled: boolean;
   /** Agenda/note live (checklist opt-in). */
   agendaEnabled: boolean;
   /** Nuvola di parole live (opt-in). */
@@ -85,13 +99,33 @@ interface Props {
   /** L'installazione puo' registrare. Senza, la registrazione non si propone:
    *  si mostra solo se l'evento ce l'ha gia' accesa, per poterla spegnere. */
   recordingAvailable?: boolean;
-  /** Cosa succede alla voce di chi non acconsente, in questa installazione. */
-  voceNelVideo?: VoceNelVideo;
-  /** Una chiamata rapida non chiede consensi: niente diagramma, niente opzione. */
+  /** Come compaiono nel video i partecipanti, in questa installazione. */
+  partecipantiNelVideo?: PartecipantiNelVideo;
+  /** Una chiamata rapida chiede il consenso in sala, all'avvio della
+   *  registrazione: niente diagramma. */
   istantanea?: boolean;
-  /** Tenere chi conduce nella registrazione lo dichiara lo staff dell'evento, non
-   *  un link di conduzione. */
+  /** Le scelte dello staff dell'evento (la destinazione): un link di conduzione
+   *  non le fa. */
   puoDichiarareChiConduce?: boolean;
+  /** La scelta della destinazione. Assente dove non si propone: una chiamata
+   *  rapida, un link di conduzione (la decide lo staff dell'evento). */
+  destinazione?: {
+    /** Quella salvata: dice cosa si puo' ancora cambiare. */
+    iniziale: Destinazione;
+    /** La sala si e' aperta almeno una volta: si puo' solo restringere. */
+    salaGiaAperta: boolean;
+    /** Va scelta per salvare (validation.ts): senza, resta «non indicata». */
+    chiesta: boolean;
+    /** Cosa diventa la registrazione con un evento su invito. */
+    nota?: NotaDestinazione | null;
+    /** Cosa diventa la pagina dopo l'evento. */
+    notaPagina?: NotaPagina | null;
+  };
+  /** La destinazione dopo il salvataggio: con un link di conduzione la scelta non
+   *  c'e', e questa dice cosa diventa l'evento. */
+  destinazioneDopo?: Destinazione;
+  /** La sala si e' gia' aperta: da li' nessuno puo' piu' allargare la destinazione. */
+  salaGiaAperta?: boolean;
   /** Porta alle lingue dell'evento, nel passo «Evento». */
   onCambiaLingue?: () => void;
   /** La post-produzione AI e' accesa sull'installazione? Spenta, le sue
@@ -117,6 +151,20 @@ interface Props {
    *  istantanea, che non ha il passo. */
   programma?: { argomenti: number; onVai: () => void };
 }
+
+/** Le due destinazioni, con il loro testo sotto `admin.wizard.step2`. */
+const DESTINAZIONI = [
+  {
+    valore: 'REGISTRANTS',
+    titolo: 'recordingDestinationReserved',
+    desc: 'recordingDestinationReservedDesc',
+  },
+  {
+    valore: 'PUBLIC',
+    titolo: 'recordingDestinationPublic',
+    desc: 'recordingDestinationPublicDesc',
+  },
+] as const;
 
 /** Le funzioni AI che si accendono con la registrazione: chi registra ha
  *  trascrizione, sintesi e traduzione (nelle lingue dell'evento) e le tracce
@@ -154,9 +202,12 @@ export default function StepPermissions({
   whiteboardInfraReady,
   liveCaptionsAvailable = false,
   recordingAvailable = true,
-  voceNelVideo = 'rimovibile',
+  partecipantiNelVideo = 'visibili',
   istantanea = false,
   puoDichiarareChiConduce = true,
+  destinazioneDopo = null,
+  salaGiaAperta = false,
+  destinazione,
   onCambiaLingue,
   aiPipelineEnabled = true,
   editing = false,
@@ -182,7 +233,11 @@ export default function StepPermissions({
   };
 
   const visibleFeatures = EVENT_FEATURES.filter(
-    (f) => f !== 'recording_control' || (value.recordingEnabled && recordingAvailable),
+    (f) =>
+      f !== 'recording_control' ||
+      (value.recordingEnabled &&
+        recordingAvailable &&
+        !registrazioneVuota(value, partecipantiNelVideo, recordingAvailable)),
   );
 
   // Le due parti: il passo «Permessi» (partecipazione e funzioni della sala)
@@ -229,7 +284,11 @@ export default function StepPermissions({
           <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
             {value.audienceAnonymous ? t('participantListAnonymous') : t('participantListVisibleDesc')}
           </div>
-          {!value.participantListVisible && togglesFromMatrix(value.permissionMatrix).participantsCanStartVideo && (
+          {/* Con gli pseudonimi l'elenco non si puo' mostrare: la nota non avrebbe
+              un'azione da proporre. */}
+          {!value.participantListVisible &&
+            !value.audienceAnonymous &&
+            togglesFromMatrix(value.permissionMatrix).participantsCanStartVideo && (
             <div className="text-secondary mt-1" style={{ fontSize: '0.85rem' }}>
               {t('participantListCameraNote')}
             </div>
@@ -246,6 +305,32 @@ export default function StepPermissions({
       {soloAscoltoBloccato && (
         <p className="text-secondary" style={{ fontSize: '0.85rem' }}>
           {t('participantListLocked')}
+        </p>
+      )}
+
+      {/* Il nickname per chi partecipa: acceso di partenza dove l'elenco e'
+          nascosto, si accende anche per un incontro riservato. Chi conduce
+          resta con il suo nome. */}
+      <div className="py-2 mb-3 d-flex justify-content-between align-items-start" style={{ borderBottom: '1px solid #e8e8e8' }}>
+        <div className="me-3">
+          <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
+            {t('nicknamesEnabled')}
+          </div>
+          <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
+            {t('nicknamesEnabledDesc')}
+          </div>
+        </div>
+        <ToggleSwitch
+          label=""
+          ariaLabel={t('nicknamesEnabled')}
+          checked={value.nicknamesEnabled}
+          disabled={soloAscoltoBloccato}
+          onChange={() => onChange({ nicknamesEnabled: !value.nicknamesEnabled })}
+        />
+      </div>
+      {soloAscoltoBloccato && (
+        <p className="text-secondary" style={{ fontSize: '0.85rem' }}>
+          {t('nicknamesLocked')}
         </p>
       )}
 
@@ -472,6 +557,16 @@ export default function StepPermissions({
                 ...(!value.recordingEnabled && aiPipelineEnabled && !editing
                   ? aiConLaRegistrazione(value)
                   : {}),
+                // Un evento nuovo che registra parte riservato, se il modello
+                // non dice altro; dove la scelta non si propone lo decide il
+                // salvataggio. Su un evento salvato la scelta resta da fare.
+                // Spegnendo la registrazione la destinazione resta nel modulo.
+                ...(!value.recordingEnabled &&
+                !editing &&
+                value.recordingDestination == null &&
+                videoDaDestinare(partecipantiNelVideo)
+                  ? { recordingDestination: DESTINAZIONE_DI_PARTENZA }
+                  : {}),
               })
             }
           />
@@ -479,7 +574,11 @@ export default function StepPermissions({
 
         {value.recordingEnabled && !value.autoStartRecording && (
           <p className="text-secondary mb-0 py-2" style={{ fontSize: '0.85rem', borderTop: '1px solid #e8e8e8' }}>
-            {t('recordingManualNote')}
+            {t(
+              registrazioneVuota(value, partecipantiNelVideo, recordingAvailable)
+                ? 'recordingNothingToCapture'
+                : 'recordingManualNote',
+            )}
           </p>
         )}
 
@@ -491,28 +590,125 @@ export default function StepPermissions({
 
         {value.recordingEnabled &&
           recordingAvailable &&
+          destinazione &&
+          videoDaDestinare(partecipantiNelVideo) && (
+          <fieldset id="wiz-destinazione" className="py-2" style={{ borderTop: '1px solid #e8e8e8' }}>
+            <legend
+              className="fw-semibold mb-1 float-none"
+              style={{ color: 'var(--app-text)', fontSize: '1rem' }}
+            >
+              {t('recordingDestination')}
+            </legend>
+            {DESTINAZIONI.map(({ valore, titolo, desc }, i) => (
+              <div key={valore} className="form-check">
+                <input
+                  id={`wiz-destinazione-${valore}`}
+                  type="radio"
+                  name="wiz-destinazione"
+                  // Sul primo: il wizard porta li' il fuoco, una volta sola.
+                  className={`form-check-input${
+                    fieldErrors.recordingDestination && i === 0 ? ' is-invalid' : ''
+                  }`}
+                  data-wizard-label={t('recordingDestination')}
+                  aria-describedby={[
+                    `wiz-destinazione-${valore}-desc`,
+                    ...(fieldErrors.recordingDestination ? ['wiz-destinazione-errore'] : []),
+                  ].join(' ')}
+                  checked={value.recordingDestination === valore}
+                  disabled={
+                    soloAscoltoBloccato ||
+                    !puoCambiareDestinazione(
+                      destinazione.iniziale,
+                      valore,
+                      destinazione.salaGiaAperta,
+                    )
+                  }
+                  onChange={() => onChange({ recordingDestination: valore })}
+                />
+                <label className="form-check-label" htmlFor={`wiz-destinazione-${valore}`}>
+                  {t(titolo)}
+                </label>
+                <div
+                  id={`wiz-destinazione-${valore}-desc`}
+                  className="text-secondary"
+                  style={{ fontSize: '0.85rem' }}
+                >
+                  {t(desc)}
+                </div>
+              </div>
+            ))}
+            {fieldErrors.recordingDestination && (
+              <div id="wiz-destinazione-errore" className="invalid-feedback d-block">
+                {t('recordingDestinationRequired')}
+              </div>
+            )}
+            {value.recordingDestination === null && !destinazione.chiesta && (
+              <p className="text-secondary mb-0 mt-1" style={{ fontSize: '0.85rem' }}>
+                {t('recordingDestinationNotSet')}
+              </p>
+            )}
+            {destinazione.salaGiaAperta && (
+              <p className="text-secondary mb-0 mt-1" style={{ fontSize: '0.85rem' }}>
+                {t('recordingDestinationLocked')}
+              </p>
+            )}
+            {destinazione.nota && (
+              <p className="text-secondary mb-0 mt-1" style={{ fontSize: '0.85rem' }}>
+                {t(destinazione.nota)}
+              </p>
+            )}
+            {destinazione.notaPagina && (
+              <p className="text-secondary mb-0 mt-1" style={{ fontSize: '0.85rem' }}>
+                {t(destinazione.notaPagina)}
+              </p>
+            )}
+          </fieldset>
+        )}
+
+        {/* Con un link di conduzione la scelta non c'e': la fa lo staff. Un evento
+            che comincia ora a registrare parte riservato, e lo staff lo puo'
+            allargare solo prima che la sala si apra. Uno che registrava gia'
+            resta senza. */}
+        {value.recordingEnabled &&
+          recordingAvailable &&
           !istantanea &&
-          puoDichiarareChiConduce &&
-          voceNelVideo === 'rimovibile' && (
-          <div
-            className="py-2 d-flex justify-content-between align-items-start"
-            style={{ borderTop: '1px solid #e8e8e8' }}
-          >
-            <div className="me-3">
-              <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
-                {t('hostsAlwaysRecorded')}
-              </div>
-              <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
-                {t('hostsAlwaysRecordedDesc')}
-              </div>
+          !puoDichiarareChiConduce &&
+          value.recordingDestination === null &&
+          videoDaDestinare(partecipantiNelVideo) && (
+            <p className="text-secondary mb-0 py-2" style={{ fontSize: '0.85rem', borderTop: '1px solid #e8e8e8' }}>
+              {t(
+                destinazioneDopo === null
+                  ? 'recordingDestinationStaffOnly'
+                  : salaGiaAperta
+                    ? 'recordingDestinationStaysReserved'
+                    : 'recordingDestinationStartsReserved',
+              )}
+            </p>
+          )}
+
+        {/* Chi conduce e' nel video, sempre: non e' una scelta dell'evento
+            (lib/live/consent-rule). La riga lo dice a chi organizza, perche'
+            l'informativa dell'evento lo dica a chi conduce. */}
+        {registraChiConduce(
+          { recordingEnabled: value.recordingEnabled, eventType: istantanea ? 'INSTANT' : null },
+          recordingAvailable,
+          partecipantiNelVideo,
+        ) &&
+          conduceNelVideo(partecipantiNelVideo) && (
+          <div className="py-2" style={{ borderTop: '1px solid #e8e8e8' }}>
+            <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
+              {t('hostsAlwaysRecorded')}
             </div>
-            <ToggleSwitch
-              label=""
-              ariaLabel={t('hostsAlwaysRecorded')}
-              checked={value.hostsAlwaysRecorded}
-              disabled={soloAscoltoBloccato}
-              onChange={() => onChange({ hostsAlwaysRecorded: !value.hostsAlwaysRecorded })}
-            />
+            <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
+              {/* Di chi partecipa, cio' che l'installazione garantisce davvero. */}
+              {t(
+                partecipantiNelVideo === 'esclusi'
+                  ? 'hostsAlwaysRecordedDescHostsOnly'
+                  : partecipantiNelVideo === 'visibili'
+                    ? 'hostsAlwaysRecordedDescVisible'
+                    : 'hostsAlwaysRecordedDesc',
+              )}
+            </div>
           </div>
         )}
 
@@ -522,9 +718,14 @@ export default function StepPermissions({
             captionsTranscript={
               liveCaptionsAvailable && value.liveCaptionsEnabled && value.captionsTranscriptEnabled
             }
+            trascrizioneVideo={trascrizioneDalVideo(
+              value,
+              { aiPipelineEnabled },
+              recordingAvailable,
+              partecipantiNelVideo,
+            )}
             {...togglesFromMatrix(value.permissionMatrix)}
-            hostsAlwaysRecorded={value.hostsAlwaysRecorded}
-            voce={voceNelVideo}
+            partecipanti={partecipantiNelVideo}
           />
         )}
 

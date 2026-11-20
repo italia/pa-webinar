@@ -8,9 +8,10 @@
  * (WhisperX, pyannote) e il doppiaggio: Piper gira su CPU, ma la filigrana
  * AudioSeal elabora l'intera traccia in un colpo solo e per un evento lungo
  * chiede decine di GB. Sintesi e traduzioni chiedono il testo al servizio
- * vLLM, che ha la sua GPU, e l'archivio rimuxa senza ricodificare: questi
- * vanno al worker senza GPU, quando il chart lo prevede, e per una sintesi
- * si accende una sola A100 (quella di vLLM) invece di due.
+ * vLLM, che ha la sua GPU, l'archivio rimuxa senza ricodificare e la
+ * rimozione da un video ricodifica con ffmpeg su CPU: questi vanno al worker
+ * senza GPU, quando il chart lo prevede, e per una sintesi si accende una sola
+ * A100 (quella di vLLM) invece di due.
  *
  * La traduzione di titolo e descrizione (TRANSLATE_TEXT) non usa vLLM: la fa
  * il motore di traduzione su CPU (postprod.mt nel chart). L'orchestratore
@@ -28,6 +29,7 @@ export const POSTPROD_JOB_KINDS = [
   'ARCHIVE',
   'REPORT',
   'TRANSLATE_TEXT',
+  'REDACT',
 ] as const;
 export type PostprodJobKind = (typeof POSTPROD_JOB_KINDS)[number];
 
@@ -57,5 +59,10 @@ export const LLM_JOB_KINDS: readonly PostprodJobKind[] = [
 /** I job del motore di traduzione su CPU (postprod.mt nel chart). */
 export const MT_JOB_KINDS: readonly PostprodJobKind[] = ['TRANSLATE_TEXT'];
 
-/** I job dell'evento, senza registrazione (`eventId`, `recordingId` nullo). */
-export const EVENT_JOB_KINDS: readonly PostprodJobKind[] = ['REPORT', 'TRANSLATE_TEXT'];
+/**
+ * I job dell'evento, senza registrazione (`eventId`, `recordingId` nullo): li
+ * chiude solo la consegna alla loro rotta (lib/report/job). La rimozione da un
+ * video (REDACT) porta la registrazione nel payload: cosi' non entra nello
+ * stato della pipeline della registrazione.
+ */
+export const EVENT_JOB_KINDS: readonly PostprodJobKind[] = ['REPORT', 'TRANSLATE_TEXT', 'REDACT'];

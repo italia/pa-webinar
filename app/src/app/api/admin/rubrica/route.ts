@@ -4,87 +4,90 @@
 /**
  * Admin rubrica (address book) list.
  *
- * Returns all Person rows currently opted in to the cross-event address
- * book. This is the people directory, independent of a single event
- * registration. Supports filtering by organization type, text search
- * (organization only — see trade-off below), and inactivity window.
+ * L'elenco delle persone in rubrica, indipendente dalle iscrizioni ai singoli
+ * eventi. Solo per l'amministrazione.
  *
- * GET params:
- *   q?          — case-insensitive substring match on organization only.
- *                 displayName is encrypted at rest (AES-256-GCM); a
- *                 `contains` query against ciphertext is meaningless, so
- *                 we drop that clause (same trade-off taken for
- *                 moderatorEmail in the moderators admin route). If we
- *                 ever need full-text rubrica search we'll add a
- *                 deterministic hash column for equality lookup, but
- *                 substring search on encrypted PII is out of scope.
- *   orgType?    — OrganizationType enum value
- *   includeOpted?  — 'out' to include opted-out persons (default: only
- *                   opted-in). The address-book page uses it to manage every
- *                   entry; the event wizard's picker never does.
- *   withEmail?  — '1' to add each person's email, from their latest
- *                 registration (decrypted): the wizard picker needs it to add
- *                 the person to an event. Only persons that still have a
- *                 registration are returned (cleanup deletes registrations
- *                 before the address-book entry). Admin only, like the route.
- *   limit?      — default 200, max 1000
- *   offset?     — pagination offset
+ * GET elenca, senza testo da cercare e senza indirizzi:
+ *   orgType?       — OrganizationType enum value
+ *   includeOpted?  — 'out' per comprendere chi ha ritirato il consenso (default:
+ *                    solo chi lo ha dato). La pagina della rubrica gestisce ogni
+ *                    voce.
+ *   limit?         — default 200, max 1000
+ *   offset?        — pagination offset
+ *
+ * POST cerca per nome, email o ente, con il testo nel corpo JSON
+ * (lib/persons/ricerca-rubrica) e gli stessi filtri: `q`, `orgType`,
+ * `includeOptedOut`, `withEmail`, `limit`, `offset`. L'email serve al confronto
+ * anche senza `withEmail`, ma nella risposta c'e' solo con `withEmail`, che
+ * restituisce solo le voci che ne hanno una: al selettore del wizard serve per
+ * mettere la persona in un evento. Se le voci sono piu' di quelle che si guardano,
+ * `scanLimit` dice quante ne ha guardate.
  */
 
 import { cookies } from 'next/headers';
 import type { OrganizationType, Prisma } from '@prisma/client';
+import { z } from 'zod';
 
-import { withErrorHandling } from '@/lib/api-handler';
+import { parseJsonBody, withErrorHandling } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
-import { UnauthorizedError } from '@/lib/errors';
+import { UnauthorizedError, ValidationError } from '@/lib/errors';
+import { VOCI_ESAMINATE_MAX, voceCorrisponde } from '@/lib/persons/ricerca-rubrica';
+import { ORGANIZATION_TYPES } from '@/lib/validation/schemas';
 
 export const dynamic = 'force-dynamic';
 
 const DEFAULT_LIMIT = 200;
 const MAX_LIMIT = 1000;
 
-export const GET = withErrorHandling(async (request) => {
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) throw new UnauthorizedError();
+const ricercaSchema = z.object({
+  q: z.string().trim().min(1).max(200),
+  orgType: z.enum(ORGANIZATION_TYPES).optional(),
+  includeOptedOut: z.boolean().optional(),
+  withEmail: z.boolean().optional(),
+  limit: z.number().int().min(1).max(MAX_LIMIT).optional(),
+  offset: z.number().int().min(0).optional(),
+});
 
-  const url = new URL(request.url);
-  const q = url.searchParams.get('q')?.trim() ?? '';
-  const orgTypeParam = url.searchParams.get('orgType');
-  const includeOpted = url.searchParams.get('includeOpted');
-  const withEmail = url.searchParams.get('withEmail') === '1';
-  const limit = Math.min(
-    parseInt(url.searchParams.get('limit') ?? String(DEFAULT_LIMIT), 10),
-    MAX_LIMIT,
-  );
-  const offset = parseInt(url.searchParams.get('offset') ?? '0', 10);
+interface Filtri {
+  orgType: OrganizationType | null;
+  includeOptedOut: boolean;
+  withEmail: boolean;
+  limit: number;
+  offset: number;
+}
 
+// Sort by lastActiveAt only — alphabetical sort on encrypted
+// displayName is meaningless (ciphertext order is random).
+const ORDINE: Prisma.PersonOrderByWithRelationInput[] = [{ lastActiveAt: 'desc' }];
+
+function vociDeiFiltri({ orgType, includeOptedOut, withEmail }: Filtri): Prisma.PersonWhereInput {
   const where: Prisma.PersonWhereInput = {};
-  if (includeOpted !== 'out') where.optedInToAddressBook = true;
-  if (orgTypeParam) where.organizationType = orgTypeParam as OrganizationType;
-  // Senza un'iscrizione non c'e' un indirizzo: la persona non si potrebbe
-  // aggiungere a un evento, e il selettore non la propone.
-  if (withEmail) where.registrations = { some: {} };
-  if (q) {
-    // displayName is stored encrypted at rest, so a `contains` clause on
-    // ciphertext would never match. We drop the displayName search and
-    // keep substring matching on `organization` only. Same trade-off as
-    // the moderators admin route after moderatorEmail was encrypted.
-    where.organization = { contains: q, mode: 'insensitive' };
-  }
+  if (!includeOptedOut) where.optedInToAddressBook = true;
+  if (orgType) where.organizationType = orgType;
+  // Senza un indirizzo la persona non si potrebbe aggiungere a un evento, e il
+  // selettore non la propone.
+  if (withEmail) where.email = { not: null };
+  return where;
+}
 
-  const [rows, total] = await Promise.all([
+async function elenco(
+  filtri: Filtri,
+  where: Prisma.PersonWhereInput,
+  { skip, total, scanLimit }: { skip: number; total: number | null; scanLimit?: number },
+): Promise<Response> {
+  const { withEmail, limit, offset } = filtri;
+  const [rows, conteggio] = await Promise.all([
     prisma.person.findMany({
       where,
-      // Sort by lastActiveAt only — alphabetical sort on encrypted
-      // displayName is meaningless (ciphertext order is random).
-      orderBy: [{ lastActiveAt: 'desc' }],
+      orderBy: ORDINE,
       take: limit,
-      skip: offset,
+      skip,
       select: {
         id: true,
         displayName: true,
+        email: withEmail,
         organization: true,
         organizationRole: true,
         organizationType: true,
@@ -97,19 +100,8 @@ export const GET = withErrorHandling(async (request) => {
         _count: { select: { registrations: true } },
       },
     }),
-    prisma.person.count({ where }),
+    total ?? prisma.person.count({ where }),
   ]);
-
-  // L'email dell'ultima iscrizione di ciascuno, in una lettura sola.
-  const emailPerPersona = new Map<string, string | null>();
-  if (withEmail && rows.length > 0) {
-    const ultime = await prisma.$queryRaw<Array<{ person_id: string; email: string }>>`
-      SELECT DISTINCT ON (person_id) person_id, email
-      FROM registrations
-      WHERE person_id = ANY(${rows.map((r) => r.id)}::uuid[])
-      ORDER BY person_id, created_at DESC`;
-    for (const u of ultime) emailPerPersona.set(u.person_id, tryDecryptPII(u.email));
-  }
 
   return Response.json(
     {
@@ -126,12 +118,76 @@ export const GET = withErrorHandling(async (request) => {
         retentionMonths: r.retentionMonths,
         createdAt: r.createdAt.toISOString(),
         registrationCount: r._count.registrations,
-        ...(withEmail ? { email: emailPerPersona.get(r.id) ?? null } : {}),
+        ...(withEmail ? { email: tryDecryptPII(r.email) } : {}),
       })),
-      total,
+      total: conteggio,
       limit,
       offset,
+      ...(scanLimit ? { scanLimit } : {}),
     },
     { headers: { 'Cache-Control': 'no-store' } },
+  );
+}
+
+async function richiediAmministrazione(): Promise<void> {
+  const isAdmin = await isAdminAuthenticated(await cookies());
+  if (!isAdmin) throw new UnauthorizedError();
+}
+
+export const GET = withErrorHandling(async (request) => {
+  await richiediAmministrazione();
+
+  const url = new URL(request.url);
+  const filtri: Filtri = {
+    orgType: url.searchParams.get('orgType') as OrganizationType | null,
+    includeOptedOut: url.searchParams.get('includeOpted') === 'out',
+    withEmail: false,
+    limit: Math.min(
+      parseInt(url.searchParams.get('limit') ?? String(DEFAULT_LIMIT), 10),
+      MAX_LIMIT,
+    ),
+    offset: parseInt(url.searchParams.get('offset') ?? '0', 10),
+  };
+  return elenco(filtri, vociDeiFiltri(filtri), { skip: filtri.offset, total: null });
+});
+
+export const POST = withErrorHandling(async (request) => {
+  await richiediAmministrazione();
+
+  const parsed = ricercaSchema.safeParse(await parseJsonBody(request, 2048));
+  if (!parsed.success) throw new ValidationError('Invalid search');
+  const { q, orgType, includeOptedOut, withEmail, limit, offset } = parsed.data;
+  const filtri: Filtri = {
+    orgType: orgType ?? null,
+    includeOptedOut: includeOptedOut === true,
+    withEmail: withEmail === true,
+    limit: limit ?? DEFAULT_LIMIT,
+    offset: offset ?? 0,
+  };
+  const where = vociDeiFiltri(filtri);
+
+  const voci = await prisma.person.findMany({
+    where,
+    orderBy: ORDINE,
+    // Una voce in piu' dice se ne sono rimaste fuori.
+    take: VOCI_ESAMINATE_MAX + 1,
+    select: { id: true, displayName: true, email: true, organization: true },
+  });
+  const trovate = voci
+    .slice(0, VOCI_ESAMINATE_MAX)
+    .filter((v) =>
+      voceCorrisponde([tryDecryptPII(v.displayName), tryDecryptPII(v.email), v.organization], q),
+    )
+    .map((v) => v.id);
+  const pagina = trovate.slice(filtri.offset, filtri.offset + filtri.limit);
+
+  return elenco(
+    filtri,
+    { AND: [where, { id: { in: pagina } }] },
+    {
+      skip: 0,
+      total: trovate.length,
+      ...(voci.length > VOCI_ESAMINATE_MAX ? { scanLimit: VOCI_ESAMINATE_MAX } : {}),
+    },
   );
 });

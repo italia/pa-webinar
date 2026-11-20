@@ -6,6 +6,10 @@
  * Un consenso si puo' dare all'iscrizione o in sala (le prove
  * RecordingConsent, MultitrackConsent): vale finche' almeno uno dei due non e'
  * ritirato. `null`: quel consenso a questa persona non e' stato chiesto.
+ *
+ * Il ritiro delle comunicazioni future vale per l'indirizzo: compare su ogni sua
+ * iscrizione, anche su quelle senza la spunta. `addressBookPending` e' la spunta
+ * della rubrica che aspetta una conferma (lib/persons/spunta-in-attesa).
  */
 export interface StatoConsenso {
   dato: boolean;
@@ -45,6 +49,7 @@ export function consensiDellIscrizione(r: {
   multitrackConsents?: readonly Prova[];
   consentFutureCommunications: boolean;
   consentFutureCommunicationsWithdrawnAt: Date | null;
+  addressBookPending?: boolean;
 }) {
   const ritiroComunicazioni = r.consentFutureCommunicationsWithdrawnAt;
   return {
@@ -65,5 +70,6 @@ export function consensiDellIscrizione(r: {
             ritiratoIl: ritiroComunicazioni?.toISOString() ?? null,
           }
         : null,
+    addressBookPending: r.addressBookPending === true,
   };
 }

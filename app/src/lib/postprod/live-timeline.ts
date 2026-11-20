@@ -5,16 +5,18 @@
  * La cronologia della sala per la post-produzione: cosa e' successo e quando,
  * sulla stessa base dei tempi della trascrizione (secondi dall'inizio della
  * registrazione), cosi' la sintesi sa collocare argomenti, sondaggi, domande e
- * reazioni accanto a cio' che si e' detto.
+ * reazioni accanto a cio' che si e' detto. La sintesi puo' finire sulla pagina
+ * dell'evento: quello che il modello legge qui puo' uscirne riformulato.
  *
  * Mette insieme due fonti, entrambe con l'ora del server:
  *  - il registro delle azioni dal vivo (live_actions, lib/live/actions.ts):
  *    agenda, sondaggi, «In una parola», stati delle domande, funzioni,
  *    registrazione, timer, mani alzate, PDF presentati e pagine mostrate,
  *    fine evento;
- *  - le righe che un'ora ce l'hanno gia': domande del Q&A e domande in chat
- *    (il testo, mai chi le ha scritte), materiali condivisi, e l'attivita'
- *    della chat e delle reazioni contata per finestre di cinque minuti.
+ *  - le righe che un'ora ce l'hanno gia': domande del Q&A (il testo, mai chi le
+ *    ha scritte, e solo se la pagina le pubblica: `domandePerIModelli`), materiali
+ *    condivisi, e l'attivita' della chat e delle reazioni contata per finestre
+ *    di cinque minuti. Della chat si contano i messaggi, il testo non si legge.
  *
  * Lo zero e' l'inizio del media (recordingTimeZero); quando e' stimato la
  * cronologia lo dice (`exact: false`), e i tempi possono allora essere
@@ -23,8 +25,8 @@
 
 import { Prisma } from '@prisma/client';
 
-import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
+import { domandePerIModelli } from '@/lib/events/post-event-sections';
 import type { LiveFlagField } from '@/lib/live-state/pubsub';
 import { normalizeWord } from '@/lib/wordcloud/normalize';
 
@@ -384,8 +386,22 @@ export async function buildLiveTimeline(opts: {
   const a = new Date(opts.until.getTime() + AFTER_MS);
   const nellaFinestra = { gte: da, lte: a };
 
-  const [azioni, agenda, domande, domandeChat, materiali, chat, reazioni, mani] =
+  const [evento, azioni, agenda, domandeLette, materiali, chat, reazioni, mani] =
     await Promise.all([
+      prisma.event.findUnique({
+        where: { id: eventId },
+        select: {
+          status: true,
+          eventType: true,
+          endsAt: true,
+          postEventPublic: true,
+          postEventPublicUntil: true,
+          postEventShowQA: true,
+          qaEnabled: true,
+          recordingDestination: true,
+          recordingAudience: true,
+        },
+      }),
       prisma.liveAction.findMany({
         where: {
           eventId,
@@ -408,16 +424,6 @@ export async function buildLiveTimeline(opts: {
         where: { eventId },
         select: { id: true, text: true, answerText: true, status: true, createdAt: true },
       }),
-      prisma.chatMessage.findMany({
-        where: {
-          eventId,
-          isQuestion: true,
-          hiddenAt: null,
-          dismissedAt: null,
-          createdAt: nellaFinestra,
-        },
-        select: { text: true, createdAt: true },
-      }),
       prisma.eventMaterial.findMany({
         where: { eventId, createdAt: nellaFinestra },
         select: { title: true, createdAt: true },
@@ -436,6 +442,8 @@ export async function buildLiveTimeline(opts: {
       .map((az) => str((az.data as Record<string, unknown> | null)?.roundId))
   );
 
+  // Senza le righe le azioni sulle domande non hanno testo, e non entrano.
+  const domande = evento && domandePerIModelli(evento) ? domandeLette : [];
   const perId = new Map(
     domande.map((q) => [q.id, { text: q.text, answerText: q.answerText }])
   );
@@ -482,17 +490,6 @@ export async function buildLiveTimeline(opts: {
       text: `Domanda dal pubblico (Q&A): «${cita(q.text)}»`,
     });
   }
-  for (const m of domandeChat) {
-    // Il testo della chat e' cifrato a riposo.
-    const testo = tryDecryptPII(m.text);
-    if (!testo) continue;
-    fatti.push({
-      at: m.createdAt,
-      kind: 'chat.question',
-      text: `Domanda in chat: «${cita(testo)}»`,
-      minore: true,
-    });
-  }
   for (const m of materiali) {
     fatti.push({
       at: m.createdAt,
@@ -528,8 +525,8 @@ export async function buildLiveTimeline(opts: {
 
   fatti.sort((x, y) => x.at.getTime() - y.at.getTime());
 
-  // Troppe voci: via per prime quelle minori (attivita' e domande in chat),
-  // dalle piu' vecchie; poi, se serve ancora, le piu' vecchie in assoluto.
+  // Troppe voci: via per prime quelle minori (attivita' della sala e pagine
+  // della presentazione), dalle piu' vecchie; poi, se serve ancora, le piu' vecchie in assoluto.
   let scelti = fatti;
   if (scelti.length > MAX_ENTRIES) {
     let daTogliere = scelti.length - MAX_ENTRIES;

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: EUPL-1.2
 // SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
 
-import type { Prisma } from '@prisma/client';
+import type { EventFormatClass, Prisma } from '@prisma/client';
 import { cookies } from 'next/headers';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
@@ -17,7 +17,9 @@ import { publishEventStatus, publishFlagsIfChanged } from '@/lib/live-state/publ
 import { LIVE_FLAG_FIELDS } from '@/lib/live-state/pubsub';
 import { recordLiveAction, recordLiveActions } from '@/lib/live/actions';
 import { reviveStatus } from '@/lib/events/lifecycle';
-import { CAMPI_VIDEO_VUOTI } from '@/lib/events/recording-fields';
+import { CAMPI_VIDEO_VUOTI, sessioniSenzaFile } from '@/lib/events/recording-fields';
+import { domandePubbliche } from '@/lib/events/post-event-sections';
+import { isEventPageVisible } from '@/lib/events/visibility';
 import { closeOpenSessions } from '@/lib/events/call-sessions';
 import { chiudiSondaggiAperti } from '@/lib/events/close-polls';
 import { eventTagIds, replaceEventTags, resolveTags, sameTagIds } from '@/lib/events/event-tags';
@@ -42,7 +44,7 @@ import { getSettings } from '@/lib/settings';
 import { encryptPIIOrNull, tryDecryptPII } from '@/lib/crypto/pii';
 import { calculateEstimates } from '@/lib/estimates';
 import { hashJoinPassword } from '@/lib/auth/password';
-import { isEventManager, requireEventManager } from '@/lib/auth/staff-session';
+import { getStaffSession, isEventManager, requireEventManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { coerceMatrix, togglesFromMatrix } from '@/lib/utils/permission-matrix';
 import { riconciliaTraduzioni } from '@/lib/text-translation/auto';
@@ -53,7 +55,20 @@ import {
   lingueDellEvento,
 } from '@/lib/text-translation/stato-lingue';
 import { unisciTesti } from '@/lib/text-translation/unione-testi';
-import { salaForseAperta } from '@/lib/live/room-open';
+import { salaForseAperta, salaGiaAperta } from '@/lib/live/room-open';
+import {
+  assertEsposizioneConsentita,
+  destinazioneDiPartenza,
+  erroreDestinazioneNonCoperta,
+  pubblicoAllineato,
+  puoCambiareDestinazione,
+  recuperoAperto,
+  type Destinazione,
+} from '@/lib/recording/destination';
+import { videoDellApp, videoPerTutti } from '@/lib/recording/audience';
+import { organizzaEvento } from '@/lib/recording/content-access';
+import { durataAmmessa } from '@/lib/recording/legacy-retention';
+import { assertVideoDellEvento, assertVideoNelloStorage } from '@/lib/storage/recordings';
 import { annullaEmailInCoda } from '@/lib/email/outbox';
 
 export const dynamic = 'force-dynamic';
@@ -120,7 +135,9 @@ export const GET = withErrorHandling(async (request, context) => {
       participantsCanStartVideo: event.participantsCanStartVideo,
       participantsCanShareScreen: event.participantsCanShareScreen,
       status: event.status,
-      recordingUrl: event.recordingUrl,
+      // La rotta dell'app, che firma il file per chi lo puo' vedere, mai
+      // l'indirizzo dello storage (lib/recording/audience).
+      recordingUrl: event.recordingUrl ? videoDellApp(event.slug) : null,
       tempRecordingUrl: event.tempRecordingUrl,
       tempRecordingStartedAt: event.tempRecordingStartedAt?.toISOString() ?? null,
       recordingPublished: event.recordingPublished,
@@ -128,6 +145,7 @@ export const GET = withErrorHandling(async (request, context) => {
       recordingFileSize: event.recordingFileSize ? Number(event.recordingFileSize) : null,
       recordingDuration: event.recordingDuration,
       recordingDeleteAfterDays: event.recordingDeleteAfterDays,
+      legacyRecordingRetention: event.legacyRecordingRetention,
       postEventPublic: event.postEventPublic,
       postEventPublicUntil: event.postEventPublicUntil?.toISOString() ?? null,
       postEventShowQA: event.postEventShowQA,
@@ -141,7 +159,10 @@ export const GET = withErrorHandling(async (request, context) => {
       recordingConsentText: event.recordingConsentText,
       audienceAnonymous: event.audienceAnonymous,
       participantListVisible: event.participantListVisible,
+      nicknamesEnabled: event.nicknamesEnabled,
       hostsAlwaysRecorded: event.hostsAlwaysRecorded,
+      recordingDestination: event.recordingDestination,
+      offerAddressBook: event.offerAddressBook,
       // Al co-moderatore torna il SUO token (valido su tutte le route che
       // già lo ammettono), mai quello del primario.
       moderatorToken: isPrimaryModerator ? event.moderatorToken : token,
@@ -168,10 +189,13 @@ export const GET = withErrorHandling(async (request, context) => {
     });
   }
 
-  // Public mode — hide DRAFT and ARCHIVED events
-  if (event.status === 'DRAFT' || event.status === 'ARCHIVED') {
-    throw new NotFoundError('Event');
-  }
+  // La lettura pubblica segue la pagina: un evento senza pagina (bozza, archivio,
+  // concluso con la pagina privata o la finestra scaduta) qui non esiste.
+  if (!isEventPageVisible(event)) throw new NotFoundError('Event');
+
+  // Come la pagina della sala: una registrazione riservata non si offre a chi
+  // legge questa risposta pubblica.
+  const recuperoInDiretta = recuperoAperto(event);
 
   return Response.json({
     id: event.id,
@@ -191,14 +215,16 @@ export const GET = withErrorHandling(async (request, context) => {
     participantsCanStartVideo: event.participantsCanStartVideo,
     participantsCanShareScreen: event.participantsCanShareScreen,
     status: event.status,
-    // Risposta in cache condivisa: il video solo se pubblicato per tutti; una
-    // registrazione riservata agli iscritti passa dalla pagina e dal player,
-    // che riconoscono l'iscritto (lib/recording/audience).
-    recordingUrl: event.recordingPublished && event.recordingAudience === 'PUBLIC' ? event.recordingUrl : null,
-    tempRecordingUrl: event.status === 'LIVE' ? event.tempRecordingUrl : null,
-    tempRecordingStartedAt: event.status === 'LIVE' ? event.tempRecordingStartedAt?.toISOString() ?? null : null,
+    // Risposta in cache condivisa: il video solo se pubblicato per tutti e dentro
+    // la finestra post-evento; una registrazione riservata agli iscritti passa
+    // dalla pagina e dal player, che riconoscono l'iscritto (lib/recording/audience).
+    recordingUrl: videoPerTutti(event),
+    tempRecordingUrl: recuperoInDiretta ? event.tempRecordingUrl : null,
+    tempRecordingStartedAt: recuperoInDiretta ? event.tempRecordingStartedAt?.toISOString() ?? null : null,
     postEventPublic: event.postEventPublic,
-    postEventShowQA: event.postEventShowQA,
+    // Il valore efficace, non l'interruttore: con la registrazione riservata le
+    // domande non si pubblicano, qualunque sia la scelta salvata.
+    postEventShowQA: domandePubbliche(event),
     postEventShowMaterials: event.postEventShowMaterials,
     postEventShowPolls: event.postEventShowPolls,
     postEventShowFeedback: event.postEventShowFeedback,
@@ -261,6 +287,75 @@ export const PUT = withErrorHandling(async (request, context) => {
     await soloStaffDellEvento(eventId, 'Only the event staff can change who is always recorded');
   }
 
+  // Se il modulo propone la rubrica decide quali dati si raccolgono: come chi
+  // partecipa, non lo cambia un link di conduzione.
+  if (data.offerAddressBook !== undefined && data.offerAddressBook !== event.offerAddressBook) {
+    await soloStaffDellEvento(eventId, 'Only the event staff can change what the registration form offers');
+  }
+
+  // Dove va il video e' cio' a cui acconsente chi spunta la casella: lo dichiara
+  // chi organizza, e un cambio che lib/recording/destination non ammette si
+  // rifiuta (togliere una destinazione dichiarata, allargarla dopo la sala).
+  // Il wizard aperto con un link di conduzione non manda il campo.
+  const destinazioneChiesta = data.recordingDestination;
+  if (destinazioneChiesta !== undefined && destinazioneChiesta !== event.recordingDestination) {
+    await soloStaffDellEvento(eventId, 'Only the event staff can change where the recording goes');
+    if (
+      !puoCambiareDestinazione(
+        event.recordingDestination,
+        destinazioneChiesta,
+        await salaGiaAperta(event),
+      )
+    ) {
+      throw erroreDestinazioneNonCoperta();
+    }
+  }
+
+  // Quale video mostra l'evento lo decide lo staff, come la destinazione: si carica
+  // dalla gestione della registrazione. Un link di conduzione puo' solo rimandare
+  // l'indirizzo che c'e' gia'.
+  if (data.recordingUrl && data.recordingUrl !== event.recordingUrl) {
+    await soloStaffDellEvento(eventId, 'Only the event staff can attach a recording');
+  }
+
+  // Quanto dura la registrazione lo decide chi organizza l'evento, come la sua
+  // cancellazione: il link principale di conduzione, o una sessione dello staff
+  // che organizza l'evento. Un co-moderatore, o l'admin che non lo organizza,
+  // no (lib/recording/content-access). Il wizard la manda solo se cambiata.
+  if (
+    data.recordingDeleteAfterDays !== undefined &&
+    data.recordingDeleteAfterDays !== event.recordingDeleteAfterDays &&
+    !isPrimaryModerator
+  ) {
+    const staff = await getStaffSession(await cookies());
+    if (!staff || !(await organizzaEvento(staff, eventId))) {
+      throw new ForbiddenError('Only the event organizers can change how long the recording is kept');
+    }
+  }
+  // Negli eventi nati prima che la registrazione si separasse dai dati si era
+  // detto che il video non pubblicato se ne va con i dati: finche' non e'
+  // pubblicato la durata si accorcia, non si toglie ne' si allunga
+  // (lib/recording/legacy-retention). La pulizia tiene comunque la promessa.
+  if (
+    data.recordingDeleteAfterDays !== undefined &&
+    data.recordingDeleteAfterDays !== event.recordingDeleteAfterDays &&
+    !durataAmmessa(
+      {
+        legacyRecordingRetention: event.legacyRecordingRetention,
+        recordingPublished:
+          data.recordingUrl === null ? false : (data.recordingPublished ?? event.recordingPublished),
+        dataRetentionDays: data.dataRetentionDays ?? event.dataRetentionDays,
+      },
+      data.recordingDeleteAfterDays
+    )
+  ) {
+    throw new AppError(
+      'An unpublished recording of this event goes with the participants\' data: its period can only be shortened',
+      422,
+      'RECORDING_RETENTION_LEGACY'
+    );
+  }
+
   // Le etichette le manda il wizard a ogni salvataggio, l'elenco intero: si
   // scrivono solo se sono cambiate, e le cambia lo staff che gestisce
   // l'evento, come chi partecipa (un link di conduzione no). Una modifica
@@ -291,6 +386,35 @@ export const PUT = withErrorHandling(async (request, context) => {
     }
   }
 
+  // Il catalogo (lib/events/catalog) lo corregge lo staff dell'evento, come le
+  // etichette, anche a evento concluso: le statistiche sono degli eventi
+  // passati. Il wizard lo manda solo se cambiato. Un modello nuovo si verifica e
+  // se ne fotografa il nome; togliere il modello toglie anche il nome, anche
+  // quello di un modello cancellato (il riferimento e' gia' vuoto).
+  const catalogo: CatalogoDaScrivere = {};
+  const togliNome =
+    data.templateId === null && event.templateId === null && event.templateName !== null;
+  if (data.templateId !== undefined && (data.templateId !== event.templateId || togliNome)) {
+    await soloStaffDellEvento(eventId, 'Only the event staff can change the event catalog');
+    const modello = data.templateId
+      ? await prisma.eventTemplate.findUnique({
+          where: { id: data.templateId },
+          select: { id: true, name: true },
+        })
+      : null;
+    if (data.templateId && !modello) {
+      throw new ValidationError('Validation failed', [
+        { path: ['templateId'], message: 'Unknown event template' },
+      ]);
+    }
+    catalogo.templateId = modello?.id ?? null;
+    catalogo.templateName = modello?.name ?? null;
+  }
+  if (data.formatClass !== undefined && data.formatClass !== event.formatClass) {
+    await soloStaffDellEvento(eventId, 'Only the event staff can change the event catalog');
+    catalogo.formatClass = data.formatClass;
+  }
+
   // Guard against the illusion of post-event configurability. These flags govern
   // LIVE capture — once an event is ENDED/ARCHIVED nothing can be captured
   // retroactively, so writing them does nothing but mislead. Strip them from a
@@ -314,13 +438,25 @@ export const PUT = withErrorHandling(async (request, context) => {
     'videoQuality',
   ] as const;
   const isTerminalStatus = event.status === 'ENDED' || event.status === 'ARCHIVED';
-  // A lifecycle edit (revive: pushing endsAt/startsAt to the future, or an
-  // explicit status change) legitimately brings the event back to life, so the
-  // capture flags matter again — don't strip in that case.
+  // Reviving an ENDED event: if the moderator pushes endsAt into the
+  // future we flip the status back to PUBLISHED or LIVE instead of
+  // leaving the row stuck in ENDED. Without this the call happens to
+  // be terminated permanently from a single timing mistake — which
+  // is what happened on a dry-run before a real event.
+  const revivedStatus = reviveStatus({
+    currentStatus: event.status,
+    currentStartsAt: event.startsAt,
+    newEndsAt: data.endsAt !== undefined ? new Date(data.endsAt) : undefined,
+    newStartsAt: data.startsAt !== undefined ? new Date(data.startsAt) : undefined,
+    statusExplicitlySet: data.status !== undefined,
+    now: new Date(),
+  });
+  // Uno stato nuovo o una riapertura rimettono in gioco la cattura: i suoi campi
+  // restano. Conta cio' che la richiesta fa davvero all'evento: il wizard manda
+  // sempre le date, una data corretta che resta nel passato non riapre niente, e
+  // un evento chiuso prima della fine riapre anche a date uguali.
   const isLifecycleEdit =
-    data.status !== undefined ||
-    data.endsAt !== undefined ||
-    data.startsAt !== undefined;
+    (data.status !== undefined && data.status !== event.status) || revivedStatus !== null;
   const ignoredCreationOnlyFields: string[] = [];
   // La registrazione decide il consenso chiesto a chi entra e
   // il blocco dei mezzi che la sala accende al primo ingresso
@@ -331,12 +467,18 @@ export const PUT = withErrorHandling(async (request, context) => {
   // pseudonimi ai nomi (stesso posto, stesso colore in chat).
   // L'elenco dei partecipanti vale da quando la sala si monta: a sala aperta
   // cambierebbe solo per chi entra dopo.
+  // Anche i nickname: spegnerli a sala aperta toglierebbe la scelta a chi
+  // entra dopo, e accenderli la darebbe a meta' della sala.
   // Anche chi conduce sempre nella registrazione: a sala aperta chi ha gia' detto
   // no ci entrerebbe al primo rientro, e chi ha letto l'avviso ne uscirebbe.
+  // Anche la destinazione, che la sala mostra nel testo della casella: il suo
+  // allargamento si e' gia' fermato qui sopra, resta la restrizione.
   const CAMPI_DELLA_SALA = [
+    'recordingDestination',
     'recordingEnabled',
     'audienceAnonymous',
     'participantListVisible',
+    'nicknamesEnabled',
     'hostsAlwaysRecorded',
   ] as const;
   const cambiaRegime = CAMPI_DELLA_SALA.some(
@@ -358,6 +500,58 @@ export const PUT = withErrorHandling(async (request, context) => {
       }
     }
   }
+
+  // Lo stato che la richiesta scrive, dopo i campi tolti qui sopra. La guardia
+  // confronta prima e dopo, quindi una modifica che non espone di piu' passa: la
+  // chiusura dell'evento, un salvataggio dal wizard.
+  const destinazionePrima = event.recordingDestination ?? null;
+  const fileNuovo =
+    !!data.recordingUrl &&
+    data.recordingUrl !== event.recordingUrl &&
+    !(await salaGiaAperta(event));
+  // Da quando, al piu' presto, conta la durata della registrazione non
+  // pubblicata (Event.recordingRetentionFrom): da adesso se la si sceglie, se
+  // si toglie la pubblicazione (anche togliendo il video pubblicato) o se si
+  // aggancia un file nuovo. Nessuna di queste
+  // scelte, su un evento finito da tempo, cancella la registrazione al giro
+  // dopo della pulizia.
+  // Negli eventi nati prima della regola scegliere la durata non sposta il punto
+  // di partenza: la promessa conta dalla fine dell'evento, e una durata scelta
+  // adesso la allungherebbe (lib/recording/legacy-retention). Una pubblicazione
+  // tolta o un file nuovo si', come per ogni evento.
+  const durataDaAdesso =
+    (data.recordingDeleteAfterDays !== undefined &&
+      data.recordingDeleteAfterDays !== event.recordingDeleteAfterDays &&
+      !event.legacyRecordingRetention) ||
+    ((data.recordingPublished === false || data.recordingUrl === null) && event.recordingPublished) ||
+    (!!data.recordingUrl && data.recordingUrl !== event.recordingUrl);
+  const destinazioneDopo: Destinazione =
+    data.recordingDestination ??
+    destinazioneDiPartenza(event, data.recordingEnabled === true || fileNuovo);
+  const pubblicoDopo = pubblicoAllineato(
+    destinazionePrima,
+    destinazioneDopo,
+    data.recordingAudience,
+    event.recordingAudience,
+  );
+  assertVideoNelloStorage(destinazioneDopo, event.recordingUrl, data.recordingUrl);
+  // Un file del nostro storage si aggancia solo se e' di questo evento: l'app
+  // firma l'indirizzo per chi vede il video (lib/storage/recordings).
+  if (data.recordingUrl && data.recordingUrl !== event.recordingUrl) {
+    await assertVideoDellEvento(eventId, data.recordingUrl);
+  }
+  assertEsposizioneConsentita(event, {
+    recordingDestination: destinazioneDopo,
+    recordingAudience: pubblicoDopo,
+    recordingPublished:
+      data.recordingUrl === null
+        ? false
+        : (data.recordingPublished ?? event.recordingPublished),
+    transcriptPublished: data.transcriptPublished ?? event.transcriptPublished,
+    youtubeUrl: data.youtubeUrl !== undefined ? data.youtubeUrl : event.youtubeUrl,
+    tempRecordingUrl:
+      data.tempRecordingUrl !== undefined ? data.tempRecordingUrl : event.tempRecordingUrl,
+  });
 
   // La foto dell'organizzatore principale: una che non c'e' piu' (o di un
   // altro evento) si lascia cadere, senza rifiutare il resto della modifica.
@@ -413,20 +607,6 @@ export const PUT = withErrorHandling(async (request, context) => {
         computedAt: new Date().toISOString(),
       }
     : undefined;
-
-  // Reviving an ENDED event: if the moderator pushes endsAt into the
-  // future we flip the status back to PUBLISHED or LIVE instead of
-  // leaving the row stuck in ENDED. Without this the call happens to
-  // be terminated permanently from a single timing mistake — which
-  // is what happened on a dry-run before a real event.
-  const revivedStatus = reviveStatus({
-    currentStatus: event.status,
-    currentStartsAt: event.startsAt,
-    newEndsAt: data.endsAt !== undefined ? new Date(data.endsAt) : undefined,
-    newStartsAt: data.startsAt !== undefined ? new Date(data.startsAt) : undefined,
-    statusExplicitlySet: data.status !== undefined,
-    now: new Date(),
-  });
 
   // Permission matrix (mirrors the POST/create path): when the client sends a
   // matrix, it is the source of truth — persist it AND re-derive the legacy
@@ -610,14 +790,19 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.recordingConsentText !== undefined && { recordingConsentText: data.recordingConsentText }),
       ...(data.audienceAnonymous !== undefined && { audienceAnonymous: data.audienceAnonymous }),
       ...(data.participantListVisible !== undefined && { participantListVisible: data.participantListVisible }),
+      ...(data.nicknamesEnabled !== undefined && { nicknamesEnabled: data.nicknamesEnabled }),
       ...(data.hostsAlwaysRecorded !== undefined && { hostsAlwaysRecorded: data.hostsAlwaysRecorded }),
+      ...(data.offerAddressBook !== undefined && { offerAddressBook: data.offerAddressBook }),
+      ...catalogo,
+      ...(destinazioneDopo !== destinazionePrima && { recordingDestination: destinazioneDopo }),
       ...(data.recordingPublished !== undefined && {
         recordingPublished: data.recordingPublished,
         ...(data.recordingPublished ? { recordingPublishedAt: new Date() } : { recordingPublishedAt: null }),
       }),
       ...(data.transcriptPublished !== undefined && { transcriptPublished: data.transcriptPublished }),
-      ...(data.recordingAudience !== undefined && { recordingAudience: data.recordingAudience }),
+      ...(pubblicoDopo !== event.recordingAudience && { recordingAudience: pubblicoDopo }),
       ...(data.recordingDeleteAfterDays !== undefined && { recordingDeleteAfterDays: data.recordingDeleteAfterDays }),
+      ...(durataDaAdesso && { recordingRetentionFrom: new Date() }),
       ...(data.recordingUrl !== undefined && { recordingUrl: data.recordingUrl }),
       ...(data.tempRecordingUrl !== undefined && { tempRecordingUrl: data.tempRecordingUrl }),
       ...(data.recordingFileSize !== undefined && { recordingFileSize: data.recordingFileSize }),
@@ -708,8 +893,10 @@ export const PUT = withErrorHandling(async (request, context) => {
   // aperti si chiudono nella stessa transazione (lib/events/close-polls).
   const closesPolls =
     nextStatus !== event.status && !isTerminalStatus && (nextStatus === 'ENDED' || nextStatus === 'ARCHIVED');
+  // Il file tolto dall'evento non resta nemmeno sulle sessioni.
+  const fileTolto = data.recordingUrl === null ? event.recordingUrl : null;
   const updated =
-    closesSessions || closesPolls || tagIds !== null || conUnione
+    closesSessions || closesPolls || tagIds !== null || conUnione || fileTolto
       ? await prisma.$transaction(async (tx) => {
           let argomenti: Prisma.EventUpdateArgs = updateArgs;
           if (conUnione) {
@@ -725,6 +912,7 @@ export const PUT = withErrorHandling(async (request, context) => {
           if (closesSessions) await closeOpenSessions(tx, [eventId], new Date());
           if (closesPolls) await chiudiSondaggiAperti(tx, [eventId], new Date());
           if (tagIds !== null) await replaceEventTags(tx, eventId, tagIds);
+          if (fileTolto) await tx.callSession.updateMany(sessioniSenzaFile(eventId, fileTolto));
           return aggiornato;
         })
       : await prisma.event.update(updateArgs);
@@ -818,8 +1006,15 @@ export const PUT = withErrorHandling(async (request, context) => {
     },
   });
 
+  // Come nella GET: i campi del solo primario non escono verso un co-moderatore,
+  // che col token primario scalerebbe a owner in modo che la revoca non puo' piu'
+  // recuperare. L'hash della password dell'evento non esce verso nessuno.
+  const { joinPasswordHash: _joinPasswordHash, ...rigaSenzaHash } = updated;
+
   return Response.json({
-    ...updated,
+    ...rigaSenzaHash,
+    moderatorToken: isPrimaryModerator ? updated.moderatorToken : token,
+    moderatorEmail: isPrimaryModerator ? tryDecryptPII(updated.moderatorEmail) : null,
     // BigInt: JSON.stringify non lo sa scrivere, e un evento registrato con
     // Jibri ne ha uno. Esce come numero, come nella GET dello stesso evento.
     recordingFileSize:
@@ -829,6 +1024,13 @@ export const PUT = withErrorHandling(async (request, context) => {
     ...(traduzione && { traduzione }),
   });
 });
+
+/** Le colonne del catalogo che un salvataggio cambia (lib/events/catalog). */
+interface CatalogoDaScrivere {
+  templateId?: string | null;
+  templateName?: string | null;
+  formatClass?: EventFormatClass | null;
+}
 
 /**
  * Un campo che decide lo staff che gestisce l'evento, non chi ha un link di

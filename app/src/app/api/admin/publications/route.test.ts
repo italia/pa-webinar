@@ -183,6 +183,27 @@ describe('GET', () => {
     ]);
   });
 
+  it('ogni riga dice chi vede la registrazione e la destinazione dell’evento', async () => {
+    prisma.event.findMany.mockResolvedValue([
+      evento('riservato', {
+        recordingAudience: 'REGISTRANTS',
+        recordingDestination: 'REGISTRANTS',
+      }),
+      evento('storico', { recordingAudience: 'PUBLIC', recordingDestination: null }),
+    ]);
+    const corpo = (await (await elenca()).json()) as {
+      rows: Array<{ recordingAudience: string; recordingDestination: string | null }>;
+    };
+    expect(corpo.rows[0]).toMatchObject({
+      recordingAudience: 'REGISTRANTS',
+      recordingDestination: 'REGISTRANTS',
+    });
+    expect(corpo.rows[1]).toMatchObject({
+      recordingAudience: 'PUBLIC',
+      recordingDestination: null,
+    });
+  });
+
   it('una registrazione risulta pubblicata solo se ha anche il file', async () => {
     prisma.event.findMany.mockResolvedValue([
       evento('senza-file', { recordingPublished: true, recordingUrl: null }),
@@ -210,6 +231,13 @@ describe('POST', () => {
       expect((await importa(corpo)).status).toBe(422);
     }
     expect(prisma.event.create).not.toHaveBeenCalled();
+  });
+
+  it('un evento d’archivio non ha una destinazione: nessun consenso da coprire', async () => {
+    await importa(ARCHIVIO);
+    expect(prisma.event.create.mock.calls[0]![0].data).not.toHaveProperty(
+      'recordingDestination',
+    );
   });
 
   it('l’evento nasce concluso, pubblicato e senza nulla di interattivo', async () => {
@@ -278,9 +306,16 @@ describe('POST', () => {
 
   it('lascia traccia dell’evento creato', async () => {
     await importa(ARCHIVIO);
+    const { data } = prisma.event.create.mock.calls[0]![0] as { data: { id: string } };
     expect(prisma.adminAuditLog.create.mock.calls[0]![0].data).toMatchObject({
       action: 'LEGACY_EVENT_CREATE',
-      target: 'evento-nuovo',
+      target: data.id,
     });
+  });
+
+  it('chi la carica la organizza: ne vede il contenuto anche ritirata', async () => {
+    await importa(ARCHIVIO);
+    const { data } = prisma.event.create.mock.calls[0]![0] as { data: { createdById: unknown } };
+    expect(data.createdById).toBe(ACCOUNT);
   });
 });

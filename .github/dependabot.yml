@@ -93,14 +93,63 @@ updates:
   - dependency-name: '@vitejs/plugin-react'
     update-types:
     - version-update:semver-major
+# Immagini di base, tutte fissate per impronta (`tag@sha256:...`): Dependabot
+# aggiorna l'impronta quando il tag si muove a monte e la versione quando ne
+# esce una nuova. Una PR per immagine, che aggiorna insieme tutte le cartelle
+# che la usano (`group-by: dependency-name`): le basi uguali restano allineate,
+# e un aggiornamento che rompe una build non trattiene quelli delle altre.
+#  - Il major di Node a runtime si sposta a mano, insieme a `@types/node` e
+#    alla CI.
+#  - Recorder e controller sono le immagini piu' delicate del progetto: il
+#    recorder gira Chrome headless e maneggia audio per-partecipante (dato
+#    dell'art. 9).
+#  - Il motore dei sottotitoli: qui si aggiorna solo l'immagine di base.
+#    Versione e impronta del motore sono fissate a mano nel Dockerfile, e
+#    cambiarle vuol dire rifare il banco di prova (infra/captions/bench).
+#  - Il worker senza GPU gira su python:<versione>-alpine: le wheel musl delle
+#    sue dipendenze arrivano dopo una versione nuova di Python, e senza
+#    compilatore il build si ferma. Il salto di versione si fa a mano, insieme
+#    alle dipendenze; Dependabot aggiorna solo Alpine e le patch.
+#  - La jitsi/web patchata NON e' qui: base e stadio `node` si aggiornano a
+#    mano insieme alla release di Jitsi (infra/jitsi-web-patched/README.md),
+#    perche' la patch e' provata sulla build esatta della base, e il workflow
+#    non ripubblica un tag gia' uscito.
 - package-ecosystem: docker
-  directory: /
+  directories:
+  - /
+  - /infra/recorder
+  - /infra/recorder-controller
+  - /infra/captions/gateway
+  - /infra/captions/engine
+  - /infra/ai
+  - /scripts/load-test
   schedule:
     interval: weekly
     day: monday
   labels:
   - dependencies
   - docker
+  groups:
+    base-images:
+      group-by: dependency-name
+  ignore:
+  - dependency-name: library/node
+    update-types:
+    - version-update:semver-major
+  - dependency-name: node
+    update-types:
+    - version-update:semver-major
+  - dependency-name: library/python
+    update-types:
+    - version-update:semver-major
+    - version-update:semver-minor
+  # Il generatore di carico: un major di Maven o del JDK si prova a mano.
+  - dependency-name: library/maven
+    update-types:
+    - version-update:semver-major
+  - dependency-name: maven
+    update-types:
+    - version-update:semver-major
 # Recorder e controller stanno FUORI dai workspace npm: hanno un package-lock
 # proprio. Sono anche le immagini piu' delicate
 # del progetto: il recorder gira Chrome headless e maneggia audio
@@ -248,88 +297,15 @@ updates:
   - dependency-name: nltk
     update-types:
     - version-update:semver-major
-- package-ecosystem: docker
-  directory: /infra/recorder
+# PyYAML per validate-chart.sh in CI: file compilato con le impronte.
+- package-ecosystem: pip
+  directory: /scripts
   schedule:
     interval: weekly
     day: monday
   labels:
   - dependencies
-  - docker
-  ignore:
-  - dependency-name: node
-    update-types:
-    - version-update:semver-major
-- package-ecosystem: docker
-  directory: /infra/recorder-controller
-  schedule:
-    interval: weekly
-    day: monday
-  labels:
-  - dependencies
-  - docker
-  ignore:
-  - dependency-name: node
-    update-types:
-    - version-update:semver-major
-- package-ecosystem: docker
-  directory: /infra/captions/gateway
-  schedule:
-    interval: weekly
-    day: monday
-  labels:
-  - dependencies
-  - docker
-  ignore:
-  - dependency-name: node
-    update-types:
-    - version-update:semver-major
-# Il motore dei sottotitoli: Dependabot aggiorna l'immagine di base. Versione
-# e impronta del motore sono fissate a mano nel Dockerfile, e cambiarle vuol
-# dire rifare il banco di prova (infra/captions/bench).
-- package-ecosystem: docker
-  directory: /infra/captions/engine
-  schedule:
-    interval: weekly
-    day: monday
-  labels:
-  - dependencies
-  - docker
-# Il worker senza GPU gira su python:<versione>-alpine: le wheel musl delle
-# sue dipendenze (oggi pydantic-core di pydantic 2.9.2, fino alla 3.13)
-# arrivano dopo una versione nuova di Python, e senza compilatore il build
-# si ferma. Il salto di versione si fa a mano,
-# insieme alle dipendenze; Dependabot aggiorna solo Alpine e le patch.
-- package-ecosystem: docker
-  directory: /infra/ai
-  schedule:
-    interval: weekly
-    day: monday
-  labels:
-  - dependencies
-  - docker
-  ignore:
-  - dependency-name: library/python
-    update-types:
-    - version-update:semver-major
-    - version-update:semver-minor
-# ATTENZIONE: questa immagine e' la build PATCHATA di jitsi/web (rnnoise 48kHz).
-# Un bump dell'immagine base perde la patch -> vedi `ignore` sotto.
-- package-ecosystem: docker
-  directory: /infra/jitsi-web-patched
-  schedule:
-    interval: weekly
-    day: monday
-  labels:
-  - dependencies
-  - docker
-  ignore:
-  - dependency-name: jitsi/web
-    update-types:
-    - version-update:semver-major
-  - dependency-name: node
-    update-types:
-    - version-update:semver-major
+  - python
 # GitHub Actions: le action sono SHA-pinnate; Dependabot aggiorna SHA + commento.
 - package-ecosystem: github-actions
   directory: /

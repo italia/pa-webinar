@@ -15,7 +15,13 @@ vi.mock('@/lib/db', () => ({
 }));
 const staff = vi.hoisted(() => ({ valore: null as { accountId: string; nome: string } | null }));
 vi.mock('@/lib/auth/staff-seat', () => ({ staffDietroIlPrimario: vi.fn(async () => staff.valore) }));
-vi.mock('@/lib/captions/room', () => ({ endpointSenzaRegistrazione: vi.fn(async () => []) }));
+const occupanti = vi.hoisted(() => ({
+  valore: [] as Array<{ endpointId: string; seatId: string; voiceExcluded: boolean }>,
+}));
+vi.mock('@/lib/captions/room', () => ({
+  endpointSenzaRegistrazione: vi.fn(async () => []),
+  occupantiInSala: vi.fn(async () => occupanti.valore),
+}));
 vi.mock('@/lib/redis', () => ({
   getRedis: () => null,
   withDeadline: <T,>(op: Promise<T>) => op,
@@ -72,6 +78,7 @@ beforeEach(() => {
   resetSeatsMemoryForTests();
   cookie.token = null;
   staff.valore = null;
+  occupanti.valore = [];
   fn(prisma.event.findUnique).mockResolvedValue({ id: 'e1', moderatorToken: 'MOD', moderatorName: null });
   fn(prisma.registration.findUnique).mockImplementation(async ({ where }: { where: { accessToken: string } }) =>
     where.accessToken.startsWith('ISCR') ? { id: `r-${where.accessToken}`, eventId: 'e1' } : null,
@@ -124,6 +131,23 @@ describe('/api/events/[slug]/seats', () => {
   it("chi modera vede gli endpoint dichiarati in solo ascolto", async () => {
     await segnaSoloAscolto('e1', 'ep-zitto');
     expect((await (await leggi('MOD')).json()).listenOnly).toEqual(['ep-zitto']);
+  });
+
+  it('dice come e\' nella registrazione chi e\' in sala: chi conduce nel video, gli altri con o senza voce', async () => {
+    occupanti.valore = [
+      { endpointId: 'ep-mod', seatId: 'mod-e1-abc12345', voiceExcluded: false },
+      { endpointId: 'ep-si', seatId: 'reg-11111111-1111-1111-1111-111111111111-abc12345', voiceExcluded: false },
+      { endpointId: 'ep-no', seatId: 'guest-22222222-2222-2222-2222-222222222222', voiceExcluded: true },
+      { endpointId: 'ep-zitto', seatId: 'guest-33333333-3333-3333-3333-333333333333', voiceExcluded: false },
+      { endpointId: 'ep-bot', seatId: 'rec-bot-44444444-4444-4444-4444-444444444444', voiceExcluded: false },
+    ];
+    await segnaSoloAscolto('e1', 'ep-zitto');
+    expect((await (await leggi('MOD')).json()).recording).toEqual({
+      'ep-mod': 'video',
+      'ep-si': 'voce',
+      'ep-no': 'nessuna',
+      'ep-zitto': 'nessuna',
+    });
   });
 
   it('solo chi modera legge; un token sconosciuto non dichiara', async () => {

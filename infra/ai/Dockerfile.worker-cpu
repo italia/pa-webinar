@@ -10,14 +10,14 @@
 # di 300 MB, e si scarica in pochi secondi sui nodi dell'app che la ospitano.
 # Alpine come l'immagine dell'app: la base Debian porta centinaia di
 # vulnerabilita' alte non ancora corrette a monte (ffmpeg e le sue librerie).
-FROM mirror.gcr.io/library/python:3.13-alpine3.24
+FROM mirror.gcr.io/library/python:3.13-alpine3.24@sha256:9ef1a599f863231c3d91e941389bfdc4a2d6070557243d54df1a4e57015b960e
 
 RUN apk add --no-cache ffmpeg tini ca-certificates
 
 WORKDIR /opt/worker
 
 COPY worker/requirements-cpu.txt ./requirements-cpu.txt
-RUN pip install --no-cache-dir -r requirements-cpu.txt
+RUN pip install --no-cache-dir --require-hashes -r requirements-cpu.txt
 
 COPY worker/ ./worker/
 

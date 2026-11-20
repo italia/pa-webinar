@@ -11,7 +11,6 @@ vi.mock('@/lib/db', () => ({
     poll: { findMany: vi.fn() },
     wordCloudSubmission: { findMany: vi.fn() },
     eventFeedback: { findMany: vi.fn(async (): Promise<unknown[]> => []) },
-    chatMessage: { findMany: vi.fn() },
     questionnaireAnswer: { findMany: vi.fn(async (): Promise<unknown[]> => []) },
   },
 }));
@@ -25,6 +24,7 @@ import {
   formatRecapSummary,
   ricostruisciRiepilogo,
   rifaiRiepilogo,
+  riepilogoPubblico,
   type EventRecap,
 } from './recap';
 
@@ -35,7 +35,6 @@ const mocked = prisma as unknown as {
   poll: { findMany: ReturnType<typeof vi.fn> };
   wordCloudSubmission: { findMany: ReturnType<typeof vi.fn> };
   eventFeedback: { findMany: ReturnType<typeof vi.fn> };
-  chatMessage: { findMany: ReturnType<typeof vi.fn> };
   questionnaireAnswer: { findMany: ReturnType<typeof vi.fn> };
 };
 
@@ -77,10 +76,6 @@ describe('buildRecap', () => {
     mocked.eventFeedback.findMany.mockResolvedValue([
       ...Array.from({ length: 10 }, () => ({ rating: 4 })),
       ...Array.from({ length: 10 }, () => ({ rating: 5 })),
-    ]);
-    mocked.chatMessage.findMany.mockResolvedValue([
-      { text: 'Ci sarà la registrazione?', answeredAt: null, _count: { reactions: 2 } },
-      { text: 'Le slide sono scaricabili?', answeredAt: new Date(), _count: { reactions: 5 } },
     ]);
   });
 
@@ -203,7 +198,19 @@ describe('formatRecapSummary', () => {
   });
 });
 
-describe('buildRecap — domande poste in chat', () => {
+describe('domande poste in chat', () => {
+  const salvato: EventRecap = {
+    version: 2,
+    generatedAt: '2026-01-01T00:00:00.000Z',
+    headcount: 12,
+    registrations: 30,
+    topQuestions: [{ text: 'Domanda del Q&A', upvotes: 3 }],
+    chatQuestions: [{ text: 'Domanda scritta in chat', reactions: 2, answered: true }],
+    polls: [{ question: 'Sondaggio', options: [{ text: 'Sì', votes: 1 }], totalVotes: 1 }],
+    topWords: [{ word: 'digitale', count: 4 }],
+    feedback: { average: 4, count: 2 },
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
     mocked.event.findUnique.mockResolvedValue({ peakParticipants: 10 });
@@ -214,31 +221,53 @@ describe('buildRecap — domande poste in chat', () => {
     mocked.eventFeedback.findMany.mockResolvedValue([]);
   });
 
-  it('ordina per reazioni ricevute e marca quelle con risposta', async () => {
-    mocked.chatMessage.findMany.mockResolvedValue([
-      { text: 'poco votata', answeredAt: null, _count: { reactions: 1 } },
-      { text: 'la più votata', answeredAt: new Date(), _count: { reactions: 9 } },
-    ]);
+  it('un riepilogo nuovo non legge la chat e non ne porta il testo', async () => {
     const recap = await buildRecap('evt1');
-    expect(recap.chatQuestions).toEqual([
-      { text: 'la più votata', reactions: 9, answered: true },
-      { text: 'poco votata', reactions: 1, answered: false },
-    ]);
+    expect(recap).not.toHaveProperty('chatQuestions');
+    // La chat non e' nel mock del database: se la leggesse, il test cadrebbe.
+    expect(recap.version).toBe(2);
   });
 
-  it('non chiede mai il nome di chi ha scritto: nello snapshot non deve entrare', async () => {
-    mocked.chatMessage.findMany.mockResolvedValue([]);
-    await buildRecap('evt1');
-    const select = mocked.chatMessage.findMany.mock.calls[0]?.[0]?.select;
-    expect(select.senderName).toBeUndefined();
-    expect(select.senderId).toBeUndefined();
+  it('la vista pubblica toglie le domande in chat da uno snapshot gia’ salvato', () => {
+    const pubblico = riepilogoPubblico(salvato, { domande: true });
+    expect(pubblico).not.toHaveProperty('chatQuestions');
+    expect(JSON.stringify(pubblico)).not.toContain('Domanda scritta in chat');
+    expect(pubblico.topQuestions).toEqual(salvato.topQuestions);
   });
 
-  it('esclude dall’archivio pubblico le domande scartate e quelle nascoste', async () => {
-    mocked.chatMessage.findMany.mockResolvedValue([]);
-    await buildRecap('evt1');
-    const where = mocked.chatMessage.findMany.mock.calls[0]?.[0]?.where;
-    expect(where).toMatchObject({ isQuestion: true, hiddenAt: null, dismissedAt: null });
+  it('senza domande pubbliche toglie anche il testo del Q&A, e il resto resta', () => {
+    const pubblico = riepilogoPubblico(salvato, { domande: false });
+    expect(pubblico.topQuestions).toEqual([]);
+    expect(pubblico).toMatchObject({
+      headcount: 12,
+      registrations: 30,
+      polls: salvato.polls,
+      topWords: salvato.topWords,
+      feedback: salvato.feedback,
+    });
+  });
+
+  it('non tocca lo snapshot ricevuto: resta intero per lo staff', () => {
+    const copia = structuredClone(salvato);
+    riepilogoPubblico(salvato, { domande: false });
+    expect(salvato).toEqual(copia);
+  });
+
+  it('una scheda che conteneva solo domande sparisce', () => {
+    const soloDomande: EventRecap = {
+      ...salvato,
+      headcount: 0,
+      registrations: 0,
+      polls: [],
+      topWords: [],
+      feedback: { average: null, count: 0 },
+    };
+    expect(isRecapEmpty(soloDomande)).toBe(false);
+    expect(isRecapEmpty(riepilogoPubblico(soloDomande, { domande: false }))).toBe(true);
+  });
+
+  it('l’email di fine evento conta ancora quelle di uno snapshot salvato', () => {
+    expect(formatRecapSummary(salvato, 'it')).toContain('Domande risposte: 2');
   });
 
   it('uno snapshot di versione 1 (senza il campo) resta leggibile', () => {
@@ -254,6 +283,7 @@ describe('buildRecap — domande poste in chat', () => {
     } satisfies EventRecap;
     expect(isRecapEmpty(vecchio)).toBe(true);
     expect(() => formatRecapSummary(vecchio, 'it')).not.toThrow();
+    expect(riepilogoPubblico(vecchio, { domande: true })).toEqual(vecchio);
   });
 });
 
@@ -265,7 +295,6 @@ describe('buildRecap — valutazioni del questionario', () => {
     mocked.question.findMany.mockResolvedValue([]);
     mocked.poll.findMany.mockResolvedValue([]);
     mocked.wordCloudSubmission.findMany.mockResolvedValue([]);
-    mocked.chatMessage.findMany.mockResolvedValue([]);
     mocked.eventFeedback.findMany.mockResolvedValue([{ rating: 2 }]);
     mocked.questionnaireAnswer.findMany.mockResolvedValue([
       { responseId: 'r1', valueScale: 4, item: { scaleMin: 1, scaleMax: 5 } },
@@ -289,7 +318,6 @@ describe('ensureEventRecap', () => {
     mocked.question.findMany.mockResolvedValue([]);
     mocked.poll.findMany.mockResolvedValue([]);
     mocked.wordCloudSubmission.findMany.mockResolvedValue([]);
-    mocked.chatMessage.findMany.mockResolvedValue([]);
     mocked.eventFeedback.findMany.mockResolvedValue([]);
   }
 
@@ -322,7 +350,6 @@ describe('ricostruisciRiepilogo', () => {
     mocked.question.findMany.mockResolvedValue([]);
     mocked.poll.findMany.mockResolvedValue([]);
     mocked.wordCloudSubmission.findMany.mockResolvedValue([]);
-    mocked.chatMessage.findMany.mockResolvedValue([]);
     mocked.eventFeedback.findMany.mockResolvedValue([]);
   }
 

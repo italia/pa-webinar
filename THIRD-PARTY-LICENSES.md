@@ -87,14 +87,35 @@ A new weak-copyleft dependency passes the check, but it is accepted case by case
 
 The rules have tests (`npm run test:scripts`), which the Lint & Typecheck job runs.
 
+Step 1 also checks the registry of model weights, described in [The model registry](#the-model-registry).
+
 **Step 2** fails when the committed report no longer matches the installed tree. When you change dependencies, run `npm run license:report` and commit `license-report.json` in the same commit as `package-lock.json`. Local CI parity is described in [docs/development/methodology.md](docs/development/methodology.md), and the workflows in [docs/development/ci-and-release.md](docs/development/ci-and-release.md).
 
 Dependabot opens its pull requests against `main`. Its npm updates change `package-lock.json` but not the report, and the report keys include package versions, so **License Compliance** fails on them until a maintainer runs `npm run license:report` on the branch and commits the result. Step 1 also covers Dependabot updates under `infra/recorder/`, `infra/recorder-controller/` and `infra/captions/gateway/`. Updates to the AI worker's Python requirements are covered by no license check. The Dependabot configuration is described in [SECURITY.md](SECURITY.md#dependency-updates).
 
+### The model registry
+
+`scripts/licenses/models.json` lists the model weights that PA Webinar downloads, bakes into an image, keeps in the repository or loads by default: the live captions model, the translation model, the post-production models and voices, and the background model that runs in the browser. Step 1 of License Compliance (`npm run license:check`) checks it with `scripts/licenses/models.mjs`, and the rules have tests in `npm run test:scripts`. The tables in [AI stack and model weights](#ai-stack-and-model-weights) explain each model; the registry is the list that CI checks. The word-alignment models that WhisperX picks for languages other than English, Italian, French, German and Spanish are not listed, because they vary with the language.
+
+Each entry gives the model's `name`, what it is for (`use`), how it reaches an installation (`delivery`), its `license` as an SPDX expression (a `LicenseRef-` identifier, or `NOASSERTION` when the terms are unclear) and its file `format`. The check fails when:
+
+- **the license** is not on the allowed list of [The rule](#the-rule) and nobody recorded, after reading the terms, why it is acceptable (`licenseReview`), or it belongs to a forbidden family, such as CC BY-NC. A forbidden license passes only as a declared gap;
+- **the format** runs code when it is loaded. The accepted formats are GGUF, CTranslate2, safetensors, ONNX, TensorFlow Lite and NumPy arrays loaded without `allow_pickle` (`gguf`, `ctranslate2`, `safetensors`, `onnx`, `tflite`, `numpy`). A PyTorch pickle (`pytorch-pickle`) passes only as a declared gap;
+- **the pinning** is missing. What the chart, Compose, a script or an image build downloads (`delivery` `download` or `image`) needs a URL at a fixed revision, a Hugging Face commit rather than a branch, and its SHA-256. Every file listed in `usedIn` must contain that checksum and download that revision, so the registry cannot fall behind the file that really downloads the model. A file kept in the repository (`repository`) must match the checksum recorded for it;
+- **a model is outside the registry**: a full Hugging Face file URL in a tracked file, a call that loads a model by a name written out in full (`from_pretrained`, `hf_hub_download`, `snapshot_download`, `torch.hub.load`, AudioSeal's `load_generator`), a tracked weights file (`.gguf`, `.onnx`, `.safetensors`, `.pt`, `.bin` and similar), or a Piper voice that a Dockerfile downloads. Documentation, tests and test data are not searched;
+- **an entry is not described** on this page: its name must appear here;
+- **a gap no longer applies**: a `format` or `pinning` gap on an entry that meets the rule must be removed, like an exception that is no longer needed.
+
+A gap (`gaps`, with a `kind` of `license`, `format` or `pinning` and a `note`) records a known deviation that is still open. Each gap stays visible in the registry, the check prints how many there are, and a license gap on a default model is also listed under [Open points](#open-points). A license gap cannot be checked automatically, because a model can carry an allowed license and still have training data to verify, so it stays until someone closes it.
+
+Models that the operator seeds or that a library fetches at run time (`operator`) carry, in `ids`, the names the code passes to load them by default. The search above cannot see a name built at run time, so two tests check the defaults instead: `app/src/lib/ai/providers.test.ts` fails when a default model id of the portal is not in the registry, and `infra/ai/worker/test_model_registry.py` when a default of the worker is not (the diarization pipeline, the fallback transcription model, the suggested voices, the watermark generator). A model loaded by a name that is neither written out nor a default, for example one read from configuration, is still a matter for review.
+
+The registry checks what is declared. Whether a model card states its license correctly, and whether the training data allows the use, is still a reading of the terms, recorded on this page.
+
 ### Limits of the automated check
 
 - **Declared licenses only.** The check trusts the license each package declares, as the lockfile records it. A package that declares the wrong license passes. The report diff and the review are the controls for that.
-- **npm only.** The AI worker's Python packages, the container images, model weights, voices, fonts and other assets are assessed by hand on this page.
+- **npm and the model registry only.** The AI worker's Python packages, the container images, fonts and other assets are assessed by hand on this page. For model weights and voices, the check reads what [the registry](#the-model-registry) declares; the terms themselves are assessed by hand.
 - **The report reads `node_modules`.** `license:report` runs a pinned `license-checker` on the installed tree, so run `npm ci` first. The policy check reads the lockfiles and needs no install.
 
 The diagram shows which control covers each part of PA Webinar:
@@ -112,6 +133,7 @@ flowchart LR
 
   rep["license-report.json<br/>and CI License Compliance"]:::data
   chk["CI license:check<br/>on the lockfiles"]:::data
+  reg["CI license:check<br/>on the model registry"]:::data
   sbom["Release SBOM<br/>sbom.spdx.json"]:::data
   manual["Manual assessment<br/>on this page"]:::check
 
@@ -122,6 +144,7 @@ flowchart LR
   rec --> chk
   py --> manual
   img --> manual
+  mdl --> reg
   mdl --> manual
   ast --> manual
 
@@ -201,7 +224,7 @@ Publishing or redistributing an image distributes everything inside it. Base ima
 | Live captions engine | `ghcr.io/italia/pa-webinar-captions-engine`, on `debian:bookworm-slim`, with the NeMo-Speech.cpp CPU release downloaded at build time and checked by SHA-256 | NeMo-Speech.cpp: Apache-2.0 for NVIDIA-authored code; its bundled third-party components (llama.cpp and ggml: MIT; the GNU OpenMP and C++ runtime libraries: GPL with the GCC Runtime Library Exception) keep their own terms. | The model is not in the image. See [AI stack and model weights](#ai-stack-and-model-weights). |
 | Recorder controller | `ghcr.io/italia/pa-webinar-recorder-controller`, on `node:22-bookworm-slim` | npm dependencies are permissive, for example `@kubernetes/client-node` and `dockerode` (both Apache-2.0). | Own lockfile, not in the report. |
 | AI post-production worker | `ghcr.io/italia/pa-webinar-postprod-worker`, on `nvcr.io/nvidia/pytorch` (NVIDIA NGC), with the CUDA libraries that the PyTorch wheels install (`nvidia-*-cu12`, cuDNN 9 among them) | NVIDIA container and cuDNN terms: **to verify** for redistribution. ffmpeg: Ubuntu package. | See [AI stack and model weights](#ai-stack-and-model-weights). |
-| AI post-production worker without a GPU | `ghcr.io/italia/pa-webinar-postprod-worker-cpu`, on `python:3.13-alpine` | Python packages: `httpx` (BSD-3-Clause), `pydantic` (MIT), `numpy` (BSD-3-Clause). ffmpeg: Alpine package, built with GPL components (for example x264), so the image carries GPL-licensed binaries. | Same code as the GPU worker; `infra/ai/worker/requirements-cpu.txt`. The translation of event texts adds no package: it calls the CPU translation engine over HTTP. |
+| AI post-production worker without a GPU | `ghcr.io/italia/pa-webinar-postprod-worker-cpu`, on `python:3.13-alpine` | Python packages, pinned with their whole dependency tree in `infra/ai/worker/requirements-cpu.txt`: `httpx`, `httpcore` and `idna` (BSD-3-Clause), `numpy` (BSD-3-Clause, with bundled 0BSD, MIT, Zlib and CC0-1.0 parts), `pydantic`, `pydantic-core`, `annotated-types`, `typing-inspection`, `anyio` and `h11` (MIT), `typing-extensions` (PSF-2.0), `certifi` (MPL-2.0). ffmpeg: Alpine package, built with GPL components (for example x264), so the image carries GPL-licensed binaries. | Same code as the GPU worker; `infra/ai/worker/requirements-cpu.txt`. The translation of event texts adds no package: it calls the CPU translation engine over HTTP. |
 | CPU translation engine | `ghcr.io/ggml-org/llama.cpp:server-b11277`, pinned by digest in `postprod.mt.image` in `values.yaml`, published by the llama.cpp project on Ubuntu 24.04. Rendered only with `postprod.mt.enabled` | llama.cpp and ggml: MIT. Ubuntu packages keep their own terms, among them the GNU C++ and OpenMP runtime libraries (GPL with the GCC Runtime Library Exception), OpenSSL (Apache-2.0) and curl (curl license). | A third-party image that the project does not build. The model is not in the image. See [Machine translation model](#machine-translation-model). |
 | vLLM | Not in the chart. The operator deploys it; [docs/POSTPROD.md](docs/POSTPROD.md) shows an example based on `vllm/vllm-openai`. | Apache-2.0 | |
 | Mailpit | `axllent/mailpit`, in `docker-compose.yml` only | MIT | A local mail catcher. Not part of the Helm chart. |
@@ -238,7 +261,7 @@ No Python counterpart of `license-report.json` exists. `infra/ai/worker/requirem
 | `pyannote/wespeaker-voxceleb-resnet34-LM` | Speaker embeddings used by the diarization pipeline | CC-BY-4.0 (model card) | Attribution. |
 | `pyannote/speaker-diarization-community-1`, `plda` folder | PLDA files that pyannote.audio 4 loads with the diarization pipeline | CC-BY-4.0 (model card) | Gated, like the models above. Attribution. |
 | torchaudio `WAV2VEC2_ASR_BASE_960H` | Word alignment for English (WhisperX default) | MIT (torchaudio documentation, from fairseq) | |
-| torchaudio `VOXPOPULI_ASR_BASE_10K_IT`, `_FR`, `_DE`, `_ES` | Word alignment for Italian, French, German and Spanish (WhisperX defaults) | CC BY-NC 4.0 (torchaudio documentation) | **To verify.** These are non-commercial terms, and Italian is the default source language. |
+| torchaudio `VOXPOPULI_ASR_BASE_10K_IT`, `VOXPOPULI_ASR_BASE_10K_FR`, `VOXPOPULI_ASR_BASE_10K_DE`, `VOXPOPULI_ASR_BASE_10K_ES` | Word alignment for Italian, French, German and Spanish (WhisperX defaults) | CC BY-NC 4.0 (torchaudio documentation) | **To verify.** These are non-commercial terms, and Italian is the default source language. |
 | Other WhisperX alignment models | Word alignment for the other languages: one Hugging Face wav2vec2 model per language | Varies | **To verify** for each language an installation transcribes. |
 | `mistralai/Mistral-Small-3.2-24B-Instruct-2506` | Default LLM for summaries and translations, set in `app/src/lib/ai/providers.ts` | Apache-2.0 (model card) | `AI_VLLM_MODEL_ID` replaces it. A replacement model must be assessed on its own terms. |
 | vLLM | LLM inference server | Apache-2.0 (PyPI metadata) | Deployed by the operator. |
@@ -306,7 +329,7 @@ Record every new component here, or in `license-report.json` for the npm workspa
 - **npm dependency in `infra/recorder/`, `infra/recorder-controller/` or `infra/captions/gateway/`.** The report does not cover these trees, although `npm run license:check` reads their lockfiles. Check the license, and add a note to the component's row if the license is not permissive.
 - **Python dependency of the AI worker.** Check the PyPI metadata and the source repository. Add a row to [AI stack and model weights](#ai-stack-and-model-weights) if the license is not permissive.
 - **Container image or chart dependency.** Add a row to [Container images and runtime components](#container-images-and-runtime-components). Prefer a pinned tag or digest over `latest` when the license depends on the version.
-- **Model weights or voices.** Read the model card and the license of the training dataset. Record both, and document any gating terms in [docs/POSTPROD.md](docs/POSTPROD.md).
+- **Model weights or voices.** Read the model card and the license of the training dataset. Record both here, add an entry to `scripts/licenses/models.json` ([The model registry](#the-model-registry)), and document any gating terms in [docs/POSTPROD.md](docs/POSTPROD.md). `npm run license:check` tells you what the entry is missing.
 - **Font, image or sound.** Commit its license text next to the file, and add a row to [Bundled assets](#bundled-assets). Prefer assets made for the repository.
 
 ## Open points

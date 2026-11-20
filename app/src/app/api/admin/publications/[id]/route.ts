@@ -16,12 +16,20 @@ import { cookies } from 'next/headers';
 import { z } from 'zod';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
-import { CAMPI_VIDEO_VUOTI } from '@/lib/events/recording-fields';
+import { CAMPI_VIDEO_VUOTI, sessioniSenzaFile } from '@/lib/events/recording-fields';
 import { materialUrlSchema } from '@/lib/validation/materials';
 import { requireEventManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
-import { AppError, ValidationError } from '@/lib/errors';
+import { AppError, NotFoundError, ValidationError } from '@/lib/errors';
+import { salaGiaAperta } from '@/lib/live/room-open';
+import {
+  assertEsposizioneConsentita,
+  destinazioneDiPartenza,
+} from '@/lib/recording/destination';
+import { videoDellApp } from '@/lib/recording/audience';
+import { requireEventContent } from '@/lib/recording/content-access';
+import { assertVideoDellEvento, assertVideoNelloStorage } from '@/lib/storage/recordings';
 
 export const dynamic = 'force-dynamic';
 
@@ -68,6 +76,68 @@ export const PATCH = withErrorHandling(async (request, context) => {
     );
   }
 
+  // La destinazione dell'evento decide cosa si puo' esporre. Un file appena
+  // caricato non si rifiuta mai: e' gia' nello storage, e sugli eventi riservati
+  // lo vedono solo gli iscritti. La guardia guarda una pubblicazione chiesta
+  // esplicitamente e gli indirizzi esterni.
+  const prima = await prisma.event.findUnique({
+    where: { id },
+    select: {
+      status: true,
+      eventType: true,
+      postEventPublic: true,
+      recordingEnabled: true,
+      recordingDestination: true,
+      recordingAudience: true,
+      recordingUrl: true,
+      recordingPublished: true,
+      transcriptPublished: true,
+      youtubeUrl: true,
+      tempRecordingUrl: true,
+    },
+  });
+  if (!prima) throw new NotFoundError('Event');
+
+  // Cambiare il file, pubblicarlo o aprire la pagina dopo l'evento espone il
+  // contenuto: lo decide chi organizza l'evento, non l'admin che non lo
+  // organizza (lib/recording/content-access). Elenco, copertina e YouTube
+  // restano di chi gestisce l'evento.
+  const espone =
+    parsed.data.recordingUrl !== undefined ||
+    (parsed.data.recordingPublished !== undefined &&
+      parsed.data.recordingPublished !== prima.recordingPublished) ||
+    (parsed.data.postEventPublic !== undefined &&
+      parsed.data.postEventPublic !== prima.postEventPublic);
+  if (espone) await requireEventContent(await cookies(), id, 'pubblicazione');
+  // Solo un file di questo evento: un indirizzo del nostro storage che e' di
+  // un altro evento non si aggancia (l'app lo firmerebbe per questo).
+  await assertVideoDellEvento(id, parsed.data.recordingUrl);
+
+  // Il caricamento accende la registrazione: un evento che comincia a registrare
+  // con questo file parte riservato, come quando la si accende dalla modifica
+  // dell'evento. A sala gia' aperta non si dichiara niente: l'evento resta senza
+  // destinazione e pubblica con un avviso (`destinazioneDiPartenza`).
+  const partenza = destinazioneDiPartenza(
+    prima,
+    !!parsed.data.recordingUrl && !(await salaGiaAperta({ id, status: prima.status })),
+  );
+  const destinazione =
+    partenza && partenza !== prima.recordingDestination
+      ? ({ recordingDestination: partenza, recordingAudience: partenza } as const)
+      : null;
+
+  assertVideoNelloStorage(partenza, prima.recordingUrl, parsed.data.recordingUrl);
+  assertEsposizioneConsentita(prima, {
+    ...prima,
+    ...destinazione,
+    recordingPublished:
+      parsed.data.recordingUrl === null
+        ? false
+        : (parsed.data.recordingPublished ?? prima.recordingPublished),
+    youtubeUrl:
+      parsed.data.youtubeUrl !== undefined ? parsed.data.youtubeUrl : prima.youtubeUrl,
+  });
+
   // Attaching a recording URL means we also flip the published switch
   // on by default — uploading a file from the admin panel is an
   // explicit intent to publish. The caller can still opt out by
@@ -77,44 +147,60 @@ export const PATCH = withErrorHandling(async (request, context) => {
     parsed.data.recordingPublished ??
     (setsRecording && parsed.data.recordingUrl !== null ? true : undefined);
 
-  const updated = await prisma.event.update({
-    where: { id },
-    data: {
-      ...(parsed.data.libraryListed !== undefined && {
-        libraryListed: parsed.data.libraryListed,
-      }),
-      ...(parsed.data.postEventPublic !== undefined && {
-        postEventPublic: parsed.data.postEventPublic,
-      }),
-      ...(parsed.data.coverImageUrl !== undefined && {
-        coverImageUrl: parsed.data.coverImageUrl,
-      }),
-      ...(parsed.data.youtubeUrl !== undefined && {
-        youtubeUrl: parsed.data.youtubeUrl,
-      }),
-      ...(setsRecording && parsed.data.recordingUrl !== null && {
-        recordingUrl: parsed.data.recordingUrl,
-        // Enable the flag even on retroactive uploads (Jibri was off
-        // during the event) so the detail page surfaces the player.
-        recordingEnabled: true,
-      }),
-      ...(publishWith !== undefined && {
-        recordingPublished: publishWith,
-        ...(publishWith && { recordingPublishedAt: new Date() }),
-      }),
-      ...(parsed.data.recordingFileSize !== undefined && {
-        recordingFileSize:
-          parsed.data.recordingFileSize === null
-            ? null
-            : BigInt(parsed.data.recordingFileSize),
-      }),
-      ...(parsed.data.recordingDuration !== undefined && {
-        recordingDuration: parsed.data.recordingDuration,
-      }),
-      // Ultimi, per vincere sui campi qui sopra: togliere il video toglie anche
-      // pubblicazione, peso e durata, qualunque cosa chieda la richiesta.
-      ...(parsed.data.recordingUrl === null && CAMPI_VIDEO_VUOTI),
-    },
+  // Il file tolto dall'evento non resta nemmeno sulle sessioni.
+  const fileTolto = parsed.data.recordingUrl === null ? prima.recordingUrl : null;
+  const updated = await prisma.$transaction(async (tx) => {
+    if (fileTolto) await tx.callSession.updateMany(sessioniSenzaFile(id, fileTolto));
+    return tx.event.update({
+      where: { id },
+      data: {
+        ...(parsed.data.libraryListed !== undefined && {
+          libraryListed: parsed.data.libraryListed,
+        }),
+        ...(parsed.data.postEventPublic !== undefined && {
+          postEventPublic: parsed.data.postEventPublic,
+        }),
+        ...(parsed.data.coverImageUrl !== undefined && {
+          coverImageUrl: parsed.data.coverImageUrl,
+        }),
+        ...(parsed.data.youtubeUrl !== undefined && {
+          youtubeUrl: parsed.data.youtubeUrl,
+        }),
+        ...(setsRecording && parsed.data.recordingUrl !== null && {
+          recordingUrl: parsed.data.recordingUrl,
+          // Enable the flag even on retroactive uploads (Jibri was off
+          // during the event) so the detail page surfaces the player.
+          recordingEnabled: true,
+          ...destinazione,
+        }),
+        ...(publishWith !== undefined && {
+          recordingPublished: publishWith,
+          ...(publishWith && { recordingPublishedAt: new Date() }),
+        }),
+        // La durata della registrazione non pubblicata conta, al piu' presto, da
+        // un file nuovo o da una pubblicazione tolta (Event.recordingRetentionFrom):
+        // nessuna delle due la fa scadere al giro dopo della pulizia.
+        ...(((setsRecording &&
+          parsed.data.recordingUrl !== null &&
+          parsed.data.recordingUrl !== prima.recordingUrl) ||
+          ((publishWith === false || parsed.data.recordingUrl === null) &&
+            prima.recordingPublished)) && {
+          recordingRetentionFrom: new Date(),
+        }),
+        ...(parsed.data.recordingFileSize !== undefined && {
+          recordingFileSize:
+            parsed.data.recordingFileSize === null
+              ? null
+              : BigInt(parsed.data.recordingFileSize),
+        }),
+        ...(parsed.data.recordingDuration !== undefined && {
+          recordingDuration: parsed.data.recordingDuration,
+        }),
+        // Ultimi, per vincere sui campi qui sopra: togliere il video toglie anche
+        // pubblicazione, peso e durata, qualunque cosa chieda la richiesta.
+        ...(parsed.data.recordingUrl === null && CAMPI_VIDEO_VUOTI),
+      },
+    });
   });
 
   await logAdminAction({
@@ -130,7 +216,8 @@ export const PATCH = withErrorHandling(async (request, context) => {
     postEventPublic: updated.postEventPublic,
     coverImageUrl: updated.coverImageUrl,
     youtubeUrl: updated.youtubeUrl,
-    recordingUrl: updated.recordingUrl,
+    // La rotta dell'app, non l'indirizzo dello storage (lib/recording/audience).
+    recordingUrl: updated.recordingUrl ? videoDellApp(updated.slug) : null,
     recordingPublished: updated.recordingPublished,
   });
 });

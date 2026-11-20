@@ -76,7 +76,7 @@ Personal data is encrypted in the application, not by the database. The code is 
 
 What follows from this design:
 
-- **No search, sort or uniqueness on encrypted columns.** Each write uses a new IV, so equal plaintexts produce different ciphertexts. Uniqueness and lookups use a hash column instead ([Keyed email hash](#keyed-email-hash)). For the same reason, the address-book search matches only `organization` and sorts by `lastActiveAt`.
+- **No search, sort or uniqueness on encrypted columns.** Each write uses a new IV, so equal plaintexts produce different ciphertexts. Uniqueness and lookups use a hash column instead ([Keyed email hash](#keyed-email-hash)). For the same reason, the address-book search decrypts the records and filters them in memory, within a limit, and sorts by `lastActiveAt` ([ADR-011](../adr/011-person-rubrica.md)).
 - **Encryption covers storage only.** Redis messages and SSE streams carry plaintext ([live-interaction.md](live-interaction.md)).
 - **No key rotation.** A different but well-formed key is not detected: decryption fails, and `tryDecryptPII()` returns the stored base64 as if it were a legacy plaintext row. No tooling re-encrypts existing data, so replacing `PII_ENCRYPTION_KEY` on a populated database makes every encrypted value unreadable.
 
@@ -86,13 +86,15 @@ Which columns are encrypted is recorded once, in the data inventory of [GDPR.md]
 
 `hashEmail()` in the same file trims and lowercases the address, then computes an HMAC-SHA-256 keyed with `APP_SECRET`, as hex. If `APP_SECRET` is unset it falls back to an unkeyed SHA-256. In production a missing `APP_SECRET` is only logged at start-up (the start-up check stops the app only for a secret shorter than 32 characters). A registration commits its rows with an unkeyed hash before any later step that signs with `APP_SECRET` fails, so set `APP_SECRET` before the first registration and never leave it unset.
 
-The hash is stored as `emailHash` on `Registration`, `EventInvitation`, `Person`, `StaffAccount` and `ProfilePhoto`. The Jitsi JWT does not carry it ([the Jitsi JWT](identity-and-access.md#the-jitsi-jwt)). The hash carries:
+The hash is stored as `emailHash` on `Registration`, `EventInvitation`, `Person`, `StaffAccount`, `ProfilePhoto`, `RecordingConsent`, `MultitrackConsent` and `RetainedConsentProof`. The Jitsi JWT does not carry it ([the Jitsi JWT](identity-and-access.md#the-jitsi-jwt)). The hash carries:
 
 - the one-registration-per-email-per-event rule;
 - deduplication of address-book entries;
 - the profile photo of an address, shared by every event that address takes part in;
 - the staff-account lookup when someone asks for a sign-in link;
 - the lookup behind data-subject access and erasure requests.
+
+`Registration.nicknameKey` is the same kind of HMAC, over the event id and the comparison form of the nickname (`improntaNickname` in `app/src/lib/live/nickname.ts`): it keeps one nickname per event without decrypting the others, and does not link the same nickname across events.
 
 `APP_SECRET` therefore also keys data: changing it changes every hash. Existing rows then stop matching new lookups. A known address can register twice for the same event, staff accounts cannot request a sign-in link, and data-subject requests no longer find their rows.
 
@@ -108,7 +110,7 @@ Most personal data is encrypted, but these fields are stored in plaintext. Reten
 
 | Field | What it holds |
 |---|---|
-| `Question.authorName` | The name shown on a Q&A question. It is copied from the registration or the named grant, or typed by a guest. The GDPR cleanup empties it at event retention. |
+| `Question.authorName` | The name shown on a Q&A question. It is copied from the registration or the named grant, or typed by a guest; the nickname, or the pseudonym, where the person appears under one. The GDPR cleanup empties it at event retention. |
 | `QuestionnaireResponse.respondentName` | A snapshot of the respondent's name at submission, from the standalone questionnaire page. Post-event (`POST_EVENT`) responses store no name and no `respondentEmailHash`, and the answers sent with a registration store no name: the response is linked to the registration, whose name is encrypted. |
 | `CallSession.dominantSpeakerLog` | The live speaker timeline, including display names as the room showed them. |
 | `Event.moderatorName`, `EventMaterial.addedBy`, `Speaker.displayName` | The primary moderator's name, a copy of that name on materials added from the room with the primary moderator link (links and file uploads alike; additions by named co-moderators and from the administration area store an empty string, shown as a translated "Added by the organisers", and the GDPR cleanup empties it at event retention), and the name attached to a transcript speaker label. `Event.moderatorEmail` is encrypted. |
@@ -144,17 +146,17 @@ flowchart LR
   EV -->|"eventId, or via a parent<br/>(Person and ProfilePhoto<br/>are instance-wide)"| PA
   EV -->|"eventId"| LI
   PA -->|"registrationId"| LI
-  EV -->|"eventId on CallSession<br/>and GdprAuditLog"| SA
+  EV -->|"eventId on CallSession<br/>and, when there is one, GdprAuditLog"| SA
   SA -->|"one Recording<br/>per CallSession"| RA
 ```
 
 | Domain | Key models | What it holds | Owner page |
 |---|---|---|---|
-| Events and content | `Event`, `EventTemplate`, `Tag` and `EventTagLink`, `EventMaterial`, `EventReminder`, `EventQuestionnaire` with `QuestionTemplate`, `QuestionnaireTemplateLink` and `QuestionItem`, `GdprTemplate`, `GlossaryTerm` (post-production glossary: instance terms without an event, event terms with one) | The event and everything an organizer prepares for it. `EventTemplate` only pre-fills the wizard: an event keeps no reference to its template, so editing a template never changes existing events. | [event-journey.md](event-journey.md); statuses in [event-lifecycle.md](event-lifecycle.md) |
-| Participation | `Registration`, `EventInvitation`, `Person`, `ProfilePhoto`, `ReminderSent`, `QuestionnaireResponse` and `QuestionnaireAnswer`, `EventFeedback` | Who registered, who was invited, the opt-in address book, the photos people show in the room, and what participants answered. | [event-journey.md](event-journey.md); address book in [GDPR.md](../GDPR.md) and [ADR-011](../adr/011-person-rubrica.md) |
+| Events and content | `Event`, `EventTemplate`, `Tag` and `EventTagLink`, `EventMaterial`, `EventReminder`, `EventQuestionnaire` with `QuestionTemplate`, `QuestionnaireTemplateLink` and `QuestionItem`, `GdprTemplate`, `GlossaryTerm` (post-production glossary: instance terms without an event, event terms with one) | The event and everything an organizer prepares for it. `EventTemplate` pre-fills the wizard: an event copies its values, so editing a template never changes existing events. The event keeps only a catalog reference to it (`Event.templateId`, `SetNull`) for the instance statistics. | [event-journey.md](event-journey.md); statuses in [event-lifecycle.md](event-lifecycle.md) |
+| Participation | `Registration`, `EventInvitation`, `Person`, `ProfilePhoto`, `ReminderSent`, `QuestionnaireResponse` and `QuestionnaireAnswer`, `EventFeedback`, `RecordingConsent`, `MultitrackConsent`, `RetainedConsentProof` | Who registered, who was invited, the opt-in address book, the photos people show in the room, what participants answered, and the proofs of the consents given in the room or kept after their source was deleted ([Deleting data](#deleting-data)). | [event-journey.md](event-journey.md); address book in [GDPR.md](../GDPR.md) and [ADR-011](../adr/011-person-rubrica.md) |
 | Live interaction | `ChatMessage` and `ChatMessageReaction`, `Question`, `QuestionUpvote` and `QuestionGuestUpvote`, `Poll` and `PollVote`, `WordCloudRound` and `WordCloudSubmission`, `EventAgendaItem` and `AgendaItemReaction`, `Reaction`, `LiveAction`, `EventPresentation` | The table-backed features beside the video during a live event, and the journal of the actions taken in the room. PostgreSQL holds their state, and Redis only fans it out. The timer and the reaction-bar counters have no table ([Live interaction](#live-interaction)). | [live-interaction.md](live-interaction.md), [ADR-005](../adr/005-live-interaction-in-portal.md) |
 | Access | `EventModerator`, `StaffAccount`, `StaffLoginToken` | Named moderator and speaker grants, staff accounts and their one-time sign-in links. The primary moderator link is a column on `Event`, and the instance API key is not stored in the database. `EventOrganizer` sits next to these models but is display metadata only: it lists co-organizing organizations on the event page and grants no access. | [identity-and-access.md](identity-and-access.md) |
-| Recording and AI | `Recording`, `RecordingTrack`, `Speaker`, `PostprodJob`, `PostprodArtifact`, `PostprodOriginalBody`, `OrphanRecording`, `RoomOccupant`, `CaptionSegment` | Recordings, per-participant audio tracks, the AI post-production queue and its outputs. Who is behind each bridge endpoint in an event's room (`RoomOccupant`, written from Prosody for every event where live captions are available on the instance, and for events with per-participant recording), and the live caption sentences kept for the transcript from captions (`CaptionSegment`, text and name encrypted, only for people who consented). `Registration.consentMultitrackVersion` and `MultitrackConsent.textVersion` record the version of the consent text each consent was given to. The AI event report, a `REPORT` job of the queue, has no table of its own: it is frozen on the event (`Event.postEventReport`, JSON with the figures and the text per language, `postEventReportAt`, `postEventReportPublished`) and, like `postEventRecap`, outlives the event's retention. The machine translation of an event's title and description, a `TRANSLATE_TEXT` job, has no table either: it goes into the event's `title` and `description` in the languages that are empty or already machine-translated, `Event.textLocaleState` records for each language whether a person or the engine wrote it and from which main text (`{ origin: MACHINE \| HUMAN, sourceHash, at, model }`, inherited by a copy), and `Event.textTranslations` keeps the last delivered translation. | [recording.md](recording.md), [POSTPROD.md](../POSTPROD.md), [live-captions.md](live-captions.md#transcript-from-captions) |
+| Recording and AI | `Recording`, `RecordingTrack`, `Speaker`, `PostprodJob`, `PostprodArtifact`, `PostprodOriginalBody`, `OrphanRecording`, `RoomOccupant`, `CaptionSegment` | Recordings, per-participant audio tracks, the AI post-production queue and its outputs. Who is behind each bridge endpoint in an event's room (`RoomOccupant`, written from Prosody for every event where live captions are available on the instance, and for events with per-participant recording), and the live caption sentences kept for the transcript from captions (`CaptionSegment`, text and name encrypted, only for people who consented). `Registration.consentMultitrackVersion` and `MultitrackConsent.textVersion` record the version of the consent text each consent was given to. `Recording.transcriptConsentRule` marks the recordings under which a transcript from the full video needs a confirmation from staff ([How work enters the queue](../POSTPROD.md#how-work-enters-the-queue)). It comes from the column default, which is true for every row created after the column was added, by any creator, and false on the rows that existed before. The AI event report, a `REPORT` job of the queue, has no table of its own: it is frozen on the event (`Event.postEventReport`, JSON with the figures and the text per language, `postEventReportAt`, `postEventReportPublished`) and, like `postEventRecap`, outlives the event's retention. The machine translation of an event's title and description, a `TRANSLATE_TEXT` job, has no table either: it goes into the event's `title` and `description` in the languages that are empty or already machine-translated, `Event.textLocaleState` records for each language whether a person or the engine wrote it and from which main text (`{ origin: MACHINE \| HUMAN, sourceHash, at, model }`, inherited by a copy), and `Event.textTranslations` keeps the last delivered translation. | [recording.md](recording.md), [POSTPROD.md](../POSTPROD.md), [live-captions.md](live-captions.md#transcript-from-captions) |
 | Settings and audit | `SiteSetting`, `EmailTemplate`, `EmailOutbox`, `CallSession`, `GdprAuditLog`, `AdminAuditLog` | The runtime settings singleton, email overrides and the outbox, call-session analytics, and the two audit trails. | [runtime-settings.md](../configuration/runtime-settings.md), [email.md](email.md), [call sessions](event-lifecycle.md#call-sessions), [GDPR.md](../GDPR.md), [audit actor format](identity-and-access.md#audit-actor-format) |
 
 ## Events, people and access
@@ -167,6 +169,7 @@ erDiagram
   STAFF_ACCOUNT |o--o{ EVENT : "creates (SetNull)"
   STAFF_ACCOUNT ||--o{ STAFF_LOGIN_TOKEN : "one-time sign-in"
   GDPR_TEMPLATE |o--o{ EVENT : "privacy notice (SetNull)"
+  EVENT_TEMPLATE |o--o{ EVENT : "catalog (SetNull)"
   EVENT |o--o{ EVENT : "series parent (SetNull)"
   EVENT ||--o{ REGISTRATION : "registrations"
   EVENT ||--o{ EVENT_INVITATION : "invitations"
@@ -186,6 +189,14 @@ erDiagram
     string jitsiRoomName UK
     uuid createdById FK "creator account, nullable"
     uuid recurrenceSeriesId FK "set only through the API"
+    uuid templateId FK "catalog, nullable"
+    string templateName "template name when created"
+    EventFormatClass formatClass "catalog, nullable"
+  }
+  EVENT_TEMPLATE {
+    uuid id PK
+    string name
+    boolean isSystem
   }
   REGISTRATION {
     uuid id PK
@@ -195,13 +206,16 @@ erDiagram
     string emailHash "HMAC, unique per event"
     string accessToken UK "personal join link"
     uuid personId FK "null unless a person record exists"
+    boolean addressBookPending "tick waiting for a confirmation"
   }
   PERSON {
     uuid id PK
     string emailHash UK "HMAC"
     string displayName "encrypted"
+    string email "encrypted, null after an opt-out"
     boolean optedInToAddressBook
-    datetime lastActiveAt "drives retention"
+    datetime optedInAt "retention counts from here"
+    datetime lastActiveAt "last tick, orders the staff list"
   }
   EVENT_INVITATION {
     uuid id PK
@@ -209,7 +223,8 @@ erDiagram
     EventInvitationRole role
     string email "encrypted"
     string emailHash "HMAC, unique per event"
-    string token UK "reserved, never set"
+    string token UK "pre-fills the registration form"
+    datetime declinedAt "invitation stopped"
   }
   EVENT_MODERATOR {
     uuid id PK
@@ -255,13 +270,15 @@ How to read it:
 
 - **How a person relates to an event.**
   - A `Registration` is a self-service sign-up with its own join link.
-  - An `EventInvitation` is an entry on the event's invitation list: an encrypted name and email, a `GUEST` or `SPEAKER` role and an optional address-book link. The columns for a pre-filled registration link (`token`, `sentAt`, `acceptedAt`, `declinedAt`) exist, but no code sends invitations or sets them. A `SPEAKER` invitation grants no room access; access comes from a named grant.
+  - An `EventInvitation` is an entry on the event's invitation list: an encrypted name and email, a `GUEST` or `SPEAKER` role and an optional address-book link. Sending it sets `token`, which only pre-fills the registration form, and `sentAt`; `acceptedAt` exists, but no code sets it. `declinedAt` marks an invitation that was stopped because the person must not be contacted any more: nothing is sent for that row from then on, and on an event not open to anyone the row stays, with the access it gives ([Email and calendar](email.md#emails-the-platform-sends)). The stop follows the address: a new row, or a row moved to another address, starts stopped if that address has stopped receiving invitations (`indirizzoFermato` in `app/src/lib/persons/inviti-fermati.ts`), and only a confirmed address-book tick lifts it, with the limit in [Known limitations](../GDPR.md#known-limitations). A `SPEAKER` invitation grants no room access; access comes from a named grant.
   - An `EventModerator` row is a named grant with its own magic link and a role, `MODERATOR` or `SPEAKER`.
   - An `EventOrganizer` row is only a name, logo and link shown on the event page.
-- **The address book is opt-in.** A `Person` row is created only when someone ticks the separate address-book consent. A later registration from the same address is linked to that row, and refreshes `lastActiveAt`, even when the box is left unticked. This also happens after an opt-out, because opting out keeps the row until the address-book retention job deletes it. `Registration.personId` is `null` only when no person record exists for the address. The model and its retention are in [ADR-011](../adr/011-person-rubrica.md) and [GDPR.md](../GDPR.md#the-address-book).
+- **The address book is opt-in.** A `Person` row is created or updated only when someone ticks the separate address-book consent, and the form offers that box only where `SiteSetting.addressBookEnabled` and `Event.offerAddressBook` are both on (`app/src/lib/persons/address-book.ts`). The tick writes the name and organization of that registration, copies its encrypted email as it is and restarts `optedInAt`, from which `retentionMonths` counts. On an address with an earlier opt-out or a stopped invitation the form proves nothing about who ticked, so the tick changes neither the row nor the invitations: it waits on the registration as `Registration.addressBookPending` until the person confirms it, and only then the opt-out is cleared and the stopped invitations reopen (`app/src/lib/persons/spunta-in-attesa.ts`). A registration without the tick is linked to the row of its address and changes nothing on it, and the same holds where the box is not offered. This also happens after an opt-out, which clears `email` at once and keeps the rest of the row until the address-book retention job deletes it. `lastActiveAt` is the last tick: it orders the staff list and plays no part in retention. `Registration.personId` is `null` only when no person record exists for the address. The model and its retention are in [ADR-011](../adr/011-person-rubrica.md) and [GDPR.md](../GDPR.md#the-address-book).
 - **Profile photos belong to an address, not to an event (not drawn).** A `ProfilePhoto` row holds one image per `emailHash`, with no foreign key: the token route finds it from the registration that enters the room, so the same photo appears at every event of that address. Named grants never carry one. The image bytes are stored in the row rather than in object storage: the server accepts at most 150,000 bytes and re-encodes every upload as a 256×256 JPEG. Uploads, serving and access are in [Avatars](identity-and-access.md#avatars); retention is in [GDPR.md](../GDPR.md#data-inventory-and-retention).
+- **Where the recording goes is declared on the event (not drawn).** `Event.recordingDestination` is what a person consents to when ticking the recording box: `PUBLIC`, `REGISTRANTS`, or null on an event that never declared it. `Event.recordingAudience` stays the choice of who sees the published recording, and a reserved destination holds it at `REGISTRANTS`. The text each consent was given to is stored with it: `Registration.consentRecordingDestination` and `consentRecordingVersion`, `RecordingConsent.destination` and `textVersion`. Both room proofs, `RecordingConsent` and `MultitrackConsent`, link the moderator or speaker who gave them through `eventModeratorId` and `staffAccountId` (`ON DELETE SET NULL`) and keep that person's `emailHash`, which still finds the proof when the grant or the account is gone. `EventTemplate` carries the starting values, with the same column names as `Event`. The rules are in [Recording destination](recording.md#recording-destination).
 - **Organizer scoping runs through `createdById` and organizer grants.** An event created by a staff account records that account, and an organizer sees the events whose `createdById` is their own, plus those where a valid organizer grant (`EventModerator.organizer`) has the account's email fingerprint (`emailHash`). Events created with the instance API key have no creator and are managed by administrators only. The rules are in [identity-and-access.md](identity-and-access.md).
 - **Series.** `recurrenceRule` stores an RFC 5545 `RRULE`. The wizard shows it on the review step, and duplication uses it to propose the next date; nothing else reads it. `recurrenceSeriesId` can link an occurrence to a parent event, but only an API client sets it: no screen does, no job creates occurrences, and a copy never inherits it ([event-journey.md](event-journey.md#recurrence)).
+- **The event catalog.** `Event.formatClass` (the family of the format) and `Event.templateId` with `templateName` (the template the event was created from, and its name then) classify the event for the instance statistics and change none of its settings. Both are empty on an event created before the catalog or without a template or a format, and nothing fills them in afterwards. Deleting the template clears `templateId` and keeps `templateName`. The rules are in [event-journey.md](event-journey.md#the-event-catalog).
 - **Call sessions.** A `CallSession` records one span of real use of the room. It is the anchor of a `Recording` (one-to-one) and of the live speaker and raised-hand logs. Its lifecycle is in [event-lifecycle.md](event-lifecycle.md#call-sessions).
 - **Questionnaires (not drawn).** Reusable `QuestionTemplate`s and ad-hoc `QuestionItem`s make up an `EventQuestionnaire`. Answers are stored as `QuestionnaireResponse` rows with their `QuestionnaireAnswer`s. The `POST_EVENT` questionnaire is the end-of-event rating; `EventFeedback` holds the older star ratings, which the room does not write but the event's reports read. At event retention the GDPR cleanup deletes the `PRE_REGISTRATION` responses, and keeps the `POST_EVENT` responses and the `EventFeedback` rows without registration, browser id, name or email hash ([Deleting data](#deleting-data)). The flow is in [event-journey.md](event-journey.md).
 
@@ -399,6 +416,7 @@ The values below are copied from `schema.prisma`. The owner page explains what e
 |---|---|---|---|
 | `EventStatus` | `DRAFT`, `PUBLISHED`, `PROVISIONING`, `LIVE`, `IDLE`, `ENDED`, `ARCHIVED` | `Event.status`. The scaler or the lifecycle cron, the API and the cleanup job move it. | [event-lifecycle.md](event-lifecycle.md) |
 | `EventType` | `SCHEDULED`, `INSTANT`, `LEGACY` | A scheduled event, an instant call, or a historical entry with no room and no registrations (metadata and a `youtubeUrl` only). | [event-journey.md](event-journey.md) |
+| `EventFormatClass` (type `event_format_class`) | `MEETING`, `PARTICIPATORY`, `PUBLIC` | `Event.formatClass`, nullable: the family of the format, for the instance statistics. `NULL` is an event not cataloged. | [event-journey.md](event-journey.md#the-event-catalog) |
 | `EventAccessMode` | `OPEN`, `INVITATION` | `Event.accessMode`, nullable: who can take part. `NULL` follows the site settings. | [event-journey.md](event-journey.md#invitation-only-registration) |
 | `EventModeratorRole` | `MODERATOR`, `SPEAKER` | The role of a named grant. | [identity-and-access.md](identity-and-access.md) |
 | `StaffRole` | `ORGANIZER`, `ADMIN` | A staff account manages its own events, or the whole instance under a name. The instance API key is not an account. | [identity-and-access.md](identity-and-access.md), [ADR-014](../adr/014-organizer-role.md), [ADR-015](../adr/015-named-administrators.md) |
@@ -435,6 +453,7 @@ Each rule below names the mechanism that enforces it. Keep that mechanism in pla
   | `Event.createdById` | Deleting a staff account keeps its events, which then only administrators manage. |
   | `Event.gdprTemplateId` | Deleting a privacy notice template leaves its events without a template. How a notice is resolved then is in [GDPR.md](../GDPR.md). |
   | `Event.recurrenceSeriesId` | An event survives the parent event it is linked to. |
+  | `Event.templateId` | Deleting an event template keeps its events and the template name stored on them (`templateName`). |
   | `personId` on `Registration`, `EventInvitation` and `Speaker` | Deleting a person record keeps the registrations and speaker labels. |
   | `ChatMessage.replyToId` | A reply survives its parent. |
   | `registrationId` on `EventFeedback` and `QuestionnaireResponse` | Answers survive their registration. The GDPR cleanup deletes the pre-registration responses and removes the identities from the others. |
@@ -491,7 +510,7 @@ flowchart LR
 
 ## Deleting data
 
-The GDPR cleanup never deletes an expired event, so the `onDelete: Cascade` of its children never fires. It deletes the event's personal data and keeps its live content without identities:
+The GDPR cleanup never deletes an expired event, so the `onDelete: Cascade` of its children never fires. It deletes the event's personal data and keeps its live content without identities. The recording (`Recording` with its artifacts and speaker records, the video files of the event and of its call sessions) is not touched at event retention: it has its own period ([Recording retention](../GDPR.md#recording-retention)), and only the per-participant track rows whose audio is gone are deleted:
 
 | Model | At event retention |
 |---|---|
@@ -502,10 +521,19 @@ The GDPR cleanup never deletes an expired event, so the `onDelete: Cascade` of i
 | `EventMaterial` | Kept, with its file. `addedBy` is emptied. The file goes when the material or the event is deleted. |
 | `EventAgendaItem`, `LiveAction` | Kept: they hold no names. An agenda item's speaker is a reference to a named grant: the grants are deleted, and `speakerGrantId` becomes empty (`ON DELETE SET NULL`) while the topic stays. The `AgendaItemReaction` rows are deleted. |
 | `EventPresentation` | Kept: it holds a material id, a page and a role. Its `presenterGrantId` becomes null when the cleanup deletes the named grants. |
+| `RetainedConsentProof` | Written here: the proofs of a video or transcript that exists, published or not, are copied before their sources are deleted, and the copies no longer covered are deleted (see below). |
 
 The event pseudonym is `'anon:' || md5(<event id> || ':' || <identity>)`, where the identity is the row's original `registrationId`, else its `guestId`, else its own `id`. It is the same for one person across the event's `PollVote`, `WordCloudSubmission`, `EventFeedback` and `POST_EVENT` `QuestionnaireResponse` rows, and differs between events, so the one-per-identity unique indexes hold and per-person counts, such as the event analytics and the words per person, stay as they were.
 
 The identities are removed before the registrations are deleted, because `Question` and `PollVote` reference `Registration` with `onDelete: Cascade`. The cleanup runs again every day on every event past retention, and each step is idempotent: the updates select only rows that still carry a name or an identity (a `registrationId`, a non-empty `authorName` or `addedBy`, a `guestId` not yet starting with `anon:`), so a later run changes nothing already handled and catches what was written since or left by a failed run. A run that deletes or anonymizes nothing for an event writes no `DATA_DELETED` row for it. A concluded event keeps its status; only an event that was never ended is set to `ARCHIVED`.
+
+**Consent proofs outlive their sources.** A video or transcript must still be able to prove its consents after the registrations, the room proofs (`RecordingConsent`, `MultitrackConsent`) and the named grants are gone. `RetainedConsentProof` holds one row per consent period, copied in the same transaction that deletes the source and before it (`app/src/lib/gdpr/retained-consent-proofs.ts`):
+
+- **Shape.** The kind (recording or transcription), source, role, `holderHash` (a per-event fingerprint of the holder, not exported: it counts people, tells the periods of a registrant's room consent apart from those replaced, finds the proofs of a registration for a withdrawal or an erasure, and recognizes the holder in a transcript from captions), `emailHash` when the person gave an address, the encrypted name copied without decrypting it, the language, the text version, the destination and the dates. The table has a foreign key only to `Event`: no cascade from a source touches it, and no reader of live consents can mistake it for a consent that still counts.
+- **What stays.** `tipiDiProvaDiCioCheEsiste` in `app/src/lib/gdpr/cleanup-selection.ts` decides, on what of the recording exists, published or not, at the end of retention and before it. With a video on the event, an external link, a catch-up URL, the file of a call session or per-participant tracks whose audio is not yet deleted, both kinds stay. With a transcript alone, the transcription proofs stay. Otherwise none does.
+- **Erasure on request.** The same copy runs before the cascade, under the same rule, without the name (`nameRemovedAt`) and with `withdrawnAt` set to the time of the request when it was empty. It reaches the room proofs through the registration, the grant, the account or their `emailHash`. Proofs already kept for that address lose the name too. Without `emailHash`, as for guests and for the primary moderator link used without a staff session, the person cannot reach the row alone.
+- **Changes.** A row changes only by a withdrawal or by losing its name. A withdrawal does not touch the video, nor an AI transcript already built. The person leaves a transcript from live captions.
+- **End of life.** The daily cleanup deletes the copies no longer covered, on the first run after what they cover no longer exists: deleted by hand, or at the end of the recording's period. An external link counts until someone removes it. Deleting the event deletes its proofs, even if an external video stays online.
 
 Every model with an `eventId` column must be classified in [`cleanup-coverage.ts`](../../app/src/lib/gdpr/cleanup-coverage.ts), or its test fails. The rules, including tables without `eventId`, blob deletion and outright event deletion, are in [GDPR.md](../GDPR.md#rules-for-developers). The checklist for adding a model that holds participant data is in [extending.md](../development/extending.md).
 
