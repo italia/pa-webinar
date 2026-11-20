@@ -212,7 +212,8 @@
       "recordingLinkSend": "Reenviar-me a ligação",
       "recordingLinkSent": "Se o endereço estiver inscrito no evento, receberá em breve um e-mail com a sua ligação pessoal.",
       "recordingLinkError": "O pedido falhou. Tente novamente dentro de alguns minutos.",
-      "registerOrGuest": "Se se inscrever, recebe por e-mail a sua ligação pessoal e novidades sobre o evento. Como convidado entra logo só com um nome, apenas enquanto o evento está em direto, e não recebe e-mails."
+      "registerOrGuest": "Se se inscrever, recebe por e-mail a sua ligação pessoal e novidades sobre o evento. Como convidado entra logo só com um nome, apenas enquanto o evento está em direto, e não recebe e-mails.",
+      "guestWhenLive": "Quando o evento estiver em direto, poderá entrar também sem se inscrever, só com o nome."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -3039,7 +3040,6 @@
       "copyPublicUrl": "Copiar ligação pública",
       "copyInviteUrl": "Copiar ligação de convite",
       "enterAsParticipant": "Entrar como participante",
-      "openAsParticipant": "Abrir como participante",
       "participantHintRoom": "Abre num novo separador: a sala tal como um convidado a vê, sem poderes de moderação.",
       "participantHintPassword": "Abre num novo separador: a sala tal como um convidado a vê, após a palavra-passe do evento.",
       "participantHintPage": "Abre num novo separador: a página pública tal como os participantes a veem.",
@@ -3132,7 +3132,8 @@
         "recordingRetention": "Eliminação automática da gravação",
         "recordingRetentionNone": "Nenhuma",
         "recordingRetentionDays": "{days, plural, one {# dia} many {# dias} other {# dias}} depois do fim do evento ou, se for publicada, depois da publicação"
-      }
+      },
+      "openPublicPage": "Abrir a página pública"
     },
     "rubrica": {
       "subtitle": "Pessoas que deram consentimento para constarem na agenda (art. 6.1.a RGPD). O nome, o e-mail e a organização só são atualizados quando a pessoa volta a assinalar a caixa.",

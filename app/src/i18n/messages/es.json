@@ -212,7 +212,8 @@
       "recordingLinkSend": "Reenviarme el enlace",
       "recordingLinkSent": "Si la dirección está inscrita en el evento, recibirás en breve un correo con tu enlace personal.",
       "recordingLinkError": "La solicitud no se ha podido completar. Inténtalo de nuevo en unos minutos.",
-      "registerOrGuest": "Si te inscribes, recibes por correo tu enlace personal y novedades sobre el evento. Como invitado entras enseguida solo con un nombre, solo mientras el evento está en directo, y no recibes correos."
+      "registerOrGuest": "Si te inscribes, recibes por correo tu enlace personal y novedades sobre el evento. Como invitado entras enseguida solo con un nombre, solo mientras el evento está en directo, y no recibes correos.",
+      "guestWhenLive": "Cuando el evento esté en directo podrás entrar también sin inscribirte, solo con tu nombre."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -3039,7 +3040,6 @@
       "copyPublicUrl": "Copiar enlace público",
       "copyInviteUrl": "Copiar enlace de invitación",
       "enterAsParticipant": "Unirse como participante",
-      "openAsParticipant": "Abrir como participante",
       "participantHintRoom": "Se abre en una pestaña nueva: la sala tal como la ve un invitado, sin poderes de moderación.",
       "participantHintPassword": "Se abre en una pestaña nueva: la sala tal como la ve un invitado, tras la contraseña del evento.",
       "participantHintPage": "Se abre en una pestaña nueva: la página pública tal como la ven los participantes.",
@@ -3132,7 +3132,8 @@
         "recordingRetention": "Eliminación automática de la grabación",
         "recordingRetentionNone": "Ninguna",
         "recordingRetentionDays": "{days, plural, one {# día} other {# días}} después del final del evento o, si se publica, después de la publicación"
-      }
+      },
+      "openPublicPage": "Abrir la página pública"
     },
     "rubrica": {
       "subtitle": "Personas que han dado consentimiento para ser incluidas en la agenda (art. 6.1.a RGPD). El nombre, el correo electrónico y la organización solo se actualizan cuando la persona vuelve a marcar la casilla.",

@@ -212,7 +212,8 @@
       "recordingLinkSend": "Poslat odkaz znovu",
       "recordingLinkSent": "Pokud je adresa na akci registrována, brzy vám přijde e-mail s osobním odkazem.",
       "recordingLinkError": "Požadavek se nezdařil. Zkuste to za několik minut znovu.",
-      "registerOrGuest": "Když se zaregistrujete, dostanete e-mailem svůj osobní odkaz a novinky o akci. Jako host vstoupíte hned jen se jménem, pouze během živého vysílání, a e-maily nedostáváte."
+      "registerOrGuest": "Když se zaregistrujete, dostanete e-mailem svůj osobní odkaz a novinky o akci. Jako host vstoupíte hned jen se jménem, pouze během živého vysílání, a e-maily nedostáváte.",
+      "guestWhenLive": "Až bude akce živě, můžete se připojit i bez registrace, jen se svým jménem."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -3039,7 +3040,6 @@
       "copyPublicUrl": "Zkopírovat veřejný odkaz",
       "copyInviteUrl": "Zkopírovat odkaz s pozvánkou",
       "enterAsParticipant": "Připojit se jako účastník",
-      "openAsParticipant": "Otevřít jako účastník",
       "participantHintRoom": "Otevře se na nové kartě: místnost tak, jak ji vidí host, bez oprávnění moderátora.",
       "participantHintPassword": "Otevře se na nové kartě: místnost tak, jak ji vidí host, po zadání hesla události.",
       "participantHintPage": "Otevře se na nové kartě: veřejná stránka tak, jak ji vidí účastníci.",
@@ -3132,7 +3132,8 @@
         "recordingRetention": "Automatické smazání záznamu",
         "recordingRetentionNone": "Žádné",
         "recordingRetentionDays": "{days, plural, one {# den} few {# dny} many {# dne} other {# dní}} po skončení akce, nebo, pokud je zveřejněn, po zveřejnění"
-      }
+      },
+      "openPublicPage": "Otevřít veřejnou stránku"
     },
     "rubrica": {
       "subtitle": "Osoby, které udělily souhlas se zařazením do adresáře (čl. 6.1.a GDPR). Jméno, e-mail a organizace se aktualizují pouze tehdy, když osoba políčko znovu zaškrtne.",

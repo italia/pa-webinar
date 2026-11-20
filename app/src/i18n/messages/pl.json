@@ -212,7 +212,8 @@
       "recordingLinkSend": "Wyślij link ponownie",
       "recordingLinkSent": "Jeśli adres jest zarejestrowany na wydarzenie, wkrótce otrzymasz e-mail z osobistym linkiem.",
       "recordingLinkError": "Żądanie nie powiodło się. Spróbuj ponownie za kilka minut.",
-      "registerOrGuest": "Jeśli się zapiszesz, otrzymasz e-mailem osobisty link i informacje o wydarzeniu. Jako gość wchodzisz od razu, podając tylko imię, tylko podczas transmisji na żywo, i nie dostajesz e-maili."
+      "registerOrGuest": "Jeśli się zapiszesz, otrzymasz e-mailem osobisty link i informacje o wydarzeniu. Jako gość wchodzisz od razu, podając tylko imię, tylko podczas transmisji na żywo, i nie dostajesz e-maili.",
+      "guestWhenLive": "Gdy wydarzenie będzie na żywo, możesz wejść także bez rejestracji, podając tylko imię."
     },
     "manage": {
       "toggleChat": "Czat",
@@ -3039,7 +3040,6 @@
       "copyPublicUrl": "Kopiuj link publiczny",
       "copyInviteUrl": "Kopiuj link z zaproszeniem",
       "enterAsParticipant": "Dołącz jako uczestnik",
-      "openAsParticipant": "Otwórz jako uczestnik",
       "participantHintRoom": "Otwiera się w nowej karcie: sala tak, jak widzi ją gość, bez uprawnień moderatora.",
       "participantHintPassword": "Otwiera się w nowej karcie: sala tak, jak widzi ją gość, po podaniu hasła wydarzenia.",
       "participantHintPage": "Otwiera się w nowej karcie: strona publiczna tak, jak widzą ją uczestnicy.",
@@ -3132,7 +3132,8 @@
         "recordingRetention": "Automatyczne usunięcie nagrania",
         "recordingRetentionNone": "Brak",
         "recordingRetentionDays": "{days, plural, one {# dzień} few {# dni} many {# dni} other {# dnia}} po zakończeniu wydarzenia lub, jeśli zostało opublikowane, po publikacji"
-      }
+      },
+      "openPublicPage": "Otwórz stronę publiczną"
     },
     "rubrica": {
       "subtitle": "Osoby, które wyraziły zgodę na wpisanie do książki adresowej (art. 6.1.a RODO). Imię i nazwisko, adres e-mail i organizacja aktualizują się tylko wtedy, gdy dana osoba ponownie zaznaczy pole.",

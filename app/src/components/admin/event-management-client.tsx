@@ -712,7 +712,7 @@ export default function EventManagementClient({
                   <Svg name="external" size={14} />
                   {ingressoPartecipante.kind === 'room'
                     ? td('enterAsParticipant')
-                    : td('openAsParticipant')}
+                    : td('openPublicPage')}
                 </Link>
                 <div id="ingresso-partecipante-nota" style={{ ...CAPTION, fontSize: '0.78rem', maxWidth: 260 }}>
                   {ingressoPartecipante.kind === 'page'
@@ -868,7 +868,7 @@ export default function EventManagementClient({
                 {/* Solo quando la pagina esiste (in bozza, archiviato o per una
                     chiamata rapida in corso l'indirizzo risponde «non
                     trovato») e quando in cima non c'e' gia' il pulsante che
-                    la apre («Apri come partecipante»). */}
+                    la apre («Apri la pagina pubblica»). */}
                 {publicPageVisible && ingressoPartecipante?.kind !== 'page' && (
                   <a href={publicUrl} target="_blank" rel="noopener noreferrer"
                      className="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2">

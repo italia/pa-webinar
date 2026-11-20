@@ -212,7 +212,8 @@
       "recordingLinkSend": "Rimandami il link",
       "recordingLinkSent": "Se l'indirizzo è iscritto all'evento, riceverai a breve un'email con il link personale.",
       "recordingLinkError": "Richiesta non riuscita. Riprova tra qualche minuto.",
-      "registerOrGuest": "Iscrivendoti ricevi per email il tuo link personale e gli aggiornamenti sull'evento. Come ospite entri subito con il solo nome, solo mentre l'evento è in diretta, e non ricevi email."
+      "registerOrGuest": "Iscrivendoti ricevi per email il tuo link personale e gli aggiornamenti sull'evento. Come ospite entri subito con il solo nome, solo mentre l'evento è in diretta, e non ricevi email.",
+      "guestWhenLive": "Quando l'evento è in diretta potrai entrare anche senza iscriverti, solo con il nome."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -3249,7 +3250,6 @@
       "copyPublicUrl": "Copia link pubblico",
       "copyInviteUrl": "Copia link d'invito",
       "enterAsParticipant": "Entra come partecipante",
-      "openAsParticipant": "Apri come partecipante",
       "participantHintRoom": "Si apre in una nuova scheda: la sala come la vede un ospite, senza poteri di moderazione.",
       "participantHintPassword": "Si apre in una nuova scheda: la sala come la vede un ospite, dopo la password dell'evento.",
       "participantHintPage": "Si apre in una nuova scheda: la pagina pubblica come la vede chi partecipa.",
@@ -3342,7 +3342,8 @@
         "recordingRetention": "Cancellazione automatica della registrazione",
         "recordingRetentionNone": "Nessuna",
         "recordingRetentionDays": "{days, plural, one {# giorno} other {# giorni}} dopo la fine dell'evento o, se pubblicata, dopo la pubblicazione"
-      }
+      },
+      "openPublicPage": "Apri la pagina pubblica"
     },
     "rubrica": {
       "subtitle": "Persone che hanno dato consenso all'inserimento in rubrica (art. 6.1.a GDPR). Nome, email e organizzazione si aggiornano solo quando la persona spunta di nuovo la casella.",

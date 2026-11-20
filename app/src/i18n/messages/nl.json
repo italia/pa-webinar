@@ -212,7 +212,8 @@
       "recordingLinkSend": "Stuur me de link opnieuw",
       "recordingLinkSent": "Als het adres voor het evenement is ingeschreven, ontvang je binnenkort een e-mail met je persoonlijke link.",
       "recordingLinkError": "Het verzoek is mislukt. Probeer het over een paar minuten opnieuw.",
-      "registerOrGuest": "Als je je inschrijft, krijg je per e-mail je persoonlijke link en nieuws over het evenement. Als gast kom je meteen binnen met alleen een naam, alleen terwijl het evenement live is, en krijg je geen e-mails."
+      "registerOrGuest": "Als je je inschrijft, krijg je per e-mail je persoonlijke link en nieuws over het evenement. Als gast kom je meteen binnen met alleen een naam, alleen terwijl het evenement live is, en krijg je geen e-mails.",
+      "guestWhenLive": "Zodra het evenement live is, kun je ook zonder inschrijving deelnemen, alleen met je naam."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -3039,7 +3040,6 @@
       "copyPublicUrl": "Openbare link kopiëren",
       "copyInviteUrl": "Uitnodigingslink kopiëren",
       "enterAsParticipant": "Als deelnemer binnenkomen",
-      "openAsParticipant": "Openen als deelnemer",
       "participantHintRoom": "Opent in een nieuw tabblad: de ruimte zoals een gast die ziet, zonder moderatorrechten.",
       "participantHintPassword": "Opent in een nieuw tabblad: de ruimte zoals een gast die ziet, na het wachtwoord van het evenement.",
       "participantHintPage": "Opent in een nieuw tabblad: de openbare pagina zoals deelnemers die zien.",
@@ -3132,7 +3132,8 @@
         "recordingRetention": "Automatische verwijdering van de opname",
         "recordingRetentionNone": "Geen",
         "recordingRetentionDays": "{days, plural, one {# dag} other {# dagen}} na het einde van het evenement of, als ze is gepubliceerd, na de publicatie"
-      }
+      },
+      "openPublicPage": "Openbare pagina openen"
     },
     "rubrica": {
       "subtitle": "Personen die toestemming hebben gegeven voor opname in het adresboek (art. 6.1.a AVG). Naam, e-mailadres en organisatie worden alleen bijgewerkt wanneer de persoon het vakje opnieuw aanvinkt.",

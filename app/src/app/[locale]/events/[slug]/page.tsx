@@ -625,6 +625,8 @@ export default async function EventDetailPage({
         registrationAccess={registrationAccess}
         registrationOpen={registrationOpen}
         guestEntryOpen={guestEntryOpen}
+        // L'ospite passa da una password: la pagina non promette il solo nome.
+        guestNeedsPassword={!!event.joinPasswordHash}
         hasPostEventQuestionnaire={hasPostEventQuestionnaire}
         feedbackProof={feedbackProof}
         // Il resoconto si scrive dalla trascrizione: segue la registrazione.

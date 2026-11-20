@@ -212,7 +212,8 @@
       "recordingLinkSend": "Link erneut senden",
       "recordingLinkSent": "Wenn die Adresse für die Veranstaltung angemeldet ist, erhalten Sie in Kürze eine E-Mail mit Ihrem persönlichen Link.",
       "recordingLinkError": "Die Anfrage ist fehlgeschlagen. Bitte versuchen Sie es in einigen Minuten erneut.",
-      "registerOrGuest": "Mit einer Anmeldung erhalten Sie Ihren persönlichen Link und Neuigkeiten zum Event per E-Mail. Als Gast treten Sie sofort nur mit einem Namen ein, nur während das Event live ist, und erhalten keine E-Mails."
+      "registerOrGuest": "Mit einer Anmeldung erhalten Sie Ihren persönlichen Link und Neuigkeiten zum Event per E-Mail. Als Gast treten Sie sofort nur mit einem Namen ein, nur während das Event live ist, und erhalten keine E-Mails.",
+      "guestWhenLive": "Sobald die Veranstaltung live ist, können Sie auch ohne Anmeldung teilnehmen, nur mit Ihrem Namen."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -3039,7 +3040,6 @@
       "copyPublicUrl": "Öffentlichen Link kopieren",
       "copyInviteUrl": "Einladungslink kopieren",
       "enterAsParticipant": "Als Teilnehmer beitreten",
-      "openAsParticipant": "Als Teilnehmer öffnen",
       "participantHintRoom": "Öffnet sich in einem neuen Tab: der Raum, wie ihn ein Gast sieht, ohne Moderationsrechte.",
       "participantHintPassword": "Öffnet sich in einem neuen Tab: der Raum, wie ihn ein Gast sieht, nach dem Passwort der Veranstaltung.",
       "participantHintPage": "Öffnet sich in einem neuen Tab: die öffentliche Seite, wie Teilnehmende sie sehen.",
@@ -3132,7 +3132,8 @@
         "recordingRetention": "Automatische Löschung der Aufzeichnung",
         "recordingRetentionNone": "Keine",
         "recordingRetentionDays": "{days, plural, one {# Tag} other {# Tage}} nach dem Ende der Veranstaltung oder, wenn veröffentlicht, nach der Veröffentlichung"
-      }
+      },
+      "openPublicPage": "Öffentliche Seite öffnen"
     },
     "rubrica": {
       "subtitle": "Personen, die der Aufnahme in das Adressbuch zugestimmt haben (Art. 6.1.a DSGVO). Name, E-Mail-Adresse und Organisation werden nur aktualisiert, wenn die Person das Kästchen erneut ankreuzt.",

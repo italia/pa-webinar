@@ -212,7 +212,8 @@
       "recordingLinkSend": "Saada link uuesti",
       "recordingLinkSent": "Kui aadress on üritusele registreeritud, saad peagi e-kirja oma isikliku lingiga.",
       "recordingLinkError": "Päring ebaõnnestus. Proovi mõne minuti pärast uuesti.",
-      "registerOrGuest": "Registreerudes saad e-postiga oma isikliku lingi ja uudised sündmuse kohta. Külalisena sisened kohe ainult nimega, ainult siis, kui sündmus on otse-eetris, ja e-kirju ei saa."
+      "registerOrGuest": "Registreerudes saad e-postiga oma isikliku lingi ja uudised sündmuse kohta. Külalisena sisened kohe ainult nimega, ainult siis, kui sündmus on otse-eetris, ja e-kirju ei saa.",
+      "guestWhenLive": "Kui üritus on otse-eetris, saad osaleda ka registreerimata, ainult oma nimega."
     },
     "manage": {
       "toggleChat": "Vestlus",
@@ -3039,7 +3040,6 @@
       "copyPublicUrl": "Kopeeri avalik link",
       "copyInviteUrl": "Kopeeri kutse link",
       "enterAsParticipant": "Sisene osalejana",
-      "openAsParticipant": "Ava osalejana",
       "participantHintRoom": "Avaneb uuel vahekaardil: ruum nii, nagu külaline seda näeb, ilma moderaatori õigusteta.",
       "participantHintPassword": "Avaneb uuel vahekaardil: ruum nii, nagu külaline seda näeb, pärast ürituse parooli.",
       "participantHintPage": "Avaneb uuel vahekaardil: avalik leht nii, nagu osalejad seda näevad.",
@@ -3132,7 +3132,8 @@
         "recordingRetention": "Salvestise automaatne kustutamine",
         "recordingRetentionNone": "Puudub",
         "recordingRetentionDays": "{days, plural, one {# päev} other {# päeva}} pärast ürituse lõppu või, kui see on avaldatud, pärast avaldamist"
-      }
+      },
+      "openPublicPage": "Ava avalik leht"
     },
     "rubrica": {
       "subtitle": "Inimesed, kes on andnud nõusoleku aadressraamatusse lisamiseks (IKÜM art. 6.1.a). Nimi, e-posti aadress ja organisatsioon uuenevad ainult siis, kui inimene märgib lahtri uuesti.",

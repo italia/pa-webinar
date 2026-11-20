@@ -212,7 +212,8 @@
       "recordingLinkSend": "Ibgħatli l-link mill-ġdid",
       "recordingLinkSent": "Jekk l-indirizz huwa rreġistrat għall-avveniment, dalwaqt tirċievi email bil-link personali tiegħek.",
       "recordingLinkError": "It-talba ma rnexxietx. Erġa' pprova fi ftit minuti.",
-      "registerOrGuest": "Jekk tirreġistra, tirċievi bl-email il-link personali tiegħek u aġġornamenti dwar l-avveniment. Bħala mistieden tidħol mill-ewwel b'isem biss, biss waqt li l-avveniment ikun live, u ma tirċievix emails."
+      "registerOrGuest": "Jekk tirreġistra, tirċievi bl-email il-link personali tiegħek u aġġornamenti dwar l-avveniment. Bħala mistieden tidħol mill-ewwel b'isem biss, biss waqt li l-avveniment ikun live, u ma tirċievix emails.",
+      "guestWhenLive": "Meta l-avveniment ikun live, tista' tidħol ukoll mingħajr reġistrazzjoni, bl-isem biss."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -3039,7 +3040,6 @@
       "copyPublicUrl": "Copia link pubblico",
       "copyInviteUrl": "Ikkopja l-link tal-istedina",
       "enterAsParticipant": "Idħol bħala parteċipant",
-      "openAsParticipant": "Iftaħ bħala parteċipant",
       "participantHintRoom": "Jinfetaħ f'tab ġdida: il-kamra kif jaraha mistieden, mingħajr setgħat ta' moderazzjoni.",
       "participantHintPassword": "Jinfetaħ f'tab ġdida: il-kamra kif jaraha mistieden, wara l-password tal-avveniment.",
       "participantHintPage": "Jinfetaħ f'tab ġdida: il-paġna pubblika kif jarawha l-parteċipanti.",
@@ -3132,7 +3132,8 @@
         "recordingRetention": "Tħassir awtomatiku tar-rekording",
         "recordingRetentionNone": "Xejn",
         "recordingRetentionDays": "{days, plural, one {# ġurnata} two {# ġranet} few {# ġranet} many {#-il ġurnata} other {# ġurnata}} wara t-tmiem tal-avveniment jew, jekk ippubblikat, wara l-pubblikazzjoni"
-      }
+      },
+      "openPublicPage": "Iftaħ il-paġna pubblika"
     },
     "rubrica": {
       "subtitle": "Persuni li taw il-kunsens biex jiddaħħlu fid-direttorju (art. 6.1.a GDPR). L-isem, l-email u l-organizzazzjoni jiġu aġġornati biss meta l-persuna terġa' timmarka l-kaxxa.",

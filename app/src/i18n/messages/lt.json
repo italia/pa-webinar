@@ -212,7 +212,8 @@
       "recordingLinkSend": "Atsiųskite nuorodą dar kartą",
       "recordingLinkSent": "Jei adresas užregistruotas renginyje, netrukus gausite el. laišką su asmenine nuoroda.",
       "recordingLinkError": "Užklausa nepavyko. Bandykite dar kartą po kelių minučių.",
-      "registerOrGuest": "Užsiregistravę el. paštu gausite asmeninę nuorodą ir naujienas apie renginį. Kaip svečias įeinate iš karto tik su vardu, tik kol renginys vyksta tiesiogiai, ir el. laiškų negaunate."
+      "registerOrGuest": "Užsiregistravę el. paštu gausite asmeninę nuorodą ir naujienas apie renginį. Kaip svečias įeinate iš karto tik su vardu, tik kol renginys vyksta tiesiogiai, ir el. laiškų negaunate.",
+      "guestWhenLive": "Kai renginys vyks tiesiogiai, galėsite prisijungti ir neužsiregistravę, tik su savo vardu."
     },
     "manage": {
       "toggleChat": "Pokalbiai",
@@ -3039,7 +3040,6 @@
       "copyPublicUrl": "Kopijuoti viešą nuorodą",
       "copyInviteUrl": "Kopijuoti kvietimo nuorodą",
       "enterAsParticipant": "Prisijungti kaip dalyvis",
-      "openAsParticipant": "Atidaryti kaip dalyvis",
       "participantHintRoom": "Atsidaro naujame skirtuke: kambarys taip, kaip jį mato svečias, be moderatoriaus teisių.",
       "participantHintPassword": "Atsidaro naujame skirtuke: kambarys taip, kaip jį mato svečias, įvedus renginio slaptažodį.",
       "participantHintPage": "Atsidaro naujame skirtuke: viešas puslapis taip, kaip jį mato dalyviai.",
@@ -3132,7 +3132,8 @@
         "recordingRetention": "Automatinis įrašo ištrynimas",
         "recordingRetentionNone": "Nėra",
         "recordingRetentionDays": "praėjus {days, plural, one {# dienai} few {# dienoms} many {# dienos} other {# dienų}} nuo renginio pabaigos arba, jei paskelbtas, nuo paskelbimo"
-      }
+      },
+      "openPublicPage": "Atidaryti viešą puslapį"
     },
     "rubrica": {
       "subtitle": "Asmenys, davę sutikimą būti įtraukti į adresų knygą (BDAR 6.1.a str.). Vardas, el. paštas ir organizacija atnaujinami tik tada, kai asmuo vėl pažymi langelį.",

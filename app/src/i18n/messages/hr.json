@@ -212,7 +212,8 @@
       "recordingLinkSend": "Pošalji mi poveznicu ponovno",
       "recordingLinkSent": "Ako je adresa prijavljena na događaj, uskoro ćete primiti e-poštu s osobnom poveznicom.",
       "recordingLinkError": "Zahtjev nije uspio. Pokušajte ponovno za nekoliko minuta.",
-      "registerOrGuest": "Ako se prijavite, e-poštom dobivate osobnu poveznicu i novosti o događaju. Kao gost ulazite odmah samo s imenom, samo dok je događaj uživo, i ne dobivate e-poštu."
+      "registerOrGuest": "Ako se prijavite, e-poštom dobivate osobnu poveznicu i novosti o događaju. Kao gost ulazite odmah samo s imenom, samo dok je događaj uživo, i ne dobivate e-poštu.",
+      "guestWhenLive": "Kad događaj bude uživo, moći ćete ući i bez prijave, samo sa svojim imenom."
     },
     "manage": {
       "toggleChat": "Razgovor",
@@ -3039,7 +3040,6 @@
       "copyPublicUrl": "Kopiraj javnu poveznicu",
       "copyInviteUrl": "Kopiraj poveznicu za pozivnicu",
       "enterAsParticipant": "Uđi kao sudionik",
-      "openAsParticipant": "Otvori kao sudionik",
       "participantHintRoom": "Otvara se u novoj kartici: soba kako je vidi gost, bez ovlasti moderatora.",
       "participantHintPassword": "Otvara se u novoj kartici: soba kako je vidi gost, nakon lozinke događaja.",
       "participantHintPage": "Otvara se u novoj kartici: javna stranica kako je vide sudionici.",
@@ -3132,7 +3132,8 @@
         "recordingRetention": "Automatsko brisanje snimke",
         "recordingRetentionNone": "Nema",
         "recordingRetentionDays": "{days, plural, one {# dan} few {# dana} other {# dana}} nakon završetka događaja ili, ako je objavljena, nakon objave"
-      }
+      },
+      "openPublicPage": "Otvori javnu stranicu"
     },
     "rubrica": {
       "subtitle": "Osobe koje su dale privolu za uvrštavanje u imenik (čl. 6.1.a GDPR). Ime, e-pošta i organizacija ažuriraju se samo kada osoba ponovno označi okvir.",

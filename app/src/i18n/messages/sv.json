@@ -212,7 +212,8 @@
       "recordingLinkSend": "Skicka länken igen",
       "recordingLinkSent": "Om adressen är anmäld till evenemanget får du snart ett e-postmeddelande med din personliga länk.",
       "recordingLinkError": "Begäran misslyckades. Försök igen om några minuter.",
-      "registerOrGuest": "Om du anmäler dig får du din personliga länk och nyheter om evenemanget via e-post. Som gäst kommer du in direkt med bara ett namn, bara medan evenemanget sänds live, och får ingen e-post."
+      "registerOrGuest": "Om du anmäler dig får du din personliga länk och nyheter om evenemanget via e-post. Som gäst kommer du in direkt med bara ett namn, bara medan evenemanget sänds live, och får ingen e-post.",
+      "guestWhenLive": "När evenemanget sänds live kan du också delta utan att anmäla dig, bara med ditt namn."
     },
     "manage": {
       "toggleChat": "Chatt",
@@ -3039,7 +3040,6 @@
       "copyPublicUrl": "Kopiera publik länk",
       "copyInviteUrl": "Kopiera inbjudningslänk",
       "enterAsParticipant": "Gå in som deltagare",
-      "openAsParticipant": "Öppna som deltagare",
       "participantHintRoom": "Öppnas i en ny flik: rummet som en gäst ser det, utan moderatorbehörighet.",
       "participantHintPassword": "Öppnas i en ny flik: rummet som en gäst ser det, efter evenemangets lösenord.",
       "participantHintPage": "Öppnas i en ny flik: den offentliga sidan som deltagarna ser den.",
@@ -3132,7 +3132,8 @@
         "recordingRetention": "Automatisk radering av inspelningen",
         "recordingRetentionNone": "Ingen",
         "recordingRetentionDays": "{days, plural, one {# dag} other {# dagar}} efter att evenemanget har avslutats eller, om den publiceras, efter publiceringen"
-      }
+      },
+      "openPublicPage": "Öppna den offentliga sidan"
     },
     "rubrica": {
       "subtitle": "Personer som har samtyckt till att läggas till i adressboken (GDPR art. 6.1.a). Namn, e-postadress och organisation uppdateras bara när personen kryssar i rutan igen.",

@@ -212,7 +212,8 @@
       "recordingLinkSend": "Send me the link again",
       "recordingLinkSent": "If the address is registered for the event, you will shortly receive an email with your personal link.",
       "recordingLinkError": "The request failed. Try again in a few minutes.",
-      "registerOrGuest": "If you register, you receive your personal link and updates on the event by email. As a guest you enter at once with just a name, only while the event is live, and receive no email."
+      "registerOrGuest": "If you register, you receive your personal link and updates on the event by email. As a guest you enter at once with just a name, only while the event is live, and receive no email.",
+      "guestWhenLive": "When the event is live you can also join without registering, with just your name."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -3039,7 +3040,6 @@
       "copyPublicUrl": "Copy public link",
       "copyInviteUrl": "Copy invite link",
       "enterAsParticipant": "Join as participant",
-      "openAsParticipant": "Open as participant",
       "participantHintRoom": "Opens in a new tab: the room as a guest sees it, without moderator powers.",
       "participantHintPassword": "Opens in a new tab: the room as a guest sees it, after the event password.",
       "participantHintPage": "Opens in a new tab: the public page as participants see it.",
@@ -3132,7 +3132,8 @@
         "recordingRetention": "Automatic deletion of the recording",
         "recordingRetentionNone": "None",
         "recordingRetentionDays": "{days, plural, one {# day} other {# days}} after the event ends or, if published, after publication"
-      }
+      },
+      "openPublicPage": "Open the public page"
     },
     "rubrica": {
       "subtitle": "People who have consented to be added to the address book (GDPR art. 6.1.a). Name, email and organization are updated only when the person ticks the box again.",

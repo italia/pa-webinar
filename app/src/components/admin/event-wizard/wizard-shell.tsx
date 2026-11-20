@@ -1777,12 +1777,19 @@ export default function EventWizard(props: WizardProps) {
   const conAnteprima =
     !istantanea &&
     (activeStep === 'base' || activeStep === 'schedule' || activeStep === 'programme');
+  // Il passo «Quando» aperto almeno una volta: la data, anche se resta quella
+  // proposta, l'ha vista e tenuta chi compila (vedi senzaData).
+  const [quandoVisto, setQuandoVisto] = useState(false);
+  useEffect(() => {
+    if (activeStep === 'schedule') setQuandoVisto(true);
+  }, [activeStep]);
   // In creazione la data del modulo e' la proposta del formato finche'
   // nessuno la cambia (nel passo «Quando», da una bozza ripresa o portata da
   // «Cambia formato»): al passo «Evento» l'anteprima non la mostra.
   const senzaData =
     mode === 'create' &&
     activeStep === 'base' &&
+    !quandoVisto &&
     moduloDifferito.startsAt === initial.startsAt &&
     moduloDifferito.endsAt === initial.endsAt &&
     moduloDifferito.timezone === initial.timezone;

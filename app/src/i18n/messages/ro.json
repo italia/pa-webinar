@@ -212,7 +212,8 @@
       "recordingLinkSend": "Retrimite-mi linkul",
       "recordingLinkSent": "Dacă adresa este înscrisă la eveniment, vei primi în curând un e-mail cu linkul personal.",
       "recordingLinkError": "Cererea nu a reușit. Încearcă din nou peste câteva minute.",
-      "registerOrGuest": "Dacă te înscrii, primești pe e-mail linkul personal și noutăți despre eveniment. Ca invitat intri imediat doar cu un nume, doar cât timp evenimentul este live, și nu primești e-mailuri."
+      "registerOrGuest": "Dacă te înscrii, primești pe e-mail linkul personal și noutăți despre eveniment. Ca invitat intri imediat doar cu un nume, doar cât timp evenimentul este live, și nu primești e-mailuri.",
+      "guestWhenLive": "Când evenimentul este în direct, poți intra și fără înscriere, doar cu numele."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -3039,7 +3040,6 @@
       "copyPublicUrl": "Copiați linkul public",
       "copyInviteUrl": "Copiați linkul de invitație",
       "enterAsParticipant": "Intrați ca participant",
-      "openAsParticipant": "Deschideți ca participant",
       "participantHintRoom": "Se deschide într-o filă nouă: sala așa cum o vede un invitat, fără puteri de moderare.",
       "participantHintPassword": "Se deschide într-o filă nouă: sala așa cum o vede un invitat, după parola evenimentului.",
       "participantHintPage": "Se deschide într-o filă nouă: pagina publică așa cum o văd participanții.",
@@ -3132,7 +3132,8 @@
         "recordingRetention": "Ștergerea automată a înregistrării",
         "recordingRetentionNone": "Niciuna",
         "recordingRetentionDays": "la {days, plural, one {# zi} few {# zile} other {# de zile}} după încheierea evenimentului sau, dacă este publicată, după publicare"
-      }
+      },
+      "openPublicPage": "Deschide pagina publică"
     },
     "rubrica": {
       "subtitle": "Persoane care și-au dat consimțământul pentru includerea în agendă (art. 6.1.a RGPD). Numele, e-mailul și organizația se actualizează doar când persoana bifează din nou caseta.",

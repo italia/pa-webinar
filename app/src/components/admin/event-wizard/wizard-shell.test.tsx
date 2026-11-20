@@ -2058,17 +2058,14 @@ describe('obbligatori — l\'errore al tentativo', () => {
       renderWizard();
       const calendario = () =>
         container.querySelector('.anteprima-pagina__ridotta use[href$="#it-calendar"]');
-      goToStep(w.flow.steps.schedule);
-      // La data proposta dal formato: nel passo «Quando» si vede.
-      expect(byId<HTMLInputElement>('ev-starts').value).not.toBe('');
-      expect(calendario()).not.toBeNull();
-      goToStep('base');
+      // Al primo passo la data proposta dal formato non si vede.
       expect(container.querySelector('.anteprima-pagina__ridotta')).not.toBeNull();
       expect(calendario()).toBeNull();
-      // Scelta a mano, si vede anche tornando al passo «Evento».
+      // Nel passo «Quando» si', e chi l'ha vista (anche tenendola com'era) la
+      // ritrova tornando al passo «Evento».
       goToStep(w.flow.steps.schedule);
-      type(byId<HTMLInputElement>('ev-starts'), '2030-03-10T10:00');
-      type(byId<HTMLInputElement>('ev-ends'), '2030-03-10T11:00');
+      expect(byId<HTMLInputElement>('ev-starts').value).not.toBe('');
+      expect(calendario()).not.toBeNull();
       goToStep('base');
       expect(calendario()).not.toBeNull();
     } finally {

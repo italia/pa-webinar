@@ -212,7 +212,8 @@
       "recordingLinkSend": "Küldjétek újra a linket",
       "recordingLinkSent": "Ha a cím regisztrálva van az eseményre, hamarosan kapsz egy e-mailt a személyes linkkel.",
       "recordingLinkError": "A kérés nem sikerült. Próbáld újra néhány perc múlva.",
-      "registerOrGuest": "Ha regisztrál, e-mailben megkapja a személyes hivatkozását és az esemény híreit. Vendégként azonnal belép csak egy névvel, csak amíg az esemény élőben zajlik, és nem kap e-mailt."
+      "registerOrGuest": "Ha regisztrál, e-mailben megkapja a személyes hivatkozását és az esemény híreit. Vendégként azonnal belép csak egy névvel, csak amíg az esemény élőben zajlik, és nem kap e-mailt.",
+      "guestWhenLive": "Amikor az esemény élőben zajlik, regisztráció nélkül, csak a nevével is beléphet."
     },
     "manage": {
       "toggleChat": "Csevegés",
@@ -3039,7 +3040,6 @@
       "copyPublicUrl": "Nyilvános hivatkozás másolása",
       "copyInviteUrl": "Meghívó hivatkozás másolása",
       "enterAsParticipant": "Belépés résztvevőként",
-      "openAsParticipant": "Megnyitás résztvevőként",
       "participantHintRoom": "Új lapon nyílik meg: a terem úgy, ahogy egy vendég látja, moderátori jogok nélkül.",
       "participantHintPassword": "Új lapon nyílik meg: a terem úgy, ahogy egy vendég látja, az esemény jelszavának megadása után.",
       "participantHintPage": "Új lapon nyílik meg: a nyilvános oldal úgy, ahogy a résztvevők látják.",
@@ -3132,7 +3132,8 @@
         "recordingRetention": "A felvétel automatikus törlése",
         "recordingRetentionNone": "Nincs",
         "recordingRetentionDays": "az esemény vége után {days, plural, one {# nappal} other {# nappal}}, vagy ha közzétették, a közzététel után"
-      }
+      },
+      "openPublicPage": "Nyilvános oldal megnyitása"
     },
     "rubrica": {
       "subtitle": "A címjegyzékbe való felvételhez hozzájárulást adó személyek (GDPR 6. cikk (1) bekezdés a) pont). A név, az e-mail cím és a szervezet csak akkor frissül, ha a személy ismét bejelöli a jelölőnégyzetet.",

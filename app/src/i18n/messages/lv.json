@@ -212,7 +212,8 @@
       "recordingLinkSend": "Nosūtīt saiti vēlreiz",
       "recordingLinkSent": "Ja adrese ir reģistrēta pasākumam, drīz saņemsiet e-pastu ar personīgo saiti.",
       "recordingLinkError": "Pieprasījums neizdevās. Mēģiniet vēlreiz pēc dažām minūtēm.",
-      "registerOrGuest": "Reģistrējoties pa e-pastu saņemat savu personīgo saiti un jaunumus par pasākumu. Kā viesis ienākat uzreiz tikai ar vārdu, tikai kamēr pasākums notiek tiešraidē, un e-pastus nesaņemat."
+      "registerOrGuest": "Reģistrējoties pa e-pastu saņemat savu personīgo saiti un jaunumus par pasākumu. Kā viesis ienākat uzreiz tikai ar vārdu, tikai kamēr pasākums notiek tiešraidē, un e-pastus nesaņemat.",
+      "guestWhenLive": "Kad pasākums notiks tiešraidē, varēsiet pievienoties arī bez reģistrācijas, tikai ar savu vārdu."
     },
     "manage": {
       "toggleChat": "Tērzēšana",
@@ -3039,7 +3040,6 @@
       "copyPublicUrl": "Kopēt publisko saiti",
       "copyInviteUrl": "Kopēt ielūguma saiti",
       "enterAsParticipant": "Pievienoties kā dalībnieks",
-      "openAsParticipant": "Atvērt kā dalībnieks",
       "participantHintRoom": "Atveras jaunā cilnē: telpa tāda, kādu to redz viesis, bez moderatora tiesībām.",
       "participantHintPassword": "Atveras jaunā cilnē: telpa tāda, kādu to redz viesis, pēc pasākuma paroles.",
       "participantHintPage": "Atveras jaunā cilnē: publiskā lapa tāda, kādu to redz dalībnieki.",
@@ -3132,7 +3132,8 @@
         "recordingRetention": "Ieraksta automātiska dzēšana",
         "recordingRetentionNone": "Nav",
         "recordingRetentionDays": "{days, plural, zero {# dienas} one {# dienu} other {# dienas}} pēc pasākuma beigām vai, ja publicēts, pēc publicēšanas"
-      }
+      },
+      "openPublicPage": "Atvērt publisko lapu"
     },
     "rubrica": {
       "subtitle": "Personas, kas devušas piekrišanu iekļaušanai kontaktu grāmatā (VDAR 6.1.a pants). Vārds, e-pasts un organizācija tiek atjaunināti tikai tad, kad persona atkārtoti atzīmē izvēles rūtiņu.",

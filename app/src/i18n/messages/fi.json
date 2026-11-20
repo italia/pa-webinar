@@ -212,7 +212,8 @@
       "recordingLinkSend": "Lähetä linkki uudelleen",
       "recordingLinkSent": "Jos osoite on ilmoittautunut tapahtumaan, saat pian sähköpostin henkilökohtaisella linkillä.",
       "recordingLinkError": "Pyyntö epäonnistui. Yritä uudelleen muutaman minuutin kuluttua.",
-      "registerOrGuest": "Ilmoittautumalla saat sähköpostiin henkilökohtaisen linkin ja tietoa tapahtumasta. Vieraana pääset heti sisään pelkällä nimellä, vain tapahtuman ollessa käynnissä, etkä saa sähköposteja."
+      "registerOrGuest": "Ilmoittautumalla saat sähköpostiin henkilökohtaisen linkin ja tietoa tapahtumasta. Vieraana pääset heti sisään pelkällä nimellä, vain tapahtuman ollessa käynnissä, etkä saa sähköposteja.",
+      "guestWhenLive": "Kun tapahtuma on käynnissä, voit osallistua myös ilmoittautumatta, pelkällä nimelläsi."
     },
     "manage": {
       "toggleChat": "Keskustelu",
@@ -3039,7 +3040,6 @@
       "copyPublicUrl": "Kopioi julkinen linkki",
       "copyInviteUrl": "Kopioi kutsulinkki",
       "enterAsParticipant": "Liity osallistujana",
-      "openAsParticipant": "Avaa osallistujana",
       "participantHintRoom": "Avautuu uuteen välilehteen: huone sellaisena kuin vieras sen näkee, ilman moderaattorin oikeuksia.",
       "participantHintPassword": "Avautuu uuteen välilehteen: huone sellaisena kuin vieras sen näkee, tapahtuman salasanan jälkeen.",
       "participantHintPage": "Avautuu uuteen välilehteen: julkinen sivu sellaisena kuin osallistujat sen näkevät.",
@@ -3132,7 +3132,8 @@
         "recordingRetention": "Tallenteen automaattinen poisto",
         "recordingRetentionNone": "Ei ole",
         "recordingRetentionDays": "{days, plural, one {# päivä} other {# päivää}} tapahtuman päättymisen jälkeen tai, jos se on julkaistu, julkaisemisen jälkeen"
-      }
+      },
+      "openPublicPage": "Avaa julkinen sivu"
     },
     "rubrica": {
       "subtitle": "Henkilöt, jotka ovat antaneet suostumuksen osoitekirjaan lisäämiseen (GDPR art. 6.1.a). Nimi, sähköposti ja organisaatio päivittyvät vain, kun henkilö valitsee ruudun uudelleen.",

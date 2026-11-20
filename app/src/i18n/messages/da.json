@@ -212,7 +212,8 @@
       "recordingLinkSend": "Send mig linket igen",
       "recordingLinkSent": "Hvis adressen er tilmeldt begivenheden, modtager du snart en e-mail med dit personlige link.",
       "recordingLinkError": "Anmodningen mislykkedes. Prøv igen om et par minutter.",
-      "registerOrGuest": "Hvis du tilmelder dig, får du dit personlige link og nyt om arrangementet på e-mail. Som gæst kommer du ind med det samme med kun et navn, kun mens arrangementet er live, og du får ingen e-mails."
+      "registerOrGuest": "Hvis du tilmelder dig, får du dit personlige link og nyt om arrangementet på e-mail. Som gæst kommer du ind med det samme med kun et navn, kun mens arrangementet er live, og du får ingen e-mails.",
+      "guestWhenLive": "Når arrangementet er live, kan du også deltage uden tilmelding, kun med dit navn."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -3039,7 +3040,6 @@
       "copyPublicUrl": "Kopiér offentligt link",
       "copyInviteUrl": "Kopiér invitationslink",
       "enterAsParticipant": "Gå ind som deltager",
-      "openAsParticipant": "Åbn som deltager",
       "participantHintRoom": "Åbner i en ny fane: rummet, som en gæst ser det, uden moderatorrettigheder.",
       "participantHintPassword": "Åbner i en ny fane: rummet, som en gæst ser det, efter begivenhedens adgangskode.",
       "participantHintPage": "Åbner i en ny fane: den offentlige side, som deltagerne ser den.",
@@ -3132,7 +3132,8 @@
         "recordingRetention": "Automatisk sletning af optagelsen",
         "recordingRetentionNone": "Ingen",
         "recordingRetentionDays": "{days, plural, one {# dag} other {# dage}} efter arrangementets afslutning eller, hvis den er offentliggjort, efter offentliggørelsen"
-      }
+      },
+      "openPublicPage": "Åbn den offentlige side"
     },
     "rubrica": {
       "subtitle": "Personer, der har givet samtykke til at blive optaget i adressebogen (GDPR art. 6.1.a). Navn, e-mailadresse og organisation opdateres kun, når personen sætter kryds i feltet igen.",

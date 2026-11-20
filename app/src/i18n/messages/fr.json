@@ -212,7 +212,8 @@
       "recordingLinkSend": "Renvoyez-moi le lien",
       "recordingLinkSent": "Si l'adresse est inscrite à l'événement, vous recevrez sous peu un e-mail avec votre lien personnel.",
       "recordingLinkError": "La demande a échoué. Réessayez dans quelques minutes.",
-      "registerOrGuest": "En vous inscrivant, vous recevez par e-mail votre lien personnel et les nouvelles de l'événement. En tant qu'invité, vous entrez tout de suite avec un simple nom, uniquement pendant le direct, et ne recevez aucun e-mail."
+      "registerOrGuest": "En vous inscrivant, vous recevez par e-mail votre lien personnel et les nouvelles de l'événement. En tant qu'invité, vous entrez tout de suite avec un simple nom, uniquement pendant le direct, et ne recevez aucun e-mail.",
+      "guestWhenLive": "Quand l'événement sera en direct, vous pourrez aussi entrer sans vous inscrire, avec votre seul nom."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -3039,7 +3040,6 @@
       "copyPublicUrl": "Copier le lien public",
       "copyInviteUrl": "Copier le lien d'invitation",
       "enterAsParticipant": "Rejoindre en tant que participant",
-      "openAsParticipant": "Ouvrir en tant que participant",
       "participantHintRoom": "S'ouvre dans un nouvel onglet : la salle telle qu'un invité la voit, sans pouvoirs de modération.",
       "participantHintPassword": "S'ouvre dans un nouvel onglet : la salle telle qu'un invité la voit, après le mot de passe de l'événement.",
       "participantHintPage": "S'ouvre dans un nouvel onglet : la page publique telle que la voient les participants.",
@@ -3132,7 +3132,8 @@
         "recordingRetention": "Suppression automatique de l'enregistrement",
         "recordingRetentionNone": "Aucune",
         "recordingRetentionDays": "{days, plural, one {# jour} many {# jours} other {# jours}} après la fin de l'événement ou, s'il est publié, après la publication"
-      }
+      },
+      "openPublicPage": "Ouvrir la page publique"
     },
     "rubrica": {
       "subtitle": "Personnes ayant consenti à être inscrites au carnet d'adresses (art. 6.1.a RGPD). Le nom, l'e-mail et l'organisation ne sont mis à jour que lorsque la personne coche à nouveau la case.",

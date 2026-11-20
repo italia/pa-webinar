@@ -165,6 +165,8 @@ interface EventDetailClientProps {
   registrationOpen: boolean;
   /** In diretta si entra anche senza iscrizione (lib/events/guest-window). */
   guestEntryOpen?: boolean;
+  /** Da ospite si entra con la password dell'evento, non col solo nome. */
+  guestNeedsPassword?: boolean;
   /** L'evento ha un questionario post-evento: solo allora compare l'invito. */
   hasPostEventQuestionnaire?: boolean;
   /** La prova di chi ha partecipato, se il server l'ha riconosciuta (link
@@ -214,6 +216,7 @@ export default function EventDetailClient({
   registrationAccess = 'open',
   registrationOpen,
   guestEntryOpen = true,
+  guestNeedsPassword = false,
   hasPostEventQuestionnaire = false,
   feedbackProof = null,
   report = null,
@@ -918,6 +921,18 @@ export default function EventDetailClient({
                         {isLive ? t('detail.registerAndJoin') : t('detail.register')}
                       </Button>
                     </Link>
+                  )}
+
+                  {/* Prima della diretta c'e' una porta sola, l'iscrizione: si
+                      dice che in diretta si entrera' anche senza, cosi' la
+                      scelta non arriva come una sorpresa. */}
+                  {!(hasRoomAccess && !invalidToken) &&
+                    !isLive &&
+                    guestEntryOpen &&
+                    !guestNeedsPassword && (
+                    <p className="text-muted mt-2 mb-0" style={{ fontSize: '0.82rem', lineHeight: 1.45 }}>
+                      {t('detail.guestWhenLive')}
+                    </p>
                   )}
 
                   {/* Iscrizione pubblica spenta: si dice prima del clic chi può
