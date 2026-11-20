@@ -278,9 +278,10 @@ export default function Step1Base({
     const conBarra =
       (!sopraPulito.trim() && titolo.includes('|')) ||
       (!sopratitoloAcceso && altre.some((tt) => tt.includes('|')));
-    const voluto = conSopra ? true : conBarra ? false : null;
-    // Uguale al sito: segue il sito (se il sito cambia idea, l'evento con lui).
-    const scelta = voluto === null || voluto === siteDefaultParseTitleKicker ? null : voluto;
+    // Un sopratitolo scritto, o un «|» che deve restare testo, e' una scelta
+    // dell'evento: resta anche se il sito cambia la sua. Senza ne' l'uno ne'
+    // l'altro, l'evento segue il sito.
+    const scelta = conSopra ? true : conBarra ? false : null;
     // La scelta vale per tutte le lingue: se l'evento divide i titoli (perche'
     // un'altra lingua ha il sopratitolo), un «|» in questo titolo lo divide
     // anche la pagina. I campi lo mostrano come lo mostrera' lei.

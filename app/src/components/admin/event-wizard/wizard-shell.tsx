@@ -2644,6 +2644,8 @@ export default function EventWizard(props: WizardProps) {
         <button
           type="button"
           onClick={() => vai('advanced')}
+          // Il punto del wizard in cui ci si trova, anche fuori dai passi.
+          aria-current={activeStep === 'advanced' ? 'step' : undefined}
           className={`btn btn-sm ${activeStep === 'advanced' ? 'btn-primary' : 'btn-outline-primary'} d-inline-flex align-items-center gap-2 wizard-testata__aggiuntive`}
         >
           <IconaImpostazioni />

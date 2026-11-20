@@ -1771,7 +1771,7 @@ describe('creazione — i default del modello', () => {
     expect(payloadInviato().parseTitleKicker ?? null).toBeNull();
   });
 
-  it('con il sopratitolo gia\' acceso dal sito, riempirlo non fissa niente per l\'evento', async () => {
+  it('il sopratitolo scritto e una scelta dell evento, anche col sito che lo usa gia', async () => {
     renderWizard({ template: modello, siteDefaultParseTitleKicker: true });
     type(byId<HTMLInputElement>('ev-kicker'), 'Ciclo');
     type(byId<HTMLInputElement>('ev-title'), 'Il primo incontro');
@@ -1779,8 +1779,9 @@ describe('creazione — i default del modello', () => {
     organizzatore();
     goToStep('review');
     await press(button(w.saveDraft));
-    // Resta «come il sito»: se il sito cambia idea, l'evento la segue.
-    expect(payloadInviato().parseTitleKicker ?? null).toBeNull();
+    // Se il sito smette di usarlo, il titolo di questo evento non diventa
+    // «Ciclo | Il primo incontro» su una riga.
+    expect(payloadInviato()).toMatchObject({ parseTitleKicker: true });
   });
 
   it('chi si iscrive: segue il sito finche non si sceglie, e solo su invito lo dice ovunque', async () => {
@@ -2265,7 +2266,7 @@ describe('programma', () => {
     ]);
     expect(passoAttivo()).toContain(w.flow.steps.invites);
     goToStep('base');
-    expect(container.querySelector('.wizard-programma-scheda')).toBeNull();
+    expect(container.textContent).not.toContain(tp.descriptionHasProgramme);
   });
 
   it('«Avanti» va da «Persone» al programma, poi ai permessi e al riepilogo; in «Persone» lo si dice', () => {
@@ -2585,7 +2586,7 @@ describe('programma', () => {
       byId<HTMLTextAreaElement>('ev-description-it'),
       'Una mattina di lavoro.\n\n## Programma\n\n- 10:00 Apertura\n- 10:30 Interventi',
     );
-    const scheda = container.querySelector<HTMLElement>('.wizard-programma-scheda')!;
+    const scheda = Array.from(container.querySelectorAll<HTMLElement>('p[role="note"]')).find((p) => p.textContent?.includes(tp.descriptionHasProgramme))!;
     expect(scheda.textContent).toContain(tp.descriptionHasProgramme);
     click(button(tp.goToProgramme, scheda));
     expect(passoAttivo()).toContain(w.flow.steps.programme);

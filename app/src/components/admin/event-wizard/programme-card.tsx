@@ -27,20 +27,14 @@ export default function ProgrammeCard({ descrizione, onVai }: Props) {
   const tp = useTranslations('admin.wizard.programme');
   if (!descrizioneConProgramma(descrizione)) return null;
   return (
-    <div className="wizard-programma-scheda mb-4">
-      <p className="wizard-iscrizione__avviso mb-0" role="note">
-        <Icon icon="it-warning-circle" size="sm" />
-        <span>
-          {tp('descriptionHasProgramme')}{' '}
-          <button
-            type="button"
-            className="btn btn-link p-0 align-baseline"
-            onClick={onVai}
-          >
-            {tp('goToProgramme')}
-          </button>
-        </span>
-      </p>
-    </div>
+    <p className="wizard-iscrizione__avviso mb-4" role="note">
+      <Icon icon="it-warning-circle" size="sm" />
+      <span>
+        {tp('descriptionHasProgramme')}{' '}
+        <button type="button" className="btn btn-link p-0 align-baseline" onClick={onVai}>
+          {tp('goToProgramme')}
+        </button>
+      </span>
+    </p>
   );
 }
