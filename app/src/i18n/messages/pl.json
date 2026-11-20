@@ -1509,7 +1509,6 @@
       "settings": "Ustawienia",
       "eventsList": "Wszystkie wydarzenia",
       "newEvent": "Nowe wydarzenie",
-      "calendar": "Kalendarz wydarzeń",
       "templates": "Szablony wydarzeń",
       "analytics": "Statystyki",
       "instantCalls": "Szybkie połączenia",
@@ -1550,7 +1549,8 @@
       "openMenu": "Otwórz menu",
       "closeMenu": "Zamknij menu",
       "recordingRemovals": "Wnioski o usunięcie",
-      "recordingRemovalDetail": "Wniosek o usunięcie"
+      "recordingRemovalDetail": "Wniosek o usunięcie",
+      "newInstantCall": "Nowe szybkie połączenie"
     },
     "publications": {
       "subtitle": "Jednolity hub redakcyjny dla wszystkich opublikowanych nagrań: zaplanowane wydarzenia, szybkie połączenia, przesłane archiwa historyczne i sesje oczekujące na promocję.",
@@ -2991,7 +2991,15 @@
       "postEventSummary": "{connected} dołączonych · {registered} rejestracji",
       "registeredCount": "{count, plural, =0 {Brak rejestracji} one {1 rejestracja} few {# rejestracje} many {# rejestracji} other {# rejestracji}}",
       "sortUpcoming": "Najbliższe najpierw",
-      "todayTitle": "Dziś i w toku"
+      "todayTitle": "Dziś i w toku",
+      "viewLabel": "Widok",
+      "viewList": "Lista",
+      "viewCalendar": "Kalendarz",
+      "type": "Typ",
+      "typeAll": "Wszystkie typy",
+      "typeScheduled": "Wydarzenia",
+      "typeInstant": "Szybkie połączenia",
+      "instantFullList": "Pełna lista szybkich połączeń, z filtrami według daty i nagrania"
     },
     "tags": {
       "subtitle": "Twórz, edytuj i usuwaj tagi używane do klasyfikacji i filtrowania wydarzeń publicznych.",

@@ -1509,7 +1509,6 @@
       "settings": "Nustatymai",
       "eventsList": "Visi renginiai",
       "newEvent": "Naujas renginys",
-      "calendar": "Renginių kalendorius",
       "templates": "Renginių šablonai",
       "analytics": "Statistika",
       "instantCalls": "Greiti skambučiai",
@@ -1550,7 +1549,8 @@
       "openMenu": "Atidaryti meniu",
       "closeMenu": "Uždaryti meniu",
       "recordingRemovals": "Pašalinimo prašymai",
-      "recordingRemovalDetail": "Pašalinimo prašymas"
+      "recordingRemovalDetail": "Pašalinimo prašymas",
+      "newInstantCall": "Naujas greitasis skambutis"
     },
     "publications": {
       "subtitle": "Bendras redakcinis centras visiems paskelbtiems vaizdo įrašams: planuoti renginiai, greitieji skambučiai, įkelti istoriniai archyvai ir sesijos, laukiančios paskelbimo.",
@@ -2991,7 +2991,15 @@
       "postEventSummary": "{connected} prisijungę · {registered} registracijų",
       "registeredCount": "{count, plural, =0 {Registracijų nėra} one {1 registracija} other {# registracijų}}",
       "sortUpcoming": "Artimiausi pirmiau",
-      "todayTitle": "Šiandien ir vykstantys"
+      "todayTitle": "Šiandien ir vykstantys",
+      "viewLabel": "Rodinys",
+      "viewList": "Sąrašas",
+      "viewCalendar": "Kalendorius",
+      "type": "Tipas",
+      "typeAll": "Visi tipai",
+      "typeScheduled": "Renginiai",
+      "typeInstant": "Greiti skambučiai",
+      "instantFullList": "Visas greitųjų skambučių sąrašas su filtrais pagal datą ir įrašą"
     },
     "tags": {
       "subtitle": "Kurkite, redaguokite ir pašalinkite žymas, naudojamas viešųjų renginių klasifikavimui ir filtravimui.",

@@ -133,6 +133,14 @@ function CenterHeader({
   const t = useTranslations('nav');
   const tr = useTranslations();
   const settings = useSettings();
+  // Nell'area di amministrazione l'header resta lo stesso in ogni sezione e
+  // non ripete cio' che il menu ha gia' (il calendario sta in «Tutti gli
+  // eventi», la videoteca in «Video»): niente collegamenti qui.
+  // Le porte d'ingresso (accesso, link per email) non hanno il menu: li'
+  // i collegamenti pubblici restano.
+  const pagina = usePathname();
+  const nellAdmin =
+    pagina.startsWith('/admin') && pagina !== '/admin/login' && pagina !== '/admin/access';
 
   return (
     <Header type="center" theme="dark" small>
@@ -184,9 +192,11 @@ function CenterHeader({
           </HeaderBrand>
         )}
         <HeaderRightZone>
-          {/* Videoteca e, se pubblico, calendario: su ogni pagina, non solo
-              nel piè di pagina dove nessuno li cercava. In un <nav>, perche'
-              chi usa un lettore di schermo li trovi tra i punti di riferimento. */}
+          {/* Videoteca e, se pubblico, calendario: su ogni pagina pubblica,
+              non solo nel piè di pagina dove nessuno li cercava. In un <nav>,
+              perche' chi usa un lettore di schermo li trovi tra i punti di
+              riferimento. */}
+          {!nellAdmin && (
           <nav aria-label={t('mainLabel')} className="d-flex align-items-center">
             {LINK_INTESTAZIONE.filter((l) => linkVisibile(l, settings)).map((l) => (
               <Link
@@ -203,6 +213,7 @@ function CenterHeader({
               </Link>
             ))}
           </nav>
+          )}
         </HeaderRightZone>
       </HeaderContent>
     </Header>

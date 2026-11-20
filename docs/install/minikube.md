@@ -700,7 +700,7 @@ Compose stack.
   **Event links**: the **Public event page**, the
   **Direct invite (no registration)** and the **Management link (moderator)**. The
   default templates carry Italian names and descriptions in every language.
-- **An instant call.** **Instant calls** > **New call** creates a call that is
+- **An instant call.** **Events** > **New quick call** creates a call that is
   live at once, with no public page. **Create and join** opens its page:
   **Join as moderator**, type your name and press **Enter now**.
   **Copy invite link** gives the link for guests.

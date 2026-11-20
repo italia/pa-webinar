@@ -1509,7 +1509,6 @@
       "settings": "Nastavenia",
       "eventsList": "Všetky udalosti",
       "newEvent": "Nová udalosť",
-      "calendar": "Kalendár udalostí",
       "templates": "Šablóny udalostí",
       "analytics": "Štatistiky",
       "instantCalls": "Rýchle hovory",
@@ -1550,7 +1549,8 @@
       "openMenu": "Otvoriť ponuku",
       "closeMenu": "Zavrieť ponuku",
       "recordingRemovals": "Žiadosti o odstránenie",
-      "recordingRemovalDetail": "Žiadosť o odstránenie"
+      "recordingRemovalDetail": "Žiadosť o odstránenie",
+      "newInstantCall": "Nový rýchly hovor"
     },
     "publications": {
       "subtitle": "Jednotný redakčný hub pre všetky zverejnené videá: naplánované podujatia, rýchle hovory, nahrané historické archívy a relácie čakajúce na zverejnenie.",
@@ -2991,7 +2991,15 @@
       "postEventSummary": "{connected} pripojených · {registered} registrácií",
       "registeredCount": "{count, plural, =0 {Žiadne registrácie} one {1 registrácia} other {# registrácií}}",
       "sortUpcoming": "Najbližšie najprv",
-      "todayTitle": "Dnes a práve prebieha"
+      "todayTitle": "Dnes a práve prebieha",
+      "viewLabel": "Zobrazenie",
+      "viewList": "Zoznam",
+      "viewCalendar": "Kalendár",
+      "type": "Typ",
+      "typeAll": "Všetky typy",
+      "typeScheduled": "Udalosti",
+      "typeInstant": "Rýchle hovory",
+      "instantFullList": "Úplný zoznam rýchlych hovorov s filtrami podľa dátumu a záznamu"
     },
     "tags": {
       "subtitle": "Vytvárajte, upravujte a odstraňujte tagy používané na klasifikáciu a filtrovanie verejných podujatí.",

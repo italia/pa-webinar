@@ -1509,7 +1509,6 @@
       "settings": "Inställningar",
       "eventsList": "Alla evenemang",
       "newEvent": "Nytt evenemang",
-      "calendar": "Evenemangskalender",
       "templates": "Evenemangsmallar",
       "analytics": "Statistik",
       "instantCalls": "Snabbsamtal",
@@ -1550,7 +1549,8 @@
       "openMenu": "Öppna menyn",
       "closeMenu": "Stäng menyn",
       "recordingRemovals": "Begäranden om borttagning",
-      "recordingRemovalDetail": "Begäran om borttagning"
+      "recordingRemovalDetail": "Begäran om borttagning",
+      "newInstantCall": "Nytt snabbsamtal"
     },
     "publications": {
       "subtitle": "Enhetlig redaktionell hubb för alla publicerade videor: schemalagda evenemang, snabbsamtal, uppladdade arkiv och sessioner som väntar på att marknadsföras.",
@@ -2991,7 +2991,15 @@
       "postEventSummary": "{connected} anslöt · {registered} anmälda",
       "registeredCount": "{count, plural, =0 {Inga anmälningar} one {1 anmälan} other {# anmälningar}}",
       "sortUpcoming": "Kommande först",
-      "todayTitle": "I dag och pågående"
+      "todayTitle": "I dag och pågående",
+      "viewLabel": "Vy",
+      "viewList": "Lista",
+      "viewCalendar": "Kalender",
+      "type": "Typ",
+      "typeAll": "Alla typer",
+      "typeScheduled": "Evenemang",
+      "typeInstant": "Snabbsamtal",
+      "instantFullList": "Fullständig lista över snabbsamtal, med filter för datum och inspelning"
     },
     "tags": {
       "subtitle": "Skapa, redigera och radera taggar som används för att klassificera och filtrera publika evenemang.",

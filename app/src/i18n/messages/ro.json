@@ -1509,7 +1509,6 @@
       "settings": "Setări",
       "eventsList": "Toate evenimentele",
       "newEvent": "Eveniment nou",
-      "calendar": "Calendarul evenimentelor",
       "templates": "Șabloane de evenimente",
       "analytics": "Statistici",
       "instantCalls": "Apeluri rapide",
@@ -1550,7 +1549,8 @@
       "openMenu": "Deschide meniul",
       "closeMenu": "Închide meniul",
       "recordingRemovals": "Cereri de eliminare",
-      "recordingRemovalDetail": "Cerere de eliminare"
+      "recordingRemovalDetail": "Cerere de eliminare",
+      "newInstantCall": "Apel rapid nou"
     },
     "publications": {
       "subtitle": "Hub editorial unic pentru toate clipurile video publicate: evenimente programate, apeluri instant, arhive istorice încărcate și sesiuni în așteptare de promovare.",
@@ -2991,7 +2991,15 @@
       "postEventSummary": "{connected} conectați · {registered} înscrieri",
       "registeredCount": "{count, plural, =0 {Nicio înscriere} one {1 înscriere} other {# înscrieri}}",
       "sortUpcoming": "Cele viitoare întâi",
-      "todayTitle": "Azi și în desfășurare"
+      "todayTitle": "Azi și în desfășurare",
+      "viewLabel": "Vizualizare",
+      "viewList": "Listă",
+      "viewCalendar": "Calendar",
+      "type": "Tip",
+      "typeAll": "Toate tipurile",
+      "typeScheduled": "Evenimente",
+      "typeInstant": "Apeluri rapide",
+      "instantFullList": "Lista completă a apelurilor rapide, cu filtre după dată și înregistrare"
     },
     "tags": {
       "subtitle": "Creați, modificați și ștergeți etichetele folosite pentru clasificarea și filtrarea evenimentelor publice.",

@@ -18,9 +18,17 @@ export type StaffRole = 'admin' | 'organizer';
 
 export interface NavItem {
   href: PercorsoStatico;
+  /** I parametri dell'indirizzo (una creazione che apre un modulo preciso). */
+  query?: Record<string, string>;
   labelKey: string;
   /** Attiva solo sul proprio indirizzo, non sulle pagine sotto. */
   exact?: boolean;
+  /** Un'azione (crea qualcosa), non una pagina da consultare: il menu la
+   *  mostra come call to action in fondo, distinta dai collegamenti. */
+  azione?: boolean;
+  /** Fuori dal menu: la pagina c'e' (briciole, titolo) ma ci si arriva da
+   *  un'altra, non dalla navigazione. */
+  menu?: false;
 }
 
 export interface NavSection {
@@ -41,7 +49,6 @@ export const VOCI_ORGANIZZATORE: ReadonlySet<PercorsoStatico> = new Set<Percorso
   '/admin/events',
   '/admin/events/new',
   '/admin/events/calls',
-  '/admin/calendar',
   '/admin/recordings',
   '/admin/postprod',
   // Il glossario comune della post-produzione: chi organizza lo arricchisce.
@@ -54,14 +61,22 @@ export const SEZIONI: readonly NavSection[] = [
     href: '/admin/events',
    
     labelKey: 'events',
-    radici: ['/admin/events', '/admin/calendar'],
+    radici: ['/admin/events'],
+    // Un punto d'accesso solo per gli appuntamenti: il calendario e' una vista
+    // di «Tutti gli eventi», le chiamate rapide un suo filtro (che porta anche
+    // al loro elenco completo).
     voci: [
       { href: '/admin/events', labelKey: 'eventsList', exact: true },
-      { href: '/admin/events/new', labelKey: 'newEvent' },
-      { href: '/admin/events/calls', labelKey: 'instantCalls' },
-      { href: '/admin/calendar', labelKey: 'calendar' },
+      { href: '/admin/events/calls', labelKey: 'instantCalls', menu: false },
       { href: '/admin/events/template', labelKey: 'templates' },
       { href: '/admin/events/statistics', labelKey: 'analytics' },
+      { href: '/admin/events/new', labelKey: 'newEvent', azione: true },
+      {
+        href: '/admin/events/new',
+        query: { instant: '1' },
+        labelKey: 'newInstantCall',
+        azione: true,
+      },
     ],
   },
   {
@@ -101,7 +116,7 @@ export const SEZIONI: readonly NavSection[] = [
       { href: '/admin/postprod', labelKey: 'recordingsPostprod' },
       { href: '/admin/glossary', labelKey: 'glossary' },
       { href: '/admin/publications', labelKey: 'publicationsList', exact: true },
-      { href: '/admin/publications/new', labelKey: 'publicationsNew' },
+      { href: '/admin/publications/new', labelKey: 'publicationsNew', azione: true },
     ],
   },
   {

@@ -1509,7 +1509,6 @@
       "settings": "Nastavitve",
       "eventsList": "Vsi dogodki",
       "newEvent": "Nov dogodek",
-      "calendar": "Koledar dogodkov",
       "templates": "Predloge dogodkov",
       "analytics": "Statistika",
       "instantCalls": "Hitri klici",
@@ -1550,7 +1549,8 @@
       "openMenu": "Odpri meni",
       "closeMenu": "Zapri meni",
       "recordingRemovals": "Zahteve za odstranitev",
-      "recordingRemovalDetail": "Zahteva za odstranitev"
+      "recordingRemovalDetail": "Zahteva za odstranitev",
+      "newInstantCall": "Nov hitri klic"
     },
     "publications": {
       "subtitle": "Enotno uredniško središče za vse objavljene videe: načrtovani dogodki, hitri klici, naloženi zgodovinski arhivi in seje, ki čakajo na promocijo.",
@@ -2991,7 +2991,15 @@
       "postEventSummary": "{connected} povezanih · {registered} prijav",
       "registeredCount": "{count, plural, =0 {Brez prijav} one {1 prijava} two {# prijavi} few {# prijave} other {# prijav}}",
       "sortUpcoming": "Najprej prihajajoči",
-      "todayTitle": "Danes in v teku"
+      "todayTitle": "Danes in v teku",
+      "viewLabel": "Pogled",
+      "viewList": "Seznam",
+      "viewCalendar": "Koledar",
+      "type": "Vrsta",
+      "typeAll": "Vse vrste",
+      "typeScheduled": "Dogodki",
+      "typeInstant": "Hitri klici",
+      "instantFullList": "Celoten seznam hitrih klicev, s filtri po datumu in posnetku"
     },
     "tags": {
       "subtitle": "Ustvarite, urejajte in izbrišite oznake za razvrščanje in filtriranje javnih dogodkov.",

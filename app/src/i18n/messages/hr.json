@@ -1509,7 +1509,6 @@
       "settings": "Postavke",
       "eventsList": "Svi događaji",
       "newEvent": "Novi događaj",
-      "calendar": "Kalendar događaja",
       "templates": "Predlošci događaja",
       "analytics": "Statistika",
       "instantCalls": "Brzi pozivi",
@@ -1550,7 +1549,8 @@
       "openMenu": "Otvori izbornik",
       "closeMenu": "Zatvori izbornik",
       "recordingRemovals": "Zahtjevi za uklanjanje",
-      "recordingRemovalDetail": "Zahtjev za uklanjanje"
+      "recordingRemovalDetail": "Zahtjev za uklanjanje",
+      "newInstantCall": "Novi brzi poziv"
     },
     "publications": {
       "subtitle": "Jedinstveno uredničko središte za sve objavljene videozapise: planirani događaji, brzi pozivi, prenesene povijesne arhive i sesije koje čekaju promociju.",
@@ -2991,7 +2991,15 @@
       "postEventSummary": "{connected} priključenih · {registered} prijava",
       "registeredCount": "{count, plural, =0 {Nema prijava} one {1 prijava} few {# prijave} other {# prijava}}",
       "sortUpcoming": "Nadolazeći prvo",
-      "todayTitle": "Danas i u tijeku"
+      "todayTitle": "Danas i u tijeku",
+      "viewLabel": "Prikaz",
+      "viewList": "Popis",
+      "viewCalendar": "Kalendar",
+      "type": "Vrsta",
+      "typeAll": "Sve vrste",
+      "typeScheduled": "Događaji",
+      "typeInstant": "Brzi pozivi",
+      "instantFullList": "Potpuni popis brzih poziva, s filtrima po datumu i snimci"
     },
     "tags": {
       "subtitle": "Stvaranje, uređivanje i brisanje oznaka koje se koriste za klasifikaciju i filtriranje javnih događaja.",

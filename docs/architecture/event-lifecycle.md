@@ -115,7 +115,7 @@ Blue statuses are set by people, teal ones only by automation, green is the open
 | Transition | Trigger | Actor | Compose | Helm `simple` / `standard` | Helm `full` with scaler |
 |---|---|---|---|---|---|
 | create → `DRAFT` | Event wizard, or **Duplicate** on the management page or in the event card menu | Administrator or organizer | Yes | Yes | Yes |
-| create → `LIVE` | **New call** under **Instant calls** | Administrator or organizer | Yes | Yes | Yes |
+| create → `LIVE` | **New quick call** (menu **Events**, or **All events**) | Administrator or organizer | Yes | Yes | Yes |
 | `DRAFT` → `PUBLISHED` | **Publish event** in the wizard, or **Publish** on the management page or in the event card menu | Moderator credential | Yes | Yes | Yes |
 | `PUBLISHED` → `DRAFT` | **Unpublish** | Moderator credential | Yes | Yes | Yes |
 | `PROVISIONING`, `IDLE`, `ARCHIVED` → `PUBLISHED` | **Publish** on the management page | Moderator credential | Yes (`ARCHIVED` only) | Yes (`ARCHIVED` only) | Yes |

@@ -27,8 +27,9 @@ function iniziali(nome: string): string {
 
 /**
  * L'area utente dello slim header, come nell'header completo dei modelli di
- * Designers Italia: chi e' entrato (nome e ruolo), l'amministrazione e
- * l'uscita. Su ogni pagina, pubblica o dell'amministrazione.
+ * Designers Italia: chi e' entrato (nome e ruolo) e l'uscita, piu' il
+ * ritorno all'amministrazione dalle pagine pubbliche. Su ogni pagina,
+ * pubblica o dell'amministrazione.
  */
 export default function MenuUtente({ staff }: { staff: StaffIntestazione }) {
   const t = useTranslations('nav');
@@ -102,16 +103,20 @@ export default function MenuUtente({ staff }: { staff: StaffIntestazione }) {
             <li>
               <span className="divider" />
             </li>
-            <li>
-              <Link
-                href="/admin/events"
-                className="dropdown-item list-item"
-                onClick={chiudi}
-              >
-                <Icon icon="it-tool" size="sm" className="me-2" />
-                <span>{t('admin')}</span>
-              </Link>
-            </li>
+            {/* Il ritorno all'amministrazione, dalle pagine pubbliche: dentro
+                l'amministrazione il menu c'e' gia'. */}
+            {!pathname.startsWith('/admin') && (
+              <li>
+                <Link
+                  href="/admin/events"
+                  className="dropdown-item list-item"
+                  onClick={chiudi}
+                >
+                  <Icon icon="it-tool" size="sm" className="me-2" />
+                  <span>{t('admin')}</span>
+                </Link>
+              </li>
+            )}
             <li>
               <button type="button" className="dropdown-item list-item" onClick={esci}>
                 <Icon icon="it-logout" size="sm" className="me-2" />

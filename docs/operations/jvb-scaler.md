@@ -602,7 +602,7 @@ Job.
 Once the single-tick checks pass, confirm the whole loop with an instant
 call when no event is scheduled:
 
-1. Create an instant call from **Instant calls** in the administration area.
+1. Create an instant call with **New quick call** (menu **Events**) in the administration area.
    It is created directly as `LIVE`, with video and recording on.
 2. On the next tick, the log shows `Scaling JVB from 0 to 1`, and Jibri also
    scales if it is installed. A bridge pod goes `Pending`, the autoscaler

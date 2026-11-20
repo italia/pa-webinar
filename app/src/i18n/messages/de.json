@@ -1509,7 +1509,6 @@
       "settings": "Einstellungen",
       "eventsList": "Alle Veranstaltungen",
       "newEvent": "Neue Veranstaltung",
-      "calendar": "Veranstaltungskalender",
       "templates": "Veranstaltungsvorlagen",
       "analytics": "Statistiken",
       "instantCalls": "Sofortanrufe",
@@ -1550,7 +1549,8 @@
       "openMenu": "Menü öffnen",
       "closeMenu": "Menü schließen",
       "recordingRemovals": "Anträge auf Entfernung",
-      "recordingRemovalDetail": "Antrag auf Entfernung"
+      "recordingRemovalDetail": "Antrag auf Entfernung",
+      "newInstantCall": "Neuer Schnellanruf"
     },
     "publications": {
       "subtitle": "Zentraler Redaktions-Hub für alle veröffentlichten Videos: geplante Events, Sofortanrufe, hochgeladene Archivaufzeichnungen und auf Promotion wartende Sitzungen.",
@@ -2991,7 +2991,15 @@
       "postEventSummary": "{connected} beigetreten · {registered} angemeldet",
       "registeredCount": "{count, plural, =0 {Keine Anmeldungen} one {1 Anmeldung} other {# Anmeldungen}}",
       "sortUpcoming": "Anstehende zuerst",
-      "todayTitle": "Heute und laufend"
+      "todayTitle": "Heute und laufend",
+      "viewLabel": "Ansicht",
+      "viewList": "Liste",
+      "viewCalendar": "Kalender",
+      "type": "Typ",
+      "typeAll": "Alle Typen",
+      "typeScheduled": "Veranstaltungen",
+      "typeInstant": "Sofortanrufe",
+      "instantFullList": "Vollständige Liste der Sofortanrufe, mit Filtern nach Datum und Aufzeichnung"
     },
     "tags": {
       "subtitle": "Erstellen, bearbeiten und löschen Sie die Tags zum Klassifizieren und Filtern öffentlicher Events.",

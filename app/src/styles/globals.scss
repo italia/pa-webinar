@@ -13112,6 +13112,31 @@ html:has(.wizard-azioni) {
   .dropdown-menu .list-item .icon {
     fill: var(--bs-primary);
   }
+
+  // Le azioni (creare qualcosa) in fondo, distinte dai collegamenti: nel
+  // megamenu con le classi del modello (it-footer-link), nella tendina con
+  // lo stesso aspetto e una riga sopra.
+  .it-footer-link,
+  .menu-azioni a {
+    color: var(--bs-primary);
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+      text-decoration: underline;
+    }
+
+    .icon {
+      fill: var(--bs-primary);
+    }
+  }
+
+  .menu-azioni {
+    margin: 0.5rem 1.5rem 0;
+    padding-top: 0.75rem;
+    border-top: 1px solid #d9dadb;
+  }
 }
 
 // Le etichette non vanno a capo: con nomi lunghi (alcune lingue) le sezioni
@@ -13131,6 +13156,13 @@ html:has(.wizard-azioni) {
     position: static !important;
     box-shadow: none !important;
   }
+}
+
+// Il titolo della scheda di un evento porta alla sua pagina: sottolineato al
+// passaggio e al fuoco, come un collegamento.
+.card-evento__titolo:hover,
+.card-evento__titolo:focus-visible {
+  text-decoration: underline !important;
 }
 
 .admin-breadcrumb {

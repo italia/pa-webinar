@@ -1719,7 +1719,6 @@
       "settings": "Impostazioni",
       "eventsList": "Tutti gli eventi",
       "newEvent": "Nuovo evento",
-      "calendar": "Calendario eventi",
       "templates": "Template di evento",
       "analytics": "Statistiche",
       "instantCalls": "Chiamate rapide",
@@ -1760,7 +1759,8 @@
       "openMenu": "Apri il menu",
       "closeMenu": "Chiudi il menu",
       "recordingRemovals": "Richieste di rimozione",
-      "recordingRemovalDetail": "Richiesta di rimozione"
+      "recordingRemovalDetail": "Richiesta di rimozione",
+      "newInstantCall": "Nuova chiamata rapida"
     },
     "publications": {
       "subtitle": "Hub editoriale unico per tutti i video pubblicati: eventi schedulati, call istantanee, archivi storici caricati e sessioni in attesa di promozione.",
@@ -3201,7 +3201,15 @@
       "postEventSummary": "{connected} connessi · {registered} iscritti",
       "registeredCount": "{count, plural, =0 {Nessun iscritto} one {1 iscritto} other {# iscritti}}",
       "sortUpcoming": "Prossimi prima",
-      "todayTitle": "Oggi e in corso"
+      "todayTitle": "Oggi e in corso",
+      "viewLabel": "Vista",
+      "viewList": "Elenco",
+      "viewCalendar": "Calendario",
+      "type": "Tipo",
+      "typeAll": "Tutti i tipi",
+      "typeScheduled": "Eventi",
+      "typeInstant": "Chiamate rapide",
+      "instantFullList": "Elenco completo delle chiamate rapide, con filtri per data e registrazione"
     },
     "tags": {
       "subtitle": "Crea, modifica ed elimina i tag usati per classificare e filtrare gli eventi pubblici.",

@@ -1509,7 +1509,6 @@
       "settings": "Paramètres",
       "eventsList": "Tous les événements",
       "newEvent": "Nouvel événement",
-      "calendar": "Calendrier des événements",
       "templates": "Modèles d'événement",
       "analytics": "Statistiques",
       "instantCalls": "Appels rapides",
@@ -1550,7 +1549,8 @@
       "openMenu": "Ouvrir le menu",
       "closeMenu": "Fermer le menu",
       "recordingRemovals": "Demandes de retrait",
-      "recordingRemovalDetail": "Demande de retrait"
+      "recordingRemovalDetail": "Demande de retrait",
+      "newInstantCall": "Nouvel appel rapide"
     },
     "publications": {
       "subtitle": "Hub éditorial unique pour toutes les vidéos publiées : événements planifiés, appels instantanés, archives historiques téléversées et sessions en attente de promotion.",
@@ -2991,7 +2991,15 @@
       "postEventSummary": "{connected} connectés · {registered} inscriptions",
       "registeredCount": "{count, plural, =0 {Aucune inscription} one {1 inscription} other {# inscriptions}}",
       "sortUpcoming": "Prochains d'abord",
-      "todayTitle": "Aujourd'hui et en cours"
+      "todayTitle": "Aujourd'hui et en cours",
+      "viewLabel": "Affichage",
+      "viewList": "Liste",
+      "viewCalendar": "Calendrier",
+      "type": "Type",
+      "typeAll": "Tous les types",
+      "typeScheduled": "Événements",
+      "typeInstant": "Appels rapides",
+      "instantFullList": "Liste complète des appels rapides, avec filtres par date et enregistrement"
     },
     "tags": {
       "subtitle": "Créez, modifiez et supprimez les tags utilisés pour classer et filtrer les événements publics.",

@@ -1509,7 +1509,6 @@
       "settings": "Configuración",
       "eventsList": "Todos los eventos",
       "newEvent": "Nuevo evento",
-      "calendar": "Calendario de eventos",
       "templates": "Plantillas de evento",
       "analytics": "Estadísticas",
       "instantCalls": "Llamadas rápidas",
@@ -1550,7 +1549,8 @@
       "openMenu": "Abrir el menú",
       "closeMenu": "Cerrar el menú",
       "recordingRemovals": "Solicitudes de retirada",
-      "recordingRemovalDetail": "Solicitud de retirada"
+      "recordingRemovalDetail": "Solicitud de retirada",
+      "newInstantCall": "Nueva llamada rápida"
     },
     "publications": {
       "subtitle": "Hub editorial único para todos los vídeos publicados: eventos planificados, llamadas instantáneas, archivos históricos cargados y sesiones a la espera de promoción.",
@@ -2991,7 +2991,15 @@
       "postEventSummary": "{connected} asistieron · {registered} inscripciones",
       "registeredCount": "{count, plural, =0 {Sin inscripciones} one {1 inscripción} other {# inscripciones}}",
       "sortUpcoming": "Próximos primero",
-      "todayTitle": "Hoy y en curso"
+      "todayTitle": "Hoy y en curso",
+      "viewLabel": "Vista",
+      "viewList": "Lista",
+      "viewCalendar": "Calendario",
+      "type": "Tipo",
+      "typeAll": "Todos los tipos",
+      "typeScheduled": "Eventos",
+      "typeInstant": "Llamadas rápidas",
+      "instantFullList": "Lista completa de llamadas rápidas, con filtros por fecha y grabación"
     },
     "tags": {
       "subtitle": "Cree, modifique y elimine las etiquetas usadas para clasificar y filtrar los eventos públicos.",

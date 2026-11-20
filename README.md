@@ -50,7 +50,7 @@ The [feature tour](docs/FEATURES.md) has the full catalog, role by role.
 - Build an event in the six-step event wizard, start from an **Event templates** entry, or reuse a past event with **Duplicate**.
 - Collect registrations and keep an invitation list, which decides who may register when registration is by invitation. Confirmations, calendar files and reminders leave through an email outbox.
 - Add pre-event and post-event questionnaires, and materials whose visibility follows the phase of the event.
-- Open a room at once from **Instant calls**.
+- Open a room at once with **New quick call**.
 - After the event, publish the recording to the **Video library** and read the event analytics on the **Statistics** tab.
 
 ### Participants

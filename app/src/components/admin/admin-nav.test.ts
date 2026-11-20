@@ -34,6 +34,7 @@ const ESENZIONI_ADMIN: Record<string, string> = {
   '/admin': 'ingresso: rimanda all’elenco degli eventi',
   '/admin/login': 'accesso: ci porta il middleware',
   '/admin/access': 'atterraggio del link monouso arrivato per email',
+  '/admin/calendar': 'indirizzo di prima: rimanda alla vista calendario di «Tutti gli eventi»',
 };
 
 /** Pagine pubbliche raggiunte da altro che intestazione e piè di pagina. */
@@ -63,12 +64,15 @@ describe('menu dello staff', () => {
   it('chi organizza vede eventi e video, con il glossario', () => {
     const sezioni = sezioniPerRuolo('organizer');
     expect(sezioni.map((s) => s.labelKey)).toEqual(['events', 'video']);
-    expect(sezioni.flatMap((s) => s.voci.map((v) => v.href))).toEqual([...VOCI_ORGANIZZATORE]);
+    expect(new Set(sezioni.flatMap((s) => s.voci.map((v) => v.href)))).toEqual(
+      new Set(VOCI_ORGANIZZATORE),
+    );
   });
 
   it('le briciole seguono il menu, anche per le pagine fuori dalla radice della sezione', () => {
     expect(catena('/admin/events').map((a) => a.labelKey)).toEqual(['events']);
-    expect(catena('/admin/calendar').map((a) => a.labelKey)).toEqual(['events', 'calendar']);
+    // Una pagina fuori dal menu ha comunque le sue briciole.
+    expect(catena('/admin/events/calls').map((a) => a.labelKey)).toEqual(['events', 'instantCalls']);
     expect(catena('/admin/events/[id]/edit').map((a) => a.labelKey)).toEqual([
       'events',
       'eventDetail',

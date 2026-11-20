@@ -1509,7 +1509,6 @@
       "settings": "Beállítások",
       "eventsList": "Összes esemény",
       "newEvent": "Új esemény",
-      "calendar": "Eseménynaptár",
       "templates": "Eseménysablonok",
       "analytics": "Statisztikák",
       "instantCalls": "Gyorshívások",
@@ -1550,7 +1549,8 @@
       "openMenu": "Menü megnyitása",
       "closeMenu": "Menü bezárása",
       "recordingRemovals": "Eltávolítási kérelmek",
-      "recordingRemovalDetail": "Eltávolítási kérelem"
+      "recordingRemovalDetail": "Eltávolítási kérelem",
+      "newInstantCall": "Új gyorshívás"
     },
     "publications": {
       "subtitle": "Egységes szerkesztőségi központ minden közzétett videóhoz: ütemezett események, azonnali hívások, feltöltött archív felvételek és előléptetésre váró munkamenetek.",
@@ -2991,7 +2991,15 @@
       "postEventSummary": "{connected} csatlakozott · {registered} regisztráció",
       "registeredCount": "{count, plural, =0 {Nincs regisztráció} one {1 regisztráció} other {# regisztráció}}",
       "sortUpcoming": "Közelgők elöl",
-      "todayTitle": "Ma és folyamatban"
+      "todayTitle": "Ma és folyamatban",
+      "viewLabel": "Nézet",
+      "viewList": "Lista",
+      "viewCalendar": "Naptár",
+      "type": "Típus",
+      "typeAll": "Minden típus",
+      "typeScheduled": "Események",
+      "typeInstant": "Gyorshívások",
+      "instantFullList": "A gyorshívások teljes listája, dátum és felvétel szerinti szűrőkkel"
     },
     "tags": {
       "subtitle": "A nyilvános események osztályozására és szűrésére használt címkék létrehozása, szerkesztése és törlése.",

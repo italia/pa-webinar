@@ -1509,7 +1509,6 @@
       "settings": "Socruithe",
       "eventsList": "Gach imeacht",
       "newEvent": "Imeacht nua",
-      "calendar": "Féilire na n-imeachtaí",
       "templates": "Teimpléid imeachta",
       "analytics": "Staitisticí",
       "instantCalls": "Glaonna láithreacha",
@@ -1550,7 +1549,8 @@
       "openMenu": "Oscail an roghchlár",
       "closeMenu": "Dún an roghchlár",
       "recordingRemovals": "Iarratais ar bhaint",
-      "recordingRemovalDetail": "Iarratas ar bhaint"
+      "recordingRemovalDetail": "Iarratas ar bhaint",
+      "newInstantCall": "Glao tapa nua"
     },
     "publications": {
       "subtitle": "Mol eagarthóireachta amháin do gach físeán foilsithe: imeachtaí sceidealta, glaonna meara, físthaifeadtaí cartlainne uaslódáilte agus seisiúin ag fanacht le cur chun cinn.",
@@ -2991,7 +2991,15 @@
       "postEventSummary": "{connected} ceangailte · {registered} cláruithe",
       "registeredCount": "{count, plural, =0 {Aon chlárúchán} one {1 chlárúchán} other {# clárúchán}}",
       "sortUpcoming": "Na cinn atá le teacht ar dtús",
-      "todayTitle": "Inniu agus ar siúl"
+      "todayTitle": "Inniu agus ar siúl",
+      "viewLabel": "Amharc",
+      "viewList": "Liosta",
+      "viewCalendar": "Féilire",
+      "type": "Cineál",
+      "typeAll": "Gach cineál",
+      "typeScheduled": "Imeachtaí",
+      "typeInstant": "Glaonna láithreacha",
+      "instantFullList": "Liosta iomlán de ghlaonna tapa, le scagairí de réir dáta agus taifeadta"
     },
     "tags": {
       "subtitle": "Cruthaigh, cuir in eagar agus scrios na clibeanna a úsáidtear chun imeachtaí poiblí a aicmiú agus a scagadh.",

@@ -1509,7 +1509,6 @@
       "settings": "Nastavení",
       "eventsList": "Všechny události",
       "newEvent": "Nová událost",
-      "calendar": "Kalendář událostí",
       "templates": "Šablony událostí",
       "analytics": "Statistiky",
       "instantCalls": "Rychlé hovory",
@@ -1550,7 +1549,8 @@
       "openMenu": "Otevřít nabídku",
       "closeMenu": "Zavřít nabídku",
       "recordingRemovals": "Žádosti o odstranění",
-      "recordingRemovalDetail": "Žádost o odstranění"
+      "recordingRemovalDetail": "Žádost o odstranění",
+      "newInstantCall": "Nový rychlý hovor"
     },
     "publications": {
       "subtitle": "Jednotný redakční hub pro všechna publikovaná videa: plánované události, rychlé hovory, nahrané historické archivy a relace čekající na zveřejnění.",
@@ -2991,7 +2991,15 @@
       "postEventSummary": "{connected} připojených · {registered} registrací",
       "registeredCount": "{count, plural, =0 {Žádné registrace} one {1 registrace} few {# registrace} other {# registrací}}",
       "sortUpcoming": "Nejbližší nejdřív",
-      "todayTitle": "Dnes a právě probíhá"
+      "todayTitle": "Dnes a právě probíhá",
+      "viewLabel": "Zobrazení",
+      "viewList": "Seznam",
+      "viewCalendar": "Kalendář",
+      "type": "Typ",
+      "typeAll": "Všechny typy",
+      "typeScheduled": "Události",
+      "typeInstant": "Rychlé hovory",
+      "instantFullList": "Úplný seznam rychlých hovorů s filtry podle data a záznamu"
     },
     "tags": {
       "subtitle": "Vytvářejte, upravujte a mažte štítky používané pro klasifikaci a filtrování veřejných událostí.",

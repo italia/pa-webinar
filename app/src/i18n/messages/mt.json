@@ -1509,7 +1509,6 @@
       "settings": "Issettjar",
       "eventsList": "L-avvenimenti kollha",
       "newEvent": "Avveniment ġdid",
-      "calendar": "Kalendarju tal-avvenimenti",
       "templates": "Templates tal-avvenimenti",
       "analytics": "Statistika",
       "instantCalls": "Sejħiet rapidi",
@@ -1550,7 +1549,8 @@
       "openMenu": "Iftaħ il-menu",
       "closeMenu": "Agħlaq il-menu",
       "recordingRemovals": "Talbiet għat-tneħħija",
-      "recordingRemovalDetail": "Talba għat-tneħħija"
+      "recordingRemovalDetail": "Talba għat-tneħħija",
+      "newInstantCall": "Sejħa rapida ġdida"
     },
     "publications": {
       "subtitle": "Hub editorjali uniku għall-vidjos pubblikati kollha: avvenimenti skedati, telefonati istantanji, arkivji storiċi mtellgħin u sessjonijiet jistennew il-promozzjoni.",
@@ -2991,7 +2991,15 @@
       "postEventSummary": "{connected} konnessi · {registered} reġistrazzjonijiet",
       "registeredCount": "{count, plural, =0 {Ebda reġistrazzjoni} one {1 reġistrazzjoni} other {# reġistrazzjonijiet}}",
       "sortUpcoming": "Dawk li ġejjin l-ewwel",
-      "todayTitle": "Illum u għaddejjin"
+      "todayTitle": "Illum u għaddejjin",
+      "viewLabel": "Veduta",
+      "viewList": "Lista",
+      "viewCalendar": "Kalendarju",
+      "type": "Tip",
+      "typeAll": "It-tipi kollha",
+      "typeScheduled": "Avvenimenti",
+      "typeInstant": "Sejħiet rapidi",
+      "instantFullList": "Lista sħiħa tas-sejħiet rapidi, b'filtri skont id-data u r-reġistrazzjoni"
     },
     "tags": {
       "subtitle": "Crea, tbiddel ed ħassar il-tag usati għal classificaru u filtraru gli avvenimenti pubbliċi.",

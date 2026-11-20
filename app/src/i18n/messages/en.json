@@ -1509,7 +1509,6 @@
       "settings": "Settings",
       "eventsList": "All events",
       "newEvent": "New event",
-      "calendar": "Event calendar",
       "templates": "Event templates",
       "analytics": "Analytics",
       "instantCalls": "Instant calls",
@@ -1550,7 +1549,8 @@
       "openMenu": "Open menu",
       "closeMenu": "Close menu",
       "recordingRemovals": "Removal requests",
-      "recordingRemovalDetail": "Removal request"
+      "recordingRemovalDetail": "Removal request",
+      "newInstantCall": "New quick call"
     },
     "publications": {
       "subtitle": "Single editorial hub for every published video: scheduled events, instant calls, uploaded archive recordings, and sessions waiting to be promoted.",
@@ -2991,7 +2991,15 @@
       "postEventSummary": "{connected} joined · {registered} registered",
       "registeredCount": "{count, plural, =0 {No registrations} one {1 registration} other {# registrations}}",
       "sortUpcoming": "Upcoming first",
-      "todayTitle": "Today and live"
+      "todayTitle": "Today and live",
+      "viewLabel": "View",
+      "viewList": "List",
+      "viewCalendar": "Calendar",
+      "type": "Type",
+      "typeAll": "All types",
+      "typeScheduled": "Events",
+      "typeInstant": "Instant calls",
+      "instantFullList": "Full list of instant calls, with filters by date and recording"
     },
     "tags": {
       "subtitle": "Create, edit and delete the tags used to classify and filter public events.",

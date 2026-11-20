@@ -1509,7 +1509,6 @@
       "settings": "Asetukset",
       "eventsList": "Kaikki tapahtumat",
       "newEvent": "Uusi tapahtuma",
-      "calendar": "Tapahtumakalenteri",
       "templates": "Tapahtumamallit",
       "analytics": "Tilastot",
       "instantCalls": "Pikapuhelut",
@@ -1550,7 +1549,8 @@
       "openMenu": "Avaa valikko",
       "closeMenu": "Sulje valikko",
       "recordingRemovals": "Poistopyynnöt",
-      "recordingRemovalDetail": "Poistopyyntö"
+      "recordingRemovalDetail": "Poistopyyntö",
+      "newInstantCall": "Uusi pikapuhelu"
     },
     "publications": {
       "subtitle": "Yhtenäinen toimituksellinen keskus kaikille julkaistuille videoille: aikataulutetut tapahtumat, pikapuhelut, ladatut arkistotallenteet ja istunnot, jotka odottavat julkaisua.",
@@ -2991,7 +2991,15 @@
       "postEventSummary": "{connected} liittyi · {registered} ilmoittautunutta",
       "registeredCount": "{count, plural, =0 {Ei ilmoittautumisia} one {1 ilmoittautuminen} other {# ilmoittautumista}}",
       "sortUpcoming": "Tulevat ensin",
-      "todayTitle": "Tänään ja käynnissä"
+      "todayTitle": "Tänään ja käynnissä",
+      "viewLabel": "Näkymä",
+      "viewList": "Luettelo",
+      "viewCalendar": "Kalenteri",
+      "type": "Tyyppi",
+      "typeAll": "Kaikki tyypit",
+      "typeScheduled": "Tapahtumat",
+      "typeInstant": "Pikapuhelut",
+      "instantFullList": "Pikapuheluiden koko luettelo, suodattimina päivämäärä ja tallenne"
     },
     "tags": {
       "subtitle": "Luo, muokkaa ja poista tageja, joilla luokitellaan ja suodatetaan julkisia tapahtumia.",

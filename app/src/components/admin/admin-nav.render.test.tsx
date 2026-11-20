@@ -11,6 +11,7 @@ import messages from '@/i18n/messages/it.json';
 const percorso = vi.hoisted(() => ({ valore: '/admin/events' }));
 vi.mock('@/i18n/navigation', () => ({
   usePathname: () => percorso.valore,
+  percorso: (p: string) => p,
   Link: ({
     href,
     ...resto
@@ -79,16 +80,44 @@ describe('menu dell’amministrazione', () => {
     const voci = Array.from(contenitore.querySelectorAll('ul.navbar-nav > li.nav-item'));
     expect(voci).toHaveLength(sezioni.length);
     voci.forEach((li, i) => {
-      const quante = sezioni[i]?.voci.length ?? 0;
-      const ricca = quante >= VOCI_PER_MEGAMENU;
+      const sezione = sezioni[i]!;
+      // Le pagine fuori dal menu non contano; le azioni stanno in fondo.
+      const collegamenti = sezione.voci.filter(
+        (v) => v.menu !== false && !v.azione
+      ).length;
+      const azioni = sezione.voci.filter((v) => v.azione).length;
+      const ricca = collegamenti + azioni >= VOCI_PER_MEGAMENU;
       expect(li.classList.contains('megamenu')).toBe(ricca);
       const pulsante = li.querySelector('button.nav-link.dropdown-toggle')!;
       const pannello = li.querySelector('.dropdown-menu')!;
       expect(pannello.getAttribute('role')).toBe('region');
       expect(pannello.getAttribute('aria-labelledby')).toBe(pulsante.id);
       expect(pulsante.getAttribute('aria-controls')).toBe(pannello.id);
-      expect(pannello.querySelectorAll('a.list-item.dropdown-item')).toHaveLength(quante);
+      expect(pannello.querySelectorAll('a.list-item.dropdown-item')).toHaveLength(
+        collegamenti
+      );
+      const cta = pannello.querySelectorAll(
+        ricca ? '.it-footer-link-wrapper a.it-footer-link' : '.menu-azioni a'
+      );
+      expect(cta).toHaveLength(azioni);
     });
+  });
+
+  it('le creazioni sono call to action in fondo, la chiamata rapida col suo modulo', () => {
+    const eventi = contenitore.querySelector('ul.navbar-nav > li.nav-item')!;
+    const cta = Array.from(
+      eventi.querySelectorAll<HTMLAnchorElement>('a.it-footer-link')
+    );
+    expect(cta.map((a) => a.getAttribute('href'))).toEqual([
+      '/admin/events/new',
+      '/admin/events/new?instant=1',
+    ]);
+    // Il calendario e le chiamate rapide non sono voci del menu.
+    const link = Array.from(eventi.querySelectorAll('a.list-item')).map((a) =>
+      a.getAttribute('href')
+    );
+    expect(link).not.toContain('/admin/events/calls');
+    expect(link).not.toContain('/admin/calendar');
   });
 
   it('segna la sezione e la pagina correnti', () => {

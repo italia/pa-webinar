@@ -1,28 +1,21 @@
 // SPDX-License-Identifier: EUPL-1.2
 // SPDX-FileCopyrightText: 2026 Dipartimento per la Trasformazione Digitale
 
-import { getLocale, getTranslations } from 'next-intl/server';
+import { redirect } from 'next/navigation';
+import { getLocale } from 'next-intl/server';
 
 import { staffOLogin } from '@/lib/auth/staff-page';
-import EventCalendar from '@/components/calendar/event-calendar-lazy';
-import AdminPageHeader from '@/components/admin/admin-page-header';
-import { adminPageMetadata, adminPageTitle } from '@/components/admin/admin-page-title';
+import { localizedPath } from '@/lib/utils/localized-url';
 
 export const dynamic = 'force-dynamic';
 
-export function generateMetadata() {
-  return adminPageMetadata('/admin/calendar');
-}
-
+/**
+ * Il calendario dello staff e' una vista di «Tutti gli eventi»: questo
+ * indirizzo resta per i collegamenti salvati e porta li'.
+ */
 export default async function AdminCalendarPage() {
-  // Aperta allo staff: gli eventi li filtra la rotta del calendario (ADR-014).
-  await staffOLogin(await getLocale());
-  const t = await getTranslations('calendar');
-
-  return (
-    <div className="container py-5">
-      <AdminPageHeader title={await adminPageTitle('/admin/calendar')} subtitle={t('subtitle')} />
-      <EventCalendar mode="admin" />
-    </div>
-  );
+  const locale = await getLocale();
+  // Come l'elenco: aperta allo staff (ADR-014), senza sessione all'accesso.
+  await staffOLogin(locale);
+  redirect(localizedPath('/admin/events?vista=calendario', locale));
 }

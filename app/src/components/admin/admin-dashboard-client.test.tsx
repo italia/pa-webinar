@@ -120,3 +120,63 @@ describe('elenco degli eventi — persone ed enti della scheda', () => {
     expect(scheda).not.toContain('Nome libero');
   });
 });
+
+describe('elenco degli eventi — il tipo', () => {
+  const tl = messages.admin.eventsList;
+  function mostra() {
+    const chiamata = { ...evento('chiamata', 'PUBLISHED', 30, 1), eventType: 'INSTANT' };
+    act(() => {
+      root.render(
+        <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
+          <AdminDashboardClient
+            events={[evento('programmato', 'PUBLISHED', 60 * 24, 2), chiamata] as never}
+            renderedAt={ora}
+            availableTags={[]}
+            siteDefaultParseTitleKicker={false}
+          />
+        </NextIntlClientProvider>,
+      );
+    });
+  }
+  const scegli = (valore: string) => {
+    const select = container.querySelector<HTMLSelectElement>('#events-type')!;
+    act(() => {
+      select.value = valore;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+  };
+  const titoli = () =>
+    Array.from(container.querySelectorAll('.row.g-4 h5')).map((h) => h.textContent);
+
+  it('separa gli eventi dalle chiamate rapide', () => {
+    mostra();
+    expect(titoli()).toHaveLength(2);
+    scegli('SCHEDULED');
+    expect(titoli()).toEqual(['Evento programmato']);
+    scegli('INSTANT');
+    expect(titoli()).toEqual(['Evento chiamata']);
+  });
+
+  it('i conteggi degli stati sono quelli del tipo scelto', () => {
+    mostra();
+    const tutti = () =>
+      container.querySelector<HTMLOptionElement>('#events-status option[value="ALL"]')!.textContent;
+    expect(tutti()).toContain('(2)');
+    scegli('INSTANT');
+    expect(tutti()).toContain('(1)');
+  });
+
+  it('con le chiamate rapide porta al loro elenco completo', () => {
+    mostra();
+    expect(container.querySelector('a[href="/admin/events/calls"]')).toBeNull();
+    scegli('INSTANT');
+    const link = container.querySelector('a[href="/admin/events/calls"]');
+    expect(link?.textContent).toBe(tl.instantFullList);
+  });
+
+  it('alla pagina dell evento porta il titolo: niente «Gestisci» nella scheda', () => {
+    mostra();
+    const scheda = container.querySelector('.row.g-4')!;
+    expect(scheda.textContent).not.toContain(messages.admin.manage);
+  });
+});

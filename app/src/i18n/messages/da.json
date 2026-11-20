@@ -1509,7 +1509,6 @@
       "settings": "Indstillinger",
       "eventsList": "Alle begivenheder",
       "newEvent": "Ny begivenhed",
-      "calendar": "Begivenhedskalender",
       "templates": "Skabeloner til begivenheder",
       "analytics": "Statistik",
       "instantCalls": "Hurtige opkald",
@@ -1550,7 +1549,8 @@
       "openMenu": "Åbn menuen",
       "closeMenu": "Luk menuen",
       "recordingRemovals": "Anmodninger om fjernelse",
-      "recordingRemovalDetail": "Anmodning om fjernelse"
+      "recordingRemovalDetail": "Anmodning om fjernelse",
+      "newInstantCall": "Nyt hurtigopkald"
     },
     "publications": {
       "subtitle": "Samlet redaktionel hub for alle offentliggjorte videoer: planlagte arrangementer, hurtige opkald, uploadede arkivoptagelser og sessioner, der venter på udgivelse.",
@@ -2991,7 +2991,15 @@
       "postEventSummary": "{connected} tilsluttede · {registered} tilmeldinger",
       "registeredCount": "{count, plural, =0 {Ingen tilmeldinger} one {1 tilmelding} other {# tilmeldinger}}",
       "sortUpcoming": "Kommende først",
-      "todayTitle": "I dag og i gang"
+      "todayTitle": "I dag og i gang",
+      "viewLabel": "Visning",
+      "viewList": "Liste",
+      "viewCalendar": "Kalender",
+      "type": "Type",
+      "typeAll": "Alle typer",
+      "typeScheduled": "Begivenheder",
+      "typeInstant": "Hurtige opkald",
+      "instantFullList": "Komplet liste over hurtige opkald, med filtre for dato og optagelse"
     },
     "tags": {
       "subtitle": "Opret, rediger og slet de tags, der bruges til at klassificere og filtrere offentlige arrangementer.",

@@ -1509,7 +1509,6 @@
       "settings": "Instellingen",
       "eventsList": "Alle evenementen",
       "newEvent": "Nieuw evenement",
-      "calendar": "Evenementenkalender",
       "templates": "Evenementsjablonen",
       "analytics": "Statistieken",
       "instantCalls": "Snelle gesprekken",
@@ -1550,7 +1549,8 @@
       "openMenu": "Menu openen",
       "closeMenu": "Menu sluiten",
       "recordingRemovals": "Verwijderingsverzoeken",
-      "recordingRemovalDetail": "Verwijderingsverzoek"
+      "recordingRemovalDetail": "Verwijderingsverzoek",
+      "newInstantCall": "Nieuwe snelle oproep"
     },
     "publications": {
       "subtitle": "Centrale redactiehub voor alle gepubliceerde video's: geplande evenementen, snelgesprekken, geladen archieven en sessies die wachten op promotie.",
@@ -2991,7 +2991,15 @@
       "postEventSummary": "{connected} verbonden · {registered} aanmeldingen",
       "registeredCount": "{count, plural, =0 {Geen aanmeldingen} one {1 aanmelding} other {# aanmeldingen}}",
       "sortUpcoming": "Komende eerst",
-      "todayTitle": "Vandaag en bezig"
+      "todayTitle": "Vandaag en bezig",
+      "viewLabel": "Weergave",
+      "viewList": "Lijst",
+      "viewCalendar": "Kalender",
+      "type": "Type",
+      "typeAll": "Alle typen",
+      "typeScheduled": "Evenementen",
+      "typeInstant": "Snelle gesprekken",
+      "instantFullList": "Volledige lijst van snelle gesprekken, met filters op datum en opname"
     },
     "tags": {
       "subtitle": "Tags maken, bewerken en verwijderen die worden gebruikt om openbare evenementen te classificeren en te filteren.",

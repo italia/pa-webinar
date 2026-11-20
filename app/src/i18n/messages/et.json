@@ -1509,7 +1509,6 @@
       "settings": "Seaded",
       "eventsList": "Kõik üritused",
       "newEvent": "Uus üritus",
-      "calendar": "Ürituste kalender",
       "templates": "Ürituste mallid",
       "analytics": "Statistika",
       "instantCalls": "Kiirkõned",
@@ -1550,7 +1549,8 @@
       "openMenu": "Ava menüü",
       "closeMenu": "Sulge menüü",
       "recordingRemovals": "Eemaldamise taotlused",
-      "recordingRemovalDetail": "Eemaldamise taotlus"
+      "recordingRemovalDetail": "Eemaldamise taotlus",
+      "newInstantCall": "Uus kiirkõne"
     },
     "publications": {
       "subtitle": "Ühtne toimetuskeskus kõigi avaldatud videote jaoks: planeeritud sündmused, kiirkõned, üleslaaditud arhiivisalvestused ja avaldamist ootavad sessioonid.",
@@ -2991,7 +2991,15 @@
       "postEventSummary": "{connected} liitunud · {registered} registreeringut",
       "registeredCount": "{count, plural, =0 {Registreeringuid pole} one {1 registreering} other {# registreeringut}}",
       "sortUpcoming": "Eelseisvad enne",
-      "todayTitle": "Täna ja käimas"
+      "todayTitle": "Täna ja käimas",
+      "viewLabel": "Vaade",
+      "viewList": "Loend",
+      "viewCalendar": "Kalender",
+      "type": "Tüüp",
+      "typeAll": "Kõik tüübid",
+      "typeScheduled": "Üritused",
+      "typeInstant": "Kiirkõned",
+      "instantFullList": "Kiirkõnede täielik loend, filtritega kuupäeva ja salvestuse järgi"
     },
     "tags": {
       "subtitle": "Looge, muutke ja kustutage silte avalike sündmuste klassifitseerimiseks ja filtreerimiseks.",
