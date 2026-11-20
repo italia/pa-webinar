@@ -11,7 +11,7 @@
 # l'unico indice CUDA 12 che ha torch 2.14. Il build si ferma se entra una
 # wheel CUDA 13 (vedi Dockerfile.worker).
 --extra-index-url https://download.pytorch.org/whl/cu126
-torch==2.14.1+cu126
+torch==2.15.0
 torchvision==0.29.1+cu126
 # torchaudio 2.11 e' l'ultima release (il progetto e' in manutenzione) e non
 # dichiara una versione di torch. Il worker non usa API di torchaudio;
