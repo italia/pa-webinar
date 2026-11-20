@@ -50,7 +50,7 @@ spec:
           effect: NoSchedule
       containers:
         - name: hub
-          image: selenium/hub:4.45.0-20260606
+          image: selenium/hub:4.52.0-20261101
           imagePullPolicy: IfNotPresent
           ports:
             - name: publish
