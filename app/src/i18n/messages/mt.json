@@ -2302,7 +2302,9 @@
         "waitingRoomEngineGame": "Videogame (lobby Phaser)",
         "waitingRoomEngineClassic": "Klassika (statika)",
         "waitingRoomEngineHelp": "Il-modalità prestabbilita tal-kamra tal-istennija. Tista' tinbidel għal avveniment wieħed u, għal żjara waħda, bil-parametru {param} fl-indirizz.",
-        "primaryColorHex": "Kulur primarju (kodiċi eżadeċimali)"
+        "primaryColorHex": "Kulur primarju (kodiċi eżadeċimali)",
+        "organizationLogoUrl": "Logo tal-entità",
+        "organizationLogoUrlHelp": "Jidher fil-footer ħdejn l-isem tal-entità li tmexxi s-servizz. Ħallih vojt biex jintwera l-isem biss."
       },
       "watermark": {
         "title": "Personalizzazzjoni tal-vidjo",
@@ -5515,22 +5517,18 @@
   "footer": {
     "privacy": "Avviż dwar il-privatezza",
     "accessibility": "Dikjarazzjoni ta' aċċessibbiltà",
-    "openSource": "Software open source",
-    "contacts": "Kuntatti",
     "legalNotes": "Noti legali",
-    "governmentSite": "Gvern Taljan",
     "systemStatus": "Status tas-sistema",
-    "sbomLatest": "SBOM tal-aħħar rilaxx",
     "transparency": "Sigurtà u trasparenza",
     "serviceInventory": "Inventario servizi",
-    "sourceCode": "Kodiċi sors",
-    "viewRelease": "Ara r-rilaxx fuq GitHub",
     "viewChangelog": "Ara x'hemm ġdid (changelog)",
     "newWindow": "jinfetaħ f'tieqa ġdida",
     "usefulLinks": "Links utli",
     "version": "Verżjoni {version}",
     "versionDev": "Verżjoni ta' żvilupp",
-    "updatedOn": "aġġornata fil-{date}"
+    "updatedOn": "aġġornata fil-{date}",
+    "projectOf": "Proġett ta'",
+    "contactsLine": "Kuntatti: <link>{email}</link>"
   },
   "changelog": {
     "metaTitle": "X'hemm ġdid u changelog",

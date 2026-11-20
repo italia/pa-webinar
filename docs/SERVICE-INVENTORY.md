@@ -29,7 +29,7 @@ Start from the template in [`docs/examples/service-inventory.example.json`](exam
 Where the page appears:
 
 - It is public and needs no sign-in.
-- The site footer links to it (**Service inventory**), and so does the `/changelog` page.
+- The **Security and transparency** page (`/security`, linked from the footer) links to it (**Service inventory**), and so does the `/changelog` page.
 - The home page's project section, when it is enabled in the home settings (**Show the “The project” section**), links to it through its **Service transparency** button.
 - The path segment is the same in every language, for example `https://webinar.example.com/en/service-inventory`.
 

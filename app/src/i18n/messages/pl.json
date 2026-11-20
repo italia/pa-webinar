@@ -2302,7 +2302,9 @@
         "waitingRoomEngineGame": "Gra wideo (lobby Phaser)",
         "waitingRoomEngineClassic": "Klasyczna (statyczna)",
         "waitingRoomEngineHelp": "Domyślny tryb poczekalni. Można go zmienić dla pojedynczego wydarzenia, a na jedną wizytę – parametrem {param} w adresie.",
-        "primaryColorHex": "Kolor podstawowy (kod szesnastkowy)"
+        "primaryColorHex": "Kolor podstawowy (kod szesnastkowy)",
+        "organizationLogoUrl": "Logo instytucji",
+        "organizationLogoUrlHelp": "Pojawia się w stopce obok nazwy instytucji, która prowadzi usługę. Zostaw puste, aby pokazać tylko nazwę."
       },
       "watermark": {
         "title": "Personalizacja wideo",
@@ -5515,22 +5517,18 @@
   "footer": {
     "privacy": "Polityka prywatności",
     "accessibility": "Oświadczenie o dostępności",
-    "openSource": "Oprogramowanie open source",
-    "contacts": "Kontakt",
     "legalNotes": "Noty prawne",
-    "governmentSite": "Rząd Włoski",
     "systemStatus": "Stan systemu",
-    "sbomLatest": "SBOM najnowszego wydania",
     "transparency": "Bezpieczeństwo i przejrzystość",
     "serviceInventory": "Inwentarz usług",
-    "sourceCode": "Kod źródłowy",
-    "viewRelease": "Zobacz wydanie na GitHubie",
     "viewChangelog": "Zobacz nowości (changelog)",
     "newWindow": "otwiera się w nowym oknie",
     "usefulLinks": "Przydatne linki",
     "version": "Wersja {version}",
     "versionDev": "Wersja deweloperska",
-    "updatedOn": "zaktualizowano {date}"
+    "updatedOn": "zaktualizowano {date}",
+    "projectOf": "Projekt realizuje",
+    "contactsLine": "Kontakt: <link>{email}</link>"
   },
   "changelog": {
     "metaTitle": "Nowości i changelog",

@@ -1784,8 +1784,9 @@ export default function EventWizard(props: WizardProps) {
     if (activeStep === 'schedule') setQuandoVisto(true);
   }, [activeStep]);
   // In creazione la data del modulo e' la proposta del formato finche'
-  // nessuno la cambia (nel passo «Quando», da una bozza ripresa o portata da
-  // «Cambia formato»): al passo «Evento» l'anteprima non la mostra.
+  // nessuno la cambia o la vede nel passo «Quando» (una data diversa arriva
+  // anche da una bozza ripresa o da «Cambia formato»): al passo «Evento»
+  // l'anteprima non la mostra.
   const senzaData =
     mode === 'create' &&
     activeStep === 'base' &&
@@ -2603,6 +2604,7 @@ export default function EventWizard(props: WizardProps) {
             onClick={() => {
               setForm(initial);
               setBozzeTitolo({});
+              setQuandoVisto(false);
               elencoSceltoRef.current = mode === 'edit';
               nicknameSceltoRef.current = mode === 'edit';
               setDestinazioneScelta(mode === 'edit' || !!props.destinazioneScelta);

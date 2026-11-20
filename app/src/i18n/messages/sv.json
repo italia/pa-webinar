@@ -2302,7 +2302,9 @@
         "waitingRoomEngineGame": "Videospel (Phaser-lobby)",
         "waitingRoomEngineClassic": "Klassiskt (statiskt)",
         "waitingRoomEngineHelp": "Väntrummets standardläge. Det kan ändras för ett enskilt evenemang och, för ett enda besök, med parametern {param} i adressen.",
-        "primaryColorHex": "Primärfärg (hexkod)"
+        "primaryColorHex": "Primärfärg (hexkod)",
+        "organizationLogoUrl": "Organisationens logotyp",
+        "organizationLogoUrlHelp": "Visas i sidfoten bredvid namnet på organisationen som driver tjänsten. Lämna tomt för att bara visa namnet."
       },
       "watermark": {
         "title": "Videoanpassning",
@@ -5515,22 +5517,18 @@
   "footer": {
     "privacy": "Integritetspolicy",
     "accessibility": "Tillgänglighetsförklaring",
-    "openSource": "Öppen källkod",
-    "contacts": "Kontakt",
     "legalNotes": "Juridiska anmärkningar",
-    "governmentSite": "Italienska regeringen",
     "systemStatus": "Systemstatus",
-    "sbomLatest": "SBOM för senaste versionen",
     "transparency": "Säkerhet och transparens",
     "serviceInventory": "Tjänsteförteckning",
-    "sourceCode": "Källkod",
-    "viewRelease": "Visa version på GitHub",
     "viewChangelog": "Se vad som är nytt (changelog)",
     "newWindow": "öppnas i ett nytt fönster",
     "usefulLinks": "Användbara länkar",
     "version": "Version {version}",
     "versionDev": "Utvecklingsversion",
-    "updatedOn": "uppdaterad {date}"
+    "updatedOn": "uppdaterad {date}",
+    "projectOf": "Ett projekt av",
+    "contactsLine": "Kontakt: <link>{email}</link>"
   },
   "changelog": {
     "metaTitle": "Nyheter och changelog",

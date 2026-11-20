@@ -8,7 +8,6 @@ import { describe, expect, it } from 'vitest';
 
 import {
   LINK_INTESTAZIONE,
-  LINK_PIEDE_EVENTI,
 } from '@/components/layout/public-links';
 import messages from '@/i18n/messages/it.json';
 import { routing } from '@/i18n/routing';
@@ -41,6 +40,8 @@ const ESENZIONI_ADMIN: Record<string, string> = {
 const ESENZIONI_PUBBLICHE: Record<string, string> = {
   '/privacy/my-data/erasure': 'raggiunta da «I miei dati»',
   '/rubrica/opt-out': 'link nelle email della rubrica',
+  '/service-inventory': 'dalla pagina «Sicurezza e trasparenza», col codice e lo SBOM',
+  '/status': 'dalla pagina «Sicurezza e trasparenza», col codice e lo SBOM',
 };
 
 describe('menu dello staff', () => {
@@ -106,7 +107,7 @@ describe('navigazione del sito pubblico', () => {
 
   it('ogni pagina pubblica statica ha un link in intestazione o piè di pagina', () => {
     const neiLink = new Set(
-      [...LINK_INTESTAZIONE, ...LINK_PIEDE_EVENTI].map((l) => l.href as string),
+      LINK_INTESTAZIONE.map((l) => l.href as string),
     );
     const orfane = percorsiStatici
       .filter((p) => p !== '/admin' && !p.startsWith('/admin/'))

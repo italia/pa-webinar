@@ -44,6 +44,7 @@ export const updateSettingsSchema = z.object({
   parentOrganizationUrl: z.preprocess(withScheme, z.string().url().or(z.literal(''))).optional(),
   siteTagline: z.record(z.string(), z.string().max(200)).optional(),
   logoUrl: urlField().nullish(),
+  organizationLogoUrl: urlField().nullish(),
   faviconUrl: urlField().nullish(),
   primaryColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
   seoTitle: z.string().max(200).optional(),

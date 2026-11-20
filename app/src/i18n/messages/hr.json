@@ -2302,7 +2302,9 @@
         "waitingRoomEngineGame": "Videoigra (Phaser predvorje)",
         "waitingRoomEngineClassic": "Klasična (statična)",
         "waitingRoomEngineHelp": "Zadani način rada čekaonice. Može se promijeniti za pojedini događaj i, za jedan posjet, parametrom {param} u adresi.",
-        "primaryColorHex": "Primarna boja (heksadecimalni kôd)"
+        "primaryColorHex": "Primarna boja (heksadecimalni kôd)",
+        "organizationLogoUrl": "Logotip ustanove",
+        "organizationLogoUrlHelp": "Prikazuje se u podnožju uz naziv ustanove koja vodi uslugu. Ostavite prazno za prikaz samo naziva."
       },
       "watermark": {
         "title": "Prilagodba videa",
@@ -5515,22 +5517,18 @@
   "footer": {
     "privacy": "Politika privatnosti",
     "accessibility": "Izjava o pristupačnosti",
-    "openSource": "Softver otvorenog koda",
-    "contacts": "Kontakti",
     "legalNotes": "Pravne napomene",
-    "governmentSite": "Talijanska Vlada",
     "systemStatus": "Stanje sustava",
-    "sbomLatest": "SBOM najnovijeg izdanja",
     "transparency": "Sigurnost i transparentnost",
     "serviceInventory": "Inventar usluga",
-    "sourceCode": "Izvorni kod",
-    "viewRelease": "Prikaži izdanje na GitHubu",
     "viewChangelog": "Pogledaj novosti (changelog)",
     "newWindow": "otvara se u novom prozoru",
     "usefulLinks": "Korisne poveznice",
     "version": "Verzija {version}",
     "versionDev": "Razvojna verzija",
-    "updatedOn": "ažurirano {date}"
+    "updatedOn": "ažurirano {date}",
+    "projectOf": "Projekt provodi",
+    "contactsLine": "Kontakti: <link>{email}</link>"
   },
   "changelog": {
     "metaTitle": "Novosti i changelog",

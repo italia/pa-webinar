@@ -2302,7 +2302,9 @@
         "waitingRoomEngineGame": "Videojáték (Phaser lobby)",
         "waitingRoomEngineClassic": "Klasszikus (statikus)",
         "waitingRoomEngineHelp": "A váróterem alapértelmezett módja. Egy-egy eseménynél módosítható, egyetlen látogatásra pedig a címben szereplő {param} paraméterrel.",
-        "primaryColorHex": "Elsődleges szín (hexadecimális kód)"
+        "primaryColorHex": "Elsődleges szín (hexadecimális kód)",
+        "organizationLogoUrl": "Az intézmény logója",
+        "organizationLogoUrlHelp": "A láblécben jelenik meg, a szolgáltatást működtető intézmény neve mellett. Hagyja üresen, ha csak a nevet szeretné megjeleníteni."
       },
       "watermark": {
         "title": "Videó testreszabás",
@@ -5515,22 +5517,18 @@
   "footer": {
     "privacy": "Adatvédelmi tájékoztató",
     "accessibility": "Akadálymentességi nyilatkozat",
-    "openSource": "Nyílt forráskódú szoftver",
-    "contacts": "Kapcsolat",
     "legalNotes": "Jogi közlemények",
-    "governmentSite": "Olasz Kormány",
     "systemStatus": "Rendszer állapota",
-    "sbomLatest": "Legutóbbi kiadás SBOM-ja",
     "transparency": "Biztonság és átláthatóság",
     "serviceInventory": "Szolgáltatásleltár",
-    "sourceCode": "Forráskód",
-    "viewRelease": "Kiadás megtekintése a GitHubon",
     "viewChangelog": "Újdonságok megtekintése (változásnapló)",
     "newWindow": "új ablakban nyílik meg",
     "usefulLinks": "Hasznos hivatkozások",
     "version": "{version} verzió",
     "versionDev": "Fejlesztői verzió",
-    "updatedOn": "frissítve: {date}"
+    "updatedOn": "frissítve: {date}",
+    "projectOf": "Megvalósító",
+    "contactsLine": "Kapcsolat: <link>{email}</link>"
   },
   "changelog": {
     "metaTitle": "Újdonságok és változásnapló",

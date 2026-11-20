@@ -61,7 +61,7 @@ export default function PAHeader({ staff = null }: PAHeaderProps) {
           parentUrl={parentUrl}
           staff={staff}
         />
-        <CenterHeader appName={appName} logoUrl={settings.logoUrl} />
+        <CenterHeader appName={appName} logoUrl={settings.logoUrl} conMenuAdmin={staff !== null} />
       </Headers>
     </header>
   );
@@ -126,9 +126,13 @@ function SlimHeader({
 function CenterHeader({
   appName,
   logoUrl,
+  conMenuAdmin,
 }: {
   appName: string;
   logoUrl?: string | null;
+  /** C'e' una sessione dello staff: nell'area di amministrazione c'e' il suo
+   *  menu (admin/layout.tsx lo disegna solo allora). */
+  conMenuAdmin: boolean;
 }) {
   const t = useTranslations('nav');
   const tr = useTranslations();
@@ -136,11 +140,11 @@ function CenterHeader({
   // Nell'area di amministrazione l'header resta lo stesso in ogni sezione e
   // non ripete cio' che il menu ha gia' (il calendario sta in «Tutti gli
   // eventi», la videoteca in «Video»): niente collegamenti qui.
-  // Le porte d'ingresso (accesso, link per email) non hanno il menu: li'
-  // i collegamenti pubblici restano.
+  // Solo dove il menu dell'amministrazione c'e': le porte d'ingresso e le
+  // pagine aperte col solo link di conduzione (senza sessione) non lo hanno, e
+  // li' i collegamenti pubblici restano.
   const pagina = usePathname();
-  const nellAdmin =
-    pagina.startsWith('/admin') && pagina !== '/admin/login' && pagina !== '/admin/access';
+  const nellAdmin = conMenuAdmin && pagina.startsWith('/admin');
 
   return (
     <Header type="center" theme="dark" small>

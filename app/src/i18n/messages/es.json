@@ -2302,7 +2302,9 @@
         "waitingRoomEngineGame": "Videojuego (lobby Phaser)",
         "waitingRoomEngineClassic": "Clásica (estática)",
         "waitingRoomEngineHelp": "Modo predeterminado de la sala de espera. Se puede cambiar para cada evento y, para una sola visita, con el parámetro {param} en la dirección.",
-        "primaryColorHex": "Color principal (código hexadecimal)"
+        "primaryColorHex": "Color principal (código hexadecimal)",
+        "organizationLogoUrl": "Logotipo de la entidad",
+        "organizationLogoUrlHelp": "Aparece en el pie de página junto al nombre de la entidad que gestiona el servicio. Déjalo vacío para mostrar solo el nombre."
       },
       "watermark": {
         "title": "Personalización del vídeo",
@@ -5515,22 +5517,18 @@
   "footer": {
     "privacy": "Política de privacidad",
     "accessibility": "Declaración de accesibilidad",
-    "openSource": "Software de código abierto",
-    "contacts": "Contacto",
     "legalNotes": "Aviso legal",
-    "governmentSite": "Gobierno Italiano",
     "systemStatus": "Estado del sistema",
-    "sbomLatest": "SBOM de la última versión",
     "transparency": "Seguridad y transparencia",
     "serviceInventory": "Inventario de servicios",
-    "sourceCode": "Código fuente",
-    "viewRelease": "Ver la versión en GitHub",
     "viewChangelog": "Ver las novedades (changelog)",
     "newWindow": "se abre en una ventana nueva",
     "usefulLinks": "Enlaces útiles",
     "version": "Versión {version}",
     "versionDev": "Versión de desarrollo",
-    "updatedOn": "actualizada el {date}"
+    "updatedOn": "actualizada el {date}",
+    "projectOf": "Un proyecto de",
+    "contactsLine": "Contacto: <link>{email}</link>"
   },
   "changelog": {
     "metaTitle": "Novedades y changelog",

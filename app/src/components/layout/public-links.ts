@@ -25,18 +25,12 @@ export interface LinkPubblico {
   soloSe?: keyof ImpostazioniDeiLink;
 }
 
-/** Intestazione, a destra: su ogni pagina. */
+/** Intestazione, a destra: su ogni pagina pubblica. E' il menu del sito: il
+ *  piè di pagina non lo ripete. */
 export const LINK_INTESTAZIONE: readonly LinkPubblico[] = [
+  { href: '/events', labelKey: 'nav.events', icon: 'it-list' },
   { href: '/calendar', labelKey: 'nav.calendar', icon: 'it-calendar', soloSe: 'calendarPublic' },
   { href: '/video-library', labelKey: 'nav.videoLibrary', icon: 'it-video' },
-];
-
-/** Piè di pagina, colonna degli eventi: quello che serve a chi partecipa. */
-export const LINK_PIEDE_EVENTI: readonly LinkPubblico[] = [
-  { href: '/events', labelKey: 'nav.allEvents' },
-  { href: '/calendar', labelKey: 'nav.calendar', soloSe: 'calendarPublic' },
-  { href: '/video-library', labelKey: 'nav.videoLibrary' },
-  { href: '/privacy/my-data', labelKey: 'gdpr.export.title' },
 ];
 
 /** Il link va mostrato con queste impostazioni? */

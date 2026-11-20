@@ -57,6 +57,7 @@ const POSTO: Record<string, [SettingsTab, string]> = {
   parentOrganization: ['branding', 'parentOrganization'],
   parentOrganizationUrl: ['branding', 'parentOrganizationUrl'],
   logoUrl: ['branding', 'logoUrl'],
+  organizationLogoUrl: ['branding', 'organizationLogoUrl'],
   faviconUrl: ['branding', 'faviconUrl'],
   jitsiWatermarkUrl: ['branding', 'jitsiWatermarkUrl'],
   jitsiWatermarkOpacity: ['branding', 'jitsiWatermarkOpacity'],

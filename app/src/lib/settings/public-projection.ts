@@ -56,7 +56,7 @@ export const PUBLIC_SETTING_FIELDS = [
   'id', 'siteName', 'siteDescription',
   'organizationName', 'organizationNameShort', 'organizationUrl',
   'parentOrganization', 'parentOrganizationUrl', 'siteTagline',
-  'logoUrl', 'faviconUrl', 'primaryColor', 'defaultTimezone',
+  'logoUrl', 'organizationLogoUrl', 'faviconUrl', 'primaryColor', 'defaultTimezone',
   'seoTitle', 'seoDescription', 'seoImage',
   // Anteprima dei link condivisi: dicono soltanto CHE COSA la scheda mostra, e
   // quello che mostra e' gia' pubblico per definizione — sta nell'immagine che

@@ -522,7 +522,8 @@ function OrganizersSection({
   };
 
   return (
-    // Aperta anche vuota: chiusa, la si saltava per la card successiva.
+    // Aperta anche vuota, come il moderatore principale che segue: e' parte di
+    // «Chi organizza», non un'aggiunta facoltativa da scoprire.
     <Gruppo
       title={t('organizersHeading')}
       help={t('organizersHelp')}

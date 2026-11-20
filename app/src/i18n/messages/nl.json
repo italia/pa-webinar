@@ -2302,7 +2302,9 @@
         "waitingRoomEngineGame": "Videogame (Phaser-lobby)",
         "waitingRoomEngineClassic": "Klassiek (statisch)",
         "waitingRoomEngineHelp": "Standaardmodus van de wachtruimte. Die kan per evenement worden gewijzigd en, voor één bezoek, met de parameter {param} in het adres.",
-        "primaryColorHex": "Primaire kleur (hexcode)"
+        "primaryColorHex": "Primaire kleur (hexcode)",
+        "organizationLogoUrl": "Logo van de organisatie",
+        "organizationLogoUrlHelp": "Staat in de voettekst naast de naam van de organisatie die de dienst beheert. Laat leeg om alleen de naam te tonen."
       },
       "watermark": {
         "title": "Video-aanpassing",
@@ -5515,22 +5517,18 @@
   "footer": {
     "privacy": "Privacybeleid",
     "accessibility": "Toegankelijkheidsverklaring",
-    "openSource": "Opensourcesoftware",
-    "contacts": "Contact",
     "legalNotes": "Juridische kennisgeving",
-    "governmentSite": "Italiaanse Overheid",
     "systemStatus": "Systeemstatus",
-    "sbomLatest": "SBOM van de laatste release",
     "transparency": "Beveiliging en transparantie",
     "serviceInventory": "Service-inventaris",
-    "sourceCode": "Broncode",
-    "viewRelease": "Bekijk release op GitHub",
     "viewChangelog": "Bekijk wat er nieuw is (changelog)",
     "newWindow": "opent in een nieuw venster",
     "usefulLinks": "Nuttige links",
     "version": "Versie {version}",
     "versionDev": "Ontwikkelversie",
-    "updatedOn": "bijgewerkt op {date}"
+    "updatedOn": "bijgewerkt op {date}",
+    "projectOf": "Een project van",
+    "contactsLine": "Contact: <link>{email}</link>"
   },
   "changelog": {
     "metaTitle": "Nieuws en changelog",

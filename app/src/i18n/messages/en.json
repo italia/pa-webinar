@@ -2302,7 +2302,9 @@
         "waitingRoomEngineGame": "Videogame (Phaser lobby)",
         "waitingRoomEngineClassic": "Classic (static)",
         "waitingRoomEngineHelp": "Default mode of the waiting room. It can be changed for a single event and, for one visit, with the {param} parameter in the address.",
-        "primaryColorHex": "Primary color (hex code)"
+        "primaryColorHex": "Primary color (hex code)",
+        "organizationLogoUrl": "Organization logo",
+        "organizationLogoUrlHelp": "Shown in the footer next to the name of the organization that runs the service. Leave empty to show the name only."
       },
       "watermark": {
         "title": "Video customization",
@@ -5515,22 +5517,18 @@
   "footer": {
     "privacy": "Privacy policy",
     "accessibility": "Accessibility statement",
-    "openSource": "Open source software",
-    "contacts": "Contacts",
     "legalNotes": "Legal notes",
-    "governmentSite": "Italian Government",
     "systemStatus": "System status",
-    "sbomLatest": "SBOM latest release",
     "transparency": "Security and transparency",
     "serviceInventory": "Service inventory",
-    "sourceCode": "Source code",
-    "viewRelease": "View release on GitHub",
     "viewChangelog": "See what's new (changelog)",
     "newWindow": "opens in a new window",
     "usefulLinks": "Useful links",
     "version": "Version {version}",
     "versionDev": "Development version",
-    "updatedOn": "updated on {date}"
+    "updatedOn": "updated on {date}",
+    "projectOf": "A project by",
+    "contactsLine": "Contacts: <link>{email}</link>"
   },
   "changelog": {
     "metaTitle": "What's new & changelog",

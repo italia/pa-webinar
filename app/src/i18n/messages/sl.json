@@ -2302,7 +2302,9 @@
         "waitingRoomEngineGame": "Videoigra (lobi Phaser)",
         "waitingRoomEngineClassic": "Klasična (statična)",
         "waitingRoomEngineHelp": "Privzeti način čakalnice. Spremeniti ga je mogoče za posamezen dogodek, za en obisk pa s parametrom {param} v naslovu.",
-        "primaryColorHex": "Primarna barva (šestnajstiška koda)"
+        "primaryColorHex": "Primarna barva (šestnajstiška koda)",
+        "organizationLogoUrl": "Logotip ustanove",
+        "organizationLogoUrlHelp": "Prikaže se v nogi strani ob imenu ustanove, ki upravlja storitev. Pustite prazno, da se prikaže samo ime."
       },
       "watermark": {
         "title": "Prilagoditev videa",
@@ -5515,22 +5517,18 @@
   "footer": {
     "privacy": "Politika zasebnosti",
     "accessibility": "Izjava o dostopnosti",
-    "openSource": "Odprtokodna programska oprema",
-    "contacts": "Kontakti",
     "legalNotes": "Pravna obvestila",
-    "governmentSite": "Italijanska vlada",
     "systemStatus": "Stanje sistema",
-    "sbomLatest": "SBOM najnovejše izdaje",
     "transparency": "Varnost in preglednost",
     "serviceInventory": "Inventar storitev",
-    "sourceCode": "Izvorna koda",
-    "viewRelease": "Oglejte si izdajo na GitHubu",
     "viewChangelog": "Oglejte si novosti (dnevnik sprememb)",
     "newWindow": "odpre se v novem oknu",
     "usefulLinks": "Uporabne povezave",
     "version": "Različica {version}",
     "versionDev": "Razvojna različica",
-    "updatedOn": "posodobljeno {date}"
+    "updatedOn": "posodobljeno {date}",
+    "projectOf": "Projekt izvaja",
+    "contactsLine": "Kontakti: <link>{email}</link>"
   },
   "changelog": {
     "metaTitle": "Novosti in dnevnik sprememb",

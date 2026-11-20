@@ -2512,7 +2512,9 @@
         "waitingRoomEngineGame": "Videogame (lobby Phaser)",
         "waitingRoomEngineClassic": "Classica (statica)",
         "waitingRoomEngineHelp": "Modalità predefinita della sala d'attesa. Si può cambiare per il singolo evento e, per una sola visita, con il parametro {param} nell'indirizzo.",
-        "primaryColorHex": "Colore primario (codice esadecimale)"
+        "primaryColorHex": "Colore primario (codice esadecimale)",
+        "organizationLogoUrl": "Logo dell'ente",
+        "organizationLogoUrlHelp": "Compare nel piè di pagina accanto al nome dell'ente che porta il servizio. Lascia vuoto per mostrare solo il nome."
       },
       "watermark": {
         "title": "Personalizzazione video",
@@ -5515,22 +5517,18 @@
   "footer": {
     "privacy": "Informativa privacy",
     "accessibility": "Dichiarazione di accessibilità",
-    "openSource": "Software open source",
-    "contacts": "Contatti",
     "legalNotes": "Note legali",
-    "governmentSite": "Governo Italiano",
     "systemStatus": "Stato del sistema",
-    "sbomLatest": "SBOM ultima release",
     "transparency": "Sicurezza e trasparenza",
     "serviceInventory": "Inventario servizi",
-    "sourceCode": "Codice sorgente",
-    "viewRelease": "Vedi la release su GitHub",
     "viewChangelog": "Vedi le novità (changelog)",
     "newWindow": "si apre in una nuova finestra",
     "usefulLinks": "Link utili",
     "version": "Versione {version}",
     "versionDev": "Versione di sviluppo",
-    "updatedOn": "aggiornata il {date}"
+    "updatedOn": "aggiornata il {date}",
+    "projectOf": "Progetto di",
+    "contactsLine": "Contatti: <link>{email}</link>"
   },
   "changelog": {
     "metaTitle": "Novità e changelog",

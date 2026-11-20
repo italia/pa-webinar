@@ -2302,7 +2302,9 @@
         "waitingRoomEngineGame": "Видеоигра (лоби с Phaser)",
         "waitingRoomEngineClassic": "Класическа (статична)",
         "waitingRoomEngineHelp": "Режим по подразбиране на чакалнята. Може да се промени за отделно събитие, а за едно посещение — с параметъра {param} в адреса.",
-        "primaryColorHex": "Основен цвят (шестнадесетичен код)"
+        "primaryColorHex": "Основен цвят (шестнадесетичен код)",
+        "organizationLogoUrl": "Лого на институцията",
+        "organizationLogoUrlHelp": "Показва се във футъра до името на институцията, която управлява услугата. Оставете празно, за да се показва само името."
       },
       "watermark": {
         "title": "Персонализиране на видеото",
@@ -5515,22 +5517,18 @@
   "footer": {
     "privacy": "Политика за поверителност",
     "accessibility": "Декларация за достъпност",
-    "openSource": "Софтуер с отворен код",
-    "contacts": "Контакти",
     "legalNotes": "Правни бележки",
-    "governmentSite": "Италианско правителство",
     "systemStatus": "Състояние на системата",
-    "sbomLatest": "SBOM на последната версия",
     "transparency": "Сигурност и прозрачност",
     "serviceInventory": "Инвентар на услугите",
-    "sourceCode": "Изходен код",
-    "viewRelease": "Преглед на версията в GitHub",
     "viewChangelog": "Вижте новостите (changelog)",
     "newWindow": "отваря се в нов прозорец",
     "usefulLinks": "Полезни връзки",
     "version": "Версия {version}",
     "versionDev": "Версия за разработка",
-    "updatedOn": "обновена на {date}"
+    "updatedOn": "обновена на {date}",
+    "projectOf": "Проектът се изпълнява от",
+    "contactsLine": "Контакти: <link>{email}</link>"
   },
   "changelog": {
     "metaTitle": "Новости и changelog",

@@ -2302,7 +2302,9 @@
         "waitingRoomEngineGame": "Videospiel (Phaser-Lobby)",
         "waitingRoomEngineClassic": "Klassisch (statisch)",
         "waitingRoomEngineHelp": "Standardmodus des Warteraums. Er lässt sich für eine einzelne Veranstaltung ändern und, für einen einzelnen Besuch, mit dem Parameter {param} in der Adresse.",
-        "primaryColorHex": "Primärfarbe (Hex-Code)"
+        "primaryColorHex": "Primärfarbe (Hex-Code)",
+        "organizationLogoUrl": "Logo der Organisation",
+        "organizationLogoUrlHelp": "Erscheint in der Fußzeile neben dem Namen der Organisation, die den Dienst betreibt. Leer lassen, um nur den Namen anzuzeigen."
       },
       "watermark": {
         "title": "Video-Anpassung",
@@ -5515,22 +5517,18 @@
   "footer": {
     "privacy": "Datenschutzerklärung",
     "accessibility": "Barrierefreiheitserklärung",
-    "openSource": "Open-Source-Software",
-    "contacts": "Kontakte",
     "legalNotes": "Rechtliche Hinweise",
-    "governmentSite": "Italienische Regierung",
     "systemStatus": "Systemstatus",
-    "sbomLatest": "SBOM der letzten Version",
     "transparency": "Sicherheit und Transparenz",
     "serviceInventory": "Dienste-Inventar",
-    "sourceCode": "Quellcode",
-    "viewRelease": "Release auf GitHub ansehen",
     "viewChangelog": "Neuigkeiten ansehen (Changelog)",
     "newWindow": "öffnet sich in einem neuen Fenster",
     "usefulLinks": "Nützliche Links",
     "version": "Version {version}",
     "versionDev": "Entwicklungsversion",
-    "updatedOn": "aktualisiert am {date}"
+    "updatedOn": "aktualisiert am {date}",
+    "projectOf": "Ein Projekt von",
+    "contactsLine": "Kontakte: <link>{email}</link>"
   },
   "changelog": {
     "metaTitle": "Neuigkeiten und Changelog",

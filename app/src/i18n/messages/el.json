@@ -2302,7 +2302,9 @@
         "waitingRoomEngineGame": "Βιντεοπαιχνίδι (lobby Phaser)",
         "waitingRoomEngineClassic": "Κλασική (στατική)",
         "waitingRoomEngineHelp": "Προεπιλεγμένη λειτουργία της αίθουσας αναμονής. Μπορεί να αλλάξει για μεμονωμένη εκδήλωση και, για μία επίσκεψη, με την παράμετρο {param} στη διεύθυνση.",
-        "primaryColorHex": "Κύριο χρώμα (δεκαεξαδικός κωδικός)"
+        "primaryColorHex": "Κύριο χρώμα (δεκαεξαδικός κωδικός)",
+        "organizationLogoUrl": "Λογότυπο του φορέα",
+        "organizationLogoUrlHelp": "Εμφανίζεται στο υποσέλιδο δίπλα στο όνομα του φορέα που διαχειρίζεται την υπηρεσία. Αφήστε κενό για να εμφανίζεται μόνο το όνομα."
       },
       "watermark": {
         "title": "Προσαρμογή βίντεο",
@@ -5515,22 +5517,18 @@
   "footer": {
     "privacy": "Πολιτική απορρήτου",
     "accessibility": "Δήλωση προσβασιμότητας",
-    "openSource": "Λογισμικό ανοιχτού κώδικα",
-    "contacts": "Επικοινωνία",
     "legalNotes": "Νομικές σημειώσεις",
-    "governmentSite": "Ιταλική Κυβέρνηση",
     "systemStatus": "Κατάσταση συστήματος",
-    "sbomLatest": "SBOM τελευταίας έκδοσης",
     "transparency": "Ασφάλεια και διαφάνεια",
     "serviceInventory": "Κατάλογος υπηρεσιών",
-    "sourceCode": "Πηγαίος κώδικας",
-    "viewRelease": "Προβολή έκδοσης στο GitHub",
     "viewChangelog": "Δείτε τα νέα (changelog)",
     "newWindow": "ανοίγει σε νέο παράθυρο",
     "usefulLinks": "Χρήσιμοι σύνδεσμοι",
     "version": "Έκδοση {version}",
     "versionDev": "Έκδοση ανάπτυξης",
-    "updatedOn": "ενημερώθηκε στις {date}"
+    "updatedOn": "ενημερώθηκε στις {date}",
+    "projectOf": "Υλοποίηση",
+    "contactsLine": "Επικοινωνία: <link>{email}</link>"
   },
   "changelog": {
     "metaTitle": "Νέα και changelog",

@@ -2302,7 +2302,9 @@
         "waitingRoomEngineGame": "Vaizdo žaidimas (Phaser fojė)",
         "waitingRoomEngineClassic": "Klasikinis (statinis)",
         "waitingRoomEngineHelp": "Numatytasis laukiamojo režimas. Jį galima pakeisti atskiram renginiui, o vienam apsilankymui – adreso parametru {param}.",
-        "primaryColorHex": "Pagrindinė spalva (šešioliktainis kodas)"
+        "primaryColorHex": "Pagrindinė spalva (šešioliktainis kodas)",
+        "organizationLogoUrl": "Įstaigos logotipas",
+        "organizationLogoUrlHelp": "Rodomas poraštėje šalia paslaugą teikiančios įstaigos pavadinimo. Palikite tuščią, kad būtų rodomas tik pavadinimas."
       },
       "watermark": {
         "title": "Vaizdo tinkinimas",
@@ -5515,22 +5517,18 @@
   "footer": {
     "privacy": "Privatumo politika",
     "accessibility": "Prieinamumo deklaracija",
-    "openSource": "Atvirojo kodo programinė įranga",
-    "contacts": "Kontaktai",
     "legalNotes": "Teisinės pastabos",
-    "governmentSite": "Italijos Vyriausybė",
     "systemStatus": "Sistemos būsena",
-    "sbomLatest": "Naujausio leidimo SBOM",
     "transparency": "Saugumas ir skaidrumas",
     "serviceInventory": "Paslaugų inventorius",
-    "sourceCode": "Šaltinio kodas",
-    "viewRelease": "Peržiūrėti leidimą „GitHub“",
     "viewChangelog": "Žiūrėti naujienas (pakeitimų sąrašą)",
     "newWindow": "atsidaro naujame lange",
     "usefulLinks": "Naudingos nuorodos",
     "version": "Versija {version}",
     "versionDev": "Kūrimo versija",
-    "updatedOn": "atnaujinta {date}"
+    "updatedOn": "atnaujinta {date}",
+    "projectOf": "Projektą vykdo",
+    "contactsLine": "Kontaktai: <link>{email}</link>"
   },
   "changelog": {
     "metaTitle": "Naujienos ir pakeitimų sąrašas",

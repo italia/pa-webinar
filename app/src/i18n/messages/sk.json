@@ -2302,7 +2302,9 @@
         "waitingRoomEngineGame": "Videohra (lobby Phaser)",
         "waitingRoomEngineClassic": "Klasická (statická)",
         "waitingRoomEngineHelp": "Predvolený režim čakárne. Dá sa zmeniť pre jednotlivé podujatie a pre jednu návštevu parametrom {param} v adrese.",
-        "primaryColorHex": "Primárna farba (hexadecimálny kód)"
+        "primaryColorHex": "Primárna farba (hexadecimálny kód)",
+        "organizationLogoUrl": "Logo inštitúcie",
+        "organizationLogoUrlHelp": "Zobrazí sa v päte vedľa názvu inštitúcie, ktorá službu prevádzkuje. Nechajte prázdne, ak chcete zobraziť len názov."
       },
       "watermark": {
         "title": "Prispôsobenie videa",
@@ -5515,22 +5517,18 @@
   "footer": {
     "privacy": "Zásady ochrany osobných údajov",
     "accessibility": "Vyhlásenie o prístupnosti",
-    "openSource": "Open source softvér",
-    "contacts": "Kontakty",
     "legalNotes": "Právne upozornenia",
-    "governmentSite": "Talianska vláda",
     "systemStatus": "Stav systému",
-    "sbomLatest": "SBOM najnovšieho vydania",
     "transparency": "Bezpečnosť a transparentnosť",
     "serviceInventory": "Inventár služieb",
-    "sourceCode": "Zdrojový kód",
-    "viewRelease": "Zobraziť vydanie na GitHube",
     "viewChangelog": "Pozrite si novinky (changelog)",
     "newWindow": "otvorí sa v novom okne",
     "usefulLinks": "Užitočné odkazy",
     "version": "Verzia {version}",
     "versionDev": "Vývojová verzia",
-    "updatedOn": "aktualizované {date}"
+    "updatedOn": "aktualizované {date}",
+    "projectOf": "Projekt realizuje",
+    "contactsLine": "Kontakty: <link>{email}</link>"
   },
   "changelog": {
     "metaTitle": "Novinky a changelog",

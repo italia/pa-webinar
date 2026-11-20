@@ -2302,7 +2302,9 @@
         "waitingRoomEngineGame": "Videohra (lobby Phaser)",
         "waitingRoomEngineClassic": "Klasická (statická)",
         "waitingRoomEngineHelp": "Výchozí režim čekárny. Lze jej změnit pro jednotlivou událost a pro jednu návštěvu parametrem {param} v adrese.",
-        "primaryColorHex": "Primární barva (hexadecimální kód)"
+        "primaryColorHex": "Primární barva (hexadecimální kód)",
+        "organizationLogoUrl": "Logo instituce",
+        "organizationLogoUrlHelp": "Zobrazí se v zápatí vedle názvu instituce, která službu provozuje. Nechte prázdné, chcete-li zobrazit jen název."
       },
       "watermark": {
         "title": "Přizpůsobení videa",
@@ -5515,22 +5517,18 @@
   "footer": {
     "privacy": "Zásady ochrany osobních údajů",
     "accessibility": "Prohlášení o přístupnosti",
-    "openSource": "Software s otevřeným zdrojovým kódem",
-    "contacts": "Kontakty",
     "legalNotes": "Právní upozornění",
-    "governmentSite": "Italská vláda",
     "systemStatus": "Stav systému",
-    "sbomLatest": "SBOM nejnovějšího vydání",
     "transparency": "Bezpečnost a transparentnost",
     "serviceInventory": "Inventář služeb",
-    "sourceCode": "Zdrojový kód",
-    "viewRelease": "Zobrazit vydání na GitHubu",
     "viewChangelog": "Zobrazit novinky (changelog)",
     "newWindow": "otevře se v novém okně",
     "usefulLinks": "Užitečné odkazy",
     "version": "Verze {version}",
     "versionDev": "Vývojová verze",
-    "updatedOn": "aktualizováno {date}"
+    "updatedOn": "aktualizováno {date}",
+    "projectOf": "Projekt realizuje",
+    "contactsLine": "Kontakty: <link>{email}</link>"
   },
   "changelog": {
     "metaTitle": "Novinky a changelog",

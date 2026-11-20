@@ -2302,7 +2302,9 @@
         "waitingRoomEngineGame": "Videospēle (Phaser vestibils)",
         "waitingRoomEngineClassic": "Klasiskā (statiskā)",
         "waitingRoomEngineHelp": "Uzgaidāmās telpas noklusējuma režīms. To var mainīt atsevišķam pasākumam un vienam apmeklējumam — ar parametru {param} adresē.",
-        "primaryColorHex": "Galvenā krāsa (heksadecimālais kods)"
+        "primaryColorHex": "Galvenā krāsa (heksadecimālais kods)",
+        "organizationLogoUrl": "Iestādes logotips",
+        "organizationLogoUrlHelp": "Tiek rādīts kājenē blakus pakalpojumu nodrošinošās iestādes nosaukumam. Atstājiet tukšu, lai rādītu tikai nosaukumu."
       },
       "watermark": {
         "title": "Video pielāgošana",
@@ -5515,22 +5517,18 @@
   "footer": {
     "privacy": "Privātuma politika",
     "accessibility": "Pieejamības paziņojums",
-    "openSource": "Atvērtā pirmkoda programmatūra",
-    "contacts": "Kontakti",
     "legalNotes": "Juridiskās piezīmes",
-    "governmentSite": "Itālijas valdība",
     "systemStatus": "Sistēmas statuss",
-    "sbomLatest": "Jaunākā laidiena SBOM",
     "transparency": "Drošība un pārredzamība",
     "serviceInventory": "Pakalpojumu inventārs",
-    "sourceCode": "Avota kods",
-    "viewRelease": "Skatīt laidienu GitHub",
     "viewChangelog": "Skatīt jaunumus (izmaiņu žurnālu)",
     "newWindow": "atveras jaunā logā",
     "usefulLinks": "Noderīgas saites",
     "version": "Versija {version}",
     "versionDev": "Izstrādes versija",
-    "updatedOn": "atjaunināta {date}"
+    "updatedOn": "atjaunināta {date}",
+    "projectOf": "Projektu īsteno",
+    "contactsLine": "Kontakti: <link>{email}</link>"
   },
   "changelog": {
     "metaTitle": "Jaunumi un izmaiņu žurnāls",

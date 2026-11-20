@@ -14886,6 +14886,68 @@ a.campo-file__nome {
   }
 }
 
+// Il piè di pagina essenziale (components/layout/pa-footer.tsx): sotto il
+// servizio, l'ente che lo porta, come nei siti della PA («Progetto di», con il
+// logo); poi gli eventuali link scelti da chi amministra.
+.footer-progetto,
+.footer-utili {
+  padding: 1.5rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+
+  a {
+    color: #fff;
+  }
+}
+
+.footer-progetto__etichetta {
+  margin: 0 0 0.75rem;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.footer-progetto__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.footer-progetto__ente {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.footer-progetto__logo {
+  height: 48px;
+  width: auto;
+  max-width: 12rem;
+  object-fit: contain;
+}
+
+.footer-progetto__nome {
+  display: block;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.footer-progetto__sovra {
+  display: block;
+  font-size: 0.875rem;
+}
+
+.footer-progetto__contatti {
+  margin: 1rem 0 0;
+  font-size: 0.9rem;
+}
+
+.footer-utili .list-inline-item:not(:last-child) {
+  margin-right: 1.5rem;
+}
+
 // «Torna su» sta in basso a destra: la riga in fondo al piè di pagina gli
 // lascia lo spazio, cosi' la versione non finisce sotto il pulsante.
 .it-footer-small-prints .container {

@@ -2302,7 +2302,9 @@
         "waitingRoomEngineGame": "Físchluiche (forsheomra Phaser)",
         "waitingRoomEngineClassic": "Clasaiceach (statach)",
         "waitingRoomEngineHelp": "Mód réamhshocraithe an tseomra feithimh. Is féidir é a athrú d'imeacht ar leith agus, do chuairt amháin, leis an bparaiméadar {param} sa seoladh.",
-        "primaryColorHex": "Príomhdhath (cód heicsidheachúlach)"
+        "primaryColorHex": "Príomhdhath (cód heicsidheachúlach)",
+        "organizationLogoUrl": "Lógó na heagraíochta",
+        "organizationLogoUrlHelp": "Taispeántar sa bhuntásc é in aice le hainm na heagraíochta a reáchtálann an tseirbhís. Fág folamh chun an t-ainm amháin a thaispeáint."
       },
       "watermark": {
         "title": "Saincheapadh físe",
@@ -5515,22 +5517,18 @@
   "footer": {
     "privacy": "Beartas príobháideachta",
     "accessibility": "Ráiteas inrochtaineachta",
-    "openSource": "Bogearraí foinse oscailte",
-    "contacts": "Teagmhálacha",
     "legalNotes": "Nótaí dlíthiúla",
-    "governmentSite": "Rialtas na hIodáile",
     "systemStatus": "Stádas an chórais",
-    "sbomLatest": "SBOM an eisiúna is déanaí",
     "transparency": "Slándáil agus trédhearcacht",
     "serviceInventory": "Fardal seirbhísí",
-    "sourceCode": "Cód foinse",
-    "viewRelease": "Féach ar an eisiúint ar GitHub",
     "viewChangelog": "Féach ar na nuashonruithe (loga athruithe)",
     "newWindow": "osclaítear i bhfuinneog nua é",
     "usefulLinks": "Naisc úsáideacha",
     "version": "Leagan {version}",
     "versionDev": "Leagan forbartha",
-    "updatedOn": "nuashonraithe ar {date}"
+    "updatedOn": "nuashonraithe ar {date}",
+    "projectOf": "Tionscadal ó",
+    "contactsLine": "Teagmhálacha: <link>{email}</link>"
   },
   "changelog": {
     "metaTitle": "Nuacht agus loga athruithe",

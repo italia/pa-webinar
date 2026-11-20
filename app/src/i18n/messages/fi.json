@@ -2302,7 +2302,9 @@
         "waitingRoomEngineGame": "Videopeli (Phaser-aula)",
         "waitingRoomEngineClassic": "Klassinen (staattinen)",
         "waitingRoomEngineHelp": "Odotushuoneen oletustila. Sitä voi muuttaa yksittäiselle tapahtumalle ja yhden käynnin ajaksi osoitteen parametrilla {param}.",
-        "primaryColorHex": "Pääväri (heksadesimaalikoodi)"
+        "primaryColorHex": "Pääväri (heksadesimaalikoodi)",
+        "organizationLogoUrl": "Organisaation logo",
+        "organizationLogoUrlHelp": "Näkyy alatunnisteessa palvelua ylläpitävän organisaation nimen vieressä. Jätä tyhjäksi, jos haluat näyttää vain nimen."
       },
       "watermark": {
         "title": "Videon mukauttaminen",
@@ -5515,22 +5517,18 @@
   "footer": {
     "privacy": "Tietosuojaseloste",
     "accessibility": "Saavutettavuusseloste",
-    "openSource": "Avoimen lähdekoodin ohjelmisto",
-    "contacts": "Yhteystiedot",
     "legalNotes": "Oikeudelliset huomautukset",
-    "governmentSite": "Italian hallitus",
     "systemStatus": "Järjestelmän tila",
-    "sbomLatest": "Viimeisimmän julkaisun SBOM",
     "transparency": "Turvallisuus ja läpinäkyvyys",
     "serviceInventory": "Palveluinventaari",
-    "sourceCode": "Lähdekoodi",
-    "viewRelease": "Näytä julkaisu GitHubissa",
     "viewChangelog": "Katso uutuudet (muutosloki)",
     "newWindow": "avautuu uuteen ikkunaan",
     "usefulLinks": "Hyödyllisiä linkkejä",
     "version": "Versio {version}",
     "versionDev": "Kehitysversio",
-    "updatedOn": "päivitetty {date}"
+    "updatedOn": "päivitetty {date}",
+    "projectOf": "Hankkeen toteuttaa",
+    "contactsLine": "Yhteystiedot: <link>{email}</link>"
   },
   "changelog": {
     "metaTitle": "Uutuudet ja muutosloki",

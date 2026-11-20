@@ -123,14 +123,15 @@ differently. The organization name, description, favicon, primary color and wate
 |---|---|---|
 | **Application name** | `siteName` | Center header, the browser-title suffix (`<page> — <siteName>`), the live-room top bar when no logo is set, the email header band, the email sender-name fallback, the `og:site_name` of event pages |
 | **Application description** | `siteDescription` | Intro of the events list page and the institutional landing. One string for all languages |
-| **Organization name** | `organizationName` | Footer heading, the institutional and plain-language landings, the built-in privacy, accessibility and legal-notice texts, event structured data, the link-preview card |
+| **Organization name** | `organizationName` | Footer band **A project by** (with its logo), the institutional and plain-language landings, the built-in privacy, accessibility and legal-notice texts, event structured data, the link-preview card |
 | **Organization short name** | `organizationNameShort` | Top bar on small screens |
-| **Organization URL** | `organizationUrl` | Footer **Contacts** column (shown as its host name) |
-| **Parent organization** and its URL | `parentOrganization`, `parentOrganizationUrl` | Top bar (a link that opens in a new tab when the URL is set) and the footer's second line |
-| **Site tagline** | `siteTagline` | Top bar and footer, only when **Parent organization** is empty. Written per language |
-| **Custom logo URL** | `logoUrl` | Center header next to the application name, live-room top bar (medium screens and up), watermark fallback |
-| **Support email** | `supportEmail` | Footer **Contacts** column (in the **Features** tab). With neither this nor **Organization URL** the column is not shown |
-| **GitHub repository URL** | `githubUrl` | Footer **Source code** and **SBOM latest release** links, the build-info commit link, the repository and Scorecard links of the **Security and transparency** page (the upstream repository when empty), and the release links and SBOM viewer of the changelog (only `https://github.com/<owner>/<repo>` URLs are used there). In the **Features** tab |
+| **Organization URL** | `organizationUrl` | The organization's name in the footer band links to it, in a new window |
+| **Parent organization** and its URL | `parentOrganization`, `parentOrganizationUrl` | Top bar (a link that opens in a new tab when the URL is set) and, under the organization's name, the footer band |
+| **Site tagline** | `siteTagline` | Top bar, only when **Parent organization** is empty. Written per language |
+| **Custom logo URL** | `logoUrl` | Center header and footer next to the application name, live-room top bar (medium screens and up), watermark fallback |
+| **Organization logo** | `organizationLogoUrl` | Footer band **A project by**, next to the organization's name (shown only with **Organization name**). Empty: the name only |
+| **Support email** | `supportEmail` | Footer band, as **Contacts** (in the **Features** tab). The band shows it even without an organization name |
+| **GitHub repository URL** | `githubUrl` | The repository, latest release (with the SBOM) and Scorecard links of the **Security and transparency** page (the upstream repository when empty), and the release links and SBOM viewer of the changelog (only `https://github.com/<owner>/<repo>` URLs are used there). In the **Features** tab |
 
 The defaults for these columns are in `app/prisma/schema.prisma`. A few are worth changing on
 day one:
@@ -254,9 +255,14 @@ title field fills both fields.
 
 ## Header, footer and legal pages
 
-The footer has fixed columns: **Events** with **Video library**, **Contacts** (organization URL and
-support email), and **Open source software**. The last column has **Source code** and
-**SBOM latest release** when a GitHub URL is set, and always **Security and transparency**.
+The footer is the essential one of the public-administration sites. Under the application's logo and
+name, a band **A project by** names the organization (**Organization name**, with **Organization logo**
+and **Parent organization**), linked to **Organization URL**, and the **Support email** as
+**Contacts**; without an organization name or a support email the band is not shown. The footer does
+not repeat the site's menu (**Events**, **Calendar** and **Video library** are in the header) nor link
+the source code: **Security and transparency** collects the repository, the latest release with its
+SBOM, the Scorecard score, the security policy and, when available, **Service inventory** and
+**System status**.
 
 The bottom row is configurable in the **Footer** tab. Editing links in that tab currently prevents
 the form from saving, so configure them through the API as described in
@@ -267,17 +273,14 @@ the form from saving, so configure them through the API as described in
   defaults if they are still wanted.
 - The default **Accessibility statement** opens in a new window, with the external-link icon and a
   hidden "opens in a new window"; so does every link to another site (`https://…`, `http://…` or
-  `//…`), including the organization's site, the source code and the SBOM. `mailto:` and `tel:` links
-  open in place.
+  `//…`), including the organization's site. `mailto:` and `tel:` links open in place.
 - The bottom row ends with the version, linked to the changelog (the commit is in the link's title),
   and the date of the last update in the page language: **Version X.Y.Z · updated on …**, or
   **Development version** for images not built from a release. A local `npm run dev` or
   `npm run build` without the `NEXT_PUBLIC_BUILD_*` variables shows none.
-- Links in the **Main** section get a column of their own, **Useful links**, next to **Software open
-  source**.
-- **Service inventory** (only when `SERVICE_INVENTORY_URL` is set, otherwise the page has nothing to
-  show) and, when the status page is enabled, **System status** are in the **Software open source**
-  column, next to **Security and transparency**.
+- Links in the **Main** section get a row of their own, under the organization band.
+- After the legal links, the bottom row always has **My data** and **Security and transparency**.
+  Legal links have no icons; only links that open a new window carry the external-link icon.
 - A link that starts with `/` opens in the same tab, and in the visitor's language when it matches a
   known page. Link titles are one string for all languages.
 
@@ -442,10 +445,8 @@ in [Branding limits](../architecture/jitsi-integration.md#branding-limits).
 
 - **Favicon URL has no effect.** The field is saved, but the browser icon comes from the bundled
   `app/src/app/icon.svg` and `apple-icon.png`.
-- **The footer always shows the PA Webinar mark**, and so does the link-preview card. **Custom logo
-  URL** does not replace it there.
-- **Some footer links never display.** Links in the **Main** section are saved, but only **Legal**
-  links are rendered.
+- **The link-preview card always shows the PA Webinar mark.** **Custom logo URL** does not replace it
+  there.
 - **Several identity fields are single-language:** **Application name**, **Application description**,
   **SEO title**, **SEO description**, footer link titles and the custom home HTML. To get
   per-language SEO text, leave **SEO title** and **SEO description** empty (**SEO description** is

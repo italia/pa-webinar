@@ -2302,7 +2302,9 @@
         "waitingRoomEngineGame": "Videomäng (Phaseri ooteala)",
         "waitingRoomEngineClassic": "Klassikaline (staatiline)",
         "waitingRoomEngineHelp": "Ooteruumi vaikerežiim. Seda saab muuta üksiku sündmuse jaoks ja ühe külastuse jaoks aadressis oleva parameetriga {param}.",
-        "primaryColorHex": "Põhivärv (kuueteistkümnendkood)"
+        "primaryColorHex": "Põhivärv (kuueteistkümnendkood)",
+        "organizationLogoUrl": "Asutuse logo",
+        "organizationLogoUrlHelp": "Kuvatakse jaluses teenust haldava asutuse nime kõrval. Jäta tühjaks, et näidata ainult nime."
       },
       "watermark": {
         "title": "Video kohandamine",
@@ -5515,22 +5517,18 @@
   "footer": {
     "privacy": "Privaatsuspoliitika",
     "accessibility": "Ligipääsetavuse avaldus",
-    "openSource": "Avatud lähtekoodiga tarkvara",
-    "contacts": "Kontaktid",
     "legalNotes": "Õigusteave",
-    "governmentSite": "Itaalia valitsus",
     "systemStatus": "Süsteemi olek",
-    "sbomLatest": "Viimase väljalaske SBOM",
     "transparency": "Turvalisus ja läbipaistvus",
     "serviceInventory": "Teenuste inventuur",
-    "sourceCode": "Lähtekood",
-    "viewRelease": "Vaata väljalaset GitHubis",
     "viewChangelog": "Vaata uuendusi (muudatuste logi)",
     "newWindow": "avaneb uues aknas",
     "usefulLinks": "Kasulikud lingid",
     "version": "Versioon {version}",
     "versionDev": "Arendusversioon",
-    "updatedOn": "uuendatud {date}"
+    "updatedOn": "uuendatud {date}",
+    "projectOf": "Projekti teostab",
+    "contactsLine": "Kontaktid: <link>{email}</link>"
   },
   "changelog": {
     "metaTitle": "Uudised ja muudatuste logi",

@@ -2302,7 +2302,9 @@
         "waitingRoomEngineGame": "Joc video (lobby Phaser)",
         "waitingRoomEngineClassic": "Clasică (statică)",
         "waitingRoomEngineHelp": "Modul implicit al sălii de așteptare. Poate fi schimbat pentru un singur eveniment și, pentru o singură vizită, cu parametrul {param} în adresă.",
-        "primaryColorHex": "Culoare principală (cod hexazecimal)"
+        "primaryColorHex": "Culoare principală (cod hexazecimal)",
+        "organizationLogoUrl": "Logoul instituției",
+        "organizationLogoUrlHelp": "Apare în subsol lângă numele instituției care gestionează serviciul. Lasă gol pentru a afișa doar numele."
       },
       "watermark": {
         "title": "Personalizare video",
@@ -5515,22 +5517,18 @@
   "footer": {
     "privacy": "Politica de confidențialitate",
     "accessibility": "Declarația de accesibilitate",
-    "openSource": "Software open source",
-    "contacts": "Contacte",
     "legalNotes": "Note legale",
-    "governmentSite": "Guvernul Italian",
     "systemStatus": "Starea sistemului",
-    "sbomLatest": "SBOM-ul ultimei versiuni",
     "transparency": "Securitate și transparență",
     "serviceInventory": "Inventar servicii",
-    "sourceCode": "Codul sursă",
-    "viewRelease": "Vezi versiunea pe GitHub",
     "viewChangelog": "Vezi noutățile (changelog)",
     "newWindow": "se deschide într-o fereastră nouă",
     "usefulLinks": "Linkuri utile",
     "version": "Versiunea {version}",
     "versionDev": "Versiune de dezvoltare",
-    "updatedOn": "actualizată la {date}"
+    "updatedOn": "actualizată la {date}",
+    "projectOf": "Proiect realizat de",
+    "contactsLine": "Contacte: <link>{email}</link>"
   },
   "changelog": {
     "metaTitle": "Noutăți și changelog",
