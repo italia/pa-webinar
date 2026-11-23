@@ -4341,7 +4341,8 @@
         "noInstall": "Über den Browser, ohne Installation",
         "interactive": "Live-Q&A und Umfragen",
         "recordings": "Aufzeichnungen und Untertitel",
-        "accessible": "Barrierefrei, in 24 Sprachen"
+        "languagesAll": "In den 24 EU-Sprachen",
+        "languagesSome": "In mehreren Sprachen"
       }
     },
     "upcoming": {

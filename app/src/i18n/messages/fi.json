@@ -4341,7 +4341,8 @@
         "noInstall": "Selaimesta, ilman asennuksia",
         "interactive": "Suorat kysymykset ja kyselyt",
         "recordings": "Tallenteet ja tekstitykset",
-        "accessible": "Saavutettava, 24 kielellä"
+        "languagesAll": "EU:n 24 kielellä",
+        "languagesSome": "Usealla kielellä"
       }
     },
     "upcoming": {

@@ -4341,7 +4341,8 @@
         "noInstall": "Din browser, fără instalări",
         "interactive": "Q&A și sondaje în direct",
         "recordings": "Înregistrări și subtitrări",
-        "accessible": "Accesibil, în 24 de limbi"
+        "languagesAll": "În cele 24 de limbi ale UE",
+        "languagesSome": "În mai multe limbi"
       }
     },
     "upcoming": {

@@ -4341,7 +4341,8 @@
         "noInstall": "Iz brskalnika, brez nameščanja",
         "interactive": "Q&A in ankete v živo",
         "recordings": "Posnetki in podnapisi",
-        "accessible": "Dostopno, v 24 jezikih"
+        "languagesAll": "V 24 jezikih EU",
+        "languagesSome": "V več jezikih"
       }
     },
     "upcoming": {

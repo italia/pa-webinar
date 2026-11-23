@@ -4341,7 +4341,8 @@
         "noInstall": "Ón bhrabhsálaí, gan suiteáil",
         "interactive": "Q&A agus pobalbhreitheanna beo",
         "recordings": "Taifeadtaí agus fotheidil",
-        "accessible": "Inrochtana, i 24 teanga"
+        "languagesAll": "I 24 teanga an AE",
+        "languagesSome": "I roinnt teangacha"
       }
     },
     "upcoming": {

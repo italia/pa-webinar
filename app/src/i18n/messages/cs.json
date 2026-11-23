@@ -4341,7 +4341,8 @@
         "noInstall": "Z prohlížeče, bez instalace",
         "interactive": "Živé Q&A a ankety",
         "recordings": "Záznamy a titulky",
-        "accessible": "Přístupné, ve 24 jazycích"
+        "languagesAll": "Ve 24 jazycích EU",
+        "languagesSome": "Ve více jazycích"
       }
     },
     "upcoming": {

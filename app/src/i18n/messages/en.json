@@ -4341,7 +4341,8 @@
         "noInstall": "From the browser, no installs",
         "interactive": "Live Q&A and polls",
         "recordings": "Recordings and subtitles",
-        "accessible": "Accessible, in 24 languages"
+        "languagesAll": "In the 24 EU languages",
+        "languagesSome": "In several languages"
       }
     },
     "upcoming": {

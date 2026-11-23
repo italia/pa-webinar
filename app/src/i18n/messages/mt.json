@@ -4341,7 +4341,8 @@
         "noInstall": "Mill-browser, bla installazzjonijiet",
         "interactive": "Q&A u stħarriġ dirett",
         "recordings": "Reġistrazzjonijiet u sottotitli",
-        "accessible": "Aċċessibbli, f'24 lingwa"
+        "languagesAll": "Fl-24 lingwa tal-UE",
+        "languagesSome": "F'diversi lingwi"
       }
     },
     "upcoming": {

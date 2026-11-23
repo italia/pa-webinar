@@ -4341,7 +4341,8 @@
         "noInstall": "Z przeglądarki, bez instalacji",
         "interactive": "Q&A i ankiety na żywo",
         "recordings": "Nagrania i napisy",
-        "accessible": "Dostępne, w 24 językach"
+        "languagesAll": "W 24 językach UE",
+        "languagesSome": "W wielu językach"
       }
     },
     "upcoming": {

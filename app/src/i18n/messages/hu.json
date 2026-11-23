@@ -4341,7 +4341,8 @@
         "noInstall": "A böngészőből, telepítés nélkül",
         "interactive": "Élő Q&A és szavazások",
         "recordings": "Felvételek és feliratok",
-        "accessible": "Akadálymentes, 24 nyelven"
+        "languagesAll": "Az EU 24 nyelvén",
+        "languagesSome": "Több nyelven"
       }
     },
     "upcoming": {

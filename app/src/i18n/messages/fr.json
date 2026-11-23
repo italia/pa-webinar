@@ -4341,7 +4341,8 @@
         "noInstall": "Depuis le navigateur, sans installation",
         "interactive": "Q&A et sondages en direct",
         "recordings": "Enregistrements et sous-titres",
-        "accessible": "Accessible, en 24 langues"
+        "languagesAll": "Dans les 24 langues de l'UE",
+        "languagesSome": "En plusieurs langues"
       }
     },
     "upcoming": {

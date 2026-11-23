@@ -4341,7 +4341,8 @@
         "noInstall": "No pārlūkprogrammas, bez instalēšanas",
         "interactive": "Tiešraides Q&A un aptaujas",
         "recordings": "Ieraksti un subtitri",
-        "accessible": "Pieejams 24 valodās"
+        "languagesAll": "24 ES valodās",
+        "languagesSome": "Vairākās valodās"
       }
     },
     "upcoming": {

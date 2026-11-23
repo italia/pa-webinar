@@ -4341,7 +4341,8 @@
         "noInstall": "Brauserist, ilma paigaldusteta",
         "interactive": "Otse küsimused ja küsitlused",
         "recordings": "Salvestused ja subtiitrid",
-        "accessible": "Ligipääsetav, 24 keeles"
+        "languagesAll": "ELi 24 keeles",
+        "languagesSome": "Mitmes keeles"
       }
     },
     "upcoming": {

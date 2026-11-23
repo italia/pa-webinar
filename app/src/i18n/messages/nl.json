@@ -4341,7 +4341,8 @@
         "noInstall": "Vanuit de browser, zonder installaties",
         "interactive": "Live Q&A en polls",
         "recordings": "Opnames en ondertiteling",
-        "accessible": "Toegankelijk, in 24 talen"
+        "languagesAll": "In de 24 talen van de EU",
+        "languagesSome": "In meerdere talen"
       }
     },
     "upcoming": {

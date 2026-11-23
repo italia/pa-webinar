@@ -7,6 +7,7 @@ import { getTranslations, getLocale } from 'next-intl/server';
 import { prisma } from '@/lib/db';
 import { getSettings } from '@/lib/settings';
 import { Link } from '@/i18n/navigation';
+import { routing } from '@/i18n/routing';
 import NessunEvento from '@/components/home/nessun-evento';
 import { serviceInventoryUrl } from '@/lib/service-inventory-url';
 import { publicEventStatusWhere } from '@/lib/events/visibility';
@@ -131,8 +132,18 @@ export default async function HomePage() {
       upcoming={upcoming}
       parseTitleKicker={parseTitleKicker}
       showProject={settings.homeShowProject}
+      lingueAttive={contaLingueAttive(settings.availableLocales)}
     />
   );
+}
+
+/** Quante lingue del sito sono attive: quelle scelte nelle impostazioni che
+ *  il sito ha davvero (di default italiano e inglese). La stessa lettura del
+ *  selettore della lingua: senza scelte salvate valgono le due predefinite. */
+function contaLingueAttive(scelte: unknown): number {
+  const lingue = Array.isArray(scelte) ? scelte : ['it', 'en'];
+  const delSito: readonly string[] = routing.locales;
+  return new Set(lingue.filter((l): l is string => typeof l === 'string' && delSito.includes(l))).size;
 }
 
 async function EventsSection({
@@ -204,18 +215,28 @@ async function LandingHome({
   upcoming,
   parseTitleKicker,
   showProject,
+  lingueAttive,
 }: {
   upcoming: Awaited<ReturnType<typeof loadUpcomingEvents>>;
   parseTitleKicker: boolean;
   showProject: boolean;
+  lingueAttive: number;
 }) {
   const t = await getTranslations('home');
 
+  // Le lingue si dicono solo come sono attive su questo sito: tutte e 24
+  // quelle dell'Unione europea, alcune, o nessun badge con una lingua sola.
+  const lingue =
+    lingueAttive >= routing.locales.length
+      ? t('hero.badges.languagesAll')
+      : lingueAttive > 1
+        ? t('hero.badges.languagesSome')
+        : null;
   const heroBadges: { id: string; label: string }[] = [
     { id: 'it-video', label: t('hero.badges.noInstall') },
     { id: 'it-comment', label: t('hero.badges.interactive') },
     { id: 'it-file-video', label: t('hero.badges.recordings') },
-    { id: 'it-hearing', label: t('hero.badges.accessible') },
+    ...(lingue ? [{ id: 'it-flag', label: lingue }] : []),
   ];
 
   const steps = [1, 2, 3, 4] as const;

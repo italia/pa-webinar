@@ -4341,7 +4341,8 @@
         "noInstall": "От браузъра, без инсталации",
         "interactive": "Q&A на живо и анкети",
         "recordings": "Записи и субтитри",
-        "accessible": "Достъпно, на 24 езика"
+        "languagesAll": "На 24-те езика на ЕС",
+        "languagesSome": "На няколко езика"
       }
     },
     "upcoming": {

@@ -4341,7 +4341,8 @@
         "noInstall": "Iš naršyklės, be diegimų",
         "interactive": "Tiesioginiai Q&A ir apklausos",
         "recordings": "Įrašai ir subtitrai",
-        "accessible": "Prieinama 24 kalbomis"
+        "languagesAll": "24 ES kalbomis",
+        "languagesSome": "Keliomis kalbomis"
       }
     },
     "upcoming": {

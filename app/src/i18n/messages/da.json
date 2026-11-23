@@ -4341,7 +4341,8 @@
         "noInstall": "Fra browseren, uden installation",
         "interactive": "Live Q&A og afstemninger",
         "recordings": "Optagelser og undertekster",
-        "accessible": "Tilgængelig, på 24 sprog"
+        "languagesAll": "På EU's 24 sprog",
+        "languagesSome": "På flere sprog"
       }
     },
     "upcoming": {
