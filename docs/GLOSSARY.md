@@ -42,10 +42,12 @@ key. It signs in with a one-time sign-in link, and the audit log records the
 account that acted. [ADR-015](adr/015-named-administrators.md)
 
 **Guest** (UI **Guest**): a person who joins a live event with only a typed
-name, without registering (seat `guest-…`). Guests enter a scheduled event
-only while it is `LIVE`, only while the site setting **Guest access
-enabled** is on, and never when the event is open only to invitees; an
-instant call admits them whatever the setting, also while it warms up. Two
+name, without registering (seat `guest-…`). Guests wait in the waiting
+room from the moment it opens, while the room warms up, and enter the
+conference once the event is `LIVE`. On a scheduled event this holds only
+while the site setting **Guest access enabled** is on, and never when the
+event is open only to invitees; an instant call admits them whatever the
+setting. Two
 other things share the word: the role `GUEST` on an invitation-list entry,
 and the `GUEST` column of the permission matrix, which stands for the whole
 audience.

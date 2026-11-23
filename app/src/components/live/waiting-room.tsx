@@ -290,9 +290,8 @@ interface WaitingRoomProps {
   /** Token dell'utente (moderatore/iscritto) da usare per leggere e scrivere in
    *  chat durante l'attesa. Vuoto per un ospite senza credenziali. */
   chatToken?: string;
-  /** Serve a sapere se la chat è leggibile prima del LIVE: le call INSTANT sono
-   *  aperte per link e ammettono ospiti già durante il warm-up, un evento
-   *  schedulato no (vedi lib/chat/read-access). */
+  /** Il tipo di evento: una chiamata rapida non ha una pagina pubblica da
+   *  condividere. */
   eventType?: 'SCHEDULED' | 'INSTANT';
   /** Il nickname, dove l'evento lo consente a questa persona (lib/live/nickname):
    *  quello gia' scelto, e il rifiuto della sala a un ingresso appena tentato. */
@@ -529,12 +528,13 @@ export default function WaitingRoom({
   // La chat è app-side e NON dipende dal bridge: mentre la sala si scalda
   // (IDLE/PROVISIONING) chi aspetta può già chiacchierare — è la differenza
   // tra un'attesa cieca e una sala d'attesa vera.
-  // La chat è leggibile prima del LIVE solo da chi ha un token (moderatore o
-  // iscritto) oppure, senza token, nelle call INSTANT — le stesse condizioni
-  // che il server applica in lettura E in scrittura (lib/chat/read-access).
-  // Mostrarla anche agli altri significherebbe un riquadro vuoto e permanente:
-  // né i messaggi né l'invio funzionerebbero.
-  const canReadChatNow = isLive || !!chatToken || eventType === 'INSTANT';
+  // La chat è leggibile prima del LIVE da chi ha un token (moderatore o
+  // iscritto) e dall'ospite, che senza token arriva qui solo dentro la
+  // finestra degli ospiti — le stesse condizioni che il server applica in
+  // lettura E in scrittura (lib/chat/read-access). Mostrarla anche agli altri
+  // significherebbe un riquadro vuoto e permanente: né i messaggi né l'invio
+  // funzionerebbero.
+  const canReadChatNow = isLive || !!chatToken || isGuest;
   const showChatPreview =
     (isLive || isWarmingUp) && (event.chatEnabled ?? true) && canReadChatNow;
   // Only LIVE events admit participants into the room. Moderators in

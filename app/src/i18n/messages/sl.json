@@ -212,8 +212,8 @@
       "recordingLinkSend": "Pošlji mi povezavo znova",
       "recordingLinkSent": "Če je naslov prijavljen na dogodek, boste kmalu prejeli e-pošto z osebno povezavo.",
       "recordingLinkError": "Zahteva ni uspela. Poskusite znova čez nekaj minut.",
-      "registerOrGuest": "Če se prijavite, po e-pošti prejmete svojo osebno povezavo in novice o dogodku. Kot gost vstopite takoj samo z imenom, le med dogodkom v živo, in ne prejemate e-pošte.",
-      "guestWhenLive": "Ko bo dogodek v živo, se lahko pridružite tudi brez prijave, samo z imenom."
+      "registerOrGuest": "Če se prijavite, po e-pošti prejmete svojo osebno povezavo in novice o dogodku. Kot gost vstopite takoj samo z imenom in ne prejemate e-pošte.",
+      "guestWhenRoomOpens": "Na dan dogodka, ko se odpre čakalnica, se lahko pridružite tudi brez prijave, samo z imenom."
     },
     "manage": {
       "toggleChat": "Klepet",

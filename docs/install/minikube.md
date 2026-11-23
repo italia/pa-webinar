@@ -746,7 +746,7 @@ on the conference host first.
   arrived after 20 s.
 - **Guests.** Open the **Direct invite (no registration)** link of a live
   event, or the **Copy invite link** of an instant call, in another profile.
-  Guests join without registering while the event is live.
+  Guests join without registering once the event's waiting room opens.
 
 The **Invitations** list in the wizard sends nothing. It decides who may
 register when the event is open only to invitees, and you share the event

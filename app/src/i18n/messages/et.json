@@ -212,8 +212,8 @@
       "recordingLinkSend": "Saada link uuesti",
       "recordingLinkSent": "Kui aadress on üritusele registreeritud, saad peagi e-kirja oma isikliku lingiga.",
       "recordingLinkError": "Päring ebaõnnestus. Proovi mõne minuti pärast uuesti.",
-      "registerOrGuest": "Registreerudes saad e-postiga oma isikliku lingi ja uudised sündmuse kohta. Külalisena sisened kohe ainult nimega, ainult siis, kui sündmus on otse-eetris, ja e-kirju ei saa.",
-      "guestWhenLive": "Kui üritus on otse-eetris, saad osaleda ka registreerimata, ainult oma nimega."
+      "registerOrGuest": "Registreerudes saad e-postiga oma isikliku lingi ja uudised sündmuse kohta. Külalisena sisened kohe ainult nimega ja e-kirju ei saa.",
+      "guestWhenRoomOpens": "Ürituse päeval, kui ooteruum avatakse, saad osaleda ka registreerimata, ainult oma nimega."
     },
     "manage": {
       "toggleChat": "Vestlus",

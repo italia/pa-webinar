@@ -102,6 +102,7 @@ function disegna(props: {
   previewPageHidden?: boolean;
   previewPageForRegistrants?: boolean;
   guestEntryOpen?: boolean;
+  guestRoomOpen?: boolean;
   guestNeedsPassword?: boolean;
   registrationAccess?: 'open' | 'invitation' | 'closed';
 }) {
@@ -341,37 +342,52 @@ describe('scheda pubblica — stato e ingresso leggibili', () => {
   });
 
   it('in diretta si offre di entrare come ospite, accanto all’iscrizione', () => {
-    disegna({ event: evento({ status: 'LIVE', startsAt: new Date(Date.now() - HOUR).toISOString() }), registrationOpen: true });
+    disegna({
+      event: evento({ status: 'LIVE', startsAt: new Date(Date.now() - HOUR).toISOString() }),
+      registrationOpen: true,
+      guestRoomOpen: true,
+    });
     expect(link(`/events/${SLUG}/live`)?.textContent).toContain(detail.joinAsGuest);
     expect(container.textContent).toContain(detail.registeredUseEmailLink);
     expect(link(`/events/${SLUG}/registration`)?.textContent).toContain(detail.registerAndJoin);
   });
 
-  it('prima della diretta una porta sola, e dice che in diretta si entrera anche senza iscriversi', () => {
+  it('a sala d’attesa aperta, prima della diretta, l’ospite entra già', () => {
+    disegna({ event: evento({ status: 'PROVISIONING' }), registrationOpen: true, guestRoomOpen: true });
+    expect(link(`/events/${SLUG}/live`)?.textContent).toContain(detail.joinAsGuest);
+    expect(link(`/events/${SLUG}/registration`)?.textContent?.trim()).toBe(detail.register);
+    // La porta c'e': la promessa non serve piu'.
+    expect(container.textContent).not.toContain(detail.guestWhenRoomOpens);
+  });
+
+  it('prima che la sala si apra una porta sola, e dice che poi si entrera anche senza iscriversi', () => {
     disegna({ event: evento(), registrationOpen: true });
     expect(link(`/events/${SLUG}/live`)).toBeNull();
     expect(link(`/events/${SLUG}/registration`)?.textContent?.trim()).toBe(detail.register);
-    expect(container.textContent).toContain(detail.guestWhenLive);
-    // In diretta la porta c'e': la promessa non serve piu'.
-    disegna({ event: evento({ status: 'LIVE', startsAt: new Date(Date.now() - HOUR).toISOString() }), registrationOpen: true });
-    expect(container.textContent).not.toContain(detail.guestWhenLive);
+    expect(container.textContent).toContain(detail.guestWhenRoomOpens);
+    disegna({
+      event: evento({ status: 'LIVE', startsAt: new Date(Date.now() - HOUR).toISOString() }),
+      registrationOpen: true,
+      guestRoomOpen: true,
+    });
+    expect(container.textContent).not.toContain(detail.guestWhenRoomOpens);
   });
 
   it('senza ospiti ammessi, o con la password, non promette l’ingresso col solo nome', () => {
     disegna({ event: evento(), registrationOpen: true, guestEntryOpen: false });
-    expect(container.textContent).not.toContain(detail.guestWhenLive);
+    expect(container.textContent).not.toContain(detail.guestWhenRoomOpens);
     disegna({ event: evento(), registrationOpen: true, guestNeedsPassword: true });
-    expect(container.textContent).not.toContain(detail.guestWhenLive);
+    expect(container.textContent).not.toContain(detail.guestWhenRoomOpens);
   });
 
   it('chi ha gia il posto non legge che potrebbe entrare senza iscriversi', () => {
     disegna({ event: evento(), registrationOpen: true, hasRoomAccess: true });
-    expect(container.textContent).not.toContain(detail.guestWhenLive);
+    expect(container.textContent).not.toContain(detail.guestWhenRoomOpens);
   });
 
   it('con l’iscrizione chiusa ma gli ospiti ammessi, lo dice comunque', () => {
     disegna({ event: evento(), registrationOpen: true, registrationAccess: 'closed' });
-    expect(container.textContent).toContain(detail.guestWhenLive);
+    expect(container.textContent).toContain(detail.guestWhenRoomOpens);
   });
 
   it('dice prima che l’evento può essere registrato', () => {

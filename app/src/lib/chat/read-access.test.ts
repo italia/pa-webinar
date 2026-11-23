@@ -35,27 +35,32 @@ const mockedJoinGrant = hasJoinGrant as unknown as ReturnType<typeof vi.fn>;
  * names + free text) fetchable by slug forever.
  */
 describe('guestChatWindowOpen', () => {
+  // La fine e' lontana: qui conta lo stato (la fine la prova guest-window.test).
+  const endsAt = new Date(Date.now() + 3_600_000);
   const scheduled = (status: string, accessMode: string | null = null) => ({
     status,
     eventType: 'SCHEDULED',
     accessMode,
+    endsAt,
   });
-  const instant = (status: string) => ({ status, eventType: 'INSTANT', accessMode: null });
+  const instant = (status: string) => ({ status, eventType: 'INSTANT', accessMode: null, endsAt });
 
   it('opens while the room is live, whatever the event type', () => {
     expect(guestChatWindowOpen(scheduled('LIVE'), true)).toBe(true);
     expect(guestChatWindowOpen(instant('LIVE'), true)).toBe(true);
   });
 
-  it('opens during the bridge warm-up of an INSTANT call only', () => {
-    // INSTANT rooms are opened by link with no time gate and show the chat while
-    // the bridge scales up.
+  it('opens with the waiting room, on both event types', () => {
+    // The chat is readable while the bridge warms up and during a pause.
     expect(guestChatWindowOpen(instant('PROVISIONING'), true)).toBe(true);
     expect(guestChatWindowOpen(instant('IDLE'), true)).toBe(true);
-    // A scheduled event must not: /wake is unauthenticated, so anyone could flip
-    // PUBLISHED→PROVISIONING and then read the room anonymously.
-    expect(guestChatWindowOpen(scheduled('PROVISIONING'), true)).toBe(false);
-    expect(guestChatWindowOpen(scheduled('IDLE'), true)).toBe(false);
+    // A scheduled event too: /wake is unauthenticated, but it warms a
+    // scheduled room only inside the pre-scale window, when the scaler would
+    // open it anyway, so nobody can open the room to guests earlier.
+    expect(guestChatWindowOpen(scheduled('PROVISIONING'), true)).toBe(true);
+    expect(guestChatWindowOpen(scheduled('IDLE'), true)).toBe(true);
+    // Before that, a scheduled event is read only with a token.
+    expect(guestChatWindowOpen(scheduled('PUBLISHED'), true)).toBe(false);
   });
 
   it('shuts on scheduled events when guest access is off, never on INSTANT calls', () => {

@@ -212,8 +212,8 @@
       "recordingLinkSend": "Seol an nasc chugam arís",
       "recordingLinkSent": "Má tá an seoladh cláraithe don ócáid, gheobhaidh tú ríomhphost leis an nasc pearsanta go luath.",
       "recordingLinkError": "Theip ar an iarratas. Bain triail eile as i gceann cúpla nóiméad.",
-      "registerOrGuest": "Má chláraíonn tú, gheobhaidh tú do nasc pearsanta agus nuashonruithe faoin ócáid trí ríomhphost. Mar aoi, téann tú isteach láithreach le hainm amháin, fad atá an ócáid beo amháin, agus ní fhaigheann tú ríomhphoist.",
-      "guestWhenLive": "Nuair a bheidh an t-imeacht beo, beidh tú in ann dul isteach gan clárú freisin, le d'ainm amháin."
+      "registerOrGuest": "Má chláraíonn tú, gheobhaidh tú do nasc pearsanta agus nuashonruithe faoin ócáid trí ríomhphost. Mar aoi, téann tú isteach láithreach le hainm amháin, agus ní fhaigheann tú ríomhphoist.",
+      "guestWhenRoomOpens": "Ar lá an imeachta, nuair a osclaítear an seomra feithimh, beidh tú in ann dul isteach gan clárú freisin, le d'ainm amháin."
     },
     "manage": {
       "toggleChat": "Comhrá",

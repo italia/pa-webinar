@@ -212,8 +212,8 @@
       "recordingLinkSend": "Stuur me de link opnieuw",
       "recordingLinkSent": "Als het adres voor het evenement is ingeschreven, ontvang je binnenkort een e-mail met je persoonlijke link.",
       "recordingLinkError": "Het verzoek is mislukt. Probeer het over een paar minuten opnieuw.",
-      "registerOrGuest": "Als je je inschrijft, krijg je per e-mail je persoonlijke link en nieuws over het evenement. Als gast kom je meteen binnen met alleen een naam, alleen terwijl het evenement live is, en krijg je geen e-mails.",
-      "guestWhenLive": "Zodra het evenement live is, kun je ook zonder inschrijving deelnemen, alleen met je naam."
+      "registerOrGuest": "Als je je inschrijft, krijg je per e-mail je persoonlijke link en nieuws over het evenement. Als gast kom je meteen binnen met alleen een naam en krijg je geen e-mails.",
+      "guestWhenRoomOpens": "Op de dag van het evenement, zodra de wachtruimte opengaat, kun je ook zonder inschrijving deelnemen, alleen met je naam."
     },
     "manage": {
       "toggleChat": "Chat",

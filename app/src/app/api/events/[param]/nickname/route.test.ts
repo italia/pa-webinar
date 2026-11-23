@@ -60,6 +60,7 @@ const evento = (over: Record<string, unknown> = {}) => ({
   status: 'PUBLISHED',
   eventType: 'SCHEDULED',
   accessMode: null,
+  endsAt: new Date(Date.now() + 3_600_000),
   joinPasswordHash: null,
   nicknamesEnabled: true,
   audienceAnonymous: false,
@@ -130,7 +131,8 @@ describe('PUT /api/events/[param]/nickname', () => {
   });
 
   it("fuori dalla finestra degli ospiti, o senza la password, l'ospite non prova niente", async () => {
-    // Prima della diretta un evento a calendario non ammette ospiti.
+    // Prima che la sala d'attesa si apra un evento a calendario non ammette
+    // ospiti.
     expect((await PUT(richiesta({ nickname: 'Pippo' }), ctx as never)).status).toBe(403);
     db.event.findUnique.mockResolvedValue(
       evento({ status: 'LIVE', joinPasswordHash: 'scrypt:x:y' })
@@ -144,10 +146,8 @@ describe('PUT /api/events/[param]/nickname', () => {
     } finally {
       sito.joinGrant = false;
     }
-    // Una chiamata rapida in accensione li ammette gia'.
-    db.event.findUnique.mockResolvedValue(
-      evento({ status: 'PROVISIONING', eventType: 'INSTANT' })
-    );
+    // A sala d'attesa aperta (in accensione) li ammette gia'.
+    db.event.findUnique.mockResolvedValue(evento({ status: 'PROVISIONING' }));
     expect((await PUT(richiesta({ nickname: 'Pippo' }), ctx as never)).status).toBe(200);
     expect(nick.verificaNickname).toHaveBeenCalledTimes(2);
   });

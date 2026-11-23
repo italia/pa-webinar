@@ -686,7 +686,7 @@ The instance API key (`ADMIN_API_KEY`) has no owner. Its sessions appear in the 
 
 ### Guests
 
-Guests join without registering, and only while the event is `LIVE`.
+Guests join without registering, from the moment the waiting room opens (`PROVISIONING`, `LIVE` or `IDLE`, and not past the end of an event that is not live). While they wait, their name and what they write in the chat, Q&A and polls are processed as for anyone else in the room.
 
 - They give only a display name, typed in the waiting room. It appears in the conference, in chat messages (encrypted), as the author of Q&A questions (plain text) and as the respondent of pre-registration questionnaires (plain text). The end-of-event rating stores no name.
 - Their votes, word-cloud words, agenda reactions and feedback are keyed by `paw_guest_id`, a random identifier kept in the browser's local storage.

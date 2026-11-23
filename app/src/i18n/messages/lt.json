@@ -212,8 +212,8 @@
       "recordingLinkSend": "Atsiųskite nuorodą dar kartą",
       "recordingLinkSent": "Jei adresas užregistruotas renginyje, netrukus gausite el. laišką su asmenine nuoroda.",
       "recordingLinkError": "Užklausa nepavyko. Bandykite dar kartą po kelių minučių.",
-      "registerOrGuest": "Užsiregistravę el. paštu gausite asmeninę nuorodą ir naujienas apie renginį. Kaip svečias įeinate iš karto tik su vardu, tik kol renginys vyksta tiesiogiai, ir el. laiškų negaunate.",
-      "guestWhenLive": "Kai renginys vyks tiesiogiai, galėsite prisijungti ir neužsiregistravę, tik su savo vardu."
+      "registerOrGuest": "Užsiregistravę el. paštu gausite asmeninę nuorodą ir naujienas apie renginį. Kaip svečias įeinate iš karto tik su vardu ir el. laiškų negaunate.",
+      "guestWhenRoomOpens": "Renginio dieną, kai atsidarys laukiamasis, galėsite prisijungti ir neužsiregistravę, tik su savo vardu."
     },
     "manage": {
       "toggleChat": "Pokalbiai",

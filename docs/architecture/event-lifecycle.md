@@ -30,7 +30,7 @@ For organizers and moderators who need to predict when a room opens and closes:
 | `DRAFT` | Created but not published. Only staff and moderator-link holders can see it. New events, duplicates and events saved with **Save as draft** start here. | Entry disabled with a valid link; without one, the live URL redirects to registration, which answers 404 |
 | `PUBLISHED` | Announced: the public page and the listings show it, and registration is open until `endsAt`. No bridge is reserved. | Countdown, then an about-to-start notice; **Start event** for moderators. Past `endsAt`: **The scheduled time for this event has passed**, no entry |
 | `PROVISIONING` | A bridge is being brought up for the event, set by the scaler's pre-scale or by a wake. Nobody can enter yet. | **Room warming up** banner, or **The room opens at the start time** when the scaler is not driving the lifecycle; entry disabled; **Start event** for moderators |
-| `LIVE` | The room is open. It is the only status in which the waiting room lets anyone into the Jitsi conference and the only one that admits guests. | **Enter now** |
+| `LIVE` | The room is open. It is the only status in which the waiting room lets anyone into the Jitsi conference, guests included. | **Enter now** |
 | `IDLE` | The room was `LIVE`, stayed empty for the inactivity grace and its bridge was scaled to zero. Only the scaler sets it. | As `PROVISIONING`; opening the page wakes the room; **Start event** for moderators |
 | `ENDED` | The event is over. With the scaler, bridges are released on the next tick. The post-event page stays public unless it was turned off (`postEventPublic`, on by default for scheduled events and off for instant calls) or `postEventPublicUntil` has passed. Retention removes personal data and leaves the status unchanged. | Closing view: recording and feedback |
 | `ARCHIVED` | Hidden from every public surface. Set by staff with bulk archive, or by the cleanup job on an event that was never ended. The event row is kept; personal data is removed once retention expires, as for `ENDED`. | Entry disabled with a valid link; without one, a redirect to the event page, which is not public |
@@ -276,7 +276,7 @@ Two layers decide whether someone gets into the conference: the waiting room, an
 |---|---|---|---|
 | `DRAFT` | `409` | `409` | `409` |
 | `PUBLISHED` | Token issued; the waiting room still waits for `LIVE` | `409`; the waiting room waits for `LIVE` | `409`; the live URL redirects to registration |
-| `PROVISIONING`, `IDLE` | `409` | `409` | `409`; scheduled events redirect to registration (so tokenless guests cannot wake an `IDLE` room); instant calls show the waiting room |
+| `PROVISIONING`, `IDLE` | `409` | `409` | `409`; before the end time the live URL shows the waiting room when guest access is allowed, and otherwise redirects a scheduled event to registration (instant calls always admit guests) |
 | `LIVE` | Token issued | Token issued | Token issued when guest access is allowed, rate-limited per IP |
 | `ENDED`, `ARCHIVED` | `409` | `409` | `409`; the live URL redirects to the event page (instant calls answer 404) |
 

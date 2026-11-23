@@ -158,10 +158,10 @@ describe('POST .../polls/[id]/vote — con quale identità si vota', () => {
   });
 
   it('chi conduce vota anche prima della diretta, mostrando il token di sala', async () => {
-    // Un evento in pre-riscaldamento non è ancora "in diretta": l'ospite non
+    // Un evento pubblicato non ha ancora la sala d'attesa aperta: l'ospite non
     // entra, ma moderatori e relatori ci sono già — e votano con
     // l'identificativo del browser, non col token.
-    mockedEvent.mockResolvedValue(eventRow({ status: 'PROVISIONING' }));
+    mockedEvent.mockResolvedValue(eventRow({ status: 'PUBLISHED' }));
     const senzaToken = await POST(vote({ optionIndex: 0, guestId: nextGuest() }), ctx());
     expect(senzaToken.status).toBe(401);
 

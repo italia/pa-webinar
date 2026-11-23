@@ -212,8 +212,8 @@
       "recordingLinkSend": "Ibgħatli l-link mill-ġdid",
       "recordingLinkSent": "Jekk l-indirizz huwa rreġistrat għall-avveniment, dalwaqt tirċievi email bil-link personali tiegħek.",
       "recordingLinkError": "It-talba ma rnexxietx. Erġa' pprova fi ftit minuti.",
-      "registerOrGuest": "Jekk tirreġistra, tirċievi bl-email il-link personali tiegħek u aġġornamenti dwar l-avveniment. Bħala mistieden tidħol mill-ewwel b'isem biss, biss waqt li l-avveniment ikun live, u ma tirċievix emails.",
-      "guestWhenLive": "Meta l-avveniment ikun live, tista' tidħol ukoll mingħajr reġistrazzjoni, bl-isem biss."
+      "registerOrGuest": "Jekk tirreġistra, tirċievi bl-email il-link personali tiegħek u aġġornamenti dwar l-avveniment. Bħala mistieden tidħol mill-ewwel b'isem biss u ma tirċievix emails.",
+      "guestWhenRoomOpens": "Fil-jum tal-avveniment, meta tinfetaħ il-kamra tal-istennija, tista' tidħol ukoll mingħajr reġistrazzjoni, bl-isem biss."
     },
     "manage": {
       "toggleChat": "Chat",

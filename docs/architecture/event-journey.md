@@ -46,7 +46,7 @@ flowchart TB
   style PAR fill:#F7F9FB,stroke:#00A3A3,color:#17324D
 
   O4 -->|"appears on public surfaces"| P1
-  O5 -.->|"guest link, while LIVE"| P4
+  O5 -.->|"guest link, once the waiting room opens"| P4
   P5 -->|"status ENDED"| O6
   O6 -->|"recording, library listing"| P6
 ```
@@ -476,7 +476,7 @@ An invitation stops when the person must not be contacted any more (`declinedAt`
 | Mode | Who gets in | How |
 |---|---|---|
 | Registration | Anyone who registers while registration is open. When registration is by invitation only, only the addresses on the invitation list | The personal link from the confirmation email, or the `event_access_<eventId>` cookie in the browser that registered, or in the browser that opened an entry link signed with `sig`, which the emails built while registration is by invitation only carry |
-| Guest link | Anyone holding `/events/{slug}/live`. The administration's event page shows it under **Event links** as **Direct invite (no registration)**, with its QR code (**QR**, drawn in the browser by `app/src/components/ui/link-qr.tsx`), and hides it for scheduled events that admit no guests | The visitor types a name in the waiting room. Scheduled events admit guests only while `LIVE`, only when the site setting `guestAccessEnabled` is on, and never when the event is `INVITATION`; instant calls, whatever that setting, admit them while `LIVE`, `IDLE` or `PROVISIONING`. At other times a scheduled event redirects to its registration page, or to the event page once `ENDED` or `ARCHIVED` |
+| Guest link | Anyone holding `/events/{slug}/live`. The administration's event page shows it under **Event links** as **Direct invite (no registration)**, with its QR code (**QR**, drawn in the browser by `app/src/components/ui/link-qr.tsx`), and hides it for scheduled events that admit no guests | The visitor types a name in the waiting room. Guests are admitted while the event is `PROVISIONING`, `LIVE` or `IDLE`, from the moment the waiting room opens; on a scheduled event only when the site setting `guestAccessEnabled` is on, and never when the event is `INVITATION`, while instant calls admit them whatever that setting. At other times a scheduled event redirects to its registration page, or to the event page once `ENDED` or `ARCHIVED` |
 | Join password | Visitors arriving without a personal token, when `joinPasswordHash` is set | Redirected to `/events/{slug}/password` first. A correct password sets a 12-hour grant cookie ([identity-and-access.md](identity-and-access.md#password-protected-events)) |
 | Moderator and speaker links | Holders of the primary moderator link or of a named grant | [identity-and-access.md](identity-and-access.md#moderator-and-speaker-links) |
 

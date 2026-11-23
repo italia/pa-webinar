@@ -212,8 +212,8 @@
       "recordingLinkSend": "Renvoyez-moi le lien",
       "recordingLinkSent": "Si l'adresse est inscrite à l'événement, vous recevrez sous peu un e-mail avec votre lien personnel.",
       "recordingLinkError": "La demande a échoué. Réessayez dans quelques minutes.",
-      "registerOrGuest": "En vous inscrivant, vous recevez par e-mail votre lien personnel et les nouvelles de l'événement. En tant qu'invité, vous entrez tout de suite avec un simple nom, uniquement pendant le direct, et ne recevez aucun e-mail.",
-      "guestWhenLive": "Quand l'événement sera en direct, vous pourrez aussi entrer sans vous inscrire, avec votre seul nom."
+      "registerOrGuest": "En vous inscrivant, vous recevez par e-mail votre lien personnel et les nouvelles de l'événement. En tant qu'invité, vous entrez tout de suite avec un simple nom et ne recevez aucun e-mail.",
+      "guestWhenRoomOpens": "Le jour de l'événement, à l'ouverture de la salle d'attente, vous pourrez aussi entrer sans vous inscrire, avec votre seul nom."
     },
     "manage": {
       "toggleChat": "Chat",

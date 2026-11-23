@@ -19,23 +19,8 @@
  *   3. Altrimenti — bozza, archiviato, chiamata rapida chiusa senza pagina
  *      post-evento — un ingresso da partecipante non esiste.
  */
-import { guestWindowOpen } from './guest-window';
+import { guestWindowOpen, roomCanStillOpen } from './guest-window';
 import { isEventPageVisible } from './visibility';
-
-/**
- * In diretta la stanza c'e'. In allestimento e in pausa invece va ancora
- * accesa, e lo fa `/wake` — che rifiuta un evento oltre la sua fine, di
- * qualunque tipo. Lo scaler chiude quell'evento al giro successivo; se e'
- * fermo, l'evento resta in pausa e chi entrasse aspetterebbe la sala in
- * allestimento senza che si apra mai. Per questo in quegli stati la porta si
- * offre solo prima della fine.
- */
-function roomCanStillOpen(
-  event: { status: string; endsAt: Date | string },
-  now: number,
-): boolean {
-  return event.status === 'LIVE' || new Date(event.endsAt).getTime() > now;
-}
 
 export interface ParticipantEntryEvent {
   slug: string;
@@ -65,7 +50,7 @@ export function participantEntry(
   guestEntryAllowed: boolean,
   now: number = Date.now(),
 ): ParticipantEntry {
-  if (guestWindowOpen(event, guestEntryAllowed) && roomCanStillOpen(event, now)) {
+  if (guestWindowOpen(event, guestEntryAllowed, now)) {
     return { kind: 'room', path: `/events/${event.slug}/live` };
   }
   if (isEventPageVisible(event, now)) {

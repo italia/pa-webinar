@@ -212,8 +212,8 @@
       "recordingLinkSend": "Link erneut senden",
       "recordingLinkSent": "Wenn die Adresse für die Veranstaltung angemeldet ist, erhalten Sie in Kürze eine E-Mail mit Ihrem persönlichen Link.",
       "recordingLinkError": "Die Anfrage ist fehlgeschlagen. Bitte versuchen Sie es in einigen Minuten erneut.",
-      "registerOrGuest": "Mit einer Anmeldung erhalten Sie Ihren persönlichen Link und Neuigkeiten zum Event per E-Mail. Als Gast treten Sie sofort nur mit einem Namen ein, nur während das Event live ist, und erhalten keine E-Mails.",
-      "guestWhenLive": "Sobald die Veranstaltung live ist, können Sie auch ohne Anmeldung teilnehmen, nur mit Ihrem Namen."
+      "registerOrGuest": "Mit einer Anmeldung erhalten Sie Ihren persönlichen Link und Neuigkeiten zum Event per E-Mail. Als Gast treten Sie sofort nur mit einem Namen ein und erhalten keine E-Mails.",
+      "guestWhenRoomOpens": "Am Tag der Veranstaltung, sobald der Warteraum öffnet, können Sie auch ohne Anmeldung teilnehmen, nur mit Ihrem Namen."
     },
     "manage": {
       "toggleChat": "Chat",

@@ -212,8 +212,8 @@
       "recordingLinkSend": "Poslať odkaz znova",
       "recordingLinkSent": "Ak je adresa na podujatie registrovaná, čoskoro vám príde e-mail s osobným odkazom.",
       "recordingLinkError": "Požiadavka zlyhala. Skúste to o niekoľko minút znova.",
-      "registerOrGuest": "Ak sa zaregistrujete, dostanete e-mailom svoj osobný odkaz a novinky o podujatí. Ako hosť vstúpite hneď len s menom, iba počas živého vysielania, a e-maily nedostávate.",
-      "guestWhenLive": "Keď bude podujatie naživo, môžete sa pripojiť aj bez registrácie, len so svojím menom."
+      "registerOrGuest": "Ak sa zaregistrujete, dostanete e-mailom svoj osobný odkaz a novinky o podujatí. Ako hosť vstúpite hneď len s menom a e-maily nedostávate.",
+      "guestWhenRoomOpens": "V deň podujatia, keď sa otvorí čakáreň, sa môžete pripojiť aj bez registrácie, len so svojím menom."
     },
     "manage": {
       "toggleChat": "Chat",

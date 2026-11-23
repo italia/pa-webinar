@@ -212,8 +212,8 @@
       "recordingLinkSend": "Poslat odkaz znovu",
       "recordingLinkSent": "Pokud je adresa na akci registrována, brzy vám přijde e-mail s osobním odkazem.",
       "recordingLinkError": "Požadavek se nezdařil. Zkuste to za několik minut znovu.",
-      "registerOrGuest": "Když se zaregistrujete, dostanete e-mailem svůj osobní odkaz a novinky o akci. Jako host vstoupíte hned jen se jménem, pouze během živého vysílání, a e-maily nedostáváte.",
-      "guestWhenLive": "Až bude akce živě, můžete se připojit i bez registrace, jen se svým jménem."
+      "registerOrGuest": "Když se zaregistrujete, dostanete e-mailem svůj osobní odkaz a novinky o akci. Jako host vstoupíte hned jen se jménem a e-maily nedostáváte.",
+      "guestWhenRoomOpens": "V den akce, až se otevře čekárna, se můžete připojit i bez registrace, jen se svým jménem."
     },
     "manage": {
       "toggleChat": "Chat",

@@ -212,8 +212,8 @@
       "recordingLinkSend": "Send mig linket igen",
       "recordingLinkSent": "Hvis adressen er tilmeldt begivenheden, modtager du snart en e-mail med dit personlige link.",
       "recordingLinkError": "Anmodningen mislykkedes. Prøv igen om et par minutter.",
-      "registerOrGuest": "Hvis du tilmelder dig, får du dit personlige link og nyt om arrangementet på e-mail. Som gæst kommer du ind med det samme med kun et navn, kun mens arrangementet er live, og du får ingen e-mails.",
-      "guestWhenLive": "Når arrangementet er live, kan du også deltage uden tilmelding, kun med dit navn."
+      "registerOrGuest": "Hvis du tilmelder dig, får du dit personlige link og nyt om arrangementet på e-mail. Som gæst kommer du ind med det samme med kun et navn, og du får ingen e-mails.",
+      "guestWhenRoomOpens": "På dagen for arrangementet, når venteværelset åbner, kan du også deltage uden tilmelding, kun med dit navn."
     },
     "manage": {
       "toggleChat": "Chat",

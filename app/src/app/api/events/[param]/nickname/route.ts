@@ -79,6 +79,7 @@ export const PUT = withErrorHandling(async (request, context) => {
       audienceAnonymous: true,
       eventType: true,
       accessMode: true,
+      endsAt: true,
       joinPasswordHash: true,
       moderatorToken: true,
       moderatorName: true,

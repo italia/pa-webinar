@@ -212,8 +212,8 @@
       "recordingLinkSend": "Send me the link again",
       "recordingLinkSent": "If the address is registered for the event, you will shortly receive an email with your personal link.",
       "recordingLinkError": "The request failed. Try again in a few minutes.",
-      "registerOrGuest": "If you register, you receive your personal link and updates on the event by email. As a guest you enter at once with just a name, only while the event is live, and receive no email.",
-      "guestWhenLive": "When the event is live you can also join without registering, with just your name."
+      "registerOrGuest": "If you register, you receive your personal link and updates on the event by email. As a guest you enter at once with just a name and receive no email.",
+      "guestWhenRoomOpens": "On the day of the event, when the waiting room opens, you can also join without registering, with just your name."
     },
     "manage": {
       "toggleChat": "Chat",

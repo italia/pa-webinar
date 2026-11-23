@@ -212,8 +212,8 @@
       "recordingLinkSend": "Küldjétek újra a linket",
       "recordingLinkSent": "Ha a cím regisztrálva van az eseményre, hamarosan kapsz egy e-mailt a személyes linkkel.",
       "recordingLinkError": "A kérés nem sikerült. Próbáld újra néhány perc múlva.",
-      "registerOrGuest": "Ha regisztrál, e-mailben megkapja a személyes hivatkozását és az esemény híreit. Vendégként azonnal belép csak egy névvel, csak amíg az esemény élőben zajlik, és nem kap e-mailt.",
-      "guestWhenLive": "Amikor az esemény élőben zajlik, regisztráció nélkül, csak a nevével is beléphet."
+      "registerOrGuest": "Ha regisztrál, e-mailben megkapja a személyes hivatkozását és az esemény híreit. Vendégként azonnal belép csak egy névvel, és nem kap e-mailt.",
+      "guestWhenRoomOpens": "Az esemény napján, amikor megnyílik a váróterem, regisztráció nélkül, csak a nevével is beléphet."
     },
     "manage": {
       "toggleChat": "Csevegés",
