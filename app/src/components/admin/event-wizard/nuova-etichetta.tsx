@@ -194,7 +194,8 @@ export default function NuovaEtichetta({
             <Icon icon="it-plus" size="xs" color="white" />
             {t('newTag')}
           </button>
-          {/* Si apre in una nuova scheda: lo dicono l'icona e il testo. */}
+          {/* Si apre in una nuova scheda: a vista lo dice l'icona, a chi usa
+              un lettore di schermo il testo nascosto. */}
           <Link
             href={percorso('/admin/settings/tags')}
             target="_blank"
@@ -203,7 +204,7 @@ export default function NuovaEtichetta({
           >
             {t('manageTags')}
             <Icon icon="it-external-link" size="xs" color="primary" />
-            <span className="small text-muted">({t('opensInNewTab')})</span>
+            <span className="visually-hidden">({t('opensInNewTab')})</span>
           </Link>
         </div>
       )}

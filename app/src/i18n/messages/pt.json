@@ -212,7 +212,8 @@
       "recordingLinkSend": "Reenviar-me a ligação",
       "recordingLinkSent": "Se o endereço estiver inscrito no evento, receberá em breve um e-mail com a sua ligação pessoal.",
       "recordingLinkError": "O pedido falhou. Tente novamente dentro de alguns minutos.",
-      "registerOrGuest": "Se se inscrever, recebe por e-mail a sua ligação pessoal e novidades sobre o evento. Como convidado entra logo só com um nome, apenas enquanto o evento está em direto, e não recebe e-mails."
+      "registerOrGuest": "Se se inscrever, recebe por e-mail a sua ligação pessoal e novidades sobre o evento. Como convidado entra logo só com um nome e não recebe e-mails.",
+      "guestWhenRoomOpens": "No dia do evento, quando a sala de espera abrir, poderá entrar também sem se inscrever, só com o nome."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -661,7 +662,6 @@
     },
     "notOpenNow": "A sala não está aberta neste momento.",
     "nameRequired": "Falta o nome com que entrar: volte atrás e escreva-o.",
-    "closeSidebar": "Fechar o painel lateral",
     "contentOnly": "Só o conteúdo, sem chat nem painéis",
     "showPanels": "Mostrar chat e painéis",
     "confirmFullscreen": "Mudar para ecrã inteiro",
@@ -1012,11 +1012,10 @@
           "BALANCED": "Equilibrada (540p)",
           "SAVE_DATA": "Poupança de dados (360p)"
         },
-        "kickerHint": "Para um antetítulo, escreva-o antes do título e separe-os com |, por exemplo «Ciclo de encontros | O primeiro encontro».",
-        "kickerUse": "Mostrar «{kicker}» como antetítulo",
-        "kickerPreview": "Assim aparece na página do evento",
+        "kickerHint": "Opcional: uma linha curta acima do título, por exemplo o nome do ciclo de encontros.",
         "coverImageSize": "16:9, recomendada 1600 × 900 píxeis.",
-        "requiredNote": "Os campos marcados com * são obrigatórios."
+        "requiredNote": "Os campos marcados com * são obrigatórios.",
+        "kickerLabel": "Antetítulo ({language})"
       },
       "step2": {
         "heading": "Quem pode fazer o quê",
@@ -1097,11 +1096,6 @@
         "recordingDestinationRequired": "Escolha para onde vai a gravação.",
         "audienceAnonymous": "Público anónimo",
         "audienceAnonymousDesc": "Quem participa aparece aos outros com um pseudónimo («Participante» e um código) no vídeo, no chat e nas perguntas; a lista de participantes fica com a moderação e não há praça. Útil para eventos grandes; nos eventos de comunidade as pessoas querem conhecer-se.",
-        "audienceAnonymousLocked": "Não se pode alterar enquanto a sala puder estar aberta: ligaria os pseudónimos aos nomes.",
-        "participantListVisible": "Mostrar ao público a lista de participantes",
-        "participantListVisibleDesc": "Desligado: a lista, a grelha e os nomes na praça ficam para quem modera e intervém; o público só vê quem está a falar. Ligado: todos veem quem está na sala.",
-        "participantListAnonymous": "Com público anónimo a lista fica oculta.",
-        "participantListLocked": "Não se altera com a sala aberta: quem já está dentro não veria a alteração.",
         "nicknamesEnabled": "Alcunhas para os participantes",
         "nicknamesEnabledDesc": "Os participantes podem escolher uma alcunha: os outros veem-na em vez do nome no vídeo, no chat, nas perguntas e na transcrição. Quem organiza e quem modera vê quem está por trás. Quem conduz mantém o próprio nome. À partida está ativado onde a lista de participantes está oculta.",
         "nicknamesLocked": "Não se altera com a sala aberta: quem já está dentro escolheu com a regra anterior.",
@@ -1110,7 +1104,13 @@
         "hostsAlwaysRecorded": "Quem conduz está sempre na gravação",
         "hostsAlwaysRecordedDesc": "Moderadores e oradores aparecem no vídeo com nome e imagem, sem caixa para assinalar: o aviso de privacidade do evento tem de o dizer. De quem participa só se grava a voz, e só com o seu consentimento.",
         "hostsAlwaysRecordedDescHostsOnly": "Moderadores e oradores aparecem no vídeo com nome e imagem, sem caixa para assinalar: o aviso de privacidade do evento tem de o dizer. Quem participa nunca se vê nem se ouve no vídeo.",
-        "hostsAlwaysRecordedDescVisible": "Moderadores e oradores aparecem no vídeo com nome e imagem, sem caixa para assinalar: o aviso de privacidade do evento tem de o dizer. Esta instalação não consegue manter fora do vídeo quem participa: quem dá o consentimento intervém com nome, voz e imagem, e o nome de quem acompanha pode aparecer mesmo sem intervir."
+        "hostsAlwaysRecordedDescVisible": "Moderadores e oradores aparecem no vídeo com nome e imagem, sem caixa para assinalar: o aviso de privacidade do evento tem de o dizer. Esta instalação não consegue manter fora do vídeo quem participa: quem dá o consentimento intervém com nome, voz e imagem, e o nome de quem acompanha pode aparecer mesmo sem intervir.",
+        "audienceHeading": "Como aparecem os participantes",
+        "audienceOptionList": "Com o nome, visível para todos",
+        "audienceOptionListDesc": "A lista de participantes, a grelha de vídeo e os nomes na praça são visíveis para todos.",
+        "audienceOptionHosts": "Com o nome, visível só para quem modera",
+        "audienceOptionHostsDesc": "O público só vê quem está a falar; a lista, a grelha e os nomes na praça ficam para quem modera e intervém.",
+        "audienceLocked": "Com a sala aberta não se pode alterar."
       },
       "step3": {
         "heading": "Pessoas e convites",
@@ -1142,7 +1142,7 @@
         "personName": "Nome",
         "personEmail": "E-mail",
         "peopleHeading": "Moderadores e oradores",
-        "peopleHelp": "Coorganizadores, moderadores e oradores. Cada um recebe a sua ligação para entrar com o seu papel; o que cada papel pode fazer está explicado acima.",
+        "peopleHelp": "Coorganizadores, moderadores e oradores: cada um recebe a sua ligação para entrar com o seu papel.",
         "personRole": "Papel",
         "roleOrganizer": "Coorganizador",
         "roleModerator": "Moderador",
@@ -1201,7 +1201,7 @@
         "invitationsHelpRestricted": "Só os endereços desta lista se podem inscrever. Depois de publicar, envia a cada um o convite por e-mail a partir da página do evento, com a ligação de inscrição; a ligação para entrar chega depois da inscrição.",
         "logoExternal": "A página pública só mostra logótipos carregados nesta plataforma: um logótipo de outro sítio não será apresentado.",
         "primaryProfileInvalid": "Verifique a organização e o endereço do logótipo.",
-        "primaryMore": "Fotografia, entidade, logótipo e página pública",
+        "primaryMore": "Fotografia, entidade e logótipo",
         "accessHeading": "Quem se inscreve",
         "accessSiteDefault": "Segue a definição do site: se a administração a alterar, aplica-se também a este evento.",
         "accessNoInvitees": "Ainda não há convidados: enquanto a lista abaixo estiver vazia, ninguém se pode inscrever.",
@@ -1348,7 +1348,7 @@
           "invites": "Pessoas",
           "programme": "Programa",
           "review": "Resumo",
-          "advanced": "Definições avançadas",
+          "advanced": "Definições adicionais",
           "permissions": "Permissões"
         },
         "templateInUse": "Modelo: <b>{name}</b>",
@@ -1367,7 +1367,6 @@
         "scheduleIntro": "Quando decorre o evento: data, hora e fuso horário.",
         "advancedIntro": "Valores já escolhidos pelo modelo: altere só o que for preciso.",
         "advancedIntroTemplate": "Valores já escolhidos pelo modelo «{name}»: altere só o que for preciso.",
-        "requiredToPublish": "Necessário para publicar o evento.",
         "toComplete": "Por completar",
         "missingHeading": "Para publicar ainda falta:",
         "fieldOrganizerName": "Nome do moderador principal",
@@ -1384,9 +1383,7 @@
         "changeFormat": "Mudar formato",
         "voiceAll": "Todos falam e aparecem em vídeo",
         "voiceSpeakers": "Falam e aparecem em vídeo oradores e moderadores; o público escreve no chat",
-        "features": "Funções: {list}",
         "liveToggleNote": "Cada função liga-se e desliga-se também durante o evento.",
-        "customize": "Personalizar as definições",
         "changeLanguages": "Mudar os idiomas",
         "translationLine": "Tradução para: {list}",
         "privacyTemplate": "Aviso de privacidade: {name}",
@@ -1423,7 +1420,6 @@
         "audienceRealNames": "Nomes do público: os reais.",
         "postEventQaHidden": "Perguntas depois do evento: não publicadas.",
         "postEventQaTextOnly": "Perguntas depois do evento: apenas o texto, sem nome.",
-        "addressBookOffered": "Agenda: proposta a quem se inscreve.",
         "addressBookNotOffered": "Agenda: não proposta.",
         "consentRecordingOptional": "gravação, facultativa",
         "consentRecordingVoice": "gravação, livre (sem ela, a pessoa fica fora da gravação)",
@@ -1433,7 +1429,6 @@
         "title": "Pré-visualização da página",
         "open": "Abrir a pré-visualização",
         "note": "Assim fica a página do evento; atualiza-se enquanto escreve.",
-        "noteNoDate": "Assim fica a página do evento; enquanto faltar a data, o horário é apenas um exemplo.",
         "titlePlaceholder": "O título do evento",
         "descriptionPlaceholder": "A descrição aparecerá aqui."
       },
@@ -1464,26 +1459,18 @@
         "notPublic": "{name} não aparece na página pública: no programa vê-se apenas o tema.",
         "makePublic": "Mostrar o nome na página",
         "madePublic": "{name} aparece agora na página pública.",
-        "cardTitle": "Programa",
-        "cardEmpty": "Os temas, com quem intervém e a que horas, aparecem aqui por baixo da descrição na página do evento.",
-        "cardPrepare": "Preparar o programa",
-        "cardSummary": "{count, plural, one {# tema} other {# temas}}",
-        "cardSummaryWithTimes": "{count, plural, one {# tema} other {# temas}} · {start}–{end}",
-        "cardOff": "Desativado: não aparece na página.",
-        "cardChange": "Alterar o programa",
         "descriptionHasProgramme": "A descrição parece conter um programa. No passo «Programa» tem horários e pessoas, e na sala vê-se o tema em curso.",
         "goToProgramme": "Ir para o programa",
-        "peoplePointer": "As intervenções de cada pessoa preparam-se no passo seguinte, «Programa».",
         "reviewEmpty": "Programa: nenhum tema",
         "reviewPrepare": "Preparar",
         "reviewOff": "Programa: desativado, não aparece na página ({count, plural, one {# tema} other {# temas}})",
         "previewPlaceholder": "Aqui aparece o programa",
-        "toggleLink": "Preparar o programa",
         "toggleOffWarning": "Desativado, o programa ({count, plural, one {# tema} other {# temas}}) não aparece na página: fica a última versão guardada, e as alterações feitas aqui só são guardadas se o ativar novamente.",
         "offKeptCreate": "Enquanto o programa estiver desativado, os seus temas não são guardados com o evento: ative-o para os manter e alterar.",
         "offKeptEdit": "Enquanto o programa estiver desativado, fica a última versão guardada: as alterações feitas aqui só são guardadas se o ativar novamente.",
         "toggleOffWarningCreate": "Desativado, o programa ({count, plural, one {# tema} other {# temas}}) não aparece na página e não é guardado com o evento: ative-o para o manter.",
-        "reviewOffCreate": "Programa: desativado, não é guardado com o evento ({count, plural, one {# tema} other {# temas}})"
+        "reviewOffCreate": "Programa: desativado, não é guardado com o evento ({count, plural, one {# tema} other {# temas}})",
+        "showToParticipants": "Mostrar o programa aos participantes"
       },
       "saveCopy": "Guardar a cópia",
       "consentMap": {
@@ -1522,7 +1509,6 @@
       "settings": "Definições",
       "eventsList": "Todos os eventos",
       "newEvent": "Novo evento",
-      "calendar": "Calendário de eventos",
       "templates": "Modelos de evento",
       "analytics": "Estatísticas",
       "instantCalls": "Chamadas rápidas",
@@ -1563,7 +1549,8 @@
       "openMenu": "Abrir o menu",
       "closeMenu": "Fechar o menu",
       "recordingRemovals": "Pedidos de remoção",
-      "recordingRemovalDetail": "Pedido de remoção"
+      "recordingRemovalDetail": "Pedido de remoção",
+      "newInstantCall": "Nova chamada rápida"
     },
     "publications": {
       "subtitle": "Núcleo editorial único para todos os vídeos publicados: eventos planeados, chamadas rápidas, arquivos históricos carregados e sessões à espera de promoção.",
@@ -2315,7 +2302,9 @@
         "waitingRoomEngineGame": "Videojogo (lobby Phaser)",
         "waitingRoomEngineClassic": "Clássica (estática)",
         "waitingRoomEngineHelp": "Modo predefinido da sala de espera. Pode ser alterado para cada evento e, para uma única visita, com o parâmetro {param} no endereço.",
-        "primaryColorHex": "Cor principal (código hexadecimal)"
+        "primaryColorHex": "Cor principal (código hexadecimal)",
+        "organizationLogoUrl": "Logótipo da entidade",
+        "organizationLogoUrlHelp": "Aparece no rodapé junto ao nome da entidade que gere o serviço. Deixe vazio para mostrar só o nome."
       },
       "watermark": {
         "title": "Personalização do vídeo",
@@ -2541,7 +2530,7 @@
     },
     "recurrence": {
       "label": "Recorrência",
-      "helpText": "Se o evento se repetir, ao duplicá-lo a cópia propõe a data da próxima edição.",
+      "helpText": "A recorrência não cria sozinha as edições seguintes: quando duplica o evento, a cópia já tem a data da próxima.",
       "preset": {
         "none": "Não se repete",
         "daily": "Todos os dias",
@@ -3004,7 +2993,15 @@
       "postEventSummary": "{connected} ligados · {registered} inscrições",
       "registeredCount": "{count, plural, =0 {Nenhuma inscrição} one {1 inscrição} other {# inscrições}}",
       "sortUpcoming": "Próximos primeiro",
-      "todayTitle": "Hoje e a decorrer"
+      "todayTitle": "Hoje e a decorrer",
+      "viewLabel": "Vista",
+      "viewList": "Lista",
+      "viewCalendar": "Calendário",
+      "type": "Tipo",
+      "typeAll": "Todos os tipos",
+      "typeScheduled": "Eventos",
+      "typeInstant": "Chamadas rápidas",
+      "instantFullList": "Lista completa de chamadas rápidas, com filtros por data e gravação"
     },
     "tags": {
       "subtitle": "Crie, edite e elimine as etiquetas usadas para classificar e filtrar os eventos públicos.",
@@ -3044,7 +3041,6 @@
       "copyPublicUrl": "Copiar ligação pública",
       "copyInviteUrl": "Copiar ligação de convite",
       "enterAsParticipant": "Entrar como participante",
-      "openAsParticipant": "Abrir como participante",
       "participantHintRoom": "Abre num novo separador: a sala tal como um convidado a vê, sem poderes de moderação.",
       "participantHintPassword": "Abre num novo separador: a sala tal como um convidado a vê, após a palavra-passe do evento.",
       "participantHintPage": "Abre num novo separador: a página pública tal como os participantes a veem.",
@@ -3137,7 +3133,8 @@
         "recordingRetention": "Eliminação automática da gravação",
         "recordingRetentionNone": "Nenhuma",
         "recordingRetentionDays": "{days, plural, one {# dia} many {# dias} other {# dias}} depois do fim do evento ou, se for publicada, depois da publicação"
-      }
+      },
+      "openPublicPage": "Abrir a página pública"
     },
     "rubrica": {
       "subtitle": "Pessoas que deram consentimento para constarem na agenda (art. 6.1.a RGPD). O nome, o e-mail e a organização só são atualizados quando a pessoa volta a assinalar a caixa.",
@@ -3797,9 +3794,6 @@
         "invitationDesc": "A página continua visível, mas só se inscreve quem está na lista; o convite com a ligação de inscrição é enviado por e-mail a partir da página do evento"
       },
       "previewInvitation": "Só se inscreve quem é convidado; sem inscrição não se entra.",
-      "previewPseudonyms": "O público aparece com um pseudónimo",
-      "previewNicknames": "Os participantes podem usar uma alcunha",
-      "previewRealNames": "O público aparece com o próprio nome",
       "templateReplaces": "Um modelo traz as suas próprias definições em vez das respostas abaixo. O título, as datas e as pessoas escreve-os nos passos seguintes.",
       "instantBack": "Criar antes um evento agendado"
     },
@@ -4347,7 +4341,8 @@
         "noInstall": "A partir do navegador, sem instalações",
         "interactive": "Q&A e sondagens ao vivo",
         "recordings": "Gravações e legendas",
-        "accessible": "Acessível, em 24 línguas"
+        "languagesAll": "Nas 24 línguas da UE",
+        "languagesSome": "Em várias línguas"
       }
     },
     "upcoming": {
@@ -5523,22 +5518,18 @@
   "footer": {
     "privacy": "Política de privacidade",
     "accessibility": "Declaração de acessibilidade",
-    "openSource": "Software de código aberto",
-    "contacts": "Contactos",
     "legalNotes": "Notas legais",
-    "governmentSite": "Governo Italiano",
     "systemStatus": "Estado do sistema",
-    "sbomLatest": "SBOM da última versão",
     "transparency": "Segurança e transparência",
     "serviceInventory": "Inventário de serviços",
-    "sourceCode": "Código fonte",
-    "viewRelease": "Ver a versão no GitHub",
     "viewChangelog": "Ver as novidades (changelog)",
     "newWindow": "abre numa nova janela",
     "usefulLinks": "Ligações úteis",
     "version": "Versão {version}",
     "versionDev": "Versão de desenvolvimento",
-    "updatedOn": "atualizada em {date}"
+    "updatedOn": "atualizada em {date}",
+    "projectOf": "Um projeto de",
+    "contactsLine": "Contactos: <link>{email}</link>"
   },
   "changelog": {
     "metaTitle": "Novidades e changelog",

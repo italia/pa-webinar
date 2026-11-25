@@ -115,8 +115,12 @@ describe('briciole di pane', () => {
       .map((f) => f.replace(/\\/g, '/'))
       .filter((f) => f === 'page.tsx' || f.endsWith('/page.tsx'))
       .map((f) => ('/admin/' + f.replace(/\/?page\.tsx$/, '')).replace(/\/$/, ''))
-      // Le porte d'ingresso e il rinvio all'elenco non stanno dentro l'area.
-      .filter((p) => p !== '/admin/login' && p !== '/admin/access' && p !== '/admin');
+      // Le porte d'ingresso e i rinvii (all'elenco, alla sua vista
+      // calendario) non stanno dentro l'area.
+      .filter(
+        (p) =>
+          p !== '/admin/login' && p !== '/admin/access' && p !== '/admin' && p !== '/admin/calendar',
+      );
     expect(pagine.filter((p) => !nomePagina(p))).toEqual([]);
   });
 });

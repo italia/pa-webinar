@@ -1,4 +1,18 @@
 {
+  "0.14.0": {
+    "title": "O sală nouă, subtitrări în direct, consimțăminte separate",
+    "notes": [
+      "Subtitrări în direct cu numele celui care vorbește, generate chiar de instalație pe CPU, fără servicii externe. Un eveniment le poate păstra transcrierea, doar cu frazele celor care au consimțit.",
+      "Înregistrarea, transcrierea și agenda au consimțăminte separate, facultative și niciodată bifate dinainte. Cine refuză înregistrarea participă și rămâne în afara ei, iar fiecare consimțământ poate fi retras din „Datele mele”. Înainte de eveniment se declară dacă videoclipul va fi rezervat sau public, iar o fișă explică ce se întâmplă cu datele.",
+      "În videoclipul înregistrat apar doar cei care conduc: dintre participanți, cu consimțământ, intră vocea. Personalul poate scoate o persoană dintr-un videoclip deja înregistrat, fiecare eveniment alege cât timp păstrează înregistrarea, iar cine a fost într-un apel instant o poate revedea.",
+      "Sală reproiectată: panouri pliabile, Regie pentru cine conduce, „Acordați cuvântul”, PDF-uri prezentate fără partajarea ecranului, cronometru al intervențiilor, coduri QR ale linkurilor. Blocarea microfoanelor și camerelor se aplică și pe puntea video, iar sala de așteptare are o înfățișare nouă, inclusiv piața.",
+      "Participanții pot apărea cu o poreclă sau un pseudonim, unde evenimentul prevede acest lucru, iar la evenimentele numeroase sau la care publicul ascultă lista participanților este ascunsă. De la deschiderea sălii de așteptare se poate intra și fără înscriere, dacă administrația permite.",
+      "Crearea unui eveniment este mai simplă: câteva întrebări aleg valorile de pornire, programul se pregătește dinainte, invitațiile pleacă prin e-mail, iar un eveniment poate fi rezervat invitaților. Titlul și descrierea se traduc în limbile alese, pe CPU, unde instalația prevede acest lucru.",
+      "După eveniment, pagina pune în față videoclipul cu limbile lui, diapozitivele sincronizate și programul ca index. La cererea personalului există un raport redactat cu inteligență artificială, un glosar ghidează transcrierile și traducerile, iar „Închideți evenimentul” spune ce mai este de făcut.",
+      "Antetul, meniurile și administrarea urmează modelele Designers Italia. Mai multe verificări automate de accesibilitate, corecții de securitate, biblioteci actualizate și Next.js 15.5.29.",
+      "La actualizare: componentele Jitsi trec la stable-11031, iar chart-ul se oprește dacă una dintre ele este fixată la altă versiune; trebuie eliminat `jitsi-meet.jibri.custom.other._finalize_sh`; cine înlocuiește configurația Jitsi trebuie să adauge `config.hiddenFromRecorderFeatureEnabled = true`; Prosody repornește; subtitrările sunt activate implicit (`global.captions.enabled`)."
+    ]
+  },
   "0.13.0": {
     "title": "Confidențialitate mai completă și transcrierile evenimentelor lungi",
     "notes": [

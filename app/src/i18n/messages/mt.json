@@ -212,7 +212,8 @@
       "recordingLinkSend": "Ibgħatli l-link mill-ġdid",
       "recordingLinkSent": "Jekk l-indirizz huwa rreġistrat għall-avveniment, dalwaqt tirċievi email bil-link personali tiegħek.",
       "recordingLinkError": "It-talba ma rnexxietx. Erġa' pprova fi ftit minuti.",
-      "registerOrGuest": "Jekk tirreġistra, tirċievi bl-email il-link personali tiegħek u aġġornamenti dwar l-avveniment. Bħala mistieden tidħol mill-ewwel b'isem biss, biss waqt li l-avveniment ikun live, u ma tirċievix emails."
+      "registerOrGuest": "Jekk tirreġistra, tirċievi bl-email il-link personali tiegħek u aġġornamenti dwar l-avveniment. Bħala mistieden tidħol mill-ewwel b'isem biss u ma tirċievix emails.",
+      "guestWhenRoomOpens": "Fil-jum tal-avveniment, meta tinfetaħ il-kamra tal-istennija, tista' tidħol ukoll mingħajr reġistrazzjoni, bl-isem biss."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -661,7 +662,6 @@
     },
     "notOpenNow": "Is-sala mhix miftuħa bħalissa.",
     "nameRequired": "Nieqes l-isem li bih tidħol: mur lura u iktbu.",
-    "closeSidebar": "Agħlaq il-pannell tal-ġenb",
     "contentOnly": "Kontenut biss, mingħajr chat u pannelli",
     "showPanels": "Uri ċ-chat u l-pannelli",
     "confirmFullscreen": "Aqleb għal skrin sħiħ",
@@ -1012,11 +1012,10 @@
           "BALANCED": "Bilanċjata (540p)",
           "SAVE_DATA": "Iffranka d-data (360p)"
         },
-        "kickerHint": "Għal sopratitolu, iktbu qabel it-titolu u isseparahom b'|, pereżempju “Serje ta' laqgħat | L-ewwel laqgħa”.",
-        "kickerUse": "Uri “{kicker}” bħala sopratitolu",
-        "kickerPreview": "Hekk jidher fuq il-paġna tal-avveniment",
+        "kickerHint": "Mhux obbligatorju: linja qasira fuq it-titolu, pereżempju l-isem tas-serje ta' laqgħat.",
         "coverImageSize": "16:9, rakkomandat 1600 × 900 pixel.",
-        "requiredNote": "Il-qasam immarkati b'* huma obbligatorji."
+        "requiredNote": "Il-qasam immarkati b'* huma obbligatorji.",
+        "kickerLabel": "Sopratitolu ({language})"
       },
       "step2": {
         "heading": "Min jista' jagħmel xiex",
@@ -1097,11 +1096,6 @@
         "recordingDestinationRequired": "Agħżel fejn imur ir-rekording.",
         "audienceAnonymous": "Udjenza anonima",
         "audienceAnonymousDesc": "Il-parteċipanti jidhru lill-oħrajn b’psewdonimu (“Parteċipant” u kodiċi) fil-vidjo, fiċ-chat u fil-mistoqsijiet; il-lista tal-parteċipanti tibqa’ għand min imexxi, u m’hemmx pjazza. Utli għal avvenimenti kbar; f’avvenimenti tal-komunità n-nies iridu jsiru jafu lil xulxin.",
-        "audienceAnonymousLocked": "Ma jinbidilx sakemm il-kamra tista’ tkun miftuħa: jorbot il-psewdonimi mal-ismijiet.",
-        "participantListVisible": "Uri l-lista tal-parteċipanti lill-udjenza",
-        "participantListVisibleDesc": "Mitfi: il-lista, il-grilja u l-ismijiet fil-pjazza jibqgħu għal min imexxi u min jitkellem; l-udjenza tara biss min qed jitkellem. Mixgħul: kulħadd jara min hemm fis-sala.",
-        "participantListAnonymous": "B'udjenza anonima l-lista tibqa' moħbija.",
-        "participantListLocked": "Ma jinbidilx bis-sala miftuħa: min diġà ġewwa ma jarax il-bidla.",
         "nicknamesEnabled": "Laqmijiet għall-parteċipanti",
         "nicknamesEnabledDesc": "Il-parteċipanti jistgħu jagħżlu laqam: l-oħrajn jarawh minflok isimhom fil-vidjo, fiċ-chat, fil-mistoqsijiet u fit-traskrizzjoni. L-organizzaturi u l-moderaturi jaraw min hemm warajh. Min imexxi jibqa' b'ismu. Fil-bidu huwa mixgħul fejn il-lista tal-parteċipanti hija moħbija.",
         "nicknamesLocked": "Ma jinbidilx waqt li l-kamra hija miftuħa: min diġà ġewwa għażel bir-regola ta' qabel.",
@@ -1110,7 +1104,13 @@
         "hostsAlwaysRecorded": "Min imexxi dejjem jidher fir-reġistrazzjoni",
         "hostsAlwaysRecordedDesc": "Il-moderaturi u l-kelliema jidhru fil-vidjo bl-isem u l-immaġni, mingħajr kaxxa x'jimmarkaw: l-avviż tal-privatezza tal-avveniment irid jgħid dan. Mill-parteċipanti jiġi rreġistrat il-leħen biss, u biss bil-kunsens tagħhom.",
         "hostsAlwaysRecordedDescHostsOnly": "Il-moderaturi u l-kelliema jidhru fil-vidjo bl-isem u l-immaġni, mingħajr kaxxa x'jimmarkaw: l-avviż tal-privatezza tal-avveniment irid jgħid dan. Il-parteċipanti qatt ma jidhru jew jinstemgħu fil-vidjo.",
-        "hostsAlwaysRecordedDescVisible": "Il-moderaturi u l-kelliema jidhru fil-vidjo bl-isem u l-immaġni, mingħajr kaxxa x'jimmarkaw: l-avviż tal-privatezza tal-avveniment irid jgħid dan. Din l-installazzjoni ma tistax iżżomm il-parteċipanti barra mill-vidjo: min jagħti l-kunsens jitkellem bl-isem, il-leħen u l-immaġni, u l-isem ta' kull min qed isegwi jista' jidher anke jekk ma jitkellimx."
+        "hostsAlwaysRecordedDescVisible": "Il-moderaturi u l-kelliema jidhru fil-vidjo bl-isem u l-immaġni, mingħajr kaxxa x'jimmarkaw: l-avviż tal-privatezza tal-avveniment irid jgħid dan. Din l-installazzjoni ma tistax iżżomm il-parteċipanti barra mill-vidjo: min jagħti l-kunsens jitkellem bl-isem, il-leħen u l-immaġni, u l-isem ta' kull min qed isegwi jista' jidher anke jekk ma jitkellimx.",
+        "audienceHeading": "Kif jidhru l-parteċipanti",
+        "audienceOptionList": "Bl-isem, viżibbli għal kulħadd",
+        "audienceOptionListDesc": "Il-lista tal-parteċipanti, il-grilja tal-vidjo u l-ismijiet fil-pjazza huma viżibbli għal kulħadd.",
+        "audienceOptionHosts": "Bl-isem, viżibbli biss għal min imexxi",
+        "audienceOptionHostsDesc": "L-udjenza tara biss min qed jitkellem; il-lista, il-grilja u l-ismijiet fil-pjazza jibqgħu għal min imexxi u min jitkellem.",
+        "audienceLocked": "Mas-sala miftuħa ma jistax jinbidel."
       },
       "step3": {
         "heading": "Persuni u stediniet",
@@ -1142,7 +1142,7 @@
         "personName": "Isem",
         "personEmail": "Email",
         "peopleHeading": "Moderaturi u kelliema",
-        "peopleHelp": "Ko-organizzaturi, moderaturi u kelliema. Kull wieħed jirċievi l-link tiegħu biex jidħol bir-rwol tiegħu; x'jista' jagħmel kull rwol hu spjegat hawn fuq.",
+        "peopleHelp": "Ko-organizzaturi, moderaturi u kelliema: kull wieħed jirċievi l-link tiegħu biex jidħol bir-rwol tiegħu.",
         "personRole": "Rwol",
         "roleOrganizer": "Ko-organizzatur",
         "roleModerator": "Moderatur",
@@ -1201,7 +1201,7 @@
         "invitationsHelpRestricted": "Jistgħu jirreġistraw biss l-indirizzi ta' din il-lista. Wara l-pubblikazzjoni, mill-paġna tal-avveniment tibgħat lil kull wieħed l-istedina bl-email, bil-link tar-reġistrazzjoni; il-link biex tidħol jasal wara r-reġistrazzjoni.",
         "logoExternal": "Il-paġna pubblika turi biss logos imtella' fuq din il-pjattaforma: logo minn sit ieħor mhux se jidher.",
         "primaryProfileInvalid": "Iċċekkja l-organizzazzjoni u l-indirizz tal-logo.",
-        "primaryMore": "Ritratt, entità, logo u paġna pubblika",
+        "primaryMore": "Ritratt, entità u logo",
         "accessHeading": "Min jirreġistra",
         "accessSiteDefault": "Isegwi l-issettjar tas-sit: jekk l-amministrazzjoni tibdlu, japplika wkoll għal dan l-avveniment.",
         "accessNoInvitees": "Għad m'hemm l-ebda mistieden: sakemm il-lista t'hawn taħt tkun vojta, ħadd ma jista' jirreġistra.",
@@ -1348,7 +1348,7 @@
           "invites": "Persuni",
           "programme": "Programm",
           "review": "Sommarju",
-          "advanced": "Settings avvanzati",
+          "advanced": "Settings addizzjonali",
           "permissions": "Permessi"
         },
         "templateInUse": "Mudell: <b>{name}</b>",
@@ -1367,7 +1367,6 @@
         "scheduleIntro": "Meta jsir l-avveniment: data, ħin u żona tal-ħin.",
         "advancedIntro": "Valuri diġà magħżula mill-mudell: ibdel biss dak li hemm bżonn.",
         "advancedIntroTemplate": "Valuri diġà magħżula mill-mudell «{name}»: ibdel biss dak li hemm bżonn.",
-        "requiredToPublish": "Meħtieġ biex jiġi ppubblikat l-avveniment.",
         "toComplete": "Biex jitlesta",
         "missingHeading": "Biex tippubblika għadu nieqes:",
         "fieldOrganizerName": "Isem il-moderatur ewlieni",
@@ -1384,9 +1383,7 @@
         "changeFormat": "Biddel il-format",
         "voiceAll": "Kulħadd jitkellem u jidher fil-vidjo",
         "voiceSpeakers": "Jitkellmu u jidhru fil-vidjo l-kelliema u l-moderaturi; il-pubbliku jikteb fiċ-chat",
-        "features": "Funzjonijiet: {list}",
         "liveToggleNote": "Kull funzjoni tinxtegħel u tintefa wkoll matul l-avveniment.",
-        "customize": "Ippersonalizza s-settings",
         "changeLanguages": "Biddel il-lingwi",
         "translationLine": "Traduzzjoni għal: {list}",
         "privacyTemplate": "Avviż ta' privatezza: {name}",
@@ -1423,7 +1420,6 @@
         "audienceRealNames": "Ismijiet tal-udjenza: dawk reali.",
         "postEventQaHidden": "Mistoqsijiet wara l-avveniment: mhux ippubblikati.",
         "postEventQaTextOnly": "Mistoqsijiet wara l-avveniment: it-test biss, mingħajr isem.",
-        "addressBookOffered": "Direttorju: propost lil min jirreġistra.",
         "addressBookNotOffered": "Direttorju: mhux propost.",
         "consentRecordingOptional": "reġistrazzjoni, fakultattiva",
         "consentRecordingVoice": "reġistrazzjoni, b'xejn (mingħajrha, il-persuna tibqa' barra mir-reġistrazzjoni)",
@@ -1433,7 +1429,6 @@
         "title": "Anteprima tal-paġna",
         "open": "Iftaħ l-anteprima",
         "note": "Hekk tidher il-paġna tal-avveniment; tiġi aġġornata waqt li tikteb.",
-        "noteNoDate": "Hekk tidher il-paġna tal-avveniment; sakemm tonqos id-data, il-ħin huwa biss eżempju.",
         "titlePlaceholder": "It-titlu tal-avveniment",
         "descriptionPlaceholder": "Id-deskrizzjoni se tidher hawn."
       },
@@ -1464,26 +1459,18 @@
         "notPublic": "L-isem {name} ma jidhirx fil-paġna pubblika: fil-programm jidher is-suġġett biss.",
         "makePublic": "Uri l-isem fil-paġna",
         "madePublic": "L-isem {name} issa jidher fil-paġna pubblika.",
-        "cardTitle": "Programm",
-        "cardEmpty": "Is-suġġetti, b'min jitkellem u f'liema ħin, jidhru hawn taħt id-deskrizzjoni fil-paġna tal-avveniment.",
-        "cardPrepare": "Ħejji l-programm",
-        "cardSummary": "{count, plural, one {# suġġett} other {# suġġetti}}",
-        "cardSummaryWithTimes": "{count, plural, one {# suġġett} other {# suġġetti}} · {start}–{end}",
-        "cardOff": "Mitfi: ma jidhirx fil-paġna.",
-        "cardChange": "Ibdel il-programm",
         "descriptionHasProgramme": "Jidher li d-deskrizzjoni fiha programm. Fil-pass “Programm” għandu ħinijiet u persuni, u fil-kamra jidher is-suġġett għaddej.",
         "goToProgramme": "Mur għall-programm",
-        "peoplePointer": "L-interventi ta' kull persuna tħejjihom fil-pass li jmiss, “Programm”.",
         "reviewEmpty": "Programm: l-ebda suġġett",
         "reviewPrepare": "Ħejji",
         "reviewOff": "Programm: mitfi, ma jidhirx fil-paġna ({count, plural, one {# suġġett} other {# suġġetti}})",
         "previewPlaceholder": "Il-programm jidher hawn",
-        "toggleLink": "Ħejji l-programm",
         "toggleOffWarning": "Meta jkun mitfi, il-programm ({count, plural, one {# suġġett} other {# suġġetti}}) ma jidhirx fil-paġna: tibqa' l-aħħar verżjoni ssejvjata, u l-bidliet li ssir hawn jiġu ssejvjati biss jekk terġa' tixgħlu.",
         "offKeptCreate": "Sakemm il-programm ikun mitfi, is-suġġetti tiegħu ma jiġux issejvjati mal-avveniment: ixgħlu biex iżżommhom u tibdilhom.",
         "offKeptEdit": "Sakemm il-programm ikun mitfi, tibqa' l-aħħar verżjoni ssejvjata: il-bidliet li ssir hawn jiġu ssejvjati biss jekk terġa' tixgħlu.",
         "toggleOffWarningCreate": "Meta jkun mitfi, il-programm ({count, plural, one {# suġġett} other {# suġġetti}}) ma jidhirx fil-paġna u ma jiġix issejvjat mal-avveniment: ixgħlu biex iżżommu.",
-        "reviewOffCreate": "Programm: mitfi, ma jiġix issejvjat mal-avveniment ({count, plural, one {# suġġett} other {# suġġetti}})"
+        "reviewOffCreate": "Programm: mitfi, ma jiġix issejvjat mal-avveniment ({count, plural, one {# suġġett} other {# suġġetti}})",
+        "showToParticipants": "Uri l-programm lill-parteċipanti"
       },
       "saveCopy": "Issejvja l-kopja",
       "consentMap": {
@@ -1522,7 +1509,6 @@
       "settings": "Issettjar",
       "eventsList": "L-avvenimenti kollha",
       "newEvent": "Avveniment ġdid",
-      "calendar": "Kalendarju tal-avvenimenti",
       "templates": "Templates tal-avvenimenti",
       "analytics": "Statistika",
       "instantCalls": "Sejħiet rapidi",
@@ -1563,7 +1549,8 @@
       "openMenu": "Iftaħ il-menu",
       "closeMenu": "Agħlaq il-menu",
       "recordingRemovals": "Talbiet għat-tneħħija",
-      "recordingRemovalDetail": "Talba għat-tneħħija"
+      "recordingRemovalDetail": "Talba għat-tneħħija",
+      "newInstantCall": "Sejħa rapida ġdida"
     },
     "publications": {
       "subtitle": "Hub editorjali uniku għall-vidjos pubblikati kollha: avvenimenti skedati, telefonati istantanji, arkivji storiċi mtellgħin u sessjonijiet jistennew il-promozzjoni.",
@@ -2315,7 +2302,9 @@
         "waitingRoomEngineGame": "Videogame (lobby Phaser)",
         "waitingRoomEngineClassic": "Klassika (statika)",
         "waitingRoomEngineHelp": "Il-modalità prestabbilita tal-kamra tal-istennija. Tista' tinbidel għal avveniment wieħed u, għal żjara waħda, bil-parametru {param} fl-indirizz.",
-        "primaryColorHex": "Kulur primarju (kodiċi eżadeċimali)"
+        "primaryColorHex": "Kulur primarju (kodiċi eżadeċimali)",
+        "organizationLogoUrl": "Logo tal-entità",
+        "organizationLogoUrlHelp": "Jidher fil-footer ħdejn l-isem tal-entità li tmexxi s-servizz. Ħallih vojt biex jintwera l-isem biss."
       },
       "watermark": {
         "title": "Personalizzazzjoni tal-vidjo",
@@ -2541,7 +2530,7 @@
     },
     "recurrence": {
       "label": "Rikorrenza",
-      "helpText": "Jekk l-avveniment jirrepeti ruħu, meta tidduplikah il-kopja tissuġġerixxi d-data tal-okkażjoni li jmiss.",
+      "helpText": "Ir-rikorrenza ma toħloqx waħedha l-edizzjonijiet ta' wara: meta tidduplikaw l-avveniment, il-kopja diġà għandha d-data tal-edizzjoni li jmiss.",
       "preset": {
         "none": "Ma jirrepetix ruħu",
         "daily": "Kull jum",
@@ -3004,7 +2993,15 @@
       "postEventSummary": "{connected} konnessi · {registered} reġistrazzjonijiet",
       "registeredCount": "{count, plural, =0 {Ebda reġistrazzjoni} one {1 reġistrazzjoni} other {# reġistrazzjonijiet}}",
       "sortUpcoming": "Dawk li ġejjin l-ewwel",
-      "todayTitle": "Illum u għaddejjin"
+      "todayTitle": "Illum u għaddejjin",
+      "viewLabel": "Veduta",
+      "viewList": "Lista",
+      "viewCalendar": "Kalendarju",
+      "type": "Tip",
+      "typeAll": "It-tipi kollha",
+      "typeScheduled": "Avvenimenti",
+      "typeInstant": "Sejħiet rapidi",
+      "instantFullList": "Lista sħiħa tas-sejħiet rapidi, b'filtri skont id-data u r-reġistrazzjoni"
     },
     "tags": {
       "subtitle": "Crea, tbiddel ed ħassar il-tag usati għal classificaru u filtraru gli avvenimenti pubbliċi.",
@@ -3044,7 +3041,6 @@
       "copyPublicUrl": "Copia link pubblico",
       "copyInviteUrl": "Ikkopja l-link tal-istedina",
       "enterAsParticipant": "Idħol bħala parteċipant",
-      "openAsParticipant": "Iftaħ bħala parteċipant",
       "participantHintRoom": "Jinfetaħ f'tab ġdida: il-kamra kif jaraha mistieden, mingħajr setgħat ta' moderazzjoni.",
       "participantHintPassword": "Jinfetaħ f'tab ġdida: il-kamra kif jaraha mistieden, wara l-password tal-avveniment.",
       "participantHintPage": "Jinfetaħ f'tab ġdida: il-paġna pubblika kif jarawha l-parteċipanti.",
@@ -3137,7 +3133,8 @@
         "recordingRetention": "Tħassir awtomatiku tar-rekording",
         "recordingRetentionNone": "Xejn",
         "recordingRetentionDays": "{days, plural, one {# ġurnata} two {# ġranet} few {# ġranet} many {#-il ġurnata} other {# ġurnata}} wara t-tmiem tal-avveniment jew, jekk ippubblikat, wara l-pubblikazzjoni"
-      }
+      },
+      "openPublicPage": "Iftaħ il-paġna pubblika"
     },
     "rubrica": {
       "subtitle": "Persuni li taw il-kunsens biex jiddaħħlu fid-direttorju (art. 6.1.a GDPR). L-isem, l-email u l-organizzazzjoni jiġu aġġornati biss meta l-persuna terġa' timmarka l-kaxxa.",
@@ -3797,9 +3794,6 @@
         "invitationDesc": "Il-paġna tibqa' viżibbli, iżda jirreġistraw biss dawk fil-lista; l-istedina bil-link tar-reġistrazzjoni tibagħtha bl-email mill-paġna tal-avveniment"
       },
       "previewInvitation": "Jirreġistraw biss il-mistiedna; mingħajr reġistrazzjoni ħadd ma jidħol.",
-      "previewPseudonyms": "L-udjenza tidher b'psewdonimu",
-      "previewNicknames": "Il-parteċipanti jistgħu jużaw laqam",
-      "previewRealNames": "L-udjenza tidher bl-ismijiet tagħha",
       "templateReplaces": "Mudell iġib l-issettjar tiegħu minflok it-tweġibiet hawn taħt. It-titlu, id-dati u n-nies tiktibhom fil-passi li ġejjin.",
       "instantBack": "Oħloq minflok avveniment skedat"
     },
@@ -4347,7 +4341,8 @@
         "noInstall": "Mill-browser, bla installazzjonijiet",
         "interactive": "Q&A u stħarriġ dirett",
         "recordings": "Reġistrazzjonijiet u sottotitli",
-        "accessible": "Aċċessibbli, f'24 lingwa"
+        "languagesAll": "Fl-24 lingwa tal-UE",
+        "languagesSome": "F'diversi lingwi"
       }
     },
     "upcoming": {
@@ -5523,22 +5518,18 @@
   "footer": {
     "privacy": "Avviż dwar il-privatezza",
     "accessibility": "Dikjarazzjoni ta' aċċessibbiltà",
-    "openSource": "Software open source",
-    "contacts": "Kuntatti",
     "legalNotes": "Noti legali",
-    "governmentSite": "Gvern Taljan",
     "systemStatus": "Status tas-sistema",
-    "sbomLatest": "SBOM tal-aħħar rilaxx",
     "transparency": "Sigurtà u trasparenza",
     "serviceInventory": "Inventario servizi",
-    "sourceCode": "Kodiċi sors",
-    "viewRelease": "Ara r-rilaxx fuq GitHub",
     "viewChangelog": "Ara x'hemm ġdid (changelog)",
     "newWindow": "jinfetaħ f'tieqa ġdida",
     "usefulLinks": "Links utli",
     "version": "Verżjoni {version}",
     "versionDev": "Verżjoni ta' żvilupp",
-    "updatedOn": "aġġornata fil-{date}"
+    "updatedOn": "aġġornata fil-{date}",
+    "projectOf": "Proġett ta'",
+    "contactsLine": "Kuntatti: <link>{email}</link>"
   },
   "changelog": {
     "metaTitle": "X'hemm ġdid u changelog",

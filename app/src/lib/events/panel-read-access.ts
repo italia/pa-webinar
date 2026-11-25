@@ -52,6 +52,7 @@ export interface PanelReadEvent {
   status: string;
   eventType: string;
   accessMode: string | null;
+  endsAt: Date | string;
   moderatorToken: string;
   joinPasswordHash: string | null;
 }
@@ -63,6 +64,7 @@ export const PANEL_READ_EVENT_SELECT = {
   status: true,
   eventType: true,
   accessMode: true,
+  endsAt: true,
   moderatorToken: true,
   joinPasswordHash: true,
 } as const;

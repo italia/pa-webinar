@@ -1,4 +1,18 @@
 {
+  "0.14.0": {
+    "title": "Une nouvelle salle, des sous-titres en direct, des consentements séparés",
+    "notes": [
+      "Sous-titres en direct avec le nom de la personne qui parle, produits par l'installation elle-même sur CPU, sans service externe. Un événement peut en conserver la transcription, avec les seules phrases des personnes qui y ont consenti.",
+      "Enregistrement, transcription et carnet d'adresses ont des consentements séparés, facultatifs et jamais cochés d'avance. Qui refuse l'enregistrement participe et n'y figure pas, et chaque consentement se retire depuis « Mes données ». Avant l'événement, on déclare si la vidéo sera réservée ou publique, et une fiche explique ce que deviennent les données.",
+      "La vidéo enregistrée ne montre que les personnes qui animent : des participants, avec leur consentement, seule la voix y figure. L'équipe peut retirer une personne d'une vidéo déjà enregistrée, chaque événement choisit la durée de conservation de son enregistrement, et qui était dans un appel instantané peut le revoir.",
+      "Salle redessinée : panneaux repliables, Régie pour qui anime, « Donner la parole », PDF présentés sans partager l'écran, minuteur des interventions, codes QR des liens. Le blocage des micros et des caméras vaut désormais aussi sur le pont vidéo, et la salle d'attente a un nouveau visage, place comprise.",
+      "Les participants peuvent apparaître sous un surnom ou un pseudonyme, là où l'événement le prévoit, et dans les événements nombreux ou où le public écoute, la liste des participants est masquée. Dès l'ouverture de la salle d'attente, on peut entrer sans s'inscrire, si l'administration le permet.",
+      "Créer un événement est plus simple : quelques questions choisissent les valeurs de départ, le programme se prépare à l'avance, les invitations partent par e-mail et un événement peut être réservé aux invités. Titre et description sont traduits dans les langues choisies, sur CPU, là où l'installation le prévoit.",
+      "Après l'événement, la page met en tête la vidéo dans ses langues, avec les diapositives synchronisées et le programme comme index. À la demande de l'équipe, un compte rendu rédigé avec l'intelligence artificielle ; un glossaire guide transcriptions et traductions, et « Clôturer l'événement » dit ce qu'il reste à faire.",
+      "L'en-tête, les menus et l'administration suivent les modèles de Designers Italia. Davantage de contrôles automatiques d'accessibilité, des corrections de sécurité, des bibliothèques à jour et Next.js 15.5.29.",
+      "Lors de la mise à jour : les composants Jitsi passent à stable-11031 et le chart s'arrête si l'un d'eux est fixé à une autre version ; retirer `jitsi-meet.jibri.custom.other._finalize_sh` ; qui remplace la configuration de Jitsi doit ajouter `config.hiddenFromRecorderFeatureEnabled = true` ; Prosody redémarre ; les sous-titres sont activés par défaut (`global.captions.enabled`)."
+    ]
+  },
   "0.13.0": {
     "title": "Une confidentialité plus complète, et les transcriptions des longs événements",
     "notes": [

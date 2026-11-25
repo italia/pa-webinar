@@ -212,7 +212,8 @@
       "recordingLinkSend": "Poslat odkaz znovu",
       "recordingLinkSent": "Pokud je adresa na akci registrována, brzy vám přijde e-mail s osobním odkazem.",
       "recordingLinkError": "Požadavek se nezdařil. Zkuste to za několik minut znovu.",
-      "registerOrGuest": "Když se zaregistrujete, dostanete e-mailem svůj osobní odkaz a novinky o akci. Jako host vstoupíte hned jen se jménem, pouze během živého vysílání, a e-maily nedostáváte."
+      "registerOrGuest": "Když se zaregistrujete, dostanete e-mailem svůj osobní odkaz a novinky o akci. Jako host vstoupíte hned jen se jménem a e-maily nedostáváte.",
+      "guestWhenRoomOpens": "V den akce, až se otevře čekárna, se můžete připojit i bez registrace, jen se svým jménem."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -661,7 +662,6 @@
     },
     "notOpenNow": "Místnost teď není otevřená.",
     "nameRequired": "Chybí jméno, pod kterým se připojíte: vraťte se a napište ho.",
-    "closeSidebar": "Zavřít boční panel",
     "contentOnly": "Pouze obsah, bez chatu a panelů",
     "showPanels": "Zobrazit chat a panely",
     "confirmFullscreen": "Přepnout na celou obrazovku",
@@ -1012,11 +1012,10 @@
           "BALANCED": "Vyvážená (540p)",
           "SAVE_DATA": "Úspora dat (360p)"
         },
-        "kickerHint": "Nadtitulek napište před název a oddělte je znakem |, například „Cyklus setkání | První setkání“.",
-        "kickerUse": "Zobrazit „{kicker}“ jako nadtitulek",
-        "kickerPreview": "Takto vypadá na stránce akce",
+        "kickerHint": "Nepovinné: krátký řádek nad názvem, například název cyklu setkání.",
         "coverImageSize": "16:9, doporučeno 1600 × 900 pixelů.",
-        "requiredNote": "Pole označená * jsou povinná."
+        "requiredNote": "Pole označená * jsou povinná.",
+        "kickerLabel": "Nadtitulek ({language})"
       },
       "step2": {
         "heading": "Kdo může co dělat",
@@ -1097,11 +1096,6 @@
         "recordingDestinationRequired": "Zvolte, kam záznam půjde.",
         "audienceAnonymous": "Anonymní publikum",
         "audienceAnonymousDesc": "Účastníci se ostatním zobrazují pod pseudonymem („Účastník“ a kód) ve videu, v chatu i v dotazech; seznam účastníků vidí jen moderátoři a náměstí není k dispozici. Hodí se pro velké akce; na komunitních akcích se lidé chtějí poznat.",
-        "audienceAnonymousLocked": "Dokud může být místnost otevřená, nelze to změnit: propojilo by to pseudonymy se jmény.",
-        "participantListVisible": "Zobrazit publiku seznam účastníků",
-        "participantListVisibleDesc": "Vypnuto: seznam, mřížka a jména na náměstí zůstávají moderátorům a řečníkům; publikum vidí jen toho, kdo mluví. Zapnuto: všichni vidí, kdo je v místnosti.",
-        "participantListAnonymous": "U anonymního publika zůstává seznam skrytý.",
-        "participantListLocked": "Při otevřené místnosti to nelze změnit: lidé uvnitř by změnu neviděli.",
         "nicknamesEnabled": "Přezdívky pro účastníky",
         "nicknamesEnabledDesc": "Účastníci si mohou zvolit přezdívku: ostatní ji vidí místo jejich jména ve videu, v chatu, v dotazech a v přepisu. Organizátoři a moderátoři vidí, kdo se za ní skrývá. Kdo vede, zůstává pod svým jménem. Ve výchozím stavu je zapnuto tam, kde je seznam účastníků skrytý.",
         "nicknamesLocked": "Při otevřené místnosti to nelze změnit: kdo už je uvnitř, volil podle předchozího pravidla.",
@@ -1110,7 +1104,13 @@
         "hostsAlwaysRecorded": "Moderátoři a řečníci jsou vždy v záznamu",
         "hostsAlwaysRecordedDesc": "Moderátoři a řečníci jsou ve videu se jménem a obrazem, bez zaškrtávacího políčka: informace o ochraně soukromí akce to musí uvádět. Od účastníků se nahrává jen hlas, a jen s jejich souhlasem.",
         "hostsAlwaysRecordedDescHostsOnly": "Moderátoři a řečníci jsou ve videu se jménem a obrazem, bez zaškrtávacího políčka: informace o ochraně soukromí akce to musí uvádět. Účastníci nejsou ve videu nikdy vidět ani slyšet.",
-        "hostsAlwaysRecordedDescVisible": "Moderátoři a řečníci jsou ve videu se jménem a obrazem, bez zaškrtávacího políčka: informace o ochraně soukromí akce to musí uvádět. Tato instalace nedokáže udržet účastníky mimo video: kdo souhlasí, vystupuje se jménem, hlasem a obrazem, a jméno kohokoli, kdo sleduje, se může objevit, i když nepromluví."
+        "hostsAlwaysRecordedDescVisible": "Moderátoři a řečníci jsou ve videu se jménem a obrazem, bez zaškrtávacího políčka: informace o ochraně soukromí akce to musí uvádět. Tato instalace nedokáže udržet účastníky mimo video: kdo souhlasí, vystupuje se jménem, hlasem a obrazem, a jméno kohokoli, kdo sleduje, se může objevit, i když nepromluví.",
+        "audienceHeading": "Jak se zobrazují účastníci",
+        "audienceOptionList": "Se jménem, viditelné pro všechny",
+        "audienceOptionListDesc": "Seznam účastníků, videomřížka a jména na náměstí jsou viditelné pro všechny.",
+        "audienceOptionHosts": "Se jménem, viditelné jen pro moderátory",
+        "audienceOptionHostsDesc": "Publikum vidí jen toho, kdo mluví; seznam, mřížka a jména na náměstí zůstávají moderátorům a řečníkům.",
+        "audienceLocked": "Při otevřené místnosti to nelze změnit."
       },
       "step3": {
         "heading": "Osoby a pozvánky",
@@ -1142,7 +1142,7 @@
         "personName": "Jméno",
         "personEmail": "E-mail",
         "peopleHeading": "Moderátoři a řečníci",
-        "peopleHelp": "Spoluorganizátoři, moderátoři a řečníci. Každý dostane vlastní odkaz pro vstup ve své roli; co která role může, je vysvětleno výše.",
+        "peopleHelp": "Spoluorganizátoři, moderátoři a řečníci: každý dostane vlastní odkaz pro vstup ve své roli.",
         "personRole": "Role",
         "roleOrganizer": "Spoluorganizátor",
         "roleModerator": "Moderátor",
@@ -1201,7 +1201,7 @@
         "invitationsHelpRestricted": "Registrovat se mohou jen adresy z tohoto seznamu. Po zveřejnění každému ze stránky akce pošlete pozvánku e-mailem s odkazem k registraci; odkaz pro vstup přijde po registraci.",
         "logoExternal": "Veřejná stránka zobrazuje jen loga nahraná na tuto platformu: logo z jiného webu se nezobrazí.",
         "primaryProfileInvalid": "Zkontrolujte organizaci a adresu loga.",
-        "primaryMore": "Fotografie, instituce, logo a veřejná stránka",
+        "primaryMore": "Fotografie, instituce a logo",
         "accessHeading": "Kdo se přihlašuje",
         "accessSiteDefault": "Řídí se nastavením webu: pokud ho správa změní, platí to i pro tuto akci.",
         "accessNoInvitees": "Zatím žádní pozvaní: dokud je seznam níže prázdný, nikdo se nemůže přihlásit.",
@@ -1348,7 +1348,7 @@
           "invites": "Osoby",
           "programme": "Program",
           "review": "Shrnutí",
-          "advanced": "Pokročilá nastavení",
+          "advanced": "Další nastavení",
           "permissions": "Oprávnění"
         },
         "templateInUse": "Šablona: <b>{name}</b>",
@@ -1367,7 +1367,6 @@
         "scheduleIntro": "Kdy se akce koná: datum, čas a časové pásmo.",
         "advancedIntro": "Hodnoty, které už zvolila šablona: změňte jen to, co je potřeba.",
         "advancedIntroTemplate": "Hodnoty, které už zvolila šablona „{name}“: změňte jen to, co je potřeba.",
-        "requiredToPublish": "Potřeba ke zveřejnění akce.",
         "toComplete": "K doplnění",
         "missingHeading": "Ke zveřejnění ještě chybí:",
         "fieldOrganizerName": "Jméno hlavního moderátora",
@@ -1384,9 +1383,7 @@
         "changeFormat": "Změnit formát",
         "voiceAll": "Všichni mluví a ukazují se na videu",
         "voiceSpeakers": "Mluví a ukazují se na videu řečníci a moderátoři; publikum píše do chatu",
-        "features": "Funkce: {list}",
         "liveToggleNote": "Každou funkci lze zapnout a vypnout i během akce.",
-        "customize": "Přizpůsobit nastavení",
         "changeLanguages": "Změnit jazyky",
         "translationLine": "Překlad do: {list}",
         "privacyTemplate": "Informace o ochraně soukromí: {name}",
@@ -1423,7 +1420,6 @@
         "audienceRealNames": "Jména publika: skutečná jména.",
         "postEventQaHidden": "Otázky po akci: nezveřejňují se.",
         "postEventQaTextOnly": "Otázky po akci: jen text, bez jména.",
-        "addressBookOffered": "Adresář: nabízí se těm, kdo se registrují.",
         "addressBookNotOffered": "Adresář: nenabízí se.",
         "consentRecordingOptional": "nahrávání, dobrovolné",
         "consentRecordingVoice": "záznam, dobrovolný (bez souhlasu zůstává osoba mimo záznam)",
@@ -1433,7 +1429,6 @@
         "title": "Náhled stránky",
         "open": "Otevřít náhled",
         "note": "Takto vypadá stránka akce; aktualizuje se během psaní.",
-        "noteNoDate": "Takto vypadá stránka akce; dokud chybí datum, je čas jen ukázkový.",
         "titlePlaceholder": "Název akce",
         "descriptionPlaceholder": "Zde se zobrazí popis."
       },
@@ -1464,26 +1459,18 @@
         "notPublic": "{name} se nezobrazuje na veřejné stránce: v programu je vidět jen téma.",
         "makePublic": "Zobrazit jméno na stránce",
         "madePublic": "{name} se nyní zobrazuje na veřejné stránce.",
-        "cardTitle": "Program",
-        "cardEmpty": "Témata s tím, kdo vystupuje a v kolik, se zobrazí zde pod popisem na stránce akce.",
-        "cardPrepare": "Připravit program",
-        "cardSummary": "{count, plural, one {# téma} few {# témata} many {# tématu} other {# témat}}",
-        "cardSummaryWithTimes": "{count, plural, one {# téma} few {# témata} many {# tématu} other {# témat}} · {start}–{end}",
-        "cardOff": "Vypnuto: nezobrazuje se na stránce.",
-        "cardChange": "Změnit program",
         "descriptionHasProgramme": "Zdá se, že popis obsahuje program. V kroku „Program“ má časy a osoby a v místnosti je vidět probíhající téma.",
         "goToProgramme": "Přejít na program",
-        "peoplePointer": "Vystoupení jednotlivých osob připravíte v dalším kroku, „Program“.",
         "reviewEmpty": "Program: žádná témata",
         "reviewPrepare": "Připravit",
         "reviewOff": "Program: vypnuto, nezobrazuje se na stránce ({count, plural, one {# téma} few {# témata} many {# tématu} other {# témat}})",
         "previewPlaceholder": "Zde se zobrazí program",
-        "toggleLink": "Připravit program",
         "toggleOffWarning": "Vypnutý program ({count, plural, one {# téma} few {# témata} many {# tématu} other {# témat}}) se na stránce nezobrazuje: platí naposledy uložená verze a změny provedené zde se uloží, jen když ho znovu zapnete.",
         "offKeptCreate": "Dokud je program vypnutý, jeho témata se s akcí neukládají: zapněte ho, abyste je zachovali a mohli změnit.",
         "offKeptEdit": "Dokud je program vypnutý, platí naposledy uložená verze: změny provedené zde se uloží, jen když ho znovu zapnete.",
         "toggleOffWarningCreate": "Vypnutý program ({count, plural, one {# téma} few {# témata} many {# tématu} other {# témat}}) se na stránce nezobrazuje a s akcí se neuloží: zapněte ho, abyste ho zachovali.",
-        "reviewOffCreate": "Program: vypnuto, s akcí se neuloží ({count, plural, one {# téma} few {# témata} many {# tématu} other {# témat}})"
+        "reviewOffCreate": "Program: vypnuto, s akcí se neuloží ({count, plural, one {# téma} few {# témata} many {# tématu} other {# témat}})",
+        "showToParticipants": "Zobrazit program účastníkům"
       },
       "saveCopy": "Uložit kopii",
       "consentMap": {
@@ -1522,7 +1509,6 @@
       "settings": "Nastavení",
       "eventsList": "Všechny události",
       "newEvent": "Nová událost",
-      "calendar": "Kalendář událostí",
       "templates": "Šablony událostí",
       "analytics": "Statistiky",
       "instantCalls": "Rychlé hovory",
@@ -1563,7 +1549,8 @@
       "openMenu": "Otevřít nabídku",
       "closeMenu": "Zavřít nabídku",
       "recordingRemovals": "Žádosti o odstranění",
-      "recordingRemovalDetail": "Žádost o odstranění"
+      "recordingRemovalDetail": "Žádost o odstranění",
+      "newInstantCall": "Nový rychlý hovor"
     },
     "publications": {
       "subtitle": "Jednotný redakční hub pro všechna publikovaná videa: plánované události, rychlé hovory, nahrané historické archivy a relace čekající na zveřejnění.",
@@ -2315,7 +2302,9 @@
         "waitingRoomEngineGame": "Videohra (lobby Phaser)",
         "waitingRoomEngineClassic": "Klasická (statická)",
         "waitingRoomEngineHelp": "Výchozí režim čekárny. Lze jej změnit pro jednotlivou událost a pro jednu návštěvu parametrem {param} v adrese.",
-        "primaryColorHex": "Primární barva (hexadecimální kód)"
+        "primaryColorHex": "Primární barva (hexadecimální kód)",
+        "organizationLogoUrl": "Logo instituce",
+        "organizationLogoUrlHelp": "Zobrazí se v zápatí vedle názvu instituce, která službu provozuje. Nechte prázdné, chcete-li zobrazit jen název."
       },
       "watermark": {
         "title": "Přizpůsobení videa",
@@ -2541,7 +2530,7 @@
     },
     "recurrence": {
       "label": "Opakování",
-      "helpText": "Pokud se akce opakuje, kopie při duplikování navrhne datum dalšího konání.",
+      "helpText": "Opakování samo nevytvoří další termíny: když akci zduplikujete, kopie už má datum toho dalšího.",
       "preset": {
         "none": "Neopakuje se",
         "daily": "Každý den",
@@ -3004,7 +2993,15 @@
       "postEventSummary": "{connected} připojených · {registered} registrací",
       "registeredCount": "{count, plural, =0 {Žádné registrace} one {1 registrace} few {# registrace} other {# registrací}}",
       "sortUpcoming": "Nejbližší nejdřív",
-      "todayTitle": "Dnes a právě probíhá"
+      "todayTitle": "Dnes a právě probíhá",
+      "viewLabel": "Zobrazení",
+      "viewList": "Seznam",
+      "viewCalendar": "Kalendář",
+      "type": "Typ",
+      "typeAll": "Všechny typy",
+      "typeScheduled": "Události",
+      "typeInstant": "Rychlé hovory",
+      "instantFullList": "Úplný seznam rychlých hovorů s filtry podle data a záznamu"
     },
     "tags": {
       "subtitle": "Vytvářejte, upravujte a mažte štítky používané pro klasifikaci a filtrování veřejných událostí.",
@@ -3044,7 +3041,6 @@
       "copyPublicUrl": "Zkopírovat veřejný odkaz",
       "copyInviteUrl": "Zkopírovat odkaz s pozvánkou",
       "enterAsParticipant": "Připojit se jako účastník",
-      "openAsParticipant": "Otevřít jako účastník",
       "participantHintRoom": "Otevře se na nové kartě: místnost tak, jak ji vidí host, bez oprávnění moderátora.",
       "participantHintPassword": "Otevře se na nové kartě: místnost tak, jak ji vidí host, po zadání hesla události.",
       "participantHintPage": "Otevře se na nové kartě: veřejná stránka tak, jak ji vidí účastníci.",
@@ -3137,7 +3133,8 @@
         "recordingRetention": "Automatické smazání záznamu",
         "recordingRetentionNone": "Žádné",
         "recordingRetentionDays": "{days, plural, one {# den} few {# dny} many {# dne} other {# dní}} po skončení akce, nebo, pokud je zveřejněn, po zveřejnění"
-      }
+      },
+      "openPublicPage": "Otevřít veřejnou stránku"
     },
     "rubrica": {
       "subtitle": "Osoby, které udělily souhlas se zařazením do adresáře (čl. 6.1.a GDPR). Jméno, e-mail a organizace se aktualizují pouze tehdy, když osoba políčko znovu zaškrtne.",
@@ -3797,9 +3794,6 @@
         "invitationDesc": "Stránka zůstává viditelná, ale registrovat se mohou jen lidé ze seznamu; pozvánku s odkazem k registraci pošlete e-mailem ze stránky akce"
       },
       "previewInvitation": "Registrují se jen pozvaní; bez registrace se nevstoupí.",
-      "previewPseudonyms": "Publikum se zobrazuje pod pseudonymem",
-      "previewNicknames": "Účastníci mohou používat přezdívku",
-      "previewRealNames": "Publikum se zobrazuje pod vlastními jmény",
       "templateReplaces": "Šablona přinese vlastní nastavení místo odpovědí níže. Název, data a osoby zadáte v dalších krocích.",
       "instantBack": "Vytvořit místo toho naplánovanou akci"
     },
@@ -4347,7 +4341,8 @@
         "noInstall": "Z prohlížeče, bez instalace",
         "interactive": "Živé Q&A a ankety",
         "recordings": "Záznamy a titulky",
-        "accessible": "Přístupné, ve 24 jazycích"
+        "languagesAll": "Ve 24 jazycích EU",
+        "languagesSome": "Ve více jazycích"
       }
     },
     "upcoming": {
@@ -5523,22 +5518,18 @@
   "footer": {
     "privacy": "Zásady ochrany osobních údajů",
     "accessibility": "Prohlášení o přístupnosti",
-    "openSource": "Software s otevřeným zdrojovým kódem",
-    "contacts": "Kontakty",
     "legalNotes": "Právní upozornění",
-    "governmentSite": "Italská vláda",
     "systemStatus": "Stav systému",
-    "sbomLatest": "SBOM nejnovějšího vydání",
     "transparency": "Bezpečnost a transparentnost",
     "serviceInventory": "Inventář služeb",
-    "sourceCode": "Zdrojový kód",
-    "viewRelease": "Zobrazit vydání na GitHubu",
     "viewChangelog": "Zobrazit novinky (changelog)",
     "newWindow": "otevře se v novém okně",
     "usefulLinks": "Užitečné odkazy",
     "version": "Verze {version}",
     "versionDev": "Vývojová verze",
-    "updatedOn": "aktualizováno {date}"
+    "updatedOn": "aktualizováno {date}",
+    "projectOf": "Projekt realizuje",
+    "contactsLine": "Kontakty: <link>{email}</link>"
   },
   "changelog": {
     "metaTitle": "Novinky a changelog",

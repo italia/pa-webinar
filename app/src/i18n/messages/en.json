@@ -212,7 +212,8 @@
       "recordingLinkSend": "Send me the link again",
       "recordingLinkSent": "If the address is registered for the event, you will shortly receive an email with your personal link.",
       "recordingLinkError": "The request failed. Try again in a few minutes.",
-      "registerOrGuest": "If you register, you receive your personal link and updates on the event by email. As a guest you enter at once with just a name, only while the event is live, and receive no email."
+      "registerOrGuest": "If you register, you receive your personal link and updates on the event by email. As a guest you enter at once with just a name and receive no email.",
+      "guestWhenRoomOpens": "On the day of the event, when the waiting room opens, you can also join without registering, with just your name."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -661,7 +662,6 @@
     },
     "notOpenNow": "The room is not open right now.",
     "nameRequired": "The name to join with is missing: go back and type it.",
-    "closeSidebar": "Close the side panel",
     "contentOnly": "Content only, without chat and panels",
     "showPanels": "Show chat and panels",
     "confirmFullscreen": "Switch to fullscreen",
@@ -1012,11 +1012,10 @@
           "BALANCED": "Balanced (540p)",
           "SAVE_DATA": "Save data (360p)"
         },
-        "kickerHint": "For a kicker above the title, write it first and separate them with |, for example “Meeting series | The first meeting”.",
-        "kickerUse": "Show “{kicker}” as a kicker above the title",
-        "kickerPreview": "How it looks on the event page",
+        "kickerHint": "Optional: a short line above the title, for example the name of the meeting series.",
         "coverImageSize": "16:9, recommended 1600 × 900 pixels.",
-        "requiredNote": "Fields marked * are required."
+        "requiredNote": "Fields marked * are required.",
+        "kickerLabel": "Kicker ({language})"
       },
       "step2": {
         "heading": "Who can do what",
@@ -1097,11 +1096,6 @@
         "recordingDestinationRequired": "Choose where the recording goes.",
         "audienceAnonymous": "Anonymous audience",
         "audienceAnonymousDesc": "Participants appear to the others under a pseudonym (“Participant” and a code) on video, in the chat and in questions; the participant list stays with the hosts, and there is no square. Useful for large events; at community events people want to know each other.",
-        "audienceAnonymousLocked": "It cannot change while the room may be open: it would link pseudonyms to names.",
-        "participantListVisible": "Show the participant list to the audience",
-        "participantListVisibleDesc": "Off: the list, the grid and the names in the square stay with hosts and speakers; the audience sees only who is speaking. On: everyone sees who is in the room.",
-        "participantListAnonymous": "With an anonymous audience the list stays hidden.",
-        "participantListLocked": "It cannot change while the room is open: people already inside would not see the change.",
         "nicknamesEnabled": "Nicknames for participants",
         "nicknamesEnabledDesc": "Participants can choose a nickname: others see it instead of their name in the video, in the chat, in questions and in the transcript. Organizers and moderators see who is behind it. Hosts keep their own name. It starts on where the participant list is hidden.",
         "nicknamesLocked": "It cannot change while the room is open: people already inside chose under the previous rule.",
@@ -1110,7 +1104,13 @@
         "hostsAlwaysRecorded": "Hosts are always in the recording",
         "hostsAlwaysRecordedDesc": "Moderators and speakers appear in the video with their name and image, with no checkbox to tick: the event's privacy notice must say so. Of the participants only the voice is recorded, and only with their consent.",
         "hostsAlwaysRecordedDescHostsOnly": "Moderators and speakers appear in the video with their name and image, with no checkbox to tick: the event's privacy notice must say so. Participants are never seen or heard in the video.",
-        "hostsAlwaysRecordedDescVisible": "Moderators and speakers appear in the video with their name and image, with no checkbox to tick: the event's privacy notice must say so. This installation cannot keep participants out of the video: those who consent take part with name, voice and image, and the name of anyone following can appear even without speaking."
+        "hostsAlwaysRecordedDescVisible": "Moderators and speakers appear in the video with their name and image, with no checkbox to tick: the event's privacy notice must say so. This installation cannot keep participants out of the video: those who consent take part with name, voice and image, and the name of anyone following can appear even without speaking.",
+        "audienceHeading": "How participants appear",
+        "audienceOptionList": "By name, visible to everyone",
+        "audienceOptionListDesc": "The participant list, the video grid and the names in the square are visible to everyone.",
+        "audienceOptionHosts": "By name, visible only to hosts",
+        "audienceOptionHostsDesc": "The audience sees only who is speaking; the list, the grid and the names in the square stay with hosts and speakers.",
+        "audienceLocked": "This cannot be changed while the room is open."
       },
       "step3": {
         "heading": "People and invites",
@@ -1142,7 +1142,7 @@
         "personName": "Name",
         "personEmail": "Email",
         "peopleHeading": "Moderators and speakers",
-        "peopleHelp": "Co-organizers, moderators and speakers. Each receives their own link to enter with their role; what each role can do is explained above.",
+        "peopleHelp": "Co-organizers, moderators and speakers: each receives their own link to enter with their role.",
         "personRole": "Role",
         "roleOrganizer": "Co-organizer",
         "roleModerator": "Moderator",
@@ -1201,7 +1201,7 @@
         "invitationsHelpRestricted": "Only the addresses on this list can register. After publishing, you send each of them the invitation by email from the event page, with the registration link; the link to enter arrives after registering.",
         "logoExternal": "The public page shows only logos uploaded to this platform: a logo from another website will not be shown.",
         "primaryProfileInvalid": "Check the organization and the logo address.",
-        "primaryMore": "Photo, organization, logo and public page",
+        "primaryMore": "Photo, organization and logo",
         "accessHeading": "Who registers",
         "accessSiteDefault": "Follows the site setting: if the administration changes it, it applies to this event too.",
         "accessNoInvitees": "No invitees yet: while the list below is empty, nobody can register.",
@@ -1348,7 +1348,7 @@
           "invites": "People",
           "programme": "Programme",
           "review": "Summary",
-          "advanced": "Advanced settings",
+          "advanced": "Additional settings",
           "permissions": "Permissions"
         },
         "templateInUse": "Template: <b>{name}</b>",
@@ -1367,7 +1367,6 @@
         "scheduleIntro": "When the event takes place: date, time and time zone.",
         "advancedIntro": "Values already chosen by the template: change only what you need.",
         "advancedIntroTemplate": "Values already chosen by the template «{name}»: change only what you need.",
-        "requiredToPublish": "Needed to publish the event.",
         "toComplete": "To complete",
         "missingHeading": "Still missing to publish:",
         "fieldOrganizerName": "Lead moderator's name",
@@ -1384,9 +1383,7 @@
         "changeFormat": "Change format",
         "voiceAll": "Everyone speaks and appears on video",
         "voiceSpeakers": "Speakers and moderators speak and appear on video; the audience writes in the chat",
-        "features": "Features: {list}",
         "liveToggleNote": "Every feature can also be turned on and off during the event.",
-        "customize": "Customize the settings",
         "changeLanguages": "Change languages",
         "translationLine": "Translation into: {list}",
         "privacyTemplate": "Privacy notice: {name}",
@@ -1423,7 +1420,6 @@
         "audienceRealNames": "Audience names: real names.",
         "postEventQaHidden": "Questions after the event: not published.",
         "postEventQaTextOnly": "Questions after the event: text only, without names.",
-        "addressBookOffered": "Address book: offered to people who register.",
         "addressBookNotOffered": "Address book: not offered.",
         "consentRecordingOptional": "recording, optional",
         "consentRecordingVoice": "recording, optional (without it, the person stays out of the recording)",
@@ -1433,7 +1429,6 @@
         "title": "Page preview",
         "open": "Open the preview",
         "note": "This is how the event page looks; it updates as you type.",
-        "noteNoDate": "This is how the event page looks; until the date is set, the time is an example.",
         "titlePlaceholder": "The event title",
         "descriptionPlaceholder": "The description will appear here."
       },
@@ -1464,26 +1459,18 @@
         "notPublic": "{name} is not shown on the public page: the programme shows only the topic.",
         "makePublic": "Show the name on the page",
         "madePublic": "{name} now appears on the public page.",
-        "cardTitle": "Programme",
-        "cardEmpty": "The topics, with who speaks and at what time, appear here under the description on the event page.",
-        "cardPrepare": "Prepare the programme",
-        "cardSummary": "{count, plural, one {# topic} other {# topics}}",
-        "cardSummaryWithTimes": "{count, plural, one {# topic} other {# topics}} · {start}–{end}",
-        "cardOff": "Off: not shown on the page.",
-        "cardChange": "Change the programme",
         "descriptionHasProgramme": "The description seems to contain a programme. In the “Programme” step it has times and people, and the room sees the current topic.",
         "goToProgramme": "Go to the programme",
-        "peoplePointer": "You prepare each person's talks in the next step, “Programme”.",
         "reviewEmpty": "Programme: no topics",
         "reviewPrepare": "Prepare",
         "reviewOff": "Programme: off, not shown on the page ({count, plural, one {# topic} other {# topics}})",
         "previewPlaceholder": "The programme appears here",
-        "toggleLink": "Prepare the programme",
         "toggleOffWarning": "Off, the programme ({count, plural, one {# topic} other {# topics}}) is not shown on the page: the last saved version stays, and changes made here are saved only if you turn it on again.",
         "offKeptCreate": "While the programme is off, its topics are not saved with the event: turn it on to keep and change them.",
         "offKeptEdit": "While the programme is off, the last saved version stays: changes made here are saved only if you turn it on again.",
         "toggleOffWarningCreate": "Off, the programme ({count, plural, one {# topic} other {# topics}}) is not shown on the page and is not saved with the event: turn it on to keep it.",
-        "reviewOffCreate": "Programme: off, not saved with the event ({count, plural, one {# topic} other {# topics}})"
+        "reviewOffCreate": "Programme: off, not saved with the event ({count, plural, one {# topic} other {# topics}})",
+        "showToParticipants": "Show the programme to participants"
       },
       "saveCopy": "Save the copy",
       "consentMap": {
@@ -1522,7 +1509,6 @@
       "settings": "Settings",
       "eventsList": "All events",
       "newEvent": "New event",
-      "calendar": "Event calendar",
       "templates": "Event templates",
       "analytics": "Analytics",
       "instantCalls": "Instant calls",
@@ -1563,7 +1549,8 @@
       "openMenu": "Open menu",
       "closeMenu": "Close menu",
       "recordingRemovals": "Removal requests",
-      "recordingRemovalDetail": "Removal request"
+      "recordingRemovalDetail": "Removal request",
+      "newInstantCall": "New quick call"
     },
     "publications": {
       "subtitle": "Single editorial hub for every published video: scheduled events, instant calls, uploaded archive recordings, and sessions waiting to be promoted.",
@@ -2315,7 +2302,9 @@
         "waitingRoomEngineGame": "Videogame (Phaser lobby)",
         "waitingRoomEngineClassic": "Classic (static)",
         "waitingRoomEngineHelp": "Default mode of the waiting room. It can be changed for a single event and, for one visit, with the {param} parameter in the address.",
-        "primaryColorHex": "Primary color (hex code)"
+        "primaryColorHex": "Primary color (hex code)",
+        "organizationLogoUrl": "Organization logo",
+        "organizationLogoUrlHelp": "Shown in the footer next to the name of the organization that runs the service. Leave empty to show the name only."
       },
       "watermark": {
         "title": "Video customization",
@@ -2541,7 +2530,7 @@
     },
     "recurrence": {
       "label": "Recurrence",
-      "helpText": "If the event repeats, duplicating it suggests the date of the next occurrence.",
+      "helpText": "The recurrence does not create the next occurrences by itself: when you duplicate the event, the copy already has the date of the next one.",
       "preset": {
         "none": "Does not repeat",
         "daily": "Daily",
@@ -3004,7 +2993,15 @@
       "postEventSummary": "{connected} joined · {registered} registered",
       "registeredCount": "{count, plural, =0 {No registrations} one {1 registration} other {# registrations}}",
       "sortUpcoming": "Upcoming first",
-      "todayTitle": "Today and live"
+      "todayTitle": "Today and live",
+      "viewLabel": "View",
+      "viewList": "List",
+      "viewCalendar": "Calendar",
+      "type": "Type",
+      "typeAll": "All types",
+      "typeScheduled": "Events",
+      "typeInstant": "Instant calls",
+      "instantFullList": "Full list of instant calls, with filters by date and recording"
     },
     "tags": {
       "subtitle": "Create, edit and delete the tags used to classify and filter public events.",
@@ -3044,7 +3041,6 @@
       "copyPublicUrl": "Copy public link",
       "copyInviteUrl": "Copy invite link",
       "enterAsParticipant": "Join as participant",
-      "openAsParticipant": "Open as participant",
       "participantHintRoom": "Opens in a new tab: the room as a guest sees it, without moderator powers.",
       "participantHintPassword": "Opens in a new tab: the room as a guest sees it, after the event password.",
       "participantHintPage": "Opens in a new tab: the public page as participants see it.",
@@ -3137,7 +3133,8 @@
         "recordingRetention": "Automatic deletion of the recording",
         "recordingRetentionNone": "None",
         "recordingRetentionDays": "{days, plural, one {# day} other {# days}} after the event ends or, if published, after publication"
-      }
+      },
+      "openPublicPage": "Open the public page"
     },
     "rubrica": {
       "subtitle": "People who have consented to be added to the address book (GDPR art. 6.1.a). Name, email and organization are updated only when the person ticks the box again.",
@@ -3797,9 +3794,6 @@
         "invitationDesc": "The page stays visible, but only people on the list can register; you send them the invitation with the registration link by email from the event page"
       },
       "previewInvitation": "Only invited people register; without registering, nobody enters.",
-      "previewPseudonyms": "The audience appears under a pseudonym",
-      "previewNicknames": "Participants can use a nickname",
-      "previewRealNames": "The audience appears under their own names",
       "templateReplaces": "A template brings its own settings instead of the answers below. You write the title, dates and people in the next steps.",
       "instantBack": "Create a scheduled event instead"
     },
@@ -4347,7 +4341,8 @@
         "noInstall": "From the browser, no installs",
         "interactive": "Live Q&A and polls",
         "recordings": "Recordings and subtitles",
-        "accessible": "Accessible, in 24 languages"
+        "languagesAll": "In the 24 EU languages",
+        "languagesSome": "In several languages"
       }
     },
     "upcoming": {
@@ -5523,22 +5518,18 @@
   "footer": {
     "privacy": "Privacy policy",
     "accessibility": "Accessibility statement",
-    "openSource": "Open source software",
-    "contacts": "Contacts",
     "legalNotes": "Legal notes",
-    "governmentSite": "Italian Government",
     "systemStatus": "System status",
-    "sbomLatest": "SBOM latest release",
     "transparency": "Security and transparency",
     "serviceInventory": "Service inventory",
-    "sourceCode": "Source code",
-    "viewRelease": "View release on GitHub",
     "viewChangelog": "See what's new (changelog)",
     "newWindow": "opens in a new window",
     "usefulLinks": "Useful links",
     "version": "Version {version}",
     "versionDev": "Development version",
-    "updatedOn": "updated on {date}"
+    "updatedOn": "updated on {date}",
+    "projectOf": "A project by",
+    "contactsLine": "Contacts: <link>{email}</link>"
   },
   "changelog": {
     "metaTitle": "What's new & changelog",

@@ -499,6 +499,22 @@ function BrandingTab({ settings, updateField }: TabProps) {
           </FormGroup>
         </Col>
       </Row>
+      {/* Il logo dell'ente, accanto al suo nome nel pie' di pagina («... e'
+          un progetto di»): non quello del servizio, qui sopra. */}
+      <Row>
+        <Col md={6}>
+          <FormGroup>
+            <FileOrUrlInput
+              id="organizationLogoUrl"
+              label={t('organizationLogoUrl')}
+              assetType="image"
+              value={settings.organizationLogoUrl ?? null}
+              onChange={(v) => updateField('organizationLogoUrl', v)}
+              helpText={t('organizationLogoUrlHelp')}
+            />
+          </FormGroup>
+        </Col>
+      </Row>
 
       {/* ── Video watermark ── */}
       <hr className="my-4" />

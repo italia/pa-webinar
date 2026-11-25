@@ -163,8 +163,13 @@ interface EventDetailClientProps {
    *  un evento non concluso vuol dire che l'orario di fine è passato senza che
    *  la sala si aprisse. */
   registrationOpen: boolean;
-  /** In diretta si entra anche senza iscrizione (lib/events/guest-window). */
+  /** L'evento ammette ospiti, stato a parte (lib/events/guest-window). */
   guestEntryOpen?: boolean;
+  /** La sala d'attesa e' aperta agli ospiti adesso: dall'accensione della
+   *  sala, poco prima dell'inizio, alla fine (lib/events/participant-entry). */
+  guestRoomOpen?: boolean;
+  /** Da ospite si entra con la password dell'evento, non col solo nome. */
+  guestNeedsPassword?: boolean;
   /** L'evento ha un questionario post-evento: solo allora compare l'invito. */
   hasPostEventQuestionnaire?: boolean;
   /** La prova di chi ha partecipato, se il server l'ha riconosciuta (link
@@ -214,6 +219,8 @@ export default function EventDetailClient({
   registrationAccess = 'open',
   registrationOpen,
   guestEntryOpen = true,
+  guestRoomOpen = false,
+  guestNeedsPassword = false,
   hasPostEventQuestionnaire = false,
   feedbackProof = null,
   report = null,
@@ -920,6 +927,18 @@ export default function EventDetailClient({
                     </Link>
                   )}
 
+                  {/* Prima che la sala d'attesa si apra c'e' una porta sola,
+                      l'iscrizione: si dice che dopo si entrera' anche senza,
+                      cosi' la scelta non arriva come una sorpresa. */}
+                  {!(hasRoomAccess && !invalidToken) &&
+                    !guestRoomOpen &&
+                    guestEntryOpen &&
+                    !guestNeedsPassword && (
+                    <p className="text-muted mt-2 mb-0" style={{ fontSize: '0.82rem', lineHeight: 1.45 }}>
+                      {t('detail.guestWhenRoomOpens')}
+                    </p>
+                  )}
+
                   {/* Iscrizione pubblica spenta: si dice prima del clic chi può
                       iscriversi, o che non si può. Senza il pulsante, chi si
                       era iscritto prima trova qui la via per farsi rimandare
@@ -943,14 +962,14 @@ export default function EventDetailClient({
                     </p>
                   )}
 
-                  {((isLive && guestEntryOpen) || (hasRoomAccess && !invalidToken)) && (
+                  {(guestRoomOpen || (hasRoomAccess && !invalidToken)) && (
                     // Via d'ingresso per chi si è già registrato: /live lo
                     // re-identifica dal cookie firmato (o lo fa entrare come
-                    // ospite se LIVE e l'amministrazione ammette ospiti),
-                    // evitando il loop registrazione → 409. Senza cookie e
-                    // senza ospiti /live rimanderebbe all'iscrizione: il link
-                    // non compare.
-                    // Su evento non ancora LIVE il link appare SOLO se il device
+                    // ospite, a sala d'attesa aperta, se l'amministrazione
+                    // ammette ospiti), evitando il loop registrazione → 409.
+                    // Senza cookie e senza ospiti /live rimanderebbe
+                    // all'iscrizione: il link non compare.
+                    // Prima che la sala si apra il link appare SOLO se il device
                     // ha il cookie firmato valido: senza, /live rimbalzerebbe alla
                     // registrazione — esattamente il dead-end che questo link vuole
                     // evitare. Con invalidToken (cookie valido ma registrazione
@@ -970,7 +989,7 @@ export default function EventDetailClient({
                         </Button>
                       </Link>
                     ) : (
-                      // In diretta si entra anche senza iscrizione: lo si
+                      // A sala aperta si entra anche senza iscrizione: lo si
                       // offre come scelta, non come domanda a chi e' iscritto.
                       // /live riconosce chi ha gia' il posto da questo
                       // dispositivo; chi si e' iscritto da un altro usa il

@@ -212,7 +212,8 @@
       "recordingLinkSend": "Send mig linket igen",
       "recordingLinkSent": "Hvis adressen er tilmeldt begivenheden, modtager du snart en e-mail med dit personlige link.",
       "recordingLinkError": "Anmodningen mislykkedes. Prøv igen om et par minutter.",
-      "registerOrGuest": "Hvis du tilmelder dig, får du dit personlige link og nyt om arrangementet på e-mail. Som gæst kommer du ind med det samme med kun et navn, kun mens arrangementet er live, og du får ingen e-mails."
+      "registerOrGuest": "Hvis du tilmelder dig, får du dit personlige link og nyt om arrangementet på e-mail. Som gæst kommer du ind med det samme med kun et navn, og du får ingen e-mails.",
+      "guestWhenRoomOpens": "På dagen for arrangementet, når venteværelset åbner, kan du også deltage uden tilmelding, kun med dit navn."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -661,7 +662,6 @@
     },
     "notOpenNow": "Rummet er ikke åbent lige nu.",
     "nameRequired": "Navnet, du vil deltage med, mangler: gå tilbage og skriv det.",
-    "closeSidebar": "Luk sidepanelet",
     "contentOnly": "Kun indhold, uden chat og paneler",
     "showPanels": "Vis chat og paneler",
     "confirmFullscreen": "Skift til fuld skærm",
@@ -1012,11 +1012,10 @@
           "BALANCED": "Balanceret (540p)",
           "SAVE_DATA": "Databesparelse (360p)"
         },
-        "kickerHint": "Skriv en overlinje før titlen og adskil dem med |, for eksempel »Mødeserie | Det første møde«.",
-        "kickerUse": "Vis »{kicker}« som overlinje",
-        "kickerPreview": "Sådan ser den ud på arrangementets side",
+        "kickerHint": "Valgfrit: en kort linje over titlen, for eksempel navnet på mødeserien.",
         "coverImageSize": "16:9, anbefalet 1600 × 900 pixels.",
-        "requiredNote": "Felter markeret med * skal udfyldes."
+        "requiredNote": "Felter markeret med * skal udfyldes.",
+        "kickerLabel": "Overlinje ({language})"
       },
       "step2": {
         "heading": "Hvem må gøre hvad",
@@ -1097,11 +1096,6 @@
         "recordingDestinationRequired": "Vælg, hvor optagelsen skal hen.",
         "audienceAnonymous": "Anonymt publikum",
         "audienceAnonymousDesc": "Deltagerne vises for de andre under et pseudonym (»Deltager« og en kode) i video, chat og spørgsmål; deltagerlisten er kun for værterne, og der er ingen plads. Nyttigt til store arrangementer; til fællesskabsarrangementer vil folk gerne lære hinanden at kende.",
-        "audienceAnonymousLocked": "Kan ikke ændres, mens rummet kan være åbent: det ville koble pseudonymer til navne.",
-        "participantListVisible": "Vis deltagerlisten for publikum",
-        "participantListVisibleDesc": "Fra: listen, gitteret og navnene på pladsen forbeholdes værter og talere; publikum ser kun den, der taler. Til: alle kan se, hvem der er i rummet.",
-        "participantListAnonymous": "Med anonymt publikum forbliver listen skjult.",
-        "participantListLocked": "Kan ikke ændres, mens rummet er åbent: dem, der allerede er inde, ville ikke se ændringen.",
         "nicknamesEnabled": "Kaldenavne for deltagere",
         "nicknamesEnabledDesc": "Deltagere kan vælge et kaldenavn: de andre ser det i stedet for navnet i videoen, i chatten, i spørgsmålene og i transskriptionen. Arrangører og moderatorer kan se, hvem der står bag. Værterne beholder deres eget navn. Fra start er det slået til, hvor deltagerlisten er skjult.",
         "nicknamesLocked": "Det kan ikke ændres, mens rummet er åbent: de, der allerede er inde, valgte efter den tidligere regel.",
@@ -1110,7 +1104,13 @@
         "hostsAlwaysRecorded": "Ordstyrere og talere er altid med i optagelsen",
         "hostsAlwaysRecordedDesc": "Ordstyrere og talere vises i videoen med navn og billede, uden et felt at krydse af: arrangementets privatlivsmeddelelse skal sige det. Af deltagerne optages kun stemmen, og kun med deres samtykke.",
         "hostsAlwaysRecordedDescHostsOnly": "Ordstyrere og talere vises i videoen med navn og billede, uden et felt at krydse af: arrangementets privatlivsmeddelelse skal sige det. Deltagerne ses og høres aldrig i videoen.",
-        "hostsAlwaysRecordedDescVisible": "Ordstyrere og talere vises i videoen med navn og billede, uden et felt at krydse af: arrangementets privatlivsmeddelelse skal sige det. Denne installation kan ikke holde deltagerne ude af videoen: den, der giver samtykke, deltager med navn, stemme og billede, og navnet på enhver, der følger med, kan blive vist, også uden at vedkommende taler."
+        "hostsAlwaysRecordedDescVisible": "Ordstyrere og talere vises i videoen med navn og billede, uden et felt at krydse af: arrangementets privatlivsmeddelelse skal sige det. Denne installation kan ikke holde deltagerne ude af videoen: den, der giver samtykke, deltager med navn, stemme og billede, og navnet på enhver, der følger med, kan blive vist, også uden at vedkommende taler.",
+        "audienceHeading": "Sådan vises deltagerne",
+        "audienceOptionList": "Med navn, synligt for alle",
+        "audienceOptionListDesc": "Deltagerlisten, videogitteret og navnene på pladsen er synlige for alle.",
+        "audienceOptionHosts": "Med navn, kun synligt for værter",
+        "audienceOptionHostsDesc": "Publikum ser kun den, der taler; listen, gitteret og navnene på pladsen forbeholdes værter og talere.",
+        "audienceLocked": "Det kan ikke ændres, mens rummet er åbent."
       },
       "step3": {
         "heading": "Personer og invitationer",
@@ -1142,7 +1142,7 @@
         "personName": "Navn",
         "personEmail": "E-mail",
         "peopleHeading": "Moderatorer og talere",
-        "peopleHelp": "Medarrangører, moderatorer og talere. Hver får sit eget link til at komme ind i sin rolle; hvad hver rolle kan, er forklaret ovenfor.",
+        "peopleHelp": "Medarrangører, moderatorer og talere: hver får sit eget link til at komme ind i sin rolle.",
         "personRole": "Rolle",
         "roleOrganizer": "Medarrangør",
         "roleModerator": "Moderator",
@@ -1201,7 +1201,7 @@
         "invitationsHelpRestricted": "Kun adresserne på denne liste kan tilmelde sig. Efter offentliggørelsen sender du hver af dem invitationen på e-mail fra arrangementets side med tilmeldingslinket; linket til at komme ind kommer efter tilmeldingen.",
         "logoExternal": "Den offentlige side viser kun logoer, der er uploadet til denne platform: et logo fra et andet websted vises ikke.",
         "primaryProfileInvalid": "Kontrollér organisationen og logoets adresse.",
-        "primaryMore": "Foto, organisation, logo og offentlig side",
+        "primaryMore": "Foto, organisation og logo",
         "accessHeading": "Hvem tilmelder sig",
         "accessSiteDefault": "Følger webstedets indstilling: hvis administrationen ændrer den, gælder det også dette arrangement.",
         "accessNoInvitees": "Ingen inviterede endnu: så længe listen nedenfor er tom, kan ingen tilmelde sig.",
@@ -1348,7 +1348,7 @@
           "invites": "Personer",
           "programme": "Program",
           "review": "Oversigt",
-          "advanced": "Avancerede indstillinger",
+          "advanced": "Yderligere indstillinger",
           "permissions": "Tilladelser"
         },
         "templateInUse": "Skabelon: <b>{name}</b>",
@@ -1367,7 +1367,6 @@
         "scheduleIntro": "Hvornår arrangementet finder sted: dato, klokkeslæt og tidszone.",
         "advancedIntro": "Værdier, som skabelonen allerede har valgt: ret kun det, der er brug for.",
         "advancedIntroTemplate": "Værdier, som skabelonen »{name}« allerede har valgt: ret kun det, der er brug for.",
-        "requiredToPublish": "Kræves for at offentliggøre arrangementet.",
         "toComplete": "Mangler",
         "missingHeading": "For at offentliggøre mangler stadig:",
         "fieldOrganizerName": "Hovedmoderatorens navn",
@@ -1384,9 +1383,7 @@
         "changeFormat": "Skift format",
         "voiceAll": "Alle taler og vises på video",
         "voiceSpeakers": "Talere og ordstyrere taler og vises på video; publikum skriver i chatten",
-        "features": "Funktioner: {list}",
         "liveToggleNote": "Hver funktion kan også slås til og fra under arrangementet.",
-        "customize": "Tilpas indstillingerne",
         "changeLanguages": "Skift sprog",
         "translationLine": "Oversættelse til: {list}",
         "privacyTemplate": "Privatlivsmeddelelse: {name}",
@@ -1423,7 +1420,6 @@
         "audienceRealNames": "Publikums navne: de rigtige navne.",
         "postEventQaHidden": "Spørgsmål efter arrangementet: offentliggøres ikke.",
         "postEventQaTextOnly": "Spørgsmål efter arrangementet: kun teksten, uden navn.",
-        "addressBookOffered": "Adressebog: tilbydes dem, der tilmelder sig.",
         "addressBookNotOffered": "Adressebog: tilbydes ikke.",
         "consentRecordingOptional": "optagelse, frivillig",
         "consentRecordingVoice": "optagelse, frivillig (uden samtykke er personen ikke med i optagelsen)",
@@ -1433,7 +1429,6 @@
         "title": "Forhåndsvisning af siden",
         "open": "Åbn forhåndsvisningen",
         "note": "Sådan ser arrangementets side ud; den opdateres, mens du skriver.",
-        "noteNoDate": "Sådan ser arrangementets side ud; så længe datoen mangler, er tidspunktet et eksempel.",
         "titlePlaceholder": "Arrangementets titel",
         "descriptionPlaceholder": "Her vises beskrivelsen."
       },
@@ -1464,26 +1459,18 @@
         "notPublic": "{name} vises ikke på den offentlige side: i programmet ses kun emnet.",
         "makePublic": "Vis navnet på siden",
         "madePublic": "{name} vises nu på den offentlige side.",
-        "cardTitle": "Program",
-        "cardEmpty": "Emnerne, med hvem der taler og hvornår, vises her under beskrivelsen på arrangementets side.",
-        "cardPrepare": "Forbered programmet",
-        "cardSummary": "{count, plural, one {# emne} other {# emner}}",
-        "cardSummaryWithTimes": "{count, plural, one {# emne} other {# emner}} · {start}–{end}",
-        "cardOff": "Slået fra: vises ikke på siden.",
-        "cardChange": "Skift programmet",
         "descriptionHasProgramme": "Beskrivelsen ser ud til at indeholde et program. I trinnet “Program” har det tider og personer, og i rummet ses det aktuelle emne.",
         "goToProgramme": "Gå til programmet",
-        "peoplePointer": "Hver persons indlæg forbereder du i næste trin, “Program”.",
         "reviewEmpty": "Program: ingen emner",
         "reviewPrepare": "Forbered",
         "reviewOff": "Program: slået fra, vises ikke på siden ({count, plural, one {# emne} other {# emner}})",
         "previewPlaceholder": "Her vises programmet",
-        "toggleLink": "Forbered programmet",
         "toggleOffWarning": "Slået fra vises programmet ({count, plural, one {# emne} other {# emner}}) ikke på siden: den senest gemte version gælder, og ændringer foretaget her gemmes kun, hvis du slår det til igen.",
         "offKeptCreate": "Så længe programmet er slået fra, gemmes dets emner ikke med arrangementet: slå det til for at beholde og ændre dem.",
         "offKeptEdit": "Så længe programmet er slået fra, gælder den senest gemte version: ændringer foretaget her gemmes kun, hvis du slår det til igen.",
         "toggleOffWarningCreate": "Slået fra vises programmet ({count, plural, one {# emne} other {# emner}}) ikke på siden og gemmes ikke med arrangementet: slå det til for at beholde det.",
-        "reviewOffCreate": "Program: slået fra, gemmes ikke med arrangementet ({count, plural, one {# emne} other {# emner}})"
+        "reviewOffCreate": "Program: slået fra, gemmes ikke med arrangementet ({count, plural, one {# emne} other {# emner}})",
+        "showToParticipants": "Vis programmet for deltagerne"
       },
       "saveCopy": "Gem kopien",
       "consentMap": {
@@ -1522,7 +1509,6 @@
       "settings": "Indstillinger",
       "eventsList": "Alle begivenheder",
       "newEvent": "Ny begivenhed",
-      "calendar": "Begivenhedskalender",
       "templates": "Skabeloner til begivenheder",
       "analytics": "Statistik",
       "instantCalls": "Hurtige opkald",
@@ -1563,7 +1549,8 @@
       "openMenu": "Åbn menuen",
       "closeMenu": "Luk menuen",
       "recordingRemovals": "Anmodninger om fjernelse",
-      "recordingRemovalDetail": "Anmodning om fjernelse"
+      "recordingRemovalDetail": "Anmodning om fjernelse",
+      "newInstantCall": "Nyt hurtigopkald"
     },
     "publications": {
       "subtitle": "Samlet redaktionel hub for alle offentliggjorte videoer: planlagte arrangementer, hurtige opkald, uploadede arkivoptagelser og sessioner, der venter på udgivelse.",
@@ -2315,7 +2302,9 @@
         "waitingRoomEngineGame": "Videospil (Phaser-lobby)",
         "waitingRoomEngineClassic": "Klassisk (statisk)",
         "waitingRoomEngineHelp": "Venteværelsets standardtilstand. Den kan ændres for det enkelte arrangement og, for et enkelt besøg, med parameteren {param} i adressen.",
-        "primaryColorHex": "Primær farve (hex-kode)"
+        "primaryColorHex": "Primær farve (hex-kode)",
+        "organizationLogoUrl": "Organisationens logo",
+        "organizationLogoUrlHelp": "Vises i sidefoden ved siden af navnet på den organisation, der driver tjenesten. Lad feltet være tomt for kun at vise navnet."
       },
       "watermark": {
         "title": "Videotilpasning",
@@ -2541,7 +2530,7 @@
     },
     "recurrence": {
       "label": "Gentagelse",
-      "helpText": "Hvis arrangementet gentages, foreslår kopien datoen for næste gang, når du duplikerer det.",
+      "helpText": "Gentagelsen opretter ikke selv de næste udgaver: når du duplikerer arrangementet, har kopien allerede datoen for den næste.",
       "preset": {
         "none": "Gentages ikke",
         "daily": "Hver dag",
@@ -3004,7 +2993,15 @@
       "postEventSummary": "{connected} tilsluttede · {registered} tilmeldinger",
       "registeredCount": "{count, plural, =0 {Ingen tilmeldinger} one {1 tilmelding} other {# tilmeldinger}}",
       "sortUpcoming": "Kommende først",
-      "todayTitle": "I dag og i gang"
+      "todayTitle": "I dag og i gang",
+      "viewLabel": "Visning",
+      "viewList": "Liste",
+      "viewCalendar": "Kalender",
+      "type": "Type",
+      "typeAll": "Alle typer",
+      "typeScheduled": "Begivenheder",
+      "typeInstant": "Hurtige opkald",
+      "instantFullList": "Komplet liste over hurtige opkald, med filtre for dato og optagelse"
     },
     "tags": {
       "subtitle": "Opret, rediger og slet de tags, der bruges til at klassificere og filtrere offentlige arrangementer.",
@@ -3044,7 +3041,6 @@
       "copyPublicUrl": "Kopiér offentligt link",
       "copyInviteUrl": "Kopiér invitationslink",
       "enterAsParticipant": "Gå ind som deltager",
-      "openAsParticipant": "Åbn som deltager",
       "participantHintRoom": "Åbner i en ny fane: rummet, som en gæst ser det, uden moderatorrettigheder.",
       "participantHintPassword": "Åbner i en ny fane: rummet, som en gæst ser det, efter begivenhedens adgangskode.",
       "participantHintPage": "Åbner i en ny fane: den offentlige side, som deltagerne ser den.",
@@ -3137,7 +3133,8 @@
         "recordingRetention": "Automatisk sletning af optagelsen",
         "recordingRetentionNone": "Ingen",
         "recordingRetentionDays": "{days, plural, one {# dag} other {# dage}} efter arrangementets afslutning eller, hvis den er offentliggjort, efter offentliggørelsen"
-      }
+      },
+      "openPublicPage": "Åbn den offentlige side"
     },
     "rubrica": {
       "subtitle": "Personer, der har givet samtykke til at blive optaget i adressebogen (GDPR art. 6.1.a). Navn, e-mailadresse og organisation opdateres kun, når personen sætter kryds i feltet igen.",
@@ -3797,9 +3794,6 @@
         "invitationDesc": "Siden er stadig synlig, men kun personer på listen kan tilmelde sig; invitationen med tilmeldingslinket sender du på e-mail fra arrangementets side"
       },
       "previewInvitation": "Kun inviterede tilmelder sig; uden tilmelding kommer man ikke ind.",
-      "previewPseudonyms": "Publikum vises under et pseudonym",
-      "previewNicknames": "Deltagere kan bruge et kaldenavn",
-      "previewRealNames": "Publikum vises med deres eget navn",
       "templateReplaces": "En skabelon bruger sine egne indstillinger i stedet for svarene nedenfor. Titel, datoer og personer skriver du i de næste trin.",
       "instantBack": "Opret i stedet et planlagt arrangement"
     },
@@ -4347,7 +4341,8 @@
         "noInstall": "Fra browseren, uden installation",
         "interactive": "Live Q&A og afstemninger",
         "recordings": "Optagelser og undertekster",
-        "accessible": "Tilgængelig, på 24 sprog"
+        "languagesAll": "På EU's 24 sprog",
+        "languagesSome": "På flere sprog"
       }
     },
     "upcoming": {
@@ -5523,22 +5518,18 @@
   "footer": {
     "privacy": "Privatlivspolitik",
     "accessibility": "Tilgængelighedserklæring",
-    "openSource": "Open source-software",
-    "contacts": "Kontakt",
     "legalNotes": "Juridiske bemærkninger",
-    "governmentSite": "Den Italienske Regering",
     "systemStatus": "Systemstatus",
-    "sbomLatest": "SBOM for seneste udgivelse",
     "transparency": "Sikkerhed og gennemsigtighed",
     "serviceInventory": "Serviceoversigt",
-    "sourceCode": "Kildekode",
-    "viewRelease": "Se udgivelse på GitHub",
     "viewChangelog": "Se nyhederne (changelog)",
     "newWindow": "åbner i et nyt vindue",
     "usefulLinks": "Nyttige links",
     "version": "Version {version}",
     "versionDev": "Udviklingsversion",
-    "updatedOn": "opdateret {date}"
+    "updatedOn": "opdateret {date}",
+    "projectOf": "Et projekt fra",
+    "contactsLine": "Kontakt: <link>{email}</link>"
   },
   "changelog": {
     "metaTitle": "Nyheder og changelog",

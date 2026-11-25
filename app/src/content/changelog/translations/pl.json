@@ -1,4 +1,18 @@
 {
+  "0.14.0": {
+    "title": "Nowa sala, napisy na żywo, osobne zgody",
+    "notes": [
+      "Napisy na żywo z imieniem mówiącego, tworzone przez samą instalację na CPU, bez usług zewnętrznych. Wydarzenie może zachować ich transkrypcję, z samymi zdaniami osób, które się zgodziły.",
+      "Nagrywanie, transkrypcja i książka adresowa mają osobne, dobrowolne i nigdy nie zaznaczone z góry zgody. Kto odmówi nagrania, uczestniczy i nie znajdzie się w nim, a każdą zgodę można wycofać w „Moje dane”. Przed wydarzeniem wskazuje się, czy film będzie zastrzeżony czy publiczny, a karta wyjaśnia, co dzieje się z danymi.",
+      "W nagranym filmie widać tylko prowadzących: od uczestników, za zgodą, wchodzi głos. Personel może usunąć osobę z już nagranego filmu, każde wydarzenie wybiera, jak długo przechowywać nagranie, a kto był w szybkiej rozmowie, może ją ponownie obejrzeć.",
+      "Przeprojektowana sala: zwijane panele, Reżyserka dla prowadzącego, „Udziel głosu”, prezentacja PDF bez udostępniania ekranu, czasomierz wypowiedzi, kody QR linków. Blokada mikrofonów i kamer działa teraz także na mostku wideo, a poczekalnia ma nowy wygląd, łącznie z placem.",
+      "Uczestnicy mogą występować pod pseudonimem lub nickiem, gdy przewiduje to wydarzenie, a w dużych wydarzeniach lub tych, w których publiczność słucha, lista uczestników jest ukryta. Od otwarcia poczekalni można wejść także bez zapisu, jeśli administracja na to pozwala.",
+      "Tworzenie wydarzenia jest prostsze: kilka pytań wybiera wartości początkowe, program przygotowuje się z wyprzedzeniem, zaproszenia idą e-mailem, a wydarzenie może być zastrzeżone dla zaproszonych. Tytuł i opis są tłumaczone na wybrane języki, na CPU, jeśli instalacja to włączy.",
+      "Po wydarzeniu strona na pierwszym miejscu pokazuje film w jego językach, ze zsynchronizowanymi slajdami i programem jako spisem. Na życzenie personelu jest raport napisany z użyciem sztucznej inteligencji, słowniczek kieruje transkrypcjami i tłumaczeniami, a „Zamknij wydarzenie” mówi, co jeszcze zostało.",
+      "Nagłówek, menu i administracja są zgodne z modelami Designers Italia. Więcej automatycznych kontroli dostępności, poprawki bezpieczeństwa, zaktualizowane biblioteki i Next.js 15.5.29.",
+      "Przy aktualizacji: komponenty Jitsi przechodzą na stable-11031, a chart zatrzymuje się, jeśli któryś jest przypięty do innej wersji; usunąć `jitsi-meet.jibri.custom.other._finalize_sh`; kto podmienia konfigurację Jitsi, musi dodać `config.hiddenFromRecorderFeatureEnabled = true`; Prosody się restartuje; napisy są domyślnie włączone (`global.captions.enabled`)."
+    ]
+  },
   "0.13.0": {
     "title": "Pełniejsza ochrona prywatności i transkrypcje długich wydarzeń",
     "notes": [

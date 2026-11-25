@@ -88,6 +88,9 @@ const STATUSES = [
   'ARCHIVED',
 ] as const;
 
+/** Il tipo di appuntamento mostrato: tutti, gli eventi o le chiamate rapide. */
+type TypeFilter = 'ALL' | 'SCHEDULED' | 'INSTANT';
+
 type SortKey = 'upcomingFirst' | 'startsAsc' | 'startsDesc' | 'createdDesc' | 'titleAsc';
 
 /** Prima quello che e' in corso, poi i prossimi in ordine di data, poi i
@@ -165,6 +168,8 @@ export default function AdminDashboardClient({
   const [statusFilter, setStatusFilter] = useState<string>(defaultStatusFilter);
   const [tagFilter, setTagFilter] = useState<Set<string>>(new Set());
   const [sort, setSort] = useState<SortKey>(DEFAULT_SORT);
+  // Eventi e chiamate rapide nello stesso elenco: il tipo li separa.
+  const [typeFilter, setTypeFilter] = useState<TypeFilter>('ALL');
 
   const toggleTagFilter = useCallback((slug: string) => {
     setTagFilter((prev) => {
@@ -180,23 +185,40 @@ export default function AdminDashboardClient({
     setStatusFilter(defaultStatusFilter);
     setTagFilter(new Set());
     setSort(DEFAULT_SORT);
+    setTypeFilter('ALL');
   }, [defaultStatusFilter]);
 
   const hasActiveFilters =
     search.trim() !== '' ||
     statusFilter !== defaultStatusFilter ||
     tagFilter.size > 0 ||
-    sort !== DEFAULT_SORT;
+    sort !== DEFAULT_SORT ||
+    typeFilter !== 'ALL';
 
+  // I conteggi del menu degli stati sono quelli del tipo scelto: con le sole
+  // chiamate rapide, quanti sono loro, non tutti gli appuntamenti.
+  const delTipo = useMemo(
+    () =>
+      events.filter((e) =>
+        typeFilter === 'INSTANT'
+          ? e.eventType === 'INSTANT'
+          : typeFilter === 'SCHEDULED'
+            ? e.eventType !== 'INSTANT'
+            : true,
+      ),
+    [events, typeFilter],
+  );
   const statusCounts = useMemo(() => {
     const counts: Record<string, number> = {};
-    for (const e of events) counts[e.status] = (counts[e.status] ?? 0) + 1;
+    for (const e of delTipo) counts[e.status] = (counts[e.status] ?? 0) + 1;
     return counts;
-  }, [events]);
+  }, [delTipo]);
 
   const filteredEvents = useMemo(() => {
     const needle = deferredSearch.trim().toLowerCase();
     let list = events.filter((event) => {
+      if (typeFilter === 'INSTANT' && event.eventType !== 'INSTANT') return false;
+      if (typeFilter === 'SCHEDULED' && event.eventType === 'INSTANT') return false;
       if (statusFilter === 'NOT_ARCHIVED') {
         if (event.status === 'ARCHIVED') return false;
       } else if (statusFilter !== 'ALL' && event.status !== statusFilter) {
@@ -254,7 +276,7 @@ export default function AdminDashboardClient({
         break;
     }
     return list;
-  }, [events, deferredSearch, statusFilter, tagFilter, sort, locale, adesso]);
+  }, [events, deferredSearch, statusFilter, tagFilter, typeFilter, sort, locale, adesso]);
 
   // «Oggi e in corso»: le sale aperte e gli eventi di oggi, con l'ingresso a
   // portata. «Oggi» e' nel fuso del sito, lo stesso degli orari mostrati. Con
@@ -352,7 +374,7 @@ export default function AdminDashboardClient({
         }}
       >
         <div className="row g-3 align-items-end">
-          <div className="col-12 col-md-5">
+          <div className="col-12 col-lg-4">
             <label
               htmlFor="events-search"
               className="form-label small fw-semibold mb-1"
@@ -378,7 +400,26 @@ export default function AdminDashboardClient({
               />
             </div>
           </div>
-          <div className="col-6 col-md-3">
+          <div className="col-6 col-lg-2">
+            <label
+              htmlFor="events-type"
+              className="form-label small fw-semibold mb-1"
+              style={{ color: 'var(--app-text)' }}
+            >
+              {tList('type')}
+            </label>
+            <select
+              id="events-type"
+              className="form-select"
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value as TypeFilter)}
+            >
+              <option value="ALL">{tList('typeAll')}</option>
+              <option value="SCHEDULED">{tList('typeScheduled')}</option>
+              <option value="INSTANT">{tList('typeInstant')}</option>
+            </select>
+          </div>
+          <div className="col-6 col-lg-3">
             <label
               htmlFor="events-status"
               className="form-label small fw-semibold mb-1"
@@ -393,10 +434,10 @@ export default function AdminDashboardClient({
               onChange={(e) => setStatusFilter(e.target.value)}
             >
               <option value="NOT_ARCHIVED">
-                {tList('statusNotArchived')} ({events.length - (statusCounts.ARCHIVED ?? 0)})
+                {tList('statusNotArchived')} ({delTipo.length - (statusCounts.ARCHIVED ?? 0)})
               </option>
               <option value="ALL">
-                {tList('statusAll')} ({events.length})
+                {tList('statusAll')} ({delTipo.length})
               </option>
               {STATUSES.map((s) => (
                 <option key={s} value={s}>
@@ -405,7 +446,7 @@ export default function AdminDashboardClient({
               ))}
             </select>
           </div>
-          <div className="col-6 col-md-4">
+          <div className="col-12 col-lg-3">
             <label
               htmlFor="events-sort"
               className="form-label small fw-semibold mb-1"
@@ -469,6 +510,14 @@ export default function AdminDashboardClient({
         <div className="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
           <span className="small text-secondary">
             {tList('resultsCount', { count: filteredEvents.length })}
+            {/* Le chiamate rapide hanno anche un elenco loro, con i filtri per
+                data e registrazione e i link da copiare: ci si arriva da qui. */}
+            {typeFilter === 'INSTANT' && (
+              <>
+                {' · '}
+                <Link href="/admin/events/calls">{tList('instantFullList')}</Link>
+              </>
+            )}
           </span>
           {hasActiveFilters && (
             <button
@@ -732,7 +781,7 @@ export default function AdminDashboardClient({
                       wrapMain={(main) => (
                         <Link
                           href={percorso(manageUrl)}
-                          className="text-decoration-none"
+                          className="text-decoration-none card-evento__titolo"
                           style={{ color: 'inherit' }}
                         >
                           {main}
@@ -846,21 +895,15 @@ export default function AdminDashboardClient({
                         </span>
                       </div>
 
+                      {/* Alla pagina dell'evento porta il titolo; qui le azioni,
+                          tutte nel menu (niente «Gestisci» che ripete il titolo). */}
                       <div
-                        className="d-flex align-items-center justify-content-between"
+                        className="d-flex align-items-center justify-content-end"
                         style={{
                           borderTop: '1px solid #e8e8e8',
                           paddingTop: 10,
                         }}
                       >
-                        <Link
-                          href={percorso(manageUrl)}
-                          className="text-decoration-none fw-semibold d-inline-flex align-items-center gap-1"
-                          style={{ color: 'var(--app-primary)', fontSize: '0.9rem' }}
-                        >
-                          {t('manage')}
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-                        </Link>
                         <EventCardMenu
                           event={{
                             id: event.id,

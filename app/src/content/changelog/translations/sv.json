@@ -1,4 +1,18 @@
 {
+  "0.14.0": {
+    "title": "Ett nytt rum, textning i realtid, separata samtycken",
+    "notes": [
+      "Textning i realtid med namnet på den som talar, framställd av installationen själv på CPU, utan extern tjänst. Ett evenemang kan behålla transkriptionen, med endast meningarna från dem som samtyckt.",
+      "Inspelning, transkription och adressbok har separata, frivilliga och aldrig förkryssade samtycken. Den som nekar inspelning deltar och hålls utanför den, och varje samtycke återkallas från ”Mina uppgifter”. Före evenemanget anges om videon blir reserverad eller offentlig, och ett blad förklarar vad som händer med uppgifterna.",
+      "I den inspelade videon syns bara de som leder: av deltagare, med samtycke, hörs rösten. Personalen kan ta bort en person ur en redan inspelad video, varje evenemang väljer hur länge inspelningen sparas, och den som var med i ett snabbsamtal kan se det igen.",
+      "Omgjort rum: hopfällbara paneler, Kontroll för den som leder, ”Ge ordet”, PDF:er utan skärmdelning, taltidsur, QR-koder för länkarna. Spärren av mikrofoner och kameror gäller nu även på videobryggan, och väntrummet har fått nytt utseende, torget inräknat.",
+      "Deltagare kan framträda med smeknamn eller pseudonym där evenemanget tillåter det, och vid stora evenemang eller sådana där publiken bara lyssnar är deltagarlistan dold. Från väntrummets öppnande kan man gå in utan anmälan, om administrationen tillåter det.",
+      "Att skapa ett evenemang är enklare: några frågor väljer startvärdena, programmet förbereds i förväg, inbjudningar går via e-post och ett evenemang kan reserveras för inbjudna. Titel och beskrivning översätts till valda språk, på CPU, där installationen har slagit på det.",
+      "Efter evenemanget visar sidan videon i sina språk först, med synkroniserade bilder och programmet som index. På personalens begäran finns en rapport skriven med artificiell intelligens, en ordlista styr transkriptioner och översättningar, och ”Avsluta evenemanget” säger vad som återstår.",
+      "Sidhuvud, menyer och administration följer Designers Italias modeller. Fler automatiska tillgänglighetskontroller, säkerhetsrättelser, uppdaterade bibliotek och Next.js 15.5.29.",
+      "Vid uppgradering: Jitsi-komponenterna går över till stable-11031 och chartet stannar om någon är låst till en annan version; ta bort `jitsi-meet.jibri.custom.other._finalize_sh`; den som ersätter Jitsi-konfigurationen måste lägga till `config.hiddenFromRecorderFeatureEnabled = true`; Prosody startar om; textning är på som standard (`global.captions.enabled`)."
+    ]
+  },
   "0.13.0": {
     "title": "Mer fullständig integritet och transkriptioner av långa evenemang",
     "notes": [

@@ -212,10 +212,10 @@ function Pagina({
   // ridotta), e senza argomenti si vede dove comparira'.
   const sulProgramma = fuoco === 'programma';
   const breve = sulProgramma && !completa;
-  // Finche' la data manca, la pagina mostra un orario d'esempio: un'ora da
-  // adesso. Lo dice la nota sotto l'anteprima.
-  const inizio = dati.startsAt ?? new Date();
-  const fine = dati.endsAt ?? new Date(inizio.getTime() + 60 * 60_000);
+  // Finche' la data manca, la pagina non ne mostra una: un orario d'esempio
+  // sembrerebbe gia' impostato. Senza fine, un'ora dall'inizio.
+  const inizio = dati.startsAt;
+  const fine = dati.endsAt ?? (inizio ? new Date(inizio.getTime() + 60 * 60_000) : null);
   const titolo = dati.title.trim() || tw('titlePlaceholder');
   const descrizione = (
     <>
@@ -332,7 +332,7 @@ function PagePreview({
         </button>
       </div>
       <p className="anteprima-pagina__nota">
-        {dati.startsAt ? tw('note') : tw('noteNoDate')}
+        {tw('note')}
       </p>
       {/* La copia ridotta solo dove si vede, e mai insieme a quella aperta:
           si disegnerebbe la pagina due volte, con gli stessi id. */}

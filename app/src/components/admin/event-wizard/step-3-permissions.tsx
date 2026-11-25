@@ -146,10 +146,10 @@ interface Props {
   /** Quale parte mostrare, fra le impostazioni avanzate: chi puo' fare cosa e
    *  le funzioni della sala, oppure registrazione e post-produzione AI. */
   parte: 'partecipazione' | 'registrazione';
-  /** Il programma accanto al suo interruttore: quanti argomenti ha e come
-   *  si arriva al passo dove si prepara. Assente per una chiamata
+  /** Il programma accanto al suo interruttore: quanti argomenti ha (per
+   *  avvisare che spegnendolo si perdono). Assente per una chiamata
    *  istantanea, che non ha il passo. */
-  programma?: { argomenti: number; onVai: () => void };
+  programma?: { argomenti: number };
 }
 
 /** Le due destinazioni, con il loro testo sotto `admin.wizard.step2`. */
@@ -249,64 +249,72 @@ export default function StepPermissions({
       {/* I ruoli e che cosa fanno stanno nel passo «Persone», dove si
           assegnano; qui la tabella di cio' che puo' fare ciascuno. */}
 
-      {/* Pubblico anonimo: per gli eventi grandi. Negli eventi di comunita'
-          ci si vuole riconoscere, per questo parte spento. */}
-      <div className="py-2 mb-3 d-flex justify-content-between align-items-start" style={{ borderBottom: '1px solid #e8e8e8' }}>
-        <div className="me-3">
-          <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
-            {t('audienceAnonymous')}
+      {/* Chi vede chi partecipa: tre stati, non due interruttori che si
+          escludono. L'elenco parte dal formato dell'evento; il pubblico anonimo
+          (pseudonimi) serve agli eventi grandi, negli eventi di comunita' ci si
+          vuole riconoscere, per questo parte spento. */}
+      <fieldset className="py-2 mb-3" style={{ borderBottom: '1px solid #e8e8e8' }}>
+        <legend className="fw-semibold fs-6 mb-2 px-0" style={{ color: 'var(--app-text)' }}>
+          {t('audienceHeading')}
+        </legend>
+        {(
+          [
+            {
+              k: 'tutti',
+              attivo: !value.audienceAnonymous && value.participantListVisible,
+              label: t('audienceOptionList'),
+              desc: t('audienceOptionListDesc'),
+              patch: { audienceAnonymous: false, participantListVisible: true },
+            },
+            {
+              k: 'conduce',
+              attivo: !value.audienceAnonymous && !value.participantListVisible,
+              label: t('audienceOptionHosts'),
+              desc: t('audienceOptionHostsDesc'),
+              patch: { audienceAnonymous: false, participantListVisible: false },
+            },
+            {
+              k: 'anonimo',
+              attivo: value.audienceAnonymous,
+              label: t('audienceAnonymous'),
+              desc: t('audienceAnonymousDesc'),
+              patch: { audienceAnonymous: true },
+            },
+          ] as const
+        ).map((o) => (
+          <div key={o.k} className="form-check mb-2">
+            <input
+              id={`wiz-pubblico-${o.k}`}
+              type="radio"
+              name="wiz-pubblico"
+              className="form-check-input"
+              checked={o.attivo}
+              disabled={soloAscoltoBloccato}
+              onChange={() => onChange(o.patch)}
+            />
+            <label className="form-check-label" htmlFor={`wiz-pubblico-${o.k}`}>
+              {o.label}
+              <span className="d-block text-secondary fw-normal" style={{ fontSize: '0.85rem' }}>
+                {o.desc}
+              </span>
+            </label>
           </div>
-          <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
-            {t('audienceAnonymousDesc')}
+        ))}
+        {/* Con l'elenco nascosto (e i nomi veri) chi accende la videocamera
+            non vede il proprio riquadro: lo si dice, con l'azione da fare. */}
+        {!value.participantListVisible &&
+          !value.audienceAnonymous &&
+          togglesFromMatrix(value.permissionMatrix).participantsCanStartVideo && (
+          <div className="text-secondary mt-1" style={{ fontSize: '0.85rem' }}>
+            {t('participantListCameraNote')}
           </div>
-        </div>
-        <ToggleSwitch
-          label=""
-          ariaLabel={t('audienceAnonymous')}
-          checked={value.audienceAnonymous}
-          disabled={soloAscoltoBloccato}
-          onChange={() => onChange({ audienceAnonymous: !value.audienceAnonymous })}
-        />
-      </div>
-      {soloAscoltoBloccato && (
-        <p className="text-secondary" style={{ fontSize: '0.85rem' }}>
-          {t('audienceAnonymousLocked')}
-        </p>
-      )}
-
-      {/* L'elenco di chi partecipa: parte dal formato dell'evento, e lo decide
-          chi organizza. Con gli pseudonimi resta nascosto. */}
-      <div className="py-2 mb-3 d-flex justify-content-between align-items-start" style={{ borderBottom: '1px solid #e8e8e8' }}>
-        <div className="me-3">
-          <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
-            {t('participantListVisible')}
-          </div>
-          <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
-            {value.audienceAnonymous ? t('participantListAnonymous') : t('participantListVisibleDesc')}
-          </div>
-          {/* Con gli pseudonimi l'elenco non si puo' mostrare: la nota non avrebbe
-              un'azione da proporre. */}
-          {!value.participantListVisible &&
-            !value.audienceAnonymous &&
-            togglesFromMatrix(value.permissionMatrix).participantsCanStartVideo && (
-            <div className="text-secondary mt-1" style={{ fontSize: '0.85rem' }}>
-              {t('participantListCameraNote')}
-            </div>
-          )}
-        </div>
-        <ToggleSwitch
-          label=""
-          ariaLabel={t('participantListVisible')}
-          checked={value.participantListVisible && !value.audienceAnonymous}
-          disabled={soloAscoltoBloccato || value.audienceAnonymous}
-          onChange={() => onChange({ participantListVisible: !value.participantListVisible })}
-        />
-      </div>
-      {soloAscoltoBloccato && (
-        <p className="text-secondary" style={{ fontSize: '0.85rem' }}>
-          {t('participantListLocked')}
-        </p>
-      )}
+        )}
+        {soloAscoltoBloccato && (
+          <p className="text-secondary mb-0 mt-1" style={{ fontSize: '0.85rem' }}>
+            {t('audienceLocked')}
+          </p>
+        )}
+      </fieldset>
 
       {/* Il nickname per chi partecipa: acceso di partenza dove l'elenco e'
           nascosto, si accende anche per un incontro riservato. Chi conduce
@@ -394,21 +402,14 @@ export default function StepPermissions({
         </h3>
         <div className="py-2 d-flex justify-content-between align-items-start">
           <div className="me-3">
+            {/* Qui si decide se il programma si mostra, non lo si prepara: quello
+                ha il suo passo, e l'etichetta lo dice. */}
             <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
-              {tAdmin('form.agendaEnabled')}
+              {tProgramma('showToParticipants')}
             </div>
             <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
               {tAdmin('form.agendaEnabledDesc')}
             </div>
-            {programma && (
-              <button
-                type="button"
-                className="btn btn-link btn-sm p-0 mt-1 text-start"
-                onClick={programma.onVai}
-              >
-                {tProgramma('toggleLink')} <span aria-hidden="true">→</span>
-              </button>
-            )}
             {/* Spento, il programma preparato non si pubblica e non si salva:
                 in creazione si perde, in modifica resta quello dell'ultimo
                 salvataggio. Lo si dice, perche' sparisce senza che si veda. */}
@@ -427,7 +428,7 @@ export default function StepPermissions({
           </div>
           <ToggleSwitch
             label=""
-            ariaLabel={tAdmin('form.agendaEnabled')}
+            ariaLabel={tProgramma('showToParticipants')}
             checked={value.agendaEnabled}
             onChange={() => onChange({ agendaEnabled: !value.agendaEnabled })}
           />

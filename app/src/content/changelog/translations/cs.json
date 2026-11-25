@@ -1,4 +1,18 @@
 {
+  "0.14.0": {
+    "title": "Nová místnost, živé titulky, oddělené souhlasy",
+    "notes": [
+      "Živé titulky se jménem mluvčího, které vytváří sama instalace na CPU bez externích služeb. Akce si může uchovat jejich přepis, jen s větami těch, kdo souhlasili.",
+      "Nahrávání, přepis a adresář mají oddělené, dobrovolné a nikdy předem zaškrtnuté souhlasy. Kdo odmítne nahrávku, účastní se a zůstane mimo ni, a každý souhlas lze odvolat v „Moje údaje“. Před akcí se uvede, zda bude video vyhrazené, nebo veřejné, a list vysvětluje, co se děje s údaji.",
+      "V nahraném videu jsou vidět jen vedoucí: od účastníků se souhlasem je slyšet hlas. Pracovníci mohou osobu odstranit z již nahraného videa, každá akce volí, jak dlouho nahrávku uchová, a kdo byl v rychlém hovoru, může si ho znovu přehrát.",
+      "Přepracovaná místnost: sbalitelné panely, Režie pro vedoucího, „Udělit slovo“, PDF bez sdílení obrazovky, časovač vystoupení, QR kódy odkazů. Blokování mikrofonů a kamer nyní platí i na videomostu a čekárna má novou podobu, včetně náměstí.",
+      "Účastníci mohou vystupovat pod přezdívkou nebo pseudonymem, kde to akce umožňuje, a u velkých akcí nebo tam, kde publikum jen poslouchá, je seznam účastníků skrytý. Od otevření čekárny lze vstoupit i bez registrace, pokud to správa dovolí.",
+      "Vytvořit akci je snazší: několik otázek zvolí výchozí hodnoty, program se připraví předem, pozvánky odcházejí e-mailem a akci lze vyhradit pozvaným. Název a popis se překládají do zvolených jazyků na CPU, pokud to instalace zapne.",
+      "Po akci stránka na prvním místě ukazuje video v jeho jazycích, se synchronizovanými snímky a programem jako rejstříkem. Na žádost pracovníků je k dispozici zpráva napsaná umělou inteligencí, slovník řídí přepisy a překlady a „Uzavřít akci“ říká, co ještě zbývá.",
+      "Záhlaví, nabídky a správa se řídí vzory Designers Italia. Více automatických kontrol přístupnosti, bezpečnostní opravy, aktualizované knihovny a Next.js 15.5.29.",
+      "Při aktualizaci: komponenty Jitsi přecházejí na stable-11031 a chart se zastaví, je-li některá připnuta k jiné verzi; odstranit `jitsi-meet.jibri.custom.other._finalize_sh`; kdo nahrazuje konfiguraci Jitsi, musí přidat `config.hiddenFromRecorderFeatureEnabled = true`; Prosody se restartuje; titulky jsou ve výchozím stavu zapnuté (`global.captions.enabled`)."
+    ]
+  },
   "0.13.0": {
     "title": "Úplnější ochrana soukromí a přepisy dlouhých událostí",
     "notes": [

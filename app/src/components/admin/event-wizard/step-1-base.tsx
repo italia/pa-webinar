@@ -15,7 +15,6 @@
 import { useRef, useState, type ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 
-import EventTitle from '@/components/events/event-title';
 import LocaleTabBar, { type StatoScheda as AspettoScheda } from '@/components/ui/locale-tab-bar';
 import { MarkdownEditor } from '@/components/ui/markdown';
 import FileOrUrlInput from '@/components/ui/file-or-url-input';
@@ -27,7 +26,7 @@ import {
 } from '@/lib/utils/recurrence';
 import { fromDatetimeLocalInTz, toDatetimeLocalInTz } from '@/lib/utils/date-format';
 import { timezoneLabel, timezoneOptions } from '@/lib/time/timezones';
-import { splitTitleKicker } from '@/lib/utils/title-kicker';
+import { componiTitolo, dividiTitolo, splitTitleKicker } from '@/lib/utils/title-kicker';
 import { EVENT_DESCRIPTION_MIN_LENGTH } from '@/lib/validation/event-description';
 import type { VideoQualityPreset } from '@/lib/jitsi/config';
 import { fondoEtichettaPiena } from '@/lib/utils/tag-color';
@@ -109,7 +108,16 @@ interface Props {
   /** Ogni file che parte per il server (true) e che ha finito (false): il
    *  wizard non salva e non cambia passo finche' ce n'e' uno in viaggio. */
   onUploadBusy?: (inCaricamento: boolean) => void;
+  /** Sopratitolo e titolo come li si sta scrivendo, per lingua: li tiene il
+   *  wizard, cosi' un sopratitolo scritto prima del titolo (che non si salva
+   *  da solo) resta cambiando passo. Senza, li tiene il passo. */
+  bozzeTitolo?: BozzeTitolo;
+  onBozzeTitolo?: (aggiorna: (prima: BozzeTitolo) => BozzeTitolo) => void;
 }
+
+/** Sopratitolo e titolo in scrittura, per lingua, con il titolo che ne e'
+ *  uscito: finche' il modulo ha quel titolo, i campi mostrano questi. */
+export type BozzeTitolo = Record<string, { sopra: string; titolo: string; composto: string }>;
 
 export default function Step1Base({
   value,
@@ -126,6 +134,8 @@ export default function Step1Base({
   onEtichettaCreata,
   lingue,
   onUploadBusy,
+  bozzeTitolo,
+  onBozzeTitolo,
 }: Props) {
   const t = useTranslations('admin.wizard.step1');
   const tf = useTranslations('admin.wizard.flow');
@@ -234,12 +244,62 @@ export default function Step1Base({
 
   // I campi obbligatori li segna l'asterisco; l'errore, rosso e accanto al
   // campo, compare quando si prova ad andare avanti (o a salvare).
+  // Sopratitolo e titolo: due campi, salvati come un titolo solo,
+  // «Sopratitolo | Titolo» (la forma che la pagina divide). I campi tengono
+  // cio' che si sta scrivendo (spazi compresi) finche' il titolo salvato e'
+  // quello composto da loro; cambiato da fuori (un modello, una traduzione),
+  // si rileggono dal titolo.
   const titoloScritto = value.title[contentLocale] ?? '';
-  const sopratitolo = splitTitleKicker(titoloScritto, true);
   const sopratitoloAcceso = value.parseTitleKicker ?? siteDefaultParseTitleKicker;
-  // Il sopratitolo l'ha acceso il titolo, non una scelta: lo si puo' ritirare.
-  const accesoDaSolo = useRef(false);
-
+  const [bozzeProprie, setBozzeProprie] = useState<BozzeTitolo>({});
+  const inScrittura = bozzeTitolo ?? bozzeProprie;
+  const setInScrittura = onBozzeTitolo ?? setBozzeProprie;
+  const bozza = inScrittura[contentLocale];
+  const campiTitolo =
+    bozza && bozza.composto === titoloScritto
+      ? bozza
+      : dividiTitolo(titoloScritto, sopratitoloAcceso);
+  const scriviTitolo = (sopra: string, titolo: string) => {
+    // «|» separa le due parti: nel sopratitolo non ci puo' stare.
+    const sopraPulito = sopra.replace(/\|/g, '');
+    const composto = componiTitolo(sopraPulito, titolo);
+    const titoli = { ...value.title, [contentLocale]: composto };
+    // Il sopratitolo dell'evento si ricava dai campi, non da una scelta a
+    // parte: acceso se una lingua ne ha uno; spento se un titolo ha un «|»
+    // che e' solo testo (la pagina non lo deve dividere); altrimenti segue
+    // il sito. Le altre lingue si leggono come le legge la pagina adesso.
+    const altre = Object.entries(titoli)
+      .filter(([l]) => l !== contentLocale)
+      .map(([, tt]) => tt ?? '');
+    // Un sopratitolo senza titolo non si salva ancora: non conta.
+    const conSopra =
+      (!!sopraPulito.trim() && !!composto) ||
+      (sopratitoloAcceso && altre.some((tt) => !!dividiTitolo(tt, true).sopra));
+    const conBarra =
+      (!sopraPulito.trim() && titolo.includes('|')) ||
+      (!sopratitoloAcceso && altre.some((tt) => tt.includes('|')));
+    // Un sopratitolo scritto, o un «|» che deve restare testo, e' una scelta
+    // dell'evento: resta anche se il sito cambia la sua. Senza ne' l'uno ne'
+    // l'altro, l'evento segue il sito.
+    const scelta = conSopra ? true : conBarra ? false : null;
+    // La scelta vale per tutte le lingue: se l'evento divide i titoli (perche'
+    // un'altra lingua ha il sopratitolo), un «|» in questo titolo lo divide
+    // anche la pagina. I campi lo mostrano come lo mostrera' lei.
+    const diviso = splitTitleKicker(titolo, true);
+    const parti =
+      (scelta ?? siteDefaultParseTitleKicker) && !sopraPulito.trim() && diviso.kicker
+        ? { sopra: diviso.kicker, titolo: diviso.main }
+        : { sopra: sopraPulito, titolo };
+    const salvato = componiTitolo(parti.sopra, parti.titolo);
+    setInScrittura((prima) => ({
+      ...prima,
+      [contentLocale]: { ...parti, composto: salvato },
+    }));
+    onChange({
+      title: { ...titoli, [contentLocale]: salvato },
+      ...(scelta !== value.parseTitleKicker ? { parseTitleKicker: scelta } : {}),
+    });
+  };
 
   if (parte === 'avanzate') {
     // Le scelte sulla sala d'attesa e sul video: le eredita dal sito, e si
@@ -458,6 +518,25 @@ export default function Step1Base({
         <div role="tabpanel" id="ev-testi-pannello" aria-labelledby={`ev-scheda-${contentLocale}`}>
         {lingue?.pannello(contentLocale)}
 
+        {/* Il sopratitolo, facoltativo: sopra il titolo, come nella pagina. */}
+        <div className="mb-3">
+          <label className="form-label fw-semibold" htmlFor="ev-kicker">
+            {t('kickerLabel', { language: nomeLingua(contentLocale) })}
+          </label>
+          <input
+            id="ev-kicker"
+            lang={contentLocale}
+            type="text"
+            className="form-control"
+            value={campiTitolo.sopra}
+            onChange={(e) => scriviTitolo(e.target.value, campiTitolo.titolo)}
+            aria-describedby="ev-kicker-aiuto"
+          />
+          <small id="ev-kicker-aiuto" className="form-text text-muted d-block mt-1">
+            {t('kickerHint')}
+          </small>
+        </div>
+
         <div
           className={`mb-3 wizard-campo${
             fieldErrors[`title.${defaultLocale}`] ? ' wizard-campo--insisti' : ''
@@ -476,36 +555,22 @@ export default function Step1Base({
                 ? 'is-invalid'
                 : ''
             }`}
-            value={value.title[contentLocale] ?? ''}
-            onChange={(e) => {
-              const nuovo = e.target.value;
-              // Appena il titolo ha un «|» il sopratitolo si accende da solo,
-              // se per questo evento nessuno l'ha ancora scelto: chi scrive
-              // «|» di solito lo vuole. Spento a mano, resta spento.
-              // Solo se cosi' non cambia nient'altro: il sopratitolo risulta
-              // spento (nessuna scelta per l'evento, sito che non lo usa) e
-              // nessun titolo, in nessuna lingua, aveva gia' un «|».
-              const accendi =
-                value.parseTitleKicker === null &&
-                !siteDefaultParseTitleKicker &&
-                !Object.values(value.title).some((tt) => splitTitleKicker(tt ?? '', true).kicker) &&
-                !!splitTitleKicker(nuovo, true).kicker;
-              // Acceso da solo e poi tolto l'ultimo «|»: si torna a seguire
-              // il sito, come se non fosse mai successo.
-              const titoli = { ...value.title, [contentLocale]: nuovo };
-              const spegni =
-                accesoDaSolo.current &&
-                value.parseTitleKicker === true &&
-                !Object.values(titoli).some((tt) => splitTitleKicker(tt ?? '', true).kicker);
-              if (accendi) accesoDaSolo.current = true;
-              if (spegni) accesoDaSolo.current = false;
-              onChange({
-                title: titoli,
-                ...(accendi ? { parseTitleKicker: true } : spegni ? { parseTitleKicker: null } : {}),
-              });
+            value={campiTitolo.titolo}
+            onChange={(e) => scriviTitolo(campiTitolo.sopra, e.target.value)}
+            onPaste={(e) => {
+              // Chi incolla un titolo gia' composto, «Ciclo | Titolo», nel
+              // campo vuoto (o tutto selezionato) e senza sopratitolo: le due
+              // parti vanno ai due campi. Un «|» scritto a mano resta testo.
+              const campo = e.currentTarget;
+              const tutto =
+                campo.selectionStart === 0 && campo.selectionEnd === campo.value.length;
+              if (campiTitolo.sopra.trim() || !tutto) return;
+              const diviso = splitTitleKicker(e.clipboardData.getData('text'), true);
+              if (!diviso.kicker) return;
+              e.preventDefault();
+              scriviTitolo(diviso.kicker, diviso.main);
             }}
             required={contentLocale === defaultLocale}
-            aria-describedby="ev-title-sopratitolo"
           />
           {fieldErrors[`title.${defaultLocale}`] &&
             (contentLocale === defaultLocale ? (
@@ -517,43 +582,6 @@ export default function Step1Base({
                 })}
               </div>
             ))}
-
-          {/* Il sopratitolo: la parte prima di «|». Lo si spiega qui, e appena
-              il titolo ne ha uno si vede come apparira' e lo si accende o
-              spegne (la scelta vale per questo evento; senza, vale quella
-              del sito). */}
-          {sopratitolo.kicker ? (
-            <div id="ev-title-sopratitolo" className="wizard-sopratitolo mt-2">
-              <div className="form-check mb-2">
-                <input
-                  id="ev-parse-title-kicker"
-                  type="checkbox"
-                  className="form-check-input"
-                  checked={sopratitoloAcceso}
-                  onChange={(e) => {
-                    // Una scelta fatta a mano resta.
-                    accesoDaSolo.current = false;
-                    onChange({ parseTitleKicker: e.target.checked });
-                  }}
-                />
-                <label className="form-check-label" htmlFor="ev-parse-title-kicker">
-                  {t('kickerUse', { kicker: sopratitolo.kicker })}
-                </label>
-              </div>
-              <p className="wizard-sopratitolo__etichetta">{t('kickerPreview')}</p>
-              <EventTitle
-                title={titoloScritto}
-                kickerEnabled={sopratitoloAcceso}
-                as="p"
-                className="wizard-sopratitolo__titolo"
-              />
-            </div>
-          ) : (
-            <small id="ev-title-sopratitolo" className="form-text text-muted d-block mt-1">
-              {t('kickerHint')}
-            </small>
-          )}
-
         </div>
 
         <div

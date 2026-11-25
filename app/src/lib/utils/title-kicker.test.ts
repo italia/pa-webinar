@@ -3,7 +3,7 @@
 
 import { describe, it, expect } from 'vitest';
 
-import { splitTitleKicker } from './title-kicker';
+import { componiTitolo, dividiTitolo, splitTitleKicker } from './title-kicker';
 
 describe('splitTitleKicker', () => {
   it('returns plain title when disabled', () => {
@@ -46,5 +46,45 @@ describe('splitTitleKicker', () => {
       kicker: null,
       main: 'Only kicker | ',
     });
+  });
+});
+
+describe('dividiTitolo e componiTitolo', () => {
+  it('dividono e ricompongono il titolo salvato', () => {
+    expect(dividiTitolo('Ciclo | Il primo incontro', true)).toEqual({
+      sopra: 'Ciclo',
+      titolo: 'Il primo incontro',
+    });
+    expect(componiTitolo('Ciclo', 'Il primo incontro')).toBe('Ciclo | Il primo incontro');
+    expect(splitTitleKicker(componiTitolo('Ciclo', 'Il primo incontro'), true)).toEqual({
+      kicker: 'Ciclo',
+      main: 'Il primo incontro',
+    });
+  });
+
+  it('con il sopratitolo spento il titolo resta intero', () => {
+    expect(dividiTitolo('Q&A | Domande', false)).toEqual({
+      sopra: '',
+      titolo: 'Q&A | Domande',
+    });
+  });
+
+  it('un «|» nel titolo resta al titolo: si divide al primo', () => {
+    const salvato = componiTitolo('Ciclo', 'Prima | seconda parte');
+    expect(dividiTitolo(salvato, true)).toEqual({
+      sopra: 'Ciclo',
+      titolo: 'Prima | seconda parte',
+    });
+  });
+
+  it('senza titolo non salva il sopratitolo da solo', () => {
+    expect(componiTitolo('Ciclo', '')).toBe('');
+    expect(componiTitolo('Ciclo', '  ')).toBe('');
+    expect(componiTitolo('', 'Solo titolo')).toBe('Solo titolo');
+    expect(componiTitolo('  ', 'Solo titolo')).toBe('Solo titolo');
+  });
+
+  it('un titolo che comincia con «|» non ha sopratitolo', () => {
+    expect(dividiTitolo('| Titolo', true)).toEqual({ sopra: '', titolo: '| Titolo' });
   });
 });

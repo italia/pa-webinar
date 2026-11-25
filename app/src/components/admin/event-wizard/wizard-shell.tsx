@@ -123,7 +123,7 @@ import {
   useStatoLibreriaDomande,
 } from './libreria-domande';
 import PagePreview, { datiAnteprima } from './page-preview';
-import Step1Base, { type Step1Value } from './step-1-base';
+import Step1Base, { type BozzeTitolo, type Step1Value } from './step-1-base';
 import StepPermissions, { type StepPermissionsValue } from './step-3-permissions';
 import StepPeople, {
   PrimarySection,
@@ -1744,7 +1744,14 @@ export default function EventWizard(props: WizardProps) {
   const goNext = () => {
     if (caricamentiInViaggio > 0) return;
     if (fermaSeInSospeso()) return;
-    const errs = controllaPasso(activeStep);
+    // In creazione «Avanti» chiede anche nome ed email dell'organizzatore
+    // principale, come ogni campo con l'asterisco; la bozza resta salvabile
+    // senza (validateStep, che vale anche per «Salva come bozza», non li
+    // chiede).
+    const errs = {
+      ...controllaPasso(activeStep),
+      ...(mode === 'create' && activeStep === 'invites' ? validatePublish(form) : {}),
+    };
     if (Object.keys(errs).length > 0) {
       chiaviClientRef.current = new Set(Object.keys(errs));
       fuocoRichiestoRef.current = true;
@@ -1770,20 +1777,45 @@ export default function EventWizard(props: WizardProps) {
   const conAnteprima =
     !istantanea &&
     (activeStep === 'base' || activeStep === 'schedule' || activeStep === 'programme');
+  // Il passo «Quando» aperto almeno una volta: la data, anche se resta quella
+  // proposta, l'ha vista e tenuta chi compila (vedi senzaData).
+  const [quandoVisto, setQuandoVisto] = useState(false);
+  useEffect(() => {
+    if (activeStep === 'schedule') setQuandoVisto(true);
+  }, [activeStep]);
+  // In creazione la data del modulo e' la proposta del formato finche'
+  // nessuno la cambia o la vede nel passo «Quando» (una data diversa arriva
+  // anche da una bozza ripresa o da «Cambia formato»): al passo «Evento»
+  // l'anteprima non la mostra.
+  const senzaData =
+    mode === 'create' &&
+    activeStep === 'base' &&
+    !quandoVisto &&
+    moduloDifferito.startsAt === initial.startsAt &&
+    moduloDifferito.endsAt === initial.endsAt &&
+    moduloDifferito.timezone === initial.timezone;
   const anteprima = useMemo(
     () =>
       conAnteprima
         ? datiAnteprima(moduloDifferito, {
             locale: linguaInterfaccia,
             tags: props.availableTags,
-            startsAt: istanteDalModulo(moduloDifferito.startsAt, moduloDifferito.timezone),
-            endsAt: istanteDalModulo(moduloDifferito.endsAt, moduloDifferito.timezone),
+            // La proposta del formato non si mostra: sembrerebbe una data gia'
+            // scelta. Dal passo «Quando» in poi si'; in modifica la data e'
+            // quella dell'evento.
+            startsAt: senzaData
+              ? null
+              : istanteDalModulo(moduloDifferito.startsAt, moduloDifferito.timezone),
+            endsAt: senzaData
+              ? null
+              : istanteDalModulo(moduloDifferito.endsAt, moduloDifferito.timezone),
             parseTitleKicker: resolveKickerEnabled(moduloDifferito, props.siteDefaultParseTitleKicker),
             campiLiberi: props.campiLiberi,
           })
         : null,
     [
       conAnteprima,
+      senzaData,
       moduloDifferito,
       linguaInterfaccia,
       props.availableTags,
@@ -1883,6 +1915,9 @@ export default function EventWizard(props: WizardProps) {
   // descrizione, date, persone, contenuti) passa al modello nuovo, che porta
   // le sue impostazioni; la bozza del modello lasciato se ne va.
   const [cambiandoModello, setCambiandoModello] = useState(false);
+  // Sopratitolo e titolo in scrittura (vedi Step1Base): qui, non nel passo,
+  // perche' restino cambiando passo.
+  const [bozzeTitolo, setBozzeTitolo] = useState<BozzeTitolo>({});
   const cambiaModello = useCallback(() => {
     // La bozza in attesa di salvarsi non deve riscrivere quella appena tolta.
     fermaAutosalvataggio();
@@ -2568,6 +2603,8 @@ export default function EventWizard(props: WizardProps) {
             className="btn btn-sm btn-outline-secondary"
             onClick={() => {
               setForm(initial);
+              setBozzeTitolo({});
+              setQuandoVisto(false);
               elencoSceltoRef.current = mode === 'edit';
               nicknameSceltoRef.current = mode === 'edit';
               setDestinazioneScelta(mode === 'edit' || !!props.destinazioneScelta);
@@ -2580,10 +2617,13 @@ export default function EventWizard(props: WizardProps) {
         </div>
       )}
 
-      {/* Il modello in uso, e il modo di cambiarlo: i default vengono da lui. */}
-      {mode === 'create' && props.onChangeTemplate && (
-        <div className="wizard-modello d-flex flex-wrap align-items-center gap-2 mb-3">
-          <span>
+      {/* In testa, vicino al titolo: il formato in uso (i default vengono da
+          lui; lo si cambia con il primo «Indietro») e, a parte dai passi, le
+          impostazioni aggiuntive: non un passo da percorrere, le scelte del
+          modello raccolte in un posto. */}
+      <div className="wizard-testata">
+        {mode === 'create' && props.onChangeTemplate && (
+          <p className="wizard-modello mb-0">
             {props.formatoLabel
               ? t.rich('flow.formatInUse', {
                   name:
@@ -2608,26 +2648,22 @@ export default function EventWizard(props: WizardProps) {
                     b: (c) => <strong>{c}</strong>,
                   })
                 : t('flow.noTemplate')}
-          </span>
-          <button
-            type="button"
-            className="btn btn-sm btn-outline-primary"
-            onClick={() => {
-              // Cio' che e' scritto e non aggiunto non viaggia con il modulo.
-              if (fermaSeInSospeso()) return;
-              cambiaModello();
-            }}
-            // Un file in viaggio non arriverebbe nel formato nuovo.
-            disabled={cambiandoModello || caricamentiInViaggio > 0}
-          >
-            {props.formatoLabel
-              ? t('flow.changeFormat')
-              : props.template
-                ? t('flow.changeTemplate')
-                : t('flow.chooseTemplate')}
-          </button>
-        </div>
-      )}
+          </p>
+        )}
+        <button
+          type="button"
+          onClick={() => vai('advanced')}
+          // Il punto del wizard in cui ci si trova, anche fuori dai passi.
+          aria-current={activeStep === 'advanced' ? 'step' : undefined}
+          className={`btn btn-sm ${activeStep === 'advanced' ? 'btn-primary' : 'btn-outline-primary'} d-inline-flex align-items-center gap-2 wizard-testata__aggiuntive`}
+        >
+          <IconaImpostazioni />
+          {t('flow.steps.advanced')}
+          {tentato && mancanti.some((m) => m.step === 'advanced') && (
+            <span className="wizard-passi__da-fare">· {t('flow.toComplete')}</span>
+          )}
+        </button>
+      </div>
 
       <StepNav
         steps={passi.map((k) => ({
@@ -2635,10 +2671,6 @@ export default function EventWizard(props: WizardProps) {
           label: t(`flow.steps.${k}`),
           daCompletare: tentato && mancanti.some((m) => m.step === k),
         }))}
-        advanced={{
-          label: t('flow.steps.advanced'),
-          daCompletare: tentato && mancanti.some((m) => m.step === 'advanced'),
-        }}
         activeStep={activeStep}
         onJump={(k) => vai(k)}
         ariaLabel={t('stepsAriaLabel')}
@@ -2681,10 +2713,11 @@ export default function EventWizard(props: WizardProps) {
             <div className="wizard-con-anteprima__modulo">
               <Step1Base
                 parte={activeStep === 'base' ? 'evento' : 'quando'}
+                bozzeTitolo={bozzeTitolo}
+                onBozzeTitolo={setBozzeTitolo}
                 dopoDescrizione={
                   istantanea ? undefined : (
                     <ProgrammeCard
-                      value={form}
                       descrizione={form.description[props.defaultLocale] ?? ''}
                       onVai={() => vai('programme')}
                     />
@@ -2724,7 +2757,6 @@ export default function EventWizard(props: WizardProps) {
               publicRegistrationEnabled={iscrizioneAperta}
               // Il programma si pubblica nella pagina dell'evento: una
               // chiamata istantanea non ne ha una, ne' il passo che lo prepara.
-              rimandoProgramma={!istantanea}
               iscrizione={
                 istantanea ? undefined : (
                   <SezioneIscrizione
@@ -2776,7 +2808,6 @@ export default function EventWizard(props: WizardProps) {
                 showLinksOnPublish={
                   mode === 'create' || initialEvent?.event.status === 'DRAFT'
                 }
-                perPubblicare={mode === 'create'}
                 photosLocked={viaToken !== null}
                 onUploadBusy={segnalaCaricamento}
               />
@@ -2818,7 +2849,6 @@ export default function EventWizard(props: WizardProps) {
                   ? undefined
                   : {
                       argomenti: (form.agenda ?? []).filter(haTitolo).length,
-                      onVai: () => vai('programme'),
                     }
               }
               value={form}
@@ -3019,18 +3049,42 @@ export default function EventWizard(props: WizardProps) {
           allo schermo mentre si scorre, con Indietro accanto ad Avanti. */}
       <div className="wizard-azioni">
         <div className="wizard-azioni__pulsanti">
-        {/* Dalle impostazioni avanzate si torna al riepilogo con il pulsante
+        {/* Dalle impostazioni aggiuntive si torna al riepilogo con il pulsante
             a destra (e con il collegamento in cima): uno solo, non due. Al
-            primo passo non c'e' niente prima. */}
-        {activeStep !== 'advanced' && activeStep !== 'base' && (
+            primo passo, prima c'e' la scelta del formato (o del modello): ci
+            si torna con quello che si e' scritto. In modifica non c'e' niente
+            prima. */}
+        {activeStep === 'base' && mode === 'create' && props.onChangeTemplate ? (
           <button
             type="button"
             className="btn btn-outline-primary"
-            onClick={goPrev}
-            disabled={fermo}
+            onClick={() => {
+              // Cio' che e' scritto e non aggiunto non viaggia con il modulo.
+              if (fermaSeInSospeso()) return;
+              cambiaModello();
+            }}
+            // Un file in viaggio non arriverebbe nel formato nuovo.
+            disabled={fermo || cambiandoModello || caricamentiInViaggio > 0}
           >
-            ← {tc('back')}
+            ←{' '}
+            {props.formatoLabel
+              ? t('flow.changeFormat')
+              : props.template
+                ? t('flow.changeTemplate')
+                : t('flow.chooseTemplate')}
           </button>
+        ) : (
+          activeStep !== 'advanced' &&
+          activeStep !== 'base' && (
+            <button
+              type="button"
+              className="btn btn-outline-primary"
+              onClick={goPrev}
+              disabled={fermo}
+            >
+              ← {tc('back')}
+            </button>
+          )
         )}
 
         {activeStep !== 'review' ? (
@@ -3220,14 +3274,12 @@ function idDelCampo(key: string, defaultLocale: string): string | null {
 
 function StepNav({
   steps,
-  advanced,
   activeStep,
   onJump,
   ariaLabel,
   daCompletareLabel,
 }: {
   steps: Array<{ key: StepKey; label: string; daCompletare: boolean }>;
-  advanced: { label: string; daCompletare: boolean };
   activeStep: StepKey;
   onJump: (k: StepKey) => void;
   ariaLabel: string;
@@ -3294,36 +3346,27 @@ function StepNav({
             </li>
           );
         })}
-        {/* Le impostazioni avanzate: non un passo da percorrere, le scelte del
-            modello raccolte in un posto. */}
-        <li className="wizard-passi__avanzate">
-          <button
-            type="button"
-            onClick={() => onJump('advanced')}
-            aria-current={activeStep === 'advanced' ? 'step' : undefined}
-            className={`btn btn-sm ${activeStep === 'advanced' ? 'btn-primary' : 'btn-outline-primary'} d-inline-flex align-items-center gap-2`}
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <circle cx="12" cy="12" r="3" />
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-            </svg>
-            {advanced.label}
-            {advanced.daCompletare && (
-              <span className="wizard-passi__da-fare">· {daCompletareLabel}</span>
-            )}
-          </button>
-        </li>
       </ol>
     </nav>
+  );
+}
+
+/** L'ingranaggio delle impostazioni aggiuntive. */
+function IconaImpostazioni() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+    </svg>
   );
 }

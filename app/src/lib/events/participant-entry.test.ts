@@ -40,10 +40,16 @@ describe('participantEntry — evento a calendario', () => {
     expect(participantEntry(ev({ status: 'LIVE' }), false, NOW)).toEqual(PAGE);
   });
 
-  it('prima della diretta, in allestimento o in pausa, la porta e\' la pagina pubblica', () => {
-    for (const status of ['PUBLISHED', 'PROVISIONING', 'IDLE']) {
-      expect(participantEntry(ev({ status }), true, NOW)).toEqual(PAGE);
+  it('a sala d\'attesa aperta (in allestimento o in pausa) si entra da ospite', () => {
+    for (const status of ['PROVISIONING', 'IDLE']) {
+      expect(participantEntry(ev({ status }), true, NOW)).toEqual(ROOM);
+      // Senza ospiti si passa dall'iscrizione.
+      expect(participantEntry(ev({ status }), false, NOW)).toEqual(PAGE);
     }
+  });
+
+  it('prima che la sala si apra la porta e\' la pagina pubblica', () => {
+    expect(participantEntry(ev({ status: 'PUBLISHED' }), true, NOW)).toEqual(PAGE);
   });
 
   it('in bozza o archiviato non c\'e\' un ingresso da partecipante', () => {

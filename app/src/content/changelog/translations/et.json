@@ -1,4 +1,18 @@
 {
+  "0.14.0": {
+    "title": "Uus saal, reaalajas subtiitrid, eraldi nõusolekud",
+    "notes": [
+      "Reaalajas subtiitrid kõneleja nimega, mille paigaldus ise CPU-l toodab, ilma välise teenuseta. Üritus võib säilitada nende transkripti, ainult nõusoleku andnute lausetega.",
+      "Salvestamisel, transkribeerimisel ja aadressiraamatul on eraldi, vabatahtlikud ja eelnevalt märkimata nõusolekud. Salvestamisest keelduja osaleb ja jääb sellest välja ning iga nõusoleku saab tagasi võtta lehelt „Minu andmed”. Enne üritust teatatakse, kas video on piiratud või avalik, ja leht selgitab, mis andmetega juhtub.",
+      "Salvestatud videos on näha ainult juhid: osalejatelt on nõusolekul kuulda hääl. Töötajad saavad juba salvestatud videost isiku eemaldada, iga üritus valib, kui kaua salvestist hoitakse, ja kiirkõnes osalenu saab seda uuesti vaadata.",
+      "Uuendatud saal: kokkupandavad paneelid, Juhtpult juhile, „Anna sõna”, PDF-ide näitamine ekraani jagamata, kõneaja taimer, linkide QR-koodid. Mikrofonide ja kaamerate lukustus kehtib nüüd ka videosillal ning ootesaal on uue ilmega, väljak kaasa arvatud.",
+      "Osalejad saavad esineda hüüdnime või pseudonüümiga, kus üritus seda lubab, ning suurtel või publiku kuulamiseks mõeldud üritustel on osalejate nimekiri peidetud. Ootesaali avanemisest saab siseneda ka registreerumata, kui haldus seda lubab.",
+      "Ürituse loomine on lihtsam: mõned küsimused valivad algväärtused, programm valmistatakse ette, kutsed saadetakse e-postiga ja üritus võib olla kutsututele. Pealkiri ja kirjeldus tõlgitakse valitud keeltesse CPU-l, kui paigaldus on selle sisse lülitanud.",
+      "Pärast üritust toob leht esile video oma keeltes, sünkroonitud slaidid ja programmi sisukorrana. Töötajate soovil saab tehisintellekti kirjutatud aruande, sõnastik suunab transkripte ja tõlkeid ning „Ürituse lõpetamine” ütleb, mis on veel teha.",
+      "Päis, menüüd ja haldus järgivad Designers Italia mudeleid. Rohkem automaatseid ligipääsetavuse kontrolle, turvaparandusi, uuendatud teegid ja Next.js 15.5.29.",
+      "Uuendamisel: Jitsi komponendid lähevad üle versioonile stable-11031 ja chart peatub, kui mõni on lukustatud teise versioonile; eemalda `jitsi-meet.jibri.custom.other._finalize_sh`; Jitsi seadistuse asendaja peab lisama `config.hiddenFromRecorderFeatureEnabled = true`; Prosody taaskäivitub; subtiitrid on vaikimisi sees (`global.captions.enabled`)."
+    ]
+  },
   "0.13.0": {
     "title": "Täielikum privaatsus ja pikkade ürituste transkriptsioonid",
     "notes": [

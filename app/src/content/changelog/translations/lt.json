@@ -1,4 +1,18 @@
 {
+  "0.14.0": {
+    "title": "Nauja salė, subtitrai tiesiogiai, atskiri sutikimai",
+    "notes": [
+      "Subtitrai tiesiogiai su kalbančiojo vardu, kuriuos pati diegtis kuria CPU, be išorinių paslaugų. Renginys gali išsaugoti jų transkripciją, tik su sutikimą davusių žmonių sakiniais.",
+      "Įrašymas, transkribavimas ir adresų knyga turi atskirus, neprivalomus ir niekada iš anksto nepažymėtus sutikimus. Kas atsisako įrašymo, dalyvauja ir į jį nepatenka, o kiekvieną sutikimą galima atšaukti skiltyje „Mano duomenys“. Prieš renginį nurodoma, ar vaizdo įrašas bus ribotas, ar viešas, o lapas paaiškina, kas vyksta su duomenimis.",
+      "Įrašytame vaizde matomi tik vedantieji: iš dalyvių, su sutikimu, girdimas balsas. Darbuotojai gali pašalinti žmogų iš jau įrašyto vaizdo, kiekvienas renginys pasirenka, kiek saugoti įrašą, o dalyvavęs greitajame skambutyje gali jį peržiūrėti.",
+      "Atnaujinta salė: sutraukiami skydeliai, Valdymas vedančiajam, „Suteikti žodį“, PDF rodymas nesidalijant ekranu, kalbos laikmatis, nuorodų QR kodai. Mikrofonų ir kamerų blokavimas dabar galioja ir vaizdo tilte, o laukimo salė atnaujinta, įskaitant aikštę.",
+      "Dalyviai gali pasirodyti slapyvardžiu ar pseudonimu, kur renginys tai numato, o dideliuose renginiuose ar kuriuose auditorija klauso dalyvių sąrašas paslėptas. Nuo laukimo salės atvėrimo galima įeiti ir neužsiregistravus, jei administracija leidžia.",
+      "Sukurti renginį paprasčiau: keli klausimai parenka pradines reikšmes, programa rengiama iš anksto, kvietimai siunčiami el. paštu, o renginys gali būti skirtas pakviestiesiems. Pavadinimas ir aprašymas verčiami į pasirinktas kalbas CPU, jei diegtis tai įjungė.",
+      "Po renginio puslapyje pirmiausia rodomas vaizdo įrašas su jo kalbomis, sinchronizuotos skaidrės ir programa kaip rodyklė. Darbuotojų prašymu yra dirbtinio intelekto parengta ataskaita, žodynėlis vadovauja transkripcijoms ir vertimams, o „Užbaigti renginį“ parodo, kas dar liko.",
+      "Antraštė, meniu ir administravimas atitinka Designers Italia modelius. Daugiau automatinių prieinamumo patikrų, saugumo pataisų, atnaujintos bibliotekos ir Next.js 15.5.29.",
+      "Atnaujinant: Jitsi komponentai pereina prie stable-11031, o chart sustoja, jei kuris nors prikabintas prie kitos versijos; reikia pašalinti `jitsi-meet.jibri.custom.other._finalize_sh`; keičiantis Jitsi konfigūraciją, pridėti `config.hiddenFromRecorderFeatureEnabled = true`; Prosody paleidžiamas iš naujo; subtitrai įjungti pagal numatymą (`global.captions.enabled`)."
+    ]
+  },
   "0.13.0": {
     "title": "Išsamesnė privatumo apsauga ir ilgų renginių nuorašai",
     "notes": [

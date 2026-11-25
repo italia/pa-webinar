@@ -1,4 +1,18 @@
 {
+  "0.14.0": {
+    "title": "Jauna telpa, subtitri tiešraidē, atsevišķas piekrišanas",
+    "notes": [
+      "Subtitri tiešraidē ar runātāja vārdu, ko veido pati instalācija ar CPU, bez ārējiem pakalpojumiem. Pasākums var saglabāt to transkripciju, tikai ar to cilvēku teikumiem, kuri piekrita.",
+      "Ierakstam, transkripcijai un adrešu grāmatai ir atsevišķas, brīvprātīgas un nekad iepriekš neatzīmētas piekrišanas. Kas atsakās no ieraksta, piedalās un tajā neparādās, un katru piekrišanu var atsaukt sadaļā „Mani dati”. Pirms pasākuma norāda, vai video būs ierobežots vai publisks, un lapa paskaidro, kas notiek ar datiem.",
+      "Ierakstītajā video redzami tikai tie, kas vada: no dalībniekiem ar piekrišanu iekļauta balss. Darbinieki var izņemt cilvēku no jau ierakstīta video, katrs pasākums izvēlas, cik ilgi glabāt ierakstu, un tas, kurš piedalījās tūlītējā zvanā, var to noskatīties atkārtoti.",
+      "Pārveidota telpa: sakļaujami paneļi, Vadība vadītājam, „Dot vārdu”, PDF rādīšana bez ekrāna kopīgošanas, runas taimeris, saišu QR kodi. Mikrofonu un kameru bloķēšana tagad darbojas arī video tiltā, un uzgaidāmā telpa ir pārveidota, tostarp laukums.",
+      "Dalībnieki var parādīties ar iesauku vai pseidonīmu, ja pasākums to paredz, un lielos pasākumos vai tajos, kur publika klausās, dalībnieku saraksts ir paslēpts. No uzgaidāmās telpas atvēršanas var ieiet arī bez reģistrācijas, ja administrācija to atļauj.",
+      "Izveidot pasākumu ir vienkāršāk: daži jautājumi izvēlas sākuma vērtības, programmu sagatavo iepriekš, ielūgumus sūta pa e-pastu, un pasākumu var rezervēt uzaicinātajiem. Nosaukumu un aprakstu tulko izvēlētajās valodās ar CPU, ja instalācija to ir ieslēgusi.",
+      "Pēc pasākuma lapa izceļ video ar tā valodām, sinhronizētus slaidus un programmu kā rādītāju. Pēc darbinieku pieprasījuma ir ar mākslīgo intelektu rakstīts pārskats, glosārijs vada transkripcijas un tulkojumus, un „Noslēgt pasākumu” parāda, kas vēl darāms.",
+      "Galvene, izvēlnes un administrācija seko Designers Italia modeļiem. Vairāk automātisku piekļūstamības pārbaužu, drošības labojumu, atjauninātas bibliotēkas un Next.js 15.5.29.",
+      "Atjauninot: Jitsi komponenti pāriet uz stable-11031, un chart apstājas, ja kāds ir fiksēts citā versijā; jānoņem `jitsi-meet.jibri.custom.other._finalize_sh`; kas aizstāj Jitsi konfigurāciju, jāpievieno `config.hiddenFromRecorderFeatureEnabled = true`; Prosody restartējas; subtitri pēc noklusējuma ir ieslēgti (`global.captions.enabled`)."
+    ]
+  },
   "0.13.0": {
     "title": "Pilnīgāka privātuma aizsardzība un garu pasākumu atšifrējumi",
     "notes": [

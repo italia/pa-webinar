@@ -11,11 +11,12 @@ import { prisma } from '@/lib/db';
 import { getSettings } from '@/lib/settings';
 import { Link } from '@/i18n/navigation';
 import AdminDashboardClient from '@/components/admin/admin-dashboard-client';
+import EventCalendar from '@/components/calendar/event-calendar-lazy';
 import AdminPageHeader from '@/components/admin/admin-page-header';
 import { adminPageMetadata, adminPageTitle } from '@/components/admin/admin-page-title';
 
 interface EventsListPageProps {
-  searchParams: Promise<{ token?: string }>;
+  searchParams: Promise<{ token?: string; vista?: string }>;
 }
 
 async function loadEvents(session: StaffSession, scope: Prisma.EventWhereInput, token?: string) {
@@ -95,15 +96,46 @@ export function generateMetadata() {
 export default async function EventsListPage({
   searchParams,
 }: EventsListPageProps) {
-  const { token } = await searchParams;
+  const { token, vista } = await searchParams;
   const locale = await getLocale();
   const session = await staffOLogin(locale);
   const t = await getTranslations('admin');
-  const [events, availableTags, settings] = await Promise.all([
-    loadEvents(session, eventScope(session), token),
-    loadAvailableTags(),
-    getSettings(),
-  ]);
+  const tList = await getTranslations('admin.eventsList');
+  // Due viste degli stessi appuntamenti, elenco e calendario, nella stessa
+  // pagina. Col token si vede un evento solo: niente calendario.
+  const calendario = vista === 'calendario' && !token;
+  const [events, availableTags, settings] = calendario
+    ? [[], [], null]
+    : await Promise.all([
+        loadEvents(session, eventScope(session), token),
+        loadAvailableTags(),
+        getSettings(),
+      ]);
+  const vistaCorrente = (attiva: boolean) => (attiva ? ('page' as const) : undefined);
+  const schede = !token && (
+    <nav aria-label={tList('viewLabel')} className="mb-4">
+      <ul className="nav nav-tabs">
+        <li className="nav-item">
+          <Link
+            href="/admin/events"
+            className={`nav-link${calendario ? '' : ' active'}`}
+            aria-current={vistaCorrente(!calendario)}
+          >
+            {tList('viewList')}
+          </Link>
+        </li>
+        <li className="nav-item">
+          <Link
+            href={{ pathname: '/admin/events', query: { vista: 'calendario' } }}
+            className={`nav-link${calendario ? ' active' : ''}`}
+            aria-current={vistaCorrente(calendario)}
+          >
+            {tList('viewCalendar')}
+          </Link>
+        </li>
+      </ul>
+    </nav>
+  );
 
   return (
     <div className="container py-5">
@@ -131,7 +163,12 @@ export default async function EventsListPage({
         }
       />
 
-      {events.length === 0 ? (
+      {schede}
+
+      {calendario || !settings ? (
+        // Gli eventi li filtra la rotta del calendario, come l'elenco (ADR-014).
+        <EventCalendar mode="admin" />
+      ) : events.length === 0 ? (
         <div
           className="text-center py-5 px-4 rounded-3"
           style={{ backgroundColor: '#F5F7FB' }}

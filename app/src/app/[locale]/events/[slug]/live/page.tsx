@@ -196,12 +196,11 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       // Fall through to the participant-resolution path below with this token.
       token = cookieToken;
     } else if (
-      // INSTANT calls: anyone with the link can walk in. Allow guest access
-      // for any joinable status (LIVE / IDLE / PROVISIONING) so the user lands
-      // on the waiting room even while the bridge warms up. SCHEDULED events
-      // still require a personal token for any non-LIVE status — via
-      // /registration — and for LIVE too when the administration turns guest
-      // access off. La regola e' la stessa di chat e pannelli.
+      // Ospiti: dall'apertura della sala d'attesa (bridge in accensione,
+      // diretta, pausa) si entra col solo nome e si aspetta li' la diretta.
+      // Prima, un evento a calendario passa dall'iscrizione; e cosi' sempre,
+      // se l'amministrazione non ammette ospiti o l'evento e' solo su invito.
+      // La regola e' la stessa di chat e pannelli (lib/events/guest-window).
       guestWindowOpen(event, settings.guestAccessEnabled) ||
       // Chiamata rapida conclusa: il link mostra la registrazione a chi era in
       // sala mentre si registrava (pass di presenza) e a chi la organizza

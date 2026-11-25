@@ -212,7 +212,8 @@
       "recordingLinkSend": "Link erneut senden",
       "recordingLinkSent": "Wenn die Adresse für die Veranstaltung angemeldet ist, erhalten Sie in Kürze eine E-Mail mit Ihrem persönlichen Link.",
       "recordingLinkError": "Die Anfrage ist fehlgeschlagen. Bitte versuchen Sie es in einigen Minuten erneut.",
-      "registerOrGuest": "Mit einer Anmeldung erhalten Sie Ihren persönlichen Link und Neuigkeiten zum Event per E-Mail. Als Gast treten Sie sofort nur mit einem Namen ein, nur während das Event live ist, und erhalten keine E-Mails."
+      "registerOrGuest": "Mit einer Anmeldung erhalten Sie Ihren persönlichen Link und Neuigkeiten zum Event per E-Mail. Als Gast treten Sie sofort nur mit einem Namen ein und erhalten keine E-Mails.",
+      "guestWhenRoomOpens": "Am Tag der Veranstaltung, sobald der Warteraum öffnet, können Sie auch ohne Anmeldung teilnehmen, nur mit Ihrem Namen."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -661,7 +662,6 @@
     },
     "notOpenNow": "Der Raum ist im Moment nicht geöffnet.",
     "nameRequired": "Der Name für den Beitritt fehlt: Gehen Sie zurück und geben Sie ihn ein.",
-    "closeSidebar": "Seitenleiste schließen",
     "contentOnly": "Nur Inhalt, ohne Chat und Seitenleisten",
     "showPanels": "Chat und Seitenleisten anzeigen",
     "confirmFullscreen": "Zum Vollbild wechseln",
@@ -1012,11 +1012,10 @@
           "BALANCED": "Ausgewogen (540p)",
           "SAVE_DATA": "Datensparen (360p)"
         },
-        "kickerHint": "Für eine Dachzeile schreiben Sie sie vor den Titel und trennen beide mit |, zum Beispiel „Veranstaltungsreihe | Das erste Treffen“.",
-        "kickerUse": "„{kicker}“ als Dachzeile anzeigen",
-        "kickerPreview": "So erscheint er auf der Veranstaltungsseite",
+        "kickerHint": "Optional: eine kurze Zeile über dem Titel, zum Beispiel der Name der Veranstaltungsreihe.",
         "coverImageSize": "16:9, empfohlen 1600 × 900 Pixel.",
-        "requiredNote": "Mit * gekennzeichnete Felder sind Pflichtfelder."
+        "requiredNote": "Mit * gekennzeichnete Felder sind Pflichtfelder.",
+        "kickerLabel": "Dachzeile ({language})"
       },
       "step2": {
         "heading": "Wer darf was",
@@ -1097,11 +1096,6 @@
         "recordingDestinationRequired": "Wählen Sie, wohin die Aufzeichnung geht.",
         "audienceAnonymous": "Anonymes Publikum",
         "audienceAnonymousDesc": "Teilnehmende erscheinen für andere unter einem Pseudonym („Teilnehmende“ und ein Code) im Video, im Chat und bei Fragen; die Teilnehmerliste bleibt bei der Moderation, und es gibt keinen Platz. Sinnvoll für große Events; bei Community-Events möchte man sich kennenlernen.",
-        "audienceAnonymousLocked": "Bei möglicherweise geöffnetem Raum nicht änderbar: Pseudonyme würden mit Namen verknüpft.",
-        "participantListVisible": "Teilnehmerliste dem Publikum zeigen",
-        "participantListVisibleDesc": "Aus: Liste, Raster und Namen auf dem Platz bleiben Moderierenden und Vortragenden vorbehalten; das Publikum sieht nur, wer gerade spricht. Ein: Alle sehen, wer im Raum ist.",
-        "participantListAnonymous": "Bei anonymem Publikum bleibt die Liste verborgen.",
-        "participantListLocked": "Bei geöffnetem Raum nicht änderbar: Wer schon im Raum ist, sähe die Änderung nicht.",
         "nicknamesEnabled": "Spitznamen für Teilnehmende",
         "nicknamesEnabledDesc": "Teilnehmende können einen Spitznamen wählen: Die anderen sehen ihn statt des Namens im Video, im Chat, bei den Fragen und im Transkript. Veranstaltende und Moderierende sehen, wer dahintersteht. Wer moderiert oder spricht, bleibt beim eigenen Namen. Standardmäßig eingeschaltet, wo die Teilnehmerliste verborgen ist.",
         "nicknamesLocked": "Bei geöffnetem Raum nicht änderbar: Wer schon drin ist, hat nach der bisherigen Regel gewählt.",
@@ -1110,7 +1104,13 @@
         "hostsAlwaysRecorded": "Moderierende und Vortragende sind immer in der Aufzeichnung",
         "hostsAlwaysRecordedDesc": "Moderation und Referierende erscheinen mit Name und Bild im Video, ohne ein Kästchen anzukreuzen: Die Datenschutzhinweise der Veranstaltung müssen das sagen. Von den Teilnehmenden wird nur die Stimme aufgezeichnet, und nur mit ihrer Einwilligung.",
         "hostsAlwaysRecordedDescHostsOnly": "Moderation und Referierende erscheinen mit Name und Bild im Video, ohne ein Kästchen anzukreuzen: Die Datenschutzhinweise der Veranstaltung müssen das sagen. Teilnehmende sind im Video nie zu sehen oder zu hören.",
-        "hostsAlwaysRecordedDescVisible": "Moderation und Referierende erscheinen mit Name und Bild im Video, ohne ein Kästchen anzukreuzen: Die Datenschutzhinweise der Veranstaltung müssen das sagen. Diese Installation kann Teilnehmende nicht aus dem Video heraushalten: Wer einwilligt, spricht mit Name, Stimme und Bild, und der Name aller Zuschauenden kann auch ohne Wortmeldung erscheinen."
+        "hostsAlwaysRecordedDescVisible": "Moderation und Referierende erscheinen mit Name und Bild im Video, ohne ein Kästchen anzukreuzen: Die Datenschutzhinweise der Veranstaltung müssen das sagen. Diese Installation kann Teilnehmende nicht aus dem Video heraushalten: Wer einwilligt, spricht mit Name, Stimme und Bild, und der Name aller Zuschauenden kann auch ohne Wortmeldung erscheinen.",
+        "audienceHeading": "Wie Teilnehmende erscheinen",
+        "audienceOptionList": "Mit Namen, für alle sichtbar",
+        "audienceOptionListDesc": "Die Teilnehmendenliste, das Videoraster und die Namen auf dem Platz sind für alle sichtbar.",
+        "audienceOptionHosts": "Mit Namen, nur für Moderierende sichtbar",
+        "audienceOptionHostsDesc": "Das Publikum sieht nur, wer gerade spricht; Liste, Raster und Namen auf dem Platz bleiben Moderierenden und Vortragenden vorbehalten.",
+        "audienceLocked": "Bei geöffnetem Raum lässt sich das nicht ändern."
       },
       "step3": {
         "heading": "Personen und Einladungen",
@@ -1142,7 +1142,7 @@
         "personName": "Name",
         "personEmail": "E-Mail",
         "peopleHeading": "Moderation und Vortragende",
-        "peopleHelp": "Mitveranstaltende, Moderation und Vortragende. Jede Person erhält einen eigenen Link, um mit ihrer Rolle einzutreten; was jede Rolle darf, steht oben.",
+        "peopleHelp": "Mitveranstaltende, Moderation und Vortragende: Jede Person erhält einen eigenen Link, um mit ihrer Rolle einzutreten.",
         "personRole": "Rolle",
         "roleOrganizer": "Mitveranstalter",
         "roleModerator": "Moderator",
@@ -1201,7 +1201,7 @@
         "invitationsHelpRestricted": "Nur die Adressen auf dieser Liste können sich anmelden. Nach der Veröffentlichung senden Sie allen die Einladung per E-Mail von der Event-Seite, mit dem Anmeldelink; der Zugangslink kommt nach der Anmeldung.",
         "logoExternal": "Die öffentliche Seite zeigt nur auf diese Plattform hochgeladene Logos: Ein Logo von einer anderen Website wird nicht angezeigt.",
         "primaryProfileInvalid": "Prüfen Sie die Organisation und die Adresse des Logos.",
-        "primaryMore": "Foto, Organisation, Logo und öffentliche Seite",
+        "primaryMore": "Foto, Organisation und Logo",
         "accessHeading": "Wer sich anmeldet",
         "accessSiteDefault": "Folgt der Einstellung der Website: Ändert die Verwaltung sie, gilt das auch für diese Veranstaltung.",
         "accessNoInvitees": "Noch keine Eingeladenen: Solange die Liste unten leer ist, kann sich niemand anmelden.",
@@ -1348,7 +1348,7 @@
           "invites": "Personen",
           "programme": "Programm",
           "review": "Übersicht",
-          "advanced": "Erweiterte Einstellungen",
+          "advanced": "Weitere Einstellungen",
           "permissions": "Berechtigungen"
         },
         "templateInUse": "Vorlage: <b>{name}</b>",
@@ -1367,7 +1367,6 @@
         "scheduleIntro": "Wann das Event stattfindet: Datum, Uhrzeit und Zeitzone.",
         "advancedIntro": "Von der Vorlage bereits gewählte Werte: Ändern Sie nur, was nötig ist.",
         "advancedIntroTemplate": "Von der Vorlage „{name}“ bereits gewählte Werte: Ändern Sie nur, was nötig ist.",
-        "requiredToPublish": "Zum Veröffentlichen der Veranstaltung nötig.",
         "toComplete": "Zu ergänzen",
         "missingHeading": "Zum Veröffentlichen fehlt noch:",
         "fieldOrganizerName": "Name der Hauptmoderation",
@@ -1384,9 +1383,7 @@
         "changeFormat": "Format ändern",
         "voiceAll": "Alle sprechen und zeigen sich im Video",
         "voiceSpeakers": "Vortragende und Moderation sprechen und zeigen sich im Video; das Publikum schreibt im Chat",
-        "features": "Funktionen: {list}",
         "liveToggleNote": "Jede Funktion lässt sich auch während der Veranstaltung ein- und ausschalten.",
-        "customize": "Einstellungen anpassen",
         "changeLanguages": "Sprachen ändern",
         "translationLine": "Übersetzung in: {list}",
         "privacyTemplate": "Datenschutzhinweis: {name}",
@@ -1423,7 +1420,6 @@
         "audienceRealNames": "Namen des Publikums: echte Namen.",
         "postEventQaHidden": "Fragen nach der Veranstaltung: nicht veröffentlicht.",
         "postEventQaTextOnly": "Fragen nach der Veranstaltung: nur der Text, ohne Namen.",
-        "addressBookOffered": "Adressbuch: wird bei der Anmeldung angeboten.",
         "addressBookNotOffered": "Adressbuch: nicht angeboten.",
         "consentRecordingOptional": "Aufzeichnung, freiwillig",
         "consentRecordingVoice": "Aufzeichnung, freiwillig (ohne Einwilligung bleibt die Person außerhalb der Aufzeichnung)",
@@ -1433,7 +1429,6 @@
         "title": "Seitenvorschau",
         "open": "Vorschau öffnen",
         "note": "So sieht die Veranstaltungsseite aus; sie wird während der Eingabe aktualisiert.",
-        "noteNoDate": "So sieht die Veranstaltungsseite aus; solange das Datum fehlt, ist die Uhrzeit nur ein Beispiel.",
         "titlePlaceholder": "Titel der Veranstaltung",
         "descriptionPlaceholder": "Hier erscheint die Beschreibung."
       },
@@ -1464,26 +1459,18 @@
         "notPublic": "{name} erscheint nicht auf der öffentlichen Seite: Im Programm ist nur das Thema zu sehen.",
         "makePublic": "Namen auf der Seite zeigen",
         "madePublic": "{name} erscheint jetzt auf der öffentlichen Seite.",
-        "cardTitle": "Programm",
-        "cardEmpty": "Die Themen mit sprechenden Personen und Uhrzeiten erscheinen hier unter der Beschreibung auf der Seite der Veranstaltung.",
-        "cardPrepare": "Programm vorbereiten",
-        "cardSummary": "{count, plural, one {# Thema} other {# Themen}}",
-        "cardSummaryWithTimes": "{count, plural, one {# Thema} other {# Themen}} · {start}–{end}",
-        "cardOff": "Aus: erscheint nicht auf der Seite.",
-        "cardChange": "Programm ändern",
         "descriptionHasProgramme": "Die Beschreibung scheint ein Programm zu enthalten. Im Schritt „Programm“ hat es Uhrzeiten und Personen, und im Raum ist das laufende Thema zu sehen.",
         "goToProgramme": "Zum Programm",
-        "peoplePointer": "Die Beiträge der einzelnen Personen werden im nächsten Schritt vorbereitet: „Programm“.",
         "reviewEmpty": "Programm: keine Themen",
         "reviewPrepare": "Vorbereiten",
         "reviewOff": "Programm: aus, erscheint nicht auf der Seite ({count, plural, one {# Thema} other {# Themen}})",
         "previewPlaceholder": "Hier erscheint das Programm",
-        "toggleLink": "Programm vorbereiten",
         "toggleOffWarning": "Ausgeschaltet erscheint das Programm ({count, plural, one {# Thema} other {# Themen}}) nicht auf der Seite: Die zuletzt gespeicherte Fassung bleibt, und Änderungen hier werden nur gespeichert, wenn es wieder eingeschaltet wird.",
         "offKeptCreate": "Solange das Programm ausgeschaltet ist, werden seine Themen nicht mit der Veranstaltung gespeichert: Zum Behalten und Ändern einschalten.",
         "offKeptEdit": "Solange das Programm ausgeschaltet ist, bleibt die zuletzt gespeicherte Fassung: Änderungen hier werden nur gespeichert, wenn es wieder eingeschaltet wird.",
         "toggleOffWarningCreate": "Ausgeschaltet erscheint das Programm ({count, plural, one {# Thema} other {# Themen}}) nicht auf der Seite und wird nicht mit der Veranstaltung gespeichert: Zum Behalten einschalten.",
-        "reviewOffCreate": "Programm: aus, wird nicht mit der Veranstaltung gespeichert ({count, plural, one {# Thema} other {# Themen}})"
+        "reviewOffCreate": "Programm: aus, wird nicht mit der Veranstaltung gespeichert ({count, plural, one {# Thema} other {# Themen}})",
+        "showToParticipants": "Programm den Teilnehmenden zeigen"
       },
       "saveCopy": "Kopie speichern",
       "consentMap": {
@@ -1522,7 +1509,6 @@
       "settings": "Einstellungen",
       "eventsList": "Alle Veranstaltungen",
       "newEvent": "Neue Veranstaltung",
-      "calendar": "Veranstaltungskalender",
       "templates": "Veranstaltungsvorlagen",
       "analytics": "Statistiken",
       "instantCalls": "Sofortanrufe",
@@ -1563,7 +1549,8 @@
       "openMenu": "Menü öffnen",
       "closeMenu": "Menü schließen",
       "recordingRemovals": "Anträge auf Entfernung",
-      "recordingRemovalDetail": "Antrag auf Entfernung"
+      "recordingRemovalDetail": "Antrag auf Entfernung",
+      "newInstantCall": "Neuer Schnellanruf"
     },
     "publications": {
       "subtitle": "Zentraler Redaktions-Hub für alle veröffentlichten Videos: geplante Events, Sofortanrufe, hochgeladene Archivaufzeichnungen und auf Promotion wartende Sitzungen.",
@@ -2315,7 +2302,9 @@
         "waitingRoomEngineGame": "Videospiel (Phaser-Lobby)",
         "waitingRoomEngineClassic": "Klassisch (statisch)",
         "waitingRoomEngineHelp": "Standardmodus des Warteraums. Er lässt sich für eine einzelne Veranstaltung ändern und, für einen einzelnen Besuch, mit dem Parameter {param} in der Adresse.",
-        "primaryColorHex": "Primärfarbe (Hex-Code)"
+        "primaryColorHex": "Primärfarbe (Hex-Code)",
+        "organizationLogoUrl": "Logo der Organisation",
+        "organizationLogoUrlHelp": "Erscheint in der Fußzeile neben dem Namen der Organisation, die den Dienst betreibt. Leer lassen, um nur den Namen anzuzeigen."
       },
       "watermark": {
         "title": "Video-Anpassung",
@@ -2541,7 +2530,7 @@
     },
     "recurrence": {
       "label": "Wiederholung",
-      "helpText": "Wenn sich das Event wiederholt, schlägt die Kopie beim Duplizieren das Datum des nächsten Termins vor.",
+      "helpText": "Die Wiederholung legt die nächsten Termine nicht von selbst an: Wenn Sie das Event duplizieren, hat die Kopie bereits das Datum des nächsten Termins.",
       "preset": {
         "none": "Wiederholt sich nicht",
         "daily": "Täglich",
@@ -3004,7 +2993,15 @@
       "postEventSummary": "{connected} beigetreten · {registered} angemeldet",
       "registeredCount": "{count, plural, =0 {Keine Anmeldungen} one {1 Anmeldung} other {# Anmeldungen}}",
       "sortUpcoming": "Anstehende zuerst",
-      "todayTitle": "Heute und laufend"
+      "todayTitle": "Heute und laufend",
+      "viewLabel": "Ansicht",
+      "viewList": "Liste",
+      "viewCalendar": "Kalender",
+      "type": "Typ",
+      "typeAll": "Alle Typen",
+      "typeScheduled": "Veranstaltungen",
+      "typeInstant": "Sofortanrufe",
+      "instantFullList": "Vollständige Liste der Sofortanrufe, mit Filtern nach Datum und Aufzeichnung"
     },
     "tags": {
       "subtitle": "Erstellen, bearbeiten und löschen Sie die Tags zum Klassifizieren und Filtern öffentlicher Events.",
@@ -3044,7 +3041,6 @@
       "copyPublicUrl": "Öffentlichen Link kopieren",
       "copyInviteUrl": "Einladungslink kopieren",
       "enterAsParticipant": "Als Teilnehmer beitreten",
-      "openAsParticipant": "Als Teilnehmer öffnen",
       "participantHintRoom": "Öffnet sich in einem neuen Tab: der Raum, wie ihn ein Gast sieht, ohne Moderationsrechte.",
       "participantHintPassword": "Öffnet sich in einem neuen Tab: der Raum, wie ihn ein Gast sieht, nach dem Passwort der Veranstaltung.",
       "participantHintPage": "Öffnet sich in einem neuen Tab: die öffentliche Seite, wie Teilnehmende sie sehen.",
@@ -3137,7 +3133,8 @@
         "recordingRetention": "Automatische Löschung der Aufzeichnung",
         "recordingRetentionNone": "Keine",
         "recordingRetentionDays": "{days, plural, one {# Tag} other {# Tage}} nach dem Ende der Veranstaltung oder, wenn veröffentlicht, nach der Veröffentlichung"
-      }
+      },
+      "openPublicPage": "Öffentliche Seite öffnen"
     },
     "rubrica": {
       "subtitle": "Personen, die der Aufnahme in das Adressbuch zugestimmt haben (Art. 6.1.a DSGVO). Name, E-Mail-Adresse und Organisation werden nur aktualisiert, wenn die Person das Kästchen erneut ankreuzt.",
@@ -3797,9 +3794,6 @@
         "invitationDesc": "Die Seite bleibt sichtbar, aber nur Personen auf der Liste können sich anmelden; die Einladung mit dem Anmeldelink senden Sie per E-Mail von der Event-Seite"
       },
       "previewInvitation": "Nur Eingeladene melden sich an; ohne Anmeldung kein Zutritt.",
-      "previewPseudonyms": "Das Publikum erscheint unter einem Pseudonym",
-      "previewNicknames": "Teilnehmende können einen Spitznamen verwenden",
-      "previewRealNames": "Das Publikum erscheint unter dem eigenen Namen",
       "templateReplaces": "Eine Vorlage bringt ihre eigenen Einstellungen anstelle der Antworten unten mit. Titel, Termine und Personen tragen Sie in den nächsten Schritten ein.",
       "instantBack": "Stattdessen ein geplantes Event erstellen"
     },
@@ -4347,7 +4341,8 @@
         "noInstall": "Über den Browser, ohne Installation",
         "interactive": "Live-Q&A und Umfragen",
         "recordings": "Aufzeichnungen und Untertitel",
-        "accessible": "Barrierefrei, in 24 Sprachen"
+        "languagesAll": "In den 24 EU-Sprachen",
+        "languagesSome": "In mehreren Sprachen"
       }
     },
     "upcoming": {
@@ -5523,22 +5518,18 @@
   "footer": {
     "privacy": "Datenschutzerklärung",
     "accessibility": "Barrierefreiheitserklärung",
-    "openSource": "Open-Source-Software",
-    "contacts": "Kontakte",
     "legalNotes": "Rechtliche Hinweise",
-    "governmentSite": "Italienische Regierung",
     "systemStatus": "Systemstatus",
-    "sbomLatest": "SBOM der letzten Version",
     "transparency": "Sicherheit und Transparenz",
     "serviceInventory": "Dienste-Inventar",
-    "sourceCode": "Quellcode",
-    "viewRelease": "Release auf GitHub ansehen",
     "viewChangelog": "Neuigkeiten ansehen (Changelog)",
     "newWindow": "öffnet sich in einem neuen Fenster",
     "usefulLinks": "Nützliche Links",
     "version": "Version {version}",
     "versionDev": "Entwicklungsversion",
-    "updatedOn": "aktualisiert am {date}"
+    "updatedOn": "aktualisiert am {date}",
+    "projectOf": "Ein Projekt von",
+    "contactsLine": "Kontakte: <link>{email}</link>"
   },
   "changelog": {
     "metaTitle": "Neuigkeiten und Changelog",

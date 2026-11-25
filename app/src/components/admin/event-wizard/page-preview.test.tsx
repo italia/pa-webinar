@@ -281,6 +281,29 @@ describe('PagePreview', () => {
     ]);
     expect(voci[0]?.textContent).toContain('Luca');
     expect(ridotta.querySelector('.event-programma__nota')?.textContent).toContain('45 minuti');
+    expect(ridotta.querySelector('use[href$="#it-calendar"]')).not.toBeNull();
+  });
+
+  it('senza data il programma non ha orari e la pagina nessuna data', () => {
+    const dati = datiAnteprima(
+      {
+        ...MODULO,
+        agendaEnabled: true,
+        agenda: [{ key: 'r1', label: 'Apertura', minutes: '15', speakerKey: null }],
+      },
+      { locale: 'it', tags: ETICHETTE, startsAt: null, endsAt: null, parseTitleKicker: false },
+    );
+    act(() => {
+      root.render(
+        <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
+          <PagePreview dati={dati} />
+        </NextIntlClientProvider>
+      );
+    });
+    const ridotta = container.querySelector('.anteprima-pagina__ridotta')!;
+    expect(ridotta.querySelectorAll('.event-programma__voce')).toHaveLength(1);
+    expect(ridotta.querySelector('.event-programma__quando time')).toBeNull();
+    expect(ridotta.querySelector('use[href$="#it-calendar"]')).toBeNull();
   });
 
   it('sul programma: senza argomenti il posto dove comparira\', la descrizione accorciata e niente copertina', () => {
@@ -362,6 +385,8 @@ describe('PagePreview', () => {
     const p = messages.admin.wizard.preview;
     expect(container.textContent).toContain(p.titlePlaceholder);
     expect(container.textContent).toContain(p.descriptionPlaceholder);
-    expect(container.textContent).toContain(p.noteNoDate);
+    expect(container.textContent).toContain(p.note);
+    // Senza data nessun orario d'esempio: sembrerebbe gia' impostato.
+    expect(container.querySelector('use[href$="#it-calendar"]')).toBeNull();
   });
 });

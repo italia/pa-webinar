@@ -704,7 +704,7 @@ Add `--cacert "$S/ca.crt"` to both with `--tls private-ca`, and
   ([Tracing a missing email](../architecture/email.md#tracing-a-missing-email)).
 - **Hold a short call** with two devices on different networks, one of them
   outside yours, and one on a network that blocks UDP if you added TURN:
-  **Instant calls** > **New call** > **Create and join**, then
+  **Events** > **New quick call** > **Create and join**, then
   **Join as moderator**, type your name and **Enter now**; open the link from
   **Copy invite link** on the other device. A participant list that fills up
   is not enough: check that you hear and see each other

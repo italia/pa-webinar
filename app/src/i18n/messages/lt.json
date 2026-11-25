@@ -212,7 +212,8 @@
       "recordingLinkSend": "Atsiųskite nuorodą dar kartą",
       "recordingLinkSent": "Jei adresas užregistruotas renginyje, netrukus gausite el. laišką su asmenine nuoroda.",
       "recordingLinkError": "Užklausa nepavyko. Bandykite dar kartą po kelių minučių.",
-      "registerOrGuest": "Užsiregistravę el. paštu gausite asmeninę nuorodą ir naujienas apie renginį. Kaip svečias įeinate iš karto tik su vardu, tik kol renginys vyksta tiesiogiai, ir el. laiškų negaunate."
+      "registerOrGuest": "Užsiregistravę el. paštu gausite asmeninę nuorodą ir naujienas apie renginį. Kaip svečias įeinate iš karto tik su vardu ir el. laiškų negaunate.",
+      "guestWhenRoomOpens": "Renginio dieną, kai atsidarys laukiamasis, galėsite prisijungti ir neužsiregistravę, tik su savo vardu."
     },
     "manage": {
       "toggleChat": "Pokalbiai",
@@ -661,7 +662,6 @@
     },
     "notOpenNow": "Kambarys šiuo metu neatidarytas.",
     "nameRequired": "Trūksta vardo, kuriuo prisijungsite: grįžkite ir jį įrašykite.",
-    "closeSidebar": "Uždaryti šoninį skydelį",
     "contentOnly": "Tik turinys, be pokalbio ir skydelių",
     "showPanels": "Rodyti pokalbį ir skydelius",
     "confirmFullscreen": "Perjungti į viso ekrano režimą",
@@ -1012,11 +1012,10 @@
           "BALANCED": "Subalansuota (540p)",
           "SAVE_DATA": "Duomenų taupymas (360p)"
         },
-        "kickerHint": "Norėdami pridėti antraštę virš pavadinimo, parašykite ją prieš pavadinimą ir atskirkite ženklu |, pavyzdžiui, „Susitikimų ciklas | Pirmasis susitikimas“.",
-        "kickerUse": "Rodyti „{kicker}“ virš pavadinimo",
-        "kickerPreview": "Taip atrodo renginio puslapyje",
+        "kickerHint": "Neprivaloma: trumpa eilutė virš pavadinimo, pavyzdžiui, susitikimų ciklo pavadinimas.",
         "coverImageSize": "16:9, rekomenduojama 1600 × 900 pikselių.",
-        "requiredNote": "Laukai, pažymėti *, yra privalomi."
+        "requiredNote": "Laukai, pažymėti *, yra privalomi.",
+        "kickerLabel": "Antraštė virš pavadinimo ({language})"
       },
       "step2": {
         "heading": "Kas ką gali daryti",
@@ -1097,11 +1096,6 @@
         "recordingDestinationRequired": "Pasirinkite, kam skirtas įrašas.",
         "audienceAnonymous": "Anoniminė auditorija",
         "audienceAnonymousDesc": "Dalyviai kitiems rodomi slapyvardžiu („Dalyvis“ ir kodas) vaizdo įraše, pokalbyje ir klausimuose; dalyvių sąrašas lieka vedėjams, aikštės nėra. Naudinga dideliems renginiams; bendruomenės renginiuose žmonės nori susipažinti.",
-        "audienceAnonymousLocked": "Kol kambarys gali būti atviras, keisti negalima: tai susietų slapyvardžius su vardais.",
-        "participantListVisible": "Rodyti dalyvių sąrašą auditorijai",
-        "participantListVisibleDesc": "Išjungta: sąrašas, tinklelis ir vardai aikštėje lieka vedėjams ir pranešėjams; auditorija mato tik kalbantįjį. Įjungta: visi mato, kas yra salėje.",
-        "participantListAnonymous": "Esant anoniminei auditorijai sąrašas lieka paslėptas.",
-        "participantListLocked": "Kai salė atidaryta, keisti negalima: jau esantys viduje pakeitimo nematytų.",
         "nicknamesEnabled": "Pravardės dalyviams",
         "nicknamesEnabledDesc": "Dalyviai gali pasirinkti pravardę: kiti ją mato vietoj vardo vaizdo įraše, pokalbyje, klausimuose ir stenogramoje. Organizatoriai ir moderatoriai mato, kas už jos slypi. Renginį vedantys lieka su savo vardu. Iš pradžių įjungta, kai dalyvių sąrašas paslėptas.",
         "nicknamesLocked": "Kol kambarys atidarytas, keisti negalima: jau esantieji viduje rinkosi pagal ankstesnę taisyklę.",
@@ -1110,7 +1104,13 @@
         "hostsAlwaysRecorded": "Vedantieji visada patenka į įrašą",
         "hostsAlwaysRecordedDesc": "Moderatoriai ir pranešėjai rodomi vaizdo įraše su vardu ir vaizdu, be žymimojo langelio: renginio privatumo pranešime tai turi būti nurodyta. Iš dalyvių įrašomas tik balsas ir tik jiems sutikus.",
         "hostsAlwaysRecordedDescHostsOnly": "Moderatoriai ir pranešėjai rodomi vaizdo įraše su vardu ir vaizdu, be žymimojo langelio: renginio privatumo pranešime tai turi būti nurodyta. Dalyvių vaizdo įraše niekada nesimato ir negirdėti.",
-        "hostsAlwaysRecordedDescVisible": "Moderatoriai ir pranešėjai rodomi vaizdo įraše su vardu ir vaizdu, be žymimojo langelio: renginio privatumo pranešime tai turi būti nurodyta. Ši diegtis negali palikti dalyvių už vaizdo įrašo ribų: sutikusieji kalba su vardu, balsu ir vaizdu, o bet kurio stebinčiojo vardas gali būti rodomas, net jei jis nekalba."
+        "hostsAlwaysRecordedDescVisible": "Moderatoriai ir pranešėjai rodomi vaizdo įraše su vardu ir vaizdu, be žymimojo langelio: renginio privatumo pranešime tai turi būti nurodyta. Ši diegtis negali palikti dalyvių už vaizdo įrašo ribų: sutikusieji kalba su vardu, balsu ir vaizdu, o bet kurio stebinčiojo vardas gali būti rodomas, net jei jis nekalba.",
+        "audienceHeading": "Kaip rodomi dalyviai",
+        "audienceOptionList": "Su vardu, matoma visiems",
+        "audienceOptionListDesc": "Dalyvių sąrašas, vaizdo tinklelis ir vardai aikštėje matomi visiems.",
+        "audienceOptionHosts": "Su vardu, matoma tik vedėjams",
+        "audienceOptionHostsDesc": "Auditorija mato tik kalbantįjį; sąrašas, tinklelis ir vardai aikštėje lieka vedėjams ir pranešėjams.",
+        "audienceLocked": "Kai salė atidaryta, to keisti negalima."
       },
       "step3": {
         "heading": "Asmenys ir kvietimai",
@@ -1142,7 +1142,7 @@
         "personName": "Vardas",
         "personEmail": "El. paštas",
         "peopleHeading": "Moderatoriai ir pranešėjai",
-        "peopleHelp": "Bendraorganizatoriai, moderatoriai ir pranešėjai. Kiekvienas gauna savo nuorodą įeiti su savo vaidmeniu; ką gali kiekvienas vaidmuo, paaiškinta aukščiau.",
+        "peopleHelp": "Bendraorganizatoriai, moderatoriai ir pranešėjai: kiekvienas gauna savo nuorodą įeiti su savo vaidmeniu.",
         "personRole": "Vaidmuo",
         "roleOrganizer": "Bendraorganizatorius",
         "roleModerator": "Moderatorius",
@@ -1201,7 +1201,7 @@
         "invitationsHelpRestricted": "Registruotis gali tik šio sąrašo adresai. Paskelbę kiekvienam iš renginio puslapio išsiunčiate kvietimą el. paštu su registracijos nuoroda; įėjimo nuoroda ateina po registracijos.",
         "logoExternal": "Viešame puslapyje rodomi tik į šią platformą įkelti logotipai: logotipas iš kitos svetainės nebus rodomas.",
         "primaryProfileInvalid": "Patikrinkite organizaciją ir logotipo adresą.",
-        "primaryMore": "Nuotrauka, įstaiga, logotipas ir viešas puslapis",
+        "primaryMore": "Nuotrauka, įstaiga ir logotipas",
         "accessHeading": "Kas registruojasi",
         "accessSiteDefault": "Taikomas svetainės nustatymas: jei administracija jį pakeis, tai galios ir šiam renginiui.",
         "accessNoInvitees": "Pakviestųjų dar nėra: kol žemiau esantis sąrašas tuščias, niekas negali užsiregistruoti.",
@@ -1348,7 +1348,7 @@
           "invites": "Žmonės",
           "programme": "Programa",
           "review": "Santrauka",
-          "advanced": "Išplėstiniai nustatymai",
+          "advanced": "Papildomi nustatymai",
           "permissions": "Leidimai"
         },
         "templateInUse": "Šablonas: <b>{name}</b>",
@@ -1367,7 +1367,6 @@
         "scheduleIntro": "Kada vyksta renginys: data, laikas ir laiko juosta.",
         "advancedIntro": "Šablono jau pasirinktos reikšmės: keiskite tik tai, ko reikia.",
         "advancedIntroTemplate": "Šablono „{name}“ jau pasirinktos reikšmės: keiskite tik tai, ko reikia.",
-        "requiredToPublish": "Reikia renginiui paskelbti.",
         "toComplete": "Reikia užpildyti",
         "missingHeading": "Kad paskelbtumėte, dar trūksta:",
         "fieldOrganizerName": "Pagrindinio moderatoriaus vardas",
@@ -1384,9 +1383,7 @@
         "changeFormat": "Keisti formatą",
         "voiceAll": "Visi kalba ir rodosi vaizdo įraše",
         "voiceSpeakers": "Kalba ir rodosi pranešėjai ir vedėjai; auditorija rašo pokalbiuose",
-        "features": "Funkcijos: {list}",
         "liveToggleNote": "Kiekvieną funkciją galima įjungti ir išjungti ir renginio metu.",
-        "customize": "Pritaikyti nustatymus",
         "changeLanguages": "Keisti kalbas",
         "translationLine": "Vertimas į: {list}",
         "privacyTemplate": "Privatumo pranešimas: {name}",
@@ -1423,7 +1420,6 @@
         "audienceRealNames": "Auditorijos vardai: tikrieji.",
         "postEventQaHidden": "Klausimai po renginio: neskelbiami.",
         "postEventQaTextOnly": "Klausimai po renginio: tik tekstas, be vardo.",
-        "addressBookOffered": "Adresų knyga: siūloma besiregistruojantiems.",
         "addressBookNotOffered": "Adresų knyga: nesiūloma.",
         "consentRecordingOptional": "įrašymas, neprivalomas",
         "consentRecordingVoice": "įrašymas, laisvas (be jo asmuo į įrašą nepatenka)",
@@ -1433,7 +1429,6 @@
         "title": "Puslapio peržiūra",
         "open": "Atidaryti peržiūrą",
         "note": "Taip atrodo renginio puslapis; jis atsinaujina jums rašant.",
-        "noteNoDate": "Taip atrodo renginio puslapis; kol nenurodyta data, laikas yra tik pavyzdys.",
         "titlePlaceholder": "Renginio pavadinimas",
         "descriptionPlaceholder": "Čia bus rodomas aprašymas."
       },
@@ -1464,26 +1459,18 @@
         "notPublic": "Vardas {name} nerodomas viešame puslapyje: programoje matoma tik tema.",
         "makePublic": "Rodyti vardą puslapyje",
         "madePublic": "Vardas {name} dabar rodomas viešame puslapyje.",
-        "cardTitle": "Programa",
-        "cardEmpty": "Temos su kalbėtojais ir laikais rodomos čia, po aprašymu renginio puslapyje.",
-        "cardPrepare": "Parengti programą",
-        "cardSummary": "{count, plural, one {# tema} few {# temos} many {# temos} other {# temų}}",
-        "cardSummaryWithTimes": "{count, plural, one {# tema} few {# temos} many {# temos} other {# temų}} · {start}–{end}",
-        "cardOff": "Išjungta: puslapyje nerodoma.",
-        "cardChange": "Keisti programą",
         "descriptionHasProgramme": "Atrodo, kad aprašyme yra programa. Žingsnyje „Programa“ ji turi laikus ir asmenis, o kambaryje matoma dabartinė tema.",
         "goToProgramme": "Eiti į programą",
-        "peoplePointer": "Kiekvieno pranešimus parengiate kitame žingsnyje, „Programa“.",
         "reviewEmpty": "Programa: temų nėra",
         "reviewPrepare": "Parengti",
         "reviewOff": "Programa: išjungta, puslapyje nerodoma ({count, plural, one {# tema} few {# temos} many {# temos} other {# temų}})",
         "previewPlaceholder": "Čia bus rodoma programa",
-        "toggleLink": "Parengti programą",
         "toggleOffWarning": "Išjungta programa ({count, plural, one {# tema} few {# temos} many {# temos} other {# temų}}) puslapyje nerodoma: galioja paskutinė išsaugota versija, o čia atlikti pakeitimai išsaugomi tik tada, kai vėl ją įjungiate.",
         "offKeptCreate": "Kol programa išjungta, jos temos neišsaugomos kartu su renginiu: įjunkite ją, kad jas išlaikytumėte ir galėtumėte keisti.",
         "offKeptEdit": "Kol programa išjungta, galioja paskutinė išsaugota versija: čia atlikti pakeitimai išsaugomi tik tada, kai vėl ją įjungiate.",
         "toggleOffWarningCreate": "Išjungta programa ({count, plural, one {# tema} few {# temos} many {# temos} other {# temų}}) puslapyje nerodoma ir neišsaugoma kartu su renginiu: įjunkite ją, kad ją išlaikytumėte.",
-        "reviewOffCreate": "Programa: išjungta, neišsaugoma kartu su renginiu ({count, plural, one {# tema} few {# temos} many {# temos} other {# temų}})"
+        "reviewOffCreate": "Programa: išjungta, neišsaugoma kartu su renginiu ({count, plural, one {# tema} few {# temos} many {# temos} other {# temų}})",
+        "showToParticipants": "Rodyti programą dalyviams"
       },
       "saveCopy": "Išsaugoti kopiją",
       "consentMap": {
@@ -1522,7 +1509,6 @@
       "settings": "Nustatymai",
       "eventsList": "Visi renginiai",
       "newEvent": "Naujas renginys",
-      "calendar": "Renginių kalendorius",
       "templates": "Renginių šablonai",
       "analytics": "Statistika",
       "instantCalls": "Greiti skambučiai",
@@ -1563,7 +1549,8 @@
       "openMenu": "Atidaryti meniu",
       "closeMenu": "Uždaryti meniu",
       "recordingRemovals": "Pašalinimo prašymai",
-      "recordingRemovalDetail": "Pašalinimo prašymas"
+      "recordingRemovalDetail": "Pašalinimo prašymas",
+      "newInstantCall": "Naujas greitasis skambutis"
     },
     "publications": {
       "subtitle": "Bendras redakcinis centras visiems paskelbtiems vaizdo įrašams: planuoti renginiai, greitieji skambučiai, įkelti istoriniai archyvai ir sesijos, laukiančios paskelbimo.",
@@ -2315,7 +2302,9 @@
         "waitingRoomEngineGame": "Vaizdo žaidimas (Phaser fojė)",
         "waitingRoomEngineClassic": "Klasikinis (statinis)",
         "waitingRoomEngineHelp": "Numatytasis laukiamojo režimas. Jį galima pakeisti atskiram renginiui, o vienam apsilankymui – adreso parametru {param}.",
-        "primaryColorHex": "Pagrindinė spalva (šešioliktainis kodas)"
+        "primaryColorHex": "Pagrindinė spalva (šešioliktainis kodas)",
+        "organizationLogoUrl": "Įstaigos logotipas",
+        "organizationLogoUrlHelp": "Rodomas poraštėje šalia paslaugą teikiančios įstaigos pavadinimo. Palikite tuščią, kad būtų rodomas tik pavadinimas."
       },
       "watermark": {
         "title": "Vaizdo tinkinimas",
@@ -2541,7 +2530,7 @@
     },
     "recurrence": {
       "label": "Pasikartojimas",
-      "helpText": "Jei renginys kartojasi, jį dubliuojant kopija pasiūlo kito renginio datą.",
+      "helpText": "Kartojimas pats nesukuria kitų renginių: kai renginį dubliuojate, kopija jau turi kito renginio datą.",
       "preset": {
         "none": "Nesikartoja",
         "daily": "Kasdien",
@@ -3004,7 +2993,15 @@
       "postEventSummary": "{connected} prisijungę · {registered} registracijų",
       "registeredCount": "{count, plural, =0 {Registracijų nėra} one {1 registracija} other {# registracijų}}",
       "sortUpcoming": "Artimiausi pirmiau",
-      "todayTitle": "Šiandien ir vykstantys"
+      "todayTitle": "Šiandien ir vykstantys",
+      "viewLabel": "Rodinys",
+      "viewList": "Sąrašas",
+      "viewCalendar": "Kalendorius",
+      "type": "Tipas",
+      "typeAll": "Visi tipai",
+      "typeScheduled": "Renginiai",
+      "typeInstant": "Greiti skambučiai",
+      "instantFullList": "Visas greitųjų skambučių sąrašas su filtrais pagal datą ir įrašą"
     },
     "tags": {
       "subtitle": "Kurkite, redaguokite ir pašalinkite žymas, naudojamas viešųjų renginių klasifikavimui ir filtravimui.",
@@ -3044,7 +3041,6 @@
       "copyPublicUrl": "Kopijuoti viešą nuorodą",
       "copyInviteUrl": "Kopijuoti kvietimo nuorodą",
       "enterAsParticipant": "Prisijungti kaip dalyvis",
-      "openAsParticipant": "Atidaryti kaip dalyvis",
       "participantHintRoom": "Atsidaro naujame skirtuke: kambarys taip, kaip jį mato svečias, be moderatoriaus teisių.",
       "participantHintPassword": "Atsidaro naujame skirtuke: kambarys taip, kaip jį mato svečias, įvedus renginio slaptažodį.",
       "participantHintPage": "Atsidaro naujame skirtuke: viešas puslapis taip, kaip jį mato dalyviai.",
@@ -3137,7 +3133,8 @@
         "recordingRetention": "Automatinis įrašo ištrynimas",
         "recordingRetentionNone": "Nėra",
         "recordingRetentionDays": "praėjus {days, plural, one {# dienai} few {# dienoms} many {# dienos} other {# dienų}} nuo renginio pabaigos arba, jei paskelbtas, nuo paskelbimo"
-      }
+      },
+      "openPublicPage": "Atidaryti viešą puslapį"
     },
     "rubrica": {
       "subtitle": "Asmenys, davę sutikimą būti įtraukti į adresų knygą (BDAR 6.1.a str.). Vardas, el. paštas ir organizacija atnaujinami tik tada, kai asmuo vėl pažymi langelį.",
@@ -3797,9 +3794,6 @@
         "invitationDesc": "Puslapis lieka matomas, bet registruotis gali tik sąraše esantys; kvietimą su registracijos nuoroda siunčiate el. paštu iš renginio puslapio"
       },
       "previewInvitation": "Registruojasi tik pakviestieji; be registracijos neįeinama.",
-      "previewPseudonyms": "Auditorija rodoma su slapyvardžiais",
-      "previewNicknames": "Dalyviai gali naudoti pravardę",
-      "previewRealNames": "Auditorija rodoma su savo vardais",
       "templateReplaces": "Šablonas atneša savo nustatymus vietoj toliau pateiktų atsakymų. Pavadinimą, datas ir žmones įrašote kituose žingsniuose.",
       "instantBack": "Vietoj to sukurti suplanuotą renginį"
     },
@@ -4347,7 +4341,8 @@
         "noInstall": "Iš naršyklės, be diegimų",
         "interactive": "Tiesioginiai Q&A ir apklausos",
         "recordings": "Įrašai ir subtitrai",
-        "accessible": "Prieinama 24 kalbomis"
+        "languagesAll": "24 ES kalbomis",
+        "languagesSome": "Keliomis kalbomis"
       }
     },
     "upcoming": {
@@ -5523,22 +5518,18 @@
   "footer": {
     "privacy": "Privatumo politika",
     "accessibility": "Prieinamumo deklaracija",
-    "openSource": "Atvirojo kodo programinė įranga",
-    "contacts": "Kontaktai",
     "legalNotes": "Teisinės pastabos",
-    "governmentSite": "Italijos Vyriausybė",
     "systemStatus": "Sistemos būsena",
-    "sbomLatest": "Naujausio leidimo SBOM",
     "transparency": "Saugumas ir skaidrumas",
     "serviceInventory": "Paslaugų inventorius",
-    "sourceCode": "Šaltinio kodas",
-    "viewRelease": "Peržiūrėti leidimą „GitHub“",
     "viewChangelog": "Žiūrėti naujienas (pakeitimų sąrašą)",
     "newWindow": "atsidaro naujame lange",
     "usefulLinks": "Naudingos nuorodos",
     "version": "Versija {version}",
     "versionDev": "Kūrimo versija",
-    "updatedOn": "atnaujinta {date}"
+    "updatedOn": "atnaujinta {date}",
+    "projectOf": "Projektą vykdo",
+    "contactsLine": "Kontaktai: <link>{email}</link>"
   },
   "changelog": {
     "metaTitle": "Naujienos ir pakeitimų sąrašas",

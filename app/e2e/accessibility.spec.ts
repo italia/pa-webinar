@@ -211,7 +211,8 @@ test('area di amministrazione', async ({ page }) => {
     '/it/admin/post-produzione',
     '/it/admin/questionari',
     '/it/admin/rubrica',
-    '/it/admin/calendario',
+    // Il calendario dello staff e' una vista di «Tutti gli eventi».
+    '/it/admin/eventi?vista=calendario',
     '/it/admin/impostazioni',
   ]) {
     await controlla(page, percorso);

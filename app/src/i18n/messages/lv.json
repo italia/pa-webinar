@@ -212,7 +212,8 @@
       "recordingLinkSend": "Nosūtīt saiti vēlreiz",
       "recordingLinkSent": "Ja adrese ir reģistrēta pasākumam, drīz saņemsiet e-pastu ar personīgo saiti.",
       "recordingLinkError": "Pieprasījums neizdevās. Mēģiniet vēlreiz pēc dažām minūtēm.",
-      "registerOrGuest": "Reģistrējoties pa e-pastu saņemat savu personīgo saiti un jaunumus par pasākumu. Kā viesis ienākat uzreiz tikai ar vārdu, tikai kamēr pasākums notiek tiešraidē, un e-pastus nesaņemat."
+      "registerOrGuest": "Reģistrējoties pa e-pastu saņemat savu personīgo saiti un jaunumus par pasākumu. Kā viesis ienākat uzreiz tikai ar vārdu un e-pastus nesaņemat.",
+      "guestWhenRoomOpens": "Pasākuma dienā, kad atvērsies uzgaidāmā telpa, varēsiet pievienoties arī bez reģistrācijas, tikai ar savu vārdu."
     },
     "manage": {
       "toggleChat": "Tērzēšana",
@@ -661,7 +662,6 @@
     },
     "notOpenNow": "Telpa pašlaik nav atvērta.",
     "nameRequired": "Trūkst vārda, ar kuru pievienoties: atgriezieties un ierakstiet to.",
-    "closeSidebar": "Aizvērt sānu paneli",
     "contentOnly": "Tikai saturs, bez tērzēšanas un paneļiem",
     "showPanels": "Rādīt tērzēšanu un paneļus",
     "confirmFullscreen": "Pārslēgt uz pilnekrāna režīmu",
@@ -1012,11 +1012,10 @@
           "BALANCED": "Līdzsvarota (540p)",
           "SAVE_DATA": "Datu taupīšana (360p)"
         },
-        "kickerHint": "Lai pievienotu virsvirsrakstu, rakstiet to pirms virsraksta un atdaliet ar |, piemēram, “Tikšanās cikls | Pirmā tikšanās”.",
-        "kickerUse": "Rādīt “{kicker}” kā virsvirsrakstu",
-        "kickerPreview": "Tā tas izskatās pasākuma lapā",
+        "kickerHint": "Neobligāti: īsa rinda virs virsraksta, piemēram, tikšanās cikla nosaukums.",
         "coverImageSize": "16:9, ieteicams 1600 × 900 pikseļi.",
-        "requiredNote": "Ar * atzīmētie lauki ir obligāti."
+        "requiredNote": "Ar * atzīmētie lauki ir obligāti.",
+        "kickerLabel": "Virsvirsraksts ({language})"
       },
       "step2": {
         "heading": "Kurš ko var darīt",
@@ -1097,11 +1096,6 @@
         "recordingDestinationRequired": "Izvēlieties, kur nonāk ieraksts.",
         "audienceAnonymous": "Anonīma auditorija",
         "audienceAnonymousDesc": "Dalībnieki citiem redzami ar pseidonīmu (“Dalībnieks” un kods) video, tērzēšanā un jautājumos; dalībnieku saraksts paliek vadītājiem, un laukuma nav. Noderīgi lieliem pasākumiem; kopienas pasākumos cilvēki vēlas iepazīties.",
-        "audienceAnonymousLocked": "Kamēr telpa var būt atvērta, to nevar mainīt: tas sasaistītu pseidonīmus ar vārdiem.",
-        "participantListVisible": "Rādīt dalībnieku sarakstu auditorijai",
-        "participantListVisibleDesc": "Izslēgts: saraksts, režģis un vārdi laukumā paliek vadītājiem un runātājiem; auditorija redz tikai runātāju. Ieslēgts: visi redz, kas ir telpā.",
-        "participantListAnonymous": "Ar anonīmu auditoriju saraksts paliek paslēpts.",
-        "participantListLocked": "Kamēr telpa ir atvērta, to mainīt nevar: tie, kas jau ir iekšā, izmaiņas neredzētu.",
         "nicknamesEnabled": "Segvārdi dalībniekiem",
         "nicknamesEnabledDesc": "Dalībnieki var izvēlēties segvārdu: citi to redz vārda vietā video, tērzēšanā, jautājumos un atšifrējumā. Organizatori un moderatori redz, kas aiz tā slēpjas. Vadītāji paliek ar savu vārdu. Sākotnēji ieslēgts, ja dalībnieku saraksts ir paslēpts.",
         "nicknamesLocked": "Kamēr telpa ir atvērta, to nevar mainīt: tie, kas jau ir iekšā, izvēlējās pēc iepriekšējā noteikuma.",
@@ -1110,7 +1104,13 @@
         "hostsAlwaysRecorded": "Vadītāji vienmēr ir ierakstā",
         "hostsAlwaysRecordedDesc": "Moderatori un runātāji ir redzami video ar vārdu un attēlu, bez izvēles rūtiņas: pasākuma privātuma paziņojumā tas ir jānorāda. No dalībniekiem tiek ierakstīta tikai balss un tikai ar viņu piekrišanu.",
         "hostsAlwaysRecordedDescHostsOnly": "Moderatori un runātāji ir redzami video ar vārdu un attēlu, bez izvēles rūtiņas: pasākuma privātuma paziņojumā tas ir jānorāda. Dalībnieki video nekad nav ne redzami, ne dzirdami.",
-        "hostsAlwaysRecordedDescVisible": "Moderatori un runātāji ir redzami video ar vārdu un attēlu, bez izvēles rūtiņas: pasākuma privātuma paziņojumā tas ir jānorāda. Šī instalācija nevar paturēt dalībniekus ārpus video: kas piekrīt, runā ar vārdu, balsi un attēlu, un ikviena sekotāja vārds var parādīties, pat ja viņš nerunā."
+        "hostsAlwaysRecordedDescVisible": "Moderatori un runātāji ir redzami video ar vārdu un attēlu, bez izvēles rūtiņas: pasākuma privātuma paziņojumā tas ir jānorāda. Šī instalācija nevar paturēt dalībniekus ārpus video: kas piekrīt, runā ar vārdu, balsi un attēlu, un ikviena sekotāja vārds var parādīties, pat ja viņš nerunā.",
+        "audienceHeading": "Kā tiek parādīti dalībnieki",
+        "audienceOptionList": "Ar vārdu, redzams visiem",
+        "audienceOptionListDesc": "Dalībnieku saraksts, video režģis un vārdi laukumā ir redzami visiem.",
+        "audienceOptionHosts": "Ar vārdu, redzams tikai vadītājiem",
+        "audienceOptionHostsDesc": "Auditorija redz tikai runātāju; saraksts, režģis un vārdi laukumā paliek vadītājiem un runātājiem.",
+        "audienceLocked": "Kamēr telpa ir atvērta, to nevar mainīt."
       },
       "step3": {
         "heading": "Personas un ielūgumi",
@@ -1142,7 +1142,7 @@
         "personName": "Vārds",
         "personEmail": "E-pasts",
         "peopleHeading": "Moderatori un runātāji",
-        "peopleHelp": "Līdzorganizatori, moderatori un runātāji. Katrs saņem savu saiti, lai ienāktu ar savu lomu; ko var katra loma, ir paskaidrots augstāk.",
+        "peopleHelp": "Līdzorganizatori, moderatori un runātāji: katrs saņem savu saiti, lai ienāktu ar savu lomu.",
         "personRole": "Loma",
         "roleOrganizer": "Līdzorganizators",
         "roleModerator": "Moderators",
@@ -1201,7 +1201,7 @@
         "invitationsHelpRestricted": "Reģistrēties var tikai šī saraksta adreses. Pēc publicēšanas no pasākuma lapas katram nosūtāt ielūgumu pa e-pastu ar reģistrācijas saiti; ieejas saite pienāk pēc reģistrācijas.",
         "logoExternal": "Publiskajā lapā redzami tikai šajā platformā augšupielādēti logotipi: logotips no citas vietnes netiks rādīts.",
         "primaryProfileInvalid": "Pārbaudiet organizāciju un logotipa adresi.",
-        "primaryMore": "Fotoattēls, iestāde, logotips un publiskā lapa",
+        "primaryMore": "Fotoattēls, iestāde un logotips",
         "accessHeading": "Kas reģistrējas",
         "accessSiteDefault": "Seko vietnes iestatījumam: ja administrācija to maina, tas attiecas arī uz šo pasākumu.",
         "accessNoInvitees": "Vēl nav uzaicināto: kamēr saraksts zemāk ir tukšs, neviens nevar reģistrēties.",
@@ -1367,7 +1367,6 @@
         "scheduleIntro": "Kad notiek pasākums: datums, laiks un laika josla.",
         "advancedIntro": "Veidnes jau izvēlētās vērtības: mainiet tikai vajadzīgo.",
         "advancedIntroTemplate": "Veidnes “{name}” jau izvēlētās vērtības: mainiet tikai vajadzīgo.",
-        "requiredToPublish": "Vajadzīgs, lai publicētu pasākumu.",
         "toComplete": "Jāaizpilda",
         "missingHeading": "Publicēšanai vēl trūkst:",
         "fieldOrganizerName": "Galvenā moderatora vārds",
@@ -1384,9 +1383,7 @@
         "changeFormat": "Mainīt formātu",
         "voiceAll": "Visi runā un rādās video",
         "voiceSpeakers": "Runā un rādās video runātāji un vadītāji; publika raksta tērzēšanā",
-        "features": "Funkcijas: {list}",
         "liveToggleNote": "Katru funkciju var ieslēgt un izslēgt arī pasākuma laikā.",
-        "customize": "Pielāgot iestatījumus",
         "changeLanguages": "Mainīt valodas",
         "translationLine": "Tulkojums: {list}",
         "privacyTemplate": "Privātuma paziņojums: {name}",
@@ -1423,7 +1420,6 @@
         "audienceRealNames": "Auditorijas vārdi: īstie vārdi.",
         "postEventQaHidden": "Jautājumi pēc pasākuma: netiek publicēti.",
         "postEventQaTextOnly": "Jautājumi pēc pasākuma: tikai teksts, bez vārda.",
-        "addressBookOffered": "Kontaktu grāmata: piedāvāta tiem, kas reģistrējas.",
         "addressBookNotOffered": "Kontaktu grāmata: nav piedāvāta.",
         "consentRecordingOptional": "ierakstīšana, brīvprātīga",
         "consentRecordingVoice": "ierakstīšana, brīva (bez tās persona paliek ārpus ieraksta)",
@@ -1433,7 +1429,6 @@
         "title": "Lapas priekšskatījums",
         "open": "Atvērt priekšskatījumu",
         "note": "Šādi izskatās pasākuma lapa; tā atjaunojas, kamēr rakstāt.",
-        "noteNoDate": "Šādi izskatās pasākuma lapa; kamēr nav norādīts datums, laiks ir tikai piemērs.",
         "titlePlaceholder": "Pasākuma nosaukums",
         "descriptionPlaceholder": "Šeit parādīsies apraksts."
       },
@@ -1464,26 +1459,18 @@
         "notPublic": "Vārds {name} nav redzams publiskajā lapā: programmā redzama tikai tēma.",
         "makePublic": "Rādīt vārdu lapā",
         "madePublic": "Vārds {name} tagad ir redzams publiskajā lapā.",
-        "cardTitle": "Programma",
-        "cardEmpty": "Tēmas ar uzstājējiem un laikiem šeit ir redzamas zem apraksta pasākuma lapā.",
-        "cardPrepare": "Sagatavot programmu",
-        "cardSummary": "{count, plural, zero {# tēmu} one {# tēma} other {# tēmas}}",
-        "cardSummaryWithTimes": "{count, plural, zero {# tēmu} one {# tēma} other {# tēmas}} · {start}–{end}",
-        "cardOff": "Izslēgta: lapā nav redzama.",
-        "cardChange": "Mainīt programmu",
         "descriptionHasProgramme": "Šķiet, ka aprakstā ir programma. Solī “Programma” tai ir laiki un personas, un telpā redzama pašreizējā tēma.",
         "goToProgramme": "Uz programmu",
-        "peoplePointer": "Katra uzstāšanās tiek sagatavota nākamajā solī, “Programma”.",
         "reviewEmpty": "Programma: nav tēmu",
         "reviewPrepare": "Sagatavot",
         "reviewOff": "Programma: izslēgta, lapā nav redzama ({count, plural, zero {# tēmu} one {# tēma} other {# tēmas}})",
         "previewPlaceholder": "Šeit būs redzama programma",
-        "toggleLink": "Sagatavot programmu",
         "toggleOffWarning": "Izslēgta programma ({count, plural, zero {# tēmu} one {# tēma} other {# tēmas}}) lapā nav redzama: spēkā ir pēdējā saglabātā versija, un šeit veiktās izmaiņas tiek saglabātas tikai tad, ja to atkal ieslēdzat.",
         "offKeptCreate": "Kamēr programma ir izslēgta, tās tēmas netiek saglabātas kopā ar pasākumu: ieslēdziet to, lai tās paturētu un mainītu.",
         "offKeptEdit": "Kamēr programma ir izslēgta, spēkā ir pēdējā saglabātā versija: šeit veiktās izmaiņas tiek saglabātas tikai tad, ja to atkal ieslēdzat.",
         "toggleOffWarningCreate": "Izslēgta programma ({count, plural, zero {# tēmu} one {# tēma} other {# tēmas}}) lapā nav redzama un netiek saglabāta kopā ar pasākumu: ieslēdziet to, lai to paturētu.",
-        "reviewOffCreate": "Programma: izslēgta, netiek saglabāta kopā ar pasākumu ({count, plural, zero {# tēmu} one {# tēma} other {# tēmas}})"
+        "reviewOffCreate": "Programma: izslēgta, netiek saglabāta kopā ar pasākumu ({count, plural, zero {# tēmu} one {# tēma} other {# tēmas}})",
+        "showToParticipants": "Rādīt programmu dalībniekiem"
       },
       "saveCopy": "Saglabāt kopiju",
       "consentMap": {
@@ -1522,7 +1509,6 @@
       "settings": "Iestatījumi",
       "eventsList": "Visi pasākumi",
       "newEvent": "Jauns pasākums",
-      "calendar": "Pasākumu kalendārs",
       "templates": "Pasākumu veidnes",
       "analytics": "Statistika",
       "instantCalls": "Ātrie zvani",
@@ -1563,7 +1549,8 @@
       "openMenu": "Atvērt izvēlni",
       "closeMenu": "Aizvērt izvēlni",
       "recordingRemovals": "Izņemšanas pieprasījumi",
-      "recordingRemovalDetail": "Izņemšanas pieprasījums"
+      "recordingRemovalDetail": "Izņemšanas pieprasījums",
+      "newInstantCall": "Jauns ātrais zvans"
     },
     "publications": {
       "subtitle": "Vienots redakcionālais centrs visiem publicētajiem video: plānoti pasākumi, ātrie zvani, augšupielādēti vēsturiski arhīvi un sesijas, kas gaida publicēšanu.",
@@ -2315,7 +2302,9 @@
         "waitingRoomEngineGame": "Videospēle (Phaser vestibils)",
         "waitingRoomEngineClassic": "Klasiskā (statiskā)",
         "waitingRoomEngineHelp": "Uzgaidāmās telpas noklusējuma režīms. To var mainīt atsevišķam pasākumam un vienam apmeklējumam — ar parametru {param} adresē.",
-        "primaryColorHex": "Galvenā krāsa (heksadecimālais kods)"
+        "primaryColorHex": "Galvenā krāsa (heksadecimālais kods)",
+        "organizationLogoUrl": "Iestādes logotips",
+        "organizationLogoUrlHelp": "Tiek rādīts kājenē blakus pakalpojumu nodrošinošās iestādes nosaukumam. Atstājiet tukšu, lai rādītu tikai nosaukumu."
       },
       "watermark": {
         "title": "Video pielāgošana",
@@ -2541,7 +2530,7 @@
     },
     "recurrence": {
       "label": "Atkārtošanās",
-      "helpText": "Ja pasākums atkārtojas, to dublējot, kopija piedāvā nākamās reizes datumu.",
+      "helpText": "Atkārtošana pati neizveido nākamās reizes: kad dublējat pasākumu, kopijai jau ir nākamās reizes datums.",
       "preset": {
         "none": "Neatkārtojas",
         "daily": "Katru dienu",
@@ -3004,7 +2993,15 @@
       "postEventSummary": "{connected} pievienojušies · {registered} reģistrēti",
       "registeredCount": "{count, plural, =0 {Nav reģistrāciju} one {1 reģistrācija} other {# reģistrācijas}}",
       "sortUpcoming": "Gaidāmie vispirms",
-      "todayTitle": "Šodien un notiek"
+      "todayTitle": "Šodien un notiek",
+      "viewLabel": "Skats",
+      "viewList": "Saraksts",
+      "viewCalendar": "Kalendārs",
+      "type": "Veids",
+      "typeAll": "Visi veidi",
+      "typeScheduled": "Pasākumi",
+      "typeInstant": "Ātrie zvani",
+      "instantFullList": "Pilns ātro zvanu saraksts ar filtriem pēc datuma un ieraksta"
     },
     "tags": {
       "subtitle": "Izveidojiet, rediģējiet un dzēsiet tagus, ko izmanto publisko pasākumu klasificēšanai un filtrēšanai.",
@@ -3044,7 +3041,6 @@
       "copyPublicUrl": "Kopēt publisko saiti",
       "copyInviteUrl": "Kopēt ielūguma saiti",
       "enterAsParticipant": "Pievienoties kā dalībnieks",
-      "openAsParticipant": "Atvērt kā dalībnieks",
       "participantHintRoom": "Atveras jaunā cilnē: telpa tāda, kādu to redz viesis, bez moderatora tiesībām.",
       "participantHintPassword": "Atveras jaunā cilnē: telpa tāda, kādu to redz viesis, pēc pasākuma paroles.",
       "participantHintPage": "Atveras jaunā cilnē: publiskā lapa tāda, kādu to redz dalībnieki.",
@@ -3137,7 +3133,8 @@
         "recordingRetention": "Ieraksta automātiska dzēšana",
         "recordingRetentionNone": "Nav",
         "recordingRetentionDays": "{days, plural, zero {# dienas} one {# dienu} other {# dienas}} pēc pasākuma beigām vai, ja publicēts, pēc publicēšanas"
-      }
+      },
+      "openPublicPage": "Atvērt publisko lapu"
     },
     "rubrica": {
       "subtitle": "Personas, kas devušas piekrišanu iekļaušanai kontaktu grāmatā (VDAR 6.1.a pants). Vārds, e-pasts un organizācija tiek atjaunināti tikai tad, kad persona atkārtoti atzīmē izvēles rūtiņu.",
@@ -3797,9 +3794,6 @@
         "invitationDesc": "Lapa paliek redzama, bet reģistrēties var tikai sarakstā esošie; ielūgumu ar reģistrācijas saiti sūtāt pa e-pastu no pasākuma lapas"
       },
       "previewInvitation": "Reģistrējas tikai uzaicinātie; bez reģistrācijas neviens netiek iekšā.",
-      "previewPseudonyms": "Auditorija ir redzama ar pseidonīmu",
-      "previewNicknames": "Dalībnieki var izmantot segvārdu",
-      "previewRealNames": "Auditorija ir redzama ar saviem vārdiem",
       "templateReplaces": "Veidne atnes savus iestatījumus zemāk esošo atbilžu vietā. Nosaukumu, datumus un personas ierakstāt nākamajos soļos.",
       "instantBack": "Tā vietā izveidot plānotu pasākumu"
     },
@@ -4347,7 +4341,8 @@
         "noInstall": "No pārlūkprogrammas, bez instalēšanas",
         "interactive": "Tiešraides Q&A un aptaujas",
         "recordings": "Ieraksti un subtitri",
-        "accessible": "Pieejams 24 valodās"
+        "languagesAll": "24 ES valodās",
+        "languagesSome": "Vairākās valodās"
       }
     },
     "upcoming": {
@@ -5523,22 +5518,18 @@
   "footer": {
     "privacy": "Privātuma politika",
     "accessibility": "Pieejamības paziņojums",
-    "openSource": "Atvērtā pirmkoda programmatūra",
-    "contacts": "Kontakti",
     "legalNotes": "Juridiskās piezīmes",
-    "governmentSite": "Itālijas valdība",
     "systemStatus": "Sistēmas statuss",
-    "sbomLatest": "Jaunākā laidiena SBOM",
     "transparency": "Drošība un pārredzamība",
     "serviceInventory": "Pakalpojumu inventārs",
-    "sourceCode": "Avota kods",
-    "viewRelease": "Skatīt laidienu GitHub",
     "viewChangelog": "Skatīt jaunumus (izmaiņu žurnālu)",
     "newWindow": "atveras jaunā logā",
     "usefulLinks": "Noderīgas saites",
     "version": "Versija {version}",
     "versionDev": "Izstrādes versija",
-    "updatedOn": "atjaunināta {date}"
+    "updatedOn": "atjaunināta {date}",
+    "projectOf": "Projektu īsteno",
+    "contactsLine": "Kontakti: <link>{email}</link>"
   },
   "changelog": {
     "metaTitle": "Jaunumi un izmaiņu žurnāls",

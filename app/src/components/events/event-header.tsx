@@ -42,8 +42,11 @@ interface EventHeaderProps {
   parseTitleKicker: boolean;
   imageUrl: string | null | undefined;
   tags: TagChip[];
-  startsAt: Date;
-  endsAt: Date;
+  /** Assenti solo nell'anteprima del wizard, finche' la data non c'e':
+   *  allora la riga della data non si mostra (un orario d'esempio
+   *  sembrerebbe gia' impostato). */
+  startsAt: Date | null;
+  endsAt: Date | null;
   /** Lo stato come lo vede il pubblico (PUBLISHED, LIVE, ENDED…). */
   publicStatus: string;
   isLive: boolean;
@@ -109,7 +112,7 @@ export default function EventHeader({
   const format = useFormatter();
   const locale = useLocale();
   const durata = useDurataTesto();
-  const durataTesto = durata(startsAt, endsAt);
+  const durataTesto = startsAt && endsAt ? durata(startsAt, endsAt) : null;
   const accentColor = STATUS_COLOR[publicStatus] ?? STATUS_COLOR.PUBLISHED;
 
   return (
@@ -210,43 +213,45 @@ export default function EventHeader({
           )}
 
           <Row className="g-3 g-lg-4">
-            <Col xs={12} md="auto">
-              <div className="d-flex align-items-center">
-                <div
-                  className="rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0"
-                  style={{
-                    width: 44,
-                    height: 44,
-                    backgroundColor: 'rgba(0,102,204,0.1)',
-                  }}
-                >
-                  <Icon icon="it-calendar" className="text-primary" />
-                </div>
-                <div>
-                  <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
-                    {format.dateTime(startsAt, {
-                      weekday: 'long',
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric',
-                    })}
+            {startsAt && endsAt && (
+              <Col xs={12} md="auto">
+                <div className="d-flex align-items-center">
+                  <div
+                    className="rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0"
+                    style={{
+                      width: 44,
+                      height: 44,
+                      backgroundColor: 'rgba(0,102,204,0.1)',
+                    }}
+                  >
+                    <Icon icon="it-calendar" className="text-primary" />
                   </div>
-                  <div className="text-muted" style={{ fontSize: '0.9rem' }}>
-                    {format.dateTime(startsAt, {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                    {' – '}
-                    {format.dateTime(endsAt, {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                    {' · '}
-                    {durataTesto}
+                  <div>
+                    <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
+                      {format.dateTime(startsAt, {
+                        weekday: 'long',
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                      })}
+                    </div>
+                    <div className="text-muted" style={{ fontSize: '0.9rem' }}>
+                      {format.dateTime(startsAt, {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                      {' – '}
+                      {format.dateTime(endsAt, {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                      {' · '}
+                      {durataTesto}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Col>
+              </Col>
+            )}
             {/* I campi di testo libero restano per gli eventi che non hanno
                 persone o enti strutturati. */}
             {speakers && (

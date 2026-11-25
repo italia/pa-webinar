@@ -126,8 +126,9 @@ The guard table and the request flow are in
 | See the recordings of their own events and run AI post-production on them, including naming transcript speaker labels | See sign-ups, questionnaire responses or feedback across all events, instance analytics or the GDPR log |
 | Read the shared tag and question libraries to compose their own events | Use the publications library, the orphaned recording files, the **Moderators** directory or staff accounts. They cannot rotate a moderator link, even for their own events |
 
-The organizer's menu shows **Events** (**All events**, **New event**, **Instant calls**,
-**Event calendar**) and **Video** (**Recordings**, **AI post-production**, **Glossary**).
+The organizer's menu shows **Events** (**All events**, with its calendar view and its filter for
+instant calls, and **New event** and **New quick call** as actions) and **Video** (**Recordings**,
+**AI post-production**, **Glossary**).
 
 ### Deactivation and deletion
 

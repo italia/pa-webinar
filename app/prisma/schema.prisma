@@ -1509,6 +1509,9 @@ model SiteSetting {
   // si scrive nulla.
   siteTagline           Json    @default("{}") @map("site_tagline") @db.JsonB
   logoUrl               String? @map("logo_url")
+  // Il logo dell'ente che porta il servizio: il pie' di pagina lo mostra nella
+  // fascia «<servizio> e' un progetto di <ente>». Vuoto: solo il nome.
+  organizationLogoUrl   String? @map("organization_logo_url")
   faviconUrl            String? @map("favicon_url")
   primaryColor          String  @default("#0066CC") @map("primary_color")
 

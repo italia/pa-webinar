@@ -692,7 +692,7 @@ Compose stack.
   event's format; an installation that can record adds a fourth (**Start from a template**, next to the heading, offers the
   saved templates). The wizard then has six steps, **Event**, **When**,
   **People**, **Programme** (optional), **Permissions** and **Summary**, with
-  **Advanced settings** apart. Publishing needs the lead
+  **Additional settings** apart. Publishing needs the lead
   moderator's name and email, entered in **People**, used for the moderator
   link and the confirmation email; like every email of this setup, it lands
   in Mailpit. After **Publish event**, or **Save as draft**, the wizard lands
@@ -700,7 +700,7 @@ Compose stack.
   **Event links**: the **Public event page**, the
   **Direct invite (no registration)** and the **Management link (moderator)**. The
   default templates carry Italian names and descriptions in every language.
-- **An instant call.** **Instant calls** > **New call** creates a call that is
+- **An instant call.** **Events** > **New quick call** creates a call that is
   live at once, with no public page. **Create and join** opens its page:
   **Join as moderator**, type your name and press **Enter now**.
   **Copy invite link** gives the link for guests.
@@ -746,7 +746,7 @@ on the conference host first.
   arrived after 20 s.
 - **Guests.** Open the **Direct invite (no registration)** link of a live
   event, or the **Copy invite link** of an instant call, in another profile.
-  Guests join without registering while the event is live.
+  Guests join without registering once the event's waiting room opens.
 
 The **Invitations** list in the wizard sends nothing. It decides who may
 register when the event is open only to invitees, and you share the event

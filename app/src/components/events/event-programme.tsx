@@ -35,7 +35,8 @@ import {
 
 interface Props {
   items: VoceProgramma[];
-  startsAt: Date;
+  /** Assente in anteprima, finche' l'evento non ha una data: niente orari. */
+  startsAt: Date | null;
   /** L'evento e' in diretta: l'argomento in corso si mostra come tale. */
   live?: boolean;
   /** Dopo l'evento: il minuto del video di ogni argomento (lib/replay/moments). */

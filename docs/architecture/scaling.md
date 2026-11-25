@@ -325,7 +325,7 @@ flowchart TB
 
 ## The capacity estimate in the wizard and on the event page
 
-The event wizard (**Advanced settings**, **Technical details**), its
+The event wizard (**Additional settings**, **Technical details**), its
 summary step and the event page show a second estimate, made for the
 organizer rather than for the scaler: how much one event weighs on one
 bridge and on the network. It is a pure model in

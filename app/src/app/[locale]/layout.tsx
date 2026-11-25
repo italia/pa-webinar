@@ -14,7 +14,6 @@ import { Skiplink } from '@/components/layout/skiplinks';
 import PAHeader from '@/components/layout/pa-header';
 import PAFooter from '@/components/layout/pa-footer';
 import BackToTop from '@/components/layout/back-to-top';
-import { serviceInventoryUrl } from '@/lib/service-inventory-url';
 import { staffPerIntestazione } from '@/lib/auth/staff-session';
 import { getSettings } from '@/lib/settings';
 import { publicSettings } from '@/lib/settings/public-projection';
@@ -103,7 +102,7 @@ export default async function LocaleLayout({
             <main id="main-content" className="flex-grow-1" tabIndex={-1}>
               {children}
             </main>
-            <PAFooter inventarioPubblicato={serviceInventoryUrl() !== null} />
+            <PAFooter />
             <BackToTop />
           </SettingsProvider>
         </NextIntlClientProvider>

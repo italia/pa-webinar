@@ -1372,3 +1372,23 @@ describe('sala d\'attesa — nickname', () => {
     expect(window.sessionStorage.getItem('pa-nickname:ev-1')).toBeNull();
   });
 });
+
+describe('sala d\'attesa — la chat prima della diretta', () => {
+  const inAccensione: Evento = {
+    ...eventoLive,
+    status: 'PROVISIONING',
+    startsAt: oraPiu(10),
+    endsAt: oraPiu(70),
+    chatEnabled: true,
+  };
+
+  it('l\'ospite di un evento a calendario la legge mentre la sala si accende', () => {
+    render({ event: inAccensione, jvbReady: false });
+    expect($('.wr-chat')).not.toBeNull();
+  });
+
+  it('con la chat spenta dall\'evento non compare', () => {
+    render({ event: { ...inAccensione, chatEnabled: false }, jvbReady: false });
+    expect($('.wr-chat')).toBeNull();
+  });
+});

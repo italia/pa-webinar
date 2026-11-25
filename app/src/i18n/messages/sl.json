@@ -212,7 +212,8 @@
       "recordingLinkSend": "Pošlji mi povezavo znova",
       "recordingLinkSent": "Če je naslov prijavljen na dogodek, boste kmalu prejeli e-pošto z osebno povezavo.",
       "recordingLinkError": "Zahteva ni uspela. Poskusite znova čez nekaj minut.",
-      "registerOrGuest": "Če se prijavite, po e-pošti prejmete svojo osebno povezavo in novice o dogodku. Kot gost vstopite takoj samo z imenom, le med dogodkom v živo, in ne prejemate e-pošte."
+      "registerOrGuest": "Če se prijavite, po e-pošti prejmete svojo osebno povezavo in novice o dogodku. Kot gost vstopite takoj samo z imenom in ne prejemate e-pošte.",
+      "guestWhenRoomOpens": "Na dan dogodka, ko se odpre čakalnica, se lahko pridružite tudi brez prijave, samo z imenom."
     },
     "manage": {
       "toggleChat": "Klepet",
@@ -661,7 +662,6 @@
     },
     "notOpenNow": "Soba trenutno ni odprta.",
     "nameRequired": "Manjka ime, s katerim boste vstopili: vrnite se in ga vpišite.",
-    "closeSidebar": "Zapri stransko ploščo",
     "contentOnly": "Samo vsebina, brez klepeta in plošč",
     "showPanels": "Prikaži klepet in plošče",
     "confirmFullscreen": "Preklopi na celozaslonski način",
@@ -1012,11 +1012,10 @@
           "BALANCED": "Uravnotežena (540p)",
           "SAVE_DATA": "Varčevanje s podatki (360p)"
         },
-        "kickerHint": "Za nadnaslov ga napišite pred naslov in ju ločite z |, na primer »Cikel srečanj | Prvo srečanje«.",
-        "kickerUse": "Prikaži »{kicker}« kot nadnaslov",
-        "kickerPreview": "Tako je videti na strani dogodka",
+        "kickerHint": "Neobvezno: kratka vrstica nad naslovom, na primer ime cikla srečanj.",
         "coverImageSize": "16:9, priporočeno 1600 × 900 slikovnih pik.",
-        "requiredNote": "Polja, označena z *, so obvezna."
+        "requiredNote": "Polja, označena z *, so obvezna.",
+        "kickerLabel": "Nadnaslov ({language})"
       },
       "step2": {
         "heading": "Kdo lahko kaj počne",
@@ -1097,11 +1096,6 @@
         "recordingDestinationRequired": "Izberite, komu je posnetek namenjen.",
         "audienceAnonymous": "Anonimno občinstvo",
         "audienceAnonymousDesc": "Udeleženci so drugim vidni pod psevdonimom (»Udeleženec« in koda) v videu, klepetu in vprašanjih; seznam udeležencev ostane voditeljem, trga ni. Uporabno za velike dogodke; na dogodkih skupnosti se ljudje želijo spoznati.",
-        "audienceAnonymousLocked": "Dokler je soba lahko odprta, se ne da spremeniti: povezalo bi psevdonime z imeni.",
-        "participantListVisible": "Pokaži občinstvu seznam udeležencev",
-        "participantListVisibleDesc": "Izklopljeno: seznam, mreža in imena na trgu ostanejo voditeljem in govorcem; občinstvo vidi samo tistega, ki govori. Vklopljeno: vsi vidijo, kdo je v dvorani.",
-        "participantListAnonymous": "Pri anonimnem občinstvu seznam ostane skrit.",
-        "participantListLocked": "Ko je dvorana odprta, tega ni mogoče spremeniti: tisti, ki so že v njej, spremembe ne bi videli.",
         "nicknamesEnabled": "Vzdevki za udeležence",
         "nicknamesEnabledDesc": "Udeleženci lahko izberejo vzdevek: drugi ga vidijo namesto imena v videu, v klepetu, pri vprašanjih in v prepisu. Organizatorji in moderatorji vidijo, kdo je za njim. Kdor vodi, ostane s svojim imenom. Privzeto je vklopljeno tam, kjer je seznam udeležencev skrit.",
         "nicknamesLocked": "Ko je soba odprta, se tega ne da spremeniti: kdor je že notri, je izbiral po prejšnjem pravilu.",
@@ -1110,7 +1104,13 @@
         "hostsAlwaysRecorded": "Voditelji so vedno v posnetku",
         "hostsAlwaysRecordedDesc": "Moderatorji in govorci so v videu z imenom in sliko, brez potrditvenega polja: obvestilo o zasebnosti dogodka mora to navesti. Od udeležencev se snema samo glas in samo z njihovo privolitvijo.",
         "hostsAlwaysRecordedDescHostsOnly": "Moderatorji in govorci so v videu z imenom in sliko, brez potrditvenega polja: obvestilo o zasebnosti dogodka mora to navesti. Udeleženci se v videu nikoli ne vidijo in ne slišijo.",
-        "hostsAlwaysRecordedDescVisible": "Moderatorji in govorci so v videu z imenom in sliko, brez potrditvenega polja: obvestilo o zasebnosti dogodka mora to navesti. Ta namestitev ne more obdržati udeležencev zunaj videa: kdor privoli, govori z imenom, glasom in sliko, ime vsakogar, ki spremlja, pa se lahko pojavi, tudi če ne spregovori."
+        "hostsAlwaysRecordedDescVisible": "Moderatorji in govorci so v videu z imenom in sliko, brez potrditvenega polja: obvestilo o zasebnosti dogodka mora to navesti. Ta namestitev ne more obdržati udeležencev zunaj videa: kdor privoli, govori z imenom, glasom in sliko, ime vsakogar, ki spremlja, pa se lahko pojavi, tudi če ne spregovori.",
+        "audienceHeading": "Kako so prikazani udeleženci",
+        "audienceOptionList": "Z imenom, vidno vsem",
+        "audienceOptionListDesc": "Seznam udeležencev, video mreža in imena na trgu so vidni vsem.",
+        "audienceOptionHosts": "Z imenom, vidno samo voditeljem",
+        "audienceOptionHostsDesc": "Občinstvo vidi samo tistega, ki govori; seznam, mreža in imena na trgu ostanejo voditeljem in govorcem.",
+        "audienceLocked": "Ko je dvorana odprta, tega ni mogoče spremeniti."
       },
       "step3": {
         "heading": "Osebe in vabila",
@@ -1142,7 +1142,7 @@
         "personName": "Ime",
         "personEmail": "E-pošta",
         "peopleHeading": "Moderatorji in govorniki",
-        "peopleHelp": "Soorganizatorji, moderatorji in govorniki. Vsak prejme svojo povezavo za vstop s svojo vlogo; kaj zmore posamezna vloga, je razloženo zgoraj.",
+        "peopleHelp": "Soorganizatorji, moderatorji in govorniki: vsak prejme svojo povezavo za vstop s svojo vlogo.",
         "personRole": "Vloga",
         "roleOrganizer": "Soorganizator",
         "roleModerator": "Moderator",
@@ -1201,7 +1201,7 @@
         "invitationsHelpRestricted": "Prijavijo se lahko le naslovi s tega seznama. Po objavi vsakemu s strani dogodka pošljete povabilo po e-pošti s povezavo za prijavo; povezava za vstop pride po prijavi.",
         "logoExternal": "Javna stran prikazuje samo logotipe, naložene na to platformo: logotip z drugega spletnega mesta ne bo prikazan.",
         "primaryProfileInvalid": "Preverite organizacijo in naslov logotipa.",
-        "primaryMore": "Fotografija, ustanova, logotip in javna stran",
+        "primaryMore": "Fotografija, ustanova in logotip",
         "accessHeading": "Kdo se prijavi",
         "accessSiteDefault": "Sledi nastavitvi spletnega mesta: če jo uprava spremeni, velja tudi za ta dogodek.",
         "accessNoInvitees": "Še ni povabljenih: dokler je spodnji seznam prazen, se nihče ne more prijaviti.",
@@ -1348,7 +1348,7 @@
           "invites": "Osebe",
           "programme": "Program",
           "review": "Povzetek",
-          "advanced": "Napredne nastavitve",
+          "advanced": "Dodatne nastavitve",
           "permissions": "Dovoljenja"
         },
         "templateInUse": "Predloga: <b>{name}</b>",
@@ -1367,7 +1367,6 @@
         "scheduleIntro": "Kdaj bo dogodek: datum, ura in časovni pas.",
         "advancedIntro": "Vrednosti, ki jih je predloga že izbrala: spremenite le, kar je treba.",
         "advancedIntroTemplate": "Vrednosti, ki jih je predloga »{name}« že izbrala: spremenite le, kar je treba.",
-        "requiredToPublish": "Potrebno za objavo dogodka.",
         "toComplete": "Za dopolnitev",
         "missingHeading": "Za objavo še manjka:",
         "fieldOrganizerName": "Ime glavnega moderatorja",
@@ -1384,9 +1383,7 @@
         "changeFormat": "Spremeni obliko",
         "voiceAll": "Vsi govorijo in se kažejo na videu",
         "voiceSpeakers": "Govorijo in se kažejo na videu govorci in moderatorji; občinstvo piše v klepet",
-        "features": "Funkcije: {list}",
         "liveToggleNote": "Vsako funkcijo lahko vklopite in izklopite tudi med dogodkom.",
-        "customize": "Prilagodi nastavitve",
         "changeLanguages": "Spremeni jezike",
         "translationLine": "Prevod v: {list}",
         "privacyTemplate": "Obvestilo o zasebnosti: {name}",
@@ -1423,7 +1420,6 @@
         "audienceRealNames": "Imena občinstva: prava imena.",
         "postEventQaHidden": "Vprašanja po dogodku: niso objavljena.",
         "postEventQaTextOnly": "Vprašanja po dogodku: samo besedilo, brez imena.",
-        "addressBookOffered": "Imenik: predlagan osebam, ki se prijavijo.",
         "addressBookNotOffered": "Imenik: ni predlagan.",
         "consentRecordingOptional": "snemanje, neobvezno",
         "consentRecordingVoice": "snemanje, prosto (brez privolitve oseba ostane zunaj posnetka)",
@@ -1433,7 +1429,6 @@
         "title": "Predogled strani",
         "open": "Odpri predogled",
         "note": "Tako je videti stran dogodka; posodablja se med pisanjem.",
-        "noteNoDate": "Tako je videti stran dogodka; dokler datum ni določen, je ura le primer.",
         "titlePlaceholder": "Naslov dogodka",
         "descriptionPlaceholder": "Tukaj se bo prikazal opis."
       },
@@ -1464,26 +1459,18 @@
         "notPublic": "Ime {name} ni prikazano na javni strani: v programu je vidna samo tema.",
         "makePublic": "Prikaži ime na strani",
         "madePublic": "Ime {name} je zdaj prikazano na javni strani.",
-        "cardTitle": "Program",
-        "cardEmpty": "Teme, s tem, kdo govori in ob kateri uri, se prikažejo tukaj pod opisom na strani dogodka.",
-        "cardPrepare": "Pripravi program",
-        "cardSummary": "{count, plural, one {# tema} two {# temi} few {# teme} other {# tem}}",
-        "cardSummaryWithTimes": "{count, plural, one {# tema} two {# temi} few {# teme} other {# tem}} · {start}–{end}",
-        "cardOff": "Izklopljeno: ni prikazano na strani.",
-        "cardChange": "Spremeni program",
         "descriptionHasProgramme": "Zdi se, da opis vsebuje program. V koraku »Program« ima ure in osebe, v sobi pa je vidna trenutna tema.",
         "goToProgramme": "Pojdi na program",
-        "peoplePointer": "Nastope posameznih oseb pripravite v naslednjem koraku, »Program«.",
         "reviewEmpty": "Program: ni tem",
         "reviewPrepare": "Pripravi",
         "reviewOff": "Program: izklopljen, ni prikazan na strani ({count, plural, one {# tema} two {# temi} few {# teme} other {# tem}})",
         "previewPlaceholder": "Tukaj se prikaže program",
-        "toggleLink": "Pripravi program",
         "toggleOffWarning": "Izklopljen program ({count, plural, one {# tema} two {# temi} few {# teme} other {# tem}}) ni prikazan na strani: velja nazadnje shranjena različica, spremembe, narejene tukaj, pa se shranijo le, če ga znova vklopite.",
         "offKeptCreate": "Dokler je program izklopljen, se njegove teme ne shranijo z dogodkom: vklopite ga, da jih ohranite in spremenite.",
         "offKeptEdit": "Dokler je program izklopljen, velja nazadnje shranjena različica: spremembe, narejene tukaj, se shranijo le, če ga znova vklopite.",
         "toggleOffWarningCreate": "Izklopljen program ({count, plural, one {# tema} two {# temi} few {# teme} other {# tem}}) ni prikazan na strani in se ne shrani z dogodkom: vklopite ga, da ga ohranite.",
-        "reviewOffCreate": "Program: izklopljen, ne shrani se z dogodkom ({count, plural, one {# tema} two {# temi} few {# teme} other {# tem}})"
+        "reviewOffCreate": "Program: izklopljen, ne shrani se z dogodkom ({count, plural, one {# tema} two {# temi} few {# teme} other {# tem}})",
+        "showToParticipants": "Pokaži program udeležencem"
       },
       "saveCopy": "Shrani kopijo",
       "consentMap": {
@@ -1522,7 +1509,6 @@
       "settings": "Nastavitve",
       "eventsList": "Vsi dogodki",
       "newEvent": "Nov dogodek",
-      "calendar": "Koledar dogodkov",
       "templates": "Predloge dogodkov",
       "analytics": "Statistika",
       "instantCalls": "Hitri klici",
@@ -1563,7 +1549,8 @@
       "openMenu": "Odpri meni",
       "closeMenu": "Zapri meni",
       "recordingRemovals": "Zahteve za odstranitev",
-      "recordingRemovalDetail": "Zahteva za odstranitev"
+      "recordingRemovalDetail": "Zahteva za odstranitev",
+      "newInstantCall": "Nov hitri klic"
     },
     "publications": {
       "subtitle": "Enotno uredniško središče za vse objavljene videe: načrtovani dogodki, hitri klici, naloženi zgodovinski arhivi in seje, ki čakajo na promocijo.",
@@ -2315,7 +2302,9 @@
         "waitingRoomEngineGame": "Videoigra (lobi Phaser)",
         "waitingRoomEngineClassic": "Klasična (statična)",
         "waitingRoomEngineHelp": "Privzeti način čakalnice. Spremeniti ga je mogoče za posamezen dogodek, za en obisk pa s parametrom {param} v naslovu.",
-        "primaryColorHex": "Primarna barva (šestnajstiška koda)"
+        "primaryColorHex": "Primarna barva (šestnajstiška koda)",
+        "organizationLogoUrl": "Logotip ustanove",
+        "organizationLogoUrlHelp": "Prikaže se v nogi strani ob imenu ustanove, ki upravlja storitev. Pustite prazno, da se prikaže samo ime."
       },
       "watermark": {
         "title": "Prilagoditev videa",
@@ -2541,7 +2530,7 @@
     },
     "recurrence": {
       "label": "Ponovitev",
-      "helpText": "Če se dogodek ponavlja, kopija pri podvajanju predlaga datum naslednje izvedbe.",
+      "helpText": "Ponavljanje samo ne ustvari naslednjih izvedb: ko dogodek podvojite, ima kopija že datum naslednje.",
       "preset": {
         "none": "Se ne ponavlja",
         "daily": "Vsak dan",
@@ -3004,7 +2993,15 @@
       "postEventSummary": "{connected} povezanih · {registered} prijav",
       "registeredCount": "{count, plural, =0 {Brez prijav} one {1 prijava} two {# prijavi} few {# prijave} other {# prijav}}",
       "sortUpcoming": "Najprej prihajajoči",
-      "todayTitle": "Danes in v teku"
+      "todayTitle": "Danes in v teku",
+      "viewLabel": "Pogled",
+      "viewList": "Seznam",
+      "viewCalendar": "Koledar",
+      "type": "Vrsta",
+      "typeAll": "Vse vrste",
+      "typeScheduled": "Dogodki",
+      "typeInstant": "Hitri klici",
+      "instantFullList": "Celoten seznam hitrih klicev, s filtri po datumu in posnetku"
     },
     "tags": {
       "subtitle": "Ustvarite, urejajte in izbrišite oznake za razvrščanje in filtriranje javnih dogodkov.",
@@ -3044,7 +3041,6 @@
       "copyPublicUrl": "Kopiraj javno povezavo",
       "copyInviteUrl": "Kopiraj povezavo za povabilo",
       "enterAsParticipant": "Vstopi kot udeleženec",
-      "openAsParticipant": "Odpri kot udeleženec",
       "participantHintRoom": "Odpre se v novem zavihku: soba, kot jo vidi gost, brez moderatorskih pooblastil.",
       "participantHintPassword": "Odpre se v novem zavihku: soba, kot jo vidi gost, po vnosu gesla dogodka.",
       "participantHintPage": "Odpre se v novem zavihku: javna stran, kot jo vidijo udeleženci.",
@@ -3137,7 +3133,8 @@
         "recordingRetention": "Samodejno brisanje posnetka",
         "recordingRetentionNone": "Brez",
         "recordingRetentionDays": "{days, plural, one {# dan} two {# dneva} few {# dni} other {# dni}} po koncu dogodka ali, če je objavljen, po objavi"
-      }
+      },
+      "openPublicPage": "Odpri javno stran"
     },
     "rubrica": {
       "subtitle": "Osebe, ki so privolile v vključitev v imenik (čl. 6.1.a GDPR). Ime, e-poštni naslov in organizacija se posodobijo samo, ko oseba znova označi polje.",
@@ -3797,9 +3794,6 @@
         "invitationDesc": "Stran ostane vidna, prijavijo pa se lahko le osebe s seznama; povabilo s povezavo za prijavo pošljete po e-pošti s strani dogodka"
       },
       "previewInvitation": "Prijavijo se le povabljeni; brez prijave ni vstopa.",
-      "previewPseudonyms": "Občinstvo je prikazano pod psevdonimom",
-      "previewNicknames": "Udeleženci lahko uporabljajo vzdevek",
-      "previewRealNames": "Občinstvo je prikazano s svojimi imeni",
       "templateReplaces": "Predloga prinese svoje nastavitve namesto spodnjih odgovorov. Naslov, datume in osebe vpišete v naslednjih korakih.",
       "instantBack": "Namesto tega ustvari načrtovan dogodek"
     },
@@ -4347,7 +4341,8 @@
         "noInstall": "Iz brskalnika, brez nameščanja",
         "interactive": "Q&A in ankete v živo",
         "recordings": "Posnetki in podnapisi",
-        "accessible": "Dostopno, v 24 jezikih"
+        "languagesAll": "V 24 jezikih EU",
+        "languagesSome": "V več jezikih"
       }
     },
     "upcoming": {
@@ -5523,22 +5518,18 @@
   "footer": {
     "privacy": "Politika zasebnosti",
     "accessibility": "Izjava o dostopnosti",
-    "openSource": "Odprtokodna programska oprema",
-    "contacts": "Kontakti",
     "legalNotes": "Pravna obvestila",
-    "governmentSite": "Italijanska vlada",
     "systemStatus": "Stanje sistema",
-    "sbomLatest": "SBOM najnovejše izdaje",
     "transparency": "Varnost in preglednost",
     "serviceInventory": "Inventar storitev",
-    "sourceCode": "Izvorna koda",
-    "viewRelease": "Oglejte si izdajo na GitHubu",
     "viewChangelog": "Oglejte si novosti (dnevnik sprememb)",
     "newWindow": "odpre se v novem oknu",
     "usefulLinks": "Uporabne povezave",
     "version": "Različica {version}",
     "versionDev": "Razvojna različica",
-    "updatedOn": "posodobljeno {date}"
+    "updatedOn": "posodobljeno {date}",
+    "projectOf": "Projekt izvaja",
+    "contactsLine": "Kontakti: <link>{email}</link>"
   },
   "changelog": {
     "metaTitle": "Novosti in dnevnik sprememb",

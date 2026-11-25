@@ -1,4 +1,18 @@
 {
+  "0.14.0": {
+    "title": "Sala nuova, sottotitoli in diretta, consensi separati",
+    "notes": [
+      "Sottotitoli in tempo reale con il nome di chi parla, generati dall'installazione senza GPU e senza servizi esterni. Un evento può conservarne la trascrizione, con le sole frasi di chi ha acconsentito.",
+      "Registrazione, trascrizione e rubrica hanno consensi separati, facoltativi e mai già spuntati. Chi nega la registrazione partecipa e ne resta fuori, e ogni consenso si ritira da «I miei dati». Prima dell'evento si dichiara se il video sarà riservato o pubblico, e una scheda spiega cosa succede ai dati.",
+      "Nel video registrato compare solo chi conduce: di chi partecipa, con il consenso, entra la voce. Lo staff può togliere una persona da un video già registrato, ogni evento sceglie per quanto tenere la registrazione e chi era in una chiamata rapida può rivederla.",
+      "Sala ridisegnata: pannelli richiudibili, Regia per chi conduce, «Dai la parola», PDF presentati senza condividere lo schermo, timer degli interventi, codice QR dei link. Il blocco di microfoni e videocamere vale davvero, anche sul ponte video, e la sala d'attesa ha un'altra veste, piazza compresa.",
+      "Chi partecipa può comparire con un nickname o uno pseudonimo, dove l'evento lo prevede, e negli eventi numerosi o in cui il pubblico ascolta l'elenco dei partecipanti è nascosto. Dall'apertura della sala d'attesa si entra anche senza iscriversi, se l'amministrazione lo consente.",
+      "Creare un evento è più semplice: poche domande scelgono i valori di partenza, il programma si prepara prima, gli inviti partono per email, e un evento può essere riservato agli invitati. Titolo e descrizione si traducono nelle lingue scelte, su CPU, dove l'installazione lo prevede.",
+      "Dopo l'evento la pagina mette in testa il video con le sue lingue, le slide sincronizzate e il programma come indice. Su richiesta dello staff c'è un resoconto con l'intelligenza artificiale, un glossario guida trascrizioni e traduzioni, e «Chiudi l'evento» dice cosa resta da fare.",
+      "Intestazione, menu e amministrazione seguono i modelli di Designers Italia. Più controlli automatici di accessibilità, correzioni di sicurezza, librerie aggiornate e Next.js 15.5.29.",
+      "Per chi aggiorna: i componenti Jitsi passano alla stable-11031 e il chart si ferma se una parte è fissata a un'altra versione; va tolto `jitsi-meet.jibri.custom.other._finalize_sh`; chi sostituisce la configurazione di Jitsi aggiunga `config.hiddenFromRecorderFeatureEnabled = true`; Prosody si riavvia; i sottotitoli sono accesi di serie (`global.captions.enabled`)."
+    ]
+  },
   "0.13.0": {
     "title": "Privacy più completa e trascrizioni degli eventi lunghi",
     "notes": [

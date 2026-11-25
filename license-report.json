@@ -593,7 +593,7 @@
     "licenses": "MIT",
     "repository": "https://github.com/Brooooooklyn/canvas"
   },
-  "@next/env@15.5.28": {
+  "@next/env@15.5.29": {
     "licenses": "MIT",
     "repository": "https://github.com/vercel/next.js",
     "publisher": "Next.js Team",
@@ -2630,7 +2630,7 @@
     "publisher": "Jan Amann",
     "email": "jan@amann.work"
   },
-  "next@15.5.28": {
+  "next@15.5.29": {
     "licenses": "MIT",
     "repository": "https://github.com/vercel/next.js"
   },

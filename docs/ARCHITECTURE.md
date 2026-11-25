@@ -24,7 +24,7 @@ flowchart LR
   subgraph ROOM["In the event"]
     direction TB
     PA(["Participant<br/>registered, personal link"]):::person
-    GU(["Guest<br/>name only, joins while LIVE"]):::person
+    GU(["Guest<br/>name only, from the waiting room"]):::person
     MO(["Moderator or speaker<br/>magic link"]):::person
   end
   style ROOM fill:#F7F9FB,stroke:#5C6F82,color:#17324D
@@ -68,7 +68,7 @@ flowchart LR
 | Actor | How they get in | What they reach |
 |---|---|---|
 | Participant | The personal link sent after registration | The waiting room and live room of one event, then its recap |
-| Guest | Their typed name, while the event is `LIVE`, after the event's join password if one is set. Scheduled events admit guests only while the site setting **Guest access enabled** is on (the default), and never when the event is open only to invitees. Instant calls always admit them, and guests can wait there from `PROVISIONING` | The live room of one event |
+| Guest | Their typed name, after the event's join password if one is set. They wait in the waiting room from the moment it opens (`PROVISIONING`, `LIVE` or `IDLE`) and enter the conference once the event is `LIVE`. Scheduled events admit guests only while the site setting **Guest access enabled** is on (the default), and never when the event is open only to invitees. Instant calls always admit them | The live room of one event |
 | Moderator or speaker | The event's moderator link or a personal magic link (named grant) | Running one event. Speakers get full audio and video, with no moderation powers |
 | Organizer | A one-time sign-in link sent by email (staff role `ORGANIZER`) | The administration area, limited to the events they own |
 | Administrator | A one-time sign-in link (staff role `ADMIN`) or the instance API key (`ADMIN_API_KEY`) | The whole instance: settings, every event, the address book and the **GDPR log**. The content of recordings (video, voices, transcripts, summaries, report) only on the events they organize, never with the instance key ([ADR-021](adr/021-recording-content-access.md)) |

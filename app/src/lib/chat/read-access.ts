@@ -17,8 +17,9 @@
  *     speaker) or a registration accessToken for THIS event → allowed in any
  *     status, so moderators keep post-event access to the archive;
  *   • no token → only while the room is genuinely open to guests, i.e. the same
- *     LIVE / INSTANT-warm-up window that lets a guest POST (closed on scheduled
- *     events when the administration turns guest access off), AND only when the
+ *     window that lets a guest POST, from the opening of the waiting room
+ *     (lib/events/guest-window; closed on scheduled events when the
+ *     administration turns guest access off), AND only when the
  *     event is not password-protected. The password check is the one place the
  *     read side is deliberately STRICTER than the write side: posting injects a
  *     message, reading exfiltrates everyone else's, so "I have the URL" cannot
@@ -63,6 +64,7 @@ export async function authorizeChatRead(
       status: true,
       eventType: true,
       accessMode: true,
+      endsAt: true,
       moderatorToken: true,
       joinPasswordHash: true,
     },

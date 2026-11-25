@@ -1,4 +1,18 @@
 {
+  "0.14.0": {
+    "title": "Nová miestnosť, živé titulky, oddelené súhlasy",
+    "notes": [
+      "Živé titulky s menom hovoriaceho, ktoré vytvára samotná inštalácia na CPU bez externých služieb. Podujatie si môže uchovať ich prepis, len s vetami tých, ktorí súhlasili.",
+      "Nahrávanie, prepis a adresár majú oddelené, dobrovoľné a nikdy vopred zaškrtnuté súhlasy. Kto odmietne nahrávku, zúčastní sa a zostane mimo nej, a každý súhlas možno odvolať v „Moje údaje“. Pred podujatím sa uvedie, či bude video vyhradené alebo verejné, a list vysvetľuje, čo sa deje s údajmi.",
+      "V nahranom videu vidno len vedúcich: od účastníkov so súhlasom počuť hlas. Pracovníci môžu osobu odstrániť z už nahraného videa, každé podujatie volí, ako dlho nahrávku uchová, a kto bol v rýchlom hovore, môže si ho znova pozrieť.",
+      "Prepracovaná miestnosť: zbaliteľné panely, Réžia pre vedúceho, „Udeliť slovo“, PDF bez zdieľania obrazovky, časovač vystúpení, QR kódy odkazov. Blokovanie mikrofónov a kamier teraz platí aj na videomoste a čakáreň má novú podobu, vrátane námestia.",
+      "Účastníci môžu vystupovať pod prezývkou alebo pseudonymom, kde to podujatie umožňuje, a pri veľkých podujatiach alebo tam, kde publikum len počúva, je zoznam účastníkov skrytý. Od otvorenia čakárne sa dá vstúpiť aj bez registrácie, ak to správa dovolí.",
+      "Vytvoriť podujatie je jednoduchšie: niekoľko otázok zvolí východiskové hodnoty, program sa pripraví vopred, pozvánky odchádzajú e-mailom a podujatie možno vyhradiť pozvaným. Názov a popis sa prekladajú do zvolených jazykov na CPU, ak to inštalácia zapne.",
+      "Po podujatí stránka ako prvé ukazuje video v jeho jazykoch, so synchronizovanými snímkami a programom ako registrom. Na žiadosť pracovníkov je k dispozícii správa napísaná umelou inteligenciou, slovník riadi prepisy a preklady a „Uzavrieť podujatie“ hovorí, čo ešte zostáva.",
+      "Hlavička, ponuky a správa sa riadia vzormi Designers Italia. Viac automatických kontrol prístupnosti, bezpečnostné opravy, aktualizované knižnice a Next.js 15.5.29.",
+      "Pri aktualizácii: komponenty Jitsi prechádzajú na stable-11031 a chart sa zastaví, ak je niektorý pripnutý k inej verzii; odstrániť `jitsi-meet.jibri.custom.other._finalize_sh`; kto nahrádza konfiguráciu Jitsi, musí pridať `config.hiddenFromRecorderFeatureEnabled = true`; Prosody sa reštartuje; titulky sú predvolene zapnuté (`global.captions.enabled`)."
+    ]
+  },
   "0.13.0": {
     "title": "Úplnejšia ochrana súkromia a prepisy dlhých podujatí",
     "notes": [

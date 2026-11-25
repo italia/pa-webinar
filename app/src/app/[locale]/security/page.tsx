@@ -4,7 +4,9 @@
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
+import { Link } from '@/i18n/navigation';
 import { getSettings } from '@/lib/settings';
+import { serviceInventoryUrl } from '@/lib/service-inventory-url';
 
 interface SecurityPageProps {
   params: Promise<{ locale: string }>;
@@ -20,7 +22,11 @@ export async function generateMetadata({
 
 export default async function SecurityPage() {
   const t = await getTranslations('legal.security');
+  const tf = await getTranslations('footer');
   const settings = await getSettings();
+  // Inventario e stato del servizio: qui, con il codice e lo SBOM, non nel
+  // pie' di pagina. L'inventario solo se ha un indirizzo.
+  const inventario = serviceInventoryUrl() !== null;
   const repoUrl = settings.githubUrl || 'https://github.com/italia/pa-webinar';
   const repoPath = repoUrl.replace(/^https?:\/\/github\.com\//, '').replace(/\/$/, '');
   const scorecardViewer = `https://scorecard.dev/viewer/?uri=github.com/${repoPath}`;
@@ -94,6 +100,16 @@ export default async function SecurityPage() {
                       {t('links.securityPolicy')}
                     </a>
                   </li>
+                  {inventario && (
+                    <li>
+                      <Link href="/service-inventory">{tf('serviceInventory')}</Link>
+                    </li>
+                  )}
+                  {settings.statusPageEnabled && (
+                    <li>
+                      <Link href="/status">{tf('systemStatus')}</Link>
+                    </li>
+                  )}
                 </ul>
               </div>
             </div>

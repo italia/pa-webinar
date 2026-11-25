@@ -8,7 +8,7 @@ import { useTranslations } from 'next-intl';
 
 import { Icon } from '@/components/ui/icon';
 import { useTendina } from '@/hooks/use-tendina';
-import { Link, usePathname } from '@/i18n/navigation';
+import { Link, percorso, usePathname } from '@/i18n/navigation';
 
 import {
   sezioneDi,
@@ -200,7 +200,28 @@ function Sezione({
     chiudi();
   }, [pathname, chiudi]);
   const etichetta = t(sezione.labelKey);
-  const mega = sezione.voci.length >= VOCI_PER_MEGAMENU;
+  // Le pagine da consultare e, a parte, le azioni (creare qualcosa): queste
+  // in fondo, come call to action distinte dai collegamenti (il megamenu «con
+  // call to action in basso» del design system).
+  const collegamenti = sezione.voci.filter((v) => v.menu !== false && !v.azione);
+  const azioni = sezione.voci.filter((v) => v.azione);
+  const mega = collegamenti.length + azioni.length >= VOCI_PER_MEGAMENU;
+  const indirizzo = (v: NavItem) =>
+    v.query ? `${v.href}?${new URLSearchParams(v.query).toString()}` : v.href;
+  const chiave = indirizzo;
+  const destinazione = (v: NavItem) => (v.query ? percorso(indirizzo(v)) : v.href);
+
+  const azione = (v: NavItem) => (
+    <Link
+      key={chiave(v)}
+      href={destinazione(v)}
+      className="it-footer-link d-inline-flex align-items-center"
+      onClick={chiudi}
+    >
+      <Icon icon="it-plus-circle" size="sm" color="primary" className="me-2" />
+      <span>{t(v.labelKey)}</span>
+    </Link>
+  );
 
   const voce = (v: NavItem) => {
     const corrente = voceAttiva(pathname, v);
@@ -209,9 +230,9 @@ function Sezione({
       <Icon icon="it-arrow-right-triangle" size="sm" className="me-2" />
     );
     return (
-      <li key={v.href}>
+      <li key={chiave(v)}>
         <Link
-          href={v.href}
+          href={destinazione(v)}
           className={`list-item dropdown-item${corrente ? ' active' : ''}`}
           aria-current={corrente ? 'page' : undefined}
           onClick={chiudi}
@@ -224,9 +245,9 @@ function Sezione({
   };
 
   // Le pagine in colonne della griglia, riempite dall'alto in basso.
-  const perColonna = Math.ceil(sezione.voci.length / COLONNE);
+  const perColonna = Math.ceil(collegamenti.length / COLONNE);
   const colonne = Array.from({ length: COLONNE }, (_, i) =>
-    sezione.voci.slice(i * perColonna, (i + 1) * perColonna),
+    collegamenti.slice(i * perColonna, (i + 1) * perColonna),
   ).filter((c) => c.length > 0);
 
   return (
@@ -260,18 +281,30 @@ function Sezione({
           // titolo (il nome della sezione e' il pulsante che lo apre).
           <div className="megamenu pb-5 pt-3 py-lg-0">
             <div className="row">
-              {colonne.map((c, i) => (
-                <div key={i} className="col-12 col-lg-4">
-                  <div className="link-list-wrapper">
-                    <ul className="link-list">{c.map(voce)}</ul>
-                  </div>
+              <div className="col-12">
+                <div className="row">
+                  {colonne.map((c, i) => (
+                    <div key={i} className="col-12 col-lg-4">
+                      <div className="link-list-wrapper">
+                        <ul className="link-list">{c.map(voce)}</ul>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+                {azioni.length > 0 && (
+                  <div className="it-footer-link-wrapper d-flex flex-column flex-lg-row gap-3">
+                    {azioni.map(azione)}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         ) : (
           <div className="link-list-wrapper">
-            <ul className="link-list">{sezione.voci.map(voce)}</ul>
+            <ul className="link-list">{collegamenti.map(voce)}</ul>
+            {azioni.length > 0 && (
+              <div className="menu-azioni d-flex flex-column gap-2">{azioni.map(azione)}</div>
+            )}
           </div>
         )}
       </div>

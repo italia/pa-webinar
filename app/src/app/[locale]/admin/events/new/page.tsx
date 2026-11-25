@@ -82,7 +82,10 @@ export default async function CreateEventPage({
     <div className="container py-5">
       <AdminPageHeader title={await adminPageTitle('/admin/events/new')} />
 
+      {/* Dal menu si passa da «Nuovo evento» a «Nuova chiamata rapida» sulla
+          stessa pagina: la chiave fa ripartire il modulo giusto. */}
       <CreateEventWithTemplate
+        key={instant === '1' ? 'chiamata' : 'evento'}
         initialInstant={instant === '1'}
         formatoParam={formato ?? null}
         scegliParam={scegli ?? null}

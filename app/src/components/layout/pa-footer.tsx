@@ -3,14 +3,16 @@
 
 'use client';
 
-import { useFormatter, useLocale, useTranslations } from 'next-intl';
+import { useFormatter, useTranslations } from 'next-intl';
 
 import { Icon } from '@/components/ui/icon';
 import { Link, percorsoSeNoto } from '@/i18n/navigation';
+import {
+  eNomeDelProdotto,
+  larghezzaMarchioIntero,
+  MARCHIO_INTERO_NEGATIVO,
+} from '@/lib/branding/marchio';
 import { useSettings } from '@/lib/settings-context';
-import { mottoDelSito } from '@/lib/utils/locale';
-
-import { LINK_PIEDE_EVENTI, linkVisibile } from './public-links';
 
 interface FooterLink {
   title: string;
@@ -27,74 +29,6 @@ const BUILD_SHA = process.env.NEXT_PUBLIC_BUILD_SHA ?? '';
 const BUILD_CHANNEL = process.env.NEXT_PUBLIC_BUILD_CHANNEL ?? 'dev';
 const BUILD_DATE = process.env.NEXT_PUBLIC_BUILD_DATE ?? '';
 
-// Inline mono-stroke SVGs so the footer bar doesn't depend on the async
-// Bootstrap Italia sprite.
-const FOOTER_ICON_SIZE = 14;
-function FooterIconShield() {
-  return (
-    <svg width={FOOTER_ICON_SIZE} height={FOOTER_ICON_SIZE} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6l8-4z" />
-    </svg>
-  );
-}
-function FooterIconAccessibility() {
-  return (
-    <svg width={FOOTER_ICON_SIZE} height={FOOTER_ICON_SIZE} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <circle cx="12" cy="4.5" r="1.8" />
-      <path d="M5 8l4 1.5v4l-1.5 6" />
-      <path d="M19 8l-4 1.5v4l1.5 6" />
-      <path d="M9 12h6" />
-    </svg>
-  );
-}
-function FooterIconDocument() {
-  return (
-    <svg width={FOOTER_ICON_SIZE} height={FOOTER_ICON_SIZE} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M7 3h8l4 4v14H7z" />
-      <path d="M15 3v4h4" />
-      <path d="M10 12h6M10 16h6" />
-    </svg>
-  );
-}
-function FooterIconLink() {
-  return (
-    <svg width={FOOTER_ICON_SIZE} height={FOOTER_ICON_SIZE} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1" />
-      <path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1" />
-    </svg>
-  );
-}
-function FooterIconTag() {
-  return (
-    <svg width={FOOTER_ICON_SIZE} height={FOOTER_ICON_SIZE} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M3 12V4h8l10 10-8 8L3 12z" />
-      <circle cx="7.5" cy="7.5" r="1.2" />
-    </svg>
-  );
-}
-
-// Pick a matching icon for custom (admin-defined) legal links based on the
-// URL/title — best-effort, falls back to the generic link glyph.
-function pickLegalIcon(link: FooterLink): React.ReactNode {
-  const hay = `${link.url} ${link.title}`.toLowerCase();
-  if (/privac/.test(hay)) return <FooterIconShield />;
-  if (/access/.test(hay)) return <FooterIconAccessibility />;
-  if (/(legal|notice|term|cookie)/.test(hay)) return <FooterIconDocument />;
-  return <FooterIconLink />;
-}
-
-// Render an icon + label pair with consistent spacing and the icon kept
-// visually subdued so it reads as decoration, not a second affordance.
-function IconLabel({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
-  return (
-    <span className="d-inline-flex align-items-center" style={{ gap: '0.375rem' }}>
-      <span style={{ opacity: 0.75, display: 'inline-flex' }}>{icon}</span>
-      <span>{children}</span>
-    </span>
-  );
-}
-
-
 /** Il segno di un link che si apre in una nuova finestra: icona e testo per
  *  chi usa un lettore di schermo. */
 function NuovaFinestra({ testo }: { testo: string }) {
@@ -106,25 +40,25 @@ function NuovaFinestra({ testo }: { testo: string }) {
   );
 }
 
-export default function PAFooter({
-  inventarioPubblicato = true,
-}: {
-  /** L'inventario dei servizi ha un indirizzo: senza, la pagina dice solo
-   *  «non pubblicato» e il link non si mostra. */
-  inventarioPubblicato?: boolean;
-}) {
+/**
+ * Il pie' di pagina essenziale dei siti della PA: il servizio, l'ente che lo
+ * porta («Progetto di», con il suo logo) e, in fondo, le informative e le
+ * dichiarazioni. Niente link che ripetono il menu: le pagine del sito si
+ * raggiungono dall'intestazione. Codice sorgente, SBOM, inventario e stato del
+ * servizio stanno nella pagina «Sicurezza e trasparenza».
+ */
+export default function PAFooter() {
   const t = useTranslations();
   const settings = useSettings();
-  const locale = useLocale();
 
-  // Come nella fascia alta: i nomi vengono dalla configurazione, mai da un
-  // ente scritto nel codice. Senza ente si firma col nome del sito.
-  const orgName =
-    settings.organizationName?.trim() || settings.siteName?.trim() || t('common.appName');
-  const parentOrg =
-    settings.parentOrganization?.trim() || mottoDelSito(settings.siteTagline, locale);
-  const orgUrl = settings.organizationUrl || '#';
-  const githubUrl = settings.githubUrl || '';
+  const appName = settings.siteName?.trim() || t('common.appName');
+  // L'ente viene dalla configurazione, mai da un nome scritto nel codice:
+  // senza, la fascia non c'e'.
+  const ente = settings.organizationName?.trim() ?? '';
+  const enteSovra = settings.parentOrganization?.trim() ?? '';
+  const enteUrl = settings.organizationUrl?.trim() ?? '';
+  const enteLogo = settings.organizationLogoUrl?.trim() ?? '';
+  const supporto = settings.supportEmail?.trim() ?? '';
 
   let footerLinks: FooterLink[] = [];
   try {
@@ -134,21 +68,34 @@ export default function PAFooter({
         : settings.footerLinks;
     if (Array.isArray(raw)) footerLinks = raw;
   } catch {
-    // fallback to empty
+    // footerLinks malformato: si usano le note di default.
   }
 
   const legalLinks = footerLinks.filter((l) => l.section === 'legal');
-  // I link della sezione «Principale»: una colonna loro, «Link utili».
+  // Le pagine che le note scelte da chi amministra portano gia': la barra non
+  // le ripete.
+  const scelti = new Set(
+    legalLinks.map((l) => (l.url.startsWith('/') ? percorsoSeNoto(l.url) : null)).filter(Boolean),
+  );
+  // I link della sezione «Principale», scelti da chi amministra: una riga loro.
   const mainLinks = footerLinks.filter((l) => l.section === 'main');
   // Fuori dal sito, in una nuova finestra: gli indirizzi web completi (anche
   // senza schema, «//host»). mailto: e tel: non aprono finestre.
   const esterno = (url: string) => /^(https?:)?\/\//i.test(url);
-  // Senza sito dell'ente né email di supporto la colonna «Contatti»
-  // resterebbe un titolo sopra il vuoto: non si disegna.
-  const conContatti = orgUrl !== '#' || Boolean(settings.supportEmail);
-  // Le colonne in una riga sola: tre o quattro, secondo quelle che ci sono.
-  const colonne = 2 + (conContatti ? 1 : 0) + (mainLinks.length > 0 ? 1 : 0);
-  const colonna = colonne === 4 ? 'col-lg-3 col-md-6 pb-2' : 'col-lg-4 col-md-4 pb-2';
+
+  const nomeEnte = (
+    <span className="footer-progetto__ente">
+      {enteLogo && (
+        // Il logo accompagna il nome, che resta scritto: e' decorativo.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={enteLogo} alt="" aria-hidden="true" className="footer-progetto__logo" />
+      )}
+      <span>
+        <span className="footer-progetto__nome">{ente}</span>
+        {enteSovra && <span className="footer-progetto__sovra">{enteSovra}</span>}
+      </span>
+    </span>
+  );
 
   return (
     <footer className="it-footer" id="footer" tabIndex={-1}>
@@ -159,219 +106,170 @@ export default function PAFooter({
               <div className="col-sm-12">
                 <div className="it-brand-wrapper">
                   <Link href="/" className="d-inline-flex align-items-center">
-                    {/* Il simbolo di PA Webinar in negativo sul piè di pagina
-                        scuro: decorativo, accanto al nome dell'ente. */}
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src="/images/logo/pa-webinar-mark-white.svg"
-                      alt=""
-                      aria-hidden="true"
-                      style={{ height: 44, marginRight: 12 }}
-                    />
-                    <div className="it-brand-text">
-                      <h2 className="mb-0">{orgName}</h2>
-                      {parentOrg && <h3 className="d-none d-md-block mb-0">{parentOrg}</h3>}
-                    </div>
+                    {settings.logoUrl ? (
+                      <>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={settings.logoUrl}
+                          alt=""
+                          aria-hidden="true"
+                          style={{ height: 44, marginRight: 12 }}
+                        />
+                        <div className="it-brand-text">
+                          <h2 className="mb-0">{appName}</h2>
+                        </div>
+                      </>
+                    ) : eNomeDelProdotto(appName) ? (
+                      // Il marchio intero, in negativo sul fondo scuro: il
+                      // nome e' nell'immagine.
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={MARCHIO_INTERO_NEGATIVO}
+                        alt={appName}
+                        width={larghezzaMarchioIntero(44)}
+                        height={44}
+                        style={{ height: 44, width: 'auto' }}
+                      />
+                    ) : (
+                      <>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src="/images/logo/pa-webinar-mark-white.svg"
+                          alt=""
+                          aria-hidden="true"
+                          style={{ height: 44, marginRight: 12 }}
+                        />
+                        <div className="it-brand-text">
+                          <h2 className="mb-0">{appName}</h2>
+                        </div>
+                      </>
+                    )}
                   </Link>
                 </div>
               </div>
             </div>
           </section>
-          <section className="py-4">
-            <div className="row">
-              <div className={colonna}>
-                <h4>
-                  <Link
-                    href="/events"
-                    className="text-white text-decoration-none"
-                  >
-                    {t('nav.events')}
-                  </Link>
-                </h4>
-                <ul className="footer-list link-list clearfix">
-                  {LINK_PIEDE_EVENTI.filter((l) => linkVisibile(l, settings)).map((l) => (
-                    <li key={l.href}>
-                      <Link href={l.href} className="list-item text-white">
-                        {t(l.labelKey)}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              {conContatti && (
-                <div className={colonna}>
-                  <h4>{t('footer.contacts')}</h4>
-                  <ul className="footer-list link-list clearfix">
-                    {orgUrl !== '#' && (
-                      <li>
-                        <a
-                          href={orgUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="list-item"
-                        >
-                          {new URL(orgUrl).hostname.replace(/^www\./, '')}
-                          <NuovaFinestra testo={t('footer.newWindow')} />
-                        </a>
-                      </li>
-                    )}
-                    {settings.supportEmail && (
-                      <li>
-                        <a
-                          href={`mailto:${settings.supportEmail}`}
-                          className="list-item"
-                        >
-                          {settings.supportEmail}
-                        </a>
-                      </li>
-                    )}
-                  </ul>
-                </div>
+
+          {(ente || supporto) && (
+            // Come nei siti della PA: chi porta il servizio, con il suo logo.
+            <section className="footer-progetto">
+              {ente && (
+                <>
+                  <h3 className="footer-progetto__etichetta">{t('footer.projectOf')}</h3>
+                  {enteUrl ? (
+                    <a
+                      href={enteUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="footer-progetto__link"
+                    >
+                      {nomeEnte}
+                      <NuovaFinestra testo={t('footer.newWindow')} />
+                    </a>
+                  ) : (
+                    nomeEnte
+                  )}
+                </>
               )}
-              <div className={colonna}>
-                <h4>{t('footer.openSource')}</h4>
-                <ul className="footer-list link-list clearfix">
-                  {githubUrl && (
-                    <>
-                      <li>
-                        <a
-                          href={githubUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="list-item"
-                        >
-                          {t('footer.sourceCode')}
-                          <NuovaFinestra testo={t('footer.newWindow')} />
-                        </a>
-                      </li>
-                      <li>
-                        <a
-                          href={`${githubUrl}/releases/latest`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="list-item"
-                        >
-                          {t('footer.sbomLatest')}
-                          <NuovaFinestra testo={t('footer.newWindow')} />
-                        </a>
-                      </li>
-                    </>
-                  )}
-                  <li>
-                    <Link href="/security" className="list-item text-white">
-                      {t('footer.transparency')}
-                    </Link>
-                  </li>
-                  {/* Inventario e stato: trasparenza del servizio, accanto al
-                      codice e alla sicurezza (non fra le note legali). */}
-                  {inventarioPubblicato && (
-                    <li>
-                      <Link href="/service-inventory" className="list-item text-white">
-                        {t('footer.serviceInventory')}
-                      </Link>
-                    </li>
-                  )}
-                  {settings.statusPageEnabled && (
-                    <li>
-                      <Link href="/status" className="list-item text-white">
-                        {t('footer.systemStatus')}
-                      </Link>
-                    </li>
-                  )}
-                </ul>
-              </div>
-              {mainLinks.length > 0 && (
-                <div className={colonna}>
-                  <h4>{t('footer.usefulLinks')}</h4>
-                  <ul className="footer-list link-list clearfix">
-                    {mainLinks.map((link) => {
-                      const interno = link.url.startsWith('/') && !esterno(link.url) ? percorsoSeNoto(link.url) : null;
-                      return (
-                        <li key={link.url}>
-                          {interno ? (
-                            <Link href={interno} className="list-item text-white">
-                              {link.title}
-                            </Link>
-                          ) : esterno(link.url) ? (
-                            <a href={link.url} target="_blank" rel="noopener noreferrer" className="list-item">
-                              {link.title}
-                              <NuovaFinestra testo={t('footer.newWindow')} />
-                            </a>
-                          ) : (
-                            <a href={link.url} className="list-item">
-                              {link.title}
-                            </a>
-                          )}
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
+              {supporto && (
+                <p className="footer-progetto__contatti">
+                  {t.rich('footer.contactsLine', {
+                    email: supporto,
+                    link: (testo) => <a href={`mailto:${supporto}`}>{testo}</a>,
+                  })}
+                </p>
               )}
-            </div>
-          </section>
+            </section>
+          )}
+
+          {mainLinks.length > 0 && (
+            <section className="footer-utili">
+              <h3 className="visually-hidden">{t('footer.usefulLinks')}</h3>
+              <ul className="list-inline mb-0">
+                {mainLinks.map((link) => {
+                  const interno =
+                    link.url.startsWith('/') && !esterno(link.url) ? percorsoSeNoto(link.url) : null;
+                  return (
+                    <li key={link.url} className="list-inline-item">
+                      {interno ? (
+                        <Link href={interno}>{link.title}</Link>
+                      ) : esterno(link.url) ? (
+                        <a href={link.url} target="_blank" rel="noopener noreferrer">
+                          {link.title}
+                          <NuovaFinestra testo={t('footer.newWindow')} />
+                        </a>
+                      ) : (
+                        <a href={link.url}>{link.title}</a>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          )}
         </div>
       </div>
 
       <div className="it-footer-small-prints clearfix">
         <div className="container">
           <h3 className="visually-hidden">{t('footer.legalNotes')}</h3>
-          <ul className="it-footer-small-prints-list list-inline mb-0 d-flex flex-column flex-md-row">
+          {/* Le informative e le dichiarazioni, senza icone davanti, come negli
+              altri siti della PA; la freccia resta solo dove si apre una nuova
+              finestra. Poi i propri dati e la trasparenza del servizio. */}
+          <ul className="it-footer-small-prints-list list-inline mb-0 d-flex flex-column flex-md-row flex-wrap">
             {legalLinks.length > 0 ? (
               legalLinks.map((link) => {
                 const interno = link.url.startsWith('/') ? percorsoSeNoto(link.url) : null;
-                // La dichiarazione di accessibilita' si apre in una nuova
-                // finestra anche quando e' una pagina del sito.
                 const accessibilita = interno === '/accessibility';
                 return (
-                <li key={link.url} className="list-inline-item">
-                  {interno ? (
-                    <Link
-                      href={interno}
-                      {...(accessibilita ? { target: '_blank', rel: 'noopener' } : {})}
-                    >
-                      <IconLabel icon={pickLegalIcon(link)}>{link.title}</IconLabel>
-                      {accessibilita && <NuovaFinestra testo={t('footer.newWindow')} />}
-                    </Link>
-                  ) : !esterno(link.url) ? (
-                    // Un indirizzo interno che la mappa non conosce resta
-                    // nella stessa scheda, com'e' stato scritto.
-                    <a href={link.url}>
-                      <IconLabel icon={pickLegalIcon(link)}>{link.title}</IconLabel>
-                    </a>
-                  ) : (
-                    <a
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <IconLabel icon={pickLegalIcon(link)}>{link.title}</IconLabel>
-                      <NuovaFinestra testo={t('footer.newWindow')} />
-                    </a>
-                  )}
-                </li>
+                  <li key={link.url} className="list-inline-item">
+                    {interno ? (
+                      <Link
+                        href={interno}
+                        {...(accessibilita ? { target: '_blank', rel: 'noopener' } : {})}
+                      >
+                        {link.title}
+                        {accessibilita && <NuovaFinestra testo={t('footer.newWindow')} />}
+                      </Link>
+                    ) : !esterno(link.url) ? (
+                      // Un indirizzo interno che la mappa non conosce resta
+                      // nella stessa scheda, com'e' stato scritto.
+                      <a href={link.url}>{link.title}</a>
+                    ) : (
+                      <a href={link.url} target="_blank" rel="noopener noreferrer">
+                        {link.title}
+                        <NuovaFinestra testo={t('footer.newWindow')} />
+                      </a>
+                    )}
+                  </li>
                 );
               })
             ) : (
               <>
                 <li className="list-inline-item">
-                  <Link href="/privacy">
-                    <IconLabel icon={<FooterIconShield />}>{t('footer.privacy')}</IconLabel>
-                  </Link>
+                  <Link href="/privacy">{t('footer.privacy')}</Link>
                 </li>
                 <li className="list-inline-item">
                   {/* Si apre in una nuova finestra, e lo dice. */}
                   <Link href="/accessibility" target="_blank" rel="noopener">
-                    <IconLabel icon={<FooterIconAccessibility />}>{t('footer.accessibility')}</IconLabel>
+                    {t('footer.accessibility')}
                     <NuovaFinestra testo={t('footer.newWindow')} />
                   </Link>
                 </li>
                 <li className="list-inline-item">
-                  <Link href="/legal-notice">
-                    <IconLabel icon={<FooterIconDocument />}>{t('footer.legalNotes')}</IconLabel>
-                  </Link>
+                  <Link href="/legal-notice">{t('footer.legalNotes')}</Link>
                 </li>
               </>
+            )}
+            {!scelti.has('/privacy/my-data') && (
+              <li className="list-inline-item">
+                <Link href="/privacy/my-data">{t('gdpr.export.title')}</Link>
+              </li>
+            )}
+            {!scelti.has('/security') && (
+              <li className="list-inline-item">
+                <Link href="/security">{t('footer.transparency')}</Link>
+              </li>
             )}
             {(BUILD_VERSION || BUILD_SHA) && (
               <li className="list-inline-item ms-md-auto text-white">
@@ -403,9 +301,6 @@ function BuildInfo({ t }: { t: ReturnType<typeof useTranslations> }) {
       className="d-inline-flex align-items-center flex-wrap"
       style={{ fontSize: '0.8rem', lineHeight: 1.25, gap: '0.375rem' }}
     >
-      <span style={{ opacity: 0.75, display: 'inline-flex' }}>
-        <FooterIconTag />
-      </span>
       <Link
         href="/changelog"
         title={`${t('footer.viewChangelog')}${commit}`}

@@ -212,7 +212,8 @@
       "recordingLinkSend": "Retrimite-mi linkul",
       "recordingLinkSent": "Dacă adresa este înscrisă la eveniment, vei primi în curând un e-mail cu linkul personal.",
       "recordingLinkError": "Cererea nu a reușit. Încearcă din nou peste câteva minute.",
-      "registerOrGuest": "Dacă te înscrii, primești pe e-mail linkul personal și noutăți despre eveniment. Ca invitat intri imediat doar cu un nume, doar cât timp evenimentul este live, și nu primești e-mailuri."
+      "registerOrGuest": "Dacă te înscrii, primești pe e-mail linkul personal și noutăți despre eveniment. Ca invitat intri imediat doar cu un nume și nu primești e-mailuri.",
+      "guestWhenRoomOpens": "În ziua evenimentului, când se deschide sala de așteptare, poți intra și fără înscriere, doar cu numele."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -661,7 +662,6 @@
     },
     "notOpenNow": "Sala nu este deschisă în acest moment.",
     "nameRequired": "Lipsește numele cu care să intri: revino și scrie-l.",
-    "closeSidebar": "Închide panoul lateral",
     "contentOnly": "Doar conținutul, fără chat și panouri",
     "showPanels": "Afișează chatul și panourile",
     "confirmFullscreen": "Comută pe ecran complet",
@@ -1012,11 +1012,10 @@
           "BALANCED": "Echilibrată (540p)",
           "SAVE_DATA": "Economie de date (360p)"
         },
-        "kickerHint": "Pentru un supratitlu, scrie-l înaintea titlului și separă-le cu |, de exemplu „Ciclu de întâlniri | Prima întâlnire”.",
-        "kickerUse": "Afișează „{kicker}” ca supratitlu",
-        "kickerPreview": "Așa apare pe pagina evenimentului",
+        "kickerHint": "Opțional: un rând scurt deasupra titlului, de exemplu numele ciclului de întâlniri.",
         "coverImageSize": "16:9, recomandat 1600 × 900 pixeli.",
-        "requiredNote": "Câmpurile marcate cu * sunt obligatorii."
+        "requiredNote": "Câmpurile marcate cu * sunt obligatorii.",
+        "kickerLabel": "Supratitlu ({language})"
       },
       "step2": {
         "heading": "Cine ce poate face",
@@ -1097,11 +1096,6 @@
         "recordingDestinationRequired": "Alege unde merge înregistrarea.",
         "audienceAnonymous": "Public anonim",
         "audienceAnonymousDesc": "Participanții apar celorlalți sub un pseudonim („Participant” și un cod) în video, în chat și la întrebări; lista participanților rămâne la moderatori și nu există piață. Util pentru evenimente mari; la evenimentele comunității oamenii vor să se cunoască.",
-        "audienceAnonymousLocked": "Nu se poate schimba cât timp sala poate fi deschisă: ar lega pseudonimele de nume.",
-        "participantListVisible": "Afișează publicului lista participanților",
-        "participantListVisibleDesc": "Dezactivat: lista, grila și numele din piață rămân la moderatori și vorbitori; publicul vede doar cine vorbește. Activat: toată lumea vede cine este în sală.",
-        "participantListAnonymous": "Cu public anonim, lista rămâne ascunsă.",
-        "participantListLocked": "Nu se poate schimba cu sala deschisă: cei deja înăuntru nu ar vedea modificarea.",
         "nicknamesEnabled": "Porecle pentru participanți",
         "nicknamesEnabledDesc": "Participanții pot alege o poreclă: ceilalți o văd în locul numelui în video, în chat, la întrebări și în transcriere. Organizatorii și moderatorii văd cine se află în spatele ei. Cei care conduc rămân cu numele propriu. Implicit este activat acolo unde lista participanților este ascunsă.",
         "nicknamesLocked": "Nu se poate schimba cât timp sala este deschisă: cine este deja înăuntru a ales după regula anterioară.",
@@ -1110,7 +1104,13 @@
         "hostsAlwaysRecorded": "Cine conduce este mereu în înregistrare",
         "hostsAlwaysRecordedDesc": "Moderatorii și vorbitorii apar în videoclip cu nume și imagine, fără o casetă de bifat: nota de informare a evenimentului trebuie să o spună. De la participanți se înregistrează doar vocea și doar cu consimțământul lor.",
         "hostsAlwaysRecordedDescHostsOnly": "Moderatorii și vorbitorii apar în videoclip cu nume și imagine, fără o casetă de bifat: nota de informare a evenimentului trebuie să o spună. Participanții nu se văd și nu se aud niciodată în videoclip.",
-        "hostsAlwaysRecordedDescVisible": "Moderatorii și vorbitorii apar în videoclip cu nume și imagine, fără o casetă de bifat: nota de informare a evenimentului trebuie să o spună. Această instalare nu poate ține participanții în afara videoclipului: cine își dă consimțământul intervine cu nume, voce și imagine, iar numele oricui urmărește poate apărea chiar dacă nu ia cuvântul."
+        "hostsAlwaysRecordedDescVisible": "Moderatorii și vorbitorii apar în videoclip cu nume și imagine, fără o casetă de bifat: nota de informare a evenimentului trebuie să o spună. Această instalare nu poate ține participanții în afara videoclipului: cine își dă consimțământul intervine cu nume, voce și imagine, iar numele oricui urmărește poate apărea chiar dacă nu ia cuvântul.",
+        "audienceHeading": "Cum apar participanții",
+        "audienceOptionList": "Cu numele, vizibil pentru toți",
+        "audienceOptionListDesc": "Lista participanților, grila video și numele din piață sunt vizibile pentru toți.",
+        "audienceOptionHosts": "Cu numele, vizibil doar pentru moderatori",
+        "audienceOptionHostsDesc": "Publicul vede doar cine vorbește; lista, grila și numele din piață rămân la moderatori și vorbitori.",
+        "audienceLocked": "Cu sala deschisă nu se poate schimba."
       },
       "step3": {
         "heading": "Persoane și invitații",
@@ -1142,7 +1142,7 @@
         "personName": "Nume",
         "personEmail": "E-mail",
         "peopleHeading": "Moderatori și vorbitori",
-        "peopleHelp": "Coorganizatori, moderatori și vorbitori. Fiecare primește propriul link pentru a intra cu rolul său; ce poate face fiecare rol este explicat mai sus.",
+        "peopleHelp": "Coorganizatori, moderatori și vorbitori: fiecare primește propriul link pentru a intra cu rolul său.",
         "personRole": "Rol",
         "roleOrganizer": "Coorganizator",
         "roleModerator": "Moderator",
@@ -1201,7 +1201,7 @@
         "invitationsHelpRestricted": "Se pot înscrie doar adresele de pe această listă. După publicare, le trimiți fiecăruia invitația pe e-mail din pagina evenimentului, cu linkul de înscriere; linkul de intrare vine după înscriere.",
         "logoExternal": "Pagina publică afișează doar siglele încărcate pe această platformă: o siglă de pe alt site nu va apărea.",
         "primaryProfileInvalid": "Verifică organizația și adresa siglei.",
-        "primaryMore": "Fotografie, instituție, logo și pagină publică",
+        "primaryMore": "Fotografie, instituție și logo",
         "accessHeading": "Cine se înscrie",
         "accessSiteDefault": "Urmează setarea site-ului: dacă administrația o schimbă, se aplică și acestui eveniment.",
         "accessNoInvitees": "Niciun invitat încă: cât timp lista de mai jos este goală, nimeni nu se poate înscrie.",
@@ -1348,7 +1348,7 @@
           "invites": "Persoane",
           "programme": "Program",
           "review": "Rezumat",
-          "advanced": "Setări avansate",
+          "advanced": "Setări suplimentare",
           "permissions": "Permisiuni"
         },
         "templateInUse": "Șablon: <b>{name}</b>",
@@ -1367,7 +1367,6 @@
         "scheduleIntro": "Când are loc evenimentul: data, ora și fusul orar.",
         "advancedIntro": "Valori deja alese de șablon: modificați doar ce este nevoie.",
         "advancedIntroTemplate": "Valori deja alese de șablonul „{name}”: modificați doar ce este nevoie.",
-        "requiredToPublish": "Necesar pentru a publica evenimentul.",
         "toComplete": "De completat",
         "missingHeading": "Pentru publicare mai lipsește:",
         "fieldOrganizerName": "Numele moderatorului principal",
@@ -1384,9 +1383,7 @@
         "changeFormat": "Schimbă formatul",
         "voiceAll": "Toți vorbesc și apar pe video",
         "voiceSpeakers": "Vorbesc și apar pe video vorbitorii și moderatorii; publicul scrie în chat",
-        "features": "Funcții: {list}",
         "liveToggleNote": "Fiecare funcție se activează și se dezactivează și în timpul evenimentului.",
-        "customize": "Personalizează setările",
         "changeLanguages": "Schimbă limbile",
         "translationLine": "Traducere în: {list}",
         "privacyTemplate": "Informare privind confidențialitatea: {name}",
@@ -1423,7 +1420,6 @@
         "audienceRealNames": "Numele publicului: cele reale.",
         "postEventQaHidden": "Întrebări după eveniment: nepublicate.",
         "postEventQaTextOnly": "Întrebări după eveniment: doar textul, fără nume.",
-        "addressBookOffered": "Agendă: propusă celor care se înscriu.",
         "addressBookNotOffered": "Agendă: nepropusă.",
         "consentRecordingOptional": "înregistrare, facultativă",
         "consentRecordingVoice": "înregistrare, liberă (fără acord, persoana rămâne în afara înregistrării)",
@@ -1433,7 +1429,6 @@
         "title": "Previzualizarea paginii",
         "open": "Deschideți previzualizarea",
         "note": "Așa arată pagina evenimentului; se actualizează pe măsură ce scrieți.",
-        "noteNoDate": "Așa arată pagina evenimentului; cât timp lipsește data, ora este doar un exemplu.",
         "titlePlaceholder": "Titlul evenimentului",
         "descriptionPlaceholder": "Aici va apărea descrierea."
       },
@@ -1464,26 +1459,18 @@
         "notPublic": "{name} nu apare pe pagina publică: în program se vede doar tema.",
         "makePublic": "Afișați numele pe pagină",
         "madePublic": "{name} apare acum pe pagina publică.",
-        "cardTitle": "Program",
-        "cardEmpty": "Temele, cu cine intervine și la ce oră, apar aici sub descriere, pe pagina evenimentului.",
-        "cardPrepare": "Pregătiți programul",
-        "cardSummary": "{count, plural, one {# temă} few {# teme} other {# de teme}}",
-        "cardSummaryWithTimes": "{count, plural, one {# temă} few {# teme} other {# de teme}} · {start}–{end}",
-        "cardOff": "Dezactivat: nu apare pe pagină.",
-        "cardChange": "Modificați programul",
         "descriptionHasProgramme": "Descrierea pare să conțină un program. În pasul „Program” are ore și persoane, iar în sală se vede tema curentă.",
         "goToProgramme": "Mergeți la program",
-        "peoplePointer": "Intervențiile fiecăruia le pregătiți în pasul următor, „Program”.",
         "reviewEmpty": "Program: nicio temă",
         "reviewPrepare": "Pregătiți",
         "reviewOff": "Program: dezactivat, nu apare pe pagină ({count, plural, one {# temă} few {# teme} other {# de teme}})",
         "previewPlaceholder": "Aici apare programul",
-        "toggleLink": "Pregătiți programul",
         "toggleOffWarning": "Dezactivat, programul ({count, plural, one {# temă} few {# teme} other {# de teme}}) nu apare pe pagină: rămâne ultima versiune salvată, iar modificările făcute aici se salvează doar dacă îl reactivați.",
         "offKeptCreate": "Cât timp programul este dezactivat, temele lui nu se salvează odată cu evenimentul: activați-l pentru a le păstra și modifica.",
         "offKeptEdit": "Cât timp programul este dezactivat, rămâne ultima versiune salvată: modificările făcute aici se salvează doar dacă îl reactivați.",
         "toggleOffWarningCreate": "Dezactivat, programul ({count, plural, one {# temă} few {# teme} other {# de teme}}) nu apare pe pagină și nu se salvează odată cu evenimentul: activați-l pentru a-l păstra.",
-        "reviewOffCreate": "Program: dezactivat, nu se salvează odată cu evenimentul ({count, plural, one {# temă} few {# teme} other {# de teme}})"
+        "reviewOffCreate": "Program: dezactivat, nu se salvează odată cu evenimentul ({count, plural, one {# temă} few {# teme} other {# de teme}})",
+        "showToParticipants": "Arată programul participanților"
       },
       "saveCopy": "Salvează copia",
       "consentMap": {
@@ -1522,7 +1509,6 @@
       "settings": "Setări",
       "eventsList": "Toate evenimentele",
       "newEvent": "Eveniment nou",
-      "calendar": "Calendarul evenimentelor",
       "templates": "Șabloane de evenimente",
       "analytics": "Statistici",
       "instantCalls": "Apeluri rapide",
@@ -1563,7 +1549,8 @@
       "openMenu": "Deschide meniul",
       "closeMenu": "Închide meniul",
       "recordingRemovals": "Cereri de eliminare",
-      "recordingRemovalDetail": "Cerere de eliminare"
+      "recordingRemovalDetail": "Cerere de eliminare",
+      "newInstantCall": "Apel rapid nou"
     },
     "publications": {
       "subtitle": "Hub editorial unic pentru toate clipurile video publicate: evenimente programate, apeluri instant, arhive istorice încărcate și sesiuni în așteptare de promovare.",
@@ -2315,7 +2302,9 @@
         "waitingRoomEngineGame": "Joc video (lobby Phaser)",
         "waitingRoomEngineClassic": "Clasică (statică)",
         "waitingRoomEngineHelp": "Modul implicit al sălii de așteptare. Poate fi schimbat pentru un singur eveniment și, pentru o singură vizită, cu parametrul {param} în adresă.",
-        "primaryColorHex": "Culoare principală (cod hexazecimal)"
+        "primaryColorHex": "Culoare principală (cod hexazecimal)",
+        "organizationLogoUrl": "Logoul instituției",
+        "organizationLogoUrlHelp": "Apare în subsol lângă numele instituției care gestionează serviciul. Lasă gol pentru a afișa doar numele."
       },
       "watermark": {
         "title": "Personalizare video",
@@ -2541,7 +2530,7 @@
     },
     "recurrence": {
       "label": "Recurență",
-      "helpText": "Dacă evenimentul se repetă, la duplicare copia propune data următoarei ediții.",
+      "helpText": "Recurența nu creează singură edițiile următoare: când duplici evenimentul, copia are deja data următoarei ediții.",
       "preset": {
         "none": "Nu se repetă",
         "daily": "Zilnic",
@@ -3004,7 +2993,15 @@
       "postEventSummary": "{connected} conectați · {registered} înscrieri",
       "registeredCount": "{count, plural, =0 {Nicio înscriere} one {1 înscriere} other {# înscrieri}}",
       "sortUpcoming": "Cele viitoare întâi",
-      "todayTitle": "Azi și în desfășurare"
+      "todayTitle": "Azi și în desfășurare",
+      "viewLabel": "Vizualizare",
+      "viewList": "Listă",
+      "viewCalendar": "Calendar",
+      "type": "Tip",
+      "typeAll": "Toate tipurile",
+      "typeScheduled": "Evenimente",
+      "typeInstant": "Apeluri rapide",
+      "instantFullList": "Lista completă a apelurilor rapide, cu filtre după dată și înregistrare"
     },
     "tags": {
       "subtitle": "Creați, modificați și ștergeți etichetele folosite pentru clasificarea și filtrarea evenimentelor publice.",
@@ -3044,7 +3041,6 @@
       "copyPublicUrl": "Copiați linkul public",
       "copyInviteUrl": "Copiați linkul de invitație",
       "enterAsParticipant": "Intrați ca participant",
-      "openAsParticipant": "Deschideți ca participant",
       "participantHintRoom": "Se deschide într-o filă nouă: sala așa cum o vede un invitat, fără puteri de moderare.",
       "participantHintPassword": "Se deschide într-o filă nouă: sala așa cum o vede un invitat, după parola evenimentului.",
       "participantHintPage": "Se deschide într-o filă nouă: pagina publică așa cum o văd participanții.",
@@ -3137,7 +3133,8 @@
         "recordingRetention": "Ștergerea automată a înregistrării",
         "recordingRetentionNone": "Niciuna",
         "recordingRetentionDays": "la {days, plural, one {# zi} few {# zile} other {# de zile}} după încheierea evenimentului sau, dacă este publicată, după publicare"
-      }
+      },
+      "openPublicPage": "Deschide pagina publică"
     },
     "rubrica": {
       "subtitle": "Persoane care și-au dat consimțământul pentru includerea în agendă (art. 6.1.a RGPD). Numele, e-mailul și organizația se actualizează doar când persoana bifează din nou caseta.",
@@ -3797,9 +3794,6 @@
         "invitationDesc": "Pagina rămâne vizibilă, dar se pot înscrie doar cei de pe listă; invitația cu linkul de înscriere o trimiți pe e-mail din pagina evenimentului"
       },
       "previewInvitation": "Se înscriu doar cei invitați; fără înscriere nu se intră.",
-      "previewPseudonyms": "Publicul apare cu un pseudonim",
-      "previewNicknames": "Participanții pot folosi o poreclă",
-      "previewRealNames": "Publicul apare cu numele propriu",
       "templateReplaces": "Un șablon aduce propriile setări în locul răspunsurilor de mai jos. Titlul, datele și persoanele le scrii în pașii următori.",
       "instantBack": "Creează în schimb un eveniment programat"
     },
@@ -4347,7 +4341,8 @@
         "noInstall": "Din browser, fără instalări",
         "interactive": "Q&A și sondaje în direct",
         "recordings": "Înregistrări și subtitrări",
-        "accessible": "Accesibil, în 24 de limbi"
+        "languagesAll": "În cele 24 de limbi ale UE",
+        "languagesSome": "În mai multe limbi"
       }
     },
     "upcoming": {
@@ -5523,22 +5518,18 @@
   "footer": {
     "privacy": "Politica de confidențialitate",
     "accessibility": "Declarația de accesibilitate",
-    "openSource": "Software open source",
-    "contacts": "Contacte",
     "legalNotes": "Note legale",
-    "governmentSite": "Guvernul Italian",
     "systemStatus": "Starea sistemului",
-    "sbomLatest": "SBOM-ul ultimei versiuni",
     "transparency": "Securitate și transparență",
     "serviceInventory": "Inventar servicii",
-    "sourceCode": "Codul sursă",
-    "viewRelease": "Vezi versiunea pe GitHub",
     "viewChangelog": "Vezi noutățile (changelog)",
     "newWindow": "se deschide într-o fereastră nouă",
     "usefulLinks": "Linkuri utile",
     "version": "Versiunea {version}",
     "versionDev": "Versiune de dezvoltare",
-    "updatedOn": "actualizată la {date}"
+    "updatedOn": "actualizată la {date}",
+    "projectOf": "Proiect realizat de",
+    "contactsLine": "Contacte: <link>{email}</link>"
   },
   "changelog": {
     "metaTitle": "Noutăți și changelog",

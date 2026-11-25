@@ -15,6 +15,7 @@ import { vistaResoconto } from '@/lib/report/view';
 import { eventAccessCookieName, verifyEventAccess } from '@/lib/event-session';
 import { isEventOpenForRegistration, isEventPageVisible } from '@/lib/events/visibility';
 import { guestAccessAllowed } from '@/lib/events/guest-window';
+import { participantEntry } from '@/lib/events/participant-entry';
 import { registrationAccessFor } from '@/lib/events/registration-access';
 import { materialPhase, materialVisibilityWhere } from '@/lib/events/material-visibility';
 import { domandePubbliche } from '@/lib/events/post-event-sections';
@@ -201,6 +202,9 @@ export default async function EventDetailPage({
     settings.publicRegistrationEnabled,
   );
   const guestEntryOpen = guestAccessAllowed(event, settings.guestAccessEnabled);
+  // La sala d'attesa e' aperta agli ospiti adesso: la stessa porta che la
+  // gestione dell'evento offre a chi la organizza (lib/events/participant-entry).
+  const guestRoomOpen = participantEntry(event, guestEntryOpen)?.kind === 'room';
   // Stessa regola della pagina d'iscrizione e della POST: un evento mai aperto
   // oltre il suo orario di fine non accetta iscrizioni, qualunque stato abbia
   // ancora. Deciso qui con l'orologio del server, così il pulsante non porta a
@@ -625,6 +629,9 @@ export default async function EventDetailPage({
         registrationAccess={registrationAccess}
         registrationOpen={registrationOpen}
         guestEntryOpen={guestEntryOpen}
+        guestRoomOpen={guestRoomOpen}
+        // L'ospite passa da una password: la pagina non promette il solo nome.
+        guestNeedsPassword={!!event.joinPasswordHash}
         hasPostEventQuestionnaire={hasPostEventQuestionnaire}
         feedbackProof={feedbackProof}
         // Il resoconto si scrive dalla trascrizione: segue la registrazione.

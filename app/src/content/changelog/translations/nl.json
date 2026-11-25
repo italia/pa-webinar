@@ -1,4 +1,18 @@
 {
+  "0.14.0": {
+    "title": "Een nieuwe zaal, live-ondertiteling, aparte toestemmingen",
+    "notes": [
+      "Live-ondertiteling met de naam van de spreker, door de installatie zelf op de CPU gemaakt, zonder externe dienst. Een evenement kan het transcript bewaren, met alleen de zinnen van wie toestemming gaf.",
+      "Opname, transcriptie en adresboek hebben aparte, vrijwillige en nooit vooraf aangevinkte toestemmingen. Wie de opname weigert, doet mee en blijft erbuiten, en elke toestemming kan worden ingetrokken via ‘Mijn gegevens’. Vóór het evenement wordt aangegeven of de video intern of openbaar wordt, en een blad legt uit wat er met de gegevens gebeurt.",
+      "In de opgenomen video staan alleen de mensen die leiden: van deelnemers komt, met toestemming, alleen de stem erin. Het team kan iemand uit een al opgenomen video verwijderen, elk evenement kiest hoe lang de opname bewaard wordt, en wie in een directe oproep zat kan die terugkijken.",
+      "Vernieuwde zaal: inklapbare panelen, Regie voor wie leidt, ‘Woord geven’, pdf’s tonen zonder schermdeling, spreektijdtimer, QR-codes van de links. Het blokkeren van microfoons en camera’s geldt nu ook op de videobrug, en de wachtkamer heeft een nieuw gezicht, plein inbegrepen.",
+      "Deelnemers kunnen onder een bijnaam of pseudoniem verschijnen waar het evenement dat toelaat, en bij grote evenementen of die waar het publiek luistert is de deelnemerslijst verborgen. Vanaf de opening van de wachtkamer kan men ook zonder inschrijving binnen, als de beheerder dat toestaat.",
+      "Een evenement aanmaken is eenvoudiger: enkele vragen kiezen de beginwaarden, het programma wordt vooraf voorbereid, uitnodigingen gaan per e-mail uit en een evenement kan aan genodigden voorbehouden zijn. Titel en omschrijving worden op de CPU in de gekozen talen vertaald, waar de installatie dat aanzet.",
+      "Na het evenement zet de pagina de video met zijn talen bovenaan, met gesynchroniseerde dia’s en het programma als index. Op verzoek van het team is er een verslag geschreven met kunstmatige intelligentie, een woordenlijst stuurt transcripties en vertalingen, en ‘Evenement afsluiten’ zegt wat er nog moet gebeuren.",
+      "Kop, menu’s en beheer volgen de modellen van Designers Italia. Meer automatische toegankelijkheidscontroles, beveiligingscorrecties, bijgewerkte bibliotheken en Next.js 15.5.29.",
+      "Bij het bijwerken: de Jitsi-onderdelen gaan naar stable-11031 en de chart stopt als er een aan een andere versie is vastgezet; verwijder `jitsi-meet.jibri.custom.other._finalize_sh`; wie de Jitsi-configuratie vervangt moet `config.hiddenFromRecorderFeatureEnabled = true` toevoegen; Prosody herstart; ondertiteling staat standaard aan (`global.captions.enabled`)."
+    ]
+  },
   "0.13.0": {
     "title": "Vollediger privacybeheer en transcripties van lange evenementen",
     "notes": [

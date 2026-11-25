@@ -38,6 +38,7 @@ const evento = (over: Partial<PanelReadEvent> = {}): PanelReadEvent => ({
   status: 'LIVE',
   eventType: 'SCHEDULED',
   accessMode: null,
+  endsAt: new Date(Date.now() + 3_600_000),
   moderatorToken: 'tok-mod',
   joinPasswordHash: null,
   ...over,
@@ -73,8 +74,22 @@ describe('authorizePanelRead', () => {
     }
   });
 
-  it('un evento a calendario non in diretta pretende un token', async () => {
-    for (const status of ['DRAFT', 'PUBLISHED', 'PROVISIONING', 'IDLE', 'ENDED']) {
+  it('un evento a calendario a sala d’attesa aperta si legge anche da ospite', async () => {
+    for (const status of ['PROVISIONING', 'IDLE']) {
+      await expect(authorizePanelRead(evento({ status }), null), status).resolves.toMatchObject({
+        kind: 'guest',
+      });
+    }
+  });
+
+  it('oltre la fine, con la sala in pausa, l’ospite non legge più', async () => {
+    await expect(
+      authorizePanelRead(evento({ status: 'IDLE', endsAt: new Date(Date.now() - 60_000) }), null),
+    ).rejects.toMatchObject({ statusCode: 401 });
+  });
+
+  it('un evento a calendario a sala chiusa pretende un token', async () => {
+    for (const status of ['DRAFT', 'PUBLISHED', 'ENDED']) {
       await expect(
         authorizePanelRead(evento({ status }), null),
         status,

@@ -23,7 +23,7 @@ import type { NotaDestinazione, NotaPagina } from './campi-del-formato';
 import { BOZZA_VUOTA, bozzaCompilata, controllaBozza, conRuolo, indirizziPresi, type Bozza } from './people-draft';
 import RuoliEvento from './ruoli-evento';
 import Gruppo from './wizard-group';
-import { emailValida, nomeOrganizzatoreValido } from './validation';
+import { emailValida } from './validation';
 import type { EventAccessModeValue } from './wizard-shell';
 
 /** Un ente che organizza l'evento: compare nella pagina pubblica. */
@@ -116,9 +116,6 @@ interface Props {
   /** Prima degli inviti: chi si iscrive e cosa gli si chiede
    *  (SezioneIscrizione). */
   iscrizione?: React.ReactNode;
-  /** Sotto le persone, il rimando al passo «Programma», dove si preparano
-   *  i loro interventi (non per una chiamata istantanea, che non ne ha). */
-  rimandoProgramma?: boolean;
   /** Le foto le carica lo staff: con il solo link di conduzione si vedono e
    *  non si cambiano. */
   photosLocked?: boolean;
@@ -138,12 +135,10 @@ export default function StepPeople({
   publicRegistrationEnabled = true,
   children,
   iscrizione,
-  rimandoProgramma = false,
   photosLocked = false,
   onUploadBusy,
 }: Props) {
   const t = useTranslations('admin.wizard.step3');
-  const tp = useTranslations('admin.wizard.programme');
   const principale = primary.email.trim() ? [primary.email.trim()] : [];
 
   return (
@@ -169,9 +164,6 @@ export default function StepPeople({
         {children}
       </section>
 
-      {/* Che cosa fa ogni ruolo, sempre in vista dove i ruoli si assegnano. */}
-      <RuoliEvento />
-
       <PeopleSection
         moderators={value.moderators}
         speakers={value.speakers}
@@ -180,13 +172,6 @@ export default function StepPeople({
         photosLocked={photosLocked}
         onUploadBusy={onUploadBusy}
       />
-
-      {rimandoProgramma && (
-        <p className="wizard-programma__rimando">
-          <Icon icon="it-info-circle" size="sm" />
-          <span>{tp('peoplePointer')}</span>
-        </p>
-      )}
 
       {iscrizione}
 
@@ -208,9 +193,9 @@ export default function StepPeople({
 /**
  * L'organizzatore principale: riceve per email il link condiviso per condurre
  * l'evento. Nome ed email servono per pubblicare, non per la bozza: finche'
- * mancano lo dicono (lampeggiano, con la riga «serve per pubblicare»), e
- * dopo un tentativo insistono. Foto, ente, logo e pagina pubblica restano
- * ripiegati.
+ * mancano li chiede «Avanti» (in creazione) e «Pubblica», con l'errore rosso
+ * accanto al campo. La pagina pubblica e' una spunta in vista; foto, ente e
+ * logo restano ripiegati.
  */
 export function PrimarySection({
   primary,
@@ -218,7 +203,6 @@ export function PrimarySection({
   fieldErrors,
   prefilledModeratorEmail,
   showLinksOnPublish,
-  perPubblicare = true,
   photosLocked = false,
   onUploadBusy,
 }: {
@@ -227,15 +211,12 @@ export function PrimarySection({
   fieldErrors: Record<string, string>;
   prefilledModeratorEmail: string | null;
   showLinksOnPublish: boolean;
-  /** Si pubblica da qui (creazione): nome ed email lo dicono finche' mancano. */
-  perPubblicare?: boolean;
   /** Senza sessione dello staff la foto si vede e non si cambia. */
   photosLocked?: boolean;
   /** La foto o il logo in viaggio verso il server: vedi StepPeople. */
   onUploadBusy?: (inCaricamento: boolean) => void;
 }) {
   const t = useTranslations('admin.wizard.step3');
-  const tf = useTranslations('admin.wizard.flow');
   const profiloErrato = !!(
     fieldErrors.moderatorOrganization ||
     fieldErrors.moderatorOrganizationLogoUrl ||
@@ -247,37 +228,15 @@ export function PrimarySection({
     profiloErrato ||
       !!primary.photoId ||
       !!primary.organization ||
-      !!primary.organizationLogoUrl ||
-      primary.publicListed
+      !!primary.organizationLogoUrl
   );
   // Un errore dentro il pannello lo apre (e lo lascia aperto).
   useEffect(() => {
     if (profiloErrato) setAltroAperto(true);
   }, [profiloErrato]);
-  const nomeVuoto = perPubblicare && !nomeOrganizzatoreValido(primary.name);
-  const emailVuota = perPubblicare && !emailValida(primary.email);
   // Come nel primo passo: l'asterisco segna il campo, l'errore compare al
-  // tentativo, rosso e accanto al campo.
+  // tentativo («Avanti» o «Pubblica»), rosso e accanto al campo.
   const stato = (errore: unknown) => (errore ? ' wizard-campo--insisti' : '');
-  const promemoria = (id: string) => (
-    <div id={id} className="wizard-campo__hint">
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <path d="M12 20h9" />
-        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
-      </svg>
-      <span>{tf('requiredToPublish')}</span>
-    </div>
-  );
   const precompilato =
     !!prefilledModeratorEmail &&
     primary.email.trim().toLowerCase() === prefilledModeratorEmail.trim().toLowerCase();
@@ -316,18 +275,10 @@ export function PrimarySection({
               className={`form-control${fieldErrors.moderatorName ? ' is-invalid' : ''}`}
               value={primary.name}
               onChange={(e) => onPrimaryChange({ moderatorName: e.target.value })}
-              aria-describedby={
-                nomeVuoto && !fieldErrors.moderatorName
-                  ? 'wiz-primary-name-promemoria'
-                  : undefined
-              }
             />
             {fieldErrors.moderatorName && (
               <div className="invalid-feedback d-block">{t('primaryNameRequired')}</div>
             )}
-            {nomeVuoto &&
-              !fieldErrors.moderatorName &&
-              promemoria('wiz-primary-name-promemoria')}
           </div>
           <div
             className={`col-md-6 wizard-campo${stato(fieldErrors.moderatorEmail)}`}
@@ -341,23 +292,31 @@ export function PrimarySection({
               className={`form-control${fieldErrors.moderatorEmail ? ' is-invalid' : ''}`}
               value={primary.email}
               onChange={(e) => onPrimaryChange({ moderatorEmail: e.target.value })}
-              aria-describedby={
-                emailVuota && !fieldErrors.moderatorEmail
-                  ? 'wiz-primary-email-promemoria'
-                  : undefined
-              }
             />
             {fieldErrors.moderatorEmail && (
               <div className="invalid-feedback d-block">{t('primaryEmailRequired')}</div>
             )}
-            {emailVuota &&
-              !fieldErrors.moderatorEmail &&
-              promemoria('wiz-primary-email-promemoria')}
           </div>
           <div className="col-12">
-            {/* Foto, ente, logo e pagina pubblica: non servono per
-                pubblicare, restano ripiegati (aperti se hanno gia' un valore
-                o un errore). */}
+            {/* Nella pagina pubblica: una scelta esplicita (e' un dato
+                personale), in vista accanto al nome, non dentro un pannello
+                che nessuno apre. */}
+            <div className="form-check mb-0">
+              <input
+                id="wiz-primary-public"
+                type="checkbox"
+                className="form-check-input"
+                checked={primary.publicListed}
+                onChange={(e) => onPrimaryChange({ moderatorPublicListed: e.target.checked })}
+              />
+              <label className="form-check-label" htmlFor="wiz-primary-public">
+                {t('personPublic')}
+              </label>
+            </div>
+          </div>
+          <div className="col-12">
+            {/* Foto, ente e logo: non servono per pubblicare, restano
+                ripiegati (aperti se hanno gia' un valore o un errore). */}
             <details className="wizard-primary__more" open={altroAperto || undefined}>
               <summary className="small">{t('primaryMore')}</summary>
               <div className="row g-3 pt-2">
@@ -391,22 +350,6 @@ export function PrimarySection({
                       {t('primaryProfileInvalid')}
                     </div>
                   )}
-                </div>
-                <div className="col-md-6 d-flex align-items-end">
-                  <div className="form-check mb-2">
-                    <input
-                      id="wiz-primary-public"
-                      type="checkbox"
-                      className="form-check-input"
-                      checked={primary.publicListed}
-                      onChange={(e) =>
-                        onPrimaryChange({ moderatorPublicListed: e.target.checked })
-                      }
-                    />
-                    <label className="form-check-label" htmlFor="wiz-primary-public">
-                      {t('personPublic')}
-                    </label>
-                  </div>
                 </div>
                 <div className="col-12">
                   <details className="wizard-person__logo">
@@ -579,10 +522,13 @@ function OrganizersSection({
   };
 
   return (
+    // Aperta anche vuota, come il moderatore principale che segue: e' parte di
+    // «Chi organizza», non un'aggiunta facoltativa da scoprire.
     <Gruppo
       title={t('organizersHeading')}
       help={t('organizersHelp')}
       count={value.length}
+      aperto
     >
       <AddedList
         items={value}
@@ -796,7 +742,10 @@ function PeopleSection({
   );
 
   return (
-    <Gruppo title={t('peopleHeading')} help={t('peopleHelp')} count={tutte.length}>
+    // Aperta, con i ruoli in testa: che cosa fa ciascuno si legge dove i
+    // ruoli si assegnano, senza aprire un menu.
+    <Gruppo title={t('peopleHeading')} help={t('peopleHelp')} count={tutte.length} aperto>
+      <RuoliEvento />
       {tutte.length > 0 && (
         <ul className="list-group mb-3 wizard-people">
           {tutte.map((r, i) => {

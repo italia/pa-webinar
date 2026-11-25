@@ -9,10 +9,17 @@
 import { isValidElement } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-const m = vi.hoisted(() => ({ eventi: vi.fn() }));
+const m = vi.hoisted(() => ({
+  eventi: vi.fn(),
+  impostazioni: {} as Record<string, unknown>,
+}));
 vi.mock('@/lib/db', () => ({ prisma: { event: { findMany: m.eventi } } }));
 vi.mock('@/lib/settings', () => ({
-  getSettings: async () => ({ homePageMode: 'EVENTS_LIST', parseTitleKicker: false }),
+  getSettings: async () => ({
+    homePageMode: 'EVENTS_LIST',
+    parseTitleKicker: false,
+    ...m.impostazioni,
+  }),
 }));
 vi.mock('next-intl/server', () => ({
   getLocale: async () => 'it',
@@ -70,5 +77,47 @@ describe('home — il video degli eventi in programma', () => {
       ['a', '/api/events/evento-a/recording'],
       ['b', null],
     ]);
+  });
+});
+
+/** I testi di un albero di elementi, cercati fra le props. */
+function testi(nodo: unknown, out: string[] = []): string[] {
+  if (typeof nodo === 'string') out.push(nodo);
+  else if (Array.isArray(nodo)) nodo.forEach((n) => testi(n, out));
+  else if (isValidElement(nodo)) {
+    for (const v of Object.values(nodo.props as Record<string, unknown>)) testi(v, out);
+  } else if (nodo && typeof nodo === 'object') {
+    for (const v of Object.values(nodo)) testi(v, out);
+  }
+  return out;
+}
+
+describe('home — le lingue del sito', () => {
+  async function badge(availableLocales: unknown): Promise<string[]> {
+    m.impostazioni = { homePageMode: 'LANDING', availableLocales };
+    m.eventi.mockResolvedValueOnce([]);
+    const pagina = await HomePage();
+    if (!isValidElement(pagina) || typeof pagina.type !== 'function') {
+      throw new Error('la home predefinita non e\' un componente');
+    }
+    const albero = await (pagina.type as (p: unknown) => Promise<unknown>)(pagina.props);
+    return testi(albero).filter((t) => t.startsWith('hero.badges.languages'));
+  }
+
+  it('tutte e 24 attive: le lingue dell’Unione europea', async () => {
+    const { locales } = await import('@/i18n/config');
+    expect(await badge([...locales])).toEqual(['hero.badges.languagesAll']);
+  });
+
+  it('solo alcune (di default italiano e inglese): «in più lingue», senza numeri', async () => {
+    expect(await badge(undefined)).toEqual(['hero.badges.languagesSome']);
+    expect(await badge(['it', 'en', 'fr'])).toEqual(['hero.badges.languagesSome']);
+  });
+
+  it('una lingua sola, o codici che il sito non ha, nessun badge', async () => {
+    expect(await badge(['it'])).toEqual([]);
+    // Un elenco vuoto, come per il selettore della lingua: nessuna scelta.
+    expect(await badge([])).toEqual([]);
+    expect(await badge(['it', 'xx', 'it'])).toEqual([]);
   });
 });

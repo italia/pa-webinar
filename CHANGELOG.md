@@ -10,6 +10,20 @@ public `/changelog` page, translated into every language the site ships.
 Versions follow [semantic versioning](https://semver.org/). Releases marked
 🔒 were primarily security or dependency hardening.
 
+## 0.14.0 — 2026-11-25
+
+**A new room, live captions, separate consents**
+
+- Live captions with the speaker's name, produced by the installation itself on CPU, with no external service. An event can keep their transcript, with only the sentences of the people who consented.
+- Recording, transcription and address book have separate consents, optional and never pre-ticked. Whoever refuses the recording takes part and stays out of it, and every consent can be withdrawn from "My data". Before the event the organizer declares whether the video will be reserved or public, and a sheet explains what happens to the data.
+- The recorded video shows only the people who lead the event: with their consent, participants are in it by voice. Staff can remove a person from a video already recorded, each event chooses how long to keep its recording, and people who were in an instant call can watch it again.
+- A redesigned room: collapsible panels, a Control panel for whoever runs the event, "Give the floor", PDFs presented without sharing the screen, speaking timers, QR codes for the links. Locking participants' microphones and cameras now holds on the video bridge too, and the waiting room has a new look, square included.
+- Participants can appear under a nickname or a pseudonym, where the event allows it, and in large events or those where the audience only listens the participant list is hidden. From the opening of the waiting room people can also enter without registering, if the administration allows it.
+- Creating an event is simpler: a few questions choose the starting values, the programme is prepared in advance, invitations go out by email, and an event can be reserved to invitees. Title and description are translated into the chosen languages, on CPU, where the installation turns it on.
+- After the event the page leads with the video in its languages, with synced slides and the programme as an index. On request, staff get an event report written with artificial intelligence, a glossary guides transcription and translation, and "Close the event" says what is left to do.
+- Header, menus and administration follow the Designers Italia models. More automated accessibility checks, security fixes, updated libraries and Next.js 15.5.29.
+- When upgrading: the Jitsi components move to stable-11031 and the chart stops if one of them is pinned to another version; remove `jitsi-meet.jibri.custom.other._finalize_sh`; whoever replaces the Jitsi configuration must add `config.hiddenFromRecorderFeatureEnabled = true`; Prosody restarts; captions are on by default (`global.captions.enabled`).
+
 ## 0.13.0 — 2026-09-28
 
 **More complete privacy, and transcripts of long events**

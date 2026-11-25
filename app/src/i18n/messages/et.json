@@ -212,7 +212,8 @@
       "recordingLinkSend": "Saada link uuesti",
       "recordingLinkSent": "Kui aadress on üritusele registreeritud, saad peagi e-kirja oma isikliku lingiga.",
       "recordingLinkError": "Päring ebaõnnestus. Proovi mõne minuti pärast uuesti.",
-      "registerOrGuest": "Registreerudes saad e-postiga oma isikliku lingi ja uudised sündmuse kohta. Külalisena sisened kohe ainult nimega, ainult siis, kui sündmus on otse-eetris, ja e-kirju ei saa."
+      "registerOrGuest": "Registreerudes saad e-postiga oma isikliku lingi ja uudised sündmuse kohta. Külalisena sisened kohe ainult nimega ja e-kirju ei saa.",
+      "guestWhenRoomOpens": "Ürituse päeval, kui ooteruum avatakse, saad osaleda ka registreerimata, ainult oma nimega."
     },
     "manage": {
       "toggleChat": "Vestlus",
@@ -661,7 +662,6 @@
     },
     "notOpenNow": "Ruum ei ole praegu avatud.",
     "nameRequired": "Nimi, millega siseneda, puudub: mine tagasi ja kirjuta see.",
-    "closeSidebar": "Sulge külgpaneel",
     "contentOnly": "Ainult sisu, ilma vestluse ja paneelideta",
     "showPanels": "Näita vestlust ja paneele",
     "confirmFullscreen": "Lülitu täisekraanile",
@@ -1012,11 +1012,10 @@
           "BALANCED": "Tasakaalustatud (540p)",
           "SAVE_DATA": "Andmesääst (360p)"
         },
-        "kickerHint": "Pealkirja kohal oleva rea jaoks kirjuta see enne pealkirja ja eralda märgiga |, näiteks „Kohtumiste sari | Esimene kohtumine“.",
-        "kickerUse": "Näita „{kicker}“ pealkirja kohal",
-        "kickerPreview": "Nii näeb see välja ürituse lehel",
+        "kickerHint": "Valikuline: lühike rida pealkirja kohal, näiteks kohtumiste sarja nimi.",
         "coverImageSize": "16:9, soovitatav 1600 × 900 pikslit.",
-        "requiredNote": "Tärniga * märgitud väljad on kohustuslikud."
+        "requiredNote": "Tärniga * märgitud väljad on kohustuslikud.",
+        "kickerLabel": "Ülarida ({language})"
       },
       "step2": {
         "heading": "Kes mida saab teha",
@@ -1097,11 +1096,6 @@
         "recordingDestinationRequired": "Vali, kuhu salvestis läheb.",
         "audienceAnonymous": "Anonüümne publik",
         "audienceAnonymousDesc": "Osalejad on teistele nähtavad pseudonüümiga („Osaleja“ ja kood) videos, vestluses ja küsimustes; osalejate nimekiri jääb juhatajatele ja väljakut pole. Kasulik suurtel sündmustel; kogukonna sündmustel tahetakse üksteist tundma õppida.",
-        "audienceAnonymousLocked": "Kuni ruum võib olla avatud, seda muuta ei saa: see seoks pseudonüümid nimedega.",
-        "participantListVisible": "Näita publikule osalejate loendit",
-        "participantListVisibleDesc": "Väljas: loend, ruudustik ja nimed väljakul jäävad juhtidele ja esinejatele; publik näeb ainult kõnelejat. Sees: kõik näevad, kes on ruumis.",
-        "participantListAnonymous": "Anonüümse publiku korral jääb loend peidetuks.",
-        "participantListLocked": "Avatud ruumiga seda muuta ei saa: juba sees olijad muudatust ei näeks.",
         "nicknamesEnabled": "Hüüdnimed osalejatele",
         "nicknamesEnabledDesc": "Osalejad saavad valida hüüdnime: teised näevad seda nime asemel videos, vestluses, küsimustes ja transkriptsioonis. Korraldajad ja moderaatorid näevad, kes selle taga on. Juhid jäävad oma nimega. Vaikimisi on see sees, kui osalejate nimekiri on peidetud.",
         "nicknamesLocked": "Avatud ruumi korral seda muuta ei saa: kes on juba sees, valis eelmise reegli järgi.",
@@ -1110,7 +1104,13 @@
         "hostsAlwaysRecorded": "Juhtijad on alati salvestuses",
         "hostsAlwaysRecordedDesc": "Moderaatorid ja esinejad on videol nime ja pildiga, ilma märkeruuduta: ürituse privaatsusteade peab seda ütlema. Osalejatest salvestatakse ainult hääl ja ainult nende nõusolekul.",
         "hostsAlwaysRecordedDescHostsOnly": "Moderaatorid ja esinejad on videol nime ja pildiga, ilma märkeruuduta: ürituse privaatsusteade peab seda ütlema. Osalejaid pole videol kunagi näha ega kuulda.",
-        "hostsAlwaysRecordedDescVisible": "Moderaatorid ja esinejad on videol nime ja pildiga, ilma märkeruuduta: ürituse privaatsusteade peab seda ütlema. See paigaldus ei suuda osalejaid videost eemal hoida: nõusoleku andnu võtab sõna nime, hääle ja pildiga ning iga jälgija nimi võib ilmuda ka ilma sõna võtmata."
+        "hostsAlwaysRecordedDescVisible": "Moderaatorid ja esinejad on videol nime ja pildiga, ilma märkeruuduta: ürituse privaatsusteade peab seda ütlema. See paigaldus ei suuda osalejaid videost eemal hoida: nõusoleku andnu võtab sõna nime, hääle ja pildiga ning iga jälgija nimi võib ilmuda ka ilma sõna võtmata.",
+        "audienceHeading": "Kuidas osalejad paistavad",
+        "audienceOptionList": "Nimega, kõigile nähtav",
+        "audienceOptionListDesc": "Osalejate loend, videoruudustik ja nimed väljakul on kõigile nähtavad.",
+        "audienceOptionHosts": "Nimega, nähtav ainult juhtidele",
+        "audienceOptionHostsDesc": "Publik näeb ainult kõnelejat; loend, ruudustik ja nimed väljakul jäävad juhtidele ja esinejatele.",
+        "audienceLocked": "Kui ruum on avatud, seda muuta ei saa."
       },
       "step3": {
         "heading": "Inimesed ja kutsed",
@@ -1142,7 +1142,7 @@
         "personName": "Nimi",
         "personEmail": "E-post",
         "peopleHeading": "Moderaatorid ja esinejad",
-        "peopleHelp": "Kaaskorraldajad, moderaatorid ja esinejad. Igaüks saab oma lingi, et siseneda oma rolliga; mida iga roll teha saab, on selgitatud ülal.",
+        "peopleHelp": "Kaaskorraldajad, moderaatorid ja esinejad: igaüks saab oma lingi, et siseneda oma rolliga.",
         "personRole": "Roll",
         "roleOrganizer": "Kaaskorraldaja",
         "roleModerator": "Moderaator",
@@ -1201,7 +1201,7 @@
         "invitationsHelpRestricted": "Registreeruda saavad ainult selle nimekirja aadressid. Pärast avaldamist saadad igaühele sündmuse lehelt kutse e-postiga koos registreerimislingiga; sisenemise link tuleb pärast registreerumist.",
         "logoExternal": "Avalikul lehel kuvatakse ainult sellele platvormile üles laaditud logosid: teiselt saidilt pärit logo ei kuvata.",
         "primaryProfileInvalid": "Kontrollige organisatsiooni ja logo aadressi.",
-        "primaryMore": "Foto, asutus, logo ja avalik leht",
+        "primaryMore": "Foto, asutus ja logo",
         "accessHeading": "Kes registreeruvad",
         "accessSiteDefault": "Järgib saidi seadet: kui haldus seda muudab, kehtib see ka sellele üritusele.",
         "accessNoInvitees": "Kutsutuid veel pole: kuni allolev nimekiri on tühi, ei saa keegi registreeruda.",
@@ -1348,7 +1348,7 @@
           "invites": "Inimesed",
           "programme": "Kava",
           "review": "Kokkuvõte",
-          "advanced": "Täpsemad seaded",
+          "advanced": "Lisaseaded",
           "permissions": "Õigused"
         },
         "templateInUse": "Mall: <b>{name}</b>",
@@ -1367,7 +1367,6 @@
         "scheduleIntro": "Millal sündmus toimub: kuupäev, kellaaeg ja ajavöönd.",
         "advancedIntro": "Malli juba valitud väärtused: muuda ainult vajalikku.",
         "advancedIntroTemplate": "Malli „{name}” juba valitud väärtused: muuda ainult vajalikku.",
-        "requiredToPublish": "Vajalik ürituse avaldamiseks.",
         "toComplete": "Täitmata",
         "missingHeading": "Avaldamiseks on veel puudu:",
         "fieldOrganizerName": "Peamoderaatori nimi",
@@ -1384,9 +1383,7 @@
         "changeFormat": "Muuda vormi",
         "voiceAll": "Kõik räägivad ja on videos näha",
         "voiceSpeakers": "Esinejad ja juhid räägivad ja on videos näha; publik kirjutab vestlusesse",
-        "features": "Funktsioonid: {list}",
         "liveToggleNote": "Iga funktsiooni saab sisse ja välja lülitada ka ürituse ajal.",
-        "customize": "Kohanda seadeid",
         "changeLanguages": "Muuda keeli",
         "translationLine": "Tõlge keeltesse: {list}",
         "privacyTemplate": "Privaatsusteave: {name}",
@@ -1423,7 +1420,6 @@
         "audienceRealNames": "Publiku nimed: pärisnimed.",
         "postEventQaHidden": "Küsimused pärast üritust: ei avaldata.",
         "postEventQaTextOnly": "Küsimused pärast üritust: ainult tekst, ilma nimedeta.",
-        "addressBookOffered": "Aadressraamat: pakutakse registreerujatele.",
         "addressBookNotOffered": "Aadressraamat: ei pakuta.",
         "consentRecordingOptional": "salvestamine, vabatahtlik",
         "consentRecordingVoice": "salvestus, vabatahtlik (ilma nõusolekuta jääb isik salvestusest välja)",
@@ -1433,7 +1429,6 @@
         "title": "Lehe eelvaade",
         "open": "Ava eelvaade",
         "note": "Selline näeb välja ürituse leht; see uueneb kirjutamise ajal.",
-        "noteNoDate": "Selline näeb välja ürituse leht; kuni kuupäev on määramata, on kellaaeg vaid näide.",
         "titlePlaceholder": "Ürituse pealkiri",
         "descriptionPlaceholder": "Siia ilmub kirjeldus."
       },
@@ -1464,26 +1459,18 @@
         "notPublic": "{name} ei ole avalikul lehel nähtav: kavas on näha ainult teema.",
         "makePublic": "Näita nime lehel",
         "madePublic": "{name} on nüüd avalikul lehel nähtav.",
-        "cardTitle": "Kava",
-        "cardEmpty": "Teemad koos esinejate ja kellaaegadega kuvatakse siin kirjelduse all ürituse lehel.",
-        "cardPrepare": "Koosta kava",
-        "cardSummary": "{count, plural, one {# teema} other {# teemat}}",
-        "cardSummaryWithTimes": "{count, plural, one {# teema} other {# teemat}} · {start}–{end}",
-        "cardOff": "Väljas: lehel ei kuvata.",
-        "cardChange": "Muuda kava",
         "descriptionHasProgramme": "Kirjeldus näib sisaldavat kava. Sammus „Kava“ on sellel kellaajad ja inimesed ning ruumis on näha käimasolev teema.",
         "goToProgramme": "Mine kava juurde",
-        "peoplePointer": "Igaühe sõnavõtud koostad järgmises sammus, „Kava“.",
         "reviewEmpty": "Kava: teemasid pole",
         "reviewPrepare": "Koosta",
         "reviewOff": "Kava: väljas, lehel ei kuvata ({count, plural, one {# teema} other {# teemat}})",
         "previewPlaceholder": "Siin kuvatakse kava",
-        "toggleLink": "Koosta kava",
         "toggleOffWarning": "Väljas olles kava ({count, plural, one {# teema} other {# teemat}}) lehel ei kuvata: kehtib viimati salvestatud versioon ja siin tehtud muudatused salvestatakse ainult siis, kui selle uuesti sisse lülitad.",
         "offKeptCreate": "Kuni kava on väljas, selle teemasid üritusega koos ei salvestata: lülita see sisse, et neid alles hoida ja muuta.",
         "offKeptEdit": "Kuni kava on väljas, kehtib viimati salvestatud versioon: siin tehtud muudatused salvestatakse ainult siis, kui selle uuesti sisse lülitad.",
         "toggleOffWarningCreate": "Väljas olles kava ({count, plural, one {# teema} other {# teemat}}) lehel ei kuvata ega üritusega koos salvestata: lülita see sisse, et seda alles hoida.",
-        "reviewOffCreate": "Kava: väljas, üritusega koos ei salvestata ({count, plural, one {# teema} other {# teemat}})"
+        "reviewOffCreate": "Kava: väljas, üritusega koos ei salvestata ({count, plural, one {# teema} other {# teemat}})",
+        "showToParticipants": "Näita kava osalejatele"
       },
       "saveCopy": "Salvesta koopia",
       "consentMap": {
@@ -1522,7 +1509,6 @@
       "settings": "Seaded",
       "eventsList": "Kõik üritused",
       "newEvent": "Uus üritus",
-      "calendar": "Ürituste kalender",
       "templates": "Ürituste mallid",
       "analytics": "Statistika",
       "instantCalls": "Kiirkõned",
@@ -1563,7 +1549,8 @@
       "openMenu": "Ava menüü",
       "closeMenu": "Sulge menüü",
       "recordingRemovals": "Eemaldamise taotlused",
-      "recordingRemovalDetail": "Eemaldamise taotlus"
+      "recordingRemovalDetail": "Eemaldamise taotlus",
+      "newInstantCall": "Uus kiirkõne"
     },
     "publications": {
       "subtitle": "Ühtne toimetuskeskus kõigi avaldatud videote jaoks: planeeritud sündmused, kiirkõned, üleslaaditud arhiivisalvestused ja avaldamist ootavad sessioonid.",
@@ -2315,7 +2302,9 @@
         "waitingRoomEngineGame": "Videomäng (Phaseri ooteala)",
         "waitingRoomEngineClassic": "Klassikaline (staatiline)",
         "waitingRoomEngineHelp": "Ooteruumi vaikerežiim. Seda saab muuta üksiku sündmuse jaoks ja ühe külastuse jaoks aadressis oleva parameetriga {param}.",
-        "primaryColorHex": "Põhivärv (kuueteistkümnendkood)"
+        "primaryColorHex": "Põhivärv (kuueteistkümnendkood)",
+        "organizationLogoUrl": "Asutuse logo",
+        "organizationLogoUrlHelp": "Kuvatakse jaluses teenust haldava asutuse nime kõrval. Jäta tühjaks, et näidata ainult nime."
       },
       "watermark": {
         "title": "Video kohandamine",
@@ -2541,7 +2530,7 @@
     },
     "recurrence": {
       "label": "Kordumine",
-      "helpText": "Kui sündmus kordub, pakub koopia dubleerimisel järgmise toimumise kuupäeva.",
+      "helpText": "Kordus ei loo järgmisi kordi ise: kui ürituse dubleerid, on koopial juba järgmise korra kuupäev.",
       "preset": {
         "none": "Ei kordu",
         "daily": "Iga päev",
@@ -3004,7 +2993,15 @@
       "postEventSummary": "{connected} liitunud · {registered} registreeringut",
       "registeredCount": "{count, plural, =0 {Registreeringuid pole} one {1 registreering} other {# registreeringut}}",
       "sortUpcoming": "Eelseisvad enne",
-      "todayTitle": "Täna ja käimas"
+      "todayTitle": "Täna ja käimas",
+      "viewLabel": "Vaade",
+      "viewList": "Loend",
+      "viewCalendar": "Kalender",
+      "type": "Tüüp",
+      "typeAll": "Kõik tüübid",
+      "typeScheduled": "Üritused",
+      "typeInstant": "Kiirkõned",
+      "instantFullList": "Kiirkõnede täielik loend, filtritega kuupäeva ja salvestuse järgi"
     },
     "tags": {
       "subtitle": "Looge, muutke ja kustutage silte avalike sündmuste klassifitseerimiseks ja filtreerimiseks.",
@@ -3044,7 +3041,6 @@
       "copyPublicUrl": "Kopeeri avalik link",
       "copyInviteUrl": "Kopeeri kutse link",
       "enterAsParticipant": "Sisene osalejana",
-      "openAsParticipant": "Ava osalejana",
       "participantHintRoom": "Avaneb uuel vahekaardil: ruum nii, nagu külaline seda näeb, ilma moderaatori õigusteta.",
       "participantHintPassword": "Avaneb uuel vahekaardil: ruum nii, nagu külaline seda näeb, pärast ürituse parooli.",
       "participantHintPage": "Avaneb uuel vahekaardil: avalik leht nii, nagu osalejad seda näevad.",
@@ -3137,7 +3133,8 @@
         "recordingRetention": "Salvestise automaatne kustutamine",
         "recordingRetentionNone": "Puudub",
         "recordingRetentionDays": "{days, plural, one {# päev} other {# päeva}} pärast ürituse lõppu või, kui see on avaldatud, pärast avaldamist"
-      }
+      },
+      "openPublicPage": "Ava avalik leht"
     },
     "rubrica": {
       "subtitle": "Inimesed, kes on andnud nõusoleku aadressraamatusse lisamiseks (IKÜM art. 6.1.a). Nimi, e-posti aadress ja organisatsioon uuenevad ainult siis, kui inimene märgib lahtri uuesti.",
@@ -3797,9 +3794,6 @@
         "invitationDesc": "Leht jääb nähtavaks, kuid registreeruda saavad ainult nimekirjas olijad; kutse registreerimislingiga saadad e-postiga sündmuse lehelt"
       },
       "previewInvitation": "Registreeruvad ainult kutsutud; ilma registreerumiseta ei pääse sisse.",
-      "previewPseudonyms": "Publik on nähtav pseudonüümiga",
-      "previewNicknames": "Osalejad saavad kasutada hüüdnime",
-      "previewRealNames": "Publik on nähtav oma nimega",
       "templateReplaces": "Mall toob alltoodud vastuste asemel oma seaded. Pealkirja, kuupäevad ja inimesed kirjutad järgmistes sammudes.",
       "instantBack": "Loo selle asemel plaanitud sündmus"
     },
@@ -4347,7 +4341,8 @@
         "noInstall": "Brauserist, ilma paigaldusteta",
         "interactive": "Otse küsimused ja küsitlused",
         "recordings": "Salvestused ja subtiitrid",
-        "accessible": "Ligipääsetav, 24 keeles"
+        "languagesAll": "ELi 24 keeles",
+        "languagesSome": "Mitmes keeles"
       }
     },
     "upcoming": {
@@ -5523,22 +5518,18 @@
   "footer": {
     "privacy": "Privaatsuspoliitika",
     "accessibility": "Ligipääsetavuse avaldus",
-    "openSource": "Avatud lähtekoodiga tarkvara",
-    "contacts": "Kontaktid",
     "legalNotes": "Õigusteave",
-    "governmentSite": "Itaalia valitsus",
     "systemStatus": "Süsteemi olek",
-    "sbomLatest": "Viimase väljalaske SBOM",
     "transparency": "Turvalisus ja läbipaistvus",
     "serviceInventory": "Teenuste inventuur",
-    "sourceCode": "Lähtekood",
-    "viewRelease": "Vaata väljalaset GitHubis",
     "viewChangelog": "Vaata uuendusi (muudatuste logi)",
     "newWindow": "avaneb uues aknas",
     "usefulLinks": "Kasulikud lingid",
     "version": "Versioon {version}",
     "versionDev": "Arendusversioon",
-    "updatedOn": "uuendatud {date}"
+    "updatedOn": "uuendatud {date}",
+    "projectOf": "Projekti teostab",
+    "contactsLine": "Kontaktid: <link>{email}</link>"
   },
   "changelog": {
     "metaTitle": "Uudised ja muudatuste logi",

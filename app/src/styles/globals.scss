@@ -918,39 +918,6 @@ button.live-time-strip__rec {
 .live-sidebar.live-sidebar--nascosta {
   display: none !important;
 }
-// La «×» sta nella striscia blu in cima alla colonna, a destra della freccia
-// che la comprime.
-.live-sidebar-close {
-  display: none;
-
-  @media (min-width: 992px) {
-    position: absolute;
-    top: 0;
-    right: 0;
-    z-index: 3;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    min-height: 28px;
-    border: 0;
-    background: transparent;
-    color: #fff;
-    cursor: pointer;
-
-    .icon {
-      fill: currentColor;
-    }
-    &:hover {
-      background: #003d7a;
-    }
-    &:focus-visible {
-      outline: 2px solid #fff;
-      outline-offset: -3px;
-    }
-  }
-}
-
 .live-captions__speaker {
   display: inline-block;
   margin-right: 0.5rem;
@@ -11584,8 +11551,22 @@ html.live-resizing .live-sidebar-resizer::after {
 
 .wizard-mancanti__titolo .icon { fill: #8a5300; }
 
-// ── Il modello in uso, sopra i passi del wizard
+// ── In testa al wizard, sopra i passi: il modello in uso e, a parte, le
+// impostazioni aggiuntive (a destra anche quando il modello non c'e').
+.wizard-testata {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.wizard-testata__aggiuntive {
+  margin-left: auto;
+}
+
 .wizard-modello {
+  flex: 1 1 22rem;
   padding: 0.6rem 0.9rem;
   border-radius: 8px;
   background: #eef4fb;
@@ -12587,41 +12568,6 @@ html:has(.wizard-azioni) {
   }
 }
 
-// Il sopratitolo accanto al titolo: come apparira' sulla pagina dell'evento.
-.wizard-sopratitolo {
-  border-left: 3px solid var(--app-primary);
-  border-radius: 0 6px 6px 0;
-  background: #F2F7FC;
-  padding: 0.75rem 1rem;
-}
-
-.wizard-sopratitolo__etichetta {
-  margin: 0 0 0.25rem;
-  font-size: 0.75rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--app-muted);
-}
-
-.wizard-sopratitolo__titolo {
-  margin: 0;
-  font-size: 1.35rem;
-  font-weight: 700;
-  line-height: 1.25;
-  color: var(--app-text);
-}
-
-.wizard-campo__hint {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin-top: 0.4rem;
-  font-size: 0.85rem;
-  color: #004d99;
-
-  svg { flex-shrink: 0; }
-}
-
 // Che cosa manca per pubblicare, in cima al riepilogo.
 .wizard-mancanti {
   padding: 0.75rem 1rem;
@@ -12655,18 +12601,12 @@ html:has(.wizard-azioni) {
   color: var(--app-text);
 }
 
-// La barra dei passi: «Da completare» sotto il nome, e le impostazioni
-// avanzate a parte.
+// La barra dei passi: «Da completare» sotto il nome (anche accanto alle
+// impostazioni aggiuntive, in testa al wizard).
 .wizard-passi__da-fare {
   font-size: 0.75rem;
   font-weight: 600;
   color: #8a5300;
-}
-
-.wizard-passi__avanzate {
-  display: flex;
-  align-items: center;
-  align-self: center;
 }
 
 // La regione del passo riceve il fuoco a ogni cambio di passo, perche' chi
@@ -13139,6 +13079,31 @@ html:has(.wizard-azioni) {
   .dropdown-menu .list-item .icon {
     fill: var(--bs-primary);
   }
+
+  // Le azioni (creare qualcosa) in fondo, distinte dai collegamenti: nel
+  // megamenu con le classi del modello (it-footer-link), nella tendina con
+  // lo stesso aspetto e una riga sopra.
+  .it-footer-link,
+  .menu-azioni a {
+    color: var(--bs-primary);
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+      text-decoration: underline;
+    }
+
+    .icon {
+      fill: var(--bs-primary);
+    }
+  }
+
+  .menu-azioni {
+    margin: 0.5rem 1.5rem 0;
+    padding-top: 0.75rem;
+    border-top: 1px solid #d9dadb;
+  }
 }
 
 // Le etichette non vanno a capo: con nomi lunghi (alcune lingue) le sezioni
@@ -13158,6 +13123,13 @@ html:has(.wizard-azioni) {
     position: static !important;
     box-shadow: none !important;
   }
+}
+
+// Il titolo della scheda di un evento porta alla sua pagina: sottolineato al
+// passaggio e al fuoco, come un collegamento.
+.card-evento__titolo:hover,
+.card-evento__titolo:focus-visible {
+  text-decoration: underline !important;
 }
 
 .admin-breadcrumb {
@@ -14785,55 +14757,6 @@ a.campo-file__nome {
   font-size: 0.8rem;
 }
 
-// Il rimando dal passo «Persone».
-.wizard-programma__rimando {
-  display: flex;
-  gap: 0.5rem;
-  align-items: flex-start;
-  margin: 0 0 1rem;
-  color: #3d4955;
-  font-size: 0.875rem;
-
-  .icon {
-    flex-shrink: 0;
-    fill: #0066cc;
-  }
-}
-
-// La scheda del programma nel passo «Evento», sotto la descrizione.
-.wizard-programma-scheda {
-  padding: 0.75rem 1rem;
-  border: 1px solid #d9dadb;
-  border-radius: 8px;
-  background: #fff;
-}
-
-.wizard-programma-scheda__riga {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem 1rem;
-}
-
-.wizard-programma-scheda__icona {
-  flex-shrink: 0;
-  fill: #0066cc;
-}
-
-.wizard-programma-scheda__testo {
-  flex: 1 1 16rem;
-  min-width: 0;
-  color: #3d4955;
-  font-size: 0.9rem;
-}
-
-.wizard-programma-scheda__titolo {
-  margin: 0 0 0.15rem;
-  color: var(--app-text);
-  font-size: 1rem;
-  font-weight: 700;
-}
-
 // Nell'anteprima con il programma in primo piano: la descrizione accorciata
 // a qualche riga, e il posto del programma finche' non ha argomenti.
 .anteprima-pagina__descrizione-breve {
@@ -14961,6 +14884,68 @@ a.campo-file__nome {
     overflow-y: auto;
     margin-top: 0.25rem;
   }
+}
+
+// Il piè di pagina essenziale (components/layout/pa-footer.tsx): sotto il
+// servizio, l'ente che lo porta, come nei siti della PA («Progetto di», con il
+// logo); poi gli eventuali link scelti da chi amministra.
+.footer-progetto,
+.footer-utili {
+  padding: 1.5rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+
+  a {
+    color: #fff;
+  }
+}
+
+.footer-progetto__etichetta {
+  margin: 0 0 0.75rem;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.footer-progetto__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.footer-progetto__ente {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.footer-progetto__logo {
+  height: 48px;
+  width: auto;
+  max-width: 12rem;
+  object-fit: contain;
+}
+
+.footer-progetto__nome {
+  display: block;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.footer-progetto__sovra {
+  display: block;
+  font-size: 0.875rem;
+}
+
+.footer-progetto__contatti {
+  margin: 1rem 0 0;
+  font-size: 0.9rem;
+}
+
+.footer-utili .list-inline-item:not(:last-child) {
+  margin-right: 1.5rem;
 }
 
 // «Torna su» sta in basso a destra: la riga in fondo al piè di pagina gli

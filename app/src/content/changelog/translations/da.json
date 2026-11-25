@@ -1,4 +1,18 @@
 {
+  "0.14.0": {
+    "title": "Et nyt rum, live-tekstning, adskilte samtykker",
+    "notes": [
+      "Live-tekstning med navnet på den, der taler, lavet af installationen selv på CPU, uden eksterne tjenester. Et arrangement kan bevare transskriptionen, kun med sætninger fra dem, der har samtykket.",
+      "Optagelse, transskription og adressebog har adskilte, frivillige og aldrig forhåndsafkrydsede samtykker. Den, der afslår optagelsen, deltager og holdes uden for den, og hvert samtykke trækkes tilbage fra »Mine data«. Før arrangementet angives det, om videoen bliver forbeholdt eller offentlig, og et ark forklarer, hvad der sker med dataene.",
+      "I den optagede video ses kun dem, der leder: fra deltagere kommer, med samtykke, stemmen med. Personalet kan fjerne en person fra en allerede optaget video, hvert arrangement vælger, hvor længe optagelsen gemmes, og den, der var i et hurtigt opkald, kan se det igen.",
+      "Nydesignet rum: sammenklappelige paneler, Styring for den, der leder, »Giv ordet«, PDF'er vist uden skærmdeling, taletidsur, QR-koder til links. Spærringen af mikrofoner og kameraer gælder nu også på videobroen, og venteværelset har fået nyt udseende, pladsen inklusive.",
+      "Deltagere kan optræde under et kælenavn eller pseudonym, hvor arrangementet tillader det, og i store arrangementer eller hvor publikum lytter, er deltagerlisten skjult. Fra venteværelset åbner, kan man gå ind uden tilmelding, hvis administrationen tillader det.",
+      "Det er enklere at oprette et arrangement: få spørgsmål vælger startværdierne, programmet forberedes på forhånd, invitationer sendes pr. e-mail, og et arrangement kan forbeholdes inviterede. Titel og beskrivelse oversættes til de valgte sprog, på CPU, hvor installationen har slået det til.",
+      "Efter arrangementet viser siden øverst videoen på sine sprog, med synkroniserede slides og programmet som indeks. På personalets anmodning er der en rapport skrevet med kunstig intelligens, en ordliste styrer transskription og oversættelser, og »Afslut arrangementet« siger, hvad der mangler.",
+      "Sidehoved, menuer og administration følger Designers Italias modeller. Flere automatiske tilgængelighedskontroller, sikkerhedsrettelser, opdaterede biblioteker og Next.js 15.5.29.",
+      "Ved opgradering: Jitsi-komponenterne skifter til stable-11031, og chartet stopper, hvis en af dem er låst til en anden version; fjern `jitsi-meet.jibri.custom.other._finalize_sh`; den, der erstatter Jitsi-konfigurationen, skal tilføje `config.hiddenFromRecorderFeatureEnabled = true`; Prosody genstarter; tekstning er slået til som standard (`global.captions.enabled`)."
+    ]
+  },
   "0.13.0": {
     "title": "Mere fuldstændigt privatliv og transskriptioner af lange begivenheder",
     "notes": [
