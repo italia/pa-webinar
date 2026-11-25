@@ -1,4 +1,18 @@
 {
+  "0.14.0": {
+    "title": "Seomra nua, fotheidil bheo, toilithe ar leithligh",
+    "notes": [
+      "Fotheidil bheo le hainm an chainteora, á ndéanamh ag an suiteáil féin ar CPU, gan seirbhís sheachtrach. Is féidir le himeacht a dtras-scríobh a choinneáil, agus abairtí na ndaoine a thoiligh ann amháin.",
+      "Tá toilithe ar leithligh ag taifeadadh, tras-scríobh agus leabhar seoltaí, roghnach agus gan tic roimh ré. An té a dhiúltaíonn don taifeadadh, glacann sé páirt agus fanann sé lasmuigh de, agus is féidir gach toiliú a tharraingt siar ó “Mo chuid sonraí”. Roimh an imeacht dearbhaítear an mbeidh an físeán forchoimeádta nó poiblí, agus míníonn bileog a tharlaíonn do na sonraí.",
+      "Ní fheictear san fhíseán taifeadta ach iad siúd atá i gceannas: ó na rannpháirtithe, le toiliú, téann an guth isteach. Is féidir leis an bhfoireann duine a bhaint as físeán atá taifeadta cheana, roghnaíonn gach imeacht cé chomh fada a choinneofar an taifeadadh, agus is féidir leis an té a bhí i nglao meandrach féachaint air arís.",
+      "Seomra athdheartha: painéil infhillte, Rialú don té atá i gceannas, “Tabhair an focal”, PDFanna gan roinnt scáileáin, amadóir cainte, cóid QR na nasc. Tá glasáil micreafón agus ceamaraí i bhfeidhm anois ar an droichead físe freisin, agus tá cuma nua ar an seomra feithimh, an chearnóg san áireamh.",
+      "Is féidir le rannpháirtithe láithriú le leasainm nó ainm cleite, áit a gceadaíonn an imeacht é, agus in imeachtaí móra nó ina n-éisteann an lucht féachana tá liosta na rannpháirtithe folaithe. Ó oscailt an tseomra feithimh is féidir dul isteach gan clárú, má cheadaíonn an riarachán é.",
+      "Tá sé níos simplí imeacht a chruthú: roghnaíonn cúpla ceist na tosluachanna, ullmhaítear an clár roimh ré, téann cuirí amach le ríomhphost, agus is féidir imeacht a choinneáil do chuireadh amháin. Aistrítear an teideal agus an cur síos go dtí na teangacha roghnaithe, ar CPU, áit a gcasann an tsuiteáil air é.",
+      "Tar éis na himeachta cuireann an leathanach an físeán ina theangacha chun tosaigh, le sleamhnáin shioncronaithe agus an clár mar innéacs. Ar iarratas na foirne tá tuarascáil scríofa le hintleacht shaorga, treoraíonn gluais na tras-scríbhinní agus na haistriúcháin, agus insíonn “Dún an imeacht” cad atá fós le déanamh.",
+      "Leanann an ceanntásc, na roghchláir agus an riarachán múnlaí Designers Italia. Breis seiceálacha uathoibríocha inrochtaineachta, ceartúcháin slándála, leabharlanna nuashonraithe agus Next.js 15.5.29.",
+      "Le linn uasghrádaithe: bogann comhpháirteanna Jitsi go stable-11031 agus stopann an chart má tá ceann acu ceangailte le leagan eile; bain `jitsi-meet.jibri.custom.other._finalize_sh`; an té a ionadaíonn cumraíocht Jitsi, caithfidh sé `config.hiddenFromRecorderFeatureEnabled = true` a chur leis; atosaítear Prosody; tá fotheidil ar siúl de réir réamhshocraithe (`global.captions.enabled`)."
+    ]
+  },
   "0.13.0": {
     "title": "Príobháideachas níos iomláine agus tras-scríbhinní imeachtaí fada",
     "notes": [

@@ -1,4 +1,18 @@
 {
+  "0.14.0": {
+    "title": "Kamra ġdida, sottotitli diretti, kunsensi separati",
+    "notes": [
+      "Sottotitli diretti bl-isem ta' min qed jitkellem, maħluqa mill-installazzjoni stess fuq CPU, mingħajr servizz estern. Avveniment jista' jżomm it-traskrizzjoni tagħhom, bis-sentenzi ta' min ta l-kunsens biss.",
+      "Ir-reġistrazzjoni, it-traskrizzjoni u l-ktieb tal-indirizzi għandhom kunsensi separati, volontarji u qatt mhux immarkati minn qabel. Min jirrifjuta r-reġistrazzjoni jipparteċipa u jibqa' barra minnha, u kull kunsens jista' jitneħħa minn “Id-dejta tiegħi”. Qabel l-avveniment jiġi ddikjarat jekk il-vidjow ikunx riservat jew pubbliku, u karta tispjega x'jiġri mid-dejta.",
+      "Fil-vidjow reġistrat jidhru biss dawk li jmexxu: tal-parteċipanti, bil-kunsens, tidħol il-vuċi. L-istaff jista' jneħħi persuna minn vidjow diġà reġistrat, kull avveniment jagħżel kemm iżomm ir-reġistrazzjoni, u min kien f'telefonata istantanja jista' jerġa' jaraha.",
+      "Kamra ddisinjata mill-ġdid: pannelli li jingħalqu, Kontroll għal min imexxi, “Agħti l-kelma”, PDFs mingħajr qsim tal-iskrin, kronometru tal-interventi, kodiċijiet QR tal-links. L-imblukkar ta' mikrofoni u kameras issa japplika wkoll fuq il-pont tal-vidjow, u l-kamra tal-istennija għandha dehra ġdida, inkluża l-pjazza.",
+      "Il-parteċipanti jistgħu jidhru b'laqam jew b'psewdonimu, fejn l-avveniment jippermetti, u f'avvenimenti kbar jew fejn il-pubbliku jisma' biss il-lista tal-parteċipanti tkun moħbija. Mill-ftuħ tal-kamra tal-istennija wieħed jista' jidħol ukoll mingħajr reġistrazzjoni, jekk l-amministrazzjoni tippermetti.",
+      "Il-ħolqien ta' avveniment huwa aktar sempliċi: ftit mistoqsijiet jagħżlu l-valuri tal-bidu, il-programm jitħejja minn qabel, l-inviti jmorru bl-email u avveniment jista' jkun riservat għall-mistiedna. It-titolu u d-deskrizzjoni jiġu tradotti fil-lingwi magħżula, fuq CPU, fejn l-installazzjoni tixgħelu.",
+      "Wara l-avveniment il-paġna tqiegħed l-ewwel il-vidjow bil-lingwi tiegħu, bi slajds sinkronizzati u l-programm bħala indiċi. Fuq talba tal-istaff hemm rapport miktub bl-intelliġenza artifiċjali, glossarju jmexxi traskrizzjonijiet u traduzzjonijiet, u “Agħlaq l-avveniment” jgħid x'fadal isir.",
+      "L-intestatura, il-menus u l-amministrazzjoni jsegwu l-mudelli ta' Designers Italia. Aktar kontrolli awtomatiċi tal-aċċessibbiltà, korrezzjonijiet tas-sigurtà, libreriji aġġornati u Next.js 15.5.29.",
+      "Meta taġġorna: il-komponenti Jitsi jgħaddu għal stable-11031 u ċ-chart jieqaf jekk xi wieħed ikun imqabbad ma' verżjoni oħra; neħħi `jitsi-meet.jibri.custom.other._finalize_sh`; min jissostitwixxi l-konfigurazzjoni ta' Jitsi jrid iżid `config.hiddenFromRecorderFeatureEnabled = true`; Prosody jerġa' jibda; is-sottotitli jkunu mixgħula awtomatikament (`global.captions.enabled`)."
+    ]
+  },
   "0.13.0": {
     "title": "Privatezza aktar sħiħa u traskrizzjonijiet ta' avvenimenti twal",
     "notes": [

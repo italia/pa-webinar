@@ -2,8 +2,8 @@ publiccodeYmlVersion: "0"
 name: PA Webinar
 url: "https://github.com/italia/pa-webinar"
 landingURL: "https://github.com/italia/pa-webinar"
-softwareVersion: "0.13.0"
-releaseDate: "2026-09-28"
+softwareVersion: "0.14.0"
+releaseDate: "2026-11-25"
 developmentStatus: beta
 softwareType: standalone/web
 platforms:

@@ -1,4 +1,18 @@
 {
+  "0.14.0": {
+    "title": "Új terem, élő feliratok, különálló hozzájárulások",
+    "notes": [
+      "Élő feliratok a beszélő nevével, amelyeket maga a telepítés készít CPU-n, külső szolgáltatás nélkül. Egy esemény megőrizheti az átiratát, csak a hozzájárulók mondataival.",
+      "A felvételhez, az átírathoz és a címjegyzékhez külön, önkéntes és előre be nem jelölt hozzájárulás tartozik. Aki elutasítja a felvételt, részt vesz és kimarad belőle, és minden hozzájárulás visszavonható „Az én adataim” alatt. Az esemény előtt megadják, hogy a videó zárt vagy nyilvános lesz, és egy lap elmagyarázza, mi történik az adatokkal.",
+      "A felvett videóban csak a vezetők láthatók: a résztvevőktől, hozzájárulással, a hang kerül bele. A munkatársak eltávolíthatnak valakit egy már felvett videóból, minden esemény megválasztja, meddig őrzi a felvételt, és aki gyorshívásban volt, újra megnézheti.",
+      "Újratervezett terem: összecsukható panelek, Rendezés a vezetőnek, „Szó megadása”, PDF képernyőmegosztás nélkül, beszédidőmérő, linkek QR-kódja. A mikrofonok és kamerák zárolása már a videohídon is érvényes, és a váróterem új külsőt kapott, a térrel együtt.",
+      "A résztvevők becenévvel vagy álnévvel jelenhetnek meg, ahol az esemény engedi, és nagy vagy csak hallgató közönségű eseményeken a résztvevők listája rejtett. A váróterem megnyitásától regisztráció nélkül is be lehet lépni, ha az adminisztráció engedi.",
+      "Egyszerűbb eseményt létrehozni: néhány kérdés kiválasztja a kezdőértékeket, a program előre készül, a meghívók e-mailben mennek, és az esemény meghívottaknak is fenntartható. A cím és a leírás a választott nyelvekre fordítódik, CPU-n, ha a telepítés bekapcsolja.",
+      "Az esemény után az oldal elöl mutatja a videót a nyelveivel, a szinkronizált diákkal és a programmal mint tartalomjegyzékkel. A munkatársak kérésére mesterséges intelligenciával írt beszámoló készül, szójegyzék vezeti az átírást és a fordítást, „Az esemény lezárása” pedig megmondja, mi van hátra.",
+      "A fejléc, a menük és az adminisztráció a Designers Italia mintáit követi. Több automatikus akadálymentességi ellenőrzés, biztonsági javítások, frissített könyvtárak és Next.js 15.5.29.",
+      "Frissítéskor: a Jitsi-összetevők stable-11031-re váltanak, és a chart leáll, ha valamelyik más verzióra van rögzítve; el kell távolítani: `jitsi-meet.jibri.custom.other._finalize_sh`; aki lecseréli a Jitsi beállítását, adja hozzá: `config.hiddenFromRecorderFeatureEnabled = true`; a Prosody újraindul; a feliratok alapból be vannak kapcsolva (`global.captions.enabled`)."
+    ]
+  },
   "0.13.0": {
     "title": "Teljesebb adatvédelem és a hosszú események átiratai",
     "notes": [

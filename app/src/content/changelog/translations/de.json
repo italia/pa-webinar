@@ -1,4 +1,18 @@
 {
+  "0.14.0": {
+    "title": "Neuer Raum, Live-Untertitel, getrennte Einwilligungen",
+    "notes": [
+      "Live-Untertitel mit dem Namen der sprechenden Person, von der Installation selbst auf der CPU erzeugt, ohne externen Dienst. Eine Veranstaltung kann das Transkript behalten, nur mit den Sätzen der Personen, die eingewilligt haben.",
+      "Aufzeichnung, Transkription und Adressbuch haben getrennte, freiwillige und nie vorangekreuzte Einwilligungen. Wer die Aufzeichnung ablehnt, nimmt teil und bleibt ihr fern, und jede Einwilligung lässt sich unter „Meine Daten“ widerrufen. Vor der Veranstaltung wird erklärt, ob das Video intern oder öffentlich sein wird, und ein Blatt beschreibt, was mit den Daten geschieht.",
+      "Im aufgezeichneten Video erscheinen nur die leitenden Personen: von Teilnehmenden, mit Einwilligung, ist nur die Stimme dabei. Das Team kann eine Person aus einem bereits aufgezeichneten Video entfernen, jede Veranstaltung legt fest, wie lange die Aufzeichnung bleibt, und wer an einem Sofortanruf teilnahm, kann ihn erneut ansehen.",
+      "Neu gestalteter Raum: einklappbare Bereiche, Regie für die Leitung, „Wort erteilen“, PDFs zeigen ohne Bildschirmfreigabe, Redezeit-Timer, QR-Codes der Links. Die Sperre von Mikrofonen und Kameras gilt nun auch auf der Videobrücke, und der Warteraum hat ein neues Gesicht, der Platz inbegriffen.",
+      "Teilnehmende können unter einem Spitznamen oder Pseudonym erscheinen, wo die Veranstaltung es vorsieht, und bei großen Veranstaltungen oder solchen, bei denen das Publikum zuhört, ist die Teilnehmerliste verborgen. Ab Öffnung des Warteraums kommt man auch ohne Anmeldung hinein, wenn die Verwaltung es erlaubt.",
+      "Eine Veranstaltung anzulegen ist einfacher: wenige Fragen wählen die Startwerte, das Programm wird vorab vorbereitet, Einladungen gehen per E-Mail hinaus, und eine Veranstaltung kann Eingeladenen vorbehalten sein. Titel und Beschreibung werden auf der CPU in die gewählten Sprachen übersetzt, wo die Installation es vorsieht.",
+      "Nach der Veranstaltung steht auf der Seite das Video in seinen Sprachen oben, mit synchronen Folien und dem Programm als Index. Auf Wunsch des Teams gibt es einen mit künstlicher Intelligenz verfassten Bericht, ein Glossar leitet Transkription und Übersetzungen, und „Veranstaltung abschließen“ sagt, was noch zu tun ist.",
+      "Kopfzeile, Menüs und Verwaltung folgen den Vorlagen von Designers Italia. Mehr automatische Prüfungen der Barrierefreiheit, Sicherheitskorrekturen, aktualisierte Bibliotheken und Next.js 15.5.29.",
+      "Beim Aktualisieren: Die Jitsi-Komponenten wechseln auf stable-11031, und das Chart bricht ab, wenn eine davon auf eine andere Version festgelegt ist; `jitsi-meet.jibri.custom.other._finalize_sh` entfernen; wer die Jitsi-Konfiguration ersetzt, muss `config.hiddenFromRecorderFeatureEnabled = true` ergänzen; Prosody startet neu; Untertitel sind standardmäßig an (`global.captions.enabled`)."
+    ]
+  },
   "0.13.0": {
     "title": "Vollständigerer Datenschutz und Transkripte langer Veranstaltungen",
     "notes": [

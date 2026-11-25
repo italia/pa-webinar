@@ -1,4 +1,18 @@
 {
+  "0.14.0": {
+    "title": "Nova soba, titlovi uživo, odvojene privole",
+    "notes": [
+      "Titlovi uživo s imenom govornika, koje izrađuje sama instalacija na CPU-u, bez vanjskih usluga. Događaj može sačuvati njihov prijepis, samo s rečenicama onih koji su pristali.",
+      "Snimanje, prijepis i adresar imaju odvojene, dobrovoljne i nikad unaprijed označene privole. Tko odbije snimanje, sudjeluje i ostaje izvan njega, a svaka se privola povlači u »Moji podaci«. Prije događaja navodi se hoće li video biti rezerviran ili javan, a list objašnjava što se događa s podacima.",
+      "U snimljenom videu vide se samo voditelji: od sudionika, uz privolu, čuje se glas. Osoblje može ukloniti osobu iz već snimljenog videa, svaki događaj bira koliko dugo čuva snimku, a tko je bio u brzom pozivu može ga ponovno pogledati.",
+      "Preuređena soba: sklopive ploče, Režija za voditelja, »Daj riječ«, PDF bez dijeljenja zaslona, mjerač govora, QR kodovi poveznica. Blokada mikrofona i kamera sada vrijedi i na videomostu, a čekaonica ima novi izgled, uključujući trg.",
+      "Sudionici se mogu pojaviti s nadimkom ili pseudonimom, gdje događaj to predviđa, a u velikim događajima ili onima u kojima publika sluša popis sudionika je skriven. Od otvaranja čekaonice može se ući i bez prijave, ako uprava dopusti.",
+      "Stvoriti događaj jednostavnije je: nekoliko pitanja bira početne vrijednosti, program se priprema unaprijed, pozivnice idu e-poštom, a događaj može biti za pozvane. Naslov i opis prevode se na odabrane jezike, na CPU-u, ako to instalacija uključi.",
+      "Nakon događaja stranica prvo prikazuje video na njegovim jezicima, sa sinkroniziranim slajdovima i programom kao kazalom. Na zahtjev osoblja postoji izvješće napisano umjetnom inteligencijom, rječnik vodi prijepise i prijevode, a »Zatvori događaj« govori što još treba učiniti.",
+      "Zaglavlje, izbornici i upravljanje slijede modele Designers Italia. Više automatskih provjera pristupačnosti, sigurnosni ispravci, ažurirane biblioteke i Next.js 15.5.29.",
+      "Pri nadogradnji: Jitsi komponente prelaze na stable-11031, a chart se zaustavlja ako je neka prikvačena na drugu verziju; ukloniti `jitsi-meet.jibri.custom.other._finalize_sh`; tko zamjenjuje konfiguraciju Jitsija mora dodati `config.hiddenFromRecorderFeatureEnabled = true`; Prosody se ponovno pokreće; titlovi su zadano uključeni (`global.captions.enabled`)."
+    ]
+  },
   "0.13.0": {
     "title": "Potpunija privatnost i transkripti dugih događaja",
     "notes": [

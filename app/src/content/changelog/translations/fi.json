@@ -1,4 +1,18 @@
 {
+  "0.14.0": {
+    "title": "Uusi sali, live-tekstitys, erilliset suostumukset",
+    "notes": [
+      "Live-tekstitys puhujan nimellä, jonka asennus tuottaa itse CPU:lla ilman ulkoisia palveluja. Tapahtuma voi säilyttää tekstityksen litteroinnin, jossa on vain suostumuksen antaneiden lauseet.",
+      "Tallenteella, litteroinnilla ja osoitekirjalla on erilliset, vapaaehtoiset ja koskaan valmiiksi rastittamattomat suostumukset. Tallennuksen kieltänyt osallistuu ja jää sen ulkopuolelle, ja jokaisen suostumuksen voi peruuttaa kohdassa ”Omat tietoni”. Ennen tapahtumaa ilmoitetaan, onko video rajattu vai julkinen, ja tietosuojaseloste kertoo, mitä tiedoille tapahtuu.",
+      "Tallennetussa videossa näkyvät vain vetäjät: osallistujilta mukana on suostumuksella ääni. Henkilöstö voi poistaa henkilön jo tallennetusta videosta, jokainen tapahtuma valitsee tallenteen säilytysajan, ja pikapuhelussa ollut voi katsoa sen uudelleen.",
+      "Uudistettu sali: kokoontaitettavat paneelit, Ohjaamo vetäjälle, ”Anna puheenvuoro”, PDF:n esittäminen ilman näytön jakamista, puheaikalaskuri, linkkien QR-koodit. Mikrofonien ja kameroiden lukitus toimii nyt myös videosillalla, ja odotushuone on uudistettu aukio mukaan lukien.",
+      "Osallistujat voivat esiintyä lempinimellä tai salanimellä, missä tapahtuma sen sallii, ja suurissa tai yleisön kuuntelemissa tapahtumissa osallistujaluettelo on piilotettu. Odotushuoneen avauduttua voi tulla sisään ilmoittautumatta, jos hallinto sallii sen.",
+      "Tapahtuman luominen on helpompaa: muutama kysymys valitsee lähtöarvot, ohjelma valmistellaan etukäteen, kutsut lähtevät sähköpostitse ja tapahtuman voi rajata kutsutuille. Otsikko ja kuvaus käännetään valituille kielille CPU:lla, kun asennus on ottanut sen käyttöön.",
+      "Tapahtuman jälkeen sivu näyttää ensin videon kielineen, synkronoidut diat ja ohjelman hakemistona. Henkilöstön pyynnöstä saa tekoälyn kirjoittaman raportin, sanasto ohjaa litterointia ja käännöksiä, ja ”Päätä tapahtuma” kertoo, mitä on vielä tehtävä.",
+      "Ylätunniste, valikot ja hallinta noudattavat Designers Italian malleja. Lisää automaattisia saavutettavuustarkistuksia, tietoturvakorjauksia, päivitettyjä kirjastoja ja Next.js 15.5.29.",
+      "Päivittäjälle: Jitsin osat siirtyvät versioon stable-11031, ja chart pysähtyy, jos jokin on kiinnitetty toiseen versioon; poista `jitsi-meet.jibri.custom.other._finalize_sh`; Jitsin määrityksen korvaavan on lisättävä `config.hiddenFromRecorderFeatureEnabled = true`; Prosody käynnistyy uudelleen; tekstitys on oletuksena päällä (`global.captions.enabled`)."
+    ]
+  },
   "0.13.0": {
     "title": "Kattavampi yksityisyydensuoja ja pitkien tapahtumien litteroinnit",
     "notes": [

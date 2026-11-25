@@ -1,4 +1,18 @@
 {
+  "0.14.0": {
+    "title": "Nova sala, legendas em direto, consentimentos separados",
+    "notes": [
+      "Legendas em direto com o nome de quem fala, geradas pela própria instalação em CPU, sem serviços externos. Um evento pode conservar a transcrição, apenas com as frases de quem consentiu.",
+      "A gravação, a transcrição e a agenda de contactos têm consentimentos separados, facultativos e nunca pré-marcados. Quem recusa a gravação participa e fica fora dela, e cada consentimento pode ser retirado em «Os meus dados». Antes do evento declara-se se o vídeo será reservado ou público, e uma ficha explica o que acontece aos dados.",
+      "No vídeo gravado aparece apenas quem conduz: dos participantes, com consentimento, entra a voz. A equipa pode retirar uma pessoa de um vídeo já gravado, cada evento escolhe por quanto tempo guarda a gravação, e quem esteve numa chamada instantânea pode voltar a vê-la.",
+      "Sala redesenhada: painéis recolhíveis, Régie para quem conduz, «Dar a palavra», PDF apresentados sem partilhar o ecrã, temporizador das intervenções, códigos QR das ligações. O bloqueio de microfones e câmaras vale também na ponte de vídeo, e a sala de espera tem novo aspeto, praça incluída.",
+      "Os participantes podem aparecer com uma alcunha ou um pseudónimo, onde o evento o preveja, e nos eventos numerosos ou em que o público ouve a lista de participantes fica oculta. Desde a abertura da sala de espera pode entrar-se sem inscrição, se a administração o permitir.",
+      "Criar um evento é mais simples: poucas perguntas escolhem os valores iniciais, o programa prepara-se antes, os convites seguem por email e um evento pode ser reservado aos convidados. O título e a descrição são traduzidos para as línguas escolhidas, em CPU, onde a instalação o prevê.",
+      "Depois do evento, a página dá destaque ao vídeo nas suas línguas, com os diapositivos sincronizados e o programa como índice. A pedido da equipa há um relatório redigido com inteligência artificial, um glossário orienta transcrições e traduções, e «Encerrar o evento» diz o que falta fazer.",
+      "O cabeçalho, os menus e a administração seguem os modelos da Designers Italia. Mais verificações automáticas de acessibilidade, correções de segurança, bibliotecas atualizadas e Next.js 15.5.29.",
+      "Ao atualizar: os componentes Jitsi passam a stable-11031 e o chart para se algum estiver fixado noutra versão; retirar `jitsi-meet.jibri.custom.other._finalize_sh`; quem substitui a configuração do Jitsi deve acrescentar `config.hiddenFromRecorderFeatureEnabled = true`; o Prosody reinicia; as legendas estão ligadas de origem (`global.captions.enabled`)."
+    ]
+  },
   "0.13.0": {
     "title": "Privacidade mais completa e transcrições de eventos longos",
     "notes": [
